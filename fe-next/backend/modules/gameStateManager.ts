@@ -666,8 +666,8 @@ export {
   initCacheInvalidation, shutdownCacheInvalidation
 };
 
-// CommonJS exports (re-use ESM exports to avoid duplication)
-const cjsExports = {
+// Default export for tests and legacy CommonJS-style imports
+export default {
   createGame, getGame, getGameAsync, updateGame, deleteGame, gameExists, getGameCount, getAllGameCodes, forEachGame,
   addUserToGame, removeUserFromGame, removeUserBySocketId, getGameBySocketId, getUsernameBySocketId,
   getSocketIdByUsername, getUserBySocketId, updateUserSocketId, updateUsernameMapping, getGameUsers,
@@ -687,19 +687,9 @@ const cjsExports = {
   initCacheInvalidation, shutdownCacheInvalidation
 };
 
-Object.defineProperty(cjsExports, 'games', {
-  get() {
-    if (process.env.NODE_ENV !== 'test') throw new Error('[gameStateManager] Direct access to games object is not allowed.');
-    return games;
-  }
-});
-
-module.exports = cjsExports;
-
 // Expose game query helpers on globalThis so integration tests can access
 // the same module instance used by handlers (avoids Vitest dual-specifier issues).
 // Test-only — production bundles must not leak game-state surface.
 if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
-
   (globalThis as any).__gameStateManager = { gameExists, getGame, clearAllGames };
 }

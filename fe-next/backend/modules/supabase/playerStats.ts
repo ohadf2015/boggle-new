@@ -421,8 +421,3 @@ export async function updatePlayerStats(
   }
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  updatePlayerStats,
-  ensureProfileExists,
-};

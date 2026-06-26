@@ -41,12 +41,3 @@ export { getTokenUsage, resetTokenUsage } from './ai/index.js';
 // Re-export main service
 export { GameAIService, gameAIService } from './ai/index.js';
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  gameAIService: require('./ai/gameAIService.js').gameAIService,
-  GameAIService: require('./ai/gameAIService.js').GameAIService,
-  getTokenUsage: require('./ai/tokenTracker.js').getTokenUsage,
-  resetTokenUsage: require('./ai/tokenTracker.js').resetTokenUsage,
-  getCacheStats: require('./ai/cache.js').getCacheStats,
-  clearCache: require('./ai/cache.js').clearCache,
-};

@@ -227,9 +227,3 @@ export async function validateWordsWithAI(words: string[], language: string = 'e
   }
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  isAIServiceAvailable,
-  validateWordWithAI,
-  validateWordsWithAI
-};

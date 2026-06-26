@@ -330,12 +330,3 @@ export async function notifyGameStarted(data: RoomEventData): Promise<void> {
   return sendNotification('game_started', data);
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  isNotificationsEnabled,
-  isDiscordConfigured,
-  isTelegramConfigured,
-  notifyRoomCreated,
-  notifyPlayerJoined,
-  notifyGameStarted
-};

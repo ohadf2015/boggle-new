@@ -98,8 +98,3 @@ export async function updateGuestStats(tokenHash: string, gameStats: GameStats):
   return { data, error };
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  getOrCreateGuestToken,
-  updateGuestStats,
-};

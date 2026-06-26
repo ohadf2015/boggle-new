@@ -260,19 +260,3 @@ export function getPeerValidationStats(game: PeerValidationGameBase | null): Pee
   };
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  // AI word tracking
-  trackAiApprovedWord,
-  trackBotWord,
-
-  // Peer validation
-  selectWordForPeerValidation,
-  recordPeerValidationVote,
-  getPeerValidationWord,
-  removePeerRejectedWordScore,
-  resetPeerValidation,
-
-  // Statistics
-  getPeerValidationStats,
-};

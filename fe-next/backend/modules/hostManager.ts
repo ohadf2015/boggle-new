@@ -140,11 +140,3 @@ export function isHostValid(game: HostGameBase | null): boolean {
   return true;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  getNextEligibleHost,
-  transferHost,
-  canBecomeHost,
-  getCurrentHost,
-  isHostValid,
-};

@@ -434,20 +434,3 @@ export async function submitBotWord(
   logger.debug('BOT', `Bot "${bot.username}" submitted "${word}" (score: ${score}, combo: ${bot.comboLevel})`);
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  // Word preparation
-  prepareBotWords,
-  orderWordPoolByFrequencyBand,
-  MIN_CORPUS_FOR_BANDING,
-  generateWrongWords,
-
-  // Timing
-  calculateNextDelay,
-
-  // Word submission
-  submitBotWord,
-
-  // Cache management (re-exported from botBehaviorCache)
-  ...require('./botBehaviorCache'),
-};

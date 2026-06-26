@@ -766,15 +766,3 @@ export const LIFETIME_ACHIEVEMENT_THRESHOLDS: Record<string, LifetimeThreshold> 
   LOYAL_PLAYER: { stat: 'uniqueDaysPlayed', threshold: 30 },
 };
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  ACHIEVEMENTS,
-  ACHIEVEMENT_ICONS,
-  getLocalizedAchievements,
-  checkLiveAchievements,
-  awardFinalAchievements,
-  checkLifetimeAchievements,
-  LIFETIME_ACHIEVEMENT_THRESHOLDS,
-  checkAndAwardAchievements,
-  getPlayerAchievements
-};

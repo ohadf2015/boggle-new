@@ -266,14 +266,3 @@ export function setTournamentIdForGame(
   return true;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  getAllGames,
-  getDetailedGames,
-  getActiveRooms,
-  isRoomEmpty,
-  getEmptyRooms,
-  getStaleGameCodes,
-  getTournamentIdFromGame,
-  setTournamentIdForGame,
-};

@@ -525,15 +525,8 @@ export const CACHE_CONFIG = {
   BLACKLIST_TTL: 10 * 60 * 1000,           // 10 minutes
 } as const;
 
-// CommonJS exports for backward compatibility (server-only).
-// Bare `module.exports = ...` leaks into client chunks under Turbopack and throws
-// `ReferenceError: module is not defined` in the browser (Sentry JAVASCRIPT-NEXTJS-13J/13H,
-// chain: OnboardingFlow → QuickProfileSetup → onboardingNameSuggestions → BOT_CONFIG).
-// The typeof guard is a no-op in the browser (branch skipped, `module` never read)
-// while preserving the CJS-replace shape that backend `require('./botConfig')` consumers expect.
-if (typeof module !== 'undefined' && typeof module === 'object') {
-  module.exports = {
-    BOT_CONFIG,
-    CACHE_CONFIG,
-  };
-}
+// Default export for backward compatibility
+export default {
+  BOT_CONFIG,
+  CACHE_CONFIG,
+};

@@ -493,39 +493,3 @@ export function cleanupStaleAuthConnections(activeGameCodes: Set<string>): numbe
 
 // Test-only named exports for internal maps
 export { socketToGame as _socketToGame, socketToUsername as _socketToUsername, usernameToSocket as _usernameToSocket, authUserConnections as _authUserConnections };
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  // User CRUD
-  addUserToGame,
-  removeUserFromGame,
-  removeUserBySocketId,
-  getGameBySocketId,
-  getUsernameBySocketId,
-  getSocketIdByUsername,
-  getUserBySocketId,
-  updateUserSocketId,
-  updateUsernameMapping,
-  getGameUsers,
-
-  // Host management
-  isHost,
-  updateHostSocketId,
-
-  // Auth user tracking
-  getAuthUserConnection,
-  setAuthUserConnection,
-  removeAuthUserConnection,
-  clearSocketMappings,
-  clearSocketMappingsForLeave,
-  cleanupUserMappings,
-  cleanupStaleAuthConnections,
-  getSocketMapSizes,
-  purgeStaleSocketEntries,
-
-  // Expose maps for testing
-  _socketToGame: socketToGame,
-  _socketToUsername: socketToUsername,
-  _usernameToSocket: usernameToSocket,
-  _authUserConnections: authUserConnections,
-};

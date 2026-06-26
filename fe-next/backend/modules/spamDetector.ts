@@ -376,10 +376,3 @@ export const spamDetector = new SpamDetector({
   penaltyPoints: parseInt(process.env.SPAM_PENALTY_POINTS || PENALTY_POINTS.toString())
 });
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  SpamDetector,
-  spamDetector,
-  PenaltyTier,
-  InvalidReason
-};

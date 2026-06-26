@@ -90,11 +90,3 @@ export function removePlayerFromReadyList(
   delete game.playersReadyForNextGame[username];
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  markPlayerReadyForNextGame,
-  getPlayersReadyCount,
-  isPlayerReadyForNextGame,
-  clearPlayersReadyForNextGame,
-  removePlayerFromReadyList,
-};

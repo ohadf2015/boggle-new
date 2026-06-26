@@ -16,16 +16,16 @@
 
 import type { Server, Socket } from 'socket.io';
 
-const {
+import {
   registerAllHandlers,
   startConnectionHealthCheck,
   MAX_PLAYERS_PER_ROOM
-} = require('./handlers');
+} from './handlers';
 
-const { loadCommunityWords } = require('./modules/communityWordManager');
-const { cleanupEmptyRooms } = require('./modules/gameStateManager');
-const { startBlockListAutoRefresh } = require('./modules/blockListManager');
-const { initRateLimit, resetRateLimit, isIpBlocked, isIpBlockedAsync, RateLimiter } = require('./utils/rateLimiter');
+import { loadCommunityWords } from './modules/communityWordManager';
+import { cleanupEmptyRooms } from './modules/gameStateManager';
+import { startBlockListAutoRefresh } from './modules/blockListManager';
+import { initRateLimit, resetRateLimit, isIpBlocked, isIpBlockedAsync, RateLimiter } from './utils/rateLimiter';
 import logger from './utils/logger';
 
 // Track cleanup timer for graceful shutdown
@@ -133,11 +133,3 @@ function stopEmptyRoomCleanup(): void {
 // Named exports for TypeScript compatibility
 export { initializeSocketHandlers, stopEmptyRoomCleanup };
 export { MAX_PLAYERS_PER_ROOM };
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  initializeSocketHandlers,
-  stopEmptyRoomCleanup,
-  MAX_PLAYERS_PER_ROOM,
-  handlers: require('./handlers'),
-};

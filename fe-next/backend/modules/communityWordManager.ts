@@ -342,17 +342,3 @@ export async function getWordStats(word: string, language: string): Promise<Word
   } catch { return { likes: 0, dislikes: 0, netScore: 0, isValid: false }; }
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  loadCommunityWords, isWordCommunityValid, addToCommunityCache, removeFromCommunityCache,
-  recordVote, recordAIVote, collectNonDictionaryWords, getWordForPlayer, getWordsForPlayer,
-  updatePendingCache, hasUserVoted, getWordStats, getWordValidationInfo, isWordValidForScoring,
-  SELF_HEALING_CONFIG: require('./communityWordHybridValidation').SELF_HEALING_CONFIG,
-  AI_VOTE_POINTS, PROMINENT_THRESHOLD, VALID_THRESHOLD,
-  shouldUseAIValidation: require('./communityWordHybridValidation').shouldUseAIValidation,
-  recordAIValidationUsed: require('./communityWordHybridValidation').recordAIValidationUsed,
-  getRemainingAIValidations: require('./communityWordHybridValidation').getRemainingAIValidations,
-  filterWordsForAIValidation: require('./communityWordHybridValidation').filterWordsForAIValidation,
-  resetGameAIValidationCount: require('./communityWordHybridValidation').resetGameAIValidationCount,
-  cleanupGameTracking: require('./communityWordHybridValidation').cleanupGameTracking
-};

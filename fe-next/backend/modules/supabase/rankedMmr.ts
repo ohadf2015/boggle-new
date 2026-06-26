@@ -172,8 +172,3 @@ export async function fetchRankedBaselines(
   return result;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  updateRankedMmr,
-  fetchRankedBaselines,
-};

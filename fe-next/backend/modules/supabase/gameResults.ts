@@ -53,7 +53,3 @@ export async function recordGameResult(result: GameResultInput): Promise<{ data:
   }
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  recordGameResult,
-};

@@ -69,8 +69,3 @@ export async function updateRankedProgress(playerId: string): Promise<{ data: un
   return { data, error };
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  updateLeaderboardEntry,
-  updateRankedProgress,
-};

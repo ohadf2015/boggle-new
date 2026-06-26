@@ -277,21 +277,3 @@ export function reactivateHost(game: PresenceGameBase | null): boolean {
   return true;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  // Presence tracking
-  updateUserPresence,
-  updateUserHeartbeat,
-  checkUserConnectionHealth,
-  markUserActivity,
-  getPresenceConfig,
-  getUsersWithPresence,
-  isUserDisconnected,
-
-  // Host presence
-  markHostActive,
-  reactivateHost,
-
-  // Export config for reference
-  PRESENCE_CONFIG,
-};

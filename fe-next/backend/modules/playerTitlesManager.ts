@@ -251,7 +251,3 @@ export function calculatePlayerTitles(
   return assignedTitles;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  calculatePlayerTitles
-};

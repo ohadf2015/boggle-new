@@ -469,26 +469,3 @@ export function isFirstFinder(
   return firstFinder.username === username;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  // Word management
-  addPlayerWord,
-  playerHasWord,
-
-  // Score management
-  updatePlayerScore,
-
-  // Leaderboard
-  getLeaderboard,
-  getLeaderboardThrottled,
-  clearLeaderboardThrottle,
-
-  // Reset
-  resetScoresForNewRound,
-  registerActiveGamesProvider,
-
-  // First-finder tracking (for first-to-find scoring)
-  getFirstFinder,
-  recordFirstFinder,
-  isFirstFinder,
-};

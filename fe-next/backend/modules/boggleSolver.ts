@@ -526,17 +526,3 @@ export function getSolverCacheStats(): SolverCacheStats {
   };
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  findAllWords,
-  findWordsForBots,
-  getWordPath,
-  buildTrie,
-  getTrieNode,
-  shuffleArray,
-  isSolidWord,
-  // Cache management
-  clearSolverCaches,
-  getSolverCacheStats,
-  getCachedTrie
-};

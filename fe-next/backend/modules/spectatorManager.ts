@@ -137,12 +137,3 @@ export function getSpectatorCount(game: SpectatorGameBase | null): number {
   return Object.keys(game.spectators).length;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  addSpectatorToGame,
-  removeSpectatorFromGame,
-  getGameSpectators,
-  upgradeSpectatorToPlayer,
-  isSpectator,
-  getSpectatorCount,
-};

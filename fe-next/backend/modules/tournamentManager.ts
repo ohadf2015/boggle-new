@@ -492,21 +492,3 @@ export async function restoreTournamentsFromRedis(): Promise<void> {
 // Export tournaments object for direct access
 export { tournaments };
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  tournaments,
-  generateTournamentId,
-  createTournament,
-  addPlayerToTournament,
-  addPlayerMidTournament,
-  removePlayerFromTournament,
-  startTournamentRound,
-  completeTournamentRound,
-  completeTournament,
-  getTournament,
-  getTournamentStandings,
-  deleteTournament,
-  getActiveTournaments,
-  linkGameToTournament,
-  restoreTournamentsFromRedis,
-};

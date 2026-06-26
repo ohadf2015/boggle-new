@@ -224,10 +224,3 @@ export function calculateGameScores(
   return results;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  calculateWordScore,
-  calculateGameScores,
-  getComboBonus,
-  getComboMultiplier // Legacy, kept for backwards compatibility
-};

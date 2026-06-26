@@ -310,7 +310,3 @@ export async function processGameResults(
   return { xpResults, lifetimeAchievements };
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  processGameResults,
-};

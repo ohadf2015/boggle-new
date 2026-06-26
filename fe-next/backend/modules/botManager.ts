@@ -12,7 +12,6 @@
  */
 
 import type { LetterGrid, Language } from '@/shared/types/game';
-import type { Bot, WordSubmissionData } from './botBehavior';
 import {
   createBot,
   generateBotId as _generateBotId,
@@ -21,23 +20,25 @@ import {
   type GameUser,
 } from './botCreation';
 import { startBot as _startBot, stopBot as _stopBot } from './botLifecycle';
-
-const botConfig = require('./botConfig');
-export const BOT_CONFIG = botConfig.BOT_CONFIG;
-
-const {
+import { BOT_CONFIG } from './botConfig';
+import {
   prepareBotWords,
   cleanupPlayerWordsCache,
   clearBehaviorCaches,
   getCacheStats,
   addWordToBlacklist,
-} = require('./botBehavior');
+  type Bot,
+  type WordSubmissionData,
+} from './botBehavior';
 import { getRecentGames } from '../services/playerGameHistory';
 import { calculatePlayerLevel, selectBotDifficulty } from '../services/adaptiveDifficulty';
 import logger from '../utils/logger';
 
 // Re-export types
 export type { Bot, WordSubmissionData };
+
+// Re-export configuration
+export { BOT_CONFIG };
 
 // Re-export creation utilities
 export {
@@ -53,6 +54,9 @@ export { startBot, stopBot, resyncBotsForNewGrid } from './botLifecycle';
 
 // Re-export blacklist management
 export { addWordToBlacklist };
+
+// Re-export behavior cache management (imported from botBehavior)
+export { prepareBotWords, cleanupPlayerWordsCache };
 
 // ==========================================
 // Interfaces
@@ -88,7 +92,7 @@ const gameBots = new Map<string, Map<string, Bot>>();
 // Bot Management CRUD
 // ==========================================
 
-function initializeGameBots(gameCode: string): Map<string, Bot> {
+export function initializeGameBots(gameCode: string): Map<string, Bot> {
   if (!gameBots.has(gameCode)) {
     gameBots.set(gameCode, new Map());
   }
@@ -297,32 +301,3 @@ export function clearBotManagerCaches(): void {
   clearBehaviorCaches();
 }
 
-// ==========================================
-// CommonJS exports for backward compatibility
-// ==========================================
-
-module.exports = {
-  addBot,
-  addBotWithAdaptiveDifficulty,
-  restoreBotFromUser,
-  removeBot,
-  getGameBots,
-  getBotByUsername,
-  isBot,
-  initializeGameBots,
-  prepareBotWords,
-  startBot: _startBot,
-  stopBot: _stopBot,
-  stopAllBots,
-  cleanupGameBots,
-  resetBotCombo,
-  resetBotsForNewRound,
-  getBotStats,
-  getBotManagerStats,
-  clearBotManagerCaches,
-  cleanupPlayerWordsCache,
-  addWordToBlacklist,
-  generateRandomPlayerName: require('./botCreation').generateRandomPlayerName,
-  getRandomGenericAvatar: require('./botCreation').getRandomGenericAvatar,
-  BOT_CONFIG,
-};

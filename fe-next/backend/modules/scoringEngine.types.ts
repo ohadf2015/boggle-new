@@ -189,9 +189,3 @@ export function calculateGameScores(
 // Exports (CommonJS compatible)
 // ==========================================
 
-module.exports = {
-  calculateWordScore,
-  calculateGameScores,
-  getComboBonus,
-  getComboMultiplier,
-};

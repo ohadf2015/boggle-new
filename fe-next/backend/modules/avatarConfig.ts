@@ -74,13 +74,3 @@ export function getValidAvatarId(id: string | undefined | null): string {
   return getRandomAvatar().id;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  AVATARS,
-  PROFILE_AVATAR_ID,
-  getAvatarById,
-  getRandomAvatar,
-  getAvatarPath,
-  isValidAvatarId,
-  getValidAvatarId,
-};

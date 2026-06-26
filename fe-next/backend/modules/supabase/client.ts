@@ -225,9 +225,3 @@ export interface LifetimeAchievement {
   icon: string;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  getSupabase,
-  isSupabaseConfigured,
-  getConnectionMetrics,
-};

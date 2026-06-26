@@ -193,17 +193,3 @@ export function isWordOnBoard(
 // Alias for backwards compatibility with socketHandlers.js
 export const validateWordOnBoard = isWordOnBoard;
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  normalizeHebrewLetter,
-  normalizeHebrewWord,
-  normalizeSpanishLetter,
-  normalizeSpanishWord,
-  normalizeLetterForLanguage,
-  normalizeWordForLanguage,
-  isWordOnBoard,
-  makePositionsMap,
-  getWordPath,
-  // Alias for backwards compatibility with socketHandlers.js
-  validateWordOnBoard: isWordOnBoard
-};

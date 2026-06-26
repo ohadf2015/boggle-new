@@ -236,11 +236,3 @@ export async function recordPlayerWrongWord(
   }
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  saveHostApprovedWord,
-  savePlayerWord,
-  getPopularPlayerWords,
-  incrementBotWordUsage,
-  recordPlayerWrongWord,
-};

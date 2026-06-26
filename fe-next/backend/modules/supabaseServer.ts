@@ -15,6 +15,3 @@
 
 // Re-export all types and functions from the modular structure
 export * from './supabase';
-
-// CommonJS exports for backward compatibility
-module.exports = require('./supabase');
