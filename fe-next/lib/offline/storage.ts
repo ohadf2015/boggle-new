@@ -35,9 +35,13 @@ async function getSqlJs(): Promise<SqlJsStatic> {
   if (sqlJsModule) return sqlJsModule;
   const isNode = typeof process !== 'undefined' && !!process.versions?.node;
   if (isNode) {
-    const { readFileSync } = await import('node:fs');
-    const { fileURLToPath } = await import('node:url');
-    const pathMod = await import('node:path');
+    // Node-only branch (SSR / tests) — reads the sql.js WASM from disk. Dead in the
+    // browser (gated by isNode). The ignore comments stop bundlers from trying to
+    // resolve the node: builtins into the client graph (webpack errors on the
+    // node: scheme; turbopack stubs it). Keeps a webpack prod build buildable.
+    const { readFileSync } = await import(/* webpackIgnore: true */ /* turbopackIgnore: true */ 'node:fs');
+    const { fileURLToPath } = await import(/* webpackIgnore: true */ /* turbopackIgnore: true */ 'node:url');
+    const pathMod = await import(/* webpackIgnore: true */ /* turbopackIgnore: true */ 'node:path');
     const here = pathMod.dirname(fileURLToPath(import.meta.url));
     const wasmPath = pathMod.resolve(here, '../../node_modules/sql.js/dist/sql-wasm.wasm');
     const fileBuffer = readFileSync(wasmPath);
