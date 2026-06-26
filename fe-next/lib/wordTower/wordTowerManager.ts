@@ -18,7 +18,6 @@ import {
   WORD_TOWER_MIN_WORD_LEN,
   WORD_TOWER_SCRAMBLES_START,
   WORD_TOWER_SCRAMBLES_MAX_BANKED,
-  WORD_TOWER_SCRAMBLE_EARN_EVERY_M,
   WORD_TOWER_BASE_FLOOR_M,
   WORD_TOWER_LENGTH_BONUS_M,
   WORD_TOWER_COMBO_STEP,
@@ -362,17 +361,14 @@ export function applyTowerWord(
   const heightBefore = state.heightM;
   const heightM = heightBefore + meters;
 
-  // Earn scrambles only for NEW altitude above the run's high-water mark, so a
-  // hazard knockback + re-climb can't repeatedly farm the same 25m boundary.
-  const earnBase = Math.max(heightBefore, state.heightHighWaterM);
-  const earned = Math.max(
-    0,
-    Math.floor(heightM / WORD_TOWER_SCRAMBLE_EARN_EVERY_M) -
-      Math.floor(earnBase / WORD_TOWER_SCRAMBLE_EARN_EVERY_M),
-  );
+  // Founder 2026-06-26: a new wheel is no longer FREE income from climbing —
+  // climbing no longer rains scrambles. They are now EARNED bonuses (surprises /
+  // wreck-compensation) or BOUGHT with coins (handled in the UI via coinManager).
+  // So the only auto-grant left here is a surprise's bonus scrambles.
+  const earned = 0;
   const scramblesLeft = Math.min(
     WORD_TOWER_SCRAMBLES_MAX_BANKED,
-    state.scramblesLeft + earned + surprise.bonusScrambles,
+    state.scramblesLeft + surprise.bonusScrambles,
   );
 
   // The wheel is REUSED — letters are not consumed, so the ring stays put. The
@@ -418,17 +414,25 @@ export function applyTowerWord(
   };
 }
 
-/** Spin a fresh wheel. Costs one scramble and breaks the combo. */
-export function scrambleTray(state: WordTowerPlayerState): WordTowerPlayerState {
-  if (state.scramblesLeft <= 0) return state;
+/**
+ * Re-spin the wheel after the caller has already PAID for it (a coin purchase,
+ * handled in the UI via coinManager). Breaks the combo (the price of a fresh
+ * ring) but does NOT require or spend a banked bonus scramble. Pure.
+ */
+export function spinWheelPaid(state: WordTowerPlayerState): WordTowerPlayerState {
   const tray = generateWheel(state.gameCode, state.playerId, state.language, state.trayDraws);
   return {
     ...state,
     tray,
     trayDraws: state.trayDraws + 1,
-    scramblesLeft: state.scramblesLeft - 1,
     combo: 0,
   };
+}
+
+/** Spin a fresh wheel using a banked BONUS scramble (no-op if none left). */
+export function scrambleTray(state: WordTowerPlayerState): WordTowerPlayerState {
+  if (state.scramblesLeft <= 0) return state;
+  return { ...spinWheelPaid(state), scramblesLeft: state.scramblesLeft - 1 };
 }
 
 /**

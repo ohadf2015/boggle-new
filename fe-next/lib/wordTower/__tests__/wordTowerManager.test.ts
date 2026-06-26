@@ -20,6 +20,7 @@ import {
   validateTowerWord,
   applyTowerWord,
   scrambleTray,
+  spinWheelPaid,
   serializeWordTowerState,
   restoreWordTowerState,
   WORD_TOWER_SAVE_VERSION,
@@ -218,21 +219,37 @@ describe('wordTowerManager — apply', () => {
     expect(noArg).toBeCloseTo(explicitOne);
   });
 
-  it('earns a scramble when crossing the meter threshold', () => {
+  it('does NOT earn scrambles from climbing (founder 2026-06-26: bonus/buy only)', () => {
     const s = freshState();
     s.heightM = WORD_TOWER_SCRAMBLE_EARN_EVERY_M - 1; // 24m, one floor crosses 25m
     const before = s.scramblesLeft;
-    const { state } = applyTowerWord(s, 'cat');
-    expect(state.scramblesLeft).toBe(before + 1);
+    const { state, result } = applyTowerWord(s, 'cat');
+    expect(state.scramblesLeft).toBe(before); // climbing no longer refills
+    expect(result.scramblesEarned).toBe(0);
   });
 
-  it('scrambleTray spins a fresh wheel, spends a scramble, and breaks the combo', () => {
+  it('scrambleTray spends a banked BONUS scramble, spins a fresh wheel, breaks combo', () => {
     const s = freshState();
     s.combo = 4;
     const before = s.scramblesLeft;
     const next = scrambleTray(s);
     expect(next.scramblesLeft).toBe(before - 1);
     expect(next.combo).toBe(0);
+    expect(next.tray).toHaveLength(WORD_TOWER_WHEEL_SIZE);
+  });
+
+  it('scrambleTray is a no-op when no bonus scrambles are banked', () => {
+    const s = { ...freshState(), scramblesLeft: 0, combo: 3 };
+    const next = scrambleTray(s);
+    expect(next).toBe(s); // unchanged reference — combo preserved, no spin
+  });
+
+  it('spinWheelPaid (coin-bought) spins a fresh wheel + breaks combo WITHOUT spending a bonus', () => {
+    const s = { ...freshState(), scramblesLeft: 0, combo: 5 };
+    const next = spinWheelPaid(s);
+    expect(next.scramblesLeft).toBe(0); // the coin was the price, not a banked scramble
+    expect(next.combo).toBe(0);
+    expect(next.trayDraws).toBe(s.trayDraws + 1);
     expect(next.tray).toHaveLength(WORD_TOWER_WHEEL_SIZE);
   });
 

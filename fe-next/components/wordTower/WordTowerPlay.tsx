@@ -16,7 +16,7 @@ import {
   serializeWordTowerState,
   type WordTowerPlayerState,
 } from '@/lib/wordTower/wordTowerManager';
-import { WORD_TOWER_MIN_WORD_LEN, WORD_TOWER_BIOMES } from '@/shared/constants/wordTowerConstants';
+import { WORD_TOWER_MIN_WORD_LEN, WORD_TOWER_BIOMES, WORD_TOWER_SCRAMBLE_COIN_COST } from '@/shared/constants/wordTowerConstants';
 import { countBuildableWords, pickClueWord } from '@/lib/wordTower/wordHints';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import { WordTowerRivalRail } from './WordTowerRivalRail';
@@ -61,7 +61,7 @@ import { WordTowerHud } from './WordTowerHud';
 import { WordTowerStatHud } from './WordTowerStatHud';
 import { getTowerArchitectTier } from '@/lib/wordTower/architectTier';
 import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
-import { addCoins } from '@/utils/coinManager';
+import { addCoins, getCoins, spendCoins } from '@/utils/coinManager';
 import {
   rollTowerReward,
   nextDryStreak,
@@ -154,6 +154,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // closure snapshot.
   const gameRef = useRef(game);
   gameRef.current = game;
+
+  // Live coin balance mirror — coinManager is a plain (server-synced) store with
+  // no reactive hook, so we mirror it locally (same pattern as the upgrade panel)
+  // and refresh after any grant/spend. Powers the scramble button's buy state.
+  const [coinBalance, setCoinBalance] = useState(() => getCoins());
   const biomeId = useMemo(() => biomeForHeight(game.heightM), [game.heightM]);
   const architectTier = useMemo(() => getTowerArchitectTier(game.floors), [game.floors]);
   const personalBest = Math.max(personalBestM, game.heightM);
@@ -263,6 +268,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       const rewardMult = useTowerUpgradeStore.getState().effects().rewardMult;
       const coins = Math.round(reward.coins * rewardMult);
       addCoins(coins, `wordtower_${source}`, { id });
+      setCoinBalance(getCoins());
       setRewardFx({ coins, tier: reward.tier, source, key: Date.now() });
       playCoinCollectSound();
     },
@@ -763,6 +769,20 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
   const selectTileHaptic = useCallback((i: number) => { haptics.selection(); tower.selectTile(i); }, [haptics, tower]);
 
+  // Scramble = a fresh wheel. Founder 2026-06-26: it's no longer free-on-tap —
+  // spend a banked BONUS scramble first (earned from surprises / wreck-comp), and
+  // once those run out, BUY a spin with coins. The 0-words-possible reroll stays
+  // free (onReroll, the soft-lock escape). The button is disabled when broke, so
+  // a fired tap here always has a banked scramble or affordable coins.
+  const handleScramble = useCallback(() => {
+    if (gameRef.current.scramblesLeft > 0) { haptics.selection(); tower.scramble(); return; }
+    if (spendCoins(WORD_TOWER_SCRAMBLE_COIN_COST, 'wordtower_scramble')) {
+      setCoinBalance(getCoins());
+      haptics.success();
+      tower.scramblePaid();
+    }
+  }, [haptics, tower]);
+
   const shareTower = useCallback(async () => {
     const g = gameRef.current;
     const params = new URLSearchParams({
@@ -1038,7 +1058,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* Hazard "tower ruined" banner — bold + red so the loss is unmissable */}
       {hazardR.value && (
         <div
-          className={`pointer-events-none absolute left-1/2 top-[15%] z-40 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-red px-4 py-2 text-center font-neo-display text-base font-black text-neo-white shadow-hard ${fxClass(hazardR.exiting, 'animate-neo-shake')}`}
+          className={`pointer-events-none absolute left-1/2 top-[9%] z-40 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-red px-4 py-2 text-center font-neo-display text-base font-black text-neo-white shadow-hard ${fxClass(hazardR.exiting, 'animate-neo-shake')}`}
           aria-live="assertive"
         >
           {hazardR.value}
@@ -1069,7 +1089,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* New daily best — the self-comparison routine beat. Gold = personal record. */}
       {newBestR.value && (
         <div
-          className={`pointer-events-none absolute inset-x-0 top-[19%] z-40 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-black uppercase tracking-wide text-black shadow-hard ${fxClass(newBestR.exiting, 'animate-neo-pop')}`}
+          className={`pointer-events-none absolute inset-x-0 top-[16%] z-40 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-black uppercase tracking-wide text-black shadow-hard ${fxClass(newBestR.exiting, 'animate-neo-pop')}`}
           aria-live="polite"
         >
           🏆 {newBestR.value}
@@ -1081,7 +1101,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {comboR.value && (() => { const comboFx = comboR.value; return (
         <div
           key={comboFx.key}
-          className={`pointer-events-none absolute inset-x-0 top-[28%] z-30 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-orange px-4 py-2 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${fxClass(comboR.exiting, 'animate-neo-pop')}`}
+          className={`pointer-events-none absolute inset-x-0 top-[30%] z-30 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-orange px-4 py-2 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${fxClass(comboR.exiting, 'animate-neo-pop')}`}
           aria-live="polite"
         >
           🔥 {t(comboFx.m.labelKey)} <span className="tabular-nums">×{comboFx.m.combo}</span>
@@ -1093,7 +1113,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {surpriseR.value && (() => { const surpriseFx = surpriseR.value; return (
         <div
           key={surpriseFx.key}
-          className={`pointer-events-none absolute inset-x-0 top-[18%] z-40 mx-auto w-fit flex flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2.5 text-center shadow-hard ${fxClass(surpriseR.exiting, 'animate-neo-pop')}`}
+          className={`pointer-events-none absolute inset-x-0 top-[23%] z-40 mx-auto w-fit flex flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2.5 text-center shadow-hard ${fxClass(surpriseR.exiting, 'animate-neo-pop')}`}
           aria-live="polite"
         >
           <div className="flex items-center gap-1.5 font-neo-display text-xl font-black uppercase tracking-wide text-black">
@@ -1176,20 +1196,20 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           The altitude HUD shares this row, so it can NEVER sit behind the back
           button (the old corner card overlapped it once the label wrapped in a
           longer locale). The container is inert; only the buttons take taps. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-3">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 p-3">
         <Link
           href={`/${language}`}
           onClick={() => save(true)}
           aria-label={t('common.backToHome')}
-          className="pointer-events-auto flex shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
+          className="pointer-events-auto absolute start-3 top-3 flex shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
         >
           <ArrowLeft className="h-4 w-4" />
           <span className="hidden min-[380px]:inline">{t('common.backToHome')}</span>
         </Link>
-        {/* Dropped below the top-centre mode-toggle badge row (Daily/Endless, a
-            fixed full-width strip ~y8–37) so the height line isn't hidden behind
-            it. Back button (left) + actions (right) stay pinned to the top. */}
-        <div className="pointer-events-none mt-8">
+        {/* Compact altitude card, centred under the top mode-toggle strip
+            (Daily/Endless, ~y8–37). Absolutely centred (mx-auto w-fit) so it
+            never depends on the back button / action widths to stay put. */}
+        <div className="pointer-events-none mx-auto mt-8 w-fit">
           <WordTowerStatHud
             heightM={game.heightM}
             biomeId={biomeId}
@@ -1200,39 +1220,42 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             t={t}
           />
         </div>
-        {/* me-12 (48px) keeps these actions clear of the global mute FAB
-            (InGameAudioButton: fixed top-inline-end, 40px + 8px inset = 48px),
-            so no button ever sits behind the mute/unmute control. RTL-safe:
-            margin-inline-end + the FAB both flip to the same corner. */}
-        <div className="pointer-events-auto me-12 flex shrink-0 items-center gap-1.5">
-          <button
-            type="button"
-            onClick={() => setShowUpgrades(true)}
-            aria-label={t('wordTower.upgrade.title')}
-            className="rounded-neo border-neo-thick border-black bg-neo-cyan p-2 text-black shadow-hard"
-          >
-            <Sparkles className="h-4 w-4" />
-          </button>
-          <button
-            type="button"
-            onClick={shareTower}
-            aria-label={t('wordTower.share.button')}
-            className="rounded-neo border-neo-thick border-black bg-neo-pink p-2 text-neo-white shadow-hard"
-          >
-            <Share2 className="h-4 w-4" />
-          </button>
-          {/* Tower-skin picker sits right beside Share (founder ask: "skin
-              selection can be near the share") instead of floating mid-screen. */}
-          <WordTowerSkinPicker inline skin={skin} bestHeightM={personalBest} t={t} dir={dir} reducedMotion={reducedMotion} />
-          <button
-            type="button"
-            onClick={onOpenLeaderboard}
-            aria-label={t('wordTower.leaderboard.title')}
-            className="rounded-neo border-neo-thick border-black bg-neo-yellow p-2 text-black shadow-hard"
-          >
-            <Trophy className="h-4 w-4" />
-          </button>
-        </div>
+      </div>
+
+      {/* Action rail — its own layer, DROPPED below the global mute FAB
+          (InGameAudioButton: fixed top-inline-end, 40px + 8px inset = 48px tall).
+          The old top-row + me-12 hack still let a button graze the FAB on narrow
+          screens; sitting the whole cluster at top-14 (56px) clears it outright.
+          Horizontal (not a vertical edge rail) so it never overlaps the rival
+          height ticks that run down the inline-end edge. RTL-safe via end-*. */}
+      <div className="pointer-events-auto absolute end-3 top-14 z-10 flex items-center gap-1.5">
+        <button
+          type="button"
+          onClick={() => setShowUpgrades(true)}
+          aria-label={t('wordTower.upgrade.title')}
+          className="rounded-neo border-neo-thick border-black bg-neo-cyan p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+        >
+          <Sparkles className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          onClick={shareTower}
+          aria-label={t('wordTower.share.button')}
+          className="rounded-neo border-neo-thick border-black bg-neo-pink p-2 text-neo-white shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+        >
+          <Share2 className="h-4 w-4" />
+        </button>
+        {/* Tower-skin picker sits right beside Share (founder ask: "skin
+            selection can be near the share") instead of floating mid-screen. */}
+        <WordTowerSkinPicker inline skin={skin} bestHeightM={personalBest} t={t} dir={dir} reducedMotion={reducedMotion} />
+        <button
+          type="button"
+          onClick={onOpenLeaderboard}
+          aria-label={t('wordTower.leaderboard.title')}
+          className="rounded-neo border-neo-thick border-black bg-neo-yellow p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+        >
+          <Trophy className="h-4 w-4" />
+        </button>
       </div>
 
       {/* pointer-events-none so this full-screen layer doesn't shield the header
@@ -1259,7 +1282,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           onBackspace={tower.backspace}
           onClear={tower.clear}
           onSubmit={tower.hold}
-          onScramble={tower.scramble}
+          onScramble={handleScramble}
+          scrambleCost={WORD_TOWER_SCRAMBLE_COIN_COST}
+          coinBalance={coinBalance}
           onDeckHeight={onDeckHeight}
           pendingWord={tower.state.pendingWord}
           onCraneDrop={triggerCraneDrop}

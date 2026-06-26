@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Delete, Shuffle, Lightbulb, ChevronDown, ChevronUp, RotateCw } from 'lucide-react';
+import { Delete, Shuffle, Lightbulb, ChevronDown, ChevronUp, RotateCw, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import { WordTowerWheel } from './WordTowerWheel';
@@ -14,7 +14,12 @@ export interface WordTowerHudProps {
   word: string;
   heightM: number;
   combo: number;
+  /** Banked BONUS scrambles (earned from surprises / wreck-compensation). */
   scramblesLeft: number;
+  /** Coin price of a fresh wheel once banked bonus scrambles run out. */
+  scrambleCost?: number;
+  /** Live coin balance — gates the buy-a-scramble path when bonuses are gone. */
+  coinBalance?: number;
   /** Tower material colour (CSS hex) — tints the wheel's ring glow + spell path. */
   accentHex?: string;
   reducedMotion?: boolean;
@@ -62,7 +67,7 @@ const TIER_KEY: Record<NonNullable<ApplyResult['tier']>, string> = {
 
 export function WordTowerHud(props: WordTowerHudProps) {
   const {
-    tray, selected, word, heightM, combo, scramblesLeft,
+    tray, selected, word, heightM, combo, scramblesLeft, scrambleCost = 0, coinBalance = 0,
     accentHex = '#7c8a99', reducedMotion = false,
     possibleWords, clueWord, onReroll, goldenLetter, lastError, errorKey, lastResult, resultKey,
     pendingWord, onCraneDrop,
@@ -78,6 +83,12 @@ export function WordTowerHud(props: WordTowerHudProps) {
   // mode: tray + edit buttons lock, the CTA becomes a one-tap DROP — keeps the
   // player's finger pinned to the same spot.
   const isPlacing = !!pendingWord;
+
+  // Scramble gating (founder 2026-06-26): spend a banked BONUS scramble first;
+  // once gone, BUY a spin with coins. Disabled only when neither is available.
+  const hasBonusScramble = scramblesLeft > 0;
+  const canBuyScramble = scrambleCost > 0 && coinBalance >= scrambleCost;
+  const canScramble = hasBonusScramble || canBuyScramble;
 
   // Clue: reveal a masked sample word on demand; reset when the wheel changes.
   const wheelKey = tray.join('');
@@ -220,48 +231,56 @@ export function WordTowerHud(props: WordTowerHudProps) {
           </div>
         )}
 
-        {/* The word WHEEL — spell by dragging a path (or tapping); it morphs into
-            the crane steering dial once a word is held for placement. */}
-        <div className={cn('transition-[filter] duration-300', lastError && errorKey > 0 && 'animate-neo-shake')}>
-          <WordTowerWheel
-            tray={tray}
-            selected={selected}
-            word={word}
-            placing={isPlacing}
-            canBuild={canSubmit}
-            intensity={intensity}
-            accentHex={accentHex}
-            goldenLetter={goldenLetter}
-            reducedMotion={reducedMotion}
-            dir={dir}
-            t={t}
-            onSelectTile={onSelectTile}
-            onDeselectTile={onDeselectTile}
-            onSubmit={onSubmit}
-            onDrop={() => onCraneDrop?.()}
-          />
-        </div>
-
-        {/* Actions — only the two tray TOOLS live here now. The BUILD / DROP CTA
-            moved INTO the wheel's centre hub (build a word → tap the centre to
-            lift it → tap again to drop), so the redundant bottom build button is
-            gone and the deck is shorter. Disabled while a word is in flight. */}
-        <div className="mx-auto flex max-w-md items-center justify-center gap-2.5">
+        {/* Builder row — the WHEEL flanked by its two tools. Flanking (instead of
+            a cramped button row beneath the wheel) gives the bigger wheel its
+            room AND pushes Change-letters / Delete to opposite edges so they're
+            never mis-tapped (founder ask 2026-06-26: bigger wheel, move + space
+            the buttons). The BUILD / DROP CTA still lives in the wheel's centre
+            hub. Tools are disabled while a word is in flight. RTL: the flex row
+            mirrors automatically, so scramble/delete swap sides cleanly. */}
+        <div className="mx-auto flex max-w-md items-center justify-center gap-3">
           <button
             type="button"
             onClick={onScramble}
-            disabled={scramblesLeft <= 0 || isPlacing}
-            className="flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-1.5 font-neo-display font-bold text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+            disabled={!canScramble || isPlacing}
+            className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-purple px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
             aria-label={t('wordTower.hud.scramble')}
           >
             <Shuffle className="h-5 w-5" />
-            <span className="tabular-nums">{scramblesLeft}</span>
+            {hasBonusScramble ? (
+              // Free bonus scramble in the bank — show how many remain.
+              <span className="tabular-nums">{scramblesLeft}</span>
+            ) : (
+              // Out of bonuses → the coin price to buy a fresh wheel.
+              <span className="flex items-center gap-0.5 tabular-nums">
+                <Coins className="h-3 w-3" aria-hidden />{scrambleCost}
+              </span>
+            )}
           </button>
+          <div className={cn('flex-1 transition-[filter] duration-300', lastError && errorKey > 0 && 'animate-neo-shake')}>
+            <WordTowerWheel
+              tray={tray}
+              selected={selected}
+              word={word}
+              placing={isPlacing}
+              canBuild={canSubmit}
+              intensity={intensity}
+              accentHex={accentHex}
+              goldenLetter={goldenLetter}
+              reducedMotion={reducedMotion}
+              dir={dir}
+              t={t}
+              onSelectTile={onSelectTile}
+              onDeselectTile={onDeselectTile}
+              onSubmit={onSubmit}
+              onDrop={() => onCraneDrop?.()}
+            />
+          </div>
           <button
             type="button"
             onClick={onBackspace}
             disabled={selected.length === 0 || isPlacing}
-            className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+            className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
             aria-label={t('wordTower.hud.backspace')}
           >
             <Delete className="h-5 w-5" />

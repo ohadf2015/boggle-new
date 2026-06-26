@@ -107,7 +107,7 @@ export function WordTowerWheel({
 
   return (
     <div
-      className="relative mx-auto aspect-square w-full max-w-[178px] touch-none select-none"
+      className="relative mx-auto aspect-square w-full max-w-[230px] touch-none select-none"
       onPointerDown={onDown}
       onPointerMove={placing ? undefined : handlePointerMove}
       onPointerUp={placing ? undefined : handlePointerUp}

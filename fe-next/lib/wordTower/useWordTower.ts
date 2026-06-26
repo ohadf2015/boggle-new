@@ -15,6 +15,7 @@ import {
   validateTowerWord,
   applyTowerWord,
   scrambleTray,
+  spinWheelPaid,
   rerollStart,
   damageTower,
   type WordTowerPlayerState,
@@ -53,6 +54,7 @@ type Action =
   | { type: 'commitPlacement'; multiplier: number }
   | { type: 'cancelPlacement' }
   | { type: 'scramble' }
+  | { type: 'scramblePaid' }
   | { type: 'rerollStart'; isViable?: (wheel: string[]) => boolean }
   | { type: 'hazard'; floors: number; kind: HazardKind; ids: string[] }
   | { type: 'reset'; game: WordTowerPlayerState };
@@ -144,6 +146,8 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
     }
     case 'scramble':
       return { ...state, game: scrambleTray(state.game), selected: [] };
+    case 'scramblePaid':
+      return { ...state, game: spinWheelPaid(state.game), selected: [] };
     case 'rerollStart':
       return { ...state, game: rerollStart(state.game, action.isViable), selected: [], lastError: null };
     case 'reset':
@@ -189,6 +193,7 @@ export function useWordTower(opts: UseWordTowerOpts) {
       commitPlacement: (multiplier: number) => dispatch({ type: 'commitPlacement', multiplier }),
       cancelPlacement: () => dispatch({ type: 'cancelPlacement' }),
       scramble: () => dispatch({ type: 'scramble' }),
+      scramblePaid: () => dispatch({ type: 'scramblePaid' }),
       reroll: (isViable?: (wheel: string[]) => boolean) => dispatch({ type: 'rerollStart', isViable }),
       hazard: (floors: number, kind: HazardKind, ids: string[]) => dispatch({ type: 'hazard', floors, kind, ids }),
       reset: () =>

@@ -20,10 +20,14 @@ export const WORD_TOWER_WHEEL_MIN_VOWELS = 2;
  *  a language bag lacks enough distinct letters to satisfy it). */
 export const WORD_TOWER_WHEEL_MAX_SAME = 2;
 export const WORD_TOWER_MIN_WORD_LEN = 3;
+/** Starting BONUS scramble allowance (a seed; climbing no longer refills it). */
 export const WORD_TOWER_SCRAMBLES_START = 3;
 export const WORD_TOWER_SCRAMBLES_MAX_BANKED = 5;
-/** Earn +1 scramble each time the tower climbs this many meters. */
+/** @deprecated 2026-06-26 — scrambles no longer rain from altitude. Kept so old
+ *  save blobs / importers don't break; not read by the live earn path. */
 export const WORD_TOWER_SCRAMBLE_EARN_EVERY_M = 25;
+/** Coin price of a fresh wheel once banked bonus scrambles run out (buy path). */
+export const WORD_TOWER_SCRAMBLE_COIN_COST = 30;
 
 // --- Altitude / scoring ---
 export const WORD_TOWER_BASE_FLOOR_M = 2.0;

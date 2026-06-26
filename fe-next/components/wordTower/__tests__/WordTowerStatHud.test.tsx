@@ -12,11 +12,14 @@ describe('WordTowerStatHud', () => {
     expect(screen.getByText(/wordTower\.biome\.city/)).toBeInTheDocument();
   });
 
-  it('shows the best line only once a personal best exists', () => {
+  it('shows the compact best chip only once a personal best exists', () => {
     const { rerender } = render(<WordTowerStatHud heightM={10} biomeId="city" floorsCount={1} personalBestM={0} combo={1} t={t} />);
-    expect(screen.queryByText(/wordTower\.hud\.best/)).toBeNull();
+    expect(screen.queryByLabelText(/wordTower\.hud\.best/)).toBeNull();
     rerender(<WordTowerStatHud heightM={10} biomeId="city" floorsCount={1} personalBestM={88} combo={1} t={t} />);
-    expect(screen.getByText('wordTower.hud.best:88')).toBeInTheDocument();
+    // Compact trophy chip: the rounded number is the visible text, the full
+    // "best" string is kept for screen readers via aria-label.
+    expect(screen.getByText('88')).toBeInTheDocument();
+    expect(screen.getByLabelText('wordTower.hud.best:88')).toBeInTheDocument();
   });
 
   it('surfaces the combo streak chip only when the chain is above 1', () => {
