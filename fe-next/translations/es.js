@@ -6431,6 +6431,9 @@ const es = {
     "signup": {
       "streakTitle": "Protege tu racha de {count} días",
       "boardTitle": "Reclama tu lugar en la tabla",
+      "rankLeaderTitle": "¡Eres el #1 de hoy! Asegura el primer puesto",
+      "rankPodiumTitle": "¡Estás #{rank} hoy! Conserva tu lugar en el podio",
+      "rankTopTenTitle": "¡Estás en el top {rank} de hoy! Reclama tu lugar",
       "firstTitle": "Guarda tu primer resultado",
       "subtitle": "Regístrate gratis — juega en cualquier dispositivo",
       "cta": "Regístrate gratis"
