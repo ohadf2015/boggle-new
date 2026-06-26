@@ -51,8 +51,21 @@ describe('WheelRushDesktopAdapter', () => {
     expect(container.querySelector('[data-mp-shell]')).toBeInTheDocument();
   });
 
-  it('shows the unified Close Race rivals panel when "me" is in the lobby', () => {
-    render(<WheelRushDesktopAdapter {...mkProps()} meId="u2" />);
+  it('shows the unified Close Race rivals panel in a large lobby (genuine subset)', () => {
+    const bigLb = [
+      { userId: 'u1', username: 'Alpha', score: 100, status: 'connected' as const },
+      { userId: 'u2', username: 'Beta', score: 90, status: 'connected' as const },
+      { userId: 'u3', username: 'Gamma', score: 80, status: 'connected' as const },
+      { userId: 'u4', username: 'Delta', score: 70, status: 'connected' as const },
+      { userId: 'u5', username: 'Epsilon', score: 60, status: 'connected' as const },
+      { userId: 'u6', username: 'Zeta', score: 50, status: 'connected' as const },
+    ];
+    render(<WheelRushDesktopAdapter {...mkProps()} leaderboard={bigLb} meId="u3" />);
     expect(screen.getByTestId('closest-rivals-panel')).toBeInTheDocument();
+  });
+
+  it('omits the rivals panel in a small lobby (it would just dupe the roster)', () => {
+    render(<WheelRushDesktopAdapter {...mkProps()} meId="u2" />);
+    expect(screen.queryByTestId('closest-rivals-panel')).not.toBeInTheDocument();
   });
 });
