@@ -7,6 +7,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import TeacherDashboard from '@/components/teacher/TeacherDashboard';
 import { DistrictUpsellBanner } from '@/components/teacher/DistrictUpsellBanner';
+import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
+import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -14,6 +16,7 @@ function TeacherDashboardInner() {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { user, profile, isAdmin, loading: authLoading } = useAuth();
+  const { trial } = useTeacherAccess();
 
   // Check if user is teacher or admin — accepts user_role OR legacy is_admin flag
   const isTeacher =
@@ -69,6 +72,13 @@ function TeacherDashboardInner() {
 
   return (
     <>
+      {trial && (
+        <div className="bg-neo-navy px-4 pt-4">
+          <div className="mx-auto max-w-5xl">
+            <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
+          </div>
+        </div>
+      )}
       <DistrictUpsellBanner t={t} language={language} />
       <TeacherDashboard />
     </>

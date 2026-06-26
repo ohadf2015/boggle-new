@@ -11833,6 +11833,18 @@ const es = {
       "try_blast": "Probar Blast",
       "try_daily": "Caza diaria"
     },
+    "trial": {
+      "title": "Tu prueba de profesor está activa 🎉",
+      "urgent_title": "Última oportunidad — tu prueba está por terminar ⏳",
+      "body": "Acceso completo al aula hasta el {date}. Crea una clase y organiza un juego en vivo ahora — no lo dejes pasar.",
+      "days_left": "días restantes",
+      "day_left": "día restante",
+      "hours_left": "horas restantes",
+      "cta": "Crea tu primera clase",
+      "expired_title": "Tu prueba de profesor ha terminado",
+      "expired_body": "Tu periodo de prueba gratis ha terminado. Vuelve a solicitarlo o escríbenos para conservar el modo aula.",
+      "renew_cta": "Renovar acceso de profesor"
+    },
     "forSchools": {
       "form": {
         "full_name": "Tu nombre",

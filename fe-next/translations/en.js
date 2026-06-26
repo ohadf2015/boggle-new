@@ -11511,6 +11511,18 @@ const en = {
       "try_blast": "Try Blast",
       "try_daily": "Daily Challenge"
     },
+    "trial": {
+      "title": "Your teacher trial is live 🎉",
+      "urgent_title": "Last chance — your trial is almost over ⏳",
+      "body": "Full classroom access until {date}. Set up a class and run a live game now — don't miss it.",
+      "days_left": "days left",
+      "day_left": "day left",
+      "hours_left": "hours left",
+      "cta": "Start your first class",
+      "expired_title": "Your teacher trial has ended",
+      "expired_body": "Your free trial window is over. Reapply or reach out to keep classroom mode.",
+      "renew_cta": "Renew teacher access"
+    },
     "forSchools": {
       "form": {
         "full_name": "Your name",

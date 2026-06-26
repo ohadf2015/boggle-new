@@ -4,13 +4,14 @@ import Link from 'next/link';
 import { gsap } from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AccessRequestForm } from '@/components/education/AccessRequestForm';
+import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useGsapReveal } from '@/lib/animation/useGsapReveal';
 import { isReducedMotionPreferred } from '@/utils/accessibility';
 
 export function PageClient() {
   const { t, language } = useLanguage();
-  const { status, latestRequest, hasAccess } = useTeacherAccess();
+  const { status, latestRequest, hasAccess, trial } = useTeacherAccess();
 
   // Hero (h1 + lede): GSAP timeline on mount.
   const heroRef = useRef<HTMLDivElement>(null);
@@ -95,6 +96,11 @@ export function PageClient() {
             className="mt-6 rounded-neo border-neo bg-neo-lime p-6 text-neo-navy shadow-hard"
           >
             <h2 className="text-xl font-bold font-neo-display">{t('education.access.already_approved_title')}</h2>
+            {trial && (
+              <div className="mt-4">
+                <TrialUrgencyBanner trial={trial} href={`/${language}/teacher`} />
+              </div>
+            )}
             <Link
               href={`/${language}/teacher`}
               className="mt-3 inline-block rounded-neo bg-neo-navy px-4 py-2 font-bold text-neo-white border-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
