@@ -27,23 +27,25 @@ lands, gate on distinct-*game* spread + the existing external `verification_stat
 
 The ideas below were sanity-checked against live data. Three premises had to change:
 
-**A. The auto-heal pipeline already exists and is *stalled*, not missing.**
-`invalid_word_submissions` carries a full verification machinery: `verification_status`,
-`verification_source/url`, `milog_*`, `auto_promoted_at/by`, `approved_at/by`, `player_appeal_count`.
-Current state:
+**A. The auto-heal pipeline EXISTS and WORKS — the "3,522 stalled" was a misread (corrected 2026-06-26).**
+Deep verification against the live DB overturned the initial "stalled verifier" reading:
+- **Hebrew is tracked by `milog_status`, not `verification_status`** — and it's healthy: 1,129 verified /
+  224 not_found / 220 needs_review / only **43 pending**. The "1,616 he pending" was on the wrong column.
+- **en/es/sv/ja verifier works as designed**: it processed *exactly* the multi-submission candidates
+  (attempted ≈ `submission_count≥2` count per language: es 133≈132, en 112≈111, sv 91=91, ja 62=62).
+  The thousands of `verification_status='pending'` rows are **singletons** (`submission_count=1`),
+  intentionally skipped (`minSubmissions=2`) — a singleton is almost always a typo, not a missing word.
+- **Acceptance layer works**: 159 Hebrew words (180 all-lang) are live via `word_scores.is_potentially_valid=true`
+  (loaded into the in-memory community cache at boot by `loadCommunityWords`). The 351k-word base
+  `hebrew_words.txt` is the primary path and is healthy.
 
-| verification_status | words | auto_promoted | last verify attempt |
-|---|---|---|---|
-| `pending` | **3,522** | 1,113 | **NULL (never attempted)** |
-| `not_found` | 215 | 0 | 2026-06-26 02:00 |
-| `verified` | 121 | 121 | 2026-06-26 02:00 |
-| `rejected_type` | 59 | 0 | 2026-06-26 02:00 |
-| `needs_review` | 3 | 0 | 2026-06-26 02:00 |
-
-The verifier ran but processed only ~400 words, leaving **3,522 pending that were never verified**.
-There appear to be **two promotion paths** (a count-based auto-promote that promoted 1,113 *while still
-`pending`*, and the milog/verification path). So Tier-1 #1 is **"unblock + reconcile the existing
-pipeline," not "build it."**
+**The 1,113 Hebrew `auto_promoted_at` rows are historical residue, not a bug.** They came from a
+count-based promote path **removed 2026-05-23**; zero Hebrew words have been milog-verified in the
+last 21 days. Only ~10 reached the accepted set and `hebrew_words_approved.txt` is empty — but the
+verified words are **marginal quality** (fragments/slang/defective spellings: כח, רפס, אוקי="okay"),
+so their non-acceptance is arguably correct. **Whether to accept milog-verified-but-marginal Hebrew
+words is a Hebrew-language product call, not an engineering fix.** No safe clean code change exists
+here; do NOT blind-backfill ~1,100 marginal words into live acceptance.
 
 **B. Bots do not actually use the corpus.** `player_words.times_found_by_bots = 0` for **all 5
 languages**. Root cause: `incrementBotWordUsage()` existed in `supabase/words.ts` (with a live
@@ -101,20 +103,13 @@ Already built and reusable:
 
 ### 🟢 Tier 1 — ship first (high leverage, low/known effort, reuses existing pipeline)
 
-**1. Unblock the stalled dictionary auto-heal (highest leverage — the pipeline already exists).**
-Do **not** build this from scratch; `invalid_word_submissions` already has the verification +
-auto-promote machinery (see Measured Reality A). The real work:
-- **Drain the 3,522-word `pending` backlog** that has `verification_last_attempt = NULL` — the
-  verifier only ever processed ~400 words. Find why it stopped (silent-failure, Class 4) and rerun.
-  This is mostly **Hebrew** (1,455 missing he words) — the single biggest dictionary win available.
-- **Reconcile the two promotion paths.** 1,113 words were auto-promoted while still `pending`
-  verification — a count-based path bypassing the dictionary check. Decide which is authoritative;
-  a count-only promote with no external check is exactly the pollution risk this doc warns about.
-- **Gate harder than raw `submission_count`** using the proxies we *do* have today: distinct-game
-  spread + external `verification_status='verified'` + per-language profanity blocklist. Add true
-  distinct-user gating only after the schema change in (D).
-- Measure "% of rejects that are real-word misses" per language as a **dictionary-quality KPI**;
-  Hebrew is the hotspot to watch.
+**1. ~~Unblock the stalled dictionary auto-heal~~ → VERIFIED WORKING (see Measured Reality A).**
+This was the initial top pick; deep verification (2026-06-26) showed the pipeline is **not stalled** —
+the verifier processes multi-submission candidates correctly and the acceptance layer works. The only
+residue is ~1,113 historical Hebrew `auto_promoted` rows of marginal quality, whose non-acceptance is
+arguably correct. **No engineering action; the open question is a Hebrew-language product call** (accept
+milog-verified-but-marginal words? probably not). The dictionary-quality KPI (% of rejects that are
+real-word misses, per language) is still worth a dashboard, but there is no broken pipeline to drain.
 
 *Promotion is staged, not instant* (council/Grok — adopt this):
 1. **Candidate** — passes the distinct-user/distinct-game query + profanity pre-filter.
