@@ -728,7 +728,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
               />
             </div>
             <span className="truncate text-xs font-semibold text-neo-white min-w-0">
-              {t('wordHunt.desktop.you')}
+              {t('common.you')}
             </span>
             <span className="font-black text-neo-lime text-xs shrink-0 ms-auto">
               {score}
