@@ -67,7 +67,7 @@ export function courseTileLayout(word: string, courseW: number, opts: CourseOpts
  *  passes this, the base scrolls off below the deck and only the newest
  *  `maxVisibleRows` rows stay in the compact bottom construction zone; the user
  *  pans down to review everything below. */
-export const DEFAULT_MAX_VISIBLE_ROWS = 2;
+export const DEFAULT_MAX_VISIBLE_ROWS = 3;
 
 /** Inputs for the grounded tower-camera row layout. */
 export interface TowerRowLayoutInput {
@@ -106,10 +106,19 @@ export interface TowerRowLayout {
  * bottom behind the deck — i.e. the camera follows the climb, Tower-Bloxx style.
  */
 export function towerRowLayout({ pinCount, H, bottomInsetPx, maxVisibleRows = DEFAULT_MAX_VISIBLE_ROWS }: TowerRowLayoutInput): TowerRowLayout {
-  const size = clamp(H * 0.066, 38, 54); // compact blocks — was 0.082/46–66 (read too big)
+  const mvr = Math.max(1, Math.round(maxVisibleRows));
+  // Founder 2026-06-26: "show ~3 building blocks at a time; scroll to see more;
+  // most of the screen should be sky/biome." Each letter is one brick, and the
+  // scene reads this `size` directly — so we size the bricks so roughly `mvr` of
+  // them fill the band between the build line (~0.28H) and the control deck. The
+  // result is fewer, chunkier, more readable blocks with the rest of the tower
+  // scrolling below the deck. Clamped so it stays sane on tiny + huge canvases.
+  const band = Math.max(0, (H - bottomInsetPx) - H * 0.28);
+  // Round to a whole pixel so rowH is integral and the camera shift stays exact
+  // (no sub-pixel float dust at the grounded↔overflow boundary).
+  const size = Math.round(clamp(band / mvr - 2, 44, 96));
   const half = size / 2;
   const rowH = size + 2; // ~2px seam → tiles read as one cohesive stacked tower, not floating blocks
-  const mvr = Math.max(1, Math.round(maxVisibleRows));
   // Build line stays in the upper-middle, glued to the crane that drops onto it
   // (the crane chrome + rival rail are anchored to this same ~0.28H line — don't
   // move it). The committed top pins here once the tower overflows.
@@ -121,7 +130,9 @@ export function towerRowLayout({ pinCount, H, bottomInsetPx, maxVisibleRows = DE
   const groundFloor = H - bottomInsetPx - half - Math.round(size * 0.12);
   const baseCenter = Math.min(topCenter + (mvr - 1) * rowH, groundFloor);
   // Overflow once the pinned top would rise above the build line; pan down to keep it there.
-  const shift = pinCount > 0 ? Math.max(0, topCenter - baseCenter + (pinCount - 1) * rowH) : 0;
+  // Round to whole pixels — H*0.28 isn't binary-exact, so the raw expression can
+  // leave sub-pixel dust that reads as a non-zero shift while grounded.
+  const shift = pinCount > 0 ? Math.max(0, Math.round(topCenter - baseCenter + (pinCount - 1) * rowH)) : 0;
   const centerY = (pos: number) => baseCenter - pos * rowH + shift;
   return { size, half, rowH, topCenter, baseCenter, shift, centerY };
 }

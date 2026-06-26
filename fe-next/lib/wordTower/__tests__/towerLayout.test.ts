@@ -108,9 +108,18 @@ describe('towerRowLayout (grounded camera)', () => {
     expect(towerRowLayout({ pinCount: mvr + 1, H, bottomInsetPx: inset, maxVisibleRows: mvr }).shift).toBeGreaterThan(0);
   });
 
-  it('defaults to a 2-row visible cap (only the top 2 blocks show when regular)', () => {
-    expect(towerRowLayout({ pinCount: 2, H, bottomInsetPx: inset }).shift).toBe(0);
-    expect(towerRowLayout({ pinCount: 3, H, bottomInsetPx: inset }).shift).toBeGreaterThan(0);
+  it('defaults to a 3-row visible cap (founder 2026-06-26: ~3 blocks on screen)', () => {
+    expect(towerRowLayout({ pinCount: 3, H, bottomInsetPx: inset }).shift).toBe(0);
+    expect(towerRowLayout({ pinCount: 4, H, bottomInsetPx: inset }).shift).toBeGreaterThan(0);
+  });
+
+  it('sizes bricks so roughly maxVisibleRows fill the band (build line → deck)', () => {
+    // A typical phone viewport: the visible committed band should hold ~mvr big
+    // blocks, not a dozen small ones (the rest scroll below the deck).
+    const l = towerRowLayout({ pinCount: 12, H: 844, bottomInsetPx: 300, maxVisibleRows: 3 });
+    const visibleRows = (844 - 300 - l.topCenter) / l.rowH;
+    expect(visibleRows).toBeGreaterThan(1.5);
+    expect(visibleRows).toBeLessThanOrEqual(4); // ~3, never a tall stack of tiny tiles
   });
 
   it('build line sits exactly (maxVisibleRows-1) rows above the grounded base', () => {
@@ -154,12 +163,12 @@ describe('towerRowLayout (grounded camera)', () => {
 
   // ── Phase-1 polish: compact, cohesive stack (founder: tiles too big, tower
   //    reads as floating blocks not a solid tower; new letters crammed at top). ──
-  it('caps tile size to a compact maximum even on tall canvases', () => {
-    expect(towerRowLayout({ pinCount: 5, H: 2000, bottomInsetPx: inset }).size).toBeLessThanOrEqual(54);
+  it('caps tile size to a chunky maximum even on tall canvases', () => {
+    expect(towerRowLayout({ pinCount: 5, H: 2000, bottomInsetPx: inset }).size).toBeLessThanOrEqual(96);
   });
 
   it('keeps a usable minimum tile size on short canvases', () => {
-    expect(towerRowLayout({ pinCount: 5, H: 300, bottomInsetPx: inset }).size).toBeGreaterThanOrEqual(38);
+    expect(towerRowLayout({ pinCount: 5, H: 300, bottomInsetPx: inset }).size).toBeGreaterThanOrEqual(44);
   });
 
   it('stacks rows nearly flush — a thin seam, never a loose gap or overlap', () => {
@@ -183,9 +192,9 @@ describe('towerRowLayout (grounded camera)', () => {
 
   it('floats the base just (maxVisibleRows-1) rows under the crane line — a tight build zone, clean screen below', () => {
     const l = towerRowLayout({ pinCount: 2, H: 915, bottomInsetPx: 130, maxVisibleRows: 3 });
-    // base hangs in the UPPER screen under the crane (not grounded at the deck),
-    // leaving the lower screen clean
-    expect(l.baseCenter).toBeLessThan(915 * 0.5);
+    // base hangs in the build zone, still ABOVE the control deck (clean strip
+    // below it), and exactly (mvr-1) rows under the crane line.
+    expect(l.baseCenter + l.half).toBeLessThan(915 - 130);
     expect(l.baseCenter - l.topCenter).toBeCloseTo(2 * l.rowH);
   });
 });
