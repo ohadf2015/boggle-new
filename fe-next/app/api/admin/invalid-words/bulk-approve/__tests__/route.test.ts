@@ -76,7 +76,7 @@ vi.mock('@/lib/auth/adminAuth', () => ({
   AdminUser: {},
 }));
 
-import { handleBulkApprove, type BulkApproveResult } from '../route';
+import { handleBulkApprove, type BulkApproveResult } from '../_handlers';
 
 const mockAdminUser = {
   id: 'admin-uuid',

@@ -21,7 +21,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import type { BulkApproveResult } from '@/app/api/admin/invalid-words/bulk-approve/route';
+import type { BulkApproveResult } from '@/app/api/admin/invalid-words/bulk-approve/_handlers';
 
 interface BulkApproveButtonProps {
   selectedCount: number;

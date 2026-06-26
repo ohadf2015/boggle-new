@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { GET, statsCache } from '../route';
+import { GET } from '../route';
+import { statsCache } from '../_handlers';
 import { NextRequest } from 'next/server';
 
 vi.mock('@/lib/landing/fetchGameModeStats', () => ({

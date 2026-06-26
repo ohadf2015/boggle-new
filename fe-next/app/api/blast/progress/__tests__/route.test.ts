@@ -20,7 +20,7 @@ vi.mock('@/utils/supabase/server', () => ({
   createClient: vi.fn(),
 }));
 
-import { handleGetBlastProgress, handleClaimBlastProgress } from '../route';
+import { handleGetBlastProgress, handleClaimBlastProgress } from '../_handlers';
 
 interface MockSupabase {
   from: Mock;

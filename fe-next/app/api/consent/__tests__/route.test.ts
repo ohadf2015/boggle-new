@@ -33,7 +33,7 @@ import {
   handleGetConsent,
   handleSubmitConsent,
   handleRevokeConsent,
-} from '../route';
+} from '../_handlers';
 
 describe('Consent API Routes', () => {
   const mockUserId = 'user-123';

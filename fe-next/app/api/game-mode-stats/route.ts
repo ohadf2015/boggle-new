@@ -12,13 +12,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { fetchGameModeStats, type GameModeStats } from '@/lib/landing/fetchGameModeStats';
-import { fetchMpModeBreakdown, type MpModeBreakdownStat } from '@/lib/admin/fetchMpModeBreakdown';
+import { fetchGameModeStats } from '@/lib/landing/fetchGameModeStats';
+import { fetchMpModeBreakdown } from '@/lib/admin/fetchMpModeBreakdown';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
-
-// In-memory cache keyed by days (5 min TTL)
-export const statsCache = new Map<number, { stats: GameModeStats[]; mpBreakdown: MpModeBreakdownStat[]; timestamp: number }>();
-const CACHE_TTL_MS = 5 * 60 * 1000;
+import { statsCache, CACHE_TTL_MS } from './_handlers';
 
 export async function GET(request: NextRequest) {
   const rateLimitResult = checkApiRateLimit(request, 'game-mode-stats', {
