@@ -24,6 +24,7 @@ const mocks = vi.hoisted(() => ({
   getTrieNode: vi.fn(),
   ensureLanguageLoaded: vi.fn(async () => {}),
   incrementBotWordUsage: vi.fn(async () => {}),
+  getCachedPlayerWords: vi.fn(async () => [] as string[]),
 }));
 
 vi.mock('../../../modules/gameStateManager', () => ({
@@ -50,6 +51,9 @@ vi.mock('../../../dictionary', () => ({
 }));
 vi.mock('../../../modules/supabaseServer', () => ({
   incrementBotWordUsage: mocks.incrementBotWordUsage,
+}));
+vi.mock('../../../modules/botBehaviorCache', () => ({
+  getCachedPlayerWords: mocks.getCachedPlayerWords,
 }));
 
 import {
@@ -197,6 +201,45 @@ describe('startBotsForWheelRush', () => {
     // The locked word should also be credited to the bot-usage corpus.
     const lockedWord = mocks.addPlayerWord.mock.calls[0][2];
     expect(mocks.incrementBotWordUsage).toHaveBeenCalledWith(lockedWord, 'en');
+  });
+
+  it('easy bot queues the COMMON player word before the rare one (frequency banding)', async () => {
+    const puzzle = {
+      centerLetter: 'C',
+      outerLetters: ['A', 'N', 'E', 'S', 'T', 'R'],
+      allLetters: ['C', 'A', 'N', 'E', 'S', 'T', 'R'],
+    };
+    const state = initWheelRushState(puzzle, ['alice', 'BotBob']);
+    mocks.getGame.mockReturnValue({
+      gameCode: 'ABCD', gameMode: 'wheel-rush', gameState: 'in-progress', language: 'en',
+      wheelRushState: state,
+      users: { alice: { avatar: 'd', isHost: true }, BotBob: { avatar: 'd', isHost: false } },
+      playerScores: { alice: 0, BotBob: 0 }, playerWords: { alice: [], BotBob: [] },
+    });
+
+    // 200-word corpus (>= MIN_CORPUS_FOR_BANDING): 'cat' commonest (rank 0),
+    // 'cent' rarest (rank 199). Keyed lowercase; the driver uppercases for lookup.
+    const corpus = ['cat', ...Array.from({ length: 198 }, (_, i) => `flr${i}`), 'cent'];
+    mocks.getCachedPlayerWords.mockResolvedValue(corpus);
+    // Constant rand → weighted ordering is a pure function of weight (deterministic).
+    const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.99);
+
+    try {
+      await startBotsForWheelRush(
+        io as unknown as import('socket.io').Server,
+        'ABCD', [makeBot({ difficulty: 'easy' })], state, 'en', 60,
+      );
+      vi.advanceTimersByTime(60_000);
+
+      const submitted = mocks.addPlayerWord.mock.calls.map(c => c[2]);
+      const iCommon = submitted.indexOf('CAT');
+      const iRare = submitted.indexOf('CENT');
+      expect(iCommon).toBeGreaterThanOrEqual(0);
+      expect(iRare).toBeGreaterThanOrEqual(0);
+      expect(iCommon).toBeLessThan(iRare);
+    } finally {
+      randSpy.mockRestore();
+    }
   });
 
   it('no-op when bot list empty', async () => {

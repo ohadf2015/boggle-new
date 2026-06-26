@@ -13,6 +13,8 @@ import type { Language, WheelPuzzle, WheelRushModeState } from '@/shared/types/g
 import type { Bot } from '../../modules/botBehavior';
 import { getGame, updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
 import { incrementBotWordUsage } from '../../modules/supabaseServer';
+import { getCachedPlayerWords } from '../../modules/botBehaviorCache';
+import { orderWordPoolByFrequencyBand, MIN_CORPUS_FOR_BANDING } from '../../modules/wordFrequencyBanding';
 import {
   getLeaderboardThrottled,
   type LeaderboardPlayer,
@@ -250,13 +252,25 @@ export async function startBotsForWheelRush(
 
   logger.info('BOT_WHEEL', `Game ${gameCode} (${language}): ${allCandidates.length} candidate wheel words for ${bots.length} bots`);
 
+  // Rank candidates by real player frequency so bots pick human-plausible words
+  // (easy → common first, hard → reach into rare real words) instead of a blind
+  // shuffle. Enumerated wheel words are UPPERCASE; player_words are lowercase, so
+  // key the rank map by uppercase. Falls back to shuffle when the corpus is thin.
+  const playerWords = await getCachedPlayerWords(language);
+  const rankByWord = playerWords.length >= MIN_CORPUS_FOR_BANDING
+    ? new Map(playerWords.map((w, i) => [w.toUpperCase(), i]))
+    : null;
+
   for (const bot of bots) {
     bot.isActive = true;
-    // Shuffled slice so bots diverge — also acts as a soft per-bot cap. Trimmed
-    // for the short 60s round so bots can't out-volume a focused human (see
+    // Banded (or shuffled) slice so bots diverge — also acts as a soft per-bot cap.
+    // Trimmed for the short 60s round so bots can't out-volume a focused human (see
     // WHEEL_RUSH_BOT_TUNING for the matching score-ceiling softening).
     const perBotCap = bot.difficulty === 'hard' ? 18 : bot.difficulty === 'medium' ? 12 : 8;
-    const words = shuffle(allCandidates).slice(0, perBotCap);
+    const ordered = rankByWord
+      ? orderWordPoolByFrequencyBand(allCandidates, rankByWord, playerWords.length, bot.difficulty)
+      : shuffle(allCandidates);
+    const words = ordered.slice(0, perBotCap);
     scheduleBot(io, gameCode, bot, state, words, language, gameEndTime);
     logger.info('BOT_WHEEL', `Bot "${bot.username}" queued ${words.length} wheel words for ${gameCode}`);
   }
