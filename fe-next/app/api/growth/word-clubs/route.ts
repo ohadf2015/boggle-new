@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createAdminClient } from '@/utils/supabase/admin';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 
 function getSupabaseAdmin() {
   return createAdminClient()!;
@@ -40,7 +41,9 @@ function generateInviteCode(): string {
  */
 export async function GET(req: NextRequest) {
   try {
-    const user = await getUserFromRequest(req);
+    // Local JWT verify (sub-ms) — callers send a Bearer token. Read-only GET;
+    // POST keeps getUserFromRequest (remote getUser) for mutation safety.
+    const user = await getAuthedUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
