@@ -452,9 +452,28 @@ const nextConfig = {
   },
 
   // Webpack configuration - alias for swedish-words package
-  webpack: (config, { isServer: _isServer }) => {
+  webpack: (config, { isServer: _isServer, dev }) => {
     // Alias the TypeScript index to the compiled JavaScript version
     config.resolve.alias['@arvidbt/swedish-words'] = path.resolve(__dirname, 'node_modules/@arvidbt/swedish-words/out/index.js');
+
+    // Peak build-memory reduction for the webpack engine (prod builds with
+    // `next build --webpack`). Railway's build container has less RAM than a dev
+    // machine; without these, a big app can spike past the heap and OOM. Dev is
+    // untouched (full speed).
+    if (!dev) {
+      // Process fewer modules concurrently → lower peak heap (slightly slower).
+      config.parallelism = 1;
+      // One-shot CI builds reuse nothing, so the persistent cache only costs
+      // serialization memory — drop it.
+      config.cache = false;
+      // Cap Terser minifier workers (default = CPU count; each worker holds
+      // chunks in memory and is the usual peak-RAM consumer).
+      for (const m of config.optimization?.minimizer ?? []) {
+        if (m && m.options && 'parallel' in m.options) {
+          m.options.parallel = 2;
+        }
+      }
+    }
 
     return config;
   },
