@@ -25,6 +25,19 @@ vi.mock('../utils/logger', () => ({ default: {
   error: vi.fn(),
 } }));
 
+vi.mock('../dictionary', () => ({
+  ensureLanguageLoaded: vi.fn().mockResolvedValue(undefined),
+}));
+
+// Partial-mock: keep getCacheStats/clearBehaviorCaches etc. real (other tests
+// assert them), override ONLY getCachedPlayerWords so the frequency-banding
+// integration tests can inject a corpus. botBehavior imports this via ESM, so
+// the mock intercepts (unlike the CommonJS require of supabaseServer).
+vi.mock('../modules/botBehaviorCache', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../modules/botBehaviorCache')>();
+  return { ...actual, getCachedPlayerWords: vi.fn(async () => [] as string[]) };
+});
+
 import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   addBot,
@@ -49,12 +62,14 @@ import {
   calculateNextDelay,
   generateWrongWords,
   submitBotWord,
+  prepareBotWords,
   clearBehaviorCaches,
   getCacheStats,
   orderWordPoolByFrequencyBand,
   type Bot,
 } from '../modules/botBehavior';
 import { incrementBotWordUsage } from '../modules/supabaseServer';
+import { getCachedPlayerWords } from '../modules/botBehaviorCache';
 
 describe('Bot Manager', () => {
 
@@ -648,6 +663,55 @@ describe('Bot Behavior', () => {
       const input = ['rare', 'common', 'mid', 'unknownword'];
       const ordered = orderWordPoolByFrequencyBand(input, rankByWord, corpusSize, 'medium', constRand);
       expect([...ordered].sort()).toEqual([...input].sort());
+    });
+  });
+
+  describe('Frequency banding integration (prepareBotWords)', () => {
+    // The real boggle solver runs on this grid (the solver mock doesn't intercept
+    // botBehavior's CommonJS require), so anchor on words it deterministically
+    // finds here: 'cat' and 'dog' (both 3-letter → land in easy AND hard pools).
+    const GRID = [['C', 'A', 'T'], ['D', 'O', 'G'], ['R', 'A', 'T']];
+
+    // 250-word freq-ordered corpus (>= MIN_CORPUS_FOR_BANDING): 'cat' rank 0
+    // (common), 'dog' rank 249 (rarest), fillers between.
+    const corpus = [
+      'cat',
+      ...Array.from({ length: 248 }, (_, i) => `zzfiller${i}`),
+      'dog',
+    ];
+
+    let randSpy: MockInstance;
+    beforeEach(() => {
+      vi.mocked(getCachedPlayerWords).mockResolvedValue(corpus);
+      // 0.99 keeps every word (0.99 > missChance) and makes the weighted-random
+      // ordering a pure function of weight — deterministic.
+      randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    });
+    afterEach(() => {
+      randSpy.mockRestore();
+      vi.mocked(getCachedPlayerWords).mockResolvedValue([]);
+    });
+
+    test('easy bot surfaces the COMMON player word before the rare one', async () => {
+      const bot = addBot('TEST1', 'easy', {}, 'en');
+      await prepareBotWords(bot, GRID, 'en');
+
+      const iCommon = bot.wordsToFind.indexOf('cat'); // rank 0
+      const iRare = bot.wordsToFind.indexOf('dog');    // rank 249
+      expect(iCommon).toBeGreaterThanOrEqual(0);
+      expect(iRare).toBeGreaterThanOrEqual(0);
+      expect(iCommon).toBeLessThan(iRare);
+    });
+
+    test('hard bot surfaces the RARE real player word before the common one', async () => {
+      const bot = addBot('TEST1', 'hard', {}, 'en');
+      await prepareBotWords(bot, GRID, 'en');
+
+      const iRare = bot.wordsToFind.indexOf('dog');    // rank 249
+      const iCommon = bot.wordsToFind.indexOf('cat');  // rank 0
+      expect(iRare).toBeGreaterThanOrEqual(0);
+      expect(iCommon).toBeGreaterThanOrEqual(0);
+      expect(iRare).toBeLessThan(iCommon);
     });
   });
 
