@@ -142,7 +142,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       className="flex-1 flex flex-col items-center justify-start pt-2 sm:pt-4 px-4 pb-bottom-stack sm:pb-10 min-h-0 overflow-y-auto"
     >
       {/* Top bar with back and language */}
-      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl flex items-center justify-between mb-2">
+      <div className="w-full max-w-md lg:max-w-4xl flex items-center justify-between mb-2">
         {/* Back button */}
         <Button
           variant="ghost"
@@ -162,7 +162,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       </div>
 
       {/* Main content - COMPACT on mobile, two-column on desktop */}
-      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 xl:gap-12 lg:items-start">
+      <div className="w-full max-w-md lg:max-w-4xl lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 xl:gap-12 lg:items-start">
       {/* Left column: primary content */}
       <div className="text-center space-y-3">
         {/* Explorer mascot — sets adventure tone before the word hunt */}
