@@ -251,7 +251,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
 
   return (
     <div
-      className="pointer-events-auto absolute inset-x-0 top-[10%] z-30 flex flex-col items-center gap-3 px-4"
+      className="pointer-events-auto absolute inset-x-0 top-[32%] z-30 flex flex-col items-center gap-3 px-4"
       role="group"
       aria-label={t('wordTower.crane.place')}
     >

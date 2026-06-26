@@ -3,9 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { visibleLandmarks } from '@/lib/wordTower/landmarks';
 import { PROP_PX_PER_M } from '@/lib/wordTower/parallaxProps';
-
-/** Build line as a fraction of viewport height — matches towerLayout's topCenter. */
-const BUILD_LINE_FRACTION = 0.28;
+import { WORD_TOWER_BUILD_LINE_FRACTION as BUILD_LINE_FRACTION } from '@/lib/wordTower/towerLayout';
 const LINE_FLOW = 'top 900ms cubic-bezier(0.22,1,0.36,1)';
 
 interface Props {

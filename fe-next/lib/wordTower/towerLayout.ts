@@ -69,6 +69,13 @@ export function courseTileLayout(word: string, courseW: number, opts: CourseOpts
  *  pans down to review everything below. */
 export const DEFAULT_MAX_VISIBLE_ROWS = 3;
 
+/** Where the crane drops + the newest tile pins, as a fraction of canvas height.
+ *  Founder 2026-06-26: a LOW build line keeps the active ~3 blocks in the lower
+ *  screen with the upper screen left as sky/biome ("most of the screen should be
+ *  fun to watch"). Single source of truth — the crane chrome + both rails align
+ *  to this same line (crane = this + a fixed chrome offset). */
+export const WORD_TOWER_BUILD_LINE_FRACTION = 0.5;
+
 /** Inputs for the grounded tower-camera row layout. */
 export interface TowerRowLayoutInput {
   /** Committed rows the camera pins on. Pending preview rows are NOT counted —
@@ -107,22 +114,17 @@ export interface TowerRowLayout {
  */
 export function towerRowLayout({ pinCount, H, bottomInsetPx, maxVisibleRows = DEFAULT_MAX_VISIBLE_ROWS }: TowerRowLayoutInput): TowerRowLayout {
   const mvr = Math.max(1, Math.round(maxVisibleRows));
-  // Founder 2026-06-26: "show ~3 building blocks at a time; scroll to see more;
-  // most of the screen should be sky/biome." Each letter is one brick, and the
-  // scene reads this `size` directly — so we size the bricks so roughly `mvr` of
-  // them fill the band between the build line (~0.28H) and the control deck. The
-  // result is fewer, chunkier, more readable blocks with the rest of the tower
-  // scrolling below the deck. Clamped so it stays sane on tiny + huge canvases.
-  const band = Math.max(0, (H - bottomInsetPx) - H * 0.28);
-  // Round to a whole pixel so rowH is integral and the camera shift stays exact
-  // (no sub-pixel float dust at the grounded↔overflow boundary).
-  const size = Math.round(clamp(band / mvr - 2, 44, 96));
+  // Founder 2026-06-26: "show ~3 building blocks; scroll for more; most of the
+  // screen should be sky/biome." Compact, readable bricks (not chunky) — the
+  // ~3-visible count now comes from the LOW build line (sky above), not from
+  // oversizing the blocks.
+  const size = Math.round(clamp(H * 0.066, 38, 54));
   const half = size / 2;
   const rowH = size + 2; // ~2px seam → tiles read as one cohesive stacked tower, not floating blocks
-  // Build line stays in the upper-middle, glued to the crane that drops onto it
-  // (the crane chrome + rival rail are anchored to this same ~0.28H line — don't
-  // move it). The committed top pins here once the tower overflows.
-  const topCenter = H * 0.28 + half;
+  // The build line sits low (WORD_TOWER_BUILD_LINE_FRACTION) so the upper screen
+  // stays sky. The crane chrome + both rails align to this SAME line. The newest
+  // committed tile pins here once the tower overflows.
+  const topCenter = H * WORD_TOWER_BUILD_LINE_FRACTION + half;
   // The base floats exactly (mvr-1) rows BELOW the build line, so a fresh tower
   // never shows more than `mvr` committed rows: the active build zone is a tight
   // cluster hanging under the crane and the rest of the screen reads clean. We

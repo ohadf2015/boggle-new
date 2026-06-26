@@ -163,12 +163,12 @@ describe('towerRowLayout (grounded camera)', () => {
 
   // ── Phase-1 polish: compact, cohesive stack (founder: tiles too big, tower
   //    reads as floating blocks not a solid tower; new letters crammed at top). ──
-  it('caps tile size to a chunky maximum even on tall canvases', () => {
-    expect(towerRowLayout({ pinCount: 5, H: 2000, bottomInsetPx: inset }).size).toBeLessThanOrEqual(96);
+  it('caps tile size to a compact maximum even on tall canvases', () => {
+    expect(towerRowLayout({ pinCount: 5, H: 2000, bottomInsetPx: inset }).size).toBeLessThanOrEqual(54);
   });
 
   it('keeps a usable minimum tile size on short canvases', () => {
-    expect(towerRowLayout({ pinCount: 5, H: 300, bottomInsetPx: inset }).size).toBeGreaterThanOrEqual(44);
+    expect(towerRowLayout({ pinCount: 5, H: 300, bottomInsetPx: inset }).size).toBeGreaterThanOrEqual(38);
   });
 
   it('stacks rows nearly flush — a thin seam, never a loose gap or overlap', () => {
@@ -180,13 +180,14 @@ describe('towerRowLayout (grounded camera)', () => {
     }
   });
 
-  it('keeps the build line glued to the crane line (~0.28H), never up by the header', () => {
-    // The crane chrome + rival rail are anchored to this same upper-middle line;
-    // the build line must stay there so the dropped block lands under the crane.
+  it('keeps the build line LOW (~0.5H) so the upper screen stays sky', () => {
+    // Founder 2026-06-26: the crane chrome + both rails align to this same low
+    // line; the dropped block lands under the crane in the lower screen, leaving
+    // the top half as sky/biome.
     for (const h of [700, 915, 1200]) {
       const l = towerRowLayout({ pinCount: 8, H: h, bottomInsetPx: 160 });
-      expect(l.topCenter).toBeGreaterThanOrEqual(h * 0.22);
-      expect(l.topCenter).toBeLessThanOrEqual(h * 0.42);
+      expect(l.topCenter).toBeGreaterThanOrEqual(h * 0.45);
+      expect(l.topCenter).toBeLessThanOrEqual(h * 0.62);
     }
   });
 

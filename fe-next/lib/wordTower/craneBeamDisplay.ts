@@ -17,13 +17,12 @@ export const CRANE_BEAM_MAX_BRICKS = 10;
 
 /** Vertical pixel budget the carried girder must fit within (the bay below the
  *  hook). Bricks shrink to share it once the word is long. */
-export const CRANE_BEAM_BUDGET_PX = 165;
+export const CRANE_BEAM_BUDGET_PX = 150;
 /** Brick size clamps (px) — never so small it's illegible, never bigger than the
- *  comfortable default that short words use. Max bumped 2026-06-26 to track the
- *  now-chunkier committed tower bricks (towerRowLayout) so a dropped word doesn't
- *  visibly balloon on landing; budget keeps a long girder inside the crane bay. */
+ *  comfortable default that short words use. Matches the compact committed tower
+ *  bricks (towerRowLayout, 38–54) so a dropped word lands without resizing. */
 export const CRANE_BEAM_TILE_MIN_PX = 16;
-export const CRANE_BEAM_TILE_MAX_PX = 48;
+export const CRANE_BEAM_TILE_MAX_PX = 38;
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
