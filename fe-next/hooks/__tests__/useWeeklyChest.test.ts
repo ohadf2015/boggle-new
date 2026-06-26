@@ -1,12 +1,15 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { renderHook, waitFor } from '@testing-library/react'
-import { useWeeklyChest } from '../useWeeklyChest'
+import { useWeeklyChest, _resetWeeklyChestCache } from '../useWeeklyChest'
 
 const makeFetch = (body: object) =>
   vi.fn().mockResolvedValue({ ok: true, json: async () => body })
 
 describe('useWeeklyChest', () => {
-  beforeEach(() => vi.clearAllMocks())
+  // Reset the module-level dedup cache between tests — without this, a cached
+  // status from one test leaks into the next (within the 4s TTL) and shifts the
+  // mocked-fetch call sequence.
+  beforeEach(() => { vi.clearAllMocks(); _resetWeeklyChestCache() })
 
   it('is loading initially', () => {
     global.fetch = makeFetch({ daysCompleted: 3, isClaimable: false, completedDates: [], cycleStart: '2026-05-10', cycleNumber: 1, pendingChest: null })

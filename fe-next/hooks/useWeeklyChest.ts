@@ -99,6 +99,14 @@ let inflightStatus: Promise<typeof DEFAULTS | null> | null = null
 let cachedStatus: typeof DEFAULTS | null = null
 let cachedAt = 0
 
+/** @internal Reset the module-level dedup cache. For test isolation only —
+ * the cache persists for the page lifetime in production by design. */
+export function _resetWeeklyChestCache() {
+  inflightStatus = null
+  cachedStatus = null
+  cachedAt = 0
+}
+
 function fetchWeeklyChestStatus(force: boolean): Promise<typeof DEFAULTS | null> {
   if (!force) {
     if (inflightStatus) return inflightStatus
