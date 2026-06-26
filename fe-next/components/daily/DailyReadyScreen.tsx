@@ -167,7 +167,8 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
       <div className="text-center space-y-3">
         {/* Explorer mascot — sets adventure tone before the word hunt */}
         <div className="flex justify-center">
-          <MascotWithEntrance variant="explorer" size="sm" delay={0.1} />
+          {/* priority: this above-fold mascot is the measured LCP on /daily/word-hunt — load eager, not lazy */}
+          <MascotWithEntrance variant="explorer" size="sm" delay={0.1} priority />
         </div>
 
         {/* Guest Mode Notice - Show only for anonymous users */}

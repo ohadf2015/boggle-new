@@ -1,3 +1,4 @@
+import ReactDOM from 'react-dom';
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
@@ -181,14 +182,25 @@ export default async function MultiplayerPage({ params }: { params: Promise<{ lo
   const { locale } = await params;
   const content = seoContent[locale] ?? seoContent.en;
   const origin = 'https://www.lexiclash.live';
+
+  // Preload the lobby LCP hero (RoomListView.tsx) from the FIRST server HTML, so the
+  // browser fetches it while the dynamic(ssr:false) multiplayer JS downloads. Without
+  // this the hero's own <Image priority> preload is absent from initial HTML (it lives
+  // inside the ssr:false flow) and the image is discovered seconds late — worst on
+  // mobile (field data: resourceLoadDelay ~4.8s). The previous static <link> here
+  // pointed at the OLD hero (/mascot/play.webp) which the lobby no longer renders — a
+  // high-priority preload of an unused asset that stole the connection from the real LCP.
+  // ponytail: srcset widths/quality hardcoded to next.config deviceSizes (q=75); update if those change.
+  const HERO = '%2Fimages%2Farena-hub-hero.jpg';
+  ReactDOM.preload(`/_next/image?url=${HERO}&w=1920&q=75`, {
+    as: 'image',
+    fetchPriority: 'high',
+    imageSrcSet: [640, 750, 828, 1080, 1200, 1920].map((w) => `/_next/image?url=${HERO}&w=${w}&q=75 ${w}w`).join(', '),
+    imageSizes: '(min-width: 1024px) 720px, (min-width: 640px) 560px, 100vw',
+  });
+
   return (
     <>
-      {/* Preload the lobby hero mascot from the FIRST server HTML response so the
-          browser fetches it while the (ssr:false) multiplayer JS downloads — the
-          mascot is the LCP element once the lobby mounts. first-timer variant is
-          the cold-visit case; returning users have it cached. React hoists this
-          rel=preload link into <head>. */}
-      <link rel="preload" as="image" href="/mascot/play.webp" type="image/webp" fetchPriority="high" />
       <VideoGameJsonLd
         mode="multiplayer"
         locale={locale}

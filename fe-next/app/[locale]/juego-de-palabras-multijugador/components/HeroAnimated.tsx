@@ -109,8 +109,8 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
         </div>
 
         <m.div
-          initial={reduced ? false : { opacity: 0, scale: 0.9, rotate: -2 }}
-          animate={reduced ? undefined : { opacity: 1, scale: 1, rotate: 0 }}
+          initial={reduced ? false : { scale: 0.92, rotate: -2 }}
+          animate={reduced ? undefined : { scale: 1, rotate: 0 }}
           transition={reduced ? undefined : { type: 'spring', stiffness: 180, damping: 18, delay: 0.25 }}
           className="relative mx-auto w-full max-w-sm lg:max-w-none"
         >
@@ -120,6 +120,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
               alt="Dos mascotas de LexiClash compitiendo en una rejilla de palabras multijugador"
               width={760}
               height={760}
+              priority
               sizes="(min-width: 1024px) 360px, (min-width: 640px) 384px, 90vw"
               className="h-auto w-full"
             />
