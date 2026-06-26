@@ -5,6 +5,7 @@ import type { RivalMarker } from '@/lib/wordTower/rivals';
 import type { HazardKind } from '@/lib/wordTower/hazards';
 import {
   SABOTAGE_PERFECT_THRESHOLD,
+  SABOTAGE_M_PER_FLOOR,
   awardSabotageToken,
   awardSabotageTokenViaAd,
   canSabotage,
@@ -131,9 +132,6 @@ export function useSabotage(perfectStreak: number, progressEarnEvents = 0) {
     perfectsPerToken: SABOTAGE_PERFECT_THRESHOLD,
   };
 }
-
-/** Approx metres lost per sabotaged floor on the rival rail (decorative only). */
-const SABOTAGE_M_PER_FLOOR = 8;
 
 /**
  * useSabotageIntegration — wraps useSabotage with rival-rail display math +

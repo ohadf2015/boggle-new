@@ -9,6 +9,8 @@ import {
   SABOTAGE_FLOORS_PER_HIT,
   canEarnViaAd,
   awardSabotageTokenViaAd,
+  heightToBlocks,
+  SABOTAGE_M_PER_FLOOR,
 } from '../sabotage';
 
 describe('awardSabotageToken — perfect-streak earn rule', () => {
@@ -79,5 +81,31 @@ describe('awardSabotageTokenViaAd', () => {
   it('clamps at cap — no over-grant', () => {
     expect(awardSabotageTokenViaAd(SABOTAGE_TOKEN_CAP)).toBe(SABOTAGE_TOKEN_CAP);
     expect(awardSabotageTokenViaAd(SABOTAGE_TOKEN_CAP - 1)).toBe(SABOTAGE_TOKEN_CAP);
+  });
+});
+
+describe('heightToBlocks — visual block count for smash scene', () => {
+  it('clamps to minBlocks when height is very low', () => {
+    expect(heightToBlocks(1)).toBe(4);
+    expect(heightToBlocks(7)).toBe(4); // less than 1 block worth
+  });
+
+  it('clamps to maxBlocks when height is very high', () => {
+    expect(heightToBlocks(120)).toBe(10);
+    expect(heightToBlocks(1000)).toBe(10);
+  });
+
+  it('scales linearly by SABOTAGE_M_PER_FLOOR within bounds', () => {
+    // At 8m (1 block worth), should be ~4 (minimum)
+    expect(heightToBlocks(32)).toBe(4); // 32m = 4 blocks, at minimum
+    // At 40m (5 blocks), should return 5
+    expect(heightToBlocks(40)).toBe(5);
+    // At 80m (10 blocks), should return 10 (maximum)
+    expect(heightToBlocks(80)).toBe(10);
+  });
+
+  it('respects custom min/max bounds', () => {
+    expect(heightToBlocks(5, 2, 8)).toBe(2);
+    expect(heightToBlocks(100, 2, 8)).toBe(8);
   });
 });

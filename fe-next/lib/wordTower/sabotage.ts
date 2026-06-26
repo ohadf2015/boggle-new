@@ -33,6 +33,8 @@ export const WRECK_LEAD_PER_FLOOR_M = 80;
  *  start — turns "I got hit" into "I got paid + I'll retaliate", per the
  *  research on keeping async PvP feeling fair to BOTH sides. */
 export const WRECK_COMPENSATION_SCRAMBLES = 1;
+/** Metres lost per sabotaged floor on the rival rail (used for display and damage calc). */
+export const SABOTAGE_M_PER_FLOOR = 8;
 
 /**
  * Award one token if the player's perfect-streak just crossed a multiple of
@@ -107,4 +109,15 @@ export function asyncWreckDamageFloors(attackerHeightM: number, targetHeightM: n
   const lead = Math.max(0, attackerHeightM - targetHeightM);
   const fromLead = 1 + Math.floor(lead / WRECK_LEAD_PER_FLOOR_M);
   return Math.max(1, Math.min(WRECK_MAX_FLOORS_PER_ATTACK, fromLead));
+}
+
+/**
+ * Convert a rival's height in metres to a display block count for the smash scene.
+ * Returns a clamped value between minBlocks and maxBlocks for visual consistency
+ * (we don't want a 1m tower or a 500m tower represented as 1000 blocks).
+ * The rendered height is purely visual — damage N is always from sabotageFloorsFor().
+ */
+export function heightToBlocks(heightM: number, minBlocks = 4, maxBlocks = 10): number {
+  const blocksFromHeight = Math.ceil(heightM / SABOTAGE_M_PER_FLOOR);
+  return Math.max(minBlocks, Math.min(maxBlocks, blocksFromHeight));
 }

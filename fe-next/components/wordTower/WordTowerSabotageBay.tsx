@@ -1,8 +1,9 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
+import { WordTowerSmashScene } from './WordTowerSmashScene';
 
 interface Props {
   tokens: number;
@@ -54,6 +55,21 @@ export function WordTowerSabotageBay({
   t,
   reducedMotion,
 }: Props) {
+  const [smashTarget, setSmashTarget] = useState<RivalMarker | null>(null);
+
+  // Transition from picker → smash scene: pick a rival, close picker, open scene
+  const handlePickRival = useCallback((rival: RivalMarker) => {
+    setSmashTarget(rival);
+    onClose();
+  }, [onClose]);
+
+  // Smash scene done: commit the hit and clear the overlay
+  const handleSmashDone = useCallback(() => {
+    if (smashTarget) {
+      onSend(smashTarget.id, smashTarget.name);
+      setSmashTarget(null);
+    }
+  }, [smashTarget, onSend]);
   // Auto-dismiss the earn toast after 2.6s — long enough to read, short enough
   // not to crowd the next action.
   useEffect(() => {
@@ -81,35 +97,29 @@ export function WordTowerSabotageBay({
   return (
     <>
       {/* Floating token chip — sits above the bottom HUD on the start (LTR=left)
-          side, opposite the (end-side) hazards. Tap to open the picker. */}
-      <button
-        type="button"
-        onClick={hasTokens ? onOpen : undefined}
-        disabled={!hasTokens}
-        aria-label={t('wordTower.sabotage.chip')}
-        className={cn(
-          'pointer-events-auto absolute start-3 bottom-[230px] z-40 flex items-center gap-1.5 rounded-neo border-neo-thick border-black px-2.5 py-1.5 font-neo-display text-sm font-black uppercase shadow-hard transition-transform',
-          hasTokens
-            ? 'bg-neo-pink text-neo-white hover:scale-105 active:translate-y-px'
-            : 'bg-neo-navy/60 text-neo-white/50',
-          hasTokens && !reducedMotion && 'animate-neo-pop',
-        )}
-      >
-        <span aria-hidden>🎯</span>
-        <span>{t('wordTower.sabotage.chip')}</span>
-        <span
+          side, opposite the (end-side) hazards. Tap to open the picker.
+          ONLY shown when tokens > 0 ("the wrecking ball should only show on the screen when the player has it"). */}
+      {hasTokens && (
+        <button
+          type="button"
+          onClick={onOpen}
+          aria-label={t('wordTower.sabotage.chip')}
           className={cn(
-            'flex h-5 min-w-5 items-center justify-center rounded-full border border-black px-1 font-neo-display text-[11px] font-black',
-            hasTokens ? 'bg-neo-yellow text-black' : 'bg-neo-navy text-neo-white/60',
+            'pointer-events-auto absolute start-3 bottom-[230px] z-40 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform hover:scale-105 active:translate-y-px',
+            !reducedMotion && 'animate-neo-pop',
           )}
         >
-          {tokens}
-        </span>
-      </button>
+          <span aria-hidden>🎯</span>
+          <span>{t('wordTower.sabotage.chip')}</span>
+          <span className="flex h-5 min-w-5 items-center justify-center rounded-full border border-black bg-neo-yellow px-1 font-neo-display text-[11px] font-black text-black">
+            {tokens}
+          </span>
+        </button>
+      )}
 
       {/* Watch-Ad CTA — cyan secondary action, only when ad is available and
-          tokens are below cap. Sits just below the spend chip so it reads as
-          a recharge option, not a primary action. */}
+          tokens are below cap. Positioned below the spend chip when it exists,
+          or at the chip position if the chip is hidden (tokens === 0). */}
       {onWatchAdForToken && (
         <button
           type="button"
@@ -117,7 +127,8 @@ export function WordTowerSabotageBay({
           disabled={adLoading}
           aria-label={t('wordTower.sabotage.watchAd')}
           className={cn(
-            'pointer-events-auto absolute start-3 bottom-[190px] z-40 flex items-center gap-1 rounded-neo border-neo border-black px-2 py-1 font-neo-display text-xs font-bold uppercase shadow-hard transition-transform',
+            'pointer-events-auto absolute start-3 z-40 flex items-center gap-1 rounded-neo border-neo border-black px-2 py-1 font-neo-display text-xs font-bold uppercase shadow-hard transition-transform',
+            hasTokens ? 'bottom-[190px]' : 'bottom-[230px]',
             adLoading
               ? 'bg-neo-navy/60 text-neo-white/40'
               : 'bg-neo-cyan text-black hover:scale-105 active:translate-y-px',
@@ -196,7 +207,7 @@ export function WordTowerSabotageBay({
                   <li key={r.id}>
                     <button
                       type="button"
-                      onClick={() => onSend(r.id, r.name)}
+                      onClick={() => handlePickRival(r)}
                       className="flex w-full items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-2.5 text-start font-neo-display text-base font-black uppercase text-neo-white shadow-hard transition-transform active:translate-y-px"
                     >
                       <span
@@ -219,43 +230,15 @@ export function WordTowerSabotageBay({
         </div>
       )}
 
-      {/* Wrecking-ball flight + hit toast — the ball arcs across the screen from
-          the sender's chip toward the rival rail edge. CSS keyframe animation
-          keyed by the hit id so each new hit replays. */}
-      {lastHit && !reducedMotion && (
-        <div
-          key={lastHit.id}
-          aria-hidden
-          className="pointer-events-none absolute start-6 bottom-[230px] z-40 select-none text-3xl"
-          style={{
-            animation: 'wt-wrecking-ball 800ms cubic-bezier(0.45, 0, 0.7, 1) forwards',
-          }}
-        >
-          💥
-        </div>
+      {/* Smash scene overlay — mounts when a rival is picked from the picker. */}
+      {smashTarget && (
+        <WordTowerSmashScene
+          target={smashTarget}
+          onDone={handleSmashDone}
+          t={t}
+          reducedMotion={reducedMotion}
+        />
       )}
-      {lastHit && (
-        <div
-          role="status"
-          aria-live="polite"
-          className={cn(
-            'pointer-events-none absolute left-1/2 top-[20%] z-40 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-2 font-neo-display text-base font-black uppercase text-neo-white shadow-hard',
-            !reducedMotion && 'animate-neo-pop',
-          )}
-        >
-          {t('wordTower.sabotage.sentTo', { name: lastHit.targetName })}
-        </div>
-      )}
-
-      {/* Keyframes scoped to the bay — kept here so the component is portable. */}
-      <style jsx global>{`
-        @keyframes wt-wrecking-ball {
-          0%   { transform: translate(0, 0) rotate(0deg) scale(0.5); opacity: 1; }
-          40%  { transform: translate(40vw, -55vh) rotate(180deg) scale(1.4); opacity: 1; }
-          80%  { transform: translate(75vw, -25vh) rotate(360deg) scale(1.7); opacity: 1; }
-          100% { transform: translate(80vw, -22vh) rotate(380deg) scale(2.2); opacity: 0; }
-        }
-      `}</style>
     </>
   );
 }
