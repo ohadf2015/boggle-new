@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useMemo, ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import { ThemeProvider } from '@/utils/ThemeContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import { RadixDirectionProvider } from '@/components/providers/RadixDirectionProvider';
@@ -27,15 +28,23 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
-import AnchoredNativeBanner from '@/components/ads/AnchoredNativeBanner';
-import BannerCoordinatorMount from '@/components/ads/BannerCoordinatorMount';
-import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
 import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer';
 import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
 import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
-import { SignupPromptHost } from '@/components/auth/SignupPromptHost';
-import PlayerStyleOnboardingWrapper from './components/PlayerStyleOnboardingWrapper';
-import { UnlockNotifierMount } from '@/components/cosmetics/UnlockNotifierMount';
+
+// Non-first-paint leaf mounts (effect-only listeners, gated modals, native
+// guards, ad banners, FX overlays) are dynamically imported with ssr:false so
+// their code leaves the synchronous first-load bundle AND their mount/effects
+// run after hydration instead of inside the critical hydration pass. None render
+// visible UI at first paint, so ssr:false is flash-free. Visible cosy surfaces
+// (CosyAmbientBackdrop, QuietCelebrationLayer) are intentionally NOT deferred —
+// ssr:false on those would flash (see .claude/rules Class-5 mobile-web flash).
+const AnchoredNativeBanner = dynamic(() => import('@/components/ads/AnchoredNativeBanner'), { ssr: false });
+const BannerCoordinatorMount = dynamic(() => import('@/components/ads/BannerCoordinatorMount'), { ssr: false });
+const WebAnchorAdObserver = dynamic(() => import('@/components/ads/WebAnchorAdObserver'), { ssr: false });
+const SignupPromptHost = dynamic(() => import('@/components/auth/SignupPromptHost').then(m => m.SignupPromptHost), { ssr: false });
+const PlayerStyleOnboardingWrapper = dynamic(() => import('./components/PlayerStyleOnboardingWrapper'), { ssr: false });
+const UnlockNotifierMount = dynamic(() => import('@/components/cosmetics/UnlockNotifierMount').then(m => m.UnlockNotifierMount), { ssr: false });
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -44,13 +53,16 @@ import { linkLogRocketSession } from '@/utils/sentry';
 import { hasConsent } from '@/utils/cookieConsent';
 import { LogRocketIdentify } from '@/components/providers/LogRocketIdentify';
 import { PostHogProvider } from '@/components/providers/PostHogProvider';
-import GlobalCoinEarnFx from '@/components/animations/GlobalCoinEarnFx';
-import SharedFxMount from '@/components/animations/SharedFxMount';
+// QuietCelebrationLayer + CosyAmbientBackdrop render visible surfaces — keep
+// them server-rendered (static) so they don't flash in after hydration.
 import QuietCelebrationLayer from '@/components/cosy/QuietCelebrationLayer';
 import CosyAmbientBackdrop from '@/components/cosy/CosyAmbientBackdrop';
-import NativeSelectionGuard from '@/components/native/NativeSelectionGuard';
-import EasterEggListener from '@/components/EasterEggListener';
-import HiddenAchievementListener from '@/components/achievements/HiddenAchievementListener';
+
+const GlobalCoinEarnFx = dynamic(() => import('@/components/animations/GlobalCoinEarnFx'), { ssr: false });
+const SharedFxMount = dynamic(() => import('@/components/animations/SharedFxMount'), { ssr: false });
+const NativeSelectionGuard = dynamic(() => import('@/components/native/NativeSelectionGuard'), { ssr: false });
+const EasterEggListener = dynamic(() => import('@/components/EasterEggListener'), { ssr: false });
+const HiddenAchievementListener = dynamic(() => import('@/components/achievements/HiddenAchievementListener'), { ssr: false });
 
 
 import type { TranslationData } from '@/translations/loadTranslation';
