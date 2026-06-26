@@ -76,52 +76,68 @@ export function useMusicFocusManager({
 
   const resumeAudio = useCallback((reason: string): void => {
     const H = getHowlerSync();
+
+    // Stop all tracks except the current one, then (re)start the current one.
+    // Web Audio shares ONE AudioContext, so this must run only AFTER the context
+    // is actually running again — playing on a still-suspended context leaves the
+    // track (and every SFX, same context) silent/stuck until the next gesture.
+    const playCurrent = (): void => {
+      const currentKey = currentTrackRef.current;
+      Object.entries(howlsRef.current).forEach(([key, howl]) => {
+        if (key !== currentKey) {
+          howl.stop();
+        }
+      });
+
+      if (currentHowlRef.current && !currentHowlRef.current.playing() && currentTrackRef.current) {
+        try {
+          const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
+          const currentHowl = currentHowlRef.current;
+
+          currentHowl.volume(targetVolume);
+          currentHowl.play();
+          logger.log(`[Music] ${reason} - resumed current Howl at volume`, targetVolume);
+
+          setTimeout(() => {
+            if (currentHowlRef.current === currentHowl && currentHowl.playing()) {
+              const actualVol = currentHowl.volume();
+              const expectedVol = isMutedRef.current ? 0 : volumeRef.current;
+              if (Math.abs(actualVol - expectedVol) > 0.05) {
+                logger.log(`[Music] ${reason} - correcting volume from`, actualVol, 'to', expectedVol);
+                currentHowl.volume(expectedVol);
+              }
+            }
+          }, 100);
+        } catch (err) {
+          logger.log(`[Music] ${reason} - Howl play error:`, err);
+        }
+      }
+    };
+
     if (H?.ctx && H.ctx.state === 'suspended' && audioUnlockedRef.current) {
       try {
         const result = H.ctx.resume();
-        if (result && typeof result.catch === 'function') {
-          result.catch((err: Error) => {
-            logger.log(`[Music] ${reason} - AudioContext resume failed:`, err.message);
-          });
+        if (result && typeof result.then === 'function') {
+          // Await the resume so play() never lands on a suspended context.
+          result
+            .then(() => {
+              logger.log(`[Music] ${reason} - resumed AudioContext`);
+              playCurrent();
+            })
+            .catch((err: Error) => {
+              logger.log(`[Music] ${reason} - AudioContext resume failed:`, err.message);
+              playCurrent(); // best-effort; onplayerror will retry the resume
+            });
+          return;
         }
-        logger.log(`[Music] ${reason} - resumed AudioContext`);
+        // Synchronous resume() (older Howler/test shims) — fall through to play now.
+        logger.log(`[Music] ${reason} - resumed AudioContext (sync)`);
       } catch (err) {
         logger.log(`[Music] ${reason} - AudioContext resume error:`, err);
       }
     }
 
-    // Stop all tracks except the current one
-    const currentKey = currentTrackRef.current;
-    Object.entries(howlsRef.current).forEach(([key, howl]) => {
-      if (key !== currentKey) {
-        howl.stop();
-      }
-    });
-
-    // Resume the current Howl instance
-    if (currentHowlRef.current && !currentHowlRef.current.playing() && currentTrackRef.current) {
-      try {
-        const targetVolume = isMutedRef.current ? 0 : volumeRef.current;
-        const currentHowl = currentHowlRef.current;
-
-        currentHowl.volume(targetVolume);
-        currentHowl.play();
-        logger.log(`[Music] ${reason} - resumed current Howl at volume`, targetVolume);
-
-        setTimeout(() => {
-          if (currentHowlRef.current === currentHowl && currentHowl.playing()) {
-            const actualVol = currentHowl.volume();
-            const expectedVol = isMutedRef.current ? 0 : volumeRef.current;
-            if (Math.abs(actualVol - expectedVol) > 0.05) {
-              logger.log(`[Music] ${reason} - correcting volume from`, actualVol, 'to', expectedVol);
-              currentHowl.volume(expectedVol);
-            }
-          }
-        }, 100);
-      } catch (err) {
-        logger.log(`[Music] ${reason} - Howl play error:`, err);
-      }
-    }
+    playCurrent();
   }, [currentHowlRef, currentTrackRef, howlsRef, isMutedRef, volumeRef, audioUnlockedRef]);
 
   // Handle tab visibility
