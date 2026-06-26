@@ -7,6 +7,7 @@
 vi.mock('../modules/supabaseServer', () => ({
   getPopularPlayerWords: vi.fn().mockResolvedValue({ data: [] }),
   getSupabase: vi.fn().mockReturnValue(null),
+  incrementBotWordUsage: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../modules/boggleSolver', () => ({
@@ -52,6 +53,7 @@ import {
   getCacheStats,
   type Bot,
 } from '../modules/botBehavior';
+import { incrementBotWordUsage } from '../modules/supabaseServer';
 
 describe('Bot Manager', () => {
 
@@ -535,6 +537,24 @@ describe('Bot Behavior', () => {
 
       expect(callback).not.toHaveBeenCalled();
       expect(bot.currentWordIndex).toBe(0);
+    });
+
+    test('submitBotWord credits times_found_by_bots for accepted words', async () => {
+      const bot = createMockBot({ language: 'en' });
+      const callback = vi.fn(); // undefined return = accepted
+
+      await submitBotWord(bot, callback);
+
+      expect(incrementBotWordUsage).toHaveBeenCalledWith('hello', 'en');
+    });
+
+    test('submitBotWord does NOT credit bot usage when the word is rejected', async () => {
+      const bot = createMockBot({ language: 'en' });
+      const callback = vi.fn().mockReturnValue(false); // rejected
+
+      await submitBotWord(bot, callback);
+
+      expect(incrementBotWordUsage).not.toHaveBeenCalled();
     });
 
     test('submitBotWord does nothing when all words submitted', async () => {

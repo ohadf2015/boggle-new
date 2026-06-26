@@ -31,6 +31,7 @@ import {
   getCachedDifficultyParams,
   getCachedWrongWords,
 } from './botBehaviorCache';
+import { incrementBotWordUsage } from './supabaseServer';
 
 // Bot interface
 export interface Bot {
@@ -45,6 +46,9 @@ export interface Bot {
   difficulty: 'easy' | 'medium' | 'hard';
   personality: string;
   isBot: boolean;
+  // Language the bot is playing in, stamped at prepareBotWords time.
+  // Used to credit times_found_by_bots on the words a bot actually submits.
+  language?: Language;
   wordsToFind: string[];
   wordsFound: string[];
   currentWordIndex: number;
@@ -144,6 +148,7 @@ function shuffleArray<T>(array: T[]): void {
 export async function prepareBotWords(bot: Bot, grid: LetterGrid, language: Language): Promise<void> {
   const staticConfig = BOT_CONFIG.WORDS[bot.difficulty] || BOT_CONFIG.WORDS.medium;
 
+  bot.language = language;
   const dynamicParams = await getCachedDifficultyParams(language, bot.difficulty);
 
   const config = {
@@ -403,6 +408,13 @@ export async function submitBotWord(
   bot.wordsFound.push(word);
   bot.score += credited;
   bot.comboLevel++;
+
+  // Credit the word the bot actually found so the player_words corpus knows
+  // which words bots use (times_found_by_bots). Fire-and-forget: never block
+  // the bot loop or fail a game on a DB hiccup.
+  if (bot.language) {
+    void incrementBotWordUsage(word, bot.language);
+  }
 
   logger.debug('BOT', `Bot "${bot.username}" submitted "${word}" (score: ${score}, combo: ${bot.comboLevel})`);
 }
