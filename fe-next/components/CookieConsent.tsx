@@ -38,12 +38,20 @@ export default function CookieConsent() {
     // Listen for consent resets (from ManageCookiesButton)
     return onConsentChange((state) => {
       if (state.timestamp === 0) {
-        // Reset triggered
+        // Reset triggered — re-show the banner and re-reserve its bottom space.
+        // This is user-initiated (clicked "Manage cookies"), so any resulting
+        // shift is excluded from CLS by spec.
+        document.documentElement.classList.add('needs-cookie-consent');
         setVisible(true);
         setAnalytics(false);
         setAdvertising(false);
       }
     });
+  }, []);
+
+  // Drop the bottom-space reservation once the user dismisses the banner.
+  const releaseConsentReservation = useCallback(() => {
+    document.documentElement.classList.remove('needs-cookie-consent');
   }, []);
 
   // Load existing state when showing details
@@ -57,34 +65,40 @@ export default function CookieConsent() {
 
   const handleAcceptAll = useCallback(() => {
     acceptAll();
+    releaseConsentReservation();
     setVisible(false);
     setShowDetails(false);
-  }, []);
+  }, [releaseConsentReservation]);
 
   const handleDeclineAll = useCallback(() => {
     declineAll();
+    releaseConsentReservation();
     setVisible(false);
     setShowDetails(false);
-  }, []);
+  }, [releaseConsentReservation]);
 
   const handleSavePreferences = useCallback(() => {
     setConsentState({ analytics, advertising });
+    releaseConsentReservation();
     setVisible(false);
     setShowDetails(false);
-  }, [analytics, advertising]);
+  }, [analytics, advertising, releaseConsentReservation]);
 
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, visible, handleDeclineAll);
 
-  // Add bottom padding to body when banner is visible so content isn't hidden behind it
+  // CLS guard: the banner's bottom-space reservation is handled by the
+  // `needs-cookie-consent` <html> class, primed in <head> BEFORE first paint
+  // (PRIME_CLS_VARS_SCRIPT). We must NEVER set body padding from a
+  // post-hydration effect — that 0→140px flip shoved the in-flow footer down
+  // and was the app-wide CLS offender. Here we only DROP the reservation when
+  // the banner can't apply: inside the CrazyGames iframe (own consent UI, our
+  // banner renders null). Dismissal drops it in the handlers below.
   useEffect(() => {
-    if (visible) {
-      document.body.style.paddingBottom = '140px';
-    } else {
-      document.body.style.paddingBottom = '';
+    if (isOnCrazyGamesPlatform) {
+      document.documentElement.classList.remove('needs-cookie-consent');
     }
-    return () => { document.body.style.paddingBottom = ''; };
-  }, [visible]);
+  }, [isOnCrazyGamesPlatform]);
 
   // CrazyGames embeds its own platform-level consent UI before our iframe loads.
   // A second banner inside the iframe violates the embed UX expectation.
