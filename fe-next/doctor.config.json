@@ -1,0 +1,21 @@
+{
+  "$schema": "https://react.doctor/schema/config.json",
+  "ignore": [
+    ".next/**",
+    ".next-dev-verify/**",
+    ".turbo/**",
+    "android/**",
+    "ios/**",
+    "dist/**",
+    "build/**",
+    "out/**",
+    "coverage/**",
+    "**/*.map",
+    "**/__tests__/**",
+    "**/__mocks__/**",
+    "**/*.test.{ts,tsx,js,jsx}",
+    "**/*.spec.{ts,tsx,js,jsx}",
+    "**/e2e/**",
+    "**/test-utils/**"
+  ]
+}
