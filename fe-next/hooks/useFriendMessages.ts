@@ -9,6 +9,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import type { Message, MessageThread, Challenge } from '@/shared/types/friends';
 import * as friendMessages from '@/utils/friendMessages';
 import logger from '@/utils/logger';
+import { useVisibilityPausedInterval } from './useVisibilityPausedInterval';
 
 interface UseFriendMessagesReturn {
   // State
@@ -495,24 +496,23 @@ export function useFriendMessages(
   }, [friendId, isConnected, loadMessages]);
 
   /**
-   * Load pending challenges
+   * Load pending challenges — initial load on mount/user change, then poll every
+   * 60s, paused while the tab is hidden (no point fetching in a background tab).
    */
-  useEffect(() => {
-    const loadChallenges = async () => {
-      try {
-        const challenges = await friendMessages.getPendingChallenges(user?.id);
-        setPendingChallenges(challenges);
-      } catch (err) {
-        logger.error('USE_FRIEND_MESSAGES', `Error loading challenges: ${(err as Error).message}`);
-      }
-    };
-
-    loadChallenges();
-
-    // Poll every 60 seconds
-    const interval = setInterval(loadChallenges, 60000);
-    return () => clearInterval(interval);
+  const loadChallenges = useCallback(async () => {
+    try {
+      const challenges = await friendMessages.getPendingChallenges(user?.id);
+      setPendingChallenges(challenges);
+    } catch (err) {
+      logger.error('USE_FRIEND_MESSAGES', `Error loading challenges: ${(err as Error).message}`);
+    }
   }, [user?.id]);
+
+  useEffect(() => {
+    loadChallenges();
+  }, [loadChallenges]);
+
+  useVisibilityPausedInterval(loadChallenges, 60000);
 
   return {
     threads,

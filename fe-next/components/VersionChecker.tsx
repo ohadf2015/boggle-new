@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback, useContext } from 'react';
 import { useLanguageSafe } from '@/contexts/LanguageContext';
 import NavigationContext from '@/contexts/NavigationContext';
+import { useVisibilityPausedInterval } from '@/hooks/useVisibilityPausedInterval';
 
 /**
  * VersionChecker Component
@@ -94,6 +95,8 @@ export function VersionChecker() {
     }
   }, []);
 
+  const [pollEnabled, setPollEnabled] = useState(false);
+
   useEffect(() => {
     // Don't check if we just force-updated (prevent reload loop)
     const justUpdated = sessionStorage.getItem('lexiclash-force-updated');
@@ -104,15 +107,19 @@ export function VersionChecker() {
 
     // Initial check after 10 seconds (let page load first)
     const initialTimeout = setTimeout(checkForUpdates, 10000);
-
-    // Then check every 5 minutes
-    const interval = setInterval(checkForUpdates, 5 * 60 * 1000);
+    setPollEnabled(true);
 
     return () => {
       clearTimeout(initialTimeout);
-      clearInterval(interval);
     };
   }, [checkForUpdates]);
+
+  // Then check every 5 minutes — paused while the tab is hidden. fireOnResume
+  // false: no need to manufacture an off-cadence version check on every refocus.
+  useVisibilityPausedInterval(checkForUpdates, 5 * 60 * 1000, {
+    enabled: pollEnabled,
+    fireOnResume: false,
+  });
 
   // No auto-reload. Stay silent unless there's an update AND the player is not
   // mid-game — hiding the prompt during gameplay keeps an active round (e.g. a
