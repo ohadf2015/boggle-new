@@ -436,8 +436,13 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
   }, [currentUserTodayData?.rank_position, activeTab]);
 
   // Get current data based on active tab
-  // Filter all-time participants to only show those who have solved at least one challenge
-  const filteredAllTimeParticipants = allTimeParticipants.filter(p => p.games_won > 0);
+  // Filter all-time participants to only show those who have solved at least one challenge.
+  // Memoized so its array identity is stable across renders — otherwise the anchorIndex
+  // useMemo below (which depends on it) re-runs its findIndex over the whole list every render.
+  const filteredAllTimeParticipants = useMemo(
+    () => allTimeParticipants.filter(p => p.games_won > 0),
+    [allTimeParticipants]
+  );
   const friendsParticipants = useMemo(
     () => todayParticipants.filter(p => p.player_id && friendUserIds.has(p.player_id)),
     [todayParticipants, friendUserIds]

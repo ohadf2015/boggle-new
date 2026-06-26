@@ -101,6 +101,14 @@ export async function getCommonWordsAsync(lang = 'en'): Promise<Set<string>> {
   return loadingPromises[lang];
 }
 
+// Warm every language's cache at module init (server boot) so the sync fallback
+// in getCommonWords() — a blocking readFileSync that stalls the whole event loop
+// (every connected socket) — never fires on the first word-hunt game. Fire-and-
+// forget; the sync fallback stays as a safety net if a load is still in flight.
+void Promise.all(
+  Object.keys(FILE_MAP).map(lang => getCommonWordsAsync(lang).catch(() => undefined)),
+);
+
 /**
  * Synchronous getter — returns cached words or falls back to sync load.
  * Prefer getCommonWordsAsync in new code to avoid blocking the event loop.
