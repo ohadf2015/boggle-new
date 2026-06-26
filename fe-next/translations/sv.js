@@ -6560,6 +6560,9 @@ const sv = {
     "signup": {
       "streakTitle": "Behåll din svit på {count} dagar",
       "boardTitle": "Ta din plats på listan",
+      "rankLeaderTitle": "Du är #1 idag — säkra förstaplatsen!",
+      "rankPodiumTitle": "Du är #{rank} idag — behåll din pallplats!",
+      "rankTopTenTitle": "Du är topp {rank} idag — ta din plats!",
       "firstTitle": "Spara ditt första resultat",
       "subtitle": "Registrera dig gratis — spela på valfri enhet",
       "cta": "Registrera dig gratis"

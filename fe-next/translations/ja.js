@@ -6453,6 +6453,9 @@ const ja = {
     "signup": {
       "streakTitle": "{count}日連続記録を守ろう",
       "boardTitle": "ランキングに名前を残そう",
+      "rankLeaderTitle": "今日は1位！首位をキープしよう",
+      "rankPodiumTitle": "今日は{rank}位！表彰台をキープしよう",
+      "rankTopTenTitle": "今日はトップ{rank}！順位を確保しよう",
       "firstTitle": "最初の結果を保存しよう",
       "subtitle": "無料登録 — どの端末でもプレイ",
       "cta": "無料で登録"

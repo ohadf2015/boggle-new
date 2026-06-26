@@ -143,6 +143,12 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   const [showConfetti, setShowConfetti] = useState(false);
   const [animatedScore, setAnimatedScore] = useState(0);
   const [rareFind, setRareFind] = useState<RareFind | null>(null);
+  // Live rank + field size for today, reported up by the leaderboard below.
+  // Feeds the rank-aware guest signup hook ("you're #1 today"). The same board
+  // already lists this player (by id or guest fingerprint), so this is just
+  // surfacing the position they can see right beneath the CTA.
+  const [currentRank, setCurrentRank] = useState<number | null>(null);
+  const [totalPlayers, setTotalPlayers] = useState(0);
 
   // Rarest-find celebration: pull the day's distinct-player count per word and
   // surface the player's rarest find ("only you found X — so far" / "rare find").
@@ -396,6 +402,8 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           isFirstCompletion={isFirstCompletion}
           dismissedRecently={wasSignupModalDismissedRecently()}
           score={result.score}
+          rank={currentRank}
+          totalPlayers={totalPlayers}
         />
       )}
 
@@ -570,6 +578,8 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
             maxVisible={5}
             compact
             myWheelWordsFound={result.wordsFound}
+            onCurrentUserRankChange={setCurrentRank}
+            onParticipantCountChange={setTotalPlayers}
           />
         </m.div>
       )}

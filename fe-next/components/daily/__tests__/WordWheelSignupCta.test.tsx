@@ -118,4 +118,29 @@ describe('WordWheelSignupCta', () => {
     fireEvent.click(screen.getByText('dismiss-inner'));
     expect(mockRecordDismissed).toHaveBeenCalled();
   });
+
+  it('surfaces the rank-leader headline when the guest is #1 today', () => {
+    render(<WordWheelSignupCta {...guestStreak} rank={1} totalPlayers={42} />);
+    expect(screen.getByTestId('wheel-signup-cta')).toBeInTheDocument();
+    // Rank copy overrides the generic offer headline.
+    expect(screen.getByTestId('wheel-signup-cta-button')).toHaveTextContent(
+      'wordWheel.signup.rankLeaderTitle',
+    );
+    // Measurement carries the rank tier so the nightly read can segment on it.
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
+      'wheel_signup_cta_viewed',
+      expect.objectContaining({ rankTier: 'leader', rank: 1 }),
+    );
+  });
+
+  it('keeps the generic offer headline when the rank is not worth bragging (deep / unknown)', () => {
+    render(<WordWheelSignupCta {...guestStreak} rank={250} totalPlayers={1000} />);
+    expect(screen.getByTestId('wheel-signup-cta-button')).toHaveTextContent(
+      'wordWheel.signup.streakTitle',
+    );
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith(
+      'wheel_signup_cta_viewed',
+      expect.objectContaining({ rankTier: null }),
+    );
+  });
 });

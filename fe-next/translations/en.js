@@ -6404,6 +6404,9 @@ const en = {
     "signup": {
       "streakTitle": "Keep your {count}-day streak safe",
       "boardTitle": "Claim your spot on the board",
+      "rankLeaderTitle": "You're #1 today — lock in first place!",
+      "rankPodiumTitle": "You're #{rank} today — keep your podium spot!",
+      "rankTopTenTitle": "You're top {rank} today — claim your spot!",
       "firstTitle": "Save your first result",
       "subtitle": "Sign up free — play on any device",
       "cta": "Sign up free"
