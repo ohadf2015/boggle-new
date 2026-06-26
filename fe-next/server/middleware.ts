@@ -110,6 +110,10 @@ export function createHelmetMiddleware(isDev: boolean): RequestHandler {
         styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com',
           'https://accounts.google.com/gsi/style'],
         imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+        // Music + SFX are offloaded to the Supabase Storage CDN (getAssetUrl).
+        // Howler streams them via an HTML5 <audio> element, which CSP governs
+        // through media-src (NOT connect-src) — without this every track is blocked.
+        mediaSrc: ["'self'", 'data:', 'https://*.supabase.co'],
         fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
         connectSrc: ["'self'", 'https://*.supabase.co', 'https://*.sentry.io',
           'https://*.logrocket.io', 'https://*.lr-in-prod.com', 'https://*.lgrckt-in.com',

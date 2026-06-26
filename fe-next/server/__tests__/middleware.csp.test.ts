@@ -41,3 +41,13 @@ describe('CSP allows Google Identity Services (One Tap / Sign In With Google)', 
     expect(connectSrc).toContain('https://accounts.google.com/gsi/');
   });
 });
+
+describe('CSP allows the Supabase Storage CDN for offloaded audio', () => {
+  // Music + SFX stream from the Supabase bucket via Howler's HTML5 <audio>,
+  // which CSP governs through media-src. Missing this blocks every track.
+  it('permits the Supabase CDN in media-src', () => {
+    const csp = getCspHeader();
+    const mediaSrc = csp.split(';').find((d) => d.trim().startsWith('media-src')) ?? '';
+    expect(mediaSrc).toContain('https://*.supabase.co');
+  });
+});
