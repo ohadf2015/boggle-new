@@ -115,6 +115,35 @@ export function WordTowerBackdrop({
         <div className="wt-wisp" style={{ top: '52%', width: 320, height: 16, animationDuration: '230s', animationDelay: '-140s' }} />
       </div>
 
+      {/* Nebula-specific ambient wisps — drifting gas clouds in the nebula band.
+          Adds to the alien/organic feel of the nebula biome. */}
+      {biomeId === 'nebula' && (
+        <div className="absolute inset-0" style={{ opacity: stars * 0.6, transition: FLOW }}>
+          <div className="wt-nebula-wisp" style={{ width: 320, height: 240, left: '10%', top: '20%', animationDuration: '32s' }} />
+          <div className="wt-nebula-wisp" style={{ width: 280, height: 200, right: '15%', top: '45%', animationDuration: '40s', animationDelay: '-16s' }} />
+          <div className="wt-nebula-wisp" style={{ width: 240, height: 180, left: '35%', bottom: '15%', animationDuration: '48s', animationDelay: '-24s' }} />
+        </div>
+      )}
+
+      {/* Galaxy-specific ambient sparkles — distant twinkling objects far away.
+          Sells the epic scale of the galaxy band. */}
+      {biomeId === 'galaxy' && (
+        <div className="absolute inset-0" style={{ opacity: stars * 0.8, transition: FLOW }}>
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div
+              key={`sparkle-${i}`}
+              className="wt-galaxy-sparkle"
+              style={{
+                left: `${(i * 19 + 7) % 100}%`,
+                top: `${(i * 23 + 13) % 80}%`,
+                animationDuration: `${1.2 + (i % 3) * 0.4}s`,
+                animationDelay: `${(i * 0.15) % 2}s`,
+              }}
+            />
+          ))}
+        </div>
+      )}
+
       {/* Drifting clouds — fuller, higher-contrast bank that lingers as you
           climb (a gentler slide than before, so they don't shoot off-screen the
           moment you leave the ground). */}
@@ -190,10 +219,43 @@ export function WordTowerBackdrop({
           from { transform: translate(-4%, -3%) scale(1); }
           to   { transform: translate(5%, 5%) scale(1.18); }
         }
+        /* Biome-specific ambient elements — nebula wisps + galaxy sparkles */
+        .wt-nebula-wisp {
+          position: absolute;
+          background: radial-gradient(ellipse at center, rgba(255,79,163,0.25), transparent 80%);
+          border-radius: 50%;
+          opacity: 0.4;
+          animation-name: wt-nebula-drift;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+        }
+        @keyframes wt-nebula-drift {
+          0%   { transform: translate(0, 0) scale(1); opacity: 0.2; }
+          50%  { transform: translate(8%, 5%) scale(1.1); opacity: 0.5; }
+          100% { transform: translate(-12%, 0) scale(0.95); opacity: 0.2; }
+        }
+        .wt-galaxy-sparkle {
+          position: absolute;
+          width: 2px;
+          height: 2px;
+          background: rgba(255,221,63,0.8);
+          border-radius: 50%;
+          box-shadow: 0 0 6px rgba(255,221,63,0.6);
+          animation-name: wt-galaxy-twinkle;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
+        }
+        @keyframes wt-galaxy-twinkle {
+          0%   { opacity: 0.2; }
+          50%  { opacity: 1; }
+          100% { opacity: 0.2; }
+        }
         @media (prefers-reduced-motion: reduce) {
           .wt-cloud { animation: none !important; }
           .wt-wisp { animation: none !important; }
           .wt-aurora { animation: none !important; }
+          .wt-nebula-wisp { animation: none !important; }
+          .wt-galaxy-sparkle { animation: none !important; }
         }
       `}</style>
     </div>
