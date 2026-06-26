@@ -23,6 +23,7 @@ const mocks = vi.hoisted(() => ({
   getCachedTrie: vi.fn(),
   getTrieNode: vi.fn(),
   ensureLanguageLoaded: vi.fn(async () => {}),
+  incrementBotWordUsage: vi.fn(async () => {}),
 }));
 
 vi.mock('../../../modules/gameStateManager', () => ({
@@ -46,6 +47,9 @@ vi.mock('../../../modules/boggleSolver', () => ({
 }));
 vi.mock('../../../dictionary', () => ({
   ensureLanguageLoaded: mocks.ensureLanguageLoaded,
+}));
+vi.mock('../../../modules/supabaseServer', () => ({
+  incrementBotWordUsage: mocks.incrementBotWordUsage,
 }));
 
 import {
@@ -189,6 +193,10 @@ describe('startBotsForWheelRush', () => {
     expect(mocks.updatePlayerScore).toHaveBeenCalled();
     const broadcastEvents = mocks.broadcastToRoom.mock.calls.map(c => c[2]);
     expect(broadcastEvents).toContain('wheelWordLocked');
+
+    // The locked word should also be credited to the bot-usage corpus.
+    const lockedWord = mocks.addPlayerWord.mock.calls[0][2];
+    expect(mocks.incrementBotWordUsage).toHaveBeenCalledWith(lockedWord, 'en');
   });
 
   it('no-op when bot list empty', async () => {

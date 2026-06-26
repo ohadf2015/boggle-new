@@ -82,6 +82,11 @@ const mocks = vi.hoisted(() => ({
   startBotsForWordHunt: vi.fn(),
   startBotsForWheelRush: vi.fn(),
   ensureLanguageLoaded: vi.fn(async () => {}),
+  incrementBotWordUsage: vi.fn(async () => {}),
+}));
+
+vi.mock('../../../modules/supabaseServer', () => ({
+  incrementBotWordUsage: mocks.incrementBotWordUsage,
 }));
 
 vi.mock('../../../modules/gameStateManager', () => ({
@@ -565,6 +570,36 @@ describe('submitBlastWord - case sensitivity fix (regression test)', () => {
 
     // EXPECT: updatePlayerScore should NOT have been called
     expect(mocks.updatePlayerScore).not.toHaveBeenCalled();
+  });
+
+  it('records times_found_by_bots for an accepted blast word', () => {
+    const bot = makeBot({ isActive: true });
+    const blastState = makeBlastState();
+    const grid = [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']];
+    mocks.findAllWords.mockReturnValue(['hello', 'world', 'test']);
+    mocks.getGame.mockReturnValue({
+      gameMode: 'blast', blastModeState: blastState, letterGrid: grid,
+      letterPositions: new Map(), playerCombos: {}, playerScores: {}, playerWords: {},
+    });
+
+    submitBlastWord(mockIo, gameCode, bot, blastState, 'hello', grid, 'en');
+
+    expect(mocks.incrementBotWordUsage).toHaveBeenCalledWith('hello', 'en');
+  });
+
+  it('does NOT record bot usage for a rejected blast word', () => {
+    const bot = makeBot({ isActive: true });
+    const blastState = makeBlastState();
+    const grid = [['A', 'B', 'C'], ['D', 'E', 'F'], ['G', 'H', 'I']];
+    mocks.findAllWords.mockReturnValue(['hello', 'world']);
+    mocks.getGame.mockReturnValue({
+      gameMode: 'blast', blastModeState: blastState, letterGrid: grid,
+      letterPositions: new Map(), playerCombos: {}, playerScores: {}, playerWords: {},
+    });
+
+    submitBlastWord(mockIo, gameCode, bot, blastState, 'notinthere', grid, 'en');
+
+    expect(mocks.incrementBotWordUsage).not.toHaveBeenCalled();
   });
 });
 

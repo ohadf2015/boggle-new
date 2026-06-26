@@ -33,6 +33,7 @@ import { BOARD_WORD_SCORE_PER_LETTER } from '@/shared/constants/wordHuntMultipla
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { queuePlayerFoundWord } from '../../utils/playerFoundWordBatcher';
 import { findAllWords, getCachedTrie } from '../../modules/boggleSolver';
+import { incrementBotWordUsage } from '../../modules/supabaseServer';
 import { setBotTimeout } from '../../modules/botLifecycle';
 import { ensureLanguageLoaded } from '../../dictionary';
 import { shouldBotScore, emitBotLeaderboard } from './botGame';
@@ -193,6 +194,10 @@ export function submitBlastWord(
     trackBotWord(gameCode, word, bot.username, totalScore);
     updatePlayerScore(gameCode, bot.username, totalScore, true);
     bot.score += totalScore;
+
+    // Credit the corpus so times_found_by_bots reflects blast bots too, not just
+    // the classic driver. Fire-and-forget (never block the bot or fail the game).
+    void incrementBotWordUsage(word, language);
 
     // Broadcast bot activity
     volatileBroadcastToRoom(io, getGameRoom(gameCode), 'botWordFound', {

@@ -12,6 +12,7 @@ import type { Server } from 'socket.io';
 import type { Language, WheelPuzzle, WheelRushModeState } from '@/shared/types/game';
 import type { Bot } from '../../modules/botBehavior';
 import { getGame, updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
+import { incrementBotWordUsage } from '../../modules/supabaseServer';
 import {
   getLeaderboardThrottled,
   type LeaderboardPlayer,
@@ -154,6 +155,7 @@ function submitOneWord(
       autoValidated: true,
       isBot: true,
     });
+    void incrementBotWordUsage(word, language);
     broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordLocked', {
       word, by: bot.username, lockUntil: outcome.lockUntil,
     });
@@ -174,6 +176,7 @@ function submitOneWord(
       autoValidated: true,
       isBot: true,
     });
+    void incrementBotWordUsage(word, language);
     broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordStolen', {
       word, by: bot.username, from: outcome.from,
     });
