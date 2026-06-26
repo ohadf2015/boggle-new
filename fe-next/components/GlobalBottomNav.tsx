@@ -119,6 +119,9 @@ const LANDING_PREFIXES: ReadonlyArray<string> = [
     // English SEO landings
     '/best-online-word-games', '/boggle-word-shake-free',
     '/play-boggle-online-free', '/word-games-online-free',
+    // Education keyword landings
+    '/vocabulary-games-for-middle-school', '/word-games-for-the-classroom',
+    '/bell-ringer-word-games', '/substitute-teacher-word-games',
     // Locale-specific landings
     '/hebrew-classroom-vocabulary-games',
     '/japanese-word-game',
@@ -126,6 +129,8 @@ const LANDING_PREFIXES: ReadonlyArray<string> = [
     // Competitor comparison landings
     '/lexiclash-vs-apalabrados', '/lexiclash-vs-cabanagrams', '/lexiclash-vs-kahoot',
     '/lexiclash-vs-popple', '/lexiclash-vs-puzzly-words', '/lexiclash-vs-quizlet',
+    '/lexiclash-vs-blooket', '/lexiclash-vs-flocabulary',
+    '/lexiclash-vs-vocabularyspellingcity', '/lexiclash-vs-freerice',
     '/lexiclash-contra-wordle', '/lexiclash-neged-wordle',
 ];
 

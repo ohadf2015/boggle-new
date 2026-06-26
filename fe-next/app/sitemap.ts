@@ -317,6 +317,18 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForLocaleOnly(routes, '/lexiclash-vs-kahoot', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-wordwall', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-kahoot-gimkit-vocabulary', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-blooket', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-flocabulary', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-vocabularyspellingcity', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+  addForLocaleOnly(routes, '/lexiclash-vs-freerice', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+
+  // ─── Education keyword landings (English-only body) ───
+  // Same pattern as comparison pages: robots: { index: locale === 'en' }, non-EN
+  // hreflang to localized education equivalents. Emit EN-only.
+  addForLocaleOnly(routes, '/vocabulary-games-for-middle-school', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
+  addForLocaleOnly(routes, '/word-games-for-the-classroom', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
+  addForLocaleOnly(routes, '/bell-ringer-word-games', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
+  addForLocaleOnly(routes, '/substitute-teacher-word-games', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
 
   // Per-locale competitor landings — locale-specific indexing for native switcher intent
   routes.push({
