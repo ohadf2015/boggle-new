@@ -76,6 +76,12 @@ interface GridComponentProps {
   effectsProfile?: GridEffectsProfile;
 }
 
+// Stable, module-level "no combo" colors. Passed to NON-selected cells so a
+// comboLevel change (every accepted word) doesn't break their memo. Combo visuals
+// are selected-only (GridCell reads combo props only behind isSelected guards;
+// GridCellEffects returns null when !isSelected), so this is visually identical.
+const NEUTRAL_COMBO_COLORS = getComboColors(0);
+
 const GridComponent = memo<GridComponentProps>(({
   grid,
   interactive = false,
@@ -603,9 +609,9 @@ const GridComponent = memo<GridComponentProps>(({
                   effectiveRenderMode={effectiveRenderMode}
                   earthquakePhase={earthquakePhase}
                   getPhaseAnimation={getPhaseAnimation}
-                  comboLevel={visualComboLevel}
-                  escalationCombo={visualEffectiveCombo}
-                  comboColors={comboColors}
+                  comboLevel={isSelected ? visualComboLevel : 0}
+                  escalationCombo={isSelected ? visualEffectiveCombo : 0}
+                  comboColors={isSelected ? comboColors : NEUTRAL_COMBO_COLORS}
                   reduceMotion={reduceMotion}
                   animateOnMount={animateOnMount}
                   interactive={interactive}
