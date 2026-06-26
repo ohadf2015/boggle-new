@@ -55,9 +55,19 @@ const PlayerView = nextDynamic(() => import('@/player/PlayerView'), {
   ssr: false,
 });
 
+// SSR the lobby view: it is the first above-fold paint (the `!isActive` default in
+// renderView). With ssr:false the hero + CTAs were absent from server HTML, so first
+// paint waited on PageClient bundle + this chunk + hydration → ~3s blank FCP (field:
+// /multiplayer FCP 2976ms vs 256ms on lighter routes). ssr:true emits the lobby into
+// the initial HTML (FCP ≈ TTFB) while still code-splitting the chunk for hydration.
+// Hydration-safe on web: the only non-deterministic branch (CgLobbyHero variant from
+// localStorage) is gated behind isOnCrazyGamesPlatform, which is false off the CG
+// platform, so the lobby renders the same CgAwareLobbyChrome on server and client.
+// In-game views (HostView/PlayerView/ResultsPage) stay ssr:false — they are behind
+// interaction (isActive), never first paint, and depend on live socket state.
 const MultiplayerFlow = nextDynamic(() => import('@/components/multiplayer/MultiplayerFlow'), {
   loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
+  ssr: true,
 });
 
 const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), {
