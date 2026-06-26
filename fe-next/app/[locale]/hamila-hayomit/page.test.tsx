@@ -2,7 +2,8 @@
 import { describe, it, expect } from 'vitest';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { generateMetadata, dailyWordHeFaqs, buildHamilaHayomitJsonLd } from './page';
+import { generateMetadata } from './page';
+import { dailyWordHeFaqs, buildHamilaHayomitJsonLd } from './seo';
 
 const CANONICAL = 'https://www.lexiclash.live/he/hamila-hayomit';
 

@@ -6,7 +6,7 @@ import {
   ALCHEMY_OPS,
   PUZZLES,
   PUZZLES_HE,
-} from '../page';
+} from '../engine';
 
 /**
  * Word Alchemy is a Parseword-lite transformation chain (experimental,

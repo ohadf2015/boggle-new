@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ALCHEMY_OPS, PUZZLES } from '../page';
+import { ALCHEMY_OPS, PUZZLES } from '../engine';
 
 /**
  * Word Alchemy i18n coverage — every op label and every puzzle clue key must
