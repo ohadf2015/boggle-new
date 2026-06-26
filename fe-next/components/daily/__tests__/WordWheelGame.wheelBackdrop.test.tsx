@@ -102,5 +102,11 @@ describe('WordWheelGame — wheel backdrop depth', () => {
     // edge — NOT a solid fill.
     expect(backdrop!.style.background).toContain('radial-gradient');
     expect(backdrop!.style.background).toContain('--neo-navy-elevated');
+
+    // A soft brand glow over the navy disc so it reads as lit depth — not flat
+    // black — even on high-contrast mobile OLED where the navy delta alone is
+    // imperceptible. Lime + cyan tint at minimum.
+    expect(backdrop!.style.background).toContain('rgba(191,255,0');
+    expect(backdrop!.style.background).toContain('rgba(0,255,255');
   });
 });

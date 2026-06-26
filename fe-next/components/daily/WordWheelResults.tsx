@@ -207,14 +207,16 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 
   return (
     <m.div
-      className="relative flex flex-col items-center gap-5 w-full max-w-md mx-auto px-4 py-8 overflow-hidden"
+      className="relative flex flex-col items-center gap-3 w-full max-w-md mx-auto px-4 py-5 overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* DOM Confetti */}
+      {/* DOM Confetti — rendered ABOVE the result cards (pointer-events-none) so
+          it rains in front of the content instead of hiding behind the opaque
+          stat/leaderboard cards, where it was effectively invisible on mobile. */}
       {showConfetti && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute inset-0 overflow-hidden pointer-events-none z-30">
           {CONFETTI_CONFIGS.slice(0, confettiCount).map((config, i) => (
             <ConfettiParticle
               key={`confetti-${i}`}
@@ -244,40 +246,43 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1 }}
       >
-        <h2 className="font-neo-display font-black text-2xl text-neo-white mb-1">
+        <h2 className="font-neo-display font-black text-xl text-neo-white">
           {t('wordWheel.results.title')}
         </h2>
-        <span className="text-neo-white text-sm">#{puzzleNumber}</span>
+        <span className="text-neo-white/70 text-xs">#{puzzleNumber}</span>
       </m.div>
 
-      {/* Score circle */}
+      {/* Score circle — solid elevated-navy fill + tier glow + tier-colored
+          number. The previous translucent `tier.bg` (e.g. bg-neo-lime/10) tinted
+          the disc a muddy olive over the navy stage; a clean navy fill keeps the
+          colored score crisp. */}
       <m.div
         className={cn(
-          'relative flex flex-col items-center justify-center w-36 h-36 rounded-full',
-          'border-3 border-neo-black shadow-hard-lg z-10',
-          tier.bg, tier.glowColor,
+          'relative flex flex-col items-center justify-center w-28 h-28 rounded-full',
+          'border-3 border-neo-black bg-neo-navy-light shadow-hard-lg z-10',
+          tier.glowColor,
         )}
         initial={{ scale: 0, rotate: -180 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 15, delay: 0.2 }}
       >
         <m.div
-          className={tier.color}
+          className={cn(tier.color, '[&>svg]:w-6 [&>svg]:h-6')}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.5, type: 'spring' }}
         >
           {tier.icon}
         </m.div>
-        <span className={cn('font-neo-display font-black text-4xl', tier.color)}>
+        <span className={cn('font-neo-display font-black text-3xl leading-none', tier.color)}>
           {animatedScore}
         </span>
-        <span className="text-neo-white text-xs">{t('wordWheel.scoreLabel')}</span>
+        <span className="text-neo-white/70 text-[10px] uppercase tracking-wide">{t('wordWheel.scoreLabel')}</span>
       </m.div>
 
       {/* Tier message */}
       <m.p
-        className={cn('font-neo-display font-bold text-xl z-10', tier.color)}
+        className={cn('font-neo-display font-bold text-lg z-10', tier.color)}
         initial={{ scale: 0 }}
         animate={{ scale: [0, 1.2, 1] }}
         transition={{ delay: 0.8, duration: 0.4 }}
@@ -351,23 +356,18 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </m.div>
       )}
 
-      {/* Stats */}
+      {/* Words-found stat — the single performance stat worth surfacing. The run
+          timer was dropped: every Word Wheel run is a fixed 2:00, so showing it
+          was constant noise that only added height. Compact inline pill. */}
       <m.div
-        className="grid grid-cols-2 gap-3 w-full z-10"
+        data-testid="word-wheel-words-stat"
+        className="z-10 inline-flex items-center gap-2 px-4 py-1.5 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
       >
-        <div className="flex flex-col items-center p-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard">
-          <span className="text-neo-lime font-black text-xl">{result.wordsFound.length}</span>
-          <span className="text-neo-white text-xs">{t('wordWheel.results.wordsFound')}</span>
-        </div>
-        <div className="flex flex-col items-center p-3 rounded-neo border-2 border-neo-black bg-neo-navy-light shadow-hard">
-          <span className="text-neo-cyan font-black text-xl">
-            {Math.floor(result.timeSeconds / 60)}:{(result.timeSeconds % 60).toString().padStart(2, '0')}
-          </span>
-          <span className="text-neo-white text-xs">{t('wordWheel.results.time')}</span>
-        </div>
+        <span className="text-neo-lime font-black text-xl leading-none">{result.wordsFound.length}</span>
+        <span className="text-neo-white/80 text-xs">{t('wordWheel.results.wordsFound')}</span>
       </m.div>
 
       {/* Daily Insight Cards — personalized analytics on challenge performance */}
