@@ -64,6 +64,7 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   return (
     <Link
       href={`/${language}/daily`}
+      prefetch={false}
       data-testid="home-daily-hero"
       onClick={() => trackLandingCtaClick('daily_banner', { mode: 'daily', hasPlayed })}
       aria-label={`${t('daily.title')} #${puzzleNumber}`}

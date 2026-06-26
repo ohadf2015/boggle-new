@@ -37,6 +37,7 @@ export const LandingSeasonHero: React.FC = () => {
     >
       <Link
         href="/leaderboard"
+        prefetch={false}
         aria-label={`${seasonLabel} — ${ctaLabel}`}
         onClick={() => haptics.tap()}
         className="group relative block isolate overflow-hidden rounded-neo border-2 bg-neo-navy-light/70 transition-[transform,border-color] duration-150 hover:-translate-y-0.5 active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neo-cyan"

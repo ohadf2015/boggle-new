@@ -88,23 +88,52 @@ function normalizeStatus(json: unknown): typeof DEFAULTS {
   }
 }
 
+// Module-level request de-duplication. The homepage mounts this hook from
+// several components (LandingView + HomeDailyHero) in one render pass; without
+// this, each instance fired its own GET, and every response triggered a
+// re-render — piling main-thread long tasks during hydration. We share a single
+// in-flight request and briefly cache the result so a burst of mounts (or a fast
+// remount) collapses to one network call. `force` bypasses both (used after claim).
+const DEDUP_TTL_MS = 4000
+let inflightStatus: Promise<typeof DEFAULTS | null> | null = null
+let cachedStatus: typeof DEFAULTS | null = null
+let cachedAt = 0
+
+function fetchWeeklyChestStatus(force: boolean): Promise<typeof DEFAULTS | null> {
+  if (!force) {
+    if (inflightStatus) return inflightStatus
+    if (cachedStatus && Date.now() - cachedAt < DEDUP_TTL_MS) {
+      return Promise.resolve(cachedStatus)
+    }
+  }
+  inflightStatus = getWithAuth('/api/daily/weekly-chest/status')
+    .then(async r => {
+      // 429/5xx return error JSON; normalize coerces but we still skip the write
+      // entirely so a rate-limited refresh doesn't blank out previously-good data.
+      if (!r.ok) return null
+      return r.json()
+    })
+    .then(json => {
+      if (json === null) return null
+      cachedStatus = normalizeStatus(json)
+      cachedAt = Date.now()
+      return cachedStatus
+    })
+    .finally(() => { inflightStatus = null })
+  return inflightStatus
+}
+
 export function useWeeklyChest(): WeeklyChestState {
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState(DEFAULTS)
   const mountedRef = useRef(true)
 
-  const refresh = useCallback(() => {
+  const refresh = useCallback((force = false) => {
     setLoading(true)
-    getWithAuth('/api/daily/weekly-chest/status')
-      .then(async r => {
-        // 429/5xx return error JSON; normalize coerces but we still skip the write
-        // entirely so a rate-limited refresh doesn't blank out previously-good data.
-        if (!r.ok) return null
-        return r.json()
-      })
-      .then(json => {
+    fetchWeeklyChestStatus(force)
+      .then(status => {
         if (!mountedRef.current) return
-        if (json !== null) setData(normalizeStatus(json))
+        if (status !== null) setData(status)
         setLoading(false)
       })
       .catch(() => { if (mountedRef.current) setLoading(false) })
@@ -120,7 +149,9 @@ export function useWeeklyChest(): WeeklyChestState {
     const res = await fetch('/api/daily/weekly-chest/claim', { method: 'POST' })
     if (!res.ok) return null
     const json = await res.json()
-    refresh()
+    // Claiming changes chest state — invalidate the shared cache and force-refetch.
+    cachedStatus = null
+    refresh(true)
     return json as PendingChest
   }, [refresh])
 

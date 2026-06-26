@@ -92,6 +92,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
           {showHeroCta && (
             <Link
               href={`/${language}/daily`}
+              prefetch={false}
               className="mt-4 inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-lime px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed animate-[fadeInUp_0.4s_ease-out_0.3s_both]"
               onClick={() => {
                 try {

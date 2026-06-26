@@ -38,6 +38,7 @@ export function WotdTeaser({ className }: WotdTeaserProps) {
   return (
     <Link
       href="/daily"
+      prefetch={false}
       data-testid="wotd-teaser"
       className={cn(
         'block rounded-neo border-neo border-neo-yellow/40 bg-neo-navy/80',

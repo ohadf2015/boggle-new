@@ -123,6 +123,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
               >
                 <Link
                   href={`/${language}/player/${encodeURIComponent(player.id)}`}
+                  prefetch={false}
                   className="inline-flex items-center gap-1 font-bold text-neo-white text-xs truncate max-w-[80px] sm:max-w-[100px] cursor-pointer hover:text-neo-cyan transition-colors"
                 >
                   <PrestigeBadge level={player.prestigeLevel ?? 0} size="xs" hideLabel />
@@ -137,6 +138,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
         </div>
         <Link
           href={`/${language}/leaderboard`}
+          prefetch={false}
           className="flex items-center justify-center gap-1 mt-2 pt-2 border-t border-neo-white/10 text-neo-white hover:text-neo-white text-xs font-bold transition-colors"
         >
           {t('landing.viewFullLeaderboard')}
@@ -193,6 +195,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
             >
               <Link
                 href={`/${language}/player/${encodeURIComponent(player.id)}`}
+                prefetch={false}
                 className="flex-1 inline-flex items-center gap-1.5 font-bold text-neo-white text-sm truncate cursor-pointer hover:text-neo-cyan transition-colors"
               >
                 <PrestigeBadge level={player.prestigeLevel ?? 0} size="sm" />
@@ -208,6 +211,7 @@ export function LandingLeaderboardPreview({ players, loading, compact }: Landing
 
       <Link
         href={`/${language}/leaderboard`}
+        prefetch={false}
         className={cn(
           'flex items-center justify-center gap-1.5 mt-3 pt-3',
           'border-t border-neo-white/10',
