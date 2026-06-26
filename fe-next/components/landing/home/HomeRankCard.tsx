@@ -7,6 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getUserRank } from '@/lib/supabase';
 import { getXpProgress, getLevelTier } from '@/backend/modules/xpManager';
 import { clampPercent } from '@/lib/landing/homeHubFormat';
+import { NeoSkeleton } from '@/components/ui/skeleton';
 
 interface HomeRankCardProps {
   /** all-time best score from usePlayerStats (null when none yet) */
@@ -22,7 +23,7 @@ interface HomeRankCardProps {
  * `profile.total_xp`; best-score line hides when the player has no score yet.
  */
 export function HomeRankCard({ playerAllTimeBest, t }: HomeRankCardProps) {
-  const { isAuthenticated, profile } = useAuth();
+  const { isAuthenticated, profile, loading: authLoading } = useAuth();
   const [rank, setRank] = useState<number | null>(null);
   // Gate profile/score-derived values behind mount so SSR + first client render
   // agree (auth + player stats resolve client-side; `.toLocaleString()` is
@@ -50,6 +51,13 @@ export function HomeRankCard({ playerAllTimeBest, t }: HomeRankCardProps) {
   const barPct = clampPercent(progress.progressPercent);
   const best = mounted ? playerAllTimeBest?.score ?? 0 : 0;
 
+  // Profile-derived values (tier/level/XP bar) resolve client-side via useAuth.
+  // Until auth settles, skeleton them instead of flashing a stale "level 1 /
+  // empty bar". A resolved guest is NOT loading (authLoading === false) so it
+  // gets the neutral state, never a permanent skeleton — same contract as
+  // HomeTopBar's `showProfileSkeleton`.
+  const showStatsSkeleton = !mounted || authLoading;
+
   return (
     <div className="flex items-center gap-3.5 rounded-neo-xl border-neo-thick border-black bg-neo-navy-light p-3.5 shadow-hard-lg">
       {/* rank */}
@@ -70,8 +78,12 @@ export function HomeRankCard({ playerAllTimeBest, t }: HomeRankCardProps) {
       {/* league + xp */}
       <div className="min-w-0 flex-1">
         <div className="mb-1.5 flex items-baseline justify-between gap-2">
-          <span className="truncate font-neo-display text-[13px] font-semibold text-neo-cream">{tierLabel}</span>
-          {!progress.isMaxLevel && (
+          {showStatsSkeleton ? (
+            <NeoSkeleton variant="text" width={90} height={13} />
+          ) : (
+            <span className="truncate font-neo-display text-[13px] font-semibold text-neo-cream">{tierLabel}</span>
+          )}
+          {!showStatsSkeleton && !progress.isMaxLevel && (
             <span className="shrink-0 font-neo-body text-[11px] font-medium text-neo-white/55 tabular-nums">
               {t('landing.home.xpToNext', { xp: xpToNext.toLocaleString(), level: level + 1 })}
             </span>
@@ -79,13 +91,15 @@ export function HomeRankCard({ playerAllTimeBest, t }: HomeRankCardProps) {
         </div>
         {/* striped XP bar */}
         <div className="relative h-[13px] overflow-hidden rounded-neo-pill border-2 border-black bg-neo-navy">
-          <div
-            className="absolute inset-y-0 start-0 border-e-2 border-black"
-            style={{
-              width: `${barPct}%`,
-              background: 'repeating-linear-gradient(45deg, var(--neo-lime) 0 7px, #a8e600 7px 14px)',
-            }}
-          />
+          {!showStatsSkeleton && (
+            <div
+              className="absolute inset-y-0 start-0 border-e-2 border-black"
+              style={{
+                width: `${barPct}%`,
+                background: 'repeating-linear-gradient(45deg, var(--neo-lime) 0 7px, #a8e600 7px 14px)',
+              }}
+            />
+          )}
         </div>
         {best > 0 && (
           <div className="mt-1.5 font-neo-body text-[11px] font-medium text-neo-white/55">

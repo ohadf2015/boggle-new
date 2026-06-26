@@ -28,7 +28,7 @@ interface HomeHubProps {
   language: string;
   isAdmin?: boolean;
   /** live-room stats (active players powers the section live pill + arena count) */
-  liveRoomStats: { activePlayers: number; openRooms: number; totalPlayers: number };
+  liveRoomStats: { activePlayers: number; openRooms: number; totalPlayers: number; isLoading: boolean };
   /** landing-stats feed for the social strip */
   gamesToday: number;
   gameModes: number;
@@ -96,6 +96,7 @@ export function HomeHub({
         gamesToday={gamesToday}
         gameModes={gameModes}
         languages={languages}
+        liveStatsLoading={liveRoomStats.isLoading}
         t={t}
       />
 
