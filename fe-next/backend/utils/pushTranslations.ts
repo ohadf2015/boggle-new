@@ -95,6 +95,12 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'curatorAssigned.title': '🎉 You\'re a Language Curator!',
     'curatorAssigned.body': 'You can now help curate {language} content. Tap to open your Curator dashboard.',
+
+    'wordTowerWreck.title': '💥 Tower Wrecked!',
+    'wordTowerWreck.body': '{attacker} ruined part of your tower! (−{damage} floors)',
+
+    'wordTowerPass.title': '🏗️ Tower Topped!',
+    'wordTowerPass.body': '{passer} just passed your tower!',
   },
   he: {
     'friendRequest.title': 'בקשת חברות',
@@ -150,6 +156,12 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'curatorAssigned.title': '!אוצר/ת שפה עכשיו את/ה 🎉',
     'curatorAssigned.body': 'מעכשיו תוכל/י לאצור תוכן בשפה {language}. הקש/י כדי לפתוח את לוח האוצר/ת.',
+
+    'wordTowerWreck.title': '!המגדל שלך התרוסס 💥',
+    'wordTowerWreck.body': '!(−{damage} קומות) {attacker} הרס חלק מהמגדל שלך',
+
+    'wordTowerPass.title': '!המגדל שלך עלה על הראש 🏗️',
+    'wordTowerPass.body': '!{passer} זה עתה עלה על מגדלך',
   },
   sv: {
     'friendRequest.title': 'Vänförfrågan',
@@ -205,6 +217,12 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'curatorAssigned.title': '🎉 Du är nu språkkurator!',
     'curatorAssigned.body': 'Du kan nu hjälpa till att kurera innehåll på {language}. Tryck för att öppna din kuratorpanel.',
+
+    'wordTowerWreck.title': '💥 Tornet förstört!',
+    'wordTowerWreck.body': '{attacker} förstörde en del av ditt torn! (−{damage} våningar)',
+
+    'wordTowerPass.title': '🏗️ Tornet överträffat!',
+    'wordTowerPass.body': '{passer} tog precis över ditt torn!',
   },
   ja: {
     'friendRequest.title': 'フレンド申請',
@@ -260,6 +278,12 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'curatorAssigned.title': '🎉 言語キュレーターになりました！',
     'curatorAssigned.body': '{language}のコンテンツのキュレーションができるようになりました。タップしてキュレーターダッシュボードを開きましょう。',
+
+    'wordTowerWreck.title': '💥 タワー崩壊！',
+    'wordTowerWreck.body': '{attacker}さんがあなたのタワーの一部を破壊しました！（−{damage}階）',
+
+    'wordTowerPass.title': '🏗️ タワー超越！',
+    'wordTowerPass.body': '{passer}さんがあなたのタワーを超えました！',
   },
   es: {
     'friendRequest.title': 'Solicitud de amistad',
@@ -315,6 +339,12 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'curatorAssigned.title': '🎉 ¡Ahora eres Curador de Idioma!',
     'curatorAssigned.body': 'Ya puedes ayudar a curar contenido en {language}. Toca para abrir tu panel de curador.',
+
+    'wordTowerWreck.title': '💥 ¡Torre destruida!',
+    'wordTowerWreck.body': '¡{attacker} destruyó parte de tu torre! (−{damage} pisos)',
+
+    'wordTowerPass.title': '🏗️ ¡Torre superada!',
+    'wordTowerPass.body': '¡{passer} acaba de superar tu torre!',
   },
 };
 

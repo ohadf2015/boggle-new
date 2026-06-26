@@ -50,7 +50,9 @@ export type PushNotificationType =
   | 'gift_received'
   | 'level_up'
   | 'season_start'
-  | 'curator_assigned';
+  | 'curator_assigned'
+  | 'word_tower_wreck'
+  | 'word_tower_pass';
 
 /**
  * Map push types to notification_type for user_notifications table (N-7)
@@ -67,6 +69,8 @@ const NOTIFICATION_TYPE_MAP: Record<PushNotificationType, string> = {
   async_challenge_result: 'social',
   gift_received: 'social',
   turn_reminder: 'social',
+  word_tower_wreck: 'social',
+  word_tower_pass: 'social',
   achievement: 'achievement',
   daily_challenge: 'system',
   level_up: 'achievement',
@@ -795,4 +799,51 @@ export async function notifyCuratorAssigned(
       deepLink: '/curator',
     },
   }, 'both');
+}
+
+/**
+ * Notify defender that an attacker wrecked part of their Word Tower.
+ * Fired server-side after the wreck row is inserted; the defender receives this
+ * while offline (applies on next session start). Includes attacker display name
+ * and damage (floors lost) so the push tells the full story without requiring
+ * the app to fetch context.
+ */
+export async function notifyWordTowerWreck(
+  defenderUserId: string,
+  attackerUsername: string,
+  damageFloors: number,
+  attackerUserId?: string
+): Promise<void> {
+  const locale = await getUserLocale(defenderUserId);
+  return triggerPush(defenderUserId, 'word_tower_wreck', {
+    title: translatePush(locale, 'wordTowerWreck.title'),
+    body: translatePush(locale, 'wordTowerWreck.body', { attacker: attackerUsername, damage: damageFloors }),
+    imageUrl: mascotImageUrl('crying'),
+    data: {
+      type: 'word_tower_wreck',
+      deepLink: '/word-tower',
+    },
+  }, 'both', attackerUserId);
+}
+
+/**
+ * Notify a rival that an attacker's tower just exceeded their best height.
+ * Fired server-side when a wreck push also results in the attacker surpassing
+ * the defender's previous high score. Celebrates the competitive moment.
+ */
+export async function notifyWordTowerPass(
+  rivalUserId: string,
+  passerUsername: string,
+  passerUserId?: string
+): Promise<void> {
+  const locale = await getUserLocale(rivalUserId);
+  return triggerPush(rivalUserId, 'word_tower_pass', {
+    title: translatePush(locale, 'wordTowerPass.title'),
+    body: translatePush(locale, 'wordTowerPass.body', { passer: passerUsername }),
+    imageUrl: mascotImageUrl('celebration'),
+    data: {
+      type: 'word_tower_pass',
+      deepLink: '/word-tower',
+    },
+  }, 'both', passerUserId);
 }

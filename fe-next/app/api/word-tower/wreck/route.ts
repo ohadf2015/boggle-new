@@ -5,6 +5,7 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { getSupabaseAdmin } from '@/lib/email';
 import { captureApiError } from '@/utils/sentry';
 import { asyncWreckDamageFloors } from '@/lib/wordTower/sabotage';
+import { notifyWordTowerWreck, notifyWordTowerPass } from '@/backend/modules/pushNotificationTriggers';
 
 export const runtime = 'nodejs';
 
@@ -136,6 +137,13 @@ export async function POST(request: NextRequest) {
       }
       captureApiError(error as unknown as Error, 'word-tower-wreck-post');
       return NextResponse.json({ error: 'failed to send' }, { status: 500 });
+    }
+
+    // Fire-and-forget push notifications: wreck to defender, pass if applicable.
+    // Both awaited to ensure FCM attempt completes; they never throw.
+    await notifyWordTowerWreck(b.targetPlayerId, attackerName, damageFloors, user.id);
+    if (attackerBest > targetBest) {
+      await notifyWordTowerPass(b.targetPlayerId, attackerName, user.id);
     }
 
     return NextResponse.json({ ok: true, damageFloors });
