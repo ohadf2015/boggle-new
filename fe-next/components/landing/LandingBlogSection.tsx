@@ -57,6 +57,7 @@ export function LandingBlogSection() {
               transition={{ delay: 0.1 * i, type: 'spring', stiffness: 300, damping: 24 }}
             >
             <Link
+              prefetch={false}
               href={`/${locale}/blog/${post.slug}`}
               className={cn(
                 'group block rounded-neo border-3 border-neo-black overflow-hidden',
@@ -106,6 +107,7 @@ export function LandingBlogSection() {
       {/* Prominent "View All" CTA — pulls eyes after the 3-card grid */}
       <div className="mt-8 flex justify-center">
         <Link
+          prefetch={false}
           href={`/${locale}/blog`}
           className={cn(
             'group inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4',

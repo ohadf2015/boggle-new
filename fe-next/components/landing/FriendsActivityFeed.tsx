@@ -52,6 +52,7 @@ export function FriendsActivityFeed() {
           {t('friendsActivity.empty')}
         </p>
         <Link
+          prefetch={false}
           href={`/${language}/friends`}
           className="block text-center text-neo-cyan font-bold text-xs hover:text-neo-white transition-colors"
         >

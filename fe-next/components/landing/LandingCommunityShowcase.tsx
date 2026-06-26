@@ -92,6 +92,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
           </h3>
         </div>
         <Link
+          prefetch={false}
           href={`/${language}/community`}
           className={cn(
             'flex items-center gap-1 text-xs font-bold',
@@ -189,6 +190,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
                   )}
                 </div>
                 <Link
+                  prefetch={false}
                   href={`/${language}/community/${board.board_code}`}
                   className={cn(
                     'flex items-center gap-1 px-2.5 py-1',
@@ -216,6 +218,7 @@ export function LandingCommunityShowcase({ className }: LandingCommunityShowcase
         transition={{ delay: 0.3 }}
       >
         <Link
+          prefetch={false}
           href={`/${language}/create/board`}
           className={cn(
             'flex items-center gap-3 px-4 py-2.5',

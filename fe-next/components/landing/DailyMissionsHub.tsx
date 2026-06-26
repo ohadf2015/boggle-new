@@ -91,6 +91,7 @@ function MissionRow({
 
   return (
     <Link
+      prefetch={false}
       href={`/${language}${href}`}
       className={cn(
         'flex items-center gap-3 p-3 rounded-neo',
