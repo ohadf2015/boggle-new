@@ -219,7 +219,7 @@ export default function AvatarBuilderModal({
                 <span className="text-neo-yellow font-black text-sm tabular-nums">{safeToLocaleString(premium.coins, language)}</span>
               </div>
             )}
-            <button onClick={onClose} className="text-neo-white hover:text-neo-white p-2.5 transition-colors" aria-label={t('common.close')}>
+            <button type="button" onClick={onClose} className="text-neo-white hover:text-neo-white p-2.5 transition-colors" aria-label={t('common.close')}>
               <X size={20} />
             </button>
           </div>
@@ -364,6 +364,7 @@ export default function AvatarBuilderModal({
           </AdaptiveMotion.button>
           <div className="flex-1 min-w-0" />
           <button
+            type="button"
             onClick={onClose}
             className="px-3 @[24rem]:px-4 py-2 text-sm text-neo-white font-bold hover:text-neo-white transition-colors shrink-0"
           >

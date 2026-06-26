@@ -102,6 +102,7 @@ export function NotificationToast({ notification, onDismiss, onAction }: Notific
 
         {/* Close button */}
         <button
+          type="button"
           onClick={(e) => {
             e.stopPropagation();
             handleDismiss();

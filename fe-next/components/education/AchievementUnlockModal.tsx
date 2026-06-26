@@ -263,6 +263,7 @@ const AchievementUnlockModal = memo<AchievementUnlockModalProps>(({ unlock, onCl
 
             {/* Continue Button */}
             <button
+              type="button"
               onClick={onClose}
               className={cn(
                 'w-full py-3 px-6',

@@ -84,6 +84,7 @@ export function PushNotificationPrompt() {
           <div className="relative bg-neo-navy border-neo border-neo-lime rounded-neo p-5 shadow-hard-lg">
             {/* Close button */}
             <button
+              type="button"
               onClick={handleDismiss}
               className="absolute top-2 inset-e-2 p-1 text-gray-400 hover:text-white transition-colors"
               aria-label={t('notifications.prompt.notNow')}
@@ -107,12 +108,14 @@ export function PushNotificationPrompt() {
                 {/* Action buttons */}
                 <div className="flex gap-3">
                   <button
+                    type="button"
                     onClick={handleEnable}
                     className="flex-1 px-4 py-2 bg-neo-lime text-neo-black font-bold text-sm rounded-neo border-neo border-neo-black shadow-hard-sm hover:shadow-hard-pressed active:translate-y-0.5 transition-all"
                   >
                     {t('notifications.prompt.enable')}
                   </button>
                   <button
+                    type="button"
                     onClick={handleDismiss}
                     className="px-4 py-2 text-gray-400 hover:text-white text-sm font-medium transition-colors"
                   >

@@ -60,6 +60,7 @@ export default function QuickStartButton({
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       className={cn(
         'group w-full p-4 rounded-neo border-neo border-neo-black',

@@ -93,6 +93,7 @@ export function BlastChestOpenModal({ contents, isOpen, onClose }: Props) {
         )}
 
         <button
+          type="button"
           onClick={onClose}
           data-testid="chest-close-btn"
           className="px-6 py-3 bg-[#ec4899] border-3 border-white rounded-lg font-bold text-lg"

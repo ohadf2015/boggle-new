@@ -139,6 +139,7 @@ export default function LightningRoundPageClient() {
         isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
       )}>
         <button
+          type="button"
           onClick={handleBack}
           className={cn(
             'flex items-center gap-2 px-3 py-2 rounded-neo',

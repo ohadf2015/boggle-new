@@ -245,6 +245,7 @@ export function DesktopGameLayout({
           <div className="flex items-center justify-between w-full px-2 shrink-0">
             {/* Quit - btn-neo red */}
             <button
+              type="button"
               onClick={onQuitRequest}
               className="flex items-center gap-2 bg-red-500 text-white px-3 py-1.5 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
             >
@@ -277,6 +278,7 @@ export function DesktopGameLayout({
             {/* Pause/Finish - btn-neo pink */}
             {isPracticeMode ? (
               <button
+                type="button"
                 onClick={onFinishPractice}
                 className="flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 text-sm font-bold uppercase tracking-wide border-3 border-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
               >
@@ -284,6 +286,7 @@ export function DesktopGameLayout({
               </button>
             ) : (
               <button
+                type="button"
                 onClick={onPauseToggle}
                 className="flex items-center justify-center bg-pink-500 text-white p-2 border-3 border-neo-black shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed transition-all duration-100"
               >

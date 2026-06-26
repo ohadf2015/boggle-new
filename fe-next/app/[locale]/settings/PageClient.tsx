@@ -83,6 +83,7 @@ interface ToggleButtonProps {
 function ToggleButton({ isOn, onToggle, isDarkMode, label, onLabel = 'On', offLabel = 'Off' }: ToggleButtonProps) {
   return (
     <button
+      type="button"
       onClick={onToggle}
       role="switch"
       aria-checked={isOn}
@@ -119,6 +120,7 @@ function VolumeSlider({ value, onChange, isMuted, onToggleMute, isDarkMode, labe
   return (
     <div className="flex items-center gap-2">
       <button
+        type="button"
         onClick={onToggleMute}
         aria-label={isMuted ? `${unmuteLabel} ${label}` : `${muteLabel} ${label}`}
         aria-pressed={isMuted}
@@ -394,6 +396,7 @@ export default function SettingsPageClient(): React.JSX.Element {
                 isDarkMode={isDarkMode}
               >
                 <button
+                  type="button"
                   onClick={cycleReduceMotion}
                   aria-label={`${t('settings.reduceMotion')}: ${getReduceMotionLabel()}`}
                   className={cn(

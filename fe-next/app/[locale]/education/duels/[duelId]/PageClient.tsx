@@ -98,6 +98,7 @@ export default function DuelGamePageClient({ duelId }: { duelId: string }) {
           >
             <p className="text-neo-white text-xl font-bold mb-4">{duelError}</p>
             <button
+              type="button"
               onClick={handleBackToLobby}
               className={cn(
                 'px-6 py-3 font-bold rounded-neo',

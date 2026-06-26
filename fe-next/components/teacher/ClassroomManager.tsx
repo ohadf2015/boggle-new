@@ -212,6 +212,7 @@ export default function ClassroomManager() {
 
                   {/* View Students Button */}
                   <button
+                    type="button"
                     onClick={() => setExpandedClassroomId(expandedClassroomId === classroom.id ? null : classroom.id)}
                     className={cn(
                       'w-full flex items-center justify-between px-3 py-2 rounded-neo border-2 border-black font-bold text-sm transition-all shadow-hard-sm',

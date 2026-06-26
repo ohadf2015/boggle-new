@@ -160,6 +160,7 @@ export function WikipediaCandidatesList({
               disabled={bulkProcessing}
             />
             <button
+              type="button"
               onClick={() => handleBulkAction('approve')}
               disabled={bulkProcessing}
               className="px-3 py-1.5 bg-green-500 text-white rounded-lg text-sm font-bold hover:bg-green-600 disabled:opacity-50 transition-colors flex items-center gap-1"
@@ -168,6 +169,7 @@ export function WikipediaCandidatesList({
               Mark Valid
             </button>
             <button
+              type="button"
               onClick={() => handleBulkAction('reject')}
               disabled={bulkProcessing}
               className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-sm font-bold hover:bg-red-600 disabled:opacity-50 transition-colors flex items-center gap-1"
@@ -176,6 +178,7 @@ export function WikipediaCandidatesList({
               Reject
             </button>
             <button
+              type="button"
               onClick={() => handleBulkAction('delete')}
               disabled={bulkProcessing}
               className="px-3 py-1.5 bg-gray-600 text-white rounded-lg text-sm font-bold hover:bg-neo-navy-elevated disabled:opacity-50 transition-colors flex items-center gap-1"
@@ -269,6 +272,7 @@ export function WikipediaCandidatesList({
                   </div>
                   <div className="flex gap-2">
                     <button
+                      type="button"
                       onClick={() => handleStatusUpdate(candidate.id, 'valid')}
                       disabled={isProcessing || candidate.validation_status === 'valid'}
                       className="p-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 transition-colors"
@@ -277,6 +281,7 @@ export function WikipediaCandidatesList({
                       <Check className="w-4 h-4" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleStatusUpdate(candidate.id, 'invalid')}
                       disabled={isProcessing || candidate.validation_status === 'invalid'}
                       className="p-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 transition-colors"
@@ -285,6 +290,7 @@ export function WikipediaCandidatesList({
                       <X className="w-4 h-4" />
                     </button>
                     <button
+                      type="button"
                       onClick={() => handleDelete(candidate.id)}
                       disabled={isProcessing}
                       className="p-2 bg-gray-600 text-white rounded-lg hover:bg-neo-navy-elevated disabled:opacity-50 transition-colors"
@@ -346,6 +352,7 @@ export function WikipediaCandidatesList({
                 </div>
                 <div className="flex gap-1">
                   <button
+                    type="button"
                     onClick={() => handleStatusUpdate(candidate.id, 'valid')}
                     disabled={isProcessing || candidate.validation_status === 'valid'}
                     className="p-1.5 bg-green-500 text-white rounded hover:bg-green-600 disabled:opacity-50 transition-colors"
@@ -354,6 +361,7 @@ export function WikipediaCandidatesList({
                     <Check className="w-4 h-4" />
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleStatusUpdate(candidate.id, 'invalid')}
                     disabled={isProcessing || candidate.validation_status === 'invalid'}
                     className="p-1.5 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 transition-colors"
@@ -362,6 +370,7 @@ export function WikipediaCandidatesList({
                     <X className="w-4 h-4" />
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleDelete(candidate.id)}
                     disabled={isProcessing}
                     className="p-1.5 bg-gray-600 text-white rounded hover:bg-neo-navy-elevated disabled:opacity-50 transition-colors"

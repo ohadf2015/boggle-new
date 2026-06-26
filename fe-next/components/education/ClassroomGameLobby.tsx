@@ -212,10 +212,10 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
           {t('education.classroomGame.noClassrooms')}
         </p>
         <div className="flex items-center justify-center gap-3">
-          <button onClick={onBack} className={cn('px-6 py-3 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all')}>
+          <button type="button" onClick={onBack} className={cn('px-6 py-3 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all')}>
             {t('common.back')}
           </button>
-          <button onClick={() => router.push(`/${language}/teacher`)} className={cn('px-6 py-3 font-bold bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all')}>
+          <button type="button" onClick={() => router.push(`/${language}/teacher`)} className={cn('px-6 py-3 font-bold bg-neo-cyan text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all')}>
             {t('education.classroomGame.createClassroom')}
           </button>
         </div>
@@ -232,10 +232,10 @@ export function ClassroomGameLobby({ initialLessonId, onBack }: ClassroomGameLob
           {t('education.classroomGame.noLessonsAvailable')}
         </p>
         <div className="flex items-center justify-center gap-3">
-          <button onClick={onBack} className={cn('px-6 py-3 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all')}>
+          <button type="button" onClick={onBack} className={cn('px-6 py-3 font-bold bg-neo-navy text-neo-white border-neo border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all')}>
             {t('common.back')}
           </button>
-          <button onClick={() => router.push(`/${language}/teacher`)} className={cn('px-6 py-3 font-bold bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all')}>
+          <button type="button" onClick={() => router.push(`/${language}/teacher`)} className={cn('px-6 py-3 font-bold bg-neo-pink text-neo-black border-neo border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg transition-all')}>
             {t('education.classroomGame.createLesson')}
           </button>
         </div>

@@ -110,6 +110,7 @@ const RunePanel = memo<RunePanelProps>(({
             </div>
           </div>
           <button
+            type="button"
             onClick={onClose}
             data-testid="rune-panel-close"
             className="p-2 rounded-neo border-2 border-neo-white/20 hover:bg-neo-white/10 transition-colors"
@@ -216,6 +217,7 @@ const RuneCard = memo<RuneCardProps>(({
       <div className="mt-2 w-full">
         {!owned ? (
           <button
+            type="button"
             data-testid={`rune-forge-${def.id}`}
             disabled={!canAfford}
             onClick={() => onForge(def.id)}
@@ -230,6 +232,7 @@ const RuneCard = memo<RuneCardProps>(({
           </button>
         ) : equipped ? (
           <button
+            type="button"
             data-testid={`rune-unequip-${def.id}`}
             onClick={() => onUnequip(def.id)}
             className="w-full py-1.5 text-[10px] font-black uppercase rounded-neo border-2 border-neo-pink/40 bg-neo-pink/20 text-neo-pink hover:bg-neo-pink/30 transition-colors flex items-center justify-center gap-1"
@@ -239,6 +242,7 @@ const RuneCard = memo<RuneCardProps>(({
           </button>
         ) : (
           <button
+            type="button"
             data-testid={`rune-equip-${def.id}`}
             disabled={slotsFull}
             onClick={() => onEquip(def.id)}

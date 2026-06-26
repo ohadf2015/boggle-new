@@ -205,6 +205,7 @@ export default function TemplateLessonSelector({
       <div className="grid grid-cols-3 gap-2 mb-4">
         {categories.map((category) => (
           <button
+            type="button"
             key={category}
             onClick={() => setSelectedCategory(category)}
             className={cn(
@@ -223,6 +224,7 @@ export default function TemplateLessonSelector({
       <div className="grid grid-cols-2 gap-3">
         {filteredTemplates.map((template) => (
           <button
+            type="button"
             key={template.id}
             onClick={() => onSelect(template)}
             className={cn(

@@ -264,7 +264,7 @@ export const GameSidebar = memo(function GameSidebar({
         {/* Row 2: Action buttons — evenly spaced */}
         <div className="flex items-center gap-2">
           {/* Hint button */}
-          <button
+          <button type="button"
             onClick={onHintClick}
             disabled={!hasHintsAvailable}
             className={cn(
@@ -292,7 +292,7 @@ export const GameSidebar = memo(function GameSidebar({
 
           {/* Time Freeze (only if upgrade purchased) */}
           {freezeSeconds > 0 && (
-            <button
+            <button type="button"
               onClick={onFreezeClick}
               disabled={freezeUsed}
               aria-label={isFrozen ? t('adventure.game.frozen') : t('adventure.game.freezeWithTime', { seconds: freezeSeconds })}
@@ -313,7 +313,7 @@ export const GameSidebar = memo(function GameSidebar({
 
           {/* Shuffle (only if upgrade purchased) */}
           {shufflesRemaining > 0 && (
-            <button
+            <button type="button"
               onClick={onShuffleClick}
               aria-label={t('adventure.game.shuffleWithCount', { count: shufflesRemaining })}
               className={cn(
@@ -329,7 +329,7 @@ export const GameSidebar = memo(function GameSidebar({
 
           {/* Detonate (Word Dynamite T3) */}
           {canDetonate && (
-            <button
+            <button type="button"
               onClick={onDetonateToggle}
               aria-label={t('adventure.game.detonate')}
               className={cn(

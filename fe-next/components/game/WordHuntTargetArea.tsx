@@ -126,8 +126,10 @@ export function WordHuntTargetArea({
           maxLength={targetLength}
           className="border-neo border-black rounded-neo px-2 py-1 bg-neo-navy-light text-neo-white font-neo-body uppercase w-32 text-center"
           placeholder={t('wordHunt.guessTarget')}
+          aria-label={t('wordHunt.guessTarget')}
         />
         <button
+          type="button"
           data-testid="target-submit-button"
           onClick={handleSubmit}
           disabled={found}

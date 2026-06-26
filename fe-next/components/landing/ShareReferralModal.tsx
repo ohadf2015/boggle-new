@@ -70,7 +70,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
               'p-5 sm:p-6',
             )}
           >
-            <button
+            <button type="button"
               data-testid="share-modal-close"
               onClick={onClose}
               autoFocus
@@ -135,7 +135,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
             )}
 
             <div className="flex gap-2 mb-3">
-              <button
+              <button type="button"
                 data-testid="share-btn-whatsapp"
                 onClick={() => handleShare('whatsapp')}
                 className={cn(
@@ -151,7 +151,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                 <span className="text-sm hidden sm:inline">WhatsApp</span>
               </button>
 
-              <button
+              <button type="button"
                 data-testid="share-btn-telegram"
                 onClick={() => handleShare('telegram')}
                 className={cn(
@@ -167,7 +167,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
                 <span className="text-sm hidden sm:inline">Telegram</span>
               </button>
 
-              <button
+              <button type="button"
                 data-testid="share-btn-native"
                 onClick={() => handleShare('native')}
                 className={cn(
@@ -184,7 +184,7 @@ export function ShareReferralModal({ isOpen, onClose }: ShareReferralModalProps)
               </button>
             </div>
 
-            <button
+            <button type="button"
               data-testid="share-btn-copy"
               onClick={handleCopy}
               className={cn(

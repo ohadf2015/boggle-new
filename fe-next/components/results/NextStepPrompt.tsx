@@ -178,6 +178,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
 
           {onRematch && (
             <button
+              type="button"
               onClick={onRematch}
               className={cn(
                 'inline-flex items-center justify-center gap-2',
@@ -196,6 +197,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
           )}
 
           <button
+            type="button"
             onClick={onBackToLobby}
             className={cn(
               'inline-flex items-center justify-center gap-2',
@@ -220,6 +222,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
     return (
       <div className={cn('flex flex-col gap-2', className)}>
         <button
+          type="button"
           onClick={() => handleNavigate(config.href)}
           className={cn(
             'relative flex items-center gap-3 p-3',
@@ -258,6 +261,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
     return (
       <div className={cn('flex flex-col gap-3', className)}>
         <button
+          type="button"
           onClick={() => handleNavigate(config.href)}
           className={cn(
             'relative block p-4',
@@ -301,6 +305,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
 
         {!hideBackButton && (
           <button
+            type="button"
             onClick={onBackToLobby}
             className="w-full py-3 text-sm font-bold uppercase text-neo-white bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2 hover:shadow-hard-lg active:shadow-hard-pressed active:translate-x-0.5 active:translate-y-0.5 transition-all duration-150"
           >
@@ -372,6 +377,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
 
         {/* Primary CTA Button */}
         <button
+          type="button"
           onClick={() => handleNavigate(config.href)}
           className={cn(
             'relative inline-flex items-center justify-center gap-3',
@@ -405,6 +411,7 @@ const NextStepPrompt: React.FC<NextStepPromptProps> = memo(({
 
         {/* Secondary Back Button */}
         <button
+          type="button"
           onClick={onBackToLobby}
           className={cn(
             'inline-flex items-center justify-center gap-2',

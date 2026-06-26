@@ -158,6 +158,7 @@ export default function WelcomeBackCard({
                 </h3>
               </div>
               <button
+                type="button"
                 onClick={handleDismiss}
                 aria-label={t('common.close')}
                 className={cn(

@@ -193,6 +193,7 @@ export function BlastConceptIntroCard({ concept, modeColor = '#BFFF00', onDismis
         </div>
         <div className="px-6 pb-6">
           <button
+            type="button"
             onClick={onDismiss}
             data-testid="concept-got-it"
             className="w-full px-4 py-3 rounded-lg font-black text-lg uppercase tracking-wide"

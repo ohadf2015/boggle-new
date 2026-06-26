@@ -192,7 +192,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
           className="max-w-md w-full space-y-6"
         >
           {/* Back button */}
-          <button
+          <button type="button"
             onClick={handleQuit}
             className={cn(
               'flex items-center gap-2 text-sm font-bold hover:underline',

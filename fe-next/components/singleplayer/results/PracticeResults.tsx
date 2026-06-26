@@ -435,6 +435,7 @@ const PracticeResults = memo(function PracticeResults({
             {/* ── Desktop secondary action: home only ── */}
             <div className="hidden md:flex gap-2.5 justify-center">
               <button
+                type="button"
                 onClick={onBackToLobby}
                 className={cn(
                   'inline-flex items-center gap-2 px-5 py-2.5',
@@ -457,6 +458,7 @@ const PracticeResults = memo(function PracticeResults({
         <div className="flex flex-col gap-2">
           {!dailyAlreadyPlayed && (
             <m.button
+              type="button"
               onClick={handleWordHuntDaily}
               animate={reducedMotion ? {} : { scale: [1, 1.03, 1] }}
               transition={{ duration: 2, repeat: ctaPulseRepeat, ease: 'easeInOut', repeatDelay: 1 }}
@@ -467,6 +469,7 @@ const PracticeResults = memo(function PracticeResults({
             </m.button>
           )}
           <button
+            type="button"
             onClick={onBackToLobby}
             className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/10 text-white font-bold text-sm uppercase border-2 border-white/20 rounded-neo transition-colors hover:bg-white/20"
           >

@@ -81,6 +81,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
     return (
       <div className={cn('flex flex-col items-center gap-3', className)}>
         <button
+          type="button"
           onClick={handleComplete}
           className={cn(
             'w-full py-4 px-8',
@@ -97,6 +98,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
           {t('autoPlay.playAgain')}
         </button>
         <button
+          type="button"
           onClick={handleCancel}
           className="text-neo-white hover:text-neo-white text-sm font-bold uppercase transition-colors"
         >
@@ -121,6 +123,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
     >
       {/* Countdown ring + number */}
       <button
+        type="button"
         onClick={handleComplete}
         className={cn(
           'relative flex items-center justify-center',
@@ -179,6 +182,7 @@ const AutoPlayCountdown: React.FC<AutoPlayCountdownProps> = memo(({
 
       {/* Exit */}
       <button
+        type="button"
         onClick={handleCancel}
         className={cn(
           'flex items-center gap-1.5',

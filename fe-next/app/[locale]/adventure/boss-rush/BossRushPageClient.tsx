@@ -167,6 +167,7 @@ export function BossRushPageClient() {
           {/* Actions */}
           <div className="flex gap-3">
             <button
+              type="button"
               onClick={reset}
               className={cn(
                 'flex-1 py-3 px-4',

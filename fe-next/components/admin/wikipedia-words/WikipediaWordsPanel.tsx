@@ -104,6 +104,7 @@ export function WikipediaWordsPanel(): React.ReactElement {
             </span>
           </div>
           <button
+            type="button"
             onClick={clearSyncSuccess}
             className="p-1 hover:bg-green-500/20 rounded transition-colors"
           >
@@ -120,6 +121,7 @@ export function WikipediaWordsPanel(): React.ReactElement {
             <span className="text-red-500 font-medium">{error}</span>
           </div>
           <button
+            type="button"
             onClick={clearError}
             className="p-1 hover:bg-red-500/20 rounded transition-colors"
           >

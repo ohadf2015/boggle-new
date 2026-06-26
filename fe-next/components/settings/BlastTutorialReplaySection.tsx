@@ -17,6 +17,7 @@ export function BlastTutorialReplaySection({ onReplayFtue, onReplayMechanic }: P
   return (
     <div className="border-neo-thick border-black rounded-neo p-4 space-y-3">
       <button
+        type="button"
         onClick={() => setExpanded(!expanded)}
         className="w-full text-left font-bold flex justify-between items-center"
       >
@@ -27,6 +28,7 @@ export function BlastTutorialReplaySection({ onReplayFtue, onReplayMechanic }: P
       {expanded && (
         <div className="space-y-2 border-t border-black pt-3">
           <button
+            type="button"
             onClick={onReplayFtue}
             className="w-full text-left text-sm px-3 py-2 hover:bg-white/10 rounded transition-colors"
           >
@@ -34,6 +36,7 @@ export function BlastTutorialReplaySection({ onReplayFtue, onReplayMechanic }: P
           </button>
           {cards.map((card) => (
             <button
+              type="button"
               key={card.key}
               onClick={() => onReplayMechanic?.(card.key)}
               className="w-full text-left text-sm px-3 py-2 hover:bg-white/10 rounded transition-colors"

@@ -114,6 +114,7 @@ export function PlayerSelector({
                 {player.display_name || player.username}
               </span>
               <button
+                type="button"
                 onClick={() => handleRemovePlayer(player.id)}
                 className="ms-1 hover:text-red-500 transition-colors"
                 aria-label={`Remove ${player.display_name || player.username}`}
@@ -156,6 +157,7 @@ export function PlayerSelector({
                 const isSelected = selectedPlayers.some(p => p.id === player.id);
                 return (
                   <button
+                    type="button"
                     key={player.id}
                     onClick={() => handleSelectPlayer(player)}
                     disabled={isSelected}

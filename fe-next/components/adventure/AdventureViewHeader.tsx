@@ -40,7 +40,7 @@ export default function AdventureViewHeader({
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Back — ghost icon, no border */}
         {(viewState !== 'worldMap' || worldMapUsesHistoryBack) ? (
-          <button onClick={onBack} aria-label={t('common.back')} className={backClass}>
+          <button type="button" onClick={onBack} aria-label={t('common.back')} className={backClass}>
             <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
           </button>
         ) : (

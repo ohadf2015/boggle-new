@@ -171,6 +171,7 @@ const TapToDragTooltip = memo<TapToDragTooltipProps>(
             >
               {/* Close button */}
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDismiss();

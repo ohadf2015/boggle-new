@@ -133,6 +133,7 @@ export function OfflineDownloadManager() {
               </div>
 
               <button
+                type="button"
                 onClick={() => {
                   if (isDownloaded) {
                     handleDelete(lang);

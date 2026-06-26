@@ -107,7 +107,7 @@ export function SchoolLeadsQueue() {
           <option value="">all</option>
           {['en', 'he', 'sv', 'ja', 'es'].map((l) => <option key={l} value={l}>{l}</option>)}
         </select>
-        <button onClick={() => { fetchRows(); fetchCounts(); }}
+        <button type="button" onClick={() => { fetchRows(); fetchCounts(); }}
           className="ml-auto rounded bg-neo-lime px-3 py-1 text-sm font-bold text-neo-navy">
           {t('admin.schoolLeads.refresh')}
         </button>
@@ -118,7 +118,7 @@ export function SchoolLeadsQueue() {
         {loading ? <div className="p-6 text-center text-slate-400">…</div>
           : rows.length === 0 ? <div className="p-6 text-center text-slate-400">{t('admin.schoolLeads.empty')}</div>
           : rows.map((r) => (
-            <button key={r.id} onClick={() => setOpen(open === r.id ? null : r.id)}
+            <button type="button" key={r.id} onClick={() => setOpen(open === r.id ? null : r.id)}
               className="w-full text-left rounded-neo border-2 border-slate-700 bg-neo-navy-light p-3 hover:border-neo-lime">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-bold text-neo-white truncate">{r.school_or_district}</span>
@@ -179,9 +179,9 @@ export function SchoolLeadsQueue() {
       </div>
 
       <div className="mt-4 flex items-center gap-2 text-sm text-neo-white">
-        <button disabled={page === 0} onClick={() => setPage(page - 1)} className="rounded border-2 border-slate-600 px-2 py-1 disabled:opacity-50">←</button>
+        <button type="button" disabled={page === 0} onClick={() => setPage(page - 1)} className="rounded border-2 border-slate-600 px-2 py-1 disabled:opacity-50">←</button>
         <span>{t('admin.schoolLeads.page')} {page + 1}</span>
-        <button disabled={rows.length < 50} onClick={() => setPage(page + 1)} className="rounded border-2 border-slate-600 px-2 py-1 disabled:opacity-50">→</button>
+        <button type="button" disabled={rows.length < 50} onClick={() => setPage(page + 1)} className="rounded border-2 border-slate-600 px-2 py-1 disabled:opacity-50">→</button>
         <a href={`/api/admin/school-leads/export?${filterQs()}`}
           className="ml-auto rounded bg-neo-lime px-3 py-1 font-bold text-neo-navy">
           {t('admin.schoolLeads.export_csv')}

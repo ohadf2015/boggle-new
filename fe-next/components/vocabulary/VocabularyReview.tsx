@@ -99,18 +99,21 @@ export function VocabularyReview({ words, onReview, onComplete }: VocabularyRevi
       {/* Response buttons */}
       <div className="flex w-full max-w-md gap-3">
         <button
+          type="button"
           onClick={() => handleAnswer(0)}
           className="flex-1 rounded-neo border-neo bg-red-600 px-3 py-2 text-sm font-bold text-white shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
         >
           {t('vocabulary.forgot')}
         </button>
         <button
+          type="button"
           onClick={() => handleAnswer(3)}
           className="flex-1 rounded-neo border-neo bg-neo-orange px-3 py-2 text-sm font-bold text-white shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
         >
           {t('vocabulary.somewhat')}
         </button>
         <button
+          type="button"
           onClick={() => handleAnswer(5)}
           className="flex-1 rounded-neo border-neo bg-green-600 px-3 py-2 text-sm font-bold text-white shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
         >

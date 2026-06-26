@@ -79,6 +79,7 @@ const ShareButton: React.FC<ShareButtonProps> = ({
 
   const button = (
     <button
+      type="button"
       onClick={onClick}
       aria-label={accessibleLabel}
       className={cn(

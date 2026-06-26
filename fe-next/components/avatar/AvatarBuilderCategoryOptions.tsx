@@ -143,6 +143,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             <div className="flex flex-wrap gap-1.5">
               {EXPRESSION_PRESETS.map(preset => (
                 <button
+                  type="button"
                   key={preset.name}
                   onClick={() => {
                     updateConfig('eyes', preset.eyes as CustomAvatarConfig['eyes']);
@@ -275,6 +276,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             <div className="flex flex-wrap gap-1.5">
               {COLOR_THEMES.map(theme => (
                 <button
+                  type="button"
                   key={theme.name}
                   onClick={() => {
                     Object.entries(theme.colors).forEach(([key, value]) => {
@@ -331,6 +333,7 @@ export default function CategoryOptions({ category, config, updateConfig, t, pre
             <div className="flex flex-wrap gap-1.5">
               {AVATAR_BODY_STYLES.map(style => (
                 <button
+                  type="button"
                   key={style}
                   onClick={() => updateConfig('bodyStyle', style)}
                   className={`px-3 py-1.5 rounded-neo border-2 text-xs font-bold capitalize transition-colors ${

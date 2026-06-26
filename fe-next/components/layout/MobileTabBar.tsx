@@ -38,6 +38,7 @@ export function MobileTabBar({
 
         return (
           <button
+            type="button"
             key={tab.id}
             onClick={() => {
               onTabChange(isActive ? '' : tab.id);

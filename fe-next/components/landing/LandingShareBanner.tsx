@@ -24,6 +24,7 @@ export function LandingShareBanner({ onShareClick }: LandingShareBannerProps) {
       transition={{ type: 'spring', stiffness: 300, damping: 22 }}
     >
       <button
+        type="button"
         onClick={onShareClick}
         className={cn(
           'w-full flex items-center gap-4 p-5 sm:p-6 relative overflow-hidden',

@@ -311,6 +311,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
           </h3>
           {compact && onToggleExpand && (
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onToggleExpand();

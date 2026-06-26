@@ -56,6 +56,7 @@ function SyncFeedDrawer({ rows, onClose }: DrawerProps) {
             {t('offline.queue.title')}
           </h2>
           <button
+            type="button"
             ref={closeRef}
             onClick={onClose}
             aria-label={t('offline.queue.close')}
@@ -140,6 +141,7 @@ export function PendingSyncBadge(){
   return (
     <>
       <button
+        type="button"
         onClick={() => setOpen(true)}
         aria-label={t('offline.pending.badge', { count })}
         className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-neo-navy-light border border-neo-white/20 text-neo-white text-xs font-neo-body hover:border-neo-white/40 transition-colors cursor-pointer"

@@ -136,7 +136,7 @@ export default function PlayerProfilePageClient() {
         <h2 className="text-xl font-black text-white">
           {error === 'PLAYER_NOT_FOUND' ? t('playerProfile.notFound') : t('playerProfile.error')}
         </h2>
-        <button onClick={() => window.location.href = '/'} className="text-neo-cyan hover:underline font-bold">
+        <button type="button" onClick={() => window.location.href = '/'} className="text-neo-cyan hover:underline font-bold">
           {t('common.backHome')}
         </button>
       </div>
@@ -158,6 +158,7 @@ export default function PlayerProfilePageClient() {
     <div className="max-w-2xl mx-auto px-4 py-6 sm:py-8">
       {/* Back button */}
       <button
+        type="button"
         onClick={() => window.history.back()}
         className="flex items-center gap-1.5 text-sm font-bold text-slate-400 hover:text-white mb-4 transition-colors"
       >
@@ -218,6 +219,7 @@ export default function PlayerProfilePageClient() {
         {!isOwnProfile && (
           <div className="flex gap-2 mt-4">
             <button
+              type="button"
               onClick={handleChallenge}
               className={cn(
                 'flex-1 flex items-center justify-center gap-1.5',
@@ -382,6 +384,7 @@ function FriendButton({
 
   return (
     <button
+      type="button"
       onClick={onAdd}
       disabled={loading}
       className={cn(

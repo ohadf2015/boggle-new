@@ -111,6 +111,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
             {/* Prestige Tier Chip — neo-brutalist hard-shadow pill */}
             {showPrestige && prestigeDisplay && (
               <button
+                type="button"
                 onClick={openPrestigeModal}
                 data-testid="prestige-tier-chip"
                 data-prestige-level={prestigeLevel}
@@ -211,6 +212,7 @@ const XpProgressBar = memo<XpProgressBarProps>(({
           )}
           {progress.isMaxLevel && (
             <button
+              type="button"
               onClick={showPrestige ? openPrestigeModal : undefined}
               className={cn(
                 'text-xs font-bold flex items-center gap-1',

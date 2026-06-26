@@ -308,6 +308,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               >
                 {/* Thumbs Down */}
                 <button
+                  type="button"
                   onClick={() => handleVote('dislike')}
                   className="
                     flex-1 max-w-28
@@ -329,6 +330,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
 
                 {/* I Don't Know */}
                 <button
+                  type="button"
                   onClick={handleDontKnow}
                   className="
                     flex-1 max-w-28
@@ -350,6 +352,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
 
                 {/* Thumbs Up */}
                 <button
+                  type="button"
                   onClick={() => handleVote('like')}
                   className="
                     flex-1 max-w-28

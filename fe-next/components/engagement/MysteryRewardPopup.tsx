@@ -342,6 +342,7 @@ const MysteryRewardPopup: React.FC<MysteryRewardPopupProps> = ({
 
                 {/* Tap to dismiss */}
                 <button
+                  type="button"
                   onClick={onClose}
                   className={cn(
                     'mt-4 px-6 py-2.5 rounded-neo border-2 border-neo-black shadow-hard-sm',

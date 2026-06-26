@@ -290,6 +290,7 @@ export default function CommunityPageClient() {
         >
           {TAB_CONFIG.map(({ key, icon: Icon, labelKey }) => (
             <button
+              type="button"
               key={key}
               role="tab"
               aria-selected={activeTab === key}

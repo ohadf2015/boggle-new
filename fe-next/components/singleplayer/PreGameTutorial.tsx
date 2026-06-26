@@ -79,6 +79,7 @@ const PreGameTutorial: React.FC<PreGameTutorialProps> = ({ onComplete, sessionId
 
       {/* Skip button — higher z-index to stay above step animations */}
       <button
+        type="button"
         onClick={(e) => {
           e.stopPropagation();
           onComplete();

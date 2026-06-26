@@ -52,6 +52,7 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
     <div className="relative inline-flex items-center">
       {/* Help icon button */}
       <button
+        type="button"
         onClick={toggleTooltip}
         className="w-5 h-5 flex items-center justify-center text-neo-black/50 hover:text-neo-black/80 transition-colors"
         aria-label={t('scoring.howItWorks')}
@@ -84,6 +85,7 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
               <NeoPanel tone="cream" shadow="lg" className="p-3 relative">
                 {/* Close button */}
                 <button
+                  type="button"
                   onClick={closeTooltip}
                   className="absolute -top-2 -right-2 w-5 h-5 bg-neo-pink text-white rounded-full border-2 border-neo-black shadow-hard-sm flex items-center justify-center hover:scale-110 transition-transform"
                   aria-label={t('common.close')}

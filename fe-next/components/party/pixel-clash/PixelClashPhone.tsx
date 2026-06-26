@@ -295,6 +295,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
         />
 
         <button
+          type="button"
           onClick={handleSubmitPrompt}
           disabled={promptEmpty}
           className={`
@@ -350,6 +351,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
         />
 
         <button
+          type="button"
           onClick={handleSubmitDrawing}
           className="
             mt-3 bg-neo-cyan border-3 border-neo-black rounded-neo shadow-hard
@@ -402,6 +404,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
         />
 
         <button
+          type="button"
           onClick={handleSubmitGuess}
           disabled={guessEmpty}
           className={`
@@ -439,6 +442,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
             const isSelf = entry.id === playerId;
             return (
               <button
+                type="button"
                 key={entry.id}
                 disabled={isSelf}
                 onClick={() => {
@@ -470,6 +474,7 @@ function PixelClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: Pi
 
         {showdownVote.best && (
           <button
+            type="button"
             onClick={handleSubmitVote}
             className="
               bg-neo-lime border-3 border-neo-black rounded-neo shadow-hard

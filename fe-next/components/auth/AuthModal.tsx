@@ -396,6 +396,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
               </p>
             </div>
             <button
+              type="button"
               onClick={onClose}
               className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-slate-600 hover:border-white hover:bg-white/10 transition-all text-gray-300 hover:text-white"
               aria-label={t('common.close')}
@@ -793,6 +794,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           {/* Continue as Guest */}
           <div className="mt-5 text-center">
             <button
+              type="button"
               onClick={onClose}
               className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
             >

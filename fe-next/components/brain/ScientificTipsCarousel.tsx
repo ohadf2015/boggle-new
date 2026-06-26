@@ -266,6 +266,7 @@ export default function ScientificTipsCarousel() {
           isDarkMode ? 'bg-neo-navy-light/70' : 'bg-slate-100/70'
         )}>
           <button
+            type="button"
             onClick={goToPrevious}
             aria-label={t('common.previous')}
             className={cn(
@@ -284,6 +285,7 @@ export default function ScientificTipsCarousel() {
           <div className="flex items-center justify-center gap-2 w-[100px]">
             {TIPS.map((tip, index) => (
               <button
+                type="button"
                 key={tip.id}
                 onClick={() => goToIndex(index)}
                 aria-label={`Go to tip ${index + 1}`}
@@ -304,6 +306,7 @@ export default function ScientificTipsCarousel() {
           </div>
 
           <button
+            type="button"
             onClick={goToNext}
             aria-label={t('common.next')}
             className={cn(

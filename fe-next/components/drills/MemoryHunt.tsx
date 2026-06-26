@@ -194,6 +194,7 @@ export default function MemoryHunt({
                             {tw.word}
                           </span>
                           <button
+                            type="button"
                             onClick={() => game.replaceInvalidWord(tw.word)}
                             className={cn(
                               'flex items-center gap-1 px-2 py-1 rounded-neo border-2 border-neo-black',
@@ -210,6 +211,7 @@ export default function MemoryHunt({
                       ))}
                     </div>
                     <button
+                      type="button"
                       onClick={game.skipStudyPhase}
                       className={cn(
                         'w-full px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
@@ -327,6 +329,7 @@ export default function MemoryHunt({
                   t={t}
                 />
                 <button
+                  type="button"
                   onClick={game.finishGame}
                   aria-label={t('brain.drills.finishGame')}
                   className={cn(

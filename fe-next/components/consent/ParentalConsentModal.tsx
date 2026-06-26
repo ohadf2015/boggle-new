@@ -201,6 +201,7 @@ export function ParentalConsentModal({
                   </p>
                 </div>
                 <button
+                  type="button"
                   onClick={onClose}
                   className={cn(
                     'shrink-0 w-10 h-10',

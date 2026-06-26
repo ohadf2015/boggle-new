@@ -313,6 +313,7 @@ function WeeklyQuestSection() {
                 const isSelecting = selectingQuestId === quest.id;
                 return (
                   <button
+                    type="button"
                     key={quest.id}
                     onClick={() => selectQuest(quest.id)}
                     disabled={!!selectingQuestId}

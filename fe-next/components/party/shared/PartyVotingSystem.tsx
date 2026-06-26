@@ -56,6 +56,7 @@ function PhoneBallotInner({ options, onVote, voted, timeRemaining, accentColor =
 
         return (
           <button
+            type="button"
             key={option.id}
             onClick={() => !isDisabled && onVote(option.id)}
             disabled={isDisabled}

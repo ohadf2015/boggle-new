@@ -151,6 +151,7 @@ function PodiumEmojiPicker({
     >
       {REACTIONS.map((r) => (
         <button
+          type="button"
           key={r.id}
           onClick={() => onSelect(r.id)}
           className="w-8 h-8 flex items-center justify-center text-base rounded hover:bg-neo-white/10 active:scale-90 transition-all"
@@ -376,6 +377,7 @@ export default function ResultsPodium({
                     {showEmojiButton && (
                       <>
                         <button
+                          type="button"
                           onClick={() => setOpenPicker(openPicker === player.username ? null : player.username)}
                           className={cn(
                             'w-7 h-7 flex items-center justify-center rounded-neo',

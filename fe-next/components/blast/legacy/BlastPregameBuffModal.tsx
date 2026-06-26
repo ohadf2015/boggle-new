@@ -65,6 +65,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
                 const isSel = selected === id;
                 return (
                   <button
+                    type="button"
                     key={id}
                     data-testid={`blast-pregame-buff-${id}`}
                     onClick={() => setSelected(id)}
@@ -96,6 +97,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
             <div className="flex w-full flex-col gap-3 pt-1">
               {canShowAd && (
                 <button
+                  type="button"
                   data-testid="blast-pregame-buff-cta"
                   onClick={offer}
                   disabled={selected === null}
@@ -108,6 +110,7 @@ export function BlastPregameBuffModal({ isOpen, onPick, onSkip, t }: BlastPregam
                 </button>
               )}
               <button
+                type="button"
                 data-testid="blast-pregame-buff-skip"
                 onClick={onSkip}
                 className="flex items-center justify-center gap-2 rounded-neo border-neo border-black/40 bg-transparent px-4 py-2 font-neo-body text-sm text-neo-white hover:text-neo-white hover:border-black"

@@ -339,6 +339,7 @@ export function BlastView() {
             );
           })() : hasRealAdProvider ? (
             <button
+              type="button"
               data-testid="blast-claim-boost-button"
               onClick={() => setBuffModalOpen(true)}
               className="group relative flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-pink px-6 py-3 font-neo-display text-sm font-black uppercase tracking-wide text-neo-navy shadow-hard-lg transition-all hover:scale-105 hover:bg-neo-pink-light active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"

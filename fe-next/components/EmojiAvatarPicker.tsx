@@ -201,6 +201,7 @@ const EmojiAvatarPicker: React.FC<AvatarPickerProps> = ({
                 const isSelected = !useProfileAvatar && selectedAvatar?.id === avatar.id;
                 return (
                   <button
+                    type="button"
                     key={avatar.id}
                     onClick={() => handleSelectAvatar(avatar)}
                     aria-label={`${t('profile.selectAvatar')} ${avatar.name}`}

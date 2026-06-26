@@ -41,6 +41,7 @@ export function WikipediaFilters({
         {SUPPORTED_LANGUAGES.map((lang: LanguageOption) => (
           <button
             key={lang.code}
+            type="button"
             onClick={() => onLanguageChange(lang.code)}
             className={cn(
               'px-3 py-2 rounded-lg border-2 font-bold transition-all shrink-0 text-sm min-h-[40px]',
@@ -65,6 +66,7 @@ export function WikipediaFilters({
             {STATUS_OPTIONS.map((option) => (
               <button
                 key={option.value}
+                type="button"
                 onClick={() => onStatusChange(option.value)}
                 className={cn(
                   'px-2.5 py-1.5 rounded-lg border-2 text-xs font-bold transition-all',

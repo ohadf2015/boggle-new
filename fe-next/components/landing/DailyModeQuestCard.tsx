@@ -57,6 +57,7 @@ export function DailyModeQuestCard() {
           {t('dailyQuest.title')}
         </span>
         <button
+          type="button"
           onClick={handleClaim}
           className="bg-neo-lime text-neo-navy font-neo-display text-sm px-3 py-1 rounded-neo border-neo shadow-hard-sm active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-transform"
         >

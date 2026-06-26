@@ -79,7 +79,7 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
       </div>
 
       {/* Dismiss button */}
-      <button
+      <button type="button"
         onClick={handleDismiss}
         className="
           absolute top-2 inset-e-2

@@ -23,7 +23,7 @@ export const DiscoveredWordsList: React.FC<DiscoveredWordsListProps> = ({ words,
         <span className="text-[11px] text-neo-white font-bold tabular-nums">
           {words.length} {t('wordHunt.mobile.words')}
         </span>
-        <button
+        <button type="button"
           onClick={() => setObfuscated(!obfuscated)}
           className="text-[10px] text-neo-white hover:text-neo-white font-medium transition-colors px-1.5 py-0.5 rounded"
         >

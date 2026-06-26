@@ -224,6 +224,7 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
     <div className="relative h-full w-full bg-neo-navy flex flex-col">
       {/* Exit button */}
       <button
+        type="button"
         onClick={handleRequestExit}
         aria-label={t('common.exit')}
         className={cn(
@@ -253,6 +254,7 @@ const AdventureHuntGame: React.FC<Props> = ({ levelConfig, initialGrid, onLevelC
             {t('adventure.hunt.noTargetAvailable')}
           </span>
           <button
+            type="button"
             onClick={onExit}
             className="px-5 py-2 rounded-neo border-neo bg-neo-cyan text-neo-navy font-neo-display shadow-hard"
           >

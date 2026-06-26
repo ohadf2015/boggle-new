@@ -71,6 +71,7 @@ export default function LessonBuilderEditDialog({
 
           <Dialog.Close asChild>
             <button
+              type="button"
               className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
               aria-label={t('common.close')}
             >

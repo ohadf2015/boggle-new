@@ -97,6 +97,7 @@ export function NotificationDropdown({
         <div className="flex items-center gap-2">
           {notifications.length > unreadCount && (
             <button
+              type="button"
               onClick={() => setShowUnreadOnly(!showUnreadOnly)}
               className={`
                 text-xs transition-colors font-medium
@@ -108,6 +109,7 @@ export function NotificationDropdown({
           )}
           {unreadCount > 0 && (
             <button
+              type="button"
               onClick={onMarkAllAsRead}
               className="
                 text-xs text-neo-cyan hover:text-neo-lime
@@ -119,6 +121,7 @@ export function NotificationDropdown({
           )}
           {notifications.length > 0 && (
             <button
+              type="button"
               onClick={onClearAll}
               className="
                 text-xs text-neo-white hover:text-neo-red
@@ -157,6 +160,7 @@ export function NotificationDropdown({
       <div className="px-4 py-2 border-t-2 border-black/20 bg-neo-navy/50 flex flex-col gap-1">
         {hasMore && !showAll && (
           <button
+            type="button"
             onClick={() => setShowAll(true)}
             className="
               w-full text-center text-xs text-neo-cyan
@@ -169,6 +173,7 @@ export function NotificationDropdown({
 
         {/* Previous notifications toggle */}
         <button
+          type="button"
           onClick={() => {
             if (!showPrevious) {
               onFetchPrevious();

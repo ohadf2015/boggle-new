@@ -110,7 +110,7 @@ export function KeyboardHintTooltip({
           aria-live="polite"
         >
           {/* Close button */}
-          <button
+          <button type="button"
             onClick={handleDismiss}
             className="absolute -top-1.5 -right-1.5 w-5 h-5 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full border-2 border-white/30 transition-colors"
             aria-label="Dismiss hint"
@@ -160,7 +160,7 @@ export function KeyboardHintTooltip({
           </div>
 
           {/* Compact dismiss button */}
-          <button
+          <button type="button"
             onClick={handleDismiss}
             className={cn(
               'w-full mt-2 px-3 py-1.5',

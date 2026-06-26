@@ -59,6 +59,7 @@ export default function SystemPageClient() {
 
           {/* Web Vitals link */}
           <button
+            type="button"
             onClick={() => router.push(`/${language}/admin/web-vitals`)}
             className="w-full bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 flex items-center gap-3 hover:bg-neo-navy-elevated/50 transition-colors text-start mb-6"
           >

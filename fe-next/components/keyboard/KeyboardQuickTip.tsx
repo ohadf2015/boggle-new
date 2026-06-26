@@ -69,7 +69,7 @@ export function KeyboardQuickTip({
             </div>
 
             {/* Close button - inline */}
-            <button
+            <button type="button"
               onClick={onDismiss}
               className="shrink-0 w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full border-2 border-white/30 transition-colors"
               aria-label="Dismiss tip"

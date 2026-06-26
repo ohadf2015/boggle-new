@@ -177,6 +177,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               className="animate-in fade-in-0 duration-300 fill-mode-both"
             >
               <button
+                type="button"
                 onClick={onStart}
                 className={cn(
                   'w-full py-3 px-4',
@@ -199,6 +200,7 @@ const BossIntro = memo<BossIntroProps>(({ boss, worldNumber: _worldNumber, onSta
               className="animate-in fade-in-0 duration-300 fill-mode-both"
             >
               <button
+                type="button"
                 onClick={onSkip}
                 className={cn(
                   'w-full py-2 px-4',

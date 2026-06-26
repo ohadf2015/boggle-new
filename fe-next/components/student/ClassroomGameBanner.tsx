@@ -213,6 +213,7 @@ export function ClassroomGameBanner({
             </div>
 
             <button
+              type="button"
               onClick={handleDismiss}
               className="p-1.5 rounded-neo border-2 border-black bg-white/40 hover:bg-white/60 shadow-hard-sm text-black transition-all"
               aria-label={t('common.close')}
@@ -248,6 +249,7 @@ export function ClassroomGameBanner({
 
           {/* Join Button */}
           <button
+            type="button"
             onClick={handleJoinGame}
             disabled={isJoining}
             className={cn(

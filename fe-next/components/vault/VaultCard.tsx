@@ -180,6 +180,7 @@ const VaultCard: React.FC<VaultCardProps> = ({
 
           {/* CTA */}
           <button
+            type="button"
             onClick={onEnter}
             className={cn(
               'w-full px-4 py-3 rounded-neo border-3 border-black',

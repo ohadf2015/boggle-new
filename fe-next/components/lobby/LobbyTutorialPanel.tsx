@@ -71,6 +71,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
         {/* Step Dots & Navigation */}
         <div className="flex items-center gap-3 mt-2">
           <button
+            type="button"
             onClick={isRTL ? handleNext : handlePrev}
             disabled={isRTL ? step === TUTORIAL_STEPS.length - 1 : step === 0}
             className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
@@ -87,6 +88,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
             ))}
           </div>
           <button
+            type="button"
             onClick={isRTL ? handlePrev : handleNext}
             disabled={isRTL ? step === 0 : step === TUTORIAL_STEPS.length - 1}
             className="w-7 h-7 flex items-center justify-center rounded bg-neo-white/10 disabled:opacity-30 transition-opacity"
@@ -106,6 +108,7 @@ export const LobbyTutorialPanel: React.FC<LobbyTutorialPanelProps> = ({ t }) => 
         <div className="flex flex-wrap gap-1.5">
           {SUPPORTED_LOCALES.map((loc) => (
             <button
+              type="button"
               key={loc}
               onClick={() => setLanguage(loc)}
               className={`px-2 py-1 text-xs font-bold rounded border-2 transition-all ${

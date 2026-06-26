@@ -47,7 +47,7 @@ export function PronunciationButton({
 
   return (
     <div className="relative">
-      <button
+      <button type="button"
         onClick={handleClick}
         disabled={isSpeaking}
         className={`

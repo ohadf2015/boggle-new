@@ -333,6 +333,7 @@ function AdventureView(): React.JSX.Element {
           </p>
           {!isOnCrazyGamesPlatform && (
             <button
+              type="button"
               onClick={() => setShowSignupPrompt(true)}
               className={cn(
                 'px-6 py-3 bg-neo-lime text-neo-black font-bold',
@@ -393,6 +394,7 @@ function AdventureView(): React.JSX.Element {
           <div className="flex gap-3">
             {isAuthError ? (
               <button
+                type="button"
                 onClick={handleReLogin}
                 className={cn(
                   'px-4 py-2 bg-neo-lime text-neo-black font-bold',
@@ -404,6 +406,7 @@ function AdventureView(): React.JSX.Element {
               </button>
             ) : (
               <button
+                type="button"
                 onClick={() => refreshProgression()}
                 className={cn(
                   'px-4 py-2 bg-neo-lime text-neo-black font-bold',
@@ -602,6 +605,7 @@ function AdventureWelcomeBanner({ t, onSelectWorld }: { t: (key: string) => stri
       className="relative bg-linear-to-r from-neo-purple to-neo-pink border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4"
     >
       <button
+        type="button"
         onClick={() => setDismissed(true)}
         className="absolute top-2 inset-e-2 p-1 text-neo-white hover:text-neo-white"
         aria-label={t('common.close')}
@@ -618,6 +622,7 @@ function AdventureWelcomeBanner({ t, onSelectWorld }: { t: (key: string) => stri
             {t('adventure.welcome.description')}
           </p>
           <button
+            type="button"
             onClick={onSelectWorld}
             className="mt-2.5 px-4 py-2 bg-neo-lime text-neo-black font-bold text-xs uppercase rounded-neo border-2 border-neo-black shadow-hard-sm active:shadow-hard-pressed active:translate-y-0.5 transition-all"
           >

@@ -81,6 +81,7 @@ export function ChatBubble({ gameCode, username, isHost, t }: ChatBubbleProps): 
                 {t('chat.title')}
               </h2>
               <button
+                type="button"
                 onClick={() => setIsOpen(false)}
                 className="w-7 h-7 flex items-center justify-center bg-neo-red/80 border-2 border-neo-black rounded-neo shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all"
                 aria-label={t('common.close')}

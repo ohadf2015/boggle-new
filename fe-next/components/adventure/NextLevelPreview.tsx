@@ -67,6 +67,7 @@ export function NextLevelPreview({
 
             <div className="flex items-center justify-between">
               <button
+                type="button"
                 onClick={onDismiss}
                 className="text-xs text-neo-white hover:text-neo-white px-3 py-2 min-h-11 min-w-11"
               >

@@ -26,6 +26,7 @@ export function EducationFAQ() {
           return (
             <div key={k} className="rounded-neo border-neo-thick border-neo-navy bg-neo-cream">
               <button
+                type="button"
                 aria-expanded={isOpen}
                 onClick={() => setOpen(isOpen ? null : k)}
                 className="flex w-full items-center justify-between p-4 text-left font-bold text-neo-navy transition-colors hover:bg-neo-cream/80"

@@ -196,6 +196,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
             const isActive = emailType === type;
             return (
               <button
+                type="button"
                 key={type}
                 onClick={() => handleTypeChange(type)}
                 className={cn(
@@ -221,6 +222,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
                 const isActive = gameMode === opt.value;
                 return (
                   <button
+                    type="button"
                     key={opt.value}
                     onClick={() => setGameMode(opt.value)}
                     className={cn(

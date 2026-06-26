@@ -144,7 +144,7 @@ export function MetricCard({
 
         {/* Actionable Button */}
         {actionable && (
-          <button
+          <button type="button"
             onClick={actionable.onClick}
             className={cn(
               'mt-1 px-3 py-2 bg-black text-neo-lime',

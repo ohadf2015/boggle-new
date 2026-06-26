@@ -47,6 +47,7 @@ export function MpModeBreakdown() {
         <div className="flex gap-1">
           {[7, 30, 90].map(d => (
             <button
+              type="button"
               key={d}
               onClick={() => setDays(d)}
               className={cn(

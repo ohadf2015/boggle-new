@@ -192,6 +192,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
           onKeyUp={handleKeyUp}
           onKeyDown={handleKeyDown}
           placeholder={placeholder || t('friends.typeMessage')}
+          aria-label={t('friends.typeMessage')}
           disabled={disabled}
           rows={1}
           className={cn(
@@ -209,6 +210,7 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
         {/* Send button — aria-disabled (not `disabled`) so clicks still commit
             IME composition on Android GBoard; handleSend reads the DOM value. */}
         <button
+          type="button"
           onClick={handleSend}
           aria-disabled={!isValid || disabled}
           className={cn(

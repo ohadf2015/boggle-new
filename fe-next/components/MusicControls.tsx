@@ -234,7 +234,7 @@ const MusicControls: React.FC = memo(() => {
                         {t('music.haptics')}
                       </span>
                     </div>
-                    <button
+                    <button type="button"
                       onClick={handleToggleHaptics}
                       className="relative flex items-center"
                       style={{ width: '44px', height: '22px' }}

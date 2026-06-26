@@ -105,6 +105,7 @@ export default function DuelChallengeModal({
             </h3>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="text-neo-white hover:text-neo-white transition-colors"
             aria-label={t('common.close', 'Close')}
@@ -205,6 +206,7 @@ export default function DuelChallengeModal({
         {/* Actions */}
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={onClose}
             className={cn(
               'flex-1 px-6 py-3 font-bold rounded-neo',
@@ -217,6 +219,7 @@ export default function DuelChallengeModal({
           </button>
 
           <button
+            type="button"
             onClick={handleSendChallenge}
             disabled={!selectedLessonId || isCreating}
             className={cn(

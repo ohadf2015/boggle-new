@@ -163,6 +163,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
                 {label('practiceNow', lang)}
               </Link>
               <button
+                type="button"
                 onClick={handleShare}
                 className="inline-flex items-center px-5 py-2.5 font-neo-display font-bold text-sm uppercase border-3 border-neo-black rounded-neo bg-neo-cyan text-neo-black shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
               >

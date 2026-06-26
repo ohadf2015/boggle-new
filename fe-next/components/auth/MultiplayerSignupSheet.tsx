@@ -99,6 +99,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
 
           {/* Close button */}
           <button
+            type="button"
             onClick={onClose}
             className={cn(
               'absolute top-3 inset-e-3 p-1.5 rounded-full transition-colors',
@@ -184,6 +185,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
 
             {/* Dismiss */}
             <button
+              type="button"
               onClick={onClose}
               className={cn(
                 'w-full mt-3 text-center text-xs py-2',

@@ -96,6 +96,7 @@ function LoadingUI({ secondsRemaining, showRetry, onRetry, locale }: LoadingUIPr
               {t('auth.callback.takingTooLong')}
             </p>
             <button
+              type="button"
               onClick={onRetry}
               className="px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold
                          rounded-neo border-neo-thick border-black shadow-hard

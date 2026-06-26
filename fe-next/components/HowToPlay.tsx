@@ -384,6 +384,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             <span className="text-slate-400 text-xs font-mono">{currentStep + 1} / {steps.length}</span>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="w-8 h-8 bg-neo-navy-light border-2 border-slate-600 rounded-lg flex items-center justify-center text-slate-400 hover:text-white hover:border-slate-400 transition-colors"
             aria-label={t('common.close')}
@@ -441,6 +442,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             const isCompleted = index < currentStep;
             return (
               <button
+                type="button"
                 key={step.id}
                 onClick={() => setCurrentStep(index)}
                 className="flex-1 h-1.5 rounded-full transition-all duration-300 relative overflow-hidden"
@@ -501,6 +503,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
       >
         {/* Back button */}
         <button
+          type="button"
           onClick={prevStep}
           disabled={currentStep === 0}
           className="flex items-center gap-2 px-5 py-2.5 rounded-xl border-3 border-neo-black font-bold uppercase text-sm transition-all
@@ -519,6 +522,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ onClose }) => {
             const isActive = index === currentStep;
             return (
               <button
+                type="button"
                 key={step.id}
                 onClick={() => setCurrentStep(index)}
                 className="relative transition-all duration-200"

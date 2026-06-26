@@ -186,6 +186,7 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
         {/* R5 — Rewarded continue on failure */}
         {!isVictory && rewarded.canShowAd && !rewarded.isDailyLimitReached && (
           <button
+            type="button"
             data-testid="rewarded-continue-btn"
             onClick={() => rewarded.showAd()}
             disabled={rewarded.status === 'loading' || rewarded.status === 'showing'}

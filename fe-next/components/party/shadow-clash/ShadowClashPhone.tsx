@@ -237,6 +237,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
         <div className="flex-1 min-h-0 flex flex-col gap-2 overflow-y-auto">
           {nightAction.targets.map(target => (
             <button
+              type="button"
               key={target}
               onClick={() => handleNightAction(target)}
               className={`
@@ -348,6 +349,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
 
         {/* Call Vote button */}
         <button
+          type="button"
           onClick={handleCallVote}
           className="
             mt-8 bg-neo-red border-3 border-neo-black rounded-neo shadow-hard
@@ -383,6 +385,7 @@ function ShadowClashPhoneInner({ socket, onSendInput }: ShadowClashPhoneProps) {
             const isSelected = votedTarget === target;
             return (
               <button
+                type="button"
                 key={target}
                 onClick={() => phase === 'voting' && handleVote(target)}
                 disabled={phase === 'voted'}

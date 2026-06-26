@@ -60,6 +60,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
             {t('socialGift.title', 'Send a Gift')}
           </h2>
           <button
+            type="button"
             data-testid="close-gift-modal"
             onClick={onClose}
             aria-label={t('common.close')}
@@ -84,6 +85,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
 
             return (
               <button
+                type="button"
                 key={type}
                 data-testid={`gift-card-${type}`}
                 onClick={() => setSelectedType(type)}
@@ -112,10 +114,11 @@ const GiftModal: React.FC<GiftModalProps> = ({
         {/* Coin amount slider (shown when coins selected) */}
         {selectedType === 'coins' && (
           <div className="mb-4 p-3 bg-neo-navy-elevated border-2 border-neo-black rounded-neo">
-            <label className="text-xs font-bold text-white block mb-2">
+            <label htmlFor="coin-slider" className="text-xs font-bold text-white block mb-2">
               {t('socialGift.amount', 'Amount')}: {coinAmount} {t('socialGift.coins', 'coins')}
             </label>
             <input
+              id="coin-slider"
               type="range"
               min={GIFT_TYPES.coins.minAmount}
               max={Math.min(GIFT_TYPES.coins.maxAmount!, senderBalance)}
@@ -137,6 +140,7 @@ const GiftModal: React.FC<GiftModalProps> = ({
 
         {/* Send button */}
         <button
+          type="button"
           data-testid="send-gift-button"
           onClick={handleSend}
           disabled={!selectedType || giftsRemaining <= 0}

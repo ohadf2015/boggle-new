@@ -188,6 +188,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
       return (
         <div className="flex flex-col gap-2 w-full">
           <button
+            type="button"
             onClick={handleSignOut}
             disabled={isSigningOut}
             className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-red-100 hover:bg-red-200 text-red-600", "disabled:opacity-50 disabled:cursor-not-allowed")}
@@ -275,6 +276,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 </div>
               ) : isCrazyGamesAccountAvailable ? (
                 <button
+                  type="button"
                   onClick={loginWithCrazyGames}
                   disabled={isCrazyGamesLoggingIn}
                   className={cn(
@@ -291,6 +293,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
           ) : (
             <>
               <button
+                type="button"
                 onClick={openSignIn}
                 className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-cyan shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard")}
               >
@@ -298,6 +301,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
                 <span className="text-neo-black">{t('auth.signIn')}</span>
               </button>
               <button
+                type="button"
                 onClick={openSignUp}
                 className={cn("flex items-center gap-3 px-3 py-2.5 text-sm font-bold rounded-neo border-2 border-neo-black transition-all w-full", "bg-neo-pink text-white shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard")}
               >

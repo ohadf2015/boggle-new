@@ -119,11 +119,13 @@ export default function DeleteAccountPageClient() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('deleteAccountWeb.emailPlaceholder')}
+                aria-label={t('deleteAccountWeb.emailPlaceholder')}
                 autoComplete="email"
                 className={inputClass}
               />
               {error && <p className="text-neo-red text-sm font-medium">{error}</p>}
               <button
+                type="button"
                 onClick={handleSendLink}
                 disabled={!email || isLoading}
                 className={cn(
@@ -168,11 +170,13 @@ export default function DeleteAccountPageClient() {
                 value={confirmText}
                 onChange={(e) => setConfirmText(e.target.value)}
                 placeholder="DELETE"
+                aria-label={t('settings.deleteAccountTypeConfirm')}
                 autoComplete="off"
                 className={cn(inputClass, 'font-mono')}
               />
               {error && <p className="text-neo-red text-sm font-medium">{error}</p>}
               <button
+                type="button"
                 onClick={handleDelete}
                 disabled={confirmText !== 'DELETE' || isLoading}
                 className={cn(

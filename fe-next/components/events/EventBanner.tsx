@@ -75,6 +75,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
         >
           {/* Dismiss button */}
           <button
+            type="button"
             onClick={onDismiss}
             aria-label={t('events.dismiss')}
             className="absolute top-2 right-2 p-1 text-white hover:text-white transition-colors"
@@ -132,6 +133,7 @@ const EventBanner: React.FC<EventBannerProps> = ({
                 </span>
               ) : (
                 <button
+                  type="button"
                   onClick={() => onJoin(event.id)}
                   className={cn(
                     'px-4 py-2 rounded-neo border-3 border-black font-bold text-sm text-black',

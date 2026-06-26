@@ -53,7 +53,7 @@ export function TreasureRoom({ isHe, onPick }: TreasureProps) {
           }}
         >
           {cards.map((c) => (
-            <button
+            <button type="button"
               key={c.id}
               onClick={() => onPick(c.id)}
               style={{
@@ -114,7 +114,7 @@ export function CampRoom({ isHe, onContinue }: CampProps) {
             ? 'אתה נח ליד האש. הבוס מחכה.'
             : 'You rest by the fire. The boss waits ahead.'}
         </p>
-        <button onClick={onContinue} style={btnStyle('#ff6b35', 'white')}>
+        <button type="button" onClick={onContinue} style={btnStyle('#ff6b35', 'white')}>
           {isHe ? 'המשך' : 'CONTINUE'}
         </button>
       </div>
@@ -156,7 +156,7 @@ export function BossIntroScreen({
         </h1>
         <p style={subStyle}>{isHe ? bossSubtitleHe : bossSubtitle}</p>
         <div style={{ marginTop: 32 }}>
-          <button onClick={onContinue} style={btnStyle('#ff1493', 'white')}>
+          <button type="button" onClick={onContinue} style={btnStyle('#ff1493', 'white')}>
             {isHe ? 'הילחם!' : 'FIGHT!'}
           </button>
         </div>

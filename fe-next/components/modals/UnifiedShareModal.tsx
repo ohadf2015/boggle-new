@@ -417,6 +417,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               </span>
             </div>
             <button
+              type="button"
               onClick={handleCopyLink}
               className={cn(
                 'border-2 border-neo-black rounded-neo p-3 min-w-[44px] min-h-[44px] flex items-center justify-center shadow-hard-sm hover:shadow-hard-md hover:-translate-y-0.5 transition-all focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2',
@@ -435,6 +436,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
           >
             {/* Primary: Copy Link - Full Width */}
             <button
+              type="button"
               onClick={handleCopyLink}
               disabled={isLoading}
               aria-label={copied ? t('share.linkCopied') : t('share.copyLink')}
@@ -462,6 +464,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
             {/* Secondary: WhatsApp - Full Width */}
             <button
+              type="button"
               onClick={handleWhatsApp}
               aria-label={t('share.whatsapp')}
               className={cn(
@@ -481,6 +484,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
             {/* More Platforms Toggle */}
             <button
+              type="button"
               onClick={() => setShowMorePlatforms(!showMorePlatforms)}
               aria-expanded={showMorePlatforms}
               aria-controls="more-platforms"
@@ -512,6 +516,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               >
                 {/* Twitter/X */}
                 <button
+                  type="button"
                   onClick={handleTwitter}
                   aria-label={t('share.twitter')}
                   className={cn(
@@ -533,6 +538,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
                 {/* Discord */}
                 <button
+                  type="button"
                   onClick={handleDiscord}
                   aria-label={t('share.discord')}
                   className={cn(
@@ -552,6 +558,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
                 {/* Email */}
                 <button
+                  type="button"
                   onClick={handleEmail}
                   aria-label={t('share.email')}
                   className={cn(
@@ -572,6 +579,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 {/* SMS - Mobile Only */}
                 {isMobile && (
                   <button
+                    type="button"
                     onClick={handleSms}
                     aria-label={t('share.sms')}
                     className={cn(
@@ -595,6 +603,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             {/* Challenge a Friend (Post-game only, when challenge data is available) */}
             {isPostGame && challengeData && (
               <button
+                type="button"
                 onClick={handleCreateChallenge}
                 disabled={isCreatingChallenge}
                 aria-label={t('challenge.challengeFriend')}
@@ -628,6 +637,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             {/* Native Share (Mobile Only) */}
             {canNativeShare && (
               <button
+                type="button"
                 onClick={handleNativeShare}
                 aria-label={t('share.more')}
                 className={cn(

@@ -274,6 +274,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
                   onChange={(e) => setMessage(e.target.value)}
                   disabled={isLoading}
                   placeholder={t('friends.challenges.customMessage')}
+                  aria-label={t('friends.challenges.customMessage')}
                   maxLength={200}
                   rows={2}
                   autoFocus
@@ -302,6 +303,7 @@ export const ChallengeInviteDialog: React.FC<ChallengeInviteDialogProps> = ({
 
           {/* SEND — single big button. Cancel is the X in the corner. */}
           <button
+            type="button"
             onClick={handleSend}
             disabled={isLoading}
             className={cn(

@@ -43,6 +43,7 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
             {t('blast.tutorial.veteran.body', 'Blast has been redesigned. Enjoy the new levels!')}
           </p>
           <button
+            type="button"
             onClick={onComplete}
             className="px-6 py-3 bg-neo-pink border-neo-thick border-black rounded-neo font-bold"
           >
@@ -104,6 +105,7 @@ export function BlastFtueOverlay({ onComplete, isVeteran, step = 1 }: Props) {
             </div>
             {step === 6 && (
               <button
+                type="button"
                 onClick={onComplete}
                 className="mt-3 px-4 py-2 bg-neo-pink border-neo-thick border-black rounded-neo text-sm font-bold"
               >

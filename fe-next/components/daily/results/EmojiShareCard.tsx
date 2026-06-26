@@ -101,7 +101,7 @@ export const EmojiShareCard: React.FC<EmojiShareCardProps> = ({
         <span className="text-neo-lime font-black text-xs uppercase tracking-widest">
           {t('daily.puzzleNumber').replace('{number}', String(puzzleNumber))} {solved ? '✅' : '❌'}
         </span>
-        <button
+        <button type="button"
           data-testid="emoji-reveal-toggle"
           onClick={(e) => {
             e.stopPropagation();

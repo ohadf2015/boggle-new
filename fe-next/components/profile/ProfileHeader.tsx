@@ -189,6 +189,7 @@ export function ProfileHeader({
 
           {/* Edit avatar button */}
           <button
+            type="button"
             onClick={() => setIsAvatarBuilderOpen(true)}
             className={cn(
               'absolute -top-1 -inset-e-1 z-10 flex items-center justify-center',
@@ -237,6 +238,7 @@ export function ProfileHeader({
             )}>
               <span className="truncate">{profile?.display_name || profile?.username || 'Player'}</span>
               <button
+                type="button"
                 onClick={startEditingName}
                 className="p-1 rounded hover:bg-neo-navy-elevated transition-colors shrink-0 text-gray-400"
                 title={t('profile.editName')}
@@ -266,6 +268,7 @@ export function ProfileHeader({
                   disabled={isSavingCountry}
                 />
                 <button
+                  type="button"
                   onClick={() => setIsEditingCountry(false)}
                   className="mt-1 text-xs text-gray-500 hover:text-gray-400"
                 >
@@ -274,6 +277,7 @@ export function ProfileHeader({
               </div>
             ) : (
               <button
+                type="button"
                 onClick={() => setIsEditingCountry(true)}
                 className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-neo-navy-elevated/60 text-sm text-gray-300 hover:bg-slate-600/60 transition-colors"
                 title={t('profile.changeCountry')}

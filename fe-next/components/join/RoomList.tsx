@@ -123,6 +123,7 @@ export const RoomList: React.FC<RoomListProps> = ({
             <div className="space-y-2">
               {activeRooms.map((room) => (
                 <button
+                  type="button"
                   key={room.gameCode}
                   onClick={() => onRoomSelect(room.gameCode)}
                   className={cn(
@@ -231,6 +232,7 @@ export const RoomList: React.FC<RoomListProps> = ({
             <div className="space-y-3">
               {activeRooms.map((room) => (
                 <button
+                  type="button"
                   key={room.gameCode}
                   onClick={() => onRoomSelect(room.gameCode)}
                   className={cn(

@@ -160,6 +160,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, onAddBots, erro
               {/* Secondary: fill seats with bots for solo play */}
               {canAddBots && (
                 <button
+                  type="button"
                   onClick={onAddBots}
                   className={`
                     bg-transparent border-3 ${accentClasses.split(' ')[1]} rounded-neo-lg
@@ -175,6 +176,7 @@ function PartyTvLobbyInner({ room, gameDef, isHost, onStartGame, onAddBots, erro
 
               {/* Primary: start the game */}
               <button
+                type="button"
                 onClick={onStartGame}
                 disabled={!canStart}
                 className={`

@@ -98,7 +98,7 @@ function BoardCardCompact({ board, personalBest, onPlay, className }: Omit<Board
   const croppedGrid = board.grid.slice(start, start + 3).map(row => row.slice(start, start + 3));
 
   return (
-    <button
+    <button type="button"
       onClick={() => onPlay?.(board.board_code)}
       className={cn(
         'group flex items-center gap-3 p-2.5',
@@ -270,7 +270,7 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay, variant =
 
       {/* CTA buttons */}
       <div className="px-3 pb-3 mt-auto flex gap-2">
-        <button
+        <button type="button"
           onClick={() => onPlay?.(board.board_code)}
           className={cn(
             'flex-1 flex items-center justify-center gap-1.5',
@@ -283,7 +283,7 @@ const BoardCard = memo<BoardCardProps>(({ board, personalBest, onPlay, variant =
           <Play size={14} />
           {personalBest != null ? t('ugc.gallery.improve') : t('ugc.gallery.play')}
         </button>
-        <button
+        <button type="button"
           onClick={() => shareBoard(board.board_code, board.title, board.creator_display_name, language, t)}
           className={cn(
             'flex items-center justify-center px-3 py-2',

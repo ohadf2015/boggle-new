@@ -93,6 +93,7 @@ export default function GameCodeDisplay({
             {gameCode}
           </span>
           <button
+            type="button"
             onClick={handleCopyCode}
             aria-label={t('share.copy')}
             className={cn(
@@ -127,6 +128,7 @@ export default function GameCodeDisplay({
       <div className="flex flex-wrap items-center justify-center gap-2">
         {/* QR Toggle */}
         <button
+          type="button"
           onClick={toggleQR}
           aria-label={showQR ? t('teacher.game.hideQrCode') : t('teacher.game.qrCode')}
           className={cn(
@@ -144,6 +146,7 @@ export default function GameCodeDisplay({
 
         {/* Copy Link */}
         <button
+          type="button"
           onClick={handleCopyLink}
           aria-label={t('teacher.game.copyLink')}
           className={cn(
@@ -160,6 +163,7 @@ export default function GameCodeDisplay({
 
         {/* Projection Mode */}
         <button
+          type="button"
           onClick={handleProjection}
           aria-label={t('teacher.game.projectMode')}
           className={cn(

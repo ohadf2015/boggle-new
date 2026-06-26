@@ -355,6 +355,7 @@ export function RealTimeDuelGame({
         <div className="flex gap-4">
           {opponentId && lessonId && (
             <button
+              type="button"
               onClick={handleRematch}
               className="px-6 py-3 bg-neo-pink text-white font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
             >
@@ -362,6 +363,7 @@ export function RealTimeDuelGame({
             </button>
           )}
           <button
+            type="button"
             onClick={onBackToLobby}
             className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
           >
@@ -457,6 +459,7 @@ export function RealTimeDuelGame({
               className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-neo rounded-neo shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
             />
             <button
+              type="button"
               onClick={handleSubmitWord}
               aria-disabled={currentWordEmpty}
               data-testid="submit-word-btn"
@@ -502,6 +505,7 @@ export function RealTimeDuelGame({
 
           {/* Forfeit Button */}
           <button
+            type="button"
             onClick={() => setShowForfeitDialog(true)}
             data-testid="forfeit-btn"
             className="text-neo-white hover:text-neo-white text-sm underline"

@@ -184,6 +184,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
             >
               {/* Close button */}
               <button
+                type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDismiss();

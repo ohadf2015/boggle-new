@@ -131,7 +131,7 @@ export function HostWordSelector({
           {t('teacher.wordSelector.title')}
         </h3>
         {selectedWords.length > 0 && (
-          <button
+          <button type="button"
             onClick={() => setSaveDialogOpen(true)}
             className="btn-neo-primary text-sm px-3 py-1 flex items-center gap-2"
           >
@@ -197,6 +197,7 @@ export function HostWordSelector({
                 setSaveError(null);
               }}
               placeholder={t('teacher.wordSelector.lessonNamePlaceholder')}
+              aria-label={t('teacher.wordSelector.saveLessonTitle')}
               className="w-full p-3 bg-neo-navy/50 border-neo rounded-neo text-neo-white placeholder:text-gray-500 mb-4"
             />
 
@@ -233,11 +234,11 @@ export function HostWordSelector({
             {/* Action Buttons */}
             <div className="flex gap-3 justify-end">
               <Dialog.Close asChild>
-                <button className="btn-neo-secondary px-4 py-2">
+                <button type="button" className="btn-neo-secondary px-4 py-2">
                   {t('common.cancel')}
                 </button>
               </Dialog.Close>
-              <button
+              <button type="button"
                 onClick={handleSave}
                 disabled={isSaving || !lessonName.trim()}
                 className={cn(

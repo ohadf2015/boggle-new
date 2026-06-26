@@ -88,6 +88,7 @@ export function SpectatorBanner({
           {/* Right: Action button */}
           {onRequestUpgrade && (
             <button
+              type="button"
               onClick={onRequestUpgrade}
               className={cn(
                 'shrink-0',

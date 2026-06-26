@@ -285,6 +285,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
 
         {/* Continue Button - Neo-Lime (Green) */}
         <button
+          type="button"
           onClick={props.onClose}
           className={cn(
             'mt-6 w-full py-3',

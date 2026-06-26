@@ -33,6 +33,7 @@ const HeaderLogo = memo(() => {
 
     return (
         <button
+            type="button"
             className="flex items-center gap-0.5 xs:gap-1 cursor-pointer bg-transparent border-none p-0 shrink-0 relative active:scale-95 transition-transform"
             onClick={handleLogoClick}
             aria-label={t('common.goToHome')}

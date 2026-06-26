@@ -161,6 +161,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
         </AnimatePresence>
         <div className="flex items-center justify-center gap-2 mt-2" role="group">
           <button
+            type="button"
             onClick={(e) => { e.stopPropagation(); setInstructionStep(Math.max(0, instructionStep - 1)); }}
             disabled={instructionStep === 0}
             className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo bg-neo-white/10 disabled:opacity-30 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
@@ -173,6 +174,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
               const isActive = i === instructionStep;
               return (
                 <button
+                  type="button"
                   key={step.titleKey}
                   onClick={(e) => { e.stopPropagation(); setInstructionStep(i); }}
                   role="tab"
@@ -187,6 +189,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
             })}
           </div>
           <button
+            type="button"
             onClick={(e) => { e.stopPropagation(); setInstructionStep(Math.min(steps.length - 1, instructionStep + 1)); }}
             disabled={instructionStep === steps.length - 1}
             className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo bg-neo-white/10 disabled:opacity-30 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"

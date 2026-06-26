@@ -78,6 +78,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
     <div className={cn('rounded-neo border-2 border-neo-black overflow-hidden', className)}>
       {/* Header Button */}
       <button
+        type="button"
         onClick={handleToggle}
         aria-expanded={isExpanded}
         aria-controls={contentId}
@@ -115,6 +116,7 @@ const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({
       {/* Summary teaser — visible only when collapsed, entices player to expand */}
       {summary && !isExpanded && (
         <button
+          type="button"
           onClick={handleToggle}
           className={cn(
             'w-full px-3 py-2 text-xs text-slate-300 border-t border-white/5 text-start',

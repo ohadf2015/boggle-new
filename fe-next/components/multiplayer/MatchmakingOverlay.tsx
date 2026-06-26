@@ -81,6 +81,7 @@ export function MatchmakingOverlay({
             </div>
 
             <button
+              type="button"
               onClick={onCancel}
               className="mt-4 rounded-neo border-neo bg-neo-red px-6 py-2 font-neo-body text-neo-white shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
             >
@@ -116,6 +117,7 @@ export function MatchmakingOverlay({
             </h2>
 
             <button
+              type="button"
               onClick={onCreateRoom}
               className="rounded-neo border-neo bg-neo-pink px-6 py-3 font-neo-body text-neo-white shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
             >
@@ -123,6 +125,7 @@ export function MatchmakingOverlay({
             </button>
 
             <button
+              type="button"
               onClick={onCancel}
               className="text-sm text-neo-white underline"
             >

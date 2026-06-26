@@ -152,6 +152,7 @@ export function SkillUnlockModal({ skill, onClose }: SkillUnlockModalProps) {
 
             {/* Close Button */}
             <button
+              type="button"
               style={{ animationDelay: '0.6s' }}
               onClick={onClose}
               className={cn(

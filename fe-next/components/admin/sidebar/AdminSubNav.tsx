@@ -71,6 +71,7 @@ export function AdminSubNav() {
           const active = isActive(item.defaultPath);
           return (
             <button
+              type="button"
               key={item.key}
               data-active={active}
               onClick={() => router.push(`${basePath}${item.defaultPath}`)}

@@ -124,6 +124,7 @@ export const DailyIntroCarousel: React.FC<DailyIntroCarouselProps> = ({
       <div className="flex justify-center gap-2 mt-3">
         {Array.from({ length: TOTAL_STEPS }).map((_, idx) => (
           <button
+            type="button"
             key={`step-${idx}`}
             aria-label={t('daily.carousel.goToStep').replace('{step}', String(idx + 1))}
             onClick={() => goToStep(idx)}

@@ -70,6 +70,7 @@ function SkillFlowNodeComponent({ data }: SkillFlowNodeProps) {
       />
 
       <button
+        type="button"
         onClick={handleClick}
         disabled={!isAvailable}
         data-testid={`skill-node-${skill.id}`}

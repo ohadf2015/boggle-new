@@ -40,7 +40,7 @@ export function BulkApproveButton({
 
   return (
     <div className="flex items-center gap-3">
-      <button
+      <button type="button"
         onClick={handleClick}
         disabled={disabled || selectedCount === 0 || loading}
         className={`

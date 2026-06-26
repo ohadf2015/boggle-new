@@ -73,6 +73,7 @@ export default function BattlePassRewardCard({
 
   return (
     <button
+      type="button"
       onClick={state === 'claimable' ? onClaim : undefined}
       disabled={state !== 'claimable'}
       className={`

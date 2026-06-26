@@ -56,6 +56,7 @@ export const RequestRow: React.FC<RequestRowProps> = ({
       </div>
       <div className="flex gap-1.5">
         <button
+          type="button"
           onClick={onAccept}
           disabled={isLoading}
           aria-label={t('friends.acceptRequest')}
@@ -68,6 +69,7 @@ export const RequestRow: React.FC<RequestRowProps> = ({
           {isLoading ? <Loader size="sm" /> : <Check className="w-4 h-4" strokeWidth={3} />}
         </button>
         <button
+          type="button"
           onClick={onDecline}
           disabled={isLoading}
           aria-label={t('friends.declineRequest')}

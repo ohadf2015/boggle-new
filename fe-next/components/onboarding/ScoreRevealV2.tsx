@@ -224,6 +224,7 @@ const ScoreRevealV2: React.FC<ScoreRevealV2Props> = ({ score, onContinue, onSkip
         </div>
         {onSkip && (
           <button
+            type="button"
             onClick={onSkip}
             className="text-[10px] font-bold text-neo-white hover:text-neo-white uppercase tracking-[0.2em] underline-offset-2 hover:underline transition-colors font-neo-body"
           >

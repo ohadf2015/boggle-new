@@ -162,6 +162,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
           )}>
             <div className="flex items-center gap-3">
               <button
+                type="button"
                 onClick={onClose}
                 className={cn(
                   'p-2 rounded-neo border-2 border-neo-black shadow-hard-sm',
@@ -205,6 +206,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
             {/* Challenge button */}
             {onChallenge && (
               <button
+                type="button"
                 onClick={onChallenge}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm',
@@ -307,6 +309,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                             )}
                           >
                             <button
+                              type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 onDeleteMessage(message.messageId);
@@ -318,6 +321,7 @@ export const MessageThread: React.FC<MessageThreadProps> = ({
                               {t('common.delete')}
                             </button>
                             <button
+                              type="button"
                               onClick={(e) => {
                                 e.stopPropagation();
                                 setDeleteMenuId(null);

@@ -96,6 +96,7 @@ export const PastSeasonsLeaderboard: React.FC = () => {
       <div className="flex flex-wrap gap-2 justify-center">
         {seasons.map((s) => (
           <button
+            type="button"
             key={s.season_id}
             onClick={() => setActiveSeason(s.season_id)}
             className={cn(

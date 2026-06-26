@@ -172,6 +172,7 @@ export function ClassProgressReport({
           <p className="text-neo-gray">Teacher: {data.teacherName}</p>
         </div>
         <button
+          type="button"
           onClick={handleExportPDF}
           disabled={exporting}
           className="px-4 py-2 bg-neo-lime text-black font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-shadow disabled:opacity-50"
@@ -247,6 +248,7 @@ export function ClassProgressReport({
                 </span>
                 {handleStudentClick ? (
                   <button
+                    type="button"
                     onClick={() => handleStudentClick(performer.studentId)}
                     className="flex-1 text-left text-neo-white font-medium hover:text-neo-lime transition-colors"
                     aria-label={`View ${performer.studentName}'s profile`}
@@ -281,6 +283,7 @@ export function ClassProgressReport({
               >
                 {handleStudentClick ? (
                   <button
+                    type="button"
                     onClick={() => handleStudentClick(student.studentId)}
                     className="flex-1 text-left text-neo-white font-medium hover:text-neo-lime transition-colors"
                     aria-label={`View ${student.studentName}'s profile`}

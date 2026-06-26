@@ -71,6 +71,7 @@ export function IndexNowPanel() {
       {/* Mode toggle */}
       <div className="flex gap-2 mb-4">
         <button
+          type="button"
           onClick={() => setMode('all')}
           className={cn(
             'px-3 py-1.5 text-sm rounded-md transition-colors',
@@ -82,6 +83,7 @@ export function IndexNowPanel() {
           All pages ({routesLoading ? '...' : allUrls.length})
         </button>
         <button
+          type="button"
           onClick={() => setMode('custom')}
           className={cn(
             'px-3 py-1.5 text-sm rounded-md transition-colors',
@@ -99,6 +101,7 @@ export function IndexNowPanel() {
           value={customUrls}
           onChange={(e) => setCustomUrls(e.target.value)}
           placeholder={`https://www.lexiclash.live/en/daily\nhttps://www.lexiclash.live/he/daily`}
+          aria-label="Custom URLs"
           className="w-full bg-neo-navy border border-slate-600 rounded-md p-3 text-sm text-slate-200 placeholder:text-slate-500 mb-4 min-h-[100px] font-mono"
         />
       )}

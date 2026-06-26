@@ -98,7 +98,7 @@ export default function LessonAssignmentDialog({
               ) : (
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {classrooms.map((classroom) => (
-                    <button
+                    <button type="button"
                       key={classroom.id}
                       onClick={() => setSelectedClassroomId(classroom.id)}
                       className={cn(
@@ -150,7 +150,7 @@ export default function LessonAssignmentDialog({
           </div>
 
           <Dialog.Close asChild>
-            <button
+            <button type="button"
               className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
               aria-label="Close"
               disabled={isAssigning}

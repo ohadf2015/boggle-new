@@ -283,6 +283,7 @@ export function TimedBlitzPractice({
                 autoComplete="off"
                 autoCorrect="off"
                 autoCapitalize="off"
+                aria-label={t('education.practice.typeWord')}
                 spellCheck="false"
                 data-testid="word-input"
                 className={cn(

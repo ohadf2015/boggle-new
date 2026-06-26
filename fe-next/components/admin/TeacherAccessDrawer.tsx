@@ -92,7 +92,7 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
   return (
     <div ref={dialogRef} className="fixed inset-0 z-50 flex items-stretch justify-end bg-black/40" role="dialog" aria-labelledby="tar-drawer-title">
       <div className="w-full max-w-xl bg-neo-white p-6 shadow-2xl overflow-y-auto">
-        <button onClick={onClose} className="text-sm text-slate-500 underline">{t('admin.teacherAccess.close')}</button>
+        <button type="button" onClick={onClose} className="text-sm text-slate-500 underline">{t('admin.teacherAccess.close')}</button>
         <h2 id="tar-drawer-title" className="mt-2 text-2xl font-bold text-neo-navy">{t('admin.teacherAccess.drawer_title')}</h2>
         <dl className="mt-4 grid grid-cols-2 gap-3 text-sm">
           <dt className="font-semibold">{t('admin.teacherAccess.field.name')}</dt><dd>{row.full_name}</dd>
@@ -158,11 +158,11 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
         )}
         {row.status === 'pending' && (
           <div className="mt-4 flex gap-3">
-            <button disabled={busy} onClick={() => act('approve')}
+            <button type="button" disabled={busy} onClick={() => act('approve')}
               className="flex-1 rounded-lg bg-neo-lime px-4 py-3 font-bold text-neo-navy disabled:opacity-50">
               {t('admin.teacherAccess.approve')}
             </button>
-            <button disabled={busy} onClick={() => act('decline')}
+            <button type="button" disabled={busy} onClick={() => act('decline')}
               className="flex-1 rounded-lg bg-neo-pink px-4 py-3 font-bold text-neo-white disabled:opacity-50">
               {t('admin.teacherAccess.decline')}
             </button>

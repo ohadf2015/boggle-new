@@ -203,6 +203,7 @@ export default function EndlessPageClient(): React.JSX.Element {
                   )}
                 </div>
                 <button
+                  type="button"
                   onClick={handleExit}
                   className="text-neo-white hover:text-neo-white text-xs font-bold uppercase transition-colors"
                 >
@@ -330,6 +331,7 @@ export default function EndlessPageClient(): React.JSX.Element {
 
               <div className="flex gap-4 mt-4">
                 <button
+                  type="button"
                   onClick={handleBackToLobby}
                   className="px-6 py-3 bg-neo-navy-light text-neo-white font-bold uppercase rounded-neo border-3 border-neo-black shadow-hard-sm active:shadow-hard-pressed active:translate-y-[2px] transition-shadow"
                 >

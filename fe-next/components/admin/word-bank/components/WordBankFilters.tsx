@@ -124,10 +124,11 @@ export function WordBankFilters({
 
         {/* Search */}
         <div>
-          <label className="block text-sm font-medium text-gray-300 mb-2">{t('admin.wordBank.filters.searchLabel')}</label>
+          <label htmlFor="word-search-input" className="block text-sm font-medium text-gray-300 mb-2">{t('admin.wordBank.filters.searchLabel')}</label>
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
+              id="word-search-input"
               type="text"
               value={searchQuery}
               onChange={e => onSearchChange(e.target.value)}

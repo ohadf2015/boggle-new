@@ -146,6 +146,7 @@ export default function BulkWordImporter({
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 placeholder={t('teacher.lesson.bulkImportPlaceholder')}
+                aria-label={t('teacher.lesson.bulkImportLabel')}
                 className={cn(
                   'w-full h-40 px-4 py-3 bg-neo-black/50 border-neo border-neo-black',
                   'text-neo-white font-neo-body shadow-hard-sm resize-none',
@@ -223,6 +224,7 @@ export default function BulkWordImporter({
 
           <Dialog.Close asChild>
             <button
+              type="button"
               className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
               aria-label={t('common.close')}
             >

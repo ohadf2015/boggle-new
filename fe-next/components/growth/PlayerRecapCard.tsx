@@ -110,6 +110,7 @@ export const PlayerRecapCard: React.FC = memo(function PlayerRecapCard() {
           </h3>
         </div>
         <button
+          type="button"
           data-testid="share-recap-btn"
           onClick={handleShare}
           className={cn(
@@ -130,6 +131,7 @@ export const PlayerRecapCard: React.FC = memo(function PlayerRecapCard() {
       <div className="flex gap-1 p-0.5 rounded-neo bg-neo-white/5" role="tablist">
         {(['weekly', 'monthly'] as RecapPeriod[]).map((p) => (
           <button
+            type="button"
             key={p}
             role="tab"
             aria-selected={period === p}

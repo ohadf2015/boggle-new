@@ -43,12 +43,14 @@ export function AvatarCustomizeHint({
 
       <div className="flex shrink-0 items-center gap-2">
         <button
+          type="button"
           onClick={onCustomize}
           className="rounded-neo border border-neo-cyan/40 bg-neo-cyan/15 px-3 py-1.5 text-xs font-bold text-neo-cyan transition-colors hover:bg-neo-cyan/25"
         >
           {t('avatar.nudge.cta')}
         </button>
         <button
+          type="button"
           onClick={onDismiss}
           aria-label={t('avatar.nudge.dismiss')}
           className="flex items-center gap-1 rounded px-1.5 py-1 text-xs text-gray-500 transition-colors hover:text-gray-300"

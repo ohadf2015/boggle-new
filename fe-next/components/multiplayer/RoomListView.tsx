@@ -214,6 +214,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
               {/* Help / How-to-play — overlays top-end (replaces the old header
                   help icon; this is the only on-demand path to the tutorial). */}
               <button
+                type="button"
                 onClick={() => setShowHowToPlay(true)}
                 className="absolute top-2 inset-e-2 z-10 flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy/80 backdrop-blur-xs shadow-hard-sm hover:bg-neo-navy active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
                 aria-label={t('landing.tutorial')}

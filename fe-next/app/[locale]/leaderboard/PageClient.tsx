@@ -231,6 +231,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
         {/* Tab Switcher */}
         <div className="flex gap-2 mb-6 justify-center">
           <button
+            type="button"
             onClick={() => setActiveTab('players')}
             className={cn(
               'px-4 py-2 font-bold text-sm rounded-neo border-3 border-neo-black transition-all',
@@ -243,6 +244,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             {t('leaderboard.title')}
           </button>
           <button
+            type="button"
             onClick={() => setActiveTab('creators')}
             className={cn(
               'px-4 py-2 font-bold text-sm rounded-neo border-3 border-neo-black transition-all',

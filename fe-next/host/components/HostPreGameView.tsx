@@ -445,6 +445,7 @@ function HostPreGameView({
           {t('hostView.noOneYet')} {t('hostView.startingWithBots')} {botCountdown}...
         </span>
         <button
+          type="button"
           onClick={cancelBotCountdown}
           className="text-xs font-bold uppercase text-neo-orange border border-neo-orange/50 rounded-lg px-3 py-1 hover:bg-neo-orange/10 transition-colors"
         >
@@ -473,6 +474,7 @@ function HostPreGameView({
         </span>
         {onCancelAutoStart && (
           <button
+            type="button"
             onClick={onCancelAutoStart}
             className="text-xs font-bold uppercase text-neo-lime border-2 border-neo-lime/60 rounded-lg px-3 py-1 hover:bg-neo-lime/10 transition-colors shrink-0"
           >
@@ -503,6 +505,7 @@ function HostPreGameView({
   const tvModeToggle = (
     <div className="flex flex-col items-end gap-0.5">
       <button
+        type="button"
         onClick={() => setHostPlaying(prev => !prev)}
         className={cn(
           'flex items-center gap-2 px-3 py-1.5 rounded-lg border-2 border-neo-black transition-all text-[10px] font-bold uppercase tracking-wider shadow-hard-sm active:translate-y-0.5 active:shadow-none',
@@ -597,6 +600,7 @@ function HostPreGameView({
               t={t}
             />
             <button
+              type="button"
               onClick={onExitRoom}
               className="w-8 h-8 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
               aria-label={t('common.exit')}

@@ -89,6 +89,7 @@ export default function WordPackBuilder({ isOpen, onClose }: WordPackBuilderProp
             {t('ugc.pack.builder.title')}
           </h2>
           <button
+            type="button"
             onClick={onClose}
             className="p-1 rounded-neo hover:bg-white/10 transition-colors"
             aria-label={t('ugc.pack.builder.close')}

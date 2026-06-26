@@ -225,7 +225,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
 
           {/* Continue as Guest */}
           <Reveal className="mt-6 text-center">
-            <button
+            <button type="button"
               onClick={onClose}
               className={cn(
                 'text-sm hover:underline',

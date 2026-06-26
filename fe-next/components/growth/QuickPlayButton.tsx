@@ -35,6 +35,7 @@ export const QuickPlayButton: React.FC = memo(function QuickPlayButton() {
 
   return (
     <button
+      type="button"
       data-testid="quick-play-button"
       onClick={handleClick}
       aria-label={t('quickPlay.ariaLabel')}

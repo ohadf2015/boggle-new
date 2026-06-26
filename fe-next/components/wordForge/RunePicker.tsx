@@ -62,6 +62,7 @@ export function RunePicker({
         <div className="flex flex-wrap gap-3 justify-center">
           {equippedRunes.map((rune, i) => (
             <button
+              type="button"
               key={rune.instanceId}
               onClick={() => onPick(selectedRune, i)}
               className={cn(
@@ -80,6 +81,7 @@ export function RunePicker({
           ))}
         </div>
         <button
+          type="button"
           onClick={() => setSelectedRune(null)}
           className="text-sm text-neo-cream/50 underline mt-2"
         >
@@ -102,6 +104,7 @@ export function RunePicker({
           const isPicking = pickingRune === rune.id;
           return (
             <m.button
+              type="button"
               key={rune.id}
               onClick={() => handleCardClick(rune)}
               initial={prefersReducedMotion ? false : { opacity: 0, y: 40 }}

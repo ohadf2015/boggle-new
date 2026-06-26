@@ -146,6 +146,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
 
           {/* Close button */}
           <button
+            type="button"
             onClick={handleClose}
             aria-label={t('common.close')}
             className={cn(

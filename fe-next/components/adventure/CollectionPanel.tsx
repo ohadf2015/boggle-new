@@ -111,6 +111,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
             data-testid="collection-close"
             className="p-2 rounded-neo border-2 border-neo-white/20 hover:bg-neo-white/10 transition-colors"
@@ -125,6 +126,7 @@ const CollectionPanel = memo<CollectionPanelProps>(({ isOpen, onClose, inventory
             const isActive = activeCategory === key;
             return (
               <button
+                type="button"
                 key={key}
                 data-testid={`collection-tab-${key}`}
                 onClick={() => setActiveCategory(key)}

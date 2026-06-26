@@ -32,6 +32,7 @@ export const MobileBottomNav = memo<MobileBottomNavProps>(function MobileBottomN
       <div className="flex items-center h-12">
         {/* Lobby Tab */}
         <button
+          type="button"
           onClick={() => onTabChange('lobby')}
           className={cn(
             'flex-1 flex flex-col items-center justify-center h-full transition-all',
@@ -55,6 +56,7 @@ export const MobileBottomNav = memo<MobileBottomNavProps>(function MobileBottomN
 
         {/* Chat Tab */}
         <button
+          type="button"
           onClick={() => onTabChange('chat')}
           className={cn(
             'flex-1 flex flex-col items-center justify-center h-full transition-all',

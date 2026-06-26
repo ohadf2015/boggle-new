@@ -216,7 +216,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
         </div>
 
         {/* Toggle Switch */}
-        <button
+        <button type="button"
           onClick={handleToggleSubscription}
           disabled={isSaving}
           className={cn(

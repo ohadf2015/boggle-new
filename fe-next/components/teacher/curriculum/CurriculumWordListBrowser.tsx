@@ -216,6 +216,7 @@ export function CurriculumWordListBrowser({
           {hasActiveFilters && (
             <div className="flex items-end">
               <button
+                type="button"
                 onClick={clearFilters}
                 className="flex items-center gap-2 px-4 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-gray hover:text-neo-white hover:bg-neo-navy/80 transition-colors"
               >
@@ -288,6 +289,7 @@ export function CurriculumWordListBrowser({
                   <div className="flex gap-2">
                     {/* Preview Button */}
                     <button
+                      type="button"
                       onClick={() => togglePreview(list.id)}
                       className="flex items-center gap-2 px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-gray hover:text-neo-white hover:bg-neo-navy/80 transition-colors"
                       aria-label={t('teacher.curriculum.preview')}
@@ -304,6 +306,7 @@ export function CurriculumWordListBrowser({
 
                     {/* Import Button */}
                     <button
+                      type="button"
                       onClick={() => handleImport(list)}
                       disabled={!teacherId || importingListId === list.id}
                       className="flex items-center gap-2 px-3 py-2 bg-neo-lime text-black border-neo border-black rounded-neo shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"

@@ -82,6 +82,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
             </div>
           </div>
           <button
+            type="button"
             onClick={() => { setShowConfirm(true); setError(null); setConfirmText(''); }}
             className={cn(
               'px-4 py-2 rounded-neo border-3 border-neo-red font-bold text-sm',
@@ -140,6 +141,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
 
                 <div className="flex gap-2">
                   <button
+                    type="button"
                     onClick={handleDelete}
                     disabled={confirmText !== 'DELETE' || isDeleting}
                     className={cn(
@@ -152,6 +154,7 @@ export default function DeleteAccountSection({ isDarkMode }: DeleteAccountSectio
                     {isDeleting ? t('settings.deleteAccountDeleting') : t('settings.deleteAccountConfirmButton')}
                   </button>
                   <button
+                    type="button"
                     onClick={() => setShowConfirm(false)}
                     disabled={isDeleting}
                     className={cn(

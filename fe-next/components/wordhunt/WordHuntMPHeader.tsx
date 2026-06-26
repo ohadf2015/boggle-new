@@ -39,6 +39,7 @@ export const WordHuntMPHeader = memo<WordHuntMPHeaderProps>(({
       {/* Help button or spacer for layout balance */}
       {onShowHelp ? (
         <button
+          type="button"
           onClick={onShowHelp}
           className={cn(
             iconBtnSize(compact),

@@ -264,6 +264,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   </div>
                   {/* Eye toggle button */}
                   <button
+                    type="button"
                     data-testid="word-visibility-toggle"
                     onClick={(e) => {
                       e.stopPropagation();

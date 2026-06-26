@@ -144,6 +144,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
 
         {/* Close Button */}
         <button
+          type="button"
           onClick={onDismiss}
           className={cn(
             'absolute -top-2 -right-2',

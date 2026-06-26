@@ -131,6 +131,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
           <div className="flex gap-1.5 flex-wrap justify-center">
             {COLORS.map((hex) => (
               <button
+                type="button"
                 key={hex}
                 onClick={() => { setActiveColor(hex); setIsEraser(false); }}
                 aria-label={hex}
@@ -146,6 +147,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
             ))}
             {/* Eraser */}
             <button
+              type="button"
               onClick={() => setIsEraser(!isEraser)}
               className={`
                 w-11 h-11 rounded-neo border-3 transition-all duration-100
@@ -167,6 +169,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
           <div className="flex gap-2 items-center">
             {BRUSH_SIZES.map((bSize) => (
               <button
+                type="button"
                 key={bSize}
                 onClick={() => setBrushSize(bSize)}
                 className={`
@@ -188,6 +191,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
           {/* Action buttons */}
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={() => canvasRef.current?.undo()}
               className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-white text-xs font-neo-body
                 hover:border-neo-cream/50 active:translate-y-px transition-all"
@@ -195,6 +199,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
               {t('party.undo') || 'Undo'}
             </button>
             <button
+              type="button"
               onClick={() => canvasRef.current?.redo()}
               className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-white text-xs font-neo-body
                 hover:border-neo-cream/50 active:translate-y-px transition-all"
@@ -202,6 +207,7 @@ const DrawingCanvasInner = forwardRef<DrawingCanvasHandle, DrawingCanvasProps>((
               {t('party.redo') || 'Redo'}
             </button>
             <button
+              type="button"
               onClick={() => canvasRef.current?.clearCanvas()}
               className="bg-neo-navy-elevated border-2 border-neo-red/30 rounded-neo px-3 py-1.5 text-neo-red/60 text-xs font-neo-body
                 hover:border-neo-red/50 active:translate-y-px transition-all"

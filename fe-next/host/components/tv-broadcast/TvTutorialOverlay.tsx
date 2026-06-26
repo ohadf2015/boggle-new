@@ -171,6 +171,7 @@ const TvTutorialOverlay: React.FC<TvTutorialOverlayProps> = ({
         >
           {/* Skip button */}
           <button
+            type="button"
             onClick={handleSkip}
             className="absolute top-3 right-3 p-2 text-neo-black/60 hover:text-neo-black hover:bg-neo-black/10 rounded-neo transition-colors"
             aria-label={t('common.skip')}

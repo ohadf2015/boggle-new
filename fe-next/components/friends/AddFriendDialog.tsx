@@ -101,7 +101,7 @@ export function AddFriendDialog({
         <DialogBody className="space-y-5">
           {/* Copy invite link — primary CTA, refined neo styling */}
           {profile?.username && (
-            <button
+            <button type="button"
               onClick={handleCopyInviteLink}
               className={cn(
                 'w-full flex items-center justify-center gap-2 py-3 px-4',

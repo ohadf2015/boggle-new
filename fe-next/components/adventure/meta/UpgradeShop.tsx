@@ -86,6 +86,7 @@ export function UpgradeShop({
           if (catCount === 0) return null;
           return (
             <button
+              type="button"
               key={cat.id}
               data-testid={`category-${cat.id}`}
               onClick={() => setActiveCategory(cat.id)}

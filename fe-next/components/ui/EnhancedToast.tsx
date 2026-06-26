@@ -142,7 +142,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
 
             {/* Action button */}
             {toast.action && (
-              <button
+              <button type="button"
                 onClick={() => {
                   toast.action?.onClick();
                   onRemove(toast.id);
@@ -161,7 +161,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
           </div>
 
           {/* Close button */}
-          <button
+          <button type="button"
             onClick={() => onRemove(toast.id)}
             className={cn(
               'shrink-0 p-2.5 rounded-neo cursor-pointer',

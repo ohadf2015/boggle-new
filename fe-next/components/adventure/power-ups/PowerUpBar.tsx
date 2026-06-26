@@ -206,13 +206,13 @@ export function PowerUpBar({
             <span className="text-sm font-bold">
               {t('adventure.confirmSpendGold', { amount: String(nextHintCost) })}
             </span>
-            <button
+            <button type="button"
               onClick={() => { toast.dismiss(toastRef.id); setPendingGoldConfirm(false); executeHint(); }}
               className="px-3 py-1 bg-neo-lime text-neo-black text-xs font-black rounded-neo border-2 border-neo-black"
             >
               {t('adventure.retrySave') === 'Retry' ? 'OK' : t('common.confirm') || 'OK'}
             </button>
-            <button
+            <button type="button"
               onClick={() => { toast.dismiss(toastRef.id); setPendingGoldConfirm(false); }}
               className="px-2 py-1 text-xs font-bold text-neo-white"
             >

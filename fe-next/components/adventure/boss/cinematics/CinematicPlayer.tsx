@@ -349,6 +349,7 @@ function CinematicPlayerInner({
           transition={{ delay: 0.5 }}
         >
           <button
+            type="button"
             onClick={skip}
             disabled={!canSkip}
             className={`

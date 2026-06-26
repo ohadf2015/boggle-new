@@ -233,6 +233,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
           {error}
         </p>
         <button
+          type="button"
           onClick={onBackToLobby}
           className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
         >
@@ -311,6 +312,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
         {/* G5 fix: Rematch + Back Buttons */}
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={() => {
               if (duelData) {
                 createChallenge(duelData.opponentId, duelData.lessonId, duelData.classroomId);
@@ -322,6 +324,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
             {t('duels.rematch')}
           </button>
           <button
+            type="button"
             onClick={onBackToLobby}
             className="px-6 py-3 bg-neo-cyan text-neo-black font-neo-body font-bold rounded-neo border-neo shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all"
           >
@@ -447,6 +450,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
               className="flex-1 px-4 py-2 bg-neo-navy text-neo-white border-neo rounded-neo shadow-hard focus:outline-hidden focus:ring-2 focus:ring-neo-cyan"
             />
             <button
+              type="button"
               onClick={handleAddWord}
               aria-disabled={currentWordEmpty}
               className={cn(
@@ -485,6 +489,7 @@ export function DuelGameView({ duelId, studentId, onBackToLobby }: DuelGameViewP
 
           {/* Submit Button */}
           <button
+            type="button"
             onClick={handleSubmitScore}
             disabled={wordsFound.length === 0 || phase === 'submitting'}
             className="w-full px-6 py-3 bg-neo-pink text-neo-white font-neo-display font-bold text-lg rounded-neo border-neo-thick shadow-hard hover:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all disabled:opacity-50 disabled:cursor-not-allowed"

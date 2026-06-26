@@ -94,6 +94,7 @@ export default function ConnectionsCommunity() {
             value={form.word1}
             onChange={(e) => setForm((f) => ({ ...f, word1: e.target.value }))}
             placeholder={t('connections.community.word1')}
+            aria-label={t('connections.community.word1')}
             className={inputCls}
             maxLength={24}
           />
@@ -103,6 +104,7 @@ export default function ConnectionsCommunity() {
             value={form.bridge}
             onChange={(e) => setForm((f) => ({ ...f, bridge: e.target.value }))}
             placeholder={t('connections.community.bridge')}
+            aria-label={t('connections.community.bridge')}
             className={`${inputCls} border-neo-cyan/60`}
             maxLength={24}
           />
@@ -112,6 +114,7 @@ export default function ConnectionsCommunity() {
             value={form.word2}
             onChange={(e) => setForm((f) => ({ ...f, word2: e.target.value }))}
             placeholder={t('connections.community.word2')}
+            aria-label={t('connections.community.word2')}
             className={inputCls}
             maxLength={24}
           />

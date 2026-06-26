@@ -230,6 +230,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
                 {captionText.length}/200
               </span>
               <button
+                type="button"
                 onClick={handleSubmitCaption}
                 disabled={captionEmpty}
                 className={`
@@ -258,6 +259,7 @@ function CaptionClashPhoneInner({ socket, playerId, isSpectator, onSendInput }: 
           {t('party.tapToLaugh') || 'Tap to laugh!'}
         </p>
         <button
+          type="button"
           onPointerDown={handleLaugh}
           aria-label={t('party.tapToLaugh') || 'Tap to laugh!'}
           className="

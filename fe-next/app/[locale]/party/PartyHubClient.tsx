@@ -135,6 +135,7 @@ export default function PartyHubClient() {
             const meta = GAME_META[game.id];
             return (
               <button
+                type="button"
                 key={game.id}
                 onClick={() => handleSelectGame(game.id)}
                 className={`
@@ -222,6 +223,7 @@ export default function PartyHubClient() {
           <div className="flex gap-3">
             <input
               type="text"
+              aria-label={t('party.enterCode') || 'Room code'}
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
               placeholder={t('party.enterCode') || 'ROOM CODE'}
@@ -236,6 +238,7 @@ export default function PartyHubClient() {
               "
             />
             <button
+              type="button"
               onClick={handleJoinRoom}
               disabled={joinCode.trim().length < 4}
               className="

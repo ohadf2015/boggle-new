@@ -80,6 +80,7 @@ const CrazyGamesFriendsStrip = memo(function CrazyGamesFriendsStrip({ roomId }: 
         ) : (
           friends.map(friend => (
             <button
+              type="button"
               key={friend.id}
               onClick={handleFriendClick}
               aria-label={t('multiplayerFlow.inviteFriend', { name: friend.username })}

@@ -30,10 +30,10 @@ export function PostFightModal({ outcome, onRetry, onExit }: Props) {
             : 'You fell. Did spelling feel like a spell?'}
         </p>
         <div style={{ display: 'flex', gap: 16, justifyContent: 'center' }}>
-          <button onClick={onRetry} style={btnStyle('#bfff00', '#1a1a2e')}>
+          <button type="button" onClick={onRetry} style={btnStyle('#bfff00', '#1a1a2e')}>
             Try Again
           </button>
-          <button onClick={onExit} style={btnStyle('#ef4444', 'white')}>
+          <button type="button" onClick={onExit} style={btnStyle('#ef4444', 'white')}>
             Back
           </button>
         </div>

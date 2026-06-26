@@ -116,6 +116,7 @@ export function HighlightPlayer({ moments, finalScore, onComplete }: Props) {
       <BoardClearedCard finalScore={finalScore} visible={inCardPhase} />
 
       <button
+        type="button"
         onClick={handleSkip}
         className="fixed top-4 right-4 z-[80] px-4 py-2 bg-black/60 text-white rounded pointer-events-auto"
         style={{ minWidth: 44, minHeight: 44, fontFamily: 'Fredoka' }}

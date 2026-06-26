@@ -26,6 +26,7 @@ const DailyOfflineFallback: React.FC<Props> = ({ onRetry }) => {
       </div>
 
       <button
+        type="button"
         onClick={onRetry}
         className="
           px-6 py-3 font-neo-display font-bold text-lg

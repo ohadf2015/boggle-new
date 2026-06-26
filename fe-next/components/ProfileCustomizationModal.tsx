@@ -171,6 +171,7 @@ const ProfileCustomizationModal: React.FC<ProfileCustomizationModalProps> = ({
                   onBlur={() => setNameTouched(true)}
                   onKeyDown={handleKeyDown}
                   placeholder={t('profileCustomization.namePlaceholder')}
+                  aria-label={t('profileCustomization.namePlaceholder')}
                   maxLength={maxLength}
                   autoComplete="off"
                   readOnly={lockName}

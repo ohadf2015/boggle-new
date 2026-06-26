@@ -95,7 +95,7 @@ export function ChallengeButton({
   if (variant === 'icon') {
     return (
       <>
-        <button
+        <button type="button"
           onClick={handleClick}
           className={cn(
             'p-2 rounded-neo transition-all',
@@ -124,7 +124,7 @@ export function ChallengeButton({
   // Button variant
   return (
     <>
-      <button
+      <button type="button"
         onClick={handleClick}
         disabled={showSuccess}
         className={cn(

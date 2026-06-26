@@ -202,6 +202,7 @@ export function StudentProgressReport({
           <p className="text-neo-gray">{data.classroomName}</p>
         </div>
         <button
+          type="button"
           onClick={handleExportPDF}
           disabled={exporting}
           className="px-4 py-2 bg-neo-lime text-black font-bold rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed transition-shadow disabled:opacity-50"

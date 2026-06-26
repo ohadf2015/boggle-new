@@ -324,6 +324,7 @@ export function SpellingChallengePractice({
             autoCapitalize="off"
             spellCheck="false"
             data-testid="spelling-input"
+            aria-label={t('education.practice.spellTheWord')}
             className={cn(
               'px-6 py-4 rounded-neo',
               'border-neo-thick border-neo-black',

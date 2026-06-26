@@ -116,6 +116,7 @@ export function BoostPicker({ open, mode, sessionId, onClose }: Props) {
           ))}
         </div>
         <button
+          type="button"
           ref={closeBtnRef}
           onClick={onClose}
           data-testid="boost-skip"
@@ -134,6 +135,7 @@ function BoostCard({ boostType, disabled, isClaimed, onClaim }: {
   const { Icon, bg, fg } = BOOST_ICONS[boostType];
   return (
     <button
+      type="button"
       onClick={(e) => onClaim((e.currentTarget as HTMLButtonElement).getBoundingClientRect())}
       disabled={disabled}
       data-boost-card

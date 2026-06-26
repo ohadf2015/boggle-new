@@ -86,6 +86,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
             </h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
             className="w-8 h-8 bg-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm hover:bg-neo-lime transition-colors"
             aria-label={t('common.close')}
@@ -110,6 +111,7 @@ const PuzzleWordEditor: React.FC<PuzzleWordEditorProps> = ({
               value={inputWord}
               onChange={onInputChange}
               placeholder={t('customPuzzle.enterWordPlaceholder')}
+              aria-label={t('customPuzzle.enterWord')}
               className={cn(
                 "w-full px-4 py-4 text-2xl font-black text-center uppercase tracking-widest",
                 "bg-neo-white border-4 border-neo-black rounded-neo shadow-hard-sm",

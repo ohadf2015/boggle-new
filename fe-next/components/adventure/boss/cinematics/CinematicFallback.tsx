@@ -196,7 +196,7 @@ export function CinematicFallback({
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
       >
-        <button
+        <button type="button"
           onClick={handleSkip}
           disabled={!canSkip}
           className={`

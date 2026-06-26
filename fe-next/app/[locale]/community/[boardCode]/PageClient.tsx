@@ -62,6 +62,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
   return (
     <div className="min-h-screen bg-neo-navy px-4 py-8 max-w-lg mx-auto">
       <button
+        type="button"
         onClick={() => router.back()}
         className="flex items-center gap-1 text-neo-white font-neo-body text-sm mb-6 hover:text-neo-white transition-colors"
       >
@@ -125,6 +126,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
 
         {/* Play button */}
         <button
+          type="button"
           onClick={handlePlay}
           className="w-full bg-neo-lime text-black font-neo-body font-bold py-3 rounded-neo border-neo border-black shadow-hard hover:shadow-hard-pressed active:shadow-hard-pressed transition-all flex items-center justify-center gap-2 text-lg mt-2"
         >

@@ -223,7 +223,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
             transition={{ duration: 0.5, delay: 0.25, ease: DECEL }}
             className="w-full max-w-md flex flex-col gap-3 mt-1"
           >
-            <button
+            <button type="button"
               data-testid="crazygames-welcome-cta-daily"
               onClick={() => handlePlay('daily')}
               className="group relative w-full py-5 px-6 rounded-neo border-neo-thick border-black bg-neo-lime text-black font-neo-display text-2xl uppercase tracking-tight shadow-hard-lg active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-transform duration-100 flex items-center justify-center gap-3"
@@ -243,7 +243,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              <button
+              <button type="button"
                 data-testid="crazygames-welcome-cta-practice"
                 onClick={() => handlePlay('practice')}
                 className="py-3 px-4 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white font-neo-display text-sm uppercase tracking-tight shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-transform duration-100 flex items-center justify-center gap-1.5 hover:bg-neo-cyan hover:text-black"
@@ -251,7 +251,7 @@ const CrazyGamesWelcome: React.FC<CrazyGamesWelcomeProps> = ({ onPlay }) => {
                 <Gamepad2 className="w-4 h-4" aria-hidden />
                 {t('onboarding.crazygames.playPractice')}
               </button>
-              <button
+              <button type="button"
                 data-testid="crazygames-welcome-cta-multiplayer"
                 onClick={() => handlePlay('multiplayer')}
                 className="py-3 px-4 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white font-neo-display text-sm uppercase tracking-tight shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-transform duration-100 flex items-center justify-center gap-1.5 hover:bg-neo-pink hover:text-black"

@@ -287,6 +287,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
             <div className="flex flex-wrap gap-1.5">
               {LANGUAGES.map(lang => (
                 <button
+                  type="button"
                   key={lang.code}
                   onClick={() => setLanguage(lang.code)}
                   className={cn(
@@ -307,6 +308,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
         {/* ── CTA ── */}
         <div className="px-5 pt-1 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom, 1.25rem))' }}>
           <button
+            type="button"
             onClick={handleCreate}
             disabled={isCreating}
             className={cn(

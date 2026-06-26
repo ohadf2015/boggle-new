@@ -39,6 +39,7 @@ export function TeacherWelcomeBanner({ hasAccess }: Props) {
           <p className="mt-1 text-sm text-neo-navy/80">{t('education.teacher.welcome_banner_body')}</p>
         </div>
         <button
+          type="button"
           onClick={handleDismiss}
           className="mt-1 whitespace-nowrap rounded-neo bg-neo-navy px-3 py-1 text-xs font-bold text-neo-white shadow-hard-sm hover:shadow-hard-sm active:shadow-hard-pressed transition-all"
         >

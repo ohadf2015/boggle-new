@@ -39,6 +39,7 @@ export function BlastUnlockCard({ mechanic, cardIndex, onDismiss, onSkipAll }: P
           {t(card.bodyKey, 'A new mechanic has been unlocked')}
         </p>
         <button
+          type="button"
           onClick={onDismiss}
           className="w-full px-4 py-3 bg-neo-pink border-neo-thick border-black rounded-neo font-bold text-center"
           data-testid="unlock-card-got-it"
@@ -47,6 +48,7 @@ export function BlastUnlockCard({ mechanic, cardIndex, onDismiss, onSkipAll }: P
         </button>
         {showSkipLink && (
           <button
+            type="button"
             onClick={() => onSkipAll?.()}
             className="text-xs text-center opacity-70 hover:opacity-100 transition-opacity w-full"
             data-testid="unlock-card-skip-all"

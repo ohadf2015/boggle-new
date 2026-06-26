@@ -269,7 +269,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
 
         {/* Words Section - Always show, collapsible - Neo-Brutalist */}
         <div className="mb-2 relative z-10">
-          <button
+          <button type="button"
             onClick={handleToggleExpand}
             className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-cream dark:bg-neo-navy-elevated shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"
           >
@@ -370,7 +370,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
         {/* Collapsible Achievements Section - Only for other players (current player has it in ConsolidatedPlayerCard) */}
         {gameAchievements.length > 0 && !isCurrentPlayer && (
           <div className="mt-2 relative z-10">
-            <button
+            <button type="button"
               onClick={() => setShowAchievements(!showAchievements)}
               aria-expanded={showAchievements}
               className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-lime/20 dark:bg-neo-lime/10 shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"

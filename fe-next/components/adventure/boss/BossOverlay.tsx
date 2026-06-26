@@ -398,6 +398,7 @@ const BossOverlay = memo<BossOverlayProps>(
             />
             {onSkipIntro && (
               <button
+                type="button"
                 onClick={onSkipIntro}
                 className="absolute bottom-6 inset-e-6 z-50 px-4 py-2 bg-neo-black/60 text-neo-white font-bold text-sm rounded-neo border border-neo-white/20 hover:bg-neo-black/80 transition-colors"
                 aria-label={t('common.skip')}

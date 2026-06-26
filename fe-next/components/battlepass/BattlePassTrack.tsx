@@ -54,7 +54,7 @@ export default function BattlePassTrack() {
               </span>
             </div>
             {!isPremium && (
-              <button className="bg-neo-yellow text-neo-black font-bold text-sm px-3 py-1 border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all">
+              <button type="button" className="bg-neo-yellow text-neo-black font-bold text-sm px-3 py-1 border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all">
                 {t('battlePass.upgrade')} - {season.premiumCost}
                 <Star className="w-3 h-3 inline-block ms-1" />
               </button>

@@ -219,6 +219,7 @@ export default function EducationBadgeGrid({
           <div key={category} className="space-y-4">
             {/* Category Header */}
             <button
+              type="button"
               onClick={() => toggleCategory(category)}
               aria-expanded={!isCollapsed}
               aria-controls={`category-${category}`}
@@ -298,6 +299,7 @@ export default function EducationBadgeGrid({
           <div className="bg-neo-pink text-neo-black px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard-lg flex items-center gap-3">
             <span className="font-neo-body">{pinError}</span>
             <button
+              type="button"
               onClick={clearError}
               className="font-bold hover:underline"
               aria-label="Dismiss error"

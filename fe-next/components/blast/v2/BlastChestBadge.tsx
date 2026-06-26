@@ -124,7 +124,7 @@ export function BlastChestBadge({
   }, [progress]);
 
   return (
-    <button
+    <button type="button"
       ref={buttonRef}
       onClick={onPreview}
       data-testid="chest-badge"

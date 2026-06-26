@@ -116,6 +116,7 @@ const ProfileSetupStep: React.FC<ProfileSetupStepProps> = ({
                 }}
                 onBlur={() => setNameTouched(true)}
                 placeholder={t('onboarding.name.placeholder')}
+                aria-label={t('onboarding.name.placeholder')}
                 maxLength={maxLength}
                 className={cn(
                   'w-full px-3 py-2.5 sm:py-3 bg-white border-3 border-neo-black rounded-neo',

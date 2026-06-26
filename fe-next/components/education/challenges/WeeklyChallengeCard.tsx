@@ -59,7 +59,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
       </div>
 
       {canClaim && (
-        <button
+        <button type="button"
           onClick={() => onClaim(quest.id)}
           className="w-full bg-neo-lime text-black font-bold py-2 px-4 rounded-neo border-neo border-3 shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-transform"
           data-testid="claim-button"

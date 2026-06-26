@@ -95,6 +95,7 @@ const TimeScopeTabs = memo<TimeScopeTabsProps>(({ timeScope, onScopeChange }) =>
     <div className="flex gap-2 mb-4">
       {tabs.map(tab => (
         <button
+          type="button"
           key={tab.key}
           onClick={() => onScopeChange(tab.key)}
           className={cn(

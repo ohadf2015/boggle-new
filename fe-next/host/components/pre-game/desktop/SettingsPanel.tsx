@@ -132,6 +132,7 @@ export function SettingsPanel({
 
       {/* TV Mode Toggle */}
       <button
+        type="button"
         data-testid="tv-mode-toggle"
         data-checked={tvMode}
         onClick={onTvModeToggle}

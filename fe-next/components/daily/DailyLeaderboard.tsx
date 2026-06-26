@@ -418,6 +418,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
         <div className="text-center text-red-500 py-4 text-sm">
           {error}
           <button
+            type="button"
             onClick={fetchLeaderboard}
             className="block mx-auto mt-2 text-neo-cyan underline"
           >

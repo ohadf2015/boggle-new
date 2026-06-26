@@ -301,7 +301,7 @@ const BossVictory = memo<BossVictoryProps>(
             <div className="flex flex-col gap-3">
               {/* Continue Button (victory only) */}
               {isVictory && (
-                <button
+                <button type="button"
                   onClick={onContinue}
                   className={cn(
                     'w-full py-3 px-4',
@@ -319,7 +319,7 @@ const BossVictory = memo<BossVictoryProps>(
               )}
 
               {/* Retry Button */}
-              <button
+              <button type="button"
                 onClick={onRetry}
                 className={cn(
                   'w-full py-3 px-4',

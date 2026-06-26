@@ -52,6 +52,7 @@ function GameErrorFallback({ onExit, onRetry, error }: { onExit: () => void; onR
 
         <div className="flex flex-col gap-3">
           <button
+            type="button"
             onClick={onRetry}
             className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-neo-yellow text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-all"
           >
@@ -59,6 +60,7 @@ function GameErrorFallback({ onExit, onRetry, error }: { onExit: () => void; onR
             {t('adventure.gameError.retry')}
           </button>
           <button
+            type="button"
             onClick={onExit}
             className="flex items-center justify-center gap-2 w-full py-3 px-4 bg-neo-navy text-neo-white font-bold border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-pressed active:translate-y-0.5 transition-all"
           >

@@ -524,7 +524,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
           </p>
         )}
         {friends.length > 5 && (
-          <button
+          <button type="button"
             onClick={() => router.push(`/${language}/friends`)}
             className={cn(
               'w-full flex items-center justify-center gap-1 py-1.5 rounded-neo border-2 text-xs font-bold',
@@ -581,7 +581,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
             : (unreadCount > 0 ? (unreadCount > 9 ? '9+' : unreadCount) : null);
 
           return (
-            <button
+            <button type="button"
               key={tab}
               role="tab"
               id={`friends-tab-${tab}`}
@@ -757,7 +757,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
                       <span className={cn('text-xs', isDark ? 'text-gray-500' : 'text-gray-400')}>
                         ({t('friends.pending')})
                       </span>
-                      <button
+                      <button type="button"
                         onClick={() => handleCancelRequest(req.id)}
                         disabled={actionLoading === req.id}
                         title={t('friends.cancelRequest')}

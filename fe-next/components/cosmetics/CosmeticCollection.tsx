@@ -41,7 +41,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
       {/* Tabs */}
       <div className="flex gap-2 mb-4 overflow-x-auto">
         {TABS.map((tab) => (
-          <button
+          <button type="button"
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`px-3 py-2 rounded-neo border-neo font-neo-body text-sm whitespace-nowrap transition-colors ${
@@ -104,7 +104,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
                 );
               })()}
               {item.isUnlocked && !item.isEquipped && (
-                <button
+                <button type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     equipCosmetic(item.id);
@@ -115,7 +115,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
                 </button>
               )}
               {!item.isUnlocked && item.unlockCondition.type === 'purchase' && (
-                <button
+                <button type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     void purchaseCosmetic(item.id);

@@ -98,6 +98,7 @@ export function AnalyticsDashboard({
           <p className="text-black/60 font-bold text-sm">{error.message}</p>
         </div>
         <button
+          type="button"
           onClick={refresh}
           className={cn(
             'px-6 py-2 bg-neo-cyan text-black border-3 border-black',
@@ -234,6 +235,7 @@ export function AnalyticsDashboard({
             {t('education.analytics.studentProgress')}
           </h3>
           <button
+            type="button"
             onClick={() => {/* export logic */}}
             className={cn(
               'px-4 py-2 bg-neo-cyan text-black border-3 border-black',

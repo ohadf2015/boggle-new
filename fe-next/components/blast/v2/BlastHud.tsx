@@ -281,6 +281,7 @@ export function BlastHud({
         <div className="flex items-center justify-center gap-3 px-4 py-2">
           {canUndo && onUndo && (
             <button
+              type="button"
               onClick={onUndo}
               data-testid="undo-btn"
               aria-label={t('blast.undoTooltip', 'Reverse last move')}
@@ -296,6 +297,7 @@ export function BlastHud({
           )}
           {(mech.revealLetterHint || mech.revealWordHint) && (
             <button
+              type="button"
               onClick={onHint}
               data-testid="hint-btn"
               aria-label={t('blast.hint.revealAria', 'Reveal a word — costs a star')}

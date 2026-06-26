@@ -185,7 +185,7 @@ export function BlastV2PageClient({ level: initialLevel }: Props) {
           <p className="font-neo-body text-base text-white">
             {t('blast.moreLevelsComingSoon')}
           </p>
-          <button
+          <button type="button"
             onClick={handleRestart}
             className="mt-2 px-6 py-3 bg-neo-lime border-neo-thick border-black rounded-neo font-neo-display text-lg text-black shadow-hard hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-hard-pressed transition-transform"
           >

@@ -51,6 +51,7 @@ export function ForfeitConfirmDialog({
           <div className="flex gap-3 justify-end">
             <AlertDialog.Cancel asChild>
               <button
+                type="button"
                 onClick={onCancel}
                 className={cn(
                   'px-4 py-2 bg-neo-white text-neo-black font-neo-body font-bold',
@@ -65,6 +66,7 @@ export function ForfeitConfirmDialog({
 
             <AlertDialog.Action asChild>
               <button
+                type="button"
                 onClick={onConfirm}
                 className={cn(
                   'px-4 py-2 bg-red-500 text-neo-white font-neo-body font-bold',

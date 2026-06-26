@@ -85,6 +85,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
       {/* Actions */}
       <div className="flex gap-2">
         <button
+          type="button"
           aria-label={t('streaks.wager.skip')}
           onClick={onSkip}
           className={cn(
@@ -95,6 +96,7 @@ export function StreakWager({ currentCoins, currentStreak, onWager, onSkip }: St
           {t('streaks.wager.skip')}
         </button>
         <button
+          type="button"
           aria-label={t('streaks.wager.confirm')}
           onClick={() => onWager(selectedAmount)}
           className={cn(

@@ -98,7 +98,7 @@ export function BulkImportModal({
             <Upload className="w-5 h-5 text-neo-yellow" />
             {t('admin.wordBank.bulkImport.title')}
           </h2>
-          <button
+          <button type="button"
             onClick={handleClose}
             className="p-1 hover:bg-neo-navy-light rounded transition-colors"
             aria-label="Close"

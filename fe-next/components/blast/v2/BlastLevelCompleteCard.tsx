@@ -523,7 +523,7 @@ export function BlastLevelCompleteCard({
           </div>
         )}
 
-        <button
+        <button type="button"
           ref={buttonRef}
           onClick={onNext}
           className="mt-7 px-8 py-3 w-full rounded-lg font-black text-lg uppercase tracking-wide"
@@ -536,7 +536,7 @@ export function BlastLevelCompleteCard({
         {(onReplay || onHome) && (
           <div className="mt-3 flex items-center justify-center gap-3">
             {onReplay && (
-              <button
+              <button type="button"
                 onClick={onReplay}
                 data-testid="complete-replay-btn"
                 className="flex-1 px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-transform active:scale-95"
@@ -546,7 +546,7 @@ export function BlastLevelCompleteCard({
               </button>
             )}
             {onHome && (
-              <button
+              <button type="button"
                 onClick={onHome}
                 data-testid="complete-home-btn"
                 className="flex-1 px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wide transition-transform active:scale-95"

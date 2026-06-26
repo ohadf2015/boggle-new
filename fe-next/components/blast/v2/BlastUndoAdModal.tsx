@@ -45,6 +45,7 @@ export function BlastUndoAdModal({ isOpen, modeColor = '#06b6d4', onWatchAd, onC
             </p>
             <div className="flex flex-col w-full gap-2 mt-2">
               <button
+                type="button"
                 data-testid="blast-undo-ad-watch"
                 onClick={onWatchAd}
                 className="w-full px-5 py-3 rounded-lg font-bold text-[#0b1530] transition-transform active:scale-95"
@@ -53,6 +54,7 @@ export function BlastUndoAdModal({ isOpen, modeColor = '#06b6d4', onWatchAd, onC
                 {t('blast.undoAdGate.watch', 'Watch ad')}
               </button>
               <button
+                type="button"
                 data-testid="blast-undo-ad-cancel"
                 onClick={onCancel}
                 className="w-full px-5 py-2 rounded-lg font-medium text-white hover:text-white transition-colors"

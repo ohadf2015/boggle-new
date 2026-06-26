@@ -72,7 +72,7 @@ export default function JoinRedirectClient() {
       <div className="min-h-screen bg-neo-navy flex items-center justify-center p-4">
         <div className="bg-neo-red/20 border-3 border-neo-red rounded-neo p-4 text-center max-w-sm">
           <p className="text-neo-red font-neo-display uppercase mb-2">{error}</p>
-          <button
+          <button type="button"
             onClick={() => { setJoined(false); window.location.reload(); }}
             className="text-neo-white text-sm underline"
           >
@@ -105,7 +105,7 @@ export default function JoinRedirectClient() {
             focus:outline-hidden focus:border-neo-cyan
           "
         />
-        <button
+        <button type="button"
           onClick={handleManualJoin}
           disabled={manualCode.trim().length < 4 || !connected}
           className="

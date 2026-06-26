@@ -155,12 +155,14 @@ export default function Error({
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <button
+            type="button"
             onClick={handleRefresh}
             className="btn-neo-primary px-6 py-3 text-lg"
           >
             {isChunkError ? `✨ ${t('errors.refreshPage')}` : `🔄 ${t('common.retry')}`}
           </button>
           <button
+            type="button"
             onClick={() => window.location.href = '/'}
             className="btn-neo-secondary px-6 py-3 text-lg"
           >

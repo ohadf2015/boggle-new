@@ -105,7 +105,7 @@ const PuzzleBrowse: React.FC = () => {
 
         {/* Sort Tabs */}
         <div className="flex gap-2 mt-4">
-          <button
+          <button type="button"
             onClick={() => handleSortChange('newest')}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all ${
               sort === 'newest'
@@ -116,7 +116,7 @@ const PuzzleBrowse: React.FC = () => {
             <Clock className="w-4 h-4" />
             {t('puzzleBrowse.sortNewest')}
           </button>
-          <button
+          <button type="button"
             onClick={() => handleSortChange('popular')}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm transition-all ${
               sort === 'popular'

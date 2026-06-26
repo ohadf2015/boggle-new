@@ -289,6 +289,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
         {/* Action Buttons */}
         <div className="p-4 space-y-3">
           <button
+            type="button"
             onClick={onStart}
             className={cn(
               'w-full py-3 px-4',
@@ -306,6 +307,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
           </button>
 
           <button
+            type="button"
             onClick={onBack}
             className={cn(
               'w-full py-2 px-4',

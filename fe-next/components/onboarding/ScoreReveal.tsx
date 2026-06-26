@@ -242,7 +242,7 @@ const ScoreReveal: React.FC<ScoreRevealProps> = ({
             {t('onboarding.ftue.continue')}
             <ArrowRight className="w-5 h-5" />
           </m.button>
-          <button
+          <button type="button"
             onClick={onTryAgain}
             className={cn(
               'w-full py-2 bg-transparent border-2 border-neo-black/20 rounded-neo',

@@ -71,9 +71,10 @@ export function TeacherAccessQueue() {
           </select>
         </label>
         <input placeholder={t('admin.teacherAccess.filter_country')} value={country}
+          aria-label={t('admin.teacherAccess.filter_country')}
           onChange={(e) => { setPage(0); setCountry(e.target.value); }}
           className="rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-sm text-neo-white placeholder-slate-500" />
-        <button onClick={() => { fetchRows(); fetchCounts(); }}
+        <button type="button" onClick={() => { fetchRows(); fetchCounts(); }}
           className="ml-auto rounded bg-neo-lime px-3 py-1 text-sm font-bold text-neo-navy">
           {t('admin.teacherAccess.refresh')}
         </button>
@@ -88,6 +89,7 @@ export function TeacherAccessQueue() {
         ) : (
           rows.map((r) => (
             <button
+              type="button"
               key={r.id}
               onClick={() => setOpen(r)}
               className="w-full text-left rounded-neo border-2 border-slate-700 bg-neo-navy-light p-3 hover:border-neo-lime focus:outline-none focus-visible:ring-2 focus-visible:ring-neo-lime"
@@ -159,9 +161,9 @@ export function TeacherAccessQueue() {
       </div>
 
       <div className="mt-4 flex items-center gap-2 text-sm text-neo-white">
-        <button disabled={page === 0} onClick={() => setPage(page - 1)} className="rounded border-2 border-slate-600 px-2 py-1 disabled:opacity-50">←</button>
+        <button type="button" disabled={page === 0} onClick={() => setPage(page - 1)} className="rounded border-2 border-slate-600 px-2 py-1 disabled:opacity-50">←</button>
         <span>{t('admin.teacherAccess.page')} {page + 1}</span>
-        <button disabled={rows.length < 50} onClick={() => setPage(page + 1)} className="rounded border-2 border-slate-600 px-2 py-1 disabled:opacity-50">→</button>
+        <button type="button" disabled={rows.length < 50} onClick={() => setPage(page + 1)} className="rounded border-2 border-slate-600 px-2 py-1 disabled:opacity-50">→</button>
         <a href={`/api/admin/teacher-access/export?${new URLSearchParams({ status, locale, country })}`}
           className="ml-auto rounded bg-neo-lime px-3 py-1 font-bold text-neo-navy">
           {t('admin.teacherAccess.export_csv')}

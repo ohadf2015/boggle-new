@@ -100,7 +100,7 @@ function TeacherReportsInner() {
           ) : classrooms && classrooms.length > 0 ? (
             <div className="space-y-3">
               {classrooms.map((classroom) => (
-                <button
+                <button type="button"
                   key={classroom.id}
                   onClick={() => handleClassroomSelect(classroom.id)}
                   className="w-full flex items-center justify-between p-4 bg-neo-navy border-neo border-black rounded-neo shadow-hard hover:shadow-hard-pressed hover:bg-neo-navy/80 transition-all text-start"
@@ -126,7 +126,7 @@ function TeacherReportsInner() {
       <div className="min-h-screen bg-neo-navy p-4 sm:p-6 lg:p-8">
         <div className="max-w-4xl mx-auto">
           {/* Back button */}
-          <button
+          <button type="button"
             onClick={handleBackToClass}
             className="flex items-center gap-2 text-neo-gray hover:text-neo-white mb-6 transition-colors"
             aria-label={t('teacher.reports.backToClass')}

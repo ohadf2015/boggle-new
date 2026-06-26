@@ -71,6 +71,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
       <div className="flex items-center gap-1.5">
         {/* Accept */}
         <button
+          type="button"
           data-testid={`accept-challenge-${challenge.id}`}
           onClick={handleAccept}
           disabled={loading !== null}
@@ -85,6 +86,7 @@ export const ChallengeRow: React.FC<ChallengeRowProps> = ({
         </button>
         {/* Decline */}
         <button
+          type="button"
           data-testid={`decline-challenge-${challenge.id}`}
           onClick={handleDecline}
           disabled={loading !== null}

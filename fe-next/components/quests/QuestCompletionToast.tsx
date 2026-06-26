@@ -137,7 +137,7 @@ export function showQuestCompletionToast({
         aria-live="assertive"
       >
         {/* Close button */}
-        <button
+        <button type="button"
           onClick={() => toast.dismiss(toastInstance.id)}
           className="absolute top-2 inset-e-2 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-neo-black/40 hover:bg-neo-black/60 text-neo-white hover:text-neo-white transition-colors"
           aria-label={t('common.close')}

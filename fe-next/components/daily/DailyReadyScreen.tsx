@@ -261,6 +261,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           className="hidden sm:block w-full max-w-sm mx-auto"
         >
           <button
+            type="button"
             onClick={onStart}
             className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
           >
@@ -289,6 +290,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-1"
           >
             <button
+              type="button"
               onClick={() => setShowCreateChallenge(true)}
               className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-pink hover:text-neo-pink-light transition-colors"
             >
@@ -296,6 +298,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               {t('daily.createCustomChallenge')}
             </button>
             <button
+              type="button"
               onClick={() => setShowLeaderboard(!showLeaderboard)}
               className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             >
@@ -303,6 +306,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               {t('daily.todaysPlayers')}
             </button>
             <button
+              type="button"
               onClick={onShowTutorial}
               className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
             >
@@ -328,12 +332,14 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               className="flex items-center justify-center gap-4 pt-2"
             >
               <button
+                type="button"
                 onClick={() => setShowLeaderboard(!showLeaderboard)}
                 className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
               >
                 <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
               </button>
               <button
+                type="button"
                 onClick={onShowTutorial}
                 className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
               >
@@ -430,6 +436,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               className="max-w-sm mx-auto pointer-events-auto"
             >
               <button
+                type="button"
                 onClick={onStart}
                 className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
               >

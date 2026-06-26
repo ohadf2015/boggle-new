@@ -111,6 +111,7 @@ export const PauseOverlay = memo(function PauseOverlay({
           <div className="flex flex-col gap-3">
             {/* Resume */}
             <button
+              type="button"
               onClick={onResume}
               className={cn(
                 'w-full py-3 px-6',
@@ -129,6 +130,7 @@ export const PauseOverlay = memo(function PauseOverlay({
 
             {/* Restart */}
             <button
+              type="button"
               onClick={() => setShowRestartConfirm(true)}
               className={cn(
                 'w-full py-3 px-6',
@@ -147,6 +149,7 @@ export const PauseOverlay = memo(function PauseOverlay({
 
             {/* Exit */}
             <button
+              type="button"
               onClick={() => setShowExitConfirm(true)}
               className={cn(
                 'w-full py-3 px-6',

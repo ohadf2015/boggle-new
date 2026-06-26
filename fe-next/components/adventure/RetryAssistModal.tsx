@@ -265,6 +265,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                 {/* R4 — Rewarded retry (bonus time via ad) */}
                 {rewarded.canShowAd && !rewarded.isDailyLimitReached && (
                   <button
+                    type="button"
                     data-testid="rewarded-retry-btn"
                     onClick={() => rewarded.showAd()}
                     disabled={rewarded.status === 'loading' || rewarded.status === 'showing'}
@@ -285,6 +286,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
 
                 {/* Try Again - Always visible */}
                 <button
+                  type="button"
                   onClick={onRetry}
                   className={cn(
                     'w-full py-3 px-4',
@@ -304,6 +306,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                 {/* Bonus Time - After 2+ failures */}
                 {showBonusTime && (
                   <button
+                    type="button"
                     onClick={onRetryWithBonus}
                     className={cn(
                       'w-full py-3 px-4',
@@ -328,6 +331,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
                 {/* Start with Hint - After 3+ failures */}
                 {showHintAssist && (
                   <button
+                    type="button"
                     onClick={onRetryWithHint}
                     className={cn(
                       'w-full py-3 px-4',
@@ -351,6 +355,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
 
                 {/* Exit */}
                 <button
+                  type="button"
                   onClick={onExit}
                   className={cn(
                     'w-full py-2 px-4',

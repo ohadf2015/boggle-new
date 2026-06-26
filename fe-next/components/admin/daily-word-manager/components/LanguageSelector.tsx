@@ -21,6 +21,7 @@ export const LanguageSelector: React.FC<LanguageSelectorProps> = ({
       <div className="flex gap-1.5 sm:gap-2 overflow-x-auto pb-1 scrollbar-hide -mx-1 px-1">
         {LANGUAGES.map(lang => (
           <button
+            type="button"
             key={lang.code}
             onClick={() => onSelectLang(lang.code)}
             className={cn(

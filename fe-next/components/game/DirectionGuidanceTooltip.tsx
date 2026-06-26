@@ -156,7 +156,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
               aria-live="polite"
             >
               {/* Close button */}
-              <button
+              <button type="button"
                 onClick={(e) => {
                   e.stopPropagation();
                   handleDismiss();

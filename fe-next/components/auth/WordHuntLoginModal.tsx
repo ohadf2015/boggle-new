@@ -211,6 +211,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
               {/* Email Form (OTP on native, magic link on web) */}
               {!showEmailForm ? (
                 <button
+                  type="button"
                   onClick={() => setShowEmailForm(true)}
                   className="w-full mb-4 text-sm text-gray-400 hover:text-gray-200 transition-colors flex items-center justify-center gap-2"
                 >
@@ -235,6 +236,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                       value={email}
                       onChange={(e) => handleEmailChange(e.target.value)}
                       placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                      aria-label={t('auth.inlineSignup.emailPlaceholder')}
                       className={cn(
                         "w-full px-4 py-3 rounded-xl border-2 bg-neo-navy-elevated text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan",
                         emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
@@ -257,6 +259,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
                         value={otpCode}
                         onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
                         placeholder={t('auth.otp.enterCode')}
+                        aria-label={t('auth.otp.enterCode')}
                         className="w-full px-4 py-3 rounded-xl border-2 bg-neo-navy-elevated text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan border-slate-600 focus:border-neo-cyan text-center text-2xl tracking-[0.5em] font-mono"
                         disabled={isLoading !== null}
                       />
@@ -303,6 +306,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
           {/* Skip Option */}
           <Reveal noSlide className="text-center">
             <button
+              type="button"
               onClick={onClose}
               className="text-sm text-gray-400 hover:text-gray-200 transition-colors"
             >

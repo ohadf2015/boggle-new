@@ -416,6 +416,7 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
                 loop
                 muted
                 playsInline
+                aria-label="Celebration video"
                 // `auto` so the first frame is decoded before the scale-in plays —
                 // `metadata` left the framed box EMPTY during the 620ms entrance,
                 // reading as a "flash / video not showing". The dark `backgroundColor`

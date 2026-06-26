@@ -541,6 +541,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         <div className="text-center text-red-500 py-4 text-sm">
           {error}
           <button
+            type="button"
             onClick={activeTab === 'today' ? fetchTodayLeaderboard : fetchAllTimeLeaderboard}
             className="block mx-auto mt-2 text-neo-cyan underline"
           >
@@ -575,7 +576,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       <div className="space-y-2">
         {/* Load more above */}
         {hasAbove && (
-          <button onClick={loadAbove} className={loadMoreClass}>
+          <button type="button" onClick={loadAbove} className={loadMoreClass}>
             <ChevronUp className="w-4 h-4" />
             {t('daily.showMore')} ({aboveCount} {t('daily.more')})
           </button>
@@ -612,7 +613,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
         {/* Load more below */}
         {hasBelow && (
-          <button onClick={loadBelow} className={loadMoreClass}>
+          <button type="button" onClick={loadBelow} className={loadMoreClass}>
             <ChevronDown className="w-4 h-4" />
             {t('daily.showMore')} ({belowCount} {t('daily.more')})
           </button>

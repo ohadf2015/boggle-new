@@ -40,7 +40,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
 }) => {
   return (
     <div className="bg-white dark:bg-neo-navy-light/50 rounded-xl border border-gray-200 dark:border-slate-700 p-3 sm:p-4 mb-4 text-gray-900 dark:text-white">
-      <button onClick={onToggleShow} className="w-full flex items-center justify-between">
+      <button type="button" onClick={onToggleShow} className="w-full flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-purple-500" />
           <span className="font-bold text-base sm:text-lg">AI Bulk Word Generator</span>
@@ -53,11 +53,12 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
           {/* Date Range Selection */}
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <label htmlFor="bulkStartDate" className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 <Calendar className="w-4 h-4 inline me-1" />
                 Start Date
               </label>
               <input
+                id="bulkStartDate"
                 type="date"
                 value={bulkStartDate}
                 onChange={e => onStartDateChange(e.target.value)}
@@ -65,11 +66,12 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
               />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
+              <label htmlFor="bulkEndDate" className="block text-sm font-medium text-gray-600 dark:text-gray-400 mb-1">
                 <Calendar className="w-4 h-4 inline me-1" />
                 End Date
               </label>
               <input
+                id="bulkEndDate"
                 type="date"
                 value={bulkEndDate}
                 onChange={e => onEndDateChange(e.target.value)}
@@ -175,6 +177,7 @@ export const BulkGenerator: React.FC<BulkGeneratorProps> = ({
                       value={item.word}
                       onChange={e => onWordChange(index, e.target.value)}
                       placeholder="Enter word"
+                      aria-label={`Word for ${formatDateDisplay(item.date)}`}
                       className={cn(
                         'flex-1 px-2 py-1 border rounded font-mono text-sm uppercase min-w-0',
                         'bg-white dark:bg-slate-600 border-gray-300 dark:border-slate-500',

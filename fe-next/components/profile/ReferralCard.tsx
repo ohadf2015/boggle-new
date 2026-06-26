@@ -284,6 +284,7 @@ export function ReferralCard() {
 
       {/* Collapsible Reward Tiers */}
       <button
+        type="button"
         onClick={() => setShowRewards(!showRewards)}
         className={cn(
           'w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-colors',

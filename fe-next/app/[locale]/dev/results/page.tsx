@@ -124,6 +124,7 @@ export default function DevResultsPage() {
         <div className="mb-4 flex flex-wrap gap-2">
           {SCENARIOS.map((s) => (
             <button
+              type="button"
               key={s.id}
               onClick={() => setScenario(s.id)}
               className={`px-3 py-1.5 text-xs font-neo-body font-bold border-2 border-black rounded-neo ${

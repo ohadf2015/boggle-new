@@ -100,6 +100,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
         <div className="flex gap-1.5 overflow-x-auto scrollbar-hide flex-1">
           {SORT_TABS.map(tab => (
             <button
+              type="button"
               key={tab.key}
               onClick={() => handleSortChange(tab.key)}
               className={cn(
@@ -122,6 +123,7 @@ const BoardGallery = memo<BoardGalleryProps>(({ onPlay }) => {
           <Filter className="w-3.5 h-3.5 text-neo-white shrink-0" />
           {DIFFICULTY_CHIPS.map(chip => (
             <button
+              type="button"
               key={chip.key}
               onClick={() => handleDifficultyToggle(chip.key)}
               className={cn(

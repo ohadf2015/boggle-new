@@ -267,6 +267,7 @@ const JoinClassroomForm: React.FC<JoinClassroomFormProps> = ({ initialCode = '' 
             {/* Back Link */}
             <div className="mt-6 pt-6 border-t border-neo-white/10">
               <button
+                type="button"
                 onClick={() => router.push(`/${language}/student`)}
                 disabled={isSubmitting}
                 className="flex items-center gap-2 text-sm text-neo-white hover:text-neo-cyan transition-colors disabled:opacity-50"

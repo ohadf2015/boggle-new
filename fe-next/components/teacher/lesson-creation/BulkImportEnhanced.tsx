@@ -194,7 +194,7 @@ export default function BulkImportEnhanced({
                 onChange={handleFileUpload}
                 className="hidden"
               />
-              <button
+              <button type="button"
                 onClick={() => fileInputRef.current?.click()}
                 className={cn(
                   'w-full p-4 border-neo border-dashed border-neo-cyan/50 rounded-neo',
@@ -317,7 +317,7 @@ export default function BulkImportEnhanced({
           </div>
 
           <Dialog.Close asChild>
-            <button
+            <button type="button"
               className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
               aria-label={t('common.close')}
             >

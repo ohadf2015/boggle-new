@@ -86,6 +86,7 @@ export const WordPactCard: React.FC = memo(function WordPactCard() {
           </div>
           <p className="text-sm text-neo-white">{t('wordPact.formDesc')}</p>
           <button
+            type="button"
             data-testid="form-pact-btn"
             onClick={() => setShowSelector(true)}
             className={cn(
@@ -154,6 +155,7 @@ export const WordPactCard: React.FC = memo(function WordPactCard() {
 
       {/* Dissolve */}
       <button
+        type="button"
         data-testid="dissolve-pact-btn"
         onClick={dissolvePact}
         className="flex items-center gap-1 text-xs text-neo-white hover:text-red-400 self-end mt-1"

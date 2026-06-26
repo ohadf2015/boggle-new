@@ -48,7 +48,7 @@ export function BlastContinueModal({
 
             <div className="flex w-full flex-col gap-3 pt-2">
               {canShowAd && (
-                <button
+                <button type="button"
                   data-testid="blast-continue-cta"
                   onClick={offer}
                   className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
@@ -57,7 +57,7 @@ export function BlastContinueModal({
                   {t('blast.continueModal.cta', { moves: bonusMoves })}
                 </button>
               )}
-              <button
+              <button type="button"
                 data-testid="blast-continue-decline"
                 onClick={onDecline}
                 className="flex items-center justify-center gap-2 rounded-neo border-neo border-black bg-neo-navy px-4 py-2 font-neo-body text-sm text-neo-white hover:text-neo-white"

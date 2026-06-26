@@ -108,6 +108,7 @@ export default function CookieConsent() {
     >
       {/* Close (X) button — declines all cookies */}
       <button
+        type="button"
         onClick={handleDeclineAll}
         aria-label={t('cookieConsent.decline')}
         className={cn(
@@ -136,6 +137,7 @@ export default function CookieConsent() {
           </p>
           <div className="flex items-center gap-2 shrink-0">
             <button
+              type="button"
               onClick={handleDeclineAll}
               className={cn(
                 'px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
@@ -147,6 +149,7 @@ export default function CookieConsent() {
               {t('cookieConsent.decline')}
             </button>
             <button
+              type="button"
               onClick={() => setShowDetails(!showDetails)}
               className={cn(
                 'px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
@@ -158,6 +161,7 @@ export default function CookieConsent() {
               {t('cookieConsent.customize')}
             </button>
             <button
+              type="button"
               onClick={handleAcceptAll}
               className={cn(
                 'px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
@@ -201,6 +205,7 @@ export default function CookieConsent() {
             </div>
             <div className="flex justify-end">
               <button
+                type="button"
                 onClick={handleSavePreferences}
                 className={cn(
                   'px-5 py-2 min-h-[44px] text-sm font-bold uppercase',
@@ -298,6 +303,7 @@ export function ManageCookiesButton() {
 
   return (
     <button
+      type="button"
       onClick={handleClick}
       className="text-sm text-neo-white hover:text-neo-white underline transition-colors"
     >

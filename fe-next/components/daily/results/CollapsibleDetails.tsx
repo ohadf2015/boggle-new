@@ -32,6 +32,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
   return (
     <div className="rounded-neo border-2 border-neo-black overflow-hidden">
       <button
+        type="button"
         onClick={() => setExpanded(!expanded)}
         className="w-full flex items-center justify-between p-2.5 bg-slate-100 dark:bg-neo-navy-elevated hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
       >

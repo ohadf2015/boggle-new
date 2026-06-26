@@ -65,6 +65,7 @@ function Header({ isDarkMode, onBack, title, backText }: HeaderProps) {
         style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
       >
         <button
+          type="button"
           onClick={onBack}
           className={cn(
             'flex items-center gap-2 px-3 py-2 rounded-neo',
@@ -225,6 +226,7 @@ export default function BrainTrainingPageClient() {
               {error}
             </p>
             <button
+              type="button"
               onClick={refresh}
               className={cn(
                 'px-6 py-3 rounded-neo font-bold',
@@ -286,6 +288,7 @@ export default function BrainTrainingPageClient() {
             </p>
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
               <button
+                type="button"
                 onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
                 className={cn(
                   'px-6 py-3 rounded-neo font-bold',
@@ -297,6 +300,7 @@ export default function BrainTrainingPageClient() {
                 {t('auth.signUp')}
               </button>
               <button
+                type="button"
                 onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
                 className={cn(
                   'px-6 py-3 rounded-neo font-bold',
@@ -366,6 +370,7 @@ export default function BrainTrainingPageClient() {
               {t('brain.empty.description')}
             </p>
             <button
+              type="button"
               onClick={() => router.push(`/${language}`)}
               className={cn(
                 'px-6 py-3 rounded-neo font-bold',

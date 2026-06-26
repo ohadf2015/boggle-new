@@ -169,6 +169,7 @@ export const TeacherOnboarding = memo<TeacherOnboardingProps>(({
         >
           {/* Skip button */}
           <button
+            type="button"
             onClick={handleSkip}
             className={cn(
               'absolute top-4 p-2',

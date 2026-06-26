@@ -347,6 +347,7 @@ export default function PracticeWordHuntSandbox() {
           <div className="flex-1">
             <span className="font-bold">{t('practice.wordHunt.discoveryTip')}</span>
             <button
+              type="button"
               onClick={() => {
                 localStorage.setItem('practice-wh-discovery-seen', '1');
                 setShowDiscoveryTip(false);

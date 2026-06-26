@@ -114,6 +114,7 @@ export default function DuelNotification({ classroomId }: DuelNotificationProps)
 
             {/* Dismiss button */}
             <button
+              type="button"
               onClick={handleDismiss}
               className="shrink-0 text-neo-white hover:text-neo-white transition-colors"
               aria-label={t('common.dismiss', 'Dismiss')}

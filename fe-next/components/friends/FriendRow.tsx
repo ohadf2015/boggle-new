@@ -162,6 +162,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
         <div className="flex items-center gap-1">
           {onMessageClick && (
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onMessageClick(friend);
@@ -177,6 +178,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
           )}
           {onGiftClick && (
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onGiftClick(friend);
@@ -192,6 +194,7 @@ export const FriendRow: React.FC<FriendRowProps> = ({
           )}
           {onChallengeClick && (
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onChallengeClick(friend);

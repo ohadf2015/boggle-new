@@ -83,6 +83,7 @@ export const ReengagementBanner: React.FC<ReengagementBannerProps> = memo(
       >
         {/* Dismiss button */}
         <button
+          type="button"
           data-testid="dismiss-reengagement"
           onClick={handleDismiss}
           className={cn(
@@ -141,6 +142,7 @@ export const ReengagementBanner: React.FC<ReengagementBannerProps> = memo(
 
         {/* Claim button */}
         <button
+          type="button"
           data-testid="claim-bonus-btn"
           onClick={handleClaim}
           className={cn(

@@ -116,7 +116,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
           {/* Title & Back Button */}
           <div>
-            <button
+            <button type="button"
               onClick={handleBackToClassroom}
               className={cn(
                 'inline-flex items-center gap-2 mb-3',

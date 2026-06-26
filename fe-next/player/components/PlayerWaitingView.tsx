@@ -165,6 +165,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       <div className="p-4 sm:p-5 flex items-center gap-4 sm:gap-5">
         {/* Large clickable avatar */}
         <button
+          type="button"
           data-testid="edit-avatar-button"
           onClick={() => setIsAvatarBuilderOpen(true)}
           className="relative shrink-0 group"
@@ -202,6 +203,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 }}
               />
               <button
+                type="button"
                 data-testid="name-save-button"
                 onClick={handleSaveName}
                 className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
@@ -209,6 +211,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
                 <Check className="w-4 h-4 text-neo-black" />
               </button>
               <button
+                type="button"
                 onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
                 className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
               >
@@ -222,6 +225,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               </h2>
               {!isAuthenticated && (
                 <button
+                  type="button"
                   data-testid="edit-name-button"
                   onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
                   className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
@@ -454,6 +458,7 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               </span>
             </div>
             <button
+              type="button"
               onClick={onExitRoom}
               className="w-9 h-9 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
               aria-label={t('common.exit')}

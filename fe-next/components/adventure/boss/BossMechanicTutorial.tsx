@@ -105,6 +105,7 @@ export const BossMechanicTutorial = memo<BossMechanicTutorialProps>(({
 
           {/* Dismiss */}
           <button
+            type="button"
             onClick={onDismiss}
             aria-label={t('adventure.bosses.tutorialGotIt')}
             className={cn(

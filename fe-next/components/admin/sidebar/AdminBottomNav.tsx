@@ -74,6 +74,7 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
                 const Icon = getAdminNavIcon(item.iconKey);
                 return (
                   <button
+                    type="button"
                     key={item.key}
                     onClick={() => onOverflowClick(item.key, item.defaultPath)}
                     className={cn(
@@ -105,6 +106,7 @@ export function AdminBottomNav({ moderationCount = 0 }: AdminBottomNavProps) {
 
             return (
               <button
+                type="button"
                 key={tab.key}
                 onClick={() =>
                   tab.isOverflow ? setSheetOpen((v) => !v) : go(tab.defaultPath)

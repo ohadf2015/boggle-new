@@ -108,7 +108,7 @@ export const WordListEditor: React.FC<WordListEditorProps> = ({
               className="flex items-center justify-between p-1.5 sm:p-2 bg-gray-50 dark:bg-neo-navy-elevated/50 rounded-lg border border-gray-200 dark:border-slate-600 group hover:border-red-300 dark:hover:border-red-500 transition-colors"
             >
               <span className="font-mono text-xs sm:text-sm truncate flex-1">{word}</span>
-              <button
+              <button type="button"
                 onClick={() => handleRemoveWord(word)}
                 className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 ms-1 shrink-0 p-1"
                 aria-label={`Remove ${word}`}

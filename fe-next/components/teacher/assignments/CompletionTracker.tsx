@@ -183,6 +183,7 @@ export default function CompletionTracker({
       {completions.length > 0 && (
         <div className="border-t border-neo-black/30 pt-4">
           <button
+            type="button"
             onClick={() => setShowStrugglingAreas(!showStrugglingAreas)}
             className="w-full flex items-center justify-between p-3 rounded-neo bg-neo-orange/10 border border-neo-orange/30 hover:bg-neo-orange/20 transition-colors"
           >

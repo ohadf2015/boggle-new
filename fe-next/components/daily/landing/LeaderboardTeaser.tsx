@@ -137,6 +137,7 @@ export function LeaderboardTeaser({ currentLanguage, onViewFull }: LeaderboardTe
         </div>
         {onViewFull && (
           <button
+            type="button"
             onClick={(e) => { e.stopPropagation(); onViewFull(); }}
             className="text-[10px] font-bold text-neo-cyan hover:text-neo-lime transition-colors underline underline-offset-2"
           >

@@ -251,6 +251,7 @@ lexiclash.com`;
                 {t('brain.share.shareYourScore')}
               </h3>
               <button
+                type="button"
                 onClick={onClose}
                 aria-label={t('common.close')}
                 className={cn(
@@ -265,6 +266,7 @@ lexiclash.com`;
             <div className="grid grid-cols-3 gap-2">
               {/* Copy Text */}
               <button
+                type="button"
                 onClick={handleCopy}
                 className={cn(
                   'flex flex-col items-center gap-1.5 p-3 rounded-neo border-2 border-neo-black',
@@ -287,6 +289,7 @@ lexiclash.com`;
 
               {/* Twitter/X */}
               <button
+                type="button"
                 onClick={handleTwitterShare}
                 className={cn(
                   'flex flex-col items-center gap-1.5 p-3 rounded-neo border-2 border-neo-black',
@@ -301,6 +304,7 @@ lexiclash.com`;
               {/* Native Share (mobile) */}
               {canShare && (
                 <button
+                  type="button"
                   onClick={handleNativeShare}
                   disabled={isSharing}
                   className={cn(

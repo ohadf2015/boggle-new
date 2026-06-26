@@ -60,6 +60,7 @@ function ChallengeRow({
 
       {/* Play button */}
       <button
+        type="button"
         data-testid={`play-challenge-${challenge.id}`}
         onClick={() => onPlay(challenge.id)}
         className={cn(
@@ -240,6 +241,7 @@ export const AsyncChallengeCard: React.FC = memo(function AsyncChallengeCard() {
             {t('asyncChallenge.emptyDesc')}
           </p>
           <button
+            type="button"
             data-testid="challenge-friend-btn"
             onClick={handleChallengeFriend}
             className={cn(

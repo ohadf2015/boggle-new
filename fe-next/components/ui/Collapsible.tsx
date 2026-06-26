@@ -256,7 +256,7 @@ export function Collapsible({
 
   // Header button content
   const headerContent = (
-    <button
+    <button type="button"
       onClick={handleToggle}
       aria-expanded={isOpen}
       aria-controls={contentId}

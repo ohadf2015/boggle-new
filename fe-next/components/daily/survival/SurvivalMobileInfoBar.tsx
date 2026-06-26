@@ -101,6 +101,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
     <div className="w-full">
       {/* Compact bar — always visible */}
       <button
+        type="button"
         data-testid="mobile-info-toggle"
         onClick={() => setIsExpanded(!isExpanded)}
         className={cn(
@@ -161,6 +162,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
               {/* Tab switches */}
               <div className="flex border-b border-neo-black/30">
                 <button
+                  type="button"
                   data-testid="mobile-info-tab-loot"
                   onClick={() => setActiveTab('loot')}
                   className={cn(
@@ -174,6 +176,7 @@ export const SurvivalMobileInfoBar: React.FC<SurvivalMobileInfoBarProps> = ({
                   {t('wordHunt.desktop.lootCollected')}
                 </button>
                 <button
+                  type="button"
                   data-testid="mobile-info-tab-ranks"
                   onClick={() => setActiveTab('ranks')}
                   className={cn(

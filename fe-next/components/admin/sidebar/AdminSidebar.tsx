@@ -64,6 +64,7 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
         return (
           <div key={bucket.key} className="flex flex-col">
             <button
+              type="button"
               onClick={() => go(bucket.defaultPath)}
               aria-current={active ? 'page' : undefined}
               className={cn(
@@ -92,6 +93,7 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
                   const childActive = isChildActive(child.defaultPath);
                   return (
                     <button
+                      type="button"
                       key={child.key}
                       onClick={() => go(child.defaultPath)}
                       aria-current={childActive ? 'page' : undefined}
@@ -123,6 +125,7 @@ export function AdminSidebar({ moderationCount = 0 }: AdminSidebarProps) {
               cleanPath.startsWith(item.defaultPath + '/'));
           return (
             <button
+              type="button"
               key={item.key}
               onClick={() =>
                 item.key === 'exit'

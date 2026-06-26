@@ -34,6 +34,7 @@ function CategoryToggle({ label, checked, onChange, icon, disabled }: CategoryTo
         <span className="text-sm font-medium text-neo-white">{label}</span>
       </div>
       <button
+        type="button"
         role="switch"
         aria-checked={checked}
         aria-label={label}

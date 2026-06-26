@@ -296,6 +296,7 @@ export default function LessonTemplateEditor({
 
           <Dialog.Close asChild>
             <button
+              type="button"
               className={cn(
                 'absolute top-4 text-neo-white hover:text-neo-white',
                 isRTL ? 'left-4' : 'right-4'

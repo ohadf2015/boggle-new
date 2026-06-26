@@ -382,6 +382,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
           </span>
           {onRetrySave && (
             <button
+              type="button"
               onClick={onRetrySave}
               className="px-3 py-1 bg-neo-red text-neo-white text-xs font-black rounded-neo border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-hard-pressed"
             >
@@ -407,6 +408,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
 
       {!isFailed && (
         <button
+          type="button"
           onClick={isLastLevelOfWorld && onNextWorld ? onNextWorld : onContinue}
           className={cn(
             'btn-primary w-full py-3 px-4',
@@ -440,6 +442,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
         {/* Share toggle — 3-star only, compact icon button */}
         {stars === 3 && !isFailed && (
           <button
+            type="button"
             onClick={() => setShowShareCard(prev => !prev)}
             className={cn(
               'py-2.5 px-3 border-2 rounded-neo transition-colors',
@@ -454,6 +457,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
         )}
 
         <button
+          type="button"
           onClick={onRetry}
           className={cn(
             'flex-1 py-2.5 px-4 flex items-center justify-center gap-2',
@@ -470,6 +474,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
         </button>
 
         <button
+          type="button"
           onClick={onExit}
           className={cn(
             'py-2.5 px-4 flex items-center justify-center gap-2',

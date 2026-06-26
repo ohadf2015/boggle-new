@@ -118,6 +118,7 @@ export function PWAInstallPrompt() {
         <div className="bg-neo-pink border-3 border-neo-black rounded-neo shadow-hard-lg p-4">
           {/* Close button */}
           <button
+            type="button"
             onClick={handleDismiss}
             className="absolute top-2 right-2 p-1 hover:bg-neo-black hover:bg-opacity-10 rounded transition-colors"
             aria-label="Dismiss"
@@ -141,12 +142,14 @@ export function PWAInstallPrompt() {
 
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={handleInstallClick}
               className="flex-1 px-4 py-2.5 bg-accent text-accent-foreground font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
             >
               {t('pwa.installButton')}
             </button>
             <button
+              type="button"
               onClick={handleDismiss}
               className="px-4 py-2.5 bg-neo-white text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
             >

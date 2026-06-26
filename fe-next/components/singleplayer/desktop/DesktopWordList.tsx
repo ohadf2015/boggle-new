@@ -102,6 +102,7 @@ export const DesktopWordList: React.FC<DesktopWordListProps> = ({
         {/* Show More/Less Button */}
         {hiddenCount > 0 && (
           <button
+            type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             className="w-full flex items-center justify-center gap-1 py-2 text-xs text-neo-white hover:text-neo-white transition-colors"
           >

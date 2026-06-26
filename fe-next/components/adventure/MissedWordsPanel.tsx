@@ -96,7 +96,7 @@ export const MissedWordsPanel = memo<MissedWordsPanelProps>(({
 
       {/* Show more / collapse */}
       {hasMore && (
-        <button
+        <button type="button"
           data-testid="missed-words-show-more"
           onClick={() => setExpanded((e) => !e)}
           className={cn(

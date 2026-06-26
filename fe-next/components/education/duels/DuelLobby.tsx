@@ -201,6 +201,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
 
                 <div className="flex gap-2">
                   <button
+                    type="button"
                     onClick={() => handleAccept(challenge.id)}
                     className={cn(
                       'px-4 py-2 font-black rounded-neo',
@@ -214,6 +215,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
                     {t('accept')}
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleDecline(challenge.id)}
                     className={cn(
                       'px-4 py-2 font-black rounded-neo',
@@ -236,6 +238,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
       {/* Quick Match Button */}
       <div className="mb-6">
         <button
+          type="button"
           onClick={handleQuickMatch}
           disabled={opponents.length === 0}
           className={cn(
@@ -265,6 +268,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
             <p className="text-neo-white mb-3">{t('education.duels.noClassmatesOnline')}</p>
             {onTabChange && (
               <button
+                type="button"
                 onClick={() => onTabChange('classmates')}
                 className={cn(
                   'px-4 py-2 font-black rounded-neo',
@@ -283,6 +287,7 @@ export default function DuelLobby({ classroomId, studentId, lessons, onTabChange
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {opponents.map((opponent) => (
               <button
+                type="button"
                 key={opponent.userId}
                 onClick={() => handleSelectOpponent(opponent)}
                 className={cn(

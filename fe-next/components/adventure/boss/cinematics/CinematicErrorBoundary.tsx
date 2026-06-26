@@ -120,6 +120,7 @@ function ErrorFallback({ error, onRetry, onSkip, testId }: ErrorFallbackProps) {
         {/* Actions */}
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={onRetry}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-sm active:translate-y-1 transition-all font-neo-display font-bold"
           >
@@ -127,6 +128,7 @@ function ErrorFallback({ error, onRetry, onSkip, testId }: ErrorFallbackProps) {
             {t('adventure.bosses.cinematics.retry')}
           </button>
           <button
+            type="button"
             onClick={onSkip}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-neo-yellow text-neo-black rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-sm active:translate-y-1 transition-all font-neo-display font-bold"
           >

@@ -18,7 +18,7 @@ export default function ComebackTestPageClient() {
 
   return (
     <div className="min-h-screen bg-neo-navy flex items-center justify-center">
-      <button
+      <button type="button"
         onClick={() => setOpen(true)}
         className="px-6 py-3 bg-neo-lime text-neo-navy font-bold rounded-neo border-neo border-black shadow-hard"
       >

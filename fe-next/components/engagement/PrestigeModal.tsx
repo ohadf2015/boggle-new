@@ -190,6 +190,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
 
                 <div className="flex gap-3">
                   <button
+                    type="button"
                     onClick={() => setIsConfirming(false)}
                     disabled={isLoading}
                     className={cn(
@@ -203,6 +204,7 @@ export const PrestigeModal: React.FC<PrestigeModalProps> = ({
                     {pm('cancel')}
                   </button>
                   <button
+                    type="button"
                     onClick={handlePrestige}
                     disabled={isLoading}
                     className={cn(

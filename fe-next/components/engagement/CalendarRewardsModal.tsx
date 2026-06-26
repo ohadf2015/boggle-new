@@ -194,6 +194,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                   {t('auth.signIn')}
                 </Button>
                 <button
+                  type="button"
                   onClick={onClose}
                   className="text-xs text-neo-black/50 hover:text-neo-black/80 underline underline-offset-2"
                 >

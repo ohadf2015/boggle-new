@@ -124,6 +124,7 @@ export default function GlobalError({
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
+                type="button"
                 onClick={reset}
                 className="btn-neo-primary px-6 py-3 text-lg"
                 aria-label={t("errors.refreshPage")}
@@ -131,6 +132,7 @@ export default function GlobalError({
                 <span aria-hidden="true" className="me-1">🔄</span> {t("errors.refreshPage")}
               </button>
               <button
+                type="button"
                 onClick={() => (window.location.href = "/")}
                 className="btn-neo-secondary px-6 py-3 text-lg"
               >

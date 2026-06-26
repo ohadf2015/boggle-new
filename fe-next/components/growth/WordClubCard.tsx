@@ -104,7 +104,7 @@ export const WordClubCard: React.FC = memo(function WordClubCard() {
         </div>
         <p className="text-sm text-neo-white">{t('wordClub.emptyDesc')}</p>
         <div className="flex gap-2">
-          <button
+          <button type="button"
             data-testid="create-club-btn"
             onClick={handleCreateClub}
             className={cn(
@@ -117,7 +117,7 @@ export const WordClubCard: React.FC = memo(function WordClubCard() {
             <Plus className="w-4 h-4" aria-hidden="true" />
             {t('wordClub.create')}
           </button>
-          <button
+          <button type="button"
             data-testid="join-club-btn"
             onClick={handleJoinClub}
             className={cn(

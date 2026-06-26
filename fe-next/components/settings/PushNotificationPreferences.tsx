@@ -136,6 +136,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
               {t('pushNotifications.settings.permissionDeniedDesc')}
             </p>
             <button
+              type="button"
               onClick={() => {
                 // Try to open device settings - this is a best-effort
                 // On iOS this will do nothing, on Android it may open settings
@@ -183,6 +184,7 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
 
         {/* Toggle Switch */}
         <button
+          type="button"
           onClick={handleToggle}
           disabled={isSaving || permissionStatus === 'denied'}
           className={cn(

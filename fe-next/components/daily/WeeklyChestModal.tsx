@@ -245,6 +245,7 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
 
         {canClose && (
           <button
+            type="button"
             data-testid="chest-continue-button"
             onClick={onClose}
             autoFocus
@@ -258,6 +259,7 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
         {/* Small dismiss "x" — also gated on canClose for symmetry with Escape/backdrop. */}
         {canClose && (
           <button
+            type="button"
             onClick={onClose}
             aria-label={t('common.tapToContinue')}
             className="absolute top-2 end-2 p-1 rounded-full text-neo-white hover:text-neo-white z-10"

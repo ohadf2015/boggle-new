@@ -29,14 +29,14 @@ export function MPGameAbortedModal({ wordCount, onContinueSolo, onReturnToLobby 
           </p>
         </div>
         <div className="flex flex-col gap-3 w-full">
-          <button
+          <button type="button"
             onClick={onContinueSolo}
             aria-label={t('mp.abort.continueSolo')}
             className="w-full px-5 py-3 font-neo-body text-sm font-bold text-neo-navy bg-neo-cyan border-2 border-neo-cyan rounded-neo hover:bg-neo-cyan/80 transition-colors"
           >
             {t('mp.abort.continueSolo')}
           </button>
-          <button
+          <button type="button"
             onClick={onReturnToLobby}
             aria-label={t('mp.abort.returnToLobby')}
             className="w-full px-5 py-3 font-neo-body text-sm text-neo-white border border-neo-white/20 rounded-neo hover:border-neo-white/40 transition-colors"

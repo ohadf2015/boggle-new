@@ -207,6 +207,7 @@ export function QuickPracticeButton({
 
               return (
                 <button
+                  type="button"
                   key={option.type}
                   onClick={() => handleModeSelect(option.type)}
                   className={cn(

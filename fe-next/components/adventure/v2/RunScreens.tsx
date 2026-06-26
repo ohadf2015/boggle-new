@@ -35,7 +35,7 @@ export function BetweenFightsScreen({
             ? `מתכוננים לקרב ${next + 1}…`
             : `Preparing for fight ${next + 1}…`}
         </p>
-        <button onClick={onContinue} style={btnStyle('#bfff00', '#1a1a2e')}>
+        <button type="button" onClick={onContinue} style={btnStyle('#bfff00', '#1a1a2e')}>
           {isHe ? 'המשך' : 'CONTINUE'}
         </button>
       </Card>
@@ -81,7 +81,7 @@ export function RunCompleteScreen({
             : `You fell on fight ${outcomes.length}`}
         </p>
         <FightDots outcomes={outcomes} fightCount={fightCount} />
-        <button onClick={onNewRun} style={btnStyle('#bfff00', '#1a1a2e')}>
+        <button type="button" onClick={onNewRun} style={btnStyle('#bfff00', '#1a1a2e')}>
           {isHe ? 'ריצה חדשה' : 'NEW RUN'}
         </button>
       </Card>

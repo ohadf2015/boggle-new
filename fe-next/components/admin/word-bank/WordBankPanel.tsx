@@ -127,6 +127,7 @@ export function WordBankPanel(): React.ReactElement {
             <span className="text-red-500 font-medium">{error}</span>
           </div>
           <button
+            type="button"
             onClick={clearError}
             className="p-1 hover:bg-red-500/20 rounded transition-colors"
           >

@@ -28,6 +28,7 @@ function NeoButton({
 }) {
   return (
     <button
+      type="button"
       data-testid={testId}
       onClick={onClick}
       disabled={disabled}
@@ -64,6 +65,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
     <div data-testid="step-configure" className="flex flex-col gap-6">
       <div className="flex items-center gap-3">
         <button
+          type="button"
           data-testid="back-to-community"
           onClick={() => router.back()}
           className={cn(
@@ -252,6 +254,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           onChange={e => setTitle(e.target.value)}
           placeholder={t('ugc.board.titlePlaceholder')}
           maxLength={40}
+          aria-label={t('ugc.board.title')}
           className={cn(
             'border-neo border-neo-white/20 bg-black/30 text-neo-white',
             'font-neo-body text-sm rounded-neo px-3 py-2',
@@ -273,6 +276,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           placeholder={t('ugc.board.descriptionPlaceholder')}
           maxLength={140}
           rows={2}
+          aria-label={t('ugc.board.description')}
           className={cn(
             'border-neo border-neo-white/20 bg-black/30 text-neo-white',
             'font-neo-body text-sm rounded-neo px-3 py-2 resize-none',
@@ -293,6 +297,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           accept="image/jpeg,image/png,image/webp"
           className="hidden"
           data-testid="cover-image-input"
+          aria-label={t('ugc.board.coverImage')}
           onChange={e => {
             const file = e.target.files?.[0] ?? null;
             setCoverImage(file);
@@ -311,6 +316,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
               className="w-full h-40 object-cover rounded-neo border-neo border-black"
             />
             <button
+              type="button"
               data-testid="remove-cover-image"
               onClick={() => setCoverImage(null)}
               className="absolute top-2 inset-e-2 bg-black/70 text-white rounded-full p-1 hover:bg-black transition-colors"
@@ -321,6 +327,7 @@ function PreviewStep({ creator }: { creator: UseBoardCreatorReturn }) {
           </div>
         ) : (
           <button
+            type="button"
             data-testid="add-cover-image"
             onClick={() => fileInputRef.current?.click()}
             className={cn(

@@ -96,6 +96,7 @@ export function WordCollectionCard({ onReviewClick, className = '' }: WordCollec
             {t('vocabulary.dueForReview', { count: dueForReview.length })}
           </span>
           <button
+            type="button"
             onClick={onReviewClick}
             className="rounded-neo border-neo bg-neo-yellow px-3 py-1 text-sm font-bold text-black shadow-hard-sm transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed"
           >

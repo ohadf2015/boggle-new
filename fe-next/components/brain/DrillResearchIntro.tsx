@@ -138,6 +138,7 @@ export default function DrillResearchIntro({ drillType }: DrillResearchIntroProp
               </p>
             </div>
             <button
+              type="button"
               onClick={dismiss}
               aria-label="Dismiss"
               className={cn(

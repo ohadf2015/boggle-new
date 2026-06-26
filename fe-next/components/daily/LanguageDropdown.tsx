@@ -63,6 +63,7 @@ export const LanguageDropdown: React.FC<LanguageDropdownProps> = ({
               const played = hasPlayedWordHuntToday(option.code);
               return (
                 <button
+                  type="button"
                   key={option.code}
                   onClick={() => {
                     onLanguageChange(option.code);

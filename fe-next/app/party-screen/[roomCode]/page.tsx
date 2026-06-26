@@ -210,6 +210,7 @@ export default function PartyScreen() {
 
           {/* Fullscreen toggle */}
           <button
+            type="button"
             onClick={toggleFullscreen}
             className="p-2 bg-neo-cream/10 border-2 border-neo-cream/30 rounded-neo hover:bg-neo-cream/20 transition-colors"
           >

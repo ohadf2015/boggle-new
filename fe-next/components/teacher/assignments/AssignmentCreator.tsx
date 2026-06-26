@@ -213,6 +213,7 @@ export default function AssignmentCreator({
                       type="date"
                       value={dueDate}
                       onChange={(e) => setDueDate(e.target.value)}
+                      aria-label={t('teacher.assignment.customDate')}
                       className="w-full p-2 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white text-sm"
                     />
                   </div>
@@ -229,6 +230,7 @@ export default function AssignmentCreator({
                 value={instructions}
                 onChange={(e) => setInstructions(e.target.value)}
                 rows={3}
+                aria-label={t('teacher.assignment.instructionsLabel')}
                 className="w-full p-3 rounded-neo border-neo border-neo-black bg-neo-navy text-neo-white font-neo-body resize-none"
                 placeholder={t('teacher.assignment.instructionsPlaceholder')}
               />
@@ -256,6 +258,7 @@ export default function AssignmentCreator({
 
           <Dialog.Close asChild>
             <button
+              type="button"
               className="absolute top-4 right-4 text-neo-white hover:text-neo-white"
               aria-label="Close"
               disabled={isSubmitting}

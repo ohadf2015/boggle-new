@@ -191,6 +191,7 @@ function PixelCanvasInner({
           <div className="flex gap-1.5 flex-wrap justify-center">
             {COLORS.map((hex, i) => (
               <button
+                type="button"
                 key={hex}
                 onClick={() => setActiveColor(i)}
                 title={COLOR_NAMES[i]}
@@ -215,6 +216,7 @@ function PixelCanvasInner({
           {/* Action buttons */}
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={handleUndo}
               className="bg-neo-navy-elevated border-2 border-neo-cream/30 rounded-neo px-3 py-1.5 text-neo-white text-xs font-neo-body
                 hover:border-neo-cream/50 active:translate-y-px transition-all"
@@ -222,6 +224,7 @@ function PixelCanvasInner({
               Undo
             </button>
             <button
+              type="button"
               onClick={handleClear}
               className="bg-neo-navy-elevated border-2 border-neo-red/30 rounded-neo px-3 py-1.5 text-neo-red/60 text-xs font-neo-body
                 hover:border-neo-red/50 active:translate-y-px transition-all"

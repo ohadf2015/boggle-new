@@ -44,6 +44,7 @@ const CgAwareLobbyChrome: React.FC<CgAwareLobbyChromeProps> = ({
       {isAdmin && (
         <div className="px-4 pt-3">
           <button
+            type="button"
             onClick={() => matchmaking.joinQueue('classic', defaultLanguage)}
             disabled={matchmaking.status !== 'idle'}
             className="w-full rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-3 font-neo-display uppercase tracking-tight text-black shadow-hard transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50"
@@ -60,6 +61,7 @@ const CgAwareLobbyChrome: React.FC<CgAwareLobbyChromeProps> = ({
             {t('multiplayerFlow.roomList.fetchTimeout')}
           </p>
           <button
+            type="button"
             onClick={onRefreshRooms}
             className="text-xs font-neo-display uppercase tracking-tight text-black bg-neo-red border-neo-thick border-black rounded-neo px-3 py-1.5 shadow-hard-sm active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px] transition-transform duration-100"
           >

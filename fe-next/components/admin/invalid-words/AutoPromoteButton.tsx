@@ -90,7 +90,7 @@ export function AutoPromoteButton({
     <div className="flex items-center gap-3">
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogTrigger asChild>
-          <button
+          <button type="button"
             disabled={isDisabled}
             className={`
               flex items-center gap-2 px-4 py-2 rounded-lg font-medium

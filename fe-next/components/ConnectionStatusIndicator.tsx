@@ -454,6 +454,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
                 a genuine drop, where forcing a retry is genuinely useful. */}
             {!copy.isUpdate && (
             <button
+              type="button"
               onClick={handleRetry}
               disabled={pendingRetry}
               aria-busy={showReconnecting}
@@ -484,6 +485,7 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, s
             {/* Leave Game escape hatch — visible after 3+ failed attempts */}
             {onLeaveGame && reconnectAttempt >= 3 && (
               <button
+                type="button"
                 onClick={onLeaveGame}
                 className={cn(
                   'px-4 py-2 rounded-neo',

@@ -405,6 +405,7 @@ export const InvalidWordsSection = memo<InvalidWordsSectionProps>(({
               />
               {showAppeal && (
                 <button
+                  type="button"
                   onClick={() => handleAppeal(wordObj.word)}
                   disabled={appealedWords.has(wordObj.word) || appealingWord === wordObj.word}
                   className={cn(

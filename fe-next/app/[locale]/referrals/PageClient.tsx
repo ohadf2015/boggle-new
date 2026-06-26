@@ -289,12 +289,14 @@ export default function ReferralDashboardClient() {
           </p>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <button
+              type="button"
               onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
               className="px-6 py-3 bg-neo-lime text-neo-black font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-none transition-shadow"
             >
               {t('auth.signUp')}
             </button>
             <button
+              type="button"
               onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
               className="px-6 py-3 bg-neo-pink text-white font-bold rounded-neo border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-none transition-shadow"
             >
@@ -322,6 +324,7 @@ export default function ReferralDashboardClient() {
       <div className="min-h-screen bg-neo-navy flex flex-col items-center justify-center p-6">
         <p className="text-red-400 font-bold text-sm mb-2">{error}</p>
         <button
+          type="button"
           onClick={() => window.location.reload()}
           className="text-neo-cyan text-sm font-bold underline"
         >
@@ -396,6 +399,7 @@ export default function ReferralDashboardClient() {
               {data.shareUrl}
             </div>
             <button
+              type="button"
               onClick={handleCopy}
               className={cn(
                 'shrink-0 flex items-center gap-1.5 px-3 py-2 font-bold text-xs',
@@ -414,6 +418,7 @@ export default function ReferralDashboardClient() {
           {/* Share buttons */}
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={() => handleShare('whatsapp')}
               className={cn(
                 'flex-1 flex items-center justify-center gap-2 h-10',
@@ -427,6 +432,7 @@ export default function ReferralDashboardClient() {
               WhatsApp
             </button>
             <button
+              type="button"
               onClick={() => handleShare('native')}
               className={cn(
                 'flex-1 flex items-center justify-center gap-2 h-10',
