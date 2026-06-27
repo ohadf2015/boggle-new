@@ -11939,6 +11939,18 @@ const sv = {
       "try_blast": "Prova Blast",
       "try_daily": "Daglig utmaning"
     },
+    "trial": {
+      "title": "Din lärarprövoperiod är igång 🎉",
+      "urgent_title": "Sista chansen — din prövoperiod är nästan slut ⏳",
+      "body": "Full klassrumsåtkomst till {date}. Skapa en klass och kör ett live-spel nu — missa det inte.",
+      "days_left": "dagar kvar",
+      "day_left": "dag kvar",
+      "hours_left": "timmar kvar",
+      "cta": "Skapa din första klass",
+      "expired_title": "Din lärarprövoperiod har tagit slut",
+      "expired_body": "Din gratis prövoperiod är slut. Ansök igen eller kontakta oss för att behålla klassrumsläget.",
+      "renew_cta": "Förnya lärarbehörighet"
+    },
     "forSchools": {
       "form": {
         "full_name": "Ditt namn",

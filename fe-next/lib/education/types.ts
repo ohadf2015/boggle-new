@@ -16,6 +16,8 @@ export interface TeacherAccessRequest {
   admin_note: string | null;
   reviewed_at: string | null;
   reviewed_by: string | null;
+  /** When the granted trial ends (set on approval). Null/absent for un-approved rows. */
+  trial_expires_at?: string | null;
   created_at: string;
 }
 

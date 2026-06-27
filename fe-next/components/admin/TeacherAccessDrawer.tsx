@@ -5,6 +5,7 @@ import { fetchWithAuth } from '@/utils/authFetch';
 import toast from 'react-hot-toast';
 import type { TeacherAccessRequest } from '@/lib/education/types';
 import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
+import { teacherTrialExpiry } from '@/lib/education/trial';
 
 interface Props { row: TeacherAccessRequest; onClose: () => void; onActioned: () => void; }
 
@@ -17,10 +18,15 @@ export function TeacherAccessDrawer({ row, onClose, onActioned }: Props) {
   const dialogRef = useRef<HTMLDivElement>(null);
 
   // Live render of the approval welcome email so the admin can see exactly how
-  // their personal note will appear to the applicant before sending.
+  // their personal note — and the trial countdown the applicant will receive —
+  // will appear before sending. Use the row's existing deadline on re-approval,
+  // otherwise preview a fresh trial window.
+  const previewTrialExpiresAt = row.trial_expires_at || teacherTrialExpiry(Date.now());
   const email = useMemo(
-    () => teacherAccessConfirmation({ full_name: row.full_name, locale: row.locale, message: note }),
-    [row.full_name, row.locale, note],
+    () => teacherAccessConfirmation({
+      full_name: row.full_name, locale: row.locale, message: note, trialExpiresAt: previewTrialExpiresAt,
+    }),
+    [row.full_name, row.locale, note, previewTrialExpiresAt],
   );
 
   async function copyEmail() {

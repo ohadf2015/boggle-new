@@ -55,4 +55,30 @@ describe('teacherAccessConfirmation email', () => {
     expect(subject.length).toBeGreaterThan(0);
     expect(html.length).toBeGreaterThan(0);
   });
+
+  describe('trial urgency', () => {
+    // ~13.something days out → the email should show the rounded-up day count.
+    const trialExpiresAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000 - 60_000).toISOString();
+
+    it('renders a trial countdown block with the remaining day count', () => {
+      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en', trialExpiresAt });
+      expect(html).toContain('trial-urgency');
+      expect(html).toMatch(/14\s*day/i);
+    });
+
+    it('puts the trial framing in the subject line', () => {
+      const { subject } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en', trialExpiresAt });
+      expect(subject.toLowerCase()).toContain('trial');
+    });
+
+    it.each(LOCALES)('renders the trial block for %s', (locale) => {
+      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale, trialExpiresAt });
+      expect(html).toContain('trial-urgency');
+    });
+
+    it('omits the trial block when no expiry is provided (back-compat)', () => {
+      const { html } = teacherAccessConfirmation({ full_name: 'Jane', locale: 'en' });
+      expect(html).not.toContain('trial-urgency');
+    });
+  });
 });

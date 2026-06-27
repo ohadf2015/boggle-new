@@ -3,23 +3,29 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 const adminProfile = { id: 'admin-1', is_admin: true };
 const userProfile = { id: 'user-1', is_admin: false };
 
-const mockSupabase = (profile: any, requestRow: any = null) => ({
-  auth: { getUser: vi.fn(async () => ({ data: { user: { id: profile.id } }, error: null })) },
-  from: vi.fn((table: string) => {
-    if (table === 'profiles') return {
-      select: () => ({ eq: () => ({ single: async () => ({ data: profile, error: null }) }) }),
-      update: vi.fn(() => ({ eq: vi.fn(async () => ({ error: null })) })),
-    };
-    if (table === 'teacher_access_requests') return {
-      select: () => ({ eq: () => ({ single: async () => ({ data: requestRow, error: null }) }) }),
-      update: vi.fn(() => ({ eq: vi.fn(async () => ({ error: null })) })),
-    };
-    if (table === 'teacher_access_allowlist') return {
-      insert: vi.fn(async () => ({ error: null })),
-    };
-    return {};
-  }),
-});
+const mockSupabase = (profile: any, requestRow: any = null) => {
+  // Stable spy so tests can inspect the teacher_access_requests UPDATE payload
+  // regardless of how many fresh `from()` objects the route creates.
+  const requestsUpdate = vi.fn(() => ({ eq: vi.fn(async () => ({ error: null })) }));
+  return {
+    requestsUpdate,
+    auth: { getUser: vi.fn(async () => ({ data: { user: { id: profile.id } }, error: null })) },
+    from: vi.fn((table: string) => {
+      if (table === 'profiles') return {
+        select: () => ({ eq: () => ({ single: async () => ({ data: profile, error: null }) }) }),
+        update: vi.fn(() => ({ eq: vi.fn(async () => ({ error: null })) })),
+      };
+      if (table === 'teacher_access_requests') return {
+        select: () => ({ eq: () => ({ single: async () => ({ data: requestRow, error: null }) }) }),
+        update: requestsUpdate,
+      };
+      if (table === 'teacher_access_allowlist') return {
+        insert: vi.fn(async () => ({ error: null })),
+      };
+      return {};
+    }),
+  };
+};
 
 vi.mock('@/utils/supabase/server', () => ({ createClient: vi.fn() }));
 vi.mock('@/lib/email/send', () => ({ sendEmail: vi.fn(async () => ({ ok: true })) }));
@@ -48,6 +54,25 @@ describe('admin teacher-access endpoints', () => {
     (createClient as any).mockReturnValue(sb);
     const res = await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
     expect(res.status).toBe(200);
+  });
+
+  it('approve stamps a trial deadline and the email leads with trial urgency', async () => {
+    const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en' };
+    const sb = mockSupabase(adminProfile, row);
+    (createClient as any).mockReturnValue(sb);
+    const res = await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
+    expect(res.status).toBe(200);
+
+    // The status UPDATE payload includes a future trial_expires_at.
+    expect(sb.requestsUpdate).toHaveBeenCalled();
+    const payload = (sb.requestsUpdate as any).mock.calls.at(-1)[0];
+    expect(payload.status).toBe('approved');
+    expect(typeof payload.trial_expires_at).toBe('string');
+    expect(Date.parse(payload.trial_expires_at)).toBeGreaterThan(Date.now());
+
+    // Email reflects the trial.
+    const arg = (sendEmail as any).mock.calls[0][0];
+    expect(arg.html).toContain('trial-urgency');
   });
 
   it('approve forwards the admin custom message into the confirmation email', async () => {

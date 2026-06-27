@@ -26,7 +26,7 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   }
 
   try {
-    const tpl = teacherAccessConfirmation({ full_name: row.full_name, locale: row.locale, message });
+    const tpl = teacherAccessConfirmation({ full_name: row.full_name, locale: row.locale, message, trialExpiresAt: row.trial_expires_at });
     await sendEmail({ to: row.email, subject: tpl.subject, html: tpl.html });
   } catch (e) {
     console.error('[teacher-access resend] email send failed', e);
