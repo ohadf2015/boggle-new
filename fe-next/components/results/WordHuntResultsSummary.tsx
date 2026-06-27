@@ -15,6 +15,8 @@ export interface WordHuntPlayerResult {
   invalidWordCount?: number;
   avgWordLength?: number;
   longestWordLength?: number;
+  /** Same-length target guesses used (from server playerAttempts) — drives the efficiency tip. */
+  attemptsToFind?: number;
   avatar?: { customAvatar?: CustomAvatarConfig | null };
 }
 
@@ -153,6 +155,7 @@ export default function WordHuntResultsSummary({
               invalidWordCount: currentPlayer.invalidWordCount ?? 0,
               avgWordLength: currentPlayer.avgWordLength ?? 0,
               longestWordLength: currentPlayer.longestWordLength ?? 0,
+              attemptsToFind: currentPlayer.attemptsToFind,
             }} />
           )}
         </m.section>
@@ -174,6 +177,7 @@ export default function WordHuntResultsSummary({
             invalidWordCount: currentPlayer.invalidWordCount ?? 0,
             avgWordLength: currentPlayer.avgWordLength ?? 0,
             longestWordLength: currentPlayer.longestWordLength ?? 0,
+            attemptsToFind: currentPlayer.attemptsToFind,
           }} />
         </m.div>
       )}

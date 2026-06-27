@@ -9,6 +9,7 @@ export interface WordHuntSummary {
   playerLives: Record<string, number>;
   eliminatedPlayers: string[];
   targetFoundBy: string | null;
+  playerAttempts?: Record<string, number>;
 }
 
 interface ResultsData {

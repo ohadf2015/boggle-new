@@ -67,6 +67,7 @@ interface WordHuntSummary {
   foundTarget: boolean;
   survivalTime: number;
   discoveryWords: number;
+  playerAttempts?: Record<string, number>;
 }
 
 interface BlastSummary {

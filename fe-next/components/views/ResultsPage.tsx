@@ -918,6 +918,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         invalidWordCount: invalidWords.length,
         avgWordLength: avgLen,
         longestWordLength: longestLen,
+        attemptsToFind: wordHuntSummary?.playerAttempts?.[p.username],
         avatar: p.avatar,
       };
     }),

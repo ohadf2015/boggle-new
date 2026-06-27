@@ -182,6 +182,10 @@ export async function calculateAndBroadcastFinalScores(
     foundTarget: !!huntState.targetFoundBy,
     survivalTime: game.gameStartedAt ? Math.round((Date.now() - game.gameStartedAt) / 1000) : 0,
     discoveryWords: huntState.discoveryWordCount || 0,
+    // Per-player same-length guess count → drives the guess-efficiency insight
+    // tip in results (parity with SP). Server is the source of truth for ALL
+    // players; the client only has the local player's attempt array.
+    playerAttempts: (huntState.playerAttempts || {}) as Record<string, number>,
   } : undefined;
 
   // Build blast mode summary if applicable

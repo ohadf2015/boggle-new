@@ -122,7 +122,7 @@ export interface ResultsPageProps {
   /** Callback to reset the series tracker (start new series) */
   onResetSeries?: () => void;
   /** Word Hunt summary from server (target word, lives, eliminated) */
-  wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null; survivalTime?: number; discoveryWords?: number };
+  wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null; survivalTime?: number; discoveryWords?: number; playerAttempts?: Record<string, number> };
   /** Blast mode summary from server */
   blastSummary?: { playerMoves?: Record<string, number>; playerStats?: Record<string, import('@/shared/types/game').BlastPlayerStats> };
   /** Wheel Rush mode summary from server */
