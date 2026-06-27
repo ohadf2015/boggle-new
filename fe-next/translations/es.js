@@ -4426,6 +4426,7 @@ const es = {
     "purchase": "Comprar ({{cost}} oro)",
     "close": "Cerrar",
     "unlockedToast": "✨ Nuevo cosmético desbloqueado: {{name}}",
+    "unlockedLabel": "Nuevo cosmético desbloqueado",
     "equipCta": "Toca para equiparlo",
     "progress": {
       "streak": "Racha de {{current}}/{{target}} días",

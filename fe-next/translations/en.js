@@ -4833,6 +4833,7 @@ const en = {
     "purchase": "Buy ({{cost}} gold)",
     "close": "Close",
     "unlockedToast": "✨ New cosmetic unlocked: {{name}}",
+    "unlockedLabel": "New cosmetic unlocked",
     "equipCta": "Tap to equip it",
     "progress": {
       "streak": "{{current}}/{{target}} day streak",

@@ -1,36 +1,26 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
-const toastSuccessMock = vi.fn();
-vi.mock('react-hot-toast', () => ({
-  __esModule: true,
-  default: { success: (...args: unknown[]) => toastSuccessMock(...args) },
+const showToastMock = vi.fn();
+vi.mock('@/components/cosmetics/CosmeticUnlockToast', () => ({
+  showCosmeticUnlockToast: (...args: unknown[]) => showToastMock(...args),
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',
+    dir: 'ltr',
     t: (key: string, params?: Record<string, string | number>) =>
       params ? `${key}:${JSON.stringify(params)}` : key,
   }),
 }));
 
-import { isValidElement } from 'react';
 import { useUnlockNotifier } from '../useUnlockNotifier';
 
-/** Walk a React element tree collecting any `href` props. */
-function collectHrefs(node: unknown): string[] {
-  if (!isValidElement(node)) return [];
-  const props = node.props as { href?: string; children?: unknown };
-  const here = typeof props.href === 'string' ? [props.href] : [];
-  const kids = Array.isArray(props.children) ? props.children : [props.children];
-  return kids.reduce<string[]>((acc, k) => acc.concat(collectHrefs(k)), here);
-}
-
-const SNAPSHOT_KEY = 'lexiclash_cosmetics_snapshot_v2';
+const NOTIFIED_KEY = 'lexiclash_cosmetics_notified_v1';
 
 describe('useUnlockNotifier', () => {
   beforeEach(() => {
-    toastSuccessMock.mockReset();
+    showToastMock.mockReset();
     localStorage.clear();
   });
 
@@ -38,48 +28,79 @@ describe('useUnlockNotifier', () => {
     localStorage.clear();
   });
 
-  it('does not fire toast on first mount when no prior snapshot exists', () => {
-    renderHook(() => useUnlockNotifier({ rankTier: 'Bronze', streakDays: 0 }));
-    expect(toastSuccessMock).not.toHaveBeenCalled();
+  it('does not fire a toast on first encounter — it silently seeds owned cosmetics', () => {
+    renderHook(() => useUnlockNotifier({ rankTier: 'bronze', streakDays: 0 }));
+    expect(showToastMock).not.toHaveBeenCalled();
+    // The seed records every currently-unlocked id so they are never announced.
+    expect(localStorage.getItem(NOTIFIED_KEY)).not.toBeNull();
   });
 
-  it('fires toast for each newly-unlocked cosmetic when rank advances', () => {
-    // Seed a prior snapshot at Bronze
+  it('fires a toast for each genuinely new cosmetic when rank advances', () => {
+    // Seed: a player who had only the Bronze tier already acknowledged.
     localStorage.setItem(
-      SNAPSHOT_KEY,
-      JSON.stringify({ rankTier: 'Bronze', streakDays: 0 }),
+      NOTIFIED_KEY,
+      JSON.stringify(['tile-default', 'board-classic', 'victory-confetti', 'frame-none', 'frame-bronze']),
     );
-    renderHook(() => useUnlockNotifier({ rankTier: 'Silver', streakDays: 0 }));
-    // Silver unlocks tile-neon + frame-silver → 2 toasts
-    expect(toastSuccessMock).toHaveBeenCalledTimes(2);
+    renderHook(() => useUnlockNotifier({ rankTier: 'silver', streakDays: 0 }));
+    // Silver newly unlocks tile-neon + frame-silver → 2 toasts.
+    expect(showToastMock).toHaveBeenCalledTimes(2);
   });
 
-  it('updates snapshot after firing so the same unlock is not announced twice', () => {
+  it('never announces the same cosmetic twice — even when streak resets and re-climbs', () => {
+    // Seed everything below the 7-day streak as already known.
     localStorage.setItem(
-      SNAPSHOT_KEY,
-      JSON.stringify({ rankTier: 'Bronze', streakDays: 0 }),
+      NOTIFIED_KEY,
+      JSON.stringify(['tile-default', 'board-classic', 'victory-confetti', 'frame-none']),
+    );
+    const { rerender } = renderHook(
+      ({ streak }: { streak: number }) => useUnlockNotifier({ rankTier: 'stone', streakDays: streak }),
+      { initialProps: { streak: 7 } },
+    );
+    // 7-day streak unlocks board-ocean → 1 toast.
+    expect(showToastMock).toHaveBeenCalledTimes(1);
+    showToastMock.mockReset();
+
+    // Streak breaks (back to 0)…
+    rerender({ streak: 0 });
+    expect(showToastMock).not.toHaveBeenCalled();
+    // …then re-climbs past 7. The OLD diff-based notifier re-fired here; the
+    // id-set notifier stays silent because board-ocean was already announced.
+    rerender({ streak: 7 });
+    expect(showToastMock).not.toHaveBeenCalled();
+  });
+
+  it('does not re-toast on a plain re-render with unchanged inputs', () => {
+    localStorage.setItem(
+      NOTIFIED_KEY,
+      JSON.stringify(['tile-default', 'board-classic', 'victory-confetti', 'frame-none', 'frame-bronze']),
     );
     const { rerender } = renderHook(
       ({ rank }: { rank: string }) => useUnlockNotifier({ rankTier: rank, streakDays: 0 }),
-      { initialProps: { rank: 'Silver' } },
+      { initialProps: { rank: 'silver' } },
     );
-    expect(toastSuccessMock).toHaveBeenCalledTimes(2);
-    toastSuccessMock.mockReset();
-    // Re-render with same rank — should NOT re-toast
-    rerender({ rank: 'Silver' });
-    expect(toastSuccessMock).not.toHaveBeenCalled();
+    expect(showToastMock).toHaveBeenCalledTimes(2);
+    showToastMock.mockReset();
+    rerender({ rank: 'silver' });
+    expect(showToastMock).not.toHaveBeenCalled();
   });
 
-  it('renders a clickable toast that deep-links to the cosmetics collection', () => {
+  it('scopes the notified record per account', () => {
+    renderHook(() => useUnlockNotifier({ rankTier: 'silver', streakDays: 0, accountId: 'user-a' }));
+    // Seeded silently under the account-scoped key, not the bare key.
+    expect(localStorage.getItem(`${NOTIFIED_KEY}:user-a`)).not.toBeNull();
+    expect(localStorage.getItem(NOTIFIED_KEY)).toBeNull();
+  });
+
+  it('passes the cosmetic and locale through to the toast', () => {
     localStorage.setItem(
-      SNAPSHOT_KEY,
-      JSON.stringify({ rankTier: 'Bronze', streakDays: 0 }),
+      NOTIFIED_KEY,
+      JSON.stringify(['tile-default', 'board-classic', 'victory-confetti', 'frame-none', 'frame-bronze']),
     );
-    renderHook(() => useUnlockNotifier({ rankTier: 'Silver', streakDays: 0 }));
-    expect(toastSuccessMock).toHaveBeenCalled();
-    const payload = toastSuccessMock.mock.calls[0][0];
-    const hrefs = collectHrefs(payload);
-    expect(hrefs.some((h) => h.endsWith('/profile?tab=collection'))).toBe(true);
-    expect(hrefs.some((h) => h.startsWith('/en/'))).toBe(true);
+    renderHook(() => useUnlockNotifier({ rankTier: 'silver', streakDays: 0 }));
+    expect(showToastMock).toHaveBeenCalled();
+    const arg = showToastMock.mock.calls[0][0] as { cosmetic: { id: string }; language: string; isRtl: boolean };
+    expect(typeof arg.cosmetic.id).toBe('string');
+    expect(arg.language).toBe('en');
+    expect(arg.isRtl).toBe(false);
   });
 });

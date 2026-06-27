@@ -4440,6 +4440,7 @@ const ja = {
     "purchase": "購入（{{cost}}ゴールド）",
     "close": "閉じる",
     "unlockedToast": "✨ 新しいコスメティック解放: {{name}}",
+    "unlockedLabel": "新しいコスメティック解放",
     "equipCta": "タップして装備",
     "progress": {
       "streak": "{{current}}/{{target}}日連続",
