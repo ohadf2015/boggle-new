@@ -89,11 +89,11 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
   return (
     <div className="min-h-screen bg-neo-navy flex items-center justify-center px-4">
       <AdaptiveMotion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ scale: 0.9 }}
+        animate={{ scale: 1 }}
         transition={{ type: 'spring', stiffness: 200 }}
         className={cn(
-          'w-full max-w-md p-6 rounded-neo',
+          'w-full max-w-md p-6 rounded-neo animate-in fade-in-0 duration-300',
           'border-neo border-neo-black shadow-hard-lg',
           isVictory ? 'bg-neo-orange/20' : 'bg-neo-red/20'
         )}

@@ -62,11 +62,12 @@ export function LevelShareCard(props: LevelShareCardProps) {
   return (
     <AdaptiveMotion.div
       data-testid="level-share-card"
-      initial={{ opacity: 0, scale: 0.92 }}
-      animate={{ opacity: 1, scale: 1 }}
+      initial={{ scale: 0.92 }}
+      animate={{ scale: 1 }}
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       className={cn(
         'relative overflow-hidden border-3 rounded-neo shadow-hard p-5 select-all',
+        'animate-in fade-in-0 duration-300',
         'bg-linear-to-br from-neo-black via-slate-900 to-neo-black',
         'border-neo-lime',
       )}

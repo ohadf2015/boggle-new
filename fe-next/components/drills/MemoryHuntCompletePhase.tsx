@@ -36,9 +36,9 @@ export function MemoryHuntCompletePhase({
 
   return (
     <AdaptiveMotion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="text-center space-y-6"
+      initial={{ scale: 0.9 }}
+      animate={{ scale: 1 }}
+      className="text-center space-y-6 animate-in fade-in-0 duration-300"
     >
       <DrillEarningsBreakdown
         drillId="memory-hunt"

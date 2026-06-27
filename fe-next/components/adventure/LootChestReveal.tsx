@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { Reveal } from '@/components/ui/Reveal';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LootDrop, LootRarity } from '@/types/adventure';
 
@@ -115,12 +116,11 @@ export default function LootChestReveal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <AdaptiveMotion.div
-        className="flex flex-col items-center gap-6 p-8"
-        initial={{ scale: 0.5, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-      >
+      {/* CSS entrance (Reveal), not framer-motion: a starved main thread — e.g.
+          while the large Hebrew bundle parses — would leave a framer `initial`
+          opacity:0 pinned, so the user sees only the dark backdrop ("black
+          screen"). CSS settles visible even if the keyframes never run. */}
+      <Reveal className="flex flex-col items-center gap-6 p-8">
         {/* Chest */}
         <AdaptiveMotion.div
           data-testid="loot-chest"
@@ -210,7 +210,7 @@ export default function LootChestReveal({
             {t('adventure.loot.continue')}
           </AdaptiveMotion.button>
         )}
-      </AdaptiveMotion.div>
+      </Reveal>
     </div>
   );
 }

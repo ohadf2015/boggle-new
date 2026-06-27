@@ -78,10 +78,10 @@ const LevelCompleteContent = memo<LevelCompleteContentProps>(({
     <>
       {/* Score & Rewards Grid */}
       <AdaptiveMotion.div
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
+        initial={{ y: 30 }}
+        animate={{ y: 0 }}
         transition={{ delay: 0.6 }}
-        className="grid grid-cols-3 gap-3 mb-6"
+        className="grid grid-cols-3 gap-3 mb-6 animate-in fade-in-0 duration-300"
       >
         {/* Score */}
         <div className="bg-neo-black/60 backdrop-blur-xs border-3 border-neo-white/20 rounded-neo p-3">

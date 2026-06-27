@@ -1200,10 +1200,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         {gameCode && onReturnToRoom && !isDesktopViewport && typeof document !== 'undefined' && createPortal(
           <div ref={setStickyBarRef} className="fixed bottom-0 inset-x-0 z-[100] text-neo-white pointer-events-none">
             <m.div
-              initial={{ y: 60, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
+              initial={{ y: 60 }}
+              animate={{ y: 0 }}
               transition={{ type: 'spring', stiffness: 200, damping: 24, delay: 0.3 }}
-              className="bg-neo-navy/95 border-t border-neo-white/8 shadow-[0_-4px_24px_rgba(0,0,0,0.5)] pointer-events-auto"
+              className="bg-neo-navy/95 border-t border-neo-white/8 shadow-[0_-4px_24px_rgba(0,0,0,0.5)] pointer-events-auto animate-in fade-in-0 duration-300"
             >
               {/* Inline style for padding-bottom: Tailwind arbitrary values
                   don't survive multi-arg max() with var() reliably. Capacitor

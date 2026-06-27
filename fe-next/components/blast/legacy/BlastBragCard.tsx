@@ -138,12 +138,12 @@ export function BlastBragCard({ results, t }: BlastBragCardProps) {
 
   return (
     <AdaptiveMotion.div
-      initial={{ scale: 0.9, opacity: 0, y: 10 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
+      initial={{ scale: 0.9, y: 10 }}
+      animate={{ scale: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.2 }}
       className={cn(
         'w-full relative overflow-hidden',
-        'rounded-neo border-3 border-neo-black p-4',
+        'rounded-neo border-3 border-neo-black p-4 animate-in fade-in-0 duration-300',
         'bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy',
       )}
       style={{ boxShadow: '6px 6px 0 #000' }}
