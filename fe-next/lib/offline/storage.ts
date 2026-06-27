@@ -30,6 +30,29 @@ const SQL_BLOB_KEY = 'sqlite-snapshot';
 const SCHEMA_VERSION = 1;
 const NATIVE_KEY_PREFIX = 'offline.';
 
+const SQL_WASM_URL = '/sql/sql-wasm.wasm';
+
+/**
+ * Browser sql.js loader. We fetch the .wasm binary ourselves and hand it to
+ * sql.js as `wasmBinary` instead of letting emscripten fetch it via `locateFile`.
+ *
+ * Why: when emscripten's own fetch fails (asset 404 / transient network / in-app
+ * browser / ad-blocker) it calls `abort()`, which throws a RuntimeError from a
+ * detached callback that ESCAPES the try/catch in tryValidateOffline → surfaces
+ * as an uncaught $exception and breaks the mode. Fetching ourselves turns any
+ * failure into a normal, catchable rejection so offline validation degrades to
+ * the network path instead of crashing. Exported for tests.
+ */
+export async function loadBrowserSqlJs(
+  init: typeof initSqlJs = initSqlJs,
+  fetchFn: typeof fetch = fetch,
+): Promise<SqlJsStatic> {
+  const res = await fetchFn(SQL_WASM_URL);
+  if (!res.ok) throw new Error(`sql-wasm fetch failed: ${res.status}`);
+  const wasmBinary = await res.arrayBuffer();
+  return init({ wasmBinary });
+}
+
 let sqlJsModule: SqlJsStatic | null = null;
 async function getSqlJs(): Promise<SqlJsStatic> {
   if (sqlJsModule) return sqlJsModule;
@@ -48,7 +71,7 @@ async function getSqlJs(): Promise<SqlJsStatic> {
     const wasmBinary = new Uint8Array(fileBuffer).buffer;
     sqlJsModule = await initSqlJs({ wasmBinary });
   } else {
-    sqlJsModule = await initSqlJs({ locateFile: (file: string) => `/sql/${file}` });
+    sqlJsModule = await loadBrowserSqlJs();
   }
   return sqlJsModule;
 }
