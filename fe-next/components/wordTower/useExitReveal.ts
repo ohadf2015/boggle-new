@@ -32,6 +32,13 @@ export function useExitReveal<T>(source: T | null | undefined, exitMs = 420): { 
       // Live (or refreshed) content — show it now, cancel any pending exit.
       setValue(source);
       setExiting(false);
+    } else if (valueRef.current != null && exitMs <= 0) {
+      // Reduced-motion path: no exit animation, so clear SYNCHRONOUSLY instead of
+      // via setTimeout(0). A busy webview frame can starve that 0ms timer, leaving
+      // the toast stuck — the founder's "notifications stay stuck" report. Clearing
+      // in the effect body removes the timer dependency entirely.
+      setValue(null);
+      setExiting(false);
     } else if (valueRef.current != null) {
       // Source cleared while something is showing → run the exit, keep the last
       // value on screen until the animation finishes, then unmount it.

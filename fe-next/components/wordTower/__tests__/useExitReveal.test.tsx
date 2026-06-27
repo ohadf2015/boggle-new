@@ -41,10 +41,11 @@ describe('useExitReveal — hold a toast through a cool exit after its source cl
     expect(result.current.value).toBe('On Fire!'); // the stale exit timer didn't kill it
   });
 
-  it('exitMs=0 unmounts on the next tick (reduced-motion path, no lingering anim)', () => {
+  it('exitMs=0 unmounts SYNCHRONOUSLY (reduced-motion path) — no timer to starve', () => {
     const { result, rerender } = renderHook(({ s }) => useExitReveal(s, 0), { initialProps: { s: 'Hi' as string | null } });
     rerender({ s: null });
-    act(() => { vi.advanceTimersByTime(1); });
+    // Cleared in the effect body, not via a 0ms timer — gone without advancing time.
     expect(result.current.value).toBeNull();
+    expect(result.current.exiting).toBe(false);
   });
 });

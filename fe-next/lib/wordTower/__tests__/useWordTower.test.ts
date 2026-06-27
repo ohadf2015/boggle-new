@@ -114,6 +114,27 @@ describe('useWordTower', () => {
       expect(result.current.state.lastHazard?.kind).toBe('wobble');
     });
 
+    it('commitPlacement refuses a word already used — no double-place from a stale hold', () => {
+      // Repro of the "same word over and over" exploit: a word is held on the
+      // crane, the SAME word gets committed by another accept path, then dropping
+      // the now-stale held word must NOT place a duplicate floor.
+      const { result } = setup(acceptAll);
+      pick(result, [0, 1, 2]);
+      act(() => result.current.hold());
+      expect(result.current.state.pendingWord).not.toBeNull();
+
+      // The identical word lands via the immediate submit path.
+      pick(result, [0, 1, 2]);
+      act(() => result.current.submit());
+      expect(result.current.state.game.floors).toHaveLength(1);
+
+      // Dropping the stale held word is rejected as a duplicate — still 1 floor.
+      act(() => result.current.commitPlacement(1));
+      expect(result.current.state.game.floors).toHaveLength(1);
+      expect(result.current.state.pendingWord).toBeNull();
+      expect(result.current.state.lastError).toBe('duplicate');
+    });
+
     it('cancelPlacement drops the held word without committing', () => {
       const { result } = setup(acceptAll);
       pick(result, [0, 1, 2]);

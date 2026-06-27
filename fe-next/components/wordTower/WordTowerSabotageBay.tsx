@@ -96,16 +96,18 @@ export function WordTowerSabotageBay({
 
   return (
     <>
-      {/* Floating token chip — sits above the bottom HUD on the start (LTR=left)
-          side, opposite the (end-side) hazards. Tap to open the picker.
-          ONLY shown when tokens > 0 ("the wrecking ball should only show on the screen when the player has it"). */}
+      {/* Floating token chip — sits in the TOP section on the start side, just
+          under the header (founder ask: "the wrecking ball should show on top and
+          not in the bottom section when it exists"). Tap to open the picker. ONLY
+          shown when tokens > 0 ("the wrecking ball should only show on the screen
+          when the player has it"). */}
       {hasTokens && (
         <button
           type="button"
           onClick={onOpen}
           aria-label={t('wordTower.sabotage.chip')}
           className={cn(
-            'pointer-events-auto absolute start-3 bottom-[230px] z-40 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform hover:scale-105 active:translate-y-px',
+            'pointer-events-auto absolute start-3 top-16 z-40 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform hover:scale-105 active:translate-y-px',
             !reducedMotion && 'animate-neo-pop',
           )}
         >
@@ -128,7 +130,7 @@ export function WordTowerSabotageBay({
           aria-label={t('wordTower.sabotage.watchAd')}
           className={cn(
             'pointer-events-auto absolute start-3 z-40 flex items-center gap-1 rounded-neo border-neo border-black px-2 py-1 font-neo-display text-xs font-bold uppercase shadow-hard transition-transform',
-            hasTokens ? 'bottom-[190px]' : 'bottom-[230px]',
+            hasTokens ? 'top-28' : 'top-16',
             adLoading
               ? 'bg-neo-navy/60 text-neo-white/40'
               : 'bg-neo-cyan text-black hover:scale-105 active:translate-y-px',
@@ -146,7 +148,7 @@ export function WordTowerSabotageBay({
           role="status"
           aria-live="polite"
           className={cn(
-            'pointer-events-none absolute start-3 bottom-[240px] z-40 rounded-neo border-neo-thick border-black bg-neo-cyan px-3 py-1.5 text-start shadow-hard',
+            'pointer-events-none absolute start-3 top-40 z-40 rounded-neo border-neo-thick border-black bg-neo-cyan px-3 py-1.5 text-start shadow-hard',
             !reducedMotion && 'animate-neo-pop',
           )}
         >
@@ -162,7 +164,7 @@ export function WordTowerSabotageBay({
           role="status"
           aria-live="polite"
           className={cn(
-            'pointer-events-none absolute start-3 bottom-[280px] z-40 rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-1.5 text-start shadow-hard',
+            'pointer-events-none absolute start-3 top-40 z-40 rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-1.5 text-start shadow-hard',
             !reducedMotion && 'animate-neo-pop',
           )}
         >

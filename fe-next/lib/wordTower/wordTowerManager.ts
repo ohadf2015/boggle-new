@@ -314,6 +314,18 @@ export function validateTowerWord(
   return { accepted: true };
 }
 
+/**
+ * True when `word` (in any form) has already been placed this run — the SAME
+ * dedup key {@link validateTowerWord} uses. Exposed so the crane's commit path
+ * can re-check defensively: `hold` validates, but the drop (`commitPlacement`)
+ * is otherwise an UNGUARDED apply, so a word committed by another path between
+ * hold and drop could be re-placed ("the same word over and over"). The commit
+ * re-runs this so a duplicate can never land twice.
+ */
+export function isTowerWordUsed(state: WordTowerPlayerState, word: string): boolean {
+  return state.usedWords.has(canon(word, state.language));
+}
+
 export interface ApplyResult {
   floorAdded: true;
   meters: number;
