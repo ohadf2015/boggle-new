@@ -657,6 +657,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const seconds = timeLeft % 60;
 
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
+  const equippedTileSkin = useEquippedCosmetic('tileSkin');
 
   // Desktop ranks panel from rivals
   const ranksPanel = !hideCompetitive ? (
@@ -1099,6 +1100,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         <WheelLetter
           letter={puzzle.centerLetter}
           isCenter
+          tileSkin={equippedTileSkin}
           onPress={(letter, _, el) => handleLetterPress(letter, -1, el)}
           isUsed={usedIndices.has(-1)}
           index={-1}
@@ -1113,6 +1115,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             key={`${letter}-${i}`}
             letter={letter}
             isCenter={false}
+            tileSkin={equippedTileSkin}
             angle={i * 60}
             radius={wheelRadius}
             onPress={(l, _, el) => handleLetterPress(l, i, el)}

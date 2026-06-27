@@ -59,14 +59,20 @@ export interface WheelLetterProps {
   onHoldStart?: (letter: string, index: number, el: HTMLButtonElement) => void;
   /** Fires on pointerup / cancel / leave — cancels an in-flight hold. */
   onHoldEnd?: () => void;
+  /** Equipped tile-skin id (e.g. 'tile-neon'); reskins resting outer letters. */
+  tileSkin?: string | null;
 }
 
 export const WheelLetter: React.FC<WheelLetterProps> = ({
   letter, isCenter, angle = 0, radius = 0, onPress, isUsed, index, reducedMotion = false,
-  showHoldRing = false, onHoldStart, onHoldEnd,
+  showHoldRing = false, onHoldStart, onHoldEnd, tileSkin,
 }) => {
   const btnRef = useRef<HTMLButtonElement>(null);
   const { t } = useLanguage();
+  // Reskin only resting outer letters — the center keeps its lime "must-use"
+  // cue and used letters keep their dimmed state. Mirrors the grid's tile skins
+  // so an equipped skin shows up in the daily word-wheel too.
+  const skin = !isCenter && !isUsed && tileSkin ? tileSkin.replace('tile-', '') : null;
 
   // Position outer letters using CSS transform (stable, no Framer Motion fighting).
   // Center letter stays at origin (inset-0 m-auto centers it).
@@ -83,7 +89,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       // Google Translate turning the tile "I" into Indonesian "saya".
       translate="no"
       className={cn(
-        'notranslate absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none touch-manipulation',
+        'wheel-letter-skinnable notranslate absolute inset-0 m-auto flex items-center justify-center font-neo-display font-black uppercase select-none touch-manipulation',
         // Invisible hit-area expander (≥48px WCAG AAA). Fixes rageclicks on Hebrew RTL wheel.
         'before:absolute before:-inset-2 before:content-[""]',
         'border-3 border-neo-black rounded-full transition-colors duration-150',
@@ -133,6 +139,7 @@ export const WheelLetter: React.FC<WheelLetterProps> = ({
       data-wheel-letter={letter}
       data-wheel-index={index}
       data-wheel-used={isUsed ? 'true' : 'false'}
+      {...(skin && { 'data-tile-skin': skin })}
     >
       {showHoldRing && <HoldRing />}
       {letter}

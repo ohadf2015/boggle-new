@@ -240,3 +240,44 @@
 .avatar-frame-diamond {
   box-shadow: 0 0 0 3px #00ffff, 0 0 16px 4px rgba(0, 255, 255, 0.6), 2px 2px 0 5px #000;
 }
+
+/* ──────────────────────────────────────────────────────────────────────────
+   Daily word-wheel tile skins
+   The wheel renders letters as round buttons (WheelLetter), not the square grid
+   tile, so it can't reuse `.letter-tile-gradient`. These rules reskin the
+   resting OUTER wheel letters with the same palettes as the grid skins, so an
+   equipped tile skin shows up in the daily word-wheel too. The lime center and
+   dimmed used-letters are left untouched (no data-tile-skin set on them).
+   ────────────────────────────────────────────────────────────────────────── */
+.wheel-letter-skinnable[data-tile-skin='neon'] {
+  background: linear-gradient(135deg, #050d1a 0%, #000f1f 100%) !important;
+  border-color: #00ffff !important;
+  color: #00ffff !important;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.9);
+}
+.wheel-letter-skinnable[data-tile-skin='wooden'] {
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.1) 0px,
+      rgba(0, 0, 0, 0.1) 1px,
+      transparent 1px,
+      transparent 6px
+    ),
+    linear-gradient(135deg, #a8754a 0%, #6b4426 50%, #8b6434 100%) !important;
+  border-color: #3d1f0a !important;
+  color: #ffe8cc !important;
+}
+.wheel-letter-skinnable[data-tile-skin='crystal'] {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, transparent 50%),
+    linear-gradient(135deg, #b8e0ff 0%, #88ccff 50%, #6ab8ff 100%) !important;
+  border-color: #0055dd !important;
+  color: #002855 !important;
+}
+.wheel-letter-skinnable[data-tile-skin='fire'] {
+  background: linear-gradient(135deg, #cc4400 0%, #ff5500 35%, #ff2200 70%, #dd1100 100%) !important;
+  border-color: #660000 !important;
+  color: #ffe8cc !important;
+  text-shadow: 0 0 6px rgba(255, 200, 0, 0.7);
+}
