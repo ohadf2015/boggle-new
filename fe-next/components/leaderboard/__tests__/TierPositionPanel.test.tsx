@@ -48,6 +48,19 @@ describe('TierPositionPanel — Gold happy path', () => {
     expect(screen.getByTestId('tier-rank-primary')).toHaveTextContent('#12 of 487 in gold');
   });
 
+  it('does NOT render real-user avatars for peers (privacy)', () => {
+    render(<TierPositionPanel position={goldPosition} userId="me" />);
+    // Avatar mock keys by userId — none of the real player ids should appear.
+    expect(screen.queryByTestId('avatar-p10')).toBeNull();
+    expect(screen.queryByTestId('avatar-me')).toBeNull();
+    expect(screen.queryByTestId('avatar-p13')).toBeNull();
+  });
+
+  it('renders a generic placeholder avatar per peer row', () => {
+    render(<TierPositionPanel position={goldPosition} userId="me" />);
+    expect(screen.getAllByTestId('peer-generic-avatar')).toHaveLength(5);
+  });
+
   it('renders percentile pill (12 / 487 ≈ top 2%)', () => {
     render(<TierPositionPanel position={goldPosition} userId="me" />);
     expect(screen.getByTestId('tier-percentile')).toHaveTextContent('Top 2% in gold');
