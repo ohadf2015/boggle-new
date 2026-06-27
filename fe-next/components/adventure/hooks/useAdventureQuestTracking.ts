@@ -21,7 +21,7 @@ interface UseAdventureQuestTrackingParams {
   chapterQuests: {
     recordWordsFound: (count: number) => void;
     recordLongWord: () => void;
-    recordStreakMaster: () => void;
+    recordStreakMaster: (streakLength: number) => void;
     recordFlashChallengeMaster: () => void;
     recordWorldMechanicUse: () => void;
   };
@@ -87,13 +87,16 @@ export function useAdventureQuestTracking(params: UseAdventureQuestTrackingParam
     prevQuestWordsRef.current = wordsFound.length;
   }, [wordsFound]);
 
-  // Chapter quest: streak master — fire when a new streak begins
-  // (transition from 0 to positive), not on every word within a streak
+  // Chapter quest: streak master — "Reach a {target}-word streak".
+  // Record the streak length each time the combo grows; the quest stores the
+  // highest value (max semantics), so a single long combo completes it.
+  // Counting streak *starts* (the old 0→positive trigger) under-counted: a
+  // 10-word combo only credited 1 toward the target.
   const prevComboRef = useRef(0);
   useEffect(() => {
     const prev = prevComboRef.current;
-    if (comboCount > 0 && prev === 0) {
-      chapterQuestsRef.current.recordStreakMaster();
+    if (comboCount > 0 && comboCount > prev) {
+      chapterQuestsRef.current.recordStreakMaster(comboCount);
     }
     prevComboRef.current = comboCount;
   }, [comboCount]);
