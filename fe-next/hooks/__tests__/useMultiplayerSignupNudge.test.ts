@@ -118,6 +118,33 @@ describe('useMultiplayerSignupNudge', () => {
     expect(result.current.activeNudge).toBe('sheet');
   });
 
+  it('does not re-show the sheet on remount after it was shown once (reload-without-dismiss)', () => {
+    // recurring-pitfalls Class 1: the shown-marker must be written at SHOW time,
+    // not dismiss time — else a reload (or remount) before the user dismisses
+    // re-pops the sheet. PostHog 45d: mp_sheet 168 events / 106 users (~1.6x).
+    const first = renderHook(() =>
+      useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+    );
+    act(() => { first.result.current.recordMpGame(); });
+    act(() => { first.result.current.recordMpGame(); });
+    act(() => { vi.advanceTimersByTime(2500); });
+    expect(first.result.current.activeNudge).toBe('sheet');
+    // User does NOT dismiss — they reload / navigate (component remounts).
+    first.unmount();
+
+    mockTrackGrowthEvent.mockClear();
+    const second = renderHook(() =>
+      useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+    );
+    act(() => { vi.advanceTimersByTime(2500); });
+
+    expect(second.result.current.activeNudge).toBeNull();
+    const sheetEmits = mockTrackGrowthEvent.mock.calls.filter(
+      ([name, props]) => name === 'signup_prompt_shown' && (props as { trigger?: string })?.trigger === 'mp_sheet',
+    );
+    expect(sheetEmits).toHaveLength(0);
+  });
+
   it('dismissNudge sets activeNudge to null', () => {
     const { result } = renderHook(() =>
       useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })

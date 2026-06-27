@@ -152,9 +152,12 @@ export function useMultiplayerSignupNudge({
       return;
     }
 
-    // Sheet: show once per session at threshold
+    // Sheet: show once per session at threshold. Mark shown at SHOW time (not in
+    // dismissNudge) so a reload/remount before the user dismisses can't re-pop it
+    // (recurring-pitfalls Class 1). dismissNudge still emits mp_sheet_dismissed.
     if (mpGames >= sheetThreshold && !wasSheetShown()) {
       const timer = setTimeout(() => {
+        markSheetShown();
         setActiveNudge('sheet');
         trackGrowthEvent('signup_prompt_shown', {
           trigger: 'mp_sheet',
