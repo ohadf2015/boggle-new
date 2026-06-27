@@ -21,11 +21,12 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 }));
 
 let mockFlagValue = 'after-2nd-game';
-let mockCopyVariant = 'control';
+// null simulates an unresolved/unenrolled flag → the hook's fallback default applies.
+let mockCopyVariant: string | null = 'control';
 vi.mock('@/hooks/usePostHogFlag', () => ({
   usePostHogFlag: (key: string, fallback?: unknown) => {
     if (key === 'mp-signup-nudge-threshold') return mockFlagValue;
-    if (key === 'mp-signup-nudge-copy-v1') return mockCopyVariant;
+    if (key === 'mp-signup-nudge-copy-v1') return mockCopyVariant ?? fallback;
     return fallback;
   },
 }));
@@ -304,6 +305,28 @@ describe('useMultiplayerSignupNudge', () => {
         ([name, props]) => name === 'signup_prompt_shown' && (props as { trigger?: string })?.trigger === 'mp_toast',
       );
       expect(toastEmits).toHaveLength(0);
+    });
+
+    it('defaults toast OFF when the flag is unresolved/unenrolled (fallback = toast-disabled)', () => {
+      // The toast converted 0/58 (28d). The hook's fallback default is now
+      // toast-disabled, so the pre-traction majority (no flag served) never gets
+      // the dead nag. Enrolled A/B users still get their served variant.
+      mockCopyVariant = null; // no variant served → hook uses its own fallback
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      // Reach + dismiss the sheet (sheet is independent of the toast flag)
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+      expect(result.current.activeNudge).toBe('sheet');
+      act(() => { result.current.dismissNudge(); });
+
+      // Game 3+: toast must NOT appear under the default
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+      expect(result.current.activeNudge).toBeNull();
     });
 
     it('suppresses toast under toast-disabled variant', () => {

@@ -93,10 +93,13 @@ export function useMultiplayerSignupNudge({
   const thresholdVariant = usePostHogFlag<string>('mp-signup-nudge-threshold', 'after-2nd-game');
   const sheetThreshold = thresholdVariant === 'after-3rd-game' ? 3 : 2;
 
-  // A/B test: copy + post-sheet toast gating. `toast-disabled` kills the
-  // game-3+ toast trigger that converted 0/58 in 28d — see
-  // `mp-signup-nudge-copy-v1` in lib/experiments.ts.
-  const copyVariant = usePostHogFlag<string>('mp-signup-nudge-copy-v1', 'control');
+  // A/B test: copy + post-sheet toast gating. The game-3+ toast converted 0/58 in
+  // 28d (see `mp-signup-nudge-copy-v1` in lib/experiments.ts), so the FALLBACK
+  // default is now `toast-disabled` — unenrolled / flag-unresolved guests (the
+  // pre-traction majority) no longer get the dead nag. Enrolled users still get
+  // whatever the experiment serves, so an active A/B is unaffected. Flip the
+  // fallback back to 'control' to re-enable by default.
+  const copyVariant = usePostHogFlag<string>('mp-signup-nudge-copy-v1', 'toast-disabled');
   const toastEnabled = copyVariant !== 'toast-disabled';
 
   // Toast threshold is always sheet + 1
