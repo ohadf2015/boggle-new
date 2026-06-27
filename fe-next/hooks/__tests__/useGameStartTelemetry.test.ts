@@ -84,4 +84,35 @@ describe('useGameStartTelemetry', () => {
     );
     expect(trackGameStart).not.toHaveBeenCalled();
   });
+
+  // ready-gate: MP rolls `random` server-side; the resolved mode + gameModeConfirmed
+  // land atomically AFTER the game goes active. Gating on `ready` (=gameModeConfirmed)
+  // makes game_started capture the RESOLVED mode, matching game_completed.
+  describe('ready gate', () => {
+    it('does not fire while active but not ready (resolved mode not yet confirmed)', () => {
+      renderHook(() =>
+        useGameStartTelemetry({ mode: 'random', isGameActive: true, ready: false }),
+      );
+      expect(trackGameStart).not.toHaveBeenCalled();
+    });
+
+    it('fires with the resolved mode once ready flips true (not the stale requested mode)', () => {
+      const { rerender } = renderHook(
+        ({ mode, ready }: { mode: string; ready: boolean }) =>
+          useGameStartTelemetry({ mode, isGameActive: true, ready }),
+        { initialProps: { mode: 'random', ready: false } },
+      );
+      expect(trackGameStart).not.toHaveBeenCalled();
+
+      // Server confirms: resolved mode + ready arrive together.
+      rerender({ mode: 'word-hunt', ready: true });
+      expect(trackGameStart).toHaveBeenCalledTimes(1);
+      expect(trackGameStart).toHaveBeenCalledWith('word-hunt', expect.any(Object));
+    });
+
+    it('defaults ready=true so non-MP callers are unaffected', () => {
+      renderHook(() => useGameStartTelemetry({ mode: 'word-wheel', isGameActive: true }));
+      expect(trackGameStart).toHaveBeenCalledTimes(1);
+    });
+  });
 });

@@ -19,19 +19,27 @@ interface UseGameStartTelemetryArgs {
   mode: string | undefined | null;
   /** True when the game is in the playing phase (not lobby, not results). */
   isGameActive: boolean;
+  /**
+   * Gate the emit until the mode is authoritative. Defaults true. MP rolls
+   * `random` server-side; the resolved mode + `gameModeConfirmed` arrive AFTER
+   * the game goes active, so MP callers pass `ready: gameModeConfirmed` to keep
+   * game_started from capturing the stale requested mode (matches game_completed).
+   */
+  ready?: boolean;
   /** Optional disambiguators forwarded to PostHog (gameCode, subMode, botCount, etc). */
   extras?: Record<string, unknown>;
 }
 
-export function useGameStartTelemetry({ mode, isGameActive, extras }: UseGameStartTelemetryArgs): void {
+export function useGameStartTelemetry({ mode, isGameActive, ready = true, extras }: UseGameStartTelemetryArgs): void {
   const firedRef = useRef(false);
 
   useEffect(() => {
     if (firedRef.current) return;
     if (!isGameActive) return;
+    if (!ready) return;
     if (!mode) return;
 
     firedRef.current = true;
     trackGameStart(mode, extras ?? {});
-  }, [mode, isGameActive, extras]);
+  }, [mode, isGameActive, ready, extras]);
 }

@@ -15,7 +15,7 @@ import type { Language, PlayerResult } from '@/types';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { GameMode } from '@/shared/types/game';
 import { setStoredUsername, setStoredCustomAvatar } from '@/utils/profileStorage';
-import { useGameMode } from '@/hooks/gameState/store';
+import { useGameMode, useGameModeConfirmed, useHostSelectedGameMode } from '@/hooks/gameState/store';
 import logger from '@/utils/logger';
 import {
   sendCountdownComplete,
@@ -134,6 +134,11 @@ const HostView: React.FC<HostViewProps> = memo(({
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
   const currentGameMode = useGameMode();
+  // MP rolls `random` server-side; the resolved mode + confirmation land together
+  // AFTER the game goes active. Gate game_started on confirmation so it captures the
+  // resolved mode (matching game_completed); keep the host's intent as requestedMode.
+  const gameModeConfirmed = useGameModeConfirmed();
+  const hostSelectedGameMode = useHostSelectedGameMode();
 
   // Host name change handler
   const handleHostNameChange = useCallback((newName: string) => {
@@ -482,9 +487,11 @@ const HostView: React.FC<HostViewProps> = memo(({
   useGameStartTelemetry({
     mode: currentGameMode ?? 'multiplayer',
     isGameActive: runtime.gameStarted && !runtime.waitingForResults,
+    ready: gameModeConfirmed,
     extras: {
       gameCode, role: 'host', isMultiplayer: true,
       engineMode: 'multiplayer', gameMode: currentGameMode ?? 'classic',
+      requestedMode: hostSelectedGameMode ?? 'random',
       playerCount: tournament.finalScores?.players?.length ?? 0,
       botCount: botPlayerCount,
     },
@@ -503,6 +510,7 @@ const HostView: React.FC<HostViewProps> = memo(({
     extras: {
       gameCode, role: 'host', isMultiplayer: true,
       engineMode: 'multiplayer', gameMode: currentGameMode ?? 'classic',
+      requestedMode: hostSelectedGameMode ?? 'random',
       playerCount: tournament.finalScores?.players?.length ?? 0,
       botCount: botPlayerCount,
     },

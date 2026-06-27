@@ -38,6 +38,7 @@ export {
   useLevelUpData,
   useBoardTheme,
   useGameMode,
+  useGameModeConfirmed,
   useHostSelectedGameMode,
   useWordHuntTargetLength,
   useWordHuntTargetCategory,

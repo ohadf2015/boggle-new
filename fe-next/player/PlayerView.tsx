@@ -52,6 +52,7 @@ import {
   useLeaderboard,
   useGameActions,
   useGameMode,
+  useGameModeConfirmed,
   useGameStore,
   useGameLanguage,
 } from '@/hooks/gameState';
@@ -130,6 +131,9 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
     v ? dispatchReveal({ type: 'endReveal' }) : dispatchReveal({ type: 'reset' });
   const [minWordLength, setMinWordLength] = useState<number>(2);
   const gameMode = useGameMode();
+  // Gate game_started until the server-resolved mode is confirmed, so MP `random`
+  // games don't tag start with the stale requested mode (matches game_completed).
+  const gameModeConfirmed = useGameModeConfirmed();
 
   // Map GameMode string to CoachModeKey for ModeCoach mount
   function getCoachMode(gm: string | undefined): CoachModeKey | undefined {
@@ -320,6 +324,7 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   useGameStartTelemetry({
     mode: gameMode ?? 'multiplayer',
     isGameActive: gameActive,
+    ready: gameModeConfirmed,
     extras: {
       gameCode, role: 'player', isMultiplayer: true,
       engineMode: 'multiplayer', gameMode: gameMode ?? 'classic',
