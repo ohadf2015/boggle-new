@@ -627,6 +627,9 @@ const WordWheelChallenge: React.FC = () => {
               language={language}
               practice={isPractice}
               isDesktop={isDesktop || isTv}
+              puzzleDate={catchupDate || getDailyChallengeDate()}
+              currentPlayerId={isAuthenticated && profile ? profile.id : null}
+              currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
             />
           </m.div>
         )}
