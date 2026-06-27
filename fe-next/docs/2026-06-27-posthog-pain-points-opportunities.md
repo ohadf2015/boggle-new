@@ -120,7 +120,12 @@ retention engine; the WASM word-wheel bug (#2) is directly sabotaging a daily mo
   Signature = generic flaky-network `fetch()` (likely an analytics/API beacon), no single defect.
 - **Opp B — MP liquidity** — `mp_player_dropped` ~311/315 users = no real-opponent liquidity
   (bot-padded). Product/design bet (async/ghost races, honest bot framing, faster solo fallback),
-  not a bug fix.
+  not a bug fix. **Corroborated by 4 independent signals all pointing at the MP lobby:**
+  rageclicks (all on `/multiplayer`), `random`-mode 24% abandon (bail in the matchmaking wait),
+  `dead_time_detected` (~77 users on `/multiplayer`: es 50 / en 27), and `mp_solo_prompt_shown`
+  (85 users — the "no opponents, play solo?" fallback already fires often). The lever is making
+  the wait either disappear (instant fill / async ghost race) or convert (faster, framed solo
+  fallback) — a design decision, deliberately not guessed at here.
 - **Signup *conversion* itself** — the `mp_sheet` (80% dismiss) copy/timing is the real lever;
   deliberately NOT rewritten (speculative, and this codebase has 4+ prior popup re-show bugs).
 - **#5 error-budget noise** (Capacitor android 543 evts/3 devices; ResizeObserver; chunk-load) —
