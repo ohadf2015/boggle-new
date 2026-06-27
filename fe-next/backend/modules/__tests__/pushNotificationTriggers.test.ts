@@ -201,8 +201,8 @@ describe('pushNotificationTriggers', () => {
     it('notifyAchievement pushes AND saves in-app row', async () => {
       await notifyAchievement('uid', 'Word Wizard');
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: 'Achievement Unlocked!',
-        body: 'You earned: Word Wizard',
+        title: '🏅 Achievement Unlocked!',
+        body: 'Nailed it — Word Wizard is yours!',
       }));
       expect(mockInsert).toHaveBeenCalledWith(
         expect.objectContaining({ user_id: 'uid', notification_type: 'achievement' })
@@ -393,7 +393,7 @@ describe('pushNotificationTriggers', () => {
       await notifyAchievement('uid', 'WORD_MASTER');
 
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        body: 'You earned: Word Master',
+        body: 'Nailed it — Word Master is yours!',
       }));
     });
 
@@ -402,7 +402,7 @@ describe('pushNotificationTriggers', () => {
       await notifyAchievement('uid', 'UNKNOWN_TEST_KEY');
 
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        body: 'You earned: UNKNOWN TEST KEY',
+        body: 'Nailed it — UNKNOWN TEST KEY is yours!',
       }));
     });
   });
@@ -419,8 +419,8 @@ describe('pushNotificationTriggers', () => {
 
       expect(mockSendToUser).toHaveBeenCalledTimes(1);
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: 'Achievement Unlocked!',
-        body: 'You earned: Word Master',
+        title: '🏅 Achievement Unlocked!',
+        body: 'Nailed it — Word Master is yours!',
       }));
     });
 
@@ -429,7 +429,7 @@ describe('pushNotificationTriggers', () => {
 
       expect(mockSendToUser).toHaveBeenCalledTimes(1);
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: '2 Achievements Unlocked!',
+        title: '🏅 2 Achievements in One Go!',
         body: 'You earned: Word Master & Combo King',
       }));
     });
@@ -444,7 +444,7 @@ describe('pushNotificationTriggers', () => {
 
       expect(mockSendToUser).toHaveBeenCalledTimes(1);
       expect(mockSendToUser).toHaveBeenCalledWith('uid', expect.objectContaining({
-        title: '4 Achievements Unlocked!',
+        title: '🏅 4 Achievements in One Go!',
         body: 'You earned: Word Master, Combo King +2 more',
       }));
     });

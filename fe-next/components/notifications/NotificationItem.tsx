@@ -5,10 +5,11 @@
  * Displays a single notification in the dropdown list
  */
 
-import { formatDistanceToNow } from 'date-fns';
+import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { X } from 'lucide-react';
 import { NOTIFICATION_TYPE_ICONS, NOTIFICATION_TYPE_COLORS, type NotificationItemProps } from './types';
+import { formatNotificationTime } from './formatNotificationTime';
 
 export function NotificationItem({ notification, onClick, onMarkAsRead, onDismiss }: NotificationItemProps) {
   const { t } = useLanguage();
@@ -16,8 +17,10 @@ export function NotificationItem({ notification, onClick, onMarkAsRead, onDismis
   const icon = NOTIFICATION_TYPE_ICONS[notification.notification_type];
   const colorClass = NOTIFICATION_TYPE_COLORS[notification.notification_type];
 
-  // Format time ago
-  const timeAgo = formatDistanceToNow(new Date(notification.created_at), { addSuffix: true });
+  // Locale-aware relative time (was date-fns English-only). `now` captured once
+  // at mount via lazy initializer to keep render pure (react-hooks/purity).
+  const [now] = useState(() => Date.now());
+  const timeAgo = formatNotificationTime(notification.created_at, now, t);
 
   const handleClick = () => {
     if (!notification.read) {

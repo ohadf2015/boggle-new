@@ -54,9 +54,9 @@ const STRINGS: Record<PushLocale, Dict> = {
     'turnReminder.title': 'Your Turn!',
     'turnReminder.body': '{opponent} played — your turn now!',
 
-    'achievement.title': 'Achievement Unlocked!',
-    'achievement.body': 'You earned: {name}',
-    'achievement.titleMulti': '{count} Achievements Unlocked!',
+    'achievement.title': '🏅 Achievement Unlocked!',
+    'achievement.body': 'Nailed it — {name} is yours!',
+    'achievement.titleMulti': '🏅 {count} Achievements in One Go!',
     'achievement.bodyTwo': 'You earned: {a} & {b}',
     'achievement.bodyMore': 'You earned: {a}, {b} +{rest} more',
 
@@ -70,8 +70,8 @@ const STRINGS: Record<PushLocale, Dict> = {
     'challengeDeclined.title': 'Challenge Declined',
     'challengeDeclined.body': '{sender} declined your challenge',
 
-    'giftReceived.title': 'Gift Received!',
-    'giftReceived.body': '{sender} sent you {label}!',
+    'giftReceived.title': '🎁 You Got a Gift!',
+    'giftReceived.body': '{sender} hooked you up with {label}!',
     'giftLabel.hints': 'a hint',
     'giftLabel.streak_freeze': 'a streak freeze',
     'giftLabel.coins': 'coins',
@@ -87,7 +87,7 @@ const STRINGS: Record<PushLocale, Dict> = {
     'dailyChallenge.body': 'Keep your streak alive — 60 seconds to play!',
 
     'levelUp.title': 'Level {level}!',
-    'levelUp.body': 'Congratulations — you reached level {level}!',
+    'levelUp.body': 'You leveled up — the grid never stood a chance!',
 
     'seasonStart.title': '🏆 Season {n} is here!',
     'seasonStart.body': 'Season {prev} ended — claim your rewards now!',
@@ -176,9 +176,9 @@ const STRINGS: Record<PushLocale, Dict> = {
     'turnReminder.title': 'Din tur!',
     'turnReminder.body': '{opponent} spelade — din tur nu!',
 
-    'achievement.title': 'Prestation upplåst!',
-    'achievement.body': 'Du fick: {name}',
-    'achievement.titleMulti': '{count} prestationer upplåsta!',
+    'achievement.title': '🏅 Bedrift upplåst!',
+    'achievement.body': 'Snyggt — {name} är din!',
+    'achievement.titleMulti': '🏅 {count} bedrifter på en gång!',
     'achievement.bodyTwo': 'Du fick: {a} & {b}',
     'achievement.bodyMore': 'Du fick: {a}, {b} +{rest} till',
 
@@ -192,8 +192,8 @@ const STRINGS: Record<PushLocale, Dict> = {
     'challengeDeclined.title': 'Utmaning avvisad',
     'challengeDeclined.body': '{sender} avvisade din utmaning',
 
-    'giftReceived.title': 'Present mottagen!',
-    'giftReceived.body': '{sender} skickade dig {label}!',
+    'giftReceived.title': '🎁 Du fick en present!',
+    'giftReceived.body': '{sender} fixade {label} till dig!',
     'giftLabel.hints': 'ett tips',
     'giftLabel.streak_freeze': 'en seriefrysning',
     'giftLabel.coins': 'mynt',
@@ -209,7 +209,7 @@ const STRINGS: Record<PushLocale, Dict> = {
     'dailyChallenge.body': 'Bryt inte serien — 60 sekunder att spela!',
 
     'levelUp.title': 'Nivå {level}!',
-    'levelUp.body': 'Grattis — du nådde nivå {level}!',
+    'levelUp.body': 'Du gick upp en nivå — rutnätet hade ingen chans!',
 
     'seasonStart.title': '🏆 Säsong {n} är här!',
     'seasonStart.body': 'Säsong {prev} avslutades — hämta dina belöningar nu!',
@@ -237,9 +237,9 @@ const STRINGS: Record<PushLocale, Dict> = {
     'turnReminder.title': 'あなたの番です！',
     'turnReminder.body': '{opponent}さんがプレイしました — あなたの番です！',
 
-    'achievement.title': '実績解除！',
-    'achievement.body': '獲得：{name}',
-    'achievement.titleMulti': '{count}個の実績解除！',
+    'achievement.title': '🏅 実績解除！',
+    'achievement.body': 'やったね！「{name}」を獲得！',
+    'achievement.titleMulti': '🏅 一気に{count}個の実績解除！',
     'achievement.bodyTwo': '獲得：{a}・{b}',
     'achievement.bodyMore': '獲得：{a}、{b} 他{rest}個',
 
@@ -253,8 +253,8 @@ const STRINGS: Record<PushLocale, Dict> = {
     'challengeDeclined.title': '対戦が辞退されました',
     'challengeDeclined.body': '{sender}さんが対戦を辞退しました',
 
-    'giftReceived.title': 'ギフトが届きました！',
-    'giftReceived.body': '{sender}さんから{label}が届きました！',
+    'giftReceived.title': '🎁 ギフト到着！',
+    'giftReceived.body': '{sender}さんが{label}を贈ってくれたよ！',
     'giftLabel.hints': 'ヒント',
     'giftLabel.streak_freeze': 'ストリークフリーズ',
     'giftLabel.coins': 'コイン',
@@ -270,7 +270,7 @@ const STRINGS: Record<PushLocale, Dict> = {
     'dailyChallenge.body': '連続記録を止めないで — 60秒で遊べます！',
 
     'levelUp.title': 'レベル{level}！',
-    'levelUp.body': 'おめでとう — レベル{level}に到達！',
+    'levelUp.body': 'レベルアップ！盤面を制したね',
 
     'seasonStart.title': '🏆 シーズン{n}開幕！',
     'seasonStart.body': 'シーズン{prev}が終了 — 報酬を受け取ろう！',
@@ -298,9 +298,9 @@ const STRINGS: Record<PushLocale, Dict> = {
     'turnReminder.title': '¡Tu turno!',
     'turnReminder.body': '¡{opponent} jugó — es tu turno ahora!',
 
-    'achievement.title': '¡Logro desbloqueado!',
-    'achievement.body': 'Obtuviste: {name}',
-    'achievement.titleMulti': '¡{count} logros desbloqueados!',
+    'achievement.title': '🏅 ¡Logro desbloqueado!',
+    'achievement.body': '¡Crack! {name} ya es tuyo',
+    'achievement.titleMulti': '🏅 ¡{count} logros de un tirón!',
     'achievement.bodyTwo': 'Obtuviste: {a} y {b}',
     'achievement.bodyMore': 'Obtuviste: {a}, {b} +{rest} más',
 
@@ -314,8 +314,8 @@ const STRINGS: Record<PushLocale, Dict> = {
     'challengeDeclined.title': 'Reto rechazado',
     'challengeDeclined.body': '{sender} rechazó tu reto',
 
-    'giftReceived.title': '¡Regalo recibido!',
-    'giftReceived.body': '¡{sender} te envió {label}!',
+    'giftReceived.title': '🎁 ¡Tienes un regalo!',
+    'giftReceived.body': '¡{sender} te consiguió {label}!',
     'giftLabel.hints': 'una pista',
     'giftLabel.streak_freeze': 'un congelador de racha',
     'giftLabel.coins': 'monedas',
@@ -331,7 +331,7 @@ const STRINGS: Record<PushLocale, Dict> = {
     'dailyChallenge.body': '¡Mantén tu racha — 60 segundos para jugar!',
 
     'levelUp.title': '¡Nivel {level}!',
-    'levelUp.body': '¡Felicidades — llegaste al nivel {level}!',
+    'levelUp.body': '¡Subiste de nivel — el tablero no tuvo ninguna oportunidad!',
 
     'seasonStart.title': '🏆 ¡Llegó la Temporada {n}!',
     'seasonStart.body': '¡La Temporada {prev} terminó — reclama tus recompensas!',
