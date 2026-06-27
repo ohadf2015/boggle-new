@@ -115,6 +115,40 @@ describe('shouldShowStylePopup', () => {
     });
   });
 
+  describe('natural break points (never interrupt active play)', () => {
+    it('never shows while a game is actively being played, in EITHER auth state', () => {
+      // The popup is a full-screen blocking overlay. Opening it mid-game would
+      // cover a live board and, in multiplayer, a running timer you cannot pause
+      // — the "shows at the wrong moment" report. Suppress whenever a game runs.
+      expect(shouldShowStylePopup({ ...base, gameActive: true })).toBe(false);
+      expect(
+        shouldShowStylePopup({ ...base, isAuthenticated: true, gameActive: true }),
+      ).toBe(false);
+    });
+
+    it('does not show on a gameplay route until the game is over (skips pre-game/lobby)', () => {
+      // On /practice, /multiplayer, … the moments BEFORE a game ends — pre-game
+      // setup, lobby, countdown — are still the wrong moment. Wait for results.
+      expect(
+        shouldShowStylePopup({ ...base, onGameplayRoute: true, resultsShowing: false }),
+      ).toBe(false);
+    });
+
+    it('shows on a gameplay route once the results screen is up (after the game)', () => {
+      expect(
+        shouldShowStylePopup({ ...base, onGameplayRoute: true, resultsShowing: true }),
+      ).toBe(true);
+    });
+
+    it('still shows on a non-gameplay in-app screen when idle (menu/home), no results needed', () => {
+      // Off gameplay routes (leaderboard, profile, …) the user is already at rest,
+      // so there is nothing to interrupt — the results gate does not apply.
+      expect(
+        shouldShowStylePopup({ ...base, onGameplayRoute: false, resultsShowing: false }),
+      ).toBe(true);
+    });
+  });
+
   it('never re-shows once the device-level "shown" flag is set, in EITHER auth state', () => {
     // `guestShown` is the localStorage marker, written the moment the popup is
     // shown (any auth state). It is a DEVICE-level "shown once" flag, so it must

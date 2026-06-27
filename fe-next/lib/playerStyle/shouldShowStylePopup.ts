@@ -59,6 +59,26 @@ export interface StylePopupGateInput {
    * content — the same content humans see once dismissed. See lib/seo/isCrawler.
    */
   isCrawler?: boolean;
+  /**
+   * A game is actively being played right now (`useGameActive()`). The popup is
+   * a full-screen blocking overlay, so opening it mid-game covers a live board —
+   * and in multiplayer a running timer the player cannot pause. Never the right
+   * moment. True → never show; the popup waits for a natural break.
+   */
+  gameActive?: boolean;
+  /**
+   * The current route is an active-gameplay screen (`isGameplayPath()`:
+   * /practice, /multiplayer, /daily, …). On these routes the only acceptable
+   * moment to prompt is AFTER the game (`resultsShowing`) — the pre-game setup,
+   * lobby and countdown are still mid-flow. Off these routes (menus, profile,
+   * leaderboard) the user is already idle, so no results gate applies.
+   */
+  onGameplayRoute?: boolean;
+  /**
+   * A game has finished and its results/game-over screen is up. Gates the prompt
+   * on a gameplay route to the post-game moment the user explicitly chose.
+   */
+  resultsShowing?: boolean;
 }
 
 /**
@@ -77,6 +97,14 @@ export function shouldShowStylePopup(input: StylePopupGateInput): boolean {
   // Wait for auth to settle before deciding — otherwise the transient
   // "not-yet-authenticated" window flashes the popup at returning users.
   if (!input.authSettled) return false;
+  // Never interrupt active play. The full-screen overlay would cover a live
+  // board (and a running, unpausable multiplayer timer). Only surface the popup
+  // at a natural break — the "showing at the wrong moment" fix.
+  if (input.gameActive) return false;
+  // On a gameplay route, hold the popup until the game is over (results screen).
+  // Pre-game setup / lobby / countdown are still mid-flow. Off gameplay routes
+  // (menus, profile, leaderboard) the user is already idle, so this gate is moot.
+  if (input.onGameplayRoute && !input.resultsShowing) return false;
   if (!input.featureEnabled) return false;
   if (input.needsProfileCustomization) return false;
   // Already picked a style (local truth) → never prompt, in either auth state.

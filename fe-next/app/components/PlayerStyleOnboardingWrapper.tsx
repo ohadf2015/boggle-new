@@ -11,6 +11,8 @@ import dynamic from 'next/dynamic';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { isLandingRoute } from '@/lib/onboarding/allowedRoutes';
+import { isGameplayPath } from '@/lib/gameplayRoutes';
+import { useGameActive, useWaitingForResults } from '@/hooks/gameState/store';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import {
   getStoredPlayerStyle,
@@ -50,6 +52,23 @@ export default function PlayerStyleOnboardingWrapper() {
   const profileShownAt = profile?.player_style_modal_shown_at ?? null;
   const profileStyle = profile?.player_style ?? null;
 
+  // Natural-break signals (global Zustand singleton — readable here, and the
+  // selectors re-render this wrapper when a game starts/ends so the gate is
+  // re-evaluated at the moment the game is over).
+  const gameActive = useGameActive();
+  const waitingForResults = useWaitingForResults();
+  const onGameplayRoute = isGameplayPath(pathname);
+  // A game has actually started this mount. Distinguishes "results screen" (a
+  // game finished → natural break) from "pre-game" (never started → still mid-
+  // flow) on a gameplay route, where both read gameActive === false.
+  const hasPlayedRef = useRef(false);
+  useEffect(() => {
+    if (gameActive) hasPlayedRef.current = true;
+  }, [gameActive]);
+  // On a gameplay route, the popup may only open once the game is over: either a
+  // game was played and is now finished, or the results are being computed.
+  const resultsShowing = (hasPlayedRef.current || waitingForResults) && !gameActive;
+
   useEffect(() => {
     if (!isMounted) return;
     // Don't fight the profile-customization modal; small settle delay.
@@ -78,6 +97,12 @@ export default function PlayerStyleOnboardingWrapper() {
         // Never trap a JS-rendering crawler behind the full-screen style modal —
         // it must index the deep-route page content, not the overlay.
         isCrawler: isCrawler(),
+        // Natural-break gating: never open mid-game, and on a gameplay route hold
+        // until the results screen ("after game"). Off gameplay routes the user
+        // is idle (menu/home) so it may open straight away.
+        gameActive,
+        onGameplayRoute,
+        resultsShowing,
       });
       // Only ever OPEN from the effect; dismissal owns closing. This prevents a
       // dep change while the modal is open from yanking it shut mid-choice, and
@@ -96,6 +121,13 @@ export default function PlayerStyleOnboardingWrapper() {
     profileLoaded,
     profileShownAt,
     profileStyle,
+    // Re-evaluate at natural breaks: when a game ends (gameActive flips false),
+    // results land, or the user navigates to a different surface.
+    gameActive,
+    waitingForResults,
+    onGameplayRoute,
+    resultsShowing,
+    pathname,
   ]);
 
   const markShown = useCallback(async () => {
