@@ -2,9 +2,9 @@
 
 import React, { memo, useEffect, useMemo, useRef } from 'react';
 import { m } from 'framer-motion';
+import { User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import Avatar from '@/components/Avatar';
 import {
   GLOBAL_LEADERBOARD_TIERS,
   type LeaderboardTierDef,
@@ -62,7 +62,7 @@ const TierPositionPanel: React.FC<Props> = memo(({ position, userId, className }
         data-testid="tier-rank-primary"
         aria-label={`Rank ${position.rank_in_tier} of ${position.tier_population} in ${tierName} tier`}
         className={cn(
-          'font-neo-display text-4xl font-bold',
+          'font-neo-display text-2xl sm:text-3xl font-bold leading-tight break-words',
           tier.textColor,
           isFirstInTier && 'animate-neo-wobble', // wired now; Task 7 adds tests
         )}
@@ -77,7 +77,7 @@ const TierPositionPanel: React.FC<Props> = memo(({ position, userId, className }
       {!isStone && !isGrandmaster && (
         <div
           data-testid="tier-percentile"
-          className="inline-block mt-2 px-2 py-0.5 rounded-neo border-neo text-xs font-bold text-neo-black"
+          className="inline-block mt-2 px-2.5 py-1 rounded-neo border-neo text-xs font-bold text-neo-black"
           style={{ backgroundColor: tier.color }}
         >
           {t('leaderboard.tier.percentile', { pct: percentile, tier: tierName })}
@@ -111,26 +111,45 @@ const TierPositionPanel: React.FC<Props> = memo(({ position, userId, className }
         </div>
       )}
 
-      <ul role="list" className="mt-3 space-y-1">
-        {position.neighbors.map((n) => (
-          <li
-            key={n.player_id}
-            role="listitem"
-            data-testid={`peer-row-${n.player_id}`}
-            data-current={n.player_id === userId ? 'true' : 'false'}
-            className={cn(
-              'flex items-center gap-2 px-2 py-1 rounded text-sm',
-              n.player_id === userId
-                ? cn('ring-2', tier.ringColor, 'bg-neo-navy')
-                : 'hover:bg-neo-navy-light',
-            )}
-          >
-            <span className="w-10 font-mono text-xs text-gray-400">#{n.rank_in_tier}</span>
-            <Avatar userId={n.player_id} size="sm" />
-            <span className="flex-1 truncate">{n.display_name ?? n.player_id}</span>
-            <span className="font-semibold">{n.total_score.toLocaleString()}</span>
-          </li>
-        ))}
+      <ul role="list" className="mt-4 space-y-1.5">
+        {position.neighbors.map((n) => {
+          const isCurrent = n.player_id === userId;
+          return (
+            <li
+              key={n.player_id}
+              role="listitem"
+              data-testid={`peer-row-${n.player_id}`}
+              data-current={isCurrent ? 'true' : 'false'}
+              className={cn(
+                'flex items-center gap-3 px-3 py-2 rounded-neo text-sm transition-colors',
+                isCurrent
+                  ? cn('ring-2 bg-neo-navy font-bold', tier.ringColor)
+                  : 'bg-neo-navy/40 hover:bg-neo-navy',
+              )}
+            >
+              <span className="w-7 shrink-0 text-center font-mono text-xs font-bold text-gray-400">
+                {n.rank_in_tier}
+              </span>
+              {/* Generic placeholder — peers' real avatars are intentionally not shown. */}
+              <span
+                data-testid="peer-generic-avatar"
+                aria-hidden="true"
+                className={cn(
+                  'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-neo bg-neo-navy-elevated',
+                  isCurrent ? tier.textColor : 'text-gray-500',
+                )}
+              >
+                <User className="h-4 w-4" />
+              </span>
+              <span className={cn('flex-1 truncate', isCurrent ? 'text-white' : 'text-gray-300')}>
+                {n.display_name ?? n.player_id}
+              </span>
+              <span className="font-semibold tabular-nums text-white">
+                {n.total_score.toLocaleString()}
+              </span>
+            </li>
+          );
+        })}
       </ul>
     </m.div>
   );
