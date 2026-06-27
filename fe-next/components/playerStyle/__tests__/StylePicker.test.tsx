@@ -139,4 +139,33 @@ describe('StylePicker', () => {
     render(<StylePicker showConfirm={false} />);
     expect(screen.queryByText('playerStyle.picker.confirm')).toBeNull();
   });
+
+  // Layout: the default ('modal') variant owns its own scroll region — correct
+  // inside the fixed-height modal/onboarding shells. The 'inline' variant (used
+  // on the normally-scrolling Settings page) must NOT create a nested scroll
+  // container, otherwise the tile grid traps the page scroll and the Settings
+  // page below the picker becomes unreachable.
+  describe('layout variants', () => {
+    it('modal (default) keeps its own internal scroll region', () => {
+      render(<StylePicker />);
+      const region = screen.getByRole('radiogroup');
+      expect(region.className).toContain('overflow-y-auto');
+      expect(region.className).toContain('flex-1');
+    });
+
+    it('inline removes the internal scroll container so the page scrolls', () => {
+      render(<StylePicker layout="inline" />);
+      const region = screen.getByRole('radiogroup');
+      expect(region.className).not.toContain('overflow-y-auto');
+      expect(region.className).not.toContain('flex-1');
+      expect(region.className).not.toContain('min-h-0');
+    });
+
+    it('inline root is not a height-constrained flex column', () => {
+      const { container } = render(<StylePicker layout="inline" />);
+      const root = container.firstElementChild as HTMLElement;
+      expect(root.className).not.toContain('flex-1');
+      expect(root.className).not.toContain('min-h-0');
+    });
+  });
 });

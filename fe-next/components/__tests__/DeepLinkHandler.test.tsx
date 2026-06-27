@@ -34,6 +34,8 @@ vi.mock('@/utils/logger', () => ({
   default: {
     log: vi.fn(),
     error: vi.fn(),
+    debug: vi.fn(),
+    warn: vi.fn(),
   },
 }));
 
@@ -205,6 +207,37 @@ describe('DeepLinkHandler', () => {
 
       // Still once — the second mount must not re-route the same launch URL.
       expect(mockReplace).toHaveBeenCalledTimes(1);
+    });
+
+    // Regression: on a real cold start the native bridge can register the App
+    // plugin slightly AFTER this component mounts, so `Capacitor.isPluginAvailable('App')`
+    // returns false at mount time. The launch URL handling must NOT be permanently
+    // skipped behind that gate (silent failure) — otherwise every cold-start deep
+    // link lands on the home page. The plugin proxy is still reachable (sync or via
+    // dynamic import), so the launch URL must still route.
+    it('routes the launch URL even when isPluginAvailable("App") is false at mount', async () => {
+      (globalThis as any).Capacitor.isPluginAvailable = vi.fn(() => false);
+      setLaunchUrl('https://www.lexiclash.live/daily');
+
+      render(<DeepLinkHandler />);
+
+      await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/en/daily'));
+    });
+
+    // Bridge-not-ready race: getLaunchUrl rejects on the first call (native bridge
+    // still booting) then resolves with the deep link. A single attempt would drop
+    // the link → home page. The handler must retry until the bridge answers.
+    it('retries getLaunchUrl when the native bridge is not ready yet', async () => {
+      const getLaunchUrl = vi
+        .fn()
+        .mockRejectedValueOnce(new Error('bridge not ready'))
+        .mockResolvedValue({ url: 'lexiclash://connections' });
+      (globalThis as any).Capacitor.Plugins.App.getLaunchUrl = getLaunchUrl;
+
+      render(<DeepLinkHandler />);
+
+      await waitFor(() => expect(mockReplace).toHaveBeenCalledWith('/en/connections'));
+      expect(getLaunchUrl.mock.calls.length).toBeGreaterThanOrEqual(2);
     });
   });
 
