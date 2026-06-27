@@ -12475,9 +12475,11 @@ const sv = {
   },
   "brag": {
     "headline": {
-      "crushed": "SORRY {name} 💀 {score}–{opponent}",
+      "crushed": "SORRY {name} 💀",
+      "topped": "{name} +{count} MOTSTÅNDARE. KROSSADE. 💪",
       "won": "{count} RIVALER. NOLL ÖVERLEVANDE.",
-      "challenge": "{score} P. TROR DU ATT DU ÄR BÄTTRE?"
+      "revenge": "{name} DENNA GÅNG. NÄSTA ÄR MIN! 🔥",
+      "challenge": "TROR DU ATT DU ÄR BÄTTRE?"
     },
     "hero": {
       "points": "ÄRANS POÄNG",
@@ -12486,7 +12488,8 @@ const sv = {
     },
     "cta": "DIN TUR →",
     "copied": "Länk kopierad!",
-    "screenshotHint": "Skärmdumpa skrytet"
+    "screenshotHint": "Skärmdumpa skrytet",
+    "others": "+{count} FLER"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

@@ -12324,9 +12324,11 @@ const ja = {
   },
   "brag": {
     "headline": {
-      "crushed": "{name}、ごめんね 💀 {score}–{opponent}",
+      "crushed": "{name}、ごめんね 💀",
+      "topped": "{name}ら{count}人を撃破。終了！💪",
       "won": "{count}人撃破。生存者ゼロ。",
-      "challenge": "{score}点。勝てる自信ある？"
+      "revenge": "{name}、まぐれだな。リベンジ！🔥",
+      "challenge": "勝てる自信ある？"
     },
     "hero": {
       "points": "栄光のポイント",
@@ -12335,7 +12337,8 @@ const ja = {
     },
     "cta": "次はキミの番 →",
     "copied": "リンクをコピー！",
-    "screenshotHint": "スクショして自慢"
+    "screenshotHint": "スクショして自慢",
+    "others": "+{count}人"
   },
   "shareResult": {
     "singleplayer": "LexiClash ソロ",

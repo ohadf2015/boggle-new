@@ -12782,9 +12782,11 @@ const he = {
   },
   "brag": {
     "headline": {
-      "crushed": "סליחה {name} 💀 {score}–{opponent}",
+      "crushed": "סליחה {name} 💀",
+      "topped": "{name} +{count} עוד. נכחדו! 💪",
       "won": "{count} יריבים. אפס ניצולים.",
-      "challenge": "{score} נק'. בטוח שתעשה יותר?"
+      "revenge": "{name} - רק מזל. רוץ שוב! 🔥",
+      "challenge": "בטוח שתעשה יותר?"
     },
     "hero": {
       "points": "נקודות של תהילה",
@@ -12793,7 +12795,8 @@ const he = {
     },
     "cta": "תורך →",
     "copied": "הקישור הועתק!",
-    "screenshotHint": "צלמו מסך והשוויצו"
+    "screenshotHint": "צלמו מסך והשוויצו",
+    "others": "+{count} עוד"
   },
   "shareResult": {
     "singleplayer": "LexiClash סולו",

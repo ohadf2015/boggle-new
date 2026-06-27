@@ -19,6 +19,7 @@ export interface BragPlayer {
 interface MpBragCardProps {
   data: BragCardData;
   current: BragPlayer;
+  /** The named face-off rival (avatar source). Name/score come from data.rival. */
   opponent?: BragPlayer;
   /** Mode label already localized (e.g. "Word Hunt"). */
   modeLabel: string;
@@ -33,14 +34,14 @@ interface MpBragCardProps {
 /** accent family → tailwind tokens. Bright accents (lime/cyan) take black ink,
  * saturated ones (pink/purple) take white. The card carries the accent itself, so
  * the avatar needs no mode-frame ring. */
-const ACCENT: Record<BragAccent, { bg: string; text: string; on: string }> = {
-  lime: { bg: 'bg-neo-lime', text: 'text-neo-lime', on: 'text-black' },
-  pink: { bg: 'bg-neo-pink', text: 'text-neo-pink', on: 'text-white' },
-  cyan: { bg: 'bg-neo-cyan', text: 'text-neo-cyan', on: 'text-black' },
-  purple: { bg: 'bg-neo-purple', text: 'text-neo-purple', on: 'text-white' },
+const ACCENT: Record<BragAccent, { bg: string; text: string; on: string; ring: string }> = {
+  lime: { bg: 'bg-neo-lime', text: 'text-neo-lime', on: 'text-black', ring: 'border-neo-lime' },
+  pink: { bg: 'bg-neo-pink', text: 'text-neo-pink', on: 'text-white', ring: 'border-neo-pink' },
+  cyan: { bg: 'bg-neo-cyan', text: 'text-neo-cyan', on: 'text-black', ring: 'border-neo-cyan' },
+  purple: { bg: 'bg-neo-purple', text: 'text-neo-purple', on: 'text-white', ring: 'border-neo-purple' },
 };
 
-/** Situational expression pools — winners look triumphant/smug/fierce, losers
+/** Situational expression pools — victors look triumphant/smug/fierce, the beaten
  * defeated/stunned/salty. Pick is deterministic (hash of name+score) so it's
  * varied across cards but stable per result — no flicker, no Math.random. */
 const WINNER_MOODS: AvatarMood[] = ['win', 'emoteLaugh', 'emoteCool', 'streak'];
@@ -51,23 +52,31 @@ function pickMood(pool: AvatarMood[], seed: string): AvatarMood {
 }
 
 /**
- * Screenshot-first "brag card" for multiplayer results. There is no Share button —
- * the card is built to be screenshotted, so the link is PRINTED on it (a screenshot
- * carries pixels, not share-text). Self-contained framing: avatars + rivalry
- * headline + ONE hero stat + printed link.
+ * Screenshot-first "brag card" for multiplayer results, built as a FIGHT POSTER:
+ * a named face-off (you vs your rival + "and N others") with a boast headline across
+ * the top like a fight result, ONE hero number, and the play link printed as a footer
+ * stamp. There is no Share button — a screenshot carries pixels, not share-text, so the
+ * URL lives on the card. People share "I beat so-and-so", not a score, so EVERY outcome
+ * names a rival: you won → the runner-up; you lost → the winner you're coming back for.
  */
 function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, onCopyLink, t, className }: MpBragCardProps) {
   const a = ACCENT[data.accent];
-  const headToHead = data.outcome === 'winner_2p' && !!opponent;
   const [copied, setCopied] = useState(false);
 
-  // Current player wears a winner face unless they lost; the opponent on a
-  // head-to-head card always lost, so they wear a defeated one — amplifying the win.
-  const currentPool = data.outcome === 'non_winner' ? LOSER_MOODS : WINNER_MOODS;
-  const currentMood = pickMood(currentPool, `${current.name}:${current.score}`);
-  const opponentMood = opponent
-    ? pickMood(LOSER_MOODS, `${opponent.name}:${opponent.score}`)
+  const youLost = data.outcome === 'non_winner';
+  const rival = data.rival;
+
+  // Your face: a winner's unless you lost. The rival's face is the inverse of yours —
+  // when you won they're crushed; when you lost they're the smug victor you're challenging.
+  const currentMood = pickMood(youLost ? LOSER_MOODS : WINNER_MOODS, `${current.name}:${current.score}`);
+  const rivalMood = rival
+    ? pickMood(youLost ? WINNER_MOODS : LOSER_MOODS, `${rival.name}:${rival.score}`)
     : undefined;
+
+  // The face-off scoreline IS the number for a plain points game, so the separate hero
+  // box only earns its place for a DISTINCTIVE flex (combo / longest word). This kills
+  // the in-card score-shown-twice dup and keeps the poster uncluttered.
+  const showHeroBox = data.hero.kind !== 'points';
 
   const handleCopy = useCallback(async () => {
     try {
@@ -90,7 +99,7 @@ function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, onC
         className
       )}
     >
-      {/* top accent strip + mode badge */}
+      {/* brand watermark strip */}
       <div className={cn('flex items-center justify-between px-3 py-1.5', a.bg)}>
         <span className={cn('font-neo-display text-[3cqw] font-bold tracking-wide', a.on)}>
           LEXICLASH
@@ -101,60 +110,80 @@ function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, onC
       </div>
 
       <div className="flex flex-col items-center gap-3 px-4 py-5 text-center">
-        {/* rivalry avatars */}
-        <div className="flex items-end justify-center gap-3">
-          <div className="flex flex-col items-center gap-1">
-            <Avatar
-              customAvatar={current.avatar?.customAvatar}
-              userId={current.name}
-              size="2xl"
-              mood={currentMood}
-              tierMarker
-            />
-            <span className="max-w-[22cqw] truncate font-neo-display text-[3.2cqw] font-bold text-neo-white">
+        {/* boast headline — the fight result, across the top */}
+        <h2 className={cn('font-neo-display text-[6cqw] font-black uppercase leading-[0.95]', a.text)}>
+          {t(data.headlineKey, data.headlineParams)}
+        </h2>
+
+        {/* the face-off: you vs your named rival */}
+        <div className="flex w-full items-stretch justify-center gap-2">
+          {/* YOU */}
+          <div className="flex flex-1 flex-col items-center gap-1">
+            <div className={cn('rounded-full border-neo-thick p-0.5', a.ring)}>
+              <Avatar
+                customAvatar={current.avatar?.customAvatar}
+                userId={current.name}
+                size="2xl"
+                mood={currentMood}
+                tierMarker
+              />
+            </div>
+            <span className="max-w-[26cqw] truncate font-neo-display text-[3.4cqw] font-black uppercase text-neo-white">
               {current.name}
             </span>
-            <span className={cn('font-neo-display text-[4.5cqw] font-extrabold leading-none', a.text)}>
+            <span className={cn('font-neo-display text-[6.5cqw] font-black leading-none tabular-nums', a.text)}>
               {current.score}
             </span>
           </div>
 
-          {headToHead && opponent && (
+          {rival && (
             <>
-              <span className="pb-8 font-neo-display text-[4cqw] font-black text-neo-white/60">VS</span>
-              <div className="flex flex-col items-center gap-1 opacity-80">
-                <Avatar
-                  customAvatar={opponent.avatar?.customAvatar}
-                  userId={opponent.name}
-                  size="xl"
-                  mood={opponentMood}
-                  disableEffects
-                />
-                <span className="max-w-[22cqw] truncate font-neo-body text-[2.8cqw] font-semibold text-neo-white/70">
-                  {opponent.name}
+              {/* VS clash */}
+              <div className="flex flex-col items-center justify-center px-1">
+                <span className="font-neo-display text-[5.5cqw] font-black italic text-neo-white drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
+                  VS
                 </span>
-                <span className="font-neo-display text-[3.4cqw] font-bold leading-none text-neo-white/60">
-                  {opponent.score}
+                {data.othersCount > 0 && (
+                  <span className={cn('mt-1 rounded-full border-neo border-black px-2 py-0.5 font-neo-body text-[2.4cqw] font-bold', a.bg, a.on)}>
+                    {t('brag.others', { count: data.othersCount })}
+                  </span>
+                )}
+              </div>
+
+              {/* RIVAL — dimmed when they lost, full-strength (smug) when they beat you */}
+              <div className={cn('flex flex-1 flex-col items-center gap-1', youLost ? '' : 'opacity-80')}>
+                <div className="rounded-full border-neo-thick border-neo-white/30 p-0.5">
+                  <Avatar
+                    customAvatar={opponent?.avatar?.customAvatar}
+                    userId={rival.name}
+                    size="2xl"
+                    mood={rivalMood}
+                    disableEffects
+                  />
+                </div>
+                <span className="max-w-[26cqw] truncate font-neo-body text-[3cqw] font-bold uppercase text-neo-white/70">
+                  {rival.name}
+                </span>
+                <span className="font-neo-display text-[5.5cqw] font-bold leading-none tabular-nums text-neo-white/50">
+                  {rival.score}
                 </span>
               </div>
             </>
           )}
         </div>
 
-        {/* headline */}
-        <h2 className="font-neo-display text-[5.2cqw] font-extrabold uppercase leading-tight text-neo-white">
-          {t(data.headlineKey, data.headlineParams)}
-        </h2>
-
-        {/* one hero stat */}
-        <div className={cn('w-full rounded-neo border-neo-thick border-black px-3 py-3 shadow-hard', a.bg)}>
-          <div className={cn('font-neo-display text-[9cqw] font-black leading-none', a.on)}>
-            {data.hero.primary}
+        {/* one hero stat — only for a distinctive flex (combo / longest word);
+            a plain points game's number already lives in the scoreline above. */}
+        {showHeroBox && (
+          <div className={cn('w-full rounded-neo border-neo-thick border-black px-3 py-3 shadow-hard', a.bg)}>
+            <div className={cn('font-neo-display text-[9cqw] font-black leading-none', a.on)}>
+              {data.hero.primary}
+            </div>
+            <div className={cn('mt-1 font-neo-body text-[2.6cqw] font-bold uppercase tracking-widest', a.on)}>
+              {t(data.hero.labelKey)}
+            </div>
           </div>
-          <div className={cn('mt-1 font-neo-body text-[2.6cqw] font-bold uppercase tracking-widest', a.on)}>
-            {t(data.hero.labelKey)}
-          </div>
-        </div>
+        )}
 
         {/* printed link — the viral loop carrier (a screenshot has no share-text,
             so the URL must live in the pixels). Tappable = the one measurable

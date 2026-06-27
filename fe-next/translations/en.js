@@ -12252,9 +12252,11 @@ const en = {
   },
   "brag": {
     "headline": {
-      "crushed": "SORRY {name} 💀 {score}–{opponent}",
+      "crushed": "SORRY {name} 💀",
+      "topped": "{name} +{count} MORE. DEMOLISHED.",
       "won": "{count} RIVALS. ZERO SURVIVORS.",
-      "challenge": "{score} PTS. THINK YOU'RE BETTER?"
+      "revenge": "{name} GOT LUCKY. RUN IT BACK. 🔥",
+      "challenge": "THINK YOU'RE BETTER?"
     },
     "hero": {
       "points": "POINTS OF GLORY",
@@ -12263,7 +12265,8 @@ const en = {
     },
     "cta": "YOUR MOVE →",
     "copied": "Link copied!",
-    "screenshotHint": "Screenshot the flex"
+    "screenshotHint": "Screenshot the flex",
+    "others": "+{count} others"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

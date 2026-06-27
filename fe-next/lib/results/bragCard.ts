@@ -3,15 +3,28 @@
  * share artifact. Takes raw match results, returns translation KEYS + params (no
  * `t()` here, so it stays unit-testable) plus visual hints (accent, RTL).
  *
+ * Every game frames a named FACE-OFF, because people share "I beat so-and-so",
+ * not "I scored X". The rival is always the closest opponent in the standings:
+ * sortedScores is descending, so the first player that isn't you is the runner-up
+ * when you won (you're #1) and the winner when you lost (your revenge target).
+ *
  * Copy matrix (multiplayer is often >2 players, and losers share too):
- *   winner_2p   — won a head-to-head: "I CRUSHED {name} {score}–{opponent}"
- *   winner_np   — won a 3+ player match: "WON · beat {count} players"
- *   non_winner  — didn't win: "{score} pts · #{rank} — beat me?"
+ *   winner_2p   — won a head-to-head:        crushed  "SORRY {name} 💀 {score}–{opponent}"
+ *   winner_np   — won a 3+ match, named:     topped   "{name} + {count} MORE. DEMOLISHED."
+ *                 won a 3+ match, anonymous: won      "{count} RIVALS. ZERO SURVIVORS."
+ *   non_winner  — lost, named the winner:    revenge  "{name} GOT LUCKY. REMATCH?"
+ *                 lost, anonymous:           challenge "{score} PTS. THINK YOU'RE BETTER?"
  */
 
 export type BragOutcome = 'winner_2p' | 'winner_np' | 'non_winner';
 export type BragAccent = 'lime' | 'pink' | 'cyan' | 'purple';
 export type HeroKind = 'points' | 'combo' | 'longest';
+
+/** The one named opponent shown in the face-off (winner→runner-up, loser→winner). */
+export interface BragRival {
+  name: string;
+  score: number;
+}
 
 export interface BragCardInput {
   gameMode?: string;
@@ -44,6 +57,10 @@ export interface BragCardData {
   hero: HeroStat;
   accent: BragAccent;
   isRTL: boolean;
+  /** The named face-off rival, or undefined when no opponent name is known. */
+  rival?: BragRival;
+  /** Players beyond you + the named rival (the "and N others"). 0 = pure 1v1. */
+  othersCount: number;
 }
 
 const ACCENT_BY_MODE: Record<string, BragAccent> = {
@@ -72,27 +89,43 @@ export function deriveBragCardData(input: BragCardInput): BragCardData {
   const accent = ACCENT_BY_MODE[input.gameMode ?? ''] ?? 'lime';
   const isRTL = input.locale === 'he';
 
+  // The closest opponent IS the face-off rival (see header). When present we frame
+  // a 1-on-1 + "and N others"; when not, we fall back to anonymous count copy.
+  const rival: BragRival | undefined = input.opponentName
+    ? { name: input.opponentName, score: input.opponentScore ?? 0 }
+    : undefined;
+  const othersCount = rival
+    ? Math.max(0, input.playerCount - 2) // you + the named rival
+    : Math.max(0, input.playerCount - 1); // everyone, since no one is named
+
   let outcome: BragOutcome;
   let headlineKey: string;
   let headlineParams: Record<string, string | number>;
 
-  if (input.isWinner && input.playerCount <= 2 && input.opponentName) {
+  // Headlines carry the BOAST; the face-off scoreline carries the NUMBERS. So
+  // headline params never include score/opponent — printing them here would
+  // restate the scoreline shown under the avatars (the dup the card avoids).
+  if (input.isWinner && input.playerCount <= 2 && rival) {
     outcome = 'winner_2p';
     headlineKey = 'brag.headline.crushed';
-    headlineParams = {
-      name: input.opponentName,
-      score: input.score,
-      opponent: input.opponentScore ?? 0,
-    };
+    headlineParams = { name: rival.name };
+  } else if (input.isWinner && rival) {
+    outcome = 'winner_np';
+    headlineKey = 'brag.headline.topped'; // names the runner-up + the rest
+    headlineParams = { name: rival.name, count: othersCount };
   } else if (input.isWinner) {
     outcome = 'winner_np';
-    headlineKey = 'brag.headline.won';
-    headlineParams = { count: Math.max(1, input.playerCount - 1), score: input.score };
+    headlineKey = 'brag.headline.won'; // anonymous fallback
+    headlineParams = { count: othersCount };
+  } else if (rival) {
+    outcome = 'non_winner';
+    headlineKey = 'brag.headline.revenge'; // names the winner you're coming for
+    headlineParams = { name: rival.name };
   } else {
     outcome = 'non_winner';
-    headlineKey = 'brag.headline.challenge';
-    headlineParams = { score: input.score, rank: input.rank };
+    headlineKey = 'brag.headline.challenge'; // anonymous taunt
+    headlineParams = {};
   }
 
-  return { outcome, headlineKey, headlineParams, hero, accent, isRTL };
+  return { outcome, headlineKey, headlineParams, hero, accent, isRTL, rival, othersCount };
 }

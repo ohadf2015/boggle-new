@@ -14,31 +14,89 @@ const base: BragCardInput = {
 };
 
 describe('deriveBragCardData — outcome / copy matrix', () => {
-  it('winner head-to-head (2 players) → winner_2p with rival name + scores', () => {
+  it('winner head-to-head (2 players) → winner_2p names the rival (no score — the scoreline carries it)', () => {
     const d = deriveBragCardData(base);
     expect(d.outcome).toBe('winner_2p');
     expect(d.headlineKey).toBe('brag.headline.crushed');
-    expect(d.headlineParams).toMatchObject({ name: 'Alice', score: 312, opponent: 187 });
+    expect(d.headlineParams).toEqual({ name: 'Alice' });
   });
 
-  it('winner in a big match (>2 players) → winner_np with beaten count', () => {
+  it('winner in a big match (>2 players) WITH a runner-up → names the rival + "and N others"', () => {
+    // sortedScores is desc, so the first non-you player when you won is the runner-up.
     const d = deriveBragCardData({ ...base, playerCount: 4, rank: 1 });
     expect(d.outcome).toBe('winner_np');
-    expect(d.headlineKey).toBe('brag.headline.won');
-    expect(d.headlineParams).toMatchObject({ count: 3 }); // beat playerCount-1
+    expect(d.headlineKey).toBe('brag.headline.topped'); // named-rival variant
+    expect(d.headlineParams).toEqual({ name: 'Alice', count: 2 }); // count = playerCount-2
   });
 
-  it('non-winner still shares — challenge framing with rank', () => {
+  it('winner in a big match with NO named rival → anonymous "won" fallback', () => {
+    const d = deriveBragCardData({ ...base, playerCount: 4, rank: 1, opponentName: undefined });
+    expect(d.outcome).toBe('winner_np');
+    expect(d.headlineKey).toBe('brag.headline.won');
+    expect(d.headlineParams).toEqual({ count: 3 }); // everyone = playerCount-1
+  });
+
+  it('non-winner WITH a rival (the winner) → revenge framing naming the winner', () => {
+    // when you lose, the first non-you player is the winner (index 0).
     const d = deriveBragCardData({ ...base, isWinner: false, rank: 3, playerCount: 4 });
     expect(d.outcome).toBe('non_winner');
-    expect(d.headlineKey).toBe('brag.headline.challenge');
-    expect(d.headlineParams).toMatchObject({ score: 312, rank: 3 });
+    expect(d.headlineKey).toBe('brag.headline.revenge'); // named-rival variant
+    expect(d.headlineParams).toEqual({ name: 'Alice' });
   });
 
-  it('winner 2P but missing opponent name → falls back to winner_np framing', () => {
+  it('non-winner with NO named rival → anonymous "challenge" taunt (no numbers)', () => {
+    const d = deriveBragCardData({ ...base, isWinner: false, rank: 3, playerCount: 4, opponentName: undefined });
+    expect(d.outcome).toBe('non_winner');
+    expect(d.headlineKey).toBe('brag.headline.challenge');
+    expect(d.headlineParams).toEqual({});
+  });
+
+  it('no headline embeds the score/opponent — the face-off scoreline owns the numbers', () => {
+    // Guards the dup the brief attacks: headlines boast, the scoreline counts.
+    const cases: BragCardInput[] = [
+      base,
+      { ...base, playerCount: 4 },
+      { ...base, playerCount: 4, opponentName: undefined },
+      { ...base, isWinner: false, rank: 3, playerCount: 4 },
+      { ...base, isWinner: false, rank: 3, playerCount: 4, opponentName: undefined },
+    ];
+    for (const c of cases) {
+      const p = deriveBragCardData(c).headlineParams;
+      expect(p).not.toHaveProperty('score');
+      expect(p).not.toHaveProperty('opponent');
+    }
+  });
+
+  it('winner 2P but missing opponent name → falls back to anonymous winner_np framing', () => {
     const d = deriveBragCardData({ ...base, opponentName: undefined });
     expect(d.outcome).toBe('winner_np');
     expect(d.headlineKey).toBe('brag.headline.won');
+  });
+});
+
+describe('deriveBragCardData — rival face-off (every game has a named rival)', () => {
+  it('exposes the named rival + score for a head-to-head win', () => {
+    const d = deriveBragCardData(base);
+    expect(d.rival).toEqual({ name: 'Alice', score: 187 });
+    expect(d.othersCount).toBe(0);
+  });
+
+  it('exposes the runner-up rival + "others" count for an N-player win', () => {
+    const d = deriveBragCardData({ ...base, playerCount: 5, rank: 1 });
+    expect(d.rival).toEqual({ name: 'Alice', score: 187 });
+    expect(d.othersCount).toBe(3); // playerCount-2 (you + the named rival)
+  });
+
+  it('exposes the winner as the rival when you lost', () => {
+    const d = deriveBragCardData({ ...base, isWinner: false, rank: 4, playerCount: 4 });
+    expect(d.rival).toEqual({ name: 'Alice', score: 187 });
+    expect(d.othersCount).toBe(2);
+  });
+
+  it('no named rival → rival undefined, othersCount counts everyone beaten', () => {
+    const d = deriveBragCardData({ ...base, playerCount: 4, rank: 1, opponentName: undefined });
+    expect(d.rival).toBeUndefined();
+    expect(d.othersCount).toBe(3); // playerCount-1
   });
 });
 

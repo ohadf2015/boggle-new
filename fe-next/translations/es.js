@@ -12406,9 +12406,11 @@ const es = {
   },
   "brag": {
     "headline": {
-      "crushed": "LO SIENTO {name} 💀 {score}–{opponent}",
+      "crushed": "LO SIENTO {name} 💀",
+      "topped": "{name} +{count} MÁS. PULVERIZADOS. 💪",
       "won": "{count} RIVALES. CERO SUPERVIVIENTES.",
-      "challenge": "{score} PTS. ¿TE CREES MEJOR?"
+      "revenge": "{name} TUVO SUERTE. ¡AHORA TOCA! 🔥",
+      "challenge": "¿TE CREES MEJOR?"
     },
     "hero": {
       "points": "PUNTOS DE GLORIA",
@@ -12417,7 +12419,8 @@ const es = {
     },
     "cta": "TE TOCA →",
     "copied": "¡Enlace copiado!",
-    "screenshotHint": "Captura y presume"
+    "screenshotHint": "Captura y presume",
+    "others": "+{count} MÁS"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",
