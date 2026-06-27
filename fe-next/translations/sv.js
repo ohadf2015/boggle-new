@@ -12782,18 +12782,51 @@ const sv = {
     "progress": "{{completed}}/{{total}}",
     "go": "KÖR",
     "done": "Klart!",
+    "feed": {
+      "title": "Senaste Vinster",
+      "pvp": "{{name}} besegrade en riktig motståndare",
+      "grandSlam": "{{name}} klarade alla 3 dagliga uppdrag"
+    },
     "daily": {
-      "wordHunt": {
-        "name": "Daglig Ordjakt",
-        "desc": "Spela dagens utmaning"
+      "long_word_6": {
+        "title": "Ordbyggare",
+        "desc": "Hitta ett ord med 6+ bokstäver"
       },
-      "multiplayer": {
-        "name": "Multiplayer-match",
-        "desc": "Spela ett multiplayerspel"
+      "long_word_7": {
+        "title": "Språkjätte",
+        "desc": "Hitta ett ord med 7+ bokstäver"
       },
-      "brainDrills": {
-        "name": "Hjärnträning",
-        "desc": "Genomför en Brain Drill-session"
+      "score_300": {
+        "title": "Precisionssskyttar",
+        "desc": "Poäng 300+ i ett spel"
+      },
+      "score_500": {
+        "title": "Högspel",
+        "desc": "Poäng 500+ i ett spel"
+      },
+      "words_15": {
+        "title": "Ordmaskin",
+        "desc": "Hitta 15+ ord i ett spel"
+      },
+      "mp_win": {
+        "title": "Mästare",
+        "desc": "Vinna en multiplayer-match"
+      },
+      "beat_human": {
+        "title": "Rivalöverväldiga",
+        "desc": "Besegra en riktig motståndare"
+      },
+      "play_mp": {
+        "title": "Gå in på arenan",
+        "desc": "Spela en multiplayer-match"
+      },
+      "play_brain": {
+        "title": "Hjärnboost",
+        "desc": "Slutför en hjärnträning"
+      },
+      "play_wordhunt": {
+        "title": "I jakt",
+        "desc": "Spela dagens ordjakt"
       }
     },
     "reward": {

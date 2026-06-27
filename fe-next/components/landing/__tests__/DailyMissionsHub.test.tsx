@@ -38,19 +38,84 @@ vi.mock('@/lib/utils', () => ({
   cn: (...args: unknown[]) => args.filter(Boolean).join(' '),
 }));
 
-// Fix rotation to [wordHunt, multiplayer, brainDrills] for all tests
+// Fix rotation to specific quest IDs for all tests
 vi.mock('@/shared/dailyQuestPool', async () => {
   const actual = await vi.importActual<typeof import('@/shared/dailyQuestPool')>('@/shared/dailyQuestPool');
   return {
     ...actual,
-    getDailyQuestModes: vi.fn().mockReturnValue(['wordHunt', 'multiplayer', 'brainDrills']),
+    getDailyQuests: vi.fn().mockReturnValue([
+      {
+        id: 'long_word_6',
+        type: 'longWord',
+        target: 6,
+        family: 'skill',
+        titleKey: 'quests.daily.long_word_6.title',
+        descKey: 'quests.daily.long_word_6.desc',
+        href: '/daily',
+        icon: '📏',
+      },
+      {
+        id: 'mp_win',
+        type: 'mpWin',
+        target: 1,
+        family: 'pvp',
+        titleKey: 'quests.daily.mp_win.title',
+        descKey: 'quests.daily.mp_win.desc',
+        href: '/multiplayer',
+        icon: '👑',
+      },
+      {
+        id: 'play_brain',
+        type: 'playMode',
+        target: 1,
+        family: 'discovery',
+        titleKey: 'quests.daily.play_brain.title',
+        descKey: 'quests.daily.play_brain.desc',
+        href: '/brain',
+        icon: '🧠',
+        mode: 'brain',
+      },
+    ]),
   };
 });
 
 const baseMissions = [
-  { type: 'wordHunt' as const, completed: false, href: '/daily' },
-  { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
-  { type: 'brainDrills' as const, completed: false, href: '/brain' },
+  {
+    slot: 0,
+    questId: 'long_word_6',
+    type: 'longWord' as const,
+    family: 'skill' as const,
+    target: 6,
+    titleKey: 'quests.daily.long_word_6.title',
+    descKey: 'quests.daily.long_word_6.desc',
+    icon: '📏',
+    completed: false,
+    href: '/daily',
+  },
+  {
+    slot: 1,
+    questId: 'mp_win',
+    type: 'mpWin' as const,
+    family: 'pvp' as const,
+    target: 1,
+    titleKey: 'quests.daily.mp_win.title',
+    descKey: 'quests.daily.mp_win.desc',
+    icon: '👑',
+    completed: false,
+    href: '/multiplayer',
+  },
+  {
+    slot: 2,
+    questId: 'play_brain',
+    type: 'playMode' as const,
+    family: 'discovery' as const,
+    target: 1,
+    titleKey: 'quests.daily.play_brain.title',
+    descKey: 'quests.daily.play_brain.desc',
+    icon: '🧠',
+    completed: false,
+    href: '/brain',
+  },
 ];
 
 beforeEach(() => {
@@ -100,10 +165,11 @@ describe('DailyMissionsHub', () => {
   it('renders all 3 mission rows from rotation', () => {
     render(<DailyMissionsHub />);
 
-    // rotation mock: [wordHunt, multiplayer, brainDrills]
-    expect(screen.getByText('dailyMissions.wordHunt')).toBeTruthy();
-    expect(screen.getByText('dailyMissions.multiplayer')).toBeTruthy();
-    expect(screen.getByText('dailyMissions.brainDrills')).toBeTruthy();
+    // Mocked quests: [long_word_6, mp_win, play_brain]
+    // Component uses mission.titleKey which should render via t()
+    expect(screen.getByText('quests.daily.long_word_6.title')).toBeTruthy();
+    expect(screen.getByText('quests.daily.mp_win.title')).toBeTruthy();
+    expect(screen.getByText('quests.daily.play_brain.title')).toBeTruthy();
   });
 
   it('renders progress text', () => {
@@ -146,9 +212,10 @@ describe('DailyMissionsHub', () => {
 
     render(<DailyMissionsHub />);
 
-    // Should show "Grand Slam! Completed!" text
-    const texts = screen.getAllByText(/dailyMissions\.(grandSlam|completed)/);
-    expect(texts.length).toBeGreaterThanOrEqual(1);
+    // The component should render all missions as completed (strikethrough + checkmark)
+    // Find the strikethrough text spans (they have line-through class)
+    const strikethroughElements = document.querySelectorAll('span.line-through');
+    expect(strikethroughElements.length).toBe(3);
   });
 
   it('mission rows have correct links', () => {

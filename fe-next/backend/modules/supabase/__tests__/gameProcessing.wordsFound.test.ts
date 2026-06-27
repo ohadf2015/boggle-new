@@ -28,7 +28,7 @@ vi.mock('../../../handlers/engagementHandler', () => ({
   processAchievementEngagement: vi.fn(async () => {}),
 }));
 vi.mock('../../../modules/weeklyQuestManager', () => ({ updateQuestProgress: vi.fn(async () => {}) }));
-vi.mock('../../../modules/dailyMissionsManager', () => ({ completeMissionForMode: vi.fn(async () => {}) }));
+vi.mock('../../../modules/dailyMissionsManager', () => ({ completeDailyQuestsForResult: vi.fn(async () => {}) }));
 vi.mock('../../../modules/supabase/rankedMmr', () => ({
   updateRankedMmr: vi.fn(async () => {}),
   fetchRankedBaselines: vi.fn(async () => new Map()),

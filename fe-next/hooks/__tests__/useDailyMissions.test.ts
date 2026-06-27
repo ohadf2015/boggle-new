@@ -50,12 +50,44 @@ vi.mock('@/hooks/useInterstitialAd', () => ({
   }),
 }));
 
-// Fix rotation to [wordHunt, multiplayer, brainDrills] for all tests
+// Fix rotation to specific quest IDs for all tests
 vi.mock('@/shared/dailyQuestPool', async () => {
   const actual = await vi.importActual<typeof import('@/shared/dailyQuestPool')>('@/shared/dailyQuestPool');
   return {
     ...actual,
-    getDailyQuestModes: vi.fn().mockReturnValue(['wordHunt', 'multiplayer', 'brainDrills']),
+    getDailyQuests: vi.fn().mockReturnValue([
+      {
+        id: 'long_word_6',
+        type: 'longWord',
+        target: 6,
+        family: 'skill',
+        titleKey: 'quests.daily.long_word_6.title',
+        descKey: 'quests.daily.long_word_6.desc',
+        href: '/daily',
+        icon: '📏',
+      },
+      {
+        id: 'mp_win',
+        type: 'mpWin',
+        target: 1,
+        family: 'pvp',
+        titleKey: 'quests.daily.mp_win.title',
+        descKey: 'quests.daily.mp_win.desc',
+        href: '/multiplayer',
+        icon: '👑',
+      },
+      {
+        id: 'play_brain',
+        type: 'playMode',
+        target: 1,
+        family: 'discovery',
+        titleKey: 'quests.daily.play_brain.title',
+        descKey: 'quests.daily.play_brain.desc',
+        href: '/brain',
+        icon: '🧠',
+        mode: 'brain',
+      },
+    ]),
   };
 });
 
@@ -147,7 +179,7 @@ describe('useDailyMissions', () => {
       expect(result.current.loading).toBe(false);
     });
 
-    // Rotation: [wordHunt, multiplayer, brainDrills] → hrefs from QUEST_MODE_HREFS
+    // Mocked quests: [long_word_6, mp_win, play_brain] → hrefs from each quest
     const hrefs = result.current.missions.map(m => m.href);
     expect(hrefs).toEqual(['/daily', '/multiplayer', '/brain']);
   });
@@ -272,10 +304,10 @@ describe('useDailyMissions', () => {
     document.dispatchEvent(new Event('visibilitychange'));
 
     await waitFor(() => {
-      // rotation mock: slot 0 = wordHunt → toast key dailyMissions.wordHunt
+      // Mocked quests: slot 0 = long_word_6 → toast with quest titleKey
       expect(showQuestCompletionToast).toHaveBeenCalledWith(
         expect.objectContaining({
-          questName: 'dailyMissions.wordHunt',
+          questName: 'quests.daily.long_word_6.title',
           xpReward: 100,
         }),
       );

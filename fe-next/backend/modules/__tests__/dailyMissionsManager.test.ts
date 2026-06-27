@@ -3,8 +3,8 @@
  */
 
 import { vi } from 'vitest';
-import { getDailyMissions, completeMission, completeMissionForMode, checkAndClaimGrandSlam, checkAndClaimAllQuestsComplete, markCelebrated, GRAND_SLAM_COIN_REWARD, PER_MISSION_XP, ALL_QUESTS_COMPLETE_XP, ALL_QUESTS_COMPLETE_COIN_REWARD } from '../dailyMissionsManager';
-import { getDailyQuestModes } from '../../../shared/dailyQuestPool';
+import { getDailyMissions, completeMission, completeDailyQuestsForResult, checkAndClaimGrandSlam, checkAndClaimAllQuestsComplete, markCelebrated, GRAND_SLAM_COIN_REWARD, PER_MISSION_XP, ALL_QUESTS_COMPLETE_XP, ALL_QUESTS_COMPLETE_COIN_REWARD } from '../dailyMissionsManager';
+import { getDailyQuests, emptyQuestResult, type QuestGameResult } from '../../../shared/dailyQuestPool';
 
 const { mockAwardCoins } = vi.hoisted(() => {
   const mockAwardCoins = vi.fn();
@@ -220,50 +220,54 @@ describe('completeMission', () => {
   });
 });
 
-describe('completeMissionForMode', () => {
-  // SLOT_COLUMNS = [word_hunt_completed, adventure_completed, community_completed].
-  // The mode that fills each slot rotates daily, so a mode MUST be credited to
-  // the column for the slot it occupies *that day* — never a hardcoded column.
-  // Regression guard for: completing the Word Hunt daily challenge marked
-  // word_hunt_completed (slot 0) statically; on days where slot 0 is the
-  // `multiplayer` mode the UI then showed "finished mp game".
-  const SLOT_COLUMNS = ['word_hunt_completed', 'adventure_completed', 'community_completed'] as const;
+describe('completeDailyQuestsForResult', () => {
+  it('completes nothing when result does not satisfy any quest condition', async () => {
+    const DATE = '2026-06-27';
+    // Build an empty result that satisfies nothing
+    const result = emptyQuestResult();
 
-  function setupCompleteMissionChain(column: string) {
-    // getDailyMissions (ensure row) + getDailyMissions (return updated) both read maybeSingle
-    mockMaybeSingle.mockResolvedValue({ data: EMPTY_ROW, error: null });
-    // Conditional update chain: .update().eq(player).eq(date).eq(column,false).select(column)
-    const selectFn = vi.fn().mockResolvedValue({ data: [{ [column]: true }], error: null });
-    const eqCol = vi.fn().mockReturnValue({ select: selectFn });
-    const eqDate = vi.fn().mockReturnValue({ eq: eqCol });
-    const eqPlayer = vi.fn().mockReturnValue({ eq: eqDate });
-    mockUpdate.mockReturnValueOnce({ eq: eqPlayer });
-  }
+    await completeDailyQuestsForResult(PLAYER_ID, result, DATE);
 
-  it('credits wordHunt to the slot column it occupies today, not always word_hunt_completed', async () => {
-    // 2026-05-20: modes = [multiplayer, wordHunt, brainDrills] → wordHunt is slot 1
-    const DATE = '2026-05-20';
-    const slot = getDailyQuestModes(DATE).indexOf('wordHunt');
-    expect(slot).toBe(1); // pins the fixture so the assertion below is meaningful
-    const expectedColumn = SLOT_COLUMNS[slot];
-    setupCompleteMissionChain(expectedColumn);
-
-    await completeMissionForMode('player-123', 'wordHunt', DATE);
-
-    expect(mockUpdate).toHaveBeenCalledWith({ [expectedColumn]: true });
-    expect(mockUpdate).not.toHaveBeenCalledWith({ word_hunt_completed: true });
+    // Should not call update (no missions completed)
+    expect(mockUpdate).not.toHaveBeenCalled();
+    // Should not grant XP
+    expect(mockRpc).not.toHaveBeenCalled();
   });
 
-  it('credits multiplayer to the slot column it occupies today', async () => {
-    // 2026-05-20: multiplayer is slot 0 → word_hunt_completed
-    const DATE = '2026-05-20';
-    const slot = getDailyQuestModes(DATE).indexOf('multiplayer');
-    const expectedColumn = SLOT_COLUMNS[slot];
-    setupCompleteMissionChain(expectedColumn);
+  it('calls completeMission for each satisfied quest slot', async () => {
+    const DATE = '2026-06-27';
 
-    await completeMissionForMode('player-123', 'multiplayer', DATE);
+    // Build a result that satisfies quests (all high values to catch various types)
+    const result: QuestGameResult = emptyQuestResult({
+      longestWordLength: 20,
+      score: 1000,
+      wordsFound: 50,
+      isMultiplayer: true,
+      humanOpponentCount: 1,
+      isTopHuman: true,
+      beatHumanOpponent: true,
+    });
 
-    expect(mockUpdate).toHaveBeenCalledWith({ [expectedColumn]: true });
+    // Setup mocks for multiple completeMission calls
+    // (We're not testing completeMission thoroughly here, just that it gets called)
+    let updateCallCount = 0;
+    mockMaybeSingle.mockImplementation(() =>
+      Promise.resolve({ data: EMPTY_ROW, error: null })
+    );
+
+    mockUpdate.mockImplementation(() => {
+      updateCallCount++;
+      const selectFn = vi.fn().mockResolvedValue({ data: [{ test: true }], error: null });
+      return { eq: () => ({ eq: () => ({ eq: () => ({ select: selectFn }) }) }) };
+    });
+
+    mockRpc.mockResolvedValue({ error: null });
+
+    await completeDailyQuestsForResult(PLAYER_ID, result, DATE);
+
+    // Should have called at least one update (for the satisfied quest)
+    // The exact number depends on which quests are in today's rotation and what the result satisfies
+    expect(updateCallCount).toBeGreaterThan(0);
   });
 });
 

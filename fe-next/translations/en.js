@@ -11922,19 +11922,22 @@ const en = {
     "progress": "{{completed}}/{{total}}",
     "go": "GO",
     "done": "Done!",
+    "feed": {
+      "title": "Recent Wins",
+      "pvp": "{{name}} beat a human rival",
+      "grandSlam": "{{name}} cleared all 3 daily quests"
+    },
     "daily": {
-      "wordHunt": {
-        "name": "Daily Word Hunt",
-        "desc": "Play today's Daily Challenge"
-      },
-      "multiplayer": {
-        "name": "Multiplayer Match",
-        "desc": "Play a multiplayer game with others"
-      },
-      "brainDrills": {
-        "name": "Brain Workout",
-        "desc": "Complete a Brain Drill session"
-      }
+      "long_word_6": { "title": "Word Architect", "desc": "Find a word 6+ letters long" },
+      "long_word_7": { "title": "Lexical Giant", "desc": "Find a word 7+ letters long" },
+      "score_300": { "title": "Sharp Shooter", "desc": "Score 300+ in a single game" },
+      "score_500": { "title": "High Roller", "desc": "Score 500+ in a single game" },
+      "words_15": { "title": "Word Machine", "desc": "Find 15+ words in one game" },
+      "mp_win": { "title": "Champion", "desc": "Win a multiplayer match" },
+      "beat_human": { "title": "Rival Crusher", "desc": "Beat a real human opponent" },
+      "play_mp": { "title": "Enter the Arena", "desc": "Play a multiplayer match" },
+      "play_brain": { "title": "Brain Boost", "desc": "Finish a Brain Drill session" },
+      "play_wordhunt": { "title": "On the Hunt", "desc": "Play today's Word Hunt" }
     },
     "reward": {
       "xp": "+{{xp}} XP",

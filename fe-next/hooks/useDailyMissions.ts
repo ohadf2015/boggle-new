@@ -12,7 +12,7 @@
  * completions have been seen, and navigating back to the page doesn't re-fire.
  *
  * DB columns word_hunt/adventure/community_completed are SLOT containers (0/1/2).
- * getDailyQuestModes() determines which DailyQuestMode fills each slot per day.
+ * getDailyQuests() determines which condition-based quest fills each slot per day.
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
@@ -22,15 +22,21 @@ import { supabase } from '@/lib/supabase';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import {
-  getDailyQuestModes,
-  QUEST_MODE_HREFS,
-  type DailyQuestMode,
+  getDailyQuests,
+  type DailyQuest,
+  type QuestConditionType,
+  type QuestFamily,
 } from '@/shared/dailyQuestPool';
 
-export type MissionType = DailyQuestMode;
-
 export interface Mission {
-  type: MissionType;
+  slot: number;
+  questId: string;
+  type: QuestConditionType;
+  family: QuestFamily;
+  target: number;
+  titleKey: string;
+  descKey: string;
+  icon: string;
   completed: boolean;
   href: string;
 }
@@ -69,26 +75,24 @@ interface MissionRow {
 }
 
 function buildMissions(data: MissionRow | null): Mission[] {
-  const modes = getDailyQuestModes();
+  const quests = getDailyQuests();
   const d = data ?? {
     word_hunt_completed: false,
     adventure_completed: false,
     community_completed: false,
   };
-  return modes.map((mode, i) => ({
-    type: mode,
+  return quests.map((quest: DailyQuest, i) => ({
+    slot: i,
+    questId: quest.id,
+    type: quest.type,
+    family: quest.family,
+    target: quest.target,
+    titleKey: quest.titleKey,
+    descKey: quest.descKey,
+    icon: quest.icon,
     completed: d[SLOT_COLUMNS[i]],
-    href: QUEST_MODE_HREFS[mode],
+    href: quest.href,
   }));
-}
-
-function getModeToCelebration(): Record<DailyQuestMode, CelebrationKey> {
-  const modes = getDailyQuestModes();
-  const result = {} as Record<DailyQuestMode, CelebrationKey>;
-  modes.forEach((mode, i) => {
-    result[mode] = SLOT_CELEBRATION_KEYS[i];
-  });
-  return result;
 }
 
 async function requestCelebration(key: CelebrationKey): Promise<{ ok: boolean; newlyCelebrated: boolean }> {
@@ -215,16 +219,18 @@ export function useDailyMissions(): UseDailyMissionsReturn {
 
   useEffect(() => {
     if (loading) return;
-    const modeToCelebration = getModeToCelebration();
     for (const mission of missions) {
       if (!mission.completed) continue;
-      const celebrationKey = modeToCelebration[mission.type as DailyQuestMode];
+      const celebrationKey = SLOT_CELEBRATION_KEYS[mission.slot];
       if (!celebrationKey || celebratedRef.current[celebrationKey]) continue;
+      // PvP quests (beat a human) are the brag-worthy ones — louder confetti.
+      const isPvp = mission.family === 'pvp';
       void tryCelebrate(celebrationKey, () => {
         import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
           showQuestCompletionToast({
-            questName: t(`dailyMissions.${mission.type}`),
+            questName: t(mission.titleKey),
             xpReward: PER_QUEST_XP,
+            isPvpWin: isPvp,
             dedupKey: `mission:${celebrationKey}`,
             t,
             onComplete: playQuestCompleteSound,

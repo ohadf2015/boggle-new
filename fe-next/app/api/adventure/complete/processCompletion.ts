@@ -11,12 +11,12 @@
  * this file, the existing route.test.ts MUST still pass.
  */
 
-import { after } from 'next/server';
 import { getLevelFromXp } from '@/shared/utils/adventureXpUtils';
 import type { UpgradeState } from '@/lib/adventure/upgradeConfig';
 import { generateLevelLoot } from '@/lib/adventure/lootGenerator';
 import type { GameStats } from '@/shared/weeklyQuestTemplates';
 import { loadDictionaryWords } from '@/app/api/word-solver/dictionaryLoader';
+import { after } from 'next/server';
 import { MIN_TIME_PLAYED_SECONDS, type ValidatedCompletionData } from './validation';
 import {
   calcXpEarned,
@@ -26,11 +26,6 @@ import {
 } from './rewards';
 import { persistLootToInventory } from './lootInventory';
 import { updateWeeklyQuestProgress, type QuestUpdateResult } from './weeklyQuest';
-
-const lazyCompleteMission = async (playerId: string, type: 'adventure') => {
-  const { completeMission } = await import('@/backend/modules/dailyMissionsManager');
-  return completeMission(playerId, type);
-};
 
 // Same supabase shape the route uses (createClient() result). Kept loose
 // to avoid coupling on a specific @supabase/supabase-js version generic.
@@ -371,13 +366,8 @@ export async function processAdventureCompletion(
   const previousLevel = existingProgression?.player_level ?? 1;
   const leveledUp = newPlayerLevel > previousLevel;
 
-  after(async () => {
-    try {
-      await lazyCompleteMission(userId, 'adventure');
-    } catch (err) {
-      console.error('[ADVENTURE COMPLETE API] Daily mission update failed:', err);
-    }
-  });
+  // Adventure is a beta mode — it deliberately does NOT credit daily quest
+  // slots (those are condition-based public-mode quests now).
 
   const lootDrops = generateLevelLoot({
     world, level,

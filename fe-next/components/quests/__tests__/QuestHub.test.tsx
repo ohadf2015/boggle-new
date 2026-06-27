@@ -20,12 +20,44 @@ vi.mock('@/hooks/useDailyMissions', () => ({
   useDailyMissions: () => mockUseDailyMissions(),
 }));
 
-// Fix rotation to [wordHunt, multiplayer, brainDrills] for all tests
+// Fix rotation to specific quest IDs for all tests
 vi.mock('@/shared/dailyQuestPool', async () => {
   const actual = await vi.importActual<typeof import('@/shared/dailyQuestPool')>('@/shared/dailyQuestPool');
   return {
     ...actual,
-    getDailyQuestModes: vi.fn().mockReturnValue(['wordHunt', 'multiplayer', 'brainDrills']),
+    getDailyQuests: vi.fn().mockReturnValue([
+      {
+        id: 'long_word_6',
+        type: 'longWord',
+        target: 6,
+        family: 'skill',
+        titleKey: 'quests.daily.long_word_6.title',
+        descKey: 'quests.daily.long_word_6.desc',
+        href: '/daily',
+        icon: '📏',
+      },
+      {
+        id: 'mp_win',
+        type: 'mpWin',
+        target: 1,
+        family: 'pvp',
+        titleKey: 'quests.daily.mp_win.title',
+        descKey: 'quests.daily.mp_win.desc',
+        href: '/multiplayer',
+        icon: '👑',
+      },
+      {
+        id: 'play_brain',
+        type: 'playMode',
+        target: 1,
+        family: 'discovery',
+        titleKey: 'quests.daily.play_brain.title',
+        descKey: 'quests.daily.play_brain.desc',
+        href: '/brain',
+        icon: '🧠',
+        mode: 'brain',
+      },
+    ]),
   };
 });
 
@@ -45,12 +77,13 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'quests.grandSlamBonus': '+500 XP Bonus',
         'quests.completedAll': 'All done for today!',
         'quests.progress': `${params?.completed ?? 0}/${params?.total ?? 0}`,
-        'quests.daily.wordHunt.name': 'Daily Word Hunt',
-        'quests.daily.wordHunt.desc': 'Find 10+ words in today\'s Daily Challenge',
-        'quests.daily.multiplayer.name': 'Multiplayer Match',
-        'quests.daily.multiplayer.desc': 'Play a multiplayer game with others',
-        'quests.daily.brainDrills.name': 'Brain Workout',
-        'quests.daily.brainDrills.desc': 'Complete a Brain Drill session',
+        // New quest keys (condition-based, not mode-based)
+        'quests.daily.long_word_6.title': 'Six-Letter Wonder',
+        'quests.daily.long_word_6.desc': 'Find a 6-letter word',
+        'quests.daily.mp_win.title': 'Multiplayer Match',
+        'quests.daily.mp_win.desc': 'Win a multiplayer game',
+        'quests.daily.play_brain.title': 'Brain Workout',
+        'quests.daily.play_brain.desc': 'Play a Brain Drill session',
 
         'quests.reward.xp': `+${params?.xp ?? 0} XP`,
         'quests.reward.gold': `+${params?.gold ?? 0} Gold`,
@@ -104,9 +137,42 @@ import { QuestHub } from '../QuestHub';
 
 const defaultMissions = {
   missions: [
-    { type: 'wordHunt' as const, completed: false, href: '/daily' },
-    { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
-    { type: 'brainDrills' as const, completed: false, href: '/brain' },
+    {
+      slot: 0,
+      questId: 'long_word_6',
+      type: 'longWord' as const,
+      family: 'skill' as const,
+      target: 6,
+      titleKey: 'quests.daily.long_word_6.title',
+      descKey: 'quests.daily.long_word_6.desc',
+      icon: '📏',
+      completed: false,
+      href: '/daily',
+    },
+    {
+      slot: 1,
+      questId: 'mp_win',
+      type: 'mpWin' as const,
+      family: 'pvp' as const,
+      target: 1,
+      titleKey: 'quests.daily.mp_win.title',
+      descKey: 'quests.daily.mp_win.desc',
+      icon: '👑',
+      completed: false,
+      href: '/multiplayer',
+    },
+    {
+      slot: 2,
+      questId: 'play_brain',
+      type: 'playMode' as const,
+      family: 'discovery' as const,
+      target: 1,
+      titleKey: 'quests.daily.play_brain.title',
+      descKey: 'quests.daily.play_brain.desc',
+      icon: '🧠',
+      completed: false,
+      href: '/brain',
+    },
   ],
   completedCount: 0,
   isGrandSlam: false,
@@ -142,17 +208,17 @@ describe('QuestHub', () => {
 
   it('renders 3 daily quests from rotation', () => {
     render(<QuestHub />);
-    // rotation mock: [wordHunt, multiplayer, brainDrills]
-    expect(screen.getByText('Daily Word Hunt')).toBeInTheDocument();
+    // Mocked quests: [long_word_6, mp_win, play_brain]
+    expect(screen.getByText('Six-Letter Wonder')).toBeInTheDocument();
     expect(screen.getByText('Multiplayer Match')).toBeInTheDocument();
     expect(screen.getByText('Brain Workout')).toBeInTheDocument();
   });
 
   it('shows quest descriptions', () => {
     render(<QuestHub />);
-    expect(screen.getByText("Find 10+ words in today's Daily Challenge")).toBeInTheDocument();
-    expect(screen.getByText('Play a multiplayer game with others')).toBeInTheDocument();
-    expect(screen.getByText('Complete a Brain Drill session')).toBeInTheDocument();
+    expect(screen.getByText('Find a 6-letter word')).toBeInTheDocument();
+    expect(screen.getByText('Win a multiplayer game')).toBeInTheDocument();
+    expect(screen.getByText('Play a Brain Drill session')).toBeInTheDocument();
   });
 
   it('shows GO button for incomplete quests', () => {
@@ -165,9 +231,9 @@ describe('QuestHub', () => {
     mockUseDailyMissions.mockReturnValue({
       ...defaultMissions,
       missions: [
-        { type: 'wordHunt' as const, completed: true, href: '/daily' },
-        { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
-        { type: 'brainDrills' as const, completed: false, href: '/brain' },
+        { ...defaultMissions.missions[0], completed: true },
+        { ...defaultMissions.missions[1], completed: false },
+        { ...defaultMissions.missions[2], completed: false },
       ],
       completedCount: 1,
     });
@@ -181,9 +247,9 @@ describe('QuestHub', () => {
     mockUseDailyMissions.mockReturnValue({
       ...defaultMissions,
       missions: [
-        { type: 'wordHunt' as const, completed: true, href: '/daily' },
-        { type: 'multiplayer' as const, completed: true, href: '/multiplayer' },
-        { type: 'brainDrills' as const, completed: true, href: '/brain' },
+        { ...defaultMissions.missions[0], completed: true },
+        { ...defaultMissions.missions[1], completed: true },
+        { ...defaultMissions.missions[2], completed: true },
       ],
       completedCount: 3,
       isGrandSlam: true,
@@ -204,7 +270,7 @@ describe('QuestHub', () => {
     // QuestCard should prepend /${language} to hrefs
     const links = screen.getAllByRole('link');
     const hrefs = links.map(link => link.getAttribute('href'));
-    // rotation mock: [wordHunt, multiplayer, brainDrills]
+    // Mocked quests: [long_word_6, mp_win, play_brain]
     expect(hrefs).toContain('/en/daily');
     expect(hrefs).toContain('/en/multiplayer');
     expect(hrefs).toContain('/en/brain');
@@ -218,9 +284,9 @@ describe('QuestHub', () => {
     mockUseDailyMissions.mockReturnValue({
       ...defaultMissions,
       missions: [
-        { type: 'wordHunt' as const, completed: true, href: '/daily' },
-        { type: 'multiplayer' as const, completed: false, href: '/multiplayer' },
-        { type: 'brainDrills' as const, completed: false, href: '/brain' },
+        { ...defaultMissions.missions[0], completed: true },
+        { ...defaultMissions.missions[1], completed: false },
+        { ...defaultMissions.missions[2], completed: false },
       ],
       completedCount: 1,
     });
@@ -246,9 +312,9 @@ describe('QuestHub', () => {
     mockUseDailyMissions.mockReturnValue({
       ...defaultMissions,
       missions: [
-        { type: 'wordHunt' as const, completed: true, href: '/daily' },
-        { type: 'multiplayer' as const, completed: true, href: '/multiplayer' },
-        { type: 'brainDrills' as const, completed: true, href: '/brain' },
+        { ...defaultMissions.missions[0], completed: true },
+        { ...defaultMissions.missions[1], completed: true },
+        { ...defaultMissions.missions[2], completed: true },
       ],
       completedCount: 3,
       isGrandSlam: true,
@@ -285,9 +351,9 @@ describe('QuestHub', () => {
     mockUseDailyMissions.mockReturnValue({
       ...defaultMissions,
       missions: [
-        { type: 'wordHunt' as const, completed: true, href: '/daily' },
-        { type: 'multiplayer' as const, completed: true, href: '/multiplayer' },
-        { type: 'brainDrills' as const, completed: true, href: '/brain' },
+        { ...defaultMissions.missions[0], completed: true },
+        { ...defaultMissions.missions[1], completed: true },
+        { ...defaultMissions.missions[2], completed: true },
       ],
       completedCount: 3,
       isGrandSlam: true,

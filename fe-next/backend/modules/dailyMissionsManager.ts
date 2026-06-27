@@ -6,7 +6,12 @@
 
 import { getSupabase } from './supabase/client';
 import { awardCoinsServer } from '../services/economy/awardCoins';
-import { getDailyQuestModes, type DailyQuestMode } from '../../shared/dailyQuestPool';
+import {
+  getDailyQuests,
+  evaluateDailyQuests,
+  type QuestGameResult,
+} from '../../shared/dailyQuestPool';
+import { recordQuestAchievement } from './questFeedManager';
 // Static import (not dynamic await import) so vi.mock('../weeklyQuestManager')
 // deterministically intercepts it in tests — a dynamic import slipped past the
 // mock and ran the real getActiveQuest against an unmocked supabase, aborting
@@ -378,14 +383,48 @@ export async function markCelebrated(
 
 const SLOT_MISSION_TYPES: MissionType[] = ['word_hunt', 'adventure', 'community'];
 
-export async function completeMissionForMode(
+/**
+ * Evaluate today's 3 daily quests against a finished-game result and complete
+ * every slot whose condition the result satisfies. Called from every game-end
+ * seam (socket / word-hunt API / drills API) with whatever data that seam has.
+ *
+ * `completeMission` is idempotent (conditional false→true update + XP only on
+ * transition), so replaying a result never double-grants.
+ */
+export async function completeDailyQuestsForResult(
   playerId: string,
-  mode: DailyQuestMode,
+  result: QuestGameResult,
   date?: string,
 ): Promise<void> {
   const today = getTodayDate(date);
-  const modes = getDailyQuestModes(today);
-  const slotIndex = modes.indexOf(mode);
-  if (slotIndex === -1) return;
-  await completeMission(playerId, SLOT_MISSION_TYPES[slotIndex], today);
+  const quests = getDailyQuests(today);
+  const slots = evaluateDailyQuests(quests, result);
+  if (slots.length === 0) return;
+
+  // Snapshot BEFORE completing so we broadcast only FRESH completions — a
+  // repeated PvP win must not spam the social feed every game.
+  const before = await getDailyMissions(playerId, today);
+  const wasComplete = [before.wordHunt, before.adventure, before.community];
+
+  for (const slot of slots) {
+    await completeMission(playerId, SLOT_MISSION_TYPES[slot], today);
+    // Social proof: broadcast brag-worthy (PvP) quests on first completion.
+    if (!wasComplete[slot] && quests[slot].family === 'pvp') {
+      void recordQuestAchievement(playerId, quests[slot].id, 'pvp');
+    }
+  }
+
+  // Claim the Grand Slam bonus once all 3 are done. This is the canonical claim
+  // site — previously the only caller was a client socket handler that nothing
+  // emitted, so the 500 XP bonus never actually fired on real play.
+  const grandSlam = await checkAndClaimGrandSlam(playerId, today);
+  if (grandSlam.claimed && grandSlam.reward > 0) {
+    void recordQuestAchievement(playerId, 'grand_slam', 'grand_slam');
+    try {
+      const { updateQuestProgress } = await import('./weeklyQuestManager');
+      await updateQuestProgress(playerId, { dailyMissionDaysCompleted: 1 });
+    } catch {
+      // Non-critical: weekly streak credit is best-effort.
+    }
+  }
 }

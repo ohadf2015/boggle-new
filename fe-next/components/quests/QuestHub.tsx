@@ -10,15 +10,16 @@
  */
 
 import { useEffect, useMemo, useRef } from 'react';
-import { Trophy, Users, Gift, Sparkles, Target, Flame, Puzzle, Brain } from 'lucide-react';
+import { Trophy, Gift, Sparkles, Target, Flame, Puzzle, Swords, Compass } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDailyMissions } from '@/hooks/useDailyMissions';
-import { getDailyQuestModes, type DailyQuestMode } from '@/shared/dailyQuestPool';
+import type { QuestFamily } from '@/shared/dailyQuestPool';
 import { useWeeklyQuest } from '@/hooks/useWeeklyQuest';
 import { cn } from '@/lib/utils';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { QuestProgressRing } from './QuestProgressRing';
 import { QuestCard } from './QuestCard';
+import { QuestFeed } from './QuestFeed';
 import { useCoinsFromContext } from '@/contexts/CoinContext';
 import PartPreview from '@/components/avatar/PartPreview';
 import { DEFAULT_AVATAR_CONFIG } from '@/shared/types/customAvatar';
@@ -67,51 +68,17 @@ const grandSlamVariants = {
   },
 };
 
-// --- Quest configs ---
-interface DailyQuestConfig {
-  type: DailyQuestMode;
-  icon: React.ElementType;
-  nameKey: string;
-  descKey: string;
-  accentColor: string;
-  ringColor: string;
-  iconColorClass: string;
-  xpReward: number;
-}
-
-const ALL_QUEST_CONFIGS: Record<DailyQuestMode, DailyQuestConfig> = {
-  wordHunt: {
-    type: 'wordHunt',
-    icon: Trophy,
-    nameKey: 'quests.daily.wordHunt.name',
-    descKey: 'quests.daily.wordHunt.desc',
-    accentColor: 'bg-neo-yellow',
-    ringColor: 'stroke-neo-yellow',
-    iconColorClass: 'text-neo-yellow',
-    xpReward: 100,
-  },
-  multiplayer: {
-    type: 'multiplayer',
-    icon: Users,
-    nameKey: 'quests.daily.multiplayer.name',
-    descKey: 'quests.daily.multiplayer.desc',
-    accentColor: 'bg-neo-pink',
-    ringColor: 'stroke-neo-pink',
-    iconColorClass: 'text-neo-pink',
-    xpReward: 100,
-  },
-  brainDrills: {
-    type: 'brainDrills',
-    icon: Brain,
-    nameKey: 'quests.daily.brainDrills.name',
-    descKey: 'quests.daily.brainDrills.desc',
-    accentColor: 'bg-neo-purple',
-    ringColor: 'stroke-neo-purple',
-    iconColorClass: 'text-neo-purple',
-    xpReward: 100,
-  },
+// --- Quest family visual styles (color-coded by family, not mode) ---
+const FAMILY_STYLE: Record<
+  QuestFamily,
+  { icon: React.ElementType; accentColor: string; ringColor: string; iconColorClass: string }
+> = {
+  skill: { icon: Trophy, accentColor: 'bg-neo-cyan', ringColor: 'stroke-neo-cyan', iconColorClass: 'text-neo-cyan' },
+  pvp: { icon: Swords, accentColor: 'bg-neo-pink', ringColor: 'stroke-neo-pink', iconColorClass: 'text-neo-pink' },
+  discovery: { icon: Compass, accentColor: 'bg-neo-purple', ringColor: 'stroke-neo-purple', iconColorClass: 'text-neo-purple' },
 };
 
+const PER_QUEST_XP = 100;
 const TOTAL_DAILY = 3;
 
 // --- Weekly quest difficulty colors ---
@@ -451,16 +418,10 @@ export function QuestHub() {
     }
   }, [allComplete, loading, t, refreshCoins]);
 
-  // Today's 3 quest configs from the daily rotation
-  const dailyQuestConfigs = useMemo(
-    () => getDailyQuestModes().map((mode) => ALL_QUEST_CONFIGS[mode]),
-    [],
+  const dailyCompleted = useMemo(
+    () => missions.filter((m) => m.completed).length,
+    [missions],
   );
-
-  const dailyCompleted = useMemo(() => dailyQuestConfigs.filter((config) => {
-    const mission = missions.find((m) => m.type === config.type);
-    return mission?.completed ?? false;
-  }).length, [dailyQuestConfigs, missions]);
 
   if (loading) {
     return (
@@ -510,20 +471,20 @@ export function QuestHub() {
           initial="hidden"
           animate="visible"
         >
-          {dailyQuestConfigs.map((config) => {
-            const mission = missions.find((m) => m.type === config.type);
+          {missions.map((mission) => {
+            const style = FAMILY_STYLE[mission.family];
             return (
-              <AdaptiveMotion.div key={config.type} variants={cardVariants}>
+              <AdaptiveMotion.div key={mission.slot} variants={cardVariants}>
                 <QuestCard
-                  icon={config.icon}
-                  nameKey={config.nameKey}
-                  descKey={config.descKey}
-                  completed={mission?.completed ?? false}
-                  href={mission?.href ?? '/'}
-                  accentColor={config.accentColor}
-                  ringColor={config.ringColor}
-                  iconColorClass={config.iconColorClass}
-                  xpReward={config.xpReward}
+                  icon={style.icon}
+                  nameKey={mission.titleKey}
+                  descKey={mission.descKey}
+                  completed={mission.completed}
+                  href={mission.href}
+                  accentColor={style.accentColor}
+                  ringColor={style.ringColor}
+                  iconColorClass={style.iconColorClass}
+                  xpReward={PER_QUEST_XP}
                 />
               </AdaptiveMotion.div>
             );
@@ -542,6 +503,9 @@ export function QuestHub() {
           </AdaptiveMotion.div>
         )}
       </section>
+
+      {/* Social proof — recent brag-worthy wins across all players */}
+      <QuestFeed />
 
       {/* --- Weekly Quest Section — slides in after daily cards --- */}
       <AdaptiveMotion.div

@@ -40,9 +40,6 @@ import {
 
 import {
   getDailyMissions,
-  completeMission,
-  checkAndClaimGrandSlam,
-  type MissionType,
 } from '../modules/dailyMissionsManager';
 
 import {
@@ -57,10 +54,6 @@ import logger from '../utils/logger';
 
 interface ClaimChallengePayload {
   challengeId: string;
-}
-
-interface CompleteMissionPayload {
-  missionType: MissionType;
 }
 
 interface GameStats {
@@ -376,49 +369,11 @@ function registerEngagementHandlers(io: Server, socket: Socket): void {
     }
   });
 
-  socket.on('engagement:completeMission', async (data: CompleteMissionPayload) => {
-    if (!checkRateLimit(socket.id)) {
-      socket.emit('rateLimited');
-      return;
-    }
-
-    const playerId = getAuthedPlayerId(socket);
-    if (!playerId) {
-      safeEmit(socket, 'engagement:error', { message: 'Authentication required' });
-      return;
-    }
-
-    const { missionType } = data || {};
-    if (!missionType) {
-      safeEmit(socket, 'engagement:error', { message: 'Mission type required' });
-      return;
-    }
-
-    try {
-      const missions = await completeMission(playerId, missionType);
-      safeEmit(socket, 'engagement:dailyMissions', { missions });
-
-      if (missions.completedCount >= 3 && !missions.grandSlamClaimed) {
-        const grandSlam = await checkAndClaimGrandSlam(playerId);
-        if (grandSlam.claimed) {
-          safeEmit(socket, 'engagement:grandSlamClaimed', grandSlam);
-
-          try {
-            const { updateQuestProgress } = await import('../modules/weeklyQuestManager');
-            await updateQuestProgress(playerId, { dailyMissionDaysCompleted: 1 });
-          } catch {
-            // Non-critical
-          }
-        }
-      }
-
-      logger.info('ENGAGEMENT', `Mission ${missionType} completed by ${playerId}`);
-    } catch (error: unknown) {
-      const err = error as Error;
-      logger.error('ENGAGEMENT', `Error completing mission: ${err.message}`);
-      safeEmit(socket, 'engagement:error', { message: 'Failed to complete mission' });
-    }
-  });
+  // NOTE: a former `engagement:completeMission` socket handler let the CLIENT
+  // mark any daily slot complete by key. Under condition-based quests that was a
+  // bypass/exploit (complete arbitrary slots → Grand Slam XP with no gameplay)
+  // and nothing emitted it. Daily quests now complete ONLY server-side via
+  // completeDailyQuestsForResult at the game-end seams.
 
   // ==================== Full Engagement Status ====================
 
@@ -529,10 +484,11 @@ async function processGameEndEngagement(socket: Socket, playerId: string, gameSt
   if (!playerId) return;
 
   try {
-    // Mark community daily mission as complete (fire-and-forget)
-    completeMission(playerId, 'community').catch((err) => {
-      logger.error('ENGAGEMENT', `Daily mission update failed for ${playerId}: ${(err as Error).message}`);
-    });
+    // Daily quest completion is handled by the canonical seam
+    // (recordGameResultsToSupabase → completeDailyQuestsForResult), which has the
+    // full human roster + per-player words to evaluate condition-based quests.
+    // Do NOT hard-complete a slot here — that would credit whatever quest happens
+    // to occupy slot 2 regardless of whether its condition was met.
 
     // Update daily challenge progress
     const challengeUpdate = await updateChallengeProgress(playerId, gameStats);

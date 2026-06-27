@@ -7,92 +7,54 @@
  */
 
 import Link from 'next/link';
-import { Trophy, Users, Brain, Check, Gift } from 'lucide-react';
+import { Trophy, Swords, Compass, Check, Gift } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useDailyMissions, type MissionType } from '@/hooks/useDailyMissions';
-import { getDailyQuestModes, type DailyQuestMode } from '@/shared/dailyQuestPool';
+import { useDailyMissions, type Mission } from '@/hooks/useDailyMissions';
+import type { QuestFamily } from '@/shared/dailyQuestPool';
 import { cn } from '@/lib/utils';
 import { DailyAvatarPartCard } from '@/components/avatar/DailyAvatarPartCard';
 
-interface MissionConfig {
-  type: MissionType;
-  icon: React.ElementType;
-  dotColor: string;
-  translationKey: string;
-}
-
-const ALL_MISSION_CONFIGS: Record<DailyQuestMode, MissionConfig> = {
-  wordHunt: {
-    type: 'wordHunt',
-    icon: Trophy,
-    dotColor: 'bg-neo-yellow',
-    translationKey: 'dailyMissions.wordHunt',
-  },
-  multiplayer: {
-    type: 'multiplayer',
-    icon: Users,
-    dotColor: 'bg-neo-pink',
-    translationKey: 'dailyMissions.multiplayer',
-  },
-  brainDrills: {
-    type: 'brainDrills',
-    icon: Brain,
-    dotColor: 'bg-neo-purple',
-    translationKey: 'dailyMissions.brainDrills',
-  },
+// Visual identity per quest family (neo-brutalist color families).
+const FAMILY_STYLE: Record<QuestFamily, { icon: React.ElementType; dotColor: string }> = {
+  skill: { icon: Trophy, dotColor: 'bg-neo-cyan' },
+  pvp: { icon: Swords, dotColor: 'bg-neo-pink' },
+  discovery: { icon: Compass, dotColor: 'bg-neo-purple' },
 };
 
-const MISSION_CONFIGS: MissionConfig[] = getDailyQuestModes().map(
-  (mode) => ALL_MISSION_CONFIGS[mode],
-);
-
-function ProgressDots({
-  missions,
-  configs,
-}: {
-  missions: { type: MissionType; completed: boolean }[];
-  configs: MissionConfig[];
-}) {
+function ProgressDots({ missions }: { missions: Mission[] }) {
   return (
     <div className="flex gap-2" aria-hidden="true">
-      {configs.map((config) => {
-        const mission = missions.find((m) => m.type === config.type);
-        const completed = mission?.completed ?? false;
-        return (
-          <div
-            key={config.type}
-            className={cn(
-              'w-3 h-3 rounded-full border-2 border-neo-black transition-all duration-300',
-              completed ? config.dotColor : 'bg-neo-navy/50',
-              completed && 'shadow-[0_0_8px_rgba(255,255,255,0.3)]',
-            )}
-          />
-        );
-      })}
+      {missions.map((mission) => (
+        <div
+          key={mission.slot}
+          className={cn(
+            'w-3 h-3 rounded-full border-2 border-neo-black transition-all duration-300',
+            mission.completed ? FAMILY_STYLE[mission.family].dotColor : 'bg-neo-navy/50',
+            mission.completed && 'shadow-[0_0_8px_rgba(255,255,255,0.3)]',
+          )}
+        />
+      ))}
     </div>
   );
 }
 
 function MissionRow({
-  config,
-  completed,
-  href,
+  mission,
   t,
   language,
 }: {
-  config: MissionConfig;
-  completed: boolean;
-  href: string;
+  mission: Mission;
   t: (key: string) => string;
   language: string;
 }) {
-  const Icon = config.icon;
+  const { icon: Icon, dotColor } = FAMILY_STYLE[mission.family];
+  const { completed } = mission;
 
   return (
     <Link
       prefetch={false}
-      href={`/${language}${href}`}
+      href={`/${language}${mission.href}`}
       className={cn(
         'flex items-center gap-3 p-3 rounded-neo',
         'border-3 border-neo-black',
@@ -102,13 +64,13 @@ function MissionRow({
         'hover:-translate-y-0.5 active:translate-y-px active:shadow-hard-pressed',
         'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
       )}
-      aria-label={`${t(config.translationKey)}${completed ? ` - ${t('dailyMissions.completed')}` : ''}`}
+      aria-label={`${t(mission.titleKey)}${completed ? ` - ${t('dailyMissions.completed')}` : ''}`}
     >
       <div
         className={cn(
           'shrink-0 w-9 h-9 flex items-center justify-center rounded-neo',
           'border-2 border-neo-black',
-          completed ? 'bg-neo-lime/20' : config.dotColor,
+          completed ? 'bg-neo-lime/20' : dotColor,
         )}
       >
         <Icon
@@ -117,14 +79,21 @@ function MissionRow({
         />
       </div>
 
-      <span
-        className={cn(
-          'flex-1 font-neo-body text-sm font-semibold',
-          completed ? 'text-neo-white line-through' : 'text-neo-white',
+      <div className="flex-1 min-w-0">
+        <span
+          className={cn(
+            'block font-neo-body text-sm font-semibold truncate',
+            completed ? 'text-neo-white line-through' : 'text-neo-white',
+          )}
+        >
+          {t(mission.titleKey)}
+        </span>
+        {!completed && (
+          <span className="block font-neo-body text-xs text-neo-white/70 truncate">
+            {t(mission.descKey)}
+          </span>
         )}
-      >
-        {t(config.translationKey)}
-      </span>
+      </div>
 
       <div
         className={cn(
@@ -207,7 +176,7 @@ export function DailyMissionsHub() {
           <span className="font-neo-body text-xs text-neo-white">
             {t('dailyMissions.progress', { current: String(completedCount) })}
           </span>
-          <ProgressDots missions={missions} configs={MISSION_CONFIGS} />
+          <ProgressDots missions={missions} />
         </div>
       </div>
 
@@ -220,19 +189,14 @@ export function DailyMissionsHub() {
 
       {/* Mission rows */}
       <div className="space-y-2">
-        {MISSION_CONFIGS.map((config) => {
-          const mission = missions.find((m) => m.type === config.type);
-          return (
-            <MissionRow
-              key={config.type}
-              config={config}
-              completed={mission?.completed ?? false}
-              href={mission?.href ?? '/'}
-              t={t}
-              language={language}
-            />
-          );
-        })}
+        {missions.map((mission) => (
+          <MissionRow
+            key={mission.slot}
+            mission={mission}
+            t={t}
+            language={language}
+          />
+        ))}
       </div>
 
       <DailyAvatarPartCard />

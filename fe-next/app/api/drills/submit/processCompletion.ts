@@ -431,9 +431,17 @@ export async function processBrainDrillCompletion(
     lastSessionScore,
   );
 
-  // Fire-and-forget: mark brainDrills quest slot complete for today
-  import('@/backend/modules/dailyMissionsManager').then(({ completeMissionForMode }) => {
-    completeMissionForMode(userId, 'brainDrills').catch(() => {});
+  // Fire-and-forget: evaluate today's daily quests against this brain-drill result.
+  // mode 'brain' satisfies the brain-discovery quest; score/wordsFound can satisfy
+  // skill quests too.
+  Promise.all([
+    import('@/backend/modules/dailyMissionsManager'),
+    import('@/shared/dailyQuestPool'),
+  ]).then(([{ completeDailyQuestsForResult }, { emptyQuestResult }]) => {
+    completeDailyQuestsForResult(
+      userId,
+      emptyQuestResult({ mode: 'brain', score, wordsFound }),
+    ).catch(() => {});
   });
 
   return {

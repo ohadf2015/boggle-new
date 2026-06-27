@@ -27,7 +27,8 @@ import {
   isValidLanguage,
   computeWordHuntRetryScore,
 } from './utils';
-import { completeMissionForMode } from '../../modules/dailyMissionsManager';
+import { completeDailyQuestsForResult } from '../../modules/dailyMissionsManager';
+import { emptyQuestResult } from '../../../shared/dailyQuestPool';
 import { rerankSequential, dedupeByPlayerKeepBest, sortWordHuntRowsGlobally } from './leaderboardSort';
 import { updateDailyProfileStats } from './profileStats';
 import { updateLeaderboardEntry } from '../../modules/supabase/leaderboard';
@@ -323,13 +324,26 @@ router.post('/submit', async (req: WordHuntSubmitRequest, res: Response): Promis
     const isRetry = !!existing;
     logger.info('API', `[WordHunt Submit] SUCCESS: id=${(data as { id?: string })?.id}, playerType=${playerId ? 'authenticated' : 'guest'}, displayName=${displayName}, solved=${solved}, isRetry=${isRetry}, isPaidRetry=${isPaidRetry}, penalty=${penaltyApplied}`);
 
-    // Mark daily mission as complete for authenticated users (fire-and-forget).
-    // Credit the `wordHunt` *mode* — completeMissionForMode resolves which slot
-    // it occupies today. Writing a fixed column would credit whichever mode
-    // happens to fill that slot (e.g. multiplayer), showing the wrong quest done.
+    // Evaluate today's daily quests against this word-hunt result (fire-and-forget).
+    // mode 'word-hunt' satisfies the word-hunt discovery quest; the longest
+    // discovered word / count can satisfy skill quests too.
     if (playerId) {
-      completeMissionForMode(playerId, 'wordHunt').catch((err) => {
-        logger.error('API', `[WordHunt] Daily mission update failed for ${playerId}: ${(err as Error).message}`);
+      const discovered: Array<{ word?: string }> = Array.isArray(wordsDiscovered)
+        ? wordsDiscovered
+        : [];
+      const longestWordLength = discovered.reduce(
+        (m: number, w) => Math.max(m, w?.word?.length || 0),
+        0,
+      );
+      completeDailyQuestsForResult(
+        playerId,
+        emptyQuestResult({
+          mode: 'word-hunt',
+          longestWordLength,
+          wordsFound: discovered.length,
+        }),
+      ).catch((err) => {
+        logger.error('API', `[WordHunt] Daily quest update failed for ${playerId}: ${(err as Error).message}`);
       });
     }
 

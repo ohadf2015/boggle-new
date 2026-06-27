@@ -23,6 +23,8 @@ interface QuestCompletionOptions {
   goldReward?: number;
   isGrandSlam?: boolean;
   isAllComplete?: boolean;
+  /** PvP quest (beat a human) — the brag-worthy one, gets louder confetti. */
+  isPvpWin?: boolean;
   /**
    * Stable, translation-independent key for in-memory dedup within a short
    * window (defends against double-invocation from the same tab). Cross-device
@@ -53,6 +55,7 @@ export function showQuestCompletionToast({
   goldReward,
   isGrandSlam = false,
   isAllComplete = false,
+  isPvpWin = false,
   dedupKey,
   t = (k) => k,
   onComplete,
@@ -78,6 +81,8 @@ export function showQuestCompletionToast({
     fireFireworks(4, 2500);
   } else if (isGrandSlam) {
     fireFireworks(3, 2000);
+  } else if (isPvpWin) {
+    fireFireworks(2, 1500);
   } else {
     fireVictoryConfetti();
   }

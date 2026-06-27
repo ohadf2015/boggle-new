@@ -12631,18 +12631,51 @@ const ja = {
     "progress": "{{completed}}/{{total}}",
     "go": "GO",
     "done": "完了！",
+    "feed": {
+      "title": "最近の勝利",
+      "pvp": "{{name}} は本物のライバルを倒した",
+      "grandSlam": "{{name}} が3つ全ての日次クエストをクリアした"
+    },
     "daily": {
-      "wordHunt": {
-        "name": "デイリーワードハント",
-        "desc": "今日のデイリーチャレンジをプレイしよう"
+      "long_word_6": {
+        "title": "単語建築家",
+        "desc": "6文字以上の単語を見つけよう"
       },
-      "multiplayer": {
-        "name": "マルチプレイヤーマッチ",
-        "desc": "マルチプレイヤーゲームをプレイしよう"
+      "long_word_7": {
+        "title": "語彙の巨人",
+        "desc": "7文字以上の単語を見つけよう"
       },
-      "brainDrills": {
-        "name": "ブレインドリル",
-        "desc": "ブレインドリルセッションをクリアしよう"
+      "score_300": {
+        "title": "狙撃手",
+        "desc": "1ゲームで300点以上稼ぐ"
+      },
+      "score_500": {
+        "title": "ハイローラー",
+        "desc": "1ゲームで500点以上稼ぐ"
+      },
+      "words_15": {
+        "title": "言葉職人",
+        "desc": "1ゲームで15個以上の単語を見つけよう"
+      },
+      "mp_win": {
+        "title": "チャンピオン",
+        "desc": "マルチプレイマッチに勝利"
+      },
+      "beat_human": {
+        "title": "ライバル撃破",
+        "desc": "実際のプレイヤーを倒す"
+      },
+      "play_mp": {
+        "title": "アリーナ参戦",
+        "desc": "マルチプレイマッチをプレイ"
+      },
+      "play_brain": {
+        "title": "脳トレ",
+        "desc": "ブレインドリルを完了"
+      },
+      "play_wordhunt": {
+        "title": "狩猟開始",
+        "desc": "今日のワードハントをプレイ"
       }
     },
     "reward": {

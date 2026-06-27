@@ -12786,18 +12786,51 @@ const es = {
     "progress": "{{completed}}/{{total}}",
     "go": "IR",
     "done": "¡Hecho!",
+    "feed": {
+      "title": "Victorias Recientes",
+      "pvp": "{{name}} venció a un rival real",
+      "grandSlam": "{{name}} completó las 3 misiones diarias"
+    },
     "daily": {
-      "wordHunt": {
-        "name": "Caza de Palabras Diaria",
-        "desc": "Juega el desafío diario de hoy"
+      "long_word_6": {
+        "title": "Arquitecto de Palabras",
+        "desc": "Encuentra una palabra de 6+ letras"
       },
-      "multiplayer": {
-        "name": "Partida Multijugador",
+      "long_word_7": {
+        "title": "Coloso Léxico",
+        "desc": "Encuentra una palabra de 7+ letras"
+      },
+      "score_300": {
+        "title": "Tirador Certero",
+        "desc": "Anota 300+ puntos en un juego"
+      },
+      "score_500": {
+        "title": "Apostador Alto",
+        "desc": "Anota 500+ puntos en un juego"
+      },
+      "words_15": {
+        "title": "Máquina de Palabras",
+        "desc": "Encuentra 15+ palabras en un juego"
+      },
+      "mp_win": {
+        "title": "Campeón",
+        "desc": "Gana una partida multijugador"
+      },
+      "beat_human": {
+        "title": "Aplasta Rivales",
+        "desc": "Vence a un jugador real"
+      },
+      "play_mp": {
+        "title": "Entra a la Arena",
         "desc": "Juega una partida multijugador"
       },
-      "brainDrills": {
-        "name": "Entrenamiento Mental",
-        "desc": "Completa una sesión de Brain Drill"
+      "play_brain": {
+        "title": "Potencia Mental",
+        "desc": "Completa un entreno cerebral"
+      },
+      "play_wordhunt": {
+        "title": "¡A Cazar!",
+        "desc": "Juega la Caza de Palabras diaria"
       }
     },
     "reward": {
