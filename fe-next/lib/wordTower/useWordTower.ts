@@ -13,6 +13,7 @@ import type { Language } from '@/shared/types/game';
 import {
   initWordTowerState,
   validateTowerWord,
+  isTowerWordUsed,
   applyTowerWord,
   scrambleTray,
   spinWheelPaid,
@@ -115,6 +116,14 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
     case 'commitPlacement': {
       // Crane step 2: drop. Apply the held word scaled by the placement quality.
       if (!state.pendingWord) return state;
+      // Defense-in-depth against the "same word over and over" report: `hold`
+      // validated this word, but the drop is otherwise an unguarded apply. If the
+      // word was already placed by another path between hold and drop (or a stale
+      // drop re-fires), refuse it here so a duplicate can NEVER land twice. Normal
+      // play is unaffected — a freshly-held word is never in usedWords yet.
+      if (isTowerWordUsed(state.game, state.pendingWord)) {
+        return { ...state, pendingWord: null, lastError: 'duplicate', errorKey: state.errorKey + 1 };
+      }
       const { state: nextGame, result } = applyTowerWord(state.game, state.pendingWord, action.multiplier);
       return {
         ...state,

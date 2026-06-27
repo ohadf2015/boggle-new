@@ -54,6 +54,18 @@ export function useAutoDismiss(token: unknown, clear: () => void, ms: number): v
       };
       raf = requestAnimationFrame(tick);
     }
-    return () => { done = true; clearTimeout(timer); if (raf) cancelAnimationFrame(raf); };
+    // Backgrounding the app (app-switch / screen-lock) PAUSES both setTimeout and
+    // rAF, so a banner shown right before the switch can still be on screen on
+    // return — the founder's "notifications stay stuck" report, repro'd by
+    // photographing the game after coming back to it. The moment we're visible
+    // again, fire if the lifespan already elapsed while hidden.
+    const onVisible = () => { if (document.visibilityState === 'visible' && now() - start >= ms) fire(); };
+    if (typeof document !== 'undefined') document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      done = true;
+      clearTimeout(timer);
+      if (raf) cancelAnimationFrame(raf);
+      if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', onVisible);
+    };
   }, [token, ms]);
 }

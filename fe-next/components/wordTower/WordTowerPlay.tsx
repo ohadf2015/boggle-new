@@ -138,11 +138,20 @@ interface PlayProps {
 }
 
 function usePrefersReducedMotion(): boolean {
-  const ref = useRef(false);
+  // Reactive STATE, not a ref: a ref mutation never re-renders, so the old
+  // version silently reported `false` forever — reduced-motion users still got
+  // every tween (and the snappy exitMs=0 dismiss path was never taken). Reading
+  // it as state means the preference is actually honoured, and it tracks live
+  // toggles via the media-query change event.
+  const [reduced, setReduced] = useState(false);
   useEffect(() => {
-    ref.current = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener?.('change', onChange);
+    return () => mq.removeEventListener?.('change', onChange);
   }, []);
-  return ref.current;
+  return reduced;
 }
 
 export function WordTowerPlay({ language, isInDictionary, dictionary, initialGame, personalBestM, onOpenLeaderboard, rivals = [], daily = false, onDailyEngaged, perkSeed = '', onNewDailyBest }: PlayProps) {
@@ -920,7 +929,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           lime → gold "ON FIRE" so the streak reads at a glance. */}
       {crane.perfectStreak >= 2 && (
         <div
-          className={`pointer-events-none absolute start-2 top-[11%] z-[8] flex items-center gap-1 rounded-neo border-neo-thick border-black px-2 py-1 shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'} ${
+          className={`pointer-events-none absolute start-2 top-28 z-[8] flex items-center gap-1 rounded-neo border-neo-thick border-black px-2 py-1 shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'} ${
             crane.perfectStreak >= 5
               ? 'bg-gradient-to-b from-neo-yellow to-neo-orange text-black'
               : crane.perfectStreak >= 4
