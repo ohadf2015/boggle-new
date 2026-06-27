@@ -245,6 +245,40 @@ describe('useMultiplayerSignupNudge', () => {
       expect(result.current.activeNudge).toBe('toast');
     });
 
+    it('shows the toast only ONCE per session — never re-fires on later games', () => {
+      // PostHog 45d: mp_toast fired ~5.8x/user (one user 22x in a day) because the
+      // toast had no shown-marker (unlike the sheet) and the effect re-ran on every
+      // new game >= threshold. A once-per-session signup toast must not re-nag.
+      mockCopyVariant = 'control';
+      const { result } = renderHook(() =>
+        useMultiplayerSignupNudge({ isAuthenticated: false, isResultsVisible: true })
+      );
+
+      // Reach + dismiss sheet at game 2
+      act(() => { result.current.recordMpGame(); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2500); });
+      act(() => { result.current.dismissNudge(); });
+
+      // Game 3 → toast fires once
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+      expect(result.current.activeNudge).toBe('toast');
+
+      mockTrackGrowthEvent.mockClear();
+
+      // Games 4 and 5 → toast must NOT re-fire
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+      act(() => { result.current.recordMpGame(); });
+      act(() => { vi.advanceTimersByTime(2000); });
+
+      const toastEmits = mockTrackGrowthEvent.mock.calls.filter(
+        ([name, props]) => name === 'signup_prompt_shown' && (props as { trigger?: string })?.trigger === 'mp_toast',
+      );
+      expect(toastEmits).toHaveLength(0);
+    });
+
     it('suppresses toast under toast-disabled variant', () => {
       mockCopyVariant = 'toast-disabled';
       const { result } = renderHook(() =>

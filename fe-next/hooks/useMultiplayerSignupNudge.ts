@@ -20,6 +20,7 @@ import { trackGrowthEvent } from '@/utils/growthTracking';
 // Session-scoped MP game counter (separate from global guest stats)
 const MP_SESSION_GAMES_KEY = 'boggle_mp_session_games';
 const MP_NUDGE_SHEET_SHOWN_KEY = 'boggle_mp_nudge_sheet_shown';
+const MP_NUDGE_TOAST_SHOWN_KEY = 'boggle_mp_nudge_toast_shown';
 
 export type NudgeType = 'sheet' | 'toast' | 'pulse' | null;
 
@@ -67,6 +68,16 @@ function wasSheetShown(): boolean {
 function markSheetShown(): void {
   if (typeof window === 'undefined') return;
   sessionStorage.setItem(MP_NUDGE_SHEET_SHOWN_KEY, 'true');
+}
+
+function wasToastShown(): boolean {
+  if (typeof window === 'undefined') return false;
+  return sessionStorage.getItem(MP_NUDGE_TOAST_SHOWN_KEY) === 'true';
+}
+
+function markToastShown(): void {
+  if (typeof window === 'undefined') return;
+  sessionStorage.setItem(MP_NUDGE_TOAST_SHOWN_KEY, 'true');
 }
 
 export function useMultiplayerSignupNudge({
@@ -153,10 +164,15 @@ export function useMultiplayerSignupNudge({
       return () => clearTimeout(timer);
     }
 
-    // Toast: show on game 3+ (after sheet was already shown/dismissed).
+    // Toast: show ONCE on game 3+ (after sheet was already shown/dismissed).
     // Suppressed under `toast-disabled` variant — see copyVariant above.
-    if (toastEnabled && mpGames >= toastThreshold && wasSheetShown()) {
+    // `!wasToastShown()` caps it to one per session — without it the effect
+    // re-ran on every game >= threshold and re-fired the toast (~5.8x/user, one
+    // user 22x in a day; PostHog 45d). Marked at SHOW time, not dismiss time, so
+    // a reload-without-dismiss can't re-pop it (recurring-pitfalls Class 1).
+    if (toastEnabled && mpGames >= toastThreshold && wasSheetShown() && !wasToastShown()) {
       const timer = setTimeout(() => {
+        markToastShown();
         setActiveNudge('toast');
         trackGrowthEvent('signup_prompt_shown', {
           trigger: 'mp_toast',
