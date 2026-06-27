@@ -8,6 +8,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from "@/components/ads";
+import { buildEmbedSnippet } from '../embed/word-of-the-day/embedSnippet';
 import type { WordEntry } from './content';
 
 const difficultyColors: Record<string, string> = {
@@ -34,6 +35,9 @@ const sectionLabels: Record<string, Record<string, string>> = {
   share: { en: 'Share', he: 'שתפו', sv: 'Dela', ja: 'シェア', es: 'Compartir' },
   copied: { en: 'Copied!', he: 'הועתק!', sv: 'Kopierat!', ja: 'コピー済み！', es: 'Copiado!' },
   partOfSpeech: { en: 'Part of Speech', he: 'חלק דיבור', sv: 'Ordklass', ja: '品詞', es: 'Categoria' },
+  embedWidget: { en: 'Embed this widget', he: 'הטמיעו את הווידג\'ט', sv: 'Bädda in widgeten', ja: 'ウィジェットを埋め込む', es: 'Inserta este widget' },
+  embedSnippet: { en: 'Copy the code below to embed this Word of the Day widget on your website', he: 'העתיקו את הקוד הבא להטמעת הווידג\'ט על האתר שלכם', sv: 'Kopiera koden nedan för att bädda in denna widget på din webbplats', ja: 'このウィジェットをあなたのWebサイトに埋め込むには、下のコードをコピーしてください', es: 'Copie el código a continuación para insertar este widget en su sitio web' },
+  embedCopyButton: { en: 'Copy Code', he: 'העתק קוד', sv: 'Kopiera Kod', ja: 'コードをコピー', es: 'Copiar Código' },
 };
 
 function label(key: string, locale: string): string {
@@ -50,6 +54,7 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
   const { language } = useLanguage();
   const lang = locale || language || 'en';
   const [copied, setCopied] = useState(false);
+  const [embedCopied, setEmbedCopied] = useState(false);
 
   const todayWord = useMemo(() => {
     if (featuredWord) return featuredWord;
@@ -71,6 +76,17 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
       // Fallback: do nothing
     }
   }, [todayWord, lang]);
+
+  const handleEmbedCopy = useCallback(async () => {
+    const snippet = buildEmbedSnippet(lang);
+    try {
+      await navigator.clipboard.writeText(snippet);
+      setEmbedCopied(true);
+      setTimeout(() => setEmbedCopied(false), 2000);
+    } catch {
+      // Fallback: do nothing
+    }
+  }, [lang]);
 
   return (
     <>
@@ -170,6 +186,31 @@ export default function WordOfTheDayClient({ allWords, featuredWord }: Props) {
                 {copied ? label('copied', lang) : label('share', lang)}
               </button>
             </div>
+
+            {/* Embed Widget Section */}
+            <section className="mt-6 pt-6 border-t-2 border-neo-black">
+              <h3 className="font-neo-display text-sm font-bold text-neo-pink uppercase tracking-wide mb-3">
+                {label('embedWidget', lang)}
+              </h3>
+              <p className="text-sm text-neo-white mb-3">
+                {label('embedSnippet', lang)}
+              </p>
+              <div className="bg-neo-navy-elevated border-2 border-neo-black rounded-neo p-3 mb-3">
+                <textarea
+                  readOnly
+                  value={buildEmbedSnippet(lang)}
+                  className="w-full bg-transparent text-neo-cream font-mono text-xs p-0 border-0 outline-none resize-none"
+                  rows={4}
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleEmbedCopy}
+                className="inline-flex items-center px-4 py-2 font-neo-display font-bold text-xs uppercase border-2 border-neo-black rounded-neo bg-neo-pink text-white shadow-hard hover:shadow-hard-pressed hover:translate-x-[2px] hover:translate-y-[2px] transition-all duration-100"
+              >
+                {embedCopied ? label('copied', lang) : label('embedCopyButton', lang)}
+              </button>
+            </section>
           </m.article>
 
           {/* Ad between sections */}

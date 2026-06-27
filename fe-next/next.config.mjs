@@ -402,8 +402,11 @@ const nextConfig = {
         ],
       },
       // Security headers for all paths
+      // NOTE: /:locale/embed/* is EXCLUDED here and gets its own permissive
+      // frame-ancestors block below. Browsers enforce the INTERSECTION of all
+      // CSP frame-ancestors, so embed must receive exactly ONE (permissive) CSP.
       {
-        source: '/:path*',
+        source: '/:path((?!(?:en|he|sv|ja|es)/embed/).*)',
         headers: [
           // Block indexing for preview/staging environments via X-Robots-Tag header
           ...(isPreviewEnvironment ? [{
@@ -447,6 +450,21 @@ const nextConfig = {
               ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://pagead2.googlesyndication.com https://*.googleadservices.com https://ep2.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data: https://*.supabase.co; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com https://accounts.google.com/gsi/ wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://accounts.google.com/gsi/; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com;"
               // Default: SDK auto-detection enabled — allow CrazyGames SDK script + ads + iframe embedding
               : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://cdn.lgrckt-in.com https://cdn.lr-in-prod.com https://cdn.lr-ingest.com https://sdk.crazygames.com https://*.crazygames.com https://pagead2.googlesyndication.com https://*.googleadservices.com https://ep2.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com https://accounts.google.com/gsi/client; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://accounts.google.com/gsi/style; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: https: blob:; media-src 'self' data: https://*.supabase.co; connect-src 'self' https://*.supabase.co https://*.sentry.io https://*.logrocket.io https://*.lr-in-prod.com https://*.lgrckt-in.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://*.googleadservices.com https://*.adtrafficquality.google https://*.posthog.com https://eu.i.posthog.com https://accounts.google.com/gsi/ wss: ws:; worker-src 'self' blob:; frame-src 'self' https://*.crazygames.com https://*.googlesyndication.com https://*.doubleclick.net https://googleads.g.doubleclick.net https://accounts.google.com/gsi/; frame-ancestors 'self' https://*.crazygames.com https://crazygames.com https://poki.com https://www.poki.com;",
+          },
+        ],
+      },
+      // Embeddable widget routes — framed by ANY origin (backlink/distribution widget).
+      // Deliberately excluded from the global block above so ONLY this permissive
+      // frame-ancestors applies. Read-only static word card → negligible clickjack risk.
+      {
+        source: '/:locale(en|he|sv|ja|es)/embed/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self'; frame-ancestors *;",
           },
         ],
       },
