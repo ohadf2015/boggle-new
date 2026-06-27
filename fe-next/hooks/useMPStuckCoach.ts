@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import {
   nextStuckStage,
@@ -174,5 +174,12 @@ export function useMPStuckCoach(args: UseMPStuckCoachArgs): MPStuckCoach {
     [resolve]
   );
 
-  return { stage, visible, markTap, markDragStart, markSubmit, markAccepted, dismiss };
+  // Stable reference: consumers (InGameScreen) put this object in callback deps
+  // that flow to the grid's onWordChange. A fresh literal each render breaks
+  // GridComponent's memo → re-renders all 16 tiles on every parent render.
+  // visible derives from stage; methods are already useCallback-stable.
+  return useMemo(
+    () => ({ stage, visible, markTap, markDragStart, markSubmit, markAccepted, dismiss }),
+    [stage, visible, markTap, markDragStart, markSubmit, markAccepted, dismiss]
+  );
 }

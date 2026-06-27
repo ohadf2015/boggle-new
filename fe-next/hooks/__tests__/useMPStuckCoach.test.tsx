@@ -151,4 +151,16 @@ describe('useMPStuckCoach', () => {
     });
     expect(result.current.visible).toBe(false);
   });
+
+  // Perf guard: the returned object feeds callback deps in InGameScreen
+  // (handleWordChange → grid onWordChange). A fresh object literal every render
+  // breaks GridComponent's memo and re-renders all 16 tiles on every parent
+  // render (per-second timer tick, every MP opponent update). Keep it stable
+  // while stage/visible are unchanged.
+  it('returns a stable reference across renders when stage is unchanged', () => {
+    const { result, rerender } = renderHook(() => useMPStuckCoach(args()));
+    const first = result.current;
+    rerender();
+    expect(result.current).toBe(first);
+  });
 });
