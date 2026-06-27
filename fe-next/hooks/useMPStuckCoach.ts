@@ -174,10 +174,8 @@ export function useMPStuckCoach(args: UseMPStuckCoachArgs): MPStuckCoach {
     [resolve]
   );
 
-  // Stable reference: consumers (InGameScreen) put this object in callback deps
-  // that flow to the grid's onWordChange. A fresh literal each render breaks
-  // GridComponent's memo → re-renders all 16 tiles on every parent render.
-  // visible derives from stage; methods are already useCallback-stable.
+  // Stable ref: feeds InGameScreen callback deps → grid onWordChange. A fresh
+  // literal each render would break GridComponent's memo on every timer tick.
   return useMemo(
     () => ({ stage, visible, markTap, markDragStart, markSubmit, markAccepted, dismiss }),
     [stage, visible, markTap, markDragStart, markSubmit, markAccepted, dismiss]

@@ -75,10 +75,8 @@ export function useTapToDragGuidance(): UseTapToDragGuidanceReturn {
     }
   }, [showDragTutorial]);
 
-  // Stable reference: consumed as a dep of handleSingleTap in InGameScreen,
-  // which flows to the grid as onSingleTapDetected. A fresh literal each render
-  // breaks GridComponent's memo on every parent render (1/s timer tick).
-  // Methods are useCallback-stable; state values change only on tutorial show/hide.
+  // Stable ref: feeds handleSingleTap → grid onSingleTapDetected. A fresh literal
+  // each render would break GridComponent's memo on every timer tick.
   return useMemo(
     () => ({
       showDragTutorial,
