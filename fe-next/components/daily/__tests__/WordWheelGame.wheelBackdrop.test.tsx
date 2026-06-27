@@ -108,5 +108,18 @@ describe('WordWheelGame — wheel backdrop depth', () => {
     // imperceptible. Lime + cyan tint at minimum.
     expect(backdrop!.style.background).toContain('rgba(191,255,0');
     expect(backdrop!.style.background).toContain('rgba(0,255,255');
+
+    // Perceptibility floor. Single-digit alphas (the old 0.08 lime / 0.05 cyan)
+    // bloom over a near-black disc and vanish on mobile OLED — the recurring
+    // "imperceptible delta" regression where the disc kept reading flat black.
+    // The glow must be strong enough to actually register as colored depth.
+    const limeAlpha = Number(
+      backdrop!.style.background.match(/rgba\(191,255,0,\s*([0-9.]+)/)?.[1],
+    );
+    const cyanAlpha = Number(
+      backdrop!.style.background.match(/rgba\(0,255,255,\s*([0-9.]+)/)?.[1],
+    );
+    expect(limeAlpha).toBeGreaterThanOrEqual(0.18);
+    expect(cyanAlpha).toBeGreaterThanOrEqual(0.1);
   });
 });

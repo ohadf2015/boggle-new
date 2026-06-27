@@ -131,5 +131,13 @@ describe('WordWheelChallenge background', () => {
     // instead of leaning on the play-only pixi bokeh. Lime + cyan at minimum.
     expect(bg).toContain('rgba(191,255,0'); // lime glow
     expect(bg).toContain('rgba(0,255,255'); // cyan glow
+
+    // Perceptibility floor. The first pass used ~0.07–0.10 alphas, which over a
+    // navy→abyss vignette still read as flat black on-device. The glows must be
+    // strong enough to give genuine ambient color, not an imperceptible tint.
+    const limeAlpha = Number(bg.match(/rgba\(191,255,0,\s*([0-9.]+)/)?.[1]);
+    const cyanAlpha = Number(bg.match(/rgba\(0,255,255,\s*([0-9.]+)/)?.[1]);
+    expect(limeAlpha).toBeGreaterThanOrEqual(0.16);
+    expect(cyanAlpha).toBeGreaterThanOrEqual(0.12);
   });
 });

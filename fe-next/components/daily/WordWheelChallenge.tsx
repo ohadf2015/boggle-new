@@ -96,9 +96,9 @@ const WORD_WHEEL_DURATION = 120; // 2 minutes
 // Always-on + phase-independent → genuine ambient feel on ready/playing/results
 // without depending on the pixi layer.
 const STAGE_AMBIENT_BG =
-  'radial-gradient(125% 75% at 50% -8%, rgba(191,255,0,0.10) 0%, transparent 55%),' +
-  'radial-gradient(115% 70% at 50% 108%, rgba(0,255,255,0.08) 0%, transparent 55%),' +
-  'radial-gradient(70% 55% at 85% 82%, rgba(139,92,246,0.07) 0%, transparent 60%),' +
+  'radial-gradient(125% 75% at 50% -8%, rgba(191,255,0,0.18) 0%, transparent 58%),' +
+  'radial-gradient(115% 70% at 50% 108%, rgba(0,255,255,0.14) 0%, transparent 58%),' +
+  'radial-gradient(70% 55% at 85% 82%, rgba(139,92,246,0.12) 0%, transparent 62%),' +
   'radial-gradient(circle at 50% 42%, var(--neo-navy-elevated) 0%, var(--neo-navy) 55%, var(--neo-abyss) 100%)';
 
 // ==========================================
