@@ -90,6 +90,14 @@ export async function GET(
       'content-type': 'text/html; charset=utf-8',
       // Refresh daily; widget content rotates per day.
       'cache-control': 'public, max-age=3600, stale-while-revalidate=86400',
+      'x-content-type-options': 'nosniff',
+      // Embeddability is the WHOLE point — own it here, in code we can unit-test,
+      // not in next.config (whose `headers()` application to Route Handlers is the
+      // untested assumption). frame-ancestors * = any origin may frame this card.
+      // Defense in depth: /embed/* is also excluded from the global CSP block in
+      // next.config.mjs, so no second (restrictive) CSP intersects this one.
+      'content-security-policy':
+        "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self'; frame-ancestors *;",
     },
   });
 }

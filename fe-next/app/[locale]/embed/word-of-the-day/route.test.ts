@@ -23,6 +23,14 @@ describe('embed word-of-the-day route handler', () => {
     expect(body.match(/<html/g)?.length).toBe(1);
   });
 
+  it('serves frame-ancestors * so ANY origin can embed it (the whole point)', async () => {
+    const res = await call('en');
+    const csp = res.headers.get('content-security-policy') || '';
+    expect(csp).toContain('frame-ancestors *');
+    // Must NOT carry a restrictive frame-ancestors that would block third-party framing.
+    expect(csp).not.toMatch(/frame-ancestors[^;]*crazygames/);
+  });
+
   it('renders today\'s word for the locale', async () => {
     const body = await (await call('en')).text();
     const word = getRotatedTodayWord('en', today());

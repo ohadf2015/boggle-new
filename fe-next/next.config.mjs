@@ -454,18 +454,17 @@ const nextConfig = {
         ],
       },
       // Embeddable widget routes — framed by ANY origin (backlink/distribution widget).
-      // Deliberately excluded from the global block above so ONLY this permissive
-      // frame-ancestors applies. Read-only static word card → negligible clickjack risk.
+      // Deliberately excluded from the global block above so its restrictive CSP never
+      // intersects these. The permissive `frame-ancestors *` CSP is set directly on the
+      // Route Handler Response (app/[locale]/embed/word-of-the-day/route.ts) where it's
+      // unit-tested — NOT here, since headers() application to Route Handlers is the
+      // uncertain part. This entry only carries the non-CSP security headers.
       {
         source: '/:locale(en|he|sv|ja|es)/embed/:path*',
         headers: [
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-          {
-            key: 'Content-Security-Policy',
-            value: "default-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; script-src 'self'; frame-ancestors *;",
-          },
         ],
       },
     ];
