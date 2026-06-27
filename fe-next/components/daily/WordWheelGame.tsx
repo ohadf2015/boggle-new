@@ -53,6 +53,17 @@ interface WordWheelGameProps {
   onWordFound?: (word: string, wordsFound: string[]) => void;
   /** Desktop layout (1024w + 700h) — 3-column grid with ranks/wheel/words. */
   isDesktop?: boolean;
+  /**
+   * The puzzle date being played (YYYY-MM-DD). Drives which day's leaderboard
+   * the live rival pill reads from — on a catch-up replay this must be the
+   * PAST date, not today, or the player sees today's rivals on yesterday's
+   * board. Defaults to today when omitted.
+   */
+  puzzleDate?: string;
+  /** Current player id — filtered out of rivals so a replay can't show "you" as the player to beat. */
+  currentPlayerId?: string | null;
+  /** Current guest fingerprint — same self-filter for unauthenticated players. */
+  currentGuestFingerprint?: string | null;
 }
 
 
@@ -62,11 +73,13 @@ interface RivalScore {
   avatarImage: string | null;
   customAvatar: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   playerId: string | null;
+  guestFingerprint: string | null;
 }
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
   hideCompetitive = false, onWordFound, isDesktop = false,
+  puzzleDate, currentPlayerId = null, currentGuestFingerprint = null,
 }) => {
   const { t } = useLanguage();
   // `useReducedMotion` returns `true` when the user has set the OS-level
@@ -124,20 +137,31 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     let interval: ReturnType<typeof setInterval> | null = null;
     const fetchRivals = async () => {
       try {
-        const today = new Date().toISOString().split('T')[0];
-        const res = await fetch(`/api/daily-challenge/word-wheel/leaderboard/${today}/${language}?limit=100`);
+        // Scope to the day being played, not always today — on a catch-up replay
+        // `puzzleDate` is a past date and today's board would be the wrong rivals.
+        const date = puzzleDate || new Date().toISOString().split('T')[0];
+        const res = await fetch(`/api/daily-challenge/word-wheel/leaderboard/${date}/${language}?limit=100`);
         if (!res.ok) return;
         const json = await res.json();
         if (cancelled) return;
         const list: RivalScore[] = (json.data || [])
           .filter((r: { score?: number; display_name?: string }) => typeof r.score === 'number' && r.display_name)
-          .map((r: { score: number; display_name: string; avatar_image?: string | null; custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null; player_id?: string | null }) => ({
+          .map((r: { score: number; display_name: string; avatar_image?: string | null; custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null; player_id?: string | null; guest_fingerprint?: string | null }) => ({
             name: r.display_name,
             score: r.score,
             avatarImage: r.avatar_image ?? null,
             customAvatar: r.custom_avatar ?? null,
             playerId: r.player_id ?? null,
+            guestFingerprint: r.guest_fingerprint ?? null,
           }))
+          // Never surface the current player as their own rival. On a replay the
+          // player's prior score already sits on that day's board, so without this
+          // they'd see themselves in the "player to beat" pill.
+          .filter((r: RivalScore) => {
+            if (currentPlayerId) return r.playerId !== currentPlayerId;
+            if (currentGuestFingerprint) return r.guestFingerprint !== currentGuestFingerprint;
+            return true;
+          })
           .sort((a: RivalScore, b: RivalScore) => a.score - b.score);
         setRivals(list);
       } catch { /* leaderboard is best-effort */ }
@@ -170,7 +194,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         document.removeEventListener('visibilitychange', handleVisibility);
       }
     };
-  }, [language, hideCompetitive]);
+  }, [language, hideCompetitive, puzzleDate, currentPlayerId, currentGuestFingerprint]);
 
   // Closest rival above me + pass detection
   const nextRival = useMemo(
@@ -834,7 +858,11 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           gap to preserve vertical budget). */}
       <m.div
         data-testid="word-builder"
-        className="relative w-full mt-2 short:mt-1 h-[52px] sm:h-[72px] short:h-[44px] flex items-center justify-center"
+        // z-20 lifts the whole builder (and its `-bottom-7` feedback toast) above
+        // the next-rival pill that sits in the reserved slot directly below — the
+        // toast hangs into that slot's band, so without this the error/score toast
+        // renders partially behind the rival avatar.
+        className="relative z-20 w-full mt-2 short:mt-1 h-[52px] sm:h-[72px] short:h-[44px] flex items-center justify-center"
         animate={
           wordBuilderShake
             ? { x: [-4, 4, -3, 3, -1, 0] }
