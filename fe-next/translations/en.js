@@ -4660,6 +4660,15 @@ const en = {
     "loginRequired": "Sign in to view your referral dashboard.",
     "shareText": "Join me on LexiClash! Use my referral code: {code}"
   },
+  "playGames": {
+    "title": "Play Games",
+    "connectPrompt": "Hook up Google Play Games to bank your achievements and storm the leaderboards.",
+    "connect": "Connect",
+    "connecting": "Connecting…",
+    "signedIn": "You're connected",
+    "achievements": "Achievements",
+    "leaderboards": "Leaderboards"
+  },
   "coins": {
     "title": "Coins & Rewards",
     "description": "Earn coins by playing games, winning matches, and unlocking achievements. Use them to collect special items!",

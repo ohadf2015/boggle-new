@@ -43,6 +43,7 @@ import { CosmeticCollection } from '@/components/cosmetics/CosmeticCollection';
 import { SeasonTrophyCase } from '@/components/seasons/SeasonTrophyCase';
 import { SeasonRankCard } from '@/components/seasons/SeasonRankCard';
 import { ProfileStyleCard } from '@/components/playerStyle/ProfileStyleCard';
+import { PlayGamesCard } from '@/components/playGames/PlayGamesCard';
 import { useSeasonBadges } from '@/hooks/useSeasonBadges';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { useEngagementStatus } from '@/hooks/useEngagementStatus';
@@ -380,6 +381,7 @@ export default function ProfilePageClient(): React.JSX.Element {
                 transition={{ duration: 0.2 }}
               >
                 <ProfileAchievements profile={profile} isDarkMode={isDarkMode} />
+                <div className="mt-4"><PlayGamesCard /></div>
               </m.div>
             )}
 
@@ -468,6 +470,9 @@ export default function ProfilePageClient(): React.JSX.Element {
 
           {/* 6. Achievements */}
           <ProfileAchievements profile={profile} isDarkMode={isDarkMode} delay={0.3} />
+
+          {/* 6b. Play Games (Android-only — self-hides off Android via the hook) */}
+          <PlayGamesCard delay={0.32} />
 
           {/* 7a. Current-season rank */}
           {user?.id && <div className="mb-4"><SeasonRankCard playerId={user.id} /></div>}

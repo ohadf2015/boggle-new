@@ -4763,6 +4763,15 @@ const he = {
     "loginRequired": "התחבר כדי לצפות בלוח ההפניות שלך.",
     "shareText": "הצטרף אליי ב-LexiClash! השתמש בקוד ההפניה שלי: {code}"
   },
+  "playGames": {
+    "title": "Play Games",
+    "connectPrompt": "מתחברים ל-Google Play Games וצוברים הישגים, מטפסים בטבלאות המובילים.",
+    "connect": "התחברות",
+    "connecting": "מתחבר…",
+    "signedIn": "אתה מחובר",
+    "achievements": "הישגים",
+    "leaderboards": "טבלאות מובילים"
+  },
   "coins": {
     "title": "מטבעות ופרסים",
     "description": "צבור מטבעות במשחקים, ניצחונות והישגים. השתמש בהם לאיסוף פריטים מיוחדים!",

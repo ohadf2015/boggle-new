@@ -4253,6 +4253,15 @@ const es = {
     "loginRequired": "Inicia sesión para ver tu panel de referidos.",
     "shareText": "¡Únete a LexiClash! Usa mi código: {code}"
   },
+  "playGames": {
+    "title": "Play Juegos",
+    "connectPrompt": "Conecta Google Play Juegos para sumar logros y arrasar en las clasificaciones.",
+    "connect": "Conectar",
+    "connecting": "Conectando…",
+    "signedIn": "Estás conectado",
+    "achievements": "Logros",
+    "leaderboards": "Clasificaciones"
+  },
   "coins": {
     "title": "Monedas y Recompensas",
     "description": "Gana monedas jugando, ganando partidas y desbloqueando logros. ¡Úsalas para coleccionar artículos especiales!",

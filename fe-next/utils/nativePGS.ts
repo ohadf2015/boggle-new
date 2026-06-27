@@ -40,11 +40,24 @@ export interface PlayGamesSignInResult extends PlayGamesResult {
 
 let plugin: CapacitorGameConnectPlugin | null = null;
 let initialized = false;
+/**
+ * Cached result of the last successful Play Games sign-in. Populated by
+ * `signInPlayGames()` (whether triggered silently at app-start by
+ * `NativePGSInitializer` or explicitly from the profile card) so UI can show
+ * "connected" state without re-prompting. Null until a sign-in succeeds.
+ */
+let lastSignIn: PlayGamesSignInResult | null = null;
 
 /** Reset module state — test-only. */
 export function __resetForTesting(): void {
   plugin = null;
   initialized = false;
+  lastSignIn = null;
+}
+
+/** The cached successful sign-in (player id/name), or null if never signed in. */
+export function getCachedPlayGamesSignIn(): PlayGamesSignInResult | null {
+  return lastSignIn;
 }
 
 function errMessage(error: unknown): string {
@@ -110,7 +123,8 @@ export async function signInPlayGames(): Promise<PlayGamesSignInResult> {
   try {
     const { player_id, player_name } = await p.signIn();
     logger.log('[PGS] Signed in:', player_id);
-    return { success: true, playerId: player_id, playerName: player_name };
+    lastSignIn = { success: true, playerId: player_id, playerName: player_name };
+    return lastSignIn;
   } catch (error) {
     logger.log('[PGS] Sign-in failed/cancelled:', errMessage(error));
     return { success: false, error: errMessage(error) };

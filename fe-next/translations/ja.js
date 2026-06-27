@@ -4267,6 +4267,15 @@ const ja = {
     "loginRequired": "紹介ダッシュボードを表示するにはログインしてください。",
     "shareText": "LexiClashで一緒に遊ぼう！紹介コード: {code}"
   },
+  "playGames": {
+    "title": "Play ゲーム",
+    "connectPrompt": "Google Play ゲームと連携して、実績を貯めてランキングを駆け上がろう。",
+    "connect": "連携する",
+    "connecting": "接続中…",
+    "signedIn": "接続済み",
+    "achievements": "実績",
+    "leaderboards": "ランキング"
+  },
   "coins": {
     "title": "コイン＆報酬",
     "description": "ゲームをプレイし、勝利し、実績をアンロックしてコインを獲得。特別なアイテムを集めよう！",

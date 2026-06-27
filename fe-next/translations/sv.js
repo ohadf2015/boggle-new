@@ -4425,6 +4425,15 @@ const sv = {
     "loginRequired": "Logga in för att se din hänvisningspanel.",
     "shareText": "Gå med mig på LexiClash! Använd min hänvisningskod: {code}"
   },
+  "playGames": {
+    "title": "Play Games",
+    "connectPrompt": "Koppla Google Play Games för att samla utmärkelser och storma topplistorna.",
+    "connect": "Anslut",
+    "connecting": "Ansluter…",
+    "signedIn": "Du är ansluten",
+    "achievements": "Utmärkelser",
+    "leaderboards": "Topplistor"
+  },
   "coins": {
     "title": "Mynt & Belöningar",
     "description": "Tjäna mynt genom att spela, vinna och låsa upp prestationer. Använd dem för att samla speciella föremål!",
