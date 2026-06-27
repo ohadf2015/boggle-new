@@ -13,7 +13,11 @@ export function practiceTargetUrl(mode: PracticeMode, locale: string): string {
       return `/${locale}/daily/word-wheel?practice=1`;
     case 'classic':
     default:
-      return `/${locale}/singleplayer?practice=1`;
+      // Practice always funnels into MULTIPLAYER — never single-player mode.
+      // Classic practice used to point at `/singleplayer`, which contradicted
+      // the product rule "practice graduates players into multiplayer, not solo
+      // play". The Arena (/multiplayer) is the real-game destination.
+      return `/${locale}/multiplayer`;
   }
 }
 

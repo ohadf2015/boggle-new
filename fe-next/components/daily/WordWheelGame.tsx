@@ -758,11 +758,16 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">
-        <div className="flex items-center justify-between w-full gap-2">
-          <div className={cn('flex items-center gap-1.5 font-neo-display font-black text-lg sm:text-xl shrink-0', timerColor, timerPulse)}>
-            <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
-            <span className="tabular-nums">{minutes}:{seconds.toString().padStart(2, '0')}</span>
-          </div>
+        <div className={cn('flex items-center w-full gap-2', practice ? 'justify-center' : 'justify-between')}>
+          {/* Countdown clock — only in the timed game. Practice has no timer, so
+              a static "2:00" that never moves just reads as broken; we drop it
+              entirely (the "End run" CTA below replaces the progress bar). */}
+          {!practice && (
+            <div data-testid="wheel-timer" className={cn('flex items-center gap-1.5 font-neo-display font-black text-lg sm:text-xl shrink-0', timerColor, timerPulse)}>
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+              <span className="tabular-nums">{minutes}:{seconds.toString().padStart(2, '0')}</span>
+            </div>
+          )}
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             {/* Combo counter — reserved slot avoids horizontal layout shift in top bar.
                 Dropped entirely in the practice hub (hideCompetitive) — no combo pressure. */}

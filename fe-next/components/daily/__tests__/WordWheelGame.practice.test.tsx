@@ -87,6 +87,36 @@ describe('WordWheelGame practice mode', () => {
     expect(onComplete).not.toHaveBeenCalled();
   });
 
+  it('hides the countdown timer in practice mode (a frozen 2:00 that never ticks looks broken)', () => {
+    const { rerender } = render(
+      <WordWheelGame
+        puzzle={puzzle}
+        duration={120}
+        onComplete={vi.fn()}
+        onValidateWord={vi.fn().mockResolvedValue(false)}
+        onEffect={vi.fn()}
+        language="en"
+        practice
+      />
+    );
+    // Practice has no countdown, so the static clock must not render.
+    expect(screen.queryByTestId('wheel-timer')).toBeNull();
+    expect(screen.queryByText('2:00')).toBeNull();
+
+    // The real (timed) game still shows the countdown clock.
+    rerender(
+      <WordWheelGame
+        puzzle={puzzle}
+        duration={120}
+        onComplete={vi.fn()}
+        onValidateWord={vi.fn().mockResolvedValue(false)}
+        onEffect={vi.fn()}
+        language="en"
+      />
+    );
+    expect(screen.getByTestId('wheel-timer')).toBeInTheDocument();
+  });
+
   it('renders an "end practice" CTA in practice mode that fires onComplete', () => {
     const onComplete = vi.fn();
     render(

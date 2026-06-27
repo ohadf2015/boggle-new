@@ -75,12 +75,15 @@ describe('PracticeHubClient tutorial simplification', () => {
     expect(tile).toHaveAttribute('href', '/en/practice/classic');
   });
 
-  it('renders a completed mode as a non-interactive, clearly-done card (not a button)', () => {
+  it('renders a completed mode as a replayable link (tapping a finished mode replays it, never a dead no-op)', () => {
+    // Root-cause fix for rage-clicks: completed tiles used to be inert <div>s, so
+    // a player who finished a mode and tapped it again got ZERO response. It now
+    // links back into the mode with ?play=1 (skip the tutorial they already saw).
     mockCompleted.current = new Set(['classic']);
     wrap(<PracticeHubClient locale="en" />);
     const tile = screen.getByTestId('practice-tile-classic');
-    expect(tile.tagName).not.toBe('A');
-    expect(tile).not.toHaveAttribute('href');
+    expect(tile.tagName).toBe('A');
+    expect(tile).toHaveAttribute('href', '/en/practice/classic?play=1');
     expect(tile).toHaveAttribute('data-complete', 'true');
   });
 
@@ -93,12 +96,12 @@ describe('PracticeHubClient tutorial simplification', () => {
 });
 
 describe('PracticeHubClient completed-tile celebration', () => {
-  it('renders a finished mode as a celebratory trophy card — not a dimmed/disabled tile', () => {
+  it('renders a finished mode as a celebratory, REPLAYABLE trophy card — not a dead no-op tile', () => {
     mockCompleted.current = new Set(['classic']);
     wrap(<PracticeHubClient locale="en" />);
     const tile = screen.getByTestId('practice-tile-classic');
-    // Still a non-interactive status card (deliberate: status, not navigation).
-    expect(tile.tagName).not.toBe('A');
+    // Replayable (a finished mode that does nothing on tap = rage-click bait).
+    expect(tile.tagName).toBe('A');
     expect(tile).toHaveAttribute('data-complete', 'true');
     // Satisfying, not greyed-out: no dimming, and a trophy badge celebrates it.
     expect(tile.className).not.toContain('opacity-80');

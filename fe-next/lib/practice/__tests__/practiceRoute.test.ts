@@ -17,8 +17,14 @@ describe('practiceTargetUrl', () => {
     expect(practiceTargetUrl('wheelRush', 'es')).toBe('/es/daily/word-wheel?practice=1');
   });
 
-  it('maps classic to /singleplayer with practice flag', () => {
-    expect(practiceTargetUrl('classic', 'ja')).toBe('/ja/singleplayer?practice=1');
+  it('maps classic to /multiplayer (practice never funnels players into single-player mode)', () => {
+    expect(practiceTargetUrl('classic', 'ja')).toBe('/ja/multiplayer');
+  });
+
+  it('never routes any practice mode into single-player mode', () => {
+    PRACTICE_MODES.forEach((mode) => {
+      expect(practiceTargetUrl(mode, 'en')).not.toContain('/singleplayer');
+    });
   });
 
   it('preserves locale across all practice modes', () => {
