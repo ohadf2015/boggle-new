@@ -12,6 +12,7 @@ import { PageLoader } from '@/components/ui/PageLoader';
 import Avatar from '@/components/Avatar';
 import { presenceBreakdown, isStalled, hostName, playerComposition, roomStatusKey, type RoomStatusKey } from '@/lib/admin/liveMonitor/liveGameInsights';
 import type { OtherPageGroup } from '@/lib/admin/liveMonitor/playersOnOtherPages';
+import { UNKNOWN_CONNECTION_PAGE, type ConnectionPageGroup } from '@/lib/admin/liveMonitor/connectionsByPage';
 import { gameModeLabel } from '@/lib/admin/gameLog/gameDisplay';
 
 // Types matching backend DetailedGame and DetailedGamePlayer
@@ -56,6 +57,7 @@ interface LiveGamesResponse {
   games: LiveGame[];
   singlePlayers?: LiveSinglePlayerSession[];
   pagePresence?: OtherPageGroup[];
+  connectionsByPage?: ConnectionPageGroup[];
   stats: {
     activeGames: number;
     playersInGames: number;
@@ -221,10 +223,11 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
     );
   }
 
-  const { games = [], singlePlayers = [], pagePresence = [], stats } = data || {
+  const { games = [], singlePlayers = [], pagePresence = [], connectionsByPage = [], stats } = data || {
     games: [],
     singlePlayers: [] as LiveSinglePlayerSession[],
     pagePresence: [] as OtherPageGroup[],
+    connectionsByPage: [] as ConnectionPageGroup[],
     stats: { activeGames: 0, playersInGames: 0, botsInGames: 0, socketConnections: 0, singlePlayerCount: 0, playersOnPages: 0 },
   };
   const hasAnyLive = games.length > 0 || singlePlayers.length > 0 || pagePresence.length > 0;
@@ -312,6 +315,37 @@ export function LiveMonitor({ authToken, onTokenExpired }: LiveMonitorProps) {
           {t('admin.live.refresh')}
         </Button>
       </div>
+
+      {/* Connections by page — explains the raw socket connection count.
+          Rendered outside the hasAnyLive gate so it still shows when sockets are
+          connected but nobody is in a game (the common "13 connections, 0 games"
+          case). */}
+      {connectionsByPage.length > 0 && (
+        <div className="bg-neo-navy-light/50 rounded-neo border-neo border-black p-4 shadow-hard">
+          <div className="flex items-center gap-2 mb-3">
+            <Wifi className="w-4 h-4 text-green-400" />
+            <h2 className="text-sm font-neo-display text-neo-white">
+              {t('admin.live.connectionsByPage', 'Connections by page')}
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+            {connectionsByPage.map((c) => (
+              <div
+                key={c.path}
+                className="flex items-center justify-between gap-2 bg-neo-navy-elevated/40 rounded px-3 py-2"
+              >
+                <span className={cn(
+                  'font-mono text-xs truncate',
+                  c.path === UNKNOWN_CONNECTION_PAGE ? 'text-slate-500 italic' : 'text-slate-300'
+                )}>
+                  {connectionPageLabel(c.path, t)}
+                </span>
+                <span className="text-sm font-bold text-neo-white shrink-0">{c.count}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Games Grid or Empty State */}
       {!hasAnyLive ? (
@@ -688,6 +722,12 @@ function SinglePlayerRow({
 function pageLabel(path: string, t: (path: string, fallback?: string) => string): string {
   if (path === '/') return t('admin.live.pageLanding', 'Landing Page');
   return path;
+}
+
+// Friendly label for a connection-page bucket (adds the "unknown" sentinel).
+function connectionPageLabel(path: string, t: (path: string, fallback?: string) => string): string {
+  if (path === UNKNOWN_CONNECTION_PAGE) return t('admin.live.unknownPage', 'Unknown / not reported');
+  return pageLabel(path, t);
 }
 
 // Page Presence Card — users online on a given page but not in a game.

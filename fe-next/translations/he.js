@@ -8008,6 +8008,8 @@ const he = {
         "finished": "הסתיים"
       },
       "connectedPlayers": "שחקנים מחוברים",
+      "connectionsByPage": "חיבורים לפי דף",
+      "unknownPage": "לא ידוע / לא דווח",
       "player": "שחקן",
       "game": "משחק",
       "status": "סטטוס",

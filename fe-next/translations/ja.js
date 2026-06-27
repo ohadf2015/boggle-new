@@ -8003,6 +8003,8 @@ const ja = {
         "finished": "終了"
       },
       "connectedPlayers": "接続中のプレイヤー",
+      "connectionsByPage": "ページ別の接続数",
+      "unknownPage": "不明 / 未報告",
       "player": "プレイヤー",
       "game": "ゲーム",
       "status": "ステータス",

@@ -32,6 +32,7 @@ import WinnerOnboardingWrapper from './components/WinnerOnboardingWrapper';
 import ProfileCustomizationWrapper from './components/ProfileCustomizationWrapper';
 import ComebackBonusWrapper from './components/ComebackBonusWrapper';
 import BoostAckListener from '@/components/boosts/BoostAckListener';
+import SocketPageReporter from '@/components/SocketPageReporter';
 import { EssentialProviders } from './essential-providers';
 
 import type { Language } from '@/shared/types/game';
@@ -109,6 +110,7 @@ export function GameSpecificProviders({ children }: GameSpecificProvidersProps) 
             <NativeAppProvider>
                 <CrazyGamesSettingsBridge>
                     <SocketProvider>
+                        <SocketPageReporter />
                         <SocketEventBusProvider>
                             <CoreGameProviders>
                                 {children}

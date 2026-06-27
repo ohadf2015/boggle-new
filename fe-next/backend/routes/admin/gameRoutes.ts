@@ -9,6 +9,7 @@ import logger from '../../utils/logger';
 import { getActiveSinglePlayerCount, getActiveSinglePlayerSessions } from '../singlePlayer';
 import { getActivePagePresence } from '../presence';
 import { playersOnOtherPages } from '../../../lib/admin/liveMonitor/playersOnOtherPages';
+import { summarizeConnectionsByPage } from '../../../lib/admin/liveMonitor/connectionsByPage';
 
 interface DetailedGamePlayerLite {
   isBot: boolean;
@@ -243,10 +244,24 @@ router.get('/live-games', async (req: AdminRequest, res: Response): Promise<void
     });
     const playersOnPages = pagePresence.reduce((sum, g) => sum + g.count, 0);
 
+    // Break the raw socket connection count down by the route each client is
+    // viewing (reported via the `pageView` socket event → socket.data.page).
+    // Explains the otherwise-opaque connection number; unreported sockets
+    // (just-connected / native / embed clients) bucket under "unknown".
+    const connectionPages: Array<string | null> = [];
+    if (io) {
+      for (const [, s] of io.sockets.sockets) {
+        const data = (s as { data?: { page?: string | null } }).data;
+        connectionPages.push(data?.page ?? null);
+      }
+    }
+    const connectionsByPage = summarizeConnectionsByPage(connectionPages);
+
     res.json({
       games: detailedGames,
       singlePlayers,
       pagePresence,
+      connectionsByPage,
       stats: {
         activeGames,
         playersInGames,
