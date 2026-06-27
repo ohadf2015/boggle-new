@@ -1,108 +1,98 @@
-import { createElement, useEffect, useRef } from 'react';
-import toast from 'react-hot-toast';
-import { diffNewlyUnlocked, type PlayerCosmeticState } from '@/lib/cosmetics';
+import { useEffect } from 'react';
+import { getUnlockedCosmetics, type PlayerCosmeticState } from '@/lib/cosmetics';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { showCosmeticUnlockToast } from '@/components/cosmetics/CosmeticUnlockToast';
 
-// v2: the unlock axis changed from the never-fetched profile.rank_tier (which
-// snapshotted a bogus capitalized 'Bronze'/0 for everyone) to the score-based
-// leaderboard tier. Bumping the key discards stale baselines so the first load
-// after the fix re-seeds cleanly instead of firing a burst of "unlocked" toasts.
-const SNAPSHOT_KEY = 'lexiclash_cosmetics_snapshot_v2';
+// Per-account record of cosmetic ids we have ALREADY announced. This is the
+// source of truth for "notify once". The previous implementation kept only a
+// {rankTier, streakDays} snapshot and re-derived "newly unlocked" from a diff —
+// which re-fired the SAME unlock every time the streak dropped and re-climbed
+// past a milestone (broke streak → recover) or the tier value churned. Tracking
+// the announced ids directly makes each cosmetic fire exactly once per account,
+// regardless of how rank/streak fluctuate afterwards.
+const NOTIFIED_KEY = 'lexiclash_cosmetics_notified_v1';
 
 interface NotifierInput {
   rankTier: string;
   streakDays: number;
   /** Optional already-purchased ids — defaults to []. Purchase notifications fire elsewhere. */
   purchasedIds?: string[];
+  /** Account id — scopes the "already notified" record so different accounts on
+   *  the same device dedup independently and never inherit each other's history. */
+  accountId?: string;
 }
 
-interface Snapshot {
-  rankTier: string;
-  streakDays: number;
+function storageKey(accountId?: string): string {
+  return accountId ? `${NOTIFIED_KEY}:${accountId}` : NOTIFIED_KEY;
 }
 
-function readSnapshot(): Snapshot | null {
+function readNotified(key: string): Set<string> | null {
   try {
-    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(SNAPSHOT_KEY) : null;
-    return raw ? (JSON.parse(raw) as Snapshot) : null;
+    const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
+    if (raw == null) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? new Set(parsed.filter((v): v is string => typeof v === 'string')) : null;
   } catch {
     return null;
   }
 }
 
-function writeSnapshot(snap: Snapshot): void {
+function writeNotified(key: string, ids: Set<string>): void {
   try {
     if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(SNAPSHOT_KEY, JSON.stringify(snap));
+      localStorage.setItem(key, JSON.stringify([...ids]));
     }
   } catch { /* storage unavailable */ }
 }
 
 /**
- * Detects newly-unlocked cosmetics between the persisted last-seen snapshot
- * and the current player state, and fires a toast for each one.
+ * Detects newly-unlocked cosmetics and fires a toast for each one — exactly
+ * once per account, ever.
  *
- * Mount this once in a top-level shell (e.g. profile page or app root) so
- * rank-ups and streak milestones surface a notification without the player
- * having to dig through the cosmetics tab.
+ * Mount this once in a top-level shell (e.g. the app root) so rank-ups and
+ * streak milestones surface a notification without the player having to dig
+ * through the cosmetics tab.
+ *
+ * First encounter for an account is a SILENT seed: every cosmetic the player
+ * already owns is recorded without a toast, so we never blast a burst of
+ * "unlocked!" capsules for things they earned long ago. After that, only
+ * genuinely new ids produce a toast.
  */
 export function useUnlockNotifier(input: NotifierInput): void {
-  const { t, language } = useLanguage();
-  const lastNotifiedRef = useRef<string>('');
-  const { rankTier, streakDays, purchasedIds } = input;
+  const { t, language, dir } = useLanguage();
+  const { rankTier, streakDays, purchasedIds, accountId } = input;
 
   useEffect(() => {
-    const prior = readSnapshot();
-    const current: Snapshot = { rankTier, streakDays };
-    const currentKey = `${current.rankTier}|${current.streakDays}`;
+    const key = storageKey(accountId);
 
-    if (lastNotifiedRef.current === currentKey) return;
-
-    if (!prior) {
-      writeSnapshot(current);
-      lastNotifiedRef.current = currentKey;
-      return;
-    }
-
-    if (prior.rankTier === current.rankTier && prior.streakDays === current.streakDays) {
-      return;
-    }
-
-    const ownedIds = purchasedIds ?? [];
-    const baseState: PlayerCosmeticState = {
-      rankTier: prior.rankTier,
-      streakDays: prior.streakDays,
+    const state: PlayerCosmeticState = {
+      rankTier,
+      streakDays,
       coins: 0,
       seasonRewards: [],
-      purchasedIds: ownedIds,
+      // Purchases are announced by their own flow; default to none so this
+      // notifier only ever surfaces rank/streak (and default) unlocks.
+      purchasedIds: purchasedIds ?? [],
       equippedIds: {},
     };
-    const nextState: PlayerCosmeticState = {
-      ...baseState,
-      rankTier: current.rankTier,
-      streakDays: current.streakDays,
-    };
 
-    const newly = diffNewlyUnlocked(baseState, nextState);
-    const href = `/${language}/profile?tab=collection`;
-    for (const c of newly) {
-      // Clickable toast — deep-links to the collection so the unlock turns into
-      // an equip, instead of a dead-end announcement the player can't act on.
-      toast.success(
-        createElement(
-          'a',
-          {
-            href,
-            className: 'flex flex-col gap-0.5 font-neo-body text-neo-black no-underline',
-          },
-          createElement('span', { className: 'text-sm font-bold' }, t('cosmetics.unlockedToast', { name: t(c.name) })),
-          createElement('span', { className: 'text-xs underline opacity-80' }, t('cosmetics.equipCta')),
-        ),
-        { duration: 6000 },
-      );
+    const unlocked = getUnlockedCosmetics(state);
+    const notified = readNotified(key);
+
+    // First ever load for this account → seed silently, announce nothing.
+    if (!notified) {
+      writeNotified(key, new Set(unlocked.map((c) => c.id)));
+      return;
     }
 
-    writeSnapshot(current);
-    lastNotifiedRef.current = currentKey;
-  }, [rankTier, streakDays, purchasedIds, t, language]);
+    const fresh = unlocked.filter((c) => !notified.has(c.id));
+    if (fresh.length === 0) return;
+
+    for (const c of fresh) {
+      showCosmeticUnlockToast({ cosmetic: c, language, isRtl: dir === 'rtl', t });
+      notified.add(c.id);
+    }
+
+    writeNotified(key, notified);
+  }, [rankTier, streakDays, purchasedIds, accountId, t, language, dir]);
 }

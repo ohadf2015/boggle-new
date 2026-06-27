@@ -16,8 +16,16 @@ import { getGlobalLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
  *
  * Renders nothing.
  */
-function ActiveNotifier({ rankTier, streakDays }: { rankTier: string; streakDays: number }) {
-  useUnlockNotifier({ rankTier, streakDays });
+function ActiveNotifier({
+  rankTier,
+  streakDays,
+  accountId,
+}: {
+  rankTier: string;
+  streakDays: number;
+  accountId?: string;
+}) {
+  useUnlockNotifier({ rankTier, streakDays, accountId });
   return null;
 }
 
@@ -26,7 +34,7 @@ export function UnlockNotifierMount() {
   const { streak, loading } = useEngagementStatus();
   // Wait for BOTH a real profile AND a resolved streak before mounting the
   // notifier. useEngagementStatus starts at streak=0 (loading) then resolves;
-  // feeding the transient 0 in would snapshot 0 and then fire false "unlocked"
+  // feeding the transient 0 in would seed 0 and then fire false "unlocked"
   // toasts for streak cosmetics the instant the real streak lands (Class 1:
   // dual-source + async resolution). Tier comes from total_score (on profile,
   // resolves with it) so only the streak axis needs the loading gate.
@@ -35,6 +43,7 @@ export function UnlockNotifierMount() {
     <ActiveNotifier
       rankTier={getGlobalLeaderboardTier(profile.total_score ?? 0).id}
       streakDays={streak}
+      accountId={profile.id}
     />
   );
 }

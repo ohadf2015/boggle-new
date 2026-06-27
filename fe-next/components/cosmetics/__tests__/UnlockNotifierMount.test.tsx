@@ -48,17 +48,17 @@ describe('UnlockNotifierMount', () => {
     expect(notifierMock).not.toHaveBeenCalled();
   });
 
-  it('runs the notifier with the score-derived tier and engagement streak', () => {
+  it('runs the notifier with the score-derived tier, engagement streak and account id', () => {
     // total_score 12000 → Gold tier (>= 10000). Streak from player_engagement.
-    authMock.mockReturnValue({ profile: { total_score: 12000 } });
+    authMock.mockReturnValue({ profile: { id: 'acc-1', total_score: 12000 } });
     engagementMock.mockReturnValue({ streak: 12, loading: false });
     render(<UnlockNotifierMount />);
-    expect(notifierMock).toHaveBeenCalledWith({ rankTier: 'gold', streakDays: 12 });
+    expect(notifierMock).toHaveBeenCalledWith({ rankTier: 'gold', streakDays: 12, accountId: 'acc-1' });
   });
 
   it('falls back to Stone/0 when total_score is missing', () => {
-    authMock.mockReturnValue({ profile: {} });
+    authMock.mockReturnValue({ profile: { id: 'acc-2' } });
     render(<UnlockNotifierMount />);
-    expect(notifierMock).toHaveBeenCalledWith({ rankTier: 'stone', streakDays: 0 });
+    expect(notifierMock).toHaveBeenCalledWith({ rankTier: 'stone', streakDays: 0, accountId: 'acc-2' });
   });
 });

@@ -4936,6 +4936,7 @@ const he = {
     "purchase": "קנה ({{cost}} זהב)",
     "close": "סגור",
     "unlockedToast": "✨ קוסמטיקה חדשה נפתחה: {{name}}",
+    "unlockedLabel": "קוסמטיקה חדשה נפתחה",
     "equipCta": "הקישו כדי לצייד",
     "progress": {
       "streak": "{{current}}/{{target}} ימי רצף",

@@ -4598,6 +4598,7 @@ const sv = {
     "purchase": "Köp ({{cost}} guld)",
     "close": "Stäng",
     "unlockedToast": "✨ Ny kosmetik upplåst: {{name}}",
+    "unlockedLabel": "Ny kosmetik upplåst",
     "equipCta": "Tryck för att utrusta",
     "progress": {
       "streak": "{{current}}/{{target}} dagar i rad",
