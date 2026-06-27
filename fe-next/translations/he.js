@@ -12817,11 +12817,11 @@ const he = {
   },
   "brag": {
     "headline": {
-      "crushed": "סליחה {name} 💀",
-      "topped": "{name} +{count} עוד. נכחדו! 💪",
-      "won": "{count} יריבים. אפס ניצולים.",
-      "revenge": "{name} - רק מזל. רוץ שוב! 🔥",
-      "challenge": "בטוח שתעשה יותר?"
+      "crushed": "ל{name} לא היה צ׳אנס 💀",
+      "topped": "{name} ועוד {count} — כולם מאחור 💪",
+      "won": "{count} יריבים, מנצח אחד 🏆",
+      "revenge": "ל{name} היה מזל. עוד סיבוב? 🔥",
+      "challenge": "בטוחים שתעשו את זה יותר טוב? 🔥"
     },
     "hero": {
       "points": "נקודות של תהילה",

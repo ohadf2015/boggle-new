@@ -626,9 +626,12 @@ export default function MultiplayerPageClient(): React.JSX.Element {
           ) : (
             // Active lobby/in-game uses a full-bleed immersive layout with its
             // own sticky header — the AutoHideHeader spacer would just stack dead
-            // space above the lobby's top accent bar. Drop it while active (keep
-            // it for the room list + results so their CLS reservation holds).
-            (isActive && !showResults) ? null : <AutoHideHeader />
+            // space above the lobby's top accent bar. Drop it while active. On the
+            // results screen the header is hidden (isInGame) but its CLS spacer
+            // was still reserving a header-tall empty band at the top — collapse
+            // it there so results content starts under the floating mute FAB
+            // instead of below dead space. The room list keeps the spacer.
+            (isActive && !showResults) ? null : <AutoHideHeader collapseSpacerWhenHidden={showResults} />
           )}
           {renderView()}
           <HostLeftGraceModal
