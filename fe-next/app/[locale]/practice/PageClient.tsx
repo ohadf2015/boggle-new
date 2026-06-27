@@ -269,24 +269,27 @@ export default function PracticeHubClient({ locale }: Props) {
               </>
             );
 
-            // Finished stages are status, not navigation — render them as a
-            // non-interactive card. But make that "done" state feel *earned*:
-            // full-saturation art, a gold trophy ribbon, and a soft mode-color
-            // glow layered over the hard shadow — a claimed badge, not a
-            // greyed-out dead tile.
+            // Finished stages still feel *earned* — full-saturation art, a gold
+            // trophy ribbon, and a soft mode-color glow layered over the hard
+            // shadow. They remain tappable so a player can REPLAY a finished
+            // mode: an inert "done" tile that swallowed taps was a silent no-op
+            // and a rage-click magnet (founder report). `?play=1` skips the
+            // tutorial they've already seen and drops straight into the sandbox.
             if (isDone) {
               return (
-                <div
+                <Link
                   key={mode}
+                  href={`/${locale}/practice/${mode}?play=1`}
+                  onClick={handleTileTap}
                   data-testid={`practice-tile-${mode}`}
                   data-complete="true"
                   data-next="false"
                   aria-label={`${t(`gameModes.${mode}.name`)} — ${t('practiceHub.completedBadge')}`}
-                  className={`${baseClass} ${accent.doneTile} cursor-default`}
+                  className={`${baseClass} ${accent.doneTile} active:translate-y-px md:hover:-translate-y-1`}
                   style={{ boxShadow: `2px 2px 0 #000, 0 0 18px rgba(${accent.glowRgb}, 0.28)` }}
                 >
                   {inner}
-                </div>
+                </Link>
               );
             }
 

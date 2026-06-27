@@ -17,13 +17,13 @@ import PracticeBailoutCta from '../PracticeBailoutCta';
 
 describe('PracticeBailoutCta', () => {
   it('renders the mode-correct bailout key when not yet done', () => {
-    render(<PracticeBailoutCta mode="classic" done={false} href="/en/singleplayer?practice=1" />);
+    render(<PracticeBailoutCta mode="classic" done={false} href="/en/multiplayer" />);
     const cta = screen.getByTestId('practice-bailout-cta');
     expect(cta).toHaveTextContent('practice.classic.bailoutCta');
   });
 
   it('renders the mode-correct play-for-real key when done — classic (regression)', () => {
-    render(<PracticeBailoutCta mode="classic" done href="/en/singleplayer?practice=1" />);
+    render(<PracticeBailoutCta mode="classic" done href="/en/multiplayer" />);
     const cta = screen.getByTestId('practice-bailout-cta');
     expect(cta).toHaveTextContent('practice.classic.playRealCta');
     // The old bug rendered the wordHunt key on the classic screen.
@@ -47,15 +47,15 @@ describe('PracticeBailoutCta', () => {
   });
 
   it('links to the provided real-game href', () => {
-    render(<PracticeBailoutCta mode="classic" done={false} href="/en/singleplayer?practice=1" />);
+    render(<PracticeBailoutCta mode="classic" done={false} href="/en/multiplayer" />);
     expect(screen.getByTestId('practice-bailout-cta')).toHaveAttribute(
       'href',
-      '/en/singleplayer?practice=1',
+      '/en/multiplayer',
     );
   });
 
   it('is visually quiet — no saturated pink fill / heavy border (it is an escape, not the hero)', () => {
-    render(<PracticeBailoutCta mode="classic" done={false} href="/en/singleplayer?practice=1" />);
+    render(<PracticeBailoutCta mode="classic" done={false} href="/en/multiplayer" />);
     const cta = screen.getByTestId('practice-bailout-cta');
     expect(cta.className).not.toMatch(/bg-neo-pink/);
     expect(cta.className).not.toMatch(/border-3/);
@@ -65,7 +65,7 @@ describe('PracticeBailoutCta', () => {
     // Founder ask: the skip-to-real-game escape was a faint underline link that
     // players missed. It must read as an actual button — a visible border + rounded
     // frame — without becoming the loud hero CTA (still no pink / border-3 above).
-    render(<PracticeBailoutCta mode="classic" done={false} href="/en/singleplayer?practice=1" />);
+    render(<PracticeBailoutCta mode="classic" done={false} href="/en/multiplayer" />);
     const cta = screen.getByTestId('practice-bailout-cta');
     expect(cta.className).toMatch(/border-2/);
     expect(cta.className).toMatch(/rounded-neo/);
@@ -73,7 +73,7 @@ describe('PracticeBailoutCta', () => {
 
   it('always shows the forward arrow (clear "go play" affordance, not just done state)', () => {
     const { container } = render(
-      <PracticeBailoutCta mode="classic" done={false} href="/en/singleplayer?practice=1" />,
+      <PracticeBailoutCta mode="classic" done={false} href="/en/multiplayer" />,
     );
     expect(container.querySelector('svg')).toBeTruthy();
   });
