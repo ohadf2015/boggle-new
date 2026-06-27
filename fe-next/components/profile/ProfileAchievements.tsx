@@ -3,7 +3,12 @@
 import React from 'react';
 import { m } from 'framer-motion';
 import { AchievementBadge } from '@/components/AchievementBadge';
-import { isHallOfFameAchievement } from '@/utils/achievementTiers';
+import {
+  isHallOfFameAchievement,
+  groupAchievementsByTier,
+  TIER_ICONS,
+  type TierName,
+} from '@/utils/achievementTiers';
 import { ACHIEVEMENT_ICONS, getAchievementIcon } from '@/constants/achievementIcons';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { ProfileData } from '@/contexts/auth/authTypes';
@@ -44,9 +49,21 @@ export function ProfileAchievements({
 
   const hallOfFameAchievements = allAchievements.filter(a => isHallOfFameAchievement(a.key));
   const regularAchievements = allAchievements.filter(a => !isHallOfFameAchievement(a.key));
+  // Group the regular grid into a tier ladder (Platinum→Bronze, then Locked) so
+  // the rare flexes lead and the wall becomes scannable. Reuses calculateTier +
+  // existing tier labels — no new copy.
+  const regularGroups = groupAchievementsByTier(regularAchievements);
 
   const totalEarned = earnedAchievements.length;
   const totalAchievements = allAchievementKeys.length;
+
+  // Tier label per group header. Reuses achievementTiers.* + profile.locked keys.
+  const groupLabel = (tier: TierName | 'locked'): string =>
+    tier === 'locked'
+      ? t('profile.locked')
+      : t(`achievementTiers.${tier.toLowerCase()}`);
+  const groupIcon = (tier: TierName | 'locked'): string =>
+    tier === 'locked' ? '🔒' : TIER_ICONS[tier];
 
   const renderAchievementBadge = ({ key, count, locked }: { key: string; count: number; locked: boolean }, index: number) => {
     const achievementData: Achievement = {
@@ -104,19 +121,35 @@ export function ProfileAchievements({
         </div>
       </m.div>
 
-      {/* Regular Achievements — frameless open field. The pills are already
-          bordered badges; wrapping them in another bordered card = nested cards.
-          Leaving them on the navy field (vs the lime-framed Hall of Fame above)
-          creates real altitude: highlighted group vs the rest. */}
+      {/* Regular Achievements — frameless open field, grouped into a tier ladder.
+          Pills are already bordered badges; wrapping them in another bordered card
+          = nested cards. On the navy field (vs the lime-framed Hall of Fame) the
+          tier groups read as a scannable progression, rarest first. */}
       <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: delay + 0.05 }}
-        className="px-1 pt-1"
+        className="px-1 pt-1 space-y-4"
       >
-        <div className="flex flex-wrap gap-2">
-          {regularAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}
-        </div>
+        {regularGroups.map((group, gi) => {
+          // Running index keeps the badge entrance stagger smooth across groups.
+          const offset = regularGroups
+            .slice(0, gi)
+            .reduce((n, g) => n + g.items.length, 0);
+          return (
+            <section key={group.tier} aria-label={groupLabel(group.tier)}>
+              <h3 className="flex items-center gap-2 mb-2 text-[11px] font-black uppercase tracking-widest text-neo-white/70">
+                <span aria-hidden>{groupIcon(group.tier)}</span>
+                <span>{groupLabel(group.tier)}</span>
+                <span className="tabular-nums text-neo-white/40">{group.items.length}</span>
+                <span className="flex-1 h-px bg-neo-white/10" aria-hidden />
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {group.items.map((achievement, i) => renderAchievementBadge(achievement, offset + i))}
+              </div>
+            </section>
+          );
+        })}
       </m.div>
     </>
   );

@@ -286,6 +286,52 @@ export function getTierDisplay(tier: TierName | null): TierDisplay | null {
   };
 }
 
+export interface AchievementGroupItem {
+  key: string;
+  count: number;
+  locked: boolean;
+}
+
+export interface AchievementTierGroup {
+  /** Earned tier name, or 'locked' for not-yet-earned achievements. */
+  tier: TierName | 'locked';
+  items: AchievementGroupItem[];
+}
+
+// Rarest tier first; locked always trails.
+const TIER_GROUP_ORDER: TierName[] = ['PLATINUM', 'GOLD', 'SILVER', 'BRONZE'];
+
+/**
+ * Group a flat achievement list into ordered tier buckets (Platinum→Bronze, then
+ * Locked) for a scannable progression ladder. Empty buckets are omitted; input
+ * order is preserved within each bucket. Reuses calculateTier — no new metadata.
+ */
+export function groupAchievementsByTier(
+  items: AchievementGroupItem[],
+): AchievementTierGroup[] {
+  const byTier = new Map<TierName, AchievementGroupItem[]>();
+  const locked: AchievementGroupItem[] = [];
+
+  for (const item of items) {
+    if (item.locked) {
+      locked.push(item);
+      continue;
+    }
+    const tier = calculateTier(item.count) ?? 'BRONZE';
+    const bucket = byTier.get(tier) ?? [];
+    bucket.push(item);
+    byTier.set(tier, bucket);
+  }
+
+  const groups: AchievementTierGroup[] = [];
+  for (const tier of TIER_GROUP_ORDER) {
+    const bucket = byTier.get(tier);
+    if (bucket && bucket.length) groups.push({ tier, items: bucket });
+  }
+  if (locked.length) groups.push({ tier: 'locked', items: locked });
+  return groups;
+}
+
 /**
  * Get all achievements with their tier information
  * @param achievementCounts - Object mapping achievement keys to counts
