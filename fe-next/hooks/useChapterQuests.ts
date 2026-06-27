@@ -18,12 +18,15 @@ interface UseChapterQuestsReturn {
   recordBossDefeatedNoHint: () => void;
   recordLongWord: () => void;
   recordWorldMechanicUse: () => void;
-  recordStreakMaster: () => void;
+  /** Record the streak length reached — quest stores the max ("reach an N-word streak"). */
+  recordStreakMaster: (streakLength: number) => void;
   recordBossHighHealth: () => void;
   recordFlashChallengeMaster: () => void;
   recordScoreChallenge: (score: number) => void;
   recordFullComboLevel: () => void;
 }
+
+type QuestUpdateMode = 'add' | 'max';
 
 export function useChapterQuests({ worldId, chapterNumber }: UseChapterQuestsProps): UseChapterQuestsReturn {
   const quests = getQuestsForChapter(worldId, chapterNumber);
@@ -59,13 +62,15 @@ export function useChapterQuests({ worldId, chapterNumber }: UseChapterQuestsPro
     }
   }, [progress, updateChapterQuestProgress]);
 
-  // Increment matching quests by type — delegates persistence to ProgressionContext
-  const increment = useCallback((type: string, amount = 1) => {
+  // Increment matching quests by type — delegates persistence to ProgressionContext.
+  // mode 'max' is used for quests that track a peak value (streak length reached)
+  // rather than a running total.
+  const increment = useCallback((type: string, amount = 1, mode: QuestUpdateMode = 'add') => {
     const matchingIds = quests
       .filter(q => q.type === type)
       .map(q => q.id);
     if (matchingIds.length === 0) return;
-    updateChapterQuestProgress(type, amount, matchingIds);
+    updateChapterQuestProgress(type, amount, matchingIds, mode);
   }, [quests, updateChapterQuestProgress]);
 
   // Stable callbacks — prevent re-renders in consumers that depend on these
@@ -74,7 +79,9 @@ export function useChapterQuests({ worldId, chapterNumber }: UseChapterQuestsPro
   const recordBossDefeatedNoHint = useCallback(() => increment('defeatBossNoHint'), [increment]);
   const recordLongWord = useCallback(() => increment('longWordCount'), [increment]);
   const recordWorldMechanicUse = useCallback(() => increment('worldMechanicUse'), [increment]);
-  const recordStreakMaster = useCallback(() => increment('streakMaster'), [increment]);
+  // "Reach a {target}-word streak" — record the streak length reached and keep
+  // the highest (max), so a single long combo completes the quest.
+  const recordStreakMaster = useCallback((streakLength: number) => increment('streakMaster', streakLength, 'max'), [increment]);
   const recordBossHighHealth = useCallback(() => increment('bossHighHealth'), [increment]);
   const recordFlashChallengeMaster = useCallback(() => increment('flashChallengeMaster'), [increment]);
   const recordScoreChallenge = useCallback((score: number) => increment('scoreChallenge', score), [increment]);

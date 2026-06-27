@@ -825,4 +825,43 @@ describe('ProgressionContext', () => {
       expect(saved).toBe(false);
     });
   });
+
+  describe('updateChapterQuestProgress', () => {
+    it('adds to existing progress in default (add) mode', async () => {
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          return Promise.resolve({ ok: true, json: async () => ({ progression: createMockProgression(), attempts: [] }) });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      act(() => { result.current.updateChapterQuestProgress('wordCountChapter', 5, ['q-add']); });
+      act(() => { result.current.updateChapterQuestProgress('wordCountChapter', 3, ['q-add']); });
+
+      expect(result.current.progression?.chapterQuestProgress?.['q-add']).toBe(8);
+    });
+
+    it('keeps the highest value in max mode (streak length, not sum)', async () => {
+      mockFetch.mockImplementation((url: string) => {
+        if (url.includes('/api/adventure/state')) {
+          return Promise.resolve({ ok: true, json: async () => ({ progression: createMockProgression(), attempts: [] }) });
+        }
+        return Promise.resolve({ ok: true, json: async () => ({}) });
+      });
+
+      const { result } = renderHook(() => useProgression(), { wrapper });
+      await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+      // A streak that climbs to 6 then a later shorter streak of 2 must not
+      // reduce progress, and repeated maxes must not accumulate.
+      act(() => { result.current.updateChapterQuestProgress('streakMaster', 4, ['q-max'], 'max'); });
+      act(() => { result.current.updateChapterQuestProgress('streakMaster', 6, ['q-max'], 'max'); });
+      act(() => { result.current.updateChapterQuestProgress('streakMaster', 2, ['q-max'], 'max'); });
+
+      expect(result.current.progression?.chapterQuestProgress?.['q-max']).toBe(6);
+    });
+  });
 });

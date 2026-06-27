@@ -54,7 +54,8 @@ describe('useChapterQuests', () => {
     expect(mockUpdateChapterQuestProgress).toHaveBeenCalledWith(
       'wordCountChapter',
       5,
-      ['w1c1-words']
+      ['w1c1-words'],
+      'add'
     );
   });
 
@@ -64,7 +65,8 @@ describe('useChapterQuests', () => {
     expect(mockUpdateChapterQuestProgress).toHaveBeenCalledWith(
       'longWordCount',
       1,
-      ['w1c1-long']
+      ['w1c1-long'],
+      'add'
     );
   });
 
@@ -74,7 +76,20 @@ describe('useChapterQuests', () => {
     expect(mockUpdateChapterQuestProgress).toHaveBeenCalledWith(
       'perfectLevels',
       1,
-      ['w1c1-perfect']
+      ['w1c1-perfect'],
+      'add'
+    );
+  });
+
+  it('recordStreakMaster delegates with max mode and the streak length', () => {
+    // World 4 / chapter 1 has a streakMaster quest (target 5, id w4c1-streak).
+    const { result } = renderHook(() => useChapterQuests({ worldId: 4, chapterNumber: 1 }));
+    act(() => { result.current.recordStreakMaster(5); });
+    expect(mockUpdateChapterQuestProgress).toHaveBeenCalledWith(
+      'streakMaster',
+      5,
+      ['w4c1-streak'],
+      'max'
     );
   });
 

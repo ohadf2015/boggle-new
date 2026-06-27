@@ -185,8 +185,12 @@ interface ProgressionContextType {
   getLevelAttempt: (worldId: number, levelId: number) => LevelAttempt | undefined;
   /** Purchase upgrade by ID — server validates cost, optimistic + reconcile */
   updateCurrency: (upgradeId: string, optimisticGold: number, optimisticUpgrades: Record<string, number>) => Promise<void>;
-  /** Update chapter quest progress — persists to server */
-  updateChapterQuestProgress: (questType: string, amount: number, questIds: string[]) => void;
+  /**
+   * Update chapter quest progress — persists to server.
+   * mode 'add' (default) accumulates (word counts, scores, etc.);
+   * mode 'max' keeps the highest value (e.g. streak length reached).
+   */
+  updateChapterQuestProgress: (questType: string, amount: number, questIds: string[], mode?: 'add' | 'max') => void;
   /** Add words to the word album — deduplicates and persists */
   updateWordAlbum: (newWords: string[]) => void;
   /** Update rune inventory (forge/equip/unequip) — optimistic local update */
@@ -219,7 +223,7 @@ interface ProgressionActionsContextType {
   getLevelCompletion: (worldId: number, levelId: number) => LevelCompletion | undefined;
   getLevelAttempt: (worldId: number, levelId: number) => LevelAttempt | undefined;
   updateCurrency: ProgressionContextType['updateCurrency'];
-  updateChapterQuestProgress: (questType: string, amount: number, questIds: string[]) => void;
+  updateChapterQuestProgress: (questType: string, amount: number, questIds: string[], mode?: 'add' | 'max') => void;
   updateWordAlbum: (newWords: string[]) => void;
   updateRunes: ProgressionContextType['updateRunes'];
 }
@@ -789,13 +793,15 @@ export function ProgressionProvider({ children }: ProgressionProviderProps) {
 
   // Update chapter quest progress — optimistic local update + debounced server persist
   const updateChapterQuestProgress = useCallback(
-    (_questType: string, amount: number, questIds: string[]) => {
+    (_questType: string, amount: number, questIds: string[], mode: 'add' | 'max' = 'add') => {
       setProgression((prev) => {
         if (!prev) return prev;
         const current = prev.chapterQuestProgress ?? {};
         const updated = { ...current };
         for (const id of questIds) {
-          updated[id] = (updated[id] ?? 0) + amount;
+          updated[id] = mode === 'max'
+            ? Math.max(updated[id] ?? 0, amount)
+            : (updated[id] ?? 0) + amount;
         }
         // Stage for debounced persist (2s window batches rapid word-find updates)
         pendingQuestProgressRef.current = updated;
