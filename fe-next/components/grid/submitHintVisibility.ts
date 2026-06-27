@@ -13,6 +13,16 @@
 export const DESKTOP_IDLE_AUTOSUBMIT_MS = 1500;
 
 /**
+ * Default desktop idle-auto-submit window (ms), applied by `useGridInteraction`
+ * to EVERY mode unless a caller overrides `autoSubmitIdleMs`. Once a desktop
+ * player has selected enough tiles (≥3) and stops for this long, the word
+ * submits automatically — no release/double-click needed. 1s is the founder-
+ * requested feel: long enough not to fire mid-build, short enough to feel
+ * hands-free. Touch is excluded in the hook (a paused finger must not submit).
+ */
+export const DEFAULT_DESKTOP_AUTOSUBMIT_MS = 1000;
+
+/**
  * Gate for the desktop "double-click last letter to submit" hint.
  *
  * Tap-to-build (click-select) words don't submit on their own on desktop — the

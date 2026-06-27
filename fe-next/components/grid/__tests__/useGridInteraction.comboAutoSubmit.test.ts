@@ -81,9 +81,12 @@ describe('useGridInteraction — combo auto-submit gating', () => {
       result.current.handleTouchMove({ clientX: 250, clientY: 50, cancelable: true, preventDefault: vi.fn() } as unknown as MouseEvent);
     });
 
-    // Player pauses for ~1s while still holding mouse. Combo timer (500ms)
-    // would fire if the gate were absent. With the gate, mouse pointer = no fire.
-    act(() => { vi.advanceTimersByTime(1500); });
+    // Player pauses while still holding mouse, up to just before the 1s desktop
+    // idle-auto-submit default. The combo timer (500ms) would fire in this
+    // window if the gate were absent; with the gate, a mouse pointer never trips
+    // it. (The idle-auto-submit path that DOES fire at 1000ms is covered in
+    // useGridInteraction.idleAutoSubmit.test.ts.)
+    act(() => { vi.advanceTimersByTime(999); });
 
     expect(onWordSubmit).not.toHaveBeenCalled();
   });
