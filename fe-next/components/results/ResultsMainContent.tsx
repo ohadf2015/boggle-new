@@ -232,7 +232,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       ''
     );
     const displayWord = language === 'he' ? applyHebrewFinalLetters(longestWord) : longestWord;
-    return [
+    const stats = [
       {
         label: t('results.bestWord') || 'Best Word',
         value: displayWord.toUpperCase() || '—',
@@ -245,14 +245,21 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         icon: <Type className="w-3 h-3" />,
         color: 'text-neo-lime',
       },
-      {
+    ];
+    // "Only You" lives in exactly ONE place. When the RivalsPanel renders (2p) it
+    // already brags this count richer ("✨ Only you found N"), so showing it again
+    // here is the same number twice, adjacent. Keep it for 3+ games (podium has no
+    // unique-words line to carry it).
+    if (!showRivals) {
+      stats.push({
         label: t('results.uniqueWords.label') || 'Only You',
         value: uniqueWordsCount,
         icon: <Star className="w-3 h-3" />,
         color: 'text-neo-cyan',
-      },
-    ];
-  }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language]);
+      });
+    }
+    return stats;
+  }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language, showRivals]);
 
   // Share params for the share button
   const shareParams = useMemo(() => {
