@@ -1072,7 +1072,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             //   1. a soft brand glow (lime→cyan) blooming from the center, and
             //   2. the elevated-navy depth disc fading to transparent at the rim.
             background:
-              'radial-gradient(circle at 50% 45%, rgba(191,255,0,0.08) 0%, rgba(0,255,255,0.05) 38%, transparent 62%),' +
+              'radial-gradient(circle at 50% 45%, rgba(191,255,0,0.22) 0%, rgba(0,255,255,0.13) 38%, transparent 64%),' +
               'radial-gradient(circle at center, var(--neo-navy-elevated) 0%, var(--neo-navy) 60%, transparent 80%)',
           }}
         />
