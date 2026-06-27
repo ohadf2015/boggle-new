@@ -343,7 +343,7 @@ export default function StickyReadyBar({
     const btnBase = 'w-full h-14 border-3 border-black rounded-xl shadow-hard font-black text-base uppercase tracking-tight flex items-center justify-center gap-3';
 
     return (
-      <div className="flex flex-col gap-2 flex-1 min-w-0">
+      <div className={cn('flex flex-col gap-2 flex-1 min-w-0', desktopProminent && 'max-w-md mx-auto')}>
         {/* Series Winner Banner */}
         <m.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -380,14 +380,13 @@ export default function StickyReadyBar({
     );
   }
 
-  return (
-    <div className="flex flex-col gap-2 flex-1 min-w-0 pb-[env(safe-area-inset-bottom)]">
-        {/* Host mode selector — always-visible horizontal pills.
-            On desktop (desktopProminent) the bar is wide, so the pills grow,
-            gain a labelled heading, and the active mode gets a high-contrast
-            ring + lift so switching modes reads clearly. */}
-        {isHost && selectedGameMode !== undefined && onSelectGameMode && (
-          <div className="flex flex-col gap-1 min-w-0">
+  /* Host mode selector — always-visible horizontal pills.
+     On desktop (desktopProminent) the bar is wide, so the pills grow,
+     gain a labelled heading, and the active mode gets a high-contrast
+     ring + lift so switching modes reads clearly. */
+  const modeSelectorBlock =
+    isHost && selectedGameMode !== undefined && onSelectGameMode ? (
+          <div className={cn('flex flex-col gap-1 min-w-0', desktopProminent && 'flex-1 justify-center')}>
             {desktopProminent && (
               <div className="text-center text-[10px] font-black uppercase tracking-widest text-neo-white/60">
                 {t('results.nextRoundMode')}
@@ -449,13 +448,11 @@ export default function StickyReadyBar({
               })()}
             </div>
           </div>
-        )}
+    ) : null;
 
-        {/* Contextual CTA button */}
-        {renderCtaButton()}
-
-        {/* Status Footer — ready avatar stack (excludes host — host clicks Start, not Ready) */}
-        {totalPlayers > 0 && (
+  /* Status Footer — ready avatar stack (excludes host — host clicks Start, not Ready) */
+  const readyFooterBlock =
+    totalPlayers > 0 ? (
           <div className="flex items-center justify-center gap-4" aria-live="polite" aria-label={`${readyCount}/${totalPlayers}`}>
             {/* Avatar dots with colored rings — bots always show as ready */}
             <div className="flex -space-x-1.5 rtl:space-x-reverse">
@@ -483,7 +480,33 @@ export default function StickyReadyBar({
               {readyCount} / {totalPlayers} {t('results.ready')}
             </span>
           </div>
+    ) : null;
+
+  // Desktop (desktopProminent): lay the mode selector and the CTA+ready group
+  // side-by-side so the wide bottom bar uses the horizontal space instead of
+  // stretching the action button edge-to-edge. Mobile keeps the stacked column.
+  return (
+    <div
+      data-testid="sticky-ready-bar"
+      className={cn(
+        'min-w-0 pb-[env(safe-area-inset-bottom)]',
+        desktopProminent
+          ? 'flex flex-row items-stretch gap-6 flex-1'
+          : 'flex flex-col gap-2 flex-1'
+      )}
+    >
+      {modeSelectorBlock}
+      <div
+        data-testid="ready-cta-group"
+        className={cn(
+          'flex flex-col gap-2 justify-center',
+          desktopProminent ? 'max-w-sm min-w-[18rem] shrink-0 mx-auto' : 'w-full min-w-0'
         )}
+      >
+        {/* Contextual CTA button */}
+        {renderCtaButton()}
+        {readyFooterBlock}
+      </div>
     </div>
   );
 }
