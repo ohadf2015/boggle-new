@@ -6,6 +6,8 @@
  * hiding the "ARENA HUB" title and top floating tiles.
  */
 import React from 'react';
+import fs from 'fs';
+import path from 'path';
 import { render, screen } from '@testing-library/react';
 import RoomListView from '../RoomListView';
 import type { ActiveRoom } from '@/shared/types/game';
@@ -129,5 +131,35 @@ describe('RoomListView hero banner — no clip, no shrink', () => {
     const img = screen.getByAltText('multiplayerFlow.roomList.heroAlt');
     const frame = img.parentElement as HTMLElement;
     expect(frame.className).toMatch(/bg-neo-navy/);
+  });
+});
+
+// LCP regression guard. The hero <Image> is the route's LCP element (priority,
+// SSR'd, loads ~561ms). A prior `initial={{ opacity: 0, y: -8 }}` entrance tween
+// kept it at opacity:0 in the SSR HTML — and LCP excludes opacity:0 elements — so
+// the hero wasn't LCP-eligible until React hydrated and ran the fade (~1712ms),
+// adding ~1.1s of pure render-delay. The hero must appear statically (no opacity:0
+// start) so it paints as soon as it decodes. See memory perf-render-delay-root-cause.
+describe('RoomListView hero entrance must not gate LCP', () => {
+  it('hero motion wrapper does not start the LCP image hidden (no opacity:0 initial)', () => {
+    const src = fs.readFileSync(path.join(__dirname, '../RoomListView.tsx'), 'utf8');
+    const heroIdx = src.indexOf('arena-hub-hero.jpg');
+    expect(heroIdx).toBeGreaterThan(-1);
+    // Walk back to the enclosing <m.div ...> that wraps the hero image and inspect
+    // its `initial` prop — it must not set opacity:0 (which delays LCP to hydration).
+    const before = src.slice(Math.max(0, heroIdx - 800), heroIdx);
+    const mDivStart = before.lastIndexOf('<m.div');
+    expect(mDivStart).toBeGreaterThan(-1);
+    const heroWrapper = before.slice(mDivStart);
+    expect(heroWrapper).not.toMatch(/initial=\{[^}]*opacity:\s*0/);
+  });
+
+  it('open-arenas room list (main above-fold content) does not start hidden', () => {
+    const src = fs.readFileSync(path.join(__dirname, '../RoomListView.tsx'), 'utf8');
+    const secIdx = src.indexOf('<m.section');
+    expect(secIdx).toBeGreaterThan(-1);
+    // the opening <m.section ...> tag up to its first '>'
+    const tag = src.slice(secIdx, src.indexOf('>', secIdx));
+    expect(tag).not.toMatch(/initial=\{[^}]*opacity:\s*0/);
   });
 });

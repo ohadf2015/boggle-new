@@ -44,10 +44,10 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               {t('legal.copyright', { year: new Date().getFullYear() })}
             </p>
             <nav aria-label={t('legal.title')} className="flex items-center gap-4">
-              <Link href={`/${language}/legal/privacy`} className={legalLinkClass}>
+              <Link prefetch={false} href={`/${language}/legal/privacy`} className={legalLinkClass}>
                 {t('legal.privacyPolicy')}
               </Link>
-              <Link href={`/${language}/legal/terms`} className={legalLinkClass}>
+              <Link prefetch={false} href={`/${language}/legal/terms`} className={legalLinkClass}>
                 {t('legal.termsOfService')}
               </Link>
             </nav>
@@ -62,11 +62,11 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               {t('footer.explore', 'Explore')}
             </h3>
             <ul className="space-y-2">
-              <li><Link href={`/${language}/about`} className={footerLinkClass}>{t('footer.about')}</Link></li>
-              <li><Link href={`/${language}/how-to-play`} className={footerLinkClass}>{t('footer.howToPlay', 'How to Play')}</Link></li>
-              <li><Link href={`/${language}/blog`} className={footerLinkClass}>{t('footer.blog')}</Link></li>
-              <li><Link href={`/${language}/faq`} className={footerLinkClass}>{t('footer.faq')}</Link></li>
-              <li><Link href={`/${language}/contact`} className={footerLinkClass}>{t('footer.contact')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/about`} className={footerLinkClass}>{t('footer.about')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/how-to-play`} className={footerLinkClass}>{t('footer.howToPlay', 'How to Play')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/blog`} className={footerLinkClass}>{t('footer.blog')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/faq`} className={footerLinkClass}>{t('footer.faq')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/contact`} className={footerLinkClass}>{t('footer.contact')}</Link></li>
             </ul>
           </nav>
 
@@ -80,10 +80,10 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               {t('footer.forTeachers', 'For Teachers')}
             </h3>
             <ul className="space-y-2">
-              <li><Link href={`/${language}/education`} className={footerLinkClass}>{t('footer.educationHub', 'Education Hub')}</Link></li>
-              <li><Link href={`/${language}/education/vocabulary-games-classroom`} className={footerLinkClass}>{t('footer.vocabularyGames', 'Vocabulary Games')}</Link></li>
-              <li><Link href={`/${language}/education/games-for-teachers`} className={footerLinkClass}>{t('footer.gamesForTeachers', 'Games for Teachers')}</Link></li>
-              <li><Link href={`/${language}/education/esl-word-games`} className={footerLinkClass}>{t('footer.eslWordGames', 'ESL Word Games')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/education`} className={footerLinkClass}>{t('footer.educationHub', 'Education Hub')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/education/vocabulary-games-classroom`} className={footerLinkClass}>{t('footer.vocabularyGames', 'Vocabulary Games')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/education/games-for-teachers`} className={footerLinkClass}>{t('footer.gamesForTeachers', 'Games for Teachers')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/education/esl-word-games`} className={footerLinkClass}>{t('footer.eslWordGames', 'ESL Word Games')}</Link></li>
             </ul>
           </nav>
 
@@ -93,11 +93,11 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               {t('footer.resources', 'Resources')}
             </h3>
             <ul className="space-y-2">
-              <li><Link href={`/${language}/word-of-the-day`} className={footerLinkClass}>{t('footer.wordOfTheDay')}</Link></li>
-              <li><Link href={`/${language}/guides`} className={footerLinkClass}>{t('footer.guides', 'Guides')}</Link></li>
-              <li><Link href={`/${language}/glossary`} className={footerLinkClass}>{t('footer.glossary', 'Glossary')}</Link></li>
-              <li><Link href={`/${language}/tools/word-solver`} className={footerLinkClass}>{t('footer.wordSolver')}</Link></li>
-              <li><Link href={`/${language}/sitemap`} className={footerLinkClass}>{t('footer.sitemap', 'Sitemap')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/word-of-the-day`} className={footerLinkClass}>{t('footer.wordOfTheDay')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/guides`} className={footerLinkClass}>{t('footer.guides', 'Guides')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/glossary`} className={footerLinkClass}>{t('footer.glossary', 'Glossary')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/tools/word-solver`} className={footerLinkClass}>{t('footer.wordSolver')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/sitemap`} className={footerLinkClass}>{t('footer.sitemap', 'Sitemap')}</Link></li>
             </ul>
           </nav>
 
@@ -107,9 +107,9 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               {t('legal.title')}
             </h3>
             <ul className="space-y-2">
-              <li><Link href={`/${language}/legal`} className={legalLinkClass}>{t('legal.title')}</Link></li>
-              <li><Link href={`/${language}/legal/privacy`} className={legalLinkClass}>{t('legal.privacyPolicy')}</Link></li>
-              <li><Link href={`/${language}/legal/terms`} className={legalLinkClass}>{t('legal.termsOfService')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/legal`} className={legalLinkClass}>{t('legal.title')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/legal/privacy`} className={legalLinkClass}>{t('legal.privacyPolicy')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/legal/terms`} className={legalLinkClass}>{t('legal.termsOfService')}</Link></li>
               <li><ManageCookiesButton /></li>
             </ul>
           </nav>

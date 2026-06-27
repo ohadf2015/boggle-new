@@ -119,8 +119,17 @@ export function getDeviceInfo(): {
 export async function initSessionTracking(): Promise<void> {
   if (typeof window === 'undefined') return;
 
-  // Delay slightly to ensure hydration is complete and avoid race conditions
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  // Defer until the main thread is idle so this non-critical analytics POST
+  // never competes with hydration/render in the post-paint window (it used to
+  // fire on a fixed 100ms timer that landed mid-hydration-settle). Falls back to
+  // a short timeout where requestIdleCallback is unavailable (jsdom, older WebKit).
+  await new Promise<void>((resolve) => {
+    if (typeof requestIdleCallback !== 'undefined') {
+      requestIdleCallback(() => resolve(), { timeout: 2000 });
+    } else {
+      setTimeout(resolve, 100);
+    }
+  });
 
   try {
     const sessionId = getGuestSessionId();

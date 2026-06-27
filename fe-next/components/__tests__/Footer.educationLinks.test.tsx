@@ -10,6 +10,8 @@
  * @vitest-environment jsdom
  */
 import React from 'react';
+import fs from 'fs';
+import path from 'path';
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import Footer from '../Footer';
@@ -56,6 +58,20 @@ describe('Footer — For Teachers education links (crawl-equity)', () => {
     expect(eduLinks.length).toBeGreaterThanOrEqual(4);
     for (const link of eduLinks) {
       expect(link.className).toMatch(/\bpy-2\b|\bpy-2\.5\b|\bpy-3\b/);
+    }
+  });
+
+  // Perf: footer links are secondary (legal/blog/SEO) and rarely clicked. The App
+  // Router eagerly prefetches each <Link>'s RSC payload on viewport-entry — on the
+  // many short pages the footer is in-viewport at load, firing ~19 background RSC
+  // fetches/renders for nothing. prefetch={false} keeps hover-prefetch (snappy on
+  // intent) and the <a href> still renders (crawl equity intact, asserted above).
+  it('every footer <Link> opts out of eager prefetch (prefetch={false})', () => {
+    const src = fs.readFileSync(path.join(__dirname, '../Footer.tsx'), 'utf8');
+    const links = src.match(/<Link\b[^>]*>/g) || [];
+    expect(links.length).toBeGreaterThan(0);
+    for (const tag of links) {
+      expect(tag).toMatch(/prefetch=\{false\}/);
     }
   });
 });

@@ -177,10 +177,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             buttons overlay the hero corners — this removes a full header row of
             vertical space, the main lever for eliminating scroll (esp. on the
             short/medium-short laptop breakpoints). */}
+        {/* Hero appears statically — NO opacity:0 entrance. This block wraps the
+            LCP <Image>; an opacity:0 initial would exclude it from LCP until React
+            hydrates and faded it in (~1.1s render-delay on a priority image that
+            already decoded ~561ms). Static appear paints it the instant it loads.
+            See memory perf-render-delay-root-cause-2026-06-27. */}
         <m.div
-          initial={hasMountedRef.current ? false : { opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4, ease: 'easeOut', delay: 0.05 }}
+          initial={false}
           className="px-5 lg:px-6 pt-3 lg:pt-4 short:pt-1.5 medium-short:pt-2 shrink-0"
         >
           <h1 className="sr-only">{t('multiplayerFlow.roomList.arenaHub')}</h1>
@@ -270,11 +273,13 @@ const RoomListView: React.FC<RoomListViewProps> = ({
             </m.div>
           )}
 
-          {/* Open Arenas Section */}
+          {/* Open Arenas Section — static appear (no opacity:0 + 0.25s delay).
+              This is the lobby's primary above-fold content; an opacity:0 entrance
+              kept the whole room list invisible until hydration ran the fade,
+              compounding the hero LCP render-delay. Individual room cards keep their
+              own entrance (AnimatePresence below). See perf-render-delay-root-cause. */}
           <m.section
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.25 }}
+            initial={false}
             className="flex flex-col gap-3"
             aria-busy={roomsLoading}
           >

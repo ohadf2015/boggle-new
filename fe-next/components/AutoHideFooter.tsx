@@ -119,19 +119,19 @@ export function AutoHideFooter({ className }: AutoHideFooterProps) {
         className="py-1.5 px-3 border-t border-neo-black/30 bg-neo-navy/80 text-center"
       >
         <nav aria-label="Legal" className="flex items-center justify-center gap-2 text-[10px] text-neo-white">
-          <Link href={`/${language}/contact`} className="hover:text-neo-white transition-colors">
+          <Link prefetch={false} href={`/${language}/contact`} className="hover:text-neo-white transition-colors">
             {t('footer.contact')}
           </Link>
           <span>·</span>
-          <Link href={`/${language}/legal/privacy`} className="hover:text-neo-white transition-colors">
+          <Link prefetch={false} href={`/${language}/legal/privacy`} className="hover:text-neo-white transition-colors">
             {t('legal.privacyPolicy')}
           </Link>
           <span>·</span>
-          <Link href={`/${language}/legal/terms`} className="hover:text-neo-white transition-colors">
+          <Link prefetch={false} href={`/${language}/legal/terms`} className="hover:text-neo-white transition-colors">
             {t('legal.termsOfService')}
           </Link>
           <span>·</span>
-          <Link href={`/${language}/about`} className="hover:text-neo-white transition-colors">
+          <Link prefetch={false} href={`/${language}/about`} className="hover:text-neo-white transition-colors">
             {t('footer.about')}
           </Link>
         </nav>
