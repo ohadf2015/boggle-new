@@ -19,6 +19,7 @@ export type QuestConditionType =
   | 'longWord' // longest word found this game >= target
   | 'score' // game score >= target
   | 'wordsInGame' // words found this game >= target
+  | 'combo' // peak combo this game >= target
   | 'mpWin' // top human in a game with >=1 human opponent
   | 'beatHuman' // outscored at least one real human opponent
   | 'playMode'; // played a specific public mode (discovery)
@@ -54,6 +55,8 @@ export interface QuestGameResult {
   score: number;
   longestWordLength: number;
   wordsFound: number;
+  /** Peak combo level reached this game. */
+  maxCombo: number;
   /** Number of OTHER human players in the game. */
   humanOpponentCount: number;
   /** This player is #1 among the humans. */
@@ -71,6 +74,7 @@ export function emptyQuestResult(
     score: 0,
     longestWordLength: 0,
     wordsFound: 0,
+    maxCombo: 0,
     humanOpponentCount: 0,
     isTopHuman: false,
     beatHumanOpponent: false,
@@ -106,6 +110,8 @@ export const DAILY_QUEST_POOL: DailyQuest[] = [
   q('score_300', 'score', 300, 'skill', '/daily', '🎯'),
   q('score_500', 'score', 500, 'skill', '/daily', '🚀'),
   q('words_15', 'wordsInGame', 15, 'skill', '/daily', '⚡'),
+  q('combo_4', 'combo', 4, 'skill', '/singleplayer', '🔥'),
+  q('combo_6', 'combo', 6, 'skill', '/singleplayer', '💥'),
   // PVP — same-language is guaranteed by matchmaking; beating a human is rare/brag-worthy
   q('mp_win', 'mpWin', 1, 'pvp', '/multiplayer', '👑'),
   q('beat_human', 'beatHuman', 1, 'pvp', '/multiplayer', '⚔️'),
@@ -178,6 +184,8 @@ function isSatisfied(quest: DailyQuest, r: QuestGameResult): boolean {
       return r.score >= quest.target;
     case 'wordsInGame':
       return r.wordsFound >= quest.target;
+    case 'combo':
+      return r.maxCombo >= quest.target;
     case 'mpWin':
       return r.isMultiplayer && r.isTopHuman && r.humanOpponentCount >= 1;
     case 'beatHuman':

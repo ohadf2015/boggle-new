@@ -11933,6 +11933,8 @@ const en = {
       "score_300": { "title": "Sharp Shooter", "desc": "Score 300+ in a single game" },
       "score_500": { "title": "High Roller", "desc": "Score 500+ in a single game" },
       "words_15": { "title": "Word Machine", "desc": "Find 15+ words in one game" },
+      "combo_4": { "title": "Combo Starter", "desc": "Hit a 4x combo in one game" },
+      "combo_6": { "title": "Combo King", "desc": "Hit a 6x combo in one game" },
       "mp_win": { "title": "Champion", "desc": "Win a multiplayer match" },
       "beat_human": { "title": "Rival Crusher", "desc": "Beat a real human opponent" },
       "play_mp": { "title": "Enter the Arena", "desc": "Play a multiplayer match" },

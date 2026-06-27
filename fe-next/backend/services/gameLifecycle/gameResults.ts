@@ -287,11 +287,16 @@ export async function recordGameResultsToSupabase(
         (m: number, w: WordDetail) => Math.max(m, w.word?.length || 0),
         0,
       );
+      const maxCombo = (p.wordDetails ?? []).reduce(
+        (m: number, w: WordDetail) => Math.max(m, w.comboLevel ?? 0),
+        0,
+      );
       const result = emptyQuestResult({
         mode: gameInfo.gameMode,
         isMultiplayer: humanCount >= 2,
         score: playerScore,
         longestWordLength,
+        maxCombo,
         wordsFound: p.wordDetails?.length || 0,
         humanOpponentCount: humanCount - 1,
         isTopHuman: humanCount >= 1 && playerScore === topHumanScore,

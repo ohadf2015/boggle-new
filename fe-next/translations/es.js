@@ -12812,6 +12812,8 @@ const es = {
         "title": "Máquina de Palabras",
         "desc": "Encuentra 15+ palabras en un juego"
       },
+      "combo_4": { "title": "Combo Iniciador", "desc": "Logra 4x combo en un juego" },
+      "combo_6": { "title": "Rey del Combo", "desc": "Logra 6x combo en un juego" },
       "mp_win": {
         "title": "Campeón",
         "desc": "Gana una partida multijugador"

@@ -12808,6 +12808,8 @@ const sv = {
         "title": "Ordmaskin",
         "desc": "Hitta 15+ ord i ett spel"
       },
+      "combo_4": { "title": "Combo Start", "desc": "Nå 4x combo i ett spel" },
+      "combo_6": { "title": "Combo Kung", "desc": "Nå 6x combo i ett spel" },
       "mp_win": {
         "title": "Mästare",
         "desc": "Vinna en multiplayer-match"

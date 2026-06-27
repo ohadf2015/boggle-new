@@ -100,6 +100,11 @@ describe('evaluateDailyQuests', () => {
     expect(run(['score_500'], { score: 499 })).toEqual([]);
   });
 
+  it('completes combo quest at/above target only', () => {
+    expect(run(['combo_6'], { maxCombo: 6 })).toEqual([0]);
+    expect(run(['combo_6'], { maxCombo: 5 })).toEqual([]);
+  });
+
   it('beatHuman requires outscoring a real human, not a bot', () => {
     expect(run(['beat_human'], { beatHumanOpponent: true })).toEqual([0]);
     // top of an all-bot lobby — no human beaten
