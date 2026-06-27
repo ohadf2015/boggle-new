@@ -3,14 +3,17 @@
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCosmetics } from '@/hooks/useCosmetics';
-import { type CosmeticCategory, RARITY_COLORS, type Cosmetic, formatUnlockHint, formatUnlockProgress } from '@/lib/cosmetics';
+import { type CosmeticCategory, RARITY_COLORS, type Cosmetic, formatUnlockHint, formatUnlockProgress, localizeTierParams } from '@/lib/cosmetics';
 import { Lock } from 'lucide-react';
 import { CosmeticPreview } from './CosmeticPreview';
+import { RankProgressBanner } from './RankProgressBanner';
 
 interface CosmeticCollectionProps {
   rankTier: string;
   streakDays: number;
   coins: number;
+  /** Lifetime total_score — drives the rank banner + roadmap. */
+  totalScore?: number;
   spendCoins?: (amount: number, reason: string, metadata?: Record<string, string | number>) => Promise<boolean>;
 }
 
@@ -21,7 +24,7 @@ const TABS: { key: CosmeticCategory; label: string }[] = [
   { key: 'profileFrame', label: 'cosmetics.profileFrames' },
 ];
 
-export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: CosmeticCollectionProps) {
+export function CosmeticCollection({ rankTier, streakDays, coins, totalScore = 0, spendCoins }: CosmeticCollectionProps) {
   const { t } = useLanguage();
   const { equipCosmetic, purchaseCosmetic, getCosmeticsByCategory } = useCosmetics({
     rankTier,
@@ -37,6 +40,9 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
   return (
     <div className="w-full">
       <h2 className="text-xl font-neo-display font-bold mb-4">{t('cosmetics.collection')}</h2>
+
+      {/* Current rank + progress to next + expandable ladder */}
+      <RankProgressBanner totalScore={totalScore} />
 
       {/* Tabs */}
       <div className="flex gap-2 mb-4 overflow-x-auto">
@@ -93,11 +99,11 @@ export function CosmeticCollection({ rankTier, streakDays, coins, spendCoins }: 
                 return (
                   <>
                     <span className="text-xs text-neo-white mt-1 block font-neo-body">
-                      {hint ? t(hint.key, hint.params) : t('cosmetics.locked')}
+                      {hint ? t(hint.key, localizeTierParams(hint.params, t)) : t('cosmetics.locked')}
                     </span>
                     {progress && (
                       <span className="text-[11px] text-neo-cyan mt-0.5 block font-neo-body font-bold tabular-nums">
-                        {t(progress.key, progress.params)}
+                        {t(progress.key, localizeTierParams(progress.params, t))}
                       </span>
                     )}
                   </>

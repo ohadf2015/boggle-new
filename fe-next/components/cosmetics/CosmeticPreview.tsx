@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
-import { type Cosmetic, RARITY_COLORS, formatUnlockHint } from '@/lib/cosmetics';
+import { type Cosmetic, RARITY_COLORS, formatUnlockHint, localizeTierParams } from '@/lib/cosmetics';
 import { X, Lock } from 'lucide-react';
 
 interface CosmeticPreviewProps {
@@ -66,7 +66,7 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
           <div>
             <p className="text-sm text-neo-white mb-2 font-neo-body">
               <span className="text-gray-500 me-1">🔒</span>
-              {hint ? t(hint.key, hint.params) : t('cosmetics.locked')}
+              {hint ? t(hint.key, localizeTierParams(hint.params, t)) : t('cosmetics.locked')}
             </p>
             {cosmetic.unlockCondition.type === 'purchase' && onPurchase && (
               <button

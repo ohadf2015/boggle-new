@@ -45,6 +45,8 @@ import { SeasonRankCard } from '@/components/seasons/SeasonRankCard';
 import { ProfileStyleCard } from '@/components/playerStyle/ProfileStyleCard';
 import { useSeasonBadges } from '@/hooks/useSeasonBadges';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { useEngagementStatus } from '@/hooks/useEngagementStatus';
+import { getGlobalLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
 
 interface GameSession {
   gameCode?: string;
@@ -74,6 +76,11 @@ export default function ProfilePageClient(): React.JSX.Element {
   const { spendCoins } = useCoinContext();
   const { collectibles: playerCollectibles, isLoading: isLoadingCollectibles } = usePlayerCollectibles(user?.id);
   const { badges: seasonBadges, isLoading: isLoadingSeasonBadges } = useSeasonBadges(user?.id);
+  // Cosmetics gate on the score-based leaderboard tier (earned through ANY mode),
+  // not the never-fetched profile.rank_tier column. Streak comes from
+  // player_engagement (via useEngagementStatus), not the absent profile.streak_days.
+  const { streak: currentStreak } = useEngagementStatus();
+  const cosmeticRankTier = getGlobalLeaderboardTier(profile?.total_score ?? 0).id;
 
   // Pull-to-refresh
   const { pullToRefreshHandlers, pullState } = usePullToRefresh({
@@ -390,9 +397,10 @@ export default function ProfilePageClient(): React.JSX.Element {
                 <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} />
                 <m.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.37 }} className="mt-4">
                   <CosmeticCollection
-                    rankTier={profile?.rank_tier || 'Bronze'}
-                    streakDays={profile?.streak_days || 0}
+                    rankTier={cosmeticRankTier}
+                    streakDays={currentStreak}
                     coins={profile?.total_coins || 0}
+                    totalScore={profile?.total_score ?? 0}
                     spendCoins={spendCoins}
 
                   />
@@ -470,9 +478,10 @@ export default function ProfilePageClient(): React.JSX.Element {
           {/* 7b. Collection */}
           <ProfileCollection collectibles={playerCollectibles} isLoading={isLoadingCollectibles} isDarkMode={isDarkMode} delay={0.35} />
           <CosmeticCollection
-            rankTier={profile?.rank_tier || 'Bronze'}
-            streakDays={profile?.streak_days || 0}
+            rankTier={cosmeticRankTier}
+            streakDays={currentStreak}
             coins={profile?.total_coins || 0}
+            totalScore={profile?.total_score ?? 0}
             spendCoins={spendCoins}
 
           />

@@ -1,8 +1,9 @@
 /**
  * UnlockNotifierMount — global gate for the cosmetic unlock toast.
  * Must NOT run the notifier for guests (no profile) — seeding the snapshot from
- * a guest default would spam toasts on a later sign-in. Must run it (with the
- * profile's rank/streak) once a real profile is loaded.
+ * a guest default would spam toasts on a later sign-in. Once a real profile is
+ * loaded it runs with the score-derived leaderboard tier (from total_score, the
+ * same axis the cosmetics gate uses) and the real streak from player_engagement.
  *
  * @vitest-environment jsdom
  */
@@ -19,10 +20,18 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => authMock(),
 }));
 
+const engagementMock = vi.fn();
+vi.mock('@/hooks/useEngagementStatus', () => ({
+  useEngagementStatus: () => engagementMock(),
+}));
+
 import { UnlockNotifierMount } from '../UnlockNotifierMount';
 
 describe('UnlockNotifierMount', () => {
-  beforeEach(() => notifierMock.mockClear());
+  beforeEach(() => {
+    notifierMock.mockClear();
+    engagementMock.mockReturnValue({ streak: 0 });
+  });
 
   it('does not run the notifier for guests (no profile)', () => {
     authMock.mockReturnValue({ profile: null });
@@ -30,15 +39,17 @@ describe('UnlockNotifierMount', () => {
     expect(notifierMock).not.toHaveBeenCalled();
   });
 
-  it('runs the notifier with the loaded profile rank/streak', () => {
-    authMock.mockReturnValue({ profile: { rank_tier: 'Gold', streak_days: 12 } });
+  it('runs the notifier with the score-derived tier and engagement streak', () => {
+    // total_score 12000 → Gold tier (>= 10000). Streak from player_engagement.
+    authMock.mockReturnValue({ profile: { total_score: 12000 } });
+    engagementMock.mockReturnValue({ streak: 12 });
     render(<UnlockNotifierMount />);
-    expect(notifierMock).toHaveBeenCalledWith({ rankTier: 'Gold', streakDays: 12 });
+    expect(notifierMock).toHaveBeenCalledWith({ rankTier: 'gold', streakDays: 12 });
   });
 
-  it('falls back to Bronze/0 when profile fields are missing', () => {
+  it('falls back to Stone/0 when total_score is missing', () => {
     authMock.mockReturnValue({ profile: {} });
     render(<UnlockNotifierMount />);
-    expect(notifierMock).toHaveBeenCalledWith({ rankTier: 'Bronze', streakDays: 0 });
+    expect(notifierMock).toHaveBeenCalledWith({ rankTier: 'stone', streakDays: 0 });
   });
 });

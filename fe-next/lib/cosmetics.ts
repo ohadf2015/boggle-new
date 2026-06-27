@@ -33,13 +33,20 @@ export interface PlayerCosmeticState {
   equippedIds: Partial<Record<CosmeticCategory, string>>;
 }
 
-// Rank hierarchy for comparison
-const RANK_ORDER: string[] = [
-  'Unranked', 'Bronze', 'Silver', 'Gold', 'Platinum', 'Diamond', 'Master', 'Grandmaster',
-];
+import { LEADERBOARD_TIER_IDS } from './ranked/leaderboardTiers';
+
+// Rank hierarchy for comparison. Cosmetics gate on the score-based leaderboard
+// tier (derived from total_score), so every game in every mode advances it —
+// not ranked ELO, which casual players never touch. Tier ids are lowercase
+// (stone < bronze < silver < gold < platinum < diamond < grandmaster).
+const RANK_ORDER: readonly string[] = LEADERBOARD_TIER_IDS;
 
 function rankAtLeast(playerTier: string, requiredTier: string): boolean {
-  return RANK_ORDER.indexOf(playerTier) >= RANK_ORDER.indexOf(requiredTier);
+  // Case-insensitive: defends against any legacy capitalized value flowing in.
+  const a = RANK_ORDER.indexOf(playerTier.toLowerCase());
+  const b = RANK_ORDER.indexOf(requiredTier.toLowerCase());
+  if (b === -1) return false; // unknown requirement (catalog bug) → never unlocks
+  return a >= b;
 }
 
 /**
@@ -62,7 +69,7 @@ export const COSMETICS: Cosmetic[] = [
     name: 'cosmetics.items.tileNeon',
     description: 'cosmetics.items.tileNeonDesc',
     rarity: 'rare',
-    unlockCondition: { type: 'rank', tier: 'Silver' },
+    unlockCondition: { type: 'rank', tier: 'silver' },
     preview: 'tile-skin-neon',
   },
   {
@@ -80,7 +87,7 @@ export const COSMETICS: Cosmetic[] = [
     name: 'cosmetics.items.tileCrystal',
     description: 'cosmetics.items.tileCrystalDesc',
     rarity: 'epic',
-    unlockCondition: { type: 'rank', tier: 'Diamond' },
+    unlockCondition: { type: 'rank', tier: 'diamond' },
     preview: 'tile-skin-crystal',
   },
   {
@@ -89,7 +96,7 @@ export const COSMETICS: Cosmetic[] = [
     name: 'cosmetics.items.tileFire',
     description: 'cosmetics.items.tileFireDesc',
     rarity: 'legendary',
-    unlockCondition: { type: 'rank', tier: 'Master' },
+    unlockCondition: { type: 'rank', tier: 'grandmaster' },
     preview: 'tile-skin-fire',
   },
 
@@ -127,7 +134,7 @@ export const COSMETICS: Cosmetic[] = [
     name: 'cosmetics.items.boardGalaxy',
     description: 'cosmetics.items.boardGalaxyDesc',
     rarity: 'epic',
-    unlockCondition: { type: 'rank', tier: 'Platinum' },
+    unlockCondition: { type: 'rank', tier: 'platinum' },
     preview: 'board-theme-galaxy',
   },
 
@@ -147,7 +154,7 @@ export const COSMETICS: Cosmetic[] = [
     name: 'cosmetics.items.victoryFireworks',
     description: 'cosmetics.items.victoryFireworksDesc',
     rarity: 'rare',
-    unlockCondition: { type: 'rank', tier: 'Gold' },
+    unlockCondition: { type: 'rank', tier: 'gold' },
     preview: 'victory-effect-fireworks',
   },
   {
@@ -176,7 +183,7 @@ export const COSMETICS: Cosmetic[] = [
     name: 'cosmetics.items.frameBronze',
     description: 'cosmetics.items.frameBronzeDesc',
     rarity: 'common',
-    unlockCondition: { type: 'rank', tier: 'Bronze' },
+    unlockCondition: { type: 'rank', tier: 'bronze' },
     preview: 'frame-bronze-ring',
   },
   {
@@ -185,7 +192,7 @@ export const COSMETICS: Cosmetic[] = [
     name: 'cosmetics.items.frameSilver',
     description: 'cosmetics.items.frameSilverDesc',
     rarity: 'rare',
-    unlockCondition: { type: 'rank', tier: 'Silver' },
+    unlockCondition: { type: 'rank', tier: 'silver' },
     preview: 'frame-silver-ring',
   },
   {
@@ -194,7 +201,7 @@ export const COSMETICS: Cosmetic[] = [
     name: 'cosmetics.items.frameGold',
     description: 'cosmetics.items.frameGoldDesc',
     rarity: 'rare',
-    unlockCondition: { type: 'rank', tier: 'Gold' },
+    unlockCondition: { type: 'rank', tier: 'gold' },
     preview: 'frame-gold-crown',
   },
   {
@@ -203,7 +210,7 @@ export const COSMETICS: Cosmetic[] = [
     name: 'cosmetics.items.frameDiamond',
     description: 'cosmetics.items.frameDiamondDesc',
     rarity: 'epic',
-    unlockCondition: { type: 'rank', tier: 'Diamond' },
+    unlockCondition: { type: 'rank', tier: 'diamond' },
     preview: 'frame-diamond-halo',
   },
 ];
@@ -263,6 +270,17 @@ export function getCosmeticsByCategory(category: CosmeticCategory): Cosmetic[] {
 }
 
 /**
+ * Cosmetics a player earns AT a given rank tier (rank-gated only).
+ * Powers the rank roadmap — "reach Gold → unlock these". Case-insensitive.
+ */
+export function cosmeticsUnlockedAtTier(tierId: string): Cosmetic[] {
+  const id = tierId.toLowerCase();
+  return COSMETICS.filter(
+    (c) => c.unlockCondition.type === 'rank' && c.unlockCondition.tier.toLowerCase() === id,
+  );
+}
+
+/**
  * Translation hint for an unlock condition.
  * Returns null for `default` (no hint to show).
  * Caller passes `key`+`params` straight to t().
@@ -308,6 +326,28 @@ export function formatUnlockProgress(
     };
   }
   return null;
+}
+
+/**
+ * Resolve any tier-id values inside a hint/progress params object to localized
+ * tier NAMES. The pure formatters emit raw lowercase tier ids ('silver') as
+ * params; the UI calls this with its `t` so "Reach {{tier}} rank" renders the
+ * localized name ("Reach Silver rank" / "הגע לדרגת כסף") instead of the raw id.
+ * Numeric params (streak days, cost) pass through untouched.
+ */
+export function localizeTierParams(
+  params: Record<string, string | number> | undefined,
+  translate: (key: string) => string,
+): Record<string, string | number> | undefined {
+  if (!params) return params;
+  const out: Record<string, string | number> = { ...params };
+  for (const k of Object.keys(out)) {
+    const v = out[k];
+    if (typeof v === 'string' && RANK_ORDER.includes(v.toLowerCase())) {
+      out[k] = translate(`rank.tier.${v.toLowerCase()}`);
+    }
+  }
+  return out;
 }
 
 /**
