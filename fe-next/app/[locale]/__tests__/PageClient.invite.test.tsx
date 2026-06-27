@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import HomePageClient from '@/app/[locale]/PageClient';
 import { getPendingRoomInvite } from '@/utils/onboardingStorage';
 
@@ -74,5 +75,18 @@ describe('HomePageClient invite parsing', () => {
     setUrl('');
     render(<HomePageClient />);
     expect(replaceMock).not.toHaveBeenCalled();
+  });
+
+  // Regression #418: the server (no window) renders LandingView. The first CLIENT
+  // paint must match — it previously rendered the connecting spinner for a
+  // returning user with ?room= (inviteRedirectUrl read in a useState initializer),
+  // diverging from server HTML → React #418 hydration crash. renderToString runs
+  // no effects, so it reproduces the first-paint output.
+  it('first paint renders LandingView (not the connecting spinner) for a returning user with ?room=', () => {
+    localStorage.setItem('lexiclash_onboarding_completed', 'true');
+    setUrl('?room=ABC123&host=Alice');
+    const html = renderToString(<HomePageClient />);
+    expect(html).toContain('landing-view');
+    expect(html).not.toContain('animate-spin');
   });
 });

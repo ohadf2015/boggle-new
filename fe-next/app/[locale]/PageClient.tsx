@@ -130,6 +130,15 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     if (hasCompletedOnboarding() || hasSupabaseSession()) return;
     setShowFTUE(true);
   }, []);
+
+  // Hydration gate for the render-affecting, window-derived branches below
+  // (invite spinner, isNewUser CTA). The server (SSG, no window) emits LandingView;
+  // these branches must NOT flip the first CLIENT render or React #418 fires (seen
+  // in prod on /en?room=… invite links). The side-effects in the initializers above
+  // still run synchronously (invite saved before child effects) — only the RENDER
+  // waits for mount, same discipline as showFTUE.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   // Defensive route allowlist: FTUE may only render on locale homepage.
   // PageClient is mounted only at /[locale]/page.tsx today, so this is dormant
   // for current users — but guards against a future hoist that would leak the
@@ -155,7 +164,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     }
   }, [inviteRedirectUrl, inviteRoomCode, clarityVariant, trackClarityExposure, router]);
 
-  if (inviteRedirectUrl) {
+  if (mounted && inviteRedirectUrl) {
     if (clarityVariant === 'status-card') {
       return (
         <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
@@ -186,7 +195,7 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   return (
     <LandingView
       initialData={initialData}
-      onStartOnboarding={isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
+      onStartOnboarding={mounted && isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
     />
   );
 }
