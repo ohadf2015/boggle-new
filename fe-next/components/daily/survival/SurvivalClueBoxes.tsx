@@ -53,8 +53,8 @@ function tileSizeClass(wordLength: number, compact?: boolean): string {
     : wordLength <= 6
       ? 'w-10 h-10 sm:w-11 sm:h-11 text-base sm:text-lg [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none'
       : wordLength <= 8
-        ? 'w-9 h-9 sm:w-10 sm:h-10 text-sm sm:text-base [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none'
-        : 'w-8 h-8 sm:w-9 sm:h-9 text-xs sm:text-sm [@media(max-height:560px)]:w-5 [@media(max-height:560px)]:h-5 [@media(max-height:560px)]:text-[9px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none';
+        ? 'w-8 h-8 sm:w-10 sm:h-10 text-sm sm:text-base [@media(max-height:560px)]:w-6 [@media(max-height:560px)]:h-6 [@media(max-height:560px)]:text-[10px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none'
+        : 'w-7 h-7 sm:w-9 sm:h-9 text-xs sm:text-sm [@media(max-height:560px)]:w-5 [@media(max-height:560px)]:h-5 [@media(max-height:560px)]:text-[9px] [@media(max-height:560px)]:rounded [@media(max-height:560px)]:border [@media(max-height:560px)]:shadow-none';
 }
 
 /**
@@ -251,7 +251,7 @@ const FeedbackOverlay: React.FC<FeedbackOverlayProps> = ({ feedback, targetWordL
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.15 }}
-      className="flex justify-center flex-wrap gap-2 sm:gap-2.5"
+      className="flex justify-center flex-nowrap gap-1.5 sm:gap-2.5"
     >
       {normalizedFeedback.map((letterFb, idx) => {
         const isClue = letterFb.feedback === 'green' || letterFb.feedback === 'yellow';
@@ -327,7 +327,7 @@ const HintBoxes: React.FC<HintBoxesProps> = ({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       transition={{ duration: 0.15 }}
-      className="flex justify-center flex-wrap gap-2 sm:gap-2.5"
+      className="flex justify-center flex-nowrap gap-1.5 sm:gap-2.5"
     >
       {hintChars.map((char, idx) => {
         const accumulatedClue = accumulatedClues.get(idx);
