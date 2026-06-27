@@ -1,13 +1,14 @@
 /**
  * Pure ordering + reranking helpers for the daily-challenge leaderboards.
  *
- * The daily-challenge leaderboard spans ALL languages: every language plays a
- * different puzzle, but players are merged into a single global ranking by the
- * same scoring criteria used inside the per-language SQL views.
+ * Each daily-challenge leaderboard is scoped to a SINGLE language: every language
+ * plays a different board, so players are only ranked against — and only see the
+ * words of — others who played the same language.
  *
- * The SQL views' `rank_position` is partitioned per language, so once the route
- * drops the `.eq('language', …)` filter it can no longer rely on that column —
- * it must re-sort the merged rows here and renumber them 1..N globally.
+ * The SQL views emit one row per ATTEMPT and their `rank_position` also counts
+ * guests + replays, so even within one language the route can't trust that column
+ * directly — it re-sorts the rows here, collapses replays to one row per player,
+ * and renumbers them 1..N.
  *
  * These helpers are intentionally pure (no DB, no I/O) so the ordering contract
  * is unit-testable and shared across every daily-challenge leaderboard route.
@@ -24,9 +25,9 @@ export function rerankSequential<T>(rows: T[]): (T & { rank_position: number })[
  * sortXGlobally helpers) so "first" == "best".
  *
  * Why: the per-language SQL views emit one row per ATTEMPT, and players replay the
- * same puzzle many times (and across languages) — so the same player shows up
- * repeatedly, including lower-scored duplicates that misread as "their real score".
- * Dedup by player_id alone fixes both same-language replays and cross-language rows.
+ * same puzzle many times — so the same player shows up repeatedly, including
+ * lower-scored duplicates that misread as "their real score". Dedup by player_id
+ * collapses those same-language replays to the single best row.
  *
  * Rows with a null/missing player_id (guests) are never collapsed together.
  */

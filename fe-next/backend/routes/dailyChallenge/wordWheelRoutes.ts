@@ -325,19 +325,21 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Cross-language (global) leaderboard: no `.eq('language', …)` filter — players
-    // from every language compete together. The view's rank_position is per-language,
-    // so we order by the scoring columns directly and renumber globally below.
+    // Per-language leaderboard: each language plays a DIFFERENT wheel, so players are
+    // only ranked against — and only see the submitted words of — others who played the
+    // same language. The view's rank_position counts guests + replays, so we re-sort
+    // and renumber below.
     const { data, error } = await supabase
       .from('daily_word_wheel_leaderboard')
       .select('*')
       .eq('puzzle_date', date)
+      .eq('language', language)
       .not('player_id', 'is', null)
       .order('score', { ascending: false, nullsFirst: false })
       .order('word_count', { ascending: false, nullsFirst: false })
       .order('completed_at', { ascending: true, nullsFirst: false })
       // Over-fetch: view has one row per ATTEMPT, so a player occupies many slots
-      // (replays + languages). Pull extra so dedup-to-one-per-player still yields `limit`.
+      // (same-language replays). Pull extra so dedup-to-one-per-player still yields `limit`.
       // ponytail: ×10 cap 500 covers current worst case; move to DISTINCT ON in the view if replays climb.
       .limit(Math.min(limit * 10, 500));
 
@@ -347,7 +349,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Sort by global scoring order, collapse each player to their single best row
+    // Sort by scoring order, collapse each player to their single best row
     // (view has one row per ATTEMPT), trim to limit, then renumber 1..N.
     const rerankedData = rerankSequential(
       dedupeByPlayerKeepBest(sortWordWheelRowsGlobally(data || [])).slice(0, limit),
@@ -356,12 +358,14 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     const { count: totalCount } = await supabase
       .from('daily_word_wheel_attempts')
       .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date);
+      .eq('puzzle_date', date)
+      .eq('language', language);
 
     const { count: guestCount } = await supabase
       .from('daily_word_wheel_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
+      .eq('language', language)
       .is('player_id', null)
       .not('guest_fingerprint', 'is', null);
 
@@ -370,6 +374,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .from('daily_word_wheel_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
+      .eq('language', language)
       .gt('word_count', 0);
 
     res.set('Cache-Control', 'public, max-age=20, s-maxage=20, stale-while-revalidate=60');

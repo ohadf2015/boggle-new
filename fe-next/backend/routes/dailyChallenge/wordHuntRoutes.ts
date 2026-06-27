@@ -511,20 +511,22 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       return;
     }
 
-    // Cross-language (global) leaderboard: no `.eq('language', …)` filter — players
-    // from every language compete together. The view's rank_position is per-language,
-    // so we order by the scoring columns directly and renumber globally below.
+    // Per-language leaderboard: each language plays a DIFFERENT board/target word,
+    // so players are only ranked against — and only see the discovered words of —
+    // others who played the same language. The view's rank_position is per-language,
+    // but it also counts guests + replays, so we still re-sort and renumber below.
     const { data, error } = await supabase
       .from('daily_word_hunt_leaderboard')
       .select('*')
       .eq('puzzle_date', date)
+      .eq('language', language)
       .eq('solved', true)
       .not('player_id', 'is', null)
       .order('efficiency_score', { ascending: false, nullsFirst: false })
       .order('attempts_used', { ascending: true, nullsFirst: false })
       .order('completed_at', { ascending: true, nullsFirst: false })
       // Over-fetch: the view has one row per ATTEMPT, so a player can occupy many
-      // slots (replays + multiple languages). Pull extra so that after collapsing to
+      // slots (same-language replays). Pull extra so that after collapsing to
       // one row per player we still have `limit` distinct players.
       // ponytail: ×10 cap 500 covers the current worst case (~8 attempts/player); if
       // replay counts climb, move the dedup into the view via DISTINCT ON (player_id).
@@ -555,6 +557,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
+      .eq('language', language)
       .eq('solved', true)
       .not('player_id', 'is', null);
 
@@ -565,7 +568,8 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
     const { count: totalPlayersCount, error: totalPlayersError } = await supabase
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
-      .eq('puzzle_date', date);
+      .eq('puzzle_date', date)
+      .eq('language', language);
 
     if (totalPlayersError) {
       logger.debug('API', `Word Hunt total players count error: ${totalPlayersError.message || totalPlayersError.code || 'Unknown'}`);
@@ -575,6 +579,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
+      .eq('language', language)
       .eq('solved', true);
 
     if (totalSolvedError) {
@@ -585,6 +590,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       .from('daily_word_hunt_attempts')
       .select('*', { count: 'exact', head: true })
       .eq('puzzle_date', date)
+      .eq('language', language)
       .eq('solved', true)
       .is('player_id', null)
       .not('guest_fingerprint', 'is', null);
@@ -593,11 +599,10 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       logger.warn('API', `Word Hunt guest solved count error: ${guestSolvedError.message || guestSolvedError.code || 'Unknown'}`, { code: guestSolvedError.code, details: guestSolvedError.details });
     }
 
-    // Sort the merged cross-language rows by the global scoring order, collapse each
-    // player to their single best row (one per ATTEMPT in the view → dedup), trim to
-    // the requested limit, then renumber rank_position sequentially 1..N. The view's
-    // rank_position is partitioned per language (and includes guests + replays), so it
-    // can't be trusted here.
+    // Sort the same-language rows by the scoring order, collapse each player to their
+    // single best row (the view emits one per ATTEMPT → dedup replays), trim to the
+    // requested limit, then renumber rank_position sequentially 1..N. The view's
+    // rank_position counts guests + replays, so it can't be trusted directly here.
     const rerankedData = rerankSequential(
       dedupeByPlayerKeepBest(sortWordHuntRowsGlobally(data || [])).slice(0, limit),
     );

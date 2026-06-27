@@ -544,33 +544,33 @@ const FriendsList: React.FC<FriendsListProps> = ({
   // Full view
   return (
     <div className={cn('space-y-4', className)}>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Users className={cn('w-5 h-5', isDark ? 'text-cyan-400' : 'text-cyan-600')} />
-          <h2 className={cn('font-black text-lg uppercase', isDark ? 'text-white' : 'text-gray-900')}>
+      {/* Header — wraps on narrow screens so the action buttons never overflow off-canvas */}
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <Users className={cn('w-5 h-5 shrink-0', isDark ? 'text-cyan-400' : 'text-cyan-600')} />
+          <h2 className={cn('font-black text-lg uppercase truncate', isDark ? 'text-white' : 'text-gray-900')}>
             {t('friends.title')}
           </h2>
           {(notificationCount > 0 || unreadCount > 0) && (
-            <span className="flex items-center justify-center w-6 h-6 text-xs font-bold bg-neo-pink text-white rounded-full animate-pulse">
+            <span className="flex items-center justify-center w-6 h-6 text-xs font-bold bg-neo-pink text-white rounded-full animate-pulse shrink-0">
               {notificationCount + unreadCount > 9 ? '9+' : notificationCount + unreadCount}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-2">
-          <EnhancedButton onClick={() => setShowPactSelector(true)} size="sm" haptic animation="pop" className="bg-neo-pink text-white">
+        <div className="flex flex-wrap items-center justify-end gap-2 shrink-0">
+          <EnhancedButton onClick={() => setShowPactSelector(true)} size="sm" haptic animation="pop" className="bg-neo-pink text-white" aria-label={t('wordPact.formPact')}>
             <Handshake className="w-4 h-4" />
-            {t('wordPact.formPact')}
+            <span className="hidden xs:inline">{t('wordPact.formPact')}</span>
           </EnhancedButton>
-          <EnhancedButton onClick={() => setShowAddFriend(true)} size="sm" haptic animation="pop" className="bg-neo-cyan text-neo-black">
+          <EnhancedButton onClick={() => setShowAddFriend(true)} size="sm" haptic animation="pop" className="bg-neo-cyan text-neo-black" aria-label={t('friends.add')}>
             <UserPlus className="w-4 h-4" />
-            {t('friends.add')}
+            <span className="hidden xs:inline">{t('friends.add')}</span>
           </EnhancedButton>
         </div>
       </div>
 
       {/* Tab Navigation (Q-18: proper ARIA tab semantics) */}
-      <div role="tablist" aria-label={t('friends.title')} className="flex gap-2 border-b-2 border-neo-black">
+      <div role="tablist" aria-label={t('friends.title')} className="flex gap-2 border-b-2 border-neo-black overflow-x-auto scrollbar-thin">
         {(['friends', 'requests', 'messages'] as const).map((tab) => {
           const isActive = activeTab === tab;
           const icons = { friends: Users, requests: Bell, messages: MessageCircle };
@@ -589,7 +589,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
               aria-controls={`friends-panel-${tab}`}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                'flex items-center gap-2 px-4 py-2 font-bold text-sm transition-all',
+                'flex items-center gap-2 px-3 sm:px-4 py-2 font-bold text-sm transition-all whitespace-nowrap shrink-0',
                 isActive
                   ? 'bg-neo-cyan text-neo-black border-2 border-neo-black border-b-0 -mb-0.5'
                   : isDark ? 'text-gray-400 hover:text-white' : 'text-gray-600 hover:text-gray-900'

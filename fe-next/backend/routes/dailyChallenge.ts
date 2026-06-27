@@ -161,19 +161,21 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         throw new Error('Database connection unavailable');
       }
 
-      // Cross-language (global) leaderboard: no `.eq('language', …)` filter — players
-      // from every language compete together. The view's rank_position is per-language,
-      // so we order by the scoring columns directly and renumber globally below.
+      // Per-language leaderboard: each language plays a DIFFERENT board, so players are
+      // only ranked against — and only see the words of — others who played the same
+      // language. The view's rank_position counts guests + replays, so we re-sort and
+      // renumber below.
       const { data, error } = await supabase
         .from('daily_puzzle_leaderboard')
         .select('*')
         .eq('puzzle_date', date)
+        .eq('language', language)
         .not('player_id', 'is', null)
         .order('score', { ascending: false, nullsFirst: false })
         .order('word_count', { ascending: false, nullsFirst: false })
         .order('time_seconds', { ascending: true, nullsFirst: false })
         // Over-fetch: view has one row per ATTEMPT, so a player occupies many slots
-        // (replays + languages). Pull extra so dedup-to-one-per-player still yields `limit`.
+        // (same-language replays). Pull extra so dedup-to-one-per-player still yields `limit`.
         // ponytail: ×10 cap 500 covers current worst case; move to DISTINCT ON in the view if replays climb.
         .limit(Math.min(limit * 10, 500));
 
@@ -185,6 +187,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         .from('daily_puzzle_attempts')
         .select('*', { count: 'exact', head: true })
         .eq('puzzle_date', date)
+        .eq('language', language)
         .not('player_id', 'is', null);
 
       if (countError) {
@@ -194,7 +197,8 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
       const { count: totalCount, error: totalCountError } = await supabase
         .from('daily_puzzle_attempts')
         .select('*', { count: 'exact', head: true })
-        .eq('puzzle_date', date);
+        .eq('puzzle_date', date)
+        .eq('language', language);
 
       if (totalCountError) {
         logger.warn('API', `Daily leaderboard total count error: ${totalCountError.message}`);
@@ -204,6 +208,7 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         .from('daily_puzzle_attempts')
         .select('*', { count: 'exact', head: true })
         .eq('puzzle_date', date)
+        .eq('language', language)
         .is('player_id', null)
         .not('guest_fingerprint', 'is', null);
 
@@ -211,10 +216,10 @@ router.get('/leaderboard/:date/:language', async (req: Request<LeaderboardParams
         logger.warn('API', `Daily leaderboard guest count error: ${guestCountError.message}`);
       }
 
-      // Sort by global scoring order, collapse each player to their single best row
-      // (view has one row per ATTEMPT — replays + languages), trim to limit, then
-      // renumber 1..N. The view's rank_position is partitioned per (puzzle_date,
-      // language) and includes guests/replays, so it can't be trusted here.
+      // Sort by the scoring order, collapse each player to their single best row
+      // (view has one row per ATTEMPT — same-language replays), trim to limit, then
+      // renumber 1..N. The view's rank_position includes guests/replays, so it can't
+      // be trusted directly here.
       const rerankedData = rerankSequential(
         dedupeByPlayerKeepBest(sortClassicPuzzleRowsGlobally(data || [])).slice(0, limit),
       );
