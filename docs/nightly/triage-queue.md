@@ -4,6 +4,18 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+### [Flag Retirement] share-prompt-timing — 87+ days, inconclusive
+- Created 2026-03-31, active, rollout 100%. Wired in SinglePlayerResults.tsx + useSharePromptImpression.ts.
+- Variants: immediate-after-win vs results-page. No statistically significant winner surfaced in nightly sweeps.
+- recommended owner: human — check PostHog experiment results; if no winner at n≥1000/arm retire and keep `results-page` (current default).
+
+### [Flag Retirement] show-signup-after-first-win — 87+ days, inconclusive
+- Created 2026-03-31, active, rollout 100%. Wired in useSignupPrompt.ts.
+- Variants: after-first-win vs after-3rd-game. 87-day window, no winner surfaced.
+- recommended owner: human — check PostHog experiment results; if no winner retire and keep `after-first-win` (lower friction).
+
+---
+
 ## 2026-06-11 (lane-01 triage)
 
 ### [Supabase Security] `upsert_player_word` REVOKE — SHIPPED
@@ -1080,3 +1092,35 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 
 ### [Supabase Security] upsert_push_token SECURITY DEFINER — carry from 06-25
 - status: no change — still deferred; see 06-25 entry for full rationale
+
+## 2026-06-27
+
+### [Supabase Security] upsert_push_token SECURITY DEFINER — SHIPPED
+- status: shipped — migration `harden_upsert_push_token_search_path` applied
+- changed `SET search_path TO 'public'` → `SET search_path = ''` + fully qualified `public.user_push_tokens`
+- SECURITY DEFINER kept: intentional — function must update other users' rows to deactivate stale tokens on device switch
+- no behavior change; closes the Supabase security advisor warning
+- recommended owner: review-by-eod (verify push notifications still work)
+
+### [Sentry] JAVASCRIPT-NEXTJS-1KQ churn-signals 502 — stale, no action
+- last seen: 2026-06-05; code exists at hooks/useChurnSignals.ts + app/api/growth/churn-signals
+- 5xx handled client-side as debug log (Sentry-excluded); Railway restart transient
+- Sentry MCP lacks write permission to resolve — manual close needed
+- recommended owner: human — close issue manually at sentry.io/issues/124871662
+
+### [Sentry] JAVASCRIPT-NEXTJS-1NB is_catchup schema cache — stale, self-healed
+- column now exists in daily_word_wheel_attempts; PostgREST cache miss post-migration
+- last seen: 2026-06-08; self-healed on next container cycle
+- Sentry MCP lacks write permission — manual close: sentry.io/issues/125836250
+- recommended owner: human — close manually
+
+### [Sentry] JAVASCRIPT-NEXTJS-1KM null.clear rAF word-wheel iOS — stale
+- 3 occurrences, 1 user, last seen 2026-06-07; minified rAF stack, no source maps
+- no .clear() callsites found in word-wheel components (likely PixiJS internals)
+- Sentry MCP lacks write permission — manual close: sentry.io/issues/124827788
+- recommended owner: human — close manually or wait for recurrence
+
+### [Supabase Security] feedback_reports RLS no policies — intentional
+- no frontend callsites found; writes likely go via API route using service_role (bypasses RLS)
+- adding blind policies risks locking out the app without knowing intent
+- recommended owner: skip unless RLS audit reveals direct anon/authenticated writes needed

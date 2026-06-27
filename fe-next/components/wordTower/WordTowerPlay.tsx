@@ -50,6 +50,7 @@ import { dropFlavor } from '@/lib/wordTower/dropFlavor';
 import { buildDropVerdict, showsTierKicker, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
 import type { PlacementOutcome } from '@/lib/wordTower/cranePlacement';
 import { useWordTowerPerks } from './useWordTowerPerks';
+import { useRunStreakPerk } from '@/lib/wordTower/useRunStreakPerk';
 import { WordTowerPerkDraft } from './WordTowerPerkDraft';
 import { perkMilestoneAt, reducedTopple, combineModifiers, PERKS } from '@/lib/wordTower/perks';
 import { beatsDailyBest } from '@/lib/wordTower/dailyBest';
@@ -352,6 +353,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // the crane + hazard sites read. Segregated from the endless board (daily gates
   // the progress POST), so height-boosting perks never inflate records.
   const perks = useWordTowerPerks(daily, perkSeed);
+  const runStreak = useRunStreakPerk();
+  useEffect(() => {
+    runStreak.onGameUpdate(game.heightM, game.floors.length);
+  }, [game.heightM, game.floors.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The day's shared mutator — the twist EVERY player faces today (daily only).
   // Date-seeded so it's identical worldwide; keeps daily scores comparable while
@@ -374,13 +379,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     // perks + mutators use: Reinforced Core (brinkExtra), Tailwind (heightMult),
     // Salvage (toppleReduction), Momentum (perfectBonus). Sweep/wind/reward/perfect-
     // band/lean-recovery are read at their own sites.
-    return combineModifiers(withMutator, {
+    const withUpgrades = combineModifiers(withMutator, {
       brinkExtra: upgradeEffects.extraTopple,
       heightMult: upgradeEffects.heightMult,
       toppleReduction: upgradeEffects.toppleReduction,
       perfectBonus: upgradeEffects.perfectBonus,
     });
-  }, [perks.modifiers, mutator, upgradeEffects]);
+    return runStreak.totalHeightMult !== 1
+      ? combineModifiers(withUpgrades, { heightMult: runStreak.totalHeightMult })
+      : withUpgrades;
+  }, [perks.modifiers, mutator, upgradeEffects, runStreak.totalHeightMult]);
   // Word-aware mutator height × (golden letter / vowels / length). Read at drop
   // time from the held word — the only mutator effect that can't fit PerkModifiers.
   const pendingWordRef = useRef<string | null>(null);
@@ -535,7 +543,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     const s = tower.state.lastResult?.surprise;
     if (!s) return;
     setSurpriseFx({ s, key: tower.state.resultKey });
-    surpriseSoundFns[TOWER_SURPRISE_META[s.event].sound]();
+    const surpriseMeta = TOWER_SURPRISE_META[s.event];
+    if (surpriseMeta) surpriseSoundFns[surpriseMeta.sound]?.();
     haptics.levelComplete();
     // NB: surprises keep paying in bonus metres + scrambles (their existing
     // reward). They intentionally do NOT grant coins — surprises fire many
@@ -895,7 +904,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           </span>
           <span className="font-neo-body text-xs font-bold">
             {t('wordTower.wreck.reportBody', {
-              name: wreckReport.names[0] ?? 'Rival',
+              name: wreckReport.names[0] ?? t('wordTower.wreck.defaultName'),
               floors: wreckReport.floors,
             })}
           </span>
@@ -1117,8 +1126,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           aria-live="polite"
         >
           <div className="flex items-center gap-1.5 font-neo-display text-xl font-black uppercase tracking-wide text-black">
-            <span aria-hidden>{TOWER_SURPRISE_META[surpriseFx.s.event].emoji}</span>
-            {t(`wordTower.surprise.${TOWER_SURPRISE_META[surpriseFx.s.event].key}`)}
+            {(() => { const m = TOWER_SURPRISE_META[surpriseFx.s.event]; if (!m) return null; return (<><span aria-hidden>{m.emoji}</span>{t(`wordTower.surprise.${m.key}`)}</>); })()}
           </div>
           {(surpriseFx.s.bonusMeters > 0 || surpriseFx.s.bonusScrambles > 0) && (
             <div dir="ltr" className="font-neo-body text-xs font-black text-black/80 tabular-nums">
@@ -1156,16 +1164,20 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* Owned perks — small badge row (daily run) so the player sees their build. */}
       {daily && perks.owned.length > 0 && (
         <div className="pointer-events-none fixed left-2 top-[76px] z-40 flex flex-col gap-1" dir={dir}>
-          {perks.owned.map((id) => (
-            <span
-              key={id}
-              className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-purple px-1.5 py-0.5 font-neo-body text-[10px] font-black text-neo-white shadow-hard-sm"
-              title={t(PERKS[id].descKey)}
-            >
-              <span aria-hidden>{PERKS[id].icon}</span>
-              {t(PERKS[id].nameKey)}
-            </span>
-          ))}
+          {perks.owned.map((id) => {
+            const perk = PERKS[id];
+            if (!perk) return null;
+            return (
+              <span
+                key={id}
+                className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-purple px-1.5 py-0.5 font-neo-body text-[10px] font-black text-neo-white shadow-hard-sm"
+                title={t(perk.descKey)}
+              >
+                <span aria-hidden>{perk.icon}</span>
+                {t(perk.nameKey)}
+              </span>
+            );
+          })}
         </div>
       )}
 
@@ -1290,6 +1302,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           onCraneDrop={triggerCraneDrop}
           accentHex={blockColorHex}
           reducedMotion={reducedMotion}
+          runPerks={runStreak.perks}
           t={t}
           dir={dir}
         />

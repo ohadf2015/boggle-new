@@ -399,6 +399,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     'alternativas-a-scrabble',
     'juegos-palabras-gratis',
     'ordspel-familjer',
+    'ai-vs-word-games-language-learning',
+    'spelling-bee-science-vocabulary',
   ];
   blogArticles.forEach((slug) => {
     addForAllLocales(routes, `/blog/${slug}`, { lastModified: BLOG_UPDATED, changeFrequency: 'monthly', priority: 0.85 });

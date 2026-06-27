@@ -1,87 +1,110 @@
 {
-  "date": "2026-06-26",
-  "note": "Thirtieth snapshot. 24h PostHog window: all routes sub-floor (n<50). 7d vitals unchanged. NEW: bundle audit found 6085KB chunk (0g6.ei74erw09.js) = @arvidbt/swedish-words array bundled client-side. serverDicts.ts reads it via fs.readFileSync (correct), but Turbopack still bundles it — no direct import found in source (grep clean). Likely Turbopack static analysis of package.json dependencies picks it up via transitive require. Must move package to devDependencies or add `serverExternalPackages` config. Supabase MCP did not connect this run — advisor items deferred.",
+  "date": "2026-06-27",
+  "note": "Thirty-first snapshot. 24h window: sub-floor (0 routes n≥50). 7d vitals: /es/multiplayer LCP REGRESSION 5932→7291ms (+23%, n=55 both runs cleared); /en/multiplayer NEW above floor (LCP 4380ms, INP 504ms, CLS 0.392, n=55 — structural, same ssr:false root cause); /he improving 2927→2702ms. FRONTEND FIX SHIPPED: serverExternalPackages added to next.config.mjs — prevents @arvidbt/swedish-words (~6MB) + an-array-of-english-words + an-array-of-spanish-words from being bundled into static/chunks by Turbopack. Supabase MCP absent AGAIN (2nd consecutive night) — DB advisor items deferred to next run with MCP or management API PAT.",
   "backend": {
-    "advisor_warnings_count": 1,
-    "note": "Supabase MCP did not connect. Advisor items from prior runs: auth_db_connections_absolute (human config), word_clubs FK (confirmed exists), idx_word_wheel_attempts_catchup (flagged unused — verify next run).",
+    "advisor_warnings_count": 3,
+    "note": "Supabase MCP did not connect (2nd consecutive night). No management API PAT in env. All advisor items deferred.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "remaining_advisor_items": [
       {
         "id": "auth_db_connections_absolute",
-        "status": "DEFERRED — human config change in Supabase dashboard (Auth connection pool strategy: absolute→percentage)"
+        "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent again.",
+        "priority": "LOW",
+        "carry_count": 3
       },
       {
-        "id": "idx_word_wheel_attempts_catchup",
-        "status": "PENDING VERIFY — advisor flagged unused partial index. Verify next run via pg_stat_user_indexes idx_scan=0 then drop."
+        "id": "unindexed_fk_word_clubs_owner_id",
+        "status": "DEFERRED — need Supabase MCP or management API PAT to apply: CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id);",
+        "priority": "MEDIUM",
+        "carry_count": 2
+      },
+      {
+        "id": "idx_word_wheel_attempts_catchup_drop",
+        "status": "DEFERRED — need Supabase MCP or management API PAT to apply: DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup;",
+        "priority": "LOW",
+        "carry_count": 2
       }
     ]
   },
   "frontend": {
-    "note": "24h window: all routes sub-floor (n<50). 7d window stable. LCP/INP unchanged from 06-25 baseline.",
+    "note": "24h sub-floor. 7d n>=50 routes below. CLS on /es/multiplayer and /en/multiplayer both extremely poor — structural issue (ssr:false dynamic imports + socket-gated render = layout shift as content loads). INP on /en/multiplayer 504ms = severe. Root cause: all multiplayer views are ssr:false dynamic imports → no stable skeleton → CLS + LCP penalty.",
     "by_route": [
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 5932,
+        "p75_lcp_ms": 7291,
         "p75_inp_ms": 368,
-        "p75_cls": 0.14,
-        "n_7d": 63,
+        "p75_cls": 0.265,
+        "n_7d": 55,
         "window": "7d",
-        "lcp_status": "REGRESSION — 5932ms stable. Root cause structural: all 4 views ssr:false dynamic imports + socket-gated. Needs Chrome profiler trace.",
-        "inp_status": "POOR — 368ms (>200ms threshold).",
-        "cls_status": "WATCH — 0.14 (improving from 0.167)"
+        "lcp_status": "REGRESSION — 7291ms (+23% from 5932ms baseline 06-26, both runs n>=50). Structural: all 4 views ssr:false. Needs Chrome profiler trace.",
+        "inp_status": "POOR — 368ms (>200ms threshold). Stable.",
+        "cls_status": "REGRESSION — 0.265 (was 0.14 in 06-26 baseline). Very poor (>0.1). Same structural root cause."
+      },
+      {
+        "route": "/en/multiplayer",
+        "p75_lcp_ms": 4380,
+        "p75_inp_ms": 504,
+        "p75_cls": 0.392,
+        "n_7d": 55,
+        "window": "7d",
+        "lcp_status": "NEW above floor — 4380ms. Structural ssr:false root cause same as /es/multiplayer.",
+        "inp_status": "SEVERE — 504ms. Tree weight + socket-gated render at loadState=complete.",
+        "cls_status": "SEVERE — 0.392. Very poor. Layout shift from dynamic content loading."
       },
       {
         "route": "/he",
-        "p75_lcp_ms": 2927,
-        "p75_inp_ms": 352,
-        "p75_cls": 0.14,
-        "n_7d": 67,
+        "p75_lcp_ms": 2702,
+        "p75_inp_ms": 304,
+        "p75_cls": 0.088,
+        "n_7d": 88,
         "window": "7d",
-        "lcp_status": "NEEDS IMPROVEMENT — 2927ms. Improving trend: 3297→3112→2927ms. Preload shipped 06-25.",
-        "inp_status": "POOR — 352ms.",
-        "cls_status": "OK — 0.14 stable"
+        "lcp_status": "IMPROVING — 2702ms (was 2927ms 06-26, -7.7%). Trend: 3297→3112→2927→2702ms.",
+        "inp_status": "POOR — 304ms. Stable. Tree weight.",
+        "cls_status": "OK — 0.088 (<0.1 threshold). Improving (was 0.14)."
       }
     ]
   },
   "bundle": {
-    "total_static_mb": 43,
+    "total_static_kb": 38912,
+    "note": "Chunks dir 38M total, 471 files. 6MB chunk (7fd32332*.js) still present in this snapshot — taken from pre-fix build. After next build with serverExternalPackages, expect 7fd32332 to shrink or disappear.",
     "top_chunks": [
-      { "name": "0g6.ei74erw09.js", "kb": 6085, "note": "swedish_words array — @arvidbt/swedish-words bundled client-side. FIX: add to next.config serverExternalPackages OR move to devDependencies. HIGH PRIORITY." },
-      { "name": "107js-lrs4mq0.js", "kb": 3284, "note": "unknown — needs identification next run" },
-      { "name": "0l2icuu3mnqnv.js", "kb": 1576, "note": "unknown" },
-      { "name": "0ha4f~i.fq32-.js", "kb": 804, "note": "unknown" },
-      { "name": "0wiae6b3iarr3.js", "kb": 650, "note": "unknown" }
+      { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6452, "note": "LIKELY @arvidbt/swedish-words array. FIX SHIPPED via serverExternalPackages in next.config.mjs (this run). Verify reduction on next build." },
+      { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3284, "note": "Unknown — needs identification next build." },
+      { "name": "82055-affbfbb6ca395994.js", "kb": 856, "note": "Unknown" },
+      { "name": "68292.bb49bb9873fa2566.js", "kb": 648, "note": "Unknown" },
+      { "name": "39299-c492000251618829.js", "kb": 560, "note": "Unknown" }
     ]
   },
   "open_watches": [
     {
       "id": "swedish-words-client-bundle",
-      "description": "6MB @arvidbt/swedish-words chunk in client JS. serverDicts.ts uses fs.readFileSync (safe), but Turbopack bundles it anyway. Fix: add '@arvidbt/swedish-words' to next.config.ts serverExternalPackages array. Expected saving: ~5.5MB from largest client chunk.",
+      "description": "6MB @arvidbt/swedish-words chunk in client JS. FIX SHIPPED: serverExternalPackages added to next.config.mjs this run. Verify chunk disappears on next prod build.",
       "severity": "HIGH",
+      "status": "FIX_SHIPPED — verify on next build",
       "since": "2026-06-26",
-      "action": "Add to next.config.ts: serverExternalPackages: ['@arvidbt/swedish-words', 'an-array-of-english-words', 'an-array-of-spanish-words']"
+      "updated": "2026-06-27"
     },
     {
-      "id": "es-multiplayer-lcp-regression",
-      "description": "/es/multiplayer p75 LCP 5932ms (7d, n=63). STABLE. Structural root cause.",
+      "id": "multiplayer-lcp-cls-regression",
+      "description": "/es/multiplayer p75 LCP 7291ms (+23% regression, n=55), CLS 0.265 (was 0.14). /en/multiplayer NEW: LCP 4380ms, INP 504ms, CLS 0.392. Root cause: all multiplayer views ssr:false dynamic imports → late content load → LCP+CLS penalty. Fix: SSR the lobby skeleton (same approach as a83548724 that killed 3s blank FCP on /multiplayer 06-26).",
       "severity": "HIGH",
-      "since": "2026-06-23",
-      "updated": "2026-06-26"
+      "since": "2026-06-27",
+      "action": "Identify MultiplayerFlow subviews for /es and /en locales — apply same ssr:true treatment as a83548724."
     },
     {
-      "id": "he-lcp-high",
-      "description": "/he p75 LCP 2927ms (7d, n=67). Improving trend. Preload shipped 06-25.",
+      "id": "supabase-db-advisor-deferred",
+      "description": "3 Supabase advisor items deferred 2nd consecutive night (MCP absent, no management API PAT in nightly env). Items: (1) unindexed FK word_clubs.owner_id; (2) unused idx_word_wheel_attempts_catchup; (3) auth DB connections absolute→percentage.",
       "severity": "MEDIUM",
-      "since": "2026-06-20",
-      "updated": "2026-06-26"
+      "since": "2026-06-25",
+      "updated": "2026-06-27",
+      "action": "Add SUPABASE_ACCESS_TOKEN (never-expire PAT) to ~/.config/lexi-nightly/env so Supabase MCP boots with valid token."
     },
     {
-      "id": "idx-word-wheel-attempts-catchup-verify",
-      "description": "Supabase advisor flagged idx_word_wheel_attempts_catchup unused. Verify next run when MCP connects.",
-      "severity": "LOW",
-      "since": "2026-06-25",
-      "updated": "2026-06-26"
+      "id": "en-multiplayer-inp-severe",
+      "description": "/en/multiplayer INP 504ms (7d, n=55). New above floor this run. Severe (>200ms threshold by 2.5x). Same structural root: socket-gated heavy tree render at loadState=complete.",
+      "severity": "HIGH",
+      "since": "2026-06-27"
     }
   ]
 }

@@ -77,6 +77,16 @@ const nextConfig = {
     ],
   },
 
+  // Mark server-only word dictionary packages as Node.js externals so Turbopack
+  // never walks their import trees into client bundles. Without this, Turbopack's
+  // static analysis bundles @arvidbt/swedish-words (~6MB) into static/chunks even
+  // though no client component imports it directly.
+  serverExternalPackages: [
+    '@arvidbt/swedish-words',
+    'an-array-of-english-words',
+    'an-array-of-spanish-words',
+  ],
+
   // Enable system TLS certs for Turbopack to fetch Google Fonts
   // optimizePackageImports automatically tree-shakes common packages like lucide-react
   // React Compiler — auto-memoizes all components (replaces Million.js)

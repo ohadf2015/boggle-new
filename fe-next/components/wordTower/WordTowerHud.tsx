@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Delete, Shuffle, Lightbulb, ChevronDown, ChevronUp, RotateCw, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
+import { type ActiveRunPerk } from '@/lib/wordTower/useRunStreakPerk';
 import { WordTowerWheel } from './WordTowerWheel';
 
 export interface WordTowerHudProps {
@@ -51,6 +52,8 @@ export interface WordTowerHudProps {
   onScramble: () => void;
   /** Reports the bottom control-deck height (px) so the tower can ground just above it. */
   onDeckHeight?: (px: number) => void;
+  /** Active ephemeral run-streak perks (Hot Streak badges above the deck). */
+  runPerks?: ActiveRunPerk[];
   t: (key: string, params?: Record<string, string | number>) => string;
   dir: 'ltr' | 'rtl';
 }
@@ -71,7 +74,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
     accentHex = '#7c8a99', reducedMotion = false,
     possibleWords, clueWord, onReroll, goldenLetter, lastError, errorKey, lastResult, resultKey,
     pendingWord, onCraneDrop,
-    onSelectTile, onDeselectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, t, dir,
+    onSelectTile, onDeselectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, runPerks, t, dir,
   } = props;
   void onClear;
 
@@ -136,6 +139,25 @@ export function WordTowerHud(props: WordTowerHudProps) {
 
       {/* Screen-reader live announcements */}
       <div aria-live="polite" className="sr-only">{liveText}</div>
+
+      {/* Hot Streak badges — ephemeral run perks earned at height milestones. */}
+      {runPerks && runPerks.length > 0 && (
+        <div className="pointer-events-none mb-1 flex items-end justify-center gap-2 px-4">
+          {runPerks.map((pk, i) => (
+            <div
+              key={`${pk.id}-${i}`}
+              role="status"
+              aria-label={t('wordTower.runPerk.hotStreak.a11y', { n: pk.dropsRemaining })}
+              className="flex items-center gap-1 rounded-full border-2 border-black bg-neo-orange px-2.5 py-0.5 font-neo-body text-xs font-black text-black shadow-hard-sm"
+              style={{ boxShadow: '0 0 10px rgba(255,107,53,0.65), 2px 2px 0 #000' }}
+            >
+              <span aria-hidden>🔥</span>
+              <span>+50%</span>
+              <span className="rounded-full bg-black/20 px-1 tabular-nums">×{pk.dropsRemaining}</span>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Bottom controls — a solid "control deck" that grounds the rack and
           caps the play area (hides the busy parallax behind a clean surface).
