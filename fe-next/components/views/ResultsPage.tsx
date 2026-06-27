@@ -1271,7 +1271,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           Portaled for the same ancestor-transform reason as mobile. */}
       {gameCode && onReturnToRoom && isDesktopViewport && typeof document !== 'undefined' && createPortal(
         <div ref={setStickyBarRef} className="fixed bottom-0 inset-x-0 z-[100] bg-neo-navy text-neo-white border-t-4 border-neo-black safe-area-pb">
-          <div className="max-w-6xl mx-auto px-4 py-2.5">
+          <div className="max-w-5xl mx-auto px-4 py-2.5">
             <StickyReadyBar
               isHost={isHost}
               isCurrentPlayerReady={isCurrentPlayerReady}

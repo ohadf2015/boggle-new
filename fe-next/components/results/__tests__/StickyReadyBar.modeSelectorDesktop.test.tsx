@@ -106,4 +106,30 @@ describe('StickyReadyBar desktop mode selector', () => {
     const active = screen.getByRole('button', { name: /label-blast/i });
     expect(active.className).toMatch(/ring-/);
   });
+
+  it('lays the desktop bar out horizontally so it uses the wide viewport', () => {
+    render(<StickyReadyBar {...baseProps} desktopProminent />);
+    const root = screen.getByTestId('sticky-ready-bar');
+    expect(root.className).toMatch(/flex-row/);
+  });
+
+  it('keeps the mobile bar stacked vertically (full-width column)', () => {
+    render(<StickyReadyBar {...baseProps} />);
+    const root = screen.getByTestId('sticky-ready-bar');
+    expect(root.className).toMatch(/flex-col/);
+    expect(root.className).not.toMatch(/flex-row/);
+  });
+
+  it('constrains the CTA group on desktop so the action button is not full-bleed', () => {
+    render(<StickyReadyBar {...baseProps} desktopProminent />);
+    const group = screen.getByTestId('ready-cta-group');
+    expect(group.className).toMatch(/max-w-/);
+  });
+
+  it('lets the CTA span the full width on mobile', () => {
+    render(<StickyReadyBar {...baseProps} />);
+    const group = screen.getByTestId('ready-cta-group');
+    expect(group.className).toMatch(/w-full/);
+    expect(group.className).not.toMatch(/max-w-/);
+  });
 });
