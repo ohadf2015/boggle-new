@@ -566,7 +566,9 @@ const DailyChallenge: React.FC = () => {
     <div
       className={`flex-1 flex flex-col min-h-0 h-dvh max-h-dvh bg-gray-100 dark:bg-neo-navy relative overflow-x-clip overflow-hidden ${seasonSkin}`}
     >
-      <AutoHideHeader />
+      {/* Collapse the in-game header spacer so the focused Word Hunt screen has no
+          empty band at the top (the header is hidden during play anyway). */}
+      <AutoHideHeader collapseSpacerWhenHidden />
 
       <AnimatePresence mode="wait">
         {phase === 'loading' && (

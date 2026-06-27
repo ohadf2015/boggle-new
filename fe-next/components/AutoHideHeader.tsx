@@ -9,6 +9,16 @@ interface AutoHideHeaderProps {
   className?: string;
   /** Callback when header visibility changes */
   onVisibilityChange?: (isVisible: boolean) => void;
+  /**
+   * Drop the CLS-protecting spacer (render nothing) when the header is hidden
+   * for gameplay / TV fullscreen. Opt-in for focused, full-screen game surfaces
+   * (e.g. the daily Word Hunt) where the reserved-but-empty band reads as a blank
+   * gap at the top. Safe there because entering the game happens behind a user tap,
+   * so the upward content shift falls inside the input-exclusion window (no CLS hit).
+   * Leave OFF (default) on pages like /multiplayer where collapsing the spacer
+   * regressed CLS to 0.29.
+   */
+  collapseSpacerWhenHidden?: boolean;
 }
 
 /**
@@ -23,7 +33,7 @@ interface AutoHideHeaderProps {
  *   the fixed-header + spacer pattern produced on CG.
  * In landscape mode it uses static positioning (handled by the Header component's landscape:static class).
  */
-export function AutoHideHeader({ className, onVisibilityChange }: AutoHideHeaderProps) {
+export function AutoHideHeader({ className, onVisibilityChange, collapseSpacerWhenHidden = false }: AutoHideHeaderProps) {
   const isTvFullscreen = useTvFullscreenListener();
   const { isInGame } = useNavigation();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -39,6 +49,11 @@ export function AutoHideHeader({ className, onVisibilityChange }: AutoHideHeader
   // as the spacer-height slot collapses and content shifts up by 60–124px.
   if (isTvFullscreen || isInGame) {
     if (onVisibilityChange) onVisibilityChange(false);
+    // Focused full-screen game surfaces opt out of the reserved spacer so the
+    // hidden header leaves no empty band at the top (see prop docs above).
+    if (collapseSpacerWhenHidden) {
+      return null;
+    }
     return (
       <div
         aria-hidden="true"
