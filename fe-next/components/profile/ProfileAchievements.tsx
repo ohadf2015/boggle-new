@@ -6,7 +6,6 @@ import { AchievementBadge } from '@/components/AchievementBadge';
 import { isHallOfFameAchievement } from '@/utils/achievementTiers';
 import { ACHIEVEMENT_ICONS, getAchievementIcon } from '@/constants/achievementIcons';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
 import type { ProfileData } from '@/contexts/auth/authTypes';
 
 interface Achievement {
@@ -105,12 +104,15 @@ export function ProfileAchievements({
         </div>
       </m.div>
 
-      {/* Regular Achievements Section */}
+      {/* Regular Achievements — frameless open field. The pills are already
+          bordered badges; wrapping them in another bordered card = nested cards.
+          Leaving them on the navy field (vs the lime-framed Hall of Fame above)
+          creates real altitude: highlighted group vs the rest. */}
       <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: delay + 0.05 }}
-        className="rounded-neo p-6 bg-neo-navy-light border-neo border-neo-white/20 shadow-hard"
+        className="px-1 pt-1"
       >
         <div className="flex flex-wrap gap-2">
           {regularAchievements.map((achievement, index) => renderAchievementBadge(achievement, index))}

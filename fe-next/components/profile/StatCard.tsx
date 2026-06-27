@@ -64,7 +64,6 @@ export function StatCard({ icon, label, value, color, index = 0 }: StatCardProps
   const c = color ? colorMap[color] : colorMap.cyan;
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, margin: '-50px' });
-  const indexLabel = String(index + 1).padStart(2, '0');
 
   return (
     <m.div
@@ -114,22 +113,6 @@ export function StatCard({ icon, label, value, color, index = 0 }: StatCardProps
         )}>
           {inView ? <AnimatedValue value={value} /> : <span aria-hidden>0</span>}
         </p>
-
-        {/* Bottom-end index marker — tabular slop-killer detail */}
-        <div className="mt-3 flex items-end justify-between">
-          <span
-            className="font-mono text-[10px] tracking-tight text-neo-white tabular-nums"
-            aria-hidden
-          >
-            {indexLabel} / 04
-          </span>
-          {/* Two short tick marks — replaces the meaningless progress bar */}
-          <div className="flex items-end gap-[3px]" aria-hidden>
-            <span className={cn('block w-[3px] h-2 rounded-sm opacity-40', c.ribbon)} />
-            <span className={cn('block w-[3px] h-3 rounded-sm opacity-70', c.ribbon)} />
-            <span className={cn('block w-[3px] h-4 rounded-sm', c.ribbon)} />
-          </div>
-        </div>
       </div>
     </m.div>
   );

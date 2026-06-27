@@ -58,31 +58,35 @@ export interface TierColors {
   glow: string;
 }
 
-// Tier display colors (for neo-brutalist design)
+// Tier display colors — neo-brutalist electric palette, not literal metals.
+// Cool→hot rarity ladder (orange→cyan→yellow→purple) so rarer reads as more
+// special, while the medal icons (🥉🥈🥇💎) carry the bronze/silver/gold/platinum
+// metaphor. Black ink + black borders are the brand signature (white text is
+// invisible on these fills; see DESIGN.md contrast rule).
 export const TIER_COLORS: Record<TierName, TierColors> = {
   BRONZE: {
-    bg: '#CD7F32',
-    border: '#8B4513',
+    bg: '#FF6B35', // neo-orange — warm, coppery, the most common tier
+    border: '#000000',
     text: '#000000',
-    glow: 'rgba(205, 127, 50, 0.5)',
+    glow: 'rgba(255, 107, 53, 0.5)',
   },
   SILVER: {
-    bg: '#C0C0C0',
-    border: '#808080',
+    bg: '#00FFFF', // neo-cyan
+    border: '#000000',
     text: '#000000',
-    glow: 'rgba(192, 192, 192, 0.5)',
+    glow: 'rgba(0, 255, 255, 0.5)',
   },
   GOLD: {
-    bg: '#FFD700',
-    border: '#B8860B',
+    bg: '#FFE135', // neo-yellow — gold tier, celebration semantic
+    border: '#000000',
     text: '#000000',
-    glow: 'rgba(255, 215, 0, 0.5)',
+    glow: 'rgba(255, 225, 53, 0.55)',
   },
   PLATINUM: {
-    bg: '#E5E4E2',
-    border: '#9370DB',
-    text: '#4B0082',
-    glow: 'rgba(147, 112, 219, 0.6)',
+    bg: '#8B5CF6', // neo-purple — rarest, premium
+    border: '#000000',
+    text: '#000000',
+    glow: 'rgba(139, 92, 246, 0.6)',
   },
 };
 

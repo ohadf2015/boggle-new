@@ -14,6 +14,7 @@ import { useAvatarCustomizationNudge } from '@/hooks/useAvatarCustomizationNudge
 import { useAvatarHistory } from '@/hooks/useAvatarHistory';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
+import { useEngagementStatus } from '@/hooks/useEngagementStatus';
 import { CountrySelector } from '@/components/settings/CountrySelector';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -133,8 +134,10 @@ export function ProfileHeader({
   const xp = getXpProgress(profile?.total_xp || 0);
   const level = xp.currentLevel;
   const tier = scoreTier(profile?.total_score);
-  const streakDays = profile?.streak_days || 0;
-  const avatarPx = compact ? 80 : 96;
+  // Streak lives in player_engagement, not on profile (profile.streak_days is
+  // never populated → flame was permanently stuck at 0).
+  const { streak: streakDays } = useEngagementStatus();
+  const avatarPx = compact ? 80 : 112;
 
   return (
     <m.div
@@ -249,16 +252,24 @@ export function ProfileHeader({
             </h1>
           )}
 
-          {/* Title + streak — the identity badges */}
-          <div className={cn('flex flex-wrap items-center gap-2', compact ? 'mt-1.5' : 'mt-2.5')}>
-            {tier !== 'stone' && (
-              <RankTierChip tier={tier} size={compact ? 'xs' : 'sm'} />
-            )}
-            <StreakFlame days={streakDays} size={compact ? 'sm' : 'md'} />
-          </div>
+          {/* Identity badges + meta pills — one row that spreads edge-to-edge on
+              desktop (badges at the inline-start, meta at the inline-end) so the
+              hero fills its width instead of leaving a lopsided desert. On mobile
+              the two groups stack. */}
+          <div className={cn(
+            'flex flex-col gap-2 md:flex-row md:items-center md:justify-between md:gap-4',
+            compact ? 'mt-1.5' : 'mt-3'
+          )}>
+            {/* Title + streak — the identity badges */}
+            <div className="flex flex-wrap items-center gap-2">
+              {tier !== 'stone' && (
+                <RankTierChip tier={tier} size={compact ? 'xs' : 'sm'} />
+              )}
+              <StreakFlame days={streakDays} size={compact ? 'sm' : 'md'} />
+            </div>
 
-          {/* Country + join date pills */}
-          <div className={cn('flex flex-wrap items-center gap-2', compact ? 'mt-1' : 'mt-3')}>
+            {/* Country + join date pills */}
+            <div className="flex flex-wrap items-center gap-2">
             {isEditingCountry ? (
               <div className="max-w-[200px]">
                 <CountrySelector
@@ -300,6 +311,7 @@ export function ProfileHeader({
             <span className="px-3 py-1 rounded-full bg-neo-navy-elevated/60 text-sm text-gray-400">
               {t('profile.memberSince')} {profile?.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
             </span>
+            </div>
           </div>
 
         </div>
