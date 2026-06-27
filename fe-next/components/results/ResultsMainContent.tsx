@@ -3,7 +3,7 @@
 import React, { memo, useMemo, useState, useEffect } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Sparkles, Type, Star, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Type, Star, Coins, ChevronDown, ChevronUp } from 'lucide-react';
 import type { Player, WordObject } from '@/components/results/types';
 import { assignConsolationCrowns } from '@/utils/consolationCrowns';
 import { selectUniqueWords } from '@/lib/results/selectUniqueWords';
@@ -22,7 +22,6 @@ import type { XpGainedData, LevelUpData } from '@/types/components';
 import type { GameModeOption } from '@/components/GameModeSelector';
 import type { SeriesStanding } from '@/hooks/useSeriesTracker';
 import SeriesStandingsBanner from '@/components/results/SeriesStandingsBanner';
-import RewardsSummary from '@/components/results/RewardsSummary';
 import type { CoinReward } from '@/components/results/CoinRewardDisplay';
 
 import { ResultsWordsSection } from '@/components/results/ResultsWordsSection';
@@ -258,8 +257,20 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         color: 'text-neo-cyan',
       });
     }
+    // Coins fold into this stats strip instead of owning a near-empty full-width
+    // row of their own (the old standalone RewardsSummary card). Only for signed-in
+    // players who actually earned coins — guests don't earn, so a "+N" there would
+    // mislead (their conversion path is the signup nudge sheet, not this chip).
+    if (isAuthenticated && coinReward && coinReward.awarded > 0) {
+      stats.push({
+        label: t('results.coinsEarned') || 'Coins',
+        value: `+${coinReward.awarded}`,
+        icon: <Coins className="w-3 h-3" />,
+        color: 'text-neo-lime',
+      });
+    }
     return stats;
-  }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language, showRivals]);
+  }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language, showRivals, isAuthenticated, coinReward]);
 
   // Share params for the share button
   const shareParams = useMemo(() => {
@@ -418,10 +429,11 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         <HighlightsBar stats={highlightStats} />
       )}
 
-      {/* ── 4. WHAT YOU EARNED — XP / level / streak, then coins, read as one
-          progress beat. ImprovementPanel renders nothing for guests w/ no
-          progress; the rewards row only appears when there's a coin reward
-          (MP) or a solo/daily share button. */}
+      {/* ── 4. WHAT YOU EARNED — XP / level / streak. ImprovementPanel renders
+          nothing for guests w/ no progress. Coins no longer get their own
+          near-empty full-width card here — they fold into the HighlightsBar
+          stats strip above (see highlightStats). The solo/daily share button
+          is the only thing left that earns this row. */}
       <ImprovementPanel
         xp={xpGainedData ?? null}
         levelUp={levelUpData ?? null}
@@ -429,21 +441,9 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         t={t}
         reducedMotion={reducedMotion}
       />
-      {(coinReward || (shareParams && !isMultiplayer)) && (
+      {shareParams && !isMultiplayer && (
         <div className="flex flex-wrap items-stretch gap-2">
-          {coinReward && (
-            <div className="flex-1 min-w-0 [&>*]:h-full">
-              <RewardsSummary
-                coinReward={coinReward}
-                isAuthenticated={isAuthenticated}
-                winStreak={null}
-                isWinner={isCurrentUserWinner}
-              />
-            </div>
-          )}
-          {shareParams && !isMultiplayer && (
-            <ShareButton params={shareParams} t={t} className="shrink-0" />
-          )}
+          <ShareButton params={shareParams} t={t} className="shrink-0" />
         </div>
       )}
 
