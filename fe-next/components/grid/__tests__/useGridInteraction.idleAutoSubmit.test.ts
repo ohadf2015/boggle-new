@@ -3,10 +3,12 @@
  *
  * Founder report (desktop practice): building a word leaves it stuck selected;
  * players think they must click elsewhere to submit. Industry standard is
- * release-to-submit (drag) + auto-submit-on-idle (click-build). We add an
- * opt-in `autoSubmitIdleMs`: on desktop, once ≥3 letters are selected and the
- * player stalls for that long, submit automatically. Mobile keeps
- * release-to-submit (idle disabled so a paused finger never fires early).
+ * release-to-submit (drag) + auto-submit-on-idle (click-build). Desktop idle
+ * auto-submit is now ON BY DEFAULT in every mode: once ≥3 letters are selected
+ * and the player stalls for the default window (`DEFAULT_DESKTOP_AUTOSUBMIT_MS`,
+ * 1s), submit automatically. `autoSubmitIdleMs` still overrides the window per
+ * caller. Mobile keeps release-to-submit (idle disabled so a paused finger
+ * never fires early).
  */
 import { renderHook, act } from '@testing-library/react';
 import { useGridInteraction } from '../useGridInteraction';
@@ -102,7 +104,7 @@ describe('useGridInteraction — desktop idle auto-submit', () => {
     expect(onWordSubmit).not.toHaveBeenCalled();
   });
 
-  it('does NOT auto-submit when autoSubmitIdleMs is unset (MP/daily behavior preserved)', () => {
+  it('auto-submits after the default 1s window when autoSubmitIdleMs is unset (default-on, all modes)', () => {
     const onWordSubmit = vi.fn();
     const gridRef = buildRef();
     const { result } = renderHook(() =>
@@ -113,9 +115,12 @@ describe('useGridInteraction — desktop idle auto-submit', () => {
     );
 
     clickBuild(result, [[0, 0, 'A'], [0, 1, 'B'], [0, 2, 'C']]);
-    act(() => { vi.advanceTimersByTime(3000); });
+    act(() => { vi.advanceTimersByTime(999); });
+    expect(onWordSubmit).not.toHaveBeenCalled(); // still within the default idle window
 
-    expect(onWordSubmit).not.toHaveBeenCalled();
+    act(() => { vi.advanceTimersByTime(1); }); // crosses the 1000ms default
+    expect(onWordSubmit).toHaveBeenCalledTimes(1);
+    expect(onWordSubmit.mock.calls[0][0]).toBe('ABC');
   });
 
   it('does NOT idle-auto-submit during a real touch drag (mobile lifts a finger to submit)', () => {

@@ -22,6 +22,7 @@ import { createVelocityTracker } from './velocityTracker';
 import { getSelectionEscalation } from './selectionEscalation';
 import { useGridKeyboardHandler } from './useGridKeyboardHandler';
 import { useGridClickHandler } from './useGridClickHandler';
+import { DEFAULT_DESKTOP_AUTOSUBMIT_MS } from './submitHintVisibility';
 
 interface UseGridInteractionProps {
   grid: LetterGrid;
@@ -41,12 +42,13 @@ interface UseGridInteractionProps {
   /** Optional adjacency override — return true if cell2 is reachable from cell1 (e.g. portal teleportation). */
   isAdjacent?: (cell1: GridPosition, cell2: GridPosition) => boolean;
   /**
-   * Desktop-only idle auto-submit. When set (ms), a selection of ≥3 cells that
-   * sits unchanged for this long on a non-touch device submits automatically —
-   * so click-built words and drag-then-stall don't leave the word stuck
-   * (founder report: players thought they had to "click elsewhere" to submit).
-   * Undefined = off (multiplayer/daily keep release/tap-to-submit only).
-   * Mobile is excluded so a paused finger never fires early.
+   * Desktop-only idle auto-submit window (ms). A selection of ≥3 cells that sits
+   * unchanged for this long on a non-touch device submits automatically — so
+   * click-built words and drag-then-stall don't leave the word stuck (founder
+   * report: players thought they had to "click elsewhere" to submit).
+   * Defaults to {@link DEFAULT_DESKTOP_AUTOSUBMIT_MS} (1s) so EVERY mode gets
+   * hands-free desktop submit; callers may override the window. Mobile is
+   * excluded so a paused finger never fires early.
    */
   autoSubmitIdleMs?: number;
 }
@@ -89,7 +91,7 @@ export function useGridInteraction({
   disableLetterKeyInput = false,
   cellFilter,
   isAdjacent: isAdjacentOverride,
-  autoSubmitIdleMs,
+  autoSubmitIdleMs = DEFAULT_DESKTOP_AUTOSUBMIT_MS,
 }: UseGridInteractionProps): UseGridInteractionReturn {
   const [internalSelectedCells, setInternalSelectedCells] = useState<SelectedCell[]>([]);
   const [fadingCells, setFadingCells] = useState<GridPosition[]>([]);
