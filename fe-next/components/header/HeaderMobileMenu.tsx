@@ -591,7 +591,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                     "text-xs font-bold flex-1",
                                                     m.completed ? "text-neo-lime/80 line-through" : "text-neo-white"
                                                 )}>
-                                                    {t(`dailyMissions.${m.type}`)}
+                                                    {t(m.titleKey)}
                                                 </span>
                                             </Link>
                                         ))}
