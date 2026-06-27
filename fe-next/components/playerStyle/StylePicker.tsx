@@ -30,6 +30,16 @@ export interface StylePickerProps {
   showConfirm?: boolean;
   /** Extra node pinned in the always-visible footer (e.g. modal "keep default"). */
   footerExtra?: React.ReactNode;
+  /**
+   * Layout mode:
+   * - 'modal' (default): the picker owns its own scroll region with a pinned
+   *   footer. Correct inside the fixed-height modal/onboarding shells.
+   * - 'inline': lays the grid out at its natural height and lets the host page
+   *   scroll. Use on the normally-scrolling Settings page — the internal
+   *   `overflow-y-auto` region otherwise traps the page scroll and makes
+   *   everything below the picker unreachable.
+   */
+  layout?: 'modal' | 'inline';
 }
 
 export function StylePicker({
@@ -37,6 +47,7 @@ export function StylePicker({
   confirmLabelKey = 'playerStyle.picker.confirm',
   showConfirm = true,
   footerExtra,
+  layout = 'modal',
 }: StylePickerProps) {
   const { t } = useLanguage();
   const { updateProfile } = useAuth();
@@ -96,14 +107,22 @@ export function StylePicker({
     }
   }, [selected, styleAvatar, avatarPreview, setStyle, updateProfile, stopSnippet, onConfirm]);
 
+  const isInline = layout === 'inline';
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
-      {/* Scrollable card region — bottom section stays pinned + always visible. */}
+    <div className={isInline ? 'flex flex-col gap-4' : 'flex min-h-0 flex-1 flex-col gap-4'}>
+      {/* Scrollable card region — bottom section stays pinned + always visible
+          in 'modal'. In 'inline' the grid lays out at natural height and the
+          host page owns the scroll (no nested scroll container to trap it). */}
       <div
-        // overscroll-contain + own compositor layer (translateZ) stops the
+        // modal: overscroll-contain + own compositor layer (translateZ) stops the
         // translucent backdrop behind the modal from repaint-flickering as this
         // region scrolls on touch devices.
-        className="grid min-h-0 flex-1 grid-cols-2 content-start gap-3 overflow-y-auto overscroll-contain px-4 pb-1 pt-4 [transform:translateZ(0)] [backface-visibility:hidden] sm:grid-cols-3"
+        className={
+          isInline
+            ? 'grid grid-cols-2 content-start gap-3 px-4 pb-1 pt-4 sm:grid-cols-3'
+            : 'grid min-h-0 flex-1 grid-cols-2 content-start gap-3 overflow-y-auto overscroll-contain px-4 pb-1 pt-4 [transform:translateZ(0)] [backface-visibility:hidden] sm:grid-cols-3'
+        }
         role="radiogroup"
         aria-label={t('playerStyle.picker.title')}
       >

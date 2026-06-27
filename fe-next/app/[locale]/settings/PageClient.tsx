@@ -342,7 +342,7 @@ export default function SettingsPageClient(): React.JSX.Element {
             )}>
               {t('playerStyle.settings.description')}
             </p>
-            <StylePicker confirmLabelKey="playerStyle.picker.apply" />
+            <StylePicker layout="inline" confirmLabelKey="playerStyle.picker.apply" />
           </m.section>
           )}
           </div>{/* end left column */}

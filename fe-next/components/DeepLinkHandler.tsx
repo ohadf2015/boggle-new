@@ -151,41 +151,83 @@ export default function DeepLinkHandler() {
       }
     };
 
+    // Cold-start retry budget: the native bridge can take a beat to register
+    // @capacitor/app after the WebView mounts, so we poll a few times rather
+    // than reading the launch URL exactly once and giving up.
+    const COLD_START_MAX_ATTEMPTS = 10;
+    const COLD_START_RETRY_MS = 150;
+    const delay = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
     const handleColdStartLaunchUrl = async () => {
       try {
-        try {
-          if (window.sessionStorage.getItem(LAUNCH_HANDLED_KEY) === '1') return;
-        } catch { /* sessionStorage unavailable — fall through, best-effort */ }
+        if (window.sessionStorage.getItem(LAUNCH_HANDLED_KEY) === '1') return;
+      } catch { /* sessionStorage unavailable — fall through, best-effort */ }
 
+      // The native bridge can register @capacitor/app slightly AFTER this
+      // component mounts (cold-start WebView race, Sentry JAVASCRIPT-NEXTJS-12A).
+      // Reading the launch URL once and bailing would silently drop every
+      // cold-start deep link onto the home page, so retry until the bridge
+      // answers. A *resolved* value — even `undefined` for a launcher-icon
+      // start — is a definitive answer that ends the loop; only a missing
+      // plugin or a rejected call (bridge not ready) triggers a retry.
+      for (let attempt = 0; attempt < COLD_START_MAX_ATTEMPTS && mounted; attempt++) {
         const AppPlugin = getSyncAppPlugin() ?? (await getAppPlugin());
-        if (!AppPlugin || typeof AppPlugin.getLaunchUrl !== 'function') return;
+        if (!AppPlugin || typeof AppPlugin.getLaunchUrl !== 'function') {
+          await delay(COLD_START_RETRY_MS);
+          continue;
+        }
 
-        const launch = await AppPlugin.getLaunchUrl();
-        const launchUrl = launch?.url;
-        if (!launchUrl || !launchUrlHasTarget(launchUrl) || !mounted) return;
+        let launchUrl: string | undefined;
+        try {
+          const launch = await AppPlugin.getLaunchUrl();
+          launchUrl = launch?.url;
+        } catch (error) {
+          // Bridge not ready yet — back off and retry.
+          logger.debug('getLaunchUrl not ready, retrying:', error);
+          await delay(COLD_START_RETRY_MS);
+          continue;
+        }
+
+        // Definitive answer received. Route only when it carries a real target;
+        // a bare origin / missing URL means "launched normally" → stay home.
+        if (!mounted) return;
+        if (!launchUrl || !launchUrlHasTarget(launchUrl)) return;
 
         // Mark consumed BEFORE awaiting the route so a fast remount mid-await
         // cannot double-fire (appUrlOpen may also replay the same URL).
         try { window.sessionStorage.setItem(LAUNCH_HANDLED_KEY, '1'); } catch { /* ignore */ }
         await handleAppUrlOpen({ url: launchUrl });
-      } catch (error) {
-        logger.debug('Cold-start launch URL handling failed:', error);
+        return;
       }
     };
 
-    // Guard against the Android WebView race: isNative() can be true before the
-    // native bridge has registered @capacitor/app (Sentry JAVASCRIPT-NEXTJS-12A).
-    const cap = (globalThis as unknown as CapGlobal).Capacitor;
-    const appPluginAvailable = typeof cap?.isPluginAvailable !== 'function' || cap.isPluginAvailable('App');
-
-    if (appPluginAvailable) {
-      // Register synchronously if plugin is available (covers test env & native Capacitor bridge)
-      const syncApp = getSyncAppPlugin();
-      if (syncApp) {
+    // Register the warm-start appUrlOpen listener. We deliberately do NOT gate
+    // this on Capacitor.isPluginAvailable('App'): during the cold-start WebView
+    // race that check can report false before the bridge finishes registering
+    // the plugin, which permanently skipped deep-link handling and dropped users
+    // on the home page (silent failure). Acquisition already degrades gracefully
+    // (sync plugin → dynamic import) and every call is wrapped in try/catch.
+    const syncApp = getSyncAppPlugin();
+    if (syncApp) {
+      try {
+        const listenerResult = syncApp.addListener('appUrlOpen', handleAppUrlOpen);
+        Promise.resolve(listenerResult)
+          .then((listener) => {
+            if (mounted) cleanup = () => listener.remove();
+          })
+          .catch((error: unknown) => {
+            logger.debug('Deep link listener unavailable:', error);
+          });
+      } catch (error) {
+        logger.debug('Deep link listener unavailable:', error);
+      }
+    } else {
+      // Async fallback for dynamic import path
+      getAppPlugin().then((AppPlugin) => {
+        if (!AppPlugin || !mounted) return;
         try {
-          const listenerResult = syncApp.addListener('appUrlOpen', handleAppUrlOpen);
-          Promise.resolve(listenerResult)
-            .then((listener) => {
+          Promise.resolve(AppPlugin.addListener('appUrlOpen', handleAppUrlOpen))
+            .then((listener: { remove: () => void }) => {
               if (mounted) cleanup = () => listener.remove();
             })
             .catch((error: unknown) => {
@@ -194,27 +236,11 @@ export default function DeepLinkHandler() {
         } catch (error) {
           logger.debug('Deep link listener unavailable:', error);
         }
-      } else {
-        // Async fallback for dynamic import path
-        getAppPlugin().then((AppPlugin) => {
-          if (!AppPlugin || !mounted) return;
-          try {
-            Promise.resolve(AppPlugin.addListener('appUrlOpen', handleAppUrlOpen))
-              .then((listener: { remove: () => void }) => {
-                if (mounted) cleanup = () => listener.remove();
-              })
-              .catch((error: unknown) => {
-                logger.debug('Deep link listener unavailable:', error);
-              });
-          } catch (error) {
-            logger.debug('Deep link listener unavailable:', error);
-          }
-        });
-      }
-
-      // After wiring the warm-start listener, resolve any cold-start launch URL.
-      void handleColdStartLaunchUrl();
+      });
     }
+
+    // After wiring the warm-start listener, resolve any cold-start launch URL.
+    void handleColdStartLaunchUrl();
 
     async function initPush() {
       try {
