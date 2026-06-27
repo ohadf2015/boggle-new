@@ -31,14 +31,17 @@ let pathname = '/en/practice';
 vi.mock('next/navigation', () => ({ usePathname: () => pathname }));
 
 import PlayerStyleOnboardingWrapper from '../PlayerStyleOnboardingWrapper';
+import { useGameStore } from '@/hooks/gameState/store';
 
 describe('PlayerStyleOnboardingWrapper route gate', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    useGameStore.getState().resetAll();
   });
   afterEach(() => {
     vi.runOnlyPendingTimers();
     vi.useRealTimers();
+    useGameStore.getState().resetAll();
   });
 
   function renderAndSettle() {
@@ -63,10 +66,52 @@ describe('PlayerStyleOnboardingWrapper route gate', () => {
     expect(screen.queryByTestId('style-popup')).not.toBeInTheDocument();
   });
 
-  it('renders the style popup on an in-app route (eligible guest)', () => {
+  it('does NOT render on a gameplay route before a game is played (pre-game/lobby)', () => {
+    // The "wrong moment" fix: on /practice etc. the popup must not open over the
+    // pre-game setup. It waits for the game to finish (results screen).
     pathname = '/en/practice';
     renderAndSettle();
+    expect(screen.queryByTestId('style-popup')).not.toBeInTheDocument();
+  });
+
+  it('renders on a gameplay route once a game has ended (results screen)', () => {
+    pathname = '/en/practice';
+    render(<PlayerStyleOnboardingWrapper />);
+    act(() => {
+      vi.advanceTimersByTime(900); // pre-game decision → stays hidden
+    });
+    expect(screen.queryByTestId('style-popup')).not.toBeInTheDocument();
+    // A game is played, then ends → results screen is the natural break.
+    act(() => {
+      useGameStore.getState().setGameActive(true);
+    });
+    act(() => {
+      useGameStore.getState().setGameActive(false);
+    });
+    act(() => {
+      vi.advanceTimersByTime(900);
+    });
     expect(screen.getByTestId('style-popup')).toBeInTheDocument();
+  });
+
+  it('renders on a non-gameplay in-app screen when idle (menu/leaderboard)', () => {
+    // Off gameplay routes the user is already at rest — nothing to interrupt — so
+    // the popup may surface without waiting for a results screen.
+    pathname = '/en/leaderboard';
+    renderAndSettle();
+    expect(screen.getByTestId('style-popup')).toBeInTheDocument();
+  });
+
+  it('does NOT render while a game is actively being played', () => {
+    pathname = '/en/multiplayer';
+    render(<PlayerStyleOnboardingWrapper />);
+    act(() => {
+      useGameStore.getState().setGameActive(true);
+    });
+    act(() => {
+      vi.advanceTimersByTime(900);
+    });
+    expect(screen.queryByTestId('style-popup')).not.toBeInTheDocument();
   });
 
   it('does NOT render when a style is already stored locally (e.g. /daily after picking)', async () => {

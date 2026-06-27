@@ -34,6 +34,7 @@ let pathname = '/en/practice';
 vi.mock('next/navigation', () => ({ usePathname: () => pathname }));
 
 import PlayerStyleOnboardingWrapper from '../PlayerStyleOnboardingWrapper';
+import { useGameStore } from '@/hooks/gameState/store';
 
 function renderAndSettle() {
   render(<PlayerStyleOnboardingWrapper />);
@@ -45,6 +46,7 @@ function renderAndSettle() {
 describe('PlayerStyleOnboardingWrapper — mark on show + migrate on login', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    useGameStore.getState().resetAll();
     markPlayerStyleModalShown.mockClear();
     hasPlayerStyleModalBeenShown.mockReturnValue(false);
     getStoredPlayerStyle.mockReturnValue(null);
@@ -56,11 +58,14 @@ describe('PlayerStyleOnboardingWrapper — mark on show + migrate on login', () 
       updateProfile,
       loading: false,
     };
-    pathname = '/en/practice';
+    // A non-gameplay in-app screen: the popup may surface here at once (no
+    // results gate), keeping these mark-on-show cases independent of game state.
+    pathname = '/en/leaderboard';
   });
   afterEach(() => {
     vi.runOnlyPendingTimers();
     vi.useRealTimers();
+    useGameStore.getState().resetAll();
   });
 
   it('writes the device-level "shown" flag the moment the popup is shown (not on dismiss)', () => {
