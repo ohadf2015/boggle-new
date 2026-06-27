@@ -5,7 +5,9 @@ WORKDIR /app
 
 COPY package.json package-lock.json .npmrc ./
 
-RUN npm ci --no-audit --no-fund
+# --ignore-scripts: postinstall (patch-package && copy-sql-wasm) needs scripts/ +
+# patches/ which aren't in this stage. It's re-run in the builder where they exist.
+RUN npm ci --no-audit --no-fund --ignore-scripts
 
 # ── Stage 2: Production deps only ────────────────────────────────────
 # Separate stage for lean production node_modules that includes ALL
@@ -26,6 +28,11 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
+
+# Run the postinstall work here (deps installed with --ignore-scripts): apply
+# patch-package patches to the build-time node_modules and generate the gitignored
+# public/sql/sql-wasm.wasm so it flows into the runner image (line: COPY public).
+RUN node_modules/.bin/patch-package && node scripts/copy-sql-wasm.mjs
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
