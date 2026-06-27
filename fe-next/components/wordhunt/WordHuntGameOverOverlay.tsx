@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
-import { Skull, Eye, Trophy, Sparkles } from 'lucide-react';
+import { Skull, Eye, Trophy, Sparkles, Crown, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { wordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
 import { WordHuntDeathRecap, type DeathRecapStats } from './WordHuntDeathRecap';
 
 export type GameOverReason = 'eliminated' | 'found' | 'otherFound' | null;
@@ -20,6 +21,12 @@ export interface WordHuntGameOverOverlayProps {
    * state feeling alive instead of stuck on a frozen grid.
    */
   playersRemaining?: number;
+  /**
+   * Same-length guesses the local player used to solve the target. Drives the
+   * Wordle-style celebration escalation (guess 1 = "Genius", bigger burst).
+   * Only meaningful when reason === 'found'.
+   */
+  attemptsToFind?: number;
 }
 
 const SPECTATOR_DELAY = 2800;
@@ -41,8 +48,16 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
   t,
   deathRecapStats,
   playersRemaining,
+  attemptsToFind,
 }) => {
   const [phase, setPhase] = useState<'impact' | 'recap' | 'spectator'>('impact');
+
+  // Celebration escalation for a personal win — fewer guesses → grander tier.
+  // Only when the guess count is known; otherwise the generic "you found it".
+  const solveTier =
+    reason === 'found' && typeof attemptsToFind === 'number'
+      ? wordHuntSolveTier(attemptsToFind)
+      : null;
 
   useEffect(() => {
     if (!reason) {
@@ -108,13 +123,15 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
           className="absolute inset-0 bg-neo-black"
         />
 
-        {/* Floating particles for personal victory only */}
-        {!isEliminated && !isOtherFound && phase === 'impact' && <VictoryParticles />}
+        {/* Floating particles for personal victory only — denser for top tiers */}
+        {!isEliminated && !isOtherFound && phase === 'impact' && (
+          <VictoryParticles count={solveTier && solveTier.tier <= 1 ? 24 : 12} />
+        )}
 
         {/* Content */}
         <AdaptiveAnimatePresence mode="wait">
           {phase === 'impact' ? (
-            <ImpactContent key="impact" isEliminated={isEliminated} isOtherFound={isOtherFound} t={t} />
+            <ImpactContent key="impact" isEliminated={isEliminated} isOtherFound={isOtherFound} solveTier={solveTier} t={t} />
           ) : phase === 'recap' && isEliminated && deathRecapStats ? (
             <WordHuntDeathRecap key="recap" stats={deathRecapStats} t={t} />
           ) : (
@@ -129,9 +146,15 @@ export const WordHuntGameOverOverlay: React.FC<WordHuntGameOverOverlayProps> = (
 WordHuntGameOverOverlay.displayName = 'WordHuntGameOverOverlay';
 
 /** Dramatic impact animation — skull for death, trophy for victory, eye for other found */
-const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t: (key: string) => string }> = ({
+const ImpactContent: React.FC<{
+  isEliminated: boolean;
+  isOtherFound: boolean;
+  solveTier: ReturnType<typeof wordHuntSolveTier> | null;
+  t: (key: string) => string;
+}> = ({
   isEliminated,
   isOtherFound,
+  solveTier,
   t,
 }) => (
   <AdaptiveMotion.div
@@ -161,6 +184,20 @@ const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t:
           className="text-blue-400 drop-shadow-[0_0_20px_rgba(59,130,246,0.8)]"
           strokeWidth={2.5}
         />
+      ) : solveTier?.isAce ? (
+        // Guess 1 — crown the genius
+        <Crown
+          size={88}
+          className="text-yellow-300 drop-shadow-[0_0_28px_rgba(253,224,71,0.95)]"
+          strokeWidth={2.5}
+        />
+      ) : solveTier && solveTier.tier === 1 ? (
+        // Guess 2 — electric
+        <Zap
+          size={80}
+          className="text-yellow-300 drop-shadow-[0_0_24px_rgba(253,224,71,0.9)]"
+          strokeWidth={2.5}
+        />
       ) : (
         <Trophy
           size={72}
@@ -185,7 +222,13 @@ const ImpactContent: React.FC<{ isEliminated: boolean; isOtherFound: boolean; t:
           : 'border-yellow-500 bg-yellow-500/90 text-neo-black',
       )}
     >
-      {isEliminated ? t('wordHunt.mp.youEliminated') : isOtherFound ? t('wordHunt.mp.someoneFoundIt') : t('wordHunt.mp.youFoundIt')}
+      {isEliminated
+        ? t('wordHunt.mp.youEliminated')
+        : isOtherFound
+        ? t('wordHunt.mp.someoneFoundIt')
+        : solveTier
+        ? t(solveTier.labelKey)
+        : t('wordHunt.mp.youFoundIt')}
     </AdaptiveMotion.div>
 
     {/* Subtitle */}
@@ -244,20 +287,22 @@ function seededRandom(seed: number): number {
   return x - Math.floor(x);
 }
 
-const PARTICLES = Array.from({ length: 12 }, (_, i) => {
-  const angle = (i / 12) * Math.PI * 2;
-  const distance = 100 + seededRandom(i) * 80;
-  return {
-    id: i,
-    x: Math.cos(angle) * distance,
-    y: Math.sin(angle) * distance,
-    delay: i * 0.05,
-    size: 12 + seededRandom(i + 100) * 8,
-  };
-});
+function buildParticles(count: number) {
+  return Array.from({ length: count }, (_, i) => {
+    const angle = (i / count) * Math.PI * 2;
+    const distance = 100 + seededRandom(i) * 80;
+    return {
+      id: i,
+      x: Math.cos(angle) * distance,
+      y: Math.sin(angle) * distance,
+      delay: i * 0.05,
+      size: 12 + seededRandom(i + 100) * 8,
+    };
+  });
+}
 
-const VictoryParticles: React.FC = () => {
-  const particles = PARTICLES;
+const VictoryParticles: React.FC<{ count?: number }> = ({ count = 12 }) => {
+  const particles = buildParticles(count);
 
   return (
     <>

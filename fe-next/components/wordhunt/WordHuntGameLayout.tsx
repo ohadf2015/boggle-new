@@ -266,6 +266,7 @@ export const WordHuntGameLayout = memo<WordHuntGameLayoutProps>(({
               <WordHuntGameOverOverlay
                 reason={isGameOver ? (targetFound ? (targetFoundBy != null && targetFoundBy !== currentUsername ? 'otherFound' : 'found') : 'eliminated') : null}
                 t={t}
+                attemptsToFind={attempts.filter((a) => a.word.length === targetLength).length}
                 deathRecapStats={deathRecapStats}
                 playersRemaining={
                   Object.entries(playerLives).filter(

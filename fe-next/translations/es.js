@@ -6544,6 +6544,7 @@ const es = {
         "coinCta": "Gasta {cost} monedas para restaurar",
         "decline": "Terminar partida"
       },
+      "findWordsToReveal": "Deletrea palabras en la cuadrícula para revelar estas letras",
       "keyboardTip": "Desliza en la cuadrícula o escribe con el teclado",
       "shop": "Tienda de Pistas",
       "revealLetter": "Revelar Letra",
@@ -6586,6 +6587,14 @@ const es = {
       "mpResults": {
         "boardCleared": "¡TABLERO DESPEJADO!"
       }
+    },
+    "celebrate": {
+      "tier1": "¡GENIO!",
+      "tier2": "¡MAGNÍFICO!",
+      "tier3": "¡IMPRESIONANTE!",
+      "tier4": "¡ESPLÉNDIDO!",
+      "tier5": "¡EXCELENTE!",
+      "tier6": "¡LA ENCONTRASTE!"
     },
     "desktop": {
       "liveRanks": "Clasificación en Vivo",
@@ -12647,6 +12656,9 @@ const es = {
     pushWordLength: "Tu promedio fue {{avg}} letras (más larga: {{longest}}). Intenta expandir palabras cortas — si ves \"MAR\", busca \"MARCA\" o \"MARCHA\" cerca.",
     scanMoreWords: "Solo {{count}} palabras encontradas. Antes de adivinar el objetivo, dedica 15-20 segundos a escanear palabras fáciles de 3-4 letras — dan vida y pistas.",
     pushForFirst: "Quedaste en el puesto #{{rank}}. Para cerrar la brecha, encuentra palabras más largas (5+ letras) y mantén alta la precisión.",
+    spellWordsFirst: "Deletrea palabras en la cuadrícula primero — cada una revela una letra de la palabra oculta.",
+    fastSolveFarmMore: "¡Resolviste en {{attempts}} intentos! Rápido como un rayo. La próxima acumula palabras del tablero para puntos extra.",
+    trustCluesSooner: "Te tomó {{attempts}} adivinanzas — confía en tus pistas reveladas y arriesgate antes para más puntos.",
   },
   wordHuntDeathRecap: {
     causeLifeDrain: "Se agotó tu vida",

@@ -6599,6 +6599,7 @@ const en = {
         "coinCta": "Spend {cost} coins to restore",
         "decline": "End run"
       },
+      "findWordsToReveal": "Spell words on the grid to reveal these letters",
       "keyboardTip": "Swipe on grid or type with keyboard",
       "shop": "Clue Shop",
       "revealLetter": "Reveal Letter",
@@ -6638,6 +6639,14 @@ const en = {
           "progressLabel": "Tier progress"
         }
       }
+    },
+    "celebrate": {
+      "tier1": "GENIUS!",
+      "tier2": "MAGNIFICENT!",
+      "tier3": "IMPRESSIVE!",
+      "tier4": "SPLENDID!",
+      "tier5": "GREAT!",
+      "tier6": "FOUND IT!"
     },
     "desktop": {
       "liveRanks": "Live Ranks",
@@ -11983,7 +11992,10 @@ const en = {
     "lifeManagement": "You finished at {{life}}% life — one more miss and you're out. Mix in short discovery words between target guesses to keep your life topped up.",
     "pushWordLength": "Your avg was {{avg}} letters (longest: {{longest}}). Try building on shorter words — if you see \"RAN\", look for \"RANGE\" or \"RANCH\" nearby.",
     "scanMoreWords": "Only {{count}} words found. Before guessing the target, spend 15-20 seconds scanning for easy 3-4 letter words — they give life and reveal letter clues.",
-    "pushForFirst": "You placed #{{rank}}. To close the gap, find longer words (5+ letters) and keep your accuracy high — invalid words cost life without scoring."
+    "pushForFirst": "You placed #{{rank}}. To close the gap, find longer words (5+ letters) and keep your accuracy high — invalid words cost life without scoring.",
+    "spellWordsFirst": "Spell words on the grid first — each one reveals a letter of the hidden word.",
+    "fastSolveFarmMore": "Solved in {{attempts}}! Lightning fast. Farm a few board words next time for bonus points on top.",
+    "trustCluesSooner": "Took {{attempts}} guesses — trust your revealed clues and commit sooner for more points."
   },
   "wordHuntDeathRecap": {
     "causeLifeDrain": "Life drained out",

@@ -315,6 +315,8 @@ export interface WordHuntModeState {
   isFirstFinderClaimed: boolean;
   /** How many players have found the target word (used for decreasing bonuses) */
   finderCount?: number;
+  /** Per-player count of same-length target guesses (drives the guess-efficiency bonus) */
+  playerAttempts?: Record<string, number>;
   discoveryWordCount?: number;
   /** Timestamp of last wordHandler life broadcast (prevents double broadcast with timer) */
   lastLifeUpdateAt?: number;

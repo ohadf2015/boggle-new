@@ -147,8 +147,9 @@ describe('useLiveScoreTracker — Season-2 projected score', () => {
       }),
     );
 
-    // speed 320 + accuracy 400 + exploration 20 = 740
-    expect(result.current[0].currentScore).toBe(740);
+    // Won on 1 guess → exploration floored to the 200 ceiling (fast clean solve
+    // is no longer punished for few words): speed 320 + accuracy 400 + 200 = 920
+    expect(result.current[0].currentScore).toBe(920);
   });
 
   it('resetScore clears accumulated state', () => {

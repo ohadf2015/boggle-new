@@ -6755,6 +6755,7 @@ const sv = {
         "coinCta": "Spendera {cost} mynt för att återställa",
         "decline": "Avsluta rundan"
       },
+      "findWordsToReveal": "Stava ord på rutorna för att avslöja dessa bokstäver",
       "keyboardTip": "Svep på rutnätet eller skriv med tangentbordet",
       "shop": "Ledtrådsbutik",
       "revealLetter": "Avslöja bokstav",
@@ -6797,6 +6798,14 @@ const sv = {
       "mpResults": {
         "boardCleared": "BORD RENSAT!"
       }
+    },
+    "celebrate": {
+      "tier1": "GENI!",
+      "tier2": "MAGNIFIK!",
+      "tier3": "IMPONERANDE!",
+      "tier4": "LYSANDE!",
+      "tier5": "BRAVT!",
+      "tier6": "HITTAD!"
     },
     "desktop": {
       "liveRanks": "Live Ranking",
@@ -12289,6 +12298,9 @@ const sv = {
     pushWordLength: "Ditt snitt var {{avg}} bokstäver (längsta: {{longest}}). Bygg vidare på korta ord — ser du \"RAN\", leta efter \"RANGE\" i närheten.",
     scanMoreWords: "Bara {{count}} ord hittade. Innan du gissar målet, spendera 15-20 sekunder på att skanna efter enkla 3-4 bokstavsord.",
     pushForFirst: "Du kom {{rank}}:a. För att stänga gapet, hitta längre ord (5+ bokstäver) och håll träffsäkerheten hög.",
+    spellWordsFirst: "Stava ord på rutorna först — varje ord avslöjar en bokstav i det dolda ordet.",
+    fastSolveFarmMore: "Löst på {{attempts}} försök! Blixtrande snabbt. Plocka ett par ord nästa gång för bonuspoäng.",
+    trustCluesSooner: "Det tog {{attempts}} gissningar — lita på dina avslöjade ledtrådar och ta risken tidigare för mer poäng.",
   },
   wordHuntDeathRecap: {
     causeLifeDrain: "Livet rann ut",

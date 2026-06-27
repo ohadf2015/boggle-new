@@ -32,7 +32,12 @@ describe('Scoring Utilities', () => {
     it('-40 per guess', () => { expect(getScoreBreakdown(100, 2, 20, true).accuracy).toBe(360); });
     it('accuracy min 0', () => { expect(getScoreBreakdown(100, 15, 20, true).accuracy).toBe(0); });
     it('0 life', () => { expect(getScoreBreakdown(0, 1, 20, true).speed).toBe(0); });
-    it('0 words', () => { expect(getScoreBreakdown(100, 1, 0, true).exploration).toBe(0); });
+    // New rule: a fast clean solve floors exploration so it isn't punished for
+    // farming no words. Guess 1 with 0 words → full 200 exploration credit.
+    it('guess-1 solve floors exploration at 200 even with 0 words', () => { expect(getScoreBreakdown(100, 1, 0, true).exploration).toBe(200); });
+    it('guess-2 solve floors exploration at 150 with 0 words', () => { expect(getScoreBreakdown(100, 2, 0, true).exploration).toBe(150); });
+    it('word volume still wins when higher than the efficiency floor', () => { expect(getScoreBreakdown(100, 3, 15, true).exploration).toBe(150); });
+    it('late solve with 0 words gets 0 exploration (floor tapered out)', () => { expect(getScoreBreakdown(100, 8, 0, true).exploration).toBe(0); });
     it('includes raw', () => { const b = getScoreBreakdown(75, 3, 12, true); expect(b.raw.lifeRemaining).toBe(75); });
     it('handles negatives', () => { const b = getScoreBreakdown(-10, -5, -3, true); expect(b.speed).toBe(0); expect(b.accuracy).toBe(400); });
   });

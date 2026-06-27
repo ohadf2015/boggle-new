@@ -16,6 +16,7 @@ import Link from 'next/link';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyInsightStack from './DailyInsightStack';
+import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
 import CatchUpSuggestion from './CatchUpSuggestion';
 import MpModeCrossPromo from './MpModeCrossPromo';
 import WatchAdButton from './WatchAdButton';
@@ -339,6 +340,41 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         <StatsBlurb stats={stats} solved={result.solved} t={t} />
       </m.div>
     )}
+
+    {/* Actionable "score more next time" insight — guess-efficiency aware.
+        attemptsToFind = guesses used; a fast solve gets a positive nudge, a blind
+        solve learns the word→clue loop, a slow solve learns to trust its clues. */}
+    {(() => {
+      const words = result.wordsDiscovered ?? [];
+      const lengths = words.map((w) => w.word.length);
+      const avgWordLength = lengths.length
+        ? Math.round((lengths.reduce((a, b) => a + b, 0) / lengths.length) * 10) / 10
+        : 0;
+      return (
+        <m.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
+          className="mx-auto max-w-xs"
+        >
+          <WordHuntTipBadge stats={{
+            score: result.efficiencyScore || 0,
+            survived: result.solved,
+            lifeRemaining: result.lifeRemaining || 0,
+            discoveryWords: words.length,
+            foundTarget: result.solved,
+            isFirstFinder: false,
+            totalPlayers: 1,
+            rank: 1,
+            validWordCount: words.length,
+            invalidWordCount: 0,
+            avgWordLength,
+            longestWordLength: lengths.length ? Math.max(...lengths) : 0,
+            attemptsToFind: result.attemptsUsed,
+          }} />
+        </m.div>
+      );
+    })()}
 
     {/* Daily Insight Cards — personalized analytics on challenge performance */}
     <DailyInsightStack mode="word_hunt" date={puzzleDate} />

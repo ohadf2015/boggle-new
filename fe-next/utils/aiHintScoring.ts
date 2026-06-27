@@ -3,6 +3,8 @@
  * Life rewards, token rewards, efficiency scoring, and shop utilities
  */
 
+import { wordHuntExplorationCredit } from '@/shared/utils/wordHuntScoring';
+
 /**
  * Score breakdown for UI display
  */
@@ -11,7 +13,7 @@ export interface ScoreBreakdown {
   speed: number;
   /** Accuracy score: 400 - (guesses - 1) x 40, min 0 */
   accuracy: number;
-  /** Exploration bonus: words x 10, capped at 200 */
+  /** Exploration: max(words x 10, efficiency floor by guesses), capped at 200 */
   exploration: number;
   /** Total efficiency score (0-1000) */
   total: number;
@@ -80,7 +82,14 @@ export function getScoreBreakdown(
   lifeRemaining: number,
   guessesUsed: number,
   wordsFound: number,
-  solved: boolean
+  solved: boolean,
+  /**
+   * Apply the guess-efficiency exploration FLOOR (a fast clean solve earns the
+   * exploration ceiling without word-farming). This is a reward for an ACTUAL
+   * solve, so it's on for the final/results score but should be OFF for the
+   * live in-game projection (otherwise a fresh game would project max).
+   */
+  applyEfficiencyFloor: boolean = true,
 ): ScoreBreakdown {
   if (!solved) {
     return {
@@ -99,7 +108,14 @@ export function getScoreBreakdown(
 
   const speed = Math.min(life, 100) * 4;
   const accuracy = Math.max(0, 400 - (guesses - 1) * 40);
-  const exploration = Math.min(words, 20) * 10;
+  // Exploration is a FLOOR (when enabled): a fast clean solve earns the
+  // exploration ceiling without word-farming, so solving in 1–2 guesses is no
+  // longer capped below a slow word-farmer. Word-farmers still reach 200 via
+  // volume. Whoever's higher. Floor is OFF for the live projection.
+  const wordExploration = Math.min(words, 20) * 10;
+  const exploration = applyEfficiencyFloor
+    ? Math.max(wordExploration, wordHuntExplorationCredit(guesses))
+    : wordExploration;
   const total = speed + accuracy + exploration;
 
   return {

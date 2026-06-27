@@ -16,6 +16,30 @@ describe('getWordHuntTip', () => {
     longestWordLength: 7,
   };
 
+  describe('guess-efficiency insights (attemptsToFind known)', () => {
+    it('does NOT punish a fast 1-guess solver — reassures + nudges to farm', () => {
+      const tip = getWordHuntTip({ ...baseStats, attemptsToFind: 1, validWordCount: 1 });
+      expect(tip.key).toBe('wordHuntTips.fastSolveFarmMore');
+      expect(tip.params?.attempts).toBe(1);
+    });
+
+    it('teaches the core loop when the target was solved blind (0 words)', () => {
+      const tip = getWordHuntTip({ ...baseStats, attemptsToFind: 2, validWordCount: 0 });
+      expect(tip.key).toBe('wordHuntTips.spellWordsFirst');
+    });
+
+    it('nudges slow solvers to trust the clues sooner', () => {
+      const tip = getWordHuntTip({ ...baseStats, attemptsToFind: 6, validWordCount: 9 });
+      expect(tip.key).toBe('wordHuntTips.trustCluesSooner');
+      expect(tip.params?.attempts).toBe(6);
+    });
+
+    it('falls through to legacy tips when attemptsToFind is absent', () => {
+      const tip = getWordHuntTip({ ...baseStats });
+      expect(tip.key).not.toBe('wordHuntTips.fastSolveFarmMore');
+    });
+  });
+
   describe('eliminated players', () => {
     it('tells players with few words to find more words to stay alive', () => {
       const tip = getWordHuntTip({

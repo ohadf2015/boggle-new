@@ -181,7 +181,11 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
           {showFeedbackOverlay && latestAttemptFeedback ? (
             <FeedbackLegend t={t} />
           ) : (
-            <KnownLettersDisplay knownLetters={knownLetters} t={t} />
+            <KnownLettersDisplay
+              knownLetters={knownLetters}
+              noCluesYet={accumulatedClues.size === 0 && knownLetters.size === 0 && revealedLetters.size === 0}
+              t={t}
+            />
           )}
         </AdaptiveAnimatePresence>
       </div>
@@ -419,10 +423,12 @@ const FeedbackLegend: React.FC<FeedbackLegendProps> = ({ t }) => (
 
 interface KnownLettersDisplayProps {
   knownLetters: Set<string>;
+  /** No clues revealed yet → prompt the player to spell board words. */
+  noCluesYet?: boolean;
   t: (key: string) => string;
 }
 
-const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters, t }) => (
+const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters, noCluesYet, t }) => (
   <AdaptiveMotion.div
     key="known-letters"
     initial={{ opacity: 0 }}
@@ -431,6 +437,19 @@ const KnownLettersDisplay: React.FC<KnownLettersDisplayProps> = ({ knownLetters,
     transition={{ duration: 0.15 }}
     className="flex flex-col items-center gap-0.5 mt-0.5"
   >
+    {/* Empty-state cue: the blank boxes don't explain themselves, so when no
+        clue has been revealed yet we say HOW to reveal them — spell words on the
+        grid. This is the in-context rule (tutorials get ignored). */}
+    {noCluesYet && (
+      <span
+        data-testid="clue-empty-cue"
+        className="text-[10px] sm:text-xs font-bold text-neo-cyan animate-pulse text-center leading-snug"
+        role="status"
+        aria-live="polite"
+      >
+        🔍 {t('wordHunt.survival.findWordsToReveal')}
+      </span>
+    )}
     {knownLetters.size > 0 && (
       <AdaptiveMotion.div
         initial={{ opacity: 0, y: -5 }}

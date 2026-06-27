@@ -14,6 +14,7 @@ import {
   getDrainRate,
 } from '@/shared/constants/wordHuntMultiplayerConstants';
 
+import { wordHuntEfficiencyBonus } from '@/shared/utils/wordHuntScoring';
 import { isWordHuntQuality } from '@/shared/utils/wordQuality';
 import { classifyWordSync } from '../services/wordCategorizer';
 import { promises as fsAsync, readFileSync } from 'fs';
@@ -286,16 +287,28 @@ export function validateTargetGuess(
 
 /**
  * Record that a player found the target word.
- * Returns whether they are the first finder and their bonus.
- * Subsequent finders during the 3s end-game window get decreasing bonuses.
+ * Returns the first-finder flag plus a bonus breakdown.
+ *
+ * Total `bonus` = finder-rank bonus (decreasing for 2nd/3rd/… finders) PLUS a
+ * guess-efficiency bonus (fewer same-length guesses → bigger reward). The
+ * efficiency bonus compensates a fast solver who farmed fewer board words, so
+ * solving on guess 1–2 is no longer punished. Callers credit the TOTAL `bonus`.
+ *
+ * @param attempts explicit same-length guess count (used by bots whose guesses
+ *   aren't tracked in `state.playerAttempts`); defaults to the player's tracked
+ *   attempt count, then to 1 (best tier).
  */
 export function recordTargetFound(
   state: WordHuntModeState,
   username: string,
-): { isFirstFinder: boolean; bonus: number } {
+  attempts?: number,
+): { isFirstFinder: boolean; bonus: number; finderBonus: number; efficiencyBonus: number; attempts: number } {
   const finderIndex = state.finderCount ?? 0;
-  const bonus = HUNT_SUBSEQUENT_FINDER_BONUSES[finderIndex] ?? HUNT_SUBSEQUENT_FINDER_BONUSES[HUNT_SUBSEQUENT_FINDER_BONUSES.length - 1];
+  const finderBonus = HUNT_SUBSEQUENT_FINDER_BONUSES[finderIndex] ?? HUNT_SUBSEQUENT_FINDER_BONUSES[HUNT_SUBSEQUENT_FINDER_BONUSES.length - 1];
   const isFirstFinder = finderIndex === 0;
+
+  const effAttempts = attempts ?? state.playerAttempts?.[username] ?? 1;
+  const efficiencyBonus = wordHuntEfficiencyBonus(effAttempts);
 
   if (isFirstFinder) {
     state.targetFoundBy = username;
@@ -303,7 +316,13 @@ export function recordTargetFound(
   }
   state.finderCount = finderIndex + 1;
 
-  return { isFirstFinder, bonus };
+  return {
+    isFirstFinder,
+    bonus: finderBonus + efficiencyBonus,
+    finderBonus,
+    efficiencyBonus,
+    attempts: effAttempts,
+  };
 }
 
 /**

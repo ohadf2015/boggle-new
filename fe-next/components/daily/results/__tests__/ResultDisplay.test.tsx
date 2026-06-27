@@ -99,13 +99,15 @@ describe('ResultDisplay Props Requirements', () => {
     expect(withLife.total).toBeGreaterThan(withoutLife.total);
   });
 
-  it('should require wordsDiscovered for accurate exploration score', () => {
-    const withWords = getScoreBreakdown(50, 3, 10, true);
-    const withoutWords = getScoreBreakdown(50, 3, 0, true);
-
-    expect(withWords.exploration).toBe(100);
-    expect(withoutWords.exploration).toBe(0);
-    expect(withWords.total).toBeGreaterThan(withoutWords.total);
+  it('exploration = max(word points, fast-solve floor)', () => {
+    // Past the efficiency floor (6+ guesses) words drive exploration as before.
+    expect(getScoreBreakdown(50, 6, 10, true).exploration).toBe(100);
+    expect(getScoreBreakdown(50, 6, 0, true).exploration).toBe(0);
+    expect(getScoreBreakdown(50, 6, 10, true).total)
+      .toBeGreaterThan(getScoreBreakdown(50, 6, 0, true).total);
+    // A fast clean solve floors exploration even with no words farmed.
+    expect(getScoreBreakdown(50, 1, 0, true).exploration).toBe(200);
+    expect(getScoreBreakdown(50, 3, 0, true).exploration).toBe(100);
   });
 });
 
@@ -171,10 +173,11 @@ describe('ResultDisplay Component', () => {
 
     it('renders score breakdown chips', () => {
       render(<ResultDisplay {...solvedProps} />);
-      // getScoreBreakdown(60, 3, 8, true) yields speed=240, accuracy=320, exploration=80
+      // getScoreBreakdown(60, 3, 8, true): speed=240, accuracy=320,
+      // exploration=max(80, fast-solve floor 100)=100
       expect(screen.getByText(/\+240/)).toBeInTheDocument();
       expect(screen.getByText(/\+320/)).toBeInTheDocument();
-      expect(screen.getByText(/\+80/)).toBeInTheDocument();
+      expect(screen.getByText(/\+100/)).toBeInTheDocument();
     });
   });
 
@@ -187,8 +190,9 @@ describe('ResultDisplay Component', () => {
     });
 
     it('regression: a sub-50% score does NOT get top praise even in few attempts', () => {
-      // life 30 (120), 3 attempts (320 accuracy), 5 words (50) → total 490 (49%) → rising
-      render(<ResultDisplay {...solvedProps} attemptsUsed={3} lifeRemaining={30} wordsDiscovered={5} />);
+      // life 15 (60), 3 attempts (320 accuracy), 0 words (fast-solve floor 100)
+      // → total 480 (48%) → rising. Tier follows score%, not the low attempt count.
+      render(<ResultDisplay {...solvedProps} attemptsUsed={3} lifeRemaining={15} wordsDiscovered={0} />);
       expect(screen.getByTestId('score-tier-rising')).toBeInTheDocument();
       expect(screen.queryByTestId('score-tier-legendary')).not.toBeInTheDocument();
       expect(screen.getByText('wordHunt.results.scoreTierRising')).toBeInTheDocument();
@@ -225,10 +229,10 @@ describe('ResultDisplay Component', () => {
 
     it('leaves the real score chips unchanged (prank does not alter the real total)', () => {
       render(<ResultDisplay {...solvedProps} currentUserId={RON_PRANK_USER_ID} />);
-      // Real breakdown for solvedProps: speed=240, accuracy=320, exploration=80
+      // Real breakdown for solvedProps: speed=240, accuracy=320, exploration=100
       expect(screen.getByText(/\+240/)).toBeInTheDocument();
       expect(screen.getByText(/\+320/)).toBeInTheDocument();
-      expect(screen.getByText(/\+80/)).toBeInTheDocument();
+      expect(screen.getByText(/\+100/)).toBeInTheDocument();
     });
   });
 

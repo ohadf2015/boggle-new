@@ -121,6 +121,13 @@ export function handleSubmitTargetWord(
   const isDiscovery = guess.length !== huntState.targetWord.length;
   const isCorrect = !isDiscovery && feedback.every((f) => f === 'correct');
 
+  // Count same-length guesses (right or wrong) per player — drives the
+  // guess-efficiency bonus + celebration tier. The winning guess is included.
+  if (!isDiscovery) {
+    if (!huntState.playerAttempts) huntState.playerAttempts = {};
+    huntState.playerAttempts[username] = (huntState.playerAttempts[username] || 0) + 1;
+  }
+
   if (isCorrect) {
     // Target found
     const result = recordTargetFound(huntState, username);
@@ -140,6 +147,9 @@ export function handleSubmitTargetWord(
       correct: true,
       isFirstFinder: result.isFirstFinder,
       bonus: result.bonus,
+      finderBonus: result.finderBonus,
+      efficiencyBonus: result.efficiencyBonus,
+      attemptsToFind: result.attempts,
       livesRemaining: huntState.playerLives[username] || 0,
       isDiscovery: false,
     });

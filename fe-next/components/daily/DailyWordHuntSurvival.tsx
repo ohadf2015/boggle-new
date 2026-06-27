@@ -11,6 +11,8 @@ const WordHuntEffectsCanvas = dynamic(
   { ssr: false }
 );
 import { useLanguage } from '@/contexts/LanguageContext';
+import { wordHuntSolveTier, type WordHuntSolveTier } from '@/shared/utils/wordHuntScoring';
+import { cn } from '@/lib/utils';
 import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useReducedEffects } from '@/hooks/useReducedEffects';
@@ -198,6 +200,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   // Micro-celebration effects (react-rewards confetti bursts)
   const { rewardId, triggerReward } = useGameRewards();
   const [showTargetConfetti, setShowTargetConfetti] = useState(false);
+  // Wordle-style solve escalation: the faster the solve, the grander the moment.
+  const [solveTier, setSolveTier] = useState<WordHuntSolveTier | null>(null);
   const [flashTrigger, setFlashTrigger] = useState(0);
   const [flashColor, setFlashColor] = useState('bg-green-400/15');
 
@@ -248,9 +252,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         }
       } else if (state.feedbackType === 'target-found') {
         if (!skipAnimations) {
+          // Escalate by how few guesses it took (Wordle: GENIUS on guess 1).
+          const tier = wordHuntSolveTier(state.attempts.filter((a) => !a.isDiscovery).length);
+          setSolveTier(tier);
           triggerReward('levelUp');
           setShowTargetConfetti(true);
-          setFlashColor('bg-neo-lime/20');
+          setFlashColor(tier.tier <= 1 ? 'bg-neo-yellow/30' : 'bg-neo-lime/20');
           setFlashTrigger((n) => n + 1);
           pushEffect({ type: 'targetFound', x: cx, y: cy });
         }
@@ -267,6 +274,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   }, [
     state.feedbackType,
     state.lastScoreIncrement,
+    state.attempts,
     triggerReward,
     skipAnimations,
     pushEffect,
@@ -563,9 +571,31 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
               </m.div>
             )}
           </AnimatePresence>
-          {/* Full confetti explosion when target word is found */}
+          {/* Full confetti explosion when target word is found — escalated for
+              a fast solve (Wordle-style: bigger burst + "GENIUS!" the fewer the guesses). */}
           {showTargetConfetti && (
-            <InlineConfetti size="lg" duration={2500} onComplete={() => setShowTargetConfetti(false)} />
+            <InlineConfetti
+              size="lg"
+              duration={solveTier && solveTier.tier <= 1 ? 3500 : 2500}
+              onComplete={() => { setShowTargetConfetti(false); setSolveTier(null); }}
+            />
+          )}
+          {showTargetConfetti && solveTier && (
+            <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
+              <m.span
+                initial={{ scale: 0.4, opacity: 0, y: 12 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 240, damping: 14 }}
+                className={cn(
+                  'px-5 py-2 rounded-neo border-3 border-neo-black shadow-hard-lg font-neo-display font-black uppercase tracking-wider',
+                  solveTier.tier <= 1
+                    ? 'text-2xl sm:text-4xl bg-neo-yellow text-neo-black'
+                    : 'text-xl sm:text-2xl bg-neo-lime text-neo-black',
+                )}
+              >
+                {t(solveTier.labelKey)}
+              </m.span>
+            </div>
           )}
         </div>
       </div>

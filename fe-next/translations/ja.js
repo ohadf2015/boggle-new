@@ -6648,6 +6648,7 @@ const ja = {
         "coinCta": "{cost}コインで回復",
         "decline": "ランを終了"
       },
+      "findWordsToReveal": "グリッド上の単語を綴って、これらの文字を表示しましょう",
       "keyboardTip": "グリッドをスワイプするかキーボードで入力",
       "shop": "ヒントショップ",
       "revealLetter": "文字を表示",
@@ -6690,6 +6691,14 @@ const ja = {
       "mpResults": {
         "boardCleared": "ボード クリア!"
       }
+    },
+    "celebrate": {
+      "tier1": "天才！",
+      "tier2": "素晴らしい！",
+      "tier3": "すごい！",
+      "tier4": "秀逸！",
+      "tier5": "素敵！",
+      "tier6": "見つけた！"
     },
     "desktop": {
       "liveRanks": "ライブランキング",
@@ -12138,6 +12147,9 @@ const ja = {
     pushWordLength: "平均{{avg}}文字（最長: {{longest}}文字）。短い単語を発展させてみよう — 「走」を見つけたら近くに「走者」がないか探してみて。",
     scanMoreWords: "見つけた単語は{{count}}個だけ。ターゲットを推測する前に15-20秒かけて簡単な3-4文字の単語をスキャン — ライフとヒントがもらえるよ。",
     pushForFirst: "{{rank}}位でフィニッシュ。差を縮めるには、長い単語（5文字以上）を見つけて正確度を高く保とう。",
+    spellWordsFirst: "グリッド上の単語を綴ってから — 各単語が隠された単語の1文字を表示します。",
+    fastSolveFarmMore: "{{attempts}}回で解きました！閃光のように速い。次は何個かグリッド単語を稼いでボーナスをゲット。",
+    trustCluesSooner: "{{attempts}}回の推測でした — 示されたヒントを信じて、もっと早く決断してより多くのポイントをゲットしましょう。",
   },
   wordHuntDeathRecap: {
     causeLifeDrain: "ライフが尽きた",

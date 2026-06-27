@@ -11,6 +11,11 @@ export interface WordHuntTipInput {
   invalidWordCount: number;
   avgWordLength: number;
   longestWordLength: number;
+  /**
+   * Same-length target guesses used to solve. Optional: present in SP (guesses
+   * used) but not in MP results. Drives guess-efficiency insights when known.
+   */
+  attemptsToFind?: number;
 }
 
 export interface WordHuntTip {
@@ -27,10 +32,29 @@ export function getWordHuntTip(stats: WordHuntTipInput): WordHuntTip {
   const {
     survived, lifeRemaining, validWordCount, invalidWordCount,
     avgWordLength, longestWordLength, rank, isFirstFinder,
+    foundTarget, attemptsToFind,
   } = stats;
 
   const totalAttempts = validWordCount + invalidWordCount;
   const accuracy = totalAttempts > 0 ? Math.round((validWordCount / totalAttempts) * 100) : 0;
+
+  // --- Guess-efficiency insights (only when attemptsToFind is known) ---
+  // These teach the point-maximization loop: words → clues → fast solve.
+  if (foundTarget && typeof attemptsToFind === 'number' && attemptsToFind > 0) {
+    // Solved blind — no words farmed, so no clues. Teach the core mechanic.
+    if (validWordCount === 0) {
+      return { key: 'wordHuntTips.spellWordsFirst' };
+    }
+    // Fast clean solve (1–2 guesses) — reassure it scored big, nudge for the
+    // exploration ceiling, never frame the few words as a failure.
+    if (attemptsToFind <= 2) {
+      return { key: 'wordHuntTips.fastSolveFarmMore', params: { attempts: attemptsToFind } };
+    }
+    // Many guesses despite having clues — trust them and commit sooner.
+    if (attemptsToFind >= 5) {
+      return { key: 'wordHuntTips.trustCluesSooner', params: { attempts: attemptsToFind } };
+    }
+  }
 
   // 1. Eliminated + barely any words → they need to find more words to stay alive
   if (!survived && validWordCount < 5) {

@@ -319,14 +319,17 @@ describe('wordHuntManager', () => {
         isFirstFinderClaimed: false,
       };
 
-      const result = recordTargetFound(state, 'alice');
+      // attempts=3 → efficiency bonus 60, finder bonus 20 → total 80
+      const result = recordTargetFound(state, 'alice', 3);
       expect(result.isFirstFinder).toBe(true);
-      expect(result.bonus).toBe(HUNT_FIRST_FINDER_BONUS);
+      expect(result.finderBonus).toBe(HUNT_FIRST_FINDER_BONUS);
+      expect(result.efficiencyBonus).toBe(60);
+      expect(result.bonus).toBe(HUNT_FIRST_FINDER_BONUS + 60);
       expect(state.targetFoundBy).toBe('alice');
       expect(state.isFirstFinderClaimed).toBe(true);
     });
 
-    it('should give decreasing bonus to second finder', () => {
+    it('should give decreasing finder bonus to second finder', () => {
       const state: WordHuntModeState = {
         targetWord: 'hello',
         targetWordLength: 5,
@@ -337,9 +340,28 @@ describe('wordHuntManager', () => {
         finderCount: 1,
       };
 
-      const result = recordTargetFound(state, 'bob');
+      const result = recordTargetFound(state, 'bob', 5);
       expect(result.isFirstFinder).toBe(false);
-      expect(result.bonus).toBe(12); // 2nd finder bonus
+      expect(result.finderBonus).toBe(12); // 2nd finder bonus
+      expect(result.efficiencyBonus).toBe(22); // 5 attempts
+      expect(result.bonus).toBe(34);
+    });
+
+    it('rewards a guess-1 solver the most via the efficiency bonus', () => {
+      const state: WordHuntModeState = {
+        targetWord: 'hello',
+        targetWordLength: 5,
+        playerLives: { alice: 100 },
+        eliminatedPlayers: [],
+        targetFoundBy: null,
+        isFirstFinderClaimed: false,
+        playerAttempts: { alice: 1 },
+      };
+      // reads state.playerAttempts when no explicit attempts passed
+      const result = recordTargetFound(state, 'alice');
+      expect(result.attempts).toBe(1);
+      expect(result.efficiencyBonus).toBe(140);
+      expect(result.bonus).toBe(HUNT_FIRST_FINDER_BONUS + 140);
     });
   });
 

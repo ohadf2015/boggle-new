@@ -65,6 +65,9 @@ export function useLiveScoreTracker({
   // losses yield 0 to match the results page.
   const projectedSolved = isGameOver ? hasWon : true;
 
+  // The guess-efficiency exploration floor rewards an ACTUAL solve, so apply it
+  // only at game over (final score). During live play it would project the
+  // exploration ceiling from turn one and kill the incentive to farm words.
   const calculatedScore = useMemo(
     () =>
       getScoreBreakdown(
@@ -72,8 +75,9 @@ export function useLiveScoreTracker({
         targetAttemptsCount,
         discoveredWords.length,
         projectedSolved,
+        isGameOver,
       ).total,
-    [lifePoints, targetAttemptsCount, discoveredWords.length, projectedSolved],
+    [lifePoints, targetAttemptsCount, discoveredWords.length, projectedSolved, isGameOver],
   );
 
   const [currentScore, setCurrentScore] = useState(0);

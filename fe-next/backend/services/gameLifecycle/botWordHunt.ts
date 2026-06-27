@@ -248,7 +248,9 @@ function scheduleWordHuntGuess(
   if (isCorrect) {
     // Score cap: use buffer when no human has scored (matches Classic mode)
     const bestHuman = getBestHumanScore(gameCode);
-    const result = recordTargetFound(huntState, bot.username);
+    // Bot guesses live on strategy.guessesMade (not huntState.playerAttempts),
+    // so pass the count explicitly for the guess-efficiency bonus.
+    const result = recordTargetFound(huntState, bot.username, strategy.guessesMade.length);
     const scoreLimit = bestHuman === 0 ? BOT_SCORE_BUFFER : bestHuman;
 
     if (result.bonus > 0 && bot.score + result.bonus <= scoreLimit) {
