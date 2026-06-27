@@ -52,7 +52,7 @@
 
 **Smell:** a failure path returns/aborts with zero output — no log, no alert, no thrown error. Looks identical to "nothing to do." This is the #1 nightly time-sink.
 
-**Incidents (≥10, mostly nightly):** off-master preflight hard-abort (silent for days), Supabase PAT 30-day expiry (silent), MCP hang/empty-sidecar, `next build` idle-hang killed at 900s → rc=124 treated as pass/inconclusive, CLI glyph `✓`→`✔` broke a hardcoded grep, reengagement emails sent ZERO for 7 weeks (queried empty legacy table).
+**Incidents (≥12, nightly + agent-tooling):** off-master preflight hard-abort (silent for days), Supabase PAT 30-day expiry (silent), MCP hang/empty-sidecar, `next build` idle-hang killed at 900s → rc=124 treated as pass/inconclusive, CLI glyph `✓`→`✔` broke a hardcoded grep, reengagement emails sent ZERO for 7 weeks (queried empty legacy table), **agent background-task `<task-notification>` reported "exit code 0" while the inner `npm run build` (rc 1, `.next/lock` contention) and `git push` (rc 1) actually FAILED — the notification reports the wrapper, not the command** (2026-06-27), **piped `git push | tail` swallowed the real rc**.
 
 **Pre-flight:**
 - [ ] Every early-`return`/abort on an error condition: does it ALERT (Telegram/log) or just vanish? Silent no-op on error = forbidden in nightly/cron paths.
@@ -60,6 +60,8 @@
 - [ ] String-matching external tool output (glyphs, status words): match ASCII substrings (`Connected`), not Unicode glyphs that the tool may change.
 - [ ] Querying a table for a job's input: assert the row count is plausible. Zero rows for a job that should always have work = alert, not silent success.
 - [ ] **Supabase PAT:** always mint with **Expires = Never**. Default `sbp_` tokens expire in 30 days and die silently mid-nightly. See `nightly-supabase-mcp-token-expiry`.
+- [ ] **Agent background tasks / piped commands:** NEVER trust the `<task-notification>` "exit code" or a `cmd | tail` pipeline's status — both report the wrapper, not the command. Verify by STATE: build → `echo "RC=$?"` sentinel inside the command + check `.next/BUILD_ID` mtime (`find .next -maxdepth 1 -name BUILD_ID -mmin -3`); push → `git merge-base --is-ancestor <sha> origin/master` after fetch; grep the real log for `error TS|failed to compile`. See `bg-task-exit-masking-and-concurrent-sessions-2026-06-27`.
+- [ ] **Concurrent agent sessions in this repo** wipe scratchpad/`tasks/*.output` files mid-read (ENOENT) and hold `.next/lock` / race `git push`. Write critical logs to `/tmp`; `ps aux | grep "next build"` and wait for the lock (don't fight it); `git fetch` immediately before pushing. Pre-push hook can hang >8min under contention → `--no-verify` is justified ONLY after lint0/tsc0/build0/tests-green were verified independently.
 
 ---
 
@@ -83,7 +85,7 @@
 | 1 Dual source of truth | 6+ | guarded per-instance; pattern still generative |
 | 2 Stale mutable state | 5 | reset helpers wired; new modes must opt in |
 | 3 Asymmetric paths | 4 | reconnect guarded; client/server score divergence OPEN (design call) |
-| 4 Silent failure | 10+ | nightly mostly guarded reactively; PAT 30d expiry = manual mint Never |
+| 4 Silent failure | 12+ | nightly mostly guarded reactively; PAT 30d expiry = manual mint Never; agent bg-task/pipe exit masking = verify by STATE not reported rc |
 | 5 Mobile-web flash | 4 | gated per-component; cream-FOUC pair latent in theme-responsive surfaces (correct there) |
 
 Related infra-level guardrail (the model for "incident → enforced check"): `.claude/rules/50-supabase-perf.md` (Realtime WAL → pg_cron audit + auto-remediation).
