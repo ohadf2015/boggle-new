@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import {
   shouldShowGuidance,
   markGuidanceShown,
@@ -75,11 +75,18 @@ export function useTapToDragGuidance(): UseTapToDragGuidanceReturn {
     }
   }, [showDragTutorial]);
 
-  return {
-    showDragTutorial,
-    tappedCell,
-    dismissDragTutorial,
-    handleSingleTapDetected,
-    markUserDragged,
-  };
+  // Stable reference: consumed as a dep of handleSingleTap in InGameScreen,
+  // which flows to the grid as onSingleTapDetected. A fresh literal each render
+  // breaks GridComponent's memo on every parent render (1/s timer tick).
+  // Methods are useCallback-stable; state values change only on tutorial show/hide.
+  return useMemo(
+    () => ({
+      showDragTutorial,
+      tappedCell,
+      dismissDragTutorial,
+      handleSingleTapDetected,
+      markUserDragged,
+    }),
+    [showDragTutorial, tappedCell, dismissDragTutorial, handleSingleTapDetected, markUserDragged]
+  );
 }
