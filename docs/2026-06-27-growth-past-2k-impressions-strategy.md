@@ -19,6 +19,20 @@ The site is **not under-optimized**. It is a mature, heavily-worked SEO property
 
 ---
 
+## Shipped today — and what it does NOT yet do (no over-claiming)
+
+| Shipped | Moves Google impressions? | Reality |
+|---|---|---|
+| **Bing IndexNow** (11 pages) | **No** — Bing only. Google ignores IndexNow. | Real Bing clicks (Bing CTR 3.8% = 6× Google), Google untouched. |
+| **Embeddable WOTD widget** (`/[locale]/embed/word-of-the-day`, frame-ancestors verified in-test) | **Not yet** — only *if embedded by third parties*. | A built lever with a **distribution dependency**. Backlinks materialize only on adoption. |
+| **Diagnosis + strategy** | n/a | The high-value output: the ceiling is authority+distribution, not SEO mechanics. |
+
+**Honest bottom line:** the 2k ceiling is **not broken yet**. The deliverable is *diagnosis + one built lever + a named distribution dependency*. The widget is inert until someone embeds it.
+
+**Named adoption risk:** "will anyone embed a no-name's word-of-the-day card?" is unanswered — and for a backlink lever, **adoption IS the product**. The vocabulary card is the laziest beachhead; the **demand-matched follow-up** is a daily-*puzzle* embed (maps to the rising, uncontested `מילת היום` market the vocab card doesn't). Treat the WOTD widget as a cheap bet; if it gets zero embeds in a few weeks, pivot to the puzzle embed or drop it.
+
+**Distribution (the actual next move, non-code):** seed the widget where intent-matched embedders live — Israeli word-game/education forums & WhatsApp groups (Hebrew daily-word), ESL/teacher blogs (education angle already built). Without seeding, the widget produces nothing.
+
 ## The data (28d, ending 2026-06-25)
 
 | Engine | Clicks | Impressions | CTR |
@@ -57,6 +71,12 @@ The es page metadata is already strong (good title/desc/OG/hreflang/VideoGameJso
 
 1. **Bing IndexNow on the working Spanish + Hebrew pages.** Pages rank on Google, missing on Bing, Bing converts 6×. IndexNow key already live (`/207c6c1a7de212bfab82a5acf0b02280.txt`). One signed POST. Pure upside.
 2. **Hebrew daily — already internally linked; needs authority, not links.** Verified: `/he/blog/milat-hayom-habit` already links to `/he/daily` with keyword-matched anchor `שחק את מילת היום`, and ES/SV cross-linking was already shipped (`072dd0db9`, `c7c17df67`). Internal-linking is **maxed** — adding more is churn. The rising Hebrew daily-word market (`מילת היום`, uncontested, intent-matched) is the best target for the **embed widget** (Tier 2) and any new authority, not more internal links.
+
+### Tier 1.5 — The one Google-DIRECT, distribution-independent lever (verified, do next)
+
+**Enrich `/he/daily` for the rising `מילת היום` market.** GSC: `המילה היומית` (570 impr) and `מילת היום` (314 impr, +1000% w/w) rank **pos 8 on `/he/daily`** — a thin force-dynamic game canvas with almost no crawlable text. A dedicated rich landing `/he/hamila-hayomit` exists but is *not* the page Google ranks. This is the only lever that grows **Google** impressions without waiting on backlinks, in an uncontested intent-matched market.
+- **Action:** add a small server-rendered above-fold intro + FAQPage block (`מה זה מילת היום?`) to `/he/daily`, OR resolve the `/he/daily` ↔ `/he/hamila-hayomit` keyword split so one page wins cleanly. Pos 8→page 1 in the best market.
+- **Blocked right now:** `/he/daily`'s mission/quest files are being actively rewritten by a concurrent session (quest-overhaul). Editing now risks collision. Do it in a clean session. Frame as "verify which URL should rank," not a blind rebuild.
 
 ### Tier 2 — The ceiling-breaker: manufacture backlinks (the one infra gap)
 
