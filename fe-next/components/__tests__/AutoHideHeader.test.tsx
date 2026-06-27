@@ -68,4 +68,27 @@ describe('AutoHideHeader', () => {
     render(<AutoHideHeader onVisibilityChange={onVisibilityChange} />);
     expect(onVisibilityChange).toHaveBeenCalledWith(false);
   });
+
+  it('collapses the spacer (returns null) during gameplay when collapseSpacerWhenHidden is set — no empty band on focused game screens', () => {
+    mockIsInGame = true;
+    const { queryByTestId, container } = render(
+      <AutoHideHeader collapseSpacerWhenHidden />,
+    );
+    expect(queryByTestId('header-mounted')).toBeNull();
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+  });
+
+  it('collapses the spacer (returns null) during TV fullscreen when collapseSpacerWhenHidden is set', () => {
+    mockIsTvFullscreen = true;
+    const { queryByTestId, container } = render(
+      <AutoHideHeader collapseSpacerWhenHidden />,
+    );
+    expect(queryByTestId('header-mounted')).toBeNull();
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+  });
+
+  it('still renders Header normally (lobby) when collapseSpacerWhenHidden is set but not in game', () => {
+    const { queryByTestId } = render(<AutoHideHeader collapseSpacerWhenHidden />);
+    expect(queryByTestId('header-mounted')).not.toBeNull();
+  });
 });
