@@ -77,6 +77,9 @@ export interface ClientToServerEvents {
   ping: () => void;
   presenceUpdate: (data: { status: 'active' | 'idle' | 'afk' }) => void;
   presenceHeartbeat: () => void;
+  // Reports the client's current route so the admin live monitor can break the
+  // raw socket connection count down by page.
+  pageView: (data: { path: string }) => void;
 
   // Host events
   hostKeepAlive: () => void;

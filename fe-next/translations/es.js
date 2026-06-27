@@ -7903,6 +7903,8 @@ const es = {
         "finished": "Finalizado"
       },
       "connectedPlayers": "Jugadores Conectados",
+      "connectionsByPage": "Conexiones por página",
+      "unknownPage": "Desconocida / no informada",
       "player": "Jugador",
       "game": "Juego",
       "status": "Estado",

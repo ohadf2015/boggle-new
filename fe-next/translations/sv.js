@@ -8031,6 +8031,8 @@ const sv = {
         "finished": "Avslutat"
       },
       "connectedPlayers": "Anslutna Spelare",
+      "connectionsByPage": "Anslutningar per sida",
+      "unknownPage": "Okänd / ej rapporterad",
       "player": "Spelare",
       "game": "Spel",
       "status": "Status",

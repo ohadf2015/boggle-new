@@ -13739,6 +13739,8 @@ const en = {
       "auth": "Authenticated",
       "bots": "bots",
       "connectedPlayers": "Connected Players",
+      "connectionsByPage": "Connections by page",
+      "unknownPage": "Unknown / not reported",
       "disconnected": "disconnected",
       "onOtherPages": "On Other Pages",
       "onPages": "browsing",
