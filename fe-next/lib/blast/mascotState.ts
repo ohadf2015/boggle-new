@@ -28,18 +28,19 @@ export type MascotState =
   | 'proud'            // wave cleared
   | 'dancing';         // 3+ wave streak
 
-/** Asset map. Animated → -nobg.gif so circular clip stays clean. */
+/** Asset map. Animated → -nobg.webp (~50% lighter than the .gif twins, plain
+ *  <img> so the animation plays); circular clip stays clean. */
 export const MASCOT_GIF_PATHS: Record<MascotState, string> = {
   idle: '/mascot-new-main.jpg',
   focused: '/mascot-new-thinking.jpg',
-  cheer: '/mascot/celebration.gif',
-  wow: '/mascot/mindblown-nobg.gif',
-  awe: '/mascot/onfire-nobg.gif',
-  oh: '/mascot/powerup-nobg.gif',
+  cheer: '/mascot/celebration.webp',
+  wow: '/mascot/mindblown-nobg.webp',
+  awe: '/mascot/onfire-nobg.webp',
+  oh: '/mascot/powerup-nobg.webp',
   nervous: '/mascot-new-panic.jpg',
-  'sad-supportive': '/mascot/crying-nobg.gif',
-  proud: '/mascot/trophy-nobg.gif',
-  dancing: '/mascot/flexing.gif',
+  'sad-supportive': '/mascot/crying-nobg.webp',
+  proud: '/mascot/trophy-nobg.webp',
+  dancing: '/mascot/flexing.webp',
 };
 
 export const GLOBAL_COOLDOWN_MS = 4000;
