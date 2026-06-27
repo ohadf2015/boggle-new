@@ -4434,6 +4434,17 @@ const es = {
       "purchase": "{{cost}} oro",
       "season": "Recompensa de temporada"
     },
+    "rank": {
+      "title": "Tu rango",
+      "seeAll": "Ver todos los rangos",
+      "hideAll": "Ocultar rangos",
+      "pointsToNext": "{{points}} pts para {{tier}}",
+      "maxReached": "¡Rango máximo alcanzado!",
+      "current": "Estás aquí",
+      "threshold": "{{score}}+ pts",
+      "reached": "Alcanzado",
+      "ladderLabel": "Escalera de rangos"
+    },
     "items": {
       "tileDefault": "Fichas Clásicas",
       "tileDefaultDesc": "El aspecto original.",

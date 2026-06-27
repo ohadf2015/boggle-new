@@ -4606,6 +4606,17 @@ const sv = {
       "purchase": "{{cost}} guld",
       "season": "Säsongsbelöning"
     },
+    "rank": {
+      "title": "Din ranking",
+      "seeAll": "Se alla rangningar",
+      "hideAll": "Dölj rangningar",
+      "pointsToNext": "{{points}} poäng till {{tier}}",
+      "maxReached": "Högsta ranking uppnådd!",
+      "current": "Du är här",
+      "threshold": "{{score}}+ poäng",
+      "reached": "Uppnådd",
+      "ladderLabel": "Rankningsstege"
+    },
     "items": {
       "tileDefault": "Klassiska brickor",
       "tileDefaultDesc": "Det ursprungliga utseendet.",

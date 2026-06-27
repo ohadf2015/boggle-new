@@ -4841,6 +4841,17 @@ const en = {
       "purchase": "{{cost}} gold",
       "season": "Season reward"
     },
+    "rank": {
+      "title": "Your Rank",
+      "seeAll": "See all ranks",
+      "hideAll": "Hide ranks",
+      "pointsToNext": "{{points}} pts to {{tier}}",
+      "maxReached": "Top rank reached!",
+      "current": "You're here",
+      "threshold": "{{score}}+ pts",
+      "reached": "Reached",
+      "ladderLabel": "Rank ladder"
+    },
     "items": {
       "tileDefault": "Classic Tiles",
       "tileDefaultDesc": "The original tile look.",

@@ -4922,7 +4922,7 @@ const he = {
     "profileFrames": "מסגרות פרופיל",
     "equipped": "מצויד",
     "locked": "נעול",
-    "equip": "הצייד",
+    "equip": "לבש",
     "unequip": "הסר",
     "purchase": "קנה ({{cost}} זהב)",
     "close": "סגור",
@@ -4930,12 +4930,12 @@ const he = {
     "equipCta": "הקישו כדי לצייד",
     "progress": {
       "streak": "{{current}}/{{target}} ימי רצף",
-      "rank": "כעת {{current}} · יעד {{tier}}"
+      "rank": "{{current}} → {{tier}}"
     },
     "rarity": {
       "common": "נפוץ",
       "rare": "נדיר",
-      "epic": "אפי",
+      "epic": "עילוי",
       "legendary": "אגדי"
     },
     "unlock": {
@@ -4943,6 +4943,17 @@ const he = {
       "streak": "רצף של {{days}} ימים",
       "purchase": "{{cost}} זהב",
       "season": "פרס עונתי"
+    },
+    "rank": {
+      "title": "הדירוג שלך",
+      "seeAll": "צפה בכל הדירוגים",
+      "hideAll": "הסתר דירוגים",
+      "pointsToNext": "{{points}} נקודות לדירוג {{tier}}",
+      "maxReached": "הגעת לדירוג הגבוה ביותר!",
+      "current": "אתה כאן",
+      "threshold": "{{score}}+ נקודות",
+      "reached": "הגיע",
+      "ladderLabel": "סולם הדירוגים"
     },
     "items": {
       "tileDefault": "אריחים קלאסיים",

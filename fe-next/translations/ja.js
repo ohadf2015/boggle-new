@@ -4448,6 +4448,17 @@ const ja = {
       "purchase": "{{cost}}ゴールド",
       "season": "シーズン報酬"
     },
+    "rank": {
+      "title": "あなたのランク",
+      "seeAll": "すべてのランクを見る",
+      "hideAll": "ランクを隠す",
+      "pointsToNext": "{{tier}}まであと{{points}}ポイント",
+      "maxReached": "最高ランクに到達しました!",
+      "current": "あなたはここ",
+      "threshold": "{{score}}+ポイント",
+      "reached": "達成済み",
+      "ladderLabel": "ランク表"
+    },
     "items": {
       "tileDefault": "クラシックタイル",
       "tileDefaultDesc": "オリジナルのタイルデザイン。",
