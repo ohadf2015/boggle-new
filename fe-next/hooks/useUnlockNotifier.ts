@@ -3,7 +3,11 @@ import toast from 'react-hot-toast';
 import { diffNewlyUnlocked, type PlayerCosmeticState } from '@/lib/cosmetics';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const SNAPSHOT_KEY = 'lexiclash_cosmetics_snapshot';
+// v2: the unlock axis changed from the never-fetched profile.rank_tier (which
+// snapshotted a bogus capitalized 'Bronze'/0 for everyone) to the score-based
+// leaderboard tier. Bumping the key discards stale baselines so the first load
+// after the fix re-seeds cleanly instead of firing a burst of "unlocked" toasts.
+const SNAPSHOT_KEY = 'lexiclash_cosmetics_snapshot_v2';
 
 interface NotifierInput {
   rankTier: string;

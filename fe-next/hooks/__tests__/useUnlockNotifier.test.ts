@@ -26,7 +26,7 @@ function collectHrefs(node: unknown): string[] {
   return kids.reduce<string[]>((acc, k) => acc.concat(collectHrefs(k)), here);
 }
 
-const SNAPSHOT_KEY = 'lexiclash_cosmetics_snapshot';
+const SNAPSHOT_KEY = 'lexiclash_cosmetics_snapshot_v2';
 
 describe('useUnlockNotifier', () => {
   beforeEach(() => {

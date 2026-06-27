@@ -30,7 +30,7 @@ import { UnlockNotifierMount } from '../UnlockNotifierMount';
 describe('UnlockNotifierMount', () => {
   beforeEach(() => {
     notifierMock.mockClear();
-    engagementMock.mockReturnValue({ streak: 0 });
+    engagementMock.mockReturnValue({ streak: 0, loading: false });
   });
 
   it('does not run the notifier for guests (no profile)', () => {
@@ -39,10 +39,19 @@ describe('UnlockNotifierMount', () => {
     expect(notifierMock).not.toHaveBeenCalled();
   });
 
+  it('does not run the notifier while engagement (streak) is still loading', () => {
+    // Feeding the transient streak=0 would snapshot 0 and fire false streak-unlock
+    // toasts the moment the real streak resolves. Gate until loading === false.
+    authMock.mockReturnValue({ profile: { total_score: 12000 } });
+    engagementMock.mockReturnValue({ streak: 0, loading: true });
+    render(<UnlockNotifierMount />);
+    expect(notifierMock).not.toHaveBeenCalled();
+  });
+
   it('runs the notifier with the score-derived tier and engagement streak', () => {
     // total_score 12000 → Gold tier (>= 10000). Streak from player_engagement.
     authMock.mockReturnValue({ profile: { total_score: 12000 } });
-    engagementMock.mockReturnValue({ streak: 12 });
+    engagementMock.mockReturnValue({ streak: 12, loading: false });
     render(<UnlockNotifierMount />);
     expect(notifierMock).toHaveBeenCalledWith({ rankTier: 'gold', streakDays: 12 });
   });

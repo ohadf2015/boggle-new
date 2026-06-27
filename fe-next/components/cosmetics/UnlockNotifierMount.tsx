@@ -16,21 +16,27 @@ import { getGlobalLeaderboardTier } from '@/lib/ranked/leaderboardTiers';
  *
  * Renders nothing.
  */
-function ActiveNotifier({ rankTier }: { rankTier: string }) {
-  // Streak lives in player_engagement, not on the profile row.
-  const { streak } = useEngagementStatus();
-  useUnlockNotifier({ rankTier, streakDays: streak });
+function ActiveNotifier({ rankTier, streakDays }: { rankTier: string; streakDays: number }) {
+  useUnlockNotifier({ rankTier, streakDays });
   return null;
 }
 
 export function UnlockNotifierMount() {
   const { profile } = useAuth();
-  // Only run once a real profile is loaded. Seeding the snapshot from a guest's
-  // default Stone/0 would spam a burst of "unlocked" toasts the moment a
-  // returning ranked player signs in. Tier is derived from total_score (the
-  // score-based leaderboard tier) — the same axis the cosmetics gate uses.
-  if (!profile) return null;
-  return <ActiveNotifier rankTier={getGlobalLeaderboardTier(profile.total_score ?? 0).id} />;
+  const { streak, loading } = useEngagementStatus();
+  // Wait for BOTH a real profile AND a resolved streak before mounting the
+  // notifier. useEngagementStatus starts at streak=0 (loading) then resolves;
+  // feeding the transient 0 in would snapshot 0 and then fire false "unlocked"
+  // toasts for streak cosmetics the instant the real streak lands (Class 1:
+  // dual-source + async resolution). Tier comes from total_score (on profile,
+  // resolves with it) so only the streak axis needs the loading gate.
+  if (!profile || loading) return null;
+  return (
+    <ActiveNotifier
+      rankTier={getGlobalLeaderboardTier(profile.total_score ?? 0).id}
+      streakDays={streak}
+    />
+  );
 }
 
 export default UnlockNotifierMount;
