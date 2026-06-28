@@ -186,6 +186,22 @@ export interface MessageThreadsResponse {
   timestamp: number;
 }
 
+/** Row shape returned by the get_friend_threads Postgres RPC (one row per thread). */
+export interface FriendThreadRow {
+  friend_id: string;
+  username: string;
+  display_name: string | null;
+  avatar_emoji: string | null;
+  avatar_color: string | null;
+  avatar_image: string | null;
+  avatar_config: import('./customAvatar').CustomAvatarConfig | null;
+  last_seen_at: string | null;
+  last_message: string;
+  last_message_at: string;
+  last_message_sender_id: string;
+  unread_count: number;
+}
+
 export interface PendingChallengesResponse {
   sent: Challenge[];
   received: Challenge[];

@@ -228,11 +228,12 @@ export async function sendDirectChallenge(
 /**
  * Get pending direct challenges (incoming)
  */
-export async function getPendingChallenges(): Promise<FriendChallenge[]> {
+export async function getPendingChallenges(userId?: string): Promise<FriendChallenge[]> {
   const supabase = createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+  // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
+  const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return [];
 
   const { data: challenges, error } = await supabase
     .from('friend_challenges')
@@ -250,7 +251,7 @@ export async function getPendingChallenges(): Promise<FriendChallenge[]> {
         avatar_color
       )
     `)
-    .eq('challenged_id', user.id)
+    .eq('challenged_id', uid)
     .eq('status', 'pending')
     .order('created_at', { ascending: false });
 
@@ -305,15 +306,16 @@ let lastOnlineStatusWrite = 0;
  * the timestamp BEFORE the awaits so simultaneous callers can't both pass the
  * gate. Safe because the window is far under the 5-minute online threshold.
  */
-export async function updateOnlineStatus(): Promise<void> {
+export async function updateOnlineStatus(userId?: string): Promise<void> {
   const now = Date.now();
   if (!shouldWriteOnlineStatus(now, lastOnlineStatusWrite)) return;
   lastOnlineStatusWrite = now;
 
   const supabase = createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) {
+  // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
+  const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) {
     // Not actually authed — release the gate so a real session isn't blocked.
     lastOnlineStatusWrite = 0;
     return;
@@ -322,7 +324,7 @@ export async function updateOnlineStatus(): Promise<void> {
   await supabase
     .from('profiles')
     .update({ last_seen_at: new Date().toISOString() })
-    .eq('id', user.id);
+    .eq('id', uid);
 }
 
 /**

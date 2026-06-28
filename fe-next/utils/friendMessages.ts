@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@/utils/supabase/client';
-import type { Message, MessageThread, Challenge } from '@/shared/types/friends';
+import type { Message, MessageThread, Challenge, FriendThreadRow } from '@/shared/types/friends';
 import logger from '@/utils/logger';
 
 /**
@@ -244,74 +244,37 @@ export async function getThreads(userId?: string): Promise<MessageThread[]> {
       return [];
     }
 
-    // Get all accepted friendships
-    const { data: friendships } = await supabase
-      .from('friends')
-      .select('user_id, friend_id')
-      .eq('status', 'accepted')
-      .or(`user_id.eq.${uid},friend_id.eq.${uid}`);
+    // One round-trip: last message + profile + unread count per thread.
+    // Replaces the old per-friend N+1 (last-msg + profile + unread queries in a loop).
+    // See migration 20260628000000_friend_threads_rpc.sql.
+    const { data: rows, error } = await supabase.rpc('get_friend_threads', { p_user_id: uid });
 
-    if (!friendships || friendships.length === 0) {
+    if (error || !rows) {
+      if (error) {
+        logger.error('FRIEND_MESSAGES', `Error getting threads: ${error.message}`);
+      }
       return [];
     }
 
-    const threads = await Promise.all(
-      friendships.map(async (friendship) => {
-        const friendId = friendship.user_id === uid
-          ? friendship.friend_id
-          : friendship.user_id;
+    const fiveMinAgo = Date.now() - 5 * 60 * 1000;
 
-        // Get last message
-        const { data: lastMsg } = await supabase
-          .from('friend_messages')
-          .select('message, created_at, sender_id')
-          .or(`and(sender_id.eq.${uid},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${uid})`)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single();
-
-        if (!lastMsg) return null;
-
-        // Get friend profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('username, display_name, avatar_emoji, avatar_color, avatar_image, avatar_config, last_seen_at')
-          .eq('id', friendId)
-          .single();
-
-        if (!profile) return null;
-
-        // Get unread count — pass userId to avoid redundant auth.getUser() calls
-        const unreadCount = await getUnreadCount(friendId, uid);
-
-        const conversationId = [uid, friendId].sort().join('_');
-        const isOnline = profile.last_seen_at &&
-          new Date(profile.last_seen_at) > new Date(Date.now() - 5 * 60 * 1000);
-
-        const thread: MessageThread = {
-          conversationId,
-          friendUserId: friendId,
-          friendUsername: profile.username,
-          friendDisplayName: profile.display_name || undefined,
-          friendAvatar: {
-            emoji: profile.avatar_emoji || '👤',
-            color: profile.avatar_color || '#808080',
-            image: profile.avatar_image || undefined,
-            customAvatar: profile.avatar_config || undefined,
-          },
-          lastMessage: lastMsg.message,
-          lastMessageAt: new Date(lastMsg.created_at).getTime(),
-          unreadCount,
-          isOnline,
-        };
-
-        return thread;
-      })
-    );
-
-    // Filter nulls and sort by last message time
-    return threads
-      .filter((t): t is MessageThread => t !== null)
+    return (rows as FriendThreadRow[])
+      .map((row): MessageThread => ({
+        conversationId: [uid, row.friend_id].sort().join('_'),
+        friendUserId: row.friend_id,
+        friendUsername: row.username,
+        friendDisplayName: row.display_name || undefined,
+        friendAvatar: {
+          emoji: row.avatar_emoji || '👤',
+          color: row.avatar_color || '#808080',
+          image: row.avatar_image || undefined,
+          customAvatar: row.avatar_config || undefined,
+        },
+        lastMessage: row.last_message,
+        lastMessageAt: new Date(row.last_message_at).getTime(),
+        unreadCount: Number(row.unread_count) || 0,
+        isOnline: !!row.last_seen_at && new Date(row.last_seen_at).getTime() > fiveMinAgo,
+      }))
       .sort((a, b) => b.lastMessageAt - a.lastMessageAt);
   } catch (error) {
     const msg = (error as Error).message;

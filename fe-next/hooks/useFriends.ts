@@ -100,11 +100,12 @@ export function useFriends(): UseFriendsReturn {
     }
 
     try {
+      // Pass the already-resolved user id so each util skips its own auth.getUser() round-trip (50–200ms each).
       const [friends, pending, outgoing, challenges] = await Promise.all([
-        getFriends(),
-        getPendingRequests(),
-        getOutgoingRequests(),
-        getPendingChallenges(),
+        getFriends(user.id),
+        getPendingRequests(user.id),
+        getOutgoingRequests(user.id),
+        getPendingChallenges(user.id),
       ]);
 
       if (isMounted.current) {
@@ -247,10 +248,10 @@ export function useFriends(): UseFriendsReturn {
     if (isAuthenticated) {
       fetchAll();
 
-      // Update online status periodically
-      updateOnlineStatus();
+      // Update online status periodically (pass user id to skip auth.getUser() round-trips)
+      updateOnlineStatus(user?.id);
       onlineStatusIntervalRef.current = setInterval(() => {
-        updateOnlineStatus();
+        updateOnlineStatus(user?.id);
       }, ONLINE_STATUS_INTERVAL);
 
       // Refresh friend list periodically (only when document is visible)
@@ -288,7 +289,7 @@ export function useFriends(): UseFriendsReturn {
       }));
       return undefined;
     }
-  }, [isAuthenticated, fetchAll]);
+  }, [isAuthenticated, fetchAll, user?.id]);
 
   // Realtime friend events — refresh on incoming/accepted/declined/removed
   useEffect(() => {

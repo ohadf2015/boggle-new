@@ -4,6 +4,7 @@
  */
 
 import type { Server, Socket } from 'socket.io';
+import type { FriendThreadRow } from '../../shared/types/friends';
 import { checkRateLimit } from '../utils/rateLimiter';
 import { emitError, ErrorCodes } from '../utils/errorHandler';
 import logger from '../utils/logger';
@@ -344,65 +345,37 @@ export function registerFriendMessagingHandlers(io: Server, socket: Socket): voi
         return;
       }
 
-      // Get all friends
-      const { data: friendships } = await supabase
-        .from('friends')
-        .select('user_id, friend_id')
-        .eq('status', 'accepted')
-        .or(`user_id.eq.${authUserId},friend_id.eq.${authUserId}`);
+      // One round-trip: last message + profile + unread count per thread.
+      // Replaces the old per-friend N+1. See migration 20260628000000_friend_threads_rpc.sql.
+      const { data: rows, error } = await supabase.rpc('get_friend_threads', { p_user_id: authUserId });
 
-      if (!friendships) {
-        socket.emit('friends:threads', {
-          threads: [],
-          timestamp: Date.now(),
-        });
+      if (error || !rows) {
+        if (error) {
+          logger.error('MESSAGING_HANDLER', `Error getting threads: ${error.message}`);
+        }
+        socket.emit('friends:threads', { threads: [], timestamp: Date.now() });
         return;
       }
 
-      // Get last message with each friend
-      const threads = await Promise.all(
-        friendships.map(async (friendship) => {
-          const friendId = friendship.user_id === authUserId
-            ? friendship.friend_id
-            : friendship.user_id;
-
-          // Get last message
-          const { data: lastMsg } = await supabase
-            .from('friend_messages')
-            .select('message, created_at, sender_id')
-            .or(`and(sender_id.eq.${authUserId},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${authUserId})`)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-
-          // Get unread count
-          const unreadCount = await friendsManager.getUnreadCount(authUserId, friendId);
-
-          // Get friend profile (includes isOnline from last_seen_at)
-          const profile = await getUserProfile(friendId);
-
-          if (!profile || !lastMsg) return null;
-
-          const conversationId = [authUserId, friendId].sort().join('_');
-
-          return {
-            conversationId,
-            friendUserId: friendId,
-            friendUsername: profile.username,
-            friendDisplayName: profile.displayName,
-            friendAvatar: profile.avatar,
-            lastMessage: lastMsg.message,
-            lastMessageAt: new Date(lastMsg.created_at).getTime(),
-            unreadCount,
-            isOnline: profile.isOnline ?? false,
-          };
-        })
-      );
-
-      // Filter out null threads and sort by last message
-      const validThreads = threads
-        .filter(t => t !== null)
-        .sort((a, b) => b!.lastMessageAt - a!.lastMessageAt);
+      const fiveMinAgo = Date.now() - 5 * 60 * 1000;
+      const validThreads = (rows as FriendThreadRow[])
+        .map((row) => ({
+          conversationId: [authUserId, row.friend_id].sort().join('_'),
+          friendUserId: row.friend_id,
+          friendUsername: row.username,
+          friendDisplayName: row.display_name || undefined,
+          friendAvatar: {
+            emoji: row.avatar_emoji || '👤',
+            color: row.avatar_color || '#808080',
+            image: row.avatar_image || undefined,
+            customAvatar: row.avatar_config || undefined,
+          },
+          lastMessage: row.last_message,
+          lastMessageAt: new Date(row.last_message_at).getTime(),
+          unreadCount: Number(row.unread_count) || 0,
+          isOnline: !!row.last_seen_at && new Date(row.last_seen_at).getTime() > fiveMinAgo,
+        }))
+        .sort((a, b) => b.lastMessageAt - a.lastMessageAt);
 
       socket.emit('friends:threads', {
         threads: validThreads,

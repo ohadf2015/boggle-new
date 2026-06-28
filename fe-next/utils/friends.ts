@@ -260,11 +260,12 @@ export async function getBlockedUsers(): Promise<Friend[]> {
 /**
  * Get all accepted friends for the current user
  */
-export async function getFriends(): Promise<Friend[]> {
+export async function getFriends(userId?: string): Promise<Friend[]> {
   const supabase = createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+  // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
+  const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return [];
 
   const { data: friendships, error } = await supabase
     .from('friends')
@@ -277,7 +278,7 @@ export async function getFriends(): Promise<Friend[]> {
       updated_at
     `)
     .eq('status', 'accepted')
-    .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`);
+    .or(`user_id.eq.${uid},friend_id.eq.${uid}`);
 
   if (error || !friendships) {
     logger.debug('Error fetching friends:', error);
@@ -285,7 +286,7 @@ export async function getFriends(): Promise<Friend[]> {
   }
 
   const friendIds = (friendships as FriendshipRow[]).map((f: FriendshipRow) =>
-    f.user_id === user.id ? f.friend_id : f.user_id
+    f.user_id === uid ? f.friend_id : f.user_id
   );
 
   if (friendIds.length === 0) return [];
@@ -322,11 +323,12 @@ export async function getFriends(): Promise<Friend[]> {
 /**
  * Get pending friend requests (incoming)
  */
-export async function getPendingRequests(): Promise<FriendRequest[]> {
+export async function getPendingRequests(userId?: string): Promise<FriendRequest[]> {
   const supabase = createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+  // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
+  const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return [];
 
   const { data: requests, error } = await supabase
     .from('friends')
@@ -343,7 +345,7 @@ export async function getPendingRequests(): Promise<FriendRequest[]> {
         avatar_config
       )
     `)
-    .eq('friend_id', user.id)
+    .eq('friend_id', uid)
     .eq('status', 'pending');
 
   if (error || !requests) {
@@ -409,11 +411,12 @@ export async function cancelFriendRequest(requestId: string): Promise<{ success:
 /**
  * Get outgoing friend requests (sent by current user, still pending)
  */
-export async function getOutgoingRequests(): Promise<FriendRequest[]> {
+export async function getOutgoingRequests(userId?: string): Promise<FriendRequest[]> {
   const supabase = createClient();
 
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return [];
+  // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
+  const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return [];
 
   const { data: requests, error } = await supabase
     .from('friends')
@@ -430,7 +433,7 @@ export async function getOutgoingRequests(): Promise<FriendRequest[]> {
         avatar_config
       )
     `)
-    .eq('user_id', user.id)
+    .eq('user_id', uid)
     .eq('status', 'pending');
 
   if (error || !requests) {
