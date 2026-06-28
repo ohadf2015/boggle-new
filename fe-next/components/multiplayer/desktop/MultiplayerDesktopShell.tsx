@@ -35,23 +35,26 @@ export const MultiplayerDesktopShell = memo<MultiplayerDesktopShellProps>(({ slo
         data-mp-shell
         className="grid gap-4 p-4 h-full grid-cols-1 @[960px]:grid-cols-[minmax(200px,1fr)_minmax(500px,720px)_minmax(200px,1fr)]"
       >
-        {/* Left rail */}
-        <aside className="flex flex-col gap-3 min-w-0" data-slot="left">
+        {/* Left rail. min-h-0 + overflow-hidden bound the column to the shell
+            height; only the flex-1 roster scrolls, so the badge (timer) stays
+            pinned at the top and the stats card at the bottom — no page scroll. */}
+        <aside className="flex flex-col gap-3 min-w-0 min-h-0 overflow-hidden" data-slot="left">
           <div data-slot="left-mode-badge">{slots.left.modeBadge}</div>
-          <div data-slot="left-roster" className="flex-1 min-h-0">{slots.left.roster}</div>
+          <div data-slot="left-roster" className="flex-1 min-h-0 overflow-y-auto">{slots.left.roster}</div>
           <div data-slot="left-secondary" aria-hidden={!slots.left.secondary}>
             {slots.left.secondary ?? <span className="opacity-30">—</span>}
           </div>
         </aside>
 
         {/* Center canvas */}
-        <main className="min-w-0 flex items-stretch justify-center" data-slot="center">
+        <main className="min-w-0 min-h-0 flex items-stretch justify-center" data-slot="center">
           {slots.center}
         </main>
 
-        {/* Right rail */}
-        <aside className="flex flex-col gap-3 min-w-0" data-slot="right">
-          <div data-slot="right-ladder" className="flex-1 min-h-0">{slots.right.wordsLadder}</div>
+        {/* Right rail. Same bounding as the left: the words ladder scrolls in
+            place while the activity stream / chat stay pinned and visible. */}
+        <aside className="flex flex-col gap-3 min-w-0 min-h-0 overflow-hidden" data-slot="right">
+          <div data-slot="right-ladder" className="flex-1 min-h-0 overflow-y-auto">{slots.right.wordsLadder}</div>
           {slots.right.activityStream ? (
             <div data-slot="right-stream">{slots.right.activityStream}</div>
           ) : null}

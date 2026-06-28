@@ -6,7 +6,7 @@ import { DesktopRivalsRosterRail } from './DesktopRivalsRosterRail';
 import { WordsLadder, type LadderWord } from './WordsLadder';
 import { KeyboardHintStrip } from './KeyboardHintStrip';
 import { ThemedPanel } from './ThemedPanel';
-import CircularTimer from '../../ui/CircularTimer';
+import { ShellBadgeTimer } from './ShellBadgeTimer';
 import { MyStatsCard } from './insights/MyStatsCard';
 import { OpponentInsightFeedConnected } from './insights/OpponentInsightFeedConnected';
 import { PaceDeltaChip } from './insights/PaceDeltaChip';
@@ -54,10 +54,9 @@ export function BlastDesktopAdapter(props: BlastDesktopAdapterProps) {
       modeBadge: (
         <ThemedPanel mode="blast" variant="badge" testId="blast-mode-badge">
           <div className="flex items-center gap-3 animate-mp-shell-fade">
-            <CircularTimer
-              duration={props.totalTime}
-              initialRemainingTime={props.remainingTime}
-              isPlaying
+            <ShellBadgeTimer
+              totalTime={props.totalTime}
+              remainingTime={props.remainingTime}
               size={88}
               colorFamily="lime"
             />

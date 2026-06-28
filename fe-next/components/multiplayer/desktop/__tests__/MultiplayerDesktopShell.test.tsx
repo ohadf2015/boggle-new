@@ -81,4 +81,27 @@ describe('MultiplayerDesktopShell', () => {
     const { container } = render(<MultiplayerDesktopShell slots={mkSlots()} />);
     expect(container.querySelector('[data-slot="left-secondary"]')).toBeInTheDocument();
   });
+
+  it('bounds each rail to the shell height so tall rosters/ladders never push a page scroll', () => {
+    // Grid/flex items default to min-height:auto, so a long roster or words
+    // ladder grew its column past the board row and overflowed the whole shell
+    // (the "scroll to see the rest of the shell" symptom). Each rail must be
+    // height-bounded (min-h-0) and clip its own overflow.
+    const { container } = render(<MultiplayerDesktopShell slots={mkSlots()} />);
+    for (const side of ['left', 'right']) {
+      const rail = container.querySelector(`[data-slot="${side}"]`) as HTMLElement;
+      expect(rail.className).toMatch(/\bmin-h-0\b/);
+      expect(rail.className).toMatch(/\boverflow-hidden\b/);
+    }
+  });
+
+  it('scrolls the long lists inside their column (roster + ladder), keeping fixed panels visible', () => {
+    const { container } = render(<MultiplayerDesktopShell slots={mkSlots()} />);
+    const roster = container.querySelector('[data-slot="left-roster"]') as HTMLElement;
+    const ladder = container.querySelector('[data-slot="right-ladder"]') as HTMLElement;
+    for (const el of [roster, ladder]) {
+      expect(el.className).toMatch(/\bmin-h-0\b/);
+      expect(el.className).toMatch(/\boverflow-y-auto\b/);
+    }
+  });
 });
