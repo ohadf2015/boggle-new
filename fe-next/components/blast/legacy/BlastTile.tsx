@@ -70,6 +70,13 @@ export interface BlastTileProps {
   cakeMaxHp?: number;
   /** True if this tile is part of any cake-bomb cluster (renders the pink wash). */
   isCakeCell?: boolean;
+  /**
+   * Suppress the special-tile explanation tooltip (the native `title` hint). Used
+   * in multiplayer where the per-tile descriptions are distracting during a timed,
+   * competitive round — players already know the mechanics by the time they're in
+   * MP. Single-player keeps them as a learning aid.
+   */
+  hideTooltip?: boolean;
   onClick?: () => void;
 }
 
@@ -230,7 +237,7 @@ export const BlastTile = memo(function BlastTile({
   letter, type, phase, isSelected, isCleared, hitsRemaining,
   fallOffset, clearRotate, spawnOffset, isNearMiss, activationEffect, isComboPreview,
   selectionIndex, selectionTotal, isLocked, countdown, fuseTimer, zonePreview,
-  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, jellyLayers, cakeHp, cakeMaxHp, isCakeCell, onClick, col,
+  isDiamondRevealed, innerType, isCascadeHighlight, portalPairIndex, isScanTarget, colorTag, jellyLayers, cakeHp, cakeMaxHp, isCakeCell, hideTooltip, onClick, col,
 }: BlastTileProps) {
   const reducedMotion = usePrefersReducedMotion();
   const { t } = useLanguage();
@@ -260,8 +267,9 @@ export const BlastTile = memo(function BlastTile({
   }
 
   const visual = TILE_VISUALS[type] ?? TILE_VISUALS.standard;
-  // Skip tooltip lookup entirely for standard tiles (the vast majority) — keeps render fast
-  const tooltip = type !== 'standard' ? getTileTooltip(type, t) : null;
+  // Skip tooltip lookup entirely for standard tiles (the vast majority) — keeps
+  // render fast — and in multiplayer where the explanations are suppressed.
+  const tooltip = type !== 'standard' && !hideTooltip ? getTileTooltip(type, t) : null;
   const effectivePhase = reducedMotion && ANIMATED_PHASES.has(phase) ? 'idle' : phase;
   const phaseStyle = effectivePhase !== 'idle' && effectivePhase !== 'selected'
     ? getPhaseStyles(effectivePhase, type, fallOffset, clearRotate, spawnOffset, col)
@@ -505,6 +513,7 @@ export const BlastTile = memo(function BlastTile({
   prev.isCascadeHighlight === next.isCascadeHighlight &&
   prev.portalPairIndex === next.portalPairIndex &&
   prev.isScanTarget === next.isScanTarget &&
+  prev.hideTooltip === next.hideTooltip &&
   prev.onClick === next.onClick
 );
 

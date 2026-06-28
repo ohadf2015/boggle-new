@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { isLandingRoute } from '@/lib/onboarding/allowedRoutes';
 import { isGameplayPath } from '@/lib/gameplayRoutes';
 import { useGameActive, useWaitingForResults } from '@/hooks/gameState/store';
+import { useUserStats } from '@/hooks/useUserStats';
 import { hasCompletedOnboarding } from '@/utils/onboardingStorage';
 import {
   getStoredPlayerStyle,
@@ -58,6 +59,13 @@ export default function PlayerStyleOnboardingWrapper() {
   const gameActive = useGameActive();
   const waitingForResults = useWaitingForResults();
   const onGameplayRoute = isGameplayPath(pathname);
+  // FTUE gate: the picker is a personalisation reward, so never surface it to a
+  // player who has not played a single game yet (covers a fresh visitor who
+  // lands straight in the multiplayer lobby). `useUserStats` resolves the guest
+  // localStorage count OR `profiles.total_games`, so this works pre-login too.
+  // Pessimistic while loading (stats null → treat as 0) to avoid an early flash.
+  const { userStats } = useUserStats();
+  const hasPlayedAtLeastOneGame = (userStats?.totalGamesPlayed ?? 0) >= 1;
   // A game has actually started this mount. Distinguishes "results screen" (a
   // game finished → natural break) from "pre-game" (never started → still mid-
   // flow) on a gameplay route, where both read gameActive === false.
@@ -103,6 +111,9 @@ export default function PlayerStyleOnboardingWrapper() {
         gameActive,
         onGameplayRoute,
         resultsShowing,
+        // Hold the picker until the player has at least one game under their belt
+        // (FTUE) — keeps it out of the multiplayer lobby for brand-new players.
+        hasPlayedAtLeastOneGame,
       });
       // Only ever OPEN from the effect; dismissal owns closing. This prevents a
       // dep change while the modal is open from yanking it shut mid-choice, and
@@ -127,6 +138,7 @@ export default function PlayerStyleOnboardingWrapper() {
     waitingForResults,
     onGameplayRoute,
     resultsShowing,
+    hasPlayedAtLeastOneGame,
     pathname,
   ]);
 

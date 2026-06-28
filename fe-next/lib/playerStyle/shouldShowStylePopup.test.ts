@@ -85,6 +85,29 @@ describe('shouldShowStylePopup', () => {
     );
   });
 
+  describe('first game gate (FTUE: never prompt a player who has not played a single game)', () => {
+    // The style picker is a personalisation reward — surfacing it to a player who
+    // has not yet played even one game (e.g. landing straight in the MP lobby)
+    // interrupts them before they have any context for the choice. Hold it until
+    // they have at least one game under their belt. Applies in either auth state.
+    it('never shows before the player has played at least one game', () => {
+      expect(shouldShowStylePopup({ ...base, hasPlayedAtLeastOneGame: false })).toBe(false);
+      expect(
+        shouldShowStylePopup({ ...base, isAuthenticated: true, hasPlayedAtLeastOneGame: false }),
+      ).toBe(false);
+    });
+
+    it('shows once the player has played at least one game (gate is satisfied)', () => {
+      expect(shouldShowStylePopup({ ...base, hasPlayedAtLeastOneGame: true })).toBe(true);
+    });
+
+    it('is backward-compatible: an undefined flag does not block (existing callers)', () => {
+      // Optional gate — only an explicit `false` suppresses. Undefined keeps the
+      // prior behaviour so unrelated call sites are unaffected.
+      expect(shouldShowStylePopup({ ...base, hasPlayedAtLeastOneGame: undefined })).toBe(true);
+    });
+  });
+
   describe('authenticated', () => {
     const authed = { ...base, isAuthenticated: true };
     it('shows once when the popup was never shown and no style chosen', () => {
