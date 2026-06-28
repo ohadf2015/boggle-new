@@ -1124,3 +1124,34 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - no frontend callsites found; writes likely go via API route using service_role (bypasses RLS)
 - adding blind policies risks locking out the app without knowing intent
 - recommended owner: skip unless RLS audit reveals direct anon/authenticated writes needed
+
+## 2026-06-28
+
+### [Supabase Security] upsert_push_token SECURITY DEFINER — SHIPPED
+- Function had implicit PUBLIC execute grant (PostgreSQL default); anon callers could invoke it and write null user_id rows to user_push_tokens
+- No anon callsites found in codebase (grep confirmed 0 matches)
+- status: shipped `20260628010000_revoke_push_token_fn_from_public.sql` — REVOKE FROM public, keep authenticated grant
+- recommended owner: review-by-eod (confirm migration applied cleanly in prod)
+
+### [Supabase Security] teacher_access_requests tar_insert_any always-true — KNOWN EXCEPTION
+- Flagged by advisor as "RLS Policy Always True"
+- Intentional design: anonymous public-form submissions (documented in 20260617120000_restore_teacher_access_anon_insert.sql)
+- status: no action — keep as-is per documented rationale
+- recommended owner: skip
+
+### [Supabase Security] feedback_reports RLS no policies — PRE-TRIAGED
+- No frontend/API callsites found; service_role (admin) bypasses RLS correctly
+- Triaged 2026-06-27: intentional, no code change needed
+- status: deferred — reconfirmed
+
+### [Sentry] JAVASCRIPT-NEXTJS-1KQ churn-signals 502 — DEFERRED
+- Route code looks correct; 502 is upstream (Supabase REST API timeout or infra)
+- Sentry/Supabase MCP unavailable this run — no stack trace obtained
+- count: 3, users: 3, score: 0.443
+- status: deferred — needs Sentry MCP to read stack trace
+- recommended owner: lane-01 next run (retry with MCP available)
+
+### [Sentry] JAVASCRIPT-NEXTJS-1CW null.clear — PRE-TRIAGED (stale)
+- reach: 5, last seen: 2026-06-07 (per prior triage entry in queue)
+- Already documented as PixiJS internal, stale — no code action
+- status: deferred — verify still stale once Sentry MCP available

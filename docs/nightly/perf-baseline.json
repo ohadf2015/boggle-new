@@ -1,110 +1,97 @@
 {
-  "date": "2026-06-27",
-  "note": "Thirty-first snapshot. 24h window: sub-floor (0 routes n≥50). 7d vitals: /es/multiplayer LCP REGRESSION 5932→7291ms (+23%, n=55 both runs cleared); /en/multiplayer NEW above floor (LCP 4380ms, INP 504ms, CLS 0.392, n=55 — structural, same ssr:false root cause); /he improving 2927→2702ms. FRONTEND FIX SHIPPED: serverExternalPackages added to next.config.mjs — prevents @arvidbt/swedish-words (~6MB) + an-array-of-english-words + an-array-of-spanish-words from being bundled into static/chunks by Turbopack. Supabase MCP absent AGAIN (2nd consecutive night) — DB advisor items deferred to next run with MCP or management API PAT.",
+  "date": "2026-06-28",
+  "note": "Thirty-second snapshot. 24h window: sub-floor (0 routes n≥50). 7d vitals: /he only route n≥50 (LCP 3120ms — slight uptick from 2702ms +15%, below 20% regression threshold; INP 256ms improving from 304ms; CLS 0.084 improving from 0.088, now below 0.1 threshold). /es/multiplayer and /en/multiplayer both dropped below n≥50 in 7d window — insufficient data. BACKEND MIGRATIONS WRITTEN (pending MCP apply): (1) quest_achievement_feed RLS initplan fix (auth.role()→(select auth.role())); (2) word_clubs FK index on owner_id. Supabase MCP absent 3rd consecutive night — migrations in fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP did not connect (2nd consecutive night). No management API PAT in env. All advisor items deferred.",
+    "note": "Supabase MCP absent (3rd consecutive night). Migration file written for gate/human apply: 20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
     "top_queries": [],
     "migrations_applied_this_run": [],
+    "migrations_written_this_run": [
+      {
+        "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
+        "items": [
+          {
+            "id": "auth_rls_initplan_quest_achievement_feed",
+            "fix": "DROP + recreate policy with (select auth.role()) = 'authenticated' to prevent per-row evaluation",
+            "status": "WRITTEN — needs MCP apply or npx supabase db push"
+          },
+          {
+            "id": "unindexed_fk_word_clubs_owner_id",
+            "fix": "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)",
+            "status": "WRITTEN — needs MCP apply or npx supabase db push",
+            "carry_count": 3
+          }
+        ]
+      }
+    ],
     "remaining_advisor_items": [
       {
         "id": "auth_db_connections_absolute",
-        "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent again.",
+        "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 3
-      },
-      {
-        "id": "unindexed_fk_word_clubs_owner_id",
-        "status": "DEFERRED — need Supabase MCP or management API PAT to apply: CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id);",
-        "priority": "MEDIUM",
-        "carry_count": 2
-      },
-      {
-        "id": "idx_word_wheel_attempts_catchup_drop",
-        "status": "DEFERRED — need Supabase MCP or management API PAT to apply: DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup;",
-        "priority": "LOW",
-        "carry_count": 2
+        "carry_count": 4
       }
     ]
   },
   "frontend": {
-    "note": "24h sub-floor. 7d n>=50 routes below. CLS on /es/multiplayer and /en/multiplayer both extremely poor — structural issue (ssr:false dynamic imports + socket-gated render = layout shift as content loads). INP on /en/multiplayer 504ms = severe. Root cause: all multiplayer views are ssr:false dynamic imports → no stable skeleton → CLS + LCP penalty.",
+    "note": "24h sub-floor. 7d: /he only route n≥50. /es + /en multiplayer dropped below floor — no regression verdict possible.",
     "by_route": [
       {
-        "route": "/es/multiplayer",
-        "p75_lcp_ms": 7291,
-        "p75_inp_ms": 368,
-        "p75_cls": 0.265,
-        "n_7d": 55,
+        "route": "/he",
+        "p75_lcp_ms": 3120,
+        "p75_inp_ms": 256,
+        "p75_cls": 0.084,
+        "n_7d": 93,
         "window": "7d",
-        "lcp_status": "REGRESSION — 7291ms (+23% from 5932ms baseline 06-26, both runs n>=50). Structural: all 4 views ssr:false. Needs Chrome profiler trace.",
-        "inp_status": "POOR — 368ms (>200ms threshold). Stable.",
-        "cls_status": "REGRESSION — 0.265 (was 0.14 in 06-26 baseline). Very poor (>0.1). Same structural root cause."
+        "lcp_status": "STABLE — 3120ms (+15% from 2702ms baseline 06-27, below 20% regression threshold). Trend: 3297→3112→2927→2702→3120ms (noisy, structural).",
+        "inp_status": "IMPROVING — 256ms (was 304ms). Still above 200ms threshold.",
+        "cls_status": "OK — 0.084 (<0.1 threshold, improving from 0.088)."
+      },
+      {
+        "route": "/es/multiplayer",
+        "p75_lcp_ms": null,
+        "p75_inp_ms": null,
+        "p75_cls": null,
+        "n_7d": "<50",
+        "window": "7d",
+        "lcp_status": "DEFERRED — low n, below 50-sample floor. Prior baseline: 7291ms (structural ssr:false root cause).",
+        "inp_status": "DEFERRED — low n.",
+        "cls_status": "DEFERRED — low n."
       },
       {
         "route": "/en/multiplayer",
-        "p75_lcp_ms": 4380,
-        "p75_inp_ms": 504,
-        "p75_cls": 0.392,
-        "n_7d": 55,
+        "p75_lcp_ms": null,
+        "p75_inp_ms": null,
+        "p75_cls": null,
+        "n_7d": "<50",
         "window": "7d",
-        "lcp_status": "NEW above floor — 4380ms. Structural ssr:false root cause same as /es/multiplayer.",
-        "inp_status": "SEVERE — 504ms. Tree weight + socket-gated render at loadState=complete.",
-        "cls_status": "SEVERE — 0.392. Very poor. Layout shift from dynamic content loading."
-      },
-      {
-        "route": "/he",
-        "p75_lcp_ms": 2702,
-        "p75_inp_ms": 304,
-        "p75_cls": 0.088,
-        "n_7d": 88,
-        "window": "7d",
-        "lcp_status": "IMPROVING — 2702ms (was 2927ms 06-26, -7.7%). Trend: 3297→3112→2927→2702ms.",
-        "inp_status": "POOR — 304ms. Stable. Tree weight.",
-        "cls_status": "OK — 0.088 (<0.1 threshold). Improving (was 0.14)."
+        "lcp_status": "DEFERRED — low n, below 50-sample floor. Prior baseline: 4380ms (structural ssr:false root cause).",
+        "inp_status": "DEFERRED — low n.",
+        "cls_status": "DEFERRED — low n."
       }
     ]
   },
   "bundle": {
-    "total_static_kb": 38912,
-    "note": "Chunks dir 38M total, 471 files. 6MB chunk (7fd32332*.js) still present in this snapshot — taken from pre-fix build. After next build with serverExternalPackages, expect 7fd32332 to shrink or disappear.",
-    "top_chunks": [
-      { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6452, "note": "LIKELY @arvidbt/swedish-words array. FIX SHIPPED via serverExternalPackages in next.config.mjs (this run). Verify reduction on next build." },
-      { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3284, "note": "Unknown — needs identification next build." },
-      { "name": "82055-affbfbb6ca395994.js", "kb": 856, "note": "Unknown" },
-      { "name": "68292.bb49bb9873fa2566.js", "kb": 648, "note": "Unknown" },
-      { "name": "39299-c492000251618829.js", "kb": 560, "note": "Unknown" }
-    ]
+    "total_static_kb": null,
+    "note": "No build in memory (.next/static/chunks not present in dev environment this run). Last known total: 38912KB pre-serverExternalPackages fix (06-27). After next build the @arvidbt/swedish-words 6.4MB chunk should be gone.",
+    "top_chunks": []
   },
   "open_watches": [
     {
-      "id": "swedish-words-client-bundle",
-      "description": "6MB @arvidbt/swedish-words chunk in client JS. FIX SHIPPED: serverExternalPackages added to next.config.mjs this run. Verify chunk disappears on next prod build.",
-      "severity": "HIGH",
-      "status": "FIX_SHIPPED — verify on next build",
-      "since": "2026-06-26",
-      "updated": "2026-06-27"
+      "id": "mp_lcp_ssr_false",
+      "description": "/es/multiplayer + /en/multiplayer structural LCP/CLS from ssr:false dynamic imports. Needs Chrome profiler trace.",
+      "status": "open — insufficient n this run",
+      "prior_lcp_ms": { "/es/multiplayer": 7291, "/en/multiplayer": 4380 }
     },
     {
-      "id": "multiplayer-lcp-cls-regression",
-      "description": "/es/multiplayer p75 LCP 7291ms (+23% regression, n=55), CLS 0.265 (was 0.14). /en/multiplayer NEW: LCP 4380ms, INP 504ms, CLS 0.392. Root cause: all multiplayer views ssr:false dynamic imports → late content load → LCP+CLS penalty. Fix: SSR the lobby skeleton (same approach as a83548724 that killed 3s blank FCP on /multiplayer 06-26).",
-      "severity": "HIGH",
-      "since": "2026-06-27",
-      "action": "Identify MultiplayerFlow subviews for /es and /en locales — apply same ssr:true treatment as a83548724."
+      "id": "he_lcp_trend",
+      "description": "/he LCP noisy 2702→3120ms — likely device/network variance, not regression. Monitor.",
+      "status": "watch"
     },
     {
-      "id": "supabase-db-advisor-deferred",
-      "description": "3 Supabase advisor items deferred 2nd consecutive night (MCP absent, no management API PAT in nightly env). Items: (1) unindexed FK word_clubs.owner_id; (2) unused idx_word_wheel_attempts_catchup; (3) auth DB connections absolute→percentage.",
-      "severity": "MEDIUM",
-      "since": "2026-06-25",
-      "updated": "2026-06-27",
-      "action": "Add SUPABASE_ACCESS_TOKEN (never-expire PAT) to ~/.config/lexi-nightly/env so Supabase MCP boots with valid token."
-    },
-    {
-      "id": "en-multiplayer-inp-severe",
-      "description": "/en/multiplayer INP 504ms (7d, n=55). New above floor this run. Severe (>200ms threshold by 2.5x). Same structural root: socket-gated heavy tree render at loadState=complete.",
-      "severity": "HIGH",
-      "since": "2026-06-27"
+      "id": "migration_pending_apply",
+      "description": "20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql written — needs Supabase MCP or npx supabase db push to apply to prod.",
+      "status": "open — 3rd night without MCP"
     }
   ]
 }
