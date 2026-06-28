@@ -145,7 +145,6 @@ bengt
 benin
 benjamin
 benn
-berattelse
 berg
 bergling
 berglund
@@ -462,7 +461,6 @@ flygplan
 fläsk
 flöjt
 fogerty
-folkdrakt
 folklig
 folsom
 fonograf
@@ -470,7 +468,6 @@ football
 force
 forces
 ford
-forfattare
 form
 forr
 fors
@@ -482,7 +479,6 @@ forward
 fossmo
 fotboll
 fotograf
-framgang
 frank
 franklin
 frankrik
@@ -548,7 +544,6 @@ glans
 glasgows
 glenn
 globes
-glogg
 godot
 goethe
 gogh
@@ -804,7 +799,6 @@ juli
 julia
 julius
 julsaga
-julstamning
 julstjarna
 julvärd
 julön
@@ -927,7 +921,6 @@ lampa
 land
 lando
 lans
-lara
 lars
 larsson
 larv
@@ -984,14 +977,12 @@ london
 londons
 loob
 lord
-lordag
 lotta
 louis
 love
 lovelace
 lublin
 lucia
-luciatag
 ludwig
 luftfart
 lukas
@@ -1016,7 +1007,6 @@ magnuson
 main
 mainstre
 maja
-majstang
 maka
 makers
 makrill
@@ -1028,7 +1018,6 @@ malin
 malmsjö
 mamma
 mammoth
-mandag
 mandela
 mando
 mandolin
@@ -1139,7 +1128,6 @@ nancy
 nanjing
 napoleon
 narva
-nasa
 natalie
 nation
 national
@@ -1194,7 +1182,6 @@ novoseli
 nuncio
 nutley
 nuvarand
-nyar
 nyarsloften
 nyberg
 nyman
@@ -1250,11 +1237,7 @@ parks
 partik
 parton
 parus
-pask
-paskafton
 paskbord
-pasklilja
-paskris
 pasta
 patent
 patricio
@@ -1424,11 +1407,9 @@ samtidig
 samuel
 sana
 sand
-sang
 santa
 sara
 sarah
-sark
 saturnus
 scen
 schulman
@@ -1515,7 +1496,6 @@ sofia
 solberg
 soldat
 somalia
-sondag
 sophie
 soppa
 soppan
@@ -1549,7 +1529,6 @@ staffan
 stalin
 stam
 stanford
-stang
 star
 stat
 state

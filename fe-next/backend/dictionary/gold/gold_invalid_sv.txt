@@ -19,3 +19,14 @@ zlpkf
 gvqxm
 yjwkp
 dwqzn
+# Diacritic-stripped non-words (2026-06-28 SÖNDAG incident).
+# Å/Ä/Ö are distinct Swedish letters; these ASCII folds must NEVER validate.
+sondag
+mandag
+lordag
+pask
+nasa
+glogg
+framgang
+forfattare
+berattelse
