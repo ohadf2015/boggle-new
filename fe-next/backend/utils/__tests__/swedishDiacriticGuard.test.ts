@@ -15,6 +15,46 @@ function readWordList(relPath: string): string[] {
     .filter((w) => w.length > 0 && !w.startsWith('#'));
 }
 
+/**
+ * Authoritative Swedish corpus the runtime actually validates against
+ * (@arvidbt/swedish-words, ~410k words), parsed the same way as
+ * backend/dictionaryLoaders.ts. Used as the detector reference so that
+ * legitimately-ASCII non-nouns (han, som, har, …) are recognized as real words
+ * and never mistaken for diacritic-stripped artifacts. Falls back to the
+ * noun list if the package is unavailable.
+ */
+function loadReferenceCorpus(): string[] {
+  for (const rel of [
+    '../node_modules/@arvidbt/swedish-words/out/index.js',
+    'node_modules/@arvidbt/swedish-words/out/index.js',
+  ]) {
+    try {
+      const content = readFileSync(path.join(BACKEND_DIR, rel), 'utf8');
+      const arr = content.match(/var swedish_words = \[([\s\S]*?)\];/);
+      if (!arr) continue;
+      const decode = (s: string): string =>
+        s.replace(/\\x([0-9A-Fa-f]{2})/g, (_m, hex) =>
+          String.fromCharCode(parseInt(hex, 16)),
+        );
+      const words: string[] = [];
+      for (const tok of arr[1].split(',')) {
+        const t = tok.trim();
+        if (!t.startsWith('"') || !t.endsWith('"')) continue;
+        try {
+          words.push((JSON.parse(decode(t)) as string).toLowerCase());
+        } catch {
+          /* skip unparseable token */
+        }
+      }
+      if (words.length > 0) return words;
+    } catch {
+      /* try next path */
+    }
+  }
+  // Fallback: noun list only (still catches the corruption, may be less precise)
+  return readWordList('sv_nouns.txt');
+}
+
 describe('foldSwedishDiacritics', () => {
   it('folds å/ä/ö to their ASCII look-alikes', () => {
     expect(foldSwedishDiacritics('SÖNDAG')).toBe('sondag');
@@ -52,30 +92,57 @@ describe('findDiacriticStrippedSwedishWords', () => {
   });
 });
 
-describe('swedish_words_approved.txt is free of diacritic-stripped artifacts', () => {
-  it('contains no ASCII-folded forms of real å/ä/ö Swedish words', () => {
-    const approved = readWordList('swedish_words_approved.txt');
-    const reference = readWordList('sv_nouns.txt');
+describe('honors the legitimate fold-collision allowlist', () => {
+  it('does not flag allowlisted names/loanwords that fold onto å/ä/ö words', () => {
+    // 'aten' (Athens) folds onto 'äten'; 'lars' onto 'lärs' — both legitimate.
+    const reference = ['äten', 'lärs', 'äventyr'];
+    const approved = ['aten', 'lars', 'aventyr'];
     const artifacts = findDiacriticStrippedSwedishWords(approved, reference);
-    const report = artifacts
-      .map((a) => `  ${a.stripped} -> ${a.suggestions.join('/')}`)
-      .join('\n');
-    expect(
-      artifacts,
-      `Diacritic-stripped Swedish words found in swedish_words_approved.txt.\n` +
-        `Å/Ä/Ö are distinct letters — these ASCII forms must be removed or fixed:\n${report}`,
-    ).toEqual([]);
+    // Only the genuine artifact 'aventyr' (→ äventyr) survives.
+    expect(artifacts.map((a) => a.stripped)).toEqual(['aventyr']);
   });
+});
 
-  it('rejects the reported "SÖNDAG bug" cases', () => {
+describe('Swedish word data is free of diacritic-stripped artifacts', () => {
+  const reference = loadReferenceCorpus();
+
+  for (const file of [
+    'swedish_words_approved.txt',
+    'dictionary/candidates/sv.txt',
+  ]) {
+    it(`${file} contains no ASCII-folded forms of real å/ä/ö words`, () => {
+      const artifacts = findDiacriticStrippedSwedishWords(
+        readWordList(file),
+        reference,
+      );
+      const report = artifacts
+        .map((a) => `  ${a.stripped} -> ${a.suggestions.join('/')}`)
+        .join('\n');
+      expect(
+        artifacts,
+        `Diacritic-stripped Swedish words found in ${file}.\n` +
+          `Å/Ä/Ö are distinct letters. Remove the stripped form, or — if it is a\n` +
+          `legitimate name/loanword — add it to KNOWN_FOLD_COLLISIONS:\n${report}`,
+      ).toEqual([]);
+    });
+  }
+
+  it('rejects every reported SÖNDAG-bug / corruption case', () => {
     const approved = new Set(
       readWordList('swedish_words_approved.txt').map((w) => w.toLowerCase()),
     );
-    // These ASCII non-words must never be accepted in place of the real word.
-    for (const bad of ['sondag', 'mandag', 'lordag', 'pask', 'nasa', 'glogg']) {
-      expect(approved.has(bad), `"${bad}" must not be an approved word`).toBe(
-        false,
-      );
+    const candidates = new Set(
+      readWordList('dictionary/candidates/sv.txt').map((w) => w.toLowerCase()),
+    );
+    // ASCII non-words that must never be accepted in place of the real spelling.
+    const bad = [
+      'sondag', 'mandag', 'lordag', 'pask', 'nasa', 'glogg', // first pass
+      'aventyr', 'forsta', 'lasa', 'onskningar', 'underhallning', 'upptack',
+      'forr', 'paskbord', 'nyarsloften', 'feststamning', // comprehensive pass
+    ];
+    for (const w of bad) {
+      expect(approved.has(w), `"${w}" must not be an approved word`).toBe(false);
     }
+    expect(candidates.has('andrande')).toBe(false);
   });
 });

@@ -99,7 +99,6 @@ augustus
 aurora
 australi
 avel
-aventyr
 averås
 axel
 axell
@@ -436,7 +435,6 @@ federala
 felicia
 feminism
 fermenta
-feststamning
 fiction
 fidel
 figur
@@ -469,11 +467,9 @@ force
 forces
 ford
 form
-forr
 fors
 forsberg
 forsknin
-forsta
 forum
 forward
 fossmo
@@ -924,7 +920,6 @@ lans
 lars
 larsson
 larv
-lasa
 lasse
 last
 latiname
@@ -1182,7 +1177,6 @@ novoseli
 nuncio
 nutley
 nuvarand
-nyarsloften
 nyberg
 nyman
 nyqvist
@@ -1204,7 +1198,6 @@ olle
 olof
 olshamma
 olsson
-onskningar
 opera
 opheim
 orchestr
@@ -1237,7 +1230,6 @@ parks
 partik
 parton
 parus
-paskbord
 pasta
 patent
 patricio
@@ -1691,7 +1683,6 @@ ugglas
 ulrik
 ulriksda
 ulvaeus
-underhallning
 unge
 unicef
 union
@@ -1699,7 +1690,6 @@ united
 universi
 uppkomst
 uppsala
-upptack
 upptäckt
 uranus
 urban
