@@ -273,19 +273,19 @@ export function getLocalMinuteOfDay(timezone: string, now: Date = new Date()): n
  * Rotate through these to find the best performer
  */
 const SUBJECT_LINES = [
-  (n: number) => `🔥 Daily #${n} just dropped`,
-  (_n: number) => `Your puzzle awaits, Word Hunter`,
-  (n: number) => `Daily #${n} - Can you crack it?`,
-  (_n: number) => `⚡ Fresh puzzle. Same grid. Beat everyone.`,
-  (n: number) => `Daily #${n} is live - don't miss out`,
+  (name: string, n: number) => `${name}, daily #${n} just went live`,
+  (name: string, _n: number) => `${name}, today's grid is waiting for you`,
+  (_name: string, n: number) => `daily #${n} — think you can crack it?`,
+  (name: string, _n: number) => `${name}, same grid, brand-new word`,
+  (name: string, n: number) => `daily #${n} is up, ${name}`,
 ];
 
 /**
  * Get a subject line - rotates based on puzzle number for natural A/B testing
  */
-function getSubjectLine(puzzleNumber: number): string {
+function getSubjectLine(recipientName: string, puzzleNumber: number): string {
   const index = puzzleNumber % SUBJECT_LINES.length;
-  return SUBJECT_LINES[index](puzzleNumber);
+  return SUBJECT_LINES[index](recipientName, puzzleNumber);
 }
 
 /**
@@ -300,7 +300,7 @@ function generateDailyChallengeEmail(
   baseUrl: string,
   _language: string = 'en'
 ): { subject: string; html: string; text: string } {
-  const subject = getSubjectLine(puzzleNumber);
+  const subject = getSubjectLine(recipientName, puzzleNumber);
   const logoUrl = `${baseUrl}/logos/lexiclash_logo_english-min.webp`;
   const colors = EMAIL_COLORS;
 

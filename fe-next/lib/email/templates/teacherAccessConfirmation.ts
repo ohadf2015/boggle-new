@@ -46,8 +46,8 @@ const DATE_LOCALE: Record<TeacherLocale, string> = {
 
 const COPY: Record<TeacherLocale, Copy> = {
   en: {
-    subject: 'Your LexiClash teacher access is approved 🎉',
-    trialSubject: 'Your LexiClash teacher trial is live — start now ⏳',
+    subject: "You're approved — welcome to LexiClash teaching",
+    trialSubject: 'Your LexiClash teacher trial just started',
     greeting: (n) => `Hi ${n},`,
     intro: 'Great news — your teacher access is approved! Teacher mode turns LexiClash into a classroom tool: run live word games with your students, track their progress, and keep vocabulary practice fun.',
     whatTitle: 'What you can do now',
@@ -65,8 +65,8 @@ const COPY: Record<TeacherLocale, Copy> = {
     dir: 'ltr',
   },
   he: {
-    subject: 'הגישה שלך כמורה ב-LexiClash אושרה 🎉',
-    trialSubject: 'תקופת הניסיון שלך כמורה ב-LexiClash פעילה — התחל/י עכשיו ⏳',
+    subject: 'אישרנו אותך — ברוך/ה הבא/ה למצב מורה ב-LexiClash',
+    trialSubject: 'תקופת הניסיון שלך כמורה ב-LexiClash התחילה',
     greeting: (n) => `שלום ${n},`,
     intro: 'חדשות טובות — הגישה שלך כמורה אושרה! מצב מורה הופך את LexiClash לכלי כיתתי: הפעל/י משחקי מילים חיים עם התלמידים, עקוב/י אחר ההתקדמות שלהם, ושמור/י על תרגול אוצר מילים מהנה.',
     whatTitle: 'מה אפשר לעשות עכשיו',
@@ -84,8 +84,8 @@ const COPY: Record<TeacherLocale, Copy> = {
     dir: 'rtl',
   },
   sv: {
-    subject: 'Din lärarbehörighet på LexiClash är godkänd 🎉',
-    trialSubject: 'Din lärarprövoperiod på LexiClash är igång — börja nu ⏳',
+    subject: 'Du är godkänd — välkommen till LexiClash för lärare',
+    trialSubject: 'Din lärarprövoperiod på LexiClash har börjat',
     greeting: (n) => `Hej ${n},`,
     intro: 'Bra nyheter — din lärarbehörighet är godkänd! Lärarläget gör LexiClash till ett klassrumsverktyg: kör live-ordspel med dina elever, följ deras framsteg och håll ordträningen rolig.',
     whatTitle: 'Vad du kan göra nu',
@@ -103,8 +103,8 @@ const COPY: Record<TeacherLocale, Copy> = {
     dir: 'ltr',
   },
   ja: {
-    subject: 'LexiClash 教師アクセスが承認されました 🎉',
-    trialSubject: 'LexiClash 教師トライアルが開始 — 今すぐスタート ⏳',
+    subject: '承認されました — LexiClash 教師モードへようこそ',
+    trialSubject: 'LexiClash 教師トライアルが始まりました',
     greeting: (n) => `${n}様、`,
     intro: '朗報です — 教師アクセスが承認されました！教師モードでは LexiClash が教室ツールになります。生徒とライブの単語ゲームを行い、進捗を確認し、語彙練習を楽しく続けられます。',
     whatTitle: '今すぐできること',
@@ -122,8 +122,8 @@ const COPY: Record<TeacherLocale, Copy> = {
     dir: 'ltr',
   },
   es: {
-    subject: 'Tu acceso de profesor en LexiClash ha sido aprobado 🎉',
-    trialSubject: 'Tu prueba de profesor en LexiClash está activa — empieza ya ⏳',
+    subject: 'Estás aprobado — bienvenido al modo profesor de LexiClash',
+    trialSubject: 'Tu prueba de profesor en LexiClash acaba de empezar',
     greeting: (n) => `Hola ${n},`,
     intro: 'Buenas noticias — ¡tu acceso de profesor ha sido aprobado! El modo profesor convierte LexiClash en una herramienta de aula: organiza juegos de palabras en vivo con tus estudiantes, sigue su progreso y mantén divertida la práctica de vocabulario.',
     whatTitle: 'Lo que puedes hacer ahora',

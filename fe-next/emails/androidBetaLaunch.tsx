@@ -160,11 +160,11 @@ const COPY: Record<string, BetaCopy> = {
 /* ───────────────────────── Subject lines ───────────────────────── */
 
 const SUBJECTS: Record<string, (name: string) => string> = {
-  en: (n) => `${n}, you're in the Android beta 📱`,
-  he: (n) => `${n}, נכנסת לבטא של אנדרואיד 📱`,
-  sv: (n) => `${n}, du är med i Android-betan 📱`,
-  ja: (n) => `${n}さん、Androidベータに当選 📱`,
-  es: (n) => `${n}, estás en la beta de Android 📱`,
+  en: (n) => `${n}, you're in — Android beta is yours`,
+  he: (n) => `${n}, אתם בפנים. בטא אנדרואיד מחכה לכם`,
+  sv: (n) => `${n}, du är med. Android-betan är din`,
+  ja: (n) => `${n}さん、当選です。Androidベータへようこそ`,
+  es: (n) => `${n}, estás dentro. La beta de Android es tuya`,
 };
 
 export function getAndroidBetaLaunchSubject(
