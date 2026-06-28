@@ -166,19 +166,40 @@ export default function PracticeHubClient({ locale }: Props) {
         {completed.size === PRACTICE_MODES.length && (
           <AdaptiveMotion.div
             data-testid="practice-all-complete"
-            initial={{ opacity: 0, scale: 0.95, y: -8 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
             role="status"
             aria-live="polite"
-            className="mb-6 px-4 py-4 rounded-neo border-3 border-neo-black bg-neo-cozy text-neo-black shadow-hard text-center"
+            className="mb-6 flex flex-col items-center text-center"
           >
-            <p className="font-neo-display font-black text-base mb-1">
+            {/* Celebratory trophy medallion — springs in so the "you did it"
+                moment actually lands. The headline is plain text on the page
+                background (no filled box) so it reads as a banner, never a
+                button; the only tappable thing here is the real-game CTA below. */}
+            <AdaptiveMotion.span
+              aria-hidden
+              initial={{ scale: 0, rotate: -25 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 13, delay: 0.12 }}
+              className="inline-flex items-center justify-center w-16 h-16 rounded-full border-3 border-neo-black bg-neo-yellow text-neo-black shadow-hard mb-3"
+            >
+              <Trophy className="w-8 h-8" strokeWidth={2.5} />
+            </AdaptiveMotion.span>
+            <p className="font-neo-display font-black text-2xl sm:text-3xl text-neo-white mb-1">
               {t('practiceHub.allCompleteTitle')}
             </p>
-            <p className="font-neo-body text-xs">
+            <p className="font-neo-body text-sm text-neo-white/80 mb-4">
               {t('practiceHub.allCompleteBody')}
             </p>
+            <Link
+              href={`/${locale}`}
+              onClick={handleTileTap}
+              data-testid="practice-all-complete-cta"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-neo-display font-black text-base uppercase tracking-wide shadow-hard active:translate-y-px md:hover:-translate-y-0.5 md:hover:shadow-hard-lg transition-transform"
+            >
+              {t('practiceHub.goLive')}
+            </Link>
           </AdaptiveMotion.div>
         )}
 
