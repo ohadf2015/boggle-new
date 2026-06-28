@@ -109,6 +109,41 @@ describe('PracticeHubClient completed-tile celebration', () => {
   });
 });
 
+describe('PracticeHubClient all-complete celebration', () => {
+  beforeEach(() => {
+    mockCompleted.current = new Set(['classic', 'wordHunt', 'wheelRush']);
+  });
+
+  it('shows the all-complete celebration once every mode is finished', () => {
+    wrap(<PracticeHubClient locale="en" />);
+    expect(screen.getByTestId('practice-all-complete')).toBeInTheDocument();
+  });
+
+  it('gives players a clear button CTA into the real game (homepage)', () => {
+    wrap(<PracticeHubClient locale="en" />);
+    const cta = screen.getByTestId('practice-all-complete-cta');
+    expect(cta.tagName).toBe('A');
+    expect(cta).toHaveAttribute('href', '/en');
+  });
+
+  it('does not style the celebration message itself as a button (no solid hard-shadow fill)', () => {
+    // The headline used to be a filled bg-neo-cozy box with a hard shadow, which
+    // read as a tappable button. The celebration message must look like a banner,
+    // not a CTA — the only button is the real-game CTA below it.
+    wrap(<PracticeHubClient locale="en" />);
+    const celebration = screen.getByTestId('practice-all-complete');
+    expect(celebration.className).not.toContain('bg-neo-cozy');
+    expect(celebration.className).not.toContain('shadow-hard');
+  });
+
+  it('hides the celebration while any mode is still incomplete', () => {
+    mockCompleted.current = new Set(['classic']);
+    wrap(<PracticeHubClient locale="en" />);
+    expect(screen.queryByTestId('practice-all-complete')).toBeNull();
+    expect(screen.queryByTestId('practice-all-complete-cta')).toBeNull();
+  });
+});
+
 describe('PracticeHubClient focused-screen chrome', () => {
   it('flips isInGame=true on mount so the hub scroll-locks and drops the footer', () => {
     wrap(<PracticeHubClient locale="en" />);
