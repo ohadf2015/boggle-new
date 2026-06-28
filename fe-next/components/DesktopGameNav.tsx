@@ -13,14 +13,25 @@ interface NavItem {
   id: string;
   labelKey: string;
   icon: typeof Home;
+  /** Path used for active-state matching against the current pathname. */
   route: string;
+  /**
+   * Optional navigation target, used when the canonical destination differs from
+   * `route`. The Quick Play tab matches the `/singleplayer` identity but must
+   * navigate to the real flow directly — `/singleplayer` is a soft-deleted route
+   * whose only job is a server-side `permanentRedirect` (308) to
+   * `/multiplayer?quickPlay=true`. Soft-navigating into that force-dynamic
+   * redirect stub failed the client RSC fetch → browser-level "page couldn't
+   * load". Routing straight to the destination removes the redirect hop.
+   */
+  href?: string;
   color: string;
   activeColor: string;
 }
 
 const NAV_ITEMS: NavItem[] = [
   { id: 'home', labelKey: 'nav.home', icon: Home, route: '', color: 'text-neo-white', activeColor: 'text-neo-lime border-neo-lime' },
-  { id: 'singleplayer', labelKey: 'nav.singleplayer', icon: Zap, route: '/singleplayer', color: 'text-neo-white', activeColor: 'text-neo-cyan border-neo-cyan' },
+  { id: 'singleplayer', labelKey: 'nav.singleplayer', icon: Zap, route: '/singleplayer', href: '/multiplayer?quickPlay=true', color: 'text-neo-white', activeColor: 'text-neo-cyan border-neo-cyan' },
   { id: 'multiplayer', labelKey: 'nav.play', icon: Swords, route: '/multiplayer', color: 'text-neo-white', activeColor: 'text-neo-pink border-neo-pink' },
   { id: 'daily', labelKey: 'nav.daily', icon: Calendar, route: '/daily', color: 'text-neo-white', activeColor: 'text-neo-yellow border-neo-yellow' },
   { id: 'leaderboard', labelKey: 'nav.leaderboard', icon: Trophy, route: '/leaderboard', color: 'text-neo-white', activeColor: 'text-neo-yellow border-neo-yellow' },
@@ -74,7 +85,7 @@ export const DesktopGameNav = memo(function DesktopGameNav() {
             return (
               <button
                 key={item.id}
-                onClick={() => router.push(`/${language}${item.route}`)}
+                onClick={() => router.push(`/${language}${item.href ?? item.route}`)}
                 className={cn(
                   'flex items-center gap-1.5 px-3 py-2.5 text-sm font-bold whitespace-nowrap transition-all duration-150 border-b-3 -mb-[2px]',
                   isActive
