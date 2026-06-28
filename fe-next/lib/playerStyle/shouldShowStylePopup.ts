@@ -79,6 +79,15 @@ export interface StylePopupGateInput {
    * on a gameplay route to the post-game moment the user explicitly chose.
    */
   resultsShowing?: boolean;
+  /**
+   * The player has completed at least one game (any mode — guest localStorage
+   * count or `profiles.total_games`). The style picker is a personalisation
+   * reward; surfacing it to someone who has not yet played a single game (e.g. a
+   * fresh visitor who lands straight in the multiplayer lobby) interrupts them
+   * before they have any context for the choice. Optional + only an explicit
+   * `false` suppresses, so existing call sites are unaffected. False → never show.
+   */
+  hasPlayedAtLeastOneGame?: boolean;
 }
 
 /**
@@ -105,6 +114,11 @@ export function shouldShowStylePopup(input: StylePopupGateInput): boolean {
   // Pre-game setup / lobby / countdown are still mid-flow. Off gameplay routes
   // (menus, profile, leaderboard) the user is already idle, so this gate is moot.
   if (input.onGameplayRoute && !input.resultsShowing) return false;
+  // FTUE: never prompt a player who has not played a single game yet. Holds the
+  // picker out of the multiplayer lobby (and every other surface) until the
+  // player has at least one game under their belt. Only an explicit `false`
+  // blocks — undefined leaves prior behaviour intact for callers that omit it.
+  if (input.hasPlayedAtLeastOneGame === false) return false;
   if (!input.featureEnabled) return false;
   if (input.needsProfileCustomization) return false;
   // Already picked a style (local truth) → never prompt, in either auth state.

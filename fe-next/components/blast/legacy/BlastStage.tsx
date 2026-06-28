@@ -414,6 +414,7 @@ export const BlastStage = memo(function BlastStage({
                 nearMissCells={nearMissCells}
                 cascadeHighlightCells={cascadeHighlightCells}
                 diamondRevealTurns={gameState.diamondRevealTurns}
+                isMultiplayer={isMultiplayer}
               />
             </div>
             {/* PixiJS effects layer — overlays DOM board so particles/shockwaves/shatters are visible above tile art. pointer-events-none so taps still reach BlastBoard. */}

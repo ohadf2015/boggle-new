@@ -206,7 +206,14 @@ describe('HostPreGameView passive bot auto-fill timer (alone host)', () => {
     render(<HostPreGameView {...baseProps} isPrivate={false} />);
 
     act(() => { vi.advanceTimersByTime(15_000); }); // alone timer
-    act(() => { vi.advanceTimersByTime(10_000); }); // bot countdown → 0
+
+    // The visible "starting with bots…" countdown runs a full 20s — long enough
+    // that a host can read it and still invite a friend before bots fill in. Just
+    // shy of 20s it must NOT have fired yet.
+    act(() => { vi.advanceTimersByTime(19_000); });
+    expect(emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill')).toBeUndefined();
+
+    act(() => { vi.advanceTimersByTime(1_000); }); // bot countdown → 0
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     expect(setAutoFill).toBeDefined();
@@ -224,7 +231,7 @@ describe('HostPreGameView passive bot auto-fill timer (alone host)', () => {
     // yet a private room never force-fills: the host is waiting on invited humans.
     // They can still press Start to fill on demand.
     act(() => { vi.advanceTimersByTime(15_000); });
-    act(() => { vi.advanceTimersByTime(10_000); });
+    act(() => { vi.advanceTimersByTime(20_000); });
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     expect(setAutoFill).toBeUndefined();

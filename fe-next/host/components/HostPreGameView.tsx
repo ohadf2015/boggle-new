@@ -332,13 +332,15 @@ function HostPreGameView({
         // Quick Play: skip alone-timer, kick off short "filling bots…" countdown.
         setBotCountdown(3);
       } else if (!isPrivate) {
-        // Passive fallback for a PUBLIC-room host who never presses Start. Halved
-        // from 30s → 15s to shrink the dead lobby wait that drove new-host
-        // abandonment. A human joining cancels this (the else-branch below).
+        // Passive fallback for a PUBLIC-room host who never presses Start. A short
+        // 15s alone-timer first absorbs the "is anyone joining?" window, then a
+        // visible 20s "starting with bots…" countdown gives the host ample time to
+        // read it and still invite a friend before bots fill in (bumped from 10s,
+        // which felt abrupt). A human joining cancels this (the else-branch below).
         // Private (invite / classroom) rooms are excluded — that host is waiting
         // on specific humans and can still press Start to fill bots on demand.
         aloneTimerRef.current = setTimeout(() => {
-          setBotCountdown(10);
+          setBotCountdown(20);
         }, 15_000);
       }
     } else {

@@ -70,6 +70,13 @@ export interface BlastBoardProps {
   cascadeHighlightCells?: Array<{ row: number; col: number }>;
   /** Remaining turns of diamond reveal (shows frozen tile inner types) */
   diamondRevealTurns?: number;
+  /**
+   * Multiplayer round — suppress the per-tile explanation tooltips (the mobile
+   * info pop-up + the native `title` hint). In a timed competitive MP game the
+   * descriptions are distracting clutter; single-player keeps them as a learning
+   * aid.
+   */
+  isMultiplayer?: boolean;
 }
 
 /**
@@ -92,6 +99,7 @@ export const BlastBoard = memo(function BlastBoard({
   nearMissCells = [],
   cascadeHighlightCells = [],
   diamondRevealTurns = 0,
+  isMultiplayer = false,
 }: BlastBoardProps) {
   const { t } = useLanguage();
   const equippedBoardTheme = useEquippedCosmetic('boardTheme');
@@ -208,8 +216,11 @@ export const BlastBoard = memo(function BlastBoard({
     return map;
   }, [sequencerState]);
 
-  // Single-tile tooltip: when exactly 1 special tile is selected, show its info
+  // Single-tile tooltip: when exactly 1 special tile is selected, show its info.
+  // Suppressed in multiplayer — the explanations are distracting clutter during a
+  // timed, competitive round.
   const singleTileTooltip = useMemo(() => {
+    if (isMultiplayer) return null;
     if (selectedCells.length !== 1) return null;
     const c = selectedCells[0];
     const tile = tileStates[c.row]?.[c.col];
@@ -217,7 +228,7 @@ export const BlastBoard = memo(function BlastBoard({
     const tooltip = getTileTooltip(tile.type, t);
     if (!tooltip) return null;
     return { ...tooltip, row: c.row, col: c.col };
-  }, [selectedCells, tileStates, t]);
+  }, [isMultiplayer, selectedCells, tileStates, t]);
 
   // Only render overlay once we have tile states
   const hasTileStates = tileStates.length > 0 && tileStates[0]?.length > 0;
@@ -314,6 +325,7 @@ export const BlastBoard = memo(function BlastBoard({
                 innerType={tile.innerType}
                 portalPairIndex={tile.type === 'portal' && tile.portalPairId ? portalPairMap.get(tile.portalPairId) : undefined}
                 isScanTarget={scanTargetKey?.key === key ? scanTargetKey.source : undefined}
+                hideTooltip={isMultiplayer}
                 clearRotate={animState?.clearRotate}
                 col={tile.col}
                 fallOffset={animState?.fallDistance ? animState.fallDistance * cellHeight : undefined}
