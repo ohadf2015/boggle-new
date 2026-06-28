@@ -138,6 +138,14 @@ describe('BlastHUD — multiplayer timer (consolidated into HUD)', () => {
     render(<BlastHUD {...mpProps} remainingTime={55} totalTime={90} />);
     expect(screen.getByTestId('blast-mp-timer').getAttribute('data-urgency')).toBe('normal');
   });
+
+  it('hides the inline MP timer inside the desktop shell (the shell badge owns the only timer)', () => {
+    // On desktop the BlastGame canvas is embedded in the 3-column shell, whose
+    // left-rail badge already renders the (server-synced) countdown. Rendering
+    // the HUD timer too produced two timers that drifted apart — suppress it.
+    render(<BlastHUD {...mpProps} remainingTime={55} totalTime={90} isDesktopCanvas />);
+    expect(screen.queryByTestId('blast-mp-timer')).toBeNull();
+  });
 });
 
 describe('BlastHUD — labelled stat columns (clarity)', () => {

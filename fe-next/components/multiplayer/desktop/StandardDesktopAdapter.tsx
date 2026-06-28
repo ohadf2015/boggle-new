@@ -6,7 +6,7 @@ import { DesktopRivalsRosterRail } from './DesktopRivalsRosterRail';
 import { WordsLadder, type LadderWord } from './WordsLadder';
 import { KeyboardHintStrip } from './KeyboardHintStrip';
 import { ThemedPanel } from './ThemedPanel';
-import CircularTimer from '../../ui/CircularTimer';
+import { ShellBadgeTimer } from './ShellBadgeTimer';
 import { MyStatsCard } from './insights/MyStatsCard';
 import { OpponentInsightFeedConnected } from './insights/OpponentInsightFeedConnected';
 import { PaceDeltaChip } from './insights/PaceDeltaChip';
@@ -67,10 +67,9 @@ function StandardDesktopAdapterImpl(props: StandardDesktopAdapterProps) {
     () => (
       <ThemedPanel mode="classic" variant="badge" testId="standard-mode-badge" withTexture>
         <div className="flex items-center gap-3 animate-mp-shell-fade">
-          <CircularTimer
-            duration={totalTime}
-            initialRemainingTime={remainingTime}
-            isPlaying
+          <ShellBadgeTimer
+            totalTime={totalTime}
+            remainingTime={remainingTime}
             size={80}
             colorFamily="cyan"
           />

@@ -176,6 +176,10 @@ interface BlastHUDProps {
   remainingTime?: number | null;
   /** MP round length in seconds — drives the urgency calc + a11y label. */
   totalTime?: number;
+  /** True when this HUD is the center canvas of the desktop 3-column shell.
+   *  The shell's left-rail badge already renders the (server-synced) countdown,
+   *  so the HUD must NOT render its own — two timers drifted apart otherwise. */
+  isDesktopCanvas?: boolean;
   t: (key: string) => string | undefined;
 }
 
@@ -204,9 +208,11 @@ export function BlastHUD({
   isMultiplayer = false,
   remainingTime = null,
   totalTime,
+  isDesktopCanvas = false,
   t,
 }: BlastHUDProps) {
   const showTimer =
+    !isDesktopCanvas &&
     isMultiplayer && remainingTime !== null && remainingTime !== undefined && (totalTime ?? 0) > 0;
   const clearPct = totalTiles > 0 ? Math.round((tilesCleared / totalTiles) * 100) : 0;
   const isFiniteMoves = isFinite(totalMoves);
