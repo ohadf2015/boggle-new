@@ -279,25 +279,25 @@ const MODE_COPY: Record<GameModeKey, Record<string, ModeCopy>> = {
 
 export const ANNOUNCEMENT_SUBJECTS: Record<GameModeKey, Record<string, (name: string) => string>> = {
   blast: {
-    en: (n) => `${n}, Blast Mode just dropped 💥`,
-    he: (n) => `${n}, מצב בלאסט עלה לאוויר 💥`,
-    sv: (n) => `${n}, Blast-läget är här 💥`,
-    ja: (n) => `${n}さん、ブラストモード登場 💥`,
-    es: (n) => `${n}, llegó el Modo Blast 💥`,
+    en: (n) => `${n}, there's a new way to play (it's called Blast)`,
+    he: (n) => `${n}, יש דרך חדשה לשחק, קוראים לה בלאסט`,
+    sv: (n) => `${n}, det finns ett nytt sätt att spela: Blast`,
+    ja: (n) => `${n}さん、新しい遊び方ができたよ。名前はブラスト`,
+    es: (n) => `${n}, hay una forma nueva de jugar y se llama Blast`,
   },
   wordhunt: {
-    en: (n) => `${n}, Word Hunt is live ⚡`,
-    he: (n) => `${n}, ווורד האנט עלה ⚡`,
-    sv: (n) => `${n}, Word Hunt är här ⚡`,
-    ja: (n) => `${n}さん、ワードハント登場 ⚡`,
-    es: (n) => `${n}, ¡Word Hunt está aquí! ⚡`,
+    en: (n) => `${n}, Word Hunt is live — think you're fast?`,
+    he: (n) => `${n}, ווורד האנט עלה לאוויר. נראה כמה מהר אתם`,
+    sv: (n) => `${n}, Word Hunt är igång. Hur snabb är du?`,
+    ja: (n) => `${n}さん、ワードハント始動。スピードに自信ある?`,
+    es: (n) => `${n}, Word Hunt ya está aquí. ¿Qué tan rápido eres?`,
   },
   adventure: {
-    en: (n) => `${n}, your Adventure awaits 🗺️`,
-    he: (n) => `${n}, ההרפתקה שלך מחכה 🗺️`,
-    sv: (n) => `${n}, ditt äventyr väntar 🗺️`,
-    ja: (n) => `${n}さん、冒険の始まり 🗺️`,
-    es: (n) => `${n}, tu aventura te espera 🗺️`,
+    en: (n) => `${n}, your Adventure is ready when you are`,
+    he: (n) => `${n}, ההרפתקה שלך מחכה לך`,
+    sv: (n) => `${n}, ditt äventyr väntar när du är redo`,
+    ja: (n) => `${n}さん、冒険はいつでも始められるよ`,
+    es: (n) => `${n}, tu aventura te espera cuando quieras`,
   },
 };
 

@@ -131,11 +131,11 @@ const COPY: Record<string, WelcomeCopy> = {
 /* ───────────────────────── Subject lines ───────────────────────── */
 
 const SUBJECTS: Record<string, (name: string) => string> = {
-  en: (n) => `Hi ${n} 👋`,
-  he: (n) => `היי ${n} 👋`,
-  sv: (n) => `Hej ${n} 👋`,
-  ja: (n) => `${n}さん、こんにちは 👋`,
-  es: (n) => `Hola ${n} 👋`,
+  en: (n) => `Hi ${n}, glad you're here`,
+  he: (n) => `היי ${n}, כיף שהצטרפת`,
+  sv: (n) => `Hej ${n}, kul att du hittade hit`,
+  ja: (n) => `${n}さん、来てくれてうれしいです`,
+  es: (n) => `Hola ${n}, qué bueno tenerte por aquí`,
 };
 
 export function getWelcomeSubject(language: string, recipientName: string): string {

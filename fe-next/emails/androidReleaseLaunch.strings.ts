@@ -36,7 +36,7 @@ export const DEFAULT_LANGUAGE = 'en';
 
 export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
   en: {
-    subject: (name) => `${name}, LexiClash is now on Android! 🎉`,
+    subject: (name) => `${name}, LexiClash is finally on Android`,
     preview: 'Your favorite word game just landed on Google Play.',
     badge: 'NOW ON GOOGLE PLAY',
     headline: "We're on Android!",
@@ -48,7 +48,7 @@ export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
     unsubscribe: 'Unsubscribe',
   },
   he: {
-    subject: (name) => `${name}, ‏LexiClash עכשיו באנדרואיד! 🎉`,
+    subject: (name) => `${name}, ‏LexiClash סוף סוף באנדרואיד`,
     preview: 'משחק המילים האהוב עליך הגיע ל‑Google Play.',
     badge: 'עכשיו ב‑GOOGLE PLAY',
     headline: 'אנחנו באנדרואיד!',
@@ -60,7 +60,7 @@ export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
     unsubscribe: 'ביטול מנוי',
   },
   sv: {
-    subject: (name) => `${name}, LexiClash finns nu på Android! 🎉`,
+    subject: (name) => `${name}, LexiClash finns äntligen på Android`,
     preview: 'Ditt favoritordspel har landat på Google Play.',
     badge: 'NU PÅ GOOGLE PLAY',
     headline: 'Vi finns på Android!',
@@ -72,7 +72,7 @@ export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
     unsubscribe: 'Avsluta prenumeration',
   },
   ja: {
-    subject: (name) => `${name}さん、LexiClashがAndroidに登場！🎉`,
+    subject: (name) => `${name}さん、LexiClashがついにAndroidに来ました`,
     preview: 'お気に入りの単語ゲームがGoogle Playに登場しました。',
     badge: 'GOOGLE PLAYで配信中',
     headline: 'Androidに登場！',
@@ -84,7 +84,7 @@ export const RELEASE_STRINGS: Record<string, ReleaseStrings> = {
     unsubscribe: '配信停止',
   },
   es: {
-    subject: (name) => `${name}, ¡LexiClash ya está en Android! 🎉`,
+    subject: (name) => `${name}, LexiClash por fin está en Android`,
     preview: 'Tu juego de palabras favorito acaba de llegar a Google Play.',
     badge: 'YA EN GOOGLE PLAY',
     headline: '¡Ya estamos en Android!',
