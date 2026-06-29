@@ -6222,7 +6222,10 @@ const sv = {
       "subtitle": "Du har {count} från de senaste dagarna kvar",
       "yesterday": "Gårdagens pussel",
       "daysAgo": "{count} dagar sedan",
-      "watchAd": "Se en kort annons för att spela"
+      "watchAd": "Se en kort annons för att spela",
+      "appTitle": "Missade du några dagar?",
+      "appSubtitle": "Du har {count} ospelade från de senaste dagarna. Spela tidigare dagliga i LexiClash-appen för Android.",
+      "appCta": "Hämta på Google Play"
     },
     "completed": "Klart!",
     "questPlayedSubtitle": "Redan spelat idag",

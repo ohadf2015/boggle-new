@@ -6048,7 +6048,10 @@ const en = {
       "subtitle": "You have {count} from the last few days still open",
       "yesterday": "Yesterday's puzzle",
       "daysAgo": "{count} days ago",
-      "watchAd": "Watch a quick ad to play"
+      "watchAd": "Watch a quick ad to play",
+      "appTitle": "Missed a few days?",
+      "appSubtitle": "You've got {count} unplayed from the last few days. Replay past dailies in the LexiClash Android app.",
+      "appCta": "Get it on Google Play"
     },
     "completed": "Complete!",
     "questPlayedSubtitle": "Already played today",

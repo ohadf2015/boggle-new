@@ -55,6 +55,12 @@ semantics); env override key `NEXT_PUBLIC_ADMOB_REWARDED_CATCHUP[_ANDROID|_IOS]`
 `CatchUpSuggestion` card: small `📺` + `t('daily.catchUp.watchAd')` shown only on
 native, so tapping a missed day isn't a bait-and-switch.
 
+> Update: catch-up replay is now a **native-app exclusive**. `CatchUpSuggestion`
+> only renders the playable missed-day links on the native shell. On web the
+> same card pitches the Android app instead
+> (`daily.catchUp.appTitle/appSubtitle/appCta` → Play Store), so web users are
+> steered to the app rather than replaying past dailies in the browser.
+
 ## i18n
 `daily.catchUp.watchAd` ×5 (en/he/sv/ja/es; he/sv/ja/es native-review pending).
 

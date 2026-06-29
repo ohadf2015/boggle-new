@@ -6,6 +6,8 @@ import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMissedDailies, type DailyMode } from '@/hooks/useMissedDailies';
 import { isNative } from '@/utils/platform';
+import { playStoreUrlWithReferrer } from '@/utils/androidApp';
+import GooglePlayMark from '@/components/android-install/GooglePlayMark';
 
 function daysAgo(date: string, today: string): number {
   const a = new Date(date + 'T00:00:00Z').getTime();
@@ -21,26 +23,68 @@ interface CatchUpSuggestionProps {
 }
 
 /**
- * Post-results nudge: lists the dailies the player missed in the catch-up
- * window (last 3 days) and links each to its past puzzle. Renders nothing when
- * there's nothing to catch up. Self-contained — fetches its own data + locale.
+ * Post-results nudge for the dailies the player missed in the catch-up window
+ * (last 3 days). Renders nothing when there's nothing to catch up.
+ *
+ * Replaying a missed daily is a **native-app exclusive**: on the native shell
+ * we list each missed day as a playable link (gated behind a rewarded ad). On
+ * **web** we deliberately don't offer replay — instead we pitch the Android
+ * app, where catch-up lives. Self-contained — fetches its own data + locale.
  */
 export default function CatchUpSuggestion({ excludeDate, mode }: CatchUpSuggestionProps) {
   const { t, language } = useLanguage();
   const { missed } = useMissedDailies(mode || 'word-hunt');
   const today = new Date().toISOString().split('T')[0];
 
-  // Native gates catch-up play behind a rewarded ad — flag it here so tapping a
-  // missed day isn't a bait-and-switch. Resolved post-mount to avoid an SSR
-  // hydration mismatch (isNative() is false on the server).
-  const [showAdHint, setShowAdHint] = useState(false);
+  // Platform decides which surface we render (links vs app pitch). Resolved
+  // post-mount because isNative() is false during SSR — holding render until
+  // we know avoids web flashing the native links and native flashing the web
+  // pitch (Class 1: render the pessimistic state until the source resolves).
+  const [mounted, setMounted] = useState(false);
+  const [native, setNative] = useState(false);
   useEffect(() => {
-    setShowAdHint(isNative());
+    setNative(isNative());
+    setMounted(true);
   }, []);
 
   const items = missed.filter(m => m.date !== excludeDate);
   if (items.length === 0) return null;
+  if (!mounted) return null;
 
+  // Web: no replay here. Advertise the native app, where catch-up lives.
+  if (!native) {
+    return (
+      <m.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.24, type: 'spring', stiffness: 300, damping: 26 }}
+        className="rounded-neo border-neo-thick border-neo-black bg-neo-cyan-muted p-4 shadow-hard"
+      >
+        <div className="mb-1 flex items-center gap-2">
+          <span aria-hidden className="text-xl">🗓️</span>
+          <h3 className="font-neo-display text-lg text-neo-black">{t('daily.catchUp.appTitle')}</h3>
+        </div>
+        <p dir="auto" className="mb-3 font-neo-body text-sm text-neo-black/80">
+          {t('daily.catchUp.appSubtitle', { count: items.length })}
+        </p>
+        <a
+          href={playStoreUrlWithReferrer('daily_catchup', language)}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${t('daily.catchUp.appCta')} — Google Play`}
+          className="group inline-flex w-full items-center justify-center gap-3 rounded-neo border-neo border-neo-black bg-neo-black px-6 py-3 text-neo-white shadow-hard-sm transition-transform hover:-translate-y-px active:translate-y-px"
+        >
+          <GooglePlayMark size={24} />
+          <span className="font-neo-display text-base font-black tracking-tight">
+            {t('daily.catchUp.appCta')}
+          </span>
+        </a>
+      </m.div>
+    );
+  }
+
+  // Native: list each missed day as a playable link (start is gated behind a
+  // rewarded ad, hinted below so tapping isn't a bait-and-switch).
   return (
     <m.div
       initial={{ opacity: 0, y: 8 }}
@@ -55,12 +99,10 @@ export default function CatchUpSuggestion({ excludeDate, mode }: CatchUpSuggesti
       <p className="mb-3 font-neo-body text-sm text-neo-black/80">
         {t('daily.catchUp.subtitle', { count: items.length })}
       </p>
-      {showAdHint && (
-        <p className="mb-3 flex items-center gap-1.5 font-neo-body text-xs font-semibold text-neo-black/70">
-          <span aria-hidden>📺</span>
-          {t('daily.catchUp.watchAd')}
-        </p>
-      )}
+      <p className="mb-3 flex items-center gap-1.5 font-neo-body text-xs font-semibold text-neo-black/70">
+        <span aria-hidden>📺</span>
+        {t('daily.catchUp.watchAd')}
+      </p>
       <div className="flex flex-col gap-2">
         {items.map(item => {
           const n = daysAgo(item.date, today);

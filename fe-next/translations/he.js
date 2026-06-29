@@ -6125,7 +6125,10 @@ const he = {
       "subtitle": "יש לכם {count} מהימים האחרונים שעדיין פתוחים",
       "yesterday": "החידה של אתמול",
       "daysAgo": "לפני {count} ימים",
-      "watchAd": "צפו בפרסומת קצרה כדי לשחק"
+      "watchAd": "צפו בפרסומת קצרה כדי לשחק",
+      "appTitle": "פספסתם כמה ימים?",
+      "appSubtitle": "יש לכם {count} מהימים האחרונים שעדיין לא שיחקתם. שחקו חידות עבר באפליקציית LexiClash לאנדרואיד.",
+      "appCta": "הורידו מ-Google Play"
     },
     "completed": "הושלם!",
     "questPlayedSubtitle": "כבר שיחקתם היום",

@@ -6152,7 +6152,10 @@ const ja = {
       "subtitle": "直近の未完了が{count}件あります",
       "yesterday": "昨日のパズル",
       "daysAgo": "{count}日前",
-      "watchAd": "短い広告を見てプレイ"
+      "watchAd": "短い広告を見てプレイ",
+      "appTitle": "数日逃しちゃった？",
+      "appSubtitle": "直近で未プレイが{count}件。過去のデイリーはLexiClashのAndroidアプリで遊べます。",
+      "appCta": "Google Playで入手"
     },
     "completed": "完了！",
     "questPlayedSubtitle": "今日はプレイ済み",

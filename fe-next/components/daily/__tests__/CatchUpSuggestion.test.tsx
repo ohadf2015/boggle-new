@@ -17,8 +17,15 @@ vi.mock('@/hooks/useMissedDailies', () => ({
   })),
 }));
 
+// Platform is toggled per-test: web (false) pitches the app, native (true)
+// renders the playable replay links.
 vi.mock('@/utils/platform', () => ({
-  isNative: () => false,
+  isNative: vi.fn(() => false),
+}));
+
+// Keep the Play Store URL deterministic so we can assert the CTA target.
+vi.mock('@/utils/androidApp', () => ({
+  playStoreUrlWithReferrer: vi.fn((campaign: string) => `https://play.example/?c=${campaign}`),
 }));
 
 // Need to mock framer-motion to avoid animation issues in tests
@@ -29,11 +36,13 @@ vi.mock('framer-motion', () => ({
 }));
 
 import { useMissedDailies } from '@/hooks/useMissedDailies';
+import { isNative } from '@/utils/platform';
+import { playStoreUrlWithReferrer } from '@/utils/androidApp';
 
 describe('CatchUpSuggestion', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // Reset mock to default return value
+    // Reset mocks to default return values
     (useMissedDailies as ReturnType<typeof vi.fn>).mockReturnValue({
       missed: [
         { date: '2025-01-19', puzzleNumber: 21 },
@@ -41,20 +50,83 @@ describe('CatchUpSuggestion', () => {
       ],
       loading: false,
     });
+    (isNative as ReturnType<typeof vi.fn>).mockReturnValue(false);
+    (playStoreUrlWithReferrer as ReturnType<typeof vi.fn>).mockImplementation(
+      (campaign: string) => `https://play.example/?c=${campaign}`,
+    );
   });
 
-  it('renders word-hunt links by default', () => {
-    render(<CatchUpSuggestion />);
-    const links = screen.getAllByRole('link');
-    expect(links[0]).toHaveAttribute('href', '/en/daily/word-hunt?date=2025-01-19');
-    expect(links[1]).toHaveAttribute('href', '/en/daily/word-hunt?date=2025-01-18');
+  describe('on web', () => {
+    it('does NOT render playable replay links for missed dailies', () => {
+      render(<CatchUpSuggestion />);
+      const links = screen.queryAllByRole('link');
+      // No link should point at a replayable daily puzzle.
+      expect(links.every(l => !l.getAttribute('href')?.includes('/daily/'))).toBe(true);
+    });
+
+    it('pitches the Android app with a Play Store CTA', () => {
+      render(<CatchUpSuggestion />);
+      const cta = screen.getByRole('link');
+      expect(cta).toHaveAttribute('href', 'https://play.example/?c=daily_catchup');
+    });
+
+    it('shows the app-pitch subtitle with the missed count', () => {
+      render(<CatchUpSuggestion />);
+      expect(screen.getByText('daily.catchUp.appSubtitle')).toBeInTheDocument();
+    });
+
+    it('renders nothing when no missed dailies', () => {
+      (useMissedDailies as ReturnType<typeof vi.fn>).mockReturnValue({ missed: [], loading: false });
+      const { container } = render(<CatchUpSuggestion />);
+      expect(container.innerHTML).toBe('');
+    });
+
+    it('renders nothing when all missed dailies are excluded', () => {
+      (useMissedDailies as ReturnType<typeof vi.fn>).mockReturnValue({
+        missed: [{ date: '2025-01-19', puzzleNumber: 21 }],
+        loading: false,
+      });
+      const { container } = render(<CatchUpSuggestion excludeDate="2025-01-19" />);
+      expect(container.innerHTML).toBe('');
+    });
   });
 
-  it('renders word-wheel links when mode is word-wheel', () => {
-    render(<CatchUpSuggestion mode="word-wheel" />);
-    const links = screen.getAllByRole('link');
-    expect(links[0]).toHaveAttribute('href', '/en/daily/word-wheel?date=2025-01-19');
-    expect(links[1]).toHaveAttribute('href', '/en/daily/word-wheel?date=2025-01-18');
+  describe('on native', () => {
+    beforeEach(() => {
+      (isNative as ReturnType<typeof vi.fn>).mockReturnValue(true);
+    });
+
+    it('renders word-hunt replay links by default', () => {
+      render(<CatchUpSuggestion />);
+      const links = screen.getAllByRole('link');
+      expect(links[0]).toHaveAttribute('href', '/en/daily/word-hunt?date=2025-01-19');
+      expect(links[1]).toHaveAttribute('href', '/en/daily/word-hunt?date=2025-01-18');
+    });
+
+    it('renders word-wheel replay links when mode is word-wheel', () => {
+      render(<CatchUpSuggestion mode="word-wheel" />);
+      const links = screen.getAllByRole('link');
+      expect(links[0]).toHaveAttribute('href', '/en/daily/word-wheel?date=2025-01-19');
+      expect(links[1]).toHaveAttribute('href', '/en/daily/word-wheel?date=2025-01-18');
+    });
+
+    it('shows the watch-ad hint', () => {
+      render(<CatchUpSuggestion />);
+      expect(screen.getByText('daily.catchUp.watchAd')).toBeInTheDocument();
+    });
+
+    it('excludes the specified date', () => {
+      render(<CatchUpSuggestion excludeDate="2025-01-19" />);
+      const links = screen.getAllByRole('link');
+      expect(links).toHaveLength(1);
+      expect(links[0]).toHaveAttribute('href', '/en/daily/word-hunt?date=2025-01-18');
+    });
+
+    it('renders nothing when no missed dailies', () => {
+      (useMissedDailies as ReturnType<typeof vi.fn>).mockReturnValue({ missed: [], loading: false });
+      const { container } = render(<CatchUpSuggestion />);
+      expect(container.innerHTML).toBe('');
+    });
   });
 
   it('passes mode to useMissedDailies hook', () => {
@@ -65,27 +137,5 @@ describe('CatchUpSuggestion', () => {
   it('passes word-hunt mode to useMissedDailies by default', () => {
     render(<CatchUpSuggestion />);
     expect(useMissedDailies).toHaveBeenCalledWith('word-hunt');
-  });
-
-  it('excludes the specified date', () => {
-    render(<CatchUpSuggestion excludeDate="2025-01-19" />);
-    const links = screen.getAllByRole('link');
-    expect(links).toHaveLength(1);
-    expect(links[0]).toHaveAttribute('href', '/en/daily/word-hunt?date=2025-01-18');
-  });
-
-  it('renders nothing when no missed dailies', () => {
-    (useMissedDailies as ReturnType<typeof vi.fn>).mockReturnValue({ missed: [], loading: false });
-    const { container } = render(<CatchUpSuggestion />);
-    expect(container.innerHTML).toBe('');
-  });
-
-  it('renders nothing when all missed dailies are excluded', () => {
-    (useMissedDailies as ReturnType<typeof vi.fn>).mockReturnValue({
-      missed: [{ date: '2025-01-19', puzzleNumber: 21 }],
-      loading: false,
-    });
-    const { container } = render(<CatchUpSuggestion excludeDate="2025-01-19" />);
-    expect(container.innerHTML).toBe('');
   });
 });
