@@ -1,25 +1,26 @@
 {
-  "date": "2026-06-28",
-  "note": "Thirty-second snapshot. 24h window: sub-floor (0 routes n≥50). 7d vitals: /he only route n≥50 (LCP 3120ms — slight uptick from 2702ms +15%, below 20% regression threshold; INP 256ms improving from 304ms; CLS 0.084 improving from 0.088, now below 0.1 threshold). /es/multiplayer and /en/multiplayer both dropped below n≥50 in 7d window — insufficient data. BACKEND MIGRATIONS WRITTEN (pending MCP apply): (1) quest_achievement_feed RLS initplan fix (auth.role()→(select auth.role())); (2) word_clubs FK index on owner_id. Supabase MCP absent 3rd consecutive night — migrations in fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql.",
+  "date": "2026-06-29",
+  "note": "7d window (24h sub-floor: 0 routes n≥50). Only /he route qualifies (n=93). LCP 3013ms improving from 3120ms; INP 280ms slight increase from 256ms (within noise); CLS 0.087 stable. Backend: migration WRITTEN 20260629020000_rls_initplan_fix_and_word_clubs_fk_index.sql — RLS initplan fix (auth.role()→(select auth.role())) + word_clubs FK index. Supabase MCP absent 4th consecutive night. Brief routes /sv/daily (4832ms) and /en/daily/word-wheel (4476ms) INELIGIBLE — both n<50 in 7d data. Homepage /he well-optimized: priority image + preload link, no above-fold dynamic imports.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (3rd consecutive night). Migration file written for gate/human apply: 20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
+    "note": "Supabase MCP absent (4th consecutive night). Migration written for gate/human apply. ESCALATION: mint never-expire PAT in nightly env (see learnings doc).",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_written_this_run": [
       {
-        "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
+        "file": "fe-next/supabase/migrations/20260629020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
         "items": [
           {
             "id": "auth_rls_initplan_quest_achievement_feed",
             "fix": "DROP + recreate policy with (select auth.role()) = 'authenticated' to prevent per-row evaluation",
-            "status": "WRITTEN — needs MCP apply or npx supabase db push"
+            "status": "WRITTEN — needs MCP apply or npx supabase db push",
+            "carry_count": 1
           },
           {
             "id": "unindexed_fk_word_clubs_owner_id",
             "fix": "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)",
             "status": "WRITTEN — needs MCP apply or npx supabase db push",
-            "carry_count": 3
+            "carry_count": 4
           }
         ]
       }
@@ -29,23 +30,35 @@
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 4
+        "carry_count": 5
       }
     ]
   },
   "frontend": {
-    "note": "24h sub-floor. 7d: /he only route n≥50. /es + /en multiplayer dropped below floor — no regression verdict possible.",
+    "note": "24h sub-floor. 7d: /he only route n≥50. Brief routes /sv/daily + /en/daily/word-wheel n<50 — ineligible per mandatory sample gate.",
     "by_route": [
       {
         "route": "/he",
-        "p75_lcp_ms": 3120,
-        "p75_inp_ms": 256,
-        "p75_cls": 0.084,
+        "p75_lcp_ms": 3013,
+        "p75_inp_ms": 280,
+        "p75_cls": 0.087,
         "n_7d": 93,
         "window": "7d",
-        "lcp_status": "STABLE — 3120ms (+15% from 2702ms baseline 06-27, below 20% regression threshold). Trend: 3297→3112→2927→2702→3120ms (noisy, structural).",
-        "inp_status": "IMPROVING — 256ms (was 304ms). Still above 200ms threshold.",
-        "cls_status": "OK — 0.084 (<0.1 threshold, improving from 0.088)."
+        "lcp_status": "IMPROVING — 3013ms (was 3120ms, -3.4%). Trend: 3297→3112→2927→2702→3120→3013ms.",
+        "inp_status": "WATCH — 280ms (was 256ms, +9.4%). Above 200ms threshold; below 20% regression trigger. framer-motion LandingChallengeCards likely source; homepage otherwise well-optimized.",
+        "cls_status": "OK — 0.087 (<0.1 threshold, stable from 0.084)."
+      },
+      {
+        "route": "/sv/daily",
+        "p75_lcp_ms": null,
+        "n_7d": "<50",
+        "lcp_status": "DEFERRED — sub-floor (n<50 in 7d data). Brief showed 4832ms (stale, low-confidence). No regression verdict possible."
+      },
+      {
+        "route": "/en/daily/word-wheel",
+        "p75_lcp_ms": null,
+        "n_7d": "<50",
+        "lcp_status": "DEFERRED — sub-floor (n<50 in 7d data). Brief showed 4476ms (stale, low-confidence). No regression verdict possible."
       },
       {
         "route": "/es/multiplayer",
@@ -73,25 +86,31 @@
   },
   "bundle": {
     "total_static_kb": null,
-    "note": "No build in memory (.next/static/chunks not present in dev environment this run). Last known total: 38912KB pre-serverExternalPackages fix (06-27). After next build the @arvidbt/swedish-words 6.4MB chunk should be gone.",
+    "note": "No .next build artifacts in working tree. Gate runs authoritative build. Last known pre-serverExternalPackages fix: 38912KB. @arvidbt/swedish-words 6.4MB chunk removed after that fix.",
     "top_chunks": []
   },
   "open_watches": [
     {
+      "id": "supabase_mcp_absent_4_nights",
+      "description": "Supabase MCP absent 4 consecutive nights. Migrations accumulate unverified. Action: mint never-expire PAT into nightly env.",
+      "status": "ESCALATED — human action required",
+      "priority": "HIGH"
+    },
+    {
       "id": "mp_lcp_ssr_false",
-      "description": "/es/multiplayer + /en/multiplayer structural LCP/CLS from ssr:false dynamic imports. Needs Chrome profiler trace.",
+      "description": "/es/multiplayer + /en/multiplayer structural LCP from ssr:false dynamic imports. Needs Chrome profiler trace.",
       "status": "open — insufficient n this run",
       "prior_lcp_ms": { "/es/multiplayer": 7291, "/en/multiplayer": 4380 }
     },
     {
-      "id": "he_lcp_trend",
-      "description": "/he LCP noisy 2702→3120ms — likely device/network variance, not regression. Monitor.",
+      "id": "he_inp_280ms",
+      "description": "/he INP 280ms (>200ms threshold, +9.4% from 256ms). framer-motion LandingChallengeCards likely source. Below 20% regression trigger.",
       "status": "watch"
     },
     {
       "id": "migration_pending_apply",
-      "description": "20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql written — needs Supabase MCP or npx supabase db push to apply to prod.",
-      "status": "open — 3rd night without MCP"
+      "description": "20260629020000_rls_initplan_fix_and_word_clubs_fk_index.sql written — needs Supabase MCP or npx supabase db push to apply to prod.",
+      "status": "open — 4th night without MCP"
     }
   ]
 }
