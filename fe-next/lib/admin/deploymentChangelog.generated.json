@@ -1,6 +1,13 @@
 {
-  "generatedAt": "2026-06-29T07:19:18.209Z",
+  "generatedAt": "2026-06-29T07:31:14.551Z",
   "commits": [
+    {
+      "sha": "50bf75ab86c7ce0e9e5578506f70673ad3f20ad6",
+      "shortSha": "50bf75a",
+      "subject": "feat(nightly): recover dropped 2026-06-29 lane code + fix stale cosmetics gate",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T10:26:29+03:00"
+    },
     {
       "sha": "26aa7078ac81c4473013b4bef299864993ecbed3",
       "shortSha": "26aa707",
@@ -133,13 +140,6 @@
       "subject": "fix(adventure): streak quest now credits the streak length reached",
       "author": "Claude",
       "date": "2026-06-27T22:37:57Z"
-    },
-    {
-      "sha": "c96d2d508f46bf7e7d358bf34ee823de820fd51d",
-      "shortSha": "c96d2d5",
-      "subject": "Merge pull request #652 from ohadf2015/claude/connections-page-analytics-c5rscy",
-      "author": "ohadf2015",
-      "date": "2026-06-28T01:36:03+03:00"
     }
   ]
 }

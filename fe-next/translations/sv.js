@@ -290,6 +290,7 @@ const sv = {
       "not-your-turn": "Vänta på din tur."
     },
     "solo": {
+      "category": { "hit": "✨ +2× {category}!" },
       "howTo": {
         "title": "Så spelar du",
         "cta": "Uppfattat!",
@@ -509,7 +510,7 @@ const sv = {
     "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
     "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
     "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
-    "share": { "button": "Dela", "text": "Jag nådde {m} m i Ordtorn — slå mitt torn!" },
+    "share": { "title": "Ordtorn", "button": "Dela", "text": "Jag nådde {m} m i Ordtorn — slå mitt torn!" },
     "versus": { "title": "Tornrace", "bomb": "Bomba {name}", "waiting": "Väntar på motståndare…", "incoming": "Inkommande bomb!", "won": "Du vann!", "lost": "{name} vann" },
     "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}", "goldenTile": "Gyllene bokstav {letter}" },
     "skin": {
@@ -2800,6 +2801,7 @@ const sv = {
     "newMessages": "Nya meddelanden"
   },
   "results": {
+    "mpGapNudge": "Bara {gap} poäng efter — ta nästa runda!",
     "rivals": {
       "aria": "Du mot dina rivaler",
       "header": "Målfoto",

@@ -32,6 +32,7 @@ import {
   type SpState,
 } from '@/lib/shiritori/sp/spEngine';
 import { botPoolForDifficulty } from '@/lib/shiritori/sp/botDict';
+import { checkCategoryBonus } from '@/lib/shiritori/sp/categoryBonus';
 import { useShiritoriGhostMultiplier } from '@/lib/shiritori/sp/useShiritoriGhostMultiplier';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
@@ -190,10 +191,17 @@ export default function ShiritoriSoloPage() {
     setState(r.state);
     setInput('');
     if (r.state.phase === 'playing') {
-      const pts = word.length * multiplier;
+      const catBonus = checkCategoryBonus(word, today);
+      const pts = word.length * multiplier * catBonus.bonusMultiplier;
       setScore((s) => s + pts);
       const rect = inputRef.current?.getBoundingClientRect();
-      if (isGhostTurn) {
+      if (catBonus.hit && catBonus.category) {
+        toast(t('shiritori.solo.category.hit', { category: t(`shiritori.solo.category.${catBonus.category}`) }), {
+          icon: '✨',
+          style: { background: 'var(--popover)', color: 'var(--popover-foreground)' },
+        });
+        if (rect) SharedFxApp.spawnBurst('sparkle-gold', rect.left + rect.width / 2, rect.top + rect.height / 2, { count: 20 });
+      } else if (isGhostTurn) {
         toast(t('shiritori.solo.ghost.reveal'), {
           icon: '👻',
           style: { background: 'var(--popover)', color: 'var(--popover-foreground)' },

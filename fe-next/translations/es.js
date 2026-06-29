@@ -132,6 +132,7 @@ const es = {
       "not-your-turn": "Espera tu turno."
     },
     "solo": {
+      "category": { "hit": "✨ +2× {category}!" },
       "title": "Shiritori en solitario",
       "tagline": "Encadena palabras en hiragana contra el bot.",
       "back": "Volver a Shiritori",
@@ -338,7 +339,7 @@ const es = {
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
-    "share": { "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
+    "share": { "title": "Torre de Palabras", "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
     "versus": { "title": "Carrera de Torres", "bomb": "Bombardear a {name}", "waiting": "Esperando rivales…", "incoming": "¡Bomba entrante!", "won": "¡Ganaste!", "lost": "Ganó {name}" },
     "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}", "goldenTile": "Letra dorada {letter}" },
     "skin": {
@@ -2502,6 +2503,7 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
+    "mpGapNudge": "¡Solo {gap} pts detrás — conquista la próxima ronda!",
     "rivals": {
       "aria": "Tú contra tus rivales",
       "header": "Final de foto",
