@@ -41,6 +41,8 @@ export interface WordScoreResult {
   runeEffects: RuneEffect[];
   /** Final score after all multipliers */
   totalScore: number;
+  /** Heat decay multiplier applied (0.4–1.0). Absent when no decay mechanic active. */
+  heatMultiplier?: number;
 }
 
 /** A single rune's contribution to a word's score */
@@ -121,6 +123,8 @@ export interface WordForgeRunState {
   bannedLetters: Set<string>;
   /** Random seed for deterministic boss selection per run */
   runSeed: number;
+  /** Timestamp (ms) when the last word was submitted or the round started — drives the heat-decay bar. */
+  chainStartedAt: number;
 }
 
 export interface RoundResult {

@@ -460,11 +460,16 @@ export function impactRing(parent: Container, x: number, y: number, baseRadius: 
   const tick = () => {
     // `ring.destroyed` alone is order-dependent: a parent.destroy({children:true})
     // during the rAF window can null the ring's context while its destroyed flag
-    // still lags. Bail on either to avoid ".clear() on null" (Sentry 1CW).
+    // still lags. Bail on either; catch the residual gap where context is nulled
+    // before the flag propagates (Sentry 1CW / 1KM).
     if (ring.destroyed || parent.destroyed) return;
     const k = Math.min(1, (performance.now() - t0) / dur);
     const r = from + (to - from) * easeOutCubic(k);
-    ring.clear().circle(0, 0, r).stroke({ color, width: Math.max(2, 4 * (1 - k)), alpha: 0.7 * (1 - k) });
+    try {
+      ring.clear().circle(0, 0, r).stroke({ color, width: Math.max(2, 4 * (1 - k)), alpha: 0.7 * (1 - k) });
+    } catch {
+      return; // PixiJS context nulled in destroy gap before destroyed flag propagates
+    }
     if (k < 1) requestAnimationFrame(tick);
     else { try { ring.destroy(); } catch { /* */ } }
   };

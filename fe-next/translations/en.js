@@ -329,6 +329,8 @@ const en = {
       "steps": ["🏗️ Tap the button to drop the word block onto the tower", "🎯 Land it centered — sloppy drops make the tower lean", "🔤 Every valid word stacks a new floor. Build as high as you can!"]
     },
     "loading": "Loading dictionary…",
+    "loadError": "Couldn't load the dictionary — tap to retry",
+    "retry": "Try Again",
     "biome": { "city": "Ground", "sky": "Sky", "stratosphere": "Stratosphere", "orbit": "Orbit", "nebula": "Nebula", "galaxy": "Galaxy" },
     "tier": { "apprentice": "Apprentice", "journeyman": "Journeyman", "master": "Master Architect" },
     "hud": { "floors": "{n} floors", "combo": "{n} chain", "scramble": "Scramble", "backspace": "Delete", "build": "Build", "restart": "Restart", "restartConfirm": "Sure?", "best": "Best {m} m", "possible": "{n} words", "clue": "Clue", "collapse": "Collapse", "expand": "Expand", "rivalPassed": "Passed {name}!", "stuck": "Stuck? New letter", "backToTop": "Top", "pickLetters": "Pick letters", "dragToBuild": "Drag or tap to spell", "chaseGap": "+{m} m", "chaseAria": "Next rival above: {name}, {m} metres to pass" },

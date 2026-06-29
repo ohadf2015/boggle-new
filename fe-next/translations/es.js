@@ -313,6 +313,8 @@ const es = {
       "steps": ["🏗️ Toca el botón para soltar el bloque de palabra sobre la torre", "🎯 Aterriza centrado: las caídas descuidadas inclinan la torre", "🔤 Cada palabra válida apila un piso. ¡Construye lo más alto posible!"]
     },
     "loading": "Cargando diccionario…",
+    "loadError": "No se pudo cargar el diccionario — toca para reintentar",
+    "retry": "Intentar de nuevo",
     "biome": { "city": "Suelo", "sky": "Cielo", "stratosphere": "Estratosfera", "orbit": "Órbita", "nebula": "Nebulosa", "galaxy": "Galaxia" },
     "hud": { "floors": "{n} pisos", "combo": "cadena {n}", "scramble": "Mezclar", "backspace": "Borrar", "build": "Construir", "restart": "Reiniciar", "restartConfirm": "¿Seguro?", "best": "Mejor {m} m", "possible": "{n} palabras", "clue": "Pista", "collapse": "Contraer", "expand": "Expandir", "rivalPassed": "¡Superaste a {name}!", "stuck": "¿Atascado? Nueva letra", "backToTop": "Arriba", "pickLetters": "Elige letras", "dragToBuild": "Arrastra o toca para formar", "chaseGap": "+{m} m", "chaseAria": "Próximo rival arriba: {name}, faltan {m} metros para superarlo" },
     "minimap": { "label": "Mapa de la torre — {m} m, toca para subir" },

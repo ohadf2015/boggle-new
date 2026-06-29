@@ -326,6 +326,8 @@ const ja = {
     "cardTitle": "ワードタワー",
     "cardDesc": "言葉を積んで空へ — 管理者プレビュー",
     "loading": "辞書を読み込み中…",
+    "loadError": "辞書を読み込めませんでした — タップして再試行",
+    "retry": "もう一度",
     "biome": { "city": "地上", "sky": "空", "stratosphere": "成層圏", "orbit": "軌道", "nebula": "星雲", "galaxy": "銀河" },
     "tier": { "apprentice": "見習い", "journeyman": "職人", "master": "マスター建築家" },
     "hud": { "floors": "{n} 階", "combo": "{n} 連鎖", "scramble": "シャッフル", "backspace": "削除", "build": "建てる", "restart": "やり直す", "restartConfirm": "本当に？", "best": "ベスト {m} m", "possible": "{n} 単語", "clue": "ヒント", "collapse": "閉じる", "expand": "開く", "rivalPassed": "{name} を抜いた！", "stuck": "詰まった？新しい文字", "backToTop": "上へ", "pickLetters": "文字を選ぶ", "dragToBuild": "なぞるかタップして綴る", "chaseGap": "+{m} m", "chaseAria": "次のライバル: {name}、抜くまであと {m} m" },

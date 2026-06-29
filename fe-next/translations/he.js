@@ -341,6 +341,8 @@ const he = {
     "cardTitle": "מגדל מילים",
     "cardDesc": "בנו מגדל מילים עד השמיים — תצוגת אדמין",
     "loading": "טוען מילון…",
+    "loadError": "לא ניתן לטעון את המילון — הקש לנסות שוב",
+    "retry": "נסה שוב",
     "biome": { "city": "קרקע", "sky": "שמיים", "stratosphere": "סטרטוספירה", "orbit": "מסלול", "nebula": "ערפילית", "galaxy": "גלקסיה" },
     "tier": { "apprentice": "מתחיל", "journeyman": "מיומן", "master": "אדריכל מאסטר" },
     "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "restartConfirm": "בטוח?", "best": "שיא {m} מ'", "possible": "{n} מילים", "clue": "רמז", "collapse": "כיווץ", "expand": "הרחבה", "rivalPassed": "עברת את {name}!", "stuck": "תקוע? אות חדשה", "backToTop": "למעלה", "pickLetters": "בחרו אותיות", "dragToBuild": "גררו או הקישו לאיות", "chaseGap": "+{m} מ'", "chaseAria": "המתחרה הבא מעליך: {name}, עוד {m} מטר לעקיפה" },

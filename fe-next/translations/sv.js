@@ -484,6 +484,8 @@ const sv = {
     "cardTitle": "Ordtorn",
     "cardDesc": "Stapla ord mot skyn — adminförhandsvisning",
     "loading": "Laddar ordlista…",
+    "loadError": "Det gick inte att ladda ordlistan — tryck för att försöka igen",
+    "retry": "Försök igen",
     "biome": { "city": "Mark", "sky": "Himmel", "stratosphere": "Stratosfär", "orbit": "Omloppsbana", "nebula": "Nebulosa", "galaxy": "Galax" },
     "tier": { "apprentice": "Lärling", "journeyman": "Gesäll", "master": "Mästararkitekt" },
     "hud": { "floors": "{n} våningar", "combo": "{n} kedja", "scramble": "Blanda", "backspace": "Radera", "build": "Bygg", "restart": "Börja om", "restartConfirm": "Säker?", "best": "Bästa {m} m", "possible": "{n} ord", "clue": "Ledtråd", "collapse": "Fäll ihop", "expand": "Expandera", "rivalPassed": "Förbi {name}!", "stuck": "Fast? Ny bokstav", "backToTop": "Toppen", "pickLetters": "Välj bokstäver", "dragToBuild": "Dra eller tryck för att stava", "chaseGap": "+{m} m", "chaseAria": "Nästa rival ovanför: {name}, {m} meter kvar att passera" },

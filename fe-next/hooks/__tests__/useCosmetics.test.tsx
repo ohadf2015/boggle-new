@@ -24,10 +24,11 @@ describe('useCosmetics', () => {
     const { result } = renderHook(() =>
       useCosmetics({ rankTier: 'Gold', streakDays: 0, coins: 0 })
     );
-    // Gold unlocks: defaults + Bronze + Silver + Gold rank items
+    // Gold unlocks: defaults + bronze + silver + gold rank items.
+    // Tier ids are lowercase (LEADERBOARD_TIER_IDS); rankAtLeast lowercases both sides.
     const goldRankItems = COSMETICS.filter(
       (c) => c.unlockCondition.type === 'rank' &&
-        ['Bronze', 'Silver', 'Gold'].includes(c.unlockCondition.tier)
+        ['bronze', 'silver', 'gold'].includes(c.unlockCondition.tier)
     );
     const defaults = COSMETICS.filter((c) => c.unlockCondition.type === 'default');
     expect(result.current.unlockedCosmetics.length).toBe(defaults.length + goldRankItems.length);

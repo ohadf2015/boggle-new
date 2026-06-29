@@ -54,6 +54,7 @@ function createInitialState(): WordForgeRunState {
     skipBonus: 0,
     bannedLetters: new Set(),
     runSeed: 0,
+    chainStartedAt: 0,
   };
 }
 
@@ -234,6 +235,7 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
     newState.runSeed = Math.floor(Math.random() * 100000);
     roundStartTimeRef.current = Date.now();
     lastWordTimeRef.current = Date.now();
+    newState.chainStartedAt = Date.now();
     setState(newState);
     setLastWordScore(null);
     startTimer();
@@ -242,6 +244,7 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
   // ─── Start Round (after pick or boss reveal) ──────────
 
   const startRound = useCallback(() => {
+    const roundNow = Date.now();
     setState(prev => {
       const constraintId = prev.bossConstraint?.def.id ?? null;
       const gridSize = getConstraintGridSize(constraintId);
@@ -274,6 +277,7 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
         gridSize: finalGridSize,
         timerDuration: withTimeWarp,
         timeRemaining: withTimeWarp,
+        chainStartedAt: roundNow,
       };
     });
     comboRef.current = 0;
@@ -344,9 +348,12 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
       };
 
       const result = scoreWord(prev.runes, context);
-      setLastWordScore(result);
+      // Heat decay: score decays 8%/sec since last word, floor at 40%
+      const heatMult = Math.max(0.4, 1 - 0.08 * wordFindTime);
+      const heatScore = Math.round(result.totalScore * heatMult);
+      setLastWordScore({ ...result, totalScore: heatScore, heatMultiplier: heatMult });
 
-      const newRoundScore = prev.roundScore + result.totalScore;
+      const newRoundScore = prev.roundScore + heatScore;
       const newBestWord = (!prev.bestWord || result.totalScore > prev.bestWord.score)
         ? { word: result.word, score: result.totalScore }
         : prev.bestWord;
@@ -366,12 +373,13 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
       const updated = {
         ...prev,
         roundScore: newRoundScore,
-        totalScore: prev.totalScore + result.totalScore,
+        totalScore: prev.totalScore + heatScore,
         wordsThisRound: [...prev.wordsThisRound, word.toUpperCase()],
         allWords: [...prev.allWords, word.toUpperCase()],
         bestWord: newBestWord,
         timeRemaining: newTimeRemaining,
         bannedLetters: newBannedLetters,
+        chainStartedAt: now,
       };
 
       // HIGH-8: Early complete when target is hit

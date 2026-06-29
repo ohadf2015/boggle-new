@@ -1,17 +1,17 @@
 {
   "summary": {
-    "totalKeysInCode": 5885,
+    "totalKeysInCode": 5919,
     "keyCountByLanguage": {
-      "en": 11275,
-      "he": 11403,
-      "sv": 11382,
-      "ja": 11383,
-      "es": 11411
+      "en": 11358,
+      "he": 11486,
+      "sv": 11465,
+      "ja": 11466,
+      "es": 11494
     },
-    "missingFromEnglish": 5,
+    "missingFromEnglish": 10,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 26,
+      "templateLiterals": 25,
       "fallbackUsages": 0,
       "variableKeys": 22
     }
@@ -170,13 +170,6 @@
         "file": "components/wordTower/WordTowerRewardReveal.tsx",
         "line": 50,
         "context": "{t(`wordTower.reward.tier.${meta.key}`)}",
-        "type": "template_literal"
-      },
-      {
-        "pattern": "dailyMissions.${mission.type}",
-        "file": "hooks/useDailyMissions.ts",
-        "line": 226,
-        "context": "questName: t(`dailyMissions.${mission.type}`),",
         "type": "template_literal"
       },
       {
@@ -431,6 +424,59 @@
         {
           "file": "components/adventure/boss/WeaknessBadge.tsx",
           "line": 51
+        }
+      ]
+    },
+    {
+      "key": "report.detailsOptional",
+      "usages": [
+        {
+          "file": "components/moderation/ReportDialog.tsx",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "key": "report.reason",
+      "usages": [
+        {
+          "file": "components/moderation/ReportDialog.tsx",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "key": "report.submit",
+      "usages": [
+        {
+          "file": "components/moderation/ReportDialog.tsx",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "key": "report.success",
+      "usages": [
+        {
+          "file": "components/RoomChat.tsx",
+          "line": 99
+        },
+        {
+          "file": "components/friends/FriendsList.tsx",
+          "line": 844
+        }
+      ]
+    },
+    {
+      "key": "report.title",
+      "usages": [
+        {
+          "file": "components/RoomChat.tsx",
+          "line": 450
+        },
+        {
+          "file": "components/friends/messaging/MessageThread.tsx",
+          "line": 365
         }
       ]
     }
