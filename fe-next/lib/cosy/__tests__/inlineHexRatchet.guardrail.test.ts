@@ -34,7 +34,12 @@ const ROOTS = ['components', 'app'];
 // dynamic `color: modeColor`, so the block can't be a Tailwind utility. Raised 172→174.
 // 2026-06-23: +1 SEO/player-style feature (style accent inline alongside dynamic color).
 // Raised 174→175.
-const BASELINE = 175;
+// 2026-06-29: +1 net from the profile redesign (c7e95681) — the new profile
+// surfaces (LevelRing, PersonalRecords, ProfileAchievements, PageClient, …) ship
+// dark-only inline-hex companions to runtime-dynamic tier colours/glows that can't
+// be Tailwind utilities. Net of the old profile components removed, the count rose
+// 175→176. Raised per the protocol above; ratchet stays armed at the new floor.
+const BASELINE = 176;
 
 // inline `style={{ ... #abc ... }}` containing a hex colour literal.
 const INLINE_STYLE_HEX = /style=\{\{[^}]*#[0-9a-fA-F]{3,6}\b[^}]*\}\}/g;
