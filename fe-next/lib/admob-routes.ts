@@ -26,7 +26,7 @@ const GAME_ROUTES = [
   '/admin',
 ];
 
-const LOCALE_PREFIX = /^\/(en|he|sv|ja|es)/;
+const LOCALE_PREFIX = /^\/(en|he|sv|ja|es|ru)/;
 
 /**
  * Whether the AdMob anchored banner may show on this route.

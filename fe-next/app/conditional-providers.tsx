@@ -61,7 +61,7 @@ export function needsGameProviders(pathname: string | null): boolean {
   if (!pathname) return false;
 
   // Remove locale prefix (e.g., /en/multiplayer -> /multiplayer)
-  const path = pathname.replace(/^\/(en|he|sv|ja|es)/, '');
+  const path = pathname.replace(/^\/(en|he|sv|ja|es|ru)/, '');
 
   return GAME_ROUTES.some(route => path.startsWith(route));
 }
