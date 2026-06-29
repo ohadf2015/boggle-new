@@ -22,6 +22,10 @@ vi.mock('@/lib/playerStyle/playerStyleStorage', () => ({
   hasPlayerStyleModalBeenShown: () => hasPlayerStyleModalBeenShown(),
   markPlayerStyleModalShown: () => markPlayerStyleModalShown(),
 }));
+// FTUE gate: the popup only surfaces to players who have played ≥1 game.
+vi.mock('@/hooks/useUserStats', () => ({
+  useUserStats: () => ({ userStats: { totalGamesPlayed: 1 }, isLoading: false }),
+}));
 vi.mock('next/dynamic', () => ({
   default: () => {
     const Stub = () => <div data-testid="style-popup" />;
