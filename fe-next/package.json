@@ -15,7 +15,7 @@
     "build:fast": "NODE_OPTIONS=--max-old-space-size=6144 next build --webpack",
     "build:turbopack": "NODE_OPTIONS=--max-old-space-size=8192 next build",
     "build:server": "node scripts/bundle-server.mjs",
-    "build:analyze": "npm run build:prebuild && cross-env ANALYZE=true NODE_OPTIONS=--max-old-space-size=10240 next build --webpack",
+    "build:analyze": "npm run build:prebuild && cross-env ANALYZE=true NODE_OPTIONS=--max-old-space-size=13312 next build --webpack",
     "build:schemas": "tsc --project backend/tsconfig.schemas.json",
     "start": "cross-env NODE_ENV=production tsx server.ts",
     "lint": "eslint",
