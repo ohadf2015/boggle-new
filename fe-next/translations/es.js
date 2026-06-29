@@ -6102,7 +6102,10 @@ const es = {
       "subtitle": "Tienes {count} de los últimos días sin completar",
       "yesterday": "El reto de ayer",
       "daysAgo": "Hace {count} días",
-      "watchAd": "Mira un anuncio corto para jugar"
+      "watchAd": "Mira un anuncio corto para jugar",
+      "appTitle": "¿Te perdiste algunos días?",
+      "appSubtitle": "Tienes {count} sin jugar de los últimos días. Juega los retos anteriores en la app de LexiClash para Android.",
+      "appCta": "Disponible en Google Play"
     },
     "completed": "¡Completado!",
     "questPlayedSubtitle": "Ya jugaste hoy",
