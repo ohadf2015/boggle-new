@@ -235,11 +235,11 @@ describe('mascotState — asset registry', () => {
     }
   });
 
-  it('uses transparent -nobg gifs for animated states (clean circle clip)', () => {
-    expect(MASCOT_GIF_PATHS['wow']).toContain('-nobg.gif');
-    expect(MASCOT_GIF_PATHS['oh']).toContain('-nobg.gif');
-    expect(MASCOT_GIF_PATHS['sad-supportive']).toContain('-nobg.gif');
-    expect(MASCOT_GIF_PATHS['proud']).toContain('-nobg.gif');
+  it('uses transparent -nobg clips for animated states (clean circle clip)', () => {
+    expect(MASCOT_GIF_PATHS['wow']).toContain('-nobg.webp');
+    expect(MASCOT_GIF_PATHS['oh']).toContain('-nobg.webp');
+    expect(MASCOT_GIF_PATHS['sad-supportive']).toContain('-nobg.webp');
+    expect(MASCOT_GIF_PATHS['proud']).toContain('-nobg.webp');
   });
 });
 

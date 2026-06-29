@@ -45,8 +45,8 @@ describe('CringeFirewall — empathy on loss', () => {
     expect(state).not.toBe('awe');
   });
 
-  it('wave-fail asset is the crying empathy gif (not a smug or mocking pose)', () => {
-    expect(MASCOT_GIF_PATHS['sad-supportive']).toBe('/mascot/crying-nobg.gif');
+  it('wave-fail asset is the crying empathy clip (not a smug or mocking pose)', () => {
+    expect(MASCOT_GIF_PATHS['sad-supportive']).toBe('/mascot/crying-nobg.webp');
   });
 
   it('wave-fail BYPASSES cooldown (player must always see empathy on loss)', () => {
@@ -88,16 +88,18 @@ describe('CringeFirewall — initial state contract', () => {
 });
 
 describe('CringeFirewall — reaction tier monotonicity', () => {
-  it('animated GIFs are reserved for celebration / surprise / empathy moments', () => {
-    // Ensure the high-arousal states use animated GIFs (not static jpgs that
-    // would feel undersized for the moment)
-    expect(MASCOT_GIF_PATHS['cheer']).toMatch(/\.gif$/);
-    expect(MASCOT_GIF_PATHS['wow']).toMatch(/\.gif$/);
-    expect(MASCOT_GIF_PATHS['awe']).toMatch(/\.gif$/);
-    expect(MASCOT_GIF_PATHS['oh']).toMatch(/\.gif$/);
-    expect(MASCOT_GIF_PATHS['sad-supportive']).toMatch(/\.gif$/);
-    expect(MASCOT_GIF_PATHS['proud']).toMatch(/\.gif$/);
-    expect(MASCOT_GIF_PATHS['dancing']).toMatch(/\.gif$/);
+  it('animated clips are reserved for celebration / surprise / empathy moments', () => {
+    // Ensure the high-arousal states use animated assets (not static jpgs that
+    // would feel undersized for the moment). The mascot assets were migrated
+    // from .gif to animated .webp (~50% lighter); the load-bearing invariant is
+    // "animated, never a static .jpg".
+    expect(MASCOT_GIF_PATHS['cheer']).toMatch(/\.webp$/);
+    expect(MASCOT_GIF_PATHS['wow']).toMatch(/\.webp$/);
+    expect(MASCOT_GIF_PATHS['awe']).toMatch(/\.webp$/);
+    expect(MASCOT_GIF_PATHS['oh']).toMatch(/\.webp$/);
+    expect(MASCOT_GIF_PATHS['sad-supportive']).toMatch(/\.webp$/);
+    expect(MASCOT_GIF_PATHS['proud']).toMatch(/\.webp$/);
+    expect(MASCOT_GIF_PATHS['dancing']).toMatch(/\.webp$/);
   });
 
   it('every mascot path lives under /public (no remote URLs that could 404)', () => {

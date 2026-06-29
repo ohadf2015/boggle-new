@@ -27,6 +27,14 @@ vi.mock('next/dynamic', () => ({
   },
 }));
 
+// FTUE gate: the popup only surfaces once the player has ≥1 game under their
+// belt. These route-gate tests are all about a returning/post-game user, so
+// report a played game; without this every "should show" case is suppressed by
+// the FTUE gate before the route logic under test is reached.
+vi.mock('@/hooks/useUserStats', () => ({
+  useUserStats: () => ({ userStats: { totalGamesPlayed: 1 }, isLoading: false }),
+}));
+
 let pathname = '/en/practice';
 vi.mock('next/navigation', () => ({ usePathname: () => pathname }));
 
