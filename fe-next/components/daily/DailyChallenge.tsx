@@ -482,6 +482,18 @@ const DailyChallenge: React.FC = () => {
       attempts: result.attemptsUsed,
     });
 
+    // First-class daily-challenge funnel event (was registered with 0 call sites).
+    // Distinct from daily_puzzle_completed: it's the mode-agnostic "the daily was
+    // finished" signal the retention funnel is built on. Fires once per real
+    // completion — never in practice (early-returned above).
+    trackGrowthEvent('daily_challenge_completed', {
+      puzzleNumber,
+      language: gameLanguage,
+      isCatchup,
+      solved: result.solved,
+      attemptsUsed: result.attemptsUsed,
+    });
+
     trackGrowthEvent('daily_word_hunt_complete', {
       ...buildDailyWordHuntCompletePayload({
         result,
