@@ -907,7 +907,8 @@ if [ "$gate_ok" = "0" ]; then
   # authored CODE, so preserve it before discarding (recover by hand if needed).
   _salvage_backup="$LOG_DIR/salvaged-code-${DATE_TAG}"
   backup_dropped_authored "$AUTHORED_CODE" "$_salvage_backup"
-  [ -s "$AUTHORED_CODE" ] && log "docs-only salvage: backed up $(grep -c . "$AUTHORED_CODE" 2>/dev/null) reverted code file(s) → $_salvage_backup"
+  _dropped_count=$(grep -c . "$AUTHORED_CODE" 2>/dev/null || echo 0)
+  [ -s "$AUTHORED_CODE" ] && log "docs-only salvage: backed up ${_dropped_count} reverted code file(s) → $_salvage_backup"
   revert_authored "$RUN_SNAPSHOT" "$AUTHORED_CODE"
   rm -f "$AUTHORED_CODE"
 
@@ -926,6 +927,7 @@ if [ "$gate_ok" = "0" ]; then
     echo -e "\n**Outcome:** GATE FAILED on lane code; no docs to salvage. All of the nightly's own changes dropped; founder WIP untouched." >> "$REPORT"
     RUN_FAILED=1; NO_CHANGE_MODE=1; NEW_SHA="$START_SHA"
     log "gate failed, nothing to ship — falling through to send the full digest, will exit 1"
+    [ "${_dropped_count:-0}" -gt 0 ] 2>/dev/null && tg_alert "nightly $TODAY: GATE FAILED — ALL ${_dropped_count} lane code file(s) DROPPED, nothing shipped. Code backed up (NOT pushed) → restore: scripts/nightly/restore-salvaged-code.sh ${DATE_TAG}"
   fi
 
   log "docs-only salvage — shipping reports/ideas/learnings, lane code dropped ($AUTHORED_COUNT docs)"
@@ -936,6 +938,10 @@ if [ "$gate_ok" = "0" ]; then
   # failed the gate at least once → it must be reviewed + re-gated, never blind-shipped.
   _restore_cmd="scripts/nightly/restore-salvaged-code.sh ${DATE_TAG}"
   log "docs-only salvage: dropped lane code is RECOVERABLE — backup at $_salvage_backup; restore with: $_restore_cmd (then review + re-gate before shipping)"
+  # Class 4 guard: a backup nobody is told about == lost work. The other failure
+  # tiers all tg_alert; this (the most destructive — ALL lane code dropped) must too,
+  # or the salvage silently parks code night after night (2026-06-28/29 incident).
+  [ "${_dropped_count:-0}" -gt 0 ] 2>/dev/null && tg_alert "nightly $TODAY: GATE FAILED on lane code — ${_dropped_count} code file(s) DROPPED (docs-only shipped). Code backed up but NOT pushed → restore: $_restore_cmd (review + re-gate first)."
   echo -e "\n**Outcome:** GATE FAILED on lane code — DOCS-ONLY salvage shipped (reports/ideas/learnings kept, lane CODE dropped, founder WIP untouched).\n\n**Lane code is NOT lost** — backed up to \`$_salvage_backup\`. Restore with \`$_restore_cmd\`, then review + re-gate (it failed the gate at least once) before shipping." >> "$REPORT"
   tg_alert "nightly $TODAY: code gate failed — shipped DOCS-ONLY (reports/ideas/learnings). Lane CODE dropped but NOT lost — recover: \`$_restore_cmd\` then review+re-gate. Founder WIP untouched. Log: \`$RUN_LOG\`."
   # fall through to commit; the allowlist now lists only the nightly's docs

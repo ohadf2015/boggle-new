@@ -92,7 +92,15 @@ _gate_npm_chain() {
   # fast + correct. Escape hatch: NIGHTLY_GATE_FULL_TEST=1 restores the full suite.
   local test_cmd="npm run test:changed"
   [ "${NIGHTLY_GATE_FULL_TEST:-0}" = "1" ] && test_cmd="npm run test"
-  printf '%s' "${chain}npm run build:schemas && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; } && ${test_cmd}"
+  # TYPE VERDICT (2026-06-28): run a standalone `tsc --noEmit` (≈54s) BEFORE build:fast and
+  # tell next build to SKIP its own "Running TypeScript" phase (NIGHTLY_SKIP_NEXT_TS=1 →
+  # next.config typescript.ignoreBuildErrors). That phase type-checks the build's GENERATED
+  # route types and is 18x+ slower AND streams no output for 15-30min, tripping the 900s idle
+  # watchdog → tests-inconclusive 4 of 7 nights (06-21/24/25/27 ALL wedged there, test phase
+  # never ran). tsc --noEmit gives the identical type/import verdict fast + non-silent; next
+  # build still runs webpack so import/module breakage is still caught. Same pattern the
+  # typecheck_only fallback tier already uses (line ~64) — just promoted to the happy path.
+  printf '%s' "${chain}npm run build:schemas && npx --no-install tsc --noEmit && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast; } && ${test_cmd}"
 }
 
 # nightly_baseline_ship_decision <authored_fail_file> <baseline_rc> <baseline_fail_file> <authored_allowlist_file>

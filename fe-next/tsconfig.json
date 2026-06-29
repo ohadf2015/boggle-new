@@ -16,7 +16,6 @@
     "noEmit": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-
     "strict": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
@@ -24,14 +23,14 @@
     "strictPropertyInitialization": true,
     "noImplicitThis": true,
     "useUnknownInCatchVariables": true,
-
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": false, // TODO: Enable after fixing remaining array access patterns
-
-    "types": ["vitest/globals"],
+    "types": [
+      "vitest/globals"
+    ],
     "skipLibCheck": true,
     "incremental": true,
     "tsBuildInfoFile": ".tsbuildinfo",
@@ -52,7 +51,9 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    ".next-verify/types/**/*.ts",
+    ".next-verify/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

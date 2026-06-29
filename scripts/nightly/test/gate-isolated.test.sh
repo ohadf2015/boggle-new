@@ -196,6 +196,20 @@ assert "NIGHTLY_GATE_FULL_TEST=1 escape hatch restores the FULL suite (terminal 
 assert "escape-hatch full chain still runs build:fast BEFORE the full suite" \
   "[[ \"\$CHAIN_FULLSUITE\" == *'build:fast'*'npm run test' ]]"
 
+# TS-PHASE SKIP (2026-06-28): the happy-path gate must run a standalone `tsc --noEmit` for the
+# type verdict AND tell next build to skip its own silent "Running TypeScript" phase
+# (NIGHTLY_SKIP_NEXT_TS=1 → next.config typescript.ignoreBuildErrors). That phase wedged 900s
+# silent on 4 of 7 nights (06-21/24/25/27) → tests-inconclusive, tests never ran. Promotes the
+# typecheck_only tier's proven fast pattern onto the default path.
+assert "default chain runs standalone tsc --noEmit (fast type verdict)" \
+  "[[ \"\$CHAIN_FULL\" == *'npx --no-install tsc --noEmit'* ]]"
+assert "default chain sets NIGHTLY_SKIP_NEXT_TS=1 on build:fast (skip next's silent TS phase)" \
+  "[[ \"\$CHAIN_FULL\" == *'NIGHTLY_SKIP_NEXT_TS=1'*'build:fast'* ]]"
+assert "tsc --noEmit precedes build:fast (catch type errors before the slow webpack compile)" \
+  "[[ \"\$CHAIN_FULL\" == *'tsc --noEmit'*'build:fast'* ]]"
+assert "build:schemas precedes tsc (dist bridge) on the happy path too" \
+  "[[ \"\$CHAIN_FULL\" == *'build:schemas'*'tsc --noEmit'* ]]"
+
 # build_only=1 → DROP lint AND test, keep build:schemas + build:fast. Used by the
 # baseline-aware ship path to prove the authored set builds clean despite a red TEST
 # baseline (test short-circuited, so the build was never verified).

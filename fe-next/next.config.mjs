@@ -38,6 +38,20 @@ const nextConfig = {
   // NEXT_BUILD_DIR unset → '.next', so their behaviour is unchanged.
   distDir: process.env.NEXT_BUILD_DIR || '.next',
 
+  // Skip next-build's OWN "Running TypeScript" phase ONLY in the nightly gate
+  // (NIGHTLY_SKIP_NEXT_TS=1). That phase type-checks the build's GENERATED route
+  // types (.next-nightly/types/**) and is 18x+ slower than a standalone
+  // `tsc --noEmit` — worse, it streams NO output for 15-30min, tripping the gate's
+  // 900s idle watchdog → tests-inconclusive on 4 of 7 nights (06-21/24/25/27, all
+  // wedged here, the test phase never even ran). The gate now runs `tsc --noEmit`
+  // (≈54s, the SAME type verdict) before build:fast and skips this redundant phase.
+  // next build still compiles webpack, so import/module breakage is still caught.
+  // Prod (`npm run build` on Railway) NEVER sets this env → full TS checking stays
+  // as the backstop, including generated-route-type conformance.
+  typescript: {
+    ignoreBuildErrors: process.env.NIGHTLY_SKIP_NEXT_TS === '1',
+  },
+
   // Standalone output for minimal Docker images.
   // The custom Express server is bundled separately by esbuild (dist/server.cjs),
   // so standalone's server.js is unused — we only want the minimal node_modules.
