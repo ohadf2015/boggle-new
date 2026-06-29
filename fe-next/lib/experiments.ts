@@ -32,6 +32,21 @@ function defineExperiment<V extends readonly string[]>(
 
 export const EXPERIMENTS = {
   /**
+   * Word Wheel drag-hint coachmark. Hypothesis: the wheel's drag-to-spell
+   * mechanic is not tap-discoverable → confused/idle players rage-click and
+   * abandon (PostHog: word-wheel is the most rage-clicked SP surface). The
+   * drag-hint arm surfaces the animated "swipe to spell" coachmark after a
+   * short idle; control shows nothing. Win = higher word-wheel completion /
+   * lower abandonment. Auto-suppresses once a word is found.
+   */
+  'exp-wordwheel-drag-hint-v1': defineExperiment({
+    variants: ['control', 'drag-hint'] as const,
+    default: 'control',
+    description:
+      'Word Wheel idle drag-hint coachmark. control = no hint, drag-hint = animated "swipe to spell" coachmark after idle. Targets the wheel rage-click/abandonment problem.',
+  }),
+
+  /**
    * First-win signup-modal CTA copy. Hypothesis: value-prop copy
    * outperforms generic "Save Your Progress" by surfacing the concrete
    * benefit (track streak, unlock daily). Conversion = signup_completed
