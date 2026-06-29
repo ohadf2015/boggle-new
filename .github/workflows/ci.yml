@@ -168,7 +168,21 @@ jobs:
         working-directory: fe-next
         # Vitest is the maintained, source-of-truth frontend suite (npm run
         # test:frontend). It is the gating frontend test run.
-        run: npx vitest run --config vitest.config.ts --shard=${{ matrix.shard }}/6 --reporter=default
+        #
+        # Pass/fail is decided from the JSON report by scripts/ci/assert-vitest-passed.mjs,
+        # NOT vitest's raw exit code. Shard 6 intermittently crashes a worker fork during
+        # teardown ("Worker exited unexpectedly", open-handle/native-module class) AFTER
+        # every test has already passed — that is not a heap OOM (raising the heap had zero
+        # effect, see reverted commit 0c573641) and would otherwise red-flag a green run and
+        # block all merges. The gate tolerates only a post-success crash; any real failed
+        # test (numFailedTests>0) or a suite that didn't run still fails CI.
+        run: |
+          set +e
+          npx vitest run --config vitest.config.ts --shard=${{ matrix.shard }}/6 \
+            --reporter=default --reporter=json --outputFile.json=vitest-shard-${{ matrix.shard }}.json
+          VITEST_RC=$?
+          set -e
+          node scripts/ci/assert-vitest-passed.mjs vitest-shard-${{ matrix.shard }}.json "$VITEST_RC"
         env:
           CI: true
 

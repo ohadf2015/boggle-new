@@ -92,6 +92,7 @@ export default defineConfig({
       'shared/**/*.test.{ts,tsx}',
       'stores/**/*.test.{ts,tsx}',
       'server/**/*.test.{ts,tsx}',
+      'scripts/**/*.test.{ts,tsx}',
       '__tests__/**/*.test.{ts,tsx}',
     ],
     exclude: [
