@@ -31,6 +31,7 @@ import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
 import { useTierPromotion } from '@/hooks/useTierPromotion';
 import { useTierPosition } from '@/hooks/useTierPosition';
 import { useExperiment } from '@/hooks/useExperiment';
+import { LeaderboardPlayCta } from './LeaderboardPlayCta';
 const TierPositionPanel = dynamic(() => import('@/components/leaderboard/TierPositionPanel'), { ssr: false });
 import { SeasonLeaderboardTabs, type SeasonTabKey } from '@/components/seasons/SeasonLeaderboardTabs';
 const SeasonBanner = dynamic(() => import('@/components/multiplayer/SeasonBanner').then(m => ({ default: m.SeasonBanner })), { ssr: false });
@@ -403,6 +404,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             />
           }
         >
+          {/* exp-leaderboard-play-cta-v1: "Play to rank up" strip (play-cta arm only). */}
+          <LeaderboardPlayCta language={language} />
           {/* Top-3 Podium — celebratory crown for the leaders */}
           {leaderboard.length > 0 && (
             <div className="mb-6 px-2">
