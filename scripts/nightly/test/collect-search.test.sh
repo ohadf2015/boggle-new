@@ -140,6 +140,31 @@ assert "bing failure → still emits signal with count fallback"   '[ "$(jq ".si
 assert "magnitude is count (5) when bing fails"                  '[ "$(jq ".signals[0].magnitude" "$OUT")" = "5" ]'
 assert "source_ok still true (bing is optional)"                 '[ "$(jq -r ._meta.source_ok "$OUT")" = "true" ]'
 
+echo "collect-search: real bing-ai-perf shape (citations + intent/topic/citation_share)"
+# Mirrors what bing-ai-perf-scrape.sh actually writes: NO impressions/count fields,
+# magnitude must come from `citations`, and the enriched columns must reach evidence.
+cat > "$PROJECT_DIR/docs/nightly/ai-search/2026-05-29.json" <<'AI_SEARCH'
+{
+  "totals": { "total_citations": 2500, "avg_cited_pages": 4 },
+  "grounding_queries": [
+    { "query": "boggle wordshake", "intent": "Learn and Solve", "topic": "Puzzle & Strategy Games", "citations": 507, "citation_share": 22.94 },
+    { "query": "daily word wheel", "intent": "Informational", "topic": "Gaming", "citations": 185, "citation_share": 57.81 }
+  ],
+  "cited_pages": []
+}
+AI_SEARCH
+rm -f "$OUT"
+( unset BING_WMT_API_KEY
+  PATH="$BIN:$PATH" INTEL_ROOT="$INTEL_ROOT" INTEL_DIR="$INTEL_DIR" \
+  PROJECT_DIR="$PROJECT_DIR" TODAY="$TODAY" bash "$COL" )
+assert "emits 2 signals from citations-shaped artifact"  '[ "$(jq ".signals|length" "$OUT")" = "2" ]'
+assert "magnitude from citations (507) not 1"            '[ "$(jq ".signals[0].magnitude" "$OUT")" = "507" ]'
+assert "second magnitude from citations (185)"           '[ "$(jq ".signals[1].magnitude" "$OUT")" = "185" ]'
+assert "severity scaled vs max citations (top=1.0)"      '[ "$(jq ".signals[0].severity" "$OUT")" = "1" ]'
+assert "evidence carries intent"                         'jq -e ".signals[0].evidence | test(\"Learn and Solve\")" "$OUT" >/dev/null'
+assert "evidence carries topic"                          'jq -e ".signals[0].evidence | test(\"Puzzle & Strategy Games\")" "$OUT" >/dev/null'
+assert "evidence carries citation_share"                 'jq -e ".signals[0].evidence | test(\"22.94\")" "$OUT" >/dev/null'
+
 echo
 echo "collect-search: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
