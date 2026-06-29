@@ -120,6 +120,11 @@ prompt "Supabase URL" \
        "Default: https://hdtmpkicuxvtmvrmtybx.supabase.co"
 [ -z "${SUPABASE_URL:-}" ] && SUPABASE_URL="https://hdtmpkicuxvtmvrmtybx.supabase.co"
 
+prompt "Supabase personal access token (MCP auth — REQUIRED for lanes 01/02 DB fixes)" \
+       "SUPABASE_ACCESS_TOKEN" \
+       "supabase.com/dashboard/account/tokens → Generate new token, Expires=NEVER (sbp_...). Default sbp_ tokens expire in 30d and die silently mid-nightly." \
+       --secret
+
 prompt "Supabase service role key (only for direct SQL fallback; MCP usually suffices)" \
        "SUPABASE_SERVICE_ROLE_KEY" \
        "Supabase dashboard → Project Settings → API → service_role secret" \
@@ -135,6 +140,7 @@ POSTHOG_PERSONAL_API_KEY="${POSTHOG_PERSONAL_API_KEY:-}"
 POSTHOG_PROJECT_ID="${POSTHOG_PROJECT_ID:-}"
 POSTHOG_HOST="${POSTHOG_HOST}"
 SUPABASE_URL="${SUPABASE_URL}"
+SUPABASE_ACCESS_TOKEN="${SUPABASE_ACCESS_TOKEN:-}"
 SUPABASE_SERVICE_ROLE_KEY="${SUPABASE_SERVICE_ROLE_KEY:-}"
 # NIGHTLY_DISABLED=1   # uncomment to pause without unloading launchd
 EOF
@@ -146,7 +152,7 @@ echo
 
 # --- verify ---------------------------------------------------------------
 missing=()
-for v in TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID POSTHOG_PERSONAL_API_KEY POSTHOG_PROJECT_ID; do
+for v in TELEGRAM_BOT_TOKEN TELEGRAM_CHAT_ID POSTHOG_PERSONAL_API_KEY POSTHOG_PROJECT_ID SUPABASE_ACCESS_TOKEN; do
   eval "val=\${$v:-}"
   [ -z "$val" ] && missing+=("$v")
 done
