@@ -137,11 +137,16 @@ export default defineConfig({
     ],
     testTimeout: 10000,
     pool: 'forks',
-    maxForks: 8,
+    // Lowered 8→4 (2026-06-29): a memory-heavy file in shard 6 was OOM-killing a
+    // fork ("Worker exited unexpectedly") even though all assertions passed.
+    // Fewer concurrent forks cuts real aggregate memory on the 16 GB CI runner,
+    // and the per-fork heap below is raised so the heavy file has headroom. Net
+    // ceiling 4×8192=32 GB < the old 8×5120=40 GB, so aggregate pressure is lower.
+    maxForks: 4,
     minForks: 2,
     poolOptions: {
       forks: {
-        execArgv: ['--max-old-space-size=5120'],
+        execArgv: ['--max-old-space-size=8192'],
       },
     },
     useAtomics: true,
