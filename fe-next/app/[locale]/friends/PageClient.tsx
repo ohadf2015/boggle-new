@@ -15,6 +15,7 @@ import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { useFriends } from '@/hooks/useFriends';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { cn } from '@/lib/utils';
+import { buildSafeAreaStyle } from '@/components/layout/SafeAreaView';
 import { captureInviteRef, peekInviteRef } from '@/utils/inviteRef';
 
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -107,7 +108,7 @@ export default function FriendsPageClient(): React.JSX.Element {
           'sticky top-0 z-40 px-4 py-3 border-b-3 border-neo-black',
           isDark ? 'bg-neo-navy-light/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'
         )}
-        style={{ paddingTop: 'max(0.75rem, env(safe-area-inset-top, 0.75rem))' }}
+        style={buildSafeAreaStyle(['top'], '0.75rem')}
       >
         <div className="max-w-2xl mx-auto flex items-center gap-4">
           <button type="button"
