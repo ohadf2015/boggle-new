@@ -133,10 +133,13 @@ describe('HostPreGameView Quick Play / bot auto-fill', () => {
     // hostPlaying=true + only host in playersReady → actualPlayerCount === 0
     render(<HostPreGameView {...baseProps} playersReady={[]} hostPlaying={false} />);
 
-    // Advance past the 30s alone timer
-    act(() => { vi.advanceTimersByTime(30_000); });
-    // Advance through 10s countdown to 0
-    act(() => { vi.advanceTimersByTime(10_000); });
+    // Advance past the 15s alone-timer → starts the visible bot countdown.
+    // Separate act() boundaries let React flush the state update + create the
+    // countdown interval before it ticks (a single combined advance would set
+    // botCountdown mid-advance, after which the interval never ticks this call).
+    act(() => { vi.advanceTimersByTime(15_000); });
+    // Advance through the 20s "starting with bots…" countdown to 0
+    act(() => { vi.advanceTimersByTime(20_000); });
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     const addBots = emitMock.mock.calls.find(([evt]) => evt === 'addBots');

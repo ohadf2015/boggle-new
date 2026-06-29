@@ -136,7 +136,27 @@ vi.mock('@/hooks/useRealtimeNotifications', () => ({
 vi.mock('@/utils/supabase/client', () => ({
   createClient: () => ({
     auth: { getUser: vi.fn().mockResolvedValue({ data: { user: null }, error: null }) },
-    from: vi.fn().mockReturnValue({ select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), single: vi.fn().mockResolvedValue({ data: null, error: null }) }),
+    // Fully chainable query builder: select/eq/update/... all return the same
+    // thenable, so both `select().eq().single()` AND fire-and-forget writes like
+    // `update().eq()` (updateOnlineStatus in useFriends) resolve instead of
+    // throwing "update is not a function" as an unhandled rejection.
+    from: vi.fn(() => {
+      const chain: Record<string, unknown> = {
+        select: vi.fn(() => chain),
+        insert: vi.fn(() => chain),
+        update: vi.fn(() => chain),
+        upsert: vi.fn(() => chain),
+        delete: vi.fn(() => chain),
+        eq: vi.fn(() => chain),
+        order: vi.fn(() => chain),
+        limit: vi.fn(() => chain),
+        single: vi.fn().mockResolvedValue({ data: null, error: null }),
+        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+        then: (resolve: (v: { data: null; error: null }) => unknown) =>
+          resolve({ data: null, error: null }),
+      };
+      return chain;
+    }),
     channel: vi.fn().mockReturnValue({ on: vi.fn().mockReturnThis(), subscribe: vi.fn() }),
     removeChannel: vi.fn(),
   }),

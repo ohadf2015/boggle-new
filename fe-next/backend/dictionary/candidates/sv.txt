@@ -709,3 +709,10 @@ filt
 matta
 spegel
 hylla
+där
+här
+in
+ned
+upp
+ut
+vilka

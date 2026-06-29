@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-25T22:12:00.315Z",
+  "generatedAt": "2026-06-29T07:31:14.551Z",
   "commits": [
     {
-      "sha": "415c39188ec5ff016fad6c956fc9f829b703e67d",
-      "shortSha": "415c391",
-      "subject": "test(bot-broadcast): fix stale assertions for playerFoundWord batching",
+      "sha": "50bf75ab86c7ce0e9e5578506f70673ad3f20ad6",
+      "shortSha": "50bf75a",
+      "subject": "feat(nightly): recover dropped 2026-06-29 lane code + fix stale cosmetics gate",
       "author": "Ohad Fisher",
-      "date": "2026-06-26T00:03:56+03:00"
+      "date": "2026-06-29T10:26:29+03:00"
     },
     {
-      "sha": "d6ae0896d23de6c3e9032bbe01a45c0f81e8db92",
-      "shortSha": "d6ae089",
-      "subject": "test: fix 13 pre-existing red test files blocking pre-push",
+      "sha": "26aa7078ac81c4473013b4bef299864993ecbed3",
+      "shortSha": "26aa707",
+      "subject": "chore(nightly): autonomous improvement loop 2026-06-29",
       "author": "Ohad Fisher",
-      "date": "2026-06-25T23:42:48+03:00"
+      "date": "2026-06-29T06:20:41+03:00"
     },
     {
-      "sha": "f6cfd01b9a296295d9379f5ca0cd5b76550a13e2",
-      "shortSha": "f6cfd01",
-      "subject": "test(mp): real-render smoke test for MpDesktopShellFrame + ignore impeccable scratch",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T22:25:48+03:00"
-    },
-    {
-      "sha": "6f15360782826f037eaab94b1c0ad402d87c0dc6",
-      "shortSha": "6f15360",
-      "subject": "feat(results): clearer placement hierarchy on the Wheel Rush results wheel",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T21:43:34+03:00"
-    },
-    {
-      "sha": "8a2462d97d749faee6d3bc48482c8e3f8f1afb23",
-      "shortSha": "8a2462d",
-      "subject": "style(auth): match Google GSI frame chrome to Discord button",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T21:37:54+03:00"
-    },
-    {
-      "sha": "d81907850a92496f90d54a4b5ec6faba3aa26af5",
-      "shortSha": "d819078",
-      "subject": "fix(popups): finish Hebrew backdrop-only modal fix + harden reveal guard",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T21:20:19+03:00"
-    },
-    {
-      "sha": "e0d94f6a851ff8ceb827d346fca9acad8b0a7cdb",
-      "shortSha": "e0d94f6",
-      "subject": "feat(daily): enforce 5-7 letter Word Hunt target words in word bank",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T21:19:46+03:00"
-    },
-    {
-      "sha": "927a83b12369a330574df598ceb818edd495e8f0",
-      "shortSha": "927a83b",
-      "subject": "fix(landing): blog-card meta text contrast to WCAG AA",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T21:02:56+03:00"
-    },
-    {
-      "sha": "1e7bd161e03ae357ff585d139ece06e4fa53cffe",
-      "shortSha": "1e7bd16",
-      "subject": "feat(results): dedup Blast results — scene shows only the player's stat card",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T21:01:31+03:00"
-    },
-    {
-      "sha": "ad7c59a157078893c0ada442055fb7ee68e588bb",
-      "shortSha": "ad7c59a",
-      "subject": "feat(ftue): coach MP sealed-bid + crossword (getCoachMode was missing them)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T20:57:57+03:00"
-    },
-    {
-      "sha": "2473772611f16750bdccbb2e77ae19217d72c905",
-      "shortSha": "2473772",
-      "subject": "chore: land in-flight working tree (motion codemod + concurrent fixes/tests)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T20:55:01+03:00"
-    },
-    {
-      "sha": "b1a55bd56b6e76777f91c50d6aad9e6fe695d716",
-      "shortSha": "b1a55bd",
-      "subject": "fix(daily): correct Ron prank user id to real profiles.id UUID",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T20:48:33+03:00"
-    },
-    {
-      "sha": "e57d1953537bc318496404236f9c20cb5c8ab35a",
-      "shortSha": "e57d195",
-      "subject": "feat(brain): Memory Hunt clue fix, ad-gated clues, no-scroll board, real memory insights",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T20:46:54+03:00"
-    },
-    {
-      "sha": "b314099a2b4371321142f1bb2cc0e3e4f8127ce2",
-      "shortSha": "b314099",
-      "subject": "feat(ftue): coach solo Blast + daily Word Hunt, add mode-coach analytics",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T20:39:17+03:00"
-    },
-    {
-      "sha": "6581282aa72c2245935225952f277aa85720d0be",
-      "shortSha": "6581282",
-      "subject": "feat(results): idle float + winner score glow on hero",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T20:38:44+03:00"
-    },
-    {
-      "sha": "789377837486512eb18d35f08a8e921fdcd148ea",
-      "shortSha": "7893778",
-      "subject": "fix(landing): remove side-stripe border tell in DailyMissionsHub",
-      "author": "Ohad Fisher",
-      "date": "2026-06-25T20:38:24+03:00"
-    },
-    {
-      "sha": "3d444cabf1ddd73068be1a913112942845e9ce4a",
-      "shortSha": "3d444ca",
-      "subject": "Merge pull request #629 from ohadf2015/claude/leaderboard-layout-redesign-mt3i22",
+      "sha": "02135d1f5763240296a2424869e24f43c7384f26",
+      "shortSha": "02135d1",
+      "subject": "Merge pull request #663 from ohadf2015/claude/email-subject-lines-wm5x2c",
       "author": "ohadf2015",
-      "date": "2026-06-26T00:20:23+03:00"
+      "date": "2026-06-28T22:26:33+03:00"
     },
     {
-      "sha": "f94e7b9b90eedaae5c7a9e9d350e9f0c9f1aacae",
-      "shortSha": "f94e7b9",
-      "subject": "feat(leaderboard): cap in-game leaderboard to a 3-row window around the player",
+      "sha": "eaf87ee1c44c4971afed2143518671ce27cb82cb",
+      "shortSha": "eaf87ee",
+      "subject": "feat(emails): rewrite subject lines to be human and emoji-free",
       "author": "Claude",
-      "date": "2026-06-25T20:42:01Z"
+      "date": "2026-06-28T19:24:09Z"
     },
     {
-      "sha": "5ac700805290e7d997cfdf65bb874884613715d8",
-      "shortSha": "5ac7008",
-      "subject": "Merge pull request #628 from ohadf2015/claude/dictionary-help-ui-timing-o5iw08",
+      "sha": "be935ef36ccb2f530d6f636af539cd17a2059b0e",
+      "shortSha": "be935ef",
+      "subject": "Merge pull request #661 from ohadf2015/claude/desktop-nav-game-play-error-3bmkuz",
       "author": "ohadf2015",
-      "date": "2026-06-25T23:27:17+03:00"
+      "date": "2026-06-28T20:39:36+03:00"
     },
     {
-      "sha": "1dde2a9683a835f084ce8e5ce34e8f2e8b8bd175",
-      "shortSha": "1dde2a9",
-      "subject": "Merge pull request #627 from ohadf2015/claude/desktop-ui-help-dialog-05i8ng",
+      "sha": "3f7487bdcc90620e4f843587e9df3ef57550abae",
+      "shortSha": "3f7487b",
+      "subject": "Merge pull request #660 from ohadf2015/claude/mp-lobby-ui-refinements-52ei9g",
       "author": "ohadf2015",
-      "date": "2026-06-25T23:26:15+03:00"
+      "date": "2026-06-28T20:39:14+03:00"
+    },
+    {
+      "sha": "68b0610a5cd0f584c935e8f14afd8dd2a8797a63",
+      "shortSha": "68b0610",
+      "subject": "feat(mp-lobby): hide style picker pre-first-game, longer bot countdown, declutter blast tiles",
+      "author": "Claude",
+      "date": "2026-06-28T17:36:52Z"
+    },
+    {
+      "sha": "22858e46b121d11ad61322005eed2a0f6b44fae3",
+      "shortSha": "22858e4",
+      "subject": "fix(nav): desktop Quick Play tab routes straight to multiplayer, not the /singleplayer redirect stub",
+      "author": "Claude",
+      "date": "2026-06-28T17:34:58Z"
+    },
+    {
+      "sha": "e654ac494e6d848998e8b05938c097e472fd36d9",
+      "shortSha": "e654ac4",
+      "subject": "Merge pull request #659 from ohadf2015/claude/desktop-shell-timers-layout-d91hyh",
+      "author": "ohadf2015",
+      "date": "2026-06-28T20:24:18+03:00"
+    },
+    {
+      "sha": "e3bf3e0d3afe16ae8ab388e2e962413c6fe3bd4f",
+      "shortSha": "e3bf3e0",
+      "subject": "Merge pull request #658 from ohadf2015/claude/practice-completion-celebration-ux-cc5py4",
+      "author": "ohadf2015",
+      "date": "2026-06-28T20:23:46+03:00"
+    },
+    {
+      "sha": "4ed02775def93450d8e57f6ea82fead377c5314b",
+      "shortSha": "4ed0277",
+      "subject": "fix(mp-desktop): single server-synced timer + no-scroll rails",
+      "author": "Claude",
+      "date": "2026-06-28T17:22:50Z"
+    },
+    {
+      "sha": "9a3045cbc76e75be97cd7f9d46a0313d70b47984",
+      "shortSha": "9a3045c",
+      "subject": "feat(practice): celebratory all-complete state with home CTA",
+      "author": "Claude",
+      "date": "2026-06-28T17:16:18Z"
+    },
+    {
+      "sha": "b2143a599d1f0ebc4c3824720aed9f342ac18eb7",
+      "shortSha": "b2143a5",
+      "subject": "perf(friends): collapse thread-list N+1 into one RPC + dedupe auth.getUser round-trips",
+      "author": "Ohad Fisher",
+      "date": "2026-06-28T12:15:39+03:00"
+    },
+    {
+      "sha": "e273f259295c4c986f6ddb1bd738504742b6f422",
+      "shortSha": "e273f25",
+      "subject": "Merge pull request #657 from ohadf2015/claude/hebrew-quest-translations-8wkiiu",
+      "author": "ohadf2015",
+      "date": "2026-06-28T09:22:52+03:00"
+    },
+    {
+      "sha": "78b2fbab1df1a5dd5db3ac5e1a05dca7c2b19be1",
+      "shortSha": "78b2fba",
+      "subject": "fix(i18n): natural Hebrew for daily quest titles & descriptions",
+      "author": "Claude",
+      "date": "2026-06-28T06:10:31Z"
+    },
+    {
+      "sha": "e481e0df849313a28d33300e9f19d7c3224a4a88",
+      "shortSha": "e481e0d",
+      "subject": "chore(nightly): autonomous improvement loop 2026-06-28",
+      "author": "Ohad Fisher",
+      "date": "2026-06-28T06:15:13+03:00"
+    },
+    {
+      "sha": "70891a7d19b0747e1782954d3de7eb0fe522993b",
+      "shortSha": "70891a7",
+      "subject": "Merge pull request #654 from ohadf2015/claude/settings-scroll-deeplink-fix-n4nkv6",
+      "author": "ohadf2015",
+      "date": "2026-06-28T02:01:07+03:00"
+    },
+    {
+      "sha": "a207b9c14974efbbd1fe8786ed632231dc414fb1",
+      "shortSha": "a207b9c",
+      "subject": "fix(settings,deeplink): scrollable settings + reliable cold-start deep links",
+      "author": "Claude",
+      "date": "2026-06-27T22:52:34Z"
+    },
+    {
+      "sha": "1fda071e28ead615b08d07f76199b3c13592147c",
+      "shortSha": "1fda071",
+      "subject": "Merge pull request #653 from ohadf2015/claude/quest-combo-trigger-bug-eua88k",
+      "author": "ohadf2015",
+      "date": "2026-06-28T01:38:29+03:00"
+    },
+    {
+      "sha": "8c6bcfd12e0c3dc348c6a8def8fbdfb8502fe613",
+      "shortSha": "8c6bcfd",
+      "subject": "fix(adventure): streak quest now credits the streak length reached",
+      "author": "Claude",
+      "date": "2026-06-27T22:37:57Z"
     }
   ]
 }

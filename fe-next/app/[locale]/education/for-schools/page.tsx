@@ -108,11 +108,11 @@ export default async function Page({ params }: PageProps) {
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-relaxed text-neo-gray-200 sm:text-xl">{c.heroSubtitle}</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
-                Play a class game free
+              <Link href={`/${locale}/education/classroom-game`} data-ph-capture-attribute-cta="hero_free_game" className="rounded-neo border-4 border-neo-black bg-neo-yellow px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
+                {c.heroCta1}
               </Link>
-              <a href="#lead" className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
-                Tell us about your school
+              <a href="#lead" data-ph-capture-attribute-cta="hero_tell_us" className="rounded-neo border-4 border-neo-black bg-neo-pink px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg">
+                {c.heroCta2}
               </a>
             </div>
           </div>

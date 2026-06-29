@@ -132,6 +132,7 @@ const en = {
       "not-your-turn": "Wait for your turn."
     },
     "solo": {
+      "category": { "hit": "✨ +2× {category}!" },
       "title": "Shiritori Solo",
       "tagline": "Chain hiragana words against the bot.",
       "back": "Back to Shiritori",
@@ -329,6 +330,8 @@ const en = {
       "steps": ["🏗️ Tap the button to drop the word block onto the tower", "🎯 Land it centered — sloppy drops make the tower lean", "🔤 Every valid word stacks a new floor. Build as high as you can!"]
     },
     "loading": "Loading dictionary…",
+    "loadError": "Couldn't load the dictionary — tap to retry",
+    "retry": "Try Again",
     "biome": { "city": "Ground", "sky": "Sky", "stratosphere": "Stratosphere", "orbit": "Orbit", "nebula": "Nebula", "galaxy": "Galaxy" },
     "tier": { "apprentice": "Apprentice", "journeyman": "Journeyman", "master": "Master Architect" },
     "hud": { "floors": "{n} floors", "combo": "{n} chain", "scramble": "Scramble", "backspace": "Delete", "build": "Build", "restart": "Restart", "restartConfirm": "Sure?", "best": "Best {m} m", "possible": "{n} words", "clue": "Clue", "collapse": "Collapse", "expand": "Expand", "rivalPassed": "Passed {name}!", "stuck": "Stuck? New letter", "backToTop": "Top", "pickLetters": "Pick letters", "dragToBuild": "Drag or tap to spell", "chaseGap": "+{m} m", "chaseAria": "Next rival above: {name}, {m} metres to pass" },
@@ -352,7 +355,7 @@ const en = {
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
     "celebration": { "highRise": "High Rise!", "tall": "Towering!", "skyscraper": "SKYSCRAPER!" },
     "leaderboard": { "title": "Top Towers", "error": "Couldn't load leaderboard", "empty": "No towers yet — be the first!" },
-    "share": { "button": "Share", "text": "I reached {m} m in Word Tower — beat my tower!" },
+    "share": { "title": "Word Tower", "button": "Share", "text": "I reached {m} m in Word Tower — beat my tower!" },
     "versus": { "title": "Tower Rush", "bomb": "Bomb {name}", "waiting": "Waiting for rivals…", "incoming": "Incoming bomb!", "won": "You won!", "lost": "{name} won" },
     "a11y": { "height": "Height {m} meters", "combo": "combo {n}", "tile": "Letter {letter}", "goldenTile": "Golden letter {letter}" },
     "skin": {
@@ -2712,6 +2715,7 @@ const en = {
     "newMessages": "New messages"
   },
   "results": {
+    "mpGapNudge": "Only {gap} pts behind — take it next round!",
     "rivals": {
       "aria": "You versus your rivals",
       "header": "Photo Finish",

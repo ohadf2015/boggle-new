@@ -45,6 +45,7 @@ export function WordTowerGame() {
 
   const dictRef = useRef<Set<string> | null>(null);
   const [dictReady, setDictReady] = useState(false);
+  const [dictError, setDictError] = useState(false);
   const [progress, setProgress] = useState<LoadedProgress | null>(null);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
 
@@ -52,10 +53,13 @@ export function WordTowerGame() {
   useEffect(() => {
     let cancelled = false;
     setDictReady(false);
+    setDictError(false);
     loadWordCraftDictionary(locale).then((set) => {
       if (cancelled) return;
       dictRef.current = set;
       setDictReady(true);
+    }).catch(() => {
+      if (!cancelled) setDictError(true);
     });
     return () => { cancelled = true; };
   }, [locale]);
@@ -121,6 +125,21 @@ export function WordTowerGame() {
   // locale so switching language re-fetches progress and re-mounts the store
   // with the freshly-restored tower for that locale's dictionary.
   const playKey = `wt-${language}-${daily ? 'daily' : 'endless'}`;
+
+  if (dictError) {
+    return (
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-4 bg-neo-navy">
+        <p className="font-neo-display text-xl text-neo-red">{t('wordTower.loadError')}</p>
+        <button
+          type="button"
+          onClick={() => window.location.reload()}
+          className="rounded-neo border-neo border-black bg-neo-cyan px-6 py-3 font-neo-display text-sm font-black uppercase text-black shadow-hard active:translate-y-px"
+        >
+          {t('common.retry')}
+        </button>
+      </div>
+    );
+  }
 
   if (!ready) {
     return (

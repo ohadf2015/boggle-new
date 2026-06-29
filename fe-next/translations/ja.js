@@ -132,6 +132,7 @@ const ja = {
       "not-your-turn": "順番をお待ちください。"
     },
     "solo": {
+      "category": { "hit": "✨ +2× {category}!" },
       "howTo": {
         "title": "遊び方",
         "cta": "OK！",
@@ -326,6 +327,8 @@ const ja = {
     "cardTitle": "ワードタワー",
     "cardDesc": "言葉を積んで空へ — 管理者プレビュー",
     "loading": "辞書を読み込み中…",
+    "loadError": "辞書を読み込めませんでした — タップして再試行",
+    "retry": "もう一度",
     "biome": { "city": "地上", "sky": "空", "stratosphere": "成層圏", "orbit": "軌道", "nebula": "星雲", "galaxy": "銀河" },
     "tier": { "apprentice": "見習い", "journeyman": "職人", "master": "マスター建築家" },
     "hud": { "floors": "{n} 階", "combo": "{n} 連鎖", "scramble": "シャッフル", "backspace": "削除", "build": "建てる", "restart": "やり直す", "restartConfirm": "本当に？", "best": "ベスト {m} m", "possible": "{n} 単語", "clue": "ヒント", "collapse": "閉じる", "expand": "開く", "rivalPassed": "{name} を抜いた！", "stuck": "詰まった？新しい文字", "backToTop": "上へ", "pickLetters": "文字を選ぶ", "dragToBuild": "なぞるかタップして綴る", "chaseGap": "+{m} m", "chaseAria": "次のライバル: {name}、抜くまであと {m} m" },
@@ -349,7 +352,7 @@ const ja = {
     "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
     "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
     "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
-    "share": { "button": "シェア", "text": "ワードタワーで {m}m 達成 — 私の塔を超えてみて！" },
+    "share": { "title": "ワードタワー", "button": "シェア", "text": "ワードタワーで {m}m 達成 — 私の塔を超えてみて！" },
     "versus": { "title": "タワーラッシュ", "bomb": "{name} を爆撃", "waiting": "対戦相手を待っています…", "incoming": "爆弾が来る！", "won": "勝利！", "lost": "{name} の勝ち" },
     "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}", "goldenTile": "ゴールデン文字 {letter}" },
     "skin": {
@@ -2641,6 +2644,7 @@ const ja = {
     "newMessages": "新メッセージ"
   },
   "results": {
+    "mpGapNudge": "あと{gap}点差 — 次のラウンドで巻き返そう！",
     "rivals": {
       "aria": "ライバルとの対戦",
       "header": "大接戦",

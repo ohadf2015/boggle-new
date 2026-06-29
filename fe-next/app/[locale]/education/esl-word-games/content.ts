@@ -27,8 +27,8 @@ export type EducationLocale = typeof EDUCATION_LOCALES[number];
 
 const content: Record<EducationLocale, LocaleContent> = {
   en: {
-    metaTitle: 'ESL Word Games Online — CEFR-Leveled Vocabulary Practice for English Learners | LexiClash',
-    metaDescription: 'Free ESL/EFL word games scaled by CEFR level (A1–C2) for English language learners. Build phonics, spelling, and vocabulary with a teacher dashboard that flags which words tripped which students. Bilingual support for English, Spanish, and Hebrew programs — no app, no per-student fees.',
+    metaTitle: 'ESL Vocabulary Games Online — Free CEFR-Leveled Practice for English Learners | LexiClash',
+    metaDescription: 'Free ESL vocabulary games online, scaled by CEFR level (A1–C2) for English learners. Build spelling, phonics, and vocabulary with live multiplayer competition and a teacher dashboard — no app, no per-student fees.',
     ogTitle: 'Free ESL Word Games for English Learners',
     ogDescription: 'Live multiplayer word games for the classroom. Free student accounts, 5 dictionaries, teacher dashboard.',
     twitterDescription: 'Free ESL/EFL word games for the classroom. Live multiplayer, 5 languages, teacher dashboard.',

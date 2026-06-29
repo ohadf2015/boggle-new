@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Alfapet & Scrabble Online Svenska Gratis — Spela Nu | LexiClash',
-    description: 'Spela Scrabble och Alfapet online på svenska gratis — utan registrering, upp till 50 spelare i realtid. Skapa rum, bjud in med länk och tävla direkt!',
+    description: 'Det bästa gratis alternativet till Scrabble på svenska — 2–50 spelare online i realtid, ingen app, ingen registrering. Skapa ett rum och börja spela nu →',
     keywords: 'ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
       title: 'Alfapet & Scrabble Online Svenska Gratis | LexiClash',

@@ -18,6 +18,11 @@ vi.mock('@/lib/playerStyle/playerStyleStorage', () => ({
   hasPlayerStyleModalBeenShown: () => false,
   markPlayerStyleModalShown: vi.fn(),
 }));
+// FTUE gate: the popup only surfaces to players who have played ≥1 game.
+// These cases test the route/results gating, not FTUE, so satisfy it.
+vi.mock('@/hooks/useUserStats', () => ({
+  useUserStats: () => ({ userStats: { totalGamesPlayed: 1 }, isLoading: false }),
+}));
 // The modal is dynamically imported — stub it so we just detect render.
 vi.mock('next/dynamic', () => ({
   default: () => {
@@ -25,6 +30,14 @@ vi.mock('next/dynamic', () => ({
     Stub.displayName = 'PlayerStyleModalStub';
     return Stub;
   },
+}));
+
+// FTUE gate: the popup only surfaces once the player has ≥1 game under their
+// belt. These route-gate tests are all about a returning/post-game user, so
+// report a played game; without this every "should show" case is suppressed by
+// the FTUE gate before the route logic under test is reached.
+vi.mock('@/hooks/useUserStats', () => ({
+  useUserStats: () => ({ userStats: { totalGamesPlayed: 1 }, isLoading: false }),
 }));
 
 let pathname = '/en/practice';

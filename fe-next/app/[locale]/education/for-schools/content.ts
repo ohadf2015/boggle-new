@@ -40,6 +40,8 @@ export interface ForSchoolsContent {
   leadIntro: string;
   faqTitle: string;
   faqs: ForSchoolsFaq[];
+  heroCta1: string;
+  heroCta2: string;
   closingTitle: string;
   closingCta: string;
 }
@@ -96,6 +98,8 @@ const EN: ForSchoolsContent = {
     { q: 'How do we start our trial or get a school plan?', a: 'Fill in the form on this page with your role, school or district, and rough student count. We\'ll confirm your trial access and share school plan details -- $149/year per school, district pricing on request.' },
     { q: 'How is this different from Kahoot, Gimkit or Quizlet?', a: 'Those are quiz/flashcard tools that cap their free tiers and are English-first. LexiClash is a word-building game (not multiple-choice), supports five languages including Hebrew RTL, has no player cap during the trial, and offers true 1v1 duels.' },
   ],
+  heroCta1: 'Play a class game free',
+  heroCta2: 'Tell us about your school',
   closingTitle: 'Ready to bring LexiClash to your school?',
   closingCta: 'Tell us about your school',
 };

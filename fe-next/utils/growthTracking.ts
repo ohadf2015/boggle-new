@@ -90,6 +90,8 @@ export type GrowthEvent =
   | 'avatar_nudge_clicked'
   | 'avatar_nudge_dismissed'
   | 'hint_used'
+  | 'wordwheel_drag_hint_shown'
+  | 'wordwheel_drag_hint_dismissed'
   // Conversion
   | 'signup_prompt_shown'
   | 'signup_completed'

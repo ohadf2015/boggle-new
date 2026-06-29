@@ -815,7 +815,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     const imgUrl = `${window.location.origin}/api/word-tower/share?${params.toString()}`;
     const text = t('wordTower.share.text', { m: Math.round(g.heightM) });
     try {
-      if (navigator.share) await navigator.share({ title: 'Word Tower', text, url: imgUrl });
+      if (navigator.share) await navigator.share({ title: t('wordTower.share.title'), text, url: imgUrl });
       else await navigator.clipboard?.writeText(`${text} ${imgUrl}`);
     } catch { /* user cancelled / unsupported */ }
   }, [t, mutator]);

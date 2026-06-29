@@ -18,7 +18,10 @@ import { useHoldToSubmit } from '@/hooks/useHoldToSubmit';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
 import { useWordWheelKeyboard } from '@/hooks/useWordWheelKeyboard';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
-import { trackGameEnd, trackGameStart } from '@/utils/growthTracking';
+import { trackGameEnd, trackGameStart, trackGrowthEvent } from '@/utils/growthTracking';
+import { useExperiment } from '@/hooks/useExperiment';
+import { useMPFTUEIdle } from '@/hooks/useMPFTUEIdle';
+import { MPDragCoachmark } from '@/components/multiplayer/MPDragCoachmark';
 import dynamic from 'next/dynamic';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
@@ -111,6 +114,22 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // pangram replaces (re-animates) rather than stacks.
   const [celebration, setCelebration] = useState<WheelCelebration | null>(null);
   const celebrationTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // exp-wordwheel-drag-hint-v1: the drag arm surfaces the "swipe to spell"
+  // coachmark after a short idle (the wheel rage-click root cause). Reuses the
+  // shared idle-FTUE + MP drag coachmark; auto-suppresses once a word is found.
+  const { variant: dragHintVariant, trackExposure: trackDragHintExposure } =
+    useExperiment('exp-wordwheel-drag-hint-v1');
+  useEffect(() => {
+    trackDragHintExposure();
+  }, [trackDragHintExposure]);
+  const dragHintFtue = useMPFTUEIdle({
+    enabled: dragHintVariant === 'drag-hint',
+    wordsFound: wordsFound.length,
+    idleMs: 6000,
+    storageKey: 'ww_ftue_drag_v1',
+    onShown: () => trackGrowthEvent('wordwheel_drag_hint_shown', { variant: dragHintVariant }),
+  });
 
   const gameOverRef = useRef(false);
   const wordsFoundRef = useRef<string[]>([]);
@@ -451,6 +470,8 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // ── Letter tap (toggle: add if unused, remove matching if already used;
   //    double-tap within DOUBLE_TAP_MS submits the built word) ──
   const handleLetterPress = useCallback((letter: string, wheelIndex: number, el: HTMLButtonElement) => {
+    // Any wheel interaction resets the drag-hint idle timer / hides it if shown.
+    dragHintFtue.markActivity();
     // A just-completed hold gesture (or eager-add) swallows its trailing onClick.
     if (holdSuppressClick()) return;
     if (gameOverRef.current) return;
@@ -477,7 +498,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     }
     addLetter(letter, wheelIndex, el);
     lastTapRef.current = { idx: wheelIndex, time: now };
-  }, [addLetter, holdSuppressClick, playButtonClickSound]);
+  }, [addLetter, holdSuppressClick, playButtonClickSound, dragHintFtue]);
 
   // ── Drag-to-build handlers (additive only — skips letters already used) ──
   // Shared with the practice wheel sandbox via useWheelDragSpell. Drag only
@@ -1160,6 +1181,17 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
             onHoldEnd={holdPointerEnd}
           />
         ))}
+        {/* exp-wordwheel-drag-hint-v1: idle "swipe to spell" coachmark (cyan = SP). */}
+        {dragHintFtue.visible && (
+          <MPDragCoachmark
+            t={t}
+            accent="cyan"
+            onDismiss={() => {
+              trackGrowthEvent('wordwheel_drag_hint_dismissed', { variant: dragHintVariant });
+              dragHintFtue.dismiss();
+            }}
+          />
+        )}
       </div>
 
       {/* The center-letter + min-length rule was removed from the live board to

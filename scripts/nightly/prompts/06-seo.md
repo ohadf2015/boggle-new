@@ -12,7 +12,13 @@ Education is a top growth target. In the GSC/Bing analysis this run, explicitly 
 ═══ STEP 0 — Pull Bing AI Performance + Keyword Research data ═══
 
 **AI Performance (Copilot citation data — UI-only, scrape via Playwriter):**
-Run `scripts/nightly/lib/bing-ai-perf-scrape.sh` BEFORE invoking the seo-daily skill. It writes `docs/nightly/ai-search/__TODAY__.json` with: `totals` (citations + avg_cited_pages over the default window), `grounding_queries` (which Copilot questions cited us, ranked by count), `cited_pages` (which of our URLs AI cites most).
+Run `scripts/nightly/lib/bing-ai-perf-scrape.sh` BEFORE invoking the seo-daily skill. It writes `docs/nightly/ai-search/__TODAY__.json` with: `totals` (citations + avg_cited_pages over the default window), `grounding_queries` (which Copilot questions cited us), `cited_pages` (which of our URLs AI cites most).
+
+Each grounding query now carries Bing's **enriched AI-visibility metadata** — use it, don't just read past it:
+- `intent` — Bing's intent label (e.g. "Learn and Solve", "Informational", "Media"). **Education lever:** treat `intent` containing "Learn"/"Solve" (and any query whose text is education-shaped) as the founder-priority education segment — prioritize those for the education-module CTR/FAQ/GEO work below.
+- `topic` — Bing's topic cluster (e.g. "Puzzle & Strategy Games", "Gaming"). Use to spot off-thesis citations (a topic that doesn't map to a real mode = don't chase it) and to group multi-query landing pages.
+- `citation_share` — our % share of citations for that query. **HIGH share (>40%) = we already dominate → defend only (internal links + FAQPage schema), do NOT rewrite the working page. LOW share (<15%) with high citations = contested high-traffic query → highest-leverage target: optimize the cited page for that exact query.**
+- `citations` — absolute citation count (drives the intel-signal magnitude/severity).
 
 Skip-gracefully — if the scrape fails (Chrome closed, Playwriter extension offline), the JSON file won't exist; continue without it. Lane 6 still works from GSC + Bing search data alone.
 

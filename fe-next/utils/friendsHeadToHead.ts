@@ -313,18 +313,26 @@ export async function updateOnlineStatus(userId?: string): Promise<void> {
 
   const supabase = createClient();
 
-  // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
-  const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
-  if (!uid) {
-    // Not actually authed — release the gate so a real session isn't blocked.
-    lastOnlineStatusWrite = 0;
-    return;
-  }
+  // Best-effort: a stale last_seen is harmless, but an unhandled rejection here
+  // (transient network / RLS / an incomplete client) crashes the fire-and-forget
+  // caller. Swallow + release the gate so the next cycle retries.
+  try {
+    // Reuse the caller's user id when available — avoids a redundant auth.getUser() round-trip (50–200ms).
+    const uid = userId ?? (await supabase.auth.getUser()).data.user?.id;
+    if (!uid) {
+      // Not actually authed — release the gate so a real session isn't blocked.
+      lastOnlineStatusWrite = 0;
+      return;
+    }
 
-  await supabase
-    .from('profiles')
-    .update({ last_seen_at: new Date().toISOString() })
-    .eq('id', uid);
+    await supabase
+      .from('profiles')
+      .update({ last_seen_at: new Date().toISOString() })
+      .eq('id', uid);
+  } catch (err) {
+    lastOnlineStatusWrite = 0;
+    logger.warn('updateOnlineStatus: best-effort write failed', (err as Error)?.message);
+  }
 }
 
 /**

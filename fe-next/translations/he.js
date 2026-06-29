@@ -132,6 +132,7 @@ const he = {
       "not-your-turn": "המתן לתורך."
     },
     "solo": {
+      "category": { "hit": "✨ +2× {category}!" },
       "howTo": {
         "title": "איך משחקים",
         "cta": "הבנתי!",
@@ -341,6 +342,8 @@ const he = {
     "cardTitle": "מגדל מילים",
     "cardDesc": "בנו מגדל מילים עד השמיים — תצוגת אדמין",
     "loading": "טוען מילון…",
+    "loadError": "לא ניתן לטעון את המילון — הקש לנסות שוב",
+    "retry": "נסה שוב",
     "biome": { "city": "קרקע", "sky": "שמיים", "stratosphere": "סטרטוספירה", "orbit": "מסלול", "nebula": "ערפילית", "galaxy": "גלקסיה" },
     "tier": { "apprentice": "מתחיל", "journeyman": "מיומן", "master": "אדריכל מאסטר" },
     "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "restartConfirm": "בטוח?", "best": "שיא {m} מ'", "possible": "{n} מילים", "clue": "רמז", "collapse": "כיווץ", "expand": "הרחבה", "rivalPassed": "עברת את {name}!", "stuck": "תקוע? אות חדשה", "backToTop": "למעלה", "pickLetters": "בחרו אותיות", "dragToBuild": "גררו או הקישו לאיות", "chaseGap": "+{m} מ'", "chaseAria": "המתחרה הבא מעליך: {name}, עוד {m} מטר לעקיפה" },
@@ -364,7 +367,7 @@ const he = {
     "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
     "celebration": { "highRise": "רב קומות!", "tall": "מתנשא לגובה!", "skyscraper": "גורד שחקים!" },
     "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },
-    "share": { "button": "שיתוף", "text": "הגעתי ל-{m} מ' במגדל מילים — נסו לעקוף את המגדל שלי!" },
+    "share": { "title": "מגדל מילים", "button": "שיתוף", "text": "הגעתי ל-{m} מ' במגדל מילים — נסו לעקוף את המגדל שלי!" },
     "versus": { "title": "מירוץ מגדלים", "bomb": "הפצצה על {name}", "waiting": "ממתינים ליריבים…", "incoming": "פצצה מתקרבת!", "won": "ניצחת!", "lost": "{name} ניצח" },
     "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}", "goldenTile": "אות זהב {letter}" },
     "skin": {
@@ -2812,6 +2815,7 @@ const he = {
     "newMessages": "הודעות חדשות"
   },
   "results": {
+    "mpGapNudge": "רק {gap} נקודות מאחור — קח את הסיבוב הבא!",
     "rivals": {
       "aria": "אתה מול היריבים",
       "header": "ראש בראש",

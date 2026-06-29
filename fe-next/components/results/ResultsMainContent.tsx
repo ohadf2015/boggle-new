@@ -184,6 +184,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   const showPodium = !hideStandings && isMultiplayer && sortedScores.length >= 3;
 
   const { variant: feedbackPosition } = useExperiment('exp-mp-round-feedback-top-v1');
+  const { variant: gapNudgeVariant } = useExperiment('exp-mp-score-gap-nudge-v1');
 
   useEffect(() => {
     if (isMultiplayer) {
@@ -361,6 +362,19 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       {nearRankData && (
         <NearRankTeaser nextTier={nearRankData.nextTier} eloNeeded={nearRankData.eloNeeded} />
       )}
+
+      {/* exp-mp-score-gap-nudge-v1: between-round gap nudge for non-winners */}
+      {gapNudgeVariant === 'gap-nudge' &&
+        isMultiplayer &&
+        !isCurrentUserWinner &&
+        seriesRoundNumber != null &&
+        seriesRoundNumber < (seriesTotalGames ?? 3) &&
+        currentPlayerData &&
+        sortedScores[0] && (
+          <div className="rounded-neo border-2 border-neo-pink bg-neo-pink/10 px-4 py-2 text-center text-sm font-neo-body text-neo-pink">
+            {t('results.mpGapNudge', { gap: String(sortedScores[0].score - currentPlayerData.score) })}
+          </div>
+        )}
 
       {/* ── 1. YOUR RESULT — the verdict: rank, score, gap to #1. The one big
           standing statement; every block below references it, never restates it

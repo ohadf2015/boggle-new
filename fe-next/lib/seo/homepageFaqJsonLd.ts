@@ -102,6 +102,30 @@ export function buildHomepageFaqJsonLd(locale: string) {
                   : 'Word Hunt is a daily word-search puzzle: you have 10 attempts to find the hidden word on the board. All players worldwide get the same board at midnight UTC. Share emoji results like Wordle. Play free on LexiClash — no download, no signup.',
         },
       },
+      {
+        '@type': 'Question',
+        name: lang === 'he'
+          ? 'מה הם משחקי המילים הטובים ביותר אונליין ב-2026?'
+          : lang === 'ja'
+            ? '2026年のおすすめ無料オンラインワードゲームは？'
+            : lang === 'sv'
+              ? 'Vilka är de bästa gratis ordspelen online 2026?'
+              : lang === 'es'
+                ? '¿Cuáles son los mejores juegos de palabras gratuitos en línea en 2026?'
+                : 'What are the best free online word games in 2026?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: lang === 'he'
+            ? 'לקסיקלאש מציע חמישה משחקי מילים חינמיים שניתן לשחק בכל דפדפן ללא הורדה: קלאסיק (בוגל בזמן אמת ל-2–50 שחקנים), גלגל המילה היומית (פאזל יומי משותף), Word Hunt (חיפוש מילים יומי), Word Forge (בניית מילים בלחץ זמן), ו-Blast (ספרינט ניקוי קוביות). ללא הרשמה, בחמש שפות כולל עברית.'
+            : lang === 'ja'
+              ? 'LexiClashはダウンロード・登録不要でブラウザから無料プレイできる5つのワードゲームを提供しています。Classic（2〜50人リアルタイムBoggle）、デイリーワードホイール（毎日更新の共有パズル）、ワードハント（毎日の単語探し）、ワードフォージ（制限時間内の単語構築）、Blast（タイルクリアスプリント）。日本語を含む5言語対応。'
+              : lang === 'sv'
+                ? 'LexiClash erbjuder fem gratis ordspel som spelas direkt i webbläsaren utan nedladdning: Classic (Boggle i realtid för 2–50 spelare), Dagligt Ordhjul (ett dagligt delat ordpussel), Word Hunt (daglig ordsökning), Word Forge (snabbt ordbyggarläge) och Blast (sprintläge med brickrensning). Inget konto krävs, tillgängligt på fem språk inklusive svenska.'
+                : lang === 'es'
+                  ? 'LexiClash ofrece cinco juegos de palabras gratuitos que se juegan en el navegador sin descargas: Classic (Boggle en tiempo real para 2–50 jugadores), Rueda de Palabras Diaria (puzzle diario compartido), Word Hunt (búsqueda de palabras diaria), Word Forge (construcción rápida de palabras) y Blast (sprint de limpieza de fichas). Sin registro, en cinco idiomas incluyendo español.'
+                  : 'LexiClash has five free word games playable in any browser with no download or signup: Classic (real-time Boggle for 2–50 players), Daily Word Wheel (a shared daily puzzle), Word Hunt (a daily word-search challenge), Word Forge (a speed word-building mode), and Blast (a tile-clearing sprint). Five languages, no account required.',
+        },
+      },
     ],
   };
 }

@@ -32,6 +32,21 @@ function defineExperiment<V extends readonly string[]>(
 
 export const EXPERIMENTS = {
   /**
+   * Word Wheel drag-hint coachmark. Hypothesis: the wheel's drag-to-spell
+   * mechanic is not tap-discoverable → confused/idle players rage-click and
+   * abandon (PostHog: word-wheel is the most rage-clicked SP surface). The
+   * drag-hint arm surfaces the animated "swipe to spell" coachmark after a
+   * short idle; control shows nothing. Win = higher word-wheel completion /
+   * lower abandonment. Auto-suppresses once a word is found.
+   */
+  'exp-wordwheel-drag-hint-v1': defineExperiment({
+    variants: ['control', 'drag-hint'] as const,
+    default: 'control',
+    description:
+      'Word Wheel idle drag-hint coachmark. control = no hint, drag-hint = animated "swipe to spell" coachmark after idle. Targets the wheel rage-click/abandonment problem.',
+  }),
+
+  /**
    * First-win signup-modal CTA copy. Hypothesis: value-prop copy
    * outperforms generic "Save Your Progress" by surfacing the concrete
    * benefit (track streak, unlock daily). Conversion = signup_completed
@@ -514,6 +529,28 @@ export const EXPERIMENTS = {
     default: 'control',
     description:
       'Word Hunt leaderboard tap-hint A/B. control = shows "Tap a player to see their path" (dead interaction → rage clicks). hide-hint = removes the hint. Targets rage-click regression on /he/daily/word-hunt (score 0.693). Conversion = wordhunt_leaderboard_tap drops.',
+  }),
+
+  /**
+   * MP between-round score-gap nudge. Signal: mp_round feedback avg 1.5
+   * (bad) + mp_player_dropped rate > completions in 24h (16 drops / 10
+   * completions). Hypothesis: showing a concrete "you're X pts behind the
+   * lead — keep pushing!" pill between rounds anchors the player to a
+   * catchable goal, reducing mid-series abandonment.
+   *
+   * control = no gap nudge (current).
+   * gap-nudge = small pill below the hero block; only shown when player
+   *   is NOT the round winner AND the series isn't over yet.
+   *
+   * Conversion = mp_round_ready_clicked (player stays for next round).
+   * Guardrail = mp_player_dropped (must not rise).
+   * Ship to PostHog: flag key = 'exp-mp-score-gap-nudge-v1', 50/50 rollout.
+   */
+  'exp-mp-score-gap-nudge-v1': defineExperiment({
+    variants: ['control', 'gap-nudge'] as const,
+    default: 'control',
+    description:
+      'MP between-round score-gap nudge. gap-nudge = show "X pts behind lead" encouragement pill when player lost the round and the series continues. Targets mp_player_dropped rate. Conversion = mp_round_ready_clicked.',
   }),
 } as const;
 

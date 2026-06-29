@@ -15,6 +15,8 @@ interface WordForgeHUDProps {
   roundTarget: number;
   bossConstraint: ActiveBossConstraint | null;
   wordsFoundCount?: number;
+  /** Timestamp (ms) of last word submission — drives live heat-decay bar. */
+  chainStartedAt?: number;
 }
 
 /**
@@ -29,6 +31,7 @@ export function WordForgeHUD({
   roundTarget,
   bossConstraint,
   wordsFoundCount = 0,
+  chainStartedAt = 0,
 }: WordForgeHUDProps): React.JSX.Element {
   const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
@@ -69,6 +72,18 @@ export function WordForgeHUD({
     prevWordsRef.current = wordsFoundCount;
     return undefined;
   }, [wordsFoundCount, prefersReducedMotion]);
+
+  // Live heat-decay bar: decays 8%/sec from 100% to 40% floor
+  const [heatPct, setHeatPct] = React.useState(100);
+  useEffect(() => {
+    if (!chainStartedAt) return;
+    setHeatPct(100);
+    const id = setInterval(() => {
+      const elapsed = (Date.now() - chainStartedAt) / 1000;
+      setHeatPct(Math.max(40, Math.round((1 - 0.08 * elapsed) * 100)));
+    }, 100);
+    return () => clearInterval(id);
+  }, [chainStartedAt]);
 
   return (
     <div className={cn(
@@ -123,6 +138,29 @@ export function WordForgeHUD({
           {roundScore}/{roundTarget}
         </span>
       </div>
+
+      {/* Heat bar — decays 8%/sec since last word (40% floor) */}
+      {chainStartedAt > 0 && (
+        <div className="flex items-center gap-2">
+          <span className="text-[10px] shrink-0">
+            {heatPct >= 75 ? '🔥' : heatPct >= 55 ? '🌡️' : '❄️'}
+          </span>
+          <div className="flex-1 h-2 bg-neo-cream/10 border border-neo-black/30 rounded-full overflow-hidden">
+            <div
+              className={cn(
+                'h-full rounded-full transition-none',
+                heatPct >= 80 ? 'bg-neo-orange' :
+                heatPct >= 60 ? 'bg-neo-yellow' :
+                heatPct >= 50 ? 'bg-neo-cyan' : 'bg-neo-cyan/40',
+              )}
+              style={{ width: `${heatPct}%` }}
+            />
+          </div>
+          <span className="text-[10px] font-bold tabular-nums text-neo-cream/50 shrink-0 w-8 text-right">
+            ×{(heatPct / 100).toFixed(2)}
+          </span>
+        </div>
+      )}
 
       {/* Words found badge */}
       {wordsFoundCount > 0 && (

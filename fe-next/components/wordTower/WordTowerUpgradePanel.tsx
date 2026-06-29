@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { getCoins } from '@/utils/coinManager';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useTowerUpgradeStore } from '@/lib/wordTower/useTowerUpgradeStore';
 import { LIVE_UPGRADE_IDS, UPGRADE_DEFS, upgradeCost, levelOf, isMaxed, type UpgradeId } from '@/lib/wordTower/upgrades';
 
@@ -37,6 +38,11 @@ export function WordTowerUpgradePanel({ onClose, t, dir = 'ltr' }: Props) {
   const buy = useTowerUpgradeStore((s) => s.buy);
   const [coins, setCoins] = useState(() => getCoins());
 
+  // WCAG 2.1.2: trap keyboard focus inside the modal + Escape-to-close. The panel
+  // only mounts while open, so the trap is always active here.
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useFocusTrap(dialogRef, true, onClose);
+
   const handleBuy = useCallback(
     (id: UpgradeId) => {
       if (buy(id)) setCoins(getCoins());
@@ -46,6 +52,7 @@ export function WordTowerUpgradePanel({ onClose, t, dir = 'ltr' }: Props) {
 
   return (
     <div
+      ref={dialogRef}
       className="fixed inset-0 z-[60] flex items-center justify-center bg-neo-navy/80 px-4 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"

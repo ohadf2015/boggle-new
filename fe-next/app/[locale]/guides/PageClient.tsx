@@ -17,6 +17,7 @@ const guidesContent: Record<string, {
   guides: Array<{ slug: string; title: string; description: string; icon: 'classic' | 'blast' | 'wordHunt' }>;
   faq: Array<{ question: string; answer: string }>;
   faqHeading: string;
+  educationCta: { heading: string; body: string; links: Array<{ label: string; path: string }> };
 }> = {
   en: {
     title: 'LexiClash Strategy Guides',
@@ -36,6 +37,15 @@ const guidesContent: Record<string, {
       { question: 'Which LexiClash mode has the best scoring potential?', answer: 'Blast mode has the highest scoring ceiling thanks to its combo multiplier. A sustained combo of 10+ words capped with a long finishing word can score several times more than the same words played in Classic. That said, Classic rewards vocabulary depth — words of 7+ letters score disproportionately well, so strong-vocabulary players are fully competitive there.' },
       { question: 'How long does it take to get good at LexiClash?', answer: 'Most players notice clear improvement within 5–10 games. The pattern that clicks first: scanning for -ING and -ED endings. After around 20 games, players start anticipating common letter clusters and can survey a full board in under five seconds. Reaching the top 25% on the leaderboard takes most players roughly 50 games — short daily sessions build word recognition faster than longer infrequent ones.' },
     ],
+    educationCta: {
+      heading: 'Using LexiClash in the Classroom?',
+      body: 'Teachers run live vocabulary competitions and spelling practice across five languages. Students at every level compete in real time — no setup needed.',
+      links: [
+        { label: 'Education Hub', path: 'education' },
+        { label: 'LexiClash for Schools', path: 'education/for-schools' },
+        { label: 'ESL Word Games', path: 'education/esl-word-games' },
+      ],
+    },
   },
   he: {
     title: 'מדריכי אסטרטגיה של לקסיקלאש',
@@ -55,6 +65,15 @@ const guidesContent: Record<string, {
       { question: 'איזה מצב משחק מציע את פוטנציאל הניקוד הגבוה ביותר?', answer: 'מצב בלאסט מציע את תקרת הניקוד הגבוהה ביותר הודות למכפיל הקומבו שלו. קומבו מתמשך עם מילה ארוכה בסוף יכול להניב כמה פעמים יותר ממה שניתן להרוויח מאותן מילים במצב קלאסי. עם זאת, קלאסי מתגמל ידע לשוני — מילים של 7 אותיות ומעלה צוברות ניקוד גבוה במיוחד.' },
       { question: 'כמה זמן לוקח להשתפר ב-LexiClash?', answer: 'רוב השחקנים שמים לב לשיפור ניכר תוך 5–10 משחקים. הדפוס שמתחיל לעבוד ראשון: סריקה אחר סיומות נפוצות. אחרי כ-20 משחקים מתחילים לאתר צברי אותיות ולסרוק לוח שלם תוך פחות מ-5 שניות. להגיע לרבע העליון בטבלה לוקח בממוצע כ-50 משחקים — משחק יומי קצר בונה זיהוי מילים מהר יותר ממפגשים ארוכים ולא תכופים.' },
     ],
+    educationCta: {
+      heading: 'משתמשים ב-LexiClash בכיתה?',
+      body: 'מורים מנהלים תחרויות אוצר מילים חיות ותרגול כתיב בחמש שפות. תלמידים בכל הרמות מתחרים בזמן אמת — ללא הגדרה מוקדמת.',
+      links: [
+        { label: 'מרכז חינוך', path: 'education' },
+        { label: 'LexiClash למוסדות חינוך', path: 'education/for-schools' },
+        { label: 'משחקי מילים לאנגלית כשפה זרה', path: 'education/esl-word-games' },
+      ],
+    },
   },
   sv: {
     title: 'LexiClash Strategiguider',
@@ -74,6 +93,15 @@ const guidesContent: Record<string, {
       { question: 'Vilket spelläge har bäst poängpotential?', answer: 'Blast-läge har det högsta poängtaket tack vare sitt kombomultiplikatorsystem. En ihållande kombo med ett långt avslutningsord kan ge flera gånger mer poäng än samma ord spelade i Klassiskt. Klassiskt belönar ordförrådsdjup — ord på 7+ bokstäver poängsätts oproportionerligt bra.' },
       { question: 'Hur lång tid tar det att bli bra på LexiClash?', answer: 'De flesta spelare märker tydlig förbättring inom 5–10 spel. Mönstret som brukar klicka in först: att skanna efter vanliga ändelser. Efter ~20 spel börjar man förutse vanliga bokstavskombinationer och kan skanna ett bräde på under fem sekunder. Att nå topp 25% på topplistan tar ungefär 50 spel — korta dagliga sessioner bygger ordigenkänning snabbare än långa ovanliga.' },
     ],
+    educationCta: {
+      heading: 'Använder du LexiClash i klassrummet?',
+      body: 'Lärare kör live-ordtävlingar och stavningsövningar på fem språk. Elever på alla nivåer tävlar i realtid — ingen förberedelse krävs.',
+      links: [
+        { label: 'Utbildningshub', path: 'education' },
+        { label: 'LexiClash för skolor', path: 'education/for-schools' },
+        { label: 'Engelska som andraspråk', path: 'education/esl-word-games' },
+      ],
+    },
   },
   ja: {
     title: 'LexiClash 攻略ガイド',
@@ -93,6 +121,15 @@ const guidesContent: Record<string, {
       { question: 'どのゲームモードが一番得点を稼ぎやすいですか？', answer: 'ブラストモードはコンボマルチプライヤーシステムのおかげで最も高いスコアを狙えます。10単語以上のコンボを維持して長い単語で締めくくると、クラシックモードの何倍もの得点になることがあります。ただし、クラシックは語彙力が直接報われ、7文字以上の単語は特に高得点です。' },
       { question: 'LexiClashが上手くなるまでどのくらいかかりますか？', answer: 'ほとんどのプレイヤーは5〜10ゲームで明確な上達を感じます。最初に身につくパターンは、よく出る接尾辞への素早い反応です。約20ゲーム後には一般的な文字の組み合わせを予測し、5秒以内にグリッド全体をスキャンできるようになります。上位25%に入るには多くのプレイヤーで約50ゲームかかります — 毎日の短いセッションの方が効果的です。' },
     ],
+    educationCta: {
+      heading: 'LexiClashを教室で活用していますか？',
+      body: '教師は5言語でライブ語彙コンテストや綴り練習を実施しています。あらゆるレベルの生徒がリアルタイムで競えます。',
+      links: [
+        { label: '教育ハブ', path: 'education' },
+        { label: '学校向けLexiClash', path: 'education/for-schools' },
+        { label: 'ESL単語ゲーム', path: 'education/esl-word-games' },
+      ],
+    },
   },
   es: {
     title: 'Guias de Estrategia LexiClash',
@@ -112,6 +149,15 @@ const guidesContent: Record<string, {
       { question: '¿Qué modo de juego tiene mayor potencial de puntuación?', answer: 'El modo Blast tiene el mayor techo de puntuación gracias a su sistema de multiplicador de combo. Un combo sostenido con una palabra larga al final puede dar varias veces más puntos que las mismas palabras jugadas en Clásico. Dicho esto, Clásico recompensa el vocabulario — las palabras largas (7+ letras) puntúan especialmente bien.' },
       { question: '¿Cuánto tiempo tarda uno en mejorar en LexiClash?', answer: 'La mayoría nota una mejora clara en 5–10 partidas. El patrón que suele encajar primero: buscar sufijos comunes como -AR, -ANDO y -CIÓN. Después de ~20 partidas se anticipan combinaciones frecuentes y se puede escanear un tablero en menos de cinco segundos. Llegar al 25% superior del marcador tarda unas 50 partidas — sesiones cortas diarias son más efectivas que sesiones largas ocasionales.' },
     ],
+    educationCta: {
+      heading: '¿Usas LexiClash en el aula?',
+      body: 'Los profesores organizan competiciones de vocabulario en vivo y práctica de ortografía en cinco idiomas. Alumnos de todos los niveles compiten en tiempo real.',
+      links: [
+        { label: 'Centro educativo', path: 'education' },
+        { label: 'LexiClash para instituciones', path: 'education/for-schools' },
+        { label: 'Juegos de palabras en inglés', path: 'education/esl-word-games' },
+      ],
+    },
   },
 };
 
@@ -221,6 +267,33 @@ export default function GuidesIndexPageClient(): React.ReactElement {
               </div>
             ))}
           </dl>
+        </section>
+
+        <section className={cn(
+          'mt-10 max-w-2xl mx-auto p-6 rounded-neo border-2 border-neo-black',
+          isDarkMode ? 'bg-neo-navy-light' : 'bg-neo-lime/10'
+        )}>
+          <h2 className={cn('text-lg font-bold mb-2', isDarkMode ? 'text-neo-lime' : 'text-neo-black')}>
+            {content.educationCta.heading}
+          </h2>
+          <p className={cn('text-sm leading-relaxed mb-4', isDarkMode ? 'text-gray-300' : 'text-gray-700')}>
+            {content.educationCta.body}
+          </p>
+          <ul className="flex flex-wrap gap-3">
+            {content.educationCta.links.map((link) => (
+              <li key={link.path}>
+                <Link
+                  href={`/${locale}/${link.path}`}
+                  className={cn(
+                    'text-sm font-semibold underline underline-offset-2',
+                    isDarkMode ? 'text-neo-cyan hover:text-neo-cyan/80' : 'text-neo-black hover:opacity-70'
+                  )}
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <InlineBannerAd webZone="content-page" className="mt-8" />

@@ -132,6 +132,7 @@ const es = {
       "not-your-turn": "Espera tu turno."
     },
     "solo": {
+      "category": { "hit": "✨ +2× {category}!" },
       "title": "Shiritori en solitario",
       "tagline": "Encadena palabras en hiragana contra el bot.",
       "back": "Volver a Shiritori",
@@ -313,6 +314,8 @@ const es = {
       "steps": ["🏗️ Toca el botón para soltar el bloque de palabra sobre la torre", "🎯 Aterriza centrado: las caídas descuidadas inclinan la torre", "🔤 Cada palabra válida apila un piso. ¡Construye lo más alto posible!"]
     },
     "loading": "Cargando diccionario…",
+    "loadError": "No se pudo cargar el diccionario — toca para reintentar",
+    "retry": "Intentar de nuevo",
     "biome": { "city": "Suelo", "sky": "Cielo", "stratosphere": "Estratosfera", "orbit": "Órbita", "nebula": "Nebulosa", "galaxy": "Galaxia" },
     "hud": { "floors": "{n} pisos", "combo": "cadena {n}", "scramble": "Mezclar", "backspace": "Borrar", "build": "Construir", "restart": "Reiniciar", "restartConfirm": "¿Seguro?", "best": "Mejor {m} m", "possible": "{n} palabras", "clue": "Pista", "collapse": "Contraer", "expand": "Expandir", "rivalPassed": "¡Superaste a {name}!", "stuck": "¿Atascado? Nueva letra", "backToTop": "Arriba", "pickLetters": "Elige letras", "dragToBuild": "Arrastra o toca para formar", "chaseGap": "+{m} m", "chaseAria": "Próximo rival arriba: {name}, faltan {m} metros para superarlo" },
     "minimap": { "label": "Mapa de la torre — {m} m, toca para subir" },
@@ -336,7 +339,7 @@ const es = {
     "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
     "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
     "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
-    "share": { "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
+    "share": { "title": "Torre de Palabras", "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
     "versus": { "title": "Carrera de Torres", "bomb": "Bombardear a {name}", "waiting": "Esperando rivales…", "incoming": "¡Bomba entrante!", "won": "¡Ganaste!", "lost": "Ganó {name}" },
     "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}", "goldenTile": "Letra dorada {letter}" },
     "skin": {
@@ -2500,6 +2503,7 @@ const es = {
     "newMessages": "Mensajes nuevos"
   },
   "results": {
+    "mpGapNudge": "¡Solo {gap} pts detrás — conquista la próxima ronda!",
     "rivals": {
       "aria": "Tú contra tus rivales",
       "header": "Final de foto",

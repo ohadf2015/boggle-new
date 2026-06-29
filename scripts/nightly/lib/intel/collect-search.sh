@@ -73,8 +73,9 @@ if [ -f "$ARTIFACT" ]; then
   query_count=$(echo "$queries" | jq 'length' 2>/dev/null || echo 0)
 
   if [ "$query_count" -gt 0 ]; then
-    # Find max impressions for severity scaling
-    max_impressions=$(echo "$queries" | jq '[.[] | .impressions // 0] | max // 1' 2>/dev/null)
+    # Find max magnitude for severity scaling. Bing AI-perf emits `citations`
+    # (not impressions/count) — include all three so scaling never collapses to 1.
+    max_impressions=$(echo "$queries" | jq '[.[] | (.impressions // .citations // .count // 0)] | max // 1' 2>/dev/null)
 
     # Emit one signal per grounding query
     while IFS= read -r query_obj; do
@@ -83,16 +84,26 @@ if [ -f "$ARTIFACT" ]; then
       q=$(echo "$query_obj" | jq -r '.query // ""' 2>/dev/null)
       [ -z "$q" ] && continue
 
-      # Magnitude: prefer impressions, fall back to count, fall back to 1
+      # Magnitude: prefer impressions, then citations (the field the scraper writes),
+      # then count, then 1.
       imp=$(echo "$query_obj" | jq '.impressions // 0' 2>/dev/null)
+      cit=$(echo "$query_obj" | jq '.citations // 0' 2>/dev/null)
       cnt=$(echo "$query_obj" | jq '.count // 0' 2>/dev/null)
-      magnitude=$(( imp > 0 ? imp : (cnt > 0 ? cnt : 1) ))
+      magnitude=$(( imp > 0 ? imp : (cit > 0 ? cit : (cnt > 0 ? cnt : 1)) ))
+
+      # Evidence: the enriched Bing AI-visibility columns (intent / topic / citation share)
+      # so lane 6 can target by intent (e.g. education) and rank by citation dominance.
+      evidence=$(echo "$query_obj" | jq -r '
+        [ (if .intent then "intent=\(.intent)" else empty end),
+          (if .topic then "topic=\(.topic)" else empty end),
+          (if .citation_share then "share=\(.citation_share)%" else empty end)
+        ] | join(" · ")' 2>/dev/null)
 
       # Fingerprint: stable dedup id (normalized query)
       fp=$(echo "search:aiquery:$q" | tr ' ' '_' | tr -cd '[:alnum:]_:' | sed 's/_*$//')
 
       add "$(emit_signal search search "AI-cited query: $q" ai_impressions "$magnitude" 0 \
-            "$(sev_of "$magnitude" "$max_impressions")" 06-seo "search:aiquery:$q" "" M "$fp")"
+            "$(sev_of "$magnitude" "$max_impressions")" 06-seo "search:aiquery:$q" "$evidence" M "$fp")"
     done < <(echo "$queries" | jq -c '.[]')
   fi
 fi
