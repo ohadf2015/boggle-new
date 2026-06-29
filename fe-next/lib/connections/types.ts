@@ -33,7 +33,7 @@ export interface ConnectionPuzzle {
   theme?: PuzzleTheme;
 }
 
-export type PuzzleLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+export type PuzzleLocale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 export type GameStatus =
   | 'playing'

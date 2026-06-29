@@ -24,7 +24,7 @@ import {
 } from '@/lib/dailyChallenge/wordBankService';
 import { syncLocalJSONToDatabase } from '@/backend/services/wikipediaWordPopulator';
 
-const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as const;
+const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru', 'fr', 'de'] as const;
 
 /**
  * GET /api/admin/daily-word/word-bank

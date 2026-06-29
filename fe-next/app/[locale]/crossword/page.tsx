@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import type { PuzzleLocale } from '@/lib/crossword/types';
 import { CrosswordPageClient } from './CrosswordPageClient';
 
-const VALID_LOCALES: PuzzleLocale[] = ['en', 'he', 'sv', 'ja', 'es'];
+const VALID_LOCALES: PuzzleLocale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 /**
  * Crossword — a fully client-side daily puzzle. The board, clue navigation and

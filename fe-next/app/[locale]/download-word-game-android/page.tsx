@@ -13,7 +13,7 @@ interface PageProps {
 
 const BASE_URL = 'https://www.lexiclash.live';
 const SLUG = 'download-word-game-android';
-const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const HERO_IMAGE = '/images/landing/download-word-game-android-hero.webp';
 
 const OG_IMAGE: Record<string, string> = {
@@ -92,7 +92,7 @@ export default async function DownloadWordGameAndroidPage({ params }: PageProps)
     applicationCategory: 'GameApplication',
     url: `${BASE_URL}/${locale}/${SLUG}`,
     image: `${BASE_URL}/${OG_IMAGE[locale] ?? OG_IMAGE.en}`,
-    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+    inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
     installUrl: PLAY_STORE_URL,
     downloadUrl: PLAY_STORE_URL,
     isFamilyFriendly: true,

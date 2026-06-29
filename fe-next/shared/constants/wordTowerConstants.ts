@@ -200,6 +200,26 @@ export const WORD_TOWER_LETTER_BAGS: Record<Language, string> = {
     'ささ' +
     'きき' +
     'くく',
+  ru:
+    'ОООООООООО' +
+    'EEEEEEEEEE' +
+    'AAAAAAAA' +
+    'ИИИИИИИ' +
+    'NNNNNN' +
+    'РРРРРР' +
+    'TTTTTT' +
+    'LLLL' +
+    'КККК' +
+    'ММММ' +
+    'ДДДД' +
+    'ПППП' +
+    'ВВВ' +
+    'ГГГ' +
+    'ЗЗ' +
+    'ББ' +
+    'СС' +
+    'УУ' +
+    'ЙХШЩЦЖФЭЮЯ',
   // Languages present in the Language union but not yet supported by Word Tower.
   fr: '',
   de: '',
@@ -219,4 +239,5 @@ export const WORD_TOWER_VOWELS: Record<Language, string> = {
   ja: 'あいうえお',
   fr: 'AEIOU',
   de: 'AEIOU',
+  ru: 'АЕИОУЫ',
 };

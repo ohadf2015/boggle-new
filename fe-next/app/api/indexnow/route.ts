@@ -3,7 +3,7 @@ import { discoverPublicRoutes } from '@/utils/discoverRoutes';
 
 const INDEXNOW_KEY = process.env.INDEXNOW_KEY || '207c6c1a7de212bfab82a5acf0b02280';
 const BASE_URL = 'https://www.lexiclash.live';
-const LOCALES = ['en', 'he', 'sv', 'ja', 'es'];
+const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 /**
  * POST /api/indexnow - Submit URLs to IndexNow for faster indexing

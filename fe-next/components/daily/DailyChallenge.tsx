@@ -85,13 +85,13 @@ const DailyChallenge: React.FC = () => {
 
   // Game language state
   const urlLocale = language as Language;
-  const defaultLanguage = urlLocale && ['en', 'he', 'sv', 'ja', 'es'].includes(urlLocale)
+  const defaultLanguage = urlLocale && ['en', 'he', 'sv', 'ja', 'es', 'ru'].includes(urlLocale)
     ? urlLocale
     : 'en';
   const [gameLanguage, setGameLanguage] = useState<Language>(defaultLanguage);
 
   const getCurrentFlag = (lang: Language) => {
-    const flags: Record<string, string> = { en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸' };
+    const flags: Record<string, string> = { en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸', ru: '🇷🇺' };
     return flags[lang] || '🌐';
   };
 

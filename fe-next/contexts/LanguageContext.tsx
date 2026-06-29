@@ -35,7 +35,7 @@ const LanguageContext = createContext<LanguageContextValue | null>(null);
 // (which carries its own `flag`) finishes loading. Keyed by language so a
 // non-Hebrew user never briefly sees the Israeli flag as the default.
 const FLAG_BY_LANGUAGE: Record<string, string> = {
-    en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸',
+    en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸', ru: '🇷🇺',
 };
 
 const parseLocaleFromPath = (pathname: string): Language | null => {

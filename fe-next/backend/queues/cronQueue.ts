@@ -109,7 +109,7 @@ export async function registerAllCronJobs(): Promise<void> {
   const { populateWikipediaWords } = await import('../services/wikipediaWordPopulator');
   const { runDictionaryEnrichment } = await import('../modules/dictionaryEnrichment');
 
-  const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+  const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
   await registerCronJob('wikipedia-words', '55 23 * * *', async () => {
     const results = await Promise.allSettled(

@@ -2,7 +2,7 @@
 // Solutions are stored NORMALIZED (Hebrew: non-sofit form). Final-letter forms are applied
 // only at the render boundary. See docs/2026-06-06-crossword-mode-spec.md.
 
-export type PuzzleLocale = 'en' | 'he' | 'es' | 'sv' | 'ja';
+export type PuzzleLocale = 'en' | 'he' | 'es' | 'sv' | 'ja' | 'ru';
 
 export type Direction = 'across' | 'down';
 

@@ -23,7 +23,7 @@ import type { Language } from '@/shared/types/game';
 // With 7 languages in parallel, some may timeout and retry
 export const maxDuration = 90;
 
-const SUPPORTED_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'];
+const SUPPORTED_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'ru', 'fr', 'de'];
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   // Verify admin authentication

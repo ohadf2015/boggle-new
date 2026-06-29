@@ -131,6 +131,31 @@ export function normalizeSpanishWord(word: string): string {
 }
 
 // ============================================================
+// RUSSIAN NORMALIZATION
+// ============================================================
+
+/**
+ * Russian ё/е folding. `ё` and `е` are routinely interchanged in everyday
+ * Russian typing, and dictionaries are inconsistent about which form they store.
+ * Fold ё→е on BOTH the dictionary (load time) and the guess (validate time) so
+ * a board `Е` tile and a dictionary `ёж`/`еж` always match. The board never
+ * shows a `Ё` tile (see russianLetterPool), so this is purely a guess-side and
+ * dictionary-side reconciliation. Mirrors the Spanish accent-fold approach.
+ */
+export function normalizeRussianLetter(letter: string): string {
+  const lower = letter.toLowerCase();
+  return lower === 'ё' ? 'е' : lower;
+}
+
+/**
+ * Normalize an entire Russian word - lowercase and fold ё→е.
+ */
+export function normalizeRussianWord(word: string): string {
+  if (typeof word !== 'string') return '';
+  return word.toLowerCase().replace(/ё/g, 'е');
+}
+
+// ============================================================
 // GENERIC NORMALIZATION (Language-agnostic)
 // ============================================================
 
@@ -144,6 +169,8 @@ export function normalizeLetter(letter: string, language: Language): string {
       return normalizeHebrewLetter(lower);
     case 'es':
       return normalizeSpanishLetter(lower);
+    case 'ru':
+      return normalizeRussianLetter(lower);
     default:
       return lower;
   }
@@ -163,6 +190,8 @@ export function normalizeWord(word: string, language: Language): string {
       return normalizeHebrewWord(word);
     case 'es':
       return normalizeSpanishWord(word);
+    case 'ru':
+      return normalizeRussianWord(word);
     case 'ja':
       return word; // Japanese doesn't need normalization
     case 'en':
@@ -235,6 +264,7 @@ const LANGUAGE_PATTERNS: Record<Language, RegExp> = {
   en: /^[a-zA-Z]+$/,
   sv: /^[a-zA-ZåäöÅÄÖ]+$/,
   es: /^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]+$/,
+  ru: /^[\u0400-\u04FF]+$/,
   ja: /^[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]+$/,
   // Add more languages as needed
   fr: /^[a-zA-ZàâäéèêëïîôùûüÿçœæÀÂÄÉÈÊËÏÎÔÙÛÜŸÇŒÆ]+$/,

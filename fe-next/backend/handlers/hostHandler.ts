@@ -16,7 +16,7 @@ import {
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import logger from '../utils/logger.js';
 
-const ALLOWED_LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es'];
+const ALLOWED_LANGUAGES: readonly Language[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 /**
  * Register host-related socket event handlers

@@ -163,4 +163,5 @@ export const WORD_FREQUENCY_TIERS: Record<Language, Record<string, number>> = {
   es: {},
   fr: {},
   de: {},
+  ru: {},
 };

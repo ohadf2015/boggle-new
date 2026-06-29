@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const validLanguages = ['en', 'he', 'sv', 'ja', 'es'];
+    const validLanguages = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
     if (!validLanguages.includes(language)) {
       return NextResponse.json(
         { success: false, error: 'Invalid language code' },

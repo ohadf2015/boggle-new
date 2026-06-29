@@ -21,7 +21,7 @@ const RATE_LIMIT_CONFIG = {
 // Input validation schema
 const generateHintsSchema = z.object({
   targetWord: z.string().min(2).max(20).regex(/^[a-zA-Z\u0590-\u05FF\u3040-\u30FF\u4E00-\u9FAF\u00C0-\u017F]+$/),
-  language: z.enum(['en', 'he', 'sv', 'ja', 'es', 'fr', 'de']).default('en'),
+  language: z.enum(['en', 'he', 'sv', 'ja', 'es', 'ru', 'fr', 'de']).default('en'),
 });
 
 // Language configuration for vowels and alphabet

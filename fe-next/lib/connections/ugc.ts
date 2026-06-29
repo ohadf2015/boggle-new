@@ -5,7 +5,7 @@
  * for moderation; approved ones surface in a community list ranked by upvotes
  * (the "dynamic ranking"). This module owns the rules; the API route owns the DB.
  */
-const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
+const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 export const MAX_UGC_WORD_LEN = 24;
 const MAX_NAME_LEN = 50;
 

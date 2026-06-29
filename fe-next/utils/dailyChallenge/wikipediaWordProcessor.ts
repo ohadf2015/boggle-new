@@ -14,7 +14,8 @@ const MIN_WORD_LENGTH: Record<Language, number> = {
   ja: 2, // Japanese kanji compounds are typically 2-4 characters
   es: 4,
   fr: 4,
-  de: 4
+  de: 4,
+  ru: 4
 };
 
 // Maximum word lengths by language
@@ -25,7 +26,8 @@ const MAX_WORD_LENGTH: Record<Language, number> = {
   ja: 4,
   es: 6,
   fr: 6,
-  de: 6
+  de: 6,
+  ru: 6
 };
 
 // Character set validators by language
@@ -36,7 +38,8 @@ const CHARACTER_VALIDATORS: Record<Language, RegExp> = {
   ja: /^[\u4E00-\u9FAF\u3040-\u309F\u30A0-\u30FF]+$/,
   es: /^[A-ZÁÉÍÓÚÜÑ]+$/,
   fr: /^[A-ZÀÂÇÉÈÊËÎÏÔÙÛÜŸŒÆ]+$/,
-  de: /^[A-ZÄÖÜẞ]+$/
+  de: /^[A-ZÄÖÜẞ]+$/,
+  ru: /^[А-ЯЁ]+$/
 };
 
 // Overused/common words to penalize (reduces interestingness score)
@@ -63,6 +66,9 @@ const OVERUSED_WORDS: Record<Language, Set<string>> = {
   ]),
   de: new Set([
     'HAUS', 'ZEIT', 'JAHR', 'WELT', 'LAND'
+  ]),
+  ru: new Set([
+    'ДОМ', 'ВРЕМЯ', 'ГОД', 'МИР', 'ЗЕМЛЯ'
   ])
 };
 

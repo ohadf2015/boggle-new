@@ -17,6 +17,7 @@ const MIN_WORD_LENGTH: Record<Language, number> = {
   es: 4,
   fr: 4,
   de: 4,
+  ru: 4,
 };
 
 /**

@@ -194,7 +194,7 @@ export async function syncLocalJSONToDatabase(
   language?: Language,
   loadWordsFromJSON?: (lang: Language) => Promise<Array<{ word: string; source: string; url?: string; score: number }> | null>
 ): Promise<{ success: boolean; results: Record<string, { synced: number; error?: string }> }> {
-  const targetLanguages = language ? [language] : (['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as Language[]);
+  const targetLanguages = language ? [language] : (['en', 'he', 'sv', 'ja', 'es', 'ru', 'fr', 'de'] as Language[]);
   const today = new Date();
 
   logger.info('WikiPopulator', `Starting local JSON sync for: ${targetLanguages.join(', ')} (parallel processing)`);

@@ -30,8 +30,8 @@ async function main() {
   );
   console.log(`  parallel html=${p1.length}B text=${p2.length}B`);
 
-  // Try all 5 languages
-  for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
+  // Try all 6 languages
+  for (const lang of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
     await time(`lang=${lang} parallel`, () =>
       Promise.all([
         render(AndroidBetaLaunchEmail({ ...props, language: lang })),

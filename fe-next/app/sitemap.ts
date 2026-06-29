@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 import { wordsByLocale as wotdWords } from './[locale]/word-of-the-day/content';
 
 const BASE_URL = 'https://www.lexiclash.live';
-const LOCALES = ['he', 'en', 'sv', 'ja', 'es'] as const;
+const LOCALES = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
 
 // Use stable dates instead of new Date() to avoid telling Google every page changed on every request.
 // NEXT_PUBLIC_BUILD_TIME is set in next.config.mjs at build time, so this auto-updates on deploy.
@@ -38,6 +38,7 @@ function langAlternates(path: string): Record<string, string> {
   alts['en-AU'] = `${BASE_URL}/en${path}`;
   alts['es-AR'] = `${BASE_URL}/es${path}`;
   alts['es-CO'] = `${BASE_URL}/es${path}`;
+  alts['ru-RU'] = `${BASE_URL}/ru${path}`;
   return alts;
 }
 
@@ -321,6 +322,12 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForLocaleOnly(routes, '/lexiclash-vs-flocabulary', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-vocabularyspellingcity', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/lexiclash-vs-freerice', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
+
+  // ─── Russian keyword landings (Russian-only body) ───
+  // robots: { index: locale === 'ru' } in each page; emit RU-only with self
+  // hreflang so Google never crawls a noindexed non-RU variant.
+  addForLocaleOnly(routes, '/igry-v-slova-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
+  addForLocaleOnly(routes, '/slovo-dnya', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.85 }, 'ru');
 
   // ─── Education keyword landings (English-only body) ───
   // Same pattern as comparison pages: robots: { index: locale === 'en' }, non-EN

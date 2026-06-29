@@ -9,6 +9,7 @@ import enHuntTargets from '@/lib/practice/data/wordHuntTargets.en.json';
 import heHuntTargets from '@/lib/practice/data/wordHuntTargets.he.json';
 import svHuntTargets from '@/lib/practice/data/wordHuntTargets.sv.json';
 import esHuntTargets from '@/lib/practice/data/wordHuntTargets.es.json';
+import ruHuntTargets from '@/lib/practice/data/wordHuntTargets.ru.json';
 
 /**
  * Bonus words to embed in the grid for survival mode playability
@@ -59,6 +60,15 @@ export const BONUS_WORD_LISTS: Record<Language, string[]> = {
     'HAUS', 'BAUM', 'BUCH', 'HUND', 'KATZE', 'SONNE', 'MOND', 'STERN',
     'BERG', 'WALD', 'FLUSS', 'MEER', 'STADT', 'LAND', 'WELT', 'ZEIT',
     'BROT', 'WEIN', 'MILCH', 'ROSE', 'BLAU', 'GRÜN', 'ROTE', 'GOLD',
+  ],
+  ru: [
+    // Common 4+ letter Russian words for discovery
+    'ДЕРЕВО', 'ПТИЦА', 'РЫБА', 'ЗВЕЗДА', 'ЛУНА', 'ДОЖДЬ', 'ВЕТЕР', 'СНЕГ',
+    'КНИГА', 'ДВЕРЬ', 'РУКА', 'НОГА', 'ГОЛОВА', 'ЛИЦО', 'КАМЕНЬ', 'ПЕСОК',
+    'ЛОДКА', 'ИГРА', 'ВОЛК', 'МЕДВЕДЬ', 'ЛЯГУШКА', 'ОЛЕНЬ', 'УТКА', 'ЯСТРЕБ',
+    'ТОРТ', 'МОЛОКО', 'СУП', 'РЫБА', 'ХЛЕБ', 'КУКУРУЗА', 'СЛИВА', 'ГРУША',
+    'ЗОЛОТО', 'ЖЕЛЕЗО', 'НЕФРИТ', 'РУБИН', 'ШЕЛК', 'ШЕРСТЬ', 'ГЛИНА', 'УГОЛЬ',
+    'ХОЛМ', 'ОЗЕРО', 'ВОЛНА', 'ПЕЩЕРА', 'ТРОПА', 'ВЕРШИНА', 'ПРУД', 'РИФ',
   ],
 };
 
@@ -196,6 +206,36 @@ const CURATED_TARGET_WORD_LISTS: Record<Language, string[]> = {
     'GARTEN', 'NATUR', 'HIMMEL', 'SOMMER', 'WINTER',
     'HERBST', 'SCHULE', 'KIRCHE', 'BRÜCKE', 'DRACHE', 'RITTER',
   ],
+  ru: [
+    // Window: 5-6 letters only (MIN_ANSWER_LENGTH=5, MAX_TARGET_WORD_LENGTH=6).
+    // ── Животные и существа ──
+    'ВЫДРА', 'ВОРОН', 'ЖУРАВЛЬ', 'БИЗОН', 'АКУЛА', 'КИТ', 'ОРЁЛ',
+    'ТИГР', 'КОНЬ', 'ЗМЕЯ',
+    // ── Природа и пейзаж ──
+    'ОБЛАКО', 'РЕКА', 'ОКЕАН', 'ПЛЯЖ',
+    // ── Еда и вкус ──
+    'ПЕРСИК', 'ВИНОГРАД', 'ЛИМОН', 'ХЛЕБ', 'МАСЛИНА', 'СЛИВКИ',
+    'ПИРШЕСТВО', 'СПЕЦИЯ', 'МАНГО', 'КАКАО',
+    // ── Магия и фантазия ──
+    'ПЛАМЯ', 'ИСКРА', 'ЧАРА', 'ЗАКЛЯТИЕ', 'ПРИЗРАК', 'ФЕЯ', 'МЕЧТА',
+    'КОРОЛЕВСТВО', 'ПРОКЛЯТИЕ', 'КУЗНИЦА', 'ДРАКОН', 'РЫЦАРЬ', 'ВОЛШЕБНИК', 'ПИРАТ',
+    'ЗАМОК',
+    // ── Цвета и материалы ──
+    'ЖЕМЧУГ', 'КОРАЛЛ', 'ЯНТАРЬ', 'СЛОНОВАЯ', 'СЕРЕБРО', 'БРОНЗА',
+    // ── Действия и движение ──
+    'ТАНЕЦ', 'ЦВЕТЕНИЕ', 'ПЛАМЯ', 'ВОЛНА', 'СТРЕМЛЕНИЕ', 'СКОЛЬЖЕНИЕ', 'БЫСТРО', 'МУЖЕСТВО',
+    // ── Эмоции и характер ──
+    'СНОВИДЕНИЕ', 'ГОРДОСТЬ', 'СЕРДЦЕ', 'МИР', 'БЛАГОРОДСТВО', 'ГРАЦИЯ', 'ВЕЛИЧИЕ',
+    // ── Объекты и инструменты ──
+    'КОРОНА', 'МЕЧ', 'ФАКЕЛ', 'РАКОВИНА',
+    // ── Места и структуры ──
+    'БАШНЯ', 'РОЩА', 'ТРОПА', 'БЕРЕГ', 'УТЁС', 'АРЕНА', 'САД',
+    'ЛЕС', 'ОСТРОВ', 'ДОЛИНА',
+    // ── Погода и небо ──
+    'МОРОЗ', 'БУРЯ', 'ТЕНЬ', 'ЗАКАТ', 'ВЕТЕРОК', 'ЛУГА', 'РУЧЕЙ',
+    // ── Дополнительные яркие слова ──
+    'РАЗВЕДЧИК', 'МЕДАЛЬ',
+  ],
 };
 
 /**
@@ -225,6 +265,7 @@ export const TARGET_WORD_LISTS: Record<Language, string[]> = {
   he: mergeUnique(CURATED_TARGET_WORD_LISTS.he, heHuntTargets as string[]),
   sv: mergeUnique(CURATED_TARGET_WORD_LISTS.sv, svHuntTargets as string[]),
   es: mergeUnique(CURATED_TARGET_WORD_LISTS.es, esHuntTargets as string[]),
+  ru: mergeUnique(CURATED_TARGET_WORD_LISTS.ru, ruHuntTargets as string[]),
 };
 
 /**
@@ -275,6 +316,11 @@ export const SAME_LENGTH_HELPER_WORDS: Record<Language, Record<number, string[]>
     4: ['HAUS', 'BAUM', 'BUCH', 'HUND', 'MOND', 'BERG', 'WALD', 'MEER', 'LAND', 'WELT', 'ZEIT', 'BROT', 'WEIN', 'ROSE', 'BLAU', 'GOLD', 'ROTE'],
     5: ['KATZE', 'SONNE', 'STERN', 'STADT', 'GROSS', 'KLEIN', 'KRAFT', 'PLATZ', 'SACHE', 'LIEBE', 'WASSER', 'FLUSS'],
     6: ['GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER', 'WINTER', 'HERBST', 'SCHULE', 'KIRCHE', 'BRÜCKE'],
+  },
+  ru: {
+    4: ['ДОМА', 'ДЕРЕВО', 'КНИГА', 'СОБАКА', 'ЛУНА', 'ГОРА', 'ЛЕС', 'МОРЕ', 'ЗЕМЛЯ', 'МИРА', 'ВРЕМЯ', 'ХЛЕБ', 'ВИНО', 'РОЗА', 'СИНИЙ', 'ЗОЛОТОЙ', 'КРАСНЫЙ'],
+    5: ['КОШКА', 'СОЛНЦЕ', 'ЗВЕЗДА', 'ГОРОД', 'БОЛЬШОЙ', 'МАЛЫЙ', 'СИЛА', 'МЕСТО', 'ВЕЩЬ', 'ЛЮБОВЬ', 'ВОДА', 'РЕКА'],
+    6: ['САД', 'ОКНО', 'ПРИРОДА', 'НЕБО', 'ЛЕТО', 'ЗИМА', 'ОСЕНЬ', 'ШКОЛА', 'ЦЕРКОВЬ', 'МОСТ'],
   },
 };
 

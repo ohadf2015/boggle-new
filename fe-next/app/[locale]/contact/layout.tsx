@@ -10,7 +10,7 @@ interface LayoutParams {
 
 export async function generateMetadata({ params }: LayoutParams): Promise<Metadata> {
   const { locale } = await params;
-  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as Locale;
+  const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as Locale;
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const enT = await loadTranslation('en') as Record<string, any>;
   const seo = t?.seo?.contact || enT.seo.contact;

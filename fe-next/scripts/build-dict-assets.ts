@@ -9,7 +9,7 @@ const OUT_DIR = path.join(ROOT, 'public', 'dicts');
 const BACKEND = path.join(ROOT, 'backend');
 
 interface Source {
-  locale: 'en' | 'he' | 'sv' | 'ja' | 'es';
+  locale: 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
   collect: () => Promise<string[]> | string[];
 }
 
@@ -65,6 +65,15 @@ const sources: Source[] = [
       const approved = readLines(path.join(BACKEND, 'spanish_words_approved.txt'));
       return [...spanish, ...approved];
     },
+  },
+  {
+    locale: 'ru',
+    // Fold ё→е to match backend normalizeRussianWord, so the offline/client
+    // dict accepts/rejects exactly what the server does.
+    collect: () => [
+      ...readLines(path.join(BACKEND, 'russian_words.txt')),
+      ...readLines(path.join(BACKEND, 'russian_words_approved.txt')),
+    ].map((w) => w.toLowerCase().replace(/ё/g, 'е')),
   },
 ];
 

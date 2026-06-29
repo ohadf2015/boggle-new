@@ -5,18 +5,18 @@ import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 export const revalidate = 86400;
 
-type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
 }
 
 const BASE_URL = 'https://www.lexiclash.live';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as ValidLocale;
+  const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as ValidLocale;
   const content = getContent(validLocale);
   const localePath = `/${locale}`;
   const pageUrl = `${BASE_URL}${localePath}/tools`;
@@ -112,7 +112,7 @@ const toolsSeoContent: Record<string, {
 
 export default async function ToolsHubPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as ValidLocale;
+  const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as ValidLocale;
   const seoData = toolsSeoContent[validLocale] ?? toolsSeoContent.en;
   return (
     <>

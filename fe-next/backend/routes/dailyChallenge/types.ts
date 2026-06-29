@@ -5,7 +5,7 @@
 
 import { Request } from 'express';
 
-export const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+export const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 export type ValidLanguage = typeof VALID_LANGUAGES[number];
 
 // ==================== Request/Response Types ====================

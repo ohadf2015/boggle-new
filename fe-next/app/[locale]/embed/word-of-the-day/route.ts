@@ -7,7 +7,7 @@ import { getRotatedTodayWord, type Locale } from '../../word-of-the-day/content'
 // Frameability (frame-ancestors *) is set per-route in next.config.mjs.
 
 const SITE_URL = 'https://www.lexiclash.live';
-const VALID_LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+const VALID_LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 const EYEBROW_LABELS: Record<Locale, string> = {
   en: 'WORD OF THE DAY',
@@ -15,6 +15,7 @@ const EYEBROW_LABELS: Record<Locale, string> = {
   sv: 'DAGENS ORD',
   ja: '今日の単語',
   es: 'PALABRA DEL DÍA',
+  ru: 'СЛОВО ДНЯ',
 };
 
 const FOOTER_LABELS: Record<Locale, string> = {
@@ -23,6 +24,7 @@ const FOOTER_LABELS: Record<Locale, string> = {
   sv: 'Drivs av LexiClash — Spela gratis →',
   ja: 'Powered by LexiClash — 無料でプレイ →',
   es: 'Con tecnología de LexiClash — Juega gratis →',
+  ru: 'Работает на LexiClash — Играйте бесплатно →',
 };
 
 // Data is our own static content.ts (not user input), but we render it into a raw

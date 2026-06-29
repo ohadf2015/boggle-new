@@ -31,6 +31,7 @@ export const LANGUAGE_CONFIG: Record<string, { name: string; vowels: string[]; a
   sv: { name: 'Swedish', vowels: ['A', 'E', 'I', 'O', 'U', 'Y', 'Å', 'Ä', 'Ö'], alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÅÄÖ' },
   ja: { name: 'Japanese', vowels: ['あ', 'い', 'う', 'え', 'お', 'ア', 'イ', 'ウ', 'エ', 'オ'], alphabet: 'あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをん' },
   es: { name: 'Spanish', vowels: ['A', 'E', 'I', 'O', 'U', 'Á', 'É', 'Í', 'Ó', 'Ú'], alphabet: 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ' },
+  ru: { name: 'Russian', vowels: ['А', 'Е', 'И', 'О', 'У', 'Ы', 'Э', 'Ю', 'Я'], alphabet: 'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ' },
   fr: { name: 'French', vowels: ['A', 'E', 'I', 'O', 'U', 'Y', 'À', 'Â', 'É', 'È', 'Ê', 'Ë', 'Î', 'Ï', 'Ô', 'Ù', 'Û', 'Ü', 'Ÿ'], alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' },
   de: { name: 'German', vowels: ['A', 'E', 'I', 'O', 'U', 'Ä', 'Ö', 'Ü'], alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß' },
 };
@@ -39,7 +40,7 @@ const HINT_UNLOCK_COSTS = { LEVEL_1: 0, LEVEL_2: 4, LEVEL_3: 8, LEVEL_4: 12, LEV
 
 export const generateHintsSchema = z.object({
   targetWord: z.string().min(2).max(20).regex(/^[a-zA-Z\u0590-\u05FF\u3040-\u30FF\u4E00-\u9FAF\u00C0-\u017F]+$/),
-  language: z.enum(['en', 'he', 'sv', 'ja', 'es', 'fr', 'de']).default('en'),
+  language: z.enum(['en', 'he', 'sv', 'ja', 'es', 'ru', 'fr', 'de']).default('en'),
 });
 
 // LRU Cache

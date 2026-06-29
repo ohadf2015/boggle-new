@@ -57,7 +57,7 @@ export const ALLOWED_IMAGE_DOMAINS: string[] = [
 // ==================== Base Schemas ====================
 // These are the building blocks reused across event schemas
 
-export const LanguageSchema = z.enum(['he', 'en', 'sv', 'ja', 'es', 'fr', 'de']);
+export const LanguageSchema = z.enum(['he', 'en', 'sv', 'ja', 'es', 'ru', 'fr', 'de']);
 
 export const AvatarSchema = z.object({
   emoji: z.string()

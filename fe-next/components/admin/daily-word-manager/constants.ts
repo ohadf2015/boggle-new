@@ -10,6 +10,7 @@ export const MIN_WORD_LENGTH: Record<Language, number> = {
   es: 4,
   fr: 4,
   de: 4,
+  ru: 4,
 };
 
 export const LANGUAGES: LanguageOption[] = [
@@ -90,6 +91,13 @@ export const INITIAL_WORD_LISTS: Record<Language, string[]> = {
     'HAUS', 'BAUM', 'BUCH', 'HUND', 'KATZE', 'SONNE', 'MOND', 'STERN',
     'WELT', 'ZEIT', 'STADT', 'GROSS', 'KLEIN', 'KRAFT', 'PLATZ', 'SACHE', 'WASSER', 'LIEBE',
     'GARTEN', 'FENSTER', 'NATUR', 'HIMMEL', 'SOMMER'
+  ],
+  ru: [
+    'ЗВЕЗДА', 'СОЛНЦЕ', 'ЛУНА', 'НЕБО', 'ОБЛАКО', 'МОЛНИЯ', 'ГРОЗА', 'БУРЯ',
+    'ВЕТЕР', 'ДОЖДЬ', 'СНЕГ', 'МОРОЗ', 'ОГОНЬ', 'ВОДА', 'ЗЕМЛЯ', 'ВОЗДУХ',
+    'ГОРА', 'РЕКА', 'ОЗЕРО', 'МОРЕ', 'ЛЕС', 'ПОЛЕ', 'САД', 'ДОЛИНА',
+    'ДРАКОН', 'ЗАМОК', 'КОРОНА', 'МЕЧА', 'ЩИТ', 'ТРОН', 'МАГИЯ', 'ЛЕГЕНДА',
+    'СКАЗКА', 'МЕЧТА', 'ВИДЕНИЕ', 'ПРИКЛЮЧЕНИЕ', 'ПУТЕШЕСТВИЕ', 'ПОИСКИ', 'СОКРОВИЩЕ', 'ТАЙНА'
   ]
 };
 

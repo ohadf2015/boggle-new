@@ -3,7 +3,7 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { NextRequest, NextResponse } from 'next/server';
 import { handleGetBlastProgress, handleClaimBlastProgress, type BlastProgressPayload, type SupabaseLike } from './_handlers';
 
-const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
 export async function POST(req: NextRequest) {
   const supabase = await createClient();

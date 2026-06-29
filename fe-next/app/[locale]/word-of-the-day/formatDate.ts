@@ -6,6 +6,7 @@ const INTL_LOCALE: Record<Locale, string> = {
   sv: 'sv-SE',
   ja: 'ja-JP',
   es: 'es-ES',
+  ru: 'ru-RU',
 };
 
 export function formatLongDate(locale: Locale, dateKey: string): string {

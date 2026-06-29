@@ -93,6 +93,38 @@ export const rubikHebrew = localFont({
   preload: false,
 });
 
+// Cyrillic display font (Russian) — Fredoka has NO Cyrillic glyphs.
+// Comfortaa is the closest rounded/friendly display face that ships Cyrillic.
+// Exposed under --font-fredoka so all `font-neo-display` usages pick it up for ru.
+export const fredokaCyrillic = localFont({
+  src: [
+    {
+      path: '../public/fonts/comfortaa-cyrillic.woff2',
+      weight: '400 700',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+  variable: '--font-fredoka',
+  fallback: ['system-ui', 'Arial', 'sans-serif'],
+  preload: false,
+});
+
+// Cyrillic body font (Russian) — Rubik upstream ships Cyrillic.
+export const rubikCyrillic = localFont({
+  src: [
+    {
+      path: '../public/fonts/rubik-cyrillic.woff2',
+      weight: '400 700',
+      style: 'normal',
+    },
+  ],
+  display: 'swap',
+  variable: '--font-rubik',
+  fallback: ['system-ui', 'Arial', 'sans-serif'],
+  preload: false,
+});
+
 // Hebrew gamified body font — Heebo: clean, modern, variable weight 400-700
 export const heeboHebrew = localFont({
   src: [

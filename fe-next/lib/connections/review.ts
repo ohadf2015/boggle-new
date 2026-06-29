@@ -5,7 +5,7 @@
  * is upserted to connections_puzzle_reviews. Bad-flagged rows later feed the
  * nightly improvement loop. This module owns the rules; the API owns the DB.
  */
-const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
+const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 const VERDICTS = ['good', 'bad', 'unsure'] as const;
 export const MAX_REVIEW_BATCH = 1000;
 const MAX_NOTE_LEN = 500;

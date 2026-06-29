@@ -74,12 +74,12 @@ export const TAILWIND_SWEEP_MULT = 1.2;
 
 /** Per-language vowel sets for {@link MUTATORS.vowelGale}. */
 const VOWELS: Record<Language, string> = {
-  en: 'AEIOU', sv: 'AEIOUÅÄÖ', es: 'AEIOU', he: 'אהוי', ja: 'あいうえお', fr: 'AEIOU', de: 'AEIOU',
+  en: 'AEIOU', sv: 'AEIOUÅÄÖ', es: 'AEIOU', he: 'אהוי', ja: 'あいうえお', fr: 'AEIOU', de: 'AEIOU', ru: 'АЕИОУЫ',
 };
 
 /** Letters too rare/awkward to make a fair golden target (per language). */
 const WEAK_GOLDEN: Record<Language, string> = {
-  en: 'QZXJKVW', sv: 'QZXWÅÄÖ', es: 'QZXWKÑ', he: 'זטצ', ja: '', fr: 'QZXWKY', de: 'QXYÄÖ',
+  en: 'QZXJKVW', sv: 'QZXWÅÄÖ', es: 'QZXWKÑ', he: 'זטצ', ja: '', fr: 'QZXWKY', de: 'QXYÄÖ', ru: 'ЙХШЩЦЖФЭЮЯ',
 };
 
 // --- deterministic RNG (FNV-1a hash + mulberry32) imported from @/lib/rng/seededRandom ---

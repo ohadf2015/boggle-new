@@ -16,7 +16,7 @@ interface PageParams {
 }
 
 const BASE_URL = 'https://www.lexiclash.live';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 function getHreflangAlternates(path: string) {
   const languages: Record<string, string> = {
@@ -46,7 +46,7 @@ function getHreflangAlternates(path: string) {
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as ValidLocale;
+  const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as ValidLocale;
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const enT = await loadTranslation('en') as Record<string, any>;
   const content = getContent(validLocale);
@@ -90,7 +90,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
 
 export default async function WordSolverPage({ params }: PageParams) {
   const { locale } = await params;
-  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as ValidLocale;
+  const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as ValidLocale;
   const content = getContent(validLocale);
   const pageUrl = `${BASE_URL}/${locale}/tools/word-solver`;
 

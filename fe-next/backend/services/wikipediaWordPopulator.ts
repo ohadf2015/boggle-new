@@ -102,6 +102,12 @@ const FALLBACK_WORD_LISTS: Record<Language, string[]> = {
     'WALD', 'WÜSTE', 'GLETSCHER', 'VULKAN', 'WASSERFALL', 'WIESE', 'TAL', 'HÜGEL',
     'SCHLOSS', 'TURM', 'BRÜCKE', 'HAFEN', 'GARTEN', 'PALAST', 'TEMPEL', 'KIRCHE',
     'LEGENDE', 'RÄTSEL', 'SCHATZ', 'REISE', 'SUCHE', 'RUHM', 'EHRE', 'SCHICKSAL'
+  ],
+  ru: [
+    'ЗВЕЗДА', 'ГАЛАКТИКА', 'КОМЕТА', 'ТУМАННОСТЬ', 'ЗАТМЕНИЕ', 'КОСМОС', 'МЕТЕОР', 'ЛУННЫЙ',
+    'ЛЕС', 'ПУСТЫНЯ', 'ЛЕДНИК', 'ВУЛКАН', 'ВОДОПАД', 'ЛУГА', 'ДОЛИНА', 'ХОЛМ',
+    'ЗАМОК', 'БАШНЯ', 'МОСТ', 'ГАВАНЬ', 'САД', 'ДВОРЕЦ', 'ХРАМ', 'ЦЕРКОВЬ',
+    'ЛЕГЕНДА', 'ЗАГАДКА', 'СОКРОВИЩЕ', 'ПУТЕШЕСТВИЕ', 'ПОИСКИ', 'СЛАВА', 'ЧЕСТЬ', 'СУДЬБА'
   ]
 };
 

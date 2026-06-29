@@ -14,7 +14,7 @@ import WordOfTheDayClient from '../PageClient';
 export const dynamic = 'force-dynamic';
 
 const SITE_URL = 'https://www.lexiclash.live';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 interface PageProps {
   params: Promise<{ locale: string; date: string }>;

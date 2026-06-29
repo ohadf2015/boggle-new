@@ -21,6 +21,7 @@ export const LANGUAGE_CONFIG: Record<Language, Omit<LanguageOption, 'code'>> = {
   sv: { flag: '🇸🇪', name: 'Swedish', nativeName: 'Svenska' },
   ja: { flag: '🇯🇵', name: 'Japanese', nativeName: '日本語' },
   es: { flag: '🇪🇸', name: 'Spanish', nativeName: 'Español' },
+  ru: { flag: '🇷🇺', name: 'Russian', nativeName: 'Русский' },
   fr: { flag: '🇫🇷', name: 'French', nativeName: 'Français' },
   de: { flag: '🇩🇪', name: 'German', nativeName: 'Deutsch' },
 };
@@ -34,6 +35,7 @@ export const LANGUAGE_FLAGS: Record<Language, string> = {
   sv: '🇸🇪',
   ja: '🇯🇵',
   es: '🇪🇸',
+  ru: '🇷🇺',
   fr: '🇫🇷',
   de: '🇩🇪',
 };
@@ -57,7 +59,7 @@ export const getLanguageName = (lang: Language, native = true): string => {
  * Languages currently available for gameplay
  * (subset of all defined languages)
  */
-export const SUPPORTED_GAME_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
+export const SUPPORTED_GAME_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 /**
  * Language options array for dropdowns and selectors
@@ -71,7 +73,7 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = SUPPORTED_GAME_LANGUAGES.map(c
 /**
  * All languages including those in development
  */
-export const ALL_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'];
+export const ALL_LANGUAGES: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'ru', 'fr', 'de'];
 
 /**
  * RTL (Right-to-Left) languages

@@ -31,7 +31,7 @@ import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
 import type { Language } from '@/shared/types/game';
 
-import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew } from '../fonts';
+import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
 const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureModal'), {
@@ -86,14 +86,14 @@ const SocialMediaPixels = nextDynamic(() => import('@/components/SocialMediaPixe
 // this session via PRIME before useSafeArea / AnchoredNativeBanner can recover.
 const PRIME_CLS_VARS_SCRIPT = `(function(){try{var d=document.documentElement;var b=parseFloat(localStorage.getItem('lc_admob_h'));var n=parseFloat(localStorage.getItem('lc_bottom_nav_h'));if(!isNaN(b)&&b>=0&&b<=200)d.style.setProperty('--admob-banner-height',b+'px');else if(!isNaN(b))try{localStorage.removeItem('lc_admob_h')}catch(e){}if(!isNaN(n)&&n>=0&&n<=200)d.style.setProperty('--bottom-nav-height',n+'px');else if(!isNaN(n))try{localStorage.removeItem('lc_bottom_nav_h')}catch(e){}if(!localStorage.getItem('cookie-consent-v2')&&!localStorage.getItem('cookie-consent'))d.classList.add('needs-cookie-consent');}catch(e){}})();`;
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface LocaleLayoutProps {
     children: ReactNode;
     params: Promise<{ locale: string }>;
 }
 
-const SUPPORTED_LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es']);
+const SUPPORTED_LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 
 function getLocalePath(locale: string): string {
     return SUPPORTED_LOCALES.has(locale) ? `/${locale}` : '/en';
@@ -234,9 +234,15 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
     // Locale-aware font preloading: Hebrew pages get all 4 font variables,
     // non-Hebrew pages skip Hebrew font preloads (~60-80KB saved)
+    // Russian needs Cyrillic glyphs: Fredoka has none → Comfortaa (display),
+    // Rubik ships Cyrillic upstream (body). Both also carry Latin so the brand
+    // name / numbers still render. Use ONLY the Cyrillic faces to avoid a
+    // --font-fredoka / --font-rubik CSS-var collision with the Latin faces.
     const fontClasses = validLocale === 'he'
       ? `${fredokaLatin.variable || ''} ${fredokaHebrew.variable || ''} ${rubikLatin.variable || ''} ${rubikHebrew.variable || ''} ${heeboHebrew.variable || ''}`
-      : `${fredokaLatin.variable || ''} ${rubikLatin.variable || ''}`;
+      : validLocale === 'ru'
+        ? `${fredokaCyrillic.variable || ''} ${rubikCyrillic.variable || ''}`
+        : `${fredokaLatin.variable || ''} ${rubikLatin.variable || ''}`;
 
     // Load only the active language's full translations server-side (~250KB instead of 1.26MB)
     // This is passed to ConditionalProviders → EssentialProviders → LanguageProvider

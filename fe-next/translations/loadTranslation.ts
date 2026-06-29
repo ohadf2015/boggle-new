@@ -44,6 +44,9 @@ export async function loadTranslation(lang: Language): Promise<TranslationData> 
     case 'es':
       mod = await import('./es.js');
       break;
+    case 'ru':
+      mod = await import('./ru.js');
+      break;
     default:
       mod = await import('./en.js');
   }
