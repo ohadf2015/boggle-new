@@ -13687,6 +13687,7 @@ const he = {
     "giveUp": "אני מוותר",
     "solutionIs": "הפתרון",
     "whyItWorks": "למה זה עובד",
+    "difficulty": { "easy": "קל", "medium": "בינוני", "hard": "קשה" },
     "like": "אהבתי",
     "dislike": "לא אהבתי",
     "next": "הבא",

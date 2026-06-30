@@ -13838,6 +13838,7 @@ const es = {
     "giveUp": "Rendirse",
     "solutionIs": "Solución",
     "whyItWorks": "Por qué funciona",
+    "difficulty": { "easy": "Fácil", "medium": "Media", "hard": "Difícil" },
     "like": "Me gusta",
     "dislike": "No me gusta",
     "next": "Siguiente",

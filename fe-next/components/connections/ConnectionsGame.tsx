@@ -510,14 +510,14 @@ export default function ConnectionsGame() {
       <div className="flex justify-center gap-2">
         <Link
           href={`/${language}/connections/daily`}
-          className="inline-flex items-center gap-1.5 rounded-full border border-neo-yellow/40 bg-neo-yellow/5 px-3 py-1 font-neo-body text-xs font-bold text-neo-yellow/90 transition-colors hover:bg-neo-yellow/10 hover:text-neo-yellow"
+          className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-yellow/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-yellow shadow-hard-sm transition-all duration-100 hover:bg-neo-yellow/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
         >
           <span aria-hidden="true">🏆</span>
           <span>{t('connections.daily.cta')}</span>
         </Link>
         <Link
           href={`/${language}/connections/community`}
-          className="inline-flex items-center gap-1.5 rounded-full border border-neo-pink/40 bg-neo-pink/5 px-3 py-1 font-neo-body text-xs font-bold text-neo-pink/90 transition-colors hover:bg-neo-pink/10 hover:text-neo-pink"
+          className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-pink/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-pink shadow-hard-sm transition-all duration-100 hover:bg-neo-pink/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
         >
           <span aria-hidden="true">👥</span>
           <span>{t('connections.community.cta')}</span>

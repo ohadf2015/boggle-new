@@ -13742,6 +13742,7 @@ const ja = {
     "giveUp": "ギブアップ",
     "solutionIs": "答え",
     "whyItWorks": "なぜつながる？",
+    "difficulty": { "easy": "かんたん", "medium": "ふつう", "hard": "むずかしい" },
     "like": "いいね",
     "dislike": "よくない",
     "next": "次へ",

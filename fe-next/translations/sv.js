@@ -247,6 +247,7 @@ const sv = {
     "giveUp": "Ge upp",
     "solutionIs": "Lösning",
     "whyItWorks": "Varför det funkar",
+    "difficulty": { "easy": "Lätt", "medium": "Medel", "hard": "Svår" },
     "like": "Gilla",
     "dislike": "Ogilla",
     "next": "Nästa",

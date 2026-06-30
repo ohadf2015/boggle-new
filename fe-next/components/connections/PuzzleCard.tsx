@@ -79,6 +79,7 @@ export default function PuzzleCard({
   const borderColor = STATUS_BORDER[state.status] ?? STATUS_BORDER.playing;
   const bgColor = STATUS_BG[state.status] ?? STATUS_BG.playing;
   const isCorrect = state.status === 'correct';
+  const isWrong = state.status === 'wrong';
   const isGaveUp = state.status === 'gaveUp';
   const isResolved = isCorrect || isGaveUp;
   const isDisabled = isResolved || state.status === 'finished' || state.status === 'outOfLives';
@@ -149,7 +150,7 @@ export default function PuzzleCard({
               DIFFICULTY_STYLE[puzzle.difficulty] ?? 'border-neo-white/20 text-neo-white',
             ].join(' ')}
           >
-            {puzzle.difficulty}
+            {t(`connections.difficulty.${puzzle.difficulty}`)}
           </span>
         )}
 
@@ -295,9 +296,9 @@ export default function PuzzleCard({
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 22, delay: 0.15 }}
-                className="mb-6 flex flex-col items-center gap-1.5 border-b border-neo-white/10 pb-5"
+                className="mb-6 flex flex-col items-center gap-2 rounded-neo border-neo border-neo-lime/30 bg-neo-lime/5 px-3 py-3 shadow-hard-sm"
               >
-                <span className="text-neo-white/50 text-[0.65rem] font-neo-body uppercase tracking-[0.18em]">
+                <span className="text-neo-lime/80 text-xs font-neo-body font-bold uppercase tracking-[0.18em]">
                   {t('connections.whyItWorks')}
                 </span>
                 <div className="flex flex-wrap items-center justify-center gap-2" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -342,8 +343,8 @@ export default function PuzzleCard({
                   className={[
                     'min-h-[3.25rem] w-full rounded-neo border-neo bg-neo-navy px-4 py-3 text-lg shadow-hard',
                     'font-neo-display font-bold text-neo-white placeholder:text-neo-white/40 placeholder:font-neo-body placeholder:font-normal',
-                    'outline-none focus:border-neo-cyan',
-                    isCorrect ? 'border-neo-lime' : 'border-neo-white/20',
+                    'outline-none focus:border-neo-cyan transition-colors duration-200',
+                    isCorrect ? 'border-neo-lime' : isWrong ? 'border-neo-red bg-neo-red/10' : 'border-neo-white/20',
                   ].join(' ')}
                 />
                 <m.button
@@ -365,9 +366,9 @@ export default function PuzzleCard({
                 aria-label={t('connections.placeholder')}
                 className={[
                   'min-h-[3.25rem] rounded-neo border-neo bg-neo-navy px-4 py-3 text-lg shadow-hard',
-                  'flex items-center font-neo-display font-bold tracking-[0.2em]',
+                  'flex items-center font-neo-display font-bold tracking-[0.2em] transition-colors duration-200',
                   isRTL ? 'justify-end text-right' : 'justify-start text-left',
-                  isCorrect ? 'border-neo-lime' : 'border-neo-white/20',
+                  isCorrect ? 'border-neo-lime' : isWrong ? 'border-neo-red bg-neo-red/10' : 'border-neo-white/20',
                 ].join(' ')}
               >
                 {bufferDisplay ? (

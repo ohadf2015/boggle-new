@@ -451,6 +451,7 @@ const ru = {
     "giveUp": "Сдаться",
     "solutionIs": "Решение",
     "whyItWorks": "Почему это работает",
+    "difficulty": { "easy": "Лёгкий", "medium": "Средний", "hard": "Сложный" },
     "like": "Нравится",
     "dislike": "Не нравится",
     "next": "Дальше",

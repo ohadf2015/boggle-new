@@ -13040,6 +13040,7 @@ const en = {
     "giveUp": "Give up",
     "solutionIs": "Solution",
     "whyItWorks": "Why it works",
+    "difficulty": { "easy": "Easy", "medium": "Medium", "hard": "Hard" },
     "like": "Like",
     "dislike": "Dislike",
     "next": "Next",
