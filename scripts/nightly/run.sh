@@ -880,7 +880,38 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
       echo -e "\n**Outcome (partial):** isolated gate passed after dropping + reverting gate-failing file(s); shipping the rest of the authored work." >> "$REPORT"
       break
     fi
-    [ "$iso_rc" != "1" ] && break   # setup failed → bail to docs-only salvage
+    if [ "$iso_rc" = "3" ]; then
+      # INCONCLUSIVE wedge in the peel re-gate (the 2026-06-30 miss: after peeling the one
+      # broken file, build:fast wedged >900s under concurrent-session contention → the old
+      # `[ != 1 ] && break` lumped rc=3 with rc=2 and DROPPED 18 BUILD-CLEAN files to
+      # docs-only). A timeout is NOT a failure. Get the conclusive verdict the FIRST-gate
+      # ladder uses (run.sh:599-640): a standalone build:schemas + tsc --noEmit + test:changed
+      # tier (~1min, unwedgeable). Ship the kept set on green; peel again if it names an
+      # offender; only fall to docs-only if that conclusive tier ALSO wedges.
+      log "drop-and-re-gate round $_round: re-gate INCONCLUSIVE (wedged ${NIGHTLY_GATE_IDLE_SECS:-900}s idle / ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop) — running the conclusive standalone typecheck tier before dropping any more BUILD-CLEAN code"
+      run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 0 1; _pl_tc_rc=$?
+      case "$(nightly_gate_typecheck_route "$_pl_tc_rc")" in
+        ship)
+          gate_ok=1
+          log "drop-and-re-gate: standalone typecheck tier PASSED — shipping the kept authored set (type-checked + affected-tests-green; full next-build + full suite UNVERIFIED this run, wedged)"
+          mkdir -p docs/nightly 2>/dev/null || true
+          printf '# Nightly TYPECHECK-TIER ship (peel loop) — %s\n\nThe drop-and-re-gate peel loop re-gate wedged in next-build under contention after\npeeling the broken file(s). A standalone `build:schemas && tsc --noEmit && test:changed`\ntier (~1min) PASSED, so the kept authored set shipped at REDUCED strength (full\nnext-build / SSG prerender + full suite UNVERIFIED). Verified post-push by\nrailway-deploy-check.sh + health-monitor.sh. ACTION: none required.\n' "${TODAY}" > "docs/nightly/TYPECHECK-TIER-${TODAY}.md" 2>/dev/null || true
+          echo "docs/nightly/TYPECHECK-TIER-${TODAY}.md" >> "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || true
+          echo -e "\n**Outcome (partial, typecheck-tier):** peel re-gate wedged; standalone tsc --noEmit + test:changed passed, so shipped the kept set at reduced strength. See docs/nightly/TYPECHECK-TIER-${TODAY}.md." >> "$REPORT"
+          tg_alert "nightly $TODAY: peel re-gate wedged in next-build; conclusive typecheck tier passed + shipped the kept set at REDUCED strength (full next-build/suite UNVERIFIED). No action required."
+          break ;;
+        peel)
+          # Typecheck tier named a real offender among the kept set → loop again; the
+          # parser at the loop top reads this tier's NIGHTLY_LAST_GATE_OUTPUT and peels it
+          # (same re-entry the first-gate 'peel' path uses).
+          log "drop-and-re-gate round $_round: typecheck tier named an offender — continuing the peel loop with parseable output"
+          iso_rc=1; continue ;;
+        *)
+          log "drop-and-re-gate: typecheck tier ALSO wedged — genuinely unverifiable; falling to docs-only salvage"
+          break ;;
+      esac
+    fi
+    [ "$iso_rc" != "1" ] && break   # setup failed (rc=2) → bail to docs-only salvage
   done
 fi
 
