@@ -43,30 +43,49 @@ export interface IdentifyUserOpts {
   timezone?: string;
   country?: string;
   platform?: string;
+  appVersion?: string;
+  playerStyle?: string;
+  birthYear?: number;
   // Flags
   isGuest?: boolean;
   isAdmin?: boolean;
   isTeacher?: boolean;
+  isBetaTester?: boolean;
   hasCustomizedProfile?: boolean;
+  avatarCustomized?: boolean;
   blastAccess?: boolean;
   practiceGraduated?: boolean;
   // Progression
   level?: number;
   prestigeLevel?: number;
+  prestigeMultiplier?: number;
   totalGames?: number;
   totalScore?: number;
   totalWords?: number;
   totalXp?: number;
+  lifetimeXp?: number;
   longestWordLength?: number;
   streakDays?: number;
+  totalTimePlayed?: number;
   rankTier?: string;
   rankedMmr?: number;
+  peakMmr?: number;
+  rankedWins?: number;
+  casualWins?: number;
+  rankedGames?: number;
+  casualGames?: number;
+  // Economy
+  coins?: number;
+  lifetimeCoins?: number;
   // Acquisition
   utmSource?: string;
   utmMedium?: string;
   utmCampaign?: string;
   referrer?: string;
   accountAgeDays?: number;
+  // Experiment cohorts — already `exp_<key>`-prefixed by the caller.
+  // Spread verbatim into traits so sessions are filterable by A/B bucket.
+  experiments?: Record<string, string | number | boolean>;
 }
 
 /**
@@ -93,26 +112,43 @@ export function identifyUser(opts: IdentifyUserOpts): void {
   setStr(traits, 'timezone', opts.timezone);
   setStr(traits, 'country', opts.country);
   setStr(traits, 'platform', opts.platform);
+  setStr(traits, 'appVersion', opts.appVersion);
+  setStr(traits, 'playerStyle', opts.playerStyle);
+  setNum(traits, 'birthYear', opts.birthYear);
 
   // Flags — `false` is meaningful (e.g. isGuest:false on authed sessions), keep it
   setBool(traits, 'isGuest', opts.isGuest);
   setBool(traits, 'isAdmin', opts.isAdmin);
   setBool(traits, 'isTeacher', opts.isTeacher);
+  setBool(traits, 'isBetaTester', opts.isBetaTester);
   setBool(traits, 'hasCustomizedProfile', opts.hasCustomizedProfile);
+  setBool(traits, 'avatarCustomized', opts.avatarCustomized);
   setBool(traits, 'blastAccess', opts.blastAccess);
   setBool(traits, 'practiceGraduated', opts.practiceGraduated);
 
   // Progression — zero is a real signal (new accounts), only drop undefined
   setNum(traits, 'level', opts.level);
   setNum(traits, 'prestigeLevel', opts.prestigeLevel);
+  setNum(traits, 'prestigeMultiplier', opts.prestigeMultiplier);
   setNum(traits, 'totalGames', opts.totalGames);
   setNum(traits, 'totalScore', opts.totalScore);
   setNum(traits, 'totalWords', opts.totalWords);
   setNum(traits, 'totalXp', opts.totalXp);
+  setNum(traits, 'lifetimeXp', opts.lifetimeXp);
   setNum(traits, 'longestWordLength', opts.longestWordLength);
   setNum(traits, 'streakDays', opts.streakDays);
+  setNum(traits, 'totalTimePlayed', opts.totalTimePlayed);
   setStr(traits, 'rankTier', opts.rankTier);
   setNum(traits, 'rankedMmr', opts.rankedMmr);
+  setNum(traits, 'peakMmr', opts.peakMmr);
+  setNum(traits, 'rankedWins', opts.rankedWins);
+  setNum(traits, 'casualWins', opts.casualWins);
+  setNum(traits, 'rankedGames', opts.rankedGames);
+  setNum(traits, 'casualGames', opts.casualGames);
+
+  // Economy
+  setNum(traits, 'coins', opts.coins);
+  setNum(traits, 'lifetimeCoins', opts.lifetimeCoins);
 
   // Acquisition
   setStr(traits, 'utmSource', opts.utmSource);
@@ -120,6 +156,13 @@ export function identifyUser(opts: IdentifyUserOpts): void {
   setStr(traits, 'utmCampaign', opts.utmCampaign);
   setStr(traits, 'referrer', opts.referrer);
   setNum(traits, 'accountAgeDays', opts.accountAgeDays);
+
+  // Experiment cohorts — keys already namespaced; merge non-empty values
+  if (opts.experiments) {
+    for (const [k, v] of Object.entries(opts.experiments)) {
+      if (v !== undefined && v !== null && v !== '') traits[k] = v;
+    }
+  }
 
   lr.identify(opts.userId, traits);
 }

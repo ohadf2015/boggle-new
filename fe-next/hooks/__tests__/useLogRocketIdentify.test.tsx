@@ -30,12 +30,29 @@ vi.mock('@capacitor/core', () => ({
   },
 }));
 
+const { getFeatureFlagMock, onFeatureFlagsMock } = vi.hoisted(() => ({
+  getFeatureFlagMock: vi.fn((_k: string) => undefined as string | boolean | undefined),
+  onFeatureFlagsMock: vi.fn(),
+}));
+vi.mock('@/lib/analytics/lazyPosthog', () => ({
+  default: {
+    getFeatureFlag: (k: string) => getFeatureFlagMock(k),
+    onFeatureFlags: (cb: () => void) => onFeatureFlagsMock(cb),
+  },
+}));
+vi.mock('@/lib/experiments', () => ({
+  EXPERIMENTS: { 'exp-test-flag': { variants: ['control', 'v1'], default: 'control' } },
+}));
+
 import { useLogRocketIdentify } from '../useLogRocketIdentify';
 
 beforeEach(() => {
   identifyUserMock.mockClear();
   identifyGuestMock.mockClear();
   mockUseAuth.mockReset();
+  getFeatureFlagMock.mockReset();
+  getFeatureFlagMock.mockReturnValue(undefined);
+  onFeatureFlagsMock.mockClear();
 });
 
 function authedAuth(profileOverrides: Record<string, unknown> = {}) {
@@ -67,6 +84,20 @@ function authedAuth(profileOverrides: Record<string, unknown> = {}) {
       utm_campaign: 'launch-q2',
       referrer: 'https://t.co/abc',
       created_at: '2026-04-15T00:00:00Z',
+      total_coins: 250,
+      lifetime_coins_earned: 4800,
+      ranked_wins: 17,
+      casual_wins: 33,
+      ranked_games: 40,
+      casual_games: 120,
+      peak_mmr: 1450,
+      lifetime_xp: 50000,
+      prestige_multiplier: 1.5,
+      total_time_played: 86400,
+      is_beta_tester: true,
+      avatar_customized: true,
+      player_style: 'competitive',
+      birth_year: 1995,
       ...profileOverrides,
     },
     isAuthenticated: true,
@@ -113,6 +144,32 @@ describe('useLogRocketIdentify', () => {
     expect(call.rankedMmr).toBe(1320);
   });
 
+  it('forwards economy, win, skill, and engagement totals from profile', () => {
+    mockUseAuth.mockReturnValue(authedAuth());
+    renderHook(() => useLogRocketIdentify());
+    const call = identifyUserMock.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(call.coins).toBe(250);
+    expect(call.lifetimeCoins).toBe(4800);
+    expect(call.rankedWins).toBe(17);
+    expect(call.casualWins).toBe(33);
+    expect(call.rankedGames).toBe(40);
+    expect(call.casualGames).toBe(120);
+    expect(call.peakMmr).toBe(1450);
+    expect(call.lifetimeXp).toBe(50000);
+    expect(call.prestigeMultiplier).toBe(1.5);
+    expect(call.totalTimePlayed).toBe(86400);
+  });
+
+  it('forwards beta-tester flag, avatar-customized flag, player style, and birth year', () => {
+    mockUseAuth.mockReturnValue(authedAuth());
+    renderHook(() => useLogRocketIdentify());
+    const call = identifyUserMock.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(call.isBetaTester).toBe(true);
+    expect(call.avatarCustomized).toBe(true);
+    expect(call.playerStyle).toBe('competitive');
+    expect(call.birthYear).toBe(1995);
+  });
+
   it('forwards customization, access, and graduation flags', () => {
     mockUseAuth.mockReturnValue(authedAuth());
     renderHook(() => useLogRocketIdentify());
@@ -153,6 +210,49 @@ describe('useLogRocketIdentify', () => {
     renderHook(() => useLogRocketIdentify());
     const call = identifyUserMock.mock.calls[0]?.[0] as Record<string, unknown>;
     expect(call.platform).toBe('web');
+  });
+
+  it('sets appVersion from NEXT_PUBLIC_APP_VERSION build env', () => {
+    const prev = process.env.NEXT_PUBLIC_APP_VERSION;
+    process.env.NEXT_PUBLIC_APP_VERSION = '9.9.9';
+    mockUseAuth.mockReturnValue(authedAuth());
+    renderHook(() => useLogRocketIdentify());
+    const call = identifyUserMock.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(call.appVersion).toBe('9.9.9');
+    process.env.NEXT_PUBLIC_APP_VERSION = prev;
+  });
+
+  it('tags authed sessions with active PostHog experiment variants (exp_ prefix)', () => {
+    getFeatureFlagMock.mockImplementation((k: string) =>
+      k === 'exp-test-flag' ? 'v1' : undefined
+    );
+    mockUseAuth.mockReturnValue(authedAuth());
+    renderHook(() => useLogRocketIdentify());
+    const call = identifyUserMock.mock.calls[0]?.[0] as Record<string, unknown>;
+    const exp = call.experiments as Record<string, unknown>;
+    expect(exp['exp_exp-test-flag']).toBe('v1');
+  });
+
+  it('omits unresolved flags (getFeatureFlag undefined) from the experiments map', () => {
+    mockUseAuth.mockReturnValue(authedAuth());
+    renderHook(() => useLogRocketIdentify());
+    const call = identifyUserMock.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(call.experiments).toEqual({});
+  });
+
+  it('re-identifies when PostHog feature flags resolve (auth-before-flags race)', () => {
+    mockUseAuth.mockReturnValue(authedAuth());
+    renderHook(() => useLogRocketIdentify());
+    expect(onFeatureFlagsMock).toHaveBeenCalledTimes(1);
+    // The registered callback re-runs identify
+    const cb = onFeatureFlagsMock.mock.calls[0]?.[0] as () => void;
+    identifyUserMock.mockClear();
+    getFeatureFlagMock.mockImplementation((k: string) =>
+      k === 'exp-test-flag' ? 'v1' : undefined
+    );
+    cb();
+    const call = identifyUserMock.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect((call.experiments as Record<string, unknown>)['exp_exp-test-flag']).toBe('v1');
   });
 
   it('routes guests to identifyGuest with name + language + platform', () => {

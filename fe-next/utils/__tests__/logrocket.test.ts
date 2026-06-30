@@ -111,6 +111,48 @@ describe('identifyUser', () => {
     expect(traits.rankedMmr).toBe(1320);
   });
 
+  it('forwards economy, win, and skill-ceiling totals as numbers', () => {
+    identifyUser({
+      userId: 'u1',
+      coins: 250,
+      lifetimeCoins: 4800,
+      rankedWins: 17,
+      casualWins: 33,
+      rankedGames: 40,
+      casualGames: 120,
+      peakMmr: 1450,
+      lifetimeXp: 50000,
+      prestigeMultiplier: 1.5,
+      totalTimePlayed: 86400,
+      birthYear: 1995,
+    });
+    const traits = lr.identify.mock.calls[0]?.[1] as Traits;
+    expect(traits.coins).toBe(250);
+    expect(traits.lifetimeCoins).toBe(4800);
+    expect(traits.rankedWins).toBe(17);
+    expect(traits.casualWins).toBe(33);
+    expect(traits.rankedGames).toBe(40);
+    expect(traits.casualGames).toBe(120);
+    expect(traits.peakMmr).toBe(1450);
+    expect(traits.lifetimeXp).toBe(50000);
+    expect(traits.prestigeMultiplier).toBe(1.5);
+    expect(traits.totalTimePlayed).toBe(86400);
+    expect(traits.birthYear).toBe(1995);
+  });
+
+  it('forwards beta-tester flag, avatar-customized flag, and player style', () => {
+    identifyUser({
+      userId: 'u1',
+      isBetaTester: true,
+      avatarCustomized: true,
+      playerStyle: 'competitive',
+    });
+    const traits = lr.identify.mock.calls[0]?.[1] as Traits;
+    expect(traits.isBetaTester).toBe(true);
+    expect(traits.avatarCustomized).toBe(true);
+    expect(traits.playerStyle).toBe('competitive');
+  });
+
   it('forwards customization, feature-access, and graduation flags', () => {
     identifyUser({
       userId: 'u1',
@@ -139,14 +181,16 @@ describe('identifyUser', () => {
     expect(traits.referrer).toBe('https://t.co/abc');
   });
 
-  it('forwards platform and accountAgeDays as filterable session metadata', () => {
+  it('forwards platform, appVersion, and accountAgeDays as filterable session metadata', () => {
     identifyUser({
       userId: 'u1',
       platform: 'android',
+      appVersion: '0.1.0',
       accountAgeDays: 42,
     });
     const traits = lr.identify.mock.calls[0]?.[1] as Traits;
     expect(traits.platform).toBe('android');
+    expect(traits.appVersion).toBe('0.1.0');
     expect(traits.accountAgeDays).toBe(42);
   });
 
@@ -171,6 +215,21 @@ describe('identifyUser', () => {
     expect(traits.totalGames).toBe(0);
     expect(traits.totalScore).toBe(0);
     expect(traits.streakDays).toBe(0);
+  });
+
+  it('merges experiment cohort traits passed via the experiments map', () => {
+    identifyUser({
+      userId: 'u1',
+      experiments: { 'exp_signup-cta': 'urgency', 'exp_drag-hint': 'control' },
+    });
+    const traits = lr.identify.mock.calls[0]?.[1] as Traits;
+    expect(traits['exp_signup-cta']).toBe('urgency');
+    expect(traits['exp_drag-hint']).toBe('control');
+  });
+
+  it('ignores an empty experiments map (no flags resolved yet)', () => {
+    identifyUser({ userId: 'u1', experiments: {} });
+    expect(lr.identify).toHaveBeenCalledWith('u1', {});
   });
 
   it('isGuest=false is preserved, not dropped, so authed sessions are filterable', () => {
