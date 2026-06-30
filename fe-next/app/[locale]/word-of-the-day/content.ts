@@ -9,7 +9,7 @@ export interface WordEntry {
   dateKey: string;
 }
 
-export type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+export type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 const enWords: WordEntry[] = [
   { dateKey: '2026-03-10', word: 'Quixotic', definition: 'Extremely idealistic; unrealistic and impractical.', etymology: 'From Don Quixote, the fictional Spanish knight created by Cervantes (1605).', example: 'Her quixotic plan to end all pollution by next year impressed no one.', funFact: 'One of the few English words derived from a fictional character\'s name.', difficulty: 'hard', partOfSpeech: 'adjective' },
@@ -112,12 +112,30 @@ const esWords: WordEntry[] = [
   { dateKey: '2026-02-25', word: 'Efimero', definition: 'Que dura muy poco tiempo; pasajero y fugaz.', etymology: 'Del griego ephemeros — "que dura un dia".', example: 'La fama en redes sociales es efimera.', funFact: 'Comparte raiz con "ephemeral" en ingles — ambas del griego antiguo.', difficulty: 'medium', partOfSpeech: 'adjetivo' },
 ];
 
+const ruWords: WordEntry[] = [
+  { dateKey: '2026-03-10', word: 'Сакура', definition: 'Японская вишня; символ весны и красоты в азиатской культуре.', etymology: 'Японское слово "桜" (sakura) вошло в русский язык через культурный обмен.', example: 'Сакура расцветает только несколько недель в году.', funFact: 'В Японии время цветения сакуры — национальный праздник, а в России это слово символ японской культуры.', difficulty: 'easy', partOfSpeech: 'существительное' },
+  { dateKey: '2026-03-09', word: 'Тоска', definition: 'Глубокая грусть, словно без четкой причины; легкая печаль с надеждой.', etymology: 'Из древнерусского "toskyti" — мучиться, томиться.', example: 'Осенняя тоска охватила его при виде опадающих листьев.', funFact: 'Это слово невозможно переводить буквально — оно описывает специфически русское чувство.', difficulty: 'medium', partOfSpeech: 'существительное' },
+  { dateKey: '2026-03-08', word: 'Умиление', definition: 'Чувство нежности и любви, вызванное чем-то милым или трогательным.', etymology: 'От слова "умилый" (очень милый) с суффиксом "-ение".', example: 'При виде котенка в его сердце проснулось умиление.', funFact: 'В русской литературе это слово часто использовал Достоевский для описания духовных переживаний.', difficulty: 'medium', partOfSpeech: 'существительное' },
+  { dateKey: '2026-03-07', word: 'Заря', definition: 'Блеск света на горизонте при восходе или закате солнца.', etymology: 'Из праславянского "zarya" — сияние, блеск.', example: 'Красная заря разгоралась над морем.', funFact: 'Это слово стало названием знаменитой советской газеты и использовалось в классической русской поэзии.', difficulty: 'easy', partOfSpeech: 'существительное' },
+  { dateKey: '2026-03-06', word: 'Доблесть', definition: 'Мужество, благородство, честь и слава в боевых подвигах.', etymology: 'От старославянского "dobla" — похвала, честь.', example: 'Воины проявили истинную доблесть в битве.', funFact: 'В русской литературе это понятие центрально для описания героических качеств.', difficulty: 'hard', partOfSpeech: 'существительное' },
+  { dateKey: '2026-03-05', word: 'Скука', definition: 'Неприятное состояние ума, вызванное отсутствием интереса или развлечения.', etymology: 'Из древнерусского "skucha" или "skuchati" — тяготиться, томиться.', example: 'На лекции его охватила скука.', funFact: 'В русской литературе скука часто описывается как экзистенциальное состояние — см. Пушкина, Лермонтова.', difficulty: 'easy', partOfSpeech: 'существительное' },
+  { dateKey: '2026-03-04', word: 'Созерцание', definition: 'Глубокое наблюдение и размышление о чем-то, часто о природе или искусстве.', etymology: 'От латинского "contemplatio" через старославянское "sozercati".', example: 'Созерцание звезд наполняет душу миром.', funFact: 'Созерцание — ключевой концепт в русской философии и литературе.', difficulty: 'medium', partOfSpeech: 'существительное' },
+  { dateKey: '2026-03-03', word: 'Вдохновение', definition: 'Творческий порыв; внезапное озарение или идея.', etymology: 'От "вдохновить" (вдохнуть жизнь) — дать вдохновение.', example: 'Поэта посетило внезапное вдохновение среди ночи.', funFact: 'В романтизме вдохновение считалось высшей творческой силой.', difficulty: 'easy', partOfSpeech: 'существительное' },
+  { dateKey: '2026-03-02', word: 'Гармония', definition: 'Красивое согласие всех частей целого; совершенное соответствие.', etymology: 'От греческого "harmonia" — стройность, согласованность.', example: 'В природе царит удивительная гармония.', funFact: 'Понятие гармонии центрально для русской философии красоты.', difficulty: 'easy', partOfSpeech: 'существительное' },
+  { dateKey: '2026-03-01', word: 'Надежда', definition: 'Уверенность в лучшем будущем; желание, что что-то хорошее произойдет.', etymology: 'От слова "на-деть" (буквально "ожидать").', example: 'Надежда помогла ему пережить трудные времена.', funFact: '"Надежда, вера и любовь" — три главных добродетели в русской духовной традиции.', difficulty: 'easy', partOfSpeech: 'существительное' },
+  { dateKey: '2026-02-28', word: 'Печаль', definition: 'Состояние грусти и скорби; сожаление об утраченном.', etymology: 'От слова "печь" (давить, тяготить).', example: 'Печаль сливалась с красотой закатного неба.', funFact: 'В русской музыке и литературе печаль часто связана с размышлением о смысле жизни.', difficulty: 'easy', partOfSpeech: 'существительное' },
+  { dateKey: '2026-02-27', word: 'Величие', definition: 'Состояние, качество быть великим; грандиозность, могущество.', etymology: 'От слова "велики" (великий) с суффиксом "-ие".', example: 'Величие гор захватывает дух.', funFact: 'Это слово часто используется в контексте национального самосознания и исторического величия.', difficulty: 'easy', partOfSpeech: 'существительное' },
+  { dateKey: '2026-02-26', word: 'Грёза', definition: 'Мечта, фантазия; состояние, между сном и явью.', etymology: 'От старославянского "greza" — дремота, грёзы.', example: 'Она потеряла себя в грёзах о далеком путешествии.', funFact: 'Грёза в русской поэзии часто описывает романтическое состояние мечтательности.', difficulty: 'medium', partOfSpeech: 'существительное' },
+  { dateKey: '2026-02-25', word: 'Восхищение', definition: 'Сильное чувство восторга и одобрения перед чем-то прекрасным.', etymology: 'От "восхитить" (взволновать) — привести в состояние восторга.', example: 'Его мастерство вызывало восхищение у всех зрителей.', funFact: 'В русской эстетике восхищение рассматривается как высшая форма эмоционального отклика на красоту.', difficulty: 'easy', partOfSpeech: 'существительное' },
+];
+
 export const wordsByLocale: Record<Locale, WordEntry[]> = {
   en: enWords,
   he: heWords,
   sv: svWords,
   ja: jaWords,
   es: esWords,
+  ru: ruWords,
 };
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;

@@ -56,6 +56,18 @@ const dayOfWeekThemes = {
     { day: 4, nameKey: 'theme.thursdayThrowback', emoji: '📷', words: ['木曜', '記憶', '過去', '歴史', '遺産', '写真', '回想', '追憶', '懐古', '伝統', '古来', '由緒'] },
     { day: 5, nameKey: 'theme.funFriday', emoji: '🎉', words: ['金曜', '楽園', '祝祭', '舞踏', '音楽', '歓喜', '笑顔', '祝福', '愉快', '娯楽', '快楽', '歓楽'] },
     { day: 6, nameKey: 'theme.saturdayAdventure', emoji: '🏔️', words: ['土曜', '冒険', '探検', '旅行', '自然', '山岳', '森林', '発見', '探索', '野外', '遠足', '放浪'] }
+  ],
+  // Russian themed words — UPPERCASE Cyrillic to match board convention.
+  // Deliberately ё-free and Ъ-free so embedded letters stay inside
+  // russianLetterPool (board never shows a tile it can't otherwise generate).
+  ru: [
+    { day: 0, nameKey: 'theme.sundayFunday', emoji: '🌞', words: ['ОТДЫХ', 'ПОКОЙ', 'ТИШИНА', 'СОН', 'УЮТ', 'ЛЕНЬ', 'НЕГА', 'ДОСУГ', 'СВОБОДА', 'ДРЕМА', 'ПОКОЙНЫЙ', 'СПОКОЙСТВИЕ'] },
+    { day: 1, nameKey: 'theme.mondayMotivation', emoji: '💪', words: ['НАЧАЛО', 'СИЛА', 'ЭНЕРГИЯ', 'ЦЕЛЬ', 'УСПЕХ', 'ВОЛЯ', 'МОЩЬ', 'РЫВОК', 'ПОБЕДА', 'ЗАДАЧА', 'УПОРСТВО', 'СТРЕМЛЕНИЕ'] },
+    { day: 2, nameKey: 'theme.tuesdayTrivia', emoji: '🧠', words: ['МОЗГ', 'МЫСЛЬ', 'ЗНАНИЕ', 'РАЗУМ', 'ИДЕЯ', 'ЛОГИКА', 'ВОПРОС', 'ОТВЕТ', 'УЧЕБА', 'УМНЫЙ', 'ЗАГАДКА', 'МУДРОСТЬ'] },
+    { day: 3, nameKey: 'theme.wednesdayWisdom', emoji: '📚', words: ['КНИГА', 'ЧТЕНИЕ', 'ПИСЬМО', 'РАССКАЗ', 'СТИХ', 'РОМАН', 'АВТОР', 'СЛОВО', 'ПОЭМА', 'ИСТОРИЯ', 'МУДРОСТЬ', 'ЛИТЕРАТУРА'] },
+    { day: 4, nameKey: 'theme.thursdayThrowback', emoji: '📷', words: ['ПАМЯТЬ', 'ПРОШЛОЕ', 'ФОТО', 'АЛЬБОМ', 'СТАРИНА', 'НАСЛЕДИЕ', 'ДАВНО', 'РЕТРО', 'ДРЕВНОСТЬ', 'ТРАДИЦИЯ', 'ИСТОРИЯ', 'ВОСПОМИНАНИЕ'] },
+    { day: 5, nameKey: 'theme.funFriday', emoji: '🎉', words: ['ПЯТНИЦА', 'ВЕСЕЛЬЕ', 'ПРАЗДНИК', 'ТАНЕЦ', 'МУЗЫКА', 'РАДОСТЬ', 'СМЕХ', 'ПЕСНЯ', 'ИГРА', 'СЧАСТЬЕ', 'ВЕЧЕРИНКА', 'ПРАЗДНОВАНИЕ'] },
+    { day: 6, nameKey: 'theme.saturdayAdventure', emoji: '🏔️', words: ['ПОХОД', 'ПРИРОДА', 'ЛЕС', 'ГОРА', 'РЕКА', 'ТРОПА', 'ДОРОГА', 'ПОИСК', 'ОТКРЫТИЕ', 'СТРАНСТВИЕ', 'ПРИКЛЮЧЕНИЕ', 'ПУТЕШЕСТВИЕ'] }
   ]
 };
 

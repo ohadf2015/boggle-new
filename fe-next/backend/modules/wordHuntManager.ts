@@ -76,6 +76,7 @@ const FILE_MAP: Record<string, string> = {
   sv: 'common_hunt_words_sv.txt',
   ja: 'common_hunt_words_ja.txt',
   es: 'common_hunt_words_es.txt',
+  ru: 'common_hunt_words_ru.txt',
 };
 
 /**

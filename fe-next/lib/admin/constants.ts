@@ -47,6 +47,7 @@ export const MIN_WORD_LENGTH: Record<Language, number> = {
   es: 3,
   fr: 3,
   de: 3,
+  ru: 3,
 };
 
 /**

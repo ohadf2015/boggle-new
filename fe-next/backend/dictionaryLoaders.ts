@@ -10,6 +10,7 @@ import logger from './utils/logger';
 import {
   normalizeHebrewWord,
   normalizeSpanishWord,
+  normalizeRussianWord,
 } from '@/shared/utils/wordNormalization';
 
 export type SafeReadFile = (filePath: string) => Promise<string>;
@@ -215,5 +216,30 @@ export async function loadSpanishDictionary(
   const approvedContent = await safeReadFile(path.join(__dirname, 'spanish_words_approved.txt'));
   mergeApprovedWords(dict, approvedContent, 'Spanish', (w) => normalizeSpanishWord(w.trim()));
   logger.debug('DICT', `Total Spanish words: ${dict.size}`);
+  return dict;
+}
+
+export async function loadRussianDictionary(
+  safeReadFile: SafeReadFile
+): Promise<Set<string>> {
+  const [russianContent, russianApprovedContent] = await Promise.all([
+    safeReadFile(path.join(__dirname, 'russian_words.txt')),
+    safeReadFile(path.join(__dirname, 'russian_words_approved.txt')),
+  ]);
+
+  let dict = new Set<string>();
+  if (russianContent) {
+    // Source list is already lowercase Cyrillic; normalize (lowercase + ё→е)
+    // so lookups match validate-time normalizeRussianWord exactly.
+    const words = russianContent
+      .split('\n')
+      .map(w => normalizeRussianWord(w.trim()))
+      .filter(w => w.length > 0);
+    dict = new Set(words);
+    logger.debug('DICT', `Loaded ${dict.size} Russian words from main dictionary`);
+  }
+
+  mergeApprovedWords(dict, russianApprovedContent, 'Russian', (w) => normalizeRussianWord(w.trim()));
+  logger.debug('DICT', `Total Russian words: ${dict.size}`);
   return dict;
 }

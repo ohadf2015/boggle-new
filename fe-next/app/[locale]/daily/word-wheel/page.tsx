@@ -4,8 +4,8 @@ import type { Metadata } from 'next';
 import { DailyLoadingFallback } from '@/components/daily/DailyLoadingFallback';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
+const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 const BASE_URL = 'https://www.lexiclash.live';
 
 interface PageParams {

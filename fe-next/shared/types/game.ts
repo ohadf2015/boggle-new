@@ -8,7 +8,7 @@ import type { CustomAvatarConfig } from './customAvatar';
 
 // ==================== Core Types ====================
 
-export type Language = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'fr' | 'de';
+export type Language = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'ru' | 'fr' | 'de';
 
 export type GameState = 'waiting' | 'in-progress' | 'finished' | 'validating';
 

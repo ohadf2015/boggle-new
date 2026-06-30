@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { buildLocaleLlms } from './content';
 
-const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es']);
+const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 
 export const dynamic = 'force-static';
 export const revalidate = 86400;

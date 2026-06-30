@@ -25,7 +25,7 @@ const { getSupabase } = require('../../modules/supabaseServer');
 const router: Router = express.Router();
 
 // Validation Schemas
-const supportedLanguages = ['en', 'he', 'sv', 'ja', 'es', 'fr', 'de'] as const;
+const supportedLanguages = ['en', 'he', 'sv', 'ja', 'es', 'ru', 'fr', 'de'] as const;
 
 const wordModSchema = z.object({
   word: z.string().min(1).max(50).transform((s: string) => s.toLowerCase().trim()),

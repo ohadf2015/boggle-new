@@ -20,6 +20,7 @@ const NON_LETTER_PATTERNS: Record<Language, RegExp> = {
   es: /[^a-zA-ZÀ-ſ]/,
   fr: /[^a-zA-ZÀ-ſ]/,
   de: /[^a-zA-ZßẞäöüÄÖÜ]/,
+  ru: /[^а-яА-ЯёЁ]/,
   he: /[^֐-׿]/,
   ja: /[^぀-ゟ゠-ヿ一-鿿]/,
 };

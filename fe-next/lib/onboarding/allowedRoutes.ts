@@ -14,7 +14,7 @@ export function isOnboardingAllowedRoute(pathname: string | null | undefined): b
   return isLocaleHome(pathname);
 }
 
-const LOCALE_PREFIX = /^\/(?:en|he|sv|ja|es)(?=\/|$)/;
+const LOCALE_PREFIX = /^\/(?:en|he|sv|ja|es|ru)(?=\/|$)/;
 
 /**
  * SEO / marketing landing-page prefixes (locale-stripped). These are public

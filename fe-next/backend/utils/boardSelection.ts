@@ -50,6 +50,10 @@ const LANG_DENSITY: Record<string, number> = {
   sv: 1,
   es: 1,
   ja: 1.5,
+  // ru dict is ~3.4x English by raw count, but Cyrillic's 33-letter alphabet
+  // lowers per-cell match probability — the two roughly offset, so start at 1.
+  // ponytail: calibration knob — bump toward 2-3 if RU boards feel too sparse.
+  ru: 1,
 };
 
 export function richnessFloor(rows: number, cols: number, language: string = 'en'): number {

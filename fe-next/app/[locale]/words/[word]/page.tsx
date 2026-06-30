@@ -18,8 +18,8 @@ function nLetterLengthFromParam(rawWord: string): ReturnType<typeof parseWordLen
 
 export const dynamic = 'force-dynamic';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
+const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 const BASE_URL = 'https://www.lexiclash.live';
 
 interface PageParams {

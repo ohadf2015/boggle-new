@@ -9,6 +9,7 @@ const wotdLabel: Record<Locale, string> = {
   sv: 'Dagens Ord',
   ja: '今日の言葉',
   es: 'Palabra del Día',
+  ru: 'Слово дня',
 };
 
 const homeLabel: Record<Locale, string> = {
@@ -17,10 +18,11 @@ const homeLabel: Record<Locale, string> = {
   sv: 'Hem',
   ja: 'ホーム',
   es: 'Inicio',
+  ru: 'Главная',
 };
 
 function loc(locale: string): Locale {
-  return (['en', 'he', 'sv', 'ja', 'es'] as const).includes(locale as Locale)
+  return (['en', 'he', 'sv', 'ja', 'es', 'ru'] as const).includes(locale as Locale)
     ? (locale as Locale)
     : 'en';
 }

@@ -6,7 +6,8 @@
       "he": 11494,
       "sv": 11473,
       "ja": 11474,
-      "es": 11502
+      "es": 11502,
+      "ru": 11366
     },
     "missingFromEnglish": 10,
     "problematicFlatKeys": 0,
@@ -379,7 +380,8 @@
     "he": [],
     "sv": [],
     "ja": [],
-    "es": []
+    "es": [],
+    "ru": []
   },
   "missingFromEnglish": [
     {
@@ -1255,7 +1257,8 @@
       "admin.actionUrlLabel",
       "admin.sendSuccess",
       "admin.sendError"
-    ]
+    ],
+    "ru": []
   },
   "keysNotInEnglish": {
     "he": [
@@ -2510,6 +2513,7 @@
       "reengagement.coins",
       "reengagement.streakFreeze",
       "reengagement.premiumDays"
-    ]
+    ],
+    "ru": []
   }
 }

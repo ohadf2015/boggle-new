@@ -2,7 +2,7 @@ import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;
@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
     sv: 'https://www.lexiclash.live/og-image-sv.webp',
     ja: 'https://www.lexiclash.live/og-image-ja.webp',
     es: 'https://www.lexiclash.live/og-image-es.webp',
+    // ru has no dedicated OG image yet → falls back to en below.
   };
   const ogImage = ogImageMap[locale] || ogImageMap.en;
 
@@ -60,6 +61,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         sv: 'https://www.lexiclash.live/sv/multiplayer',
         ja: 'https://www.lexiclash.live/ja/multiplayer',
         es: 'https://www.lexiclash.live/es/multiplayer',
+        ru: 'https://www.lexiclash.live/ru/multiplayer',
         'en-IL': 'https://www.lexiclash.live/en/multiplayer',
         'he-IL': 'https://www.lexiclash.live/he/multiplayer',
         'en-US': 'https://www.lexiclash.live/en/multiplayer',

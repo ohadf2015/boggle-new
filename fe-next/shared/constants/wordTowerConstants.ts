@@ -200,6 +200,29 @@ export const WORD_TOWER_LETTER_BAGS: Record<Language, string> = {
     'ささ' +
     'きき' +
     'くく',
+  // Pure Cyrillic frequency-weighted bag. (A prior pass mixed in Latin
+  // lookalikes E/A/N/T/L which never match the Cyrillic dictionary — every
+  // letter here is verified Cyrillic, no Ё/Ъ.)
+  ru:
+    'ОООООООООО' +
+    'ЕЕЕЕЕЕЕЕЕЕ' +
+    'АААААААА' +
+    'ИИИИИИИ' +
+    'НННННН' +
+    'РРРРРР' +
+    'ТТТТТТ' +
+    'ЛЛЛЛ' +
+    'КККК' +
+    'ММММ' +
+    'ДДДД' +
+    'ПППП' +
+    'ВВВ' +
+    'ГГГ' +
+    'ЗЗ' +
+    'ББ' +
+    'СС' +
+    'УУ' +
+    'ЙХШЩЦЖФЭЮЯ',
   // Languages present in the Language union but not yet supported by Word Tower.
   fr: '',
   de: '',
@@ -219,4 +242,5 @@ export const WORD_TOWER_VOWELS: Record<Language, string> = {
   ja: 'あいうえお',
   fr: 'AEIOU',
   de: 'AEIOU',
+  ru: 'АЕИОУЫ',
 };

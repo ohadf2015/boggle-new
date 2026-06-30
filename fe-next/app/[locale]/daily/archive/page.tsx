@@ -8,7 +8,7 @@ import { InlineBannerAd } from '@/components/ads';
 
 export const dynamic = 'force-dynamic';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
   params: Promise<{ locale: string }>;

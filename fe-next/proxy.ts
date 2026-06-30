@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { matchAcceptLanguage } from './lib/localeResolution';
 
-const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const DEFAULT_LOCALE = 'en';
 
 // Bot probes for secrets / admin panels. Short-circuit with 404 before
@@ -74,7 +74,7 @@ export async function proxy(request: NextRequest) {
     '/challenge', '/join', '/brain', '/custom', '/party-screen',
     '/teacher', '/student', '/auth', '/settings', '/profile',
   ];
-  const pathWithoutLocale = pathname.replace(/^\/(en|he|sv|ja|es)/, '');
+  const pathWithoutLocale = pathname.replace(/^\/(en|he|sv|ja|es|ru)/, '');
   const needsAuth = AUTH_ROUTES.some(route => pathWithoutLocale.startsWith(route));
 
   // Create Supabase client for session refresh (skip for bots and public pages)

@@ -55,6 +55,14 @@ const LETTER_WEIGHTS: Record<Language, Record<string, number>> = {
     'S': 7.3, 'T': 6.2, 'U': 4.4, 'V': 0.7, 'W': 1.9, 'X': 0.03,
     'Y': 0.04, 'Z': 1.1,
   },
+  ru: {
+    'О': 11.0, 'Е': 8.0, 'А': 8.0, 'И': 7.0, 'Н': 7.0, 'Т': 6.0,
+    'С': 5.0, 'Р': 5.0, 'В': 5.0, 'Л': 4.0, 'К': 3.0, 'М': 3.0,
+    'Д': 3.0, 'П': 3.0, 'У': 3.0, 'Я': 2.0, 'Ы': 2.0, 'Ь': 2.0,
+    'Г': 2.0, 'З': 2.0, 'Б': 2.0, 'Ч': 1.0, 'Й': 1.0, 'Х': 1.0,
+    'Ж': 1.0, 'Ш': 1.0, 'Ю': 1.0, 'Ц': 1.0, 'Щ': 1.0, 'Э': 1.0,
+    'Ф': 1.0,
+  },
 };
 
 interface WordWithPath {
@@ -79,6 +87,8 @@ function getLettersForLanguage(language: Language): string[] {
       return 'ABCDEFGHIJKLMNOPQRSTUVWXYZÀÂÉÈÊËÏÎÔÙÛÇ'.split('');
     case 'de':
       return 'ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÜß'.split('');
+    case 'ru':
+      return 'АБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ'.split('');
     case 'en':
     default:
       return 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');

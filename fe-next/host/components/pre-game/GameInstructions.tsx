@@ -27,7 +27,7 @@ const STEP_IMAGE_KEYS: Record<string, string> = {
   'gameModes.wheelRush.description': 'wheel-spell',
 };
 
-const SUPPORTED_IMAGE_LANGS = new Set<Language>(['en', 'he', 'sv', 'ja', 'es']);
+const SUPPORTED_IMAGE_LANGS = new Set<Language>(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 
 function stepImageSrc(lang: Language, descKey: string): string | null {
   const concept = STEP_IMAGE_KEYS[descKey];

@@ -4,6 +4,7 @@ import { getThemedWords, getCurrentTheme } from './data/dateThemedWords';
 import {
   normalizeHebrewWord,
   isValidHebrewLetter,
+  normalizeRussianWord,
 } from '@/shared/utils/wordNormalization';
 import {
   createSafeReadFile,
@@ -12,6 +13,7 @@ import {
   loadSwedishDictionary,
   loadJapaneseDictionary,
   loadSpanishDictionary,
+  loadRussianDictionary,
   loadNounList,
 } from './dictionaryLoaders';
 
@@ -66,6 +68,7 @@ class Dictionary {
   swedishWords: Set<string>;
   japaneseWords: Set<string>;
   spanishWords: Set<string>;
+  russianWords: Set<string>;
   kanjiCompounds: string[];
   // Noun-only subsets for board seeding (players see recognizable words)
   nounLists: Map<Language, Set<string>>;
@@ -80,6 +83,7 @@ class Dictionary {
     this.swedishWords = new Set();
     this.japaneseWords = new Set();
     this.spanishWords = new Set();
+    this.russianWords = new Set();
     this.kanjiCompounds = [];
     this.nounLists = new Map();
     this.loaded = false;
@@ -91,7 +95,7 @@ class Dictionary {
   private getDictionaryForLanguage(lang: Language): Set<string> {
     const map: Record<string, Set<string>> = {
       en: this.englishWords, he: this.hebrewWords, sv: this.swedishWords,
-      ja: this.japaneseWords, es: this.spanishWords,
+      ja: this.japaneseWords, es: this.spanishWords, ru: this.russianWords,
     };
     return map[lang] || this.englishWords;
   }
@@ -99,7 +103,7 @@ class Dictionary {
   getMemoryStats(): DictionaryMemoryStats[] {
     const avgBytesPerWord = 12;
     const stats: DictionaryMemoryStats[] = [];
-    const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
+    const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
     for (const lang of languages) {
       if (this.loadedLanguages.has(lang)) {
         const dict = this.getDictionaryForLanguage(lang);
@@ -132,6 +136,7 @@ class Dictionary {
       case 'sv': this.swedishWords = new Set(); break;
       case 'ja': this.japaneseWords = new Set(); this.kanjiCompounds = []; break;
       case 'es': this.spanishWords = new Set(); break;
+      case 'ru': this.russianWords = new Set(); break;
     }
 
     this.nounLists.delete(language);
@@ -195,7 +200,7 @@ class Dictionary {
     const startTime = Date.now();
 
     try {
-      const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
+      const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
       await Promise.all(languages.map(lang => this.loadLanguage(lang)));
 
       this.loaded = true;
@@ -256,6 +261,9 @@ class Dictionary {
         case 'es':
           this.spanishWords = await loadSpanishDictionary(safeReadFile);
           break;
+        case 'ru':
+          this.russianWords = await loadRussianDictionary(safeReadFile);
+          break;
       }
 
       // Load noun list for board seeding (non-blocking — empty set is fine as fallback)
@@ -300,6 +308,10 @@ class Dictionary {
         normalizedWord = normalizeSpanishWord(word);
         dictionary = this.spanishWords;
         break;
+      case 'ru':
+        normalizedWord = normalizeRussianWord(word);
+        dictionary = this.russianWords;
+        break;
       case 'en':
       default:
         normalizedWord = word.toLowerCase();
@@ -325,6 +337,7 @@ class Dictionary {
   isValidSwedishWord(word: string): boolean | null { return this.isValidWord(word, 'sv'); }
   isValidJapaneseWord(word: string): boolean | null { return this.isValidWord(word, 'ja'); }
   isValidSpanishWord(word: string): boolean | null { return this.isValidWord(word, 'es'); }
+  isValidRussianWord(word: string): boolean | null { return this.isValidWord(word, 'ru'); }
 
   getRandomKanjiCompounds(count: number = 5, minLength: number = 2, maxLength: number = 4): string[] {
     if (!this.kanjiCompounds || this.kanjiCompounds.length === 0) return [];
@@ -354,6 +367,10 @@ class Dictionary {
         break;
       case 'es':
         dictionary = this.spanishWords;
+        normalizer = (w: string): string => w.toUpperCase();
+        break;
+      case 'ru':
+        dictionary = this.russianWords;
         normalizer = (w: string): string => w.toUpperCase();
         break;
       case 'ja':
@@ -409,13 +426,14 @@ function isDictionaryWord(word: string, language: Language): boolean | null {
 }
 
 function getAvailableDictionaries(): Language[] {
-  return ['en', 'he', 'sv', 'ja', 'es'];
+  return ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 }
 
 function normalizeWord(word: string, language: Language): string {
   switch (language) {
     case 'he': return normalizeHebrewWord(word);
     case 'es': return normalizeSpanishWord(word);
+    case 'ru': return normalizeRussianWord(word);
     case 'ja': return word;
     case 'en':
     case 'sv':
@@ -430,6 +448,7 @@ function getLanguageConfig(language: Language): LanguageConfig {
     sv: { dictionary: dictionary.swedishWords, approvedFile: 'swedish_words_approved.txt' },
     ja: { dictionary: dictionary.japaneseWords, approvedFile: 'japanese_words_approved.txt' },
     es: { dictionary: dictionary.spanishWords, approvedFile: 'spanish_words_approved.txt' },
+    ru: { dictionary: dictionary.russianWords, approvedFile: 'russian_words_approved.txt' },
   };
   return configs[language] || configs.en;
 }

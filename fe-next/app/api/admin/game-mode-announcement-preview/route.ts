@@ -5,7 +5,7 @@ import {
 } from '@/lib/gameModeAnnouncementEmail';
 
 const ALLOWED_MODES: GameModeKey[] = ['blast', 'wordhunt', 'adventure'];
-const ALLOWED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
+const ALLOWED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 /**
  * GET /api/admin/game-mode-announcement-preview?language=en&mode=blast

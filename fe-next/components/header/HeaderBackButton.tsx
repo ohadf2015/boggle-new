@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import { cn } from '@/lib/utils';
 
-const HOME_PATH_RE = /^\/?(?:en|he|sv|ja|es)?\/?$/;
+const HOME_PATH_RE = /^\/?(?:en|he|sv|ja|es|ru)?\/?$/;
 
 export const HeaderBackButton = memo(function HeaderBackButton() {
   const pathname = usePathname() || '/';

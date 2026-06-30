@@ -2,7 +2,7 @@ import { loadTranslation, type TranslationData } from '@/translations/loadTransl
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;
@@ -10,7 +10,7 @@ interface LayoutParams {
 
 export async function generateMetadata({ params }: LayoutParams): Promise<Metadata> {
   const { locale } = await params;
-  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as Locale;
+  const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as Locale;
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const enT = await loadTranslation('en') as Record<string, any>;
   const seo = t?.seo?.blog || enT.seo.blog;
@@ -52,6 +52,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         sv: 'https://www.lexiclash.live/sv/blog',
         ja: 'https://www.lexiclash.live/ja/blog',
         es: 'https://www.lexiclash.live/es/blog',
+        ru: 'https://www.lexiclash.live/ru/blog',
         'en-IL': 'https://www.lexiclash.live/en/blog',
         'he-IL': 'https://www.lexiclash.live/he/blog',
         'en-US': 'https://www.lexiclash.live/en/blog',

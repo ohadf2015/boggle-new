@@ -3,7 +3,7 @@
  * Used by middleware.ts and i18n/request.ts.
  */
 
-export const locales = ['en', 'he', 'sv', 'ja', 'es'] as const;
+export const locales = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 export type Locale = (typeof locales)[number];
 export const defaultLocale: Locale = 'en';
 

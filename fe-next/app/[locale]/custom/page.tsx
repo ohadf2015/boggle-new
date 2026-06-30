@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import PageClient from './PageClient';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
   params: Promise<{ locale: string }>;

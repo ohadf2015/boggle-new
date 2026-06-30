@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { loadTranslation } from '@/translations/loadTranslation';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 // FAQ keys used in the schema — maps to faq.q.* and faq.a.* translation keys
 const FAQ_KEYS = [
@@ -70,7 +70,7 @@ interface FAQLayoutProps {
 
 export default async function FAQLayout({ children, params }: FAQLayoutProps): Promise<ReactNode> {
   const { locale } = await params;
-  const validLocale = (['en', 'he', 'sv', 'ja', 'es'].includes(locale) ? locale : 'en') as Locale;
+  const validLocale = (['en', 'he', 'sv', 'ja', 'es', 'ru'].includes(locale) ? locale : 'en') as Locale;
   const localePath = `/${validLocale}`;
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const faqT = t?.faq;

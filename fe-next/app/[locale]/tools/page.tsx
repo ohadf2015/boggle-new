@@ -5,18 +5,18 @@ import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 export const revalidate = 86400;
 
-type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
 }
 
 const BASE_URL = 'https://www.lexiclash.live';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as ValidLocale;
+  const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as ValidLocale;
   const content = getContent(validLocale);
   const localePath = `/${locale}`;
   const pageUrl = `${BASE_URL}${localePath}/tools`;
@@ -108,11 +108,27 @@ const toolsSeoContent: Record<string, {
       { question: '¿Son gratuitas las herramientas?', answer: 'Todas las herramientas de palabras en LexiClash son completamente gratuitas sin necesidad de cuenta.' },
     ],
   },
+  ru: {
+    title: 'Инструменты слов LexiClash — Решатель, Расшифровщик и многое другое',
+    description: 'Бесплатные инструменты для слов, чтобы улучшить вашу игру. Используйте наш Решатель слов, чтобы найти слова из любых букв, расшифруйте перепутанные слова и откройте для себя новую лексику.',
+    features: [
+      'Решатель слов — введите любые буквы и получите все допустимые слова мгновенно',
+      'Поиск анаграмм — расшифруйте перепутанные буквы в реальные слова',
+      'Фильтрация результатов по длине слова для целевой практики',
+      'Поддержка многих языков — работает с английским, иврит, шведским, японским и испанским словарями',
+      'Бесплатно — без регистрации и платежей',
+    ],
+    faq: [
+      { question: 'Как работает Решатель слов?', answer: 'Введите доступные вам буквы, и решатель проверит все возможные комбинации по нашему словарю. Результаты сгруппированы по длине и отсортированы по оценке.' },
+      { question: 'Могу ли я использовать эти инструменты для Scrabble или других словесных игр?', answer: 'Да — Решатель слов использует стандартный словарь, который охватывает допустимые слова Scrabble, Boggle, Words With Friends и LexiClash.' },
+      { question: 'Инструменты бесплатны?', answer: 'Все инструменты слов на LexiClash полностью бесплатны и не требуют учетной записи.' },
+    ],
+  },
 };
 
 export default async function ToolsHubPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as ValidLocale;
+  const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as ValidLocale;
   const seoData = toolsSeoContent[validLocale] ?? toolsSeoContent.en;
   return (
     <>

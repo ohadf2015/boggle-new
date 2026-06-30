@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { PageLoader } from '@/components/ui/PageLoader';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
   params: Promise<{ locale: string; puzzleCode: string }>;

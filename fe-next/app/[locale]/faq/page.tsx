@@ -25,7 +25,7 @@ function buildFaqJsonLd(locale: string): string {
   return JSON.stringify(schema);
 }
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
@@ -33,7 +33,7 @@ interface PageParams {
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as Locale;
+  const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as Locale;
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const enT = await loadTranslation('en') as Record<string, any>;
   const seo = t?.seo?.faq || enT.seo.faq;
@@ -201,6 +201,35 @@ const faqSeoContent: Record<string, {
       {
         question: '¿Es LexiClash gratis?',
         answer: 'Sí — LexiClash es completamente gratis. Todos los modos de juego, desafíos diarios y funciones multijugador están disponibles sin pago.',
+      },
+    ],
+  },
+  ru: {
+    title: 'Часто задаваемые вопросы — справочный центр LexiClash',
+    description:
+      'Ответы на самые частые вопросы о LexiClash. Узнайте про режимы игры, начисление очков, аккаунты, многопользовательскую игру и многое другое — от первых шагов до продвинутых стратегий.',
+    features: [
+      'Подробные ответы про режимы «Классический», «Бласт», «Охота за словами» и «Приключение»',
+      'Настройка аккаунта, оформление профиля и отслеживание серий',
+      'Создание комнат для многопользовательской игры и режима вечеринки на ТВ',
+      'Как считаются очки — длина слова, комбо, бонусные плитки и множители',
+      'Поддержка языков — играйте на русском, английском, иврите, шведском, японском или испанском',
+    ],
+    faq: [
+      {
+        question: 'Что такое LexiClash?',
+        answer:
+          'LexiClash — это бесплатная многопользовательская игра в слова в реальном времени. Составляйте слова из букв на поле, соревнуйтесь с друзьями или соперниками и поднимайтесь в таблице лидеров. Доступна на 6 языках с несколькими режимами.',
+      },
+      {
+        question: 'Как начать игру с другими?',
+        answer:
+          'Нажмите «Создать комнату» в главном меню, выберите режим и настройки, затем поделитесь кодом комнаты с друзьями — они вводят код, чтобы присоединиться. Можно также зайти в случайную открытую комнату.',
+      },
+      {
+        question: 'LexiClash бесплатный?',
+        answer:
+          'Да — LexiClash полностью бесплатный. Все режимы, ежедневные испытания и многопользовательские функции доступны без оплаты и без рекламы, мешающей игре.',
       },
     ],
   },

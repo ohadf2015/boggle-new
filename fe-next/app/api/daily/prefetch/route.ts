@@ -3,7 +3,7 @@ import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { generateDailyPuzzle } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
 
-const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_DATES = 3;
 

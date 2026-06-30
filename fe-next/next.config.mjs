@@ -161,7 +161,7 @@ const nextConfig = {
       },
       // Author route rename: the-word-nerd → ohad-fisher
       {
-        source: '/:locale(en|he|sv|ja|es)/about/the-word-nerd',
+        source: '/:locale(en|he|sv|ja|es|ru)/about/the-word-nerd',
         destination: '/:locale/about/ohad-fisher',
         permanent: true,
       },
@@ -173,7 +173,7 @@ const nextConfig = {
       // Slug consolidation: the underperforming text page (pos ~13, ~1 click/mo)
       // folds into the richer showcase landing for the same intent.
       {
-        source: '/:locale(en|he|sv|ja|es)/multiplayer-word-game-online',
+        source: '/:locale(en|he|sv|ja|es|ru)/multiplayer-word-game-online',
         destination: '/:locale/free-multiplayer-word-game',
         permanent: true,
       },
@@ -212,13 +212,13 @@ const nextConfig = {
       // This prevents 308s from the app router and gives Google clean 301s.
       // Must be AFTER the non-www redirect and root redirect above.
       {
-        source: '/:path((?!en|he|sv|ja|es|api|_next|favicon\\.ico|.*\\..*).*)',
+        source: '/:path((?!en|he|sv|ja|es|ru|api|_next|favicon\\.ico|.*\\..*).*)',
         destination: '/en/:path',
         permanent: true,
       },
       // Also handle nested paths without locale (e.g. /legal/privacy → /en/legal/privacy)
       {
-        source: '/:path((?!en|he|sv|ja|es|api|_next|favicon\\.ico|.*\\..*).*?)/:rest*',
+        source: '/:path((?!en|he|sv|ja|es|ru|api|_next|favicon\\.ico|.*\\..*).*?)/:rest*',
         destination: '/en/:path/:rest*',
         permanent: true,
       },
@@ -420,7 +420,7 @@ const nextConfig = {
       // frame-ancestors block below. Browsers enforce the INTERSECTION of all
       // CSP frame-ancestors, so embed must receive exactly ONE (permissive) CSP.
       {
-        source: '/:path((?!(?:en|he|sv|ja|es)/embed/).*)',
+        source: '/:path((?!(?:en|he|sv|ja|es|ru)/embed/).*)',
         headers: [
           // Block indexing for preview/staging environments via X-Robots-Tag header
           ...(isPreviewEnvironment ? [{
@@ -474,7 +474,7 @@ const nextConfig = {
       // unit-tested — NOT here, since headers() application to Route Handlers is the
       // uncertain part. This entry only carries the non-CSP security headers.
       {
-        source: '/:locale(en|he|sv|ja|es)/embed/:path*',
+        source: '/:locale(en|he|sv|ja|es|ru)/embed/:path*',
         headers: [
           { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
           { key: 'X-Content-Type-Options', value: 'nosniff' },

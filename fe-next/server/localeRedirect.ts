@@ -24,6 +24,8 @@ export const COUNTRY_TO_LOCALE: Record<string, string> = {
   IL: 'he', US: 'en', GB: 'en', CA: 'en', AU: 'en', NZ: 'en',
   IE: 'en', ZA: 'en', IN: 'en', PH: 'en', SG: 'en',
   SE: 'sv', FI: 'sv', JP: 'ja',
+  // Russian-speaking countries
+  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru',
   // Spanish-speaking countries
   ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es',
   VE: 'es', EC: 'es', GT: 'es', CU: 'es', BO: 'es', DO: 'es',
@@ -31,7 +33,7 @@ export const COUNTRY_TO_LOCALE: Record<string, string> = {
   UY: 'es', PR: 'es', GQ: 'es'
 };
 
-export const SUPPORTED_LOCALES: string[] = ['he', 'en', 'sv', 'ja', 'es'];
+export const SUPPORTED_LOCALES: string[] = ['he', 'en', 'sv', 'ja', 'es', 'ru'];
 export const DEFAULT_LOCALE: string = 'en';
 
 // Social media crawler user agents

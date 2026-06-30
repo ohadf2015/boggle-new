@@ -26,7 +26,7 @@ export function normalizeForStorage(word: string, language?: Language): string {
 }
 
 // Types matching database schema from migration 056
-export type Language = 'en' | 'he' | 'sv' | 'ja' | 'es';
+export type Language = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 export interface Classroom {
   id: string;

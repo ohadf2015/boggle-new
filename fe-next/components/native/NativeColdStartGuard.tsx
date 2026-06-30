@@ -13,7 +13,7 @@ import {
 
 const NATIVE_COLD_START_FLAG = 'lexiclash_native_cold_start_handled';
 
-const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 type Locale = (typeof SUPPORTED_LOCALES)[number];
 
 // Paths users should NEVER land on when opening the app fresh. These are

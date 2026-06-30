@@ -33,6 +33,8 @@ export const GEM_LETTERS: Record<Language, Set<string>> = {
   fr: new Set(['K', 'W', 'X', 'Y', 'Z']),
   // DE — German Scrabble 10-pt tier: Q,X,Y + Ö
   de: new Set(['Q', 'X', 'Y', 'Ö']),
+  // RU — Russian rare letters (uncommon in typical text): Ж, Х, Ц, Ч, Ш, Щ, Э, Ю, Ф
+  ru: new Set(['Ж', 'Х', 'Ц', 'Ч', 'Ш', 'Щ', 'Э', 'Ю', 'Ф']),
 };
 
 export function isGemLetter(letter: string, language: Language): boolean {

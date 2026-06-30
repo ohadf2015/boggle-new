@@ -8,7 +8,7 @@
 import { yesterdayISO } from './streak';
 import { DAILY_PUZZLE_COUNT } from './daily';
 
-const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'];
+const LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MAX_TIME_SECONDS = 86_400; // a day's worth — anything above is garbage
 const MAX_NAME_LEN = 50;

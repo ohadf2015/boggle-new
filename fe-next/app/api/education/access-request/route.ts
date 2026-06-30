@@ -6,7 +6,7 @@ import { teacherAccessAdminNotify } from '@/lib/email/templates/teacherAccessAdm
 import type { TeacherAccessFormPayload } from '@/lib/education/types';
 
 const ROLES = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'] as const;
-const LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function bad(msg: string, status = 400) {

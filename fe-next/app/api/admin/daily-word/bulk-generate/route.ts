@@ -28,6 +28,7 @@ const WORD_LENGTH_RANGE: Record<Language, { min: number; max: number }> = {
   es: { min: 5, max: 7 },
   fr: { min: 5, max: 7 },
   de: { min: 5, max: 7 },
+  ru: { min: 5, max: 7 },
 };
 
 

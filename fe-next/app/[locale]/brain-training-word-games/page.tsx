@@ -9,7 +9,7 @@ interface PageProps {
 }
 
 const BASE_URL = 'https://www.lexiclash.live';
-const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
 const OG_IMAGE: Record<string, string> = {
   en: 'og-image-en.webp',
@@ -101,7 +101,7 @@ export default async function BrainTrainingWordGamesPage({ params }: PageProps) 
     playMode: ['SinglePlayer'],
     applicationCategory: 'GameApplication',
     operatingSystem: 'Any (Web Browser)',
-    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+    inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock', url: `${BASE_URL}/${locale}/brain` },
     publisher: { '@type': 'Organization', name: 'LexiClash', url: BASE_URL },
   });

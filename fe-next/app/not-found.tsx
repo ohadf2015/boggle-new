@@ -10,11 +10,11 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-const SUPPORTED_LOCALES = ['he', 'en', 'sv', 'ja', 'es'] as const;
+const SUPPORTED_LOCALES = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
 type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 function detectLocaleFromPath(pathname: string): SupportedLocale | null {
-  const match = pathname.match(/^\/(he|en|sv|ja|es)\b/);
+  const match = pathname.match(/^\/(he|en|sv|ja|es|ru)\b/);
   return (match?.[1] as SupportedLocale) || null;
 }
 
@@ -69,6 +69,13 @@ const notFoundTranslations: Record<string, {
     description: 'Intentaste deletrear una página que no existe. Error clásico de casilla triple. Hasta nuestra mascota revisó el diccionario dos veces.',
     hint: '(Dato curioso: 404 valdría 8 puntos en Scrabble — si fuera una palabra. No lo es.)',
     cta: 'Volver al tablero',
+  },
+  ru: {
+    title: '404 — Слово не найдено!',
+    subtitle: '«404» набрало 0 очков. Недопустимое слово.',
+    description: 'Вы попытались составить страницу, которой не существует. Классический промах с тройной буквой. Даже наш маскот дважды проверил словарь.',
+    hint: '(Любопытный факт: «404» стоило бы 8 очков в Скрабле — если бы это было слово. Но это не слово.)',
+    cta: 'Вернуться к доске',
   },
 };
 
@@ -135,6 +142,7 @@ export default async function GlobalNotFound() {
                  locale === 'ja' ? '辞書にない' :
                  locale === 'sv' ? 'inte i ordboken' :
                  locale === 'es' ? 'no en el diccionario' :
+                 locale === 'ru' ? 'нет в словаре' :
                  'not in dictionary'}
               </span>
             </div>
@@ -163,6 +171,7 @@ export default async function GlobalNotFound() {
                  locale === 'ja' ? 'それ単語じゃない！' :
                  locale === 'sv' ? 'Det är inget ord!' :
                  locale === 'es' ? '¡Eso no es palabra!' :
+                 locale === 'ru' ? 'Это не слово!' :
                  "That's not a word!"}
                 <div className={`absolute bottom-[-6px] ${isRTL ? 'left-4' : 'right-4'}
                   w-3 h-3 bg-neo-cream border-b-2 border-r-2 border-black

@@ -104,6 +104,7 @@ const VOWEL_SETS: Record<Language, string[]> = {
   es: ['A', 'E', 'I', 'O', 'U', 'Á', 'É', 'Í', 'Ó', 'Ú'],
   fr: ['A', 'E', 'I', 'O', 'U', 'Y', 'À', 'Â', 'É', 'È', 'Ê', 'Ë', 'Î', 'Ï', 'Ô', 'Ù', 'Û', 'Ü', 'Ÿ'],
   de: ['A', 'E', 'I', 'O', 'U', 'Ä', 'Ö', 'Ü'],
+  ru: ['А', 'Е', 'И', 'О', 'У', 'Ы', 'Э', 'Ю', 'Я'],
 };
 
 // ============================================
@@ -312,6 +313,7 @@ function generateDefaultExampleSentence(word: string, language: Language): strin
     es: [`Hoy vi un hermoso ${word.toLowerCase()}.`, `El ${word.toLowerCase()} era muy impresionante.`],
     fr: [`J'ai vu un beau ${word.toLowerCase()} aujourd'hui.`, `Le ${word.toLowerCase()} était très impressionnant.`],
     de: [`Ich habe heute einen schönen ${word} gesehen.`, `Der ${word} war sehr beeindruckend.`],
+    ru: [`Сегодня я видел красивый ${word.toLowerCase()}.`, `${word} был очень впечатляющим.`],
   };
 
   const langTemplates = templates[language] || templates.en;

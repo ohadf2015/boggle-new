@@ -64,6 +64,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         sv: 'https://www.lexiclash.live/sv/adventure',
         ja: 'https://www.lexiclash.live/ja/adventure',
         es: 'https://www.lexiclash.live/es/adventure',
+        ru: 'https://www.lexiclash.live/ru/adventure',
         'en-IL': 'https://www.lexiclash.live/en/adventure',
         'he-IL': 'https://www.lexiclash.live/he/adventure',
         'en-US': 'https://www.lexiclash.live/en/adventure',

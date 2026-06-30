@@ -57,7 +57,7 @@ export const ALLOWED_IMAGE_DOMAINS: string[] = [
 // ==================== Base Schemas ====================
 // These are the building blocks reused across event schemas
 
-export const LanguageSchema = z.enum(['he', 'en', 'sv', 'ja', 'es', 'fr', 'de']);
+export const LanguageSchema = z.enum(['he', 'en', 'sv', 'ja', 'es', 'ru', 'fr', 'de']);
 
 export const AvatarSchema = z.object({
   emoji: z.string()
@@ -105,7 +105,8 @@ export const UsernameSchema = z.string()
   .max(30, 'Username must be at most 30 characters')
   // Latin: a-zA-Z + Latin-1 Supplement/Extended (\u00C0-\u024F) covers Spanish/Swedish/French/German/Nordic accents.
   // Sentry 139/142/138/143: non-ASCII names like "Andr\u00E9s", "Bj\u00F6rn", "Fran\u00E7ois" were rejected.
-  .regex(/^[a-zA-Z0-9._\-\u00C0-\u024F\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
+  // Sentry JAVASCRIPT-NEXTJS-1MC: \u0400-\u04FF (Cyrillic) added for Russian locale.
+  .regex(/^[a-zA-Z0-9._\-\u00C0-\u024F\u0400-\u04FF\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
   .transform(s => s.trim())
   // SECURITY: Reject control characters, zero-width characters, and BOM
   .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Username contains invalid characters');

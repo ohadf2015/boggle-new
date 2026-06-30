@@ -6,7 +6,7 @@
  */
 
 const VALID_DIFFICULTIES = ['easy', 'medium', 'hard'] as const;
-const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const VALID_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
 // Upper bounds based on game mechanics:
 // Max grid is 6×6 = 36 tiles. Score of 50,000 is extremely generous
