@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import { fetchWiktionaryMeaning } from '../../../lib/dictionary/wiktionaryMeaning';
 import { definitionToClue } from '../../../lib/crossword/clues/clueText';
 
-const CACHE_DIR = join(__dirname, '.cache-wiktionary');
+const CACHE_DIR = join(__dirname, '.cache', 'wiktionary'); // under the already-gitignored .cache/
 
 function cachePathFor(lang: string, word: string): string {
   return join(CACHE_DIR, `${lang}-${encodeURIComponent(word)}.json`);

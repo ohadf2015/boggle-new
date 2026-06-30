@@ -77,7 +77,7 @@ async function main() {
     await sleep(120);
   }
 
-  if (!DRY) writeFileSync(bankPath, JSON.stringify(bank));
+  if (!DRY) writeFileSync(bankPath, `${JSON.stringify(bank, null, 2)}\n`); // match the bank's pretty-printed format
   console.log(`DONE ${DRY ? '(dry)' : ''} ${LANG}: +${added} added, ${miss} no-def, ${rejected} low-quality. bank ${before} -> ${before + (DRY ? 0 : added)}`);
 }
 
