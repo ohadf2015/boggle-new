@@ -11,8 +11,8 @@ interface PageProps {
 }
 
 const BASE_URL = 'https://www.lexiclash.live';
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
-const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
+const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 // SEO keywords per locale
 const KEYWORDS: Record<Locale, string> = {
@@ -21,6 +21,7 @@ const KEYWORDS: Record<Locale, string> = {
   sv: 'dagligt ordhjul, ordpussel, gratis ordspel, dagligt ordspel, ordhjul online',
   ja: 'デイリーワードホイール, ワードパズル, 無料ワードゲーム, 毎日のワードゲーム',
   es: 'rueda de palabras diaria, puzzle de palabras, juego de palabras gratis, juego de palabras diario',
+  ru: 'ежедневное колесо слов, словесная головоломка, бесплатная игра в слова, ежедневная игра в слова',
 };
 
 // Per-locale metadata fallbacks — kills cross-locale dup-title flagging when translation keys missing
@@ -54,6 +55,12 @@ const META_FALLBACK: Record<Locale, { title: string; description: string; ogTitl
     description: 'Gira la rueda de palabras diaria y encuentra cada palabra escondida. Puzzle gratis online — sin registro, sin descarga. Letras nuevas cada día.',
     ogTitle: 'Rueda de Palabras Diaria — Puzzle Gratis',
     ogDescription: 'Gira la rueda y encuentra todas las palabras. ¡Nuevo puzzle cada día!',
+  },
+  ru: {
+    title: 'Ежедневное колесо слов — Бесплатная онлайн-головоломка | LexiClash',
+    description: 'Играйте в бесплатную головоломку Daily Word Wheel — крутите колесо букв, найдите все скрытые слова. Новая задача каждый день, отслеживание полос, глобальная таблица лидеров. Без регистрации, без скачивания.',
+    ogTitle: 'Ежедневное колесо слов — Бесплатная головоломка',
+    ogDescription: 'Крутите колесо слов, найдите все слова. Новая бесплатная головоломка каждый день — отслеживание полос, глобальная таблица лидеров!',
   },
 };
 
@@ -95,8 +102,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   languages['es-ES'] = `${BASE_URL}/es/daily-word-wheel`;
   languages['es-MX'] = `${BASE_URL}/es/daily-word-wheel`;
   languages['es-US'] = `${BASE_URL}/es/daily-word-wheel`;
+  languages['ru-RU'] = `${BASE_URL}/ru/daily-word-wheel`;
 
-  const ogLocaleMap: Record<string, string> = { en: 'en_US', he: 'he_IL', sv: 'sv_SE', ja: 'ja_JP', es: 'es_ES' };
+  const ogLocaleMap: Record<string, string> = { en: 'en_US', he: 'he_IL', sv: 'sv_SE', ja: 'ja_JP', es: 'es_ES', ru: 'ru_RU' };
 
   const fallback = META_FALLBACK[validLocale];
   return {

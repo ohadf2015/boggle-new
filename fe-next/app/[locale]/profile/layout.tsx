@@ -2,7 +2,7 @@ import { loadTranslation, type TranslationData } from '@/translations/loadTransl
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;

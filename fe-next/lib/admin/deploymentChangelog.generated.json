@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-29T07:31:14.551Z",
+  "generatedAt": "2026-06-30T05:57:29.585Z",
   "commits": [
     {
-      "sha": "50bf75ab86c7ce0e9e5578506f70673ad3f20ad6",
-      "shortSha": "50bf75a",
-      "subject": "feat(nightly): recover dropped 2026-06-29 lane code + fix stale cosmetics gate",
+      "sha": "14be495e64e820dfc389ea4077028c8463b6871e",
+      "shortSha": "14be495",
+      "subject": "feat(i18n): 3 more Russian landing pages + ru per-page SEO metadata",
       "author": "Ohad Fisher",
-      "date": "2026-06-29T10:26:29+03:00"
+      "date": "2026-06-30T08:50:46+03:00"
     },
     {
-      "sha": "26aa7078ac81c4473013b4bef299864993ecbed3",
-      "shortSha": "26aa707",
-      "subject": "chore(nightly): autonomous improvement loop 2026-06-29",
+      "sha": "32101564752ed949b1c15006302bd22fc9dbd818",
+      "shortSha": "3210156",
+      "subject": "feat(i18n): Russian UI translation (ru.js) + fix ru locale routing",
       "author": "Ohad Fisher",
-      "date": "2026-06-29T06:20:41+03:00"
+      "date": "2026-06-30T02:47:28+03:00"
     },
     {
-      "sha": "02135d1f5763240296a2424869e24f43c7384f26",
-      "shortSha": "02135d1",
-      "subject": "Merge pull request #663 from ohadf2015/claude/email-subject-lines-wm5x2c",
-      "author": "ohadf2015",
-      "date": "2026-06-28T22:26:33+03:00"
-    },
-    {
-      "sha": "eaf87ee1c44c4971afed2143518671ce27cb82cb",
-      "shortSha": "eaf87ee",
-      "subject": "feat(emails): rewrite subject lines to be human and emoji-free",
-      "author": "Claude",
-      "date": "2026-06-28T19:24:09Z"
-    },
-    {
-      "sha": "be935ef36ccb2f530d6f636af539cd17a2059b0e",
-      "shortSha": "be935ef",
-      "subject": "Merge pull request #661 from ohadf2015/claude/desktop-nav-game-play-error-3bmkuz",
-      "author": "ohadf2015",
-      "date": "2026-06-28T20:39:36+03:00"
-    },
-    {
-      "sha": "3f7487bdcc90620e4f843587e9df3ef57550abae",
-      "shortSha": "3f7487b",
-      "subject": "Merge pull request #660 from ohadf2015/claude/mp-lobby-ui-refinements-52ei9g",
-      "author": "ohadf2015",
-      "date": "2026-06-28T20:39:14+03:00"
-    },
-    {
-      "sha": "68b0610a5cd0f584c935e8f14afd8dd2a8797a63",
-      "shortSha": "68b0610",
-      "subject": "feat(mp-lobby): hide style picker pre-first-game, longer bot countdown, declutter blast tiles",
-      "author": "Claude",
-      "date": "2026-06-28T17:36:52Z"
-    },
-    {
-      "sha": "22858e46b121d11ad61322005eed2a0f6b44fae3",
-      "shortSha": "22858e4",
-      "subject": "fix(nav): desktop Quick Play tab routes straight to multiplayer, not the /singleplayer redirect stub",
-      "author": "Claude",
-      "date": "2026-06-28T17:34:58Z"
-    },
-    {
-      "sha": "e654ac494e6d848998e8b05938c097e472fd36d9",
-      "shortSha": "e654ac4",
-      "subject": "Merge pull request #659 from ohadf2015/claude/desktop-shell-timers-layout-d91hyh",
-      "author": "ohadf2015",
-      "date": "2026-06-28T20:24:18+03:00"
-    },
-    {
-      "sha": "e3bf3e0d3afe16ae8ab388e2e962413c6fe3bd4f",
-      "shortSha": "e3bf3e0",
-      "subject": "Merge pull request #658 from ohadf2015/claude/practice-completion-celebration-ux-cc5py4",
-      "author": "ohadf2015",
-      "date": "2026-06-28T20:23:46+03:00"
-    },
-    {
-      "sha": "4ed02775def93450d8e57f6ea82fead377c5314b",
-      "shortSha": "4ed0277",
-      "subject": "fix(mp-desktop): single server-synced timer + no-scroll rails",
-      "author": "Claude",
-      "date": "2026-06-28T17:22:50Z"
-    },
-    {
-      "sha": "9a3045cbc76e75be97cd7f9d46a0313d70b47984",
-      "shortSha": "9a3045c",
-      "subject": "feat(practice): celebratory all-complete state with home CTA",
-      "author": "Claude",
-      "date": "2026-06-28T17:16:18Z"
-    },
-    {
-      "sha": "b2143a599d1f0ebc4c3824720aed9f342ac18eb7",
-      "shortSha": "b2143a5",
-      "subject": "perf(friends): collapse thread-list N+1 into one RPC + dedupe auth.getUser round-trips",
+      "sha": "2892e8aa23c4764d84d1779f582b87fe83ed59f1",
+      "shortSha": "2892e8a",
+      "subject": "feat(i18n): add Russian (ru) locale — playable game, fonts, plumbing, landing pages",
       "author": "Ohad Fisher",
-      "date": "2026-06-28T12:15:39+03:00"
+      "date": "2026-06-30T01:12:03+03:00"
     },
     {
-      "sha": "e273f259295c4c986f6ddb1bd738504742b6f422",
-      "shortSha": "e273f25",
-      "subject": "Merge pull request #657 from ohadf2015/claude/hebrew-quest-translations-8wkiiu",
-      "author": "ohadf2015",
-      "date": "2026-06-28T09:22:52+03:00"
-    },
-    {
-      "sha": "78b2fbab1df1a5dd5db3ac5e1a05dca7c2b19be1",
-      "shortSha": "78b2fba",
-      "subject": "fix(i18n): natural Hebrew for daily quest titles & descriptions",
-      "author": "Claude",
-      "date": "2026-06-28T06:10:31Z"
-    },
-    {
-      "sha": "e481e0df849313a28d33300e9f19d7c3224a4a88",
-      "shortSha": "e481e0d",
-      "subject": "chore(nightly): autonomous improvement loop 2026-06-28",
+      "sha": "b8d41cbb21e69d52b4739d96995b9141c67ce117",
+      "shortSha": "b8d41cb",
+      "subject": "fix(nightly): setup.sh prompts for SUPABASE_ACCESS_TOKEN (close the 4-night MCP gap)",
       "author": "Ohad Fisher",
-      "date": "2026-06-28T06:15:13+03:00"
+      "date": "2026-06-29T14:19:01+03:00"
     },
     {
-      "sha": "70891a7d19b0747e1782954d3de7eb0fe522993b",
-      "shortSha": "70891a7",
-      "subject": "Merge pull request #654 from ohadf2015/claude/settings-scroll-deeplink-fix-n4nkv6",
-      "author": "ohadf2015",
-      "date": "2026-06-28T02:01:07+03:00"
+      "sha": "3d283a61bc3425d2a42a619c8bfc740bf8014018",
+      "shortSha": "3d283a6",
+      "subject": "Merge pull request #662 from ohadf2015/claude/swedish-o-umlaut-bug-wbwgdm",
+      "author": "Eden Ekdahl",
+      "date": "2026-06-29T13:18:18+02:00"
     },
     {
-      "sha": "a207b9c14974efbbd1fe8786ed632231dc414fb1",
-      "shortSha": "a207b9c",
-      "subject": "fix(settings,deeplink): scrollable settings + reliable cold-start deep links",
+      "sha": "150a60160c455333414724f7d0d48157f5c068d4",
+      "shortSha": "150a601",
+      "subject": "test: dedupe useUserStats mock in PlayerStyleOnboardingWrapper route test",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T13:41:10+03:00"
+    },
+    {
+      "sha": "006a45234356f9cc47597ca40cdef7cc6a8a774e",
+      "shortSha": "006a452",
+      "subject": "feat(leaderboard): wire exp-leaderboard-play-cta-v1 render path (lane 03 step 6)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T13:39:00+03:00"
+    },
+    {
+      "sha": "83aff89f6a69e4746bdbc55f06110217dfa29433",
+      "shortSha": "83aff89",
+      "subject": "Merge remote-tracking branch 'origin/master' into claude/swedish-o-umlaut-bug-wbwgdm",
       "author": "Claude",
-      "date": "2026-06-27T22:52:34Z"
+      "date": "2026-06-29T10:17:09Z"
     },
     {
-      "sha": "1fda071e28ead615b08d07f76199b3c13592147c",
-      "shortSha": "1fda071",
-      "subject": "Merge pull request #653 from ohadf2015/claude/quest-combo-trigger-bug-eua88k",
-      "author": "ohadf2015",
-      "date": "2026-06-28T01:38:29+03:00"
+      "sha": "b6531d123840f95e4cc67481c5b06a309ea96c68",
+      "shortSha": "b6531d1",
+      "subject": "Merge pull request #666 from ohadf2015/fix/pre-existing-ci-failures",
+      "author": "Eden Ekdahl",
+      "date": "2026-06-29T12:15:36+02:00"
     },
     {
-      "sha": "8c6bcfd12e0c3dc348c6a8def8fbdfb8502fe613",
-      "shortSha": "8c6bcfd",
-      "subject": "fix(adventure): streak quest now credits the streak length reached",
+      "sha": "0c573641c143fbbcde33e63698171043cfb72767",
+      "shortSha": "0c57364",
+      "subject": "Revert \"fix(ci): stop shard-6 worker OOM — lower vitest maxForks 8→4, raise fork heap to 8192\"",
       "author": "Claude",
-      "date": "2026-06-27T22:37:57Z"
+      "date": "2026-06-29T09:30:26Z"
+    },
+    {
+      "sha": "8b40c83025c0f35fdfe887d70ebf55e52b563566",
+      "shortSha": "8b40c83",
+      "subject": "fix(friends): guard best-effort updateOnlineStatus against unhandled rejection",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T12:06:10+03:00"
+    },
+    {
+      "sha": "91e08ca96550f7eeb29e0439ae5a7ea084d18556",
+      "shortSha": "91e08ca",
+      "subject": "fix(ci): stop shard-6 worker OOM — lower vitest maxForks 8→4, raise fork heap to 8192",
+      "author": "Claude",
+      "date": "2026-06-29T09:03:58Z"
+    },
+    {
+      "sha": "c2d30ef428fcbd41c644a0fa7c4494bd0b554f7a",
+      "shortSha": "c2d30ef",
+      "subject": "feat(wordwheel): A/B drag-hint coachmark to fix wheel rage-clicks (lane 03)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T11:51:01+03:00"
+    },
+    {
+      "sha": "77b744164f42f7e653f52a321029c6bab93f28a9",
+      "shortSha": "77b7441",
+      "subject": "fix(ci): raise inline-hex ratchet baseline 175→176; bump analyze heap to 13312",
+      "author": "Claude",
+      "date": "2026-06-29T08:43:34Z"
+    },
+    {
+      "sha": "f39dfdcba623a21bde2d0d6fa54955da74833587",
+      "shortSha": "f39dfdc",
+      "subject": "fix(a11y): trap focus in Word Tower upgrade panel (WCAG 2.1.2) (lane 11)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T11:33:58+03:00"
+    },
+    {
+      "sha": "245e8f855aa49b4182a5933986bd59f63ab40dd2",
+      "shortSha": "245e8f8",
+      "subject": "feat(telemetry): wire daily_challenge_completed funnel event (lane 12)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T11:30:13+03:00"
+    },
+    {
+      "sha": "689aa4d70e2fd29a380ddc54fdf380aadb1538fe",
+      "shortSha": "689aa4d",
+      "subject": "fix(ci): repair pre-existing test + bundle-analysis failures on master",
+      "author": "Claude",
+      "date": "2026-06-29T08:13:44Z"
+    },
+    {
+      "sha": "221b88a5bba3b9492912f0f7be45770c8226db3c",
+      "shortSha": "221b88a",
+      "subject": "test: fix 4 stale pre-existing master-red tests (green nightly baseline)",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T11:11:42+03:00"
+    },
+    {
+      "sha": "f70f6febeb1072279d7aeb6f26a0ce3508b91420",
+      "shortSha": "f70f6fe",
+      "subject": "feat(skills): add seo-improve — on-demand SEO/GEO run with Bing AI-visibility",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T10:56:03+03:00"
+    },
+    {
+      "sha": "22fa1dcfbb8b68c8c391553130355d5d75f68422",
+      "shortSha": "22fa1dc",
+      "subject": "fix(nightly): capture Bing's enriched AI-visibility metadata + fix 3 silent scraper regressions",
+      "author": "Ohad Fisher",
+      "date": "2026-06-29T10:51:54+03:00"
     }
   ]
 }

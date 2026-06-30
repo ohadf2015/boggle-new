@@ -9,7 +9,7 @@ const POPULAR_ANAGRAM_SEEDS = ['listen', 'stared', 'heart', 'stone', 'rates', 'l
 
 export const dynamic = 'force-dynamic';
 
-type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type ValidLocale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
   params: Promise<{ locale: string }>;

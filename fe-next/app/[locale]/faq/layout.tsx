@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { loadTranslation } from '@/translations/loadTranslation';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 // FAQ keys used in the schema — maps to faq.q.* and faq.a.* translation keys
 const FAQ_KEYS = [

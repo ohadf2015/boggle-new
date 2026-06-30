@@ -11,6 +11,7 @@ const TITLES: Record<string, string> = {
   sv: 'Dagligt Ordhjul',
   ja: 'デイリーワードホイール',
   es: 'Rueda de Palabras Diaria',
+  ru: 'Ежедневное колесо слов',
 };
 
 const SUBTITLES: Record<string, string> = {
@@ -19,6 +20,7 @@ const SUBTITLES: Record<string, string> = {
   sv: 'Gratis Dagligt Ordpussel',
   ja: '毎日の無料ワードパズル',
   es: 'Puzzle de Palabras Diario Gratis',
+  ru: 'Бесплатная ежедневная головоломка со словами',
 };
 
 const TAGLINES: Record<string, string> = {
@@ -27,11 +29,12 @@ const TAGLINES: Record<string, string> = {
   sv: 'Nytt pussel varje dag • Tävla globalt',
   ja: '毎日新しいパズル • 世界と競争',
   es: 'Nuevo puzzle cada día • Compite globalmente',
+  ru: 'Новая головоломка каждый день • Соревнуйтесь во всём мире',
 };
 
 export default async function OGImage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
-  const lang = ['en', 'he', 'sv', 'ja', 'es'].includes(locale) ? locale : 'en';
+  const lang = ['en', 'he', 'sv', 'ja', 'es', 'ru'].includes(locale) ? locale : 'en';
 
   const title = TITLES[lang] || TITLES.en;
   const subtitle = SUBTITLES[lang] || SUBTITLES.en;

@@ -11,7 +11,7 @@ import { verifyAdminAuth } from '@/lib/auth/adminAuth';
 import { getSupabaseAdmin } from '@/lib/admin/server';
 import { captureApiError } from '@/utils/sentry';
 
-const VALID_LANGUAGES = new Set(['en', 'he', 'sv', 'ja', 'es']);
+const VALID_LANGUAGES = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 
 export async function POST(request: NextRequest) {
   try {

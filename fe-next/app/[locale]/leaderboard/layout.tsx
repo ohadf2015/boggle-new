@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
   en: {
@@ -43,6 +43,12 @@ const seoContent: Record<string, { title: string; description: string; features:
     title: 'Tabla de Clasificacion Global - Mejores Jugadores de Palabras',
     description: 'Descubre tu posicion entre los mejores jugadores de juegos de palabras del mundo.',
     features: ['Rankings globales actualizados en tiempo real'],
+    faq: [],
+  },
+  ru: {
+    title: 'Глобальная таблица лидеров - Топ-игроки в словесные игры во всём мире',
+    description: 'Посмотрите, где вы занимаете место среди лучших игроков в словесные игры во всём мире. Участвуйте в многопользовательских матчах LexiClash и ежедневных вызовах, чтобы подняться в рейтинге.',
+    features: ['Глобальные рейтинги, обновляющиеся в реальном времени', 'Отслеживание таблицы лидеров всё время с общими баллами во всех играх'],
     faq: [],
   },
 };

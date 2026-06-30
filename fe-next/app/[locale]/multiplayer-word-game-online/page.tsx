@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageProps {
   params: Promise<{ locale: string }>;

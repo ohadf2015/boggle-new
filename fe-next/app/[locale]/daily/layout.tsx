@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { dailySeoContent } from './dailySeo.data';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 const seoContent = dailySeoContent;
 
@@ -192,7 +192,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     // manual action. Do not reintroduce without verified UGC ratings AND a
     // visible rating badge on the page (Google policy requires both).
     browserRequirements: 'Requires a modern web browser',
-    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+    inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
   };
 
   // FAQPage schema — uses the same locale FAQ already rendered (sr-only) by
@@ -299,7 +299,7 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     },
     image: 'https://www.lexiclash.live/og-image-en.webp',
     isAccessibleForFree: true,
-    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+    inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
   };
 
   return (

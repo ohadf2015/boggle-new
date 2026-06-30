@@ -9,7 +9,7 @@ import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
 
 export const dynamic = 'force-dynamic';
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
     params: Promise<{ locale: string }>;
@@ -17,7 +17,7 @@ interface PageParams {
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
     const { locale } = await params;
-    const validLocale = (['en','he','sv','ja','es'].includes(locale) ? locale : 'en') as Locale;
+    const validLocale = (['en','he','sv','ja','es','ru'].includes(locale) ? locale : 'en') as Locale;
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const enT = await loadTranslation('en') as Record<string, any>;
     const pageContent = getHowToPlayContent(validLocale);
@@ -57,6 +57,7 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
                 sv: 'https://www.lexiclash.live/sv/how-to-play',
                 ja: 'https://www.lexiclash.live/ja/how-to-play',
                 es: 'https://www.lexiclash.live/es/how-to-play',
+                ru: 'https://www.lexiclash.live/ru/how-to-play',
                 'en-IL': 'https://www.lexiclash.live/en/how-to-play',
                 'he-IL': 'https://www.lexiclash.live/he/how-to-play',
                 'en-US': 'https://www.lexiclash.live/en/how-to-play',

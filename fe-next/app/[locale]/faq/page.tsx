@@ -25,7 +25,7 @@ function buildFaqJsonLd(locale: string): string {
   return JSON.stringify(schema);
 }
 
-type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 
 interface PageParams {
   params: Promise<{ locale: string }>;
