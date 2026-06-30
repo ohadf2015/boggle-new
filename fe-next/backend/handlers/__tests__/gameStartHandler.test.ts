@@ -15,7 +15,7 @@
 
 // ─── Mocks (must come before imports) ─────────────────────────────────────
 
-const { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, mockUpdateGame, mockGetGameBySocketId, mockGetGameUsers, mockGetSocketIdByUsername, mockCanTransitionGameState, mockTransitionGameState, mockResetGameForNewRound, mockBroadcastToRoom, mockGetGameRoom, mockSafeEmit, mockGetSocketById, mockMakePositionsMap, mockEnsureGame, mockGenerateRandomTable, mockEnsureLanguageLoaded, mockClearGameTimer, mockGameStartCoordinator, mockStopAllBots, mockNotifyGameStarted, mockSelectNextGameMode, mockInitializePlayerData, mockGetClassroomGame, mockInitBlastModeState, mockHashStringToSeed, mockInitWordHuntState, mockSelectTargetWordWithFallback, mockFindAllWordsAsync, mockGetCachedTrie, mockAutoAddBotsForSoloPlayer, mockStartGameTimer, mockLogger } = vi.hoisted(() => {
+const { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, mockUpdateGame, mockGetGameBySocketId, mockGetGameUsers, mockGetSocketIdByUsername, mockCanTransitionGameState, mockTransitionGameState, mockResetGameForNewRound, mockBroadcastToRoom, mockGetGameRoom, mockSafeEmit, mockGetSocketById, mockMakePositionsMap, mockNormalizeWordForLanguage, mockEnsureGame, mockGenerateRandomTable, mockEnsureLanguageLoaded, mockClearGameTimer, mockGameStartCoordinator, mockStopAllBots, mockNotifyGameStarted, mockSelectNextGameMode, mockInitializePlayerData, mockGetClassroomGame, mockInitBlastModeState, mockHashStringToSeed, mockInitWordHuntState, mockSelectTargetWordWithFallback, mockSelectCleanCommonTarget, mockGetRecentMpTargets, mockRecordMpTarget, mockFindAllWordsAsync, mockGetCachedTrie, mockAutoAddBotsForSoloPlayer, mockStartGameTimer, mockLogger } = vi.hoisted(() => {
   const mockCheckRateLimit = vi.fn(() => true);
   const mockValidatePayload = vi.fn();
   const mockEmitError = vi.fn();
@@ -32,6 +32,12 @@ const { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, moc
   const mockSafeEmit = vi.fn();
   const mockGetSocketById = vi.fn();
   const mockMakePositionsMap = vi.fn(() => new Map());
+  // Mirrors the real he final-letter→base normalization (the bit the fix relies on).
+  const mockNormalizeWordForLanguage = vi.fn((w: string, lang: string) =>
+    lang === 'he'
+      ? w.replace(/ם/g, 'מ').replace(/ן/g, 'נ').replace(/ץ/g, 'צ').replace(/ף/g, 'פ').replace(/ך/g, 'כ').toLowerCase()
+      : w.toLowerCase(),
+  );
   const mockEnsureGame = vi.fn();
   const mockGenerateRandomTable = vi.fn(() => [['X', 'Y'], ['Z', 'W']]);
   const mockEnsureLanguageLoaded = vi.fn(() => Promise.resolve());
@@ -53,6 +59,9 @@ const { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, moc
   const mockHashStringToSeed = vi.fn(() => 42);
   const mockInitWordHuntState = vi.fn(() => ({ targetWordLength: 5, targetCategory: null, playerLives: {} }));
   const mockSelectTargetWordWithFallback = vi.fn(() => 'brave');
+  const mockSelectCleanCommonTarget = vi.fn<(lang?: string, exclude?: Set<string>) => string | null>(() => null);
+  const mockGetRecentMpTargets = vi.fn(() => new Set<string>());
+  const mockRecordMpTarget = vi.fn();
   const mockFindAllWordsAsync = vi.fn(() => Promise.resolve(['brave', 'braves', 'rave']));
   const mockGetCachedTrie = vi.fn(() => ({}));
   const mockAutoAddBotsForSoloPlayer = vi.fn(() => Promise.resolve({ botsAdded: 0 }));
@@ -63,7 +72,7 @@ const { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, moc
     warn: vi.fn(),
     error: vi.fn(),
   };
-  return { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, mockUpdateGame, mockGetGameBySocketId, mockGetGameUsers, mockGetSocketIdByUsername, mockCanTransitionGameState, mockTransitionGameState, mockResetGameForNewRound, mockBroadcastToRoom, mockGetGameRoom, mockSafeEmit, mockGetSocketById, mockMakePositionsMap, mockEnsureGame, mockGenerateRandomTable, mockEnsureLanguageLoaded, mockClearGameTimer, mockGameStartCoordinator, mockStopAllBots, mockNotifyGameStarted, mockSelectNextGameMode, mockInitializePlayerData, mockGetClassroomGame, mockInitBlastModeState, mockHashStringToSeed, mockInitWordHuntState, mockSelectTargetWordWithFallback, mockFindAllWordsAsync, mockGetCachedTrie, mockAutoAddBotsForSoloPlayer, mockStartGameTimer, mockLogger };
+  return { mockCheckRateLimit, mockValidatePayload, mockEmitError, mockGetGame, mockUpdateGame, mockGetGameBySocketId, mockGetGameUsers, mockGetSocketIdByUsername, mockCanTransitionGameState, mockTransitionGameState, mockResetGameForNewRound, mockBroadcastToRoom, mockGetGameRoom, mockSafeEmit, mockGetSocketById, mockMakePositionsMap, mockNormalizeWordForLanguage, mockEnsureGame, mockGenerateRandomTable, mockEnsureLanguageLoaded, mockClearGameTimer, mockGameStartCoordinator, mockStopAllBots, mockNotifyGameStarted, mockSelectNextGameMode, mockInitializePlayerData, mockGetClassroomGame, mockInitBlastModeState, mockHashStringToSeed, mockInitWordHuntState, mockSelectTargetWordWithFallback, mockSelectCleanCommonTarget, mockGetRecentMpTargets, mockRecordMpTarget, mockFindAllWordsAsync, mockGetCachedTrie, mockAutoAddBotsForSoloPlayer, mockStartGameTimer, mockLogger };
 });
 
 
@@ -92,7 +101,7 @@ vi.mock('../../../backend/utils/socketHelpers', () => ({
   safeEmit: mockSafeEmit,
   getSocketById: mockGetSocketById,
 }));
-vi.mock('../../../backend/modules/wordValidator', () => ({ makePositionsMap: mockMakePositionsMap }));
+vi.mock('../../../backend/modules/wordValidator', () => ({ makePositionsMap: mockMakePositionsMap, normalizeWordForLanguage: mockNormalizeWordForLanguage }));
 vi.mock('../../../backend/utils/metrics', () => ({ ensureGame: mockEnsureGame }));
 vi.mock('../../../backend/utils/gameUtils', () => ({ generateRandomTable: mockGenerateRandomTable }));
 vi.mock('../../../backend/dictionary', () => ({ ensureLanguageLoaded: mockEnsureLanguageLoaded }));
@@ -116,6 +125,9 @@ vi.mock('../../../backend/modules/blastModeManager', () => ({
 vi.mock('../../../backend/modules/wordHuntManager', () => ({
   initWordHuntState: mockInitWordHuntState,
   selectTargetWordWithFallback: mockSelectTargetWordWithFallback,
+  selectCleanCommonTarget: mockSelectCleanCommonTarget,
+  getRecentMpTargets: mockGetRecentMpTargets,
+  recordMpTarget: mockRecordMpTarget,
 }));
 vi.mock('../../../backend/modules/wordValidatorPool', () => ({
   findAllWordsAsync: mockFindAllWordsAsync,
@@ -495,6 +507,36 @@ describe('registerStartGameHandler', () => {
 
       expect(mockSelectTargetWordWithFallback).toHaveBeenCalled();
       expect(mockInitWordHuntState).toHaveBeenCalled();
+    });
+
+    it('target-first: embeds a clean curated word and skips the any-dict fallback', async () => {
+      // 'brave' is in mockFindAllWordsAsync's result, so the embedded target lands.
+      mockSelectCleanCommonTarget.mockReturnValueOnce('brave');
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ gameMode: 'word-hunt' }));
+
+      // Clean target used directly — the fail-open dictionary fallback is NOT consulted.
+      expect(mockSelectTargetWordWithFallback).not.toHaveBeenCalled();
+      expect(mockInitWordHuntState).toHaveBeenCalledWith('brave', expect.anything());
+      // Board was rebuilt to embed the target.
+      expect(mockUpdateGame).toHaveBeenCalledWith('GAME1', expect.objectContaining({ letterGrid: expect.anything() }));
+    });
+
+    it('he: normalizes a final-letter target so it matches the normalized board (no fallback)', async () => {
+      // 'שלום' ends in final mem (ם). The solver/board use the base form (מ).
+      // Without normalizing the target, the membership re-check would miss and
+      // fall through to the weird-word fallback — the Hebrew-specific bug.
+      mockSelectCleanCommonTarget.mockReturnValueOnce('שלום');
+      mockFindAllWordsAsync.mockResolvedValueOnce(['שלומ', 'שלו']); // normalized form, as the solver emits
+      const { socket, handlers } = createMockSocket('socket-host');
+      registerStartGameHandler(mockIo, socket);
+
+      await triggerStartGame(handlers, makePayload({ gameMode: 'word-hunt', language: 'he' }));
+
+      expect(mockSelectTargetWordWithFallback).not.toHaveBeenCalled();
+      expect(mockInitWordHuntState).toHaveBeenCalledWith('שלומ', expect.anything());
     });
 
     it('does NOT initialize word hunt state for classic mode', async () => {

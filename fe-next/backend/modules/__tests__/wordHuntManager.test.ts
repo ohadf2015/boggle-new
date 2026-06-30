@@ -18,6 +18,8 @@ import {
   areAllPlayersEliminated,
   computeDiscoveryClues,
   getCommonWords,
+  selectCleanCommonTarget,
+  huntTargetBand,
 } from '../wordHuntManager';
 
 import type { WordHuntModeState } from '@/shared/types/game';
@@ -575,6 +577,52 @@ describe('wordHuntManager', () => {
       const result = computeDiscoveryClues('PIANO', 'PLANT');
       // pos 0: p=p → green. Also 'a' at pos 2 in 'plant' vs 'a' at pos 2 in 'piano' → green
       expect(result.greenPositions).toContainEqual({ position: 0, letter: 'p' });
+    });
+  });
+
+  // ==========================================
+  // huntTargetBand — lang-aware target length
+  // ==========================================
+  describe('huntTargetBand', () => {
+    it('defaults to the 5-7 band', () => {
+      expect(huntTargetBand('en')).toEqual([5, 7]);
+      expect(huntTargetBand('he')).toEqual([5, 7]);
+    });
+
+    it('uses a shorter band for Japanese (words are short in kana/kanji)', () => {
+      const [min, max] = huntTargetBand('ja');
+      expect(min).toBeLessThan(5);
+      expect(max).toBeLessThanOrEqual(5);
+    });
+  });
+
+  // ==========================================
+  // selectCleanCommonTarget — fail-closed target-first selection
+  // ==========================================
+  describe('selectCleanCommonTarget', () => {
+    it('returns a word drawn from the curated common list, within the band', () => {
+      for (const lang of ['en', 'he', 'sv', 'es', 'ja', 'ru']) {
+        const common = getCommonWords(lang);
+        if (common.size === 0) continue;
+        const [min, max] = huntTargetBand(lang);
+        const word = selectCleanCommonTarget(lang);
+        expect(word, `lang=${lang}`).not.toBeNull();
+        expect(common.has(word!.toLowerCase()), `${lang}: "${word}" must be a curated word`).toBe(true);
+        const n = [...word!].length;
+        expect(n, `${lang}: "${word}" len`).toBeGreaterThanOrEqual(min);
+        expect(n, `${lang}: "${word}" len`).toBeLessThanOrEqual(max);
+      }
+    });
+
+    it('never returns an excluded (recently-served) word', () => {
+      const common = getCommonWords('en');
+      const exclude = new Set([...common].map((w) => w.toLowerCase()));
+      // Excluding the entire list leaves nothing → null, never a non-common word.
+      expect(selectCleanCommonTarget('en', exclude)).toBeNull();
+    });
+
+    it('returns null for a language with no curated list', () => {
+      expect(selectCleanCommonTarget('zz-unknown')).toBeNull();
     });
   });
 });

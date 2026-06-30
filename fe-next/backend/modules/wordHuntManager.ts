@@ -10,6 +10,8 @@ import {
   HUNT_INITIAL_LIFE,
   HUNT_SUBSEQUENT_FINDER_BONUSES,
   HUNT_WRONG_GUESS_PENALTY,
+  HUNT_TARGET_MIN_LENGTH,
+  HUNT_TARGET_MAX_LENGTH,
   getHuntLifeBonus,
   getDrainRate,
 } from '@/shared/constants/wordHuntMultiplayerConstants';
@@ -122,6 +124,45 @@ export function getCommonWords(lang = 'en'): Set<string> {
   // Subsequent calls hit cache. This keeps backward compat for sync callers.
   commonWordsByLang[lang] = loadWordFileSync(FILE_MAP[lang] || `common_hunt_words_${lang}.txt`);
   return commonWordsByLang[lang];
+}
+
+/**
+ * Lang-aware target length band (in code points). Defaults to the shared
+ * 5-7 constant. Japanese words are short in kana/kanji — only a handful of
+ * curated ja words reach 5+ chars, so the 5-7 band starves and selection
+ * falls through to raw dictionary words. Give short-word scripts a band their
+ * curated list can actually fill.
+ */
+const TARGET_LEN_BY_LANG: Record<string, [number, number]> = {
+  ja: [3, 5],
+};
+
+export function huntTargetBand(lang: string): [number, number] {
+  return TARGET_LEN_BY_LANG[lang] ?? [HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH];
+}
+
+/**
+ * Fail-closed target-first selection: pick a word straight from the curated
+ * common list (already judged clean), within the lang-aware band, excluding
+ * recently-served words. The caller then EMBEDS this word into the board so
+ * it's guaranteed findable — instead of solving a random board and falling
+ * back to an unjudged dictionary word when no curated word happens to fit.
+ * Returns null only when the language has no usable curated word.
+ */
+export function selectCleanCommonTarget(lang = 'en', exclude?: Set<string>): string | null {
+  const common = getCommonWords(lang);
+  if (common.size === 0) return null;
+  const [minLen, maxLen] = huntTargetBand(lang);
+  const inBand = (w: string): boolean => {
+    const n = [...w].length;
+    return n >= minLen && n <= maxLen && !(exclude?.has(w.toLowerCase()));
+  };
+  const quality = [...common].filter((w) => inBand(w) && isWordHuntQuality(w, lang));
+  // The list is already curated, so fall back to length-only if the structural
+  // quality heuristic (tuned for the raw-dict path) leaves nothing.
+  const pool = quality.length > 0 ? quality : [...common].filter(inBand);
+  if (pool.length === 0) return null;
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 /**

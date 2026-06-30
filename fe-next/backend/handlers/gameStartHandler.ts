@@ -26,7 +26,7 @@ import {
   getSocketById,
 } from '../utils/socketHelpers.js';
 
-import { makePositionsMap } from '../modules/wordValidator.js';
+import { makePositionsMap, normalizeWordForLanguage } from '../modules/wordValidator.js';
 import { clearAutoStartState } from '../modules/lobbyAutoStart.js';
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
@@ -52,7 +52,7 @@ import { BLAST_MP_DEFAULT_TIMER, DEFAULT_TIMER, DIFFICULTIES, DEFAULT_DIFFICULTY
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
-import { initWordHuntState, selectTargetWordWithFallback, recordMpTarget, getRecentMpTargets } from '../modules/wordHuntManager.js';
+import { initWordHuntState, selectTargetWordWithFallback, selectCleanCommonTarget, recordMpTarget, getRecentMpTargets } from '../modules/wordHuntManager.js';
 import { initWheelRushState, generateWheelPuzzle } from '../modules/wheelRushManager.js';
 import { initVersusMatch } from '@/lib/wordTower/versusMatch';
 import { initShiritoriState } from '../modules/shiritoriManager.js';
@@ -653,12 +653,44 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     // Also reuse the solve result for totalBoardWords to avoid double graph traversal
     let wordHuntSolveReused = false;
     if (resolvedMode === 'word-hunt') {
+      const recentTargets = getRecentMpTargets(gameLang);
+      // TARGET-FIRST (fail-closed): pick a clean curated word, then rebuild the
+      // board to embed it (guaranteed findable). This is the fix for "weird" MP
+      // targets — the old solve-then-fallback path served raw, unjudged
+      // dictionary words whenever no curated word happened to fit the random
+      // board (near-always for Japanese, whose curated words are too short for
+      // the 5-7 band). Classroom games keep their vocab-driven board untouched.
+      // Normalize to the board/solver form (Hebrew finals → base letters, etc.)
+      // so it matches both the embedded grid and the tile-derived player guesses
+      // — validateTargetGuess only lowercases, so a natural-form he target with a
+      // final letter would never match the normalized board word.
+      const cleanTargetRaw = vocabToEmbed.length > 0
+        ? null
+        : selectCleanCommonTarget(gameLang, recentTargets);
+      const cleanTarget = cleanTargetRaw ? normalizeWordForLanguage(cleanTargetRaw, gameLang) : null;
+      if (cleanTarget) {
+        letterGrid = generateRichBoard(
+          () => generateRandomTable(gridRows, gridCols, gameLang, [cleanTarget]),
+          gameLang,
+          gridRows,
+          gridCols,
+        ) as LetterGrid;
+        const newPositions = makePositionsMap(letterGrid);
+        updateGame(gameCode, { letterGrid });
+        const rg = getGame(gameCode);
+        if (rg) rg.letterPositions = newPositions;
+      }
+
       const trie = getCachedTrie(gameLang);
       const allValidWords = await findAllWordsAsync(letterGrid, gameLang, { minLength: 3, maxLength: 8, maxWords: 10000, trie });
-      // Exclude recently-served targets so the same word isn't the answer two games running.
-      const targetWord = selectTargetWordWithFallback(
-        allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH, gameLang, getRecentMpTargets(gameLang),
-      );
+      // Prefer the embedded clean target; fall back to the solve-based selector
+      // only for classroom games or if the embed somehow didn't land on board.
+      // Exclude recently-served targets so the same word isn't the answer twice running.
+      const targetWord = (cleanTarget && allValidWords.some((w) => w.toLowerCase() === cleanTarget.toLowerCase()))
+        ? cleanTarget
+        : selectTargetWordWithFallback(
+            allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH, gameLang, recentTargets,
+          );
       if (targetWord) {
         recordMpTarget(gameLang, targetWord);
         const huntState = initWordHuntState(targetWord, playerUsernames);
