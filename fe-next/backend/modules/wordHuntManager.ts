@@ -135,9 +135,10 @@ export function selectTargetWord(
   maxLen: number,
   commonOnly = false,
   lang = 'en',
+  exclude?: Set<string>,
 ): string | null {
   const candidates = validWords.filter(
-    (w) => w.length >= minLen && w.length <= maxLen,
+    (w) => w.length >= minLen && w.length <= maxLen && !(exclude?.has(w.toLowerCase())),
   );
   if (candidates.length === 0) return null;
 
@@ -176,24 +177,51 @@ export function selectTargetWordWithFallback(
   preferredMinLen: number,
   maxLen: number,
   lang = 'en',
+  exclude?: Set<string>,
 ): string | null {
   // Try common words in preferred range first
-  const commonResult = selectTargetWord(validWords, preferredMinLen, maxLen, true, lang);
+  const commonResult = selectTargetWord(validWords, preferredMinLen, maxLen, true, lang, exclude);
   if (commonResult) return commonResult;
 
   // Fall back to any word in preferred range
-  const result = selectTargetWord(validWords, preferredMinLen, maxLen);
+  const result = selectTargetWord(validWords, preferredMinLen, maxLen, false, lang, exclude);
   if (result) return result;
 
   // Progressive fallback, minimum 4 letters
   for (let min = preferredMinLen - 1; min >= 4; min--) {
-    const commonFallback = selectTargetWord(validWords, min, min, true, lang);
+    const commonFallback = selectTargetWord(validWords, min, min, true, lang, exclude);
     if (commonFallback) return commonFallback;
-    const fallback = selectTargetWord(validWords, min, min);
+    const fallback = selectTargetWord(validWords, min, min, false, lang, exclude);
     if (fallback) return fallback;
   }
 
   return null;
+}
+
+/**
+ * Recently-served MP target words per language (in-memory LRU). Keeps the same
+ * word from being the target two games running. Bounded so a long-lived server
+ * can't grow it without limit. Lost on restart — acceptable for a no-repeat hint.
+ */
+const MP_RECENT_CAP = 200;
+const recentMpTargets: Record<string, string[]> = {};
+
+export function recordMpTarget(lang: string, word: string): void {
+  const w = word.toLowerCase();
+  const list = (recentMpTargets[lang] ??= []);
+  const dup = list.indexOf(w);
+  if (dup !== -1) list.splice(dup, 1); // move-to-front on repeat
+  list.push(w);
+  if (list.length > MP_RECENT_CAP) list.splice(0, list.length - MP_RECENT_CAP);
+}
+
+export function getRecentMpTargets(lang: string): Set<string> {
+  return new Set(recentMpTargets[lang] ?? []);
+}
+
+/** Test-only: clear the recent-targets LRU between cases. */
+export function __resetMpTargetsForTest(): void {
+  for (const k of Object.keys(recentMpTargets)) delete recentMpTargets[k];
 }
 
 /**

@@ -17,7 +17,7 @@ import { gameAIService } from '@/lib/ai-service';
 import { getWordsFromWordBank } from '@/lib/dailyChallenge/wordBankService';
 import { validateUpcomingWords, type ValidateDeps, type ValidateSummary } from '@/lib/dailyChallenge/validateUpcomingWords';
 import { processSuggestions, type SuggestionDeps, type SuggestionSummary } from '@/lib/dailyChallenge/processSuggestions';
-import { sendTelegramMessage, isTelegramConfigured } from '@/lib/telegram';
+import { sendTelegramMessage, isTelegramConfigured, escapeTelegramMarkdownV2 } from '@/lib/telegram';
 import logger from '@/backend/utils/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Language } from '@/types';
@@ -216,11 +216,15 @@ export async function runUpcomingWordValidation(options: RunOptions = {}): Promi
   const allFailures = [...summary.failures, ...suggestions.failures];
   if (allFailures.length > 0 && isTelegramConfigured()) {
     const lines = allFailures.slice(0, 20).join('\n');
-    await sendTelegramMessage(
+    // Escape the whole plain-text body — failure strings contain quotes/parens/
+    // dashes/slashes that 400 a raw MarkdownV2 send, silently swallowing the alert.
+    const msg =
       `⚠️ Daily-word validator: ${allFailures.length} issue(s) ` +
-        `(checked ${summary.checked}, replaced ${summary.replaced}, meanings ${summary.meaningsFilled}, ` +
-        `suggestions +${suggestions.approved}/-${suggestions.rejected}).\n${lines}`
-    ).catch((e) => logger.error('DAILY_WORD_VALIDATOR', 'Telegram alert failed', e));
+      `(checked ${summary.checked}, replaced ${summary.replaced}, meanings ${summary.meaningsFilled}, ` +
+      `suggestions +${suggestions.approved}/-${suggestions.rejected}).\n${lines}`;
+    await sendTelegramMessage(escapeTelegramMarkdownV2(msg)).catch((e) =>
+      logger.error('DAILY_WORD_VALIDATOR', 'Telegram alert failed', e),
+    );
   }
 
   return { ...summary, suggestions };

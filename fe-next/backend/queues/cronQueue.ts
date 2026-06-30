@@ -139,6 +139,25 @@ export async function registerAllCronJobs(): Promise<void> {
     logger.info('BULLMQ', 'Daily-word validation complete', summary ?? { skipped: 'no-client' });
   });
 
+  // Proactively judge the WHOLE active word-bank pool (not just served words), so
+  // selection can serve only judge-approved words. Caps LLM spend per run; the
+  // unjudged backlog drains over a few nights. Runs after the validator (01:30).
+  await registerCronJob('sweep-daily-word-bank', '0 2 * * *', async () => {
+    const { runWordBankSweep } = await import('../modules/wordBankSweep');
+    // 800/lang/night drains the ~10k raw backlog in ~2-3 nights, then just keeps
+    // up with new inserts. Concurrency 6 (the Vertex client serializes heavily).
+    const summary = await runWordBankSweep({ maxPerLanguage: 800, concurrency: 6 });
+    logger.info('BULLMQ', 'Word-bank sweep complete', summary ?? { skipped: 'no-client' });
+  });
+
+  // Weekly: extend the pre-assigned daily-word horizon to ~1 year ahead, drawing
+  // distinct judge-approved words from the bank (no repeats within the year).
+  await registerCronJob('year-ahead-daily-words', '0 5 * * 0', async () => {
+    const { runYearAheadAssignment } = await import('../modules/yearAheadAssigner');
+    const summary = await runYearAheadAssignment();
+    logger.info('BULLMQ', 'Year-ahead assignment complete', summary ?? { skipped: 'no-client' });
+  });
+
   await registerCronJob('bot-difficulty', '0 3 * * 0', async () => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

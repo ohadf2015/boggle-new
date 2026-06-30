@@ -52,7 +52,7 @@ import { BLAST_MP_DEFAULT_TIMER, DEFAULT_TIMER, DIFFICULTIES, DEFAULT_DIFFICULTY
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 import { getClassroomGame } from '../modules/classroomGameManager.js';
 import { initBlastModeState, hashStringToSeed } from '../modules/blastModeManager.js';
-import { initWordHuntState, selectTargetWordWithFallback } from '../modules/wordHuntManager.js';
+import { initWordHuntState, selectTargetWordWithFallback, recordMpTarget, getRecentMpTargets } from '../modules/wordHuntManager.js';
 import { initWheelRushState, generateWheelPuzzle } from '../modules/wheelRushManager.js';
 import { initVersusMatch } from '@/lib/wordTower/versusMatch';
 import { initShiritoriState } from '../modules/shiritoriManager.js';
@@ -655,8 +655,12 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
     if (resolvedMode === 'word-hunt') {
       const trie = getCachedTrie(gameLang);
       const allValidWords = await findAllWordsAsync(letterGrid, gameLang, { minLength: 3, maxLength: 8, maxWords: 10000, trie });
-      const targetWord = selectTargetWordWithFallback(allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH, gameLang);
+      // Exclude recently-served targets so the same word isn't the answer two games running.
+      const targetWord = selectTargetWordWithFallback(
+        allValidWords, HUNT_TARGET_MIN_LENGTH, HUNT_TARGET_MAX_LENGTH, gameLang, getRecentMpTargets(gameLang),
+      );
       if (targetWord) {
+        recordMpTarget(gameLang, targetWord);
         const huntState = initWordHuntState(targetWord, playerUsernames);
         const currentGame = getGame(gameCode);
         if (currentGame) {

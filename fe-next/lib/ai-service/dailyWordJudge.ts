@@ -26,12 +26,15 @@ export interface DailyWordVerdict {
   ok: boolean;
   reason: string;
   meaning: string;
+  /** 1 (dull/abstract) .. 5 (concrete, vivid, fun to reveal). Only meaningful when ok=true. */
+  interestingness?: number;
 }
 
 const VerdictSchema = z.object({
   ok: z.boolean(),
   reason: z.string().optional().default(''),
   meaning: z.string().optional().default(''),
+  interestingness: z.coerce.number().min(1).max(5).optional(),
 });
 
 export function buildDailyWordJudgePrompt(word: string, language: string): string {
@@ -54,10 +57,13 @@ REJECT (set ok=false) if the word is ANY of these:
 - An inflected/conjugated fragment, plural-of, possessive, or otherwise not a clean base word.
 - Misspelled or broken orthography (stray diacritics, wrong final letters, partial word).
 
-If ok=true, also return "meaning": a very short (max 8 words) simple definition in ${languageName}, suitable for all ages. If ok=false, "meaning" may be "".
+If ok=true, also return:
+- "meaning": a very short (max 8 words) simple definition in ${languageName}, suitable for all ages.
+- "interestingness": an integer 1-5 for how fun/satisfying the word is to reveal in a puzzle — 5 = concrete, vivid, picturable (e.g. dragon, rocket, jungle); 1 = dull/abstract/functional (e.g. amount, period, manner). Prefer high-interest words.
+If ok=false, "meaning" may be "" and "interestingness" may be 1.
 
 Output ONLY raw JSON, no prose:
-{"ok": true|false, "reason": "brief why", "meaning": "short ${languageName} definition or empty"}`;
+{"ok": true|false, "reason": "brief why", "meaning": "short ${languageName} definition or empty", "interestingness": 1-5}`;
 }
 
 export function parseDailyWordJudgeResponse(text: string): DailyWordVerdict {
@@ -67,7 +73,7 @@ export function parseDailyWordJudgeResponse(text: string): DailyWordVerdict {
     throw new Error('Daily word judge: no JSON in response');
   }
   const parsed = VerdictSchema.parse(JSON.parse(match[0]));
-  return { ok: parsed.ok, reason: parsed.reason, meaning: parsed.meaning };
+  return { ok: parsed.ok, reason: parsed.reason, meaning: parsed.meaning, interestingness: parsed.interestingness };
 }
 
 /**
