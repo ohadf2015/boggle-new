@@ -200,15 +200,18 @@ export const WORD_TOWER_LETTER_BAGS: Record<Language, string> = {
     'ささ' +
     'きき' +
     'くく',
+  // Pure Cyrillic frequency-weighted bag. (A prior pass mixed in Latin
+  // lookalikes E/A/N/T/L which never match the Cyrillic dictionary — every
+  // letter here is verified Cyrillic, no Ё/Ъ.)
   ru:
     'ОООООООООО' +
-    'EEEEEEEEEE' +
-    'AAAAAAAA' +
+    'ЕЕЕЕЕЕЕЕЕЕ' +
+    'АААААААА' +
     'ИИИИИИИ' +
-    'NNNNNN' +
+    'НННННН' +
     'РРРРРР' +
-    'TTTTTT' +
-    'LLLL' +
+    'ТТТТТТ' +
+    'ЛЛЛЛ' +
     'КККК' +
     'ММММ' +
     'ДДДД' +

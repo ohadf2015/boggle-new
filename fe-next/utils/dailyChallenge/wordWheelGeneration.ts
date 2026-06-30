@@ -73,8 +73,10 @@ const NINE_LETTER_SOURCES: Record<Language, string[]> = {
   fr: [],
   de: [],
   ru: [
-    'СТРОИТЕЛИ', 'ПЕРЕВОДИТ', 'ТЕХНОЛОГИЯ', 'ОБРАЗЦОВЫЙ', 'ФУНДАМЕНТ',
-    'ГОСУДАРСТВА', 'ОПИСЫВАЕТ', 'СПРАВОЧНИК', 'РАЗНОВИДНОСТИ', 'ИСКУССТВО',
+    // All exactly 9 letters and present in russian_words.txt (the wheel uses
+    // the source word's 9 letters; non-9-letter words break wheel generation).
+    'СТРОИТЕЛИ', 'ПЕРЕВОДИТ', 'ФУНДАМЕНТ', 'ОПИСЫВАЕТ', 'ИСКУССТВО',
+    'КОМПЬЮТЕР', 'ВОЛШЕБНИК', 'КАРТОФЕЛЬ', 'МУЗЫКАНТЫ', 'ПРИРОДНЫЙ',
   ],
 };
 
