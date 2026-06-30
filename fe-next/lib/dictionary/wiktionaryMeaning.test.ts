@@ -164,6 +164,14 @@ describe('fetchWiktionaryMeaning', () => {
     expect((globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0]).toContain('en.wiktionary.org');
   });
 
+  it('lowercases the title (served words are stored UPPERCASE; Wiktionary pages are lowercase)', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue({
+      ok: true, json: async () => ({ query: { pages: { '1': { extract: EN_CAT } } } }),
+    }));
+    await fetchWiktionaryMeaning('CAT', 'en');
+    expect((globalThis.fetch as ReturnType<typeof vi.fn>).mock.calls[0][0]).toContain('titles=cat');
+  });
+
   it('fails soft to null on network error / non-ok response', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('ECONNRESET')));
     expect(await fetchWiktionaryMeaning('дом', 'ru')).toBeNull();

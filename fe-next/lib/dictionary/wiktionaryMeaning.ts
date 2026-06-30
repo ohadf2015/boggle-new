@@ -191,15 +191,18 @@ function extractOf(data: unknown): string | undefined {
 export async function fetchWiktionaryMeaning(word: string, language: string): Promise<string | null> {
   const w = (word ?? '').trim();
   if (!w) return null;
+  // Wiktionary disables first-letter capitalization, so common-noun pages are
+  // lowercase; served words are stored uppercase. Lowercasing is a no-op for he/ja.
+  const title = w.toLowerCase();
 
   const api = (lang: string, params: string) =>
-    `https://${lang}.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&redirects=1&format=json${params}&titles=${encodeURIComponent(w)}`;
+    `https://${lang}.wiktionary.org/w/api.php?action=query&prop=extracts&explaintext=1&redirects=1&format=json${params}&titles=${encodeURIComponent(title)}`;
 
   if (language === 'he') {
     return parseHebrewExtract(extractOf(await getJson(api('he', '&exsentences=1'))));
   }
   if (LANG_SECTION[language]) {
-    return parseEditionExtract(extractOf(await getJson(api(language, ''))), language, w);
+    return parseEditionExtract(extractOf(await getJson(api(language, ''))), language, title);
   }
   return null; // unsupported language → LLM fallback
 }
