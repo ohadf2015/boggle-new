@@ -30,6 +30,7 @@ import {
   pixelBasedPreset,
 } from '@react-email/components';
 import { getWelcomeEmailModes, type WelcomeEmailMode } from '@/lib/email/welcomeModes';
+import { playStoreUrlWithReferrer } from '@/utils/androidApp';
 import { ModeGrid } from './components/ModeGrid';
 
 /* ───────────────────────── Types ───────────────────────── */
@@ -41,6 +42,13 @@ export interface WelcomeEmailProps {
   playUrl: string; // where the CTA goes
   videoUrl: string; // hosted tour clip (YouTube / mux / etc.)
   baseUrl?: string; // asset origin; defaults to production
+  /**
+   * Google Play listing for the native Android app. Defaults to the shared
+   * Play Store URL carrying a `welcome_email` install referrer (so installs
+   * sourced from this email are attributable in Play Console). Pass a value
+   * to override (e.g. a different campaign tag).
+   */
+  androidUrl?: string;
   /**
    * Localized, link-ready public modes — computed server-side from the shared
    * MODE_META registry (see lib/email/welcomeModes). Keeps the email in sync
@@ -58,6 +66,8 @@ interface WelcomeCopy {
   modesHeader: string;
   cta: string;
   ps: string;
+  androidLabel: string; // "Prefer an app? Play on Android."
+  androidCta: string; // "Get it on Google Play"
   footerReason: string;
   unsubscribe: string;
   privacy: string;
@@ -74,6 +84,8 @@ const COPY: Record<string, WelcomeCopy> = {
     modesHeader: 'PICK YOUR FIGHT',
     cta: 'Play now',
     ps: "Fair warning: it's addictive.",
+    androidLabel: 'On the go? LexiClash lives on your phone too.',
+    androidCta: 'Get it on Google Play',
     footerReason: 'You just joined LexiClash.',
     unsubscribe: 'Unsubscribe',
     privacy: 'Privacy',
@@ -86,6 +98,8 @@ const COPY: Record<string, WelcomeCopy> = {
     modesHeader: 'בחרו את הקרב',
     cta: 'יאללה, משחקים',
     ps: 'אזהרה: זה ממכר.',
+    androidLabel: 'בדרכים? LexiClash גם בנייד שלך.',
+    androidCta: 'הורידו מ-Google Play',
     footerReason: 'הרגע הצטרפת ל-LexiClash.',
     unsubscribe: 'ביטול הרשמה',
     privacy: 'פרטיות',
@@ -98,6 +112,8 @@ const COPY: Record<string, WelcomeCopy> = {
     modesHeader: 'VÄLJ DIN MATCH',
     cta: 'Spela nu',
     ps: 'Varning: beroendeframkallande.',
+    androidLabel: 'På språng? LexiClash finns i fickan också.',
+    androidCta: 'Hämta på Google Play',
     footerReason: 'Du gick precis med i LexiClash.',
     unsubscribe: 'Avprenumerera',
     privacy: 'Integritet',
@@ -110,6 +126,8 @@ const COPY: Record<string, WelcomeCopy> = {
     modesHeader: '勝負を選べ',
     cta: '今すぐ遊ぶ',
     ps: '注意：ハマります。',
+    androidLabel: '外出中でも？ LexiClashはスマホでも遊べます。',
+    androidCta: 'Google Playで入手',
     footerReason: 'LexiClashに登録しました。',
     unsubscribe: '配信停止',
     privacy: 'プライバシー',
@@ -122,6 +140,8 @@ const COPY: Record<string, WelcomeCopy> = {
     modesHeader: 'ELIGE TU BATALLA',
     cta: 'Jugar ya',
     ps: 'Aviso: engancha.',
+    androidLabel: '¿En movimiento? LexiClash también vive en tu móvil.',
+    androidCta: 'Descárgalo en Google Play',
     footerReason: 'Acabas de unirte a LexiClash.',
     unsubscribe: 'Cancelar suscripción',
     privacy: 'Privacidad',
@@ -180,6 +200,7 @@ export default function WelcomeEmail({
   playUrl,
   videoUrl,
   baseUrl = DEFAULT_BASE,
+  androidUrl,
   modes,
 }: WelcomeEmailProps) {
   const t = COPY[language] || COPY.en;
@@ -189,6 +210,14 @@ export default function WelcomeEmail({
   const sh = rtl ? '-' : ''; // hard-shadow direction flips in RTL
   const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
   const privacyUrl = `${baseUrl}/${locale}/privacy`;
+  // Native Android app — defaults to the Play Store listing tagged with a
+  // `welcome_email` install referrer (+ per-locale utm_content) so installs
+  // from this email are attributable in Play Console.
+  const androidPlayUrl = androidUrl || playStoreUrlWithReferrer('welcome_email', locale);
+  // Neo "play" glyph for the Google Play button (shared with the release email).
+  const playIconUrl = baseUrl
+    ? `${baseUrl}/email-assets/android-release-play-icon.png`
+    : '/static/android-release-play-icon.png';
   // Animated GIF — the only thing that actually plays inside an inbox.
   // Outlook desktop shows frame 1 only (it's the hero mosaic, so it reads fine).
   const videoGifUrl = baseUrl
@@ -435,6 +464,71 @@ export default function WelcomeEmail({
                             }}>
                               {t.ps}
                             </Text>
+
+                            {/* ── Android app callout — "also on Android, grab it on Google Play".
+                                 A quiet secondary CTA (cream Play badge) so it never competes with
+                                 the lime "Play now" focal point above. ── */}
+                            <table role="presentation" cellPadding={0} cellSpacing={0} width="100%"
+                              style={{ marginTop: '24px' }}>
+                              <tr>
+                                <td style={{ borderTop: `1px solid ${C.grayDark}`, fontSize: 0, lineHeight: 0 }}>&nbsp;</td>
+                              </tr>
+                              <tr>
+                                <td align="center" style={{ paddingTop: '20px', direction: dir }}>
+                                  <Text style={{
+                                    color: C.white,
+                                    fontSize: '14px',
+                                    fontWeight: 600,
+                                    textAlign: 'center',
+                                    margin: '0 0 14px',
+                                    lineHeight: '1.5',
+                                    direction: dir,
+                                  }}>
+                                    {t.androidLabel}
+                                  </Text>
+                                  <table role="presentation" cellPadding={0} cellSpacing={0} style={{ margin: '0 auto' }}>
+                                    <tr>
+                                      <td style={{
+                                        backgroundColor: C.white,
+                                        borderRadius: '12px',
+                                        border: `3px solid ${C.black}`,
+                                        boxShadow: `${sh}5px 5px 0px ${C.black}`,
+                                      }}>
+                                        <Link
+                                          href={androidPlayUrl}
+                                          target="_blank"
+                                          style={{
+                                            display: 'inline-block',
+                                            padding: '12px 22px',
+                                            fontSize: '15px',
+                                            fontWeight: 700,
+                                            color: C.black,
+                                            textDecoration: 'none',
+                                            fontFamily: "'Fredoka', Arial, sans-serif",
+                                            whiteSpace: 'nowrap',
+                                          }}
+                                        >
+                                          <Img
+                                            src={playIconUrl}
+                                            alt="Google Play"
+                                            width="22"
+                                            height="22"
+                                            style={{
+                                              display: 'inline-block',
+                                              verticalAlign: 'middle',
+                                              border: 0,
+                                              outline: 'none',
+                                              ...(rtl ? { marginLeft: '9px' } : { marginRight: '9px' }),
+                                            }}
+                                          />
+                                          <span style={{ verticalAlign: 'middle' }}>{t.androidCta}</span>
+                                        </Link>
+                                      </td>
+                                    </tr>
+                                  </table>
+                                </td>
+                              </tr>
+                            </table>
                           </td>
                         </tr>
                       </table>
@@ -509,6 +603,7 @@ WelcomeEmail.PreviewProps = {
   playUrl: 'https://www.lexiclash.live/en',
   videoUrl: 'https://www.lexiclash.live/en?tour=1',
   baseUrl: '',
+  androidUrl: 'https://play.google.com/store/apps/details?id=live.lexiclash.app',
   modes: getWelcomeEmailModes('en', ''),
 } satisfies WelcomeEmailProps;
 

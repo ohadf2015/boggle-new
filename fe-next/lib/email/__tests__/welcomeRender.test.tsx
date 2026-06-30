@@ -92,3 +92,46 @@ describe('WelcomeEmail — dynamic cube-image mode grid', () => {
     expect(out).not.toContain('/modes/cubes/crossword.png');
   });
 });
+
+describe('WelcomeEmail — Android app download callout', () => {
+  it('links to the Google Play listing for the native Android app', async () => {
+    const out = await renderHtml('en').html;
+    expect(out).toContain(
+      'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+    );
+  });
+
+  it('tags the Play Store link with a welcome-email install referrer (attribution)', async () => {
+    const out = await renderHtml('en').html;
+    expect(out).toContain('utm_campaign%3Dwelcome_email');
+  });
+
+  it('shows the localized "Get it on Google Play" call to action', async () => {
+    const out = await renderHtml('en').html;
+    expect(out).toContain('Get it on Google Play');
+  });
+
+  it('renders the Android callout in Hebrew (RTL) with a he attribution tag', async () => {
+    const out = await renderHtml('he').html;
+    expect(out).toContain(
+      'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+    );
+    expect(out).toContain('utm_content%3Dhe');
+  });
+
+  it('lets a caller override the Android URL', async () => {
+    const out = await render(
+      WelcomeEmail({
+        recipientName: 'Maya',
+        language: 'en',
+        unsubscribeUrl: `${BASE}/api/email/unsubscribe?token=x`,
+        playUrl: `${BASE}/en`,
+        videoUrl: `${BASE}/en?tour=1`,
+        baseUrl: BASE,
+        androidUrl: 'https://play.google.com/store/apps/details?id=custom.override',
+        modes: getWelcomeEmailModes('en', BASE),
+      }),
+    );
+    expect(out).toContain('custom.override');
+  });
+});
