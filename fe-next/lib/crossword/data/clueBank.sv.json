@@ -2438,5 +2438,1333 @@
   "haft": {
     "clue": "Varit i sin ägo",
     "score": 90
+  },
+  "alg": {
+    "clue": "Eukaryota organismer som utvinner energi ur ljus genom",
+    "score": 50
+  },
+  "allians": {
+    "clue": "Förbund, koalition, union",
+    "score": 50
+  },
+  "anka": {
+    "clue": "Domesticerad and",
+    "score": 50
+  },
+  "annan": {
+    "clue": "Inte den tidigare nämnda",
+    "score": 50
+  },
+  "backe": {
+    "clue": "Markområde som lutar",
+    "score": 50
+  },
+  "bagare": {
+    "clue": "Person som yrkesmässigt bakar matbröd och liknande",
+    "score": 50
+  },
+  "bal": {
+    "clue": "Högtidlig fest med dans",
+    "score": 50
+  },
+  "bank": {
+    "clue": "Inrättning som ägnar sig åt att låna in och låna ut pengar",
+    "score": 50
+  },
+  "banner": {
+    "clue": "Webbannons, annonsruta",
+    "score": 50
+  },
+  "bidrag": {
+    "clue": "Någon form av stöd",
+    "score": 50
+  },
+  "bin": {
+    "clue": "Böjningsform av bi",
+    "score": 50
+  },
+  "binda": {
+    "clue": "Knyta ihop något",
+    "score": 50
+  },
+  "blad": {
+    "clue": "Del av växt som sticker ut från stammen eller stjälken",
+    "score": 50
+  },
+  "blick": {
+    "clue": "Målmedvetet åtstadkommen vridning av ögonen för att se något",
+    "score": 50
+  },
+  "blixt": {
+    "clue": "Atmosfärisk elektrisk urladdning vid åska",
+    "score": 50
+  },
+  "blomma": {
+    "clue": "Del av fröväxt, avsedd för fortplantning , ofta färgglad",
+    "score": 50
+  },
+  "blåbär": {
+    "clue": "Lågväxande och rikt förgrenad växtart i familjen ljungväxter",
+    "score": 50
+  },
+  "boa": {
+    "clue": "Långt klädesplagg som man har runt halsen",
+    "score": 50
+  },
+  "boll": {
+    "clue": "Runt, ofta mjukt föremål och ofta med förmåga att studsa",
+    "score": 50
+  },
+  "bomb": {
+    "clue": "Sprängladdning",
+    "score": 50
+  },
+  "bord": {
+    "clue": "Bo:lbuːɽ ,bå:rdboːɖ",
+    "score": 50
+  },
+  "borg": {
+    "clue": "Om forntida kringgående befästning",
+    "score": 50
+  },
+  "brand": {
+    "clue": "Utbrott av eld som förhärjar ett fordon",
+    "score": 50
+  },
+  "brons": {
+    "clue": "En legering av främst koppar och tenn",
+    "score": 50
+  },
+  "brygga": {
+    "clue": "Artificiell gångväg som sträcker sig ut i vatten och ofta",
+    "score": 50
+  },
+  "bröd": {
+    "clue": "Baslivsmedel oftast bakat av mjöl på en någon form av säd",
+    "score": 50
+  },
+  "bubbla": {
+    "clue": "Sfärisk inneslutning av gas i en vätska",
+    "score": 50
+  },
+  "bukt": {
+    "clue": "Bred och mjukt rundad havsvik",
+    "score": 50
+  },
+  "bur": {
+    "clue": "Ofta gallerförsett utrymme i vilket djur hålls",
+    "score": 50
+  },
+  "buske": {
+    "clue": "Flerårig växt med förvedade stammar som grenar ut sig från",
+    "score": 50
+  },
+  "buss": {
+    "clue": "Större vägfordon som transporterar främst personer",
+    "score": 50
+  },
+  "bäck": {
+    "clue": "Litet, naturligt vattendrag",
+    "score": 50
+  },
+  "bälte": {
+    "clue": "Rem som bärs kring midjan eller runt höfterna och har bara",
+    "score": 50
+  },
+  "bäver": {
+    "clue": "Samlingsnamn för stora gnagare på norra halvklotet med bred",
+    "score": 50
+  },
+  "båge": {
+    "clue": "Del av cirkel",
+    "score": 50
+  },
+  "centrum": {
+    "clue": "Mittpunkt, oftast av en tätort",
+    "score": 50
+  },
+  "cirkus": {
+    "clue": "Nöjes- och konstform med tonvikt på förevisning av akrobater",
+    "score": 50
+  },
+  "clown": {
+    "clue": "Pajas, lustig figur",
+    "score": 50
+  },
+  "dal": {
+    "clue": "Lägre område mellan två berg, åsar eller kullar",
+    "score": 50
+  },
+  "datum": {
+    "clue": "Tidsangivelse för dag",
+    "score": 50
+  },
+  "deckare": {
+    "clue": "Detektivroman, kriminalroman",
+    "score": 50
+  },
+  "docka": {
+    "clue": "Som efterliknar en människa",
+    "score": 50
+  },
+  "druva": {
+    "clue": "Frukt hos flertalet arter i familjen vinväxter",
+    "score": 50
+  },
+  "duva": {
+    "clue": "Fågel tillhörande familjen Columbidae",
+    "score": 50
+  },
+  "dvärg": {
+    "clue": "Onormalt liten människa",
+    "score": 50
+  },
+  "dåre": {
+    "clue": "Person som handlar oförnuftigt",
+    "score": 50
+  },
+  "dörr": {
+    "clue": "Öppningsbart hinder i väggen",
+    "score": 50
+  },
+  "enbart": {
+    "clue": "Endast eller bara fast utan eventuell negativ bemärkelse som",
+    "score": 50
+  },
+  "fack": {
+    "clue": "Liten låda avsedd för att sortera in saker i",
+    "score": 50
+  },
+  "farkost": {
+    "clue": "Teknisk anordning för transport",
+    "score": 50
+  },
+  "fasan": {
+    "clue": "En art inom fågelfamiljen fälthöns",
+    "score": 50
+  },
+  "fisk": {
+    "clue": "Växelvarmt vattenlevande ryggradsdjur samlingsnamn för",
+    "score": 50
+  },
+  "fjäder": {
+    "clue": "Utväxt bestående av keratin från en fågels hud",
+    "score": 50
+  },
+  "fjäll": {
+    "clue": "Berg som når över trädgränsen",
+    "score": 50
+  },
+  "fjäril": {
+    "clue": "Flygande insekt av ordningen Lepidoptera",
+    "score": 50
+  },
+  "flagga": {
+    "clue": "Tygstycke som symboliserar något",
+    "score": 50
+  },
+  "flaska": {
+    "clue": "En cylindrisk behållare",
+    "score": 50
+  },
+  "flock": {
+    "clue": "Grupp, klunga",
+    "score": 50
+  },
+  "flod": {
+    "clue": "Större vattendrag",
+    "score": 50
+  },
+  "fluga": {
+    "clue": "Tvåvingad insekt av underordningen Brachycera av",
+    "score": 50
+  },
+  "fläsk": {
+    "clue": "Kött från gris",
+    "score": 50
+  },
+  "foder": {
+    "clue": "Mat för djur i en djuruppfödning",
+    "score": 50
+  },
+  "frukost": {
+    "clue": "Måltid som intas på morgonen",
+    "score": 50
+  },
+  "frö": {
+    "clue": "Utsäde, grobart korn",
+    "score": 50
+  },
+  "fysik": {
+    "clue": "Gren inom vetenskapen som handlar om kraft, rörelse, optik",
+    "score": 50
+  },
+  "fält": {
+    "clue": "Åker, öppen mark, överfört som område",
+    "score": 50
+  },
+  "färg": {
+    "clue": "Synintryck av olika våglängder av ljus",
+    "score": 50
+  },
+  "färja": {
+    "clue": "Farkost för transport över vatten",
+    "score": 50
+  },
+  "fönster": {
+    "clue": "Öppning i en vägg, ofta innehållande en glasskiva",
+    "score": 50
+  },
+  "först": {
+    "clue": "I absoluta början av något",
+    "score": 50
+  },
+  "gaffel": {
+    "clue": "Vanligt ätverktyg i form av ca 3-4 parallella",
+    "score": 50
+  },
+  "galt": {
+    "clue": "Gris av hankön",
+    "score": 50
+  },
+  "gapa": {
+    "clue": "Öppna munnen",
+    "score": 50
+  },
+  "glob": {
+    "clue": "Klot, föremål format som en sfär",
+    "score": 50
+  },
+  "glöd": {
+    "clue": "Heta rester av träkol från en eld",
+    "score": 50
+  },
+  "glögg": {
+    "clue": "Varm dryck på vin och kryddor",
+    "score": 50
+  },
+  "gnista": {
+    "clue": "Liten, kortvarigt lysande eller glödande partikel",
+    "score": 50
+  },
+  "gnutta": {
+    "clue": "Liten mängd",
+    "score": 50
+  },
+  "gosig": {
+    "clue": "Mjuk och behaglig",
+    "score": 50
+  },
+  "grind": {
+    "clue": "Bit av staket som kan öppnas som en dörr",
+    "score": 50
+  },
+  "grotta": {
+    "clue": "Ihålighet i berg /av naturligt ursprung/",
+    "score": 50
+  },
+  "grus": {
+    "clue": "Mängd små stenar, använda för vägar",
+    "score": 50
+  },
+  "gryta": {
+    "clue": "Kokkärl avsett för kokning av större mängder mat",
+    "score": 50
+  },
+  "grädde": {
+    "clue": "Vattenemulsion av fett som avskilts från mjölk",
+    "score": 50
+  },
+  "gränd": {
+    "clue": "Trång och smal gata",
+    "score": 50
+  },
+  "gummi": {
+    "clue": "Organiskt ämne med elastiska egenskaper",
+    "score": 50
+  },
+  "gård": {
+    "clue": "Området runt ett hus",
+    "score": 50
+  },
+  "gås": {
+    "clue": "Fågel från släktena Anser eller Branta i familjen andfåglar",
+    "score": 50
+  },
+  "halm": {
+    "clue": "Del av en sädesväxt som axet sitter på",
+    "score": 50
+  },
+  "halvö": {
+    "clue": "Landområde som till stor del, men inte helt",
+    "score": 50
+  },
+  "hamn": {
+    "clue": "Plats där båtar eller fartyg kan lägga till och lastas eller",
+    "score": 50
+  },
+  "hatt": {
+    "clue": "Huvudbonad med kulle och brätte, vanligtvis tämligen styv",
+    "score": 50
+  },
+  "hav": {
+    "clue": "Sammanhängande vattenområde som avskiljer kontinenter",
+    "score": 50
+  },
+  "havre": {
+    "clue": "Sädesslag med axet i form av en vippa",
+    "score": 50
+  },
+  "hemlig": {
+    "clue": "Som enligt överenskommelse",
+    "score": 50
+  },
+  "hetta": {
+    "clue": "Stark uppvärmning, hög temperatur",
+    "score": 50
+  },
+  "hink": {
+    "clue": "Ihålig handtagsförsedd behållare",
+    "score": 50
+  },
+  "hjort": {
+    "clue": "Typ av högbent hovdjur med greniga horn",
+    "score": 50
+  },
+  "hjul": {
+    "clue": "Rund skiva, ofta med syfte att rotera",
+    "score": 50
+  },
+  "horn": {
+    "clue": "Utväxt av keratin på vissa djurs huvuden",
+    "score": 50
+  },
+  "humla": {
+    "clue": "Insekt ur släktet Bombus i ordningen steklar med tjock och",
+    "score": 50
+  },
+  "hylla": {
+    "clue": "Plan horisontell yta eller ställning med sådana ytor som",
+    "score": 50
+  },
+  "häxa": {
+    "clue": "Trolldomskunnig kvinna",
+    "score": 50
+  },
+  "igel": {
+    "clue": "Ett vattenlevande parasitiskt djur",
+    "score": 50
+  },
+  "isbjörn": {
+    "clue": "En art inom däggdjursfamiljen björnar",
+    "score": 50
+  },
+  "juice": {
+    "clue": "Dryck pressad ur frukt eller grönsaker",
+    "score": 50
+  },
+  "jägare": {
+    "clue": "Person som bedriver djurfångst med fällor",
+    "score": 50
+  },
+  "kajak": {
+    "clue": "Täckt kanot med en eller flera sittbrunnar",
+    "score": 50
+  },
+  "kaka": {
+    "clue": "Matbröd som är runt till formen",
+    "score": 50
+  },
+  "kalkon": {
+    "clue": "En art inom fågelfamiljen fälthöns",
+    "score": 50
+  },
+  "kalv": {
+    "clue": "Ung avkomma till vissa djur",
+    "score": 50
+  },
+  "kamin": {
+    "clue": "Anordning avsedd för uppvärmning av ett utrymme",
+    "score": 50
+  },
+  "kanal": {
+    "clue": "Anlagd farled",
+    "score": 50
+  },
+  "kanin": {
+    "clue": "En art inom däggdjursfamiljen harar",
+    "score": 50
+  },
+  "kanna": {
+    "clue": "Ett kärl, en tillbringare för vätska",
+    "score": 50
+  },
+  "kanon": {
+    "clue": "Mycket bra, jättebra",
+    "score": 50
+  },
+  "kedja": {
+    "clue": "Långt, smalt",
+    "score": 50
+  },
+  "keps": {
+    "clue": "Typ av huvudbonad med skärm",
+    "score": 50
+  },
+  "kikare": {
+    "clue": "Hjälpmedel som används för att förstora saker på långt avstånd",
+    "score": 50
+  },
+  "kil": {
+    "clue": "Verktyg bestående av järn eller trä eller dylikt med två",
+    "score": 50
+  },
+  "kista": {
+    "clue": "Större, kraftigare förvaringslåda med lock",
+    "score": 50
+  },
+  "klang": {
+    "clue": "Ljud med estetisk eller tilltalande karaktär",
+    "score": 50
+  },
+  "klapp": {
+    "clue": "Lätt beröring med handen",
+    "score": 50
+  },
+  "klass": {
+    "clue": "Kategori, gruppering",
+    "score": 50
+  },
+  "klint": {
+    "clue": "Liten och vanligtvis kal bergstopp",
+    "score": 50
+  },
+  "klippa": {
+    "clue": "Stort stycke av sten eller bergart",
+    "score": 50
+  },
+  "kloss": {
+    "clue": "Byggblock /i byggsats, t.ex",
+    "score": 50
+  },
+  "knapp": {
+    "clue": "Litet, runt och platt föremål",
+    "score": 50
+  },
+  "knäck": {
+    "clue": "Karamell gjord på socker",
+    "score": 50
+  },
+  "kock": {
+    "clue": "Person som har till yrke att laga mat",
+    "score": 50
+  },
+  "kolv": {
+    "clue": "Ax med förtjockad stjälk",
+    "score": 50
+  },
+  "konst": {
+    "clue": "Framställning och av något",
+    "score": 50
+  },
+  "kopp": {
+    "clue": "Dryckeskärl, ofta av porslin, avsett att dricka ur",
+    "score": 50
+  },
+  "kork": {
+    "clue": "Propp som försluter en flaska, eller liknande",
+    "score": 50
+  },
+  "korn": {
+    "clue": "Växt av släktet Hordeum",
+    "score": 50
+  },
+  "korp": {
+    "clue": "En art inom fågelfamiljen kråkfåglar",
+    "score": 50
+  },
+  "korsord": {
+    "clue": "Ordpussel utlagt i ett rutsystem",
+    "score": 50
+  },
+  "korv": {
+    "clue": "Vanlig maträtt bestående av ett avlångt tubformat skinn som",
+    "score": 50
+  },
+  "korvett": {
+    "clue": "En sorts krigsfartyg",
+    "score": 50
+  },
+  "kraft": {
+    "clue": "Styrka, förmåga, energi, ork",
+    "score": 50
+  },
+  "krita": {
+    "clue": "En vit bergart, Ca2CO3",
+    "score": 50
+  },
+  "kropp": {
+    "clue": "Levande varelsers fysiska beståndsdelar som helhet",
+    "score": 50
+  },
+  "kruka": {
+    "clue": "Flatbottnat kärl av keramik eller ibland metall",
+    "score": 50
+  },
+  "kudde": {
+    "clue": "Tygfodral fyllt med något mjukt",
+    "score": 50
+  },
+  "kulle": {
+    "clue": "Bergknalle, backe, höjd",
+    "score": 50
+  },
+  "kupol": {
+    "clue": "Överbyggnad som liknar ett halvklot eller en lök",
+    "score": 50
+  },
+  "kust": {
+    "clue": "Landområde som ligger i närheten av ett hav",
+    "score": 50
+  },
+  "kvist": {
+    "clue": "Mindre gren på ett träd",
+    "score": 50
+  },
+  "kälke": {
+    "clue": "Färdmedel med två medar för att färdas på snö",
+    "score": 50
+  },
+  "källa": {
+    "clue": "Plats där grundvatten bryter igenom markytan",
+    "score": 50
+  },
+  "kärlek": {
+    "clue": "Känsla av stark tillgivenhet riktad mot någon eller något",
+    "score": 50
+  },
+  "kärr": {
+    "clue": "Mindre vattensamling som håller på att växa igen, slags våtmark",
+    "score": 50
+  },
+  "kåpa": {
+    "clue": "Långt, kappliknande överplagg, vanligen med kapuschong",
+    "score": 50
+  },
+  "lamm": {
+    "clue": "Unge till får",
+    "score": 50
+  },
+  "lampa": {
+    "clue": "Apparat som alstrar elektromagnetisk strålning",
+    "score": 50
+  },
+  "larv": {
+    "clue": "Insekt innan den blir en puppa",
+    "score": 50
+  },
+  "lav": {
+    "clue": "Organism som bildas av ett symbiotiskt förhållande mellan en",
+    "score": 50
+  },
+  "lava": {
+    "clue": "Smält sten som spottas ut ur en vulkan",
+    "score": 50
+  },
+  "lejon": {
+    "clue": "En art inom däggdjursfamiljen kattdjur",
+    "score": 50
+  },
+  "lime": {
+    "clue": "En växtart , i familjen vinrutor",
+    "score": 50
+  },
+  "limpa": {
+    "clue": "Bröd",
+    "score": 50
+  },
+  "ljud": {
+    "clue": "Vågrörelser i exempelvis luft som människor och många andra",
+    "score": 50
+  },
+  "lodjur": {
+    "clue": "En art inom däggdjursfamiljen kattdjur",
+    "score": 50
+  },
+  "lokal": {
+    "clue": "Tredimensionellt område inomhus som begränsas av golv",
+    "score": 50
+  },
+  "lott": {
+    "clue": "Andel av en helhet, del av något större",
+    "score": 50
+  },
+  "lund": {
+    "clue": "Mindre lövskogsparti med relativt öppen mark",
+    "score": 50
+  },
+  "lykta": {
+    "clue": "Utomhus lampa",
+    "score": 50
+  },
+  "lyx": {
+    "clue": "Det att i betydande omfattning",
+    "score": 50
+  },
+  "läger": {
+    "clue": "Tillfällig boplats för en grupp av människor, t.ex",
+    "score": 50
+  },
+  "läpp": {
+    "clue": "En av två mjuka delar",
+    "score": 50
+  },
+  "låda": {
+    "clue": "Behållare för föremål",
+    "score": 50
+  },
+  "lök": {
+    "clue": "Underjordisk växtdel som består av köttiga blad i täta lager",
+    "score": 50
+  },
+  "mage": {
+    "clue": "Ett organ i bukhålan, under mellangärdet",
+    "score": 50
+  },
+  "mask": {
+    "clue": "Liten ryggradslös organism, ofta lång och smal",
+    "score": 50
+  },
+  "matros": {
+    "clue": "Sjöman som tillhör manskapet, underordnad båtsman",
+    "score": 50
+  },
+  "meny": {
+    "clue": "Lista över maträtter",
+    "score": 50
+  },
+  "mjöd": {
+    "clue": "Alkoholhaltig dryck av bland annat jäst honungsvatten och",
+    "score": 50
+  },
+  "mjöl": {
+    "clue": "Finmalet pulver av säd",
+    "score": 50
+  },
+  "mjölk": {
+    "clue": "Vätska som däggdjurshonor producerar för att föda avkomman",
+    "score": 50
+  },
+  "mossa": {
+    "clue": "Någon av arterna i växtdivisionerna bladmossor",
+    "score": 50
+  },
+  "mugg": {
+    "clue": "Typ av enklare cylinderformad dryckeskärl: större kopp",
+    "score": 50
+  },
+  "munk": {
+    "clue": "Man som lever i kloster",
+    "score": 50
+  },
+  "munter": {
+    "clue": "På glatt humör, obekymrad över tillvaron",
+    "score": 50
+  },
+  "mur": {
+    "clue": "Hög och vanligen stabil struktur som åtminstone delvis",
+    "score": 50
+  },
+  "mus": {
+    "clue": "Individ av olika arter ur däggdjursordningen gnagare",
+    "score": 50
+  },
+  "mussla": {
+    "clue": "Klass i djurstammen blötdjur",
+    "score": 50
+  },
+  "mynt": {
+    "clue": "Betalningsmedel i form av präglade metallbitar",
+    "score": 50
+  },
+  "möbel": {
+    "clue": "Föremål som har en bestämd plats i ett rum",
+    "score": 50
+  },
+  "mössa": {
+    "clue": "Mjukt klädesplagg som bärs på huvudet",
+    "score": 50
+  },
+  "nacke": {
+    "clue": "Halsens baksida",
+    "score": 50
+  },
+  "natur": {
+    "clue": "Den biologiska och geologiska världen",
+    "score": 50
+  },
+  "njure": {
+    "clue": "Något av de två organ som renar blodet från avfallsämnen och",
+    "score": 50
+  },
+  "nord": {
+    "clue": "Ett av de fyra huvudväderstrecken",
+    "score": 50
+  },
+  "nos": {
+    "clue": "Näsa eller motsvarande kroppsdel hos andra djur",
+    "score": 50
+  },
+  "not": {
+    "clue": "Ett tecken som anger tonhöjd och längd",
+    "score": 50
+  },
+  "nyckel": {
+    "clue": "Redskap, vanligen av metall",
+    "score": 50
+  },
+  "näbb": {
+    "clue": "Kroppsdel på fågel, starkt förlängd",
+    "score": 50
+  },
+  "näste": {
+    "clue": "Bo, tillhåll",
+    "score": 50
+  },
+  "nät": {
+    "clue": "System av maskor, som bildats av ordnade trådar eller linor",
+    "score": 50
+  },
+  "oboe": {
+    "clue": "Ett träblåsinstrument med dubbla rörblad",
+    "score": 50
+  },
+  "ocean": {
+    "clue": "Stort hav som helt skiljer kontinenter från varandra",
+    "score": 50
+  },
+  "opera": {
+    "clue": "En form av musikteater",
+    "score": 50
+  },
+  "orre": {
+    "clue": "En art inom fågelfamiljen fälthöns",
+    "score": 50
+  },
+  "ostron": {
+    "clue": "Skalbeklätt vattenlevande blötdjur",
+    "score": 50
+  },
+  "paj": {
+    "clue": "Maträtt bakad av mjölbaserad deg i ugn",
+    "score": 50
+  },
+  "panna": {
+    "clue": "Del av huvudet mellan ögonbrynen och upp till hårfästet",
+    "score": 50
+  },
+  "pappa": {
+    "clue": "Manlig förälder",
+    "score": 50
+  },
+  "paprika": {
+    "clue": "Slags grönsak som finns i olika färger",
+    "score": 50
+  },
+  "park": {
+    "clue": "Rekreationsområde som utgörs av mer eller mindre ansad",
+    "score": 50
+  },
+  "piano": {
+    "clue": "/parti av ett/ musikstycke med svag ton",
+    "score": 50
+  },
+  "pion": {
+    "clue": "Växt inom släktet Paeonia",
+    "score": 50
+  },
+  "plog": {
+    "clue": "Redskap som används för att vända jord",
+    "score": 50
+  },
+  "plåt": {
+    "clue": "Plan, tunn men relativt styv metallskiva",
+    "score": 50
+  },
+  "poesi": {
+    "clue": "Lyrisk diktning",
+    "score": 50
+  },
+  "polka": {
+    "clue": "En livlig dans i 2/4 takt",
+    "score": 50
+  },
+  "port": {
+    "clue": "Större öppning i vissa fall bestående av en dörr eller grind",
+    "score": 50
+  },
+  "potatis": {
+    "clue": "Sydamerikansk växtart med parflikiga blad inom familjen",
+    "score": 50
+  },
+  "pralin": {
+    "clue": "En sorts chokladbit med fyllning",
+    "score": 50
+  },
+  "prins": {
+    "clue": "Titel för en ej regerande manlig medlem av ett kunga- eller",
+    "score": 50
+  },
+  "pryl": {
+    "clue": "Obestämd sak",
+    "score": 50
+  },
+  "puck": {
+    "clue": "Svart rund skiva av vulkaniserat gummi som ishockey spelas med",
+    "score": 50
+  },
+  "pudel": {
+    "clue": "Intelligent och lättlärd medelstor hundras med hängande öron",
+    "score": 50
+  },
+  "puma": {
+    "clue": "En art inom däggdjursfamiljen kattdjur",
+    "score": 50
+  },
+  "pussel": {
+    "clue": "Bild uppskuren i ett antal delar som sedan för nöjes skull",
+    "score": 50
+  },
+  "påföljd": {
+    "clue": "Händelse direkt orsakad av annan händelse",
+    "score": 50
+  },
+  "rabatt": {
+    "clue": "Samling prydnadsväxter i en avlång jordremsa",
+    "score": 50
+  },
+  "racket": {
+    "clue": "Redskap som används i somliga bollspel för att slå bollar",
+    "score": 50
+  },
+  "regn": {
+    "clue": "Nederbörd i smält form",
+    "score": 50
+  },
+  "rep": {
+    "clue": "Grovt snöre, grovt tågvirke",
+    "score": 50
+  },
+  "rubin": {
+    "clue": "En röd ädelsten",
+    "score": 50
+  },
+  "ruin": {
+    "clue": "Lämning av byggnadsverk",
+    "score": 50
+  },
+  "rumba": {
+    "clue": "En latinamerikansk dans",
+    "score": 50
+  },
+  "rund": {
+    "clue": "Formad som en cirkel, sfär eller liknande",
+    "score": 50
+  },
+  "rygg": {
+    "clue": "Del av kropp från spets i svansbenet till nacken",
+    "score": 50
+  },
+  "räka": {
+    "clue": "Typ av kräftdjur som förekommer i både sötvatten och saltvatten",
+    "score": 50
+  },
+  "räv": {
+    "clue": "Kortbent djur inom familjen hunddjur",
+    "score": 50
+  },
+  "råolja": {
+    "clue": "Trögflytande svart substans främst bestående av långa kolkedjor",
+    "score": 50
+  },
+  "rönn": {
+    "clue": "Ett trädslag i släktet oxlar",
+    "score": 50
+  },
+  "sabel": {
+    "clue": "Form av svärd med böjd eneggad klinga avsett som huggvapen",
+    "score": 50
+  },
+  "safari": {
+    "clue": "Utflykt till vildmark",
+    "score": 50
+  },
+  "safir": {
+    "clue": "Korund som vanligtvis är blå",
+    "score": 50
+  },
+  "saga": {
+    "clue": "Text av en litterär genre med overkliga, fiktiva berättelser",
+    "score": 50
+  },
+  "samband": {
+    "clue": "Abstrakt och ofta svårupptäckt förbindelse som knyter vissa",
+    "score": 50
+  },
+  "samtal": {
+    "clue": "Session av informationsutbyte",
+    "score": 50
+  },
+  "sand": {
+    "clue": "Sten som blivit till små korn",
+    "score": 50
+  },
+  "sjal": {
+    "clue": "Större tygstycke att bära runt axlarna",
+    "score": 50
+  },
+  "sjö": {
+    "clue": "Större ansamling av vatten",
+    "score": 50
+  },
+  "skata": {
+    "clue": "En art inom fågelfamiljen kråkfåglar",
+    "score": 50
+  },
+  "skatt": {
+    "clue": "Obligatorisk avgift",
+    "score": 50
+  },
+  "skepp": {
+    "clue": "Större fartyg",
+    "score": 50
+  },
+  "skjuta": {
+    "clue": "Förflytta /något/ framför sig i rummet",
+    "score": 50
+  },
+  "skog": {
+    "clue": "Område bevuxet med träd med förmåga att bilda ett till stor del",
+    "score": 50
+  },
+  "skrin": {
+    "clue": "Ask med lock för förvaring",
+    "score": 50
+  },
+  "skräck": {
+    "clue": "Stark känsla av akut rädsla",
+    "score": 50
+  },
+  "skugga": {
+    "clue": "Mörkare område som förekommer på motsatt sida av ett föremål",
+    "score": 50
+  },
+  "skum": {
+    "clue": "Lätt och luftig",
+    "score": 50
+  },
+  "slang": {
+    "clue": "Böjligt rör, vanligen av plast eller gummi",
+    "score": 50
+  },
+  "slott": {
+    "clue": "Påkostad stor och praktfull byggnad",
+    "score": 50
+  },
+  "släkte": {
+    "clue": "Taxonomisk rang mellan art och familj",
+    "score": 50
+  },
+  "slöja": {
+    "clue": "Tunt tyg för att dölja ansiktet med",
+    "score": 50
+  },
+  "smör": {
+    "clue": "Mejeriprodukt",
+    "score": 50
+  },
+  "snabb": {
+    "clue": "Egenskapen att röras eller förändras fort",
+    "score": 50
+  },
+  "snopp": {
+    "clue": "Neutralt ord för mannens könsorgan, penisen",
+    "score": 50
+  },
+  "socka": {
+    "clue": "Tjockare, ofta stickad strumpa",
+    "score": 50
+  },
+  "socker": {
+    "clue": "Organiskt ämne av typen kolhydrat",
+    "score": 50
+  },
+  "soffa": {
+    "clue": "Stoppad sittmöbel",
+    "score": 50
+  },
+  "sol": {
+    "clue": "Relativt vanlig typ av gul stjärna",
+    "score": 50
+  },
+  "sommar": {
+    "clue": "Den varmaste årstiden",
+    "score": 50
+  },
+  "spark": {
+    "clue": "Stöt/slag med fot eller liknande fotrörelse",
+    "score": 50
+  },
+  "spegel": {
+    "clue": "Reflekterande yta, vanligen av glas med försilvrat bakstycke",
+    "score": 50
+  },
+  "spira": {
+    "clue": "Stav som regenter",
+    "score": 50
+  },
+  "spjut": {
+    "clue": "Lång stav med en vass spets i ena änden, använt som vapen",
+    "score": 50
+  },
+  "sport": {
+    "clue": "Aktivitet som ibland har tävlingsmoment och regelverk",
+    "score": 50
+  },
+  "spruta": {
+    "clue": "Medicinskt redskap bestående av ett ihåligt rör och en",
+    "score": 50
+  },
+  "spöke": {
+    "clue": "Uppenbarelse av en död varelse",
+    "score": 50
+  },
+  "staty": {
+    "clue": "Skulptur av person i helfigur",
+    "score": 50
+  },
+  "stege": {
+    "clue": "Flyttbart hjälpmedel eller fast installerad struktur för",
+    "score": 50
+  },
+  "stol": {
+    "clue": "En möbel på vilken man sitter",
+    "score": 50
+  },
+  "strand": {
+    "clue": "Gränsområde mellan öppet vatten och fastare land",
+    "score": 50
+  },
+  "stuga": {
+    "clue": "Mindre hus, ofta använt som fritidshus",
+    "score": 50
+  },
+  "stål": {
+    "clue": "En legering av järn och kol",
+    "score": 50
+  },
+  "sula": {
+    "clue": "Undersida på fot eller sko",
+    "score": 50
+  },
+  "svan": {
+    "clue": "Fågel i tribuset Cygnini",
+    "score": 50
+  },
+  "svans": {
+    "clue": "Utväxt från ryggslutet hos många djur",
+    "score": 50
+  },
+  "sylt": {
+    "clue": "Mosig matvara av bär eller frukter kokade med socker",
+    "score": 50
+  },
+  "säck": {
+    "clue": "Större påse för förvaring och transportering",
+    "score": 50
+  },
+  "tand": {
+    "clue": "Hårt organ hos vissa djur placerat i munhålan",
+    "score": 50
+  },
+  "tavla": {
+    "clue": "Bild som hängs upp på en vägg i syfte att vara estetiskt",
+    "score": 50
+  },
+  "tempel": {
+    "clue": "Byggnad för religiös vördnad",
+    "score": 50
+  },
+  "tenn": {
+    "clue": "Silverglänsande metalliskt grundämne med låg smältpunkt",
+    "score": 50
+  },
+  "tiger": {
+    "clue": "En art inom däggdjursfamiljen kattdjur",
+    "score": 50
+  },
+  "tomat": {
+    "clue": "En art inom växtfamiljen potatisväxter",
+    "score": 50
+  },
+  "topp": {
+    "clue": "Högsta punkten, spetsigt föremål, det bästa",
+    "score": 50
+  },
+  "torg": {
+    "clue": "Ett öppet område i en stad",
+    "score": 50
+  },
+  "torn": {
+    "clue": "Hög smal ihålig byggnad",
+    "score": 50
+  },
+  "tratt": {
+    "clue": "Koniskt redskap",
+    "score": 50
+  },
+  "träd": {
+    "clue": "Hög växt med kraftig, barkklädd stam",
+    "score": 50
+  },
+  "tuba": {
+    "clue": "Relativt stort bleckblåsinstrument",
+    "score": 50
+  },
+  "tupp": {
+    "clue": "Hönsfågel av hankön",
+    "score": 50
+  },
+  "tusch": {
+    "clue": "Svart färg",
+    "score": 50
+  },
+  "tårta": {
+    "clue": "Större, ofta sött bakverk",
+    "score": 50
+  },
+  "unik": {
+    "clue": "Enda i sitt slag",
+    "score": 50
+  },
+  "utter": {
+    "clue": "En art inom däggdjursfamiljen mårddjur",
+    "score": 50
+  },
+  "vals": {
+    "clue": "Sorts musikstil i tretakt med betoning på första taktdelen",
+    "score": 50
+  },
+  "valv": {
+    "clue": "Konstruktivt element bestående av kilformade stenar pressade",
+    "score": 50
+  },
+  "vass": {
+    "clue": "Som har en kant avsmalnande till en linje och därav förmågan",
+    "score": 50
+  },
+  "vatten": {
+    "clue": "En färg-, lukt- och smaklös vätska",
+    "score": 50
+  },
+  "vik": {
+    "clue": "Inbuktning av vatten i landmassa",
+    "score": 50
+  },
+  "vild": {
+    "clue": "Ej van att vara med människor",
+    "score": 50
+  },
+  "villa": {
+    "clue": "Fristående bostadshus",
+    "score": 50
+  },
+  "vind": {
+    "clue": "Naturföreteelse bestående av luftström som rör sig i",
+    "score": 50
+  },
+  "vinge": {
+    "clue": "Tunn, skivliknande del av ett objekt",
+    "score": 50
+  },
+  "vinst": {
+    "clue": "Begrepp inom nationalekonomi och företagsekonomi",
+    "score": 50
+  },
+  "virvel": {
+    "clue": "Rotationsrörelse i fluid",
+    "score": 50
+  },
+  "vrist": {
+    "clue": "Leden mellan fot och underben",
+    "score": 50
+  },
+  "vägg": {
+    "clue": "Lodrätt, ofta plan",
+    "score": 50
+  },
+  "våg": {
+    "clue": "Funktion av tiden och en eller flera rumsvariabler som",
+    "score": 50
+  },
+  "våning": {
+    "clue": "Uppsättning av rum på samma höjd i en byggnad",
+    "score": 50
+  },
+  "yttre": {
+    "clue": "Som finns på utsidan av något",
+    "score": 50
+  },
+  "yxa": {
+    "clue": "Mycket gammalt, skärande",
+    "score": 50
+  },
+  "ämbar": {
+    "clue": "Hink eller spann avsedd för vatten",
+    "score": 50
+  },
+  "ämbete": {
+    "clue": "Officiell befattning",
+    "score": 50
+  },
+  "ängel": {
+    "clue": "Sändebud för gudom",
+    "score": 50
+  },
+  "ånga": {
+    "clue": "Gasform av ett normalt sett flytande ämne",
+    "score": 50
+  },
+  "årlig": {
+    "clue": "Som inträffar en gång om året",
+    "score": 50
+  },
+  "åtala": {
+    "clue": "Yrka inför domstol att viss handling skall utredas och",
+    "score": 50
+  },
+  "ödemark": {
+    "clue": "Avlägset område utan bebyggelse",
+    "score": 50
+  },
+  "ödla": {
+    "clue": "Kräldjur tillhörande underordningen Lacertilia",
+    "score": 50
+  },
+  "öra": {
+    "clue": "Hörselorgan, särskilt hos människor och däggdjur",
+    "score": 50
+  },
+  "öring": {
+    "clue": "Salmo trutta",
+    "score": 50
+  },
+  "örn": {
+    "clue": "Vardagligt samlingsnamn för en grupp större rovfåglar inom",
+    "score": 50
+  },
+  "ört": {
+    "clue": "Växt med ej förvedade, utan mjuka stammar eller stjälkar",
+    "score": 50
   }
 }
