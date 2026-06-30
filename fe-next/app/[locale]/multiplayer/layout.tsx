@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
     sv: 'https://www.lexiclash.live/og-image-sv.webp',
     ja: 'https://www.lexiclash.live/og-image-ja.webp',
     es: 'https://www.lexiclash.live/og-image-es.webp',
-    ru: 'https://www.lexiclash.live/og-image-es.webp',
+    // ru has no dedicated OG image yet → falls back to en below.
   };
   const ogImage = ogImageMap[locale] || ogImageMap.en;
 
