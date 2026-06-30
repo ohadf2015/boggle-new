@@ -520,7 +520,6 @@ mural
 muralla
 museo
 musgo
-muslera
 muslo
 muñeca
 máscara
@@ -592,7 +591,6 @@ pavo
 pecho
 pedal
 pelota
-peluso
 pepino
 pera
 perla

@@ -160,13 +160,9 @@ export async function runYearAheadAssignment(
       shortfalls.push(`${language}: no existing daily rows to continue numbering from`);
       continue;
     }
-    // Fill the day AFTER the latest existing row, forward for `days`.
-    const startDate = (() => {
-      const d = new Date(`${base.date}T00:00:00Z`);
-      d.setUTCDate(d.getUTCDate() + 1);
-      return d.toISOString().slice(0, 10);
-    })();
-
+    // Start from TODAY so we fill any mid-sequence gaps (deleted/blocked slots),
+    // not just append past the last row. assignYearAhead skips already-filled dates.
+    const startDate = isoToday();
     const summary = await assignYearAhead(buildDeps(supabase, language, base), { language, startDate, days });
     out[language] = summary;
     if (summary.shortfall > 0) shortfalls.push(`${language}: ${summary.shortfall} day(s) unfilled (approved pool too small)`);
