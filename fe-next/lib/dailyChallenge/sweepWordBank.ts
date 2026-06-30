@@ -26,6 +26,13 @@ export interface SweepDeps {
   getUnjudged: (language: string, limit: number) => Promise<string[]>;
   /** Throws if the LLM is unavailable — the word is then left unjudged (retried next run). */
   judge: (word: string, language: string) => Promise<DailyWordVerdict>;
+  /**
+   * Optional deterministic backstop: is the word in the game dictionary?
+   * `false` → reject as a non-word WITHOUT spending an LLM call (catches the
+   * wrong-orthography / non-word class the judge is unreliable on). `null` → dict
+   * unavailable, fall through to the judge (don't fail-closed on a dict gap).
+   */
+  isValidWord?: (word: string, language: string) => Promise<boolean | null>;
   /** Mark approved: validation_status='approved', store meaning + interestingness, stamp judged_at. */
   markApproved: (language: string, wordUpper: string, meaning: string, interestingness: number) => Promise<void>;
   /** Mark rejected: status='blocked', validation_status='rejected', blocked_reason, stamp judged_at. */
@@ -81,18 +88,37 @@ export async function sweepWordBank(deps: SweepDeps, opts: SweepOptions): Promis
       for (let off = 0; off < fresh.length && processedThisLang < maxPerLang; off += concurrency) {
         const slice = fresh.slice(off, off + concurrency);
         const verdicts = await Promise.all(
-          slice.map(async (word): Promise<{ word: string; verdict?: DailyWordVerdict; error?: unknown }> => {
-            try {
-              return { word, verdict: await deps.judge(word, language) };
-            } catch (error) {
-              return { word, error };
-            }
-          }),
+          slice.map(
+            async (word): Promise<{ word: string; verdict?: DailyWordVerdict; error?: unknown; dictReject?: boolean }> => {
+              // Deterministic dict backstop first — a non-word is rejected without
+              // spending an LLM call (and catches orthography the judge misses).
+              if (deps.isValidWord) {
+                try {
+                  const valid = await deps.isValidWord(word, language);
+                  if (valid === false) return { word, dictReject: true };
+                } catch {
+                  /* dict hiccup → fall through to the judge */
+                }
+              }
+              try {
+                return { word, verdict: await deps.judge(word, language) };
+              } catch (error) {
+                return { word, error };
+              }
+            },
+          ),
         );
 
-        for (const { word, verdict, error } of verdicts) {
+        for (const { word, verdict, error, dictReject } of verdicts) {
           if (processedThisLang >= maxPerLang) break;
           const wu = word.toUpperCase();
+          if (dictReject) {
+            await deps.markRejected(language, wu, 'not in dictionary');
+            summary.rejected++;
+            summary.judged++;
+            processedThisLang++;
+            continue;
+          }
           if (error || !verdict) {
             erroredThisRun.add(wu);
             summary.failures.push(`${language} "${word}": judge failed (${errMsg(error)})`);

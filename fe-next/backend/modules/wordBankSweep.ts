@@ -16,8 +16,10 @@ import { createServiceClient } from '@/lib/ai-service/client';
 import { gameAIService } from '@/lib/ai-service';
 import { sweepWordBank, type SweepDeps, type SweepSummary } from '@/lib/dailyChallenge/sweepWordBank';
 import { sendTelegramMessage, isTelegramConfigured, escapeTelegramMarkdownV2 } from '@/lib/telegram';
+import { isValidWordCached } from '@/backend/dictionary';
 import logger from '@/backend/utils/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import type { Language } from '@/types';
 
 const SWEEP_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
@@ -34,6 +36,10 @@ function buildDeps(supabase: SupabaseClient): SweepDeps {
     },
 
     judge: (word, language) => gameAIService.judgeDailyWord(word, language),
+
+    // Deterministic backstop: only the game dictionary can confirm a word is real
+    // (catches wrong-orthography / non-words the LLM judge waves through).
+    isValidWord: (word, language) => isValidWordCached(word, language as Language),
 
     markApproved: async (language, wordUpper, meaning, interestingness) => {
       await supabase

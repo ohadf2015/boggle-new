@@ -107,6 +107,41 @@ describe('sweepWordBank', () => {
     expect(summary.judged).toBe(30); // stops at the cap, remainder picked up next run
   });
 
+  describe('dictionary backstop (deterministic, catches LLM misses)', () => {
+    it('rejects a non-dictionary word WITHOUT calling the judge (saves LLM, catches non-words)', async () => {
+      const judge = vi.fn(async () => verdict(true, { meaning: 'm' }));
+      const { deps, approved, rejected } = memDeps({ en: ['HAJART'] }, judge);
+      deps.isValidWord = vi.fn(async () => false); // not in dictionary
+
+      const summary = await sweepWordBank(deps, { languages: ['en'] });
+
+      expect(judge).not.toHaveBeenCalled(); // dict-rejected before the LLM
+      expect(approved).toEqual([]);
+      expect(rejected).toEqual([{ lang: 'en', word: 'HAJART', reason: 'not in dictionary' }]);
+      expect(summary.rejected).toBe(1);
+    });
+
+    it('still judges words that ARE in the dictionary', async () => {
+      const judge = vi.fn(async () => verdict(true, { meaning: 'def' }));
+      const { deps, approved } = memDeps({ en: ['GARDEN'] }, judge);
+      deps.isValidWord = vi.fn(async () => true);
+
+      await sweepWordBank(deps, { languages: ['en'] });
+      expect(judge).toHaveBeenCalledOnce();
+      expect(approved.map((a) => a.word)).toEqual(['GARDEN']);
+    });
+
+    it('falls through to the judge when the dictionary is unavailable (null), not fail-closed on dict gaps', async () => {
+      const judge = vi.fn(async () => verdict(true, { meaning: 'def' }));
+      const { deps, approved } = memDeps({ en: ['GARDEN'] }, judge);
+      deps.isValidWord = vi.fn(async () => null); // dict not loaded
+
+      await sweepWordBank(deps, { languages: ['en'] });
+      expect(judge).toHaveBeenCalledOnce();
+      expect(approved.map((a) => a.word)).toEqual(['GARDEN']);
+    });
+  });
+
   it('processes each language independently', async () => {
     const judge = vi.fn(async (word: string) => verdict(word !== 'BADHE'));
     const { deps, approved, rejected } = memDeps({ en: ['GOODEN'], he: ['BADHE'] }, judge);
