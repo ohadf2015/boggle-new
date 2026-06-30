@@ -418,12 +418,10 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
                   <span className="text-sm font-bold text-neo-cream leading-snug">
                     {result.meaning}
                   </span>
-                  {/* CC BY-SA attribution: he meanings are sourced from Wiktionary (other langs are LLM) */}
-                  {language === 'he' && (
-                    <span className="text-[10px] text-slate-400 mt-0.5">
-                      {t('wordHunt.results.meaningSource')}
-                    </span>
-                  )}
+                  {/* CC BY-SA attribution: meanings are dictionary-sourced from Wiktionary (all langs) */}
+                  <span className="text-[10px] text-slate-400 mt-0.5">
+                    {t('wordHunt.results.meaningSource')}
+                  </span>
                 </div>
               </div>
             )}

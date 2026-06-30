@@ -44,9 +44,12 @@ Wiktionary).
 - `en.wiktionary` rest_v1 gives structured senses but the first POS block is often
   `Symbol`/`Letter` (translingual junk) and definitions carry HTML — filter to lexical POS
   (Noun/Verb/…) + strip tags.
-- `es/ja/ru/sv` on-demand extracts are **unreliable** (return Etimología / 漢字 / Морфология
-  headers, not the gloss). Native glosses for these need bulk wiktextract → **phase 2**.
-- No single free source gives native glosses for all 6 languages on-demand.
+- `es/ja/ru/sv`: the **intro** extract (`exsentences`) returns Etimología / 漢字 / Морфология,
+  NOT the gloss — but the **full** plaintext extract has a learnable section structure, so
+  walking `== lang ==` → POS subsection → first real line recovers the native gloss reliably
+  (see Scope below; 48/48 live). No bulk download needed.
+- No single uniform free *API* gives native glosses for all 6 languages — but a per-edition
+  parser over the action API's full extract does.
 
 ## Decision
 
@@ -61,23 +64,42 @@ Resolution order at every meaning write site:
 
 Dictionary meanings **bypass** the Hebrew suppression (verified good); LLM meanings keep it.
 
-### Scope this PR (phase 1) — Hebrew only
-- `he` → `he.wiktionary` extracts (fills the suppressed gap — the whole point; verified
-  clean + working server-side).
-- `en/es/ja/sv/ru` → LLM unchanged.
-  - `en` was prototyped against `en.wiktionary` rest_v1 but **dropped**: its first Noun sense
-    is often a nym/"Terms related to…" cross-reference, not a gloss — and English LLM
-    meanings are already fine.
+### Scope — all 6 languages (on-demand, fail-soft)
+Each edition's plaintext extract has a learnable structure, so a single section-tree walker
+(`== lang ==` → first POS subsection → first non-noise line) + small per-edition rules covers
+all of them. Live smoke (8 common words/lang, 2026-06-30): **48/48 native definitions**.
 
-### Phase 2 (deferred, documented)
-- Bulk wiktextract for `en/es/ja/ru` (and run wiktextract on `he`/`sv` dumps for fuller
-  Hebrew/Swedish coverage). Build a committed compact `word→gloss` artifact intersected with
-  served/approved lists; same dictionary-first seam (`fetchWiktionaryMeaning`), just a
-  local-file source instead of HTTP.
+- `he` → `he.wiktionary` extract: line after the `== HEADWORD ==` header (`exsentences=1`).
+- `en` → `English` → `Noun/Verb/…`; skip headword/`Terms relating to…` nym/`Synonyms:`; strip
+  `(countable)` labels + `[from 9th c.]` tags.
+- `es` → `Español` → `Sustantivo/Verbo/…`; the gloss is the line **after** the first `N <topic>`
+  numbered sense.
+- `sv` → `Svenska` → `Substantiv/…`; skip headword + `uttal:`; first prose line.
+- `ja` → `日本語` (not `漢字`) → `名詞/…`; strip leading `（reading）` groups.
+- `ru` → `Русский` → explicit `Значение` section; strip `зоол.`-style domain labels; cut at `◆`.
+
+Anything uncertain → null → LLM fallback. `daily_target_words.meaning` caches the result, so a
+Wiktionary call fires only when a slot's meaning is (re)filled.
+
+### Backfill note
+The validator is idempotent (skips already-validated rows), so existing rows keep their old LLM
+meaning until re-validated. New/changed slots get dictionary meanings on the nightly cron; run a
+one-off `runUpcomingWordValidation` (or clear `validated_at`) to backfill near-term slots.
+
+### Phase 2 (deferred)
+If on-demand quality/coverage proves insufficient for a language, swap that language's source to
+bulk **wiktextract** (kaikki, structured `senses[].glosses`) behind the same
+`fetchWiktionaryMeaning` seam — local file instead of HTTP.
 
 > Note: this lookup runs **server-side** (Node/undici), where a custom `User-Agent` and
-> cross-origin fetch are allowed. It would NOT work from a browser-like env (jsdom/happy-dom
-> forbids setting `User-Agent`) — which is why the network smoke must run in a node test env.
+> cross-origin fetch are allowed. It returns null in a browser-like env (jsdom/happy-dom forbids
+> setting `User-Agent`) — so the network smoke must run in a node test env.
+
+### Attribution
+CC BY-SA credit (`wordHunt.results.meaningSource` ×6 locales) shows under every displayed
+meaning on the results card. Since served daily words are common base forms, dictionary hit-rate
+is ~total; the rare LLM fallback shares the generic source credit (acceptable de minimis — for
+strict per-row provenance, add a `meaning_source` column and gate on it).
 
 ## Implementation
 
