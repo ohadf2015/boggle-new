@@ -17,6 +17,7 @@ import { gameAIService } from '@/lib/ai-service';
 import { getWordsFromWordBank } from '@/lib/dailyChallenge/wordBankService';
 import { validateUpcomingWords, type ValidateDeps, type ValidateSummary } from '@/lib/dailyChallenge/validateUpcomingWords';
 import { processSuggestions, type SuggestionDeps, type SuggestionSummary } from '@/lib/dailyChallenge/processSuggestions';
+import { meaningForLanguage } from '@/lib/dailyChallenge/wordMeaningPolicy';
 import { sendTelegramMessage, isTelegramConfigured, escapeTelegramMarkdownV2 } from '@/lib/telegram';
 import logger from '@/backend/utils/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -79,7 +80,7 @@ function buildDeps(supabase: SupabaseClient): ValidateDeps {
       const now = new Date().toISOString(); // same stamp so updated_at <= validated_at → idempotent next run
       await supabase
         .from('daily_target_words')
-        .update({ meaning, validated_at: now, updated_at: now })
+        .update({ meaning: meaningForLanguage(language, meaning), validated_at: now, updated_at: now })
         .eq('language', language)
         .eq('puzzle_date', date);
     },
@@ -94,7 +95,7 @@ function buildDeps(supabase: SupabaseClient): ValidateDeps {
           override_at: now,
           word_source: 'validator',
           ai_reason: 'Auto-replaced by daily-word quality validator',
-          meaning,
+          meaning: meaningForLanguage(language, meaning),
           validated_at: now,
           grid: null, // force serve-time grid regeneration for the new word
           grid_generated_at: null,
@@ -168,7 +169,7 @@ function buildSuggestionDeps(supabase: SupabaseClient, from: Date): SuggestionDe
         .update({
           override_word: wordUpper, override_by: null, override_at: now,
           word_source: 'suggestion', ai_reason: 'Player-suggested word (auto-approved by quality judge)',
-          meaning, validated_at: now, grid: null, grid_generated_at: null, updated_at: now,
+          meaning: meaningForLanguage(language, meaning), validated_at: now, grid: null, grid_generated_at: null, updated_at: now,
         })
         .eq('language', language)
         .eq('puzzle_date', date);
