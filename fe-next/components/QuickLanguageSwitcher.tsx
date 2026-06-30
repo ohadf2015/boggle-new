@@ -26,6 +26,7 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: 'sv', flag: '🇸🇪', labelKey: 'joinView.swedish' },
   { code: 'ja', flag: '🇯🇵', labelKey: 'joinView.japanese' },
   { code: 'es', flag: '🇪🇸', labelKey: 'joinView.spanish' },
+  { code: 'ru', flag: '🇷🇺', labelKey: 'joinView.russian' },
 ];
 
 interface QuickLanguageSwitcherProps {

@@ -1809,6 +1809,7 @@ const sv = {
     "swedish": "Svenska",
     "japanese": "日本語",
     "spanish": "Español",
+    "russian": "Русский",
     "generateNewCode": "Ny kod",
     "createNewRoom": "Skapa ett rum!",
     "howToPlay": "Hur spelar man",

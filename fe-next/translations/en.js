@@ -1638,6 +1638,7 @@ const en = {
     "swedish": "Swedish",
     "japanese": "Japanese",
     "spanish": "Spanish",
+    "russian": "Russian",
     "generateNewCode": "New code",
     "createNewRoom": "Create a room!",
     "howToPlay": "How to play",

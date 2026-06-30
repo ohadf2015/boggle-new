@@ -11478,6 +11478,7 @@ const ru = {
     "swedish": "Шведский",
     "japanese": "Японский",
     "spanish": "Испанский",
+    "russian": "Русский",
     "generateNewCode": "Новый код",
     "createNewRoom": "Создай комнату!",
     "howToPlay": "Как играть",
