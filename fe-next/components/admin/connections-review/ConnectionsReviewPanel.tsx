@@ -14,7 +14,17 @@ const VERDICT_BTN: Record<Verdict, { Icon: typeof ThumbsUp; on: string }> = {
 };
 
 export default function ConnectionsReviewPanel() {
-  const rows = useMemo(() => buildReviewRows({ he: getPuzzlesForLocale('he'), en: getPuzzlesForLocale('en') }), []);
+  const rows = useMemo(
+    () =>
+      buildReviewRows({
+        en: getPuzzlesForLocale('en'),
+        he: getPuzzlesForLocale('he'),
+        es: getPuzzlesForLocale('es'),
+        sv: getPuzzlesForLocale('sv'),
+        ja: getPuzzlesForLocale('ja'),
+      }),
+    [],
+  );
   const [verdicts, setVerdicts] = useState<Record<string, Verdict>>({});
   const [feedback, setFeedback] = useState<Record<string, FeedbackStat>>({});
   const [changed, setChanged] = useState<Set<string>>(new Set());
@@ -119,7 +129,7 @@ export default function ConnectionsReviewPanel() {
       {/* Filters */}
       <div className="flex flex-wrap gap-2" data-testid="review-filters">
         <select aria-label="language" className="rounded-neo border-neo border-neo-white/20 bg-neo-navy px-2 py-1 text-sm" value={filter.language} onChange={(e) => setFilter((f) => ({ ...f, language: e.target.value as ReviewFilter['language'] }))}>
-          <option value="all">All langs</option><option value="he">Hebrew</option><option value="en">English</option>
+          <option value="all">All langs</option><option value="en">English</option><option value="he">Hebrew</option><option value="es">Spanish</option><option value="sv">Swedish</option><option value="ja">Japanese</option>
         </select>
         <select aria-label="difficulty" className="rounded-neo border-neo border-neo-white/20 bg-neo-navy px-2 py-1 text-sm" value={filter.difficulty} onChange={(e) => setFilter((f) => ({ ...f, difficulty: e.target.value as ReviewFilter['difficulty'] }))}>
           <option value="all">All diff</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option>

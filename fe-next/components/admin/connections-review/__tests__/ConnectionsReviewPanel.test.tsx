@@ -2,12 +2,16 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import ConnectionsReviewPanel from '../ConnectionsReviewPanel';
 
-vi.mock('@/lib/connections/puzzles', () => ({
-  getPuzzlesForLocale: (loc: string) =>
-    loc === 'he'
-      ? [{ id: 'he-o-006', word1: 'כלב', word2: 'תיכון', bridge: 'ים', difficulty: 'medium' }]
-      : [{ id: 'en-o-001', word1: 'SUN', word2: 'HOUSE', bridge: 'LIGHT', difficulty: 'easy' }],
-}));
+vi.mock('@/lib/connections/puzzles', () => {
+  const pools: Record<string, Array<{ id: string; word1: string; word2: string; bridge: string; difficulty: string }>> = {
+    he: [{ id: 'he-o-006', word1: 'כלב', word2: 'תיכון', bridge: 'ים', difficulty: 'medium' }],
+    en: [{ id: 'en-o-001', word1: 'SUN', word2: 'HOUSE', bridge: 'LIGHT', difficulty: 'easy' }],
+    es: [{ id: 'es-o-001', word1: 'SOL', word2: 'CASA', bridge: 'LUZ', difficulty: 'easy' }],
+    sv: [{ id: 'sv-o-001', word1: 'SOL', word2: 'HUS', bridge: 'LJUS', difficulty: 'easy' }],
+    ja: [{ id: 'ja-o-001', word1: '太陽', word2: '家', bridge: '光', difficulty: 'easy' }],
+  };
+  return { getPuzzlesForLocale: (loc: string) => pools[loc] ?? pools.en };
+});
 
 const fetchReviews = vi.fn();
 const saveReviews = vi.fn();

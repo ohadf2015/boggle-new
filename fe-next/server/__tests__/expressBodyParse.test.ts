@@ -25,3 +25,16 @@ describe('shouldExpressParseJsonBody — teacher-access Next.js routes', () => {
     expect(shouldExpressParseJsonBody('/api/admin/curators')).toBe(true);
   });
 });
+
+/**
+ * Regression: POST /api/admin/connections-puzzles/reviews is a Next.js App
+ * Router route (bulk-upsert connection-puzzle verdicts) with NO Express
+ * counterpart. It reads its body via `await request.json()`. Express pre-parsing
+ * drained the stream → the await hung → the admin "mark bad riddles" save failed.
+ * MUST be excluded from Express body parsing.
+ */
+describe('shouldExpressParseJsonBody — connections-puzzles review Next.js route', () => {
+  it('does NOT pre-parse the connection-puzzle reviews POST body', () => {
+    expect(shouldExpressParseJsonBody('/api/admin/connections-puzzles/reviews')).toBe(false);
+  });
+});

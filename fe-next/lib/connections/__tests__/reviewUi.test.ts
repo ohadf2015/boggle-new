@@ -31,6 +31,25 @@ describe('buildReviewRows', () => {
   });
 });
 
+describe('buildReviewRows — all native locales', () => {
+  const es: ConnectionPuzzle[] = [{ id: 'es-e-001', word1: 'SOL', word2: 'CASA', bridge: 'LUZ', difficulty: 'easy' }];
+  const sv: ConnectionPuzzle[] = [{ id: 'sv-e-001', word1: 'SOL', word2: 'HUS', bridge: 'LJUS', difficulty: 'easy' }];
+  const ja: ConnectionPuzzle[] = [{ id: 'ja-e-001', word1: '太陽', word2: '家', bridge: '光', difficulty: 'easy' }];
+
+  it('includes es/sv/ja rows when their pools are supplied', () => {
+    const rows = buildReviewRows({ he, en, es, sv, ja });
+    expect(rows).toHaveLength(7);
+    expect(rows.find((x) => x.id === 'es-e-001')!.language).toBe('es');
+    expect(rows.find((x) => x.id === 'sv-e-001')!.language).toBe('sv');
+    expect(rows.find((x) => x.id === 'ja-e-001')!.language).toBe('ja');
+  });
+
+  it('filters by a non-en/he language', () => {
+    const rows = buildReviewRows({ he, en, es, sv, ja });
+    expect(filterRows(rows, { language: 'ja', difficulty: 'all', source: 'all', status: 'all' }, {}).map((r) => r.id)).toEqual(['ja-e-001']);
+  });
+});
+
 describe('filterRows', () => {
   const rows = buildReviewRows({ he, en });
   const verdicts = { 'he-e-001': 'good', 'he-g-1': 'bad' };

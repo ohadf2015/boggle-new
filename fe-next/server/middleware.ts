@@ -45,6 +45,11 @@ const NEXT_ADMIN_BODY_ROUTES: string[] = [
   // 408). Prefix covers /api/admin/teacher-access/:id/approve|decline. The GET
   // list/export have no body so this is a no-op for them.
   '/api/admin/teacher-access',
+  // Connection-puzzle review verdicts (admin marks riddles good/bad/unsure) is a
+  // Next.js POST that reads request.json(). Express pre-parsing drained the
+  // stream → the save hung → admin "mark bad riddles" silently failed. Prefix
+  // covers /api/admin/connections-puzzles/reviews.
+  '/api/admin/connections-puzzles',
 ];
 
 export function shouldExpressParseJsonBody(path: string): boolean {

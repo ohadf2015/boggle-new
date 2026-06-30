@@ -41,13 +41,17 @@ function rowsFor(puzzles: ConnectionPuzzle[], language: string): ReviewRow[] {
   }));
 }
 
-/** Flatten the per-locale pools into review rows. */
-export function buildReviewRows(pools: { he: ConnectionPuzzle[]; en: ConnectionPuzzle[] }): ReviewRow[] {
-  return [...rowsFor(pools.he, 'he'), ...rowsFor(pools.en, 'en')];
+/** Languages with a native connection-puzzle pool (review-tool coverage). */
+export const REVIEW_LANGUAGES = ['en', 'he', 'es', 'sv', 'ja'] as const;
+export type ReviewLanguage = (typeof REVIEW_LANGUAGES)[number];
+
+/** Flatten the per-locale pools into review rows. Iterates every supplied pool. */
+export function buildReviewRows(pools: Partial<Record<ReviewLanguage, ConnectionPuzzle[]>>): ReviewRow[] {
+  return REVIEW_LANGUAGES.flatMap((lang) => rowsFor(pools[lang] ?? [], lang));
 }
 
 export interface ReviewFilter {
-  language: 'all' | 'he' | 'en';
+  language: 'all' | ReviewLanguage;
   difficulty: 'all' | 'easy' | 'medium' | 'hard';
   source: 'all' | PuzzleSource;
   status: 'all' | 'unreviewed' | 'good' | 'bad' | 'unsure';
