@@ -113,8 +113,8 @@ const ResultsRivalsPanel: React.FC<ResultsRivalsPanelProps> = ({
           return (
             <m.li
               key={row.id}
-              initial={reducedMotion ? undefined : { opacity: 0, x: row.isMe ? 0 : aheadOfMe ? 16 : -16 }}
-              animate={{ opacity: 1, x: 0 }}
+              initial={reducedMotion ? undefined : { x: row.isMe ? 0 : aheadOfMe ? 16 : -16 }}
+              animate={{ x: 0 }}
               transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1], delay: reducedMotion ? 0 : idx * 0.06 }}
               data-testid={`rivals-row-${row.id}`}
               data-row="true"
@@ -122,7 +122,7 @@ const ResultsRivalsPanel: React.FC<ResultsRivalsPanelProps> = ({
               data-rank={row.rank}
               data-direction={row.direction}
               className={[
-                'relative flex items-center gap-2 px-2.5 py-2 rounded-lg border-2 overflow-hidden',
+                'relative flex items-center gap-2 px-2.5 py-2 rounded-lg border-2 overflow-hidden animate-in fade-in-0 duration-300',
                 row.isMe
                   ? 'border-neo-cyan bg-neo-cyan/10'
                   : adjacentToMe

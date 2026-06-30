@@ -124,20 +124,20 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
       tl.from('[data-scene-center]', {
-        scale: 0, opacity: 0, duration: 0.55, delay: 0.6, ease: 'back.out(1.7)',
+        scale: 0, duration: 0.55, delay: 0.6, ease: 'back.out(1.7)',
       });
       tl.from('[data-scene-orbit]', {
-        scale: 0, opacity: 0, duration: 0.5,
+        scale: 0, duration: 0.5,
         stagger: { each: 0.1, from: 'random' },
         ease: 'back.out(1.5)',
       }, '-=0.2');
       tl.from('[data-scene-stat]', {
-        y: 18, opacity: 0, duration: 0.4, stagger: 0.08,
+        y: 18, duration: 0.4, stagger: 0.08,
       }, '-=0.15');
       const awardEls = sceneRef.current?.querySelectorAll('[data-scene-award]');
       if (awardEls && awardEls.length > 0) {
         tl.from(awardEls, {
-          y: 14, opacity: 0, duration: 0.35, stagger: 0.08,
+          y: 14, duration: 0.35, stagger: 0.08,
         }, '-=0.1');
       }
     }, sceneRef);

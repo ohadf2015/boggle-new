@@ -168,21 +168,21 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
 
     return (
         <m.section
-          initial={reducedMotion ? undefined : { opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={reducedMotion ? undefined : {}}
+          animate={{}}
           transition={{ duration: 0.3 }}
-          className="flex flex-col items-center text-center relative pt-8 pb-4 medium-short:pt-3 medium-short:pb-2 short:pt-1 short:pb-1"
+          className="flex flex-col items-center text-center relative pt-8 pb-4 medium-short:pt-3 medium-short:pb-2 short:pt-1 short:pb-1 animate-in fade-in-0"
           data-testid="results-hero-section"
         >
           {/* Rank Display — dramatic slam entrance */}
           <div className="relative z-10 flex flex-col items-center mb-6 medium-short:mb-2 short:mb-1">
             {isEliminated ? (
               <m.span
-                initial={reducedMotion ? undefined : { opacity: 0, scale: 2, rotate: -8 }}
-                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                initial={reducedMotion ? undefined : { scale: 2, rotate: -8 }}
+                animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 180, damping: 12, delay: 0.1 }}
                 className={cn(
-                  'font-neo-display font-black text-3xl medium-short:text-2xl xs:text-4xl sm:text-5xl md:text-7xl leading-none',
+                  'font-neo-display font-black text-3xl medium-short:text-2xl xs:text-4xl sm:text-5xl md:text-7xl leading-none animate-in fade-in-0 duration-300',
                   'text-red-500 drop-shadow-[0_0_35px_rgba(255,0,0,0.5)] drop-shadow-[4px_4px_0px_rgba(0,0,0,1)]',
                 )}
               >
@@ -190,11 +190,11 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               </m.span>
             ) : (
               <m.span
-                initial={reducedMotion ? undefined : { opacity: 0, scale: 3, y: -40 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
+                initial={reducedMotion ? undefined : { scale: 3, y: -40 }}
+                animate={{ scale: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.15 }}
                 className={cn(
-                  'text-5xl medium-short:text-4xl short:text-3xl xs:text-6xl sm:text-7xl md:text-9xl font-neo-display font-black leading-none',
+                  'text-5xl medium-short:text-4xl short:text-3xl xs:text-6xl sm:text-7xl md:text-9xl font-neo-display font-black leading-none animate-in fade-in-0 duration-300',
                   displayAccent.text,
                   displayAccent.glow,
                 )}
@@ -205,12 +205,12 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
 
             {!isEliminated && (
               <m.div
-                initial={reducedMotion ? undefined : { opacity: 0, scale: 0, y: 10 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
+                initial={reducedMotion ? undefined : { scale: 0, y: 10 }}
+                animate={{ scale: 1, y: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 18, delay: 0.45 }}
                 className={cn(
                   displayAccent.bg,
-                  'text-black px-6 py-2 medium-short:px-4 medium-short:py-1 rounded-full border-3 border-neo-black shadow-hard-sm mt-2 sm:-mt-4 md:-mt-8 medium-short:mt-1 medium-short:sm:-mt-2 medium-short:md:-mt-4 relative z-20',
+                  'text-black px-6 py-2 medium-short:px-4 medium-short:py-1 rounded-full border-3 border-neo-black shadow-hard-sm mt-2 sm:-mt-4 md:-mt-8 medium-short:mt-1 medium-short:sm:-mt-2 medium-short:md:-mt-4 relative z-20 animate-in fade-in-0 duration-300',
                 )}
               >
                 <p className="text-xs medium-short:text-[10px] font-black uppercase tracking-[0.2em]">
@@ -222,9 +222,9 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
 
           {/* Pulsing Avatar — drops in from above */}
           <m.div
-            className="relative mb-8 medium-short:mb-4 short:mb-2"
-            initial={reducedMotion ? undefined : { opacity: 0, y: -30, scale: 0.8 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            className="relative mb-8 medium-short:mb-4 short:mb-2 animate-in fade-in-0 duration-300"
+            initial={reducedMotion ? undefined : { y: -30, scale: 0.8 }}
+            animate={{ y: 0, scale: 1 }}
             transition={{ type: 'spring', stiffness: 200, damping: 16, delay: 0.55 }}
           >
             {!reducedMotion && (
@@ -255,12 +255,12 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               />
             </div>
             <m.div
-              initial={reducedMotion ? undefined : { opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={reducedMotion ? undefined : { scale: 0.5 }}
+              animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.75 }}
               className={cn(
                 'absolute -bottom-2 left-1/2 -translate-x-1/2 max-w-[80vw]',
-                'bg-neo-navy border-2 px-5 py-1.5 rounded-full shadow-hard-sm',
+                'bg-neo-navy border-2 px-5 py-1.5 rounded-full shadow-hard-sm animate-in fade-in-0 duration-300',
                 displayAccent.border,
               )}
             >
@@ -277,9 +277,9 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
 
           {/* Score & gap — score counter starts after avatar lands */}
           <m.div
-            className="space-y-4 medium-short:space-y-2"
-            initial={reducedMotion ? undefined : { opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
+            className="space-y-4 medium-short:space-y-2 animate-in fade-in-0 duration-300"
+            initial={reducedMotion ? undefined : { y: 15 }}
+            animate={{ y: 0 }}
             transition={{ type: 'spring', stiffness: 150, damping: 20, delay: 0.85 }}
           >
             <div>
@@ -297,10 +297,10 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
                 />
               </span>
               <m.p
-                initial={reducedMotion ? undefined : { opacity: 0 }}
-                animate={{ opacity: 1 }}
+                initial={reducedMotion ? undefined : {}}
+                animate={{}}
                 transition={{ delay: 1.2 }}
-                className="text-[10px] font-bold text-white uppercase tracking-widest"
+                className="text-[10px] font-bold text-white uppercase tracking-widest animate-in fade-in-0 duration-300"
               >
                 {t('results.totalPoints')}
               </m.p>

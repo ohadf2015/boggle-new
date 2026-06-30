@@ -17,10 +17,10 @@ const container = {
   show: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
 };
 const row = {
-  hidden: { opacity: 0, y: 18, scale: 0.96 },
-  show: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring' as const, stiffness: 280, damping: 22 } },
+  hidden: { y: 18, scale: 0.96 },
+  show: { y: 0, scale: 1, transition: { type: 'spring' as const, stiffness: 280, damping: 22 } },
 };
-const reduced = { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.15 } } };
+const reduced = { hidden: {}, show: { transition: { duration: 0.15 } } };
 
 function StatChip({ icon, value, label, accent }: {
   icon: React.ReactNode; value: React.ReactNode; label: string; accent: string;
@@ -53,7 +53,7 @@ export default function BlastResultsScene({ playerStats, currentUsername }: Blas
 
   return (
     <m.div variants={container} initial="hidden" animate="show" className="space-y-3">
-      <m.div variants={v} className="flex items-center gap-2 px-1">
+      <m.div variants={v} className="flex items-center gap-2 px-1 animate-in fade-in-0 duration-300">
         <Bomb className="w-5 h-5 text-neo-lime" />
         <h3 className="text-sm font-black uppercase tracking-wider text-neo-white">
           {t('blast.results.sceneTitle')}
@@ -68,7 +68,7 @@ export default function BlastResultsScene({ playerStats, currentUsername }: Blas
         <m.div
           variants={v}
           data-testid="blast-result-me"
-          className="relative overflow-hidden p-4 rounded-neo border-3 border-neo-pink shadow-hard bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy shadow-[0_0_18px_rgba(255,20,147,0.4)]"
+          className="relative overflow-hidden p-4 rounded-neo border-3 border-neo-pink shadow-hard bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy shadow-[0_0_18px_rgba(255,20,147,0.4)] animate-in fade-in-0 duration-300"
         >
           {!prefersReduced && (
             <m.div

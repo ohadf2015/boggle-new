@@ -208,16 +208,16 @@ export default function ResultsPodium({
 
   return (
     <m.div
-      className="w-full"
-      initial={reducedMotion ? undefined : { opacity: 0 }}
-      animate={{ opacity: 1 }}
+      className="w-full animate-in fade-in-0 duration-300"
+      initial={reducedMotion ? undefined : {}}
+      animate={{}}
       transition={{ duration: 0.3 }}
     >
       {/* Section header */}
       <m.div
-        className="flex items-center justify-center gap-1.5 mb-4 medium-short:mb-2"
-        initial={reducedMotion ? undefined : { opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center justify-center gap-1.5 mb-4 medium-short:mb-2 animate-in fade-in-0 duration-300"
+        initial={reducedMotion ? undefined : { y: -8 }}
+        animate={{ y: 0 }}
         transition={{ delay: 0.05, duration: 0.3 }}
       >
         <Trophy className="w-3.5 h-3.5 text-white" />
@@ -254,9 +254,9 @@ export default function ResultsPodium({
           return (
             <m.div
               key={player.username}
-              className={cn('flex flex-col items-center', config.ptOffset)}
-              initial={reducedMotion ? undefined : { opacity: 0 }}
-              animate={{ opacity: 1 }}
+              className={cn('flex flex-col items-center animate-in fade-in-0 duration-300', config.ptOffset)}
+              initial={reducedMotion ? undefined : {}}
+              animate={{}}
               transition={{ delay: baseDelay, duration: 0.2 }}
             >
               {/* Emoji bubbles on this player */}
@@ -277,9 +277,9 @@ export default function ResultsPodium({
 
               {/* Avatar — bouncy drop-in */}
               <m.div
-                className="relative mb-3 medium-short:mb-1.5"
-                initial={reducedMotion ? undefined : { opacity: 0, y: -25, scale: 0.6 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
+                className="relative mb-3 medium-short:mb-1.5 animate-in fade-in-0 duration-300"
+                initial={reducedMotion ? undefined : { y: -25, scale: 0.6 }}
+                animate={{ y: 0, scale: 1 }}
                 transition={{
                   type: 'spring',
                   stiffness: 260,
@@ -344,9 +344,9 @@ export default function ResultsPodium({
 
               {/* Name, Score & Emoji button — fade up after avatar */}
               <m.div
-                className="text-center mb-3 min-w-0 px-1 relative"
-                initial={reducedMotion ? undefined : { opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
+                className="text-center mb-3 min-w-0 px-1 relative animate-in fade-in-0 duration-300"
+                initial={reducedMotion ? undefined : { y: 8 }}
+                animate={{ y: 0 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 20, delay: baseDelay + 0.2 }}
               >
                 <p
@@ -358,11 +358,11 @@ export default function ResultsPodium({
                   {displayName}
                 </p>
                 <m.p
-                  initial={reducedMotion ? undefined : { opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  initial={reducedMotion ? undefined : {}}
+                  animate={{}}
                   transition={{ delay: baseDelay + 0.35 }}
                   className={cn(
-                    'font-black mt-0.5',
+                    'font-black mt-0.5 animate-in fade-in-0 duration-300',
                     config.scoreSize,
                     config.textClass
                   )}

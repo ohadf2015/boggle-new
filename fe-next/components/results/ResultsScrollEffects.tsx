@@ -211,10 +211,10 @@ export const ResultsSectionReveal: React.FC<SectionRevealProps> = ({
   return (
     <m.div
       ref={ref}
-      className={className}
+      className={`${className} animate-in fade-in-0`}
       data-testid="results-section-reveal-motion"
-      initial={{ opacity: 0, y: 22, x: xFrom, rotate: rotateFrom }}
-      whileInView={{ opacity: 1, y: 0, x: 0, rotate: 0 }}
+      initial={{ y: 22, x: xFrom, rotate: rotateFrom }}
+      whileInView={{ y: 0, x: 0, rotate: 0 }}
       viewport={{ once: true, amount: 0.15, margin: '0px 0px -8% 0px' }}
       transition={{
         type: 'spring',

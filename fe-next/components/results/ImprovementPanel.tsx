@@ -48,10 +48,10 @@ const ImprovementPanel: React.FC<ImprovementPanelProps> = ({ xp, levelUp, streak
       data-testid="improvement-panel"
       data-component="improvement"
       aria-label={t('results.progress.aria')}
-      initial={reducedMotion ? undefined : { opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={reducedMotion ? undefined : { y: 12 }}
+      animate={{ y: 0 }}
       transition={{ duration: 0.36, ease: [0.16, 1, 0.3, 1] }}
-      className="flex flex-col gap-3 rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard p-3"
+      className="flex flex-col gap-3 rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard p-3 animate-in fade-in-0 duration-300"
     >
       <div className="flex items-center justify-between gap-2">
         <span className="font-neo-display font-bold uppercase tracking-wide text-sm text-neo-yellow">

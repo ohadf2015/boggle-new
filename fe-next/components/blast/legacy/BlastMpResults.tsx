@@ -52,10 +52,10 @@ const BlastMpResults = memo<BlastMpResultsProps>(({ results }) => {
     if (prefersReduced || !sceneRef.current) return;
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-      tl.from('[data-winner]', { scale: 0.6, opacity: 0, duration: 0.5, ease: 'back.out(1.6)' });
+      tl.from('[data-winner]', { scale: 0.6, duration: 0.5, ease: 'back.out(1.6)' });
       const rows = sceneRef.current?.querySelectorAll('[data-row]');
       if (rows && rows.length) {
-        tl.from(rows, { y: 16, opacity: 0, duration: 0.35, stagger: 0.07 }, '-=0.15');
+        tl.from(rows, { y: 16, duration: 0.35, stagger: 0.07 }, '-=0.15');
       }
     }, sceneRef);
     return () => ctx.revert();
