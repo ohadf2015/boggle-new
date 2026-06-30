@@ -109,6 +109,14 @@ describe('parseHebrewExtract', () => {
   it('skips a leading "see also" line', () => {
     expect(parseHebrewExtract(HE_SEE_ALSO)).toBe('יונק טורף מבוית מהמשפחה החתוליים.');
   });
+  it('strips a leading era/register tag (לשון המקרא / עברית חדשה / לשון חז"ל)', () => {
+    expect(parseHebrewExtract('== א ==\n\nלשון המקרא שחרורו של האדם משעבודיו.')).toBe('שחרורו של האדם משעבודיו.');
+    expect(parseHebrewExtract('== ב ==\n\nעברית חדשה מאכל קפוא מוקצף.')).toBe('מאכל קפוא מוקצף.');
+    expect(parseHebrewExtract('== ג ==\n\nלשון חז"ל טורף ממשפחת החתוליים.')).toBe('טורף ממשפחת החתוליים.');
+  });
+  it('leaves a definition that merely starts with a real word untouched', () => {
+    expect(parseHebrewExtract('== ד ==\n\nבעל חיים ממחלקת העופות.')).toBe('בעל חיים ממחלקת העופות.');
+  });
   it('returns null for empty / no-header input', () => {
     expect(parseHebrewExtract('')).toBeNull();
     expect(parseHebrewExtract('prose without header')).toBeNull();

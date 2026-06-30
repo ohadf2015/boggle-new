@@ -94,9 +94,13 @@ function section(lines: string[], match: (title: string) => boolean): string[] |
   return null;
 }
 
+// he.wiktionary prefixes glosses with an era/register tag (Biblical, Mishnaic, Modern…).
+// Strip a known leading tag so the card shows the definition, not the label.
+const HE_REGISTER_RE = /^(לשון המקרא|לשון חז["״']ל|לשון ימי[ ־]הביניים|לשון המשנה|לשון התלמוד|לשון ספרותית|לשון רבנית|לשון פיוטית|לשון נדירה|עברית חדשה|עברית מדוברת|עברית מודרנית|ארמית|סלנג)\s+/;
+
 /**
  * he.wiktionary plaintext extract: "[optional ראו גם …]\n== HEADWORD ==\n\n<definition>".
- * Take the first non-empty line after the first header.
+ * Take the first non-empty line after the first header; strip a leading register tag.
  */
 export function parseHebrewExtract(extract: string | null | undefined): string | null {
   if (!extract) return null;
@@ -104,7 +108,7 @@ export function parseHebrewExtract(extract: string | null | undefined): string |
   for (const line of extract.split('\n')) {
     const t = line.trim();
     if (header(t)) { afterHeader = true; continue; }
-    if (afterHeader && t) return cleanMeaning(t);
+    if (afterHeader && t) return cleanMeaning(t.replace(HE_REGISTER_RE, ''));
   }
   return null;
 }

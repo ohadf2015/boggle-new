@@ -14,6 +14,8 @@ import { fetchWiktionaryMeaning } from '@/lib/dictionary/wiktionaryMeaning';
 const DRY = process.argv.includes('--dry');
 const limitArg = process.argv.find((a) => a.startsWith('--limit='));
 const LIMIT = limitArg ? parseInt(limitArg.split('=')[1], 10) : Infinity;
+const langArg = process.argv.find((a) => a.startsWith('--lang='));
+const ONLY_LANG = langArg ? langArg.split('=')[1] : null;
 const DELAY_MS = 120; // polite to Wikimedia
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -39,7 +41,9 @@ async function main() {
     if (!data || data.length < PAGE) break;
   }
 
-  const rows = all.filter((r) => (r.override_word || r.target_word || '').trim());
+  const rows = all
+    .filter((r) => (r.override_word || r.target_word || '').trim())
+    .filter((r) => !ONLY_LANG || r.language === ONLY_LANG);
   console.log(`${DRY ? '[DRY] ' : ''}backfilling ${Math.min(rows.length, LIMIT)} / ${rows.length} upcoming served rows`);
 
   const stat: Record<string, { hit: number; miss: number; updated: number }> = {};
