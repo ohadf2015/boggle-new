@@ -50,3 +50,39 @@ export function normalizeClue(clue: string): string {
   const t = clue.replace(/\s+/g, ' ').trim();
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
+
+/**
+ * Turn a dictionary definition (e.g. a Wiktionary gloss) into a short crossword clue:
+ * clean → first clause/sentence → cap at CLUE_MAX on a word boundary (no ellipsis).
+ * Returns null if the result is empty, untrimmable to length, or circular (gives the
+ * answer away). Language-agnostic: tokenization uses \p{L} via isCircularClue.
+ */
+export function definitionToClue(def: string, answer: string): string | null {
+  if (!def) return null;
+  let s = cleanDefinition(def).replace(/…+$/, '').trim();
+  // first sentence (Latin "." / ";" and CJK "。" "；"), then drop a trailing "— extra" gloss
+  s = s.split(/(?<=[.;])\s|。|；/)[0].trim();
+  s = s.split(/\s[—–]\s/)[0].trim();
+  s = s.replace(/[.;,\s]+$/, '').trim(); // drop the sentence-end punctuation the split kept
+  if (s.length > CLUE_MAX) {
+    // prefer cutting at a clause (comma) boundary so we don't dangle mid-phrase
+    const parts = s.split(',');
+    let acc = '';
+    for (const p of parts) {
+      const next = acc ? `${acc},${p}` : p;
+      if (next.trim().length <= CLUE_MAX) acc = next; else break;
+    }
+    s = acc.trim();
+    if (s.length === 0 || s.length > CLUE_MAX) {
+      const cut = s.length ? s : parts[0]; // first clause still too long → hard word-boundary cut
+      const c = cut.slice(0, CLUE_MAX);
+      const sp = c.lastIndexOf(' ');
+      s = (sp > 20 ? c.slice(0, sp) : c).trim(); // CJK has no spaces → hard cut
+    }
+    s = s.replace(/[.;,\s]+$/, '').trim();
+  }
+  s = normalizeClue(s);
+  if (!clueLengthOk(s)) return null;
+  if (isCircularClue(s, answer)) return null;
+  return s;
+}

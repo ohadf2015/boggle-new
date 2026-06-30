@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { cleanDefinition, isCircularClue, clueLengthOk, normalizeClue } from './clueText';
+import { cleanDefinition, isCircularClue, clueLengthOk, normalizeClue, definitionToClue } from './clueText';
 
 describe('cleanDefinition', () => {
   it('strips the Datamuse POS prefix and parentheticals', () => {
@@ -56,5 +56,33 @@ describe('clueLengthOk', () => {
 describe('normalizeClue', () => {
   it('sentence-cases and trims', () => {
     expect(normalizeClue('  swift  ocean current ')).toBe('Swift ocean current');
+  });
+});
+
+describe('definitionToClue', () => {
+  it('takes the first sentence and trims a definition into a clue', () => {
+    expect(definitionToClue('A domestic species of feline animal. Often kept as a pet.', 'cat'))
+      .toBe('Domestic species of feline animal');
+  });
+  it('drops a trailing "— extra" gloss and an upstream ellipsis', () => {
+    expect(definitionToClue('Large stream that drains a land mass…', 'river'))
+      .toBe('Large stream that drains a land mass');
+    expect(definitionToClue('Elevation of land — a big hill', 'mountain')).toBe('Elevation of land');
+  });
+  it('caps an over-long definition on a word boundary (no ellipsis)', () => {
+    const clue = definitionToClue('A series of connected metal links used for fastening pulling lifting or securing heavy objects together', 'chain')!;
+    expect(clue.length).toBeLessThanOrEqual(64);
+    expect(clue.endsWith('…')).toBe(false);
+    expect(clue.startsWith('Series of connected metal links')).toBe(true);
+  });
+  it('rejects a circular clue (definition contains the answer or a derivative)', () => {
+    expect(definitionToClue('A house is a building for living', 'house')).toBeNull();
+    expect(definitionToClue('Houses where people live', 'house')).toBeNull();
+  });
+  it('works on native (non-Latin) glosses', () => {
+    expect(definitionToClue('פרי אדום ועסיסי ממשפחת הסולניים', 'עגבנייה')).toBe('פרי אדום ועסיסי ממשפחת הסולניים');
+  });
+  it('returns null for empty input', () => {
+    expect(definitionToClue('', 'x')).toBeNull();
   });
 });
