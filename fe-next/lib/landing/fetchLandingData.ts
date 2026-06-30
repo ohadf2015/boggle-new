@@ -20,6 +20,7 @@ import { createSupabasePublicClient } from '@/lib/supabaseServer';
 import type { TopPlayer } from '@/hooks/useTopPlayers';
 import { fetchGameModeStats, getCardOrder, type GameModeStats, type LandingGameMode } from './fetchGameModeStats';
 import { cachedWithTtl } from '@/lib/cache/ttlCache';
+import { SUPPORTED_GAME_LANGUAGES } from '@/lib/languageConfig';
 
 export interface LandingInitialData {
   topPlayers: TopPlayer[];
@@ -33,7 +34,9 @@ export interface LandingInitialData {
 }
 
 const TOP_PLAYERS_LIMIT = 5;
-const VALID_LANGUAGES = new Set(['en', 'he', 'sv', 'ja', 'es']);
+// Source of truth for shipped game languages — keep in lockstep so a newly
+// launched locale (e.g. `ru`) gets real landing data instead of the `en` fallback.
+const VALID_LANGUAGES = new Set<string>(SUPPORTED_GAME_LANGUAGES);
 
 /**
  * Landing data is identical for every visitor of a given language and is
