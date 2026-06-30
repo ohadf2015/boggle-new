@@ -34,7 +34,7 @@ export interface ValidateDeps {
   getCandidates: (language: string, count: number, exclude: Set<string>) => Promise<string[]>;
   blockBankWord: (language: string, wordUpper: string) => Promise<void>;
   /** GOOD served word (or human override): store meaning + stamp validated_at. */
-  saveMeaning: (language: string, date: string, meaning: string) => Promise<void>;
+  saveMeaning: (language: string, date: string, word: string, meaning: string) => Promise<void>;
   /** Replace served word: set override_word + meaning + validated_at, null the grid. */
   saveReplacement: (language: string, date: string, wordUpper: string, meaning: string) => Promise<void>;
   log?: (msg: string) => void;
@@ -111,7 +111,7 @@ export async function validateUpcomingWords(
       const humanOverride = !!row.overrideBy;
       if (verdict.ok || humanOverride) {
         // Keep the word. Respect human overrides even if the judge dislikes them.
-        await deps.saveMeaning(language, date, verdict.meaning || '');
+        await deps.saveMeaning(language, date, served, verdict.meaning || '');
         summary.meaningsFilled++;
         usedThisRun.add(servedUpper);
         continue;

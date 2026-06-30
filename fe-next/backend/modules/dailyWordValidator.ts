@@ -18,6 +18,7 @@ import { getWordsFromWordBank } from '@/lib/dailyChallenge/wordBankService';
 import { validateUpcomingWords, type ValidateDeps, type ValidateSummary } from '@/lib/dailyChallenge/validateUpcomingWords';
 import { processSuggestions, type SuggestionDeps, type SuggestionSummary } from '@/lib/dailyChallenge/processSuggestions';
 import { meaningForLanguage } from '@/lib/dailyChallenge/wordMeaningPolicy';
+import { fetchWiktionaryMeaning } from '@/lib/dictionary/wiktionaryMeaning';
 import { sendTelegramMessage, isTelegramConfigured, escapeTelegramMarkdownV2 } from '@/lib/telegram';
 import logger from '@/backend/utils/logger';
 import type { SupabaseClient } from '@supabase/supabase-js';
@@ -28,6 +29,17 @@ const WINDOW_DAYS = 8; // today + next 7
 
 function isoDate(d: Date): string {
   return d.toISOString().slice(0, 10);
+}
+
+/**
+ * Final meaning to persist: a native Wiktionary gloss wins (authoritative, and it
+ * BYPASSES the Hebrew suppression since dictionary Hebrew is good — unlike the LLM);
+ * otherwise fall back to the LLM meaning under the existing per-language policy.
+ */
+async function resolveMeaning(word: string, language: string, llmMeaning: string): Promise<string | null> {
+  const dict = await fetchWiktionaryMeaning(word, language); // cleaned; null on miss/error
+  if (dict) return dict;
+  return meaningForLanguage(language, llmMeaning);
 }
 
 function upcomingDates(from: Date, days: number): string[] {
@@ -76,11 +88,11 @@ function buildDeps(supabase: SupabaseClient): ValidateDeps {
         .ilike('word', wordUpper);
     },
 
-    saveMeaning: async (language, date, meaning) => {
+    saveMeaning: async (language, date, word, meaning) => {
       const now = new Date().toISOString(); // same stamp so updated_at <= validated_at → idempotent next run
       await supabase
         .from('daily_target_words')
-        .update({ meaning: meaningForLanguage(language, meaning), validated_at: now, updated_at: now })
+        .update({ meaning: await resolveMeaning(word, language, meaning), validated_at: now, updated_at: now })
         .eq('language', language)
         .eq('puzzle_date', date);
     },
@@ -95,7 +107,7 @@ function buildDeps(supabase: SupabaseClient): ValidateDeps {
           override_at: now,
           word_source: 'validator',
           ai_reason: 'Auto-replaced by daily-word quality validator',
-          meaning: meaningForLanguage(language, meaning),
+          meaning: await resolveMeaning(wordUpper, language, meaning),
           validated_at: now,
           grid: null, // force serve-time grid regeneration for the new word
           grid_generated_at: null,
@@ -169,7 +181,7 @@ function buildSuggestionDeps(supabase: SupabaseClient, from: Date): SuggestionDe
         .update({
           override_word: wordUpper, override_by: null, override_at: now,
           word_source: 'suggestion', ai_reason: 'Player-suggested word (auto-approved by quality judge)',
-          meaning: meaningForLanguage(language, meaning), validated_at: now, grid: null, grid_generated_at: null, updated_at: now,
+          meaning: await resolveMeaning(wordUpper, language, meaning), validated_at: now, grid: null, grid_generated_at: null, updated_at: now,
         })
         .eq('language', language)
         .eq('puzzle_date', date);

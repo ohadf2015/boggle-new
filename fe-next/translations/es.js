@@ -6647,6 +6647,7 @@ const es = {
       "scoreTierLegendary": "¡Magnífico!",
       "targetWord": "Palabra Objetivo",
       "meaning": "Significado",
+      "meaningSource": "De Wikcionario",
       "betterLuckNextTime": "¡La próxima te desquitas!",
       "nextChallengeIn": "Próximo desafío en",
       "rankOutOf": "#{rank} de {total} jugadores",

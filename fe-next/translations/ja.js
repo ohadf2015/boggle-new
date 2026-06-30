@@ -6753,6 +6753,7 @@ const ja = {
       "scoreTierLegendary": "圧巻！",
       "targetWord": "目標単語",
       "meaning": "意味",
+      "meaningSource": "ウィクショナリーより",
       "betterLuckNextTime": "次回は頑張って！",
       "nextChallengeIn": "次のチャレンジまで",
       "rankOutOf": "{total}人中{rank}位",

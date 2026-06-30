@@ -231,6 +231,7 @@ const ru = {
       "scoreTierLegendary": "Великолепно!",
       "targetWord": "Целевое слово",
       "meaning": "Значение",
+      "meaningSource": "Из Викисловаря",
       "betterLuckNextTime": "Удачи в следующий раз!",
       "nextChallengeIn": "Следующий вызов в",
       "rankOutOf": "#{rank} из {total} игроков",

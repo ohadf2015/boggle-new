@@ -6701,6 +6701,7 @@ const en = {
       "scoreTierLegendary": "Magnificent!",
       "targetWord": "Target Word",
       "meaning": "Meaning",
+      "meaningSource": "From Wiktionary",
       "betterLuckNextTime": "Better luck next time!",
       "nextChallengeIn": "Next challenge in",
       "rankOutOf": "#{rank} out of {total} players",

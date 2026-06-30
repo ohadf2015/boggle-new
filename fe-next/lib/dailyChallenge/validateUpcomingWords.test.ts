@@ -28,7 +28,7 @@ describe('validateUpcomingWords', () => {
   it('keeps a GOOD word and stores its meaning, no replacement', async () => {
     const deps = makeDeps({ loadRow: vi.fn().mockResolvedValue(row({ targetWord: 'גלידה' })), judge: vi.fn().mockResolvedValue(ok('קינוח קר')) });
     const s = await validateUpcomingWords(deps, opts);
-    expect(deps.saveMeaning).toHaveBeenCalledWith('he', '2026-07-01', 'קינוח קר');
+    expect(deps.saveMeaning).toHaveBeenCalledWith('he', '2026-07-01', 'גלידה', 'קינוח קר');
     expect(deps.saveReplacement).not.toHaveBeenCalled();
     expect(s.meaningsFilled).toBe(1);
     expect(s.replaced).toBe(0);

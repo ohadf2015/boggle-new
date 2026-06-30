@@ -6861,6 +6861,7 @@ const sv = {
       "scoreTierLegendary": "Magnifikt!",
       "targetWord": "Målordet",
       "meaning": "Betydelse",
+      "meaningSource": "Från Wiktionary",
       "betterLuckNextTime": "Bättre lycka nästa gång!",
       "nextChallengeIn": "Nästa utmaning om",
       "rankOutOf": "#{rank} av {total} spelare",

@@ -6802,6 +6802,7 @@ const he = {
       "scoreTierLegendary": "מרהיב!",
       "targetWord": "מילת היעד",
       "meaning": "פירוש",
+      "meaningSource": "מתוך ויקימילון",
       "betterLuckNextTime": "בהצלחה בפעם הבאה!",
       "nextChallengeIn": "האתגר הבא בעוד",
       "rankOutOf": "מקום #{rank} מתוך {total} שחקנים",
