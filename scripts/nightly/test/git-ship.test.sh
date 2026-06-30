@@ -405,6 +405,42 @@ assert "founder commit NOT published"             "! git show origin/master:fe-n
 assert "NOT stranded to recovery ref"             "! git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
 unset NIGHTLY_ISOLATED_SHIP
 
+echo "Scenario 20 — founder switches the shared tree to a feature branch MID-RUN → nightly still ships to master, founder branch untouched (the 2026-06-30 miss)"
+# The nightly runs for hours in the founder's LIVE working tree. Preflight validated
+# 'on master' at 01:00, but the founder checked out a feature branch before ship time.
+# OLD code did `git commit` on live HEAD → the nightly commit landed on the feature
+# branch (and `git rebase --autostash` rebased it, `git reset --hard` could reset it),
+# then `git push origin master` shipped NOTHING (local master ref was untouched at base).
+# git-ship must detect HEAD != master and ship the authored diff onto origin/master
+# WITHOUT committing/rebasing/resetting the founder's branch.
+setup
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+printf 'export const y = 2; // nightly authored\n' > fe-next/app/feature.tsx
+# build the authored allowlist run.sh would pass
+NIGHTLY_AUTHORED=$(mktemp); printf '%s\n' "docs/nightly/reports/2026-01-01.md" "fe-next/app/feature.tsx" > "$NIGHTLY_AUTHORED"
+git checkout -q -b feature/founder-wip    # founder switches the shared tree off master
+FEATURE_BEFORE=$(git rev-parse HEAD)
+NIGHTLY_PUSH_RETRY_SLEEP=0 ship_nightly_commit; rc=$?
+assert "returns 0 (shipped despite branch drift)"        "[ $rc -eq 0 ]"
+assert "lane work reached origin/master"                 "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'lane work'"
+assert "authored code reached origin/master"             "git show origin/master:fe-next/app/feature.tsx | grep -q 'nightly authored'"
+assert "feature branch NOT advanced (no nightly commit)"  "[ \"\$(git rev-parse HEAD)\" = \"$FEATURE_BEFORE\" ]"
+assert "HEAD still on the founder's feature branch"      "[ \"\$(git rev-parse --abbrev-ref HEAD)\" = 'feature/founder-wip' ]"
+assert "NOT stranded to recovery ref"                    "! git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
+unset NIGHTLY_AUTHORED
+
+echo "Scenario 21 — busy merge window (10 consecutive rejects) → retry budget wins, never strands (RC-1: the 5-attempt cap removed)"
+# The 2026-06-30 ship lost the push window 5× during a PR-merge burst and stranded to
+# refs/nightly-pending with NOTHING shipped. A pure non-fast-forward reject is contention,
+# not an error — the default retry budget must outlast a normal merge window.
+setup
+reject_first_n_pushes 10
+echo "lane work" > docs/nightly/reports/2026-01-01.md
+NIGHTLY_PUSH_RETRY_SLEEP=0 ship_nightly_commit; rc=$?    # DEFAULT retries (no override)
+assert "returns 0 (budget outlasts a 10-reject window)"  "[ $rc -eq 0 ]"
+assert "NOT stranded (5-attempt cap removed)"            "! git rev-parse refs/nightly-pending/2026-01-01 >/dev/null 2>&1"
+assert "lane work shipped"                               "git show origin/master:docs/nightly/reports/2026-01-01.md | grep -q 'lane work'"
+
 echo
 echo "──────────────────────────────────────────"
 echo "PASS=$PASS  FAIL=$FAIL"

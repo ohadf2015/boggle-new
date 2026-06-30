@@ -43,18 +43,23 @@ NIGHTLY_GENERATED_EXCLUDE=(
 # race lost BOTH of the old code's two push attempts to a fast concurrent pusher
 # (founder /commit-push landing the i18n commit mid-run), stranding the whole night
 # to refs/nightly-pending. This loops: push; on reject re-fetch + rebase --autostash
-# onto the NEW origin/master + push again, up to NIGHTLY_PUSH_RETRIES (default 5)
-# with a short NIGHTLY_PUSH_RETRY_SLEEP (default 3s) between. Re-fetching every
-# iteration means it wins as soon as it gets one clean window. Returns:
+# onto the NEW origin/master + push again. A pure non-fast-forward reject is CONTENTION,
+# not an error — so the loop keeps trying until it wins, bounded only by a wall-clock
+# budget NIGHTLY_PUSH_BUDGET_SECS (default 900s = 15min) AND an attempt backstop
+# NIGHTLY_PUSH_RETRIES (default 1000) so it can NEVER loop forever. The old default of 5
+# attempts stranded the 2026-06-30 night when a PR-merge burst outlasted 5×3s — far too
+# tight for a normal merge window. NIGHTLY_PUSH_RETRY_SLEEP (default 3s) between tries.
+# Returns:
 #   0  pushed
 #   2  rebase hit a REAL conflict (rebase left in progress; caller's docs-resolve /
 #      salvage handles it — same contract as the old inline rebase)
-#   1  retries exhausted on pure rejects with no conflict (caller salvages)
+#   1  budget/backstop exhausted on pure rejects with no conflict (caller salvages)
 _push_master_retrying() {
-  local retries="${NIGHTLY_PUSH_RETRIES:-5}" slp="${NIGHTLY_PUSH_RETRY_SLEEP:-3}" t=0
+  local retries="${NIGHTLY_PUSH_RETRIES:-1000}" slp="${NIGHTLY_PUSH_RETRY_SLEEP:-3}" t=0
+  local budget="${NIGHTLY_PUSH_BUDGET_SECS:-900}" start=$SECONDS
   if git push --no-verify origin master >> "$RUN_LOG" 2>&1; then return 0; fi
-  log "push rejected — fetch+rebase+retry loop (max $retries)"
-  while [ "$t" -lt "$retries" ]; do
+  log "push rejected — fetch+rebase+retry loop (budget ${budget}s, backstop $retries)"
+  while [ "$t" -lt "$retries" ] && [ "$((SECONDS - start))" -lt "$budget" ]; do
     t=$((t+1))
     git fetch origin master --quiet || { [ "$slp" -gt 0 ] && sleep "$slp"; continue; }
     # --autostash: the nightly runs on the founder's dirty WIP; plain rebase refuses
@@ -142,6 +147,57 @@ ship_nightly_commit() {
     NO_CHANGE_MODE=1
     rm -f "$MSG_FILE"
     return 0
+  fi
+
+  # ── Concurrent founder branch-switch guard (the 2026-06-30 strand) ───────────
+  # The nightly runs for HOURS in the founder's LIVE working tree. Preflight verified
+  # HEAD was on master at run-start, but the founder can `git checkout` a feature branch
+  # mid-run (the shared-tree concurrent-session hazard). If we `git commit` now, the
+  # nightly commit lands on the FOUNDER'S branch (and the rebase/reset path would mutate
+  # it), while `git push origin master` ships NOTHING — local master is untouched. That
+  # is exactly 2026-06-30: the night committed onto feature/russian-locale, rebased it,
+  # pushed nothing. So when HEAD is NOT master we NEVER commit/rebase/reset live HEAD:
+  # build the commit as a DANGLING object (commit-tree moves no ref) parented on
+  # origin/master, containing ONLY the staged authored files, then ship it via the
+  # worktree-isolated cherry-pick path (3-way-merges onto a fresh origin/master and still
+  # detects a genuine concurrent same-file conflict). Live HEAD stays byte-identical.
+  local _head_branch
+  _head_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  if [ "$_head_branch" != "master" ]; then
+    log "ship: HEAD on '$_head_branch' not master (founder switched the shared tree mid-run) — detached commit + isolated ship (founder branch untouched)"
+    git fetch origin master --quiet 2>>"$RUN_LOG" || true
+    local _om _staged _tmpidx _tree _p
+    _om=$(git rev-parse origin/master 2>/dev/null)
+    _staged=$(git diff --cached --name-only)
+    _tmpidx=$(mktemp -u -t nightly-idx.XXXXXX)
+    if [ -n "$_om" ] && GIT_INDEX_FILE="$_tmpidx" git read-tree "$_om" 2>>"$RUN_LOG"; then
+      while IFS= read -r _p; do
+        [ -z "$_p" ] && continue
+        if [ -e "$_p" ]; then GIT_INDEX_FILE="$_tmpidx" git add -- "$_p" 2>>"$RUN_LOG"
+        else GIT_INDEX_FILE="$_tmpidx" git rm -q --cached --ignore-unmatch -- "$_p" 2>>"$RUN_LOG"; fi
+      done <<< "$_staged"
+      _tree=$(GIT_INDEX_FILE="$_tmpidx" git write-tree 2>>"$RUN_LOG")
+      rm -f "$_tmpidx"
+      NEW_SHA=$(git commit-tree "$_tree" -p "$_om" -F "$MSG_FILE" 2>>"$RUN_LOG")
+      git reset -q 2>/dev/null || true   # unstage live index; founder's working files stay on disk (run.sh owns revert)
+      rm -f "$MSG_FILE"
+      if [ -z "$NEW_SHA" ]; then
+        log "ship: commit-tree failed on branch-drift path"
+        tg_alert "nightly $TODAY: HEAD on \`$_head_branch\` (not master) and detached commit-tree failed. NOTHING shipped. See \`$RUN_LOG\`."
+        return 1
+      fi
+      log "ship: built detached nightly commit $NEW_SHA (parent origin/master, founder branch '$_head_branch' untouched)"
+      if [ "${NO_PUSH:-0}" = "1" ]; then
+        git update-ref "refs/nightly-pending/$TODAY" "$NEW_SHA" 2>>"$RUN_LOG" || true
+        log "--no-push — detached commit saved to refs/nightly-pending/$TODAY for inspection"
+        echo -e "\n**Outcome:** built \`$NEW_SHA\` (HEAD off-master; saved to refs/nightly-pending, not pushed)." >> "$REPORT"
+        return 0
+      fi
+      _ship_isolated "$NEW_SHA"
+      return $?
+    fi
+    rm -f "$_tmpidx"
+    log "ship: branch-drift detached build unavailable (no origin/master) — falling through to legacy commit"
   fi
 
   git commit -F "$MSG_FILE" >> "$RUN_LOG" 2>&1 || {
@@ -320,7 +376,8 @@ _ship_isolated() {
     # pick) then pushes, so a concurrent pusher winning one window doesn't strand the
     # night. A cherry-pick CONFLICT (origin touched a nightly file) is genuine → strand
     # immediately, no retry. A push REJECT is transient → retry on a fresh origin.
-    local retries="${NIGHTLY_PUSH_RETRIES:-5}" slp="${NIGHTLY_PUSH_RETRY_SLEEP:-3}" t=0
+    local retries="${NIGHTLY_PUSH_RETRIES:-1000}" slp="${NIGHTLY_PUSH_RETRY_SLEEP:-3}" t=0
+    local budget="${NIGHTLY_PUSH_BUDGET_SECS:-900}" start=$SECONDS
     while : ; do
       git -C "$wt" fetch origin master --quiet 2>>"$RUN_LOG" || true
       git -C "$wt" reset --hard origin/master >>"$RUN_LOG" 2>&1 || true   # wipes any prior attempt's cherry-pick
@@ -332,7 +389,10 @@ _ship_isolated() {
       if git -C "$wt" push --no-verify origin HEAD:master >>"$RUN_LOG" 2>&1; then
         ok=1; NEW_SHA=$(git -C "$wt" rev-parse HEAD); break
       fi
-      t=$((t+1)); [ "$t" -ge "$retries" ] && break
+      # Pure push REJECT (origin advanced) is contention, not error — retry until a
+      # clean window, bounded by the same wall-clock budget + attempt backstop as
+      # _push_master_retrying so a busy merge window never strands the night.
+      t=$((t+1)); { [ "$t" -ge "$retries" ] || [ "$((SECONDS - start))" -ge "$budget" ]; } && break
       log "isolated push attempt $t lost the window — retrying"
       [ "$slp" -gt 0 ] && sleep "$slp"
     done
