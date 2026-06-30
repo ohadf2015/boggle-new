@@ -8,6 +8,7 @@ import {
   hebrewLetters,
   swedishLetters,
   spanishLetters,
+  russianLetterPool,
   japaneseLetters,
   kanjiCompounds,
   DIFFICULTIES,
@@ -81,10 +82,16 @@ export function generateDailyGrid(
     letters = swedishLetters;
   } else if (language === 'es') {
     letters = spanishLetters;
+  } else if (language === 'ru') {
+    letters = russianLetterPool;
   } else if (language === 'ja') {
     return generateSeededJapaneseGrid(random, rows, cols);
-  } else {
+  } else if (language === 'he') {
     letters = hebrewLetters;
+  } else {
+    // Unknown language must not silently become a Hebrew board (Russian leaked
+    // Hebrew tiles before the 'ru' branch existed). Default to English.
+    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   }
 
   const lettersArray = typeof letters === 'string' ? letters.split('') : letters;
@@ -231,10 +238,15 @@ export function generateDailyPuzzle(
     letters = swedishLetters;
   } else if (language === 'es') {
     letters = spanishLetters;
+  } else if (language === 'ru') {
+    letters = russianLetterPool;
   } else if (language === 'ja') {
     return generateJapaneseDailyPuzzle(dateString, language, random, rows, cols, preSelectedWord);
-  } else {
+  } else if (language === 'he') {
     letters = hebrewLetters;
+  } else {
+    // Unknown language must not silently become a Hebrew board. Default English.
+    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   }
 
   // Select target word

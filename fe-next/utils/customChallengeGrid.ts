@@ -9,6 +9,7 @@ import {
   hebrewLetters,
   swedishLetters,
   spanishLetters,
+  russianLetterPool,
   japaneseLetters,
 } from './consts';
 import type { Language, LetterGrid } from '@/types';
@@ -216,11 +217,16 @@ export function generateCustomChallengeGrid(
     letters = swedishLetters;
   } else if (language === 'es') {
     letters = spanishLetters;
+  } else if (language === 'ru') {
+    letters = russianLetterPool;
   } else if (language === 'ja') {
     // Japanese uses different embedding strategy
     return embedJapaneseWord(targetWord, rows, cols);
-  } else {
+  } else if (language === 'he') {
     letters = hebrewLetters;
+  } else {
+    // Unknown language must not silently become a Hebrew board. Default English.
+    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
   }
 
   // Normalize Hebrew final letters to regular letters for grid display
