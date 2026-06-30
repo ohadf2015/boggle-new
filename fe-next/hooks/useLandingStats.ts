@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLiveRoomStats } from './useLiveRoomStats';
 import { supabase } from '@/lib/supabase';
+import { SUPPORTED_GAME_LANGUAGES } from '@/lib/languageConfig';
 
 interface UseLandingStatsOptions {
   /** Pre-fetched server value — skips client fetch */
@@ -41,7 +42,9 @@ export function useLandingStats(options: UseLandingStatsOptions = {}) {
     activePlayers,
     gamesToday,
     gameModes: 4,   // static: Solo, Multiplayer, Daily Challenge, Adventure
-    languages: 5,   // static: en, he, sv, ja, es
+    // Derive from the single source of truth so the count never drifts when a
+    // language ships (it silently read "5" after Russian was added).
+    languages: SUPPORTED_GAME_LANGUAGES.length,
     loading: isLoading,
   };
 }
