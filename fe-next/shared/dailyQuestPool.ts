@@ -104,14 +104,20 @@ const q = (
 });
 
 export const DAILY_QUEST_POOL: DailyQuest[] = [
-  // SKILL — achieve something inside the gameplay
-  q('long_word_6', 'longWord', 6, 'skill', '/daily', '📏'),
-  q('long_word_7', 'longWord', 7, 'skill', '/daily', '🔠'),
-  q('score_300', 'score', 300, 'skill', '/daily', '🎯'),
-  q('score_500', 'score', 500, 'skill', '/daily', '🚀'),
-  q('words_15', 'wordsInGame', 15, 'skill', '/daily', '⚡'),
-  q('combo_4', 'combo', 4, 'skill', '/singleplayer', '🔥'),
-  q('combo_6', 'combo', 6, 'skill', '/singleplayer', '💥'),
+  // SKILL — achieve something inside the gameplay. All steer to /multiplayer:
+  // the classic socket seam (gameResults.ts) is the ONLY game-end that credits
+  // every skill metric (score, longest word, words found, peak combo), and it
+  // works solo-vs-bots (skill quests don't require a real opponent). Word Hunt
+  // (/daily) emits no score/combo and can't guarantee a 7-letter target or 15
+  // words; single-player never reaches a seam at all — so steering skill quests
+  // there left them silently uncompletable.
+  q('long_word_6', 'longWord', 6, 'skill', '/multiplayer', '📏'),
+  q('long_word_7', 'longWord', 7, 'skill', '/multiplayer', '🔠'),
+  q('score_300', 'score', 300, 'skill', '/multiplayer', '🎯'),
+  q('score_500', 'score', 500, 'skill', '/multiplayer', '🚀'),
+  q('words_15', 'wordsInGame', 15, 'skill', '/multiplayer', '⚡'),
+  q('combo_4', 'combo', 4, 'skill', '/multiplayer', '🔥'),
+  q('combo_6', 'combo', 6, 'skill', '/multiplayer', '💥'),
   // PVP — same-language is guaranteed by matchmaking; beating a human is rare/brag-worthy
   q('mp_win', 'mpWin', 1, 'pvp', '/multiplayer', '👑'),
   q('beat_human', 'beatHuman', 1, 'pvp', '/multiplayer', '⚔️'),

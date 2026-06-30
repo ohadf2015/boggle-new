@@ -7,6 +7,7 @@ import {
   QUEST_PUBLIC_MODES,
   type DailyQuest,
   type QuestGameResult,
+  type QuestConditionType,
 } from '../dailyQuestPool';
 
 const DATES = Array.from({ length: 60 }, (_, day) =>
@@ -75,6 +76,49 @@ describe('getDailyQuests', () => {
   it('produces variety across 20 consecutive dates', () => {
     const seen = new Set(DATES.slice(0, 20).map(d => getDailyQuests(d).map(q => q.id).join(',')));
     expect(seen.size).toBeGreaterThan(1);
+  });
+});
+
+describe('quest achievability — href must route to a seam that credits its condition', () => {
+  // What each game-end seam (keyed by the route that reaches it) can actually
+  // credit. A quest is only achievable via its href if that route's seam
+  // populates the field its condition checks.
+  //   /multiplayer  → classic socket seam: every skill metric + pvp
+  //   /brain        → brain seam: score, wordsFound
+  //   /daily        → word-hunt seam: longestWordLength + wordsFound, BUT the
+  //                   daily grid guarantees neither a 7-letter target nor 15
+  //                   words, so longWord/wordsInGame are NOT reliably creditable
+  //                   there; only the word-hunt playMode quest is guaranteed.
+  //   /singleplayer → never reaches a seam, no comboLevel → credits nothing.
+  const SEAM_CREDITS: Record<string, Set<QuestConditionType>> = {
+    '/multiplayer': new Set<QuestConditionType>([
+      'longWord', 'score', 'wordsInGame', 'combo', 'mpWin', 'beatHuman', 'playMode',
+    ]),
+    '/brain': new Set<QuestConditionType>(['score', 'wordsInGame', 'playMode']),
+    '/daily': new Set<QuestConditionType>(['playMode']),
+    '/singleplayer': new Set<QuestConditionType>([]),
+  };
+
+  it('every quest is completable via the route it steers players to', () => {
+    for (const quest of DAILY_QUEST_POOL) {
+      const credits = SEAM_CREDITS[quest.href];
+      expect(credits, `unknown href ${quest.href} for ${quest.id}`).toBeDefined();
+      expect(
+        credits.has(quest.type),
+        `${quest.id} (${quest.type}) steers to ${quest.href}, whose seam cannot credit it`,
+      ).toBe(true);
+    }
+  });
+
+  it('playMode quests steer to the route for their specific mode', () => {
+    const MODE_ROUTE: Record<string, string> = {
+      multiplayer: '/multiplayer',
+      brain: '/brain',
+      'word-hunt': '/daily',
+    };
+    for (const quest of DAILY_QUEST_POOL.filter(q => q.type === 'playMode')) {
+      expect(quest.href).toBe(MODE_ROUTE[quest.mode as string]);
+    }
   });
 });
 

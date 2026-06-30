@@ -16,6 +16,7 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { supabase } from '@/lib/supabase';
@@ -115,7 +116,9 @@ export function useDailyMissions(): UseDailyMissionsReturn {
   const { t } = useLanguage();
   const { playQuestCompleteSound } = useSoundEffects();
   const playerId = user?.id ?? null;
+  const pathname = usePathname();
   const isMounted = useRef(true);
+  const didMountRef = useRef(false);
 
   const [missions, setMissions] = useState<Mission[]>(buildMissions(null));
   const [grandSlamClaimed, setGrandSlamClaimed] = useState(false);
@@ -213,6 +216,24 @@ export function useDailyMissions(): UseDailyMissionsReturn {
       document.removeEventListener('visibilitychange', handleVisibility);
     };
   }, [fetchMissions]);
+
+  // Refetch on in-app navigation. The hook lives in the persistent bottom nav,
+  // so without this it never re-reads the row mid-session — a quest completed
+  // during a game (server-side, fire-and-forget) would only toast on tab
+  // refocus or a fresh QuestHub mount. Skip the initial mount (the effect above
+  // already fetched). One short delayed retry covers the completion write
+  // landing just after the route change.
+  useEffect(() => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
+    fetchMissions();
+    const retry = setTimeout(() => {
+      if (isMounted.current) fetchMissions();
+    }, 2500);
+    return () => clearTimeout(retry);
+  }, [pathname, fetchMissions]);
 
   const completedCount = missions.filter(m => m.completed).length;
   const isGrandSlam = completedCount === missions.length && missions.length > 0;

@@ -24,6 +24,12 @@ vi.mock('@/lib/supabase', () => ({
   },
 }));
 
+// Controllable pathname so we can simulate in-app navigation after a game.
+const { pathnameRef } = vi.hoisted(() => ({ pathnameRef: { current: '/multiplayer' } }));
+vi.mock('next/navigation', () => ({
+  usePathname: () => pathnameRef.current,
+}));
+
 vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'user-123' } }),
 }));
@@ -103,6 +109,7 @@ import { GRAND_SLAM_BONUS } from '@/utils/coinManager';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  pathnameRef.current = '/multiplayer';
   global.fetch = vi.fn().mockResolvedValue({
     ok: true,
     json: async () => ({ newlyCelebrated: true }),
@@ -281,6 +288,38 @@ describe('useDailyMissions', () => {
 
     // Should not celebrate a mission that was already celebrated server-side.
     expect(showQuestCompletionToast).not.toHaveBeenCalled();
+  });
+
+  it('refetches and toasts after in-app navigation (post-game route change)', async () => {
+    // Reproduces the real flow: a classic game completes a skill quest
+    // server-side (fire-and-forget), the player navigates back in-app WITHOUT
+    // backgrounding the tab. The persistent hook must refetch on route change
+    // and fire the toast — otherwise it never re-reads the row this session.
+    mockSingle
+      .mockResolvedValueOnce({ data: EMPTY_DATA, error: null })
+      .mockResolvedValue({
+        data: { ...EMPTY_DATA, word_hunt_completed: true },
+        error: null,
+      });
+
+    const { rerender } = renderHook(() => useDailyMissions());
+
+    await waitFor(() => {
+      expect(showQuestCompletionToast).not.toHaveBeenCalled();
+    });
+
+    // Player leaves the game route → returns to a hub route.
+    pathnameRef.current = '/';
+    rerender();
+
+    await waitFor(() => {
+      expect(showQuestCompletionToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          questName: 'quests.daily.long_word_6.title',
+          xpReward: 100,
+        }),
+      );
+    });
   });
 
   it('fires per-quest toast when a mission transitions false → true after refetch', async () => {
