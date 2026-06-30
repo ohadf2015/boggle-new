@@ -1,5 +1,19 @@
 // EN translations
 const en = {
+  "report": {
+    "title": "Report",
+    "reason": "What's the problem?",
+    "reasons": {
+      "harassment": "Harassment or bullying",
+      "spam": "Spam or scam",
+      "inappropriate": "Inappropriate content",
+      "other": "Something else"
+    },
+    "detailsOptional": "Add details (optional)",
+    "submit": "Submit report",
+    "success": "Thanks — our team will review this.",
+    "error": "Couldn't submit report. Please try again."
+  },
   "mpCrossPromo": {
     "heading": "Play live with others",
     "wheelRushTitle": "Word Wheel · Live",

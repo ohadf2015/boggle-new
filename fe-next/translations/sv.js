@@ -1,5 +1,19 @@
 // Sv translations
 const sv = {
+  "report": {
+    "title": "Rapportera",
+    "reason": "Vad är problemet?",
+    "reasons": {
+      "harassment": "Trakasserier eller mobbning",
+      "spam": "Skräppost eller bluff",
+      "inappropriate": "Olämpligt innehåll",
+      "other": "Något annat"
+    },
+    "detailsOptional": "Lägg till detaljer (valfritt)",
+    "submit": "Skicka rapport",
+    "success": "Tack — vårt team granskar detta.",
+    "error": "Det gick inte att skicka rapporten. Försök igen."
+  },
   "mpCrossPromo": {
     "heading": "Spela live med andra",
     "wheelRushTitle": "Ordhjul · Live",

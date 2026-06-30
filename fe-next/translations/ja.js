@@ -1,5 +1,19 @@
 // Ja translations
 const ja = {
+  "report": {
+    "title": "報告",
+    "reason": "問題の内容は？",
+    "reasons": {
+      "harassment": "嫌がらせ・いじめ",
+      "spam": "スパム・詐欺",
+      "inappropriate": "不適切なコンテンツ",
+      "other": "その他"
+    },
+    "detailsOptional": "詳細を追加（任意）",
+    "submit": "報告を送信",
+    "success": "ありがとうございます。チームが確認します。",
+    "error": "報告を送信できませんでした。もう一度お試しください。"
+  },
   "mpCrossPromo": {
     "heading": "みんなとライブで対戦",
     "wheelRushTitle": "ワードホイール · ライブ",

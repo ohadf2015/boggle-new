@@ -1,5 +1,19 @@
 // Es translations
 const es = {
+  "report": {
+    "title": "Reportar",
+    "reason": "¿Cuál es el problema?",
+    "reasons": {
+      "harassment": "Acoso o intimidación",
+      "spam": "Spam o estafa",
+      "inappropriate": "Contenido inapropiado",
+      "other": "Otra cosa"
+    },
+    "detailsOptional": "Agrega detalles (opcional)",
+    "submit": "Enviar reporte",
+    "success": "Gracias, nuestro equipo lo revisará.",
+    "error": "No se pudo enviar el reporte. Inténtalo de nuevo."
+  },
   "mpCrossPromo": {
     "heading": "Juega en vivo con otros",
     "wheelRushTitle": "Rueda de Palabras · En vivo",

@@ -1,5 +1,19 @@
 // HE translations
 const he = {
+  "report": {
+    "title": "דיווח",
+    "reason": "מה הבעיה?",
+    "reasons": {
+      "harassment": "הטרדה או בריונות",
+      "spam": "ספאם או הונאה",
+      "inappropriate": "תוכן לא הולם",
+      "other": "משהו אחר"
+    },
+    "detailsOptional": "הוסיפו פרטים (לא חובה)",
+    "submit": "שליחת דיווח",
+    "success": "תודה — הצוות שלנו יבדוק את זה.",
+    "error": "לא ניתן לשלוח את הדיווח. נסו שוב."
+  },
   "mpCrossPromo": {
     "heading": "שחקו בשידור חי עם אחרים",
     "wheelRushTitle": "מרוץ הגלגל · לייב",
