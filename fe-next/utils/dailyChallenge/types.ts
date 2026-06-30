@@ -21,6 +21,7 @@ export interface DailyPuzzle {
   puzzleDate: string;
   language: Language;
   puzzleNumber: number;
+  meaning?: string | null;
 }
 
 /**
@@ -63,6 +64,7 @@ export interface WordHuntResult {
   solved: boolean;                // Did player find the target word?
   attemptsUsed: number;          // 1-10 attempts
   targetWord: string;            // The word they were hunting for
+  meaning?: string | null;        // Short definition of the target word
 
   // Attempt history
   attempts: Array<{

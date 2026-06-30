@@ -6627,6 +6627,16 @@ const sv = {
     "pointsPerWord": "Poäng per ord"
   },
   "wordHunt": {
+    "suggest": {
+      "title": "Föreslå morgondagens ord",
+      "placeholder": "Ditt ord (5–7 bokstäver)",
+      "button": "Föreslå",
+      "success": "Tack! Vi granskar ditt ord.",
+      "duplicate": "Redan föreslaget — tack!",
+      "tooMany": "Du har redan väntande förslag.",
+      "error": "Kunde inte skicka. Prova ett annat ord.",
+      "invalid": "Ange ett riktigt ord på 5–7 bokstäver."
+    },
     "play": "Spela Ordjakt",
     "categoryHint": "Kategori: {{category}}",
     "dangerAlert": "Fara! Lågt på liv!",
@@ -6849,6 +6859,7 @@ const sv = {
       "scoreTierStellar": "Lysande!",
       "scoreTierLegendary": "Magnifikt!",
       "targetWord": "Målordet",
+      "meaning": "Betydelse",
       "betterLuckNextTime": "Bättre lycka nästa gång!",
       "nextChallengeIn": "Nästa utmaning om",
       "rankOutOf": "#{rank} av {total} spelare",

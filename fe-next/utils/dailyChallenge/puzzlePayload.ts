@@ -3,6 +3,7 @@ import type { LetterGrid } from '../../types';
 export interface UsableDailyPuzzle {
   grid: LetterGrid;
   targetWord: string;
+  meaning?: string | null;
 }
 
 /**

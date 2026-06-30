@@ -33,6 +33,7 @@ import {
   isValidDateFormat,
   isValidLanguage,
 } from './dailyChallenge/utils';
+import { validateSuggestionInput } from './dailyChallenge/suggestionValidation';
 
 const router: Router = express.Router();
 
@@ -75,6 +76,7 @@ router.get('/puzzle/:date/:language', async (req: Request<LeaderboardParams>, re
         puzzleDate: puzzle.puzzleDate,
         puzzleNumber: puzzle.puzzleNumber,
         language: puzzle.language,
+        meaning: puzzle.meaning ?? null,
       };
 
       // Never cache an empty puzzle — regenerate synchronously as a last resort
@@ -87,6 +89,7 @@ router.get('/puzzle/:date/:language', async (req: Request<LeaderboardParams>, re
           puzzleDate: fallback.puzzleDate,
           puzzleNumber: fallback.puzzleNumber,
           language: fallback.language,
+          meaning: null,
         };
         if (isUsableDailyPuzzle(fallbackPayload)) {
           await cacheDailyPuzzle(date, language, fallbackPayload);
@@ -111,7 +114,8 @@ router.get('/puzzle/:date/:language', async (req: Request<LeaderboardParams>, re
         targetWord: puzzle.targetWord,
         puzzleDate: puzzle.puzzleDate,
         puzzleNumber: puzzle.puzzleNumber,
-        language: puzzle.language
+        language: puzzle.language,
+        meaning: null,
       });
     } catch (fallbackError) {
       res.status(500).json({ error: 'Failed to generate puzzle' });
@@ -492,6 +496,67 @@ router.get('/stats/:date/:language', async (req: Request<LeaderboardParams>, res
     const err = error as Error;
     logger.error('API', `Daily stats error: ${err.message}`);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * POST /api/daily-challenge/suggest-word
+ * Player suggests a future daily word. Stored pending; the nightly validator
+ * judges it and, if good, places it on an upcoming day.
+ */
+router.post('/suggest-word', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { language, word, playerId, guestFingerprint } = (req.body ?? {}) as {
+      language?: string; word?: string; playerId?: string; guestFingerprint?: string;
+    };
+    const validation = validateSuggestionInput(language, word);
+    if (!validation.ok) {
+      res.status(400).json({ error: validation.error });
+      return;
+    }
+    const wordUpper = validation.word as string;
+
+    const supabase = getSupabase();
+    if (!supabase) {
+      res.status(503).json({ error: 'unavailable' });
+      return;
+    }
+
+    // Light anti-spam: cap pending suggestions per authenticated submitter.
+    if (playerId) {
+      const { count } = await supabase
+        .from('daily_word_suggestions')
+        .select('id', { count: 'exact', head: true })
+        .eq('suggested_by', playerId)
+        .eq('status', 'pending');
+      if ((count ?? 0) >= 5) {
+        res.status(429).json({ error: 'too_many', message: 'You already have pending suggestions' });
+        return;
+      }
+    }
+
+    const { error } = await supabase.from('daily_word_suggestions').insert({
+      language,
+      word: wordUpper,
+      suggested_by: playerId ?? null,
+      guest_fingerprint: guestFingerprint ?? null,
+    });
+
+    if (error) {
+      // unique_violation on the pending (language, upper(word)) index → already queued
+      if ((error as { code?: string }).code === '23505') {
+        res.json({ ok: true, status: 'pending', duplicate: true });
+        return;
+      }
+      logger.error('DAILY', 'suggest-word insert failed', error);
+      res.status(500).json({ error: 'insert_failed' });
+      return;
+    }
+
+    res.json({ ok: true, status: 'pending' });
+  } catch (e) {
+    logger.error('DAILY', 'suggest-word error', e);
+    res.status(500).json({ error: 'error' });
   }
 });
 

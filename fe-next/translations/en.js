@@ -6471,6 +6471,16 @@ const en = {
     "pointsPerWord": "Points per word"
   },
   "wordHunt": {
+    "suggest": {
+      "title": "Suggest tomorrow's word",
+      "placeholder": "Your word (5–7 letters)",
+      "button": "Suggest",
+      "success": "Thanks! We'll review your word.",
+      "duplicate": "Already suggested — thanks!",
+      "tooMany": "You already have pending suggestions.",
+      "error": "Couldn't submit. Try another word.",
+      "invalid": "Use a real 5–7 letter word."
+    },
     "title": "Word Hunt",
     "play": "Play Word Hunt",
     "categoryHint": "Category: {{category}}",
@@ -6690,6 +6700,7 @@ const en = {
       "scoreTierStellar": "Brilliant!",
       "scoreTierLegendary": "Magnificent!",
       "targetWord": "Target Word",
+      "meaning": "Meaning",
       "betterLuckNextTime": "Better luck next time!",
       "nextChallengeIn": "Next challenge in",
       "rankOutOf": "#{rank} out of {total} players",

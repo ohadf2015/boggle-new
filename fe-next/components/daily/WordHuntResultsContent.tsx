@@ -11,13 +11,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { m } from 'framer-motion';
-import { Eye, CircleDot, ArrowRight, CheckCircle2, Home } from 'lucide-react';
+import { Eye, CircleDot, ArrowRight, CheckCircle2, Home, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyInsightStack from './DailyInsightStack';
 import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
 import CatchUpSuggestion from './CatchUpSuggestion';
+import { SuggestWordCard } from './SuggestWordCard';
 import MpModeCrossPromo from './MpModeCrossPromo';
 import WatchAdButton from './WatchAdButton';
 import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
@@ -284,6 +285,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       lifeRemaining={result.lifeRemaining || 0}
       wordsDiscovered={result.wordsDiscovered?.length || 0}
       currentUserId={profile?.id}
+      meaning={result.meaning}
       t={t}
     />
 
@@ -401,11 +403,24 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       <div className="space-y-3">
         {/* Reveal target word */}
         {coinActions.targetWordRevealed ? (
-          <div className="py-3 px-4 bg-neo-navy-light/50 rounded-neo border-2 border-slate-700/50 text-center">
-            <div className="text-xs text-slate-400 mb-1">{t('wordHunt.results.theTargetWordWas')}</div>
+          <div className="py-3 px-4 bg-neo-navy-light/50 rounded-neo border-2 border-slate-700/50 text-center space-y-2">
+            <div className="text-xs text-slate-400">{t('wordHunt.results.theTargetWordWas')}</div>
             <div className="text-2xl font-black text-neo-lime tracking-wider">
               {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
             </div>
+            {result.meaning && (
+              <div className="mt-2 flex items-start gap-2.5 rounded-neo border-neo-thick border-black bg-neo-cyan/15 px-3 py-2.5 shadow-hard text-start">
+                <BookOpen className="w-4 h-4 text-neo-cyan shrink-0 mt-0.5" aria-hidden="true" />
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-neo-cyan">
+                    {t('wordHunt.results.meaning')}
+                  </span>
+                  <span className="text-sm font-bold text-neo-cream leading-snug">
+                    {result.meaning}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
           <div className="max-w-btn space-y-2">
@@ -575,6 +590,9 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         <DailyWordHuntFacts result={result} stats={stats} t={t} />
       </m.div>
     )}
+
+    {/* Suggest tomorrow's word — community contribution */}
+    <SuggestWordCard language={language} playerId={profile?.id} guestFingerprint={guestFingerprint} />
 
     {/* Create Your Own Board + Language Options — visible, not collapsed */}
     <MoreOptionsAccordion

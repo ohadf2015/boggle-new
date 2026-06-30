@@ -6520,6 +6520,16 @@ const ja = {
     "pointsPerWord": "単語あたりのポイント"
   },
   "wordHunt": {
+    "suggest": {
+      "title": "明日の単語を提案",
+      "placeholder": "あなたの単語（2〜4文字）",
+      "button": "提案する",
+      "success": "ありがとう！確認します。",
+      "duplicate": "すでに提案されています — ありがとう！",
+      "tooMany": "保留中の提案がすでにあります。",
+      "error": "送信できませんでした。別の単語をお試しください。",
+      "invalid": "実在する2〜4文字の単語を入力してください。"
+    },
     "title": "ワードハント",
     "dangerAlert": "危険！ライフが残り少ない！",
     "eliminatedAlert": "脱落しました！",
@@ -6742,6 +6752,7 @@ const ja = {
       "scoreTierStellar": "見事！",
       "scoreTierLegendary": "圧巻！",
       "targetWord": "目標単語",
+      "meaning": "意味",
       "betterLuckNextTime": "次回は頑張って！",
       "nextChallengeIn": "次のチャレンジまで",
       "rankOutOf": "{total}人中{rank}位",

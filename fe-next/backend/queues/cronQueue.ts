@@ -130,6 +130,15 @@ export async function registerAllCronJobs(): Promise<void> {
     });
   });
 
+  // Quality-gate the upcoming week of daily words (30 min after the selector):
+  // rejects proper nouns / loanwords / niche / inflected fragments, replaces them
+  // with vetted bank words, and stores a short meaning for the results page.
+  await registerCronJob('validate-upcoming-daily-words', '30 1 * * *', async () => {
+    const { runUpcomingWordValidation } = await import('../modules/dailyWordValidator');
+    const summary = await runUpcomingWordValidation();
+    logger.info('BULLMQ', 'Daily-word validation complete', summary ?? { skipped: 'no-client' });
+  });
+
   await registerCronJob('bot-difficulty', '0 3 * * 0', async () => {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

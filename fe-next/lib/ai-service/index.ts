@@ -40,6 +40,7 @@ import {
   generateThemedBoard,
   generateBulkWords,
 } from './generation';
+import { judgeDailyWord, type DailyWordVerdict } from './dailyWordJudge';
 
 import logger from '@/backend/utils/logger';
 
@@ -341,6 +342,23 @@ class GameAIService {
       this.withTimeout.bind(this),
       this.tokenUsage
     );
+  }
+
+  // ===========================================================================
+  // Daily Word Quality Judge
+  // ===========================================================================
+
+  /**
+   * Strict verdict on whether a word is a good daily-puzzle answer (rejects
+   * proper nouns, loanwords, niche/technical, inflected fragments) plus a short
+   * meaning in the word's language when approved. Throws if AI is unavailable.
+   */
+  async judgeDailyWord(word: string, language: string = 'en'): Promise<DailyWordVerdict> {
+    await this.initialize();
+    if (!this.model) {
+      throw new Error('Vertex AI model not initialized');
+    }
+    return judgeDailyWord(this.model, word, language, this.withTimeout.bind(this), this.tokenUsage);
   }
 
   // ===========================================================================

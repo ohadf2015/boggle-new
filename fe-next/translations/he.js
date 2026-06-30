@@ -6569,6 +6569,16 @@ const he = {
     "pointsPerWord": "נקודות למילה"
   },
   "wordHunt": {
+    "suggest": {
+      "title": "הציעו את מילת המחר",
+      "placeholder": "המילה שלכם (5–7 אותיות)",
+      "button": "הצעה",
+      "success": "תודה! נבדוק את המילה.",
+      "duplicate": "כבר הוצעה — תודה!",
+      "tooMany": "כבר יש לכם הצעות שממתינות.",
+      "error": "ההגשה נכשלה. נסו מילה אחרת.",
+      "invalid": "הקלידו מילה אמיתית בת 5–7 אותיות."
+    },
     "title": "ציד מילים",
     "dangerAlert": "סכנה! נשארו מעט חיים!",
     "eliminatedAlert": "הודחת!",
@@ -6791,6 +6801,7 @@ const he = {
       "scoreTierStellar": "מבריק!",
       "scoreTierLegendary": "מרהיב!",
       "targetWord": "מילת היעד",
+      "meaning": "פירוש",
       "betterLuckNextTime": "בהצלחה בפעם הבאה!",
       "nextChallengeIn": "האתגר הבא בעוד",
       "rankOutOf": "מקום #{rank} מתוך {total} שחקנים",

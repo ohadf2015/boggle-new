@@ -32,6 +32,7 @@ export interface ResultDisplayProps {
   totalPlayers?: number;
   /** Current player's id — drives the display-only Ron bonus easter egg. */
   currentUserId?: string | null;
+  meaning?: string | null;
   t: (key: string) => string;
 }
 
@@ -80,6 +81,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
   lifeRemaining = 0,
   wordsDiscovered = 0,
   currentUserId,
+  meaning,
   t,
 }) => {
   const [wordHidden, setWordHidden] = useState(false);
@@ -281,6 +283,28 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                   </button>
                 </div>
               </m.div>
+
+              {/* Meaning (short definition) — prominent "did you know" card */}
+              {meaning && (
+                <m.div
+                  initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ delay: 0.55, type: 'spring', stiffness: 320, damping: 22 }}
+                  className="w-full max-w-xs mx-auto"
+                >
+                  <div className="flex items-start gap-3 rounded-neo border-neo-thick border-black bg-neo-cyan/15 px-4 py-3 shadow-hard text-start">
+                    <BookOpen className="w-5 h-5 text-neo-cyan shrink-0 mt-0.5" aria-hidden="true" />
+                    <div className="flex flex-col gap-0.5">
+                      <span className="text-[11px] font-black uppercase tracking-wider text-neo-cyan">
+                        {t('wordHunt.results.meaning')}
+                      </span>
+                      <span className="text-base font-bold text-neo-cream leading-snug">
+                        {meaning}
+                      </span>
+                    </div>
+                  </div>
+                </m.div>
+              )}
 
               {/* Score breakdown chips — staggered pop-in */}
               <div className="flex flex-wrap gap-2 justify-center">

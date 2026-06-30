@@ -110,6 +110,7 @@ const DailyChallenge: React.FC = () => {
   const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [targetWord, setTargetWord] = useState<string>('');
+  const [meaning, setMeaning] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<string>('');
   const [storedResult, setStoredResult] = useState<StoredWordHuntResult | null>(null);
   const [, setGameResult] = useState<SurvivalGameResult | null>(null);
@@ -239,12 +240,13 @@ const DailyChallenge: React.FC = () => {
 
       if (!online) {
         const store = await getOfflineStore();
-        const cached = await getCachedDailyPuzzle<{ grid: LetterGrid; targetWord: string }>(
+        const cached = await getCachedDailyPuzzle<{ grid: LetterGrid; targetWord: string; meaning?: string | null }>(
           store, date, gameLanguage, 'wordhunt',
         );
         if (cached && isMounted) {
           setGrid(cached.grid);
           setTargetWord(cached.targetWord);
+          setMeaning(cached.meaning ?? null);
           setPhase('ready');
           return;
         }
@@ -260,18 +262,21 @@ const DailyChallenge: React.FC = () => {
         if (isUsableDailyPuzzle(puzzleData)) {
           setGrid(puzzleData.grid);
           setTargetWord(puzzleData.targetWord);
+          setMeaning(puzzleData.meaning ?? null);
         } else {
           // ok-but-empty body, non-ok status, or unparseable JSON → generate locally
           const puzzle = generateDailyPuzzle(date, gameLanguage);
           if (!isMounted) return;
           setGrid(puzzle.grid);
           setTargetWord(puzzle.targetWord);
+          setMeaning(null);
         }
       } catch {
         if (!isMounted) return;
         const puzzle = generateDailyPuzzle(date, gameLanguage);
         setGrid(puzzle.grid);
         setTargetWord(puzzle.targetWord);
+        setMeaning(null);
       }
 
       if (!isMounted) return;
@@ -459,6 +464,7 @@ const DailyChallenge: React.FC = () => {
       solved: result.solved,
       attemptsUsed: result.attemptsUsed,
       targetWord: result.targetWord,
+      meaning: meaning ?? null,
       attempts: result.attempts,
       wordsDiscovered: result.wordsDiscovered,
       lifeRemaining: result.lifeRemaining,

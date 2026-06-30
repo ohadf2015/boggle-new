@@ -6498,6 +6498,16 @@ const es = {
     "pointsPerWord": "Puntos por palabra"
   },
   "wordHunt": {
+    "suggest": {
+      "title": "Sugiere la palabra de mañana",
+      "placeholder": "Tu palabra (5–7 letras)",
+      "button": "Sugerir",
+      "success": "¡Gracias! Revisaremos tu palabra.",
+      "duplicate": "Ya sugerida, ¡gracias!",
+      "tooMany": "Ya tienes sugerencias pendientes.",
+      "error": "No se pudo enviar. Prueba otra palabra.",
+      "invalid": "Usa una palabra real de 5–7 letras."
+    },
     "title": "Caza de Palabras",
     "play": "Jugar a Caza de Palabras",
     "categoryHint": "Categoría: {{category}}",
@@ -6636,6 +6646,7 @@ const es = {
       "scoreTierStellar": "¡Brillante!",
       "scoreTierLegendary": "¡Magnífico!",
       "targetWord": "Palabra Objetivo",
+      "meaning": "Significado",
       "betterLuckNextTime": "¡La próxima te desquitas!",
       "nextChallengeIn": "Próximo desafío en",
       "rankOutOf": "#{rank} de {total} jugadores",

@@ -1,6 +1,16 @@
 // RU translations
 const ru = {
   "wordHunt": {
+    "suggest": {
+      "title": "Предложите слово на завтра",
+      "placeholder": "Ваше слово (5–7 букв)",
+      "button": "Предложить",
+      "success": "Спасибо! Мы проверим ваше слово.",
+      "duplicate": "Уже предложено — спасибо!",
+      "tooMany": "У вас уже есть ожидающие предложения.",
+      "error": "Не удалось отправить. Попробуйте другое слово.",
+      "invalid": "Введите настоящее слово из 5–7 букв."
+    },
     "title": "Охота за словами",
     "play": "Играть в Охоту за словами",
     "categoryHint": "Категория: {{category}}",
@@ -220,6 +230,7 @@ const ru = {
       "scoreTierStellar": "Блистательно!",
       "scoreTierLegendary": "Великолепно!",
       "targetWord": "Целевое слово",
+      "meaning": "Значение",
       "betterLuckNextTime": "Удачи в следующий раз!",
       "nextChallengeIn": "Следующий вызов в",
       "rankOutOf": "#{rank} из {total} игроков",

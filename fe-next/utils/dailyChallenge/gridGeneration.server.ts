@@ -25,6 +25,7 @@ interface DailyPuzzleData {
   targetWord: string;
   grid: LetterGrid | null;
   gridGeneratedAt: string | null;
+  meaning?: string | null;
 }
 
 /**
@@ -48,7 +49,7 @@ async function fetchDailyPuzzleData(
 
     const { data, error } = await supabase
       .from('daily_target_words')
-      .select('target_word, override_word, grid, grid_generated_at')
+      .select('target_word, override_word, grid, grid_generated_at, meaning')
       .eq('puzzle_date', dateString)
       .eq('language', language)
       .single();
@@ -62,6 +63,7 @@ async function fetchDailyPuzzleData(
       targetWord: data.override_word || data.target_word,
       grid: data.grid as LetterGrid | null,
       gridGeneratedAt: data.grid_generated_at,
+      meaning: data.meaning ?? null,
     };
   } catch {
     // Silently fail and fall back to deterministic
@@ -209,6 +211,7 @@ export async function generateDailyPuzzleAsync(
           puzzleDate: dateString,
           language,
           puzzleNumber: getPuzzleNumber(dateString),
+          meaning: puzzleData.meaning ?? null,
         };
       } else {
         // Target word is NOT on the stored grid - need to regenerate!
@@ -229,7 +232,7 @@ export async function generateDailyPuzzleAsync(
       logger.log(`[Daily Puzzle] Saved new grid for ${dateString}/${language}`);
     }
 
-    return puzzle;
+    return { ...puzzle, meaning: puzzleData.meaning ?? null };
   }
 
   // No puzzle data in database - generate from scratch
@@ -244,7 +247,7 @@ export async function generateDailyPuzzleAsync(
     logger.log(`[Daily Puzzle] Saved generated grid for ${dateString}/${language}`);
   }
 
-  return puzzle;
+  return { ...puzzle, meaning: null };
 }
 
 /**
