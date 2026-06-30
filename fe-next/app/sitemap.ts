@@ -328,6 +328,9 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // hreflang so Google never crawls a noindexed non-RU variant.
   addForLocaleOnly(routes, '/igry-v-slova-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
   addForLocaleOnly(routes, '/slovo-dnya', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.85 }, 'ru');
+  addForLocaleOnly(routes, '/balda-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
+  addForLocaleOnly(routes, '/erudit-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
+  addForLocaleOnly(routes, '/sostav-slova-iz-bukv', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
 
   // ─── Education keyword landings (English-only body) ───
   // Same pattern as comparison pages: robots: { index: locale === 'en' }, non-EN
