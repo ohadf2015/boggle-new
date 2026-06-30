@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useCallback, useMemo, useRef, useEffect } from 'react';
-import CircularTimer from '@/components/CircularTimer';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -37,7 +36,7 @@ import { useBlastCascade } from './hooks/useBlastCascade';
 import { useBlastWordHandler } from './hooks/useBlastWordHandler';
 import { useBlastGameEnd, type DeadEndFinaleTile } from './hooks/useBlastGameEnd';
 import { BlastContinueModal } from './BlastContinueModal';
-import { shouldOfferBlastContinue } from './utils/blastContinueOffer';
+import { resolveBlastRecover, BLAST_MAX_LIVES } from './utils/blastLives';
 import type { BlastPregameBuff } from './BlastPregameBuffModal';
 import { useBlastBuffEffects } from './hooks/useBlastBuffEffects';
 import { useBlastObjectiveEffects } from './hooks/useBlastObjectiveEffects';
@@ -85,6 +84,11 @@ interface BlastGameProps {
   modifierScoreMultiplier?: number;
   /** SP-only: active wave modifier descriptor — surfaced as a HUD chip. */
   activeModifier?: BlastWaveModifier | null;
+  /** Run-level lives left (3-lives model). While > 0, an out-of-moves dead-end
+   *  free-revives instead of showing the rewarded-ad continue offer. SP only. */
+  livesRemaining?: number;
+  /** Called when a free revive consumes a life. Parent owns the run-level count. */
+  onConsumeLife?: () => void;
   /** True when rendered as the center slot of the MP desktop shell. Collapses
    *  BlastStage's own desktop side-rails (rivals/word-area) so the board fills
    *  the slot and stops duplicating the shell's rails. */
@@ -122,6 +126,8 @@ export function BlastGame({
   initialBuff,
   modifierScoreMultiplier = 1,
   activeModifier,
+  livesRemaining = BLAST_MAX_LIVES,
+  onConsumeLife,
   isDesktopCanvas = false,
 }: BlastGameProps) {
   const isMultiplayer = mode === 'multiplayer';
@@ -501,7 +507,11 @@ export function BlastGame({
   // dead-end branch in useBlastGameEnd will simply call onWaveComplete.
   const objectiveAlreadyMet = engine.gameState.totalTiles > 0
     && (engine.gameState.tilesCleared / engine.gameState.totalTiles) * 100 >= 90;
-  const continueModalOpen = shouldOfferBlastContinue({
+
+  // 3-lives model: a dead-end free-revives while lives remain, and only shows
+  // the rewarded-ad continue offer once they're spent.
+  const recoverMode = resolveBlastRecover({
+    livesRemaining,
     hasRealAdProvider,
     isMultiplayer,
     isDeadEnd: engine.gameState.isDeadEnd,
@@ -510,6 +520,30 @@ export function BlastGame({
     continueDeclined,
     objectiveAlreadyMet,
   });
+  const continueModalOpen = recoverMode === 'ad-offer';
+
+  // "💔 -1 life · N left" toast shown on a free revive. Holds the lives left
+  // AFTER consuming, so the player sees their remaining count.
+  const [lifeLostToast, setLifeLostToast] = useState<number | null>(null);
+  const lifeToastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Re-entry guard: revive() clears isDeadEnd, which flips recoverMode away from
+  // 'free-revive' on the next render — but until that lands we must not fire twice.
+  const revivingRef = useRef(false);
+  useEffect(() => {
+    if (recoverMode !== 'free-revive') {
+      revivingRef.current = false;
+      return;
+    }
+    if (revivingRef.current) return;
+    revivingRef.current = true;
+    engine.revive(BLAST_CONTINUE_BONUS_MOVES);
+    onConsumeLife?.();
+    setLifeLostToast(Math.max(0, livesRemaining - 1));
+    if (lifeToastTimerRef.current) clearTimeout(lifeToastTimerRef.current);
+    lifeToastTimerRef.current = setTimeout(() => setLifeLostToast(null), 1800);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- engine.revive method ref; livesRemaining read at fire time
+  }, [recoverMode]);
+  useEffect(() => () => { if (lifeToastTimerRef.current) clearTimeout(lifeToastTimerRef.current); }, []);
 
   const handleContinueAccept = useCallback(() => {
     hasUsedContinueRef.current = true;
@@ -547,7 +581,7 @@ export function BlastGame({
     maxCombo: combo.maxCombo, sounds,
     setExplosionShake, explosionShakeTimerRef,
     onDeadEndFinale: handleDeadEndFinale,
-    deferDeadEndFinale: continueModalOpen,
+    deferDeadEndFinale: recoverMode !== 'none',
     recorder: highlightRecorderRef.current,
   });
 
@@ -586,6 +620,18 @@ export function BlastGame({
         onDecline={handleContinueDecline}
         t={t}
       />
+
+      {lifeLostToast !== null && (
+        <div
+          data-testid="blast-life-lost-toast"
+          role="status"
+          aria-live="polite"
+          className="fixed top-20 left-1/2 -translate-x-1/2 z-[80] flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-pink px-5 py-3 font-neo-display text-base font-black uppercase tracking-wide text-neo-navy shadow-hard-lg animate-neo-pop"
+        >
+          <span className="text-xl">💔</span>
+          {t('blast.lifeLost', { lives: lifeLostToast })}
+        </div>
+      )}
 
       <BlastMoveWarningMascot movesRemaining={engine.gameState.movesRemaining} t={tAdapter} />
 
@@ -626,6 +672,7 @@ export function BlastGame({
         language={config.language}
         gameState={engine.gameState}
         waveNumber={waveNumber}
+        livesRemaining={isMultiplayer ? undefined : livesRemaining}
         comboLevel={combo.comboLevel}
         formedWord={formedWord}
         currentFeedback={wordSubmission.currentFeedback}

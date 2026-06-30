@@ -10240,6 +10240,9 @@ const sv = {
         "boardCleared": "BORD RENSAT!"
       }
     },
+    "adBadge": "ANNONS",
+    "lifeLost": "Liv förlorat · {lives} kvar",
+    "livesLabel": "{lives} liv kvar",
     "continueModal": {
       "title": "Sluta inte nu!",
       "body": "Du har slut på drag. Titta på en snabb annons för att fortsätta.",
@@ -10249,7 +10252,7 @@ const sv = {
     "retryWaveModal": {
       "title": "Våg {wave} — så nära!",
       "body": "Du rensade {percent}%. Se en annons för att göra om våg {wave} — tidigare vågor sparas.",
-      "cta": "Gör om våg {wave}",
+      "cta": "Se annons · gör om våg {wave}",
       "decline": "Starta om från våg 1"
     },
     "pregameBuff": {

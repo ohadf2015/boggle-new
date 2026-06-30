@@ -211,3 +211,31 @@ describe('BlastHUD — neo-brutalist contrast polish', () => {
     expect(chip.className).not.toContain('border-neo-cyan/40');
   });
 });
+
+describe('BlastHUD — lives (3-lives model)', () => {
+  it('renders no lives chip when livesRemaining is undefined (e.g. MP)', () => {
+    render(<BlastHUD {...baseProps} />);
+    expect(screen.queryByTestId('blast-lives-chip')).toBeNull();
+  });
+
+  it('renders the lives chip when livesRemaining is provided', () => {
+    render(<BlastHUD {...baseProps} livesRemaining={3} />);
+    expect(screen.getByTestId('blast-lives-chip')).toBeDefined();
+  });
+
+  it('hides the chip in multiplayer even if a count is passed', () => {
+    render(<BlastHUD {...baseProps} isMultiplayer livesRemaining={3} />);
+    expect(screen.queryByTestId('blast-lives-chip')).toBeNull();
+  });
+
+  it('fills exactly livesRemaining hearts (pink) and dims the spent ones', () => {
+    render(<BlastHUD {...baseProps} livesRemaining={1} />);
+    const chip = screen.getByTestId('blast-lives-chip');
+    const hearts = chip.querySelectorAll('svg');
+    expect(hearts.length).toBe(3); // BLAST_MAX_LIVES
+    const filled = chip.querySelectorAll('.text-neo-pink');
+    const spent = chip.querySelectorAll('.text-white\\/20');
+    expect(filled.length).toBe(1);
+    expect(spent.length).toBe(2);
+  });
+});

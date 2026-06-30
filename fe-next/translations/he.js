@@ -10321,6 +10321,9 @@ const he = {
         "skipFuture": "דלג על מדריכים בעתיד"
       }
     },
+    "adBadge": "פרסומת",
+    "lifeLost": "אבד לב · נותרו {lives}",
+    "livesLabel": "נותרו {lives} לבבות",
     "continueModal": {
       "title": "אל תעצור עכשיו!",
       "body": "נגמרו לך הצעדים. צפה בפרסומת קצרה והמשך לשחק.",
@@ -10330,7 +10333,7 @@ const he = {
     "retryWaveModal": {
       "title": "גל {wave} — כמעט הצלחת!",
       "body": "ניקית {percent}%. צפה בפרסומת ונסה שוב את גל {wave} — הגלים הקודמים נשמרים.",
-      "cta": "נסה שוב את גל {wave}",
+      "cta": "צפה בפרסומת · נסה שוב את גל {wave}",
       "decline": "התחל מחדש מגל 1"
     },
     "pregameBuff": {

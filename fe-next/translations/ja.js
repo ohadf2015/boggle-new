@@ -10139,6 +10139,9 @@ const ja = {
         "boardCleared": "ボード クリア!"
       }
     },
+    "adBadge": "広告",
+    "lifeLost": "ライフ消失 · 残り{lives}",
+    "livesLabel": "残りライフ{lives}",
     "continueModal": {
       "title": "まだ終わらせない！",
       "body": "手数がなくなりました。短い広告を見てプレイを続けよう。",
@@ -10148,7 +10151,7 @@ const ja = {
     "retryWaveModal": {
       "title": "ウェーブ{wave} — あと少し！",
       "body": "{percent}%クリア。広告を見てウェーブ{wave}に再挑戦 — 前のウェーブは保持されます。",
-      "cta": "ウェーブ{wave}に再挑戦",
+      "cta": "広告を見て · ウェーブ{wave}に再挑戦",
       "decline": "ウェーブ1から再開"
     },
     "pregameBuff": {

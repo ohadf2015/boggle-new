@@ -9733,6 +9733,9 @@ const en = {
         "skipFuture": "Skip future tutorials"
       }
     },
+    "adBadge": "AD",
+    "lifeLost": "Life lost · {lives} left",
+    "livesLabel": "{lives} lives left",
     "continueModal": {
       "title": "Don't stop now!",
       "body": "You're out of moves. Watch a quick ad to keep your run alive.",
@@ -9742,7 +9745,7 @@ const en = {
     "retryWaveModal": {
       "title": "Wave {wave} — so close!",
       "body": "You cleared {percent}%. Watch an ad to retry wave {wave} — your earlier waves are safe.",
-      "cta": "Retry Wave {wave}",
+      "cta": "Watch Ad · Retry Wave {wave}",
       "decline": "Restart from wave 1"
     },
     "pregameBuff": {

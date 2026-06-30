@@ -21,6 +21,7 @@ import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { playWaveFailArpeggio } from '@/lib/blast/waveFailArpeggio';
 import { useBlastCheckpoint } from './hooks/useBlastCheckpoint';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
+import { BLAST_MAX_LIVES } from './utils/blastLives';
 import { selectWaveModifier, applyModifierToWaveConfig } from './utils/blastModifiers';
 import { BlastModifierBadge } from './BlastModifierBadge';
 import { calculateEarnedStars } from './utils/blastStarCalculator';
@@ -76,6 +77,14 @@ export function BlastView() {
   const [allWordsFound, setAllWordsFound] = useState<string[]>([]);
   const [waveHistory, setWaveHistory] = useState<WaveResult[]>([]);
   const [lastWaveStats, setLastWaveStats] = useState({ score: 0, words: 0, clearPct: 0 });
+
+  // 3-lives model (run-level). Each out-of-moves dead-end free-revives and
+  // burns a life; only once all are spent does BlastGame show the ad-continue
+  // offer. Reset at the start of every fresh run.
+  const [livesRemaining, setLivesRemaining] = useState(BLAST_MAX_LIVES);
+  const handleConsumeLife = useCallback(() => {
+    setLivesRemaining((n) => Math.max(0, n - 1));
+  }, []);
 
   // Pre-game buff (rewarded-ad picker, single-use per run)
   const [pregameBuff, setPregameBuff] = useState<BlastPregameBuff | null>(null);
@@ -228,6 +237,7 @@ export function BlastView() {
   const handleStart = useCallback(() => {
     setRunSeed(Math.floor(Math.random() * 1_000_000));
     setCurrentWave(1);
+    setLivesRemaining(BLAST_MAX_LIVES);
     snapshotPreWave(1, 0, [], []);
     setPhase('playing');
   }, [snapshotPreWave]);
@@ -236,6 +246,7 @@ export function BlastView() {
     setRunSeed(Math.floor(Math.random() * 1_000_000));
     const wave = checkpoint.resumeFromWave;
     setCurrentWave(wave);
+    setLivesRemaining(BLAST_MAX_LIVES);
     snapshotPreWave(wave, 0, [], []);
     setPhase('playing');
   }, [checkpoint.resumeFromWave, snapshotPreWave]);
@@ -266,6 +277,7 @@ export function BlastView() {
     setAllWordsFound([]);
     setWaveHistory([]);
     setPregameBuff(null);
+    setLivesRemaining(BLAST_MAX_LIVES);
     retryUsedRef.current = false;
     setRetryDeclined(false);
     preWaveSnapshotRef.current = null;
@@ -372,6 +384,8 @@ export function BlastView() {
             initialBuff={pregameBuff}
             modifierScoreMultiplier={activeModifier?.scoreMultiplier ?? 1}
             activeModifier={activeModifier}
+            livesRemaining={livesRemaining}
+            onConsumeLife={handleConsumeLife}
             onWaveComplete={handleWaveComplete}
             onGameEnd={handleGameEnd}
             onHighlightStart={handleHighlightStart}

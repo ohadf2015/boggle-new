@@ -10151,6 +10151,9 @@ const es = {
         "boardCleared": "¡TABLERO DESPEJADO!"
       }
     },
+    "adBadge": "ANUNCIO",
+    "lifeLost": "Vida perdida · quedan {lives}",
+    "livesLabel": "{lives} vidas restantes",
     "continueModal": {
       "title": "¡No pares ahora!",
       "body": "Te quedaste sin movimientos. Mira un anuncio rápido para seguir jugando.",
@@ -10160,7 +10163,7 @@ const es = {
     "retryWaveModal": {
       "title": "Oleada {wave} — ¡muy cerca!",
       "body": "Limpiaste {percent}%. Mira un anuncio para reintentar la oleada {wave} — tus oleadas previas se conservan.",
-      "cta": "Reintentar oleada {wave}",
+      "cta": "Ver anuncio · reintentar oleada {wave}",
       "decline": "Reiniciar desde la oleada 1"
     },
     "pregameBuff": {

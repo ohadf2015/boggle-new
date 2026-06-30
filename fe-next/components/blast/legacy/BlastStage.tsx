@@ -54,6 +54,8 @@ interface BlastStageProps {
   gameState: BlastGameState;
   // Wave
   waveNumber: number;
+  /** Run-level lives left (3-lives model). Undefined in MP (no lives). */
+  livesRemaining?: number;
   // Combo
   comboLevel: number;
   // Word forming
@@ -133,6 +135,7 @@ export const BlastStage = memo(function BlastStage({
   language,
   gameState,
   waveNumber,
+  livesRemaining,
   comboLevel,
   formedWord,
   currentFeedback,
@@ -289,6 +292,7 @@ export const BlastStage = memo(function BlastStage({
         movesRemaining={movesRemaining}
         totalMoves={totalMoves}
         waveNumber={waveNumber}
+        livesRemaining={livesRemaining}
         tilesCleared={tilesCleared}
         totalTiles={totalTiles}
         onQuit={onQuit}

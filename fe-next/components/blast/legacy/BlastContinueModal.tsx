@@ -1,6 +1,6 @@
 'use client';
 
-import { Play, X, Heart } from 'lucide-react';
+import { Clapperboard, X, Heart } from 'lucide-react';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 
 interface BlastContinueModalProps {
@@ -51,10 +51,16 @@ export function BlastContinueModal({
                 <button type="button"
                   data-testid="blast-continue-cta"
                   onClick={offer}
-                  className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
+                  className="relative flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
                 >
-                  <Play className="h-5 w-5" strokeWidth={3} />
+                  <Clapperboard className="h-5 w-5" strokeWidth={3} />
                   {t('blast.continueModal.cta', { moves: bonusMoves })}
+                  <span
+                    aria-hidden
+                    className="absolute -top-2.5 -right-2.5 rounded-full border-2 border-black bg-neo-yellow px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-neo-navy shadow-hard"
+                  >
+                    {t('blast.adBadge')}
+                  </span>
                 </button>
               )}
               <button type="button"

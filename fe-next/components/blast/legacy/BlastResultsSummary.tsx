@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import { MobileTooltip } from '@/components/ui/MobileTooltip';
 import { cn } from '@/lib/utils';
 import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
@@ -517,6 +518,13 @@ export function BlastResultsSummary({
       )}
 
       </div>
+
+      {/* Post-game banner — in-flow slot ABOVE the sticky CTA. Matches the 5
+          sibling results screens (SinglePlayer/Daily/Challenge/...). The slot
+          becomes the higher-priority banner OWNER, parking the native AdMob
+          banner on its own footprint so it can never paint over the CTA below
+          (the bottom-anchored fallback owner used to occlude it). */}
+      <ResultsBannerSlot placement="singleplayer-complete" className="shrink-0" />
 
       {/* Sticky CTA footer — always visible without scrolling */}
       <AdaptiveMotion.div

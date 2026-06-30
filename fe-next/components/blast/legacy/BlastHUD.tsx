@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { HelpCircle, Shield, Bomb, Zap, Sparkles, Clock } from 'lucide-react';
+import { HelpCircle, Shield, Bomb, Zap, Sparkles, Clock, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import { formatTimeMMSS } from '@/shared/utils/timeFormatting';
 import { computeTimerUrgency } from '@/lib/cosy/timerUrgency';
 import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { BlastComboStreakBadge } from './BlastComboStreakBadge';
+import { BLAST_MAX_LIVES } from './utils/blastLives';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
 
 /** Pre-game buff chip — shown in HUD top row when player claimed a rewarded-ad boost. */
@@ -152,6 +153,8 @@ interface BlastHUDProps {
   movesRemaining: number;
   totalMoves: number;
   waveNumber: number;
+  /** Run-level lives left (3-lives model). Undefined hides the hearts (e.g. MP). */
+  livesRemaining?: number;
   tilesCleared: number;
   totalTiles: number;
   onQuit: () => void;
@@ -195,6 +198,7 @@ export function BlastHUD({
   movesRemaining,
   totalMoves,
   waveNumber,
+  livesRemaining,
   tilesCleared,
   totalTiles,
   onQuit,
@@ -252,6 +256,23 @@ export function BlastHUD({
               aria-label={`${t('blast.wave')} ${waveNumber}`}
             >
               W{waveNumber}
+            </span>
+          )}
+          {/* Lives — 3-lives model. Hidden in MP (no lives) and until plumbed. */}
+          {!isMultiplayer && livesRemaining !== undefined && (
+            <span
+              data-testid="blast-lives-chip"
+              className="shrink-0 inline-flex items-center gap-0.5 rounded-lg border-2 border-black bg-neo-navy-light px-1.5 py-0.5 shadow-hard"
+              aria-label={t('blast.livesLabel')?.replace('{lives}', String(livesRemaining)) ?? `${livesRemaining} lives`}
+            >
+              {Array.from({ length: BLAST_MAX_LIVES }).map((_, i) => (
+                <Heart
+                  key={`life-${i}`}
+                  className={cn('h-3.5 w-3.5', i < livesRemaining ? 'text-neo-pink' : 'text-white/20')}
+                  fill="currentColor"
+                  strokeWidth={2}
+                />
+              ))}
             </span>
           )}
           {/* Lucky Boost chip — visible only when DDA assist is active. */}
