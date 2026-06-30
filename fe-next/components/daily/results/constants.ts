@@ -23,6 +23,7 @@ export const LANGUAGE_OPTIONS: LanguageOption[] = [
   { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
   { code: 'ja', flag: '🇯🇵', name: '日本語' },
   { code: 'es', flag: '🇪🇸', name: 'Español' },
+  // ru intentionally omitted: no Russian daily-word content (see LanguageDropdown).
 ];
 
 /**

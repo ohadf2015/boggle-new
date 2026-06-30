@@ -1687,6 +1687,7 @@ const es = {
     "swedish": "Sueco",
     "japanese": "Japonés",
     "spanish": "Español",
+    "russian": "Русский",
     "generateNewCode": "Nuevo código",
     "createNewRoom": "¡Crea una sala!",
     "howToPlay": "Cómo jugar",

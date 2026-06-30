@@ -14,6 +14,8 @@ export const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] 
   { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
   { code: 'ja', flag: '🇯🇵', name: '日本語' },
   { code: 'es', flag: '🇪🇸', name: 'Español' },
+  // ru intentionally omitted: daily-word generation (bulk-generate route) does not
+  // produce Russian puzzles, so the daily picker must not offer a language with no content.
 ];
 
 interface LanguageDropdownProps {

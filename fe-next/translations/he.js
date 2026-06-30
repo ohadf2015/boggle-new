@@ -1665,6 +1665,7 @@ const he = {
     "swedish": "Svenska",
     "japanese": "日本語",
     "spanish": "Español",
+    "russian": "Русский",
     "generateNewCode": "קוד חדש",
     "createNewRoom": "צרו חדר!",
     "howToPlay": "איך משחקים?",

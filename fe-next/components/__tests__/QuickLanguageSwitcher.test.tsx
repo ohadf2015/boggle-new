@@ -16,6 +16,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'joinView.swedish': 'Svenska',
         'joinView.japanese': '日本語',
         'joinView.spanish': 'Español',
+        'joinView.russian': 'Русский',
       };
       return translations[key] || key;
     },
@@ -45,7 +46,7 @@ describe('QuickLanguageSwitcher', () => {
     expect(trigger).toHaveAttribute('aria-label', 'Change Language');
   });
 
-  it('should show all 5 language options when opened', async () => {
+  it('should show all 6 language options when opened (incl. Russian)', async () => {
     render(<QuickLanguageSwitcher />);
 
     // Click to open the dropdown
@@ -59,6 +60,7 @@ describe('QuickLanguageSwitcher', () => {
       expect(screen.getByText('Svenska')).toBeInTheDocument();
       expect(screen.getByText('日本語')).toBeInTheDocument();
       expect(screen.getByText('Español')).toBeInTheDocument();
+      expect(screen.getByText('Русский')).toBeInTheDocument();
     });
   });
 

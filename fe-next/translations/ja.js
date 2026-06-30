@@ -1651,6 +1651,7 @@ const ja = {
     "swedish": "Svenska",
     "japanese": "日本語",
     "spanish": "Español",
+    "russian": "Русский",
     "generateNewCode": "新コード",
     "createNewRoom": "ルーム作成！",
     "howToPlay": "遊び方",
