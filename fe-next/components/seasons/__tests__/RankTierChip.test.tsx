@@ -25,4 +25,18 @@ describe('RankTierChip', () => {
     const { container } = render(<RankTierChip tier="bogus" />);
     expect(container.firstChild).toBeNull();
   });
+
+  it('renders no rank image by default', () => {
+    const { container } = render(<RankTierChip tier="diamond" />);
+    expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('renders the tier badge image when showImage is set', () => {
+    const { container } = render(<RankTierChip tier="diamond" showImage />);
+    const img = container.querySelector('img');
+    expect(img).toBeTruthy();
+    expect(img?.getAttribute('src')).toContain('tier-diamond');
+    // Label still rendered alongside the image.
+    expect(screen.getByText('rank.tier.diamond')).toBeInTheDocument();
+  });
 });

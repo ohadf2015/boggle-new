@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState, type TouchEvent as ReactTouchEvent } from 'react';
 import { createPortal } from 'react-dom';
 import { LazyMotion, domAnimation, m, AnimatePresence } from 'framer-motion';
-import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, ChevronRight, Sparkles, User, Flame, Bell, Check, Pencil, Bug } from 'lucide-react';
+import { Menu, X, Settings, Trophy, ScrollText, Coffee, Accessibility, Info, HelpCircle, Mail, Cookie, Gift, Users, UserPlus, Sparkles, User, Bell, BellOff, ChevronDown, Check, Pencil, Bug } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useQueryClient } from '@tanstack/react-query';
@@ -12,9 +12,8 @@ import { cn } from '../../lib/utils';
 import AuthButton from '../auth/AuthButton';
 import MusicControls from '../MusicControls';
 import { ReportBugModal } from '../feedback/ReportBugModal';
-import { CoinBalance } from '../CoinBalance';
-import { RankTierChip } from '../seasons/RankTierChip';
 import { scoreTier } from '@/lib/seasons/scoreTier';
+import { DrawerProfileHero } from './DrawerProfileHero';
 import { GiftNotificationBadge } from '../gift/GiftNotificationBadge';
 import { QuickLanguageSwitcher } from '../QuickLanguageSwitcher';
 import { NotificationItem } from '../notifications/NotificationItem';
@@ -448,59 +447,20 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                     </div>
 
                                     {isAuthenticated && profile ? (
-                                        <Link href={`/${language}/profile`} onClick={closeMenu} className="block group">
-                                            <div className="flex items-center gap-3.5">
-                                                <div className="relative shrink-0">
-                                                    <div className={cn(
-                                                        'rounded-full border-3 shadow-hard-sm p-0.5 bg-neo-navy group-hover:border-neo-cyan transition-colors',
-                                                        playerStyle.accentHex ? 'border-accent' : 'border-neo-lime'
-                                                    )}>
-                                                        <Avatar
-                                                            customAvatar={avatarConfig}
-                                                            userId={user?.id}
-                                                            size="lg"
-                                                        />
-                                                    </div>
-                                                    {/* Level badge */}
-                                                    {profile.current_level != null && (
-                                                        <div className="absolute -bottom-1 -right-1 bg-neo-lime text-neo-black text-[10px] font-black px-1.5 py-0.5 rounded-full border-2 border-neo-black shadow-hard-sm">
-                                                            {profile.current_level}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className="flex flex-col min-w-0">
-                                                    <div className="flex items-center gap-2 min-w-0">
-                                                        <span className="text-base font-black text-neo-white truncate">
-                                                            {profile.display_name || profile.username}
-                                                        </span>
-                                                        {/* Player title — score-based rank tier, fully translated
-                                                            via rank.tier.* in all 5 languages. */}
-                                                        <RankTierChip tier={scoreTier(profile.total_score)} size="xs" className="shrink-0" />
-                                                    </div>
-                                                    <div className="flex items-center gap-2 mt-1.5">
-                                                        <CoinBalance coins={profile.total_coins || 0} size="md" showSparkle />
-                                                    </div>
-                                                    {engagementStatus.streak > 0 && (
-                                                        <div className="flex items-center gap-2 mt-1">
-                                                            <Flame className="w-3.5 h-3.5 text-neo-orange fill-current" />
-                                                            <span className="text-[10px] font-black text-neo-orange">{engagementStatus.streak}</span>
-                                                            <span className="text-[10px] font-bold text-neo-cyan/80">
-                                                                {t('streakBar.level', { level: engagementStatus.level })}
-                                                            </span>
-                                                        </div>
-                                                    )}
-                                                    {profile.total_games != null && profile.total_games > 0 && (
-                                                        <span className="text-[10px] text-neo-white mt-0.5 font-bold">
-                                                            {profile.total_games} {t('profile.gamesPlayed')}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <ChevronRight className={cn(
-                                                    "ms-auto w-4 h-4 text-neo-white group-hover:text-neo-white transition-colors shrink-0",
-                                                    isRtl && "rotate-180"
-                                                )} />
-                                            </div>
-                                        </Link>
+                                        <DrawerProfileHero
+                                            href={`/${language}/profile`}
+                                            onNavigate={closeMenu}
+                                            displayName={profile.display_name || profile.username}
+                                            avatarConfig={avatarConfig}
+                                            userId={user?.id}
+                                            currentLevel={profile.current_level ?? null}
+                                            tier={scoreTier(profile.total_score)}
+                                            coins={profile.total_coins || 0}
+                                            streak={engagementStatus.streak}
+                                            totalGames={profile.total_games ?? null}
+                                            accentHex={playerStyle.accentHex ?? null}
+                                            isRtl={isRtl}
+                                        />
                                     ) : (
                                         <div className="flex flex-col gap-3">
                                             <div className="flex items-center gap-3">
@@ -668,7 +628,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 {filteredNotifications.length > 3 && (
                                                     <button
                                                         onClick={() => setShowAllNotifications(!showAllNotifications)}
-                                                        className="w-full mt-1 text-center text-[10px] text-neo-white hover:text-neo-cyan transition-colors font-bold py-1"
+                                                        className="w-full mt-1 text-center text-[10px] text-neo-white/70 hover:text-neo-white transition-colors font-bold py-1"
                                                     >
                                                         {showAllNotifications
                                                             ? t('common.showLess')
@@ -678,18 +638,28 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 )}
                                             </>
                                         ) : (
-                                            <div className="text-[10px] text-neo-white text-center py-2 font-bold">
-                                                {t('notifications.empty')}
+                                            <div className="flex flex-col items-center gap-1.5 rounded-neo border-2 border-dashed border-neo-white/15 bg-neo-white/[0.03] py-5 px-3 text-center">
+                                                <BellOff className="w-5 h-5 text-neo-white/40" aria-hidden="true" />
+                                                <span className="text-[11px] font-bold text-neo-white/60">
+                                                    {t('notifications.empty')}
+                                                </span>
                                             </div>
                                         )}
                                         <button
                                             onClick={togglePreviousNotifications}
-                                            className="w-full mt-1 text-center text-[10px] text-neo-white hover:text-neo-cyan transition-colors font-bold py-1"
+                                            className="mt-2 w-full flex items-center justify-center gap-1.5 rounded-neo border-2 border-neo-white/10 bg-neo-white/5 py-2 text-[10px] font-bold text-neo-white/70 hover:text-neo-white hover:border-neo-white/20 transition-colors"
                                             aria-expanded={showPreviousNotifications}
                                         >
                                             {showPreviousNotifications
                                                 ? t('notifications.hidePrevious')
                                                 : t('notifications.showPrevious')}
+                                            <ChevronDown
+                                                className={cn(
+                                                    'w-3 h-3 transition-transform duration-200',
+                                                    showPreviousNotifications && 'rotate-180',
+                                                )}
+                                                aria-hidden="true"
+                                            />
                                         </button>
                                         {showPreviousNotifications && (
                                             <div className={cn(
@@ -698,11 +668,11 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                                 notificationListScrollClass(previousNotifications.length, "max-h-64")
                                             )}>
                                                 {isLoadingPrevious ? (
-                                                    <div className="text-[10px] text-neo-white text-center py-2">
+                                                    <div className="text-[11px] text-neo-white/50 text-center py-3 font-bold">
                                                         …
                                                     </div>
                                                 ) : previousNotifications.length === 0 ? (
-                                                    <div className="text-[10px] text-neo-white text-center py-2 font-bold">
+                                                    <div className="text-[11px] text-neo-white/60 text-center py-3 font-bold">
                                                         {t('notifications.noPrevious')}
                                                     </div>
                                                 ) : (

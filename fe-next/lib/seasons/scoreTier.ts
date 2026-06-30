@@ -56,6 +56,22 @@ const TIER_DOT: Record<TierId, string> = {
   grandmaster: 'bg-neo-pink',
 };
 
+// Rank badge imagery lives in the leaderboard tier defs (single source for the
+// tier .webp art + brand hex + glow). The season ladder shares the same 7 ids,
+// so we look the visual up there rather than duplicating asset paths here.
+// `lib/seasons/__tests__/scoreTier.test.ts` asserts every TierId resolves to an
+// existing image, keeping the two lists locked together.
+import { tierById } from '@/lib/ranked/leaderboardTiers';
+
+/** Path to the tier's badge .webp (e.g. `/images/tiers/tier-diamond.webp`). */
+export const tierImagePath = (tier: TierId): string => tierById(tier).imagePath;
+
+/** Tier badge visual: image path, brand hex color, and rgba glow. */
+export function tierVisual(tier: TierId): { imagePath: string; color: string; glowColor: string } {
+  const def = tierById(tier);
+  return { imagePath: def.imagePath, color: def.color, glowColor: def.glowColor };
+}
+
 export const tierTextClass = (tier: TierId): string => TIER_TEXT[tier];
 export const tierBorderClass = (tier: TierId): string => TIER_BORDER[tier];
 export const tierDotClass = (tier: TierId): string => TIER_DOT[tier];

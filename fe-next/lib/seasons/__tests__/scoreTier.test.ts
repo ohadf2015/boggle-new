@@ -1,5 +1,24 @@
 import { describe, it, expect } from 'vitest';
-import { scoreTier, TIER_ORDER, tierTextClass, tierDotClass, navTierForPath } from '../scoreTier';
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+import { scoreTier, TIER_ORDER, tierTextClass, tierDotClass, navTierForPath, tierImagePath } from '../scoreTier';
+import { GLOBAL_LEADERBOARD_TIERS } from '@/lib/ranked/leaderboardTiers';
+
+describe('season tier ↔ leaderboard image mapping', () => {
+  // The season tier ladder (scoreTier) and the leaderboard tier defs are two
+  // separately-maintained lists that share the same 7 ids. The rank badge image
+  // is sourced from the leaderboard defs, so every season tier MUST resolve to a
+  // def with a real on-disk image. This locks the lists together (a platinum
+  // image once nearly went missing).
+  it.each(TIER_ORDER)('tier "%s" maps to a leaderboard def with an existing image', (id) => {
+    const def = GLOBAL_LEADERBOARD_TIERS.find((t) => t.id === id);
+    expect(def, `no leaderboard def for tier "${id}"`).toBeTruthy();
+    const path = tierImagePath(id);
+    expect(path).toBe(def!.imagePath);
+    expect(path).toMatch(/\/images\/tiers\/tier-.+\.webp$/);
+    expect(existsSync(join(process.cwd(), 'public', path)), `missing asset: public${path}`).toBe(true);
+  });
+});
 
 describe('scoreTier', () => {
   // Thresholds MUST mirror SQL get_user_current_season_rank / get_user_tier_position.

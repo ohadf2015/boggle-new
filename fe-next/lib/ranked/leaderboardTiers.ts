@@ -162,6 +162,14 @@ export const DAILY_LEADERBOARD_TIERS: LeaderboardTierDef[] = GLOBAL_LEADERBOARD_
 // ──────────────────────────────────────────────
 
 /**
+ * Look up a tier def by its id. Returns Stone as a safe fallback for an
+ * unknown id (callers that pass a validated LeaderboardTierId never hit it).
+ */
+export function tierById(id: LeaderboardTierId): LeaderboardTierDef {
+  return GLOBAL_LEADERBOARD_TIERS.find((t) => t.id === id) ?? GLOBAL_LEADERBOARD_TIERS[0];
+}
+
+/**
  * Get the leaderboard tier for a global total_score.
  * Returns the appropriate tier, never undefined.
  */
