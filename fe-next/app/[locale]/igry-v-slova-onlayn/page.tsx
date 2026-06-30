@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { RuLandingLinks } from '@/components/landing/RuLandingLinks';
 
 export const revalidate = 86400;
 
@@ -157,6 +158,8 @@ export default async function Page({ params }: PageProps) {
             ))}
           </div>
         </section>
+
+        <RuLandingLinks locale={locale} current="igry-v-slova-onlayn" />
 
         <section className="mb-12">
           <h2 className="font-neo-display text-2xl font-bold sm:text-3xl">Начни играть прямо сейчас</h2>
