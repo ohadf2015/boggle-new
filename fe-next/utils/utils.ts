@@ -1,4 +1,4 @@
-import { hebrewLetters, swedishLetters, spanishLetters, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS, AVATAR_IMAGE_IDS } from "./consts";
+import { hebrewLetters, swedishLetters, spanishLetters, russianLetterPool, japaneseLetters, kanjiCompounds, DIFFICULTIES, DEFAULT_DIFFICULTY, AVATAR_COLORS, AVATAR_EMOJIS, AVATAR_IMAGE_IDS } from "./consts";
 import type { Language, LetterGrid, GridPosition, Avatar } from "@/types";
 
 // Import and re-export word normalization functions from shared module
@@ -181,11 +181,18 @@ export function generateRandomTable(
       letters = swedishLetters;
     } else if (language === 'es') {
       letters = spanishLetters;
+    } else if (language === 'ru') {
+      letters = russianLetterPool;
     } else if (language === 'ja') {
       // For Japanese, generate a board with embedded Kanji compounds
       return generateJapaneseTable(rows, cols);
-    } else {
+    } else if (language === 'he') {
       letters = hebrewLetters;
+    } else {
+      // Unknown/undefined language must NOT silently become Hebrew — that leaked
+      // Hebrew (and, before this branch existed, a Hebrew board onto Russian
+      // players). Hebrew requires an explicit 'he'; everything else → English.
+      letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     }
 
     // If we have words to embed, use enhanced generation

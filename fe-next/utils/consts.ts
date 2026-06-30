@@ -73,6 +73,32 @@ export const spanishBaseLetters: string[] = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ'.split
 export const spanishAccentedLetters: string[] = ['Á', 'É', 'Í', 'Ó', 'Ú', 'Ü'];
 export const spanishLetters: string[] = [...spanishBaseLetters, ...spanishAccentedLetters];
 
+// Russian (Cyrillic) — mirror of backend/utils/gameUtils.ts so the client board
+// generators (single-player word hunt, daily, custom challenge) produce real
+// Cyrillic tiles instead of falling through to the Hebrew `else`. Board uses
+// UPPERCASE (en/sv/es convention); validation lowercases the guess. Hard sign Ъ
+// is excluded — it never starts a word and is a dead tile.
+export const russianLetters: string[] =
+  'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЫЬЭЮЯ'.split('');
+
+// Frequency-weighted pool for board generation (counts ≈ Russian letter
+// frequency %), so common vowels/consonants surface more often → playable
+// boards. Same approach as spanishLetterPool / the backend russianLetterPool.
+// Ё is intentionally absent: it folds to Е (ё→е) at validate time, so the board
+// never shows a tile that can't form a stored word.
+export const russianLetterPool: string[] = (() => {
+  const weights: Record<string, number> = {
+    О: 11, Е: 8, А: 8, И: 7, Н: 7, Т: 6, С: 5, Р: 5, В: 5, Л: 4,
+    К: 3, М: 3, Д: 3, П: 3, У: 3, Я: 2, Ы: 2, Ь: 2, Г: 2, З: 2, Б: 2,
+    Ч: 1, Й: 1, Х: 1, Ж: 1, Ш: 1, Ю: 1, Ц: 1, Щ: 1, Э: 1, Ф: 1,
+  };
+  const pool: string[] = [];
+  for (const [letter, count] of Object.entries(weights)) {
+    for (let i = 0; i < count; i++) pool.push(letter);
+  }
+  return pool;
+})();
+
 // HIRAGANA board tiles — single source of truth in shared/constants/japaneseLetters.
 // Japanese gameplay is phonetic-kana, not kanji (logographs can't be a Boggle grid).
 // Consumed by every frontend JA board generator (single-player, custom challenge,
