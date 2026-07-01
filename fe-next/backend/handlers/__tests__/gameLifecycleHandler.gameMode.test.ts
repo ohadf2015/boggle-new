@@ -195,6 +195,8 @@ vi.mock('../../../backend/modules/wordHuntManager', () => ({
     playerProgress: {},
   }),
   getRecentMpTargets: vi.fn().mockReturnValue(new Set<string>()),
+  selectCleanCommonTarget: vi.fn().mockReturnValue(null),
+  recordMpTarget: vi.fn(),
 }));
 
 vi.mock('../../../backend/utils/socketValidation', () => ({
