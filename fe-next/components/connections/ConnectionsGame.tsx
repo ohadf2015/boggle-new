@@ -9,6 +9,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
+import { useGameExitGuard } from '@/hooks/useGameExitGuard';
 import { getPuzzleForLevel, getTotalLevels } from '@/lib/connections/puzzles';
 import {
   initGameState,
@@ -33,6 +34,7 @@ import { momentumState, isStreakMilestone } from '@/lib/connections/momentum';
 import PuzzleCard from './PuzzleCard';
 import ConnectionsMomentumChip from './ConnectionsMomentumChip';
 import OutOfLivesModal from './OutOfLivesModal';
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
 
 const ConnectionsEffectsCanvas = dynamic(() => import('./ConnectionsEffectsCanvas'), { ssr: false });
 
@@ -310,6 +312,17 @@ export default function ConnectionsGame() {
     router.push(`/${language}`);
   }, [router, language]);
 
+  // Guard the in-game back / browser-back / Android hardware-back so an active
+  // puzzle with real progress isn't dropped silently (parity with singleplayer).
+  const exitGuard = useGameExitGuard({
+    active:
+      state.status !== 'finished' &&
+      state.status !== 'outOfLives' &&
+      (solvedThisSession > 0 || sessionScore > 0),
+    onQuit: handleQuit,
+    message: t('singlePlayer.quitConfirmMessage'),
+  });
+
   const handleAdvance = useCallback(() => {
     advanceToNextLevel();
   }, [advanceToNextLevel]);
@@ -420,7 +433,7 @@ export default function ConnectionsGame() {
         {/* Back — icon-only to keep the bar light */}
         <button
           type="button"
-          onClick={handleQuit}
+          onClick={exitGuard.requestExit}
           aria-label={t('common.back')}
           className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-neo border-neo border-black bg-neo-navy-light text-neo-white shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed active:translate-y-[1px] transition-all duration-100"
         >
@@ -564,6 +577,17 @@ export default function ConnectionsGame() {
         level={level}
         onRevive={handleRevive}
         onQuit={handleQuit}
+      />
+
+      <ConfirmationDialog
+        open={exitGuard.showConfirm}
+        onOpenChange={exitGuard.setShowConfirm}
+        title={t('singlePlayer.quitConfirmTitle')}
+        description={t('singlePlayer.quitConfirmMessage')}
+        confirmText={t('common.quit')}
+        cancelText={t('common.cancel')}
+        onConfirm={exitGuard.confirmQuit}
+        variant="warning"
       />
     </div>
   );

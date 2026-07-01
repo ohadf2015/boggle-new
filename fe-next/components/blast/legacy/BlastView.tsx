@@ -30,6 +30,8 @@ import { useHighlightStore } from '@/stores/highlightStore';
 import { rankMoments } from '@/lib/blast/highlightScoring';
 import type { Language } from '@/shared/types/game';
 import { Button } from '@/components/ui/button';
+import ConfirmationDialog from '@/components/ui/ConfirmationDialog';
+import { useGameExitGuard } from '@/hooks/useGameExitGuard';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { saveBlastResult } from './utils/saveBlastResult';
 
@@ -289,6 +291,19 @@ export function BlastView() {
     router.push(`/${language}/`);
   }, [router, language]);
 
+  // Guard the in-game quit / browser-back / Android hardware-back so an active
+  // run isn't dropped silently (parity with singleplayer/daily).
+  const exitGuard = useGameExitGuard({
+    // Span the whole run — phase cycles playing→waveTransition→highlight→playing
+    // each wave; gating on 'playing' alone would toggle the guard (and churn its
+    // phantom-history entry) every wave and leave between-wave back unguarded.
+    active:
+      (phase === 'playing' || phase === 'waveTransition' || phase === 'highlight') &&
+      (totalScore > 0 || allWordsFound.length > 0),
+    onQuit: handleQuit,
+    message: t('singlePlayer.quitConfirmMessage'),
+  });
+
   /** Compute top-1 ranked moment for highlight phase playback */
   const highlightMoments = useMemo(() => {
     if (phase !== 'highlight') return [];
@@ -389,7 +404,7 @@ export function BlastView() {
             onWaveComplete={handleWaveComplete}
             onGameEnd={handleGameEnd}
             onHighlightStart={handleHighlightStart}
-            onQuit={handleQuit}
+            onQuit={exitGuard.requestExit}
           />
           <div className="absolute top-3 right-3 z-50">
             <BlastMascotHud
@@ -507,6 +522,17 @@ export function BlastView() {
           />
         );
       })()}
+
+      <ConfirmationDialog
+        open={exitGuard.showConfirm}
+        onOpenChange={exitGuard.setShowConfirm}
+        title={t('singlePlayer.quitConfirmTitle')}
+        description={t('singlePlayer.quitConfirmMessage')}
+        confirmText={t('common.quit')}
+        cancelText={t('common.cancel')}
+        onConfirm={exitGuard.confirmQuit}
+        variant="warning"
+      />
     </div>
   );
 }
