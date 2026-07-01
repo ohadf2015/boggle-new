@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createAdminClient()!;
+    const supabase = await createAdminClient()!;
     const result = await handleGetComboCodex(user.id, supabase as unknown as ComboCodexSupabase);
     return NextResponse.json(result.data, { status: result.status });
   } catch (error) {
