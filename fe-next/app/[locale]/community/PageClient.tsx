@@ -18,6 +18,7 @@ import {
 import { m, useMotionValue, useTransform, animate, useInView } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import Header from '@/components/Header';
@@ -153,6 +154,7 @@ function StatPill({
 export default function CommunityPageClient() {
   const { t, dir, language } = useLanguage();
   const router = useRouter();
+  const goBack = useBackOneLevel();
   const [activeTab, setActiveTab] = useState<Tab>('boards');
   const stats = useCommunityStats();
 
@@ -179,7 +181,7 @@ export default function CommunityPageClient() {
       <div className="relative z-10 p-4 pb-28 max-w-5xl mx-auto">
         {/* ── Back button ── */}
         <AdaptiveMotion.button
-          onClick={() => router.back()}
+          onClick={goBack}
           initial={{ opacity: 0, x: dir === 'rtl' ? 12 : -12 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.25 }}

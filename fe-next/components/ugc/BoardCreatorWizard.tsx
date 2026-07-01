@@ -4,9 +4,9 @@ import { useCallback, useEffect, useRef } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { ArrowLeft, ImagePlus, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeBack } from '@/hooks/useSafeBack';
 import { useBoardCreator, type UseBoardCreatorReturn } from '@/hooks/useBoardCreator';
 import { AnimatedBoardGrid } from './AnimatedBoardGrid';
 import { SeedWordTags } from './SeedWordTags';
@@ -47,8 +47,8 @@ function NeoButton({
 // ── Step 1: Configure (Live Grid) ───────────────────────────────────────────
 
 function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
-  const { t } = useLanguage();
-  const router = useRouter();
+  const { t, language } = useLanguage();
+  const goBack = useSafeBack(`/${language}/community`);
   const {
     gridSize,
     seedTags, addTag, removeTag, updateTag,
@@ -67,7 +67,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
         <button
           type="button"
           data-testid="back-to-community"
-          onClick={() => router.back()}
+          onClick={goBack}
           className={cn(
             'border-neo border-black bg-neo-navy text-neo-white shadow-hard-sm',
             'rounded-neo p-2 transition-transform active:translate-y-0.5 active:shadow-hard-pressed',

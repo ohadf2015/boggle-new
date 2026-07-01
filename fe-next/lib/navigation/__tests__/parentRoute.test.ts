@@ -26,6 +26,12 @@ describe('parentRoute', () => {
     expect(parentRoute('/es/education/duels')).toBe('/es/education');
   });
 
+  it('recognises every supported locale, incl. ru (was dropped by a hardcoded 5-list)', () => {
+    expect(parentRoute('/ru/settings')).toBe('/ru');
+    expect(parentRoute('/ru/daily/archive')).toBe('/ru/daily');
+    expect(parentRoute('/ru')).toBe('/ru');
+  });
+
   it('returns the localized home (a no-op) when already at home', () => {
     expect(parentRoute('/en')).toBe('/en');
     expect(parentRoute('/he/')).toBe('/he');

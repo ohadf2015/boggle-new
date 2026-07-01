@@ -14,7 +14,9 @@
  *  - PARENT_OVERRIDES handle routes whose URL parent has no page of its own.
  */
 
-const LOCALES = ['en', 'he', 'sv', 'ja', 'es'];
+// Single source of truth for locales — importing avoids the drift that left
+// 'ru' out here while other copies had it (Russian back nav dropped the prefix).
+import { locales as LOCALES } from '@/lib/i18n';
 
 /** Routes (locale-stripped) whose URL-drop-one parent has no page → explicit parent. */
 const PARENT_OVERRIDES: { test: RegExp; parent: string }[] = [

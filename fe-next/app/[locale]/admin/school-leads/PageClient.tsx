@@ -23,9 +23,9 @@ export function PageClient() {
 
   useEffect(() => {
     if (!loading && !profileLoading && !isAdmin) {
-      router.replace('/');
+      router.replace(`/${language}`);
     }
-  }, [isAdmin, loading, profileLoading, router]);
+  }, [isAdmin, loading, profileLoading, router, language]);
 
   if (loading || profileLoading || !isAdmin) return null;
 

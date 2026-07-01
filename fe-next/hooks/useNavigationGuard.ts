@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { registerNavigationGuard } from '@/lib/navigation/navigationGuardRegistry';
 
 interface UseNavigationGuardOptions {
   /** Whether navigation should be guarded (typically when game is active) */
@@ -76,6 +77,17 @@ export function useNavigationGuard({
     onNavigationAttemptRef.current = onNavigationAttempt;
     onAbandonAttemptRef.current = onAbandonAttempt;
   });
+
+  // Advertise this guard to the Capacitor Android back handler while enabled.
+  // On Android the hardware back never fires popstate, so without this signal
+  // the "leave game?" confirm below is silently skipped (web/iOS get it). The
+  // handler consults isNavigationGuardActive() and routes back through history
+  // so our popstate handler fires. Registered on the `enabled` lifecycle (not
+  // render) so StrictMode's double-invoke nets zero.
+  useEffect(() => {
+    if (!enabled) return;
+    return registerNavigationGuard();
+  }, [enabled]);
 
   // Handle beforeunload (tab close / refresh)
   useEffect(() => {

@@ -20,6 +20,7 @@ import { useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { isNative } from '../utils/platform';
 import { parentRoute } from '../lib/navigation/parentRoute';
+import { isNavigationGuardActive } from '../lib/navigation/navigationGuardRegistry';
 
 const ROOT_PATH_PATTERNS: RegExp[] = [
   /^\/[a-z]{2}\/?$/,
@@ -68,6 +69,20 @@ export function useAndroidBackButton(): void {
 
     const handler = (data: { canGoBack: boolean }) => {
       try {
+        // A game guard (useNavigationGuard) is active: route the back press
+        // through browser history so its popstate handler fires the "leave
+        // game?" confirm — parity with web/iOS. Takes priority over the
+        // root-path double-tap-to-exit, which would otherwise skip the prompt.
+        if (isNavigationGuardActive()) {
+          if (window.history.length > 1) {
+            window.history.back();
+          } else {
+            // No history to pop (deep-link/cold start): synthesize popstate so
+            // the guard still intercepts instead of the app exiting.
+            window.dispatchEvent(new PopStateEvent('popstate'));
+          }
+          return;
+        }
         if (isRootPath(pathRef.current)) {
           const now = Date.now();
           if (now - lastBackPressAtRef.current < EXIT_DOUBLE_TAP_WINDOW_MS) {

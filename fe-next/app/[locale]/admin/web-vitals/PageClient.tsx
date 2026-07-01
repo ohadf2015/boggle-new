@@ -63,7 +63,7 @@ const DEVICE_ICONS = {
 export default function WebVitalsPageClient() {
   const router = useRouter();
   const { theme } = useTheme();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { user, loading: authLoading } = useAuth();
 
   const [vitals, setVitals] = useState<WebVital[]>([]);
@@ -78,7 +78,7 @@ export default function WebVitalsPageClient() {
     try {
       if (!supabase) {
         toast.error('Database connection error');
-        router.push('/');
+        router.push(`/${language}`);
         return;
       }
 
@@ -90,7 +90,7 @@ export default function WebVitalsPageClient() {
 
       if (!profile?.is_admin) {
         toast.error('Access denied: Admin only');
-        router.push('/');
+        router.push(`/${language}`);
         return;
       }
 
@@ -98,21 +98,21 @@ export default function WebVitalsPageClient() {
     } catch (error) {
       console.error('Error checking admin access:', error);
       toast.error('Error checking permissions');
-      router.push('/');
+      router.push(`/${language}`);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, router]);
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push('/');
+      router.push(`/${language}`);
       return;
     }
 
     if (user) {
       checkAdminAccess();
     }
-  }, [user, authLoading, router, checkAdminAccess]);
+  }, [user, authLoading, router, checkAdminAccess, language]);
 
   async function fetchData() {
     setLoading(true);

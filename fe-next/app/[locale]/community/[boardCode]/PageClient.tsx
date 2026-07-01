@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Play, ArrowLeft } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { BoardCardBoard } from '@/components/ugc/BoardCard';
 
@@ -16,6 +17,7 @@ interface Props {
 export default function BoardPlayPageClient({ boardCode }: Props) {
   const { t } = useLanguage();
   const router = useRouter();
+  const goBack = useBackOneLevel();
   const [board, setBoard] = useState<BoardCardBoard | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -63,7 +65,7 @@ export default function BoardPlayPageClient({ boardCode }: Props) {
     <div className="min-h-screen bg-neo-navy px-4 py-8 max-w-lg mx-auto">
       <button
         type="button"
-        onClick={() => router.back()}
+        onClick={goBack}
         className="flex items-center gap-1 text-neo-white font-neo-body text-sm mb-6 hover:text-neo-white transition-colors"
       >
         <ArrowLeft size={16} className="rtl:scale-x-[-1]" />

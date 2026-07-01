@@ -58,7 +58,8 @@ describe('school-leads PageClient admin guard', () => {
   it('redirects once we know a logged-in user is NOT an admin', async () => {
     authState = { user: { id: 'u1' }, profile: { is_admin: false }, isAdmin: false, loading: false };
     render(<PageClient />);
-    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/'));
+    // Locale-preserving bounce: a Hebrew visitor lands on /he, not / (English).
+    await waitFor(() => expect(replaceMock).toHaveBeenCalledWith('/he'));
   });
 
   it('renders the queue for an admin without redirecting', async () => {

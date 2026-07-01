@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { XpByModeBreakdown } from '@/components/profile/XpByModeBreakdown';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useSafeBack } from '@/hooks/useSafeBack';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useAuth } from '@/contexts/AuthContext';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
@@ -42,6 +43,7 @@ export default function PlayerProfilePageClient() {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { id } = useParams<{ id: string }>();
+  const goBack = useSafeBack(`/${language}`);
   const { profile: myProfile, isAuthenticated } = useAuth();
 
   const [profile, setProfile] = useState<PublicProfile | null>(null);
@@ -159,7 +161,7 @@ export default function PlayerProfilePageClient() {
       {/* Back button */}
       <button
         type="button"
-        onClick={() => window.history.back()}
+        onClick={goBack}
         className="flex items-center gap-1.5 text-sm font-bold text-slate-400 hover:text-white mb-4 transition-colors"
       >
         <ArrowLeft className="w-4 h-4 rtl:scale-x-[-1]" />
