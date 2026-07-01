@@ -24,7 +24,7 @@ const mockTranslations: Record<string, string> = {
   'adventure.preview.notAttempted': 'Not attempted yet',
   'adventure.level': 'Level',
   'adventure.worldLabel': 'World',
-  'adventure.boss': 'Boss',
+  'adventure.bossLabel': 'Boss',
   'common.score': 'Score',
   'common.wordsFound': 'Words',
   'adventure.objectives.wordCount': 'Find words',

@@ -149,7 +149,7 @@ const ChapterIndicator = memo<ChapterIndicatorProps>(({
           )}
         >
           <Star className="w-3 h-3 fill-current" />
-          <span>{t('adventure.boss')}</span>
+          <span>{t('adventure.bossLabel')}</span>
         </AdaptiveMotion.div>
       )}
     </AdaptiveMotion.div>

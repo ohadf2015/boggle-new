@@ -8819,7 +8819,7 @@ const ja = {
         "prepare": "新たな挑戦に備えよう！"
       }
     },
-    "boss": "ボス",
+    "bossLabel": "ボス",
     "allStars": "全スター獲得！",
     "continue": "続ける",
     "perfect": "パーフェクト！",

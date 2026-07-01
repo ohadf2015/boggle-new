@@ -124,7 +124,7 @@ const LevelPreviewCard = memo<LevelPreviewCardProps>(
               )}
             >
               <Crown className="w-4 h-4" />
-              {t('adventure.boss')}
+              {t('adventure.bossLabel')}
             </div>
           )}
 

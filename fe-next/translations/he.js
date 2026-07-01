@@ -9014,7 +9014,7 @@ const he = {
         "prepare": "התכוננו לאתגרים חדשים!"
       }
     },
-    "boss": "בוס",
+    "bossLabel": "בוס",
     "combo": {
       "nice": "יפה!",
       "great": "מעולה!",

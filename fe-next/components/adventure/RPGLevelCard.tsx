@@ -112,7 +112,7 @@ const RPGLevelCard = memo(function RPGLevelCard({
             <div className="flex items-center gap-1.5 mb-1.5">
               <Swords data-testid="swords-icon" className="w-3.5 h-3.5 text-neo-red" />
               <span className="text-[10px] font-neo-display font-black text-neo-red uppercase tracking-widest">
-                {t('adventure.boss')}
+                {t('adventure.bossLabel')}
               </span>
             </div>
           )}

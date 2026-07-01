@@ -13216,7 +13216,7 @@ const ru = {
   "forfeitCancel": "Отменить",
   "wonByForfeit": "Победа по отказу",
   "adventure": {
-    "boss": "Босс",
+    "bossLabel": "Босс",
     "surprise": {
       "doubleGold": {
         "label": "Двойное золото!",

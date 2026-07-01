@@ -8969,7 +8969,7 @@ const sv = {
         "prepare": "Förbered dig för nya utmaningar!"
       }
     },
-    "boss": "Boss",
+    "bossLabel": "Boss",
     "combo": {
       "nice": "Snyggt!",
       "great": "Toppen!",

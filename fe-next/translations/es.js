@@ -8751,7 +8751,7 @@ const es = {
       "returnToLevels": "Volver a los niveles",
       "retry": "Intentar de nuevo"
     },
-    "boss": "Jefe",
+    "bossLabel": "Jefe",
     "allStars": "Todas las Estrellas",
     "continue": "Continuar",
     "perfect": "¡Perfecto!",

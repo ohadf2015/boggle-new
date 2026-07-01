@@ -7929,7 +7929,7 @@ const en = {
     "hiddenWord": "Hidden Word",
     "devPreview": "Development Preview",
     "devPreviewDesc": "Adventure Mode is under development. This preview shows the world map and level configuration.",
-    "boss": "Boss",
+    "bossLabel": "Boss",
     "allStars": "All stars collected!",
     "continue": "Continue",
     "perfect": "Perfect!",

@@ -5,7 +5,7 @@ const mockT = (key: string) => {
   const translations: Record<string, string> = {
     'adventure.lvl': 'LVL',
     'adventure.next': 'NEXT',
-    'adventure.boss': 'BOSS',
+    'adventure.bossLabel': 'BOSS',
   };
   return translations[key] || key;
 };
