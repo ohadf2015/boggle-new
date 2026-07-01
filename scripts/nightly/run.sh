@@ -651,8 +651,10 @@ if [ "$gate_ok" = "0" ]; then
           || { log "test failed (attempt $attempt)"; continue; }
         # Build into an ISOLATED dir (.next-nightly via NEXT_BUILD_DIR) so a running
         # dev server's .next is never shared (raced phantom SSR errors on 2026-05-20).
+        # NIGHTLY_SKIP_NEXT_TS=1: skip next build's slow/silent "Running TypeScript" phase
+        # (wedges >900s); the isolated gate's standalone tsc --noEmit already covers types.
         ( cd fe-next; rm -rf .next-nightly 2>/dev/null
-          NEXT_BUILD_DIR=.next-nightly npm run build:fast 2>&1 | tail -30 ) >> "$RUN_LOG" 2>&1 \
+          NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast 2>&1 | tail -30 ) >> "$RUN_LOG" 2>&1 \
           || { log "build failed (attempt $attempt)"; continue; }
         gate_ok=1; break
       done

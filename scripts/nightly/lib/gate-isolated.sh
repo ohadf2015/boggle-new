@@ -70,7 +70,11 @@ _gate_npm_chain() {
   # never verified — proving it builds clean before shipping keeps the old "never
   # ship build-breaking code" guarantee even when we deliberately ignore the tests.
   if [ "$build_only" = "1" ]; then
-    printf '%s' "npm run build:schemas && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly npm run build:fast; }"
+    # tsc --noEmit gives the type verdict + NIGHTLY_SKIP_NEXT_TS=1 tells next build to
+    # SKIP its own "Running TypeScript" phase — which wedges silently >900s in a fresh
+    # worktree (2026-07-01: the build-only re-gate wedged there, dropping to the slow
+    # typecheck tier after a ~40min hang). Mirrors the happy-path chain (line ~103).
+    printf '%s' "npm run build:schemas && npx --no-install tsc --noEmit && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast; }"
     return 0
   fi
   [ "$skip_lint" = "1" ] || chain="npm run lint && "
