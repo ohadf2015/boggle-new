@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     }
     const userId = user.id;
 
-    const supabase = createAdminClient()!;
+    const supabase = await createAdminClient()!;
     const { data: engagement } = await supabase
       .from('player_engagement')
       .select('last_played_at, comeback_bonus_expires_at')

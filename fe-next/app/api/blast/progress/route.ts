@@ -1,7 +1,7 @@
 import { createClient } from '@/utils/supabase/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { NextRequest, NextResponse } from 'next/server';
-import { handleGetBlastProgress, handleClaimBlastProgress, type BlastProgressPayload, type SupabaseLike } from './_handlers';
+import { handleGetBlastProgress, handleClaimBlastProgress, type SupabaseLike } from './_handlers';
 
 const VALID_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
   // otherwise. Read-only. The cookie client is still used for the data read.
   const user = await getAuthedUser(req);
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const supabase = await createClient();
+  const supabase = await createClient(); // Keep for SELECT queries; auth is local
 
   const localeParam = new URL(req.url).searchParams.get('locale');
   const defaultLocale = VALID_LOCALES.includes(localeParam as (typeof VALID_LOCALES)[number])

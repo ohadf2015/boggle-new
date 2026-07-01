@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
     const userId = user.id;
 
-    const supabase = await createClient();
+    const supabase = await createClient(); // Keep for SELECT queries; auth is local
     const { data: profile, error } = await supabase
       .from('profiles')
       .select('current_level, prestige_level, prestige_multiplier, prestige_unlocks, total_xp, lifetime_xp')

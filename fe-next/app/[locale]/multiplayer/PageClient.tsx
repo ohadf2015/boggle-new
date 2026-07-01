@@ -35,7 +35,12 @@ import { useGameActions, useGameStore, useGameActive, useShowStartAnimation } fr
 import { resolveMultiplayerMusicTrack } from './multiplayerMusic';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { neoInfoToast } from '@/components/NeoToast';
-import { HostLeftGraceModal } from '@/components/multiplayer/HostLeftGraceModal';
+// Grace modal only appears on a rare host-left socket event, never at lobby first
+// paint — lazy-load to keep it out of the multiplayer route's initial parse.
+const HostLeftGraceModal = nextDynamic(
+  () => import('@/components/multiplayer/HostLeftGraceModal').then((m) => m.HostLeftGraceModal),
+  { ssr: false },
+);
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import { roomGoneFeedback } from '@/lib/multiplayer/roomGoneFeedback';
 import { trackInviteRoomDead, trackGrowthEvent, trackInviteConsumed } from '@/utils/growthTracking';

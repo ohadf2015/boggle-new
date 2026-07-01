@@ -40,7 +40,10 @@ import FirstGameCelebration from '@/components/brain/FirstGameCelebration';
 import PersonalizedDrillRecommendation from '@/components/brain/PersonalizedDrillRecommendation';
 import WelcomeBackCard from '@/components/brain/WelcomeBackCard';
 import BrainScoreShareCard from '@/components/brain/BrainScoreShareCard';
-import AuthModal from '@/components/auth/AuthModal';
+// Sign-in modal opens only on a CTA click, far below the fold — lazy-load to keep
+// its ~40KB (framer + OAuth UI) out of this route's initial parse. ssr:false: renders
+// nothing when closed, so first-paint HTML is unchanged.
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 import PageLoader from '@/components/ui/PageLoader';
 
 /**
@@ -323,12 +326,14 @@ export default function BrainTrainingPageClient() {
           </div>
 
           {/* Auth Modal */}
-          <AuthModal
-            isOpen={showAuthModal}
-            onClose={() => setShowAuthModal(false)}
-            showGuestStats={true}
-            initialMode={authModalMode}
-          />
+          {showAuthModal && (
+            <AuthModal
+              isOpen
+              onClose={() => setShowAuthModal(false)}
+              showGuestStats={true}
+              initialMode={authModalMode}
+            />
+          )}
         </div>
       </div>
     );

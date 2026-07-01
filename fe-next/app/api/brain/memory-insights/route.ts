@@ -8,6 +8,7 @@
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 import { computeMemoryInsights, type WeekWindow } from '@/shared/utils/memoryInsights';
 
@@ -29,16 +30,16 @@ function avgScore(rows: { working_memory: number | null }[]): number {
   return vals.reduce((a, b) => a + b, 0) / vals.length;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const supabase = await createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+    // Local JWT verify (sub-ms) instead of a 50-200ms auth.getUser() round-trip.
+    // Read-only insights; user.id scopes the SELECTs below. createClient is kept
+    // (still needed for the queries), but auth no longer costs a network hop.
+    const user = await getAuthedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const supabase = await createClient();
 
     const now = Date.now();
     const thisWeekStart = new Date(now - WEEK_MS);

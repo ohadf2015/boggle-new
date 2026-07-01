@@ -28,13 +28,13 @@ export async function GET(request: NextRequest) {
   let userId: string;
   let supabase: Awaited<ReturnType<typeof createClient>>;
   try {
-    supabase = await createClient();
     const user = await getAuthedUser(request);
 
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     userId = user.id;
+    supabase = await createClient();
   } catch (authErr) {
     const msg = authErr instanceof Error ? authErr.message : String(authErr);
     console.error('[ADVENTURE API] Auth threw:', msg);

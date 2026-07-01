@@ -28,8 +28,18 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { QueryProvider } from '@/components/providers/QueryProvider';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
 import { AdMobProvider } from '@/contexts/AdMobContext';
-import { SeasonClaimContainer } from '@/components/seasons/SeasonClaimContainer';
-import { SeasonAnnouncementModal } from '@/components/seasons/SeasonAnnouncementModal';
+// Season claim/announcement are home-only, interaction-gated popups (never SSR/SEO
+// content) — lazy-load so their ~35KB stays out of the synchronous initial parse on
+// every route. ssr:false: they render nothing visible when there's nothing to claim,
+// so first-paint HTML is identical (no CLS).
+const SeasonClaimContainer = dynamic(
+  () => import('@/components/seasons/SeasonClaimContainer').then((m) => m.SeasonClaimContainer),
+  { ssr: false },
+);
+const SeasonAnnouncementModal = dynamic(
+  () => import('@/components/seasons/SeasonAnnouncementModal').then((m) => m.SeasonAnnouncementModal),
+  { ssr: false },
+);
 import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
 
 // Non-first-paint leaf mounts (effect-only listeners, gated modals, native
