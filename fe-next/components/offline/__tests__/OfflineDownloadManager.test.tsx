@@ -102,7 +102,7 @@ describe('OfflineDownloadManager', () => {
     render(<OfflineDownloadManager />);
     await waitFor(() => {
       const downloadButtons = screen.getAllByText('offlineDownload.downloadButton');
-      expect(downloadButtons.length).toBe(5); // 5 languages
+      expect(downloadButtons.length).toBe(6); // 6 languages
     });
   });
 

@@ -194,6 +194,7 @@ vi.mock('../../../backend/modules/wordHuntManager', () => ({
     targetWordLength: 7,
     playerProgress: {},
   }),
+  getRecentMpTargets: vi.fn().mockReturnValue(new Set<string>()),
 }));
 
 vi.mock('../../../backend/utils/socketValidation', () => ({
