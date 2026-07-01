@@ -22,6 +22,8 @@ import { useCoinsFromContext } from '@/contexts/CoinContext';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import { buildQuitDialogConfig } from './survival/quitDialogConfig';
+import logger from '@/utils/logger';
 import WordFormingArea from '@/components/game/WordFormingArea';
 import { useGameRewards } from '@/hooks/useGameRewards';
 import { InlineConfetti } from '@/components/effects/InlineConfetti';
@@ -363,11 +365,30 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     return () => setIsInGame(false);
   }, [isGameActive, setIsInGame]);
 
+  // Quit-confirmation copy, resolved defensively. A locale bundle that resolves
+  // one of these keys to a non-string would otherwise make React throw during
+  // render — and on this nav-hidden, guard-armed surface that throw presents as
+  // a black, frozen screen (the "exit Daily in Hebrew → black screen" report).
+  // buildQuitDialogConfig never throws: broken keys degrade to a generic config.
+  const quitDialog = useMemo(() => buildQuitDialogConfig(t), [t]);
+
   // Handle quit flow
   const handleQuitConfirm = () => {
+    // Close the dialog and disarm the guard FIRST and unconditionally, so its
+    // teardown can't fire the history.go(-1) that blanks a Capacitor WebView.
     actions.setShowQuitConfirm(false);
     setQuitting(true); // disarm guard before the exit nav
-    onQuit();
+    try {
+      onQuit();
+    } catch (err) {
+      // A throw in the exit bookkeeping (analytics/nav) must never strand the
+      // player on a nav-hidden game screen. Force a hard navigation to the
+      // daily hub as a last-resort escape hatch instead of freezing black.
+      logger.error('Daily quit handler threw; forcing navigation to hub', err);
+      if (typeof window !== 'undefined') {
+        window.location.assign(`/${language}/daily`);
+      }
+    }
   };
 
   // Stable callbacks for SurvivalDesktopLayout — inline arrows broke the memo()
@@ -468,13 +489,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         <ConfirmationDialog
           open={state.showQuitConfirm}
           onOpenChange={(open) => actions.setShowQuitConfirm(open)}
-          title={t('daily.quitConfirmTitle')}
-          description={
-            t('daily.quitConfirm') ||
-            "If you quit, this will count as your attempt for today. You won't be able to try again until tomorrow."
-          }
-          confirmText={t('daily.imSure')}
-          cancelText={t('common.cancel')}
+          title={quitDialog.title}
+          description={quitDialog.description}
+          confirmText={quitDialog.confirmText}
+          cancelText={quitDialog.cancelText}
           onConfirm={handleQuitConfirm}
           variant="danger"
           analyticsId="daily_survival_quit_confirm"
@@ -666,13 +684,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       <ConfirmationDialog
         open={state.showQuitConfirm}
         onOpenChange={(open) => actions.setShowQuitConfirm(open)}
-        title={t('daily.quitConfirmTitle')}
-        description={
-          t('daily.quitConfirm') ||
-          "Your progress won't be saved. You'll need to watch an ad to play again today."
-        }
-        confirmText={t('daily.imSure')}
-        cancelText={t('common.cancel')}
+        title={quitDialog.title}
+        description={quitDialog.description}
+        confirmText={quitDialog.confirmText}
+        cancelText={quitDialog.cancelText}
         onConfirm={handleQuitConfirm}
         variant="danger"
         analyticsId="daily_survival_quit_confirm"
