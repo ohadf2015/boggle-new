@@ -275,9 +275,14 @@ const PlayerView: React.FC<PlayerViewProps> = memo(({
   });
 
 
-  // Navigation guard - prevent accidental navigation during active game
+  // Navigation guard — intercept a phone back-gesture for the ENTIRE MP session,
+  // not just active play. Since lobby auto-start was removed, players sit in the
+  // pre-game waiting room until the host starts; a back-gesture there must also
+  // confirm and return to the lobby instead of silently leaving. PlayerView only
+  // mounts while the player is in a room, so guarding its whole lifetime is
+  // correct. The confirm dialog + exit-to-lobby are wired in both sub-views.
   useNavigationGuard({
-    enabled: gameActive,
+    enabled: true,
     leaving,
     message: t('playerView.exitWarning'),
     onNavigationAttempt: () => {

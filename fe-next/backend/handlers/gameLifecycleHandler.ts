@@ -43,7 +43,6 @@ import {
 import { emitError, ErrorCodes } from '../utils/errorHandler.js';
 import {
   shouldTriggerAutoStart,
-  startAutoStartCountdown,
   cancelAutoStartCountdown,
   clearAutoStartState,
 } from '../modules/lobbyAutoStart.js';
@@ -108,24 +107,6 @@ interface AuthConnection {
 // Guards against TOCTOU race in createGame: tracks game codes whose creation
 // is in-flight (between gameExists check and createGame call across async yields).
 const gamesBeingCreated = new Set<string>();
-
-/**
- * Begin the server-owned lobby auto-start countdown for a game. Ticks are
- * broadcast to the whole room (one synced clock for host + guests); at zero the
- * host socket is told to fire its normal `startGame` path. Re-resolves the host
- * socket at fire time so a host reconnect mid-countdown still receives it.
- */
-function beginLobbyAutoStart(io: Server, gameCode: string): void {
-  startAutoStartCountdown(gameCode, {
-    onTick: (secondsLeft) =>
-      broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartTick', { secondsLeft }),
-    onFire: () => {
-      const game = getGame(gameCode);
-      if (!game || game.gameState !== 'waiting' || !game.hostSocketId) return;
-      io.to(game.hostSocketId).emit('lobbyAutoStartFire', {});
-    },
-  });
-}
 
 /**
  * Register game lifecycle socket event handlers
@@ -681,14 +662,14 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
       });
 
       // Everyone (non-host humans) is ready in the *waiting* lobby: nudge the
-      // host AND begin a short server-owned countdown so a stalled host no
-      // longer blocks the game. Any un-ready cancels it.
+      // host so it knows it can start. The game does NOT auto-start — the host
+      // stays in explicit control via the "Start Battle" button (product
+      // decision: removed the server-owned auto-start countdown).
       if (data?.ready && shouldTriggerAutoStart(result.readyCount, result.totalPlayers)) {
         broadcastToRoom(io, getGameRoom(gameCode), 'allPlayersReady', {
           readyCount: result.readyCount,
           totalPlayers: result.totalPlayers,
         });
-        beginLobbyAutoStart(io, gameCode);
       } else if (!data?.ready) {
         cancelAutoStartCountdown(gameCode, () =>
           broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartCancelled', {})

@@ -1,14 +1,12 @@
 /**
- * lobbyReady → server-owned lobby auto-start wiring.
+ * lobbyReady → all-ready host nudge (NO auto-start).
  *
- * The initial *waiting* lobby previously sent NO host signal when every guest
- * readied (only the silent `playersReadyUpdate` count), so a stalled host could
- * strand a fully-ready lobby. These tests lock in the fix: all-ready now both
- * nudges the host (`allPlayersReady`) and starts a synced countdown that fires
- * the host's start; any un-ready cancels it.
- *
- * The real `lobbyAutoStart` module runs here (not mocked) so the countdown
- * behaviour is exercised end-to-end under fake timers.
+ * Product decision: the MP lobby must NOT auto-start. When every non-host human
+ * readies, the host is still *nudged* (`allPlayersReady`) so it knows it can hit
+ * "Start Battle", but the server no longer runs a countdown that starts the game
+ * on the host's behalf — the host stays in explicit control. These tests lock in
+ * that the informational nudge fires while the countdown (`lobbyAutoStartTick` /
+ * `lobbyAutoStartFire`) never does.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { clearAutoStartState } from '../../modules/lobbyAutoStart';
@@ -139,8 +137,8 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-describe('lobbyReady → lobby auto-start', () => {
-  it('nudges the host and begins a synced countdown when everyone is ready', () => {
+describe('lobbyReady → all-ready nudge (no auto-start)', () => {
+  it('nudges the host but does NOT begin an auto-start countdown when everyone is ready', () => {
     mockGetPlayersReadyCount.mockReturnValue({ readyCount: 2, totalPlayers: 2, readyUsernames: ['A', 'B'] });
     const { io } = makeIo();
     const socket = createSocket();
@@ -150,10 +148,22 @@ describe('lobbyReady → lobby auto-start', () => {
 
     const events = broadcastEvents();
     expect(events).toContain('allPlayersReady');
-    expect(events).toContain('lobbyAutoStartTick'); // immediate first tick
+    expect(events).not.toContain('lobbyAutoStartTick');
   });
 
-  it('does NOT start a countdown while some players are still not ready', () => {
+  it('never fires the host start, even after the old countdown window elapses', () => {
+    mockGetPlayersReadyCount.mockReturnValue({ readyCount: 1, totalPlayers: 1, readyUsernames: ['A'] });
+    const { io, hostEmit } = makeIo();
+    const socket = createSocket();
+    registerGameLifecycleHandlers(io, socket as never);
+
+    socket.handlers['lobbyReady']({ ready: true });
+    vi.advanceTimersByTime(6000); // past the removed AUTO_START_SECONDS window
+
+    expect(hostEmit).not.toHaveBeenCalledWith('lobbyAutoStartFire', {});
+  });
+
+  it('does NOT nudge while some players are still not ready', () => {
     mockGetPlayersReadyCount.mockReturnValue({ readyCount: 1, totalPlayers: 2, readyUsernames: ['A'] });
     const { io } = makeIo();
     const socket = createSocket();
@@ -165,47 +175,5 @@ describe('lobbyReady → lobby auto-start', () => {
     expect(events).toContain('playersReadyUpdate');
     expect(events).not.toContain('allPlayersReady');
     expect(events).not.toContain('lobbyAutoStartTick');
-  });
-
-  it('fires the host start after the countdown elapses', () => {
-    mockGetPlayersReadyCount.mockReturnValue({ readyCount: 1, totalPlayers: 1, readyUsernames: ['A'] });
-    const { io, hostEmit } = makeIo();
-    const socket = createSocket();
-    registerGameLifecycleHandlers(io, socket as never);
-
-    socket.handlers['lobbyReady']({ ready: true });
-    vi.advanceTimersByTime(6000); // past AUTO_START_SECONDS
-
-    expect(hostEmit).toHaveBeenCalledWith('lobbyAutoStartFire', {});
-  });
-
-  it('cancels the countdown when a player un-readies', () => {
-    mockGetPlayersReadyCount.mockReturnValue({ readyCount: 2, totalPlayers: 2, readyUsernames: ['A', 'B'] });
-    const { io, hostEmit } = makeIo();
-    const socket = createSocket();
-    registerGameLifecycleHandlers(io, socket as never);
-
-    socket.handlers['lobbyReady']({ ready: true });
-    // Now someone toggles off
-    mockGetPlayersReadyCount.mockReturnValue({ readyCount: 1, totalPlayers: 2, readyUsernames: ['A'] });
-    socket.handlers['lobbyReady']({ ready: false });
-
-    expect(broadcastEvents()).toContain('lobbyAutoStartCancelled');
-    vi.advanceTimersByTime(6000);
-    expect(hostEmit).not.toHaveBeenCalledWith('lobbyAutoStartFire', {});
-  });
-
-  it('host can cancel via lobbyAutoStartCancel', () => {
-    mockGetPlayersReadyCount.mockReturnValue({ readyCount: 1, totalPlayers: 1, readyUsernames: ['A'] });
-    const { io, hostEmit } = makeIo();
-    const socket = createSocket();
-    registerGameLifecycleHandlers(io, socket as never);
-
-    socket.handlers['lobbyReady']({ ready: true });
-    socket.handlers['lobbyAutoStartCancel']();
-
-    expect(broadcastEvents()).toContain('lobbyAutoStartCancelled');
-    vi.advanceTimersByTime(6000);
-    expect(hostEmit).not.toHaveBeenCalledWith('lobbyAutoStartFire', {});
   });
 });

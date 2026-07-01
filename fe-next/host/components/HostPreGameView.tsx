@@ -496,10 +496,14 @@ function HostPreGameView({
     return <SoloPlayPrompt onPlayVsBots={handleSoloPlayVsBots} t={t} />;
   };
 
-  // Some — but not all — guests are ready: nudge the host to start (no auto-fire).
+  // Guests are ready: nudge the host to start manually (auto-start removed, so
+  // the host is always the one who begins). Fires from the first ready player
+  // through all-ready (`<=`) — at all-ready the existing "{count}/{total} ready
+  // — start the game!" copy IS the affirmative "everyone's in, press Start" cue
+  // that the removed auto-start banner used to provide.
   const readyCount = readyUsernames.length;
   const showWaitingNudge =
-    autoStartSecondsLeft === null && readyCount > 0 && readyTotal > 0 && readyCount < readyTotal;
+    autoStartSecondsLeft === null && readyCount > 0 && readyTotal > 0 && readyCount <= readyTotal;
 
   // TV mode toggle — neo-brutalist pill with hard shadow. The caption beneath
   // surfaces the view-only consequence AT the decision point, so a host knows
