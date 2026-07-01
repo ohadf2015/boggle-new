@@ -4,7 +4,16 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
-### [Flag Retirement] share-prompt-timing — 87+ days, inconclusive
+### [Flag Retirement] mp-signup-nudge-copy-v1 — 54 days, inconclusive
+- Created 2026-05-08, active, rollout 100%. Wired in useMultiplayerSignupNudge.ts.
+- Variants: control (sheet+toast) vs toast-disabled (sheet only). 54-day window with no winner surfaced.
+- Recommended owner: human — check PostHog experiment results; if no winner at n≥1000/arm retire and keep `toast-disabled` (simpler UX).
+
+### [Flag Ghost] exp-blast-wave-banner-v1 — in PostHog but NOT in experiments.ts
+- Created 2026-06-29, active, rollout 100%. No call site in fe-next (not wired).
+- Recommended owner: human — either wire it to a component or delete from PostHog.
+
+### [Flag Retirement] share-prompt-timing — 88+ days, inconclusive
 - Created 2026-03-31, active, rollout 100%. Wired in SinglePlayerResults.tsx + useSharePromptImpression.ts.
 - Variants: immediate-after-win vs results-page. No statistically significant winner surfaced in nightly sweeps.
 - recommended owner: human — check PostHog experiment results; if no winner at n≥1000/arm retire and keep `results-page` (current default).

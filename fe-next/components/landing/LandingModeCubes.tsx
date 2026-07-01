@@ -131,6 +131,10 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
   return (
     <Link
       href={locked ? '#' : model.href}
+      // Don't viewport-prefetch every game route on landing load — that pulls ~8
+      // heavy route chunks into the initial parse window. Hover/focus prefetch still
+      // fires, so navigation stays snappy. (HomeDailyHero already does this.)
+      prefetch={false}
       onClick={handleClick}
       aria-disabled={locked || undefined}
       data-testid={anchor ? 'mode-cube-anchor' : 'mode-cube'}

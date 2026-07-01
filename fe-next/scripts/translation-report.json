@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 5925,
+    "totalKeysInCode": 5941,
     "keyCountByLanguage": {
-      "en": 11366,
-      "he": 11494,
-      "sv": 11473,
-      "ja": 11474,
-      "es": 11502,
-      "ru": 11366
+      "en": 11396,
+      "he": 11524,
+      "sv": 11503,
+      "ja": 11504,
+      "es": 11532,
+      "ru": 11393
     },
-    "missingFromEnglish": 10,
+    "missingFromEnglish": 5,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 25,
@@ -134,7 +134,7 @@
       {
         "pattern": "rank.tier.${tier}",
         "file": "components/seasons/RankTierChip.tsx",
-        "line": 39,
+        "line": 59,
         "context": "{t(`rank.tier.${tier}`)}",
         "type": "template_literal"
       },
@@ -426,59 +426,6 @@
         {
           "file": "components/adventure/boss/WeaknessBadge.tsx",
           "line": 51
-        }
-      ]
-    },
-    {
-      "key": "report.detailsOptional",
-      "usages": [
-        {
-          "file": "components/moderation/ReportDialog.tsx",
-          "line": 82
-        }
-      ]
-    },
-    {
-      "key": "report.reason",
-      "usages": [
-        {
-          "file": "components/moderation/ReportDialog.tsx",
-          "line": 58
-        }
-      ]
-    },
-    {
-      "key": "report.submit",
-      "usages": [
-        {
-          "file": "components/moderation/ReportDialog.tsx",
-          "line": 100
-        }
-      ]
-    },
-    {
-      "key": "report.success",
-      "usages": [
-        {
-          "file": "components/RoomChat.tsx",
-          "line": 99
-        },
-        {
-          "file": "components/friends/FriendsList.tsx",
-          "line": 844
-        }
-      ]
-    },
-    {
-      "key": "report.title",
-      "usages": [
-        {
-          "file": "components/RoomChat.tsx",
-          "line": 450
-        },
-        {
-          "file": "components/friends/messaging/MessageThread.tsx",
-          "line": 365
         }
       ]
     }
@@ -1258,7 +1205,11 @@
       "admin.sendSuccess",
       "admin.sendError"
     ],
-    "ru": []
+    "ru": [
+      "daily.catchUp.appTitle",
+      "daily.catchUp.appSubtitle",
+      "daily.catchUp.appCta"
+    ]
   },
   "keysNotInEnglish": {
     "he": [

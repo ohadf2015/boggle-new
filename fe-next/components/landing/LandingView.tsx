@@ -192,8 +192,11 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
     >
       {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
-      {!hideExternalAuth && <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />}
-      <ShareReferralModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
+      {/* Render modals only once opened so their dynamic chunks load on interaction,
+          not during initial hydration — keeps ~50KB of modal JS out of the landing
+          first-paint parse window. */}
+      {!hideExternalAuth && showAuthModal && <AuthModal isOpen onClose={() => setShowAuthModal(false)} />}
+      {showShareModal && <ShareReferralModal isOpen onClose={() => setShowShareModal(false)} />}
       <Header />
 
       {visibleEvent && (

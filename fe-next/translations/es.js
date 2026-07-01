@@ -13361,6 +13361,11 @@ const es = {
       "masterForge": "¡GRAN FORJA!",
       "aria": "{{heat}} de 3 creaciones perfectas"
     },
+    "scoreTier": {
+      "good": "¡BIEN!",
+      "great": "¡GENIAL!",
+      "blazing": "¡BRILLANTE!"
+    },
     "subtitle": "Deletrea palabras. Reúne runas. Rompe el récord.",
     "go": "¡Adelante!",
     "startRun": "Iniciar partida",

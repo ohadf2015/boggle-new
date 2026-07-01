@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
     }
     const userId = user.id;
 
-    const supabase = createAdminClient()!;
+    const supabase = await createAdminClient()!;
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();

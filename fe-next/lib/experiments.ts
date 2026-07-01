@@ -552,6 +552,24 @@ export const EXPERIMENTS = {
     description:
       'MP between-round score-gap nudge. gap-nudge = show "X pts behind lead" encouragement pill when player lost the round and the series continues. Targets mp_player_dropped rate. Conversion = mp_round_ready_clicked.',
   }),
+
+  /**
+   * Landing page quick-play CTA. Hypothesis: rage-clicks on /es (and other
+   * locales) signal decision paralysis — the mode grid offers too many choices
+   * with no clear primary action. The `quick-play` arm adds a high-contrast
+   * "Play Now →" button below the hero that links directly to multiplayer,
+   * giving first-time visitors a single unambiguous action.
+   *
+   * Conversion = game_started within 2min of landing_view.
+   * Guardrail = bounce_rate (must not rise vs control).
+   * Ship to PostHog: flag key = 'exp-landing-quick-play-v1', 50/50 rollout.
+   */
+  'exp-landing-quick-play-v1': defineExperiment({
+    variants: ['control', 'quick-play'] as const,
+    default: 'control',
+    description:
+      'Landing page quick-play CTA. quick-play = prominent "Play Now" button below hero linking to multiplayer. Targets rage-click drop on /es and other locales. Control = current mode grid only.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

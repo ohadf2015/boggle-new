@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-29T07:31:14.551Z",
+  "generatedAt": "2026-06-30T20:28:42.125Z",
   "commits": [
     {
-      "sha": "50bf75ab86c7ce0e9e5578506f70673ad3f20ad6",
-      "shortSha": "50bf75a",
-      "subject": "feat(nightly): recover dropped 2026-06-29 lane code + fix stale cosmetics gate",
+      "sha": "747c8d39e0e3f94e26bce3af44a445a8db7d0a10",
+      "shortSha": "747c8d3",
+      "subject": "feat(daily): native Hebrew word meanings from Wiktionary + dict-first enrichment",
       "author": "Ohad Fisher",
-      "date": "2026-06-29T10:26:29+03:00"
+      "date": "2026-06-30T23:23:52+03:00"
     },
     {
-      "sha": "26aa7078ac81c4473013b4bef299864993ecbed3",
-      "shortSha": "26aa707",
-      "subject": "chore(nightly): autonomous improvement loop 2026-06-29",
+      "sha": "9a75cfe26f1482ca3139f67b6dcf9b6f2b606639",
+      "shortSha": "9a75cfe",
+      "subject": "feat(connections): UI polish — i18n difficulty, wrong-guess flash, why-it-works box, neo CTAs",
       "author": "Ohad Fisher",
-      "date": "2026-06-29T06:20:41+03:00"
+      "date": "2026-06-30T23:18:37+03:00"
     },
     {
-      "sha": "02135d1f5763240296a2424869e24f43c7384f26",
-      "shortSha": "02135d1",
-      "subject": "Merge pull request #663 from ohadf2015/claude/email-subject-lines-wm5x2c",
-      "author": "ohadf2015",
-      "date": "2026-06-28T22:26:33+03:00"
-    },
-    {
-      "sha": "eaf87ee1c44c4971afed2143518671ce27cb82cb",
-      "shortSha": "eaf87ee",
-      "subject": "feat(emails): rewrite subject lines to be human and emoji-free",
-      "author": "Claude",
-      "date": "2026-06-28T19:24:09Z"
-    },
-    {
-      "sha": "be935ef36ccb2f530d6f636af539cd17a2059b0e",
-      "shortSha": "be935ef",
-      "subject": "Merge pull request #661 from ohadf2015/claude/desktop-nav-game-play-error-3bmkuz",
-      "author": "ohadf2015",
-      "date": "2026-06-28T20:39:36+03:00"
-    },
-    {
-      "sha": "3f7487bdcc90620e4f843587e9df3ef57550abae",
-      "shortSha": "3f7487b",
-      "subject": "Merge pull request #660 from ohadf2015/claude/mp-lobby-ui-refinements-52ei9g",
-      "author": "ohadf2015",
-      "date": "2026-06-28T20:39:14+03:00"
-    },
-    {
-      "sha": "68b0610a5cd0f584c935e8f14afd8dd2a8797a63",
-      "shortSha": "68b0610",
-      "subject": "feat(mp-lobby): hide style picker pre-first-game, longer bot countdown, declutter blast tiles",
-      "author": "Claude",
-      "date": "2026-06-28T17:36:52Z"
-    },
-    {
-      "sha": "22858e46b121d11ad61322005eed2a0f6b44fae3",
-      "shortSha": "22858e4",
-      "subject": "fix(nav): desktop Quick Play tab routes straight to multiplayer, not the /singleplayer redirect stub",
-      "author": "Claude",
-      "date": "2026-06-28T17:34:58Z"
-    },
-    {
-      "sha": "e654ac494e6d848998e8b05938c097e472fd36d9",
-      "shortSha": "e654ac4",
-      "subject": "Merge pull request #659 from ohadf2015/claude/desktop-shell-timers-layout-d91hyh",
-      "author": "ohadf2015",
-      "date": "2026-06-28T20:24:18+03:00"
-    },
-    {
-      "sha": "e3bf3e0d3afe16ae8ab388e2e962413c6fe3bd4f",
-      "shortSha": "e3bf3e0",
-      "subject": "Merge pull request #658 from ohadf2015/claude/practice-completion-celebration-ux-cc5py4",
-      "author": "ohadf2015",
-      "date": "2026-06-28T20:23:46+03:00"
-    },
-    {
-      "sha": "4ed02775def93450d8e57f6ea82fead377c5314b",
-      "shortSha": "4ed0277",
-      "subject": "fix(mp-desktop): single server-synced timer + no-scroll rails",
-      "author": "Claude",
-      "date": "2026-06-28T17:22:50Z"
-    },
-    {
-      "sha": "9a3045cbc76e75be97cd7f9d46a0313d70b47984",
-      "shortSha": "9a3045c",
-      "subject": "feat(practice): celebratory all-complete state with home CTA",
-      "author": "Claude",
-      "date": "2026-06-28T17:16:18Z"
-    },
-    {
-      "sha": "b2143a599d1f0ebc4c3824720aed9f342ac18eb7",
-      "shortSha": "b2143a5",
-      "subject": "perf(friends): collapse thread-list N+1 into one RPC + dedupe auth.getUser round-trips",
+      "sha": "2786c7328a3c2050a0d0b595f39718ae6c05f2c4",
+      "shortSha": "2786c73",
+      "subject": "fix(connections): admin can mark bad riddles (Express body-drain + all-locale review)",
       "author": "Ohad Fisher",
-      "date": "2026-06-28T12:15:39+03:00"
+      "date": "2026-06-30T23:17:53+03:00"
     },
     {
-      "sha": "e273f259295c4c986f6ddb1bd738504742b6f422",
-      "shortSha": "e273f25",
-      "subject": "Merge pull request #657 from ohadf2015/claude/hebrew-quest-translations-8wkiiu",
-      "author": "ohadf2015",
-      "date": "2026-06-28T09:22:52+03:00"
-    },
-    {
-      "sha": "78b2fbab1df1a5dd5db3ac5e1a05dca7c2b19be1",
-      "shortSha": "78b2fba",
-      "subject": "fix(i18n): natural Hebrew for daily quest titles & descriptions",
-      "author": "Claude",
-      "date": "2026-06-28T06:10:31Z"
-    },
-    {
-      "sha": "e481e0df849313a28d33300e9f19d7c3224a4a88",
-      "shortSha": "e481e0d",
-      "subject": "chore(nightly): autonomous improvement loop 2026-06-28",
+      "sha": "156e275ebe7ca8f779236d4a2e7a2b0ada9e5cba",
+      "shortSha": "156e275",
+      "subject": "feat(menu): rank badge image + cleaner profile hero & notifications in side drawer",
       "author": "Ohad Fisher",
-      "date": "2026-06-28T06:15:13+03:00"
+      "date": "2026-06-30T23:16:54+03:00"
     },
     {
-      "sha": "70891a7d19b0747e1782954d3de7eb0fe522993b",
-      "shortSha": "70891a7",
-      "subject": "Merge pull request #654 from ohadf2015/claude/settings-scroll-deeplink-fix-n4nkv6",
+      "sha": "28ea6e811bbf8ec300c5c74c15f2900b92203053",
+      "shortSha": "28ea6e8",
+      "subject": "feat(mp): expand curated ja word list after full ja sweep",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T23:06:42+03:00"
+    },
+    {
+      "sha": "01f27497a9eea9457f15a4e9480410c498d08187",
+      "shortSha": "01f2749",
+      "subject": "fix(daily): suppress Hebrew daily-word meanings in validator",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T22:51:47+03:00"
+    },
+    {
+      "sha": "83ed5203b8438e8aa6287c82cc1df83dd76d5674",
+      "shortSha": "83ed520",
+      "subject": "feat(mp): curate Japanese Word Hunt word list from sweep verdicts",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T22:32:03+03:00"
+    },
+    {
+      "sha": "617dfcd28dfc961bd20343af0735b1ea3caccfbf",
+      "shortSha": "617dfcd",
+      "subject": "fix(daily): dict-recheck approved corpus + year-ahead fills gaps from today",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T22:11:46+03:00"
+    },
+    {
+      "sha": "3e3aa842f84e6c17a8bada9c27d2ced2f485ff3f",
+      "shortSha": "3e3aa84",
+      "subject": "feat(daily): dictionary backstop in word sweep + curate MP word lists",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T21:54:39+03:00"
+    },
+    {
+      "sha": "49ab1d391105f8cf89476994115919e51794a29a",
+      "shortSha": "49ab1d3",
+      "subject": "feat(daily,mp): bulletproof word quality across both modes + all languages",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T21:41:46+03:00"
+    },
+    {
+      "sha": "ac27c4100ce1d531386fd9e22c8cb4f9c153a624",
+      "shortSha": "ac27c41",
+      "subject": "fix(quests): make all skill quests achievable + toast on in-session completion",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T21:13:16+03:00"
+    },
+    {
+      "sha": "4707ca9be312015da6ef2affbf508faa178ed615",
+      "shortSha": "4707ca9",
+      "subject": "Merge pull request #669 from ohadf2015/claude/fix-shard6-worker-crash-gate",
+      "author": "Eden Ekdahl",
+      "date": "2026-06-30T12:19:13+02:00"
+    },
+    {
+      "sha": "09297f19aa54b589ad20ca959920027135774777",
+      "shortSha": "09297f1",
+      "subject": "fix(ru): use Cyrillic tiles on Russian boards instead of Hebrew (#676)",
       "author": "ohadf2015",
-      "date": "2026-06-28T02:01:07+03:00"
+      "date": "2026-06-30T11:25:04+03:00"
     },
     {
-      "sha": "a207b9c14974efbbd1fe8786ed632231dc414fb1",
-      "shortSha": "a207b9c",
-      "subject": "fix(settings,deeplink): scrollable settings + reliable cold-start deep links",
-      "author": "Claude",
-      "date": "2026-06-27T22:52:34Z"
+      "sha": "6abbe7cf8efa93cb3abd208fc4b8815e7180b165",
+      "shortSha": "6abbe7c",
+      "subject": "feat(daily): quality-gate daily words + word meaning + player suggestions",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T11:03:20+03:00"
     },
     {
-      "sha": "1fda071e28ead615b08d07f76199b3c13592147c",
-      "shortSha": "1fda071",
-      "subject": "Merge pull request #653 from ohadf2015/claude/quest-combo-trigger-bug-eua88k",
+      "sha": "59e743ecb0671cde220064617738fe4b1c85abd7",
+      "shortSha": "59e743e",
+      "subject": "feat(i18n): show Russian in the in-game language selectors (#674)",
       "author": "ohadf2015",
-      "date": "2026-06-28T01:38:29+03:00"
+      "date": "2026-06-30T10:32:33+03:00"
     },
     {
-      "sha": "8c6bcfd12e0c3dc348c6a8def8fbdfb8502fe613",
-      "shortSha": "8c6bcfd",
-      "subject": "fix(adventure): streak quest now credits the streak length reached",
-      "author": "Claude",
-      "date": "2026-06-27T22:37:57Z"
+      "sha": "0477568fc4e64b71e930a358030312b113ed0f61",
+      "shortSha": "0477568",
+      "subject": "fix(nightly): ship reliably under concurrent branch-switch + never drop build-clean code (#673)",
+      "author": "ohadf2015",
+      "date": "2026-06-30T10:07:18+03:00"
+    },
+    {
+      "sha": "fcf24b08484989d597c13a6a888c3e38169be69a",
+      "shortSha": "fcf24b0",
+      "subject": "Merge pull request #672 from ohadf2015/feature/russian-locale",
+      "author": "ohadf2015",
+      "date": "2026-06-30T09:53:09+03:00"
+    },
+    {
+      "sha": "5f207ddf4c2589fcbf4cf7456dca480899359be9",
+      "shortSha": "5f207dd",
+      "subject": "fix(i18n): correct ru dict/validation across game modes",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T09:47:53+03:00"
+    },
+    {
+      "sha": "704d39a01bdce891f27a9e338f140a407c93d500",
+      "shortSha": "704d39a",
+      "subject": "feat(i18n): ru SEO for faq/tools/contact/wotd/anagram + landing cross-links",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T09:18:23+03:00"
+    },
+    {
+      "sha": "0660c9584f6615838d671432c0def72b35d4af93",
+      "shortSha": "0660c95",
+      "subject": "fix(i18n): ru OG image falls back to en (not es); drop build-noise changelog",
+      "author": "Ohad Fisher",
+      "date": "2026-06-30T09:04:36+03:00"
     }
   ]
 }

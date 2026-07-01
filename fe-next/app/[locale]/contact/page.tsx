@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import ContactPageClient from './PageClient';
+import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 
 export const revalidate = 86400;
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+
+const SITE_URL = 'https://www.lexiclash.live';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
@@ -146,6 +150,15 @@ export default async function ContactPage({ params }: { params: Promise<{ locale
   const content = contactSeoContent[locale] ?? contactSeoContent.en;
   return (
     <>
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'Home', url: `${SITE_URL}/${locale}` },
+          { name: 'Contact', url: `${SITE_URL}/${locale}/contact` },
+        ]}
+      />
+      <FaqPageJsonLd
+        faqs={content.faq.map(({ question, answer }) => ({ q: question, a: answer }))}
+      />
       <ContactPageClient />
       <GamePageSeoContent
         title={content.title}

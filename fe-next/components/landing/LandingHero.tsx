@@ -62,10 +62,24 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
   const showLivePill = energetic && activePlayers > 10;
   const { variant: heroVariant, trackExposure } = useExperiment('landing-variant-homepage-v1');
   const showHeroCta = heroVariant === 'variant';
+  const { variant: quickPlayVariant, trackExposure: trackQuickPlayExposure } = useExperiment('exp-landing-quick-play-v1');
+  const showQuickPlay = quickPlayVariant === 'quick-play';
 
   useEffect(() => {
     if (showHeroCta) trackExposure();
   }, [showHeroCta, trackExposure]);
+
+  useEffect(() => {
+    if (showQuickPlay) {
+      trackQuickPlayExposure();
+      try {
+        (posthog.capture as (e: string, p?: Record<string, unknown>) => void)(
+          'landing_quick_play_viewed',
+          { variant: 'quick-play', locale: language },
+        );
+      } catch { /* posthog not loaded */ }
+    }
+  }, [showQuickPlay, trackQuickPlayExposure, language]);
 
   return (
     <div className="w-full max-w-5xl mx-auto px-2 sm:px-4 md:px-5 lg:px-6">
@@ -104,6 +118,24 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
               }}
             >
               {t('landing.playTodayChallenge')}
+            </Link>
+          )}
+
+          {showQuickPlay && (
+            <Link
+              href={`/${language}/multiplayer`}
+              prefetch={false}
+              className="mt-4 inline-flex items-center gap-2 rounded-neo border-2 border-black bg-neo-pink px-5 py-2.5 font-neo-display text-sm font-black uppercase tracking-wide text-neo-white shadow-hard transition-transform active:translate-y-px active:shadow-hard-pressed animate-[fadeInUp_0.4s_ease-out_0.3s_both]"
+              onClick={() => {
+                try {
+                  (posthog.capture as (e: string, p?: Record<string, unknown>) => void)(
+                    'landing_quick_play_clicked',
+                    { variant: 'quick-play', locale: language },
+                  );
+                } catch { /* posthog not loaded */ }
+              }}
+            >
+              {t('landing.playNowFree')}
             </Link>
           )}
 

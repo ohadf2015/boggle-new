@@ -90,7 +90,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = await createClient();
+    const supabase = await createClient(); // Keep for SELECT queries; auth is local
     const { data, error } = await supabase
       .from('user_notification_preferences')
       .select(

@@ -47,12 +47,13 @@ export async function GET(req: NextRequest) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const userId = user.id;
 
     // Get club IDs user belongs to
     const { data: memberships, error: memErr } = await getSupabaseAdmin()
       .from('word_club_members')
       .select('club_id, role, joined_at')
-      .eq('user_id', user.id);
+      .eq('user_id', userId);
 
     if (memErr) {
       console.error('[API] word-clubs GET memberships error:', memErr.message);

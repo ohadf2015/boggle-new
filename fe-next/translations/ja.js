@@ -13206,6 +13206,11 @@ const ja = {
       "masterForge": "マスターフォージ！",
       "aria": "{{heat}} / 3 の完璧な鍛造"
     },
+    "scoreTier": {
+      "good": "いいね！",
+      "great": "すごい！",
+      "blazing": "最高！"
+    },
     "perfectCraft": "完璧な一撃！",
     "subtitle": "単語を綴れ。ルーンを集めろ。スコアを打ち破れ。",
     "go": "GO！",

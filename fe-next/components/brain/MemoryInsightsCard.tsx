@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Brain, TrendingUp, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getWithAuth } from '@/utils/authFetch';
 import type { MemoryInsights } from '@/shared/utils/memoryInsights';
 
 interface MemoryInsightsCardProps {
@@ -21,7 +22,9 @@ export function MemoryInsightsCard({ t }: MemoryInsightsCardProps) {
 
   useEffect(() => {
     const ac = new AbortController();
-    fetch('/api/brain/memory-insights', { signal: ac.signal })
+    // getWithAuth sends the Bearer token so the route's local JWT verify fast-path
+    // fires (plain fetch → no header → server falls back to slow remote verify).
+    getWithAuth('/api/brain/memory-insights', { signal: ac.signal })
       .then(r => (r.ok ? r.json() : null))
       .then((d: MemoryInsights | null) => setData(d))
       .catch(() => {})

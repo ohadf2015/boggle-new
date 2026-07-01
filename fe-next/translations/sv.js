@@ -13359,6 +13359,11 @@ const sv = {
       "masterForge": "MÄSTERSMIDE!",
       "aria": "{{heat}} av 3 perfekta smiden"
     },
+    "scoreTier": {
+      "good": "BRA!",
+      "great": "STRÅLANDE!",
+      "blazing": "LYSANDE!"
+    },
     "subtitle": "Stava ord. Samla runor. Slå rekordet.",
     "startRun": "Starta körning",
     "tryAgain": "Försök igen",

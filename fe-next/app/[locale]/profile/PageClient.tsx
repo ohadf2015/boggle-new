@@ -17,7 +17,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 
 import { usePlayerCollectibles } from '@/hooks/usePlayerCollectibles';
-import AuthModal from '@/components/auth/AuthModal';
+import dynamic from 'next/dynamic';
+// Sign-in modal opens only on a CTA click — lazy-load to keep its ~40KB out of the
+// profile route's initial parse. ssr:false: renders nothing when closed (no CLS).
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { ReferralCard } from '@/components/profile/ReferralCard';
 import { XpByModeBreakdown } from '@/components/profile/XpByModeBreakdown';
@@ -216,8 +219,8 @@ export default function ProfilePageClient(): React.JSX.Element {
             </div>
           </m.div>
         </div>
-        {!isOnCrazyGamesPlatform && (
-          <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} showGuestStats={true} />
+        {!isOnCrazyGamesPlatform && showAuthModal && (
+          <AuthModal isOpen onClose={() => setShowAuthModal(false)} showGuestStats={true} />
         )}
       </div>
     );

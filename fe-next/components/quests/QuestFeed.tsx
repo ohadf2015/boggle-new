@@ -9,6 +9,7 @@
 import { useEffect, useState } from 'react';
 import { Trophy } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getWithAuth } from '@/utils/authFetch';
 import { cn } from '@/lib/utils';
 
 interface FeedEntry {
@@ -24,7 +25,9 @@ export function QuestFeed() {
 
   useEffect(() => {
     let alive = true;
-    fetch('/api/quests/feed')
+    // getWithAuth sends the Bearer token so the route's local JWT verify fast-path
+    // fires (plain fetch → no header → server falls back to slow remote verify).
+    getWithAuth('/api/quests/feed')
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {
         if (alive && json?.success && Array.isArray(json.entries)) {

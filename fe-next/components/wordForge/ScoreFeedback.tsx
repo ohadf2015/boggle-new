@@ -5,6 +5,7 @@ import { m, useReducedMotion } from 'framer-motion';
 import type { WordScoreResult } from '@/types/wordForge';
 import { cn } from '@/lib/utils';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface ScoreFeedbackProps {
   lastScore: WordScoreResult | null;
@@ -17,6 +18,7 @@ interface ScoreFeedbackProps {
  * Fades after 2.5 seconds.
  */
 export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Element | null {
+  const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
   const [visible, setVisible] = useState(false);
   const [displayScore, setDisplayScore] = useState<WordScoreResult | null>(null);
@@ -38,6 +40,20 @@ export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Elem
 
   if (!displayScore || !visible) return null;
 
+  const tierLabel = displayScore.totalScore >= 100
+    ? t('wordForge.scoreTier.blazing')
+    : displayScore.totalScore >= 50
+    ? t('wordForge.scoreTier.great')
+    : displayScore.totalScore >= 25
+    ? t('wordForge.scoreTier.good')
+    : null;
+
+  const tierColor = displayScore.totalScore >= 100
+    ? 'text-neo-orange border-neo-orange/40 bg-neo-orange/10'
+    : displayScore.totalScore >= 50
+    ? 'text-tier-gold border-tier-gold/30 bg-tier-gold/10'
+    : 'text-neo-cyan border-neo-cyan/30 bg-neo-cyan/10';
+
   const chipEffects = displayScore.runeEffects.filter(e => e.type === 'addPoints');
   const multEffects = displayScore.runeEffects.filter(e => e.type === 'multiply');
 
@@ -54,7 +70,16 @@ export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Elem
         animate={{ opacity: visible ? 1 : 0, y: 0 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       >
-        <div className="bg-[#0A0A1A]/90 border-2 border-neo-black rounded-neo px-4 py-2 flex items-center gap-1.5 flex-wrap justify-center">
+        <div className="bg-[#0A0A1A]/90 border-2 border-neo-black rounded-neo px-4 py-2 flex flex-col items-center gap-1.5">
+          {tierLabel && (
+            <span className={cn(
+              'text-xs font-black uppercase tracking-widest border rounded-neo px-2 py-0.5 font-neo-display',
+              tierColor,
+            )}>
+              {tierLabel}
+            </span>
+          )}
+          <div className="flex items-center gap-1.5 flex-wrap justify-center">
           {/* Word */}
           <span className="text-sm font-black text-neo-cream uppercase font-neo-display">
             {applyHebrewFinalLetters(displayScore.word)}
@@ -117,6 +142,7 @@ export function ScoreFeedback({ lastScore }: ScoreFeedbackProps): React.JSX.Elem
               ✨
             </m.span>
           )}
+          </div>
         </div>
       </m.div>
     </>

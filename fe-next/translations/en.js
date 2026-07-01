@@ -12981,6 +12981,11 @@ const en = {
       "label": "Forge Heat",
       "masterForge": "MASTER FORGE!",
       "aria": "{{heat}} of 3 perfect crafts"
+    },
+    "scoreTier": {
+      "good": "NICE!",
+      "great": "GREAT!",
+      "blazing": "BLAZING!"
     }
   },
   "wheel": {

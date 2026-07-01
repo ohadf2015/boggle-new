@@ -1,28 +1,33 @@
 {
-  "date": "2026-06-29",
-  "note": "7d window (24h sub-floor: 0 routes n≥50). Only /he route qualifies (n=93). LCP 3013ms improving from 3120ms; INP 280ms slight increase from 256ms (within noise); CLS 0.087 stable. Backend: migration WRITTEN 20260629020000_rls_initplan_fix_and_word_clubs_fk_index.sql — RLS initplan fix (auth.role()→(select auth.role())) + word_clubs FK index. Supabase MCP absent 4th consecutive night. Brief routes /sv/daily (4832ms) and /en/daily/word-wheel (4476ms) INELIGIBLE — both n<50 in 7d data. Homepage /he well-optimized: priority image + preload link, no above-fold dynamic imports.",
+  "date": "2026-07-01",
+  "note": "7d window (24h sub-floor: 0 routes n≥50). Two routes qualify: /en/multiplayer (n=52) and /he (n=84). /en/multiplayer CLS=0.401 critical (threshold 0.1) — root cause uninvestigated (no ad banners found, no images in MultiplayerFlow, likely conditional-render layout shifts from SpectatorBanner/AutoHideHeader/isActive state transitions). Backend: wrote 20260701020000_drop_unused_index_word_wheel_catchup.sql (DROP unused idx_word_wheel_attempts_catchup). Deleted duplicate 20260629020000_rls_initplan_fix_and_word_clubs_fk_index.sql (identical SQL to 06-28 version). Supabase MCP absent (6th consecutive night) — migrations accumulate unapplied.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (4th consecutive night). Migration written for gate/human apply. ESCALATION: mint never-expire PAT in nightly env (see learnings doc).",
+    "note": "Supabase MCP absent (6th consecutive night). Migrations written but not applied to prod.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_written_this_run": [
       {
-        "file": "fe-next/supabase/migrations/20260629020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
+        "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
         "items": [
           {
-            "id": "auth_rls_initplan_quest_achievement_feed",
-            "fix": "DROP + recreate policy with (select auth.role()) = 'authenticated' to prevent per-row evaluation",
+            "id": "unused_index_word_wheel_catchup",
+            "fix": "DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup",
             "status": "WRITTEN — needs MCP apply or npx supabase db push",
             "carry_count": 1
-          },
-          {
-            "id": "unindexed_fk_word_clubs_owner_id",
-            "fix": "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)",
-            "status": "WRITTEN — needs MCP apply or npx supabase db push",
-            "carry_count": 4
           }
         ]
+      }
+    ],
+    "migrations_pending_apply": [
+      {
+        "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
+        "items": [
+          "RLS initplan fix: (select auth.role()) on quest_achievement_feed policy",
+          "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)"
+        ],
+        "carry_count": 6,
+        "status": "WRITTEN — pending apply (6th night)"
       }
     ],
     "remaining_advisor_items": [
@@ -30,87 +35,79 @@
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 5
+        "carry_count": 6
+      },
+      {
+        "id": "unindexed_fk_word_club_members_user_id",
+        "status": "LIKELY FALSE POSITIVE — idx_word_club_members_user already in migration 20260322700000_growth_retention_features.sql:149. If advisor still flags after applying pending migrations, investigate prod state.",
+        "priority": "LOW"
       }
     ]
   },
   "frontend": {
-    "note": "24h sub-floor. 7d: /he only route n≥50. Brief routes /sv/daily + /en/daily/word-wheel n<50 — ineligible per mandatory sample gate.",
+    "note": "24h sub-floor (0 routes n≥50). 7d: /en/multiplayer (n=52, barely above floor) and /he (n=84). /en/multiplayer CLS=0.401 is critical structural issue.",
     "by_route": [
       {
-        "route": "/he",
-        "p75_lcp_ms": 3013,
-        "p75_inp_ms": 280,
-        "p75_cls": 0.087,
-        "n_7d": 93,
-        "window": "7d",
-        "lcp_status": "IMPROVING — 3013ms (was 3120ms, -3.4%). Trend: 3297→3112→2927→2702→3120→3013ms.",
-        "inp_status": "WATCH — 280ms (was 256ms, +9.4%). Above 200ms threshold; below 20% regression trigger. framer-motion LandingChallengeCards likely source; homepage otherwise well-optimized.",
-        "cls_status": "OK — 0.087 (<0.1 threshold, stable from 0.084)."
-      },
-      {
-        "route": "/sv/daily",
-        "p75_lcp_ms": null,
-        "n_7d": "<50",
-        "lcp_status": "DEFERRED — sub-floor (n<50 in 7d data). Brief showed 4832ms (stale, low-confidence). No regression verdict possible."
-      },
-      {
-        "route": "/en/daily/word-wheel",
-        "p75_lcp_ms": null,
-        "n_7d": "<50",
-        "lcp_status": "DEFERRED — sub-floor (n<50 in 7d data). Brief showed 4476ms (stale, low-confidence). No regression verdict possible."
-      },
-      {
-        "route": "/es/multiplayer",
-        "p75_lcp_ms": null,
-        "p75_inp_ms": null,
-        "p75_cls": null,
-        "n_7d": "<50",
-        "window": "7d",
-        "lcp_status": "DEFERRED — low n, below 50-sample floor. Prior baseline: 7291ms (structural ssr:false root cause).",
-        "inp_status": "DEFERRED — low n.",
-        "cls_status": "DEFERRED — low n."
-      },
-      {
         "route": "/en/multiplayer",
-        "p75_lcp_ms": null,
-        "p75_inp_ms": null,
-        "p75_cls": null,
-        "n_7d": "<50",
+        "p75_lcp_ms": 6960,
+        "p75_inp_ms": 496,
+        "p75_cls": 0.401,
+        "n_7d": 52,
         "window": "7d",
-        "lcp_status": "DEFERRED — low n, below 50-sample floor. Prior baseline: 4380ms (structural ssr:false root cause).",
-        "inp_status": "DEFERRED — low n.",
-        "cls_status": "DEFERRED — low n."
+        "lcp_status": "WATCH — 6960ms (prior baseline n<50, no valid comparison). Brief: 10552ms (stale, lower confidence). Structural: ssr:false×4 dynamic imports in PageClient.",
+        "inp_status": "CRITICAL — 496ms (threshold 200ms). Socket-heavy client, large JS parse.",
+        "cls_status": "CRITICAL — 0.401 (threshold 0.1). Root cause: uninvestigated. Suspects: SpectatorBanner (no height reservation), AutoHideHeader conditional (null vs header), isActive state transitions. No ad banners or unresized images found in MultiplayerFlow or PageClient. Needs deeper investigation with Chrome DevTools CLS attribution."
+      },
+      {
+        "route": "/he",
+        "p75_lcp_ms": 2672,
+        "p75_inp_ms": 254,
+        "p75_cls": 0.080,
+        "n_7d": 84,
+        "window": "7d",
+        "lcp_status": "IMPROVING — 2672ms (was 3013ms, -11.3%). Trend: 3297→3112→2927→2702→3120→3013→2672ms.",
+        "inp_status": "WATCH — 254ms (was 280ms, -9.3%). Improving but still above 200ms threshold.",
+        "cls_status": "OK — 0.080 (<0.1 threshold, stable from 0.087)."
       }
     ]
   },
   "bundle": {
     "total_static_kb": null,
-    "note": "No .next build artifacts in working tree. Gate runs authoritative build. Last known pre-serverExternalPackages fix: 38912KB. @arvidbt/swedish-words 6.4MB chunk removed after that fix.",
+    "note": "No .next build artifacts in working tree. Gate runs authoritative build.",
     "top_chunks": []
   },
   "open_watches": [
     {
-      "id": "supabase_mcp_absent_4_nights",
-      "description": "Supabase MCP absent 4 consecutive nights. Migrations accumulate unverified. Action: mint never-expire PAT into nightly env.",
+      "id": "multiplayer_cls_0401",
+      "description": "/en/multiplayer CLS=0.401 (4× threshold). Root cause not identified. Suspects: SpectatorBanner/AutoHideHeader conditional renders, isActive state transitions causing height shifts. Next run: use Chrome DevTools CLS attribution panel or add layout-shift debugging to find the shifting element.",
+      "status": "CRITICAL — new this run, needs investigation",
+      "priority": "HIGH"
+    },
+    {
+      "id": "supabase_mcp_absent_6_nights",
+      "description": "Supabase MCP absent 6 consecutive nights. 2 migrations accumulate unverified. Action: mint never-expire PAT into nightly env.",
       "status": "ESCALATED — human action required",
       "priority": "HIGH"
     },
     {
-      "id": "mp_lcp_ssr_false",
-      "description": "/es/multiplayer + /en/multiplayer structural LCP from ssr:false dynamic imports. Needs Chrome profiler trace.",
-      "status": "open — insufficient n this run",
-      "prior_lcp_ms": { "/es/multiplayer": 7291, "/en/multiplayer": 4380 }
+      "id": "migration_pending_apply_06_28",
+      "description": "20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql written — needs Supabase MCP or npx supabase db push (RLS initplan + word_clubs owner_id FK index).",
+      "status": "open — 6th night without MCP"
     },
     {
-      "id": "he_inp_280ms",
-      "description": "/he INP 280ms (>200ms threshold, +9.4% from 256ms). framer-motion LandingChallengeCards likely source. Below 20% regression trigger.",
-      "status": "watch"
+      "id": "migration_pending_apply_07_01",
+      "description": "20260701020000_drop_unused_index_word_wheel_catchup.sql written — needs Supabase MCP or npx supabase db push (DROP unused idx_word_wheel_attempts_catchup).",
+      "status": "open — written this run, needs apply"
     },
     {
-      "id": "migration_pending_apply",
-      "description": "20260629020000_rls_initplan_fix_and_word_clubs_fk_index.sql written — needs Supabase MCP or npx supabase db push to apply to prod.",
-      "status": "open — 4th night without MCP"
+      "id": "mp_inp_496ms",
+      "description": "/en/multiplayer INP 496ms (2.5× threshold). Socket-heavy client with large JS parse. Needs Chrome profiler trace.",
+      "status": "open — structural"
+    },
+    {
+      "id": "he_inp_254ms",
+      "description": "/he INP 254ms (improving from 280ms). Still above 200ms threshold.",
+      "status": "improving — watch"
     }
   ]
 }
