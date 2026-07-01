@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { updateEmailPreferences, generateUnsubscribeToken } from '@/lib/email';
+import { verifyJwtLocal } from '@/lib/auth/verifyJwt';
 
 /**
  * Get Supabase admin client for database operations
@@ -37,10 +38,17 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Database not configured' }, { status: 503 });
   }
 
-  // Verify the JWT and get user
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
-
-  if (authError || !user) {
+  // Local JWT verify (~1ms) instead of a 50-200ms remote auth.getUser(token)
+  // round-trip. Read-only GET; fall back to remote verify if local fails
+  // (e.g. asymmetric signing keys — this route is bearer-only, no cookie path).
+  let user = await verifyJwtLocal(token);
+  if (!user) {
+    const remote = await supabase.auth.getUser(token);
+    user = remote.data.user
+      ? { id: remote.data.user.id, email: remote.data.user.email }
+      : null;
+  }
+  if (!user) {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 
