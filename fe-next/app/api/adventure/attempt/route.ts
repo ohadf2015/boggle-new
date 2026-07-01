@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
+import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { captureApiError } from '@/utils/sentry';
 import { getPostHogServer } from '@/lib/posthog';
 
@@ -204,13 +205,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
   }
   try {
-    // Get authenticated user
-    const supabase = await createClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
+    // Local JWT verify (~1ms) instead of a 50-200ms auth.getUser() round-trip.
+    // Read-only GET; POST (records attempts) keeps remote verify.
+    const user = await getAuthedUser(request);
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+    const supabase = await createClient();
 
     const userId = user.id;
 
