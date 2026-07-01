@@ -194,6 +194,14 @@ vi.mock('../../../backend/modules/wordHuntManager', () => ({
     targetWordLength: 7,
     playerProgress: {},
   }),
+  // gameStartHandler's word-hunt path (added in afb4025) calls these too.
+  // getRecentMpTargets returns a Set<string> of recently-served targets;
+  // selectCleanCommonTarget returns null here so the flow falls through to
+  // selectTargetWordWithFallback ('testing'), preserving this test's original
+  // behavior; recordMpTarget is a void side-effect.
+  getRecentMpTargets: vi.fn(() => new Set()),
+  selectCleanCommonTarget: vi.fn(() => null),
+  recordMpTarget: vi.fn(),
 }));
 
 vi.mock('../../../backend/utils/socketValidation', () => ({

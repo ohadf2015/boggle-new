@@ -48,7 +48,7 @@ describe('OfflineDownloadManager', () => {
     vi.restoreAllMocks();
   });
 
-  it('renders language rows for all 5 supported languages', async () => {
+  it('renders language rows for all 6 supported languages', async () => {
     render(<OfflineDownloadManager />);
     await waitFor(() => {
       expect(screen.getByText('English')).toBeInTheDocument();
@@ -56,6 +56,7 @@ describe('OfflineDownloadManager', () => {
       expect(screen.getByText('Svenska')).toBeInTheDocument();
       expect(screen.getByText('日本語')).toBeInTheDocument();
       expect(screen.getByText('Español')).toBeInTheDocument();
+      expect(screen.getByText('Русский')).toBeInTheDocument();
     });
   });
 
@@ -102,7 +103,7 @@ describe('OfflineDownloadManager', () => {
     render(<OfflineDownloadManager />);
     await waitFor(() => {
       const downloadButtons = screen.getAllByText('offlineDownload.downloadButton');
-      expect(downloadButtons.length).toBe(5); // 5 languages
+      expect(downloadButtons.length).toBe(6); // 6 languages
     });
   });
 
