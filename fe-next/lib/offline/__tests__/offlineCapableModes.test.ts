@@ -155,8 +155,9 @@ describe('offlineCapableModes', () => {
       // newly offline-enabled puzzle modes precache their own shells
       expect(routes).toContain('/en/crossword');
       expect(routes).toContain('/en/blast/v2');
-      // 5 locales x 9 modes (7 original + crossword + wordfall)
-      expect(routes).toHaveLength(45);
+      expect(routes).toContain('/ru/daily');
+      // 6 locales x 9 modes (7 original + crossword + wordfall)
+      expect(routes).toHaveLength(54);
     });
   });
 });

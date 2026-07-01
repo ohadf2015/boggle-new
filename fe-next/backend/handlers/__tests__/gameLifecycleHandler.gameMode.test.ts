@@ -194,6 +194,9 @@ vi.mock('../../../backend/modules/wordHuntManager', () => ({
     targetWordLength: 7,
     playerProgress: {},
   }),
+  // gameStartHandler calls this on the word-hunt path (added in afb4025);
+  // the real export returns a Set<string> of recently-used MP targets.
+  getRecentMpTargets: vi.fn(() => new Set()),
 }));
 
 vi.mock('../../../backend/utils/socketValidation', () => ({

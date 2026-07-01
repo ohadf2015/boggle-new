@@ -21,6 +21,7 @@ const LANGUAGE_NAMES: Record<string, string> = {
   sv: 'Svenska',
   ja: '日本語',
   es: 'Español',
+  ru: 'Русский',
 };
 
 export function OfflineDownloadManager() {
