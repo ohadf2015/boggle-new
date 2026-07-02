@@ -19,9 +19,12 @@ import { toppleCrashFx } from '@/lib/wordTower/crashFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
 import { stepMomentum, clampFlickVelocity, WHEEL_SCALE } from '@/lib/wordTower/scrollMomentum';
 import {
-  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLand, impactRing, bumpScale,
+  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLandScaled, impactRing, bumpScale, tumbleOut,
   type TileSprite,
 } from './towerSprites';
+import { impactDipPx } from '@/lib/wordTower/landingImpact';
+import { tumbleParams } from '@/lib/wordTower/tumbleArc';
+import { punchScaleAt } from '@/lib/wordTower/impactPunch';
 import { shaftWindX } from '@/lib/wordTower/shaftWind';
 import { resonanceSchedule } from '@/lib/wordTower/resonance';
 import { BIOME_THEME } from './biomeTheme';
@@ -31,7 +34,7 @@ import { WordTowerSighting } from './WordTowerSighting';
 import { WordTowerMascot } from './WordTowerMascot';
 import { WordTowerMinimap } from './WordTowerMinimap';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
-import type { PlacementQuality } from '@/lib/wordTower/cranePlacement';
+import { dropQualityIntensity, type PlacementQuality } from '@/lib/wordTower/cranePlacement';
 
 /** Pixi particle presets carry bare 6-char hex strings ('00ffff'); the biome
  *  palettes are hex ints. Convert int → bare-hex string for `burst({colors})`. */
@@ -168,6 +171,15 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   // Screen-y of the ground line the sway pivots about (deck top), kept fresh by
   // the diff effect so the rAF can pivot correctly even mid-pan.
   const groundYRef = useRef(0);
+  // Landing compression: the WHOLE tower dips + rebounds (damped spring) under
+  // a fresh block — applied to the tilt container's position in the tick loop,
+  // so the rigid-stack invariant (fixed per-tile y) stays intact.
+  const impactRef = useRef<{ at: number; intensity: number } | null>(null);
+  const impactQualityRef = useRef(dropQuality);
+  impactQualityRef.current = dropQuality;
+  // Zoom punch: perfect drops / clutch saves pump the tower's scale around its
+  // ground pivot (hitstop feel without rescaling the phase-locked clock).
+  const punchRef = useRef<{ at: number; intensity: number } | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
   const firstRender = useRef(true);
   const prevMaxPos = useRef(-1);
@@ -268,11 +280,22 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     // would fight the pan. Realistic towers are tens of tiles — cheap for Pixi.
     const liveKeys = new Set(live.map((l) => l.key));
 
-    // Retire sprites no longer in the stack (a backspaced pending ghost).
+    // Retire sprites no longer in the stack (a backspaced pending ghost, or a
+    // toppled floor). Toppled COMMITTED blocks tumble off on a physics arc
+    // toward the lean side — but only for hazard-sized removals (≤4 floors);
+    // a full board reset still clears instantly, no 40-block firework.
+    const removed: [string, TileSprite][] = [];
     for (const [key, tile] of Array.from(registry.current)) {
       if (liveKeys.has(key)) continue;
       registry.current.delete(key);
+      removed.push([key, tile]);
+    }
+    const tumbling = !reducedMotion && removed.filter(([, tl2]) => !tl2.pending).length <= 4;
+    for (const [key, tile] of removed) {
       if (!reducedMotion && tile.pending) popOut(tile, () => { try { tile.destroy({ children: true }); } catch { /* */ } });
+      else if (tumbling && !tile.pending) {
+        tumbleOut(tile, tumbleParams(key, Math.sign(leanRef.current) || 1), () => { try { tile.destroy({ children: true }); } catch { /* */ } });
+      }
       else { try { tile.destroy({ children: true }); } catch { /* */ } }
     }
 
@@ -338,10 +361,19 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       const startDeg = swivelStartDeg(leanRef.current, topDy);
       const durMs = swivelDurationMs(committing.length);
       const baseColor = committing[0].color;
+      // Drop-quality intensity drives the physical response: squash depth on the
+      // landing bricks + how hard the whole tower compresses underneath.
+      const impactIntensity = dropQualityIntensity(impactQualityRef.current ?? 'good');
       swivelWordIn(committing, pivotX, pivotY, startDeg, durMs, (i) => {
         const { tile } = committing[i];
-        squashLand(tile); // each brick lands with weight as it settles flush
+        squashLandScaled(tile, impactIntensity); // lands with quality-scaled weight
         if (i === 0) {
+          // Kick off the whole-tower compression rebound (consumed by the tick loop).
+          impactRef.current = { at: performance.now(), intensity: impactIntensity };
+          // Perfect drops also earn the zoom punch — the crisp "nailed it" kiss.
+          if (impactQualityRef.current === 'perfect') {
+            punchRef.current = { at: performance.now(), intensity: 0.8 };
+          }
           // A heavy, layered thud where the girder bites in: a fat outer ring + a
           // tight inner ring read as a real shock-wave, a dust burst that scales
           // with the word's heft, and a camera kick. Punchier than the old single
@@ -474,7 +506,14 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         const inst0 = instabilityRef.current;
         const groundLocal = groundYRef.current - cc.y;
         tl.pivot.set(centerXRef.current, groundLocal);
-        tl.position.set(centerXRef.current, groundLocal);
+        // Landing compression — the whole tower dips + rebounds under a fresh
+        // block (impactDipPx returns 0 outside its damped-spring window).
+        const imp = impactRef.current;
+        const dip = imp ? impactDipPx(0, now - imp.at, imp.intensity) : 0;
+        tl.position.set(centerXRef.current, groundLocal + dip);
+        // Zoom punch — pumps the tower from its base on perfect/clutch beats.
+        const punch = punchRef.current;
+        tl.scale.set(punch ? punchScaleAt(now - punch.at, punch.intensity) : 1);
         tl.angle = leanRef.current + swayAngleAt(now, inst0) + swayJitterDeg(now, inst0);
       }
       // Upper-shaft wind: a tiny travelling x-sway on settled crown tiles so a
@@ -579,6 +618,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     engine.particles.burst(CONFETTI_BURST, W / 2, H * 0.32, 28);
     engine.flash.flash({ color: 0xbfff00, duration: 0.35, intensity: 0.4 });
     engine.shake.shake({ intensity: 14, duration: 0.45, decay: 'exponential' });
+    // The biggest save in the game gets the biggest zoom punch.
+    punchRef.current = { at: performance.now(), intensity: 1 };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clutchSaveKey]);
 

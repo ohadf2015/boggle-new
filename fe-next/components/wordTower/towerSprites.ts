@@ -11,6 +11,8 @@ import { Container, Graphics, Text, TextStyle } from 'pixi.js';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import type { BlockSurface } from '@/lib/wordTower/blockGrade';
 import { swivelBrickFrame, SWIVEL_DESCENT_PX, SWIVEL_DESCENT_STAGGER } from '@/lib/wordTower/swivelDrop';
+import { squashScale, IMPACT_MS } from '@/lib/wordTower/landingImpact';
+import { tumbleAt, TUMBLE_MS, type TumbleParams } from '@/lib/wordTower/tumbleArc';
 import { tileVariation, type TileVariation } from './tileVariation';
 import { pickGreeble, type Greeble } from '@/lib/wordTower/greebles';
 
@@ -442,6 +444,31 @@ export function squashLand(tile: TileSprite): void {
   run(tile, 240, 0, (k) => {
     const e = easeOutBack(k); // overshoots >1 mid-way → brief stretch on the rebound
     tile.scale.set(1 + 0.22 * (1 - e), 1 - 0.22 * (1 - e));
+  }, () => tile.scale.set(1));
+}
+
+/** Launch a retired block on a tumbling physics arc off the tower (spin +
+ *  parabola + late fade), then hand back for destruction. The Tower Bloxx
+ *  beat: a toppled floor FALLS, it doesn't vanish. */
+export function tumbleOut(tile: TileSprite, params: TumbleParams, done?: () => void): void {
+  const x0 = tile.x;
+  const y0 = tile.y;
+  tile.zIndex = 1_000_001; // fly over every settled tile while airborne
+  run(tile, TUMBLE_MS, 0, (k) => {
+    const f = tumbleAt(params, k * TUMBLE_MS);
+    tile.position.set(x0 + f.dx, y0 + f.dy);
+    tile.angle = f.rotDeg;
+    tile.alpha = f.alpha;
+  }, done);
+}
+
+/** Quality-scaled squash — drives {@link squashLand}'s job off the drop's
+ *  impact intensity (perfect = crisp kiss, miss = a fat splat) using the
+ *  area-preserving landingImpact curve. */
+export function squashLandScaled(tile: TileSprite, intensity: number): void {
+  run(tile, IMPACT_MS, 0, (k) => {
+    const s = squashScale(k * IMPACT_MS, intensity);
+    tile.scale.set(s.sx, s.sy);
   }, () => tile.scale.set(1));
 }
 

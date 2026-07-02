@@ -71,3 +71,14 @@ export function stepPendulum(
   const angleDeg = state.angleDeg + velDegPerSec * dt;
   return { angleDeg, velDegPerSec };
 }
+
+/**
+ * Post-release cable whip: freed of its load, the cable springs UP (negative
+ * px — it shortens) and settles with a damped wobble over the fall window.
+ * `k` is fall progress in [0,1]. Render-only; never feeds the verdict.
+ */
+export function cableRecoilPx(k: number): number {
+  const t = clamp(k, 0, 1);
+  const v = -7 * Math.sin(Math.PI * 2.2 * t) * Math.exp(-3.5 * t) * (1 - t);
+  return v === 0 ? 0 : v; // normalise -0 at the window edges
+}

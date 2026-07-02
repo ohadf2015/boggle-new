@@ -4,6 +4,7 @@ import {
   stepPendulum,
   REST_PENDULUM,
   PENDULUM_MAX_DEG,
+  cableRecoilPx,
   type PendulumState,
 } from '../cranePendulum';
 
@@ -51,5 +52,23 @@ describe('stepPendulum — spring-damper integration (cosmetic, stable)', () => 
     const s = stepPendulum({ ...REST_PENDULUM }, PENDULUM_MAX_DEG, 100000);
     expect(Number.isFinite(s.angleDeg)).toBe(true);
     expect(Math.abs(s.angleDeg)).toBeLessThan(PENDULUM_MAX_DEG * 3);
+  });
+});
+
+describe('cableRecoilPx — post-release whip', () => {
+  it('is 0 at release and after settling', () => {
+    expect(cableRecoilPx(0)).toBe(0);
+    expect(cableRecoilPx(1)).toBeCloseTo(0, 5);
+  });
+
+  it('shortens the cable (negative) at its peak — the freed cable whips UP', () => {
+    const peak = Math.min(...[0.1, 0.2, 0.3, 0.4].map(cableRecoilPx));
+    expect(peak).toBeLessThan(0);
+    expect(peak).toBeGreaterThanOrEqual(-8);
+  });
+
+  it('clamps outside the window', () => {
+    expect(cableRecoilPx(-1)).toBe(0);
+    expect(cableRecoilPx(2)).toBeCloseTo(0, 5);
   });
 });
