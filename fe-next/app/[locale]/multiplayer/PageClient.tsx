@@ -10,6 +10,7 @@ import { EducationHeader } from '@/components/education/EducationHeader';
 import { ClassroomModeBanner } from '@/components/education/ClassroomModeBanner';
 import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
 import { ConnectionDot, ConnectionBanner } from '@/components/ConnectionStatusIndicator';
+import { ConnectionQualityChip } from '@/components/multiplayer/ConnectionQualityChip';
 import SpectatorBanner from '@/components/SpectatorBanner';
 import { SocketContext } from '@/utils/SocketContext';
 import { saveSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
@@ -620,6 +621,14 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             toast(t('multiplayerFlow.roomList.leftGame'), { icon: '👋' });
           }} /> : <ConnectionDot />}
           <SpectatorBanner isSpectating={isSpectator} onRequestUpgrade={handleUpgradeToPlayer} t={t} spectatorCount={spectators.length} />
+          {/* RTT-tier quality signal (degraded/weak) while the socket is still up.
+              Gated on isConnected so the full-offline state stays owned solely by
+              ConnectionBanner — the chip renders null on a healthy connection. */}
+          {isActive && isConnected && (
+            <div className="pointer-events-none fixed top-14 end-2 z-40">
+              <ConnectionQualityChip />
+            </div>
+          )}
           {isClassroomMode ? (
             // Hide header + banner during active gameplay to maximize grid space;
             // show in lobby and results
