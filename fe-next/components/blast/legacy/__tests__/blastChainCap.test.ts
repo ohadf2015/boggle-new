@@ -43,9 +43,9 @@ describe('blast chain cap — runaway blast radius', () => {
 
     const result = processTilesForWord(makeInput(grid, path, 'AB'));
 
-    // 36-tile board → cap ~ floor(36*0.5)=18 chain tiles + the 2 word tiles + a
+    // 36-tile board → cap ~ floor(36*0.4)=14 chain tiles + the 2 word tiles + a
     // small atomic overshoot. Must be well under "half the level" (i.e. << 36).
-    expect(result.newlyClearedCount).toBeLessThanOrEqual(22);
+    expect(result.newlyClearedCount).toBeLessThanOrEqual(18);
   });
 
   it('lightning-packed board does NOT clear the whole board via recursive columns', () => {
@@ -61,7 +61,7 @@ describe('blast chain cap — runaway blast radius', () => {
 
     const result = processTilesForWord(makeInput(grid, path, 'ABCDEFG'));
 
-    expect(result.newlyClearedCount).toBeLessThanOrEqual(22);
+    expect(result.newlyClearedCount).toBeLessThanOrEqual(18);
   });
 
   it('leaves an ordinary single-bomb word fully intact (no clipping for normal play)', () => {

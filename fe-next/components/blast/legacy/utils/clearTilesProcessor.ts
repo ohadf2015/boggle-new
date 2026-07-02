@@ -50,7 +50,6 @@ import {
   spawnGemSpecials,
   fireCatalystUpgrade,
   reFireOffensiveSpecial,
-  recordSuppressed,
 } from './blastTileEffects';
 import { calculateBonusMoves } from './blastMoveUtils';
 import { earnTileUpgrade } from './blastEarnedTiles';
