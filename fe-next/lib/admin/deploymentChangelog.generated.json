@@ -1,6 +1,62 @@
 {
-  "generatedAt": "2026-07-02T07:38:27.429Z",
+  "generatedAt": "2026-07-02T08:59:32.135Z",
   "commits": [
+    {
+      "sha": "2e5d6160321bc721cf50347f8f0e73cb7d18ba51",
+      "shortSha": "2e5d616",
+      "subject": "feat(multiplayer): surface RTT quality chip in-game (dead since offline Phase 3)",
+      "author": "Ohad Fisher",
+      "date": "2026-07-02T11:00:27+03:00"
+    },
+    {
+      "sha": "497bbce8e359f8b849b5124d81fca81e9a43817a",
+      "shortSha": "497bbce",
+      "subject": "feat(word-tower): bomb-hit screen shake + combo-chain confetti burst",
+      "author": "Ohad Fisher",
+      "date": "2026-07-02T10:59:08+03:00"
+    },
+    {
+      "sha": "f07c3ad1513ec096de0ffa3f7f42d16ecf2fcfb6",
+      "shortSha": "f07c3ad",
+      "subject": "Merge remote-tracking branch 'origin/master' into feature/word-tower-overhaul",
+      "author": "Ohad Fisher",
+      "date": "2026-07-02T10:58:51+03:00"
+    },
+    {
+      "sha": "7e46192e829b8f27a0b1cf3495be119ba6799e46",
+      "shortSha": "7e46192",
+      "subject": "chore: sync generated reports + nightly scripts (content-identical to master)",
+      "author": "Ohad Fisher",
+      "date": "2026-07-02T10:58:47+03:00"
+    },
+    {
+      "sha": "7f2868ea018cb2ede33beb0d7a886df2631f175f",
+      "shortSha": "7f2868e",
+      "subject": "fix(seo): remediate AdSense low-value-content rejection",
+      "author": "Ohad Fisher",
+      "date": "2026-07-02T10:58:33+03:00"
+    },
+    {
+      "sha": "94020e15f1d0f1d64118674ec6a9f12dde2e3815",
+      "shortSha": "94020e1",
+      "subject": "feat(word-tower): unified notice column, top-chrome fix, coin wallet + tier-scaled reward juice",
+      "author": "Ohad Fisher",
+      "date": "2026-07-02T10:55:31+03:00"
+    },
+    {
+      "sha": "396dfdae7999e67ba2f12835250de622d454e0ef",
+      "shortSha": "396dfda",
+      "subject": "fix(multiplayer): true combo multiplier in desktop HUD, rejoin toast, neo-palette sweep",
+      "author": "Ohad Fisher",
+      "date": "2026-07-02T10:54:46+03:00"
+    },
+    {
+      "sha": "27f61a310590e274bcd06c41c4a2f32df27134ea",
+      "shortSha": "27f61a3",
+      "subject": "fix(nightly): re-verify before docs-only drop-all + resilient telegram alerts",
+      "author": "Ohad Fisher",
+      "date": "2026-07-02T10:02:11+03:00"
+    },
     {
       "sha": "78cbd1c9e81dcb03a76fab5333c73ea766d6be5c",
       "shortSha": "78cbd1c",
@@ -84,62 +140,6 @@
       "subject": "fix(nav): make back navigation locale-safe and cross-platform consistent",
       "author": "Ohad Fisher",
       "date": "2026-07-01T10:05:02+03:00"
-    },
-    {
-      "sha": "aa4158c8761ec9a4b205ed099d085fa38564f4ef",
-      "shortSha": "aa4158c",
-      "subject": "perf: local JWT verify on adventure/attempt GET",
-      "author": "Ohad Fisher",
-      "date": "2026-07-01T09:38:57+03:00"
-    },
-    {
-      "sha": "dbe4c635a460eb3fdb2f6d256717312e01b533f7",
-      "shortSha": "dbe4c63",
-      "subject": "perf: local JWT verify on email/preferences GET",
-      "author": "Ohad Fisher",
-      "date": "2026-07-01T09:36:07+03:00"
-    },
-    {
-      "sha": "0bf1278d48f58582fbc1c8bf796918d7d6f0ea60",
-      "shortSha": "0bf1278",
-      "subject": "perf: local JWT verify on 8 more read-only GET routes",
-      "author": "Ohad Fisher",
-      "date": "2026-07-01T09:26:50+03:00"
-    },
-    {
-      "sha": "5041084f4be099c17d583f33cfb73954d3349c57",
-      "shortSha": "5041084",
-      "subject": "feat(multiplayer): remove lobby auto-start; guard waiting-room back-gesture",
-      "author": "Ohad Fisher",
-      "date": "2026-07-01T09:23:08+03:00"
-    },
-    {
-      "sha": "583c5034b90f74ee42c302b1ba1e5e765c2d74b6",
-      "shortSha": "583c503",
-      "subject": "perf: defer eager client chunks + local JWT verify on hot read routes",
-      "author": "Ohad Fisher",
-      "date": "2026-07-01T09:13:14+03:00"
-    },
-    {
-      "sha": "815b92d51fee368feb66ff1f94b7c59a90dc67d8",
-      "shortSha": "815b92d",
-      "subject": "Merge remote-tracking branch 'origin/master' into fix/he-daily-word-meaning",
-      "author": "Ohad Fisher",
-      "date": "2026-07-01T01:17:52+03:00"
-    },
-    {
-      "sha": "6eb4448f85aefbe50c177ce69b77de798b78ad7c",
-      "shortSha": "6eb4448",
-      "subject": "chore(crossword): pretty-print bank output, ignore cache, regen he puzzles",
-      "author": "Ohad Fisher",
-      "date": "2026-07-01T01:00:45+03:00"
-    },
-    {
-      "sha": "951179ce55fe5bd51cc0567ae06fbb0227a225e1",
-      "shortSha": "951179c",
-      "subject": "feat(crossword): grow es/sv/he clue banks from Wiktionary (+988 native clues)",
-      "author": "Ohad Fisher",
-      "date": "2026-07-01T00:59:23+03:00"
     }
   ]
 }
