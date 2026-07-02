@@ -53,6 +53,16 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
   const canSubmit = tower.word.length >= 3;
   const banked = bankedBombs(you?.bombCharge ?? 0);
 
+  // Bomb-hit shake — armed per bombKey, released after the keyframe so the
+  // class re-toggles (and thus replays) on every subsequent hit.
+  const [bombShake, setBombShake] = useState(false);
+  useEffect(() => {
+    if (tower.state.bombKey === 0) return;
+    setBombShake(true);
+    const id = setTimeout(() => setBombShake(false), 600);
+    return () => clearTimeout(id);
+  }, [tower.state.bombKey]);
+
   if (!you) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center bg-neo-navy" dir={dir}>
@@ -63,7 +73,12 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
 
   return (
     <div className="relative min-h-[100dvh] w-full overflow-hidden bg-neo-navy" dir={dir}>
-      <WordTowerScene floors={floors} biomeId={biomeId} heightM={you?.heightM ?? 0} pendingWord="" resultKey={tower.state.resultKey} errorKey={tower.state.errorKey} lastResult={null} />
+      {/* Bomb shake — an incoming hit physically rocks the battlefield (the red
+          flash alone read as a UI glitch, not a HIT). Class toggles on/off per
+          bombKey so the keyframe replays without remounting the Pixi scene. */}
+      <div className={bombShake ? 'animate-neo-shake motion-reduce:animate-none' : ''}>
+        <WordTowerScene floors={floors} biomeId={biomeId} heightM={you?.heightM ?? 0} pendingWord="" resultKey={tower.state.resultKey} errorKey={tower.state.errorKey} lastResult={null} />
+      </div>
 
       {/* Incoming-bomb red flash */}
       {tower.state.bombKey > 0 && (

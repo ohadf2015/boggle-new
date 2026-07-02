@@ -547,6 +547,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setComboFx({ m: hit, key: tower.state.resultKey });
     haptics.success();
     playComboMilestoneSound(hit.combo);
+    // ×5 and up get a physical burst that grows with the chain — the banner
+    // alone undersold the rarest skill beat in the mode.
+    if (hit.combo >= 5 && !reducedMotion) {
+      fireConfetti({ particleCount: Math.min(30 + hit.combo * 6, 100), spread: 80, origin: { y: 0.4 } });
+    }
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
   useAutoDismiss(comboFx?.key, () => setComboFx(null), TOAST_MS);
 
