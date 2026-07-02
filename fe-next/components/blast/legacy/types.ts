@@ -285,6 +285,13 @@ export const TREASURE_GEM_BONUS_MOVES = 2;
 export const MAX_CASCADE_CHAIN = 5;
 /** Maximum words/clusters cleared per cascade level */
 export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
+/** Chain level at which cascade auto-clears require a "quality" match.
+ * Deep chains become rare/earned — variable-ratio reward instead of routine wipes. */
+export const CASCADE_QUALITY_MIN_CHAIN = 3;
+/** Minimum match-3 cluster size that counts as quality at deep chain levels. */
+export const CASCADE_QUALITY_MIN_CLUSTER = 4;
+/** Minimum auto-word length that counts as quality at deep chain levels. */
+export const CASCADE_QUALITY_MIN_WORD_LEN = 5;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
 export const CASCADE_MIN_WORD_LENGTH = 4;
 /** Delay (ms) before scanning for cascade words after grid settles.

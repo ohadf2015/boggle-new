@@ -10,7 +10,6 @@ import {
   type BlastTileState,
   MAX_CASCADE_CHAIN,
   CASCADE_MIN_WORD_LENGTH,
-  MAX_CASCADE_WORDS_PER_LEVEL,
   CASCADE_CHAIN_BONUS_MULTIPLIER,
   CASCADE_MOMENTUM_THRESHOLDS,
   CASCADE_MOMENTUM_PER_WORD,
@@ -21,6 +20,7 @@ import {
   CASCADE_HIGHLIGHT_LINGER,
 } from '../types';
 import type { WaveConfig } from '../utils/blastWaveConfig';
+import { selectCascadeFinds } from '../utils/blastCascadeQuality';
 import { diffClearedTiles } from '../utils/diffClearedTiles';
 import type { ClearedTileEvent } from '../BlastEffectsCanvas';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
@@ -106,7 +106,7 @@ export function useBlastCascade(deps: CascadeDeps) {
 
         // 1. Match-3 clusters
         const allClusters = detectMatch3Clusters(grid, latestTiles, affectedCols);
-        for (const cluster of allClusters.slice(0, MAX_CASCADE_WORDS_PER_LEVEL)) {
+        for (const cluster of allClusters) {
           cascadeFinds.push({
             cells: cluster.cells,
             label: `[${cluster.letter}×${cluster.cells.length}]`,
@@ -116,7 +116,7 @@ export function useBlastCascade(deps: CascadeDeps) {
 
         // 2. Vertical auto-words
         const vertWords = detectVerticalWords(grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedCols);
-        for (const vw of vertWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL)) {
+        for (const vw of vertWords) {
           cascadeFinds.push({
             cells: vw.path,
             label: vw.word,
@@ -126,7 +126,7 @@ export function useBlastCascade(deps: CascadeDeps) {
 
         // 3. Horizontal auto-words
         const horizWords = detectHorizontalWords(grid, latestTiles, checkWord, foundWordsSet, CASCADE_MIN_WORD_LENGTH, affectedRows);
-        for (const hw of horizWords.slice(0, MAX_CASCADE_WORDS_PER_LEVEL)) {
+        for (const hw of horizWords) {
           cascadeFinds.push({
             cells: hw.path,
             label: hw.word,
@@ -134,10 +134,12 @@ export function useBlastCascade(deps: CascadeDeps) {
           });
         }
 
-        if (cascadeFinds.length === 0) break;
-        // Cap total finds per level to 2 (match-3 + one word) — prevents 3
-        // simultaneous detectors from wiping half the board in a single chain step.
-        cascadeFinds.splice(2);
+        // One quality-gated find per chain level — cascades celebrate a single
+        // best match instead of triple-clearing, and deep chains need quality.
+        const picked = selectCascadeFinds(cascadeFinds, chainLevel + 1);
+        if (picked.length === 0) break;
+        cascadeFinds.length = 0;
+        cascadeFinds.push(...picked);
 
         chainLevel++;
 
