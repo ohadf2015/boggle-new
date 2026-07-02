@@ -93,6 +93,20 @@ describe('admin teacher-access endpoints', () => {
     expect(res.status).toBe(200);
   });
 
+  it('approve logs the reason when sendEmail reports failure via result.ok=false (no silent swallow)', async () => {
+    // Resend does NOT throw on a rejected send — it resolves { ok:false, error }.
+    // The route must notice that and log it, otherwise a failed trial email vanishes.
+    const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en' };
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
+    (sendEmail as any).mockResolvedValueOnce({ ok: false, error: 'domain not verified' });
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const res = await approve(req(), { params: Promise.resolve({ id: 'req-1' }) });
+    expect(res.status).toBe(200); // approval (DB state) still stands
+    expect(errSpy).toHaveBeenCalled();
+    expect(errSpy.mock.calls.flat().join(' ')).toContain('domain not verified');
+    errSpy.mockRestore();
+  });
+
   it('decline writes admin_note and status', async () => {
     const row = { id: 'req-1', user_id: 'u-1', email: 'x@y.com', full_name: 'X', locale: 'en' };
     const sb = mockSupabase(adminProfile, row);
@@ -136,6 +150,14 @@ describe('admin teacher-access endpoints', () => {
     const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en', status: 'approved' };
     (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
     (sendEmail as any).mockRejectedValueOnce(new Error('smtp down'));
+    const res = await resend(req(), { params: Promise.resolve({ id: 'req-1' }) });
+    expect(res.status).toBe(502);
+  });
+
+  it('resend surfaces 502 when sendEmail resolves { ok:false } (Resend rejects without throwing)', async () => {
+    const row = { id: 'req-1', user_id: null, email: 'x@y.com', full_name: 'X', locale: 'en', status: 'approved' };
+    (createClient as any).mockReturnValue(mockSupabase(adminProfile, row));
+    (sendEmail as any).mockResolvedValueOnce({ ok: false, error: 'domain not verified' });
     const res = await resend(req(), { params: Promise.resolve({ id: 'req-1' }) });
     expect(res.status).toBe(502);
   });
