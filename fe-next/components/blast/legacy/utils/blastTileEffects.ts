@@ -42,7 +42,7 @@ export interface TileEffectContext {
    * is reached, so one word can't wipe half the board. Absent → uncapped (legacy
    * behaviour; keeps hand-built test contexts working).
    */
-  chainBudget?: { detonations: number; cleared: number; maxDetonations: number; maxCleared: number };
+  chainBudget?: { detonations: number; cleared: number; suppressed: number; maxDetonations: number; maxCleared: number };
 }
 
 // ── Runaway-chain budget helpers ─────────────────────────────────────────
@@ -68,6 +68,10 @@ function chainAtClearCap(ctx: TileEffectContext): boolean {
 function chainMarkCleared(ctx: TileEffectContext, t: BlastTileState): void {
   ctx.markCleared(t);
   if (ctx.chainBudget) ctx.chainBudget.cleared++;
+}
+/** Record a detonation/clear the budget refused — fuels the Overflow Surge payout. */
+export function recordSuppressed(ctx: TileEffectContext): void {
+  if (ctx.chainBudget) ctx.chainBudget.suppressed++;
 }
 
 export interface EffectResult {
@@ -171,7 +175,7 @@ export function fireLightningColumn(
 ): number {
   const { next, gridSize, processedBombs, bombQueue, isMultiHitAlive, hitMultiHitTile } = ctx;
   let bonus = 0;
-  if (chainAtDetonationCap(ctx)) return 0;
+  if (chainAtDetonationCap(ctx)) { recordSuppressed(ctx); return 0; }
   noteDetonation(ctx);
   for (let r = 0; r < gridSize; r++) {
     if (r === sourceRow) continue;
@@ -180,7 +184,7 @@ export function fireLightningColumn(
     if (isMultiHitAlive(target)) {
       hitMultiHitTile(target);
     } else {
-      if (chainAtClearCap(ctx)) break;
+      if (chainAtClearCap(ctx)) { recordSuppressed(ctx); break; }
       chainMarkCleared(ctx, target);
       bonus += LIGHTNING_COLUMN_CLEAR_BONUS;
       if (target.type === 'bomb' && !processedBombs.has(`${r},${col}`)) {
@@ -206,7 +210,7 @@ export function firePrismCross(
 ): number {
   const { next, gridSize, processedBombs, processedLightning, bombQueue, isMultiHitAlive, hitMultiHitTile } = ctx;
   let bonus = 0;
-  if (chainAtDetonationCap(ctx)) return 0;
+  if (chainAtDetonationCap(ctx)) { recordSuppressed(ctx); return 0; }
   noteDetonation(ctx);
 
   const clearLine = (r: number, c: number) => {
@@ -215,7 +219,7 @@ export function firePrismCross(
     if (isMultiHitAlive(target)) {
       hitMultiHitTile(target);
     } else {
-      if (chainAtClearCap(ctx)) return;
+      if (chainAtClearCap(ctx)) { recordSuppressed(ctx); return; }
       chainMarkCleared(ctx, target);
       if (target.type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
         processedBombs.add(`${r},${c}`);
@@ -250,7 +254,7 @@ export function fireMagnetExplode(
 ): number {
   const { next, gridSize, processedBombs, bombQueue, isMultiHitAlive, hitMultiHitTile } = ctx;
   let bonus = 0;
-  if (chainAtDetonationCap(ctx)) return 0;
+  if (chainAtDetonationCap(ctx)) { recordSuppressed(ctx); return 0; }
   noteDetonation(ctx);
   for (let dr = -VORTEX_EXPLODE_RADIUS; dr <= VORTEX_EXPLODE_RADIUS; dr++) {
     for (let dc = -VORTEX_EXPLODE_RADIUS; dc <= VORTEX_EXPLODE_RADIUS; dc++) {
@@ -263,7 +267,7 @@ export function fireMagnetExplode(
       if (isMultiHitAlive(target)) {
         hitMultiHitTile(target);
       } else {
-        if (chainAtClearCap(ctx)) break;
+        if (chainAtClearCap(ctx)) { recordSuppressed(ctx); break; }
         chainMarkCleared(ctx, target);
         bonus += VORTEX_EXPLODE_BONUS;
         if (target.type === 'bomb' && !processedBombs.has(`${r},${c}`)) {
@@ -342,7 +346,7 @@ export function processBombBFS(
   while (bombQueue.length > 0) {
     // Stop chaining once the move's detonation cap or clear ceiling is hit —
     // leftover queued bombs stay un-detonated on the board rather than wiping it.
-    if (chainAtDetonationCap(ctx) || chainAtClearCap(ctx)) break;
+    if (chainAtDetonationCap(ctx) || chainAtClearCap(ctx)) { recordSuppressed(ctx); break; }
     const bomb = bombQueue.shift()!;
     noteDetonation(ctx);
     const staggeredTime = now + bomb.depth * CHAIN_BOMB_STAGGER;
@@ -361,7 +365,7 @@ export function processBombBFS(
             if (isMultiHitAlive(next[r][c])) {
               hitMultiHitTile(next[r][c]);
             } else {
-              if (chainAtClearCap(ctx)) break;
+              if (chainAtClearCap(ctx)) { recordSuppressed(ctx); break; }
               chainMarkCleared(ctx, next[r][c]);
               bonusScore += BOMB_AREA_CLEAR_BONUS;
               if (next[r][c].type === 'bomb' && !processedBombs.has(`${r},${c}`)) {

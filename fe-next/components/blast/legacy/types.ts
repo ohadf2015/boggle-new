@@ -159,11 +159,14 @@ export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
  * both limits, so ordinary play is never clipped.
  */
 /** Max number of chained special detonations (bomb pop / lightning column / prism cross) per move. */
-export const BLAST_MAX_CHAIN_DETONATIONS = 8;
+export const BLAST_MAX_CHAIN_DETONATIONS = 5;
 /** Hard ceiling on tiles cleared by chain effects, as a fraction of the board. */
-export const BLAST_MAX_CHAIN_CLEAR_FRACTION = 0.5;
+export const BLAST_MAX_CHAIN_CLEAR_FRACTION = 0.4;
 /** Floor for the chain-clear ceiling on tiny boards. */
 export const BLAST_MIN_CHAIN_CLEAR_CAP = 8;
+/** Points paid per chain detonation suppressed by the budget — the cap reads
+ * as an "overflow surge" payout, never as a nerf. */
+export const OVERFLOW_SURGE_POINTS_PER_DETONATION = 10;
 
 // ==================== Vortex (Magnet Rework) Constants ====================
 

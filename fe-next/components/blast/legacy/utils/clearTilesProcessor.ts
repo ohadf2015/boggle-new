@@ -31,6 +31,7 @@ import {
   BLAST_MAX_CHAIN_DETONATIONS,
   BLAST_MAX_CHAIN_CLEAR_FRACTION,
   BLAST_MIN_CHAIN_CLEAR_CAP,
+  OVERFLOW_SURGE_POINTS_PER_DETONATION,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -49,6 +50,7 @@ import {
   spawnGemSpecials,
   fireCatalystUpgrade,
   reFireOffensiveSpecial,
+  recordSuppressed,
 } from './blastTileEffects';
 import { calculateBonusMoves } from './blastMoveUtils';
 import { earnTileUpgrade } from './blastEarnedTiles';
@@ -81,6 +83,8 @@ export interface TileProcessingResult {
   shuffleTriggered: boolean;
   /** Portal word multiplier (applied if word passes through portal) */
   portalMultiplier: number;
+  /** Points from Overflow Surge payout (suppressed chain detonations) — already folded into totalScore */
+  overflowSurge: number;
 }
 
 /**
@@ -146,6 +150,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     chainBudget: {
       detonations: 0,
       cleared: 0,
+      suppressed: 0,
       maxDetonations: BLAST_MAX_CHAIN_DETONATIONS,
       maxCleared: Math.max(BLAST_MIN_CHAIN_CLEAR_CAP, Math.floor(gridSize * gridSize * BLAST_MAX_CHAIN_CLEAR_FRACTION)),
     },
@@ -519,11 +524,24 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     }
   }
 
+  // Overflow Surge payout: convert suppressed chain detonations to score
+  const overflowSurge = (ctx.chainBudget?.suppressed ?? 0) * OVERFLOW_SURGE_POINTS_PER_DETONATION;
+  bonusScore += overflowSurge;
+  if (overflowSurge > 0 && path.length > 0) {
+    pendingPopups.push({
+      id: `surge-${now}`, row: path[path.length - 1].row, col: path[path.length - 1].col,
+      score: overflowSurge, isSpecial: true, timestamp: now,
+    });
+  }
+
+  // Recalculate totalScore after all bonusScore modifications
+  const finalTotalScore = effectiveBase * goldMultiplier * comboMultiplier + bonusScore;
+
   const bonusMoveCount = calculateBonusMoves(word.length) + tileBonusMoves;
 
   return {
     next,
-    totalScore,
+    totalScore: finalTotalScore,
     newlyClearedCount,
     clearedTypeCounts,
     explosions: newExplosions,
@@ -534,5 +552,6 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     diamondRevealTurns,
     shuffleTriggered,
     portalMultiplier,
+    overflowSurge,
   };
 }
