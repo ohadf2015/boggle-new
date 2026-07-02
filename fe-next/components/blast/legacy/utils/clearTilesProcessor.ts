@@ -31,6 +31,7 @@ import {
   BLAST_MAX_CHAIN_DETONATIONS,
   BLAST_MAX_CHAIN_CLEAR_FRACTION,
   BLAST_MIN_CHAIN_CLEAR_CAP,
+  OVERFLOW_SURGE_POINTS_PER_DETONATION,
   type BlastTileState,
   type BlastTileType,
   type BlastExplosion,
@@ -52,6 +53,7 @@ import {
 } from './blastTileEffects';
 import { calculateBonusMoves } from './blastMoveUtils';
 import { earnTileUpgrade } from './blastEarnedTiles';
+import { rollMysteryOutcome } from './blastMysteryTile';
 
 export interface TileProcessingInput {
   prev: BlastTileState[][];
@@ -81,6 +83,8 @@ export interface TileProcessingResult {
   shuffleTriggered: boolean;
   /** Portal word multiplier (applied if word passes through portal) */
   portalMultiplier: number;
+  /** Points from Overflow Surge payout (suppressed chain detonations) — already folded into totalScore */
+  overflowSurge: number;
 }
 
 /**
@@ -146,6 +150,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     chainBudget: {
       detonations: 0,
       cleared: 0,
+      suppressed: 0,
       maxDetonations: BLAST_MAX_CHAIN_DETONATIONS,
       maxCleared: Math.max(BLAST_MIN_CHAIN_CLEAR_CAP, Math.floor(gridSize * gridSize * BLAST_MAX_CHAIN_CLEAR_FRACTION)),
     },
@@ -398,6 +403,33 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         break;
       }
 
+      case 'mystery': {
+        const outcome = rollMysteryOutcome(rng);
+        if (outcome.kind === 'scoreBurst' || outcome.kind === 'mega') {
+          bonusScore += outcome.points;
+          pendingPopups.push({ id: `mystery-bonus-${now}-${cell.row}-${cell.col}`, score: outcome.points, row: cell.row, col: cell.col, isSpecial: true, timestamp: now });
+        } else if (outcome.kind === 'spawnSpecial') {
+          // Convert one random adjacent standard tile into the rolled special.
+          const neighbors = [[0,1],[0,-1],[1,0],[-1,0]]
+            .map(([dr,dc]) => ({ row: cell.row+dr, col: cell.col+dc }))
+            .filter(p => next[p.row]?.[p.col] && !next[p.row][p.col].isCleared && next[p.row][p.col].type === 'standard');
+          if (neighbors.length > 0) {
+            const pick = neighbors[Math.floor(rng() * neighbors.length)];
+            next[pick.row][pick.col].type = outcome.special;
+          }
+        } else { // miniPop
+          const neighbors = [[0,1],[0,-1],[1,0],[-1,0]]
+            .map(([dr,dc]) => ({ row: cell.row+dr, col: cell.col+dc }))
+            .filter(p => next[p.row]?.[p.col] && !next[p.row][p.col].isCleared && !pathSet.has(`${p.row},${p.col}`));
+          if (neighbors.length > 0) {
+            const pick = neighbors[Math.floor(rng() * neighbors.length)];
+            markCleared(next[pick.row][pick.col]);
+          }
+        }
+        newExplosions.push({ id: `mystery-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
+        break;
+      }
+
     }
   }
 
@@ -519,11 +551,24 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     }
   }
 
+  // Overflow Surge payout: convert suppressed chain detonations to score
+  const overflowSurge = (ctx.chainBudget?.suppressed ?? 0) * OVERFLOW_SURGE_POINTS_PER_DETONATION;
+  bonusScore += overflowSurge;
+  if (overflowSurge > 0 && path.length > 0) {
+    pendingPopups.push({
+      id: `surge-${now}`, row: path[path.length - 1].row, col: path[path.length - 1].col,
+      score: overflowSurge, isSpecial: true, timestamp: now,
+    });
+  }
+
+  // Recalculate totalScore after all bonusScore modifications
+  const finalTotalScore = effectiveBase * goldMultiplier * comboMultiplier + bonusScore;
+
   const bonusMoveCount = calculateBonusMoves(word.length) + tileBonusMoves;
 
   return {
     next,
-    totalScore,
+    totalScore: finalTotalScore,
     newlyClearedCount,
     clearedTypeCounts,
     explosions: newExplosions,
@@ -534,5 +579,6 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     diamondRevealTurns,
     shuffleTriggered,
     portalMultiplier,
+    overflowSurge,
   };
 }

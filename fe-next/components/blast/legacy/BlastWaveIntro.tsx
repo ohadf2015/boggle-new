@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { getMascotForArchetype, MASCOT_IMAGES } from './utils/blastMascot';
+import { TILE_VISUALS } from './blastTileVisuals';
 import type { BlastWaveArchetype } from './utils/blastWaveConfig';
+import type { BlastTileType } from '@/shared/types/blast';
 
 interface BlastWaveIntroProps {
   waveNumber: number;
   archetype: BlastWaveArchetype;
   t: (key: string) => string | undefined;
+  featured?: readonly BlastTileType[];
 }
 
 const INTRO_DISPLAY_MS = 1500;
@@ -21,7 +24,7 @@ const ARCHETYPE_ACCENT: Record<BlastWaveArchetype, string> = {
   silence: 'text-neo-cyan',
 };
 
-export function BlastWaveIntro({ waveNumber, archetype, t }: BlastWaveIntroProps) {
+export function BlastWaveIntro({ waveNumber, archetype, t, featured }: BlastWaveIntroProps) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -64,6 +67,38 @@ export function BlastWaveIntro({ waveNumber, archetype, t }: BlastWaveIntroProps
           >
             {label}
           </span>
+          {featured && featured.length > 0 && (
+            <div className="flex flex-row gap-2 flex-wrap justify-center">
+              {featured.map((tile) => {
+                const visual = TILE_VISUALS[tile];
+                const tileNameKey = `blast.tileGuide.${tile}.name`;
+                const tileDescKey = `blast.tileGuide.${tile}.desc`;
+                const tileName = t(tileNameKey) || tile;
+                const tileDesc = t(tileDescKey) || '';
+                const Icon = visual.indicator;
+
+                return (
+                  <div
+                    key={tile}
+                    data-testid={`featured-chip-${tile}`}
+                    className={`${accent} flex flex-col items-center gap-1 px-3 py-2 rounded-neo bg-black/70 border-2 border-neo-black shadow-hard`}
+                  >
+                    {Icon && (
+                      <Icon className="w-5 h-5" strokeWidth={2.5} />
+                    )}
+                    <span className="font-neo-display font-bold text-sm uppercase tracking-wide">
+                      {tileName}
+                    </span>
+                    {tileDesc && (
+                      <span className="font-neo-body text-xs opacity-85 text-center max-w-[120px] leading-tight">
+                        {tileDesc}
+                      </span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </AdaptiveMotion.div>
       </AdaptiveAnimatePresence>
     </div>

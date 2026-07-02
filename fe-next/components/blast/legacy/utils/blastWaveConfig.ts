@@ -43,6 +43,10 @@ export type BlastWaveArchetype =
 export interface WaveConfig {
   /** Emotional identity tag — UI only, ignored by the engine */
   archetype: BlastWaveArchetype;
+  /** Exotic specials allowed to spawn this wave (undefined = no filtering).
+   * Core specials (bomb/ice/gold/rainbow) always spawn. Filled from
+   * getFeaturedSpecialsForWave so waves >12 keep rotating. */
+  featuredSpecials?: readonly BlastTileType[];
   /** Minimum word length for player submissions */
   minWordLength: number;
   /** Chance of a cell being special (0-1) */
@@ -95,6 +99,8 @@ export interface WaveConfig {
   lockedEnabled?: boolean;
   /** Whether key tiles can appear (pairs with locked; unlocks wave 11) */
   keyEnabled?: boolean;
+  /** Whether mystery (surprise outcome) tiles can appear (unlocks wave 5) */
+  mysteryEnabled?: boolean;
   /** Number of moves allowed per wave */
   movesAllowed: number;
 }
@@ -161,7 +167,7 @@ const WAVE_TABLE: WaveConfig[] = [
     anchorEnabled: false,
     movesAllowed: 8,
   },
-  // Wave 5 — diamond unlock (7 moves)
+  // Wave 5 — mystery + diamond unlock (7 moves)
   {
     archetype: 'normal',
     minWordLength: 2, specialTileChance: 0.23, iceDistribution: 0.27, goldDistribution: 0.14,
@@ -171,6 +177,7 @@ const WAVE_TABLE: WaveConfig[] = [
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     anchorEnabled: false,
+    mysteryEnabled: true,
     movesAllowed: 7,
   },
   // Wave 6 — frost unlock (7 moves)
@@ -183,6 +190,7 @@ const WAVE_TABLE: WaveConfig[] = [
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     anchorEnabled: false,
+    mysteryEnabled: true,
     movesAllowed: 7,
   },
   // Wave 7 — vortex unlock (6 moves — tight, requires strategy)
@@ -195,6 +203,7 @@ const WAVE_TABLE: WaveConfig[] = [
     diamondEnabled: false,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: false, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     anchorEnabled: false,
+    mysteryEnabled: true,
     movesAllowed: 6,
   },
   // Wave 8 — revival staircase 1/4: diamond + anchor + gem + magma unlock
@@ -207,6 +216,7 @@ const WAVE_TABLE: WaveConfig[] = [
     diamondEnabled: true,
     countdownEnabled: false, shuffleEnabled: false, magmaEnabled: true, portalEnabled: false, catalystEnabled: false, crystalEnabled: false, fuseEnabled: false,
     anchorEnabled: true,
+    mysteryEnabled: true,
     movesAllowed: 6,
   },
   // Wave 9 — revival staircase 2/4: + vortex + catalyst + portal + shuffle
@@ -219,6 +229,7 @@ const WAVE_TABLE: WaveConfig[] = [
     diamondEnabled: true,
     countdownEnabled: false, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: false, fuseEnabled: false,
     anchorEnabled: true,
+    mysteryEnabled: true,
     movesAllowed: 5,
   },
   // Wave 10 — revival staircase 3/4: + countdown + fuse + crystal
@@ -231,6 +242,7 @@ const WAVE_TABLE: WaveConfig[] = [
     diamondEnabled: true,
     countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
     anchorEnabled: true,
+    mysteryEnabled: true,
     movesAllowed: 5,
   },
   // Wave 11 — revival staircase 4/4
@@ -243,6 +255,7 @@ const WAVE_TABLE: WaveConfig[] = [
     diamondEnabled: true,
     countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
     anchorEnabled: true, lockedEnabled: true, keyEnabled: true,
+    mysteryEnabled: true,
     movesAllowed: 6,
   },
   // Wave 12+ — master tier (full revival inheritance)
@@ -255,6 +268,7 @@ const WAVE_TABLE: WaveConfig[] = [
     diamondEnabled: true,
     countdownEnabled: true, shuffleEnabled: true, magmaEnabled: true, portalEnabled: true, catalystEnabled: true, crystalEnabled: true, fuseEnabled: true,
     anchorEnabled: true, lockedEnabled: true, keyEnabled: true,
+    mysteryEnabled: true,
     movesAllowed: 6,
   },
 ];
@@ -275,12 +289,14 @@ export function getWaveConfig(wave: number): WaveConfig {
     config.movesAllowed = Math.max(6, Math.ceil(config.scoreThreshold / 120));
   }
 
-  return config;
+  // Inject the featured roster so every wave — including >12 — has its own identity.
+  return { ...config, featuredSpecials: getFeaturedSpecialsForWave(wave) };
 }
 
 // ==================== Wave Objectives ====================
 
 import type { BlastObjective, BlastTileType } from '../types';
+import { applyFeaturedRoster, getFeaturedSpecialsForWave } from './blastWaveRoster';
 import { getTargetWordPool, pickRandomTargetWord } from './blastTargetWordPool';
 
 /**
@@ -497,6 +513,8 @@ export const ANCHOR_SHARE = 0.08;
 export const LOCKED_SHARE = 0.06;
 /** Key tile share when enabled (unlocks paired locked tiles; unlocks wave 11). */
 export const KEY_SHARE = 0.06;
+/** Mystery tile share when enabled (surprise outcome; unlocks wave 5). */
+export const MYSTERY_SHARE = 0.04;
 
 /**
  * CURATED PERMANENT ROSTER (clarity pass, 2026-06).
@@ -561,7 +579,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     diamondEnabled,
     countdownEnabled, shuffleEnabled, magmaEnabled, portalEnabled, catalystEnabled,
     crystalEnabled, fuseEnabled, anchorEnabled,
-    lockedEnabled, keyEnabled,
+    lockedEnabled, keyEnabled, mysteryEnabled,
   } = config;
 
   // Effective flags (support deprecated field aliases)
@@ -590,6 +608,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
   let anchor = 0;
   let locked = 0;
   let key = 0;
+  let mystery = 0;
 
   // Helper: take a share proportionally from gold + rainbow.
   // Floor of 0.10 combined preserves the workhorse score economy
@@ -688,6 +707,11 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     takeShare(KEY_SHARE);
   }
 
+  if (mysteryEnabled) {
+    mystery = MYSTERY_SHARE;
+    takeShare(MYSTERY_SHARE);
+  }
+
   const raw: Record<string, number> = {
     gold: Math.max(0, gold),
     bomb: BOMB_BASE,
@@ -712,6 +736,7 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
     anchor,
     locked,
     key,
+    mystery,
   };
 
   // Curation: zero every retired type before normalization so the freed weight
@@ -720,6 +745,10 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
   for (const t of BLAST_RETIRED_SPECIAL_TYPES) {
     if (t in raw) raw[t] = 0;
   }
+
+  // Featured roster: uniqueness per wave with FEWER concurrent tile kinds.
+  const filtered = applyFeaturedRoster(raw, config.featuredSpecials);
+  for (const k of Object.keys(raw)) raw[k] = filtered[k] ?? 0;
 
   // Normalize to sum to 1.0 (avoids drift when many tiles are enabled)
   const sum = Object.values(raw).reduce((a, b) => a + b, 0);

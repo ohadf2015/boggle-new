@@ -26,6 +26,7 @@ import { BlastMoveWarningMascot } from './BlastMoveWarningMascot';
 import { BlastFxBridge } from './BlastFxBridge';
 import { type BlastComboType, type SpecialCombo } from './utils/blastCombos';
 import { getWaveObjectives, type WaveConfig } from './utils/blastWaveConfig';
+import { getFeaturedSpecialsForWave } from './utils/blastWaveRoster';
 import type { BlastWaveModifier } from './utils/blastModifiers';
 import { useJellyEnabled, useCakeEnabled, useChocolateEnabled } from '@/lib/blast/ccMechanicFlags';
 import { validateWaveObjectives } from './utils/blastObjectiveValidator';
@@ -608,7 +609,7 @@ export function BlastGame({
       />
 
       {waveConfig?.archetype && (
-        <BlastWaveIntro waveNumber={waveNumber} archetype={waveConfig.archetype} t={tAdapter} />
+        <BlastWaveIntro waveNumber={waveNumber} archetype={waveConfig.archetype} t={tAdapter} featured={getFeaturedSpecialsForWave(waveNumber)} />
       )}
 
       <BlastSugarCrushFinale active={sugarCrushActive} t={tAdapter} />

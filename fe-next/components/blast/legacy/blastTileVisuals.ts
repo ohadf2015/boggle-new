@@ -2,7 +2,7 @@ import {
   type LucideIcon,
   Bomb, Zap, Triangle, Rainbow, Snowflake, Gem, Magnet,
   Diamond, Hourglass, Shuffle, Flame, Orbit, FlaskConical,
-  Sparkles, Star, Anchor, Lock, KeyRound,
+  Sparkles, Star, Anchor, Lock, KeyRound, CircleHelp,
 } from 'lucide-react';
 import type { BlastTileType } from './types';
 
@@ -40,6 +40,7 @@ const F = {
   aqua:   '#5EE6D0', aquaEdge:  '#0F6E62',  // diamond
   teal:   '#37D9A0', tealEdge:  '#0B5E45',  // catalyst
   anchor: '#14B8A6', anchorEdge:'#0B5E45',  // anchor
+  mystery:'#B7A6FF', mysteryEdge:'#4C1D95',  // mystery (violet family, surprise)
 };
 
 /* Prism/rainbow are inherently multi-colour. Instead of a soft gradient FACE
@@ -74,6 +75,7 @@ export const TILE_VISUALS: Record<BlastTileType, { bg: string; indicator?: Lucid
   crystal:   { bg: '', indicator: Sparkles,     text: 'text-white',    style: solid(F.lilac,  F.lilacEdge) },
   fuse:      { bg: '', indicator: Flame,        text: 'text-neo-navy', style: solid(F.fuse,   F.fuseEdge) },
   anchor:    { bg: '', indicator: Anchor,       text: 'text-white',    style: solid(F.anchor, F.anchorEdge) },
+  mystery:   { bg: '', indicator: CircleHelp,   text: 'text-neo-navy', style: solid(F.mystery, F.mysteryEdge) },
   // chocolate + cake paint via overlays in BlastTile; visual record is intentionally minimal.
   chocolate: { bg: '', text: 'text-white',    style: { background: '#3a1f0e', boxShadow: HARD_SHADOW, border: `3px solid #1c0e04` } },
   cake:      { bg: '', text: 'text-white',    style: { background: 'transparent', boxShadow: HARD_SHADOW, border: `3px solid ${INK}` } },
@@ -102,6 +104,7 @@ export const CLEARING_COLORS: Partial<Record<BlastTileType, { background: string
   catalyst:  { background: 'radial-gradient(circle, #98E4BC 0%, #083826 100%)', border: CB },
   crystal:   { background: 'radial-gradient(circle, #D8A0E8 0%, #28084E 100%)', border: CB },
   fuse:      { background: 'radial-gradient(circle, #FFB040 0%, #4C1600 100%)', border: CB },
+  mystery:   { background: 'radial-gradient(circle, #D8A0E8 0%, #5B21B6 100%)', border: CB },
 };
 
 /** Type-specific clearing transform overrides — visually distinct death animations.
@@ -125,4 +128,5 @@ export const CLEARING_ANIMS: Partial<Record<BlastTileType, { transform: string; 
   catalyst:  { transform: 'scale(2.0) rotate(-15deg)', transition: 'all 220ms ease-out', filter: 'brightness(2.5) saturate(2)' },
   crystal:   { transform: 'scale(1.7) rotate(180deg)', transition: 'all 260ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(2.2) saturate(2.5) hue-rotate(20deg)' },
   fuse:      { transform: 'scale(2.3) rotate(-20deg)', transition: 'all 220ms cubic-bezier(0.17, 0.67, 0.83, 0.67)', filter: 'brightness(2.8) saturate(2.5)' },
+  mystery:   { transform: 'scale(2.0) rotate(-15deg)', transition: 'all 240ms cubic-bezier(0.34, 1.56, 0.64, 1)', filter: 'brightness(2.5) saturate(2) hue-rotate(-20deg)' },
 };

@@ -37,7 +37,7 @@ describe('selectBlastTileToTeach', () => {
 
   it('teachable order only contains the curated core', () => {
     expect(BLAST_TEACHABLE_ORDER).toEqual([
-      'bomb', 'ice', 'gold', 'rainbow', 'prism', 'lightning', 'frozen',
+      'bomb', 'ice', 'gold', 'rainbow', 'prism', 'lightning', 'frozen', 'mystery',
     ]);
   });
 });

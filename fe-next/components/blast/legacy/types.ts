@@ -159,11 +159,14 @@ export const BOMB_RADIUS = 1; // 3x3 area (8 adjacent cells)
  * both limits, so ordinary play is never clipped.
  */
 /** Max number of chained special detonations (bomb pop / lightning column / prism cross) per move. */
-export const BLAST_MAX_CHAIN_DETONATIONS = 8;
+export const BLAST_MAX_CHAIN_DETONATIONS = 5;
 /** Hard ceiling on tiles cleared by chain effects, as a fraction of the board. */
-export const BLAST_MAX_CHAIN_CLEAR_FRACTION = 0.5;
+export const BLAST_MAX_CHAIN_CLEAR_FRACTION = 0.4;
 /** Floor for the chain-clear ceiling on tiny boards. */
 export const BLAST_MIN_CHAIN_CLEAR_CAP = 8;
+/** Points paid per chain detonation suppressed by the budget — the cap reads
+ * as an "overflow surge" payout, never as a nerf. */
+export const OVERFLOW_SURGE_POINTS_PER_DETONATION = 10;
 
 // ==================== Vortex (Magnet Rework) Constants ====================
 
@@ -285,6 +288,13 @@ export const TREASURE_GEM_BONUS_MOVES = 2;
 export const MAX_CASCADE_CHAIN = 5;
 /** Maximum words/clusters cleared per cascade level */
 export const MAX_CASCADE_WORDS_PER_LEVEL = 1;
+/** Chain level at which cascade auto-clears require a "quality" match.
+ * Deep chains become rare/earned — variable-ratio reward instead of routine wipes. */
+export const CASCADE_QUALITY_MIN_CHAIN = 3;
+/** Minimum match-3 cluster size that counts as quality at deep chain levels. */
+export const CASCADE_QUALITY_MIN_CLUSTER = 4;
+/** Minimum auto-word length that counts as quality at deep chain levels. */
+export const CASCADE_QUALITY_MIN_WORD_LEN = 5;
 /** Minimum word length for cascade auto-detection (shorter words ignored) */
 export const CASCADE_MIN_WORD_LENGTH = 4;
 /** Delay (ms) before scanning for cascade words after grid settles.
@@ -356,6 +366,7 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   crystal: 0,
   fuse: 0,
   anchor: 0,
+  mystery: 0,
   chocolate: 0,
   cake: 0,
   locked: 0,
