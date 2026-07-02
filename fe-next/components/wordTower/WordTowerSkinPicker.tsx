@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Palette, Lock, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { TOWER_SKINS } from '@/lib/wordTower/skins';
@@ -26,8 +27,14 @@ const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`;
  * skins equip on tap; locked ones show the height still to climb (the carrot).
  * Self-contained open state so the parent mounts it with one line.
  */
-export function WordTowerSkinPicker({ skin, bestHeightM, t, dir, reducedMotion, inline = false }: Props) {
+export function WordTowerSkinPicker({ skin, t, dir, reducedMotion, inline = false }: Props) {
   const [open, setOpen] = useState(false);
+  // Portal target (document.body) only exists client-side — gate the portal on
+  // mount so SSR/first render never calls createPortal with no DOM ("Target
+  // container is not a DOM element" → error boundary swallowed it and the sheet
+  // fell back to rendering nested, clipped under the HUD).
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <>
@@ -52,7 +59,11 @@ export function WordTowerSkinPicker({ skin, bestHeightM, t, dir, reducedMotion, 
         />
       </button>
 
-      {open && (
+      {/* Portal to <body>: the inline trigger lives inside the top chrome's own
+          stacking context (z-10), where a nested fixed z-[60] still paints UNDER
+          the later z-10 HUD layer — the wheel deck was covering the sheet's list
+          on phones (390px QA, 2026-07-02). Escaping the context is the fix. */}
+      {open && mounted && createPortal(
         <div
           className="pointer-events-auto fixed inset-0 z-[60] flex items-end justify-center bg-black/50 p-3 sm:items-center"
           dir={dir}
@@ -133,7 +144,8 @@ export function WordTowerSkinPicker({ skin, bestHeightM, t, dir, reducedMotion, 
               })}
             </ul>
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
