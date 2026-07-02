@@ -131,7 +131,7 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
             </button>
           )}
           {nameError && (
-            <p className="text-xs font-bold text-red-400 mt-1" role="alert">
+            <p className="text-xs font-bold text-neo-red mt-1" role="alert">
               {t(nameError)}
             </p>
           )}

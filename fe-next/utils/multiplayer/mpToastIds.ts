@@ -14,4 +14,5 @@ export const MP_TOAST_IDS = {
   notConnected: 'mp-not-connected',
   connectionTimeout: 'mp-connection-timeout',
   loadingProfile: 'mp-loading-profile',
+  rejoined: 'mp-rejoined',
 } as const;

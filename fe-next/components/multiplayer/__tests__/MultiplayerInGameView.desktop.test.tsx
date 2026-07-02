@@ -46,6 +46,18 @@ vi.mock('../desktop/StandardDesktopAdapter', () => ({
   ),
 }));
 
+let capturedBlastAdapterProps: Record<string, unknown> | null = null;
+vi.mock('../desktop/BlastDesktopAdapter', () => ({
+  BlastDesktopAdapter: (props: Record<string, unknown>) => {
+    capturedBlastAdapterProps = props;
+    return <div data-blast-shell>BlastDesktopAdapter</div>;
+  },
+}));
+
+vi.mock('../../../lib/blast/mpBlastIntro', () => ({
+  markMpBlastIntroSeen: vi.fn(),
+}));
+
 vi.mock('../../OpponentWordFeed', () => ({
   OpponentWordFeed: () => null,
 }));
@@ -59,6 +71,8 @@ vi.mock('../../ErrorBoundaries', () => ({
 }));
 
 import { useDesktopShellEnabled } from '../../../hooks/useDesktopShellEnabled';
+import { useGameMode } from '../../../hooks/gameState/store';
+import { getComboMultiplier } from '../../../shared/utils/scoring';
 
 const mkProps = () => ({
   letterGrid: [
@@ -86,6 +100,7 @@ const mkProps = () => ({
 describe('MultiplayerInGameView desktop branch', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    (useGameMode as any).mockReturnValue('classic');
   });
 
   it('mounts StandardDesktopAdapter when desktop shell enabled + classic mode', () => {
@@ -94,6 +109,19 @@ describe('MultiplayerInGameView desktop branch', () => {
       <MultiplayerInGameView {...(mkProps() as any)} />,
     );
     expect(container.querySelector('[data-mp-shell]')).toBeInTheDocument();
+  });
+
+  it('passes the canonical server combo multiplier to BlastDesktopAdapter (not the linear approximation)', () => {
+    (useDesktopShellEnabled as any).mockReturnValue(true);
+    (useGameMode as any).mockReturnValue('blast');
+    capturedBlastAdapterProps = null;
+    const comboLevel = 14; // linear formula would say 2.4×; server credits 2.25×
+    render(
+      <MultiplayerInGameView {...({ ...mkProps(), comboLevel } as any)} />,
+    );
+    expect(capturedBlastAdapterProps).not.toBeNull();
+    expect(capturedBlastAdapterProps!.comboMultiplier).toBe(getComboMultiplier(comboLevel));
+    expect(capturedBlastAdapterProps!.comboMultiplier).toBe(2.25);
   });
 
   it('mounts legacy InGameScreen when desktop shell disabled', () => {

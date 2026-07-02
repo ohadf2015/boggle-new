@@ -1739,6 +1739,8 @@ const he = {
     "host": "מארח",
     "roomClosed": "החדר נסגר",
     "roomTimedOut": "החדר שלך פג זמן — חוזרים ללובי.",
+    "rejoinedRoom": "חזרת! התחברת מחדש לחדר {code}",
+    "rejoinedGame": "חזרת למשחק!",
     "hostLeftReason": {
       "explicitNoSuccessor": "המארח עזב ואין שחקנים נוספים. החדר נסגר.",
       "graceExpired": "המארח לא חזר בזמן. החדר נסגר.",

@@ -1725,6 +1725,8 @@ const ja = {
     "host": "ホスト",
     "roomClosed": "ルームが閉鎖されました",
     "roomTimedOut": "ルームの時間切れです — ロビーに戻ります。",
+    "rejoinedRoom": "復帰しました！ルーム {code} に再接続",
+    "rejoinedGame": "ゲームに復帰しました！",
     "hostLeftReason": {
       "explicitNoSuccessor": "ホストが退出し、他のプレイヤーもいません。ルームを閉じます。",
       "graceExpired": "ホストが時間内に戻りませんでした。ルームを閉じます。",

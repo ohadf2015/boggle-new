@@ -59,6 +59,7 @@ import type {
 import type { EarthquakeState } from '@/shared/types/earthquake';
 import type { BoardTheme } from '@/shared/types/socket';
 import { cn } from '@/lib/utils';
+import { getComboMultiplier } from '@/shared/utils/scoring';
 import { useAuth } from '@/contexts/AuthContext';
 import { OpponentWordFeedConnected } from '@/components/multiplayer/OpponentWordFeedConnected';
 import { useGameMode, useGameStore } from '@/hooks/gameState/store';
@@ -556,7 +557,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           meId={username}
           socket={socket}
           comboCount={comboLevel}
-          comboMultiplier={1 + comboLevel * 0.1}
+          comboMultiplier={getComboMultiplier(comboLevel)}
           canvas={blastCanvas}
         />
       );
@@ -685,17 +686,17 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       {/* Exit Confirmation Dialog (player-only) */}
       {!isHost && setShowExitConfirm && onConfirmExit && (
         <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
-          <AlertDialogContent className="bg-white text-neo-black dark:bg-neo-navy-light dark:text-white border-red-500/30">
+          <AlertDialogContent className="bg-neo-navy-light text-neo-white border-neo-thick border-neo-black shadow-hard-lg">
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-slate-900 dark:text-white">
+              <AlertDialogTitle className="text-neo-white">
                 {t('playerView.exitConfirmation')}
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-slate-600 dark:text-gray-300">
+              <AlertDialogDescription className="text-gray-300">
                 {t('playerView.exitWarning')}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="bg-slate-100 dark:bg-neo-navy-elevated text-slate-900 dark:text-white border-slate-300 dark:border-slate-600">
+              <AlertDialogCancel className="bg-neo-navy-elevated text-neo-white border-slate-600">
                 {t('common.cancel')}
               </AlertDialogCancel>
               <AlertDialogAction

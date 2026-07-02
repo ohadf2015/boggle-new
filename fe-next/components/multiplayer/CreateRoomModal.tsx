@@ -225,7 +225,7 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
                     <span
                       key="error"
                       id="create-username-error"
-                      className="text-[10px] font-bold text-red-400 animate-in fade-in-0 duration-300"
+                      className="text-[10px] font-bold text-neo-red animate-in fade-in-0 duration-300"
                       role="alert"
                     >
                       {t(nameError)}

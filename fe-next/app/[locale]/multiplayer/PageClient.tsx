@@ -43,6 +43,7 @@ const HostLeftGraceModal = nextDynamic(
 );
 import { stripMultiplayerExitParams } from '@/lib/multiplayer/stripExitParams';
 import { roomGoneFeedback } from '@/lib/multiplayer/roomGoneFeedback';
+import { rejoinFeedback } from '@/lib/multiplayer/rejoinFeedback';
 import { trackInviteRoomDead, trackGrowthEvent, trackInviteConsumed } from '@/utils/growthTracking';
 import type { Language, ActiveRoom, Avatar, GameMode, GameModeSelection } from '@/shared/types/game';
 import type { Socket } from 'socket.io-client';
@@ -272,11 +273,15 @@ export default function MultiplayerPageClient(): React.JSX.Element {
     language: language as Language, gameCode, username, roomName,
     isActive, isHost, roomLanguage,
     onJoined: (data) => {
+      // Capture BEFORE the reset below — this join completing while a
+      // reconnect was in flight is what makes it a "rejoin".
+      const rejoin = rejoinFeedback({ wasReconnecting: attemptingReconnect, roomCode: data.gameCode || gameCode });
       setIsHost(data.isHost);
       setIsActive(true);
       setIsPrivate(!!data.isPrivate);
       setError('');
       setAttemptingReconnect(false);
+      if (rejoin) toast(t(rejoin.key, rejoin.params), { duration: 3000, icon: rejoin.icon, id: MP_TOAST_IDS.rejoined });
       setShouldAutoJoin(false);
       setIsJoining(false);
       setPrefilledRoomCode('');

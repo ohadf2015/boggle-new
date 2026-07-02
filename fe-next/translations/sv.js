@@ -1886,6 +1886,8 @@ const sv = {
     "host": "Värd",
     "roomClosed": "Rummet stängt",
     "roomTimedOut": "Ditt rum gick ut — tillbaka till lobbyn.",
+    "rejoinedRoom": "Du är tillbaka! Återansluten till rum {code}",
+    "rejoinedGame": "Tillbaka i spelet!",
     "hostLeftReason": {
       "explicitNoSuccessor": "Värden lämnade och ingen annan är kvar. Rummet stängs.",
       "graceExpired": "Värden kom inte tillbaka i tid. Rummet stängs.",

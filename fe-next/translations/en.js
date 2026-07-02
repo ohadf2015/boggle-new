@@ -1712,6 +1712,8 @@ const en = {
     "host": "Host",
     "roomClosed": "Room closed",
     "roomTimedOut": "Your room timed out — back to the lobby.",
+    "rejoinedRoom": "Back in! Rejoined room {code}",
+    "rejoinedGame": "Back in the game!",
     "hostLeftModal": {
       "title": "Host Left",
       "body": "The room is closing. Returning to the lobby in a few seconds — or tap below to leave now.",

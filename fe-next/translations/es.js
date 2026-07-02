@@ -1732,6 +1732,8 @@ const es = {
     "inviteFriend": "Invitar a un Amigo",
     "roomClosed": "Sala cerrada",
     "roomTimedOut": "Tu sala expiró — volviendo al lobby.",
+    "rejoinedRoom": "¡De vuelta! Reconectado a la sala {code}",
+    "rejoinedGame": "¡De vuelta al juego!",
     "hostLeftReason": {
       "explicitNoSuccessor": "El anfitrión se fue y no queda nadie más. Cerrando la sala.",
       "graceExpired": "El anfitrión no volvió a tiempo. Cerrando la sala.",

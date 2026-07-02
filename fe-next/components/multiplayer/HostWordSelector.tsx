@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Check, AlertTriangle, BookOpen, Save, X } from 'lucide-react';
+import { Check, AlertTriangle, BookOpen, Save } from 'lucide-react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { Socket } from 'socket.io-client';
 import { useVocabularySelection } from '@/hooks/useVocabularySelection';
@@ -165,11 +165,11 @@ export function HostWordSelector({
                 {isSelected && integration && (
                   integration.canIntegrate ? (
                     <span title={t('teacher.lesson.canIntegrate')}>
-                      <Check className="w-4 h-4 text-green-400" />
+                      <Check className="w-4 h-4 text-neo-lime" />
                     </span>
                   ) : (
                     <span title={t('teacher.lesson.cannotIntegrate')}>
-                      <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                      <AlertTriangle className="w-4 h-4 text-neo-yellow" />
                     </span>
                   )
                 )}
