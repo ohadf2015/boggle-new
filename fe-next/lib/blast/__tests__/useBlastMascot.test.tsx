@@ -6,6 +6,7 @@
 import React from 'react';
 import { render, act } from '@testing-library/react';
 import { useBlastMascot } from '../useBlastMascot';
+import { MASCOT_VISIBLE_MS } from '../mascotState';
 
 function Probe({
   onMount,
@@ -16,7 +17,13 @@ function Probe({
   React.useEffect(() => {
     onMount(api);
   }, [api, onMount]);
-  return <div data-testid="probe" data-state={api.state} />;
+  return (
+    <div
+      data-testid="probe"
+      data-state={api.state}
+      data-visible={String(api.visible)}
+    />
+  );
 }
 
 describe('useBlastMascot', () => {
@@ -66,5 +73,71 @@ describe('useBlastMascot', () => {
       captured!.fire({ kind: 'wave-fail' });
     });
     expect(getByTestId('probe').getAttribute('data-state')).toBe('sad-supportive');
+  });
+
+  describe('transient visibility — celebrate briefly, then get out of the way', () => {
+    beforeEach(() => vi.useFakeTimers());
+    afterEach(() => vi.useRealTimers());
+
+    it('starts hidden so the mascot never occludes the HUD at rest', () => {
+      let captured: ReturnType<typeof useBlastMascot> | null = null;
+      render(<Probe onMount={(api) => (captured = api)} />);
+      expect(captured!.visible).toBe(false);
+    });
+
+    it('reveals on a reaction, then auto-hides after MASCOT_VISIBLE_MS', () => {
+      let captured: ReturnType<typeof useBlastMascot> | null = null;
+      const { getByTestId } = render(
+        <Probe onMount={(api) => (captured = api)} />,
+      );
+      act(() => {
+        captured!.fire({ kind: 'word-submitted', wordLength: 4, gemLetterUsed: false });
+      });
+      expect(getByTestId('probe').getAttribute('data-visible')).toBe('true');
+
+      act(() => {
+        vi.advanceTimersByTime(MASCOT_VISIBLE_MS + 1);
+      });
+      expect(getByTestId('probe').getAttribute('data-visible')).toBe('false');
+    });
+
+    it('a new reaction before the timer elapses extends the visible window', () => {
+      let captured: ReturnType<typeof useBlastMascot> | null = null;
+      const { getByTestId } = render(
+        <Probe onMount={(api) => (captured = api)} />,
+      );
+      act(() => {
+        captured!.fire({ kind: 'word-submitted', wordLength: 4, gemLetterUsed: false });
+      });
+      // wave-fail bypasses cooldown, so it retriggers a fresh visible window.
+      act(() => {
+        vi.advanceTimersByTime(MASCOT_VISIBLE_MS - 100);
+        captured!.fire({ kind: 'wave-fail' });
+      });
+      // Old timer would have fired here; the refreshed one should keep it up.
+      act(() => {
+        vi.advanceTimersByTime(200);
+      });
+      expect(getByTestId('probe').getAttribute('data-visible')).toBe('true');
+    });
+
+    it('does not reveal when an event is cooldown-blocked (no real transition)', () => {
+      let captured: ReturnType<typeof useBlastMascot> | null = null;
+      const { getByTestId } = render(
+        <Probe onMount={(api) => (captured = api)} />,
+      );
+      act(() => {
+        captured!.fire({ kind: 'word-submitted', wordLength: 4, gemLetterUsed: false });
+      });
+      act(() => {
+        vi.advanceTimersByTime(MASCOT_VISIBLE_MS + 1);
+      });
+      expect(getByTestId('probe').getAttribute('data-visible')).toBe('false');
+      // Within global cooldown → blocked → must not re-reveal.
+      act(() => {
+        captured!.fire({ kind: 'word-submitted', wordLength: 6, gemLetterUsed: false });
+      });
+      expect(getByTestId('probe').getAttribute('data-visible')).toBe('false');
+    });
   });
 });

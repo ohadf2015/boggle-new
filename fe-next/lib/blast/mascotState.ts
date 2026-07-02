@@ -46,6 +46,13 @@ export const MASCOT_GIF_PATHS: Record<MascotState, string> = {
 export const GLOBAL_COOLDOWN_MS = 4000;
 export const STATE_COOLDOWN_MS = 10000;
 
+/**
+ * How long the HUD mascot stays on screen after a reaction before auto-hiding.
+ * The mascot is a transient celebration — it pops in, reacts, and gets out of
+ * the way so it never permanently occludes the score/HUD.
+ */
+export const MASCOT_VISIBLE_MS = 2000;
+
 const WORD_LEN_CHEER_MIN = 4;
 const WORD_LEN_WOW = 6;
 const WORD_LEN_AWE_MIN = 7;
