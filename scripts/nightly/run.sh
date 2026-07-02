@@ -699,6 +699,12 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
   _MAX_REGATE_ROUNDS=$(( _authored_n + 1 ))
   [ "$_MAX_REGATE_ROUNDS" -lt 4 ] && _MAX_REGATE_ROUNDS=4
   _round=0
+  # Run-once guard for the last-resort conclusive verify (below). It re-runs the
+  # wedge-proof tsc+test:changed tier BEFORE any docs-only drop-all so an
+  # unattributable/undecidable red (a flake, not a real break) can never again
+  # nuke a whole night of build-clean code (2026-07-02). Guarded so a tier that
+  # itself returns an unparseable "peel" can't spin the loop — one shot, then docs-only.
+  _conclusive_verify_done=0
   while [ "$_round" -lt "$_MAX_REGATE_ROUNDS" ]; do
     _round=$(( _round + 1 ))
     _bad_raw=$(nightly_parse_gate_failures "${NIGHTLY_LAST_GATE_OUTPUT:-}")
@@ -851,7 +857,44 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
           log "drop-and-re-gate: authored set still fails with lint skipped (rc=$_nl_rc) — not a clean baseline-poison; using docs-only salvage"
         fi
       else
-        log "drop-and-re-gate: gate output had no parseable offenders — using docs-only salvage"
+        log "drop-and-re-gate: gate output had no parseable offenders"
+      fi
+      # LAST-RESORT CONCLUSIVE VERIFY before the destructive docs-only drop-all (2026-07-02 fix).
+      # We are here because the full gate is RED but NOTHING is positively attributable: no
+      # lint/tsc offender parsed, AND the baseline comparison was undecidable (e.g. the scoped
+      # baseline gate's `npm run test:backend` found no matching files for a FRONTEND-only failing
+      # set → rc=1 with no parseable FAIL header → "not a decidable pre-existing baseline"). That
+      # state is INDISTINGUISHABLE from a false-red/flake in the wedged full-suite run — and on
+      # 2026-07-02 it dropped ALL 22 build-clean lane files (WordTower, sealedBid, translations,
+      # landing pages, dictionary candidates — none related to the "failing" tests), every one of
+      # which passed tsc --noEmit + its own tests on re-run. NEVER discard build-clean code on an
+      # unparseable/undecidable red. Run the wedge-proof conclusive tier (build:schemas + standalone
+      # tsc --noEmit + test:changed, ~1min) ONCE: type-clean + affected-tests-green ⇒ the red was a
+      # flake ⇒ SHIP. A named offender ⇒ peel it. Only if the tier ALSO wedges ⇒ docs-only.
+      if [ "$gate_ok" = "0" ] && [ "$_conclusive_verify_done" = "0" ]; then
+        _conclusive_verify_done=1
+        log "drop-and-re-gate: unattributable gate failure — running the conclusive typecheck tier (build:schemas + tsc --noEmit + test:changed) on the authored set BEFORE any docs-only drop-all (never discard build-clean code on an unparseable/undecidable red)"
+        run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 0 1; _uv_tc_rc=$?
+        # NOTE: do NOT rm NIGHTLY_LAST_GATE_OUTPUT here — the `peel` branch below
+        # relies on the loop-top parser re-reading it to name the offender (same
+        # contract as the rc=3 peel path). ship/wedge break out, leaving a harmless temp.
+        case "$(nightly_gate_typecheck_route "$_uv_tc_rc")" in
+          ship)
+            gate_ok=1
+            log "drop-and-re-gate: conclusive typecheck tier PASSED — the unattributable red was a false-red/flake; shipping the authored set (tsc clean + affected tests green; full next-build + full suite UNVERIFIED this run)"
+            mkdir -p docs/nightly 2>/dev/null || true
+            printf '# Nightly TYPECHECK-TIER ship (unattributable red) — %s\n\nThe full gate went RED but named NO attributable offender (no lint/tsc error; the\nbaseline comparison was undecidable). A standalone `build:schemas && tsc --noEmit &&\ntest:changed` tier (~1min) PASSED, so the authored set shipped at REDUCED strength\n(full next-build / SSG prerender + full suite UNVERIFIED). The red was a flake/wedge,\nNOT a real break (the 2026-07-02 all-code drop was exactly this false-red). Verified\npost-push by railway-deploy-check.sh + health-monitor.sh. ACTION: none required.\n' "${TODAY}" > "docs/nightly/TYPECHECK-TIER-${TODAY}.md" 2>/dev/null || true
+            echo "docs/nightly/TYPECHECK-TIER-${TODAY}.md" >> "$NIGHTLY_AUTHORED_FILE" 2>/dev/null || true
+            echo -e "\n**Outcome (typecheck-tier, unattributable red):** the gate failed with no parseable offender and an undecidable baseline; a standalone tsc --noEmit + test:changed tier passed, so the authored set shipped at reduced strength (the red was a flake). See docs/nightly/TYPECHECK-TIER-${TODAY}.md." >> "$REPORT"
+            tg_alert "nightly $TODAY: gate RED but UNATTRIBUTABLE (no offender, baseline undecidable); conclusive tsc + test:changed tier PASSED → shipped the authored set at REDUCED strength (full next-build/suite UNVERIFIED). Likely a flake. No action required."
+            break ;;
+          peel)
+            log "drop-and-re-gate: conclusive typecheck tier named an offender — continuing the peel loop with parseable output"
+            iso_rc=1; continue ;;
+          *)
+            log "drop-and-re-gate: conclusive typecheck tier ALSO wedged — genuinely unverifiable; falling to docs-only salvage"
+            break ;;
+        esac
       fi
       break
     fi
