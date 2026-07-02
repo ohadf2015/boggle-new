@@ -1,8 +1,16 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import type { PuzzleLocale } from '@/lib/crossword/types';
 import { CrosswordPageClient } from './CrosswordPageClient';
 
 const VALID_LOCALES: PuzzleLocale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
+
+// Client-only shell (~37 crawlable words) not surfaced on the home hub —
+// noindexed 2026-07-02 (AdSense low-value-content remediation). Restore when
+// crossword ships with a real landing/content surface.
+export const metadata: Metadata = {
+  robots: { index: false, follow: true },
+};
 
 /**
  * Crossword — a fully client-side daily puzzle. The board, clue navigation and

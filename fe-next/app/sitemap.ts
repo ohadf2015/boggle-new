@@ -1,5 +1,4 @@
 import type { MetadataRoute } from 'next';
-import { wordsByLocale as wotdWords } from './[locale]/word-of-the-day/content';
 
 const BASE_URL = 'https://www.lexiclash.live';
 const LOCALES = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
@@ -110,13 +109,33 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // Route still serves variants (?autoStart, ?preset, ?boardCode, ?returnTo) but those are not sitemap-worthy.
   addForAllLocales(routes, '/multiplayer', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
   addForAllLocales(routes, '/daily', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
-  addForAllLocales(routes, '/blast', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.9 });
-  addForAllLocales(routes, '/word-craft', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 });
+  // /blast, /word-craft, /daily/word-hunt, /daily/word-wheel are near-empty
+  // game shells (30-282 crawlable words, measured live 2026-07-02) — noindexed
+  // at page level after the AdSense "low value content" rejection. Search
+  // intent is covered by /word-craft-game, /daily-word-wheel and /guides/*.
   addForAllLocales(routes, '/word-craft-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
-  addForAllLocales(routes, '/adventure', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
-  addForAllLocales(routes, '/daily/word-hunt', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
-  addForAllLocales(routes, '/daily/word-wheel', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.85 });
+  // /adventure dropped while BETA-gated (PageClient redirects non-beta users —
+  // crawlers and the AdSense reviewer land on a wall). Restore at GA together
+  // with the noindex in adventure/page.tsx + layout.tsx.
   addForAllLocales(routes, '/daily/archive', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.7 });
+
+  // Connections is LIVE with a real en+he landing (content.ts); other locales
+  // are noindex → canonical en, so emit only the supported pair.
+  (['en', 'he'] as const).forEach((locale) => {
+    routes.push({
+      url: `${BASE_URL}/${locale}/connections`,
+      lastModified: LAST_DEPLOYED,
+      changeFrequency: 'daily',
+      priority: 0.8,
+      alternates: {
+        languages: {
+          'x-default': `${BASE_URL}/en/connections`,
+          en: `${BASE_URL}/en/connections`,
+          he: `${BASE_URL}/he/connections`,
+        },
+      },
+    });
+  });
 
   // Per-date archive child pages are intentionally NOT listed here.
   // They are thin per-puzzle stat/leaderboard snapshots and were dragging the
@@ -127,10 +146,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
 
   // ─── Brain training ───
   addForAllLocales(routes, '/brain', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.8 });
-  const drills = ['combo-master', 'lightning-round', 'memory-hunt', 'pattern-switcher', 'rare-gems'];
-  drills.forEach((drill) => {
-    addForAllLocales(routes, `/brain/drills/${drill}`, { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
-  });
+  // /brain/drills/* dropped (2026-07-02): 30 URLs at ~212 crawlable words each,
+  // now noindex at page level. The /brain hub remains the indexable entry.
 
   // ─── Practice / tutorial ───
   // Interactive-only pages — noindexed in the AdSense thin-page sweep (2026-06-17), so
@@ -289,19 +306,11 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/rules', { lastModified: GUIDES_UPDATED, changeFrequency: 'monthly', priority: 0.7 });
   addForAllLocales(routes, '/word-of-the-day', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.9 });
 
-  // Per-date Word of the Day pages — each curated word becomes a distinct indexable URL.
-  // Only emit per-locale URLs where that locale actually has the word, so we don't serve
-  // identical EN content under /he/.../<date> and dilute the HE corpus.
-  LOCALES.forEach((locale) => {
-    wotdWords[locale]?.forEach((entry) => {
-      routes.push({
-        url: `${BASE_URL}/${locale}/word-of-the-day/${entry.dateKey}`,
-        lastModified: `${entry.dateKey}T00:00:00.000Z`,
-        changeFrequency: 'monthly',
-        priority: 0.7,
-      });
-    });
-  });
+  // Per-date Word of the Day pages dropped (2026-07-02, AdSense round 2):
+  // ~106 URLs rendering ~216 crawlable words each — the same thin-per-date
+  // footprint the 06-04 round removed for /daily/archive/[date]. Rejected for
+  // "low value content" with them indexed. The hub above keeps every word;
+  // per-date pages are noindex,follow and stay fully browsable.
   addForAllLocales(routes, '/leaderboard', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.8 });
 
   // ─── Comparison pages ───
@@ -335,6 +344,8 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   // ─── Education keyword landings (English-only body) ───
   // Same pattern as comparison pages: robots: { index: locale === 'en' }, non-EN
   // hreflang to localized education equivalents. Emit EN-only.
+  // Blast landing (live mode; its /blast play route is a noindexed shell)
+  addForLocaleOnly(routes, '/word-blast-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.85 });
   addForLocaleOnly(routes, '/vocabulary-games-for-middle-school', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
   addForLocaleOnly(routes, '/word-games-for-the-classroom', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
   addForLocaleOnly(routes, '/bell-ringer-word-games', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.8 });
@@ -412,8 +423,25 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     'ai-vs-word-games-language-learning',
     'spelling-bee-science-vocabulary',
   ];
+  // ru excluded: 0 of the 28 articles have a Russian translation, so /ru/blog/*
+  // serves the English body and generateBlogMetadata noindexes it. Advertising
+  // noindex'd duplicates in the sitemap is a pure negative signal (AdSense
+  // "low value content" rejection, 2026-07-02).
+  const blogLocales = LOCALES.filter((l) => l !== 'ru');
   blogArticles.forEach((slug) => {
-    addForAllLocales(routes, `/blog/${slug}`, { lastModified: BLOG_UPDATED, changeFrequency: 'monthly', priority: 0.85 });
+    // hreflang must not point at the noindexed ru sibling either.
+    const alts = langAlternates(`/blog/${slug}`);
+    delete alts.ru;
+    delete alts['ru-RU'];
+    blogLocales.forEach((locale) => {
+      routes.push({
+        url: `${BASE_URL}/${locale}/blog/${slug}`,
+        lastModified: BLOG_UPDATED,
+        changeFrequency: 'monthly',
+        priority: 0.85,
+        alternates: { languages: alts },
+      });
+    });
   });
 
   // ─── Info pages ───

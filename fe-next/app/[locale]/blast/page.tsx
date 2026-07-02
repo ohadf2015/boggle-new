@@ -1,6 +1,14 @@
 import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import type { Locale } from '@/lib/blast/v2/types';
 import BlastLegacyPageClient from './legacy/PageClient';
+
+// Near-empty game shell (~38 crawlable words, measured 2026-07-02) — noindexed
+// after the AdSense "low value content" rejection. /guides/blast-strategy
+// carries the indexable Blast content. Page stays fully playable.
+export const metadata: Metadata = {
+  robots: { index: false, follow: true },
+};
 
 const VALID_LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es'];
 

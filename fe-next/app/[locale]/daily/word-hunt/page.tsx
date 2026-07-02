@@ -19,7 +19,9 @@ export const revalidate = 3600;
 
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'daily', path: '/daily/word-hunt', locale });
+  // Game shell (~282 crawlable words) — noindexed 2026-07-02; /daily is the
+  // indexable hub for the daily modes.
+  return generatePageMetadata({ seoKey: 'daily', path: '/daily/word-hunt', locale, noIndex: true });
 }
 
 /**

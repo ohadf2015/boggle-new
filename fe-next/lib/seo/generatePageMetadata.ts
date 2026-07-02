@@ -58,7 +58,7 @@ export async function generatePageMetadata({
         canonical: `${BASE_URL}/${locale}${path}`,
         languages: Object.fromEntries(LOCALES.map((l) => [l, `${BASE_URL}/${l}${path}`])),
       },
-      robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
+      robots: noIndex ? { index: false, follow: true } : { index: true, follow: true },
     };
   }
 
@@ -117,6 +117,8 @@ export async function generatePageMetadata({
       canonical: `${BASE_URL}${fullPath}`,
       languages: alternateLanguages,
     },
-    robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
+    // noindex,follow (not nofollow): keeps outbound links passing crawl signal
+    // from noindexed shells — same convention as /anagram/[letters].
+    robots: noIndex ? { index: false, follow: true } : { index: true, follow: true },
   };
 }

@@ -141,7 +141,9 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
       canonical: `${BASE_URL}${localePath}/daily/word-wheel`,
       languages,
     },
-    robots: { index: true, follow: true },
+    // Game shell — noindexed 2026-07-02 (AdSense low-value-content remediation);
+    // /daily-word-wheel is the indexable landing for this mode.
+    robots: { index: false, follow: true },
   };
 }
 

@@ -9,7 +9,10 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'adventure', path: '/adventure', locale });
+  // BETA-gated (PageClient redirects non-beta users) — noindexed 2026-07-02
+  // so search/AdSense reviewers don't land on a wall. Restore index (here,
+  // in layout.tsx and in app/sitemap.ts) when Adventure goes GA.
+  return generatePageMetadata({ seoKey: 'adventure', path: '/adventure', locale, noIndex: true });
 }
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {

@@ -1,4 +1,4 @@
-import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
+import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import AdventureProviderWrapper from './AdventureProviderWrapper';
@@ -83,8 +83,10 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         'es-CO': 'https://www.lexiclash.live/es/adventure',
       },
     },
+    // BETA-gated mode — noindex all /adventure/* children too (boss-rush,
+    // endless, achievements, skills). Restore index:true at GA.
     robots: {
-      index: true,
+      index: false,
       follow: true,
     },
   };

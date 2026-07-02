@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
-  return generatePageMetadata({ seoKey: 'brainRareGems', path: '/brain/drills/rare-gems', locale });
+  return generatePageMetadata({ seoKey: 'brainRareGems', path: '/brain/drills/rare-gems', locale, noIndex: true });
 }
 
 const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {

@@ -55,7 +55,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           .concat([['x-default', `${SITE_URL}/en/word-of-the-day/${date}`]]),
       ),
     },
-    robots: { index: true, follow: true },
+    // Thin per-date page (~216 crawlable words) — noindexed 2026-07-02 after
+    // the AdSense "low value content" rejection; the /word-of-the-day hub is
+    // the indexable surface. Same treatment as /daily/archive/[date] (06-04).
+    robots: { index: false, follow: true },
   };
 }
 
