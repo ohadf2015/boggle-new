@@ -216,17 +216,18 @@ describe('getWaveDistribution', () => {
     expect(dist.magnet).toBe(0);
   });
 
-  it('keeps diamond retired at wave 4', () => {
+  it('keeps diamond retired at wave 4, features lightning only', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
-    expect(dist.prism).toBeGreaterThan(0);
     expect(dist.lightning).toBeGreaterThan(0);
+    expect(dist.prism ?? 0).toBe(0);
     expect(dist.diamond).toBe(0);
     expect(dist.gem).toBe(0);
   });
 
-  it('keeps magnet retired at wave 7', () => {
+  it('keeps magnet retired at wave 7, features anchor only', () => {
     const dist = getWaveDistribution(getWaveConfig(7));
-    expect(dist.lightning).toBeGreaterThan(0);
+    expect(dist.anchor ?? 0).toBeGreaterThan(0);
+    expect(dist.lightning ?? 0).toBe(0);
     expect(dist.magnet).toBe(0);
   });
 
@@ -298,18 +299,20 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     expect(dist.frozen ?? 0).toBe(0);
   });
 
-  it('wave 4: unlocks lightning, retired diamond/magnet stay off', () => {
+  it('wave 4: unlocks lightning, retired diamond/magnet stay off, no prism yet', () => {
     const dist = getWaveDistribution(getWaveConfig(4));
     expect(dist.lightning).toBeGreaterThan(0);
+    expect(dist.prism ?? 0).toBe(0);
     expect(dist.diamond ?? 0).toBe(0);
     expect(dist.magnet ?? 0).toBe(0);
     expect(dist.frozen ?? 0).toBe(0);
   });
 
-  it('wave 5: diamond retired (no longer unlocks)', () => {
+  it('wave 5: features mystery, diamond+lightning retired', () => {
     const dist = getWaveDistribution(getWaveConfig(5));
+    expect(dist.mystery ?? 0).toBeGreaterThan(0);
     expect(dist.diamond ?? 0).toBe(0);
-    expect(dist.lightning).toBeGreaterThan(0);
+    expect(dist.lightning ?? 0).toBe(0);
     expect(dist.frozen ?? 0).toBe(0);
   });
 
@@ -320,10 +323,11 @@ describe('getWaveDistribution — new tile unlock progression', () => {
     expect(dist.diamond ?? 0).toBe(0);
   });
 
-  it('wave 7+: magnet stays retired', () => {
+  it('wave 7+: magnet stays retired, features anchor', () => {
     const dist = getWaveDistribution(getWaveConfig(7));
     expect(dist.magnet ?? 0).toBe(0);
-    expect(dist.lightning).toBeGreaterThan(0);
+    expect(dist.anchor ?? 0).toBeGreaterThan(0);
+    expect(dist.lightning ?? 0).toBe(0);
   });
 
   it('all distributions for waves 1-6 sum to 1.0 (within 0.01)', () => {
@@ -613,11 +617,18 @@ describe('getWaveDistribution — curated permanent roster', () => {
     }
   });
 
-  it('keeps the legible core spawning at high waves', () => {
+  it('keeps the core + featured specials spawning at high waves', () => {
     const dist = getWaveDistribution(getWaveConfig(12));
-    for (const kept of KEPT_CORE) {
-      expect(dist[kept] ?? 0).toBeGreaterThan(0);
-    }
+    // W12 features: lightning + mystery
+    // CORE always: bomb, ice, gold, rainbow
+    expect(dist.bomb ?? 0).toBeGreaterThan(0);
+    expect(dist.ice ?? 0).toBeGreaterThan(0);
+    expect(dist.gold ?? 0).toBeGreaterThan(0);
+    expect(dist.rainbow ?? 0).toBeGreaterThan(0);
+    expect(dist.lightning ?? 0).toBeGreaterThan(0);
+    expect(dist.mystery ?? 0).toBeGreaterThan(0);
+    // W12 does NOT feature prism, so it should be zeroed
+    expect(dist.prism ?? 0).toBe(0);
   });
 
   it('still normalizes to ~1.0 after curation at high waves', () => {

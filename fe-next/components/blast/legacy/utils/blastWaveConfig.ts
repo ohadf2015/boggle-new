@@ -43,6 +43,10 @@ export type BlastWaveArchetype =
 export interface WaveConfig {
   /** Emotional identity tag — UI only, ignored by the engine */
   archetype: BlastWaveArchetype;
+  /** Exotic specials allowed to spawn this wave (undefined = no filtering).
+   * Core specials (bomb/ice/gold/rainbow) always spawn. Filled from
+   * getFeaturedSpecialsForWave so waves >12 keep rotating. */
+  featuredSpecials?: readonly BlastTileType[];
   /** Minimum word length for player submissions */
   minWordLength: number;
   /** Chance of a cell being special (0-1) */
@@ -285,12 +289,14 @@ export function getWaveConfig(wave: number): WaveConfig {
     config.movesAllowed = Math.max(6, Math.ceil(config.scoreThreshold / 120));
   }
 
-  return config;
+  // Inject the featured roster so every wave — including >12 — has its own identity.
+  return { ...config, featuredSpecials: getFeaturedSpecialsForWave(wave) };
 }
 
 // ==================== Wave Objectives ====================
 
 import type { BlastObjective, BlastTileType } from '../types';
+import { applyFeaturedRoster, getFeaturedSpecialsForWave } from './blastWaveRoster';
 import { getTargetWordPool, pickRandomTargetWord } from './blastTargetWordPool';
 
 /**
@@ -739,6 +745,10 @@ export function getWaveDistribution(config: WaveConfig): Record<string, number> 
   for (const t of BLAST_RETIRED_SPECIAL_TYPES) {
     if (t in raw) raw[t] = 0;
   }
+
+  // Featured roster: uniqueness per wave with FEWER concurrent tile kinds.
+  const filtered = applyFeaturedRoster(raw, config.featuredSpecials);
+  for (const k of Object.keys(raw)) raw[k] = filtered[k] ?? 0;
 
   // Normalize to sum to 1.0 (avoids drift when many tiles are enabled)
   const sum = Object.values(raw).reduce((a, b) => a + b, 0);

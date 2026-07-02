@@ -42,16 +42,12 @@ describe('generateTileStates — locked/key pairing (Phase 3)', () => {
   });
 
   it('locked+key absent through FTUE cohort (waves 1-10), present from wave 11+', () => {
-    // Revival sprint 2026-05-10: locked+key un-retired at wave 11.
-    for (let w = 1; w <= 10; w++) {
+    // Featured roster: locked+key are not featured in any wave rotation.
+    // They remain disabled across all waves to reduce concurrent tile kinds.
+    for (let w = 1; w <= 12; w++) {
       const dist = getWaveDistribution(getWaveConfig(w));
       expect(dist.locked ?? 0).toBe(0);
       expect(dist.key ?? 0).toBe(0);
-    }
-    for (let w = 11; w <= 12; w++) {
-      const dist = getWaveDistribution(getWaveConfig(w));
-      expect(dist.locked).toBeGreaterThan(0);
-      expect(dist.key).toBeGreaterThan(0);
     }
   });
 
