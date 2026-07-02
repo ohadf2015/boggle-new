@@ -29,8 +29,11 @@ export function WordTowerMascot({ resultKey, lastResult, reducedMotion }: WordTo
   const pose = reactionMascotPose(lastResult?.tier ?? 'none');
 
   return (
+    // top-44 (176px) clears the restructured top chrome (buttons row + altitude
+    // row end ~140px) on phone AND desktop — at the old top-[9%] the cheer pose
+    // popped straight over the altitude pill on 844px-tall phones (2026-07-02).
     <div
-      className={`pointer-events-none absolute end-[6%] top-[9%] z-[1] ${reducedMotion ? '' : 'animate-neo-pop'}`}
+      className={`pointer-events-none absolute end-[4%] top-44 z-[1] ${reducedMotion ? '' : 'animate-neo-pop'}`}
       aria-hidden
     >
       <InteractiveMascot

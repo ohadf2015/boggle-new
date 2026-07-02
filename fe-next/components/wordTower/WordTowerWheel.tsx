@@ -117,6 +117,19 @@ export function WordTowerWheel({
       aria-label={t(placing ? 'wordTower.crane.steer' : 'wordTower.hud.dragToBuild')}
       dir={dir}
     >
+      {/* Full-word ribbon — floats above the ring while spelling, so long words
+          stay readable end-to-end (the centre hub truncates past ~5 letters:
+          "HONE" read as "HO…" in the 2026-07-02 audit). Hidden while placing —
+          the crane column already shows the word as bricks. */}
+      {!placing && word.length > 0 && (
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-2 left-1/2 z-30 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy px-3 py-0.5 font-neo-display text-lg font-black uppercase tracking-[0.2em] text-neo-white shadow-hard"
+        >
+          {word}
+        </div>
+      )}
+
       {/* Biome glow — the ring's halo brightens with altitude (more satisfying up high). */}
       <div
         aria-hidden

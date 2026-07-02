@@ -31,17 +31,22 @@ export function WordTowerRewardReveal({ reward, t, reducedMotion }: Props) {
   const meta = REWARD_TIER_META[reward.tier];
   const isBig = reward.tier === 'rare' || reward.tier === 'epic';
   const bg = isBig ? 'bg-neo-yellow' : 'bg-neo-cyan';
+  // Louder the rarer: commons read as a quick receipt, rare/epic as an event.
+  const amountSize = reward.tier === 'epic' ? 'text-2xl' : reward.tier === 'rare' ? 'text-xl' : 'text-lg';
 
+  // In-flow chip — renders inside the play screen's notice column (the parent
+  // owns stacking), so a reward that lands WITH a zone banner reads as one
+  // tidy stack instead of two toasts fighting mid-screen.
   return (
     <div
       key={reward.key}
       role="status"
       aria-live="polite"
-      className={`pointer-events-none absolute inset-x-0 top-[30%] z-40 mx-auto flex w-fit flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black ${bg} px-5 py-2.5 text-center text-black shadow-hard ${
+      className={`pointer-events-none flex w-fit flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black ${bg} px-5 py-2.5 text-center text-black shadow-hard ${
         reducedMotion ? '' : 'animate-neo-pop'
       }`}
     >
-      <span className="flex items-center gap-1.5 font-neo-display text-lg font-extrabold">
+      <span className={`flex items-center gap-1.5 font-neo-display ${amountSize} font-extrabold`}>
         <span aria-hidden>{meta.emoji}</span>
         +{reward.coins}
         <span aria-hidden>🪙</span>

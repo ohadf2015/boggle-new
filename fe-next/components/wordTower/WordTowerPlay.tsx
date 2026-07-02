@@ -2,13 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Trophy, Share2, ChevronsUp, Flame, Sparkles } from 'lucide-react';
+import { ArrowLeft, Trophy, Share2, Flame, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameActiveSound } from '@/hooks/useGameActiveSound';
-import { TOWER_SURPRISE_META, UPDRAFT_MULT, type ActiveTowerSurprise, type TowerSurpriseSound } from '@/lib/wordTower/towerSurprise';
+import { TOWER_SURPRISE_META, type ActiveTowerSurprise, type TowerSurpriseSound } from '@/lib/wordTower/towerSurprise';
 import type { Language } from '@/shared/types/game';
 import { useWordTower } from '@/lib/wordTower/useWordTower';
 import {
@@ -39,6 +39,10 @@ import {
 import { comboMilestone, type ComboMilestone } from '@/lib/wordTower/comboMilestone';
 import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { WordTowerMutatorBanner } from './WordTowerMutatorBanner';
+import { WordTowerNoticeColumn } from './WordTowerNoticeColumn';
+import { fireConfetti } from '@/utils/confettiUtils';
+import { LazyMotion, domAnimation } from 'framer-motion';
+import { CoinCounterAnimated } from '@/components/animations/CoinCounterAnimated';
 import { swayInstability, swayHeightDampen, steadyHandsDampen } from '@/lib/wordTower/towerSway';
 import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import { newlyUnlockedSkin, type TowerSkin } from '@/lib/wordTower/skins';
@@ -47,7 +51,7 @@ import { WordTowerSkinPicker } from './WordTowerSkinPicker';
 import { WordTowerFlowFrame } from './WordTowerFlowFrame';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
-import { buildDropVerdict, showsTierKicker, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
+import { buildDropVerdict, type DropVerdict } from '@/lib/wordTower/dropVerdict';
 import type { PlacementOutcome } from '@/lib/wordTower/cranePlacement';
 import { useWordTowerPerks } from './useWordTowerPerks';
 import { useRunStreakPerk } from '@/lib/wordTower/useRunStreakPerk';
@@ -69,7 +73,7 @@ import {
   rewardRoll01,
   type RewardSource,
 } from '@/lib/wordTower/towerReward';
-import { WordTowerRewardReveal, type RewardRevealPayload } from './WordTowerRewardReveal';
+import { type RewardRevealPayload } from './WordTowerRewardReveal';
 import { useTowerUpgradeStore } from '@/lib/wordTower/useTowerUpgradeStore';
 import { computeEffects as computeUpgradeEffects } from '@/lib/wordTower/upgrades';
 import { WordTowerUpgradePanel } from './WordTowerUpgradePanel';
@@ -96,22 +100,7 @@ const REWARD_MS = 1500;
  *  story beat the defender should actually read. */
 const WRECK_REPORT_MS = 3500;
 
-/** Verdict-pop colour by band — mirrors the swinging-beam tint families. */
-const VERDICT_TONE_CLASS: Record<VerdictTone, string> = {
-  lime: 'bg-neo-lime text-neo-black',
-  cyan: 'bg-neo-cyan text-neo-black',
-  yellow: 'bg-neo-yellow text-neo-black',
-  red: 'bg-neo-red text-neo-white',
-};
-
-/** Long-word celebration label per tier — folded into the verdict pop so the
- *  "SKYSCRAPER!" beat rides with the drop verdict instead of as a 2nd floating
- *  pop. (Mirrors WordTowerHud's TIER_KEY.) */
-const TOWER_TIER_KEY: Record<'highRise' | 'tall' | 'skyscraper', string> = {
-  highRise: 'wordTower.celebration.highRise',
-  tall: 'wordTower.celebration.tall',
-  skyscraper: 'wordTower.celebration.skyscraper',
-};
+/* (Verdict tone classes + tier-kicker keys moved into WordTowerNoticeColumn.) */
 
 interface PlayProps {
   language: Language;
@@ -281,8 +270,22 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       setCoinBalance(getCoins());
       setRewardFx({ coins, tier: reward.tier, source, key: Date.now() });
       playCoinCollectSound();
+      // Rare/epic drops get a PHYSICAL payoff beyond the chip — a confetti
+      // burst scaled to tier + the chest sting on epic — so the controlled-
+      // rarity moment is felt, not just read. Commons stay quiet by design
+      // (they fire every zone; celebrating all of them would be noise).
+      if (reward.tier === 'rare' || reward.tier === 'epic') {
+        if (!reducedMotion) {
+          fireConfetti({
+            particleCount: reward.tier === 'epic' ? 90 : 40,
+            spread: reward.tier === 'epic' ? 100 : 70,
+            origin: { y: 0.35 },
+          });
+        }
+        if (reward.tier === 'epic') playChestOpenSound();
+      }
     },
-    [playCoinCollectSound],
+    [playCoinCollectSound, playChestOpenSound, reducedMotion],
   );
   useAutoDismiss(rewardFx?.key, () => setRewardFx(null), REWARD_MS);
 
@@ -491,6 +494,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     const gain = game.heightM - prevVerdictHeight.current;
     prevVerdictHeight.current = game.heightM;
     setVerdict({ v: buildDropVerdict(o, gain), key: tower.state.resultKey });
+    // PERFECT landings pay a small sharp burst at the tower line — kept to the
+    // flawless band only so it stays a skill signal, not per-drop noise.
+    if (o.quality === 'perfect' && !reducedMotion) {
+      fireConfetti({ particleCount: 24, spread: 60, startVelocity: 28, scalar: 0.8, origin: { y: 0.42 } });
+    }
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
   // Dismiss via the shared hook (keyed on the verdict's own resultKey) rather than
   // an inline timer, so the lifespan is owned in ONE place and can never be reset
@@ -728,6 +736,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     setNewBestShown(true);
     setNewBestText(t('wordTower.daily.newBest'));
     onNewDailyBest?.(game.heightM);
+    // A personal record is THE self-comparison payoff — celebrate it bigger
+    // than any single drop (wide gold-heavy burst + the level-complete buzz).
+    haptics.levelComplete();
+    if (!reducedMotion) {
+      fireConfetti({ particleCount: 120, spread: 120, startVelocity: 45, origin: { y: 0.4 } });
+    }
   }, [daily, newBestShown, personalBestM, game.heightM, onNewDailyBest]); // eslint-disable-line react-hooks/exhaustive-deps
   useAutoDismiss(newBestText, () => setNewBestText(null), TOAST_MS);
   useEffect(() => { if (game.heightM > 0) save(); }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -754,7 +768,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const surpriseR = useExitReveal(surpriseFx, EXIT_MS);
   const achR = useExitReveal(achToast, EXIT_MS);
   /** Entrance anim while live, the clip-wipe exit while leaving (none under RM). */
-  const fxClass = (exiting: boolean, enter: string) => (reducedMotion ? '' : exiting ? 'wt-toast-out' : enter);
 
   // Always flush when the tab is hidden / page unloads.
   useEffect(() => {
@@ -876,148 +889,99 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           Keyed off the live climb height, not the panned view. */}
       <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
 
-      {/* Wrecking Ball bay — token chip + rival picker + the wrecking-ball arc.
-          Earned by reaching new zones / unlocking achievements; spent to raid a
-          rival's tower (local beat now, lands on their next climb via the queue). */}
-      <WordTowerSabotageBay
-        tokens={sab.tokens}
-        rivals={displayRivals}
-        pickerOpen={sab.pickerOpen}
-        onOpen={sab.openPicker}
-        onClose={sab.closePicker}
-        onSend={sendWreck}
-        lastHit={sab.lastHit}
-        onDismissHit={sab.dismissHit}
-        earnedToast={sab.earnedToast}
-        onDismissEarned={sab.dismissEarned}
-        adEarnedToast={sab.adEarnedToast}
-        onDismissAdEarned={sab.dismissAdEarned}
-        t={t}
-        reducedMotion={reducedMotion}
-      />
+      {/* ── Left utility rail ── persistent state chips (wrecking ball + watch-ad,
+          steady-hands streak, active mutator, owned perks) stack in ONE flex
+          column on the start side, below the top chrome. One layout owner means
+          they can never overlap each other — or the centred banners — at
+          hand-tuned absolute offsets again (the 390px pile-up, 2026-07-02). */}
+      <div className="pointer-events-none absolute start-2 top-36 z-20 flex max-w-[45%] flex-col items-start gap-1" dir={dir}>
+        {/* Wrecking Ball bay — token chip + rival picker + the wrecking-ball arc.
+            Earned by reaching new zones / unlocking achievements; spent to raid a
+            rival's tower. Chips render inline here; overlays stay fullscreen. */}
+        <WordTowerSabotageBay
+          inline
+          tokens={sab.tokens}
+          rivals={displayRivals}
+          pickerOpen={sab.pickerOpen}
+          onOpen={sab.openPicker}
+          onClose={sab.closePicker}
+          onSend={sendWreck}
+          lastHit={sab.lastHit}
+          onDismissHit={sab.dismissHit}
+          earnedToast={sab.earnedToast}
+          onDismissEarned={sab.dismissEarned}
+          adEarnedToast={sab.adEarnedToast}
+          onDismissAdEarned={sab.dismissAdEarned}
+          t={t}
+          reducedMotion={reducedMotion}
+        />
 
-      {/* "You actually got coins" reveal — flashes the granted amount + rarity. */}
-      <WordTowerRewardReveal reward={rewardFx} t={t} reducedMotion={reducedMotion} />
+        {/* Steady-hands FLOW chip — the positive crane-skill beat: a run of
+            perfect drops calms the tower (see instability) and escalates this
+            badge. Cyan → lime → gold "ON FIRE" so the streak reads at a glance. */}
+        {crane.perfectStreak >= 2 && (
+          <div
+            className={`flex items-center gap-1 rounded-neo border-neo-thick border-black px-2 py-1 shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'} ${
+              crane.perfectStreak >= 5
+                ? 'bg-gradient-to-b from-neo-yellow to-neo-orange text-black'
+                : crane.perfectStreak >= 4
+                  ? 'bg-neo-lime text-black'
+                  : 'bg-neo-cyan text-black'
+            }`}
+            role="status"
+            aria-live="polite"
+            aria-label={t('wordTower.crane.steadyAria', { n: crane.perfectStreak })}
+          >
+            {crane.perfectStreak >= 5
+              ? <Flame className={`h-4 w-4 ${reducedMotion ? '' : 'animate-bounce'}`} aria-hidden />
+              : <Sparkles className="h-4 w-4" aria-hidden />}
+            <span className="font-neo-display text-sm font-black uppercase tracking-wide tabular-nums">
+              {crane.perfectStreak >= 5 ? t('wordTower.crane.onFire') : t('wordTower.crane.steady')} ×{crane.perfectStreak}
+            </span>
+          </div>
+        )}
 
-      {/* Wreck Report — a rival raided you while away; the hit (session-only) has
-          already been folded in + you were handed a compensation scramble. */}
-      {wreckReport && (
-        <div
-          role="status"
-          aria-live="polite"
-          className={`pointer-events-none absolute inset-x-0 top-[6.75rem] z-40 mx-auto flex w-fit flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-pink px-5 py-2.5 text-center text-neo-white shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'}`}
-        >
-          <span className="flex items-center gap-1.5 font-neo-display text-base font-extrabold">
-            <span aria-hidden>🧨</span>
-            {t('wordTower.wreck.reportTitle')}
+        {/* Persistent mutator chip — keeps the day's active twist visible all run. */}
+        {mutator && (
+          <span
+            className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-lime px-1.5 py-0.5 font-neo-body text-[10px] font-black text-black shadow-hard-sm"
+            title={t(mutator.descKey, mutator.id === 'goldenLetter' ? { letter: mutator.goldenLetter ?? '' } : undefined)}
+          >
+            <span aria-hidden>{mutator.icon}</span>
+            {t(mutator.nameKey)}
           </span>
-          <span className="font-neo-body text-xs font-bold">
-            {t('wordTower.wreck.reportBody', {
-              name: wreckReport.names[0] ?? t('wordTower.wreck.defaultName'),
-              floors: wreckReport.floors,
-            })}
-          </span>
-        </div>
-      )}
+        )}
+
+        {/* Owned perks — small badge column (daily run) so the player sees their build. */}
+        {daily && perks.owned.map((id) => {
+          const perk = PERKS[id];
+          if (!perk) return null;
+          return (
+            <span
+              key={id}
+              className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-purple px-1.5 py-0.5 font-neo-body text-[10px] font-black text-neo-white shadow-hard-sm"
+              title={t(perk.descKey)}
+            >
+              <span aria-hidden>{perk.icon}</span>
+              {t(perk.nameKey)}
+            </span>
+          );
+        })}
+      </div>
+
+      {/* (Coin-reward reveal now renders inside the notice column, directly
+          under the zone banner it usually accompanies.) */}
 
       {/* "In the zone" frame — a hard-edged electric border that lights the play
           area on a hot perfect-drop streak, gold at "ON FIRE". Pure feel. */}
       <WordTowerFlowFrame perfectStreak={crane.perfectStreak} reducedMotion={reducedMotion} />
 
-      {/* Steady-hands FLOW chip — the positive crane-skill beat: a run of perfect
-          drops calms the tower (see instability) and escalates this badge. Cyan →
-          lime → gold "ON FIRE" so the streak reads at a glance. */}
-      {crane.perfectStreak >= 2 && (
-        <div
-          className={`pointer-events-none absolute start-2 top-28 z-[8] flex items-center gap-1 rounded-neo border-neo-thick border-black px-2 py-1 shadow-hard ${reducedMotion ? '' : 'animate-neo-pop'} ${
-            crane.perfectStreak >= 5
-              ? 'bg-gradient-to-b from-neo-yellow to-neo-orange text-black'
-              : crane.perfectStreak >= 4
-                ? 'bg-neo-lime text-black'
-                : 'bg-neo-cyan text-black'
-          }`}
-          role="status"
-          aria-live="polite"
-          aria-label={t('wordTower.crane.steadyAria', { n: crane.perfectStreak })}
-        >
-          {crane.perfectStreak >= 5
-            ? <Flame className={`h-4 w-4 ${reducedMotion ? '' : 'animate-bounce'}`} aria-hidden />
-            : <Sparkles className="h-4 w-4" aria-hidden />}
-          <span className="font-neo-display text-sm font-black uppercase tracking-wide tabular-nums">
-            {crane.perfectStreak >= 5 ? t('wordTower.crane.onFire') : t('wordTower.crane.steady')} ×{crane.perfectStreak}
-          </span>
-        </div>
-      )}
+      {/* (Steady-hands FLOW chip + skin picker now live in the left utility rail
+          and the top-bar actions row respectively.) */}
 
-      {/* (Tower-skin picker now lives in the top-bar actions row beside Share.) */}
-
-      {/* NEW SKIN UNLOCKED — the variable-reward beat when a climb crosses a
-          skin's height milestone (the new look is auto-equipped). */}
-      {skinUnlockR.value && (() => { const skinUnlock = skinUnlockR.value; return (
-        <div
-          className={`pointer-events-none absolute left-1/2 top-[22%] z-40 flex -translate-x-1/2 items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 shadow-hard ${fxClass(skinUnlockR.exiting, 'animate-neo-pop')}`}
-          role="status"
-          aria-live="polite"
-        >
-          <span className="flex overflow-hidden rounded-neo border-neo border-black" aria-hidden>
-            <span className="h-6 w-2.5" style={{ background: `#${skinUnlock.palette.city.toString(16).padStart(6, '0')}` }} />
-            <span className="h-6 w-2.5" style={{ background: `#${skinUnlock.palette.galaxy.toString(16).padStart(6, '0')}` }} />
-          </span>
-          <span className="flex flex-col items-start leading-tight">
-            <span className="font-neo-body text-[10px] font-bold uppercase tracking-[0.2em] text-black/60">
-              {t('wordTower.skin.unlockedToast')}
-            </span>
-            <span className="font-neo-display text-base font-black uppercase tracking-wide text-black">
-              {t(skinUnlock.nameKey)}
-            </span>
-          </span>
-        </div>
-      ); })()}
-
-      {/* Next-zone tease — quiet anticipation chip in the approach window. Hidden
-          while the NEW ZONE banner is paying off the arrival. */}
-      {tease && !zoneText && (
-        <div
-          className="pointer-events-none absolute left-1/2 top-[6.75rem] z-20 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
-          aria-live="polite"
-        >
-          <ChevronsUp className="h-3 w-3" />
-          {t('wordTower.zone.next', { zone: t(`wordTower.biome.${tease.nextBiomeId}`), m: Math.ceil(tease.metersToNext) })}
-        </div>
-      )}
-
-      {/* NEW ZONE banner — the headline of entering a new biome */}
-      {zoneR.value && (
-        <div
-          className={`pointer-events-none absolute left-1/2 top-[6.75rem] z-30 -translate-x-1/2 ${fxClass(zoneR.exiting, 'animate-neo-pop')} rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-2 text-center shadow-hard`}
-          aria-live="polite"
-        >
-          <div className="font-neo-body text-[10px] font-bold uppercase tracking-[0.2em] text-black/60">{t('wordTower.zone.entered')}</div>
-          <div className="font-neo-display text-base font-black uppercase tracking-wide text-black">{zoneR.value}</div>
-        </div>
-      )}
-
-      {/* Witty milestone toast */}
-      {milestoneR.value && (
-        <div
-          className={`pointer-events-none absolute left-1/2 top-[16%] z-20 -translate-x-1/2 ${fxClass(milestoneR.exiting, 'animate-neo-pop')} rounded-neo border-neo-thick border-black bg-neo-purple px-3 py-1.5 font-neo-display text-sm font-black text-neo-white shadow-hard`}
-          aria-live="polite"
-        >
-          {milestoneR.value}
-        </div>
-      )}
-
-      {/* Calm landmark flyby — a cosy, warm "you passed X" beat. Low-key cream
-          (not electric) so it reads as a scenic moment, not a celebration.
-          Shares the guarded milestone slot, so the two never co-occur. */}
-      {landmarkR.value && (
-        <div
-          className={`pointer-events-none absolute left-1/2 top-[16%] z-20 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-cream px-3 py-1.5 font-neo-display text-sm font-black text-black shadow-hard ${fxClass(landmarkR.exiting, 'animate-neo-pop')}`}
-          aria-live="polite"
-        >
-          {landmarkR.value}
-        </div>
-      )}
+      {/* (All transient banners — zone, milestone, landmark, skin unlock, tease,
+          combo, surprise, new-best, clutch, hazard, achievement, wreck report —
+          now render in the single notice column below the verdict block.) */}
 
       {/* Crane Stack — the held word swings; tap the BOTTOM CTA to drop it.
           The crane's own button is hidden; the HUD's swapped-in DROP button
@@ -1040,155 +1004,36 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         />
       )}
 
-      {/* Unmistakable DROP VERDICT — the single big beat that answers "did I nail
-          it?". Band-coloured headline (PERFECT/NICE/SLOPPY/MISSED) + the metres
-          actually gained, popped centre-stage so it can't be missed. */}
-      {verdictR.value && (() => { const verdict = verdictR.value; return (
-        <div
-          key={verdict.key}
-          className={`pointer-events-none absolute left-1/2 top-[40%] z-40 flex -translate-x-1/2 -translate-y-1/2 flex-col items-center gap-1.5 ${fxClass(verdictR.exiting, '')}`}
-          aria-live="assertive"
-          role="status"
-        >
-          {/* Tier kicker — the long-word celebration (SKYSCRAPER!) folded INTO the
-              verdict so it is ONE consolidated beat, not a separate floating pop
-              stacking on top of this one (founder: less clutter, more fun to watch).
-              Hidden on a MISS so a fumbled drop never reads as a celebration
-              (founder screenshot: "HIGH-RISE!" sat on top of a red "MISSED!"). */}
-          {tower.state.lastResult && tower.state.lastResult.tier !== 'none' && showsTierKicker(verdict.v.tone) && (
-            <div className="rounded-neo border-neo border-black bg-neo-yellow px-3 py-0.5 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard">
-              {t(TOWER_TIER_KEY[tower.state.lastResult.tier])}
-            </div>
-          )}
-          <div
-            className={`rounded-neo border-neo-thick border-black px-5 py-2.5 text-center font-neo-display text-2xl font-black uppercase tracking-wide shadow-hard ${VERDICT_TONE_CLASS[verdict.v.tone]} ${reducedMotion ? '' : verdict.v.toppled ? 'animate-neo-shake' : 'animate-neo-pop'}`}
-          >
-            {t(verdict.v.labelKey)}
-          </div>
-          {verdict.v.gainText !== '+0m' && (
-            <div dir="ltr" className="rounded-neo border-neo border-black bg-neo-navy/85 px-3 py-1 font-neo-display text-lg font-black text-neo-white shadow-hard backdrop-blur-sm">
-              {verdict.v.gainText}
-            </div>
-          )}
-        </div>
-      ); })()}
-
-      {/* Hazard "tower ruined" banner — bold + red so the loss is unmissable */}
-      {hazardR.value && (
-        <div
-          className={`pointer-events-none absolute left-1/2 top-[9%] z-40 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-red px-4 py-2 text-center font-neo-display text-base font-black text-neo-white shadow-hard ${fxClass(hazardR.exiting, 'animate-neo-shake')}`}
-          aria-live="assertive"
-        >
-          {hazardR.value}
-        </div>
-      )}
-
-      {/* CRITICAL-lean warning — the tower is one shaky drop from falling.
-          Telegraphs the clutch stake: land THIS drop cleanly. */}
-      {crane.critical && tower.state.pendingWord && !clutchText && (
-        <div
-          className={`pointer-events-none absolute left-1/2 top-[6.75rem] z-30 -translate-x-1/2 flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-orange px-3 py-1.5 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-pulse'}`}
-          aria-live="assertive"
-        >
-          ⚠ {t('wordTower.clutch.critical')}
-        </div>
-      )}
-
-      {/* CLUTCH SAVE banner — the do-or-die payoff. Lime = triumph. */}
-      {clutchR.value && (
-        <div
-          className={`pointer-events-none absolute inset-x-0 top-[6.75rem] z-40 mx-auto w-fit rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-2.5 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${fxClass(clutchR.exiting, 'animate-neo-pop')}`}
-          aria-live="assertive"
-        >
-          {clutchR.value}
-        </div>
-      )}
-
-      {/* New daily best — the self-comparison routine beat. Gold = personal record. */}
-      {newBestR.value && (
-        <div
-          className={`pointer-events-none absolute inset-x-0 top-[16%] z-40 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-black uppercase tracking-wide text-black shadow-hard ${fxClass(newBestR.exiting, 'animate-neo-pop')}`}
-          aria-live="polite"
-        >
-          🏆 {newBestR.value}
-        </div>
-      )}
-
-      {/* Combo-milestone fanfare — a flame-orange "×5 ON FIRE!" beat. Sits below
-          the centre verdict so the two read as separate hits, not one pile. */}
-      {comboR.value && (() => { const comboFx = comboR.value; return (
-        <div
-          key={comboFx.key}
-          className={`pointer-events-none absolute inset-x-0 top-[30%] z-30 mx-auto w-fit flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-orange px-4 py-2 text-center font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard ${fxClass(comboR.exiting, 'animate-neo-pop')}`}
-          aria-live="polite"
-        >
-          🔥 {t(comboFx.m.labelKey)} <span className="tabular-nums">×{comboFx.m.combo}</span>
-        </div>
-      ); })()}
-
-      {/* Surprise pop — the variable-reward beat. Gold tile (celebration accent),
-          sits high-centre so it reads as its own lucky hit above the verdict. */}
-      {surpriseR.value && (() => { const surpriseFx = surpriseR.value; return (
-        <div
-          key={surpriseFx.key}
-          className={`pointer-events-none absolute inset-x-0 top-[23%] z-40 mx-auto w-fit flex flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2.5 text-center shadow-hard ${fxClass(surpriseR.exiting, 'animate-neo-pop')}`}
-          aria-live="polite"
-        >
-          <div className="flex items-center gap-1.5 font-neo-display text-xl font-black uppercase tracking-wide text-black">
-            {(() => { const m = TOWER_SURPRISE_META[surpriseFx.s.event]; if (!m) return null; return (<><span aria-hidden>{m.emoji}</span>{t(`wordTower.surprise.${m.key}`)}</>); })()}
-          </div>
-          {(surpriseFx.s.bonusMeters > 0 || surpriseFx.s.bonusScrambles > 0) && (
-            <div dir="ltr" className="font-neo-body text-xs font-black text-black/80 tabular-nums">
-              {surpriseFx.s.bonusMeters > 0 && `+${Math.round(surpriseFx.s.bonusMeters)}m`}
-              {surpriseFx.s.bonusMeters > 0 && surpriseFx.s.bonusScrambles > 0 && ' · '}
-              {surpriseFx.s.bonusScrambles > 0 && `+${surpriseFx.s.bonusScrambles}🔀`}
-            </div>
-          )}
-          {/* Updraft pays out on the NEXT word, so it has no immediate bonus to
-              show — surface the PROMISE explicitly so the reward isn't hollow. */}
-          {surpriseFx.s.event === 'updraft' && (
-            <div className="font-neo-body text-xs font-black text-black/80 tabular-nums">
-              {t('wordTower.surprise.nextWord')} ×{UPDRAFT_MULT}
-            </div>
-          )}
-        </div>
-      ); })()}
+      {/* ── Notice column ── every transient banner (verdict, alarms,
+          celebrations, rewards, scenic beats) stacks here in priority order.
+          See WordTowerNoticeColumn for the rationale + ordering. */}
+      <WordTowerNoticeColumn
+        verdict={verdictR}
+        lastResultTier={tower.state.lastResult?.tier ?? null}
+        hazard={hazardR}
+        clutch={clutchR}
+        critical={crane.critical && !!tower.state.pendingWord && !clutchText}
+        newBest={newBestR}
+        zone={zoneR}
+        tease={zoneText ? null : tease}
+        reward={rewardFx}
+        sabEarned={sab.earnedToast}
+        sabAdEarned={!!sab.adEarnedToast}
+        skinUnlock={skinUnlockR}
+        surprise={surpriseR}
+        combo={comboR}
+        milestone={milestoneR}
+        landmark={landmarkR}
+        ach={achR}
+        wreckReport={wreckReport}
+        reducedMotion={reducedMotion}
+        t={t}
+      />
 
       {/* Daily mutator intro — the day's shared twist, popped once on entry. */}
       {mutator && <WordTowerMutatorBanner mutator={mutator} t={t} reducedMotion={reducedMotion} />}
 
-      {/* Persistent mutator chip — keeps the active twist visible all run. */}
-      {mutator && (
-        <div className="pointer-events-none fixed left-2 top-[44px] z-40" dir={dir}>
-          <span
-            className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-lime px-1.5 py-0.5 font-neo-body text-[10px] font-black text-black shadow-hard-sm"
-            title={t(mutator.descKey, mutator.id === 'goldenLetter' ? { letter: mutator.goldenLetter ?? '' } : undefined)}
-          >
-            <span aria-hidden>{mutator.icon}</span>
-            {t(mutator.nameKey)}
-          </span>
-        </div>
-      )}
-
-      {/* Owned perks — small badge row (daily run) so the player sees their build. */}
-      {daily && perks.owned.length > 0 && (
-        <div className="pointer-events-none fixed left-2 top-[76px] z-40 flex flex-col gap-1" dir={dir}>
-          {perks.owned.map((id) => {
-            const perk = PERKS[id];
-            if (!perk) return null;
-            return (
-              <span
-                key={id}
-                className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-purple px-1.5 py-0.5 font-neo-body text-[10px] font-black text-neo-white shadow-hard-sm"
-                title={t(perk.descKey)}
-              >
-                <span aria-hidden>{perk.icon}</span>
-                {t(perk.nameKey)}
-              </span>
-            );
-          })}
-        </div>
-      )}
+      {/* (Mutator chip + owned-perk badges now live in the left utility rail.) */}
 
       {/* Roguelike perk draft — pick 1 of 3 at each daily milestone. */}
       <WordTowerPerkDraft choices={perks.draft} onChoose={perks.choose} onSkip={perks.skip} t={t} dir={dir} />
@@ -1202,54 +1047,26 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         <WordTowerUpgradePanel onClose={() => setShowUpgrades(false)} t={t} dir={dir} />
       )}
 
-      {/* Achievement unlock toast */}
-      {achR.value && (() => { const achToast = achR.value; return (
-        <div
-          className={`pointer-events-none absolute left-1/2 top-[23%] z-30 -translate-x-1/2 rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-2 text-center shadow-hard ${fxClass(achR.exiting, 'animate-neo-pop')}`}
-          aria-live="polite"
-        >
-          <div className="font-neo-body text-[10px] font-bold uppercase tracking-wider text-black/60">{t('wordTower.ach.unlocked')}</div>
-          <div className="font-neo-display text-sm font-black text-black">{achToast.icon} {t(achToast.nameKey)}</div>
-        </div>
-      ); })()}
-
-      {/* Top bar — three flex columns: [back] · [altitude readout] · [actions].
-          The altitude HUD shares this row, so it can NEVER sit behind the back
-          button (the old corner card overlapped it once the label wrapped in a
-          longer locale). The container is inert; only the buttons take taps. */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 p-3">
-        <Link
-          href={`/${language}`}
-          onClick={() => save(true)}
-          aria-label={t('common.backToHome')}
-          className="pointer-events-auto absolute start-3 top-3 flex shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span className="hidden min-[380px]:inline">{t('common.backToHome')}</span>
-        </Link>
-        {/* Compact altitude card, centred under the top mode-toggle strip
-            (Daily/Endless, ~y8–37). Absolutely centred (mx-auto w-fit) so it
-            never depends on the back button / action widths to stay put. */}
-        <div className="pointer-events-none mx-auto mt-8 w-fit">
-          <WordTowerStatHud
-            heightM={game.heightM}
-            biomeId={biomeId}
-            floorsCount={game.floors.length}
-            personalBestM={personalBest}
-            combo={game.combo}
-            tier={architectTier}
-            t={t}
-          />
-        </div>
-      </div>
-
-      {/* Action rail — its own layer, DROPPED below the global mute FAB
-          (InGameAudioButton: fixed top-inline-end, 40px + 8px inset = 48px tall).
-          The old top-row + me-12 hack still let a button graze the FAB on narrow
-          screens; sitting the whole cluster at top-14 (56px) clears it outright.
-          Horizontal (not a vertical edge rail) so it never overlaps the rival
-          height ticks that run down the inline-end edge. RTL-safe via end-*. */}
-      <div className="pointer-events-auto absolute end-3 top-14 z-10 flex items-center gap-1.5">
+      {/* Top chrome — ONE flow layout so nothing overlaps by construction:
+          row 1 is a real flex row [back] · [actions], row 2 centres the
+          altitude readout below it. The old version kept THREE separate
+          absolute layers (back @top-3, StatHud @mt-8, actions @top-14) whose
+          hand-tuned offsets collided on 390px phones — the altitude pill sat
+          BEHIND the action buttons (founder screenshot, 2026-07-02). pt-10
+          clears the fixed Daily/Endless strip (~y8–36); the actions row keeps
+          me-12 so it clears the global mute FAB (fixed top-inline-end, 48px). */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-3 pt-10">
+        <div className="flex items-start justify-between gap-2">
+          <Link
+            href={`/${language}`}
+            onClick={() => save(true)}
+            aria-label={t('common.backToHome')}
+            className="pointer-events-auto flex shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span className="hidden min-[380px]:inline">{t('common.backToHome')}</span>
+          </Link>
+          <div className="pointer-events-auto me-12 flex items-center gap-1.5">
         <button
           type="button"
           onClick={() => setShowUpgrades(true)}
@@ -1277,6 +1094,30 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         >
           <Trophy className="h-4 w-4" />
         </button>
+          </div>
+        </div>
+        {/* Compact altitude card — its own centred row BELOW the buttons, so no
+            locale label width or icon count can ever push it behind them. The
+            live WALLET rides beside it: rewards were previously paid into a
+            void (no visible balance anywhere in the climb) — now every grant
+            counts up + pulses where the player is already looking. */}
+        <div className="mx-auto mt-1.5 flex w-fit items-center gap-1.5">
+          <WordTowerStatHud
+            heightM={game.heightM}
+            biomeId={biomeId}
+            floorsCount={game.floors.length}
+            personalBestM={personalBest}
+            combo={game.combo}
+            tier={architectTier}
+            t={t}
+          />
+          {/* LazyMotion: the counter is built on framer `m.` primitives, which
+              render nothing without a features provider — and this page has
+              none (the counter had no live consumer before this). */}
+          <LazyMotion features={domAnimation}>
+            <CoinCounterAnimated value={coinBalance} size="xs" animateOnMount={false} />
+          </LazyMotion>
+        </div>
       </div>
 
       {/* pointer-events-none so this full-screen layer doesn't shield the header

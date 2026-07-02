@@ -22,6 +22,10 @@ interface Props {
   adLoading?: boolean;
   adEarnedToast?: boolean;
   onDismissAdEarned?: () => void;
+  /** Render the chip/CTA/toasts in normal flow (inside the play screen's left
+   *  utility rail) instead of self-positioning absolutely. The picker + smash
+   *  overlays stay absolute either way. */
+  inline?: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
   reducedMotion?: boolean;
 }
@@ -52,6 +56,7 @@ export function WordTowerSabotageBay({
   adLoading,
   adEarnedToast,
   onDismissAdEarned,
+  inline,
   t,
   reducedMotion,
 }: Props) {
@@ -107,12 +112,15 @@ export function WordTowerSabotageBay({
           onClick={onOpen}
           aria-label={t('wordTower.sabotage.chip')}
           className={cn(
-            'pointer-events-auto absolute start-3 top-16 z-40 flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform hover:scale-105 active:translate-y-px',
+            'pointer-events-auto flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform hover:scale-105 active:translate-y-px',
+            !inline && 'absolute start-3 top-16 z-40',
             !reducedMotion && 'animate-neo-pop',
           )}
         >
           <span aria-hidden>🎯</span>
-          <span>{t('wordTower.sabotage.chip')}</span>
+          {/* Inline (left-rail) mode keeps the chip icon-first so centred notice
+              banners never collide with a wide label on narrow phones. */}
+          <span className={cn(inline && 'hidden sm:inline')}>{t('wordTower.sabotage.chip')}</span>
           <span className="flex h-5 min-w-5 items-center justify-center rounded-full border border-black bg-neo-yellow px-1 font-neo-display text-[11px] font-black text-black">
             {tokens}
           </span>
@@ -129,8 +137,9 @@ export function WordTowerSabotageBay({
           disabled={adLoading}
           aria-label={t('wordTower.sabotage.watchAd')}
           className={cn(
-            'pointer-events-auto absolute start-3 z-40 flex items-center gap-1 rounded-neo border-neo border-black px-2 py-1 font-neo-display text-xs font-bold uppercase shadow-hard transition-transform',
-            hasTokens ? 'top-28' : 'top-16',
+            'pointer-events-auto flex items-center gap-1 rounded-neo border-neo border-black px-2 py-1 font-neo-display text-xs font-bold uppercase shadow-hard transition-transform',
+            !inline && 'absolute start-3 z-40',
+            !inline && (hasTokens ? 'top-28' : 'top-16'),
             adLoading
               ? 'bg-neo-navy/60 text-neo-white/40'
               : 'bg-neo-cyan text-black hover:scale-105 active:translate-y-px',
@@ -142,13 +151,16 @@ export function WordTowerSabotageBay({
         </button>
       )}
 
-      {/* AD-EARN toast — token just granted via reward ad. */}
-      {adEarnedToast && (
+      {/* AD-EARN toast — token just granted via reward ad. (Inline mode: the
+          play screen renders this beat in its notice column instead; the
+          auto-dismiss timers above still run either way.) */}
+      {adEarnedToast && !inline && (
         <div
           role="status"
           aria-live="polite"
           className={cn(
-            'pointer-events-none absolute start-3 top-40 z-40 rounded-neo border-neo-thick border-black bg-neo-cyan px-3 py-1.5 text-start shadow-hard',
+            'pointer-events-none rounded-neo border-neo-thick border-black bg-neo-cyan px-3 py-1.5 text-start shadow-hard',
+            !inline && 'absolute start-3 top-40 z-40',
             !reducedMotion && 'animate-neo-pop',
           )}
         >
@@ -158,13 +170,15 @@ export function WordTowerSabotageBay({
         </div>
       )}
 
-      {/* EARN toast — a token just dropped in. Pops above the chip. */}
-      {earnedToast != null && (
+      {/* EARN toast — a token just dropped in. (Inline mode: shown in the play
+          screen's notice column instead.) */}
+      {earnedToast != null && !inline && (
         <div
           role="status"
           aria-live="polite"
           className={cn(
-            'pointer-events-none absolute start-3 top-40 z-40 rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-1.5 text-start shadow-hard',
+            'pointer-events-none rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-1.5 text-start shadow-hard',
+            !inline && 'absolute start-3 top-40 z-40',
             !reducedMotion && 'animate-neo-pop',
           )}
         >
@@ -181,7 +195,7 @@ export function WordTowerSabotageBay({
           user can clearly see who they're targeting in context). */}
       {pickerOpen && (
         <div
-          className="pointer-events-auto absolute inset-0 z-50 flex flex-col items-center justify-end bg-black/55 backdrop-blur-sm p-4"
+          className="pointer-events-auto fixed inset-0 z-50 flex flex-col items-center justify-end bg-black/55 backdrop-blur-sm p-4"
           role="dialog"
           aria-modal="true"
           aria-label={t('wordTower.sabotage.pickTarget')}
