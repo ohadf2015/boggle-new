@@ -86,4 +86,41 @@ describe('buildQuitDialogConfig', () => {
     expect(() => buildQuitDialogConfig(t)).not.toThrow();
     expect(buildQuitDialogConfig(t)).toEqual(GENERIC_QUIT_DIALOG);
   });
+
+  // --- key overrides (Word Wheel reuses this helper with a different message) ---
+
+  it('resolves overridden keys when provided (Word Wheel description)', () => {
+    const dict: Record<string, string> = {
+      'daily.quitConfirmTitle': 'לצאת באמצע המשחק?',
+      'wordHunt.quitConfirmMessage': 'ההתקדמות שלך תאבד!',
+      'daily.imSure': 'צא בכל זאת',
+      'common.cancel': 'ביטול',
+    };
+    const t = (key: string) => dict[key];
+
+    const config = buildQuitDialogConfig(t, { descriptionKey: 'wordHunt.quitConfirmMessage' });
+    expect(config.title).toBe('לצאת באמצע המשחק?');
+    // The overridden key is used — NOT the default daily.quitConfirm (which the
+    // dict above doesn't even define).
+    expect(config.description).toBe('ההתקדמות שלך תאבד!');
+    expect(config.confirmText).toBe('צא בכל זאת');
+  });
+
+  it('falls back to a per-field override fallback when the overridden key is missing', () => {
+    const t = (key: string) => key; // every key missing (echoes path)
+
+    const config = buildQuitDialogConfig(t, {
+      descriptionKey: 'wordHunt.quitConfirmMessage',
+      fallback: { description: "Your progress won't be saved." },
+    });
+    // Missing key → the supplied ad-free fallback, not the generic ad message.
+    expect(config.description).toBe("Your progress won't be saved.");
+    // Non-overridden fields still fall back to the generic floor.
+    expect(config.title).toBe(GENERIC_QUIT_DIALOG.title);
+  });
+
+  it('default call is unchanged (backward compatible)', () => {
+    const t = (key: string) => key;
+    expect(buildQuitDialogConfig(t)).toEqual(GENERIC_QUIT_DIALOG);
+  });
 });
