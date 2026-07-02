@@ -12,11 +12,11 @@ const FIELD_CLASS =
   'focus:border-neo-lime focus:shadow-hard focus:-translate-y-0.5';
 const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display';
 
-export function AccessRequestForm() {
+export function AccessRequestForm({ lockedEmail }: { lockedEmail?: string } = {}) {
   const { t, language } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(lockedEmail ?? '');
   const [school, setSchool] = useState('');
   const [country, setCountry] = useState('');
   const [role, setRole] = useState<TeacherAccessRole>('teacher');
@@ -131,7 +131,11 @@ export function AccessRequestForm() {
       <m.div variants={item}>
         <label htmlFor="tar-email" className={LABEL_CLASS}>{t('education.access.email')}</label>
         <input id="tar-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-          className={FIELD_CLASS} />
+          readOnly={!!lockedEmail} aria-readonly={lockedEmail ? true : undefined}
+          className={`${FIELD_CLASS}${lockedEmail ? ' opacity-70 cursor-not-allowed' : ''}`} />
+        {lockedEmail && (
+          <p className="mt-1 text-xs text-neo-white/60">{t('education.access.email_locked_hint')}</p>
+        )}
       </m.div>
       <m.div variants={item}>
         <label htmlFor="tar-role" className={LABEL_CLASS}>{t('education.access.role')}</label>

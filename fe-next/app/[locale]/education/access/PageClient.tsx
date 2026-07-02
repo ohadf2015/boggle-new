@@ -3,7 +3,7 @@ import { useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { gsap } from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { AccessRequestForm } from '@/components/education/AccessRequestForm';
+import { AccessRequestGate } from '@/components/education/AccessRequestGate';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useGsapReveal } from '@/lib/animation/useGsapReveal';
@@ -145,7 +145,7 @@ export function PageClient() {
             ref={statusRef}
             className="mt-6 rounded-neo border-neo-thick bg-neo-navy-light p-6 text-neo-white shadow-hard-lg"
           >
-            <AccessRequestForm />
+            <AccessRequestGate />
           </div>
         )}
 

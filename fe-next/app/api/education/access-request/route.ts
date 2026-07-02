@@ -17,9 +17,8 @@ export async function POST(req: Request) {
   let body: any;
   try { body = await req.json(); } catch { return bad('invalid json'); }
 
-  const { email, full_name, role, locale, use_case, school_or_org, country } = body || {};
+  const { full_name, role, locale, use_case, school_or_org, country } = body || {};
 
-  if (!email || typeof email !== 'string' || !EMAIL_RE.test(email)) return bad('invalid email');
   if (!full_name || typeof full_name !== 'string' || full_name.length < 2 || full_name.length > 120) return bad('invalid full_name');
   if (!ROLES.includes(role)) return bad('invalid role');
   if (!LOCALES.includes(locale)) return bad('invalid locale');
@@ -28,6 +27,16 @@ export async function POST(req: Request) {
   if (country && (typeof country !== 'string' || country.length > 80)) return bad('invalid country');
 
   const sb = await createClient();
+
+  // Teacher access requires a signed-up account with a verified email. The
+  // request is bound to that verified identity — the email is taken from the
+  // account (not the form body), so a request can never be filed for an
+  // address the requester hasn't proven they own.
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return bad('sign up and sign in to request teacher access', 401);
+  if (!user.email_confirmed_at) return bad('verify your email address first', 403);
+  if (!user.email || !EMAIL_RE.test(user.email)) return bad('account has no verified email', 403);
+  const email = user.email;
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const recent = await sb
@@ -38,7 +47,7 @@ export async function POST(req: Request) {
   if ((recent.count || 0) >= 3) return bad('too many requests in 24h, try again later', 429);
 
   const payload: TeacherAccessFormPayload = { email, full_name, role, locale, use_case, school_or_org, country };
-  const ins = await sb.from('teacher_access_requests').insert({ ...payload, user_id: null });
+  const ins = await sb.from('teacher_access_requests').insert({ ...payload, user_id: user.id });
   if (ins.error) return bad('insert failed: ' + ins.error.message, 500);
 
   const tpl = teacherAccessAdminNotify(payload);

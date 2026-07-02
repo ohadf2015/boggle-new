@@ -172,6 +172,24 @@ export async function verifyOtpCode(email: string, token: string) {
   });
 }
 
+/**
+ * Resend the signup confirmation email for an account that hasn't verified yet.
+ * Used by gated flows (e.g. teacher access) that require a verified email.
+ */
+export async function resendEmailVerification(email: string) {
+  if (!supabase) return { data: null, error: { message: 'Supabase not configured' } };
+
+  const currentLocale = getCurrentLocale();
+  const locale = currentLocale || 'en';
+  const redirectUrl = appendNextParam(new URL(`/${locale}/auth/callback`, window.location.origin));
+
+  return supabase.auth.resend({
+    type: 'signup',
+    email,
+    options: { emailRedirectTo: redirectUrl },
+  });
+}
+
 export async function signOut() {
   if (!supabase) return { error: { message: 'Supabase not configured' } };
 
