@@ -40,6 +40,9 @@ export interface WordTowerHudProps {
    *  truthy the BUILD CTA flips to a DROP CTA at the SAME screen position so
    *  the player's thumb never has to chase the crane. */
   pendingWord?: string | null;
+  /** Pre-formatted height reward ("+3m") for the current word — shown on the
+   *  wheel's BUILD hub so the payoff is visible before committing. */
+  gainPreview?: string;
   /** Triggered by the swapped-in DROP CTA — wires through to the crane's
    *  imperative `drop()`. */
   onCraneDrop?: () => void;
@@ -73,7 +76,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
     tray, selected, word, heightM, combo, scramblesLeft, scrambleCost = 0, coinBalance = 0,
     accentHex = '#7c8a99', reducedMotion = false,
     possibleWords, clueWord, onReroll, goldenLetter, lastError, errorKey, lastResult, resultKey,
-    pendingWord, onCraneDrop,
+    pendingWord, gainPreview, onCraneDrop,
     onSelectTile, onDeselectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, runPerks, t, dir,
   } = props;
   void onClear;
@@ -286,6 +289,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
               word={word}
               placing={isPlacing}
               canBuild={canSubmit}
+              gainPreview={gainPreview}
               intensity={intensity}
               accentHex={accentHex}
               goldenLetter={goldenLetter}

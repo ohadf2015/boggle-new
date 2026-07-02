@@ -28,3 +28,12 @@ export function letterPlacementFx(depth: number): PlacementFx {
     ringScale: clamp(1 + d * 0.1, 1, 1.7),
   };
 }
+
+/**
+ * Playback rate (pitch) for the per-letter spell tick — climbs with the
+ * 0-based index of the letter being added so a growing word audibly escalates,
+ * capped so a marathon word never chipmunks.
+ */
+export function letterTickRate(index: number): number {
+  return clamp(1 + Math.max(0, index) * 0.07, 1, 1.6);
+}

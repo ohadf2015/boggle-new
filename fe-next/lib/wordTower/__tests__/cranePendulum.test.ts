@@ -5,8 +5,34 @@ import {
   REST_PENDULUM,
   PENDULUM_MAX_DEG,
   cableRecoilPx,
+  loadOffsetNorm,
   type PendulumState,
 } from '../cranePendulum';
+
+describe('loadOffsetNorm — the swinging load IS the scored object', () => {
+  it('equals the trolley offset when the load hangs straight', () => {
+    expect(loadOffsetNorm(0.3, 0, 100, 110)).toBe(0.3);
+  });
+
+  it('a positive tilt displaces the load to the right of the trolley', () => {
+    expect(loadOffsetNorm(0, 10, 110, 110)).toBeCloseTo(Math.sin((10 * Math.PI) / 180), 6);
+    expect(loadOffsetNorm(0, -10, 110, 110)).toBeCloseTo(-Math.sin((10 * Math.PI) / 180), 6);
+  });
+
+  it('displacement scales with the arm length', () => {
+    const short = loadOffsetNorm(0, 8, 55, 110);
+    const long = loadOffsetNorm(0, 8, 110, 110);
+    expect(long).toBeCloseTo(short * 2, 6);
+  });
+
+  it('guards a degenerate range (returns the trolley offset)', () => {
+    expect(loadOffsetNorm(0.5, 10, 100, 0)).toBe(0.5);
+  });
+
+  it('normalises -0 to 0', () => {
+    expect(Object.is(loadOffsetNorm(0, 0, 100, 110), -0)).toBe(false);
+  });
+});
 
 describe('pendulumTargetDeg — the hanging load lags the trolley', () => {
   it('is zero when the trolley is still', () => {

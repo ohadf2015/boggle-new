@@ -1,20 +1,40 @@
 /**
- * Word Tower — carried-load pendulum (pure, COSMETIC ONLY).
+ * Word Tower — carried-load pendulum (pure, MECHANICAL).
  *
  * A real crane's hanging load lags the trolley: as the carriage slides, the load
  * swings back, overshoots, and settles — that lag is what sells "this block has
  * weight and gravity is acting on it". This module is a tiny spring-damper that
  * trails a target tilt derived from the trolley's velocity.
  *
- * HARD RULE — this NEVER feeds scoring. The drop verdict reads only the trolley
- * offset + the (separate) tower-sway offset via `effectiveDropError`; the
- * pendulum tilt is a render-time rotation of the cable + beam and must stay out
- * of the placement math, or a perfectly-aimed drop would *look* misaligned and
- * we'd reintroduce the WYSIWYG lie the colour/sway work is fixing.
+ * HARD RULE (2026-07-02 inversion) — the LOAD is the scored object. The player
+ * watches the hanging girder, not the invisible trolley, so the drop verdict
+ * reads {@link loadOffsetNorm} (trolley + the pendulum's horizontal
+ * displacement). WYSIWYG now holds BECAUSE the swing counts: the live band
+ * preview, landing shadow, and verdict must all derive from the same
+ * `loadOffsetNorm` — never mix trolley-only and load-based reads.
  */
 
-/** Max cosmetic tilt (deg) of the hanging load at full trolley speed. */
-export const PENDULUM_MAX_DEG = 8;
+/** Max tilt (deg) of the hanging load at full trolley speed. Timing the swing
+ *  is a real skill input now, so the arc is slightly bigger than the old
+ *  cosmetic 8° to stay legible. */
+export const PENDULUM_MAX_DEG = 10;
+
+/**
+ * Horizontal offset of the load's CENTRE in the crane's normalised [-1,1]
+ * space: the trolley offset plus the pendulum tilt swung over the arm
+ * (joint → girder centre). This is what the player actually aims with —
+ * verdict + preview + shadow all read it.
+ */
+export function loadOffsetNorm(
+  trolleyNorm: number,
+  angleDeg: number,
+  armPx: number,
+  rangePx: number,
+): number {
+  if (!(rangePx > 0)) return trolleyNorm;
+  const v = trolleyNorm + Math.sin((angleDeg * Math.PI) / 180) * (armPx / rangePx);
+  return v === 0 ? 0 : v; // normalise -0 → 0
+}
 
 /** Peak cable stretch (px) at full drop intensity. The cable visibly elongates
  *  as the freed load yanks it, then snaps back taut. */

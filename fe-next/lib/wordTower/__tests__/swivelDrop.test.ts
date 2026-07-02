@@ -100,6 +100,25 @@ describe('swivelStartDeg — clean drops tip gently, sloppy ones tip harder', ()
     const arc = 600 * Math.sin((tall * Math.PI) / 180);
     expect(arc).toBeLessThanOrEqual(SWIVEL_ARC_CAP_PX + 0.5);
   });
+
+  it('drop quality scales the wobble: perfect snaps in tighter than sloppy', () => {
+    // topDy 80 keeps the arc cap (asin(28/80) ≈ 20.5°) from muting the spread.
+    const perfect = Math.abs(swivelStartDeg(4, 80, 'perfect'));
+    const good = Math.abs(swivelStartDeg(4, 80, 'good'));
+    const legacy = Math.abs(swivelStartDeg(4, 80));
+    const sloppy = Math.abs(swivelStartDeg(4, 80, 'sloppy'));
+    const miss = Math.abs(swivelStartDeg(4, 80, 'miss'));
+    expect(perfect).toBeLessThan(good);
+    expect(good).toBeCloseTo(legacy, 5); // default keeps the legacy feel
+    expect(sloppy).toBeGreaterThan(good);
+    expect(miss).toBeCloseTo(sloppy, 5);
+  });
+
+  it('quality never lifts the tilt past the max or the arc cap', () => {
+    expect(Math.abs(swivelStartDeg(999, 120, 'miss'))).toBeLessThanOrEqual(SWIVEL_MAX_DEG + 1e-6);
+    const tall = Math.abs(swivelStartDeg(0, 600, 'miss'));
+    expect(600 * Math.sin((tall * Math.PI) / 180)).toBeLessThanOrEqual(SWIVEL_ARC_CAP_PX + 0.5);
+  });
 });
 
 describe('swivelBrickFrame — rigid rotation about the base pivot', () => {

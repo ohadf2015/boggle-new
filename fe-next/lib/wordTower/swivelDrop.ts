@@ -64,18 +64,33 @@ export function swivelDescent(k: number): number {
   return 1 - Math.pow(1 - t, 3);
 }
 
+/** How drop quality scales the settle wobble: a PERFECT drop snaps in tight
+ *  and confident, a sloppy/missed one visibly staggers in. `good` (and the
+ *  quality-less legacy call) keeps the tuned base feel. */
+const QUALITY_SWIVEL_MULT: Record<SwivelQuality, number> = {
+  perfect: 0.6,
+  good: 1,
+  sloppy: 1.5,
+  miss: 1.5,
+};
+
+export type SwivelQuality = 'perfect' | 'good' | 'sloppy' | 'miss';
+
 /**
  * Start tilt (deg, signed) for a placed run. A clean drop (|lean|≈0) tips the
  * gentle base amount in the default (+) direction; a sloppier drop (larger
- * |lean|) tips harder and FOLLOWS the lean so the correction is seen. Always
- * capped so the top brick's horizontal swing stays within {@link
+ * |lean|) tips harder and FOLLOWS the lean so the correction is seen. Drop
+ * `quality` scales the wobble (perfect = tight snap, sloppy/miss = stagger).
+ * Always capped so the top brick's horizontal swing stays within {@link
  * SWIVEL_ARC_CAP_PX} — tall words are forced to a gentler tip.
  *
- * @param lean   tower lean (deg, signed) at placement — sets direction + bias
- * @param topDy  vertical distance (px, >0) from the pivot to the run's TOP brick
+ * @param lean    tower lean (deg, signed) at placement — sets direction + bias
+ * @param topDy   vertical distance (px, >0) from the pivot to the run's TOP brick
+ * @param quality drop quality band (omit for the legacy `good` feel)
  */
-export function swivelStartDeg(lean: number, topDy: number): number {
-  const mag = clamp(SWIVEL_BASE_DEG + Math.abs(lean) * LEAN_TO_DEG, SWIVEL_BASE_DEG, SWIVEL_MAX_DEG);
+export function swivelStartDeg(lean: number, topDy: number, quality: SwivelQuality = 'good'): number {
+  const base = clamp(SWIVEL_BASE_DEG + Math.abs(lean) * LEAN_TO_DEG, SWIVEL_BASE_DEG, SWIVEL_MAX_DEG);
+  const mag = Math.min(base * QUALITY_SWIVEL_MULT[quality], SWIVEL_MAX_DEG);
   const sign = lean < 0 ? -1 : 1; // clean (lean 0) tips right by default
   const dy = Math.max(1, topDy);
   const capRad = Math.asin(clamp(SWIVEL_ARC_CAP_PX / dy, 0, 1));

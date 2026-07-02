@@ -16,6 +16,9 @@ export interface WordTowerWheelProps {
   placing: boolean;
   /** Word is long enough to build (≥ 3). */
   canBuild: boolean;
+  /** Pre-formatted height reward ("+3m") shown on the BUILD hub — the player
+   *  sees the payoff BEFORE committing the word to the crane. */
+  gainPreview?: string;
   /**
    * Climb intensity 0..1 (grows with altitude). Higher = brighter ring glow and
    * more orbiting sparks — the wheel itself gets more satisfying the higher you go.
@@ -60,7 +63,7 @@ function letterPos(i: number, n: number): { x: number; y: number } {
  * crane" transition the design asks for.
  */
 export function WordTowerWheel({
-  tray, selected, word, placing, canBuild, intensity, accentHex, goldenLetter,
+  tray, selected, word, placing, canBuild, gainPreview, intensity, accentHex, goldenLetter,
   reducedMotion = false, dir, t, onSelectTile, onDeselectTile, onSubmit, onDrop,
 }: WordTowerWheelProps) {
   const n = tray.length;
@@ -126,7 +129,11 @@ export function WordTowerWheel({
           aria-hidden
           className="pointer-events-none absolute -top-2 left-1/2 z-30 -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy px-3 py-0.5 font-neo-display text-lg font-black uppercase tracking-[0.2em] text-neo-white shadow-hard"
         >
-          {word}
+          {/* Inner span carries the per-letter re-pop (keyed by length) so the
+              keyframe's transform never fights the wrapper's centring translate. */}
+          <span key={word.length} className={cn('inline-block', !reducedMotion && 'wt-tile-pop')}>
+            {word}
+          </span>
         </div>
       )}
 
@@ -190,6 +197,8 @@ export function WordTowerWheel({
       {tray.map((letter, i) => {
         const pos = letterPos(i, n);
         const isSel = selected.includes(i);
+        // The just-added letter POPS — per-letter feedback so spelling escalates.
+        const isLast = isSel && selected[selected.length - 1] === i;
         const isGolden = !!goldenLetter && letter.toUpperCase() === goldenLetter.toUpperCase();
         return (
           <button
@@ -213,7 +222,12 @@ export function WordTowerWheel({
             style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: 'translate(-50%,-50%)' }}
           >
             {isGolden && !isSel && <span aria-hidden className="absolute -top-2 -right-1 text-[10px]">🌟</span>}
-            {letter}
+            <span
+              key={isLast ? selected.length : 0}
+              className={cn('inline-block', isLast && !reducedMotion && 'wt-tile-pop')}
+            >
+              {letter}
+            </span>
           </button>
         );
       })}
@@ -286,6 +300,9 @@ export function WordTowerWheel({
               <ArrowUp className="h-3 w-3" />
               {t('wordTower.hud.build')}
             </span>
+            {gainPreview && (
+              <span className="text-[10px] font-bold tabular-nums text-black/70">{gainPreview}</span>
+            )}
           </button>
         ) : (
           <div

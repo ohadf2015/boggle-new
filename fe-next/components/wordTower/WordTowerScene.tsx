@@ -358,7 +358,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       const pivotX = centerX;
       const pivotY = baseRestY + half; // the hinge: bottom edge of the run's base
       const topDy = pivotY - topRestY; // distance pivot → top brick (for arc cap)
-      const startDeg = swivelStartDeg(leanRef.current, topDy);
+      // Quality-linked wobble: a perfect drop snaps in tight, a sloppy one staggers.
+      const startDeg = swivelStartDeg(leanRef.current, topDy, impactQualityRef.current ?? 'good');
       const durMs = swivelDurationMs(committing.length);
       const baseColor = committing[0].color;
       // Drop-quality intensity drives the physical response: squash depth on the

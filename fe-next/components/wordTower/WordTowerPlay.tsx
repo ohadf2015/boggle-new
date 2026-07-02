@@ -13,9 +13,11 @@ import type { Language } from '@/shared/types/game';
 import { useWordTower } from '@/lib/wordTower/useWordTower';
 import {
   biomeForHeight,
+  floorMeters,
   serializeWordTowerState,
   type WordTowerPlayerState,
 } from '@/lib/wordTower/wordTowerManager';
+import { letterTickRate } from '@/lib/wordTower/placementFx';
 import { WORD_TOWER_MIN_WORD_LEN, WORD_TOWER_BIOMES, WORD_TOWER_SCRAMBLE_COIN_COST } from '@/shared/constants/wordTowerConstants';
 import { countBuildableWords, pickClueWord } from '@/lib/wordTower/wordHints';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
@@ -51,7 +53,7 @@ import { WordTowerSkinPicker } from './WordTowerSkinPicker';
 import { WordTowerFlowFrame } from './WordTowerFlowFrame';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
-import { buildDropVerdict, type DropVerdict } from '@/lib/wordTower/dropVerdict';
+import { buildDropVerdict, formatHeightGain, type DropVerdict } from '@/lib/wordTower/dropVerdict';
 import type { PlacementOutcome } from '@/lib/wordTower/cranePlacement';
 import { useWordTowerPerks } from './useWordTowerPerks';
 import { useRunStreakPerk } from '@/lib/wordTower/useRunStreakPerk';
@@ -201,6 +203,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     playPathConnectSound,
     playTileSelectSound,
     playTileAppearSound,
+    playSound,
   } = useSoundEffects();
   // A satisfying, slightly-random LANDING thock on every drop (founder ask). The
   // variant + dust scale by how cleanly it landed; seeded per drop so it's varied
@@ -803,7 +806,18 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     if (isNearMiss(crane.leanDeg)) setNearMissKey((k) => k + 1);
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const selectTileHaptic = useCallback((i: number) => { haptics.selection(); tower.selectTile(i); }, [haptics, tower]);
+  // Per-letter escalation: each added letter ticks at a rising pitch, so a
+  // growing word audibly climbs (rate is Howler playback speed = pitch).
+  const selectTileHaptic = useCallback((i: number) => {
+    haptics.selection();
+    playSound('tileSelect', { rate: letterTickRate(tower.state.selected.length) });
+    tower.selectTile(i);
+  }, [haptics, tower, playSound]);
+  // Unselecting rewinds the pitch ladder — a lower tick reads as "letter removed".
+  const deselectTileTick = useCallback((i: number) => {
+    playSound('tileSelect', { rate: 0.9 });
+    tower.deselectTile(i);
+  }, [tower, playSound]);
 
   // Scramble = a fresh wheel. Founder 2026-06-26: it's no longer free-on-tap —
   // spend a banked BONUS scramble first (earned from surprises / wreck-comp), and
@@ -1145,7 +1159,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           lastResult={tower.state.lastResult}
           resultKey={tower.state.resultKey}
           onSelectTile={selectTileHaptic}
-          onDeselectTile={tower.deselectTile}
+          onDeselectTile={deselectTileTick}
           onBackspace={tower.backspace}
           onClear={tower.clear}
           onSubmit={tower.hold}
@@ -1153,6 +1167,11 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           scrambleCost={WORD_TOWER_SCRAMBLE_COIN_COST}
           coinBalance={coinBalance}
           onDeckHeight={onDeckHeight}
+          gainPreview={
+            tower.word.length >= WORD_TOWER_MIN_WORD_LEN
+              ? formatHeightGain(floorMeters(tower.word.length, game.combo))
+              : undefined
+          }
           pendingWord={tower.state.pendingWord}
           onCraneDrop={triggerCraneDrop}
           accentHex={blockColorHex}
