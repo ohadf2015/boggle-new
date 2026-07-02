@@ -201,6 +201,15 @@ export function useBlastWordHandler({
     if (treasureTier === 'jackpot') {
       vibrateBlastPrism();
       effects.setComboParticle(c => c + 1);
+
+      // Jackpot celebration: full-screen tier 3 flash + mascot reaction.
+      // This makes the 5% moment unmistakably bigger than the 22% lucky tier.
+      effects.setComboFlash({ id: `jackpot-${flyIdRef.current}`, tier: 3 });
+      try {
+        emitMascotEvent({ kind: 'cascade-detected', chainDepth: 3 });
+      } catch {
+        /* mascot is decorative — swallow */
+      }
     }
 
     // 4. Combo flash effect

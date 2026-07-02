@@ -13,9 +13,39 @@ vi.mock('@/components/grid/hapticFeedback', () => ({
   vibrateBlastLightning: vi.fn(),
   vibrateBlastPrism: vi.fn(),
 }));
+vi.mock('@/lib/blast/mascotBus', () => ({
+  emitMascotEvent: vi.fn(),
+}));
 
 import { useBlastWordHandler } from '../useBlastWordHandler';
 import { detectSpecialCombos } from '../../utils/blastCombos';
+import { emitMascotEvent } from '@/lib/blast/mascotBus';
+import { rollTreasure } from '@/lib/blast/blastTreasureRoll';
+
+// ─── Test helpers ─────────────────────────────────────────────────────
+/**
+ * Finds a word that, combined with flyId 0, yields the target treasure tier.
+ * The hook constructs seed as `${word}:${flyIdRef.current}` BEFORE incrementing flyIdRef.
+ * flyIdRef starts at 0, so the seed for the first word is 'wordN:0'.
+ */
+function findWordForTier(targetTier: 'jackpot' | 'lucky'): string {
+  // We'll use word strings like 'jack0', 'jack1', etc.
+  // The treasure roll happens with flyIdRef.current = 0 (before the increment at line 168)
+  for (let i = 0; i <= 50; i++) {
+    const wordPrefix = `jack${i}`;
+    // Test with flyId 0 (flyIdRef starts at 0)
+    const roll = rollTreasure({
+      seed: `${wordPrefix}:0`,
+      base: 20,
+      comboLevel: 0,
+      hasSpecial: false,
+    });
+    if (roll.tier === targetTier) {
+      return wordPrefix;
+    }
+  }
+  throw new Error(`Could not find word yielding ${targetTier} tier`);
+}
 
 // ─── Test factories ─────────────────────────────────────────────────────
 function makeEngine() {
@@ -162,5 +192,74 @@ describe('useBlastWordHandler', () => {
       await result.current.handleWordAccepted({ word: 'cat', score: 5 });
     });
     expect(params.onWordWithComboTypeRef.current).toHaveBeenCalledWith('cat', 'tripleGem');
+  });
+
+  describe('treasure roll: jackpot celebration', () => {
+    it('fires full celebration on jackpot tier: comboFlash tier 3 + mascot event', async () => {
+      const jackpotWord = findWordForTier('jackpot');
+      const { params, effects } = setup({
+        enableTreasureRoll: true,
+      });
+      params.lastPathRef.current = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
+
+      const { result } = renderHook(() => useBlastWordHandler(params));
+      await act(async () => {
+        await result.current.handleWordAccepted({ word: jackpotWord, score: 20 });
+      });
+
+      // Verify jackpot celebration fired
+      expect(effects.setComboFlash).toHaveBeenCalledWith(
+        expect.objectContaining({ tier: 3 })
+      );
+      expect(emitMascotEvent).toHaveBeenCalledWith(
+        expect.objectContaining({ kind: 'cascade-detected', chainDepth: 3 })
+      );
+    });
+
+    it('does NOT fire jackpot celebration on lucky tier', async () => {
+      const luckyWord = findWordForTier('lucky');
+      const { params, effects } = setup({
+        enableTreasureRoll: true,
+      });
+      params.lastPathRef.current = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
+
+      const { result } = renderHook(() => useBlastWordHandler(params));
+      await act(async () => {
+        await result.current.handleWordAccepted({ word: luckyWord, score: 20 });
+      });
+
+      // Verify jackpot celebration did NOT fire for lucky
+      const comboFlashCalls = (effects.setComboFlash as ReturnType<typeof vi.fn>).mock.calls;
+      const jackpotFlashCalls = comboFlashCalls.filter(
+        ([call]) => (call as any)?.tier === 3 && (call as any)?.id?.includes('jackpot')
+      );
+      expect(jackpotFlashCalls.length).toBe(0);
+
+      // Verify no jackpot mascot event on lucky tier
+      const jackpotMascotCalls = (emitMascotEvent as ReturnType<typeof vi.fn>).mock.calls.filter(
+        ([event]) => (event as any)?.chainDepth === 3
+      );
+      expect(jackpotMascotCalls.length).toBe(0);
+    });
+
+    it('does NOT fire celebration when enableTreasureRoll is false', async () => {
+      const jackpotWord = findWordForTier('jackpot');
+      const { params, effects } = setup({
+        enableTreasureRoll: false,
+      });
+      params.lastPathRef.current = [{ row: 0, col: 0 }, { row: 0, col: 1 }, { row: 0, col: 2 }];
+
+      const { result } = renderHook(() => useBlastWordHandler(params));
+      await act(async () => {
+        await result.current.handleWordAccepted({ word: jackpotWord, score: 20 });
+      });
+
+      // Verify jackpot celebration did NOT fire when feature is disabled
+      const comboFlashCalls = (effects.setComboFlash as ReturnType<typeof vi.fn>).mock.calls;
+      const jackpotFlashCalls = comboFlashCalls.filter(
+        ([call]) => (call as any)?.tier === 3 && (call as any)?.id?.includes('jackpot')
+      );
+      expect(jackpotFlashCalls.length).toBe(0);
+    });
   });
 });
