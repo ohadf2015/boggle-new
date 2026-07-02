@@ -1,19 +1,19 @@
 {
   "summary": {
-    "totalKeysInCode": 5941,
+    "totalKeysInCode": 5945,
     "keyCountByLanguage": {
-      "en": 11396,
-      "he": 11524,
-      "sv": 11503,
-      "ja": 11504,
-      "es": 11532,
-      "ru": 11393
+      "en": 11420,
+      "he": 11529,
+      "sv": 11508,
+      "ja": 11509,
+      "es": 11537,
+      "ru": 11395
     },
-    "missingFromEnglish": 5,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 25,
-      "fallbackUsages": 0,
+      "fallbackUsages": 1,
       "variableKeys": 22
     }
   },
@@ -169,7 +169,7 @@
       {
         "pattern": "wordTower.reward.tier.${meta.key}",
         "file": "components/wordTower/WordTowerRewardReveal.tsx",
-        "line": 50,
+        "line": 55,
         "context": "{t(`wordTower.reward.tier.${meta.key}`)}",
         "type": "template_literal"
       },
@@ -195,7 +195,17 @@
         "type": "template_literal"
       }
     ],
-    "fallbackUsages": [],
+    "fallbackUsages": [
+      {
+        "pattern": "t('daily.quitConfirm') || '…'",
+        "key": "daily.quitConfirm",
+        "fallback": "…",
+        "file": "components/daily/survival/quitDialogConfig.ts",
+        "line": 7,
+        "context": "*   description={t('daily.quitConfirm') || '…'}   // dead `|| fallback`",
+        "type": "fallback_usage"
+      }
+    ],
     "variableKeys": [
       {
         "pattern": "t(currentTaunt)",
@@ -383,57 +393,30 @@
     "es": [],
     "ru": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "adventure.boss.combat.abilityBar",
-      "usages": [
-        {
-          "file": "components/adventure/boss/PlayerAbilityBar.tsx",
-          "line": 53
-        }
-      ]
-    },
-    {
-      "key": "adventure.boss.combat.charge",
-      "usages": [
-        {
-          "file": "components/adventure/boss/PlayerAbilityBar.tsx",
-          "line": 102
-        }
-      ]
-    },
-    {
-      "key": "adventure.boss.combat.parry.success",
-      "usages": [
-        {
-          "file": "components/adventure/boss/ParryPrompt.tsx",
-          "line": 45
-        }
-      ]
-    },
-    {
-      "key": "adventure.boss.combat.weakLabel",
-      "usages": [
-        {
-          "file": "components/adventure/boss/WeaknessBadge.tsx",
-          "line": 29
-        }
-      ]
-    },
-    {
-      "key": "adventure.boss.combat.weaknessHit",
-      "usages": [
-        {
-          "file": "components/adventure/boss/WeaknessBadge.tsx",
-          "line": 51
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "he": [
       "multiplayer.rankUp",
       "multiplayer.welcomeToTier",
+      "adventure.boss.combat.abilityBar",
+      "adventure.boss.combat.charge",
+      "adventure.boss.combat.weakLabel",
+      "adventure.boss.combat.weaknessHit",
+      "adventure.boss.combat.weakness.length",
+      "adventure.boss.combat.weakness.lengthLong",
+      "adventure.boss.combat.weakness.lengthEpic",
+      "adventure.boss.combat.weakness.doubleLetter",
+      "adventure.boss.combat.weakness.palindrome",
+      "adventure.boss.combat.weakness.rareLetter",
+      "adventure.boss.combat.weakness.vowelHeavy",
+      "adventure.boss.combat.parry.hint",
+      "adventure.boss.combat.parry.success",
+      "adventure.boss.combat.ability.smite.name",
+      "adventure.boss.combat.ability.smite.desc",
+      "adventure.boss.combat.ability.ward.name",
+      "adventure.boss.combat.ability.ward.desc",
+      "adventure.boss.combat.ability.focus.name",
+      "adventure.boss.combat.ability.focus.desc",
       "adventure.surprise.doubleGold.label",
       "adventure.surprise.doubleGold.desc",
       "adventure.surprise.bonusChest.label",
@@ -572,6 +555,25 @@
       "friends.backToFriends",
       "quickPlay.seekingMatch",
       "quickPlay.seekingMatchSub",
+      "adventure.boss.combat.abilityBar",
+      "adventure.boss.combat.charge",
+      "adventure.boss.combat.weakLabel",
+      "adventure.boss.combat.weaknessHit",
+      "adventure.boss.combat.weakness.length",
+      "adventure.boss.combat.weakness.lengthLong",
+      "adventure.boss.combat.weakness.lengthEpic",
+      "adventure.boss.combat.weakness.doubleLetter",
+      "adventure.boss.combat.weakness.palindrome",
+      "adventure.boss.combat.weakness.rareLetter",
+      "adventure.boss.combat.weakness.vowelHeavy",
+      "adventure.boss.combat.parry.hint",
+      "adventure.boss.combat.parry.success",
+      "adventure.boss.combat.ability.smite.name",
+      "adventure.boss.combat.ability.smite.desc",
+      "adventure.boss.combat.ability.ward.name",
+      "adventure.boss.combat.ability.ward.desc",
+      "adventure.boss.combat.ability.focus.name",
+      "adventure.boss.combat.ability.focus.desc",
       "adventure.surprise.doubleGold.label",
       "adventure.surprise.doubleGold.desc",
       "adventure.surprise.bonusChest.label",
@@ -791,6 +793,25 @@
       "multiplayer.welcomeToTier",
       "quickPlay.seekingMatch",
       "quickPlay.seekingMatchSub",
+      "adventure.boss.combat.abilityBar",
+      "adventure.boss.combat.charge",
+      "adventure.boss.combat.weakLabel",
+      "adventure.boss.combat.weaknessHit",
+      "adventure.boss.combat.weakness.length",
+      "adventure.boss.combat.weakness.lengthLong",
+      "adventure.boss.combat.weakness.lengthEpic",
+      "adventure.boss.combat.weakness.doubleLetter",
+      "adventure.boss.combat.weakness.palindrome",
+      "adventure.boss.combat.weakness.rareLetter",
+      "adventure.boss.combat.weakness.vowelHeavy",
+      "adventure.boss.combat.parry.hint",
+      "adventure.boss.combat.parry.success",
+      "adventure.boss.combat.ability.smite.name",
+      "adventure.boss.combat.ability.smite.desc",
+      "adventure.boss.combat.ability.ward.name",
+      "adventure.boss.combat.ability.ward.desc",
+      "adventure.boss.combat.ability.focus.name",
+      "adventure.boss.combat.ability.focus.desc",
       "adventure.surprise.doubleGold.label",
       "adventure.surprise.doubleGold.desc",
       "adventure.surprise.bonusChest.label",
@@ -1011,6 +1032,25 @@
       "wordHunt.results.wordsFound",
       "quickPlay.seekingMatch",
       "quickPlay.seekingMatchSub",
+      "adventure.boss.combat.abilityBar",
+      "adventure.boss.combat.charge",
+      "adventure.boss.combat.weakLabel",
+      "adventure.boss.combat.weaknessHit",
+      "adventure.boss.combat.weakness.length",
+      "adventure.boss.combat.weakness.lengthLong",
+      "adventure.boss.combat.weakness.lengthEpic",
+      "adventure.boss.combat.weakness.doubleLetter",
+      "adventure.boss.combat.weakness.palindrome",
+      "adventure.boss.combat.weakness.rareLetter",
+      "adventure.boss.combat.weakness.vowelHeavy",
+      "adventure.boss.combat.parry.hint",
+      "adventure.boss.combat.parry.success",
+      "adventure.boss.combat.ability.smite.name",
+      "adventure.boss.combat.ability.smite.desc",
+      "adventure.boss.combat.ability.ward.name",
+      "adventure.boss.combat.ability.ward.desc",
+      "adventure.boss.combat.ability.focus.name",
+      "adventure.boss.combat.ability.focus.desc",
       "adventure.surprise.doubleGold.label",
       "adventure.surprise.doubleGold.desc",
       "adventure.surprise.bonusChest.label",
@@ -1208,7 +1248,29 @@
     "ru": [
       "daily.catchUp.appTitle",
       "daily.catchUp.appSubtitle",
-      "daily.catchUp.appCta"
+      "daily.catchUp.appCta",
+      "adventure.boss.combat.abilityBar",
+      "adventure.boss.combat.charge",
+      "adventure.boss.combat.weakLabel",
+      "adventure.boss.combat.weaknessHit",
+      "adventure.boss.combat.weakness.length",
+      "adventure.boss.combat.weakness.lengthLong",
+      "adventure.boss.combat.weakness.lengthEpic",
+      "adventure.boss.combat.weakness.doubleLetter",
+      "adventure.boss.combat.weakness.palindrome",
+      "adventure.boss.combat.weakness.rareLetter",
+      "adventure.boss.combat.weakness.vowelHeavy",
+      "adventure.boss.combat.parry.hint",
+      "adventure.boss.combat.parry.success",
+      "adventure.boss.combat.ability.smite.name",
+      "adventure.boss.combat.ability.smite.desc",
+      "adventure.boss.combat.ability.ward.name",
+      "adventure.boss.combat.ability.ward.desc",
+      "adventure.boss.combat.ability.focus.name",
+      "adventure.boss.combat.ability.focus.desc",
+      "wordForge.scoreTier.good",
+      "wordForge.scoreTier.great",
+      "wordForge.scoreTier.blazing"
     ]
   },
   "keysNotInEnglish": {

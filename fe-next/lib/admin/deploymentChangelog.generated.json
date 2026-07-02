@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-06-30T20:28:42.125Z",
+  "generatedAt": "2026-07-02T07:38:27.429Z",
   "commits": [
     {
-      "sha": "747c8d39e0e3f94e26bce3af44a445a8db7d0a10",
-      "shortSha": "747c8d3",
-      "subject": "feat(daily): native Hebrew word meanings from Wiktionary + dict-first enrichment",
+      "sha": "78cbd1c9e81dcb03a76fab5333c73ea766d6be5c",
+      "shortSha": "78cbd1c",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-02",
       "author": "Ohad Fisher",
-      "date": "2026-06-30T23:23:52+03:00"
+      "date": "2026-07-02T07:56:22+03:00"
     },
     {
-      "sha": "9a75cfe26f1482ca3139f67b6dcf9b6f2b606639",
-      "shortSha": "9a75cfe",
-      "subject": "feat(connections): UI polish — i18n difficulty, wrong-guess flash, why-it-works box, neo CTAs",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T23:18:37+03:00"
-    },
-    {
-      "sha": "2786c7328a3c2050a0d0b595f39718ae6c05f2c4",
-      "shortSha": "2786c73",
-      "subject": "fix(connections): admin can mark bad riddles (Express body-drain + all-locale review)",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T23:17:53+03:00"
-    },
-    {
-      "sha": "156e275ebe7ca8f779236d4a2e7a2b0ada9e5cba",
-      "shortSha": "156e275",
-      "subject": "feat(menu): rank badge image + cleaner profile hero & notifications in side drawer",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T23:16:54+03:00"
-    },
-    {
-      "sha": "28ea6e811bbf8ec300c5c74c15f2900b92203053",
-      "shortSha": "28ea6e8",
-      "subject": "feat(mp): expand curated ja word list after full ja sweep",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T23:06:42+03:00"
-    },
-    {
-      "sha": "01f27497a9eea9457f15a4e9480410c498d08187",
-      "shortSha": "01f2749",
-      "subject": "fix(daily): suppress Hebrew daily-word meanings in validator",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T22:51:47+03:00"
-    },
-    {
-      "sha": "83ed5203b8438e8aa6287c82cc1df83dd76d5674",
-      "shortSha": "83ed520",
-      "subject": "feat(mp): curate Japanese Word Hunt word list from sweep verdicts",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T22:32:03+03:00"
-    },
-    {
-      "sha": "617dfcd28dfc961bd20343af0735b1ea3caccfbf",
-      "shortSha": "617dfcd",
-      "subject": "fix(daily): dict-recheck approved corpus + year-ahead fills gaps from today",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T22:11:46+03:00"
-    },
-    {
-      "sha": "3e3aa842f84e6c17a8bada9c27d2ced2f485ff3f",
-      "shortSha": "3e3aa84",
-      "subject": "feat(daily): dictionary backstop in word sweep + curate MP word lists",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T21:54:39+03:00"
-    },
-    {
-      "sha": "49ab1d391105f8cf89476994115919e51794a29a",
-      "shortSha": "49ab1d3",
-      "subject": "feat(daily,mp): bulletproof word quality across both modes + all languages",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T21:41:46+03:00"
-    },
-    {
-      "sha": "ac27c4100ce1d531386fd9e22c8cb4f9c153a624",
-      "shortSha": "ac27c41",
-      "subject": "fix(quests): make all skill quests achievable + toast on in-session completion",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T21:13:16+03:00"
-    },
-    {
-      "sha": "4707ca9be312015da6ef2affbf508faa178ed615",
-      "shortSha": "4707ca9",
-      "subject": "Merge pull request #669 from ohadf2015/claude/fix-shard6-worker-crash-gate",
+      "sha": "930ff439df5e7e9845441529b2d9c109e6c507ef",
+      "shortSha": "930ff43",
+      "subject": "Merge pull request #680 from ohadf2015/claude/daily-challenge-hebrew-exit-kecb2b",
       "author": "Eden Ekdahl",
-      "date": "2026-06-30T12:19:13+02:00"
+      "date": "2026-07-01T23:03:17+02:00"
     },
     {
-      "sha": "09297f19aa54b589ad20ca959920027135774777",
-      "shortSha": "09297f1",
-      "subject": "fix(ru): use Cyrillic tiles on Russian boards instead of Hebrew (#676)",
-      "author": "ohadf2015",
-      "date": "2026-06-30T11:25:04+03:00"
-    },
-    {
-      "sha": "6abbe7cf8efa93cb3abd208fc4b8815e7180b165",
-      "shortSha": "6abbe7c",
-      "subject": "feat(daily): quality-gate daily words + word meaning + player suggestions",
+      "sha": "c826e1924ee89acf5e9cf1f30c9bbe6dcb469a1b",
+      "shortSha": "c826e19",
+      "subject": "fix(nightly): skip next-build TS phase in ALL gate tiers (kills the wedge)",
       "author": "Ohad Fisher",
-      "date": "2026-06-30T11:03:20+03:00"
+      "date": "2026-07-01T14:39:36+03:00"
     },
     {
-      "sha": "59e743ecb0671cde220064617738fe4b1c85abd7",
-      "shortSha": "59e743e",
-      "subject": "feat(i18n): show Russian in the in-game language selectors (#674)",
-      "author": "ohadf2015",
-      "date": "2026-06-30T10:32:33+03:00"
+      "sha": "aa769237631df4fb925009fc2a78b4bffe6a57dd",
+      "shortSha": "aa76923",
+      "subject": "test: complete wordHuntManager mock for gameStartHandler word-hunt path",
+      "author": "Claude",
+      "date": "2026-07-01T10:52:51Z"
     },
     {
-      "sha": "0477568fc4e64b71e930a358030312b113ed0f61",
-      "shortSha": "0477568",
-      "subject": "fix(nightly): ship reliably under concurrent branch-switch + never drop build-clean code (#673)",
-      "author": "ohadf2015",
-      "date": "2026-06-30T10:07:18+03:00"
+      "sha": "92a0289822da3d6251b5205c18eeb56607e20f22",
+      "shortSha": "92a0289",
+      "subject": "test: fix pre-existing CI failures from the 6th-locale (ru) rollout",
+      "author": "Claude",
+      "date": "2026-07-01T10:46:39Z"
     },
     {
-      "sha": "fcf24b08484989d597c13a6a888c3e38169be69a",
-      "shortSha": "fcf24b0",
-      "subject": "Merge pull request #672 from ohadf2015/feature/russian-locale",
-      "author": "ohadf2015",
-      "date": "2026-06-30T09:53:09+03:00"
-    },
-    {
-      "sha": "5f207ddf4c2589fcbf4cf7456dca480899359be9",
-      "shortSha": "5f207dd",
-      "subject": "fix(i18n): correct ru dict/validation across game modes",
+      "sha": "f71be592d25f3a64feffc1113ab89d7cb1f8ac1b",
+      "shortSha": "f71be59",
+      "subject": "fix(i18n): resolve adventure.boss key collision (label vs combat object)",
       "author": "Ohad Fisher",
-      "date": "2026-06-30T09:47:53+03:00"
+      "date": "2026-07-01T13:35:26+03:00"
     },
     {
-      "sha": "704d39a01bdce891f27a9e338f140a407c93d500",
-      "shortSha": "704d39a",
-      "subject": "feat(i18n): ru SEO for faq/tools/contact/wotd/anagram + landing cross-links",
-      "author": "Ohad Fisher",
-      "date": "2026-06-30T09:18:23+03:00"
+      "sha": "06b0bea2fc4fee8652e14fb7f8b5105662aad50b",
+      "shortSha": "06b0bea",
+      "subject": "fix(daily): prevent black-screen freeze on Hebrew Daily Challenge exit",
+      "author": "Claude",
+      "date": "2026-07-01T10:21:33Z"
     },
     {
-      "sha": "0660c9584f6615838d671432c0def72b35d4af93",
-      "shortSha": "0660c95",
-      "subject": "fix(i18n): ru OG image falls back to en (not es); drop build-noise changelog",
+      "sha": "eb7ea74326f36864582724b730cd850755fad4aa",
+      "shortSha": "eb7ea74",
+      "subject": "Merge remote-tracking branch 'origin/master'",
       "author": "Ohad Fisher",
-      "date": "2026-06-30T09:04:36+03:00"
+      "date": "2026-07-01T13:19:04+03:00"
+    },
+    {
+      "sha": "89b2cd8562014a79b907ca047d974998e6c1c04a",
+      "shortSha": "89b2cd8",
+      "subject": "chore: ship nightly-authored improvements + in-flight WIP",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T13:18:30+03:00"
+    },
+    {
+      "sha": "e11788f6b9719f358d9b36b9e8e14cc979736c1d",
+      "shortSha": "e11788f",
+      "subject": "Merge remote-tracking branch 'origin/master' into HEAD",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T10:24:41+03:00"
+    },
+    {
+      "sha": "4f22b6c20dbb95f9d48ea70d007fbb56c7146444",
+      "shortSha": "4f22b6c",
+      "subject": "feat(game): confirm before quitting an active Blast run or Connections puzzle",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T10:05:12+03:00"
+    },
+    {
+      "sha": "d46f79a1a67312b2b626d652982e115241426cd9",
+      "shortSha": "d46f79a",
+      "subject": "fix(nav): make back navigation locale-safe and cross-platform consistent",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T10:05:02+03:00"
+    },
+    {
+      "sha": "aa4158c8761ec9a4b205ed099d085fa38564f4ef",
+      "shortSha": "aa4158c",
+      "subject": "perf: local JWT verify on adventure/attempt GET",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T09:38:57+03:00"
+    },
+    {
+      "sha": "dbe4c635a460eb3fdb2f6d256717312e01b533f7",
+      "shortSha": "dbe4c63",
+      "subject": "perf: local JWT verify on email/preferences GET",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T09:36:07+03:00"
+    },
+    {
+      "sha": "0bf1278d48f58582fbc1c8bf796918d7d6f0ea60",
+      "shortSha": "0bf1278",
+      "subject": "perf: local JWT verify on 8 more read-only GET routes",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T09:26:50+03:00"
+    },
+    {
+      "sha": "5041084f4be099c17d583f33cfb73954d3349c57",
+      "shortSha": "5041084",
+      "subject": "feat(multiplayer): remove lobby auto-start; guard waiting-room back-gesture",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T09:23:08+03:00"
+    },
+    {
+      "sha": "583c5034b90f74ee42c302b1ba1e5e765c2d74b6",
+      "shortSha": "583c503",
+      "subject": "perf: defer eager client chunks + local JWT verify on hot read routes",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T09:13:14+03:00"
+    },
+    {
+      "sha": "815b92d51fee368feb66ff1f94b7c59a90dc67d8",
+      "shortSha": "815b92d",
+      "subject": "Merge remote-tracking branch 'origin/master' into fix/he-daily-word-meaning",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T01:17:52+03:00"
+    },
+    {
+      "sha": "6eb4448f85aefbe50c177ce69b77de798b78ad7c",
+      "shortSha": "6eb4448",
+      "subject": "chore(crossword): pretty-print bank output, ignore cache, regen he puzzles",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T01:00:45+03:00"
+    },
+    {
+      "sha": "951179ce55fe5bd51cc0567ae06fbb0227a225e1",
+      "shortSha": "951179c",
+      "subject": "feat(crossword): grow es/sv/he clue banks from Wiktionary (+988 native clues)",
+      "author": "Ohad Fisher",
+      "date": "2026-07-01T00:59:23+03:00"
     }
   ]
 }
