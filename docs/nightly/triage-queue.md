@@ -9,6 +9,35 @@ Items deferred from automated nightly triage. Human review required.
 - Variants: control (sheet+toast) vs toast-disabled (sheet only). 54-day window with no winner surfaced.
 - Recommended owner: human — check PostHog experiment results; if no winner at n≥1000/arm retire and keep `toast-disabled` (simpler UX).
 
+## 2026-07-02
+
+- [Sentry] JAVASCRIPT-NEXTJS-1KQ — Error: churn-signals report failed with status 502
+  - first/last seen: 2026-06-03 / 2026-06-05, 278 occurrences, 3 users
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1KQ
+  - status: deferred
+  - why: 502 is infrastructure-level (Vercel edge/proxy); route code is clean, all error paths handled. No code fix possible.
+  - recommended owner: self — resolve in Sentry if no recurrence
+
+- [Sentry] JAVASCRIPT-NEXTJS-1CW — TypeError: Cannot read properties of null (reading 'clear')
+  - first/last seen: 2026-05-15 / 2026-06-09, 13 occurrences, 4 users, culprit: /daily/word-wheel
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1CW
+  - status: shipped — already fixed in fe-next/components/daily/WordWheelPixiRing.tsx:86,180 (guard + ticker.stop() before destroy; comment references this Sentry ID)
+  - why: fix deployed after last occurrence; safe to resolve in Sentry
+  - recommended owner: review-by-eod — close issue in Sentry
+
+- [Supabase] SECURITY DEFINER upsert_push_token callable by authenticated role
+  - status: deferred — false positive; anon has no EXECUTE grant; authenticated is intentional (push token reg requires login); function body scoped to auth.uid() — no cross-user access possible; SET search_path='' already hardened
+  - recommended owner: self — no action
+
+- [Supabase] RLS always-true INSERT on teacher_access_requests (tar_insert_any)
+  - status: deferred — intentional; teacher sign-up form allows any visitor to submit a request; SELECT restricted to admin OR own row; UPDATE restricted to admin
+  - recommended owner: self — no action
+
+- [Feedback] Music not starting automatically (Hebrew, /he/daily/word-hunt, 2026-07-01)
+  - status: deferred — browser autoplay policy blocks unmuted audio without user gesture; needs investigation of music trigger site in daily word-hunt flow
+  - why: no callsite found in daily components; music lives in lib/audio + hooks, needs deeper trace
+  - recommended owner: review-by-eod — find trigger site, add user-gesture guard or prompt
+
 ### [Flag Ghost] exp-blast-wave-banner-v1 — in PostHog but NOT in experiments.ts
 - Created 2026-06-29, active, rollout 100%. No call site in fe-next (not wired).
 - Recommended owner: human — either wire it to a component or delete from PostHog.
@@ -1164,3 +1193,16 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - reach: 5, last seen: 2026-06-07 (per prior triage entry in queue)
 - Already documented as PixiJS internal, stale — no code action
 - status: deferred — verify still stale once Sentry MCP available
+
+### [Engagement] exp-blast-wave-banner-v1 UNWIRED — PostHog flag live, 0 code call sites
+- PostHog flag created 2026-06-29, rollout 100%, active=true
+- grep: `rg -l "exp-blast-wave-banner-v1" fe-next -g "*.ts" -g "*.tsx" | grep -v experiments.ts` → 0 results
+- An unwired flag serves a variant that changes nothing — fake running test
+- status: deferred — wire variant-B in code OR delete the flag
+- recommended owner: lane-03 next run
+
+### [Engagement] exp-settings-lang-feedback-v1 UNWIRED — defined in experiments.ts, needs PageClient.tsx wiring
+- Experiment added to lib/experiments.ts on 2026-07-02 but variant-B not wired yet
+- PostHog flag intentionally NOT created until call site exists
+- status: deferred — wire in settings/PageClient.tsx then run posthog-experiment.sh ensure
+- recommended owner: lane-03 next run

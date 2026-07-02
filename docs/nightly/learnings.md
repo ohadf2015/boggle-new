@@ -2,81 +2,80 @@
 
 Rewritten by **lane 7** each night from prior 7 reports. **≤200 lines.** All lane prompts inject this file as preamble.
 
-> **Window: 2026-06-23..06-29 (7 report nights).** **0 code reverts of pushed work all window.** Lane ship rate 6–7/7 each lane (degrades = MCP-absent advisor deferrals or 2 docs-salvaged gate-fails, never a code fault that reached master). Gate outcomes: **4/7 nights TESTS-INCONCLUSIVE** (Vitest idle-wedge → build-only re-gate passed every time = test-infra, not code), 2 gate-fails salvaged docs-only (06-23, 06-28). **Window wins:** (1) **word-tower readiness 0%→67%** (lane 11, daily-challenge fully audited, 4+ crash-guards); (2) **MP brag card → named-rival fight poster** (`628b295f7`); (3) **condition-based daily quests + social feed** (`f98847780`+`c938b3e50`); (4) **Play-Games made live** (`8eb74f2e6`, was inert); (5) **results black-overlay framer-pin fixed** (`699344710`); (6) **asset re-encode sweep ~37MB** (celebration mp4 43→11M, mascot webp 8.7→6.8M, word-vault sprites 3→1M, blog/og 17→2M); (7) **friend-threads N+1 → one RPC** (`b2143a599`). **Autonomy rising:** 10+ nightly fixes reached master via auto-PR this window (settings scroll, daily-challenge language scope, cosmetics dedup, friends responsive). **#1 infra friction: Supabase MCP token staleness — absent 06-27/28/29, DB advisor work (FK index, RLS initplan, auth pool) deferred 3 nights running.**
+> **Window: 2026-06-27..07-02 (6 report nights).** Gate outcomes DEGRADED vs prior window: **3 CONSECUTIVE docs-only gate-salvages (06-28/29/30)** + a **07-01 01:00 preflight ABORT** (tree not on master / dirty — shared tree on `fix/he-daily-word-meaning`) + 5 lanes failed exit-75/1 on 07-01. Root of the 3 salvages = the gate Vitest/next-build TS-phase wedge; **fix landed 07-02 `c826e1924`** ("skip next-build TS phase in ALL gate tiers"). 07-02 ran clean. **0 pushed-code reverts** (salvage drops lane code pre-push, never a master regression). **Most reliable lanes: 02-perf 7/7 (avg 9.2m), 11-mode-qa 7/7 (avg 15.3m).** **Window wins:** (1) **word-tower readiness 58%→79%** (lane 11, 6 nights: crash guards, daily-challenge audit, dict-retry UI, a11y/i18n); (2) **4 mode-polish ships** — Hot Streak Perks (WT), Shiritori Category Chain Bonus, Word Forge Tier Labels, Sealed Bid decaying-multiplier (partial); (3) **3 autonomy Supabase RPC hardenings** (search_path + REVOKE, `upsert_push_token`/`get_friend_threads`); (4) **posthog-coverage.sh extractor fix** recovered 7 live events (mp_results_viewed 264/7d); (5) **Wiktionary clue-bank + Russian locale** push (07-01). **#1 infra: Supabase MCP token staleness — absent 6/6 nights, 3 migrations (20260628/29/30) still unapplied.**
 
 ## FOUNDER DIRECTIVE — highest priority
-- **2026-06-27 (blog cadence):** ship a NEW blog every 2 days — unique generated hero image (match existing blog style), interesting words/word-game topic w/ SEO keywords, lean education + newest angles ("use AI to learn a language"), link a game MODE sophisticatedly, witty + sourced. **Lane 08 owns; 04/06 feed topics.** Status: blocked on repeatable Higgsfield hero-image recipe (CLI sudo-install pending 7 nights).
-- **2026-06-26 (word-tower physics, shipped `f35bcf57f`+):** lean/sway/notification-clear/HUD-overlap/crane-raise/dup-drop-block ✅. Open: **green-part drops + celebrate**; **more upgrades** (10 wired); **DAILY-over-MP refocus** (06-24/25). Lane 05/11.
+- **2026-06-30 (Word Vault):** "Word vault isn't actually fun — rework the puzzles + UI, should feel like a real escape room, fun to explore." Captured in lane-04 ideas (escape-room redesign, mastery hook, M effort). Lane 05/09 to pick up.
+- **2026-06-27 (blog cadence):** ship a NEW blog every 2 days — unique generated hero image, word-game/word topic w/ SEO keywords, education + newest angles ("use AI to learn a language"), link a game MODE, witty + sourced. **Lane 08 owns; 04/06 feed topics.** Status: blocked on repeatable Higgsfield hero-image recipe (CLI sudo-install pending).
+- **2026-06-26 (word-tower physics, shipped `f35bcf57f`+):** lean/sway/notification-clear/HUD/crane/dup-block ✅. Open: green-part drops + celebrate; more upgrades; **DAILY-over-MP refocus** + daily-leaderboard backend (the ONE blocker to 90% readiness — needs founder design call: 1-attempt/day vs unlimited). Lane 05/11.
 - **2026-06-24/25:** Education "free forever"→trial+price ✅. **STOP deferring to human — ship reversible work** (autonomy). Sealed-bid Showdown shipped.
 - **2026-06-23 (standing):** (1) SPEED without bugs, (2) MODE READINESS to release quality, (3) EDUCATION growth into real `/[locale]/education` pages, (4) AUTONOMY (ship reversible, defer only irreversible).
 - **Improve admin-beta modes nightly — NO new modes** (2026-06-16). Lane 05 STEP 0 improves ONE existing admin-gated mode/night, EXISTING files only, keeps admin gate.
 - **No hard file-count cap.** `LEXI_LANE_FILE_CAP=999`; per-lane working-set ~8. Write all 5 locale translations FIRST.
 
 ## Telegram-button feedback (last 7d)
-- **idea:build ×3 vs idea:pass ×1 = 75% build-rate (n=4)** — appetite for concrete BUILDABLE ideas holds; first `idea:pass` of the window appeared (some discernment). **Lane 04 must surface 1-3 buildable ideas/night w/ named target mode + file.**
-- **polish:try ×10 vs polish:pass ×1 = 91% try-rate** — broad mode appetite: brain-drill ×3, word-forge ×2, word-vault, word-tower, word-alchemy, shiritori, sealed-bid, crane. Top lane-05 targets. (crane got the lone `polish:pass`.)
-- **modeqa:ontrack:word-tower ×6** — lane 11 readiness cards trusted 6 nights running. Keep shipping them.
-- **Zero night:good/meh this 7d** (silence = no dissatisfaction). **Zero reddit:* (40+ d)** — accept silence.
+- **polish:try ×13 vs polish:pass ×1 = 93% try-rate** — broad mode appetite holds: brain-drill ×3, word-tower ×2, word-vault ×2, crane, sealed-bid, word-forge, crossword. Top lane-05 targets. (word-vault got the lone pass, then a fresh escape-room directive.)
+- **idea:build ×6 vs idea:pass ×1 = 86% build-rate (n=7)** — appetite for concrete BUILDABLE ideas w/ named mode+file. Lane 04 must keep surfacing 1-3/night.
+- **modeqa:ontrack:word-tower ×5-6** — lane 11 readiness cards trusted 6 nights running. Keep shipping them.
+- **Zero night:good/meh + zero structured reddit:* callbacks this 7d.** One TEXT reddit directive: "start light promo comments to lexiclash.live." Silence = no dissatisfaction; accept it.
 
 ## What works (validated this week)
-- **0 code reverts of pushed work across the window.** Baseline-red gate poison FIXED → no gate-drop of clean code; the 2 gate-fails were docs-salvaged, never a master regression. (strongest)
-- **Low-MCP / prompt-only lanes never time out** — 04/07/12 ship every night; #1 reliability lever = no MCP round-trips + no full-test self-check. (30+ nights)
-- **Autonomy fast-path is paying off** — reversible fixes auto-PR'd and merged same/next day (settings scroll, daily-challenge language scope, friends responsive, cosmetics dedup). Defer only the irreversible. (validated, founder-aligned)
-- **Lane 05 mode-polish via TDD on pure modules + page-wire in one budget** — sealed-bid, word-tower physics, shiritori category-bonus, word-tower hot-streak perks all TDD-green, 0 reverts, prefers-reduced-motion gated. (validated)
-- **Define→wire→emit FLAG in ONE lane** (lane 03) — flag-wiring sweep 7/7, 0 rollback, when render-path exists FIRST. Dot-keys break PostHog (`blast.v2`→`blast-v2`). (validated)
-- **Founder-directive fast path** — free-text directives = top of queue, same-run ship (tower physics, sealed-bid, education pricing, blog cadence). (strongest)
-- **Salvage-on-gate-failure floor** — every degraded night (06-23, 06-28) preserved code + shipped docs + flagged. Gate failure never zeroed a night. (validated)
+- **0 pushed-code reverts across the window** — salvage drops lane code BEFORE push; a gate-fail never regresses master. (strongest, holding across every degraded night)
+- **02-perf + 11-mode-qa are the reliability backbone** — both 7/7, no timeout, no salvage-drop. Asset/SSR perf wins + systematic mode-QA are the highest-yield lanes. (validated)
+- **Lane 05 mode-polish via TDD on pure module + page-wire in one budget** — Hot Streak Perks, Shiritori bonus, Word Forge tiers all TDD-green, prefers-reduced-motion gated, all 5 locales. (validated)
+- **Autonomy fast-path** — 3 reversible Supabase RPC hardenings shipped + marked 9am-skim, none needed a human. Founder-aligned; keep shipping reversible, defer only irreversible. (validated)
+- **Salvage-on-gate-failure floor** — 06-28/29/30 all preserved lane code to `~/logs/lexi-nightly/salvaged-code-<tag>/` + shipped docs. Gate failure never zeroed a night. (validated — but 3-in-a-row is a cost, not a win; see "avoid")
+- **Founder-directive fast path** — free-text directives = top of queue (Word Vault escape-room captured same night). (strongest)
 - **eslint-changed-files-only self-check + single end-of-run commit** — lanes skipping full tsc/build finish inside budget; one rollback target. (30+ nights)
-- **Mandatory-Minimum-Artifact floor** — every salvage/timeout night still shipped its `docs/nightly/artifacts/lane-NN-*.md` (docs/ outside fe-next/, gate-clean). Floor never zero. (validated)
-- **Asset re-encode = free perf, 0 risk** — ~37MB window savings, all in-browser verified, asset-only. (lane 02 doctrine)
-- **`revalidate=N` over `force-dynamic`** + **`serverExternalPackages` for fs-read server dicts** — cumulative AdSense/LCP wins, dict client-leak fixed. (doctrine)
-- **Multi-night refactor → big structural flip** — webpack switch (`dcdda2375`) landed only after route non-page exports moved to `_handlers`. Big wins ship when blocker cleared a PRIOR night. (validated)
+- **Mandatory-Minimum-Artifact floor** — every degraded/failed lane still shipped its `docs/nightly/artifacts/lane-NN-*.md` (docs/ gate-clean). Floor never zero. (validated)
+- **`revalidate=N` over `force-dynamic`** + **`serverExternalPackages` for fs-read server dicts** (06-27, ~6MB client-leak fixed) — cumulative AdSense/LCP wins. (doctrine)
+- **Helper-script-the-repeatable** — `posthog-coverage.sh` extractor bug fix (06-30) recovered 7 live events; scripts pay off. (validated)
 
 ## What to avoid (failed this week)
-- **Supabase MCP token staleness silent-degrades perf/triage** — absent 06-27/28/29 → FK-index/RLS-initplan/auth-pool work DEFERRED 3 nights. Root: missing never-expire `SUPABASE_ACCESS_TOKEN` in nightly env + no preflight refresh. **#1 infra.** (open, worsening)
-- **Gate-runner full Vitest wedges 4/7 nights** (TESTS-INCONCLUSIVE, ~5400s idle backstop) — build-only re-gate passed all 4 = structural test-infra wedge, not code. FIX: scope gate tests to changed files OR hard per-suite timeout+kill, never a 5400s idle. **#1 test-infra.** (open, frequency rising)
-- **Authored code interacts with broken test files at gate** — both gate-fails (06-23, 06-28) salvaged docs-only; baseline wedge-check ruled out pre-existing red, so a new test + a wedge-prone suite compound. Scope-to-changed mitigates both this AND the wedge. (carry)
-- **Reddit OAuth/JSON blocked → search source stale all window** (lane 04). OAuth un-configured — use RSS fallback, wrap fetch in error-tolerant parse, stop retrying. (kept)
-- **Unguarded `Record`/lookup access crashes modes** — `TOWER_SURPRISE_META[key]`, `PERKS[id]` crashed on unknown keys. Guard before wiring; double-scaling score still open. (carry, lane 11)
-- **>500-line files block flag-wiring + split** — `WordTowerPlay.tsx` 1248L / `WordTowerScene.tsx` 762L / `wordTowerManager.ts` 602L still over cap. (carry, lane 11)
-- **Over-scoped mode-polish (TDD + 5 locales + page-wire)** — write ALL 5 locales FIRST. (high-frequency)
-- **Experiment whose variant-B has no conditional render** — check render-path EXISTS before creating the flag. (kept)
-- **Flagging a Web-Vitals regression on a single reading** — never name a suspect below n≥50 in BOTH runs (lane 02 enforced this gate 06-29, correctly skipped /sv/daily). (holding)
-- **Demoting `logger.warn→debug` to silence Sentry** — root-cause or queue, never mute. (kept)
+- **Gate wedge → 3 CONSECUTIVE docs-only salvages (06-28/29/30)** — next-build's silent "Running TypeScript" phase + full Vitest tripped the idle watchdog. Fix `c826e1924` (07-02) skips the next-build TS phase in ALL gate tiers. **MONITOR 07-03/04: if a salvage recurs, the fix is incomplete** — next step is scope-Vitest-to-changed-files + per-suite hard kill (never a 5400s idle). (was #1 test-infra; fix landed, verifying)
+- **Supabase MCP token staleness — 6/6 nights, WORSENING** — no never-expire `SUPABASE_ACCESS_TOKEN` in nightly env → FK-index/RLS-initplan/auth-pool DB work deferred, 3 migrations (20260628/29/30) written-but-unapplied. **#1 infra.** Fix: mint never-expire PAT into nightly env + preflight refresh probe. (open, worsening)
+- **07-01 preflight ABORT — shared tree on a feature branch + dirty** (`fix/he-daily-word-meaning`, RC-0 hazard) → whole 01:00 run rejected, 5 lanes failed exit-75/1. Nightly REQUIRES tree-on-master + clean; a concurrent session left it switched. Preflight should auto-stash/checkout-master or alert loudly, not silent-abort. (open)
+- **Lane 03 keeps DEFINING flags with no render path** — `exp-blast-wave-banner-v1`, `exp-wordwheel-drag-hint-v1`, `exp-settings-lang-feedback-v1` all created/defined with 0 code call sites = zombie/dark flags, 0 evals. RULE (re-stated, keeps being violated): lane 03 must WIRE the conditional render in the SAME night, or NOT create the flag. Delete zombies before making new ones. (recurring)
+- **Lane 05 over-scope — 8/8 file cap hit, sealed-bid page.tsx deferred** — engine+tests+translations shipped but UI unwired = a half-mode. Write ALL 5 locales FIRST, then pick a slice that fully wires in one budget. (high-frequency)
+- **Lane 09 ship-drought — 0 code shipped 6/6 nights** (research-only or reverted). Monetization lane needs a concrete reversible slice per night (ad-UX flag, education upsell copy) — NOT another research doc. (open, worsening)
+- **Unguarded `Record`/lookup access crashes modes** — `TOWER_SURPRISE_META[key]`, `PERKS[id]` crashed on unknown keys (fixed 06-27). Guard before wiring. (carry, lane 11)
+- **>500-line files block flag-wiring + split** — `WordTowerPlay.tsx` / `WordTowerScene.tsx` / `wordTowerManager.ts` still over cap. (carry, lane 11)
+- **Flagging a Web-Vitals regression on a single reading** — never name a suspect below n≥50 in BOTH runs. (holding; 07-01 /en/multiplayer CLS=0.401 correctly cleared n≥52 → fixed 07-02.)
+- **Reddit OAuth/JSON blocked → search source stale all window** (lane 04). Use RSS fallback, error-tolerant parse, stop retrying. (kept)
 - **`next build`/full `tsc`/full test in a LANE verify path** — wedge risk. Lanes eslint-changed-files-only; gate runs authoritative build AFTER. (kept)
-- **Per-lane commits / headless realtime-table creation / Reddit OAuth retry** — all banned, all held. (kept)
+- **Demoting `logger.warn→debug` to silence Sentry / per-lane commits / headless realtime-table creation** — all banned, all held. (kept)
 
 ## Open watches (carry forward)
-- **Supabase MCP token staleness** — mint never-expire PAT into nightly env + preflight refresh probe. Status: #1 infra, lane 02/01.
-- **Gate-runner test wedge (4/7)** — scope-to-changed-files or hard per-suite kill; replaces 5400s idle backstop. Status: #1 test-infra, lane 07 to spec.
-- **`/es/multiplayer` + `/en/multiplayer` LCP/INP** — /es LCP +23% structural (`ssr:false`×4, socket-gated); /en INP high. Needs Chrome profiler trace (not headless-reproducible). Status: #1 perf, lane 02/03.
-- **word-tower drop-feel + green-part drops + more upgrades + DAILY-over-MP refocus** (founder 06-26/24/25). Status: open, lane 05/11.
-- **word-tower file-cap split + double-scaling score + setTimeout leak** (`wordTowerManager.ts`, `WordTowerScene.tsx`). Status: open, lane 11.
-- **Blog cadence engine** — needs repeatable Higgsfield hero-image recipe (CLI install blocked 7 nights) + topic rotation. Status: #1 founder, lane 08.
-- **PostHog flag dot-keys** — `blast.v2` style keys silently mis-route; use dashes. Status: open, lane 03.
-- **Telemetry dead-event backlog** — 59-60 dead events; `daily_challenge_completed` never wired (high-value retention gap); brain-drill `game_started` fixed 06-26 but 0 plays post-deploy. Status: open, lane 12.
-- **ES "scrabble online" CTR gap** — stabilized pos 5.0-5.2, 11k+ impr, ~0.1-0.6% CTR (vanity, structural — do NOT rewrite scrabble metadata; reframe to intent-matched markets). Status: ride, lane 06.
-- **SECURITY DEFINER batch** — 68 functions; REVOKE PUBLIC sweep underway; bulk audit rest before REVOKE. Status: open, lane 01.
-- **`deploymentChangelog.generated.json` untracked diff every run** — gitignore or auto-gen check. Status: open, lane 01.
-- **Education off-brand OG images** — copy swapped; mascot-correct Higgsfield images open. Status: open, lane 05/06/08.
-- **IndexNow Bing parity (ES/SV/HE) + AdSense re-submit + Higgsfield CLI install** — manual ops. Status: open, human.
+- **Supabase MCP token staleness** — mint never-expire PAT + preflight refresh probe; apply 3 pending migrations. Status: #1 infra, lane 02/01.
+- **Gate wedge** — `c826e1924` fix landed 07-02; verify no salvage 07-03/04, else scope-to-changed + per-suite kill. Status: verifying, lane 07.
+- **07-01-style preflight abort** — preflight should recover (stash + checkout master) or alert, not silent-reject a whole run. Status: open, lane 01/infra.
+- **Word Tower daily-leaderboard backend (Layer B)** — the ONE blocker from 79%→90%; needs founder design call (1-attempt/day vs unlimited, singular scoring). Status: open, lane 11 + founder.
+- **PostHog zombie/dark flags** — delete `exp-daily-hub-streak-nudge-v1`; wire-or-delete `exp-blast-wave-banner-v1`/`exp-wordwheel-drag-hint-v1`/`exp-settings-lang-feedback-v1`. Status: open, lane 03.
+- **Sealed-bid page.tsx completion** — 4 edits specified in 07-02 artifact (rAF decay timer, display chip, multiplier pass, UI ship). Status: open, lane 05.
+- **Telemetry `results_viewed` genuine-0** — 81 SP completions, 0 events (not a classifier gap); `daily_challenge_completed` added to CANONICAL_DUAL_EMIT 07-02. 56+ DEAD events remain. Status: open, lane 12.
+- **`/es/multiplayer` LCP + `/en/multiplayer` INP** — need Chrome profiler trace (not headless-reproducible). Status: #1 perf, lane 02/03.
+- **word-tower drop-feel + green-part drops + more upgrades + file-cap split** (founder 06-26). Status: open, lane 05/11.
+- **Blog cadence engine** — needs repeatable Higgsfield hero-image recipe (CLI install blocked) + topic rotation. Status: #1 founder, lane 08.
+- **ES "scrabble online" CTR gap** — vanity, structural; do NOT rewrite scrabble metadata, reframe to intent-matched markets. Status: ride, lane 06.
+- **SECURITY DEFINER batch** — REVOKE PUBLIC sweep underway (2 done this window); bulk-audit rest before REVOKE. Status: open, lane 01.
+- **IndexNow Bing parity + AdSense re-submit + Higgsfield CLI install** — manual ops. Status: open, human.
 
 ## Specialized Skills (maintained by lane 7)
 
 | Lane | Recommended skills | Evidence |
 |---|---|---|
-| 01 triage | `security`, `supabase-db-manager` | 6/7; idempotent REVOKE migrations, search_path pins |
-| 02 perf | `superpowers:systematic-debugging`, `supabase-db-manager` | 7/7, 0 reverts — most reliable lane (asset+SSR wins) |
-| 03 engagement | `frontend-design` | 7/7, flag-wiring sweep 0 rollback |
-| 04 competitor | `humanizer`, `game-designer` | idea:build 75% (n=4) — surface buildable ideas w/ named mode+file |
-| 05 landing | `frontend-design`, `impeccable:craft`, `animate-ai` | mode polish 7/7, 0 reverts (design non-negotiable) |
-| 06 seo | `seo-daily` | 7/7; native HE/SV/JA/ES review (mandatory keep) |
-| 07 self-learn | none — prompt-only | ships every night |
-| 08 adsense | `humanizer`, `higgsfield-generate` | blog ISR+JSON-LD 6/7; hero-image gen blocked on CLI install |
-| 09 monetization | `frontend-design` | 6/7; education pricing + tower upgrades, 0 reverts |
-| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | 6/7; infinite es/sv crosswords (top throughput) |
-| 11 mode-qa | `senior-qa`, `ccgs-design-review` | readiness 0→67%; modeqa:ontrack ×6 |
-| 12 telemetry | none — prompt-only | 6/7; brain-drill game_started + user_identified fixed |
+| 01 triage | `security`, `supabase-db-manager` | 4/6 shipped (2 RPC hardenings); idempotent REVOKE + search_path pins |
+| 02 perf | `superpowers:systematic-debugging`, `supabase-db-manager` | 7/7, avg 9.2m — most reliable lane (asset+SSR+CLS wins) |
+| 03 engagement | `frontend-design` | ships but keeps making dark flags — wire render-path FIRST |
+| 04 competitor | `humanizer`, `game-designer` | idea:build 86% (n=7); surface buildable ideas w/ named mode+file |
+| 05 landing | `frontend-design`, `impeccable:craft`, `animate-ai` | 3/6 mode-polish shipped, 0 reverts (design non-negotiable) |
+| 06 seo | `seo-daily` | 6/6 content shipped; native HE/SV/JA/ES review (mandatory keep) |
+| 07 self-learn | none — prompt-only | ships every night (except 07-01 whole-run abort) |
+| 08 adsense | `humanizer`, `higgsfield-generate` | blog ISR+JSON-LD 6/6; hero-image gen blocked on CLI install |
+| 09 monetization | `frontend-design` | 0 code 6/6 (ship-drought) — needs a reversible slice/night |
+| 10 dict | `dictionary-improvement`, `crossword-clue-craft` | Wiktionary +988 clues + Russian locale (top throughput) |
+| 11 mode-qa | `senior-qa`, `ccgs-design-review` | readiness 58→79%; modeqa:ontrack ×5-6 |
+| 12 telemetry | none — prompt-only | posthog-coverage.sh extractor fix recovered 7 live events |
 
 ## Reddit reply etiquette (lane 4 sub-output)
 - **Never auto-post.** Drafts only. User reviews + posts manually.

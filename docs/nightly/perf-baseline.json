@@ -1,6 +1,6 @@
 {
-  "date": "2026-07-01",
-  "note": "7d window (24h sub-floor: 0 routes n≥50). Two routes qualify: /en/multiplayer (n=52) and /he (n=84). /en/multiplayer CLS=0.401 critical (threshold 0.1) — root cause uninvestigated (no ad banners found, no images in MultiplayerFlow, likely conditional-render layout shifts from SpectatorBanner/AutoHideHeader/isActive state transitions). Backend: wrote 20260701020000_drop_unused_index_word_wheel_catchup.sql (DROP unused idx_word_wheel_attempts_catchup). Deleted duplicate 20260629020000_rls_initplan_fix_and_word_clubs_fk_index.sql (identical SQL to 06-28 version). Supabase MCP absent (6th consecutive night) — migrations accumulate unapplied.",
+  "date": "2026-07-02",
+  "note": "7d window (24h sub-floor: 0 routes n≥50). /en/multiplayer (n=55) CLS=0.383 (was 0.401). ROOT CAUSE FOUND+FIXED: PageClient.tsx returned null instead of <AutoHideHeader> during active gameplay, bypassing internal spacer-preservation. Fix: always render <AutoHideHeader collapseSpacerWhenHidden={showResults} />. /he (n=72) CLS=0.075 OK, LCP/INP improving. Supabase MCP absent (7th night) — 2 migrations pending apply.",
   "backend": {
     "advisor_warnings_count": 3,
     "note": "Supabase MCP absent (6th consecutive night). Migrations written but not applied to prod.",
