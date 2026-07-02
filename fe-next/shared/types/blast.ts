@@ -27,6 +27,7 @@ export type BlastTileType =
   | 'crystal'
   | 'fuse'
   | 'anchor'
+  | 'mystery'
   | 'chocolate'
   | 'cake'
   | 'locked'
@@ -53,6 +54,7 @@ export const BLAST_TILE_TYPE_LIST: readonly BlastTileType[] = [
   'crystal',
   'fuse',
   'anchor',
+  'mystery',
   'chocolate',
   'cake',
   'locked',

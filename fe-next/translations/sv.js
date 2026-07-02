@@ -10339,7 +10339,8 @@ const sv = {
       "catalyst":  { "name": "Katalysator","desc": "+10 p. Uppgraderar intilliggande vanliga brickor till specialer." },
       "crystal":   { "name": "Kristall",   "desc": "Växer +1× varje oanvänd tur (max 5×). Multiplicerar din ordpoäng när den används." },
       "fuse":      { "name": "Stubin",     "desc": "Länkat par. Rensa en för att tända dess partner — desarmera inom 3 drag för +15 p och 2 drag, annars detonerar en 3×3-smäll för -50 p." },
-      "anchor":    { "name": "Ankare",     "desc": "Belönar långa ord. Ger +3 poäng per bokstav i ordet när den rensas." }
+      "anchor":    { "name": "Ankare",     "desc": "Belönar långa ord. Ger +3 poäng per bokstav i ordet när den rensas." },
+      "mystery":   { "name": "Gåta",       "desc": "Överraskning! Slumpmässig effekt: poängburst, ny speciell, mini-pop eller mega +150." }
     },
     "title": "Blast-läge",
     "description": "Rensa brädet! Ord spränger brickor.",
@@ -10767,7 +10768,8 @@ const sv = {
       "catalyst": { "name": "Katalysator", "desc": "Uppgraderar alla intilliggande brickor till special" },
       "crystal": { "name": "Kristall", "desc": "Växer +1× per oanvänd tur (max 5×) — multiplicerar ordpoäng" },
       "fuse": { "name": "Stubin", "desc": "Länkat par — rensa en för att tända partnern, desarmera inom 3 drag annars smäller det" },
-      "anchor": { "name": "Ankare", "desc": "Långordsbonus — +3 p per bokstav i ordet när den rensas" }
+      "anchor": { "name": "Ankare", "desc": "Långordsbonus — +3 p per bokstav i ordet när den rensas" },
+      "mystery": { "name": "Gåta", "desc": "Överraskning — poängburst, ny speciell, mini-pop eller mega +150" }
     },
     "highlight": {
       "captions": {

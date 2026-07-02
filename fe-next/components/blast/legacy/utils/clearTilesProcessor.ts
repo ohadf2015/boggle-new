@@ -53,6 +53,7 @@ import {
 } from './blastTileEffects';
 import { calculateBonusMoves } from './blastMoveUtils';
 import { earnTileUpgrade } from './blastEarnedTiles';
+import { rollMysteryOutcome } from './blastMysteryTile';
 
 export interface TileProcessingInput {
   prev: BlastTileState[][];
@@ -399,6 +400,33 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
         // Length-bonus tile: awards ANCHOR_LENGTH_BONUS per letter in the word.
         bonusScore += ANCHOR_LENGTH_BONUS * word.length;
         newExplosions.push({ id: `anchor-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
+        break;
+      }
+
+      case 'mystery': {
+        const outcome = rollMysteryOutcome(rng);
+        if (outcome.kind === 'scoreBurst' || outcome.kind === 'mega') {
+          bonusScore += outcome.points;
+          pendingPopups.push({ id: `mystery-bonus-${now}-${cell.row}-${cell.col}`, score: outcome.points, row: cell.row, col: cell.col, isSpecial: true, timestamp: now });
+        } else if (outcome.kind === 'spawnSpecial') {
+          // Convert one random adjacent standard tile into the rolled special.
+          const neighbors = [[0,1],[0,-1],[1,0],[-1,0]]
+            .map(([dr,dc]) => ({ row: cell.row+dr, col: cell.col+dc }))
+            .filter(p => next[p.row]?.[p.col] && !next[p.row][p.col].isCleared && next[p.row][p.col].type === 'standard');
+          if (neighbors.length > 0) {
+            const pick = neighbors[Math.floor(rng() * neighbors.length)];
+            next[pick.row][pick.col].type = outcome.special;
+          }
+        } else { // miniPop
+          const neighbors = [[0,1],[0,-1],[1,0],[-1,0]]
+            .map(([dr,dc]) => ({ row: cell.row+dr, col: cell.col+dc }))
+            .filter(p => next[p.row]?.[p.col] && !next[p.row][p.col].isCleared && !pathSet.has(`${p.row},${p.col}`));
+          if (neighbors.length > 0) {
+            const pick = neighbors[Math.floor(rng() * neighbors.length)];
+            markCleared(next[pick.row][pick.col]);
+          }
+        }
+        newExplosions.push({ id: `mystery-${now}-${cell.row}-${cell.col}`, row: cell.row, col: cell.col, type: 'word', intensity: 2, timestamp: now });
         break;
       }
 

@@ -19,6 +19,7 @@ export const BLAST_TEACHABLE_ORDER: readonly BlastTileType[] = [
   'prism',
   'lightning',
   'frozen',
+  'mystery',
 ];
 
 /**

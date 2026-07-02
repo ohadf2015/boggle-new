@@ -9895,6 +9895,10 @@ const en = {
       "anchor": {
         "name": "Anchor",
         "desc": "Rewards long words. Adds +3 points per letter in the word when cleared."
+      },
+      "mystery": {
+        "name": "Mystery",
+        "desc": "The slot machine! Clear it for a random surprise: score burst, new special, mini-pop, or mega +150."
       }
     },
     "title": "Blast Mode",
@@ -10328,6 +10332,10 @@ const en = {
       "anchor": {
         "name": "Anchor",
         "desc": "Long-word bonus — +3 pts per letter in the word when cleared"
+      },
+      "mystery": {
+        "name": "Mystery",
+        "desc": "Random surprise — score burst, spawn special, mini-pop, or mega +150"
       }
     },
     "highlight": {

@@ -10250,7 +10250,8 @@ const es = {
       "catalyst":  { "name": "Catalizador","desc": "+10 pts. Mejora fichas normales adyacentes a especiales." },
       "crystal":   { "name": "Cristal",    "desc": "Crece +1× cada turno sin usar (máx 5×). Multiplica tu puntuación de palabra al usarlo." },
       "fuse":      { "name": "Mecha",      "desc": "Par vinculado. Elimina una para encender su pareja — desactívala en 3 turnos para +15 pts y 2 movimientos, o detona un estallido 3×3 con -50 pts." },
-      "anchor":    { "name": "Ancla",      "desc": "Recompensa palabras largas. Suma +3 puntos por cada letra de la palabra al eliminarse." }
+      "anchor":    { "name": "Ancla",      "desc": "Recompensa palabras largas. Suma +3 puntos por cada letra de la palabra al eliminarse." },
+      "mystery":   { "name": "Misterio",  "desc": "¡Sorpresa aleatoria! Ráfaga de puntos, nueva especial, mini-pop o mega +150." }
     },
     "title": "Modo Blast",
     "description": "¡Limpia el tablero! Las palabras explotan fichas.",
@@ -10682,7 +10683,8 @@ const es = {
       "catalyst": { "name": "Catalizador", "desc": "Mejora todas las fichas adyacentes a especiales aleatorias" },
       "crystal": { "name": "Cristal", "desc": "Crece +1× por turno sin usar (máx 5×) — multiplica la puntuación" },
       "fuse": { "name": "Mecha", "desc": "Par vinculado — enciende al eliminar uno, desactívala en 3 turnos o explota" },
-      "anchor": { "name": "Ancla", "desc": "Bonus de palabra larga — +3 pts por cada letra de la palabra al eliminarse" }
+      "anchor": { "name": "Ancla", "desc": "Bonus de palabra larga — +3 pts por cada letra de la palabra al eliminarse" },
+      "mystery": { "name": "Misterio", "desc": "Sorpresa — ráfaga de puntos, nueva especial, mini-pop o mega +150" }
     },
     "highlight": {
       "captions": {

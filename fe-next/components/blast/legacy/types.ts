@@ -366,6 +366,7 @@ export const SPECIAL_TILE_DISTRIBUTION: Record<Exclude<BlastTileType, 'standard'
   crystal: 0,
   fuse: 0,
   anchor: 0,
+  mystery: 0,
   chocolate: 0,
   cake: 0,
   locked: 0,

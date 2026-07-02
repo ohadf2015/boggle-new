@@ -28,6 +28,7 @@ export const SHATTER_COLORS: Record<string, string[]> = {
   mirror: ['#E0E0FF', '#8888FF', '#C0C0FF'],
   silver: ['#E8E8E8', '#B0B0B0', '#D4D4D4'],
   diamond: ['#B9F2FF', '#00CED1', '#E0FFFF'],
+  mystery: ['#B7A6FF', '#8B5CF6', '#EDE9FE'],
   standard: ['#FFFFFF', '#E0E0E0', '#C0C0C0'],
 };
 
