@@ -8,7 +8,7 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { trackGameStart } from '@/utils/growthTracking';
 import { trackBlastRunEnded } from '@/components/blast/legacy/utils/blastTelemetry';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
-import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { BlastGame } from './BlastGame';
 import { BlastResultsSummary } from './BlastResultsSummary';
 import { BlastPregameBuffModal, type BlastPregameBuff } from './BlastPregameBuffModal';
@@ -406,13 +406,28 @@ export function BlastView() {
             onHighlightStart={handleHighlightStart}
             onQuit={exitGuard.requestExit}
           />
-          <div className="absolute top-3 right-3 z-50">
-            <BlastMascotHud
-              state={mascot.state}
-              enabled={mascotPref.enabled}
-              onToggle={mascotPref.toggle}
-            />
-          </div>
+          {/* Transient celebration: the mascot pops in on a reaction and
+              auto-hides after a beat so it never sits over the score/HUD. When
+              the player has muted it, the (dimmed) frame stays put so the
+              unmute affordance remains reachable. */}
+          <AdaptiveAnimatePresence>
+            {(mascot.visible || !mascotPref.enabled) && (
+              <AdaptiveMotion.div
+                key="blast-mascot-hud"
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.6 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 24 }}
+                className="absolute top-3 right-3 z-50"
+              >
+                <BlastMascotHud
+                  state={mascot.state}
+                  enabled={mascotPref.enabled}
+                  onToggle={mascotPref.toggle}
+                />
+              </AdaptiveMotion.div>
+            )}
+          </AdaptiveAnimatePresence>
           <ModeCoach mode="blast" />
         </>
       )}
