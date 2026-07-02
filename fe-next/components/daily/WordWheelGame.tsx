@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Clock, Delete, RotateCcw, Flame, TrendingUp, ChevronUp, Check, Trophy } from 'lucide-react';
+import { Clock, Delete, RotateCcw, Flame, TrendingUp, ChevronUp, Check, Trophy, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
@@ -67,6 +67,13 @@ interface WordWheelGameProps {
   currentPlayerId?: string | null;
   /** Current guest fingerprint — same self-filter for unauthenticated players. */
   currentGuestFingerprint?: string | null;
+  /**
+   * Fired when the player taps the in-HUD exit affordance. The Word Wheel had
+   * no exit control at all (the player was trapped mid-game — worst under RTL,
+   * where there was no top-nav back button to fall back on); the parent owns the
+   * quit-confirm dialog + navigation. Omit to hide the button.
+   */
+  onExit?: () => void;
 }
 
 
@@ -82,7 +89,7 @@ interface RivalScore {
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
   hideCompetitive = false, onWordFound, isDesktop = false,
-  puzzleDate, currentPlayerId = null, currentGuestFingerprint = null,
+  puzzleDate, currentPlayerId = null, currentGuestFingerprint = null, onExit,
 }) => {
   const { t } = useLanguage();
   // `useReducedMotion` returns `true` when the user has set the OS-level
@@ -803,16 +810,34 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">
-        <div className={cn('flex items-center w-full gap-2', practice ? 'justify-center' : 'justify-between')}>
-          {/* Countdown clock — only in the timed game. Practice has no timer, so
-              a static "2:00" that never moves just reads as broken; we drop it
-              entirely (the "End run" CTA below replaces the progress bar). */}
-          {!practice && (
-            <div data-testid="wheel-timer" className={cn('flex items-center gap-1.5 font-neo-display font-black text-lg sm:text-xl shrink-0', timerColor, timerPulse)}>
-              <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
-              <span className="tabular-nums">{minutes}:{seconds.toString().padStart(2, '0')}</span>
-            </div>
-          )}
+        <div className="flex items-center w-full gap-2 justify-between">
+          {/* Start cluster: exit affordance + countdown. Laid out in-flow with
+              flexbox (NOT absolute left/right) so it flips correctly under RTL —
+              in Hebrew the whole cluster sits at the visual right (the start of
+              the row) and the arrow is mirrored via rtl:rotate-180, instead of
+              an absolutely-positioned control drifting off-screen. */}
+          <div className="flex items-center gap-2 shrink-0">
+            {onExit && (
+              <button
+                type="button"
+                onClick={onExit}
+                aria-label={t('common.quit')}
+                data-testid="wheel-exit"
+                className="flex items-center justify-center w-8 h-8 rounded-full border-2 border-neo-cream/10 bg-neo-black/50 text-neo-white hover:bg-neo-black/70 active:scale-95 transition-all duration-150 shrink-0"
+              >
+                <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+              </button>
+            )}
+            {/* Countdown clock — only in the timed game. Practice has no timer, so
+                a static "2:00" that never moves just reads as broken; we drop it
+                entirely (the "End run" CTA below replaces the progress bar). */}
+            {!practice && (
+              <div data-testid="wheel-timer" className={cn('flex items-center gap-1.5 font-neo-display font-black text-lg sm:text-xl shrink-0', timerColor, timerPulse)}>
+                <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="tabular-nums">{minutes}:{seconds.toString().padStart(2, '0')}</span>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             {/* Combo counter — reserved slot avoids horizontal layout shift in top bar.
                 Dropped entirely in the practice hub (hideCompetitive) — no combo pressure. */}

@@ -24,6 +24,9 @@ vi.mock('framer-motion', () => ({
 }));
 vi.mock('next/navigation', () => ({
   useSearchParams: () => ({ get: (k: string) => (k === 'date' ? '2026-04-24' : null) }),
+  // WordWheelChallenge now calls useRouter() for the mid-game exit nav; this
+  // local mock overrides the global one, so it must provide it too.
+  useRouter: () => ({ push: vi.fn(), replace: vi.fn(), prefetch: vi.fn(), back: vi.fn(), forward: vi.fn(), refresh: vi.fn() }),
 }));
 vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k, language: 'en' }) }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({ useSoundEffects: () => ({ setGameActive: vi.fn() }) }));

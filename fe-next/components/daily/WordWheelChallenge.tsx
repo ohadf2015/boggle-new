@@ -1,12 +1,15 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import dynamic from 'next/dynamic';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { AnimatePresence, m } from 'framer-motion';
 import { Star, Type, Timer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
+import { buildQuitDialogConfig } from './survival/quitDialogConfig';
+import logger from '@/utils/logger';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
 import WordWheelResults from './WordWheelResults';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
@@ -107,6 +110,7 @@ const STAGE_AMBIENT_BG =
 
 const WordWheelChallenge: React.FC = () => {
   const { t, language } = useLanguage();
+  const router = useRouter();
   const isPractice = usePracticeFlag();
   const { setGameActive } = useSoundEffects();
   const { profile, isAuthenticated } = useAuth();
@@ -126,6 +130,31 @@ const WordWheelChallenge: React.FC = () => {
   const [effects, setEffects] = useState<WordWheelEffect[]>([]);
   const [canvasSize, setCanvasSize] = useState({ width: 400, height: 600 });
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
+
+  // Mid-game exit. The Word Wheel had no exit affordance at all — the player
+  // was trapped once the timer started (no top-nav back button, worst under
+  // RTL). Tapping the in-HUD exit opens a confirm; confirming leaves for the
+  // daily hub. Reuses the shared defensive quit-dialog config (never throws on
+  // a bad locale bundle) with the ad-free "progress will be lost" message.
+  const quitDialog = useMemo(
+    () => buildQuitDialogConfig(t, {
+      descriptionKey: 'wordHunt.quitConfirmMessage',
+      fallback: { description: "Your progress won't be saved." },
+    }),
+    [t],
+  );
+  const handleExitClick = useCallback(() => setShowExitConfirm(true), []);
+  const handleExitConfirm = useCallback(() => {
+    setShowExitConfirm(false);
+    try {
+      router.push(`/${language}/daily`);
+    } catch (err) {
+      // Never let a nav throw strand the player on the nav-hidden game surface.
+      logger.error('Word Wheel exit navigation failed; forcing hard nav', err);
+      if (typeof window !== 'undefined') window.location.assign(`/${language}/daily`);
+    }
+  }, [router, language]);
 
   // Catch-up ad gate — mirrors DailyChallenge pattern. Per-date unlock so a
   // single ad watch covers the whole session for that date.
@@ -630,6 +659,7 @@ const WordWheelChallenge: React.FC = () => {
               puzzleDate={catchupDate || getDailyChallengeDate()}
               currentPlayerId={isAuthenticated && profile ? profile.id : null}
               currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+              onExit={handleExitClick}
             />
           </m.div>
         )}
@@ -660,6 +690,21 @@ const WordWheelChallenge: React.FC = () => {
           </m.div>
         )}
       </AnimatePresence>
+
+      {/* Mid-game exit confirmation. Rendered at the stage root (outside the
+          phase branches) so it overlays the wheel; strings come from the shared
+          defensive builder so a broken locale bundle can't crash render. */}
+      <ConfirmationDialog
+        open={showExitConfirm}
+        onOpenChange={setShowExitConfirm}
+        title={quitDialog.title}
+        description={quitDialog.description}
+        confirmText={quitDialog.confirmText}
+        cancelText={quitDialog.cancelText}
+        onConfirm={handleExitConfirm}
+        variant="danger"
+        analyticsId="word_wheel_quit_confirm"
+      />
     </div>
   );
 };

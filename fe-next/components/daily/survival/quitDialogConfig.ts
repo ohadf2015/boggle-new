@@ -64,16 +64,40 @@ function resolveString(t: TranslateFn, key: string, fallback: string): string {
 }
 
 /**
- * Build the Daily Challenge quit-confirmation dialog config. Guaranteed to
- * return four non-empty strings and to never throw, regardless of the state of
- * the active locale bundle.
+ * Optional per-call overrides. Lets a second surface (e.g. the Word Wheel)
+ * reuse this defensive builder with different translation keys and/or ad-free
+ * fallback copy, without duplicating the resolution logic.
  */
-export function buildQuitDialogConfig(t: TranslateFn): QuitDialogConfig {
-  if (typeof t !== 'function') return { ...GENERIC_QUIT_DIALOG };
+export interface QuitDialogKeys {
+  titleKey?: string;
+  descriptionKey?: string;
+  confirmKey?: string;
+  cancelKey?: string;
+  /** Per-field generic fallbacks (the English floor) when a key is unusable. */
+  fallback?: Partial<QuitDialogConfig>;
+}
+
+/**
+ * Build a quit-confirmation dialog config. Guaranteed to return four non-empty
+ * strings and to never throw, regardless of the state of the active locale
+ * bundle. Called with no options it produces the Word Hunt config unchanged;
+ * pass `keys` to point specific fields at different translation keys (with an
+ * optional ad-free fallback) for other surfaces like the Word Wheel.
+ */
+export function buildQuitDialogConfig(t: TranslateFn, keys: QuitDialogKeys = {}): QuitDialogConfig {
+  const {
+    titleKey = 'daily.quitConfirmTitle',
+    descriptionKey = 'daily.quitConfirm',
+    confirmKey = 'daily.imSure',
+    cancelKey = 'common.cancel',
+    fallback,
+  } = keys;
+  const floor: QuitDialogConfig = { ...GENERIC_QUIT_DIALOG, ...(fallback ?? {}) };
+  if (typeof t !== 'function') return { ...floor };
   return {
-    title: resolveString(t, 'daily.quitConfirmTitle', GENERIC_QUIT_DIALOG.title),
-    description: resolveString(t, 'daily.quitConfirm', GENERIC_QUIT_DIALOG.description),
-    confirmText: resolveString(t, 'daily.imSure', GENERIC_QUIT_DIALOG.confirmText),
-    cancelText: resolveString(t, 'common.cancel', GENERIC_QUIT_DIALOG.cancelText),
+    title: resolveString(t, titleKey, floor.title),
+    description: resolveString(t, descriptionKey, floor.description),
+    confirmText: resolveString(t, confirmKey, floor.confirmText),
+    cancelText: resolveString(t, cancelKey, floor.cancelText),
   };
 }
