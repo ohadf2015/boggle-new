@@ -47,12 +47,19 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
   }
 
   // Email is best-effort — the approval (DB state) is the source of truth and
-  // must not be undone by a flaky mail provider, so failures are swallowed.
+  // must not be undone by a flaky mail provider, so failures don't 500. But
+  // sendEmail reports provider rejections (bad key, unverified sender domain,
+  // Resend API error) via a resolved { ok:false } result rather than a throw,
+  // so we must inspect that result and log it — otherwise a failed trial email
+  // vanishes with zero trace (silent no-op).
   try {
     const tpl = teacherAccessConfirmation({ full_name: row.full_name, locale: row.locale, message, trialExpiresAt });
-    await sendEmail({ to: row.email, subject: tpl.subject, html: tpl.html });
+    const sent = await sendEmail({ to: row.email, subject: tpl.subject, html: tpl.html });
+    if (!sent.ok) {
+      console.error('[teacher-access approve] email send failed for', row.email, '-', sent.error);
+    }
   } catch (e) {
-    console.error('[teacher-access approve] email send failed', e);
+    console.error('[teacher-access approve] email send threw', e);
   }
 
   return NextResponse.json({ ok: true });
