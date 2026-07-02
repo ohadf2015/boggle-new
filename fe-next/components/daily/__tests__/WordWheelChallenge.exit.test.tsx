@@ -88,7 +88,9 @@ import WordWheelChallenge from '../WordWheelChallenge';
 
 async function reachPlaying() {
   render(<WordWheelChallenge />);
-  const playBtn = await waitFor(() => screen.getByRole('button', { name: 'Play' }));
+  // The ready-screen Play control is a framer-motion `m.button`, which the
+  // pass-through mock above renders as a <div> — so match by text, not role.
+  const playBtn = await waitFor(() => screen.getByText('Play'));
   fireEvent.click(playBtn);
   return waitFor(() => screen.getByTestId('wheel-exit-trigger'));
 }
