@@ -14,7 +14,7 @@ describe('blastColorTokens', () => {
     expect(SHATTER_COLORS.bomb).toEqual(['#FF4444', '#CC0000', '#FF6B35']);
     expect(SHATTER_COLORS.rainbow).toEqual(['#FF1493', '#00FFFF', '#FFE135', '#7FFF00', '#A855F7']);
     expect(SHATTER_COLORS.standard).toEqual(['#FFFFFF', '#E0E0E0', '#C0C0C0']);
-    expect(Object.keys(SHATTER_COLORS)).toHaveLength(13);
+    expect(Object.keys(SHATTER_COLORS)).toHaveLength(14);
   });
 
   test('EXPLOSION_COLORS maps all blast explosion types', () => {
