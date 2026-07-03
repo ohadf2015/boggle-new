@@ -388,6 +388,15 @@ export function useBlastEngine(
 
     tileStatesRef.current = tilesAfterThaw;
 
+    // Commit the grid together with the tile states so committed React state can
+    // never LAG the refs. If an earlier cascade's grid commit was skipped (e.g. a
+    // concurrency-guarded animation), `currentGrid` would otherwise stay a
+    // generation behind `tileStates` — mapping live tiles onto a stale grid and
+    // stranding letterless/mismatched cells on screen. For a normal word this is
+    // the same array reference (React bails the re-render); it only does work when
+    // state has actually diverged, healing it every turn.
+    if (effectiveGridRef.current) setCurrentGrid(effectiveGridRef.current);
+
     // Count colored tiles in the path for color_power objective tracking
     const colorCounts = { pink: 0, cyan: 0, lime: 0 };
     for (const cell of path) {

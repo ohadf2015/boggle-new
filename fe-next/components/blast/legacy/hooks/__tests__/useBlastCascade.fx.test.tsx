@@ -85,4 +85,51 @@ describe('useBlastCascade — cascade FX feed', () => {
       { row: 2, col: 0, type: 'standard' },
     ]));
   });
+
+  it('chain score fly shows the ACTUAL credited bonus, not a token placeholder', async () => {
+    const tiles = makeTiles();
+    const grid = tiles.map(row => row.map(t => t.type === 'standard' ? 'A' : t.type));
+    const clusterCells = [{ row: 0, col: 0 }, { row: 1, col: 0 }, { row: 2, col: 0 }];
+    detectMatch3Clusters.mockReturnValueOnce([{ letter: 'A', cells: clusterCells }]).mockReturnValue([]);
+
+    const submittedBonuses: number[] = [];
+    const engine = {
+      startCascade: vi.fn(() => ({ gravity: { newGrid: grid, newTileStates: tiles, clearedTiles: [], fallingTiles: [], newTiles: [] }, commit: undefined })),
+      stopCascade: vi.fn(),
+      submitWord: vi.fn((cells: Array<{ row: number; col: number }>, _label: string, bonus: number) => {
+        submittedBonuses.push(bonus);
+        for (const c of cells) tiles[c.row][c.col].isCleared = true;
+        return { score: 0, combos: [], clearedTiles: [], explosions: [], bonusMoves: 0, countdownExplosions: [] };
+      }),
+      getLatestState: () => ({ grid, tileStates: tiles }),
+      gameState: { wordsFound: [] },
+    };
+    const setScoreFlyEvents = vi.fn();
+    const deps = {
+      engine: engine as never,
+      sequencer: { animateCascade: vi.fn().mockResolvedValue(undefined) } as never,
+      sounds: { playCascadeChain: vi.fn() },
+      comboStreak: { pauseTimer: vi.fn(), resumeTimer: vi.fn(), onWordSubmitted: vi.fn() } as never,
+      checkWord: vi.fn(() => true),
+      waveConfig: undefined,
+      setCascadeHighlightCells: vi.fn(),
+      setCascadeHighlightWord: vi.fn(),
+      setScoreFlyEvents,
+      setComboFlash: vi.fn(),
+      flyIdRef: { current: 0 },
+      setClearedTilesForEffects: vi.fn(),
+    };
+
+    const { result } = renderHook(() => useBlastCascade(deps as never));
+    await result.current.runCascade(5);
+
+    const totalCredited = submittedBonuses.reduce((s, b) => s + b, 0);
+    expect(totalCredited).toBeGreaterThan(0);
+    // Find the chain fly event and check its score matches what the engine credited.
+    const flyScores = setScoreFlyEvents.mock.calls
+      .map(([updater]) => (typeof updater === 'function' ? updater([]) : updater))
+      .flat()
+      .map((e: { score: number }) => e.score);
+    expect(flyScores).toContain(totalCredited);
+  });
 });

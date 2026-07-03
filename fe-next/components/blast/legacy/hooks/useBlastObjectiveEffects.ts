@@ -22,6 +22,7 @@ interface ObjectiveEffectsDeps {
   };
   sounds: {
     playWaveClear: () => void;
+    playComboActivation: (tier: 1 | 2 | 3) => void;
   };
   t: (key: string) => string;
   setScoreFlyEvents: React.Dispatch<React.SetStateAction<ScoreFlyEvent[]>>;
@@ -69,6 +70,9 @@ export function useBlastObjectiveEffects(deps: ObjectiveEffectsDeps) {
           }]);
           setComboFlash({ id: flyId, tier: 2 });
           setComboTypeName(formatObjectiveLabel(obj.objective, t));
+          // Completion must be HEARD too — the flash/fly/shake were silent,
+          // so the hardest goals (target_word) landed without an audio cue.
+          sounds.playComboActivation(2);
           if (explosionShakeTimerRef.current) clearTimeout(explosionShakeTimerRef.current);
           setExplosionShake(2);
           explosionShakeTimerRef.current = setTimeout(() => setExplosionShake(0), 500);
@@ -79,7 +83,7 @@ export function useBlastObjectiveEffects(deps: ObjectiveEffectsDeps) {
         }
       }
     });
-  }, [objectives.objectiveProgress, engine, t, setScoreFlyEvents, setComboFlash, setComboTypeName, setExplosionShake, explosionShakeTimerRef, flyIdRef]);
+  }, [objectives.objectiveProgress, engine, sounds, t, setScoreFlyEvents, setComboFlash, setComboTypeName, setExplosionShake, explosionShakeTimerRef, flyIdRef]);
 
   // Play wave-clear sound once when ALL objectives are met
   const waveClearPlayedRef = useRef(false);

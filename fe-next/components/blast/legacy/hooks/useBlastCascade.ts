@@ -157,8 +157,10 @@ export function useBlastCascade(deps: CascadeDeps) {
         // cells reach the FX layer — without this, cascade-cleared tiles vanished
         // with only the highlight + gravity (Bug: "tiles disappear without effect").
         const preCascade = structuredClone(engine.getLatestState().tileStates);
+        let creditedBonus = 0;
         for (const find of cascadeFinds) {
           const bonus = find.bonusFn(chainLevel);
+          creditedBonus += bonus;
           engine.submitWord(find.cells, find.label, bonus);
           foundWordsSet.add(find.label);
         }
@@ -171,7 +173,10 @@ export function useBlastCascade(deps: CascadeDeps) {
         sounds.playCascadeChain(chainLevel);
         const chainFlyId = `chain-${++flyIdRef.current}`;
         const chainTier: 1 | 2 | 3 = chainLevel >= 3 ? 3 : chainLevel >= 2 ? 2 : 1;
-        const chainBonus = chainLevel * 5;
+        // Fly the bonus the engine ACTUALLY credited — the old `chainLevel * 5`
+        // token understated deep chains ~5-10× (a 5-letter chain-2 find credits
+        // ~38pts but flew "+10"), hiding the cascade payoff from the player.
+        const chainBonus = creditedBonus;
         setScoreFlyEvents(prev => [...prev.slice(-3), {
           id: chainFlyId, score: chainBonus,
           startX: 50, startY: 50,

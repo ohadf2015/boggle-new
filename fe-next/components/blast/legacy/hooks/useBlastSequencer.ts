@@ -159,7 +159,16 @@ export function useBlastSequencer(): UseBlastSequencerReturn {
     chainLevel: number,
     commitFn?: () => void,
   ): Promise<void> => {
-    if (runningRef.current) return; // guard against concurrent execution
+    if (runningRef.current) {
+      // Concurrency guard: a cascade is already animating (e.g. a second word
+      // submitted mid-cascade — handleWordAccepted is re-entrant). Skip the
+      // OVERLAPPING ANIMATION, but never the grid commit: the engine refs have
+      // already advanced to the repaired grid, so dropping commitFn here freezes
+      // React state on the stale pre-gravity grid and strands a letterless tile
+      // on screen. Snap the board to correct state (no fall tween) instead.
+      commitFn?.();
+      return;
+    }
     runningRef.current = true;
     const token = cancelTokenRef.current;
     const cancelled = () => token !== cancelTokenRef.current;

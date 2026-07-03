@@ -126,3 +126,45 @@ describe('BlastObjectiveBanner', () => {
     expect(screen.queryByRole('button', { name: /close|dismiss/i })).not.toBeInTheDocument();
   });
 });
+
+describe('BlastObjectiveBanner — completion feedback', () => {
+  it('strikes through the label of a completed objective', () => {
+    render(
+      <BlastObjectiveBanner objectives={[progress('score_target', 250, 200)]} t={t} />,
+    );
+    const label = screen.getByText('Score 200 points');
+    expect(label.className).toMatch(/line-through/);
+  });
+
+  it('shows a completion check on a completed color_power objective', () => {
+    render(
+      <BlastObjectiveBanner
+        objectives={[progress('color_power', 4, 1, { minColorCount: 4, colorTag: 'pink' })]}
+        t={t}
+      />,
+    );
+    const row = screen.getByTestId('blast-objective-row-0');
+    expect(row.querySelector('[data-testid="objective-check"]')).not.toBeNull();
+  });
+
+  it('pops a row only when it TRANSITIONS from incomplete to complete', () => {
+    const { rerender } = render(
+      <BlastObjectiveBanner objectives={[progress('score_target', 100, 200)]} t={t} />,
+    );
+    // Not complete yet → no pop.
+    expect(screen.getByTestId('blast-objective-row-0').className).not.toMatch(/animate-neo-pop/);
+
+    // Flip to complete → celebrate once.
+    rerender(
+      <BlastObjectiveBanner objectives={[progress('score_target', 200, 200)]} t={t} />,
+    );
+    expect(screen.getByTestId('blast-objective-row-0').className).toMatch(/animate-neo-pop/);
+  });
+
+  it('does NOT pop an objective that was already complete on first render', () => {
+    render(
+      <BlastObjectiveBanner objectives={[progress('score_target', 250, 200)]} t={t} />,
+    );
+    expect(screen.getByTestId('blast-objective-row-0').className).not.toMatch(/animate-neo-pop/);
+  });
+});

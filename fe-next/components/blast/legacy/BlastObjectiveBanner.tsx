@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { Check, Target, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
@@ -51,6 +51,25 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
   t,
 }: BlastObjectiveBannerProps) {
   const visible = objectives.filter(p => p.objective.type !== 'clear_percent');
+
+  // Track prior completion per objective so we celebrate the MOMENT a goal
+  // flips complete (a one-shot pop) rather than silently re-styling it. A goal
+  // that is already complete on first render must NOT pop — seed the ref lazily
+  // and treat "never seen" as already-complete so mount is quiet.
+  const keyOf = (p: BlastObjectiveProgress) =>
+    `${p.objective.type}-${p.objective.tileType ?? p.objective.targetWord ?? p.objective.colorTag ?? ''}`;
+  const prevCompleteRef = useRef<Map<string, boolean> | null>(null);
+  const firstRender = prevCompleteRef.current === null;
+  if (firstRender) prevCompleteRef.current = new Map();
+  const prevComplete = prevCompleteRef.current!;
+  const wasComplete = (p: BlastObjectiveProgress) =>
+    firstRender ? true : (prevComplete.get(keyOf(p)) ?? false);
+
+  useEffect(() => {
+    const m = prevCompleteRef.current!;
+    for (const p of objectives) m.set(keyOf(p), p.isComplete);
+  }, [objectives]);
+
   if (visible.length === 0) return null;
 
   return (
@@ -73,6 +92,8 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
           else if (colorTag === 'lime') colorClass = 'text-neo-lime';
         }
 
+        const justCompleted = p.isComplete && !wasComplete(p);
+
         return (
           <div
             key={`${p.objective.type}-${p.objective.tileType ?? p.objective.targetWord ?? p.objective.colorTag ?? ''}-${i}`}
@@ -81,15 +102,18 @@ export const BlastObjectiveBanner = memo(function BlastObjectiveBanner({
             className={cn(
               'flex items-center gap-2 text-xs font-bold tabular-nums transition-opacity',
               p.isComplete ? 'text-neo-lime opacity-80' : 'text-neo-white',
+              justCompleted && 'animate-neo-pop',
             )}
           >
             {isTargetWord && <Target className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />}
             {isColorPower && <Heart className={cn('h-3.5 w-3.5 shrink-0', colorClass)} fill={colorClass.replace('text-', '')} strokeWidth={2} />}
-            {p.isComplete && !isTargetWord && !isColorPower && <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />}
+            {p.isComplete && !isTargetWord && (
+              <Check data-testid="objective-check" className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />
+            )}
             {(p.objective.type === 'collect_type' || p.objective.type === 'clear_all_type') && p.objective.tileType && (
               <ObjectiveTilePreview tileType={p.objective.tileType} />
             )}
-            <span dir="auto" className="flex-1 truncate">{formatObjectiveLabel(p.objective, t)}</span>
+            <span dir="auto" className={cn('flex-1 truncate', p.isComplete && 'line-through')}>{formatObjectiveLabel(p.objective, t)}</span>
             {!isTargetWord && !isColorPower && (
               <span dir="ltr" className="shrink-0 text-white">
                 {Math.min(p.current, p.objective.target)} / {p.objective.target}

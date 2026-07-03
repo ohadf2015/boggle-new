@@ -1,7 +1,8 @@
 /**
  * blastWaveObjectives - Tests for wave objective definitions and retrieval.
  */
-import { getWaveObjectives } from '../blastWaveConfig';
+import { getWaveObjectives, capWaveObjectives, MAX_WAVE_OBJECTIVES } from '../blastWaveConfig';
+import type { BlastObjective } from '../../types';
 
 describe('getWaveObjectives', () => {
   it('returns a word_length objective for wave 1', () => {
@@ -139,5 +140,58 @@ describe('getWaveObjectives', () => {
   it('clamps wave numbers below 1 to wave 1', () => {
     const objectives = getWaveObjectives(0);
     expect(objectives).toEqual(getWaveObjectives(1));
+  });
+});
+
+describe('objective cap', () => {
+  const allCcFlags = { jelly: true, cake: true, chocolate: true };
+
+  it('never exceeds MAX_WAVE_OBJECTIVES for any wave, even with all cc flags on', () => {
+    for (let wave = 1; wave <= 40; wave++) {
+      const objectives = getWaveObjectives(wave, 'en', allCcFlags);
+      expect(objectives.length).toBeLessThanOrEqual(MAX_WAVE_OBJECTIVES);
+    }
+  });
+
+  it('always retains the clear_percent primary objective', () => {
+    for (let wave = 1; wave <= 40; wave++) {
+      const objectives = getWaveObjectives(wave, 'en', allCcFlags);
+      expect(objectives.some(o => o.type === 'clear_percent')).toBe(true);
+    }
+  });
+
+  it('always retains all base (non-bonus) objectives — only bonuses get trimmed', () => {
+    // Bonus objective types (the only ones the cap may drop).
+    const BONUS_TYPES = new Set([
+      'target_word', 'color_power', 'clear_jelly', 'kill_cake', 'stop_chocolate',
+    ]);
+    // Waves 3+ define exactly 3 base objectives (clear_percent + 2). The cap must
+    // never reduce that count, regardless of how many bonuses were seeded.
+    for (let wave = 3; wave <= 40; wave++) {
+      const full = getWaveObjectives(wave, 'en', allCcFlags);
+      const baseCount = full.filter(o => !BONUS_TYPES.has(o.type)).length;
+      expect(baseCount).toBe(3);
+    }
+  });
+
+  it('capWaveObjectives trims bonus objectives from the end, keeping the front', () => {
+    const objs: BlastObjective[] = [
+      { type: 'clear_percent', target: 90 },
+      { type: 'word_length', target: 3, minWordLength: 4 },
+      { type: 'score_target', target: 60 },
+      { type: 'target_word', target: 1, targetWord: 'HELLO' },
+      { type: 'color_power', target: 1, colorTag: 'pink', minColorCount: 3 },
+    ];
+    const capped = capWaveObjectives(objs, 4);
+    expect(capped).toHaveLength(4);
+    expect(capped).toEqual(objs.slice(0, 4));
+  });
+
+  it('capWaveObjectives returns the input unchanged when already within the cap', () => {
+    const objs: BlastObjective[] = [
+      { type: 'clear_percent', target: 90 },
+      { type: 'word_length', target: 4, minWordLength: 3 },
+    ];
+    expect(capWaveObjectives(objs, 4)).toEqual(objs);
   });
 });

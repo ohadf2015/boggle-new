@@ -308,6 +308,28 @@ import { getTargetWordPool, pickRandomTargetWord } from './blastTargetWordPool';
 /** Primary objective: always clear 90%+ of the board */
 const CLEAR_BOARD: BlastObjective = { type: 'clear_percent', target: 90 };
 
+/**
+ * Max objectives shown per wave (incl. the clear_percent primary). The banner
+ * filters out clear_percent, so this caps VISIBLE goal rows at MAX-1 (=3) — the
+ * comfortable ceiling on a phone before the list scrolls off and players lose
+ * track. Base objectives always come first and bonuses are appended, so capping
+ * from the front preserves every base goal and trims only bonus goals.
+ */
+export const MAX_WAVE_OBJECTIVES = 4;
+
+/**
+ * Clamp a wave's objective list to `max` by trimming from the END. Base
+ * objectives are built first and bonus objectives (target_word / color_power /
+ * cc-mechanic) are appended, so slicing the front keeps the required goals and
+ * drops surplus bonuses.
+ */
+export function capWaveObjectives(
+  objectives: BlastObjective[],
+  max: number = MAX_WAVE_OBJECTIVES,
+): BlastObjective[] {
+  return objectives.length <= max ? objectives : objectives.slice(0, max);
+}
+
 const WAVE_OBJECTIVES: Record<number, BlastObjective[]> = {
   1: [CLEAR_BOARD, { type: 'word_length', target: 4, minWordLength: 3 }],
   2: [CLEAR_BOARD, { type: 'word_length', target: 3, minWordLength: 4 }, { type: 'score_target', target: 60 }],
@@ -370,7 +392,9 @@ export function getWaveObjectives(
   let withAllSeeds = seedColorPowerObjective(clamped, withTargetWord);
   if (ccFlags) withAllSeeds = seedCcMechanicObjective(clamped, withAllSeeds, ccFlags);
 
-  return withAllSeeds;
+  // Cap total goals so waves never overwhelm the player (base goals kept,
+  // surplus bonus goals trimmed). See MAX_WAVE_OBJECTIVES.
+  return capWaveObjectives(withAllSeeds);
 }
 
 /**

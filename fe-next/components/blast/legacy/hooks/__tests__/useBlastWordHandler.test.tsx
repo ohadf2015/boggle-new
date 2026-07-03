@@ -194,6 +194,61 @@ describe('useBlastWordHandler', () => {
     expect(params.onWordWithComboTypeRef.current).toHaveBeenCalledWith('cat', 'tripleGem');
   });
 
+  describe('re-entrancy guard (double-submit race)', () => {
+    // A second word submitted before the first finishes animating (fast
+    // double-tap in the render-lag window before the grid disables input)
+    // must be DROPPED — otherwise it double-processes score/moves AND can
+    // strand a letterless tile (engine refs advance twice while the skipped
+    // second cascade never commits the grid). See useBlastSequencer fix.
+    function deferred() {
+      let resolve!: () => void;
+      const promise = new Promise<void>((r) => { resolve = r; });
+      return { promise, resolve };
+    }
+
+    it('ignores a second word while the first is still in flight', async () => {
+      const { params, engine, runCascade, lastPathRef } = setup();
+      const gate = deferred();
+      (params.sequencer as unknown as { animateWordClear: ReturnType<typeof vi.fn> })
+        .animateWordClear = vi.fn(() => gate.promise);
+
+      const { result } = renderHook(() => useBlastWordHandler(params));
+
+      let p1!: Promise<void>;
+      let p2!: Promise<void>;
+      await act(async () => {
+        // First submit — enters, awaits animateWordClear (held open by the gate).
+        p1 = result.current.handleWordAccepted({ word: 'cat', score: 5 });
+        // Grid builds a NEW word and fires again before the first resolves.
+        lastPathRef.current = [{ row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }];
+        p2 = result.current.handleWordAccepted({ word: 'dog', score: 5 });
+        // Release the gate and let both settle.
+        gate.resolve();
+        await Promise.all([p1, p2]);
+      });
+
+      // Only the FIRST word processed — no double score/move, no skipped-commit strand.
+      expect(engine.submitWord).toHaveBeenCalledTimes(1);
+      expect(engine.submitWord).toHaveBeenCalledWith(expect.any(Array), 'cat', 10);
+      expect(runCascade).toHaveBeenCalledTimes(1);
+    });
+
+    it('accepts the next word after the first fully completes', async () => {
+      const { params, engine, lastPathRef } = setup();
+      const { result } = renderHook(() => useBlastWordHandler(params));
+
+      await act(async () => {
+        await result.current.handleWordAccepted({ word: 'cat', score: 5 });
+      });
+      lastPathRef.current = [{ row: 1, col: 0 }, { row: 1, col: 1 }, { row: 1, col: 2 }];
+      await act(async () => {
+        await result.current.handleWordAccepted({ word: 'dog', score: 5 });
+      });
+
+      expect(engine.submitWord).toHaveBeenCalledTimes(2);
+    });
+  });
+
   describe('treasure roll: jackpot celebration', () => {
     it('fires full celebration on jackpot tier: comboFlash tier 3 + mascot event', async () => {
       const jackpotWord = findWordForTier('jackpot');

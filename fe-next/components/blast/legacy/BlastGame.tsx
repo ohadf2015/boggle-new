@@ -567,6 +567,7 @@ export function BlastGame({
     const enriched: BlastResultsData = {
       ...results,
       adContinueUsed: adContinueAcceptedRef.current,
+      finalObjectives: objectives.objectiveProgress,
       ...(targetObj?.objective.targetWord
         ? { targetWord: targetObj.objective.targetWord, targetWordFound: targetObj.isComplete }
         : {}),
@@ -609,7 +610,7 @@ export function BlastGame({
       />
 
       {waveConfig?.archetype && (
-        <BlastWaveIntro waveNumber={waveNumber} archetype={waveConfig.archetype} t={tAdapter} featured={getFeaturedSpecialsForWave(waveNumber)} />
+        <BlastWaveIntro waveNumber={waveNumber} archetype={waveConfig.archetype} t={tAdapter} featured={getFeaturedSpecialsForWave(waveNumber)} objectives={objectives.objectiveProgress} />
       )}
 
       <BlastSugarCrushFinale active={sugarCrushActive} t={tAdapter} />

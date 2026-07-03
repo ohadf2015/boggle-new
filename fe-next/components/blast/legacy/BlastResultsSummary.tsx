@@ -3,7 +3,7 @@
 import { type ComponentType } from 'react';
 import {
   Trophy, Star, Sparkles, Waves, Flag, Link as LinkIcon, Crown,
-  BookOpen, Target, TrendingUp, Award, Zap, LayoutGrid,
+  BookOpen, Target, TrendingUp, Award, Zap, LayoutGrid, Check, X,
 } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ import { useBlastBadgeUnlocks } from './hooks/useBlastBadgeUnlocks';
 import { BlastBragCard } from './BlastBragCard';
 import { getMascotForResults, MASCOT_IMAGES } from './utils/blastMascot';
 import { computeFailReason } from './utils/computeFailReason';
+import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
 import type { BlastResultsData } from './types';
 
 type IconType = ComponentType<{ className?: string; strokeWidth?: number }>;
@@ -72,6 +73,8 @@ export function BlastResultsSummary({
 
   // Fail signal mirrors advance gate in useBlastGameEnd.ts (clearPct >= 90)
   const didFail = results.clearPercentage < 90;
+  // Final wave's goals for the ✓/✗ summary (clear_percent owned by fail card).
+  const goalRows = (results.finalObjectives ?? []).filter(p => p.objective.type !== 'clear_percent');
   // Sprint 1 clarity guard: concrete "N tiles short" reads sharper than a
   // bare percent. Falls back to needClearPct copy when shortfall is unknown.
   const failReason = computeFailReason({
@@ -214,6 +217,34 @@ export function BlastResultsSummary({
         >
           {t('blast.objective.targetWordMissed', { word: results.targetWord })}
         </AdaptiveMotion.div>
+      )}
+
+      {/* Per-objective ✓/✗ summary — closes the loop on the wave's goals.
+          clear_percent is excluded: the fail card / clear stat already owns it. */}
+      {goalRows.length > 0 && (
+        <div
+          data-testid="blast-objective-summary"
+          className="w-full rounded-neo border-2 border-neo-black bg-neo-navy-light px-3 py-2 flex flex-col gap-1"
+        >
+          {goalRows.map((p, i) => (
+              <div
+                key={`obj-${p.objective.type}-${i}`}
+                data-testid="blast-objective-summary-row"
+                dir="auto"
+                className={cn(
+                  'flex items-center gap-2 text-xs font-bold',
+                  p.isComplete ? 'text-neo-lime' : 'text-neo-white/50',
+                )}
+              >
+                {p.isComplete
+                  ? <Check className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />
+                  : <X className="h-3.5 w-3.5 shrink-0" strokeWidth={3} />}
+                <span className={cn('flex-1 truncate text-start', p.isComplete && 'line-through')}>
+                  {formatObjectiveLabel(p.objective, t)}
+                </span>
+              </div>
+          ))}
+        </div>
       )}
 
       {/* Score card */}

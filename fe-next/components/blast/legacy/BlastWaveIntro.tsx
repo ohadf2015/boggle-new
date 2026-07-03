@@ -4,17 +4,23 @@ import { useState, useEffect } from 'react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { getMascotForArchetype, MASCOT_IMAGES } from './utils/blastMascot';
 import { TILE_VISUALS } from './blastTileVisuals';
+import { formatObjectiveLabel } from './utils/blastObjectiveUtils';
 import type { BlastWaveArchetype } from './utils/blastWaveConfig';
 import type { BlastTileType } from '@/shared/types/blast';
+import type { BlastObjectiveProgress } from './types';
 
 interface BlastWaveIntroProps {
   waveNumber: number;
   archetype: BlastWaveArchetype;
   t: (key: string) => string | undefined;
   featured?: readonly BlastTileType[];
+  /** Wave objectives — previewed so the player knows the goals before play. */
+  objectives?: BlastObjectiveProgress[];
 }
 
 const INTRO_DISPLAY_MS = 1500;
+/** With a goal preview on screen, 1.5s is an unreadable flash — hold longer. */
+const INTRO_WITH_GOALS_MS = 2600;
 
 const ARCHETYPE_ACCENT: Record<BlastWaveArchetype, string> = {
   normal: 'text-neo-white',
@@ -24,14 +30,15 @@ const ARCHETYPE_ACCENT: Record<BlastWaveArchetype, string> = {
   silence: 'text-neo-cyan',
 };
 
-export function BlastWaveIntro({ waveNumber, archetype, t, featured }: BlastWaveIntroProps) {
+export function BlastWaveIntro({ waveNumber, archetype, t, featured, objectives }: BlastWaveIntroProps) {
   const [visible, setVisible] = useState(true);
+  const hasGoals = (objectives ?? []).some(p => p.objective.type !== 'clear_percent');
 
   useEffect(() => {
     setVisible(true);
-    const id = setTimeout(() => setVisible(false), INTRO_DISPLAY_MS);
+    const id = setTimeout(() => setVisible(false), hasGoals ? INTRO_WITH_GOALS_MS : INTRO_DISPLAY_MS);
     return () => clearTimeout(id);
-  }, [waveNumber]);
+  }, [waveNumber, hasGoals]);
 
   if (!visible) return null;
 
@@ -40,6 +47,10 @@ export function BlastWaveIntro({ waveNumber, archetype, t, featured }: BlastWave
   const label = t(`blast.archetypes.${archetype}`) || '';
   const mascotAlt = t(`blast.mascot.${mascotKey}`) || '';
   const accent = ARCHETYPE_ACCENT[archetype];
+
+  // Goal preview — everything except clear_percent (the HUD already shows the
+  // board-clear progress bar). Gives the player their targets up front.
+  const goalPreview = (objectives ?? []).filter(p => p.objective.type !== 'clear_percent');
 
   return (
     <div className="absolute inset-0 pointer-events-none z-50 flex flex-col items-center justify-center gap-3">
@@ -97,6 +108,26 @@ export function BlastWaveIntro({ waveNumber, archetype, t, featured }: BlastWave
                   </div>
                 );
               })}
+            </div>
+          )}
+          {goalPreview.length > 0 && (
+            <div
+              data-testid="blast-wave-intro-goals"
+              className="flex flex-col items-stretch gap-1 px-3 py-2 rounded-neo bg-black/70 border-2 border-neo-black shadow-hard max-w-[280px]"
+            >
+              <span className="font-neo-display font-black uppercase tracking-wider text-xs text-neo-white/80 text-center">
+                {t('blast.objective.bannerTitle') || 'Goals'}
+              </span>
+              {goalPreview.map((p, i) => (
+                <span
+                  key={`goal-${p.objective.type}-${i}`}
+                  dir="auto"
+                  className="font-neo-body font-bold text-sm text-neo-white text-center leading-tight animate-neo-pop"
+                  style={{ animationDelay: `${200 + i * 140}ms`, animationFillMode: 'backwards' }}
+                >
+                  {formatObjectiveLabel(p.objective, t)}
+                </span>
+              ))}
             </div>
           )}
         </AdaptiveMotion.div>

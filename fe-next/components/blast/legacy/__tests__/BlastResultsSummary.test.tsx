@@ -401,3 +401,34 @@ describe('BlastResultsSummary — neo-brutalist polish', () => {
     expect(label.className).not.toContain('text-yellow-400/80');
   });
 });
+
+describe('per-objective summary', () => {
+  const noop = () => {};
+  const finalObjectives = [
+    { objective: { type: 'clear_percent' as const, target: 90 }, current: 95, isComplete: true },
+    { objective: { type: 'word_length' as const, target: 4, minWordLength: 3 }, current: 4, isComplete: true },
+    { objective: { type: 'score_target' as const, target: 500 }, current: 320, isComplete: false },
+  ];
+
+  it('renders a ✓/✗ row per objective, filtering clear_percent', () => {
+    render(
+      <BlastResultsSummary
+        results={makeResults({ finalObjectives })}
+        t={t}
+        onPlayAgain={noop}
+        onQuit={noop}
+      />,
+    );
+    const rows = screen.getAllByTestId('blast-objective-summary-row');
+    expect(rows).toHaveLength(2); // clear_percent excluded
+    expect(rows[0].className).toContain('text-neo-lime');
+    expect(rows[1].className).not.toContain('text-neo-lime');
+  });
+
+  it('renders nothing when finalObjectives absent', () => {
+    render(
+      <BlastResultsSummary results={makeResults()} t={t} onPlayAgain={noop} onQuit={noop} />,
+    );
+    expect(screen.queryByTestId('blast-objective-summary-row')).toBeNull();
+  });
+});

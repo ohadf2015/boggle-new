@@ -8,7 +8,7 @@
 // State is owned by BlastGame and passed in via the `effects` setter bag;
 // refs are passed in so unmount-cleanup remains anchored in the parent.
 
-import { useCallback, type Dispatch, type SetStateAction, type MutableRefObject } from 'react';
+import { useCallback, useRef, type Dispatch, type SetStateAction, type MutableRefObject } from 'react';
 import { detectSpecialCombos, type SpecialCombo } from '../utils/blastCombos';
 import { diffClearedTiles } from '../utils/diffClearedTiles';
 import { detectNearMiss } from '../utils/blastNearMiss';
@@ -86,9 +86,21 @@ export function useBlastWordHandler({
   recorder,
   enableTreasureRoll = false,
 }: UseBlastWordHandlerParams) {
+  // Re-entrancy guard. handleWordAccepted is async and runs for ~1-2s (animate
+  // clear → submit → full cascade). The board disables input during that window,
+  // but the disable is React state that lags a render — a fast double-tap can
+  // fire a SECOND word before the grid goes inert. Processing it twice
+  // double-counts score/moves AND strands a letterless tile (engine refs advance
+  // twice while the overlapping cascade's grid commit is skipped). Drop any
+  // submission that arrives while one is already in flight.
+  const processingRef = useRef(false);
+
   const handleWordAccepted = useCallback(async (data: { word: string; score: number }) => {
     if (lastPathRef.current.length === 0) return;
+    if (processingRef.current) return;
+    processingRef.current = true;
 
+    try {
     const path = lastPathRef.current;
     lastPathRef.current = [];
 
@@ -285,6 +297,11 @@ export function useBlastWordHandler({
       });
     } catch {
       /* mascot is decorative — swallow */
+    }
+    } finally {
+      // Always release the guard so the next word is accepted, even if a
+      // step above threw. A stuck flag would silently freeze all input.
+      processingRef.current = false;
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [engine, runCascade, onComboDetected, sounds, sequencer, config.gridSize, t, scoreMultiplier, enableTreasureRoll]);

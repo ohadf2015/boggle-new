@@ -136,6 +136,10 @@ export interface BlastResultsData {
    *  Gates progress persistence: a wave-loss with no ad watched (and < 90% clear) must NOT
    *  save score/PB/leaderboard/XP — see BlastView.handleGameEnd save gate. */
   adContinueUsed?: boolean;
+  /** Final wave's objective progress snapshot — results screen renders a
+   *  per-objective ✓/✗ summary so the player sees exactly which goals landed.
+   *  clear_percent is filtered at render (the fail card already covers it). */
+  finalObjectives?: BlastObjectiveProgress[];
 }
 
 // ==================== Special Tile Effects ====================
