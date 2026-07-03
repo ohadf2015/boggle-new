@@ -108,6 +108,16 @@ const TAGLINES: Record<string, Record<string, string>> = {
     crossword: 'Llena la cuadrícula, pista a pista',
     practice: 'Sin reloj, solo palabras',
   },
+  ru: {
+    arena: 'Живые поединки с реальными игроками',
+    daily: 'Одна загадка. Для всех.',
+    blast: 'Комбо до взрыва',
+    connections: 'Найди скрытые связи',
+    wordCraft: 'Завоёвывай территорию словами',
+    brainGym: 'Тренируй словесный мозг',
+    crossword: 'Заполняй сетку, подсказку за подсказкой',
+    practice: 'Без времени, только слова',
+  },
 };
 
 function tagline(key: string, language: string, descKey: string): string {

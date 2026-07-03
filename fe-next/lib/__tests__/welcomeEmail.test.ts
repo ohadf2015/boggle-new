@@ -252,6 +252,12 @@ describe('sendWelcomeEmailToUser', () => {
       expect(result.language).toBe('sv');
     });
 
+    it('uses Russian locale when provided', async () => {
+      const result = await sendWelcomeEmailToUser('user-123', { locale: 'ru' });
+
+      expect(result.language).toBe('ru');
+    });
+
     it('falls back to country_code-based language when locale not provided', async () => {
       const result = await sendWelcomeEmailToUser('user-123');
 

@@ -72,6 +72,15 @@ describe('WelcomeEmail — dynamic cube-image mode grid', () => {
     expect(modes.every((m) => m.href.includes('/he/'))).toBe(true);
   });
 
+  it('renders in Russian (LTR) without throwing and links stay /ru and contains Cyrillic', async () => {
+    const { modes, html } = renderHtml('ru');
+    const out = await html;
+    expect(out).toContain(`${BASE}/ru/multiplayer`);
+    expect(modes.every((m) => m.href.includes('/ru/'))).toBe(true);
+    // Russian should contain Cyrillic characters (basic check for ж-ы-х common letters)
+    expect(/[Ѐ-ӿ]/.test(out)).toBe(true);
+  });
+
   it('never uses pure #000000 (Gmail dark-mode inverts it to white, killing the CTA)', async () => {
     // Gmail (Android) dark mode force-swaps pure #000000 → #FFFFFF. That turned
     // the lime CTA's dark text + border + hard-shadow white (unreadable on lime).

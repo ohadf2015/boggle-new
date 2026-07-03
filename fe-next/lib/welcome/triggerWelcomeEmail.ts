@@ -15,7 +15,7 @@
  * the player actually wants), which the server prefers over geo-IP country.
  */
 
-const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 const SESSION_GUARD_KEY = 'lc_welcome_email_tried';
 
 let firedThisPageLoad = false;

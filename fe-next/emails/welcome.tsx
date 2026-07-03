@@ -146,6 +146,20 @@ const COPY: Record<string, WelcomeCopy> = {
     unsubscribe: 'Cancelar suscripción',
     privacy: 'Privacidad',
   },
+  ru: {
+    heading: (n) => `Привет, ${n} 👋`,
+    intro: 'Добро пожаловать. Выбирай режим, начинай игру.',
+    videoLabel: 'Смотри в действии',
+    videoSub: '↑ вот так это работает',
+    modesHeader: 'ВЫБЕРИ БОЕВОЙ РЕЖИМ',
+    cta: 'Начинаем',
+    ps: 'Внимание: затягивает.',
+    androidLabel: 'На ходу? LexiClash и в мобильном приложении.',
+    androidCta: 'Скачай с Google Play',
+    footerReason: 'Ты только что присоединился к LexiClash.',
+    unsubscribe: 'Отписаться',
+    privacy: 'Приватность',
+  },
 };
 
 /* ───────────────────────── Subject lines ───────────────────────── */
@@ -156,6 +170,7 @@ const SUBJECTS: Record<string, (name: string) => string> = {
   sv: (n) => `Hej ${n}, kul att du hittade hit`,
   ja: (n) => `${n}さん、来てくれてうれしいです`,
   es: (n) => `Hola ${n}, qué bueno tenerte por aquí`,
+  ru: (n) => `Привет, ${n}! Рады видеть тебя`,
 };
 
 export function getWelcomeSubject(language: string, recipientName: string): string {
@@ -208,7 +223,7 @@ export default function WelcomeEmail({
   const rtl = language === 'he';
   const dir = rtl ? 'rtl' : 'ltr';
   const sh = rtl ? '-' : ''; // hard-shadow direction flips in RTL
-  const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
+  const locale = ['he', 'sv', 'ja', 'es', 'ru'].includes(language) ? language : 'en';
   const privacyUrl = `${baseUrl}/${locale}/privacy`;
   // Native Android app — defaults to the Play Store listing tagged with a
   // `welcome_email` install referrer (+ per-locale utm_content) so installs

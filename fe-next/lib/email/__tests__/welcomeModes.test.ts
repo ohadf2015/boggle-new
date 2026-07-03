@@ -52,7 +52,7 @@ describe('getWelcomeEmailModes — dynamic public mode list for the welcome emai
   });
 
   it('gives every mode a non-empty localized title and tagline', () => {
-    for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
+    for (const lang of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
       for (const m of getWelcomeEmailModes(lang, BASE)) {
         expect(m.title.trim().length).toBeGreaterThan(0);
         expect(m.tagline.trim().length).toBeGreaterThan(0);
@@ -70,7 +70,7 @@ describe('getWelcomeEmailModes — dynamic public mode list for the welcome emai
 
   it('contains no emoji characters in titles or taglines (less AI slop)', () => {
     const emoji = /\p{Extended_Pictographic}/u;
-    for (const lang of ['en', 'he', 'sv', 'ja', 'es']) {
+    for (const lang of ['en', 'he', 'sv', 'ja', 'es', 'ru']) {
       for (const m of getWelcomeEmailModes(lang, BASE)) {
         expect(emoji.test(m.title)).toBe(false);
         expect(emoji.test(m.tagline)).toBe(false);

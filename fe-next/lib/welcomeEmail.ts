@@ -30,7 +30,7 @@ export function getResendClient(): Resend | null {
   return new Resend(process.env.RESEND_API_KEY);
 }
 
-const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const SUPPORTED_LANGUAGES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
 export interface SendWelcomeEmailResult {
   sent: boolean;
@@ -48,7 +48,7 @@ export interface SendWelcomeEmailResult {
  * 3. No double-sends on reload or concurrent calls
  *
  * @param userId - Supabase auth user ID
- * @param opts.locale - Optional language override ('en'|'he'|'sv'|'ja'|'es')
+ * @param opts.locale - Optional language override ('en'|'he'|'sv'|'ja'|'es'|'ru')
  * @param opts.email - Optional email (skips auth.getUser lookup)
  * @param opts.baseUrl - Optional base URL for links (defaults to NEXT_PUBLIC_APP_URL)
  * @returns { sent: true, language } on success, { sent: false, reason } on failure
@@ -268,7 +268,7 @@ export async function sendTestWelcomeEmail(
 
   const fromEmail = process.env.RESEND_FROM_EMAIL || 'noreply@lexiclash.live';
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.lexiclash.live';
-  const locale = ['he', 'sv', 'ja', 'es'].includes(language) ? language : 'en';
+  const locale = ['he', 'sv', 'ja', 'es', 'ru'].includes(language) ? language : 'en';
 
   try {
     const subject = getWelcomeSubject(language, recipientName);
