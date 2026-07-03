@@ -21,6 +21,10 @@ const sb = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE,
 );
 
+// Fail-closed quality gate (mirrors Word Hunt daily): a row with NULL
+// quality_score never ships — .gte() excludes NULLs in PostgREST.
+const QUALITY_GATE = 60;
+
 const j = (v) => JSON.stringify(v);
 
 for (const locale of locales) {
@@ -29,6 +33,7 @@ for (const locale of locales) {
     .select('id,word1,bridge,word2,accepted_answers,hint,examples,difficulty,source')
     .eq('locale', locale)
     .eq('is_active', true)
+    .gte('quality_score', QUALITY_GATE)
     .order('id', { ascending: true });
   if (error) {
     console.error(locale, 'ERR', error.message);

@@ -21,13 +21,26 @@ const ENGLISH_LETTERS = Array.from({ length: 26 }, (_, i) =>
   String.fromCharCode(65 + i),
 );
 
+/**
+ * 32 Cyrillic base letters, А → Я without Ё. Like Hebrew sofit forms, Ё is a
+ * render-time variant: canonicalize() NFD-folds ё→е on both sides, so the
+ * player types Е and ё-bridges still match.
+ */
+const RUSSIAN_LETTERS = [
+  'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ж', 'З', 'И', 'Й', 'К',
+  'Л', 'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х',
+  'Ц', 'Ч', 'Ш', 'Щ', 'Ъ', 'Ы', 'Ь', 'Э', 'Ю', 'Я',
+];
+
 /** Upper bound on a guess — longest curated bridge is well under this; guards
  *  against a stuck-finger runaway. */
 export const MAX_GUESS_LEN = 12;
 
 /** Letters to render on the keyboard for a given locale. */
 export function getKeyboardLetters(locale: string): string[] {
-  return locale === 'he' ? HEBREW_LETTERS : ENGLISH_LETTERS;
+  if (locale === 'he') return HEBREW_LETTERS;
+  if (locale === 'ru') return RUSSIAN_LETTERS;
+  return ENGLISH_LETTERS;
 }
 
 /**

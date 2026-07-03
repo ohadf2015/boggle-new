@@ -7,8 +7,23 @@ describe('localeNeedsIME — which locales need a native IME instead of on-scree
   it('Japanese needs an IME (kanji cannot live on a finite on-screen keyboard)', () => {
     expect(localeNeedsIME('ja')).toBe(true);
   });
-  it('Latin/Hebrew locales do NOT need an IME (on-screen keyboard suffices)', () => {
-    for (const l of ['en', 'he', 'es', 'sv']) expect(localeNeedsIME(l)).toBe(false);
+  it('Latin/Hebrew/Cyrillic locales do NOT need an IME (on-screen keyboard suffices)', () => {
+    for (const l of ['en', 'he', 'es', 'sv', 'ru']) expect(localeNeedsIME(l)).toBe(false);
+  });
+});
+
+describe('Russian on-screen keyboard', () => {
+  it('exposes the 32 Cyrillic base letters (ё folds to е in matching, like sofit)', () => {
+    const letters = getKeyboardLetters('ru');
+    expect(letters).toHaveLength(32);
+    expect(letters).toContain('А');
+    expect(letters).toContain('Я');
+    expect(letters).not.toContain('Ё');
+  });
+
+  it('checkGuess folds ё→е so the base keyboard can match ё-bridges', () => {
+    const ru: ConnectionPuzzle = { id: 'ru-t-1', word1: 'ТЁПЛЫЙ', bridge: 'МЁД', word2: 'ЛИПОВЫЙ', difficulty: 'easy' };
+    expect(checkGuess('МЕД', ru).correct).toBe(true);
   });
 });
 

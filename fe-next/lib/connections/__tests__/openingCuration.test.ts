@@ -10,7 +10,7 @@ import { getPuzzleForLevel, getPuzzlesForLocale, getTotalLevels, CURATED_OPENING
  * curated locale. This suite pins that contract.
  */
 describe('curated opening — leads the level path with the good puzzles', () => {
-  for (const locale of ['en', 'he'] as const) {
+  for (const locale of ['en', 'he', 'es', 'sv', 'ja', 'ru'] as const) {
     const opening = CURATED_OPENING[locale] ?? [];
 
     it(`${locale}: defines a non-trivial curated opening`, () => {
@@ -51,16 +51,14 @@ describe('curated opening — leads the level path with the good puzzles', () =>
   }
 
   it('curated opening is a pure reordering — no puzzle added or dropped', () => {
-    for (const locale of ['en', 'he'] as const) {
+    for (const locale of ['en', 'he', 'es', 'sv', 'ja', 'ru'] as const) {
       expect(getTotalLevels(locale)).toBe(getPuzzlesForLocale(locale).length);
     }
   });
 
-  it('locales with no curated entry are unaffected (still resolve a level-1 puzzle)', () => {
-    // sv/ja/es deliberately have no curated opening — they fall through to the
-    // existing interleave unchanged.
-    for (const locale of ['sv', 'es', 'ja'] as const) {
-      expect(CURATED_OPENING[locale]).toBeUndefined();
+  it('every pooled locale now has a curated opening (2026-07-03 sweep)', () => {
+    for (const locale of ['en', 'he', 'es', 'sv', 'ja', 'ru'] as const) {
+      expect(CURATED_OPENING[locale]?.length ?? 0).toBeGreaterThanOrEqual(8);
       expect(getPuzzleForLevel(locale, 1)).toBeTruthy();
     }
   });

@@ -5,6 +5,7 @@ import { HE_PUZZLES } from './generated/he.generated';
 import { ES_PUZZLES } from './generated/es.generated';
 import { SV_PUZZLES } from './generated/sv.generated';
 import { JA_PUZZLES } from './generated/ja.generated';
+import { RU_PUZZLES } from './generated/ru.generated';
 
 /**
  * Locales with a materialized native pool. Authored in the DB
@@ -19,6 +20,7 @@ const PUZZLES_BY_LOCALE: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = {
   es: ES_PUZZLES,
   sv: SV_PUZZLES,
   ja: JA_PUZZLES,
+  ru: RU_PUZZLES,
 };
 
 /**
@@ -108,25 +110,69 @@ function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
  * "head" of state) and is flagged for native review.
  */
 export const CURATED_OPENING: Partial<Record<PuzzleLocale, readonly string[]>> = {
+  // Rebuilt 2026-07-03 from the dual-judge sweep: only judge-approved (≥80)
+  // easy puzzles; old entries the sweep re-labeled or deactivated were dropped.
   en: [
-    'en-v-038', // RAIN · BOW · TIE       — rainbow / bow tie
     'en-v-035', // PINE · APPLE · SAUCE   — pineapple / applesauce
-    'en-v-040', // SEA · HORSE · POWER    — seahorse / horsepower
+    'en-q-010', // POP · CORN · FIELD     — popcorn / cornfield
     'en-v-036', // BUTTER · CUP · CAKE    — buttercup / cupcake
-    'en-v-008', // JIG · SAW · DUST       — jigsaw / sawdust
-    'en-v-053', // POT · BELLY · LAUGH    — potbelly / belly laugh
+    'en-q-006', // SAIL · BOAT · HOUSE    — sailboat / boathouse
     'en-v-037', // COW · BOY · FRIEND     — cowboy / boyfriend
-    'en-v-010', // FINGER · NAIL · POLISH — fingernail / nail polish
+    'en-q-008', // ARM · CHAIR · MAN      — armchair / chairman
+    'en-q-005', // HEAD · BAND · STAND    — headband / bandstand
+    'en-q-004', // EYE · BALL · PARK      — eyeball / ballpark
   ],
   he: [
     'he-e-034', // כאב · ראש · ממשלה     — כאב ראש (headache) / ראש ממשלה (PM)
-    'he-h-028', // שלט · רחוק · מאוד     — שלט רחוק (remote) / רחוק מאוד (far)
+    'he-m-079', // פרח · בר · מצווה      — פרח בר (wildflower) / בר מצווה — meaning pivot
     'he-h-020', // בית · ספר · תורה      — בית ספר (school) / ספר תורה (scroll)
-    'he-e-081', // אמצע · יום · הולדת    — אמצע יום (midday) / יום הולדת (birthday)
+    'he-o-002', // עץ · תפוח · אדום      — עץ תפוח / תפוח אדום
     'he-h-022', // מי · ברז · מים        — מי ברז (tap water) / ברז מים
-    'he-e-016', // גלידת · שמנת · חמוצה  — גלידת שמנת (cream) / שמנת חמוצה (sour cream)
-    'he-e-070', // טחנת · רוח · קלה      — טחנת רוח (windmill) / רוח קלה (light breeze)
-    'he-h-041', // מכונת · כביסה · ידנית — מכונת כביסה (machine) / כביסה ידנית (hand-wash)
+    'he-e-001', // עוגת · שוקולד · חם    — עוגת שוקולד / שוקולד חם
+    'he-m-093', // חדר · שינה · עמוקה    — חדר שינה / שינה עמוקה
+    'he-h-084', // דלת · כניסה · ראשית   — דלת כניסה / כניסה ראשית
+  ],
+  // es/sv/ja/ru: top judge-scored (≥75) concrete easy puzzles, distinct bridges
+  // (2026-07-03 dual-judge sweep — see docs/superpowers/specs/2026-07-03-connections-quality-and-pyramid-design.md).
+  es: [
+    'es-e-001', // pasa · TIEMPO · libre     — pasatiempo / tiempo libre
+    'es-e-002', // cumple · AÑOS · luz       — cumpleaños / años luz
+    'es-e-009', // sobre · MESA · redonda    — sobremesa / mesa redonda
+    'es-h-002', // para · SOL · naciente     — parasol / sol naciente
+    'es-e-003', // video · JUEGO · mesa      — videojuego / juego de mesa
+    'es-e-006', // ferro · CARRIL · bici     — ferrocarril / carril bici
+    'es-h-009', // lava · PLATOS · hondos    — lavaplatos / platos hondos
+    'es-h-008', // traba · LENGUAS · vivas   — trabalenguas / lenguas vivas
+  ],
+  sv: [
+    'sv-e-001', // fot · BOLL · plan         — fotboll / bollplan
+    'sv-e-008', // sjuk · HUS · läkare       — sjukhus / husläkare
+    'sv-h-022', // barn · BOK · hylla        — barnbok / bokhylla
+    'sv-h-024', // köks · KNIV · ställ       — kökskniv / knivställ
+    'sv-h-028', // guld · RING · finger      — guldring / ringfinger
+    'sv-h-033', // tåg · BILJETT · kontroll  — tågbiljett / biljettkontroll
+    'sv-h-034', // is · GLASS · pinne        — isglass / glasspinne
+    'sv-h-036', // jul · GRAN · fot          — julgran / granfot
+  ],
+  ja: [
+    'ja-m-003', // 外 · 国 · 語              — 外国 / 国語
+    'ja-e-004', // 学 · 校 · 長              — 学校 / 校長
+    'ja-h-004', // 会 · 社 · 員              — 会社 / 社員
+    'ja-h-047', // 何 · 時 · 間              — 何時 / 時間
+    'ja-h-033', // 都 · 市 · 場              — 都市 / 市場
+    'ja-h-045', // 注 · 目 · 的              — 注目 / 目的
+    'ja-v-002', // 七 · 夕 · 日              — 七夕 / 夕日
+    'ja-v-005', // 団 · 子 · 供              — 団子 / 子供
+  ],
+  ru: [
+    'ru-a-004', // КРУГЛЫЙ · СТОЛ · ПЕРЕГОВОРОВ — круглый стол / стол переговоров
+    'ru-a-012', // ЗОЛОТОЙ · ЗУБ · МУДРОСТИ     — золотой зуб / зуб мудрости
+    'ru-a-014', // ФУТБОЛЬНОЕ · ПОЛЕ · ЧУДЕС    — футбольное поле / поле чудес
+    'ru-a-016', // КРАСНАЯ · КНИГА · РЕКОРДОВ   — красная книга / книга рекордов
+    'ru-a-011', // АНГЛИЙСКИЙ · ЯЗЫК · ЖЕСТОВ   — английский язык / язык жестов
+    'ru-a-007', // ВОЛШЕБНАЯ · ПАЛОЧКА · ВЫРУЧАЛОЧКА — волшебная палочка / палочка-выручалочка
+    'ru-a-003', // ВЫСШАЯ · ШКОЛА · ЖИЗНИ       — высшая школа / школа жизни
+    'ru-a-026', // НОВЫЙ · ГОД · СВИНЬИ         — новый год / год свиньи
   ],
 };
 
