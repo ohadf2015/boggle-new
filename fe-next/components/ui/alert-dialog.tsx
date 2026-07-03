@@ -31,7 +31,14 @@ const AlertDialogContent = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <AlertDialogPortal>
     <AlertDialogOverlay />
-    <div className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none">
+    {/* Portaled fixed layer: it escapes <body>'s overflow clip (containing block
+        is the viewport) and html is `overflow: visible`, so any child wider than
+        the viewport would add document-level horizontal scroll — which under RTL
+        anchors the page to the right and slides the whole app off-screen behind a
+        black gap. Clip x and bind to 100vw here so the modal can never expand the
+        document width. overflow-x:hidden computes overflow-y to auto, so tall
+        dialogs still scroll vertically. */}
+    <div className="fixed inset-0 z-[101] flex items-center justify-center pointer-events-none overflow-x-hidden max-w-[100vw]">
     <AlertDialogPrimitive.Content
       ref={ref}
       className={cn(
