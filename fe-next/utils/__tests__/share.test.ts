@@ -39,3 +39,26 @@ describe('getJoinUrl', () => {
     expect(url).not.toContain('host=');
   });
 });
+
+describe('getBragShareUrl', () => {
+  beforeEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: { origin: 'https://lexiclash.live', pathname: '/en/multiplayer' },
+      writable: true,
+    });
+  });
+
+  it('returns a live room join link when the room is still open', async () => {
+    const { getBragShareUrl } = await import('@/utils/share');
+    const url = getBragShareUrl('ABC123');
+    const parsed = new URL(url);
+    expect(parsed.searchParams.get('room')).toBe('ABC123');
+    expect(parsed.searchParams.get('utm_source')).toBe('brag_card');
+  });
+
+  it('falls back to the homepage when there is no game code', async () => {
+    const { getBragShareUrl } = await import('@/utils/share');
+    expect(getBragShareUrl(undefined)).toBe('https://lexiclash.live');
+    expect(getBragShareUrl('')).toBe('https://lexiclash.live');
+  });
+});

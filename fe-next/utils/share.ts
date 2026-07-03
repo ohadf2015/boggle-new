@@ -66,6 +66,17 @@ export const getJoinUrl = (gameCode: string, utmSource?: string, hostName?: stri
 };
 
 /**
+ * Share URL for the MP results brag card. The room outlives the game (it's
+ * held open for the rematch), so while a code exists the card carries a LIVE
+ * join link — a friend who taps it lands in the room for the next round.
+ * Without a code (or during SSR) it falls back to the homepage.
+ */
+export const getBragShareUrl = (gameCode?: string): string => {
+  const joinUrl = gameCode ? getJoinUrl(gameCode, 'brag_card') : '';
+  return joinUrl || 'https://lexiclash.live';
+};
+
+/**
  * Copy the join URL to clipboard
  * @param gameCode - The game code
  * @param t - Translation function (optional for backward compatibility)

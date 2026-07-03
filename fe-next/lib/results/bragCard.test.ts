@@ -144,3 +144,44 @@ describe('deriveBragCardData — accent + RTL', () => {
     expect(deriveBragCardData({ ...base, locale: 'en' }).isRTL).toBe(false);
   });
 });
+
+describe('deriveBragShareText', () => {
+  const base = {
+    gameMode: 'classic',
+    isWinner: true,
+    rank: 1,
+    playerCount: 2,
+    score: 312,
+    wordsFound: 14,
+    opponentName: 'Alice',
+    opponentScore: 187,
+    locale: 'en',
+  } as BragCardInput;
+
+  it('boasts the win over the named rival with the scoreline', async () => {
+    const { deriveBragShareText, deriveBragCardData } = await import('./bragCard');
+    const out = deriveBragShareText(deriveBragCardData(base), 312);
+    expect(out.key).toBe('brag.shareTextWin');
+    expect(out.params).toEqual({ name: 'Alice', score: 312, rivalScore: 187 });
+  });
+
+  it('frames a loss as a call for backup against the winner', async () => {
+    const { deriveBragShareText, deriveBragCardData } = await import('./bragCard');
+    const out = deriveBragShareText(
+      deriveBragCardData({ ...base, isWinner: false, rank: 3, playerCount: 4 }),
+      120
+    );
+    expect(out.key).toBe('brag.shareTextLoss');
+    expect(out.params).toEqual({ name: 'Alice', score: 120, rivalScore: 187 });
+  });
+
+  it('falls back to a score-only boast when no rival is known', async () => {
+    const { deriveBragShareText, deriveBragCardData } = await import('./bragCard');
+    const out = deriveBragShareText(
+      deriveBragCardData({ ...base, opponentName: undefined, opponentScore: undefined }),
+      312
+    );
+    expect(out.key).toBe('brag.shareTextSolo');
+    expect(out.params).toEqual({ score: 312 });
+  });
+});

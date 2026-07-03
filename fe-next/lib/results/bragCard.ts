@@ -129,3 +129,22 @@ export function deriveBragCardData(input: BragCardInput): BragCardData {
 
   return { outcome, headlineKey, headlineParams, hero, accent, isRTL, rival, othersCount };
 }
+
+/**
+ * Share-sheet boast for the brag card's native Share action. Unlike the card
+ * (pixels carry the numbers), share TEXT travels without the screenshot, so it
+ * carries the scoreline itself: win → taunt the beaten rival, loss → recruit
+ * backup against the winner, no known rival → plain score flex.
+ */
+export function deriveBragShareText(
+  data: BragCardData,
+  score: number
+): { key: string; params: Record<string, string | number> } {
+  if (data.rival) {
+    return {
+      key: data.outcome === 'non_winner' ? 'brag.shareTextLoss' : 'brag.shareTextWin',
+      params: { name: data.rival.name, score, rivalScore: data.rival.score },
+    };
+  }
+  return { key: 'brag.shareTextSolo', params: { score } };
+}

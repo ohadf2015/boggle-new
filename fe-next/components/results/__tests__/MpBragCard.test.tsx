@@ -4,7 +4,7 @@
  * only shows for a distinctive flex (combo/longest, not plain points), and the
  * "+N others" chip appears only when the match had more than the two shown.
  */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import MpBragCard, { type BragPlayer } from '../MpBragCard';
 import { deriveBragCardData, type BragCardInput } from '@/lib/results/bragCard';
@@ -109,5 +109,70 @@ describe('MpBragCard — share action', () => {
     );
     fireEvent.click(screen.getByTestId('brag-copy-link'));
     await waitFor(() => expect(onCopyLink).toHaveBeenCalledOnce());
+  });
+});
+
+describe('MpBragCard — native share', () => {
+  const dataWithRival = deriveBragCardData(baseInput);
+
+  function renderWithShare(onNativeShare = vi.fn()) {
+    render(
+      <MpBragCard
+        data={dataWithRival}
+        current={you}
+        opponent={rival}
+        modeLabel="CLASSIC"
+        shareUrl="https://lexiclash.live/en?room=ABC123"
+        shareText="I just beat Alice 312–187"
+        onNativeShare={onNativeShare}
+        t={t}
+      />
+    );
+    return onNativeShare;
+  }
+
+  afterEach(() => {
+     
+    delete (navigator as any).share;
+  });
+
+  it('shows the share button when the Web Share API is available', async () => {
+    Object.defineProperty(navigator, 'share', {
+      value: vi.fn().mockResolvedValue(undefined),
+      configurable: true,
+      writable: true,
+    });
+    renderWithShare();
+    await waitFor(() => expect(screen.getByTestId('brag-native-share')).toBeTruthy());
+  });
+
+  it('hides the share button when the Web Share API is missing', async () => {
+    renderWithShare();
+    // printed link still there; no native share affordance
+    expect(screen.getByTestId('brag-copy-link')).toBeTruthy();
+    expect(screen.queryByTestId('brag-native-share')).toBeNull();
+  });
+
+  it('shares boast text + join URL and reports success', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true, writable: true });
+    const onNativeShare = renderWithShare();
+    const btn = await waitFor(() => screen.getByTestId('brag-native-share'));
+    fireEvent.click(btn);
+    await waitFor(() => expect(onNativeShare).toHaveBeenCalledOnce());
+    expect(share).toHaveBeenCalledWith({
+      text: 'I just beat Alice 312–187',
+      url: 'https://lexiclash.live/en?room=ABC123',
+    });
+  });
+
+  it('stays silent when the player cancels the share sheet', async () => {
+    const share = vi.fn().mockRejectedValue(new DOMException('cancel', 'AbortError'));
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true, writable: true });
+    const onNativeShare = renderWithShare();
+    const btn = await waitFor(() => screen.getByTestId('brag-native-share'));
+    fireEvent.click(btn);
+    await waitFor(() => expect(share).toHaveBeenCalledOnce());
+    expect(onNativeShare).not.toHaveBeenCalled();
   });
 });

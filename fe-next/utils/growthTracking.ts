@@ -227,8 +227,12 @@ export type GrowthEvent =
   //   mp_brag_card_copy_link: player tapped the explicit Copy-link affordance on the
   //     card. Props: { gameMode, outcome, language }. The one directly-measurable
   //     share action; best signal that an impression converted to share intent.
+  //   mp_brag_card_native_share: player COMPLETED the Web Share sheet on the card
+  //     (fires on success only, not cancel). Props: { gameMode, outcome, language,
+  //     hasRoomLink }.
   | 'mp_brag_card_viewed'
-  | 'mp_brag_card_copy_link';
+  | 'mp_brag_card_copy_link'
+  | 'mp_brag_card_native_share';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

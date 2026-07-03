@@ -30,7 +30,8 @@ import { NearRankTeaser } from '@/components/multiplayer/NearRankTeaser';
 import type { RankTier } from '@/shared/utils/eloRating';
 import { ShareButton } from '@/components/results/ShareButton';
 import MpBragCard from '@/components/results/MpBragCard';
-import { deriveBragCardData } from '@/lib/results/bragCard';
+import { deriveBragCardData, deriveBragShareText } from '@/lib/results/bragCard';
+import { getBragShareUrl, trackShareCompleted } from '@/utils/share';
 import GameFeedback from '@/components/feedback/GameFeedback';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -471,14 +472,31 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           current={bragData.current}
           opponent={bragData.opponent}
           modeLabel={BRAG_MODE_LABEL[gameMode ?? ''] ?? 'MULTIPLAYER'}
-          shareUrl="https://lexiclash.live"
+          // The room stays open through results (held for the rematch), so the
+          // card carries a LIVE join link — a shared link lands the friend in
+          // the room for the next round, not on the homepage.
+          shareUrl={getBragShareUrl(gameCode)}
+          shareText={(() => {
+            const { key, params } = deriveBragShareText(bragData.data, bragData.current.score);
+            return t(key, params);
+          })()}
           onCopyLink={() =>
             trackGrowthEvent('mp_brag_card_copy_link', {
               gameMode: gameMode ?? 'unknown',
               outcome: bragData.data.outcome,
               language,
+              hasRoomLink: !!gameCode,
             })
           }
+          onNativeShare={() => {
+            trackGrowthEvent('mp_brag_card_native_share', {
+              gameMode: gameMode ?? 'unknown',
+              outcome: bragData.data.outcome,
+              language,
+              hasRoomLink: !!gameCode,
+            });
+            trackShareCompleted('web_share_api', { surface: 'mp_brag_card' });
+          }}
           t={t}
         />
       )}

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { memo, useCallback, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import { Share2 } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import type { Avatar as AvatarType } from '@/types';
 import { cn } from '@/lib/utils';
@@ -25,8 +26,12 @@ interface MpBragCardProps {
   modeLabel: string;
   /** The play/challenge URL printed on the card and copied by the Copy-link tap. */
   shareUrl: string;
+  /** Localized boast for the native share sheet. Without it the Share button stays hidden. */
+  shareText?: string;
   /** Fires when the player taps Copy-link (the one directly-measurable share action). */
   onCopyLink?: () => void;
+  /** Fires after a SUCCESSFUL native share (sheet resolved, not cancelled). */
+  onNativeShare?: () => void;
   t: TFunction;
   className?: string;
 }
@@ -59,9 +64,15 @@ function pickMood(pool: AvatarMood[], seed: string): AvatarMood {
  * URL lives on the card. People share "I beat so-and-so", not a score, so EVERY outcome
  * names a rival: you won → the runner-up; you lost → the winner you're coming back for.
  */
-function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, onCopyLink, t, className }: MpBragCardProps) {
+function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, shareText, onCopyLink, onNativeShare, t, className }: MpBragCardProps) {
   const a = ACCENT[data.accent];
   const [copied, setCopied] = useState(false);
+  // Web Share API support is a client-only fact — resolve after mount so the
+  // server render (no navigator) and first client paint agree.
+  const [canNativeShare, setCanNativeShare] = useState(false);
+  useEffect(() => {
+    setCanNativeShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function');
+  }, []);
 
   const youLost = data.outcome === 'non_winner';
   const rival = data.rival;
@@ -88,6 +99,16 @@ function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, onC
     }
     onCopyLink?.();
   }, [shareUrl, onCopyLink]);
+
+  const handleNativeShare = useCallback(async () => {
+    if (!shareText) return;
+    try {
+      await navigator.share({ text: shareText, url: shareUrl });
+      onNativeShare?.();
+    } catch {
+      /* cancelled the sheet (AbortError) or share blocked — nothing to report */
+    }
+  }, [shareText, shareUrl, onNativeShare]);
 
   return (
     <div
@@ -188,17 +209,36 @@ function MpBragCardComponent({ data, current, opponent, modeLabel, shareUrl, onC
         {/* printed link — the viral loop carrier (a screenshot has no share-text,
             so the URL must live in the pixels). Tappable = the one measurable
             share action (Copy link). */}
-        <button
-          type="button"
-          onClick={handleCopy}
-          data-testid="brag-copy-link"
-          className="w-full rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 text-center transition active:translate-y-px"
-        >
-          <div className={cn('font-neo-display text-[4cqw] font-extrabold', a.text)}>lexiclash.live</div>
-          <div className="font-neo-body text-[2.4cqw] font-semibold text-neo-white/60">
-            {copied ? t('brag.copied') : t('brag.cta')}
-          </div>
-        </button>
+        <div className="flex w-full items-stretch gap-2">
+          <button
+            type="button"
+            onClick={handleCopy}
+            data-testid="brag-copy-link"
+            className="min-w-0 flex-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 text-center transition active:translate-y-px"
+          >
+            <div className={cn('font-neo-display text-[4cqw] font-extrabold', a.text)}>lexiclash.live</div>
+            <div className="font-neo-body text-[2.4cqw] font-semibold text-neo-white/60">
+              {copied ? t('brag.copied') : t('brag.cta')}
+            </div>
+          </button>
+          {canNativeShare && shareText && (
+            <button
+              type="button"
+              onClick={handleNativeShare}
+              data-testid="brag-native-share"
+              aria-label={t('brag.share')}
+              className={cn(
+                'flex shrink-0 flex-col items-center justify-center gap-0.5 rounded-neo border-neo border-black px-3 shadow-hard transition active:translate-y-px',
+                a.bg
+              )}
+            >
+              <Share2 className={cn('h-[4.5cqw] min-h-4 w-[4.5cqw] min-w-4', a.on)} aria-hidden />
+              <span className={cn('font-neo-body text-[2.2cqw] font-bold uppercase', a.on)}>
+                {t('brag.share')}
+              </span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* screenshot hint (sits OUTSIDE the brag frame visually via muted strip) */}
