@@ -255,6 +255,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
         sv: `${baseUrl}/sv/daily`,
         ja: `${baseUrl}/ja/daily`,
         es: `${baseUrl}/es/daily`,
+        ru: `${baseUrl}/ru/daily`,
       },
     },
     openGraph: {

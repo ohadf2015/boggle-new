@@ -52,6 +52,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         sv: `${BASE_URL}/sv/word-craft-game`,
         ja: `${BASE_URL}/ja/word-craft-game`,
         es: `${BASE_URL}/es/word-craft-game`,
+        ru: `${BASE_URL}/ru/word-craft-game`,
       },
     },
     // English is the indexed canonical; localized variants stay crawlable but

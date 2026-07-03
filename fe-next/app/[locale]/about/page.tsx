@@ -55,6 +55,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         sv: 'https://www.lexiclash.live/sv/about',
         ja: 'https://www.lexiclash.live/ja/about',
         es: 'https://www.lexiclash.live/es/about',
+        ru: 'https://www.lexiclash.live/ru/about',
         'en-IL': 'https://www.lexiclash.live/en/about',
         'he-IL': 'https://www.lexiclash.live/he/about',
         'en-US': 'https://www.lexiclash.live/en/about',
@@ -71,6 +72,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         'en-AU': 'https://www.lexiclash.live/en/about',
         'es-AR': 'https://www.lexiclash.live/es/about',
         'es-CO': 'https://www.lexiclash.live/es/about',
+        'ru-RU': 'https://www.lexiclash.live/ru/about',
       },
     },
   };

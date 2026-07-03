@@ -75,6 +75,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
                 sv: `${SITE_URL}/sv/about/ohad-fisher`,
                 ja: `${SITE_URL}/ja/about/ohad-fisher`,
                 es: `${SITE_URL}/es/about/ohad-fisher`,
+                ru: `${SITE_URL}/ru/about/ohad-fisher`,
             },
         },
         robots: isEnglish ? { index: true, follow: true } : { index: false, follow: true },

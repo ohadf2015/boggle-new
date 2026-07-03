@@ -182,6 +182,8 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
                 sv: 'https://www.lexiclash.live/sv',
                 ja: 'https://www.lexiclash.live/ja',
                 es: 'https://www.lexiclash.live/es',
+                ru: 'https://www.lexiclash.live/ru',
+                'ru-RU': 'https://www.lexiclash.live/ru',
                 'en-IL': 'https://www.lexiclash.live/en',
                 'he-IL': 'https://www.lexiclash.live/he',
                 'en-US': 'https://www.lexiclash.live/en',

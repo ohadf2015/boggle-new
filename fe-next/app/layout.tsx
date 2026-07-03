@@ -23,6 +23,7 @@ export const metadata: Metadata = {
             sv: 'https://www.lexiclash.live/sv',
             ja: 'https://www.lexiclash.live/ja',
             es: 'https://www.lexiclash.live/es',
+            ru: 'https://www.lexiclash.live/ru',
         },
     },
     title: {

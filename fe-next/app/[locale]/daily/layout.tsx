@@ -51,6 +51,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         sv: 'https://www.lexiclash.live/sv/daily',
         ja: 'https://www.lexiclash.live/ja/daily',
         es: 'https://www.lexiclash.live/es/daily',
+        ru: 'https://www.lexiclash.live/ru/daily',
         'en-IL': 'https://www.lexiclash.live/en/daily',
         'he-IL': 'https://www.lexiclash.live/he/daily',
         'en-US': 'https://www.lexiclash.live/en/daily',
@@ -67,6 +68,7 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         'en-AU': 'https://www.lexiclash.live/en/daily',
         'es-AR': 'https://www.lexiclash.live/es/daily',
         'es-CO': 'https://www.lexiclash.live/es/daily',
+        'ru-RU': 'https://www.lexiclash.live/ru/daily',
       },
     },
     robots: {
