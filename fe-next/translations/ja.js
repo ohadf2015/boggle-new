@@ -12394,9 +12394,8 @@ const ja = {
     "screenshotHint": "スクショして自慢",
     "others": "+{count}人",
     "share": "シェア",
-    "shareTextWin": "LexiClashで{name}に{score}–{rivalScore}で勝った😤 次は誰？",
-    "shareTextLoss": "LexiClashで{name}に{rivalScore}–{score}で負けた…リベンジに力を貸して！",
-    "shareTextSolo": "LexiClashで{score}点獲得😤 超えられる？"
+    "shareTextVs": "⚔️ {score}–{rivalScore} vs {name} — LexiClash",
+    "shareTextSolo": "⚔️ {score}点 — LexiClash"
   },
   "shareResult": {
     "singleplayer": "LexiClash ソロ",

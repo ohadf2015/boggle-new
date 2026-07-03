@@ -12893,9 +12893,8 @@ const he = {
     "screenshotHint": "צלמו מסך והשוויצו",
     "others": "+{count} עוד",
     "share": "שיתוף",
-    "shareTextWin": "ניצחתי את {name} {score}–{rivalScore} בלקסיקלאש 😤 מי הבא בתור?",
-    "shareTextLoss": "הפסדתי ל־{name} {rivalScore}–{score} בלקסיקלאש. חייבים תגבורת — בואו!",
-    "shareTextSolo": "עשיתי {score} נקודות בלקסיקלאש 😤 נסו לעבור אותי"
+    "shareTextVs": "⚔️ {score}–{rivalScore} מול {name} — LexiClash",
+    "shareTextSolo": "⚔️ {score} נק' — LexiClash"
   },
   "shareResult": {
     "singleplayer": "LexiClash סולו",

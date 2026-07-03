@@ -158,24 +158,24 @@ describe('deriveBragShareText', () => {
     locale: 'en',
   } as BragCardInput;
 
-  it('boasts the win over the named rival with the scoreline', async () => {
+  it('emits a neutral factual scoreline against the named rival (your score first)', async () => {
     const { deriveBragShareText, deriveBragCardData } = await import('./bragCard');
     const out = deriveBragShareText(deriveBragCardData(base), 312);
-    expect(out.key).toBe('brag.shareTextWin');
+    expect(out.key).toBe('brag.shareTextVs');
     expect(out.params).toEqual({ name: 'Alice', score: 312, rivalScore: 187 });
   });
 
-  it('frames a loss as a call for backup against the winner', async () => {
+  it('keeps YOUR score first on a loss too — the numbers tell the story', async () => {
     const { deriveBragShareText, deriveBragCardData } = await import('./bragCard');
     const out = deriveBragShareText(
       deriveBragCardData({ ...base, isWinner: false, rank: 3, playerCount: 4 }),
       120
     );
-    expect(out.key).toBe('brag.shareTextLoss');
+    expect(out.key).toBe('brag.shareTextVs');
     expect(out.params).toEqual({ name: 'Alice', score: 120, rivalScore: 187 });
   });
 
-  it('falls back to a score-only boast when no rival is known', async () => {
+  it('falls back to a score-only line when no rival is known', async () => {
     const { deriveBragShareText, deriveBragCardData } = await import('./bragCard');
     const out = deriveBragShareText(
       deriveBragCardData({ ...base, opponentName: undefined, opponentScore: undefined }),

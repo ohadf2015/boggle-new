@@ -12476,9 +12476,8 @@ const es = {
     "screenshotHint": "Captura y presume",
     "others": "+{count} MÁS",
     "share": "Compartir",
-    "shareTextWin": "Acabo de ganarle a {name} {score}–{rivalScore} en LexiClash 😤 ¿Quién sigue?",
-    "shareTextLoss": "{name} me ganó {rivalScore}–{score} en LexiClash. Necesito refuerzos, ¡métete!",
-    "shareTextSolo": "Hice {score} puntos en LexiClash 😤 A ver si lo superas."
+    "shareTextVs": "⚔️ {score}–{rivalScore} vs {name} — LexiClash",
+    "shareTextSolo": "⚔️ {score} pts — LexiClash"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

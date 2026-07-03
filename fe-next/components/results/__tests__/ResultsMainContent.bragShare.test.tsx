@@ -90,7 +90,7 @@ describe('ResultsMainContent — brag card share wiring', () => {
     render(<ResultsMainContent {...baseProps} gameCode="ABC123" />);
     const props = bragProps.mock.calls.at(-1)?.[0];
     // t() echoes the key in this harness — win vs the named rival.
-    expect(props.shareText).toBe('brag.shareTextWin');
+    expect(props.shareText).toBe('brag.shareTextVs');
   });
 
   it('tracks the native share as a growth event + unified share funnel', () => {

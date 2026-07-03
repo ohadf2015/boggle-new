@@ -12331,9 +12331,8 @@ const en = {
     "screenshotHint": "Screenshot the flex",
     "others": "+{count} others",
     "share": "Share",
-    "shareTextWin": "Just beat {name} {score}–{rivalScore} in LexiClash 😤 Who's next?",
-    "shareTextLoss": "{name} got me {rivalScore}–{score} in LexiClash. I need backup — get in here!",
-    "shareTextSolo": "Scored {score} in LexiClash 😤 Beat that."
+    "shareTextVs": "⚔️ {score}–{rivalScore} vs {name} — LexiClash",
+    "shareTextSolo": "⚔️ {score} pts — LexiClash"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

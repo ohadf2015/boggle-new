@@ -12558,9 +12558,8 @@ const sv = {
     "screenshotHint": "Skärmdumpa skrytet",
     "others": "+{count} FLER",
     "share": "Dela",
-    "shareTextWin": "Slog precis {name} {score}–{rivalScore} i LexiClash 😤 Vem står på tur?",
-    "shareTextLoss": "{name} slog mig {rivalScore}–{score} i LexiClash. Jag behöver förstärkning — häng med!",
-    "shareTextSolo": "Fick {score} poäng i LexiClash 😤 Slå det om du kan."
+    "shareTextVs": "⚔️ {score}–{rivalScore} mot {name} — LexiClash",
+    "shareTextSolo": "⚔️ {score} p — LexiClash"
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

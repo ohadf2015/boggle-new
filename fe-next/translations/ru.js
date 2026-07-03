@@ -9559,9 +9559,8 @@ const ru = {
     "screenshotHint": "Заскринь и хвастайся",
     "others": "+{count} других",
     "share": "Поделиться",
-    "shareTextWin": "Победа над {name} — {score}–{rivalScore} в LexiClash 😤 Кто следующий?",
-    "shareTextLoss": "{name} впереди — {rivalScore}–{score} в LexiClash. Нужна подмога, заходи!",
-    "shareTextSolo": "Мой счёт в LexiClash — {score} 😤 Слабо побить?"
+    "shareTextVs": "⚔️ {score}–{rivalScore} против {name} — LexiClash",
+    "shareTextSolo": "⚔️ {score} очк. — LexiClash"
   },
   "cg": {
     "hero": {
