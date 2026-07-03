@@ -130,7 +130,7 @@ function tagline(key: string, language: string, descKey: string): string {
 
 /**
  * Build the localized, link-ready mode list for the welcome email.
- * @param language one of en|he|sv|ja|es (anything else resolves to en copy)
+ * @param language one of en|he|sv|ja|es|ru (anything else resolves to en copy)
  * @param baseUrl  asset/link origin, e.g. https://www.lexiclash.live
  */
 export function getWelcomeEmailModes(language: string, baseUrl: string): WelcomeEmailMode[] {
