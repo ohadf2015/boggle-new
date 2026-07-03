@@ -135,12 +135,33 @@ const ES: DailyReminderTemplate[] = [
   { title: '¿Speedrun de medianoche? 🏁', body: 'Quedan {hoursLeft}h para resolverlo. Menos si te das prisa.' },
 ];
 
+// Russian — gender-neutral (present/imperative phrasing avoids Russian's
+// gendered past tense). AI-authored, native review pending.
+const RU: DailyReminderTemplate[] = [
+  { title: 'Твой мозг звонит 📞', body: 'Говорит, сегодняшний вызов ещё не решён. Осталось {hoursLeft} ч.' },
+  { title: 'Тик-так, мастер слов ⏰', body: 'Вызов сам себя не решит. {hoursLeft} ч на часах.' },
+  { title: 'Неожиданный поворот 📖', body: 'Сегодня ты ещё не в игре. Исправь это за 60 секунд.' },
+  { title: 'Поле скучает по тебе 🧩', body: 'Буквы готовы. {hoursLeft} ч до закрытия.' },
+  { title: 'Один пазл. Твоё имя. ✍️', body: 'Ежедневный вызов ждёт чемпиона.' },
+  { title: 'Проверка серии 🔥', body: 'Не дай {hoursLeft} ч ускользнуть — сохрани серию.' },
+  { title: 'Вызов взял больничный 😷', body: 'Шутка. Он хочет боя. Заходи.' },
+  { title: 'Осталось {hoursLeft} ч, волшебник слов 🧙', body: 'Быстрый раунд, пока поле не сбросилось.' },
+  { title: 'Буквы сплетничают 🤫', body: 'Они заждались. Покажи, что ты в игре.' },
+  { title: 'Не дай сегодняшнему дню ускользнуть 👻', body: '60 секунд — это всё, что нужно вызову.' },
+  { title: 'Вызов: не решён 🔍', body: 'Появится ли сегодня твоё имя? Осталось {hoursLeft} ч.' },
+  { title: 'Мягкое напоминание 💌', body: 'Вызов открыт. Мозг разогрет. Вперёд.' },
+  { title: 'Часы показывают {hoursLeft} ч ⏳', body: 'Ежедневный вызов зовёт: приходи за победой.' },
+  { title: 'Внимание, словесный гик 🚨', body: 'Сегодняшний пазл ещё не нашёл соперника. Ты?' },
+  { title: 'Ночной спидран? 🏁', body: '{hoursLeft} ч на решение. Меньше, если поспешишь.' },
+];
+
 export const DAILY_REMINDER_TEMPLATES_BY_LOCALE: Record<PushLocale, DailyReminderTemplate[]> = {
   en: EN,
   he: HE,
   sv: SV,
   ja: JA,
   es: ES,
+  ru: RU,
 };
 
 export const DAILY_REMINDER_TEMPLATE_COUNT = EN.length;

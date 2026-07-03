@@ -9,9 +9,9 @@
  * to 'en'; unknown locales fall back to 'en'.
  */
 
-export type PushLocale = 'he' | 'en' | 'sv' | 'ja' | 'es';
+export type PushLocale = 'he' | 'en' | 'sv' | 'ja' | 'es' | 'ru';
 
-export const SUPPORTED_PUSH_LOCALES: readonly PushLocale[] = ['he', 'en', 'sv', 'ja', 'es'] as const;
+export const SUPPORTED_PUSH_LOCALES: readonly PushLocale[] = ['he', 'en', 'sv', 'ja', 'es', 'ru'] as const;
 
 export function isPushLocale(value: unknown): value is PushLocale {
   return typeof value === 'string' && (SUPPORTED_PUSH_LOCALES as readonly string[]).includes(value);
@@ -25,6 +25,7 @@ const COUNTRY_LOCALE_MAP: Record<string, PushLocale> = {
   IL: 'he',
   JP: 'ja',
   SE: 'sv',
+  RU: 'ru', BY: 'ru', KZ: 'ru', KG: 'ru',
   ES: 'es', MX: 'es', AR: 'es', CO: 'es', CL: 'es', PE: 'es', VE: 'es',
   EC: 'es', BO: 'es', CR: 'es', GT: 'es', HN: 'es', NI: 'es', PA: 'es',
   PY: 'es', SV: 'es', UY: 'es', DO: 'es', PR: 'es',
@@ -345,6 +346,67 @@ const STRINGS: Record<PushLocale, Dict> = {
 
     'wordTowerPass.title': '🏗️ ¡Torre superada!',
     'wordTowerPass.body': '¡{passer} acaba de superar tu torre!',
+  },
+  ru: {
+    'friendRequest.title': 'Заявка в друзья',
+    'friendRequest.body': '{sender} хочет добавить тебя в друзья!',
+
+    'friendAccepted.title': 'Заявка в друзья принята',
+    'friendAccepted.body': '{sender} принял твою заявку в друзья!',
+
+    'gameInvite.title': 'Приглашение в игру',
+    'gameInvite.body': '{sender} зовёт тебя сыграть!',
+
+    'turnReminder.title': 'Твой ход!',
+    'turnReminder.body': '{opponent} сходил — теперь твой ход!',
+
+    'achievement.title': '🏅 Достижение открыто!',
+    'achievement.body': 'Есть! «{name}» теперь твоё!',
+    'achievement.titleMulti': '🏅 Сразу {count} достижения!',
+    'achievement.bodyTwo': 'Ты получил: {a} и {b}',
+    'achievement.bodyMore': 'Ты получил: {a}, {b} и ещё {rest}',
+
+    'directMessage.title': 'Сообщение от {sender}',
+    'directMessage.body': '{preview}',
+    'directMessage.bodyMulti': '{count} новых сообщений',
+
+    'challengeAccepted.title': 'Вызов принят!',
+    'challengeAccepted.body': '{sender} принял твой вызов — заходи скорее!',
+
+    'challengeDeclined.title': 'Вызов отклонён',
+    'challengeDeclined.body': '{sender} отклонил твой вызов',
+
+    'giftReceived.title': '🎁 Тебе подарок!',
+    'giftReceived.body': '{sender} подарил тебе {label}!',
+    'giftLabel.hints': 'подсказку',
+    'giftLabel.streak_freeze': 'заморозку серии',
+    'giftLabel.coins': 'монеты',
+
+    'gift.title': 'Тебе подарок!',
+    'gift.bodyXpOnly': '{sender} прислал тебе {xp} XP!',
+    'gift.bodyXpAndCoins': '{sender} прислал тебе {xp} XP и {coins} монет!',
+    'gift.bodyCoinsOnly': '{sender} прислал тебе {coins} монет!',
+    'gift.bodyBadge': '{sender} прислал тебе значок!',
+    'gift.bodyGeneric': '{sender} прислал тебе подарок!',
+
+    'dailyChallenge.title': '🎯 Ежедневный вызов ждёт',
+    'dailyChallenge.body': 'Не теряй серию — всего 60 секунд игры!',
+
+    'levelUp.title': 'Уровень {level}!',
+    'levelUp.body': 'Новый уровень — поле не устояло!',
+
+    'seasonStart.title': '🏆 Сезон {n} начался!',
+    'seasonStart.body': 'Сезон {prev} завершён — забери свои награды!',
+    'seasonStart.bodyNoClaim': 'Начался новый сезон — поднимайся в рейтинге!',
+
+    'curatorAssigned.title': '🎉 Ты теперь языковой куратор!',
+    'curatorAssigned.body': 'Теперь ты можешь помогать с контентом на языке {language}. Нажми, чтобы открыть панель куратора.',
+
+    'wordTowerWreck.title': '💥 Башня разрушена!',
+    'wordTowerWreck.body': '{attacker} разрушил часть твоей башни! (−{damage} этажей)',
+
+    'wordTowerPass.title': '🏗️ Башня превзойдена!',
+    'wordTowerPass.body': '{passer} только что обошёл твою башню!',
   },
 };
 

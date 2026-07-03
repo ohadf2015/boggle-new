@@ -30,6 +30,7 @@ const RIVAL_GENERIC: Record<PushLocale, string> = {
   sv: 'en rival',
   ja: 'ライバル',
   es: 'un rival',
+  ru: 'соперник',
 };
 
 /**

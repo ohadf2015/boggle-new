@@ -147,12 +147,13 @@ describe('pickDailyReminderCopy', () => {
     expect(DAILY_REMINDER_TEMPLATES_BY_LOCALE.sv.length).toBe(DAILY_REMINDER_TEMPLATE_COUNT);
     expect(DAILY_REMINDER_TEMPLATES_BY_LOCALE.ja.length).toBe(DAILY_REMINDER_TEMPLATE_COUNT);
     expect(DAILY_REMINDER_TEMPLATES_BY_LOCALE.es.length).toBe(DAILY_REMINDER_TEMPLATE_COUNT);
+    expect(DAILY_REMINDER_TEMPLATES_BY_LOCALE.ru.length).toBe(DAILY_REMINDER_TEMPLATE_COUNT);
   });
 
   it('locale-specific templates render {hoursLeft} placeholders', () => {
     // Sample many users in each locale to exercise placeholder substitution
     // across templates that contain {hoursLeft}.
-    for (const locale of ['he', 'sv', 'ja', 'es'] as const) {
+    for (const locale of ['he', 'sv', 'ja', 'es', 'ru'] as const) {
       for (let i = 0; i < 30; i++) {
         const c = pickDailyReminderCopy({
           userId: `${locale}-${i}`,

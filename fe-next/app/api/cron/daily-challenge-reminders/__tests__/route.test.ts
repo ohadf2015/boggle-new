@@ -101,11 +101,7 @@ describe('/api/cron/daily-challenge-reminders no-rival telemetry', () => {
           'u1',
           {
             username: 'rival1',
-            direction: 'ahead',
-            scoreGap: 50,
-            mode: 'puzzle',
-            rivalScore: 100,
-            rankDelta: 1,
+            mode: 'wordHunt',
             additionalCount: 0,
             avatarImage: null,
           },

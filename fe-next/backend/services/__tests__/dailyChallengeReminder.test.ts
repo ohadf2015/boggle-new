@@ -54,11 +54,7 @@ const recipient = (userId: string, locale: 'en' | 'he' | 'sv' | 'ja' | 'es' = 'e
 
 const mockRival = (overrides = {}) => ({
   username: 'Maya',
-  direction: 'above' as const,
-  scoreGap: 120,
-  mode: 'classic',
-  rivalScore: 980,
-  rankDelta: 2,
+  mode: 'wordHunt' as const,
   additionalCount: 0,
   avatarImage: 'https://example.com/avatar.png',
   ...overrides,
@@ -202,11 +198,7 @@ describe('sendDailyChallengeReminders', () => {
           userId: 'user-1',
           locale: 'en',
           rivalUsername: rival.username,
-          direction: rival.direction,
-          scoreGap: rival.scoreGap,
           mode: rival.mode,
-          rivalScore: rival.rivalScore,
-          rankDelta: rival.rankDelta,
           additionalCount: rival.additionalCount,
         })
       );
