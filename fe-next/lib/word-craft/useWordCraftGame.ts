@@ -2,11 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react';
 import { createBoard, getCell, isFirstMove, type Board, type BoardSize } from './board';
-import { createBag, draw, RACK_SIZE, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
+import { createBag, draw, remaining, swap as swapBag, type SupportedLocale, type TileBag } from './tileBag';
 import { validateAndScoreMove, type DictionaryCheck } from './moveValidator';
 import { findBestBotMove } from './botMove';
 import { botTuning, shouldBotSkipTurn, DEFAULT_BOT_DIFFICULTY, type BotDifficulty } from './botDifficulty';
-import { rollModifier, toScoreModifier, modifierCaptureSpread, type WordCraftModifier } from './modifiers';
+import { rollModifier, toScoreModifier, modifierCaptureSpread, modifierRackSize, isGoldenTile, WORDCRAFT_MODIFIERS, type WordCraftModifier } from './modifiers';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { getBoardDims, type BoardDims } from './boardDimensions';
 import { applyClaims, endgameTerritoryBonus, resolveCaptures, type Coord, type Owner } from './territory';
@@ -68,6 +68,23 @@ export interface WordCraftState {
    * symmetrically to player + bot scoring via {@link toScoreModifier}.
    */
   modifier: WordCraftModifier;
+  /**
+   * Rack capacity for this game — 7 normally, 5 under quick_draw. Drives the
+   * opening deal, post-commit refills, and the swap guard symmetrically.
+   */
+  rackSize: number;
+  /**
+   * The game's seed. Stored so pure per-tile rules (golden_tiles) can be
+   * recomputed anywhere — rack UI, board UI, commit, bot ranking — from
+   * (seed, tileId) with zero extra plumbing.
+   */
+  seed: number;
+  /**
+   * The game's very first tile-select auto-places that tile on the center cell
+   * (recallable) to remove the blank-board "where do I start?" decision. This
+   * flag flips after that one nudge so a recall hands full control back.
+   */
+  autoCenterDone: boolean;
 }
 
 /** Free clues granted at the start of every WordCraft game. */
@@ -88,22 +105,29 @@ type Action =
   | { type: 'USE_CLUE' }
   | { type: 'GRANT_CLUE' }
   | { type: 'BURNOUT_SKIP' }
-  | { type: 'RESET'; seed: number; boardSize: 13 | 15; locale: SupportedLocale; territoryEnabled?: boolean; hotseat?: boolean; viewportDims?: { size: BoardSize; bagSize: number } };
+  | { type: 'RESET'; seed: number; boardSize: 13 | 15; locale: SupportedLocale; territoryEnabled?: boolean; hotseat?: boolean; viewportDims?: { size: BoardSize; bagSize: number }; modifierOverride?: WordCraftModifier };
 
 const BOT_NAME = 'WordBot';
 
-function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean; hotseat?: boolean }): WordCraftState {
+function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale?: SupportedLocale; viewportDims?: { size: BoardSize; bagSize: number }; territoryEnabled?: boolean; hotseat?: boolean; modifierOverride?: WordCraftModifier }): WordCraftState {
   const seed = typeof init === 'number' ? init : init.seed;
   const boardSize = typeof init === 'number' ? 15 : (init.boardSize ?? 15);
   const locale = typeof init === 'number' ? 'en' : (init.locale ?? 'en');
   const viewportDims = typeof init === 'number' ? undefined : init.viewportDims;
   const territoryEnabled = typeof init === 'number' ? true : (init.territoryEnabled ?? true);
   const hotseat = typeof init === 'number' ? false : (init.hotseat ?? false);
+  const modifierOverride = typeof init === 'number' ? undefined : init.modifierOverride;
 
   const finalBoardSize = viewportDims?.size ?? boardSize;
   const bag = createBag({ seed, locale, bagSize: viewportDims?.bagSize });
-  const playerRack = draw(bag, RACK_SIZE);
-  const botRack = draw(bag, RACK_SIZE);
+  // Modifier resolves BEFORE dealing — quick_draw shrinks both opening racks.
+  const modifier =
+    modifierOverride && WORDCRAFT_MODIFIERS.includes(modifierOverride)
+      ? modifierOverride
+      : rollModifier(seed);
+  const rackSize = modifierRackSize(modifier);
+  const playerRack = draw(bag, rackSize);
+  const botRack = draw(bag, rackSize);
   return {
     // Conquest mode: a neutral grid with no premium squares and no center
     // star. Every cell is plain until a player claims it.
@@ -126,7 +150,12 @@ function buildInitial(init: number | { seed: number; boardSize?: 13 | 15; locale
     hotseat,
     streaks: { player: 0, bot: 0 },
     cluesRemaining: STARTING_CLUES,
-    modifier: rollModifier(seed),
+    // A player-picked modifier (setup screen) wins; otherwise the seeded
+    // surprise roll — resolved above, before racks were dealt.
+    modifier,
+    rackSize,
+    seed,
+    autoCenterDone: false,
   };
 }
 
@@ -146,7 +175,7 @@ function commitMove(
   // which (a) froze the HUD's memoized sack count — the "sack stays 40" bug —
   // and (b) double-drained the sack under React StrictMode's double-invoke.
   // Cloning the tile list and carrying a FRESH bag object fixes both.
-  const drawCount = Math.max(0, RACK_SIZE - remainingRack.length);
+  const drawCount = Math.max(0, state.rackSize - remainingRack.length);
   const nextBagTiles = state.bag.tiles.slice();
   const replenish = nextBagTiles.splice(0, Math.min(drawCount, nextBagTiles.length));
   const nextBag: TileBag = { ...state.bag, tiles: nextBagTiles };
@@ -169,8 +198,17 @@ function commitMove(
     // placements) so newly-placed cells aren't flagged as "anchors of the
     // opponent". Use state.board, not tilePlacedBoard. land_grab spreads each
     // capture by one ring (symmetric — applies to whoever is committing).
+    // golden_tiles: each golden tile placed this turn ring-captures around
+    // its own cell — symmetric for whichever seat commits.
+    const goldenCenters =
+      state.modifier === 'golden_tiles'
+        ? placements
+            .filter((p) => isGoldenTile(state.seed, p.rackTileId))
+            .map((p) => ({ row: p.row, col: p.col }))
+        : undefined;
     const capture = resolveCaptures(state.board, placements, lists, who, {
       spreadToNeighbors: modifierCaptureSpread(state.modifier),
+      ringCenters: goldenCenters,
     });
     captureBonus = capture.bonus;
     nextBoard = applyClaims(tilePlacedBoard, placements, capture.capturedCells, who);
@@ -229,8 +267,35 @@ function applyEndgameTerritory(state: WordCraftState): WordCraftState {
 
 function reducer(state: WordCraftState, action: Action): WordCraftState {
   switch (action.type) {
-    case 'SELECT_RACK_TILE':
+    case 'SELECT_RACK_TILE': {
+      // Opening nudge: the game's very first tile-select drops the tile onto
+      // the center cell as a normal (recallable) pending placement, killing
+      // the "where do I even start?" blank-board decision. Strictly once per
+      // game — a recall hands full control back (no auto-replace tug-of-war).
+      if (action.id && !state.autoCenterDone && state.pendingPlacements.length === 0 && isFirstMove(state.board)) {
+        const activeRack = state.turn === 'bot' ? state.bot.rack : state.player.rack;
+        const tile = activeRack.find((t) => t.id === action.id);
+        const center = Math.floor(state.board.size / 2);
+        if (tile && !state.board.cells[center][center].tile) {
+          const placement: PlacedTile = {
+            row: center,
+            col: center,
+            letter: tile.letter,
+            value: tile.value,
+            isBlank: tile.isBlank,
+            rackTileId: tile.id,
+          };
+          return {
+            ...state,
+            pendingPlacements: [placement],
+            selectedRackTileId: null,
+            lastError: null,
+            autoCenterDone: true,
+          };
+        }
+      }
       return { ...state, selectedRackTileId: action.id, lastError: null };
+    }
     case 'PLACE_PENDING':
       return {
         ...state,
@@ -309,7 +374,7 @@ function reducer(state: WordCraftState, action: Action): WordCraftState {
       // viewportDims carries the locked board size + solo bag size so a
       // play-again (or locale switch) keeps the same tight bag instead of
       // silently falling back to the full default 100-tile bag.
-      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat, viewportDims: action.viewportDims });
+      return buildInitial({ seed: action.seed, boardSize: action.boardSize, locale: action.locale, territoryEnabled: action.territoryEnabled ?? state.territoryEnabled, hotseat: action.hotseat ?? state.hotseat, viewportDims: action.viewportDims, modifierOverride: action.modifierOverride });
     default:
       return state;
   }
@@ -345,11 +410,17 @@ export interface UseWordCraftGameOptions {
    * When omitted, dims come from `window.innerWidth` (the normal solo path).
    */
   forcedDims?: BoardDims;
+  /**
+   * Player-picked per-game modifier (setup screen "twist"). When omitted the
+   * modifier is the seeded surprise roll. Duels must NEVER pass this — both
+   * duel boards must derive the identical modifier from the shared seed.
+   */
+  modifierOverride?: WordCraftModifier;
 }
 
 export { reducer as wordCraftReducer, buildInitial as buildInitialState }
 
-export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims }: UseWordCraftGameOptions) {
+export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15, territoryEnabled = true, difficulty = DEFAULT_BOT_DIFFICULTY, botSkillVariance, hotseat = false, forcedDims, modifierOverride }: UseWordCraftGameOptions) {
   const tuning = botTuning(difficulty);
   const effectiveVariance = botSkillVariance ?? tuning.skillVariance;
   // Capture dims at initialization and lock them for the game lifetime. A duel
@@ -360,7 +431,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   );
   const initialDims = initialDimsRef.current;
 
-  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat]);
+  const initArg = useMemo(() => ({ seed, boardSize, locale, viewportDims: initialDims, territoryEnabled, hotseat, modifierOverride }), [seed, boardSize, locale, initialDims, territoryEnabled, hotseat, modifierOverride]);
   const [state, dispatch] = useReducer(reducer, initArg, buildInitial);
 
   // Active per-game scoring modifier, applied symmetrically to player commits,
@@ -423,9 +494,10 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
         territoryEnabled,
         hotseat,
         viewportDims: initialDimsRef.current,
+        modifierOverride,
       });
     },
-    [seed, boardSize, locale, territoryEnabled, hotseat],
+    [seed, boardSize, locale, territoryEnabled, hotseat, modifierOverride],
   );
 
   const selectRackTile = useCallback(
@@ -550,14 +622,14 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
   const swap = useCallback(
     (tilesToReturn: RackTile[]) => {
       if (state.turn !== 'player' && state.turn !== 'bot') return;
-      const replacements = swapBag(state.bag, tilesToReturn);
+      const replacements = swapBag(state.bag, tilesToReturn, state.rackSize);
       if (!replacements) {
         dispatch({ type: 'SET_ERROR', message: 'BAG_TOO_SMALL_TO_SWAP' });
         return;
       }
       dispatch({ type: 'SWAP', tilesToReturn, replacements });
     },
-    [state.turn, state.bag],
+    [state.turn, state.bag, state.rackSize],
   );
 
   const botTurnRunning = useRef(false);
@@ -589,6 +661,14 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
           ? (placements, wordCells) =>
               resolveCaptures(state.board, placements, wordCells, 'bot', {
                 spreadToNeighbors: modifierCaptureSpread(state.modifier),
+                // Keep the bot's valuation symmetric with commit-time rules:
+                // golden placements ring-capture, so it should chase them too.
+                ringCenters:
+                  state.modifier === 'golden_tiles'
+                    ? placements
+                        .filter((p) => isGoldenTile(state.seed, p.rackTileId))
+                        .map((p) => ({ row: p.row, col: p.col }))
+                    : undefined,
               }).bonus * tuning.captureAggression
           : undefined,
         // Difficulty: cap word length (easy/medium kill bingos) and pick from a
@@ -625,7 +705,7 @@ export function useWordCraftGame({ seed = 1, dict, locale = 'en', boardSize = 15
     // `tuning` is a stable module-level object keyed by difficulty (see
     // botDifficulty's TUNING record), so listing it whole is both correct and
     // satisfies exhaustive-deps for the shouldBotSkipTurn(tuning) call.
-  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning, effectiveVariance, state.modifier, modifierSpec]);
+  }, [hotseat, state.turn, dict, state.board, state.bot.rack, state.territoryEnabled, isWordValid, tuning, effectiveVariance, state.modifier, state.seed, modifierSpec]);
 
   const isFirstMoveOfGame = useMemo(() => isFirstMove(state.board), [state.board]);
   const tilesRemaining = useMemo(() => remaining(state.bag), [state.bag]);

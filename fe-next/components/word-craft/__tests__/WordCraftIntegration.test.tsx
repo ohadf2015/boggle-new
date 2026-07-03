@@ -96,32 +96,43 @@ function readState(): { pending: number; axis: string } {
   return { pending: m ? Number(m[1]) : -1, axis: m ? m[2] : '' };
 }
 
+/**
+ * NEW CONTRACT (2026-07-03 overhaul): the game's very first rack-tile tap
+ * auto-places that tile on the CENTER cell (recallable). All flows below
+ * drive that contract explicitly — tile #1 is never manually aimed.
+ */
+function centerKey(): { key: string; row: number; col: number } {
+  const board = document.querySelector('[data-wc-board]') as HTMLElement;
+  const size = Number(board.dataset.boardSize);
+  const c = Math.floor(size / 2);
+  return { key: `${c},${c}`, row: c, col: c };
+}
+
 describe('WordCraft mobile-redesign integration', () => {
-  it('tap → tap places one pending tile and shows no axis', () => {
+  it('first rack tap auto-places the tile on the center cell', () => {
     render(<TestHarness />);
 
-    // Pick the first rack tile + tap an empty board cell
     const firstTile = screen.getAllByRole('button', { pressed: false })[0];
     fireEvent.click(firstTile);
-    const cell = document.querySelector('[data-board-cell="7,7"]') as HTMLElement;
-    expect(cell).toBeTruthy();
-    fireEvent.click(cell);
 
     expect(readState()).toEqual({ pending: 1, axis: 'none' });
+    const { key } = centerKey();
+    const cell = document.querySelector(`[data-board-cell="${key}"]`) as HTMLElement;
+    expect(cell.dataset.tileState).toBe('pending');
   });
 
   it('placing 2 tiles in the same row infers a horizontal axis', () => {
     render(<TestHarness />);
 
-    // Tile #1 → (7,7)
     const rackButtons = () =>
       Array.from(document.querySelectorAll('[data-rack-tile-id]')) as HTMLElement[];
+    // Tile #1 → auto-centers
     fireEvent.click(rackButtons()[0]);
-    fireEvent.click(document.querySelector('[data-board-cell="7,7"]') as HTMLElement);
+    const { row, col } = centerKey();
 
-    // Tile #2 → (7,9) (same row, different col)
+    // Tile #2 → (row, col+2) (same row, different col)
     fireEvent.click(rackButtons()[1]);
-    fireEvent.click(document.querySelector('[data-board-cell="7,9"]') as HTMLElement);
+    fireEvent.click(document.querySelector(`[data-board-cell="${row},${col + 2}"]`) as HTMLElement);
 
     expect(readState()).toEqual({ pending: 2, axis: 'h' });
     // Axis chip should appear inside the pending strip
@@ -134,11 +145,11 @@ describe('WordCraft mobile-redesign integration', () => {
     const rackButtons = () =>
       Array.from(document.querySelectorAll('[data-rack-tile-id]')) as HTMLElement[];
 
-    // Lock axis with two row-7 placements
+    // Lock axis: tile #1 auto-centers, tile #2 lands beside it
     fireEvent.click(rackButtons()[0]);
-    fireEvent.click(document.querySelector('[data-board-cell="7,7"]') as HTMLElement);
+    const { row, col } = centerKey();
     fireEvent.click(rackButtons()[1]);
-    fireEvent.click(document.querySelector('[data-board-cell="7,8"]') as HTMLElement);
+    fireEvent.click(document.querySelector(`[data-board-cell="${row},${col + 1}"]`) as HTMLElement);
     expect(readState()).toEqual({ pending: 2, axis: 'h' });
 
     // New contract: a single rack tap SELECTS; tapping the already-selected
@@ -153,11 +164,11 @@ describe('WordCraft mobile-redesign integration', () => {
     fireEvent.click(byId()); // first tap selects — nothing placed yet
     expect(readState()).toEqual({ pending: 2, axis: 'h' });
 
-    fireEvent.click(byId()); // tap the selected tile again → fast-place on (7,9)
+    fireEvent.click(byId()); // tap the selected tile again → fast-place on the next axis cell
     expect(readState()).toEqual({ pending: 3, axis: 'h' });
 
-    // Cell (7,9) should now hold a pending tile
-    const filledCell = document.querySelector('[data-board-cell="7,9"]') as HTMLElement;
+    // The next cell along the axis should now hold a pending tile
+    const filledCell = document.querySelector(`[data-board-cell="${row},${col + 2}"]`) as HTMLElement;
     expect(filledCell.dataset.tileState).toBe('pending');
   });
 
@@ -167,28 +178,28 @@ describe('WordCraft mobile-redesign integration', () => {
     const rackButtons = () =>
       Array.from(document.querySelectorAll('[data-rack-tile-id]')) as HTMLElement[];
 
-    fireEvent.click(rackButtons()[0]);
-    fireEvent.click(document.querySelector('[data-board-cell="7,7"]') as HTMLElement);
+    fireEvent.click(rackButtons()[0]); // auto-centers
+    const { row, col } = centerKey();
     fireEvent.click(rackButtons()[1]);
-    fireEvent.click(document.querySelector('[data-board-cell="7,8"]') as HTMLElement);
+    fireEvent.click(document.querySelector(`[data-board-cell="${row},${col + 1}"]`) as HTMLElement);
     expect(readState().pending).toBe(2);
 
     fireEvent.click(screen.getByLabelText('recall all'));
     expect(readState().pending).toBe(0);
   });
 
-  it('tapping a pending tile on the board recalls just that one', () => {
+  it('tapping the auto-centered pending tile on the board recalls it', () => {
     render(<TestHarness />);
 
     const rackButtons = () =>
       Array.from(document.querySelectorAll('[data-rack-tile-id]')) as HTMLElement[];
 
-    fireEvent.click(rackButtons()[0]);
-    fireEvent.click(document.querySelector('[data-board-cell="7,7"]') as HTMLElement);
+    fireEvent.click(rackButtons()[0]); // auto-centers
     expect(readState().pending).toBe(1);
 
-    // Click the now-pending cell to recall it
-    fireEvent.click(document.querySelector('[data-board-cell="7,7"]') as HTMLElement);
+    // Click the now-pending center cell to recall it
+    const { key } = centerKey();
+    fireEvent.click(document.querySelector(`[data-board-cell="${key}"]`) as HTMLElement);
     expect(readState().pending).toBe(0);
   });
 });
