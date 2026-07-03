@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { buildLeaderboardFaqJsonLd, encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
-import LeaderboardPageClient from './PageClient';
+import LeaderboardPageClient from './PageClientNoSsr';
 
 export const revalidate = 300;
 

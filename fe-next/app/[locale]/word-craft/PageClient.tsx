@@ -63,9 +63,11 @@ import {
   trackWordCraftPendingRecall,
   trackWordCraftRecallAll,
   trackWordCraftTurnSubmitted,
+  trackWordCraftGameStarted,
   emitWordCraftGameEnd,
   type WordCraftInputMethod,
 } from '@/components/word-craft/wordCraftTelemetry';
+import { useExperiment } from '@/hooks/useExperiment';
 import { useAchievementQueue } from '@/components/achievements';
 import { countClaimed } from '@/lib/word-craft/territory';
 import { cellsGainedThisTurn } from '@/lib/word-craft/territoryFeedback';
@@ -130,7 +132,7 @@ export default function WordCraftPageClient() {
   useEffect(() => {
     let cancelled = false;
     loadWordCraftDictionary(locale).then((d) => {
-      if (!cancelled) setDict(d);
+      if (!cancelled) { setDict(d); trackWordCraftGameStarted({ locale }); }
     }).catch(() => {
       if (!cancelled) setDict(new Set());
     });
@@ -778,6 +780,10 @@ export default function WordCraftPageClient() {
     }
   }, [game.state, game.state.turn, sceneCtx, hotseat, territoryEnabled, playerTerritory, botTerritory, cosyMode, prefersReducedMotion, playNewBest, duel, t]);
 
+  const { variant: hintDurationVariant, trackExposure: trackHintExposure } = useExperiment('exp-wordcraft-hint-duration-v1');
+  const hintTurnLimit = hintDurationVariant === 'extended-hints' ? 6 : 3;
+  useEffect(() => { trackHintExposure(); }, [trackHintExposure]);
+
   // --- Error shake ---
   const lastErrorRef = useRef<string | null>(null);
   useEffect(() => {
@@ -809,6 +815,7 @@ export default function WordCraftPageClient() {
 
   // First-move flag drives the rack glow (no center star to ping anymore).
   const isFirstMove = game.state.history.length === 0 && game.state.pendingPlacements.length === 0;
+
   const showPendingStrip = game.state.pendingPlacements.length > 0;
   // Whether the on-screen human may act now. Bot-mode: only on the player's
   // turn. Hot-seat: either seat's turn, but not while the hand-off curtain is
@@ -1096,7 +1103,7 @@ export default function WordCraftPageClient() {
             the first few turns so veterans aren't nagged. */}
         <WordCraftStepHint
           step={
-            game.state.history.length < 3 && game.state.turn !== 'over'
+            game.state.history.length < hintTurnLimit && game.state.turn !== 'over'
               ? resolveWordCraftStep({
                   turn: game.state.turn,
                   selectedTileId: game.state.selectedRackTileId,
