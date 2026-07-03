@@ -3376,7 +3376,7 @@ const en = {
     "wordHunt": {
       "bonusWordsTitle": "Free Bonus Words",
       "step1ImageAlt": "A mascot inspects glowing letter tiles with a magnifying glass",
-      "step2ImageAlt": "A mascot cheers as a heart and a coin burst out of word tiles",
+      "step2ImageAlt": "A crowned mascot cheers: a long tile row spends a try, while a short tile row pops a heart for a free life",
       "step3ImageAlt": "A mascot celebrates with a trophy and a globe",
       "welcome": {
         "title": "Word Hunt",

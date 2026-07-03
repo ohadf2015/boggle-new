@@ -3494,7 +3494,7 @@ const sv = {
     "wordHunt": {
       "bonusWordsTitle": "Gratis bonusord",
       "step1ImageAlt": "En maskot granskar lysande bokstavsbrickor med ett förstoringsglas",
-      "step2ImageAlt": "En maskot jublar när ett hjärta och ett mynt sprutar ut ur ordbrickor",
+      "step2ImageAlt": "En krönt maskot jublar: en lång brickrad kostar ett försök, medan en kort rad ploppar fram ett hjärta för ett gratis liv",
       "step3ImageAlt": "En maskot firar med en pokal och en jordglob",
       "welcome": {
         "title": "Word Hunt",

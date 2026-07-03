@@ -4801,7 +4801,7 @@ const es = {
     "wordHunt": {
       "bonusWordsTitle": "Palabras bonus gratis",
       "step1ImageAlt": "Una mascota examina fichas de letras brillantes con una lupa",
-      "step2ImageAlt": "Una mascota celebra mientras un corazón y una moneda salen de las fichas de palabras",
+      "step2ImageAlt": "Una mascota coronada celebra: una fila larga de fichas gasta un intento, mientras una fila corta hace saltar un corazón que da una vida gratis",
       "step3ImageAlt": "Una mascota celebra con un trofeo y un globo terráqueo",
       "welcome": {
         "title": "Word Hunt",
