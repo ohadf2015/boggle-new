@@ -5,8 +5,9 @@ import {
   isOfflineCapable,
   offlineCapableRoutes,
 } from '../offlineCapableModes';
-
-const LOCALES = ['en', 'he', 'sv', 'ja', 'es'];
+// Source of truth for supported locales — derive loops/counts from it so adding
+// a locale can't leave this test asserting a stale hardcoded set or total.
+import { locales } from '@/i18n/config';
 
 describe('offlineCapableModes', () => {
   describe('OFFLINE_CAPABLE_MODES', () => {
@@ -80,7 +81,7 @@ describe('offlineCapableModes', () => {
 
   describe('isOfflineCapable', () => {
     it('returns true for every offline-capable mode across locales', () => {
-      for (const loc of LOCALES) {
+      for (const loc of locales) {
         for (const seg of OFFLINE_CAPABLE_MODES) {
           expect(isOfflineCapable(`/${loc}/${seg}`)).toBe(true);
         }
@@ -156,8 +157,10 @@ describe('offlineCapableModes', () => {
       expect(routes).toContain('/en/crossword');
       expect(routes).toContain('/en/blast/v2');
       expect(routes).toContain('/ru/daily');
-      // 6 locales x 9 modes (7 original + crossword + wordfall)
-      expect(routes).toHaveLength(54);
+      // One route per (locale × offline mode entry) — derived from the sources so
+      // it never drifts when a locale or a mode is added (7 original modes +
+      // crossword + wordfall = OFFLINE_MODES entries).
+      expect(routes).toHaveLength(locales.length * OFFLINE_MODES.length);
     });
   });
 });

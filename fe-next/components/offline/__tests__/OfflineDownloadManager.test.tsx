@@ -33,6 +33,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 import { OfflineDownloadManager } from '../OfflineDownloadManager';
+// Source of truth for the supported-locale count. The component renders one row
+// per locale; deriving from `locales` keeps this test correct when a locale is
+// added/removed instead of drifting against a hardcoded number.
+import { locales } from '@/i18n/config';
 
 describe('OfflineDownloadManager', () => {
   beforeEach(() => {
@@ -103,7 +107,7 @@ describe('OfflineDownloadManager', () => {
     render(<OfflineDownloadManager />);
     await waitFor(() => {
       const downloadButtons = screen.getAllByText('offlineDownload.downloadButton');
-      expect(downloadButtons.length).toBe(6); // 6 languages
+      expect(downloadButtons.length).toBe(locales.length); // one per supported locale
     });
   });
 

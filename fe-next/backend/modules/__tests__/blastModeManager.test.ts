@@ -281,7 +281,11 @@ describe('blastModeManager', () => {
       Array.from({ length: 10 }, () => 'A')
     );
 
-    it('BLAST_TILE_TYPES should include all 24 canonical types', () => {
+    // Subset guard only — no hardcoded total. Adding a tile to the source must
+    // not break this test (a magic count here duplicated the one in
+    // shared/types/blast.test.ts and drifted independently, blocking unrelated
+    // PRs). Removing a documented tile still fails via toContain.
+    it('BLAST_TILE_TYPES should include every canonical type', () => {
       const canonicalTypes = [
         'standard', 'gold', 'bomb', 'rainbow', 'ice', 'lightning',
         'magnet', 'prism', 'gem', 'frozen', 'diamond',
@@ -292,7 +296,6 @@ describe('blastModeManager', () => {
       for (const t of canonicalTypes) {
         expect(BLAST_TILE_TYPES).toContain(t);
       }
-      expect(BLAST_TILE_TYPES).toHaveLength(24);
     });
 
     it('BLAST_TILE_TYPES should include core advanced types (diamond, prism, frozen)', () => {
