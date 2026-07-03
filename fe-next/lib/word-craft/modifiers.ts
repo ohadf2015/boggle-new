@@ -12,7 +12,9 @@ export type WordCraftModifier =
   | 'bingo_bonanza'
   | 'long_words'
   | 'rich_letters'
-  | 'land_grab';
+  | 'land_grab'
+  | 'quick_draw'
+  | 'golden_tiles';
 
 export const WORDCRAFT_MODIFIERS: readonly WordCraftModifier[] = [
   'none',
@@ -20,6 +22,8 @@ export const WORDCRAFT_MODIFIERS: readonly WordCraftModifier[] = [
   'long_words',
   'rich_letters',
   'land_grab',
+  'quick_draw',
+  'golden_tiles',
 ];
 
 // Weighted so ~half of games run with a live modifier and the rest are the
@@ -32,6 +36,8 @@ const WEIGHTED: readonly WordCraftModifier[] = [
   'long_words',
   'rich_letters',
   'land_grab', 'land_grab',
+  'quick_draw',
+  'golden_tiles',
 ];
 
 // Same small deterministic PRNG family used by the tile bag — seeded so a game
@@ -57,12 +63,38 @@ export function toScoreModifier(modifier: WordCraftModifier): ScoreModifierSpec 
     case 'rich_letters':
       return { richLetterThreshold: 4, richLetterMult: 2 };
     case 'land_grab':
-      // Pure capture-rule modifier — no scoring change (see modifierCaptureSpread).
+    case 'quick_draw':
+    case 'golden_tiles':
+      // Pure rule modifiers — no scoring change (see modifierCaptureSpread,
+      // modifierRackSize, isGoldenTile).
       return {};
     case 'none':
     default:
       return {};
   }
+}
+
+/**
+ * quick_draw: a lighter 5-tile rack — fewer choices per turn, faster play.
+ * Symmetric (bot draws from the same rack size).
+ */
+export function modifierRackSize(modifier: WordCraftModifier): number {
+  return modifier === 'quick_draw' ? 5 : 7;
+}
+
+/**
+ * golden_tiles: a deterministic ~1-in-6 of tile ids are golden. Placing a
+ * golden tile captures the opponent cells in its orthogonal ring (threaded via
+ * ResolveCapturesOptions.ringCenters). Pure function of (seed, tileId) so the
+ * rack UI, board UI, commit logic, and bot ranking all agree with zero state
+ * plumbing.
+ */
+export function isGoldenTile(seed: number, tileId: string): boolean {
+  let h = hashSeed(seed);
+  for (let i = 0; i < tileId.length; i++) {
+    h = Math.imul(h ^ tileId.charCodeAt(i), 0x01000193) >>> 0;
+  }
+  return h % 6 === 0;
 }
 
 /**

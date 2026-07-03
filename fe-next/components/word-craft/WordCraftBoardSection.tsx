@@ -26,6 +26,8 @@ interface Props {
   reticle?: { row: number; col: number } | null;
   zoomLabel?: string;
   zoomResetLabel?: string;
+  /** golden_tiles modifier: true for tile ids that ring-capture on commit. */
+  isGolden?: (tileId: string) => boolean;
 }
 
 export function WordCraftBoardSection(props: Props) {
@@ -70,6 +72,7 @@ export function WordCraftBoardSection(props: Props) {
           dragHoverCell={props.dragHoverCell}
           locale={props.locale}
           reticle={props.reticle}
+          isGolden={props.isGolden}
         />
         <WordCraftPixiStage
           boardRef={boardRef}

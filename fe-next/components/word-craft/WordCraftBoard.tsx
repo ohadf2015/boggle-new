@@ -27,6 +27,11 @@ export interface WordCraftBoardProps {
   locale?: string;
   /** Keyboard reticle position — renders a focus ring on this cell */
   reticle?: { row: number; col: number } | null;
+  /**
+   * golden_tiles modifier: true for tile ids that ring-capture on commit.
+   * Golden pending/placed tiles carry a gold ring so the twist reads on-board.
+   */
+  isGolden?: (tileId: string) => boolean;
 }
 
 /** Build the set of axis-hint cells (N/E/S/W neighbors) for a single anchor. */
@@ -51,6 +56,7 @@ function WordCraftBoardImpl({
   isFirstMove,
   dragHoverCell,
   reticle,
+  isGolden,
 }: WordCraftBoardProps) {
   const size = board.size;
   const centerIndex = Math.floor(size / 2);
@@ -110,6 +116,8 @@ function WordCraftBoardImpl({
           const isAxisHint = axisHintCells.has(key) && isEmpty && !disabled;
           const isReticle = reticle?.row === r && reticle?.col === c;
           const isTabAnchor = tabAnchor.row === r && tabAnchor.col === c;
+          const goldenId = pending?.rackTileId ?? placedTile?.rackTileId;
+          const golden = goldenId ? (isGolden?.(goldenId) ?? false) : false;
 
           // Screen-reader label includes WHO owns the tile — territory is the
           // whole game, so a blind player needs to hear "your" vs "rival"
@@ -127,6 +135,7 @@ function WordCraftBoardImpl({
               type="button"
               role="gridcell"
               data-board-cell={key}
+              data-golden={golden ? 'true' : undefined}
               data-premium=""
               data-claim={placedTile && cell.claim ? cell.claim : undefined}
               data-tile-id={pending?.rackTileId ?? placedTile?.rackTileId ?? undefined}
@@ -163,6 +172,7 @@ function WordCraftBoardImpl({
                   : pending
                     ? 'bg-neo-lime text-neo-navy shadow-[0_3px_0_0_rgba(0,0,0,0.9)] ring-2 ring-neo-lime-light hover:ring-neo-pink hover:rotate-1'
                     : 'bg-neo-navy-light/70',
+                golden && !isDragTarget && 'ring-2 ring-neo-yellow z-10',
                 isDragTarget && 'bg-neo-cyan/30 ring-4 ring-neo-cyan scale-110 z-10',
                 isAxisHint && !isDragTarget && 'wc-axis-hint',
                 isReticle && !isDragTarget && 'ring-2 ring-neo-yellow z-10',

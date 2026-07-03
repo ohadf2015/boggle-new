@@ -38,6 +38,12 @@ export interface ResolveCapturesOptions {
    * blast bounded and symmetric for both seats.
    */
   spreadToNeighbors?: boolean;
+  /**
+   * `golden_tiles` modifier: each listed coord (a golden tile placed this
+   * turn) also captures the opponent cells orthogonally adjacent to it — same
+   * one-ring, no-flood contract as spreadToNeighbors.
+   */
+  ringCenters?: readonly Coord[];
 }
 
 export function resolveCaptures(
@@ -74,6 +80,19 @@ export function resolveCaptures(
         bonus += gained;
         directCells.push({ row: c.row, col: c.col });
       }
+    }
+  }
+
+  // Pass 1b (golden_tiles): one orthogonal ring around each golden placement.
+  if (options.ringCenters) {
+    for (const cell of options.ringCenters) {
+      const ring: [number, number][] = [
+        [cell.row - 1, cell.col],
+        [cell.row + 1, cell.col],
+        [cell.row, cell.col - 1],
+        [cell.row, cell.col + 1],
+      ];
+      for (const [r, c] of ring) bonus += tryCapture(r, c);
     }
   }
 

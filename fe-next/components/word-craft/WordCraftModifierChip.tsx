@@ -35,6 +35,19 @@ const PRESENTATION: Record<Exclude<WordCraftModifier, 'none'>, { emoji: string; 
     note: 'Rare tiles score double',
     tone: 'bg-neo-pink text-white',
   },
+  quick_draw: {
+    emoji: '⚡',
+    label: 'Quick Draw',
+    note: '5-tile rack — faster turns',
+    tone: 'bg-neo-cyan text-neo-navy',
+  },
+  golden_tiles: {
+    emoji: '✦',
+    label: 'Golden Tiles',
+    note: '✦ tiles capture their ring',
+    // Gold = celebration semantic; correct for the golden twist.
+    tone: 'bg-neo-yellow text-neo-navy',
+  },
 };
 
 export function WordCraftModifierChip({ modifier, t }: { modifier: WordCraftModifier; t: TFn }) {

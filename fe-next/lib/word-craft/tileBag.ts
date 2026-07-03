@@ -91,8 +91,8 @@ export function draw(bag: TileBag, n: number): RackTile[] {
   return bag.tiles.splice(0, count);
 }
 
-export function swap(bag: TileBag, returned: RackTile[]): RackTile[] | null {
-  if (bag.tiles.length < RACK_SIZE) return null;
+export function swap(bag: TileBag, returned: RackTile[], rackSize: number = RACK_SIZE): RackTile[] | null {
+  if (bag.tiles.length < rackSize) return null;
   const replacements = bag.tiles.splice(0, returned.length);
   bag.tiles.push(...returned);
   shuffleInPlace(bag.tiles, bag.rng);

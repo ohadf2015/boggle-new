@@ -35,6 +35,12 @@ export interface WordCraftRackProps {
   locale?: string;
   /** ID of the tile currently being dragged — fades it in the rack */
   draggingTileId?: string | null;
+  /**
+   * golden_tiles modifier: returns true for tile ids that ring-capture on
+   * commit. Golden tiles get a gold ring + ✦ badge so the twist is visible
+   * before the play, not discovered after it.
+   */
+  isGolden?: (tileId: string) => boolean;
 }
 
 const TILT = ['-rotate-3', '-rotate-1', 'rotate-1', 'rotate-3', '-rotate-2', 'rotate-2', '-rotate-1'];
@@ -54,6 +60,7 @@ function WordCraftRackImpl({
   hintPick,
   locale = 'en',
   draggingTileId,
+  isGolden,
 }: WordCraftRackProps) {
   return (
     <div
@@ -96,12 +103,14 @@ function WordCraftRackImpl({
         const isPending = pendingIds.has(tile.id);
         const isSelected = selectedId === tile.id;
         const isDragging = draggingTileId === tile.id;
+        const golden = isGolden?.(tile.id) ?? false;
         const tilt = !isPending && !isSelected && !isDragging ? TILT[idx % TILT.length] : '';
         return (
           <button
             key={tile.id}
             type="button"
             data-rack-tile-id={tile.id}
+            data-golden={golden ? 'true' : undefined}
             data-fast-tap={autoPlaceOnTap || (axisLocked && isSelected) ? 'true' : undefined}
             disabled={disabled || isPending}
             aria-pressed={isSelected}
@@ -146,6 +155,9 @@ function WordCraftRackImpl({
               'rounded-neo border-neo-thick border-black',
               'transition-all duration-200 ease-out',
               tilt,
+              // Gold ring = celebration semantic (design system): this tile
+              // ring-captures on commit under golden_tiles.
+              golden && !isPending && 'ring-2 ring-neo-yellow',
               isPending
                 ? 'opacity-30 bg-neo-cream/50 text-neo-navy cursor-not-allowed shadow-hard-pressed'
                 : isDragging
@@ -156,6 +168,11 @@ function WordCraftRackImpl({
             )}
           >
             <span aria-hidden className="absolute inset-x-1.5 top-1 h-px bg-white/70" />
+            {golden && (
+              <span aria-hidden className="absolute top-0.5 start-0.5 text-neo-yellow text-[10px] leading-none">
+                ✦
+              </span>
+            )}
             <span
               className={cn('wc-tile-glyph relative text-3xl sm:text-4xl', tile.isBlank && 'text-neo-purple')}
             >
