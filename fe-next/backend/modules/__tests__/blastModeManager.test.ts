@@ -281,18 +281,18 @@ describe('blastModeManager', () => {
       Array.from({ length: 10 }, () => 'A')
     );
 
-    it('BLAST_TILE_TYPES should include all 23 canonical types', () => {
+    it('BLAST_TILE_TYPES should include all 24 canonical types', () => {
       const canonicalTypes = [
         'standard', 'gold', 'bomb', 'rainbow', 'ice', 'lightning',
         'magnet', 'prism', 'gem', 'frozen', 'diamond',
         'countdown', 'portal', 'catalyst', 'shuffle', 'magma',
-        'crystal', 'fuse', 'anchor',
+        'crystal', 'fuse', 'anchor', 'mystery',
         'chocolate', 'cake', 'locked', 'key',
       ];
       for (const t of canonicalTypes) {
         expect(BLAST_TILE_TYPES).toContain(t);
       }
-      expect(BLAST_TILE_TYPES).toHaveLength(23);
+      expect(BLAST_TILE_TYPES).toHaveLength(24);
     });
 
     it('BLAST_TILE_TYPES should include core advanced types (diamond, prism, frozen)', () => {
