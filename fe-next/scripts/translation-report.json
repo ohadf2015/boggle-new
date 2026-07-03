@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 5945,
+    "totalKeysInCode": 5979,
     "keyCountByLanguage": {
-      "en": 11420,
-      "he": 11529,
-      "sv": 11508,
-      "ja": 11509,
-      "es": 11537,
-      "ru": 11395
+      "en": 11466,
+      "he": 11575,
+      "sv": 11554,
+      "ja": 11555,
+      "es": 11583,
+      "ru": 11441
     },
     "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 25,
+      "templateLiterals": 23,
       "fallbackUsages": 1,
       "variableKeys": 22
     }
@@ -83,23 +83,9 @@
         "type": "template_literal"
       },
       {
-        "pattern": "blast.archetypes.${archetype}",
-        "file": "components/blast/legacy/BlastWaveIntro.tsx",
-        "line": 37,
-        "context": "const label = t(`blast.archetypes.${archetype}`) || '';",
-        "type": "template_literal"
-      },
-      {
-        "pattern": "blast.mascot.${mascotKey}",
-        "file": "components/blast/legacy/BlastWaveIntro.tsx",
-        "line": 38,
-        "context": "const mascotAlt = t(`blast.mascot.${mascotKey}`) || '';",
-        "type": "template_literal"
-      },
-      {
         "pattern": "blast.combo.${detectedCombos[0].type}",
         "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
-        "line": 211,
+        "line": 232,
         "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU",
         "type": "template_literal"
       },

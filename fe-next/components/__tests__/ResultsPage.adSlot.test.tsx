@@ -86,7 +86,6 @@ vi.mock('canvas-confetti', () => ({ __esModule: true, default: vi.fn() }));
 vi.mock('next/dynamic', () => ({
   __esModule: true,
   default: () => {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
     const React = require('react');
     const Component = React.forwardRef((_props: any, _ref: any) => null);
     Component.displayName = 'DynamicComponent';

@@ -153,7 +153,6 @@ describe('QuickProfileSetup', () => {
     it('scrolls the Continue button into view when the soft keyboard opens', () => {
       const scrollSpy = vi.fn();
       // happy-dom doesn't implement scrollIntoView — install a spy to observe it.
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (Element.prototype as any).scrollIntoView = scrollSpy;
 
       const { rerender } = render(<QuickProfileSetup {...defaultProps} />);
@@ -168,7 +167,6 @@ describe('QuickProfileSetup', () => {
 
     it('does not scroll on mount while the keyboard is closed', () => {
       const scrollSpy = vi.fn();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (Element.prototype as any).scrollIntoView = scrollSpy;
       render(<QuickProfileSetup {...defaultProps} />);
       expect(scrollSpy).not.toHaveBeenCalled();
