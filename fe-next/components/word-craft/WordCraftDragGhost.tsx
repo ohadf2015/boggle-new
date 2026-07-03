@@ -5,6 +5,14 @@ import type { DragState } from './useWordCraftDrag';
 
 export interface WordCraftDragGhostProps {
   drag: DragState | null;
+  /**
+   * Callback ref from useWordCraftDrag — the hook writes the live pointer
+   * position onto this wrapper as a translate3d transform on each
+   * pointermove (rAF-batched), so following the finger costs ZERO React
+   * re-renders. React only re-renders this component on begin/end,
+   * activation flip, and hover-cell crossings.
+   */
+  ghostRef: (el: HTMLDivElement | null) => void;
   /** Pass active locale so :lang() typography rules engage on the ghost */
   locale?: string;
 }
@@ -22,10 +30,12 @@ const LIFT_OFFSET_PX: Record<DragState['pointerType'], number> = {
 
 /**
  * Floating tile that follows the user's pointer during a drag-to-place.
- * Rendered into a viewport-fixed layer; pointer-events: none so the underlying
- * board cells still receive hover/move detection.
+ * Two layers: the OUTER wrapper is positioned imperatively by the drag hook
+ * (absolute translate3d at the pointer); the INNER tile owns all the visual
+ * styling (centering, lift, rotate, scale, transitions).
+ * pointer-events: none so the underlying board cells still receive the drop.
  */
-function WordCraftDragGhostImpl({ drag, locale = 'en' }: WordCraftDragGhostProps) {
+function WordCraftDragGhostImpl({ drag, ghostRef, locale = 'en' }: WordCraftDragGhostProps) {
   if (!drag) return null;
   const baseLift = LIFT_OFFSET_PX[drag.pointerType] ?? LIFT_OFFSET_PX.mouse;
   // Short viewports (landscape phones, ~568 px) would float the 88 px touch
@@ -41,30 +51,41 @@ function WordCraftDragGhostImpl({ drag, locale = 'en' }: WordCraftDragGhostProps
   const pre = !drag.active;
   return (
     <div
+      ref={ghostRef}
       aria-hidden
-      lang={locale}
-      data-drag-locked={locked ? 'true' : undefined}
-      data-drag-pre={pre ? 'true' : undefined}
       style={{
         position: 'fixed',
-        left: drag.x,
-        top: pre ? drag.y : drag.y - lift,
-        transform: pre
-          ? 'translate(-50%, -50%) rotate(-2deg) scale(0.85)'
-          : `translate(-50%, -50%) rotate(-4deg) scale(${locked ? 1.22 : 1.15})`,
-        opacity: pre ? 0.5 : 1,
+        left: 0,
+        top: 0,
+        // Initial paint at the drag-start point; the hook overwrites this
+        // transform imperatively on every subsequent pointermove.
+        transform: `translate3d(${drag.x}px, ${drag.y}px, 0)`,
+        willChange: 'transform',
         pointerEvents: 'none',
-        transition: 'transform 120ms ease-out, opacity 100ms linear, top 120ms ease-out',
       }}
-      className="z-50 w-14 h-16 sm:w-16 sm:h-[72px] rounded-neo border-neo-thick border-black bg-neo-lime text-neo-navy flex items-center justify-center shadow-hard-lg"
+      className="z-50"
     >
-      <span aria-hidden className="absolute inset-x-1.5 top-1 h-px bg-white/70" />
-      <span className="wc-tile-glyph relative text-3xl sm:text-4xl">
-        {drag.letter === '_' ? '·' : drag.letter}
-      </span>
-      <span className="absolute bottom-1 end-1.5 text-[10px] sm:text-[11px] opacity-60 font-bold tabular-nums">
-        {drag.value}
-      </span>
+      <div
+        lang={locale}
+        data-drag-locked={locked ? 'true' : undefined}
+        data-drag-pre={pre ? 'true' : undefined}
+        style={{
+          transform: pre
+            ? 'translate(-50%, -50%) rotate(-2deg) scale(0.85)'
+            : `translate(-50%, calc(-50% - ${lift}px)) rotate(-4deg) scale(${locked ? 1.22 : 1.15})`,
+          opacity: pre ? 0.5 : 1,
+          transition: 'transform 120ms ease-out, opacity 100ms linear',
+        }}
+        className="w-14 h-16 sm:w-16 sm:h-[72px] rounded-neo border-neo-thick border-black bg-neo-lime text-neo-navy flex items-center justify-center shadow-hard-lg"
+      >
+        <span aria-hidden className="absolute inset-x-1.5 top-1 h-px bg-white/70" />
+        <span className="wc-tile-glyph relative text-3xl sm:text-4xl">
+          {drag.letter === '_' ? '·' : drag.letter}
+        </span>
+        <span className="absolute bottom-1 end-1.5 text-[10px] sm:text-[11px] opacity-60 font-bold tabular-nums">
+          {drag.value}
+        </span>
+      </div>
     </div>
   );
 }

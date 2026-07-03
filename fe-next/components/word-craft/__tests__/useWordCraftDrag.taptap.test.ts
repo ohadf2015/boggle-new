@@ -2,16 +2,53 @@ import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useWordCraftDrag } from '../useWordCraftDrag';
 
+/**
+ * Fake 15×15 board for grid-math drop resolution: 318×318 at (0,0) →
+ * 3px border + 6px padding (chrome 9), inner 300, 2px gaps.
+ * pitch = (300 + 2) / 15 ≈ 20.13. Cell (r,c) center = 9 + i*pitch + span/2.
+ */
+function makeFakeBoard(size = 15): HTMLElement {
+  const el = document.createElement('div');
+  el.setAttribute('data-wc-board', '');
+  el.setAttribute('data-board-size', String(size));
+  el.style.borderLeftWidth = '3px';
+  el.style.paddingLeft = '6px';
+  el.getBoundingClientRect = () =>
+    ({ left: 0, top: 0, width: 318, height: 318, right: 318, bottom: 318, x: 0, y: 0, toJSON: () => ({}) }) as DOMRect;
+  Object.defineProperty(el, 'offsetWidth', { value: 318 });
+  return el;
+}
+const PITCH = (300 + 2) / 15;
+const CHROME = 9;
+function cellCenter(r: number, c: number): [number, number] {
+  return [CHROME + c * PITCH + (PITCH - 2) / 2, CHROME + r * PITCH + (PITCH - 2) / 2];
+}
+
 describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
   let container: HTMLDivElement;
+  let board: HTMLElement;
+  // Per-test set of empty board cells the hook resolves drops against.
+  let emptyCells: Set<string>;
+  const getEmptyCells = () => emptyCells;
 
   beforeEach(() => {
     container = document.createElement('div');
     document.body.appendChild(container);
+    board = makeFakeBoard();
+    document.body.appendChild(board);
+    emptyCells = new Set<string>();
+    // jsdom lacks a paint loop; run ghost-paint rAF callbacks synchronously.
+    vi.stubGlobal('requestAnimationFrame', (cb: FrameRequestCallback) => {
+      cb(0);
+      return 0;
+    });
+    vi.stubGlobal('cancelAnimationFrame', () => {});
   });
 
   afterEach(() => {
     document.body.removeChild(container);
+    board.remove();
+    vi.unstubAllGlobals();
   });
 
   function createPointerEvent(
@@ -34,7 +71,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('touch pointer with pointerdown + pointerup (no movement) = tap, no drag ghost', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       // Simulate touch pointer down on a rack tile
@@ -62,7 +99,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('touch pointer with >6px movement escalates to drag (ghost becomes active)', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'touch', 50, 50);
@@ -77,16 +114,17 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
       window.dispatchEvent(evt);
     });
 
-    // After >6px movement, drag should become active
+    // After >6px movement, drag should become active. x/y stay at the START
+    // position — live motion is imperative (ghostRef transform), not state.
     expect(result.current.drag).not.toBeNull();
     expect(result.current.drag?.active).toBe(true);
-    expect(result.current.drag?.x).toBe(100);
-    expect(result.current.drag?.y).toBe(100);
+    expect(result.current.drag?.x).toBe(50);
+    expect(result.current.drag?.y).toBe(50);
   });
 
   it('mouse pointer with pointerdown + movement immediately activates drag (unchanged behavior)', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'mouse', 0, 0);
@@ -108,7 +146,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('pen pointer with movement immediately activates drag (unchanged behavior)', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'pen', 0, 0);
@@ -128,7 +166,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('touch pointer with <6px movement does not activate drag', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'touch', 100, 100);
@@ -141,15 +179,15 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
       window.dispatchEvent(evt);
     });
 
-    // Should still not be active (below threshold)
+    // Should still not be active (below threshold); x/y = start position
     expect(result.current.drag?.active).toBe(false);
-    expect(result.current.drag?.x).toBe(103);
-    expect(result.current.drag?.y).toBe(103);
+    expect(result.current.drag?.x).toBe(100);
+    expect(result.current.drag?.y).toBe(100);
   });
 
   it('touch pointer with vertical-only 4px movement activates drag (fast lane)', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'touch', 100, 100);
@@ -171,7 +209,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     // inactive (both activation paths required absDy >= absDx) so diagonal
     // drags silently died — the "dragging feels stuck" bug.
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'touch', 50, 100);
@@ -189,7 +227,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('touch pointer with horizontal-only swipe does NOT activate drag (rack scroll wins)', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'touch', 50, 50);
@@ -206,7 +244,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('begin() ignores non-primary pointers so pinch second-finger never starts a drag', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'touch', 100, 100, undefined, {
@@ -220,7 +258,7 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('horizontal swipe sets consumeDropFlag so the trailing click is suppressed', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'touch', 100, 100);
@@ -242,38 +280,25 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
     expect(result.current.consumeDropFlag()).toBe(false);
   });
 
-  it('drop snap: pointerup in a 2px gap resolves to the nearest empty cell', () => {
+  it('drop snap: pointerup in the gap between two empty cells resolves to a cell', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
+    emptyCells = new Set(['0,0', '0,1']);
 
-    const c1 = document.createElement('div');
-    c1.dataset.boardCell = '0,0';
-    c1.dataset.tileState = 'empty';
-    Object.defineProperty(c1, 'getBoundingClientRect', {
-      value: () => ({ left: 0, top: 0, right: 30, bottom: 30, width: 30, height: 30, x: 0, y: 0, toJSON: () => ({}) }),
-    });
-    const c2 = document.createElement('div');
-    c2.dataset.boardCell = '0,1';
-    c2.dataset.tileState = 'empty';
-    Object.defineProperty(c2, 'getBoundingClientRect', {
-      value: () => ({ left: 32, top: 0, right: 62, bottom: 30, width: 30, height: 30, x: 32, y: 0, toJSON: () => ({}) }),
-    });
-    container.appendChild(c1);
-    container.appendChild(c2);
-
+    const [c00x, c00y] = cellCenter(0, 0);
     act(() => {
-      const evt = createPointerEvent('pointerdown', 'mouse', 5, 5);
+      const evt = createPointerEvent('pointerdown', 'mouse', c00x - 12, c00y - 12);
       result.current.begin('t-snap', 'S', 1, evt as any);
     });
     act(() => {
-      const evt = createPointerEvent('pointermove', 'mouse', 8, 8);
+      const evt = createPointerEvent('pointermove', 'mouse', c00x - 8, c00y - 8);
       window.dispatchEvent(evt);
     });
     act(() => {
-      vi.spyOn(document, 'elementFromPoint').mockReturnValue(document.body);
-      const evt = createPointerEvent('pointerup', 'mouse', 31, 15);
+      // Release in the 2px gap between (0,0) and (0,1)
+      const gapX = CHROME + PITCH - 1;
+      const evt = createPointerEvent('pointerup', 'mouse', gapX, c00y);
       window.dispatchEvent(evt);
-      vi.spyOn(document, 'elementFromPoint').mockRestore();
     });
 
     expect(onDrop).toHaveBeenCalledTimes(1);
@@ -281,17 +306,10 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
   });
 
   it('drop snap: a near-miss ~28px from a cell center still snaps (forgiving radius)', () => {
-    // GIVEN one empty 30px cell at origin (center 15,15)
+    // GIVEN only cell (0,0) is empty
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
-
-    const c1 = document.createElement('div');
-    c1.dataset.boardCell = '0,0';
-    c1.dataset.tileState = 'empty';
-    Object.defineProperty(c1, 'getBoundingClientRect', {
-      value: () => ({ left: 0, top: 0, right: 30, bottom: 30, width: 30, height: 30, x: 0, y: 0, toJSON: () => ({}) }),
-    });
-    container.appendChild(c1);
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
+    emptyCells = new Set(['0,0']);
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'mouse', 5, 5);
@@ -302,12 +320,11 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
       window.dispatchEvent(evt);
     });
     act(() => {
-      vi.spyOn(document, 'elementFromPoint').mockReturnValue(document.body);
-      // WHEN releasing 28px below the cell center (15,43) — beyond the old
-      // 24px radius but within a more forgiving 32px radius.
-      const evt = createPointerEvent('pointerup', 'mouse', 15, 43);
+      // WHEN releasing ~25px below the (0,0) cell center — beyond the cell,
+      // inside the forgiving 32px snap radius.
+      const [cx, cy] = cellCenter(0, 0);
+      const evt = createPointerEvent('pointerup', 'mouse', cx - 3, cy + 25);
       window.dispatchEvent(evt);
-      vi.spyOn(document, 'elementFromPoint').mockRestore();
     });
 
     // THEN the tile still lands on the nearest empty cell
@@ -316,15 +333,8 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('drop snap: pointerup beyond SNAP_RADIUS_PX does not snap', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
-
-    const c1 = document.createElement('div');
-    c1.dataset.boardCell = '0,0';
-    c1.dataset.tileState = 'empty';
-    Object.defineProperty(c1, 'getBoundingClientRect', {
-      value: () => ({ left: 0, top: 0, right: 30, bottom: 30, width: 30, height: 30, x: 0, y: 0, toJSON: () => ({}) }),
-    });
-    container.appendChild(c1);
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
+    emptyCells = new Set(['0,0']);
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'mouse', 5, 5);
@@ -335,10 +345,8 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
       window.dispatchEvent(evt);
     });
     act(() => {
-      vi.spyOn(document, 'elementFromPoint').mockReturnValue(document.body);
       const evt = createPointerEvent('pointerup', 'mouse', 200, 200);
       window.dispatchEvent(evt);
-      vi.spyOn(document, 'elementFromPoint').mockRestore();
     });
 
     expect(onDrop).not.toHaveBeenCalled();
@@ -346,7 +354,10 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('touch: no drop fires if pointerup before threshold reached', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
+    // The cell under (52,52) — floor((52-9)/20.13) = 2 — is empty and would
+    // accept a drop if the drag were active.
+    emptyCells = new Set(['2,2']);
 
     act(() => {
       const evt = createPointerEvent('pointerdown', 'touch', 50, 50);
@@ -359,19 +370,10 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
       window.dispatchEvent(evt);
     });
 
-    // Create a board cell to drop onto
-    const cell = document.createElement('div');
-    cell.dataset.boardCell = '5,5';
-    cell.dataset.tileState = 'empty';
-    container.appendChild(cell);
-
     act(() => {
-      // Point pointerup over the cell while drag is still inactive
+      // Pointerup over the empty cell while drag is still inactive
       const evt = createPointerEvent('pointerup', 'touch', 52, 52);
-      // Override elementFromPoint to return our test cell
-      vi.spyOn(document, 'elementFromPoint').mockReturnValue(cell);
       window.dispatchEvent(evt);
-      vi.spyOn(document, 'elementFromPoint').mockRestore();
     });
 
     // onDrop should NOT fire because drag.active was false
@@ -380,36 +382,31 @@ describe('useWordCraftDrag — touch-pointer tap-tap default', () => {
 
   it('consumeDropFlag reflects successful drop', () => {
     const onDrop = vi.fn();
-    const { result } = renderHook(() => useWordCraftDrag({ onDrop }));
+    const { result } = renderHook(() => useWordCraftDrag({ onDrop, getEmptyCells }));
+    emptyCells = new Set(['3,3']);
 
     // Before any gesture, consumeDropFlag should return false
     expect(result.current.consumeDropFlag()).toBe(false);
 
+    const [cx, cy] = cellCenter(3, 3);
     act(() => {
-      const evt = createPointerEvent('pointerdown', 'mouse', 0, 0);
+      const evt = createPointerEvent('pointerdown', 'mouse', cx - 5, cy - 5);
       result.current.begin('t-8', 'H', 8, evt as any);
     });
 
     act(() => {
       // Activate drag with mouse movement
-      const evt = createPointerEvent('pointermove', 'mouse', 5, 5);
+      const evt = createPointerEvent('pointermove', 'mouse', cx, cy);
       window.dispatchEvent(evt);
     });
-
-    // Create a valid drop target
-    const cell = document.createElement('div');
-    cell.dataset.boardCell = '3,3';
-    cell.dataset.tileState = 'empty';
-    container.appendChild(cell);
 
     act(() => {
-      // End drag over a valid empty cell
-      const evt = createPointerEvent('pointerup', 'mouse', 5, 5);
-      vi.spyOn(document, 'elementFromPoint').mockReturnValue(cell);
+      // End drag over the valid empty cell
+      const evt = createPointerEvent('pointerup', 'mouse', cx, cy);
       window.dispatchEvent(evt);
-      vi.spyOn(document, 'elementFromPoint').mockRestore();
     });
 
+    expect(onDrop).toHaveBeenCalledWith('t-8', 3, 3);
     // Now consumeDropFlag should return true (and clear it)
     expect(result.current.consumeDropFlag()).toBe(true);
     // Second call should return false
