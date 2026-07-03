@@ -37,11 +37,11 @@ function WordCraftStepHintImpl({ step, labels }: WordCraftStepHintProps) {
   }, [step]);
 
   if (step === 'idle') {
-    return <div className="h-7" aria-hidden />;
+    return <div data-wc-step-hint className="h-7" aria-hidden />;
   }
 
   return (
-    <div className="flex items-center justify-center" aria-live="polite" aria-atomic="true">
+    <div data-wc-step-hint className="flex items-center justify-center" aria-live="polite" aria-atomic="true">
       <div
         ref={ref}
         data-step={step}

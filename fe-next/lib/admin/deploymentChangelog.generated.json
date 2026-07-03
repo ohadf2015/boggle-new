@@ -1,6 +1,20 @@
 {
-  "generatedAt": "2026-07-03T19:20:40.875Z",
+  "generatedAt": "2026-07-03T19:51:54.430Z",
   "commits": [
+    {
+      "sha": "eb03050c7bbc2be40fd62434024358b5bef68da1",
+      "shortSha": "eb03050",
+      "subject": "chore(i18n): refresh translation report after wordcraft setup keys",
+      "author": "Ohad Fisher",
+      "date": "2026-07-03T22:28:28+03:00"
+    },
+    {
+      "sha": "264ab4f093564e8346b80874bde14e55de9536d0",
+      "shortSha": "264ab4f",
+      "subject": "feat(wordcraft): remote Challenge-a-Friend opponent + scroll-free responsive setup screen",
+      "author": "Ohad Fisher",
+      "date": "2026-07-03T22:27:28+03:00"
+    },
     {
       "sha": "983153f9bce87519b3471bf1fb206d6be3362213",
       "shortSha": "983153f",
@@ -126,20 +140,6 @@
       "subject": "fix(daily): regenerate Word Hunt tutorial images with brand mascot",
       "author": "Ohad Fisher",
       "date": "2026-07-03T18:26:47+03:00"
-    },
-    {
-      "sha": "3567cbeed33a38e6e8927f411fc42f510f34ffb1",
-      "shortSha": "3567cbe",
-      "subject": "fix(push): truthful event-based rival copy + Russian locale",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T17:31:42+03:00"
-    },
-    {
-      "sha": "e4e68e15eede87c9bb64974ee6cc70ea3fc7950f",
-      "shortSha": "e4e68e1",
-      "subject": "feat(nightly): close the loop — repair pass, dropped-work requeue, impact ledger, brief-gated lanes, preflight self-retry",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T17:13:39+03:00"
     }
   ]
 }

@@ -3631,6 +3631,76 @@ html.needs-cookie-consent body.screen-fit-locked {
   }
 }
 
+/* WordCraft landscape-phone game layout.
+   Portrait stacks chrome above/below a container-query-sized board; on a
+   ~360px-tall landscape phone the chrome consumed the whole column and the
+   `100cqmin` board collapsed to 0. Here the main column becomes a 2-col grid:
+   the board owns the left column at an explicit square size (svh/vw — cqmin
+   is bypassed because its container no longer has a definite flex height),
+   and every other row of chrome stacks in the right column in source order. */
+@media (orientation: landscape) and (max-height: 520px) {
+  [data-wc-main] {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-auto-rows: min-content;
+    align-content: start;
+    column-gap: 10px;
+    row-gap: 4px;
+    max-width: none;
+  }
+  [data-wc-main] > * {
+    grid-column: 2;
+  }
+  [data-wc-main] > [data-wc-board-zone] {
+    grid-column: 1;
+    /* Span more rows than the chrome will ever produce so the board always
+       occupies the full left rail. */
+    grid-row: 1 / span 20;
+    align-self: start;
+    /* container-type:size gives the zone a 0×0 auto size (size containment),
+       which zeroed the grid's auto column AND let the square flex-shrink to
+       0 width. Pin the zone to the square's size explicitly. */
+    width: min(78svh, 42vw);
+    height: min(78svh, 42vw);
+    flex: none;
+  }
+  [data-wc-board-square] {
+    width: min(78svh, 42vw) !important;
+    height: min(78svh, 42vw) !important;
+    flex-shrink: 0;
+  }
+  /* The page is immersive and the in-main topbar already has Back — the
+     global header + its flow spacer are pure height loss at ~360px tall. */
+  [data-wc-page] > header,
+  [data-wc-page] > .h-header {
+    display: none !important;
+  }
+  /* Coach rows (first-move guide + live step hint) don't fit the right rail;
+     the tutor "?" stays available in the topbar. */
+  [data-wc-page] [data-wc-placement-guide],
+  [data-wc-page] [data-wc-step-hint] {
+    display: none !important;
+  }
+  /* Slimmer rack: shorter rail, smaller tiles, tighter padding. */
+  [data-wc-main] [role='toolbar'] {
+    min-height: 58px !important;
+  }
+  [data-wc-main] [role='toolbar'] > div {
+    padding: 4px 8px !important;
+  }
+  [data-wc-main] [data-rack-tile-id] {
+    width: 44px !important;
+    height: 52px !important;
+  }
+  /* Slimmer action row. */
+  [data-wc-main] [data-wc-controls] > button {
+    height: 40px !important;
+  }
+  [data-wc-main] [data-wc-controls] > button:not(:first-child) {
+    width: 40px !important;
+  }
+}
+
 /* Utility for any page that needs to clear the bottom-fixed stack
    (nav + banner). Reactive: updates automatically as either layer resizes. */
 .pb-bottom-stack {

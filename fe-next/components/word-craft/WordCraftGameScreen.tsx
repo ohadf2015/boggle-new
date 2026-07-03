@@ -850,6 +850,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
 
   return (
     <div
+      data-wc-page
       className={cn(
         // No-scroll viewport contract: fill exactly the small viewport height,
         // hide overflow, lay everything out as flex column. Game must FIT.
@@ -877,7 +878,10 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
         }}
       />
 
-      <main className="flex-1 min-h-0 px-3 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1 relative">
+      {/* data-wc-main: landscape-phone grid override lives in globals.css —
+          board left, all chrome stacked right (the portrait flex column
+          collapsed the cqmin board to 0 height on ~360px-tall screens). */}
+      <main data-wc-main className="flex-1 min-h-0 px-3 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1 relative">
         {/* Topbar: back · title · play-friend · How to play · loading (public — no beta badge) */}
         <div className="relative flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
@@ -959,10 +963,11 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
             max-w-full` which is height-bound and wastes 100–140 px on tall
             portrait phones after chrome compression. */}
         <div
+          data-wc-board-zone
           className="flex-1 min-h-0 flex items-center justify-center"
           style={{ containerType: 'size' }}
         >
-          <div className="relative aspect-square" style={{ width: '100cqmin', height: '100cqmin' }}>
+          <div data-wc-board-square className="relative aspect-square" style={{ width: '100cqmin', height: '100cqmin' }}>
             <WordCraftBoardSection
               board={game.state.board}
               pending={game.state.pendingPlacements}

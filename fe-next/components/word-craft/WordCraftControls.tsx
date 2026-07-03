@@ -50,7 +50,7 @@ function WordCraftControlsImpl({
 }: WordCraftControlsProps) {
   const submitLive = canSubmit && !disabled;
   return (
-    <div className="flex gap-2 justify-center items-stretch shrink-0 pb-[max(0px,env(safe-area-inset-bottom))]">
+    <div data-wc-controls className="flex gap-2 justify-center items-stretch shrink-0 pb-[max(0px,env(safe-area-inset-bottom))]">
       <button
         type="button"
         onClick={onSubmit}
