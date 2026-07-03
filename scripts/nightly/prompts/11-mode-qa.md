@@ -77,3 +77,9 @@ Update the `#### Mode readiness verdict` block in `docs/nightly/reports/__TODAY_
 ```
 
 Also append a short `### Lane — Mode QA (<slug>)` section with the full findings list for the record.
+
+═══ IMPACT LEDGER (measure what you ship — 2026-07-03 overhaul) ═══
+When you SHIP a change this run, APPEND one ndjson line to `docs/nightly/impact-ledger.ndjson`:
+`{"id":"11-mode-qa-__TODAY__-<slug>","date":"__TODAY__","lane":"11-mode-qa","change":"<one line>","metric":"<posthog:...|sentry:...|supabase:...>","source":"posthog|sentry|supabase","query_hint":"<how to re-measure this in one query>","baseline":<current number>,"direction":"up|down","check_after_days":3}`
+One entry per shipped change; pick ONE falsifiable metric you can query later. If genuinely unmeasurable (pure hardening), use `"metric":"none"` plus a `"why"`.
+If tonight's brief contains an **IMPACT CHECK** item: run its ONE targeted query, APPEND the exact verdict line it specifies, and if the verdict is REGRESSED, fixing or reverting that change becomes your TOP task tonight.

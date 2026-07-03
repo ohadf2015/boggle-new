@@ -25,16 +25,20 @@ LOG_DIR="${LEXI_NIGHTLY_LOG_DIR:-$HOME/logs/lexi-nightly}"
 REPO_DIR="${LEXI_REPO_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 tag="${1:-latest}"
 
+# Backups come from TWO drop paths: docs-only salvage → salvaged-code-<tag>/,
+# drop-and-re-gate peel → dropped-<tag>/. Accept either (salvaged-code wins on
+# a same-tag tie; peel + salvage never share a DATE_TAG in one run anyway).
 if [ "$tag" = "latest" ]; then
-  src=$(ls -dt "$LOG_DIR"/salvaged-code-* 2>/dev/null | head -1)
+  src=$(ls -dt "$LOG_DIR"/salvaged-code-* "$LOG_DIR"/dropped-* 2>/dev/null | head -1)
 else
   src="$LOG_DIR/salvaged-code-$tag"
+  [ -d "$src" ] || src="$LOG_DIR/dropped-$tag"
 fi
 
 if [ -z "${src:-}" ] || [ ! -d "$src" ]; then
   echo "restore-salvaged-code: no backup found for '$tag' under $LOG_DIR" >&2
   echo "  available:" >&2
-  ls -dt "$LOG_DIR"/salvaged-code-* 2>/dev/null | sed 's#.*/salvaged-code-#    #' >&2 || echo "    (none)" >&2
+  ls -dt "$LOG_DIR"/salvaged-code-* "$LOG_DIR"/dropped-* 2>/dev/null | sed "s#$LOG_DIR/#    #" >&2 || echo "    (none)" >&2
   exit 1
 fi
 

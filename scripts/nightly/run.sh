@@ -197,6 +197,19 @@ trap on_signal TERM INT
 # night is never silent). Tested by test/failure-digest.test.sh.
 # shellcheck disable=SC1091
 . "$LIB_DIR/failure-digest.sh"
+# 2026-07-03 overhaul: dropped-work requeue ledger + brief-gated lane selection
+# + same-night repair pass. Tested by test/restore-queue.test.sh,
+# test/lane-scheduler.test.sh, test/repair-dropped.test.sh.
+# shellcheck disable=SC1091
+. "$LIB_DIR/restore-queue.sh"
+# shellcheck disable=SC1091
+. "$LIB_DIR/lane-scheduler.sh"
+# shellcheck disable=SC1091
+. "$LIB_DIR/repair-dropped.sh"
+# headless_run for the repair pass (lanes source this themselves; run.sh needs
+# it only for nightly_repair_attempt).
+# shellcheck disable=SC1091
+. "$LIB_DIR/headless.sh"
 # founder free-text directives (texted to the bot) → active block for this run.
 # shellcheck disable=SC1091
 . "$LIB_DIR/user-directives.sh"
@@ -213,6 +226,23 @@ log "========================================"
 if ! preflight_check >> "$RUN_LOG" 2>&1; then
   log "preflight failed — aborting"
   tail -20 "$RUN_LOG" 2>/dev/null
+  # Timed self-retry (2026-07-03 overhaul C4): 3 of the last 15 nights shipped
+  # NOTHING because the shared tree sat on a feature branch with unpushed work at
+  # 01:00 (a concurrent session), and the abort was final. When preflight flags
+  # the abort as retryable (retry-requested marker), re-run ONCE after a delay —
+  # by then the concurrent session has usually pushed/switched back. One shot
+  # (NIGHTLY_IS_RETRY guard), and the once-per-day dedup still applies if the
+  # retry succeeds.
+  _retry_flag="$HOME/.cache/lexi-nightly/retry-requested"
+  if [ -f "$_retry_flag" ] && [ "${NIGHTLY_IS_RETRY:-0}" != "1" ]; then
+    rm -f "$_retry_flag"
+    _rd="${NIGHTLY_RETRY_DELAY:-10800}"
+    log "preflight requested a timed retry — re-running once in $((_rd/60)) min"
+    tg_alert "nightly: preflight aborted on a retryable condition (repo off-master with unpushed work) — self-retrying ONCE in $((_rd/60)) min."
+    nohup bash -c "sleep $_rd; NIGHTLY_IS_RETRY=1 exec /bin/bash '$PROJECT_DIR/scripts/nightly/run.sh'" \
+      >> "$LOG_DIR/retry.log" 2>&1 &
+    disown 2>/dev/null || true
+  fi
   send_failure_digest "Preflight failed (dirty tree, stale lock, or git divergence) — the run never started. Nothing changed."
   exit 1
 fi
@@ -367,6 +397,33 @@ log "$MCP_PROBE_LINE"
 # dropped on a healthy night. Reordering is safe: the loop matches by lane NAME, not position.
 LANES=(01-triage 11-mode-qa 02-perf 05-landing 06-seo 03-engagement 12-telemetry-coverage 07-self-learn 10-dictionary 09-monetization 04-competitor 08-adsense)
 LANE_RESULTS=()
+
+# Brief-gated lane selection (2026-07-03 overhaul C3): a lane whose Phase-0
+# brief slice is EMPTY falls back to in-lane discovery — often invented work —
+# while burning the shared usage window that later high-signal lanes then die on
+# (rc=75 cascades). Core lanes always run; zero-signal non-core lanes are
+# trimmed to a 2-per-night rotation. Fail-open on any problem (all lanes).
+# Kill-switch: NIGHTLY_SCHEDULER=0. Tested by test/lane-scheduler.test.sh.
+if [ -z "$ONLY" ]; then
+  _SCHED=()
+  while IFS= read -r _sl; do [ -n "$_sl" ] && _SCHED+=("$_sl"); done \
+    < <(nightly_schedule_lanes "${BRIEF_JSON_FILE:-}" "${LANES[@]}")
+  if [ "${#_SCHED[@]}" -ge 1 ] && [ "${#_SCHED[@]}" -le "${#LANES[@]}" ]; then
+    _skipped=""
+    for _l in "${LANES[@]}"; do
+      case " ${_SCHED[*]} " in *" $_l "*) ;; *) _skipped="${_skipped}${_l} " ;; esac
+    done
+    if [ -n "$_skipped" ]; then
+      log "lane scheduler: ${#_SCHED[@]}/${#LANES[@]} lanes selected this night — skipping zero-signal lanes: ${_skipped}(rotation gives every idle lane a slot ~every 3 nights; NIGHTLY_SCHEDULER=0 restores all)"
+      echo "**Lane scheduler:** ran ${#_SCHED[@]}/${#LANES[@]} lanes; skipped (no brief signal, off-rotation): \`${_skipped}\`" >> "$REPORT"
+      for _l in ${_skipped}; do
+        LANE_RESULTS+=("⏭️  $_l — skipped (no brief signal, off-rotation)")
+      done
+    fi
+    LANES=("${_SCHED[@]}")
+  fi
+  unset _SCHED _skipped _sl _l
+fi
 
 should_run() {
   local n="$1"
@@ -705,6 +762,8 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
   # nuke a whole night of build-clean code (2026-07-02). Guarded so a tier that
   # itself returns an unparseable "peel" can't spin the loop — one shot, then docs-only.
   _conclusive_verify_done=0
+  # One-shot guard for the same-night repair pass (2026-07-03 overhaul C1).
+  _repair_done=0
   while [ "$_round" -lt "$_MAX_REGATE_ROUNDS" ]; do
     _round=$(( _round + 1 ))
     _bad_raw=$(nightly_parse_gate_failures "${NIGHTLY_LAST_GATE_OUTPUT:-}")
@@ -730,6 +789,44 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
     if [ -n "$_ignored" ]; then
       log "drop-and-re-gate: parser returned $(printf '%s' "$_ignored" | grep -c .) non-authored path(s) — ignoring (not in authored allowlist):"
       printf '%s\n' "$_ignored" | while IFS= read -r f; do [ -n "$f" ] && log "  ignore: $f"; done
+    fi
+
+    # ── Same-night REPAIR pass (2026-07-03 overhaul C1) ────────────────────────
+    # Before DROPPING a named authored offender, spend ONE bounded headless run
+    # (default 600s, sonnet) fixing the actual gate error — the recurring drop
+    # causes are mechanical (hooks after early return, ssr:false in a Server
+    # Component, missed import) and 312 files were dropped over 06-19→07-03.
+    # Claims are never trusted: the FULL isolated gate re-runs after the attempt.
+    # Any failure falls through to the unchanged drop path — this can only save
+    # work. Kill-switch: NIGHTLY_REPAIR_PASS=0.
+    if [ -n "$_bad" ] && [ "${NIGHTLY_REPAIR_PASS:-1}" = "1" ] && [ "$_repair_done" = "0" ]; then
+      _repair_done=1
+      _rbad=$(mktemp); printf '%s\n' "$_bad" > "$_rbad"
+      _rbefore=$(mktemp); nightly_dirty_paths > "$_rbefore"
+      log "repair pass: bounded fix attempt on $(grep -c . "$_rbad") gate-failing file(s) BEFORE dropping (cap ${NIGHTLY_REPAIR_SECS:-600}s, one attempt/night)"
+      if nightly_repair_attempt "$_rbad" "$_authored_out" "$RUN_LOG" >> "$RUN_LOG" 2>&1; then
+        # The repair may have added a NEW file (e.g. a 'use client' wrapper) —
+        # fold anything it authored into the allowlist so the re-gate sees it.
+        _rafter=$(mktemp); nightly_dirty_paths > "$_rafter"
+        comm -13 "$_rbefore" "$_rafter" >> "$NIGHTLY_AUTHORED_FILE"
+        sort -u "$NIGHTLY_AUTHORED_FILE" -o "$NIGHTLY_AUTHORED_FILE"
+        rm -f "$_rafter" "$_rbad" "$_rbefore" "$_authored_out"
+        log "repair pass: attempt finished — re-gating the full authored set (claims not trusted)"
+        run_isolated_gate "$NIGHTLY_AUTHORED_FILE"; iso_rc=$?
+        if [ "$iso_rc" = "0" ]; then
+          gate_ok=1
+          log "repair pass: re-gate PASSED — the would-be-dropped file(s) were fixed and ship tonight (nothing dropped)"
+          echo -e "\n**Outcome (repaired):** the gate-failing file(s) were fixed by the bounded repair pass and the full re-gate passed — nothing dropped." >> "$REPORT"
+          break
+        fi
+        log "repair pass: re-gate still red (rc=$iso_rc) — continuing the normal peel/drop path"
+        [ "$iso_rc" = "1" ] && continue
+        # rc=3/2 → fall through: the drop below re-gates and its own wedge/setup
+        # handling takes over (unchanged behaviour).
+      else
+        log "repair pass: headless attempt failed/timed out — continuing the normal drop path"
+        rm -f "$_rbad" "$_rbefore"
+      fi
     fi
     if [ -z "$_bad" ]; then
       # ── Baseline-aware salvage ────────────────────────────────────────────────
@@ -915,6 +1012,13 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
     _drop_backup="$LOG_DIR/dropped-${DATE_TAG}"
     backup_dropped_authored "$_dropped_list" "$_drop_backup"
     log "drop-and-re-gate: backed up $(grep -c . "$_dropped_list" 2>/dev/null) dropped file(s) → $_drop_backup (recover: cp from there if mis-blamed)"
+    # Requeue (2026-07-03 overhaul C1): a dropped file is no longer a manual
+    # chase — the entry feeds collect-restore.sh, which makes restoring it the
+    # NEXT night's top triage signal. Committed with tonight's docs.
+    restore_queue_append "$PROJECT_DIR/docs/nightly/restore-queue.ndjson" "$DATE_TAG" \
+      "$_dropped_list" "$_drop_backup" "drop-and-re-gate round $_round (gate-failing)"
+    echo "docs/nightly/restore-queue.ndjson" >> "$NIGHTLY_AUTHORED_FILE"
+    sort -u "$NIGHTLY_AUTHORED_FILE" -o "$NIGHTLY_AUTHORED_FILE"
     revert_authored "$RUN_SNAPSHOT" "$_dropped_list"
     rm -f "$_dropped_list"
     if [ ! -s "$NIGHTLY_AUTHORED_FILE" ]; then log "drop-and-re-gate: nothing left after drops"; break; fi
@@ -985,6 +1089,14 @@ if [ "$gate_ok" = "0" ]; then
   backup_dropped_authored "$AUTHORED_CODE" "$_salvage_backup"
   _dropped_count=$(grep -c . "$AUTHORED_CODE" 2>/dev/null || echo 0)
   [ -s "$AUTHORED_CODE" ] && log "docs-only salvage: backed up ${_dropped_count} reverted code file(s) → $_salvage_backup"
+  # Requeue (2026-07-03 overhaul C1): the salvaged code becomes the NEXT night's
+  # top triage signal via collect-restore.sh instead of a manual founder chase.
+  # The queue file is docs/ so it survives this very docs-only salvage.
+  if [ -s "$AUTHORED_CODE" ]; then
+    restore_queue_append "$PROJECT_DIR/docs/nightly/restore-queue.ndjson" "$DATE_TAG" \
+      "$AUTHORED_CODE" "$_salvage_backup" "docs-only salvage: gate failed on lane code"
+    echo "docs/nightly/restore-queue.ndjson" >> "$NIGHTLY_AUTHORED_FILE"
+  fi
   revert_authored "$RUN_SNAPSHOT" "$AUTHORED_CODE"
   rm -f "$AUTHORED_CODE"
 

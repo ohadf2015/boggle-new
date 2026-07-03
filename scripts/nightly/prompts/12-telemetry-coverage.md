@@ -92,3 +92,9 @@ Top mode hole: <mode> <started>→<completed>"
 ```
 If you found a likely regression (newly-dead high-traffic event) but could NOT safely fix it,
 `"scripts/nightly/lib/telegram.sh" alert "<event> stopped firing — needs human look"` instead.
+
+═══ IMPACT LEDGER (measure what you ship — 2026-07-03 overhaul) ═══
+When you SHIP a change this run, APPEND one ndjson line to `docs/nightly/impact-ledger.ndjson`:
+`{"id":"12-telemetry-coverage-__TODAY__-<slug>","date":"__TODAY__","lane":"12-telemetry-coverage","change":"<one line>","metric":"<posthog:...|sentry:...|supabase:...>","source":"posthog|sentry|supabase","query_hint":"<how to re-measure this in one query>","baseline":<current number>,"direction":"up|down","check_after_days":3}`
+One entry per shipped change; pick ONE falsifiable metric you can query later. If genuinely unmeasurable (pure hardening), use `"metric":"none"` plus a `"why"`.
+If tonight's brief contains an **IMPACT CHECK** item: run its ONE targeted query, APPEND the exact verdict line it specifies, and if the verdict is REGRESSED, fixing or reverting that change becomes your TOP task tonight.

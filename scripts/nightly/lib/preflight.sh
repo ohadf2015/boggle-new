@@ -200,7 +200,11 @@ preflight_check() {
       fi
     else
       echo "preflight: ABORT — not on master (on ${branch:-detached}) and auto-recover unsafe (dirty tree or unpushed work)"
-      tg_alert "⚠️ nightly ABORTED — repo on stray branch '${branch:-detached}' with uncommitted or unpushed work; refusing to switch (would lose work). Manual review needed."
+      # Retryable: a concurrent session usually pushes/switches back within hours.
+      # run.sh sees this marker and schedules ONE timed re-run (2026-07-03 C4 —
+      # this exact abort cost 3 of the last 15 nights their entire run).
+      touch "$HOME/.cache/lexi-nightly/retry-requested" 2>/dev/null || true
+      tg_alert "⚠️ nightly ABORTED — repo on stray branch '${branch:-detached}' with uncommitted or unpushed work; refusing to switch (would lose work). Will self-retry once in a few hours."
       return 1
     fi
   fi

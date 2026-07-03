@@ -20,6 +20,8 @@ INTEL_SOURCES=(
   "supabase:collect-supabase.sh:60"
   "revenue:collect-revenue.sh:60"
   "flagged-puzzles:collect-flagged-puzzles.sh:45"
+  "restore:collect-restore.sh:20"
+  "impact:collect-impact.sh:20"
 )
 
 # Validate the registry: every entry must be "id:script:timeout" with a numeric

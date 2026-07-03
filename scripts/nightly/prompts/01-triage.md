@@ -17,6 +17,8 @@ Phase 0 already queried every data source over REST and ranked the highest-lever
 
 __BRIEF__
 
+**Dropped-work restores come FIRST:** if the brief contains a **Restore dropped nightly work** item, it outranks everything else tonight. Restore the listed files from their backup (`scripts/nightly/restore-salvaged-code.sh <tag>`), fix the ORIGINAL gate error (the drop reason names it — recurring causes: hooks after an early return, `ssr:false` in a Server Component), and append `{"resolve":"<tag>"}` to `docs/nightly/restore-queue.ndjson`. Restored code failed a gate once — it must pass tonight's gate like any other change.
+
 **Brief-first contract:** Pick the top 1–3 items above and fix/ship them this run. The data was already collected — do NOT re-run broad Sentry/Supabase/PostHog discovery. ONLY if the brief slice above is empty or marked STALE may you do ONE quick targeted query (e.g., "last 24h Sentry errors for project lexiclash"), then act. Use MCP to *apply* a fix (Supabase migrations, error boundaries, null guards), not to re-explore.
 
 ═══ SKILLS TO USE ═══
@@ -110,3 +112,9 @@ Append to `docs/nightly/reports/__TODAY__.md`:
 - Queued for human review (DEFER side of matrix): <count> (see docs/nightly/triage-queue.md, status: deferred)
 - Marked review-by-eod (shipped but worth a 9am skim): <count> (same file, status: shipped)
 ```
+
+═══ IMPACT LEDGER (measure what you ship — 2026-07-03 overhaul) ═══
+When you SHIP a change this run, APPEND one ndjson line to `docs/nightly/impact-ledger.ndjson`:
+`{"id":"01-triage-__TODAY__-<slug>","date":"__TODAY__","lane":"01-triage","change":"<one line>","metric":"<posthog:...|sentry:...|supabase:...>","source":"posthog|sentry|supabase","query_hint":"<how to re-measure this in one query>","baseline":<current number>,"direction":"up|down","check_after_days":3}`
+One entry per shipped change; pick ONE falsifiable metric you can query later. If genuinely unmeasurable (pure hardening), use `"metric":"none"` plus a `"why"`.
+If tonight's brief contains an **IMPACT CHECK** item: run its ONE targeted query, APPEND the exact verdict line it specifies, and if the verdict is REGRESSED, fixing or reverting that change becomes your TOP task tonight.
