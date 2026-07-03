@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useRef, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useRef, useMemo, useState, type ReactNode } from 'react';
 import { Capacitor } from '@capacitor/core';
 import { AdMob, AdmobConsentStatus } from '@capacitor-community/admob';
 import { getAdmobConfig, type AdmobConfig, type AdPlatform } from '@/lib/admob-config';
@@ -29,6 +29,15 @@ interface AdMobContextValue {
   isInterstitialReady: () => boolean;
   /** Mark the warm interstitial consumed (call right before showing it). */
   consumeInterstitial: () => void;
+  /**
+   * True once an interstitial slot came due but was blocked ONLY by the
+   * undeclared ('unknown') tier. The UI uses this natural break to ask for
+   * the user's age instead of showing an ad — a declared 13+ flips the tier
+   * to 'adult' and real interstitials serve from the next eligible game.
+   * Latches true for the session; the consumer applies its own once-per-
+   * install marker.
+   */
+  ageGatePromptOpportunity: boolean;
 }
 
 // Defensive cap. Prevents new interstitial trigger sites (mission-claim, streak-save, etc.)
@@ -59,6 +68,10 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   const { tier, authResolved } = useSocialCapabilities();
   const totalGameEnds = useRef(0);
   const interstitialsShown = useRef(0);
+  // Latched when an interstitial slot came due but tier was still 'unknown' —
+  // the cue for the UI to ask for age at that natural break (state, not ref,
+  // so the consuming wrapper re-renders when it flips).
+  const [ageGatePromptOpportunity, setAgeGatePromptOpportunity] = useState(false);
   const initPromise = useRef<Promise<void> | null>(null);
   const initStarted = useRef(false);
   // Interstitial preload state (app-scoped, resets per provider). A "warm" ad
@@ -124,8 +137,22 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
     return shouldSuppressAdsForTier(tier);
   }
 
+  // Cadence + cap check shared by the real interstitial gate and the age-gate
+  // opportunity: warmup of 3 games, then every 3rd game, capped per session.
+  function interstitialSlotDue(): boolean {
+    if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
+    if (totalGameEnds.current <= 3) return false;
+    return (totalGameEnds.current - 3) % 3 === 0;
+  }
+
   function recordGameEnd() {
     totalGameEnds.current += 1;
+    // A slot came due and the ONLY blocker is that we don't know the user's
+    // age — surface the age prompt at this natural break instead of an ad.
+    // Declared 13+ → tier 'adult' → real interstitials from the next slot.
+    if (tier === 'unknown' && interstitialSlotDue()) {
+      setAgeGatePromptOpportunity(true);
+    }
   }
 
   function recordInterstitialShown() {
@@ -136,10 +163,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
     // Families Ad Format: interstitials only for KNOWN adults (suppresses child
     // AND undeclared-guest tiers). This is the v5740 rejection fix.
     if (shouldSuppressInterstitialForTier(tier)) return false;
-    if (interstitialsShown.current >= MAX_INTERSTITIALS_PER_SESSION) return false;
-    if (totalGameEnds.current <= 3) return false;
-    const postWarmupCount = totalGameEnds.current - 3;
-    return postWarmupCount % 3 === 0;
+    return interstitialSlotDue();
   }
 
   function getConfig(): AdmobConfig | null {
@@ -192,7 +216,7 @@ export function AdMobProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial, isInterstitialReady, consumeInterstitial }}>
+    <AdMobContext.Provider value={{ recordGameEnd, shouldShowInterstitial, recordInterstitialShown, hasNoAds, getConfig, whenReady, prepareInterstitial, isInterstitialReady, consumeInterstitial, ageGatePromptOpportunity }}>
       {children}
     </AdMobContext.Provider>
   );

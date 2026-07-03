@@ -37,6 +37,10 @@ export function useRewardedFeatureUnlock(
   const { status, canShowAd, rewardAmount, isPlaceholder, showAd } = useRewardedAd({
     rewardKind: 'feature',
     surface,
+    // Feature-unlock CTAs are high-intent placements (continue/retry modals,
+    // hint at the moment of need) — pre-warm the slot while enabled so
+    // tap→ad is instant instead of a cold load racing the 12s prepare timeout.
+    warm: !disabled,
     onRewardEarned: async () => {
       await onUnlockRef.current();
     },

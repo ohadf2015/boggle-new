@@ -137,4 +137,36 @@ describe('RewardedAdGoldButton', () => {
     render(<RewardedAdGoldButton goldAmount={20} surface="player_waiting" />);
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
+
+  // AdMob 30d audit (2026-07-03): this button's unconditional mount preload
+  // burned 198 rewarded loads for 2 shows from passive placements (lobby,
+  // profile). Warming is now opt-in via the `warm` prop — only results-moment
+  // callers set it; the hook owns the actual preload.
+  describe('warm preload', () => {
+    test('does not pre-load the ad slot on mount (no prepareAd call)', () => {
+      const prepareAdMock = vi.fn();
+      (useRewardedAd as jest.Mock).mockReturnValue({
+        status: 'idle',
+        isAdAvailable: true,
+        isPlaceholderCooldown: false,
+        showAd: mockShowAd,
+        prepareAd: prepareAdMock,
+        error: null,
+        rewardAmount: 25,
+        canShowAd: true,
+      });
+      render(<RewardedAdGoldButton goldAmount={20} surface="lobby" />);
+      expect(prepareAdMock).not.toHaveBeenCalled();
+    });
+
+    test('forwards warm prop to useRewardedAd (results-moment callers)', () => {
+      render(<RewardedAdGoldButton goldAmount={20} surface="adventure_results" warm />);
+      expect(useRewardedAd).toHaveBeenCalledWith(expect.objectContaining({ warm: true }));
+    });
+
+    test('defaults warm to false for passive placements', () => {
+      render(<RewardedAdGoldButton goldAmount={20} surface="lobby" />);
+      expect(useRewardedAd).toHaveBeenCalledWith(expect.objectContaining({ warm: false }));
+    });
+  });
 });

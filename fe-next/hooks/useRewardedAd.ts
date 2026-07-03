@@ -121,6 +121,15 @@ interface UseRewardedAdOptions {
    * by surface. Defaults to the routing `surface` when omitted.
    */
   analyticsSurface?: string;
+  /**
+   * Pre-load the surface's AdMob unit once, as soon as the hook can serve
+   * (native provider + daily cap not hit). Pass true at HIGH-INTENT moments
+   * (retry/continue modals, results doubling) so tap→ad is instant — cold
+   * loads on tap lost 36% of retry watches to the 12s prepare timeout
+   * (AdMob 30d audit 2026-07-03). Leave unset on passive placements (lobby
+   * gold button burned 198 loads for 2 shows there).
+   */
+  warm?: boolean;
 }
 
 interface UseRewardedAdReturn {
@@ -180,7 +189,7 @@ interface UseRewardedAdReturn {
  * ```
  */
 export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAdReturn {
-  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins', surface = 'generic', analyticsSurface } = options;
+  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins', surface = 'generic', analyticsSurface, warm = false } = options;
   const telemetrySurface = analyticsSurface ?? surface;
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -516,6 +525,16 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
     if (!shouldUseAdMob) return;
     void adMob.prepareRewarded({ surface });
   }, [shouldUseAdMob, adMob, surface]);
+
+  // Opt-in warm-up: load the surface unit once when the caller signals a
+  // high-intent placement (warm: true). Once per hook instance — a re-render
+  // or warm flapping must not stack loads (198-loads/2-shows lesson).
+  const warmedRef = useRef(false);
+  useEffect(() => {
+    if (!warm || warmedRef.current || !shouldUseAdMob || isDailyLimitReached()) return;
+    warmedRef.current = true;
+    void adMob.prepareRewarded({ surface });
+  }, [warm, shouldUseAdMob, adMob, surface]);
 
   return {
     status,

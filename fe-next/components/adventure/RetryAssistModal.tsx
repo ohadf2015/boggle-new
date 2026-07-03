@@ -86,6 +86,7 @@ const RetryAssistModal = memo<RetryAssistModalProps>(
     const rewarded = useRewardedAd({
       rewardKind: 'feature',
       surface: 'retry',
+      warm: isOpen,
       onRewardEarned: () => onRetryWithBonus(),
     });
 

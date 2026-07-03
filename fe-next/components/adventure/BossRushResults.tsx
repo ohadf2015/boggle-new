@@ -64,6 +64,7 @@ const BossRushResults = memo<BossRushResultsProps>(({ state, onRetry, onExit }) 
   const rewarded = useRewardedAd({
     rewardKind: 'feature',
     surface: 'retry',
+    warm: true,
     onRewardEarned: () => onRetry(),
   });
 

@@ -19,11 +19,14 @@ let mockRewardedAdReturn: {
   showAd: (...args: unknown[]) => void;
   // capture onRewardEarned so tests can fire it
   _capturedOnReward?: (coins: number) => void | Promise<void>;
+  // capture the full options bag so tests can assert passthrough (warm, surface)
+  _capturedOpts?: Record<string, unknown>;
 };
 
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: (opts: { onRewardEarned?: (n: number) => void } = {}) => {
     mockRewardedAdReturn._capturedOnReward = opts.onRewardEarned;
+    mockRewardedAdReturn._capturedOpts = opts;
     return {
       status: mockRewardedAdReturn.status,
       canShowAd: mockRewardedAdReturn.canShowAd,
@@ -126,5 +129,29 @@ describe('useRewardedFeatureUnlock', () => {
     expect(result.current.status).toBe('showing');
     expect(result.current.canShowAd).toBe(true);
     expect(result.current.rewardAmount).toBe(50);
+  });
+
+  // Every feature-unlock CTA is a high-intent placement (continue/retry
+  // modals, hint buttons at the moment of need), so the wrapper pre-warms the
+  // underlying rewarded slot whenever it is enabled — tap→ad must be instant
+  // (cold loads on tap lost 36% of retry watches, AdMob audit 2026-07-03).
+  describe('warm passthrough', () => {
+    it('passes warm: true to useRewardedAd when enabled', () => {
+      renderHook(() =>
+        useRewardedFeatureUnlock({ placement: 'blast_wave_continue', onUnlock: vi.fn() }),
+      );
+      expect(mockRewardedAdReturn._capturedOpts).toMatchObject({ warm: true });
+    });
+
+    it('passes warm: false while disabled (modal closed)', () => {
+      renderHook(() =>
+        useRewardedFeatureUnlock({
+          placement: 'blast_wave_continue',
+          onUnlock: vi.fn(),
+          disabled: true,
+        }),
+      );
+      expect(mockRewardedAdReturn._capturedOpts).toMatchObject({ warm: false });
+    });
   });
 });

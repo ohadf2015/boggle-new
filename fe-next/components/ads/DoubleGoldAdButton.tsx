@@ -41,6 +41,9 @@ export const DoubleGoldAdButton: React.FC<DoubleGoldAdButtonProps> = ({
     rewardKind: 'feature',
     surface: 'doubleGold',
     analyticsSurface: surface,
+    // Results doubling is a high-intent moment — warm so tap→ad is instant,
+    // but never for a hidden CTA (earnedAmount 0 renders nothing).
+    warm: earnedAmount > 0,
     onRewardEarned: async () => {
       await addCoins(earnedAmount, 'Double Gold Ad', { surface, bonus: earnedAmount });
       setDoubled(true);

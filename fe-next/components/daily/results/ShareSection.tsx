@@ -51,6 +51,7 @@ function WatchAdRetryButton({
   const { showAd, status, isAdAvailable, isPlaceholderCooldown } = useRewardedAd({
     rewardKind: 'feature',
     surface: 'retry',
+    warm: true,
     onRewardEarned: async () => {
       setBusy(true);
       try {

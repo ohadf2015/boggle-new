@@ -331,6 +331,7 @@ const DailyChallenge: React.FC = () => {
   const { showAd, isAdAvailable, isPlaceholderCooldown } = useRewardedAd({
     rewardKind: 'feature',
     surface: 'retry',
+    warm: forfeitedToday,
     onRewardEarned: () => beginPlaying(),
     // The ad is a best-effort speed bump, not a hard wall. On ANY non-reward
     // outcome (user skip, no-fill, a stalled show that hits the safety timeout)

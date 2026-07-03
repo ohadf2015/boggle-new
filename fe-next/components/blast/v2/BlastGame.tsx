@@ -286,6 +286,7 @@ export function BlastGame({
   const rewardedAd = useRewardedAd({
     surface: 'retry',
     rewardKind: 'feature',
+    warm: showUndoAdModal,
     onRewardEarned: () => {
       handlers.onRewardedUndoGranted();
       handlers.onUndo();

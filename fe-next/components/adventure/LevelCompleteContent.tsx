@@ -402,6 +402,7 @@ export const LevelCompleteActions = memo<LevelCompleteActionsProps>(({
           goldAmount={COIN_REWARDS.WATCH_AD}
           surface="adventure_level_complete"
           size="md"
+          warm
           className="w-full justify-center"
         />
       )}

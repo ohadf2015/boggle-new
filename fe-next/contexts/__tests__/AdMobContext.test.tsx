@@ -433,4 +433,61 @@ describe('AdMobProvider', () => {
       render(<TestConsumer onMount={vi.fn()} />);
     }).toThrow('useAdMobContext must be used within AdMobProvider');
   });
+
+  // Age-gate opportunity: interstitials are suppressed for the 'unknown' tier,
+  // which (post-Families-exit, 13+ listing) left the format earning ₪0. When
+  // the cadence would have fired but the ONLY blocker is the undeclared tier,
+  // the provider raises a flag so the UI can ask for the user's age at that
+  // natural break instead of showing an ad. Declared 13+ → 'adult' → real
+  // interstitials from the next eligible game.
+  describe('ageGatePromptOpportunity', () => {
+    async function renderCaptured() {
+      let captured: ReturnType<typeof useAdMobContext> | null = null;
+      await act(async () => {
+        render(
+          <AdMobProvider>
+            <TestConsumer onMount={(ctx) => { captured = ctx; }} />
+          </AdMobProvider>
+        );
+      });
+      return () => captured!;
+    }
+
+    it('flags the opportunity when the cadence hits and tier is unknown', async () => {
+      social.tier = 'unknown';
+      const ctx = await renderCaptured();
+      expect(ctx().ageGatePromptOpportunity).toBe(false);
+      await act(async () => {
+        for (let i = 0; i < 6; i++) ctx().recordGameEnd(); // warmup 3 + cadence 3
+      });
+      expect(ctx().ageGatePromptOpportunity).toBe(true);
+    });
+
+    it('does not flag during warmup', async () => {
+      social.tier = 'unknown';
+      const ctx = await renderCaptured();
+      await act(async () => {
+        for (let i = 0; i < 3; i++) ctx().recordGameEnd();
+      });
+      expect(ctx().ageGatePromptOpportunity).toBe(false);
+    });
+
+    it('does not flag for a declared adult (the real interstitial shows instead)', async () => {
+      social.tier = 'adult';
+      const ctx = await renderCaptured();
+      await act(async () => {
+        for (let i = 0; i < 6; i++) ctx().recordGameEnd();
+      });
+      expect(ctx().ageGatePromptOpportunity).toBe(false);
+    });
+
+    it('does not flag for a declared child (age already known, no ads at all)', async () => {
+      social.tier = 'child';
+      const ctx = await renderCaptured();
+      await act(async () => {
+        for (let i = 0; i < 6; i++) ctx().recordGameEnd();
+      });
+      expect(ctx().ageGatePromptOpportunity).toBe(false);
+    });
+  });
 });

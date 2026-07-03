@@ -54,6 +54,7 @@ const BannerCoordinatorMount = dynamic(() => import('@/components/ads/BannerCoor
 const WebAnchorAdObserver = dynamic(() => import('@/components/ads/WebAnchorAdObserver'), { ssr: false });
 const SignupPromptHost = dynamic(() => import('@/components/auth/SignupPromptHost').then(m => m.SignupPromptHost), { ssr: false });
 const PlayerStyleOnboardingWrapper = dynamic(() => import('./components/PlayerStyleOnboardingWrapper'), { ssr: false });
+const AgeGatePromptWrapper = dynamic(() => import('./components/AgeGatePromptWrapper'), { ssr: false });
 const UnlockNotifierMount = dynamic(() => import('@/components/cosmetics/UnlockNotifierMount').then(m => m.UnlockNotifierMount), { ssr: false });
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
@@ -264,6 +265,10 @@ export function EssentialProviders({ children, lang, initialTranslations }: Esse
                                                     Gated (shouldShowStylePopup): never double-prompts, defers to
                                                     profile-customization, skips fresh-onboarding visitors. */}
                                                 <PlayerStyleOnboardingWrapper />
+                                                {/* Once-per-install age prompt at the interstitial natural break
+                                                    (undeclared tier blocks the format). Declared 13+ → adult tier
+                                                    → personalized ads + interstitials from the next slot. */}
+                                                <AgeGatePromptWrapper />
                                                 {/* Cosmetic unlock toast — global so rank-up/streak unlocks surface a
                                                     tap-to-equip deep-link wherever the player is, not just on profile. */}
                                                 <UnlockNotifierMount />

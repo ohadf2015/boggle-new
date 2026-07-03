@@ -20,11 +20,13 @@ let mockRewardedAdReturn: {
   canShowAd: boolean;
   isPlaceholderCooldown: boolean;
   _capturedOnReward?: () => void | Promise<void>;
+  _capturedOpts?: Record<string, unknown>;
 };
 
 vi.mock('@/hooks/useRewardedAd', () => ({
   useRewardedAd: (opts: { onRewardEarned?: () => void | Promise<void> } = {}) => {
     mockRewardedAdReturn._capturedOnReward = opts.onRewardEarned;
+    mockRewardedAdReturn._capturedOpts = opts;
     return {
       status: mockRewardedAdReturn.status,
       canShowAd: mockRewardedAdReturn.canShowAd,
@@ -98,6 +100,16 @@ describe('DoubleGoldAdButton', () => {
       expect.stringContaining('Double'),
       expect.objectContaining({ surface: 'sp_results' }),
     );
+  });
+
+  // Results doubling is a high-intent moment — warm the slot so tap→ad is
+  // instant, but only when there are actually coins to double (earnedAmount 0
+  // must not burn a load for a hidden CTA).
+  it('warms the ad slot only when there are coins to double', () => {
+    render(<DoubleGoldAdButton earnedAmount={120} surface="sp_results" />);
+    expect(mockRewardedAdReturn._capturedOpts).toMatchObject({ warm: true });
+    render(<DoubleGoldAdButton earnedAmount={0} surface="sp_results" />);
+    expect(mockRewardedAdReturn._capturedOpts).toMatchObject({ warm: false });
   });
 
   it('disappears after a successful double to prevent re-offering', async () => {

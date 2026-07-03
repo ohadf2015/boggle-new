@@ -23,6 +23,13 @@ interface RewardedAdGoldButtonProps {
    * (e.g. the lobby reward cluster next to Start) so it doesn't compete.
    */
   quietIdle?: boolean;
+  /**
+   * Pre-load the rewarded slot on mount. Set ONLY at results-moment
+   * placements where a tap is plausible; passive placements (lobby, profile)
+   * must stay cold — the old unconditional preload burned 198 loads for
+   * 2 shows in 30 days (AdMob audit 2026-07-03).
+   */
+  warm?: boolean;
 }
 
 export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
@@ -32,6 +39,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   surface,
   size = 'sm',
   quietIdle = false,
+  warm = false,
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -47,23 +55,24 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   // in prod) or the daily cap is hit — defaults to true so the button still
   // renders for callers/tests that don't surface the flag. Real hook always
   // returns an explicit boolean.
-  const { showAd, prepareAd, status, isPlaceholderCooldown, canShowAd = true } = useRewardedAd({
+  const { showAd, status, isPlaceholderCooldown, canShowAd = true } = useRewardedAd({
     surface: 'doubleGold',
     analyticsSurface: surface,
+    // Preload only at results-moment placements (warm prop); passive
+    // placements stay cold and load on tap instead.
+    warm,
     onRewardEarned: (amount) => {
       onRewardEarned?.(amount);
     },
   });
 
-  // Fire offer + warm the ad slot once the button can actually show — only
-  // when an active ad provider exists. Gating here keeps the PostHog
-  // offer→watch funnel clean (no phantom offers for a hidden CTA). prepareAd
-  // is a no-op on web/CG/simulation.
+  // Fire offer once the button can actually show — only when an active ad
+  // provider exists. Gating here keeps the PostHog offer→watch funnel clean
+  // (no phantom offers for a hidden CTA).
   useEffect(() => {
     if (!canShowAd || offeredRef.current) return;
     offeredRef.current = true;
     trackRewardedAdOffered(surface);
-    prepareAd();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canShowAd]);
 
