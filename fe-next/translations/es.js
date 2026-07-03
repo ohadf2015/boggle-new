@@ -12474,7 +12474,11 @@ const es = {
     "cta": "TE TOCA →",
     "copied": "¡Enlace copiado!",
     "screenshotHint": "Captura y presume",
-    "others": "+{count} MÁS"
+    "others": "+{count} MÁS",
+    "share": "Compartir",
+    "shareTextWin": "Acabo de ganarle a {name} {score}–{rivalScore} en LexiClash 😤 ¿Quién sigue?",
+    "shareTextLoss": "{name} me ganó {rivalScore}–{score} en LexiClash. Necesito refuerzos, ¡métete!",
+    "shareTextSolo": "Hice {score} puntos en LexiClash 😤 A ver si lo superas."
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",
@@ -13875,6 +13879,18 @@ const es = {
     "giveUp": "Rendirse",
     "solutionIs": "Solución",
     "whyItWorks": "Por qué funciona",
+    "pyramid": {
+      "title": "Pirámide de Puentes de Palabras",
+      "cta": "Pirámide",
+      "tagline": "3 acertijos. 1 palabra los une a todos.",
+      "finale": "Final",
+      "finalePrompt": "¿Qué palabra conecta las tres?",
+      "cluesLabel": "Encuentra la palabra que une cada puente:",
+      "won": "¡Pirámide completada!",
+      "lost": "La pirámide se derrumbó.",
+      "reveal": "La respuesta era",
+      "acceptLoss": "Aceptar derrota"
+    },
     "difficulty": { "easy": "Fácil", "medium": "Media", "hard": "Difícil" },
     "like": "Me gusta",
     "dislike": "No me gusta",

@@ -15,6 +15,7 @@ import ConnectionsFAQ from '@/components/connections/landing/ConnectionsFAQ';
 import ConnectionsFooterCTA from '@/components/connections/landing/ConnectionsFooterCTA';
 import ConnectionsStickyCTA from '@/components/connections/landing/ConnectionsStickyCTA';
 import { trackLandingView } from '@/lib/connections/landingTelemetry';
+import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import type { ConnectionsLandingCopy } from './content';
 
 function LoadingFallback(): React.JSX.Element {
@@ -79,6 +80,14 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
         >
           👥 {t('connections.community.cta', locale === 'he' ? 'קהילה' : 'Community')}
         </Link>
+        {getPyramidsForLocale(locale).length > 0 && (
+          <Link
+            href={`/${locale}/connections/pyramid`}
+            className="flex items-center gap-2 rounded-neo border-neo-thick border-neo-purple bg-neo-purple/15 px-4 py-2 font-neo-display text-sm font-black text-neo-purple shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          >
+            🔺 {t('connections.pyramid.cta', locale === 'he' ? 'פירמידה' : 'Pyramid')}
+          </Link>
+        )}
       </div>
       <ConnectionsSampleStrip locale={locale} copy={copy.samples} />
       <ConnectionsWhyPlay copy={copy.why} />

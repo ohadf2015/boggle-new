@@ -12392,7 +12392,11 @@ const ja = {
     "cta": "次はキミの番 →",
     "copied": "リンクをコピー！",
     "screenshotHint": "スクショして自慢",
-    "others": "+{count}人"
+    "others": "+{count}人",
+    "share": "シェア",
+    "shareTextWin": "LexiClashで{name}に{score}–{rivalScore}で勝った😤 次は誰？",
+    "shareTextLoss": "LexiClashで{name}に{rivalScore}–{score}で負けた…リベンジに力を貸して！",
+    "shareTextSolo": "LexiClashで{score}点獲得😤 超えられる？"
   },
   "shareResult": {
     "singleplayer": "LexiClash ソロ",
@@ -13779,6 +13783,18 @@ const ja = {
     "giveUp": "ギブアップ",
     "solutionIs": "答え",
     "whyItWorks": "なぜつながる？",
+    "pyramid": {
+      "title": "ワードブリッジピラミッド",
+      "cta": "ピラミッド",
+      "tagline": "謎は3つ、つなぐ言葉は1つ。",
+      "finale": "フィナーレ",
+      "finalePrompt": "3つ全てとつながる言葉は？",
+      "cluesLabel": "各橋とつながる言葉を見つけよう:",
+      "won": "ピラミッド完成！",
+      "lost": "ピラミッドが崩れた。",
+      "reveal": "答えは",
+      "acceptLoss": "敗北を受け入れる"
+    },
     "difficulty": { "easy": "かんたん", "medium": "ふつう", "hard": "むずかしい" },
     "like": "いいね",
     "dislike": "よくない",

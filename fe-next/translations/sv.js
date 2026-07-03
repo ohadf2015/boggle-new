@@ -261,6 +261,18 @@ const sv = {
     "giveUp": "Ge upp",
     "solutionIs": "Lösning",
     "whyItWorks": "Varför det funkar",
+    "pyramid": {
+      "title": "Ordbro-pyramiden",
+      "cta": "Pyramid",
+      "tagline": "3 gåtor. 1 ord binder ihop allt.",
+      "finale": "Final",
+      "finalePrompt": "Vilket ord förbinder alla tre?",
+      "cluesLabel": "Hitta ordet som kopplar varje bro:",
+      "won": "Pyramid slutförd!",
+      "lost": "Pyramiden föll.",
+      "reveal": "Svaret var",
+      "acceptLoss": "Godkänn förlust"
+    },
     "difficulty": { "easy": "Lätt", "medium": "Medel", "hard": "Svår" },
     "like": "Gilla",
     "dislike": "Ogilla",
@@ -12544,7 +12556,11 @@ const sv = {
     "cta": "DIN TUR →",
     "copied": "Länk kopierad!",
     "screenshotHint": "Skärmdumpa skrytet",
-    "others": "+{count} FLER"
+    "others": "+{count} FLER",
+    "share": "Dela",
+    "shareTextWin": "Slog precis {name} {score}–{rivalScore} i LexiClash 😤 Vem står på tur?",
+    "shareTextLoss": "{name} slog mig {rivalScore}–{score} i LexiClash. Jag behöver förstärkning — häng med!",
+    "shareTextSolo": "Fick {score} poäng i LexiClash 😤 Slå det om du kan."
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",

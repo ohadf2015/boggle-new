@@ -466,6 +466,18 @@ const ru = {
     "giveUp": "Сдаться",
     "solutionIs": "Решение",
     "whyItWorks": "Почему это работает",
+    "pyramid": {
+      "title": "Пирамида словесных мостов",
+      "cta": "Пирамида",
+      "tagline": "3 загадки. 1 слово связывает всё.",
+      "finale": "Финал",
+      "finalePrompt": "Какое слово соединяет все три?",
+      "cluesLabel": "Найди слово, соединяющее каждый мост:",
+      "won": "Пирамида завершена!",
+      "lost": "Пирамида рухнула.",
+      "reveal": "Ответ был",
+      "acceptLoss": "Признать поражение"
+    },
     "difficulty": { "easy": "Лёгкий", "medium": "Средний", "hard": "Сложный" },
     "like": "Нравится",
     "dislike": "Не нравится",
@@ -9532,20 +9544,24 @@ const ru = {
   "brag": {
     "headline": {
       "crushed": "ИЗВИНИ, {name} 💀",
-      "topped": "{name} +{count} БОЛЬШЕ. РАЗРУШЕНО.",
-      "won": "{count} СОПЕРНИКОВ. НУЛЕВЫЕ ВЫЖИВШИЕ.",
-      "revenge": "{name} ПОВЕЗЛО. СДЕЛАЙ ЕЩЁ РАЗ. 🔥",
+      "topped": "{name} И ЕЩЁ {count}. РАЗГРОМ.",
+      "won": "{count} СОПЕРНИКОВ. ВЫЖИВШИХ НЕТ.",
+      "revenge": "{name} ПРОСТО ПОВЕЗЛО. РЕВАНШ! 🔥",
       "challenge": "ДУМАЕШЬ, ТЫ ЛУЧШЕ?"
     },
     "hero": {
       "points": "ОЧКИ СЛАВЫ",
       "combo": "ДИКОЕ КОМБО",
-      "longest": "ЭНЕРГИЯ БОЛЬШОГО СЛОВА"
+      "longest": "МОЩЬ ДЛИННОГО СЛОВА"
     },
-    "cta": "ТОП ХОДИТЬ →",
+    "cta": "ТВОЙ ХОД →",
     "copied": "Ссылка скопирована!",
-    "screenshotHint": "Сделайте скриншот флекса",
-    "others": "+{count} других"
+    "screenshotHint": "Заскринь и хвастайся",
+    "others": "+{count} других",
+    "share": "Поделиться",
+    "shareTextWin": "Победа над {name} — {score}–{rivalScore} в LexiClash 😤 Кто следующий?",
+    "shareTextLoss": "{name} впереди — {rivalScore}–{score} в LexiClash. Нужна подмога, заходи!",
+    "shareTextSolo": "Мой счёт в LexiClash — {score} 😤 Слабо побить?"
   },
   "cg": {
     "hero": {

@@ -12891,7 +12891,11 @@ const he = {
     "cta": "תורך →",
     "copied": "הקישור הועתק!",
     "screenshotHint": "צלמו מסך והשוויצו",
-    "others": "+{count} עוד"
+    "others": "+{count} עוד",
+    "share": "שיתוף",
+    "shareTextWin": "ניצחתי את {name} {score}–{rivalScore} בלקסיקלאש 😤 מי הבא בתור?",
+    "shareTextLoss": "הפסדתי ל־{name} {rivalScore}–{score} בלקסיקלאש. חייבים תגבורת — בואו!",
+    "shareTextSolo": "עשיתי {score} נקודות בלקסיקלאש 😤 נסו לעבור אותי"
   },
   "shareResult": {
     "singleplayer": "LexiClash סולו",
@@ -13730,6 +13734,18 @@ const he = {
     "giveUp": "אני מוותר",
     "solutionIs": "הפתרון",
     "whyItWorks": "למה זה עובד",
+    "pyramid": {
+      "title": "פירמידת גשר מילים",
+      "cta": "פירמידה",
+      "tagline": "3 חידות. מילה אחת מחברת את כולן.",
+      "finale": "סיום",
+      "finalePrompt": "איזו מילה קושרת את שלוש המילים?",
+      "cluesLabel": "מצא מילה שקושרת כל גשר:",
+      "won": "פירמידה הושלמה!",
+      "lost": "הפירמידה נפלה.",
+      "reveal": "התשובה הייתה",
+      "acceptLoss": "קבל הפסד"
+    },
     "difficulty": { "easy": "קל", "medium": "בינוני", "hard": "קשה" },
     "like": "אהבתי",
     "dislike": "לא אהבתי",

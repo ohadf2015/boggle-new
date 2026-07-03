@@ -12329,7 +12329,11 @@ const en = {
     "cta": "YOUR MOVE →",
     "copied": "Link copied!",
     "screenshotHint": "Screenshot the flex",
-    "others": "+{count} others"
+    "others": "+{count} others",
+    "share": "Share",
+    "shareTextWin": "Just beat {name} {score}–{rivalScore} in LexiClash 😤 Who's next?",
+    "shareTextLoss": "{name} got me {rivalScore}–{score} in LexiClash. I need backup — get in here!",
+    "shareTextSolo": "Scored {score} in LexiClash 😤 Beat that."
   },
   "shareResult": {
     "singleplayer": "LexiClash Solo",
@@ -13083,6 +13087,18 @@ const en = {
     "giveUp": "Give up",
     "solutionIs": "Solution",
     "whyItWorks": "Why it works",
+    "pyramid": {
+      "title": "Word Bridge Pyramid",
+      "cta": "Pyramid",
+      "tagline": "3 riddles. 1 word connects them all.",
+      "finale": "Finale",
+      "finalePrompt": "Which word connects all three?",
+      "cluesLabel": "Find the word that pairs with each bridge:",
+      "won": "Pyramid complete!",
+      "lost": "Pyramid lost.",
+      "reveal": "The answer was",
+      "acceptLoss": "Accept loss"
+    },
     "difficulty": { "easy": "Easy", "medium": "Medium", "hard": "Hard" },
     "like": "Like",
     "dislike": "Dislike",

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
+import Link from 'next/link';
 import { m } from 'framer-motion';
 import { Share2, Flame, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -29,6 +30,7 @@ import {
   type LeaderboardRow,
 } from '@/lib/connections/dailyClient';
 import { buildDailyBridgeGrid, gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
+import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import { earnedMedal } from '@/lib/connections/progressTrack';
 import ConnectionsProgressTrack from './ConnectionsProgressTrack';
 import { MedalArt } from './ConnectionsRewardArt';
@@ -269,6 +271,15 @@ export default function ConnectionsDailyChallenge() {
             {copied ? t('connections.daily.copied') : t('connections.daily.share')}
           </m.button>
         </m.div>
+
+        {getPyramidsForLocale(language).length > 0 && (
+          <Link
+            href={`/${language}/connections/pyramid`}
+            className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-purple bg-neo-purple/15 px-4 py-2.5 font-neo-display text-sm font-black text-neo-purple shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          >
+            🔺 {t('connections.pyramid.cta')} — {t('connections.pyramid.tagline')}
+          </Link>
+        )}
 
         <ConnectionsLeaderboard
           rows={results?.rows ?? []}
