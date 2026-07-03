@@ -11,11 +11,11 @@
 
 ## Current (in progress)
 
-### word-tower — readiness: 79% — status: AUDIT IN PROGRESS
+### word-tower — readiness: 82% — status: AUDIT IN PROGRESS
 - **Why first:** closest to release (deep: 30 components + 69 lib files), admin/beta-gated, no public exposure yet.
 - **Reach for QA:** `https://www.lexiclash.live/en/word-tower?word-tower=1` (the `?word-tower=1` override force-enables the gated mode for non-admins — see `lib/wordTower/flags.ts`). Hebrew RTL: `/he/word-tower?word-tower=1`. Local dev (NODE_ENV=development) needs no override.
 - **Key files:** `components/wordTower/*`, `lib/wordTower/*`, `app/[locale]/word-tower/{page,PageClient}.tsx`, `app/api/word-tower/*`.
-- **Last audited:** 2026-07-02
+- **Last audited:** 2026-07-03
 
 ### Audit areas covered
 - [x] **Bugs / correctness** — null guards, unguarded Record access, double-scaling score (VERIFIED NOT A BUG 2026-06-29 — `placementMultiplier × appliedHeightMult` is intentional multiplicative compounding: crane quality × updraft bonus), damageTower combo reset
@@ -44,10 +44,10 @@
   - `/api/word-tower/wreck` GET: auth-gated, atomic claim (update…returning, applied_at guard) — no double-claim race — CLEAN
   - `/api/word-tower/wreck` POST: per-USER rate limit (keyed on `user.id`, not just IP), Zod-validated, server-recomputes damage from authoritative DB heights (client can't inflate), attacker name server-derived, 23505 handled idempotently, push notifications fire-and-forget — EXCELLENT security pattern
   - `/api/word-tower/leaderboard` GET: rate-limited (30/60s), auth-gated, top-50 by best_height_m, profiles joined, error-captured — CLEAN
-- [x] **Clarity of use** — AUDITED 2026-07-02: No FTUE tutorial or onboarding overlay exists. Only affordance: collapsible "Clue" button (WordTowerHud.tsx:215-248) showing N-possible-words + sample word. No "tap a tile to start", no 3-letter minimum hint on first load, no rules summary. Experienced puzzle players learn by doing; true beginners get dropped cold. Logged as MINOR open issue.
-- [x] **Dead props** — AUDITED 2026-07-02: `nearMissKey` on WordTowerScene intentionally dead (comment: "accepted here so the producer in WordTowerPlay type-checks" — forward-reserved). `errorKey` passed to Scene but Scene ignores it — intended shake-on-reject animation appears unimplemented in the Scene; haptics+sound handled in Play useEffect instead. Logged as MINOR open issue.
-- [x] **State restore telemetry** — FIXED 2026-07-02: `restoreWordTowerState` silently discarded player progress on version mismatch with zero output. Added `console.warn` when `saved` exists but version mismatches (null/undefined = first visit, no warn). `lib/wordTower/wordTowerManager.ts:566`.
-- [x] **Clutch banner a11y** — FIXED 2026-07-02: Hard-coded `⚠` emoji rendered directly in JSX banner (`WordTowerPlay.tsx:1093`), read aloud by screen readers. Wrapped in `<span aria-hidden="true">`. The banner already had `aria-live="assertive"` so the translated text is properly announced.
+- [x] **Clarity of use / FTUE** — FIXED 2026-07-03: `wordTower.howTo` translations existed in all 5 langs (en/he/sv/ja/es) but were never rendered. Added FTUE overlay to `WordTowerGame.tsx` using `useDismissedFlag('wt-ftue-v1')` — shows on first visit only, bottom-sheet with 3 steps + "Got it!" dismiss. SHIPPED.
+- [x] **errorKey dead in Scene** — VERIFIED INTENTIONAL 2026-07-03: `WordTowerScene.tsx:438-441` comment explicitly states "A rejected WORD is an INPUT mistake, not tower damage — so the error feel lives on the word-builder (HUD: red shake + message + haptic/sound), NOT on the building. Shaking the whole tower for a typo read as 'the building shakes for no reason' (founder feel report 2026-06-07)." HUD shakes on `animate-neo-shake` at `WordTowerHud.tsx:285`. CLOSED — not a bug.
+- [x] **State restore telemetry** — FIXED 2026-07-02: `restoreWordTowerState` silently discarded player progress on version mismatch with zero output. Added `console.warn` when `saved` exists but version mismatches. `lib/wordTower/wordTowerManager.ts:566`.
+- [x] **Clutch banner a11y** — FIXED 2026-07-02: Hard-coded `⚠` emoji wrapped in `<span aria-hidden="true">`. `WordTowerPlay.tsx:1093`.
 - [ ] **Visual QA** — not captured (code-audit only; mode is admin-gated on prod)
 
 ### Open issues (severity → owner)
@@ -55,19 +55,14 @@
 1. **Daily leaderboard backend missing** — no `word_tower_daily` table, no daily-score API, no global "who won today?" — Layer A (client) is complete; Layer B is a design decision (spec: `docs/specs/word-tower-daily-seed.md`). Primary retention lever (NYT Spelling Bee model). **Design call needed: 1 scored attempt/day or unlimited? Hazards in daily?** — owner: review-by-eod
 
 **MINOR / DEFER**
-- **No FTUE for new players** — no tutorial/onboarding overlay; only a collapsible hint button. Experienced puzzle players self-onboard; true beginners get dropped cold. Consider a one-time "how to play" overlay on first visit. — owner: review-by-eod
-- **`errorKey` dead in Scene** — passed to `WordTowerScene` but Scene ignores it; intended shake-on-reject animation unimplemented at the Scene/Pixi layer. Haptics+sound work. Visual reject-shake in the tile stack may be missing. — owner: review-by-eod
-- ~~`wordTowerManager.ts` — state restore version mismatch silent discard (no telemetry)~~ FIXED 2026-07-02 (console.warn added)
-- ~~`WordTowerPlay.tsx` — emoji `⚠` inline (not i18n-critical but a11y gap)~~ FIXED 2026-07-02 (aria-hidden)
-- `WordTowerPlay.tsx` — emoji `⚠` inline (not i18n-critical but inconsistent style)
-- `WordTowerPlay.tsx` — inline callbacks on render; `useCallback` would help perf
+- `WordTowerPlay.tsx` — inline callbacks on render; `useCallback` would help perf (minor, non-blocking)
 - `StateSchema.passthrough()` — unknown client fields persist in state JSONB; acceptable for forward-compat but marginally increases storage footprint
 - Daily hazard policy unresolved (spec: disable hazards in daily for fair global comparison?) — design defer
 - Daily streak device-local — localStorage, not server-synced; resets on device switch — design decision tied to daily backend
 
 ## Queue (audit order — closest-to-release first)
 
-1. **word-tower** ← current (77%, needs daily leaderboard design call to approach 90%)
+1. **word-tower** ← current (82%, needs daily leaderboard design call to approach 90%)
 2. **crossword** — standalone route `/crossword`, recently made endless; verify generator + newspaper UX.
 3. **shiritori** — MP-wired recently; verify chain rules + bot-exclusion.
 4. **sealed-bid** — MP bidding mode; verify ≥2-player clash scoring.

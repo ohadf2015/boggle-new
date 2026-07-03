@@ -24,6 +24,22 @@ function safeCapture(event: string, payload: Record<string, unknown>): void {
   }
 }
 
+/** Fired once when the dictionary finishes loading and the game is ready to play. */
+export function trackWordCraftGameStarted(params: { locale: string }): void {
+  safeCapture('word_craft_game_started', { ...params });
+}
+
+/**
+ * Fired when a player leaves word-craft mid-game (fewer than 3 player turns
+ * completed). High rate = early abandonment / confusion signal.
+ */
+export function trackWordCraftAbandoned(params: {
+  playerTurns: number;
+  playerScore: number;
+}): void {
+  safeCapture('word_craft_abandoned', { ...params });
+}
+
 /** Fired the first time during a turn that 2 pending tiles establish an axis. */
 export function trackWordCraftAxisLocked(params: {
   axis: WordCraftAxis;

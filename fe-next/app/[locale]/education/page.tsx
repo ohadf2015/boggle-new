@@ -218,11 +218,12 @@ function EducationResourceLinks({ locale }: { locale: string }) {
         </Link>
         <Link
           href={`/${locale}/education/for-schools`}
-          className="rounded-neo border-3 border-neo-black bg-neo-navy-light p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+          className="rounded-neo border-3 border-neo-black bg-neo-lime p-5 shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg"
+          data-ph-capture-attribute-source="edu_hub_for_schools_card"
         >
-          <span className="inline-block border-2 border-neo-black bg-neo-lime px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-navy">{rc.forSchools.badge}</span>
-          <h3 className="mt-3 font-neo-display text-base font-black uppercase text-neo-white">{rc.forSchools.title}</h3>
-          <p className="mt-2 text-xs text-neo-gray-200">{rc.forSchools.desc}</p>
+          <span className="inline-block border-2 border-neo-black bg-neo-navy px-2 py-0.5 font-neo-display text-[10px] font-black uppercase tracking-widest text-neo-lime">{rc.forSchools.badge}</span>
+          <h3 className="mt-3 font-neo-display text-base font-black uppercase text-black">{rc.forSchools.title}</h3>
+          <p className="mt-2 text-xs text-black/70">{rc.forSchools.desc}</p>
         </Link>
       </div>
     </section>

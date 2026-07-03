@@ -62,6 +62,16 @@ import {
 } from "./engine";
 
 
+// Maps each alchemy operation to its elemental particle preset.
+// synonym/changeLetter → fire (metamorphosis); anagram/reverse → water (rearrangement);
+// addLetter/removeLetter → earth (building/removing); homophone → air (sound).
+function elementBurstPreset(op: AlchemyOp): string {
+  if (op === 'synonym' || op === 'changeLetter') return 'element-fire';
+  if (op === 'anagram' || op === 'reverse') return 'element-water';
+  if (op === 'addLetter' || op === 'removeLetter') return 'element-earth';
+  return 'element-air';
+}
+
 // ─── Component ──────────────────────────────────────────────────────────────
 
 export default function WordAlchemyPage() {
@@ -198,7 +208,11 @@ export default function WordAlchemyPage() {
         toast.success(t('wordAlchemy.streakNewPB', { n: nextStreak }));
       }
       playSound(wasRush ? 'victoryFanfare' : 'wordAccepted');
-      burstAt(wasRush ? 'celebration' : nextStreak >= 3 ? 'celebration' : 'sparkle-valid', inputRef.current, wasRush ? 32 : nextStreak >= 3 ? 18 : undefined);
+      const prefersReduced = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      const burstPreset = wasRush || nextStreak >= 3
+        ? 'celebration'
+        : prefersReduced ? 'sparkle-valid' : elementBurstPreset(step.op);
+      burstAt(burstPreset, inputRef.current, wasRush ? 32 : nextStreak >= 3 ? 18 : undefined);
     } else {
       setWrongCount((w) => w + 1);
       setStreak(0);

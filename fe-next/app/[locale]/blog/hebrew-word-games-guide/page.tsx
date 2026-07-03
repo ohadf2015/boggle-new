@@ -16,7 +16,7 @@ const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
   en: 'Hebrew Word Games Guide - Free Online משחק מילים בעברית',
-  he: 'משחק מילים בעברית חינם - מדריך מלא | בוגל וסקראבל אונליין',
+  he: 'משחק מילים בעברית חינם - מדריך מלא | סקריבל ובוגל אונליין',
   sv: 'Hebreiska Ordspel Guide - Spela Höger till Vänster Online',
   ja: 'ヘブライ語ワードゲームガイド - 右から左へのプレイ',
   es: 'Guía de Juegos de Palabras en Hebreo - Jugando de Derecha a Izquierda',

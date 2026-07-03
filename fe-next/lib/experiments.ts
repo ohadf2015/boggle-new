@@ -570,6 +570,29 @@ export const EXPERIMENTS = {
     description:
       'Landing page quick-play CTA. quick-play = prominent "Play Now" button below hero linking to multiplayer. Targets rage-click drop on /es and other locales. Control = current mode grid only.',
   }),
+
+  /**
+   * Word Craft step-hint duration experiment. PostHog rage-click data shows
+   * 5 rage clicks on /en/word-craft (top signal). The coaching pill currently
+   * retires after 3 player turns — but turns 4-6 are the next friction window
+   * where players have "learned to place" but still struggle with axis / blank
+   * selection / word validity. The `extended-hints` arm extends the coaching
+   * pill through turn 6, keeping the live pick→place→submit feedback visible
+   * until the player has developed their own pattern.
+   *
+   * control = pill retires after 3 player turns (current behaviour).
+   * extended-hints = pill retires after 6 player turns.
+   *
+   * Conversion = word_craft_turn_submitted rate (more turns = fewer ragers).
+   * Guardrail = rage clicks on /en/word-craft (must drop or hold).
+   * Ship to PostHog: flag key = 'exp-wordcraft-hint-duration-v1', 50/50.
+   */
+  'exp-wordcraft-hint-duration-v1': defineExperiment({
+    variants: ['control', 'extended-hints'] as const,
+    default: 'control',
+    description:
+      'Word Craft step-hint duration. control = coaching pill retires after 3 turns, extended-hints = retires after 6 turns. Targets /en/word-craft rage-click rage signal (top PostHog priority). Conversion = word_craft_turn_submitted.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

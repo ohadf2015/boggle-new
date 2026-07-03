@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import GuidesIndexPageClient from './PageClient';
 import { encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 86400;
 
 interface PageProps {
   params: Promise<{ locale: string }>;

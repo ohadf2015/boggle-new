@@ -18,7 +18,7 @@ const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 const KEYWORDS: Record<Locale, string> = {
   en: 'daily word wheel, word wheel puzzles free online, word wheel puzzle, word wheel game free online, free daily word game, word wheel online, daily word challenge, wordle alternative daily, daily word game free, word wheel puzzle game online, free word wheel puzzle',
   he: 'גלגל מילים יומי, פאזל מילים, משחק מילים חינם, משחק מילים יומי, אתגר מילים',
-  sv: 'dagligt ordhjul, ordpussel, gratis ordspel, dagligt ordspel, ordhjul online',
+  sv: 'ordhjulet, dagligt ordhjul, ordpussel, gratis ordspel, dagligt ordspel, ordhjul online',
   ja: 'デイリーワードホイール, ワードパズル, 無料ワードゲーム, 毎日のワードゲーム',
   es: 'rueda de palabras diaria, puzzle de palabras, juego de palabras gratis, juego de palabras diario',
   ru: 'ежедневное колесо слов, словесная головоломка, бесплатная игра в слова, ежедневная игра в слова',
@@ -39,7 +39,7 @@ const META_FALLBACK: Record<Locale, { title: string; description: string; ogTitl
     ogDescription: 'סובבו את הגלגל ומצאו את כל המילים. פאזל חדש כל יום!',
   },
   sv: {
-    title: 'Dagligt Ordhjul — Gratis Pussel Online | LexiClash',
+    title: 'Ordhjulet — Dagligt Gratis Pussel Online | LexiClash',
     description: 'Snurra det dagliga ordhjulet och hitta alla dolda ord. Gratis ordpussel online — ingen registrering, ingen nedladdning. Nya bokstäver varje dag.',
     ogTitle: 'Dagligt Ordhjul — Gratis Pussel',
     ogDescription: 'Snurra ordhjulet och hitta alla ord. Nytt pussel varje dag!',

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useDismissedFlag } from '@/hooks/useLocalStorageState';
 import { getWithAuth } from '@/utils/authFetch';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
@@ -119,6 +120,8 @@ export function WordTowerGame() {
   const closeLeaderboard = useCallback(() => setShowLeaderboard(false), []);
   const rivals = useWordTowerRivals();
 
+  const { isDismissed: ftueShown, dismiss: dismissFtue } = useDismissedFlag('wt-ftue-v1');
+
   const ready = dictReady && progress !== null;
 
   // useWordTower lazy-inits from initialGame only on first mount. Re-key on
@@ -196,6 +199,37 @@ export function WordTowerGame() {
       </div>
 
       {showLeaderboard && <WordTowerLeaderboard onClose={closeLeaderboard} t={t} dir={dir} />}
+
+      {ready && !ftueShown && (
+        <div
+          className="fixed inset-0 z-[100] flex items-end justify-center bg-black/70 p-4"
+          dir={dir}
+          onClick={dismissFtue}
+        >
+          <div
+            className="w-full max-w-sm rounded-neo border-neo-thick border-black bg-neo-navy p-6 shadow-hard-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 className="mb-4 text-center font-neo-display text-2xl font-black uppercase text-neo-cyan">
+              {t('wordTower.howTo.title')}
+            </h2>
+            <ol className="mb-6 flex flex-col gap-3">
+              {[0, 1, 2].map((i) => (
+                <li key={i} className="font-neo-body text-sm text-neo-cream">
+                  {t(`wordTower.howTo.steps.${i}`)}
+                </li>
+              ))}
+            </ol>
+            <button
+              type="button"
+              onClick={dismissFtue}
+              className="w-full rounded-neo border-neo-thick border-black bg-neo-lime py-3 font-neo-display text-lg font-black uppercase tracking-wide text-black shadow-hard transition-transform active:translate-y-px"
+            >
+              {t('wordTower.howTo.cta')}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

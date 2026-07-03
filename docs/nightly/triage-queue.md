@@ -1206,3 +1206,34 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - PostHog flag intentionally NOT created until call site exists
 - status: deferred — wire in settings/PageClient.tsx then run posthog-experiment.sh ensure
 - recommended owner: lane-03 next run
+
+## 2026-07-03
+
+### [Sentry] JAVASCRIPT-NEXTJS-1KQ churn-signals 502 — RETRY
+- Route code at `app/api/growth/churn-signals/route.ts` is clean (proper try/catch, Supabase admin upsert with onConflict)
+- 502 is Vercel-level (gateway timeout or function crash before response); not reproducible without stack trace
+- Sentry MCP unavailable this run; could not fetch trace
+- status: deferred — retry next run with Sentry MCP
+- recommended owner: lane-01 next run
+
+### [Sentry] JAVASCRIPT-NEXTJS-1MC username validation — NEEDS CALLSITE
+- Error: "Invalid request: username: Username must be at most 30 characters, username: Invalid string: must match pattern /^[a-zA-Z0-9._\-...]+$/"
+- Looks like Supabase Auth API rejection (not our Zod) when calling updateUserById with a too-long or non-ASCII username
+- UsernameSchema exists in backend/utils/schemas.ts (imported from elsewhere); callsite not traced before time budget ran out
+- reach: 1 user, low severity but worth a frontend maxLength guard
+- status: deferred — find where auth.updateUser/admin.updateUserById is called with username
+- recommended owner: lane-01 next run
+
+### [Supabase Security] upsert_push_token authenticated_security_definer — ACCEPTED FALSE POSITIVE
+- Migration 20260628010000 (REVOKE from public) confirmed APPLIED to prod
+- Current advisor flags `authenticated` role having EXECUTE on SECURITY DEFINER function — this is INTENTIONAL
+- Function is self-scoped to auth.uid(); authenticated users MUST call it to register push tokens
+- No anon grant exists; REVOKE from authenticated would break the feature
+- status: accepted false-positive — no action; advisor will keep firing
+- recommended owner: skip
+
+### [Supabase] Migration state audit
+- 20260628010000_revoke_push_token_fn_from_public: APPLIED ✓
+- 20260629020000_rls_initplan_fix_and_word_clubs_fk_index: APPLIED ✓
+- No 06-30 migration file exists on disk — learnings note "3 unapplied migrations 06-28/29/30" was stale
+- status: resolved — learnings note to be corrected by lane-07

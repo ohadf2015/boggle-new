@@ -22,7 +22,11 @@ type PresetName =
   | 'boost-freezeTime'
   | 'boost-hint'
   | 'boost-scoreMultiplier'
-  | 'boost-firstWordBonus';
+  | 'boost-firstWordBonus'
+  | 'element-fire'
+  | 'element-water'
+  | 'element-earth'
+  | 'element-air';
 
 // Palette drawn from neo-brutalist design system (no #).
 const LIME = 'BFFF00';
@@ -274,6 +278,46 @@ export const PRESETS: Record<PresetName, ParticleConfig> = {
     blendMode: 'add',
     shape: 'diamond',
   },
+
+  // Word Alchemy — elemental particle bursts, one per operation family.
+  // fire: synonym / changeLetter (dramatic metamorphosis)
+  'element-fire': sparkle([ORANGE, RED, YELLOW]),
+  // water: anagram / reverse (fluid rearrangement)
+  'element-water': {
+    maxParticles: 16,
+    frequency: 0,
+    emitterLifetime: 0.01,
+    particlesPerWave: 12,
+    lifetime: { min: 0.5, max: 0.8 },
+    speed: { min: 60, max: 160 },
+    gravity: { x: 0, y: 80 },
+    scale: { start: 1, end: 0 },
+    alpha: { start: 1, end: 0 },
+    rotationSpeed: { min: 1, max: 3 },
+    colors: [CYAN, '7DD3FC', 'FFFFFF'],
+    spawnShape: 'burst',
+    blendMode: 'add',
+    shape: 'circle',
+  },
+  // earth: addLetter / removeLetter (building / removing material)
+  'element-earth': {
+    maxParticles: 14,
+    frequency: 0,
+    emitterLifetime: 0.01,
+    particlesPerWave: 10,
+    lifetime: { min: 0.5, max: 0.8 },
+    speed: { min: 60, max: 140 },
+    gravity: { x: 0, y: 220 },
+    scale: { start: 1, end: 0.2 },
+    alpha: { start: 1, end: 0 },
+    rotationSpeed: { min: 2, max: 4 },
+    colors: [GREEN, YELLOW, GOLD],
+    spawnShape: 'burst',
+    blendMode: 'add',
+    shape: 'diamond',
+  },
+  // air: homophone (sound-based, wispy scatter)
+  'element-air': sparkle([LIME, CYAN, 'FFFFFF']),
 
   // Blast: victory-burst — staggered celebration, 5-color stars.
   'victory-burst': {

@@ -1,24 +1,11 @@
 {
-  "date": "2026-07-02",
-  "note": "7d window (24h sub-floor: 0 routes n≥50). /en/multiplayer (n=55) CLS=0.383 (was 0.401). ROOT CAUSE FOUND+FIXED: PageClient.tsx returned null instead of <AutoHideHeader> during active gameplay, bypassing internal spacer-preservation. Fix: always render <AutoHideHeader collapseSpacerWhenHidden={showResults} />. /he (n=72) CLS=0.075 OK, LCP/INP improving. Supabase MCP absent (7th night) — 2 migrations pending apply.",
+  "date": "2026-07-03",
+  "note": "7d window (24h: 0 routes n≥50). Only above-floor route: /he (n=60) improving across all metrics — LCP 2354ms (↓from 2672ms), INP 170ms (↓from 254ms), CLS 0.078 (stable). Sub-floor routes show alarming CLS (0.7-1.6) but ineligible for regression verdict. /en/daily LCP 10204ms (n=3, sub-floor) — root cause identified: dynamic-import chain + Framer Motion opacity-0 container delays LCP candidate visibility. No code fix tonight (all regression routes sub-floor; /he improving). Supabase MCP absent (8th consecutive night) — 2 migrations still pending apply.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (6th consecutive night). Migrations written but not applied to prod.",
+    "note": "Supabase MCP absent (8th consecutive night). Migration runner uses exec_sql RPC that does not exist on prod. Cannot apply migrations via JS client or MCP.",
     "top_queries": [],
     "migrations_applied_this_run": [],
-    "migrations_written_this_run": [
-      {
-        "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
-        "items": [
-          {
-            "id": "unused_index_word_wheel_catchup",
-            "fix": "DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup",
-            "status": "WRITTEN — needs MCP apply or npx supabase db push",
-            "carry_count": 1
-          }
-        ]
-      }
-    ],
     "migrations_pending_apply": [
       {
         "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
@@ -26,8 +13,16 @@
           "RLS initplan fix: (select auth.role()) on quest_achievement_feed policy",
           "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)"
         ],
-        "carry_count": 6,
-        "status": "WRITTEN — pending apply (6th night)"
+        "carry_count": 7,
+        "status": "WRITTEN — pending apply (7th night)"
+      },
+      {
+        "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
+        "items": [
+          "DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup"
+        ],
+        "carry_count": 2,
+        "status": "WRITTEN — pending apply (2nd night)"
       }
     ],
     "remaining_advisor_items": [
@@ -35,41 +30,72 @@
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 6
+        "carry_count": 7
       },
       {
         "id": "unindexed_fk_word_club_members_user_id",
-        "status": "LIKELY FALSE POSITIVE — idx_word_club_members_user already in migration 20260322700000_growth_retention_features.sql:149. If advisor still flags after applying pending migrations, investigate prod state.",
-        "priority": "LOW"
+        "status": "LIKELY FALSE POSITIVE — idx_word_club_members_user already in migration 20260322700000_growth_retention_features.sql:149. Pending migration 20260628 confirms with idx_word_clubs_owner_id covering owner FK.",
+        "priority": "LOW",
+        "carry_count": 7
+      },
+      {
+        "id": "unused_index_word_wheel_catchup",
+        "status": "Migration written (20260701020000). Pending apply (2nd night).",
+        "priority": "LOW",
+        "carry_count": 2
       }
     ]
   },
   "frontend": {
-    "note": "24h sub-floor (0 routes n≥50). 7d: /en/multiplayer (n=52, barely above floor) and /he (n=84). /en/multiplayer CLS=0.401 is critical structural issue.",
+    "note": "7d window. Only /he above n≥50 floor. All game pages show alarming sub-floor CLS (0.7-1.6), ineligible for regression verdicts. Root cause investigation: DailyChallengeLanding uses Framer Motion initial opacity-0 on outer container — delays LCP. Dynamic import chain for DailyRedirect (browser-API dependency) compounds the issue.",
     "by_route": [
       {
-        "route": "/en/multiplayer",
-        "p75_lcp_ms": 6960,
-        "p75_inp_ms": 496,
-        "p75_cls": 0.401,
-        "n_7d": 52,
+        "route": "/he",
+        "p75_lcp_ms": 2354,
+        "p75_inp_ms": 170,
+        "p75_cls": 0.078,
+        "n_7d": 60,
         "window": "7d",
-        "lcp_status": "WATCH — 6960ms (prior baseline n<50, no valid comparison). Brief: 10552ms (stale, lower confidence). Structural: ssr:false×4 dynamic imports in PageClient.",
-        "inp_status": "CRITICAL — 496ms (threshold 200ms). Socket-heavy client, large JS parse.",
-        "cls_status": "CRITICAL — 0.401 (threshold 0.1). Root cause: uninvestigated. Suspects: SpectatorBanner (no height reservation), AutoHideHeader conditional (null vs header), isActive state transitions. No ad banners or unresized images found in MultiplayerFlow or PageClient. Needs deeper investigation with Chrome DevTools CLS attribution."
+        "lcp_status": "GOOD — 2354ms (↓ from 2672ms, -11.9%). Strong improving trend.",
+        "inp_status": "GOOD — 170ms (↓ from 254ms, -33%). Below 200ms threshold.",
+        "cls_status": "OK — 0.078 (stable, ↓ from 0.080)."
+      }
+    ],
+    "sub_floor_observations": [
+      {
+        "route": "/",
+        "p75_cls": 0.866,
+        "n_7d": 30,
+        "note": "APPROACHING FLOOR (n=30). Extreme CLS. Likely from redirect chain through middleware + anchor ad height adjustment. Watch for n≥50."
       },
       {
-        "route": "/he",
-        "p75_lcp_ms": 2672,
-        "p75_inp_ms": 254,
-        "p75_cls": 0.080,
-        "n_7d": 84,
-        "window": "7d",
-        "lcp_status": "IMPROVING — 2672ms (was 3013ms, -11.3%). Trend: 3297→3112→2927→2702→3120→3013→2672ms.",
-        "inp_status": "WATCH — 254ms (was 280ms, -9.3%). Improving but still above 200ms threshold.",
-        "cls_status": "OK — 0.080 (<0.1 threshold, stable from 0.087)."
+        "route": "/he/daily/word-hunt",
+        "p75_cls": 0.982,
+        "p75_inp_ms": 952,
+        "n_7d": 21,
+        "note": "Extreme CLS and INP. Game state transitions (loading→game→results) likely cause large layout shifts if results not position:fixed. Sub-floor — cannot verdict."
+      },
+      {
+        "route": "/en/daily/word-wheel",
+        "p75_lcp_ms": 4252,
+        "p75_cls": 0.980,
+        "n_7d": 18,
+        "note": "Extreme CLS. Same game-state-transition pattern. Sub-floor."
+      },
+      {
+        "route": "/en/daily",
+        "p75_lcp_ms": 10204,
+        "n_7d": 3,
+        "note": "DEFERRED — n=3, far below 50-sample floor. Root cause analysis done: dynamic-import + Framer Motion opacity-0 cascade. No regression verdict."
+      },
+      {
+        "route": "/he/blast",
+        "p75_cls": 1.624,
+        "n_7d": 11,
+        "note": "Extreme CLS (>1.0). Sub-floor."
       }
-    ]
+    ],
+    "lcp_root_cause_note": "DailyChallengeLanding outer container uses initial={{opacity:0}} Framer Motion. Chrome excludes opacity-0 elements from LCP measurement. Fix: gate opacity animation on useReducedMotion() or skip opacity-0 for above-fold container. Architecture blocker: DailyRedirect uses browser APIs (LanguageContext → localStorage), must stay dynamic import (no SSR)."
   },
   "bundle": {
     "total_static_kb": null,
@@ -78,36 +104,42 @@
   },
   "open_watches": [
     {
-      "id": "multiplayer_cls_0401",
-      "description": "/en/multiplayer CLS=0.401 (4× threshold). Root cause not identified. Suspects: SpectatorBanner/AutoHideHeader conditional renders, isActive state transitions causing height shifts. Next run: use Chrome DevTools CLS attribution panel or add layout-shift debugging to find the shifting element.",
-      "status": "CRITICAL — new this run, needs investigation",
-      "priority": "HIGH"
-    },
-    {
-      "id": "supabase_mcp_absent_6_nights",
-      "description": "Supabase MCP absent 6 consecutive nights. 2 migrations accumulate unverified. Action: mint never-expire PAT into nightly env.",
+      "id": "supabase_mcp_absent_8_nights",
+      "description": "Supabase MCP absent 8 consecutive nights. 2 migrations accumulate unverified (20260628 + 20260701). run-migrations.js unusable (exec_sql RPC missing). ESCALATED: mint never-expire PAT into nightly env. Human action required.",
       "status": "ESCALATED — human action required",
       "priority": "HIGH"
     },
     {
       "id": "migration_pending_apply_06_28",
-      "description": "20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql written — needs Supabase MCP or npx supabase db push (RLS initplan + word_clubs owner_id FK index).",
-      "status": "open — 6th night without MCP"
+      "description": "20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql — RLS initplan + word_clubs owner_id FK index. Carry_count=7.",
+      "status": "open — 7th night without MCP"
     },
     {
       "id": "migration_pending_apply_07_01",
-      "description": "20260701020000_drop_unused_index_word_wheel_catchup.sql written — needs Supabase MCP or npx supabase db push (DROP unused idx_word_wheel_attempts_catchup).",
-      "status": "open — written this run, needs apply"
+      "description": "20260701020000_drop_unused_index_word_wheel_catchup.sql — DROP unused idx_word_wheel_attempts_catchup. Carry_count=2.",
+      "status": "open — 2nd night without MCP"
     },
     {
-      "id": "mp_inp_496ms",
-      "description": "/en/multiplayer INP 496ms (2.5× threshold). Socket-heavy client with large JS parse. Needs Chrome profiler trace.",
+      "id": "he_route_improving",
+      "description": "/he (n=60) LCP 2354ms/INP 170ms/CLS 0.078 — all improving. No fix needed. Continue monitoring.",
+      "status": "healthy — watch"
+    },
+    {
+      "id": "daily_lcp_opacity_animation",
+      "description": "DailyChallengeLanding outer container uses initial={{opacity:0}} Framer Motion — suppresses LCP candidate. Fix: add useReducedMotion() guard or skip opacity-0 on the outer container. Low-risk change. Prioritize when /en/daily reaches n≥50.",
+      "status": "documented — not yet actionable (n=3)",
+      "priority": "MEDIUM"
+    },
+    {
+      "id": "sub_floor_cls_game_pages",
+      "description": "Multiple game pages (/he/daily/word-hunt, /en/daily/word-wheel, /he/blast) show CLS 0.98-1.62 at n<50. Likely game state transitions (loading→game→results) causing in-flow layout shifts. Investigate results overlay positioning. Ineligible for regression verdicts until n≥50.",
+      "status": "documented — sub-floor, cannot verdict",
+      "priority": "MEDIUM"
+    },
+    {
+      "id": "mp_inp_structural",
+      "description": "/en/multiplayer (n=14, sub-floor) INP 376ms. Socket-heavy client. Needs Chrome profiler trace.",
       "status": "open — structural"
-    },
-    {
-      "id": "he_inp_254ms",
-      "description": "/he INP 254ms (improving from 280ms). Still above 200ms threshold.",
-      "status": "improving — watch"
     }
   ]
 }
