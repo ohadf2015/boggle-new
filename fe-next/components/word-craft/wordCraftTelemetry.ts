@@ -29,6 +29,15 @@ export function trackWordCraftGameStarted(params: { locale: string }): void {
   safeCapture('word_craft_game_started', { ...params });
 }
 
+/** Fired when the player hits START on the pre-game setup screen. */
+export function trackWordCraftSetupStart(params: {
+  opponent: string;
+  difficulty: string;
+  modifier: string;
+}): void {
+  safeCapture('wordcraft_setup_start', { ...params });
+}
+
 /**
  * Fired when a player leaves word-craft mid-game (fewer than 3 player turns
  * completed). High rate = early abandonment / confusion signal.

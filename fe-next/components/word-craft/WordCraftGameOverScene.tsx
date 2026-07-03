@@ -3,6 +3,7 @@
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import { WordCraftDuelResult } from './WordCraftDuelResult';
+import { WordCraftPlayFriendControl } from './WordCraftPlayFriendControl';
 import type { BoardDims } from '@/lib/word-craft/boardDimensions';
 import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
@@ -153,6 +154,25 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
                 {t('wordcraft.home')}
               </button>
             ) : null}
+          </div>
+        ) : null}
+
+        {/* Challenge-a-friend (beat-my-score duel link). Lives here since the
+            in-game topbar affordance was removed — the natural brag moment is
+            right after the final score anyway. Solo vs-bot only: hot-seat
+            (isSeated) already has an opponent in the room. */}
+        {!isSeated && currentSeed != null ? (
+          <div className="w-full">
+            <WordCraftPlayFriendControl
+              t={t}
+              seed={currentSeed}
+              playerScore={playerScore}
+              locale={currentLocale ?? 'en'}
+              challengerName={challengerName}
+              challengerAvatar={challengerAvatar}
+              dims={currentDims}
+              difficulty={currentDifficulty}
+            />
           </div>
         ) : null}
       </div>
