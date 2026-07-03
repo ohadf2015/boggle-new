@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { parseDuel } from '@/lib/word-craft/duel';
 import { WordCraftSetup } from '@/components/word-craft/WordCraftSetup';
 import { WordCraftGameView } from '@/components/word-craft/WordCraftGameScreen';
@@ -39,6 +40,15 @@ export function resolveInitialWordCraftPhase(
 export default function WordCraftPageClient() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
+
+  // Hide the global bottom nav for BOTH phases (setup + game): the page is a
+  // no-scroll h-svh surface, and the nav would overlap the setup footer.
+  // Owned here (not in the game view) so START's remount can't flicker it.
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   // Parsed once (lazy state init) — duels and deep links never change within
   // a visit, and the random fallback seed must not re-roll on re-render.
@@ -93,6 +103,7 @@ export default function WordCraftPageClient() {
       seed={seed}
       duel={duel}
       hotseat={phase.choice.opponent === 'hotseat'}
+      challengeIntent={phase.choice.opponent === 'friend'}
       difficulty={phase.choice.difficulty}
       modifierOverride={phase.choice.modifier === 'surprise' ? undefined : phase.choice.modifier}
     />

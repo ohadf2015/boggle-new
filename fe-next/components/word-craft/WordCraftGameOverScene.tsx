@@ -33,13 +33,18 @@ interface Props {
   /** Board dims + bot difficulty just played — embedded in re-challenge links. */
   currentDims?: BoardDims;
   currentDifficulty?: BotDifficulty;
+  /**
+   * Player chose "Challenge a Friend" at setup — the duel link is the whole
+   * point of this game, so the share block gets a headline + entrance pop.
+   */
+  challengeIntent?: boolean;
   /** Play-again closure loop — re-rolls a fresh solo game in place. */
   onPlayAgain?: () => void;
   /** Leave to the home/menu screen. */
   onHome?: () => void;
 }
 
-export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, onPlayAgain, onHome }: Props) {
+export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, botName, isNewBest, playerAvatar, opponentAvatar, duelOutcome, currentSeed, currentLocale, challengerName, challengerAvatar, currentDims, currentDifficulty, challengeIntent, onPlayAgain, onHome }: Props) {
   // If in a duel, show duel result instead of vs-bot result
   if (duelOutcome) {
     return (
@@ -162,7 +167,12 @@ export function WordCraftGameOverScene({ t, playerScore, botScore, playerName, b
             right after the final score anyway. Solo vs-bot only: hot-seat
             (isSeated) already has an opponent in the room. */}
         {!isSeated && currentSeed != null ? (
-          <div className="w-full">
+          <div className={cn('w-full', challengeIntent && 'animate-neo-pop')}>
+            {challengeIntent ? (
+              <p className="mb-1.5 text-center text-[12px] font-neo-display font-black uppercase tracking-wider text-neo-lime">
+                {t('wordcraft.setup.sendChallengeNow')}
+              </p>
+            ) : null}
             <WordCraftPlayFriendControl
               t={t}
               seed={currentSeed}

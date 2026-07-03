@@ -7,7 +7,6 @@ import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useHideNavigation } from '@/contexts/NavigationContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { useWordCraftGame } from '@/lib/word-craft/useWordCraftGame';
 import { useAdMob } from '@/hooks/useAdMob';
@@ -105,12 +104,18 @@ interface GameViewProps {
   seed: number;
   duel: ReturnType<typeof parseDuel>;
   hotseat: boolean;
+  /**
+   * Setup screen "Challenge a Friend": play vs bot, then push the
+   * beat-my-score duel link hard on the results screen — the player's
+   * declared goal is a remote opponent, not the bot.
+   */
+  challengeIntent?: boolean;
   difficulty: BotDifficulty;
   /** Player-picked twist from the setup screen; undefined = seeded surprise roll. */
   modifierOverride?: WordCraftModifier;
 }
 
-export function WordCraftGameView({ seed, duel, hotseat, difficulty, modifierOverride }: GameViewProps) {
+export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, difficulty, modifierOverride }: GameViewProps) {
   const router = useRouter();
   const { t, language } = useLanguage();
   const { loading: authLoading, profile } = useAuth();
@@ -124,15 +129,8 @@ export function WordCraftGameView({ seed, duel, hotseat, difficulty, modifierOve
   );
   const locale = (language ?? 'en') as SupportedLocale;
 
-  // Hide the global bottom nav while in WordCraft — it's an immersive,
-  // no-scroll screen and the nav was overlapping the board and rack. This
-  // also drops --bottom-nav-height to 0 so the h-svh layout reclaims the
-  // full viewport.
-  const setIsInGame = useHideNavigation();
-  useEffect(() => {
-    setIsInGame(true);
-    return () => setIsInGame(false);
-  }, [setIsInGame]);
+  // Bottom-nav hiding lives in the page-level phase switcher (PageClient) so
+  // it covers the setup phase too and START's remount can't flicker it.
 
   const [dict, setDict] = useState<Set<string> | null>(null);
 
@@ -1224,6 +1222,7 @@ export function WordCraftGameView({ seed, duel, hotseat, difficulty, modifierOve
           challengerAvatar={challengerIdentity.avatar}
           currentDims={game.dims}
           currentDifficulty={effectiveDifficulty}
+          challengeIntent={challengeIntent}
           onPlayAgain={() => game.reset(Math.floor(Math.random() * 1_000_000))}
           onHome={() => router.push(`/${language}`)}
         />

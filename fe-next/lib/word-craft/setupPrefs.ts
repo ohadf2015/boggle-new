@@ -10,7 +10,11 @@ const KEY = 'wordcraft.setup.v1';
  * to flash-override the UI.
  */
 export interface WordCraftSetupChoice {
-  opponent: 'bot' | 'hotseat';
+  /**
+   * 'friend' = remote challenge: plays vs the bot, then the results screen
+   * pushes the beat-my-score duel link to send to a player who isn't nearby.
+   */
+  opponent: 'bot' | 'hotseat' | 'friend';
   difficulty: BotDifficulty;
   /** 'surprise' = keep the seeded per-game roll (the pre-overhaul behavior). */
   modifier: WordCraftModifier | 'surprise';
@@ -24,7 +28,7 @@ export function loadSetupPrefs(): WordCraftSetupChoice {
     if (!raw) return DEFAULT_SETUP;
     const p = JSON.parse(raw) as Partial<WordCraftSetupChoice>;
     return {
-      opponent: p.opponent === 'hotseat' ? 'hotseat' : 'bot',
+      opponent: p.opponent === 'hotseat' || p.opponent === 'friend' ? p.opponent : 'bot',
       difficulty: BOT_DIFFICULTIES.includes(p.difficulty as BotDifficulty)
         ? (p.difficulty as BotDifficulty)
         : DEFAULT_SETUP.difficulty,

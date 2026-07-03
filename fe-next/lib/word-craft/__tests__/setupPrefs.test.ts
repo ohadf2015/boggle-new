@@ -22,4 +22,9 @@ describe('setupPrefs', () => {
     );
     expect(loadSetupPrefs()).toEqual(DEFAULT_SETUP);
   });
+
+  it('round-trips the friend (remote challenge) opponent', () => {
+    saveSetupPrefs({ opponent: 'friend', difficulty: 'medium', modifier: 'surprise' });
+    expect(loadSetupPrefs()).toEqual({ opponent: 'friend', difficulty: 'medium', modifier: 'surprise' });
+  });
 });

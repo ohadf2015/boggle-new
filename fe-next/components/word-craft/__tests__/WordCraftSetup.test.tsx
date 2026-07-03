@@ -30,6 +30,16 @@ describe('WordCraftSetup', () => {
     expect(screen.queryByRole('radiogroup', { name: /setup\.difficulty\.label/ })).toBeNull();
   });
 
+  it('offers a remote Challenge-a-Friend opponent and passes it through START', () => {
+    const onStart = vi.fn();
+    render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={onStart} t={t} />);
+    fireEvent.click(screen.getByRole('radio', { name: /setup\.opponent\.friend/ }));
+    // Friend games still run vs the bot (async duel) — difficulty stays tunable.
+    expect(screen.getByRole('radiogroup', { name: /setup\.difficulty\.label/ })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /setup\.start/ }));
+    expect(onStart).toHaveBeenCalledWith({ ...DEFAULT_SETUP, opponent: 'friend' });
+  });
+
   it('surprise twist is the default and start passes it through', () => {
     const onStart = vi.fn();
     render(<WordCraftSetup initial={DEFAULT_SETUP} onStart={onStart} t={t} />);

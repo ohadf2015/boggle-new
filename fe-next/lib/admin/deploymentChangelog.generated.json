@@ -1,6 +1,41 @@
 {
-  "generatedAt": "2026-07-03T17:53:45.246Z",
+  "generatedAt": "2026-07-03T19:20:40.875Z",
   "commits": [
+    {
+      "sha": "983153f9bce87519b3471bf1fb206d6be3362213",
+      "shortSha": "983153f",
+      "subject": "chore: sweep generated artifacts + test lint-directive cleanup",
+      "author": "Ohad Fisher",
+      "date": "2026-07-03T21:50:37+03:00"
+    },
+    {
+      "sha": "a9e05ee183a2f150ab867e166fdde788fead0fc9",
+      "shortSha": "a9e05ee",
+      "subject": "feat(wordcraft): pre-game setup screen + board-first declutter",
+      "author": "Ohad Fisher",
+      "date": "2026-07-03T21:07:06+03:00"
+    },
+    {
+      "sha": "40a08659daa9e580e32abf3fe756859e251c734a",
+      "shortSha": "40a0865",
+      "subject": "perf(wordcraft): O(1) drop resolution + imperative drag ghost",
+      "author": "Ohad Fisher",
+      "date": "2026-07-03T21:06:46+03:00"
+    },
+    {
+      "sha": "af1f5dfbbf26b66a99d400aae17f565b438d9b8c",
+      "shortSha": "af1f5df",
+      "subject": "feat(wordcraft): quick_draw + golden_tiles felt modifiers",
+      "author": "Ohad Fisher",
+      "date": "2026-07-03T21:06:27+03:00"
+    },
+    {
+      "sha": "0661c343f8b4c2acce448838c011032421778e83",
+      "shortSha": "0661c34",
+      "subject": "feat(wordcraft): auto-center opening tile + player modifier override",
+      "author": "Ohad Fisher",
+      "date": "2026-07-03T21:06:08+03:00"
+    },
     {
       "sha": "fced320a620f7d91e3bc2241d7edacaca7633a43",
       "shortSha": "fced320",
@@ -105,41 +140,6 @@
       "subject": "feat(nightly): close the loop — repair pass, dropped-work requeue, impact ledger, brief-gated lanes, preflight self-retry",
       "author": "Ohad Fisher",
       "date": "2026-07-03T17:13:39+03:00"
-    },
-    {
-      "sha": "6e37b10cd76ecc08407976ded0c00ee3f89daf0b",
-      "shortSha": "6e37b10",
-      "subject": "Merge pull request #691 from ohadf2015/claude/daily-challenge-hebrew-exit-kecb2b",
-      "author": "ohadf2015",
-      "date": "2026-07-03T15:32:21+03:00"
-    },
-    {
-      "sha": "88ae8a4a3387c701fa83c8a54427cbe33ee799f5",
-      "shortSha": "88ae8a4",
-      "subject": "test: make count assertions derive from source so they stop going stale",
-      "author": "Claude",
-      "date": "2026-07-03T11:36:18Z"
-    },
-    {
-      "sha": "4094d1c050ddfb5e10da6dca030d5fd39813831c",
-      "shortSha": "4094d1c",
-      "subject": "Merge pull request #690 from ohadf2015/claude/daily-challenge-hebrew-exit-kecb2b",
-      "author": "ohadf2015",
-      "date": "2026-07-03T14:18:02+03:00"
-    },
-    {
-      "sha": "0fd30d8ca076ec929f8a0655b0e0f6e89bc018a3",
-      "shortSha": "0fd30d8",
-      "subject": "test(blast): update canonical tile-type counts 23→24 for the 'mystery' tile",
-      "author": "Claude",
-      "date": "2026-07-03T10:18:55Z"
-    },
-    {
-      "sha": "64dcdcfc2084bc64ea242166e6f57c48ddb59026",
-      "shortSha": "64dcdcf",
-      "subject": "fix(ui): clip modal layer to 100vw so RTL exit dialog can't push the app off-screen",
-      "author": "Claude",
-      "date": "2026-07-03T10:09:44Z"
     }
   ]
 }

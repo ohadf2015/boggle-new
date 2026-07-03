@@ -13962,7 +13962,7 @@ const he = {
     "difficulty": { "label": "רמת קושי", "easy": "קל", "medium": "בינוני", "hard": "קשה" },
     "clue": { "button": "רמז", "reveal": "נסה: {{word}}", "none": "לא נמצא מהלך — נסה להחליף", "granted": "‎+1 רמז!", "adFailed": "הפרסומת לא זמינה — נסה שוב" },
     "modifier": { "bingo_bonanza": "בונוס בינגו", "long_words": "מילים ארוכות", "rich_letters": "אותיות יקרות", "land_grab": "כיבוש שטח", "quick_draw": "שליפה מהירה", "golden_tiles": "אריחי זהב", "none": "", "desc": { "bingo_bonanza": "בינגו שווה ‎+90", "long_words": "מילים מ‎-5 אותיות ‎+15", "rich_letters": "אותיות נדירות שוות כפול", "land_grab": "כיבושים מתפשטים לשכנים", "quick_draw": "מגש של 5 אותיות — תורות מהירים", "golden_tiles": "אריחי ✦ כובשים את המשבצות שסביבם" } },
-    "setup": { "title": "מכינים את המשחק", "opponent": { "label": "יריב", "bot": "נגד בוט", "botDesc": "משחק מול וורדבוט", "hotseat": "מסך משותף", "hotseatDesc": "שני שחקנים, מכשיר אחד" }, "difficulty": { "label": "רמת הבוט" }, "twist": { "label": "טוויסט", "surprise": "תפתיעו אותי" }, "start": "מתחילים", "challengeHint": "אתגר-חבר מחכה במסך התוצאות" },
+    "setup": { "title": "מכינים את המשחק", "opponent": { "label": "יריב", "bot": "נגד בוט", "botDesc": "משחק מול וורדבוט", "hotseat": "מסך משותף", "hotseatDesc": "שני שחקנים, מכשיר אחד", "friend": "אתגר לחבר", "friendDesc": "שולחים קישור למרחוק — מי ינצח?" }, "difficulty": { "label": "רמת הבוט" }, "twist": { "label": "טוויסט", "surprise": "תפתיעו אותי" }, "start": "מתחילים", "challengeHint": "אתגר-חבר מחכה במסך התוצאות", "sendChallengeNow": "עכשיו שולחים את האתגר!" },
     "squares": "משבצות",
     "place": { "step1": "הקישו על אות", "step2": "הקישו על משבצת", "step3": "שלחו" },
     "newBest": "שיא חדש!",
