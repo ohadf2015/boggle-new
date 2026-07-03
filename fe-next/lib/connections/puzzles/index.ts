@@ -44,16 +44,22 @@ const BRIDGE_PENALTY = 10000;
 const THEME_PENALTY = 100;
 const STEM_PENALTY = 30;
 
-function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
+// Recency windows (2026-07-03): penalizing only the IMMEDIATELY previous pick
+// let the same bridge/stem echo back at distance 2 — players read that as
+// "almost the same puzzle again". Each axis now looks back over a short
+// window with penalties decaying by recency (÷1, ÷2, ÷3…), so a repeat two
+// or three levels back still repels but never outweighs a fresher clash.
+const BRIDGE_WINDOW = 4;
+const THEME_WINDOW = 2;
+const STEM_WINDOW = 3;
+
+/** Exported for tests — production callers go through the ordered level path. */
+export function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
   // Stable, deterministic base order; greedy reorders from here.
   const remaining = [...items].sort((a, b) => a.id.localeCompare(b.id));
   const themeOf = new Map(remaining.map((p) => [p.id, inferTheme(p)] as const));
 
   const out: ConnectionPuzzle[] = [];
-  let lastBridge: string | null = null;
-  let lastTheme: string | null = null;
-  let lastWord1: string | null = null;
-  let lastWord2: string | null = null;
 
   while (remaining.length > 0) {
     // Remaining count per bridge — used only as a tie-break toward draining the
@@ -65,12 +71,20 @@ function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
     let bestScore = Infinity;
     for (let i = 0; i < remaining.length; i++) {
       const p = remaining[i];
-      let penalty = 0;
-      if (p.bridge === lastBridge) penalty += BRIDGE_PENALTY;
       const th = themeOf.get(p.id)!;
-      if (th !== 'misc' && th === lastTheme) penalty += THEME_PENALTY;
-      if (p.word1 === lastWord1) penalty += STEM_PENALTY;
-      if (p.word2 === lastWord2) penalty += STEM_PENALTY;
+      let penalty = 0;
+      for (let back = 1; back <= BRIDGE_WINDOW; back++) {
+        const recent = out[out.length - back];
+        if (!recent) break;
+        if (p.bridge === recent.bridge) penalty += BRIDGE_PENALTY / back;
+        if (back <= THEME_WINDOW && th !== 'misc' && th === themeOf.get(recent.id)) {
+          penalty += THEME_PENALTY / back;
+        }
+        if (back <= STEM_WINDOW) {
+          if (p.word1 === recent.word1) penalty += STEM_PENALTY / back;
+          if (p.word2 === recent.word2) penalty += STEM_PENALTY / back;
+        }
+      }
       // Prefer draining the largest remaining bridge bucket (tiny weight → pure
       // tie-break). Among equal penalties the lowest index (id-sorted) wins.
       penalty -= (bridgeCount.get(p.bridge) ?? 0) * 0.001;
@@ -80,12 +94,7 @@ function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
       }
     }
 
-    const picked = remaining.splice(bestIdx, 1)[0];
-    out.push(picked);
-    lastBridge = picked.bridge;
-    lastTheme = themeOf.get(picked.id)!;
-    lastWord1 = picked.word1;
-    lastWord2 = picked.word2;
+    out.push(remaining.splice(bestIdx, 1)[0]);
   }
   return out;
 }
