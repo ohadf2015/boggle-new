@@ -46,4 +46,13 @@ describe('leaderboardJsonLd', () => {
       expect(decoded).toEqual(obj);
     });
   });
+
+  describe('Russian (ru) locale support', () => {
+    it('buildLeaderboardFaqJsonLd supports ru locale with ru URL', () => {
+      const faq = [{ question: 'How is score calculated?', answer: 'By total wins.' }];
+      const schema = buildLeaderboardFaqJsonLd('ru', faq);
+      expect(schema!['@id']).toBe('https://www.lexiclash.live/ru/leaderboard#faq');
+      expect(schema!.inLanguage).toBe('ru');
+    });
+  });
 });

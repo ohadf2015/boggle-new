@@ -123,7 +123,7 @@ const softwareAppJsonLd = JSON.stringify({
     'Combo scoring system',
   ],
   browserRequirements: 'Requires a modern web browser',
-  inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+  inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
 });
 
 const stickerBadges = ['NO DOWNLOAD', 'NO SIGNUP', 'NO ADS HELL', 'PLAY IN 5s', '5 LANGUAGES', 'REAL-TIME', 'INSTANT FUN'];

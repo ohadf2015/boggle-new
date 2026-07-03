@@ -172,4 +172,48 @@ describe('educationJsonLd', () => {
       });
     });
   });
+
+  describe('Russian (ru) locale support', () => {
+    it('buildEducationOrgJsonLd supports ru locale with Russian description', () => {
+      const schema = buildEducationOrgJsonLd('ru');
+      expect(schema.url).toBe('https://www.lexiclash.live/ru/education');
+      expect(schema['@id']).toBe('https://www.lexiclash.live/ru/education#org');
+      expect(schema.inLanguage).toBe('ru');
+      expect(typeof schema.description).toBe('string');
+      expect(schema.description.length).toBeGreaterThan(0);
+      // Russian text should be present (not English fallback)
+      expect(schema.description).not.toBe('LexiClash Education provides classroom-ready word games, vocabulary duels, and a teacher dashboard for assigning curriculum-aligned exercises and tracking student progress. Free to use, browser-based, no downloads required.');
+    });
+
+    it('buildEducationCourseJsonLd supports ru locale with Russian strings', () => {
+      const schema = buildEducationCourseJsonLd('ru');
+      expect(schema.inLanguage).toBe('ru');
+      expect(schema.url).toBe('https://www.lexiclash.live/ru/education');
+      expect(typeof schema.name).toBe('string');
+      expect(schema.name.length).toBeGreaterThan(0);
+    });
+
+    it('buildEducationWebApplicationJsonLd supports ru locale with Russian features', () => {
+      const schema = buildEducationWebApplicationJsonLd('ru');
+      expect(schema.inLanguage).toContain('ru');
+      expect(schema.url).toBe('https://www.lexiclash.live/ru/education');
+      expect(Array.isArray(schema.featureList)).toBe(true);
+      expect(schema.featureList.length).toBeGreaterThanOrEqual(4);
+      // At least one feature should not be the English default
+      const joined = schema.featureList.join(' ');
+      expect(joined).toBeTruthy();
+    });
+
+    it('buildEducationFaqJsonLd uses ru locale in @id', () => {
+      const faq = [{ question: 'Test?', answer: 'Test.' }];
+      const schema = buildEducationFaqJsonLd('ru', faq);
+      expect(schema!['@id']).toBe('https://www.lexiclash.live/ru/education#faq');
+    });
+
+    it('buildEducationBreadcrumbJsonLd uses ru locale in URLs', () => {
+      const schema = buildEducationBreadcrumbJsonLd('ru');
+      expect(schema.itemListElement[0].item).toBe('https://www.lexiclash.live/ru');
+      expect(schema.itemListElement[1].item).toBe('https://www.lexiclash.live/ru/education');
+    });
+  });
 });

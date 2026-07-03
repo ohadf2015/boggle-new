@@ -49,7 +49,7 @@ export function VideoGameJsonLd(props: VideoGameJsonLdProps = {}): ReactNode {
             maxValue: numberOfPlayers?.maxValue ?? 20,
         },
         playMode: playMode ?? ['SinglePlayer', 'MultiPlayer', 'CoOp'],
-        inLanguage: isModeScoped ? lang : ['en', 'he', 'sv', 'ja', 'es'],
+        inLanguage: isModeScoped ? lang : ['en', 'he', 'sv', 'ja', 'es', 'ru'],
         isFamilyFriendly: true,
         offers: {
             '@type': 'Offer',

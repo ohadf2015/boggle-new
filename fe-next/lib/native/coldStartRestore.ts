@@ -15,7 +15,7 @@ export const LAST_ROUTE_KEY = 'lexiclash_last_route';
 /** Don't resurrect a route the user abandoned long ago — feels random, not helpful. */
 export const ROUTE_RESTORE_WINDOW_MS = 30 * 60 * 1000; // 30 min
 
-const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const SUPPORTED_LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
 /**
  * Stateless hub/account/social screens that are safe to auto-restore. Curated

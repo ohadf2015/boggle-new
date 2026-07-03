@@ -137,7 +137,7 @@ export default async function WordBlastGameLandingPage({ params }: PageProps) {
     applicationCategory: 'GameApplication',
     operatingSystem: 'Any',
     playMode: ['SinglePlayer', 'MultiPlayer'],
-    inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+    inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     publisher: { '@type': 'Organization', name: 'LexiClash', url: BASE_URL },
   });

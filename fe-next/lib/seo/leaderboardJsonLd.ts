@@ -1,5 +1,5 @@
 const BASE_URL = 'https://www.lexiclash.live';
-const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es']);
+const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 
 interface FaqItem {
   question: string;

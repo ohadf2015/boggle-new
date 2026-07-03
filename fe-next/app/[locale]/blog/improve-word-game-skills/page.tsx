@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Hur Man Hittar Ord Snabbare - Bästa Tips för Ordspel',
   ja: 'ワードハントで単語を見つけるコツ - ボグル攻略法',
   es: 'Cómo Encontrar Palabras Más Rápido - Tips para Boggle y Word Hunt',
+  ru: 'Как быстро находить слова в словесных играх — техники и советы',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Vad är det bästa sättet att hitta ord? Beprövade strategier för att förbättra dina ordspelsfärdigheter. Lär dig chunking-tekniken och mönsterigenkänning.',
   ja: 'ワードハントで単語を見つける最善の方法は？ワードゲームスキルを向上させる実証済み戦略。チャンキング技法やパターン認識を学ぶ。',
   es: '¿Cuál es la mejor manera de encontrar palabras? Estrategias probadas para mejorar tus habilidades en juegos de palabras. Técnica de chunking y reconocimiento de patrones.',
+  ru: 'Как находить слова быстрее в словесных играх? Проверенные стратегии для улучшения навыков. Техника группирования, распознавание шаблонов и советы от опытных игроков. Бесплатные советы для Слова дня и других словесных игр.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function ImproveSkillsPage({ params }: PageProps) {

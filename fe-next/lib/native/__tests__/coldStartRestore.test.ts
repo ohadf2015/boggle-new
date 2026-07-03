@@ -12,6 +12,7 @@ describe('coldStartRestore', () => {
     it('removes a recognized locale prefix', () => {
       expect(stripLocale('/en/profile')).toBe('/profile');
       expect(stripLocale('/he/friends/123')).toBe('/friends/123');
+      expect(stripLocale('/ru/profile')).toBe('/profile');
     });
 
     it('returns "/" for the bare locale home', () => {

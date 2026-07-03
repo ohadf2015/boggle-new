@@ -423,16 +423,27 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     'ai-vs-word-games-language-learning',
     'spelling-bee-science-vocabulary',
   ];
-  // ru excluded: 0 of the 28 articles have a Russian translation, so /ru/blog/*
-  // serves the English body and generateBlogMetadata noindexes it. Advertising
-  // noindex'd duplicates in the sitemap is a pure negative signal (AdSense
-  // "low value content" rejection, 2026-07-02).
-  const blogLocales = LOCALES.filter((l) => l !== 'ru');
+  // Articles with a native ru translation (contentByLocale.ru + ru metaTitles →
+  // hasTranslation indexes them). Every other article serves the English body
+  // on /ru noindexed — advertising those in the sitemap is a pure negative
+  // signal (AdSense "low value content" rejection, 2026-07-02). Add a slug here
+  // when its ru translation ships.
+  const RU_TRANSLATED_BLOG = new Set([
+    'word-games-for-brain-training',
+    'free-word-games-online',
+    'vocabulary-building-strategies',
+    'improve-word-game-skills',
+  ]);
+  const blogLocalesNoRu = LOCALES.filter((l) => l !== 'ru');
   blogArticles.forEach((slug) => {
-    // hreflang must not point at the noindexed ru sibling either.
+    const hasRu = RU_TRANSLATED_BLOG.has(slug);
     const alts = langAlternates(`/blog/${slug}`);
-    delete alts.ru;
-    delete alts['ru-RU'];
+    if (!hasRu) {
+      // hreflang must not point at the noindexed ru sibling.
+      delete alts.ru;
+      delete alts['ru-RU'];
+    }
+    const blogLocales = hasRu ? LOCALES : blogLocalesNoRu;
     blogLocales.forEach((locale) => {
       routes.push({
         url: `${BASE_URL}/${locale}/blog/${slug}`,

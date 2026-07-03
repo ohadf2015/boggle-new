@@ -5,7 +5,7 @@
 // Locale-keyed strings mirror the educationJsonLd.ts pattern.
 
 const BASE_URL = 'https://www.lexiclash.live';
-const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es']);
+const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 
 function safeLocale(locale: string): string {
   return SUPPORTED.has(locale) ? locale : 'en';
@@ -77,6 +77,17 @@ const DUELS_CONTENT: Record<string, SubpageContent> = {
     audience: 'Estudiantes de primaria, secundaria y bachillerato; estudiantes ESL/EFL; adultos que construyen vocabulario.',
     educationalUse: ['Construcción de Vocabulario', 'Práctica de Ortografía', 'Práctica ESL', 'Actividad de Aula'],
   },
+  ru: {
+    name: 'Как организовать дуэль словарного запаса 1v1',
+    description: 'Объедини учеников для дуэлей словарного запаса. Бесплатно, без регистрации, работает в любом браузере.',
+    steps: [
+      { name: 'Открой дуэли словарного запаса', text: 'Перейди на /education/duels и выбери список слов — из своей программы, пакет ESL или быстрый разогрев.' },
+      { name: 'Объедини учеников', text: 'Двое учеников одновременно ищут слова на одной доске букв. Первый, кто достигнет целевого результата, побеждает.' },
+      { name: 'Проверь пропущенные слова', text: 'После раунда оба игрока видят каждое слово, которое они пропустили, и могут потренироваться с ним в режиме практики.' },
+    ],
+    audience: 'Учащиеся начальной, средней и старшей школы; учащиеся ESL/EFL; взрослые, развивающие словарный запас.',
+    educationalUse: ['Развитие словарного запаса', 'Практика правописания', 'Практика ESL', 'Классная деятельность'],
+  },
 };
 
 const CLASSROOM_CONTENT: Record<string, SubpageContent> = {
@@ -134,6 +145,17 @@ const CLASSROOM_CONTENT: Record<string, SubpageContent> = {
     ],
     audience: 'Aulas K-12, programas ESL/EFL, clubes extraescolares, actividades de profesor sustituto.',
     educationalUse: ['Construcción de Vocabulario', 'Actividad de Toda la Clase', 'Evaluación Formativa', 'Práctica ESL', 'Descanso Mental'],
+  },
+  ru: {
+    name: 'Как организовать словесную игру для всего класса',
+    description: 'Живая многоплеерная словесная игра для всего класса. Ученики присоединяются с 4-значным кодом. Для учеников не требуются учетные записи.',
+    steps: [
+      { name: 'Создай сеанс', text: 'Нажми "Начать игру в классе". Выбери список слов, лимит времени и режим игры (сетка Boggle, Охота на слова или Колесо).' },
+      { name: 'Поделись кодом', text: 'Отобрази 4-значный код или QR на проекторе. Ученики присоединяются из любого мобильного браузера или ноутбука — без входа.' },
+      { name: 'Играй и просмотри', text: 'До 30 учеников соревнуются в реальном времени. Живая таблица лидеров. После раунда панель показывает точность класса и какие слова сбили с толку большинство учеников.' },
+    ],
+    audience: 'Классы K-12, программы ESL/EFL, внешкольные клубы, деятельность учителя-замены.',
+    educationalUse: ['Развитие словарного запаса', 'Деятельность всего класса', 'Формативное оценивание', 'Практика ESL', 'Перерыв для мозга'],
   },
 };
 

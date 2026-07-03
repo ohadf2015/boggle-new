@@ -95,7 +95,7 @@ const videoGameJsonLd = JSON.stringify({
   numberOfPlayers: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 20 },
   applicationCategory: 'GameApplication',
   operatingSystem: 'Any (Web Browser)',
-  inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+  inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock', url: `${BASE_URL}/en/multiplayer` },
   publisher: { '@type': 'Organization', name: 'LexiClash', url: BASE_URL },
 });

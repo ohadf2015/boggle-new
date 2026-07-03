@@ -5,8 +5,8 @@
 // BreadcrumbList mirrors the /guides pattern for consistent site navigation.
 
 const BASE_URL = 'https://www.lexiclash.live';
-const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es']);
-const LOCALES = ['en', 'he', 'sv', 'ja', 'es'];
+const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
+const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
 
 // Real, existing LexiClash profiles — used as sameAs for entity verification.
 // NEVER add placeholder/non-existent URLs here: an invalid sameAs hurts more
@@ -50,6 +50,7 @@ const ORG_DESCRIPTION: Record<string, string> = {
   sv: 'LexiClash Education erbjuder klassrumsfärdiga ordspel, ordförrådsdueller och en lärarpanel för att tilldela läroplansanpassade övningar och följa elevernas framsteg. Gratis att använda, webbläsarbaserad, inga nedladdningar krävs.',
   ja: 'LexiClash Educationは、教室向けのワードゲーム、語彙デュエル、カリキュラムに沿った課題の割り当てと生徒の進捗追跡のための教師ダッシュボードを提供します。無料、ブラウザベース、ダウンロード不要。',
   es: 'LexiClash Education ofrece juegos de palabras listos para el aula, duelos de vocabulario y un panel del profesor para asignar ejercicios alineados con el currículo y monitorear el progreso de los estudiantes. Gratis, basado en navegador, sin descargas.',
+  ru: 'LexiClash Education предоставляет готовые к использованию словесные игры, дуэли словарного запаса и панель для учителя для назначения упражнений, соответствующих учебной программе, и отслеживания прогресса учащихся. Бесплатно, в браузере, без скачивания.',
 };
 
 export function buildEducationOrgJsonLd(locale: string) {
@@ -84,6 +85,7 @@ const COURSE_NAME: Record<string, string> = {
   sv: 'Ordförrådsbyggande genom Ordspel',
   ja: 'ワードゲームによる語彙構築',
   es: 'Desarrollo de Vocabulario a través de Juegos de Palabras',
+  ru: 'Развитие словарного запаса через словесные игры',
 };
 
 const COURSE_DESCRIPTION: Record<string, string> = {
@@ -92,6 +94,7 @@ const COURSE_DESCRIPTION: Record<string, string> = {
   sv: 'Självgående och lärarledd ordförrådsövning genom tävlingsinriktade ordspel. Lämplig för grundskola, mellanstadium och gymnasium, samt vuxenutbildning. Inga förkunskaper krävs.',
   ja: '競争的なワードゲームによる自己学習および教師主導の語彙練習。小学校、中学校、高校の教室、ESL/EFLプログラム、成人学習者に適しています。前提条件なし。',
   es: 'Práctica de vocabulario autodirigida y guiada por el profesor a través de juegos de palabras competitivos. Adecuado para aulas de primaria, secundaria y bachillerato, programas ESL/EFL y estudiantes adultos. Sin requisitos previos.',
+  ru: 'Самостоятельная и ведомая учителем практика словарного запаса через конкурентные словесные игры. Подходит для начальных, средних и старших классов, программ ESL/EFL и взрослых обучающихся. Без предварительных требований; работает в любом браузере.',
 };
 
 export function buildEducationCourseJsonLd(locale: string) {
@@ -189,6 +192,14 @@ const WEBAPP_FEATURES: Record<string, string[]> = {
     '5 idiomas incluyendo hebreo (RTL) y japonés, cada uno con su propio diccionario',
     'Dificultad alineada al currículo para primaria, secundaria y ESL/EFL',
     'Funciona en cualquier navegador — sin descargas, sin muros de pago',
+  ],
+  ru: [
+    'Без регистрации учеников — присоединись к классу с 4-значным кодом',
+    'Многоплеерные дуэли словарного запаса (1v1) и живые игры для всего класса',
+    'Панель учителя: пользовательские списки слов, отслеживание прогресса, аналитика класса',
+    '6 языков включая иврит (RTL) и японский, каждый с собственным словарем',
+    'Уровень сложности, соответствующий учебной программе для начальной, средней и старшей школы, ESL/EFL',
+    'Работает в любом браузере — без скачивания, без платных стен, без премиум-уровня',
   ],
 };
 

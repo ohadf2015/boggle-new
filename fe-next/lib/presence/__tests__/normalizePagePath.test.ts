@@ -5,6 +5,7 @@ describe('normalizePagePath', () => {
   it('strips a 2-letter locale prefix', () => {
     expect(normalizePagePath('/he/play')).toBe('/play');
     expect(normalizePagePath('/en/lobby')).toBe('/lobby');
+    expect(normalizePagePath('/ru/play')).toBe('/play');
   });
 
   it('treats locale-only path as home', () => {

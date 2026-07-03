@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Jag larde mig 500 nya ord pa 30 dagar - Strategier for ordforrad',
   ja: '30日で500の新単語を習得 - 語彙構築戦略',
   es: 'Aprendi 500 palabras en 30 dias - Estrategias de vocabulario',
+  ru: 'Выучил 500 новых слов за 30 дней - Стратегии расширения словаря',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Lar dig hur utspridd repetition, aktiv aterkallelse och ordspel hjalpte mig att lara mig 500 nya ord pa 30 dagar.',
   ja: '間隔反復、能動的想起、ワードゲームで30日間に500の新単語を習得した方法。研究に裏付けされた語彙構築戦略。',
   es: 'Descubre como la repeticion espaciada, el recuerdo activo y los juegos de palabras me ayudaron a aprender 500 palabras nuevas en 30 dias.',
+  ru: 'Как интервальное повторение, активное припоминание и словесные игры помогли мне выучить 500 новых слов за 30 дней. Проверенные стратегии расширения словаря.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function VocabularyPage({ params }: PageProps) {

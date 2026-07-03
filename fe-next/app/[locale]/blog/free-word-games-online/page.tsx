@@ -17,10 +17,12 @@ const DATE_MODIFIED = '2026-05-11';
 
 const metaTitles: Record<string, string> = {
   en: 'Free Word Games Online: The Honest Guide (No Pay-to-Win, 2026)',
+  ru: 'Бесплатные словесные игры онлайн: честный гайд 2026',
 };
 
 const metaDescriptions: Record<string, string> = {
   en: 'A field guide to free word games that respect your time and wallet. Five-question red-flag checklist + the daily puzzle and PWA patterns that actually work in 2026.',
+  ru: 'Путеводитель по бесплатным словесным играм без платежей. Чеклист красных флагов и проверенные форматы ежедневных головоломок и веб-приложений для 2026.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     description,
     datePublished: DATE_PUBLISHED,
     dateModified: DATE_MODIFIED,
-    hasTranslation: locale === 'en',
+    hasTranslation: locale in metaTitles,
+    ruTranslated: 'ru' in metaTitles,
   });
 }
 

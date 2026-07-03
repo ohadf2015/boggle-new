@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 
 const BASE_URL = 'https://www.lexiclash.live';
-const LOCALES = ['en', 'he', 'sv', 'ja', 'es'] as const;
+const LOCALES = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
 type Locale = (typeof LOCALES)[number];
 
@@ -83,6 +83,7 @@ export async function generatePageMetadata({
     'en-GB': 'en', 'en-SE': 'en', 'sv-SE': 'sv', 'en-JP': 'en',
     'ja-JP': 'ja', 'en-ES': 'en', 'es-ES': 'es', 'en-MX': 'en',
     'es-MX': 'es', 'en-AU': 'en', 'es-AR': 'es', 'es-CO': 'es',
+    'ru-RU': 'ru',
   };
   for (const [ext, base] of Object.entries(extendedMappings)) {
     alternateLanguages[ext] = `${BASE_URL}/${base}${path}`;

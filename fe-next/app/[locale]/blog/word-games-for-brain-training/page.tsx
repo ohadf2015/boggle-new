@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Fördelar med Ordspel för Hjärnträning - Vad Forskningen Säger',
   ja: 'ワードゲームで脳トレ - プレイするメリットを研究が証明',
   es: 'Beneficios de Jugar Juegos de Palabras para el Cerebro (Investigación)',
+  ru: 'Словесные игры для здоровья мозга - Что говорят исследования',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Vilka är fördelarna med att spela ordspel? En studie med 19 000 deltagare visar att ordspel slår hjärnträningsappar. Evidensbaserad analys.',
   ja: 'ワードゲームのプレイにどんなメリットがあるか？19,000人の研究がワードゲームは脳トレアプリよりも認知機能に効果的と証明。',
   es: '¿Cuáles son los beneficios de jugar juegos de palabras? Un estudio con 19.000 participantes muestra que superan a las apps de entrenamiento cerebral.',
+  ru: 'Какие преимущества словесных игр для мозга? Исследование на 19 000 человек показывает, что словесные игры лучше приложений для тренировки мозга. Научный анализ.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function BrainTrainingPage({ params }: PageProps) {

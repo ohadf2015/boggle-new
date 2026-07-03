@@ -63,6 +63,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         sv: `${SITE_URL}/sv/word-of-the-day`,
         ja: `${SITE_URL}/ja/word-of-the-day`,
         es: `${SITE_URL}/es/word-of-the-day`,
+        ru: `${SITE_URL}/ru/word-of-the-day`,
+        'ru-RU': `${SITE_URL}/ru/word-of-the-day`,
         'en-IL': `${SITE_URL}/en/word-of-the-day`,
         'he-IL': `${SITE_URL}/he/word-of-the-day`,
         'en-US': `${SITE_URL}/en/word-of-the-day`,

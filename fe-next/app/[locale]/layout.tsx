@@ -291,13 +291,14 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 height: 630,
             },
             screenshot: 'https://www.lexiclash.live/og-image-en.webp',
-            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es'],
+            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es', 'ru'],
             availableLanguage: [
                 { '@type': 'Language', name: 'English', alternateName: 'en' },
                 { '@type': 'Language', name: 'Hebrew', alternateName: 'he' },
                 { '@type': 'Language', name: 'Swedish', alternateName: 'sv' },
                 { '@type': 'Language', name: 'Japanese', alternateName: 'ja' },
                 { '@type': 'Language', name: 'Spanish', alternateName: 'es' },
+                { '@type': 'Language', name: 'Russian', alternateName: 'ru' },
             ],
             featureList: [
                 'Online multiplayer word game with real-time gameplay',
@@ -378,7 +379,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'customer support',
-                availableLanguage: ['English', 'Hebrew', 'Swedish', 'Japanese', 'Spanish'],
+                availableLanguage: ['English', 'Hebrew', 'Swedish', 'Japanese', 'Spanish', 'Russian'],
             },
             foundingDate: '2024',
             slogan: 'Real-Time Multiplayer Word Battles',
@@ -402,7 +403,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             publisher: {
                 '@id': 'https://www.lexiclash.live/#organization',
             },
-            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es'],
+            inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es', 'ru'],
         },
         // WebPage schema - marks the main page as the primary entry point
         {

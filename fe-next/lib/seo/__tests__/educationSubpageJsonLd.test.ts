@@ -79,4 +79,36 @@ describe('educationSubpageJsonLd', () => {
       }
     });
   });
+
+  describe('Russian (ru) locale support', () => {
+    it('buildEducationDuelsJsonLd supports ru locale with Russian strings', () => {
+      const { howTo, resource, breadcrumb } = buildEducationDuelsJsonLd('ru');
+      expect(howTo.inLanguage).toBe('ru');
+      expect(howTo['@id']).toBe('https://www.lexiclash.live/ru/education/duels#howto');
+      expect(typeof howTo.name).toBe('string');
+      expect(howTo.name.length).toBeGreaterThan(0);
+      expect(resource.inLanguage).toBe('ru');
+      expect(breadcrumb.itemListElement[0].item).toBe('https://www.lexiclash.live/ru');
+      expect(breadcrumb.itemListElement[1].item).toBe('https://www.lexiclash.live/ru/education');
+      expect(breadcrumb.itemListElement[2].item).toBe('https://www.lexiclash.live/ru/education/duels');
+    });
+
+    it('buildEducationClassroomJsonLd supports ru locale with Russian strings', () => {
+      const { howTo, resource, breadcrumb } = buildEducationClassroomJsonLd('ru');
+      expect(howTo.inLanguage).toBe('ru');
+      expect(resource.inLanguage).toBe('ru');
+      expect(breadcrumb.itemListElement[2].item).toBe('https://www.lexiclash.live/ru/education/classroom-game');
+      expect(typeof howTo.name).toBe('string');
+      expect(howTo.name.length).toBeGreaterThan(0);
+    });
+
+    it('getEducationSubpageContent returns ru strings for both subpage keys', () => {
+      const duels = getEducationSubpageContent('duels', 'ru');
+      const classroom = getEducationSubpageContent('classroomGame', 'ru');
+      expect(duels.name).toBeTruthy();
+      expect(duels.steps).toHaveLength(3);
+      expect(classroom.name).toBeTruthy();
+      expect(classroom.steps).toHaveLength(3);
+    });
+  });
 });

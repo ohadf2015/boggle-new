@@ -183,6 +183,12 @@ interface BlogMetadataOptions {
     dateModified?: string;
     /** When false, emit noindex — used for locales that fall back to English body. */
     hasTranslation?: boolean;
+    /**
+     * Opt-in: article has a native ru translation → include ru/ru-RU in the
+     * hreflang cluster. Off by default so untranslated articles never point
+     * at their noindexed /ru sibling (invalid-cluster signal in GSC).
+     */
+    ruTranslated?: boolean;
 }
 
 export function generateBlogMetadata({
@@ -193,6 +199,7 @@ export function generateBlogMetadata({
     datePublished,
     dateModified,
     hasTranslation = true,
+    ruTranslated = false,
 }: BlogMetadataOptions): Metadata {
     const imageUrl = getBlogImage(slug);
     const articleUrl = `https://www.lexiclash.live/${locale}/blog/${slug}`;
@@ -242,6 +249,12 @@ export function generateBlogMetadata({
                 'en-AU': `https://www.lexiclash.live/en/blog/${slug}`,
                 'es-AR': `https://www.lexiclash.live/es/blog/${slug}`,
                 'es-CO': `https://www.lexiclash.live/es/blog/${slug}`,
+                ...(ruTranslated
+                    ? {
+                        ru: `https://www.lexiclash.live/ru/blog/${slug}`,
+                        'ru-RU': `https://www.lexiclash.live/ru/blog/${slug}`,
+                    }
+                    : {}),
             },
         },
         robots: hasTranslation ? { index: true, follow: true } : { index: false, follow: true },

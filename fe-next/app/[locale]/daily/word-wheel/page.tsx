@@ -182,7 +182,7 @@ export default async function WordWheelPage({ params }: PageParams): Promise<Rea
       organizer: { '@type': 'Organization', name: 'LexiClash' },
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock', url: `${BASE_URL}${localePath}/daily/word-wheel` },
       isAccessibleForFree: true,
-      inLanguage: ['en', 'he', 'sv', 'ja', 'es'],
+      inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
     },
     ...(content.faq.length > 0 ? [{
       '@context': 'https://schema.org',

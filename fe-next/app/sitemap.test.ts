@@ -121,14 +121,36 @@ describe('sitemap', () => {
     expect(nonEn.map((r) => r.url)).toEqual([]);
   });
 
-  // /ru/blog/* serves the English article body (0 of 28 articles have a ru
-  // translation → hasTranslation noindexes them). Advertising noindex'd
-  // duplicate-content URLs in the sitemap is a pure negative signal.
-  it('does NOT list Russian blog article URLs (untranslated → noindex)', () => {
-    const ruBlogArticles = routes.filter((r) =>
-      /\/ru\/blog\/.+/.test(r.url)
+  // /ru/blog/* is listed ONLY for articles with a native ru translation
+  // (hasTranslation indexes them). Untranslated articles serve the English
+  // body noindexed — advertising those in the sitemap is a pure negative
+  // signal (AdSense "low value content", 2026-07-02).
+  it('lists Russian blog articles ONLY for ru-translated slugs', () => {
+    const RU_TRANSLATED = [
+      'word-games-for-brain-training',
+      'free-word-games-online',
+      'vocabulary-building-strategies',
+      'improve-word-game-skills',
+    ];
+    for (const slug of RU_TRANSLATED) {
+      expect(
+        routes.find((r) => r.url === `${BASE_URL}/ru/blog/${slug}`),
+        `missing ru blog article ${slug}`
+      ).toBeDefined();
+    }
+    const unexpected = routes
+      .filter((r) => /\/ru\/blog\/.+/.test(r.url))
+      .filter((r) => !RU_TRANSLATED.some((slug) => r.url.endsWith(`/blog/${slug}`)));
+    expect(unexpected.map((r) => r.url), 'untranslated ru blog articles must stay out').toEqual([]);
+  });
+
+  it('keeps ru hreflang only on ru-translated blog articles', () => {
+    const ruSlug = routes.find((r) => r.url === `${BASE_URL}/en/blog/free-word-games-online`);
+    expect((ruSlug?.alternates?.languages as Record<string, string>)?.ru).toBe(
+      `${BASE_URL}/ru/blog/free-word-games-online`
     );
-    expect(ruBlogArticles.map((r) => r.url)).toEqual([]);
+    const nonRuSlug = routes.find((r) => r.url === `${BASE_URL}/en/blog/boggle-vs-wordle`);
+    expect((nonRuSlug?.alternates?.languages as Record<string, string>)?.ru).toBeUndefined();
   });
 
   it('still lists blog articles for translated locales', () => {

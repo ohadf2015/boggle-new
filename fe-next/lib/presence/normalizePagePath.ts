@@ -10,7 +10,7 @@
  * No React, no side effects — safe to unit test and to call on the server.
  */
 
-const LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es']);
+const LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es', 'ru']);
 
 /** A segment looks like an opaque id if it's long and/or mixes digits. */
 function isIdSegment(seg: string): boolean {
