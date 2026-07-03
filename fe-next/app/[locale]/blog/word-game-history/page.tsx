@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Ordspelens Historia - Från Antika Brickor till Digitala Rutnät',
   ja: 'ワードゲームの歴史 - 古代のタイルからデジタルグリッドまで',
   es: 'Historia de los Juegos de Palabras - De Azulejos Antiguos a Cuadrículas Digitales',
+  ru: 'История словесных игр - от древних плиток к цифровым сеткам',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Upptäck ordspelens vilda 4 000-åriga historia. Från forntida egyptiska gåtor till Scrabble, Boggle, Wordle och framtidens flerspråkiga ordspel.',
   ja: 'ワードゲームの4000年にわたる驚くべき歴史を発見。古代エジプトの謎々からスクラブル、ボグル、Wordleまで。',
   es: 'Descubre la alocada historia de 4,000 años de los juegos de palabras. Desde acertijos egipcios hasta Scrabble, Boggle, Wordle y el futuro.',
+  ru: 'Откройте дикую 4000-летнюю историю словесных игр. От древнеегипетских загадок к Скраблу, Богдлу, Wordle и будущему многоязычных словесных игр.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function WordGameHistoryPage({ params }: PageProps) {

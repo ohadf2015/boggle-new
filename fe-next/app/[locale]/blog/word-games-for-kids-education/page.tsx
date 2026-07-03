@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Gratis Ordspel för Barn & Utbildning - Stavning & Ordförråd',
   ja: '子供向け無料ワードゲーム＆教育 - スペルと語彙',
   es: 'Juegos de Palabras Gratis para Niños - Ortografía y Vocabulario',
+  ru: 'Словесные игры для детей — правописание и развитие словарного запаса',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Forskningsbaserad guide till ordspel i klassrummet. Ordförrådsförvärv, ESL-fördelar, differentierad undervisning och bedömning genom spel.',
   ja: 'K-12教室でのワードゲーム活用の研究に基づくガイド。語彙習得、ESLの利点、差別化指導、遊びを通じた評価。',
   es: 'Guía respaldada por investigación para usar juegos de palabras en el aula K-12. Adquisición de vocabulario, beneficios ESL e instrucción diferenciada.',
+  ru: 'Научно обоснованное руководство по использованию словесных игр в классах K-12. Усвоение словарного запаса, преимущества для изучающих английский язык, дифференцированное обучение и оценка через игру.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function WordGamesEducationPage({ params }: PageProps) {

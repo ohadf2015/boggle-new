@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Lär Dig Språk Genom Ordspel - Gratis Flerspråkiga Tips',
   ja: 'ワードゲームで言語を学ぶ - 無料多言語学習ガイド',
   es: 'Aprende Idiomas con Juegos de Palabras Gratis',
+  ru: 'Учи языки через словесные игры — советы для многоязычных игроков',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Upptäck hur flerspråkiga ordspel påskyndar ordinlärning. Forskningsbaserade strategier för svenska, engelska, hebreiska och japanska.',
   ja: '多言語ワードゲームが語彙習得をどう加速するか発見。ヘブライ語、英語、スウェーデン語、日本語の学習戦略を紹介。',
   es: 'Descubre cómo los juegos de palabras multilingües aceleran el aprendizaje de vocabulario. Estrategias basadas en investigación.',
+  ru: 'Как словесные игры ускоряют изучение языков. Стратегии на основе исследований для английского, русского, иврита, шведского и японского.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function MultilingualPage({ params }: PageProps) {

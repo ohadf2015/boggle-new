@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Dagliga Ordhjulet Strategier - Tips för Att Vinna Utmaningen',
   ja: 'デイリーワードホイール攻略法 - 世界記録への道',
   es: 'Estrategias para el Reto Diario de Palabras - Tips para Ganar',
+  ru: 'Стратегии ежедневного челленджа - советы для победы',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Bemästra det dagliga ordhjulet med expertstrategier. Lär dig beprövade taktiker för att maximera din poäng i dagliga ordutmaningar.',
   ja: 'デイリーワードホイールチャレンジをマスターする攻略法。世界記録に挑戦！スコアを最大化しリーダーボードを上るための実証済みの戦術。',
   es: 'Domina el reto diario de la rueda de palabras con estrategias expertas. Tácticas probadas para maximizar tu puntuación y subir en la clasificación.',
+  ru: 'Освойте стратегии ежедневного словесного челленджа. Проверенные тактики для поиска больше слов, максимизации очков и подъёма в рейтингах. Советы для игроков.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function StrategiesPage({ params }: PageProps) {

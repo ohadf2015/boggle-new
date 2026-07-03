@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Multiplayer Ordspel Online Gratis - Varfor Spela Med Vanner Ar Battre',
   ja: 'オンラインマルチプレイヤーワードゲーム無料 - 友達と遊ぶと別次元',
   es: 'Juegos de Palabras Multijugador Online Gratis - Jugar Con Amigos Es Mejor',
+  ru: 'Онлайн словесные игры мультиплеер бесплатно - почему с друзьями лучше',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Letar du efter multiplayer ordspel online gratis? Upptack varfor ordspel med vanner starker hjarnan mer an solospel. Ingen nedladdning kravs.',
   ja: 'オンラインマルチプレイヤーワードゲームを無料で探していますか？友達とのワードゲームがソロプレイよりも脳を活性化する理由を発見。ダウンロード不要。',
   es: '¿Buscas juegos de palabras multijugador online gratis? Descubre por que jugar con amigos potencia tu cerebro mas que jugar solo. Sin descargas.',
+  ru: 'Ищешь бесплатные онлайн словесные игры с друзьями? Узнай, почему игры с противниками улучшают мозг лучше, чем одиночная игра. Без загрузки — играй сразу в браузере.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function MultiplayerSocialPage({ params }: PageProps) {

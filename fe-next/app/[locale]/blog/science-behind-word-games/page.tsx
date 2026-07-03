@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Vetenskapen Bakom Ordspel och Hjärnhälsa',
   ja: 'ワードゲームと脳の健康 - 科学的根拠を解説',
   es: 'Ciencia de los Juegos de Palabras y Salud Cerebral',
+  ru: 'Наука о словесных играх и здоровье мозга',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Utforska den kognitiva vetenskapen bakom ordspel. Lär dig hur ordpussel förbättrar minne, ordförråd och mental smidighet.',
   ja: 'ワードゲームの認知科学を探求。ボグルやワードルが記憶力、語彙力、精神の鋭さをどう向上させるか科学的に解説。',
   es: 'Explora la ciencia cognitiva detrás de los juegos de palabras. Descubre cómo mejoran la memoria, el vocabulario y la agilidad mental.',
+  ru: 'Исследуй когнитивную науку словесных игр. Узнай, как головоломки со словами улучшают память, словарный запас и остроту ума.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function SciencePage({ params }: PageProps) {

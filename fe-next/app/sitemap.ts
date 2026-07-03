@@ -433,6 +433,16 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     'free-word-games-online',
     'vocabulary-building-strategies',
     'improve-word-game-skills',
+    '10-surprising-benefits-word-games',
+    'science-behind-word-games',
+    'why-word-games-are-addictive',
+    'word-games-and-mental-health',
+    'multilingual-word-learning',
+    'word-game-history',
+    'word-games-for-kids-education',
+    'daily-challenge-strategies',
+    'multiplayer-word-games-social',
+    'top-player-secrets',
   ]);
   const blogLocalesNoRu = LOCALES.filter((l) => l !== 'ru');
   blogArticles.forEach((slug) => {

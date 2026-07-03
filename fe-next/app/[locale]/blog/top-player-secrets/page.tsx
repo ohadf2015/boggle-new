@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: '7 Hemligheter Toppspelare Använder i Ordspel',
   ja: 'トップワードゲームプレイヤーの7つの秘密',
   es: '7 Secretos de Jugadores Profesionales de Palabras',
+  ru: '7 секретов топовых игроков в словесные игры',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Upptäck insidertekniker som skiljer mästare från nybörjare. Lär dig psykologiska trick och övningsmetoder.',
   ja: 'チャンピオンとカジュアルプレイヤーを分ける内部テクニックを発見。心理的トリック、練習方法、競技戦略を学ぶ。',
   es: 'Descubre técnicas internas que separan a los campeones. Aprende trucos psicológicos y estrategias competitivas.',
+  ru: 'Откройте методики топовых игроков, которые их отделяют от любителей. Изучите психологические трюки, способы тренировки и стратегии профессионалов.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function SecretsPage({ params }: PageProps) {

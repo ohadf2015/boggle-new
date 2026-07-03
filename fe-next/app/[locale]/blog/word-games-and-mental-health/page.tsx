@@ -20,6 +20,7 @@ const metaTitles: Record<string, string> = {
   sv: 'Fördelar med Ordspel för Mental Hälsa & Ångestlindring',
   ja: 'ワードゲームのメンタルヘルスへの効果 - 不安解消とストレス軽減',
   es: 'Beneficios de Jugar Juegos de Palabras para la Salud Mental',
+  ru: 'Словесные игры и психическое здоровье - снижение тревоги и стресса',
 };
 
 const metaDescriptions: Record<string, string> = {
@@ -28,6 +29,7 @@ const metaDescriptions: Record<string, string> = {
   sv: 'Upptäck hur ordspel kan hjälpa hantera ångest genom flow-tillstånd, kognitiv undanträngning och dagliga ritualer. Personlig berättelse stödd av psykologisk forskning.',
   ja: 'フロー状態、認知的置換、日課の儀式を通じて、ワードゲームが不安管理にどう役立つかを発見。心理学研究に裏付けられた個人的な物語。',
   es: 'Descubre cómo los juegos de palabras pueden ayudar a manejar la ansiedad a través de estados de flujo, desplazamiento cognitivo y rituales diarios.',
+  ru: 'Узнайте, как словесные игры помогают управлять тревогой через flow-состояния, когнитивное вытеснение и ежедневные ритуалы. История, подкреплённая психологическими исследованиями.',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const title = metaTitles[locale] || metaTitles.en;
   const description = metaDescriptions[locale] || metaDescriptions.en;
 
-  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles });
+  return generateBlogMetadata({ slug: SLUG, locale, title, description, datePublished: DATE_PUBLISHED, dateModified: DATE_MODIFIED, hasTranslation: locale in metaTitles, ruTranslated: 'ru' in metaTitles });
 }
 
 export default async function MentalHealthPage({ params }: PageProps) {
