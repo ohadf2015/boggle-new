@@ -3,6 +3,7 @@
 > Updated 2026-07-04 via androidpublisher API (edit committed; managed publishing OFF — changes auto-publish once Google review approves, verified in Console same day).
 > Changes: NEW ru-RU listing · 5→6 languages everywhere · Word Tower added to mode lists · removed Jackbox/Boggle trademark line (Play metadata policy risk).
 > Supersedes: docs/google-play-store-listing.md, docs/store-listing-hebrew.md, docs/store-listing-swedish.md, docs/store-listing-japanese.md (copy sections only — those files keep tags/rating-questionnaire notes).
+> Screenshots: ru-RU / es-419 / es-ES each got 6 localized phone screenshots (uploaded via API same day; sources in screenshots/store-final/{ru,es}/phone/, regenerate with captioned-promo pipeline: raw capture of prod at 360×640@3x with onboarding+consent localStorage pre-seeded, then HTML compose at 540×960@2x).
 
 ## en-GB
 

@@ -3328,6 +3328,10 @@ const ru = {
   "mp": {
     "stopGameConfirm": "Завершить игру для всех?",
     "stopGameYes": "Закончить игру",
+    "noRoomsYet": "Сейчас нет активных битв",
+    "emptyStateCaption": "Начни первую — места займут боты!",
+    "quickPlayAction": "Быстрая игра",
+    "dailyChallengeAction": "Ежедневный вызов",
     "kbHint": {
       "submit": "отправить",
       "pop": "удалить последнее",

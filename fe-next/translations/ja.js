@@ -13677,6 +13677,21 @@ const ja = {
     quality: { degraded: "接続が不安定です", reconnecting: "再接続中…", weak: "接続が弱いです" },
     stopGameConfirm: "全員のゲームを終了しますか？",
     stopGameYes: "ゲーム終了",
+    noRoomsYet: "進行中のバトルはありません",
+    emptyStateCaption: "今すぐ始めよう — 空席はボットが埋めます！",
+    quickPlayAction: "クイックプレイ",
+    dailyChallengeAction: "デイリーチャレンジ",
+    reconnect: {
+      title: "再接続中…",
+      attempt: "再接続しています…",
+      giveUp: "ゲームを退出"
+    },
+    abort: {
+      title: "ゲーム終了",
+      body: "ホストがマッチを終了しました。",
+      continueSolo: "ソロで続ける",
+      returnToLobby: "ロビーに戻る"
+    },
     kbHint: {
       submit: "送信",
       pop: "末尾削除",

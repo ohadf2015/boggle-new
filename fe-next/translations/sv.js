@@ -13840,6 +13840,21 @@ const sv = {
     quality: { degraded: "Anslutningen är instabil", reconnecting: "Återansluter…", weak: "Svag anslutning" },
     stopGameConfirm: "Avsluta spelet för alla?",
     stopGameYes: "Avsluta spelet",
+    noRoomsYet: "Inga strider pågår",
+    emptyStateCaption: "Starta en nu — vi fyller platserna med bottar!",
+    quickPlayAction: "Snabbspel",
+    dailyChallengeAction: "Daglig utmaning",
+    reconnect: {
+      title: "Återansluter…",
+      attempt: "Försöker återansluta…",
+      giveUp: "Lämna spelet"
+    },
+    abort: {
+      title: "Matchen avslutades",
+      body: "Värden avslutade matchen.",
+      continueSolo: "Fortsätt själv",
+      returnToLobby: "Tillbaka till lobbyn"
+    },
     kbHint: {
       submit: "skicka",
       pop: "ta bort sista",

@@ -13945,6 +13945,17 @@ const es = {
     "emptyStateCaption": "¡Comienza ahora — los robots llenarán los asientos!",
     "quickPlayAction": "Juego rápido",
     "dailyChallengeAction": "Desafío diario",
+    "reconnect": {
+      "title": "Reconectando…",
+      "attempt": "Intentando reconectar…",
+      "giveUp": "Salir de la partida"
+    },
+    "abort": {
+      "title": "Partida terminada",
+      "body": "El anfitrión terminó la partida.",
+      "continueSolo": "Continuar en solitario",
+      "returnToLobby": "Volver al lobby"
+    },
     "rivals": {
       "header": "Codo a codo",
       "you": "Tú",
