@@ -24,11 +24,15 @@ export function useLiveRoomStats(): LiveRoomStats {
   const socketContext = useSocketOptional();
   const socket = socketContext?.socket ?? null;
   const isConnected = socketContext?.isConnected ?? false;
+  // No SocketProvider (e.g. landing page) = no live source that will ever
+  // connect. Start resolved so the stats cards don't sit in a loading state
+  // for the 3s fallback timeout below every single page load.
+  const hasProvider = socketContext !== null;
   const [stats, setStats] = useState<Omit<LiveRoomStats, 'refresh'>>({
     openRooms: 0,
     totalPlayers: 0,
     activePlayers: 0,
-    isLoading: true,
+    isLoading: hasProvider,
   });
 
   const refresh = useCallback(() => {
@@ -79,16 +83,18 @@ export function useLiveRoomStats(): LiveRoomStats {
     };
   }, [socket, isConnected, handleActiveRooms]);
 
-  // Mark as not loading after a timeout if socket isn't connected
+  // Fallback: a provider exists but hasn't connected yet — give it 3s then
+  // stop showing loading. Skip entirely when there's no provider (already
+  // resolved above) so the landing page never waits on a socket that can't come.
   useEffect(() => {
-    if (!isConnected) {
+    if (hasProvider && !isConnected) {
       const timeout = setTimeout(() => {
         setStats(prev => ({ ...prev, isLoading: false }));
       }, 3000);
       return () => clearTimeout(timeout);
     }
     return undefined;
-  }, [isConnected]);
+  }, [hasProvider, isConnected]);
 
   return {
     openRooms: stats.openRooms,
