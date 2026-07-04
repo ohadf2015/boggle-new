@@ -25,7 +25,11 @@ export default function Loading() {
   // eslint-disable-next-line react-hooks/purity
   const styleKey = DANCERS[Math.floor(Math.random() * DANCERS.length)];
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-6 bg-neo-navy page-content-safe h-full">
+    // ponytail: fixed inset-0 (not flex-1/h-full) — viewport-pinned so it's
+    // always full-screen. `h-full` (height:100%) collapsed to content height on
+    // mobile Chromium when the flex parent had no definite height → short loader
+    // → CLS. Mirrors the OnboardingFlow fallback in PageClient.tsx.
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-neo-navy">
       <LoadingDancer
         styleKey={styleKey}
         className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44"
