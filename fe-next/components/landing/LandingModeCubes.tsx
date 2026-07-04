@@ -139,7 +139,7 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
       aria-disabled={locked || undefined}
       data-testid={anchor ? 'mode-cube-anchor' : 'mode-cube'}
       data-cube-key={model.key}
-      style={{ animationDelay: `${Math.min(index, 8) * 0.05}s`, ['--cube-img-scale' as string]: model.imgScale ?? 1 }}
+      style={{ animationDelay: `${Math.min(index, 8) * 0.05}s`, ['--cube-img-scale' as string]: model.imgScale ?? 1, ['--cube-glow' as string]: v.glow }}
       className={cn(
         // Colour-coding folded INTO a quiet 2px mode-tinted hard border (no blur) —
         // replaces both the loud 3px black frame AND the detached coloured offset
@@ -157,6 +157,13 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
         'active:shadow-hard-pressed',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
         v.shadow, v.ring,
+        // A bit of glow on hover/focus: a soft mode-hued drop-shadow halo (a filter,
+        // so it stacks on top of the hard box-shadow instead of replacing it). Reads
+        // as electric-brand energy without softening the neo edge at rest. motion-safe
+        // gated + transitioned to match the sibling image-scale pop (respects
+        // prefers-reduced-motion). `--cube-glow` (the mode hue) is set on this Link.
+        'motion-safe:transition-[filter] motion-safe:duration-200',
+        'motion-safe:hover:drop-shadow-[0_0_16px_var(--cube-glow)] motion-safe:focus-visible:drop-shadow-[0_0_16px_var(--cube-glow)]',
         anchor
           ? bigAnchor
             ? 'col-span-2 md:row-span-2 aspect-[16/9] sm:aspect-[2/1] md:aspect-square'

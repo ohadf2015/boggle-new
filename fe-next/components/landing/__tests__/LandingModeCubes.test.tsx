@@ -192,6 +192,18 @@ describe('LandingModeCubes', () => {
     expect(restingShadow(arena)).toBeUndefined();
   });
 
+  it('adds a soft per-mode glow halo on hover/focus (a bit of glow, not a resting slab)', () => {
+    renderCubes();
+    const arena = screen.getByRole('link', { name: /Arena/i });
+    // the mode hue is exposed on the tile so the halo can tint itself
+    expect(arena.style.getPropertyValue('--cube-glow')).toMatch(/rgba\(/);
+    // a blurred drop-shadow halo, hue-driven, appears only on hover + focus-visible
+    expect(arena.className).toMatch(/hover:drop-shadow-\[[^\]]*--cube-glow[^\]]*\]/);
+    expect(arena.className).toMatch(/focus-visible:drop-shadow-\[[^\]]*--cube-glow[^\]]*\]/);
+    // resting tile stays clean (no drop-shadow without an interaction prefix)
+    expect(arena.className).not.toMatch(/(?:^|\s)drop-shadow-\[/);
+  });
+
   // ---- art framing: mascots fill the tile (the homepage "images take the width") ----
 
   const artModels = [
