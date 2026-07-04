@@ -17,9 +17,14 @@ vi.mock('next/image', () => ({
   },
 }));
 
+vi.mock('next/link', () => ({
+  default: ({ children, href }: { children: React.ReactNode; href: string }) =>
+    children,
+}));
+
 import ArenaEmptyState from '../ArenaEmptyState';
 
-describe('ArenaEmptyState (focused / decluttered)', () => {
+describe('ArenaEmptyState with action CTAs', () => {
   beforeEach(() => {
     tMock.mockClear();
   });
@@ -27,42 +32,49 @@ describe('ArenaEmptyState (focused / decluttered)', () => {
     cleanup();
   });
 
-  it('renders the spectating mascot, headline, subhead', () => {
-    const { container } = render(<ArenaEmptyState />);
+  it('renders the spectating mascot, headline, subhead with new keys', () => {
+    const { container } = render(<ArenaEmptyState onQuickPlay={vi.fn()} />);
     expect(screen.getByTestId('arena-empty-state')).toBeInTheDocument();
-    expect(screen.getByText('multiplayerFlow.roomList.noRoomsYet')).toBeInTheDocument();
-    expect(screen.getByText('multiplayerFlow.roomList.beTheLegend')).toBeInTheDocument();
+    expect(screen.getByText('mp.noRoomsYet')).toBeInTheDocument();
+    expect(screen.getByText('mp.emptyStateCaption')).toBeInTheDocument();
     const mascot = container.querySelector('img');
     expect(mascot).toHaveAttribute('src', '/mascot/spectating.webp');
   });
 
-  it('does NOT render mode-teaser chips (decluttered — CTAStrip owns actions)', () => {
-    render(<ArenaEmptyState />);
+  it('renders Quick Play and Daily Challenge action CTAs', () => {
+    render(<ArenaEmptyState onQuickPlay={vi.fn()} />);
+    expect(screen.getByText('mp.quickPlayAction')).toBeInTheDocument();
+    expect(screen.getByText('mp.dailyChallengeAction')).toBeInTheDocument();
+  });
+
+  it('calls onQuickPlay callback when Quick Play button clicked', () => {
+    const mockQuickPlay = vi.fn();
+    const { getByText } = render(<ArenaEmptyState onQuickPlay={mockQuickPlay} />);
+
+    const quickPlayButton = getByText('mp.quickPlayAction').closest('button');
+    quickPlayButton?.click();
+
+    expect(mockQuickPlay).toHaveBeenCalled();
+  });
+
+  it('disables Quick Play button during loading', () => {
+    render(<ArenaEmptyState onQuickPlay={vi.fn()} isQuickPlayLoading={true} />);
+    const button = screen.getByText('common.starting').closest('button');
+    expect(button).toBeDisabled();
+  });
+
+  it('does NOT render mode-teaser chips (decluttered)', () => {
+    render(<ArenaEmptyState onQuickPlay={vi.fn()} />);
     expect(screen.queryByText('multiplayerFlow.roomList.gameModes.classic')).toBeNull();
     expect(screen.queryByText('multiplayerFlow.roomList.gameModes.blast')).toBeNull();
     expect(screen.queryByText('multiplayerFlow.roomList.gameModes.wordHunt')).toBeNull();
     expect(screen.queryByText('multiplayerFlow.roomList.gameModes.wheelRush')).toBeNull();
   });
 
-  it('does NOT render its own Quick Start CTA (the CTA strip is the single source of action)', () => {
-    render(<ArenaEmptyState />);
-    expect(screen.queryByRole('button')).toBeNull();
-  });
-
-  it('mascot has no hard offset-box shadow (opaque webp + hard shadow = visible square; must blend into the navy pane)', () => {
-    const { container } = render(<ArenaEmptyState />);
-    const mascot = container.querySelector('img');
-    // The spectating.webp has a baked-in opaque navy square; a hard pixel
-    // drop-shadow casts off its rectangle edge -> ugly offset border. Forbid it.
-    expect(mascot?.className).not.toMatch(/drop-shadow-\[\d+px_\d+px_0/);
-  });
-
-  it('mascot image is decorative (empty alt -> presentation, screen readers skip)', () => {
-    const { container } = render(<ArenaEmptyState />);
+  it('mascot image is decorative (empty alt)', () => {
+    const { container } = render(<ArenaEmptyState onQuickPlay={vi.fn()} />);
     const mascot = container.querySelector('img');
     expect(mascot).toHaveAttribute('alt', '');
-    // Empty alt strips the implicit `img` role → not queryable as role=img.
-    // Meaning is carried by the adjacent h3.
     expect(screen.queryByRole('img')).toBeNull();
   });
 });

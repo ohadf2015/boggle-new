@@ -17,6 +17,15 @@ interface UseModalQueueOptions {
  * Only one modal shows at a time in priority order (lower number = higher priority).
  * When dismissed, the next queued modal shows.
  * Dismissed set resets when all modals become not-ready (new game cycle).
+ *
+ * POLICY: Post-game modal sequencing.
+ * - Celebration modals (levelUp, referralMilestone) show first — capture emotional peak.
+ * - Guest conversion (firstWin, auth) shows second — strike while motivation is high.
+ * - Content resolution (wordFeedback) shows third — let players resolve outstanding disputes.
+ * - Engagement surveys (gameFeedback rating) shows last — only after rematch CTA is visible.
+ *
+ * Rationale: Users must not be blocked from rematch/exit flows by signup or survey dialogs.
+ * Conversion moments (signups) have time-sensitive emotional value; surveys do not.
  */
 export function useModalQueue({ modals }: UseModalQueueOptions): {
   activeModalId: string | null;

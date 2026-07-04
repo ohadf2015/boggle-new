@@ -241,6 +241,43 @@ export function generateChallengeUrl(result: WordHuntResult): string {
 }
 
 /**
+ * Generate a challenge share URL with sender score for head-to-head comparison
+ *
+ * Includes whName, whEmoji, whScore, and whPuzzle params for "beat me" loop.
+ * WhatsApp-safe format (short, no word list).
+ *
+ * @param result - Word hunt result
+ * @param displayName - Sender's display name
+ * @param avatarEmoji - Sender's emoji
+ * @param score - Sender's score for this puzzle
+ * @param streakDays - Optional streak count to display on receiver's link
+ * @param siteUrl - Optional site URL override
+ */
+export function generateChallengeShareUrl(
+  result: WordHuntResult,
+  displayName: string,
+  avatarEmoji: string,
+  score: number,
+  streakDays?: number,
+  siteUrl?: string
+): string {
+  const baseUrl = siteUrl || (typeof window !== 'undefined' ? window.location.origin : 'https://lexiclash.live');
+
+  const params = new URLSearchParams({
+    whName: displayName,
+    whEmoji: avatarEmoji,
+    whScore: String(score),
+    whPuzzle: String(result.puzzleNumber),
+  });
+
+  if (streakDays && streakDays > 0) {
+    params.append('whStreak', String(streakDays));
+  }
+
+  return `${baseUrl}/${result.language}/daily?${params.toString()}`;
+}
+
+/**
  * Parse a legacy challenge URL parameter (for backwards compatibility)
  * New URLs don't include challenge data, but we keep this for old links.
  */

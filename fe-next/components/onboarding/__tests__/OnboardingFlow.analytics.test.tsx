@@ -44,6 +44,15 @@ vi.mock('@/utils/onboardingStorage', () => ({
   getPendingRoomInvite: () => mockGetPendingRoom(),
 }));
 
+// Mock getGuestStats to return returning user (1+ games) so ReturningUserStep appears in flow
+vi.mock('@/utils/guestManager', async () => {
+  const actual = await vi.importActual('@/utils/guestManager');
+  return {
+    ...actual,
+    getGuestStats: () => ({ games: 1, wins: 0, words: 0, score: 0 }),
+  };
+});
+
 vi.mock('@/utils/profileStorage', () => ({
   setStoredCustomAvatar: vi.fn(),
   getStoredCustomAvatar: vi.fn(() => null),

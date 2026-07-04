@@ -61,6 +61,7 @@ export type GrowthEvent =
   | 'daily_puzzle_opened'
   | 'daily_puzzle_completed'
   | 'daily_word_hunt_complete'
+  | 'daily_rival_landed' // Rival challenge link landed (beat-me loop invitation)
   // Adventure
   | 'adventure_level_start'
   | 'adventure_level_pass'
@@ -232,7 +233,11 @@ export type GrowthEvent =
   //     hasRoomLink }.
   | 'mp_brag_card_viewed'
   | 'mp_brag_card_copy_link'
-  | 'mp_brag_card_native_share';
+  | 'mp_brag_card_native_share'
+  //   mp_results_challenge_cta: player tapped the explicit "Challenge a friend" CTA
+  //     on the MP results brag card (opens UnifiedShareModal in challenge mode).
+  //     Props: { surface: 'mp_results' }.
+  | 'mp_results_challenge_cta';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

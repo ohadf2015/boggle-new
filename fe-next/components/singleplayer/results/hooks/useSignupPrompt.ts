@@ -1,8 +1,10 @@
 /**
- * useSignupPrompt - Show signup modal for guests after multiple games
+ * useSignupPrompt - Show signup modal for guests ONLY post-game
  *
- * Prompts guests to sign up after they've played 2+ games
- * to encourage account creation and persist progress.
+ * Prompts guests to sign up after completing at least 1 game
+ * and only surfaces the modal on results screens, never pre-game.
+ * Gate: 1+ games completed (ensures first-game is done before prompt).
+ * Variant via PostHog flag: after-first-win (1 win minimum) or after-third-game (3 games minimum).
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -77,8 +79,13 @@ export function useSignupPrompt({
     const games = stats.games || 0;
     const wins = stats.wins || 0;
 
-    // Emotional peak gating: ride the celebration. Fallback ensures non-winners
-    // still convert before churning out.
+    // MANDATORY GATE: Never show before first game is completed.
+    // This ensures the signup flow only appears post-game, not during gameplay or pre-game lobbies.
+    if (games < 1) return;
+
+    // Post-first-game threshold: based on variant and emotional peak strategy.
+    // after-third-game: fires at 3+ games (consistent, predictable)
+    // after-first-win (default): fires at 1+ win, or 5+ games as fallback for non-winners
     const qualifies = signupVariant === 'after-third-game'
       ? games >= 3
       : wins >= 1 || games >= 5;

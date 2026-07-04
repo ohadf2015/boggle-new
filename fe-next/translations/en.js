@@ -870,6 +870,7 @@ const en = {
     "stepOf": "Step {current} of {total}",
     "previous": "Previous",
     "confirm": "Confirm",
+    "starting": "Starting…",
     "cancel": "Cancel",
     "or": "or",
     "and": "and",
@@ -2809,6 +2810,8 @@ const en = {
     "exitRoom": "Leave",
     "exitWarning": "Leave now? You'll miss the next round.",
     "playAgain": "Again!",
+    "challengeCta": "Challenge a Friend",
+    "challengeCtaSubtext": "Send a beat-my-score link",
     "maxCombo": "Max Combo",
     "celebrate": "Celebrate",
     "celebrateAgain": "More!",
@@ -6202,6 +6205,13 @@ const en = {
       "streak": "🔥 {days} day streak!",
       "streakMilestone7": "🔥 One week streak! Can you keep it going?",
       "streakMilestone30": "🔥 30 day streak! Legendary dedication!"
+    },
+    "rival": {
+      "header": "Beat Me Challenge",
+      "you": "You",
+      "youWin": "You beat {name}!",
+      "youLose": "{name} wins this round",
+      "tie": "It's a tie! 🤝"
     },
     "errorWordTooShort": "Word must be at least {min} letters",
     "errorWordTooLong": "Word must be at most {max} letters",
@@ -13609,6 +13619,10 @@ const en = {
       "wordHunt": "Word Hunt",
       "blast": "Blast"
     },
+    "noRoomsYet": "No battles in progress",
+    "emptyStateCaption": "Start one now — we'll fill the seats with bots!",
+    "quickPlayAction": "Quick Play",
+    "dailyChallengeAction": "Daily Challenge",
     "rivals": {
       "header": "Close Race",
       "you": "You",

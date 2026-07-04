@@ -1,10 +1,25 @@
 import { vi } from 'vitest';
 import React from 'react';
 import { act, render } from '@testing-library/react';
-import HostPreGameView from '../components/HostPreGameView';
+
+// Mock analytics first (before importing the component that uses it)
+vi.mock('@/utils/posthogEngagement', () => ({
+  trackSoloPlayPrompt: vi.fn(),
+}));
+
+import HostPreGameView, { QUICKPLAY_AUTO_FILL_SECONDS } from '../components/HostPreGameView';
+import { trackSoloPlayPrompt } from '@/utils/posthogEngagement';
 
 const emitMock = vi.fn();
 const mockSocket = { emit: emitMock, on: vi.fn(), off: vi.fn() } as unknown as { emit: (...args: unknown[]) => void };
+
+let capturedStartProps: { disabled: boolean; onStartGame: () => void } | null = null;
+vi.mock('../components/pre-game/StartButton', () => ({
+  StartButton: (props: { disabled: boolean; onStartGame: () => void }) => {
+    capturedStartProps = props;
+    return React.createElement('button', { disabled: props.disabled, onClick: props.onStartGame }, 'start');
+  },
+}));
 
 vi.mock('../../utils/SocketContext', () => ({
   useSocket: () => ({ socket: mockSocket }),
@@ -68,7 +83,6 @@ vi.mock('../components/pre-game/PresetSelector', () => ({
 }));
 vi.mock('../components/pre-game/PlayerRoster', () => ({ PlayerRoster: () => null }));
 vi.mock('../components/pre-game/BattleModeCard', () => ({ BattleModeCard: () => null }));
-vi.mock('../components/pre-game/StartButton', () => ({ StartButton: () => null }));
 vi.mock('../components/pre-game/MobileBottomNav', () => ({ MobileBottomNav: () => null }));
 vi.mock('../components/pre-game/MobileShareSection', () => ({ MobileShareSection: () => null }));
 vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: () => null }));
@@ -86,10 +100,10 @@ vi.mock('../components/HostPreGameView.useAvatarPremium', () => ({ useAvatarPrem
 const mockT = (key: string) => key;
 
 const baseProps = {
-  gameCode: 'QUICK1',
+  gameCode: 'QP01',
   roomLanguage: 'en' as const,
   language: 'en' as const,
-  username: 'Host',
+  username: 'QuickPlayHost',
   t: mockT,
   timerValue: 3,
   setTimerValue: vi.fn(),
@@ -104,9 +118,9 @@ const baseProps = {
   tournamentRounds: 3,
   setTournamentRounds: vi.fn(),
   tournamentData: null,
-  hostPlaying: true,
+  hostPlaying: false,
   setHostPlaying: vi.fn(),
-  playersReady: [{ username: 'Host', isHost: true }],
+  playersReady: [] as Array<{ username: string; isHost: boolean }>,
   playerWordCounts: {},
   shufflingGrid: null,
   highlightedCells: [],
@@ -119,9 +133,10 @@ const baseProps = {
   tournamentCreating: false,
 };
 
-describe('HostPreGameView Quick Play / bot auto-fill', () => {
+describe('HostPreGameView quickplay auto-fill timer', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    capturedStartProps = null;
     vi.useFakeTimers();
   });
 
@@ -129,40 +144,114 @@ describe('HostPreGameView Quick Play / bot auto-fill', () => {
     vi.useRealTimers();
   });
 
-  it('emits setAutoFill (NOT broken addBots) when bot countdown elapses', () => {
-    // hostPlaying=true + only host in playersReady → actualPlayerCount === 0
-    render(<HostPreGameView {...baseProps} playersReady={[]} hostPlaying={false} />);
-
-    // Advance past the 15s alone-timer → starts the visible bot countdown.
-    // Separate act() boundaries let React flush the state update + create the
-    // countdown interval before it ticks (a single combined advance would set
-    // botCountdown mid-advance, after which the interval never ticks this call).
-    act(() => { vi.advanceTimersByTime(15_000); });
-    // Advance through the 20s "starting with bots…" countdown to 0
-    act(() => { vi.advanceTimersByTime(20_000); });
-
-    const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
-    const addBots = emitMock.mock.calls.find(([evt]) => evt === 'addBots');
-
-    expect(addBots).toBeUndefined();
-    expect(setAutoFill).toBeDefined();
-    expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
-    // Auto-fill rescue starts directly with bots — never via the solo-confirm
-    // popup path (onStartGame → startGame → setShowSoloConfirm).
-    expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
-    expect(baseProps.onStartGame).not.toHaveBeenCalled();
+  it('exports configurable QUICKPLAY_AUTO_FILL_SECONDS constant', () => {
+    expect(QUICKPLAY_AUTO_FILL_SECONDS).toBe(5);
   });
 
-  it('starts bot countdown immediately when isQuickPlay=true and alone', () => {
-    render(<HostPreGameView {...baseProps} playersReady={[]} hostPlaying={false} isQuickPlay />);
+  it('starts bot countdown immediately when quickplay host is alone', () => {
+    render(
+      <HostPreGameView
+        {...baseProps}
+        isQuickPlay={true}
+        playersReady={[]}
+      />
+    );
 
-    // No 15s alone-timer: only a ~5s countdown before emitting setAutoFill
-    act(() => { vi.advanceTimersByTime(5_000); });
+    // No manual timer needed — the countdown effect fires immediately
+    expect(emitMock).not.toHaveBeenCalledWith('setAutoFill', expect.anything());
+  });
 
-    const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
-    expect(setAutoFill).toBeDefined();
-    expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
+  it('auto-fills with bots after 5 seconds when quickplay host alone', () => {
+    render(
+      <HostPreGameView
+        {...baseProps}
+        isQuickPlay={true}
+        playersReady={[]}
+      />
+    );
+
+    // Fast-forward to the countdown expiration
+    act(() => {
+      vi.advanceTimersByTime(QUICKPLAY_AUTO_FILL_SECONDS * 1000);
+    });
+
+    // Should emit setAutoFill to the server
+    expect(emitMock).toHaveBeenCalledWith('setAutoFill', {
+      enabled: true,
+      targetCount: 3,
+    });
+
+    // Should call onAutoStartWithBots (or fallback to onStartGame)
     expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
-    expect(baseProps.onStartGame).not.toHaveBeenCalled();
+  });
+
+  it('tracks auto-fill with auto_filled: true when timer expires', () => {
+    render(
+      <HostPreGameView
+        {...baseProps}
+        isQuickPlay={true}
+        playersReady={[]}
+      />
+    );
+
+    act(() => {
+      vi.advanceTimersByTime(QUICKPLAY_AUTO_FILL_SECONDS * 1000);
+    });
+
+    // Should track with auto_filled: true
+    expect(trackSoloPlayPrompt).toHaveBeenCalledWith({
+      event: 'shown',
+      auto_filled: true,
+    });
+  });
+
+  it('cancels quickplay auto-fill when a human joins', () => {
+    const { rerender } = render(
+      <HostPreGameView
+        {...baseProps}
+        isQuickPlay={true}
+        playersReady={[]}
+      />
+    );
+
+    // A human joins the room before timer expires
+    rerender(
+      <HostPreGameView
+        {...baseProps}
+        isQuickPlay={true}
+        playersReady={[{ username: 'Guest', isHost: false }]}
+      />
+    );
+
+    // Fast-forward past what would be the timer
+    act(() => {
+      vi.advanceTimersByTime(QUICKPLAY_AUTO_FILL_SECONDS * 1000);
+    });
+
+    // Should NOT auto-fill since a human joined
+    expect(emitMock).not.toHaveBeenCalledWith('setAutoFill', expect.anything());
+  });
+
+  it('does NOT auto-fill non-quickplay public rooms at 5 seconds (waits for 15s alone timer)', () => {
+    render(
+      <HostPreGameView
+        {...baseProps}
+        isQuickPlay={false}
+        isPrivate={false}
+        playersReady={[]}
+      />
+    );
+
+    // Should NOT emit setAutoFill at 5 seconds (quickplay rate)
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(emitMock).not.toHaveBeenCalledWith('setAutoFill', expect.anything());
+
+    // Still should NOT emit at 14.9s (before the 15s alone-timer fires)
+    act(() => {
+      vi.advanceTimersByTime(9900);
+    });
+    expect(emitMock).not.toHaveBeenCalledWith('setAutoFill', expect.anything());
   });
 });

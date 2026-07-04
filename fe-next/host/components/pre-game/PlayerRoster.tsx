@@ -362,6 +362,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
                     disabled={!(isMe && canEditSelfName)}
                   >
                     <span className="truncate min-w-0">{name}</span>
+                    {isBot && <span className="text-sm shrink-0">🤖</span>}
                     {isMe && canEditSelfName && <Pencil className="w-2.5 h-2.5 shrink-0 opacity-60" />}
                   </button>
                 )}

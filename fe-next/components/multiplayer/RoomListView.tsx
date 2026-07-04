@@ -446,7 +446,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                 </AnimatePresence>
               </m.div>
             ) : (
-              <ArenaEmptyState />
+              <ArenaEmptyState onQuickPlay={onQuickPlay} isQuickPlayLoading={isQuickPlayLoading} />
             )}
           </m.section>
           </div>

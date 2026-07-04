@@ -881,6 +881,7 @@ const he = {
     "stepOf": "שלב {current} מתוך {total}",
     "previous": "הקודם",
     "confirm": "אישור",
+    "starting": "מתחילים…",
     "cancel": "ביטול",
     "dismiss": "סגור",
     "info": "מידע",
@@ -2909,6 +2910,8 @@ const he = {
     "exitRoom": "יציאה",
     "exitWarning": "יוצאים? אפשר להישאר לסיבוב הבא.",
     "playAgain": "עוד פעם",
+    "challengeCta": "אתגר חברים",
+    "challengeCtaSubtext": "שלח קישור להנצחת הניקוד",
     "maxCombo": "קומבו מקסימלי",
     "celebrate": "חגיגה",
     "celebrateAgain": "עוד!",
@@ -6284,6 +6287,13 @@ const he = {
       "streak": "רצף של {days} ימים! 🔥",
       "streakMilestone7": "רצף של שבוע! תצליחו להמשיך? 🔥",
       "streakMilestone30": "רצף של 30 יום! מסירות אגדית! 🔥"
+    },
+    "rival": {
+      "header": "אתגר תחרותי",
+      "you": "את/ה",
+      "youWin": "הבסתם את {name}! 🏆",
+      "youLose": "{name} ניצח/ה את הסיבוב הזה",
+      "tie": "זה תיקו! 🤝"
     },
     "errorWordTooShort": "המילה חייבת להכיל לפחות {min} אותיות",
     "errorWordTooLong": "המילה יכולה להכיל עד {max} אותיות",
@@ -14262,6 +14272,10 @@ const he = {
       "wordHunt": "ציד מילים",
       "blast": "פיצוץ"
     },
+    "noRoomsYet": "אין קרבות פעילים כרגע",
+    "emptyStateCaption": "התחל משחק עכשיו — רובוטים ימלאו את המושבים!",
+    "quickPlayAction": "משחק מהיר",
+    "dailyChallengeAction": "אתגר יומי",
     "rivals": {
       "header": "מרוץ צמוד",
       "you": "אני",

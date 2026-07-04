@@ -55,6 +55,15 @@ afterEach(() => {
 });
 
 describe('useSignupPrompt — after-first-win variant', () => {
+  it('does NOT show before any game is completed (games=0)', async () => {
+    mockStats.mockReturnValue({ games: 0, wins: 0 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(false);
+  });
+
   it('does NOT show after 2 games with 0 wins', async () => {
     mockStats.mockReturnValue({ games: 2, wins: 0 });
     const { result } = renderHook(() =>
@@ -95,6 +104,15 @@ describe('useSignupPrompt — after-first-win variant', () => {
 describe('useSignupPrompt — after-third-game variant', () => {
   beforeEach(() => {
     mockFlag.mockReturnValue('after-third-game');
+  });
+
+  it('does NOT show before any game is completed (games=0)', async () => {
+    mockStats.mockReturnValue({ games: 0, wins: 0 });
+    const { result } = renderHook(() =>
+      useSignupPrompt({ isAuthenticated: false, hasUser: false, authLoading: false })
+    );
+    await flushTimer();
+    expect(result.current.showSignupModal).toBe(false);
   });
 
   it('does NOT show after 2 games', async () => {

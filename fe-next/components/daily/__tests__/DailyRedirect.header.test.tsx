@@ -8,6 +8,8 @@ import DailyRedirect from '../DailyRedirect';
 
 vi.mock('next/navigation', () => ({
   useRouter: vi.fn(() => ({ push: vi.fn() })),
+  // useDailyRivalChallenge (mounted by DailyRedirect) reads the share-link params.
+  useSearchParams: vi.fn(() => new URLSearchParams()),
 }));
 
 vi.mock('@/contexts/LanguageContext', () => ({

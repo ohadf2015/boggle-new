@@ -20,6 +20,7 @@ interface PageParams {
     whEmoji?: string;
     whStreak?: string;
     whAvatar?: string; // Custom avatar image filename
+    whScore?: string; // Rival score for "beat me" challenge
   }>;
 }
 
@@ -62,7 +63,7 @@ function getWhPerformanceMessage(solved: boolean, attempts: number, locale: stri
 
 export async function generateMetadata({ params, searchParams }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const { share, wh, whSolved, whAttempts, whPuzzle, whName, whEmoji, whStreak, whAvatar } = await searchParams;
+  const { share, wh, whSolved, whAttempts, whPuzzle, whName, whEmoji, whStreak, whAvatar, whScore } = await searchParams;
   const validLocale = (locale as Locale) || 'en';
   const t = await loadTranslation(validLocale) as Record<string, any>;
   const enT = await loadTranslation('en') as Record<string, any>;

@@ -9,6 +9,8 @@ import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import CrazyGamesBanner from '@/components/CrazyGamesBanner';
 import { Share2, Flame, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
 import { useDailyConfetti } from './results/useDailyConfetti';
+import RivalCompareCard from './RivalCompareCard';
+import { useDailyRivalChallenge } from '@/hooks/useDailyRivalChallenge';
 import { Loader } from '@/components/ui/Loader';
 import { SharePanelModal, XTwitterIcon, WhatsAppIcon } from './results/SharePanelModal';
 import { ImagePreviewModal } from './results/ImagePreviewModal';
@@ -74,8 +76,15 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
+  // Capture rival challenge from URL if present
+  useDailyRivalChallenge(result.puzzleNumber);
+
+  // Rival challenge state
+  const [rivalData, setRivalData] = useState<{ name: string; emoji: string; score: number; puzzleNumber: number } | null>(null);
+
   const hasMarkedQuestRef = useRef(false);
   const hasRequestedReviewRef = useRef(false);
+  const hasShownRivalCardRef = useRef(false);
   useEffect(() => {
     showInterstitial('daily-complete');
     if (result.score > 0) {
@@ -94,6 +103,27 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       hasRequestedReviewRef.current = true;
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Read rival challenge from sessionStorage (only once)
+  useEffect(() => {
+    if (!hasShownRivalCardRef.current) {
+      try {
+        const stored = sessionStorage.getItem('daily_challenge_rival');
+        if (stored) {
+          const data = JSON.parse(stored);
+          // Validate it's for today's puzzle
+          if (data.puzzleNumber === result.puzzleNumber) {
+            setRivalData(data);
+            hasShownRivalCardRef.current = true;
+            // Clear after showing (to prevent re-showing on re-mounts)
+            sessionStorage.removeItem('daily_challenge_rival');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to read rival challenge data:', error);
+      }
+    }
+  }, [result.puzzleNumber]);
 
   const {
     currentUserRank,
@@ -442,6 +472,24 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 
       {/* RIGHT COLUMN on desktop: leaderboard (on mobile rendered below via normal flow) */}
       <div>
+        {/* Rival Challenge Card - Head-to-head comparison */}
+        {rivalData && (
+          <m.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.65 }}
+            className="mb-6"
+          >
+            <RivalCompareCard
+              rivalName={rivalData.name}
+              rivalEmoji={rivalData.emoji}
+              rivalScore={rivalData.score}
+              myScore={result.score}
+              t={t}
+            />
+          </m.div>
+        )}
+
         {/* Today's Players Leaderboard */}
         <m.div
           initial={{ y: 20, opacity: 0 }}

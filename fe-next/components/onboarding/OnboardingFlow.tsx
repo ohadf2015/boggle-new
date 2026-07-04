@@ -17,6 +17,7 @@ import {
 } from '@/utils/growthTracking';
 import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { useInviteOnboardingMode, type FlowStep } from '@/hooks/useInviteOnboardingMode';
+import { getGuestStats } from '@/utils/guestManager';
 import LanguageSelect from './LanguageSelect';
 import CalmModeChoice from './CalmModeChoice';
 import StyleSelectStep from './StyleSelectStep';
@@ -268,7 +269,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     onComplete();
   }, [isNavigating, playerName, recordStep, language, router, onComplete, emitCompleted]);
 
-  // Step 0: Language selected — proceed to returningUser prompt
+  // Step 0: Language selected — proceed to returningUser prompt OR straight to profile.
+  // POLICY: Brand-new users (0 games) skip ReturningUserStep — they go straight to play.
+  // Returning users (1+ games) see ReturningUserStep to re-engage with account options.
   // On CrazyGames the "have an account" branch is dead (no external auth),
   // so skip straight to the CG short-flow (handled by the early return).
   // In invite mode, skip returnUser and go straight to profile.
@@ -282,7 +285,16 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       setStep('profile');
       return;
     }
-    setStep('returningUser');
+    // Check if user is brand-new (no games played yet)
+    const guestStats = getGuestStats();
+    const gamesPlayed = guestStats.games || 0;
+    if (gamesPlayed === 0) {
+      // Brand-new user: skip account dialog, go straight to profile setup
+      setStep('profile');
+    } else {
+      // Returning user: show account re-engagement option
+      setStep('returningUser');
+    }
   }, [isOnCrazyGamesPlatform, isInviteMode, recordStep]);
 
   // CrazyGames portal: replace 5-step FTUE with one welcome screen.

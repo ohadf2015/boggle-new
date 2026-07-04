@@ -852,6 +852,7 @@ const es = {
     "stepOf": "Paso {current} de {total}",
     "previous": "Anterior",
     "confirm": "Confirmar",
+    "starting": "Comenzando…",
     "cancel": "Cancelar",
     "dismiss": "Cerrar",
     "info": "Info",
@@ -2600,6 +2601,8 @@ const es = {
     "exitRoom": "Salir",
     "exitWarning": "¿Te vas? Puedes quedarte para la próxima ronda.",
     "playAgain": "Otra vez",
+    "challengeCta": "Desafía a un Amigo",
+    "challengeCtaSubtext": "Envía un enlace de beat-my-score",
     "maxCombo": "Combo máximo",
     "celebrate": "Celebrar",
     "celebrateAgain": "¡Otra vez!",
@@ -6261,6 +6264,13 @@ const es = {
       "streak": "🔥 ¡{days} días seguidos!",
       "streakMilestone7": "🔥 ¡Una semana! ¿Puedes continuar?",
       "streakMilestone30": "🔥 ¡30 días seguidos! ¡Legendario!"
+    },
+    "rival": {
+      "header": "Desafío de Rivalidad",
+      "you": "Tú",
+      "youWin": "¡Venciste a {name}! 🏆",
+      "youLose": "{name} gana esta ronda",
+      "tie": "¡Es un empate! 🤝"
     },
     "screenshotProtection": "Regresa para continuar jugando",
     "trainingSuggestion": {
@@ -13927,6 +13937,10 @@ const es = {
       "wordHunt": "Caza de Palabras",
       "blast": "Estallido"
     },
+    "noRoomsYet": "No hay batallas en progreso",
+    "emptyStateCaption": "¡Comienza ahora — los robots llenarán los asientos!",
+    "quickPlayAction": "Juego rápido",
+    "dailyChallengeAction": "Desafío diario",
     "rivals": {
       "header": "Codo a codo",
       "you": "Tú",

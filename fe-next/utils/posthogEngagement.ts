@@ -222,6 +222,7 @@ export function trackMpStuckCoachOutcome(args: {
 export function trackSoloPlayPrompt(args: {
   event: 'shown' | 'clicked';
   lobbyWaitSec?: number;
+  auto_filled?: boolean;
 }): void {
   safe(() =>
     (posthog.capture as PHFn)(
@@ -229,6 +230,7 @@ export function trackSoloPlayPrompt(args: {
       {
         mode: 'classic',
         lobby_wait_sec: args.lobbyWaitSec,
+        auto_filled: args.auto_filled,
       }
     )
   );

@@ -1037,6 +1037,7 @@ const sv = {
     "stepOf": "Steg {current} av {total}",
     "previous": "Föregående",
     "confirm": "Bekräfta",
+    "starting": "Startar…",
     "cancel": "Avbryt",
     "dismiss": "Stäng",
     "info": "Info",
@@ -2911,6 +2912,8 @@ const sv = {
     "exitRoom": "Lämna",
     "exitWarning": "Gå nu? Du kan stanna för nästa runda.",
     "playAgain": "Igen",
+    "challengeCta": "Utmana en vän",
+    "challengeCtaSubtext": "Skicka en beat-my-score-länk",
     "maxCombo": "Max kombo",
     "celebrate": "Fira",
     "celebrateAgain": "Igen!",
@@ -6428,6 +6431,13 @@ const sv = {
       "streakMilestone7": "🔥 En veckas svit! Kan du fortsätta?",
       "streakMilestone30": "🔥 30 dagars svit! Legendarisk!"
     },
+    "rival": {
+      "header": "Slå mig-utmaning",
+      "you": "Du",
+      "youWin": "Du slog {name}! 🏆",
+      "youLose": "{name} vinner denna runda",
+      "tie": "Det är oavgjort! 🤝"
+    },
     "errorWordTooShort": "Ordet måste ha minst {min} bokstäver",
     "errorWordTooLong": "Ordet får ha max {max} bokstäver",
     "wordPlaceholder": "Skriv ett ord...",
@@ -6719,6 +6729,10 @@ const sv = {
       },
       "stopGameConfirm": "Avsluta spelet för alla?",
       "stopGameYes": "Avsluta spelet",
+      "noRoomsYet": "Inga strider pågår",
+      "emptyStateCaption": "Starta ett nu — vi fyller platserna med robotar!",
+      "quickPlayAction": "Snabbspel",
+      "dailyChallengeAction": "Daglig utmaning",
       "quality": {
         "degraded": "Anslutningen försämrad",
         "weak": "Svag anslutning",

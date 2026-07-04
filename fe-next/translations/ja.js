@@ -866,6 +866,7 @@ const ja = {
     "stepOf": "ステップ {current} / {total}",
     "previous": "前へ",
     "confirm": "確認",
+    "starting": "開始中…",
     "cancel": "キャンセル",
     "dismiss": "閉じる",
     "info": "情報",
@@ -2739,6 +2740,8 @@ const ja = {
     "exitRoom": "退出",
     "exitWarning": "退出する？次のラウンドに残れるよ。",
     "playAgain": "もう一回",
+    "challengeCta": "友達に挑戦",
+    "challengeCtaSubtext": "スコアに挑戦できるリンクを送ろう",
     "maxCombo": "最大コンボ",
     "celebrate": "祝う",
     "celebrateAgain": "もう一回！",
@@ -6312,6 +6315,13 @@ const ja = {
       "streakMilestone7": "🔥 1週間連続！続けられる？",
       "streakMilestone30": "🔥 30日連続！伝説だ！"
     },
+    "rival": {
+      "header": "私を倒すチャレンジ",
+      "you": "あなた",
+      "youWin": "{name}を倒しました！🏆",
+      "youLose": "{name}がこのラウンドで勝ちました",
+      "tie": "引き分けです！🤝"
+    },
     "screenshotProtection": "続けるには戻ってください",
     "errorWordTooShort": "{min}文字以上必要です",
     "errorWordTooLong": "{max}文字以下にしてください",
@@ -6599,6 +6609,10 @@ const ja = {
       },
       "stopGameConfirm": "全員のゲームを終了しますか？",
       "stopGameYes": "ゲーム終了",
+      "noRoomsYet": "進行中のバトルなし",
+      "emptyStateCaption": "今すぐ始めましょう — ロボットが座席を埋めます！",
+      "quickPlayAction": "クイックプレイ",
+      "dailyChallengeAction": "デイリーチャレンジ",
       "quality": {
         "degraded": "通信が弱い",
         "weak": "通信が不安定",

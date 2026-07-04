@@ -130,6 +130,15 @@ interface HostPreGameViewProps {
   isQuickPlay?: boolean;
 }
 
+// ==================== Constants ====================
+
+/**
+ * Auto-fill bots timer: when a quickplay host is alone in the lobby,
+ * trigger bot fill after this many seconds instead of requiring a click.
+ * Configurable so it can be tuned based on UX feedback.
+ */
+export const QUICKPLAY_AUTO_FILL_SECONDS = 5;
+
 // ==================== Component ====================
 
 function HostPreGameView({
@@ -329,8 +338,9 @@ function HostPreGameView({
   useEffect(() => {
     if (humanGuestCount === 0) {
       if (isQuickPlay) {
-        // Quick Play: skip alone-timer, kick off short "filling bots…" countdown.
-        setBotCountdown(3);
+        // Quick Play: skip alone-timer, kick off ~5s "filling bots…" countdown.
+        // The timer fires without user interaction — abandoned hosts never click dialogs.
+        setBotCountdown(QUICKPLAY_AUTO_FILL_SECONDS);
       } else if (!isPrivate) {
         // Passive fallback for a PUBLIC-room host who never presses Start. A short
         // 15s alone-timer first absorbs the "is anyone joining?" window, then a
@@ -365,6 +375,9 @@ function HostPreGameView({
   useEffect(() => {
     if (botCountdown === null) return;
     if (botCountdown <= 0) {
+      // Track auto-fill when timer expires (quickplay or alone-timer fallback).
+      // Keep mp_solo_prompt_shown as the base event, add auto_filled property.
+      trackSoloPlayPrompt({ event: 'shown', auto_filled: true });
       // setAutoFill is the backend's bot-fill primitive; the prior 'addBots'
       // event had no server handler so silently dropped (bots never spawned).
       socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useMemo, useState, useEffect } from 'react';
+import React, { memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Sparkles, Type, Star, Coins, ChevronDown, ChevronUp } from 'lucide-react';
@@ -193,6 +193,15 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Challenge CTA analytics
+  const handleChallengeCta = useCallback(() => {
+    trackGrowthEvent('mp_results_challenge_cta', {
+      gameMode: gameMode ?? 'unknown',
+      language,
+      surface: 'mp_brag_card',
+    });
+  }, [gameMode, language]);
 
   // Split players: top 3 for podium, 4th+ for consolation rows
   const podiumPlayers = useMemo(() => sortedScores.slice(0, 3), [sortedScores]);
@@ -497,6 +506,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
             });
             trackShareCompleted('web_share_api', { surface: 'mp_brag_card' });
           }}
+          onChallenge={handleChallengeCta}
           t={t}
         />
       )}

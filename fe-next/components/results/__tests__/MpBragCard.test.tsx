@@ -176,3 +176,40 @@ describe('MpBragCard — native share', () => {
     expect(onNativeShare).not.toHaveBeenCalled();
   });
 });
+
+describe('MpBragCard — challenge CTA', () => {
+  it('fires onChallenge when the challenge button is tapped', async () => {
+    const onChallenge = vi.fn();
+    const data = deriveBragCardData(baseInput);
+    render(
+      <MpBragCard
+        data={data}
+        current={you}
+        opponent={rival}
+        modeLabel="CLASSIC"
+        shareUrl="https://lexiclash.live"
+        onChallenge={onChallenge}
+        t={t}
+      />
+    );
+    const challengeBtn = screen.getByTestId('brag-challenge-button');
+    fireEvent.click(challengeBtn);
+    await waitFor(() => expect(onChallenge).toHaveBeenCalledOnce());
+  });
+
+  it('displays challenge button with correct text', () => {
+    const data = deriveBragCardData(baseInput);
+    render(
+      <MpBragCard
+        data={data}
+        current={you}
+        opponent={rival}
+        modeLabel="CLASSIC"
+        shareUrl="https://lexiclash.live"
+        onChallenge={vi.fn()}
+        t={t}
+      />
+    );
+    expect(screen.getByText('results.challengeCta')).toBeTruthy();
+  });
+});

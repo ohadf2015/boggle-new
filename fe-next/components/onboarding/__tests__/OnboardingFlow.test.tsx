@@ -59,6 +59,16 @@ vi.mock('@/utils/profileStorage', () => ({
   getStoredCustomAvatar: vi.fn(() => null),
 }));
 
+// Mock getGuestStats to return returning user (1+ games) so ReturningUserStep appears in flow.
+// POLICY: Brand-new (0 games) skip ReturningUserStep; returning users see it.
+vi.mock('@/utils/guestManager', async () => {
+  const actual = await vi.importActual('@/utils/guestManager');
+  return {
+    ...actual,
+    getGuestStats: () => ({ games: 1, wins: 0, words: 0, score: 0 }),
+  };
+});
+
 // Controllable auth mock — Calm Mode onboarding step is admin-gated, so most
 // tests run as admin; one test flips to non-admin to assert the step is skipped.
 const { mockUseAuth } = vi.hoisted(() => ({ mockUseAuth: vi.fn() }));

@@ -28,6 +28,7 @@ const ReferralMilestonePopup = dynamic(() => import('@/components/engagement/Ref
 const LevelUpCelebration = dynamic(() => import('@/components/animations/LevelUpCelebration'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 const FirstWinSignupModal = dynamic(() => import('@/components/auth/FirstWinSignupModal'), { ssr: false });
+const GameFeedbackCard = dynamic(() => import('@/components/results/GameFeedbackCard'), { ssr: false });
 
 // ==============================================
 // TYPES
@@ -85,6 +86,22 @@ interface FirstWinModalState {
   setShowFirstWinModal: (show: boolean) => void;
 }
 
+/** Game feedback (rating survey) modal state */
+interface GameFeedbackState {
+  /** Whether game feedback modal is visible */
+  showGameFeedback: boolean;
+  /** Close handler callback */
+  setShowGameFeedback: (show: boolean) => void;
+  /** Game surface (e.g., 'singleplayer', 'mp_round', 'daily') */
+  surface: 'singleplayer' | 'mp_round' | 'daily' | 'word_hunt';
+  /** Game mode (e.g., 'classic', 'blast') */
+  gameMode?: string;
+  /** MP session game counter or similar */
+  throttleKey?: string;
+  /** Whether this feedback modal should be eligible to show */
+  eligible: boolean;
+}
+
 export interface ResultsModalsProps {
   /** Word feedback modal state and handlers */
   wordFeedback: WordFeedbackState;
@@ -96,7 +113,8 @@ export interface ResultsModalsProps {
   authModal: AuthModalState;
   /** First win modal state and handlers */
   firstWinModal: FirstWinModalState;
-
+  /** Game feedback (rating survey) modal state and handlers */
+  gameFeedback?: GameFeedbackState;
 }
 
 // ==============================================
@@ -109,27 +127,48 @@ export function ResultsModals({
   levelUp,
   authModal,
   firstWinModal,
+  gameFeedback,
 }: ResultsModalsProps) {
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const hideExternal = isOnCrazyGamesPlatform;
 
-  const modals = useMemo(
-    () => [
-      // Level-up celebration disabled on MP results — XP/level shown inline in player card
+  const modals = useMemo(() => {
+    // Modal priority order (lower number = higher priority, shows first):
+    // 1. levelUp: Celebration peaks (epic full-screen GSAP, auto-dismisses after 5s)
+    // 2. referralMilestone: Friend milestone notifications (quick, non-intrusive)
+    // 3. firstWin: Guest signup after first win (high-priority conversion moment)
+    // 4. auth: Guest signup for non-winners (secondary conversion opportunity)
+    // 5. wordFeedback: Dictionary word voting (let players resolve word disputes before leaving)
+    // 6. gameFeedback: Post-game sentiment rating ("How was that round?") — ONLY after rematch CTA visible.
+    //    POLICY: useGameFeedback gates on eligible flag + min-games + cooldown.
+    //    Eligible should be true ONLY AFTER rematch CTA is visible and accessible.
+    //    For SP: eligible after first game. For MP: eligible after 3rd game in session.
+
+    const baseModals: Array<{ id: string; priority: number; isReady: boolean }> = [
       { id: 'levelUp', priority: 1, isReady: false },
       { id: 'referralMilestone', priority: 2, isReady: referralMilestone.showReferralMilestone },
       { id: 'firstWin', priority: 3, isReady: !hideExternal && firstWinModal.showFirstWinModal },
       { id: 'auth', priority: 4, isReady: !hideExternal && authModal.showAuthModal },
       { id: 'wordFeedback', priority: 5, isReady: wordFeedback.showWordFeedback && wordFeedback.wordToVote !== null },
-    ],
-    [
-      referralMilestone.showReferralMilestone,
-      firstWinModal.showFirstWinModal,
-      authModal.showAuthModal,
-      wordFeedback.showWordFeedback, wordFeedback.wordToVote,
-      hideExternal,
-    ]
-  );
+    ];
+
+    if (gameFeedback) {
+      baseModals.push({
+        id: 'gameFeedback',
+        priority: 6,
+        isReady: !hideExternal && gameFeedback.showGameFeedback,
+      });
+    }
+
+    return baseModals;
+  }, [
+    referralMilestone.showReferralMilestone,
+    firstWinModal.showFirstWinModal,
+    authModal.showAuthModal,
+    wordFeedback.showWordFeedback, wordFeedback.wordToVote,
+    gameFeedback,
+    hideExternal,
+  ]);
 
   const { activeModalId, dismiss } = useModalQueue({ modals });
 
@@ -188,6 +227,18 @@ export function ResultsModals({
         <FirstWinSignupModal
           isOpen={activeModalId === 'firstWin'}
           onClose={() => { trackModalDismissed({ modalId: 'first_win_signup', method: 'close_button' }); dismiss('firstWin'); firstWinModal.setShowFirstWinModal(false); }}
+        />
+      )}
+
+      {/* Post-game Sentiment Rating Survey - Hidden on CrazyGames */}
+      {gameFeedback && !hideExternal && (
+        <GameFeedbackCard
+          isOpen={activeModalId === 'gameFeedback'}
+          onClose={() => { trackModalDismissed({ modalId: 'game_feedback', method: 'close_button' }); dismiss('gameFeedback'); gameFeedback.setShowGameFeedback(false); }}
+          surface={gameFeedback.surface}
+          gameMode={gameFeedback.gameMode}
+          eligible={gameFeedback.eligible}
+          throttleKey={gameFeedback.throttleKey}
         />
       )}
     </>

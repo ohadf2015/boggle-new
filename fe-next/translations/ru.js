@@ -6247,6 +6247,13 @@ const ru = {
       "streakMilestone7": "🔥 Неделя серии! Ты можешь держать это?",
       "streakMilestone30": "🔥 30 дневная серия! Легендарная преданность!"
     },
+    "rival": {
+      "header": "Вызов соперника",
+      "you": "Ты",
+      "youWin": "Ты победил(а) {name}! 🏆",
+      "youLose": "{name} выигрывает этот раунд",
+      "tie": "Ничья! 🤝"
+    },
     "errorWordTooShort": "Слово должно быть минимум {min} букв",
     "errorWordTooLong": "Слово должно быть максимум {max} букв",
     "wordPlaceholder": "Введи слово...",
@@ -7612,6 +7619,7 @@ const ru = {
     "stepOf": "Шаг {current} из {total}",
     "previous": "Назад",
     "confirm": "Подтвердить",
+    "starting": "Запуск…",
     "cancel": "Отмена",
     "or": "или",
     "and": "и",
