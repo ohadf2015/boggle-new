@@ -10552,7 +10552,9 @@ const es = {
       "title": "Oleada {wave}",
       "objectives": "Objetivos",
       "go": "¡YA!",
-      "moves": "{moves} Movimientos"
+      "moves": "{moves} Movimientos",
+      "dragHint": "Arrastra las letras para formar palabras",
+      "tapToStart": "Toca para empezar"
     },
     "objective": {
       "scoreTarget": "Anota {target} pts",
@@ -10709,6 +10711,28 @@ const es = {
       "skipLabel": "Omitir",
       "reelLabel": "Repetición",
       "bestWord": "Mejor palabra"
+    },
+    "store": {
+      "title": "Tienda de Mejoras",
+      "close": "Listo",
+      "buy": "Comprar",
+      "max": "MÁXIMO",
+      "extraMoves": {
+        "name": "Movimientos Extra",
+        "desc": "Comienza con +1 movimiento por nivel"
+      },
+      "luckySpawn": {
+        "name": "Aparición de Suerte",
+        "desc": "+3% de probabilidad de ficha especial por nivel"
+      },
+      "comboSurge": {
+        "name": "Onda de Combo",
+        "desc": "+25% bonificación de combo por nivel"
+      },
+      "safetyNet": {
+        "name": "Red de Seguridad",
+        "desc": "+1 recuperación gratuita cuando quedas atascado por nivel"
+      }
     }
   },
   "student": {

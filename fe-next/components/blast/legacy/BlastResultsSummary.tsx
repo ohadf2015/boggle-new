@@ -39,10 +39,11 @@ interface BlastResultsSummaryProps {
   t: (key: string, vars?: Record<string, string | number> | string) => string;
   onPlayAgain: () => void;
   onQuit: () => void;
+  onOpenStore?: () => void;
 }
 
 export function BlastResultsSummary({
-  results, t, onPlayAgain, onQuit,
+  results, t, onPlayAgain, onQuit, onOpenStore,
 }: BlastResultsSummaryProps) {
   const badges = useBlastBadgeUnlocks({ results, t });
 
@@ -577,6 +578,17 @@ export function BlastResultsSummary({
         >
           {didFail ? t('blast.results.tryAgain') : t('blast.playAgain')}
         </Button>
+        {onOpenStore && (
+          <Button
+            data-testid="blast-results-upgrades-button"
+            variant="ghost"
+            size="sm"
+            onClick={onOpenStore}
+            className="font-semibold text-neo-cyan hover:text-neo-cyan hover:bg-transparent uppercase tracking-wider text-xs"
+          >
+            {t('blast.store.title') || 'Upgrades'}
+          </Button>
+        )}
         <Button
           variant="ghost"
           size="sm"

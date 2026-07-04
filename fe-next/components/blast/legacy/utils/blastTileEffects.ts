@@ -355,7 +355,7 @@ export function processBombBFS(
       row: bomb.row, col: bomb.col, type: 'bomb', intensity: 3, timestamp: staggeredTime,
     });
 
-    for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
+    bombRadius: for (let dr = -BOMB_RADIUS; dr <= BOMB_RADIUS; dr++) {
       for (let dc = -BOMB_RADIUS; dc <= BOMB_RADIUS; dc++) {
         if (dr === 0 && dc === 0) continue;
         const r = bomb.row + dr;
@@ -365,7 +365,10 @@ export function processBombBFS(
             if (isMultiHitAlive(next[r][c])) {
               hitMultiHitTile(next[r][c]);
             } else {
-              if (chainAtClearCap(ctx)) { recordSuppressed(ctx); break; }
+              // Cap hit: stop this bomb's radius cleanly. `break bombRadius` exits
+              // BOTH loops so we record ONE suppression, not one per remaining row
+              // (a bare `break` left the outer loop spinning → inflated Overflow Surge).
+              if (chainAtClearCap(ctx)) { recordSuppressed(ctx); break bombRadius; }
               chainMarkCleared(ctx, next[r][c]);
               bonusScore += BOMB_AREA_CLEAR_BONUS;
               if (next[r][c].type === 'bomb' && !processedBombs.has(`${r},${c}`)) {

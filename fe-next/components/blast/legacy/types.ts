@@ -140,6 +140,8 @@ export interface BlastResultsData {
    *  per-objective ✓/✗ summary so the player sees exactly which goals landed.
    *  clear_percent is filtered at render (the fail card already covers it). */
   finalObjectives?: BlastObjectiveProgress[];
+  /** Coins earned this run (SP only) — awarded to global context on save. */
+  sessionCoins?: number;
 }
 
 // ==================== Special Tile Effects ====================

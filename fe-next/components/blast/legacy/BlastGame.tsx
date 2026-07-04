@@ -5,6 +5,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
+import { useCoinContext } from '@/contexts/CoinContext';
+import { useBlastGems } from '@/lib/blast/useBlastGems';
 import { createHighlightRecorder, type HighlightRecorder } from '@/lib/blast/highlightRecorder';
 import { useBlastSounds } from './hooks/useBlastSounds';
 import { useComboSystem } from '@/hooks/useComboSystem';
@@ -266,6 +268,26 @@ export function BlastGame({
   const lastPathRef = useRef<Array<{ row: number; col: number }>>([]);
   const [gameStartTime] = useState(() => Date.now());
 
+  // Currency tracking (SP only)
+  const { coins: contextCoins } = useCoinContext();
+  const baseCoinsRef = useRef<number>(0);
+  useEffect(() => {
+    if (baseCoinsRef.current === 0) baseCoinsRef.current = contextCoins;
+  }, [contextCoins]);
+  const [sessionCoins, setSessionCoins] = useState(0);
+  const currencyBurstIdRef = useRef(0);
+  interface CurrencyBurstEvent {
+    id: number;
+    kind: 'coin' | 'gem';
+    amount: number;
+    originX?: number;
+    originY?: number;
+  }
+  const [currencyBurst, setCurrencyBurst] = useState<CurrencyBurstEvent | null>(null);
+  // Subscribe to the live gem balance at the top level — hooks must be called
+  // unconditionally, never inside the JSX ternary below.
+  const gemBalance = useBlastGems(s => s.gems);
+
   const onWordWithComboTypeRef = useRef(onWordWithComboType);
   useEffect(() => { onWordWithComboTypeRef.current = onWordWithComboType; }, [onWordWithComboType]);
 
@@ -277,6 +299,33 @@ export function BlastGame({
     setScoreFlyEvents, setComboFlash, flyIdRef,
     setClearedTilesForEffects,
   });
+
+  // Currency earn handler (SP only) — declared BEFORE the word-handler call
+  // below because it is passed into that call's effects bag.
+  const handleCurrencyEarned = useCallback(
+    (data: { coinDelta: number; gemDelta: number; avgRow: number; avgCol: number }) => {
+      if (isMultiplayer) return; // Guard: SP only
+      const { coinDelta, gemDelta, avgRow, avgCol } = data;
+
+      setSessionCoins(c => c + coinDelta);
+
+      if (gemDelta > 0) {
+        useBlastGems.getState().addGems(gemDelta);
+      }
+
+      // Fire burst (prefer gem, else coin)
+      const kind = gemDelta > 0 ? 'gem' : 'coin';
+      const amount = gemDelta > 0 ? gemDelta : coinDelta;
+      setCurrencyBurst({
+        id: ++currencyBurstIdRef.current,
+        kind,
+        amount,
+        originX: ((avgCol + 0.5) / config.gridSize) * 100,
+        originY: ((avgRow + 0.5) / config.gridSize) * 100,
+      });
+    },
+    [config.gridSize, isMultiplayer],
+  );
 
   // Word-accepted pipeline (extracted to useBlastWordHandler)
   const { handleWordAccepted } = useBlastWordHandler({
@@ -294,6 +343,7 @@ export function BlastGame({
       setClearedTilesForEffects, setScoreFlyEvents,
       setComboFlash, setComboTypeName, setComboParticle,
       setExplosionShake, setNearMissCells,
+      onCurrencyEarned: handleCurrencyEarned,
     },
   });
 
@@ -571,9 +621,10 @@ export function BlastGame({
       ...(targetObj?.objective.targetWord
         ? { targetWord: targetObj.objective.targetWord, targetWordFound: targetObj.isComplete }
         : {}),
+      ...(!isMultiplayer ? { sessionCoins } : {}),
     };
     onGameEnd(enriched);
-  }, [objectives.objectiveProgress, onGameEnd]);
+  }, [objectives.objectiveProgress, onGameEnd, isMultiplayer, sessionCoins]);
 
   // Game end detection + Sugar Crush (extracted to useBlastGameEnd)
   const { sugarCrushActive } = useBlastGameEnd({
@@ -708,6 +759,9 @@ export function BlastGame({
         buffConsumed={initialBuff === 'shield' ? shieldConsumed : false}
         objectiveProgress={objectives.objectiveProgress}
         ddaBoostActive={!isMultiplayer && engine.ddaBoostActive}
+        coins={!isMultiplayer ? baseCoinsRef.current + sessionCoins : 0}
+        gems={!isMultiplayer ? gemBalance : 0}
+        currencyBurst={!isMultiplayer ? currencyBurst : null}
         hintSlot={!isMultiplayer ? (
           <BlastHintButton
             waveNumber={waveNumber}

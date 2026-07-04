@@ -260,21 +260,22 @@ describe('BlastTile', () => {
   });
 
   describe('landing bounce spring curve', () => {
-    it('uses spring cubic-bezier for landing phase', () => {
+    it('uses an overshoot cubic-bezier for landing phase', () => {
       const { container } = render(
         <BlastTile {...baseProps} type="standard" phase="landing" />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transition).toContain('cubic-bezier(0.34, 1.56, 0.64, 1)');
+      expect(button?.style.transition).toContain('cubic-bezier(0.34, 1.7, 0.5, 1)');
     });
 
-    it('uses enhanced bounce amplitude for landing', () => {
+    it('lands with an impact squash (short-and-wide, scaleY<1)', () => {
       const { container } = render(
         <BlastTile {...baseProps} type="standard" phase="landing" />
       );
       const button = container.querySelector('button');
-      expect(button?.style.transform).toContain('scaleY(1.08)');
-      expect(button?.style.transform).toContain('scaleX(0.94)');
+      // Impact compresses the tile shorter + wider — the same for every tile type.
+      expect(button?.style.transform).toContain('scaleY(0.88)');
+      expect(button?.style.transform).toContain('scaleX(1.1)');
     });
   });
 

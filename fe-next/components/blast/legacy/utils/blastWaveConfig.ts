@@ -581,6 +581,16 @@ export const BLAST_RETIRED_SPECIAL_TYPES: ReadonlySet<BlastTileType> = new Set<B
   // retired. ICE is kept — it now spawns and is directly selectable/meltable (no
   // lock; see THAWABLE_TYPES in blastThaw.ts). Reversible: drop frozen to bring back.
   'frozen',
+  // locked/key retirement (2026-07-04): the `locked` tile renders a padlock icon
+  // (reads as untouchable) but computeCellFilter never gated it → it was actually
+  // freely selectable, and the key→unlock mechanic was NEVER implemented
+  // (clearTilesProcessor has zero key handling). Net effect: a tile that LOOKS
+  // locked but isn't, confusing players into thinking they're dead-ended. Same
+  // failure mode the frozen retirement fixed. Reversible: to ship locked as a
+  // REAL mechanic, add 'locked' to THAWABLE_TYPES (reuses the thaw pipeline) and
+  // drop this pair from the retired set.
+  'locked',
+  'key',
 ]);
 
 /**

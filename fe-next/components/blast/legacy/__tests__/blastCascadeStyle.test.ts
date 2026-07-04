@@ -65,9 +65,10 @@ describe('gravity preservation', () => {
 });
 
 describe('getCascadeLandStyle', () => {
-  it('returns squash transform with back.out cubic-bezier', () => {
+  it('returns an impact squash (short-and-wide, scaleY<1) with an overshoot ease', () => {
     const s = getCascadeLandStyle();
-    expect(s.transform).toBe('scaleY(1.08) scaleX(0.94)');
-    expect(String(s.transition)).toContain('cubic-bezier(0.34, 1.56, 0.64, 1)');
+    // A landing compresses SHORT-and-wide — scaleY<1, scaleX>1 (not taller).
+    expect(s.transform).toBe('scaleY(0.88) scaleX(1.1)');
+    expect(String(s.transition)).toContain('cubic-bezier(0.34, 1.7, 0.5, 1)');
   });
 });

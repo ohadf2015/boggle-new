@@ -13,8 +13,9 @@ export function getCascadeFallStyle(distPx: number, col: number): CSSProperties 
 }
 
 export function getCascadeLandStyle(): CSSProperties {
+  // Impact squash — short-and-wide (scaleY<1), uniform for all tile types.
   return {
-    transform: 'scaleY(1.08) scaleX(0.94)',
-    transition: 'transform 100ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+    transform: 'scaleY(0.88) scaleX(1.1)',
+    transition: 'transform 110ms cubic-bezier(0.34, 1.7, 0.5, 1)',
   };
 }

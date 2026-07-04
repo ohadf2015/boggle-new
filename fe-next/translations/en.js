@@ -10154,7 +10154,9 @@ const en = {
       "title": "Wave {wave}",
       "objectives": "Objectives",
       "go": "GO!",
-      "moves": "{moves} Moves"
+      "moves": "{moves} Moves",
+      "dragHint": "Drag to connect letters into words",
+      "tapToStart": "Tap to start"
     },
     "objective": {
       "scoreTarget": "Score {target} pts",
@@ -10387,6 +10389,28 @@ const en = {
       "verticalWords": {
         "title": "Words can be vertical too",
         "body": "Drag straight down (or up) to spell vertical words."
+      }
+    },
+    "store": {
+      "title": "Upgrade Store",
+      "close": "Done",
+      "buy": "Buy",
+      "max": "MAXED",
+      "extraMoves": {
+        "name": "Extra Moves",
+        "desc": "Start with +1 moves per level"
+      },
+      "luckySpawn": {
+        "name": "Lucky Spawn",
+        "desc": "+3% special tile chance per level"
+      },
+      "comboSurge": {
+        "name": "Combo Surge",
+        "desc": "+25% combo bonus score per level"
+      },
+      "safetyNet": {
+        "name": "Safety Net",
+        "desc": "+1 free recovery when stuck per level"
       }
     },
     "settings": {

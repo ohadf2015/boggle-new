@@ -10541,7 +10541,9 @@ const ja = {
       "title": "ウェーブ {wave}",
       "objectives": "目標",
       "go": "スタート!",
-      "moves": "{moves} 手"
+      "moves": "{moves} 手",
+      "dragHint": "文字をドラッグして単語を作ろう",
+      "tapToStart": "タップしてスタート"
     },
     "objective": {
       "scoreTarget": "{target}点を獲得",
@@ -10697,6 +10699,28 @@ const ja = {
       "skipLabel": "スキップ",
       "reelLabel": "ハイライト",
       "bestWord": "ベストワード"
+    },
+    "store": {
+      "title": "アップグレードストア",
+      "close": "完了",
+      "buy": "購入",
+      "max": "最大",
+      "extraMoves": {
+        "name": "追加ムーブ",
+        "desc": "レベルあたり+1ムーブで開始"
+      },
+      "luckySpawn": {
+        "name": "ラッキースポーン",
+        "desc": "レベルあたり+3%特殊タイル確率"
+      },
+      "comboSurge": {
+        "name": "コンボサージ",
+        "desc": "レベルあたり+25%コンボボーナス"
+      },
+      "safetyNet": {
+        "name": "セーフティネット",
+        "desc": "詰まった時の無料救助がレベルあたり+1"
+      }
     }
   },
   "student": {

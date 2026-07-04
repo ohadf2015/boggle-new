@@ -26,6 +26,8 @@ const mockT = (key: string) => {
     'blast.objective.scoreTarget': 'Score {target} pts',
     'blast.objective.clearPercent': 'Clear {target}% of the board',
     'blast.objective.bannerTitle': 'Goals',
+    'blast.waveIntro.dragHint': 'Drag to connect letters into words',
+    'blast.waveIntro.tapToStart': 'Tap to start',
   };
   return map[key];
 };
@@ -61,14 +63,14 @@ describe('BlastWaveIntro', () => {
     expect(screen.getByText('SCORE RUSH')).toBeInTheDocument();
   });
 
-  it('auto-dismisses after 1500ms', () => {
+  it('auto-dismisses after 2600ms (no goals)', () => {
     const { container } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
     expect(container.textContent).toContain('STANDARD WAVE');
-    act(() => { jest.advanceTimersByTime(1600); });
+    act(() => { jest.advanceTimersByTime(2700); });
     expect(container.textContent).toBe('');
   });
 
-  it('stays visible longer when goals are previewed (readable, not a flash)', () => {
+  it('stays visible longer when goals are previewed (4200ms total)', () => {
     const { container } = render(
       <BlastWaveIntro
         waveNumber={3}
@@ -77,20 +79,57 @@ describe('BlastWaveIntro', () => {
         objectives={[prog('score_target', 500), prog('clear_percent', 90)]}
       />,
     );
-    act(() => { jest.advanceTimersByTime(1600); });
-    // Still on screen after the goal-less duration…
+    // Still on screen after 2.7s (no-goal duration)
+    act(() => { jest.advanceTimersByTime(2700); });
     expect(container.textContent).toContain('STANDARD WAVE');
-    act(() => { jest.advanceTimersByTime(1400); });
-    // …but gone by 3s.
+    // But gone after 4.3s (with-goal duration)
+    act(() => { jest.advanceTimersByTime(1600); });
     expect(container.textContent).toBe('');
   });
 
   it('re-triggers on waveNumber change', () => {
     const { container, rerender } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
-    act(() => { jest.advanceTimersByTime(1600); });
+    act(() => { jest.advanceTimersByTime(2700); });
     expect(container.textContent).toBe('');
     rerender(<BlastWaveIntro waveNumber={2} archetype="treasureHunt" t={mockT} />);
     expect(container.textContent).toContain('TREASURE HUNT');
+  });
+
+  it('tap-to-dismiss works after guard period (500ms)', () => {
+    const { container, getByTestId } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
+    const overlay = getByTestId('blast-wave-intro-overlay');
+    expect(container.textContent).toContain('STANDARD WAVE');
+
+    // Tap at 0ms (within guard window) — should not dismiss
+    act(() => { overlay.click(); });
+    expect(container.textContent).toContain('STANDARD WAVE');
+
+    // Advance 600ms (now > 500ms guard threshold)
+    act(() => { jest.advanceTimersByTime(600); });
+
+    // Tap now should dismiss
+    act(() => { overlay.click(); });
+    expect(container.textContent).toBe('');
+  });
+
+  it('tap-to-start hint appears after 1s', () => {
+    const { getByText, queryByText } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
+    // Hint should not be visible initially
+    expect(queryByText('Tap to start')).toBeNull();
+    // Advance to 1s (hint delay)
+    act(() => { jest.advanceTimersByTime(1000); });
+    // Now hint should be visible
+    expect(getByText('Tap to start')).toBeInTheDocument();
+  });
+
+  it('wave 1 displays dragHint', () => {
+    const { getByText } = render(<BlastWaveIntro waveNumber={1} archetype="normal" t={mockT} />);
+    expect(getByText('Drag to connect letters into words')).toBeInTheDocument();
+  });
+
+  it('wave 2+ does not display dragHint', () => {
+    const { queryByText } = render(<BlastWaveIntro waveNumber={2} archetype="normal" t={mockT} />);
+    expect(queryByText('Drag to connect letters into words')).toBeNull();
   });
 
   it('previews the wave goals (excluding clear_percent, shown in HUD)', () => {

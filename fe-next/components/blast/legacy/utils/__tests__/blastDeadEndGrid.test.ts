@@ -27,11 +27,15 @@ describe('buildDeadEndGrid', () => {
   });
 
   describe('ice and frozen tiles', () => {
-    it('masks unthawed ice tiles as empty string', () => {
+    // Ice was un-gated on 2026-06-13 (THAWABLE_TYPES = {frozen} only): it now
+    // spawns directly-selectable/meltable. So ice must NOT be masked — masking a
+    // selectable tile makes the detector fire a FALSE dead-end when only
+    // ice-routed words remain. Only unthawed `frozen` (the frost vault) is blocked.
+    it('exposes ice tiles (directly selectable since 2026-06-13)', () => {
       const grid = [['A', 'B']];
       const tiles = [[tile({ type: 'ice', isThawed: false }), tile()]];
       const result = buildDeadEndGrid(grid, tiles);
-      expect(result[0][0]).toBe('');
+      expect(result[0][0]).toBe('A');
     });
 
     it('masks unthawed frozen tiles as empty string', () => {
@@ -41,9 +45,9 @@ describe('buildDeadEndGrid', () => {
       expect(result[0][0]).toBe('');
     });
 
-    it('exposes thawed ice tiles (selectable after thaw)', () => {
+    it('exposes thawed frozen tiles (selectable after thaw)', () => {
       const grid = [['A', 'B']];
-      const tiles = [[tile({ type: 'ice', isThawed: true }), tile()]];
+      const tiles = [[tile({ type: 'frozen', isThawed: true }), tile()]];
       const result = buildDeadEndGrid(grid, tiles);
       expect(result[0][0]).toBe('A');
     });

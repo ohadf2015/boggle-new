@@ -156,6 +156,24 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
     },
   };
 
+  // Budget-aware clear for COMBO effects. Combos route every clear through
+  // ctx.markCleared (applyToTile, fireAreaBlast, and direct calls like
+  // prism_prism's board loop), so wrapping it here bounds EVERY combo by the same
+  // chainBudget the bomb/lightning BFS respects. Without this, combos used the raw
+  // markCleared and ignored the ceiling → prism_prism wiped the entire board in one
+  // frame ("blast all the board for no reason or animation"). Once the shared cap is
+  // hit the combo simply stops clearing — the ×N score multiplier is the reward, so
+  // we deliberately do NOT feed the overflow into Overflow Surge (that payout is
+  // per-bomb-detonation; crediting ~half a board of suppressed tile-clears would be
+  // a huge, exploitable bonus on a single rare combo).
+  const comboMarkCleared = (t: BlastTileState) => {
+    if (t.isCleared) return;
+    const b = ctx.chainBudget;
+    if (b && b.cleared >= b.maxCleared) return;
+    markCleared(t);
+    if (b) b.cleared++;
+  };
+
   // ── Combo detection (skip if caller already detected) ──
   const detectedCombos = preDetectedCombos ?? detectSpecialCombos(path, next);
   let comboMultiplier = 1;
@@ -165,7 +183,7 @@ export function processTilesForWord(input: TileProcessingInput): TileProcessingR
       const effectResult = executeComboEffect({
         combo, next, gridSize, path, now,
         wordLengthScale: getWordLengthScaleFactor(path.length),
-        markCleared, isMultiHitAlive, hitMultiHitTile,
+        markCleared: comboMarkCleared, isMultiHitAlive, hitMultiHitTile,
       });
       newExplosions.push(...effectResult.explosions);
       for (const key of effectResult.processedBombKeys) processedBombs.add(key);

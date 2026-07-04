@@ -17,6 +17,7 @@ import { emitMascotEvent } from '@/lib/blast/mascotBus';
 import { hasGemLetter } from '@/lib/blast/gemLetters';
 import { blastLetterBonus } from '@/lib/blast/blastLetterBonus';
 import { rollTreasure, type TreasureTier } from '@/lib/blast/blastTreasureRoll';
+import { rollGemDrop } from '@/lib/blast/blastGemDrop';
 import type { BlastTileType, BlastGameConfig } from '../types';
 import type { ScoreFlyEvent } from '../BlastScoreFly';
 import type { ClearedTileEvent } from '../BlastEffectsCanvas';
@@ -40,6 +41,8 @@ interface WordHandlerEffects {
   setComboParticle: Dispatch<SetStateAction<number>>;
   setExplosionShake: Dispatch<SetStateAction<number>>;
   setNearMissCells: Dispatch<SetStateAction<Array<{ row: number; col: number }>>>;
+  /** Fire when gems/coins are earned from word submission. Optional for backward compatibility. */
+  onCurrencyEarned?: (data: { coinDelta: number; gemDelta: number; avgRow: number; avgCol: number }) => void;
 }
 
 interface UseBlastWordHandlerParams {
@@ -207,6 +210,20 @@ export function useBlastWordHandler({
         ? { bonus: treasureBonus, luckyTier: treasureTier }
         : {}),
     }]);
+
+    // Currency earn (SP only, wired via callback)
+    try {
+      const coinDelta = Math.max(1, Math.round(result.score / 10));
+      const gemDelta = rollGemDrop({
+        wordLength: path.length,
+        hasGemLetter: hasGemLetter(data.word, config.language),
+        treasureTier,
+        comboLevel: detectedCombos.length,
+      });
+      effects.onCurrencyEarned?.({ coinDelta, gemDelta, avgRow, avgCol });
+    } catch {
+      // Currency is decorative — never block gameplay on earn failure
+    }
 
     // Jackpot juice — a celebratory buzz + extra particle burst so the rare roll
     // is felt, not just seen. (Decorative; reduced-motion FX gate lives downstream.)

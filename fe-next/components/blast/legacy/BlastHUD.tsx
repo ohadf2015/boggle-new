@@ -8,6 +8,7 @@ import { formatTimeMMSS } from '@/shared/utils/timeFormatting';
 import { computeTimerUrgency } from '@/lib/cosy/timerUrgency';
 import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { BlastComboStreakBadge } from './BlastComboStreakBadge';
+import BlastWalletHud from './BlastWalletHud';
 import { BLAST_MAX_LIVES } from './utils/blastLives';
 import type { ComboStreakState } from './hooks/useBlastComboStreak';
 
@@ -183,6 +184,10 @@ interface BlastHUDProps {
    *  The shell's left-rail badge already renders the (server-synced) countdown,
    *  so the HUD must NOT render its own — two timers drifted apart otherwise. */
   isDesktopCanvas?: boolean;
+  /** In-run coins balance (SP only) */
+  coins?: number;
+  /** In-run gems balance (SP only) */
+  gems?: number;
   t: (key: string) => string | undefined;
 }
 
@@ -213,6 +218,8 @@ export function BlastHUD({
   remainingTime = null,
   totalTime,
   isDesktopCanvas = false,
+  coins = 0,
+  gems = 0,
   t,
 }: BlastHUDProps) {
   const showTimer =
@@ -316,6 +323,7 @@ export function BlastHUD({
         </div>
 
         <div className="flex items-center gap-1.5">
+          {!isMultiplayer && coins > 0 && <BlastWalletHud coins={coins} gems={gems} showGems={true} />}
           {hintSlot}
           {onShowHelp && (
             <button

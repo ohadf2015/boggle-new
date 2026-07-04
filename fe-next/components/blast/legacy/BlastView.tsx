@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Star, Gift, Shield, Bomb, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { useCoinContext } from '@/contexts/CoinContext';
 import { trackGameStart } from '@/utils/growthTracking';
 import { trackBlastRunEnded } from '@/components/blast/legacy/utils/blastTelemetry';
 import { useHasRealAdProvider } from '@/hooks/useHasRealAdProvider';
@@ -14,10 +15,12 @@ import { BlastResultsSummary } from './BlastResultsSummary';
 import { BlastPregameBuffModal, type BlastPregameBuff } from './BlastPregameBuffModal';
 import { BlastRetryWaveModal } from './BlastRetryWaveModal';
 import { BlastMascotHud } from './BlastMascotHud';
+import BlastUpgradePanel from './BlastUpgradePanel';
 import { HighlightPlayer } from './highlight/HighlightPlayer';
 import { useBlastMascot } from '@/lib/blast/useBlastMascot';
 import { useMascotEnabled } from '@/lib/blast/useMascotEnabled';
 import { emitMascotEvent } from '@/lib/blast/mascotBus';
+import { useBlastUpgradeStore, computeUpgradeEffects } from '@/lib/blast/useBlastUpgradeStore';
 import { playWaveFailArpeggio } from '@/lib/blast/waveFailArpeggio';
 import { useBlastCheckpoint } from './hooks/useBlastCheckpoint';
 import { getWaveConfig, getWaveDistribution } from './utils/blastWaveConfig';
@@ -131,15 +134,29 @@ export function BlastView() {
     () => applyModifierToWaveConfig(getWaveConfig(currentWave), activeModifier),
     [currentWave, activeModifier],
   );
+  const upgradeLevels = useBlastUpgradeStore(s => s.levels);
+  const upgradeEffects = useMemo(() => computeUpgradeEffects(upgradeLevels), [upgradeLevels]);
+  const [showStore, setShowStore] = useState(false);
   const config = useMemo(
     () => ({
       ...resolveBlastConfig((language as Language) || 'en', 'medium'),
-      specialTileChance: waveConfig.specialTileChance,
+      specialTileChance: Math.min(0.35, waveConfig.specialTileChance + upgradeEffects.luckySpawnChance),
       customDistribution: getWaveDistribution(waveConfig),
       // Always shrink — cleared cells stay empty so full board clear is achievable
       boardClearMode: 'shrink' as const,
     }),
-    [language, waveConfig],
+    [language, waveConfig, upgradeEffects],
+  );
+  const enhancedWaveConfig = useMemo(
+    () => ({
+      ...waveConfig,
+      movesAllowed: (waveConfig.movesAllowed ?? 0) + upgradeEffects.startingMovesBonus,
+    }),
+    [waveConfig, upgradeEffects],
+  );
+  const enhancedModifierScoreMultiplier = useMemo(
+    () => (activeModifier?.scoreMultiplier ?? 1) * upgradeEffects.comboScoreMult,
+    [activeModifier?.scoreMultiplier, upgradeEffects.comboScoreMult],
   );
 
   /** Wave completed — transition to next wave */
@@ -165,6 +182,8 @@ export function BlastView() {
   }, []);
 
   /** Game ended */
+  const { addCoins } = useCoinContext();
+  const coinsAwardedRef = useRef(false);
   const handleGameEnd = useCallback((resultsData: BlastResultsData) => {
     const mergedResults: BlastResultsData = {
       ...resultsData,
@@ -204,6 +223,17 @@ export function BlastView() {
           setResults((prev) => (prev ? { ...prev, ...patch } : prev));
         },
       );
+
+      // Award coins earned this run (SP only, fire-and-forget)
+      // ponytail: client-awarded from real word scores; move to server validation if cheating becomes a problem
+      if (!coinsAwardedRef.current && (mergedResults.sessionCoins ?? 0) > 0) {
+        coinsAwardedRef.current = true;
+        try {
+          addCoins(mergedResults.sessionCoins ?? 0, 'blast_legacy_earn', { wave: currentWave });
+        } catch {
+          // Coin award is decorative — swallow failures
+        }
+      }
     }
 
     // Canonical cross-mode funnel event. Without this PostHog only sees
@@ -221,7 +251,7 @@ export function BlastView() {
       bestWordLength: bestWord.length,
       difficulty: config.difficulty ?? 'medium',
     });
-  }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language]);
+  }, [totalScore, allWordsFound, waveHistory, currentWave, config.difficulty, language, addCoins]);
 
   /** Advance to next wave */
   const handleWaveAdvance = useCallback(() => {
@@ -394,12 +424,12 @@ export function BlastView() {
             key={`game-${gameKeyRef.current}`}
             config={config}
             waveNumber={currentWave}
-            waveConfig={waveConfig}
+            waveConfig={enhancedWaveConfig}
             cumulativeScore={totalScore}
             initialBuff={pregameBuff}
-            modifierScoreMultiplier={activeModifier?.scoreMultiplier ?? 1}
+            modifierScoreMultiplier={enhancedModifierScoreMultiplier}
             activeModifier={activeModifier}
-            livesRemaining={livesRemaining}
+            livesRemaining={livesRemaining + upgradeEffects.freeRecoveries}
             onConsumeLife={handleConsumeLife}
             onWaveComplete={handleWaveComplete}
             onGameEnd={handleGameEnd}
@@ -534,9 +564,18 @@ export function BlastView() {
             t={t}
             onPlayAgain={handlePlayAgain}
             onQuit={handleQuit}
+            onOpenStore={() => setShowStore(true)}
           />
         );
       })()}
+
+      {showStore && (
+        <BlastUpgradePanel
+          onClose={() => setShowStore(false)}
+          t={t}
+          dir={language === 'he' ? 'rtl' : 'ltr'}
+        />
+      )}
 
       <ConfirmationDialog
         open={exitGuard.showConfirm}

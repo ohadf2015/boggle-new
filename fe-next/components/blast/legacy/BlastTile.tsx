@@ -164,9 +164,12 @@ function getPhaseStyles(phase: TilePhase, type: BlastTileType, fallOffset?: numb
         animation: 'blastTileAppear 400ms cubic-bezier(0.22, 1, 0.36, 1) forwards',
       } as React.CSSProperties;
     case 'landing':
+      // Impact squash — a landed tile compresses SHORT-and-wide (scaleY<1), not
+      // taller. Same for every tile type (standard, ice, bomb…) so gravity reads
+      // identically across the board. The overshoot ease springs it back to rest.
       return {
-        transform: 'scaleY(1.08) scaleX(0.94)',
-        transition: 'transform 100ms cubic-bezier(0.34, 1.56, 0.64, 1)',
+        transform: 'scaleY(0.88) scaleX(1.1)',
+        transition: 'transform 110ms cubic-bezier(0.34, 1.7, 0.5, 1)',
       };
     default:
       return {};

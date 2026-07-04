@@ -10654,7 +10654,9 @@ const sv = {
       "title": "Vag {wave}",
       "objectives": "Mal",
       "go": "KOR!",
-      "moves": "{moves} Drag"
+      "moves": "{moves} Drag",
+      "dragHint": "Dra bokstäver för att bilda ord",
+      "tapToStart": "Peka för att starta"
     },
     "objective": {
       "scoreTarget": "Nå {target} poäng",
@@ -10810,6 +10812,28 @@ const sv = {
       "skipLabel": "Hoppa över",
       "reelLabel": "Höjdpunkter",
       "bestWord": "Bästa ord"
+    },
+    "store": {
+      "title": "Uppgraderingsbutik",
+      "close": "Klart",
+      "buy": "Köp",
+      "max": "MAXAD",
+      "extraMoves": {
+        "name": "Extra drag",
+        "desc": "Börja med +1 drag per nivå"
+      },
+      "luckySpawn": {
+        "name": "Lyckospawn",
+        "desc": "+3% specialbricka per nivå"
+      },
+      "comboSurge": {
+        "name": "Comboökning",
+        "desc": "+25% combobonuspoäng per nivå"
+      },
+      "safetyNet": {
+        "name": "Säkerhetsnät",
+        "desc": "+1 gratis räddning när du kör fast per nivå"
+      }
     }
   },
   "student": {
