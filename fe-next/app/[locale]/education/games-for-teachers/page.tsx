@@ -20,6 +20,7 @@ const OG_IMAGE: Record<string, string> = {
   sv: 'education-hero-sv.webp',
   ja: 'education-hero-ja.webp',
   es: 'education-hero-es.webp',
+  ru: 'education-hero-en.webp',
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -27,7 +28,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const isTargetLocale = EDUCATION_LOCALES.includes(locale as EducationLocale);
   const pageUrl = `${BASE_URL}/${locale}${PAGE_PATH}`;
   const c = getGamesForTeachersContent(locale);
-  const ogLocale = locale === 'he' ? 'he_IL' : locale === 'es' ? 'es_ES' : locale === 'sv' ? 'sv_SE' : locale === 'ja' ? 'ja_JP' : 'en_US';
+  const ogLocale = locale === 'he' ? 'he_IL' : locale === 'es' ? 'es_ES' : locale === 'sv' ? 'sv_SE' : locale === 'ja' ? 'ja_JP' : locale === 'ru' ? 'ru_RU' : 'en_US';
   const ogImage = `${BASE_URL}/images/${OG_IMAGE[locale as EducationLocale] ?? OG_IMAGE.en}`;
   return {
     title: c.metaTitle,
@@ -56,6 +57,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
         sv: `${BASE_URL}/sv${PAGE_PATH}`,
         ja: `${BASE_URL}/ja${PAGE_PATH}`,
         es: `${BASE_URL}/es${PAGE_PATH}`,
+        ru: `${BASE_URL}/ru${PAGE_PATH}`,
       },
     },
     robots: isTargetLocale ? { index: true, follow: true } : { index: false, follow: true },
