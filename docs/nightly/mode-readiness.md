@@ -11,11 +11,11 @@
 
 ## Current (in progress)
 
-### word-tower — readiness: 82% — status: AUDIT IN PROGRESS
+### word-tower — readiness: 83% — status: AUDIT IN PROGRESS
 - **Why first:** closest to release (deep: 30 components + 69 lib files), admin/beta-gated, no public exposure yet.
 - **Reach for QA:** `https://www.lexiclash.live/en/word-tower?word-tower=1` (the `?word-tower=1` override force-enables the gated mode for non-admins — see `lib/wordTower/flags.ts`). Hebrew RTL: `/he/word-tower?word-tower=1`. Local dev (NODE_ENV=development) needs no override.
 - **Key files:** `components/wordTower/*`, `lib/wordTower/*`, `app/[locale]/word-tower/{page,PageClient}.tsx`, `app/api/word-tower/*`.
-- **Last audited:** 2026-07-03
+- **Last audited:** 2026-07-04
 
 ### Audit areas covered
 - [x] **Bugs / correctness** — null guards, unguarded Record access, double-scaling score (VERIFIED NOT A BUG 2026-06-29 — `placementMultiplier × appliedHeightMult` is intentional multiplicative compounding: crane quality × updraft bonus), damageTower combo reset
@@ -45,6 +45,9 @@
   - `/api/word-tower/wreck` POST: per-USER rate limit (keyed on `user.id`, not just IP), Zod-validated, server-recomputes damage from authoritative DB heights (client can't inflate), attacker name server-derived, 23505 handled idempotently, push notifications fire-and-forget — EXCELLENT security pattern
   - `/api/word-tower/leaderboard` GET: rate-limited (30/60s), auth-gated, top-50 by best_height_m, profiles joined, error-captured — CLEAN
 - [x] **Clarity of use / FTUE** — FIXED 2026-07-03: `wordTower.howTo` translations existed in all 5 langs (en/he/sv/ja/es) but were never rendered. Added FTUE overlay to `WordTowerGame.tsx` using `useDismissedFlag('wt-ftue-v1')` — shows on first visit only, bottom-sheet with 3 steps + "Got it!" dismiss. SHIPPED.
+- [x] **WordTowerWheel.tsx** — AUDITED CLEAN 2026-07-04: pointer events (down/move/up/cancel/leave) all gated on `placing`; letter buttons have `aria-pressed`+`aria-label` via `t()`; `dir` prop threaded through for RTL; drag de-dupe via `addedDuringDragRef`; no hardcoded strings; golden-letter tray visual (`🌟` aria-hidden); placing morph hides letters with `opacity-0 scale-50` (disabled, not removed from DOM — acceptable). CLEAN.
+- [x] **WordTowerSabotageBay.tsx** — AUDITED 2026-07-04: all strings via `t()`; `role="dialog"` + `aria-modal` + `aria-label` on picker overlay; `role="status"` + `aria-live="polite"` on toasts; `useCallback` on handlers; `useEffect` cleanup on all auto-dismiss timers. ONE A11Y BUG FIXED: picker close button `✕` had no `aria-label` — screen readers announced raw multiplication sign. Fixed with `aria-label={t('wordTower.sabotage.cancel')}` + `<span aria-hidden>✕</span>`.
+- [x] **WordTowerShareCard.tsx** — AUDITED 2026-07-04: SSR-only SVG component (params-driven, no hooks). Hardcoded English strings are intentional pattern for OG share images — English-only share cards are industry norm. NOTE: `'s tower` possessive suffix at line 104 is grammatically awkward for Hebrew names (`יונתן's tower`). Non-blocking for release (share card is an enhancement, not core gameplay). Logged as MINOR/DEFER.
 - [x] **errorKey dead in Scene** — VERIFIED INTENTIONAL 2026-07-03: `WordTowerScene.tsx:438-441` comment explicitly states "A rejected WORD is an INPUT mistake, not tower damage — so the error feel lives on the word-builder (HUD: red shake + message + haptic/sound), NOT on the building. Shaking the whole tower for a typo read as 'the building shakes for no reason' (founder feel report 2026-06-07)." HUD shakes on `animate-neo-shake` at `WordTowerHud.tsx:285`. CLOSED — not a bug.
 - [x] **State restore telemetry** — FIXED 2026-07-02: `restoreWordTowerState` silently discarded player progress on version mismatch with zero output. Added `console.warn` when `saved` exists but version mismatches. `lib/wordTower/wordTowerManager.ts:566`.
 - [x] **Clutch banner a11y** — FIXED 2026-07-02: Hard-coded `⚠` emoji wrapped in `<span aria-hidden="true">`. `WordTowerPlay.tsx:1093`.
@@ -59,6 +62,7 @@
 - `StateSchema.passthrough()` — unknown client fields persist in state JSONB; acceptable for forward-compat but marginally increases storage footprint
 - Daily hazard policy unresolved (spec: disable hazards in daily for fair global comparison?) — design defer
 - Daily streak device-local — localStorage, not server-synced; resets on device switch — design decision tied to daily backend
+- `WordTowerShareCard.tsx` line 104: `'s tower` possessive suffix grammatically wrong for Hebrew names — minor, share card is non-core, but worth a locale-aware format string eventually (`wordTower.share.ownerLabel`)
 
 ## Queue (audit order — closest-to-release first)
 

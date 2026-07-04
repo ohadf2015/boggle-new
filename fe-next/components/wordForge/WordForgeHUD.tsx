@@ -17,6 +17,8 @@ interface WordForgeHUDProps {
   wordsFoundCount?: number;
   /** Timestamp (ms) of last word submission — drives live heat-decay bar. */
   chainStartedAt?: number;
+  /** Consecutive clean rounds (no misfires) — drives Iron Streak glow. */
+  ironStreak?: number;
 }
 
 /**
@@ -32,6 +34,7 @@ export function WordForgeHUD({
   bossConstraint,
   wordsFoundCount = 0,
   chainStartedAt = 0,
+  ironStreak = 0,
 }: WordForgeHUDProps): React.JSX.Element {
   const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
@@ -162,18 +165,36 @@ export function WordForgeHUD({
         </div>
       )}
 
-      {/* Words found badge */}
-      {wordsFoundCount > 0 && (
-        <m.div
-          className="flex justify-center"
-          animate={wordsPopping ? { scale: [1, 1.15, 1] } : { scale: 1 }}
-          transition={{ type: 'tween', duration: 0.2 }}
-        >
-          <span className="text-[10px] font-bold text-neo-cream/50 bg-neo-cream/10 px-2 py-0.5 rounded-neo border border-neo-cream/20">
+      {/* Words found + Iron Streak row */}
+      <div className="flex items-center justify-center gap-2">
+        {wordsFoundCount > 0 && (
+          <m.span
+            className="text-[10px] font-bold text-neo-cream/50 bg-neo-cream/10 px-2 py-0.5 rounded-neo border border-neo-cream/20"
+            animate={wordsPopping ? { scale: [1, 1.15, 1] } : { scale: 1 }}
+            transition={{ type: 'tween', duration: 0.2 }}
+          >
             {wordsFoundCount} {t('wordForge.wordsFound').toLowerCase()}
-          </span>
-        </m.div>
-      )}
+          </m.span>
+        )}
+        {ironStreak >= 1 && (
+          <m.span
+            key={ironStreak}
+            initial={prefersReducedMotion ? false : { scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+            className={cn(
+              'text-[10px] font-black px-2 py-0.5 rounded-neo border font-neo-display tracking-wide',
+              ironStreak >= 5
+                ? 'text-neo-red bg-neo-red/20 border-neo-red/60 motion-safe:animate-pulse-subtle'
+                : ironStreak >= 3
+                ? 'text-neo-orange bg-neo-orange/15 border-neo-orange/50'
+                : 'text-neo-yellow/80 bg-neo-yellow/10 border-neo-yellow/30',
+            )}
+          >
+            {ironStreak >= 5 ? '🔥' : ironStreak >= 3 ? '⚡' : '✨'} {t('wordForge.ironStreak')} ×{ironStreak}
+          </m.span>
+        )}
+      </div>
     </div>
   );
 }

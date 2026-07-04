@@ -11667,7 +11667,7 @@ const en = {
         "submit_error": "Something went wrong. Please try again.",
         "rate_limited": "Too many submissions. Please try again in 24 hours.",
         "success_title": "Thanks — we’ve got it!",
-        "success_body": "We’ll be in touch about early access to school features. Keep playing with your class in the meantime — it’s free.",
+        "success_body": "We’ll confirm your trial access and share school plan details within 1–2 business days. Keep playing with your class in the meantime — it’s free.",
         "privacy_note": "We’ll only use this to talk to you about school features. No spam."
       }
     },
@@ -13010,6 +13010,7 @@ const en = {
       "notWord": "Not in the dictionary"
     },
     "dictLoading": "Loading dictionary…",
+    "ironStreak": "Iron Streak",
     "heat": {
       "label": "Forge Heat",
       "masterForge": "MASTER FORGE!",

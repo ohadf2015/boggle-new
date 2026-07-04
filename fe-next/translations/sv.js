@@ -12093,7 +12093,7 @@ const sv = {
         "submit_error": "Något gick fel. Försök igen.",
         "rate_limited": "För många inlämningar. Försök igen om 24 timmar.",
         "success_title": "Tack — vi har tagit emot det!",
-        "success_body": "Vi hör av oss snart om tidig åtkomst till skolfunktioner. Fortsätt spela med din klass under tiden — det är gratis.",
+        "success_body": "Vi bekräftar din provperiod och delar information om skolplanen inom 1–2 arbetsdagar. Fortsätt spela med din klass under tiden — det är gratis.",
         "privacy_note": "Vi använder detta endast för att kontakta dig om skolfunktioner. Ingen spam."
       }
     }
@@ -13397,6 +13397,7 @@ const sv = {
       "notWord": "Inte i ordlistan"
     },
     "dictLoading": "Laddar ordlista…",
+    "ironStreak": "Järnsvit",
     "heat": {
       "label": "Smidesvärme",
       "masterForge": "MÄSTERSMIDE!",

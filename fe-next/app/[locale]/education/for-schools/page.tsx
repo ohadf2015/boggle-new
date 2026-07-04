@@ -161,6 +161,12 @@ export default async function Page({ params }: PageProps) {
               </tbody>
             </table>
           </div>
+          <p className="mt-3 text-xs text-neo-gray-300">
+            Want the full breakdown?{' '}
+            <Link href={`/${locale}/lexiclash-vs-kahoot`} className="text-neo-cyan underline underline-offset-2 hover:text-neo-lime">
+              LexiClash vs Kahoot — feature-by-feature comparison →
+            </Link>
+          </p>
         </section>
 
         {/* What's coming for schools */}

@@ -55,6 +55,7 @@ function createInitialState(): WordForgeRunState {
     bannedLetters: new Set(),
     runSeed: 0,
     chainStartedAt: 0,
+    ironStreak: 0,
   };
 }
 
@@ -119,6 +120,8 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
   const comboRef = useRef(0);
   const lastWordTimeRef = useRef(0);
   const roundStartTimeRef = useRef(0);
+  // true if any word was rejected this round — resets ironStreak on round end
+  const misfiredThisRoundRef = useRef(false);
 
   // Ref for saveRunResults so handleRoundEnd can call it without forward-reference
   const saveRunResultsRef = useRef<(finalState: WordForgeRunState) => void>(() => {});
@@ -128,6 +131,8 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
 
   const handleRoundEnd = useCallback((prev: WordForgeRunState): WordForgeRunState => {
     const passed = prev.roundScore >= prev.roundTarget;
+    const cleanRound = passed && !misfiredThisRoundRef.current;
+    const newIronStreak = cleanRound ? (prev.ironStreak ?? 0) + 1 : 0;
 
     const roundResult = {
       round: prev.round,
@@ -187,6 +192,7 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
       phase: 'roundResult',
       timeRemaining: 0,
       roundHistory: [...prev.roundHistory, roundResult],
+      ironStreak: newIronStreak,
     };
   }, []);
 
@@ -237,6 +243,7 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
     lastWordTimeRef.current = Date.now();
     newState.chainStartedAt = Date.now();
     setState(newState);
+    misfiredThisRoundRef.current = false;
     setLastWordScore(null);
     startTimer();
   }, [startTimer]);
@@ -257,6 +264,8 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
       // Check for timeWarp rune — adds 10s
       const hasTimeWarp = prev.runes.some(r => r.def.id === 'timeWarp');
       const withTimeWarp = hasTimeWarp ? finalTimer + 10 : finalTimer;
+      // Iron Streak ≥3 clean rounds = +10% timer ("forge momentum")
+      const withIronBonus = prev.ironStreak >= 3 ? Math.round(withTimeWarp * 1.1) : withTimeWarp;
 
       // Check for bigGrid rune — 6x6 grid (HIGH-7)
       const hasBigGrid = prev.runes.some(r => r.def.id === 'bigGrid');
@@ -275,12 +284,13 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
         bannedLetters: new Set(),
         grid: pickRichestBoardClient(() => generateWordForgeGrid(finalGridSize, languageRef.current), languageRef.current, 4),
         gridSize: finalGridSize,
-        timerDuration: withTimeWarp,
-        timeRemaining: withTimeWarp,
+        timerDuration: withIronBonus,
+        timeRemaining: withIronBonus,
         chainStartedAt: roundNow,
       };
     });
     comboRef.current = 0;
+    misfiredThisRoundRef.current = false;
     roundStartTimeRef.current = Date.now();
     lastWordTimeRef.current = Date.now();
     setLastWordScore(null);
@@ -290,6 +300,7 @@ export function useWordForgeRun(language: Language = 'en'): UseWordForgeRunRetur
   // ─── Submit Word ───────────────────────────────────────
 
   const reject = useCallback((reason: WordForgeRejectReason, word: string) => {
+    misfiredThisRoundRef.current = true;
     rejectNonceRef.current += 1;
     setLastRejection({ reason, word: word.toUpperCase(), nonce: rejectNonceRef.current });
   }, []);

@@ -18,6 +18,7 @@ const guidesContent: Record<string, {
   faq: Array<{ question: string; answer: string }>;
   faqHeading: string;
   educationCta: { heading: string; body: string; links: Array<{ label: string; path: string }> };
+  relatedReading?: { heading: string; links: Array<{ label: string; href: string }> };
 }> = {
   en: {
     title: 'LexiClash Strategy Guides',
@@ -44,6 +45,14 @@ const guidesContent: Record<string, {
         { label: 'Education Hub', path: 'education' },
         { label: 'LexiClash for Schools', path: 'education/for-schools' },
         { label: 'ESL Word Games', path: 'education/esl-word-games' },
+      ],
+    },
+    relatedReading: {
+      heading: 'Further Reading',
+      links: [
+        { label: 'Best Boggle alternatives in 2026', href: '/en/blog/best-boggle-alternatives-2026' },
+        { label: 'Boggle vs. Scrabble — which is better?', href: '/en/blog/boggle-vs-scrabble' },
+        { label: 'Best online word games ranked', href: '/en/best-online-word-games' },
       ],
     },
   },
@@ -74,6 +83,14 @@ const guidesContent: Record<string, {
         { label: 'משחקי מילים לאנגלית כשפה זרה', path: 'education/esl-word-games' },
       ],
     },
+    relatedReading: {
+      heading: 'קריאה נוספת',
+      links: [
+        { label: 'חלופות Boggle הטובות ביותר ב-2026', href: '/en/blog/best-boggle-alternatives-2026' },
+        { label: 'Boggle מול Scrabble — מי מנצח?', href: '/en/blog/boggle-vs-scrabble' },
+        { label: 'משחקי המילים הטובים ביותר אונליין', href: '/en/best-online-word-games' },
+      ],
+    },
   },
   sv: {
     title: 'LexiClash Strategiguider',
@@ -100,6 +117,14 @@ const guidesContent: Record<string, {
         { label: 'Utbildningshub', path: 'education' },
         { label: 'LexiClash för skolor', path: 'education/for-schools' },
         { label: 'Engelska som andraspråk', path: 'education/esl-word-games' },
+      ],
+    },
+    relatedReading: {
+      heading: 'Mer läsning',
+      links: [
+        { label: 'Bästa Boggle-alternativen 2026', href: '/en/blog/best-boggle-alternatives-2026' },
+        { label: 'Boggle vs. Scrabble — vilket är bäst?', href: '/en/blog/boggle-vs-scrabble' },
+        { label: 'Bästa ordspelen online rankade', href: '/en/best-online-word-games' },
       ],
     },
   },
@@ -130,6 +155,14 @@ const guidesContent: Record<string, {
         { label: 'ESL単語ゲーム', path: 'education/esl-word-games' },
       ],
     },
+    relatedReading: {
+      heading: '関連記事',
+      links: [
+        { label: '2026年のボーグル代替ゲームベスト', href: '/en/blog/best-boggle-alternatives-2026' },
+        { label: 'ボーグル対スクラブル — どっちがいい？', href: '/en/blog/boggle-vs-scrabble' },
+        { label: 'おすすめオンラインワードゲームランキング', href: '/en/best-online-word-games' },
+      ],
+    },
   },
   es: {
     title: 'Guias de Estrategia LexiClash',
@@ -156,6 +189,14 @@ const guidesContent: Record<string, {
         { label: 'Centro educativo', path: 'education' },
         { label: 'LexiClash para instituciones', path: 'education/for-schools' },
         { label: 'Juegos de palabras en inglés', path: 'education/esl-word-games' },
+      ],
+    },
+    relatedReading: {
+      heading: 'Lectura adicional',
+      links: [
+        { label: 'Mejores alternativas a Boggle en 2026', href: '/en/blog/best-boggle-alternatives-2026' },
+        { label: 'Boggle vs. Scrabble — ¿cuál es mejor?', href: '/en/blog/boggle-vs-scrabble' },
+        { label: 'Los mejores juegos de palabras online', href: '/en/best-online-word-games' },
       ],
     },
   },
@@ -296,6 +337,28 @@ export default function GuidesIndexPageClient(): React.ReactElement {
           </ul>
         </section>
 
+        {content.relatedReading && (
+          <section className="mt-8 max-w-2xl mx-auto">
+            <h2 className={cn('text-base font-semibold mb-3', isDarkMode ? 'text-neo-gray-200' : 'text-gray-700')}>
+              {content.relatedReading.heading}
+            </h2>
+            <ul className="flex flex-wrap gap-3">
+              {content.relatedReading.links.map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className={cn(
+                      'text-sm font-medium underline underline-offset-2',
+                      isDarkMode ? 'text-neo-cyan hover:text-neo-cyan/80' : 'text-neo-black hover:opacity-70'
+                    )}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         <InlineBannerAd webZone="content-page" className="mt-8" />
       </main>
     </div>

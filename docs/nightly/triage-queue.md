@@ -9,6 +9,24 @@ Items deferred from automated nightly triage. Human review required.
 - Variants: control (sheet+toast) vs toast-disabled (sheet only). 54-day window with no winner surfaced.
 - Recommended owner: human — check PostHog experiment results; if no winner at n≥1000/arm retire and keep `toast-disabled` (simpler UX).
 
+## 2026-07-04
+
+### [Flag Retirement] exp-results-replay-cta-v1 — 32 days, needs decision
+- Created 2026-06-02, active, rollout 50%, wired in `components/singleplayer/SinglePlayerResults.tsx`.
+- Variants: control vs quick-replay ("Run it back?" button on SP results). 32-day window — past the 14-day inconclusive threshold.
+- Recommended owner: human — pull PostHog experiment results (`exp-results-replay-cta-v1`); if quick-replay arm wins (≥p<0.05, n≥1000/arm) unwire the conditional and keep the button. If inconclusive, retire and keep `control`.
+
+### [Flag Kill-switch Audit] landing-modes-cubes-v1 — 23 days, experiment concluded
+- Created 2026-06-11, active, rollout 100%. Code default flipped to `cubes` (experiment concluded). `control` retained only as remote PostHog kill-switch.
+- **No active A/B test** — all users get `cubes`. The PostHog flag is purely a deployment safety valve now, not an experiment.
+- Recommended owner: human — if the kill-switch is no longer needed (30+ days of stable `cubes`), delete the flag from PostHog and remove the conditional in `LandingModeCubes.tsx` to simplify code.
+
+### [Experiment Proposal] exp-mp-room-join-loading-v1 — root-cause for /en/multiplayer rage clicks
+- Rage clicks on /en/multiplayer (PostHog 24h signal) root cause: `RoomListView` room-card buttons have no disabled/loading state when `joiningRoomCode` is set. User clicks a room → async join fires → nothing visually changes → rage-clicks.
+- `CgAwareLobbyChrome` already holds `joiningRoomCode` prop but passes it only as `isQuickPlayLoading` to `RoomListView` (disabling Quick Start). Individual room cards are never disabled.
+- **Proposed fix**: Add `joiningRoomCode?: string | null` to `RoomListViewProps`; in the card render, gate `disabled={joiningRoomCode === room.gameCode}` + spinner behind `exp-mp-room-join-loading-v1` loading-state variant. Wire in `CgAwareLobbyChrome` + ensure flag in PostHog.
+- **Files**: `lib/experiments.ts` (+1 entry), `components/multiplayer/RoomListView.tsx` (~8 lines), `components/multiplayer/CgAwareLobbyChrome.tsx` (~1 line). Deferred from 07-04 lane (time budget); should be picked up by lane-03 on 07-05.
+
 ## 2026-07-02
 
 - [Sentry] JAVASCRIPT-NEXTJS-1KQ — Error: churn-signals report failed with status 502
@@ -1237,3 +1255,46 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - 20260629020000_rls_initplan_fix_and_word_clubs_fk_index: APPLIED ✓
 - No 06-30 migration file exists on disk — learnings note "3 unapplied migrations 06-28/29/30" was stale
 - status: resolved — learnings note to be corrected by lane-07
+
+---
+
+## 2026-07-04
+- [Sentry] JAVASCRIPT-NEXTJS-1CW — TypeError: Cannot read properties of null (reading 'clear')
+  - first: 2026-05-15, last: 2026-06-09, count: 13, users: 4
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1CW
+  - status: deferred (no code change needed — guards already in place)
+  - why: All .clear() callers in gameEngine (TileRenderer.ts:429, TrailRenderer.ts:60+68, ScreenFlash.ts:78, GameCanvas.tsx:154) already guarded with `_destroyed || graphics?.destroyed` checks. Last seen 25 days ago. Sentry MCP token is read-only (403 on update).
+  - recommended owner: review-by-eod — manually resolve in Sentry UI: lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1CW
+
+- [Sentry] JAVASCRIPT-NEXTJS-1KQ — Error: churn-signals report failed with status 502
+  - first: 2026-06-03, last: 2026-06-05, count: 278, users: 3
+  - link: https://lexiclash.sentry.io/issues/124871662/
+  - status: deferred
+  - why: useChurnSignals hook does not exist in current codebase. Chunk hash (0zi.dqcpmu2.9.js) from old build. Code was removed in a subsequent deploy. Sentry MCP read-only.
+  - recommended owner: review-by-eod — manually resolve in Sentry UI
+
+- [Sentry] JAVASCRIPT-NEXTJS-1M7 — NotFoundError: Failed to execute 'insertBefore' on 'Node'
+  - first: 2026-06-05, last: 2026-06-05, count: 2, users: 1
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1M7
+  - status: deferred
+  - why: Old build chunk hash; 2 occurrences June 5 only. Likely transient React DOM reconciliation error from a navigation race. Low impact. Sentry MCP read-only.
+  - recommended owner: review-by-eod — manually resolve in Sentry UI if no recurrence
+
+- [Sentry] JAVASCRIPT-NEXTJS-1MC — Invalid username pattern (parentheses not stripped)
+  - first/last: 2026-06-05, count: 1, users: 1
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1MC
+  - status: deferred — fix queued
+  - why: User "Sonia Díaz Conesa (Sonia Conesa)" — parentheses () not allowed by backend UsernameSchema but not stripped client-side before socket emit. Backend correctly rejects, but Sentry logs it as an error. Fix: strip invalid chars from username before MP join emit. Low priority (1 occurrence, June 5).
+  - recommended owner: lane-01 next run — find UsernameSchema, add strip to client-side join handler
+
+- [Supabase] authenticated_security_definer_function_executable — upsert_push_token
+  - evidence: Function public.upsert_push_token is SECURITY DEFINER executable by authenticated role
+  - status: deferred — intentional
+  - why: Function needs SECURITY DEFINER to UPDATE tokens owned by OTHER users (token rotation: deactivates same-token rows where user_id != auth.uid()). Already hardened with SET search_path = ''. No anon path exists (API route requires auth.getUser() first). Reviewed 2026-07-04.
+  - recommended owner: none — this is intentional. Can add a comment to the function explaining why SECURITY DEFINER is required.
+
+- [Supabase] rls_policy_always_true — teacher_access_requests.tar_insert_any
+  - evidence: INSERT policy WITH CHECK always true for teacher_access_requests
+  - status: deferred
+  - why: RLS policy REPLACEMENT on existing table = autonomy matrix DEFER. The always-true INSERT allows anyone to submit a teacher access request (intentional — open signup flow). To harden: restrict WITH CHECK to auth.uid() IS NOT NULL. Requires understanding if anon submissions are needed.
+  - recommended owner: backend — add `WITH CHECK (auth.uid() IS NOT NULL)` if anon submissions are not required

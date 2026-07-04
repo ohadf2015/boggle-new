@@ -208,9 +208,10 @@ export function WordTowerSabotageBay({
               <button
                 type="button"
                 onClick={onClose}
+                aria-label={t('wordTower.sabotage.cancel')}
                 className="rounded-neo border-neo border-black bg-neo-navy-light px-2 py-1 font-neo-body text-xs font-bold text-neo-white shadow-hard"
               >
-                ✕
+                <span aria-hidden>✕</span>
               </button>
             </div>
             {rivals.length === 0 ? (

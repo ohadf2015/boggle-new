@@ -245,6 +245,7 @@ export default function WordForgeGame(): React.JSX.Element {
         bossConstraint={run.state.bossConstraint}
         wordsFoundCount={run.state.wordsThisRound.length}
         chainStartedAt={run.state.chainStartedAt}
+        ironStreak={run.state.ironStreak}
       />
 
       {/* Grid */}

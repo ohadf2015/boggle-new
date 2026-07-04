@@ -125,6 +125,8 @@ export interface WordForgeRunState {
   runSeed: number;
   /** Timestamp (ms) when the last word was submitted or the round started — drives the heat-decay bar. */
   chainStartedAt: number;
+  /** Consecutive clean rounds (no rejected words) — drives Iron Streak glow + timer bonus. */
+  ironStreak: number;
 }
 
 export interface RoundResult {

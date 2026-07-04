@@ -1,9 +1,9 @@
 {
-  "date": "2026-07-03",
-  "note": "7d window (24h: 0 routes n≥50). Only above-floor route: /he (n=60) improving across all metrics — LCP 2354ms (↓from 2672ms), INP 170ms (↓from 254ms), CLS 0.078 (stable). Sub-floor routes show alarming CLS (0.7-1.6) but ineligible for regression verdict. /en/daily LCP 10204ms (n=3, sub-floor) — root cause identified: dynamic-import chain + Framer Motion opacity-0 container delays LCP candidate visibility. No code fix tonight (all regression routes sub-floor; /he improving). Supabase MCP absent (8th consecutive night) — 2 migrations still pending apply.",
+  "date": "2026-07-04",
+  "note": "7d window (24h: 0 routes n≥50). /he peak at n=42 — still below 50-sample floor (was n=60 last week, traffic dip). No above-floor routes eligible for regression verdict. Sub-floor CLS extremes (0.7-1.6) on game pages remain ineligible. 6.4MB dictionary chunk (7fd32332) confirmed lazy-loaded (webpack-runtime reference only) — not on critical path. Supabase MCP absent (9th consecutive night) — 2 migrations still pending apply. No code shipped tonight: all regression routes sub-floor; Supabase unavailable.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (8th consecutive night). Migration runner uses exec_sql RPC that does not exist on prod. Cannot apply migrations via JS client or MCP.",
+    "note": "Supabase MCP absent (9th consecutive night). Cannot apply migrations via MCP or exec_sql RPC.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
@@ -13,16 +13,16 @@
           "RLS initplan fix: (select auth.role()) on quest_achievement_feed policy",
           "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)"
         ],
-        "carry_count": 7,
-        "status": "WRITTEN — pending apply (7th night)"
+        "carry_count": 8,
+        "status": "WRITTEN — pending apply (8th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
         "items": [
           "DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup"
         ],
-        "carry_count": 2,
-        "status": "WRITTEN — pending apply (2nd night)"
+        "carry_count": 3,
+        "status": "WRITTEN — pending apply (3rd night)"
       }
     ],
     "remaining_advisor_items": [
@@ -30,116 +30,115 @@
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 7
+        "carry_count": 8
       },
       {
         "id": "unindexed_fk_word_club_members_user_id",
-        "status": "LIKELY FALSE POSITIVE — idx_word_club_members_user already in migration 20260322700000_growth_retention_features.sql:149. Pending migration 20260628 confirms with idx_word_clubs_owner_id covering owner FK.",
+        "status": "LIKELY FALSE POSITIVE — idx_word_club_members_user already in migration 20260322700000_growth_retention_features.sql:149. Pending migration 20260628 covers idx_word_clubs_owner_id.",
         "priority": "LOW",
-        "carry_count": 7
+        "carry_count": 8
       },
       {
         "id": "unused_index_word_wheel_catchup",
-        "status": "Migration written (20260701020000). Pending apply (2nd night).",
+        "status": "Migration written (20260701020000). Pending apply (3rd night).",
         "priority": "LOW",
-        "carry_count": 2
+        "carry_count": 3
       }
     ]
   },
   "frontend": {
-    "note": "7d window. Only /he above n≥50 floor. All game pages show alarming sub-floor CLS (0.7-1.6), ineligible for regression verdicts. Root cause investigation: DailyChallengeLanding uses Framer Motion initial opacity-0 on outer container — delays LCP. Dynamic import chain for DailyRedirect (browser-API dependency) compounds the issue.",
+    "note": "7d window. /he n=42 (BELOW 50-sample floor — was 60 last week, traffic dip). No above-floor routes. Documented opacity-0 LCP issue re-investigated: no Framer Motion opacity-0 found in DailyChallengeLanding.tsx or DailyRedirect.tsx — issue may have already been resolved. Homepage LCP candidate root cause: useState(mounted)+showFTUE gates LandingView behind JS execution, adding hydration latency before first paint.",
     "by_route": [
       {
         "route": "/he",
-        "p75_lcp_ms": 2354,
-        "p75_inp_ms": 170,
-        "p75_cls": 0.078,
-        "n_7d": 60,
+        "p75_lcp_ms": null,
+        "p75_inp_ms": null,
+        "p75_cls": null,
+        "n_7d": 42,
         "window": "7d",
-        "lcp_status": "GOOD — 2354ms (↓ from 2672ms, -11.9%). Strong improving trend.",
-        "inp_status": "GOOD — 170ms (↓ from 254ms, -33%). Below 200ms threshold.",
-        "cls_status": "OK — 0.078 (stable, ↓ from 0.080)."
+        "lcp_status": "DEFERRED — n=42, below 50-sample floor (was 60 last week). Improving trend from prior nights continues.",
+        "inp_status": "DEFERRED — n=42, below 50-sample floor.",
+        "cls_status": "DEFERRED — n=42, below 50-sample floor."
       }
     ],
     "sub_floor_observations": [
       {
         "route": "/",
-        "p75_cls": 0.866,
-        "n_7d": 30,
-        "note": "APPROACHING FLOOR (n=30). Extreme CLS. Likely from redirect chain through middleware + anchor ad height adjustment. Watch for n≥50."
+        "n_7d": 39,
+        "note": "Near-floor (n=39). Homepage LCP 4117ms reported by brief (Phase 0 data). Root cause candidate: useState(mounted)+showFTUE gates LandingView render, adding JS execution overhead before paint. LandingView has no raw img tags without priority — image loading is not the bottleneck."
       },
       {
         "route": "/he/daily/word-hunt",
-        "p75_cls": 0.982,
-        "p75_inp_ms": 952,
-        "n_7d": 21,
-        "note": "Extreme CLS and INP. Game state transitions (loading→game→results) likely cause large layout shifts if results not position:fixed. Sub-floor — cannot verdict."
+        "n_7d": 23,
+        "note": "Sub-floor. Game-state-transition CLS pattern."
       },
       {
         "route": "/en/daily/word-wheel",
-        "p75_lcp_ms": 4252,
-        "p75_cls": 0.980,
-        "n_7d": 18,
-        "note": "Extreme CLS. Same game-state-transition pattern. Sub-floor."
+        "n_7d": 17,
+        "note": "Sub-floor."
       },
       {
-        "route": "/en/daily",
-        "p75_lcp_ms": 10204,
-        "n_7d": 3,
-        "note": "DEFERRED — n=3, far below 50-sample floor. Root cause analysis done: dynamic-import + Framer Motion opacity-0 cascade. No regression verdict."
-      },
-      {
-        "route": "/he/blast",
-        "p75_cls": 1.624,
-        "n_7d": 11,
-        "note": "Extreme CLS (>1.0). Sub-floor."
+        "route": "/en/multiplayer",
+        "n_7d": 14,
+        "note": "Sub-floor. INP structural (Socket.IO heavy client)."
       }
     ],
-    "lcp_root_cause_note": "DailyChallengeLanding outer container uses initial={{opacity:0}} Framer Motion. Chrome excludes opacity-0 elements from LCP measurement. Fix: gate opacity animation on useReducedMotion() or skip opacity-0 for above-fold container. Architecture blocker: DailyRedirect uses browser APIs (LanguageContext → localStorage), must stay dynamic import (no SSR)."
+    "lcp_root_cause_note": "Homepage: mounted/showFTUE useState gates LandingView render. Server emits LandingView, client re-mounts after FTUE check — adds hydration latency. Fix: render LandingView unconditionally from SSR; gate FTUE overlay separately (not the base content). Low blast-radius. Prioritize when / reaches n>=50."
   },
   "bundle": {
-    "total_static_kb": null,
-    "note": "No .next build artifacts in working tree. Gate runs authoritative build.",
-    "top_chunks": []
+    "total_uncompressed_kb": 41048,
+    "note": "Uncompressed build artifacts (~4x multiplier to gzip). Dictionary chunk (7fd32332, 6.4MB) confirmed lazy-loaded — not on critical path.",
+    "top_chunks": [
+      { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6452, "note": "Word dictionary — LAZY (not critical path)" },
+      { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3284 },
+      { "name": "82055-affbfbb6ca395994.js", "kb": 856 },
+      { "name": "64789-5dffd4566c33487b.js", "kb": 708 },
+      { "name": "68292.bb49bb9873fa2566.js", "kb": 648 },
+      { "name": "39299-1e5fefa3989b2cd0.js", "kb": 568 },
+      { "name": "82745-3db5a1cd5a8d6a70.js", "kb": 548 },
+      { "name": "62972-b16db851d55471f3.js", "kb": 504 }
+    ]
   },
   "open_watches": [
     {
-      "id": "supabase_mcp_absent_8_nights",
-      "description": "Supabase MCP absent 8 consecutive nights. 2 migrations accumulate unverified (20260628 + 20260701). run-migrations.js unusable (exec_sql RPC missing). ESCALATED: mint never-expire PAT into nightly env. Human action required.",
+      "id": "supabase_mcp_absent_9_nights",
+      "description": "Supabase MCP absent 9 consecutive nights. 2 migrations accumulate unverified (20260628 carry=8, 20260701 carry=3). ESCALATED: mint never-expire PAT into nightly env. Human action required.",
       "status": "ESCALATED — human action required",
       "priority": "HIGH"
     },
     {
       "id": "migration_pending_apply_06_28",
-      "description": "20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql — RLS initplan + word_clubs owner_id FK index. Carry_count=7.",
-      "status": "open — 7th night without MCP"
+      "description": "20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql — RLS initplan + word_clubs owner_id FK index. Carry_count=8.",
+      "status": "open — 8th night without MCP"
     },
     {
       "id": "migration_pending_apply_07_01",
-      "description": "20260701020000_drop_unused_index_word_wheel_catchup.sql — DROP unused idx_word_wheel_attempts_catchup. Carry_count=2.",
-      "status": "open — 2nd night without MCP"
+      "description": "20260701020000_drop_unused_index_word_wheel_catchup.sql — DROP unused idx_word_wheel_attempts_catchup. Carry_count=3.",
+      "status": "open — 3rd night without MCP"
     },
     {
-      "id": "he_route_improving",
-      "description": "/he (n=60) LCP 2354ms/INP 170ms/CLS 0.078 — all improving. No fix needed. Continue monitoring.",
-      "status": "healthy — watch"
+      "id": "traffic_dip_below_floor",
+      "description": "/he at n=42 in 7d (was 60 last week). All routes sub-floor. Cannot make regression verdicts until traffic recovers.",
+      "status": "watching",
+      "priority": "LOW"
     },
     {
-      "id": "daily_lcp_opacity_animation",
-      "description": "DailyChallengeLanding outer container uses initial={{opacity:0}} Framer Motion — suppresses LCP candidate. Fix: add useReducedMotion() guard or skip opacity-0 on the outer container. Low-risk change. Prioritize when /en/daily reaches n≥50.",
-      "status": "documented — not yet actionable (n=3)",
+      "id": "homepage_lcp_ftue_gate",
+      "description": "Homepage LCP 4117ms (Phase 0 brief, n=39 sub-floor). Root cause candidate: useState(mounted)+showFTUE gates LandingView render. Fix: render LandingView unconditionally; gate FTUE overlay separately. Low blast-radius. Prioritize when / reaches n>=50.",
+      "status": "documented — not yet actionable (n=39, sub-floor)",
       "priority": "MEDIUM"
+    },
+    {
+      "id": "dictionary_chunk_lazy_confirmed",
+      "description": "6.4MB chunk 7fd32332 (word dictionary) confirmed lazy-loaded (only referenced by webpack-runtime). NOT on critical path. Not a LCP blocker.",
+      "status": "resolved — no action needed",
+      "priority": "LOW"
     },
     {
       "id": "sub_floor_cls_game_pages",
-      "description": "Multiple game pages (/he/daily/word-hunt, /en/daily/word-wheel, /he/blast) show CLS 0.98-1.62 at n<50. Likely game state transitions (loading→game→results) causing in-flow layout shifts. Investigate results overlay positioning. Ineligible for regression verdicts until n≥50.",
+      "description": "Multiple game pages show extreme CLS at n<50. Ineligible for verdict. Watch for n>=50.",
       "status": "documented — sub-floor, cannot verdict",
       "priority": "MEDIUM"
-    },
-    {
-      "id": "mp_inp_structural",
-      "description": "/en/multiplayer (n=14, sub-floor) INP 376ms. Socket-heavy client. Needs Chrome profiler trace.",
-      "status": "open — structural"
     }
   ]
 }

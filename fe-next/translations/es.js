@@ -11985,7 +11985,7 @@ const es = {
         "submit_error": "Algo salió mal. Por favor intenta de nuevo.",
         "rate_limited": "Demasiados envíos. Por favor intenta de nuevo en 24 horas.",
         "success_title": "¡Gracias — lo recibimos!",
-        "success_body": "Nos pondremos en contacto pronto sobre acceso anticipado a funciones escolares. Mientras tanto, sigue jugando con tu clase — es gratis.",
+        "success_body": "Confirmaremos tu acceso de prueba y compartiremos los detalles del plan escolar en 1–2 días hábiles. Mientras tanto, sigue jugando con tu clase — es gratis.",
         "privacy_note": "Solo usaremos esto para comunicarnos contigo sobre funciones escolares. Sin spam."
       }
     },
@@ -13383,6 +13383,7 @@ const es = {
       "notWord": "No está en el diccionario"
     },
     "dictLoading": "Cargando diccionario…",
+    "ironStreak": "Racha de hierro",
     "heat": {
       "label": "Calor de Forja",
       "masterForge": "¡GRAN FORJA!",
