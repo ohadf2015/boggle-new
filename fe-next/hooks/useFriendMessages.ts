@@ -63,6 +63,12 @@ export function useFriendMessages(
   const threadsIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const messagesIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Guards against overlapping conversation fetches. The 5s offline-poll fallback
+  // re-fires loadMessages on an interval; under a slow network the previous
+  // getConversation can still be in flight, stacking duplicate friend_messages
+  // requests (Sentry N+1 API-call on /admin/analytics). Skip a fresh-load poll
+  // while one is already running (pagination `before` loads are still allowed).
+  const loadInFlightRef = useRef(false);
 
   /**
    * Load message threads
@@ -85,6 +91,9 @@ export function useFriendMessages(
    */
   const loadMessages = useCallback(async (targetFriendId: string, before?: number) => {
     if (!targetFriendId) return;
+    // Drop overlapping fresh-load polls (a slow getConversation still in flight).
+    if (loadInFlightRef.current && !before) return;
+    loadInFlightRef.current = true;
 
     setIsLoading(true);
     setError(null);
@@ -111,6 +120,7 @@ export function useFriendMessages(
       logger.error('USE_FRIEND_MESSAGES', `Error loading messages: ${(err as Error).message}`);
       setError('Failed to load messages');
     } finally {
+      loadInFlightRef.current = false;
       setIsLoading(false);
     }
   }, [user?.id]);

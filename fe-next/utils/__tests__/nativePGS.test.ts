@@ -48,6 +48,13 @@ vi.mock('@openforge/capacitor-game-connect', () => ({
   CapacitorGameConnect: mockGameConnect,
 }));
 
+// Mock Capacitor — initializePlayGames now gates on the native plugin being
+// registered (isPluginAvailable), so the bridge only runs on real device builds.
+const mockIsPluginAvailable = vi.hoisted(() => vi.fn(() => true));
+vi.mock('@capacitor/core', () => ({
+  Capacitor: { isPluginAvailable: mockIsPluginAvailable },
+}));
+
 describe('Native Play Games Services bridge', () => {
   const mockIsAndroid = platform.isAndroid as jest.Mock;
 
@@ -55,8 +62,9 @@ describe('Native Play Games Services bridge', () => {
     vi.clearAllMocks();
     __resetForTesting();
 
-    // Default: native Android
+    // Default: native Android with the plugin natively registered
     mockIsAndroid.mockReturnValue(true);
+    mockIsPluginAvailable.mockReturnValue(true);
 
     mockGameConnect.signIn.mockResolvedValue({ player_name: 'Ada', player_id: 'p_123' });
     mockGameConnect.submitScore.mockResolvedValue(undefined);
@@ -75,6 +83,17 @@ describe('Native Play Games Services bridge', () => {
       // THEN: false, no plugin call, unavailable
       expect(result).toBe(false);
       expect(isPlayGamesAvailable()).toBe(false);
+    });
+
+    it('returns false on Android when the native plugin is not registered (no unhandled rejection)', async () => {
+      // GIVEN: Android but the native CapacitorGameConnect module isn't compiled in
+      mockIsPluginAvailable.mockReturnValue(false);
+      // WHEN: initialize
+      const result = await initializePlayGames();
+      // THEN: skips cleanly — never touches the plugin proxy
+      expect(result).toBe(false);
+      expect(isPlayGamesAvailable()).toBe(false);
+      expect(mockGameConnect.signIn).not.toHaveBeenCalled();
     });
 
     it('returns true on Android and is idempotent', async () => {

@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Script from 'next/script';
 import { Capacitor } from '@capacitor/core';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
@@ -42,17 +41,25 @@ export function AdSenseLoader() {
     onboardingActive,
   });
 
-  if (!load) return null;
+  // Inject the AdSense loader as a plain <script> instead of next/script.
+  // next/script stamps a `data-nscript` attribute on the tag, which AdSense's
+  // adsbygoogle.js rejects ("AdSense head tag doesn't support the data-nscript
+  // attribute" — a Sentry warning). A raw async script tag is the integration
+  // Google documents. Idempotent (id guard) and consent-gated via `load`.
+  useEffect(() => {
+    if (!load) return;
+    const client = getAdSenseClient();
+    if (!client) return;
+    if (document.getElementById('adsbygoogle-init')) return;
+    const s = document.createElement('script');
+    s.id = 'adsbygoogle-init';
+    s.async = true;
+    s.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(client)}`;
+    s.crossOrigin = 'anonymous';
+    document.head.appendChild(s);
+  }, [load]);
 
-  const client = getAdSenseClient();
-  return (
-    <Script
-      id="adsbygoogle-init"
-      src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(client)}`}
-      strategy="afterInteractive"
-      crossOrigin="anonymous"
-    />
-  );
+  return null;
 }
 
 export default AdSenseLoader;

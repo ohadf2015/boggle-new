@@ -23,6 +23,7 @@
  */
 
 import type { CapacitorGameConnectPlugin } from '@openforge/capacitor-game-connect';
+import { Capacitor } from '@capacitor/core';
 import { isAndroid } from '@/utils/platform';
 import logger from '@/utils/logger';
 
@@ -71,6 +72,18 @@ function errMessage(error: unknown): string {
 export async function initializePlayGames(): Promise<boolean> {
   if (!isAndroid()) {
     logger.log('[PGS] Not Android, skipping Play Games initialization');
+    return false;
+  }
+
+  // Only touch the plugin when its NATIVE implementation is actually registered
+  // on this device. On builds where the Android module isn't compiled in, every
+  // access to the Capacitor proxy — including the implicit `.then` when the
+  // returned value is awaited — rejects with "CapacitorGameConnect.<x>() is not
+  // implemented on android", surfacing as an unhandled promise rejection in
+  // Sentry. Gating here (the single chokepoint all PGS calls route through)
+  // skips it cleanly instead.
+  if (!Capacitor.isPluginAvailable('CapacitorGameConnect')) {
+    logger.log('[PGS] CapacitorGameConnect native plugin unavailable, skipping');
     return false;
   }
 

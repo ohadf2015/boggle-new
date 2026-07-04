@@ -102,7 +102,10 @@ export async function verifyWordOnJisho(word: string): Promise<JishoVerification
       return { verified: false, status: 'not_found' };
     }
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('JishoVerify', `Error verifying "${word}"`, { error: errorMessage });
+    // jisho.org is a best-effort EXTERNAL dependency: timeouts, 5xx and network
+    // blips are expected noise, not our bug, and the caller degrades gracefully
+    // (status: 'error'). Warn (not error) so transient flakiness doesn't page Sentry.
+    logger.warn('JishoVerify', `Error verifying "${word}"`, { error: errorMessage });
     return { verified: false, status: 'error', error: errorMessage };
   }
 }

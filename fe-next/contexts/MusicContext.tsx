@@ -277,10 +277,10 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
       pendingUnlockTrackRef.current = null;
       logger.log('[Music] unlockAudio - Playing pending track:', trackKey);
-      pendingUnlockTimeoutRef.current = setTimeout(() => {
-        pendingUnlockTimeoutRef.current = null;
-        fadeToTrackRef.current?.(trackKey, fadeOutMs, fadeInMs);
-      }, 100);
+      // iOS: html5 audio must start playback within the user-gesture activation
+      // window. A setTimeout defer (even 100ms) pushes play() outside that window
+      // → iOS blocks it and music never starts. Kick it off synchronously here.
+      fadeToTrackRef.current?.(trackKey, fadeOutMs, fadeInMs);
     }
   }, []);
 
@@ -422,31 +422,32 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
   useEffect(() => {
     if (typeof window === 'undefined' || audioUnlocked) return;
 
-    const handleFirstInteraction = async (): Promise<void> => {
+    const handleFirstInteraction = (): void => {
       if (audioUnlockedRef.current) return;
       logger.log('[Music] First user interaction detected, unlocking audio...');
-
-      try {
-        const H = await getHowler();
-        if (H.ctx && H.ctx.state === 'suspended') {
-          await H.ctx.resume();
-        }
-      } catch (err) { logger.log('[Music] Failed to resume AudioContext:', err); }
 
       audioUnlockedRef.current = true;
       setAudioUnlocked(true);
 
-      // Play pending track if unlockAudio() hasn't already consumed it
+      // iOS: start the pending track SYNCHRONOUSLY inside the gesture handler —
+      // html5 audio won't autoplay once we leave the user-activation window, and
+      // an `await` (Howler load / ctx.resume) crosses a microtask boundary that
+      // ends it. Play first, resume the WebAudio context in the background.
       if (pendingUnlockTrackRef.current) {
         const { trackKey, fadeOutMs, fadeInMs } = pendingUnlockTrackRef.current;
         pendingUnlockTrackRef.current = null;
         fadeToTrack(trackKey, fadeOutMs, fadeInMs);
       }
 
+      getHowler().then((H) => {
+        if (H.ctx && H.ctx.state === 'suspended') H.ctx.resume().catch(() => {});
+      }).catch((err) => { logger.log('[Music] Failed to resume AudioContext:', err); });
+
       cleanup();
     };
 
-    const events = ['click', 'touchend', 'keydown'];
+    // pointerdown fires earliest (before touchend/click) → widest activation window on iOS.
+    const events = ['pointerdown', 'click', 'touchend', 'keydown'];
     events.forEach(event => {
       document.addEventListener(event, handleFirstInteraction, { capture: true, passive: true });
     });

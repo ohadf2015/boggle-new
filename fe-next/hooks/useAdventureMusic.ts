@@ -133,6 +133,9 @@ export function useAdventureMusic({
   // Track refs for Howl instances
   const track1Ref = useRef<Howl | null>(null);
   const track2Ref = useRef<Howl | null>(null);
+  // Howls currently mid-replay from their own onend handler — re-entrancy guard
+  // that breaks a synchronous onend→play→onend recursion (stack-overflow fix).
+  const replayingHowlsRef = useRef<Set<Howl>>(new Set());
 
   // State refs
   const currentTrackRef = useRef<1 | 2 | null>(null);
@@ -317,12 +320,24 @@ export function useAdventureMusic({
                           (isTrack2 && currentTrackRef.current === 2);
 
         if (shouldLoop && enabledRef.current && isPlayingRef.current && !isPausedRef.current) {
+          // Re-entrancy guard against infinite recursion (Sentry RangeError
+          // "Maximum call stack size exceeded", a.play ↔ a._ended): a
+          // zero-duration / corrupt decode can fire 'end' synchronously from
+          // within howl.play() below, re-entering this handler on the same stack
+          // → overflow. If we're already replaying THIS howl, bail — the outer
+          // call already scheduled the loop.
+          if (replayingHowlsRef.current.has(howl)) return;
           const targetVolume = getEffectiveVolume();
           logger.log(`[AdventureMusic] ${trackName} ended, looping with crossfade to volume ${targetVolume}`);
-          howl.seek(0);
-          howl.volume(0);
-          howl.play();
-          howl.fade(0, targetVolume, CROSSFADE_MS);
+          replayingHowlsRef.current.add(howl);
+          try {
+            howl.seek(0);
+            howl.volume(0);
+            howl.play();
+            howl.fade(0, targetVolume, CROSSFADE_MS);
+          } finally {
+            replayingHowlsRef.current.delete(howl);
+          }
         }
       },
     });
