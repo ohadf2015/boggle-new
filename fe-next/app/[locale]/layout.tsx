@@ -22,7 +22,6 @@ import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import GoogleOneTapInitializer from '@/components/auth/GoogleOneTapInitializer';
 import NativePGSInitializer from '@/components/NativePGSInitializer';
-import { AnimatedSplash } from '@/components/splash/AnimatedSplash';
 import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { OfflineBanner } from '@/components/offline/OfflineBanner';
 import { NativeLanguageBanner } from '@/components/NativeLanguageBanner';
@@ -641,8 +640,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     </ul>
                 </nav>
                 <ConditionalProviders lang={validLocale} initialTranslations={initialTranslations}>
-                    {/* Animated loading splash — self-gates on session flag and fail-safe timeout */}
-                    <AnimatedSplash />
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
                     {/* Auto-recovers stale-deploy chunk 404s that escape error boundaries

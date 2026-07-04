@@ -9,8 +9,8 @@ import { PageLoader } from '@/components/ui/PageLoader';
  * page-agnostic: the mascot PageLoader, the same loader leaderboard/profile/
  * multiplayer already use.
  *
- * The homepage's richer cubes skeleton lives in (home)/loading.tsx — scoped to
- * the (home) route group so it no longer leaks down to these siblings.
+ * The homepage has its own (home)/loading.tsx (a random dancing mascot), scoped
+ * to the (home) route group so it doesn't leak down to these siblings.
  */
 export default function Loading() {
   return (
