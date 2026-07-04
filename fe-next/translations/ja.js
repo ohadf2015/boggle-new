@@ -5320,7 +5320,8 @@ const ja = {
     "educationHub": "教育ハブ",
     "vocabularyGames": "語彙ゲーム",
     "gamesForTeachers": "先生のための単語ゲーム",
-    "eslWordGames": "英語単語ゲーム"
+    "eslWordGames": "英語単語ゲーム",
+    "androidApp": "Androidアプリ"
   },
   "sitemap": {
     "title": "サイトマップ",

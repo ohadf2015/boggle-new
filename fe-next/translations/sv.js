@@ -5491,7 +5491,8 @@ const sv = {
     "educationHub": "Utbildningshub",
     "vocabularyGames": "Ordförrådsspel",
     "gamesForTeachers": "Ordspel för lärare",
-    "eslWordGames": "Ordspel för engelska"
+    "eslWordGames": "Ordspel för engelska",
+    "androidApp": "Android-appen"
   },
   "sitemap": {
     "title": "Webbkarta",

@@ -5353,7 +5353,8 @@ const es = {
     "educationHub": "Centro de Educación",
     "vocabularyGames": "Juegos de vocabulario",
     "gamesForTeachers": "Juegos para docentes",
-    "eslWordGames": "Juegos de inglés"
+    "eslWordGames": "Juegos de inglés",
+    "androidApp": "App para Android"
   },
   "sitemap": {
     "title": "Mapa del sitio",

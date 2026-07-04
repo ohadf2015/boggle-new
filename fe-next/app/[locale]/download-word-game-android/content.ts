@@ -85,7 +85,7 @@ const en: DownloadLandingCopy = {
   twitterTitle: 'Download LexiClash for Android — Free Word Game',
   twitterDescription: 'Multiplayer word battles, daily challenges, brain drills. Free on Google Play.',
 
-  marqueeBadges: ['FREE TO PLAY', 'NO PAYWALL', '5 LANGUAGES', '2-20 PLAYERS', 'DAILY CHALLENGES', 'ON GOOGLE PLAY'],
+  marqueeBadges: ['FREE TO PLAY', 'NO PAYWALL', '6 LANGUAGES', '2-20 PLAYERS', 'DAILY CHALLENGES', 'ON GOOGLE PLAY'],
   badge: '★ Free on Google Play ★',
   h1Pre: 'The word game,',
   h1Highlight: 'now on your home screen.',
@@ -106,7 +106,7 @@ const en: DownloadLandingCopy = {
     { icon: '⚡', title: 'Built for phones', blurb: 'Full-screen play with no browser bars. The grid fills your screen so every letter is in thumb reach.' },
     { icon: '🔔', title: 'Daily reminders', blurb: 'Opt in to a gentle nudge at your usual play time so your daily streak never slips.' },
     { icon: '🎮', title: 'Every mode, free', blurb: 'Multiplayer rooms, daily challenge, brain drills, solo practice — the whole game, no paywall.' },
-    { icon: '🌍', title: '5 languages', blurb: 'Play in English, Hebrew, Swedish, Japanese, or Spanish — including full right-to-left Hebrew.' },
+    { icon: '🌍', title: '6 languages', blurb: 'Play in English, Spanish, Russian, Hebrew, Swedish, or Japanese — including full right-to-left Hebrew.' },
   ],
 
   comparisonHeading: 'App vs. browser',
@@ -152,7 +152,7 @@ const en: DownloadLandingCopy = {
 
   appName: 'LexiClash',
   appDescription:
-    'Free multiplayer word game for Android. Race friends to find words on a shared grid, play daily challenges and brain drills, in 5 languages. No paywall, no signup required.',
+    'Free multiplayer word game for Android. Race friends to find words on a shared grid, play daily challenges and brain drills, in 6 languages. No paywall, no signup required.',
 };
 
 const he: DownloadLandingCopy = {
@@ -167,7 +167,7 @@ const he: DownloadLandingCopy = {
   twitterTitle: 'הורידו את LexiClash לאנדרואיד — משחק מילים חינמי',
   twitterDescription: 'קרבות מילים רב-משתתפים, אתגרים יומיים ותרגולי מוח. חינם בגוגל פליי.',
 
-  marqueeBadges: ['חינם לחלוטין', 'בלי תשלום', '5 שפות', '2-20 שחקנים', 'אתגרים יומיים', 'בגוגל פליי'],
+  marqueeBadges: ['חינם לחלוטין', 'בלי תשלום', '6 שפות', '2-20 שחקנים', 'אתגרים יומיים', 'בגוגל פליי'],
   badge: '★ חינם בגוגל פליי ★',
   h1Pre: 'משחק המילים,',
   h1Highlight: 'עכשיו על מסך הבית.',
@@ -188,7 +188,7 @@ const he: DownloadLandingCopy = {
     { icon: '⚡', title: 'בנוי לטלפון', blurb: 'משחק במסך מלא בלי סרגלי דפדפן. הלוח ממלא את המסך וכל אות במרחק אגודל.' },
     { icon: '🔔', title: 'תזכורות יומיות', blurb: 'בוחרים לקבל תזכורת עדינה בשעת המשחק הרגילה כדי שרצף הימים לא יישבר.' },
     { icon: '🎮', title: 'כל המצבים בחינם', blurb: 'חדרים רב-משתתפים, אתגר יומי, תרגולי מוח ותרגול עצמאי — כל המשחק, בלי תשלום.' },
-    { icon: '🌍', title: '5 שפות', blurb: 'אנגלית, עברית, שוודית, יפנית או ספרדית — כולל עברית מלאה מימין לשמאל.' },
+    { icon: '🌍', title: '6 שפות', blurb: 'עברית, אנגלית, רוסית, שוודית, יפנית או ספרדית — כולל עברית מלאה מימין לשמאל.' },
   ],
 
   comparisonHeading: 'אפליקציה מול דפדפן',
@@ -234,7 +234,7 @@ const he: DownloadLandingCopy = {
 
   appName: 'LexiClash',
   appDescription:
-    'משחק מילים רב-משתתפים חינמי לאנדרואיד. מתחרים בחברים על מציאת מילים בלוח משותף, אתגרים יומיים ותרגולי מוח, ב-5 שפות. בלי תשלום, בלי הרשמה.',
+    'משחק מילים רב-משתתפים חינמי לאנדרואיד. מתחרים בחברים על מציאת מילים בלוח משותף, אתגרים יומיים ותרגולי מוח, ב-6 שפות. בלי תשלום, בלי הרשמה.',
 };
 
 const sv: DownloadLandingCopy = {
@@ -249,7 +249,7 @@ const sv: DownloadLandingCopy = {
   twitterTitle: 'Ladda ner LexiClash för Android — Gratis ordspel',
   twitterDescription: 'Ordstrider för flera spelare, dagliga utmaningar och hjärnträning. Gratis på Google Play.',
 
-  marqueeBadges: ['GRATIS ATT SPELA', 'INGEN BETALVÄGG', '5 SPRÅK', '2-20 SPELARE', 'DAGLIGA UTMANINGAR', 'PÅ GOOGLE PLAY'],
+  marqueeBadges: ['GRATIS ATT SPELA', 'INGEN BETALVÄGG', '6 SPRÅK', '2-20 SPELARE', 'DAGLIGA UTMANINGAR', 'PÅ GOOGLE PLAY'],
   badge: '★ Gratis på Google Play ★',
   h1Pre: 'Ordspelet,',
   h1Highlight: 'nu på din hemskärm.',
@@ -270,7 +270,7 @@ const sv: DownloadLandingCopy = {
     { icon: '⚡', title: 'Byggt för telefoner', blurb: 'Helskärm utan webbläsarrader. Rutnätet fyller skärmen så varje bokstav når tummen.' },
     { icon: '🔔', title: 'Dagliga påminnelser', blurb: 'Välj en mjuk påminnelse vid din vanliga speltid så att din svit aldrig bryts.' },
     { icon: '🎮', title: 'Alla lägen gratis', blurb: 'Flerspelarrum, daglig utmaning, hjärnträning, solospel — hela spelet, ingen betalvägg.' },
-    { icon: '🌍', title: '5 språk', blurb: 'Spela på engelska, hebreiska, svenska, japanska eller spanska — inklusive fullt höger-till-vänster för hebreiska.' },
+    { icon: '🌍', title: '6 språk', blurb: 'Spela på svenska, engelska, ryska, hebreiska, japanska eller spanska — inklusive fullt höger-till-vänster för hebreiska.' },
   ],
 
   comparisonHeading: 'App vs. webbläsare',
@@ -316,7 +316,7 @@ const sv: DownloadLandingCopy = {
 
   appName: 'LexiClash',
   appDescription:
-    'Gratis ordspel för flera spelare för Android. Kapplöp med vänner om att hitta ord på ett delat rutnät, spela dagliga utmaningar och hjärnträning, på 5 språk. Ingen betalvägg, ingen registrering.',
+    'Gratis ordspel för flera spelare för Android. Kapplöp med vänner om att hitta ord på ett delat rutnät, spela dagliga utmaningar och hjärnträning, på 6 språk. Ingen betalvägg, ingen registrering.',
 };
 
 const ja: DownloadLandingCopy = {
@@ -331,7 +331,7 @@ const ja: DownloadLandingCopy = {
   twitterTitle: 'LexiClash を Android でダウンロード — 無料ワードゲーム',
   twitterDescription: 'マルチプレイの単語バトル、デイリーチャレンジ、脳トレ。Google Play で無料。',
 
-  marqueeBadges: ['無料で遊べる', '課金の壁なし', '5言語', '2〜20人', 'デイリーチャレンジ', 'GOOGLE PLAY'],
+  marqueeBadges: ['無料で遊べる', '課金の壁なし', '6言語', '2〜20人', 'デイリーチャレンジ', 'GOOGLE PLAY'],
   badge: '★ Google Play で無料 ★',
   h1Pre: 'あのワードゲームが、',
   h1Highlight: 'ホーム画面に。',
@@ -352,7 +352,7 @@ const ja: DownloadLandingCopy = {
     { icon: '⚡', title: 'スマホ向け設計', blurb: 'ブラウザのバーなしの全画面プレイ。グリッドが画面いっぱいに広がり、どの文字も親指の届く範囲に。' },
     { icon: '🔔', title: 'デイリー通知', blurb: 'いつもの時間にやさしいリマインドをオンにすれば、連続記録が途切れません。' },
     { icon: '🎮', title: '全モード無料', blurb: 'マルチプレイのルーム、デイリーチャレンジ、脳トレ、ソロ練習 — ゲームのすべてが課金の壁なし。' },
-    { icon: '🌍', title: '5言語', blurb: '英語・ヘブライ語・スウェーデン語・日本語・スペイン語でプレイ可能（右から左に書くヘブライ語にも完全対応）。' },
+    { icon: '🌍', title: '6言語', blurb: '日本語・英語・ロシア語・ヘブライ語・スウェーデン語・スペイン語でプレイ可能（右から左に書くヘブライ語にも完全対応）。' },
   ],
 
   comparisonHeading: 'アプリ vs ブラウザ',
@@ -398,7 +398,7 @@ const ja: DownloadLandingCopy = {
 
   appName: 'LexiClash',
   appDescription:
-    'Android 向けの無料マルチプレイ ワードゲーム。共有グリッドで友だちと単語探しを競い、デイリーチャレンジや脳トレを5言語で。課金の壁なし、登録不要。',
+    'Android 向けの無料マルチプレイ ワードゲーム。共有グリッドで友だちと単語探しを競い、デイリーチャレンジや脳トレを6言語で。課金の壁なし、登録不要。',
 };
 
 const es: DownloadLandingCopy = {
@@ -413,7 +413,7 @@ const es: DownloadLandingCopy = {
   twitterTitle: 'Descarga LexiClash para Android — Juego de palabras gratis',
   twitterDescription: 'Batallas de palabras multijugador, retos diarios y entrenamiento mental. Gratis en Google Play.',
 
-  marqueeBadges: ['GRATIS', 'SIN MURO DE PAGO', '5 IDIOMAS', '2-20 JUGADORES', 'RETOS DIARIOS', 'EN GOOGLE PLAY'],
+  marqueeBadges: ['GRATIS', 'SIN MURO DE PAGO', '6 IDIOMAS', '2-20 JUGADORES', 'RETOS DIARIOS', 'EN GOOGLE PLAY'],
   badge: '★ Gratis en Google Play ★',
   h1Pre: 'El juego de palabras,',
   h1Highlight: 'ahora en tu pantalla de inicio.',
@@ -434,7 +434,7 @@ const es: DownloadLandingCopy = {
     { icon: '⚡', title: 'Hecho para móviles', blurb: 'Juego a pantalla completa sin barras del navegador. La cuadrícula llena la pantalla y cada letra queda al alcance del pulgar.' },
     { icon: '🔔', title: 'Recordatorios diarios', blurb: 'Activa un aviso suave a tu hora habitual de juego para que tu racha no se rompa.' },
     { icon: '🎮', title: 'Todos los modos, gratis', blurb: 'Salas multijugador, reto diario, entrenamiento mental, práctica en solitario: todo el juego, sin muro de pago.' },
-    { icon: '🌍', title: '5 idiomas', blurb: 'Juega en inglés, hebreo, sueco, japonés o español, con soporte completo de derecha a izquierda para el hebreo.' },
+    { icon: '🌍', title: '6 idiomas', blurb: 'Juega en español, inglés, ruso, hebreo, sueco o japonés, con soporte completo de derecha a izquierda para el hebreo.' },
   ],
 
   comparisonHeading: 'App vs. navegador',
@@ -480,7 +480,7 @@ const es: DownloadLandingCopy = {
 
   appName: 'LexiClash',
   appDescription:
-    'Juego de palabras multijugador gratuito para Android. Compite con amigos por encontrar palabras en una cuadrícula compartida, juega retos diarios y entrenamiento mental, en 5 idiomas. Sin muro de pago, sin registro.',
+    'Juego de palabras multijugador gratuito para Android. Compite con amigos por encontrar palabras en una cuadrícula compartida, juega retos diarios y entrenamiento mental, en 6 idiomas. Sin muro de pago, sin registro.',
 };
 
 const ru: DownloadLandingCopy = {
@@ -495,7 +495,7 @@ const ru: DownloadLandingCopy = {
   twitterTitle: 'Скачайте LexiClash для Android — Бесплатная словесная игра',
   twitterDescription: 'Многопользовательские словесные батальи, ежедневные испытания и тренинг мозга. Бесплатно в Google Play.',
 
-  marqueeBadges: ['БЕСПЛАТНО', 'БЕЗ ПЛАТНЫХ СТЕН', '5 ЯЗЫКОВ', '2-20 ИГРОКОВ', 'ЕЖЕДНЕВНЫЕ ИСПЫТАНИЯ', 'В GOOGLE PLAY'],
+  marqueeBadges: ['БЕСПЛАТНО', 'БЕЗ ПЛАТНЫХ СТЕН', '6 ЯЗЫКОВ', '2-20 ИГРОКОВ', 'ЕЖЕДНЕВНЫЕ ИСПЫТАНИЯ', 'В GOOGLE PLAY'],
   badge: '★ Бесплатно в Google Play ★',
   h1Pre: 'Словесная игра,',
   h1Highlight: 'теперь на вашем рабочем столе.',
@@ -516,7 +516,7 @@ const ru: DownloadLandingCopy = {
     { icon: '⚡', title: 'Оптимизировано для мобильных', blurb: 'Полноэкранная игра без полос браузера. Сетка заполняет экран и каждая буква находится в пределах досягаемости пальца.' },
     { icon: '🔔', title: 'Ежедневные напоминания', blurb: 'Включите мягкое уведомление в ваше обычное время игры, чтобы ваша серия не прерывалась.' },
     { icon: '🎮', title: 'Все режимы, бесплатно', blurb: 'Многопользовательские комнаты, ежедневный вызов, тренинг мозга, одиночная практика: вся игра, без платных стен.' },
-    { icon: '🌍', title: '5 языков', blurb: 'Играйте на английском, иврите, шведском, японском или испанском языках с полной поддержкой справа налево для иврита.' },
+    { icon: '🌍', title: '6 языков', blurb: 'Играйте на русском, английском, испанском, иврите, шведском или японском языке с полной поддержкой письма справа налево для иврита.' },
   ],
 
   comparisonHeading: 'Приложение vs. браузер',
@@ -562,7 +562,7 @@ const ru: DownloadLandingCopy = {
 
   appName: 'LexiClash',
   appDescription:
-    'Бесплатная многопользовательская словесная игра для Android. Соревнуйтесь с друзьями в поиске слов на общей сетке, играйте в ежедневные испытания и тренинг мозга на 5 языках. Без платных стен, без регистрации.',
+    'Бесплатная многопользовательская словесная игра для Android. Соревнуйтесь с друзьями в поиске слов на общей сетке, играйте в ежедневные испытания и тренинг мозга на 6 языках. Без платных стен, без регистрации.',
 };
 
 const COPY: Record<Locale, DownloadLandingCopy> = { en, he, sv, ja, es, ru };

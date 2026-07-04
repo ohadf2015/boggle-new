@@ -1,3 +1,5 @@
+> **SUPERSEDED (copy):** live listing copy now maintained in docs/play-store-listings-2026-07-04.md (pushed via API). This file kept for tags/rating/questionnaire notes.
+
 # Google Play Store Listing — Swedish (Svenska)
 
 ## Title (30 chars max)

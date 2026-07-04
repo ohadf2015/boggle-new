@@ -10672,7 +10672,8 @@ const ru = {
     "educationHub": "Образовательный Хаб",
     "vocabularyGames": "Игры на Словарный Запас",
     "gamesForTeachers": "Игры для Учителей",
-    "eslWordGames": "Игры со Словами ESL"
+    "eslWordGames": "Игры со Словами ESL",
+    "androidApp": "Приложение для Android"
   },
   "blog": {
     "backToBlog": "Назад в Блог",

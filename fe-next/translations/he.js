@@ -5449,7 +5449,8 @@ const he = {
     "educationHub": "מרכז החינוך",
     "vocabularyGames": "משחקי אוצר מילים",
     "gamesForTeachers": "משחקי מילים למורים",
-    "eslWordGames": "משחקי מילים באנגלית"
+    "eslWordGames": "משחקי מילים באנגלית",
+    "androidApp": "אפליקציית אנדרואיד"
   },
   "sitemap": {
     "title": "מפת אתר",

@@ -5346,7 +5346,8 @@ const en = {
     "educationHub": "Education Hub",
     "vocabularyGames": "Vocabulary Games",
     "gamesForTeachers": "Games for Teachers",
-    "eslWordGames": "ESL Word Games"
+    "eslWordGames": "ESL Word Games",
+    "androidApp": "Android App"
   },
   "sitemap": {
     "title": "Sitemap",

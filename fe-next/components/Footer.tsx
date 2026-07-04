@@ -67,6 +67,11 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               <li><Link prefetch={false} href={`/${language}/blog`} className={footerLinkClass}>{t('footer.blog')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/faq`} className={footerLinkClass}>{t('footer.faq')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/contact`} className={footerLinkClass}>{t('footer.contact')}</Link></li>
+              {/* Sitewide link into the Play Store install landing — it was
+                  crawl-orphaned (sitemap-only) and the install popup only
+                  fires on Android browsers. Same crawl-equity rationale as
+                  the For Teachers cluster above. */}
+              <li><Link prefetch={false} href={`/${language}/download-word-game-android`} className={footerLinkClass}>{t('footer.androidApp', 'Android App')}</Link></li>
             </ul>
           </nav>
 
