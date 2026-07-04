@@ -217,10 +217,10 @@ describe('HostPreGameView passive bot auto-fill timer (alone host)', () => {
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     expect(setAutoFill).toBeDefined();
-    // Passive rescue must start DIRECTLY with bots — NOT via the solo-confirm
-    // popup path (onStartGame → startGame → setShowSoloConfirm). An abandoned
-    // host never clicks a modal, so a popup here would strand the lobby forever.
-    expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
+    // Passive rescue FILLS the lobby with bots but must NOT start the game —
+    // MP mode never auto-starts. The now-populated host presses Play (or the
+    // explicit "Play vs Bots" card) to begin.
+    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
     expect(baseProps.onStartGame).not.toHaveBeenCalled();
   });
 

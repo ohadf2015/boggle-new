@@ -363,15 +363,12 @@ function HostPreGameView({
     };
   }, [humanGuestCount, isQuickPlay, isPrivate]);
 
-  // Automatic rescue start (passive alone-timer + Quick Play countdown). Routes
-  // through onAutoStartWithBots so the game starts DIRECTLY with bots instead of
-  // re-prompting the solo-confirm popup (onStartGame → startGame →
-  // setShowSoloConfirm). A modal here pops up with no user click and an
-  // abandoned host never dismisses it, stranding the lobby.
-  const startWithBots = useCallback(() => {
-    (onAutoStartWithBots ?? onStartGame)();
-  }, [onAutoStartWithBots, onStartGame]);
-
+  // Passive rescue for a solo host (alone-timer + Quick Play countdown). This
+  // only FILLS the lobby with bots — it deliberately never starts the game.
+  // Starting is always the host's explicit action (product decision: MP mode
+  // must never auto-start without the host pressing Play). The bots simply give
+  // the abandoned host a populated lobby to start on demand, or via the explicit
+  // "Play vs Bots" card (handleSoloPlayVsBots → onAutoStartWithBots).
   useEffect(() => {
     if (botCountdown === null) return;
     if (botCountdown <= 0) {
@@ -380,8 +377,8 @@ function HostPreGameView({
       trackSoloPlayPrompt({ event: 'shown', auto_filled: true });
       // setAutoFill is the backend's bot-fill primitive; the prior 'addBots'
       // event had no server handler so silently dropped (bots never spawned).
+      // It adds bots and broadcasts the roster — it does NOT start the game.
       socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
-      startWithBots();
       setBotCountdown(null);
       return;
     }
@@ -391,7 +388,7 @@ function HostPreGameView({
     return () => {
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     };
-  }, [botCountdown, socket, gameCode, startWithBots]);
+  }, [botCountdown, socket, gameCode]);
 
   const handleRoomLanguageChange = useCallback((newLang: Language) => {
     socket?.emit('changeRoomLanguage', { gameCode, language: newLang });
@@ -457,7 +454,7 @@ function HostPreGameView({
         className="bg-neo-orange/20 border border-neo-orange/50 rounded-xl px-4 py-2 flex items-center justify-between"
       >
         <span className="text-neo-orange font-bold text-sm">
-          {t('hostView.noOneYet')} {t('hostView.startingWithBots')} {botCountdown}...
+          {t('hostView.noOneYet')} {t('hostView.addingBots')} {botCountdown}...
         </span>
         <button
           type="button"

@@ -2047,6 +2047,7 @@ const sv = {
     "playersInRoom": "Spelare i rummet",
     "noOneYet": "Ingen ännu?",
     "startingWithBots": "Startar med bottar om",
+    "addingBots": "Lägger till bottar om",
     "soloPrompt": {
       "title": "Ingen här än?",
       "subtitle": "Kör igång mot bottar nu — eller dela din kod och vänta på att vänner ansluter.",
