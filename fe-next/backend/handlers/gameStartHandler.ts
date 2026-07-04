@@ -93,11 +93,6 @@ interface StartGamePayload {
   gameMode?: GameMode | 'random';
   tvMode?: boolean;
   /**
-   * Per-player latch (host's localStorage): true once this player has seen the
-   * blast showcase opener — skips the forced blast-first round on later new rooms.
-   */
-  blastIntroSeen?: boolean;
-  /**
    * Optional boost token bundled with startGame so the boost is registered
    * atomically with state transition — eliminates the race where a separate
    * `boost:apply` emit could arrive after the first submitWord.
@@ -319,13 +314,8 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
 
     const enabledModes = ALL_GAME_MODES;
 
-    // Per-player latch: force the blast showcase opener only until the host has
-    // seen it once (client sends blastIntroSeen from localStorage). After that, a
-    // random first round rolls weighted-random instead of blast every new room.
-    const forceBlastFirst = !validatedData.blastIntroSeen;
-
     let resolvedMode: GameMode = isRandomRoll
-      ? selectNextGameMode(game.modeHistory || [], enabledModes, forceBlastFirst)
+      ? selectNextGameMode(game.modeHistory || [], enabledModes)
       : gameMode as GameMode;
 
     // Timer: clamp host choice to the safe range. Blast falls back to its own

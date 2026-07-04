@@ -21,7 +21,6 @@ import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { TournamentData } from './useHostViewState';
 import type { BoardTheme } from '@/shared/types/socket';
 import { useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
-import { hasSeenMpBlastIntro } from '@/lib/blast/mpBlastIntro';
 import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 
 interface UseHostGameActionsOptions {
@@ -241,7 +240,6 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       boardTheme: boardTheme,
       gameMode: hostSelectedGameMode || 'random',
       tvMode: !hostPlaying,
-      blastIntroSeen: hasSeenMpBlastIntro(),
       ...(boostToken ? { boostToken } : {}),
     });
 
@@ -421,7 +419,6 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           boardTheme: boardTheme,
           gameMode: hostSelectedGameMode || 'random',
           tvMode: !hostPlaying,
-          blastIntroSeen: hasSeenMpBlastIntro(),
         });
 
         neoSuccessToast(t('common.gameStarted'), {

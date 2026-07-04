@@ -23,31 +23,16 @@ describe('gameModeSelector', () => {
       }
     });
 
-    it('should ALWAYS open a new room (empty history) on blast', () => {
-      // First game for a new host: a deterministic, high-energy opener beats a
-      // 35%-weighted classic. Blast is the showcase mode → first random game = blast.
-      for (let i = 0; i < 200; i++) {
-        expect(selectNextGameMode([], ALL_GAME_MODES)).toBe('blast');
-      }
-    });
-
-    it('should NOT force blast on an empty history when forceBlastFirst is false', () => {
-      // A returning player who already saw the blast showcase: their next NEW room
-      // should roll weighted-random from round 1, not blast again.
+    it('should NOT force blast on a new room (empty history) — blast is one weighted mode', () => {
+      // Blast is no longer the guaranteed opener. A new room rolls weighted-random
+      // from round 1, so across many rolls more than one mode appears.
       const results = new Set<GameMode>();
       for (let i = 0; i < 300; i++) {
-        const result = selectNextGameMode([], ALL_GAME_MODES, false);
+        const result = selectNextGameMode([], ALL_GAME_MODES);
         expect(ALL_GAME_MODES).toContain(result);
         results.add(result);
       }
-      // Across many rolls more than one mode must appear (i.e. not always blast).
       expect(results.size).toBeGreaterThan(1);
-    });
-
-    it('still forces blast on empty history when forceBlastFirst is true (default)', () => {
-      for (let i = 0; i < 100; i++) {
-        expect(selectNextGameMode([], ALL_GAME_MODES, true)).toBe('blast');
-      }
     });
 
     it('should fall back to weighted random on the first game when blast is disabled', () => {
@@ -90,7 +75,7 @@ describe('gameModeSelector', () => {
     });
 
     it('should produce a weighted distribution (classic ~40%, blast ~30%, word-hunt ~30%)', () => {
-      const counts: Record<GameMode, number> = { 'classic': 0, 'blast': 0, 'word-hunt': 0, 'wheel-rush': 0, 'word-tower': 0, 'shiritori': 0 };
+      const counts: Record<GameMode, number> = { 'classic': 0, 'blast': 0, 'word-hunt': 0, 'wheel-rush': 0, 'word-tower': 0, 'shiritori': 0, 'sealed-bid': 0, 'crossword': 0 };
       const iterations = 10000;
 
       for (let i = 0; i < iterations; i++) {

@@ -54,10 +54,6 @@ vi.mock('../desktop/BlastDesktopAdapter', () => ({
   },
 }));
 
-vi.mock('../../../lib/blast/mpBlastIntro', () => ({
-  markMpBlastIntroSeen: vi.fn(),
-}));
-
 vi.mock('../../OpponentWordFeed', () => ({
   OpponentWordFeed: () => null,
 }));

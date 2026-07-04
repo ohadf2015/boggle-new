@@ -293,7 +293,7 @@ export const BlastStage = memo(function BlastStage({
           the score · moves · progress cluster reads as one console aligned over
           the board, instead of stretching edge-to-edge across a wide viewport.
           On phones the cap exceeds the screen, so it stays full-width. */}
-      <div className="relative z-40 w-full max-w-[640px] lg:max-w-[840px] xl:max-w-[920px] mx-auto">
+      <div className="relative z-40 w-full max-w-[640px] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(680px,80dvh)] 2xl:max-w-[min(820px,86dvh)] mx-auto">
       <BlastHUD
         score={displayScore}
         wordsFoundCount={wordsFound.length}
@@ -381,7 +381,7 @@ export const BlastStage = memo(function BlastStage({
         {/* Board frame — neo-brutalist with hard shadow + reactive glow */}
         <div
           className={cn(
-            'relative w-full max-w-[min(94vw,80dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(640px,76dvh)] 2xl:max-w-[min(760px,82dvh)] p-1.5 rounded-neo border-3 shadow-hard-lg transition-all duration-300',
+            'relative w-full max-w-[min(94vw,80dvh)] sm:max-w-[min(440px,75dvh)] md:max-w-[min(480px,72dvh)] lg:max-w-[min(560px,72dvh)] xl:max-w-[min(680px,80dvh)] 2xl:max-w-[min(820px,86dvh)] p-1.5 rounded-neo border-3 shadow-hard-lg transition-all duration-300',
             // In the shell the board owns the full center column — override the
             // phone-tuned caps so it fills instead of floating tiny.
             isDesktopCanvas && '!max-w-[min(680px,82dvh)]',

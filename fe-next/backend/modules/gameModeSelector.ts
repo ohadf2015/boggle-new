@@ -29,24 +29,13 @@ export const GAME_MODE_WEIGHTS: Record<GameMode, number> = {
  */
 export function selectNextGameMode(
   history: GameMode[],
-  enabledModes: GameMode[],
-  forceBlastFirst = true
+  enabledModes: GameMode[]
 ): GameMode {
   if (enabledModes.length === 0) return 'classic';
   if (enabledModes.length === 1) return enabledModes[0];
 
-  // First game for a new room (empty history): deterministically open on blast — the
-  // showcase mode is a stronger first impression than a 35%-weighted classic. Only
-  // reached on random rolls (an explicit host pick bypasses this selector entirely).
-  // Game 2+ falls through to the weighted no-repeat rotation below.
-  //
-  // forceBlastFirst is gated per-player by the client (the host's localStorage
-  // "blast intro seen" latch): once a player has been shown the blast opener once,
-  // their later NEW rooms pass false here so they roll weighted-random from round 1.
-  if (forceBlastFirst && history.length === 0 && enabledModes.includes('blast')) {
-    return 'blast';
-  }
-
+  // Blast is one of the weighted modes — no longer force-opened on a new room.
+  // Every game (including the first) rolls the weighted no-repeat rotation below.
   const lastMode = history.length > 0 ? history[history.length - 1] : null;
 
   // Filter out the last played mode to avoid repetition
