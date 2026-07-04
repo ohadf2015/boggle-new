@@ -12026,6 +12026,7 @@ const ru = {
   "forfeitConfirm": "Да, сдаться",
   "lostByForfeit": "Проигран сдачей",
   "blast": {
+    "toCatchUp": "чтобы догнать",
     "firstUse": {
       "gotIt": "Понял"
     },

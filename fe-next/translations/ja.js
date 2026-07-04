@@ -10067,6 +10067,7 @@ const ja = {
     }
   },
   "blast": {
+    "toCatchUp": "追いつくまで",
     "firstUse": { "gotIt": "了解" },
     "level": "レベル{n}",
     "results": {
@@ -13672,6 +13673,7 @@ const ja = {
     }
   },
   mp: {
+    quality: { degraded: "接続が不安定です", reconnecting: "再接続中…", weak: "接続が弱いです" },
     stopGameConfirm: "全員のゲームを終了しますか？",
     stopGameYes: "ゲーム終了",
     kbHint: {

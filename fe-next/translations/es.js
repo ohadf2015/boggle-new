@@ -10075,6 +10075,7 @@ const es = {
     }
   },
   "blast": {
+    "toCatchUp": "para alcanzar",
     "firstUse": { "gotIt": "Entendido" },
     "level": "Nivel {n}",
     "results": {
@@ -13922,6 +13923,7 @@ const es = {
     "adminGiveUp": "Saltar puzzle (admin)"
   },
   "mp": {
+    "quality": { "degraded": "Conexión inestable", "reconnecting": "Reconectando…", "weak": "Conexión débil" },
     "stopGameConfirm": "¿Terminar el juego para todos?",
     "stopGameYes": "Terminar juego",
     "kbHint": {

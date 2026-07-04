@@ -10180,6 +10180,7 @@ const sv = {
     }
   },
   "blast": {
+    "toCatchUp": "för att komma ikapp",
     "firstUse": { "gotIt": "Förstått" },
     "level": "Nivå {n}",
     "results": {
@@ -13835,6 +13836,7 @@ const sv = {
     }
   },
   mp: {
+    quality: { degraded: "Anslutningen är instabil", reconnecting: "Återansluter…", weak: "Svag anslutning" },
     stopGameConfirm: "Avsluta spelet för alla?",
     stopGameYes: "Avsluta spelet",
     kbHint: {

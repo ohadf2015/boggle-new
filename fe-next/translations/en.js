@@ -9610,6 +9610,7 @@ const en = {
     }
   },
   "blast": {
+    "toCatchUp": "to catch up",
     "firstUse": { "gotIt": "Got it" },
     "level": "Level {n}",
     "results": {
