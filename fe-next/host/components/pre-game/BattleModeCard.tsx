@@ -156,6 +156,7 @@ export function BattleModeCard({
                 aria-pressed={isActive}
                 className={cn(
                   'flex flex-col items-start gap-1 p-2 rounded-xl border-2 text-left transition-all duration-150',
+                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cream focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
                   isActive
                     ? `${style.activeBg} border-neo-black shadow-hard-lg`
                     : cn(
