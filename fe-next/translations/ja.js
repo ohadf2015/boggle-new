@@ -1876,6 +1876,7 @@ const ja = {
     "playersInRoom": "ルーム内のプレイヤー",
     "noOneYet": "まだ誰もいない？",
     "startingWithBots": "ボットで開始まで",
+    "addingBots": "ボット追加まで",
     "soloPrompt": {
       "title": "まだ誰もいない？",
       "subtitle": "今すぐボットと対戦しよう — またはコードを共有して友達の参加を待とう。",

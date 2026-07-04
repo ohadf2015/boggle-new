@@ -129,7 +129,7 @@ describe('HostPreGameView Quick Play / bot auto-fill', () => {
     vi.useRealTimers();
   });
 
-  it('emits setAutoFill (NOT broken addBots) when bot countdown elapses', () => {
+  it('emits setAutoFill (NOT broken addBots) when bot countdown elapses — WITHOUT starting the game', () => {
     // hostPlaying=true + only host in playersReady → actualPlayerCount === 0
     render(<HostPreGameView {...baseProps} playersReady={[]} hostPlaying={false} />);
 
@@ -138,7 +138,7 @@ describe('HostPreGameView Quick Play / bot auto-fill', () => {
     // countdown interval before it ticks (a single combined advance would set
     // botCountdown mid-advance, after which the interval never ticks this call).
     act(() => { vi.advanceTimersByTime(15_000); });
-    // Advance through the 20s "starting with bots…" countdown to 0
+    // Advance through the 20s "adding bots…" countdown to 0
     act(() => { vi.advanceTimersByTime(20_000); });
 
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
@@ -147,13 +147,13 @@ describe('HostPreGameView Quick Play / bot auto-fill', () => {
     expect(addBots).toBeUndefined();
     expect(setAutoFill).toBeDefined();
     expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
-    // Auto-fill rescue starts directly with bots — never via the solo-confirm
-    // popup path (onStartGame → startGame → setShowSoloConfirm).
-    expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
+    // The rescue fills the lobby with bots but MUST NOT auto-start the game —
+    // starting is always the host's explicit action (MP never auto-starts).
+    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
     expect(baseProps.onStartGame).not.toHaveBeenCalled();
   });
 
-  it('starts bot countdown immediately when isQuickPlay=true and alone', () => {
+  it('fills bots (no auto-start) immediately when isQuickPlay=true and alone', () => {
     render(<HostPreGameView {...baseProps} playersReady={[]} hostPlaying={false} isQuickPlay />);
 
     // No 15s alone-timer: only a ~5s countdown before emitting setAutoFill
@@ -162,7 +162,8 @@ describe('HostPreGameView Quick Play / bot auto-fill', () => {
     const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
     expect(setAutoFill).toBeDefined();
     expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
-    expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
+    // Bots are added, but the game does not start — the host must press Play.
+    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
     expect(baseProps.onStartGame).not.toHaveBeenCalled();
   });
 });

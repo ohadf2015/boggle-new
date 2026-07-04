@@ -1863,6 +1863,7 @@ const en = {
     "playersInRoom": "Players in Room",
     "noOneYet": "No one yet?",
     "startingWithBots": "Starting with bots in",
+    "addingBots": "Adding bots in",
     "soloPrompt": {
       "title": "No one here yet?",
       "subtitle": "Jump in against bots now — or share your code and wait for friends to join.",

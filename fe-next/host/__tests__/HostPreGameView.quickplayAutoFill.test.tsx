@@ -181,8 +181,10 @@ describe('HostPreGameView quickplay auto-fill timer', () => {
       targetCount: 3,
     });
 
-    // Should call onAutoStartWithBots (or fallback to onStartGame)
-    expect(baseProps.onAutoStartWithBots).toHaveBeenCalled();
+    // Bots are added, but the game must NOT auto-start — MP mode only ever
+    // starts on the host's explicit action (Play button / "Play vs Bots" card).
+    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
+    expect(baseProps.onStartGame).not.toHaveBeenCalled();
   });
 
   it('tracks auto-fill with auto_filled: true when timer expires', () => {
