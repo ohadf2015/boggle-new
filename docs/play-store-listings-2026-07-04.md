@@ -1,6 +1,6 @@
 # Play Store Listings — LIVE COPY (source of truth)
 
-> Updated 2026-07-04 via androidpublisher API (edit committed; managed publishing ON — publish manually in Play Console after Google review).
+> Updated 2026-07-04 via androidpublisher API (edit committed; managed publishing OFF — changes auto-publish once Google review approves, verified in Console same day).
 > Changes: NEW ru-RU listing · 5→6 languages everywhere · Word Tower added to mode lists · removed Jackbox/Boggle trademark line (Play metadata policy risk).
 > Supersedes: docs/google-play-store-listing.md, docs/store-listing-hebrew.md, docs/store-listing-swedish.md, docs/store-listing-japanese.md (copy sections only — those files keep tags/rating-questionnaire notes).
 
