@@ -101,7 +101,14 @@ export function isBot(userAgent: string): boolean {
  * @returns Locale code
  */
 export function determineLocale(req: GeoRequest): string {
-  // Priority 1: Cookie preference (explicit user selection)
+  // Priority 1: explicit ?locale= query (supports documented ?locale=he for testing/RTL/automation + deep links)
+  const urlStr = (req as any).url || '';
+  const qMatch = /[?&]locale=([a-z]{2})/i.exec(urlStr);
+  if (qMatch && SUPPORTED_LOCALES.includes(qMatch[1])) {
+    return qMatch[1];
+  }
+
+  // Priority 2: Cookie preference (explicit user selection)
   const cookies = req.headers.cookie;
   const cookieLocale = cookies?.split(';')
     .find(c => c.trim().startsWith('boggle_language='))
@@ -111,7 +118,7 @@ export function determineLocale(req: GeoRequest): string {
     return cookieLocale;
   }
 
-  // Priority 2: Accept-Language header (browser preference). Shared resolver
+  // Priority 3: Accept-Language header (browser preference). Shared resolver
   // q-sorts the full list AND maps close-but-unshipped languages to a native
   // bundle (e.g. pt-BR -> es) before falling back to DEFAULT_LOCALE. Previously
   // this only inspected the first tag and ignored proximity, so Brazilians got

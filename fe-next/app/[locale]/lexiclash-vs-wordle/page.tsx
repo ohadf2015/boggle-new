@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
+import { permanentRedirect } from 'next/navigation';
 import { ComparisonLanding } from '@/components/landing/comparison/ComparisonLanding';
+import { englishComparisonRedirect } from '@/lib/comparison/enOnlyRedirect';
+import { loadTranslation } from '@/translations/loadTranslation';
+import { buildComparisonRows, WORDLE_ROW_DEFS } from '@/lib/comparison/comparisonTable';
 
 export const dynamic = 'force-dynamic';
 
@@ -88,6 +92,13 @@ const faqJsonLd = JSON.stringify({
 export default async function LexiClashVsWordlePage({ params }: PageProps) {
   const { locale } = await params;
 
+  const redirect = englishComparisonRedirect(locale, 'lexiclash-vs-wordle');
+  if (redirect) permanentRedirect(redirect);
+
+  const trans = await loadTranslation(locale as any) as Record<string, any>;
+  const vs = (trans.vs || trans.comparison || {}) as Record<string, string>;
+  const featureLabel = vs.feature || 'Feature';
+
   return (
     <>
       {/* Static JSON-LD for FAQ rich results — hardcoded content only, no user input */}
@@ -108,21 +119,9 @@ export default async function LexiClashVsWordlePage({ params }: PageProps) {
           { href: `/${locale}/multiplayer`, label: 'Play With Friends', variant: 'pink' },
         ]}
         competitorName="Wordle"
-        comparisonRows={[
-          ['Games per day', 'Unlimited', '1'],
-          ['Multiplayer', 'Real-time, 2-20+ players', 'None'],
-          ['Game type', 'Word-finding on grid', 'Letter guessing'],
-          ['Free to play', 'Yes, fully free', 'Yes (part of NYT)'],
-          ['No download needed', 'Yes', 'Yes'],
-          ['Languages', '5 (EN, HE, SV, JA, ES)', '1 (English)'],
-          ['Adventure mode', '100+ levels, boss battles', 'None'],
-          ['Daily challenge', 'Yes + global leaderboard', 'Yes'],
-          ['Brain training', '5 drill modes', 'None'],
-          ['Streak system', 'Yes + streak freeze', 'Yes'],
-          ['Shareable results', 'Emoji grid + challenge link', 'Emoji grid only'],
-          ['Account required', 'No', 'No (optional NYT)'],
-        ]}
-        featuresTitle="What LexiClash Does That Wordle Doesn't"
+        comparisonRows={buildComparisonRows(vs, WORDLE_ROW_DEFS)}
+        featureLabel={featureLabel}
+        featuresTitle={vs.whatLexiDoes || "What LexiClash Does That Wordle Doesn't"}
         features={[
           { title: 'You Can Actually Keep Playing', desc: 'Wordle gives you one puzzle and says "see you tomorrow." LexiClash has no limit. Solo, multiplayer, adventure mode — play for five minutes or five hours.' },
           { title: 'Multiplayer That Gets Competitive', desc: 'Same board, same timer, everyone racing at once. It turns out word games are way more fun when you can watch your friend panic in real time.' },

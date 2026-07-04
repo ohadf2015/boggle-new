@@ -14486,6 +14486,34 @@ const en = {
     "downloaded": "{size} MB · {count} words",
     "notDownloaded": "Not downloaded",
     "errorGeneric": "Download failed. Please try again."
+  },
+  "vs": {
+    "feature": "Feature",
+    "gamesPerDay": "Games per day",
+    "multiplayer": "Multiplayer",
+    "gameType": "Game type",
+    "freeToPlay": "Free to play",
+    "noDownload": "No download needed",
+    "languages": "Languages",
+    "adventureMode": "Adventure mode",
+    "dailyChallenge": "Daily challenge",
+    "brainTraining": "Brain training",
+    "streakSystem": "Streak system",
+    "shareableResults": "Shareable results",
+    "accountRequired": "Account required",
+    "sideBySide": "Side-by-side, no spin",
+    "whatLexiDoes": "What LexiClash Does That Wordle Doesn't",
+    "free": "Free",
+    "noStudentLogin": "No student login",
+    "coreFormat": "Core format",
+    "liveWholeClassMultiplayer": "Live whole-class multiplayer",
+    "oneVOneDuels": "1v1 duels with student pairing",
+    "teacherDashboard": "Teacher dashboard / analytics",
+    "customWordLists": "Custom curriculum word lists",
+    "wordFormation": "Word formation (spelling practice)",
+    "fiveLanguages": "5 languages with native dictionaries",
+    "charitableDonation": "Charitable donation angle",
+    "bestFor": "Best for"
   }
 };
 

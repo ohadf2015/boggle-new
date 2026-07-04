@@ -1,9 +1,13 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { permanentRedirect } from 'next/navigation';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
+import { englishComparisonRedirect } from '@/lib/comparison/enOnlyRedirect';
+import { loadTranslation } from '@/translations/loadTranslation';
+import { buildComparisonRows, FREERICE_ROW_DEFS } from '@/lib/comparison/comparisonTable';
 
-export const revalidate = 86400;
+export const dynamic = 'force-dynamic';
 
 interface PageProps {
   params: Promise<{ locale: string }>;
@@ -59,22 +63,17 @@ const faqs = [
   { q: 'Should I use both Freerice and LexiClash?', a: 'They serve different moments. Freerice is a calm, solo, do-good activity — good for early finishers or independent practice. LexiClash is the loud, competitive, whole-class review game. Using both gives you a solo option and a multiplayer option, both free and login-free.' },
 ];
 
-const compareRows: ReadonlyArray<readonly [string, string, string]> = [
-  ['Free', '✓', '✓'],
-  ['No student login', '✓ 4-digit join code', '✓ Anonymous play'],
-  ['Core format', 'Live word-formation games', 'Solo multiple-choice quiz'],
-  ['Live whole-class multiplayer', '✓ Free, up to 30', '✗ Solo (group totals only)'],
-  ['1v1 duels with student pairing', '✓', '✗'],
-  ['Teacher dashboard / analytics', '✓ Per-student + class-wide', '✗ Anonymous'],
-  ['Custom curriculum word lists', '✓', '✗ Fixed question banks'],
-  ['Word formation (spelling practice)', '✓ Boggle/Wheel/Anagram', '✗ Pick the right definition'],
-  ['5 languages with native dictionaries', '✓ EN/HE/SV/JA/ES', 'Several quiz categories'],
-  ['Charitable donation angle', '✗', '✓ Rice via World Food Programme'],
-  ['Best for', 'Whole-class review games', 'Solo do-good vocabulary practice'],
-];
-
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
+
+  const redirect = englishComparisonRedirect(locale, 'lexiclash-vs-freerice');
+  if (redirect) permanentRedirect(redirect);
+
+  const trans = await loadTranslation(locale as any) as Record<string, any>;
+  const vs = (trans.vs || trans.comparison || {}) as Record<string, string>;
+  const featureLabel = vs.feature || 'Feature';
+
+  const rows = buildComparisonRows(vs, FREERICE_ROW_DEFS);
 
   const faqJsonLd = {
     '@context': 'https://schema.org',
@@ -126,18 +125,18 @@ export default async function Page({ params }: PageProps) {
         </section>
 
         <section className="mb-12">
-          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">Side-by-side, no spin</h2>
+          <h2 className="mb-6 font-neo-display text-2xl font-bold sm:text-3xl">{vs.sideBySide || 'Side-by-side, no spin'}</h2>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse rounded-neo border-3 border-neo-gray-400 text-sm sm:text-base">
               <thead>
                 <tr className="border-b-3 border-neo-gray-400 bg-neo-navy/80">
-                  <th className="px-4 py-3 text-left font-bold text-neo-lime">Feature</th>
+                  <th className="px-4 py-3 text-left font-bold text-neo-lime">{featureLabel}</th>
                   <th className="px-4 py-3 text-center font-bold text-neo-cyan">LexiClash</th>
                   <th className="px-4 py-3 text-center text-neo-gray-300">Freerice</th>
                 </tr>
               </thead>
               <tbody>
-                {compareRows.map(([feature, lexi, fr]) => (
+                {rows.map(([feature, lexi, fr]) => (
                   <tr key={feature} className="border-b border-neo-gray-400/50">
                     <td className="px-4 py-3 font-medium">{feature}</td>
                     <td className="px-4 py-3 text-center text-neo-cyan">{lexi}</td>

@@ -61,6 +61,7 @@ export interface ComparisonLandingProps {
   // Scoreboard
   competitorName: string;
   comparisonRows: ComparisonRow[];
+  featureLabel?: string;
 
   // Feature / pain-point grid
   featuresTitle: string;
@@ -141,9 +142,11 @@ function QuickCtaButton({ cta }: { cta: QuickCta }) {
 function Scoreboard({
   competitorName,
   rows,
+  featureLabel,
 }: {
   competitorName: string;
   rows: ComparisonRow[];
+  featureLabel?: string;
 }) {
   return (
     <div
@@ -154,7 +157,7 @@ function Scoreboard({
         <thead>
           <tr className="border-b-[3px] border-neo-black bg-neo-navy-elevated">
             <th className="px-4 py-4 text-left font-neo-display text-xs font-black uppercase tracking-wider text-neo-cream/70">
-              Feature
+              {featureLabel || 'Feature'}
             </th>
             <th
               data-testid="winner-col-header"
@@ -232,6 +235,7 @@ export function ComparisonLanding(props: ComparisonLandingProps) {
     quickCtas,
     competitorName,
     comparisonRows,
+    featureLabel,
     featuresTitle,
     features,
     featuresStyle = 'positive',
@@ -270,7 +274,7 @@ export function ComparisonLanding(props: ComparisonLandingProps) {
         {/* Scoreboard */}
         <section className="mb-16">
           <SectionHeading accent="cyan">Head to Head</SectionHeading>
-          <Scoreboard competitorName={competitorName} rows={comparisonRows} />
+          <Scoreboard competitorName={competitorName} rows={comparisonRows} featureLabel={featureLabel} />
         </section>
 
         {/* Features / pain points */}

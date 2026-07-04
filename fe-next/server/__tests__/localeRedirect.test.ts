@@ -116,4 +116,13 @@ describe('handleLocaleRedirect — root always rewrites (never 301)', () => {
     expect(handleLocaleRedirect(r, res, { pathname: '/', search: '?ref=x' } as unknown as UrlWithParsedQuery)).toBe(false);
     expect(r.url).toBe('/en?ref=x');
   });
+
+  it('honours explicit ?locale= query param (documented ?locale=he support for RTL/testing)', () => {
+    const res = mockRes();
+    const r = { headers: { 'user-agent': 'Mozilla/5.0', 'sec-fetch-mode': 'navigate' }, url: '/?locale=he' } as unknown as GeoRequest;
+    const p = { pathname: '/', search: '?locale=he' } as unknown as UrlWithParsedQuery;
+    expect(handleLocaleRedirect(r, res, p)).toBe(false);
+    // After fix: should rewrite to /he?locale=he (query preserved)
+    expect(r.url).toBe('/he?locale=he');
+  });
 });

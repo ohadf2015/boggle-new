@@ -14591,6 +14591,34 @@ const he = {
     "downloaded": "{size} MB · {count} מילים",
     "notDownloaded": "לא הורד",
     "errorGeneric": "ההורדה נכשלה. אנא נסו שוב."
+  },
+  "vs": {
+    "feature": "תכונה",
+    "gamesPerDay": "משחקים ביום",
+    "multiplayer": "מולטיפלייר",
+    "gameType": "סוג משחק",
+    "freeToPlay": "חינם",
+    "noDownload": "אין צורך בהורדה",
+    "languages": "שפות",
+    "adventureMode": "מצב הרפתקה",
+    "dailyChallenge": "אתגר יומי",
+    "brainTraining": "אימון מוח",
+    "streakSystem": "רצף",
+    "shareableResults": "שתף תוצאות",
+    "accountRequired": "חשבון נדרש",
+    "sideBySide": "זה לצד זה, ללא ספין",
+    "whatLexiDoes": "מה לקסיקלאש עושה ש-Wordle לא",
+    "free": "חינם",
+    "noStudentLogin": "אין צורך בהתחברות תלמיד",
+    "coreFormat": "פורמט ליבה",
+    "liveWholeClassMultiplayer": "מולטיפלייר כיתתי חי",
+    "oneVOneDuels": "דו-קרב 1:1",
+    "teacherDashboard": "לוח מחוונים למורה / אנליטיקס",
+    "customWordLists": "רשימות מילים מותאמות אישית",
+    "wordFormation": "יצירת מילים (תרגול כתיב)",
+    "fiveLanguages": "5 שפות עם מילונים מקומיים",
+    "charitableDonation": "היבט תרומה צדקה",
+    "bestFor": "הכי מתאים ל"
   }
 };
 

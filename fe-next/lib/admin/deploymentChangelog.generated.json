@@ -1,6 +1,111 @@
 {
-  "generatedAt": "2026-07-03T19:51:54.430Z",
+  "generatedAt": "2026-07-04T21:33:30.026Z",
   "commits": [
+    {
+      "sha": "dd70014c0d803a22d7bade6baea7fa81e1031720",
+      "shortSha": "dd70014",
+      "subject": "feat(marketing): THE LAST WORD cinematic trailer reel — final v13 (en + he)",
+      "author": "Ohad Fisher",
+      "date": "2026-07-05T00:15:10+03:00"
+    },
+    {
+      "sha": "eb0b57d1e00e49746f3afc716e8384772f34f4c6",
+      "shortSha": "eb0b57d",
+      "subject": "perf(home): kill 3s landing-stats stall when no SocketProvider",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T21:55:00+03:00"
+    },
+    {
+      "sha": "e91b688f257d118c2f74ef061d377fc126e21f1b",
+      "shortSha": "e91b688",
+      "subject": "feat(blast): dead-end/combo fixes, feel polish, and coins+gems upgrade store",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T19:16:17+03:00"
+    },
+    {
+      "sha": "3a3f31bb03706f69d40bab8fc45fd8e5a425f098",
+      "shortSha": "3a3f31b",
+      "subject": "feat(i18n): native 6-locale copy for all education landing pages (+ru)",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T19:14:14+03:00"
+    },
+    {
+      "sha": "0d9444f9bc7fd204456bcda05ae2334bbf92d28b",
+      "shortSha": "0d9444f",
+      "subject": "fix(daily): wire ghost-rival challenge end-to-end",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T16:53:38+03:00"
+    },
+    {
+      "sha": "60e598c9458b8c176187fd92e33edca87c063e35",
+      "shortSha": "60e598c",
+      "subject": "fix(i18n): add missing mp.* keys in ru/sv/ja/es (raw MP.NOROOMSYET shown on ru arena)",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T16:37:39+03:00"
+    },
+    {
+      "sha": "96c17dce7e1fccfb9ff03547bcdcfb7fde695cc0",
+      "shortSha": "96c17dc",
+      "subject": "fix(boot): homepage loader full-screen — kill CLS from short loader",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T16:26:21+03:00"
+    },
+    {
+      "sha": "d0f1e252e8d743e3a86ebf00ef78dc149444f68a",
+      "shortSha": "d0f1e25",
+      "subject": "docs(aso): correct publishing note — managed publishing is OFF, listings auto-publish on approval",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T15:55:36+03:00"
+    },
+    {
+      "sha": "13ce653977fe56f67e444ea1065f6eed2fdddcaf",
+      "shortSha": "13ce653",
+      "subject": "feat(aso): play-store listing refresh (ru-RU + 6-lang) + footer link to install landing",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T15:50:57+03:00"
+    },
+    {
+      "sha": "3a8a2d1081e45eac0618185fb45b1909747edc87",
+      "shortSha": "3a8a2d1",
+      "subject": "perf(boot): lighter homepage loader + drop redundant splash",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T12:36:06+03:00"
+    },
+    {
+      "sha": "b19cffd1ea6a355f72e50ba624447f38436e6e3f",
+      "shortSha": "b19cffd",
+      "subject": "fix: resolve 5 Sentry issues + iPhone music autoplay",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T12:33:12+03:00"
+    },
+    {
+      "sha": "b340b071a3b07d816dfeb29d86a4faa59d7751de",
+      "shortSha": "b340b07",
+      "subject": "fix(i18n): add missing mp.quality.* and blast.toCatchUp keys",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T11:24:33+03:00"
+    },
+    {
+      "sha": "1bf70c095d62f9de8c0e46ecb12565cf25620fa9",
+      "shortSha": "1bf70c0",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-04",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T06:16:52+03:00"
+    },
+    {
+      "sha": "6e4f718b398624ed65243b2c3cdb064e46aac37d",
+      "shortSha": "6e4f718",
+      "subject": "feat(growth): daily-first funnel — beat-me challenge loop, lobby auto-fill, friction removal",
+      "author": "Ohad Fisher",
+      "date": "2026-07-04T05:26:00+03:00"
+    },
+    {
+      "sha": "9bcd43d0d4cd7c7aaa926fef53f6c9b8e366d8fe",
+      "shortSha": "9bcd43d",
+      "subject": "fix(wordcraft): landscape-phone game layout — board no longer collapses",
+      "author": "Ohad Fisher",
+      "date": "2026-07-03T23:02:38+03:00"
+    },
     {
       "sha": "eb03050c7bbc2be40fd62434024358b5bef68da1",
       "shortSha": "eb03050",
@@ -35,111 +140,6 @@
       "subject": "perf(wordcraft): O(1) drop resolution + imperative drag ghost",
       "author": "Ohad Fisher",
       "date": "2026-07-03T21:06:46+03:00"
-    },
-    {
-      "sha": "af1f5dfbbf26b66a99d400aae17f565b438d9b8c",
-      "shortSha": "af1f5df",
-      "subject": "feat(wordcraft): quick_draw + golden_tiles felt modifiers",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T21:06:27+03:00"
-    },
-    {
-      "sha": "0661c343f8b4c2acce448838c011032421778e83",
-      "shortSha": "0661c34",
-      "subject": "feat(wordcraft): auto-center opening tile + player modifier override",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T21:06:08+03:00"
-    },
-    {
-      "sha": "fced320a620f7d91e3bc2241d7edacaca7633a43",
-      "shortSha": "fced320",
-      "subject": "feat(blast): audit fixes — ghost-tile re-entrancy, true cascade bonus fly, goal completion feedback",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T20:33:31+03:00"
-    },
-    {
-      "sha": "7f75c9588c70feb72ffc60876c892277925b2f37",
-      "shortSha": "7f75c95",
-      "subject": "docs(email): note ru in getWelcomeEmailModes locale list",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T19:42:57+03:00"
-    },
-    {
-      "sha": "4b14f696d11d96d44a25c8136f2727f578677f91",
-      "shortSha": "4b14f69",
-      "subject": "feat(i18n): 10 more blog articles translated to native Russian",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T19:36:59+03:00"
-    },
-    {
-      "sha": "eeb4f52829d7b01d377119faa658cb4cecb139a8",
-      "shortSha": "eeb4f52",
-      "subject": "refactor(mp): brag share text — neutral scoreline, not canned trash talk",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T19:33:46+03:00"
-    },
-    {
-      "sha": "48d7d22137386ad5e138efcf7579c7c6fe132241",
-      "shortSha": "48d7d22",
-      "subject": "feat(mp): brag card carries live room join link + native share",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T19:18:09+03:00"
-    },
-    {
-      "sha": "fb270fab33343c8dc806aaaada1487520742c007",
-      "shortSha": "fb270fa",
-      "subject": "feat(seo): add ru hreflang to remaining hardcoded alternates maps",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T18:58:35+03:00"
-    },
-    {
-      "sha": "43eb8341e48c076810c666dae4d4f63175364133",
-      "shortSha": "43eb834",
-      "subject": "feat(i18n): Russian welcome email — subject, body, mode blurbs",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T18:49:46+03:00"
-    },
-    {
-      "sha": "14ef8061f583a24f93998ec7b54625b87c83eddf",
-      "shortSha": "14ef806",
-      "subject": "feat(ads): warm rewarded slots at intent moments + age prompt at interstitial break",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T18:48:43+03:00"
-    },
-    {
-      "sha": "ea9d258ed000cacdb98a604aac9bf217f7f26669",
-      "shortSha": "ea9d258",
-      "subject": "feat(connections): recency-window interleave — no near-repeat puzzles",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T18:40:02+03:00"
-    },
-    {
-      "sha": "06e2669f3d53191db4cd6b546f9ac4784383401f",
-      "shortSha": "06e2669",
-      "subject": "feat(connections): bridge pyramid daily mode",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T18:29:03+03:00"
-    },
-    {
-      "sha": "9bc126981fe3d787d7ce207d2bf6ce03f21c9c85",
-      "shortSha": "9bc1269",
-      "subject": "feat(connections): fail-closed quality gate, judged pools, ru locale",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T18:28:38+03:00"
-    },
-    {
-      "sha": "5e3fa37791e45cc0e68dfd654e56e64e3178e2c9",
-      "shortSha": "5e3fa37",
-      "subject": "feat(i18n): Russian blog content + close ru SEO gaps (hreflang, JsonLd, sitemap)",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T18:27:48+03:00"
-    },
-    {
-      "sha": "2d7a8510819d2dfde63b0357d1e1c80c27bb2251",
-      "shortSha": "2d7a851",
-      "subject": "fix(daily): regenerate Word Hunt tutorial images with brand mascot",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T18:26:47+03:00"
     }
   ]
 }

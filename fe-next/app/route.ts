@@ -11,6 +11,12 @@ export const dynamic = 'force-dynamic';
 
 // Helper to detect user's preferred locale from request
 function getPreferredLocale(request: NextRequest): string {
+  // Highest: explicit ?locale= query (matches documented usage for ?locale=he RTL/testing + deep links)
+  const qLocale = request.nextUrl.searchParams.get('locale');
+  if (qLocale && locales.includes(qLocale)) {
+    return qLocale;
+  }
+
   // First, check for locale cookie (set by the app when user changes language)
   const localeCookie = request.cookies.get('boggle_language')?.value;
   if (localeCookie && locales.includes(localeCookie)) {

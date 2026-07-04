@@ -117,3 +117,8 @@ describe('useBlastEngine — applyServerBoard skips redundant replacements (anti
     expect(result.current.tileStates[2][3].isCleared).toBe(true);
   });
 });
+
+afterAll(() => {
+  vi.restoreAllMocks();
+  vi.clearAllMocks();
+});
