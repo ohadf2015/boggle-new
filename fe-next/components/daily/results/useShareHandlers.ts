@@ -9,6 +9,7 @@ import {
   type WordHuntResult,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
+import { generateChallengeShareUrl } from '@/utils/dailyChallenge/shareUtils';
 // dailyShareImage (620 LOC + canvas rendering) is dynamically imported inside the
 // share handler so it stays out of the results-screen chunk — it only runs on share-tap.
 import type { Language } from '@/types';
@@ -171,20 +172,20 @@ export function useShareHandlers({
     }
   }, [shareTextWithUrl]);
 
-  // Build challenge URL with gauntlet params so recipients see the challenger's score
+  // Build challenge URL on the rival contract (whName/whEmoji/whScore/whPuzzle)
+  // that the receiver parses via parseRivalFromParams — same param names the
+  // capture hook + head-to-head compare card read. Score axis = efficiencyScore
+  // (the Word Hunt canonical score), so challenger and challenged compare like
+  // for like. puzzleNumber/language are guaranteed via the explicit props.
   const challengeUrl = useMemo(() => {
-    const origin = typeof window !== 'undefined'
-      ? window.location.origin
-      : 'https://www.lexiclash.live';
-    const score = result.efficiencyScore ?? 0;
-    const params = new URLSearchParams({
-      whChallenger: displayName,
-      whChallengeScore: String(score),
-      whChallengeEmoji: avatarEmoji,
-      whChallengeDate: puzzleDate,
-    });
-    return `${origin}/${language}/daily?${params.toString()}`;
-  }, [displayName, avatarEmoji, puzzleDate, language, result.efficiencyScore]);
+    return generateChallengeShareUrl(
+      { ...result, puzzleNumber, language },
+      displayName,
+      avatarEmoji,
+      result.efficiencyScore ?? 0,
+      result.streakDays || 0,
+    );
+  }, [result, puzzleNumber, language, displayName, avatarEmoji]);
 
   // Handle challenge (gauntlet) share via native share or panel fallback
   const handleChallengeShare = useCallback(async () => {

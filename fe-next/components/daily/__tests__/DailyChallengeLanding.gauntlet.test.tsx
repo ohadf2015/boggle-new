@@ -2,7 +2,7 @@
  * Tests for ScoreGauntletBanner integration in DailyChallengeLanding.
  *
  * Requirements:
- * 1. When URL params include whChallenger, whChallengeScore, whChallengeEmoji → show ScoreGauntletBanner
+ * 1. When URL params include whName, whScore, whEmoji (the rival contract) → show ScoreGauntletBanner
  * 2. When no challenge params → banner is absent
  */
 
@@ -118,7 +118,7 @@ describe('DailyChallengeLanding - ScoreGauntletBanner integration', () => {
     beforeEach(() => {
       mockUseSearchParams.mockReturnValue(
         new URLSearchParams(
-          'whChallenger=Ohad&whChallengeScore=847&whChallengeEmoji=%F0%9F%8E%AF'
+          'whName=Ohad&whScore=847&whEmoji=%F0%9F%8E%AF'
         )
       );
     });
@@ -163,7 +163,7 @@ describe('DailyChallengeLanding - ScoreGauntletBanner integration', () => {
   describe('GIVEN URL has challenger name but no score', () => {
     beforeEach(() => {
       mockUseSearchParams.mockReturnValue(
-        new URLSearchParams('whChallenger=Ohad')
+        new URLSearchParams('whName=Ohad')
       );
     });
 

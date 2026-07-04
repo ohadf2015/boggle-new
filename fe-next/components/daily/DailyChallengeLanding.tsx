@@ -49,11 +49,15 @@ export function DailyChallengeLanding({
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const challengerName = searchParams?.get('whChallenger') || null;
-  const challengerScore = searchParams?.get('whChallengeScore')
-    ? Number(searchParams.get('whChallengeScore'))
+  // Pre-game gauntlet banner. Reads the same rival contract the share link emits
+  // (whName/whScore/whEmoji) and the results head-to-head card consumes — one
+  // contract end to end. The validated verdict lives on the results screen
+  // (useDailyRivalChallenge → sessionStorage); this banner is just the hype.
+  const challengerName = searchParams?.get('whName') || null;
+  const challengerScore = searchParams?.get('whScore')
+    ? Number(searchParams.get('whScore'))
     : null;
-  const challengerEmoji = searchParams?.get('whChallengeEmoji') || null;
+  const challengerEmoji = searchParams?.get('whEmoji') || null;
 
   // Use the centralized hook for Word Hunt status + streak (fetches from server for authed users)
   const dailyStatus = useDailyChallengeStatus(currentLanguage);

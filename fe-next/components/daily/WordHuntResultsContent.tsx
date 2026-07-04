@@ -28,6 +28,8 @@ import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
 import { MascotWithEntrance } from '@/components/ui/Mascot';
+import RivalCompareCard from './RivalCompareCard';
+import { useDailyRivalCompare } from '@/hooks/useDailyRivalCompare';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
 import type { Language } from '@/shared/types/game';
 import {
@@ -134,6 +136,11 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   isStreakProtected = false,
   t,
 }) => {
+  // Head-to-head rival captured from a friend's challenge share link (persisted
+  // to sessionStorage on the /daily landing). Compare on the same score axis the
+  // challenger sent — efficiencyScore — so the verdict is honest.
+  const rival = useDailyRivalCompare(puzzleNumber);
+
   // Word Wheel completion gate: localStorage-first (no first-paint flash) then
   // server-of-record cross-device check — so a player who finished the wheel on
   // another device sees "Back to Daily Hub", not a nag to replay it.
@@ -288,6 +295,23 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       meaning={result.meaning}
       t={t}
     />
+
+    {/* Head-to-head: a friend challenged you — did you beat their score? */}
+    {rival && (
+      <m.div
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.08, type: 'spring', stiffness: 300, damping: 26 }}
+      >
+        <RivalCompareCard
+          rivalName={rival.name}
+          rivalEmoji={rival.emoji}
+          rivalScore={rival.score}
+          myScore={result.efficiencyScore ?? 0}
+          t={t}
+        />
+      </m.div>
+    )}
 
     {/* Streak freeze shields indicator */}
     {(freezesAvailable > 0 || isStreakProtected) && (

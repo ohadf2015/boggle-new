@@ -5,6 +5,7 @@
 
 import { renderHook, act } from '@testing-library/react';
 import { useShareHandlers } from '../useShareHandlers';
+import { parseRivalFromParams } from '@/utils/dailyChallenge/rivalChallenge';
 import type { WordHuntResult, GuestDailyPlayer } from '@/utils/dailyChallenge';
 
 // Mock generateWordHuntShareableResult and image utilities
@@ -71,7 +72,11 @@ describe('useShareHandlers - challenge share', () => {
     expect(typeof result.current.challengeUrl).toBe('string');
   });
 
-  it('challenge URL contains whChallenger param', async () => {
+  // The share URL MUST use the same param contract the receiver parses
+  // (whName/whEmoji/whScore/whPuzzle via parseRivalFromParams). This is the
+  // cross-boundary guard the two halves lacked — a mismatch here silently
+  // killed the whole ghost-rival pipeline.
+  it('challenge URL uses the rival contract params', async () => {
     const { result } = renderHook(() => useShareHandlers(baseProps));
     mockShare.mockResolvedValue(undefined);
 
@@ -81,11 +86,13 @@ describe('useShareHandlers - challenge share', () => {
 
     expect(mockShare).toHaveBeenCalled();
     const callArg = mockShare.mock.calls[0][0];
-    expect(callArg.url).toContain('whChallenger=');
-    expect(callArg.url).toContain('whChallengeScore=');
+    expect(callArg.url).toContain('whName=TestPlayer');
+    expect(callArg.url).toContain('whScore=87'); // efficiencyScore
+    expect(callArg.url).toContain('whEmoji=');
+    expect(callArg.url).toContain('whPuzzle=42');
   });
 
-  it('challenge URL contains the correct challenger name', async () => {
+  it('produces a URL the receiver parser accepts for today’s puzzle', async () => {
     const { result } = renderHook(() => useShareHandlers(baseProps));
     mockShare.mockResolvedValue(undefined);
 
@@ -94,43 +101,14 @@ describe('useShareHandlers - challenge share', () => {
     });
 
     const callArg = mockShare.mock.calls[0][0];
-    expect(callArg.url).toContain('whChallenger=TestPlayer');
-  });
+    const search = new URL(callArg.url).searchParams;
+    const params = Object.fromEntries(search.entries());
+    const rival = parseRivalFromParams(params, 42);
 
-  it('challenge URL contains whChallengeScore with efficiencyScore', async () => {
-    const { result } = renderHook(() => useShareHandlers(baseProps));
-    mockShare.mockResolvedValue(undefined);
-
-    await act(async () => {
-      await result.current.handleChallengeShare();
-    });
-
-    const callArg = mockShare.mock.calls[0][0];
-    expect(callArg.url).toContain('whChallengeScore=87');
-  });
-
-  it('challenge URL contains whChallengeEmoji param', async () => {
-    const { result } = renderHook(() => useShareHandlers(baseProps));
-    mockShare.mockResolvedValue(undefined);
-
-    await act(async () => {
-      await result.current.handleChallengeShare();
-    });
-
-    const callArg = mockShare.mock.calls[0][0];
-    expect(callArg.url).toContain('whChallengeEmoji=');
-  });
-
-  it('challenge URL contains whChallengeDate param', async () => {
-    const { result } = renderHook(() => useShareHandlers(baseProps));
-    mockShare.mockResolvedValue(undefined);
-
-    await act(async () => {
-      await result.current.handleChallengeShare();
-    });
-
-    const callArg = mockShare.mock.calls[0][0];
-    expect(callArg.url).toContain('whChallengeDate=2026-02-22');
+    expect(rival).not.toBeNull();
+    expect(rival?.name).toBe('TestPlayer');
+    expect(rival?.score).toBe(87);
+    expect(rival?.puzzleNumber).toBe(42);
   });
 
   it('calls navigator.share with title and text', async () => {
