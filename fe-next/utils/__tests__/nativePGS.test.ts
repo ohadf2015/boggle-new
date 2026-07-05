@@ -181,6 +181,46 @@ describe('Native Play Games Services bridge', () => {
     });
   });
 
+  describe('thenable Capacitor proxy (JAVASCRIPT-NEXTJS-1PH regression)', () => {
+    // The real Capacitor plugin proxy exposes EVERY property access as a native
+    // method — so it is accidentally "thenable". Returning or awaiting the bare
+    // proxy runs Promise assimilation, which INVOKES proxy.then(resolve, reject)
+    // → native '"CapacitorGameConnect.then()" is not implemented on android' →
+    // an unhandled rejection (153 Sentry events). The bridge must never let the
+    // bare proxy flow through await/return; it must resolve to a boolean and
+    // reference the plugin synchronously.
+    afterEach(() => {
+      delete (mockGameConnect as unknown as { then?: unknown }).then;
+    });
+
+    function makeProxyThenable(): void {
+      (mockGameConnect as unknown as { then: unknown }).then = (
+        _resolve: unknown,
+        reject: (e: Error) => void,
+      ) => reject(new Error('"CapacitorGameConnect.then()" is not implemented on android'));
+    }
+
+    it('submitLeaderboardScore resolves (no unhandled rejection) when the proxy is thenable', async () => {
+      makeProxyThenable();
+      // A rejection here IS the 1PH unhandled rejection. Must resolve instead.
+      const res = await submitLeaderboardScore('lb_words', 4200);
+      expect(res.success).toBe(true);
+      expect(mockGameConnect.submitScore).toHaveBeenCalled();
+    });
+
+    it('signInPlayGames resolves when the proxy is thenable', async () => {
+      makeProxyThenable();
+      const res = await signInPlayGames();
+      expect(res.success).toBe(true);
+    });
+
+    it('showLeaderboard resolves when the proxy is thenable (fire-and-forget path)', async () => {
+      makeProxyThenable();
+      const res = await showLeaderboard('lb_words');
+      expect(res.success).toBe(true);
+    });
+  });
+
   describe('native UI surfaces', () => {
     it('showLeaderboard passes { leaderboardID }', async () => {
       const res = await showLeaderboard('lb_words');

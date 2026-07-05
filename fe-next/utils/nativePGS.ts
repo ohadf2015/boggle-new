@@ -111,27 +111,35 @@ export function isPlayGamesAvailable(): boolean {
 }
 
 /**
- * Resolve the plugin, lazily initializing. Null when unavailable (web/iOS).
- * Never rejects — any init/import failure resolves to null, so callers (and the
- * fire-and-forget award path) can never surface an unhandled rejection.
+ * Ensure the plugin is initialized. Resolves to `true` once it's ready, `false`
+ * otherwise (web/iOS/init failure). Never rejects.
+ *
+ * CRITICAL — returns a BOOLEAN, not the plugin. The Capacitor proxy exposes
+ * every property access as a native method, so it is accidentally "thenable":
+ * returning or awaiting the bare proxy runs Promise assimilation, which INVOKES
+ * `proxy.then(resolve, reject)` → native rejects with
+ * `"CapacitorGameConnect.then()" is not implemented on android`. That surfaced
+ * as 153 unhandled rejections (Sentry JAVASCRIPT-NEXTJS-1PH). Callers must read
+ * the module-level `plugin` synchronously after this resolves — never await it.
  */
-async function ensurePlugin(): Promise<CapacitorGameConnectPlugin | null> {
+async function ensurePluginReady(): Promise<boolean> {
   try {
     if (!isPlayGamesAvailable()) {
       await initializePlayGames();
     }
   } catch {
-    return null;
+    return false;
   }
-  return isPlayGamesAvailable() ? plugin : null;
+  return isPlayGamesAvailable();
 }
 
 /**
  * Sign the player in to Play Games (Games-scoped — NOT the Supabase session).
  */
 export async function signInPlayGames(): Promise<PlayGamesSignInResult> {
-  const p = await ensurePlugin();
-  if (!p) return { success: false, error: 'Play Games not available' };
+  const ready = await ensurePluginReady();
+  const p = plugin; // read synchronously — never `await`/`return` the bare proxy (1PH)
+  if (!ready || !p) return { success: false, error: 'Play Games not available' };
 
   try {
     const { player_id, player_name } = await p.signIn();
@@ -149,8 +157,9 @@ export async function submitLeaderboardScore(
   leaderboardID: string,
   totalScoreAmount: number,
 ): Promise<PlayGamesResult> {
-  const p = await ensurePlugin();
-  if (!p) return { success: false, error: 'Play Games not available' };
+  const ready = await ensurePluginReady();
+  const p = plugin; // read synchronously — never `await`/`return` the bare proxy (1PH)
+  if (!ready || !p) return { success: false, error: 'Play Games not available' };
 
   try {
     await p.submitScore({ leaderboardID, totalScoreAmount });
@@ -163,8 +172,9 @@ export async function submitLeaderboardScore(
 
 /** Unlock a Play Games achievement. */
 export async function unlockAchievement(achievementID: string): Promise<PlayGamesResult> {
-  const p = await ensurePlugin();
-  if (!p) return { success: false, error: 'Play Games not available' };
+  const ready = await ensurePluginReady();
+  const p = plugin; // read synchronously — never `await`/`return` the bare proxy (1PH)
+  if (!ready || !p) return { success: false, error: 'Play Games not available' };
 
   try {
     await p.unlockAchievement({ achievementID });
@@ -180,8 +190,9 @@ export async function incrementAchievement(
   achievementID: string,
   pointsToIncrement: number,
 ): Promise<PlayGamesResult> {
-  const p = await ensurePlugin();
-  if (!p) return { success: false, error: 'Play Games not available' };
+  const ready = await ensurePluginReady();
+  const p = plugin; // read synchronously — never `await`/`return` the bare proxy (1PH)
+  if (!ready || !p) return { success: false, error: 'Play Games not available' };
 
   try {
     await p.incrementAchievementProgress({ achievementID, pointsToIncrement });
@@ -194,8 +205,9 @@ export async function incrementAchievement(
 
 /** Open the native Play Games leaderboard UI. */
 export async function showLeaderboard(leaderboardID: string): Promise<PlayGamesResult> {
-  const p = await ensurePlugin();
-  if (!p) return { success: false, error: 'Play Games not available' };
+  const ready = await ensurePluginReady();
+  const p = plugin; // read synchronously — never `await`/`return` the bare proxy (1PH)
+  if (!ready || !p) return { success: false, error: 'Play Games not available' };
 
   try {
     await p.showLeaderboard({ leaderboardID });
@@ -208,8 +220,9 @@ export async function showLeaderboard(leaderboardID: string): Promise<PlayGamesR
 
 /** Open the native Play Games achievements UI. */
 export async function showAchievements(): Promise<PlayGamesResult> {
-  const p = await ensurePlugin();
-  if (!p) return { success: false, error: 'Play Games not available' };
+  const ready = await ensurePluginReady();
+  const p = plugin; // read synchronously — never `await`/`return` the bare proxy (1PH)
+  if (!ready || !p) return { success: false, error: 'Play Games not available' };
 
   try {
     await p.showAchievements();
