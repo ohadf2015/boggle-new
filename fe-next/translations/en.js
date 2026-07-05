@@ -5464,6 +5464,8 @@ const en = {
     "sectionMultiplayerSubtitle": "Real players, live chaos",
     "sectionSoloTitle": "Solo",
     "sectionSoloSubtitle": "Train. Climb. Beat your best.",
+    "calmSectionTitle": "Take Your Time",
+    "calmSectionSubtitle": "Relaxed puzzles at your own pace",
     "arena": "Multiplayer",
     "arenaDesc": "Play solo or challenge friends!",
     "offlineLocked": "Needs internet",

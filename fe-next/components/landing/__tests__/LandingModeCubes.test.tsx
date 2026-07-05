@@ -250,4 +250,49 @@ describe('LandingModeCubes', () => {
     renderCubes(); // default models have no genIcon
     expect(screen.queryByTestId('cube-glow')).not.toBeInTheDocument();
   });
+
+  // ---- calm / no-timer section: a distinct, quieter "room" for untimed puzzles ----
+  describe('calm / no-timer section', () => {
+    const calm = [
+      model({ key: 'crossword', title: 'Crossword', href: '/en/crossword', variant: 'cyan' }),
+      model({ key: 'connections', title: 'Connections', href: '/en/connections/play', variant: 'blue' }),
+    ];
+
+    it('renders a distinct calm section with its own heading + hint when calmModels are given', () => {
+      renderCubes({ calmModels: calm, calmLabel: 'Take Your Time', calmHint: 'Relaxed puzzles at your own pace' });
+      const section = screen.getByTestId('landing-cubes-calm');
+      expect(within(section).getByRole('heading', { name: /Take Your Time/i })).toBeInTheDocument();
+      expect(within(section).getByText('Relaxed puzzles at your own pace')).toBeInTheDocument();
+      expect(within(section).getByRole('link', { name: /Crossword/i })).toHaveAttribute('href', '/en/crossword');
+      expect(within(section).getByRole('link', { name: /Connections/i })).toBeInTheDocument();
+    });
+
+    it('omits the calm section entirely when there are no calm modes (no empty room)', () => {
+      renderCubes({ calmModels: [] });
+      expect(screen.queryByTestId('landing-cubes-calm')).not.toBeInTheDocument();
+    });
+
+    it('looks intentional at 2 tiles (public set) — renders both without an anchor hero', () => {
+      renderCubes({ models: [model({ key: 'arena', title: 'Arena', role: 'anchor' })], calmModels: calm });
+      const section = screen.getByTestId('landing-cubes-calm');
+      // calm cubes are peers — none gets the 2×2 anchor treatment
+      expect(within(section).queryByTestId('mode-cube-anchor')).not.toBeInTheDocument();
+      expect(within(section).getAllByTestId('mode-cube').length).toBe(2);
+    });
+
+    it('softens calm cubes: gentler hover shadow + no loud mode-glow halo', () => {
+      renderCubes({ models: [model({ key: 'arena', title: 'Arena', role: 'anchor' })], calmModels: calm });
+      const crossword = screen.getByRole('link', { name: /Crossword/i });
+      // the competitive cubes get a blurred mode-hue glow on hover — the calm ones don't
+      expect(crossword.className).not.toMatch(/hover:drop-shadow-\[[^\]]*--cube-glow/);
+      // and a softer hard-shadow tier on hover (shadow-hard-sm, not the full shadow-hard-*)
+      expect(crossword.className).toMatch(/group-hover:shadow-hard-sm/);
+    });
+
+    it('never sheens a calm cube (quiet by construction)', () => {
+      renderCubes({ models: [model({ key: 'arena', title: 'Arena', role: 'anchor' })], calmModels: calm });
+      const section = screen.getByTestId('landing-cubes-calm');
+      expect(within(section).queryByTestId('cube-sheen')).not.toBeInTheDocument();
+    });
+  });
 });

@@ -11244,6 +11244,8 @@ const ru = {
     "playTodayChallenge": "Играй сегодняшний вызов",
     "moreGameModes": "Больше режимов",
     "moreGameModesHint": "Нажми для исследования",
+    "calmSectionTitle": "Не спеша",
+    "calmSectionSubtitle": "Спокойные головоломки в своём темпе",
     "singlePlayer": "Быстрая игра",
     "singlePlayerDesc": "Прыгай и играй сразу",
     "badgeBots": "Боты",

@@ -5425,6 +5425,8 @@ const ja = {
     "playTodayChallenge": "今日のチャレンジをプレイ",
     "moreGameModes": "その他のゲームモード",
     "moreGameModesHint": "タップして探索",
+    "calmSectionTitle": "じっくりプレイ",
+    "calmSectionSubtitle": "のんびり解けるパズル",
     "singlePlayer": "クイックプレイ",
     "singlePlayerDesc": "すぐにプレイ開始",
     "badgeBots": "ボット",

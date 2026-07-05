@@ -5554,6 +5554,8 @@ const he = {
     "playTodayChallenge": "שחקו באתגר היומי",
     "moreGameModes": "עוד מצבי משחק",
     "moreGameModesHint": "הקישו לחקור",
+    "calmSectionTitle": "קחו את הזמן",
+    "calmSectionSubtitle": "חידות רגועות, בקצב שלכם",
     "singlePlayer": "משחק מהיר",
     "singlePlayerDesc": "קפצו פנימה ושחקו מיד",
     "badgeBots": "בוטים",

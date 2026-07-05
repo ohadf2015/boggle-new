@@ -17,7 +17,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, ArrowLeft, Lock, ChevronDown, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Lock, ChevronDown, Sparkles, TimerOff } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CUBE_BLUR_DATA_URL, type ModeCubeModel, type ModeCubeVariant } from '@/lib/landing/modeMeta';
@@ -96,6 +96,10 @@ interface CubeProps {
   /** when false, the anchor is a wide single-row banner instead of a 2×2 block
       (used when there are too few sibling cubes to wrap a 2×2 anchor cleanly) */
   bigAnchor?: boolean;
+  /** `'calm'` cubes live in the quieter no-timer section — they drop the idle
+      sheen and the loud mode-hue glow halo, and use a softer hover shadow so the
+      section reads as a calmer "room" without leaving the neo-brutalist system. */
+  tone?: 'fast' | 'calm';
 }
 
 function StartHerePill({ label, compact }: { label: string; compact?: boolean }) {
@@ -111,11 +115,12 @@ function StartHerePill({ label, compact }: { label: string; compact?: boolean })
   );
 }
 
-function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
+function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast' }: CubeProps) {
   const { dir } = useLanguage();
   const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const v = VARIANT[model.variant];
-  const showSheen = anchor || RECOMMENDED_SHEEN_KEYS.has(model.key);
+  const calm = tone === 'calm';
+  const showSheen = !calm && (anchor || RECOMMENDED_SHEEN_KEYS.has(model.key));
   const locked = !!model.locked;
   const [imgFailed, setImgFailed] = useState(false);
   const hasArt = !!model.genIcon && !imgFailed;
@@ -156,14 +161,18 @@ function Cube({ model, index, anchor = false, bigAnchor = true }: CubeProps) {
         'cube-tilt',
         'active:shadow-hard-pressed',
         'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-        v.shadow, v.ring,
+        // Calm cubes soften the hover to a gentle 1px hard shadow (the loud
+        // coloured slab is competitive-only); fast cubes keep the mode-hued slab.
+        calm ? 'group-hover:shadow-hard-sm' : v.shadow, v.ring,
         // A bit of glow on hover/focus: a soft mode-hued drop-shadow halo (a filter,
         // so it stacks on top of the hard box-shadow instead of replacing it). Reads
         // as electric-brand energy without softening the neo edge at rest. motion-safe
         // gated + transitioned to match the sibling image-scale pop (respects
         // prefers-reduced-motion). `--cube-glow` (the mode hue) is set on this Link.
+        // Reserved for the energetic set — calm cubes stay glow-free so the no-timer
+        // room reads quiet.
         'motion-safe:transition-[filter] motion-safe:duration-200',
-        'motion-safe:hover:drop-shadow-[0_0_16px_var(--cube-glow)] motion-safe:focus-visible:drop-shadow-[0_0_16px_var(--cube-glow)]',
+        !calm && 'motion-safe:hover:drop-shadow-[0_0_16px_var(--cube-glow)] motion-safe:focus-visible:drop-shadow-[0_0_16px_var(--cube-glow)]',
         anchor
           ? bigAnchor
             ? 'col-span-2 md:row-span-2 aspect-[16/9] sm:aspect-[2/1] md:aspect-square'
@@ -297,6 +306,14 @@ export interface LandingModeCubesProps {
   /** the DailyChallengeBanner element — special-cased hero, never a cube */
   dailyNode?: React.ReactNode;
   extras?: ModeCubeModel[];
+  /** the calm / no-timer set (crossword, word craft, sealed bid, connections).
+      Rendered in a distinct, quieter "take your time" room below the energetic
+      bento. Empty/absent ⇒ the section is not rendered at all (no empty room). */
+  calmModels?: ModeCubeModel[];
+  /** heading for the calm section (e.g. "Take Your Time") */
+  calmLabel?: string;
+  /** sub-copy under the calm heading (e.g. "Relaxed puzzles at your own pace") */
+  calmHint?: string;
   sectionLabel: string;
   moreLabel?: string;
   moreHint?: string;
@@ -314,6 +331,9 @@ export function LandingModeCubes({
   models,
   dailyNode,
   extras = [],
+  calmModels = [],
+  calmLabel,
+  calmHint,
   sectionLabel,
   moreLabel,
   moreHint,
@@ -325,6 +345,7 @@ export function LandingModeCubes({
   const anchor = models.find((m) => m.role === 'anchor') ?? models[0];
   const rest = models.filter((m) => m !== anchor);
   const hasExtras = extras.length > 0;
+  const hasCalm = calmModels.length > 0;
   // A 2×2 anchor only looks balanced with enough small cubes to wrap it; with a
   // sparse newcomer set (anchor + 1-2 cubes) it becomes a lopsided block, so the
   // anchor degrades to a full-width banner instead.
@@ -364,6 +385,47 @@ export function LandingModeCubes({
           ))}
         </div>
       </section>
+
+      {/* ===== CALM / NO-TIMER ROOM =====
+          A quieter, deliberately separate "world" for the untimed puzzles
+          (crossword, word craft, sealed bid, connections). Stays inside the
+          neo-brutalist system — hard border, navy, Fredoka — but dials the energy
+          down: a defined cool-tinted panel (vs the bento's bare-navy grid), a
+          TimerOff-icon header that names the promise, roomier centred tiles, and
+          glow/sheen-free cubes (tone="calm"). Sized to read intentional from 2
+          tiles (public: word craft + connections) up to 4 (admin adds
+          crossword + sealed bid) — no anchor hero, all peers. */}
+      {hasCalm && (
+        <section
+          data-testid="landing-cubes-calm"
+          aria-label={calmLabel ?? t('landing.calmSectionTitle')}
+          className="rounded-neo border-2 border-neo-cyan/25 bg-neo-navy-light/40 p-4 sm:p-5"
+        >
+          <div className="mb-3 flex items-center gap-2.5 px-0.5 sm:mb-4">
+            <span
+              aria-hidden="true"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-neo border-2 border-black bg-neo-cyan shadow-hard-sm sm:h-10 sm:w-10"
+            >
+              <TimerOff className="h-5 w-5 text-neo-navy" strokeWidth={2.5} />
+            </span>
+            <div className="flex min-w-0 flex-col">
+              <h3 className="font-neo-display text-lg font-black uppercase leading-none tracking-wide text-neo-cyan">
+                {calmLabel ?? t('landing.calmSectionTitle')}
+              </h3>
+              <span className="mt-0.5 font-neo-body text-xs text-neo-cream/85 sm:text-sm">
+                {calmHint ?? t('landing.calmSectionSubtitle')}
+              </span>
+            </div>
+          </div>
+          {/* auto-fit + capped tile width keeps 2 tiles from ballooning and stays
+              tidy at 3/4; centred so a short set never hugs the start edge. */}
+          <div className="grid auto-rows-fr grid-cols-2 justify-center gap-3 sm:gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(150px,190px))]">
+            {calmModels.map((m, i) => (
+              <Cube key={m.key} model={m} index={i} tone="calm" />
+            ))}
+          </div>
+        </section>
+      )}
 
       {hasExtras && (
         <details

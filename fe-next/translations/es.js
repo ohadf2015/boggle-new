@@ -5458,6 +5458,8 @@ const es = {
     "playTodayChallenge": "Jugar el desafío de hoy",
     "moreGameModes": "Más modos de juego",
     "moreGameModesHint": "Toca para explorar",
+    "calmSectionTitle": "Tómate tu tiempo",
+    "calmSectionSubtitle": "Puzzles relajados a tu ritmo",
     "singlePlayer": "Juego Rápido",
     "singlePlayerDesc": "¡Salta y juega al instante!",
     "badgeBots": "Bots",

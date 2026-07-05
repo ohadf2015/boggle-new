@@ -38,6 +38,13 @@ export interface ModeMetaEntry {
   readonly path: string;
   readonly Icon: LucideIcon;
   readonly variant: ModeCubeVariant;
+  /**
+   * Homepage grouping. `'calm'` modes are the untimed, no-pressure puzzles
+   * (crossword, word craft, sealed bid, connections) — the landing splits them
+   * into a quieter "take your time" section, away from the energetic
+   * competitive bento. Absent ⇒ treated as `'fast'` (the default energetic set).
+   */
+  readonly category?: 'fast' | 'calm';
   readonly badge?: string;
   /** existing raster sticker (reused from control cards) */
   readonly modeImage?: string;
@@ -81,7 +88,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   connections: {
     titleKey: 'landing.wordChainMode', descKey: 'landing.wordChainModeDesc', path: '/connections/play',
-    Icon: Link2, variant: 'blue', badge: 'NEW', modeImage: '/modes/connections.png', genIcon: '/modes/cubes/connections.png',
+    Icon: Link2, variant: 'blue', badge: 'NEW', category: 'calm', modeImage: '/modes/connections.png', genIcon: '/modes/cubes/connections.png',
     imgScale: 1.15, // subject ~50% framed; 1.6 over-grew it (hard sticker outline crammed the top edge) → gentle bump that reads full-bleed with margin
   },
   brainGym: {
@@ -93,12 +100,12 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   wordCraft: {
     titleKey: 'wordcraft.modeTitle', descKey: 'wordcraft.modeDesc', path: '/word-craft',
-    Icon: Layers, variant: 'orange', badge: 'NEW', modeImage: '/modes/word-craft.png', genIcon: '/modes/cubes/wordcraft.png',
+    Icon: Layers, variant: 'orange', badge: 'NEW', category: 'calm', modeImage: '/modes/word-craft.png', genIcon: '/modes/cubes/wordcraft.png',
     imgScale: 1.1, // hammer + anvil already fill ~60% → a gentle bump to match wordForge, not overgrow
   },
   crossword: {
     titleKey: 'crossword.name', descKey: 'crossword.tagline', path: '/crossword',
-    Icon: Grid3x3, variant: 'cyan', badge: 'NEW', genIcon: '/modes/cubes/crossword.png',
+    Icon: Grid3x3, variant: 'cyan', badge: 'NEW', category: 'calm', genIcon: '/modes/cubes/crossword.png',
   },
   // Admin-only dev previews — also carry generated cube icons so the "+ More"
   // grid is full-bleed art across the board. Colours spread to avoid clusters.
@@ -128,7 +135,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   sealedBid: {
     titleKey: 'landing.sealedBidMode', descKey: 'landing.sealedBidModeDesc', path: '/sealed-bid',
-    Icon: Gavel, variant: 'cyan', badge: 'ADMIN', genIcon: '/modes/cubes/sealedbid.png',
+    Icon: Gavel, variant: 'cyan', badge: 'ADMIN', category: 'calm', genIcon: '/modes/cubes/sealedbid.png',
   },
   // Wordfall = Blast V2 (falling-tile blast). Admin/beta dev preview. Shares the
   // blast cube art (same game family) until a bespoke Wordfall sticker exists.
@@ -150,6 +157,8 @@ export interface ModeCubeModel {
   readonly variant: ModeCubeVariant;
   readonly Icon: LucideIcon;
   readonly genIcon?: string;
+  /** homepage grouping — see ModeMetaEntry.category */
+  readonly category?: 'fast' | 'calm';
   /** per-asset CSS scale for the cube art (default 1) — see ModeMetaEntry.imgScale */
   readonly imgScale?: number;
   readonly badge?: string;
@@ -170,4 +179,14 @@ export function modeRoute(key: string, language: string): string | null {
   const meta = MODE_META[key];
   if (!meta) return null;
   return `/${language}${meta.path}`;
+}
+
+/**
+ * The fast/calm PARTITION — a single pure predicate both the desktop bento and
+ * the mobile Home Hub route through (they share one renderer, so the split can
+ * never drift). `'calm'` = untimed, no-pressure puzzles surfaced in the quieter
+ * "take your time" section. Unknown keys are not calm (never throws).
+ */
+export function isCalmMode(key: string): boolean {
+  return MODE_META[key]?.category === 'calm';
 }

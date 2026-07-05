@@ -5596,6 +5596,8 @@ const sv = {
     "playTodayChallenge": "Spela dagens utmaning",
     "moreGameModes": "Fler spellägen",
     "moreGameModesHint": "Tryck för att utforska",
+    "calmSectionTitle": "Ta det lugnt",
+    "calmSectionSubtitle": "Avslappnade pussel i din egen takt",
     "singlePlayer": "Snabbspel",
     "singlePlayerDesc": "Hoppa in och spela direkt",
     "badgeBots": "Bottar",

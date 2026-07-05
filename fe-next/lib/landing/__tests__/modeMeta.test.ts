@@ -6,7 +6,7 @@
  * (route changed control-side, not mirrored here) forces a conscious update.
  */
 import { describe, it, expect } from 'vitest';
-import { MODE_META, modeRoute, CUBE_VARIANTS } from '../modeMeta';
+import { MODE_META, modeRoute, CUBE_VARIANTS, isCalmMode } from '../modeMeta';
 
 describe('MODE_META — parity with control renderCard', () => {
   // [key, route-suffix, variant] mirrored from LandingChallengeCards.renderCard
@@ -92,6 +92,29 @@ describe('MODE_META — parity with control renderCard', () => {
 
     it('returns null for an unknown key', () => {
       expect(modeRoute('nope', 'en')).toBeNull();
+    });
+  });
+
+  // The homepage splits modes into an energetic competitive bento and a calmer
+  // "no-timer / play at your pace" section. Category is intrinsic per-mode data
+  // (lives in the table); the fast/calm PARTITION is a pure helper both the
+  // desktop + mobile renderers call so the split can never drift between them.
+  describe('mode category — calm / no-timer grouping', () => {
+    const CALM = ['crossword', 'wordCraft', 'sealedBid', 'connections'] as const;
+    const FAST = ['arena', 'blast', 'practice', 'adventure', 'brainGym'] as const;
+
+    it.each(CALM)('%s is tagged category=calm', (key) => {
+      expect(MODE_META[key].category, `${key} category`).toBe('calm');
+    });
+
+    it.each(FAST)('%s is NOT calm (energetic/competitive bento)', (key) => {
+      expect(MODE_META[key].category === 'calm', `${key} not calm`).toBe(false);
+    });
+
+    describe('isCalmMode', () => {
+      it('true for a calm mode', () => expect(isCalmMode('connections')).toBe(true));
+      it('false for a fast mode', () => expect(isCalmMode('arena')).toBe(false));
+      it('false for an unknown key (no throw)', () => expect(isCalmMode('nope')).toBe(false));
     });
   });
 

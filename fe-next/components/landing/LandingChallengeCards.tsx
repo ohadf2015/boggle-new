@@ -14,7 +14,7 @@ import { requiresNetworkToPlay } from '@/lib/offline/landingOfflineAwareness';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
 import { LandingModeCubes } from './LandingModeCubes';
-import { MODE_META, modeRoute, type ModeCubeModel } from '@/lib/landing/modeMeta';
+import { MODE_META, modeRoute, isCalmMode, type ModeCubeModel } from '@/lib/landing/modeMeta';
 
 interface DailyChallengePreloadedStats {
   hasPlayed: boolean;
@@ -233,7 +233,7 @@ export function LandingChallengeCards({
     };
     const base: ModeCubeModel = {
       key, title: t(meta.titleKey), href, variant: meta.variant, Icon: meta.Icon,
-      genIcon: meta.genIcon, imgScale: meta.imgScale, badge: meta.badge, role, onClick,
+      genIcon: meta.genIcon, imgScale: meta.imgScale, badge: meta.badge, category: meta.category, role, onClick,
     };
     if (key === 'arena') {
       const arenaHighlight = isFirstTimer && !isNewbie && !practiceWinsHighlight;
@@ -270,6 +270,13 @@ export function LandingChallengeCards({
   const visibleModels = visibleKeys
     .map((k) => buildCubeModel(k, k === 'arena' ? 'anchor' : 'normal'))
     .filter(isModel);
+  // Split the energetic competitive bento (arena anchor, blast, practice, …)
+  // from the calm no-timer room (crossword, word craft, sealed bid, connections)
+  // via the SHARED partition — the mobile Home Hub reuses this exact component,
+  // so both surfaces group identically with no drift. Order within each group is
+  // preserved from the gated `visibleKeys` computation above.
+  const fastModels = visibleModels.filter((m) => !isCalmMode(m.key));
+  const calmModels = visibleModels.filter((m) => isCalmMode(m.key));
   // Daily is the cubes hero — always present (it's the once-a-day hook), not
   // gated on heroCards like the control arm. It renders above the bento grid.
   // Both mobile Home Hub and desktop bento use the richer HomeDailyHero banner
@@ -278,7 +285,10 @@ export function LandingChallengeCards({
 
   return (
     <LandingModeCubes
-      models={visibleModels}
+      models={fastModels}
+      calmModels={calmModels}
+      calmLabel={t('landing.calmSectionTitle')}
+      calmHint={t('landing.calmSectionSubtitle')}
       dailyNode={dailyNode}
       sectionLabel={layout === 'hub' ? t('landing.home.gameModes') : t('landing.sectionSoloTitle')}
       t={t}
