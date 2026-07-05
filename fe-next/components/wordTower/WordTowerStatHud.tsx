@@ -1,6 +1,7 @@
 'use client';
 
-import { Flame, Trophy } from 'lucide-react';
+import { useState } from 'react';
+import { ChevronDown, Flame, Trophy } from 'lucide-react';
 import { comboMult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 import type { ArchitectTier } from '@/lib/wordTower/architectTier';
@@ -32,43 +33,50 @@ const TIER_CLASS: Record<ArchitectTier, string> = {
 
 export function WordTowerStatHud({ heightM, biomeId, floorsCount, personalBestM, combo, tier, t }: Props) {
   const mult = comboMult(combo);
-  // Compact card (founder ask 2026-06-26: "the high record can be more compact,
-  // use icons, and sit a bit to the side"). The live altitude is the hero; the
-  // combo flame rides beside it; the personal best is demoted to a small trophy
-  // ICON chip set to the trailing side, so the card reads as one tight unit
-  // instead of a wordy "BEST 245m" string competing with the live number.
+  const [expanded, setExpanded] = useState(false);
+  // Simplified readout (#4): collapsed shows only the hero altitude + the live
+  // combo flame — no data overload. A tap reveals the detail row (biome · floors
+  // · tier · best) for players who want it. The altitude stays the hero either way.
+  const hasDetail = personalBestM > 0 || floorsCount > 0 || !!tier;
   return (
-    <div className="pointer-events-none flex items-stretch gap-2 rounded-neo border-neo border-black bg-neo-navy/85 px-2.5 py-1 shadow-hard-sm backdrop-blur-sm">
-      <div className="flex flex-col items-center text-center">
-        <div className="flex items-baseline gap-1.5">
-          <span className="font-neo-display text-2xl font-black leading-none text-neo-white tabular-nums">
-            {heightM.toFixed(0)}<span className="text-sm text-neo-cyan">m</span>
+    <button
+      type="button"
+      onClick={() => setExpanded((v) => !v)}
+      aria-expanded={expanded}
+      aria-label={expanded ? t('wordTower.hud.collapse') : t('wordTower.hud.expand')}
+      className="pointer-events-auto flex flex-col items-center gap-0.5 rounded-neo border-neo border-black bg-neo-navy/85 px-2.5 py-1 shadow-hard-sm backdrop-blur-sm"
+    >
+      <div className="flex items-baseline gap-1.5">
+        <span className="font-neo-display text-2xl font-black leading-none text-neo-white tabular-nums">
+          {heightM.toFixed(0)}<span className="text-sm text-neo-cyan">m</span>
+        </span>
+        {combo > 1 && (
+          <span className="flex items-center gap-0.5 rounded-full border border-black bg-neo-orange px-1.5 py-0.5 font-neo-display text-[11px] font-black leading-none text-black tabular-nums">
+            <Flame className="h-3 w-3" aria-hidden />×{mult.toFixed(1)}
           </span>
-          {combo > 1 && (
-            <span className="flex items-center gap-0.5 rounded-full border border-black bg-neo-orange px-1.5 py-0.5 font-neo-display text-[11px] font-black leading-none text-black tabular-nums">
-              <Flame className="h-3 w-3" aria-hidden />×{mult.toFixed(1)}
-            </span>
-          )}
-        </div>
-        <span className="mt-0.5 flex items-center gap-1.5 font-neo-body text-[10px] uppercase leading-none tracking-wider text-neo-cyan">
+        )}
+        {hasDetail && (
+          <ChevronDown
+            className={`h-3.5 w-3.5 text-neo-cyan transition-transform ${expanded ? 'rotate-180' : ''}`}
+            aria-hidden
+          />
+        )}
+      </div>
+      {expanded && hasDetail && (
+        <div className="flex items-center gap-1.5 pt-0.5 font-neo-body text-[10px] uppercase leading-none tracking-wider text-neo-cyan">
           <span>{t(`wordTower.biome.${biomeId}`)} · {t('wordTower.hud.floors', { n: floorsCount })}</span>
           {tier && (
             <span className={`rounded-sm border border-black px-1 py-px font-neo-display text-[9px] font-black uppercase leading-none tracking-wide ${TIER_CLASS[tier]}`}>
               {t(`wordTower.tier.${tier.toLowerCase()}`)}
             </span>
           )}
-        </span>
-      </div>
-      {/* Personal best — compact trophy chip, to the side, de-emphasised. */}
-      {personalBestM > 0 && (
-        <span
-          className="flex items-center gap-0.5 self-center rounded-full border border-black bg-neo-navy-light/80 px-1.5 py-0.5 font-neo-body text-[10px] font-black leading-none text-neo-yellow tabular-nums"
-          title={t('wordTower.hud.best', { m: Math.round(personalBestM) })}
-          aria-label={t('wordTower.hud.best', { m: Math.round(personalBestM) })}
-        >
-          <Trophy className="h-3 w-3" aria-hidden />{Math.round(personalBestM)}
-        </span>
+          {personalBestM > 0 && (
+            <span className="flex items-center gap-0.5 rounded-full border border-black bg-neo-navy-light/80 px-1.5 py-0.5 font-neo-body text-[10px] font-black leading-none text-neo-yellow tabular-nums">
+              <Trophy className="h-3 w-3" aria-hidden />{Math.round(personalBestM)}
+            </span>
+          )}
+        </div>
       )}
-    </div>
+    </button>
   );
 }

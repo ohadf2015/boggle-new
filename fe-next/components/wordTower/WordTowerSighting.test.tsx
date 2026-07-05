@@ -7,7 +7,7 @@ beforeEach(() => { vi.useFakeTimers(); });
 afterEach(() => { vi.useRealTimers(); cleanup(); vi.restoreAllMocks(); });
 
 const ROLL_INTERVAL_MS = 4800;
-const DRIFT_MS = 9000;
+const DRIFT_MS = 13000; // calmer, longer glide (#10)
 
 describe('WordTowerSighting', () => {
   it('renders nothing under reduced motion, however lucky the roll', () => {

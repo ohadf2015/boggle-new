@@ -15,7 +15,8 @@ import { pickSighting, SIGHTING_ASSET, type SightingKind } from '@/lib/wordTower
  */
 
 const ROLL_INTERVAL_MS = 4800;
-const DRIFT_MS = 9000;
+// Calmer, longer glide (was a brisk 9s straight line that read mechanical).
+const DRIFT_MS = 13000;
 
 interface ActiveSighting {
   id: number;
@@ -78,6 +79,14 @@ export function WordTowerSighting({
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {/* Gentle swim bob + soft edge fade so the drift reads alive, not like a
+          sprite sliding on a rail (founder: sightings looked "weird"). The X
+          drift stays steady (translate transition); a nested layer adds the
+          vertical bob, and opacity fades in/out at the screen edges. */}
+      <style>{`
+        @keyframes wt-sighting-bob { 0%,100% { transform: translateY(-7px) rotate(-1.5deg); } 50% { transform: translateY(7px) rotate(1.5deg); } }
+        @keyframes wt-sighting-fade { 0% { opacity: 0; } 14% { opacity: var(--wt-op, 0.92); } 86% { opacity: var(--wt-op, 0.92); } 100% { opacity: 0; } }
+      `}</style>
       <div
         key={sighting.id}
         className="absolute"
@@ -86,20 +95,21 @@ export function WordTowerSighting({
           left: 0,
           transform: `translateX(${drifting ? endX : startX})`,
           transition: `transform ${DRIFT_MS}ms linear`,
-          willChange: 'transform',
+          animation: `wt-sighting-fade ${DRIFT_MS}ms ease-in-out both`,
+          willChange: 'transform, opacity',
         }}
       >
+        <div style={{ animation: 'wt-sighting-bob 4.2s ease-in-out infinite', willChange: 'transform' }}>
         {kind === 'whale' && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={SIGHTING_ASSET.whale}
             alt=""
             style={{
-              width: 'clamp(120px, 24vmin, 280px)',
+              width: 'clamp(110px, 22vmin, 240px)',
               height: 'auto',
               transform: `scaleX(${faceFlip})`,
-              opacity: 0.92,
-              filter: 'drop-shadow(0 0 14px rgba(120,180,255,0.35))',
+              filter: 'drop-shadow(0 0 16px rgba(120,180,255,0.4))',
             }}
           />
         )}
@@ -126,6 +136,7 @@ export function WordTowerSighting({
             }}
           />
         )}
+        </div>
       </div>
     </div>
   );

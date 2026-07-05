@@ -47,6 +47,22 @@ export function craneOffsetAt(elapsedMs: number, periodMs: number): number {
   return 4 * p - 4; //                 -1   →  0    (rising final quarter)
 }
 
+/** Shortest buildable word — below this the swing sits at its gentle floor. */
+export const SWING_MIN_LEN = 3;
+
+/**
+ * Fraction of the full sweep a beam of `letterCount` letters uses, in [0.5, 1].
+ * The word is built letter-by-letter onto the crane, and each added letter makes
+ * the load swing a bit wider (a heavier girder throws further), clamped to the
+ * full sweep — the "max swing". A 3-letter word swings gently; ~8 letters hit the
+ * cap. Applied to {@link craneOffsetAt}'s output, so the shown swing and the
+ * scored release offset scale together (WYSIWYG preserved).
+ */
+export function craneSwingFactor(letterCount: number): number {
+  const len = Number.isFinite(letterCount) ? Math.max(0, letterCount) : 0;
+  return clamp(0.5 + 0.1 * (len - SWING_MIN_LEN), 0.5, 1);
+}
+
 /**
  * Sweep period (ms) for a tower of `towerHeightFloors` floors. Starts at
  * {@link SWEEP_PERIOD_START_MS} and shortens by {@link SWEEP_PERIOD_STEP_MS} per

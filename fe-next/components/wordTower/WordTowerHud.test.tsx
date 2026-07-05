@@ -2,6 +2,12 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 import { WordTowerHud, type WordTowerHudProps } from './WordTowerHud';
 
+// Rewarded ad (clue gate) — mocked; the real hook needs AdMobProvider (global
+// in prod via essential-providers, absent in unit tests).
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({ showAd: vi.fn(), isAdAvailable: false, status: 'idle' as const, rewardAmount: 0, preload: vi.fn() }),
+}));
+
 // jsdom lacks ResizeObserver (the deck-height effect needs it).
 beforeEach(() => {
   vi.stubGlobal('ResizeObserver', class { observe() {} unobserve() {} disconnect() {} });

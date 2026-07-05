@@ -1,10 +1,28 @@
 import { describe, it, expect } from 'vitest';
 import {
   craneOffsetAt,
+  craneSwingFactor,
   sweepPeriodMs,
   SWEEP_PERIOD_START_MS,
   SWEEP_PERIOD_FLOOR_MS,
 } from '../craneSweep';
+
+describe('craneSwingFactor — swing widens per letter, capped (#9)', () => {
+  it('sits at the gentle floor for the shortest words', () => {
+    expect(craneSwingFactor(3)).toBeCloseTo(0.5);
+    expect(craneSwingFactor(2)).toBeCloseTo(0.5); // never below the floor
+    expect(craneSwingFactor(0)).toBeCloseTo(0.5);
+  });
+  it('grows with each added letter', () => {
+    expect(craneSwingFactor(4)).toBeGreaterThan(craneSwingFactor(3));
+    expect(craneSwingFactor(6)).toBeGreaterThan(craneSwingFactor(5));
+    expect(craneSwingFactor(5)).toBeCloseTo(0.7);
+  });
+  it('caps at the full sweep (max swing)', () => {
+    expect(craneSwingFactor(8)).toBeCloseTo(1);
+    expect(craneSwingFactor(12)).toBe(1); // never exceeds the max
+  });
+});
 
 describe('craneSweep — constant-velocity triangle sweep', () => {
   const P = 2000;

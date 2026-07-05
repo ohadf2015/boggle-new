@@ -10,6 +10,7 @@ import {
   type PlacementOutcome,
   type PlacementQuality,
 } from '@/lib/wordTower/cranePlacement';
+import { craneSwingFactor } from '@/lib/wordTower/craneSweep';
 import { releaseFx } from '@/lib/wordTower/craneReleaseFx';
 import { CraneFooter, CraneSparkBurst, CraneStabilityMeter } from './WordTowerCraneBits';
 import { swayAngleAt, swayNormalizedOffset, effectiveDropError } from '@/lib/wordTower/towerSway';
@@ -118,6 +119,9 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   const swayRef = useRef(0);
   const instabilityRef = useRef(instability);
   instabilityRef.current = instability;
+  // Per-letter swing scale — read live inside the rAF sweep; updated in render
+  // from the current beam length so adding a letter widens the swing (#9).
+  const swingKRef = useRef(1);
   const droppedRef = useRef(false);
   const [result, setResult] = useState<PlacementOutcome | null>(null);
   // Detach animation: once dropped, the beam drops straight down before the
@@ -176,7 +180,10 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
       const elapsed = now - start;
       // Freeze the trolley at the release position — the girder is ballistic
       // now; only its inherited momentum (fallDrift below) moves it sideways.
-      const x = droppedRef.current ? posRef.current : craneOffsetAt(elapsed, periodMs);
+      // Each letter on the beam widens the swing, capped at the full sweep (#9).
+      // Scales the single source of the sweep, so the shown swing and the scored
+      // release offset stay identical (WYSIWYG).
+      const x = droppedRef.current ? posRef.current : craneOffsetAt(elapsed, periodMs) * swingKRef.current;
       posRef.current = x;
       setPos(x);
       // Swing the landing target when the tower is unstable (0 = steady). Uses the
@@ -286,6 +293,8 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   const beamTilePx = craneBeamTilePx(beamChars.length);
   // Glyph size tracks the brick so dense (small-brick) girders stay legible.
   const beamFontPx = Math.max(11, Math.round(beamTilePx * 0.5));
+  // Feed the live beam length to the sweep so each added letter swings wider (#9).
+  swingKRef.current = craneSwingFactor(beamChars.length);
 
   return (
     <div
@@ -388,7 +397,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                 <div
                   data-testid="crane-block"
                   className={cn(
-                    'flex flex-col-reverse items-stretch justify-center gap-px rounded-neo',
+                    'flex flex-col-reverse items-stretch justify-center gap-px rounded-none',
                     !reducedMotion && !falling && 'animate-neo-pop',
                     !reducedMotion && falling && 'crane-girder-land',
                     celebrating && release?.glow && 'crane-girder-perfect',
@@ -403,8 +412,17 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                     <span
                       key={i}
                       data-testid="crane-letter"
-                      className="flex flex-1 items-center justify-center rounded-neo border-neo-thick border-black font-neo-display font-black uppercase shadow-hard"
-                      style={{ backgroundColor: blockColorHex, color: blockTextHex, fontSize: `${beamFontPx}px` }}
+                      className="flex flex-1 items-center justify-center border-neo-thick border-black font-neo-display font-black uppercase"
+                      style={{
+                        backgroundColor: blockColorHex,
+                        color: blockTextHex,
+                        fontSize: `${beamFontPx}px`,
+                        // Same pixel-block read as the tower tiles (#8): a square
+                        // face with a flat inset bevel — light top-left, dark
+                        // bottom-right — plus a hard drop shadow. So the block
+                        // hanging on the crane IS visually the block that lands.
+                        boxShadow: 'inset 3px 3px 0 rgba(255,255,255,0.38), inset -3px -4px 0 rgba(0,0,0,0.34), 2px 2px 0 rgba(0,0,0,0.85)',
+                      }}
                     >
                       {ch}
                     </span>

@@ -79,9 +79,12 @@ function shade(hex: number, f: number): number {
 }
 
 /**
- * (Re)draw a tile as a chunky neo-brutalist building block: solid fill, a lit
- * top edge + shaded base band (flat two-tone → 3D weight without gradients),
- * hard black border, hard drop shadow. `shared` connectors wear a bright ring.
+ * (Re)draw a tile as a PIXEL-ART building block: a square face (no rounded
+ * corners), a flat stepped bevel — light top+left, dark bottom+right, snapped to
+ * a pixel unit — plus a corner highlight/shadow pixel, a hard black outline and a
+ * hard offset drop shadow. Same biome colour + per-tile tonal variation as
+ * before, just an 8-bit read instead of a smooth chiclet (founder: "pixeletad
+ * but with the idea of how it looks"). `shared` connectors wear a bright ring.
  */
 export function paintTile(tile: TileSprite, color: number, pending: boolean, shared = false): void {
   // A queued tween or its `done()` callback can fire after the tile was
@@ -92,44 +95,49 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
 
   const s = tile.size;
   const half = s / 2;
-  const r = Math.max(7, s * 0.2);
-  const inset = Math.ceil(r * 0.7);
   const a = pending ? 0.5 : 1;
   tile.color = color;
   tile.pending = pending;
 
-  // Per-tile variation: a faint tonal shift on the face + a varied highlight
-  // strip, so a tall stack of same-coloured tiles reads as individually placed
-  // bricks rather than one stamped column.
+  // Per-tile variation: a faint tonal shift on the face so a tall stack of
+  // same-coloured tiles reads as individually placed bricks, not one column.
   const v = tile.variation;
   const faceColor = v ? shade(color, 1 + v.tone) : color;
+  // "Pixel" unit — the bevel/edge thickness snaps to this so the block reads
+  // chunky and 8-bit at any tile size.
+  const px = Math.max(2, Math.round(s * 0.11));
 
-  tile.shadow.clear().roundRect(-half + 4, -half + 5, s, s, r).fill({ color: 0x000000, alpha: pending ? 0.2 : 0.5 });
+  // Hard pixel drop shadow: a solid offset SQUARE, no blur, no radius.
+  const off = Math.max(3, Math.round(s * 0.09));
+  tile.shadow.clear().rect(-half + off, -half + off, s, s).fill({ color: 0x000000, alpha: pending ? 0.2 : 0.5 });
 
   const g = tile.face;
   g.clear();
-  g.roundRect(-half, -half, s, s, r).fill({ color: faceColor, alpha: a });
-  // Isometric block shading: light reads from the top-LEFT, so a lit top strip +
-  // lit left edge meet at a bright corner, and a dark base band + dark right edge
-  // meet at a shadowed corner — giving each tile real extruded weight (a chunky
-  // building block) instead of a flat coloured chiclet. Inset so the bands never
-  // collide with the rounded corners.
-  const edge = Math.ceil(r * 0.5);
-  const topH = Math.round(s * 0.15 * (v?.highlight ?? 1));
-  const baseH = Math.round(s * 0.22);
-  const sideW = Math.round(s * 0.13);
-  const innerH = s - inset * 2;
-  g.rect(-half + inset, -half + edge, s - inset * 2, topH).fill({ color: shade(faceColor, 1.32), alpha: a * 0.9 });
-  g.rect(-half + edge, -half + inset, sideW, innerH).fill({ color: shade(faceColor, 1.18), alpha: a * 0.7 });
-  g.rect(half - edge - sideW, -half + inset, sideW, innerH).fill({ color: shade(faceColor, 0.72), alpha: a * 0.85 });
-  g.rect(-half + inset, half - edge - baseH, s - inset * 2, baseH).fill({ color: shade(faceColor, 0.6), alpha: a });
-  g.roundRect(-half, -half, s, s, r).stroke({ color: 0x000000, width: Math.max(4, s * 0.06), alignment: 1, alpha: pending ? 0.85 : 1 });
+  // Square face — a flat pixel block.
+  g.rect(-half, -half, s, s).fill({ color: faceColor, alpha: a });
+  // Flat stepped bevel (light reads from the top-left): lit top + left bands,
+  // shaded bottom + right bands — no gradients, hard pixel edges.
+  const top = shade(faceColor, 1.34 * (v?.highlight ?? 1));
+  const left = shade(faceColor, 1.18);
+  const bottom = shade(faceColor, 0.56);
+  const right = shade(faceColor, 0.74);
+  g.rect(-half, -half, s, px).fill({ color: top, alpha: a });
+  g.rect(-half, -half, px, s).fill({ color: left, alpha: a });
+  g.rect(-half, half - px, s, px).fill({ color: bottom, alpha: a });
+  g.rect(half - px, -half, px, s).fill({ color: right, alpha: a });
+  // Second-step corner pixels — a brighter top-left, a darker bottom-right — for
+  // the crisp stair-stepped look of a beveled sprite block.
+  g.rect(-half + px, -half + px, px, px).fill({ color: shade(top, 1.12), alpha: a * 0.85 });
+  g.rect(half - px * 2, half - px * 2, px, px).fill({ color: shade(bottom, 0.88), alpha: a * 0.85 });
+
+  // Hard black pixel outline.
+  g.rect(-half, -half, s, s).stroke({ color: 0x000000, width: Math.max(3, s * 0.07), alignment: 1, alpha: pending ? 0.85 : 1 });
 
   if (shared && !pending) {
-    g.roundRect(-half + 4, -half + 4, s - 8, s - 8, Math.max(4, r - 3)).stroke({ color: 0xfffef0, width: 2, alpha: 0.75 });
+    g.rect(-half + px, -half + px, s - px * 2, s - px * 2).stroke({ color: 0xfffef0, width: 2, alpha: 0.75 });
   }
   if (pending) {
-    g.roundRect(-half + 4, -half + 4, s - 8, s - 8, Math.max(4, r - 3)).stroke({ color: 0xffffff, width: 1.5, alpha: 0.55 });
+    g.rect(-half + px, -half + px, s - px * 2, s - px * 2).stroke({ color: 0xffffff, width: 1.5, alpha: 0.55 });
   }
 
   if (tile.glyph) {

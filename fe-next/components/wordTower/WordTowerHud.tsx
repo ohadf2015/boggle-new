@@ -1,9 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Delete, Shuffle, Lightbulb, ChevronDown, ChevronUp, RotateCw, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
+import { utcDateKey } from '@/lib/wordTower/dailySeed';
+import { freeClueUsedToday, markFreeClueUsed } from '@/lib/wordTower/clueGate';
 import { type ActiveRunPerk } from '@/lib/wordTower/useRunStreakPerk';
 import { WordTowerWheel } from './WordTowerWheel';
 
@@ -96,11 +99,32 @@ export function WordTowerHud(props: WordTowerHudProps) {
   const canBuyScramble = scrambleCost > 0 && coinBalance >= scrambleCost;
   const canScramble = hasBonusScramble || canBuyScramble;
 
-  // Clue: reveal a masked sample word on demand; reset when the wheel changes.
+  // Clue: reveal a sample word on demand; reset when the wheel changes.
   const wheelKey = tray.join('');
   const [clueShown, setClueShown] = useState(false);
   useEffect(() => { setClueShown(false); }, [wheelKey]);
   const maskedClue = clueWord ?? ''; // reveal the FULL word — a masked clue led to wrong last-letter guesses ("not in dictionary")
+
+  // Clue gating (#6): ONE clue is free each UTC day; every clue after that costs
+  // a rewarded ad. The "N words possible" count stays free (it doesn't solve).
+  const dateKey = utcDateKey();
+  const needsAd = !clueShown && freeClueUsedToday(dateKey);
+  const revealClue = useCallback(() => setClueShown(true), []);
+  const clueAd = useRewardedAd({
+    surface: 'hint',
+    rewardKind: 'feature',
+    onRewardEarned: revealClue,
+    onAdError: revealClue, // web / no fill → still reveal (never punish non-native)
+  });
+  const requestClue = useCallback(() => {
+    if (!freeClueUsedToday(dateKey)) {
+      markFreeClueUsed(dateKey);
+      setClueShown(true);
+    } else {
+      clueAd.showAd();
+    }
+  }, [dateKey, clueAd]);
+  const clueBusy = clueAd.status === 'loading' || clueAd.status === 'showing';
 
   // Mobile drawer: the deck collapses to a peek bar to free the screen for the tower.
   const [deckOpen, setDeckOpen] = useState(true);
@@ -155,7 +179,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
               style={{ boxShadow: '0 0 10px rgba(255,107,53,0.65), 2px 2px 0 #000' }}
             >
               <span aria-hidden>🔥</span>
-              <span>+50%</span>
+              <span>+{Math.round((pk.heightMult - 1) * 100)}%</span>
               <span className="rounded-full bg-black/20 px-1 tabular-nums">×{pk.dropsRemaining}</span>
             </div>
           ))}
@@ -234,8 +258,8 @@ export function WordTowerHud(props: WordTowerHudProps) {
             ) : (
               <button
                 type="button"
-                onClick={() => setClueShown(true)}
-                disabled={!clueWord || clueShown}
+                onClick={requestClue}
+                disabled={!clueWord || clueShown || clueBusy}
                 aria-label={t('wordTower.hud.possible', { n: possibleWords })}
                 title={t('wordTower.hud.clue')}
                 className="relative flex h-9 w-9 items-center justify-center rounded-full border-neo border-black bg-neo-navy-light/70 text-neo-cyan shadow-hard-sm transition-transform active:translate-y-0.5 disabled:opacity-60"
@@ -245,6 +269,11 @@ export function WordTowerHud(props: WordTowerHudProps) {
                   <span className="absolute -end-1.5 -top-1.5 min-w-[1.1rem] rounded-full border border-black bg-neo-cyan px-1 text-center font-neo-body text-[10px] font-black leading-4 text-black tabular-nums">
                     {possibleWords}
                   </span>
+                )}
+                {/* After today's free clue is spent, the next one costs a rewarded
+                    ad — a small 📺 marks the button so the cost is obvious. */}
+                {needsAd && (
+                  <span className="absolute -bottom-1.5 -start-1.5 text-[10px] leading-none">📺</span>
                 )}
               </button>
             )}

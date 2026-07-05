@@ -147,6 +147,82 @@ export function generateWheel(
   return out;
 }
 
+// --- daily wheel quality (#5): pick the ring that actually builds words ---
+//
+// The plain frequency draw can still hand out a wheel starved of makeable words
+// (too many hard/duplicate letters). `pickBestWheel` scores a handful of
+// deterministic candidate wheels against the real dictionary and keeps the one
+// whose letters COVER the most distinct words — so every letter is usable and
+// "words from all the letters" is possible. Coverage-max naturally rejects
+// hard-letter-heavy rings, so no separate rare-letter cap is needed.
+
+export interface WheelScore {
+  /** Dictionary words (≥ minLen) buildable from the wheel (each tile ≤ once). */
+  buildable: number;
+  /** Distinct wheel letters used by at least one buildable word (0..wheel size). */
+  coverage: number;
+}
+
+/**
+ * Score a wheel against `dict` in a SINGLE pass: how many words it can build and
+ * how many of its distinct letters are actually usable. Same canonical-form +
+ * multiplicity rules as {@link isBuildable}.
+ */
+export function scoreWheel(dict: Iterable<string>, wheel: ReadonlyArray<string>, minLen: number): WheelScore {
+  const avail = new Map<string, number>();
+  for (const t of wheel) avail.set(t, (avail.get(t) ?? 0) + 1);
+  const used = new Set<string>();
+  let buildable = 0;
+  for (const w of dict) {
+    if (w.length < minLen) continue;
+    const need = new Map<string, number>();
+    let ok = true;
+    for (const ch of w) {
+      const n = (need.get(ch) ?? 0) + 1;
+      need.set(ch, n);
+      if (n > (avail.get(ch) ?? 0)) { ok = false; break; }
+    }
+    if (!ok) continue;
+    buildable++;
+    for (const ch of w) used.add(ch);
+  }
+  let coverage = 0;
+  for (const t of new Set(wheel)) if (used.has(t)) coverage++;
+  return { buildable, coverage };
+}
+
+/**
+ * The best daily wheel: draw `candidates` deterministic wheels and keep the one
+ * with the most letter COVERAGE (tie-broken by total buildable words). Falls
+ * back to the plain drawIndex-0 wheel when no dictionary is available. Fully
+ * deterministic for a given (gameCode, playerId, language, dict), so the daily
+ * ring is identical for every player.
+ */
+export function pickBestWheel(
+  gameCode: string,
+  playerId: string,
+  language: Language,
+  dict?: Iterable<string> | null,
+  opts: { candidates?: number; minLen?: number } = {},
+): string[] {
+  const { candidates = 8, minLen = WORD_TOWER_MIN_WORD_LEN } = opts;
+  const base = generateWheel(gameCode, playerId, language, 0);
+  if (!dict) return base;
+  // A Set is re-iterable; an array is too. (An exhaustible iterator would be
+  // consumed after the first candidate — daily callers pass the dictionary Set.)
+  let best = base;
+  let bestScore = scoreWheel(dict, base, minLen);
+  for (let i = 1; i < candidates; i++) {
+    const wheel = generateWheel(gameCode, playerId, language, i);
+    const s = scoreWheel(dict, wheel, minLen);
+    if (s.coverage > bestScore.coverage || (s.coverage === bestScore.coverage && s.buildable > bestScore.buildable)) {
+      best = wheel;
+      bestScore = s;
+    }
+  }
+  return best;
+}
+
 // --- buildability: word must be formable from the wheel letters, each wheel
 //     tile usable at most once per word (no chain anchor — the word stands on
 //     its own letters). The wheel is REUSED across words, never consumed. ---
@@ -252,10 +328,16 @@ export interface InitOpts {
    * Kept so existing daily callers compile unchanged.
    */
   avoidWeakAnchor?: boolean;
+  /**
+   * Canonical dictionary (Set). When present, the opening wheel is the best of
+   * several candidates by word coverage (#5) instead of a plain frequency draw,
+   * so the daily letters are always makeable. Omit to keep the plain draw.
+   */
+  dict?: Iterable<string> | null;
 }
 
 export function initWordTowerState(opts: InitOpts): WordTowerPlayerState {
-  const { gameCode, playerId, language } = opts;
+  const { gameCode, playerId, language, dict } = opts;
   return {
     gameCode,
     playerId,
@@ -266,7 +348,7 @@ export function initWordTowerState(opts: InitOpts): WordTowerPlayerState {
     // Chain retired: there is no required start letter, so the anchor is empty.
     // The field is kept (always '') for save/versus-prototype shape compatibility.
     anchorLetter: '',
-    tray: generateWheel(gameCode, playerId, language, 0),
+    tray: pickBestWheel(gameCode, playerId, language, dict),
     scramblesLeft: WORD_TOWER_SCRAMBLES_START,
     scramblesEarned: 0,
     bombCharge: 0,

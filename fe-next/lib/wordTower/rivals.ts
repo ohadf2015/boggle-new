@@ -106,6 +106,42 @@ export function nearestRivalAbove(viewerHeightM: number, rivals: ReadonlyArray<R
   return { ...best, gapM: Math.max(1, Math.ceil(best.heightM - viewerHeightM)) };
 }
 
+export interface RailRival extends RivalMarker {
+  /** Draw position (px), CLAMPED into [topMargin, buildLineY]. */
+  screenY: number;
+  /** True when the rival's record is above the top edge (show a chase chip). */
+  pinnedAbove: boolean;
+  /** Metres still to climb to reach the rival (0 once level/passed). */
+  gapM: number;
+}
+
+/**
+ * Every rival, always drawn (#2). The record line is clamped so it can never sit
+ * BELOW our own tower top (`buildLineY`) — a rival you've passed pins at the
+ * build line instead of sinking away, and a rival far above pins at the top edge
+ * (`pinnedAbove`) so it stays on-screen with a "+Xm" chase chip. Unlike
+ * {@link visibleRivalMarkers}, nothing is culled — the founder wants a rival's
+ * tower visible for as long as it exists.
+ */
+export function railRivals(
+  viewerHeightM: number,
+  rivals: ReadonlyArray<RivalMarker>,
+  buildLineY: number,
+  pxPerM: number,
+  topMargin = 56,
+): RailRival[] {
+  return rivals.map((r) => {
+    const rawY = rivalScreenY(r.heightM, viewerHeightM, buildLineY, pxPerM);
+    const screenY = Math.max(topMargin, Math.min(rawY, buildLineY));
+    return {
+      ...r,
+      screenY,
+      pinnedAbove: rawY < topMargin,
+      gapM: Math.max(0, Math.ceil(r.heightM - viewerHeightM)),
+    };
+  });
+}
+
 /** Rivals overtaken as the viewer climbs from `prevHeightM` to `curHeightM`. */
 export function rivalsPassed(prevHeightM: number, curHeightM: number, rivals: ReadonlyArray<RivalMarker>): RivalMarker[] {
   if (curHeightM <= prevHeightM) return [];

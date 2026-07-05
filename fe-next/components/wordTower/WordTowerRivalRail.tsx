@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { visibleRivalMarkers, rivalsPassed, type RivalMarker } from '@/lib/wordTower/rivals';
+import { railRivals, rivalsPassed, type RivalMarker } from '@/lib/wordTower/rivals';
 import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import { PROP_PX_PER_M } from '@/lib/wordTower/parallaxProps';
 import Avatar from '@/components/Avatar';
@@ -60,7 +60,8 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
   }, [passed]);
 
   const buildLineY = h * BUILD_LINE_FRACTION;
-  const markers = h > 0 ? visibleRivalMarkers(viewerHeightM, rivals, buildLineY, h, PROP_PX_PER_M) : [];
+  // Every rival, always drawn + clamped so none sits below our tower top (#2).
+  const markers = h > 0 ? railRivals(viewerHeightM, rivals, buildLineY, PROP_PX_PER_M) : [];
 
   return (
     <div ref={ref} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
@@ -87,6 +88,9 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
                 className="shrink-0 rounded-full border border-black"
               />
               {m.name} · {Math.round(m.heightM)}m
+              {m.pinnedAbove && (
+                <span className="rounded-sm bg-neo-cyan px-1 text-[9px] font-black text-black">↑ +{m.gapM}m</span>
+              )}
             </span>
             {/* Roof cap — the rival tower's crown at their record height. */}
             <div className="h-1.5 w-5 rounded-t-neo border border-black" style={{ background: mat }} />

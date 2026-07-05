@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rivalScreenY, rivalsPassed, visibleRivalMarkers, rivalsFromLeaderboard, nearestRivalAbove, type RivalMarker } from '../rivals';
+import { rivalScreenY, rivalsPassed, visibleRivalMarkers, railRivals, rivalsFromLeaderboard, nearestRivalAbove, type RivalMarker } from '../rivals';
 
 const PX = 5;
 const BUILD = 200; // build-line y
@@ -42,6 +42,33 @@ describe('visibleRivalMarkers', () => {
   it('brings a high record into view as the viewer climbs toward it', () => {
     const vis = visibleRivalMarkers(280, rivals, BUILD, 600, PX); // near Cy(300)
     expect(vis.map((m) => m.id)).toContain('c');
+  });
+});
+
+describe('railRivals — always visible, never below our tower (#2)', () => {
+  const TOP = 50;
+  it('returns EVERY rival (no viewport cull) — a far-above record still shows', () => {
+    const out = railRivals(100, rivals, BUILD, PX, TOP);
+    expect(out.map((r) => r.id).sort()).toEqual(['a', 'b', 'c']);
+  });
+  it('clamps a passed rival to the build line — never drawn below our tower', () => {
+    // Ann(40) with viewer at 100 would sink to 500 (below build 200); clamp to BUILD.
+    const ann = railRivals(100, rivals, BUILD, PX, TOP).find((r) => r.id === 'a')!;
+    expect(ann.screenY).toBe(BUILD);
+    expect(ann.pinnedAbove).toBe(false);
+  });
+  it('pins a record above the top edge and flags it for a chase chip', () => {
+    // Cy(300) with viewer at 100 → rawY = -800 (above top); clamp to TOP + pinned.
+    const cy = railRivals(100, rivals, BUILD, PX, TOP).find((r) => r.id === 'c')!;
+    expect(cy.screenY).toBe(TOP);
+    expect(cy.pinnedAbove).toBe(true);
+    expect(cy.gapM).toBe(200); // 300 - 100
+  });
+  it('draws a taller-but-onscreen rival at its true (above-build) position', () => {
+    // Bo(100) viewer 80 → rawY = 200 + (80-100)*5 = 100, within [TOP, BUILD].
+    const bo = railRivals(80, rivals, BUILD, PX, TOP).find((r) => r.id === 'b')!;
+    expect(bo.screenY).toBe(100);
+    expect(bo.pinnedAbove).toBe(false);
   });
 });
 

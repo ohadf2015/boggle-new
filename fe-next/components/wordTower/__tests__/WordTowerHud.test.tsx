@@ -2,6 +2,12 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { WordTowerHud, type WordTowerHudProps } from '../WordTowerHud';
 
+// Rewarded ad (clue gate) — mocked; the real hook needs AdMobProvider (global
+// in prod via essential-providers, absent in unit tests).
+vi.mock('@/hooks/useRewardedAd', () => ({
+  useRewardedAd: () => ({ showAd: vi.fn(), isAdAvailable: false, status: 'idle' as const, rewardAmount: 0, preload: vi.fn() }),
+}));
+
 // t echoes key + params so labels are distinguishable in queries.
 const t = (key: string, params?: Record<string, string | number>) =>
   params ? `${key}:${Object.values(params).join(',')}` : key;

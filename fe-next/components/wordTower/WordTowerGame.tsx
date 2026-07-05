@@ -70,9 +70,14 @@ export function WordTowerGame() {
   // fetch saved progress and restore.
   useEffect(() => {
     let cancelled = false;
+    // Wait for the dictionary so the opening wheel is chosen for word coverage
+    // (#5) — pickBestWheel needs the word list. `ready` already gates render on
+    // dictReady, so this adds no visible delay.
+    if (!dictReady) return () => { cancelled = true; };
+    const dict = dictRef.current;
 
     if (daily) {
-      const opts = { gameCode: dailyTowerGameCode(), playerId: DAILY_PLAYER_ID, language, avoidWeakAnchor: true };
+      const opts = { gameCode: dailyTowerGameCode(), playerId: DAILY_PLAYER_ID, language, avoidWeakAnchor: true, dict };
       let best = 0;
       try { best = Number(localStorage.getItem(`wt-daily-best-${utcDateKey()}`)) || 0; } catch { /* */ }
       setProgress({ initialGame: restoreWordTowerState(opts, null), personalBestM: best });
@@ -84,7 +89,7 @@ export function WordTowerGame() {
     // style) while the endless climb itself persists across days. Stable within
     // the day, so reloads keep the same letters. (Step toward folding the daily
     // letter set into the broader daily-challenges flow.)
-    const opts = { gameCode: `solo-${utcDateKey()}`, playerId: 'solo', language };
+    const opts = { gameCode: `solo-${utcDateKey()}`, playerId: 'solo', language, dict };
     getWithAuth('/api/word-tower/progress')
       .then((r) => (r.ok ? r.json() : Promise.resolve({ progress: null })))
       .then((d) => {
@@ -99,7 +104,7 @@ export function WordTowerGame() {
         if (!cancelled) setProgress({ initialGame: restoreWordTowerState(opts, null), personalBestM: 0 });
       });
     return () => { cancelled = true; };
-  }, [language, daily]);
+  }, [language, daily, dictReady]);
 
   const isInDictionary = useCallback(
     (canonWord: string) => dictRef.current?.has(canonWord) ?? false,
@@ -169,10 +174,10 @@ export function WordTowerGame() {
         onNewDailyBest={persistDailyBest}
       />
 
-      {/* Daily badge + streak + mode toggle — the routine hook. Top-centre, above
-          the climb chrome; the toggle swaps between today's shared tower and the
-          endless personal climb. */}
-      <div className="pointer-events-none fixed inset-x-0 top-2 z-50 flex justify-center px-2" dir={dir}>
+      {/* Daily badge + streak + mode toggle — the routine hook. Top-centre, dropped
+          one row (top-14) so the top band is free for the header actions row that
+          now shares the mute-FAB line (#4). */}
+      <div className="pointer-events-none fixed inset-x-0 top-14 z-50 flex justify-center px-2" dir={dir}>
         <div className="pointer-events-auto flex items-center gap-1.5">
           {daily && (
             <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-2 py-1 font-neo-display text-[11px] font-black uppercase tracking-wide text-black shadow-hard-sm">

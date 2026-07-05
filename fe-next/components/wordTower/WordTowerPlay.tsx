@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Trophy, Share2, Flame, Sparkles } from 'lucide-react';
+import { ArrowLeft, Trophy, Flame, Sparkles } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -841,25 +841,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     }
   }, [haptics, tower]);
 
-  const shareTower = useCallback(async () => {
-    const g = gameRef.current;
-    const params = new URLSearchParams({
-      h: String(Math.round(g.heightM)),
-      f: String(g.floors.length),
-      b: biomeForHeight(g.heightM),
-      w: g.longestWord || '',
-    });
-    // Surface the day's shared twist on the card — the brag hook that ties the
-    // daily ("I climbed 240m on Golden-Letter day").
-    if (mutator) params.set('m', mutator.id);
-    const imgUrl = `${window.location.origin}/api/word-tower/share?${params.toString()}`;
-    const text = t('wordTower.share.text', { m: Math.round(g.heightM) });
-    try {
-      if (navigator.share) await navigator.share({ title: t('wordTower.share.title'), text, url: imgUrl });
-      else await navigator.clipboard?.writeText(`${text} ${imgUrl}`);
-    } catch { /* user cancelled / unsupported */ }
-  }, [t, mutator]);
-
   // keyboard
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -882,7 +863,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         floors={game.floors}
         biomeId={biomeId}
         heightM={game.heightM}
-        pendingWord={tower.word}
+        pendingWord=""
         anchorLen={game.anchorLetter.length}
         resultKey={tower.state.resultKey}
         errorKey={tower.state.errorKey}
@@ -922,6 +903,18 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           they can never overlap each other — or the centred banners — at
           hand-tuned absolute offsets again (the 390px pile-up, 2026-07-02). */}
       <div className="pointer-events-none absolute start-2 top-36 z-20 flex max-w-[45%] flex-col items-start gap-1" dir={dir}>
+        {/* Biome spine (#7) — a slim pixel-notched bar tinted with the current
+            biome's block colour, so the left rail reads as part of the world
+            you've climbed into (a lime city bar → gold galaxy bar) instead of a
+            loose stack of chips. Sits just outside the chips, full rail height. */}
+        <div
+          aria-hidden
+          className="absolute inset-y-0 -start-2.5 w-2 rounded-full border-neo border-black shadow-hard-sm"
+          style={{
+            backgroundColor: blockColorHex,
+            backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.30) 0 2px, transparent 2px 9px), linear-gradient(90deg, rgba(255,255,255,0.35), transparent)',
+          }}
+        />
         {/* Wrecking Ball bay — token chip + rival picker + the wrecking-ball arc.
             Earned by reaching new zones / unlocking achievements; spent to raid a
             rival's tower. Chips render inline here; overlays stay fullscreen. */}
@@ -1011,13 +1004,15 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           combo, surprise, new-best, clutch, hazard, achievement, wreck report —
           now render in the single notice column below the verdict block.) */}
 
-      {/* Crane Stack — the held word swings; tap the BOTTOM CTA to drop it.
-          The crane's own button is hidden; the HUD's swapped-in DROP button
-          calls craneRef.current.drop() so the player never chases the beam. */}
-      {tower.state.pendingWord && (
+      {/* Crane Stack — the word builds ON the crane: each selected letter stacks
+          onto the swinging beam (not the tower crown, #9), and the swing widens
+          per letter. Once BUILT (held), the HUD's DROP button drops it — the
+          crane's own button is hidden so the player never chases the beam. The
+          drop is a no-op until a word is actually held, so previewing is safe. */}
+      {(tower.state.pendingWord || tower.word) && (
         <WordTowerCrane
           ref={craneRef}
-          word={tower.state.pendingWord}
+          word={tower.state.pendingWord || tower.word}
           consecutiveSloppy={crane.consecutiveSloppy}
           onDrop={handleCraneDrop}
           onSignedDrop={crane.pushSignedOffset}
@@ -1075,61 +1070,54 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         <WordTowerUpgradePanel onClose={() => setShowUpgrades(false)} t={t} dir={dir} />
       )}
 
-      {/* Top chrome — ONE flow layout so nothing overlaps by construction:
-          row 1 is a real flex row [back] · [actions], row 2 centres the
-          altitude readout below it. The old version kept THREE separate
-          absolute layers (back @top-3, StatHud @mt-8, actions @top-14) whose
-          hand-tuned offsets collided on 390px phones — the altitude pill sat
-          BEHIND the action buttons (founder screenshot, 2026-07-02). pt-10
-          clears the fixed Daily/Endless strip (~y8–36); the actions row keeps
-          me-12 so it clears the global mute FAB (fixed top-inline-end, 48px). */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-3 pt-10">
-        <div className="flex items-start justify-between gap-2">
+      {/* Top chrome — actions now share the mute-FAB row (#4). Row 1 sits at the
+          top band (aligned with the fixed mute FAB): [back] · [upgrades · skin ·
+          leaderboard · coins], reserving the FAB's width via me-12. The
+          Daily/Endless pill dropped to top-14 (WordTowerGame) so this band is
+          free. Row 2 centres the simplified, expandable altitude readout below
+          the pill. */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
+        <div className="flex items-center justify-between gap-2">
           <Link
             href={`/${language}`}
             onClick={() => save(true)}
             aria-label={t('common.backToHome')}
-            className="pointer-events-auto flex shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
+            className="pointer-events-auto flex h-10 shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
           >
             <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
             <span className="hidden min-[380px]:inline">{t('common.backToHome')}</span>
           </Link>
           <div className="pointer-events-auto me-12 flex items-center gap-1.5">
-        <button
-          type="button"
-          onClick={() => setShowUpgrades(true)}
-          aria-label={t('wordTower.upgrade.title')}
-          className="rounded-neo border-neo-thick border-black bg-neo-cyan p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
-        >
-          <Sparkles className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={shareTower}
-          aria-label={t('wordTower.share.button')}
-          className="rounded-neo border-neo-thick border-black bg-neo-pink p-2 text-neo-white shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
-        >
-          <Share2 className="h-4 w-4" />
-        </button>
-        {/* Tower-skin picker sits right beside Share (founder ask: "skin
-            selection can be near the share") instead of floating mid-screen. */}
-        <WordTowerSkinPicker inline skin={skin} bestHeightM={personalBest} t={t} dir={dir} reducedMotion={reducedMotion} />
-        <button
-          type="button"
-          onClick={onOpenLeaderboard}
-          aria-label={t('wordTower.leaderboard.title')}
-          className="rounded-neo border-neo-thick border-black bg-neo-yellow p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
-        >
-          <Trophy className="h-4 w-4" />
-        </button>
+            <button
+              type="button"
+              onClick={() => setShowUpgrades(true)}
+              aria-label={t('wordTower.upgrade.title')}
+              className="rounded-neo border-neo-thick border-black bg-neo-cyan p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+            >
+              <Sparkles className="h-4 w-4" />
+            </button>
+            {/* Tower-skin picker (founder ask: keep skin selection in the top bar). */}
+            <WordTowerSkinPicker inline skin={skin} bestHeightM={personalBest} t={t} dir={dir} reducedMotion={reducedMotion} />
+            <button
+              type="button"
+              onClick={onOpenLeaderboard}
+              aria-label={t('wordTower.leaderboard.title')}
+              className="rounded-neo border-neo-thick border-black bg-neo-yellow p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+            >
+              <Trophy className="h-4 w-4" />
+            </button>
+            {/* Compact wallet rides the same row so rewards count up where the
+                player is already looking, without a dedicated card. LazyMotion:
+                the counter uses framer `m.` primitives that need a features provider. */}
+            <LazyMotion features={domAnimation}>
+              <CoinCounterAnimated value={coinBalance} size="xs" animateOnMount={false} />
+            </LazyMotion>
           </div>
         </div>
-        {/* Compact altitude card — its own centred row BELOW the buttons, so no
-            locale label width or icon count can ever push it behind them. The
-            live WALLET rides beside it: rewards were previously paid into a
-            void (no visible balance anywhere in the climb) — now every grant
-            counts up + pulses where the player is already looking. */}
-        <div className="mx-auto mt-1.5 flex w-fit items-center gap-1.5">
+        {/* Simplified altitude readout — its own centred row below the dropped
+            Daily/Endless pill (mt clears it). Collapsed = altitude + combo only;
+            tap to expand for biome/floors/best/tier (less data overload). */}
+        <div className="mx-auto mt-12 flex w-fit items-center gap-1.5">
           <WordTowerStatHud
             heightM={game.heightM}
             biomeId={biomeId}
@@ -1139,12 +1127,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             tier={architectTier}
             t={t}
           />
-          {/* LazyMotion: the counter is built on framer `m.` primitives, which
-              render nothing without a features provider — and this page has
-              none (the counter had no live consumer before this). */}
-          <LazyMotion features={domAnimation}>
-            <CoinCounterAnimated value={coinBalance} size="xs" animateOnMount={false} />
-          </LazyMotion>
         </div>
       </div>
 

@@ -51,13 +51,15 @@ describe('paintTile teardown guard', () => {
   });
 });
 
-describe('paintTile isometric bevel', () => {
-  it('draws four edge bands (top + base + left + right) so blocks read as 3D bricks, not flat chiclets', () => {
+describe('paintTile pixel block', () => {
+  it('draws a SQUARE beveled block (face + edge bands + corner pixels), never a rounded rect', () => {
     const face = chainable();
     const tile = fakeTile({ face });
     paintTile(tile, 0x00ff00, false);
-    // top strip, base band, left bevel, right bevel
-    expect(face.rect).toHaveBeenCalledTimes(4);
+    // Face + 4 bevel bands + 2 corner pixels + outline are all square rects.
+    expect((face.rect as ReturnType<typeof vi.fn>).mock.calls.length).toBeGreaterThanOrEqual(6);
+    // Pixel-art look = hard corners: the face is never drawn as a rounded rect.
+    expect(face.roundRect).not.toHaveBeenCalled();
   });
 });
 
