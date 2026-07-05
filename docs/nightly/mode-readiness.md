@@ -11,11 +11,11 @@
 
 ## Current (in progress)
 
-### word-tower — readiness: 83% — status: AUDIT IN PROGRESS
+### word-tower — readiness: 84% — status: AUDIT IN PROGRESS
 - **Why first:** closest to release (deep: 30 components + 69 lib files), admin/beta-gated, no public exposure yet.
 - **Reach for QA:** `https://www.lexiclash.live/en/word-tower?word-tower=1` (the `?word-tower=1` override force-enables the gated mode for non-admins — see `lib/wordTower/flags.ts`). Hebrew RTL: `/he/word-tower?word-tower=1`. Local dev (NODE_ENV=development) needs no override.
 - **Key files:** `components/wordTower/*`, `lib/wordTower/*`, `app/[locale]/word-tower/{page,PageClient}.tsx`, `app/api/word-tower/*`.
-- **Last audited:** 2026-07-04
+- **Last audited:** 2026-07-05
 
 ### Audit areas covered
 - [x] **Bugs / correctness** — null guards, unguarded Record access, double-scaling score (VERIFIED NOT A BUG 2026-06-29 — `placementMultiplier × appliedHeightMult` is intentional multiplicative compounding: crane quality × updraft bonus), damageTower combo reset
@@ -51,6 +51,8 @@
 - [x] **errorKey dead in Scene** — VERIFIED INTENTIONAL 2026-07-03: `WordTowerScene.tsx:438-441` comment explicitly states "A rejected WORD is an INPUT mistake, not tower damage — so the error feel lives on the word-builder (HUD: red shake + message + haptic/sound), NOT on the building. Shaking the whole tower for a typo read as 'the building shakes for no reason' (founder feel report 2026-06-07)." HUD shakes on `animate-neo-shake` at `WordTowerHud.tsx:285`. CLOSED — not a bug.
 - [x] **State restore telemetry** — FIXED 2026-07-02: `restoreWordTowerState` silently discarded player progress on version mismatch with zero output. Added `console.warn` when `saved` exists but version mismatches. `lib/wordTower/wordTowerManager.ts:566`.
 - [x] **Clutch banner a11y** — FIXED 2026-07-02: Hard-coded `⚠` emoji wrapped in `<span aria-hidden="true">`. `WordTowerPlay.tsx:1093`.
+- [x] **WordTowerPlay.tsx pagehide leak** — FIXED 2026-07-05: anonymous handler passed to `window.addEventListener('pagehide')` could never be removed (no reference kept), accumulated on every mount. Named to `onPageHide`, added to useEffect cleanup. (`WordTowerPlay.tsx:784`)
+- [x] **WordTowerSmashScene.tsx / WordTowerVersus.tsx / WordTowerStatHud.tsx / WordTowerMutatorBanner.tsx / WordTowerNextRivalChip.tsx / WordTowerPerkDraft.tsx / WordTowerMascot.tsx / WordTowerFlowFrame.tsx** — AUDITED CLEAN 2026-07-05: hardcoded unit symbols (`m`, `s`, `x`, `·`) are international symbols, ACCEPTABLE. `PERKS[id]` in PerkDraft type-safe. GSAP `repeat:-1` swing in SmashScene acceptable (GSAP handles null refs). All a11y and cleanup patterns CLEAN.
 - [ ] **Visual QA** — not captured (code-audit only; mode is admin-gated on prod)
 
 ### Open issues (severity → owner)

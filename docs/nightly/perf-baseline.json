@@ -1,9 +1,9 @@
 {
-  "date": "2026-07-04",
-  "note": "7d window (24h: 0 routes n≥50). /he peak at n=42 — still below 50-sample floor (was n=60 last week, traffic dip). No above-floor routes eligible for regression verdict. Sub-floor CLS extremes (0.7-1.6) on game pages remain ineligible. 6.4MB dictionary chunk (7fd32332) confirmed lazy-loaded (webpack-runtime reference only) — not on critical path. Supabase MCP absent (9th consecutive night) — 2 migrations still pending apply. No code shipped tonight: all regression routes sub-floor; Supabase unavailable.",
+  "date": "2026-07-05",
+  "note": "24h window: 0 routes n≥50 (all sub-floor). No eligible regression verdicts. Supabase MCP absent (10th consecutive night). 2 migrations pending apply. One frontend fix shipped: removed 150ms animation delay from homepage h1 LCP element (LandingHero.tsx). Framer Motion synchronously in critical path via ModeCard → LandingChallengeCards (documented carry, requires LazyMotion refactor).",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (9th consecutive night). Cannot apply migrations via MCP or exec_sql RPC.",
+    "note": "Supabase MCP absent (10th consecutive night). Cannot apply migrations via MCP or exec_sql RPC. ESCALATED to human — mint never-expire PAT.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
@@ -13,16 +13,16 @@
           "RLS initplan fix: (select auth.role()) on quest_achievement_feed policy",
           "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)"
         ],
-        "carry_count": 8,
-        "status": "WRITTEN — pending apply (8th night)"
+        "carry_count": 9,
+        "status": "WRITTEN — pending apply (9th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
         "items": [
           "DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup"
         ],
-        "carry_count": 3,
-        "status": "WRITTEN — pending apply (3rd night)"
+        "carry_count": 4,
+        "status": "WRITTEN — pending apply (4th night)"
       }
     ],
     "remaining_advisor_items": [
@@ -30,115 +30,76 @@
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 8
+        "carry_count": 9
       },
       {
         "id": "unindexed_fk_word_club_members_user_id",
         "status": "LIKELY FALSE POSITIVE — idx_word_club_members_user already in migration 20260322700000_growth_retention_features.sql:149. Pending migration 20260628 covers idx_word_clubs_owner_id.",
         "priority": "LOW",
-        "carry_count": 8
+        "carry_count": 9
       },
       {
         "id": "unused_index_word_wheel_catchup",
-        "status": "Migration written (20260701020000). Pending apply (3rd night).",
+        "status": "Migration written (20260701020000). Pending apply (4th night).",
         "priority": "LOW",
-        "carry_count": 3
+        "carry_count": 4
       }
     ]
   },
   "frontend": {
-    "note": "7d window. /he n=42 (BELOW 50-sample floor — was 60 last week, traffic dip). No above-floor routes. Documented opacity-0 LCP issue re-investigated: no Framer Motion opacity-0 found in DailyChallengeLanding.tsx or DailyRedirect.tsx — issue may have already been resolved. Homepage LCP candidate root cause: useState(mounted)+showFTUE gates LandingView behind JS execution, adding hydration latency before first paint.",
+    "note": "24h window (n≥50 gate). Zero routes above floor. No regression verdicts. Homepage LCP root-cause investigation completed: h1 animation delay removed (150ms savings), Framer Motion in critical path documented. Carry: double-hydration (mobile HomeHub + desktop tree), LazyMotion wrapper needed.",
+    "shipped_fix": {
+      "file": "fe-next/components/landing/LandingHero.tsx:94",
+      "change": "Removed 150ms animation delay from h1 LCP element. With animation-fill-mode:both, the 0.15s delay caused the LCP candidate to sit at opacity:0 for 150ms before becoming visible. LCP now fires ~150ms earlier on desktop.",
+      "impact": "~150ms LCP improvement when h1 is LCP candidate. Subtitle (0.25s) and button (0.3s) stagger preserved."
+    },
     "by_route": [
       {
-        "route": "/he",
+        "route": "/",
         "p75_lcp_ms": null,
         "p75_inp_ms": null,
         "p75_cls": null,
-        "n_7d": 42,
-        "window": "7d",
-        "lcp_status": "DEFERRED — n=42, below 50-sample floor (was 60 last week). Improving trend from prior nights continues.",
-        "inp_status": "DEFERRED — n=42, below 50-sample floor.",
-        "cls_status": "DEFERRED — n=42, below 50-sample floor."
+        "n_24h": 0,
+        "window": "24h",
+        "lcp_status": "DEFERRED — n<50. Phase-0 brief: 6522ms. Root cause: TTFB (Railway) + Framer Motion in critical path. Animation delay fix shipped (-150ms).",
+        "inp_status": "DEFERRED — n<50.",
+        "cls_status": "DEFERRED — n<50."
       }
     ],
-    "sub_floor_observations": [
+    "open_watches": [
       {
-        "route": "/",
-        "n_7d": 39,
-        "note": "Near-floor (n=39). Homepage LCP 4117ms reported by brief (Phase 0 data). Root cause candidate: useState(mounted)+showFTUE gates LandingView render, adding JS execution overhead before paint. LandingView has no raw img tags without priority — image loading is not the bottleneck."
+        "id": "framer_motion_critical_path",
+        "description": "ModeCard imports { m } from framer-motion synchronously → LandingChallengeCards → LandingView. Framer Motion is in the main landing bundle. Fix: LazyMotion provider wrapping ModeCard subtree with domAnimation features loaded dynamically.",
+        "status": "documented — LazyMotion refactor needed, multi-file, deferred",
+        "priority": "HIGH",
+        "files": ["fe-next/components/landing/ModeCard.tsx:6", "fe-next/components/landing/LandingChallengeCards.tsx"]
       },
       {
-        "route": "/he/daily/word-hunt",
-        "n_7d": 23,
-        "note": "Sub-floor. Game-state-transition CLS pattern."
+        "id": "double_hydration_mobile_desktop",
+        "description": "LandingView renders both HomeHub (md:hidden) and desktop tree (hidden md:flex) simultaneously. Both trees are SSR'd + hydrated. CSS-gated but both in DOM.",
+        "status": "documented — architectural, deferred",
+        "priority": "MEDIUM"
       },
       {
-        "route": "/en/daily/word-wheel",
-        "n_7d": 17,
-        "note": "Sub-floor."
-      },
-      {
-        "route": "/en/multiplayer",
-        "n_7d": 14,
-        "note": "Sub-floor. INP structural (Socket.IO heavy client)."
+        "id": "homepage_lcp_animation_delay",
+        "description": "h1 animation delay 0.15s → 0s shipped (LandingHero.tsx:94). ~150ms LCP improvement.",
+        "status": "SHIPPED — 2026-07-05",
+        "priority": "DONE"
       }
-    ],
-    "lcp_root_cause_note": "Homepage: mounted/showFTUE useState gates LandingView render. Server emits LandingView, client re-mounts after FTUE check — adds hydration latency. Fix: render LandingView unconditionally from SSR; gate FTUE overlay separately (not the base content). Low blast-radius. Prioritize when / reaches n>=50."
-  },
-  "bundle": {
-    "total_uncompressed_kb": 41048,
-    "note": "Uncompressed build artifacts (~4x multiplier to gzip). Dictionary chunk (7fd32332, 6.4MB) confirmed lazy-loaded — not on critical path.",
-    "top_chunks": [
-      { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6452, "note": "Word dictionary — LAZY (not critical path)" },
-      { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3284 },
-      { "name": "82055-affbfbb6ca395994.js", "kb": 856 },
-      { "name": "64789-5dffd4566c33487b.js", "kb": 708 },
-      { "name": "68292.bb49bb9873fa2566.js", "kb": 648 },
-      { "name": "39299-1e5fefa3989b2cd0.js", "kb": 568 },
-      { "name": "82745-3db5a1cd5a8d6a70.js", "kb": 548 },
-      { "name": "62972-b16db851d55471f3.js", "kb": 504 }
     ]
   },
-  "open_watches": [
-    {
-      "id": "supabase_mcp_absent_9_nights",
-      "description": "Supabase MCP absent 9 consecutive nights. 2 migrations accumulate unverified (20260628 carry=8, 20260701 carry=3). ESCALATED: mint never-expire PAT into nightly env. Human action required.",
-      "status": "ESCALATED — human action required",
-      "priority": "HIGH"
-    },
-    {
-      "id": "migration_pending_apply_06_28",
-      "description": "20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql — RLS initplan + word_clubs owner_id FK index. Carry_count=8.",
-      "status": "open — 8th night without MCP"
-    },
-    {
-      "id": "migration_pending_apply_07_01",
-      "description": "20260701020000_drop_unused_index_word_wheel_catchup.sql — DROP unused idx_word_wheel_attempts_catchup. Carry_count=3.",
-      "status": "open — 3rd night without MCP"
-    },
-    {
-      "id": "traffic_dip_below_floor",
-      "description": "/he at n=42 in 7d (was 60 last week). All routes sub-floor. Cannot make regression verdicts until traffic recovers.",
-      "status": "watching",
-      "priority": "LOW"
-    },
-    {
-      "id": "homepage_lcp_ftue_gate",
-      "description": "Homepage LCP 4117ms (Phase 0 brief, n=39 sub-floor). Root cause candidate: useState(mounted)+showFTUE gates LandingView render. Fix: render LandingView unconditionally; gate FTUE overlay separately. Low blast-radius. Prioritize when / reaches n>=50.",
-      "status": "documented — not yet actionable (n=39, sub-floor)",
-      "priority": "MEDIUM"
-    },
-    {
-      "id": "dictionary_chunk_lazy_confirmed",
-      "description": "6.4MB chunk 7fd32332 (word dictionary) confirmed lazy-loaded (only referenced by webpack-runtime). NOT on critical path. Not a LCP blocker.",
-      "status": "resolved — no action needed",
-      "priority": "LOW"
-    },
-    {
-      "id": "sub_floor_cls_game_pages",
-      "description": "Multiple game pages show extreme CLS at n<50. Ineligible for verdict. Watch for n>=50.",
-      "status": "documented — sub-floor, cannot verdict",
-      "priority": "MEDIUM"
-    }
-  ]
+  "bundle": {
+    "total_kb_uncompressed": 40846,
+    "note": "Pre-tonight build (LandingHero.tsx change is CSS-class only, no chunk size impact). Dictionary chunk (7fd32332, 6449KB) confirmed lazy-loaded. No regressions vs yesterday.",
+    "top_chunks": [
+      { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6449, "note": "Word dictionary — LAZY" },
+      { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3283 },
+      { "name": "82055-affbfbb6ca395994.js", "kb": 853 },
+      { "name": "64789-6fd77af49601b4b4.js", "kb": 706 },
+      { "name": "68292.bb49bb9873fa2566.js", "kb": 647 },
+      { "name": "39299-7863ee3220653743.js", "kb": 569 },
+      { "name": "82745-e68fdc9b13adbbe1.js", "kb": 547 },
+      { "name": "62972-c82c108ebaa659c3.js", "kb": 502 }
+    ]
+  }
 }

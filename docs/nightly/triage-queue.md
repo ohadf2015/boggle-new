@@ -21,11 +21,8 @@ Items deferred from automated nightly triage. Human review required.
 - **No active A/B test** — all users get `cubes`. The PostHog flag is purely a deployment safety valve now, not an experiment.
 - Recommended owner: human — if the kill-switch is no longer needed (30+ days of stable `cubes`), delete the flag from PostHog and remove the conditional in `LandingModeCubes.tsx` to simplify code.
 
-### [Experiment Proposal] exp-mp-room-join-loading-v1 — root-cause for /en/multiplayer rage clicks
-- Rage clicks on /en/multiplayer (PostHog 24h signal) root cause: `RoomListView` room-card buttons have no disabled/loading state when `joiningRoomCode` is set. User clicks a room → async join fires → nothing visually changes → rage-clicks.
-- `CgAwareLobbyChrome` already holds `joiningRoomCode` prop but passes it only as `isQuickPlayLoading` to `RoomListView` (disabling Quick Start). Individual room cards are never disabled.
-- **Proposed fix**: Add `joiningRoomCode?: string | null` to `RoomListViewProps`; in the card render, gate `disabled={joiningRoomCode === room.gameCode}` + spinner behind `exp-mp-room-join-loading-v1` loading-state variant. Wire in `CgAwareLobbyChrome` + ensure flag in PostHog.
-- **Files**: `lib/experiments.ts` (+1 entry), `components/multiplayer/RoomListView.tsx` (~8 lines), `components/multiplayer/CgAwareLobbyChrome.tsx` (~1 line). Deferred from 07-04 lane (time budget); should be picked up by lane-03 on 07-05.
+### [Experiment Proposal] exp-mp-room-join-loading-v1 — ✅ SHIPPED 2026-07-05 lane-03
+- Implemented: `joiningRoomCode` prop threaded through `CgAwareLobbyChrome` → `RoomListView`; room card `disabled` + Loader spinner gated on `loading-state` variant. PostHog flag created (id=219697). Check rage-click rate in 7 days.
 
 ## 2026-07-02
 
@@ -1298,3 +1295,23 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
   - status: deferred
   - why: RLS policy REPLACEMENT on existing table = autonomy matrix DEFER. The always-true INSERT allows anyone to submit a teacher access request (intentional — open signup flow). To harden: restrict WITH CHECK to auth.uid() IS NOT NULL. Requires understanding if anon submissions are needed.
   - recommended owner: backend — add `WITH CHECK (auth.uid() IS NOT NULL)` if anon submissions are not required
+
+## 2026-07-05
+
+### [Supabase] teacher_access_requests INSERT always-true RLS — intentional but worth confirming
+- Policy `tar_insert_any` has `WITH CHECK (true)` for INSERT (any role).
+- Likely intentional: public teacher signup form, request requires admin approval before access is granted.
+- Status: deferred — not a data-corruption risk, but spam/flooding possible without rate limit.
+- Recommended owner: review-by-eod (confirm intentional, consider adding rate-limit or CAPTCHA at app layer)
+
+### [Sentry] JAVASCRIPT-NEXTJS-1PV — TypeError null.clear word-wheel (NEW 2026-07-04)
+- First/last: 2026-07-04, 4 occurrences, 2 users. Mechanism: rAF. Android 16 Samsung S931B.
+- Root cause: `TrailRenderer.draw()` called `this.graphics.clear()` without guard; PixiJS nulls internal render context before setting `graphics.destroyed=true` on WebGL context loss.
+- Status: shipped fix in `fe-next/lib/gameEngine/TrailRenderer.ts` (added `_destroyed || graphics?.destroyed` guard + try/catch in `draw()`). Fixes JAVASCRIPT-NEXTJS-1PV.
+- Recommended owner: review-by-eod (visual verify word-wheel trail still renders normally)
+
+### [Sentry] JAVASCRIPT-NEXTJS-1KQ — churn-signals 502 (stale, 1 user = founder)
+- First: 2026-06-03, last: 2026-06-05. 278 occurrences, 1 user. Handled=yes.
+- useChurnSignals hook fires POST to a churn-report endpoint that returns 502. Stale (30d+ dormant).
+- Status: deferred — error is handled (not user-facing), stale, single user. Monitor if resurfaces.
+- Recommended owner: self (check if churn-signals endpoint is still live; if dead, remove the hook call)
