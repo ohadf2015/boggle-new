@@ -10,6 +10,7 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { Zap, Target, BookOpen, Coins, Lock, RotateCcw } from 'lucide-react';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { ScoreGaugeRing } from './ScoreGaugeRing';
 import type { CoinRewardMode } from '@/components/results/CoinRewardDisplay';
 
@@ -27,6 +28,7 @@ export interface PerformanceSectionProps {
   guessesUsed: number;
   extraTries?: number;
   t: (key: string) => string;
+  language: string;
 }
 
 interface MiniRingConfig {
@@ -47,6 +49,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
   guessesUsed,
   extraTries = 0,
   t,
+  language,
 }) => {
   const isTeasing = coinRewardMode === 'teasing';
   const breakdown = getScoreBreakdown(lifeRemaining, guessesUsed, wordsDiscovered, solved);
@@ -169,7 +172,7 @@ export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
               <Coins className={`w-4 h-4 ${isTeasing ? 'text-amber-500/50' : 'text-amber-400'}`} />
               <span className={`text-xs font-medium ${isTeasing ? 'text-slate-400' : 'text-slate-300'}`}>
                 {isTeasing
-                  ? (t('coins.guestTeasing') || '').replace('{amount}', String(coinReward.awarded))
+                  ? (t('coins.guestTeasing') || '').replace('{amount}', safeToLocaleString(coinReward.awarded, language))
                   : (t('wordHunt.results.coinsEarned'))}
               </span>
             </div>

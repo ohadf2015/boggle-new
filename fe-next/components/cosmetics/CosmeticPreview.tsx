@@ -2,6 +2,7 @@
 
 import { useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { type Cosmetic, RARITY_COLORS, formatUnlockHint, localizeTierParams } from '@/lib/cosmetics';
 import { X, Lock } from 'lucide-react';
@@ -15,7 +16,7 @@ interface CosmeticPreviewProps {
 }
 
 export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurchase }: CosmeticPreviewProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const rarityClass = RARITY_COLORS[cosmetic.rarity];
   const dialogRef = useRef<HTMLDivElement>(null);
   useFocusTrap(dialogRef, true, onClose);
@@ -73,7 +74,7 @@ export function CosmeticPreview({ cosmetic, isUnlocked, onClose, onEquip, onPurc
                 onClick={() => onPurchase(cosmetic.id)}
                 className="w-full py-2 bg-neo-lime text-black font-bold rounded-neo border-neo shadow-hard-sm"
               >
-                {t('cosmetics.purchase', { cost: cosmetic.unlockCondition.cost })}
+                {t('cosmetics.purchase', { cost: safeToLocaleString(cosmetic.unlockCondition.cost, language) })}
               </button>
             )}
           </div>

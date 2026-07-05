@@ -4,12 +4,14 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { NeoPanel } from '@/components/ui/panel';
 import { getRewardCoins } from '@/lib/dailyRewards';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 interface DailyRewardClaimProps {
   coinsEarned: number;
   currentStreakDay: number;
   badge?: string;
   t: (key: string) => string;
+  language: string;
 }
 
 function interpolateTranslation(template: string, vars: Record<string, string | number>): string {
@@ -24,7 +26,7 @@ function interpolateTranslation(template: string, vars: Record<string, string | 
  * DailyRewardClaim - Shows reward after completing daily challenge.
  * Displays coin count, optional badge reveal, and tomorrow's preview.
  */
-export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t }: DailyRewardClaimProps) {
+export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t, language }: DailyRewardClaimProps) {
   const tomorrowCoins = getRewardCoins(currentStreakDay + 1);
 
   return (
@@ -40,7 +42,7 @@ export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t }: Da
         transition={{ type: 'spring', stiffness: 200, delay: 0.2 }}
       >
         <p className="text-2xl font-black text-neo-cyan">
-          {interpolateTranslation(t('daily.rewardClaimed'), { coins: coinsEarned })}
+          {interpolateTranslation(t('daily.rewardClaimed'), { coins: safeToLocaleString(coinsEarned, language) })}
         </p>
       </m.div>
 
@@ -64,7 +66,7 @@ export function DailyRewardClaim({ coinsEarned, currentStreakDay, badge, t }: Da
         transition={{ delay: 0.8 }}
         className="text-sm text-neo-white"
       >
-        {interpolateTranslation(t('daily.comeBackTomorrow'), { coins: tomorrowCoins })}
+        {interpolateTranslation(t('daily.comeBackTomorrow'), { coins: safeToLocaleString(tomorrowCoins, language) })}
       </m.p>
     </m.div>
     </NeoPanel>

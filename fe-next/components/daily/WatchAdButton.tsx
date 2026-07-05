@@ -7,6 +7,7 @@ import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
@@ -15,6 +16,8 @@ interface WatchAdButtonProps {
   onCoinsEarned: (coins: number, newTotal: number) => void;
   /** Translation function */
   t: (key: string) => string;
+  /** Language code for locale-aware number formatting */
+  language?: string;
   /** Optional className for styling */
   className?: string;
   /** Whether to show as a compact button or full card */
@@ -36,6 +39,7 @@ interface WatchAdButtonProps {
 const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   onCoinsEarned,
   t,
+  language = 'en',
   className,
   variant = 'button',
   surface,
@@ -81,7 +85,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
     if (showSuccess) {
       return {
         icon: <CheckCircle className="w-5 h-5 text-neo-lime" />,
-        text: `+${earnedAmount} ${t('wordHunt.ad.coinsEarned')}`,
+        text: `+${safeToLocaleString(earnedAmount, language)} ${t('wordHunt.ad.coinsEarned')}`,
         subtext: null,
       };
     }
@@ -109,7 +113,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
         return {
           icon: <Play className="w-5 h-5" />,
           text: t('wordHunt.ad.watchAd'),
-          subtext: `+${rewardAmount} ${t('common.coins')}`,
+          subtext: `+${safeToLocaleString(rewardAmount, language)} ${t('common.coins')}`,
         };
     }
   };
@@ -136,7 +140,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
         {/* Reward badge */}
         <div className="absolute top-2 inset-e-2 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
           <Coins className="w-4 h-4" />
-          <span className="font-black text-sm">+{rewardAmount}</span>
+          <span className="font-black text-sm">+{safeToLocaleString(rewardAmount, language)}</span>
         </div>
 
         {/* Main content */}
@@ -193,7 +197,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
             {!showSuccess && status === 'idle' && (
               <span className="flex items-center gap-0.5 text-neo-lime">
                 <Coins className="w-4 h-4" />
-                <span className="text-xs font-bold">+{rewardAmount}</span>
+                <span className="text-xs font-bold">+{safeToLocaleString(rewardAmount, language)}</span>
               </span>
             )}
           </span>

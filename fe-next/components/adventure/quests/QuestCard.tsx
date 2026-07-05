@@ -4,6 +4,7 @@ import { memo } from 'react';
 import { Check, Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { ChapterQuest, ChapterQuestProgress } from '@/types/adventure';
 
 interface QuestCardProps {
@@ -12,7 +13,7 @@ interface QuestCardProps {
 }
 
 export const QuestCard = memo(function QuestCard({ quest, progress }: QuestCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const pct = Math.min((progress.current / quest.target) * 100, 100);
 
   return (
@@ -55,7 +56,7 @@ export const QuestCard = memo(function QuestCard({ quest, progress }: QuestCardP
         {/* Reward */}
         <div className="flex items-center gap-1 mt-1">
           <Coins className="w-3 h-3 text-neo-yellow/60" />
-          <span className="text-[10px] text-neo-yellow/60">{quest.reward.coins}</span>
+          <span className="text-[10px] text-neo-yellow/60">{safeToLocaleString(quest.reward.coins, language)}</span>
         </div>
       </div>
     </div>

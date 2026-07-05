@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import type * as React from 'react';
 import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { resultCelebration } from '@/lib/blast/v2/celebration';
 import { themeEmoji } from '@/lib/blast/v2/themeEmoji';
 
@@ -162,7 +163,7 @@ export function BlastLevelCompleteCard({
   chestProgressGain = 0,
   chestNumber,
 }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const emoji = themeEmoji(theme);
   const showStars = typeof stars === 'number' && stars > 0;
   const showBonus = bonusWordsFound > 0;
@@ -236,7 +237,7 @@ export function BlastLevelCompleteCard({
           n: coins,
           duration: 0.7,
           ease: 'power2.out',
-          onUpdate: () => { valueEl.textContent = `+${Math.round(obj.n)}`; },
+          onUpdate: () => { valueEl.textContent = `+${safeToLocaleString(Math.round(obj.n), language)}`; },
         }, '-=0.35');
       }
     }
@@ -327,7 +328,7 @@ export function BlastLevelCompleteCard({
     }
 
     return () => { tl.kill(); };
-  }, [modeColor, coins, celebration.confettiCount, celebration.perStarBurst, celebration.finale, celebration.tier]);
+  }, [modeColor, coins, language, celebration.confettiCount, celebration.perStarBurst, celebration.finale, celebration.tier]);
 
   return (
     <div

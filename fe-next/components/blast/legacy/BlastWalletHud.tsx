@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Coins, Gem } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 
 interface BlastWalletHudProps {
@@ -49,6 +51,7 @@ interface ChipProps {
 }
 
 function WalletChip({ value, icon: Icon, accent, label }: ChipProps) {
+  const { language } = useLanguage();
   const shown = useCountUp(value);
   const prevRef = useRef(value);
   const [creditKey, setCreditKey] = useState(0);
@@ -71,7 +74,7 @@ function WalletChip({ value, icon: Icon, accent, label }: ChipProps) {
     >
       <Icon className="h-4 w-4" style={{ color: accent, filter: `drop-shadow(0 0 3px ${accent}aa)` }} strokeWidth={2.75} aria-hidden="true" />
       <span className="font-neo-display text-base font-black tabular-nums leading-none" style={{ color: accent }}>
-        {shown}
+        {safeToLocaleString(shown, language)}
       </span>
     </AdaptiveMotion.div>
   );

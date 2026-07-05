@@ -3,6 +3,7 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import GameFeedback from '@/components/feedback/GameFeedback';
 import { m, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/contexts/LanguageContext';
 import WatchAdButton from './WatchAdButton';
 import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
@@ -63,8 +64,10 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   countdown,
   isNewCompletion,
   onBack,
-  t,
+  t: tProp,
 }) => {
+  const { language } = useLanguage();
+  const t = tProp;
   const [copied, setCopied] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
   const { guestFingerprint, guestPlayer, leaderboardKey } = useDailyResultSubmission(result, longestWord, isNewCompletion);
@@ -292,13 +295,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               coinsEarned={getRewardCoins(streak.currentStreak)}
               currentStreakDay={streak.currentStreak}
               t={t}
+              language={language}
             />
             {/* Endowment anchoring: double the daily reward they just saw */}
             <DoubleGoldAdButton
               earnedAmount={getRewardCoins(streak.currentStreak)}
               surface="daily_results_double"
             />
-            <WatchAdButton onCoinsEarned={() => {}} t={t} surface="daily_challenge_results" />
+            <WatchAdButton onCoinsEarned={() => {}} t={t} language={language} surface="daily_challenge_results" />
           </>
         )}
 

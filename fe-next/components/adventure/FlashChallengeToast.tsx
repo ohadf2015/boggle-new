@@ -5,6 +5,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { Coins, Check, Zap, XCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { FlashChallenge } from '@/types/adventure';
 
 /** Auto-dismiss delay after completion/failure (ms) */
@@ -25,7 +26,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
   onDismiss,
   timeLeft,
 }: FlashChallengeToastProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Auto-dismiss after completion or failure
   useEffect(() => {
@@ -83,7 +84,7 @@ export const FlashChallengeToast = memo(function FlashChallengeToast({
                 <div className="flex items-center gap-1">
                   <Coins className={cn('w-3 h-3', isComplete ? 'text-neo-black' : 'text-neo-yellow')} />
                   <span className={cn('text-[11px] font-black', isComplete ? 'text-neo-black' : 'text-neo-yellow')}>
-                    +{challenge.rewardCoins}
+                    +{safeToLocaleString(challenge.rewardCoins, language)}
                   </span>
                   {!isComplete && (
                     <span className="text-[10px] font-mono font-bold text-neo-white">{timeLeft}s</span>

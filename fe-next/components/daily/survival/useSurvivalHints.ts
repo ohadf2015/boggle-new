@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { Language } from '@/types';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { generateProgressiveHints, generateFallbackHints, CLUE_SHOP_ITEMS, type HintLevel, type ClueShopItem } from '@/utils/aiHintGenerator';
 import type { FeedbackType } from '../WordFeedbackToast';
 
@@ -192,11 +193,11 @@ export function useSurvivalHints({
               : 'wordHunt.survival.exampleSentence';
         showToast(
           'clue-unlocked',
-          t('wordHunt.survival.clueUnlocked', { name: t(clueNameKey), cost: nextHintItem.cost }),
+          t('wordHunt.survival.clueUnlocked', { name: t(clueNameKey), cost: safeToLocaleString(nextHintItem.cost, language) }),
         );
     }
-    
-  }, [nextHintItem, unrevealedPositions, playWordAcceptedSound, showToast, t]);
+
+  }, [nextHintItem, unrevealedPositions, playWordAcceptedSound, showToast, t, language]);
 
 
   // Auto-Unlock logic

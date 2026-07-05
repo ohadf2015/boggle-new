@@ -413,6 +413,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       canAffordCoinRestore={canAffordCoinRestore}
       onCoinRestore={handleExtraLifeCoinAccept}
       t={t}
+      language={language}
     />
   ) : null;
 
@@ -481,6 +482,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
               onDismiss={() => actions.dismissNotification(notification.id)}
               direction={actions.gameDir}
               t={t}
+              language={language}
             />
           ))}
         </AnimatePresence>
@@ -676,6 +678,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
             onDismiss={() => actions.dismissNotification(notification.id)}
             direction={actions.gameDir}
             t={t}
+            language={language}
           />
         ))}
       </AnimatePresence>

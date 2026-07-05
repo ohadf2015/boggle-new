@@ -4,6 +4,7 @@ import React, { memo } from 'react';
 import { Coins } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 interface MobileCompactRewardsProps {
   /** Current win streak (0 = no streak) */
@@ -28,7 +29,7 @@ const MobileCompactRewards: React.FC<MobileCompactRewardsProps> = memo(({
   isAuthenticated = true,
   className,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const hasStreak = winStreak > 0;
   const hasCoins = coins > 0;
@@ -69,7 +70,7 @@ const MobileCompactRewards: React.FC<MobileCompactRewardsProps> = memo(({
             'text-base font-black',
             isAuthenticated ? 'text-neo-lime' : 'text-amber-400/60'
           )}>
-            +{coins}
+            +{safeToLocaleString(coins, language)}
           </span>
           {!isAuthenticated && (
             <span className="text-[10px] text-white">

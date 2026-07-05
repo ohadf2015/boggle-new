@@ -341,6 +341,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           guessesUsed={result.attemptsUsed}
           extraTries={result.extraTries}
           t={t}
+          language={language}
         />
       </m.div>
     )}
@@ -483,7 +484,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
               <span>{t('wordHunt.ad.needMoreCoins')}</span>
               <div className="flex-1 h-px bg-neo-navy-elevated" />
             </div>
-            <WatchAdButton onCoinsEarned={() => {}} t={t} surface="word_hunt_results" />
+            <WatchAdButton onCoinsEarned={() => {}} t={t} language={language} surface="word_hunt_results" />
           </div>
         )}
       </div>

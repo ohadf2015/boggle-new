@@ -6,6 +6,7 @@ import { Play, Coins, Loader2, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
 
@@ -43,7 +44,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const reducedMotion = useReducedMotion();
 
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -87,10 +88,10 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
   const label = status === 'showing'
     ? t('ads.rewarded.earning')
     : isDone
-      ? t('ads.rewarded.earned').replace('{amount}', String(goldAmount))
+      ? t('ads.rewarded.earned').replace('{amount}', safeToLocaleString(goldAmount, language))
       : capped
         ? t('ads.rewarded.cooldown')
-        : t('ads.rewarded.watchForGold').replace('{amount}', String(goldAmount));
+        : t('ads.rewarded.watchForGold').replace('{amount}', safeToLocaleString(goldAmount, language));
 
   const Icon = isDone ? CheckCircle : isLoading ? Loader2 : Play;
   const isMd = size === 'md';
@@ -122,7 +123,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
       disabled={isDisabled}
-      aria-label={t('ads.rewarded.watchForGold').replace('{amount}', String(goldAmount))}
+      aria-label={t('ads.rewarded.watchForGold').replace('{amount}', safeToLocaleString(goldAmount, language))}
       whileHover={!isDisabled ? { scale: 1.05, y: -2 } : undefined}
       whileTap={!isDisabled ? { scale: 0.94 } : undefined}
       animate={idleMotion && !reducedMotion ? { y: [0, -1.5, 0] } : { y: 0 }}
@@ -223,7 +224,7 @@ export const RewardedAdGoldButton: React.FC<RewardedAdGoldButtonProps> = ({
             transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 2, ease: 'easeInOut' }}
           >
             <Coins className={isMd ? 'h-4 w-4' : 'h-3.5 w-3.5'} />
-            +{goldAmount}
+            +{safeToLocaleString(goldAmount, language)}
           </m.span>
         )}
       </span>

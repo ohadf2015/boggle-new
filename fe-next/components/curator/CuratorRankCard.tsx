@@ -1,6 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import {
   curatorRankForPoints,
   progressToNextRank,
@@ -21,7 +22,7 @@ interface CuratorRankCardProps {
  * (trust_tier) lives elsewhere. All copy via t('curator.*').
  */
 export function CuratorRankCard({ points, celebrateRank }: CuratorRankCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const rank = curatorRankForPoints(points);
   const progress = progressToNextRank(points);
   const nextMilestone = CURATOR_COIN_MILESTONES.find((m) => m.points > points) ?? null;
@@ -75,7 +76,7 @@ export function CuratorRankCard({ points, celebrateRank }: CuratorRankCardProps)
         <p className="mt-1 text-xs font-neo-body text-neo-yellow">
           {t('curator.coins.nextMilestone', {
             points: nextMilestone.points,
-            coins: nextMilestone.coins,
+            coins: safeToLocaleString(nextMilestone.coins, language),
           })}
         </p>
       )}

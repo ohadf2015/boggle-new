@@ -2,6 +2,7 @@
 
 import { Check, Star, Coins, Zap, Target, Swords } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useDailySideQuests, QuestProgress } from '@/hooks/useDailySideQuests';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 
@@ -69,7 +70,7 @@ function QuestRow({ quest, t }: { quest: QuestProgress; t: (key: string, params?
 }
 
 export function DailyQuestTracker() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { quests, allComplete, totalRewards } = useDailySideQuests();
 
   return (
@@ -109,7 +110,7 @@ export function DailyQuestTracker() {
               </div>
               <div className="flex items-center gap-1">
                 <Coins className="w-4 h-4" />
-                {t('dailyQuests.totalCoins', { coins: totalRewards.coins })}
+                {t('dailyQuests.totalCoins', { coins: safeToLocaleString(totalRewards.coins, language) })}
               </div>
             </div>
           </AdaptiveMotion.div>

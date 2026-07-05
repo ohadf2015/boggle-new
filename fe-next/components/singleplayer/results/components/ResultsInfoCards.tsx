@@ -4,6 +4,7 @@ import { memo } from 'react';
 import { TrendingUp, TrendingDown, Minus, Coins, Flame, Lock, Trophy, Zap, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
 import { MiniSparkline } from '@/components/charts/MiniSparkline';
 import { RankBadge } from '@/components/ui/RankBadge';
@@ -60,7 +61,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
   winStreakData,
   achievementCount,
 }: ResultsInfoCardsProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { sparklineScores, trend, hasSparkline } = useSparklineTrend(currentScore);
   const top5 = participants.slice(0, 5);
   const showLeaderboard = mode === 'solo-bots' && top5.length > 1;
@@ -208,7 +209,7 @@ export const ResultsInfoCards = memo(function ResultsInfoCards({
                   'font-black text-lg',
                   isAuthenticated ? 'text-neo-lime' : 'text-amber-400',
                 )}>
-                  +{coins}
+                  +{safeToLocaleString(coins, language)}
                 </span>
                 <span className="text-[10px] text-white block font-bold uppercase">
                   {t('results.dailyPlayBonus')}

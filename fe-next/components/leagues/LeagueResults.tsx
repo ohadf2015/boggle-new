@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { LeagueTier, LeagueZone } from '@/hooks/useLeague';
@@ -30,7 +31,7 @@ interface LeagueResultsProps {
 }
 
 export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: LeagueResultsProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
 
@@ -62,7 +63,7 @@ export function LeagueResults({ tier, position, zone, coinsEarned, onClose }: Le
 
         <div className="border-3 border-black rounded-neo bg-neo-navy/50 p-4 text-center mb-4">
           <p className="text-sm text-neo-white">{t('league.coinsEarned')}</p>
-          <p className="font-neo-display text-2xl font-bold text-neo-yellow">{coinsEarned}</p>
+          <p className="font-neo-display text-2xl font-bold text-neo-yellow">{safeToLocaleString(coinsEarned, language)}</p>
         </div>
 
         {/* Inline banner ad (web iframe; native shows no inline banner) */}

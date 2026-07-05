@@ -3,6 +3,7 @@
 import { m } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { WeeklyQuestRow } from '@/lib/supabase/education/types';
 
 interface WeeklyChallengeCardProps {
@@ -11,7 +12,7 @@ interface WeeklyChallengeCardProps {
 }
 
 export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Canonical contract: requirements + current_progress are both keyed by quest.quest_type
   const requirements = (quest.requirements ?? {}) as Record<string, number>;
@@ -54,7 +55,7 @@ export function WeeklyChallengeCard({ quest, onClaim }: WeeklyChallengeCardProps
       <div className="flex items-center gap-3 mb-3 text-sm">
         <span className="text-neo-lime">{t('education.challenges.xpReward', { amount: quest.xp_reward })}</span>
         {quest.bonus_rewards?.coins && (
-          <span className="text-neo-pink">{t('education.challenges.coinReward', { amount: quest.bonus_rewards.coins })}</span>
+          <span className="text-neo-pink">{t('education.challenges.coinReward', { amount: safeToLocaleString(quest.bonus_rewards.coins, language) })}</span>
         )}
       </div>
 

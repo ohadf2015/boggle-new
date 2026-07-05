@@ -4,6 +4,8 @@ import React, { useEffect, useState, useCallback, useMemo, memo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/utils/accessibility';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 interface CoinParticle {
   id: number;
@@ -33,6 +35,7 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
   onAnimationComplete,
   className,
 }) => {
+  const { language } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
   const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
   const [showAnimation, setShowAnimation] = useState(false);
@@ -138,7 +141,7 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
       >
         <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-linear-to-r from-yellow-400 to-orange-400 text-white font-bold shadow-lg">
           <span>💰</span>
-          <span>+{displayAmount}</span>
+          <span>+{safeToLocaleString(displayAmount, language)}</span>
         </div>
       </m.div>
     );
@@ -191,7 +194,7 @@ const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
               >
                 💰
               </m.span>
-              <span>+{displayAmount}</span>
+              <span>+{safeToLocaleString(displayAmount, language)}</span>
             </span>
           </m.div>
         </m.div>

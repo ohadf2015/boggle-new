@@ -15,6 +15,7 @@ import {
 import dynamic from 'next/dynamic';
 const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => ({ default: m.QRCodeSVG })), { ssr: false });
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
@@ -80,7 +81,7 @@ function MilestoneProgress({
   milestones: ReferralMilestoneData[];
   totalJoined: number;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const maxThreshold = milestones[milestones.length - 1]?.threshold ?? 50;
   const pct = Math.min((totalJoined / maxThreshold) * 100, 100);
 
@@ -146,7 +147,7 @@ function MilestoneProgress({
             <div className="text-xs font-black text-neo-white">
               {m.threshold} {t('referralDashboard.friendsJoined').toLowerCase()}
             </div>
-            <div className="text-xs font-bold text-neo-yellow">+{m.coins}</div>
+            <div className="text-xs font-bold text-neo-yellow">+{safeToLocaleString(m.coins, language)}</div>
             {m.reached && (
               <Check className="w-3 h-3 text-neo-lime mx-auto mt-0.5" aria-hidden="true" />
             )}

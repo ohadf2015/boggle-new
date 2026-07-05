@@ -2,6 +2,7 @@
 import { useEffect } from 'react';
 import { m } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
 
@@ -12,7 +13,7 @@ type Props = {
 };
 
 export function BlastChestOpenModal({ contents, isOpen, onClose }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Server-granted chest coins — fire the flying-coins + sound FX on open.
   useEffect(() => {
@@ -62,7 +63,7 @@ export function BlastChestOpenModal({ contents, isOpen, onClose }: Props) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <div className="text-6xl font-bold text-[#BFFF00]">{contents.coins}</div>
+          <div className="text-6xl font-bold text-[#BFFF00]">{safeToLocaleString(contents.coins, language)}</div>
           <div className="text-lg">{t('blast.chest.coins', 'Coins')}</div>
         </m.div>
 

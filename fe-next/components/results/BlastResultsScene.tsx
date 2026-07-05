@@ -4,6 +4,7 @@ import { m, useReducedMotion } from 'framer-motion';
 import { Bomb, Flame, Gem, LayoutGrid, Trophy } from 'lucide-react';
 import { useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { BlastPlayerStats } from '@/shared/types/game';
 
 interface BlastResultsSceneProps {
@@ -36,7 +37,7 @@ function StatChip({ icon, value, label, accent }: {
 }
 
 export default function BlastResultsScene({ playerStats, currentUsername }: BlastResultsSceneProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const prefersReduced = useReducedMotion();
   const v = prefersReduced ? reduced : row;
 
@@ -84,7 +85,7 @@ export default function BlastResultsScene({ playerStats, currentUsername }: Blas
             </span>
             <div className="grid grid-cols-4 gap-1.5">
               <StatChip icon={<Flame className="w-4 h-4" />} value={`${me.stats.maxCombo}x`} label={t('blast.results.comboChain')} accent="text-neo-orange" />
-              <StatChip icon={<Gem className="w-4 h-4" />} value={me.stats.gemsCollected} label={t('blast.results.gemsCollected')} accent="text-neo-cyan" />
+              <StatChip icon={<Gem className="w-4 h-4" />} value={safeToLocaleString(me.stats.gemsCollected, language)} label={t('blast.results.gemsCollected')} accent="text-neo-cyan" />
               <StatChip icon={<Bomb className="w-4 h-4" />} value={me.stats.tilesCleared} label={t('blast.results.tilesCleared')} accent="text-neo-lime" />
               <StatChip icon={<LayoutGrid className="w-4 h-4" />} value={me.stats.boardClears} label={t('blast.results.boardClears')} accent="text-neo-purple" />
             </div>

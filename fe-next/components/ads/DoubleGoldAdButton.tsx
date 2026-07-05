@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { Play, Coins, Loader2, CheckCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { useCoinContext } from '@/contexts/CoinContext';
 import { trackRewardedAdOffered } from '@/utils/growthTracking';
@@ -33,7 +34,7 @@ export const DoubleGoldAdButton: React.FC<DoubleGoldAdButtonProps> = ({
   className,
   onDoubled,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { addCoins } = useCoinContext();
   const [doubled, setDoubled] = useState(false);
 
@@ -65,7 +66,7 @@ export const DoubleGoldAdButton: React.FC<DoubleGoldAdButtonProps> = ({
   const Icon = isLoading ? Loader2 : status === 'completed' ? CheckCircle : Play;
   const label = isLoading
     ? t('ads.doubleGold.earning')
-    : t('ads.doubleGold.cta', { amount: earnedAmount });
+    : t('ads.doubleGold.cta', { amount: safeToLocaleString(earnedAmount, language) });
 
   return (
     <button

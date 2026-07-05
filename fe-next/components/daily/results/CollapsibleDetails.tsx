@@ -8,6 +8,7 @@
 import React, { useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Coins, Timer, Sparkles } from 'lucide-react';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { getSurvivalBonusMessage } from './constants';
 
 export interface CollapsibleDetailsProps {
@@ -15,6 +16,7 @@ export interface CollapsibleDetailsProps {
   survivalBonusTime: number;
   rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
   t: (key: string) => string;
+  language: string;
 }
 
 export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
@@ -22,6 +24,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
   survivalBonusTime,
   rarestWord,
   t,
+  language,
 }) => {
   const [expanded, setExpanded] = useState(false);
 
@@ -47,7 +50,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
           {!expanded && (
             <div className="flex items-center gap-1.5">
               {coinReward && coinReward.awarded > 0 && (
-                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">+{coinReward.awarded}🪙</span>
+                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">+{safeToLocaleString(coinReward.awarded, language)}🪙</span>
               )}
               {survivalBonusTime > 0 && (
                 <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">+{survivalBonusTime}s</span>
@@ -77,12 +80,12 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
                     <span className="font-bold text-sm text-gray-700 dark:text-gray-200">{t('wordHunt.results.coinsEarned')}</span>
                   </div>
                   <div className="text-right">
-                    <span className="font-black text-lg text-amber-600 dark:text-amber-400">+{coinReward.awarded}</span>
+                    <span className="font-black text-lg text-amber-600 dark:text-amber-400">+{safeToLocaleString(coinReward.awarded, language)}</span>
                     {(coinReward.breakdown.base > 0 || coinReward.breakdown.efficiency > 0 || coinReward.breakdown.streak > 0) && (
                       <div className="text-[10px] text-gray-500 dark:text-gray-400">
-                        {coinReward.breakdown.base > 0 && <span>Base: {coinReward.breakdown.base}</span>}
-                        {coinReward.breakdown.efficiency > 0 && <span> + Efficiency: {coinReward.breakdown.efficiency}</span>}
-                        {coinReward.breakdown.streak > 0 && <span> + Streak: {coinReward.breakdown.streak}</span>}
+                        {coinReward.breakdown.base > 0 && <span>Base: {safeToLocaleString(coinReward.breakdown.base, language)}</span>}
+                        {coinReward.breakdown.efficiency > 0 && <span> + Efficiency: {safeToLocaleString(coinReward.breakdown.efficiency, language)}</span>}
+                        {coinReward.breakdown.streak > 0 && <span> + Streak: {safeToLocaleString(coinReward.breakdown.streak, language)}</span>}
                       </div>
                     )}
                   </div>

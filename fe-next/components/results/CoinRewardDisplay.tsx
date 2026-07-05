@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import { Coins, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 export interface CoinReward {
   awarded: number;
@@ -71,7 +72,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
   showHint = false,
   className,
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   if (!reward || reward.awarded === 0) {
     return null;
@@ -87,6 +88,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
         variant={variant}
         className={className}
         t={t}
+        language={language}
       />
     );
   }
@@ -100,7 +102,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
       )}>
         <div className="flex items-center justify-center gap-1">
           <Coins className="w-3 h-3 text-neo-black" />
-          <span className="font-black text-neo-black">+{reward.awarded}</span>
+          <span className="font-black text-neo-black">+{safeToLocaleString(reward.awarded, language)}</span>
         </div>
         <div className="text-[10px] font-bold uppercase text-neo-black/70">
           {t('reveal.coins')}
@@ -118,7 +120,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
       )}>
         <div className="flex items-center justify-center gap-2">
           <Coins className="w-5 h-5 text-neo-black" />
-          <span className="font-black text-xl text-neo-black">+{reward.awarded}</span>
+          <span className="font-black text-xl text-neo-black">+{safeToLocaleString(reward.awarded, language)}</span>
           <span className="text-sm font-bold text-neo-black/70">
             {t('reveal.coins')}
           </span>
@@ -153,7 +155,7 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
         >
           <Coins className="w-6 h-6 text-neo-black" />
         </m.div>
-        <span className="font-black text-2xl text-neo-black">+{reward.awarded}</span>
+        <span className="font-black text-2xl text-neo-black">+{safeToLocaleString(reward.awarded, language)}</span>
         <span className="text-sm font-bold text-neo-black/70">
           {t('reveal.coins')}
         </span>
@@ -163,22 +165,22 @@ const CoinRewardDisplay: React.FC<CoinRewardDisplayProps> = memo(({
       {showBreakdown && (
         <div className="flex items-center justify-center gap-3 text-xs text-neo-black/70 font-bold flex-wrap relative z-10">
           {reward.breakdown.base > 0 && (
-            <span>{t('reveal.base')}: +{reward.breakdown.base}</span>
+            <span>{t('reveal.base')}: +{safeToLocaleString(reward.breakdown.base, language)}</span>
           )}
           {(reward.breakdown.scoreBonus ?? 0) > 0 && (
-            <span>{t('coins.score')}: +{reward.breakdown.scoreBonus}</span>
+            <span>{t('coins.score')}: +{safeToLocaleString(reward.breakdown.scoreBonus ?? 0, language)}</span>
           )}
           {(reward.breakdown.placement ?? 0) > 0 && (
-            <span>{t('coins.placement')}: +{reward.breakdown.placement}</span>
+            <span>{t('coins.placement')}: +{safeToLocaleString(reward.breakdown.placement ?? 0, language)}</span>
           )}
           {(reward.breakdown.efficiency ?? 0) > 0 && (
-            <span>{t('coins.efficiency')}: +{reward.breakdown.efficiency}</span>
+            <span>{t('coins.efficiency')}: +{safeToLocaleString(reward.breakdown.efficiency ?? 0, language)}</span>
           )}
           {(reward.breakdown.streak ?? 0) > 0 && (
-            <span>{t('coins.streak')}: +{reward.breakdown.streak}</span>
+            <span>{t('coins.streak')}: +{safeToLocaleString(reward.breakdown.streak ?? 0, language)}</span>
           )}
           {(reward.breakdown.streakBonus ?? 0) > 0 && (
-            <span className="text-amber-600 font-semibold">🔥 +{reward.breakdown.streakBonus}</span>
+            <span className="text-amber-600 font-semibold">🔥 +{safeToLocaleString(reward.breakdown.streakBonus ?? 0, language)}</span>
           )}
         </div>
       )}
@@ -201,6 +203,7 @@ interface TeasingDisplayProps {
   variant: 'full' | 'compact' | 'inline';
   className?: string;
   t: (key: string) => string;
+  language: string;
 }
 
 const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
@@ -208,9 +211,10 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
   variant,
   className,
   t,
+  language,
 }) => {
   const teasingMessage = t('coins.guestTeasing');
-  const formattedMessage = teasingMessage.replace('{amount}', String(reward.awarded));
+  const formattedMessage = teasingMessage.replace('{amount}', safeToLocaleString(reward.awarded, language));
 
   // Inline variant - small muted badge
   if (variant === 'inline') {
@@ -221,7 +225,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
       )}>
         <div className="flex items-center justify-center gap-1">
           <Lock className="w-3 h-3 text-neo-white" />
-          <span className="font-bold text-neo-white text-xs">+{reward.awarded}</span>
+          <span className="font-bold text-neo-white text-xs">+{safeToLocaleString(reward.awarded, language)}</span>
         </div>
         <div className="text-[9px] font-bold text-neo-white">
           {t('coins.signInShort')}
@@ -240,7 +244,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
         <div className="flex items-center justify-center gap-2">
           <Lock className="w-4 h-4 text-amber-400" />
           <Coins className="w-5 h-5 text-amber-400/60" />
-          <span className="font-black text-xl text-amber-400/80">+{reward.awarded}</span>
+          <span className="font-black text-xl text-amber-400/80">+{safeToLocaleString(reward.awarded, language)}</span>
         </div>
         <p className="text-xs text-neo-white mt-1 text-center">
           {formattedMessage}
@@ -264,7 +268,7 @@ const TeasingDisplay: React.FC<TeasingDisplayProps> = memo(({
       <div className="flex items-center justify-center gap-2 mb-1">
         <Lock className="w-4 h-4 text-amber-400" />
         <Coins className="w-5 h-5 text-amber-400/60" />
-        <span className="font-black text-xl text-amber-400/80">+{reward.awarded}</span>
+        <span className="font-black text-xl text-amber-400/80">+{safeToLocaleString(reward.awarded, language)}</span>
         <span className="text-sm font-bold text-neo-white">
           {t('reveal.coins')}
         </span>

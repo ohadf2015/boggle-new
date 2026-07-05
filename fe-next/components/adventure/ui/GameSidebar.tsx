@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import AdventureObjectives from '../AdventureObjectives';
 import AdventureHuntClueBoxes from './AdventureHuntClueBoxes';
 import { WordHuntLifeBar } from '@/components/game/WordHuntLifeBar';
@@ -144,7 +145,7 @@ export const GameSidebar = memo(function GameSidebar({
   chapterQuestProgress = [],
   className,
 }: GameSidebarProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   // Derive completion progress for the desktop objectives card glow
   const completedCount = objectives.filter(o => o.isComplete).length;
@@ -283,9 +284,9 @@ export const GameSidebar = memo(function GameSidebar({
             <Lightbulb className="w-4 h-4" />
             <span className="text-xs font-bold">
               {hintGoldPending
-                ? t('adventure.confirmSpendGold', { amount: nextHintCost })
+                ? t('adventure.confirmSpendGold', { amount: safeToLocaleString(nextHintCost, language) })
                 : nextHintCost > 0
-                  ? t('adventure.game.hintCost', { cost: nextHintCost })
+                  ? t('adventure.game.hintCost', { cost: safeToLocaleString(nextHintCost, language) })
                   : t('adventure.game.hint')}
             </span>
           </button>
@@ -446,7 +447,7 @@ export const GameSidebar = memo(function GameSidebar({
           >
             <Lightbulb className="w-4 h-4" />
             <span>
-              {nextHintCost > 0 ? t('adventure.game.hintCost', { cost: nextHintCost }) : t('adventure.game.hint')}
+              {nextHintCost > 0 ? t('adventure.game.hintCost', { cost: safeToLocaleString(nextHintCost, language) }) : t('adventure.game.hint')}
             </span>
           </AdaptiveMotion.button>
 

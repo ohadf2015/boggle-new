@@ -10,6 +10,7 @@
 import { useState, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import toast from 'react-hot-toast';
 import { PowerUpButton } from './PowerUpButton';
 import { PowerUpActivationEffect } from './PowerUpActivationEffect';
@@ -84,7 +85,7 @@ export function PowerUpBar({
   nextHintCost = 0,
   className,
 }: PowerUpBarProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [pendingGoldConfirm, setPendingGoldConfirm] = useState(false);
 
   // Inventory for persistence
@@ -204,7 +205,7 @@ export function PowerUpBar({
         (toastRef) => (
           <div className="flex items-center gap-3">
             <span className="text-sm font-bold">
-              {t('adventure.confirmSpendGold', { amount: String(nextHintCost) })}
+              {t('adventure.confirmSpendGold', { amount: safeToLocaleString(nextHintCost, language) })}
             </span>
             <button type="button"
               onClick={() => { toast.dismiss(toastRef.id); setPendingGoldConfirm(false); executeHint(); }}
@@ -227,7 +228,7 @@ export function PowerUpBar({
 
     setPendingGoldConfirm(false);
     executeHint();
-  }, [cascadeActive, nextHintCost, pendingGoldConfirm, executeHint, t]);
+  }, [cascadeActive, nextHintCost, pendingGoldConfirm, executeHint, t, language]);
 
   /**
    * Handle Score Multiplier activation

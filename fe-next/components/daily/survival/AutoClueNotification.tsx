@@ -4,12 +4,14 @@ import React, { useEffect, useRef } from 'react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { X, Sparkles, Tag, FileText } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 
 export interface AutoClueNotificationProps {
   clueType: 'reveal_letter' | 'reveal_category' | 'example_sentence';
   onDismiss: () => void;
   direction: 'ltr' | 'rtl';
   t: (key: string) => string;
+  language: string;
 }
 
 /**
@@ -22,6 +24,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
   onDismiss,
   direction,
   t,
+  language,
 }) => {
   // Auto-dismiss after 1.5 seconds. Use ref so the timer is set ONCE on mount
   // and isn't reset by parent re-renders that produce a new onDismiss identity.
@@ -132,7 +135,7 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
 
               {/* Cost Reference */}
               <div className="text-[10px] text-neo-black/60 font-bold mt-1">
-                {t('wordHunt.survival.clueAutoMessage')?.replace('{cost}', String(content.cost)) ||
+                {t('wordHunt.survival.clueAutoMessage')?.replace('{cost}', safeToLocaleString(content.cost, language)) ||
                   `Auto-unlocked at ${content.cost} tokens`}
               </div>
             </div>

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { Coins, Award, X, Snowflake, Sparkles } from 'lucide-react'
 import { useLanguage } from '@/contexts/LanguageContext'
+import { safeToLocaleString } from '@/utils/bcp47Locale'
 import { cn } from '@/lib/utils'
 import gsap from 'gsap'
 import { triggerHaptic } from '@/utils/hapticFeedback'
@@ -52,7 +53,7 @@ interface Props {
 }
 
 export default function WeeklyChestModal({ chest, onClose }: Props) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const chestRef = useRef<HTMLImageElement>(null)
   const raysRef = useRef<HTMLDivElement>(null)
   const haloRef = useRef<HTMLDivElement>(null)
@@ -205,7 +206,7 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
                 TIER_COLORS[chest.tier]
               )}
             >
-              +{coinCount}
+              +{safeToLocaleString(coinCount, language)}
             </span>
           </div>
 
@@ -239,7 +240,7 @@ export default function WeeklyChestModal({ chest, onClose }: Props) {
         {/* aria-live announcement so screen readers hear the prize once it's revealed. */}
         <div className="sr-only" aria-live="polite">
           {canClose
-            ? `${tierLabel} ${t('daily.weeklyChest.title')} — ${chest.labelKey ? t(chest.labelKey) + ', ' : ''}+${chest.coins} coins${freezes > 0 ? `, +${freezes} streak ${freezes === 1 ? 'freeze' : 'freezes'}` : ''}`
+            ? `${tierLabel} ${t('daily.weeklyChest.title')} — ${chest.labelKey ? t(chest.labelKey) + ', ' : ''}+${safeToLocaleString(chest.coins, language)} coins${freezes > 0 ? `, +${safeToLocaleString(freezes, language)} streak ${freezes === 1 ? 'freeze' : 'freezes'}` : ''}`
             : ''}
         </div>
 

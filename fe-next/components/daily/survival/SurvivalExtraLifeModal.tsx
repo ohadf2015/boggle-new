@@ -2,6 +2,7 @@
 
 import { Play, X, Heart, Coins } from 'lucide-react';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 
 interface SurvivalExtraLifeModalProps {
@@ -10,13 +11,14 @@ interface SurvivalExtraLifeModalProps {
   onRestore: () => void;
   onDecline: () => void;
   t: (key: string, vars?: Record<string, string | number>) => string;
+  language: string;
   coinCost?: number;
   canAffordCoinRestore?: boolean;
   onCoinRestore?: () => void;
 }
 
 export function SurvivalExtraLifeModal({
-  isOpen, restoreAmount, onRestore, onDecline, t,
+  isOpen, restoreAmount, onRestore, onDecline, t, language,
   coinCost, canAffordCoinRestore, onCoinRestore,
 }: SurvivalExtraLifeModalProps) {
   const { offer, canShowAd } = useRewardedFeatureUnlock({
@@ -69,7 +71,7 @@ export function SurvivalExtraLifeModal({
                   className="flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-yellow px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
                 >
                   <Coins className="h-5 w-5" strokeWidth={3} />
-                  {t('wordHunt.survival.extraLifeModal.coinCta', { cost: coinCost })}
+                  {t('wordHunt.survival.extraLifeModal.coinCta', { cost: safeToLocaleString(coinCost, language) })}
                 </button>
               )}
               <button type="button"

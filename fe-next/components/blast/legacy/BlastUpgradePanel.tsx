@@ -7,12 +7,14 @@ import { useBlastUpgradeStore, BLAST_UPGRADES } from '@/lib/blast/useBlastUpgrad
 import { upgradeCost, type BlastUpgradeId } from '@/lib/blast/blastUpgradeCatalog';
 import { useBlastGems } from '@/lib/blast/useBlastGems';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 
 interface Props {
   onClose: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
+  language?: string;
   dir?: 'ltr' | 'rtl';
 }
 
@@ -35,7 +37,7 @@ function Pips({ level, max }: { level: number; max: number }) {
  * scrollable upgrade list with level pips, cost, and BUY button (maxed/unaffordable disabled).
  * Purchase pops with animation. RTL-safe; dark neo-brutalist brand.
  */
-export function BlastUpgradePanel({ onClose, t, dir = 'ltr' }: Props) {
+export function BlastUpgradePanel({ onClose, t, language = 'en', dir = 'ltr' }: Props) {
   // Subscribe to the reactive levels map so pips/costs re-render after a purchase.
   const levels = useBlastUpgradeStore((s) => s.levels);
   const buy = useBlastUpgradeStore((s) => s.buy);
@@ -76,12 +78,12 @@ export function BlastUpgradePanel({ onClose, t, dir = 'ltr' }: Props) {
             {/* Coins chip */}
             <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-3 py-1 font-neo-display text-sm font-black text-black shadow-hard-sm">
               <Coins size={16} className="shrink-0" />
-              {coins}
+              {safeToLocaleString(coins, language)}
             </span>
             {/* Gems chip */}
             <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-purple px-3 py-1 font-neo-display text-sm font-black text-neo-white shadow-hard-sm">
               <Gem size={16} className="shrink-0" />
-              {gems}
+              {safeToLocaleString(gems, language)}
             </span>
           </div>
         </div>

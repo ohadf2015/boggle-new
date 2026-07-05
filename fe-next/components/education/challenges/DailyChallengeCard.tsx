@@ -3,6 +3,7 @@
 import { m } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { DailyChallengeRow } from '@/lib/supabase/education/types';
 
 interface DailyChallengeCardProps {
@@ -11,7 +12,7 @@ interface DailyChallengeCardProps {
 }
 
 export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   const tierColors: Record<'easy' | 'medium' | 'hard', string> = {
     easy: 'bg-neo-lime text-neo-black',
@@ -68,7 +69,7 @@ export function DailyChallengeCard({ challenge, onClaim }: DailyChallengeCardPro
       <div className="flex items-center gap-3 mb-3 text-sm">
         <span className="text-neo-lime">{t('education.challenges.xpReward', { amount: challenge.xp_reward })}</span>
         {challenge.bonus_reward?.coins && (
-          <span className="text-neo-pink">{t('education.challenges.coinReward', { amount: challenge.bonus_reward.coins })}</span>
+          <span className="text-neo-pink">{t('education.challenges.coinReward', { amount: safeToLocaleString(challenge.bonus_reward.coins, language) })}</span>
         )}
       </div>
 

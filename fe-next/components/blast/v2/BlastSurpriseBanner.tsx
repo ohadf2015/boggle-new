@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { SURPRISE_META, type ActiveSurprise } from '@/lib/blast/v2/surprise';
 
 const VISIBLE_MS = 1600;
@@ -19,7 +20,7 @@ export function BlastSurpriseBanner({
   surprise: ActiveSurprise | null;
   modeColor: string;
 }) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const reduce = useReducedMotion();
   const [shown, setShown] = useState<ActiveSurprise | null>(null);
 
@@ -36,8 +37,8 @@ export function BlastSurpriseBanner({
   const coins = Math.round(shown.coins);
   const chestPct = Math.round(shown.chestProgress * 100);
   const rewardBits: string[] = [];
-  if (coins > 0) rewardBits.push(`+${coins} 🪙`);
-  if (chestPct > 0) rewardBits.push(`+${chestPct}% 💎`);
+  if (coins > 0) rewardBits.push(`+${safeToLocaleString(coins, language)} 🪙`);
+  if (chestPct > 0) rewardBits.push(`+${safeToLocaleString(chestPct, language)}% 💎`);
   if (shown.event === 'lucky_double') rewardBits.push(t('blast.surprise.nextWordDouble', 'Next word ×2'));
 
   return (

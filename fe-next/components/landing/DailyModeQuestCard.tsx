@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useDailyModeQuest } from '@/hooks/useDailyModeQuest';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCoinContext } from '@/contexts/CoinContext';
@@ -13,7 +14,7 @@ import { useCoinContext } from '@/contexts/CoinContext';
  * Max height collapsed: 80px. No modal — reward shown inline.
  */
 export function DailyModeQuestCard() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { getQuestProgress, claimReward, data } = useDailyModeQuest();
   const { playDailyRewardSound } = useSoundEffects();
   const { addCoins } = useCoinContext();
@@ -42,7 +43,7 @@ export function DailyModeQuestCard() {
       <div className="w-full border-neo rounded-neo bg-neo-navy-light px-4 py-3 flex items-center justify-between shadow-hard-sm">
         <span className="font-neo-display text-neo-lime text-sm">
           {rewardAmount !== null
-            ? t('dailyQuest.rewardEarned', { coins: rewardAmount })
+            ? t('dailyQuest.rewardEarned', { coins: safeToLocaleString(rewardAmount, language) })
             : t('dailyQuest.questComplete')}
         </span>
       </div>

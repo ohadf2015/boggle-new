@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { m, useMotionValue, animate } from 'framer-motion';
 import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { ChestContents } from '@/lib/blast/v2/chest-roll';
 
 type Props = {
@@ -35,7 +36,7 @@ export function BlastChestBadge({
   onPreview,
   modeColor = '#BFFF00',
 }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const tier = contents?.tier ?? 'wood';
   const tierColors = TIER_COLORS[tier] ?? TIER_COLORS.wood!;
   const fillColor = tierColors.fill;
@@ -180,9 +181,9 @@ export function BlastChestBadge({
       </div>
       {contents && (
         <div className="text-[10px] space-y-0.5 leading-tight opacity-95">
-          <div>+{contents.coins} {t('blast.chest.coinsSuffix', 'coins')}</div>
+          <div>+{safeToLocaleString(contents.coins, language)} {t('blast.chest.coinsSuffix', 'coins')}</div>
           {contents.boosts.length > 0 && (
-            <div>+{contents.boosts.length} {t('blast.chest.boostSuffix', 'boost')}</div>
+            <div>+{safeToLocaleString(contents.boosts.length, language)} {t('blast.chest.boostSuffix', 'boost')}</div>
           )}
           {contents.avatarPart && <div>+1 {t('blast.chest.avatarSuffix', 'avatar part')}</div>}
         </div>

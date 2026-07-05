@@ -11,12 +11,15 @@
 import { useEffect, useRef } from 'react';
 import { Coins, Sparkles, Gift, Share2, RotateCcw } from 'lucide-react';
 import { fireConfetti } from '@/utils/confettiUtils';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { SoloModifier } from '@/lib/solo/soloDaily';
 
 type TFunc = (key: string, params?: Record<string, string | number>) => string;
 
 export interface SoloRewardCardProps {
   t: TFunc;
+  /** Language code for locale-aware number formatting */
+  language?: string;
   /** Coins awarded this completion (0 on a practice replay). */
   awarded: number;
   /** Variable surprise bonus included in `awarded` (shown as a flourish when > 0). */
@@ -31,6 +34,7 @@ export interface SoloRewardCardProps {
 
 export function SoloRewardCard({
   t,
+  language = 'en',
   awarded,
   bonus,
   modifier,
@@ -77,7 +81,7 @@ export function SoloRewardCard({
         <div data-testid="solo-reward-coins" className="space-y-1.5">
           <div className="flex items-center justify-center gap-2 font-neo-display font-black text-4xl text-neo-yellow">
             <Coins className="h-8 w-8" />
-            <span aria-label={t('solo.reward.coinsEarned', { n: awarded })}>+{awarded}</span>
+            <span aria-label={t('solo.reward.coinsEarned', { n: awarded })}>+{safeToLocaleString(awarded, language)}</span>
           </div>
           {bonus > 0 && (
             <div
@@ -85,7 +89,7 @@ export function SoloRewardCard({
               className="inline-flex items-center gap-1.5 rounded-neo border-3 border-black bg-neo-orange px-2.5 py-1 font-neo-display font-black text-xs uppercase text-neo-navy shadow-hard-sm animate-neo-wobble"
             >
               <Gift className="h-3.5 w-3.5" />
-              <span>+{bonus} {t('solo.reward.surpriseBonus')}</span>
+              <span>+{safeToLocaleString(bonus, language)} {t('solo.reward.surpriseBonus')}</span>
             </div>
           )}
         </div>

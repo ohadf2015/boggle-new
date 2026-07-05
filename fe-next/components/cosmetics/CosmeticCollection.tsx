@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useCosmetics } from '@/hooks/useCosmetics';
 import { type CosmeticCategory, RARITY_COLORS, type Cosmetic, formatUnlockHint, formatUnlockProgress, localizeTierParams } from '@/lib/cosmetics';
 import { Lock } from 'lucide-react';
@@ -25,7 +26,7 @@ const TABS: { key: CosmeticCategory; label: string }[] = [
 ];
 
 export function CosmeticCollection({ rankTier, streakDays, coins, totalScore = 0, spendCoins }: CosmeticCollectionProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { equipCosmetic, purchaseCosmetic, getCosmeticsByCategory } = useCosmetics({
     rankTier,
     streakDays,
@@ -128,7 +129,7 @@ export function CosmeticCollection({ rankTier, streakDays, coins, totalScore = 0
                   }}
                   className="mt-1 text-xs bg-neo-lime text-black px-2 py-0.5 rounded-neo font-bold border-neo shadow-hard-sm"
                 >
-                  {t('cosmetics.purchase', { cost: item.unlockCondition.cost })}
+                  {t('cosmetics.purchase', { cost: safeToLocaleString(item.unlockCondition.cost, language) })}
                 </button>
               )}
             </div>
