@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Trophy, Share2, Flame, Sparkles } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -1084,7 +1085,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             aria-label={t('common.backToHome')}
             className="pointer-events-auto flex shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 py-2 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
           >
-            <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+            <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
             <span className="hidden min-[380px]:inline">{t('common.backToHome')}</span>
           </Link>
           <div className="pointer-events-auto me-12 flex items-center gap-1.5">

@@ -5,6 +5,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { ArrowLeft } from 'lucide-react';
 import XpProgressBar from '@/components/education/XpProgressBar';
 import StreakBonusIndicator from '@/components/education/StreakBonusIndicator';
@@ -54,7 +55,7 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
   showMascot = false,
   className,
 }) => {
-  const { t, language, dir } = useLanguage();
+  const { t, dir } = useLanguage();
   const isRTL = dir === 'rtl';
 
   const getModeLabel = (type: PracticeType): string => {
@@ -116,7 +117,7 @@ export const PracticeHeader = memo<PracticeHeaderProps>(({
             aria-label={t('common.back')}
             className="text-neo-white hover:text-neo-white hover:bg-neo-white/10 p-2"
           >
-            <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+            <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
 
           {/* Title and mode */}

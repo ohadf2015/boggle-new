@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronRight, Home } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 
 interface BreadcrumbItem {
@@ -37,7 +38,6 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
 }) => {
   const pathname = usePathname();
   const { t, language } = useLanguage();
-  const isRTL = language === 'he';
 
   // Generate breadcrumb items from pathname
   const items: BreadcrumbItem[] = useMemo(() => {
@@ -136,7 +136,7 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
         className={cn(
           'flex items-center gap-1 sm:gap-2 text-sm font-neo-body',
           'overflow-x-auto scrollbar-hide',
-          isRTL && 'flex-row-reverse'
+          language === 'he' && 'flex-row-reverse'
         )}
       >
         {items.map((item, index) => {
@@ -148,16 +148,14 @@ export const EducationBreadcrumbs = memo<EducationBreadcrumbsProps>(({
               key={item.href}
               className={cn(
                 'flex items-center gap-1 sm:gap-2 whitespace-nowrap',
-                isRTL && 'flex-row-reverse'
+                language === 'he' && 'flex-row-reverse'
               )}
             >
               {/* Separator (except for first item) */}
               {!isFirst && (
-                <ChevronRight
-                  className={cn(
-                    'w-4 h-4 text-neo-white shrink-0',
-                    isRTL && 'rotate-180'
-                  )}
+                <DirectionalIcon
+                  icon={ChevronRight}
+                  className="w-4 h-4 text-neo-white shrink-0"
                   aria-hidden="true"
                 />
               )}

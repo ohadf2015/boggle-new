@@ -16,6 +16,7 @@ import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Check, X, ArrowLeft } from 'lucide-react';
 import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import PracticeResultsCard from './PracticeResultsCard';
@@ -248,7 +249,7 @@ export const WordMatchingPractice = memo<WordMatchingPracticeProps>(
               aria-label={t('common.back')}
               className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
             >
-              <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+              <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
             </Button>
 
             <div className="text-center">

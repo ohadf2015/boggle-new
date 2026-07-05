@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import GridComponent from '@/components/GridComponent';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
@@ -49,9 +50,8 @@ export default function WarmupRound({
   onWordFound,
   xpSessionData,
 }: WarmupRoundProps) {
-  const { t, language: uiLanguage } = useLanguage();
+  const { t } = useLanguage();
   const { playWordAcceptedSound, setGameActive } = useSoundEffects();
-  const isRTL = uiLanguage === 'he';
 
   // Enable sound gate
   useEffect(() => {
@@ -253,7 +253,7 @@ export default function WarmupRound({
             aria-label={t('common.back')}
             className="text-slate-400 hover:text-neo-white"
           >
-            <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+            <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-neo-display text-neo-white flex items-center gap-2">

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { signOut } from '@/lib/supabase';
 import { cn } from '@/lib/utils';
 import MusicControls from '@/components/MusicControls';
@@ -159,7 +160,7 @@ export const EducationHeader = memo<EducationHeaderProps>(({
               )}
               aria-label={t('common.back')}
             >
-              <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+              <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
             </button>
           )}
 

@@ -13,6 +13,7 @@ import {
   AlertCircle,
   BookOpen
 } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import type { VocabularyWord } from '@/lib/supabase/education';
 
 interface WordListPreviewProps {
@@ -58,7 +59,7 @@ export default function WordListPreview({
             }}
             className="text-slate-400 hover:text-neo-white"
           >
-            <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+            <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-neo-display text-neo-white flex items-center gap-2">

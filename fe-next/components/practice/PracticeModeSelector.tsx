@@ -5,6 +5,7 @@ import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import {
   Layers,
   Grid3X3,
@@ -65,8 +66,7 @@ export default function PracticeModeSelector({
         blitz: progress.progress.blitz_sessions,
       }
     : { flashcard: 0, solo_board: 0, warmup: 0, word_list: 0, matching: 0, spelling: 0, blitz: 0 };
-  const { t, language } = useLanguage();
-  const isRTL = language === 'he';
+  const { t } = useLanguage();
 
   const practiceOptions: PracticeModeOption[] = [
     {
@@ -173,7 +173,7 @@ export default function PracticeModeSelector({
             aria-label={t('common.back')}
             className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
           >
-            <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+            <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
           <div className="flex-1">
             <h1 className="text-2xl font-neo-display text-neo-white">

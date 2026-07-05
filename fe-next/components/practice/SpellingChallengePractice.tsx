@@ -5,6 +5,7 @@ import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/Ada
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { ArrowLeft, Lightbulb, Check, X } from 'lucide-react';
 import { useSpellingGame } from './hooks/useSpellingGame';
 import PracticeResultsCard from './PracticeResultsCard';
@@ -163,7 +164,7 @@ export function SpellingChallengePractice({
             aria-label={t('common.back')}
             className="text-neo-white hover:text-neo-white hover:bg-neo-white/10"
           >
-            <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+            <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
           </Button>
 
           <div className="text-center">

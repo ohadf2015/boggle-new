@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -885,7 +886,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
         {/* Topbar: back · title · play-friend · How to play · loading (public — no beta badge) */}
         <div className="relative flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
-            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
           </Button>
           {/* Logo badge + visual title removed for a lighter HUD — the board IS
               the game's identity. Heading kept sr-only so the page still has a

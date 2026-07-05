@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import { X, Target, Sparkles, Zap, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { useRouter } from 'next/navigation';
@@ -24,7 +25,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
 }) => {
   const { t, language, dir } = useLanguage();
   const router = useRouter();
-  const isRTL = dir === 'rtl';
+  const isRTL = language === 'he';
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const canAnimate = enableComplexAnimations && !prefersReducedMotion;
   const { canShow, recordImpression } = useWordHuntPromo();
@@ -165,7 +166,7 @@ const WordHuntPromoPopup: React.FC<WordHuntPromoPopupProps> = ({
               >
                 <Target className="w-5 h-5" />
                 {t('wordHuntPromo.cta')}
-                <ChevronRight className={cn('w-4 h-4', isRTL && 'rotate-180')} />
+                <DirectionalIcon icon={ChevronRight} className="w-4 h-4" />
               </m.button>
 
               {/* Dismiss text — appears with close button */}

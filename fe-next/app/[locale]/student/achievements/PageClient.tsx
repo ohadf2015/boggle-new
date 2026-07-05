@@ -11,6 +11,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { EducationHeader } from '@/components/education/EducationHeader';
@@ -127,7 +128,7 @@ export default function StudentAchievementsPageClient() {
           href={`/${language}/student`}
           className="inline-flex items-center gap-2 text-neo-white hover:text-neo-white mb-6 transition-colors"
         >
-          <ArrowLeft className={cn('w-4 h-4', isRTL && 'rotate-180')} />
+          <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
           <span className="font-neo-body">{t('common.back')}</span>
         </Link>
 

@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { m, AnimatePresence, useAnimationControls } from 'framer-motion';
 import { ArrowRight, Flag, Check, Lightbulb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 import type { PyramidPuzzle } from '@/lib/connections/pyramid/types';
 import { localeNeedsIME, MAX_GUESS_LEN, getKeyboardLetters, appendLetter, backspace } from '@/lib/connections/keyboard';
@@ -348,7 +349,7 @@ export default function FinaleCard({
               className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan text-neo-navy font-neo-display font-bold px-6 py-2 shadow-hard inline-flex items-center gap-2"
             >
               {t('connections.next')}
-              <ArrowRight className={`w-4 h-4 ${isRTL ? 'rotate-180' : ''}`} aria-hidden="true" />
+              <DirectionalIcon icon={ArrowRight} className="w-4 h-4" aria-hidden="true" />
             </m.button>
           </m.div>
         )}

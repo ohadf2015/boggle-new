@@ -37,3 +37,5 @@
 - `animate-neo-shake` - error shake
 
 **Halftone Texture:** Body has subtle dot pattern overlay, use `texture-halftone` class
+
+**RTL Directional Icons:** For ANY back/exit/directional icon (arrows, LogOut), use `<DirectionalIcon icon={ArrowLeft} className="…" />` (`components/ui/DirectionalIcon.tsx`) — it auto-flips in RTL. Symmetric arrows flip by default (`rtl:rotate-180`); asymmetric icons (LogOut) need the `mirror` prop (`rtl:scale-x-[-1]`) since rotating them looks upside-down. Full back/exit buttons prefer `BackButton` (nav-up) / `ExitRoomButton` (game→lobby). Never hand-write `rtl:rotate-180` on a directional icon.

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
 import { ArrowLeft, Gem as GemLucide } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -247,7 +248,7 @@ export default function GemHuntPageClient() {
       <main className="flex-1 min-h-0 px-2 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1.5 relative">
         <div className="flex items-center gap-2 shrink-0">
           <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
-            <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
           </Button>
           <span aria-hidden className="inline-flex items-center justify-center w-7 h-7 rounded-neo bg-neo-cyan text-neo-navy border-2 border-black shadow-hard-sm rotate-[-4deg]">
             <GemLucide className="w-4 h-4" />

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Mascot } from '@/components/ui/Mascot';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Trophy, Star, RotateCcw, ArrowLeft } from 'lucide-react';
 
 export interface PracticeResultsCardProps {
@@ -257,7 +258,7 @@ export const PracticeResultsCard = memo<PracticeResultsCardProps>(({
               'flex items-center gap-2'
             )}
           >
-            <ArrowLeft className={cn('w-5 h-5', isRTL && 'rotate-180')} />
+            <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
             {t('education.practice.back')}
           </Button>
         </AdaptiveMotion.div>

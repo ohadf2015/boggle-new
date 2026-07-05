@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import { Target, Sparkles, Zap, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { useRouter } from 'next/navigation';
@@ -24,7 +25,7 @@ const WordHuntAnnouncementBanner: React.FC<WordHuntAnnouncementBannerProps> = ({
 }) => {
   const { t, language, dir } = useLanguage();
   const router = useRouter();
-  const isRTL = dir === 'rtl';
+  const isRTL = language === 'he';
   const [isHovered, setIsHovered] = useState(false);
   const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
   const canAnimate = enableComplexAnimations && !prefersReducedMotion;
@@ -143,7 +144,7 @@ const WordHuntAnnouncementBanner: React.FC<WordHuntAnnouncementBannerProps> = ({
           transition={{ duration: 1.5, repeat: Infinity }}
           className="shrink-0 flex items-center gap-0.5 bg-neo-lime text-neo-black font-black text-[10px] uppercase px-2.5 py-1.5 rounded-neo border-2 border-neo-black shadow-hard-sm"
         >
-          <ChevronRight className={cn('w-3.5 h-3.5', isRTL && 'rotate-180')} />
+          <DirectionalIcon icon={ChevronRight} className="w-3.5 h-3.5" />
         </m.div>
       </div>
 
