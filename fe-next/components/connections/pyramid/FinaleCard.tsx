@@ -349,7 +349,7 @@ export default function FinaleCard({
               className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan text-neo-navy font-neo-display font-bold px-6 py-2 shadow-hard inline-flex items-center gap-2"
             >
               {t('connections.next')}
-              <DirectionalIcon icon={ArrowRight} className="w-4 h-4" aria-hidden="true" />
+              <DirectionalIcon icon={ArrowRight} className="w-4 h-4" />
             </m.button>
           </m.div>
         )}

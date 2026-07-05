@@ -885,7 +885,7 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
       <main data-wc-main className="flex-1 min-h-0 px-3 py-1 max-w-[820px] mx-auto w-full flex flex-col gap-1 relative">
         {/* Topbar: back · title · play-friend · How to play · loading (public — no beta badge) */}
         <div className="relative flex items-center gap-2 shrink-0">
-          <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} className="shrink-0 h-8 px-2">
+          <Button variant="outline" size="sm" onClick={() => router.push(`/${language}`)} aria-label={t('common.back')} className="shrink-0 h-8 px-2">
             <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
           </Button>
           {/* Logo badge + visual title removed for a lighter HUD — the board IS
