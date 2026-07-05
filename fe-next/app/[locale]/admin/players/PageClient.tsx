@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Shield } from 'lucide-react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getSession } from '@/lib/supabase';
@@ -53,7 +54,7 @@ export default function PlayersPageClient() {
             Admin Access Required
           </h1>
           <Button onClick={() => router.push(`/${language}`)} variant="outline">
-            <ArrowLeft className="w-4 h-4 me-2" />
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-2" />
             Back to Home
           </Button>
         </div>

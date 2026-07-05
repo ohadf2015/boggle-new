@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
 import { ArrowLeft, ChevronDown, ChevronUp, HelpCircle, BookOpen } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Button } from '@/components/ui/button';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { InlineBannerAd } from "@/components/ads";
@@ -43,7 +44,7 @@ export default function FAQPageClient(): React.ReactElement {
                 isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated' : 'bg-white text-neo-black hover:bg-neo-cream'
               )}
             >
-              <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
+              <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-1" />
               {c.back}
             </Button>
           </Link>

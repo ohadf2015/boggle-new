@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
@@ -210,7 +211,7 @@ export default function SettingsPageClient(): React.JSX.Element {
               isDarkMode ? 'bg-neo-navy-light text-white hover:bg-neo-navy-elevated hover:text-white' : 'bg-white text-neo-black hover:bg-neo-cream'
             )}
           >
-            <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-1" />
             {t('common.back')}
           </Button>
           <h1 className={cn(

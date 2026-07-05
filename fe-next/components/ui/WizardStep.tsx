@@ -18,6 +18,7 @@ import { ReactNode } from 'react';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { cn } from '@/lib/utils';
 
 export interface WizardStepProps {
@@ -136,8 +137,9 @@ export function WizardStep({
                 'transition-all'
               )}
             >
-              <ArrowLeft
-                className="w-4 h-4 me-2 rtl:rotate-180"
+              <DirectionalIcon
+                icon={ArrowLeft}
+                className="w-4 h-4 me-2"
               />
               {backLabel || defaultBackLabel}
             </Button>

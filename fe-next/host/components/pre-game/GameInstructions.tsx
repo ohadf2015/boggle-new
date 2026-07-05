@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { m, AnimatePresence } from 'framer-motion';
 import { Grid3X3, Zap, Crosshair, Disc3, Lightbulb, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '../../../lib/utils';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useAutoAdvanceStep } from '../../hooks/useAutoAdvanceStep';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 import type { GameModeOption } from '@/components/GameModeSelector';
@@ -176,7 +177,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen = true, lang
             className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo bg-neo-white/10 disabled:opacity-30 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             aria-label={t('common.previous')}
           >
-            <ChevronLeft className="w-5 h-5 text-neo-cream rtl:rotate-180" />
+            <DirectionalIcon icon={ChevronLeft} className="w-5 h-5 text-neo-cream" />
           </button>
           <div className="flex gap-0.5" role="tablist">
             {steps.map((step, i) => {
@@ -204,7 +205,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen = true, lang
             className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo bg-neo-white/10 disabled:opacity-30 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
             aria-label={t('common.next')}
           >
-            <ChevronRight className="w-5 h-5 text-neo-cream rtl:rotate-180" />
+            <DirectionalIcon icon={ChevronRight} className="w-5 h-5 text-neo-cream" />
           </button>
         </div>
       </div>

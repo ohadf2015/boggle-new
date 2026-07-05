@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -168,7 +169,7 @@ export default function GuestDetailPageClient() {
           <Shield className="w-16 h-16 text-neo-lime mx-auto mb-4" />
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">Admin Access Required</h1>
           <Button onClick={() => router.push(`/${language}`)} variant="outline">
-            <ArrowLeft className="w-4 h-4 me-2" /> Back to Home
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-2" /> Back to Home
           </Button>
         </div>
       </div>
@@ -207,7 +208,7 @@ export default function GuestDetailPageClient() {
               href={`/${language}/admin/guests`}
               className="text-slate-400 hover:text-neo-white"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
             </Link>
             <div>
               <h1 className={cn('text-2xl font-bold font-mono', isDarkMode ? 'text-white' : 'text-gray-900')}>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Shield, RefreshCw } from 'lucide-react';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -66,7 +67,7 @@ export default function PlayerDetailPageClient({ playerId }: Props) {
           <Shield className="w-16 h-16 text-neo-lime mx-auto mb-4" />
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">{t('admin.accessRequired')}</h1>
           <Button onClick={() => router.push(`/${language}`)} variant="outline">
-            <ArrowLeft className="w-4 h-4 me-2" />
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-2" />
             {t('common.backToHome')}
           </Button>
         </div>
@@ -96,7 +97,7 @@ export default function PlayerDetailPageClient({ playerId }: Props) {
               onClick={() => router.push(`/${language}/admin/players`)}
               className="gap-2"
             >
-              <ArrowLeft className="w-4 h-4" />
+              <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
               {t('admin.player.back')}
             </Button>
             <h1 className="text-2xl font-neo-display text-neo-white">

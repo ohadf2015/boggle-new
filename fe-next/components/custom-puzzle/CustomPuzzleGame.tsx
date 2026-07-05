@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { getGuestFingerprint } from '@/utils/dailyChallenge';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ArrowLeft, Share2, Trophy, Crown } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Button } from '@/components/ui/button';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import Link from 'next/link';
@@ -202,7 +203,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             <h2 className="text-xl font-bold text-red-500 mb-4">{error}</h2>
             <Link href={`/${language}/custom`}>
               <Button variant="outline">
-                <ArrowLeft className="w-4 h-4 me-2 rtl:scale-x-[-1]" />
+                <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-2" />
                 {t('common.back')}
               </Button>
             </Link>
@@ -262,7 +263,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
 
           <Link href={`/${language}/custom`} className="block mt-4">
             <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 me-2 rtl:scale-x-[-1]" />
+              <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-2" />
               {t('common.back')}
             </Button>
           </Link>

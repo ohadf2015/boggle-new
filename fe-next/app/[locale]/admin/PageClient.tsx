@@ -5,6 +5,7 @@ import { ArrowLeft, Shield, RefreshCw } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -55,7 +56,7 @@ export default function AdminPageClient() {
           </h1>
           <p className="text-slate-400 mb-6">{t('admin.accessDenied')}</p>
           <Button onClick={() => router.push(`/${language}`)} variant="outline">
-            <ArrowLeft className="w-4 h-4 me-2" />
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-2" />
             {t('common.backToHome')}
           </Button>
         </div>

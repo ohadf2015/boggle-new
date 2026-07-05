@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { ArrowLeft, ImagePlus, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useSafeBack } from '@/hooks/useSafeBack';
 import { useBoardCreator, type UseBoardCreatorReturn } from '@/hooks/useBoardCreator';
 import { AnimatedBoardGrid } from './AnimatedBoardGrid';
@@ -75,7 +76,7 @@ function ConfigureStep({ creator }: { creator: UseBoardCreatorReturn }) {
           )}
           aria-label={t('common.back') || 'Back'}
         >
-          <ArrowLeft className="w-5 h-5" />
+          <DirectionalIcon icon={ArrowLeft} className="w-5 h-5" />
         </button>
         <h1 className="font-neo-display text-2xl font-bold text-neo-white">
           {t('ugc.createBoard')}

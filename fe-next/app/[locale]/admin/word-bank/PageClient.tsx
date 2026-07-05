@@ -4,6 +4,7 @@ import { WordBankPanel } from '@/components/admin/word-bank';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Shield } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -31,7 +32,7 @@ export default function WordBankPageClient() {
           <h1 className="text-2xl font-neo-display text-neo-white mb-2">{t('admin.accessRequired')}</h1>
           <p className="text-slate-400 mb-6">{t('admin.accessDenied')}</p>
           <Button onClick={() => router.push(`/${language}`)} variant="outline">
-            <ArrowLeft className="w-4 h-4 me-2" />
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4 me-2" />
             {t('common.backToHome')}
           </Button>
         </div>

@@ -5,6 +5,7 @@ import { m } from 'framer-motion';
 import { ArrowLeft, Play } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 
@@ -56,7 +57,7 @@ export function ProfileBackButtons({
             : 'bg-linear-to-r from-neo-cyan to-neo-cyan/80 text-neo-black hover:opacity-90'
         )}
       >
-        <ArrowLeft className="me-2 rtl:rotate-180" />
+        <DirectionalIcon icon={ArrowLeft} className="me-2" />
         {activeGameSession
           ? (t('profile.backToLobby'))
           : (t('profile.backToGame'))}
