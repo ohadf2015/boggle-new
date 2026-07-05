@@ -29,4 +29,27 @@ describe('EmoteTray', () => {
     fireEvent.click(btn);
     expect(onEmote).not.toHaveBeenCalled();
   });
+
+  describe('compact mode', () => {
+    it('collapses to a single trigger button — emote row hidden until tapped', () => {
+      render(<EmoteTray onEmote={vi.fn()} t={t} compact />);
+      expect(screen.getByTestId('emote-trigger')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: 'lobby.emote.angry' })).toBeNull();
+    });
+
+    it('expands the emote row when the trigger is tapped', () => {
+      render(<EmoteTray onEmote={vi.fn()} t={t} compact />);
+      fireEvent.click(screen.getByTestId('emote-trigger'));
+      expect(screen.getByRole('button', { name: 'lobby.emote.angry' })).toBeInTheDocument();
+    });
+
+    it('sends the emote and collapses again after a tap', () => {
+      const onEmote = vi.fn();
+      render(<EmoteTray onEmote={onEmote} t={t} compact />);
+      fireEvent.click(screen.getByTestId('emote-trigger'));
+      fireEvent.click(screen.getByRole('button', { name: 'lobby.emote.angry' }));
+      expect(onEmote).toHaveBeenCalledWith('emoteAngry');
+      expect(screen.queryByRole('button', { name: 'lobby.emote.angry' })).toBeNull();
+    });
+  });
 });

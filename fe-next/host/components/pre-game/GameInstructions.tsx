@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { m, AnimatePresence } from 'framer-motion';
-import { Grid3X3, Zap, Crosshair, Disc3, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Grid3X3, Zap, Crosshair, Disc3, Lightbulb, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { useAutoAdvanceStep } from '../../hooks/useAutoAdvanceStep';
 import { useShouldReduceMotion } from '@/contexts/AccessibilityContext';
@@ -84,17 +84,18 @@ const GAME_INSTRUCTIONS: Record<string, { icon: React.ReactNode; barClass: strin
   },
 };
 
-export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpen = true, lang = 'en' }: GameInstructionsProps): React.ReactElement | null {
+export function GameInstructions({ selectedGameMode, t, defaultOpen = true, lang = 'en' }: GameInstructionsProps): React.ReactElement | null {
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [open, setOpen] = useState(defaultOpen);
   const reduceMotion = useShouldReduceMotion();
 
   const config = GAME_INSTRUCTIONS[selectedGameMode];
   const stepCount = config?.steps.length ?? 0;
-  // Auto-advance slides; pause on hover/keyboard-focus, and disable for reduced-motion.
+  // Auto-advance slides; pause on hover/keyboard-focus, when collapsed, and for reduced-motion.
   const [instructionStep, setInstructionStep] = useAutoAdvanceStep({
     count: stepCount,
-    paused: hovered || focused || reduceMotion,
+    paused: hovered || focused || reduceMotion || !open,
     resetKey: selectedGameMode,
   });
 
@@ -114,7 +115,13 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
       onBlurCapture={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setFocused(false); }}
     >
       <div className={cn('h-1', barClass)} />
-      <div className="w-full p-2.5 flex items-center gap-2">
+      <button
+        type="button"
+        data-testid="how-to-play-toggle"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        className="w-full p-2.5 flex items-center gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+      >
         <div className={cn('w-6 h-6 rounded-full border-2 border-neo-black flex items-center justify-center shadow-hard-sm text-neo-black shrink-0', iconBgClass)}>
           {icon}
         </div>
@@ -122,7 +129,9 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
           <Lightbulb className="w-3.5 h-3.5 text-neo-yellow" />
           {t('help.howToPlay')}
         </h3>
-      </div>
+        <ChevronDown className={cn('w-4 h-4 text-neo-cream shrink-0 transition-transform', open && 'rotate-180')} />
+      </button>
+      {open && (
       <div className="px-3 pb-3">
         <AnimatePresence mode="wait">
           <m.div
@@ -199,6 +208,7 @@ export function GameInstructions({ selectedGameMode, t, defaultOpen: _defaultOpe
           </button>
         </div>
       </div>
+      )}
     </m.div>
   );
 }

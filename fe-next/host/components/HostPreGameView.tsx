@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { BookOpen, LogOut, Monitor, Zap } from 'lucide-react';
+import { BookOpen, LogOut, Monitor, Zap, Check } from 'lucide-react';
 import { useCrazyGamesInvite } from '../../hooks/useCrazyGamesInvite';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
@@ -215,12 +215,7 @@ function HostPreGameView({
   // a piece of the avatar, surfaced right where the avatar lives.
   const selfRosterActions = (
     <div className="flex flex-col items-center gap-2 pt-1">
-      <div className="w-full space-y-1.5">
-        <h4 className="px-1 text-center text-[10px] font-bold uppercase tracking-widest text-neo-cream/50">
-          {t('lobby.emote.title')}
-        </h4>
-        <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} />
-      </div>
+      <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />
       <LobbyAvatarRewardButton />
     </div>
   );
@@ -253,7 +248,7 @@ function HostPreGameView({
   // Apply default preset on mount
   useEffect(() => {
     if (!hasInitialized) {
-      const preset = GAME_PRESETS['party'];
+      const preset = GAME_PRESETS['fast'];
       setTimerValue(preset.timer);
       setDifficulty(preset.difficulty);
       setMinWordLength(2);
@@ -512,8 +507,24 @@ function HostPreGameView({
   // — start the game!" copy IS the affirmative "everyone's in, press Start" cue
   // that the removed auto-start banner used to provide.
   const readyCount = readyUsernames.length;
-  const showWaitingNudge =
-    autoStartSecondsLeft === null && readyCount > 0 && readyTotal > 0 && readyCount <= readyTotal;
+  const allReady = readyTotal > 0 && readyCount >= readyTotal;
+  // Always-visible ready tally (whenever there are guests who can ready up) so the
+  // host sees at a glance how many are set — goes loud (lime + wobble) the moment
+  // everyone's in. Replaces the old count-only-when-nonzero yellow nudge.
+  const readyChip = readyTotal > 0 ? (
+    <div
+      data-testid="host-ready-chip"
+      role="status"
+      aria-live="polite"
+      className={cn(
+        'mx-auto w-fit flex items-center justify-center gap-1.5 rounded-neo border-2 border-neo-black px-3 py-1 mb-1.5 font-neo-display font-bold text-sm uppercase tracking-wide shadow-hard-sm',
+        allReady ? 'bg-neo-lime text-neo-black animate-neo-wobble' : 'bg-neo-navy-light text-neo-cream',
+      )}
+    >
+      <Check className="w-4 h-4 stroke-[3] shrink-0" />
+      <span>{readyCount}/{readyTotal} {t('hostView.playersReady')}</span>
+    </div>
+  ) : null;
 
   // TV mode toggle — neo-brutalist pill with hard shadow. The caption beneath
   // surfaces the view-only consequence AT the decision point, so a host knows
@@ -682,11 +693,7 @@ function HostPreGameView({
           />
           {/* Sticky bottom start button — desktop */}
           <div className="shrink-0 px-6 py-3 short:py-1.5 desktop-short:lg:py-1 desktop-medium-short:lg:py-2 border-t-3 border-neo-black bg-neo-navy/95">
-            {showWaitingNudge && (
-              <p className="text-center text-neo-yellow font-neo-display font-bold text-xs uppercase tracking-wide mb-1.5 animate-neo-wobble">
-                {t('hostView.playersWaitingNudge', { count: readyCount, total: readyTotal })}
-              </p>
-            )}
+            {readyChip}
             {anyAdActive && (
               <p role="status" className="text-center text-neo-cyan font-neo-body text-xs mb-1.5">
                 {t('hostView.adWatchHold')}
@@ -742,11 +749,7 @@ function HostPreGameView({
           </div>
           {/* Sticky bottom start button — mobile */}
           <div className="shrink-0 px-5 short:px-3 py-3 short:py-1.5 border-t-3 border-neo-black bg-neo-navy/95" style={{ paddingBottom: 'max(0.75rem, env(safe-area-inset-bottom, 0px))' }}>
-            {showWaitingNudge && (
-              <p className="max-w-[600px] mx-auto text-center text-neo-yellow font-neo-display font-bold text-xs uppercase tracking-wide mb-1.5 animate-neo-wobble">
-                {t('hostView.playersWaitingNudge', { count: readyCount, total: readyTotal })}
-              </p>
-            )}
+            {readyChip}
             {anyAdActive && (
               <p role="status" className="max-w-[600px] mx-auto text-center text-neo-cyan font-neo-body text-xs mb-1.5">
                 {t('hostView.adWatchHold')}

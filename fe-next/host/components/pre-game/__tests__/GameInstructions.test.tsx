@@ -19,24 +19,28 @@ vi.mock('framer-motion', () => {
 const t = (key: string) => key;
 
 describe('GameInstructions', () => {
-  it('always shows content — no collapse/expand', () => {
+  it('shows content by default (defaultOpen defaults to true)', () => {
     render(<GameInstructions selectedGameMode="classic" t={t} />);
     expect(screen.getByText('howToPlay.steps.basics.title')).toBeTruthy();
   });
 
-  it('always shows content even when defaultOpen=false', () => {
+  it('starts collapsed when defaultOpen=false — steps hidden, header visible', () => {
     render(<GameInstructions selectedGameMode="classic" t={t} defaultOpen={false} />);
+    expect(screen.queryByText('howToPlay.steps.basics.title')).toBeNull();
+    expect(screen.getByTestId('how-to-play-toggle')).toBeTruthy();
+  });
+
+  it('expands when the collapsed header is tapped', () => {
+    render(<GameInstructions selectedGameMode="classic" t={t} defaultOpen={false} />);
+    expect(screen.queryByText('howToPlay.steps.basics.title')).toBeNull();
+    fireEvent.click(screen.getByTestId('how-to-play-toggle'));
     expect(screen.getByText('howToPlay.steps.basics.title')).toBeTruthy();
   });
 
-  it('always shows content when defaultOpen=true', () => {
+  it('collapses again when the header is tapped while open', () => {
     render(<GameInstructions selectedGameMode="classic" t={t} defaultOpen={true} />);
-    expect(screen.getByText('howToPlay.steps.basics.title')).toBeTruthy();
-  });
-
-  it('does not render a collapse toggle button', () => {
-    render(<GameInstructions selectedGameMode="classic" t={t} />);
-    expect(document.querySelector('[data-testid="how-to-play-toggle"]')).toBeNull();
+    fireEvent.click(screen.getByTestId('how-to-play-toggle'));
+    expect(screen.queryByText('howToPlay.steps.basics.title')).toBeNull();
   });
 
   it('renders an infographic image for the active step', () => {

@@ -4,7 +4,7 @@ import React, { memo, useState, useCallback, useMemo } from 'react';
 import dynamic from 'next/dynamic';
 import { m, AnimatePresence } from 'framer-motion';
 const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
-import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap, Crosshair, Grid3X3, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap } from 'lucide-react';
 import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
@@ -247,13 +247,15 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               whileTap={{ scale: 0.96 }}
               aria-pressed={isReady}
               className={cn(
-                'mt-3 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide shadow-hard transition-colors',
+                'mt-3 w-full flex items-center justify-center gap-2 py-3 px-4 rounded-neo border-3 font-black uppercase tracking-wide shadow-hard transition-colors',
                 isReady
-                  ? 'bg-neo-lime text-neo-black'
-                  : 'bg-neo-navy-light text-neo-cream hover:bg-white/10',
+                  // Confirmed: solid lime fill + check — unmistakable "you're ready".
+                  ? 'bg-neo-lime text-neo-black border-neo-black'
+                  // Resting CTA: lime-outlined on navy — clearly a ready button asking for the tap.
+                  : 'bg-neo-navy border-neo-lime text-neo-lime hover:bg-neo-lime/10',
               )}
             >
-              {isReady ? <Check className="w-4 h-4 stroke-[3]" /> : <Zap className="w-4 h-4" />}
+              {isReady ? <Check className="w-5 h-5 stroke-[3]" /> : <Zap className="w-5 h-5" />}
               <span>{isReady ? t('playerView.readyConfirmed') : t('playerView.readyUp')}</span>
             </m.button>
           ) : null}
@@ -278,15 +280,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   // ==================== Player Roster ====================
   const renderPlayerRoster = (): React.ReactElement => (
     <section className="space-y-2">
-      <div className="flex items-center justify-between px-1">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
-          {t('hostView.playersInRoom')}
-        </h3>
-        <span className="text-xs font-bold text-slate-500">
-          {nonHostPlayers.length}/{MAX_PLAYERS}
-        </span>
-      </div>
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      {/* No roster header — the top bar already shows the live X/8 count; a second
+          "players in room" label + count was pure noise. */}
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide pt-1">
         <AnimatePresence>
           {nonHostPlayers.map((player, index) => {
             const name = typeof player === 'string' ? player : player.username;
@@ -377,12 +373,12 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
         ))}
       </div>
 
-      {/* Emote tray — tap a face and your own avatar (above) reacts for the room */}
-      <div className="space-y-1.5 pt-1">
-        <h4 className="px-1 text-xs font-bold uppercase tracking-widest text-slate-500">
-          {t('lobby.emote.title')}
-        </h4>
-        <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} />
+      {/* Compact emote — one button that expands the emoji row on tap; tapping a
+          face reacts on your own avatar (above) for the whole room. No permanent
+          labelled row. Lives here (not the overflow-hidden hero card) so the
+          expanded row isn't clipped. */}
+      <div className="px-1 pt-1">
+        <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />
       </div>
     </section>
   );
@@ -400,21 +396,30 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
       <GameInstructions
         selectedGameMode={mode}
         t={t}
+        defaultOpen={false}
         lang={gameLanguage ?? 'en'}
       />
     );
   };
 
   // ==================== Mobile Content ====================
+  // Non-scrolling flex column: the fixed-size sections stack at their natural
+  // height and the chat/tutorial panel (flex-1, min-h-0) absorbs all remaining
+  // space — so the screen fits without page scroll, and an inline emote expansion
+  // just shrinks the chat rather than overflowing. The duplicate share section was
+  // dropped (invite already lives compact in the top bar).
   const renderMobileContent = (): React.ReactElement => (
-    <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-3 space-y-4 min-h-0">
-      <section>{renderHeroCard()}</section>
-      {renderDailyEmber()}
-      {renderPlayerRoster()}
-      {renderModeTips()}
-      <MobileShareSection gameCode={gameCode} t={t} />
-      <section className="pb-4">
-        <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-64 sm:h-80">
+    <div className="flex-1 flex flex-col overflow-hidden px-3 py-2 gap-2 min-h-0">
+      <section className="shrink-0">{renderHeroCard()}</section>
+      <div className="shrink-0">{renderDailyEmber()}</div>
+      <div className="shrink-0">{renderPlayerRoster()}</div>
+      <div className="shrink-0">{renderModeTips()}</div>
+      <section className="flex-1 min-h-0 pb-1">
+        {/* overflow-y-auto (not -hidden): on a short screen the chat panel is the
+            flex-fill that gets squeezed — its content (e.g. the guest age-gate)
+            then scrolls WITHIN the panel instead of being clipped. The page itself
+            never scrolls (the mobile root is bounded). */}
+        <div className="h-full bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-y-auto overscroll-contain">
           {isOnCrazyGamesPlatform ? (
             <LobbyTutorialPanel t={t} />
           ) : (
