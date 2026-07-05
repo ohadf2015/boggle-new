@@ -531,7 +531,7 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
                                         {missions.map((m) => (
                                             <Link
                                                 key={m.type}
-                                                href={`/${language}${m.href}`}
+                                                href={`/${language}/quests`}
                                                 onClick={closeMenu}
                                                 className={cn(
                                                     "flex items-center gap-2.5 px-3 py-2 rounded-neo",

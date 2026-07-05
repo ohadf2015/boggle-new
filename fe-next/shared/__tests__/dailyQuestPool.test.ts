@@ -5,6 +5,8 @@ import {
   emptyQuestResult,
   DAILY_QUEST_POOL,
   QUEST_PUBLIC_MODES,
+  QUEST_BETA_MODES,
+  isQuestEligibleMode,
   type DailyQuest,
   type QuestGameResult,
   type QuestConditionType,
@@ -132,11 +134,11 @@ describe('evaluateDailyQuests', () => {
     evaluateDailyQuests(ids.map(byId), emptyQuestResult(partial));
 
   it('returns the slot index of a satisfied longWord quest', () => {
-    expect(run(['long_word_7'], { longestWordLength: 7 })).toEqual([0]);
+    expect(run(['long_word_6'], { longestWordLength: 6 })).toEqual([0]);
   });
 
   it('does not complete longWord below target', () => {
-    expect(run(['long_word_7'], { longestWordLength: 6 })).toEqual([]);
+    expect(run(['long_word_6'], { longestWordLength: 5 })).toEqual([]);
   });
 
   it('completes score quest at/above target only', () => {
@@ -166,11 +168,39 @@ describe('evaluateDailyQuests', () => {
   });
 
   it('returns multiple slot indices when several of today\'s quests are satisfied', () => {
-    const idx = run(['long_word_7', 'score_500'], { longestWordLength: 8, score: 600 });
+    const idx = run(['long_word_6', 'score_500'], { longestWordLength: 8, score: 600 });
     expect(idx).toEqual([0, 1]);
   });
 
   it('returns empty for an empty result (no silent false-positive)', () => {
-    expect(run(['long_word_7', 'score_500', 'words_15'], {})).toEqual([]);
+    expect(run(['long_word_6', 'score_500', 'words_15'], {})).toEqual([]);
+  });
+});
+
+describe('difficulty ceiling', () => {
+  it('no daily longWord quest asks for a 7+ letter word (too hard for casuals)', () => {
+    for (const quest of DAILY_QUEST_POOL) {
+      if (quest.type === 'longWord') {
+        expect(quest.target).toBeLessThanOrEqual(6);
+      }
+    }
+  });
+});
+
+describe('isQuestEligibleMode — beta modes never credit quest progress', () => {
+  it('excludes every beta mode', () => {
+    for (const mode of QUEST_BETA_MODES) {
+      expect(isQuestEligibleMode(mode)).toBe(false);
+    }
+  });
+
+  it('allows classic multiplayer and word-hunt', () => {
+    expect(isQuestEligibleMode('classic')).toBe(true);
+    expect(isQuestEligibleMode('word-hunt')).toBe(true);
+  });
+
+  it('fails open — an unknown/new mode credits by default (blocklist, not allowlist)', () => {
+    expect(isQuestEligibleMode('some-future-public-mode')).toBe(true);
+    expect(isQuestEligibleMode(undefined)).toBe(true);
   });
 });

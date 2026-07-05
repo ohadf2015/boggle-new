@@ -15,7 +15,7 @@ import type { UserAuthInfo } from '../../modules/supabase/client';
 import { extractFoundWords } from '../../modules/supabase/foundWords';
 import { updateQuestProgress } from '../../modules/weeklyQuestManager';
 import { completeDailyQuestsForResult } from '../../modules/dailyMissionsManager';
-import { emptyQuestResult } from '@/shared/dailyQuestPool';
+import { emptyQuestResult, isQuestEligibleMode } from '@/shared/dailyQuestPool';
 import type { GameStats } from '@/shared/weeklyQuestTemplates';
 import { getSocketById, safeEmit } from '../../utils/socketHelpers';
 import { incrementWordApproval } from '../../redis/wordApproval';
@@ -269,42 +269,49 @@ export async function recordGameResultsToSupabase(
     // Process engagement events for each player
     await processEngagementEvents(io, scoresArray, game, gameCode);
 
-    // Update weekly quest progress for each authenticated player
-    await updateWeeklyQuestProgressForPlayers(scoresArray, game, userAuthMap, io);
+    // Quest crediting (weekly + daily). Beta modes (crossword, sealed-bid,
+    // shiritori, word-tower, blast, wheel-rush) route through this SAME seam but
+    // must NOT grant quest progress — the quest pool never steers players there,
+    // so a high score in a beta mode silently completing a skill quest is a bug.
+    // Gate both weekly and daily crediting behind mode eligibility.
+    if (isQuestEligibleMode(gameInfo.gameMode)) {
+      // Update weekly quest progress for each authenticated player
+      await updateWeeklyQuestProgressForPlayers(scoresArray, game, userAuthMap, io);
 
-    // Fire-and-forget: evaluate today's daily quests against each human player's
-    // result. A game with >=2 humans is a genuine multiplayer session (the honest
-    // signal for PvP quests — no single-vs-bots false credit). isTopHuman /
-    // beatHumanOpponent drive the win/beat-a-rival quests; same-language is
-    // already guaranteed by matchmaking (matchmakingQueue.ts).
-    const topHumanScore = sortedForStats[0]?.totalScore ?? 0;
-    const humanCount = humanScores.length;
-    for (const p of humanScores) {
-      const authUserId = (game.users?.[p.username] as UserData | undefined)?.authUserId;
-      if (!authUserId) continue;
-      const playerScore = p.totalScore || 0;
-      const longestWordLength = (p.wordDetails ?? []).reduce(
-        (m: number, w: WordDetail) => Math.max(m, w.word?.length || 0),
-        0,
-      );
-      const maxCombo = (p.wordDetails ?? []).reduce(
-        (m: number, w: WordDetail) => Math.max(m, w.comboLevel ?? 0),
-        0,
-      );
-      const result = emptyQuestResult({
-        mode: gameInfo.gameMode,
-        isMultiplayer: humanCount >= 2,
-        score: playerScore,
-        longestWordLength,
-        maxCombo,
-        wordsFound: p.wordDetails?.length || 0,
-        humanOpponentCount: humanCount - 1,
-        isTopHuman: humanCount >= 1 && playerScore === topHumanScore,
-        beatHumanOpponent: humanScores.some(
-          (o) => o.username !== p.username && (o.totalScore || 0) < playerScore,
-        ),
-      });
-      completeDailyQuestsForResult(authUserId, result).catch(() => {});
+      // Fire-and-forget: evaluate today's daily quests against each human player's
+      // result. A game with >=2 humans is a genuine multiplayer session (the honest
+      // signal for PvP quests — no single-vs-bots false credit). isTopHuman /
+      // beatHumanOpponent drive the win/beat-a-rival quests; same-language is
+      // already guaranteed by matchmaking (matchmakingQueue.ts).
+      const topHumanScore = sortedForStats[0]?.totalScore ?? 0;
+      const humanCount = humanScores.length;
+      for (const p of humanScores) {
+        const authUserId = (game.users?.[p.username] as UserData | undefined)?.authUserId;
+        if (!authUserId) continue;
+        const playerScore = p.totalScore || 0;
+        const longestWordLength = (p.wordDetails ?? []).reduce(
+          (m: number, w: WordDetail) => Math.max(m, w.word?.length || 0),
+          0,
+        );
+        const maxCombo = (p.wordDetails ?? []).reduce(
+          (m: number, w: WordDetail) => Math.max(m, w.comboLevel ?? 0),
+          0,
+        );
+        const result = emptyQuestResult({
+          mode: gameInfo.gameMode,
+          isMultiplayer: humanCount >= 2,
+          score: playerScore,
+          longestWordLength,
+          maxCombo,
+          wordsFound: p.wordDetails?.length || 0,
+          humanOpponentCount: humanCount - 1,
+          isTopHuman: humanCount >= 1 && playerScore === topHumanScore,
+          beatHumanOpponent: humanScores.some(
+            (o) => o.username !== p.username && (o.totalScore || 0) < playerScore,
+          ),
+        });
+        completeDailyQuestsForResult(authUserId, result).catch(() => {});
+      }
     }
 
     // Increment word approval counts for dictionary words

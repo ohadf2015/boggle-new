@@ -24,8 +24,7 @@ import { toast } from './ui/EnhancedToast';
 import type { Message } from '@/shared/types/friends';
 
 // 3 daily missions shown in the Quests tab (no brain drill)
-const QUEST_MISSION_TYPES = ['wordHunt', 'adventure', 'community'] as const;
-const QUEST_TOTAL = QUEST_MISSION_TYPES.length;
+const QUEST_TOTAL = 3;
 
 // Lazy load AuthModal - only shown when unauthenticated users tap Profile
 const AuthModal = dynamic(() => import('./auth/AuthModal'), { ssr: false });
@@ -223,9 +222,11 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
     const { unreadCount } = useFriendMessages(undefined, handleIncomingMessage);
     const socialBadgeCount = pendingRequests.length + pendingChallenges.length + unreadCount;
 
-    // Count completed quests (3 shown: wordHunt, adventure, community — no brain drill)
+    // Count completed daily missions. `missions` is already the 3 daily slots
+    // (from useDailyMissions); m.type is a condition type (longWord/score/…), NOT
+    // a slot name — filtering on completion is the only correct signal here.
     const questsCompleted = useMemo(() =>
-        missions.filter(m => QUEST_MISSION_TYPES.includes(m.type as typeof QUEST_MISSION_TYPES[number]) && m.completed).length,
+        missions.filter(m => m.completed).length,
     [missions]);
 
     const cleanPath = useMemo(

@@ -30,6 +30,37 @@ export type QuestFamily = 'skill' | 'pvp' | 'discovery';
 export const QUEST_PUBLIC_MODES = ['multiplayer', 'brain', 'word-hunt'] as const;
 export type QuestPublicMode = (typeof QUEST_PUBLIC_MODES)[number];
 
+/**
+ * Beta / not-yet-public game modes. Their socket games route through the SAME
+ * recording seam as classic multiplayer (recordGameResultsToSupabase), so a
+ * high score in crossword/sealed-bid/etc would otherwise silently credit the
+ * daily/weekly skill quests — even though the quest pool never steers players
+ * there. `isQuestEligibleMode` gates that seam so beta play grants no quest
+ * progress. Keep this list in sync with the header-comment enumeration above.
+ */
+export const QUEST_BETA_MODES = [
+  'adventure',
+  'blast',
+  'wheel-rush',
+  'word-tower',
+  'shiritori',
+  'sealed-bid',
+  'crossword',
+] as const;
+
+/**
+ * Whether a finished game in this mode may credit quest progress (daily OR
+ * weekly). Blocklist by design (fails OPEN): an unknown/newly-added mode credits
+ * by default; only the known beta modes are excluded. This keeps quest
+ * completion working the day a new public mode ships — the opposite (an
+ * allowlist) would silently stop completion, the exact "quests don't complete"
+ * bug we're fixing.
+ */
+export function isQuestEligibleMode(gameMode: string | undefined | null): boolean {
+  if (!gameMode) return true;
+  return !(QUEST_BETA_MODES as readonly string[]).includes(gameMode);
+}
+
 export interface DailyQuest {
   id: string;
   type: QuestConditionType;
@@ -111,8 +142,9 @@ export const DAILY_QUEST_POOL: DailyQuest[] = [
   // (/daily) emits no score/combo and can't guarantee a 7-letter target or 15
   // words; single-player never reaches a seam at all — so steering skill quests
   // there left them silently uncompletable.
+  // Longest-word target capped at 6: a 7+ letter word was too hard for the
+  // casual audience (many games' best word never hits 7). 6 stays achievable.
   q('long_word_6', 'longWord', 6, 'skill', '/multiplayer', '📏'),
-  q('long_word_7', 'longWord', 7, 'skill', '/multiplayer', '🔠'),
   q('score_300', 'score', 300, 'skill', '/multiplayer', '🎯'),
   q('score_500', 'score', 500, 'skill', '/multiplayer', '🚀'),
   q('words_15', 'wordsInGame', 15, 'skill', '/multiplayer', '⚡'),
