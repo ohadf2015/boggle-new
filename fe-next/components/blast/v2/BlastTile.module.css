@@ -51,6 +51,16 @@
 .tileColumn {
   width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
   flex: 0 0 var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  /* Hold the FULL grid height even after words clear so a partial column
+     doesn't collapse to its tile count. Matches the cell-well backdrop
+     (visualRows tiles + gaps). With flex-col-reverse the remaining tiles
+     rest at the column BOTTOM (aligned to the well bottoms), and the
+     centered board (items-center) then centers a full-height column over
+     its full-height well instead of floating a shrunken one mid-air. */
+  min-height: calc(
+    var(--blast-rows, 6) * var(--blast-tile-size, 64px) +
+      (var(--blast-rows, 6) - 1) * var(--blast-tile-gap, 8px)
+  );
 }
 
 .tile {
