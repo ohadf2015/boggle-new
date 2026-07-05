@@ -90,7 +90,7 @@ export default function OutOfLivesModal({ open, isAdmin, level, onRevive, onQuit
                 onClick={onQuit}
                 className="w-full inline-flex items-center justify-center gap-2 rounded-neo border-neo border-neo-white/30 bg-transparent text-neo-white font-neo-body text-sm px-5 py-2.5 hover:bg-neo-white/5 transition-colors"
               >
-                <LogOut className="w-4 h-4" aria-hidden="true" />
+                <LogOut className="w-4 h-4 rtl:scale-x-[-1]" aria-hidden="true" />
                 {t('connections.quitToMenu')}
               </button>
 
