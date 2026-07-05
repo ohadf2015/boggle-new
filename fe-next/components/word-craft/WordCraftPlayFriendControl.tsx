@@ -4,11 +4,10 @@ import { useState } from 'react';
 import { Users, Share2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
-import { buildDuelUrl } from '@/lib/word-craft/duel';
+import { buildDuelShareData, performDuelShare } from '@/lib/word-craft/duelShare';
 import type { BoardDims } from '@/lib/word-craft/boardDimensions';
 import type { BotDifficulty } from '@/lib/word-craft/botDifficulty';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
-import { cn } from '@/lib/utils';
 
 interface Props {
   t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
@@ -51,52 +50,20 @@ export function WordCraftPlayFriendControl({ t, seed, playerScore, locale, disab
 
       const origin = typeof window !== 'undefined' ? window.location.origin : 'https://www.lexiclash.live';
 
-      const duelUrl = buildDuelUrl(origin, locale, {
-        seed,
-        name: username,
-        score: playerScore,
-        avatar: challengerAvatar,
-        dims,
-        difficulty,
+      const data = buildDuelShareData(
+        origin,
+        locale,
+        { seed, name: username, score: playerScore, avatar: challengerAvatar, dims, difficulty },
+        t('wordcraft.duel.shareText', { score: playerScore }),
+        t('wordcraft.duel.shareTitleChallenge'),
+      );
+
+      await performDuelShare(data, {
+        onCopied: () => toast.success(t('wordcraft.duel.linkCopied')),
+        onCopyFailed: () => toast.error(t('wordcraft.duel.linkCopyFailed')),
       });
-
-      const shareText = t('wordcraft.duel.shareText', { score: playerScore });
-      const shareTitle = t('wordcraft.duel.shareTitleChallenge');
-
-      // Try Web Share API first
-      if (navigator.share && typeof navigator.share === 'function') {
-        try {
-          await navigator.share({
-            title: shareTitle,
-            text: shareText,
-            url: duelUrl,
-          });
-        } catch (err: unknown) {
-          // User cancelled or share failed; fall back to clipboard
-          if (err instanceof Error && err.name !== 'AbortError') {
-            fallbackToClipboard(duelUrl);
-          }
-        }
-      } else {
-        // Fallback to clipboard
-        fallbackToClipboard(duelUrl);
-      }
     } finally {
       setSharing(false);
-    }
-  };
-
-  const fallbackToClipboard = (url: string) => {
-    try {
-      navigator.clipboard.writeText(url).then(() => {
-        toast.success(t('wordcraft.duel.linkCopied'));
-      }).catch(() => {
-        // Clipboard write rejected (permissions / insecure context): surface it
-        // so the share doesn't silently no-op and leave the inviter confused.
-        toast.error(t('wordcraft.duel.linkCopyFailed'));
-      });
-    } catch {
-      toast.error(t('wordcraft.duel.linkCopyFailed'));
     }
   };
 

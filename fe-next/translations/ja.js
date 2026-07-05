@@ -13632,6 +13632,7 @@ const ja = {
       "shareTitleChallenge": "WordCraft で対戦しよう",
       "linkCopied": "招待リンクをコピーしました！",
       "linkCopyFailed": "リンクをコピーできませんでした",
+      "inviteHint": "ボードを送って、スコアを超えられるか友達に挑戦させよう",
       "vsChallenger": "vs {{name}}",
       "youWin": "勝利！",
       "youLose": "敗北",

@@ -14230,6 +14230,7 @@ const he = {
       "shareTitleChallenge": "אתגור אותי ב-WordCraft",
       "linkCopied": "קישור הזמנה הועתק!",
       "linkCopyFailed": "לא ניתן להעתיק את הקישור",
+      "inviteHint": "שלחו את הלוח — חבר ישחק וינסה לשבור את הניקוד שלכם",
       "vsChallenger": "מול {{name}}",
       "youWin": "ניצחת!",
       "youLose": "הם ניצחו",

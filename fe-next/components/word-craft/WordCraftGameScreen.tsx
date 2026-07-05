@@ -28,6 +28,7 @@ import { WordCraftLiveRegion } from '@/components/word-craft/WordCraftLiveRegion
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
 import { WordCraftHandoff } from '@/components/word-craft/WordCraftHandoff';
 import { WordCraftGameOverScene } from '@/components/word-craft/WordCraftGameOverScene';
+import { WordCraftChallengeInviteStrip } from '@/components/word-craft/WordCraftChallengeInviteStrip';
 import { useWordCraftJuice } from '@/components/word-craft/useWordCraftJuice';
 import { useWordCraftDrag } from '@/components/word-craft/useWordCraftDrag';
 import { useWordCraftKeyboardShortcuts } from '@/components/word-craft/hooks/useWordCraftKeyboardShortcuts';
@@ -955,6 +956,23 @@ export function WordCraftGameView({ seed, duel, hotseat, challengeIntent, diffic
             friendScore={duel.score}
             playerScore={playerTerritory}
             friendAvatar={duel.avatar}
+          />
+        ) : null}
+
+        {/* Challenge-a-Friend intent (sender side): the game is otherwise
+            identical to vs-bot, so surface a persistent, tappable invite for
+            the whole game — the declared intent gets an immediate payoff
+            instead of one buried on the game-over screen. */}
+        {challengeIntent && !duel && !hotseat ? (
+          <WordCraftChallengeInviteStrip
+            t={t}
+            seed={seed}
+            playerScore={playerTerritory}
+            locale={locale}
+            challengerName={challengerIdentity.name}
+            challengerAvatar={challengerIdentity.avatar}
+            dims={game.dims}
+            difficulty={effectiveDifficulty}
           />
         ) : null}
 

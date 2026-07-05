@@ -13577,6 +13577,7 @@ const en = {
       "shareTitleChallenge": "Challenge me at WordCraft",
       "linkCopied": "Invite link copied!",
       "linkCopyFailed": "Couldn't copy link",
+      "inviteHint": "Send your board — they'll try to beat your score",
       "vsChallenger": "vs {{name}}",
       "youWin": "You win!",
       "youLose": "They win",

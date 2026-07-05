@@ -13782,6 +13782,7 @@ const es = {
       "shareTitleChallenge": "Retame en WordCraft",
       "linkCopied": "¡Enlace de invitación copiado!",
       "linkCopyFailed": "No se pudo copiar el enlace",
+      "inviteHint": "Envía tu tablero — intentarán superar tu puntuación",
       "vsChallenger": "vs {{name}}",
       "youWin": "¡Ganaste!",
       "youLose": "Ellos ganan",

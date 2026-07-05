@@ -11138,6 +11138,7 @@ const ru = {
       "shareTitleChallenge": "Вызови меня в WordCraft",
       "linkCopied": "Ссылка приглашения скопирована!",
       "linkCopyFailed": "Не удалось скопировать ссылку",
+      "inviteHint": "Отправь свою доску — друг попробует побить твой счёт",
       "vsChallenger": "против {{name}}",
       "youWin": "Ты выиграл!",
       "youLose": "Они выиграли",
