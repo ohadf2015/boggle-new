@@ -13183,19 +13183,6 @@ const es = {
     "noData": "¡Juega algunas partidas para ver tu resumen!",
     "copied": "¡Resumen copiado!"
   },
-  "quickPlay": {
-    "title": "Juego rápido",
-    "subtitle": "¡Salta directamente!",
-    "creating": "Creando...",
-    "hostAndPlay": "Crear y jugar",
-    "ariaLabel": "Juego rápido — salta a jugar",
-    "play": "Jugar ahora",
-    "daily": "Puzzle diario",
-    "classic": "Partida clásica",
-    "blast": "Modo Blast",
-    "wordHunt": "Caza de palabras",
-    "seconds": "~{{count}}s"
-  },
   "rankedTier": {
     "title": "Clasificatoria",
     "rating": "Puntuación: {{rating}}",

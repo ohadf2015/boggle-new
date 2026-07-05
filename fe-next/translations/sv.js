@@ -13196,19 +13196,6 @@ const sv = {
     "noData": "Spela några spel för att se din sammanfattning!",
     "copied": "Sammanfattning kopierad!"
   },
-  "quickPlay": {
-    "title": "Snabbspel",
-    "subtitle": "Hoppa rakt in!",
-    "creating": "Skapar...",
-    "hostAndPlay": "Skapa & Spela",
-    "ariaLabel": "Snabbspel — hoppa in i ett spel",
-    "play": "Spela nu",
-    "daily": "Dagligt pussel",
-    "classic": "Klassiskt spel",
-    "blast": "Blast-läge",
-    "wordHunt": "Ordjakt",
-    "seconds": "~{{count}}s"
-  },
   "rankedTier": {
     "title": "Rankat",
     "rating": "Rating: {{rating}}",

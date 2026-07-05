@@ -13032,19 +13032,6 @@ const ja = {
     "noData": "まとめを見るにはゲームをプレイしよう！",
     "copied": "クリップボードにコピーしました！"
   },
-  "quickPlay": {
-    "title": "クイックプレイ",
-    "subtitle": "すぐにプレイ！",
-    "creating": "作成中...",
-    "hostAndPlay": "ホスト＆プレイ",
-    "ariaLabel": "クイックプレイ — すぐにゲーム開始",
-    "play": "今すぐプレイ",
-    "daily": "デイリーパズル",
-    "classic": "クラシック",
-    "blast": "ブラストモード",
-    "wordHunt": "ワードハント",
-    "seconds": "約{{count}}秒"
-  },
   "rankedTier": {
     "title": "ランクマッチ",
     "rating": "レーティング: {{rating}}",
