@@ -94,13 +94,15 @@ export function useSabotage(perfectStreak: number, progressEarnEvents = 0) {
   const closePicker = useCallback(() => setPickerOpen(false), []);
   const dismissHit = useCallback(() => setLastHit(null), []);
 
-  /** Send the wrecking ball — spends a token, drops the rail marker locally. */
-  const sabotage = useCallback((targetId: string, targetName: string) => {
+  /** Send the wrecking ball — spends a token, drops the rail marker locally by
+   *  `floors` (the mini-game's skill-derived damage; falls back to the flat
+   *  per-hit floor for non-interactive callers). */
+  const sabotage = useCallback((targetId: string, targetName: string, floors = sabotageFloorsFor()) => {
     if (tokens <= 0) return;
     setTokens((t) => spendSabotageToken(t));
     const hitId = `sab-${Date.now()}`;
     setLastHit({ id: hitId, targetId, targetName });
-    setHitsByRival((m) => ({ ...m, [targetId]: (m[targetId] ?? 0) + sabotageFloorsFor() }));
+    setHitsByRival((m) => ({ ...m, [targetId]: (m[targetId] ?? 0) + Math.max(1, Math.floor(floors)) }));
     setPickerOpen(false);
     // Best-effort breadcrumb (server wire-up deferred — see memory).
     try {

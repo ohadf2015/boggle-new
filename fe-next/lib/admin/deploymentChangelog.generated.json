@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-07-04T21:33:30.026Z",
+  "generatedAt": "2026-07-05T23:19:54.628Z",
   "commits": [
     {
-      "sha": "dd70014c0d803a22d7bade6baea7fa81e1031720",
-      "shortSha": "dd70014",
-      "subject": "feat(marketing): THE LAST WORD cinematic trailer reel — final v13 (en + he)",
+      "sha": "1d0cbbd74b3e55df97b3afe7d82a7c125fd72d6c",
+      "shortSha": "1d0cbbd",
+      "subject": "fix(quests): open quest page from side menu, gate beta modes, cap word length",
       "author": "Ohad Fisher",
-      "date": "2026-07-05T00:15:10+03:00"
+      "date": "2026-07-06T01:45:53+03:00"
     },
     {
-      "sha": "eb0b57d1e00e49746f3afc716e8384772f34f4c6",
-      "shortSha": "eb0b57d",
-      "subject": "perf(home): kill 3s landing-stats stall when no SocketProvider",
+      "sha": "a39bd07c5e46c3ce537cb3c0663a932f22a83d65",
+      "shortSha": "a39bd07",
+      "subject": "fix(rtl): flip admin/app-level back arrows, route through DirectionalIcon",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T21:55:00+03:00"
+      "date": "2026-07-06T01:38:20+03:00"
     },
     {
-      "sha": "e91b688f257d118c2f74ef061d377fc126e21f1b",
-      "shortSha": "e91b688",
-      "subject": "feat(blast): dead-end/combo fixes, feel polish, and coins+gems upgrade store",
+      "sha": "cea85284d3b63b5dc3dd8f381fb44b811c8405a9",
+      "shortSha": "cea8528",
+      "subject": "refactor(rtl): clarity polish on DirectionalIcon call sites",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T19:16:17+03:00"
+      "date": "2026-07-06T01:18:55+03:00"
     },
     {
-      "sha": "3a3f31bb03706f69d40bab8fc45fd8e5a425f098",
-      "shortSha": "3a3f31b",
-      "subject": "feat(i18n): native 6-locale copy for all education landing pages (+ru)",
+      "sha": "3f8b260cf3a71f616fb1ff4665c1c140ff4df975",
+      "shortSha": "3f8b260",
+      "subject": "feat(landing): group calm no-timer modes into a distinct homepage section",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T19:14:14+03:00"
+      "date": "2026-07-06T01:10:01+03:00"
     },
     {
-      "sha": "0d9444f9bc7fd204456bcda05ae2334bbf92d28b",
-      "shortSha": "0d9444f",
-      "subject": "fix(daily): wire ghost-rival challenge end-to-end",
+      "sha": "11d8014b55f0b17f087fe8e191ce0a118144eb44",
+      "shortSha": "11d8014",
+      "subject": "refactor(rtl): add DirectionalIcon component, adopt across back/exit arrows",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T16:53:38+03:00"
+      "date": "2026-07-06T01:09:13+03:00"
     },
     {
-      "sha": "60e598c9458b8c176187fd92e33edca87c063e35",
-      "shortSha": "60e598c",
-      "subject": "fix(i18n): add missing mp.* keys in ru/sv/ja/es (raw MP.NOROOMSYET shown on ru arena)",
+      "sha": "d5955d128be296447befe5528c6543fffe82628c",
+      "shortSha": "d5955d1",
+      "subject": "feat(mp-lobby): compact emote, collapsible how-to-play, clearer ready states, no-scroll fit",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T16:37:39+03:00"
+      "date": "2026-07-06T01:04:23+03:00"
     },
     {
-      "sha": "96c17dce7e1fccfb9ff03547bcdcfb7fde695cc0",
-      "shortSha": "96c17dc",
-      "subject": "fix(boot): homepage loader full-screen — kill CLS from short loader",
+      "sha": "38d0ad46d116faf81dbd12ba8b2be095a4e06bc9",
+      "shortSha": "38d0ad4",
+      "subject": "fix(rtl): flip in-game back/exit arrows in RTL locales",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T16:26:21+03:00"
+      "date": "2026-07-06T00:56:53+03:00"
     },
     {
-      "sha": "d0f1e252e8d743e3a86ebf00ef78dc149444f68a",
-      "shortSha": "d0f1e25",
-      "subject": "docs(aso): correct publishing note — managed publishing is OFF, listings auto-publish on approval",
+      "sha": "a79c5b3eb84839cc70690fc555392b3706936c3e",
+      "shortSha": "a79c5b3",
+      "subject": "fix(wordfall): pin tile column to full grid height so cleared columns stay bottom-aligned",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T15:55:36+03:00"
+      "date": "2026-07-06T00:18:56+03:00"
     },
     {
-      "sha": "13ce653977fe56f67e444ea1065f6eed2fdddcaf",
-      "shortSha": "13ce653",
-      "subject": "feat(aso): play-store listing refresh (ru-RU + 6-lang) + footer link to install landing",
+      "sha": "aff53e96d716446c4c2428957179816f0a45232d",
+      "shortSha": "aff53e9",
+      "subject": "fix(ads): guard AdMob banner listeners against unregistered-plugin thenable rejection",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T15:50:57+03:00"
+      "date": "2026-07-06T00:04:59+03:00"
     },
     {
-      "sha": "3a8a2d1081e45eac0618185fb45b1909747edc87",
-      "shortSha": "3a8a2d1",
-      "subject": "perf(boot): lighter homepage loader + drop redundant splash",
+      "sha": "285ab14d306a8f914ff2067e7a892a09a99fecce",
+      "shortSha": "285ab14",
+      "subject": "fix(i18n): remove duplicate quickPlay block dropping es/ja/sv seekingMatch keys",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T12:36:06+03:00"
+      "date": "2026-07-05T10:01:57+03:00"
     },
     {
-      "sha": "b19cffd1ea6a355f72e50ba624447f38436e6e3f",
-      "shortSha": "b19cffd",
-      "subject": "fix: resolve 5 Sentry issues + iPhone music autoplay",
+      "sha": "eb3551526da44cea8ae9708416241c447b5e1b8f",
+      "shortSha": "eb35515",
+      "subject": "fix(word-wheel): try/catch the Pixi ring draw loop against post-destroy null context",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T12:33:12+03:00"
+      "date": "2026-07-05T10:01:51+03:00"
     },
     {
-      "sha": "b340b071a3b07d816dfeb29d86a4faa59d7751de",
-      "shortSha": "b340b07",
-      "subject": "fix(i18n): add missing mp.quality.* and blast.toCatchUp keys",
+      "sha": "04f6ca96de5931450ced2d0248b1939716b36e12",
+      "shortSha": "04f6ca9",
+      "subject": "fix(daily): align word-bank import filter to the DB 5-7 length constraint",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T11:24:33+03:00"
+      "date": "2026-07-05T09:46:53+03:00"
     },
     {
-      "sha": "1bf70c095d62f9de8c0e46ecb12565cf25620fa9",
-      "shortSha": "1bf70c0",
-      "subject": "chore(nightly): autonomous improvement loop 2026-07-04",
+      "sha": "647f6ecac0df59fc4497f5d7891e0264b0bb656b",
+      "shortSha": "647f6ec",
+      "subject": "fix(gameEngine): guard sibling Pixi .clear() sites against post-unmount null-context race",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T06:16:52+03:00"
+      "date": "2026-07-05T09:33:10+03:00"
     },
     {
-      "sha": "6e4f718b398624ed65243b2c3cdb064e46aac37d",
-      "shortSha": "6e4f718",
-      "subject": "feat(growth): daily-first funnel — beat-me challenge loop, lobby auto-fill, friction removal",
+      "sha": "d2fb54b033cd72f60be308dd407e84af2e9c563e",
+      "shortSha": "d2fb54b",
+      "subject": "fix(pgs): stop unhandled rejection from awaiting the bare Capacitor proxy",
       "author": "Ohad Fisher",
-      "date": "2026-07-04T05:26:00+03:00"
+      "date": "2026-07-05T09:32:55+03:00"
     },
     {
-      "sha": "9bcd43d0d4cd7c7aaa926fef53f6c9b8e366d8fe",
-      "shortSha": "9bcd43d",
-      "subject": "fix(wordcraft): landscape-phone game layout — board no longer collapses",
+      "sha": "4016221d01c99c297a4b7cc3c6d8bf103501613e",
+      "shortSha": "4016221",
+      "subject": "test(singleplayer): re-add quit-abandon coverage via pure policy",
       "author": "Ohad Fisher",
-      "date": "2026-07-03T23:02:38+03:00"
+      "date": "2026-07-05T09:23:02+03:00"
     },
     {
-      "sha": "eb03050c7bbc2be40fd62434024358b5bef68da1",
-      "shortSha": "eb03050",
-      "subject": "chore(i18n): refresh translation report after wordcraft setup keys",
+      "sha": "e347fe29c8593060d36da56b508630098c05f4a6",
+      "shortSha": "e347fe2",
+      "subject": "feat(nightly-salvage): ship 2026-07-05 lane code dropped on gate wedge",
       "author": "Ohad Fisher",
-      "date": "2026-07-03T22:28:28+03:00"
+      "date": "2026-07-05T08:38:58+03:00"
     },
     {
-      "sha": "264ab4f093564e8346b80874bde14e55de9536d0",
-      "shortSha": "264ab4f",
-      "subject": "feat(wordcraft): remote Challenge-a-Friend opponent + scroll-free responsive setup screen",
+      "sha": "0f0954fab47fe67b6ce8e9f1cbbb3c21bb473100",
+      "shortSha": "0f0954f",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-05",
       "author": "Ohad Fisher",
-      "date": "2026-07-03T22:27:28+03:00"
+      "date": "2026-07-05T05:34:02+03:00"
     },
     {
-      "sha": "983153f9bce87519b3471bf1fb206d6be3362213",
-      "shortSha": "983153f",
-      "subject": "chore: sweep generated artifacts + test lint-directive cleanup",
+      "sha": "a2bd61e2735fa194ffdfd20c0d68675345aed2d0",
+      "shortSha": "a2bd61e",
+      "subject": "fix(mp,a11y): visible keyboard focus ring on desktop battle-mode cards",
       "author": "Ohad Fisher",
-      "date": "2026-07-03T21:50:37+03:00"
+      "date": "2026-07-05T02:43:46+03:00"
     },
     {
-      "sha": "a9e05ee183a2f150ab867e166fdde788fead0fc9",
-      "shortSha": "a9e05ee",
-      "subject": "feat(wordcraft): pre-game setup screen + board-first declutter",
+      "sha": "d2eaebb6c9f4ac1f8e435d45f454c30c3f47e105",
+      "shortSha": "d2eaebb",
+      "subject": "feat(mp): electric color-coded desktop battle-mode picker",
       "author": "Ohad Fisher",
-      "date": "2026-07-03T21:07:06+03:00"
+      "date": "2026-07-05T02:39:39+03:00"
     },
     {
-      "sha": "40a08659daa9e580e32abf3fe756859e251c734a",
-      "shortSha": "40a0865",
-      "subject": "perf(wordcraft): O(1) drop resolution + imperative drag ghost",
-      "author": "Ohad Fisher",
-      "date": "2026-07-03T21:06:46+03:00"
+      "sha": "cb386fcb79fbefb3dc8d14716b2e9e9e67977da3",
+      "shortSha": "cb386fc",
+      "subject": "fix(mp): never auto-start the game — fill bots only, host presses Play (#694)",
+      "author": "ohadf2015",
+      "date": "2026-07-05T02:12:29+03:00"
     }
   ]
 }

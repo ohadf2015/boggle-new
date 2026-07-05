@@ -98,17 +98,61 @@ export function wreckingBallEarn(
   };
 }
 
+/** Max floors an interactive SMASH mini-game can remove on a perfect strike.
+ *  Mirrors the async attack ceiling so both paths cap identically — a forger
+ *  claiming perfect skill can never beat what a high-lead player already gets. */
+export const SMASH_MAX_FLOORS = WRECK_MAX_FLOORS_PER_ATTACK;
+/** Strike power (0..1) at/above which the mini-game counts as a PERFECT hit
+ *  (sweet-spot band in the power meter) and awards the top floor. */
+export const SMASH_SWEET_SPOT = 0.85;
+
 /**
- * Floors a single async wrecking-ball attack removes from the target's restored
- * tower, scaled by the attacker's height lead and clamped to
- * {@link WRECK_MAX_FLOORS_PER_ATTACK}. Always at least 1 — an attack the player
- * spent a charge on must visibly land something. Pure so the server can re-clamp
- * the client-claimed damage with the identical formula.
+ * Map a strike's captured power (0..1 — the player's timing/coordination in the
+ * mini-game) to floors destroyed (1..{@link SMASH_MAX_FLOORS}). A weak/mistimed
+ * tap lands the minimum; nailing the green sweet-spot lands the max. The top
+ * floor is reserved for the sweet spot so "PERFECT" feels earned. Pure so the
+ * meter, the damage apply, and the server share one source of truth.
  */
-export function asyncWreckDamageFloors(attackerHeightM: number, targetHeightM: number): number {
+export function smashPowerToFloors(power01: number): number {
+  const p = Math.max(0, Math.min(1, power01));
+  if (p >= SMASH_SWEET_SPOT) return SMASH_MAX_FLOORS;
+  // Ramp 1 → (max-1) across the sub-sweet-spot range; keep the top floor exclusive.
+  const ramp = 1 + Math.floor((p / SMASH_SWEET_SPOT) * (SMASH_MAX_FLOORS - 1));
+  return Math.max(1, Math.min(SMASH_MAX_FLOORS - 1, ramp));
+}
+
+/** Verdict label for the result flair — drives the copy + colour of the payoff. */
+export function smashVerdict(power01: number): 'perfect' | 'solid' | 'weak' {
+  const p = Math.max(0, Math.min(1, power01));
+  if (p >= SMASH_SWEET_SPOT) return 'perfect';
+  if (p >= 0.5) return 'solid';
+  return 'weak';
+}
+
+/**
+ * Floors a single wrecking-ball attack removes from the target's restored tower.
+ * Damage is the STRONGER of two levers — the attacker's height lead and the
+ * player's mini-game skill (`accuracy01`, 0..1) — clamped to
+ * {@link WRECK_MAX_FLOORS_PER_ATTACK}. Skill *raises* damage (so a perfect strike
+ * lands the max even with zero lead — coordination visibly matters), but never
+ * past the cap, so a forged `accuracy=1` tops out at the same ceiling a high-lead
+ * player already reaches: no new cheat surface. Always ≥1 — an attack the player
+ * spent a charge on must land something. Pure so the client rail and the server
+ * compute the identical number from the identical formula.
+ *
+ * Omitting `accuracy01` (default 0 → skill floor of 1) reproduces the original
+ * lead-only behaviour for back-compat.
+ */
+export function asyncWreckDamageFloors(
+  attackerHeightM: number,
+  targetHeightM: number,
+  accuracy01 = 0,
+): number {
   const lead = Math.max(0, attackerHeightM - targetHeightM);
-  const fromLead = 1 + Math.floor(lead / WRECK_LEAD_PER_FLOOR_M);
-  return Math.max(1, Math.min(WRECK_MAX_FLOORS_PER_ATTACK, fromLead));
+  const leadFloors = 1 + Math.floor(lead / WRECK_LEAD_PER_FLOOR_M);
+  const skillFloors = smashPowerToFloors(accuracy01);
+  const combined = Math.max(leadFloors, skillFloors);
+  return Math.max(1, Math.min(WRECK_MAX_FLOORS_PER_ATTACK, combined));
 }
 
 /**

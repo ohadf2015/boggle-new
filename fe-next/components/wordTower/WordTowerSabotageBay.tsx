@@ -11,7 +11,9 @@ interface Props {
   pickerOpen: boolean;
   onOpen: () => void;
   onClose: () => void;
-  onSend: (rivalId: string, rivalName: string) => void;
+  onSend: (rivalId: string, rivalName: string, accuracy: number) => void;
+  /** Attacker's height (m) — feeds the shared damage formula in the smash scene. */
+  attackerHeightM: number;
   /** The most recent hit — drives the wrecking-ball animation + toast. */
   lastHit: { id: string; targetName: string; targetId: string } | null;
   onDismissHit: () => void;
@@ -48,6 +50,7 @@ export function WordTowerSabotageBay({
   onOpen,
   onClose,
   onSend,
+  attackerHeightM,
   lastHit,
   onDismissHit,
   earnedToast,
@@ -68,10 +71,11 @@ export function WordTowerSabotageBay({
     onClose();
   }, [onClose]);
 
-  // Smash scene done: commit the hit and clear the overlay
-  const handleSmashDone = useCallback(() => {
+  // Smash scene done: commit the hit (with the player's strike accuracy) and
+  // clear the overlay. Accuracy (0..1) drives the authoritative damage.
+  const handleSmashDone = useCallback((accuracy: number) => {
     if (smashTarget) {
-      onSend(smashTarget.id, smashTarget.name);
+      onSend(smashTarget.id, smashTarget.name, accuracy);
       setSmashTarget(null);
     }
   }, [smashTarget, onSend]);
@@ -251,6 +255,7 @@ export function WordTowerSabotageBay({
       {smashTarget && (
         <WordTowerSmashScene
           target={smashTarget}
+          attackerHeightM={attackerHeightM}
           onDone={handleSmashDone}
           t={t}
           reducedMotion={reducedMotion}

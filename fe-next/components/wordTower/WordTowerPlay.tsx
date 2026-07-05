@@ -83,6 +83,7 @@ import { WordTowerUpgradePanel } from './WordTowerUpgradePanel';
 import { useSabotageIntegration } from './useSabotage';
 import { WordTowerSabotageBay } from './WordTowerSabotageBay';
 import { applyAsyncWrecks, type PendingWreck } from '@/lib/wordTower/asyncWreck';
+import { asyncWreckDamageFloors } from '@/lib/wordTower/sabotage';
 
 /** How long a transient celebration toast holds before it auto-dismisses. Kept
  *  short + uniform so banners clear quickly and never pile up / "stick" on
@@ -591,20 +592,24 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     tower.hazard,
   );
   const sendWreck = useCallback(
-    (rivalId: string, rivalName: string) => {
-      sab.sabotage(rivalId, rivalName); // local beat + spend a charge
+    (rivalId: string, rivalName: string, accuracy: number) => {
       const rival = rivals.find((r) => r.id === rivalId);
+      // Skill (mini-game accuracy) + height lead combine via the SHARED formula,
+      // so the optimistic local rail drop matches what the server will apply.
+      const floors = asyncWreckDamageFloors(personalBest, rival?.heightM ?? 0, accuracy);
+      sab.sabotage(rivalId, rivalName, floors); // local beat + spend a charge
       if (!daily && rival?.playerId) {
-        // Heights are derived server-side from the authoritative progress table —
-        // we only name the target; the server computes + clamps the damage.
+        // The server re-derives heights from the authoritative progress table and
+        // re-clamps the damage; we only name the target + report the strike
+        // accuracy (skill raises damage, but never past the shared cap).
         void fetch('/api/word-tower/wreck', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ targetPlayerId: rival.playerId }),
+          body: JSON.stringify({ targetPlayerId: rival.playerId, accuracy }),
         }).catch(() => { /* best-effort raid */ });
       }
     },
-    [sab, rivals, daily],
+    [sab, rivals, daily, personalBest],
   );
 
   // Apply any pending async wrecks ONCE on session start (endless only): fold
@@ -928,6 +933,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           onOpen={sab.openPicker}
           onClose={sab.closePicker}
           onSend={sendWreck}
+          attackerHeightM={personalBest}
           lastHit={sab.lastHit}
           onDismissHit={sab.dismissHit}
           earnedToast={sab.earnedToast}

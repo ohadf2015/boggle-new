@@ -27,6 +27,10 @@ export const runtime = 'nodejs';
 const PostSchema = z.object({
   targetPlayerId: z.string().uuid(),
   reason: z.string().max(48).optional(),
+  // Mini-game strike accuracy (0..1). Skill RAISES damage up to the shared cap
+  // but can never exceed it, so a forged 1.0 tops out at the same ceiling a
+  // high height-lead already reaches — no new cheat surface. Clamped again below.
+  accuracy: z.number().min(0).max(1).optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -106,8 +110,9 @@ export async function POST(request: NextRequest) {
     const targetBest = Number(targetRow.best_height_m) || 0;
 
     // Server is the sole authority on damage — derived from authoritative heights
-    // and clamped by the shared pure formula (1..WRECK_MAX_FLOORS_PER_ATTACK).
-    const damageFloors = asyncWreckDamageFloors(attackerBest, targetBest);
+    // and the (clamped) client strike accuracy, via the shared pure formula
+    // (1..WRECK_MAX_FLOORS_PER_ATTACK). Skill lifts damage but never past the cap.
+    const damageFloors = asyncWreckDamageFloors(attackerBest, targetBest, b.accuracy ?? 0);
 
     // Denormalize the attacker's display name (server-derived, never client) so
     // the defender's session-start read needs no profiles join.
