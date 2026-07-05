@@ -593,6 +593,25 @@ export const EXPERIMENTS = {
     description:
       'Word Craft step-hint duration. control = coaching pill retires after 3 turns, extended-hints = retires after 6 turns. Targets /en/word-craft rage-click rage signal (top PostHog priority). Conversion = word_craft_turn_submitted.',
   }),
+
+  /**
+   * MP room-join loading state. Rage-click signal on /en/multiplayer (PostHog
+   * 24h data). Root cause: room card buttons have no disabled/loading state while
+   * `joiningRoomCode` is set — user clicks, async join fires, nothing changes
+   * visually → rage-clicks. `loading-state` arm disables the clicked card and
+   * shows a spinner while the join is in-flight; control = current no-feedback
+   * behaviour.
+   *
+   * Conversion = room_join_rage_click rate must drop.
+   * Guardrail = mp_room_joined rate must not drop.
+   * PostHog flag key = 'exp-mp-room-join-loading-v1', 50/50 rollout.
+   */
+  'exp-mp-room-join-loading-v1': defineExperiment({
+    variants: ['control', 'loading-state'] as const,
+    default: 'control',
+    description:
+      'MP room-card join loading state. loading-state = disables clicked room card + shows spinner while join is in-flight. control = current no-feedback behaviour. Targets rage-clicks on /en/multiplayer.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

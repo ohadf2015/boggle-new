@@ -86,7 +86,12 @@ export class TrailRenderer {
   // ─── Internal ───────────────────────────────────────────────────
 
   private draw(): void {
-    this.graphics.clear();
+    // PixiJS can null the internal render context before setting graphics.destroyed=true
+    // (WebGL context-loss path). The guard in update() is not enough — guard here too.
+    // Fixes JAVASCRIPT-NEXTJS-1PV.
+    if (this._destroyed || this.graphics?.destroyed) return;
+    try { this.graphics.clear(); } catch { return; }
+
 
     if (this.points.length < 2) {
       // Draw a glow dot at single point

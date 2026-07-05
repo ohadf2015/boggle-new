@@ -5348,6 +5348,7 @@ const en = {
     "vocabularyGames": "Vocabulary Games",
     "gamesForTeachers": "Games for Teachers",
     "eslWordGames": "ESL Word Games",
+    "forSchools": "For Schools",
     "androidApp": "Android App"
   },
   "sitemap": {

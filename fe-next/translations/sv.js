@@ -5493,6 +5493,7 @@ const sv = {
     "vocabularyGames": "Ordförrådsspel",
     "gamesForTeachers": "Ordspel för lärare",
     "eslWordGames": "Ordspel för engelska",
+    "forSchools": "För skolor",
     "androidApp": "Android-appen"
   },
   "sitemap": {

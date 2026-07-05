@@ -10678,6 +10678,7 @@ const ru = {
     "vocabularyGames": "Игры на Словарный Запас",
     "gamesForTeachers": "Игры для Учителей",
     "eslWordGames": "Игры со Словами ESL",
+    "forSchools": "Для школ",
     "androidApp": "Приложение для Android"
   },
   "blog": {

@@ -5451,6 +5451,7 @@ const he = {
     "vocabularyGames": "משחקי אוצר מילים",
     "gamesForTeachers": "משחקי מילים למורים",
     "eslWordGames": "משחקי מילים באנגלית",
+    "forSchools": "עבור בתי ספר",
     "androidApp": "אפליקציית אנדרואיד"
   },
   "sitemap": {

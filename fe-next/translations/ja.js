@@ -5322,6 +5322,7 @@ const ja = {
     "vocabularyGames": "語彙ゲーム",
     "gamesForTeachers": "先生のための単語ゲーム",
     "eslWordGames": "英語単語ゲーム",
+    "forSchools": "学校向け",
     "androidApp": "Androidアプリ"
   },
   "sitemap": {

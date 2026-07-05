@@ -5355,6 +5355,7 @@ const es = {
     "vocabularyGames": "Juegos de vocabulario",
     "gamesForTeachers": "Juegos para docentes",
     "eslWordGames": "Juegos de inglés",
+    "forSchools": "Para escuelas",
     "androidApp": "App para Android"
   },
   "sitemap": {

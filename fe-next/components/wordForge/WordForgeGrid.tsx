@@ -26,6 +26,8 @@ interface WordForgeGridProps {
   onReject?: (reason: 'notWord') => void;
   /** Show ▲/▼ alphabet-position hints on idle tiles after 2 consecutive rejections. */
   showAlphaHints?: boolean;
+  /** Consecutive clean-round streak — drives grid glow at thresholds 3 (orange) and 5 (red pulse). */
+  ironStreak?: number;
 }
 
 /**
@@ -44,6 +46,7 @@ export function WordForgeGrid({
   dictReady = true,
   onReject,
   showAlphaHints = false,
+  ironStreak = 0,
 }: WordForgeGridProps): React.JSX.Element {
   const prefersReducedMotion = useReducedMotion();
   const { customHaptic } = useHapticFeedback();
@@ -177,9 +180,11 @@ export function WordForgeGrid({
       <div
         ref={gridRef}
         className={cn(
-          'game-board-frame relative select-none touch-none',
+          'game-board-frame relative select-none touch-none transition-shadow duration-500',
           feedback === 'valid' && 'ring-4 ring-neo-lime/50',
           feedback === 'invalid' && 'motion-safe:animate-neo-shake ring-4 ring-neo-red/50',
+          feedback === 'none' && ironStreak >= 5 && 'ring-2 ring-neo-red/60 motion-safe:animate-pulse-subtle',
+          feedback === 'none' && ironStreak >= 3 && ironStreak < 5 && 'ring-2 ring-neo-orange/50',
         )}
         style={{
           display: 'grid',

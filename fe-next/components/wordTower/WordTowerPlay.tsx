@@ -780,11 +780,13 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // Always flush when the tab is hidden / page unloads.
   useEffect(() => {
     const onHide = () => { if (document.visibilityState === 'hidden') save(true); };
+    const onPageHide = () => save(true);
     window.addEventListener('visibilitychange', onHide);
-    window.addEventListener('pagehide', () => save(true));
+    window.addEventListener('pagehide', onPageHide);
     return () => {
       save(true);
       window.removeEventListener('visibilitychange', onHide);
+      window.removeEventListener('pagehide', onPageHide);
     };
   }, [save]);
 

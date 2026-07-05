@@ -259,6 +259,7 @@ export default function WordForgeGame(): React.JSX.Element {
           dictReady={dictLoaded}
           onReject={() => { flashReject('notWord'); setConsecutiveRejectCount(c => c + 1); }}
           showAlphaHints={consecutiveRejectCount >= 2}
+          ironStreak={run.state.ironStreak}
         />
       </div>
 

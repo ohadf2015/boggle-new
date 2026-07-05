@@ -42,6 +42,7 @@ import { useBotSimulation } from './useBotSimulation';
 import { useSpamDetection } from './useSpamDetection';
 import { useSinglePlayerEffects } from './useSinglePlayerEffects';
 import { buildGameResults, buildFallbackResults, emitSinglePlayerGameEnd } from './buildGameResults';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { SinglePlayerGameState, SinglePlayerResultsData } from '../../SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
@@ -473,6 +474,7 @@ export function useSinglePlayerCore({
   const handleFinishPractice = useCallback(() => setIsGameOver(true), []);
   const handleQuitRequest = useCallback(() => {
     if (settings.mode === 'practice') { setIsGameOver(true); return; }
+    trackGrowthEvent('game_abandon_attempted', { mode: settings.mode, score, hadScore: score > 0 });
     score > 0 ? setShowQuitConfirm(true) : onQuit();
   }, [score, onQuit, settings.mode]);
   // Confirm path: disarm the guard (leaving) BEFORE the exit nav so its teardown

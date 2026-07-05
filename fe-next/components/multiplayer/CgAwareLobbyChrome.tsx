@@ -78,6 +78,7 @@ const CgAwareLobbyChrome: React.FC<CgAwareLobbyChromeProps> = ({
         onCreateRoom={onCreateRoom}
         onQuickPlay={onQuickPlay}
         isQuickPlayLoading={!!joiningRoomCode || isJoining}
+        joiningRoomCode={joiningRoomCode}
       />
     </>
   );

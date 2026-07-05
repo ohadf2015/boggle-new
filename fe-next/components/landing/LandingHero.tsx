@@ -91,7 +91,7 @@ export function LandingHero({ players, playersLoading, isMobilePortrait, energet
               {energetic && <FloatingTiles />}
               <HeroStyleMascot isMobilePortrait={isMobilePortrait} energetic={energetic} />
             </div>
-            <h1 className="font-black uppercase tracking-tight text-neo-white text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl sm:mt-3 sm:mb-2 neo-title animate-[fadeInUp_0.4s_ease-out_0.15s_both]">
+            <h1 className="font-black uppercase tracking-tight text-neo-white text-2xl sm:text-3xl md:text-4xl lg:text-4xl xl:text-5xl sm:mt-3 sm:mb-2 neo-title animate-[fadeInUp_0.4s_ease-out_0s_both]">
               <span className="sr-only">LexiClash — </span>
               {t('landing.welcomeTitle')}
             </h1>
