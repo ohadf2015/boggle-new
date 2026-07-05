@@ -28,7 +28,7 @@ vi.mock('@/hooks/useAdMob', () => ({
 
 const admobListeners: Record<string, Array<() => void>> = {};
 vi.mock('@capacitor/core', () => ({
-  Capacitor: { isNativePlatform: () => true, getPlatform: () => 'android' },
+  Capacitor: { isNativePlatform: () => true, isPluginAvailable: () => true, getPlatform: () => 'android' },
 }));
 
 vi.mock('@capacitor-community/admob', () => ({

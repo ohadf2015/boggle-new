@@ -14,7 +14,11 @@ export default function AnchoredNativeBanner() {
   const safeArea = useSafeArea();
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    // isPluginAvailable is stricter than isNativePlatform — on Android WebView
+    // the bridge can report native before AdMob is registered; addListener()
+    // then returns a rejected thenable proxy ("not implemented on android"),
+    // an unhandled rejection from this app-wide-mounted effect (see AdMobContext.tsx:61).
+    if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('AdMob')) return;
 
     const removers: Array<() => void> = [];
 

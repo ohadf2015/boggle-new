@@ -36,7 +36,12 @@ export default function BannerCoordinatorMount() {
   useAppLifecycle({ onForeground: () => void bannerController.reassert() });
 
   useEffect(() => {
-    if (!Capacitor.isNativePlatform()) return;
+    // isPluginAvailable is stricter than isNativePlatform — on Android WebView
+    // the bridge can report native before AdMob is registered; resumeBanner()/
+    // addListener() then return a rejected thenable proxy ("not implemented on
+    // android"), an unhandled rejection from this app-wide-mounted effect
+    // (see AdMobContext.tsx:61).
+    if (!Capacitor.isNativePlatform() || !Capacitor.isPluginAvailable('AdMob')) return;
 
     bannerController.setOps({
       show: async (margin, variant) => {

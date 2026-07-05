@@ -12,7 +12,7 @@ const { showBanner, hideBanner, resumeBanner, isNative, listeners, foregroundCb 
 }));
 
 vi.mock('@capacitor/core', () => ({
-  Capacitor: { isNativePlatform: () => isNative.current },
+  Capacitor: { isNativePlatform: () => isNative.current, isPluginAvailable: () => true },
 }));
 
 vi.mock('@capacitor-community/admob', () => ({

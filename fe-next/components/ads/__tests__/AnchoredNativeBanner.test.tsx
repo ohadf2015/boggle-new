@@ -30,6 +30,7 @@ vi.mock('@/hooks/useSafeArea', () => ({
 vi.mock('@capacitor/core', () => ({
   Capacitor: {
     isNativePlatform: () => true,
+    isPluginAvailable: () => true,
     getPlatform: () => mockPlatform.current,
   },
 }));
