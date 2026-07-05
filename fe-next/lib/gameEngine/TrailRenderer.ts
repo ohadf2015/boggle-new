@@ -58,7 +58,10 @@ export class TrailRenderer {
     // can null this Graphics' context before our destroy() runs, turning .clear()
     // into "Cannot read properties of null (reading 'clear')" (Sentry 1CW/1KM).
     if (this._destroyed || this.graphics?.destroyed) return;
-    this.graphics.clear();
+    // ?.destroyed is not enough: PixiJS nulls the render context BEFORE setting
+    // destroyed=true (WebGL context-loss path) → .clear() still throws. Mirror
+    // the draw() guard (Sentry JAVASCRIPT-NEXTJS-1PV).
+    try { this.graphics.clear(); } catch { /* post-unmount race — nothing to draw */ }
   }
 
   /** Call each frame with delta in seconds */

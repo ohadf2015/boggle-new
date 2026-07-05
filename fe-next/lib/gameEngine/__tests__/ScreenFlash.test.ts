@@ -91,4 +91,17 @@ describe('ScreenFlash', () => {
     (flash as unknown as { graphics: { destroyed: boolean } }).graphics.destroyed = true;
     expect(() => flash.update(0.1)).not.toThrow();
   });
+
+  it('does not crash when .clear() throws while destroyed is still false (context nulled first)', () => {
+    // The exact JAVASCRIPT-NEXTJS-1PV race the ?.destroyed guard MISSES: PixiJS
+    // nulls the render context on WebGL context-loss BEFORE it sets
+    // destroyed=true, so a queued per-frame tick reaches .clear() and throws.
+    flash.flash({ color: 0xff0000, duration: 0.2, intensity: 0.8 });
+    const g = (flash as unknown as { graphics: { clear: () => void; destroyed: boolean } }).graphics;
+    g.destroyed = false; // guard would NOT early-return
+    g.clear = () => {
+      throw new TypeError("Cannot read properties of null (reading 'clear')");
+    };
+    expect(() => flash.update(0.1)).not.toThrow();
+  });
 });

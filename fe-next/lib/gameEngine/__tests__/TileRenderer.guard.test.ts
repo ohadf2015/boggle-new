@@ -123,4 +123,20 @@ describe('TileRenderer destroyed-guard', () => {
     // Re-running setTiles for the same id hits the drawTile redraw path.
     expect(() => renderer.setTiles([tile('a')])).not.toThrow();
   });
+
+  it('redraw does not crash when .clear() throws while destroyed is still false', () => {
+    // The JAVASCRIPT-NEXTJS-1PV race the ?.destroyed guard MISSES: PixiJS nulls
+    // the render context on WebGL context-loss BEFORE setting destroyed=true, so
+    // .clear() throws even though sprite.bg.destroyed is still false.
+    renderer.setTiles([tile('a')]);
+    const sprites = (renderer as unknown as {
+      tiles: Map<string, { bg: { clear: jest.Mock; destroyed: boolean } }>;
+    }).tiles;
+    const bg = sprites.get('a')!.bg;
+    bg.destroyed = false; // guard would NOT early-return
+    bg.clear.mockImplementation(() => {
+      throw new TypeError("Cannot read properties of null (reading 'clear')");
+    });
+    expect(() => renderer.setTiles([tile('a')])).not.toThrow();
+  });
 });

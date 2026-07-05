@@ -426,6 +426,9 @@ export class TileRenderer {
   private drawTile(sprite: TileSprite): void {
     // A state-change redraw can land after teardown destroyed this tile's
     // Graphics (nulled context) — guard before .clear() (Sentry 1CW/1CK/1KM).
+    // ?.destroyed is not enough: PixiJS nulls the render context BEFORE setting
+    // destroyed=true (WebGL context-loss path), so .clear() can still throw
+    // (Sentry JAVASCRIPT-NEXTJS-1PV) — wrap it like TrailRenderer/ScreenFlash.
     if (this._destroyed || sprite.bg?.destroyed) return;
     const { tileSize, cornerRadius } = this.config;
     const theme = this.themes[sprite.data.variant] ?? this.themes.standard;
@@ -436,7 +439,7 @@ export class TileRenderer {
     const fill = selected ? theme.selectedBg : theme.bg;
     const r = cornerRadius ?? 4;
 
-    sprite.bg.clear();
+    try { sprite.bg.clear(); } catch { return; }
 
     // ─── Selected glow ring (drawn first, behind tile) ───────────
     if (selected) {

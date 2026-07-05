@@ -90,7 +90,10 @@ export class ScreenFlash {
 
     // Draw the strongest active flash (highest current alpha)
     this.graphics.visible = true;
-    this.graphics.clear();
+    // ?.destroyed guard above is not enough: PixiJS nulls the render context
+    // BEFORE setting destroyed=true (WebGL context-loss path), so this per-frame
+    // .clear() can still throw on a queued tick (Sentry JAVASCRIPT-NEXTJS-1PV).
+    try { this.graphics.clear(); } catch { return; }
 
     let maxAlpha = 0;
     let maxColor = 0xffffff;
