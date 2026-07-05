@@ -80,13 +80,17 @@ export default function WordWheelPixiRing({
         // Guard: a ticker tick already queued in the rAF loop can fire AFTER the
         // unmount cleanup calls app.destroy({children:true}), which nulls each
         // Graphics' internal context. Touching .clear() then throws
-        // "Cannot read properties of null (reading 'clear')" (Sentry 1CW, route
-        // /daily/word-wheel). Mirrors the post-destroy guards added in a39f63378
-        // for the blast renderers.
+        // "Cannot read properties of null (reading 'clear')" (Sentry 1CW/1PV,
+        // route /daily/word-wheel). Mirrors the post-destroy guards added in
+        // a39f63378 for the blast renderers.
         if (destroyed || orbitGfx.destroyed || lineGfx.destroyed || glowGfx.destroyed) return;
         // Skip all draw work for an invisible canvas (backgrounded tab / hidden
         // PWA). Freezing `angle` here too avoids a large delta jump on resume.
         if (typeof document !== 'undefined' && document.hidden) return;
+        // The destroyed flags above are not enough: PixiJS nulls the render
+        // context on WebGL context-loss BEFORE it sets destroyed=true, so
+        // .clear()/draw on a queued tick can still throw. Belt: bail the frame.
+        try {
         const dt = ticker.deltaMS / 1000;
         const { selectedIndices: sel, radius: r, combo: c, pointerPosRef: ppRef, isDraggingRef: dragRef } = stateRef.current;
         angle += dt * 0.5;
@@ -166,6 +170,7 @@ export default function WordWheelPixiRing({
           glowGfx.circle(cx, cy, gr * 0.65);
           glowGfx.fill({ color: 0x00ffff, alpha: 0.04 + boost * 0.1 });
         }
+        } catch { /* post-destroy null-context race — skip this frame (Sentry 1PV) */ }
       });
     };
 

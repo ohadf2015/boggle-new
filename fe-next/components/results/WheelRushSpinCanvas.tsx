@@ -82,7 +82,12 @@ export default function WheelRushSpinCanvas({ reducedMotion = false, settleAngle
       const initialVelocity = reducedMotion ? 0 : 14; // rad/sec at t=0
 
       const tick = () => {
-        if (destroyed) return;
+        // ?.destroyed is not enough: PixiJS nulls the render context on WebGL
+        // context-loss BEFORE it sets destroyed=true, so .clear()/draw on a
+        // queued frame can still throw "Cannot read properties of null (reading
+        // 'clear')" (Sentry 1PV class). Guard + try-belt, bail the frame.
+        if (destroyed || arcGfx.destroyed || particleGfx.destroyed || centerGfx.destroyed) return;
+        try {
         const t = performance.now() - startTime;
         const progress = Math.min(1, t / SPIN_DURATION);
         // Ease-out cubic for the global rotation envelope
@@ -119,6 +124,7 @@ export default function WheelRushSpinCanvas({ reducedMotion = false, settleAngle
         centerGfx.fill({ color: 0x00ffff, alpha: 0.05 });
 
         if (reducedMotion && progress >= 1) return; // freeze frame for a11y
+        } catch { return; /* post-destroy null-context race — stop decorative loop */ }
         raf = requestAnimationFrame(tick);
       };
 
