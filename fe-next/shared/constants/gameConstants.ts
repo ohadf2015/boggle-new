@@ -77,7 +77,7 @@ export const MAX_WORD_LENGTH = 50;
 /**
  * Minimum TARGET word length by language for Daily Challenge word hunt
  * Most languages: 5 letters minimum — keeps targets vivid + dodges jargon-heavy 4-letter
- * dictionary fallbacks. Combined with MAX_TARGET_WORD_LENGTH=6 the window is [5,6].
+ * dictionary fallbacks. Combined with MAX_TARGET_WORD_LENGTH=7 the window is [5,7].
  * Japanese kanji compounds: 2 characters minimum (kanji are complex)
  */
 export const MIN_ANSWER_LENGTH: Record<string, number> = {
