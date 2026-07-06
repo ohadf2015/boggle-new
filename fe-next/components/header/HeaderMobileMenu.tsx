@@ -193,10 +193,20 @@ const HeaderMobileMenu = memo<HeaderMobileMenuProps>(({ unclaimedCount, onOpenGi
     const mobileMenuRef = useRef<HTMLDivElement>(null);
     const isRtl = language === 'he';
 
-    // Close mobile menu when clicking outside
+    // Close mobile menu when clicking outside. Radix popovers/selects/dropdowns
+    // rendered inside the drawer (e.g. the Language row's <Select>) portal their
+    // open content straight to document.body — a DOM *sibling* of the drawer,
+    // not a descendant — so `mobileMenuRef.contains(target)` is false for them.
+    // Without this guard, opening/using any such control reads as an "outside"
+    // click and slams the whole drawer shut mid-interaction. Every Radix portal
+    // node is stamped with `data-radix-popper-content-wrapper`, so exempt it.
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target as Node)) {
+            const target = event.target as Node;
+            if (target instanceof Element && target.closest('[data-radix-popper-content-wrapper]')) {
+                return;
+            }
+            if (mobileMenuRef.current && !mobileMenuRef.current.contains(target)) {
                 setShowMobileMenu(false);
             }
         };
