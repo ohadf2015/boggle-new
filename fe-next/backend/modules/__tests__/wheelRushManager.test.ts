@@ -24,6 +24,7 @@ import {
 import {
   WHEEL_RUSH_FIRST_FINDER_BONUS,
   WHEEL_RUSH_PANGRAM_BONUS,
+  WHEEL_RUSH_REPEAT_SCORE_FACTOR,
 } from '@/shared/constants/wheelRushConstants';
 import { calculateWordScoreByLength } from '@/shared/utils/scoring';
 
@@ -148,12 +149,10 @@ describe('wheelRushManager', () => {
     it('first finder gets base score + first-finder bonus and is recorded', () => {
       const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
       const r = applyWheelWord(s, 'p1', 'CANE', 1000);
-      expect(r.kind).toBe('scored');
-      if (r.kind === 'scored') {
-        expect(r.firstFinder).toBe(true);
-        expect(r.firstFinderBonus).toBe(WHEEL_RUSH_FIRST_FINDER_BONUS);
-        expect(r.score).toBe(calculateWordScoreByLength(4) + WHEEL_RUSH_FIRST_FINDER_BONUS);
-      }
+      expect(r.repeat).toBe(false);
+      expect(r.firstFinder).toBe(true);
+      expect(r.firstFinderBonus).toBe(WHEEL_RUSH_FIRST_FINDER_BONUS);
+      expect(r.score).toBe(calculateWordScoreByLength(4) + WHEEL_RUSH_FIRST_FINDER_BONUS);
       expect(s.firstFinders['CANE']).toBe('p1');
       expect(s.foundWords.p1).toContain('CANE');
     });
@@ -162,12 +161,10 @@ describe('wheelRushManager', () => {
       const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
       applyWheelWord(s, 'p1', 'CANE', 1000);
       const r = applyWheelWord(s, 'p2', 'CANE', 1500);
-      expect(r.kind).toBe('scored');
-      if (r.kind === 'scored') {
-        expect(r.firstFinder).toBe(false);
-        expect(r.firstFinderBonus).toBe(0);
-        expect(r.score).toBe(calculateWordScoreByLength(4));
-      }
+      expect(r.repeat).toBe(false);
+      expect(r.firstFinder).toBe(false);
+      expect(r.firstFinderBonus).toBe(0);
+      expect(r.score).toBe(calculateWordScoreByLength(4));
       // The word stays credited to BOTH players (parallel discovery).
       expect(s.foundWords.p1).toContain('CANE');
       expect(s.foundWords.p2).toContain('CANE');
@@ -175,11 +172,28 @@ describe('wheelRushManager', () => {
       expect(s.firstFinders['CANE']).toBe('p1');
     });
 
-    it('rejects duplicate by same user', () => {
+    it('re-submitting an already-claimed word still scores, at the reduced repeat rate', () => {
       const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
       applyWheelWord(s, 'p1', 'CANE', 1000);
       const r = applyWheelWord(s, 'p1', 'CANE', 1500);
-      expect(r.kind).toBe('rejected');
+      expect(r.repeat).toBe(true);
+      expect(r.firstFinder).toBe(false);
+      expect(r.firstFinderBonus).toBe(0);
+      expect(r.score).toBe(Math.round(calculateWordScoreByLength(4) * WHEEL_RUSH_REPEAT_SCORE_FACTOR));
+      expect(r.score).toBeGreaterThan(0);
+      // Word isn't duplicated in the found-words list — it was already there.
+      expect(s.foundWords.p1.filter(w => w === 'CANE')).toHaveLength(1);
+    });
+
+    it('caps the repeat bonus at one credit per word — spamming the same word further scores 0', () => {
+      const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
+      applyWheelWord(s, 'p1', 'CANE', 1000);       // original find
+      applyWheelWord(s, 'p1', 'CANE', 1500);       // first repeat — reduced score
+      const third = applyWheelWord(s, 'p1', 'CANE', 2000);
+      const fourth = applyWheelWord(s, 'p1', 'CANE', 2500);
+      expect(third.repeat).toBe(true);
+      expect(third.score).toBe(0);
+      expect(fourth.score).toBe(0);
     });
   });
 
@@ -198,11 +212,9 @@ describe('wheelRushManager', () => {
     it('scored outcome increments wordsLocked (words found) and totalScore', () => {
       const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
       const r = applyWheelWord(s, 'p1', 'CANE', 1000);
-      expect(r.kind).toBe('scored');
+      expect(r.repeat).toBe(false);
       expect(s.playerStats.p1.wordsLocked).toBe(1);
-      if (r.kind === 'scored') {
-        expect(s.playerStats.p1.totalScore).toBe(r.score);
-      }
+      expect(s.playerStats.p1.totalScore).toBe(r.score);
       expect(s.playerStats.p1.bestWord).toBe('CANE');
     });
 

@@ -370,6 +370,10 @@ export interface WheelRushModeState {
   startedAt: number;
   /** Per-player domination stats for end-game awards screen */
   playerStats: Record<string, WheelRushPlayerStats>;
+  /** Words (UPPERCASE) each player has already been paid the one-time
+   *  reduced "repeat" score for. Caps the repeat bonus at a single credit per
+   *  word so resubmitting it endlessly can't farm points. */
+  repeatCredited?: Record<string, string[]>;
 }
 
 /** Shiritori (しりとり) word-chain mode state tracked per game. */

@@ -4779,12 +4779,7 @@ const es = {
     }
   },
   "preGameTutorial": {
-    "welcome": {
-      "title": "¡Hola!",
-      "subtitle": "Soy Lexi — ¡vamos!"
-    },
     "practice": {
-      "instruction": "Desliza sobre las letras para deletrear:",
       "success": "¡Perfecto! ¡Ya le agarraste la onda!"
     },
     "tips": {
@@ -4793,8 +4788,6 @@ const es = {
     },
     "letsPlay": "¡A jugar!",
     "buildAvatar": "¿Crear tu avatar primero?",
-    "skip": "Saltar tutorial",
-    "next": "Siguiente",
     "step": "Paso {current} de {total}"
   },
   "tutorialPrompt": {
@@ -6462,12 +6455,11 @@ const es = {
     "gameOver": "¡Se acabó el tiempo!",
     "submit": "ENVIAR",
     "alreadyFound": "¡Ya encontrada!",
+    "alreadyFoundBonus": "Encontrada de nuevo (+{points})",
     "notInDictionary": "No es una palabra válida",
     "missingCenter": "Debe incluir la letra central ({letter})",
     "tooShort": "Demasiado corta (mín {min} letras)",
     "invalidLetters": "Solo puedes usar las letras de la rueda",
-    "alreadyClosed": "Palabra ya cerrada",
-    "lockedByOther": "Bloqueada por otro jugador",
     "yourWordStolen": "¡{by} te robó la palabra {word}!",
     "stealGain": "ROBO +{score}",
     "allLettersUsed": "¡TODAS LAS LETRAS!",
@@ -12246,6 +12238,7 @@ const es = {
       "title": "Adivina la Palabra",
       "step1": "Encuentra la palabra oculta",
       "step2": "Forma palabras para ver pistas",
+      "step3": "Las palabras cortas no gastan intentos",
       "scoreTip": "¡Aciértala primero y gana más!"
     },
     "wheelRush": {

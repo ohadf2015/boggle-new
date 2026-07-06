@@ -56,50 +56,53 @@ export interface BotConfigType {
 export const BOT_CONFIG: BotConfigType = {
   // Timing ranges in milliseconds (simulates human thinking/typing)
   // Medium and hard bots are intentionally slower to feel more realistic
+  // Bumped again — players still found easy/medium/hard bots too sharp at
+  // the old timings for a casual round.
   TIMING: {
     easy: {
-      minDelay: 2000,    // Minimum time between words
-      maxDelay: 5500,    // Maximum time between words
-      startDelay: 2000,  // Initial delay before first word
-      typingSpeed: 150,  // Base ms per character "typing"
+      minDelay: 2500,    // Minimum time between words
+      maxDelay: 6500,    // Maximum time between words
+      startDelay: 2500,  // Initial delay before first word
+      typingSpeed: 190,  // Base ms per character "typing"
     },
     medium: {
-      minDelay: 1500,    // Thinks quickly
-      maxDelay: 4000,    // Occasional pauses
-      startDelay: 1500,  // Scans board then starts
-      typingSpeed: 120,  // Faster typing
+      minDelay: 2200,    // Thinks quickly
+      maxDelay: 5500,    // Occasional pauses
+      startDelay: 2200,  // Scans board then starts
+      typingSpeed: 170,  // Faster typing
     },
     hard: {
-      minDelay: 800,     // Fast word recognition
-      maxDelay: 2500,    // Brief thinking pauses
-      startDelay: 800,   // Quick scan
-      typingSpeed: 70,   // Expert typing speed
+      minDelay: 1400,    // Fast word recognition
+      maxDelay: 4000,    // Brief thinking pauses
+      startDelay: 1400,  // Quick scan
+      typingSpeed: 110,  // Expert typing speed
     }
   },
 
   // Word selection configuration
-  // Medium and hard bots find fewer words per minute for more realistic gameplay
+  // Lowered another notch across the board — bots found too many words too
+  // fast and with too few mistakes at the old rates.
   WORDS: {
     easy: {
       maxWordLength: 6,       // Find short-medium words
-      wordsPerMinute: 7,      // Decent pace
+      wordsPerMinute: 5,      // Decent pace
       focusOnShort: true,     // Prefer 3-4 letter words
-      missChance: 0.10,       // 10% chance to "miss" a word
-      wrongWordChance: 0.08,  // 8% chance to submit a wrong word
+      missChance: 0.16,       // 16% chance to "miss" a word
+      wrongWordChance: 0.12,  // 12% chance to submit a wrong word
     },
     medium: {
-      maxWordLength: 8,
-      wordsPerMinute: 11,     // Competitive pace
+      maxWordLength: 7,
+      wordsPerMinute: 8,      // Competitive pace
       focusOnShort: false,
-      missChance: 0.05,       // Fewer mistakes
-      wrongWordChance: 0.04,  // 4% wrong word chance
+      missChance: 0.09,       // Fewer mistakes
+      wrongWordChance: 0.07,  // 7% wrong word chance
     },
     hard: {
-      maxWordLength: 12,      // Experts find long words
-      wordsPerMinute: 16,     // Fast and aggressive
+      maxWordLength: 10,      // Experts find long words
+      wordsPerMinute: 11,     // Fast and aggressive
       focusOnShort: false,
-      missChance: 0.03,       // Rarely misses
-      wrongWordChance: 0.02,  // Very few mistakes
+      missChance: 0.06,       // Rarely misses
+      wrongWordChance: 0.05,  // Few mistakes
     }
   },
 

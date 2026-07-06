@@ -2688,12 +2688,7 @@ const en = {
     }
   },
   "preGameTutorial": {
-    "welcome": {
-      "title": "Hey there!",
-      "subtitle": "I'm Lexi — let's go"
-    },
     "practice": {
-      "instruction": "Swipe across the letters to spell:",
       "success": "Perfect! You're getting it!"
     },
     "tips": {
@@ -2702,8 +2697,6 @@ const en = {
     },
     "letsPlay": "Let's Play!",
     "buildAvatar": "Create your avatar first?",
-    "skip": "Skip Tutorial",
-    "next": "Next",
     "step": "Step {current} of {total}"
   },
   "tips": {
@@ -6451,12 +6444,11 @@ const en = {
     "gameOver": "Time's Up!",
     "submit": "SUBMIT",
     "alreadyFound": "Already found!",
+    "alreadyFoundBonus": "Found again (+{points})",
     "notInDictionary": "Not a valid word",
     "missingCenter": "Must include center letter ({letter})",
     "tooShort": "Too short (min {min} letters)",
     "invalidLetters": "Can only use wheel letters",
-    "alreadyClosed": "Word already closed",
-    "lockedByOther": "Locked by another player",
     "yourWordStolen": "{by} stole your word {word}!",
     "stealGain": "STEAL +{score}",
     "allLettersUsed": "ALL LETTERS!",
@@ -12234,6 +12226,7 @@ const en = {
       "title": "Crack the Word",
       "step1": "Find the hidden word",
       "step2": "Spell words to reveal clues",
+      "step3": "Short words cost no try",
       "scoreTip": "Crack it first for big points!"
     },
     "wheelRush": {

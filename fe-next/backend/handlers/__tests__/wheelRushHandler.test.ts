@@ -77,7 +77,7 @@ describe('wheelRushHandler', () => {
   it('scores the word, emits accepted result, and pings wheelWordFound (first finder)', () => {
     (getGame as unknown as Mock).mockReturnValue(gameBase);
     (validateWheelSubmission as unknown as Mock).mockReturnValue({ valid: true });
-    (applyWheelWord as unknown as Mock).mockReturnValue({ kind: 'scored', score: 17, firstFinder: true, firstFinderBonus: 5 });
+    (applyWheelWord as unknown as Mock).mockReturnValue({ score: 17, firstFinder: true, firstFinderBonus: 5, repeat: false });
     const sock = mkSocket();
     handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
     expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 17, true);
@@ -94,7 +94,7 @@ describe('wheelRushHandler', () => {
   it('scores a non-first finder without a first-finder bonus (word stays claimable)', () => {
     (getGame as unknown as Mock).mockReturnValue(gameBase);
     (validateWheelSubmission as unknown as Mock).mockReturnValue({ valid: true });
-    (applyWheelWord as unknown as Mock).mockReturnValue({ kind: 'scored', score: 12, firstFinder: false, firstFinderBonus: 0 });
+    (applyWheelWord as unknown as Mock).mockReturnValue({ score: 12, firstFinder: false, firstFinderBonus: 0, repeat: false });
     const sock = mkSocket();
     handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
     expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 12, true);
@@ -106,16 +106,16 @@ describe('wheelRushHandler', () => {
     expect(events).not.toContain('wheelWordStolen');
   });
 
-  it('emits rejection without broadcast on rejected outcome', () => {
+  it('re-submitting an already-claimed word still scores (reduced) instead of being rejected', () => {
     (getGame as unknown as Mock).mockReturnValue(gameBase);
     (validateWheelSubmission as unknown as Mock).mockReturnValue({ valid: true });
-    (applyWheelWord as unknown as Mock).mockReturnValue({ kind: 'rejected', reason: 'duplicate' });
+    (applyWheelWord as unknown as Mock).mockReturnValue({ score: 3, firstFinder: false, firstFinderBonus: 0, repeat: true });
     const sock = mkSocket();
     handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
-    expect(sock.emit).toHaveBeenCalledWith('wheelWordResult', { word: 'CANE', accepted: false, error: 'duplicate' });
-    expect(broadcastToRoom).not.toHaveBeenCalled();
-    expect(updatePlayerScore).not.toHaveBeenCalled();
-    expect(addPlayerWord).not.toHaveBeenCalled();
+    expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 3, true);
+    expect(sock.emit).toHaveBeenCalledWith('wheelWordResult', expect.objectContaining({
+      word: 'CANE', accepted: true, score: 3, repeat: true,
+    }));
   });
 
   it('rejects when game is not wheel-rush mode', () => {

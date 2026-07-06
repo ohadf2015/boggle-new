@@ -73,18 +73,17 @@ interface Props {
 const MIN_LEN = WHEEL_RUSH_MIN_WORD_LEN;
 
 
-type WheelErrorCode =
-  | 'too-short' | 'no-center' | 'bad-letters' | 'not-a-word'
-  | 'already-closed' | 'locked-by-other' | 'duplicate';
+// 'duplicate'/'already-closed'/'locked-by-other' used to be real rejections
+// under the old lock/steal model. Parallel discovery removed the lock, and
+// applyWheelWord now scores repeats (reduced) instead of rejecting them, so
+// none of those codes are ever emitted anymore.
+type WheelErrorCode = 'too-short' | 'no-center' | 'bad-letters' | 'not-a-word';
 
 const ERROR_KEY: Record<WheelErrorCode, string> = {
   'too-short': 'wordWheel.tooShort',
   'no-center': 'wordWheel.missingCenter',
   'bad-letters': 'wordWheel.invalidLetters',
   'not-a-word': 'wordWheel.notInDictionary',
-  'already-closed': 'wordWheel.alreadyClosed',
-  'locked-by-other': 'wordWheel.lockedByOther',
-  'duplicate': 'wordWheel.alreadyFound',
 };
 
 export const FogCountdown: React.FC<{ endsAt: number }> = ({ endsAt }) => {

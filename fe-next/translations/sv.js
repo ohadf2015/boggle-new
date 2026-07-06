@@ -79,6 +79,7 @@ const sv = {
       "title": "Gissa ordet",
       "step1": "Hitta det dolda ordet",
       "step2": "Stava ord för att avslöja ledtrådar",
+      "step3": "Korta ord kostar inget försök",
       "scoreTip": "Rätt först ger bonus!"
     },
     "wheelRush": {
@@ -2771,12 +2772,7 @@ const sv = {
     }
   },
   "preGameTutorial": {
-    "welcome": {
-      "title": "Hej!",
-      "subtitle": "Jag är Lexi — kör!"
-    },
     "practice": {
-      "instruction": "Svep över bokstäverna för att stava:",
       "success": "Perfekt! Du förstår det!"
     },
     "tips": {
@@ -2785,8 +2781,6 @@ const sv = {
     },
     "letsPlay": "Nu kör vi!",
     "buildAvatar": "Skapa din avatar först?",
-    "skip": "Hoppa över guide",
-    "next": "Nästa",
     "step": "Steg {current} av {total}"
   },
   "tips": {
@@ -6604,12 +6598,11 @@ const sv = {
     "gameOver": "Tiden är ute!",
     "submit": "SKICKA",
     "alreadyFound": "Redan hittad!",
+    "alreadyFoundBonus": "Hittad igen (+{points})",
     "notInDictionary": "Inte ett giltigt ord",
     "missingCenter": "Måste innehålla mittenbokstaven ({letter})",
     "tooShort": "För kort (min {min} bokstäver)",
     "invalidLetters": "Kan bara använda hjulets bokstäver",
-    "alreadyClosed": "Ordet är redan stängt",
-    "lockedByOther": "Låst av en annan spelare",
     "yourWordStolen": "{by} stal ditt ord {word}!",
     "stealGain": "STÖLD +{score}",
     "allLettersUsed": "ALLA BOKSTÄVER!",

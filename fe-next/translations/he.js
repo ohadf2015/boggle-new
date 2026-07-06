@@ -2757,12 +2757,7 @@ const he = {
     }
   },
   "preGameTutorial": {
-    "welcome": {
-      "title": "היי!",
-      "subtitle": "אני לקסי — קדימה!"
-    },
     "practice": {
-      "instruction": ":החליקו על האותיות כדי לאיית",
       "success": "מושלם! אתם תופסים את זה!"
     },
     "tips": {
@@ -2771,8 +2766,6 @@ const he = {
     },
     "letsPlay": "בואו נשחק!",
     "buildAvatar": "ליצור אווטאר קודם?",
-    "skip": "דלג על ההדרכה",
-    "next": "הבא",
     "step": "שלב {current} מתוך {total}"
   },
   "tips": {
@@ -6518,12 +6511,11 @@ const he = {
     "gameOver": "הזמן נגמר!",
     "submit": "שלח",
     "alreadyFound": "כבר נמצאה!",
+    "alreadyFoundBonus": "נמצאה שוב (+{points})",
     "notInDictionary": "מילה לא חוקית",
     "missingCenter": "חייב לכלול את האות המרכזית ({letter})",
     "tooShort": "קצר מדי (מינימום {min} אותיות)",
     "invalidLetters": "ניתן להשתמש רק באותיות הגלגל",
-    "alreadyClosed": "המילה כבר נסגרה",
-    "lockedByOther": "נעול על ידי שחקן אחר",
     "yourWordStolen": "{by} גנב לך את המילה {word}!",
     "stealGain": "גניבה +{score}",
     "allLettersUsed": "כל האותיות!",
@@ -12765,6 +12757,7 @@ const he = {
       "title": "פצח את המילה",
       "step1": "מצא את המילה הנסתרת",
       "step2": "אייתו מילים כדי לחשוף רמזים",
+      "step3": "מילים קצרות לא עולות ניסיון",
       "scoreTip": "פצח ראשון = ניקוד גדול!"
     },
     "wheelRush": {

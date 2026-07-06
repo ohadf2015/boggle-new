@@ -56,9 +56,9 @@ import logger from '../../utils/logger';
  * bot floor. See shouldBotScore / BotScoreTuning.
  */
 const WHEEL_RUSH_BOT_TUNING: BotScoreTuning = {
-  targetMult: 0.7,   // hard ≈ 0.80×, medium ≈ 0.67×, easy ≈ 0.53× of best human
-  floorMult: 0.4,    // floors → easy 32 / medium 60 / hard 100
-  ceilingMult: 0.6,  // gentler fallback if nobody has scored yet
+  targetMult: 0.55,  // lowered again — hard ≈ 0.65×, medium ≈ 0.55×, easy ≈ 0.4× of best human
+  floorMult: 0.3,    // floors → easy 24 / medium 45 / hard 75
+  ceilingMult: 0.45, // gentler fallback if nobody has scored yet
   graceMs: 9_000,    // ≈ fog duration, not the classic 25s
 };
 
@@ -176,8 +176,6 @@ function submitOneWord(
   }
 
   const outcome = applyWheelWord(state, bot.username, word, Date.now());
-  if (outcome.kind !== 'scored') return; // duplicate for this bot — nothing to do.
-
   const total = outcome.score;
   if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty, WHEEL_RUSH_BOT_TUNING)) return;
   bot.score += total;
@@ -283,7 +281,7 @@ export async function startBotsForWheelRush(
     // Banded (or shuffled) slice so bots diverge — also acts as a soft per-bot cap.
     // Trimmed for the short 60s round so bots can't out-volume a focused human (see
     // WHEEL_RUSH_BOT_TUNING for the matching score-ceiling softening).
-    const perBotCap = bot.difficulty === 'hard' ? 18 : bot.difficulty === 'medium' ? 12 : 8;
+    const perBotCap = bot.difficulty === 'hard' ? 14 : bot.difficulty === 'medium' ? 9 : 6;
     const ordered = rankByWord
       ? orderWordPoolByFrequencyBand(allCandidates, rankByWord, playerWords.length, bot.difficulty)
       : shuffle(allCandidates);

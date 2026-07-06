@@ -2600,12 +2600,7 @@ const ja = {
     }
   },
   "preGameTutorial": {
-    "welcome": {
-      "title": "やあ！",
-      "subtitle": "レクシーだよ — いくよ！"
-    },
     "practice": {
-      "instruction": "文字をなぞって単語を作ろう：",
       "success": "完璧！いい感じ！"
     },
     "tips": {
@@ -2614,8 +2609,6 @@ const ja = {
     },
     "letsPlay": "さあ遊ぼう！",
     "buildAvatar": "先にアバターを作る？",
-    "skip": "チュートリアルをスキップ",
-    "next": "次へ",
     "step": "ステップ {current} / {total}"
   },
 
@@ -6484,12 +6477,11 @@ const ja = {
     "gameOver": "時間切れ！",
     "submit": "送信",
     "alreadyFound": "すでに見つかりました！",
+    "alreadyFoundBonus": "再発見 (+{points})",
     "notInDictionary": "有効な単語ではありません",
     "missingCenter": "中央の文字（{letter}）を含める必要があります",
     "tooShort": "短すぎます（最低{min}文字）",
     "invalidLetters": "ホイールの文字のみ使用できます",
-    "alreadyClosed": "単語はすでに確定済みです",
-    "lockedByOther": "他のプレイヤーがロック中",
     "yourWordStolen": "{by}に単語{word}を奪われました！",
     "stealGain": "スチール +{score}",
     "allLettersUsed": "全文字使用！",
@@ -14165,6 +14157,7 @@ const ja = {
       "title": "単語を当てる",
       "step1": "隠れた単語を見つけよう",
       "step2": "言葉を作ってヒントを集めよう",
+      "step3": "短い単語は無料だよ",
       "scoreTip": "いち早く当てると大加点！"
     },
     "wheelRush": {

@@ -3667,12 +3667,7 @@ const ru = {
     }
   },
   "preGameTutorial": {
-    "welcome": {
-      "title": "Привет!",
-      "subtitle": "Я Лекси — пошли"
-    },
     "practice": {
-      "instruction": "Проведи по буквам для составления:",
       "success": "Идеально! Ты разбираешься!"
     },
     "tips": {
@@ -3681,8 +3676,6 @@ const ru = {
     },
     "letsPlay": "Давай играть!",
     "buildAvatar": "Создать аватара сначала?",
-    "skip": "Пропустить обучение",
-    "next": "Дальше",
     "step": "Шаг {current} из {total}"
   },
   "reveal": {
@@ -6934,6 +6927,7 @@ const ru = {
       "title": "Разгадай Слово",
       "step1": "Найди скрытое слово",
       "step2": "Произноси слова чтобы открыть подсказки",
+      "step3": "Короткие слова не тратят попытку",
       "scoreTip": "Разгадай первым за большие очки!"
     },
     "wheelRush": {
@@ -10407,12 +10401,11 @@ const ru = {
     "gameOver": "Время Вышло!",
     "submit": "ОТПРАВИТЬ",
     "alreadyFound": "Уже найдено!",
+    "alreadyFoundBonus": "Найдено снова (+{points})",
     "notInDictionary": "Слово не в словаре",
     "missingCenter": "Должно содержать центральную букву ({letter})",
     "tooShort": "Слишком коротко (мин {min} букв)",
     "invalidLetters": "Можно использовать только буквы колеса",
-    "alreadyClosed": "Слово уже закрыто",
-    "lockedByOther": "Заблокировано другим игроком",
     "yourWordStolen": "{by} украл твоё слово {word}!",
     "stealGain": "КРАЖА +{score}",
     "allLettersUsed": "ВСЕ БУКВЫ!",

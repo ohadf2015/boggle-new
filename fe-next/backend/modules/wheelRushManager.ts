@@ -14,6 +14,7 @@ import {
   WHEEL_RUSH_FIRST_FINDER_BONUS,
   WHEEL_RUSH_MIN_WORD_LEN,
   WHEEL_RUSH_PANGRAM_BONUS,
+  WHEEL_RUSH_REPEAT_SCORE_FACTOR,
 } from '@/shared/constants/wheelRushConstants';
 import { calculateWordScoreByLength } from '@/shared/utils/scoring';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
@@ -189,17 +190,18 @@ export function scoreWheelWord(word: string, allLetters: string[]): number {
   return usesAll ? base + WHEEL_RUSH_PANGRAM_BONUS : base;
 }
 
-export type WheelApplyOutcome =
-  | {
-      kind: 'scored';
-      /** Total awarded = base word score (+ first-finder bonus when applicable). */
-      score: number;
-      /** True if this player was the first in the room to find this word. */
-      firstFinder: boolean;
-      /** Flat bonus included in `score` (0 when not the first finder). */
-      firstFinderBonus: number;
-    }
-  | { kind: 'rejected'; reason: 'duplicate' };
+export interface WheelApplyOutcome {
+  /** Total awarded (base word score, reduced on repeat, + first-finder bonus when applicable). */
+  score: number;
+  /** True if this player was the first in the room to find this word. */
+  firstFinder: boolean;
+  /** Flat bonus included in `score` (0 when not the first finder). */
+  firstFinderBonus: number;
+  /** True if this player already claimed this exact word before — it still
+   *  scores, just at WHEEL_RUSH_REPEAT_SCORE_FACTOR of the base value instead
+   *  of being rejected outright. */
+  repeat: boolean;
+}
 
 /**
  * Apply a validated word submission — parallel-discovery semantics.
@@ -209,7 +211,8 @@ export type WheelApplyOutcome =
  *   - The FIRST player in the room to submit a given word also gets a flat
  *     first-finder bonus (WHEEL_RUSH_FIRST_FINDER_BONUS). The word then stays
  *     open and claimable at base score for everyone else.
- *   - A player cannot claim the same word twice (their own duplicate is rejected).
+ *   - Re-submitting a word this player already claimed still scores, just at
+ *     a reduced rate — repeating a found word is never a dead end.
  *
  * `now` is accepted for signature parity with the old lock model; it is unused.
  */
@@ -221,7 +224,7 @@ export function applyWheelWord(
 ): WheelApplyOutcome {
   const upper = word.toUpperCase();
   const userList = state.foundWords[username] ?? (state.foundWords[username] = []);
-  if (userList.includes(upper)) return { kind: 'rejected', reason: 'duplicate' };
+  const repeat = userList.includes(upper);
 
   if (!state.firstFinders) state.firstFinders = {};
   const isFirstFinder = !(upper in state.firstFinders);
@@ -229,14 +232,26 @@ export function applyWheelWord(
 
   const base = scoreWheelWord(upper, state.puzzle.allLetters);
   const firstFinderBonus = isFirstFinder ? WHEEL_RUSH_FIRST_FINDER_BONUS : 0;
-  const score = base + firstFinderBonus;
 
-  userList.push(upper);
+  let score: number;
+  if (!repeat) {
+    score = base + firstFinderBonus;
+  } else {
+    // Repeat bonus pays out ONCE per word per player — otherwise resubmitting
+    // the same word forever would farm unbounded points.
+    if (!state.repeatCredited) state.repeatCredited = {};
+    const credited = state.repeatCredited[username] ?? (state.repeatCredited[username] = []);
+    const alreadyCredited = credited.includes(upper);
+    score = alreadyCredited ? 0 : Math.max(1, Math.round(base * WHEEL_RUSH_REPEAT_SCORE_FACTOR));
+    if (!alreadyCredited) credited.push(upper);
+  }
+
+  if (!repeat) userList.push(upper);
   const stats = ensureStats(state, username);
-  stats.wordsLocked += 1;              // total words this player claimed
-  if (isFirstFinder) stats.wordsStolen += 1; // repurposed: first-finder count
+  if (!repeat) stats.wordsLocked += 1;        // total unique words this player claimed
+  if (isFirstFinder) stats.wordsStolen += 1;  // repurposed: first-finder count
   stats.totalScore += score;
   bumpBestWord(stats, upper);
 
-  return { kind: 'scored', score, firstFinder: isFirstFinder, firstFinderBonus };
+  return { score, firstFinder: isFirstFinder, firstFinderBonus, repeat };
 }

@@ -68,34 +68,30 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
 
   const outcome = applyWheelWord(state, username, word, Date.now());
 
-  if (outcome.kind === 'scored') {
-    updatePlayerScore(gameCode, username, outcome.score, true);
-    addPlayerWord(gameCode, username, word, {
-      score: outcome.score,
-      validated: true,
-      autoValidated: true,
-    });
-    // `kind: 'locked'` here means "locked into your own word list" — the client's
-    // accepted-word rendering keys off it. Parallel discovery: the word is NOT
-    // exclusive; it stays claimable by everyone else at base score.
-    socket.emit('wheelWordResult', {
-      word, accepted: true, kind: 'locked',
-      score: outcome.score,
-      firstFinder: outcome.firstFinder,
-      firstFinderBonus: outcome.firstFinderBonus,
-    });
-    // Opponent-activity ping (no locking side effects on other clients). Lets the
-    // room surface "X found WORD" / leaderboard refresh without gating the word.
-    broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordFound', {
-      word, by: username, firstFinder: outcome.firstFinder,
-    });
-    broadcastWheelLeaderboard(io, gameCode);
-    logger.info('WHEEL_RUSH', `${username} found "${word}" in ${gameCode} (+${outcome.score}${outcome.firstFinder ? ' first-find' : ''})`);
-    return;
-  }
-
-  // rejected — duplicate claim by the same player.
-  socket.emit('wheelWordResult', { word, accepted: false, error: outcome.reason });
+  updatePlayerScore(gameCode, username, outcome.score, true);
+  addPlayerWord(gameCode, username, word, {
+    score: outcome.score,
+    validated: true,
+    autoValidated: true,
+  });
+  // `kind: 'locked'` here means "locked into your own word list" — the client's
+  // accepted-word rendering keys off it. Parallel discovery: the word is NOT
+  // exclusive; it stays claimable by everyone else at base score. Repeats of a
+  // word this player already claimed still land here, just at a lower score.
+  socket.emit('wheelWordResult', {
+    word, accepted: true, kind: 'locked',
+    score: outcome.score,
+    firstFinder: outcome.firstFinder,
+    firstFinderBonus: outcome.firstFinderBonus,
+    repeat: outcome.repeat,
+  });
+  // Opponent-activity ping (no locking side effects on other clients). Lets the
+  // room surface "X found WORD" / leaderboard refresh without gating the word.
+  broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordFound', {
+    word, by: username, firstFinder: outcome.firstFinder,
+  });
+  broadcastWheelLeaderboard(io, gameCode);
+  logger.info('WHEEL_RUSH', `${username} found "${word}" in ${gameCode} (+${outcome.score}${outcome.firstFinder ? ' first-find' : outcome.repeat ? ' repeat' : ''})`);
 }
 
 /**
