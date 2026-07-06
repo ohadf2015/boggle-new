@@ -127,3 +127,13 @@ export function awardSoloDaily(
 
   return { awarded: reward.coins, breakdown: reward.breakdown, bonus: reward.bonus };
 }
+
+/**
+ * Mark today's daily as claimed for a mode that awards coins through its own
+ * flow (e.g. Sealed Bid cashes chips out via `addCoins` directly rather than
+ * `awardSoloDaily`). Call after awarding so the once-per-day guard holds.
+ */
+export function markSoloDailyClaimed(mode: SoloMode, dateISO: string, language: string): void {
+  if (typeof window === 'undefined') return;
+  saveToLocalStorage(soloAwardKey(mode, dateISO, language), new Date().toISOString());
+}

@@ -1,55 +1,55 @@
 'use client';
 
 /**
- * Sealed Bid single-player — admin-gated preview. Each round shows a letter
- * rack; the player secretly bids a word by TAPPING tiles (no typing), the bot
- * bids the obvious high-value word. Unique bid = double points, clash = half,
- * pass/invalid = zero. Rules live in the pure `sbEngine`; player words go
- * through /api/dictionary/check (lang follows the locale) so we don't ship the
- * full dictionary to the browser.
+ * Sealed Bid solo — a poker betting table. Each of 5 rounds deals a 7-letter
+ * rack (guaranteed to contain a full-rack word) on a word wheel. The player
+ * spells a word, stakes chips at rarity-scaled odds, and locks a SEALED bid:
+ * unique vs the hidden bots pays out, a clash loses the stake. Chips cash out
+ * to coins once per day at the end.
  *
- * Hebrew: the engine, rack, and dictionary all work in BASE-letter form (sofit
- * forms are normalized away in the he word list); we apply final letters only
- * for display via `toDisplay`, and flip text direction to RTL.
+ * Rack generation, chip math, and wager settlement are pure (`rackPool`,
+ * `chipWallet`, `wager`); player words are validated via /api/dictionary/check
+ * so we never ship the full dictionary to the browser. Hebrew works in
+ * base-letter form (the wheel applies sofits for display) and flips to RTL.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { ArrowLeft, ArrowRight, Bot, Delete, Gavel, Send, Sparkles, Trophy, User, X } from 'lucide-react';
+import { ArrowLeft, Coins, Gavel } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useCoinActions } from '@/contexts/CoinContext';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { GameStage } from '@/components/game/GameStage';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
-import {
-  advanceRound,
-  commitBid,
-  initialSbState,
-  letterValue,
-  MIN_WORD_LEN,
-  type RoundResult,
-  type SbState,
-} from '@/lib/sealedBid/sp/sbEngine';
-import { SealedBidShareCard } from '@/components/sealedBid/SealedBidShareCard';
+import SealedBidWheel from '@/components/sealedBid/SealedBidWheel';
+import OddsBoard from '@/components/sealedBid/OddsBoard';
+import ChipTray from '@/components/sealedBid/ChipTray';
+import Showdown from '@/components/sealedBid/Showdown';
 import { SealedBidSessionSummary } from '@/components/sealedBid/SealedBidSessionSummary';
-import { pickRounds, poolForLang, ROUNDS_PER_GAME } from '@/lib/sealedBid/sp/rounds';
-import { toDisplay, wordFromChosen } from '@/lib/sealedBid/sp/rackBuilder';
-import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
-import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { dealRounds, type SbRackDeal } from '@/lib/sealedBid/sp/rackPool';
 import {
-  awardSoloDaily,
-  getSoloDateISO,
-  isSoloDailyClaimed,
-  pickDailyModifier,
-} from '@/lib/solo/soloDaily';
+  initWallet,
+  clampStake,
+  applyDelta,
+  cashOutCoins,
+  START_CHIPS,
+  MIN_STAKE,
+  type ChipWallet,
+} from '@/lib/sealedBid/sp/chipWallet';
+import { settleBid, type Settlement } from '@/lib/sealedBid/sp/wager';
+import type { RoundResult } from '@/lib/sealedBid/sp/sbEngine';
+import { getSoloDateISO, isSoloDailyClaimed, markSoloDailyClaimed } from '@/lib/solo/soloDaily';
+
+const ROUNDS = 5;
+// Bot opponents are proper-noun characters (not translated UI copy).
+const BOT_NAMES: [string, string] = ['Rook', 'Vega'];
 
 async function dictCheck(word: string, lang: string): Promise<boolean> {
   try {
-    // The route is POST-only and reads { word, language } from the JSON body —
-    // a GET with query params 405s (which silently rejected every bid before).
     const res = await fetch('/api/dictionary/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -63,401 +63,285 @@ async function dictCheck(word: string, lang: string): Promise<boolean> {
   }
 }
 
+/** Two hidden bots per round, drawn from the rack's precomputed common picks. */
+function botsFor(deal: SbRackDeal, names: [string, string]): { name: string; word: string }[] {
+  const picks = deal.botPicks;
+  return [
+    { name: names[0], word: (picks[0] ?? '').toUpperCase() },
+    { name: names[1], word: (picks[1] ?? picks[0] ?? '').toUpperCase() },
+  ];
+}
+
 export default function SealedBidPage() {
   const { t } = useLanguage();
-  const { canSeeInWorkModes } = useAuth();
   const { playSound } = useSoundEffects();
+  const { addCoins } = useCoinActions();
   const params = useParams<{ locale: string }>();
   const locale = params?.locale ?? 'en';
   const isHe = locale === 'he';
   const dir = isHe ? 'rtl' : 'ltr';
   const dictLang = isHe ? 'he' : 'en';
+  const reducedMotion = useReducedMotion();
 
-  // SSR-safe init: a DETERMINISTIC slice (no Math.random in render → no
-  // hydration mismatch). We shuffle to a random draw in a mount effect below.
-  const [state, setState] = useState<SbState>(() => initialSbState(poolForLang(locale).slice(0, ROUNDS_PER_GAME)));
-  const [chosen, setChosen] = useState<number[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [deals, setDeals] = useState<SbRackDeal[]>([]);
+  const [roundIndex, setRoundIndex] = useState(0);
+  const [wallet, setWallet] = useState<ChipWallet>(() => initWallet(START_CHIPS));
+  const [chosenWord, setChosenWord] = useState('');
+  const [stake, setStake] = useState(MIN_STAKE);
+  const [settlement, setSettlement] = useState<Settlement | null>(null);
+  const [phase, setPhase] = useState<'bidding' | 'revealed' | 'done'>('bidding');
   const [pending, setPending] = useState(false);
   const [history, setHistory] = useState<RoundResult[]>([]);
+  const [coinsAwarded, setCoinsAwarded] = useState<number | undefined>(undefined);
   const [winFlash, setWinFlash] = useState(0);
-  // Poker showdown sequence: 0=hidden, 1=heading, 2=player flipped, 3=bot flipped, 4=outcome
-  const [revealStep, setRevealStep] = useState(0);
-  const builtRef = useRef<HTMLDivElement>(null);
-  const revealRef = useRef<HTMLDivElement>(null);
-  const didShuffleRef = useRef(false);
-  const revealFiredRef = useRef(false);
 
-  // Solo Daily layer: shared per-day modifier + once-per-day coin award.
-  const today = useMemo(() => getSoloDateISO(), []);
-  const dailyModifier = useMemo(() => pickDailyModifier('sealed-bid', today), [today]);
-  const [soloAward, setSoloAward] = useState<{ awarded: number; bonus: number; claimed: boolean } | null>(null);
+  const payoutTargetRef = useRef<HTMLDivElement>(null);
+  const didInitRef = useRef(false);
 
-  // Full-screen game: hide global header / bottom-nav / footer so the play
-  // surface owns the viewport (and surfaces the in-game mute FAB).
+  // Full-screen game surface.
   const setIsInGame = useHideNavigation();
   useEffect(() => {
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
 
-  // Randomize the round order once, on the client only (post-hydration).
+  // Deal the rounds once, client-only (post-hydration → no SSR mismatch).
   useEffect(() => {
-    if (didShuffleRef.current) return;
-    didShuffleRef.current = true;
-    setState(initialSbState(pickRounds(ROUNDS_PER_GAME, locale)));
-    setChosen([]);
-  }, [locale]);
+    if (didInitRef.current) return;
+    didInitRef.current = true;
+    setDeals(dealRounds(ROUNDS, dictLang, `${dictLang}-${Date.now()}`));
+  }, [dictLang]);
 
-  const round = state.rounds[state.index];
-  const result = state.lastResult;
-  const word = useMemo(() => wordFromChosen(round?.rack ?? '', chosen), [round, chosen]);
-  const canLock = word.length >= MIN_WORD_LEN && !pending;
+  const currentDeal = deals[roundIndex];
 
-  const shakeBuilt = useCallback(() => {
-    const el = builtRef.current;
-    const reduce = typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    if (el && !reduce) {
-      el.classList.remove('animate-neo-shake');
-      void el.offsetWidth;
-      el.classList.add('animate-neo-shake');
-    }
-  }, []);
+  const canLock =
+    phase === 'bidding' &&
+    !pending &&
+    !!currentDeal &&
+    chosenWord.length >= 3 &&
+    stake >= MIN_STAKE &&
+    stake <= wallet.chips &&
+    !wallet.busted;
 
-  // Accumulate completed rounds for the share card.
-  useEffect(() => {
-    if (state.phase === 'revealed' && state.lastResult) {
-      setHistory((h) => [...h, state.lastResult!]);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.lastResult]);
-
-  // Reveal ceremony — fire once whenever a round flips to revealed.
-  useEffect(() => {
-    if (state.phase !== 'revealed' || !result) return;
-    const rect = revealRef.current?.getBoundingClientRect();
-    const x = rect ? rect.left + rect.width / 2 : window.innerWidth / 2;
-    const y = rect ? rect.top + rect.height / 2 : window.innerHeight / 3;
-    if (result.outcome === 'unique') {
-      playSound('wordAccepted');
-      SharedFxApp.spawnBurst('sparkle-gold', x, y, { count: 16 });
-    } else {
-      playSound('wordRejected');
-    }
-  }, [state.phase, result, playSound]);
-
-  // Poker showdown sequence — stage the reveal over 1.4 s (skipped on reduced motion).
-  useEffect(() => {
-    if (state.phase !== 'revealed') { setRevealStep(0); return; }
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) { setRevealStep(4); return; }
-    setRevealStep(1);
-    const t1 = setTimeout(() => setRevealStep(2), 400);
-    const t2 = setTimeout(() => setRevealStep(3), 900);
-    const t3 = setTimeout(() => setRevealStep(4), 1400);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [state.phase]);
-
-  // Final fanfare on the last reveal — fire once per game end + award daily coins.
-  useEffect(() => {
-    if (state.phase !== 'done') { revealFiredRef.current = false; return; }
-    if (revealFiredRef.current) return;
-    revealFiredRef.current = true;
-    playSound('victoryFanfare');
-    setWinFlash((f) => f + 1);
-    SharedFxApp.spawnBurst('celebration', window.innerWidth / 2, window.innerHeight / 3);
-
-    // Once-per-day coin award; replays the same day are practice (claimed).
-    const claimedBefore = isSoloDailyClaimed('sealed-bid', today, dictLang);
-    const res = awardSoloDaily('sealed-bid', today, dictLang, state.totalScore, state.totalScore > 0);
-    setSoloAward(
-      res
-        ? { awarded: res.awarded, bonus: res.bonus, claimed: false }
-        : { awarded: 0, bonus: 0, claimed: claimedBefore },
-    );
-  }, [state.phase, playSound, today, dictLang, state.totalScore]);
-
-  const newGame = useCallback(() => {
-    setState(initialSbState(pickRounds(ROUNDS_PER_GAME, locale)));
-    setChosen([]);
-    setError(null);
-    setHistory([]);
-  }, [locale]);
-
-  const tapTile = useCallback((i: number) => {
-    if (state.phase !== 'bidding' || pending) return;
-    setChosen((c) => (c.includes(i) ? c : [...c, i]));
-    if (error) setError(null);
-  }, [state.phase, pending, error]);
-
-  const backspace = useCallback(() => setChosen((c) => c.slice(0, -1)), []);
-  const clear = useCallback(() => { setChosen([]); setError(null); }, []);
-
-  const lockIn = useCallback(async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (state.phase !== 'bidding' || pending) return;
-    if (word.length < MIN_WORD_LEN) return; // guarded by canLock; defensive
-    setError(null);
-    setPending(true);
-    const ok = await dictCheck(word, dictLang);
-    setPending(false);
-    if (!ok) {
-      setError(t('sealedBid.err.notWord'));
-      playSound('wordRejected');
-      shakeBuilt();
-      return;
-    }
-    setState((s) => commitBid(s, word, true));
-    setChosen([]);
-  }, [word, dictLang, state.phase, pending, t, playSound, shakeBuilt]);
-
-  const pass = useCallback(() => {
-    if (state.phase !== 'bidding' || pending) return;
-    setState((s) => commitBid(s, null, false));
-    setChosen([]);
-    setError(null);
-  }, [state.phase, pending]);
-
-  const next = useCallback(() => setState((s) => advanceRound(s)), []);
-
-  // Admin gate — hooks above run on every render so order stays stable.
-  // Dev bypass lets the preview be reached locally (incl. /he RTL playtest).
-  const isDev = process.env.NODE_ENV === 'development';
-  if (!canSeeInWorkModes && !isDev) {
-    return (
-      <main className="min-h-[100dvh] bg-neo-navy texture-halftone px-4 py-12 flex items-center justify-center">
-        <p className="font-neo-body text-neo-white text-center max-w-sm">{t('sealedBid.adminOnly')}</p>
-      </main>
-    );
-  }
-
-  const resultKey = result
-    ? result.outcome === 'unique' ? 'sealedBid.resultUnique'
-      : result.outcome === 'clash' ? 'sealedBid.resultShared'
-        : 'sealedBid.resultNone'
-    : '';
-
-  const usedTiles = new Set(chosen);
-
-  // Header slot: back link, title/badge, round counter, score
-  const header = (
-    <div className="mx-auto w-full max-w-2xl space-y-2.5">
-      <div className="flex items-center justify-between">
-        <Link
-          href={`/${locale}`}
-          className="inline-flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy-light px-2.5 py-1.5 font-neo-body text-xs text-neo-white shadow-hard-sm"
-        >
-          <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
-          {t('sealedBid.title')}
-        </Link>
-        <h1 className="truncate font-neo-display text-base font-black uppercase tracking-wide text-neo-white">
-          {t('sealedBid.title')}
-        </h1>
-        <span className="inline-flex items-center gap-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white">
-          <Gavel className="h-3.5 w-3.5" />
-          {t('sealedBid.badge')}
-        </span>
-      </div>
-
-      <div className="flex items-center justify-between gap-2">
-        <span className="rounded-neo border-2 border-black bg-neo-navy-light px-3 py-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white shadow-hard-sm">
-          {t('sealedBid.roundLabel', { n: state.index + 1, total: state.rounds.length })}
-        </span>
-        <span className="rounded-neo border-2 border-black bg-neo-cyan px-3 py-1.5 font-neo-display font-black text-xs uppercase tracking-wide text-neo-navy shadow-hard-sm">
-          {t('sealedBid.totalScore', { score: state.totalScore })}
-        </span>
-      </div>
-
-      <p className="text-center font-neo-body text-sm text-neo-white/90">{t('sealedBid.instructions')}</p>
-    </div>
+  const recordAndReveal = useCallback(
+    (sett: Settlement, playerWord: string | null) => {
+      setWallet((w) => applyDelta(w, sett.delta));
+      setSettlement(sett);
+      setHistory((h) => [
+        ...h,
+        {
+          outcome: sett.outcome,
+          basePoints: sett.stake,
+          points: sett.delta,
+          playerWord,
+          botWord: currentDeal?.botPicks[0] ?? '',
+        },
+      ]);
+      setPhase('revealed');
+      if (sett.outcome === 'unique') {
+        playSound('wordAccepted');
+      } else if (sett.outcome === 'clash') {
+        playSound('wordRejected');
+      }
+    },
+    [currentDeal, playSound],
   );
 
-  // Footer slot: during bidding phase, the rack and word-builder controls; during revealed/done, null
-  const footer =
-    state.phase === 'bidding' ? (
-      <div className="mx-auto w-full max-w-2xl space-y-3">
-        {/* The rack — tappable tiles. Used tiles dim out. */}
-        <div dir={dir} className="flex flex-wrap items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard">
-          {round.rack.split('').map((ch, i) => {
-            const used = usedTiles.has(i);
-            const disabled = used || state.phase !== 'bidding' || pending;
-            return (
-              <button
-                key={`${ch}-${i}`}
-                type="button"
-                onClick={() => tapTile(i)}
-                disabled={disabled}
-                aria-label={ch}
-                className={`relative inline-flex h-12 w-12 items-center justify-center rounded-neo border-2 border-black font-neo-display font-black text-2xl shadow-hard-sm transition-transform ${
-                  used ? 'bg-neo-navy text-neo-white/30' : 'bg-neo-cream text-neo-navy hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed'
-                } disabled:cursor-default`}
-              >
-                {/* Tiles show the BASE glyph — sofit forms only appear at word end (built strip / reveal). */}
-                {ch}
-                <span className="absolute -top-1.5 ltr:-right-1.5 rtl:-left-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-black bg-neo-cyan px-1 font-neo-body text-[10px] font-bold leading-none text-neo-navy">
-                  {letterValue(ch)}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+  const lockBid = useCallback(async () => {
+    if (!canLock || !currentDeal) return;
+    setPending(true);
+    const dictOk = await dictCheck(chosenWord, dictLang);
+    setPending(false);
+    const sett = settleBid({
+      playerWord: dictOk ? chosenWord : null,
+      botWords: currentDeal.botPicks,
+      dictOk,
+      rack: currentDeal.rack,
+      stake,
+    });
+    recordAndReveal(sett, dictOk ? chosenWord.toUpperCase() : null);
+  }, [canLock, currentDeal, chosenWord, dictLang, stake, recordAndReveal]);
 
-        {/* Controls — backspace/clear edit the bid shown centre-stage; lock-in seals it. */}
-        <form onSubmit={lockIn} className="space-y-2">
-          {error && <p className="text-center font-neo-body text-sm text-neo-red">{error}</p>}
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={backspace}
-              disabled={chosen.length === 0 || pending}
-              aria-label={t('sealedBid.backspace')}
-              className="inline-flex h-12 flex-1 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
-            >
-              <Delete className="h-5 w-5 rtl:rotate-180" />
-            </button>
-            <button
-              type="button"
-              onClick={clear}
-              disabled={chosen.length === 0 || pending}
-              aria-label={t('sealedBid.clear')}
-              className="inline-flex h-12 flex-1 items-center justify-center rounded-neo border-3 border-black bg-neo-navy-light text-neo-white shadow-hard-sm disabled:opacity-40"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={!canLock}
-              className="flex flex-1 items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-lime px-5 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-0.5 disabled:opacity-50"
-            >
-              <Send className="h-4 w-4" />
-              {t('sealedBid.lockIn')}
-            </button>
-            <button
-              type="button"
-              onClick={pass}
-              disabled={pending}
-              className="rounded-neo border-3 border-black bg-neo-navy-light px-4 py-3 font-neo-display font-black text-xs uppercase tracking-wide text-neo-white shadow-hard-sm disabled:opacity-50"
-            >
-              {t('sealedBid.skip')}
-            </button>
-          </div>
-        </form>
-      </div>
-    ) : null;
+  const pass = useCallback(() => {
+    if (phase !== 'bidding' || pending || !currentDeal) return;
+    const sett = settleBid({
+      playerWord: null,
+      botWords: currentDeal.botPicks,
+      dictOk: false,
+      rack: currentDeal.rack,
+      stake: 0,
+    });
+    recordAndReveal(sett, null);
+  }, [phase, pending, currentDeal, recordAndReveal]);
+
+  // Advance to the next round, or end the game (busted / last round).
+  const nextRound = useCallback(() => {
+    if (phase !== 'revealed') return;
+    const endedWallet = wallet; // wallet already reflects this round's delta
+    setChosenWord('');
+    setStake(MIN_STAKE);
+    setSettlement(null);
+
+    if (endedWallet.busted || roundIndex >= ROUNDS - 1) {
+      setPhase('done');
+      playSound('victoryFanfare');
+      setWinFlash((f) => f + 1);
+      if (!reducedMotion) {
+        SharedFxApp.spawnBurst('celebration', window.innerWidth / 2, window.innerHeight / 3);
+      }
+      // Cash out chips → coins, ONCE per day. Mark claimed synchronously before
+      // the async award so a fast replay can't double-award (Class-1 guard).
+      if (!isSoloDailyClaimed('sealed-bid', getSoloDateISO(), dictLang)) {
+        const coins = cashOutCoins(endedWallet.chips);
+        if (coins > 0) {
+          markSoloDailyClaimed('sealed-bid', getSoloDateISO(), dictLang);
+          addCoins(coins, 'sealed_bid_cashout', {
+            chips: endedWallet.chips,
+            rounds: (roundIndex + 1).toString(),
+            busted: endedWallet.busted ? 'yes' : 'no',
+          }).catch(() => {});
+        }
+        setCoinsAwarded(coins);
+      } else {
+        setCoinsAwarded(0);
+      }
+    } else {
+      setRoundIndex((i) => i + 1);
+      setPhase('bidding');
+    }
+  }, [phase, wallet, roundIndex, reducedMotion, dictLang, addCoins, playSound]);
+
+  const newGame = useCallback(() => {
+    setDeals(dealRounds(ROUNDS, dictLang, `${dictLang}-${Date.now()}`));
+    setRoundIndex(0);
+    setWallet(initWallet(START_CHIPS));
+    setChosenWord('');
+    setStake(MIN_STAKE);
+    setSettlement(null);
+    setPhase('bidding');
+    setHistory([]);
+    setCoinsAwarded(undefined);
+  }, [dictLang]);
 
   return (
-    <GameStage accent="cyan" header={header} footer={footer}>
-      <ModeCoach mode="sealedBid" />
-      <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-cyan/40" />
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3">
-        {state.phase === 'done' ? (
-          <div className="space-y-4">
-            <div className="flex flex-1 items-center justify-center">
-              <div className="w-full animate-neo-pop rounded-neo border-3 border-black bg-neo-cyan p-6 text-center shadow-hard-lg space-y-4">
-                <h2 className="inline-flex items-center justify-center gap-2 font-neo-display font-black text-2xl uppercase text-neo-navy">
-                  <Trophy className="h-6 w-6" />
-                  {t('sealedBid.finalScore')}
-                </h2>
-                <p className="font-neo-display font-black text-5xl text-neo-navy">{state.totalScore}</p>
-              </div>
-            </div>
-            {soloAward && (
-              <SoloRewardCard
-                t={t}
-                awarded={soloAward.awarded}
-                bonus={soloAward.bonus}
-                modifier={dailyModifier}
-                claimed={soloAward.claimed}
-                onPlayAgain={newGame}
-              />
-            )}
-            {history.length > 0 && (
-              <SealedBidSessionSummary history={history} totalScore={state.totalScore} />
-            )}
-            {history.length > 0 && (
-              <SealedBidShareCard history={history} totalScore={state.totalScore} />
-            )}
+    <GameStage>
+      <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-lime" />
+      <main
+        dir={dir}
+        className="mx-auto flex min-h-[100dvh] w-full max-w-2xl flex-col gap-4 bg-neo-navy px-4 py-4 text-neo-white"
+      >
+        {/* Header: back + round counter + chip stack (coin-stream target) */}
+        <header className="flex items-center justify-between gap-2">
+          <Link
+            href={`/${locale}`}
+            aria-label={t('common.back')}
+            className="flex h-10 w-10 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard"
+          >
+            <ArrowLeft className="h-5 w-5 text-neo-cyan rtl:rotate-180" aria-hidden="true" />
+          </Link>
+
+          <div className="flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 shadow-hard">
+            <Gavel className="h-4 w-4 text-neo-cyan" aria-hidden="true" />
+            <span className="font-neo-display font-black text-sm text-neo-white">
+              {t('sealedBid.round')} {Math.min(roundIndex + 1, ROUNDS)}/{ROUNDS}
+            </span>
           </div>
-        ) : state.phase === 'revealed' && result ? (
-          <div ref={revealRef} className="rounded-neo border-3 border-black bg-neo-navy-light p-5 text-center shadow-hard-lg space-y-3">
-            {/* Poker showdown heading — fades in first */}
-            <p className={`font-neo-display font-black text-sm uppercase tracking-[0.25em] transition-opacity duration-300 ${revealStep >= 1 ? 'text-neo-yellow opacity-100' : 'opacity-0'}`}>
-              {t('sealedBid.showdown')}
-            </p>
-            <div dir={dir} className="flex items-center justify-center gap-4">
-              {/* Player flip card */}
-              <div className="space-y-1">
-                <p className="inline-flex items-center gap-1 font-neo-body text-xs text-neo-white/80"><User className="h-3.5 w-3.5" />{t('sealedBid.youPicked')}</p>
-                <div style={{ perspective: '600px' }}>
-                  <div
-                    className="relative min-w-[80px]"
-                    style={{ transformStyle: 'preserve-3d', transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1)', transform: revealStep >= 2 ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
-                  >
-                    <div className="rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 font-neo-display font-black text-lg text-neo-white/40 shadow-hard-sm text-center select-none" style={{ backfaceVisibility: 'hidden' }}>?</div>
-                    <div className="absolute inset-0 flex items-center justify-center rounded-neo border-2 border-black bg-neo-lime px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-                      {result.playerWord ? toDisplay(result.playerWord) : '—'}
-                    </div>
-                  </div>
-                </div>
+
+          <div
+            ref={payoutTargetRef}
+            data-testid="chip-stack"
+            className="flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 shadow-hard"
+          >
+            <Coins className="h-4 w-4 text-neo-yellow" aria-hidden="true" />
+            <span className="font-neo-display font-black text-sm text-neo-yellow">{wallet.chips}</span>
+          </div>
+        </header>
+
+        {phase !== 'done' && currentDeal && (
+          <>
+            {/* Word wheel — spell your bid */}
+            <section className="flex flex-1 items-center justify-center">
+              <SealedBidWheel
+                key={roundIndex}
+                letters={currentDeal.displayLetters}
+                disabled={phase !== 'bidding' || pending}
+                onChange={(word) => setChosenWord(word)}
+                onSubmit={() => {
+                  if (canLock) void lockBid();
+                }}
+                reducedMotion={reducedMotion}
+                dir={dir}
+              />
+            </section>
+
+            {/* Odds board + chip tray — read the odds, place your stake */}
+            <section className="space-y-3">
+              <OddsBoard word={chosenWord} stake={stake} reducedMotion={reducedMotion} />
+              <ChipTray
+                balance={wallet.chips}
+                stake={stake}
+                disabled={phase !== 'bidding' || pending}
+                onStakeChange={(s) => setStake(clampStake(wallet, s))}
+                reducedMotion={reducedMotion}
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={pass}
+                  disabled={phase !== 'bidding' || pending}
+                  className="flex-1 rounded-neo border-neo-thick border-black bg-neo-navy-light px-4 py-3 font-neo-display font-black uppercase tracking-wide text-neo-white/70 shadow-hard disabled:opacity-40"
+                >
+                  {t('sealedBid.pass')}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void lockBid()}
+                  disabled={!canLock}
+                  className="flex-[2] rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40"
+                >
+                  {t('sealedBid.lockBid')}
+                </button>
               </div>
-              {/* Bot flip card */}
-              <div className="space-y-1">
-                <p className="inline-flex items-center gap-1 font-neo-body text-xs text-neo-white/80"><Bot className="h-3.5 w-3.5" />{t('sealedBid.botPicked')}</p>
-                <div style={{ perspective: '600px' }}>
-                  <div
-                    className="relative min-w-[80px]"
-                    style={{ transformStyle: 'preserve-3d', transition: 'transform 0.5s cubic-bezier(0.4,0,0.2,1)', transform: revealStep >= 3 ? 'rotateY(180deg)' : 'rotateY(0deg)' }}
-                  >
-                    <div className="rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 font-neo-display font-black text-lg text-neo-white/40 shadow-hard-sm text-center select-none" style={{ backfaceVisibility: 'hidden' }}>?</div>
-                    <div className="absolute inset-0 flex items-center justify-center rounded-neo border-2 border-black bg-neo-pink px-3 py-1.5 font-neo-display font-black text-lg text-neo-navy shadow-hard-sm" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
-                      {toDisplay(result.botWord)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            {/* Outcome + points fade in after both cards flip */}
-            <div className={`space-y-1 transition-opacity duration-300 ${revealStep >= 4 ? 'opacity-100' : 'opacity-0'}`}>
-              <p className={`inline-flex items-center justify-center gap-1.5 font-neo-display font-black text-lg uppercase ${result.outcome === 'unique' ? 'text-neo-lime' : result.outcome === 'clash' ? 'text-neo-orange' : 'text-neo-white/70'}`}>
-                {result.outcome === 'unique' && <Sparkles className="h-5 w-5" />}
-                {t(resultKey)}
-              </p>
-              <p className="font-neo-display font-black text-2xl text-neo-white">{t('sealedBid.pointsEarned', { pts: result.points })}</p>
+            </section>
+          </>
+        )}
+
+        {/* Showdown overlay */}
+        {phase === 'revealed' && settlement && currentDeal && (
+          <Showdown
+            playerWord={settlement.outcome === 'none' ? null : chosenWord.toUpperCase()}
+            bots={botsFor(currentDeal, BOT_NAMES)}
+            settlement={settlement}
+            reducedMotion={reducedMotion}
+            onDone={nextRound}
+            payoutTargetRef={payoutTargetRef}
+          />
+        )}
+
+        {/* Game over: cash-out summary */}
+        {phase === 'done' && (
+          <section className="flex flex-1 flex-col items-center justify-center gap-4">
+            <h2 className="font-neo-display font-black text-2xl uppercase tracking-wide text-neo-yellow">
+              {wallet.busted ? t('sealedBid.busted') : t('sealedBid.gameOver')}
+            </h2>
+            <div className="w-full max-w-md">
+              <SealedBidSessionSummary
+                history={history}
+                totalScore={wallet.chips}
+                chips={wallet.chips}
+                coinsAwarded={coinsAwarded}
+              />
             </div>
             <button
               type="button"
-              onClick={next}
-              className="inline-flex items-center gap-2 rounded-neo border-3 border-black bg-neo-cyan px-5 py-2.5 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard"
+              onClick={newGame}
+              className="rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
             >
-              {t('sealedBid.nextRound')}
-              <ArrowRight className="h-4 w-4 rtl:rotate-180" />
+              {t('sealedBid.playAgain')}
             </button>
-          </div>
-        ) : (
-          /* Bidding: the secret word being built takes centre stage above the rack. */
-          <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-            <p className="font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/80">
-              {t('sealedBid.sealPhase')}
-            </p>
-            <div
-              ref={builtRef}
-              dir={dir}
-              aria-live="polite"
-              className="flex min-h-[88px] w-full max-w-sm items-center justify-center rounded-neo border-3 border-black bg-neo-cream px-5 py-4 font-neo-display font-black text-4xl tracking-widest text-neo-navy shadow-hard-lg"
-            >
-              {word ? (
-                toDisplay(word)
-              ) : (
-                <span className="font-neo-body text-base font-normal tracking-normal text-neo-navy/50">
-                  {t('sealedBid.tapHint')}
-                </span>
-              )}
-            </div>
-          </div>
+          </section>
         )}
-      </div>
+      </main>
     </GameStage>
   );
 }

@@ -8,6 +8,10 @@ import type { RoundResult } from '@/lib/sealedBid/sp/sbEngine';
 interface Props {
   history: RoundResult[];
   totalScore: number;
+  /** Chips left in the wallet at cash-out (poker wager mode). */
+  chips?: number;
+  /** Coins awarded from the chip cash-out (once/day). */
+  coinsAwarded?: number;
 }
 
 export function buildBluffShareText(history: RoundResult[], totalScore: number): string {
@@ -16,7 +20,7 @@ export function buildBluffShareText(history: RoundResult[], totalScore: number):
   return `🧠 Outsmarted the bot ${unique}/${total} rounds — ${totalScore} pts\nlexiclash.com/en/sealed-bid`;
 }
 
-export function SealedBidSessionSummary({ history, totalScore }: Props) {
+export function SealedBidSessionSummary({ history, totalScore, chips, coinsAwarded }: Props) {
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
@@ -90,6 +94,24 @@ export function SealedBidSessionSummary({ history, totalScore }: Props) {
           <span className="font-neo-body text-[10px] text-neo-white/50">{t('sealedBid.session.passLabel')}</span>
         </div>
       </div>
+
+      {coinsAwarded !== undefined && (
+        <div
+          data-testid="sealed-bid-cashout"
+          className="flex items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-navy px-3 py-2 shadow-hard-sm"
+        >
+          <span className="font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/70">
+            {t('sealedBid.cashOut')}
+          </span>
+          <span className="font-neo-display font-black text-sm text-neo-cyan">
+            {chips ?? 0} {t('sealedBid.chips')}
+          </span>
+          <span className="text-neo-white/40" aria-hidden="true">→</span>
+          <span className="font-neo-display font-black text-base text-neo-yellow">
+            {coinsAwarded} 🪙
+          </span>
+        </div>
+      )}
 
       <button
         type="button"

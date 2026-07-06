@@ -281,7 +281,25 @@ const en = {
     "err": {
       "notInRack": "Use only the rack letters",
       "notWord": "Not in the dictionary"
-    }
+    },
+    "allIn": "All in",
+    "currentStake": "Current stake",
+    "balance": "Balance",
+    "stake": "Stake",
+    "uniquePays": "Unique pays {mult}x",
+    "potentialPayout": "Potential payout {amount}",
+    "lockBid": "Lock bid",
+    "pass": "Pass",
+    "unique": "Unique",
+    "clash": "Clash",
+    "busted": "Busted",
+    "cashOut": "Cash out",
+    "chips": "Chips",
+    "round": "Round",
+    "chipStack": "Chips: {chips}",
+    "gameOver": "Game over",
+    "youWin": "You win!",
+    "continue": "Continue"
   },
   "wordAlchemy": {
     "badge": "Word Alchemy",
