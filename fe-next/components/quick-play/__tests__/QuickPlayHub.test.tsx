@@ -9,6 +9,12 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({ user: { id: 'u1' } }),
 }));
 vi.mock('@/lib/analytics/lazyPosthog', () => ({ default: { capture: vi.fn() } }));
+vi.mock('@/components/ui/BackButton', () => ({
+  BackButton: ({ label }: any) => <button data-testid="mock-back">{label}</button>,
+}));
+vi.mock('@/hooks/useBackOneLevel', () => ({
+  useBackOneLevel: () => vi.fn(),
+}));
 vi.mock('../QuickPlayWheel', () => ({
   QuickPlayWheel: ({ onSelect, onPlay }: any) => (
     <div>

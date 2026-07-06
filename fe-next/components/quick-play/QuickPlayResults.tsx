@@ -13,6 +13,7 @@ import { haptics } from '@/utils/haptics/HapticsManager';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
 import { celebrationTier } from './celebrationTier';
 import { quickRank } from './quickRank';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { QuickRoundResult, QuickSubmitOutcome } from './types';
 
 export interface QuickRival {
@@ -44,7 +45,7 @@ const GAUGE_R = 54;
 const GAUGE_C = 2 * Math.PI * GAUGE_R;
 
 export function QuickPlayResults({ result, outcome, rival, onNextRound, onChallenge }: QuickPlayResultsProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const [showFullBoard, setShowFullBoard] = useState(false);
   const celebrated = useRef(false);
@@ -113,8 +114,8 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
       </h1>
 
       {isPersonalBest && (
-        <div className="animate-neo-pop rounded-2xl border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-bold tracking-wide text-black shadow-hard" data-testid="quick-new-best">
-          {t('quickPlay.solo.newBest')}
+        <div className="animate-neo-pop -rotate-1 rounded-2xl border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-bold tracking-wide text-black shadow-hard" data-testid="quick-new-best">
+          ★ {t('quickPlay.solo.newBest')}
         </div>
       )}
       {rankedUp && (
@@ -192,8 +193,8 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
           <span className="text-neo-white/60">
             {rankNow.nextAt !== null
               ? t('quickPlay.solo.rankProgress', {
-                  points: String(outcome.totalPoints),
-                  next: String(rankNow.nextAt),
+                  points: safeToLocaleString(outcome.totalPoints, language),
+                  next: safeToLocaleString(rankNow.nextAt, language),
                   rank: t(`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`),
                 })
               : t('quickPlay.solo.rankMax')}

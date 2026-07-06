@@ -13,6 +13,8 @@ import { QuickModeAdapter } from './adapters/QuickModeAdapter';
 import { QuickPlayResults, type QuickRival } from './QuickPlayResults';
 import { shareChallenge } from './challengeShare';
 import { quickRank } from './quickRank';
+import { BackButton } from '@/components/ui/BackButton';
+import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import type { WheelSelection } from './wheelGeometry';
 import { QUICK_MODES, type QuickMode, type QuickRoundConfig, type QuickRoundResult, type QuickSubmitOutcome } from './types';
 
@@ -43,6 +45,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   const [challenge, setChallenge] = useState<ChallengeInfo | null>(null);
   const [answered, setAnswered] = useState<{ name: string; theirPct: number; yourPct: number } | null>(null);
   const [totalPoints, setTotalPoints] = useState<number | null>(null);
+  const goBack = useBackOneLevel();
   const submitting = useRef(false);
 
   // Loop closer: tell the challenger when someone answered their challenge.
@@ -232,6 +235,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   return (
     <div className="flex min-h-full flex-col bg-neo-navy pb-8" data-testid="quick-play-hub">
       <header className="flex items-center justify-between px-5 pt-6">
+        <BackButton onClick={goBack} label={t('common.back')} isDarkMode />
         <div className="text-center">
           <h1 className="font-neo-display text-2xl font-bold tracking-wide text-neo-cream">
             {t('quickPlay.solo.title')}

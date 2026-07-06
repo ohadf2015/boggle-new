@@ -18,11 +18,11 @@ import { QUICK_MODES, type QuickMode } from './types';
 // ponytail: local color map — the two "canonical" maps (MODE_ACTIVE_COLORS,
 // BattleModeCard families) disagree and both reuse colors across these 4 modes;
 // the wheel needs 4 visually distinct families.
-const NODE_COLORS: Record<QuickMode, { bg: string; ring: string; text: string }> = {
-  classic: { bg: 'bg-neo-lime', ring: 'ring-neo-lime', text: 'text-neo-lime' },
-  blast: { bg: 'bg-neo-pink', ring: 'ring-neo-pink', text: 'text-neo-pink' },
-  'word-hunt': { bg: 'bg-neo-cyan', ring: 'ring-neo-cyan', text: 'text-neo-cyan' },
-  'wheel-rush': { bg: 'bg-neo-purple', ring: 'ring-neo-purple', text: 'text-neo-purple' },
+const NODE_COLORS: Record<QuickMode, { bg: string; ring: string; text: string; tether: string }> = {
+  classic: { bg: 'bg-neo-lime', ring: 'ring-neo-lime-light', text: 'text-neo-lime', tether: 'bg-neo-lime' },
+  blast: { bg: 'bg-neo-pink', ring: 'ring-neo-pink-light', text: 'text-neo-pink', tether: 'bg-neo-pink' },
+  'word-hunt': { bg: 'bg-neo-cyan', ring: 'ring-neo-cyan-light', text: 'text-neo-cyan', tether: 'bg-neo-cyan' },
+  'wheel-rush': { bg: 'bg-neo-purple', ring: 'ring-neo-purple-light', text: 'text-neo-purple', tether: 'bg-neo-purple' },
 };
 
 const RING_RADIUS_PX = 132;
@@ -107,6 +107,14 @@ export function QuickPlayWheel({ selection, onSelect, onPlay }: QuickPlayWheelPr
           className="absolute inset-14 rounded-full border-[3px] border-dashed border-neo-white/20"
           aria-hidden
         />
+        {active !== 'random' && (
+          <div
+            aria-hidden
+            data-testid="quick-wheel-tether"
+            className={`absolute left-1/2 top-1/2 z-[1] h-[118px] w-1.5 origin-top border-2 border-black ${NODE_COLORS[active].tether}`}
+            style={{ transform: `translateX(-50%) rotate(${NODE_ANGLES[active] - 180}deg)` }}
+          />
+        )}
         {QUICK_MODES.map((mode, idx) => {
           const rad = (NODE_ANGLES[mode] * Math.PI) / 180;
           const x = Math.sin(rad) * RING_RADIUS_PX;
@@ -127,7 +135,7 @@ export function QuickPlayWheel({ selection, onSelect, onPlay }: QuickPlayWheelPr
             >
               <span
                 className={`animate-neo-pop flex h-full w-full flex-col items-center justify-center gap-1 rounded-2xl border-neo-thick border-black font-neo-display text-xs font-semibold text-black ${
-                  isActive ? 'shadow-hard-lg' : 'shadow-hard'
+                  isActive ? `shadow-hard-lg ring-4 ${NODE_COLORS[mode].ring}` : 'shadow-hard'
                 } ${NODE_COLORS[mode].bg}`}
                 style={{ animationDelay: `${idx * 80}ms`, animationFillMode: 'both' }}
               >
@@ -168,7 +176,11 @@ export function QuickPlayWheel({ selection, onSelect, onPlay }: QuickPlayWheelPr
       <p className="text-sm text-neo-white/55">{t('quickPlay.solo.dragHint')}</p>
 
       <div className="flex w-full flex-col items-center gap-3 px-5">
-        <p className="font-neo-display text-[15px] text-neo-cream">
+        <p className="flex items-center justify-center gap-2.5 font-neo-display text-[15px] text-neo-cream">
+          <span
+            aria-hidden
+            className={`h-3.5 w-3.5 rounded border-2 border-black ${active !== 'random' ? NODE_COLORS[active].bg : 'bg-neo-cozy'}`}
+          />
           {t('quickPlay.solo.selected')}{' '}
           <b className={active !== 'random' ? NODE_COLORS[active].text : 'text-neo-cozy'}>
             {t(active === 'random' ? 'quickPlay.solo.random' : `quickPlay.solo.mode.${active}`)}
