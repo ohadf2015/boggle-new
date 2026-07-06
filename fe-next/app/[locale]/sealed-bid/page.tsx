@@ -15,9 +15,10 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, Coins, Gavel } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCoinActions } from '@/contexts/CoinContext';
@@ -83,6 +84,13 @@ export default function SealedBidPage() {
   const dictLang = isHe ? 'he' : 'en';
   const reducedMotion = useReducedMotion();
 
+  // Beta gate: Sealed Bid is in-work (admins OR beta testers only). Wait for
+  // auth to resolve before deciding, so we never flash the game to a
+  // non-beta user (Class-1 async-resolution guard).
+  const router = useRouter();
+  const { canSeeInWorkModes, loading: authLoading } = useAuth();
+  const betaAllowed = canSeeInWorkModes || process.env.NODE_ENV === 'development';
+
   const [deals, setDeals] = useState<SbRackDeal[]>([]);
   const [roundIndex, setRoundIndex] = useState(0);
   const [wallet, setWallet] = useState<ChipWallet>(() => initWallet(START_CHIPS));
@@ -105,6 +113,11 @@ export default function SealedBidPage() {
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
+
+  // Redirect non-beta users home once auth resolves.
+  useEffect(() => {
+    if (!authLoading && !betaAllowed) router.replace(`/${locale}`);
+  }, [authLoading, betaAllowed, locale, router]);
 
   // Deal the rounds once, client-only (post-hydration → no SSR mismatch).
   useEffect(() => {
@@ -229,6 +242,12 @@ export default function SealedBidPage() {
     setHistory([]);
     setCoinsAwarded(undefined);
   }, [dictLang]);
+
+  // Pessimistic render until auth resolves and confirms beta access — no flash
+  // of the game to non-beta users.
+  if (authLoading || !betaAllowed) {
+    return <div className="min-h-[100dvh] bg-neo-navy" aria-hidden />;
+  }
 
   return (
     <GameStage>
