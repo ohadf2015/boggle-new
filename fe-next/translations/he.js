@@ -229,41 +229,22 @@ const he = {
       }
     }
   },
-  "sealedBid": {
-    "allIn": "הכול פנימה",
-    "currentStake": "ההימור הנוכחי",
-    "balance": "יתרה",
-    "stake": "הימור",
-    "uniquePays": "ייחודי משלם {mult}x",
-    "potentialPayout": "זכייה אפשרית {amount}",
-    "lockBid": "נעילת הימור",
-    "pass": "דילוג",
-    "unique": "ייחודי",
-    "clash": "התנגשות",
-    "notAWord": "לא מילה",
-    "busted": "נגמרו הז'יטונים",
-    "cashOut": "פדיון",
-    "chips": "ז'יטונים",
-    "round": "סיבוב",
-    "chipStack": "ז'יטונים: {chips}",
-    "gameOver": "המשחק נגמר",
-    "youWin": "ניצחת!",
-    "continue": "המשך",
-    "mp": {
-      "waiting": "מכינים את המכרז…",
-      "round": "סבב {{n}}/{{total}}",
-      "scores": "ניקוד",
-      "youWin": "זכיתם במכרז!",
-      "wins": "זכה במכרז!",
-      "bidPrompt": "בנו מילה מהאותיות — בחרו אחת שאף יריב לא יבחר!",
-      "results": "ההצעות נחשפו",
-      "outcome": { "unique": "ייחודי ×2", "clash": "התנגשות ÷2", "none": "אין הצעה" },
-      "locked": "ההצעה ננעלה — ממתינים ליריבים…",
-      "lockProgress": "{{locked}}/{{total}} ננעלו",
-      "clear": "נקה",
-      "pass": "ויתור",
-      "lock": "נעל הצעה"
-    },
+  "sealedBidMp": {
+    "waiting": "מכינים את המכרז…",
+    "round": "סבב {{n}}/{{total}}",
+    "scores": "ניקוד",
+    "youWin": "זכיתם במכרז!",
+    "wins": "זכה במכרז!",
+    "bidPrompt": "בנו מילה מהאותיות — בחרו אחת שאף יריב לא יבחר!",
+    "results": "ההצעות נחשפו",
+    "outcome": { "unique": "ייחודי ×2", "clash": "התנגשות ÷2", "none": "אין הצעה" },
+    "locked": "ההצעה ננעלה — ממתינים ליריבים…",
+    "lockProgress": "{{locked}}/{{total}} ננעלו",
+    "clear": "נקה",
+    "pass": "ויתור",
+    "lock": "נעל הצעה"
+  },
+  "sealedBidLegacy": {
     "badge": "הצעה חתומה",
     "title": "הצעה חתומה",
     "instructions": "בחרו מילה שאף אחד לא יבחר — הצעה ייחודית מכפילה ניקוד!",
@@ -14700,7 +14681,25 @@ const he = {
     "cashOut": "משוך",
     "chips": "שבבים",
     "showdown": "הצגת כוח",
-    "round": "סיבוב"
+    "round": "סיבוב",
+    "vsRivals": "מול {a} ו{b}",
+    "gameOver": "המשחק נגמר",
+    "playAgain": "שחק שוב",
+    "notAWord": "לא מילה",
+    "continue": "המשך",
+    "shareCard": {
+      "title": "הסיפור שלך",
+      "cta": "שתף תוצאה",
+      "copied": "הועתק!"
+    },
+    "session": {
+      "title": "מונה הבלוף",
+      "outsmarted": "סיבובים שבהם ניצחתי",
+      "uniqueLabel": "ייחודי",
+      "clashLabel": "התנגשות",
+      "passLabel": "פאס",
+      "shareCta": "שתף תוצאה"
+    }
   }
 };
 

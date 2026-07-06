@@ -225,26 +225,22 @@ const es = {
       }
     }
   },
-  "sealedBid": {
-    "allIn": "Todo dentro",
-    "currentStake": "Apuesta actual",
-    "balance": "Saldo",
-    "stake": "Apuesta",
-    "uniquePays": "Única paga {mult}x",
-    "potentialPayout": "Pago posible {amount}",
-    "lockBid": "Fijar apuesta",
+  "sealedBidMp": {
+    "waiting": "Preparando la subasta…",
+    "round": "Ronda {{n}}/{{total}}",
+    "scores": "Puntuaciones",
+    "youWin": "¡Ganaste la subasta!",
+    "wins": "gana la subasta!",
+    "bidPrompt": "Forma una palabra con las letras — ¡elige una que nadie más elija!",
+    "results": "Pujas reveladas",
+    "outcome": { "unique": "Única ×2", "clash": "Choque ÷2", "none": "Sin puja" },
+    "locked": "Puja fijada — esperando a los rivales…",
+    "lockProgress": "{{locked}}/{{total}} fijadas",
+    "clear": "Limpiar",
     "pass": "Pasar",
-    "unique": "Única",
-    "clash": "Choque",
-    "notAWord": "No es una palabra",
-    "busted": "Sin fichas",
-    "cashOut": "Cobrar",
-    "chips": "Fichas",
-    "round": "Ronda",
-    "chipStack": "Fichas: {chips}",
-    "gameOver": "Fin del juego",
-    "youWin": "¡Ganaste!",
-    "continue": "Continuar",
+    "lock": "Fijar apuesta"
+  },
+  "sealedBidLegacy": {
     "badge": "Puja secreta",
     "title": "Puja secreta",
     "instructions": "Elige la palabra que nadie más elegirá — ¡las pujas únicas dan el doble de puntos!",
@@ -14320,7 +14316,25 @@ const es = {
     "cashOut": "Retirar",
     "chips": "Fichas",
     "showdown": "Enfrentamiento",
-    "round": "Ronda"
+    "round": "Ronda",
+    "vsRivals": "vs {a} y {b}",
+    "gameOver": "Fin del juego",
+    "playAgain": "Jugar de nuevo",
+    "notAWord": "No es una palabra",
+    "continue": "Continuar",
+    "shareCard": {
+      "title": "Tu historia de engaños",
+      "cta": "Compartir resultado",
+      "copied": "¡Copiado!"
+    },
+    "session": {
+      "title": "Contador de bluffs",
+      "outsmarted": "rondas superadas",
+      "uniqueLabel": "Único",
+      "clashLabel": "Choque",
+      "passLabel": "Paso",
+      "shareCta": "Compartir puntuación"
+    }
   }
 };
 

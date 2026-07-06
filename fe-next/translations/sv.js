@@ -400,26 +400,22 @@ const sv = {
       }
     }
   },
-  "sealedBid": {
-    "allIn": "Satsa allt",
-    "currentStake": "Nuvarande insats",
-    "balance": "Saldo",
-    "stake": "Insats",
-    "uniquePays": "Unik betalar {mult}x",
-    "potentialPayout": "Möjlig vinst {amount}",
-    "lockBid": "Lås budet",
+  "sealedBidMp": {
+    "waiting": "Förbereder auktionen…",
+    "round": "Runda {{n}}/{{total}}",
+    "scores": "Poäng",
+    "youWin": "Du vann auktionen!",
+    "wins": "vann auktionen!",
+    "bidPrompt": "Bygg ett ord från brickorna — välj ett ingen annan väljer!",
+    "results": "Buden avslöjade",
+    "outcome": { "unique": "Unikt ×2", "clash": "Krock ÷2", "none": "Inget bud" },
+    "locked": "Budet är låst — väntar på motståndare…",
+    "lockProgress": "{{locked}}/{{total}} låsta",
+    "clear": "Rensa",
     "pass": "Passa",
-    "unique": "Unik",
-    "clash": "Krock",
-    "notAWord": "Inte ett ord",
-    "busted": "Pank",
-    "cashOut": "Lös in",
-    "chips": "Marker",
-    "round": "Runda",
-    "chipStack": "Marker: {chips}",
-    "gameOver": "Spelet slut",
-    "youWin": "Du vann!",
-    "continue": "Fortsätt",
+    "lock": "Lås budet"
+  },
+  "sealedBidLegacy": {
     "badge": "Förseglat bud",
     "title": "Förseglat bud",
     "instructions": "Välj ett ord ingen annan väljer — unikt bud ger dubbla poäng!",
@@ -14233,7 +14229,25 @@ const sv = {
     "cashOut": "Ta ut",
     "chips": "Marker",
     "showdown": "Avgöring",
-    "round": "Omgång"
+    "round": "Omgång",
+    "vsRivals": "mot {a} och {b}",
+    "gameOver": "Spelet slut",
+    "playAgain": "Spela igen",
+    "notAWord": "Inte ett ord",
+    "continue": "Fortsätt",
+    "shareCard": {
+      "title": "Din bluffhistoria",
+      "cta": "Dela resultat",
+      "copied": "Kopierat!"
+    },
+    "session": {
+      "title": "Bluffräknare",
+      "outsmarted": "rundor överlistas",
+      "uniqueLabel": "Unik",
+      "clashLabel": "Krock",
+      "passLabel": "Pass",
+      "shareCta": "Dela poäng"
+    }
   }
 };
 

@@ -53,7 +53,7 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
   if (!game.ready) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center bg-neo-navy" dir={dir}>
-        <p className="animate-pulse font-neo-display text-xl text-neo-pink">{t('sealedBid.mp.waiting')}</p>
+        <p className="animate-pulse font-neo-display text-xl text-neo-pink">{t('sealedBidMp.waiting')}</p>
       </div>
     );
   }
@@ -70,9 +70,9 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
         {/* Round + scoreboard */}
         <div className="flex items-center justify-between">
           <span className="font-neo-display text-sm font-bold text-neo-cream/70">
-            {t('sealedBid.mp.round', { n: game.index + 1, total: game.totalRounds })}
+            {t('sealedBidMp.round', { n: game.index + 1, total: game.totalRounds })}
           </span>
-          <ul className="flex flex-wrap gap-2" aria-label={t('sealedBid.mp.scores')}>
+          <ul className="flex flex-wrap gap-2" aria-label={t('sealedBidMp.scores')}>
             {sortedScores.map(([u, s]) => (
               <li key={u} className={`rounded-neo border-neo border-black px-2.5 py-1 font-neo-display text-xs shadow-hard ${u === username ? 'bg-neo-pink text-black' : 'bg-neo-navy-light text-neo-white'}`}>
                 {u} <span className="tabular-nums">{s}</span>
@@ -84,13 +84,13 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
         {/* Game over */}
         {game.phase === 'done' ? (
           <div className="rounded-neo border-neo-thick border-black bg-neo-yellow p-5 text-center font-neo-display text-2xl font-bold text-black shadow-hard" role="status">
-            {game.winner === username ? t('sealedBid.mp.youWin') : `${game.winner ?? ''} ${t('sealedBid.mp.wins')}`}
+            {game.winner === username ? t('sealedBidMp.youWin') : `${game.winner ?? ''} ${t('sealedBidMp.wins')}`}
           </div>
         ) : (
           <>
             {/* Rack */}
             <div className="text-center">
-              <p className="font-neo-body text-sm text-neo-white/80">{t('sealedBid.mp.bidPrompt')}</p>
+              <p className="font-neo-body text-sm text-neo-white/80">{t('sealedBidMp.bidPrompt')}</p>
               <div className="mt-2 flex flex-wrap justify-center gap-1.5">
                 {rack.split('').map((letter, i) => {
                   const used = picks.includes(i);
@@ -117,13 +117,13 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
 
             {/* Reveal */}
             {game.phase === 'revealed' && game.results && (
-              <ol className="flex flex-col gap-1.5" aria-label={t('sealedBid.mp.results')}>
+              <ol className="flex flex-col gap-1.5" aria-label={t('sealedBidMp.results')}>
                 {[...game.results].sort((a, b) => b.points - a.points).map((r) => (
                   <li key={r.username} className={`flex items-center justify-between rounded-neo border-neo border-black px-3 py-1.5 font-neo-body text-sm shadow-hard ${
                     r.outcome === 'unique' ? 'bg-neo-lime text-black' : r.outcome === 'clash' ? 'bg-neo-orange text-black' : 'bg-neo-navy-light text-neo-white/70'
                   }`}>
                     <span className="font-bold">{r.username}</span>
-                    <span className="tabular-nums">{r.word ?? '—'} · {t(`sealedBid.mp.outcome.${r.outcome}`)} · +{r.points}</span>
+                    <span className="tabular-nums">{r.word ?? '—'} · {t(`sealedBidMp.outcome.${r.outcome}`)} · +{r.points}</span>
                   </li>
                 ))}
               </ol>
@@ -134,19 +134,19 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
               <div className="flex flex-col gap-2">
                 {locked ? (
                   <p className="text-center font-neo-display font-bold text-neo-cyan" role="status">
-                    {t('sealedBid.mp.locked')}
-                    {game.lockProgress && <span className="ml-2 text-neo-cream/60">{t('sealedBid.mp.lockProgress', { locked: game.lockProgress.locked, total: game.lockProgress.total })}</span>}
+                    {t('sealedBidMp.locked')}
+                    {game.lockProgress && <span className="ml-2 text-neo-cream/60">{t('sealedBidMp.lockProgress', { locked: game.lockProgress.locked, total: game.lockProgress.total })}</span>}
                   </p>
                 ) : (
                   <div className="flex gap-2">
-                    <button type="button" onClick={backspace} disabled={picks.length === 0} aria-label={t('sealedBid.mp.clear')} className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-3 text-neo-white shadow-hard disabled:opacity-40">
+                    <button type="button" onClick={backspace} disabled={picks.length === 0} aria-label={t('sealedBidMp.clear')} className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-3 text-neo-white shadow-hard disabled:opacity-40">
                       <Delete className="h-5 w-5" />
                     </button>
                     <button type="button" onClick={pass} className="rounded-neo border-neo-thick border-black bg-neo-navy-light px-4 py-3 font-neo-display font-bold text-neo-white shadow-hard">
-                      {t('sealedBid.mp.pass')}
+                      {t('sealedBidMp.pass')}
                     </button>
                     <button type="button" onClick={lockBid} disabled={word.length < 3} className="flex flex-1 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-pink py-3 font-neo-display text-lg font-bold text-black shadow-hard disabled:opacity-40">
-                      {t('sealedBid.mp.lock')}
+                      {t('sealedBidMp.lock')}
                     </button>
                   </div>
                 )}

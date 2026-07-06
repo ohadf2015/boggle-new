@@ -30,14 +30,14 @@ describe('SealedBidVersus', () => {
   it('shows a waiting state before init', () => {
     mockState = { ...base, ready: false };
     render(<SealedBidVersus socket={null} username="me" />);
-    expect(screen.getByText('sealedBid.mp.waiting')).toBeInTheDocument();
+    expect(screen.getByText('sealedBidMp.waiting')).toBeInTheDocument();
   });
 
   it('renders the rack and a disabled lock until a 3+ letter word is built', () => {
     render(<SealedBidVersus socket={null} username="me" />);
     // 7 rack tiles
     expect(screen.getByLabelText('T')).toBeInTheDocument();
-    const lock = screen.getByText('sealedBid.mp.lock');
+    const lock = screen.getByText('sealedBidMp.lock');
     expect(lock).toBeDisabled();
   });
 
@@ -46,14 +46,14 @@ describe('SealedBidVersus', () => {
     fireEvent.click(screen.getByLabelText('T'));
     fireEvent.click(screen.getByLabelText('R'));
     fireEvent.click(screen.getByLabelText('A'));
-    fireEvent.click(screen.getByText('sealedBid.mp.lock'));
+    fireEvent.click(screen.getByText('sealedBidMp.lock'));
     expect(submitBid).toHaveBeenCalledWith('TRA');
   });
 
   it('shows lock-confirmation once my bid is locked', () => {
     mockState = { ...base, myLock: { word: 'TRAIN', valid: true }, lockProgress: { locked: 1, total: 2 } };
     render(<SealedBidVersus socket={null} username="me" />);
-    expect(screen.getByText('sealedBid.mp.locked')).toBeInTheDocument();
+    expect(screen.getByText('sealedBidMp.locked')).toBeInTheDocument();
   });
 
   it('renders reveal outcomes', () => {
@@ -63,12 +63,12 @@ describe('SealedBidVersus', () => {
       scores: { me: 12, bob: 0 },
     };
     render(<SealedBidVersus socket={null} username="me" />);
-    expect(screen.getByText(/sealedBid.mp.outcome.unique/)).toBeInTheDocument();
+    expect(screen.getByText(/sealedBidMp.outcome.unique/)).toBeInTheDocument();
   });
 
   it('renders the win banner on game over', () => {
     mockState = { ...base, phase: 'done', winner: 'me' };
     render(<SealedBidVersus socket={null} username="me" />);
-    expect(screen.getByText('sealedBid.mp.youWin')).toBeInTheDocument();
+    expect(screen.getByText('sealedBidMp.youWin')).toBeInTheDocument();
   });
 });

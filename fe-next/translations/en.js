@@ -225,22 +225,22 @@ const en = {
       }
     }
   },
-  "sealedBid": {
-    "mp": {
-      "waiting": "Setting up the auction…",
-      "round": "Round {{n}}/{{total}}",
-      "scores": "Scores",
-      "youWin": "You win the auction!",
-      "wins": "wins the auction!",
-      "bidPrompt": "Build a word from the rack — pick one no rival will!",
-      "results": "Bids revealed",
-      "outcome": { "unique": "Unique ×2", "clash": "Clash ÷2", "none": "No bid" },
-      "locked": "Bid locked — waiting for rivals…",
-      "lockProgress": "{{locked}}/{{total}} locked",
-      "clear": "Clear",
-      "pass": "Pass",
-      "lock": "Lock bid"
-    },
+  "sealedBidMp": {
+    "waiting": "Setting up the auction…",
+    "round": "Round {{n}}/{{total}}",
+    "scores": "Scores",
+    "youWin": "You win the auction!",
+    "wins": "wins the auction!",
+    "bidPrompt": "Build a word from the rack — pick one no rival will!",
+    "results": "Bids revealed",
+    "outcome": { "unique": "Unique ×2", "clash": "Clash ÷2", "none": "No bid" },
+    "locked": "Bid locked — waiting for rivals…",
+    "lockProgress": "{{locked}}/{{total}} locked",
+    "clear": "Clear",
+    "pass": "Pass",
+    "lock": "Lock bid"
+  },
+  "sealedBidLegacy": {
     "badge": "Sealed Bid",
     "title": "Sealed Bid",
     "instructions": "Pick a word nobody else will — unique bids score double!",
@@ -14607,7 +14607,25 @@ const en = {
     "cashOut": "Cash out",
     "chips": "Chips",
     "showdown": "Showdown",
-    "round": "Round"
+    "round": "Round",
+    "vsRivals": "vs {a} & {b}",
+    "gameOver": "Game over",
+    "playAgain": "Play again",
+    "notAWord": "Not a word",
+    "continue": "Continue",
+    "shareCard": {
+      "title": "Your bluffing story",
+      "cta": "Share result",
+      "copied": "Copied!"
+    },
+    "session": {
+      "title": "Bluff Counter",
+      "outsmarted": "rounds outsmarted",
+      "uniqueLabel": "Unique",
+      "clashLabel": "Clash",
+      "passLabel": "Pass",
+      "shareCta": "Share Score"
+    }
   }
 };
 

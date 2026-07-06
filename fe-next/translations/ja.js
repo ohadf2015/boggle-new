@@ -229,26 +229,22 @@ const ja = {
       }
     }
   },
-  "sealedBid": {
-    "allIn": "オールイン",
-    "currentStake": "現在の賭け金",
-    "balance": "残高",
-    "stake": "賭け金",
-    "uniquePays": "ユニークは{mult}倍",
-    "potentialPayout": "予想配当 {amount}",
-    "lockBid": "ビッドを確定",
+  "sealedBidMp": {
+    "waiting": "オークションを準備中…",
+    "round": "ラウンド {{n}}/{{total}}",
+    "scores": "スコア",
+    "youWin": "オークション勝利！",
+    "wins": "がオークションに勝利！",
+    "bidPrompt": "ラックから単語を作ろう — 誰も選ばない単語を！",
+    "results": "入札結果を公開",
+    "outcome": { "unique": "ユニーク ×2", "clash": "衝突 ÷2", "none": "入札なし" },
+    "locked": "入札を確定 — 対戦相手を待っています…",
+    "lockProgress": "{{locked}}/{{total}} 人が確定",
+    "clear": "クリア",
     "pass": "パス",
-    "unique": "ユニーク",
-    "clash": "衝突",
-    "notAWord": "辞書にない単語",
-    "busted": "チップ切れ",
-    "cashOut": "換金",
-    "chips": "チップ",
-    "round": "ラウンド",
-    "chipStack": "チップ: {chips}",
-    "gameOver": "ゲーム終了",
-    "youWin": "勝利！",
-    "continue": "続ける",
+    "lock": "入札を確定"
+  },
+  "sealedBidLegacy": {
     "badge": "シールドビッド",
     "title": "シールドビッド",
     "instructions": "誰も選ばない単語を選べ — ユニークな入札で得点2倍！",
@@ -14241,7 +14237,25 @@ const ja = {
     "cashOut": "キャッシュアウト",
     "chips": "チップ",
     "showdown": "ショーダウン",
-    "round": "ラウンド"
+    "round": "ラウンド",
+    "vsRivals": "{a}・{b}と対戦中",
+    "gameOver": "ゲーム終了",
+    "playAgain": "もう一度",
+    "notAWord": "単語ではありません",
+    "continue": "続ける",
+    "shareCard": {
+      "title": "あなたのブラフ記録",
+      "cta": "結果をシェア",
+      "copied": "コピーしました！"
+    },
+    "session": {
+      "title": "ブラフカウンター",
+      "outsmarted": "ラウンド上回った",
+      "uniqueLabel": "ユニーク",
+      "clashLabel": "クラッシュ",
+      "passLabel": "パス",
+      "shareCta": "スコアをシェア"
+    }
   }
 };
 
