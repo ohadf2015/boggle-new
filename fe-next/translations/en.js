@@ -9666,18 +9666,18 @@ const en = {
   },
   "wheelRush": {
     "title": "Wheel Rush",
-    "description": "Lock letters fast. Steal opponents' words.",
+    "description": "Race to spell words on the wheel — find one first for a bonus!",
     "results": {
       "matchRecap": "Wheel Rush Recap",
       "sceneTitle": "Wheel Settles",
-      "totalLocks": "Words Locked",
-      "stealRate": "Steal Rate",
-      "locks": "Locks",
-      "steals": "Steals",
+      "totalLocks": "Words Found",
+      "stealRate": "First-Find Rate",
+      "locks": "Words",
+      "steals": "First Finds",
       "boardDomination": "Wheel Domination",
       "pts": "pts",
-      "locksmith": "Locksmith",
-      "bandit": "Bandit",
+      "locksmith": "Word Machine",
+      "bandit": "Trailblazer",
       "wordsmith": "Wordsmith"
     },
     "ftue": {
@@ -12346,8 +12346,8 @@ const en = {
     },
     "wheelRush": {
       "name": "Wheel Rush",
-      "description": "Race the wheel — steal words to win!",
-      "feature1": "Steal-lock window",
+      "description": "Race the wheel — be first to a word for a bonus!",
+      "feature1": "First-finder bonus",
       "feature2": "Fog of war",
       "feature3": "Pangram bonus",
       "intro": {

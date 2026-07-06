@@ -10239,18 +10239,18 @@ const he = {
   },
   "wheelRush": {
     "title": "גלגל מרוץ",
-    "description": "נעל אותיות במהירות. גנוב מילים מהיריבים.",
+    "description": "מרוץ לאיית מילים על הגלגל — מצא ראשון וקבל בונוס!",
     "results": {
       "matchRecap": "סיכום גלגל מרוץ",
       "sceneTitle": "הגלגל נעצר",
-      "totalLocks": "מילים נעולות",
-      "stealRate": "אחוז גניבה",
-      "locks": "נעילות",
-      "steals": "גניבות",
+      "totalLocks": "מילים שנמצאו",
+      "stealRate": "אחוז ראשונים",
+      "locks": "מילים",
+      "steals": "ראשונים",
       "boardDomination": "שליטה בגלגל",
       "pts": "נק'",
-      "locksmith": "מנעולן",
-      "bandit": "שודד",
+      "locksmith": "מכונת מילים",
+      "bandit": "חלוץ",
       "wordsmith": "אמן מילים"
     },
     "ftue": {

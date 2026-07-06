@@ -1,6 +1,6 @@
 /**
  * Wheel Rush Manager Tests
- * Pure logic: puzzle gen, validation, steal-lock state machine, reap.
+ * Pure logic: puzzle gen, validation, parallel word discovery + first-finder bonus.
  */
 
 import { describe, it, expect, vi } from 'vitest';
@@ -20,12 +20,9 @@ import {
   validateWheelSubmission,
   scoreWheelWord,
   applyWheelWord,
-  reapExpiredLocks,
 } from '../wheelRushManager';
 import {
-  WHEEL_RUSH_LOCK_MS,
-  WHEEL_RUSH_STEAL_BONUS,
-  WHEEL_RUSH_FIRST_FINDER_MULT,
+  WHEEL_RUSH_FIRST_FINDER_BONUS,
   WHEEL_RUSH_PANGRAM_BONUS,
 } from '@/shared/constants/wheelRushConstants';
 import { calculateWordScoreByLength } from '@/shared/utils/scoring';
@@ -117,10 +114,11 @@ describe('wheelRushManager', () => {
     it('accepts valid word', () => {
       expect(validateWheelSubmission(state(), 'CANE', 'en')).toEqual({ valid: true });
     });
-    it('rejects already-closed', () => {
+    it('still accepts a word another player already found (parallel discovery)', () => {
       const s = state();
-      s.closed.push('CANE');
-      expect(validateWheelSubmission(s, 'CANE', 'en').error).toBe('already-closed');
+      // Simulate p2 having already claimed CANE — it must remain valid for p1.
+      applyWheelWord(s, 'p2', 'CANE', 1000);
+      expect(validateWheelSubmission(s, 'CANE', 'en')).toEqual({ valid: true });
     });
 
     // Hebrew sofit normalization: keyboard input may send the final form (ם)
@@ -144,32 +142,37 @@ describe('wheelRushManager', () => {
     });
   });
 
-  describe('applyWheelWord — steal-lock', () => {
+  describe('applyWheelWord — parallel discovery + first-finder bonus', () => {
     const puzzle = { centerLetter: 'C', outerLetters: ['A','N','E','S','T','X'], allLetters: ['C','A','N','E','S','T','X'] };
 
-    it('first finder gets locked w/ multiplier', () => {
+    it('first finder gets base score + first-finder bonus and is recorded', () => {
       const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
       const r = applyWheelWord(s, 'p1', 'CANE', 1000);
-      expect(r.kind).toBe('locked');
-      if (r.kind === 'locked') {
-        expect(r.lockUntil).toBe(1000 + WHEEL_RUSH_LOCK_MS);
-        expect(r.score).toBe(Math.round(calculateWordScoreByLength(4) * WHEEL_RUSH_FIRST_FINDER_MULT));
+      expect(r.kind).toBe('scored');
+      if (r.kind === 'scored') {
+        expect(r.firstFinder).toBe(true);
+        expect(r.firstFinderBonus).toBe(WHEEL_RUSH_FIRST_FINDER_BONUS);
+        expect(r.score).toBe(calculateWordScoreByLength(4) + WHEEL_RUSH_FIRST_FINDER_BONUS);
       }
-      expect(s.locks['CANE'].by).toBe('p1');
+      expect(s.firstFinders['CANE']).toBe('p1');
+      expect(s.foundWords.p1).toContain('CANE');
     });
 
-    it('second finder during window steals', () => {
+    it('a second player can still claim the same word — no lock, base score only', () => {
       const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
       applyWheelWord(s, 'p1', 'CANE', 1000);
       const r = applyWheelWord(s, 'p2', 'CANE', 1500);
-      expect(r.kind).toBe('stolen');
-      if (r.kind === 'stolen') {
-        expect(r.from).toBe('p1');
-        expect(r.stealBonus).toBe(WHEEL_RUSH_STEAL_BONUS);
+      expect(r.kind).toBe('scored');
+      if (r.kind === 'scored') {
+        expect(r.firstFinder).toBe(false);
+        expect(r.firstFinderBonus).toBe(0);
         expect(r.score).toBe(calculateWordScoreByLength(4));
       }
-      expect(s.closed).toContain('CANE');
-      expect(s.locks['CANE']).toBeUndefined();
+      // The word stays credited to BOTH players (parallel discovery).
+      expect(s.foundWords.p1).toContain('CANE');
+      expect(s.foundWords.p2).toContain('CANE');
+      // First-finder attribution never changes hands.
+      expect(s.firstFinders['CANE']).toBe('p1');
     });
 
     it('rejects duplicate by same user', () => {
@@ -178,81 +181,53 @@ describe('wheelRushManager', () => {
       const r = applyWheelWord(s, 'p1', 'CANE', 1500);
       expect(r.kind).toBe('rejected');
     });
-
-    it('after lock expires, next finder becomes new locker', () => {
-      const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
-      applyWheelWord(s, 'p1', 'CANE', 1000);
-      const r = applyWheelWord(s, 'p2', 'CANE', 1000 + WHEEL_RUSH_LOCK_MS + 1);
-      expect(r.kind).toBe('locked');
-    });
   });
 
   describe('playerStats tracking', () => {
     const puzzle = { centerLetter: 'C', outerLetters: ['A','N','E','S','T','X'], allLetters: ['C','A','N','E','S','T','X'] };
 
-    it('initWheelRushState seeds empty playerStats per player', () => {
+    it('initWheelRushState seeds empty playerStats + firstFinders', () => {
       const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
       expect(s.playerStats).toEqual({
         p1: { wordsLocked: 0, wordsStolen: 0, wordsStolenFromMe: 0, bestWord: '', totalScore: 0 },
         p2: { wordsLocked: 0, wordsStolen: 0, wordsStolenFromMe: 0, bestWord: '', totalScore: 0 },
       });
+      expect(s.firstFinders).toEqual({});
     });
 
-    it('locked outcome increments wordsLocked and totalScore', () => {
+    it('scored outcome increments wordsLocked (words found) and totalScore', () => {
       const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
       const r = applyWheelWord(s, 'p1', 'CANE', 1000);
-      expect(r.kind).toBe('locked');
+      expect(r.kind).toBe('scored');
       expect(s.playerStats.p1.wordsLocked).toBe(1);
-      if (r.kind === 'locked') {
+      if (r.kind === 'scored') {
         expect(s.playerStats.p1.totalScore).toBe(r.score);
       }
       expect(s.playerStats.p1.bestWord).toBe('CANE');
     });
 
-    it('stolen outcome credits stealer and debits original locker', () => {
+    it('first-finder count (wordsStolen) only increments for the first finder', () => {
       const s = initWheelRushState(puzzle, ['p1','p2'], 1000);
-      applyWheelWord(s, 'p1', 'CANE', 1000);
-      const r = applyWheelWord(s, 'p2', 'CANE', 1500);
-      expect(r.kind).toBe('stolen');
-      expect(s.playerStats.p2.wordsStolen).toBe(1);
-      expect(s.playerStats.p1.wordsStolenFromMe).toBe(1);
-      if (r.kind === 'stolen') {
-        expect(s.playerStats.p2.totalScore).toBe(r.score + r.stealBonus);
-      }
-      expect(s.playerStats.p2.bestWord).toBe('CANE');
+      applyWheelWord(s, 'p1', 'CANE', 1000);  // p1 first
+      applyWheelWord(s, 'p2', 'CANE', 1500);  // p2 not first
+      expect(s.playerStats.p1.wordsStolen).toBe(1);
+      expect(s.playerStats.p2.wordsStolen).toBe(0);
+      // No stealing occurs, so nothing is ever debited.
+      expect(s.playerStats.p1.wordsStolenFromMe).toBe(0);
     });
 
     it('bestWord tracks longest word', () => {
       const s = initWheelRushState(puzzle, ['p1'], 1000);
       applyWheelWord(s, 'p1', 'CANE', 1000);
-      applyWheelWord(s, 'p1', 'CANES', 1000 + WHEEL_RUSH_LOCK_MS + 2);
+      applyWheelWord(s, 'p1', 'CANES', 1002);
       expect(s.playerStats.p1.bestWord).toBe('CANES');
     });
 
     it('bestWord does not shrink when shorter word follows', () => {
       const s = initWheelRushState(puzzle, ['p1'], 1000);
       applyWheelWord(s, 'p1', 'CANES', 1000);
-      applyWheelWord(s, 'p1', 'SCAN', 1000 + WHEEL_RUSH_LOCK_MS + 2);
+      applyWheelWord(s, 'p1', 'SCAN', 1002);
       expect(s.playerStats.p1.bestWord).toBe('CANES');
-    });
-  });
-
-  describe('reapExpiredLocks', () => {
-    const puzzle = { centerLetter: 'C', outerLetters: ['A','N','E','S','T','X'], allLetters: ['C','A','N','E','S','T','X'] };
-    it('moves expired locks to closed', () => {
-      const s = initWheelRushState(puzzle, ['p1'], 1000);
-      applyWheelWord(s, 'p1', 'CANE', 1000);
-      const reaped = reapExpiredLocks(s, 1000 + WHEEL_RUSH_LOCK_MS + 1);
-      expect(reaped).toEqual([{ word: 'CANE', finder: 'p1' }]);
-      expect(s.closed).toContain('CANE');
-      expect(s.locks['CANE']).toBeUndefined();
-    });
-    it('leaves active locks intact', () => {
-      const s = initWheelRushState(puzzle, ['p1'], 1000);
-      applyWheelWord(s, 'p1', 'CANE', 1000);
-      const reaped = reapExpiredLocks(s, 1500);
-      expect(reaped).toEqual([]);
-      expect(s.locks['CANE']).toBeDefined();
     });
   });
 });

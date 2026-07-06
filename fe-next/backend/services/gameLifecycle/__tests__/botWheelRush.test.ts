@@ -59,8 +59,14 @@ vi.mock('../../../modules/botBehaviorCache', () => ({
 import {
   enumerateWheelWords,
   startBotsForWheelRush,
+  decideBotWheelMove,
+  botThinkDelay,
 } from '../botWheelRush';
 import { initWheelRushState } from '../../../modules/wheelRushManager';
+import {
+  WHEEL_RUSH_BOT_THINK_MIN_MS,
+  WHEEL_RUSH_BOT_THINK_MAX_MS,
+} from '@/shared/constants/wheelRushConstants';
 import type { Bot } from '../../../modules/botBehavior';
 
 function makeBot(overrides: Partial<Bot> = {}): Bot {
@@ -156,51 +162,91 @@ describe('startBotsForWheelRush', () => {
     vi.useRealTimers();
   });
 
-  it('schedules a bot word submission and broadcasts wheelWordLocked', async () => {
-    const puzzle = {
-      centerLetter: 'C',
-      outerLetters: ['A', 'N', 'E', 'S', 'T', 'R'],
-      allLetters: ['C', 'A', 'N', 'E', 'S', 'T', 'R'],
-    };
-    const state = initWheelRushState(puzzle, ['alice', 'BotBob']);
-    mocks.getGame.mockReturnValue({
-      gameCode: 'ABCD',
-      gameMode: 'wheel-rush',
-      gameState: 'in-progress',
-      language: 'en',
-      wheelRushState: state,
-      users: {
-        alice: { avatar: 'default', isHost: true },
-        BotBob: { avatar: 'default', isHost: false },
-      },
-      playerScores: { alice: 100, BotBob: 0 },
-      playerWords: { alice: [], BotBob: [] },
-    });
+  it('schedules a bot word submission and broadcasts wheelWordFound', async () => {
+    // Force the per-turn success gate + shuffle to be deterministic (0 < any
+    // success rate → always submit the intended word).
+    const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0);
+    try {
+      const puzzle = {
+        centerLetter: 'C',
+        outerLetters: ['A', 'N', 'E', 'S', 'T', 'R'],
+        allLetters: ['C', 'A', 'N', 'E', 'S', 'T', 'R'],
+      };
+      const state = initWheelRushState(puzzle, ['alice', 'BotBob']);
+      mocks.getGame.mockReturnValue({
+        gameCode: 'ABCD',
+        gameMode: 'wheel-rush',
+        gameState: 'in-progress',
+        language: 'en',
+        wheelRushState: state,
+        users: {
+          alice: { avatar: 'default', isHost: true },
+          BotBob: { avatar: 'default', isHost: false },
+        },
+        playerScores: { alice: 100, BotBob: 0 },
+        playerWords: { alice: [], BotBob: [] },
+      });
 
-    const bot = makeBot();
+      const bot = makeBot();
 
-    await startBotsForWheelRush(
-      io as unknown as import('socket.io').Server,
-      'ABCD',
-      [bot],
-      state,
-      'en',
-      60,
-    );
+      await startBotsForWheelRush(
+        io as unknown as import('socket.io').Server,
+        'ABCD',
+        [bot],
+        state,
+        'en',
+        60,
+      );
 
-    expect(bot.isActive).toBe(true);
-    expect(bot.activeTimers.size).toBeGreaterThan(0);
+      expect(bot.isActive).toBe(true);
+      expect(bot.activeTimers.size).toBeGreaterThan(0);
 
-    // Advance well past the maximum `startDelay + maxDelay` for hard difficulty.
-    vi.advanceTimersByTime(30_000);
+      // Advance past the artificial think delays (3–7s) enough for several turns.
+      vi.advanceTimersByTime(30_000);
 
-    expect(mocks.updatePlayerScore).toHaveBeenCalled();
-    const broadcastEvents = mocks.broadcastToRoom.mock.calls.map(c => c[2]);
-    expect(broadcastEvents).toContain('wheelWordLocked');
+      expect(mocks.updatePlayerScore).toHaveBeenCalled();
+      const broadcastEvents = mocks.broadcastToRoom.mock.calls.map(c => c[2]);
+      expect(broadcastEvents).toContain('wheelWordFound');
+      // Parallel discovery — bots never emit lock/steal/close events.
+      expect(broadcastEvents).not.toContain('wheelWordLocked');
+      expect(broadcastEvents).not.toContain('wheelWordStolen');
 
-    // The locked word should also be credited to the bot-usage corpus.
-    const lockedWord = mocks.addPlayerWord.mock.calls[0][2];
-    expect(mocks.incrementBotWordUsage).toHaveBeenCalledWith(lockedWord, 'en');
+      // The found word should also be credited to the bot-usage corpus.
+      const foundWord = mocks.addPlayerWord.mock.calls[0][2];
+      expect(mocks.incrementBotWordUsage).toHaveBeenCalledWith(foundWord, 'en');
+    } finally {
+      randSpy.mockRestore();
+    }
+  });
+
+  it('does not fire the first move before the minimum artificial think delay', async () => {
+    const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0); // firstDelay → MIN
+    try {
+      const puzzle = {
+        centerLetter: 'C', outerLetters: ['A','N','E','S','T','R'], allLetters: ['C','A','N','E','S','T','R'],
+      };
+      const state = initWheelRushState(puzzle, ['alice', 'BotBob']);
+      mocks.getGame.mockReturnValue({
+        gameCode: 'ABCD', gameMode: 'wheel-rush', gameState: 'in-progress', language: 'en',
+        wheelRushState: state,
+        users: { alice: { avatar: 'd', isHost: true }, BotBob: { avatar: 'd', isHost: false } },
+        playerScores: { alice: 100, BotBob: 0 }, playerWords: { alice: [], BotBob: [] },
+      });
+
+      await startBotsForWheelRush(
+        io as unknown as import('socket.io').Server, 'ABCD', [makeBot()], state, 'en', 60,
+      );
+
+      // Just before the minimum think delay — the bot must not have scored yet.
+      vi.advanceTimersByTime(WHEEL_RUSH_BOT_THINK_MIN_MS - 100);
+      expect(mocks.updatePlayerScore).not.toHaveBeenCalled();
+
+      // Cross the threshold — now it plays.
+      vi.advanceTimersByTime(500);
+      expect(mocks.updatePlayerScore).toHaveBeenCalled();
+    } finally {
+      randSpy.mockRestore();
+    }
   });
 
   it('easy bot queues the COMMON player word before the rare one (frequency banding)', async () => {
@@ -222,7 +268,9 @@ describe('startBotsForWheelRush', () => {
     const corpus = ['cat', ...Array.from({ length: 198 }, (_, i) => `flr${i}`), 'cent'];
     mocks.getCachedPlayerWords.mockResolvedValue(corpus);
     // Constant rand → weighted ordering is a pure function of weight (deterministic).
-    const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    // 0.3 < easy success-rate (0.5) so the per-turn gate always lands the intended
+    // word → submission order mirrors the banded pool order.
+    const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0.3);
 
     try {
       await startBotsForWheelRush(
@@ -254,5 +302,48 @@ describe('startBotsForWheelRush', () => {
     vi.advanceTimersByTime(30_000);
     expect(mocks.updatePlayerScore).not.toHaveBeenCalled();
     expect(mocks.broadcastToRoom).not.toHaveBeenCalled();
+  });
+});
+
+describe('botThinkDelay — artificial thinking delay', () => {
+  it('always falls within the configured 3–7s band', () => {
+    expect(botThinkDelay(() => 0)).toBe(WHEEL_RUSH_BOT_THINK_MIN_MS);
+    expect(botThinkDelay(() => 1)).toBe(WHEEL_RUSH_BOT_THINK_MAX_MS);
+    const mid = botThinkDelay(() => 0.5);
+    expect(mid).toBeGreaterThan(WHEEL_RUSH_BOT_THINK_MIN_MS);
+    expect(mid).toBeLessThan(WHEEL_RUSH_BOT_THINK_MAX_MS);
+  });
+});
+
+describe('decideBotWheelMove — per-turn success rate', () => {
+  const pool = ['CANE', 'CENT', 'CAT']; // lengths 4, 4, 3
+
+  it('submits the intended word when the roll is under the success rate', () => {
+    // rng() = 0.1 < 0.65 → success.
+    const move = decideBotWheelMove('CANE', pool, 0.65, () => 0.1);
+    expect(move).toEqual({ action: 'submit', word: 'CANE' });
+  });
+
+  it('skips the turn on a miss that rolls into the skip branch', () => {
+    // First roll 0.9 (>=0.65 → miss); second roll 0.1 (<0.5 → skip).
+    const rolls = [0.9, 0.1];
+    let i = 0;
+    const move = decideBotWheelMove('CANE', pool, 0.65, () => rolls[i++]);
+    expect(move).toEqual({ action: 'skip' });
+  });
+
+  it('downgrades to a shorter word on a miss that rolls into the downgrade branch', () => {
+    // First roll 0.9 (miss); second roll 0.9 (>=0.5 → downgrade to a shorter word).
+    const rolls = [0.9, 0.9];
+    let i = 0;
+    const move = decideBotWheelMove('CANE', pool, 0.65, () => rolls[i++]);
+    expect(move).toEqual({ action: 'submit', word: 'CAT' }); // only shorter option
+  });
+
+  it('skips when a downgrade is wanted but no shorter word exists', () => {
+    const rolls = [0.9, 0.9];
+    let i = 0;
+    const move = decideBotWheelMove('CAT', ['CANE', 'CENT'], 0.65, () => rolls[i++]);
+    expect(move).toEqual({ action: 'skip' });
   });
 });

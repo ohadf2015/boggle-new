@@ -124,19 +124,25 @@ describe('startBotsForWheelRush — cold-dictionary recovery', () => {
 
     const bot = makeBot();
 
-    await startBotsForWheelRush(
-      io as unknown as import('socket.io').Server,
-      'ABCD', [bot], state, 'en', 60,
-    );
+    // Deterministic per-turn success gate (0 < any success rate → always submits).
+    const randSpy = vi.spyOn(Math, 'random').mockReturnValue(0);
+    try {
+      await startBotsForWheelRush(
+        io as unknown as import('socket.io').Server,
+        'ABCD', [bot], state, 'en', 60,
+      );
 
-    // Must warm the dict for the GAME language before reading the trie.
-    expect(mocks.ensureLanguageLoaded).toHaveBeenCalledWith('en');
-    // Bots scheduled despite the cold start (would be 0 if it bailed on null trie).
-    expect(bot.activeTimers.size).toBeGreaterThan(0);
+      // Must warm the dict for the GAME language before reading the trie.
+      expect(mocks.ensureLanguageLoaded).toHaveBeenCalledWith('en');
+      // Bots scheduled despite the cold start (would be 0 if it bailed on null trie).
+      expect(bot.activeTimers.size).toBeGreaterThan(0);
 
-    vi.advanceTimersByTime(30_000);
-    expect(mocks.updatePlayerScore).toHaveBeenCalled();
-    const events = mocks.broadcastToRoom.mock.calls.map(c => c[2]);
-    expect(events).toContain('wheelWordLocked');
+      vi.advanceTimersByTime(30_000);
+      expect(mocks.updatePlayerScore).toHaveBeenCalled();
+      const events = mocks.broadcastToRoom.mock.calls.map(c => c[2]);
+      expect(events).toContain('wheelWordFound');
+    } finally {
+      randSpy.mockRestore();
+    }
   });
 });

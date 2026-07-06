@@ -1,14 +1,17 @@
 /**
  * Wheel Rush Manager
  * Server-side logic for Wheel Rush MP mode:
- * puzzle generation, word validation, steal-lock resolution.
+ * puzzle generation, word validation, parallel word discovery.
+ *
+ * Discovery model: every player can independently find and claim any valid word
+ * from the wheel — a word another player (or bot) already found stays open and
+ * claimable at base score. The only competitive edge is a flat first-finder
+ * bonus paid to whoever submits a given word first in the room.
  */
 
 import type { WheelRushModeState, WheelPuzzle, Language, WheelRushPlayerStats } from '@/shared/types/game';
 import {
-  WHEEL_RUSH_LOCK_MS,
-  WHEEL_RUSH_STEAL_BONUS,
-  WHEEL_RUSH_FIRST_FINDER_MULT,
+  WHEEL_RUSH_FIRST_FINDER_BONUS,
   WHEEL_RUSH_MIN_WORD_LEN,
   WHEEL_RUSH_PANGRAM_BONUS,
 } from '@/shared/constants/wheelRushConstants';
@@ -116,8 +119,7 @@ export function initWheelRushState(
   return {
     puzzle,
     foundWords,
-    locks: {},
-    closed: [],
+    firstFinders: {},
     startedAt: now,
     playerStats,
   };
@@ -153,15 +155,16 @@ export type WheelValidationError =
   | 'too-short'
   | 'no-center'
   | 'bad-letters'
-  | 'not-a-word'
-  | 'already-closed';
+  | 'not-a-word';
 
 export interface WheelValidationResult {
   valid: boolean;
   error?: WheelValidationError;
 }
 
-/** Pure validation — shape, letter set, dictionary, not-already-closed.
+/** Pure validation — shape, letter set, dictionary.
+ *  Parallel discovery: there is no "already-closed" state — a word another
+ *  player found remains valid for everyone.
  *  Hebrew submissions are normalized (sofit→regular) before any comparison so
  *  keyboard or external clients sending the final form still match the wheel. */
 export function validateWheelSubmission(
@@ -171,7 +174,6 @@ export function validateWheelSubmission(
 ): WheelValidationResult {
   const upper = normalizeWordForLang(word.toUpperCase(), language);
   if (upper.length < WHEEL_RUSH_MIN_WORD_LEN) return { valid: false, error: 'too-short' };
-  if (state.closed.includes(upper)) return { valid: false, error: 'already-closed' };
   if (!upper.includes(state.puzzle.centerLetter.toUpperCase())) return { valid: false, error: 'no-center' };
   if (!isWheelShape(upper, state.puzzle.centerLetter, state.puzzle.allLetters)) {
     return { valid: false, error: 'bad-letters' };
@@ -188,76 +190,53 @@ export function scoreWheelWord(word: string, allLetters: string[]): number {
 }
 
 export type WheelApplyOutcome =
-  | { kind: 'locked'; lockUntil: number; score: number }          // first finder, window open
-  | { kind: 'stolen'; score: number; stealBonus: number; from: string } // stealer during window
-  | { kind: 'closed'; score: number }                              // first finder's word closed after window
-  | { kind: 'rejected'; reason: WheelValidationError | 'locked-by-other' | 'duplicate' };
+  | {
+      kind: 'scored';
+      /** Total awarded = base word score (+ first-finder bonus when applicable). */
+      score: number;
+      /** True if this player was the first in the room to find this word. */
+      firstFinder: boolean;
+      /** Flat bonus included in `score` (0 when not the first finder). */
+      firstFinderBonus: number;
+    }
+  | { kind: 'rejected'; reason: 'duplicate' };
 
 /**
- * Apply a validated word submission.
- * Steal-lock semantics:
- *   - If no lock: user becomes locker, gets provisional score*MULT; lock expires at now+LOCK_MS.
- *   - If lock held by someone else (still open): allow steal — stealer gets base score + STEAL_BONUS; closes word.
- *   - If lock expired and word still in locks (not closed yet): caller should reap via reapExpiredLocks.
- *   - Duplicate in user's foundWords: reject.
+ * Apply a validated word submission — parallel-discovery semantics.
+ *
+ *   - A player may claim any valid word regardless of who else has found it.
+ *   - Each claim scores the base word score.
+ *   - The FIRST player in the room to submit a given word also gets a flat
+ *     first-finder bonus (WHEEL_RUSH_FIRST_FINDER_BONUS). The word then stays
+ *     open and claimable at base score for everyone else.
+ *   - A player cannot claim the same word twice (their own duplicate is rejected).
+ *
+ * `now` is accepted for signature parity with the old lock model; it is unused.
  */
 export function applyWheelWord(
   state: WheelRushModeState,
   username: string,
   word: string,
-  now: number = Date.now(),
+  _now: number = Date.now(),
 ): WheelApplyOutcome {
   const upper = word.toUpperCase();
   const userList = state.foundWords[username] ?? (state.foundWords[username] = []);
   if (userList.includes(upper)) return { kind: 'rejected', reason: 'duplicate' };
-  if (state.closed.includes(upper)) return { kind: 'rejected', reason: 'already-closed' };
 
-  const lock = state.locks[upper];
+  if (!state.firstFinders) state.firstFinders = {};
+  const isFirstFinder = !(upper in state.firstFinders);
+  if (isFirstFinder) state.firstFinders[upper] = username;
+
   const base = scoreWheelWord(upper, state.puzzle.allLetters);
+  const firstFinderBonus = isFirstFinder ? WHEEL_RUSH_FIRST_FINDER_BONUS : 0;
+  const score = base + firstFinderBonus;
 
-  if (!lock || lock.until <= now) {
-    // No active lock — become the first finder (or take over expired lock).
-    state.locks[upper] = { by: username, until: now + WHEEL_RUSH_LOCK_MS };
-    userList.push(upper);
-    const score = Math.round(base * WHEEL_RUSH_FIRST_FINDER_MULT);
-    const stats = ensureStats(state, username);
-    stats.wordsLocked += 1;
-    stats.totalScore += score;
-    bumpBestWord(stats, upper);
-    return { kind: 'locked', lockUntil: state.locks[upper].until, score };
-  }
-
-  if (lock.by === username) return { kind: 'rejected', reason: 'duplicate' };
-
-  // Steal during open window.
   userList.push(upper);
-  state.closed.push(upper);
-  delete state.locks[upper];
-  const stealerStats = ensureStats(state, username);
-  stealerStats.wordsStolen += 1;
-  stealerStats.totalScore += base + WHEEL_RUSH_STEAL_BONUS;
-  bumpBestWord(stealerStats, upper);
-  const victimStats = ensureStats(state, lock.by);
-  victimStats.wordsStolenFromMe += 1;
-  return { kind: 'stolen', score: base, stealBonus: WHEEL_RUSH_STEAL_BONUS, from: lock.by };
-}
+  const stats = ensureStats(state, username);
+  stats.wordsLocked += 1;              // total words this player claimed
+  if (isFirstFinder) stats.wordsStolen += 1; // repurposed: first-finder count
+  stats.totalScore += score;
+  bumpBestWord(stats, upper);
 
-/**
- * Reap expired locks. Words whose lock has elapsed become "closed" and award
- * no additional points to anyone beyond the first-finder multiplier already paid.
- * Returns list of {word, finder} that were just closed.
- */
-export function reapExpiredLocks(
-  state: WheelRushModeState,
-  now: number = Date.now(),
-): Array<{ word: string; finder: string }> {
-  const closed: Array<{ word: string; finder: string }> = [];
-  for (const [word, lock] of Object.entries(state.locks)) {
-    if (lock.until <= now) {
-      closed.push({ word, finder: lock.by });
-      state.closed.push(word);
-      delete state.locks[word];
-    }
-  }
-  return closed;
+  return { kind: 'scored', score, firstFinder: isFirstFinder, firstFinderBonus };
 }
