@@ -13,6 +13,7 @@ import { vi, type MockedFunction } from 'vitest';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { AuthButtonDropdownMenu } from '@/components/auth/AuthButtonDropdownMenu';
+import { DropdownMenu } from '@/components/ui/dropdown-menu';
 import PostGameEngagement from '@/components/growth/PostGameEngagement';
 import { ResultsCtaSection } from '@/components/results/ResultsCtaSection';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
@@ -99,9 +100,6 @@ describe('CrazyGames multiplayer-only gating', () => {
 
   describe('AuthButtonDropdownMenu', () => {
     const baseProps = {
-      dropdownRef: { current: null } as React.RefObject<HTMLDivElement | null>,
-      dropdownPosition: { top: 0, left: 0, right: 0 },
-      isRTL: false,
       isDarkMode: true,
       language: 'en',
       currentLang: { code: 'en' as const, name: 'English', flag: 'US' },
@@ -111,13 +109,21 @@ describe('CrazyGames multiplayer-only gating', () => {
       t: (k: string) => k,
       router: { push: vi.fn() },
       setLanguage: vi.fn(),
-      setShowUserMenu: vi.fn(),
       setShowCalendarModal: vi.fn(),
       onSignOut: vi.fn(),
     };
 
+    // DropdownMenuContent requires a Menu context — render it open & controlled,
+    // matching how AuthButton mounts it (DropdownMenu open={showUserMenu}).
+    const renderMenu = (props: React.ComponentProps<typeof AuthButtonDropdownMenu>) =>
+      render(
+        <DropdownMenu open onOpenChange={() => {}}>
+          <AuthButtonDropdownMenu {...props} />
+        </DropdownMenu>
+      );
+
     it('hides Profile / Leaderboard / Friends / Settings / Admin links on CG', () => {
-      render(<AuthButtonDropdownMenu {...baseProps} isCrazyGames />);
+      renderMenu({ ...baseProps, isCrazyGames: true });
       expect(screen.queryByText('profile.title')).not.toBeInTheDocument();
       expect(screen.queryByText('leaderboard.title')).not.toBeInTheDocument();
       expect(screen.queryByText('friends.title')).not.toBeInTheDocument();
@@ -126,14 +132,14 @@ describe('CrazyGames multiplayer-only gating', () => {
     });
 
     it('still allows language switching and sign out on CG', () => {
-      render(<AuthButtonDropdownMenu {...baseProps} isCrazyGames />);
+      renderMenu({ ...baseProps, isCrazyGames: true });
       // Language row + Sign out remain
       expect(screen.getByText('English')).toBeInTheDocument();
       expect(screen.getByText('auth.signOut')).toBeInTheDocument();
     });
 
     it('still shows all items off CG', () => {
-      render(<AuthButtonDropdownMenu {...baseProps} isCrazyGames={false} />);
+      renderMenu({ ...baseProps, isCrazyGames: false });
       expect(screen.getByText('profile.title')).toBeInTheDocument();
       expect(screen.getByText('leaderboard.title')).toBeInTheDocument();
       expect(screen.getByText('friends.title')).toBeInTheDocument();

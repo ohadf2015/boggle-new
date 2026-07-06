@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useMemo } from 'react';
-import { createPortal } from 'react-dom';
+import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { m } from 'framer-motion';
 import { Reveal } from '@/components/ui/Reveal';
 import {
@@ -117,19 +117,24 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
   };
 
   if (!isOpen) return null;
-  if (typeof document === 'undefined') return null;
 
   const allSkills = Object.keys(SKILL_CONFIGS);
   const masteredCount = summary.mastered.length;
   const totalSkills = allSkills.length;
   const progressPercent = Math.round((masteredCount / totalSkills) * 100);
 
-  return createPortal(
-      <Reveal
-        noSlide
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
-        onClick={handleClose}
-      >
+  return (
+    <DialogPrimitive.Root open={isOpen} onOpenChange={(open) => { if (!open) handleClose(); }}>
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xs animate-in fade-in-0 duration-300" />
+        <DialogPrimitive.Content
+          aria-describedby={undefined}
+          onClick={handleClose}
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 outline-none"
+        >
+          <DialogPrimitive.Title className="sr-only">
+            {hasPassed ? t('training.analysis.titleComplete') : t('training.analysis.titleProgress')}
+          </DialogPrimitive.Title>
         <Reveal
           className={cn(
             'w-full max-w-lg max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl relative',
@@ -482,8 +487,9 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
             )}
           </Reveal>
         </Reveal>
-      </Reveal>,
-    document.body
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
   );
 };
 

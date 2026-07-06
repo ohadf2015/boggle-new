@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { createPortal } from 'react-dom';
 import Image from 'next/image';
 import { User, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '../ui/button';
@@ -20,6 +19,7 @@ import { useRouter } from 'next/navigation';
 import { useCrazyGamesAuth } from '@/hooks/useCrazyGamesAuth';
 import { CalendarRewardsModal } from '../engagement/CalendarRewardsModal';
 import { AuthButtonDropdownMenu } from './AuthButtonDropdownMenu';
+import { DropdownMenu, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import type { Language as LanguageType } from '@/shared/types';
 
 interface LanguageItem {
@@ -44,13 +44,12 @@ interface AuthButtonProps {
 }
 
 const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: AuthButtonProps = {}): React.ReactElement | null => {
-  const { t, language, setLanguage, dir } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const { isAuthenticated, profile, isSupabaseEnabled, loading, isAdmin, user } = useAuth();
   // Personal accent ring around the header avatar when a non-default style is chosen.
   const { style: playerStyle } = usePlayerStyle();
   const router = useRouter();
   const isDarkMode = true;
-  const isRTL = dir === 'rtl';
 
   const {
     isCrazyGames,
@@ -69,46 +68,7 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [hasUnclaimedReward, setHasUnclaimedReward] = useState(false);
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
   const rewardCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<{ top: number; left: number; right: number } | null>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowUserMenu(false);
-      }
-    };
-    if (showUserMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showUserMenu]);
-
-  // Calculate dropdown position for portal rendering
-  useEffect(() => {
-    const updatePosition = () => {
-      if (buttonRef.current && showUserMenu) {
-        const rect = buttonRef.current.getBoundingClientRect();
-        setDropdownPosition({
-          top: rect.bottom + 8,
-          left: isRTL ? rect.left : undefined!,
-          right: isRTL ? undefined! : window.innerWidth - rect.right,
-        });
-      }
-    };
-    if (showUserMenu) {
-      updatePosition();
-      window.addEventListener('resize', updatePosition);
-      window.addEventListener('scroll', updatePosition, true);
-    }
-    return () => {
-      window.removeEventListener('resize', updatePosition);
-      window.removeEventListener('scroll', updatePosition, true);
-    };
-  }, [showUserMenu, isRTL]);
 
   // Check for unclaimed calendar rewards
   const checkUnclaimedReward = useCallback(async () => {
@@ -202,37 +162,32 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
 
     // Default dropdown variant
     return (
-      <div className="relative shrink-0" ref={dropdownRef}>
-        <Button
-          ref={buttonRef}
-          variant="outline"
-          size="sm"
-          onClick={() => setShowUserMenu(!showUserMenu)}
-          aria-haspopup="menu"
-          aria-expanded={showUserMenu}
-          aria-label={t('auth.userMenu')}
-          className={cn(
-            'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3 min-h-[44px]',
-            isDarkMode
-              ? 'bg-neo-navy-light text-cyan-300 hover:bg-neo-navy-elevated hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
-              : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
-          )}
-        >
-          <span className={playerStyle.accentHex ? 'rounded-full ring-2 ring-accent ring-offset-1 ring-offset-neo-navy' : ''}>
-            <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} userId={user?.id} size="sm" />
-          </span>
-          <span className="hidden sm:inline max-w-[80px] truncate font-medium">{profile.display_name || profile.username}</span>
-          {profile.total_xp !== undefined && (
-            <LevelBadge level={getLevelFromXp(profile.total_xp || 0)} size="sm" animate={false} />
-          )}
-          <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} aria-hidden="true" />
-        </Button>
+      <div className="relative shrink-0">
+        <DropdownMenu open={showUserMenu} onOpenChange={setShowUserMenu}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              aria-label={t('auth.userMenu')}
+              className={cn(
+                'flex items-center gap-1 sm:gap-2 rounded-full transition-all duration-300 px-2 sm:px-3 min-h-[44px]',
+                isDarkMode
+                  ? 'bg-neo-navy-light text-cyan-300 hover:bg-neo-navy-elevated hover:shadow-[0_0_15px_rgba(6,182,212,0.3)] border-slate-700'
+                  : 'bg-white text-cyan-600 hover:bg-gray-50 hover:shadow-[0_0_15px_rgba(6,182,212,0.2)] border-gray-200'
+              )}
+            >
+              <span className={playerStyle.accentHex ? 'rounded-full ring-2 ring-accent ring-offset-1 ring-offset-neo-navy' : ''}>
+                <Avatar customAvatar={profile.avatar_config} avatarImage={profile.avatar_image} userId={user?.id} size="sm" />
+              </span>
+              <span className="hidden sm:inline max-w-[80px] truncate font-medium">{profile.display_name || profile.username}</span>
+              {profile.total_xp !== undefined && (
+                <LevelBadge level={getLevelFromXp(profile.total_xp || 0)} size="sm" animate={false} />
+              )}
+              <ChevronDown size={10} className={showUserMenu ? 'rotate-180 transition-transform' : 'transition-transform'} aria-hidden="true" />
+            </Button>
+          </DropdownMenuTrigger>
 
-        {showUserMenu && dropdownPosition && typeof document !== 'undefined' && createPortal(
           <AuthButtonDropdownMenu
-            dropdownRef={dropdownRef}
-            dropdownPosition={dropdownPosition}
-            isRTL={isRTL}
             isDarkMode={isDarkMode}
             language={language}
             currentLang={currentLang}
@@ -242,13 +197,11 @@ const AuthButton = ({ inline = false, onClose, onSignInClick, onSignUpClick }: A
             t={t}
             router={router}
             setLanguage={setLanguage}
-            setShowUserMenu={setShowUserMenu}
             setShowCalendarModal={setShowCalendarModal}
             onSignOut={handleSignOut}
             isCrazyGames={isCrazyGames}
-          />,
-          document.body
-        )}
+          />
+        </DropdownMenu>
 
         <CalendarRewardsModal isOpen={showCalendarModal} onClose={handleCalendarClose} />
       </div>

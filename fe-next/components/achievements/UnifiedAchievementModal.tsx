@@ -14,7 +14,7 @@
 
 'use client';
 
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -24,6 +24,7 @@ import type { AchievementPayload } from '@/shared/types/socket';
 import type { UnlockPayload } from '@/hooks/useAchievementUnlock';
 import type { AdventureAchievementDef } from '@/utils/adventureAchievementUtils';
 import { SilentVideo } from '@/components/ui/SilentVideo';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 // ==============================================
 // TYPES
@@ -175,13 +176,6 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
     });
   }, [unlockId, playAchievementSound]);
 
-  // Handle backdrop click
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      props.onClose();
-    }
-  };
-
   if (!normalized) return null;
 
   // Get title text
@@ -189,28 +183,16 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
     ? t('achievements.unlocked')
     : t('achievements.upgraded');
 
-  // CSS entrances (animate-in) instead of framer-motion: a starved main thread —
-  // e.g. while the large Hebrew bundle parses — would leave a framer-motion
-  // `initial` opacity:0 pinned, so the user sees only the dark backdrop ("black
-  // screen"). CSS runs off the main thread and always settles visible.
   return (
-    <div
-      onClick={handleBackdropClick}
-      className={cn(
-        'fixed inset-0 z-60',
-        'flex items-center justify-center',
-        'bg-neo-black/80 backdrop-blur-xs',
-        'animate-in fade-in-0 duration-300'
-      )}
-      data-testid="unified-achievement-modal"
-    >
-      <div
+    <Dialog open onOpenChange={(open) => { if (!open) props.onClose(); }}>
+      <DialogContent
+        noDescription
+        hideCloseButton
+        data-testid="unified-achievement-modal"
         className={cn(
-          'relative p-8 rounded-neo',
-          'bg-neo-navy border-4',
-          'shadow-hard-lg',
-          'max-w-sm w-full mx-4',
-          'animate-in fade-in-0 zoom-in-95 duration-300'
+          'relative p-8 rounded-neo max-w-sm',
+          'bg-neo-navy! border-4!',
+          'shadow-hard-lg!'
         )}
         style={{
           borderColor: tierColors?.border || '#BFFF00',
@@ -219,6 +201,7 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
             : '0 0 30px rgba(191, 255, 0, 0.5)',
         }}
       >
+        <DialogTitle className="sr-only">{titleText}</DialogTitle>
         {/* Celebration mascot */}
         <div className="flex justify-center mb-2 animate-in zoom-in-50 duration-300">
           <SilentVideo
@@ -246,8 +229,9 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
           <span className="text-4xl">{normalized.icon}</span>
         </div>
 
-        {/* Title */}
+        {/* Title — visible duplicate of sr-only DialogTitle above; hidden from AT to avoid double-announce */}
         <h2
+          aria-hidden="true"
           className={cn(
             'text-xl font-black text-center mb-2',
             'text-neo-white',
@@ -301,8 +285,8 @@ export function UnifiedAchievementModal(props: UnifiedAchievementModalProps) {
         >
           {t('common.continue')}
         </button>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 

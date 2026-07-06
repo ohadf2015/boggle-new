@@ -103,6 +103,14 @@ const MusicControls: React.FC = memo(() => {
       setShowSlider(false);
     }
   }, []);
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    // No focus-return to the button here: this panel opens via onFocus too, and
+    // refocusing the button would fire that same onFocus (it bubbles), reopening
+    // the panel we just closed. Unlike a modal, Escape here just dismisses.
+    if (e.key === 'Escape' && showSlider) {
+      setShowSlider(false);
+    }
+  }, [showSlider]);
 
   return (
     <div
@@ -111,6 +119,7 @@ const MusicControls: React.FC = memo(() => {
       onMouseLeave={handleMouseLeave}
       onFocus={handleFocus}
       onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
       role="group"
       aria-label={t('music.controls')}
     >

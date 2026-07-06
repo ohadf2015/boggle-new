@@ -8,7 +8,7 @@
 
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import { Shield, Trophy, TrendingUp, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -59,6 +59,17 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
     },
   });
 
+  // Non-modal by design (doesn't block interaction with results), but still
+  // dismissible via Escape like its visible close affordances (X, "maybe later").
+  useEffect(() => {
+    if (!isOpen || isOnCrazyGamesPlatform) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, isOnCrazyGamesPlatform, onClose]);
+
   if (isOnCrazyGamesPlatform) return null;
 
   return (
@@ -85,8 +96,7 @@ export const MultiplayerSignupSheet: React.FC<MultiplayerSignupSheetProps> = ({
             'shadow-hard-lg md:max-w-lg md:mx-auto max-w-[calc(100%-1.5rem)] mx-auto',
             isDarkMode ? 'bg-neo-navy-light' : 'bg-white',
           )}
-          role="dialog"
-          aria-modal="true"
+          role="region"
           aria-label={t('auth.mpSignup.title')}
         >
           {/* Drag handle */}

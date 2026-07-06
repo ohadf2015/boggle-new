@@ -1,14 +1,24 @@
 /**
  * AuthButton Dropdown Position Tests
  *
- * Tests for RTL dropdown positioning in the AuthButton component.
- * Issue: In RTL mode, dropdown appears on wrong side of screen.
+ * HISTORY: this test used to guard a hand-rolled positioning bug — in RTL mode,
+ * manual `getBoundingClientRect` + `window.innerWidth - rect.right` math placed
+ * the dropdown on the wrong side of the screen. That entire positioning
+ * mechanism (manual style.left/right + resize/scroll listeners + a `react-dom`
+ * createPortal mock to inspect it) was removed when the menu was migrated onto
+ * @radix-ui/react-dropdown-menu, which positions itself via its own Popper
+ * anchor and reads direction from the app's ambient RadixDirectionProvider
+ * (app/essential-providers.tsx) — so the RTL-flip class of bug is now
+ * structurally impossible, not just newly correct. There is nothing left to
+ * assert about `style.left`/`style.right` (Radix positions via a computed
+ * `transform`, not those properties). What's left worth verifying: the menu
+ * still opens correctly and renders its content when `dir` is RTL.
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
-// Mock the contexts and hooks before importing the component
 vi.mock('../../../utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark', toggleTheme: vi.fn() }),
 }));
@@ -20,6 +30,10 @@ vi.mock('../../../contexts/LanguageContext', () => ({
     setLanguage: vi.fn(),
     dir: 'rtl',
   }),
+}));
+
+vi.mock('../../../contexts/PlayerStyleContext', () => ({
+  usePlayerStyle: () => ({ style: { accentHex: null } }),
 }));
 
 vi.mock('../../../contexts/AuthContext', () => ({
@@ -63,13 +77,6 @@ vi.mock('@/hooks/useCrazyGamesAuth', () => ({
   }),
 }));
 
-vi.mock('framer-motion', () => ({
-  m: {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
-
 vi.mock('../../Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar">Avatar</div>,
@@ -88,78 +95,28 @@ vi.mock('../../engagement/CalendarRewardsModal', () => ({
   CalendarRewardsModal: () => null,
 }));
 
-// Mock createPortal to render in the document (allows us to inspect style)
-vi.mock('react-dom', () => {
-  const originalModule = vi.importActual('react-dom');
-  return {
-    ...originalModule,
-    createPortal: (node: React.ReactNode) => node, // Render inline instead of portal
-  };
-});
+vi.mock('@/utils/authFetch', () => ({
+  fetchWithAuth: vi.fn(() => Promise.resolve({ ok: false })),
+}));
 
-// Mock getBoundingClientRect
-const mockButtonRect = {
-  left: 50,
-  right: 150,
-  top: 10,
-  bottom: 50,
-  width: 100,
-  height: 40,
-  x: 50,
-  y: 10,
-  toJSON: () => ({}),
-};
-
-describe('AuthButton Dropdown Position', () => {
-  beforeEach(() => {
-    // Mock window.innerWidth
-    Object.defineProperty(window, 'innerWidth', {
-      writable: true,
-      configurable: true,
-      value: 1000,
-    });
-
-    // Mock getBoundingClientRect for button
-    Element.prototype.getBoundingClientRect = vi.fn(() => mockButtonRect);
-
-    // Mock fetch for calendar rewards
-    global.fetch = vi.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () => Promise.resolve({ canClaimToday: false }),
-      })
-    ) as jest.Mock;
-  });
-
+describe('AuthButton Dropdown — RTL', () => {
   afterEach(() => {
     vi.clearAllMocks();
   });
 
-  it('positions dropdown under the button in RTL mode (not on opposite side)', async () => {
-    // Import dynamically to ensure mocks are applied
+  it('opens and renders menu content when dir="rtl" (no manual position math left to break)', async () => {
+    const user = userEvent.setup();
     const { default: AuthButton } = await import('../AuthButton');
 
     render(<AuthButton />);
 
-    // Click the user menu button to open dropdown (aria-label is the translation key)
     const menuButton = screen.getByRole('button', { name: /auth\.userMenu/i });
-    fireEvent.click(menuButton);
+    await user.click(menuButton);
 
-    // Wait for the dropdown menu to appear
     await waitFor(() => {
       expect(screen.getByRole('menu')).toBeInTheDocument();
     });
 
-    const dropdownMenu = screen.getByRole('menu');
-    const style = dropdownMenu.getAttribute('style');
-
-    // In RTL mode with button at left: 50, the dropdown should be positioned
-    // with left: 50 (aligned to button's left edge), NOT at window.innerWidth - rect.right = 850
-    // which would place it on the opposite side of the screen
-    //
-    // Bug: Current code calculates: left = window.innerWidth - rect.right = 1000 - 150 = 850
-    // Fix: Should be: left = rect.left = 50
-    expect(style).toContain('left: 50px');
-    expect(style).not.toContain('left: 850px');
+    expect(screen.getAllByRole('menuitem').length).toBeGreaterThan(0);
   });
 });

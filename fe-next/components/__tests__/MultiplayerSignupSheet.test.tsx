@@ -87,7 +87,7 @@ describe('MultiplayerSignupSheet', () => {
       <MultiplayerSignupSheet isOpen={false} onClose={vi.fn()} stats={defaultStats} />
     );
 
-    expect(container.querySelector('[role="dialog"]')).toBeNull();
+    expect(container.querySelector('[role="region"]')).toBeNull();
   });
 
   it('calls onClose when dismiss button clicked', () => {
@@ -121,12 +121,25 @@ describe('MultiplayerSignupSheet', () => {
     expect(screen.getByTestId('oauth-group')).toBeTruthy();
   });
 
-  it('has proper accessibility role', () => {
+  it('is a non-modal region, not a dialog (does not block interaction)', () => {
     render(
       <MultiplayerSignupSheet isOpen={true} onClose={vi.fn()} stats={defaultStats} />
     );
 
-    expect(screen.getByRole('dialog')).toBeTruthy();
+    const region = screen.getByRole('region');
+    expect(region).toBeTruthy();
+    expect(region).not.toHaveAttribute('aria-modal');
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('calls onClose when Escape is pressed', () => {
+    const onClose = vi.fn();
+    render(
+      <MultiplayerSignupSheet isOpen={true} onClose={onClose} stats={defaultStats} />
+    );
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it('sits above the sticky ready bar using the measured bottomOffset', () => {
@@ -140,7 +153,7 @@ describe('MultiplayerSignupSheet', () => {
     );
 
     // Sheet must clear the fixed sticky bar — bottom = offset + gap (8px).
-    const dialog = screen.getByRole('dialog');
+    const dialog = screen.getByRole('region');
     expect(dialog.style.bottom).toBe('158px');
   });
 
@@ -155,7 +168,7 @@ describe('MultiplayerSignupSheet', () => {
     );
 
     // No inline bottom → Tailwind fallback class governs the pre-measure frame.
-    const dialog = screen.getByRole('dialog');
+    const dialog = screen.getByRole('region');
     expect(dialog.style.bottom).toBe('');
   });
 });

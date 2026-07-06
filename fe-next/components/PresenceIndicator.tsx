@@ -168,6 +168,12 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape' && tooltipVisible) {
+      setTooltipVisible(false);
+    }
+  };
+
   return (
     <div
       ref={containerRef}
@@ -175,6 +181,7 @@ const PresenceIndicator = memo<PresenceIndicatorProps>(({
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onKeyDown={handleKeyDown}
     >
       {/* Custom Tooltip */}
       <AnimatePresence>

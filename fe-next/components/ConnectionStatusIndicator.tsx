@@ -199,6 +199,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       onMouseLeave={() => setShowTooltip(false)}
       onFocus={() => setShowTooltip(true)}
       onBlur={() => setShowTooltip(false)}
+      onKeyDown={(e) => { if (e.key === 'Escape') setShowTooltip(false); }}
       tabIndex={0}
       role="status"
       aria-label={config.description}
