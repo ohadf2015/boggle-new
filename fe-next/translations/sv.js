@@ -10223,18 +10223,18 @@ const sv = {
   },
   "wheelRush": {
     "title": "Hjulrush",
-    "description": "Lås bokstäver snabbt. Stjäl motståndarnas ord.",
+    "description": "Kapplöp om att stava ord på hjulet — hitta ett först för en bonus!",
     "results": {
       "matchRecap": "Hjulrush Sammanfattning",
       "sceneTitle": "Hjulet Stannar",
-      "totalLocks": "Låsta Ord",
-      "stealRate": "Stöldfrekvens",
-      "locks": "Lås",
-      "steals": "Stölder",
+      "totalLocks": "Hittade Ord",
+      "stealRate": "Först-andel",
+      "locks": "Ord",
+      "steals": "Först-fynd",
       "boardDomination": "Hjuldominans",
       "pts": "p",
-      "locksmith": "Låssmed",
-      "bandit": "Bandit",
+      "locksmith": "Ordmaskin",
+      "bandit": "Pionjär",
       "wordsmith": "Ordsmed"
     },
     "ftue": {

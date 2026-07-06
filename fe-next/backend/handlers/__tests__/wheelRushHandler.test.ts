@@ -17,21 +17,6 @@ vi.mock('../../utils/socketHelpers', () => ({
   getGameRoom: vi.fn((code: string) => `room:${code}`),
 }));
 
-vi.mock('../../utils/timerManager', () => ({
-  __esModule: true,
-  default: { setTimeout: vi.fn(), clearTimer: vi.fn(), clearTimersWithPrefix: vi.fn() },
-}));
-
-const { cleanupCallbacks } = vi.hoisted(() => ({
-  cleanupCallbacks: {} as { onGameEnd?: (p: { gameCode: string }) => void; onGameReset?: (p: { gameCode: string }) => void },
-}));
-vi.mock('../../events/gameCleanup', () => ({
-  gameCleanupEmitter: {
-    onGameEnd: vi.fn((cb: (p: { gameCode: string }) => void) => { cleanupCallbacks.onGameEnd = cb; }),
-    onGameReset: vi.fn((cb: (p: { gameCode: string }) => void) => { cleanupCallbacks.onGameReset = cb; }),
-  },
-}));
-
 vi.mock('../../modules/gameStateManager', () => ({
   getGame: vi.fn(),
   getGameBySocketId: vi.fn(() => 'GAME1'),
@@ -43,7 +28,6 @@ vi.mock('../../modules/gameStateManager', () => ({
 vi.mock('../../modules/wheelRushManager', () => ({
   validateWheelSubmission: vi.fn(),
   applyWheelWord: vi.fn(),
-  reapExpiredLocks: vi.fn(() => []),
 }));
 
 vi.mock('../../modules/scoreManager', () => ({
@@ -56,7 +40,6 @@ import { broadcastToRoom } from '../../utils/socketHelpers';
 import { getGame, updatePlayerScore, addPlayerWord } from '../../modules/gameStateManager';
 import { validateWheelSubmission, applyWheelWord } from '../../modules/wheelRushManager';
 import { getLeaderboard } from '../../modules/scoreManager';
-import timerManager from '../../utils/timerManager';
 
 const mkSocket = () => ({ id: 's1', emit: vi.fn() } as unknown as Socket);
 const mkIo = () => ({} as Server);
@@ -74,8 +57,7 @@ const gameBase = {
   wheelRushState: {
     puzzle: { centerLetter: 'C', outerLetters: ['A','N','E','S','T','X'], allLetters: ['C','A','N','E','S','T','X'] },
     foundWords: { p1: [], p2: [] },
-    locks: {},
-    closed: [],
+    firstFinders: {},
     startedAt: 1000,
   },
 };
@@ -92,30 +74,36 @@ describe('wheelRushHandler', () => {
     expect(broadcastToRoom).not.toHaveBeenCalled();
   });
 
-  it('broadcasts wheelWordLocked on locked outcome', () => {
+  it('scores the word, emits accepted result, and pings wheelWordFound (first finder)', () => {
     (getGame as unknown as Mock).mockReturnValue(gameBase);
     (validateWheelSubmission as unknown as Mock).mockReturnValue({ valid: true });
-    (applyWheelWord as unknown as Mock).mockReturnValue({ kind: 'locked', score: 12, lockUntil: 9999 });
+    (applyWheelWord as unknown as Mock).mockReturnValue({ kind: 'scored', score: 17, firstFinder: true, firstFinderBonus: 5 });
+    const sock = mkSocket();
+    handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
+    expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 17, true);
+    expect(addPlayerWord).toHaveBeenCalledWith('GAME1', 'p1', 'CANE',
+      expect.objectContaining({ score: 17, validated: true, autoValidated: true }));
+    expect(sock.emit).toHaveBeenCalledWith('wheelWordResult', expect.objectContaining({
+      word: 'CANE', accepted: true, kind: 'locked', score: 17, firstFinder: true, firstFinderBonus: 5,
+    }));
+    // Opponent-activity ping — never closes/locks the word for anyone else.
+    expect(broadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'wheelWordFound',
+      { word: 'CANE', by: 'p1', firstFinder: true });
+  });
+
+  it('scores a non-first finder without a first-finder bonus (word stays claimable)', () => {
+    (getGame as unknown as Mock).mockReturnValue(gameBase);
+    (validateWheelSubmission as unknown as Mock).mockReturnValue({ valid: true });
+    (applyWheelWord as unknown as Mock).mockReturnValue({ kind: 'scored', score: 12, firstFinder: false, firstFinderBonus: 0 });
     const sock = mkSocket();
     handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
     expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 12, true);
-    expect(addPlayerWord).toHaveBeenCalledWith('GAME1', 'p1', 'CANE',
-      expect.objectContaining({ score: 12, validated: true, autoValidated: true }));
-    expect(broadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'wheelWordLocked',
-      { word: 'CANE', by: 'p1', lockUntil: 9999 });
-  });
-
-  it('broadcasts wheelWordStolen on stolen outcome with steal bonus total', () => {
-    (getGame as unknown as Mock).mockReturnValue(gameBase);
-    (validateWheelSubmission as unknown as Mock).mockReturnValue({ valid: true });
-    (applyWheelWord as unknown as Mock).mockReturnValue({ kind: 'stolen', score: 8, stealBonus: 3, from: 'p2' });
-    const sock = mkSocket();
-    handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
-    expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 11, true);
-    expect(addPlayerWord).toHaveBeenCalledWith('GAME1', 'p1', 'CANE',
-      expect.objectContaining({ score: 11, validated: true, autoValidated: true }));
-    expect(broadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'wheelWordStolen',
-      { word: 'CANE', by: 'p1', from: 'p2' });
+    expect(broadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'wheelWordFound',
+      { word: 'CANE', by: 'p1', firstFinder: false });
+    // Crucially, there is NO "closed"/"stolen" broadcast — discovery is parallel.
+    const events = (broadcastToRoom as unknown as Mock).mock.calls.map(c => c[2]);
+    expect(events).not.toContain('wheelWordClosed');
+    expect(events).not.toContain('wheelWordStolen');
   });
 
   it('emits rejection without broadcast on rejected outcome', () => {
@@ -139,14 +127,13 @@ describe('wheelRushHandler', () => {
   });
 
   describe('requestWheelRushState — reconnect snapshot', () => {
-    it('emits wheelRushInit with full state snapshot (puzzle + foundWords + locks + closed)', () => {
+    it('emits wheelRushInit with state snapshot (puzzle + foundWords + firstFinders)', () => {
       const richState = {
         ...gameBase,
         wheelRushState: {
           puzzle: { centerLetter: 'C', outerLetters: ['A','N','E'], allLetters: ['C','A','N','E'] },
           foundWords: { p1: ['CANE'], p2: ['ACE'] },
-          locks: { CANE: { by: 'p1', until: 9999 } },
-          closed: ['ACE'],
+          firstFinders: { CANE: 'p1', ACE: 'p2' },
           startedAt: 1234,
         },
       };
@@ -157,8 +144,7 @@ describe('wheelRushHandler', () => {
         puzzle: richState.wheelRushState.puzzle,
         startedAt: 1234,
         foundWords: { p1: ['CANE'], p2: ['ACE'] },
-        locks: { CANE: { by: 'p1', until: 9999 } },
-        closed: ['ACE'],
+        firstFinders: { CANE: 'p1', ACE: 'p2' },
       }));
     });
 
@@ -185,18 +171,6 @@ describe('wheelRushHandler', () => {
           { username: 'p2', score: 50 },
         ],
       });
-    });
-  });
-
-  describe('cleanup on game end/reset', () => {
-    it('clears all per-word reap timers for the game on game end', () => {
-      cleanupCallbacks.onGameEnd?.({ gameCode: 'GAME1' });
-      expect(timerManager.clearTimersWithPrefix).toHaveBeenCalledWith('wheelRushReap:GAME1:');
-    });
-
-    it('clears all per-word reap timers for the game on game reset', () => {
-      cleanupCallbacks.onGameReset?.({ gameCode: 'GAME1' });
-      expect(timerManager.clearTimersWithPrefix).toHaveBeenCalledWith('wheelRushReap:GAME1:');
     });
   });
 });

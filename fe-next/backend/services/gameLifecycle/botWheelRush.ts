@@ -3,9 +3,18 @@
  *
  * Enumerates valid wheel-rush words from the puzzle letter set + language trie,
  * then drip-feeds submissions per bot using the shared bot-lifecycle scheduler.
- * Mirrors the human wheelRushHandler path: validateWheelSubmission → applyWheelWord →
- * score gate → updatePlayerScore → broadcast wheelWordLocked / wheelWordStolen, and
- * schedules the same reap timer key so locks close at window expiry.
+ *
+ * Difficulty balancing (see wheelRushConstants):
+ *   - Artificial "thinking delay": each move is spaced by a random 3–7s interval
+ *     instead of the classic sub-second bot cadence, so bots no longer appear to
+ *     predict words instantly.
+ *   - Per-turn success rate: on each turn a bot only sometimes lands its intended
+ *     (best available) word — otherwise it misses (skips the turn) or downgrades
+ *     to a shorter, lower-scoring word. Medium sits at ~65%.
+ *
+ * Scoring mirrors the human wheelRushHandler path (validateWheelSubmission →
+ * applyWheelWord → score gate → updatePlayerScore) under the parallel-discovery
+ * model — no locks, steals, or reaping.
  */
 
 import type { Server } from 'socket.io';
@@ -23,16 +32,19 @@ import {
 import { getCachedTrie, type TrieNode } from '../../modules/boggleSolver';
 import {
   applyWheelWord,
-  reapExpiredLocks,
   validateWheelSubmission,
 } from '../../modules/wheelRushManager';
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
-import timerManager from '../../utils/timerManager';
 import { setBotTimeout } from '../../modules/botLifecycle';
 import { ensureLanguageLoaded } from '../../dictionary';
 import { shouldBotScore, type BotScoreTuning } from './botGame';
-import { BOT_CONFIG } from '../../modules/botConfig';
-import { WHEEL_RUSH_MIN_WORD_LEN } from '@/shared/constants/wheelRushConstants';
+import {
+  WHEEL_RUSH_MIN_WORD_LEN,
+  WHEEL_RUSH_BOT_THINK_MIN_MS,
+  WHEEL_RUSH_BOT_THINK_MAX_MS,
+  WHEEL_RUSH_BOT_SUCCESS_RATE,
+  WHEEL_RUSH_BOT_SKIP_ON_MISS,
+} from '@/shared/constants/wheelRushConstants';
 import logger from '../../utils/logger';
 
 /**
@@ -108,23 +120,43 @@ function broadcastWheelLeaderboard(io: Server, gameCode: string): void {
   }, lbThrottleMs);
 }
 
-function scheduleReap(
-  io: Server,
-  gameCode: string,
-  word: string,
-  lockUntil: number,
-): void {
-  const now = Date.now();
-  timerManager.setTimeout(`wheelRushReap:${gameCode}:${word}`, () => {
-    const g = getGame(gameCode);
-    if (!g?.wheelRushState) return;
-    const closed = reapExpiredLocks(g.wheelRushState);
-    for (const c of closed) {
-      broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordClosed', {
-        word: c.word, finder: c.finder,
-      });
-    }
-  }, Math.max(0, lockUntil - now) + 50);
+/** Random artificial think delay (ms) for a bot's next move. */
+export function botThinkDelay(rng: () => number = Math.random): number {
+  const span = WHEEL_RUSH_BOT_THINK_MAX_MS - WHEEL_RUSH_BOT_THINK_MIN_MS;
+  return WHEEL_RUSH_BOT_THINK_MIN_MS + rng() * span;
+}
+
+export type WheelBotMove =
+  | { action: 'submit'; word: string }
+  | { action: 'skip' };
+
+/**
+ * Decide a bot's move for one turn given a per-difficulty success rate.
+ *
+ *   - With probability `successRate`, submit the intended (best available) word.
+ *   - Otherwise it's a MISS: either skip the turn entirely, or downgrade to a
+ *     shorter word from the remaining pool (so the bot occasionally finds a
+ *     lesser word instead of the optimal one).
+ *
+ * Pure + rng-injectable for deterministic tests. `pool` should be the bot's
+ * remaining candidate words (used only to source a shorter downgrade word).
+ */
+export function decideBotWheelMove(
+  intended: string,
+  pool: string[],
+  successRate: number,
+  rng: () => number = Math.random,
+): WheelBotMove {
+  if (rng() < successRate) return { action: 'submit', word: intended };
+
+  // Miss: sometimes skip, sometimes downgrade to a shorter word.
+  if (rng() < WHEEL_RUSH_BOT_SKIP_ON_MISS) return { action: 'skip' };
+
+  const shorter = pool.filter(w => w.length < intended.length && w !== intended);
+  if (shorter.length === 0) return { action: 'skip' };
+  // Pick the shortest available — the most conservative "I only saw a small word" miss.
+  const word = shorter.reduce((a, b) => (b.length < a.length ? b : a));
+  return { action: 'submit', word };
 }
 
 function submitOneWord(
@@ -143,48 +175,26 @@ function submitOneWord(
     return;
   }
 
-  const now = Date.now();
-  const outcome = applyWheelWord(state, bot.username, word, now);
+  const outcome = applyWheelWord(state, bot.username, word, Date.now());
+  if (outcome.kind !== 'scored') return; // duplicate for this bot — nothing to do.
 
-  if (outcome.kind === 'locked') {
-    const total = outcome.score;
-    if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty, WHEEL_RUSH_BOT_TUNING)) return;
-    bot.score += total;
-    updatePlayerScore(gameCode, bot.username, total, true);
-    addPlayerWord(gameCode, bot.username, word, {
-      score: total,
-      validated: true,
-      autoValidated: true,
-      isBot: true,
-    });
-    void incrementBotWordUsage(word, language);
-    broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordLocked', {
-      word, by: bot.username, lockUntil: outcome.lockUntil,
-    });
-    broadcastWheelLeaderboard(io, gameCode);
-    scheduleReap(io, gameCode, word, outcome.lockUntil);
-    logger.info('BOT_WHEEL', `${bot.username} locked "${word}" (+${total})`);
-    return;
-  }
-
-  if (outcome.kind === 'stolen') {
-    const total = outcome.score + outcome.stealBonus;
-    if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty, WHEEL_RUSH_BOT_TUNING)) return;
-    bot.score += total;
-    updatePlayerScore(gameCode, bot.username, total, true);
-    addPlayerWord(gameCode, bot.username, word, {
-      score: total,
-      validated: true,
-      autoValidated: true,
-      isBot: true,
-    });
-    void incrementBotWordUsage(word, language);
-    broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordStolen', {
-      word, by: bot.username, from: outcome.from,
-    });
-    broadcastWheelLeaderboard(io, gameCode);
-    logger.info('BOT_WHEEL', `${bot.username} stole "${word}" from ${outcome.from} (+${total})`);
-  }
+  const total = outcome.score;
+  if (!shouldBotScore(gameCode, bot.username, bot.score, total, bot.difficulty, WHEEL_RUSH_BOT_TUNING)) return;
+  bot.score += total;
+  updatePlayerScore(gameCode, bot.username, total, true);
+  addPlayerWord(gameCode, bot.username, word, {
+    score: total,
+    validated: true,
+    autoValidated: true,
+    isBot: true,
+  });
+  void incrementBotWordUsage(word, language);
+  // Opponent-activity ping — parallel discovery, no locking side effects.
+  broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordFound', {
+    word, by: bot.username, firstFinder: outcome.firstFinder,
+  });
+  broadcastWheelLeaderboard(io, gameCode);
+  logger.info('BOT_WHEEL', `${bot.username} found "${word}" (+${total}${outcome.firstFinder ? ' first-find' : ''})`);
 }
 
 function scheduleBot(
@@ -197,18 +207,25 @@ function scheduleBot(
   gameEndTime: number,
 ): void {
   if (!bot.isActive || words.length === 0) return;
-  const timing = BOT_CONFIG.TIMING[bot.difficulty] || BOT_CONFIG.TIMING.medium;
+  const successRate = WHEEL_RUSH_BOT_SUCCESS_RATE[bot.difficulty] ?? WHEEL_RUSH_BOT_SUCCESS_RATE.medium;
 
-  const firstDelay = timing.startDelay + Math.random() * 1500;
+  // First move waits a full think-delay too — no more near-instant opening word.
+  const firstDelay = botThinkDelay();
 
   const tick = (idx: number): void => {
     if (!bot.isActive || idx >= words.length) return;
     const remaining = gameEndTime - Date.now();
     if (remaining <= 500) return;
 
-    submitOneWord(io, gameCode, bot, state, words[idx], language);
+    // Per-turn success gate: land the intended word, miss (skip), or downgrade.
+    const move = decideBotWheelMove(words[idx], words.slice(idx + 1), successRate);
+    if (move.action === 'submit') {
+      submitOneWord(io, gameCode, bot, state, move.word, language);
+    } else {
+      logger.debug('BOT_WHEEL', `[${bot.username}] missed turn (skipped "${words[idx]}")`);
+    }
 
-    const delay = timing.minDelay + Math.random() * (timing.maxDelay - timing.minDelay);
+    const delay = botThinkDelay();
     if (delay >= remaining - 500) return;
     setBotTimeout(bot, () => tick(idx + 1), delay);
   };

@@ -20,24 +20,14 @@ import {
 import {
   validateWheelSubmission,
   applyWheelWord,
-  reapExpiredLocks,
 } from '../modules/wheelRushManager.js';
 import { broadcastToRoom, volatileBroadcastToRoom, getGameRoom } from '../utils/socketHelpers.js';
 import { checkRateLimit } from '../utils/rateLimiter.js';
 import { validatePayload } from '../utils/socketValidation.js';
 import { SubmitWheelWordSchema, type SubmitWheelWordData } from '../../shared/schemas/socketSchemas.js';
 import logger from '../utils/logger.js';
-import timerManager from '../utils/timerManager.js';
-import { gameCleanupEmitter } from '../events/gameCleanup.js';
 import type { Language } from '@/shared/types/game';
 import { normalizeHebrewLetter } from '@/shared/utils/wordNormalization';
-
-gameCleanupEmitter.onGameEnd(({ gameCode }) => {
-  timerManager.clearTimersWithPrefix(`wheelRushReap:${gameCode}:`);
-});
-gameCleanupEmitter.onGameReset(({ gameCode }) => {
-  timerManager.clearTimersWithPrefix(`wheelRushReap:${gameCode}:`);
-});
 
 function broadcastWheelLeaderboard(io: Server, gameCode: string): void {
   const game = getGame(gameCode);
@@ -76,61 +66,36 @@ export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWh
     return;
   }
 
-  const now = Date.now();
-  const outcome = applyWheelWord(state, username, word, now);
+  const outcome = applyWheelWord(state, username, word, Date.now());
 
-  if (outcome.kind === 'locked') {
+  if (outcome.kind === 'scored') {
     updatePlayerScore(gameCode, username, outcome.score, true);
     addPlayerWord(gameCode, username, word, {
       score: outcome.score,
       validated: true,
       autoValidated: true,
     });
+    // `kind: 'locked'` here means "locked into your own word list" — the client's
+    // accepted-word rendering keys off it. Parallel discovery: the word is NOT
+    // exclusive; it stays claimable by everyone else at base score.
     socket.emit('wheelWordResult', {
       word, accepted: true, kind: 'locked',
-      score: outcome.score, lockUntil: outcome.lockUntil,
+      score: outcome.score,
+      firstFinder: outcome.firstFinder,
+      firstFinderBonus: outcome.firstFinderBonus,
     });
-    broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordLocked', {
-      word, by: username, lockUntil: outcome.lockUntil,
+    // Opponent-activity ping (no locking side effects on other clients). Lets the
+    // room surface "X found WORD" / leaderboard refresh without gating the word.
+    broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordFound', {
+      word, by: username, firstFinder: outcome.firstFinder,
     });
     broadcastWheelLeaderboard(io, gameCode);
-    // Schedule reap sweep for this specific lock expiry
-    timerManager.setTimeout(`wheelRushReap:${gameCode}:${word}`, () => {
-      const g = getGame(gameCode);
-      if (!g?.wheelRushState) return;
-      const closed = reapExpiredLocks(g.wheelRushState);
-      for (const c of closed) {
-        broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordClosed', { word: c.word, finder: c.finder });
-      }
-    }, Math.max(0, outcome.lockUntil - now) + 50);
-    logger.info('WHEEL_RUSH', `${username} locked "${word}" in ${gameCode} (+${outcome.score})`);
+    logger.info('WHEEL_RUSH', `${username} found "${word}" in ${gameCode} (+${outcome.score}${outcome.firstFinder ? ' first-find' : ''})`);
     return;
   }
 
-  if (outcome.kind === 'stolen') {
-    const total = outcome.score + outcome.stealBonus;
-    updatePlayerScore(gameCode, username, total, true);
-    addPlayerWord(gameCode, username, word, {
-      score: total,
-      validated: true,
-      autoValidated: true,
-    });
-    socket.emit('wheelWordResult', {
-      word, accepted: true, kind: 'stolen',
-      score: total, stolenFrom: outcome.from,
-    });
-    broadcastToRoom(io, getGameRoom(gameCode), 'wheelWordStolen', {
-      word, by: username, from: outcome.from,
-    });
-    broadcastWheelLeaderboard(io, gameCode);
-    logger.info('WHEEL_RUSH', `${username} stole "${word}" from ${outcome.from} in ${gameCode} (+${total})`);
-    return;
-  }
-
-  if (outcome.kind === 'rejected') {
-    socket.emit('wheelWordResult', { word, accepted: false, error: outcome.reason });
-    return;
-  }
+  // rejected — duplicate claim by the same player.
+  socket.emit('wheelWordResult', { word, accepted: false, error: outcome.reason });
 }
 
 /**
@@ -149,8 +114,10 @@ export function handleRequestWheelRushState(socket: Socket): void {
     puzzle: state.puzzle,
     startedAt: state.startedAt,
     foundWords: state.foundWords ?? {},
-    locks: state.locks ?? {},
-    closed: state.closed ?? [],
+    firstFinders: state.firstFinders ?? {},
+    // `closed` retained (empty) for client-snapshot back-compat — parallel
+    // discovery never closes words, so nothing is ever unavailable.
+    closed: [],
     myWords: username ? (state.foundWords?.[username] ?? []) : [],
   });
   // Also push a fresh leaderboard directly to this socket. Opponent scores

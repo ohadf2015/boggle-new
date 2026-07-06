@@ -10110,18 +10110,18 @@ const ja = {
   },
   "wheelRush": {
     "title": "ホイールラッシュ",
-    "description": "文字を素早くロック。相手の単語を奪え。",
+    "description": "ホイールで単語を作る競争 — 最初に見つけてボーナスを獲得！",
     "results": {
       "matchRecap": "ホイールラッシュ要約",
       "sceneTitle": "ホイール停止",
-      "totalLocks": "ロックされた単語",
-      "stealRate": "奪取率",
-      "locks": "ロック",
-      "steals": "スティール",
+      "totalLocks": "見つけた単語",
+      "stealRate": "先取り率",
+      "locks": "単語",
+      "steals": "先取り",
       "boardDomination": "ホイール制覇",
       "pts": "pt",
-      "locksmith": "ロックスミス",
-      "bandit": "バンディット",
+      "locksmith": "単語マシン",
+      "bandit": "先駆者",
       "wordsmith": "言葉の達人"
     },
     "ftue": {

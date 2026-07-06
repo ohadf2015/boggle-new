@@ -10118,18 +10118,18 @@ const es = {
   },
   "wheelRush": {
     "title": "Rueda Veloz",
-    "description": "Bloquea letras rápido. Roba palabras a tus rivales.",
+    "description": "¡Corre para formar palabras en la rueda — encuentra una primero y gana un bono!",
     "results": {
       "matchRecap": "Resumen de Rueda Veloz",
       "sceneTitle": "La Rueda se Detiene",
-      "totalLocks": "Palabras Bloqueadas",
-      "stealRate": "Tasa de Robo",
-      "locks": "Bloqueos",
-      "steals": "Robos",
+      "totalLocks": "Palabras Encontradas",
+      "stealRate": "Tasa de Primeros",
+      "locks": "Palabras",
+      "steals": "Primeros Hallazgos",
       "boardDomination": "Dominio de Rueda",
       "pts": "pts",
-      "locksmith": "Cerrajero",
-      "bandit": "Bandido",
+      "locksmith": "Máquina de Palabras",
+      "bandit": "Pionero",
       "wordsmith": "Maestro de Palabras"
     },
     "ftue": {

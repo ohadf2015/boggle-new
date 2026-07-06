@@ -335,14 +335,20 @@ export interface WheelPuzzle {
   solutions?: string[];
 }
 
-/** Lock claimed by first finder — word is temporarily stealable, then permanently closed */
-export interface WheelWordLock {
-  by: string;
-  /** Absolute epoch ms when steal window expires */
-  until: number;
-}
-
-/** Per-player wheel-rush stats tracked during a game */
+/**
+ * Per-player wheel-rush stats tracked during a game.
+ *
+ * NOTE — field semantics after the parallel-discovery redesign (words are no
+ * longer locked/stolen; every player can independently claim any word):
+ *   - `wordsLocked`  → total valid words this player claimed ("locked into
+ *                       their own list"). No longer implies exclusivity.
+ *   - `wordsStolen`  → repurposed as the player's FIRST-FINDER count: words this
+ *                       player was the first in the room to submit.
+ *   - `wordsStolenFromMe` → deprecated (no stealing); always 0. Kept for payload
+ *                       shape stability with the results-screen consumers.
+ * The field names are retained to avoid churning the results UI/i18n; the
+ * meaning is documented here and surfaced with first-finder labels.
+ */
 export interface WheelRushPlayerStats {
   wordsLocked: number;
   wordsStolen: number;
@@ -354,12 +360,12 @@ export interface WheelRushPlayerStats {
 /** Wheel Rush mode state tracked per game */
 export interface WheelRushModeState {
   puzzle: WheelPuzzle;
-  /** Words each player has claimed (after lock resolved) */
+  /** Words each player has claimed. Parallel discovery: the same word can appear
+   *  under multiple players — finding it is independent per player. */
   foundWords: Record<string, string[]>;
-  /** Words currently stealable — keyed by word */
-  locks: Record<string, WheelWordLock>;
-  /** Words permanently closed (anyone tries → already-found feedback) */
-  closed: string[];
+  /** word (UPPERCASE) → username of the first player in the room to find it.
+   *  Drives the flat first-finder bonus; the word stays open to everyone else. */
+  firstFinders: Record<string, string>;
   /** Timestamp when round started, for fog-of-war reveal gating */
   startedAt: number;
   /** Per-player domination stats for end-game awards screen */
