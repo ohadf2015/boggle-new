@@ -2,7 +2,8 @@
 
 /**
  * Quick Play hub — the spin → play → results loop.
- * One screen at a time, zero pre-game config. Random resolves at PLAY press.
+ * One screen at a time, zero pre-game config. Tapping/dragging to a mode
+ * plays it immediately; Random resolves at that same instant.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -105,18 +106,20 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
     };
   }, [challengeId]);
 
-  const handleSelect = useCallback((sel: WheelSelection, method: 'drag' | 'tap') => {
-    setSelection(sel);
-    posthog.capture('quick_play_mode_selected', { mode: sel, method, roundIndex });
-  }, [roundIndex]);
-
-  const handlePlay = useCallback(async () => {
+  // Tapping a mode node or releasing the drag knob on one plays it
+  // immediately — there's no separate confirm step. handlePlay takes the
+  // picked selection as an argument rather than reading `selection` state,
+  // since setSelection(sel) below wouldn't be visible yet to a closure over
+  // the pre-update state.
+  const handlePlay = useCallback(async (sel: WheelSelection, method: 'drag' | 'tap') => {
     const mode: QuickMode =
       challenge?.mode ??
-      (selection === 'random'
+      (sel === 'random'
         ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
-        : selection);
-    if (selection === 'random' && !challenge) {
+        : sel);
+    setSelection(sel);
+    posthog.capture('quick_play_mode_selected', { mode: sel, method, roundIndex });
+    if (sel === 'random' && !challenge) {
       posthog.capture('quick_play_mode_selected', { mode, method: 'random', roundIndex });
     }
     setPhase('loading');
@@ -132,12 +135,12 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       setConfig(round);
       setPhase('playing');
     } catch {
-      // Silent no-op on error is forbidden — surface it (a dead-looking PLAY
-      // button is indistinguishable from a bug).
+      // Silent no-op on error is forbidden — surface it (a dead-looking wheel
+      // tap is indistinguishable from a bug).
       setLoadError(true);
       setPhase('wheel');
     }
-  }, [challenge, selection, language, roundIndex]);
+  }, [challenge, language, roundIndex]);
 
   const handleDone = useCallback(
     async (r: QuickRoundResult) => {
@@ -312,7 +315,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
             {t('quickPlay.solo.loading')}
           </div>
         ) : (
-          <QuickPlayWheel selection={selection} onSelect={handleSelect} onPlay={handlePlay} />
+          <QuickPlayWheel selection={selection} onSelect={handlePlay} />
         )}
       </div>
     </div>

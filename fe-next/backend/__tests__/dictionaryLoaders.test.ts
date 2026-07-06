@@ -1,4 +1,5 @@
-import { loadNounList, loadSpanishDictionary, SafeReadFile } from '../dictionaryLoaders';
+import * as path from 'path';
+import { loadNounList, loadSpanishDictionary, loadHebrewDictionary, SafeReadFile } from '../dictionaryLoaders';
 
 describe('loadNounList', () => {
   const mockSafeReadFile: SafeReadFile = vi.fn();
@@ -44,6 +45,23 @@ describe('loadNounList', () => {
     expect(mockSafeReadFile).toHaveBeenCalledWith(
       expect.stringContaining('he_nouns.txt')
     );
+  });
+});
+
+describe('loadHebrewDictionary — resolves its asset path off process.cwd(), not __dirname', () => {
+  // Regression for a real prod bug: Next.js API routes bundle this module
+  // (Turbopack/webpack), which relocates __dirname away from backend/ on
+  // disk. A __dirname-anchored path silently resolved to a nonexistent file
+  // (safeReadFile treats missing-file as "" rather than throwing), so every
+  // non-English quick-play round threw "Dictionary unavailable" with no
+  // logged error at all. process.cwd() is stable across both the plain tsx
+  // server and Next's bundled route handlers, so anchor there instead.
+  it('reads from an absolute path under <cwd>/backend, not a bundler-relative one', async () => {
+    const safeReadFile: SafeReadFile = vi.fn().mockResolvedValue('');
+    await loadHebrewDictionary(safeReadFile);
+    const calledPaths = (safeReadFile as ReturnType<typeof vi.fn>).mock.calls.map((c) => c[0]);
+    expect(calledPaths).toContain(path.join(process.cwd(), 'backend', 'hebrew_words.txt'));
+    expect(calledPaths).toContain(path.join(process.cwd(), 'backend', 'hebrew_words_approved.txt'));
   });
 });
 

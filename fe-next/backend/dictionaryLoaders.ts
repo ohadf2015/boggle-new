@@ -13,6 +13,14 @@ import {
   normalizeRussianWord,
 } from '@/shared/utils/wordNormalization';
 
+// __dirname is unreliable here: Next.js API routes execute this module inside
+// a Turbopack/webpack bundle whose __dirname points into the bundler's own
+// chunk layout, not backend/ on disk — every *.txt read below silently found
+// nothing and returned '' (no throw, since safeReadFile treats a missing file
+// as empty). process.cwd() is always the project root (fe-next/) for both the
+// custom tsx server and Next itself, so anchor there instead.
+const BACKEND_DIR = path.join(process.cwd(), 'backend');
+
 export type SafeReadFile = (filePath: string) => Promise<string>;
 
 export function createSafeReadFile(): SafeReadFile {
@@ -58,7 +66,7 @@ export async function loadEnglishDictionary(
   const dict = new Set(englishWords.map(w => w.toLowerCase()));
   logger.debug('DICT', `Loaded ${dict.size} English words from main dictionary`);
 
-  const approvedContent = await safeReadFile(path.join(__dirname, 'english_words_approved.txt'));
+  const approvedContent = await safeReadFile(path.join(BACKEND_DIR, 'english_words_approved.txt'));
   mergeApprovedWords(dict, approvedContent, 'English');
   logger.debug('DICT', `Total English words: ${dict.size}`);
   return dict;
@@ -68,8 +76,8 @@ export async function loadHebrewDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
   const [hebrewContent, hebrewApprovedContent] = await Promise.all([
-    safeReadFile(path.join(__dirname, 'hebrew_words.txt')),
-    safeReadFile(path.join(__dirname, 'hebrew_words_approved.txt')),
+    safeReadFile(path.join(BACKEND_DIR, 'hebrew_words.txt')),
+    safeReadFile(path.join(BACKEND_DIR, 'hebrew_words_approved.txt')),
   ]);
 
   let dict = new Set<string>();
@@ -88,10 +96,10 @@ export async function loadSwedishDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
   const [swedishFileContent, swedishApprovedContent] = await Promise.all([
-    safeReadFile(path.join(__dirname, 'node_modules/@arvidbt/swedish-words/out/index.js')).then(content =>
-      content || safeReadFile(path.join(__dirname, '../node_modules/@arvidbt/swedish-words/out/index.js'))
+    safeReadFile(path.join(BACKEND_DIR, 'node_modules/@arvidbt/swedish-words/out/index.js')).then(content =>
+      content || safeReadFile(path.join(BACKEND_DIR, '../node_modules/@arvidbt/swedish-words/out/index.js'))
     ),
-    safeReadFile(path.join(__dirname, 'swedish_words_approved.txt')),
+    safeReadFile(path.join(BACKEND_DIR, 'swedish_words_approved.txt')),
   ]);
 
   let dict = new Set<string>();
@@ -154,9 +162,9 @@ export async function loadJapaneseDictionary(
   safeReadFile: SafeReadFile
 ): Promise<{ words: Set<string>; compounds: string[] }> {
   const [hiraganaContent, kanjiContent, japaneseApprovedContent] = await Promise.all([
-    safeReadFile(path.join(__dirname, 'japanese_words.txt')),
-    safeReadFile(path.join(__dirname, 'kanji_compounds.txt')),
-    safeReadFile(path.join(__dirname, 'japanese_words_approved.txt')),
+    safeReadFile(path.join(BACKEND_DIR, 'japanese_words.txt')),
+    safeReadFile(path.join(BACKEND_DIR, 'kanji_compounds.txt')),
+    safeReadFile(path.join(BACKEND_DIR, 'japanese_words_approved.txt')),
   ]);
 
   const dict = new Set<string>();
@@ -193,7 +201,7 @@ export async function loadNounList(
   language: string,
   normalizer: (w: string) => string = (w) => w.trim().toLowerCase()
 ): Promise<Set<string>> {
-  const filePath = path.join(__dirname, `${language}_nouns.txt`);
+  const filePath = path.join(BACKEND_DIR, `${language}_nouns.txt`);
   const content = await safeReadFile(filePath);
   if (!content) return new Set();
 
@@ -213,7 +221,7 @@ export async function loadSpanishDictionary(
   const dict = new Set(spanishWords.map(w => normalizeSpanishWord(w)));
   logger.debug('DICT', `Loaded ${dict.size} Spanish words from main dictionary`);
 
-  const approvedContent = await safeReadFile(path.join(__dirname, 'spanish_words_approved.txt'));
+  const approvedContent = await safeReadFile(path.join(BACKEND_DIR, 'spanish_words_approved.txt'));
   mergeApprovedWords(dict, approvedContent, 'Spanish', (w) => normalizeSpanishWord(w.trim()));
   logger.debug('DICT', `Total Spanish words: ${dict.size}`);
   return dict;
@@ -223,8 +231,8 @@ export async function loadRussianDictionary(
   safeReadFile: SafeReadFile
 ): Promise<Set<string>> {
   const [russianContent, russianApprovedContent] = await Promise.all([
-    safeReadFile(path.join(__dirname, 'russian_words.txt')),
-    safeReadFile(path.join(__dirname, 'russian_words_approved.txt')),
+    safeReadFile(path.join(BACKEND_DIR, 'russian_words.txt')),
+    safeReadFile(path.join(BACKEND_DIR, 'russian_words_approved.txt')),
   ]);
 
   let dict = new Set<string>();

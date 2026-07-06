@@ -16,10 +16,13 @@ vi.mock('@/hooks/useBackOneLevel', () => ({
   useBackOneLevel: () => vi.fn(),
 }));
 vi.mock('../QuickPlayWheel', () => ({
-  QuickPlayWheel: ({ onSelect, onPlay }: any) => (
+  // The real wheel plays immediately on select (tap a node / release a drag) —
+  // there's no separate PLAY button anymore. mock-play stands in for
+  // "release on random", the old default when PLAY was pressed with no pick.
+  QuickPlayWheel: ({ onSelect }: any) => (
     <div>
       <button data-testid="mock-select" onClick={() => onSelect('blast', 'drag')}>sel</button>
-      <button data-testid="mock-play" onClick={onPlay}>play</button>
+      <button data-testid="mock-play" onClick={() => onSelect('random', 'tap')}>play</button>
     </div>
   ),
 }));

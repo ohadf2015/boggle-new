@@ -2,9 +2,11 @@
 
 /**
  * Quick Play mode wheel — the feature's identity interaction.
- * Drag the center knob toward a mode node to select it; release inside the
- * dead zone to stay on Random. Deliberately NOT a card grid: card grids are
- * multiplayer's mode-select language, quick play must feel physical/arcade.
+ * Tap a mode node, or drag the center knob toward one and release, to play it
+ * immediately — no separate confirm step. Release the knob without dragging
+ * (or drop it inside the dead zone) to play Random. Deliberately NOT a card
+ * grid: card grids are multiplayer's mode-select language, quick play must
+ * feel physical/arcade.
  */
 import { useRef, useState, useCallback } from 'react';
 import { Shuffle } from 'lucide-react';
@@ -23,10 +25,9 @@ const KNOB_TRAVEL_MAX_PX = 96;
 interface QuickPlayWheelProps {
   selection: WheelSelection;
   onSelect: (selection: WheelSelection, method: 'drag' | 'tap') => void;
-  onPlay: () => void;
 }
 
-export function QuickPlayWheel({ selection, onSelect, onPlay }: QuickPlayWheelProps) {
+export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
   const { t } = useLanguage();
   const { playSound } = useSoundEffects();
   const knobRef = useRef<HTMLButtonElement>(null);
@@ -89,7 +90,6 @@ export function QuickPlayWheel({ selection, onSelect, onPlay }: QuickPlayWheelPr
   );
 
   const active = hovered ?? selection;
-  const playColor = active !== 'random' ? NODE_COLORS[active].bg : 'bg-neo-cozy';
 
   return (
     <div className="flex flex-col items-center gap-6 bg-neo-navy">
@@ -116,7 +116,7 @@ export function QuickPlayWheel({ selection, onSelect, onPlay }: QuickPlayWheelPr
               key={mode}
               type="button"
               data-testid={`quick-wheel-node-${mode}`}
-              onClick={() => (selection === mode ? onPlay() : onSelect(mode, 'tap'))}
+              onClick={() => onSelect(mode, 'tap')}
               aria-label={t(`quickPlay.solo.mode.${mode}`)}
               aria-pressed={isActive}
               className={`absolute left-1/2 top-1/2 h-[88px] w-[88px] -translate-x-1/2 -translate-y-1/2 transition-transform duration-200 ${
@@ -148,8 +148,16 @@ export function QuickPlayWheel({ selection, onSelect, onPlay }: QuickPlayWheelPr
             resetKnob();
             setHovered(null);
           }}
-          aria-hidden="true"
-          tabIndex={-1}
+          onKeyDown={(e) => {
+            // Pointer drag owns click/touch; keyboard has no drag gesture, so
+            // Enter/Space is the only way a keyboard user can reach Random
+            // now that there's no separate PLAY button to Tab to.
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onSelect('random', 'tap');
+            }
+          }}
+          aria-label={t('quickPlay.solo.random')}
           className="absolute left-1/2 top-1/2 z-20 h-[104px] w-[104px] -translate-x-1/2 -translate-y-1/2 touch-none"
         >
           <span
@@ -178,14 +186,6 @@ export function QuickPlayWheel({ selection, onSelect, onPlay }: QuickPlayWheelPr
             {t(active === 'random' ? 'quickPlay.solo.random' : `quickPlay.solo.mode.${active}`)}
           </b>
         </p>
-        <button
-          type="button"
-          data-testid="quick-wheel-play"
-          onClick={onPlay}
-          className={`h-[64px] w-full max-w-sm rounded-2xl border-4 border-black font-neo-display text-2xl font-bold tracking-[3px] text-black shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed ${playColor}`}
-        >
-          {t('quickPlay.solo.play')}
-        </button>
         <p className="text-xs text-neo-white/50">{t('quickPlay.solo.subCaption')}</p>
       </div>
     </div>

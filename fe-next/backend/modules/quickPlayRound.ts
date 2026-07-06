@@ -15,7 +15,7 @@ import {
 import { scoreWord as scoreWheelWord } from '@/utils/dailyChallenge/wordWheelScoring';
 // ESM import — a bare require() here trips the backend vitest CJS transform
 // into a module-init loop (mixed-mode file) and hangs the whole test run.
-import { dictionary, load as loadDictionaries } from '../dictionary';
+import { dictionary, ensureLanguageLoaded } from '../dictionary';
 
 export type QuickMode = 'classic' | 'blast' | 'word-hunt' | 'wheel-rush';
 
@@ -64,7 +64,7 @@ export async function buildQuickRound(
   // Cold Next process: dictionaries load lazily — an empty set would mint
   // garbage rounds (no words, perfectScore=1) instead of failing loud.
   if (dictionaryFor(language).size === 0) {
-    await loadDictionaries();
+    await ensureLanguageLoaded(language as never);
     if (dictionaryFor(language).size === 0) {
       throw new Error(`Dictionary unavailable for language ${language}`);
     }

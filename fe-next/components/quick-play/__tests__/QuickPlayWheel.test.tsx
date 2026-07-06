@@ -13,24 +13,23 @@ vi.mock('@/utils/haptics/HapticsManager', () => ({
 
 describe('QuickPlayWheel', () => {
   const onSelect = vi.fn();
-  const onPlay = vi.fn();
 
   beforeEach(() => vi.clearAllMocks());
 
   function renderWheel(selection: Parameters<typeof QuickPlayWheel>[0]['selection'] = 'random') {
-    return render(<QuickPlayWheel selection={selection} onSelect={onSelect} onPlay={onPlay} />);
+    return render(<QuickPlayWheel selection={selection} onSelect={onSelect} />);
   }
 
-  it('renders 4 mode nodes + knob + play button', () => {
+  it('renders 4 mode nodes + knob, no separate play button', () => {
     renderWheel();
     expect(screen.getByTestId('quick-wheel-knob')).toBeTruthy();
     for (const mode of ['classic', 'blast', 'word-hunt', 'wheel-rush']) {
       expect(screen.getByTestId(`quick-wheel-node-${mode}`)).toBeTruthy();
     }
-    expect(screen.getByTestId('quick-wheel-play')).toBeTruthy();
+    expect(screen.queryByTestId('quick-wheel-play')).toBeNull();
   });
 
-  it('drag up selects wheel-rush with method drag', () => {
+  it('drag up plays wheel-rush immediately with method drag', () => {
     renderWheel();
     const knob = screen.getByTestId('quick-wheel-knob');
     fireEvent.pointerDown(knob, { clientX: 100, clientY: 100, pointerId: 1 });
@@ -39,7 +38,7 @@ describe('QuickPlayWheel', () => {
     expect(onSelect).toHaveBeenCalledWith('wheel-rush', 'drag');
   });
 
-  it('release inside dead zone returns random', () => {
+  it('release inside dead zone plays random immediately', () => {
     renderWheel('blast');
     const knob = screen.getByTestId('quick-wheel-knob');
     fireEvent.pointerDown(knob, { clientX: 100, clientY: 100, pointerId: 1 });
@@ -48,27 +47,29 @@ describe('QuickPlayWheel', () => {
     expect(onSelect).toHaveBeenCalledWith('random', 'drag');
   });
 
-  it('tapping a node selects it with method tap', () => {
+  it('tapping any node plays it immediately, on the first tap', () => {
     renderWheel();
     fireEvent.click(screen.getByTestId('quick-wheel-node-classic'));
+    expect(onSelect).toHaveBeenCalledTimes(1);
     expect(onSelect).toHaveBeenCalledWith('classic', 'tap');
   });
 
-  it('tapping the already-selected node starts the round', () => {
+  it('tapping an already-selected node still plays it again (no toggle-off)', () => {
     renderWheel('classic');
     fireEvent.click(screen.getByTestId('quick-wheel-node-classic'));
-    expect(onPlay).toHaveBeenCalledTimes(1);
-    expect(onSelect).not.toHaveBeenCalled();
-  });
-
-  it('play button fires onPlay', () => {
-    renderWheel('word-hunt');
-    fireEvent.click(screen.getByTestId('quick-wheel-play'));
-    expect(onPlay).toHaveBeenCalledTimes(1);
+    expect(onSelect).toHaveBeenCalledWith('classic', 'tap');
   });
 
   it('nodes are buttons (a11y / keyboard reachable)', () => {
     renderWheel();
     expect(screen.getByTestId('quick-wheel-node-blast').tagName).toBe('BUTTON');
+  });
+
+  it('knob is keyboard-focusable and Enter plays random (only keyboard path to Random since PLAY is gone)', () => {
+    renderWheel();
+    const knob = screen.getByTestId('quick-wheel-knob');
+    expect(knob.getAttribute('aria-hidden')).not.toBe('true');
+    fireEvent.keyDown(knob, { key: 'Enter' });
+    expect(onSelect).toHaveBeenCalledWith('random', 'tap');
   });
 });
