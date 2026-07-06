@@ -1,6 +1,6 @@
 'use client';
 
-import { Clapperboard, RotateCcw, Trophy } from 'lucide-react';
+import { Clapperboard, Loader2, RotateCcw, Trophy } from 'lucide-react';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 
 interface BlastRetryWaveModalProps {
@@ -23,7 +23,7 @@ interface BlastRetryWaveModalProps {
 export function BlastRetryWaveModal({
   isOpen, waveNumber, clearPct, onRetry, onDecline, t,
 }: BlastRetryWaveModalProps) {
-  const { offer, canShowAd } = useRewardedFeatureUnlock({
+  const { offer, canShowAd, status } = useRewardedFeatureUnlock({
     placement: 'blast_wave_retry',
     surface: 'retry',
     onUnlock: onRetry,
@@ -32,6 +32,8 @@ export function BlastRetryWaveModal({
   });
 
   if (!isOpen) return null;
+
+  const adActive = status === 'loading' || status === 'showing';
 
   return (
     <>
@@ -61,16 +63,23 @@ export function BlastRetryWaveModal({
                   type="button"
                   data-testid="blast-retry-wave-cta"
                   onClick={offer}
-                  className="relative flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed"
+                  disabled={adActive}
+                  aria-busy={adActive}
+                  className="relative flex items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-lime px-6 py-3 font-neo-display text-lg font-black text-neo-navy shadow-hard transition-transform active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  <Clapperboard className="h-5 w-5" strokeWidth={3} />
+                  {adActive
+                    ? <Loader2 className="h-5 w-5 animate-spin" strokeWidth={3} />
+                    : <Clapperboard className="h-5 w-5" strokeWidth={3} />
+                  }
                   {t('blast.retryWaveModal.cta', { wave: waveNumber })}
-                  <span
-                    aria-hidden
-                    className="absolute -top-2.5 -right-2.5 rounded-full border-2 border-black bg-neo-yellow px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-neo-navy shadow-hard"
-                  >
-                    {t('blast.adBadge')}
-                  </span>
+                  {!adActive && (
+                    <span
+                      aria-hidden
+                      className="absolute -top-2.5 -right-2.5 rounded-full border-2 border-black bg-neo-yellow px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-neo-navy shadow-hard"
+                    >
+                      {t('blast.adBadge')}
+                    </span>
+                  )}
                 </button>
               )}
               <button

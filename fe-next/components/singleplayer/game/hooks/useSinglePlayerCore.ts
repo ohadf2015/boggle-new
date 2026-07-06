@@ -42,7 +42,6 @@ import { useBotSimulation } from './useBotSimulation';
 import { useSpamDetection } from './useSpamDetection';
 import { useSinglePlayerEffects } from './useSinglePlayerEffects';
 import { buildGameResults, buildFallbackResults, emitSinglePlayerGameEnd } from './buildGameResults';
-import { resolveQuitRequest } from './quitRequestPolicy';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import type { SinglePlayerGameState, SinglePlayerResultsData } from '../../SinglePlayerView';
 import type { LetterGrid } from '@/shared/types/game';
@@ -474,11 +473,9 @@ export function useSinglePlayerCore({
   const handleWordChange = useCallback((word: string, count: number) => { setFormedWord(word); setLetterCount(count); }, []);
   const handleFinishPractice = useCallback(() => setIsGameOver(true), []);
   const handleQuitRequest = useCallback(() => {
-    const { trackAbandon, action } = resolveQuitRequest(settings.mode, score);
-    if (trackAbandon) trackGrowthEvent('game_abandon_attempted', { mode: settings.mode, score, hadScore: score > 0 });
-    if (action === 'finishPractice') setIsGameOver(true);
-    else if (action === 'confirm') setShowQuitConfirm(true);
-    else onQuit();
+    if (settings.mode === 'practice') { setIsGameOver(true); return; }
+    trackGrowthEvent('game_abandon_attempted', { mode: settings.mode, score, hadScore: score > 0 });
+    score > 0 ? setShowQuitConfirm(true) : onQuit();
   }, [score, onQuit, settings.mode]);
   // Confirm path: disarm the guard (leaving) BEFORE the exit nav so its teardown
   // doesn't race-cancel the router push (black screen on native). The score===0
