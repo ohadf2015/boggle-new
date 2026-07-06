@@ -56,7 +56,7 @@ import { useAdventureSFX, useAdventureAnalytics } from './hooks/useAdventureSFXA
 import { useAdventureMusic } from '@/hooks/useAdventureMusic';
 import type { LevelConfig } from '@/types/adventure';
 import { MAX_EQUIPPED_RUNES } from '@/lib/adventure/runeCatalog';
-import { RunePicker } from '@/components/wordForge/RunePicker';
+import { RunePicker } from './RunePicker';
 
 export interface GameTimerState { timeRemaining: number; totalTime: number; isPlaying: boolean; isPaused: boolean; }
 

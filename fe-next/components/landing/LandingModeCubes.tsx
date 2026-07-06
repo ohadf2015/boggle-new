@@ -61,7 +61,7 @@ const VARIANT: Record<ModeCubeVariant, VariantStyle> = {
 // RECOMMENDED modes keep the idle "glance" sheen — the high-energy competitive
 // set (multiplayer arena, blast, party). Calm modes (practice, adventure, …) stay
 // glare-free so the homepage has less going on at once (the anchor is always in).
-const RECOMMENDED_SHEEN_KEYS = new Set(['arena', 'multiplayer', 'blast', 'party']);
+const RECOMMENDED_SHEEN_KEYS = new Set(['arena', 'multiplayer', 'blast']);
 
 // Badge wears the mode colour (not navy) so every flagged cube pops a chip of
 // its own hue — a contained, on-brand splash of colour on the bento beyond the

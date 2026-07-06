@@ -19,7 +19,6 @@ const GAMEPLAY_SEGMENTS = new Set<string>([
   'word-wheel',
   'crossword',
   'adventure',
-  'party',
   'connections',
   'brain',
   'practice',

@@ -19,10 +19,7 @@
 import { locales as LOCALES } from '@/lib/i18n';
 
 /** Routes (locale-stripped) whose URL-drop-one parent has no page → explicit parent. */
-const PARENT_OVERRIDES: { test: RegExp; parent: string }[] = [
-  // /party/<gameId>/host and /play have no /party/<gameId> page.
-  { test: /^\/party\/[^/]+\/(host|play)$/, parent: '/party' },
-];
+const PARENT_OVERRIDES: { test: RegExp; parent: string }[] = [];
 
 export function parentRoute(pathname: string): string {
   if (!pathname) return '/';

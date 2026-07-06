@@ -20,7 +20,7 @@ vi.mock('./RetryAssistModal', () => ({
 vi.mock('./AdventureTutorial', () => ({
   AdventureTutorial: () => <div data-testid="tutorial" />,
 }));
-vi.mock('@/components/wordForge/RuneBar', () => ({
+vi.mock('./RuneBar', () => ({
   RuneBar: () => <div data-testid="rune-bar" />,
 }));
 vi.mock('@/lib/adventure/nearMiss', () => ({

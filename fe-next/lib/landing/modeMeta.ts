@@ -12,7 +12,7 @@
  */
 import {
   Swords, BookOpen, Map, Bomb, Link2, Brain, Layers, Building2,
-  Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel, Grid3x3,
+  ScrollText, Gavel, Grid3x3,
   CloudRain, Zap,
   type LucideIcon,
 } from 'lucide-react';
@@ -116,22 +116,6 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   wordTower: {
     titleKey: 'wordTower.cardTitle', descKey: 'wordTower.cardDesc', path: '/word-tower',
     Icon: Building2, variant: 'lime', badge: 'ADMIN', modeImage: '/modes/word-tower.png', genIcon: '/modes/cubes/wordtower.png',
-  },
-  wordForge: {
-    titleKey: 'landing.wordForgeMode', descKey: 'landing.wordForgeModeDesc', path: '/word-forge',
-    Icon: Hammer, variant: 'orange', badge: 'ADMIN', genIcon: '/modes/cubes/wordforge.png',
-  },
-  wordVault: {
-    titleKey: 'landing.wordVaultMode', descKey: 'landing.wordVaultModeDesc', path: '/word-vault',
-    Icon: Vault, variant: 'cyan', badge: 'ADMIN', genIcon: '/modes/cubes/wordvault.png',
-  },
-  party: {
-    titleKey: 'landing.partyMode', descKey: 'landing.partyModeDesc', path: '/party',
-    Icon: PartyPopper, variant: 'pink', badge: 'ADMIN', genIcon: '/modes/cubes/party.png',
-  },
-  wordAlchemy: {
-    titleKey: 'landing.wordAlchemyMode', descKey: 'landing.wordAlchemyModeDesc', path: '/word-alchemy',
-    Icon: FlaskConical, variant: 'purple', badge: 'ADMIN', genIcon: '/modes/cubes/wordalchemy.png',
   },
   shiritori: {
     titleKey: 'landing.shiritoriMode', descKey: 'landing.shiritoriModeDesc', path: '/shiritori/solo',

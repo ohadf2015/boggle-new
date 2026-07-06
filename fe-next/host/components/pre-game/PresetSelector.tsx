@@ -26,14 +26,6 @@ export const GAME_PRESETS: Record<PresetKey, GamePreset> = {
     difficulty: 'MEDIUM',
     minWordLength: 2,
   },
-  party: {
-    nameKey: 'hostView.presetParty',
-    detailsKey: 'hostView.presetPartyDetails',
-    icon: '🎉',
-    timer: 2,
-    difficulty: 'MEDIUM',
-    minWordLength: 2,
-  },
   challenge: {
     nameKey: 'hostView.presetChallenge',
     detailsKey: 'hostView.presetChallengeDetails',
@@ -44,7 +36,7 @@ export const GAME_PRESETS: Record<PresetKey, GamePreset> = {
   },
 } as const;
 
-export type PresetKey = 'fast' | 'party' | 'challenge';
+export type PresetKey = 'fast' | 'challenge';
 
 const PRESET_COLORS: Record<PresetKey, {
   active: string;
@@ -53,10 +45,6 @@ const PRESET_COLORS: Record<PresetKey, {
   fast: {
     active: 'bg-neo-cyan border-neo-cyan',
     glow: 'shadow-[0_0_12px_rgba(0,255,255,0.3)]',
-  },
-  party: {
-    active: 'bg-neo-yellow border-neo-yellow',
-    glow: 'shadow-[0_0_12px_rgba(255,225,53,0.3)]',
   },
   challenge: {
     active: 'bg-neo-pink border-neo-pink',

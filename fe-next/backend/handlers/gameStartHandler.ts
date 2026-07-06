@@ -367,6 +367,9 @@ export function registerStartGameHandler(io: Server, socket: Socket): void {
       const boardLang = language || game.language || 'en';
       if (inWorkAllowed && resolvedMode === 'shiritori' && boardLang !== 'ja') inWorkAllowed = false;
       if (inWorkAllowed && resolvedMode === 'sealed-bid' && boardLang !== 'en' && boardLang !== 'he') inWorkAllowed = false;
+      // Shiritori is PUBLISHED for Japanese: a ja board is live for every host,
+      // no admin/beta gate (still human-only, JA hiragana dictionary enforced).
+      if (resolvedMode === 'shiritori' && boardLang === 'ja') inWorkAllowed = true;
       if (!inWorkAllowed) {
         gamesStarting.delete(gameCode);
         logger.debug('SOCKET', `Rejected in-work mode ${resolvedMode} for ${gameCode}: host lacks access or wrong language`);

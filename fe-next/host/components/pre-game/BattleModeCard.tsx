@@ -109,12 +109,12 @@ export function BattleModeCard({
 
   // Blast is now offered to ALL players (gate removed after MP-blast parity).
   // Word Tower stays admin-only AND behind the `word-tower` experiment (mirrors
-  // the solo gating; server enforces admin too). Shiritori is an in-work beta
-  // mode: admin-only AND Japanese-only (server gates it the same — JA dictionary
-  // + canAccessInWorkMode), so it never reaches non-beta players' rotation.
+  // the solo gating; server enforces admin too). Shiritori is PUBLISHED for
+  // Japanese: any ja host may pick it (no admin/beta gate) — server still
+  // enforces the ja board (JA hiragana dictionary).
   const { variant: wordTowerVariant } = useExperiment('word-tower');
   const wordTowerEnabled = isAdmin && wordTowerVariant === 'on';
-  const shiritoriEnabled = isAdmin && isShiritoriAvailable(language);
+  const shiritoriEnabled = isShiritoriAvailable(language);
   // Sealed Bid has curated racks + dictionary only for EN and HE boards.
   const sealedBidEnabled = isAdmin && (language === 'en' || language === 'he');
   // Crossword has a baked puzzle pool for every locale (falls back to EN).

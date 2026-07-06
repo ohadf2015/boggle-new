@@ -7,7 +7,7 @@ import { AdventureToast } from './AdventureToast';
 import MechanicBonusToast from './MechanicBonusToast';
 import RetryAssistModal from './RetryAssistModal';
 import { AdventureTutorial } from './AdventureTutorial';
-import { RuneBar } from '@/components/wordForge/RuneBar';
+import { RuneBar } from './RuneBar';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
 import { trackModalDismissed } from '@/utils/posthogEngagement';
 

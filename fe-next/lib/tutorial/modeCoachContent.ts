@@ -127,16 +127,6 @@ export const MODE_COACH: Record<CoachModeKey, CoachContent> = {
       { demo: 'icon', emoji: '✨', captionKey: 'modeCoach.wordCraft.step2' },
     ],
   },
-  wordAlchemy: {
-    mode: 'wordAlchemy',
-    tier: 'simple',
-    accent: 'purple',
-    titleKey: 'modeCoach.wordAlchemy.title',
-    steps: [
-      { demo: 'icon', emoji: '⚗️', captionKey: 'modeCoach.wordAlchemy.step1' },
-      { demo: 'icon', emoji: '🔮', captionKey: 'modeCoach.wordAlchemy.step2' },
-    ],
-  },
   crossword: {
     mode: 'crossword',
     tier: 'simple',

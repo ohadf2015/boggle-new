@@ -1,7 +1,7 @@
 /**
  * soloReward — pure per-mode score→coin mapping + a deterministic variable bonus.
  *
- * Wires the session-only beta modes (Shiritori, Sealed Bid, Word Alchemy, Crossword)
+ * Wires the session-only beta modes (Shiritori, Sealed Bid, Crossword)
  * into the existing coin economy (`utils/coinManager`) WITHOUT new infra. Each mode's
  * score→coin mapping is an explicit, tested function — this is also the "is the reward
  * fair/fun" knob, so it is never an inline expression.
@@ -13,7 +13,7 @@
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
 import { seededRandom } from './soloDaily';
 
-export type SoloMode = 'shiritori' | 'sealed-bid' | 'word-alchemy' | 'crossword';
+export type SoloMode = 'shiritori' | 'sealed-bid' | 'crossword';
 
 export interface SoloRewardBreakdown {
   base: number;
@@ -75,16 +75,6 @@ export function computeSoloReward(args: {
   );
 
   return { coins: total, breakdown: { base, scoreBonus, winBonus }, bonus };
-}
-
-/**
- * Word Alchemy has no numeric score — synthesize one from the heat meter on a win.
- * Heat fraction (0..1) → up to 150 points so a hot completion rewards well.
- */
-export function alchemyScore(heat: number, maxHeat: number, won: boolean): number {
-  if (!won) return 0;
-  const frac = maxHeat > 0 ? Math.min(1, Math.max(0, heat / maxHeat)) : 0;
-  return Math.round(40 + frac * 110);
 }
 
 /**

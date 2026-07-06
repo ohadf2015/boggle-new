@@ -13,7 +13,6 @@
  */
 const NETWORK_ONLY_LANDING_MODES: ReadonlySet<string> = new Set([
   'arena', // real-time multiplayer rooms
-  'party', // socket-driven party games (Pixel/Caption/Shadow Clash)
 ]);
 
 export function requiresNetworkToPlay(landingCardKey: string): boolean {

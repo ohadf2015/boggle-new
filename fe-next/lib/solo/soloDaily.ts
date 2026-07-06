@@ -68,11 +68,6 @@ const MODIFIERS: Record<SoloMode, SoloModifier[]> = {
     { id: 'vowel-tax', labelKey: 'solo.modifier.sealedBid.vowelTax.label', descKey: 'solo.modifier.sealedBid.vowelTax.desc' },
     { id: 'high-stakes', labelKey: 'solo.modifier.sealedBid.highStakes.label', descKey: 'solo.modifier.sealedBid.highStakes.desc' },
   ],
-  'word-alchemy': [
-    { id: 'double-catalyst', labelKey: 'solo.modifier.wordAlchemy.doubleCatalyst.label', descKey: 'solo.modifier.wordAlchemy.doubleCatalyst.desc' },
-    { id: 'heat-decay', labelKey: 'solo.modifier.wordAlchemy.heatDecay.label', descKey: 'solo.modifier.wordAlchemy.heatDecay.desc' },
-    { id: 'pure-transmute', labelKey: 'solo.modifier.wordAlchemy.pureTransmute.label', descKey: 'solo.modifier.wordAlchemy.pureTransmute.desc' },
-  ],
   crossword: [
     { id: 'themed-grid', labelKey: 'solo.modifier.crossword.themedGrid.label', descKey: 'solo.modifier.crossword.themedGrid.desc' },
     { id: 'no-check', labelKey: 'solo.modifier.crossword.noCheck.label', descKey: 'solo.modifier.crossword.noCheck.desc' },

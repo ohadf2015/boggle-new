@@ -26,7 +26,6 @@ export type CoachModeKey =
   | 'wordTower'
   | 'connections'
   | 'wordCraft'
-  | 'wordAlchemy'
   | 'crossword'
   | 'sealedBid'
   | 'shiritori'

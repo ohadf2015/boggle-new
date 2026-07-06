@@ -56,10 +56,6 @@ type LandingCardKey =
   | 'brainGym'
   | 'wordCraft'
   | 'wordTower'
-  | 'wordForge'
-  | 'wordVault'
-  | 'party'
-  | 'wordAlchemy'
   | 'shiritori'
   | 'sealedBid'
   | 'crossword'
@@ -77,8 +73,7 @@ const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'blast', 'practice', 
 const FEATURED_MODES = new Set<LandingCardKey>([
   'daily', 'arena', 'blast', 'practice',
   'connections', 'brainGym', 'wordCraft', 'wordTower',
-  'wordForge', 'wordVault',
-  'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword', 'wordfall',
+  'shiritori', 'sealedBid', 'crossword', 'wordfall',
   'adventure', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
   'quickPlay', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
 ]);
@@ -161,16 +156,8 @@ export function LandingChallengeCards({
     // WordCraft is public — territory surfaces on the hub for everyone.
     if (!next.includes('wordCraft')) next.push('wordCraft');
     if (canSeeInWorkModes && !next.includes('wordTower')) next.push('wordTower');
-    // In-work dev previews of modes not yet surfaced on the public hub.
-    if (canSeeInWorkModes && !next.includes('wordForge')) next.push('wordForge');
-    if (canSeeInWorkModes && !next.includes('wordVault')) next.push('wordVault');
-    // Hidden modes that ship code but aren't surfaced to the public hub —
-    // gated behind a PostHog flag (party), a typed-URL-only puzzle
-    // (wordAlchemy), or pure standalone routes (shiritori). Admins + beta
-    // testers get one hub entry per mode so previews stay reachable without
-    // flipping flags in the dashboard.
-    if (canSeeInWorkModes && !next.includes('party')) next.push('party');
-    if (canSeeInWorkModes && !next.includes('wordAlchemy')) next.push('wordAlchemy');
+    // Standalone-route preview modes — admins + beta testers get one hub entry
+    // each so previews stay reachable without flipping dashboard flags.
     if (canSeeInWorkModes && !next.includes('shiritori')) next.push('shiritori');
     if (canSeeInWorkModes && !next.includes('sealedBid')) next.push('sealedBid');
     if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
@@ -205,7 +192,7 @@ export function LandingChallengeCards({
 
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword', 'wordfall', 'quickPlay']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'shiritori', 'sealedBid', 'crossword', 'wordfall', 'quickPlay']);
 
   // Every mode is surfaced directly on the hub — no "More Game Modes" collapse.
   // New and returning players alike see the full roster (the old newcomer
@@ -255,9 +242,6 @@ export function LandingChallengeCards({
         highlighted: showPracticeHighlight,
         highlightLabel: showPracticeHighlight ? t('onboarding.welcome.startHere') : undefined,
       };
-    }
-    if (key === 'party') {
-      return { ...base, locked: isOffline && requiresNetworkToPlay('party'), lockedMessage: t('landing.offlineLocked') };
     }
     return base;
   };

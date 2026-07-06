@@ -37,7 +37,6 @@ import { registerReactionHandlers } from './reactionHandler.js';
 import { registerLobbyEmoteHandlers } from './lobbyEmoteHandler.js';
 import { registerLobbyAdGateHandlers } from './lobbyAdGateHandler.js';
 import { registerGiftHandlers } from './giftHandler.js';
-import { registerPartyHandlers } from './partyHandler.js';
 import { registerBoostHandlers } from './boostHandler.js';
 import { getGame } from '../modules/gameStateManager.js';
 
@@ -81,7 +80,6 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerLobbyEmoteHandlers(io, socket);
   registerLobbyAdGateHandlers(io, socket);
   registerGiftHandlers(io, socket);
-  registerPartyHandlers(io, socket);
   registerBoostHandlers(io, socket);
 }
 
