@@ -87,6 +87,7 @@ export default function SealedBidPage() {
   const [roundIndex, setRoundIndex] = useState(0);
   const [wallet, setWallet] = useState<ChipWallet>(() => initWallet(START_CHIPS));
   const [chosenWord, setChosenWord] = useState('');
+  const [playedWord, setPlayedWord] = useState<string | null>(null);
   const [stake, setStake] = useState(MIN_STAKE);
   const [settlement, setSettlement] = useState<Settlement | null>(null);
   const [phase, setPhase] = useState<'bidding' | 'revealed' | 'done'>('bidding');
@@ -127,6 +128,7 @@ export default function SealedBidPage() {
     (sett: Settlement, playerWord: string | null) => {
       setWallet((w) => applyDelta(w, sett.delta));
       setSettlement(sett);
+      setPlayedWord(playerWord);
       setHistory((h) => [
         ...h,
         {
@@ -152,14 +154,17 @@ export default function SealedBidPage() {
     setPending(true);
     const dictOk = await dictCheck(chosenWord, dictLang);
     setPending(false);
+    // Always pass the word + dictOk so settleBid applies the invalid-word ante
+    // (a staked word that isn't in the dictionary loses a small ante, not a
+    // free pass). A deliberate Pass sends a null word via `pass()` below.
     const sett = settleBid({
-      playerWord: dictOk ? chosenWord : null,
+      playerWord: chosenWord,
       botWords: currentDeal.botPicks,
       dictOk,
       rack: currentDeal.rack,
       stake,
     });
-    recordAndReveal(sett, dictOk ? chosenWord.toUpperCase() : null);
+    recordAndReveal(sett, chosenWord.toUpperCase());
   }, [canLock, currentDeal, chosenWord, dictLang, stake, recordAndReveal]);
 
   const pass = useCallback(() => {
@@ -179,6 +184,7 @@ export default function SealedBidPage() {
     if (phase !== 'revealed') return;
     const endedWallet = wallet; // wallet already reflects this round's delta
     setChosenWord('');
+    setPlayedWord(null);
     setStake(MIN_STAKE);
     setSettlement(null);
 
@@ -216,6 +222,7 @@ export default function SealedBidPage() {
     setRoundIndex(0);
     setWallet(initWallet(START_CHIPS));
     setChosenWord('');
+    setPlayedWord(null);
     setStake(MIN_STAKE);
     setSettlement(null);
     setPhase('bidding');
@@ -309,7 +316,7 @@ export default function SealedBidPage() {
         {/* Showdown overlay */}
         {phase === 'revealed' && settlement && currentDeal && (
           <Showdown
-            playerWord={settlement.outcome === 'none' ? null : chosenWord.toUpperCase()}
+            playerWord={playedWord}
             bots={botsFor(currentDeal, BOT_NAMES)}
             settlement={settlement}
             reducedMotion={reducedMotion}

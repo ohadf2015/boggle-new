@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Settlement } from '@/lib/sealedBid/sp/wager';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
+import { useLanguage } from '@/contexts/LanguageContext';
 import gsap from 'gsap';
 
 export interface ShowdownProps {
@@ -22,6 +23,7 @@ export default function Showdown({
   onDone,
   payoutTargetRef,
 }: ShowdownProps): React.JSX.Element {
+  const { t } = useLanguage();
   const [revealed, setRevealed] = useState(false);
   const cardRefsRef = useRef<(HTMLDivElement | null)[]>([]);
 
@@ -85,6 +87,16 @@ export default function Showdown({
   const deltaText = settlement.delta >= 0 ? `+${settlement.delta}` : `${settlement.delta}`;
   const bannerColor =
     settlement.outcome === 'unique' ? 'text-neo-yellow' : settlement.outcome === 'clash' ? 'text-neo-red' : 'text-neo-white';
+  // Label the outcome so a 0/negative delta reads clearly: a clash, a rejected
+  // word (staked but not in the dictionary → ante lost), or a deliberate pass.
+  const outcomeLabel =
+    settlement.outcome === 'unique'
+      ? t('sealedBid.unique')
+      : settlement.outcome === 'clash'
+        ? t('sealedBid.clash')
+        : playerWord
+          ? t('sealedBid.notAWord')
+          : t('sealedBid.pass');
 
   return (
     <div className="fixed inset-0 bg-neo-navy/80 flex items-center justify-center z-50">
@@ -113,9 +125,12 @@ export default function Showdown({
           {playerWord}
         </div>
 
-        {/* Outcome banner */}
+        {/* Outcome banner: label + delta so a 0/negative result reads clearly */}
         {revealed && (
-          <div className={`text-2xl font-neo-display ${bannerColor} mt-4`}>{deltaText}</div>
+          <div className={`flex flex-col items-center gap-1 mt-4 ${bannerColor}`}>
+            <div className="text-sm font-neo-display uppercase tracking-widest opacity-80">{outcomeLabel}</div>
+            <div className="text-2xl font-neo-display">{deltaText}</div>
+          </div>
         )}
 
         {/* Continue button */}
@@ -124,7 +139,7 @@ export default function Showdown({
             onClick={onDone}
             className="mt-4 px-4 py-2 bg-neo-lime text-black font-neo-display border-2 border-black shadow-hard hover:shadow-hard-pressed"
           >
-            Continue
+            {t('sealedBid.continue')}
           </button>
         )}
       </div>

@@ -240,6 +240,7 @@ const ja = {
     "pass": "パス",
     "unique": "ユニーク",
     "clash": "衝突",
+    "notAWord": "辞書にない単語",
     "busted": "チップ切れ",
     "cashOut": "換金",
     "chips": "チップ",

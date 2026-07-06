@@ -411,6 +411,7 @@ const sv = {
     "pass": "Passa",
     "unique": "Unik",
     "clash": "Krock",
+    "notAWord": "Inte ett ord",
     "busted": "Pank",
     "cashOut": "Lös in",
     "chips": "Marker",

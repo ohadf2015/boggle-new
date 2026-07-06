@@ -10,6 +10,11 @@ vi.mock('../../../lib/pixiFx/SharedFxApp', () => ({
   },
 }));
 
+// t returns the key so we can assert which label rendered.
+vi.mock('../../../contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+}));
+
 describe('Showdown', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -25,6 +30,34 @@ describe('Showdown', () => {
     reducedMotion: true,
     bots: [{ name: 'Bot A', word: 'TRAIN' }],
   };
+
+  it('labels a rejected word (none outcome, word present) as not-a-word', async () => {
+    render(
+      <Showdown
+        {...base}
+        playerWord="ZZZZ"
+        settlement={{ outcome: 'none', stake: 20, multiplier: 0, delta: -5 }}
+      />,
+    );
+    vi.advanceTimersByTime(400);
+    await waitFor(() => {
+      expect(screen.getByText('sealedBid.notAWord')).toBeInTheDocument();
+    });
+  });
+
+  it('labels a deliberate pass (none outcome, no word) as pass', async () => {
+    render(
+      <Showdown
+        {...base}
+        playerWord={null}
+        settlement={{ outcome: 'none', stake: 0, multiplier: 0, delta: 0 }}
+      />,
+    );
+    vi.advanceTimersByTime(400);
+    await waitFor(() => {
+      expect(screen.getByText('sealedBid.pass')).toBeInTheDocument();
+    });
+  });
 
   it('unique shows win + payout with +60 text', async () => {
     render(

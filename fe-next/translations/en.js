@@ -292,6 +292,7 @@ const en = {
     "pass": "Pass",
     "unique": "Unique",
     "clash": "Clash",
+    "notAWord": "Not a word",
     "busted": "Busted",
     "cashOut": "Cash out",
     "chips": "Chips",

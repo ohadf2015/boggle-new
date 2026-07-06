@@ -236,6 +236,7 @@ const es = {
     "pass": "Pasar",
     "unique": "Única",
     "clash": "Choque",
+    "notAWord": "No es una palabra",
     "busted": "Sin fichas",
     "cashOut": "Cobrar",
     "chips": "Fichas",
