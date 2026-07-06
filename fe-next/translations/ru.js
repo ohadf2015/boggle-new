@@ -12098,6 +12098,7 @@ const ru = {
   "lostByForfeit": "Проигран сдачей",
   "blast": {
     "toCatchUp": "чтобы догнать",
+    "leadingBy": "с отрывом в",
     "firstUse": {
       "gotIt": "Понял"
     },

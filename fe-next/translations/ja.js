@@ -10128,6 +10128,7 @@ const ja = {
   },
   "blast": {
     "toCatchUp": "追いつくまで",
+    "leadingBy": "リード",
     "firstUse": { "gotIt": "了解" },
     "level": "レベル{n}",
     "results": {

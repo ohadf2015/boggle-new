@@ -79,4 +79,22 @@ describe('Wikipedia Word Sync Batching', () => {
     expect(upsertCalls.length).toBe(1);
     expect((upsertCalls[0].data as unknown[]).length).toBe(50);
   });
+
+  /**
+   * Regression: 7 Sentry issues ("[Wikipedia] Batch upsert error" /
+   * "Stored 0/50 candidates" for en/es/sv/he) all traced to the same cause —
+   * insertData included validation_status/source_article_title/
+   * source_article_url/interestingness_score/fetch_date, none of which are
+   * real columns on daily_challenge_word_bank, so Postgres rejected every
+   * upsert. Locks the row shape to only real columns.
+   */
+  it('only sends columns that exist on daily_challenge_word_bank', async () => {
+    await storeWikipediaWordCandidates('en', new Date(), [
+      { word: 'test', source: 'wikipedia', url: 'https://example.com/test', score: 75 },
+    ]);
+
+    expect(upsertCalls.length).toBe(1);
+    const row = (upsertCalls[0].data as Array<Record<string, unknown>>)[0];
+    expect(Object.keys(row).sort()).toEqual(['language', 'source', 'status', 'word']);
+  });
 });

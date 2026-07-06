@@ -10241,6 +10241,7 @@ const he = {
   },
   "blast": {
     "toCatchUp": "כדי להשיג",
+    "leadingBy": "יתרון של",
     "firstUse": { "gotIt": "הבנתי" },
     "level": "שלב {n}",
     "results": {

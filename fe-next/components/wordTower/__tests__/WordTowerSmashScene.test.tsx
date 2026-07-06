@@ -1,7 +1,27 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { WordTowerSmashScene } from '../WordTowerSmashScene';
+import { Container } from 'pixi.js';
+import type { ReactNode } from 'react';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
+
+// Bypass real PixiJS/WebGL init — render children directly, expose a spy engine
+// whose `app.ticker` we can null out mid-test to reproduce a torn-down-engine race.
+const mockEngine = {
+  app: { ticker: { add: vi.fn(), remove: vi.fn() } as { add: ReturnType<typeof vi.fn>; remove: ReturnType<typeof vi.fn> } | null },
+  camera: new Container(),
+  width: 400,
+  height: 600,
+  particles: { burst: vi.fn() },
+  flash: { flash: vi.fn() },
+  shake: { shake: vi.fn() },
+};
+
+vi.mock('@/lib/gameEngine', () => ({
+  GameCanvas: ({ children }: { children: ReactNode }) => <div data-testid="mock-game-canvas">{children}</div>,
+  useGameEngine: () => mockEngine,
+}));
+
+import { WordTowerSmashScene } from '../WordTowerSmashScene';
 
 // Identity-ish translator: echoes the key (+ params) so we can assert on keys.
 const t = (key: string, params?: Record<string, string | number>) =>
@@ -74,5 +94,27 @@ describe('WordTowerSmashScene — strike captures skill and reports it', () => {
     );
     // Still aiming — nothing committed yet.
     expect(onDone).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * Regression for Sentry JAVASCRIPT-NEXTJS-1R6/1R7: "Cannot read properties of
+ * null (reading 'remove')". Pixi's Application.destroy() nulls its own
+ * `ticker` property; if a sibling scene tears down the shared engine before
+ * this scene's aim/swing effect cleanup runs, `engine.app.ticker` is null.
+ */
+describe('WordTowerSmashScene — Pixi ticker cleanup survives a torn-down engine', () => {
+  afterEach(() => {
+    mockEngine.app.ticker = { add: vi.fn(), remove: vi.fn() };
+  });
+
+  it('unmounts without throwing when engine.app.ticker is already null', () => {
+    const { unmount } = render(
+      <WordTowerSmashScene target={target} attackerHeightM={100} onDone={vi.fn()} t={t} />,
+    );
+
+    mockEngine.app.ticker = null;
+
+    expect(() => unmount()).not.toThrow();
   });
 });

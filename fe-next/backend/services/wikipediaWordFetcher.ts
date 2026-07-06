@@ -597,7 +597,7 @@ const BATCH_SIZE = 500;
  */
 export async function storeWikipediaWordCandidates(
   language: Language,
-  date: Date,
+  _date: Date,
   candidates: Array<{ word: string; source: string; url?: string; score?: number }>
 ): Promise<void> {
   if (candidates.length === 0) {
@@ -612,19 +612,18 @@ export async function storeWikipediaWordCandidates(
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    const dateStr = date.toISOString().split('T')[0];
-
-    // Prepare all insert data for UNIFIED WORD BANK
+    // Prepare all insert data for UNIFIED WORD BANK. Only columns that exist
+    // on daily_challenge_word_bank (061_daily_challenge_word_bank.sql +
+    // 20260630160000_word_bank_judged_trust.sql) — a prior version of this
+    // mapping included validation_status/source_article_title/
+    // source_article_url/interestingness_score/fetch_date, none of which are
+    // real columns, so Supabase rejected every upsert (Sentry: "[Wikipedia]
+    // Batch upsert error" + "Stored 0/50 candidates" for en/es/sv/he).
     const insertData = candidates.map(c => ({
       word: c.word.toUpperCase(),
       language,
       source: 'wikipedia' as const,
       status: 'active' as const,
-      validation_status: 'pending' as const,
-      source_article_title: c.source,
-      source_article_url: c.url,
-      interestingness_score: c.score || 50,
-      fetch_date: dateStr
     }));
 
     // Process in batches to prevent timeout on large datasets

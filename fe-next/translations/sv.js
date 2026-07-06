@@ -10241,6 +10241,7 @@ const sv = {
   },
   "blast": {
     "toCatchUp": "för att komma ikapp",
+    "leadingBy": "leder med",
     "firstUse": { "gotIt": "Förstått" },
     "level": "Nivå {n}",
     "results": {

@@ -9687,6 +9687,7 @@ const en = {
   },
   "blast": {
     "toCatchUp": "to catch up",
+    "leadingBy": "leading by",
     "firstUse": { "gotIt": "Got it" },
     "level": "Level {n}",
     "results": {

@@ -131,6 +131,12 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
 
   const audioUnlockedRef = useRef(false);
   const howlsRef = useRef<Record<TrackKey, Howl>>({} as Record<TrackKey, Howl>);
+  // Re-entrancy guard for the onplayerror retry below: a corrupted/0-duration
+  // track can fail .play() synchronously, re-firing onplayerror on the same
+  // stack before this Set update would otherwise land, so unguarded retry
+  // recurses to a stack overflow (Sentry JAVASCRIPT-NEXTJS-1PP, mirrors the
+  // fix already in useAdventureMusic.ts's onend loop guard).
+  const retryingPlayRef = useRef<Set<TrackKey>>(new Set());
   const currentHowlRef = useRef<Howl | null>(null);
   const fadeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const currentTrackRef = useRef<TrackKey | null>(null);
@@ -180,12 +186,16 @@ export function MusicProvider({ children }: MusicProviderProps): React.ReactElem
       onloaderror: (_id, err) => { logger.log(`[Music] Failed to load ${key}:`, err); },
       onplayerror: (_id, err) => {
         logger.log(`[Music] Failed to play ${key}:`, err);
+        if (retryingPlayRef.current.has(key)) return;
         getHowler().then((H) => {
           if (H.ctx && H.ctx.state === 'suspended') {
             H.ctx.resume()
               .then(() => {
+                retryingPlayRef.current.add(key);
                 try { howlsRef.current[key]?.play(); } catch (playErr) {
                   logger.log(`[Music] Retry play failed for ${key}:`, playErr);
+                } finally {
+                  retryingPlayRef.current.delete(key);
                 }
               })
               .catch((resumeErr: Error) => {

@@ -10136,6 +10136,7 @@ const es = {
   },
   "blast": {
     "toCatchUp": "para alcanzar",
+    "leadingBy": "con ventaja de",
     "firstUse": { "gotIt": "Entendido" },
     "level": "Nivel {n}",
     "results": {

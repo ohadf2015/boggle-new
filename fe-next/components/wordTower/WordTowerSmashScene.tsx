@@ -342,7 +342,10 @@ function SmashStage({ phase, powerRef, floors, blockCount, onImpactDone }: Stage
     engine.app.ticker.add(tick);
 
     return () => {
-      engine.app.ticker.remove(tick);
+      // engine.app.ticker can already be null here — Pixi's Application.destroy()
+      // nulls its own `ticker` property, and this cleanup can run after a sibling
+      // scene already tore down the shared engine (Sentry JAVASCRIPT-NEXTJS-1R6/1R7).
+      engine.app.ticker?.remove(tick);
       if (!root.destroyed) root.destroy({ children: true });
       refs.current = null;
     };
