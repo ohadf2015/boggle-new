@@ -118,6 +118,7 @@ export default function SealedBidWheel({
           combo={0}
           pointerPosRef={pointerPosRef}
           isDraggingRef={draggingRef}
+          outerCount={letters.length}
         />
 
         {/* Tiles arranged in circle */}

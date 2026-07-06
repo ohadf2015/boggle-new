@@ -23,10 +23,12 @@ const source = readFileSync(
   'utf8',
 );
 
-// Isolate the ticker callback body: from `app.ticker.add(` to the setup arrow's
-// close. We bound it generously and assert on what must / must not appear.
+// Isolate the per-frame callback body: from the rAF `frame` function to the
+// setup arrow's close. We bound it generously and assert on what must / must
+// not appear. (Was `app.ticker.add(` before the ticker→rAF migration that
+// stopped Pixi's own ticker to avoid a post-destroy null-context crash.)
 function tickerBody(src: string): string {
-  const start = src.indexOf('app.ticker.add(');
+  const start = src.indexOf('const frame = (time: number) => {');
   expect(start).toBeGreaterThan(-1);
   // Ends at the close of the setup() async fn that wraps the ticker.
   const end = src.indexOf('    };\n\n    setup();');

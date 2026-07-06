@@ -16,6 +16,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import gsap from 'gsap';
 import { ArrowLeft, Coins, Gavel } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -107,6 +108,7 @@ export default function SealedBidPage() {
 
   const payoutTargetRef = useRef<HTMLDivElement>(null);
   const didInitRef = useRef(false);
+  const lockBtnRef = useRef<HTMLButtonElement>(null);
 
   // Full-screen game surface.
   const setIsInGame = useHideNavigation();
@@ -165,6 +167,16 @@ export default function SealedBidPage() {
 
   const lockBid = useCallback(async () => {
     if (!canLock || !currentDeal) return;
+    // A quick stamp-thud on the button — "sealed" is the whole premise of this
+    // mode, so locking the bid should feel like pressing a wax seal, not just
+    // clicking a button.
+    if (!reducedMotion && lockBtnRef.current) {
+      gsap.fromTo(
+        lockBtnRef.current,
+        { scale: 1 },
+        { scale: 0.88, duration: 0.08, ease: 'power1.out', yoyo: true, repeat: 1 },
+      );
+    }
     setPending(true);
     const dictOk = await dictCheck(chosenWord, dictLang);
     setPending(false);
@@ -179,7 +191,7 @@ export default function SealedBidPage() {
       stake,
     });
     recordAndReveal(sett, chosenWord.toUpperCase());
-  }, [canLock, currentDeal, chosenWord, dictLang, stake, recordAndReveal]);
+  }, [canLock, currentDeal, chosenWord, dictLang, stake, recordAndReveal, reducedMotion]);
 
   const pass = useCallback(() => {
     if (phase !== 'bidding' || pending || !currentDeal) return;
@@ -280,21 +292,23 @@ export default function SealedBidPage() {
 
   const bettingFooter =
     phase !== 'done' ? (
-      <div dir={dir} className="flex gap-2">
+      <div dir={dir} className="flex items-center gap-3">
         <button
           type="button"
           onClick={pass}
           disabled={phase !== 'bidding' || pending}
-          className="flex-1 rounded-neo border-neo-thick border-black bg-neo-navy-light px-4 py-3 font-neo-display font-black uppercase tracking-wide text-neo-white/70 shadow-hard disabled:opacity-40"
+          className="shrink-0 px-2 py-3 font-neo-display text-sm font-bold uppercase tracking-wide text-neo-white/50 underline decoration-dotted underline-offset-4 disabled:opacity-40"
         >
           {t('sealedBid.pass')}
         </button>
         <button
+          ref={lockBtnRef}
           type="button"
           onClick={() => void lockBid()}
           disabled={!canLock}
-          className="flex-[2] rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40"
+          className="flex flex-1 items-center justify-center gap-2 rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40"
         >
+          <Gavel className="h-4 w-4" aria-hidden="true" />
           {t('sealedBid.lockBid')}
         </button>
       </div>

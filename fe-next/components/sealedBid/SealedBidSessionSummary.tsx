@@ -67,32 +67,23 @@ export function SealedBidSessionSummary({ history, totalScore, chips, coinsAward
         </p>
       </div>
 
-      <div className="flex justify-center gap-2">
-        <div className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 shadow-hard-sm">
-          <span className="text-sm" aria-hidden="true">✅</span>
-          <span className="font-neo-display font-black text-sm text-neo-lime">{unique}</span>
-          <span className="font-neo-body text-[10px] text-neo-white/50">{t('sealedBid.session.uniqueLabel')}</span>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 shadow-hard-sm">
-          <span className="text-sm" aria-hidden="true">🤝</span>
-          <span
-            data-testid="bluff-clash-count"
-            className="font-neo-display font-black text-sm text-neo-orange"
-          >
+      {/* Unique count is already the big number above — this line only adds
+          what that number doesn't show: how the rest of the rounds went. */}
+      <div className="flex items-center justify-center gap-3 text-xs text-neo-white/60">
+        <span className="flex items-center gap-1">
+          🤝{' '}
+          <span data-testid="bluff-clash-count" className="font-neo-display font-black text-neo-orange">
             {clash}
-          </span>
-          <span className="font-neo-body text-[10px] text-neo-white/50">{t('sealedBid.session.clashLabel')}</span>
-        </div>
-        <div className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 shadow-hard-sm">
-          <span className="text-sm" aria-hidden="true">⬜</span>
-          <span
-            data-testid="bluff-pass-count"
-            className="font-neo-display font-black text-sm text-neo-white/40"
-          >
+          </span>{' '}
+          {t('sealedBid.session.clashLabel')}
+        </span>
+        <span className="flex items-center gap-1">
+          ⬜{' '}
+          <span data-testid="bluff-pass-count" className="font-neo-display font-black text-neo-white/40">
             {pass}
-          </span>
-          <span className="font-neo-body text-[10px] text-neo-white/50">{t('sealedBid.session.passLabel')}</span>
-        </div>
+          </span>{' '}
+          {t('sealedBid.session.passLabel')}
+        </span>
       </div>
 
       {coinsAwarded !== undefined && (

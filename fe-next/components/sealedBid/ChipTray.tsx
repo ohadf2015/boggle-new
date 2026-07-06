@@ -1,9 +1,9 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef } from 'react';
 import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { clampStake, MIN_STAKE } from '@/lib/sealedBid/sp/chipWallet';
+import { clampStake } from '@/lib/sealedBid/sp/chipWallet';
 
 export interface ChipTrayProps {
   balance: number;
@@ -55,13 +55,9 @@ export default function ChipTray({
     onStakeChange(balance);
   };
 
-  const handleClear = () => {
-    onStakeChange(MIN_STAKE);
-  };
-
   return (
     <div className="flex flex-col gap-3 p-3">
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         {DENOMINATIONS.map(({ value, label, bg }) => (
           <button
             key={value}
@@ -72,6 +68,7 @@ export default function ChipTray({
             disabled={disabled}
             aria-label={`${label} chips`}
             className={`
+              chip-token
               flex items-center justify-center
               w-14 h-14 rounded-full
               border-neo-thick border-black
@@ -87,15 +84,13 @@ export default function ChipTray({
             {label}
           </button>
         ))}
-      </div>
 
-      <div className="flex gap-3">
         <button
           onClick={handleAllIn}
           disabled={disabled}
           aria-label={t('sealedBid.allIn')}
           className={`
-            flex-1 px-4 py-2
+            flex-1 px-4 py-3
             border-neo-thick border-black
             shadow-hard
             bg-neo-purple
@@ -107,25 +102,6 @@ export default function ChipTray({
           `}
         >
           {t('sealedBid.allIn')}
-        </button>
-
-        <button
-          onClick={handleClear}
-          disabled={disabled}
-          aria-label={t('sealedBid.clear')}
-          className={`
-            flex-1 px-4 py-2
-            border-neo-thick border-black
-            shadow-hard
-            bg-neo-cream
-            font-neo-display text-sm font-bold
-            text-black
-            disabled:opacity-50 disabled:cursor-not-allowed
-            active:shadow-hard-pressed
-            transition-shadow
-          `}
-        >
-          {t('sealedBid.clear')}
         </button>
       </div>
 

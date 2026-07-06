@@ -19,14 +19,19 @@ interface WordWheelPixiRingProps {
   pointerPosRef?: React.RefObject<{ x: number; y: number } | null>;
   /** Whether a drag gesture is currently active */
   isDraggingRef?: React.RefObject<boolean>;
+  /** Number of outer wheel slots the caller lays tiles on (default 6, the daily
+   * wheel's hexagon). Sealed Bid's 7-letter wheel must pass 7 — otherwise this
+   * ring's connection-line/drag-trail math (which used to hardcode 60° = 360/6)
+   * draws at the wrong angle and visually detaches from the actual tiles. */
+  outerCount?: number;
 }
 
 export default function WordWheelPixiRing({
-  selectedIndices, radius, combo, pointerPosRef, isDraggingRef,
+  selectedIndices, radius, combo, pointerPosRef, isDraggingRef, outerCount = 6,
 }: WordWheelPixiRingProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const stateRef = useRef({ selectedIndices, radius, combo, pointerPosRef, isDraggingRef });
-  stateRef.current = { selectedIndices, radius, combo, pointerPosRef, isDraggingRef };
+  const stateRef = useRef({ selectedIndices, radius, combo, pointerPosRef, isDraggingRef, outerCount });
+  stateRef.current = { selectedIndices, radius, combo, pointerPosRef, isDraggingRef, outerCount };
 
   useEffect(() => {
     const el = containerRef.current;
@@ -34,6 +39,7 @@ export default function WordWheelPixiRing({
 
     let destroyed = false;
     let removeRectListeners: (() => void) | null = null;
+    let rafId: number | null = null;
     const app = new Application();
 
     const setup = async () => {
@@ -53,6 +59,17 @@ export default function WordWheelPixiRing({
 
       if (destroyed) { try { app.destroy(true, { children: true }); } catch { /* already destroyed by cleanup */ } return; }
       el.appendChild(app.canvas);
+
+      // Pixi's TickerPlugin registers its OWN render-every-tick listener on
+      // app.ticker, outside our control — that internal listener is what still
+      // threw "Cannot read properties of null (reading 'clear')" after destroy
+      // (Sentry 1PV) even though OUR callback below was already guarded: it
+      // runs Application's internal render on a Graphics context Pixi nulled
+      // out mid-teardown, and there's no hook to guard someone else's listener.
+      // Stop it immediately and drive our own rAF loop instead, so cleanup can
+      // cancelAnimationFrame() our own pending frame directly instead of hoping
+      // a destroyed-flag check wins a race against an already-queued tick.
+      app.ticker.stop();
 
       // Cache the canvas screen rect OUTSIDE the ticker. It only moves on
       // scroll/resize, so reading it per-frame (during a drag) was a forced
@@ -75,24 +92,25 @@ export default function WordWheelPixiRing({
       let angle = 0;
       const cx = w / 2;
       const cy = h / 2;
+      let lastTime = performance.now();
 
-      app.ticker.add((ticker) => {
-        // Guard: a ticker tick already queued in the rAF loop can fire AFTER the
-        // unmount cleanup calls app.destroy({children:true}), which nulls each
-        // Graphics' internal context. Touching .clear() then throws
-        // "Cannot read properties of null (reading 'clear')" (Sentry 1CW/1PV,
-        // route /daily/word-wheel). Mirrors the post-destroy guards added in
-        // a39f63378 for the blast renderers.
+      const frame = (time: number) => {
+        // Schedule the next frame FIRST so an early return (hidden tab, etc.)
+        // never stalls the loop permanently.
+        if (!destroyed) rafId = requestAnimationFrame(frame);
+
+        // Guard: cleanup calls cancelAnimationFrame on unmount (below), but a
+        // frame already dispatched by the browser before that call still runs
+        // once more. Bail before touching any Graphics — this is belt, the
+        // cancelAnimationFrame is suspenders (Sentry 1CW/1PV, /daily/word-wheel).
         if (destroyed || orbitGfx.destroyed || lineGfx.destroyed || glowGfx.destroyed) return;
         // Skip all draw work for an invisible canvas (backgrounded tab / hidden
         // PWA). Freezing `angle` here too avoids a large delta jump on resume.
-        if (typeof document !== 'undefined' && document.hidden) return;
-        // The destroyed flags above are not enough: PixiJS nulls the render
-        // context on WebGL context-loss BEFORE it sets destroyed=true, so
-        // .clear()/draw on a queued tick can still throw. Belt: bail the frame.
+        if (typeof document !== 'undefined' && document.hidden) { lastTime = time; return; }
         try {
-        const dt = ticker.deltaMS / 1000;
-        const { selectedIndices: sel, radius: r, combo: c, pointerPosRef: ppRef, isDraggingRef: dragRef } = stateRef.current;
+        const dt = (time - lastTime) / 1000;
+        lastTime = time;
+        const { selectedIndices: sel, radius: r, combo: c, pointerPosRef: ppRef, isDraggingRef: dragRef, outerCount: oc } = stateRef.current;
         angle += dt * 0.5;
 
         // ── Orbital ring 1: lime dots ──
@@ -124,7 +142,7 @@ export default function WordWheelPixiRing({
         if (sel.length >= 1) {
           const pts = sel.map(idx => {
             if (idx === -1) return { x: cx, y: cy };
-            const rad = (idx * 60 * Math.PI) / 180;
+            const rad = (idx * (360 / oc) * Math.PI) / 180;
             return { x: cx + Math.sin(rad) * r, y: cy - Math.cos(rad) * r };
           });
 
@@ -170,8 +188,12 @@ export default function WordWheelPixiRing({
           glowGfx.circle(cx, cy, gr * 0.65);
           glowGfx.fill({ color: 0x00ffff, alpha: 0.04 + boost * 0.1 });
         }
+
+        app.render();
         } catch { /* post-destroy null-context race — skip this frame (Sentry 1PV) */ }
-      });
+      };
+
+      rafId = requestAnimationFrame(frame);
     };
 
     setup();
@@ -179,9 +201,9 @@ export default function WordWheelPixiRing({
     return () => {
       destroyed = true;
       removeRectListeners?.();
-      // Stop ticker BEFORE destroying children — otherwise a rAF-queued tick can
-      // fire after Graphics contexts are nulled → "Cannot read properties of null
-      // (reading 'clear')" (Sentry 1CW). Mirrors GameCanvas.tsx teardown order.
+      // Cancel our own pending rAF frame directly, rather than relying solely
+      // on the destroyed-flag check inside it to win a race.
+      if (rafId !== null) cancelAnimationFrame(rafId);
       try { app.ticker?.stop(); } catch { /* */ }
       try { app.destroy(true, { children: true }); } catch { /* */ }
       while (el.firstChild) el.removeChild(el.firstChild);
