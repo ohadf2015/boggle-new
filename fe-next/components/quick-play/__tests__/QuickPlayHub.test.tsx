@@ -116,6 +116,33 @@ describe('QuickPlayHub', () => {
     await waitFor(() => expect(screen.getByTestId('quick-play-hub')).toBeTruthy());
   });
 
+  it('submit network failure still reaches results (no stranded round)', async () => {
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) {
+        return Promise.resolve({ ok: true, json: async () => roundPayload });
+      }
+      if (String(url).includes('/submit')) {
+        return Promise.reject(new Error('network down'));
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub />);
+    fireEvent.click(screen.getByTestId('mock-play'));
+    await waitFor(() => screen.getByTestId('mock-finish'));
+    fireEvent.click(screen.getByTestId('mock-finish'));
+    await waitFor(() => expect(screen.getByTestId('mock-results')).toBeTruthy());
+  });
+
+  it('returning to the wheel screen moves focus to its heading (screen swap has no nav to anchor on)', async () => {
+    render(<QuickPlayHub />);
+    fireEvent.click(screen.getByTestId('mock-play'));
+    await waitFor(() => screen.getByTestId('mock-finish'));
+    fireEvent.click(screen.getByTestId('mock-finish'));
+    await waitFor(() => screen.getByTestId('mock-next'));
+    fireEvent.click(screen.getByTestId('mock-next'));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByText('quickPlay.solo.title')));
+  });
+
   it('challenge deep link shows banner and locks board', async () => {
     fetchMock.mockImplementation((url: string) => {
       if (String(url).includes('/challenge?id=ch-9')) {

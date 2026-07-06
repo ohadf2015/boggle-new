@@ -13,6 +13,7 @@ import { haptics } from '@/utils/haptics/HapticsManager';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
 import { celebrationTier } from './celebrationTier';
 import { quickRank } from './quickRank';
+import { NODE_COLORS } from './modeColors';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import type { QuickRoundResult, QuickSubmitOutcome } from './types';
 
@@ -49,6 +50,14 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const [showFullBoard, setShowFullBoard] = useState(false);
   const celebrated = useRef(false);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  // This screen replaces the game board with no navigation, so keyboard
+  // focus needs to move here explicitly instead of being stranded on a
+  // now-unmounted in-game control.
+  useEffect(() => {
+    headingRef.current?.focus();
+  }, []);
 
   // history[0] is this round (inserted before fetch); compare vs the rest
   const priorAvg = useMemo(() => {
@@ -85,7 +94,7 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
       fireConfetti({ particleCount: 220, spread: 120 });
       setTimeout(() => fireConfetti({ particleCount: 120, spread: 70 }), 450);
     }
-  }, [result.scorePct, isPersonalBest, beatRival, outcome.percentileToday]);
+  }, [result.scorePct, isPersonalBest, beatRival, outcome.percentileToday, rankedUp]);
 
   useEffect(() => {
     let cancelled = false;
@@ -101,15 +110,16 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
   }, []);
 
   const dash = (result.scorePct / 100) * GAUGE_C;
+  const modeColor = NODE_COLORS[result.mode];
 
   return (
-    <div className="flex min-h-full flex-col gap-4 bg-neo-navy px-4 py-6" data-testid="quick-play-results">
+    <div className="flex min-h-full flex-col gap-4 bg-neo-navy px-4 py-6 animate-[fadeInUp_0.2s_ease-out_0s_both]" data-testid="quick-play-results">
       <div className="flex justify-center">
-        <span className="rounded-xl border-neo-thick border-black bg-neo-cozy px-4 py-1.5 font-neo-display text-sm font-bold tracking-widest text-black shadow-hard">
+        <span className={`rounded-xl border-neo-thick border-black px-4 py-1.5 font-neo-display text-sm font-bold tracking-widest text-black shadow-hard ${modeColor.bg}`}>
           {t(`quickPlay.solo.mode.${result.mode}`)}
         </span>
       </div>
-      <h1 className="text-center font-neo-display text-2xl font-bold tracking-wide text-neo-cream">
+      <h1 ref={headingRef} tabIndex={-1} className="text-center font-neo-display text-2xl font-bold tracking-wide text-neo-cream outline-none">
         {t('quickPlay.solo.roundComplete')}
       </h1>
 
@@ -130,18 +140,18 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
           <svg width="128" height="128" viewBox="0 0 128 128" className="-rotate-90">
             <circle cx="64" cy="64" r={GAUGE_R} fill="none" stroke="var(--neo-abyss)" strokeWidth="14" />
             <circle
-              cx="64" cy="64" r={GAUGE_R} fill="none" stroke="var(--neo-lime)" strokeWidth="14"
+              cx="64" cy="64" r={GAUGE_R} fill="none" stroke={modeColor.hex} strokeWidth="14"
               strokeDasharray={`${dash} ${GAUGE_C - dash}`}
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <b className="font-neo-display text-3xl text-neo-lime">{result.scorePct}%</b>
+            <b className={`font-neo-display text-3xl ${modeColor.text}`}>{result.scorePct}%</b>
             <small className="text-[10px] tracking-wider text-neo-white/60">{t('quickPlay.solo.ofPerfect')}</small>
           </div>
         </div>
         <div className="flex flex-col gap-2 text-neo-cream">
           <div className="font-neo-display text-2xl">
-            <em className="not-italic text-neo-lime">{result.score}</em> {t('quickPlay.solo.points')}
+            <em className={`not-italic ${modeColor.text}`}>{result.score}</em> {t('quickPlay.solo.points')}
           </div>
           <div className="text-sm text-neo-white/75">
             {t('quickPlay.solo.wordsFound', { found: String(result.wordsFound), total: String(result.totalWords) })}
@@ -170,6 +180,18 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
           ★ +{outcome.xp} XP
         </div>
       </div>
+
+      {/* Rival compare: the competitive hook, promoted above the utility bars so
+          it (and the Challenge CTA below) don't require a scroll to reach. */}
+      {rival && (
+        <RivalCompareCard
+          rivalName={rival.name}
+          rivalEmoji={rival.emoji}
+          rivalScore={rival.theirValue}
+          myScore={rival.myValue}
+          t={t}
+        />
+      )}
 
       {/* Percentile */}
       <div className="rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-4 shadow-hard">
@@ -210,16 +232,6 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
           {t('quickPlay.solo.rankGained', { pts: String(result.scorePct) })}
         </p>
       </div>
-
-      {rival && (
-        <RivalCompareCard
-          rivalName={rival.name}
-          rivalEmoji={rival.emoji}
-          rivalScore={rival.theirValue}
-          myScore={rival.myValue}
-          t={t}
-        />
-      )}
 
       {/* Leaderboard peek */}
       {board.length > 0 && (

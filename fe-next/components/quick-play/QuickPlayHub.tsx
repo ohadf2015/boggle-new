@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useAnnouncer } from '@/components/GameAnnouncer';
 import posthog from '@/lib/analytics/lazyPosthog';
 import { QuickPlayWheel } from './QuickPlayWheel';
 import { QuickModeAdapter } from './adapters/QuickModeAdapter';
@@ -35,6 +36,7 @@ interface QuickPlayHubProps {
 export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   const { t, language } = useLanguage();
   const { user } = useAuth();
+  const { announce } = useAnnouncer();
   const [phase, setPhase] = useState<HubPhase>('wheel');
   const [selection, setSelection] = useState<WheelSelection>('random');
   const [roundIndex, setRoundIndex] = useState(1);
@@ -48,6 +50,17 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   const [loadError, setLoadError] = useState(false);
   const goBack = useBackOneLevel();
   const submitting = useRef(false);
+  const wheelHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  // Phase changes swap the whole screen with no page navigation, so screen
+  // readers get no automatic signal and sighted keyboard focus is stranded
+  // on an unmounted control. Announce the change; move focus back to the
+  // wheel heading whenever we return to it (results/playing own their focus).
+  useEffect(() => {
+    if (phase === 'wheel') wheelHeadingRef.current?.focus();
+    else if (phase === 'loading') announce(t('quickPlay.solo.loading'));
+    else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));
+  }, [phase, config?.mode, announce, t]);
 
   // Loop closer: tell the challenger when someone answered their challenge.
   useEffect(() => {
@@ -132,22 +145,26 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       submitting.current = true;
       setResult(r);
       try {
-        const res = await fetch('/api/quick-play/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            mode: r.mode,
-            language,
-            seed: r.seed,
-            score: r.score,
-            wordsFound: r.wordsFound,
-            durationMs: r.durationMs,
-            challengeId: challenge?.id,
-          }),
-        });
-        const out: QuickSubmitOutcome = res.ok
-          ? await res.json()
-          : { scorePct: r.scorePct, coins: 0, xp: 0, percentileToday: 0, history: [], totalPoints: 0 };
+        let out: QuickSubmitOutcome = { scorePct: r.scorePct, coins: 0, xp: 0, percentileToday: 0, history: [], totalPoints: 0 };
+        try {
+          const res = await fetch('/api/quick-play/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              mode: r.mode,
+              language,
+              seed: r.seed,
+              score: r.score,
+              wordsFound: r.wordsFound,
+              durationMs: r.durationMs,
+              challengeId: challenge?.id,
+            }),
+          });
+          if (res.ok) out = await res.json();
+        } catch {
+          // Network failure on submit — fall through with the zero-outcome
+          // default so results still render instead of stranding the round.
+        }
         setOutcome(out);
         if (out.totalPoints > 0) setTotalPoints(out.totalPoints);
         posthog.capture('quick_play_round_completed', {
@@ -238,26 +255,26 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   }
 
   return (
-    <div className="flex min-h-full flex-col bg-neo-navy pb-8" data-testid="quick-play-hub">
+    <div className="flex min-h-full flex-col bg-neo-navy pb-8 animate-[fadeInUp_0.2s_ease-out_0s_both]" data-testid="quick-play-hub">
       <header className="flex items-center justify-between px-5 pt-6">
         <BackButton onClick={goBack} label={t('common.back')} isDarkMode />
         <div className="text-center">
-          <h1 className="font-neo-display text-2xl font-bold tracking-wide text-neo-cream">
+          <h1 ref={wheelHeadingRef} tabIndex={-1} className="font-neo-display text-2xl font-bold tracking-wide text-neo-cream outline-none">
             {t('quickPlay.solo.title')}
           </h1>
           <span className="inline-block -rotate-2 rounded-lg border-2 border-black bg-neo-yellow px-2 py-0.5 text-[10px] font-bold tracking-[2px] text-black shadow-hard-sm">
             BETA
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-stretch divide-x-2 divide-black rtl:divide-x-reverse rounded-xl border-neo-thick border-black bg-neo-navy-elevated text-center font-neo-display text-xs font-semibold shadow-hard" data-testid="quick-header-stats">
           {totalPoints !== null && (
-            <div className="rounded-xl border-neo-thick border-black bg-neo-navy-elevated px-3 py-2 text-center font-neo-display text-xs font-semibold shadow-hard" data-testid="quick-rank-chip">
+            <div className="px-3 py-2" data-testid="quick-rank-chip">
               <span className={quickRank(totalPoints).color}>
                 {t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}
               </span>
             </div>
           )}
-          <div className="rounded-xl border-neo-thick border-black bg-neo-navy-elevated px-3 py-2 text-center font-neo-display text-xs font-semibold text-neo-cream shadow-hard">
+          <div className="px-3 py-2 text-neo-cream">
             {t('quickPlay.solo.round')}
             <b className="block text-base text-neo-cozy">{roundIndex}</b>
           </div>
