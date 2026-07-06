@@ -13,7 +13,7 @@
 import {
   Swords, BookOpen, Map, Bomb, Link2, Brain, Layers, Building2,
   Hammer, Vault, PartyPopper, FlaskConical, ScrollText, Gavel, Grid3x3,
-  CloudRain,
+  CloudRain, Zap,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -85,6 +85,10 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   adventure: {
     titleKey: 'landing.adventureMode', descKey: 'landing.adventureModeDesc', path: '/adventure',
     Icon: Map, variant: 'lime', badge: 'BETA', modeImage: '/modes/adventure.png', genIcon: '/modes/cubes/adventure.png',
+  },
+  quickPlay: {
+    titleKey: 'landing.quickPlayMode', descKey: 'landing.quickPlayModeDesc', path: '/quick-play',
+    Icon: Zap, variant: 'orange', badge: 'BETA', genIcon: '/modes/cubes/quickplay.png',
   },
   connections: {
     titleKey: 'landing.wordChainMode', descKey: 'landing.wordChainModeDesc', path: '/connections/play',

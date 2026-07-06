@@ -526,6 +526,12 @@ const en = {
       "ogTitle": "LexiClash Blog - Word Game Tips & Strategies",
       "ogDescription": "Expert tips, strategies, and insights to improve your word game skills."
     },
+    "quickPlay": {
+      "title": "Quick Play - Fast Solo Word Rounds",
+      "description": "Spin the mode wheel and race the perfect score in 60-second word rounds. Challenge friends on the exact same board.",
+      "ogTitle": "LexiClash Quick Play - Beat the Board",
+      "ogDescription": "60-second word rounds scored against perfect. Spin the wheel, beat the board, challenge a friend on the same puzzle."
+    },
     "adventure": {
       "title": "Word Adventure Game - RPG Word Puzzle Free",
       "description": "Embark on an epic word adventure! Battle bosses, conquer 100 levels across 10 themed worlds. Free RPG word puzzle game with special tiles, power-ups, and progression. No download needed.",
@@ -5504,6 +5510,8 @@ const en = {
     "brainTrainingDesc": "Track cognitive growth",
     "adventureMode": "Adventure",
     "adventureModeDesc": "100 levels across 10 worlds",
+    "quickPlayMode": "Quick Play",
+    "quickPlayModeDesc": "Spin the wheel, beat the board",
     "blastMode": "Blast Mode",
     "blastModeDesc": "Clear the board!",
     "wordChainMode": "Word Chain",
@@ -7757,6 +7765,43 @@ const en = {
     "help": "Show Tutorial"
   },
   "quickPlay": {
+"solo": {
+      "title": "Quick Play",
+      "round": "Round",
+      "random": "Random",
+      "dragMe": "Drag me",
+      "dragHint": "Drag the knob to pick a mode — or leave it on Random",
+      "selected": "Selected:",
+      "play": "PLAY",
+      "subCaption": "60-second round · no bots · you vs the perfect score",
+      "loading": "Building your board…",
+      "mode": {
+        "classic": "Classic",
+        "blast": "Blast",
+        "word-hunt": "Hunt",
+        "wheel-rush": "Wheel"
+      },
+      "roundComplete": "Round complete",
+      "ofPerfect": "of perfect",
+      "points": "pts",
+      "wordsFound": "{found} / {total} words found",
+      "vsAverage": "{pct}% vs your average",
+      "betterThan": "Better than {pct}% of today's Quick Play scores",
+      "seeLeaderboard": "See full leaderboard",
+      "nextRound": "Spin next round",
+      "challengeFriend": "Challenge a friend — same board",
+      "challengeHint": "They play your exact board. Their score becomes your next rival.",
+      "challengeBanner": "{name}: {pct}% on this board — beat it!",
+      "answeredBanner": "{name} answered your challenge: {theirPct}% vs your {yourPct}%",
+      "newBest": "NEW PERSONAL BEST!",
+      "rankUp": "RANK UP — {rank}!",
+      "rankProgress": "{points} / {next} to {rank}",
+      "rankMax": "Top rank reached",
+      "rankGained": "+{pts} rank points this round",
+      "rank": {"rookie": "Rookie", "bronze": "Bronze", "silver": "Silver", "gold": "Gold", "platinum": "Platinum", "diamond": "Diamond", "legend": "Word Legend"},
+      "shareTitle": "LexiClash Quick Play",
+      "shareText": "I hit {pct}% of perfect on this board. Same board, your turn:"
+    },
     "title": "Quick Play",
     "creating": "Creating...",
     "hostAndPlay": "Host & Play",

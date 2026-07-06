@@ -136,6 +136,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/practice",
   "/profile",
   "/quests",
+  "/quick-play",
   "/referrals",
   "/rules",
   "/scrabble-alternative-online",

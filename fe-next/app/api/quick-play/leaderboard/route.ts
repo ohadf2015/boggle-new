@@ -1,0 +1,59 @@
+/**
+ * GET /api/quick-play/leaderboard?range=today|all — top quick players by best
+ * score_pct, plus display names resolved from profiles.
+ */
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { captureApiError } from '@/utils/sentry';
+
+export async function GET(request: NextRequest) {
+  const rateLimit = checkApiRateLimit(request, 'quick-play-leaderboard', {
+    maxRequests: 30,
+    windowMs: 60_000,
+  });
+  if (!rateLimit.success) {
+    return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
+  }
+
+  const range = request.nextUrl.searchParams.get('range') === 'all' ? 'all' : 'today';
+
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase.rpc('get_quick_play_leaderboard', {
+      p_range: range,
+      p_limit: 50,
+    });
+    if (error) throw new Error(error.message);
+
+    const rows = (data ?? []) as Array<{
+      user_id: string; best_score_pct: number; best_score: number; rounds: number; rank: number;
+    }>;
+
+    let names: Record<string, string> = {};
+    if (rows.length > 0) {
+      const { data: profiles } = await supabase
+        .from('profiles')
+        .select('id, display_name')
+        .in('id', rows.map((r) => r.user_id));
+      names = Object.fromEntries(
+        (profiles ?? []).map((p: { id: string; display_name: string | null }) => [p.id, p.display_name ?? ''])
+      );
+    }
+
+    return NextResponse.json({
+      range,
+      entries: rows.map((r) => ({
+        userId: r.user_id,
+        name: names[r.user_id] || 'Player',
+        bestScorePct: Number(r.best_score_pct),
+        bestScore: r.best_score,
+        rounds: Number(r.rounds),
+        rank: Number(r.rank),
+      })),
+    });
+  } catch (err) {
+    captureApiError(err instanceof Error ? err : new Error(String(err)), 'quick-play-leaderboard');
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

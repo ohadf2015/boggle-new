@@ -44,9 +44,9 @@ interface LandingChallengeCardsProps {
 }
 
 /**
- * Landing card identifiers — `'quickPlay'` is a landing-only synthetic mode
- * that routes into `/multiplayer?quickPlay=true` (auto-creates a bot room and
- * starts a random game). It is not part of `LandingGameMode` (server stats).
+ * Landing card identifiers — `'quickPlay'` is the beta-only solo arcade hub
+ * (`/quick-play`, wheel mode picker). It is not part of `LandingGameMode`
+ * (server stats).
  * `'connections'` and `'brainGym'` are landing-only synthetic modes routing
  * to `/connections` and `/brain` respectively.
  */
@@ -63,7 +63,8 @@ type LandingCardKey =
   | 'shiritori'
   | 'sealedBid'
   | 'crossword'
-  | 'wordfall';
+  | 'wordfall'
+  | 'quickPlay';
 
 /** Default card order when no server data available */
 const DEFAULT_ORDER: LandingCardKey[] = ['daily', 'arena', 'blast', 'practice', 'connections', 'brainGym'];
@@ -79,6 +80,7 @@ const FEATURED_MODES = new Set<LandingCardKey>([
   'wordForge', 'wordVault',
   'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword', 'wordfall',
   'adventure', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
+  'quickPlay', // beta/admin-only cube — gated in rawOrder by canSeeInWorkModes
 ]);
 
 /** CSS stagger delay for each card index */
@@ -145,8 +147,6 @@ export function LandingChallengeCards({
 
   // Layered ordering, applied to a `LandingCardKey[]` working set:
   //   1. Start from the server-provided order (or `DEFAULT_ORDER`).
-  //   2. Inject the synthetic `'quickPlay'` card just after `'daily'` so the
-  //      primary CTA sits in the top row on mobile.
   //   3. Strip `'practice'` for veterans.
   //   4. Surface `'practice'` first for brand-new players (< 3 games).
   //   5. Guarantee `'daily'` lands in the top 2 — it must never be buried.
@@ -176,9 +176,11 @@ export function LandingChallengeCards({
     if (canSeeInWorkModes && !next.includes('crossword')) next.push('crossword');
     // Wordfall (Blast V2) — admin/beta dev preview, routes to /blast/v2.
     if (canSeeInWorkModes && !next.includes('wordfall')) next.push('wordfall');
+    // Quick Play — beta-only solo arcade hub (wheel picker, /quick-play).
+    if (canSeeInWorkModes && !next.includes('quickPlay')) next.push('quickPlay');
     // Adventure is a beta/admin-only preview for now — hide it from the public
     // hub (the route guard in adventure/PageClient blocks direct navigation too).
-    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure');
+    const gated = canSeeInWorkModes ? next : next.filter((m) => m !== 'adventure' && m !== 'quickPlay');
     if (language === 'ja') return gated.filter((m) => !JA_HIDDEN_MODES.has(m));
     return gated;
   })();
@@ -203,7 +205,7 @@ export function LandingChallengeCards({
 
 
   const MP_MODES = new Set<LandingCardKey>(['arena']);
-  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword', 'wordfall']);
+  const SP_MODES = new Set<LandingCardKey>(['practice', 'blast', 'adventure', 'connections', 'brainGym', 'wordCraft', 'wordTower', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid', 'crossword', 'wordfall', 'quickPlay']);
 
   // Every mode is surfaced directly on the hub — no "More Game Modes" collapse.
   // New and returning players alike see the full roster (the old newcomer
