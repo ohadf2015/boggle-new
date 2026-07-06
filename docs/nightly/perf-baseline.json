@@ -1,9 +1,9 @@
 {
-  "date": "2026-07-05",
-  "note": "24h window: 0 routes n≥50 (all sub-floor). No eligible regression verdicts. Supabase MCP absent (10th consecutive night). 2 migrations pending apply. One frontend fix shipped: removed 150ms animation delay from homepage h1 LCP element (LandingHero.tsx). Framer Motion synchronously in critical path via ModeCard → LandingChallengeCards (documented carry, requires LazyMotion refactor).",
+  "date": "2026-07-06",
+  "note": "24h window: 0 routes n≥50 (all sub-floor, max n=8 on /he and /en/multiplayer). No eligible regression verdicts. Supabase MCP absent (11th consecutive night — CRITICAL: human must mint never-expire PAT). Migration written for quick_play_challenges index cleanup. Frontend: no safe quick wins found (word-wheel canvas-based, multiplayer has no hero image — subagent hallucinated CgLobbyHero).",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (10th consecutive night). Cannot apply migrations via MCP or exec_sql RPC. ESCALATED to human — mint never-expire PAT.",
+    "note": "Supabase MCP absent (11th consecutive night). Written migration 20260706020000 for unused index drop + FK index on word_club_members. RLS initplan fix for quick_play_challenges deferred — needs pg_policies query to get exact USING clause before safe rewrite.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
@@ -13,84 +13,103 @@
           "RLS initplan fix: (select auth.role()) on quest_achievement_feed policy",
           "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)"
         ],
-        "carry_count": 9,
-        "status": "WRITTEN — pending apply (9th night)"
+        "carry_count": 10,
+        "status": "WRITTEN — pending apply (10th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
         "items": [
           "DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup"
         ],
-        "carry_count": 4,
-        "status": "WRITTEN — pending apply (4th night)"
+        "carry_count": 5,
+        "status": "WRITTEN — pending apply (5th night)"
+      },
+      {
+        "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql",
+        "items": [
+          "DROP INDEX IF EXISTS public.quick_play_challenges_challenger_idx",
+          "CREATE INDEX IF NOT EXISTS idx_word_club_members_user_id ON public.word_club_members(user_id)"
+        ],
+        "carry_count": 0,
+        "status": "WRITTEN TONIGHT — pending apply"
       }
     ],
     "remaining_advisor_items": [
       {
+        "id": "auth_rls_initplan_quick_play_challenges",
+        "table": "quick_play_challenges",
+        "policy": "quick_play_challenges_accept",
+        "status": "DEFERRED — needs exact USING clause from pg_policies before safe DROP+CREATE. MCP required.",
+        "fix_query": "SELECT polname, pg_get_expr(polqual, polrelid) FROM pg_policy WHERE polrelid = 'public.quick_play_challenges'::regclass;",
+        "priority": "MEDIUM",
+        "carry_count": 0
+      },
+      {
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 9
+        "carry_count": 10
       },
       {
         "id": "unindexed_fk_word_club_members_user_id",
-        "status": "LIKELY FALSE POSITIVE — idx_word_club_members_user already in migration 20260322700000_growth_retention_features.sql:149. Pending migration 20260628 covers idx_word_clubs_owner_id.",
+        "status": "Migration 20260706020000 written. Pending apply.",
+        "priority": "MEDIUM",
+        "carry_count": 0
+      },
+      {
+        "id": "unused_index_quick_play_challenges_challenger_idx",
+        "status": "Migration 20260706020000 written. Pending apply.",
         "priority": "LOW",
-        "carry_count": 9
+        "carry_count": 0
       },
       {
         "id": "unused_index_word_wheel_catchup",
-        "status": "Migration written (20260701020000). Pending apply (4th night).",
+        "status": "Migration 20260701020000 written (5th night). Pending apply.",
         "priority": "LOW",
-        "carry_count": 4
+        "carry_count": 5
       }
     ]
   },
   "frontend": {
-    "note": "24h window (n≥50 gate). Zero routes above floor. No regression verdicts. Homepage LCP root-cause investigation completed: h1 animation delay removed (150ms savings), Framer Motion in critical path documented. Carry: double-hydration (mobile HomeHub + desktop tree), LazyMotion wrapper needed.",
-    "shipped_fix": {
-      "file": "fe-next/components/landing/LandingHero.tsx:94",
-      "change": "Removed 150ms animation delay from h1 LCP element. With animation-fill-mode:both, the 0.15s delay caused the LCP candidate to sit at opacity:0 for 150ms before becoming visible. LCP now fires ~150ms earlier on desktop.",
-      "impact": "~150ms LCP improvement when h1 is LCP candidate. Subtitle (0.25s) and button (0.3s) stagger preserved."
-    },
+    "note": "0 routes above n≥50 floor (max n=8). All LCP/INP/CLS verdicts DEFERRED. Phase-0 brief shows single-sample LCP values (word-wheel 4180ms, multiplayer 3802ms, best-online-word-games 3300ms) — all sub-floor, no regression verdict possible. word-wheel: canvas-based, no hero image, PixiJS lazy with ssr:false appropriate. multiplayer PageClient: no framer-motion top-level, no background image. No safe frontend quick wins identified this run.",
     "by_route": [
       {
-        "route": "/",
+        "route": "/he",
         "p75_lcp_ms": null,
-        "p75_inp_ms": null,
-        "p75_cls": null,
-        "n_24h": 0,
-        "window": "24h",
-        "lcp_status": "DEFERRED — n<50. Phase-0 brief: 6522ms. Root cause: TTFB (Railway) + Framer Motion in critical path. Animation delay fix shipped (-150ms).",
-        "inp_status": "DEFERRED — n<50.",
-        "cls_status": "DEFERRED — n<50."
+        "n_24h": 8,
+        "lcp_status": "DEFERRED — n=8, below 50-sample floor"
+      },
+      {
+        "route": "/en/multiplayer",
+        "p75_lcp_ms": null,
+        "n_24h": 8,
+        "lcp_status": "DEFERRED — n=8, below 50-sample floor"
+      },
+      {
+        "route": "/en/daily/word-wheel",
+        "p75_lcp_ms": null,
+        "n_24h": 2,
+        "lcp_status": "DEFERRED — n=2, below 50-sample floor. Phase-0 brief: 4180ms single-sample (not actionable)."
       }
     ],
     "open_watches": [
       {
         "id": "framer_motion_critical_path",
-        "description": "ModeCard imports { m } from framer-motion synchronously → LandingChallengeCards → LandingView. Framer Motion is in the main landing bundle. Fix: LazyMotion provider wrapping ModeCard subtree with domAnimation features loaded dynamically.",
+        "description": "ModeCard imports { m } from framer-motion synchronously → LandingChallengeCards → LandingView. Framer Motion in main landing bundle. Fix: LazyMotion wrapper with domAnimation features loaded dynamically.",
         "status": "documented — LazyMotion refactor needed, multi-file, deferred",
-        "priority": "HIGH",
-        "files": ["fe-next/components/landing/ModeCard.tsx:6", "fe-next/components/landing/LandingChallengeCards.tsx"]
+        "priority": "HIGH"
       },
       {
-        "id": "double_hydration_mobile_desktop",
-        "description": "LandingView renders both HomeHub (md:hidden) and desktop tree (hidden md:flex) simultaneously. Both trees are SSR'd + hydrated. CSS-gated but both in DOM.",
-        "status": "documented — architectural, deferred",
+        "id": "quick_play_challenges_rls_initplan",
+        "description": "quick_play_challenges_accept policy re-evaluates auth.<fn>() per row. Fix: (select auth.<fn>()). Blocked on seeing exact USING clause — need MCP or human to apply.",
+        "status": "documented — migration query provided, pending MCP",
         "priority": "MEDIUM"
-      },
-      {
-        "id": "homepage_lcp_animation_delay",
-        "description": "h1 animation delay 0.15s → 0s shipped (LandingHero.tsx:94). ~150ms LCP improvement.",
-        "status": "SHIPPED — 2026-07-05",
-        "priority": "DONE"
       }
     ]
   },
   "bundle": {
     "total_kb_uncompressed": 40846,
-    "note": "Pre-tonight build (LandingHero.tsx change is CSS-class only, no chunk size impact). Dictionary chunk (7fd32332, 6449KB) confirmed lazy-loaded. No regressions vs yesterday.",
+    "note": "No fresh build this run (no .next/chunks available). Carrying prior baseline. No new dependencies added — migration file only, no bundle impact.",
     "top_chunks": [
       { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6449, "note": "Word dictionary — LAZY" },
       { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3283 },

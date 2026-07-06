@@ -1315,3 +1315,21 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - useChurnSignals hook fires POST to a churn-report endpoint that returns 502. Stale (30d+ dormant).
 - Status: deferred — error is handled (not user-facing), stale, single user. Monitor if resurfaces.
 - Recommended owner: self (check if churn-signals endpoint is still live; if dead, remove the hook call)
+
+## 2026-07-06
+
+### [Supabase] upsert_push_token search_path hardening incomplete
+- Function body has `SET search_path = public` (not `''`). The 20260628010000 migration only revoked PUBLIC execute; function body never updated.
+- Fix requires: `CREATE OR REPLACE FUNCTION public.upsert_push_token(...) ... SET search_path = '' ... UPDATE public.user_push_tokens ...` (fully-qualify table names).
+- Status: deferred — Supabase MCP unavailable during lane run; need MCP `apply_migration` to apply.
+- Recommended owner: lane-01 next night (apply migration via Supabase MCP)
+
+### [Sentry] CapacitorGameConnect.then() still showing 7 events (1PH)
+- Fix `d2fb54b03` is in HEAD. Events are from stale app cache / users on old APK versions.
+- Status: monitoring — should resolve as users update. No code fix needed.
+- Recommended owner: self (confirm zero events after next Play release)
+
+### [Sentry] TrailRenderer null.clear (1CW/1PV) — salvage regression reverted
+- Salvaged code from 20260705 removed the null guard (try-catch + _destroyed check). Lane 01 reverted to HEAD.
+- Status: shipped correct version (HEAD guard intact). Sentry should trend down.
+- Recommended owner: review-by-eod (verify Sentry 1CW/1PV trending down)

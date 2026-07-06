@@ -11,11 +11,11 @@
 
 ## Current (in progress)
 
-### word-tower — readiness: 84% — status: AUDIT IN PROGRESS
+### word-tower — readiness: 86% — status: AUDIT IN PROGRESS
 - **Why first:** closest to release (deep: 30 components + 69 lib files), admin/beta-gated, no public exposure yet.
 - **Reach for QA:** `https://www.lexiclash.live/en/word-tower?word-tower=1` (the `?word-tower=1` override force-enables the gated mode for non-admins — see `lib/wordTower/flags.ts`). Hebrew RTL: `/he/word-tower?word-tower=1`. Local dev (NODE_ENV=development) needs no override.
 - **Key files:** `components/wordTower/*`, `lib/wordTower/*`, `app/[locale]/word-tower/{page,PageClient}.tsx`, `app/api/word-tower/*`.
-- **Last audited:** 2026-07-05
+- **Last audited:** 2026-07-06
 
 ### Audit areas covered
 - [x] **Bugs / correctness** — null guards, unguarded Record access, double-scaling score (VERIFIED NOT A BUG 2026-06-29 — `placementMultiplier × appliedHeightMult` is intentional multiplicative compounding: crane quality × updraft bonus), damageTower combo reset
@@ -53,22 +53,32 @@
 - [x] **Clutch banner a11y** — FIXED 2026-07-02: Hard-coded `⚠` emoji wrapped in `<span aria-hidden="true">`. `WordTowerPlay.tsx:1093`.
 - [x] **WordTowerPlay.tsx pagehide leak** — FIXED 2026-07-05: anonymous handler passed to `window.addEventListener('pagehide')` could never be removed (no reference kept), accumulated on every mount. Named to `onPageHide`, added to useEffect cleanup. (`WordTowerPlay.tsx:784`)
 - [x] **WordTowerSmashScene.tsx / WordTowerVersus.tsx / WordTowerStatHud.tsx / WordTowerMutatorBanner.tsx / WordTowerNextRivalChip.tsx / WordTowerPerkDraft.tsx / WordTowerMascot.tsx / WordTowerFlowFrame.tsx** — AUDITED CLEAN 2026-07-05: hardcoded unit symbols (`m`, `s`, `x`, `·`) are international symbols, ACCEPTABLE. `PERKS[id]` in PerkDraft type-safe. GSAP `repeat:-1` swing in SmashScene acceptable (GSAP handles null refs). All a11y and cleanup patterns CLEAN.
+- [x] **WordTowerLeaderboard.tsx** — AUDITED CLEAN 2026-07-06: `highestBiome` null-safe (API route has `?? 'city'` guard); no hardcoded strings; loading/error/empty states present.
+- [x] **WordTowerLandmarkRail.tsx** — AUDITED CLEAN 2026-07-06: decorative/inert rail, `aria-hidden` correct; unit symbol `m` is international — acceptable.
+- [x] **WordTowerRivalRail.tsx** — AUDITED CLEAN 2026-07-06: non-null assertion `!` on line 50 is safe (inside `crossed.length > 0` guard); ResizeObserver cleanup present; auto-dismiss in own effect — no cancellation race.
+- [x] **WordTowerVersusRail.tsx** — AUDITED CLEAN 2026-07-06.
+- [x] **WordTowerSkinPicker.tsx** — AUDITED CLEAN 2026-07-06: portal guard via `mounted` state; no hardcoded strings.
+- [x] **WordTowerNoticeColumn.tsx** — AUDITED CLEAN 2026-07-06: `TOWER_SURPRISE_META[event]` guarded by `meta ?` on render; `gainText !== '+0m'` is internal data comparison (not user-facing); wreck `names[0] ?? fallback` safe.
+- [x] **WordTowerBackdrop.tsx / TowerNotice.tsx / WordTowerSighting.tsx** — AUDITED CLEAN 2026-07-06.
+- [x] **WordTowerCrane.tsx** — AUDITED CLEAN 2026-07-06: `+{hiddenCount}` badge is `aria-hidden` (decorative) — acceptable.
+- [x] **WordTowerHud.tsx perk badge** — FIXED 2026-07-06: hardcoded `+50%` replaced with `+${Math.round((pk.heightMult - 1) * 100)}%` — derives from `ActiveRunPerk.heightMult` so display auto-updates if constant changes. (`WordTowerHud.tsx:158`)
 - [ ] **Visual QA** — not captured (code-audit only; mode is admin-gated on prod)
 
 ### Open issues (severity → owner)
 **BLOCKERS (must fix before release)**
-1. **Daily leaderboard backend missing** — no `word_tower_daily` table, no daily-score API, no global "who won today?" — Layer A (client) is complete; Layer B is a design decision (spec: `docs/specs/word-tower-daily-seed.md`). Primary retention lever (NYT Spelling Bee model). **Design call needed: 1 scored attempt/day or unlimited? Hazards in daily?** — owner: review-by-eod
+_(none — daily leaderboard reclassified below; mode fully playable without it)_
 
 **MINOR / DEFER**
+- **Daily leaderboard backend missing** — no `word_tower_daily` table, no daily-score API — Layer A (client) complete; Layer B is a design decision (`docs/specs/word-tower-daily-seed.md`). Mode is fully functional endless without it. **Design call needed: 1 attempt/day or unlimited? Hazards in daily?** — owner: review-by-eod
 - `WordTowerPlay.tsx` — inline callbacks on render; `useCallback` would help perf (minor, non-blocking)
-- `StateSchema.passthrough()` — unknown client fields persist in state JSONB; acceptable for forward-compat but marginally increases storage footprint
-- Daily hazard policy unresolved (spec: disable hazards in daily for fair global comparison?) — design defer
-- Daily streak device-local — localStorage, not server-synced; resets on device switch — design decision tied to daily backend
-- `WordTowerShareCard.tsx` line 104: `'s tower` possessive suffix grammatically wrong for Hebrew names — minor, share card is non-core, but worth a locale-aware format string eventually (`wordTower.share.ownerLabel`)
+- `StateSchema.passthrough()` — unknown client fields persist in state JSONB; acceptable for forward-compat
+- Daily hazard policy unresolved — design defer
+- Daily streak device-local — localStorage, not server-synced; resets on device switch — tied to daily backend
+- `WordTowerShareCard.tsx` line 104: `'s tower` possessive suffix awkward for Hebrew names — minor, share card non-core
 
 ## Queue (audit order — closest-to-release first)
 
-1. **word-tower** ← current (82%, needs daily leaderboard design call to approach 90%)
+1. **word-tower** ← current (86%, no blockers; design call on daily leaderboard backend to reach 90%)
 2. **crossword** — standalone route `/crossword`, recently made endless; verify generator + newspaper UX.
 3. **shiritori** — MP-wired recently; verify chain rules + bot-exclusion.
 4. **sealed-bid** — MP bidding mode; verify ≥2-player clash scoring.
