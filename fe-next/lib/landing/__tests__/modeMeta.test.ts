@@ -100,8 +100,8 @@ describe('MODE_META — parity with control renderCard', () => {
   // (lives in the table); the fast/calm PARTITION is a pure helper both the
   // desktop + mobile renderers call so the split can never drift between them.
   describe('mode category — calm / no-timer grouping', () => {
-    const CALM = ['crossword', 'wordCraft', 'sealedBid', 'connections'] as const;
-    const FAST = ['arena', 'blast', 'practice', 'adventure', 'brainGym'] as const;
+    const CALM = ['crossword', 'wordCraft', 'sealedBid', 'connections', 'blast'] as const;
+    const FAST = ['arena', 'practice', 'adventure', 'brainGym'] as const;
 
     it.each(CALM)('%s is tagged category=calm', (key) => {
       expect(MODE_META[key].category, `${key} category`).toBe('calm');

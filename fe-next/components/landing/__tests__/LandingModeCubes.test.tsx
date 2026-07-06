@@ -280,6 +280,29 @@ describe('LandingModeCubes', () => {
       expect(within(section).getAllByTestId('mode-cube').length).toBe(2);
     });
 
+    it('spans the lone trailing tile full-width when the calm set is odd (no half-width orphan)', () => {
+      const three = [
+        model({ key: 'wordCraft', title: 'Word Craft' }),
+        model({ key: 'connections', title: 'Connections' }),
+        model({ key: 'blast', title: 'Blast' }),
+      ];
+      renderCubes({ models: [model({ key: 'arena', title: 'Arena', role: 'anchor' })], calmModels: three });
+      const section = screen.getByTestId('landing-cubes-calm');
+      const last = within(section).getByRole('link', { name: /Blast/i });
+      // orphan fills the mobile 2-col row, then reverts to a normal square once
+      // the calm grid auto-fits at sm
+      expect(last.className).toMatch(/\bcol-span-2\b/);
+      expect(last.className).toMatch(/sm:col-span-1/);
+    });
+
+    it('never spans a calm tile when the set is even (clean 2-col rows)', () => {
+      renderCubes({ models: [model({ key: 'arena', title: 'Arena', role: 'anchor' })], calmModels: calm });
+      const section = screen.getByTestId('landing-cubes-calm');
+      within(section).getAllByTestId('mode-cube').forEach((c) => {
+        expect(c.className).not.toMatch(/\bcol-span-2\b/);
+      });
+    });
+
     it('softens calm cubes: gentler hover shadow + no loud mode-glow halo', () => {
       renderCubes({ models: [model({ key: 'arena', title: 'Arena', role: 'anchor' })], calmModels: calm });
       const crossword = screen.getByRole('link', { name: /Crossword/i });
@@ -293,6 +316,36 @@ describe('LandingModeCubes', () => {
       renderCubes({ models: [model({ key: 'arena', title: 'Arena', role: 'anchor' })], calmModels: calm });
       const section = screen.getByTestId('landing-cubes-calm');
       expect(within(section).queryByTestId('cube-sheen')).not.toBeInTheDocument();
+    });
+  });
+
+  // ---- mobile orphan guard: never leave a single 1×1 cube alone at 50% width ----
+  describe('mobile orphan tile (no half-width box alone in a row)', () => {
+    it('spans the lone fast tile full-width when only the anchor + 1 cube remain', () => {
+      renderCubes({
+        models: [
+          model({ key: 'arena', title: 'Arena', role: 'anchor' }),
+          model({ key: 'brainGym', title: 'Brain Gym' }),
+        ],
+      });
+      const tile = screen.getByRole('link', { name: /Brain Gym/i });
+      // spans the mobile 2-col row, reverts to a square once the bento goes 4-col at md
+      expect(tile.className).toMatch(/\bcol-span-2\b/);
+      expect(tile.className).toMatch(/md:col-span-1/);
+    });
+
+    it('does not span fast tiles when the rest count is even', () => {
+      renderCubes({
+        models: [
+          model({ key: 'arena', title: 'Arena', role: 'anchor' }),
+          model({ key: 'a', title: 'Alpha' }),
+          model({ key: 'b', title: 'Beta' }),
+        ],
+      });
+      ['Alpha', 'Beta'].forEach((name) => {
+        const t = screen.getByRole('link', { name: new RegExp(name, 'i') });
+        expect(t.className).not.toMatch(/\bcol-span-2\b/);
+      });
     });
   });
 });

@@ -80,7 +80,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
   },
   blast: {
     titleKey: 'landing.blastMode', descKey: 'landing.blastModeDesc', path: '/blast',
-    Icon: Bomb, variant: 'orange', badge: 'NEW', modeImage: '/modes/blast.png', genIcon: '/modes/cubes/blast.png',
+    Icon: Bomb, variant: 'orange', badge: 'NEW', category: 'calm', modeImage: '/modes/blast.png', genIcon: '/modes/cubes/blast.png',
   },
   adventure: {
     titleKey: 'landing.adventureMode', descKey: 'landing.adventureModeDesc', path: '/adventure',

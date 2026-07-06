@@ -100,6 +100,11 @@ interface CubeProps {
       sheen and the loud mode-hue glow halo, and use a softer hover shadow so the
       section reads as a calmer "room" without leaving the neo-brutalist system. */
   tone?: 'fast' | 'calm';
+  /** A lone trailing 1×1 cube on a 2-col mobile grid would sit alone at 50%
+      width. Setting this spans it full-width instead (a tidy wide banner), then
+      reverts to a square once its grid leaves 2-col — at `sm` for the calm
+      auto-fit grid, at `md` for the fast bento's 4-col grid. */
+  wideOrphan?: false | 'sm' | 'md';
 }
 
 function StartHerePill({ label, compact }: { label: string; compact?: boolean }) {
@@ -115,7 +120,15 @@ function StartHerePill({ label, compact }: { label: string; compact?: boolean })
   );
 }
 
-function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast' }: CubeProps) {
+// Full-literal class strings (Tailwind JIT can't see runtime-built ones): a lone
+// trailing cube spans both mobile columns as a wide banner, then reverts to a
+// square at the breakpoint where its grid stops being 2-col.
+const WIDE_ORPHAN: Record<'sm' | 'md', string> = {
+  sm: 'col-span-2 aspect-[5/2] sm:col-span-1 sm:aspect-square',
+  md: 'col-span-2 aspect-[5/2] md:col-span-1 md:aspect-square',
+};
+
+function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', wideOrphan = false }: CubeProps) {
   const { dir } = useLanguage();
   const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const v = VARIANT[model.variant];
@@ -177,6 +190,8 @@ function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast' }:
           ? bigAnchor
             ? 'col-span-2 md:row-span-2 aspect-[16/9] sm:aspect-[2/1] md:aspect-square'
             : 'col-span-2 aspect-[16/9] sm:aspect-[5/2]' // wide banner: too few siblings for a 2×2
+          : wideOrphan
+          ? WIDE_ORPHAN[wideOrphan] // lone trailing cube → full-width banner, not a half-width orphan
           : 'aspect-square',
         // base fill when there's no full-bleed art behind the content
         !hasArt && (anchor ? cn(v.fill, v.ink) : 'bg-neo-navy-light'),
@@ -381,7 +396,15 @@ export function LandingModeCubes({
         <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
           {anchor && <Cube model={anchor} index={0} anchor bigAnchor={bigAnchor} />}
           {rest.map((m, i) => (
-            <Cube key={m.key} model={m} index={i + 1} />
+            // Odd rest ⇒ the last cube would sit alone at 50% on the 2-col mobile
+            // grid; span it full-width (reverts to a square once the bento goes
+            // 4-col at md). The anchor already fills its own row so it's exempt.
+            <Cube
+              key={m.key}
+              model={m}
+              index={i + 1}
+              wideOrphan={rest.length % 2 === 1 && i === rest.length - 1 ? 'md' : false}
+            />
           ))}
         </div>
       </section>
@@ -421,7 +444,15 @@ export function LandingModeCubes({
               tidy at 3/4; centred so a short set never hugs the start edge. */}
           <div className="grid auto-rows-fr grid-cols-2 justify-center gap-3 sm:gap-4 sm:[grid-template-columns:repeat(auto-fit,minmax(150px,190px))]">
             {calmModels.map((m, i) => (
-              <Cube key={m.key} model={m} index={i} tone="calm" />
+              // Odd calm set ⇒ span the lone trailing tile full-width on the
+              // 2-col mobile grid (reverts to a square once it auto-fits at sm).
+              <Cube
+                key={m.key}
+                model={m}
+                index={i}
+                tone="calm"
+                wideOrphan={calmModels.length % 2 === 1 && i === calmModels.length - 1 ? 'sm' : false}
+              />
             ))}
           </div>
         </section>
