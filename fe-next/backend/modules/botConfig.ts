@@ -529,7 +529,8 @@ export const CACHE_CONFIG = {
 } as const;
 
 // Default export for backward compatibility
-export default {
+const botConfigDefault = {
   BOT_CONFIG,
   CACHE_CONFIG,
 };
+export default botConfigDefault;
