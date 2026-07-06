@@ -47,6 +47,7 @@ import Header from '@/components/Header';
 import { getPerfVariant } from '@/utils/perfVariant';
 import { useEvents } from '@/hooks/useEvents';
 import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
+import { isDashboardProfileLoading } from '@/lib/landing/dashboardReadiness';
 
 const EventBanner = dynamic(() => import('@/components/events/EventBanner'), { ssr: false });
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
@@ -70,7 +71,13 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
-  const { isAuthenticated, isAdmin, profile, loading: authLoading } = useAuth();
+  const { isAuthenticated, isAdmin, profile, user, loading: authLoading } = useAuth();
+  // Cold-start guard: the auth session resolves (`authLoading` → false) and sets
+  // `user` before the separate profile fetch lands, so the top bar would paint the
+  // guest "Player" default then snap to the real name. Keep the profile-derived UI
+  // in its skeleton state until the profile actually resolves for a signed-in
+  // session (guests get the neutral state immediately). See pitfall Class 1.
+  const dashboardProfileLoading = isDashboardProfileLoading(authLoading, user, profile);
   const isMobilePortrait = useMobilePortrait();
   // The in-content InlineBannerAd below is a WEB monetization slot. On native it
   // would register a banner-coordinator 'slot' (priority > the bottom anchor),
@@ -218,7 +225,7 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
         <HomeHub
           className="md:hidden"
           profile={profile}
-          authLoading={authLoading}
+          authLoading={dashboardProfileLoading}
           language={language}
           isAdmin={isAdmin}
           liveRoomStats={liveRoomStats}
