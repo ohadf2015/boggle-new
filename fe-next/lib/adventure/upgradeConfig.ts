@@ -112,7 +112,7 @@ export const UPGRADES: UpgradeDefinition[] = [
     id: 'armorPlating',
     category: 'survival',
     nameKey: 'adventure.upgrades.armorPlating.name',
-    descriptionKey: 'adventure.upgrades.armorPlating.descGeneral',
+    descriptionKey: 'adventure.upgrades.armorPlating.desc',
     icon: 'upgrade-armor-plating.png',
     unlockWorld: 3,
     tiers: [
