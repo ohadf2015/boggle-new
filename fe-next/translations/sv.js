@@ -8573,6 +8573,7 @@ const sv = {
       "challengeHint": "De spelar exakt din bräda. Deras resultat blir din nästa rival.",
       "challengeBanner": "{name}: {pct}% på den här brädan — slå det!",
       "answeredBanner": "{name} svarade på din utmaning: {theirPct}% mot dina {yourPct}%",
+      "loadError": "Kunde inte bygga din bräda — kontrollera anslutningen och försök igen",
       "newBest": "NYTT PERSONBÄSTA!",
       "rankUp": "NY RANG — {rank}!",
       "rankProgress": "{points} / {next} till {rank}",

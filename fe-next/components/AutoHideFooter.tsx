@@ -19,6 +19,7 @@ interface AutoHideFooterProps {
 // (e.g. word-craft-game, word-craft-landing, anagram, shiritori) are deliberately
 // NOT listed — those keep the full footer for internal-link SEO.
 const GAME_ROUTES = new Set([
+  'quick-play',
   'singleplayer',
   'multiplayer',
   'daily',

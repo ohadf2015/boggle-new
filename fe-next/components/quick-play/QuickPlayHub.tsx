@@ -45,6 +45,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   const [challenge, setChallenge] = useState<ChallengeInfo | null>(null);
   const [answered, setAnswered] = useState<{ name: string; theirPct: number; yourPct: number } | null>(null);
   const [totalPoints, setTotalPoints] = useState<number | null>(null);
+  const [loadError, setLoadError] = useState(false);
   const goBack = useBackOneLevel();
   const submitting = useRef(false);
 
@@ -106,6 +107,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       posthog.capture('quick_play_mode_selected', { mode, method: 'random', roundIndex });
     }
     setPhase('loading');
+    setLoadError(false);
     try {
       const res = await fetch('/api/quick-play/round', {
         method: 'POST',
@@ -117,6 +119,9 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       setConfig(round);
       setPhase('playing');
     } catch {
+      // Silent no-op on error is forbidden — surface it (a dead-looking PLAY
+      // button is indistinguishable from a bug).
+      setLoadError(true);
       setPhase('wheel');
     }
   }, [challenge, selection, language, roundIndex]);
@@ -258,6 +263,12 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
           </div>
         </div>
       </header>
+
+      {loadError && (
+        <div className="mx-5 mt-4 rounded-2xl border-neo-thick border-black bg-neo-red p-3 text-center font-neo-display text-sm font-semibold text-white shadow-hard" data-testid="quick-load-error">
+          {t('quickPlay.solo.loadError')}
+        </div>
+      )}
 
       {answered && !challenge && (
         <div className="mx-5 mt-4 rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 text-center font-neo-display text-sm font-semibold text-neo-cream shadow-hard" data-testid="quick-answered-banner">

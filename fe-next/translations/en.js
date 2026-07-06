@@ -7793,6 +7793,7 @@ const en = {
       "challengeHint": "They play your exact board. Their score becomes your next rival.",
       "challengeBanner": "{name}: {pct}% on this board — beat it!",
       "answeredBanner": "{name} answered your challenge: {theirPct}% vs your {yourPct}%",
+      "loadError": "Couldn't build your board — check your connection and try again",
       "newBest": "NEW PERSONAL BEST!",
       "rankUp": "RANK UP — {rank}!",
       "rankProgress": "{points} / {next} to {rank}",

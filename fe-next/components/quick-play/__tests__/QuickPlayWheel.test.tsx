@@ -54,6 +54,13 @@ describe('QuickPlayWheel', () => {
     expect(onSelect).toHaveBeenCalledWith('classic', 'tap');
   });
 
+  it('tapping the already-selected node starts the round', () => {
+    renderWheel('classic');
+    fireEvent.click(screen.getByTestId('quick-wheel-node-classic'));
+    expect(onPlay).toHaveBeenCalledTimes(1);
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
   it('play button fires onPlay', () => {
     renderWheel('word-hunt');
     fireEvent.click(screen.getByTestId('quick-wheel-play'));

@@ -8461,6 +8461,7 @@ const he = {
       "challengeHint": "מי שמקבל את הקישור משחק בדיוק באותו לוח, והתוצאה תהפוך ליריב הבא שלכם.",
       "challengeBanner": "{name}: {pct}% בלוח הזה — עכשיו תורכם!",
       "answeredBanner": "יש תגובה לאתגר שלכם מ{name}: {theirPct}% מול {yourPct}% שלכם",
+      "loadError": "לא הצלחנו להכין את הלוח — בדקו את החיבור ונסו שוב",
       "newBest": "שיא אישי חדש!",
       "rankUp": "עלית דרגה — {rank}!",
       "rankProgress": "{points} / {next} עד {rank}",

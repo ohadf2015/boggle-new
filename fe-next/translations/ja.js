@@ -7821,6 +7821,7 @@ const ja = {
       "challengeHint": "友達はあなたと同じボードをプレイ。そのスコアが次のライバルに。",
       "challengeBanner": "{name}がこのボードで{pct}% — 超えられる？",
       "answeredBanner": "{name}が挑戦に応えた: {theirPct}%（あなたは{yourPct}%）",
+      "loadError": "ボードを準備できませんでした — 接続を確認してもう一度",
       "newBest": "自己ベスト更新！",
       "rankUp": "ランクアップ — {rank}！",
       "rankProgress": "{points} / {next}（{rank}まで）",

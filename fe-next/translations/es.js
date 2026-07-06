@@ -8428,6 +8428,7 @@ const es = {
       "challengeHint": "Jugará exactamente tu tablero. Su puntuación será tu próximo rival.",
       "challengeBanner": "{name}: {pct}% en este tablero — ¡supéralo!",
       "answeredBanner": "{name} respondió a tu reto: {theirPct}% frente a tu {yourPct}%",
+      "loadError": "No pudimos preparar tu tablero — revisa tu conexión e inténtalo de nuevo",
       "newBest": "¡NUEVO RÉCORD PERSONAL!",
       "rankUp": "¡SUBES DE RANGO — {rank}!",
       "rankProgress": "{points} / {next} para {rank}",

@@ -125,7 +125,7 @@ export function QuickPlayWheel({ selection, onSelect, onPlay }: QuickPlayWheelPr
               key={mode}
               type="button"
               data-testid={`quick-wheel-node-${mode}`}
-              onClick={() => onSelect(mode, 'tap')}
+              onClick={() => (selection === mode ? onPlay() : onSelect(mode, 'tap'))}
               aria-label={t(`quickPlay.solo.mode.${mode}`)}
               aria-pressed={isActive}
               className={`absolute left-1/2 top-1/2 h-[88px] w-[88px] -translate-x-1/2 -translate-y-1/2 transition-transform duration-200 ${
