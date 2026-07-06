@@ -21,6 +21,7 @@ export default function OddsBoard({ word, stake, reducedMotion }: OddsBoardProps
   const hasValidWord = word.length >= 3;
   const mult = hasValidWord ? oddsMultiplier(word.toUpperCase()) : 0;
   const payout = hasValidWord ? Math.round(stake * mult) : 0;
+  const multText = hasValidWord ? mult.toFixed(1) : '—';
 
   // GSAP odometer ref for the multiplier
   const multDisplayRef = useRef<HTMLDivElement>(null);
@@ -31,7 +32,7 @@ export default function OddsBoard({ word, stake, reducedMotion }: OddsBoardProps
     if (shouldReduceMotion || !hasValidWord) {
       multValueRef.current.value = mult;
       if (multDisplayRef.current) {
-        multDisplayRef.current.textContent = hasValidWord ? mult.toFixed(1) : '—';
+        multDisplayRef.current.textContent = multText;
       }
       return;
     }
@@ -51,34 +52,35 @@ export default function OddsBoard({ word, stake, reducedMotion }: OddsBoardProps
         },
       });
     } else if (multDisplayRef.current) {
-      multDisplayRef.current.textContent = hasValidWord ? mult.toFixed(1) : '—';
+      multDisplayRef.current.textContent = multText;
     }
-  }, [mult, hasValidWord, shouldReduceMotion]);
+  }, [mult, hasValidWord, shouldReduceMotion, multText]);
 
   return (
-    <div className="border-neo-thick border-black shadow-hard-lg bg-neo-navy-light rounded-neo p-6">
+    <div className="border-neo-thick border-black shadow-hard-lg bg-neo-navy-light rounded-neo p-3 flex items-center justify-between gap-4">
       {/* Multiplier */}
-      <div className="mb-4">
+      <div>
         <div
           data-testid="odds-mult"
-          className="font-neo-display text-5xl text-neo-yellow"
+          className="font-neo-display text-3xl text-neo-yellow leading-none"
         >
-          <span ref={multDisplayRef}>{hasValidWord ? mult.toFixed(1) : '—'}</span>
+          <span ref={multDisplayRef}>{multText}</span>
+          <span className="text-base">×</span>
         </div>
-        <div className="text-sm text-neo-cream mt-1">
-          {t('sealedBid.uniquePays', { mult: hasValidWord ? mult.toFixed(1) : '—' })}
+        <div className="text-xs text-neo-cream mt-0.5">
+          {t('sealedBid.uniquePays', { mult: multText })}
         </div>
       </div>
 
       {/* Payout */}
-      <div>
+      <div className="text-right">
         <div
           data-testid="odds-payout"
-          className="font-neo-body text-neo-cyan text-2xl"
+          className="font-neo-body text-neo-cyan text-xl leading-none"
         >
           {payout}
         </div>
-        <div className="text-sm text-neo-cream mt-1">
+        <div className="text-xs text-neo-cream mt-0.5">
           {t('sealedBid.potentialPayout', { amount: payout })}
         </div>
       </div>

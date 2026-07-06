@@ -13,10 +13,12 @@ export interface ChipTrayProps {
   reducedMotion?: boolean;
 }
 
+// Explicit class map — Tailwind's JIT scanner can't resolve a template-literal
+// `bg-${color}` class name, it needs the literal string present in source.
 const DENOMINATIONS = [
-  { value: 5, label: '+5', color: 'neo-cyan' },
-  { value: 10, label: '+10', color: 'neo-lime' },
-  { value: 25, label: '+25', color: 'neo-pink' },
+  { value: 5, label: '+5', bg: 'bg-neo-cyan' },
+  { value: 10, label: '+10', bg: 'bg-neo-lime' },
+  { value: 25, label: '+25', bg: 'bg-neo-pink' },
 ];
 
 export default function ChipTray({
@@ -58,9 +60,9 @@ export default function ChipTray({
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-3 p-3">
       <div className="flex flex-wrap gap-3">
-        {DENOMINATIONS.map(({ value, label, color }) => (
+        {DENOMINATIONS.map(({ value, label, bg }) => (
           <button
             key={value}
             ref={(el) => {
@@ -71,10 +73,10 @@ export default function ChipTray({
             aria-label={`${label} chips`}
             className={`
               flex items-center justify-center
-              w-16 h-16 rounded-full
+              w-14 h-14 rounded-full
               border-neo-thick border-black
               shadow-hard
-              bg-${color}
+              ${bg}
               font-neo-display text-base font-bold
               text-black
               disabled:opacity-50 disabled:cursor-not-allowed

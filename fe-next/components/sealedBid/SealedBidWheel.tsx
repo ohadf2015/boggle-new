@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WheelLetter } from '@/components/daily/WordWheelParts';
 import WordWheelPixiRing from '@/components/daily/WordWheelPixiRing';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
+import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { cn } from '@/lib/utils';
 
 export interface SealedBidWheelProps {
@@ -15,8 +17,6 @@ export interface SealedBidWheelProps {
   reducedMotion?: boolean;
   dir?: 'ltr' | 'rtl';
 }
-
-const CIRCLE_RADIUS = 140; // px from center to outer tiles
 
 export default function SealedBidWheel({
   letters,
@@ -32,15 +32,39 @@ export default function SealedBidWheel({
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
   const wheelContainerRef = useRef<HTMLDivElement>(null);
 
+  // Radius tracks the container's rendered size (shared with the daily +
+  // multiplayer word wheels) so the 7-petal ring shrinks to fit whatever
+  // space GameStage's flex layout leaves it instead of overflowing on short
+  // viewports — that overflow was the root cause of page scroll here.
+  const [radius, setRadius] = useState(140);
+  useEffect(() => {
+    const el = wheelContainerRef.current;
+    if (!el) return;
+    const shortVp = typeof window !== 'undefined' ? window.matchMedia('(max-height: 600px)') : null;
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      setRadius(selectWheelRadius({ width: rect.width, height: rect.height, isShort: !!shortVp?.matches }));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    shortVp?.addEventListener?.('change', update);
+    return () => {
+      ro.disconnect();
+      shortVp?.removeEventListener?.('change', update);
+    };
+  }, []);
+
   // Build the word from picked indices
   const word = picks.map((i) => letters[i]).join('');
+  const pickedSet = new Set(picks);
 
   // Wire drag-to-spell
   const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
     draggingRef,
     pointerPosRef,
     minLength: 3,
-    isIndexUsed: (idx) => picks.includes(idx),
+    isIndexUsed: (idx) => pickedSet.has(idx),
     addLetter: (idx) => {
       setPicks((p) => [...p, idx]);
     },
@@ -52,14 +76,17 @@ export default function SealedBidWheel({
 
   // Call onChange whenever picks change
   useEffect(() => {
-    const newWord = picks.map((i) => letters[i]).join('');
-    onChange(newWord, picks);
-  }, [picks, letters, onChange]);
+    onChange(word, picks);
+  }, [word, picks, onChange]);
 
-  // Handle tap on a tile
-  const handleTilePress = (letter: string, idx: number, el: HTMLButtonElement) => {
-    if (disabled || picks.includes(idx)) return;
+  // Handle tap on a tile — a quick squash+pop confirms the tap registered,
+  // since tiles were otherwise silent on press (felt unresponsive).
+  const handleTilePress = (_letter: string, idx: number, el: HTMLButtonElement) => {
+    if (disabled || pickedSet.has(idx)) return;
     setPicks((p) => [...p, idx]);
+    if (!reducedMotion) {
+      gsap.fromTo(el, { scale: 0.85 }, { scale: 1, duration: 0.25, ease: 'back.out(2)' });
+    }
   };
 
   // Clear all picks
@@ -87,7 +114,7 @@ export default function SealedBidWheel({
         {/* Pixi ring background */}
         <WordWheelPixiRing
           selectedIndices={picks}
-          radius={CIRCLE_RADIUS}
+          radius={radius}
           combo={0}
           pointerPosRef={pointerPosRef}
           isDraggingRef={draggingRef}
@@ -101,9 +128,9 @@ export default function SealedBidWheel({
               letter={letter}
               isCenter={false}
               angle={getAngle(idx)}
-              radius={CIRCLE_RADIUS}
+              radius={radius}
               onPress={handleTilePress}
-              isUsed={picks.includes(idx)}
+              isUsed={pickedSet.has(idx)}
               index={idx}
               reducedMotion={reducedMotion}
             />

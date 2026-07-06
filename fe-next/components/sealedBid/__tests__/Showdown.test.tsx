@@ -15,6 +15,19 @@ vi.mock('../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
 }));
 
+// gsap is mocked (per project convention, see ResultsHeroTilt.test.tsx) so we
+// assert on which API the reveal calls rather than jsdom's unreliable CSS
+// transform application.
+vi.mock('gsap', () => ({
+  default: {
+    set: vi.fn(),
+    to: vi.fn(),
+    from: vi.fn(),
+    fromTo: vi.fn(),
+  },
+}));
+import gsap from 'gsap';
+
 describe('Showdown', () => {
   beforeEach(() => {
     vi.useFakeTimers();
@@ -91,5 +104,31 @@ describe('Showdown', () => {
     await waitFor(() => {
       expect(screen.getByText(/-20/)).toBeInTheDocument();
     });
+  });
+
+  it('applies the flip end-state via gsap.set under reducedMotion — the flip must not be animation-only, or reduced-motion users never see the reveal', () => {
+    render(
+      <Showdown
+        {...base}
+        playerWord="TRAIN"
+        settlement={{ outcome: 'clash', stake: 20, multiplier: 2, delta: -20 }}
+      />,
+    );
+    vi.advanceTimersByTime(400);
+    expect(gsap.set).toHaveBeenCalledWith(expect.anything(), { rotationY: 180 });
+    expect(gsap.to).not.toHaveBeenCalled();
+  });
+
+  it('animates the flip via gsap.to when motion is not reduced', () => {
+    render(
+      <Showdown
+        {...base}
+        reducedMotion={false}
+        playerWord="TRAIN"
+        settlement={{ outcome: 'clash', stake: 20, multiplier: 2, delta: -20 }}
+      />,
+    );
+    vi.advanceTimersByTime(400);
+    expect(gsap.to).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({ rotationY: 180 }));
   });
 });

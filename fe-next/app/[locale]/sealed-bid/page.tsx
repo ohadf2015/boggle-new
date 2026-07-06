@@ -25,6 +25,7 @@ import { useCoinActions } from '@/contexts/CoinContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 import { GameStage } from '@/components/game/GameStage';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import SealedBidWheel from '@/components/sealedBid/SealedBidWheel';
 import OddsBoard from '@/components/sealedBid/OddsBoard';
@@ -249,44 +250,71 @@ export default function SealedBidPage() {
     return <div className="min-h-[100dvh] bg-neo-navy" aria-hidden />;
   }
 
-  return (
-    <GameStage>
-      <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-lime" />
-      <main
-        dir={dir}
-        className="mx-auto flex min-h-[100dvh] w-full max-w-2xl flex-col gap-4 bg-neo-navy px-4 py-4 text-neo-white"
+  const headerRow = (
+    <div dir={dir} className="flex items-center justify-between gap-2">
+      <Link
+        href={`/${locale}`}
+        aria-label={t('common.back')}
+        className="flex h-10 w-10 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard"
       >
-        {/* Header: back + round counter + chip stack (coin-stream target) */}
-        <header className="flex items-center justify-between gap-2">
-          <Link
-            href={`/${locale}`}
-            aria-label={t('common.back')}
-            className="flex h-10 w-10 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-navy-light shadow-hard"
-          >
-            <ArrowLeft className="h-5 w-5 text-neo-cyan rtl:rotate-180" aria-hidden="true" />
-          </Link>
+        <DirectionalIcon icon={ArrowLeft} className="h-5 w-5 text-neo-cyan" />
+      </Link>
 
-          <div className="flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 shadow-hard">
-            <Gavel className="h-4 w-4 text-neo-cyan" aria-hidden="true" />
-            <span className="font-neo-display font-black text-sm text-neo-white">
-              {t('sealedBid.round')} {Math.min(roundIndex + 1, ROUNDS)}/{ROUNDS}
-            </span>
-          </div>
+      <div className="flex items-center gap-2 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 shadow-hard">
+        <Gavel className="h-4 w-4 text-neo-cyan" aria-hidden="true" />
+        <span className="font-neo-display font-black text-sm text-neo-white">
+          {t('sealedBid.round')} {Math.min(roundIndex + 1, ROUNDS)}/{ROUNDS}
+        </span>
+      </div>
 
-          <div
-            ref={payoutTargetRef}
-            data-testid="chip-stack"
-            className="flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 shadow-hard"
-          >
-            <Coins className="h-4 w-4 text-neo-yellow" aria-hidden="true" />
-            <span className="font-neo-display font-black text-sm text-neo-yellow">{wallet.chips}</span>
-          </div>
-        </header>
+      <div
+        ref={payoutTargetRef}
+        data-testid="chip-stack"
+        className="flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-3 py-1.5 shadow-hard"
+      >
+        <Coins className="h-4 w-4 text-neo-yellow" aria-hidden="true" />
+        <span className="font-neo-display font-black text-sm text-neo-yellow">{wallet.chips}</span>
+      </div>
+    </div>
+  );
 
+  const bettingFooter =
+    phase !== 'done' ? (
+      <div dir={dir} className="flex gap-2">
+        <button
+          type="button"
+          onClick={pass}
+          disabled={phase !== 'bidding' || pending}
+          className="flex-1 rounded-neo border-neo-thick border-black bg-neo-navy-light px-4 py-3 font-neo-display font-black uppercase tracking-wide text-neo-white/70 shadow-hard disabled:opacity-40"
+        >
+          {t('sealedBid.pass')}
+        </button>
+        <button
+          type="button"
+          onClick={() => void lockBid()}
+          disabled={!canLock}
+          className="flex-[2] rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40"
+        >
+          {t('sealedBid.lockBid')}
+        </button>
+      </div>
+    ) : undefined;
+
+  return (
+    <GameStage header={headerRow} footer={bettingFooter} bodyLabel={t('sealedBid.round')}>
+      <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-lime" />
+      <div dir={dir} className="mx-auto flex h-full w-full max-w-2xl flex-col gap-2 text-neo-white">
         {phase !== 'done' && currentDeal && (
           <>
+            {/* Who you're bidding against — makes the "unique beats hidden
+                rivals" loop legible before the reveal, not just after it. */}
+            <div className="flex items-center justify-center gap-1.5 text-xs text-neo-white/60">
+              <span aria-hidden="true">🤫</span>
+              <span>{t('sealedBid.vsRivals', { a: BOT_NAMES[0], b: BOT_NAMES[1] })}</span>
+            </div>
+
             {/* Word wheel — spell your bid */}
-            <section className="flex flex-1 items-center justify-center">
+            <section className="flex min-h-0 flex-1 items-center justify-center">
               <SealedBidWheel
                 key={roundIndex}
                 letters={currentDeal.displayLetters}
@@ -301,7 +329,7 @@ export default function SealedBidPage() {
             </section>
 
             {/* Odds board + chip tray — read the odds, place your stake */}
-            <section className="space-y-3">
+            <section className="shrink-0 space-y-2">
               <OddsBoard word={chosenWord} stake={stake} reducedMotion={reducedMotion} />
               <ChipTray
                 balance={wallet.chips}
@@ -310,24 +338,6 @@ export default function SealedBidPage() {
                 onStakeChange={(s) => setStake(clampStake(wallet, s))}
                 reducedMotion={reducedMotion}
               />
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={pass}
-                  disabled={phase !== 'bidding' || pending}
-                  className="flex-1 rounded-neo border-neo-thick border-black bg-neo-navy-light px-4 py-3 font-neo-display font-black uppercase tracking-wide text-neo-white/70 shadow-hard disabled:opacity-40"
-                >
-                  {t('sealedBid.pass')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void lockBid()}
-                  disabled={!canLock}
-                  className="flex-[2] rounded-neo border-neo-thick border-black bg-neo-cyan px-4 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-40"
-                >
-                  {t('sealedBid.lockBid')}
-                </button>
-              </div>
             </section>
           </>
         )}
@@ -367,7 +377,7 @@ export default function SealedBidPage() {
             </button>
           </section>
         )}
-      </main>
+      </div>
     </GameStage>
   );
 }

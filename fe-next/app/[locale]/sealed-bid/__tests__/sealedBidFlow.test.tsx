@@ -28,7 +28,21 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({ replace: replaceMock }),
 }));
 vi.mock('../../../../components/game/GameStage', () => ({
-  GameStage: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  GameStage: ({
+    children,
+    header,
+    footer,
+  }: {
+    children: React.ReactNode;
+    header?: React.ReactNode;
+    footer?: React.ReactNode;
+  }) => (
+    <div>
+      {header}
+      {children}
+      {footer}
+    </div>
+  ),
 }));
 
 // Mutable auth state so we can exercise both the beta and non-beta branches.
