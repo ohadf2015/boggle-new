@@ -2,7 +2,7 @@ import { vi, type Mock, } from 'vitest';
 /**
  * Tests for HostPreGameView game mode selection and default settings.
  *
- * - Default "party" preset settings are applied on mount (timer=2, MEDIUM)
+ * - Default "fast" preset settings are applied on mount (timer=1, MEDIUM)
  * - Game mode cards are always visible (no collapsible)
  * - Default game mode is "random"
  * - Game mode buttons render for both desktop and mobile
@@ -154,7 +154,7 @@ describe('HostPreGameView Game Mode Selection', () => {
     vi.clearAllMocks();
   });
 
-  it('applies default party preset on mount', async () => {
+  it('applies default fast preset on mount', async () => {
     const setTimerValue = vi.fn();
     const setDifficulty = vi.fn();
     const setMinWordLength = vi.fn();
@@ -171,7 +171,7 @@ describe('HostPreGameView Game Mode Selection', () => {
     );
 
     await waitFor(() => {
-      expect(setTimerValue).toHaveBeenCalledWith(2);
+      expect(setTimerValue).toHaveBeenCalledWith(1);
       expect(setDifficulty).toHaveBeenCalledWith('MEDIUM');
       expect(setMinWordLength).toHaveBeenCalledWith(2);
     });

@@ -119,7 +119,7 @@ describe('MODE_META — parity with control renderCard', () => {
   });
 
   describe('admin modes carry the ADMIN badge', () => {
-    it.each(['wordTower', 'wordForge', 'wordVault', 'party', 'wordAlchemy', 'shiritori', 'sealedBid'])(
+    it.each(['wordTower', 'shiritori', 'sealedBid'])(
       '%s badge=ADMIN',
       (key) => {
         expect(MODE_META[key].badge).toBe('ADMIN');

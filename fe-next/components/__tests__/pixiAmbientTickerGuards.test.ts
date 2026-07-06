@@ -19,11 +19,7 @@ const FILES = [
     path: '../blast/legacy/BlastSparksCanvas.tsx',
     teardownFlag: /if \(destroyed\) return/,
   },
-  {
-    name: 'EmberOverlay',
-    path: '../word-vault/pixi/EmberOverlay.tsx',
-    teardownFlag: /if \(state\.destroyed\) return/,
-  },
+  // EmberOverlay lived under the Word Vault mode, which has been removed.
 ];
 
 describe('ambient Pixi ticker guards', () => {

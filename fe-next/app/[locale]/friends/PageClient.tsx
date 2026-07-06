@@ -130,8 +130,10 @@ export default function FriendsPageClient(): React.JSX.Element {
         </div>
       </header>
 
-      {/* Content */}
-      <div className="max-w-2xl mx-auto p-4 page-content-safe flex-1">
+      {/* Content — `overflow-x-clip min-w-0` guards the whole friends surface
+          against horizontal page scroll (the padding box, not the content box,
+          is the clip boundary, so child entrance animations are unaffected). */}
+      <div className="max-w-2xl mx-auto p-4 page-content-safe flex-1 w-full min-w-0 overflow-x-clip">
         <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

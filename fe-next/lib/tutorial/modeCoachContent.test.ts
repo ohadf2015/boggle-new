@@ -10,7 +10,6 @@ const EXPECTED_MODES: CoachModeKey[] = [
   'wordTower',
   'connections',
   'wordCraft',
-  'wordAlchemy',
   'crossword',
   'sealedBid',
   'shiritori',

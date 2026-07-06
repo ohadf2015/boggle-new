@@ -5,7 +5,6 @@
 
 import {
   computeSoloReward,
-  alchemyScore,
   crosswordScore,
 } from './soloReward';
 import { COIN_EARNING_OTHER } from '@/utils/coinManager';
@@ -39,7 +38,7 @@ describe('soloReward', () => {
     });
 
     it('coins = base + scoreBonus + winBonus + bonus (sum of parts)', () => {
-      const r = computeSoloReward({ mode: 'word-alchemy', score: 120, won: true, seed: 42 });
+      const r = computeSoloReward({ mode: 'crossword', score: 120, won: true, seed: 42 });
       expect(r.coins).toBe(
         r.breakdown.base + r.breakdown.scoreBonus + r.breakdown.winBonus + r.bonus,
       );
@@ -69,21 +68,6 @@ describe('soloReward', () => {
         const r = computeSoloReward({ mode: 'shiritori', score: 30, won: true, seed: s });
         expect([0, 5, 10, 25]).toContain(r.bonus);
       }
-    });
-  });
-
-  describe('alchemyScore (heat → synthesized score)', () => {
-    it('is 0 when not won', () => {
-      expect(alchemyScore(80, 100, false)).toBe(0);
-    });
-    it('scales with heat fraction when won', () => {
-      const low = alchemyScore(20, 100, true);
-      const high = alchemyScore(90, 100, true);
-      expect(high).toBeGreaterThan(low);
-    });
-    it('guards divide-by-zero maxHeat', () => {
-      expect(() => alchemyScore(0, 0, true)).not.toThrow();
-      expect(alchemyScore(0, 0, true)).toBeGreaterThanOrEqual(0);
     });
   });
 

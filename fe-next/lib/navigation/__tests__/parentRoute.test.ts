@@ -41,10 +41,13 @@ describe('parentRoute', () => {
     expect(parentRoute('/en/daily/archive/')).toBe('/en/daily');
   });
 
-  it('applies overrides where the URL parent has no page', () => {
-    // /party/<id>/host and /play have no /party/<id> page → back goes to /party
-    expect(parentRoute('/en/party/abc123/host')).toBe('/en/party');
-    expect(parentRoute('/he/party/xyz/play')).toBe('/he/party');
+  it('drops exactly one segment when no override matches', () => {
+    // The party mode was removed, so its PARENT_OVERRIDES entry is gone; these
+    // deep routes now fall through to the default "drop one segment" rule.
+    // (The override mechanism itself is still exercised by the source when a
+    // future PARENT_OVERRIDES entry is added.)
+    expect(parentRoute('/en/party/abc123/host')).toBe('/en/party/abc123');
+    expect(parentRoute('/he/party/xyz/play')).toBe('/he/party/xyz');
   });
 
   it('handles non-locale roots (e.g. party-screen)', () => {

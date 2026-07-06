@@ -123,78 +123,6 @@ describe('LandingChallengeCards — Word Tower admin solo gate', () => {
   });
 });
 
-describe('LandingChallengeCards — Word Forge admin dev-preview gate', () => {
-  it('does NOT render the Word Forge card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="wordForge"]')).toBeNull();
-  });
-
-  it('renders the Word Forge card for an admin with /word-forge href', () => {
-    mockIsAdmin.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const card = container.querySelector('[data-cube-key="wordForge"]');
-    expect(card).toBeInTheDocument();
-    expect(card?.getAttribute('href')).toBe('/en/word-forge');
-  });
-});
-
-describe('LandingChallengeCards — Word Vault admin dev-preview gate', () => {
-  it('does NOT render the Word Vault card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="wordVault"]')).toBeNull();
-  });
-
-  it('renders the Word Vault card for an admin with /word-vault href', () => {
-    mockIsAdmin.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const card = container.querySelector('[data-cube-key="wordVault"]');
-    expect(card).toBeInTheDocument();
-    expect(card?.getAttribute('href')).toBe('/en/word-vault');
-  });
-});
-
-describe('LandingChallengeCards — Party Games admin dev-preview gate', () => {
-  it('does NOT render the Party Games card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="party"]')).toBeNull();
-  });
-
-  it('renders the Party Games card for an admin with /party href', () => {
-    mockIsAdmin.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const card = container.querySelector('[data-cube-key="party"]');
-    expect(card).toBeInTheDocument();
-    expect(card?.getAttribute('href')).toBe('/en/party');
-  });
-});
-
-describe('LandingChallengeCards — Word Alchemy admin dev-preview gate', () => {
-  it('does NOT render the Word Alchemy card for a non-admin', () => {
-    mockIsAdmin.mockReturnValue(false);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    expect(container.querySelector('[data-cube-key="wordAlchemy"]')).toBeNull();
-  });
-
-  it('renders the Word Alchemy card for an admin with /word-alchemy href', () => {
-    mockIsAdmin.mockReturnValue(true);
-    mockGamesCompleted.mockReturnValue(10);
-    const { container } = render(<LandingChallengeCards {...baseProps} />);
-    const card = container.querySelector('[data-cube-key="wordAlchemy"]');
-    expect(card).toBeInTheDocument();
-    expect(card?.getAttribute('href')).toBe('/en/word-alchemy');
-  });
-});
-
 describe('LandingChallengeCards — Shiritori admin dev-preview gate', () => {
   it('does NOT render the Shiritori card for a non-admin', () => {
     mockIsAdmin.mockReturnValue(false);
@@ -217,7 +145,7 @@ describe('LandingChallengeCards — Shiritori admin dev-preview gate', () => {
 
 
 describe('LandingChallengeCards — full admin dev-preview roster', () => {
-  it('renders ALL 7 admin-gated dev preview cards for a post-newbie admin', () => {
+  it('renders ALL 4 admin-gated dev preview cards for a post-newbie admin', () => {
     mockIsAdmin.mockReturnValue(true);
     mockUserEmail.mockReturnValue('admin@example.com');
     // Past newbie + first-timer + newcomer-by-games gates → no collapse expander,
@@ -229,11 +157,8 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     const expected = [
       // WordCraft consolidated to ONE public card; Cards/Gems are URL sub-modes
       // (gateWordCraftMode), not hub cards — so none appear in this admin roster.
+      // Party, Word Alchemy, Word Forge and Word Vault modes were removed.
       'wordTower',          // Word Tower
-      'wordForge',          // Word Forge
-      'wordVault',          // Word Vault
-      'party',              // Party Games
-      'wordAlchemy',        // Word Alchemy
       'shiritori',          // Shiritori
       'sealedBid',          // Sealed Bid
       'wordfall',           // Wordfall (Blast V2)
@@ -253,10 +178,6 @@ describe('LandingChallengeCards — full admin dev-preview roster', () => {
     const { container } = render(<LandingChallengeCards {...baseProps} />);
     const adminOnly = [
       'wordTower',
-      'wordForge',
-      'wordVault',
-      'party',
-      'wordAlchemy',
       'shiritori',
       'sealedBid',
       'wordfall',

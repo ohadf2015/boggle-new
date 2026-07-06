@@ -4,7 +4,6 @@ import { requiresNetworkToPlay } from '../landingOfflineAwareness';
 describe('requiresNetworkToPlay', () => {
   it('flags live-multiplayer landing modes as network-only', () => {
     expect(requiresNetworkToPlay('arena')).toBe(true);
-    expect(requiresNetworkToPlay('party')).toBe(true);
   });
 
   it('does NOT flag offline-capable solo modes (they stay playable on a flight)', () => {
