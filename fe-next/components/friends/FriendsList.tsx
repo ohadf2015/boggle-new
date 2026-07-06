@@ -543,10 +543,17 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
   // Full view
   return (
-    <div className={cn('space-y-4', className)}>
-      {/* Header — wraps on narrow screens so the action buttons never overflow off-canvas */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <div className="flex items-center gap-2 min-w-0">
+    // `min-w-0 max-w-full overflow-x-clip`: the friends surface can never gain
+    // horizontal page scroll from a stray over-wide child — which is what rode
+    // the header's trailing-edge action buttons off-screen on wide phones
+    // (e.g. S25 Ultra) in every LTR locale. Fixed/portal modals below are
+    // viewport-anchored, so this clip does not affect them.
+    <div className={cn('space-y-4 w-full min-w-0 max-w-full overflow-x-clip', className)}>
+      {/* Header — single non-wrapping row: the title yields space and truncates
+          while the action cluster stays `shrink-0`, pinned to the trailing
+          (inline-end) edge in both LTR and RTL and never displaced off-canvas. */}
+      <div className="flex flex-nowrap items-center justify-between gap-2 min-w-0">
+        <div className="flex items-center gap-2 min-w-0 flex-1">
           <Users className={cn('w-5 h-5 shrink-0', isDark ? 'text-cyan-400' : 'text-cyan-600')} />
           <h2 className={cn('font-black text-lg uppercase truncate', isDark ? 'text-white' : 'text-gray-900')}>
             {t('friends.title')}
@@ -557,20 +564,24 @@ const FriendsList: React.FC<FriendsListProps> = ({
             </span>
           )}
         </div>
-        <div className="flex flex-wrap items-center justify-end gap-2 shrink-0">
+        <div data-testid="friends-header-actions" className="flex items-center justify-end gap-2 shrink-0">
           <EnhancedButton onClick={() => setShowPactSelector(true)} size="sm" haptic animation="pop" className="bg-neo-pink text-white" aria-label={t('wordPact.formPact')}>
             <Handshake className="w-4 h-4" />
-            <span className="hidden xs:inline">{t('wordPact.formPact')}</span>
+            {/* Label only from `sm` (tablet/desktop) — never at the `xs` (480px)
+                wide-phone width where the extra width pushed the header out. */}
+            <span className="hidden sm:inline">{t('wordPact.formPact')}</span>
           </EnhancedButton>
           <EnhancedButton onClick={() => setShowAddFriend(true)} size="sm" haptic animation="pop" className="bg-neo-cyan text-neo-black" aria-label={t('friends.add')}>
             <UserPlus className="w-4 h-4" />
-            <span className="hidden xs:inline">{t('friends.add')}</span>
+            <span className="hidden sm:inline">{t('friends.add')}</span>
           </EnhancedButton>
         </div>
       </div>
 
-      {/* Tab Navigation (Q-18: proper ARIA tab semantics) */}
-      <div role="tablist" aria-label={t('friends.title')} className="flex gap-2 border-b-2 border-neo-black overflow-x-auto scrollbar-thin">
+      {/* Tab Navigation (Q-18: proper ARIA tab semantics).
+          `min-w-0 max-w-full` keeps the strip inside its parent so a long
+          locale's tab labels scroll internally instead of widening the page. */}
+      <div role="tablist" aria-label={t('friends.title')} className="flex gap-2 border-b-2 border-neo-black overflow-x-auto scrollbar-thin min-w-0 max-w-full">
         {(['friends', 'requests', 'messages'] as const).map((tab) => {
           const isActive = activeTab === tab;
           const icons = { friends: Users, requests: Bell, messages: MessageCircle };
