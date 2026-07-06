@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
@@ -16,10 +17,13 @@ import {
 } from '@/utils/cookieConsent';
 
 /**
- * Granular cookie consent banner for GDPR compliance.
- * Shows at bottom until user makes a choice.
- * Supports "Accept All", "Decline All", and granular category toggles.
- * Can be re-opened via the ManageCookiesButton component.
+ * Blocking cookie-consent modal (GDPR).
+ * Centered, screen-covering overlay shown until the user makes a choice — it
+ * cannot be dismissed by backdrop click or Escape, so a decision is required
+ * (unlike a bottom banner most users reflexively close). "Accept All" is the
+ * prominent primary CTA; "Decline All" and "Customize" stay equal-weight,
+ * one-click buttons so reject is as easy as accept (ePrivacy dark-pattern rule).
+ * Re-openable via the ManageCookiesButton component.
  */
 export default function CookieConsent() {
   const { t, language } = useLanguage();
@@ -35,24 +39,27 @@ export default function CookieConsent() {
       setVisible(true);
     }
 
-    // Listen for consent resets (from ManageCookiesButton)
+    // Listen for consent resets (from ManageCookiesButton) — re-open the modal.
     return onConsentChange((state) => {
       if (state.timestamp === 0) {
-        // Reset triggered — re-show the banner and re-reserve its bottom space.
-        // This is user-initiated (clicked "Manage cookies"), so any resulting
-        // shift is excluded from CLS by spec.
-        document.documentElement.classList.add('needs-cookie-consent');
         setVisible(true);
+        setShowDetails(false);
         setAnalytics(false);
         setAdvertising(false);
       }
     });
   }, []);
 
-  // Drop the bottom-space reservation once the user dismisses the banner.
-  const releaseConsentReservation = useCallback(() => {
-    document.documentElement.classList.remove('needs-cookie-consent');
-  }, []);
+  // Lock background scroll while the blocking modal is up. Save/restore the
+  // prior inline value so we never clobber screen-fit's own overflow control.
+  useEffect(() => {
+    if (!visible || isOnCrazyGamesPlatform) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [visible, isOnCrazyGamesPlatform]);
 
   // Load existing state when showing details
   useEffect(() => {
@@ -65,135 +72,124 @@ export default function CookieConsent() {
 
   const handleAcceptAll = useCallback(() => {
     acceptAll();
-    releaseConsentReservation();
     setVisible(false);
     setShowDetails(false);
-  }, [releaseConsentReservation]);
+  }, []);
 
   const handleDeclineAll = useCallback(() => {
     declineAll();
-    releaseConsentReservation();
     setVisible(false);
     setShowDetails(false);
-  }, [releaseConsentReservation]);
+  }, []);
 
   const handleSavePreferences = useCallback(() => {
     setConsentState({ analytics, advertising });
-    releaseConsentReservation();
     setVisible(false);
     setShowDetails(false);
-  }, [analytics, advertising, releaseConsentReservation]);
+  }, [analytics, advertising]);
 
   const dialogRef = useRef<HTMLDivElement>(null);
-  useFocusTrap(dialogRef, visible, handleDeclineAll);
-
-  // CLS guard: the banner's bottom-space reservation is handled by the
-  // `needs-cookie-consent` <html> class, primed in <head> BEFORE first paint
-  // (PRIME_CLS_VARS_SCRIPT). We must NEVER set body padding from a
-  // post-hydration effect — that 0→140px flip shoved the in-flow footer down
-  // and was the app-wide CLS offender. Here we only DROP the reservation when
-  // the banner can't apply: inside the CrazyGames iframe (own consent UI, our
-  // banner renders null). Dismissal drops it in the handlers below.
-  useEffect(() => {
-    if (isOnCrazyGamesPlatform) {
-      document.documentElement.classList.remove('needs-cookie-consent');
-    }
-  }, [isOnCrazyGamesPlatform]);
+  // No onEscape handler: this is a blocking consent gate — Escape must NOT
+  // dismiss it, the user has to pick an option.
+  useFocusTrap(dialogRef, visible);
 
   // CrazyGames embeds its own platform-level consent UI before our iframe loads.
-  // A second banner inside the iframe violates the embed UX expectation.
+  // A second modal inside the iframe violates the embed UX expectation.
   if (isOnCrazyGamesPlatform) return null;
   if (!visible) return null;
 
   const isRtl = language === 'he';
 
   return (
+    // Backdrop: covers the screen and captures all interaction. Intentionally
+    // has NO onClick — clicking outside must not dismiss (user must choose).
     <div
-      ref={dialogRef}
-      role="dialog"
-      aria-label={t('cookieConsent.title')}
-      aria-modal="true"
       className={cn(
-        'fixed bottom-[var(--bottom-stack-height,0px)] inset-x-0 z-[110] p-3 sm:p-4',
-        'bg-neo-navy border-t-4 border-neo-black',
-        'animate-fade-in-up'
+        'fixed inset-0 z-[110] flex items-center justify-center p-4',
+        'bg-neo-black/80 backdrop-blur-sm animate-fade-in-up'
       )}
       dir={isRtl ? 'rtl' : 'ltr'}
     >
-      {/* Close (X) button — declines all cookies */}
-      <button
-        type="button"
-        onClick={handleDeclineAll}
-        aria-label={t('cookieConsent.decline')}
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t('cookieConsent.title')}
         className={cn(
-          'absolute top-2 inset-e-2 p-1.5 min-h-[44px] min-w-[44px]',
-          'flex items-center justify-center',
-          'text-neo-white hover:text-neo-white',
-          'transition-colors duration-100'
+          'relative w-full max-w-md max-h-[90vh] overflow-y-auto',
+          'bg-neo-navy border-4 border-neo-black rounded-neo shadow-hard-lg',
+          'p-6 animate-neo-pop'
         )}
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" />
-          <line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
-      </button>
-      <div className="max-w-4xl mx-auto">
-        {/* Main message */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
-          <p className="text-sm text-neo-white font-medium flex-1 text-center sm:text-start pe-8 sm:pe-0">
-            {t('cookieConsent.message')}{' '}
-            <a
-              href={`/${language}/legal/cookies`}
-              className="text-neo-cyan hover:underline font-bold"
-            >
-              {t('cookieConsent.learnMore')}
-            </a>
-          </p>
-          <div className="flex items-center gap-2 shrink-0">
-            <button
-              type="button"
-              onClick={handleDeclineAll}
-              className={cn(
-                'px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
-                'text-neo-white hover:text-neo-white',
-                'border-2 border-neo-cream/30 rounded-neo',
-                'transition-colors duration-100'
-              )}
-            >
-              {t('cookieConsent.decline')}
-            </button>
+        {/* Mascot happily munching a cookie — decorative, brand personality */}
+        <Image
+          src="/cookie-consent-mascot.png"
+          alt={t('cookieConsent.mascotAlt')}
+          width={96}
+          height={96}
+          className="mx-auto mb-3 h-24 w-24 object-contain"
+        />
+
+        <h2 className="mb-2 text-center text-xl font-bold font-neo-display text-neo-white">
+          {t('cookieConsent.title')}
+        </h2>
+        <p className="mb-5 text-center text-sm font-medium text-neo-white">
+          {t('cookieConsent.message')}{' '}
+          <a
+            href={`/${language}/legal/cookies`}
+            className="font-bold text-neo-cyan hover:underline"
+          >
+            {t('cookieConsent.learnMore')}
+          </a>
+        </p>
+
+        {/* Actions. Accept = prominent primary (top, full-width, accent).
+            Decline + Customize = equal-weight one-click buttons below — reject
+            stays as easy as accept; only visual weight nudges toward Accept. */}
+        <div className="flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={handleAcceptAll}
+            className={cn(
+              'w-full px-4 py-3 text-base font-bold uppercase',
+              'bg-accent text-accent-foreground',
+              'border-3 border-neo-black rounded-neo shadow-hard',
+              'hover:shadow-hard-lg active:shadow-hard-pressed',
+              'transition-all duration-100'
+            )}
+          >
+            {t('cookieConsent.accept')}
+          </button>
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setShowDetails(!showDetails)}
               className={cn(
-                'px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
+                'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
                 'text-neo-cyan hover:text-neo-white',
-                'border-2 border-neo-cyan/40 rounded-neo',
-                'transition-colors duration-100'
+                'border-2 border-neo-cyan/40 rounded-neo transition-colors duration-100'
               )}
             >
               {t('cookieConsent.customize')}
             </button>
             <button
               type="button"
-              onClick={handleAcceptAll}
+              onClick={handleDeclineAll}
               className={cn(
-                'px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
-                'bg-accent text-accent-foreground',
-                'border-3 border-neo-black rounded-neo shadow-hard-sm',
-                'hover:shadow-hard active:shadow-hard-pressed',
-                'transition-all duration-100'
+                'flex-1 px-4 py-2 min-h-[44px] text-sm font-bold uppercase',
+                'text-neo-white hover:text-neo-white',
+                'border-2 border-neo-cream/30 rounded-neo transition-colors duration-100'
               )}
             >
-              {t('cookieConsent.accept')}
+              {t('cookieConsent.decline')}
             </button>
           </div>
         </div>
 
         {/* Granular preferences panel */}
         {showDetails && (
-          <div className="mt-4 pt-4 border-t-2 border-neo-cream/10">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+          <div className="mt-5 pt-5 border-t-2 border-neo-cream/10">
+            <div className="grid grid-cols-1 gap-3 mb-4">
               {/* Essential — always on */}
               <ConsentToggle
                 label={t('cookieConsent.categories.essential')}
@@ -217,21 +213,19 @@ export default function CookieConsent() {
                 onChange={setAdvertising}
               />
             </div>
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={handleSavePreferences}
-                className={cn(
-                  'px-5 py-2 min-h-[44px] text-sm font-bold uppercase',
-                  'bg-neo-cyan text-neo-black',
-                  'border-3 border-neo-black rounded-neo shadow-hard-sm',
-                  'hover:shadow-hard active:shadow-hard-pressed',
-                  'transition-all duration-100'
-                )}
-              >
-                {t('cookieConsent.savePreferences')}
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={handleSavePreferences}
+              className={cn(
+                'w-full px-5 py-2 min-h-[44px] text-sm font-bold uppercase',
+                'bg-neo-cyan text-neo-black',
+                'border-3 border-neo-black rounded-neo shadow-hard-sm',
+                'hover:shadow-hard active:shadow-hard-pressed',
+                'transition-all duration-100'
+              )}
+            >
+              {t('cookieConsent.savePreferences')}
+            </button>
           </div>
         )}
       </div>

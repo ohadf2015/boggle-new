@@ -808,9 +808,9 @@ const es = {
     }
   },
   "cookieConsent": {
-    "title": "Consentimiento de cookies",
+    "title": "¿Te apetece una cookie? 🍪",
     "mascotAlt": "La mascota de LexiClash mordisqueando una galleta feliz",
-    "message": "Usamos cookies para análisis y para mostrar anuncios relevantes. Puedes personalizar tus preferencias a continuación.",
+    "message": "Nuestra mascota ya le está dando un mordisco. Usamos cookies para analítica y para mostrar anuncios que de verdad encajan — acepta todas y a jugar. ¿Prefieres elegir? Personaliza abajo.",
     "accept": "Aceptar todo",
     "decline": "Rechazar todo",
     "customize": "Personalizar",
@@ -14263,6 +14263,24 @@ const es = {
     "downloaded": "{size} MB · {count} palabras",
     "notDownloaded": "No descargado",
     "errorGeneric": "Fallo en la descarga. Intenta de nuevo."
+  },
+  "sealedBid": {
+    "allIn": "Todo adentro",
+    "clear": "Limpiar",
+    "currentStake": "Apuesta actual",
+    "balance": "Saldo",
+    "stake": "Apuesta",
+    "uniquePays": "Único paga {mult}x",
+    "potentialPayout": "Pago potencial {amount}",
+    "lockBid": "Bloquear oferta",
+    "pass": "Pasar",
+    "unique": "Único",
+    "clash": "Choque",
+    "busted": "Quebrado",
+    "cashOut": "Retirar",
+    "chips": "Fichas",
+    "showdown": "Enfrentamiento",
+    "round": "Ronda"
   }
 };
 

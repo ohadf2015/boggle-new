@@ -992,9 +992,9 @@ const sv = {
     }
   },
   "cookieConsent": {
-    "title": "Cookiemedgivande",
+    "title": "Sugen på en kaka? 🍪",
     "mascotAlt": "LexiClash-maskoten som glatt mumsar på en kaka",
-    "message": "Vi använder cookies för analys och för att visa relevanta annonser. Du kan anpassa dina inställningar nedan.",
+    "message": "Vår maskot har redan mumsat i sig ett par. Vi använder cookies för statistik och för att visa annonser som faktiskt passar — godkänn alla så kör vi. Vill du välja själv? Anpassa nedan.",
     "accept": "Acceptera alla",
     "decline": "Avvisa alla",
     "customize": "Anpassa",
@@ -14176,6 +14176,24 @@ const sv = {
     "downloaded": "{size} MB · {count} ord",
     "notDownloaded": "Ej nedladdad",
     "errorGeneric": "Nedladdningen misslyckades. Försök igen."
+  },
+  "sealedBid": {
+    "allIn": "Allt in",
+    "clear": "Rensa",
+    "currentStake": "Nuvarande insats",
+    "balance": "Saldo",
+    "stake": "Insats",
+    "uniquePays": "Unik betalar {mult}x",
+    "potentialPayout": "Potentiell utbetalning {amount}",
+    "lockBid": "Lås bud",
+    "pass": "Passera",
+    "unique": "Unik",
+    "clash": "Sammanstötning",
+    "busted": "Bruten",
+    "cashOut": "Ta ut",
+    "chips": "Marker",
+    "showdown": "Avgöring",
+    "round": "Omgång"
   }
 };
 

@@ -246,6 +246,7 @@ const en = {
     "instructions": "Pick a word nobody else will — unique bids score double!",
     "roundLabel": "Round {n} of {total}",
     "totalScore": "Score: {score}",
+    "chipStack": "Chips: {chips}",
     "timerLabel": "Type your word…",
     "sealPhase": "Seal your bid",
     "tapHint": "Tap letters to build your word",
@@ -263,6 +264,8 @@ const en = {
     "pointsEarned": "+{pts} pts",
     "nextRound": "Next round →",
     "finalScore": "Final score",
+    "gameOver": "Game over",
+    "busted": "Busted!",
     "playAgain": "Play again",
     "adminOnly": "Sealed Bid is an admin-only preview.",
     "shareCard": {
@@ -276,7 +279,10 @@ const en = {
       "uniqueLabel": "Unique",
       "clashLabel": "Clash",
       "passLabel": "Pass",
-      "shareCta": "Share Score"
+      "shareCta": "Share Score",
+      "cashOut": "Cash out",
+      "chips": "chips",
+      "coins": "coins"
     },
     "err": {
       "notInRack": "Use only the rack letters",
@@ -824,9 +830,9 @@ const en = {
     }
   },
   "cookieConsent": {
-    "title": "Cookie consent",
+    "title": "Care for a cookie? 🍪",
     "mascotAlt": "LexiClash mascot happily munching a cookie",
-    "message": "We use cookies for analytics and to serve relevant ads. You can customize your preferences below.",
+    "message": "Our mascot's already munching away. We use cookies for analytics and to show ads actually worth your while — hit Accept All and let's play. Rather pick? Customize below.",
     "accept": "Accept All",
     "decline": "Decline All",
     "customize": "Customize",
@@ -14538,6 +14544,24 @@ const en = {
     "fiveLanguages": "5 languages with native dictionaries",
     "charitableDonation": "Charitable donation angle",
     "bestFor": "Best for"
+  },
+  "sealedBid": {
+    "allIn": "All in",
+    "clear": "Clear",
+    "currentStake": "Current stake",
+    "balance": "Balance",
+    "stake": "Stake",
+    "uniquePays": "Unique pays {mult}x",
+    "potentialPayout": "Potential payout {amount}",
+    "lockBid": "Lock bid",
+    "pass": "Pass",
+    "unique": "Unique",
+    "clash": "Clash",
+    "busted": "Busted",
+    "cashOut": "Cash out",
+    "chips": "Chips",
+    "showdown": "Showdown",
+    "round": "Round"
   }
 };
 

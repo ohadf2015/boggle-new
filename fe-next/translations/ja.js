@@ -821,9 +821,9 @@ const ja = {
     }
   },
   "cookieConsent": {
-    "title": "Cookieの同意",
+    "title": "クッキー、いかが？🍪",
     "mascotAlt": "クッキーを頬張るLexiClashのマスコット",
-    "message": "分析および関連広告の表示にCookieを使用しています。以下で設定をカスタマイズできます。",
+    "message": "マスコットはもうモグモグ中。分析と、あなたにぴったりの広告のためにCookieを使っています。「すべて承認」でサクッと遊びに行こう。自分で選ぶなら下からどうぞ。",
     "accept": "すべて承認",
     "decline": "すべて拒否",
     "customize": "カスタマイズ",
@@ -14184,6 +14184,24 @@ const ja = {
       "step1": "目標をクリアして進む",
       "step2": "大きな単語でボスを倒す"
     }
+  },
+  "sealedBid": {
+    "allIn": "全て投入",
+    "clear": "クリア",
+    "currentStake": "現在の賭け金",
+    "balance": "残高",
+    "stake": "賭け金",
+    "uniquePays": "ユニークは{mult}倍支払う",
+    "potentialPayout": "潜在的なペイアウト {amount}",
+    "lockBid": "入札をロック",
+    "pass": "パス",
+    "unique": "ユニーク",
+    "clash": "衝突",
+    "busted": "破裂",
+    "cashOut": "キャッシュアウト",
+    "chips": "チップ",
+    "showdown": "ショーダウン",
+    "round": "ラウンド"
   }
 };
 

@@ -1,18 +1,16 @@
 /**
- * CookieConsent — CLS (layout-shift) guard.
+ * CookieConsent — blocking-modal layout guard.
  *
- * Field data showed the page footer shifting ~140px at dom-content-loaded on
- * every route: the banner used to set `document.body.style.paddingBottom`
- * inside a post-hydration effect (0 → 140px), shoving the in-flow footer down.
- *
- * The fix reserves that space via the `needs-cookie-consent` <html> class,
- * primed in <head> BEFORE paint. So:
- *  - mounting the banner must NOT mutate body.style.paddingBottom, and
- *  - dismissing it must DROP the class (user-initiated → excluded from CLS).
+ * The consent prompt is a centered, screen-covering modal (not a bottom banner).
+ * Being a `fixed inset-0` overlay it shifts nothing in document flow, so:
+ *  - it must NEVER mutate body.style.paddingBottom (the old bottom-banner CLS
+ *    offender that shoved the in-flow footer down), and
+ *  - while open it locks background scroll via body.style.overflow, restoring
+ *    the prior value on unmount so it never clobbers screen-fit's overflow.
  */
 
 import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
 import CookieConsent from '../CookieConsent';
 
@@ -33,26 +31,31 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
 }));
 
-describe('CookieConsent — CLS guard', () => {
+describe('CookieConsent — blocking-modal layout guard', () => {
   beforeEach(() => {
     document.body.style.paddingBottom = '';
-    document.documentElement.classList.remove('needs-cookie-consent');
+    document.body.style.overflow = '';
+  });
+
+  it('renders as a blocking modal dialog', () => {
+    render(<CookieConsent />);
+    const dialog = screen.getByRole('dialog');
+    expect(dialog).toBeInTheDocument();
+    expect(dialog).toHaveAttribute('aria-modal', 'true');
   });
 
   it('does NOT push the footer by mutating body paddingBottom on mount', () => {
     render(<CookieConsent />);
-    expect(screen.getByRole('dialog')).toBeInTheDocument();
-    // The old CLS bug: this was set to '140px' in a post-paint effect.
+    // The old bottom-banner CLS bug set this to '140px' in a post-paint effect.
     expect(document.body.style.paddingBottom).toBe('');
   });
 
-  it('drops the needs-cookie-consent reservation when dismissed', () => {
-    // Simulate the head-script prime that reserves space before paint.
-    document.documentElement.classList.add('needs-cookie-consent');
-    render(<CookieConsent />);
-    fireEvent.click(screen.getByText('cookieConsent.accept'));
-    expect(
-      document.documentElement.classList.contains('needs-cookie-consent'),
-    ).toBe(false);
+  it('locks background scroll while open and restores it on unmount', () => {
+    const prior = 'scroll';
+    document.body.style.overflow = prior;
+    const { unmount } = render(<CookieConsent />);
+    expect(document.body.style.overflow).toBe('hidden');
+    unmount();
+    expect(document.body.style.overflow).toBe(prior);
   });
 });

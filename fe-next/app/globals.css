@@ -3593,23 +3593,6 @@ html {
   }
 }
 
-/* Cookie-consent banner reservation (CLS guard).
-   The fixed banner (~140px) used to be cleared by a post-hydration
-   `body.style.paddingBottom = 140px`, which shifted the in-flow footer down on
-   EVERY route at dom-content-loaded — the app-wide CLS offender. Instead we
-   reserve the space from first paint: the `needs-cookie-consent` class is primed
-   in <head> (PRIME_CLS_VARS_SCRIPT) for users with no stored consent decision,
-   and CookieConsent drops it on dismiss (user-initiated → CLS-excluded).
-   Applies at all widths (banner is not viewport-gated). Selectors mirror the
-   @media bottom-stack rule's specificity (0,2,2) and sit AFTER it in source so
-   they win when both match (mobile + banner). Stacks ABOVE the nav/admob band;
-   the banner positions itself at --bottom-stack-height, so its own height is
-   added only to body padding, not double-counted in the offset. */
-html.needs-cookie-consent body.screen-fit,
-html.needs-cookie-consent body.screen-fit-locked {
-  padding-bottom: calc(var(--bottom-stack-height) + 140px);
-}
-
 /* Landscape PHONE compaction.
    A phone in landscape is ~360px tall but ~800px WIDE, so it crosses the `md`
    (768px) breakpoint and renders the DESKTOP header band — the app header bar
