@@ -41,7 +41,6 @@ export interface AdventureGameShellProps {
   upgradeState: Unknown;
   upgradeTriggered: { upgradeId: string; effectValue: number } | null;
   lastWordWasThemed: boolean;
-  showTutorial: boolean;
   showRetryAssist: boolean;
   consecutiveFailures: number;
   showAutoHint: boolean;
@@ -80,7 +79,6 @@ export interface AdventureGameShellProps {
   handleRetryWithBonus: () => void;
   handleRetryWithHint: () => void;
   onExit: () => void;
-  setShowTutorial: (v: boolean) => void;
   submitHuntGuess: (word: string) => void;
   t: (key: string) => string;
 }
@@ -92,7 +90,7 @@ const AdventureGameShell = memo<AdventureGameShellProps>((p) => {
     isBossLevel, showLevelComplete, isPaused, isPlaying, entryPhase, timeRemaining,
     effectiveComboTimeout, masteryAura, currentHP, maxHP, movesRemaining,
     themedWordsFound, upgradeState, upgradeTriggered, lastWordWasThemed,
-    showTutorial, showRetryAssist, consecutiveFailures,
+    showRetryAssist, consecutiveFailures,
     showAutoHint, currentHint, nextHintCost, hintGoldPending,
     freezeUsed, isFrozen, shufflesRemaining, detonateActive, hasHintsAvailable,
     minWordLength, currentWord, isValidating,
@@ -101,7 +99,7 @@ const AdventureGameShell = memo<AdventureGameShellProps>((p) => {
     gridRef, handleExitWithConfirm, handleCascadeComplete, handleEntryPhaseComplete,
     handleHintClick, activateFreeze, shuffleTiles, playBoardShuffleSound,
     setDetonateActive, handleRetryFromAssist, handleRetryWithBonus, handleRetryWithHint,
-    onExit, setShowTutorial, t,
+    onExit, t,
   } = p;
 
   return (
@@ -227,8 +225,6 @@ const AdventureGameShell = memo<AdventureGameShellProps>((p) => {
         onRetryWithBonus={handleRetryWithBonus}
         onRetryWithHint={handleRetryWithHint}
         onExit={onExit}
-        showTutorial={showTutorial}
-        onTutorialComplete={() => setShowTutorial(false)}
         forgeEquippedRunes={forgeEquippedRunes as never}
         maxRuneSlots={MAX_EQUIPPED_RUNES}
       />

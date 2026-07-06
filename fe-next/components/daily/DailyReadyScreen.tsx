@@ -43,7 +43,6 @@ export interface DailyReadyScreenProps {
   targetWordLength: number;
   currentPlayerId: string | null;
   guestFingerprint: string | null;
-  tutorialCompleted: boolean;
   onLanguageChange: (lang: Language) => void;
   onStart: () => void;
   onBack: () => void;
@@ -65,7 +64,6 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   targetWordLength,
   currentPlayerId,
   guestFingerprint,
-  tutorialCompleted,
   onLanguageChange,
   onStart,
   onBack,

@@ -328,6 +328,7 @@ vi.mock('framer-motion', () => {
     AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
     useSpring,
     useTransform,
+    useReducedMotion: () => false,
   };
 });
 

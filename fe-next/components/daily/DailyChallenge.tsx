@@ -30,7 +30,6 @@ import {
   saveWordHuntResult,
   getGuestFingerprint,
   mapServerResultToStoredResult,
-  getWordHuntTutorialKey,
   getWordHuntResultKey,
   markWordHuntForfeitToday,
   hasWordHuntForfeitToday,
@@ -44,8 +43,6 @@ import {
   buildDailyWordHuntCompletePayload,
   type WordHuntRescueMethod,
 } from './analytics/wordHuntCompletePayload';
-import { shouldAutoShowTutorial } from './tutorial/shouldAutoShowTutorial';
-import { markWordHuntTutorialSeen } from './tutorial/markWordHuntTutorialSeen';
 import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
 import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
 import { isUsableDailyPuzzle } from '@/utils/dailyChallenge/puzzlePayload';
@@ -99,13 +96,6 @@ const DailyChallenge: React.FC = () => {
   const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
   const [phase, setPhase] = useState<DailyChallengePhase>('loading');
   const [showTutorial, setShowTutorial] = useState(false);
-  const [tutorialCompleted, setTutorialCompleted] = useState(false);
-
-  useEffect(() => {
-    if (shouldAutoShowTutorial({ phase, tutorialCompleted, showTutorial })) {
-      setShowTutorial(true);
-    }
-  }, [phase, tutorialCompleted, showTutorial]);
   const [puzzleDate, setPuzzleDate] = useState<string>('');
   const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
   const [grid, setGrid] = useState<LetterGrid | null>(null);
@@ -185,10 +175,6 @@ const DailyChallenge: React.FC = () => {
       if (!isMounted) return;
       setPuzzleDate(date);
       setPuzzleNumber(number);
-
-      const tutorialKey = getWordHuntTutorialKey(gameLanguage);
-      const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
-      setTutorialCompleted(hasCompletedTutorial);
 
       // Mid-game forfeit today (no saved result) → gate re-entry behind a
       // rewarded ad on native. Skipped for practice + post-retry replays.
@@ -553,18 +539,12 @@ const DailyChallenge: React.FC = () => {
 }, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak, isPractice, isCatchup]);
 
   const handleTutorialComplete = useCallback(() => {
-    markWordHuntTutorialSeen(gameLanguage);
-    setTutorialCompleted(true);
     setShowTutorial(false);
-  }, [gameLanguage]);
+  }, []);
 
-  // Skip persists the seen flag too — otherwise the auto-show effect re-fires
-  // immediately (X button bug) and the tutorial re-appears next session.
   const handleTutorialSkip = useCallback(() => {
-    markWordHuntTutorialSeen(gameLanguage);
-    setTutorialCompleted(true);
     setShowTutorial(false);
-  }, [gameLanguage]);
+  }, []);
   const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
   // Client-side nav (no hard reload) — a hard nav while the game-active
   // beforeunload guard is armed can blank a Capacitor WebView (black screen).
@@ -607,7 +587,6 @@ const DailyChallenge: React.FC = () => {
             targetWordLength={targetWord?.length || 0}
             currentPlayerId={isAuthenticated && profile ? profile.id : null}
             guestFingerprint={!isAuthenticated ? guestFingerprint : null}
-            tutorialCompleted={tutorialCompleted}
             onLanguageChange={setGameLanguage}
             onStart={handleStartGame}
             onBack={handleBack}

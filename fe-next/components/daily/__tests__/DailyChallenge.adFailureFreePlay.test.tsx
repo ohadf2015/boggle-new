@@ -94,7 +94,6 @@ vi.mock('@/utils/dailyChallenge', () => ({
   getGuestFingerprint: vi.fn(() => Promise.resolve('fp')),
   mapServerResultToStoredResult: vi.fn(),
   GAME_LANGUAGE_KEY: 'daily_game_language',
-  getWordHuntTutorialKey: vi.fn(() => 'word_hunt_tutorial_en'),
   getWordHuntResultKey: vi.fn(() => 'word_hunt_result_en'),
 }));
 

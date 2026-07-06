@@ -310,6 +310,7 @@ vi.mock('framer-motion', () => {
     AnimatePresence: ({ children }: any) => children,
     useSpring,
     useTransform,
+    useReducedMotion: () => false,
   };
 });
 

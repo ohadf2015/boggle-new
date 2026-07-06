@@ -68,6 +68,7 @@ export const MODE_COACH: Record<CoachModeKey, CoachContent> = {
     steps: [
       { demo: 'tapClue', captionKey: 'modeCoach.wordHunt.step1' },
       { demo: 'drag', captionKey: 'modeCoach.wordHunt.step2' },
+      { demo: 'icon', emoji: '💚', captionKey: 'modeCoach.wordHunt.step3' },
     ],
     scoreTipKey: 'modeCoach.wordHunt.scoreTip',
   },

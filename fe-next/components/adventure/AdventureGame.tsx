@@ -43,7 +43,6 @@ import AdventureFinishCTA from './AdventureFinishCTA';
 import { calculateStars, allObjectivesComplete } from '@/hooks/adventureGameReducer';
 import { useAdventureDerivations } from './hooks/useAdventureDerivations';
 import { useAdventureActions } from './hooks/useAdventureActions';
-import { hasSeenTutorial } from './AdventureTutorial';
 import { useAdventureGameCallbacks } from './hooks/useAdventureGameCallbacks';
 import { useAdventureOverlayProps } from './hooks/useAdventureOverlayProps';
 import { useAdventureQuestTracking } from './hooks/useAdventureQuestTracking';
@@ -162,7 +161,6 @@ const AdventureGame = memo<AdventureGameProps>(
     const [showLootChest, setShowLootChest] = useState(false);
     const [retriesUsed, setRetriesUsed] = useState(0);
     const [showStoryBeat, setShowStoryBeat] = useState(false);
-    const [showTutorial, setShowTutorial] = useState(() => !hasSeenTutorial());
     const [detonateActive, setDetonateActive] = useState(false);
     const cinematics = useAdventureCinematics();
     const entryPhaseManager = useAdventureEntryPhase();
@@ -589,7 +587,6 @@ const AdventureGame = memo<AdventureGameProps>(
         upgradeState={upgradeState as never}
         upgradeTriggered={upgradeTriggered}
         lastWordWasThemed={lastWordWasThemed}
-        showTutorial={showTutorial}
         showRetryAssist={showRetryAssist}
         consecutiveFailures={consecutiveFailures}
         showAutoHint={showAutoHint}
@@ -628,7 +625,6 @@ const AdventureGame = memo<AdventureGameProps>(
         handleRetryWithBonus={handleRetryWithBonus}
         handleRetryWithHint={handleRetryWithHint}
         onExit={onExit}
-        setShowTutorial={setShowTutorial}
         submitHuntGuess={submitHuntGuess}
         t={t}
       />

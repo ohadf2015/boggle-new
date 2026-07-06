@@ -6,7 +6,7 @@ import { LowHPOverlay } from '@/components/wordhunt/LowHPOverlay';
 import { AdventureToast } from './AdventureToast';
 import MechanicBonusToast from './MechanicBonusToast';
 import RetryAssistModal from './RetryAssistModal';
-import { AdventureTutorial } from './AdventureTutorial';
+import { ModeCoach } from '@/components/tutorial/ModeCoach';
 import { RuneBar } from './RuneBar';
 import { getNearMissMessages } from '@/lib/adventure/nearMiss';
 import { trackModalDismissed } from '@/utils/posthogEngagement';
@@ -42,8 +42,6 @@ interface AdventureTailOverlaysProps {
   onRetryWithBonus: () => void;
   onRetryWithHint: () => void;
   onExit: () => void;
-  showTutorial: boolean;
-  onTutorialComplete: () => void;
   forgeEquippedRunes: RuneBarRunes;
   maxRuneSlots: number;
 }
@@ -69,8 +67,6 @@ export default function AdventureTailOverlays({
   onRetryWithBonus,
   onRetryWithHint,
   onExit,
-  showTutorial,
-  onTutorialComplete,
   forgeEquippedRunes,
   maxRuneSlots,
 }: AdventureTailOverlaysProps) {
@@ -114,7 +110,7 @@ export default function AdventureTailOverlays({
           }}
         />
       )}
-      {showTutorial && <AdventureTutorial onComplete={onTutorialComplete} />}
+      <ModeCoach mode="adventure" />
       {archetype === 'forge' && forgeEquippedRunes.length > 0 && (
         <div className="fixed bottom-[var(--admob-banner-height,0px)] inset-x-0 z-30">
           <RuneBar runes={forgeEquippedRunes} maxSlots={maxRuneSlots} />

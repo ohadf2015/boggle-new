@@ -85,6 +85,7 @@ vi.mock('framer-motion', () => {
     domMax: {},
     useSpring,
     useTransform,
+    useReducedMotion: () => false,
   };
 });
 

@@ -83,12 +83,6 @@ export const TRAINING_GATEWAY_SEEN_KEY = 'lexiclash_training_gateway_seen';
 export const KEEP_PLAYING_DISMISSED_KEY = 'lexiclash_keepPlaying_dismissed';
 
 /**
- * Get storage key for Word Hunt tutorial completion by language
- */
-export const getWordHuntTutorialKey = (lang: Language): string =>
-  `lexiclash_wordHunt_tutorial_completed_${lang}`;
-
-/**
  * Get storage key for Word Hunt result by language and date
  */
 export const getWordHuntResultKey = (lang: Language, date: string): string =>

@@ -71,7 +71,6 @@ const makeProps = (overrides: Partial<Parameters<typeof AdventureGameShell>[0]> 
     upgradeState: {},
     upgradeTriggered: null,
     lastWordWasThemed: false,
-    showTutorial: false,
     showRetryAssist: false,
     consecutiveFailures: 0,
     showAutoHint: false,
@@ -109,7 +108,6 @@ const makeProps = (overrides: Partial<Parameters<typeof AdventureGameShell>[0]> 
     handleRetryWithBonus: vi.fn(),
     handleRetryWithHint: vi.fn(),
     onExit,
-    setShowTutorial: vi.fn(),
     submitHuntGuess: vi.fn(),
     t: (k: string) => k,
   } as never;

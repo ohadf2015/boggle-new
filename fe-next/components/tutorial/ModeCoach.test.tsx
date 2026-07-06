@@ -93,4 +93,14 @@ describe('ModeCoach', () => {
     expect(screen.getByText('modeCoach.classic.step2')).toBeInTheDocument();
     expect(screen.getByText('modeCoach.classic.scoreTip')).toBeInTheDocument();
   });
+
+  it('wordHunt reaches a 3rd step teaching the free-bonus-word mechanic', () => {
+    render(<ModeCoach mode="wordHunt" graceMs={300} />);
+    act(() => {
+      vi.advanceTimersByTime(700 + 300);
+    });
+    fireEvent.click(screen.getByText('modeCoach.next')); // step1 -> step2
+    fireEvent.click(screen.getByText('modeCoach.next')); // step2 -> step3
+    expect(screen.getByText('modeCoach.wordHunt.step3')).toBeInTheDocument();
+  });
 });

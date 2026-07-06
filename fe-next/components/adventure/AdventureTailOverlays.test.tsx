@@ -17,8 +17,8 @@ vi.mock('./RetryAssistModal', () => ({
   default: ({ isOpen }: { isOpen: boolean }) =>
     isOpen ? <div data-testid="retry-assist" /> : null,
 }));
-vi.mock('./AdventureTutorial', () => ({
-  AdventureTutorial: () => <div data-testid="tutorial" />,
+vi.mock('@/components/tutorial/ModeCoach', () => ({
+  ModeCoach: ({ mode }: { mode: string }) => <div data-testid="mode-coach" data-mode={mode} />,
 }));
 vi.mock('./RuneBar', () => ({
   RuneBar: () => <div data-testid="rune-bar" />,
@@ -51,8 +51,6 @@ const baseProps = {
   onRetryWithBonus: vi.fn(),
   onRetryWithHint: vi.fn(),
   onExit: vi.fn(),
-  showTutorial: false,
-  onTutorialComplete: vi.fn(),
   forgeEquippedRunes: [],
   maxRuneSlots: 3,
 };
@@ -88,9 +86,11 @@ describe('AdventureTailOverlays', () => {
     expect(screen.getByTestId('retry-assist')).toBeInTheDocument();
   });
 
-  it('renders AdventureTutorial when showTutorial', () => {
-    render(<AdventureTailOverlays {...baseProps} showTutorial />);
-    expect(screen.getByTestId('tutorial')).toBeInTheDocument();
+  it('always mounts ModeCoach for adventure mode', () => {
+    render(<AdventureTailOverlays {...baseProps} />);
+    const coach = screen.getByTestId('mode-coach');
+    expect(coach).toBeInTheDocument();
+    expect(coach).toHaveAttribute('data-mode', 'adventure');
   });
 
   it('renders RuneBar when forge + runes equipped', () => {

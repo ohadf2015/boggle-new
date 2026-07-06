@@ -1,14 +1,11 @@
 /**
- * Funnel telemetry: `daily_challenge_completed` had 0 call sites despite being a
- * registered growth event ("the one funnel we're told to grow"). It must fire
- * once when the live daily challenge (Word Hunt) is actually finished — and never
- * in practice mode (which skips all persistence + analytics).
+ * DailyChallengeTutorial must no longer auto-show when the ready phase loads —
+ * that auto-fire duplicated ModeCoach's wordHunt overlay. It's now opened only
+ * on demand via DailyReadyScreen's "How to Play" button.
  */
 
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-
-let mockDateParam: string | null = null;
+import { render, screen, waitFor, act } from '@testing-library/react';
 
 vi.mock('framer-motion', () => ({
   m: {
@@ -60,27 +57,21 @@ vi.mock('@/contexts/AdMobContext', () => ({
     consumeInterstitial: vi.fn(),
   }),
 }));
-
-// Spy on the growth tracker — this is what the test asserts against.
-const trackGrowthEvent = vi.fn();
 vi.mock('@/utils/growthTracking', () => ({
-  trackGrowthEvent: (...args: unknown[]) => trackGrowthEvent(...args),
+  trackGrowthEvent: vi.fn(),
   trackDailyPuzzle: vi.fn(),
   trackFeatureFirstUse: vi.fn(),
 }));
 vi.mock('../analytics/wordHuntCompletePayload', () => ({
   buildDailyWordHuntCompletePayload: () => ({}),
 }));
-
-// Web (not native) → no rewarded-ad gate; today's first play starts directly.
 vi.mock('@/utils/platform', async (importActual) => ({
   ...(await importActual<typeof import('@/utils/platform')>()),
   isNative: () => false,
 }));
-
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push: vi.fn(), back: vi.fn() }),
-  useSearchParams: () => ({ get: (k: string) => (k === 'date' ? mockDateParam : null), toString: () => '' }),
+  useSearchParams: () => ({ get: () => null, toString: () => '' }),
 }));
 
 vi.mock('@/utils/dailyChallenge', () => ({
@@ -104,65 +95,44 @@ vi.mock('@/utils/dailyChallenge', () => ({
   getGuestFingerprint: vi.fn(() => Promise.resolve('fp')),
   mapServerResultToStoredResult: vi.fn(),
   GAME_LANGUAGE_KEY: 'daily_game_language',
+  getWordHuntTutorialKey: vi.fn(() => 'word_hunt_tutorial_en'),
   getWordHuntResultKey: vi.fn(() => 'word_hunt_result_en'),
 }));
 
-const RESULT = {
-  solved: true,
-  attemptsUsed: 2,
-  targetWord: 'TEST',
-  attempts: [],
-  wordsDiscovered: [],
-  lifeRemaining: 3,
-  clueTokensEarned: 0,
-  clueTokensSpent: 0,
-  hintsUnlocked: 0,
-  efficiencyScore: 100,
-};
-
-// Survival game stub that lets the test drive completion via onComplete.
 vi.mock('../DailyWordHuntSurvival', () => ({
   __esModule: true,
-  default: ({ onComplete }: { onComplete: (r: typeof RESULT) => void }) => (
-    <div data-testid="survival-game">
-      <button data-testid="finish" onClick={() => onComplete(RESULT)}>finish</button>
-    </div>
-  ),
+  default: () => <div data-testid="survival-game" />,
 }));
-vi.mock('../DailyWordHuntResults', () => ({ __esModule: true, default: () => <div data-testid="results-screen">Results</div> }));
+vi.mock('../DailyWordHuntResults', () => ({ __esModule: true, default: () => <div data-testid="results-screen" /> }));
 vi.mock('../DailyReadyScreen', () => ({
   __esModule: true,
-  default: ({ onStart }: { onStart: () => void }) => (
-    <div data-testid="ready-screen"><button onClick={onStart} data-testid="play-button">Play</button></div>
-  ),
+  default: () => <div data-testid="ready-screen" />,
 }));
-vi.mock('../DailyChallengeTutorial', () => ({ DailyChallengeTutorial: () => null }));
+vi.mock('../DailyChallengeTutorial', () => ({
+  DailyChallengeTutorial: () => <div data-testid="tutorial" />,
+}));
 
 global.fetch = vi.fn(() => Promise.resolve({ ok: true, json: () => Promise.resolve({ hasPlayed: false }) })) as unknown as typeof fetch;
 
 import DailyChallenge from '../DailyChallenge';
 
-describe('DailyChallenge — daily_challenge_completed funnel event', () => {
+describe('DailyChallenge — tutorial no longer auto-shows', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockDateParam = null;
     Storage.prototype.getItem = vi.fn(() => null);
     Storage.prototype.setItem = vi.fn();
   });
 
-  it('emits daily_challenge_completed once when the daily challenge is finished', async () => {
+  it('does NOT auto-show the tutorial once the ready phase loads', async () => {
     render(<DailyChallenge />);
 
     await waitFor(() => expect(screen.getByTestId('ready-screen')).toBeInTheDocument());
-    fireEvent.click(screen.getByTestId('play-button'));
-    await waitFor(() => expect(screen.getByTestId('survival-game')).toBeInTheDocument());
+    // Give any pending auto-show effect a chance to fire its follow-up render
+    // before asserting it never does.
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    });
 
-    fireEvent.click(screen.getByTestId('finish'));
-
-    const calls = trackGrowthEvent.mock.calls.filter(([evt]) => evt === 'daily_challenge_completed');
-    expect(calls).toHaveLength(1);
-    expect(calls[0][1]).toEqual(
-      expect.objectContaining({ puzzleNumber: 42, language: 'en', solved: true }),
-    );
+    expect(screen.queryByTestId('tutorial')).toBeNull();
   });
 });

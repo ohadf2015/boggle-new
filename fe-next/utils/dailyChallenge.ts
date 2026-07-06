@@ -50,7 +50,6 @@ export {
   getWordLengthEmoji,
   WORD_FREQUENCY_TIERS,
   MIN_SAME_LENGTH_WORDS,
-  getWordHuntTutorialKey,
   getWordHuntResultKey,
   getWordWheelResultKey,
   WORD_WHEEL_STORAGE_KEY,

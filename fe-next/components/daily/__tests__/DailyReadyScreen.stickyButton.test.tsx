@@ -49,7 +49,6 @@ describe('DailyReadyScreen - Mobile sticky button safe area', () => {
     targetWordLength: 5,
     currentPlayerId: null,
     guestFingerprint: null,
-    tutorialCompleted: true,
     onLanguageChange: vi.fn(),
     onStart: vi.fn(),
     onBack: vi.fn(),
