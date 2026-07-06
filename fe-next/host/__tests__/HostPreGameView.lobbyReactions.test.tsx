@@ -62,7 +62,6 @@ vi.mock('../components/pre-game/PresetSelector', () => ({
   PresetSelector: () => null,
   GAME_PRESETS: {
     fast: { timer: 1, difficulty: 'EASY', nameKey: 'hostView.presetQuick' },
-    party: { timer: 3, difficulty: 'EASY', nameKey: 'hostView.presetParty' },
     challenge: { timer: 5, difficulty: 'HARD', nameKey: 'hostView.presetPro' },
   },
 }));
@@ -142,7 +141,9 @@ describe('HostPreGameView lobby emote (avatar emotion picker)', () => {
 
   it('emits a lobbyEmote over the socket when the host picks an emote', () => {
     render(<HostPreGameView {...baseProps} />);
-    // Tap the first emote face → server-echoed lobbyEmote drives the face-swap.
+    // The compact emote tray hides its faces behind a trigger — open it first,
+    // then tap the first emote face → server-echoed lobbyEmote drives the swap.
+    fireEvent.click(screen.getAllByTestId('emote-trigger')[0]);
     const laugh = screen.getAllByLabelText('lobby.emote.laugh')[0];
     fireEvent.click(laugh);
     expect(emitMock).toHaveBeenCalledWith('lobbyEmote', { emote: 'emoteLaugh' });

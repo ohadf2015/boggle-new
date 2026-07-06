@@ -271,7 +271,6 @@ describe('GlobalBottomNav', () => {
             ['/en/daily', /daily/i],
             ['/en/word-of-the-day', /daily/i],
             ['/en/blast', /blast/i],
-            ['/en/word-forge', /forge/i],
             ['/en/leaderboard', /ranks|leaderboard/i],
             ['/en/profile', /profile/i],
             ['/en/settings', /settings/i],

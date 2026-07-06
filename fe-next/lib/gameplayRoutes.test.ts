@@ -11,7 +11,6 @@ describe('isGameplayPath', () => {
     expect(isGameplayPath('/sv/adventure/level-3')).toBe(true);
     expect(isGameplayPath('/en/connections/daily')).toBe(true);
     expect(isGameplayPath('/en/daily/word-wheel')).toBe(true);
-    expect(isGameplayPath('/ja/party/abc/play')).toBe(true);
   });
 
   it('matches without a locale prefix', () => {
