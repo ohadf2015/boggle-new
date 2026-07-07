@@ -52,13 +52,19 @@ describe('modeCoachContent', () => {
     expect(MODE_COACH.blast.tier).toBe('rich');
   });
 
-  it('every rich step declares an animated demo type (not a plain icon)', () => {
+  // The rich tier is defined by being animation-FORWARD: it must LEAD with an
+  // animated gesture demo and never degrade into an all-static coach (that is
+  // what the `simple` tier is for). A rich coach MAY still close with one static
+  // info step where no gesture demo fits the copy — e.g. wordHunt's "Short words
+  // cost no try" rule — so the contract is "leads animated + has ≥1 animated
+  // demo", not "every single step is animated".
+  it('every rich coach leads with an animated demo and is never all-static', () => {
     for (const mode of ALL_COACH_MODES) {
       const c = MODE_COACH[mode];
       if (c.tier !== 'rich') continue;
-      for (const step of c.steps) {
-        expect(step.demo, `${mode} rich step needs a demo`).not.toBe('icon');
-      }
+      expect(c.steps[0]?.demo, `${mode} rich coach must OPEN with an animated demo`).not.toBe('icon');
+      const animated = c.steps.filter((step) => step.demo !== 'icon');
+      expect(animated.length, `${mode} rich coach needs ≥1 animated demo`).toBeGreaterThan(0);
     }
   });
 

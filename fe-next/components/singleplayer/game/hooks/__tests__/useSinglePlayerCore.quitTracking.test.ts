@@ -22,7 +22,7 @@ vi.mock('@/contexts/AccessibilityContext', () => ({
   useSuppressTimerUrgency: () => false,
 }));
 vi.mock('@/contexts/SoundEffectsContext', () => ({
-  useSoundEffects: () => ({ playSound: vi.fn(), stopSound: vi.fn(), playWordFound: vi.fn(), playWordError: vi.fn(), playCountdownBeep: vi.fn(), stopAllMusic: vi.fn() }),
+  useSoundEffects: () => ({ playSound: vi.fn(), stopSound: vi.fn(), playWordFound: vi.fn(), playWordError: vi.fn(), playCountdownBeep: vi.fn(), stopAllMusic: vi.fn(), setGameActive: vi.fn() }),
 }));
 vi.mock('@/hooks/useGameMusic', () => ({ useGameMusic: () => ({ startMusic: vi.fn(), stopMusic: vi.fn() }) }));
 vi.mock('@/hooks/useEarthquakeFireRound', () => ({ useEarthquakeFireRound: () => ({ fireRoundActive: false, fireRoundRemaining: 0, earthquakeState: null, startFireRound: vi.fn() }) }));
@@ -45,10 +45,26 @@ vi.mock('@/hooks/useKeyboardWordInput', () => ({ useKeyboardWordInput: () => ({ 
 vi.mock('@/utils/singlePlayerAchievements', () => ({ checkLiveAchievements: () => [], createAchievementState: () => ({}) }));
 vi.mock('@/shared/utils/scoring', () => ({ getComboBonus: () => 0, calculateWordScore: () => 5 }));
 vi.mock('@/lib/cosy/cosyGameplay', () => ({ shouldPlayCountdownBeep: () => false }));
-vi.mock('./useBotSimulation', () => ({ useBotSimulation: () => ({ botScores: [], simulateBotWord: vi.fn() }) }));
-vi.mock('./useSpamDetection', () => ({ useSpamDetection: () => ({ checkSpam: vi.fn() }) }));
-vi.mock('./useSinglePlayerEffects', () => ({ useSinglePlayerEffects: vi.fn() }));
-vi.mock('./buildGameResults', () => ({
+// These siblings live one level up from __tests__/, and useSinglePlayerCore
+// imports them as './…'. vi.mock resolves relative to THIS test file, so the
+// specifier must be '../…' to actually intercept core's import — with './…' the
+// mock silently no-ops and the REAL hooks run (network heartbeat, undefined refs).
+// Match the hooks' real return shapes — core destructures botWords/resetBots/
+// initializeBotUsedWords and checkSubmission/resetSpamDetection, so a partial
+// mock leaves those undefined and the rendered hook throws when it calls them.
+vi.mock('../useBotSimulation', () => ({ useBotSimulation: () => ({ botScores: [], botWords: [], resetBots: vi.fn(), initializeBotUsedWords: vi.fn() }) }));
+vi.mock('../useSpamDetection', () => ({ useSpamDetection: () => ({ checkSubmission: vi.fn(() => ({ allowed: true })), resetSpamDetection: vi.fn() }) }));
+// Core reads effects.gameStartTimeRef/lastWordFoundTimeRef/showLandscapeTutorial/
+// dismissLandscapeTutorial, so the mock must return that shape (not bare undefined).
+vi.mock('../useSinglePlayerEffects', () => ({
+  useSinglePlayerEffects: () => ({
+    showLandscapeTutorial: false,
+    dismissLandscapeTutorial: vi.fn(),
+    lastWordFoundTimeRef: { current: 0 },
+    gameStartTimeRef: { current: 0 },
+  }),
+}));
+vi.mock('../buildGameResults', () => ({
   buildGameResults: vi.fn(),
   buildFallbackResults: vi.fn(),
   emitSinglePlayerGameEnd: vi.fn(),
@@ -67,7 +83,9 @@ import type { SinglePlayerGameState } from '../../../SinglePlayerView';
 
 const baseSettings: SinglePlayerGameState = {
   mode: 'classic',
-  difficulty: 'medium',
+  // DIFFICULTIES is keyed EASY/MEDIUM/HARD (uppercase) — a lowercase 'medium'
+  // yields an undefined config and a "reading 'rows'" crash on the classic path.
+  difficulty: 'MEDIUM',
   language: 'en',
   timerSeconds: 180,
   gridSize: 4,
