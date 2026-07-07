@@ -9,18 +9,27 @@
  * feel physical/arcade.
  */
 import { useRef, useState, useCallback } from 'react';
+import Image from 'next/image';
 import { Shuffle } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics/HapticsManager';
-import { MODE_ICONS } from '@/components/GameModeSelector';
 import { nearestNode, NODE_ANGLES, type WheelSelection } from './wheelGeometry';
-import { QUICK_MODES } from './types';
+import { QUICK_MODES, type QuickMode } from './types';
 import { NODE_COLORS } from './modeColors';
 
 const RING_RADIUS_PX = 132;
 const DEAD_ZONE_PX = 28;
 const KNOB_TRAVEL_MAX_PX = 96;
+
+// Custom sticker-style mode icons (replaces generic Lucide glyphs — each mode
+// gets a distinct illustrated identity instead of a line icon).
+const MODE_ICON_SRC: Record<QuickMode, string> = {
+  classic: '/modes/quickplay-icons/classic.webp',
+  blast: '/modes/quickplay-icons/blast.webp',
+  'word-hunt': '/modes/quickplay-icons/hunt.webp',
+  'wheel-rush': '/modes/quickplay-icons/wheel.webp',
+};
 
 interface QuickPlayWheelProps {
   selection: WheelSelection;
@@ -130,7 +139,7 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
                 } ${NODE_COLORS[mode].bg}`}
                 style={{ animationDelay: `${idx * 80}ms`, animationFillMode: 'both' }}
               >
-                <span className="[&>svg]:h-7 [&>svg]:w-7">{MODE_ICONS[mode]}</span>
+                <Image src={MODE_ICON_SRC[mode]} alt="" aria-hidden className="h-9 w-9 drop-shadow-[1px_1px_0_rgba(0,0,0,0.35)]" width={36} height={36} />
                 {t(`quickPlay.solo.mode.${mode}`)}
               </span>
             </button>
@@ -165,8 +174,12 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
             style={{ animationDelay: '380ms', animationFillMode: 'both' }}
           >
             <span className="h-1.5 w-8 rounded-full bg-neo-white/35" aria-hidden />
-            <Shuffle className="h-6 w-6" />
-            <span className="font-neo-display text-[11px] font-semibold tracking-wide text-neo-cozy">
+            <Shuffle className={`h-6 w-6 ${selection === 'random' ? 'animate-pulse' : ''}`} />
+            <span
+              className={`font-neo-display text-[11px] font-semibold tracking-wide text-neo-cozy ${
+                selection === 'random' ? 'animate-pulse' : ''
+              }`}
+            >
               {selection === 'random' ? t('quickPlay.solo.random') : t('quickPlay.solo.dragMe')}
             </span>
           </span>
