@@ -18,6 +18,7 @@ import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 // the stale chunk that 404s, defeating its purpose.
 import ChunkErrorRecovery from '@/components/ChunkErrorRecovery';
 import AnimationsLoader from '@/components/AnimationsLoader';
+import { STORAGE_SHIM_SCRIPT } from '@/utils/storageShim';
 import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import GoogleOneTapInitializer from '@/components/auth/GoogleOneTapInitializer';
@@ -546,6 +547,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <html lang={validLocale} dir={dir} className={`dark ${fontClasses}`} suppressHydrationWarning>
             <head>
                 <meta charSet="utf-8" />
+                {/* Must be the first script — see STORAGE_SHIM_SCRIPT comment above */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: STORAGE_SHIM_SCRIPT,
+                    }}
+                />
                 {/* Preconnect hints for faster resource loading on slow connections */}
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://www.lexiclash.live" />
