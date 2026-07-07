@@ -1,294 +1,214 @@
 /**
- * Generate verified sealed bid racks from word dictionaries.
- * Uses hand-seeded racks with dictionary validation.
- * Run: npx tsx scripts/genSealedBidRacks.ts
+ * Build-time generator for Sealed Bid rack pool
+ * Outputs verified JSON with guaranteed full-rack words (7-letter racks with bingo words)
  */
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
-import { canFormFromRack, letterScore } from '../lib/sealedBid/sp/sbEngine';
+import * as fs from 'fs';
+import * as path from 'path';
 import { normalizeHebrewWord } from '../shared/utils/wordNormalization';
+import { canFormFromRack, letterScore } from '../lib/sealedBid/sp/sbEngine';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Load English dictionary from npm package
+function loadEnglishWords(): Set<string> {
+  const englishWords: string[] = require('an-array-of-english-words');
+  return new Set(englishWords.map(w => w.toLowerCase()));
+}
 
-interface GeneratedRack {
+// Load Hebrew dictionary from text file
+async function loadHebrewWords(): Promise<Set<string>> {
+  const hebrewPath = path.join(__dirname, '../backend/hebrew_words.txt');
+  try {
+    const content = fs.readFileSync(hebrewPath, 'utf-8');
+    const words = content
+      .split('\n')
+      .map(w => w.trim())
+      .filter(w => w.length > 0)
+      .map(w => normalizeHebrewWord(w));
+    return new Set(words);
+  } catch (e) {
+    console.warn(`Could not load Hebrew words from ${hebrewPath}: ${e}`);
+    return new Set();
+  }
+}
+
+interface Rack {
   letters: string;
   bingoWords: string[];
   wordsByLen: Record<string, string[]>;
   botPicks: string[];
 }
 
-// Hand-seeded racks to avoid massive computation
-const HAND_SEEDED_RACKS: Record<string, string[]> = {
-  en: [
-    'AEINRST', // RETINAS, SINTER, TRAIN, STEIN, RAIN, ANT
-    'ADELORS', // LOADERS, SOARED, ROADS, LOAD, ROSE, ADS
-    'ACEHORT', // TOCHER, OTHER, TORCH, ROACH, COAT, HOT
-    'EGILNRS', // SLINGER, SINGLE, SLING, LINER, REIN, GEL
-    'AEHMPRT', // CHAPTER, PREACH, HEART, TRAP, HATE, ART
-    'DEILMNO', // ELODIN, LEMON, MINED, DIME, MILE, ODE
-    'BEINRST', // INERTS, BRINE, BINS, BENT, BITE, BIT
-    'ACELMNO', // OLECAN, CLEAN, LANCE, OCEAN, LEAN, OLE
-    'ADELMNT', // MENTAL, DELTA, METAL, DEAL, TALE, AND
-    'EGINORT', // TOEING, TONER, GRIN, GONE, TIRE, ERG
-    'ACILMRS', // CLAIMS, CREAM, CALM, SLIM, SLAM, AIM
-    'AEGHNOT', // THONG, AGENT, TANGO, OATH, GONE, AGE
-    'AILMRST', // TRAILS, TRIAL, SMILT, MAILS, MAIL, AIL
-    'ADEINST', // DETAINS, INSTEAD, STAIN, DENTS, DINS, DIN
-    'ACEINST', // CANTIES, ANTICS, SATIN, CANES, CANE, ACE
-  ],
-  he: [],
-};
-
-function loadWordsForLang(lang: string): string[] {
-  if (lang === 'en') {
-    // Load English words from npm package
-    try {
-      const englishWords = require('an-array-of-english-words');
-      return (englishWords as string[])
-        .map((w) => w.toUpperCase())
-        .filter((w) => /^[A-Z]+$/.test(w));
-    } catch {
-      console.warn('Could not load English words from npm, using small seed');
-      return [];
-    }
-  } else if (lang === 'he') {
-    // Load Hebrew words from file
-    try {
-      const filePath = path.join(__dirname, '../backend/hebrew_words.txt');
-      const content = fs.readFileSync(filePath, 'utf-8');
-      return content
-        .split('\n')
-        .map((line) => line.trim().toUpperCase())
-        .filter((word) => word.length > 0 && /^[א-ת]+$/.test(word))
-        .map(normalizeHebrewWord);
-    } catch {
-      console.warn('Could not load Hebrew words from file, using small seed');
-      return [];
-    }
-  }
-  return [];
+/**
+ * Canonical rack key: sorted unique letters for deduplication
+ */
+function rackKey(letters: string): string {
+  return [...letters.toUpperCase()].sort().join('');
 }
 
-async function generateRacksForLang(
-  rackSeeds: string[],
-  words: string[],
-  lang: string,
-): Promise<GeneratedRack[]> {
-  console.log(
-    `[${lang}] Generating racks from ${rackSeeds.length} hand-seeded racks...`,
-  );
+/**
+ * Generate racks for a language
+ */
+function generateRacksForLanguage(wordSet: Set<string>, lang: string): Rack[] {
+  console.log(`\n=== ${lang.toUpperCase()} ===`);
+  console.log(`Word set size: ${wordSet.size}`);
 
-  const candidates: GeneratedRack[] = [];
+  // Find all 7-letter words to use as candidate racks
+  const sevenLetterWords = Array.from(wordSet).filter(w => w.length === 7);
+  console.log(`7-letter words: ${sevenLetterWords.length}`);
 
-  for (let i = 0; i < rackSeeds.length; i++) {
-    const rackLetters = rackSeeds[i]!;
+  // Collect candidate racks (deduplicated by sorted letters), capped for performance
+  const candidatesByKey = new Map<string, string>();
+
+  // Use fixed seed (LCG) to deterministically select a subset of 7-letter words
+  // This ensures consistent rack pool across generator runs
+  const seed = lang === 'en' ? 12345 : 54321;
+  let lcg = seed;
+  const lcgNext = () => {
+    lcg = (lcg * 1103515245 + 12345) % 2147483648;
+    return lcg / 2147483648;
+  };
+
+  // Shuffle 7-letter words using LCG
+  const shuffled = [...sevenLetterWords];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(lcgNext() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  // Take first N shuffled words (capped for performance)
+  const maxCandidates = 1500; // Process ~1.5k words; with early-stop, should finish in reasonable time
+  const toProcess = shuffled.slice(0, maxCandidates);
+
+  for (const word of toProcess) {
+    const key = rackKey(word);
+    if (!candidatesByKey.has(key)) {
+      candidatesByKey.set(key, word.toUpperCase());
+    }
+  }
+  console.log(`Candidate racks (deduped from first ${toProcess.length}): ${candidatesByKey.size}`);
+
+  // For each candidate, compute formable words
+  // Early-stop once we have enough valid racks for good coverage
+  const allRacks: Rack[] = [];
+  const targetRacks = 50; // Try to reach 50 valid racks, stop after
+  for (const letters of candidatesByKey.values()) {
+    if (allRacks.length >= targetRacks && candidatesByKey.size > 1000) break; // Early stop if we have enough
     const wordsByLen: Record<string, string[]> = {};
     const bingoWords: string[] = [];
 
-    // Scan words to find formable ones
-    for (const word of words) {
-      if (!canFormFromRack(word, rackLetters)) continue;
+    for (const word of wordSet) {
+      if (word.length < 3 || word.length > 7) continue;
+      const upper = word.toUpperCase();
+      if (!canFormFromRack(upper, letters)) continue;
 
       const len = word.length.toString();
-      if (!wordsByLen[len]) {
-        wordsByLen[len] = [];
-      }
-      wordsByLen[len].push(word);
+      if (!wordsByLen[len]) wordsByLen[len] = [];
+      wordsByLen[len].push(upper);
 
-      // Track 7-letter bingo words
       if (word.length === 7) {
-        bingoWords.push(word);
+        bingoWords.push(upper);
       }
     }
 
-    // De-duplicate arrays
-    for (const len in wordsByLen) {
-      wordsByLen[len] = [...new Set(wordsByLen[len])];
-    }
-    const bingoUnique = [...new Set(bingoWords)];
-
-    const totalWords = Object.values(wordsByLen).reduce(
-      (sum, arr) => sum + arr.length,
-      0,
-    );
-    const bucketCount = Object.values(wordsByLen).filter(
-      (arr) => arr.length > 0,
-    ).length;
-
-    // Keep racks that meet criteria
-    if (bingoUnique.length >= 1 && totalWords >= 6 && bucketCount >= 2) {
-      // Compute botPicks: top 3 by commonness (lowest letterScore), length 4-6
-      const candidates4To6: Array<{ word: string; score: number }> = [];
-      for (const len of ['4', '5', '6']) {
-        if (wordsByLen[len]) {
-          for (const w of wordsByLen[len]) {
-            candidates4To6.push({ word: w, score: letterScore(w) });
-          }
-        }
-      }
-      candidates4To6.sort((a, b) => a.score - b.score);
-      const botPicks: string[] = [];
-      const seenWords = new Set<string>();
-      for (const { word } of candidates4To6) {
-        if (botPicks.length >= 3) break;
-        if (!seenWords.has(word)) {
-          botPicks.push(word);
-          seenWords.add(word);
-        }
-      }
-
-      if (botPicks.length > 0) {
-        candidates.push({
-          letters: rackLetters,
-          bingoWords: bingoUnique,
-          wordsByLen,
-          botPicks,
-        });
-      }
+    // Filter: keep only racks with >=1 bingo, >=6 total words, >=2 length buckets
+    const totalWords = Object.values(wordsByLen).reduce((a, b) => a + b.length, 0);
+    const buckets = Object.keys(wordsByLen).filter(k => wordsByLen[k].length > 0);
+    if (bingoWords.length >= 1 && totalWords >= 6 && buckets.length >= 2) {
+      allRacks.push({ letters, bingoWords, wordsByLen, botPicks: [] });
     }
   }
 
-  console.log(`[${lang}] Found ${candidates.length} valid racks`);
+  console.log(`Valid racks (before botPicks): ${allRacks.length}`);
 
-  // Sort by bingo count (desc)
-  candidates.sort((a, b) => b.bingoWords.length - a.bingoWords.length);
+  // Assign botPicks: prefer length 4-6 with lowest letterScore
+  for (const rack of allRacks) {
+    const candidates: string[] = [];
+    for (const len of ['4', '5', '6']) {
+      if (rack.wordsByLen[len]) {
+        candidates.push(...rack.wordsByLen[len]);
+      }
+    }
+    // If not enough 4-6 words, add length 3
+    if (candidates.length === 0 && rack.wordsByLen['3']) {
+      candidates.push(...rack.wordsByLen['3']);
+    }
 
-  // Self-verify each rack
-  for (const rack of candidates) {
-    // Check 7 letters
-    if (rack.letters.length !== 7)
-      throw new Error(`Rack ${rack.letters} not 7 letters`);
+    // Sort by letterScore (ascending = common) and pick top 3 distinct
+    const sorted = candidates.sort((a, b) => letterScore(a) - letterScore(b));
+    const seen = new Set<string>();
+    const picks: string[] = [];
+    for (const w of sorted) {
+      if (!seen.has(w) && picks.length < 3) {
+        picks.push(w);
+        seen.add(w);
+      }
+    }
+    rack.botPicks = picks;
+  }
 
-    // Check bingo words
-    if (rack.bingoWords.length === 0)
-      throw new Error(`Rack ${rack.letters} has no bingo words`);
+  // Sort by bingoWords.length descending and cap at ~40 per language
+  allRacks.sort((a, b) => b.bingoWords.length - a.bingoWords.length);
+  const capped = allRacks.slice(0, 40);
+  console.log(`After botPicks + sort + cap(40): ${capped.length}`);
+
+  // Self-verify: every rack must pass invariants
+  for (const [i, rack] of capped.entries()) {
+    if (rack.letters.length !== 7) throw new Error(`[${i}] letters length !== 7`);
+    if (rack.bingoWords.length < 1) throw new Error(`[${i}] no bingo words`);
     for (const w of rack.bingoWords) {
-      if (w.length !== 7) throw new Error(`Bingo ${w} is not 7 letters`);
-      if (!canFormFromRack(w, rack.letters))
-        throw new Error(`Bingo ${w} not formable from ${rack.letters}`);
+      if (w.length !== 7) throw new Error(`[${i}] bingo word length !== 7: ${w}`);
+      if (!canFormFromRack(w, rack.letters)) throw new Error(`[${i}] bingo not formable: ${w}`);
     }
-
-    // Check word coverage
-    const totalWords = Object.values(rack.wordsByLen).reduce(
-      (sum, arr) => sum + arr.length,
-      0,
-    );
-    if (totalWords < 6)
-      throw new Error(`Rack ${rack.letters} has only ${totalWords} words`);
-
-    const bucketCount = Object.values(rack.wordsByLen).filter(
-      (arr) => arr.length > 0,
-    ).length;
-    if (bucketCount < 2)
-      throw new Error(`Rack ${rack.letters} has only ${bucketCount} buckets`);
-
-    // Check botPicks
-    if (rack.botPicks.length === 0)
-      throw new Error(`Rack ${rack.letters} has no botPicks`);
+    const total = Object.values(rack.wordsByLen).reduce((a: number, b: any) => a + b.length, 0);
+    const buckets = Object.keys(rack.wordsByLen).filter(k => (rack.wordsByLen[k] as string[]).length > 0);
+    if (total < 6) throw new Error(`[${i}] total words < 6: ${total}`);
+    if (buckets.length < 2) throw new Error(`[${i}] buckets < 2: ${buckets.length}`);
+    if (rack.botPicks.length < 1) throw new Error(`[${i}] botPicks empty`);
     for (const w of rack.botPicks) {
-      if (!canFormFromRack(w, rack.letters))
-        throw new Error(`BotPick ${w} not formable from ${rack.letters}`);
+      if (!canFormFromRack(w, rack.letters)) throw new Error(`[${i}] botPick not formable: ${w}`);
     }
   }
+  console.log(`✓ All invariants passed for ${capped.length} racks`);
 
-  console.log(
-    `[${lang}] Self-verified ${candidates.length} racks (first: ${candidates[0]?.letters} with ${candidates[0]?.bingoWords.length} bingos)`,
-  );
-
-  return candidates;
+  return capped;
 }
 
 async function main() {
-  console.log('Sealed Bid Rack Generator (Hand-Seeded)');
-  console.log('======================================\n');
+  console.log('Generating Sealed Bid Rack Pool...');
+  const startTime = Date.now();
 
-  const result: Record<string, GeneratedRack[]> = {};
+  // Load word sets
+  const enWords = loadEnglishWords();
+  const heWords = await loadHebrewWords();
 
-  // Generate English racks
-  const enWords = loadWordsForLang('en');
-  const enRacks = await generateRacksForLang(
-    HAND_SEEDED_RACKS.en,
-    enWords,
-    'en',
-  );
-  result.en = enRacks;
+  // Generate racks
+  const enRacks = generateRacksForLanguage(enWords, 'en');
+  const heRacks = generateRacksForLanguage(heWords, 'he');
 
-  // Generate Hebrew racks - auto-extract 7-letter seeds if needed
-  const heWords = loadWordsForLang('he');
-  if (HAND_SEEDED_RACKS.he.length === 0 && heWords.length > 0) {
-    // Auto-extract 7-letter words as seeds (take every 100th word to spread coverage)
-    const heSeeds = [];
-    for (let i = 0; i < heWords.length && heSeeds.length < 12; i += Math.max(1, Math.floor(heWords.length / 20))) {
-      if (heWords[i]!.length === 7) {
-        heSeeds.push(heWords[i]!);
-      }
-    }
-    // If we don't have enough 7-letter words, try collecting them directly
-    if (heSeeds.length < 8) {
-      console.log(`[he] Only found ${heSeeds.length} 7-letter word seeds, collecting more...`);
-      const heWordSet = new Set<string>();
-      for (const w of heWords) {
-        if (w.length === 7 && heWordSet.size < 20) {
-          heWordSet.add(w);
-        }
-      }
-      HAND_SEEDED_RACKS.he = Array.from(heWordSet);
-    } else {
-      HAND_SEEDED_RACKS.he = heSeeds;
-    }
+  // Verify we have meaningful pools
+  if (enRacks.length < 8) {
+    throw new Error(`English pool too small: ${enRacks.length} (need >=8)`);
   }
+  console.log(`\n✓ Hebrew pool: ${heRacks.length} racks (fallback to en if < 8)`);
 
-  const heRacks = await generateRacksForLang(
-    HAND_SEEDED_RACKS.he,
-    heWords,
-    'he',
-  );
-  result.he = heRacks;
+  // Output JSON
+  const output = {
+    en: enRacks,
+    he: heRacks.length >= 8 ? heRacks : enRacks, // Fallback to English if Hebrew too small
+  };
 
-  // Ensure minimum pool sizes
-  if (result.en.length < 8 || result.he.length < 8) {
-    console.warn(
-      `Warning: pools smaller than recommended (en: ${result.en.length}, he: ${result.he.length})`,
-    );
-  }
+  const outPath = path.join(__dirname, '../lib/sealedBid/sp/data/sealedBidRacks.generated.json');
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  fs.writeFileSync(outPath, JSON.stringify(output, null, 2));
 
-  // Write JSON
-  const outputPath = path.join(
-    __dirname,
-    '../lib/sealedBid/sp/data/sealedBidRacks.generated.json',
-  );
-  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-  fs.writeFileSync(outputPath, JSON.stringify(result, null, 2));
-
-  console.log(`\nWrote ${outputPath}`);
-  console.log(
-    `Pool sizes: en=${result.en.length} racks, he=${result.he.length} racks`,
-  );
-
-  // Show sample
-  if (result.en.length > 0) {
-    const sample = result.en[0]!;
-    console.log(
-      `\nSample EN rack: ${sample.letters} (${sample.bingoWords.length} bingos, ${Object.values(sample.wordsByLen).reduce((s, a) => s + a.length, 0)} total words)`,
-    );
-    console.log(`  Bingo examples: ${sample.bingoWords.slice(0, 2).join(', ')}`);
-    console.log(`  Bot picks: ${sample.botPicks.join(', ')}`);
-  }
-
-  if (result.he.length > 0) {
-    const sample = result.he[0]!;
-    console.log(
-      `\nSample HE rack: ${sample.letters} (${sample.bingoWords.length} bingos, ${Object.values(sample.wordsByLen).reduce((s, a) => s + a.length, 0)} total words)`,
-    );
-  }
-
-  console.log('\n✓ Generation complete');
+  const elapsed = Date.now() - startTime;
+  console.log(`\n✓ Generated: ${outPath}`);
+  console.log(`  en: ${enRacks.length} racks`);
+  console.log(`  he: ${heRacks.length} racks (${heRacks.length >= 8 ? 'native' : 'fallback to en'})`);
+  console.log(`  Time: ${elapsed}ms`);
 }
 
-main().catch((err) => {
-  console.error('Error:', err.message);
+main().catch(err => {
+  console.error('Generator error:', err);
   process.exit(1);
 });

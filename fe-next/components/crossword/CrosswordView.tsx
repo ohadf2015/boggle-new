@@ -54,7 +54,7 @@ export function CrosswordView({
   onNewPuzzle,
   onDailySolved,
 }: CrosswordViewProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const reduced = useReducedMotion();
   const { playSound } = useSoundEffects();
   const [burst, setBurst] = useState(0);
@@ -332,6 +332,7 @@ export function CrosswordView({
             {soloAward && (
               <SoloRewardCard
                 t={t}
+                language={language}
                 awarded={soloAward.awarded}
                 bonus={soloAward.bonus}
                 modifier={dailyModifier}

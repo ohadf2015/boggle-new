@@ -45,17 +45,10 @@ vi.mock('@/hooks/useKeyboardWordInput', () => ({ useKeyboardWordInput: () => ({ 
 vi.mock('@/utils/singlePlayerAchievements', () => ({ checkLiveAchievements: () => [], createAchievementState: () => ({}) }));
 vi.mock('@/shared/utils/scoring', () => ({ getComboBonus: () => 0, calculateWordScore: () => 5 }));
 vi.mock('@/lib/cosy/cosyGameplay', () => ({ shouldPlayCountdownBeep: () => false }));
-vi.mock('../useBotSimulation', () => ({ useBotSimulation: () => ({ botScores: [], botWords: [], resetBots: vi.fn(), initializeBotUsedWords: vi.fn(), simulateBotWord: vi.fn() }) }));
-vi.mock('../useSpamDetection', () => ({ useSpamDetection: () => ({ checkSubmission: vi.fn(() => ({ allowed: true })), resetSpamDetection: vi.fn() }) }));
-vi.mock('../useSinglePlayerEffects', () => ({
-  useSinglePlayerEffects: () => ({
-    showLandscapeTutorial: false,
-    dismissLandscapeTutorial: vi.fn(),
-    lastWordFoundTimeRef: { current: 0 },
-    gameStartTimeRef: { current: 0 },
-  }),
-}));
-vi.mock('../buildGameResults', () => ({
+vi.mock('./useBotSimulation', () => ({ useBotSimulation: () => ({ botScores: [], simulateBotWord: vi.fn() }) }));
+vi.mock('./useSpamDetection', () => ({ useSpamDetection: () => ({ checkSpam: vi.fn() }) }));
+vi.mock('./useSinglePlayerEffects', () => ({ useSinglePlayerEffects: vi.fn() }));
+vi.mock('./buildGameResults', () => ({
   buildGameResults: vi.fn(),
   buildFallbackResults: vi.fn(),
   emitSinglePlayerGameEnd: vi.fn(),
@@ -74,7 +67,7 @@ import type { SinglePlayerGameState } from '../../../SinglePlayerView';
 
 const baseSettings: SinglePlayerGameState = {
   mode: 'classic',
-  difficulty: 'MEDIUM',
+  difficulty: 'medium',
   language: 'en',
   timerSeconds: 180,
   gridSize: 4,

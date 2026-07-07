@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { getVocabClassroomContent, EDUCATION_LOCALES, type EducationLocale } from './content';
 import { EducationHeroBanner } from '@/components/education/EducationHeroBanner';
-import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
+import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { ScrollRevealSection } from '@/components/education/ScrollRevealSection';
 import { educationCourseJsonLd } from '@/lib/seo/educationStructuredData';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
@@ -288,7 +288,7 @@ export default async function Page({ params }: PageProps) {
           </div>
         </section>
 
-        <TeacherAccessCTA />
+        <DistrictUpsellStrip />
       </div>
     </main>
   );

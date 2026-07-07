@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef } from 'react';
 import { getCoins } from '@/utils/coinManager';
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useTowerUpgradeStore } from '@/lib/wordTower/useTowerUpgradeStore';
 import { UPGRADE_DEFS, upgradeCost, levelOf, isMaxed, type UpgradeId } from '@/lib/wordTower/upgrades';
@@ -11,6 +12,7 @@ import { cn } from '@/lib/utils';
 interface Props {
   onClose: () => void;
   t: (key: string, params?: Record<string, string | number>) => string;
+  language: string;
   dir?: 'ltr' | 'rtl';
 }
 
@@ -42,7 +44,7 @@ function Pips({ level, max }: { level: number; max: number }) {
  * affordable buy, and a purchase pop. Coins are spent through the store's `buy()`
  * (which goes via coinManager). RTL-safe; buy CTA carries black-on-lime for AA.
  */
-export function WordTowerUpgradePanel({ onClose, t, dir = 'ltr' }: Props) {
+export function WordTowerUpgradePanel({ onClose, t, language, dir = 'ltr' }: Props) {
   const levels = useTowerUpgradeStore((s) => s.levels);
   const buy = useTowerUpgradeStore((s) => s.buy);
   const [coins, setCoins] = useState(() => getCoins());
@@ -147,7 +149,7 @@ export function WordTowerUpgradePanel({ onClose, t, dir = 'ltr' }: Props) {
                         onClick={() => handleBuy(id)}
                         disabled={!affordable}
                         aria-label={`${t(`wordTower.upgrade.${id}.name`)} — ${
-                          maxed ? t('wordTower.upgrade.max') : t('wordTower.upgrade.balance', { n: cost })
+                          maxed ? t('wordTower.upgrade.max') : t('wordTower.upgrade.balance', { n: safeToLocaleString(cost, language) })
                         }`}
                         className={`min-h-[44px] shrink-0 rounded-neo border-neo border-black px-3 py-2 font-neo-display text-xs font-black uppercase shadow-hard-sm transition active:translate-y-px ${
                           maxed

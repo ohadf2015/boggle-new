@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import WatchAdButton from '@/components/daily/WatchAdButton';
 
 interface Props {
@@ -8,8 +9,9 @@ interface Props {
   className?: string;
 }
 
-const SinglePlayerGoldTopUp: React.FC<Props> = ({ t, className }) => (
-  <WatchAdButton t={t} onCoinsEarned={() => {}} className={className} surface="gold_top_up" />
-);
+const SinglePlayerGoldTopUp: React.FC<Props> = ({ t, className }) => {
+  const { language } = useLanguage();
+  return <WatchAdButton t={t} language={language} onCoinsEarned={() => {}} className={className} surface="gold_top_up" />;
+};
 
 export default SinglePlayerGoldTopUp;

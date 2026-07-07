@@ -8,9 +8,7 @@ import type { RoundResult } from '@/lib/sealedBid/sp/sbEngine';
 interface Props {
   history: RoundResult[];
   totalScore: number;
-  /** Chips left in the wallet at cash-out (poker wager mode). */
   chips?: number;
-  /** Coins awarded from the chip cash-out (once/day). */
   coinsAwarded?: number;
 }
 
@@ -67,40 +65,40 @@ export function SealedBidSessionSummary({ history, totalScore, chips, coinsAward
         </p>
       </div>
 
-      {/* Unique count is already the big number above — this line only adds
-          what that number doesn't show: how the rest of the rounds went. */}
-      <div className="flex items-center justify-center gap-3 text-xs text-neo-white/60">
-        <span className="flex items-center gap-1">
-          🤝{' '}
-          <span data-testid="bluff-clash-count" className="font-neo-display font-black text-neo-orange">
+      <div className="flex justify-center gap-2">
+        <div className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 shadow-hard-sm">
+          <span className="text-sm" aria-hidden="true">✅</span>
+          <span className="font-neo-display font-black text-sm text-neo-lime">{unique}</span>
+          <span className="font-neo-body text-[10px] text-neo-white/50">{t('sealedBid.session.uniqueLabel')}</span>
+        </div>
+        <div className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 shadow-hard-sm">
+          <span className="text-sm" aria-hidden="true">🤝</span>
+          <span
+            data-testid="bluff-clash-count"
+            className="font-neo-display font-black text-sm text-neo-orange"
+          >
             {clash}
-          </span>{' '}
-          {t('sealedBid.session.clashLabel')}
-        </span>
-        <span className="flex items-center gap-1">
-          ⬜{' '}
-          <span data-testid="bluff-pass-count" className="font-neo-display font-black text-neo-white/40">
+          </span>
+          <span className="font-neo-body text-[10px] text-neo-white/50">{t('sealedBid.session.clashLabel')}</span>
+        </div>
+        <div className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 shadow-hard-sm">
+          <span className="text-sm" aria-hidden="true">⬜</span>
+          <span
+            data-testid="bluff-pass-count"
+            className="font-neo-display font-black text-sm text-neo-white/40"
+          >
             {pass}
-          </span>{' '}
-          {t('sealedBid.session.passLabel')}
-        </span>
+          </span>
+          <span className="font-neo-body text-[10px] text-neo-white/50">{t('sealedBid.session.passLabel')}</span>
+        </div>
       </div>
 
-      {coinsAwarded !== undefined && (
-        <div
-          data-testid="sealed-bid-cashout"
-          className="flex items-center justify-center gap-2 rounded-neo border-3 border-black bg-neo-navy px-3 py-2 shadow-hard-sm"
-        >
-          <span className="font-neo-display font-black text-xs uppercase tracking-wide text-neo-white/70">
-            {t('sealedBid.cashOut')}
-          </span>
-          <span className="font-neo-display font-black text-sm text-neo-cyan">
-            {chips ?? 0} {t('sealedBid.chips')}
-          </span>
-          <span className="text-neo-white/40" aria-hidden="true">→</span>
-          <span className="font-neo-display font-black text-base text-neo-yellow">
-            {coinsAwarded} 🪙
-          </span>
+      {chips !== undefined && coinsAwarded !== undefined && (
+        <div className="rounded-neo border-2 border-black bg-neo-navy px-3 py-2 shadow-hard-sm text-center">
+          <p className="font-neo-body text-xs text-neo-white/60">{t('sealedBid.session.cashOut')}</p>
+          <p className="font-neo-display font-black text-sm text-neo-yellow">
+            {chips} {t('sealedBid.session.chips')} → {coinsAwarded} {t('sealedBid.session.coins')}
+          </p>
         </div>
       )}
 

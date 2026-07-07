@@ -6,7 +6,7 @@ import { useAchievementQueue } from '@/components/achievements';
 import FirstTimeEncouragement from '@/components/game/FirstTimeEncouragement';
 import { useFirstTimeEncouragement } from '@/hooks/useFirstTimeEncouragement';
 import { useIdleDetection } from '@/hooks/useIdleDetection';
-import { trackDeadTime, trackGameStart } from '@/utils/growthTracking';
+import { trackDeadTime, trackGameStart, trackGrowthEvent } from '@/utils/growthTracking';
 import { createFirstMinuteSurvivalTimer, detectPlatform } from '@/utils/posthogEngagement';
 
 const DEAD_TIME_THRESHOLD_MS = 15000;
@@ -87,6 +87,7 @@ function SinglePlayerGame({
     const wordCount = core.foundWords.length;
     if (wordCount === 1 && prevWordCountRef.current === 0) {
       encouragement.triggerEncouragement('first-word');
+      trackGrowthEvent('first_word_found', { mode: settings.mode });
     }
     prevWordCountRef.current = wordCount;
   }, [core.foundWords.length, encouragement]);

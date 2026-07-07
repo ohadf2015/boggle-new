@@ -1067,7 +1067,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           button — founder 2026-06-25: "the hud on the top has some buttons
           overlap each other".) */}
       {showUpgrades && (
-        <WordTowerUpgradePanel onClose={() => setShowUpgrades(false)} t={t} dir={dir} />
+        <WordTowerUpgradePanel onClose={() => setShowUpgrades(false)} t={t} language={language} dir={dir} />
       )}
 
       {/* Top chrome — actions now share the mute-FAB row (#4). Row 1 sits at the

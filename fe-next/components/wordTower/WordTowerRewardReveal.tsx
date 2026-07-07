@@ -1,5 +1,6 @@
 'use client';
 
+import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { REWARD_TIER_META, type RewardTier, type RewardSource } from '@/lib/wordTower/towerReward';
 
 export interface RewardRevealPayload {
@@ -13,6 +14,7 @@ export interface RewardRevealPayload {
 interface Props {
   reward: RewardRevealPayload | null;
   t: (key: string, params?: Record<string, string | number>) => string;
+  language: string;
   reducedMotion?: boolean;
 }
 
@@ -26,7 +28,7 @@ interface Props {
  * Presentation only — the parent owns the coin grant, the dedupe, and the
  * auto-dismiss lifecycle (mirrors the surprise-FX chip).
  */
-export function WordTowerRewardReveal({ reward, t, reducedMotion }: Props) {
+export function WordTowerRewardReveal({ reward, t, language, reducedMotion }: Props) {
   if (!reward) return null;
   const meta = REWARD_TIER_META[reward.tier];
   const isBig = reward.tier === 'rare' || reward.tier === 'epic';
@@ -48,7 +50,7 @@ export function WordTowerRewardReveal({ reward, t, reducedMotion }: Props) {
     >
       <span className={`flex items-center gap-1.5 font-neo-display ${amountSize} font-extrabold`}>
         <span aria-hidden>{meta.emoji}</span>
-        +{reward.coins}
+        +{safeToLocaleString(reward.coins, language)}
         <span aria-hidden>🪙</span>
       </span>
       <span className="font-neo-body text-[11px] font-bold uppercase tracking-wide opacity-80">

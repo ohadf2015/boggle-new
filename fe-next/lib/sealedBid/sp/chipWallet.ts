@@ -8,8 +8,10 @@ export interface ChipWallet {
 }
 
 export function initWallet(start?: number): ChipWallet {
-  const chipCount = start ?? START_CHIPS;
-  return { chips: chipCount, busted: false };
+  return {
+    chips: start ?? START_CHIPS,
+    busted: false,
+  };
 }
 
 export function clampStake(w: ChipWallet, desired: number): number {
@@ -18,7 +20,10 @@ export function clampStake(w: ChipWallet, desired: number): number {
 
 export function applyDelta(w: ChipWallet, delta: number): ChipWallet {
   const newChips = Math.max(0, w.chips + delta);
-  return { chips: newChips, busted: newChips === 0 };
+  return {
+    chips: newChips,
+    busted: newChips === 0,
+  };
 }
 
 export function cashOutCoins(chips: number): number {

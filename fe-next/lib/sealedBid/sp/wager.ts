@@ -1,12 +1,14 @@
 import { letterScore, canFormFromRack, BidOutcome } from './sbEngine';
 
-/** Calculate odds multiplier for a word based on rarity (letter score) and length.
- * Formula: clamp(1.5 + word.length*0.4 + letterScore(word)*0.12, 1.5, 6), rounded to 1 decimal.
+/**
+ * Compute the odds multiplier for a word based on its length and rarity (letter score).
+ * Bounded [1.5, 6], roughly monotonic in length and letter score.
+ * Rounded to 1 decimal place.
  */
 export function oddsMultiplier(word: string): number {
-  const len = word.length;
+  const length = word.length;
   const score = letterScore(word);
-  const raw = 1.5 + len * 0.4 + score * 0.12;
+  const raw = 1.5 + length * 0.4 + score * 0.12;
   const clamped = Math.max(1.5, Math.min(6, raw));
   return Math.round(clamped * 10) / 10;
 }
@@ -18,26 +20,25 @@ export interface Settlement {
   delta: number;
 }
 
-export interface SettleBidArgs {
+/**
+ * Settle a single bid. Determines outcome (unique/clash/none) and chip delta.
+ *
+ * Rules:
+ * - null word (deliberate pass) → none, delta 0
+ * - Invalid word (not in dict or not formable) → none, delta -min(stake, 5)
+ * - Valid word matching a bot pick → clash, delta -stake
+ * - Valid unique word → unique, delta +round(stake*(mult-1))
+ */
+export function settleBid(args: {
   playerWord: string | null;
   botWords: string[];
   dictOk: boolean;
   rack: string;
   stake: number;
-}
-
-/** Settle a single wager based on the player's word, bot words, and validity.
- *
- * Rules:
- * - null word (deliberate pass) → outcome 'none', delta 0
- * - word invalid (not dictOk or can't form from rack) → outcome 'none', delta -Math.min(stake, 5)
- * - word clashes with a bot word → outcome 'clash', delta -stake
- * - word is unique → outcome 'unique', delta Math.round(stake * (multiplier - 1))
- */
-export function settleBid(args: SettleBidArgs): Settlement {
+}): Settlement {
   const { playerWord, botWords, dictOk, rack, stake } = args;
 
-  // Deliberate pass (null word) risks nothing
+  // Deliberate pass (null word) → no risk
   if (playerWord === null) {
     return {
       outcome: 'none',
@@ -48,21 +49,23 @@ export function settleBid(args: SettleBidArgs): Settlement {
   }
 
   const word = playerWord.toUpperCase();
-  const mult = oddsMultiplier(word);
 
-  // Invalid word (not in dict or can't form from rack) loses small ante
+  // Invalid word (failed dict check or not formable from rack)
   if (!dictOk || !canFormFromRack(word, rack)) {
     return {
       outcome: 'none',
       stake,
-      multiplier: mult,
+      multiplier: 0,
       delta: -Math.min(stake, 5),
     };
   }
 
-  // Check for clash with bot words
-  const botWordsUpper = botWords.map(w => w.toUpperCase());
+  // Valid word: check for clash against bot picks
+  const botWordsUpper = botWords.map((w) => w.toUpperCase());
+  const mult = oddsMultiplier(word);
+
   if (botWordsUpper.includes(word)) {
+    // Clash: loses entire stake
     return {
       outcome: 'clash',
       stake,
@@ -71,11 +74,12 @@ export function settleBid(args: SettleBidArgs): Settlement {
     };
   }
 
-  // Unique word pays stake * (multiplier - 1)
+  // Unique: wins stake * (multiplier - 1)
+  const delta = Math.round(stake * (mult - 1));
   return {
     outcome: 'unique',
     stake,
     multiplier: mult,
-    delta: Math.round(stake * (mult - 1)),
+    delta,
   };
 }

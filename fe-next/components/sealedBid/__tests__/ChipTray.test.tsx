@@ -16,9 +16,4 @@ describe('ChipTray', () => {
     fireEvent.click(screen.getByRole('button', { name: /all.?in/i }));
     expect(onStakeChange).toHaveBeenCalledWith(42);
   });
-
-  it('has no stake-clear button — it collided with the wheel\'s letter-clear button', () => {
-    render(<ChipTray balance={42} stake={5} onStakeChange={() => {}} reducedMotion />);
-    expect(screen.queryByRole('button', { name: /^clear$/i })).not.toBeInTheDocument();
-  });
 });

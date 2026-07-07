@@ -612,6 +612,25 @@ export const EXPERIMENTS = {
     description:
       'MP room-card join loading state. loading-state = disables clicked room card + shows spinner while join is in-flight. control = current no-feedback behaviour. Targets rage-clicks on /en/multiplayer.',
   }),
+
+  /**
+   * Classic/survival word-count goal badge. Classic mode 7d completion = 16%
+   * (73 started, 12 completed) — worst of all modes. Hypothesis: players
+   * abandon because there is no concrete progress anchor (only a timer). The
+   * `word-goal` arm overlays a "X / 10" progress badge in the bottom-right
+   * corner during classic/survival games, giving a tangible milestone to hit.
+   * Midway (≥5 words) the badge shifts to a warm colour to signal momentum.
+   *
+   * Conversion = game_completed for classic/survival modes.
+   * Guardrail = game_abandoned must not rise.
+   * PostHog flag key = 'exp-singleplayer-word-goal-v1', 50/50 rollout.
+   */
+  'exp-singleplayer-word-goal-v1': defineExperiment({
+    variants: ['control', 'word-goal'] as const,
+    default: 'control',
+    description:
+      'Classic/survival SP word-count goal badge. word-goal = shows "X / 10 words" progress badge bottom-right. Targets 16% classic completion by anchoring players to a concrete word-count goal. Conversion = game_completed (classic/survival). Guardrail = game_abandoned.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

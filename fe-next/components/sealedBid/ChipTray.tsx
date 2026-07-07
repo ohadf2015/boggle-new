@@ -3,7 +3,7 @@
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { clampStake } from '@/lib/sealedBid/sp/chipWallet';
+import { clampStake, MIN_STAKE, type ChipWallet } from '@/lib/sealedBid/sp/chipWallet';
 
 export interface ChipTrayProps {
   balance: number;
@@ -13,13 +13,15 @@ export interface ChipTrayProps {
   reducedMotion?: boolean;
 }
 
-// Explicit class map — Tailwind's JIT scanner can't resolve a template-literal
-// `bg-${color}` class name, it needs the literal string present in source.
-const DENOMINATIONS = [
-  { value: 5, label: '+5', bg: 'bg-neo-cyan' },
-  { value: 10, label: '+10', bg: 'bg-neo-lime' },
-  { value: 25, label: '+25', bg: 'bg-neo-pink' },
-];
+type DenominationType = 5 | 10 | 25 | 'allIn' | 'clear';
+
+interface ChipButtonConfig {
+  label: string;
+  ariaLabel: string;
+  bgColor: string;
+  denomination?: number;
+  type: DenominationType;
+}
 
 export default function ChipTray({
   balance,
@@ -29,87 +31,138 @@ export default function ChipTray({
   reducedMotion = false,
 }: ChipTrayProps) {
   const { t } = useLanguage();
-  const chipRefsMap = useRef<Map<number, HTMLButtonElement | null>>(new Map());
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleAdd = (denomination: number) => {
-    const desired = stake + denomination;
-    const clamped = clampStake({ chips: balance, busted: false }, desired);
+  // Build a wallet for clampStake
+  const wallet: ChipWallet = {
+    chips: balance,
+    busted: false,
+  };
 
-    if (!reducedMotion && chipRefsMap.current.has(denomination)) {
-      const ref = chipRefsMap.current.get(denomination);
-      if (ref) {
-        gsap.from(ref, {
-          y: -30,
-          scale: 1.3,
-          opacity: 0,
-          duration: 0.6,
-          ease: 'back.out',
-        });
+  const denominationButtons: ChipButtonConfig[] = [
+    {
+      label: '+5',
+      ariaLabel: '+5 chips',
+      bgColor: 'bg-neo-cyan',
+      denomination: 5,
+      type: 5,
+    },
+    {
+      label: '+10',
+      ariaLabel: '+10 chips',
+      bgColor: 'bg-neo-lime',
+      denomination: 10,
+      type: 10,
+    },
+    {
+      label: '+25',
+      ariaLabel: '+25 chips',
+      bgColor: 'bg-neo-pink',
+      denomination: 25,
+      type: 25,
+    },
+    {
+      label: t('sealedBid.allIn'),
+      ariaLabel: `${t('sealedBid.allIn')} - stake all ${balance} chips`,
+      bgColor: 'bg-neo-purple',
+      type: 'allIn',
+    },
+    {
+      label: t('sealedBid.clear'),
+      ariaLabel: `${t('sealedBid.clear')} - reset to ${MIN_STAKE}`,
+      bgColor: 'bg-neo-navy-light border-neo-thick border-neo-cream',
+      type: 'clear',
+    },
+  ];
+
+  const handleChipClick = (config: ChipButtonConfig) => {
+    if (disabled) return;
+
+    let newStake: number;
+
+    if (config.type === 'allIn') {
+      newStake = balance;
+    } else if (config.type === 'clear') {
+      newStake = MIN_STAKE;
+    } else if (typeof config.denomination === 'number') {
+      newStake = clampStake(wallet, stake + config.denomination);
+    } else {
+      return;
+    }
+
+    // Animate the chip if not reduced motion and it's an add action
+    if (
+      !reducedMotion &&
+      config.type !== 'allIn' &&
+      config.type !== 'clear' &&
+      containerRef.current
+    ) {
+      const chipEl = containerRef.current.querySelector(
+        `[data-chip-type="${config.type}"]`
+      ) as HTMLElement;
+      if (chipEl) {
+        // GSAP chip-toss: small y/scale back.out
+        gsap.fromTo(
+          chipEl,
+          {
+            y: -20,
+            scale: 0.8,
+          },
+          {
+            y: 0,
+            scale: 1,
+            duration: 0.5,
+            ease: 'back.out',
+          }
+        );
       }
     }
 
-    onStakeChange(clamped);
-  };
-
-  const handleAllIn = () => {
-    onStakeChange(balance);
+    onStakeChange(newStake);
   };
 
   return (
-    <div className="flex flex-col gap-3 p-3">
-      <div className="flex flex-wrap items-center gap-3">
-        {DENOMINATIONS.map(({ value, label, bg }) => (
-          <button
-            key={value}
-            ref={(el) => {
-              if (el) chipRefsMap.current.set(value, el);
-            }}
-            onClick={() => handleAdd(value)}
-            disabled={disabled}
-            aria-label={`${label} chips`}
-            className={`
-              chip-token
-              flex items-center justify-center
-              w-14 h-14 rounded-full
-              border-neo-thick border-black
-              shadow-hard
-              ${bg}
-              font-neo-display text-base font-bold
-              text-black
-              disabled:opacity-50 disabled:cursor-not-allowed
-              active:shadow-hard-pressed
-              transition-shadow
-            `}
-          >
-            {label}
-          </button>
-        ))}
-
-        <button
-          onClick={handleAllIn}
-          disabled={disabled}
-          aria-label={t('sealedBid.allIn')}
-          className={`
-            flex-1 px-4 py-3
-            border-neo-thick border-black
-            shadow-hard
-            bg-neo-purple
-            font-neo-display text-sm font-bold
-            text-white
-            disabled:opacity-50 disabled:cursor-not-allowed
-            active:shadow-hard-pressed
-            transition-shadow
-          `}
-        >
-          {t('sealedBid.allIn')}
-        </button>
+    <div ref={containerRef} className="flex flex-col gap-4">
+      {/* Display current stake */}
+      <div className="text-center">
+        <div className="text-sm opacity-75">{t('sealedBid.currentStake')}</div>
+        <div className="text-2xl font-neo-display font-bold">{stake} chips</div>
       </div>
 
-      <div
-        className="text-center font-neo-display text-sm"
-        aria-label={t('sealedBid.stake', { stake })}
-      >
-        {t('sealedBid.stake', { stake })}
+      {/* Chip buttons grid */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5 md:gap-2">
+        {denominationButtons.map((config) => (
+          <button
+            key={config.type}
+            data-chip-type={config.type}
+            onClick={() => handleChipClick(config)}
+            disabled={disabled}
+            aria-label={config.ariaLabel}
+            className={`
+              relative
+              px-3 py-2
+              md:px-2 md:py-1
+              ${config.bgColor}
+              border-neo-thick border-black
+              shadow-hard
+              rounded-neo
+              font-neo-display font-bold
+              text-sm
+              md:text-xs
+              transition-all
+              active:shadow-hard-pressed
+              disabled:opacity-50 disabled:cursor-not-allowed
+              hover:not-disabled:shadow-hard-lg
+            `}
+          >
+            {config.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Balance info */}
+      <div className="text-xs text-center opacity-60">
+        {t('sealedBid.balance')}: {balance} chips
       </div>
     </div>
   );

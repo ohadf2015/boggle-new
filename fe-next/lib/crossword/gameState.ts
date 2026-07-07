@@ -13,6 +13,10 @@ export interface GameState {
   revealed: string[]; // "r,c" cells filled by a hint
   /** transient check result per cell: 'correct' | 'wrong'. Cleared on next input. */
   checks: Record<string, 'correct' | 'wrong'>;
+  /** times each slot was fully filled with a wrong answer */
+  slotAttempts: Record<string, number>;
+  /** warmth hint per cell, shown at attempt ≥ 2 on wrong fill */
+  warmths: Record<string, 'cold' | 'warm' | 'hot'>;
 }
 
 const k = (row: number, col: number) => `${row},${col}`;
@@ -65,6 +69,8 @@ export function initGame(
     status,
     revealed: [...revealed],
     checks: {},
+    slotAttempts: {},
+    warmths: {},
   };
 }
 

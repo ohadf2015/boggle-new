@@ -10,9 +10,7 @@ describe('sealedBidRacks.generated.json invariants', () => {
     it(`${lang}: pool is non-empty`, () => {
       expect(pool.length).toBeGreaterThanOrEqual(8);
     });
-    // Use INDEX loop, not pool.entries(), to avoid tsc downlevelIteration
-    for (let i = 0; i < pool.length; i++) {
-      const r = pool[i];
+    for (const [i, r] of pool.entries()) {
       it(`${lang}[${i}] ${r.letters}: 7 letters`, () => {
         expect(r.letters).toHaveLength(7);
       });

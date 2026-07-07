@@ -1333,3 +1333,32 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - Salvaged code from 20260705 removed the null guard (try-catch + _destroyed check). Lane 01 reverted to HEAD.
 - Status: shipped correct version (HEAD guard intact). Sentry should trend down.
 - Recommended owner: review-by-eod (verify Sentry 1CW/1PV trending down)
+
+## 2026-07-07
+### [Supabase] upsert_push_token SECURITY DEFINER — migration written, unapplied
+- Migration `20260628010000_revoke_push_token_fn_from_public.sql` REVOKEs EXECUTE from PUBLIC, re-grants to authenticated only
+- Status: deferred — Supabase MCP unavailable tonight (~11 nights of token drought)
+- Why: needs live Supabase MCP to apply_migration; migration file is written and correct
+- Recommended owner: apply via `supabase-db-manager` once MCP token is refreshed
+
+### [Supabase] RLS always-true tar_insert_any on teacher_access_requests — intentional
+- Advisor flags `tar_insert_any` INSERT WITH CHECK (true) as always-true
+- Status: DO NOT CHANGE — public teacher apply form requires anon INSERT (migration 20260617120000 explains; changing it broke an applicant 2026-06-14, was reverted same night)
+- Why: anonymous applicants submit BEFORE having an account; app-layer rate-limit is the spam guard
+- Recommended owner: close the advisor ticket (not actionable)
+
+### [Sentry] Word Wheel is_catchup schema cache miss
+- Migration `20260607100000_word_wheel_catchup.sql` adds is_catchup column to daily_word_wheel_attempts
+- Status: deferred — Supabase MCP unavailable, migration unapplied
+- Why: same MCP token drought; applying this migration will clear the Sentry 1NB error
+- Recommended owner: apply alongside upsert_push_token migration once MCP is restored
+
+### [Sentry] CapacitorGameConnect.then() (1PH) — fix in code, noise from stale APK
+- `nativePGS.ts:96,125` already guards against bare-proxy return; comment cites the exact Sentry ID
+- Status: no code change needed; 7 remaining instances likely old APK versions
+- Recommended owner: monitor 24h post-gate — should trend to 0 as old APKs retire
+
+### [Sentry] Pixi null.clear (1PV) — guard already present
+- `WordWheelPixiRing.tsx:106` checks `orbitGfx.destroyed` before any `.clear()` call
+- Status: no code change needed; remaining instances from old/cached versions
+- Recommended owner: monitor 24h

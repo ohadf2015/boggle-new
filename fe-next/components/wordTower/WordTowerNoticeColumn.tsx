@@ -1,6 +1,7 @@
 'use client';
 
 import { ChevronsUp } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { TowerNotice } from './TowerNotice';
 import { WordTowerRewardReveal, type RewardRevealPayload } from './WordTowerRewardReveal';
 import { showsTierKicker, type DropVerdict, type VerdictTone } from '@/lib/wordTower/dropVerdict';
@@ -68,6 +69,7 @@ export function WordTowerNoticeColumn({
   reward, sabEarned, sabAdEarned, skinUnlock, surprise, combo, milestone,
   landmark, ach, wreckReport, reducedMotion, t,
 }: WordTowerNoticeColumnProps) {
+  const { language } = useLanguage();
   const fxClass = (exiting: boolean, enter: string) => (reducedMotion ? '' : exiting ? 'wt-toast-out' : enter);
 
   return (
@@ -148,7 +150,7 @@ export function WordTowerNoticeColumn({
 
       {/* "You actually got coins" reveal — the granted amount + rarity, right
           under the zone/achievement banner that usually pays it. */}
-      <WordTowerRewardReveal reward={reward} t={t} reducedMotion={reducedMotion} />
+      <WordTowerRewardReveal reward={reward} t={t} language={language} reducedMotion={reducedMotion} />
 
       {/* Wrecking-ball EARN toasts — surfaced here (not beside the rail chip)
           so the "new zone → coins + wrecking ball" combo stacks as one beat. */}

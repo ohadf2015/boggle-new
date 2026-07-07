@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
-import { oddsMultiplier } from '../../lib/sealedBid/sp/wager';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { useReducedMotion } from '../../hooks/useReducedMotion';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { oddsMultiplier } from '@/lib/sealedBid/sp/wager';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export interface OddsBoardProps {
   word: string;
@@ -12,77 +12,57 @@ export interface OddsBoardProps {
   reducedMotion?: boolean;
 }
 
-export default function OddsBoard({ word, stake, reducedMotion }: OddsBoardProps) {
+export default function OddsBoard({ word, stake, reducedMotion: forceReducedMotion }: OddsBoardProps) {
   const { t } = useLanguage();
   const prefersReducedMotion = useReducedMotion();
-  const shouldReduceMotion = reducedMotion || prefersReducedMotion;
+  const reducedMotion = forceReducedMotion ?? prefersReducedMotion;
 
-  // Compute multiplier and payout
-  const hasValidWord = word.length >= 3;
-  const mult = hasValidWord ? oddsMultiplier(word.toUpperCase()) : 0;
-  const payout = hasValidWord ? Math.round(stake * mult) : 0;
-  const multText = hasValidWord ? mult.toFixed(1) : '—';
+  const displayedMultRef = useRef<number>(1.5);
+  const [displayedMult, setDisplayedMult] = useState<number>(1.5);
 
-  // GSAP odometer ref for the multiplier
-  const multDisplayRef = useRef<HTMLDivElement>(null);
-  const multValueRef = useRef({ value: mult });
+  // Compute multiplier and potential payout
+  const shouldShow = word && word.length >= 3;
+  const mult = shouldShow ? oddsMultiplier(word) : 1.5;
+  const payout = shouldShow ? Math.round(stake * mult) : 0;
 
-  // Animate multiplier change with GSAP (unless reduced motion)
+  // GSAP odometer animation
   useEffect(() => {
-    if (shouldReduceMotion || !hasValidWord) {
-      multValueRef.current.value = mult;
-      if (multDisplayRef.current) {
-        multDisplayRef.current.textContent = multText;
-      }
+    if (reducedMotion) {
+      displayedMultRef.current = mult;
+      setDisplayedMult(mult);
       return;
     }
 
-    const oldValue = multValueRef.current.value;
-    multValueRef.current.value = mult;
+    gsap.to(displayedMultRef, {
+      current: mult,
+      duration: 0.6,
+      ease: 'power2.out',
+      onUpdate: () => {
+        setDisplayedMult(Math.round(displayedMultRef.current * 10) / 10);
+      },
+    });
+  }, [mult, reducedMotion]);
 
-    // Only animate if the value actually changed
-    if (oldValue !== mult && hasValidWord) {
-      gsap.to(multValueRef.current, {
-        value: mult,
-        duration: 0.5,
-        onUpdate: () => {
-          if (multDisplayRef.current) {
-            multDisplayRef.current.textContent = multValueRef.current.value.toFixed(1);
-          }
-        },
-      });
-    } else if (multDisplayRef.current) {
-      multDisplayRef.current.textContent = multText;
-    }
-  }, [mult, hasValidWord, shouldReduceMotion, multText]);
+  const multDisplay = shouldShow ? displayedMult.toFixed(1) : '—';
+  const payoutText = shouldShow ? t('sealedBid.potentialPayout', { amount: payout }) : '—';
+  const multText = t('sealedBid.uniquePays', { mult: multDisplay });
 
   return (
-    <div className="border-neo-thick border-black shadow-hard-lg bg-neo-navy-light rounded-neo p-3 flex items-center justify-between gap-4">
-      {/* Multiplier */}
-      <div>
-        <div
-          data-testid="odds-mult"
-          className="font-neo-display text-3xl text-neo-yellow leading-none"
-        >
-          <span ref={multDisplayRef}>{multText}</span>
-          <span className="text-base">×</span>
-        </div>
-        <div className="text-xs text-neo-cream mt-0.5">
-          {t('sealedBid.uniquePays', { mult: multText })}
-        </div>
+    <div className="flex flex-col items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-navy-light p-6 shadow-hard-lg">
+      {/* Multiplier display */}
+      <div
+        data-testid="odds-mult"
+        className="text-center font-neo-display text-5xl font-bold text-neo-yellow leading-tight"
+      >
+        {multText}
       </div>
 
-      {/* Payout */}
-      <div className="text-right">
-        <div
-          data-testid="odds-payout"
-          className="font-neo-body text-neo-cyan text-xl leading-none"
-        >
-          {payout}
-        </div>
-        <div className="text-xs text-neo-cream mt-0.5">
-          {t('sealedBid.potentialPayout', { amount: payout })}
-        </div>
+      {/* Payout display */}
+      <div
+        data-testid="odds-payout"
+        className="text-center font-neo-body text-lg text-neo-cyan"
+      >
+        {payoutText}
       </div>
     </div>
   );

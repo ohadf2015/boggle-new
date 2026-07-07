@@ -11,11 +11,11 @@
 
 ## Current (in progress)
 
-### word-tower — readiness: 86% — status: AUDIT IN PROGRESS
+### word-tower — readiness: 87% — status: AUDIT IN PROGRESS
 - **Why first:** closest to release (deep: 30 components + 69 lib files), admin/beta-gated, no public exposure yet.
 - **Reach for QA:** `https://www.lexiclash.live/en/word-tower?word-tower=1` (the `?word-tower=1` override force-enables the gated mode for non-admins — see `lib/wordTower/flags.ts`). Hebrew RTL: `/he/word-tower?word-tower=1`. Local dev (NODE_ENV=development) needs no override.
 - **Key files:** `components/wordTower/*`, `lib/wordTower/*`, `app/[locale]/word-tower/{page,PageClient}.tsx`, `app/api/word-tower/*`.
-- **Last audited:** 2026-07-06
+- **Last audited:** 2026-07-07
 
 ### Audit areas covered
 - [x] **Bugs / correctness** — null guards, unguarded Record access, double-scaling score (VERIFIED NOT A BUG 2026-06-29 — `placementMultiplier × appliedHeightMult` is intentional multiplicative compounding: crane quality × updraft bonus), damageTower combo reset
@@ -62,6 +62,8 @@
 - [x] **WordTowerBackdrop.tsx / TowerNotice.tsx / WordTowerSighting.tsx** — AUDITED CLEAN 2026-07-06.
 - [x] **WordTowerCrane.tsx** — AUDITED CLEAN 2026-07-06: `+{hiddenCount}` badge is `aria-hidden` (decorative) — acceptable.
 - [x] **WordTowerHud.tsx perk badge** — FIXED 2026-07-06: hardcoded `+50%` replaced with `+${Math.round((pk.heightMult - 1) * 100)}%` — derives from `ActiveRunPerk.heightMult` so display auto-updates if constant changes. (`WordTowerHud.tsx:158`)
+- [x] **safeToLocaleString integration (WordTowerRewardReveal + WordTowerUpgradePanel)** — AUDITED CLEAN 2026-07-07: language prop correctly threaded from WordTowerPlay → WordTowerNoticeColumn → WordTowerRewardReveal and WordTowerPlay → WordTowerUpgradePanel. Missing `language` prop call site FIXED (`WordTowerPlay.tsx:1070`).
+- [x] **WordTowerSmashScene.tsx Pixi ticker null guard** — REGRESSION RESTORED 2026-07-07: `engine.app.ticker?.remove(tick)` null guard (Sentry JAVASCRIPT-NEXTJS-1R6/1R7) was removed in uncommitted modifications; restored. Regression test suite also restored in `__tests__/WordTowerSmashScene.test.tsx`.
 - [ ] **Visual QA** — not captured (code-audit only; mode is admin-gated on prod)
 
 ### Open issues (severity → owner)

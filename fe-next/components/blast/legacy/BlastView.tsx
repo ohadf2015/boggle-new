@@ -573,6 +573,7 @@ export function BlastView() {
         <BlastUpgradePanel
           onClose={() => setShowStore(false)}
           t={t}
+          language={language}
           dir={language === 'he' ? 'rtl' : 'ltr'}
         />
       )}

@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { retryImport } from '@/utils/retryImport';
 import { LoadingDancer } from '@/components/ui/LoadingDancer';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
-import { trackInviteLanded, trackInviteRedirectFired } from '@/utils/growthTracking';
+import { trackInviteLanded, trackInviteRedirectFired, trackGrowthEvent } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
 import { isCrawler } from '@/lib/seo/isCrawler';
 import { LandingView } from '@/components/landing';
@@ -141,6 +141,15 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // waits for mount, same discipline as showFTUE.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  // Instrument landing page views — fires once after hydration on the real
+  // homepage (not redirects, not crawlers). Fills the funnel's top-step gap
+  // (landing_view = 0 in PostHog because no call site existed here before).
+  useEffect(() => {
+    if (!mounted || inviteRedirectUrl) return;
+    if (isCrawler()) return;
+    trackGrowthEvent('landing_view', { is_new_user: isNewUser });
+  }, [mounted, inviteRedirectUrl, isNewUser]);
   // Defensive route allowlist: FTUE may only render on locale homepage.
   // PageClient is mounted only at /[locale]/page.tsx today, so this is dormant
   // for current users — but guards against a future hoist that would leak the

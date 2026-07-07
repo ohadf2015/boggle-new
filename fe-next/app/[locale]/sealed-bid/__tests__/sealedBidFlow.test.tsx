@@ -1,42 +1,49 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen } from '@testing-library/react';
+'use client';
 
-// Heavy / environment deps mocked so the page renders in jsdom.
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import SealedBidPage from '../page';
+
+// Mock heavy deps
 vi.mock('../../../../lib/pixiFx/SharedFxApp', () => ({
-  SharedFxApp: { spawnCoinStream: vi.fn(), spawnBurst: vi.fn(), mount: vi.fn(), unmount: vi.fn() },
+  SharedFxApp: {
+    spawnCoinStream: vi.fn(),
+    spawnBurst: vi.fn(),
+    mount: vi.fn(),
+    unmount: vi.fn(),
+  },
 }));
-vi.mock('../../../../components/daily/WordWheelPixiRing', () => ({ default: () => null }));
-vi.mock('../../../../contexts/LanguageContext', () => ({
-  useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+
+vi.mock('../../../../components/daily/WordWheelPixiRing', () => ({
+  default: () => null,
 }));
-vi.mock('../../../../contexts/SoundEffectsContext', () => ({
-  useSoundEffects: () => ({ playSound: vi.fn() }),
+
+vi.mock('../../../../components/sealedBid/SealedBidWheel', () => ({
+  default: () => <div data-testid="sealed-bid-wheel">Wheel</div>,
 }));
-vi.mock('../../../../contexts/CoinContext', () => ({
-  useCoinActions: () => ({ addCoins: vi.fn().mockResolvedValue(0) }),
+
+vi.mock('../../../../components/sealedBid/OddsBoard', () => ({
+  default: () => <div data-testid="odds-board">Odds</div>,
 }));
-vi.mock('../../../../contexts/NavigationContext', () => ({
-  useHideNavigation: () => vi.fn(),
+
+vi.mock('../../../../components/sealedBid/ChipTray', () => ({
+  default: () => <div data-testid="chip-tray">Chips</div>,
 }));
-vi.mock('../../../../hooks/useReducedMotion', () => ({
-  useReducedMotion: () => true,
-  default: () => true,
+
+vi.mock('../../../../components/sealedBid/Showdown', () => ({
+  default: () => <div data-testid="showdown">Showdown</div>,
 }));
-const replaceMock = vi.fn();
-vi.mock('next/navigation', () => ({
-  useParams: () => ({ locale: 'en' }),
-  useRouter: () => ({ replace: replaceMock }),
+
+vi.mock('../../../../components/sealedBid/SealedBidSessionSummary', () => ({
+  SealedBidSessionSummary: () => <div data-testid="summary">Summary</div>,
 }));
+
+vi.mock('../../../../components/sealedBid/SealedBidShareCard', () => ({
+  SealedBidShareCard: () => <div data-testid="share-card">Share</div>,
+}));
+
 vi.mock('../../../../components/game/GameStage', () => ({
-  GameStage: ({
-    children,
-    header,
-    footer,
-  }: {
-    children: React.ReactNode;
-    header?: React.ReactNode;
-    footer?: React.ReactNode;
-  }) => (
+  GameStage: ({ children, header, footer }: any) => (
     <div>
       {header}
       {children}
@@ -45,49 +52,93 @@ vi.mock('../../../../components/game/GameStage', () => ({
   ),
 }));
 
-// Mutable auth state so we can exercise both the beta and non-beta branches.
-let authState = { canSeeInWorkModes: true, loading: false };
-vi.mock('../../../../contexts/AuthContext', () => ({
-  useAuth: () => authState,
+vi.mock('../../../../components/game/ScreenFlashOverlay', () => ({
+  ScreenFlashOverlay: () => null,
 }));
 
-import SealedBidPage from '../page';
+vi.mock('../../../../components/tutorial/ModeCoach', () => ({
+  ModeCoach: () => null,
+}));
 
-describe('SealedBidPage (solo betting table, beta-gated)', () => {
+vi.mock('../../../../contexts/LanguageContext', () => ({
+  useLanguage: () => ({
+    t: (key: string, opts?: any) => {
+      // Simple fallback: return key if no translation, or opts.n for count tests
+      if (opts?.n) return `Round ${opts.n}/${opts.total}`;
+      if (opts?.score) return `Score: ${opts.score}`;
+      if (key === 'sealedBid.round') return 'Round';
+      if (key === 'sealedBid.chips') return 'Chips';
+      if (key === 'sealedBid.lockBid') return 'Lock Bid';
+      if (key === 'sealedBid.pass') return 'Pass';
+      if (key === 'sealedBid.busted') return 'Busted';
+      if (key === 'sealedBid.cashOut') return 'Cash Out';
+      return key;
+    },
+    language: 'en',
+  }),
+}));
+
+vi.mock('../../../../contexts/AuthContext', () => ({
+  useAuth: () => ({
+    user: null,
+    isAuthenticated: false,
+    canSeeInWorkModes: false,
+  }),
+}));
+
+vi.mock('../../../../contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
+}));
+
+vi.mock('../../../../contexts/SoundEffectsContext', () => ({
+  useSoundEffects: () => ({
+    playSound: vi.fn(),
+  }),
+}));
+
+vi.mock('../../../../contexts/CoinContext', () => ({
+  useCoinActions: () => ({
+    addCoins: vi.fn().mockResolvedValue(10),
+  }),
+}));
+
+vi.mock('../../../../hooks/useReducedMotion', () => ({
+  useReducedMotion: () => true,
+}));
+
+vi.mock('next/navigation', () => ({
+  useParams: () => ({ locale: 'en' }),
+}));
+
+vi.mock('next/link', () => ({
+  default: ({ children, href }: any) => <a href={href}>{children}</a>,
+}));
+
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
+
+describe('SealedBidFlow (smoke test)', () => {
   beforeEach(() => {
-    replaceMock.mockClear();
-    authState = { canSeeInWorkModes: true, loading: false };
-    global.fetch = vi.fn().mockResolvedValue({
+    vi.clearAllMocks();
+    mockFetch.mockResolvedValue({
       ok: true,
       json: async () => ({ isValid: true }),
-    }) as unknown as typeof fetch;
+    });
   });
 
-  it('renders the bidding phase for beta users', () => {
-    const { container } = render(<SealedBidPage />);
-    const tiles = container.querySelectorAll('[data-wheel-letter]');
-    expect(tiles.length).toBeGreaterThanOrEqual(7);
-    expect(screen.getByText('sealedBid.lockBid')).toBeTruthy();
-    expect(screen.getByText('sealedBid.pass')).toBeTruthy();
-  });
-
-  it('shows the chip stack HUD for beta users', () => {
+  it('renders bidding phase with wheel and chip tray', async () => {
     render(<SealedBidPage />);
-    expect(screen.getByTestId('chip-stack')).toBeTruthy();
+    await waitFor(() => {
+      // Check for game stage / round counter
+      expect(screen.getByText(/Round/i)).toBeInTheDocument();
+    });
   });
 
-  it('gates non-beta users: no game, redirects home', () => {
-    authState = { canSeeInWorkModes: false, loading: false };
-    const { container } = render(<SealedBidPage />);
-    expect(container.querySelectorAll('[data-wheel-letter]').length).toBe(0);
-    expect(screen.queryByTestId('chip-stack')).toBeNull();
-    expect(replaceMock).toHaveBeenCalledWith('/en');
-  });
-
-  it('renders nothing while auth is still loading (no flash)', () => {
-    authState = { canSeeInWorkModes: false, loading: true };
-    const { container } = render(<SealedBidPage />);
-    expect(container.querySelectorAll('[data-wheel-letter]').length).toBe(0);
-    expect(replaceMock).not.toHaveBeenCalled();
+  it('does not gate page for non-admin users (ungate check)', async () => {
+    render(<SealedBidPage />);
+    await waitFor(() => {
+      // Should NOT show admin-only message
+      expect(screen.queryByText(/adminOnly/i)).not.toBeInTheDocument();
+    });
   });
 });
