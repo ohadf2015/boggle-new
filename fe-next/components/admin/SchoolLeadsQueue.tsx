@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchWithAuth } from '@/utils/authFetch';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   SCHOOL_LEAD_ROLES,
   STUDENT_COUNT_BUCKETS,
@@ -87,26 +88,34 @@ export function SchoolLeadsQueue() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <select value={role} onChange={(e) => { setPage(0); setRole(e.target.value); }}
-          className="rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-sm text-neo-white">
-          <option value="">{t('admin.schoolLeads.filter_role_all')}</option>
-          {SCHOOL_LEAD_ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
-        </select>
-        <select value={studentCount} onChange={(e) => { setPage(0); setStudentCount(e.target.value); }}
-          className="rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-sm text-neo-white">
-          <option value="">{t('admin.schoolLeads.filter_size_all')}</option>
-          {STUDENT_COUNT_BUCKETS.map((b) => <option key={b} value={b}>{SIZE_LABEL[b]}</option>)}
-        </select>
-        <select value={interest} onChange={(e) => { setPage(0); setInterest(e.target.value); }}
-          className="rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-sm text-neo-white">
-          <option value="">{t('admin.schoolLeads.filter_interest_all')}</option>
-          {SCHOOL_LEAD_INTERESTS.map((i) => <option key={i} value={i}>{i}</option>)}
-        </select>
-        <select value={locale} onChange={(e) => { setPage(0); setLocale(e.target.value); }}
-          className="rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-sm text-neo-white">
-          <option value="">all</option>
-          {['en', 'he', 'sv', 'ja', 'es'].map((l) => <option key={l} value={l}>{l}</option>)}
-        </select>
+        <Select value={role || '_all'} onValueChange={(v) => { setPage(0); setRole(v === '_all' ? '' : v); }}>
+          <SelectTrigger className="h-8 w-auto rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-sm text-neo-white"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">{t('admin.schoolLeads.filter_role_all')}</SelectItem>
+            {SCHOOL_LEAD_ROLES.map((r) => <SelectItem key={r} value={r}>{r}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={studentCount || '_all'} onValueChange={(v) => { setPage(0); setStudentCount(v === '_all' ? '' : v); }}>
+          <SelectTrigger className="h-8 w-auto rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-sm text-neo-white"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">{t('admin.schoolLeads.filter_size_all')}</SelectItem>
+            {STUDENT_COUNT_BUCKETS.map((b) => <SelectItem key={b} value={b}>{SIZE_LABEL[b]}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={interest || '_all'} onValueChange={(v) => { setPage(0); setInterest(v === '_all' ? '' : v); }}>
+          <SelectTrigger className="h-8 w-auto rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-sm text-neo-white"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">{t('admin.schoolLeads.filter_interest_all')}</SelectItem>
+            {SCHOOL_LEAD_INTERESTS.map((i) => <SelectItem key={i} value={i}>{i}</SelectItem>)}
+          </SelectContent>
+        </Select>
+        <Select value={locale || '_all'} onValueChange={(v) => { setPage(0); setLocale(v === '_all' ? '' : v); }}>
+          <SelectTrigger className="h-8 w-auto rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-sm text-neo-white"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="_all">all</SelectItem>
+            {['en', 'he', 'sv', 'ja', 'es'].map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+          </SelectContent>
+        </Select>
         <button type="button" onClick={() => { fetchRows(); fetchCounts(); }}
           className="ml-auto rounded bg-neo-lime px-3 py-1 text-sm font-bold text-neo-navy">
           {t('admin.schoolLeads.refresh')}

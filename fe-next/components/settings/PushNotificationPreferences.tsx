@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { m } from 'framer-motion';
 import { Bell, BellOff, Clock, AlertTriangle, Check, Settings } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
 import { cn } from '@/lib/utils';
@@ -68,8 +69,8 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
   }
 
   // Handle hour change
-  async function handleHourChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const newHour = parseInt(e.target.value, 10);
+  async function handleHourChange(value: string) {
+    const newHour = parseInt(value, 10);
     setIsSaving(true);
     try {
       await setTime(newHour, preferences.minute);
@@ -79,8 +80,8 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
   }
 
   // Handle minute change
-  async function handleMinuteChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const newMinute = parseInt(e.target.value, 10);
+  async function handleMinuteChange(value: string) {
+    const newMinute = parseInt(value, 10);
     setIsSaving(true);
     try {
       await setTime(preferences.hour, newMinute);
@@ -243,45 +244,39 @@ export function PushNotificationPreferences({ isDarkMode }: PushNotificationPref
 
           <div className="flex gap-2">
             {/* Hour Selector */}
-            <select
-              value={preferences.hour}
-              onChange={handleHourChange}
+            <Select
+              value={String(preferences.hour)}
+              onValueChange={handleHourChange}
               disabled={isSaving}
-              aria-label="Select hour"
-              className={cn(
-                'flex-1 px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-                isDarkMode
-                  ? 'bg-neo-navy-light border-slate-600 text-white'
-                  : 'bg-white border-gray-300 text-gray-900',
-                isSaving && 'opacity-50 cursor-not-allowed'
-              )}
             >
-              {HOUR_OPTIONS.map((hour) => (
-                <option key={hour} value={hour}>
-                  {formatHour(hour)}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger className="flex-1" aria-label="Select hour">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {HOUR_OPTIONS.map((hour) => (
+                  <SelectItem key={hour} value={String(hour)}>
+                    {formatHour(hour)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* Minute Selector */}
-            <select
-              value={preferences.minute}
-              onChange={handleMinuteChange}
+            <Select
+              value={String(preferences.minute)}
+              onValueChange={handleMinuteChange}
               disabled={isSaving}
-              aria-label="Select minute"
-              className={cn(
-                'w-24 px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-                isDarkMode
-                  ? 'bg-neo-navy-light border-slate-600 text-white'
-                  : 'bg-white border-gray-300 text-gray-900',
-                isSaving && 'opacity-50 cursor-not-allowed'
-              )}
             >
-              <option value={0}>:00</option>
-              <option value={15}>:15</option>
-              <option value={30}>:30</option>
-              <option value={45}>:45</option>
-            </select>
+              <SelectTrigger className="w-24" aria-label="Select minute">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="0">:00</SelectItem>
+                <SelectItem value="15">:15</SelectItem>
+                <SelectItem value="30">:30</SelectItem>
+                <SelectItem value="45">:45</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       )}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ThumbsUp, ThumbsDown, HelpCircle, Save, Flag } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getPuzzlesForLocale } from '@/lib/connections/puzzles';
 import { buildReviewRows, filterRows, type ReviewFilter } from '@/lib/connections/reviewUi';
 import { fetchReviews, saveReviews, type FeedbackStat, type SaveVerdict } from '@/lib/connections/reviewClient';
@@ -128,18 +129,30 @@ export default function ConnectionsReviewPanel() {
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2" data-testid="review-filters">
-        <select aria-label="language" className="rounded-neo border-neo border-neo-white/20 bg-neo-navy px-2 py-1 text-sm" value={filter.language} onChange={(e) => setFilter((f) => ({ ...f, language: e.target.value as ReviewFilter['language'] }))}>
-          <option value="all">All langs</option><option value="en">English</option><option value="he">Hebrew</option><option value="es">Spanish</option><option value="sv">Swedish</option><option value="ja">Japanese</option>
-        </select>
-        <select aria-label="difficulty" className="rounded-neo border-neo border-neo-white/20 bg-neo-navy px-2 py-1 text-sm" value={filter.difficulty} onChange={(e) => setFilter((f) => ({ ...f, difficulty: e.target.value as ReviewFilter['difficulty'] }))}>
-          <option value="all">All diff</option><option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option>
-        </select>
-        <select aria-label="source" className="rounded-neo border-neo border-neo-white/20 bg-neo-navy px-2 py-1 text-sm" value={filter.source} onChange={(e) => setFilter((f) => ({ ...f, source: e.target.value as ReviewFilter['source'] }))}>
-          <option value="all">All sources</option><option value="curated">Curated</option><option value="generated">Generated</option><option value="online">Online</option>
-        </select>
-        <select aria-label="status" className="rounded-neo border-neo border-neo-white/20 bg-neo-navy px-2 py-1 text-sm" value={filter.status} onChange={(e) => setFilter((f) => ({ ...f, status: e.target.value as ReviewFilter['status'] }))}>
-          <option value="all">All status</option><option value="unreviewed">Unreviewed</option><option value="good">Good</option><option value="bad">Bad</option><option value="unsure">Unsure</option>
-        </select>
+        <Select value={filter.language} onValueChange={(v) => setFilter((f) => ({ ...f, language: v as ReviewFilter['language'] }))}>
+          <SelectTrigger aria-label="language" className="h-8 w-auto px-2 py-1 text-sm"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All langs</SelectItem><SelectItem value="en">English</SelectItem><SelectItem value="he">Hebrew</SelectItem><SelectItem value="es">Spanish</SelectItem><SelectItem value="sv">Swedish</SelectItem><SelectItem value="ja">Japanese</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={filter.difficulty} onValueChange={(v) => setFilter((f) => ({ ...f, difficulty: v as ReviewFilter['difficulty'] }))}>
+          <SelectTrigger aria-label="difficulty" className="h-8 w-auto px-2 py-1 text-sm"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All diff</SelectItem><SelectItem value="easy">Easy</SelectItem><SelectItem value="medium">Medium</SelectItem><SelectItem value="hard">Hard</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={filter.source} onValueChange={(v) => setFilter((f) => ({ ...f, source: v as ReviewFilter['source'] }))}>
+          <SelectTrigger aria-label="source" className="h-8 w-auto px-2 py-1 text-sm"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All sources</SelectItem><SelectItem value="curated">Curated</SelectItem><SelectItem value="generated">Generated</SelectItem><SelectItem value="online">Online</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={filter.status} onValueChange={(v) => setFilter((f) => ({ ...f, status: v as ReviewFilter['status'] }))}>
+          <SelectTrigger aria-label="status" className="h-8 w-auto px-2 py-1 text-sm"><SelectValue /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All status</SelectItem><SelectItem value="unreviewed">Unreviewed</SelectItem><SelectItem value="good">Good</SelectItem><SelectItem value="bad">Bad</SelectItem><SelectItem value="unsure">Unsure</SelectItem>
+          </SelectContent>
+        </Select>
         <button type="button" onClick={selectAllVisible} className="rounded-neo border-neo border-neo-cyan/60 px-3 py-1 text-sm text-neo-cyan">
           {selected.size === visible.length && visible.length > 0 ? 'Deselect all' : `Select all (${visible.length})`}
         </button>

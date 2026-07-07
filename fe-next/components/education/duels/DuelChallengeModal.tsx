@@ -21,6 +21,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
 import { cn } from '@/lib/utils';
 import { X, Swords } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 // ============================================
 // TYPE DEFINITIONS
@@ -183,24 +184,26 @@ export default function DuelChallengeModal({
           <label className="block text-neo-white font-bold mb-2">
             {t('selectLesson')}
           </label>
-          <select
-            value={selectedLessonId}
-            onChange={(e) => setSelectedLessonId(e.target.value)}
-            className={cn(
-              'w-full px-4 py-3 rounded-neo',
-              'bg-neo-navy border-neo border-neo-black',
-              'text-neo-white font-neo-body shadow-hard-sm',
-              'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan'
-            )}
-            aria-label={t('selectLesson')}
-          >
-            <option value="">{t('selectLesson')}</option>
-            {lessons.map((lesson) => (
-              <option key={lesson.id} value={lesson.id}>
-                {lesson.name}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedLessonId} onValueChange={setSelectedLessonId}>
+            <SelectTrigger
+              className={cn(
+                'w-full px-4 py-3',
+                'bg-neo-navy border-neo border-neo-black',
+                'text-neo-white font-neo-body shadow-hard-sm',
+                'focus:ring-neo-cyan'
+              )}
+              aria-label={t('selectLesson')}
+            >
+              <SelectValue placeholder={t('selectLesson')} />
+            </SelectTrigger>
+            <SelectContent>
+              {lessons.map((lesson) => (
+                <SelectItem key={lesson.id} value={lesson.id}>
+                  {lesson.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Actions */}

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Search } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Language } from '@/types';
 import type { ValidationStatus } from '../types';
 
@@ -61,65 +62,69 @@ export function WordBankFilters({
         {/* Language Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">{t('admin.wordBank.language')}</label>
-          <select
-            value={selectedLanguage}
-            onChange={e => onLanguageChange(e.target.value as Language)}
-            className="w-full bg-neo-navy border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
-          >
-            {LANGUAGES.map(lang => (
-              <option key={lang} value={lang}>
-                {lang.toUpperCase()}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedLanguage} onValueChange={v => onLanguageChange(v as Language)}>
+            <SelectTrigger className="w-full bg-neo-navy border-gray-700 text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LANGUAGES.map(lang => (
+                <SelectItem key={lang} value={lang}>
+                  {lang.toUpperCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Status Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">{t('admin.wordBank.status')}</label>
-          <select
-            value={selectedStatus}
-            onChange={e => onStatusChange(e.target.value as typeof selectedStatus)}
-            className="w-full bg-neo-navy border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
-          >
-            {STATUSES.map(status => (
-              <option key={status.value} value={status.value}>
-                {status.label}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedStatus} onValueChange={v => onStatusChange(v as typeof selectedStatus)}>
+            <SelectTrigger className="w-full bg-neo-navy border-gray-700 text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUSES.map(status => (
+                <SelectItem key={status.value} value={status.value}>
+                  {status.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Validation Status Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">{t('admin.wordBank.validationStatus')}</label>
-          <select
-            value={selectedValidationStatus}
-            onChange={e => onValidationStatusChange(e.target.value as typeof selectedValidationStatus)}
-            className="w-full bg-neo-navy border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
-          >
-            {VALIDATION_STATUSES.map(status => (
-              <option key={status.value} value={status.value}>
-                {status.label}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedValidationStatus} onValueChange={v => onValidationStatusChange(v as typeof selectedValidationStatus)}>
+            <SelectTrigger className="w-full bg-neo-navy border-gray-700 text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {VALIDATION_STATUSES.map(status => (
+                <SelectItem key={status.value} value={status.value}>
+                  {status.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Source Filter */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">{t('admin.wordBank.source')}</label>
-          <select
-            value={selectedSource}
-            onChange={e => onSourceChange(e.target.value)}
-            className="w-full bg-neo-navy border border-gray-700 text-white rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
-          >
-            {SOURCES.map(source => (
-              <option key={source.value} value={source.value}>
-                {source.label}
-              </option>
-            ))}
-          </select>
+          <Select value={selectedSource} onValueChange={onSourceChange}>
+            <SelectTrigger className="w-full bg-neo-navy border-gray-700 text-white">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {SOURCES.map(source => (
+                <SelectItem key={source.value} value={source.value}>
+                  {source.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Search */}

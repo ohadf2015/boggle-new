@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { m } from 'framer-motion';
 import { Plus, Loader2 } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import WordPackCard from './WordPackCard';
 import WordPackBuilder from './WordPackBuilder';
 
@@ -146,39 +148,42 @@ export default function WordPackGallery() {
       </div>
 
       {/* Sort tabs */}
-      <div className="flex gap-1 mb-4" role="tablist" aria-label={t('ugc.gallery.sortLabel')}>
-        {SORT_TABS.map((tab) => (
-          <button
-            key={tab.value}
-            type="button"
-            role="tab"
-            aria-selected={sort === tab.value}
-            onClick={() => setSort(tab.value)}
-            className={`px-4 py-2 text-sm font-neo-display border-neo border-black rounded-neo transition-colors ${
-              sort === tab.value
-                ? 'bg-neo-yellow text-black shadow-hard-sm'
-                : 'bg-neo-navy text-neo-white hover:bg-neo-navy/80'
-            }`}
-          >
-            {t(tab.labelKey)}
-          </button>
-        ))}
-      </div>
+      <Tabs value={sort} onValueChange={(v) => setSort(v as SortOption)} className="mb-4">
+        <TabsList
+          variant="pill"
+          className="h-auto gap-1 bg-transparent p-0"
+          aria-label={t('ugc.gallery.sortLabel')}
+        >
+          {SORT_TABS.map((tab) => (
+            <TabsTrigger
+              key={tab.value}
+              value={tab.value}
+              variant="pill"
+              className="rounded-neo border-neo border-black bg-neo-navy px-4 py-2 text-sm font-neo-display text-neo-white transition-colors hover:bg-neo-navy/80 data-[state=active]:bg-neo-yellow data-[state=active]:text-black data-[state=active]:shadow-hard-sm"
+            >
+              {t(tab.labelKey)}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </Tabs>
 
       {/* Language filter */}
       <div className="mb-6">
-        <select
-          value={language}
-          onChange={(e) => setLanguage(e.target.value)}
-          aria-label={t('ugc.gallery.languageFilter')}
-          className="px-3 py-2 bg-neo-navy border-neo border-black rounded-neo text-neo-white text-sm focus:outline-hidden focus:ring-2 focus:ring-neo-yellow"
-        >
-          {LANGUAGES.map((lang) => (
-            <option key={lang.value} value={lang.value}>
-              {lang.value === 'all' ? t(lang.label) : lang.label}
-            </option>
-          ))}
-        </select>
+        <Select value={language} onValueChange={setLanguage}>
+          <SelectTrigger
+            className="w-auto bg-neo-navy border-black text-neo-white text-sm focus:ring-neo-yellow"
+            aria-label={t('ugc.gallery.languageFilter')}
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {LANGUAGES.map((lang) => (
+              <SelectItem key={lang.value} value={lang.value}>
+                {lang.value === 'all' ? t(lang.label) : lang.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       {/* Error */}

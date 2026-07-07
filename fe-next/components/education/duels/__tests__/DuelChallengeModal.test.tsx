@@ -7,6 +7,38 @@ import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
 // Mock dependencies
 vi.mock('@/hooks/useDuelSocket');
 
+// Radix Select isn't a native <select> (no change event, portal-rendered options) —
+// stand in with a native select so existing fireEvent.change-based tests still drive it.
+vi.mock('@/components/ui/select', () => {
+  const Select = ({
+    value,
+    onValueChange,
+    children,
+  }: {
+    value: string;
+    onValueChange: (v: string) => void;
+    children: React.ReactNode;
+  }) => (
+    <select
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+    >
+      {children}
+    </select>
+  );
+  const SelectItem = ({ value, children }: { value: string; children: React.ReactNode }) => (
+    <option value={value}>{children}</option>
+  );
+  const passthrough = ({ children }: { children?: React.ReactNode }) => <>{children}</>;
+  return {
+    Select,
+    SelectContent: passthrough,
+    SelectItem,
+    SelectTrigger: passthrough,
+    SelectValue: passthrough,
+  };
+});
+
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     language: 'en',

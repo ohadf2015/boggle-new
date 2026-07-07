@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { postHogPersonUrl } from '@/lib/admin/postHogLinks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import Avatar from '@/components/Avatar';
 import type { Player, CuratorAssignmentRow } from './playerManagerTypes';
 import { PlayerCuratorControl } from './PlayerCuratorControl';
@@ -61,12 +62,11 @@ export function PlayerCard({
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           {/* Player Info */}
           <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={selected}
-              onChange={() => onToggleSelect(player.id)}
+              onCheckedChange={() => onToggleSelect(player.id)}
               aria-label={`Select ${name}`}
-              className="w-4 h-4 flex-shrink-0"
+              className="flex-shrink-0"
             />
             <Avatar customAvatar={player.avatar_config} userId={player.id} size="lg" />
             <div>

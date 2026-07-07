@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -255,20 +256,21 @@ export default function SettingsPageClient(): React.JSX.Element {
                 label={t('settings.language')}
                 isDarkMode={isDarkMode}
               >
-                <select
+                <Select
                   value={language}
-                  onChange={(e) => setLanguage(e.target.value as 'en' | 'he' | 'sv' | 'ja' | 'es')}
-                  className={cn(
-                    'px-3 py-2 rounded-neo border-3 border-neo-black font-bold',
-                    isDarkMode ? 'bg-neo-navy-elevated text-white' : 'bg-neo-cream text-neo-black'
-                  )}
+                  onValueChange={(v) => setLanguage(v as 'en' | 'he' | 'sv' | 'ja' | 'es')}
                 >
-                  {LANGUAGES.map((lang) => (
-                    <option key={lang.code} value={lang.code}>
-                      {lang.flag} {lang.name}
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger className="w-auto">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {LANGUAGES.map((lang) => (
+                      <SelectItem key={lang.code} value={lang.code}>
+                        {lang.flag} {lang.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </SettingRow>
             </div>
           </m.section>

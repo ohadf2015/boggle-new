@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Trash2, AlertTriangle, Check, X, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { WordBankWord, ValidationStatus } from '../types';
 
@@ -124,11 +125,9 @@ export function WordBankTable({
           <thead className="bg-neo-navy-light border-b-2 border-gray-700">
             <tr>
               <th className="px-2 py-3 text-center">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={allSelected}
-                  onChange={onToggleSelectAll}
-                  className="w-4 h-4 rounded border-gray-600 bg-neo-navy-light text-neo-yellow focus:ring-neo-yellow"
+                  onCheckedChange={onToggleSelectAll}
                 />
               </th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">
@@ -155,11 +154,9 @@ export function WordBankTable({
             {words.map(word => (
               <tr key={word.id} className={`hover:bg-neo-navy-light/50 transition-colors ${selectedWords.has(word.id) ? 'bg-neo-yellow/5' : ''}`}>
                 <td className="px-2 py-3 text-center">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={selectedWords.has(word.id)}
-                    onChange={() => onToggleSelect(word.id)}
-                    className="w-4 h-4 rounded border-gray-600 bg-neo-navy-light text-neo-yellow focus:ring-neo-yellow"
+                    onCheckedChange={() => onToggleSelect(word.id)}
                   />
                 </td>
                 <td className="px-4 py-3">

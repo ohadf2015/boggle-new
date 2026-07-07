@@ -38,4 +38,10 @@
 
 **Halftone Texture:** Body has subtle dot pattern overlay, use `texture-halftone` class
 
+**Reuse shadcn/Radix primitives — don't hand-roll:**
+- Before writing a `<select>`, modal overlay, dropdown menu, tabs, switch/toggle, tooltip, textarea, or progress bar, check `components/ui/` first: `select.tsx`, `dialog.tsx`/`alert-dialog.tsx`, `dropdown-menu.tsx`, `tabs.tsx`, `switch.tsx`/`toggle-group.tsx`, `tooltip.tsx`, `textarea.tsx`, `progress.tsx` already exist, are Radix-backed (a11y/keyboard-nav for free), and are pre-skinned to this neo-brutalist system.
+- These are NOT vanilla shadcn — variants/colors are heavily customized (see button.tsx). Never re-run `npx shadcn add <x> --overwrite`; it reverts to stock Tailwind styling and destroys the customization.
+- Exception: game-board/canvas/Pixi interactions, animated combo/health/wave meters, and drag mechanics are intentional custom game-feel — not shadcn's job, don't force a primitive there.
+- Radix `Select.Item`/similar can't take `value=""` — use a sentinel (e.g. `"_all"`) and map to/from your real empty-string state at the boundary.
+
 **RTL Directional Icons:** For ANY back/exit/directional icon (arrows, LogOut), use `<DirectionalIcon icon={ArrowLeft} className="…" />` (`components/ui/DirectionalIcon.tsx`) — it auto-flips in RTL. Symmetric arrows flip by default (`rtl:rotate-180`); asymmetric icons (LogOut) need the `mirror` prop (`rtl:scale-x-[-1]`) since rotating them looks upside-down. Full back/exit buttons prefer `BackButton` (nav-up) / `ExitRoomButton` (game→lobby). Never hand-write `rtl:rotate-180` on a directional icon.

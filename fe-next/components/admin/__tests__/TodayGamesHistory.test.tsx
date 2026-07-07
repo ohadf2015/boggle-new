@@ -26,6 +26,42 @@ vi.mock('framer-motion', () => {
   };
 });
 
+// Radix Select isn't a native <select> (no change event, no getByDisplayValue
+// support) — stand in with a native select so existing fireEvent.change /
+// getByDisplayValue-based tests still drive it. aria-label lives on
+// SelectTrigger in real usage, so it's lifted onto the underlying <select>.
+vi.mock('@/components/ui/select', () => {
+  const Select = ({
+    value,
+    onValueChange,
+    disabled,
+    children,
+  }: React.PropsWithChildren<{ value: string; onValueChange: (v: string) => void; disabled?: boolean }>) => {
+    let ariaLabel: string | undefined;
+    React.Children.forEach(children, (child) => {
+      if (React.isValidElement(child) && (child.props as Record<string, unknown>)['aria-label']) {
+        ariaLabel = (child.props as Record<string, string>)['aria-label'];
+      }
+    });
+    return (
+      <select value={value} disabled={disabled} aria-label={ariaLabel} onChange={(e) => onValueChange(e.target.value)}>
+        {children}
+      </select>
+    );
+  };
+  const SelectItem = ({ value, children }: React.PropsWithChildren<{ value: string }>) => (
+    <option value={value}>{children}</option>
+  );
+  const passthrough = ({ children }: React.PropsWithChildren) => <>{children}</>;
+  return {
+    Select,
+    SelectContent: passthrough,
+    SelectItem,
+    SelectTrigger: passthrough,
+    SelectValue: passthrough,
+  };
+});
+
 // Mock useDevicePerformance hook to allow PageLoader to render properly
 vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({

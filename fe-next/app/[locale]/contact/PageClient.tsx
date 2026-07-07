@@ -9,6 +9,7 @@ import AutoHideHeader from '@/components/AutoHideHeader';
 import { Button } from '@/components/ui/button';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -267,7 +268,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   {t('contact.messageLabel')}
                   <span className="text-neo-red">*</span>
                 </label>
-                <textarea
+                <Textarea
                   id="message"
                   name="message"
                   value={formData.message}
@@ -276,17 +277,7 @@ export default function ContactPageClient(): React.JSX.Element {
                   required
                   disabled={status === 'submitting'}
                   rows={5}
-                  className={cn(
-                    'flex w-full px-4 py-3 text-sm font-medium resize-none',
-                    'rounded-neo border-3 border-neo-black dark:border-slate-500',
-                    'bg-neo-cream dark:bg-neo-navy-elevated text-slate-900 dark:text-white',
-                    'shadow-[inset_2px_2px_0px_rgba(0,0,0,0.1)]',
-                    'placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:font-normal',
-                    'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                    'focus:shadow-[inset_3px_3px_0px_rgba(0,0,0,0.15)]',
-                    'disabled:cursor-not-allowed disabled:opacity-50',
-                    'transition-shadow duration-100'
-                  )}
+                  className="resize-none"
                 />
               </div>
 

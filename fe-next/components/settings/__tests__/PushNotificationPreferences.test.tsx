@@ -5,7 +5,7 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { PushNotificationPreferences } from '../PushNotificationPreferences';
-import type { ReactNode } from 'react';
+import { Children, isValidElement, type ReactNode } from 'react';
 
 // Mock framer-motion
 vi.mock('framer-motion', () => ({
@@ -15,6 +15,47 @@ vi.mock('framer-motion', () => ({
     ),
   },
 }));
+
+// Radix Select isn't a native <select> (no change event) — stand in with a
+// native select so existing fireEvent.change-based tests still drive it.
+// The aria-label lives on SelectTrigger in real usage, so it's lifted onto
+// the underlying <select> here (SelectTrigger itself is a pure passthrough).
+vi.mock('@/components/ui/select', () => {
+  const Select = ({
+    value,
+    onValueChange,
+    disabled,
+    children,
+  }: {
+    value: string;
+    onValueChange: (v: string) => void;
+    disabled?: boolean;
+    children: ReactNode;
+  }) => {
+    let ariaLabel: string | undefined;
+    Children.forEach(children, (child) => {
+      if (isValidElement(child) && (child.props as Record<string, unknown>)['aria-label']) {
+        ariaLabel = (child.props as Record<string, string>)['aria-label'];
+      }
+    });
+    return (
+      <select value={value} disabled={disabled} aria-label={ariaLabel} onChange={(e) => onValueChange(e.target.value)}>
+        {children}
+      </select>
+    );
+  };
+  const SelectItem = ({ value, children }: { value: string; children: ReactNode }) => (
+    <option value={value}>{children}</option>
+  );
+  const passthrough = ({ children }: { children?: ReactNode }) => <>{children}</>;
+  return {
+    Select,
+    SelectContent: passthrough,
+    SelectItem,
+    SelectTrigger: passthrough,
+    SelectValue: passthrough,
+  };
+});
 
 // Mock LanguageContext
 vi.mock('@/contexts/LanguageContext', () => ({
