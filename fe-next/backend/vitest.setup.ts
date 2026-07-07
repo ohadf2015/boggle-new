@@ -3,17 +3,6 @@
  */
 import { vi } from 'vitest';
 
-// Mock translations module
-vi.mock('../translations/index.js', () => ({
-  translations: {
-    en: { achievements: {}, game: {}, errors: {} },
-    he: { achievements: {}, game: {}, errors: {} },
-    sv: { achievements: {}, game: {}, errors: {} },
-    ja: { achievements: {}, game: {}, errors: {} },
-    es: { achievements: {}, game: {}, errors: {} },
-  },
-}));
-
 // Global mock for ioredis to prevent real Redis connections in any test
 vi.mock('ioredis', () => {
   const RedisMock = vi.fn().mockImplementation(() => ({
