@@ -39,7 +39,7 @@ export type GameBadgeVariant =
   | 'streak'          // Orange badge for streaks
   | 'default';        // Default Neo-Navy styling
 
-export type GameBadgeSize = 'xs' | 'sm' | 'md';
+export type GameBadgeSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export type GameBadgeAnimation =
   | 'spring'   // Pop-in spring animation
@@ -84,9 +84,9 @@ const VARIANT_STYLES: Record<GameBadgeVariant, string> = {
   'new-feature': 'bg-neo-lime text-neo-black border-neo-black',
   'late-joiner': 'bg-neo-pink/20 text-neo-black border-neo-black',
   'rank': 'bg-amber-400 text-neo-black border-neo-black',
-  'score-success': 'bg-emerald-500 text-white border-neo-black',
+  'score-success': 'bg-neo-lime text-neo-black border-neo-black',
   'score-fail': 'bg-neo-gray text-white border-neo-black',
-  'streak': 'bg-orange-500 text-white border-neo-black',
+  'streak': 'bg-neo-orange text-neo-black border-neo-black',
   'default': 'bg-neo-navy text-neo-white border-neo-white/20',
 };
 
@@ -94,12 +94,14 @@ const SIZE_CLASSES: Record<GameBadgeSize, string> = {
   xs: 'text-[8px] px-1 py-0.5 gap-0.5',
   sm: 'text-[10px] px-1.5 py-0.5 gap-1',
   md: 'text-xs px-2 py-1 gap-1.5',
+  lg: 'text-sm px-2 py-1 gap-1.5',
 };
 
 const ICON_SIZES: Record<GameBadgeSize, string> = {
   xs: 'w-2 h-2',
   sm: 'w-2.5 h-2.5',
   md: 'w-3 h-3',
+  lg: 'w-4 h-4',
 };
 
 // ==================== Animation Configurations ====================

@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { Trophy, X } from 'lucide-react';
+import { GameBadge } from '@/components/ui/GameBadge';
 import type { Language } from '@/types';
 
 export interface ScoreBadgeProps {
@@ -31,20 +32,18 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
     onClick={onClick}
   >
     {solved ? (
-      <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-lime rounded-neo border-2 border-neo-black shadow-hard-sm">
-        <Trophy className="w-4 h-4 text-neo-black" />
-        <span className="font-black text-neo-black text-sm">{attemptsUsed}/10</span>
-      </div>
+      <GameBadge variant="score-success" icon={Trophy} size="lg" animate={false}>
+        {attemptsUsed}/10
+      </GameBadge>
     ) : (
-      <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-gray rounded-neo border-2 border-neo-black shadow-hard-sm">
-        <X className="w-4 h-4 text-neo-white" />
-        <span className="font-black text-neo-white text-sm">X/10</span>
-      </div>
+      <GameBadge variant="score-fail" icon={X} size="lg" animate={false}>
+        X/10
+      </GameBadge>
     )}
     {streakDays > 0 && (
-      <span className="text-xs bg-neo-orange text-neo-black px-1.5 py-0.5 rounded-neo border border-neo-black font-bold">
+      <GameBadge variant="streak" size="sm" animate={false} className="text-xs">
         🔥{streakDays}
-      </span>
+      </GameBadge>
     )}
   </div>
 );
