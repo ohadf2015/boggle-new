@@ -1173,14 +1173,22 @@ EOF
 fi
 
 # --- post-push monitor (skip in no-change / dry-run / no-push) ------------
+# caffeinate -i wraps both watchers (2026-07-07): logs showed most nights'
+# nohup'd watchers dying mid-poll (0-9 of their ticks, never completing) —
+# root cause is macOS idle sleep suspending the whole login session the
+# LaunchAgent runs under. caffeinate -i holds an idle-sleep assertion for
+# exactly the lifetime of its child, so a 10/30 min watcher no longer needs
+# the Mac to stay awake on its own. Fall back to bare nohup if unavailable.
+CAFFEINATE=""
+command -v caffeinate >/dev/null 2>&1 && CAFFEINATE="caffeinate -i"
 if [ "$NO_MONITOR" = "0" ] && [ "$NO_CHANGE_MODE" = "0" ] && [ "$DRY_RUN" = "0" ] && [ "$NO_PUSH" = "0" ] && [ "$RUN_FAILED" = "0" ]; then
   log "spawning health monitor (30 min)"
-  nohup "$LIB_DIR/health-monitor.sh" "$NEW_SHA" \
+  nohup $CAFFEINATE "$LIB_DIR/health-monitor.sh" "$NEW_SHA" \
     >> "$LOG_DIR/health-monitor.log" 2>&1 &
   disown 2>/dev/null || true
 
   log "spawning Railway deploy check (10 min)"
-  nohup "$LIB_DIR/railway-deploy-check.sh" "$NEW_SHA" \
+  nohup $CAFFEINATE "$LIB_DIR/railway-deploy-check.sh" "$NEW_SHA" \
     >> "$LOG_DIR/railway-check.log" 2>&1 &
   disown 2>/dev/null || true
 fi
