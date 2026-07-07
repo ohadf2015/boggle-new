@@ -26,19 +26,50 @@ const DEFAULT_STATE: ConsentState = {
   timestamp: 0,
 };
 
+/**
+ * Storage in some contexts (iOS Safari private mode, many in-app / social
+ * webviews with partitioned or blocked storage) throws on write — and
+ * occasionally on read. A consent DECISION must still apply in-session (so the
+ * blocking modal closes and PostHog opts in/out) even when it can't be
+ * PERSISTED. These helpers never throw; a failed persist just means the choice
+ * is re-asked next session, which is far better than trapping the user behind
+ * the consent wall with every signup entry point unreachable.
+ */
+function safeGetItem(key: string): string | null {
+  try {
+    return localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+function safeSetItem(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value);
+  } catch {
+    // best-effort persistence — see note above
+  }
+}
+function safeRemoveItem(key: string): void {
+  try {
+    localStorage.removeItem(key);
+  } catch {
+    // best-effort — see note above
+  }
+}
+
 /** Check if user has made any consent decision */
 export function hasConsentDecision(): boolean {
   if (typeof window === 'undefined') return false;
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const stored = safeGetItem(STORAGE_KEY);
   // Also check legacy key for migration
-  if (!stored && localStorage.getItem('cookie-consent')) return true;
+  if (!stored && safeGetItem('cookie-consent')) return true;
   return stored !== null;
 }
 
 /** Migrate from legacy cookie-consent (accept/decline) to v2 granular format */
 function migrateLegacyConsent(): ConsentState | null {
   if (typeof window === 'undefined') return null;
-  const legacy = localStorage.getItem('cookie-consent');
+  const legacy = safeGetItem('cookie-consent');
   if (!legacy) return null;
 
   const accepted = legacy === 'accepted';
@@ -50,8 +81,8 @@ function migrateLegacyConsent(): ConsentState | null {
   };
 
   // Save in new format and remove legacy key
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  localStorage.removeItem('cookie-consent');
+  safeSetItem(STORAGE_KEY, JSON.stringify(state));
+  safeRemoveItem('cookie-consent');
   return state;
 }
 
@@ -59,7 +90,7 @@ function migrateLegacyConsent(): ConsentState | null {
 export function getConsentState(): ConsentState {
   if (typeof window === 'undefined') return DEFAULT_STATE;
 
-  const stored = localStorage.getItem(STORAGE_KEY);
+  const stored = safeGetItem(STORAGE_KEY);
   if (stored) {
     try {
       const parsed = JSON.parse(stored) as ConsentState;
@@ -94,7 +125,11 @@ export function setConsentState(state: Partial<Omit<ConsentState, 'essential' | 
     timestamp: Date.now(),
   };
 
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  // Persist best-effort. A failed write must NOT prevent the decision from
+  // applying in-session below — otherwise the blocking consent modal never
+  // closes (its Accept/Decline handler throws before setVisible(false)),
+  // trapping the user with every Play / Sign-up button unreachable.
+  safeSetItem(STORAGE_KEY, JSON.stringify(updated));
 
   // Update Google Consent Mode v2
   updateGoogleConsent(updated);
@@ -116,8 +151,8 @@ export function declineAll(): void {
 /** Reset consent (user wants to re-choose) */
 export function resetConsent(): void {
   if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem('cookie-consent');
+  safeRemoveItem(STORAGE_KEY);
+  safeRemoveItem('cookie-consent');
 
   // Reset Google Consent Mode to denied
   updateGoogleConsent(DEFAULT_STATE);
