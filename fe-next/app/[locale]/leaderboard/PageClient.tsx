@@ -12,7 +12,7 @@ import { Loader } from '@/components/ui/Loader';
 import { SkeletonCard } from '@/components/ui/EnhancedLoading';
 import { ErrorState, EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useRouter } from 'next/navigation';
-import { EnhancedButton } from '@/components/ui/EnhancedButton';
+import { Button } from '@/components/ui/button';
 import { PageLayout } from '@/components/layout/PageLayout';
 import { PageStateHandler } from '@/components/layout/PageStateHandler';
 import { useTheme } from '@/utils/ThemeContext';
@@ -153,7 +153,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           <p className={cn('text-lg', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
             Coming soon! Leaderboard feature is being set up.
           </p>
-          <EnhancedButton
+          <Button
             onClick={() => router.push(`/${language}`)}
             variant="cyan"
             className="mt-6"
@@ -162,7 +162,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />
             {t('common.backToMenu')}
-          </EnhancedButton>
+          </Button>
         </div>
       </PageLayout>
     );
@@ -204,7 +204,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   : t('common.connecting')}
               </span>
             </div>
-            <EnhancedButton
+            <Button
               variant="ghost"
               size="icon"
               onClick={() => refetch()}
@@ -225,7 +225,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                   )}
                 />
               )}
-            </EnhancedButton>
+            </Button>
           </div>
         </m.div>
 
@@ -527,7 +527,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
         {/* Back Button */}
         <div className="mt-8 text-center">
-          <EnhancedButton
+          <Button
             onClick={() => router.push(`/${language}`)}
             variant="cyan"
             haptic
@@ -535,7 +535,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
           >
             <ArrowLeft className="me-2 rtl:rotate-180" />
             {t('common.backToMenu')}
-          </EnhancedButton>
+          </Button>
         </div>
       </div>
     </PageLayout>

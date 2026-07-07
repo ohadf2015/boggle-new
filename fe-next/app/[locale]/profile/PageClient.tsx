@@ -9,7 +9,7 @@ import { useQueryState, parseAsStringLiteral } from 'nuqs';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import AutoHideHeader from '@/components/AutoHideHeader';
-import { EnhancedButton } from '@/components/ui/EnhancedButton';
+import { Button } from '@/components/ui/button';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -208,14 +208,14 @@ export default function ProfilePageClient(): React.JSX.Element {
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               {!isOnCrazyGamesPlatform && (
-                <EnhancedButton onClick={() => setShowAuthModal(true)} variant="cyan" haptic animation="pop">
+                <Button onClick={() => setShowAuthModal(true)} variant="cyan" haptic animation="pop">
                   {t('auth.signIn')}
-                </EnhancedButton>
+                </Button>
               )}
-              <EnhancedButton variant="outline" onClick={() => router.push(`/${language}`)} haptic>
+              <Button variant="outline" onClick={() => router.push(`/${language}`)} haptic>
                 <ArrowLeft className="me-2 rtl:rotate-180" />
                 {t('profile.backToGame')}
-              </EnhancedButton>
+              </Button>
             </div>
           </m.div>
         </div>

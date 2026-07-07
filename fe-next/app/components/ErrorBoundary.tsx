@@ -6,7 +6,6 @@ import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/types';
 import logger from '@/utils/logger';
 import { captureError } from '@/utils/sentry';
-import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import { ErrorState } from '@/components/ui/EnhancedEmptyState';
 
 /**

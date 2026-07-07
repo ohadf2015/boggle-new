@@ -110,10 +110,6 @@ vi.mock('react-hot-toast', () => ({
   default: { success: vi.fn(), error: vi.fn() },
 }));
 
-vi.mock('@/components/ui/EnhancedButton', () => ({
-  EnhancedButton: ({ children, ...props }: any) => <button {...props}>{children}</button>,
-}));
-
 vi.mock('@/components/ui/PullToRefreshIndicator', () => ({
   PullToRefreshIndicator: () => null,
 }));

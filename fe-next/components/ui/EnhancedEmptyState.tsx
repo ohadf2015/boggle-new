@@ -4,7 +4,7 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { Search, Inbox, FolderOpen, Frown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { EnhancedButton } from './EnhancedButton';
+import { Button } from './button';
 import { Mascot, type MascotVariant } from './Mascot';
 
 /**
@@ -30,7 +30,7 @@ export interface EnhancedEmptyStateProps {
   /**
    * Primary action — either a fully custom element (rendered as-is, for
    * bespoke button styling) or a {label, onClick} config rendered via the
-   * standard EnhancedButton.
+   * standard Button.
    */
   action?: React.ReactElement | {
     label: string;
@@ -191,14 +191,14 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           {React.isValidElement(action) ? (
             action
           ) : (
-            <EnhancedButton
+            <Button
               onClick={action.onClick}
               variant={action.variant === 'secondary' ? 'secondary' : 'default'}
               size={compact ? 'sm' : 'default'}
               animation="pop"
             >
               {action.label}
-            </EnhancedButton>
+            </Button>
           )}
         </m.div>
       )}

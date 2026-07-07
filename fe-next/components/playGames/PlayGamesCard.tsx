@@ -13,7 +13,7 @@
 import { useState } from 'react';
 import { m } from 'framer-motion';
 import { Gamepad2, Trophy, BarChart3 } from 'lucide-react';
-import { EnhancedButton } from '@/components/ui/EnhancedButton';
+import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePlayGamesServices } from '@/hooks/usePlayGamesServices';
 import { getCachedPlayGamesSignIn } from '@/utils/nativePGS';
@@ -63,24 +63,24 @@ export function PlayGamesCard({ delay = 0.22 }: PlayGamesCardProps): React.React
           <p className="text-sm text-neo-cream/80 mb-1">{t('playGames.signedIn')}</p>
           {playerName ? <p className="text-base font-black text-neo-lime mb-4">{playerName}</p> : <div className="mb-4" />}
           <div className="grid grid-cols-2 gap-3">
-            <EnhancedButton variant="cyan" onClick={() => void showAchievements()} className="w-full">
+            <Button variant="cyan" onClick={() => void showAchievements()} className="w-full">
               <Trophy className="w-5 h-5 me-1" aria-hidden />
               {t('playGames.achievements')}
-            </EnhancedButton>
-            <EnhancedButton
+            </Button>
+            <Button
               variant="cyan"
               onClick={() => void showLeaderboard(PLAY_GAMES_LEADERBOARDS.highScore)}
               className="w-full"
             >
               <BarChart3 className="w-5 h-5 me-1" aria-hidden />
               {t('playGames.leaderboards')}
-            </EnhancedButton>
+            </Button>
           </div>
         </>
       ) : (
         <>
           <p className="text-sm text-neo-cream/80 mb-4">{t('playGames.connectPrompt')}</p>
-          <EnhancedButton
+          <Button
             variant="gradient"
             onClick={() => void handleConnect()}
             disabled={connecting}
@@ -88,7 +88,7 @@ export function PlayGamesCard({ delay = 0.22 }: PlayGamesCardProps): React.React
           >
             <Gamepad2 className="w-5 h-5 me-1" aria-hidden />
             {connecting ? t('playGames.connecting') : t('playGames.connect')}
-          </EnhancedButton>
+          </Button>
         </>
       )}
     </m.div>

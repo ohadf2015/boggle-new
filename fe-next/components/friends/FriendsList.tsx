@@ -25,7 +25,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { cn } from '@/lib/utils';
 import { resolveDisplayName } from '@/lib/displayName';
-import { EnhancedButton } from '@/components/ui/EnhancedButton';
+import { Button } from '@/components/ui/button';
 import Avatar from '@/components/Avatar';
 import { FriendRow } from './FriendRow';
 import { RequestRow } from './RequestRow';
@@ -436,7 +436,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
             {t('friends.signInRequired')}
           </p>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-2">
-            <EnhancedButton
+            <Button
               onClick={() => { setAuthModalMode('signup'); setShowAuthModal(true); }}
               size="sm"
               haptic
@@ -444,8 +444,8 @@ const FriendsList: React.FC<FriendsListProps> = ({
               className="bg-neo-lime text-neo-black mx-auto"
             >
               {t('auth.signUp')}
-            </EnhancedButton>
-            <EnhancedButton
+            </Button>
+            <Button
               onClick={() => { setAuthModalMode('signin'); setShowAuthModal(true); }}
               size="sm"
               haptic
@@ -453,7 +453,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
               className="bg-neo-pink text-white mx-auto"
             >
               {t('auth.signIn')}
-            </EnhancedButton>
+            </Button>
           </div>
         </div>
         <AuthModal
@@ -565,16 +565,16 @@ const FriendsList: React.FC<FriendsListProps> = ({
           )}
         </div>
         <div data-testid="friends-header-actions" className="flex items-center justify-end gap-2 shrink-0">
-          <EnhancedButton onClick={() => setShowPactSelector(true)} size="sm" haptic animation="pop" className="bg-neo-pink text-white" aria-label={t('wordPact.formPact')}>
+          <Button onClick={() => setShowPactSelector(true)} size="sm" haptic animation="pop" className="bg-neo-pink text-white" aria-label={t('wordPact.formPact')}>
             <Handshake className="w-4 h-4" />
             {/* Label only from `sm` (tablet/desktop) — never at the `xs` (480px)
                 wide-phone width where the extra width pushed the header out. */}
             <span className="hidden sm:inline">{t('wordPact.formPact')}</span>
-          </EnhancedButton>
-          <EnhancedButton onClick={() => setShowAddFriend(true)} size="sm" haptic animation="pop" className="bg-neo-cyan text-neo-black" aria-label={t('friends.add')}>
+          </Button>
+          <Button onClick={() => setShowAddFriend(true)} size="sm" haptic animation="pop" className="bg-neo-cyan text-neo-black" aria-label={t('friends.add')}>
             <UserPlus className="w-4 h-4" />
             <span className="hidden sm:inline">{t('friends.add')}</span>
-          </EnhancedButton>
+          </Button>
         </div>
       </div>
 
