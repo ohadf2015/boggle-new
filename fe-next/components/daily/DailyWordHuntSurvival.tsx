@@ -620,21 +620,26 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         </div>
       </div>
 
-      {/* Category and example hints (if unlocked) */}
-      {state.showCategory && (
-        <div className="text-[11px] bg-purple-50 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-600 rounded px-2 py-0.5 max-w-3xl mx-auto w-full mb-0.5 text-purple-900 dark:text-purple-100">
-          <span className="font-bold">
-            {t('wordHunt.survival.category')?.replace('{category}', state.category) ||
-              `Category: ${state.category}`}
-          </span>
-        </div>
-      )}
-      {state.showExample && (
-        <div className="text-[11px] bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-600 rounded px-2 py-0.5 max-w-3xl mx-auto w-full mb-0.5 text-green-900 dark:text-green-100">
-          <span className="font-bold">{t('wordHunt.survival.exampleSentence')}</span>{' '}
-          {state.exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
-        </div>
-      )}
+      {/* Category and example hints (if unlocked) — reserved slots so unlocking
+          a hint mid-round doesn't shift the grid below (Class-5 layout shift). */}
+      <div className="min-h-[22px] mb-0.5" data-testid="wordhunt-category-slot">
+        {state.showCategory && (
+          <div className="text-[11px] bg-purple-50 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-600 rounded px-2 py-0.5 max-w-3xl mx-auto w-full text-purple-900 dark:text-purple-100">
+            <span className="font-bold">
+              {t('wordHunt.survival.category')?.replace('{category}', state.category) ||
+                `Category: ${state.category}`}
+            </span>
+          </div>
+        )}
+      </div>
+      <div className="min-h-[22px] mb-0.5" data-testid="wordhunt-example-slot">
+        {state.showExample && (
+          <div className="text-[11px] bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-600 rounded px-2 py-0.5 max-w-3xl mx-auto w-full text-green-900 dark:text-green-100">
+            <span className="font-bold">{t('wordHunt.survival.exampleSentence')}</span>{' '}
+            {state.exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
+          </div>
+        )}
+      </div>
 
       {/* Life bar — overflow-x clips sideways particles, overflow-y visible for gain animation */}
       <div className="shrink-0 overflow-x-clip">
@@ -661,13 +666,16 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
         />
       </div>
 
-      {/* Mobile: discovered words list with obfuscate toggle */}
-      {state.discoveredWords.length > 0 && (
-        <DiscoveredWordsList
-          words={state.discoveredWords}
-          t={t}
-        />
-      )}
+      {/* Mobile: discovered words list with obfuscate toggle. Reserved slot so the
+          first word found doesn't shrink the flex-1 grid above it mid-round. */}
+      <div className="shrink-0 min-h-[64px]" data-testid="wordhunt-discovered-words-slot">
+        {state.discoveredWords.length > 0 && (
+          <DiscoveredWordsList
+            words={state.discoveredWords}
+            t={t}
+          />
+        )}
+      </div>
 
       {/* Auto-Clue Notifications */}
       <AnimatePresence>

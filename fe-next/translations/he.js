@@ -8426,6 +8426,8 @@ const he = {
       "ofPerfect": "מהמושלם",
       "points": "נק׳",
       "wordsFound": "נמצאו {found} מתוך {total} מילים",
+      "targetWordFound": "🎯 מצאתם את המילה: {word}",
+      "targetWordMissed": "🎯 המילה הייתה: {word}",
       "vsAverage": "{pct}% לעומת הממוצע שלכם",
       "betterThan": "טוב יותר מ-{pct}% מתוצאות המשחק המהיר היום",
       "seeLeaderboard": "לטבלת המובילים המלאה",

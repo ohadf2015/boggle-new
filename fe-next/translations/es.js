@@ -8408,6 +8408,8 @@ const es = {
       "ofPerfect": "del perfecto",
       "points": "pts",
       "wordsFound": "{found} / {total} palabras",
+      "targetWordFound": "🎯 Encontraste la palabra: {word}",
+      "targetWordMissed": "🎯 La palabra era: {word}",
       "vsAverage": "{pct}% frente a tu media",
       "betterThan": "Mejor que el {pct}% de las partidas rápidas de hoy",
       "seeLeaderboard": "Ver clasificación completa",

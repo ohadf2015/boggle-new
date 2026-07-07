@@ -8554,6 +8554,8 @@ const sv = {
       "ofPerfect": "av perfekt",
       "points": "poäng",
       "wordsFound": "{found} / {total} ord hittade",
+      "targetWordFound": "🎯 Du hittade ordet: {word}",
+      "targetWordMissed": "🎯 Ordet var: {word}",
       "vsAverage": "{pct}% mot ditt snitt",
       "betterThan": "Bättre än {pct}% av dagens snabbspelsresultat",
       "seeLeaderboard": "Visa hela topplistan",
