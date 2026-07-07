@@ -64,6 +64,31 @@ function concurrencyLimitedFetch(input: RequestInfo | URL, init?: RequestInit): 
   });
 }
 
+type ServiceKeyError = { message: string; code?: string } | null;
+type ServiceKeyTestClient = { from: (table: string) => { select: (cols: string) => { limit: (n: number) => PromiseLike<{ error: ServiceKeyError }> } } };
+
+/**
+ * Runs the service-key probe query, retrying transient (network) failures once.
+ * Auth failures (401 / PGRST301) never retry — a bad key won't self-heal.
+ * Exported for tests; also guards against the parallel `next build` workers
+ * (up to MAX_CONCURRENT_REQUESTS of them) each hitting the network at boot,
+ * where a single DNS/connect blip previously logged a false "VALIDATION FAILED".
+ */
+export async function validateServiceKeyWithRetry(
+  testClient: ServiceKeyTestClient,
+  retries = 1,
+  delayMs = 1500
+): Promise<ServiceKeyError> {
+  for (let attempt = 0; ; attempt++) {
+    const { error } = await testClient.from('profiles').select('id').limit(1);
+    const isAuthError = !!error && (error.message.includes('401') || error.code === 'PGRST301');
+    if (!error || isAuthError || attempt >= retries) {
+      return error;
+    }
+    await new Promise((resolve) => setTimeout(resolve, delayMs));
+  }
+}
+
 // Log configuration status at startup
 logger.info('SUPABASE', `Configuration status: URL=${!!supabaseUrl}, ServiceKey=${!!supabaseServiceKey}, MaxConcurrent=${MAX_CONCURRENT_REQUESTS}`);
 if (!supabaseUrl || !supabaseServiceKey) {
@@ -76,7 +101,7 @@ if (!supabaseUrl || !supabaseServiceKey) {
         auth: { autoRefreshToken: false, persistSession: false },
         global: { fetch: concurrencyLimitedFetch }
       });
-      const { error } = await testClient.from('profiles').select('id').limit(1);
+      const error = await validateServiceKeyWithRetry(testClient);
       if (error) {
         logger.error('SUPABASE', `SERVICE KEY VALIDATION FAILED: ${error.message}. Check your SUPABASE_SERVICE_ROLE_KEY in .env`);
         if (error.message.includes('401') || error.code === 'PGRST301') {
