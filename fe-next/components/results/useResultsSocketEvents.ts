@@ -15,7 +15,7 @@ import { useEffect, useState, useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import logger from '@/utils/logger';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { showToast } from '@/components/ui/EnhancedToast';
+import { neoInfoToast } from '@/components/NeoToast';
 import type { NearMiss } from './NearMissCard';
 import type { ReferralMilestone } from '@/shared/types/socket';
 import type { WordToVote, XpGainedData, LevelUpData } from '@/types/components';
@@ -188,7 +188,7 @@ export function useResultsSocketEvents({
       const { prompt } = data;
       const title = prompt.title || t('oneMoreGame.defaultTitle');
       const message = prompt.message || t('oneMoreGame.defaultMessage');
-      showToast({ type: 'info', title, message, duration: 8000 });
+      neoInfoToast(title, { description: message, duration: 8000 });
     };
 
     const handleWeeklyQuestCompleted = (data: { questType: string; xpReward: number; description: string }) => {

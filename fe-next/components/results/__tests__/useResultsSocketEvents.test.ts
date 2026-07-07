@@ -25,10 +25,10 @@ vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: mockT }),
 }));
 
-// Mock EnhancedToast showToast
-const mockShowToast = vi.fn();
-vi.mock('@/components/ui/EnhancedToast', () => ({
-  showToast: (...args: unknown[]) => mockShowToast(...args),
+// Mock NeoToast neoInfoToast
+const mockNeoInfoToast = vi.fn();
+vi.mock('@/components/NeoToast', () => ({
+  neoInfoToast: (...args: unknown[]) => mockNeoInfoToast(...args),
 }));
 
 // ==============================================
@@ -86,7 +86,7 @@ describe('useResultsSocketEvents', () => {
     vi.useFakeTimers();
     mockSocket = createMockSocket();
     vi.clearAllMocks();
-    mockShowToast.mockClear();
+    mockNeoInfoToast.mockClear();
   });
 
   afterEach(() => {
@@ -764,11 +764,10 @@ describe('useResultsSocketEvents', () => {
         });
 
         // THEN
-        expect(mockShowToast).toHaveBeenCalledWith(
+        expect(mockNeoInfoToast).toHaveBeenCalledWith(
+          'Keep Going!',
           expect.objectContaining({
-            type: 'info',
-            title: 'Keep Going!',
-            message: 'You were on fire — play again!',
+            description: 'You were on fire — play again!',
           })
         );
       });
@@ -791,11 +790,10 @@ describe('useResultsSocketEvents', () => {
         });
 
         // THEN
-        expect(mockShowToast).toHaveBeenCalledWith(
+        expect(mockNeoInfoToast).toHaveBeenCalledWith(
+          'oneMoreGame.defaultTitle',
           expect.objectContaining({
-            type: 'info',
-            title: 'oneMoreGame.defaultTitle',
-            message: 'oneMoreGame.defaultMessage',
+            description: 'oneMoreGame.defaultMessage',
           })
         );
       });
@@ -812,7 +810,7 @@ describe('useResultsSocketEvents', () => {
         });
 
         // THEN
-        expect(mockShowToast).not.toHaveBeenCalled();
+        expect(mockNeoInfoToast).not.toHaveBeenCalled();
       });
 
       it('should register engagement:oneMoreGame listener on mount', () => {

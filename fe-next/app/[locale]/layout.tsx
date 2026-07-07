@@ -23,7 +23,6 @@ import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
 import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
 import GoogleOneTapInitializer from '@/components/auth/GoogleOneTapInitializer';
 import NativePGSInitializer from '@/components/NativePGSInitializer';
-import { ToastContainer } from '@/components/ui/EnhancedToast';
 import { OfflineBanner } from '@/components/offline/OfflineBanner';
 import { NativeLanguageBanner } from '@/components/NativeLanguageBanner';
 import { FirstGameLanguageNotice } from '@/components/FirstGameLanguageNotice';
@@ -685,8 +684,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         consent shows our domain, not <ref>.supabase.co. No redirect. */}
                     <GoogleOneTapInitializer />
                     <ChurnSignalTracker />
-                    {/* Toast notifications container */}
-                    <ToastContainer position="bottom-right" />
                 </ConditionalProviders>
             </body>
         </html>
