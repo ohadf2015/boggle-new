@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Flame, ArrowRight, ArrowLeft, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { NeoSkeleton } from '@/components/ui/skeleton';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { useDailyChallengeStats, type PreloadedDailyStats } from '@/hooks/useDailyChallengeStats';
@@ -46,6 +47,12 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
   const countdown = mounted ? stats.countdown : '';
   const hasPlayed = mounted ? stats.hasPlayed : false;
   const hasSolved = mounted ? stats.hasSolved : false;
+  // The CTA (Play ↔ View results) hinges entirely on `hasPlayed`, which for an
+  // authed player only becomes known once their daily snapshot resolves. Until
+  // then — and pre-mount — render a skeleton pill instead of the optimistic
+  // "Play" default, so the button never snaps from Play → View results after the
+  // fetch lands (pitfall Class 1: render the pessimistic state until it resolves).
+  const ctaLoading = !mounted || stats.loading;
   // Prefer the chest-authoritative streak threaded through `preloadedStats`
   // (all daily modes + freezes) so the fire icon matches the weekly chest; fall
   // back to the hook's localStorage value when no preloaded streak is supplied.
@@ -141,25 +148,39 @@ export function HomeDailyHero({ preloadedStats }: HomeDailyHeroProps) {
       </div>
 
       {/* CTA pill — once today's daily is played it flips from the lime "Play"
-          prompt to a calmer "View results" so it never invites a replay it can't grant. */}
-      <span
-        className={cn(
-          'absolute end-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black px-3 py-[7px] font-neo-display text-[13px] font-bold uppercase shadow-hard transition-transform group-hover:translate-x-0.5 md:end-5 md:top-5 md:px-4 md:py-2 md:text-sm',
-          hasPlayed ? 'bg-neo-navy-light text-neo-cream' : 'bg-neo-lime text-neo-navy',
-        )}
-      >
-        {hasPlayed ? (
-          <>
-            {t('daily.viewResults')}
-            {hasSolved && <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />}
-          </>
-        ) : (
-          <>
-            {t('daily.play')}
-            <Arrow className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />
-          </>
-        )}
-      </span>
+          prompt to a calmer "View results" so it never invites a replay it can't
+          grant. While the outcome is still resolving we paint a skeleton pill (same
+          footprint) rather than guess "Play" — otherwise it would visibly snap to
+          "View results" for a player who has already completed today's challenge. */}
+      {ctaLoading ? (
+        <span
+          data-testid="daily-cta-skeleton"
+          aria-hidden="true"
+          className="absolute end-3.5 top-3.5 md:end-5 md:top-5"
+        >
+          <NeoSkeleton variant="default" width={104} height={34} className="rounded-neo-pill border-2 border-black" />
+        </span>
+      ) : (
+        <span
+          data-testid="daily-cta"
+          className={cn(
+            'absolute end-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-neo-pill border-2 border-black px-3 py-[7px] font-neo-display text-[13px] font-bold uppercase shadow-hard transition-transform group-hover:translate-x-0.5 md:end-5 md:top-5 md:px-4 md:py-2 md:text-sm',
+            hasPlayed ? 'bg-neo-navy-light text-neo-cream' : 'bg-neo-lime text-neo-navy',
+          )}
+        >
+          {hasPlayed ? (
+            <>
+              {t('daily.viewResults')}
+              {hasSolved && <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />}
+            </>
+          ) : (
+            <>
+              {t('daily.play')}
+              <Arrow className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />
+            </>
+          )}
+        </span>
+      )}
     </Link>
   );
 }

@@ -28,6 +28,14 @@ export interface DailyChallengeStats {
   streak: number;
   puzzleNumber: number;
   isClient: boolean;
+  /**
+   * True until today's win/loss outcome is *known* — i.e. an authed player's
+   * server snapshot is still in flight and no local completion exists yet.
+   * Consumers must render the pessimistic/skeleton state while this is true
+   * instead of the optimistic "not played → Play" default, which would flip to
+   * "View results" once the snapshot lands (the CTA-flicker bug, pitfall Class 1).
+   */
+  loading: boolean;
 }
 
 /**
@@ -50,6 +58,11 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
   const [streak, setStreak] = useState<number>(preloadedStats?.currentStreak ?? 0);
   const [puzzleNumber, setPuzzleNumber] = useState<number>(preloadedStats?.puzzleNumber ?? 0);
   const [isClient, setIsClient] = useState(false);
+  // Outcome-resolution flag. Seeds pessimistically to `true` so SSR + the first
+  // client frame both paint the not-yet-known state; the mount effect flips it to
+  // `false` the moment the outcome is known (local completion, resolved server
+  // snapshot, or a guest with no server fetch pending).
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     setIsClient(true);
@@ -68,6 +81,7 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
       setHasSolved(localStatus.solved);
       setStreak(getDailyStreak().currentStreak);
       setPuzzleNumber(preloadedStats?.puzzleNumber || getPuzzleNumber(date));
+      setLoading(false);
       return;
     }
 
@@ -76,6 +90,7 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
       setHasSolved(preloadedStats.hasSolved ?? false);
       setStreak(preloadedStats.currentStreak);
       setPuzzleNumber(preloadedStats.puzzleNumber || getPuzzleNumber(date));
+      setLoading(false);
       return;
     }
 
@@ -83,6 +98,11 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
     setHasPlayed(false);
     setHasSolved(false);
     setStreak(getDailyStreak().currentStreak);
+    // Keep loading=true ONLY while an authed server snapshot is genuinely still
+    // in flight (`preloadedStats.loading`). With no preloaded feed at all,
+    // localStorage is the sole source of truth and it has already resolved here,
+    // so the outcome is known — don't strand consumers in a skeleton forever.
+    setLoading(preloadedStats?.loading ?? false);
   }, [language, preloadedStats]);
 
   // Refresh outcome when the tab regains focus (player may have just finished a
@@ -94,6 +114,9 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
       setHasPlayed(!!status);
       setHasSolved(status?.solved ?? false);
       setStreak(getDailyStreak().currentStreak);
+      // A focus/visibility refresh reads the freshest local truth synchronously —
+      // the outcome is known, so clear any lingering loading state.
+      setLoading(false);
     };
     const onVisible = () => document.visibilityState === 'visible' && refresh();
     document.addEventListener('visibilitychange', onVisible);
@@ -112,7 +135,7 @@ export function useDailyChallengeStats(preloadedStats?: PreloadedDailyStats): Da
     isClient ? 1000 : null,
   );
 
-  return { countdown, hasPlayed, hasSolved, streak, puzzleNumber, isClient };
+  return { countdown, hasPlayed, hasSolved, streak, puzzleNumber, isClient, loading };
 }
 
 export default useDailyChallengeStats;
