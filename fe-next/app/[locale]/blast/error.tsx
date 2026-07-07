@@ -3,7 +3,8 @@
 import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
-import { translations } from '../../../translations';
+import { getCachedTranslation } from '@/translations/loadTranslation';
+import type { Language } from '@/types';
 
 export default function BlastError({
   error,
@@ -18,7 +19,7 @@ export default function BlastError({
   const t = (path: string): string => {
     try {
       const keys = path.split('.');
-      let current: unknown = translations[locale as keyof typeof translations] || translations.en;
+      let current: unknown = getCachedTranslation(locale as Language) || getCachedTranslation('en');
       for (const key of keys) {
         current = (current as Record<string, unknown>)[key];
         if (current === undefined) return path;
