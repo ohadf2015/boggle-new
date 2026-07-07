@@ -5,12 +5,13 @@
  *
  * Consolidates all game-specific badge variants with animations into a single component.
  *
- * Replaces:
- * - NewPlayerBadge (components/game/NewPlayerBadge.tsx)
- * - NewBadge (components/brain/NewBadge.tsx)
- * - LateJoinerBadge (components/game/LateJoinerBadge.tsx)
- * - RankBadge (components/daily/results/RankBadge.tsx)
- * - ScoreBadge (components/daily/results/ScoreBadge.tsx)
+ * Replaced NewPlayerBadge (components/game/NewPlayerBadge.tsx) and
+ * LateJoinerBadge (components/game/LateJoinerBadge.tsx) — both deleted.
+ * NewBadge (components/brain/NewBadge.tsx), RankBadge and ScoreBadge
+ * (components/daily/results/) were NOT actually migrated despite once being
+ * listed here — they're still live, separate components. Fold them into
+ * GameBadge only with the same call-site-by-call-site care as any other
+ * live-component consolidation, not by assuming this comment is accurate.
  *
  * This component is specifically for game-related badges that need animations,
  * auto-hide functionality, and game-specific styling. For general-purpose badges
