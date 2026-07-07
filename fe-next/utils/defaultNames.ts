@@ -3,7 +3,7 @@
  * Names are localized based on UI language
  */
 
-import { translations } from '@/translations';
+import { getCachedTranslation } from '@/translations/loadTranslation';
 
 type SupportedLanguage = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -235,14 +235,14 @@ export function getAvatarForName(name: string): { emoji: string; color: string; 
  */
 export function getRandomDefaultNameWithAvatar(language: string = 'en'): NameWithAvatar {
   const lang = (language as SupportedLanguage) || 'en';
-  const langTranslations = translations[lang] || translations.en;
-  const defaultNames = langTranslations?.joinView?.defaultPlayerNames;
+  const langTranslations = getCachedTranslation(lang) || getCachedTranslation('en');
+  const defaultNames = (langTranslations as Record<string, any>)?.joinView?.defaultPlayerNames;
 
   let name: string;
 
   if (!defaultNames || !Array.isArray(defaultNames) || defaultNames.length === 0) {
     // Fallback to English if no names available for the language
-    const fallbackNames = translations.en?.joinView?.defaultPlayerNames;
+    const fallbackNames = (getCachedTranslation('en') as Record<string, any>)?.joinView?.defaultPlayerNames;
     if (!fallbackNames || !Array.isArray(fallbackNames) || fallbackNames.length === 0) {
       name = 'Player';
     } else {
