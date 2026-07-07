@@ -1,9 +1,8 @@
 'use client';
 
 import { memo, useState, useCallback, useMemo } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
 import { HelpCircle, X } from 'lucide-react';
-import { NeoPanel } from '@/components/ui/panel';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 interface ScoreBreakdownTooltipProps {
   t: (key: string, params?: Record<string, string | number>) => string;
@@ -31,10 +30,6 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const toggleTooltip = useCallback(() => {
-    setIsOpen(prev => !prev);
-  }, []);
-
   const closeTooltip = useCallback(() => {
     setIsOpen(false);
   }, []);
@@ -49,85 +44,55 @@ const ScoreBreakdownTooltip = memo<ScoreBreakdownTooltipProps>(({
   );
 
   return (
-    <div className="relative inline-flex items-center">
-      {/* Help icon button */}
-      <button
-        type="button"
-        onClick={toggleTooltip}
-        className="w-5 h-5 flex items-center justify-center text-neo-black/50 hover:text-neo-black/80 transition-colors"
-        aria-label={t('scoring.howItWorks')}
-        aria-expanded={isOpen}
-      >
-        <HelpCircle className="w-4 h-4" />
-      </button>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          className="w-5 h-5 flex items-center justify-center text-neo-black/50 hover:text-neo-black/80 transition-colors"
+          aria-label={t('scoring.howItWorks')}
+        >
+          <HelpCircle className="w-4 h-4" />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-auto min-w-[180px] p-3 relative">
+        {/* Close button */}
+        <button
+          type="button"
+          onClick={closeTooltip}
+          className="absolute -top-2 -right-2 w-5 h-5 bg-neo-pink text-white rounded-full border-2 border-neo-black shadow-hard-sm flex items-center justify-center hover:scale-110 transition-transform"
+          aria-label={t('common.close')}
+        >
+          <X className="w-2.5 h-2.5" />
+        </button>
 
-      {/* Tooltip popup */}
-      <AnimatePresence>
-        {isOpen && (
-          <>
-            {/* Backdrop to close on outside click */}
-            <m.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-40"
-              onClick={closeTooltip}
-            />
+        {/* Header */}
+        <h4 className="font-black text-neo-black text-xs uppercase tracking-wide mb-2 text-center">
+          {t('scoring.pointsPerWord')}
+        </h4>
 
-            {/* Tooltip content */}
-            <m.div
-              initial={{ opacity: 0, scale: 0.9, y: -10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: -10 }}
-              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
-              className="absolute top-full left-1/2 -translate-x-1/2 mt-2 z-50 min-w-[180px]"
+        {/* Scoring table */}
+        <div className="space-y-1">
+          {visibleRules.map((rule) => (
+            <div
+              key={rule.letters}
+              className="flex items-center justify-between gap-2 px-2 py-1 rounded-neo bg-white/50"
             >
-              <NeoPanel tone="cream" shadow="lg" className="p-3 relative">
-                {/* Close button */}
-                <button
-                  type="button"
-                  onClick={closeTooltip}
-                  className="absolute -top-2 -right-2 w-5 h-5 bg-neo-pink text-white rounded-full border-2 border-neo-black shadow-hard-sm flex items-center justify-center hover:scale-110 transition-transform"
-                  aria-label={t('common.close')}
-                >
-                  <X className="w-2.5 h-2.5" />
-                </button>
+              <span className="text-xs font-bold text-neo-black/80">
+                {rule.letters} {t('scoring.letters')}
+              </span>
+              <span className="text-sm font-black text-neo-black">
+                {rule.points} {t('scoring.pts')}
+              </span>
+            </div>
+          ))}
+        </div>
 
-                {/* Header */}
-                <h4 className="font-black text-neo-black text-xs uppercase tracking-wide mb-2 text-center">
-                  {t('scoring.pointsPerWord')}
-                </h4>
-
-                {/* Scoring table */}
-                <div className="space-y-1">
-                  {visibleRules.map((rule) => (
-                    <div
-                      key={rule.letters}
-                      className="flex items-center justify-between gap-2 px-2 py-1 rounded-neo bg-white/50"
-                    >
-                      <span className="text-xs font-bold text-neo-black/80">
-                        {rule.letters} {t('scoring.letters')}
-                      </span>
-                      <span className="text-sm font-black text-neo-black">
-                        {rule.points} {t('scoring.pts')}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Tip */}
-                <p className="text-[10px] text-neo-black/60 text-center mt-2 leading-tight">
-                  {t('scoring.longerWordsTip')}
-                </p>
-
-                {/* Arrow pointer */}
-                <div className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-neo-cream border-l-3 border-t-3 border-neo-black rotate-45" />
-              </NeoPanel>
-            </m.div>
-          </>
-        )}
-      </AnimatePresence>
-    </div>
+        {/* Tip */}
+        <p className="text-[10px] text-neo-black/60 text-center mt-2 leading-tight">
+          {t('scoring.longerWordsTip')}
+        </p>
+      </PopoverContent>
+    </Popover>
   );
 });
 
