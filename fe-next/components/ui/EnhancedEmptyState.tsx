@@ -111,7 +111,7 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
         >
           <Mascot
             variant={mascotVariant}
-            size={compact ? 'xs' : 'sm'}
+            size={compact ? 'xs' : 'md'}
             animated={!reduceMotion}
           />
         </m.div>
