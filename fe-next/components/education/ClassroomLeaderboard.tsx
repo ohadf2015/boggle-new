@@ -23,7 +23,7 @@ import { useClassroomLeaderboard } from '@/hooks/useClassroomLeaderboard';
 import { getLeaderboardTier } from '@/lib/supabase/education/leaderboard';
 import { cn } from '@/lib/utils';
 import { Loader } from '@/components/ui/Loader';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import type { LeaderboardEntryWithDelta, LeaderboardTimeScope } from '@/lib/supabase/education/types';
 
 // ============================================
@@ -430,12 +430,10 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
             className
           )}
         >
-          <EmptyState
-            type="waiting-players"
+          <EnhancedEmptyState
             title={t('education.leaderboard.noStudentsYet')}
             icon={<Users className="w-full h-full" />}
-            showMascot={false}
-            size="sm"
+            compact
           />
         </div>
       );
