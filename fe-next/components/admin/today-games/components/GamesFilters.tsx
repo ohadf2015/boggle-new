@@ -4,6 +4,7 @@ import React from 'react';
 import { Filter } from 'lucide-react';
 import type { GameTypeFilter, GameLogSource } from '../types';
 import { DATE_RANGES, type DateRange } from '../constants';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface GamesFiltersProps {
   languageFilter: string;
@@ -49,70 +50,77 @@ export function GamesFilters({
         </span>
       </div>
 
-      <select
-        value={dateRange}
-        onChange={(e) => onDateRangeChange(e.target.value as DateRange)}
-        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
-        aria-label={t('admin.todayGames.dateRange', 'Date range')}
-      >
-        {DATE_RANGES.map((range) => (
-          <option key={range} value={range}>
-            {t(`admin.todayGames.range.${range}`, DATE_RANGE_FALLBACK[range])}
-          </option>
-        ))}
-      </select>
+      <Select value={dateRange} onValueChange={(v) => onDateRangeChange(v as DateRange)}>
+        <SelectTrigger className="h-8 w-auto bg-neo-navy-elevated text-neo-white text-sm border-black px-3 py-1.5" aria-label={t('admin.todayGames.dateRange', 'Date range')}>
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {DATE_RANGES.map((range) => (
+            <SelectItem key={range} value={range}>
+              {t(`admin.todayGames.range.${range}`, DATE_RANGE_FALLBACK[range])}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      <select
-        value={languageFilter}
-        onChange={(e) => onLanguageChange(e.target.value)}
-        disabled={logSource === 'analytics'}
-        title={logSource === 'analytics' ? t('admin.todayGames.source.noLanguage', 'Language is not recorded per play in the all-plays source') : undefined}
-        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
-      >
-        <option value="all">{t('admin.todayGames.allLanguages')}</option>
-        <option value="en">🇺🇸 English</option>
-        <option value="he">🇮🇱 Hebrew</option>
-        <option value="sv">🇸🇪 Swedish</option>
-        <option value="ja">🇯🇵 Japanese</option>
-        <option value="es">🇪🇸 Spanish</option>
-      </select>
+      <Select value={languageFilter} onValueChange={onLanguageChange} disabled={logSource === 'analytics'}>
+        <SelectTrigger
+          className="h-8 w-auto bg-neo-navy-elevated text-neo-white text-sm border-black px-3 py-1.5 disabled:opacity-40 disabled:cursor-not-allowed"
+          title={logSource === 'analytics' ? t('admin.todayGames.source.noLanguage', 'Language is not recorded per play in the all-plays source') : undefined}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('admin.todayGames.allLanguages')}</SelectItem>
+          <SelectItem value="en">🇺🇸 English</SelectItem>
+          <SelectItem value="he">🇮🇱 Hebrew</SelectItem>
+          <SelectItem value="sv">🇸🇪 Swedish</SelectItem>
+          <SelectItem value="ja">🇯🇵 Japanese</SelectItem>
+          <SelectItem value="es">🇪🇸 Spanish</SelectItem>
+        </SelectContent>
+      </Select>
 
-      <select
-        value={gameTypeFilter}
-        onChange={(e) => onGameTypeChange(e.target.value as GameTypeFilter)}
-        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
-      >
-        <option value="all">{t('admin.todayGames.allTypes')}</option>
-        <option value="multiplayer">{t('admin.todayGames.multiplayer')}</option>
-        <option value="word_hunt">{t('admin.todayGames.wordHunt')}</option>
-        <option value="daily_challenge">{t('admin.todayGames.daily')}</option>
-        <option value="drill">{t('admin.todayGames.drills')}</option>
-        <option value="blast">{t('admin.todayGames.blast', 'Blast')}</option>
-        <option value="word_wheel">{t('admin.todayGames.wordWheel', 'Word Wheel')}</option>
-        <option value="practice">{t('admin.todayGames.practice', 'Practice')}</option>
-      </select>
+      <Select value={gameTypeFilter} onValueChange={(v) => onGameTypeChange(v as GameTypeFilter)}>
+        <SelectTrigger className="h-8 w-auto bg-neo-navy-elevated text-neo-white text-sm border-black px-3 py-1.5">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('admin.todayGames.allTypes')}</SelectItem>
+          <SelectItem value="multiplayer">{t('admin.todayGames.multiplayer')}</SelectItem>
+          <SelectItem value="word_hunt">{t('admin.todayGames.wordHunt')}</SelectItem>
+          <SelectItem value="daily_challenge">{t('admin.todayGames.daily')}</SelectItem>
+          <SelectItem value="drill">{t('admin.todayGames.drills')}</SelectItem>
+          <SelectItem value="blast">{t('admin.todayGames.blast', 'Blast')}</SelectItem>
+          <SelectItem value="word_wheel">{t('admin.todayGames.wordWheel', 'Word Wheel')}</SelectItem>
+          <SelectItem value="practice">{t('admin.todayGames.practice', 'Practice')}</SelectItem>
+        </SelectContent>
+      </Select>
 
-      <select
-        value={rankedFilter}
-        onChange={(e) => onRankedChange(e.target.value)}
-        className="bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
-      >
-        <option value="all">{t('admin.todayGames.allModes')}</option>
-        <option value="true">{t('admin.todayGames.rankedOnly')}</option>
-        <option value="false">{t('admin.todayGames.casualOnly')}</option>
-      </select>
+      <Select value={rankedFilter} onValueChange={onRankedChange}>
+        <SelectTrigger className="h-8 w-auto bg-neo-navy-elevated text-neo-white text-sm border-black px-3 py-1.5">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">{t('admin.todayGames.allModes')}</SelectItem>
+          <SelectItem value="true">{t('admin.todayGames.rankedOnly')}</SelectItem>
+          <SelectItem value="false">{t('admin.todayGames.casualOnly')}</SelectItem>
+        </SelectContent>
+      </Select>
 
       {/* Data source toggle — placed last so existing filter ordering is preserved. */}
-      <select
-        value={logSource}
-        onChange={(e) => onLogSourceChange(e.target.value as GameLogSource)}
-        className="ms-auto bg-neo-navy-elevated text-neo-white text-sm rounded-neo border-neo border-black px-3 py-1.5"
-        aria-label={t('admin.todayGames.source.label', 'Data source')}
-        title={t('admin.todayGames.source.hint', 'Analytics = every play incl. anonymous; Tables = per-product records')}
-      >
-        <option value="analytics">{t('admin.todayGames.source.analyticsAll', 'All plays (incl. guests)')}</option>
-        <option value="tables">{t('admin.todayGames.source.productTables', 'Product tables')}</option>
-      </select>
+      <Select value={logSource} onValueChange={(v) => onLogSourceChange(v as GameLogSource)}>
+        <SelectTrigger
+          className="h-8 w-auto ms-auto bg-neo-navy-elevated text-neo-white text-sm border-black px-3 py-1.5"
+          aria-label={t('admin.todayGames.source.label', 'Data source')}
+          title={t('admin.todayGames.source.hint', 'Analytics = every play incl. anonymous; Tables = per-product records')}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="analytics">{t('admin.todayGames.source.analyticsAll', 'All plays (incl. guests)')}</SelectItem>
+          <SelectItem value="tables">{t('admin.todayGames.source.productTables', 'Product tables')}</SelectItem>
+        </SelectContent>
+      </Select>
     </div>
   );
 }

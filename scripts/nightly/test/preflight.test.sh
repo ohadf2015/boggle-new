@@ -28,6 +28,16 @@ if [ "$1" = "mcp" ] && [ "$2" = "list" ]; then
 fi
 STUB
 chmod +x "$BIN/claude"
+
+# Stub `curl` so the network-readiness check (unconditional, added 2026-07-08)
+# reports "ready" instantly by default — every existing case below drives
+# preflight_check() repeatedly and must stay fast/hermetic (no real network).
+# The dedicated network-readiness section further down swaps this out.
+cat > "$BIN/curl" <<'STUB'
+#!/bin/bash
+exit 0
+STUB
+chmod +x "$BIN/curl"
 export PATH="$BIN:$PATH"
 
 # Real temp repo on master with a file:// origin (so fetch/pull resolve).
@@ -70,6 +80,60 @@ OUT2=$(preflight_check 2>&1); rc2=$?
 assert "returns 0"                    "[ $rc2 -eq 0 ]"
 assert "took the ff-pull path"        'printf "%s" "$OUT2" | grep -q "ff-pulling master"'
 assert "did NOT log dirty-skip"       '! printf "%s" "$OUT2" | grep -q "skipping ff-pull"'
+
+# ── network readiness runs on a DIRTY tree too (2026-07-08 regression) ─────
+# The old code had NO network check outside the ff-pull block, so a dirty tree
+# (WIP is the common case) skipped straight to the MCP check with only its own
+# 45s budget — not enough to absorb a post-wake DNS delay, which surfaced as
+# "supabase/sentry MCP unavailable" for 13 consecutive nights. The new check
+# must run UNCONDITIONALLY, retry while curl fails, and never abort the run
+# even if the network never comes up (last line of defense: the MCP retries).
+( cd "$REPO"; echo "founder WIP" >> base.txt )  # dirty tree again
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+_curl_fail_count_file="$ROOT/curl-fail-count"
+echo 0 > "$_curl_fail_count_file"
+cat > "$BIN/curl" <<STUB
+#!/bin/bash
+count_file="$_curl_fail_count_file"
+n=\$(cat "\$count_file")
+n=\$((n+1))
+echo "\$n" > "\$count_file"
+[ "\$n" -ge 2 ] && exit 0   # fails attempt 1, succeeds attempt 2
+exit 1
+STUB
+chmod +x "$BIN/curl"
+export NIGHTLY_NETWORK_RETRIES=5 NIGHTLY_NETWORK_RETRY_SLEEP=0
+echo
+echo "network readiness check on a DIRTY tree (retries then recovers)"
+OUTN=$(preflight_check 2>&1); rcN=$?
+assert "proceeds once network recovers (return 0)"   "[ $rcN -eq 0 ]"
+assert "  …logged a not-ready retry"                 'printf "%s" "$OUTN" | grep -q "network not ready (attempt 1/5)"'
+assert "  …did NOT abort the run"                     '! printf "%s" "$OUTN" | grep -q "ABORT"'
+unset NIGHTLY_NETWORK_RETRIES NIGHTLY_NETWORK_RETRY_SLEEP
+
+# Network never comes up → still proceeds (non-fatal; MCP check degrades on its own).
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null; echo "wip" >> base.txt )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
+cat > "$BIN/curl" <<'STUB'
+#!/bin/bash
+exit 1
+STUB
+chmod +x "$BIN/curl"
+export NIGHTLY_NETWORK_RETRIES=2 NIGHTLY_NETWORK_RETRY_SLEEP=0
+echo
+echo "network readiness check — network never recovers (must NOT abort)"
+OUTN2=$(preflight_check 2>&1); rcN2=$?
+assert "still proceeds (return 0, non-fatal)"        "[ $rcN2 -eq 0 ]"
+assert "  …logs giving up after max attempts"        'printf "%s" "$OUTN2" | grep -q "network readiness check failed after 2 attempts"'
+unset NIGHTLY_NETWORK_RETRIES NIGHTLY_NETWORK_RETRY_SLEEP
+# Restore the always-ready stub for every case below.
+cat > "$BIN/curl" <<'STUB'
+#!/bin/bash
+exit 0
+STUB
+chmod +x "$BIN/curl"
+( cd "$REPO"; git checkout -q -- . 2>/dev/null; git clean -fdq 2>/dev/null )
+rm -f "$LOCK_FILE" "$LAST_RUN_FILE"
 
 # ── MCP graceful degradation (2026-05-24 regression) ──────────────────────
 # posthog ✗-failed at 02:00:13 and the OLD hard-abort killed all 8 lanes — even

@@ -6007,6 +6007,8 @@ const ru = {
       "ofPerfect": "от идеала",
       "points": "очк.",
       "wordsFound": "Найдено {found} из {total} слов",
+      "targetWordFound": "🎯 Вы нашли слово: {word}",
+      "targetWordMissed": "🎯 Слово было: {word}",
       "vsAverage": "{pct}% к вашему среднему",
       "betterThan": "Лучше, чем {pct}% результатов быстрой игры сегодня",
       "seeLeaderboard": "Полная таблица лидеров",

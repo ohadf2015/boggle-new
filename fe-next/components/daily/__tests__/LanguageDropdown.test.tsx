@@ -2,19 +2,15 @@
  * Tests for LanguageDropdown — extracted from DailyReadyScreen.
  * Shows current flag + count of languages played today, opens dropdown
  * to select from the 5 supported languages.
+ *
+ * Exercises the real (unmocked) Radix DropdownMenu primitive, same pattern
+ * as AuthButtonMenu.a11y.test.tsx — Radix opens on pointerdown, not a bare
+ * `click` event, so interactions go through `userEvent`.
  */
 
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { LanguageDropdown } from '../LanguageDropdown';
-
-vi.mock('framer-motion', () => ({
-  AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  m: new Proxy({}, { get: () => (props: Record<string, unknown>) => {
-    const { children, ...rest } = props as { children?: React.ReactNode } & Record<string, unknown>;
-    return <div {...(rest as React.HTMLAttributes<HTMLDivElement>)}>{children}</div>;
-  } }),
-}));
 
 vi.mock('@/utils/dailyChallenge', () => ({
   hasPlayedWordHuntToday: (lang: string) => lang === 'en' || lang === 'he',
@@ -33,9 +29,11 @@ describe('LanguageDropdown', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 
-  it('opens dropdown with all 5 language options on click', () => {
+  it('opens dropdown with all 5 language options on click', async () => {
+    const user = userEvent.setup();
     render(<LanguageDropdown language="en" currentFlag="🇺🇸" onLanguageChange={noop} />);
-    fireEvent.click(screen.getByRole('button'));
+    await user.click(screen.getByRole('button'));
+    await waitFor(() => expect(screen.getByRole('menu')).toBeInTheDocument());
     expect(screen.getByText('English')).toBeInTheDocument();
     expect(screen.getByText('עברית')).toBeInTheDocument();
     expect(screen.getByText('Svenska')).toBeInTheDocument();
@@ -43,11 +41,13 @@ describe('LanguageDropdown', () => {
     expect(screen.getByText('Español')).toBeInTheDocument();
   });
 
-  it('calls onLanguageChange with selected code', () => {
+  it('calls onLanguageChange with selected code', async () => {
+    const user = userEvent.setup();
     const onChange = vi.fn();
     render(<LanguageDropdown language="en" currentFlag="🇺🇸" onLanguageChange={onChange} />);
-    fireEvent.click(screen.getByRole('button'));
-    fireEvent.click(screen.getByText('Svenska'));
+    await user.click(screen.getByRole('button'));
+    await waitFor(() => expect(screen.getByRole('menu')).toBeInTheDocument());
+    await user.click(screen.getByText('Svenska'));
     expect(onChange).toHaveBeenCalledWith('sv');
   });
 });

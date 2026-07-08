@@ -171,10 +171,14 @@ export async function recordGameResultsToSupabase(
     );
     const totalPlayersInGame = humanScores.length;
 
+    // O(n) placement lookup instead of an O(n) findIndex per player (was O(n^2) overall).
+    const placementByUsername = new Map(
+      sortedForStats.map((p, i) => [p.username, i + 1])
+    );
+
     // Map PlayerResult[] to PlayerScore[] format expected by processGameResults
     const mappedScores = boostedScores.map((playerResult) => {
-      const placement =
-        sortedForStats.findIndex((p) => p.username === playerResult.username) + 1;
+      const placement = placementByUsername.get(playerResult.username) ?? 0;
       const longestWord =
         playerResult.wordDetails?.reduce(
           (max: string, w: WordDetail) =>

@@ -320,7 +320,7 @@ describe('RealTimeDuelGame', () => {
     fireEvent.click(screen.getByTestId('forfeit-btn'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('forfeit-dialog')).toBeInTheDocument();
+      expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     });
   });
 

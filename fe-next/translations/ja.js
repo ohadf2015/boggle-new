@@ -7801,6 +7801,8 @@ const ja = {
       "ofPerfect": "パーフェクト比",
       "points": "点",
       "wordsFound": "{found} / {total} 語発見",
+      "targetWordFound": "🎯 単語を発見: {word}",
+      "targetWordMissed": "🎯 単語は「{word}」でした",
       "vsAverage": "自己平均より{pct}%",
       "betterThan": "今日のクイックプレイの{pct}%より上位",
       "seeLeaderboard": "ランキングを見る",

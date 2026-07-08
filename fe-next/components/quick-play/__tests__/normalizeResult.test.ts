@@ -26,6 +26,23 @@ describe('normalizeResult', () => {
     expect(r.scorePct).toBeGreaterThan(0);
   });
 
+  it('survival result carries the target word so results can reveal it', () => {
+    const r = fromSurvival(
+      { wordsDiscovered: [{ word: 'cat' }] },
+      { ...cfg, mode: 'word-hunt', targetWord: 'TRADE' }
+    );
+    expect(r.targetWord).toBe('TRADE');
+    expect(r.targetWordFound).toBe(false);
+  });
+
+  it('survival result marks the target word found case-insensitively', () => {
+    const r = fromSurvival(
+      { wordsDiscovered: [{ word: 'trade' }] },
+      { ...cfg, mode: 'word-hunt', targetWord: 'TRADE' }
+    );
+    expect(r.targetWordFound).toBe(true);
+  });
+
   it('single player result normalizes', () => {
     const r = fromSinglePlayer({ score: 500, wordsFound: ['x'] }, { ...cfg, mode: 'classic' });
     expect(r.scorePct).toBe(100);

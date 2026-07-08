@@ -1,44 +1,25 @@
 /**
- * Test to verify translations can be imported in browser-compatible way
+ * Verifies each locale's translation chunk loads correctly via the lazy
+ * per-locale loader (translations/loadTranslation.ts), which replaced the
+ * eager translations/index.js barrel that bundled all languages into every page.
  */
-describe('Translations ES Module Import', () => {
-  it('should successfully import translations using ES module syntax', async () => {
-    // This import should work without throwing "module is not defined"
-    const { translations } = await import('../translations/index.js');
+import { loadTranslation } from '../translations/loadTranslation';
 
-    expect(translations).toBeDefined();
-    expect(typeof translations).toBe('object');
-  });
+describe('Translations lazy-load per locale', () => {
+  it('should have required properties on every language', async () => {
+    for (const lang of ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const) {
+      const data = await loadTranslation(lang) as Record<string, unknown>;
 
-  it('should have all required language objects', async () => {
-    const { translations } = await import('../translations/index.js');
+      expect(data).toBeDefined();
+      expect(typeof data).toBe('object');
 
-    // Verify all language objects exist
-    expect(translations.en).toBeDefined();
-    expect(translations.he).toBeDefined();
-    expect(translations.sv).toBeDefined();
-    expect(translations.ja).toBeDefined();
-    expect(translations.es).toBeDefined();
+      const flag = data.flag;
+      const name = data.name;
+      const direction = data.direction;
 
-    // Verify they are objects
-    expect(typeof translations.en).toBe('object');
-    expect(typeof translations.he).toBe('object');
-    expect(typeof translations.sv).toBe('object');
-    expect(typeof translations.ja).toBe('object');
-    expect(typeof translations.es).toBe('object');
-  });
-
-  it('should have required properties on language objects', async () => {
-    const { translations } = await import('../translations/index.js');
-
-    // Check each language has basic required properties
-    for (const lang of ['en', 'he', 'sv', 'ja', 'es'] as const) {
-      const langObj = translations[lang];
-
-      expect(langObj.flag).toBeDefined();
-      expect(langObj.name).toBeDefined();
-      expect(langObj.direction).toBeDefined();
-      expect(['ltr', 'rtl']).toContain(langObj.direction);
+      expect(flag).toBeDefined();
+      expect(name).toBeDefined();
+      expect(['ltr', 'rtl']).toContain(direction);
     }
   });
 });

@@ -6,6 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { Switch } from '@/components/ui/switch';
 import {
   hasConsentDecision,
   getConsentState,
@@ -258,29 +259,14 @@ function ConsentToggle({ label, description, checked, disabled, requiredLabel, o
         !disabled && 'cursor-pointer'
       )}
     >
-      <div className="relative mt-0.5 shrink-0">
-        <input
-          type="checkbox"
+      <span className="mt-0.5 shrink-0">
+        <Switch
           checked={checked}
           disabled={disabled}
-          onChange={onChange ? (e) => onChange(e.target.checked) : undefined}
-          className="sr-only peer"
+          onCheckedChange={onChange}
+          className="border-neo-cream/40 data-[state=checked]:bg-neo-lime data-[state=unchecked]:bg-neo-cream/20"
         />
-        <div
-          className={cn(
-            'w-10 h-6 rounded-full transition-colors',
-            checked ? 'bg-neo-lime' : 'bg-neo-cream/20',
-            disabled && 'bg-neo-cream/30'
-          )}
-        />
-        <div
-          className={cn(
-            'absolute top-0.5 w-5 h-5 rounded-full transition-transform',
-            'bg-white border-2 border-neo-black shadow-xs',
-            checked ? 'translate-x-[18px] rtl:-translate-x-[18px]' : 'translate-x-0.5 rtl:-translate-x-0.5'
-          )}
-        />
-      </div>
+      </span>
       <div className="flex-1 min-w-0">
         <span className="text-sm font-bold text-neo-white block">
           {label}

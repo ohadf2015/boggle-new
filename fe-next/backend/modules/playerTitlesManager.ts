@@ -3,8 +3,9 @@
  */
 
 import type { WordDetail } from '@/shared/types/game';
+import type { Language } from '@/types';
 import logger from '../utils/logger';
-const { translations } = require('../../translations/index.js');
+import { getCachedTranslation } from '../../translations/loadTranslation';
 
 export interface PlayerTitle {
   name: string;
@@ -63,7 +64,7 @@ export function calculatePlayerTitles(
   }
 
   const supportedLocale = ['he', 'en', 'sv', 'ja', 'es'].includes(locale) ? locale : 'he';
-  const titleTranslations = translations[supportedLocale]?.playerTitles;
+  const titleTranslations = (getCachedTranslation(supportedLocale as Language) as { playerTitles?: Record<string, PlayerTitle> } | undefined)?.playerTitles;
 
   // If playerTitles translations are missing, return empty (graceful degradation)
   if (!titleTranslations) {

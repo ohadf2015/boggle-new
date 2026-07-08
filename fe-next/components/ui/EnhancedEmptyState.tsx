@@ -4,9 +4,8 @@ import React from 'react';
 import { m } from 'framer-motion';
 import { Search, Inbox, FolderOpen, Frown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
-import { EnhancedButton } from './EnhancedButton';
-import { getMascotBgTypeForSrc } from './Mascot';
+import { Button } from './button';
+import { Mascot, type MascotVariant } from './Mascot';
 
 /**
  * Enhanced Empty State Component
@@ -28,8 +27,12 @@ export interface EnhancedEmptyStateProps {
   description?: string;
   /** Icon variant or custom icon */
   icon?: EmptyIcon;
-  /** Primary action button */
-  action?: {
+  /**
+   * Primary action — either a fully custom element (rendered as-is, for
+   * bespoke button styling) or a {label, onClick} config rendered via the
+   * standard Button.
+   */
+  action?: React.ReactElement | {
     label: string;
     onClick: () => void;
     variant?: 'default' | 'primary' | 'secondary';
@@ -45,8 +48,8 @@ export interface EnhancedEmptyStateProps {
   reduceMotion?: boolean;
   /** Custom className */
   className?: string;
-  /** Optional mascot image path (e.g. '/mascot/explorer.webp') */
-  mascotSrc?: string;
+  /** Animated mascot variant (preferred over the icon box when set) */
+  mascotVariant?: MascotVariant;
 }
 
 const iconComponents = {
@@ -66,7 +69,7 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
   compact = false,
   reduceMotion = false,
   className,
-  mascotSrc,
+  mascotVariant,
 }) => {
   const IconComponent = typeof icon === 'string' ? iconComponents[icon as keyof typeof iconComponents] : null;
 
@@ -101,20 +104,15 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
       aria-live="polite"
     >
       {/* Icon or Mascot */}
-      {mascotSrc ? (
+      {mascotVariant ? (
         <m.div
-          data-mascot-bg={getMascotBgTypeForSrc(mascotSrc)}
-          className={cn('mb-6', compact ? 'w-16 h-16' : 'w-24 h-24')}
+          className="mb-6"
           variants={reduceMotion ? {} : itemVariants}
         >
-          <Image
-            src={mascotSrc}
-            alt=""
-            width={compact ? 64 : 96}
-            height={compact ? 64 : 96}
-            className="object-contain drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
-            unoptimized
-            aria-hidden="true"
+          <Mascot
+            variant={mascotVariant}
+            size={compact ? 'xs' : 'md'}
+            animated={!reduceMotion}
           />
         </m.div>
       ) : (
@@ -190,14 +188,18 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
           className="mt-6"
           variants={reduceMotion ? {} : itemVariants}
         >
-          <EnhancedButton
-            onClick={action.onClick}
-            variant={action.variant === 'secondary' ? 'secondary' : 'default'}
-            size={compact ? 'sm' : 'default'}
-            animation="pop"
-          >
-            {action.label}
-          </EnhancedButton>
+          {React.isValidElement(action) ? (
+            action
+          ) : (
+            <Button
+              onClick={action.onClick}
+              variant={action.variant === 'secondary' ? 'secondary' : 'default'}
+              size={compact ? 'sm' : 'default'}
+              animation="pop"
+            >
+              {action.label}
+            </Button>
+          )}
         </m.div>
       )}
 
@@ -220,84 +222,9 @@ export const EnhancedEmptyState: React.FC<EnhancedEmptyStateProps> = ({
   );
 };
 
-// Pre-configured empty states for common scenarios
-export const EmptySearchResults: React.FC<{
-  searchTerm?: string;
-  onClearSearch?: () => void;
-  className?: string;
-}> = ({ searchTerm, onClearSearch, className }) => (
-  <EnhancedEmptyState
-    title="No results found"
-    description={
-      searchTerm
-        ? `We couldn't find anything matching "${searchTerm}". Try different keywords.`
-        : 'Try adjusting your search or filters to find what you\'re looking for.'
-    }
-    icon="search"
-    mascotSrc="/mascot/explorer.webp"
-    action={
-      onClearSearch
-        ? {
-            label: 'Clear Search',
-            onClick: onClearSearch,
-          }
-        : undefined
-    }
-    className={className}
-  />
-);
-
-export const EmptyInbox: React.FC<{
-  message?: string;
-  onRefresh?: () => void;
-  className?: string;
-}> = ({ message = 'You\'re all caught up!', onRefresh, className }) => (
-  <EnhancedEmptyState
-    title="Nothing to see here"
-    description={message}
-    icon="inbox"
-    action={
-      onRefresh
-        ? {
-            label: 'Refresh',
-            onClick: onRefresh,
-          }
-        : undefined
-    }
-    className={className}
-  />
-);
-
-export const EmptyContent: React.FC<{
-  title?: string;
-  description?: string;
-  onCreate?: () => void;
-  createLabel?: string;
-  className?: string;
-}> = ({
-  title = 'No content yet',
-  description = 'Get started by creating your first item.',
-  onCreate,
-  createLabel = 'Create New',
-  className,
-}) => (
-  <EnhancedEmptyState
-    title={title}
-    description={description}
-    icon="folder"
-    action={
-      onCreate
-        ? {
-            label: createLabel,
-            onClick: onCreate,
-            variant: 'primary',
-          }
-        : undefined
-    }
-    className={className}
-  />
-);
-
+// Pre-configured error state for common scenarios (the only one of this
+// file's convenience wrappers with real call sites — the rest were unused
+// and dropped).
 export const ErrorState: React.FC<{
   title?: string;
   description?: string;
@@ -312,45 +239,13 @@ export const ErrorState: React.FC<{
   <EnhancedEmptyState
     title={title}
     description={description}
-    icon="sad"
-    mascotSrc="/mascot/oops.webp"
+    mascotVariant="oops"
     action={
       onRetry
         ? {
             label: 'Try Again',
             onClick: onRetry,
             variant: 'secondary',
-          }
-        : undefined
-    }
-    className={className}
-  />
-);
-
-export const SuccessState: React.FC<{
-  title?: string;
-  description?: string;
-  onContinue?: () => void;
-  continueLabel?: string;
-  className?: string;
-}> = ({
-  title = 'All done!',
-  description = 'Your action was completed successfully.',
-  onContinue,
-  continueLabel = 'Continue',
-  className,
-}) => (
-  <EnhancedEmptyState
-    title={title}
-    description={description}
-    icon="sparkles"
-    mascotSrc="/mascot/celebration.webp"
-    action={
-      onContinue
-        ? {
-            label: continueLabel,
-            onClick: onContinue,
-            variant: 'primary',
           }
         : undefined
     }

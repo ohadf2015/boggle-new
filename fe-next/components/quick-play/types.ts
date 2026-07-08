@@ -40,6 +40,9 @@ export interface QuickRoundResult {
   wordsFound: number;
   totalWords: number;
   durationMs: number;
+  /** word-hunt only: the seeded mystery word and whether the player found it */
+  targetWord?: string;
+  targetWordFound?: boolean;
 }
 
 export interface QuickSubmitOutcome {

@@ -4,7 +4,8 @@
  */
 
 import type { Game, WordDetail } from '@/shared/types/game';
-const { translations } = require('../../translations/index.js');
+import type { Language } from '@/types';
+import { getCachedTranslation } from '../../translations/loadTranslation';
 import logger from '../utils/logger';
 import { hasNoVowels, hasAllVowels, isQWithoutU, isLongIsogram, LEVIATHAN_MIN_LENGTH } from './achievements/wordFeats';
 
@@ -114,8 +115,8 @@ interface GameWithAchievements extends Game {
  * Get localized achievements based on locale
  */
 export function getLocalizedAchievements(locale: string = 'he'): Record<string, Achievement> {
-  const supportedLocale = ['he', 'en', 'sv', 'ja', 'es'].includes(locale) ? locale : 'he';
-  const t = translations[supportedLocale].achievements;
+  const supportedLocale = (['he', 'en', 'sv', 'ja', 'es'].includes(locale) ? locale : 'he') as Language;
+  const t = getCachedTranslation(supportedLocale)!.achievements as Record<string, { name: string; description: string }>;
 
   const achievements: Record<string, Achievement> = {};
   Object.keys(ACHIEVEMENT_ICONS).forEach(key => {

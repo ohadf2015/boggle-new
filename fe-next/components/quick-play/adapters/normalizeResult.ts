@@ -37,7 +37,13 @@ export function fromSurvival(
   cfg: QuickRoundConfig
 ): QuickRoundResult {
   const score = r.wordsDiscovered.reduce((sum, d) => sum + calculateWordScore(d.word, 0), 0);
-  return base(score, r.wordsDiscovered.length, cfg);
+  return {
+    ...base(score, r.wordsDiscovered.length, cfg),
+    targetWord: cfg.targetWord,
+    targetWordFound: cfg.targetWord
+      ? r.wordsDiscovered.some(d => d.word.toLowerCase() === cfg.targetWord!.toLowerCase())
+      : undefined,
+  };
 }
 
 export function fromSinglePlayer(

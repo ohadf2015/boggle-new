@@ -20,7 +20,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyMissions } from '../hooks/useDailyMissions';
 import { useFriends } from '../hooks/useFriends';
 import { useFriendMessages } from '../hooks/useFriendMessages';
-import { toast } from './ui/EnhancedToast';
+import { neoInfoToast } from './NeoToast';
 import type { Message } from '@/shared/types/friends';
 
 // 3 daily missions shown in the Quests tab (no brain drill)
@@ -205,14 +205,17 @@ export const GlobalBottomNav = memo(function GlobalBottomNav() {
             ? message.message.substring(0, 77) + '...'
             : message.message;
 
-        toast.info(
+        neoInfoToast(
             t('friends.messageFrom', { name: senderName }),
-            preview,
             {
-                label: t('friends.open'),
-                onClick: () => router.push(
-                    `/${language}/friends?tab=messages&friendUserId=${message.fromUserId}`
-                ),
+                description: preview,
+                duration: 6000,
+                action: {
+                    label: t('friends.open'),
+                    onClick: () => router.push(
+                        `/${language}/friends?tab=messages&friendUserId=${message.fromUserId}`
+                    ),
+                },
             }
         );
     }, [t, router, language]);

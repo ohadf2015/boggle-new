@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { TeacherAccessFormPayload, TeacherAccessRole, TeacherLocale } from '@/lib/education/types';
 
 const ROLES: TeacherAccessRole[] = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'];
@@ -139,10 +140,12 @@ export function AccessRequestForm({ lockedEmail }: { lockedEmail?: string } = {}
       </m.div>
       <m.div variants={item}>
         <label htmlFor="tar-role" className={LABEL_CLASS}>{t('education.access.role')}</label>
-        <select id="tar-role" value={role} onChange={(e) => setRole(e.target.value as TeacherAccessRole)}
-          className={FIELD_CLASS}>
-          {ROLES.map((r) => <option key={r} value={r}>{t(`education.access.role_${r}`)}</option>)}
-        </select>
+        <Select value={role} onValueChange={(v) => setRole(v as TeacherAccessRole)}>
+          <SelectTrigger id="tar-role" className={FIELD_CLASS}><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {ROLES.map((r) => <SelectItem key={r} value={r}>{t(`education.access.role_${r}`)}</SelectItem>)}
+          </SelectContent>
+        </Select>
       </m.div>
       <m.div variants={item}>
         <label htmlFor="tar-school" className={LABEL_CLASS}>{t('education.access.school_or_org')}</label>

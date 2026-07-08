@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle, RefreshCw, Home, HelpCircle, Wifi } from 'lucide-react';
 import logger from '@/utils/logger';
-import { translations } from '@/translations';
+import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
 
 // ==========================================
@@ -36,7 +36,7 @@ function getTranslationFn(): TranslationFunction {
   return (path: string, fallback?: string): string => {
     try {
       const keys = path.split('.');
-      let current: unknown = translations[language as keyof typeof translations];
+      let current: unknown = getCachedTranslation(language);
       for (const key of keys) {
         if (current === null || typeof current !== 'object') return fallback || path;
         current = (current as Record<string, unknown>)[key];

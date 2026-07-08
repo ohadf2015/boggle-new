@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import {
   SCHOOL_LEAD_ROLES,
@@ -121,15 +123,21 @@ export function SchoolLeadForm() {
       </m.div>
       <m.div variants={item}>
         <label htmlFor="sl-role" className={LABEL_CLASS}>{t('education.forSchools.form.role')}</label>
-        <select id="sl-role" value={role} onChange={(e) => setRole(e.target.value as SchoolLeadRole)} className={FIELD_CLASS}>
-          {SCHOOL_LEAD_ROLES.map((r) => <option key={r} value={r}>{t(`education.forSchools.form.role_${r}`)}</option>)}
-        </select>
+        <Select value={role} onValueChange={(v) => setRole(v as SchoolLeadRole)}>
+          <SelectTrigger id="sl-role" className={FIELD_CLASS}><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {SCHOOL_LEAD_ROLES.map((r) => <SelectItem key={r} value={r}>{t(`education.forSchools.form.role_${r}`)}</SelectItem>)}
+          </SelectContent>
+        </Select>
       </m.div>
       <m.div variants={item}>
         <label htmlFor="sl-student_count" className={LABEL_CLASS}>{t('education.forSchools.form.student_count')}</label>
-        <select id="sl-student_count" value={studentCount} onChange={(e) => setStudentCount(e.target.value as StudentCountBucket)} className={FIELD_CLASS}>
-          {STUDENT_COUNT_BUCKETS.map((b) => <option key={b} value={b}>{t(`education.forSchools.form.count_${b}`)}</option>)}
-        </select>
+        <Select value={studentCount} onValueChange={(v) => setStudentCount(v as StudentCountBucket)}>
+          <SelectTrigger id="sl-student_count" className={FIELD_CLASS}><SelectValue /></SelectTrigger>
+          <SelectContent>
+            {STUDENT_COUNT_BUCKETS.map((b) => <SelectItem key={b} value={b}>{t(`education.forSchools.form.count_${b}`)}</SelectItem>)}
+          </SelectContent>
+        </Select>
       </m.div>
       <m.fieldset variants={item} className="space-y-2">
         <legend className={LABEL_CLASS}>{t('education.forSchools.form.interests_legend')}</legend>
@@ -154,7 +162,7 @@ export function SchoolLeadForm() {
       </m.div>
       <m.div variants={item}>
         <label htmlFor="sl-message" className={LABEL_CLASS}>{t('education.forSchools.form.message')}</label>
-        <textarea id="sl-message" maxLength={800} rows={3} value={message} onChange={(e) => setMessage(e.target.value)} className={FIELD_CLASS} />
+        <Textarea id="sl-message" maxLength={800} rows={3} value={message} onChange={(e) => setMessage(e.target.value)} className={FIELD_CLASS} />
       </m.div>
       {error && <p role="alert" aria-live="polite" className="text-neo-red font-semibold">{error}</p>}
       <m.button

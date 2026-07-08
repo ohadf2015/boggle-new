@@ -3,9 +3,10 @@
 import { useEffect } from 'react';
 import { captureError } from '@/utils/sentry';
 import { Mascot } from '@/components/ui/Mascot';
-import { translations } from '../../../translations';
+import { getCachedTranslation } from '@/translations/loadTranslation';
+import type { Language } from '@/types';
 
-type SupportedLocale = keyof typeof translations;
+type SupportedLocale = Language;
 
 function getLocale(): SupportedLocale {
   try {
@@ -19,7 +20,7 @@ function getLocale(): SupportedLocale {
 function t(locale: SupportedLocale, path: string): string {
   try {
     const keys = path.split('.');
-    let current: unknown = translations[locale] || translations.en;
+    let current: unknown = getCachedTranslation(locale as Language) || getCachedTranslation('en');
     for (const key of keys) {
       current = (current as Record<string, unknown>)[key];
       if (current === undefined) return path;

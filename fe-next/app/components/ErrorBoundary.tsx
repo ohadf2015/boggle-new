@@ -2,10 +2,10 @@
 
 import { Component, ReactNode, ErrorInfo } from 'react';
 import { m } from 'framer-motion';
-import { translations } from '../../translations';
+import { getCachedTranslation } from '@/translations/loadTranslation';
+import type { Language } from '@/types';
 import logger from '@/utils/logger';
 import { captureError } from '@/utils/sentry';
-import { EnhancedButton } from '@/components/ui/EnhancedButton';
 import { ErrorState } from '@/components/ui/EnhancedEmptyState';
 
 /**
@@ -94,7 +94,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       const t: TranslationFunction = (path: string): string => {
         try {
           const keys = path.split('.');
-          let current: unknown = translations[language as keyof typeof translations];
+          let current: unknown = getCachedTranslation(language as Language);
           for (const key of keys) {
             if (current === null || typeof current !== 'object') return path;
             current = (current as Record<string, unknown>)[key];

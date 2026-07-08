@@ -59,7 +59,16 @@ export function BlastQuickRound({ config, onDone, onQuit }: BlastQuickRoundProps
 
   return (
     <BlastGame
-      config={{ gridSize: config.grid.length || 6, specialTileChance: 0.12, language: config.language as never }}
+      config={{
+        gridSize: config.grid.length || 6,
+        specialTileChance: 0.12,
+        language: config.language as never,
+        // Bare board: cleared tiles stay cleared, matching the sibling
+        // multiplayer implementations (BlastView, useBlastMultiplayerBridge).
+        // Without this the engine defaults to refill, so the board never
+        // empties and cleared tiles are immediately replaced by new ones.
+        boardClearMode: 'shrink',
+      }}
       mode="multiplayer"
       serverGrid={config.grid as never}
       blastSeed={hashString(config.seed)}

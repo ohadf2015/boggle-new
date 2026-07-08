@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
 import { cva, type VariantProps } from "class-variance-authority";
+import { AdaptiveMotion } from "../motion/AdaptiveMotion";
 
 import { cn } from "../../lib/utils";
 
@@ -59,6 +60,11 @@ const buttonVariants = cva(
         accent: "bg-neo-pink text-neo-black hover:brightness-110",
         // NEW: Cyan variant
         cyan: "bg-neo-cyan text-neo-black hover:brightness-110",
+        // Gradient: special CTAs
+        gradient: [
+          "bg-linear-to-r from-neo-pink via-neo-orange to-neo-yellow",
+          "text-neo-black hover:brightness-110",
+        ].join(" "),
       },
       size: {
         // Consistent sizing with proper touch targets (48px minimum)
@@ -84,18 +90,48 @@ export interface ButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
   asChild?: boolean;
+  /** Vibrate briefly on click (mobile only; no-op where unsupported) */
+  haptic?: boolean;
+  /** Optional hover/tap micro-animation. Default 'none' adds zero wrapper/cost. */
+  animation?: "none" | "pop";
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, haptic = false, animation = "none", onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    return (
+
+    const handleClick = React.useCallback(
+      (e: React.MouseEvent<HTMLButtonElement>) => {
+        if (haptic && typeof navigator !== "undefined" && navigator.vibrate) {
+          navigator.vibrate(50);
+        }
+        onClick?.(e);
+      },
+      [haptic, onClick]
+    );
+
+    const button = (
       <Comp
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
+        onClick={handleClick}
         {...props}
       />
     );
+
+    if (animation === "pop") {
+      return (
+        <AdaptiveMotion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        >
+          {button}
+        </AdaptiveMotion.div>
+      );
+    }
+
+    return button;
   }
 );
 Button.displayName = "Button";

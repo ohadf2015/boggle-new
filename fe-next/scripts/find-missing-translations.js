@@ -21,7 +21,6 @@ try {
 
 // Configuration
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const TRANSLATIONS_FILE = path.join(PROJECT_ROOT, 'translations/index.js');
 const EXTENSIONS_TO_SCAN = ['.ts', '.tsx', '.js', '.jsx'];
 const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts', '.venv', 'venv', '.venv-rembg', '__pycache__', '__tests__', '__mocks__', 'e2e', 'playwright', 'coverage', '.turbo', 'out'];
 const FILE_PATTERNS_TO_EXCLUDE = [/\.test\.[tj]sx?$/, /\.spec\.[tj]sx?$/, /\.stories\.[tj]sx?$/];
@@ -101,26 +100,21 @@ function parseESMTranslationFile(filePath) {
 }
 
 function getTranslationKeysFromFile() {
-  console.log('Reading translations file...');
+  console.log('Reading translations files...');
 
-  const translationsDir = path.dirname(TRANSLATIONS_FILE);
-  const indexContent = fs.readFileSync(TRANSLATIONS_FILE, 'utf-8');
-
-  // Extract language imports: import { en } from './en.js'
-  const importRegex = /import\s*\{\s*(\w+)\s*\}\s*from\s*['"]\.\/(\w+)\.js['"]/g;
+  const translationsDir = path.join(PROJECT_ROOT, 'translations');
+  // Each language is its own file (en.js, he.js, ...) — loaded lazily per-locale
+  // by translations/loadTranslation.ts. There is no more combined barrel file.
+  const langFiles = fs.readdirSync(translationsDir).filter((f) => /^[a-z]{2}\.js$/.test(f));
   const translations = {};
-  let m;
-  while ((m = importRegex.exec(indexContent)) !== null) {
-    const langName = m[1];
-    const fileName = m[2];
-    const langFile = path.join(translationsDir, `${fileName}.js`);
-    if (fs.existsSync(langFile)) {
-      try {
-        translations[langName] = parseESMTranslationFile(langFile);
-      } catch (e) {
-        console.error(`Failed to parse ${langFile}: ${e.message}`);
-        process.exit(1);
-      }
+  for (const fileName of langFiles) {
+    const langName = fileName.replace(/\.js$/, '');
+    const langFile = path.join(translationsDir, fileName);
+    try {
+      translations[langName] = parseESMTranslationFile(langFile);
+    } catch (e) {
+      console.error(`Failed to parse ${langFile}: ${e.message}`);
+      process.exit(1);
     }
   }
 

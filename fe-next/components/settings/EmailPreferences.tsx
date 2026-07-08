@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { m } from 'framer-motion';
 import { Mail, Bell, BellOff, Globe, Check } from 'lucide-react';
 import { Loader } from '@/components/ui/Loader';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -138,8 +139,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
   }
 
   // Change timezone
-  function handleTimezoneChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    const newTimezone = e.target.value;
+  function handleTimezoneChange(newTimezone: string) {
     setTimezone(newTimezone);
     savePreferences(dailyEmailSubscribed, newTimezone);
   }
@@ -271,29 +271,22 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
             </div>
           </div>
 
-          <select
-            value={timezone}
-            onChange={handleTimezoneChange}
-            disabled={isSaving}
-            aria-label={t('emailPreferences.selectTimezone')}
-            className={cn(
-              'w-full px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-              isDarkMode
-                ? 'bg-neo-navy-light border-slate-600 text-white'
-                : 'bg-white border-gray-300 text-gray-900',
-              isSaving && 'opacity-50 cursor-not-allowed'
-            )}
-          >
-            {TIMEZONE_OPTIONS.map((tz) => (
-              <option key={tz.value} value={tz.value}>
-                {tz.label}
-              </option>
-            ))}
-            {/* Include user's detected timezone if not in the list */}
-            {!TIMEZONE_OPTIONS.find(tz => tz.value === timezone) && timezone && (
-              <option value={timezone}>{timezone}</option>
-            )}
-          </select>
+          <Select value={timezone} onValueChange={handleTimezoneChange} disabled={isSaving}>
+            <SelectTrigger className="w-full" aria-label={t('emailPreferences.selectTimezone')}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TIMEZONE_OPTIONS.map((tz) => (
+                <SelectItem key={tz.value} value={tz.value}>
+                  {tz.label}
+                </SelectItem>
+              ))}
+              {/* Include user's detected timezone if not in the list */}
+              {!TIMEZONE_OPTIONS.find(tz => tz.value === timezone) && timezone && (
+                <SelectItem value={timezone}>{timezone}</SelectItem>
+              )}
+            </SelectContent>
+          </Select>
         </div>
       )}
 

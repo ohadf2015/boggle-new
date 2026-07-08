@@ -5,12 +5,14 @@
  *
  * Consolidates all game-specific badge variants with animations into a single component.
  *
- * Replaces:
- * - NewPlayerBadge (components/game/NewPlayerBadge.tsx)
- * - NewBadge (components/brain/NewBadge.tsx)
- * - LateJoinerBadge (components/game/LateJoinerBadge.tsx)
- * - RankBadge (components/daily/results/RankBadge.tsx)
- * - ScoreBadge (components/daily/results/ScoreBadge.tsx)
+ * Replaced NewPlayerBadge (components/game/NewPlayerBadge.tsx),
+ * LateJoinerBadge (components/game/LateJoinerBadge.tsx), and NewBadge
+ * (components/brain/NewBadge.tsx, via variant="new-feature" animate="pulse")
+ * — all deleted. RankBadge and ScoreBadge (components/daily/results/) were
+ * NOT actually migrated despite once being listed here — they're still
+ * live, separate components with their own call sites and test mocks. Fold
+ * them into GameBadge only with the same call-site-by-call-site care, not
+ * by assuming this comment is accurate before checking.
  *
  * This component is specifically for game-related badges that need animations,
  * auto-hide functionality, and game-specific styling. For general-purpose badges
@@ -37,7 +39,7 @@ export type GameBadgeVariant =
   | 'streak'          // Orange badge for streaks
   | 'default';        // Default Neo-Navy styling
 
-export type GameBadgeSize = 'xs' | 'sm' | 'md';
+export type GameBadgeSize = 'xs' | 'sm' | 'md' | 'lg';
 
 export type GameBadgeAnimation =
   | 'spring'   // Pop-in spring animation
@@ -82,9 +84,9 @@ const VARIANT_STYLES: Record<GameBadgeVariant, string> = {
   'new-feature': 'bg-neo-lime text-neo-black border-neo-black',
   'late-joiner': 'bg-neo-pink/20 text-neo-black border-neo-black',
   'rank': 'bg-amber-400 text-neo-black border-neo-black',
-  'score-success': 'bg-emerald-500 text-white border-neo-black',
+  'score-success': 'bg-neo-lime text-neo-black border-neo-black',
   'score-fail': 'bg-neo-gray text-white border-neo-black',
-  'streak': 'bg-orange-500 text-white border-neo-black',
+  'streak': 'bg-neo-orange text-neo-black border-neo-black',
   'default': 'bg-neo-navy text-neo-white border-neo-white/20',
 };
 
@@ -92,12 +94,14 @@ const SIZE_CLASSES: Record<GameBadgeSize, string> = {
   xs: 'text-[8px] px-1 py-0.5 gap-0.5',
   sm: 'text-[10px] px-1.5 py-0.5 gap-1',
   md: 'text-xs px-2 py-1 gap-1.5',
+  lg: 'text-sm px-2 py-1 gap-1.5',
 };
 
 const ICON_SIZES: Record<GameBadgeSize, string> = {
   xs: 'w-2 h-2',
   sm: 'w-2.5 h-2.5',
   md: 'w-3 h-3',
+  lg: 'w-4 h-4',
 };
 
 // ==================== Animation Configurations ====================

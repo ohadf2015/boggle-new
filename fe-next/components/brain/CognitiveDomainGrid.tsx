@@ -2,13 +2,13 @@
 
 import React, { useState, useCallback } from 'react';
 import { m } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, TrendingDown, Minus, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { GameBadge } from '@/components/ui/GameBadge';
 import type { GameCognitiveScore } from '@/shared/types/cognitive';
-import NewBadge from './NewBadge';
 import DeltaDisplay from './DeltaDisplay';
 
 type TrendType = 'improving' | 'stable' | 'declining';
@@ -182,7 +182,9 @@ export default function CognitiveDomainGrid({
                         {t(`brain.domains.${domainKey}`)}
                       </p>
                       {showNewBadge ? (
-                        <NewBadge />
+                        <GameBadge variant="new-feature" icon={Sparkles} animate="pulse">
+                          {t('brain.newBadge')}
+                        </GameBadge>
                       ) : showDelta ? (
                         <DeltaDisplay delta={calculateDomainDelta(domainKey, recentGameScores)} />
                       ) : (

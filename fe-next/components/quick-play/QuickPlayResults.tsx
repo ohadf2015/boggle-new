@@ -113,31 +113,31 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
   const modeColor = NODE_COLORS[result.mode];
 
   return (
-    <div className="flex min-h-full flex-col gap-4 bg-neo-navy px-4 py-6 animate-[fadeInUp_0.2s_ease-out_0s_both]" data-testid="quick-play-results">
-      <div className="flex justify-center">
-        <span className={`rounded-xl border-neo-thick border-black px-4 py-1.5 font-neo-display text-sm font-bold tracking-widest text-black shadow-hard ${modeColor.bg}`}>
+    <div className="flex min-h-full flex-col gap-2.5 bg-neo-navy px-4 py-3 animate-[fadeInUp_0.2s_ease-out_0s_both]" data-testid="quick-play-results">
+      <div className="flex items-center justify-center gap-2">
+        <span className={`rounded-xl border-neo-thick border-black px-3 py-1 font-neo-display text-xs font-bold tracking-widest text-black shadow-hard ${modeColor.bg}`}>
           {t(`quickPlay.solo.mode.${result.mode}`)}
         </span>
+        <h1 ref={headingRef} tabIndex={-1} className="font-neo-display text-lg font-bold tracking-wide text-neo-cream outline-none">
+          {t('quickPlay.solo.roundComplete')}
+        </h1>
       </div>
-      <h1 ref={headingRef} tabIndex={-1} className="text-center font-neo-display text-2xl font-bold tracking-wide text-neo-cream outline-none">
-        {t('quickPlay.solo.roundComplete')}
-      </h1>
 
       {isPersonalBest && (
-        <div className="animate-neo-pop -rotate-1 rounded-2xl border-neo-thick border-black bg-neo-yellow px-4 py-2 text-center font-neo-display text-base font-bold tracking-wide text-black shadow-hard" data-testid="quick-new-best">
+        <div className="animate-neo-pop -rotate-1 rounded-xl border-neo-thick border-black bg-neo-yellow px-3 py-1.5 text-center font-neo-display text-sm font-bold tracking-wide text-black shadow-hard" data-testid="quick-new-best">
           ★ {t('quickPlay.solo.newBest')}
         </div>
       )}
       {rankedUp && (
-        <div className="animate-neo-pop rounded-2xl border-neo-thick border-black bg-neo-pink px-4 py-2 text-center font-neo-display text-base font-bold tracking-wide text-black shadow-hard" data-testid="quick-rank-up">
+        <div className="animate-neo-pop rounded-xl border-neo-thick border-black bg-neo-pink px-3 py-1.5 text-center font-neo-display text-sm font-bold tracking-wide text-black shadow-hard" data-testid="quick-rank-up">
           {t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}
         </div>
       )}
 
       {/* Hero: % of perfect gauge */}
-      <div className="flex items-center gap-5 rounded-3xl border-neo-thick border-black bg-neo-navy-elevated p-5 shadow-hard-lg">
-        <div className="relative h-32 w-32 flex-none">
-          <svg width="128" height="128" viewBox="0 0 128 128" className="-rotate-90">
+      <div className="flex items-center gap-4 rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard-lg">
+        <div className="relative h-24 w-24 flex-none">
+          <svg width="96" height="96" viewBox="0 0 128 128" className="-rotate-90">
             <circle cx="64" cy="64" r={GAUGE_R} fill="none" stroke="var(--neo-abyss)" strokeWidth="14" />
             <circle
               cx="64" cy="64" r={GAUGE_R} fill="none" stroke={modeColor.hex} strokeWidth="14"
@@ -145,20 +145,28 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <b className={`font-neo-display text-3xl ${modeColor.text}`}>{result.scorePct}%</b>
-            <small className="text-[10px] tracking-wider text-neo-white/60">{t('quickPlay.solo.ofPerfect')}</small>
+            <b className={`font-neo-display text-2xl ${modeColor.text}`}>{result.scorePct}%</b>
+            <small className="text-[9px] tracking-wider text-neo-white/60">{t('quickPlay.solo.ofPerfect')}</small>
           </div>
         </div>
-        <div className="flex flex-col gap-2 text-neo-cream">
-          <div className="font-neo-display text-2xl">
+        <div className="flex flex-col gap-1 text-neo-cream">
+          <div className="font-neo-display text-xl">
             <em className={`not-italic ${modeColor.text}`}>{result.score}</em> {t('quickPlay.solo.points')}
           </div>
           <div className="text-sm text-neo-white/75">
             {t('quickPlay.solo.wordsFound', { found: String(result.wordsFound), total: String(result.totalWords) })}
           </div>
+          {result.mode === 'word-hunt' && result.targetWord && (
+            <div className={`text-sm font-bold ${result.targetWordFound ? 'text-neo-lime' : 'text-neo-white/75'}`}>
+              {t(
+                result.targetWordFound ? 'quickPlay.solo.targetWordFound' : 'quickPlay.solo.targetWordMissed',
+                { word: result.targetWord.toUpperCase() }
+              )}
+            </div>
+          )}
           {improvementPct !== null && (
             <span
-              className={`w-max rounded-lg border-2 px-2.5 py-1 text-sm font-bold ${
+              className={`w-max rounded-lg border-2 px-2 py-0.5 text-xs font-bold ${
                 improvementPct >= 0
                   ? 'border-neo-lime bg-neo-lime/15 text-neo-lime'
                   : 'border-neo-white/30 bg-neo-white/5 text-neo-white/70'
@@ -172,11 +180,11 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
       </div>
 
       {/* Rewards */}
-      <div className="flex gap-3">
-        <div className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-neo-thick border-black bg-neo-yellow py-3 font-neo-display text-lg font-bold text-black shadow-hard">
+      <div className="flex gap-2.5">
+        <div className="flex flex-1 items-center justify-center gap-2 rounded-xl border-neo-thick border-black bg-neo-yellow py-2 font-neo-display text-base font-bold text-black shadow-hard">
           ◉ +{outcome.coins}
         </div>
-        <div className="flex flex-1 items-center justify-center gap-2 rounded-2xl border-neo-thick border-black bg-neo-purple py-3 font-neo-display text-lg font-bold text-white shadow-hard">
+        <div className="flex flex-1 items-center justify-center gap-2 rounded-xl border-neo-thick border-black bg-neo-purple py-2 font-neo-display text-base font-bold text-white shadow-hard">
           ★ +{outcome.xp} XP
         </div>
       </div>
@@ -193,22 +201,19 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
         />
       )}
 
-      {/* Percentile */}
-      <div className="rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-4 shadow-hard">
-        <p className="mb-2 text-sm text-neo-cream">
+      {/* Percentile + Quick Rank — merged into one card (was two) to cut a
+          full card's worth of border/padding overhead. */}
+      <div className="rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-3 shadow-hard" data-testid="quick-rank-bar">
+        <p className="mb-1 text-xs text-neo-cream">
           {t('quickPlay.solo.betterThan', { pct: String(outcome.percentileToday) })}
         </p>
-        <div className="h-4 overflow-hidden rounded-full border-2 border-black bg-neo-abyss">
+        <div className="h-2.5 overflow-hidden rounded-full border-2 border-black bg-neo-abyss">
           <i
             className="block h-full border-r-2 border-black bg-neo-cyan"
             style={{ width: `${outcome.percentileToday}%` }}
           />
         </div>
-      </div>
-
-      {/* Quick Rank progression */}
-      <div className="rounded-2xl border-neo-thick border-black bg-neo-navy-elevated p-4 shadow-hard" data-testid="quick-rank-bar">
-        <div className="mb-2 flex items-center justify-between text-sm">
+        <div className="mt-2.5 flex items-center justify-between text-xs">
           <span className={`font-neo-display font-bold tracking-wide ${rankNow.color}`}>
             {t(`quickPlay.solo.rank.${rankNow.key}`)}
           </span>
@@ -222,35 +227,37 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
               : t('quickPlay.solo.rankMax')}
           </span>
         </div>
-        <div className="h-4 overflow-hidden rounded-full border-2 border-black bg-neo-abyss">
+        <div className="mt-1 h-2.5 overflow-hidden rounded-full border-2 border-black bg-neo-abyss">
           <i
             className="block h-full border-r-2 border-black bg-neo-cozy transition-[width] duration-700"
             style={{ width: `${Math.round(rankNow.progress * 100)}%` }}
           />
         </div>
-        <p className="mt-1.5 text-xs text-neo-white/55">
+        <p className="mt-1 text-[11px] text-neo-white/55">
           {t('quickPlay.solo.rankGained', { pts: String(result.scorePct) })}
         </p>
       </div>
 
-      {/* Leaderboard peek */}
+      {/* Leaderboard: collapsed to one summary line by default (was 3 always-open
+          rows) — tap to expand, no scroll cost when the player isn't curious. */}
       {board.length > 0 && (
         <div className="overflow-hidden rounded-2xl border-neo-thick border-black bg-neo-navy-elevated shadow-hard">
-          {(showFullBoard ? board : board.slice(0, 3)).map((e) => (
-            <div key={e.userId} className="flex items-center gap-3 border-b-2 border-black/40 px-4 py-2.5 text-sm text-neo-cream">
-              <span className="w-6 font-neo-display font-bold text-neo-white/60">{e.rank}</span>
-              <span className="flex-1">{e.name}</span>
-              <span className="font-neo-display font-semibold">{e.bestScorePct}%</span>
-            </div>
-          ))}
-          {board.length > 3 && !showFullBoard && (
+          {!showFullBoard ? (
             <button
               type="button"
               onClick={() => setShowFullBoard(true)}
-              className="w-full py-2.5 text-sm font-bold tracking-wide text-neo-cyan"
+              className="w-full py-2 text-sm font-bold tracking-wide text-neo-cyan"
             >
               {t('quickPlay.solo.seeLeaderboard')}
             </button>
+          ) : (
+            board.map((e) => (
+              <div key={e.userId} className="flex items-center gap-3 border-b-2 border-black/40 px-4 py-2 text-sm text-neo-cream">
+                <span className="w-6 font-neo-display font-bold text-neo-white/60">{e.rank}</span>
+                <span className="flex-1">{e.name}</span>
+                <span className="font-neo-display font-semibold">{e.bestScorePct}%</span>
+              </div>
+            ))
           )}
         </div>
       )}
@@ -259,7 +266,7 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
         type="button"
         data-testid="quick-results-next"
         onClick={onNextRound}
-        className="h-[60px] rounded-2xl border-4 border-black bg-neo-lime font-neo-display text-xl font-bold tracking-[2px] text-black shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
+        className="h-[52px] rounded-2xl border-4 border-black bg-neo-lime font-neo-display text-lg font-bold tracking-[2px] text-black shadow-hard-lg active:translate-x-0.5 active:translate-y-0.5 active:shadow-hard-pressed"
       >
         {t('quickPlay.solo.nextRound')}
       </button>
@@ -267,11 +274,11 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
         type="button"
         data-testid="quick-results-challenge"
         onClick={onChallenge}
-        className="h-[52px] rounded-2xl border-[3px] border-neo-cozy font-neo-display text-base font-semibold text-neo-cozy"
+        className="h-[44px] rounded-2xl border-[3px] border-neo-cozy font-neo-display text-sm font-semibold text-neo-cozy"
       >
         {t('quickPlay.solo.challengeFriend')}
       </button>
-      <p className="-mt-2 text-center text-[11px] text-neo-white/45">{t('quickPlay.solo.challengeHint')}</p>
+      <p className="text-center text-[10px] text-neo-white/45">{t('quickPlay.solo.challengeHint')}</p>
     </div>
   );
 }

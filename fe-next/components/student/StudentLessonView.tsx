@@ -13,7 +13,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useStudentProgress } from '@/hooks/useStudentProgress';
 import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { Button } from '@/components/ui/button';
 import { QuickPracticeButton } from '@/components/practice/QuickPracticeButton';
 import { BookOpen, Award, Activity, Star } from 'lucide-react';
@@ -101,14 +101,10 @@ export default function StudentLessonView() {
   if (lessons.length === 0) {
     return (
       <div className="py-12">
-        <EmptyState
-          type="custom"
+        <EnhancedEmptyState
           title={t('student.lessons.empty.title')}
           description={t('student.lessons.empty.subtitle')}
-          icon={<BookOpen className="w-full h-full text-neo-cyan" />}
-          showMascot
           mascotVariant="thinking"
-          size="lg"
           action={
             <Button
               onClick={() => router.push(`/${language}/student/join`)}

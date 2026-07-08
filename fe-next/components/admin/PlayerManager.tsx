@@ -7,6 +7,7 @@ import {
 import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -334,15 +335,15 @@ export function PlayerManager({ authToken }: { authToken: string }) {
           </div>
           <div className="flex items-end">
             <label className="inline-flex items-center gap-2 text-sm cursor-pointer select-none">
-              <input type="checkbox" checked={hasBlast}
-                onChange={(e) => { setHasBlast(e.target.checked); setOffset(0); }} className="w-4 h-4" />
+              <Checkbox checked={hasBlast}
+                onCheckedChange={(checked) => { setHasBlast(checked === true); setOffset(0); }} />
               Has Blast access
             </label>
           </div>
           <div className="flex items-end">
             <label className="inline-flex items-center gap-2 text-sm cursor-pointer select-none">
-              <input type="checkbox" checked={hasBeta}
-                onChange={(e) => { setHasBeta(e.target.checked); setOffset(0); }} className="w-4 h-4" />
+              <Checkbox checked={hasBeta}
+                onCheckedChange={(checked) => { setHasBeta(checked === true); setOffset(0); }} />
               Beta testers
             </label>
           </div>
@@ -353,8 +354,8 @@ export function PlayerManager({ authToken }: { authToken: string }) {
       {players.length > 0 && (
         <div className="flex items-center justify-between gap-3 px-3 py-2 bg-white dark:bg-neo-navy-light rounded-lg shadow-xs">
           <label className="inline-flex items-center gap-2 text-sm cursor-pointer select-none text-black dark:text-white">
-            <input type="checkbox" checked={allOnPageSelected} onChange={toggleSelectAll}
-              aria-label="Select all players" className="w-4 h-4" />
+            <Checkbox checked={allOnPageSelected} onCheckedChange={toggleSelectAll}
+              aria-label="Select all players" />
             Select all on page
           </label>
           {selectedIds.size > 0 && (

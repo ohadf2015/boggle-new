@@ -9,8 +9,8 @@ import { DuelLobby, DuelHistory, DuelNotification } from '@/components/education
 import { ClassmatesList } from '@/components/education/duels/ClassmatesList';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { getStudentClassroom, getLessons, getClassroomStudents, type Classroom, type VocabularyLesson, type ClassroomStudent } from '@/lib/supabase/education';
-import { cn } from '@/lib/utils';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 
 type Tab = 'lobby' | 'history' | 'classmates';
 
@@ -78,55 +78,44 @@ function DuelsPageClientInner() {
       <TopBackLink className="mb-4" />
       <DuelNotification classroomId={classroom.id} />
 
-      <div className="flex gap-1 mb-6 border-b-2 border-neo-white/10" role="tablist">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <button
-              key={tab.id}
-              role="tab"
-              aria-selected={activeTab === tab.id}
-              aria-controls={`tabpanel-${tab.id}`}
-              id={`tab-${tab.id}`}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                'flex items-center gap-2 px-6 py-3 font-bold transition-all',
-                activeTab === tab.id
-                  ? 'text-neo-lime border-b-4 border-neo-lime -mb-[2px]'
-                  : 'text-neo-white hover:text-neo-white'
-              )}
-            >
-              <Icon className="w-5 h-5" />
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
+      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as Tab)}>
+        <TabsList variant="underline" className="mb-6 h-auto gap-1 bg-transparent p-0">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                variant="underline"
+                activeColor="lime"
+                className="gap-2 px-6 py-3 font-bold normal-case"
+              >
+                <Icon className="w-5 h-5" />
+                {tab.label}
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
 
-      {activeTab === 'lobby' && (
-        <div role="tabpanel" id="tabpanel-lobby" aria-labelledby="tab-lobby">
+        <TabsContent value="lobby">
           <DuelLobby
             classroomId={classroom.id}
             studentId={user.id}
             lessons={lessonOptions}
           />
-        </div>
-      )}
-      {activeTab === 'history' && (
-        <div role="tabpanel" id="tabpanel-history" aria-labelledby="tab-history">
+        </TabsContent>
+        <TabsContent value="history">
           <DuelHistory studentId={user.id} />
-        </div>
-      )}
-      {activeTab === 'classmates' && (
-        <div role="tabpanel" id="tabpanel-classmates" aria-labelledby="tab-classmates">
+        </TabsContent>
+        <TabsContent value="classmates">
           <ClassmatesList
             classmates={classmates}
             classroomId={classroom.id}
             lessons={lessonOptions}
             currentUserId={user.id}
           />
-        </div>
-      )}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

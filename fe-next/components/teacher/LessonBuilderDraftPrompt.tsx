@@ -2,7 +2,16 @@
 
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import {
+  AlertDialog,
+  AlertDialogPortal,
+  AlertDialogOverlay,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
 
 interface LessonBuilderDraftPromptProps {
   open: boolean;
@@ -22,33 +31,32 @@ export default function LessonBuilderDraftPrompt({
   t,
 }: LessonBuilderDraftPromptProps) {
   return (
-    <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
-      <AlertDialog.Portal>
-        <AlertDialog.Overlay className="fixed inset-0 bg-neo-black/80 z-[60]" />
-        <AlertDialog.Content
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogPortal>
+        <AlertDialogOverlay className="z-[60]" />
+        <AlertDialogContent
           className={cn(
-            'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
             'w-full max-w-md p-6 bg-neo-navy border-neo border-neo-black shadow-hard-lg z-[60]',
             'rounded-neo'
           )}
         >
-          <AlertDialog.Title className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
+          <AlertDialogTitle className="text-2xl font-neo-display text-neo-white mb-2 text-balance">
             {t('teacher.lesson.resumeDraft')}
-          </AlertDialog.Title>
-          <AlertDialog.Description className="text-neo-white mb-6 text-pretty">
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-neo-white mb-6 text-pretty">
             {t('teacher.lesson.draftFound', { time: formattedAge })}
-          </AlertDialog.Description>
+          </AlertDialogDescription>
 
           <div className="flex gap-3">
-            <AlertDialog.Action asChild>
+            <AlertDialogAction asChild>
               <Button
                 onClick={onRestore}
                 className="flex-1 bg-neo-cyan text-neo-black font-bold shadow-hard hover:shadow-hard-pressed"
               >
                 {t('teacher.lesson.resumeDraftButton')}
               </Button>
-            </AlertDialog.Action>
-            <AlertDialog.Cancel asChild>
+            </AlertDialogAction>
+            <AlertDialogCancel asChild>
               <Button
                 onClick={onDiscard}
                 variant="outline"
@@ -56,10 +64,10 @@ export default function LessonBuilderDraftPrompt({
               >
                 {t('teacher.lesson.discardDraftButton')}
               </Button>
-            </AlertDialog.Cancel>
+            </AlertDialogCancel>
           </div>
-        </AlertDialog.Content>
-      </AlertDialog.Portal>
-    </AlertDialog.Root>
+        </AlertDialogContent>
+      </AlertDialogPortal>
+    </AlertDialog>
   );
 }

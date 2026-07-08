@@ -1,10 +1,19 @@
 'use client';
 
-import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
-import { ChevronDown, Search, X, Globe } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { ChevronDown, X, Globe, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command';
 
 // Common countries list with ISO 3166-1 alpha-2 codes
 // Sorted by approximate usage / popularity
@@ -90,212 +99,88 @@ interface CountrySelectorProps {
 export function CountrySelector({
   value,
   onChange,
-  isDarkMode = false,
   disabled = false,
   className,
 }: CountrySelectorProps) {
   const { t } = useLanguage();
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState('');
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [open, setOpen] = useState(false);
 
-  // Find current country
   const currentCountry = useMemo(() => {
     if (!value) return null;
-    return COUNTRIES.find(c => c.code === value) || { code: value, name: value };
+    return COUNTRIES.find((c) => c.code === value) || { code: value, name: value };
   }, [value]);
 
-  // Filter countries based on search
-  const filteredCountries = useMemo(() => {
-    if (!search.trim()) return COUNTRIES;
-    const searchLower = search.toLowerCase();
-    return COUNTRIES.filter(
-      c =>
-        c.name.toLowerCase().includes(searchLower) ||
-        c.code.toLowerCase().includes(searchLower)
-    );
-  }, [search]);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setSearch('');
-      }
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // Focus search input when dropdown opens
-  useEffect(() => {
-    if (isOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [isOpen]);
-
-  const handleSelect = useCallback((code: string | null) => {
+  const handleSelect = (code: string | null) => {
     onChange(code);
-    setIsOpen(false);
-    setSearch('');
-  }, [onChange]);
+    setOpen(false);
+  };
 
   return (
-    <div ref={dropdownRef} className={cn('relative', className)}>
-      {/* Trigger Button */}
-      <button
-        type="button"
-        onClick={() => !disabled && setIsOpen(!isOpen)}
-        disabled={disabled}
-        aria-label={t('profile.selectCountry')}
-        aria-expanded={isOpen}
-        className={cn(
-          'flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors w-full',
-          'text-sm font-medium',
-          disabled && 'opacity-50 cursor-not-allowed',
-          isDarkMode
-            ? 'bg-neo-navy-elevated border-slate-600 text-gray-200 hover:bg-slate-600'
-            : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50',
-          isOpen && (isDarkMode ? 'ring-2 ring-cyan-500/50' : 'ring-2 ring-cyan-500/30')
-        )}
-      >
-        {currentCountry ? (
-          <>
-            <span className="text-lg">{getCountryFlag(currentCountry.code)}</span>
-            <span className="flex-1 text-left truncate">{currentCountry.name}</span>
-          </>
-        ) : (
-          <>
-            <Globe className="w-4 h-4 opacity-50" />
-            <span className="flex-1 text-left opacity-70">
-              {t('profile.selectCountry')}
-            </span>
-          </>
-        )}
-        <ChevronDown
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          type="button"
+          disabled={disabled}
+          aria-label={t('profile.selectCountry')}
+          aria-expanded={open}
           className={cn(
-            'w-4 h-4 transition-transform',
-            isOpen && 'rotate-180'
-          )}
-        />
-      </button>
-
-      {/* Dropdown */}
-      {isOpen && (
-        <div
-          className={cn(
-            'absolute z-50 mt-1 w-full rounded-lg border shadow-lg overflow-hidden',
-            isDarkMode
-              ? 'bg-neo-navy-light border-slate-700'
-              : 'bg-white border-gray-200'
+            'flex items-center gap-2 px-3 py-2 rounded-neo border-3 border-neo-black dark:border-slate-500 transition-colors w-full',
+            'text-sm font-bold',
+            'bg-neo-cream dark:bg-neo-navy-elevated text-neo-black dark:text-neo-white',
+            'hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-sm',
+            'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
+            'disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-none',
+            className
           )}
         >
-          {/* Search Input */}
-          <div className={cn(
-            'p-2 border-b',
-            isDarkMode ? 'border-slate-700' : 'border-gray-200'
-          )}>
-            <div className="relative">
-              <Search className={cn(
-                'absolute left-2 rtl:left-auto rtl:right-2 top-1/2 -translate-y-1/2 w-4 h-4',
-                isDarkMode ? 'text-gray-500' : 'text-gray-400'
-              )} />
-              <input
-                ref={inputRef}
-                type="text"
-                role="searchbox"
-                aria-label={t('profile.searchCountry')}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('profile.searchCountry')}
-                className={cn(
-                  'w-full ps-8 pe-8 py-2 text-sm rounded-md border',
-                  'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
-                  isDarkMode
-                    ? 'bg-neo-navy-elevated border-slate-600 text-white placeholder:text-gray-500 focus:border-cyan-500'
-                    : 'bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-cyan-500'
-                )}
-              />
-              {search && (
-                <button
-                  type="button"
-                  onClick={() => setSearch('')}
-                  aria-label={t('common.clearSearch')}
-                  className={cn(
-                    'absolute right-2 rtl:right-auto rtl:left-2 top-1/2 -translate-y-1/2',
-                    'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 rounded',
-                    isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-400 hover:text-gray-500'
-                  )}
-                >
-                  <X className="w-4 h-4" aria-hidden="true" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Clear Selection Option */}
-          {value && (
-            <button
-              type="button"
-              onClick={() => handleSelect(null)}
-              className={cn(
-                'w-full px-3 py-2 text-sm text-left border-b flex items-center gap-2',
-                isDarkMode
-                  ? 'border-slate-700 text-red-400 hover:bg-neo-navy-elevated'
-                  : 'border-gray-200 text-red-600 hover:bg-gray-50'
-              )}
-            >
-              <X className="w-4 h-4" />
-              {t('profile.clearCountry')}
-            </button>
+          {currentCountry ? (
+            <>
+              <span className="text-lg">{getCountryFlag(currentCountry.code)}</span>
+              <span className="flex-1 text-start truncate">{currentCountry.name}</span>
+            </>
+          ) : (
+            <>
+              <Globe className="w-4 h-4 opacity-50" />
+              <span className="flex-1 text-start opacity-70">
+                {t('profile.selectCountry')}
+              </span>
+            </>
           )}
-
-          {/* Country List */}
-          <div className="max-h-60 overflow-y-auto">
-            {filteredCountries.length === 0 ? (
-              <div className={cn(
-                'px-3 py-4 text-sm text-center',
-                isDarkMode ? 'text-gray-500' : 'text-gray-400'
-              )}>
-                {t('profile.noCountryFound')}
-              </div>
-            ) : (
-              filteredCountries.map((country) => (
-                <button
+          <ChevronDown className={cn('w-4 h-4 shrink-0 transition-transform', open && 'rotate-180')} />
+        </button>
+      </PopoverTrigger>
+      <PopoverContent className="w-(--radix-popover-trigger-width) p-0" align="start">
+        <Command>
+          <CommandInput placeholder={t('profile.searchCountry')} aria-label={t('profile.searchCountry')} />
+          <CommandList className="max-h-60">
+            <CommandEmpty>{t('profile.noCountryFound')}</CommandEmpty>
+            <CommandGroup>
+              {value && (
+                <CommandItem
+                  value="__clear__"
+                  onSelect={() => handleSelect(null)}
+                  className="text-neo-red data-[selected=true]:bg-neo-red/10 data-[selected=true]:text-neo-red"
+                >
+                  <X className="w-4 h-4" />
+                  {t('profile.clearCountry')}
+                </CommandItem>
+              )}
+              {COUNTRIES.map((country) => (
+                <CommandItem
                   key={country.code}
-                  type="button"
-                  onClick={() => handleSelect(country.code)}
-                  className={cn(
-                    'w-full px-3 py-2 text-sm text-left flex items-center gap-2 transition-colors',
-                    value === country.code
-                      ? isDarkMode
-                        ? 'bg-cyan-900/30 text-cyan-400'
-                        : 'bg-cyan-50 text-cyan-700'
-                      : isDarkMode
-                        ? 'text-gray-200 hover:bg-neo-navy-elevated'
-                        : 'text-gray-700 hover:bg-gray-50'
-                  )}
+                  value={country.name}
+                  onSelect={() => handleSelect(country.code)}
                 >
                   <span className="text-lg">{getCountryFlag(country.code)}</span>
                   <span className="flex-1 truncate">{country.name}</span>
-                  {value === country.code && (
-                    <span className={cn(
-                      'text-xs px-1.5 py-0.5 rounded',
-                      isDarkMode ? 'bg-cyan-800 text-cyan-300' : 'bg-cyan-100 text-cyan-700'
-                    )}>
-                      {t('common.selected')}
-                    </span>
-                  )}
-                </button>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-    </div>
+                  {value === country.code && <Check className="w-4 h-4 shrink-0" />}
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
 

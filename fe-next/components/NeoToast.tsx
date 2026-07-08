@@ -110,10 +110,17 @@ interface WordRejectedOptions {
   duration?: number;
 }
 
+interface NeoToastAction {
+  label: string;
+  onClick: () => void;
+}
+
 interface NeoToastOptions {
   icon?: string | React.ReactNode;
   id?: string;
   duration?: number;
+  description?: string;
+  action?: NeoToastAction;
 }
 
 // Neo-Brutalist Word Accepted Toast
@@ -496,7 +503,7 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
             transition={SPRING_PRESETS.snappy}
             role="status"
             aria-live="polite"
-            className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-cyan border-3 border-neo-black shadow-hard"
+            className="flex items-start gap-3 px-4 py-3 rounded-lg bg-neo-cyan border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
             <m.span
@@ -508,9 +515,28 @@ export const neoInfoToast = (message: string, options: NeoToastOptions = {}): st
             >
               {icon}
             </m.span>
-            <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
-              {message}
-            </span>
+            <div className="flex flex-col gap-1">
+              <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
+                {message}
+              </span>
+              {options.description && (
+                <span dir="auto" className="text-xs font-bold text-neo-black/80">
+                  {options.description}
+                </span>
+              )}
+              {options.action && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    options.action?.onClick();
+                    toast.dismiss(t.id);
+                  }}
+                  className="mt-1 self-start px-2 py-1 text-xs font-black uppercase rounded border-2 border-neo-black bg-neo-black text-neo-white hover:bg-neo-black/80 transition-colors"
+                >
+                  {options.action.label}
+                </button>
+              )}
+            </div>
           </m.div>
         )}
       </AnimatePresence>

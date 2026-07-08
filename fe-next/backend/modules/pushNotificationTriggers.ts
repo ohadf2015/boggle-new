@@ -11,26 +11,20 @@ import { sendToUser, type FCMPayload } from './fcmService';
 import { mascotImageUrl } from '../services/pushNotificationService';
 import { getSupabase, isSupabaseConfigured } from './supabase';
 import { shouldSendDirectMessagePush } from './pushDedup';
-
-// Translation table for achievement display names. Lazy-required to avoid pulling
-// the full 10k-line translations bundle into modules that don't need it.
-let cachedTranslations: Record<string, { achievements?: Record<string, { name?: string }> }> | null = null;
-function getTranslations() {
-  if (cachedTranslations) return cachedTranslations;
-  cachedTranslations = require('../../translations/index.js').translations;
-  return cachedTranslations!;
-}
+import { getCachedTranslation } from '../../translations/loadTranslation';
+import type { Language } from '@/types';
 
 /**
  * Resolve a single achievement key (e.g. 'WORD_MASTER') to a display name in
  * the recipient's locale. Falls back to English, then to a humanized key.
  */
 function resolveAchievementName(key: string, locale: PushLocale): string {
-  const t = getTranslations();
-  const localized = t[locale]?.achievements?.[key]?.name;
+  const t = getCachedTranslation(locale as Language) as { achievements?: Record<string, { name?: string }> } | undefined;
+  const localized = t?.achievements?.[key]?.name;
   if (localized) return localized;
-  const en = t.en?.achievements?.[key]?.name;
-  if (en) return en;
+  const en = getCachedTranslation('en') as { achievements?: Record<string, { name?: string }> } | undefined;
+  const enName = en?.achievements?.[key]?.name;
+  if (enName) return enName;
   return key.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
 }
 

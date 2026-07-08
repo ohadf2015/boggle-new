@@ -7777,6 +7777,8 @@ const en = {
       "ofPerfect": "of perfect",
       "points": "pts",
       "wordsFound": "{found} / {total} words found",
+      "targetWordFound": "🎯 You found the word: {word}",
+      "targetWordMissed": "🎯 The word was: {word}",
       "vsAverage": "{pct}% vs your average",
       "betterThan": "Better than {pct}% of today's Quick Play scores",
       "seeLeaderboard": "See full leaderboard",

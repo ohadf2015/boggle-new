@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { fetchWithAuth } from '@/utils/authFetch';
 import { TeacherAccessDrawer } from './TeacherAccessDrawer';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { TeacherAccessRequest, TeacherAccessStatus } from '@/lib/education/types';
 
 export function TeacherAccessQueue() {
@@ -52,23 +53,27 @@ export function TeacherAccessQueue() {
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <label className="text-sm text-neo-white">
+        <label className="flex items-center gap-2 text-sm text-neo-white">
           {t('admin.teacherAccess.filter_status')}
-          <select value={status} onChange={(e) => { setPage(0); setStatus(e.target.value as any); }}
-            className="ml-2 rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-neo-white">
-            <option value="">{t('admin.teacherAccess.filter_status_all')}</option>
-            <option value="pending">pending</option>
-            <option value="approved">approved</option>
-            <option value="declined">declined</option>
-          </select>
+          <Select value={status || '_all'} onValueChange={(v) => { setPage(0); setStatus((v === '_all' ? '' : v) as any); }}>
+            <SelectTrigger className="h-8 w-auto rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-neo-white"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_all">{t('admin.teacherAccess.filter_status_all')}</SelectItem>
+              <SelectItem value="pending">pending</SelectItem>
+              <SelectItem value="approved">approved</SelectItem>
+              <SelectItem value="declined">declined</SelectItem>
+            </SelectContent>
+          </Select>
         </label>
-        <label className="text-sm text-neo-white">
+        <label className="flex items-center gap-2 text-sm text-neo-white">
           {t('admin.teacherAccess.filter_locale')}
-          <select value={locale} onChange={(e) => { setPage(0); setLocale(e.target.value); }}
-            className="ml-2 rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-neo-white">
-            <option value="">all</option>
-            {['en', 'he', 'sv', 'ja', 'es'].map((l) => <option key={l} value={l}>{l}</option>)}
-          </select>
+          <Select value={locale || '_all'} onValueChange={(v) => { setPage(0); setLocale(v === '_all' ? '' : v); }}>
+            <SelectTrigger className="h-8 w-auto rounded border-2 border-slate-600 bg-neo-navy-light p-1 text-neo-white"><SelectValue /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="_all">all</SelectItem>
+              {['en', 'he', 'sv', 'ja', 'es'].map((l) => <SelectItem key={l} value={l}>{l}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </label>
         <input placeholder={t('admin.teacherAccess.filter_country')} value={country}
           aria-label={t('admin.teacherAccess.filter_country')}

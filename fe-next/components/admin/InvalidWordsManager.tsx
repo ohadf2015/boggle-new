@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Select,
   SelectContent,
@@ -538,11 +539,9 @@ export function InvalidWordsManager({ authToken }: InvalidWordsManagerProps) {
                     <CardContent className="p-4 space-y-3">
                       {/* Selection Checkbox */}
                       <div className="absolute top-2 left-2">
-                        <input
-                          type="checkbox"
+                        <Checkbox
                           checked={isSelected(word.id)}
-                          onChange={() => toggleSelection(word.id)}
-                          className="w-5 h-5 rounded border-slate-600 bg-neo-navy-elevated text-neo-yellow focus:ring-neo-yellow cursor-pointer"
+                          onCheckedChange={() => toggleSelection(word.id)}
                           aria-label={`Select ${word.word}`}
                         />
                       </div>

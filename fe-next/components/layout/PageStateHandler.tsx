@@ -4,7 +4,7 @@ import React from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { EmptyState } from '@/components/ui/EmptyState';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -141,10 +141,8 @@ export function PageStateHandler({
     }
 
     return (
-      <EmptyState
-        type="no-results"
+      <EnhancedEmptyState
         title={emptyText || t('common.noData')}
-        showMascot
         mascotVariant="happy"
       />
     );

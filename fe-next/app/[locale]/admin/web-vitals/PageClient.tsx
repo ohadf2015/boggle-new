@@ -9,6 +9,7 @@ import {
 import { useRouter } from 'next/navigation';
 import Header from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -277,76 +278,68 @@ export default function WebVitalsPageClient() {
               <label className={cn("block text-sm font-medium mb-2", isDark ? "text-gray-300" : "text-gray-700")}>
                 Time Range
               </label>
-              <select
-                value={timeRange}
-                onChange={(e) => setTimeRange(e.target.value as any)}
-                className={cn(
-                  "w-full px-3 py-2 rounded-lg border",
-                  isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300"
-                )}
-              >
-                <option value="1h">Last Hour</option>
-                <option value="24h">Last 24 Hours</option>
-                <option value="7d">Last 7 Days</option>
-                <option value="30d">Last 30 Days</option>
-              </select>
+              <Select value={timeRange} onValueChange={(v) => setTimeRange(v as any)}>
+                <SelectTrigger className={cn("w-full", isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1h">Last Hour</SelectItem>
+                  <SelectItem value="24h">Last 24 Hours</SelectItem>
+                  <SelectItem value="7d">Last 7 Days</SelectItem>
+                  <SelectItem value="30d">Last 30 Days</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <label className={cn("block text-sm font-medium mb-2", isDark ? "text-gray-300" : "text-gray-700")}>
                 Metric
               </label>
-              <select
-                value={selectedMetric}
-                onChange={(e) => setSelectedMetric(e.target.value)}
-                className={cn(
-                  "w-full px-3 py-2 rounded-lg border",
-                  isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300"
-                )}
-              >
-                <option value="all">All Metrics</option>
-                {Object.keys(METRIC_INFO).map(key => (
-                  <option key={key} value={key}>{key}</option>
-                ))}
-              </select>
+              <Select value={selectedMetric} onValueChange={setSelectedMetric}>
+                <SelectTrigger className={cn("w-full", isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Metrics</SelectItem>
+                  {Object.keys(METRIC_INFO).map(key => (
+                    <SelectItem key={key} value={key}>{key}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <label className={cn("block text-sm font-medium mb-2", isDark ? "text-gray-300" : "text-gray-700")}>
                 Device Type
               </label>
-              <select
-                value={selectedDevice}
-                onChange={(e) => setSelectedDevice(e.target.value)}
-                className={cn(
-                  "w-full px-3 py-2 rounded-lg border",
-                  isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300"
-                )}
-              >
-                <option value="all">All Devices</option>
-                <option value="mobile">Mobile</option>
-                <option value="tablet">Tablet</option>
-                <option value="desktop">Desktop</option>
-              </select>
+              <Select value={selectedDevice} onValueChange={setSelectedDevice}>
+                <SelectTrigger className={cn("w-full", isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Devices</SelectItem>
+                  <SelectItem value="mobile">Mobile</SelectItem>
+                  <SelectItem value="tablet">Tablet</SelectItem>
+                  <SelectItem value="desktop">Desktop</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div>
               <label className={cn("block text-sm font-medium mb-2", isDark ? "text-gray-300" : "text-gray-700")}>
                 Performance
               </label>
-              <select
-                value={selectedRating}
-                onChange={(e) => setSelectedRating(e.target.value)}
-                className={cn(
-                  "w-full px-3 py-2 rounded-lg border",
-                  isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300"
-                )}
-              >
-                <option value="all">All Ratings</option>
-                <option value="good">Good</option>
-                <option value="needs-improvement">Needs Improvement</option>
-                <option value="poor">Poor</option>
-              </select>
+              <Select value={selectedRating} onValueChange={setSelectedRating}>
+                <SelectTrigger className={cn("w-full", isDark ? "bg-neo-navy-elevated border-gray-600 text-white" : "bg-white border-gray-300")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Ratings</SelectItem>
+                  <SelectItem value="good">Good</SelectItem>
+                  <SelectItem value="needs-improvement">Needs Improvement</SelectItem>
+                  <SelectItem value="poor">Poor</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
