@@ -41,10 +41,13 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   detectCrazyGamesSync: () => false,
 }));
 
-// Avoid PostHog network calls from trackInviteLanded.
+// Avoid PostHog network calls. PageClient also fires trackGrowthEvent
+// ('landing_view') from a mount effect, so the mock must expose it too —
+// otherwise the mounted component throws "No trackGrowthEvent export".
 vi.mock('@/utils/growthTracking', () => ({
   trackInviteLanded: vi.fn(),
   trackInviteRedirectFired: vi.fn(),
+  trackGrowthEvent: vi.fn(),
 }));
 
 describe('HomePageClient new-user room invite', () => {
