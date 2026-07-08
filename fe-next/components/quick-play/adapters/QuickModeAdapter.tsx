@@ -37,19 +37,31 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
   switch (config.mode) {
     case 'wheel-rush': {
       if (!wordSet.current) wordSet.current = new Set(config.words ?? []);
+      // Bounded flex-column stage — parity with the Daily Challenge playing
+      // wrapper (WordWheelChallenge). WordWheelGame's mobile root is `flex-1`
+      // and its wheel cluster uses `[container-type:size]`; both need a
+      // definite-height flex-column ancestor. Rendered bare (the old Quick Game
+      // path) the container-query block-size collapses to ~0 and the board flies
+      // up into the timer/HUD — the crush this route showed under RTL/Hebrew.
+      // `justify-start pt-3` gives clearance from the top HUD, `overflow-y-auto
+      // overscroll-contain` lets it scroll on short viewports instead of
+      // overlapping, and `pb-bottom-stack` keeps the found-words list clear of
+      // the bottom nav/banner. Direction-agnostic: fixes LTR and RTL alike.
       return (
-        <WordWheelGame
-          puzzle={config.wheel as never}
-          duration={config.durationSec}
-          language={config.language as never}
-          hideCompetitive
-          onEffect={() => undefined}
-          onValidateWord={async (word: string) => wordSet.current!.has(word.toLowerCase())}
-          onComplete={(r: { wordsFound: string[]; score: number; timeSeconds: number }) =>
-            finish(fromWordWheel(r, config))
-          }
-          onExit={onQuit}
-        />
+        <div className="relative flex flex-1 flex-col items-center justify-start min-h-0 overflow-y-auto overscroll-contain pt-3 sm:pt-4 pb-bottom-stack">
+          <WordWheelGame
+            puzzle={config.wheel as never}
+            duration={config.durationSec}
+            language={config.language as never}
+            hideCompetitive
+            onEffect={() => undefined}
+            onValidateWord={async (word: string) => wordSet.current!.has(word.toLowerCase())}
+            onComplete={(r: { wordsFound: string[]; score: number; timeSeconds: number }) =>
+              finish(fromWordWheel(r, config))
+            }
+            onExit={onQuit}
+          />
+        </div>
       );
     }
     case 'word-hunt':
