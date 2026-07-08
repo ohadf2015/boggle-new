@@ -13,7 +13,7 @@ export interface CrosswordGridProps {
 }
 
 export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordGridProps) {
-  const { puzzle, active, checks, revealed } = state;
+  const { puzzle, active, checks, revealed, warmths } = state;
   const size = puzzle.size;
   const reduced = useReducedMotion();
   const gridRef = useRef<HTMLDivElement>(null);
@@ -103,6 +103,7 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
             inActiveSlot={activeSlotCells.has(key)}
             isWordEnd={wordEndCells.has(key)}
             check={checks[key]}
+            warmth={warmths[key]}
             revealed={revealed.includes(key)}
             onSelect={onSelect}
             label={t('crossword.cellLabel', { row: cell.row + 1, col: cell.col + 1 })}

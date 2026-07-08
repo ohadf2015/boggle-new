@@ -242,7 +242,8 @@ export function revealWord(state: GameState): GameState {
   return { ...next, status: recomputeStatus(next) };
 }
 
-/** Check filled cells: mark each 'correct' or 'wrong' (transient, no penalty). */
+/** Check filled cells: mark each 'correct' or 'wrong' (transient, no penalty).
+ *  At attempt ≥ 2 per slot, colours wrong cells cold/warm/hot by how many letters are correct. */
 export function checkAll(state: GameState): GameState {
   const checks: Record<string, 'correct' | 'wrong'> = {};
   for (const cell of state.puzzle.cells) {
@@ -252,5 +253,30 @@ export function checkAll(state: GameState): GameState {
     if (!entered) continue;
     checks[key] = entered === cell.solution ? 'correct' : 'wrong';
   }
-  return { ...state, checks };
+
+  const slotAttempts = { ...state.slotAttempts };
+  const warmths: Record<string, 'cold' | 'warm' | 'hot'> = {};
+  const RANK = { cold: 0, warm: 1, hot: 2 } as const;
+
+  for (const slot of state.puzzle.slots) {
+    const filled = slot.cells.every((c) => state.entries[k(c.row, c.col)]);
+    if (!filled) continue;
+    const correct = slot.cells.filter((c) => checks[k(c.row, c.col)] === 'correct').length;
+    if (correct < slot.length) {
+      slotAttempts[slot.id] = (slotAttempts[slot.id] ?? 0) + 1;
+    }
+    if ((slotAttempts[slot.id] ?? 0) >= 2) {
+      const ratio = correct / slot.length;
+      const level: 'cold' | 'warm' | 'hot' = ratio > 0.6 ? 'hot' : ratio > 0.25 ? 'warm' : 'cold';
+      for (const c of slot.cells) {
+        const key = k(c.row, c.col);
+        if (checks[key] === 'wrong') {
+          const existing = warmths[key];
+          if (!existing || RANK[level] > RANK[existing]) warmths[key] = level;
+        }
+      }
+    }
+  }
+
+  return { ...state, checks, slotAttempts, warmths };
 }

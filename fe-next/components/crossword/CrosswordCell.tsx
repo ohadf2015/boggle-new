@@ -14,6 +14,7 @@ export interface CrosswordCellProps {
   inActiveSlot: boolean;
   isWordEnd: boolean;
   check?: 'correct' | 'wrong';
+  warmth?: 'cold' | 'warm' | 'hot';
   revealed: boolean;
   onSelect: (row: number, col: number) => void;
   label: string;
@@ -31,6 +32,7 @@ function CrosswordCellBase({
   inActiveSlot,
   isWordEnd,
   check,
+  warmth,
   revealed,
   onSelect,
   label,
@@ -62,7 +64,13 @@ function CrosswordCellBase({
     check === 'wrong'
       ? isActive
         ? 'bg-neo-red'
-        : 'bg-neo-red/25'
+        : warmth === 'hot'
+          ? 'bg-neo-orange/45'
+          : warmth === 'warm'
+            ? 'bg-neo-orange/25'
+            : warmth === 'cold'
+              ? 'bg-[#7cc0ff]/30'
+              : 'bg-neo-red/25'
       : isActive
         ? 'bg-[#7cc0ff]'
         : inActiveSlot
@@ -72,7 +80,9 @@ function CrosswordCellBase({
     check === 'wrong'
       ? isActive
         ? 'text-neo-white'
-        : 'text-neo-red'
+        : warmth === 'hot' || warmth === 'warm'
+          ? 'text-neo-orange'
+          : 'text-neo-red'
       : revealed
         ? 'text-neo-navy/55'
         : 'text-neo-navy';

@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
 const BASE_URL = 'https://www.lexiclash.live';
 
 // 28d GSC: 0 clicks & ≤2 impressions → noindex until they earn organic traffic
-const DEAD_LETTERS = new Set(['c', 'd', 'f', 'i', 'o', 'y']);
+const DEAD_LETTERS = new Set(['c', 'd', 'f', 'i', 'o', 'w', 'y']);
 
 interface PageParams {
   params: Promise<{ locale: string; letter: string }>;

@@ -68,8 +68,10 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
         </div>
       </m.div>
 
-      {/* Percentile pill with glow — extra excitement for top 5% */}
-      {percentile > 0 && (
+      {/* Percentile pill with glow — extra excitement for top 5%.
+          Hidden at 100% (finished last): "Top 100%" is meaningless and reads
+          as a bug. The rank pill (#N out of M) still conveys the placement. */}
+      {percentile > 0 && percentile < 100 && (
         <m.div
           initial={{ opacity: 0, scale: 0.5, y: 8 }}
           animate={

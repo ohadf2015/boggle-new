@@ -1,6 +1,7 @@
 'use client';
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import Script from 'next/script';
 import { m, useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -12,6 +13,7 @@ import { SixModeTour } from '@/components/education/SixModeTour';
 import { ComparisonStrip } from '@/components/education/ComparisonStrip';
 import { EducationFAQ } from '@/components/education/EducationFAQ';
 import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { TeacherWelcomeBanner } from '@/components/education/TeacherWelcomeBanner';
 import { speakableJsonLd } from '@/lib/seo/educationStructuredData';
 
@@ -160,13 +162,23 @@ export function PageClient() {
         <section className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
           <div className="grid gap-6 md:grid-cols-2">
             {/* Teacher card */}
-            <div className="rounded-neo border-neo border-neo-pink bg-neo-navy-light p-6 shadow-hard">
-              <h3 className="text-2xl font-neo-display font-black text-neo-pink">
-                {t('education.landing.teacher')}
-              </h3>
-              <p className="mt-3 text-neo-white">
-                {t('education.landing.teacherCta')}
-              </p>
+            <div className="rounded-neo border-neo border-neo-pink bg-neo-navy-light p-6 shadow-hard flex flex-col gap-4">
+              <div>
+                <h3 className="text-2xl font-neo-display font-black text-neo-pink">
+                  {t('education.landing.teacher')}
+                </h3>
+                <p className="mt-3 text-neo-white">
+                  {t('education.landing.teacherCta')}
+                </p>
+              </div>
+              <Link
+                href={`/${language}/education/access`}
+                data-testid="teacher-card-access-link"
+                onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'teacher_card_access' })}
+                className="self-start rounded-neo border-neo border-neo-pink bg-neo-pink/20 px-5 py-2.5 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-pink/30 hover:shadow-hard"
+              >
+                {t('education.landing.teacherLeadCta.button')}
+              </Link>
             </div>
             {/* Student card */}
             <div className="rounded-neo border-neo border-neo-cyan bg-neo-navy-light p-6 shadow-hard">

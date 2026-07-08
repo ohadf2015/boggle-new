@@ -26,7 +26,7 @@ import { getCurrentLives, setCurrentLives, MAX_LIVES } from '@/lib/connections/l
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import { submitConnectionsFeedback } from '@/lib/connections/feedback';
 import { fetchBannedPuzzleIds, getCachedBannedIds } from '@/lib/connections/bannedPuzzles';
-import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
+import { trackGameStart, trackGameEnd, trackGrowthEvent } from '@/utils/growthTracking';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { fireStreakConfetti, fireLevelUpConfetti } from '@/utils/confettiUtils';
@@ -297,10 +297,12 @@ export default function ConnectionsGame() {
   }, []);
 
   const handleGiveUp = useCallback(() => {
+    trackGrowthEvent('game_abandoned', { gameMode: 'connections', reason: 'give_up' });
     dispatch({ type: 'GIVE_UP' });
   }, []);
 
   const handleRevealHint = useCallback(() => {
+    trackGrowthEvent('hint_used', { gameMode: 'connections', hintType: 'text' });
     dispatch({ type: 'REVEAL_HINT' });
   }, []);
 
