@@ -1,9 +1,9 @@
 {
-  "date": "2026-07-07",
-  "note": "24h window: 0 routes n≥50 (all sub-floor — same as 07-06). No eligible regression verdicts. Supabase MCP absent (12th consecutive night — CRITICAL: human must mint never-expire PAT). Migration written for quick_play RLS initplan fix. Frontend: no safe quick wins found — free-multiplayer-word-game uses canvas+GSAP frame scrub (LCP data is single-sample, sub-floor). web_vitals FK index was already created in migration 20260429160100 — advisor data is stale. LazyMotion + domMax + m-alias already correctly configured — no Framer Motion work needed.",
+  "date": "2026-07-08",
+  "note": "24h window: 0 routes n≥50 (3rd consecutive night all sub-floor). No eligible regression verdicts. Supabase MCP absent (13th consecutive night — CRITICAL: human must mint never-expire PAT). Frontend: homepage priority+preload already correct. Fixed serial-then-parallel waterfall in fetchLandingData (game_results + daily_word_hunt_stats + fetchGameModeStats now start in parallel with season_rpc instead of waiting behind it). Saves ~50-150ms on cold cache misses.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (12th consecutive night). Migration 20260707020000 written for RLS initplan fix on quick_play_challenges_accept, quick_play_results_insert, quick_play_challenges_insert policies. web_vitals FK: already indexed by 20260429160100 (web_vitals_player_id_idx) — advisor showing stale data, no new migration needed.",
+    "note": "Supabase MCP absent (13th consecutive night). 4 migrations pending apply. web_vitals FK: already indexed by 20260429160100 (web_vitals_player_id_idx) — advisor showing stale data.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
@@ -13,16 +13,16 @@
           "RLS initplan fix: (select auth.role()) on quest_achievement_feed policy",
           "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)"
         ],
-        "carry_count": 11,
-        "status": "WRITTEN — pending apply (11th night)"
+        "carry_count": 12,
+        "status": "WRITTEN — pending apply (12th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
         "items": [
           "DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup"
         ],
-        "carry_count": 6,
-        "status": "WRITTEN — pending apply (6th night)"
+        "carry_count": 7,
+        "status": "WRITTEN — pending apply (7th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql",
@@ -30,8 +30,8 @@
           "DROP INDEX IF EXISTS public.quick_play_challenges_challenger_idx",
           "CREATE INDEX IF NOT EXISTS idx_word_club_members_user_id ON public.word_club_members(user_id)"
         ],
-        "carry_count": 1,
-        "status": "WRITTEN — pending apply (1st night)"
+        "carry_count": 2,
+        "status": "WRITTEN — pending apply (2nd night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql",
@@ -40,8 +40,8 @@
           "DROP+CREATE quick_play_results_insert: WITH CHECK uses (SELECT auth.uid()) — initplan wrapper",
           "DROP+CREATE quick_play_challenges_insert: WITH CHECK uses (SELECT auth.uid()) — initplan wrapper"
         ],
-        "carry_count": 0,
-        "status": "WRITTEN TONIGHT — pending apply"
+        "carry_count": 1,
+        "status": "WRITTEN — pending apply (1st night)"
       }
     ],
     "remaining_advisor_items": [
@@ -49,58 +49,57 @@
         "id": "auth_rls_initplan_quick_play_challenges",
         "table": "quick_play_challenges",
         "policy": "quick_play_challenges_accept + insert policies",
-        "status": "Migration 20260707020000 written. Pending apply. Fix: (SELECT auth.uid()) wrapper on all three policies.",
+        "status": "Migration 20260707020000 written. Pending apply.",
         "priority": "MEDIUM",
-        "carry_count": 0
+        "carry_count": 1
       },
       {
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 11
+        "carry_count": 12
       },
       {
         "id": "unindexed_fk_web_vitals_player_id",
         "status": "STALE ADVISOR DATA — web_vitals_player_id_idx already created in migration 20260429160100. No new migration needed.",
         "priority": "INFO",
-        "carry_count": 0
+        "carry_count": 1
       }
     ]
   },
   "frontend": {
-    "note": "0 routes above n≥50 floor (max n<50 all routes). All LCP/INP/CLS verdicts DEFERRED. Phase-0 brief LCP values (free-multiplayer-word-game 6824ms, word-wheel 3828ms, /es 3080ms, /en 2910ms) are single-sample or sub-floor — not actionable. free-multiplayer-word-game: canvas+GSAP frame scrub, too complex to safely optimize in lane budget. LazyMotionRoot already configured correctly (domMax + m alias) — no Framer Motion work needed.",
+    "note": "0 routes above n≥50 floor (3rd consecutive night). All LCP/INP/CLS verdicts DEFERRED. Phase-0 brief LCP values (word-hunt 8472ms, homepage 6904ms, /es/multiplayer 4560ms) are sub-floor — not actionable as regressions. Homepage: mascot preload + priority already correct. fetchLandingData parallelization fix shipped tonight.",
     "by_route": [
       {
-        "route": "/en/free-multiplayer-word-game",
+        "route": "/en/daily/word-hunt",
         "p75_lcp_ms": null,
         "n_24h": "sub-50",
-        "lcp_status": "DEFERRED — sub-floor. Single-sample phase-0 reading: 6824ms. Canvas hero + GSAP, no safe quick win identified."
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 8472ms. noIndex game shell."
       },
       {
-        "route": "/en/daily/word-wheel",
+        "route": "/",
         "p75_lcp_ms": null,
         "n_24h": "sub-50",
-        "lcp_status": "DEFERRED — sub-floor. Single-sample phase-0 reading: 3828ms. Canvas/Pixi-based, no LCP image to optimize."
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 6904ms. winner.webp preloaded + priority set."
       },
       {
-        "route": "/en",
+        "route": "/es/multiplayer",
         "p75_lcp_ms": null,
         "n_24h": "sub-50",
-        "lcp_status": "DEFERRED — sub-floor. Single-sample phase-0 reading: 2910ms."
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 4560ms."
       }
     ],
-    "open_watches": [
+    "shipped_this_run": [
       {
-        "id": "free_multiplayer_word_game_lcp",
-        "description": "Canvas frame scrub hero (324 JPEGs via vanilla Image()) with GSAP ScrollTrigger. LCP candidate is likely a video poster JPG. All components statically bundled (no dynamic imports). Fix: dynamic() import Showcase3DClient + fetchpriority='high' on first video poster.",
-        "status": "documented — multi-file refactor, deferred to human review",
-        "priority": "MEDIUM"
+        "file": "fe-next/lib/landing/fetchLandingData.ts",
+        "change": "Parallelized fetchLandingDataUncached: game_results + daily_word_hunt_stats + fetchGameModeStats now fire in parallel with season_rpc instead of blocked behind it. Leaderboard still waits for currentSeasonId.",
+        "estimated_saving_ms": "50-150ms on cold cache miss (TTL=30s)"
       }
     ]
   },
   "bundle": {
     "total_kb_uncompressed": null,
-    "note": "No .next/chunks available this run (no fresh build). Carrying prior baseline shape. No new JS dependencies added — SQL migration only, zero bundle impact.",
+    "note": "No .next/chunks available (no fresh build). fetchLandingData change is server-side only — zero bundle impact.",
     "top_chunks": [
       { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6449, "note": "Word dictionary — LAZY" },
       { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3283 },

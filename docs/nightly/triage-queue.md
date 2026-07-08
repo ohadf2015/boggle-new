@@ -1362,3 +1362,29 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - `WordWheelPixiRing.tsx:106` checks `orbitGfx.destroyed` before any `.clear()` call
 - Status: no code change needed; remaining instances from old/cached versions
 - Recommended owner: monitor 24h
+
+## 2026-07-08
+- [Sentry] CapacitorGameConnect.then() not implemented on android (1PH, reach=7)
+  - first seen: prior weeks; last seen: 2026-07-08; count: 7 in 24h
+  - link: https://lexiclash.sentry.io/issues/132085085/
+  - status: deferred (monitoring)
+  - why: Code already has isPluginAvailable guard + sync proxy reads. 153→7 reduction confirms fix is live. Remaining 7 likely from stale APK builds pre-dating the guard. Code review found no remaining bad path. Monitor for further decline.
+  - recommended owner: self (check next 3 nights; if stable at 0-2, close)
+
+- [Supabase] SECURITY DEFINER upsert_push_token callable by authenticated role
+  - link: advisor:security:authenticated_security_definer_function_executable
+  - status: deferred (MCP unavailable — migration already written at 20260628010000_revoke_push_token_fn_from_public.sql)
+  - why: REVOKE from PUBLIC migration was written on 2026-06-28 but unapplied (Supabase MCP token drought). Callsite is auth-gated API route only (no anon path). Apply migration when MCP is restored.
+  - recommended owner: self (apply via supabase MCP `apply_migration` — run `cat fe-next/supabase/migrations/20260628010000_revoke_push_token_fn_from_public.sql` for the SQL)
+
+- [Supabase] teacher_access_requests tar_insert_any RLS always-true
+  - link: advisor:security:rls_policy_always_true
+  - status: deferred
+  - why: The always-true INSERT policy is intentional — migration 20260617120000_restore_teacher_access_anon_insert.sql explicitly restored anon insert access (teacher sign-up form is public). The advisor warning is expected. Needs owner to confirm intentionality and document with an allowlist comment.
+  - recommended owner: review-by-eod (confirm design intent; if intentional add explicit comment in migration)
+
+- [Sentry] JAVASCRIPT-NEXTJS-1PV TrailRenderer null.clear
+  - link: https://lexiclash.sentry.io/issues/132119253/ (score 0.102, reach=6)
+  - status: deferred (impact check unable-to-verify, Sentry MCP unavailable)
+  - why: Fix was shipped 2026-07-05. Brief shows 6 events — likely draining from pre-fix state. Monitor next run when MCP available.
+  - recommended owner: self (check Sentry JAVASCRIPT-NEXTJS-1PV count on next run)
