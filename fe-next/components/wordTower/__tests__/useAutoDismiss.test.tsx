@@ -62,4 +62,49 @@ describe('useAutoDismiss', () => {
     expect(clearA).not.toHaveBeenCalled();
     expect(clearB).toHaveBeenCalledTimes(1);
   });
+
+  // The founder's "compliment stays permanently frozen, then the next ones pile
+  // up on top of it" report. If the dismiss callback THROWS the first time (a
+  // transient downstream render error during the purge — the "animation callback
+  // fails to fire" case), the OLD code latched `done = true` BEFORE calling it,
+  // so the throw escaped uncaught in a timer and the toast was stranded forever.
+  // The hook must instead swallow-and-retry until the purge actually lands.
+  it('retries the dismissal when clear() throws, instead of stranding the toast', () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const clear = vi
+      .fn()
+      .mockImplementationOnce(() => {
+        throw new Error('render blew up mid-dismiss');
+      })
+      .mockImplementation(() => {});
+    renderHook(() => useAutoDismiss('a', clear, 1000));
+    // First dismiss attempt fires and throws — must NOT crash the timer, and the
+    // toast must NOT be considered dismissed yet.
+    act(() => vi.advanceTimersByTime(1000));
+    expect(clear).toHaveBeenCalledTimes(1);
+    // The retry window elapses and the purge is attempted again — this time it
+    // succeeds, so the toast is guaranteed gone.
+    act(() => vi.advanceTimersByTime(1000));
+    expect(clear.mock.calls.length).toBeGreaterThanOrEqual(2);
+    // The failure was reported, never a silent no-op (repo pitfall Class 4).
+    expect(errSpy).toHaveBeenCalled();
+    errSpy.mockRestore();
+  });
+
+  // A callback that keeps throwing must not hammer forever — the retry schedule
+  // is bounded, so a permanently-broken purge degrades gracefully instead of
+  // spinning the main thread.
+  it('gives up after a bounded number of retries when clear() always throws', () => {
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const clear = vi.fn(() => {
+      throw new Error('always broken');
+    });
+    renderHook(() => useAutoDismiss('a', clear, 1000));
+    act(() => vi.advanceTimersByTime(1000));
+    act(() => vi.advanceTimersByTime(60_000));
+    const calls = clear.mock.calls.length;
+    expect(calls).toBeGreaterThan(1); // it did retry
+    expect(calls).toBeLessThanOrEqual(20); // but stopped — no infinite storm
+    errSpy.mockRestore();
+  });
 });

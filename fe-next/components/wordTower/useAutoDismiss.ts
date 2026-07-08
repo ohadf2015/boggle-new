@@ -23,6 +23,10 @@ import { useEffect, useRef } from 'react';
  * @param clear  called once when the dismiss fires (e.g. `() => setToast(null)`).
  * @param ms     lifespan in milliseconds.
  */
+/** Bounded self-heal for a dismiss callback that THROWS (see `fire`). */
+const DISMISS_RETRIES = 8;
+const DISMISS_RETRY_MS = 150;
+
 export function useAutoDismiss(token: unknown, clear: () => void, ms: number): void {
   const clearRef = useRef(clear);
   clearRef.current = clear;
@@ -30,14 +34,35 @@ export function useAutoDismiss(token: unknown, clear: () => void, ms: number): v
     if (token == null) return;
     let done = false;
     let raf = 0;
+    let attempts = 0;
+    let retry: ReturnType<typeof setTimeout> | undefined;
     const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
     const start = now();
     const fire = () => {
       if (done) return;
-      done = true;
-      if (raf) cancelAnimationFrame(raf);
-      clearTimeout(timer);
-      clearRef.current();
+      try {
+        // Latch `done` ONLY after the purge actually lands. The old code set it
+        // BEFORE calling clear(), so a callback that threw (a transient render
+        // error during the dismiss — the "animation callback fails to fire" case)
+        // escaped uncaught in the timer and stranded the toast on screen forever,
+        // with the next compliments piling on top of it (founder screenshot).
+        clearRef.current();
+        done = true;
+        if (raf) cancelAnimationFrame(raf);
+        clearTimeout(timer);
+        if (retry) clearTimeout(retry);
+      } catch (err) {
+        // Never a silent no-op on an error path (repo pitfall Class 4): report it,
+        // then retry the purge on a bounded schedule so a phantom banner can never
+        // survive a one-off throw. If it keeps failing we stop after a few tries
+        // rather than hammer the main thread — the effect's own teardown still
+        // clears it the moment the token next changes.
+        // eslint-disable-next-line no-console
+        console.error('[useAutoDismiss] dismiss callback threw; retrying purge', err);
+        if (retry) clearTimeout(retry);
+        if (attempts++ < DISMISS_RETRIES) retry = setTimeout(fire, DISMISS_RETRY_MS);
+        else done = true;
+      }
     };
     // Primary path: a plain setTimeout.
     const timer = setTimeout(fire, ms);
@@ -64,6 +89,7 @@ export function useAutoDismiss(token: unknown, clear: () => void, ms: number): v
     return () => {
       done = true;
       clearTimeout(timer);
+      if (retry) clearTimeout(retry);
       if (raf) cancelAnimationFrame(raf);
       if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', onVisible);
     };
