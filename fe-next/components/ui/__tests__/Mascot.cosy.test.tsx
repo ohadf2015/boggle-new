@@ -68,9 +68,9 @@ describe('Cosy hook on path-based renderers', () => {
     expect(container.querySelector('[data-mascot-bg="dark"]')).not.toBeNull();
   });
 
-  it('EnhancedEmptyState tags an opaque mascotSrc as dark', () => {
+  it('EnhancedEmptyState tags an opaque mascot variant as dark', () => {
     const { container } = render(
-      <EnhancedEmptyState title="Nothing here" mascotSrc="/mascot/oops.webp" />,
+      <EnhancedEmptyState title="Nothing here" mascotVariant="oops" />,
     );
     expect(container.querySelector('[data-mascot-bg="dark"]')).not.toBeNull();
   });
