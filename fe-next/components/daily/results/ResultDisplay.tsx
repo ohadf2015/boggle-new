@@ -13,6 +13,7 @@ import { Flame, Clock, Eye, EyeOff, Skull, Zap, Target, BookOpen, Sparkles, Part
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { getScoreBreakdown } from '@/utils/aiHintGenerator';
 import { isRonPrankUser, RON_PRANK_BONUS_POINTS } from '@/utils/dailyChallenge/ronPrank';
+import { isMeaningDisplayableForLanguage } from '@/lib/dailyChallenge/wordMeaningPolicy';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { ScoreGaugeRing } from './ScoreGaugeRing';
 import { getScoreTier } from './scoreFeedbackTiers';
@@ -284,8 +285,11 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({
                 </div>
               </m.div>
 
-              {/* Meaning (short definition) — prominent "did you know" card */}
-              {meaning && (
+              {/* Meaning (short definition) — prominent "did you know" card.
+                  Guard against a mismatched-script gloss (e.g. an English
+                  definition attached to a Hebrew target) leaking through from
+                  stale DB rows — show it only when the script matches. */}
+              {isMeaningDisplayableForLanguage(language, meaning) && (
                 <m.div
                   initial={{ opacity: 0, y: 10, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
