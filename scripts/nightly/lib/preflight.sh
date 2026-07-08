@@ -293,6 +293,33 @@ preflight_check() {
     fi
   fi
 
+  # --- network readiness (unconditional) --------------------------------
+  # The git-fetch retry above only runs on a CLEAN tree (git pull --ff-only
+  # requires one) — on a DIRTY tree (common: WIP left by an interactive
+  # session) that retry, and the network-readiness buffer it incidentally
+  # provides, is skipped entirely. The MCP check below then becomes the
+  # FIRST network op of the run with only its own 45s retry budget — not
+  # enough to absorb the same post-wake DNS/network delay the fetch retry
+  # was built to absorb (the 2026-06-19 miss). On a dirty-tree night this
+  # surfaced instead as "supabase/sentry MCP unavailable" for 13 consecutive
+  # nights through 2026-07-08 (confirmed via the 01:13 run log: both
+  # independent npx-based MCP servers failed transport together while the
+  # SUPABASE_ACCESS_TOKEN itself verified fine hours later — a network-
+  # timing gap, not a credential problem). Give the MCP check its own
+  # unconditional readiness wait so it no longer depends on tree cleanliness.
+  # Never aborts: a still-down network here just proceeds to the MCP check's
+  # own retries, which WARN-and-continue on genuine outages as before.
+  _nr_try=0; _nr_max="${NIGHTLY_NETWORK_RETRIES:-5}"; _nr_slp="${NIGHTLY_NETWORK_RETRY_SLEEP:-15}"
+  until curl -sS --max-time 10 -o /dev/null https://registry.npmjs.org/ 2>/dev/null; do
+    _nr_try=$((_nr_try+1))
+    if [ "$_nr_try" -ge "$_nr_max" ]; then
+      echo "preflight: network readiness check failed after $_nr_max attempts — proceeding anyway (MCP retries below are the last line of defense)"
+      break
+    fi
+    echo "preflight: network not ready (attempt $_nr_try/$_nr_max) — retrying in ${_nr_slp}s"
+    sleep "$_nr_slp"
+  done
+
   # --- MCP servers alive ----------------------------------------------
   # ALL MCP servers are SOFT — a single analytics MCP being unreachable must NOT
   # abort the whole night. posthog/sentry are HTTP services that blip; on
