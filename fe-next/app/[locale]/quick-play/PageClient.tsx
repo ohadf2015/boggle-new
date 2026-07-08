@@ -38,7 +38,14 @@ function QuickPlayGate() {
 export default function QuickPlayPageClient() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <div className="min-h-screen bg-neo-navy">
+      {/* Participate in the app layout's bounded flex-column height chain
+          (`<main>` → children wrapper are `flex-1 flex flex-col min-h-0`), the
+          same chain the Daily Challenge route relies on. A `min-h-screen` block
+          here (the old shell) breaks that chain: the Word Wheel's `flex-1` root
+          becomes inert and its `[container-type:size]` wheel cluster collapses,
+          crushing the board into the top HUD. `overflow-y-auto` keeps shorter
+          phases (wheel select / results) scrollable within the bounded height. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-neo-navy">
         <QuickPlayGate />
       </div>
     </Suspense>
