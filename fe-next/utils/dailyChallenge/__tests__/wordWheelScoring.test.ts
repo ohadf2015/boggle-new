@@ -1,16 +1,13 @@
 import { describe, it, expect } from 'vitest';
-import { scoreWord, scoreRepeatWord, WORD_WHEEL_REPEAT_SCORE_FACTOR } from '../wordWheelScoring';
+import { scoreWord } from '../wordWheelScoring';
 
-describe('scoreRepeatWord', () => {
-  it('is a reduced fraction of the base word score', () => {
-    expect(scoreRepeatWord('CANE')).toBe(Math.round(scoreWord('CANE') * WORD_WHEEL_REPEAT_SCORE_FACTOR));
+describe('scoreWord', () => {
+  it('scales up with word length', () => {
+    expect(scoreWord('CAT')).toBeLessThan(scoreWord('CANE'));
+    expect(scoreWord('CANE')).toBeLessThan(scoreWord('PUZZLE'));
   });
 
-  it('is strictly less than the base score for a re-found word', () => {
-    expect(scoreRepeatWord('PUZZLE')).toBeLessThan(scoreWord('PUZZLE'));
-  });
-
-  it('never scores zero even for the shortest valid word', () => {
-    expect(scoreRepeatWord('CAT')).toBeGreaterThan(0);
+  it('scores nothing for words below the minimum length', () => {
+    expect(scoreWord('AT')).toBe(0);
   });
 });

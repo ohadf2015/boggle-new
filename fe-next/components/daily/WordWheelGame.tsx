@@ -7,7 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
-import { scoreWord, scoreRepeatWord } from '@/utils/dailyChallenge/wordWheelScoring';
+import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
 import { WheelRushCelebration, type WheelCelebration } from '@/components/multiplayer/WheelRushCelebration';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -140,10 +140,6 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
 
   const gameOverRef = useRef(false);
   const wordsFoundRef = useRef<string[]>([]);
-  // Words that already got their one-time repeat bonus — caps the reward at
-  // a single reduced credit per word instead of letting a player farm points
-  // by resubmitting the same found word over and over.
-  const repeatCreditedRef = useRef<Set<string>>(new Set());
   const scoreRef = useRef(0);
   const timeWarningFiredRef = useRef(false);
   const gameContainerRef = useRef<HTMLDivElement>(null);
@@ -589,27 +585,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
     }
 
     if (wordsFound.includes(word)) {
-      // Re-typing a found word used to score nothing (full reject) — a dead
-      // end that felt punishing. The FIRST replay still scores, just at a
-      // reduced rate; further replays of the same word are capped at zero so
-      // this can't be farmed for infinite points.
-      const alreadyCredited = repeatCreditedRef.current.has(word);
-      const repeatPoints = alreadyCredited ? 0 : scoreRepeatWord(word);
-      if (!alreadyCredited) repeatCreditedRef.current.add(word);
-
-      if (repeatPoints > 0) {
-        setScore(prev => prev + repeatPoints);
-        setLastWordScore(repeatPoints);
-        setTimeout(() => setLastWordScore(null), 1200);
-        showFeedback(t('wordWheel.alreadyFoundBonus', { points: repeatPoints }), 'success');
-        onEffect({ type: 'wordValid', x: cx, y: 200, points: repeatPoints });
-        playWordAcceptedSound();
-        haptic(10);
-      } else {
-        showFeedback(t('wordWheel.alreadyFound'), 'error');
-        onEffect({ type: 'error', x: cx, y: 80 });
-        playWordRejectedSound();
-      }
+      // Daily is single-player: once you've found a word it's yours, so
+      // re-typing it is blocked outright (no points). This differs from
+      // multiplayer Wheel Rush, where the same word can be re-submitted because
+      // a different player found it first — but that path is server-authoritative
+      // (WheelRushView), not this client-side check.
+      showFeedback(t('wordWheel.alreadyFound'), 'error');
+      onEffect({ type: 'error', x: cx, y: 80 });
+      playWordRejectedSound();
       setBuiltLetters([]);
       return;
     }
