@@ -47,6 +47,17 @@ export default function CatchUpSuggestion({ excludeDate, mode }: CatchUpSuggesti
     setMounted(true);
   }, []);
 
+  // Suppress the nudge on a catch-up's OWN results screen. `excludeDate` is
+  // always the puzzle currently being viewed; when it's a *past* date we're
+  // already inside a catch-up, not on today's results. Re-surfacing the nudge
+  // there is a UI-locking trap: two unsolved past dailies (a failed Word Hunt
+  // never counts as "solved", so it stays "missed") mutually offer each other,
+  // and because each item only swaps the `?date=` search param in place, every
+  // tap just re-renders the already-played results to the *other* date — the
+  // #189<->#190 ping-pong. The nudge belongs only on today's results, so any
+  // navigation into a historical puzzle stays put instead of fighting back.
+  if (excludeDate && excludeDate < today) return null;
+
   const items = missed.filter(m => m.date !== excludeDate);
   if (items.length === 0) return null;
   if (!mounted) return null;
