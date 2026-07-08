@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useExperiment } from '@/hooks/useExperiment';
 import { m, AnimatePresence, useAnimationControls } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -85,6 +86,14 @@ export default function PuzzleCard({
   const isResolved = isCorrect || isGaveUp;
   const isDisabled = isResolved || state.status === 'finished' || state.status === 'outOfLives';
   const bridgeRevealed = isCorrect || isGaveUp;
+
+  const { variant: hintGateVariant, trackExposure: trackHintGateExposure } =
+    useExperiment('exp-connections-hint-gate-v1');
+  const showFallbackHint =
+    hintGateVariant === 'after-3-wrong' && state.wrongAttempts >= 3 && !isAdmin;
+  useEffect(() => {
+    if (showFallbackHint && puzzle.hint && !state.hintRevealed) trackHintGateExposure();
+  }, [showFallbackHint, puzzle.hint, state.hintRevealed, trackHintGateExposure]);
   const hasRated = state.ratedIds.has(puzzle.id);
   const showHint = state.hintRevealed && !!puzzle.hint;
 
@@ -353,7 +362,7 @@ export default function PuzzleCard({
                   onClick={onSubmit}
                   whileTap={{ scale: 0.97 }}
                   disabled={state.input.trim().length === 0}
-                  className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan px-4 py-2.5 font-neo-display font-black text-neo-navy shadow-hard disabled:opacity-40"
+                  className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan px-4 py-2.5 font-neo-display font-black text-neo-navy shadow-hard disabled:opacity-40 disabled:cursor-not-allowed"
                 >
                   {t('connections.submit')}
                 </m.button>
@@ -413,13 +422,13 @@ export default function PuzzleCard({
                   <Lightbulb className="w-4 h-4" aria-hidden="true" />
                   {t('connections.revealHint')}
                 </m.button>
-              ) : revealHintAd.canShowAd ? (
+              ) : (revealHintAd.canShowAd || showFallbackHint) ? (
                 <m.button
                   type="button"
-                  onClick={revealHintAd.offer}
+                  onClick={revealHintAd.canShowAd ? revealHintAd.offer : onRevealHint}
                   whileTap={{ scale: 0.96 }}
-                  disabled={revealHintAd.status === 'loading' || revealHintAd.status === 'showing'}
-                  className="inline-flex items-center gap-1.5 text-neo-white/55 font-neo-body text-xs px-2 py-1 hover:text-neo-yellow underline-offset-4 hover:underline transition-colors disabled:opacity-60"
+                  disabled={revealHintAd.canShowAd && (revealHintAd.status === 'loading' || revealHintAd.status === 'showing')}
+                  className="inline-flex items-center gap-1.5 text-neo-white/55 font-neo-body text-xs px-2 py-1 hover:text-neo-yellow underline-offset-4 hover:underline transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <Lightbulb className="w-3.5 h-3.5" aria-hidden="true" />
                   {t('connections.revealHintAd')}
@@ -445,7 +454,7 @@ export default function PuzzleCard({
                 onClick={revealAnswerAd.offer}
                 whileTap={{ scale: 0.96 }}
                 disabled={revealAnswerAd.status === 'loading' || revealAnswerAd.status === 'showing'}
-                className="inline-flex items-center gap-1.5 text-neo-white/55 font-neo-body text-xs px-2 py-1 hover:text-neo-purple underline-offset-4 hover:underline transition-colors disabled:opacity-60"
+                className="inline-flex items-center gap-1.5 text-neo-white/55 font-neo-body text-xs px-2 py-1 hover:text-neo-purple underline-offset-4 hover:underline transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <Eye className="w-3.5 h-3.5" aria-hidden="true" />
                 {t('connections.revealAnswerAd')}

@@ -69,39 +69,36 @@ async function fetchLandingDataUncached(language: string): Promise<LandingInitia
 
   const today = new Date().toISOString().slice(0, 10);
 
-  // Resolve current season first so the leaderboard query returns the active window only.
-  // Falls back to season 1 if get_current_season_id() returns NULL (no date-window match).
-  const seasonResp = await supabase.rpc('get_current_season_id');
-  const currentSeasonId = (seasonResp?.data as number | null) ?? 1;
-
-  const [supabaseResults, gameModeStats] = await Promise.all([
-    Promise.all([
-      supabase
-        .from('leaderboard')
-        .select(
-          'player_id, username, display_name, total_score, avatar_image, avatar_config, profiles!leaderboard_player_id_fkey(prestige_level)'
-        )
-        .eq('season_id', currentSeasonId)
-        .gt('total_score', 0)
-        .order('total_score', { ascending: false })
-        .limit(TOP_PLAYERS_LIMIT),
-
-      supabase
-        .from('game_results')
-        .select('id', { count: 'exact', head: true })
-        .gte('created_at', `${today}T00:00:00Z`),
-
-      supabase
-        .from('daily_word_hunt_stats')
-        .select('solve_rate')
-        .eq('puzzle_date', today)
-        .eq('language', language)
-        .maybeSingle(),
-    ]),
+  // game_results, daily_word_hunt_stats, and gameModeStats have no dependency on
+  // the season ID — start them in parallel with the season RPC instead of waiting
+  // behind it. Leaderboard still waits for currentSeasonId, but the other three
+  // round-trips overlap the season fetch rather than queuing after it.
+  const [seasonResp, gameModeStats, gamesTodayResult, solveRateResult] = await Promise.all([
+    supabase.rpc('get_current_season_id'),
     fetchGameModeStats(7),
+    supabase
+      .from('game_results')
+      .select('id', { count: 'exact', head: true })
+      .gte('created_at', `${today}T00:00:00Z`),
+    supabase
+      .from('daily_word_hunt_stats')
+      .select('solve_rate')
+      .eq('puzzle_date', today)
+      .eq('language', language)
+      .maybeSingle(),
   ]);
 
-  const [topPlayersResult, gamesTodayResult, solveRateResult] = supabaseResults;
+  const currentSeasonId = (seasonResp?.data as number | null) ?? 1;
+
+  const topPlayersResult = await supabase
+    .from('leaderboard')
+    .select(
+      'player_id, username, display_name, total_score, avatar_image, avatar_config, profiles!leaderboard_player_id_fkey(prestige_level)'
+    )
+    .eq('season_id', currentSeasonId)
+    .gt('total_score', 0)
+    .order('total_score', { ascending: false })
+    .limit(TOP_PLAYERS_LIMIT);
 
   // Map leaderboard rows to TopPlayer shape
   const topPlayers: TopPlayer[] = (topPlayersResult.data ?? []).map((row: any) => {

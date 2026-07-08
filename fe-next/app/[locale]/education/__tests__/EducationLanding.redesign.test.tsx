@@ -141,5 +141,12 @@ describe('Education Landing — redesign (WU-9)', () => {
       render(<EducationPageClient />);
       expect(screen.getByText('education.landing.socialProof')).toBeInTheDocument();
     });
+
+    it('teacher role card links to the access request page', () => {
+      render(<EducationPageClient />);
+      const teacherAccessLink = screen.getByTestId('teacher-card-access-link');
+      expect(teacherAccessLink).toBeInTheDocument();
+      expect(teacherAccessLink).toHaveAttribute('href', expect.stringContaining('/education/access'));
+    });
   });
 });

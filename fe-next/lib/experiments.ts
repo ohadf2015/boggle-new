@@ -631,6 +631,30 @@ export const EXPERIMENTS = {
     description:
       'Classic/survival SP word-count goal badge. word-goal = shows "X / 10 words" progress badge bottom-right. Targets 16% classic completion by anchoring players to a concrete word-count goal. Conversion = game_completed (classic/survival). Guardrail = game_abandoned.',
   }),
+
+  /**
+   * Connections hint fallback after 3 wrong attempts. PostHog rage-click data
+   * (2026-07-08) shows connections/play is the #1 rage-click surface. Current
+   * UX: hint button only visible when an ad is available (`canShowAd`). Users
+   * without ad eligibility have zero help affordance → frustration → abandon.
+   *
+   * control = current behavior (hint gated behind ad eligibility).
+   * after-3-wrong = after 3+ wrong attempts, hint button surfaces regardless
+   *   of ad eligibility; clicking it calls onRevealHint() directly (free hint),
+   *   bypassing the ad offer. Hypothesis: reduces rage-clicks and lifts
+   *   connections game_completed by reducing stuck-with-no-help abandons.
+   *
+   * Conversion: game_completed (connections). Guardrail: connections_hint_used
+   *   must rise (confirms treatment is actually engaging the hint, not just
+   *   clicking through to next puzzle without it).
+   * PostHog flag key = 'exp-connections-hint-gate-v1', 50/50 rollout.
+   */
+  'exp-connections-hint-gate-v1': defineExperiment({
+    variants: ['control', 'after-3-wrong'] as const,
+    default: 'control',
+    description:
+      'Connections hint fallback after 3 wrong attempts. after-3-wrong = hint button surfaces after 3+ wrong attempts even without ad eligibility (free hint). Targets rage-click #1 surface connections/play. Conversion = game_completed (connections). Guardrail = connections_hint_used must rise.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;
