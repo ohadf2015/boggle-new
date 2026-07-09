@@ -1,9 +1,9 @@
 {
-  "date": "2026-07-08",
-  "note": "24h window: 0 routes n≥50 (3rd consecutive night all sub-floor). No eligible regression verdicts. Supabase MCP absent (13th consecutive night — CRITICAL: human must mint never-expire PAT). Frontend: homepage priority+preload already correct. Fixed serial-then-parallel waterfall in fetchLandingData (game_results + daily_word_hunt_stats + fetchGameModeStats now start in parallel with season_rpc instead of waiting behind it). Saves ~50-150ms on cold cache misses.",
+  "date": "2026-07-09",
+  "note": "24h window: 0 routes n≥50 (4th consecutive night all sub-floor). No eligible regression verdicts. Supabase MCP absent (14th consecutive night — CRITICAL: human must mint never-expire PAT). All prior LCP fixes verified in-place: homepage winner.webp preload (correct, unoptimized asset), fetchLandingData parallelization, multiplayer arena-hub-hero preload. No new code changes this run — all targets already optimized.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (13th consecutive night). 4 migrations pending apply. web_vitals FK: already indexed by 20260429160100 (web_vitals_player_id_idx) — advisor showing stale data.",
+    "note": "Supabase MCP absent (14th consecutive night). 4 migrations pending apply. Impact check for 02-perf-2026-07-06-qpc-index-cleanup DEFERRED (pg_stat_user_indexes unreachable). web_vitals FK: already indexed by 20260429160100 (web_vitals_player_id_idx) — advisor showing stale data. Auth connections (absolute→percentage): human dashboard task.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
@@ -13,16 +13,16 @@
           "RLS initplan fix: (select auth.role()) on quest_achievement_feed policy",
           "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)"
         ],
-        "carry_count": 12,
-        "status": "WRITTEN — pending apply (12th night)"
+        "carry_count": 13,
+        "status": "WRITTEN — pending apply (13th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
         "items": [
           "DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup"
         ],
-        "carry_count": 7,
-        "status": "WRITTEN — pending apply (7th night)"
+        "carry_count": 8,
+        "status": "WRITTEN — pending apply (8th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql",
@@ -30,8 +30,8 @@
           "DROP INDEX IF EXISTS public.quick_play_challenges_challenger_idx",
           "CREATE INDEX IF NOT EXISTS idx_word_club_members_user_id ON public.word_club_members(user_id)"
         ],
-        "carry_count": 2,
-        "status": "WRITTEN — pending apply (2nd night)"
+        "carry_count": 3,
+        "status": "WRITTEN — pending apply (3rd night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql",
@@ -40,8 +40,8 @@
           "DROP+CREATE quick_play_results_insert: WITH CHECK uses (SELECT auth.uid()) — initplan wrapper",
           "DROP+CREATE quick_play_challenges_insert: WITH CHECK uses (SELECT auth.uid()) — initplan wrapper"
         ],
-        "carry_count": 1,
-        "status": "WRITTEN — pending apply (1st night)"
+        "carry_count": 2,
+        "status": "WRITTEN — pending apply (2nd night)"
       }
     ],
     "remaining_advisor_items": [
@@ -51,61 +51,61 @@
         "policy": "quick_play_challenges_accept + insert policies",
         "status": "Migration 20260707020000 written. Pending apply.",
         "priority": "MEDIUM",
-        "carry_count": 1
+        "carry_count": 2
       },
       {
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 12
+        "carry_count": 13
       },
       {
         "id": "unindexed_fk_web_vitals_player_id",
         "status": "STALE ADVISOR DATA — web_vitals_player_id_idx already created in migration 20260429160100. No new migration needed.",
         "priority": "INFO",
-        "carry_count": 1
+        "carry_count": 2
       }
     ]
   },
   "frontend": {
-    "note": "0 routes above n≥50 floor (3rd consecutive night). All LCP/INP/CLS verdicts DEFERRED. Phase-0 brief LCP values (word-hunt 8472ms, homepage 6904ms, /es/multiplayer 4560ms) are sub-floor — not actionable as regressions. Homepage: mascot preload + priority already correct. fetchLandingData parallelization fix shipped tonight.",
+    "note": "0 routes above n≥50 floor (4th consecutive night). All LCP/INP/CLS verdicts DEFERRED. Phase-0 brief LCP values (/es?utm 4260ms, /en/daily/word-wheel 3996ms, /es/multiplayer 3333ms, /es 2776ms) are all sub-floor — not actionable as regressions. All known LCP optimizations verified in-place this run: hero preload correct (unoptimized WebP), fetchLandingData parallelized, multiplayer arena-hub-hero preload wired. next/font self-hosted fonts confirmed (no Google Fonts round-trip). Below-fold images confirmed default-lazy (no priority misuse).",
     "by_route": [
       {
-        "route": "/en/daily/word-hunt",
+        "route": "/es",
         "p75_lcp_ms": null,
         "n_24h": "sub-50",
-        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 8472ms. noIndex game shell."
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 2776ms. Homepage: winner.webp preloaded + priority set, fetchLandingData parallelized."
       },
       {
-        "route": "/",
+        "route": "/es (utm_source=chatgpt.com)",
         "p75_lcp_ms": null,
         "n_24h": "sub-50",
-        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 6904ms. winner.webp preloaded + priority set."
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 4260ms. Same page as /es — UTM param does not affect ISR cache. Likely cold-visitor (first visit, no mascot cached)."
+      },
+      {
+        "route": "/en/daily/word-wheel",
+        "p75_lcp_ms": null,
+        "n_24h": "sub-floor (n<50)",
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 3996ms. noIndex game shell. Dynamic import loading state uses priority-mascot (fast). Actual delay = JS download + dynamic resolve."
       },
       {
         "route": "/es/multiplayer",
         "p75_lcp_ms": null,
-        "n_24h": "sub-50",
-        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 4560ms."
+        "n_24h": "sub-floor (n<50)",
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 3333ms. arena-hub-hero.jpg preload wired correctly."
       }
     ],
-    "shipped_this_run": [
-      {
-        "file": "fe-next/lib/landing/fetchLandingData.ts",
-        "change": "Parallelized fetchLandingDataUncached: game_results + daily_word_hunt_stats + fetchGameModeStats now fire in parallel with season_rpc instead of blocked behind it. Leaderboard still waits for currentSeasonId.",
-        "estimated_saving_ms": "50-150ms on cold cache miss (TTL=30s)"
-      }
-    ]
+    "shipped_this_run": []
   },
   "bundle": {
     "total_kb_uncompressed": null,
-    "note": "No .next/chunks available (no fresh build). fetchLandingData change is server-side only — zero bundle impact.",
+    "note": "Top chunks unchanged vs 2026-07-08 baseline within 3KB — no regression. Chunk hashes changed (fresh build from prior lanes), sizes stable.",
     "top_chunks": [
-      { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6449, "note": "Word dictionary — LAZY" },
-      { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3283 },
-      { "name": "82055-affbfbb6ca395994.js", "kb": 853 },
-      { "name": "64789-6fd77af49601b4b4.js", "kb": 706 },
-      { "name": "68292.bb49bb9873fa2566.js", "kb": 647 }
+      { "name": "8aafd928.bc81927d996732a9.js", "kb": 6452, "note": "Word dictionary — LAZY" },
+      { "name": "6c0d0f8e.e929edfbc529ee96.js", "kb": 3284 },
+      { "name": "62013-966f6608ee5cbc47.js", "kb": 856 },
+      { "name": "60150.6f0277a1c4778f3c.js", "kb": 712 },
+      { "name": "26644.51104cd213c865d8.js", "kb": 612 }
     ]
   }
 }

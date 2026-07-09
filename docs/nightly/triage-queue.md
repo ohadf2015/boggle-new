@@ -1388,3 +1388,33 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
   - status: deferred (impact check unable-to-verify, Sentry MCP unavailable)
   - why: Fix was shipped 2026-07-05. Brief shows 6 events — likely draining from pre-fix state. Monitor next run when MCP available.
   - recommended owner: self (check Sentry JAVASCRIPT-NEXTJS-1PV count on next run)
+
+## 2026-07-09
+- [Sentry] CapacitorGameConnect.then() not implemented on android (JAVASCRIPT-NEXTJS-1PH)
+  - last seen: 2026-07-09, count: ~7, userCount: 7
+  - link: https://lexiclash.sentry.io/issues/132085085/
+  - status: deferred — code already fixed in nativePGS.ts (Capacitor.isPluginAvailable guard + return boolean not proxy). Remaining 7 errors likely old app version installs.
+  - why: no actionable code fix remains; monitor for new occurrences post-app-update
+  - recommended owner: self — close if count stays ~0 next week
+
+- [Sentry] TypeError: Cannot read properties of null (reading 'clear') (JAVASCRIPT-NEXTJS-1PV)
+  - last seen: 2026-07-09, count: ~6, userCount: 6
+  - link: https://lexiclash.sentry.io/issues/132119253/
+  - status: shipped — added `if (line.destroyed) return;` guard in pathTrace.ts:35 (GSAP onUpdate fires after Pixi context nulled on unmount)
+  - recommended owner: review-by-eod
+
+- [Supabase] Signed-In Users Can Execute SECURITY DEFINER Function upsert_push_token
+  - evidence: authenticated role can call via /rest/v1/rpc/upsert_push_token
+  - status: deferred — REVOKE EXECUTE from anon/public not from authenticated (push token is user-auth flow, authenticated callers are intentional)
+  - why: authenticated execution is the intended design; ambiguous whether anon path exists
+  - recommended owner: backend review-by-eod
+
+- [Supabase] RLS Policy Always True on teacher_access_requests (tar_insert_any INSERT)
+  - status: deferred — RLS addition on sensitive table; blast radius = lock out inserts
+  - why: needs schema review before tightening
+  - recommended owner: backend
+
+## 2026-07-09 Lane 03 — Stale experiment flags (human review)
+- `share-prompt-timing` (created 2026-03-31, 100d) — A/B share prompt timing; needs winner determination + code cleanup
+- `show-signup-after-first-win` (created 2026-03-31, 100d) — A/B signup prompt timing; same
+- `mp-signup-nudge-copy-v1` (created 2026-05-08, 62d) — MP signup nudge copy variants; 0/77 converts on control noted in flag description

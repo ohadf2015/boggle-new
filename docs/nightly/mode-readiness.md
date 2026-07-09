@@ -11,11 +11,11 @@
 
 ## Current (in progress)
 
-### word-tower — readiness: 88% — status: AUDIT IN PROGRESS
+### word-tower — readiness: 89% — status: AUDIT IN PROGRESS
 - **Why first:** closest to release (deep: 30 components + 69 lib files), admin/beta-gated, no public exposure yet.
 - **Reach for QA:** `https://www.lexiclash.live/en/word-tower?word-tower=1` (the `?word-tower=1` override force-enables the gated mode for non-admins — see `lib/wordTower/flags.ts`). Hebrew RTL: `/he/word-tower?word-tower=1`. Local dev (NODE_ENV=development) needs no override.
 - **Key files:** `components/wordTower/*`, `lib/wordTower/*`, `app/[locale]/word-tower/{page,PageClient}.tsx`, `app/api/word-tower/*`.
-- **Last audited:** 2026-07-08
+- **Last audited:** 2026-07-09
 
 ### Audit areas covered
 - [x] **Bugs / correctness** — null guards, unguarded Record access, double-scaling score (VERIFIED NOT A BUG 2026-06-29 — `placementMultiplier × appliedHeightMult` is intentional multiplicative compounding: crane quality × updraft bonus), damageTower combo reset
@@ -60,6 +60,10 @@
 - [x] **WordTowerSkinPicker.tsx** — AUDITED CLEAN 2026-07-06: portal guard via `mounted` state; no hardcoded strings.
 - [x] **WordTowerNoticeColumn.tsx** — AUDITED CLEAN 2026-07-06: `TOWER_SURPRISE_META[event]` guarded by `meta ?` on render; `gainText !== '+0m'` is internal data comparison (not user-facing); wreck `names[0] ?? fallback` safe.
 - [x] **WordTowerBackdrop.tsx / TowerNotice.tsx / WordTowerSighting.tsx** — AUDITED CLEAN 2026-07-06.
+- [x] **useDailyStreak.ts** — AUDITED CLEAN 2026-07-09: localStorage deferred to useEffect (no SSR mismatch), idempotent recordPlay (today-guard), proper error handling.
+- [x] **useRunStreakPerk.ts** — AUDITED CLEAN 2026-07-09: milestone re-award on state restore is acceptable (perks ephemeral, non-economy-touching). `totalHeightMult` correctly memoized.
+- [x] **useWordTowerRivals.ts** — AUDITED CLEAN 2026-07-09: alive flag prevents post-unmount state updates, graceful empty array fallback on failure.
+- [x] **BiomeEventEmitter (WordTowerParallaxProps.tsx)** — BUG FIXED 2026-07-09: was creating raw imperative divs with no animation; BackgroundEvent (GSAP) was never rendered. Converted to React state + onDone callback. Background sky events now visible.
 - [x] **WordTowerCrane.tsx** — AUDITED CLEAN 2026-07-06: `+{hiddenCount}` badge is `aria-hidden` (decorative) — acceptable.
 - [x] **WordTowerCraneBits.tsx** — AUDITED CLEAN 2026-07-08: CraneStabilityMeter (aria-label+aria-hidden dots, all t()), CraneSparkBurst (decorative aria-hidden), CraneFooter (role=status+aria-live=assertive, t(), data-testid, disabled state) — all clean.
 - [x] **WordTowerMinimap.tsx** — AUDITED CLEAN 2026-07-08: aria-label via t(), RTL via end-2 logical prop, decorative elements aria-hidden, m unit international — acceptable. tap=scroll-to-top affordance clear.
@@ -80,7 +84,7 @@ _(none — daily leaderboard reclassified below; mode fully playable without it)
 - Daily hazard policy unresolved — design defer
 - Daily streak device-local — localStorage, not server-synced; resets on device switch — tied to daily backend
 - `WordTowerShareCard.tsx` line 104: `'s tower` possessive suffix awkward for Hebrew names — minor, share card non-core
-- **BiomeEventEmitter background events invisible** — `WordTowerParallaxProps.tsx`: `scheduleNextEvent` creates empty unstyled divs; `BackgroundEvent` (GSAP animation) is dead code never rendered. Fix = React state list + render `<BackgroundEvent>` per event. Decorative only. **owner: review-by-eod**
+- ~~**BiomeEventEmitter background events invisible**~~ — FIXED 2026-07-09: React state-driven rendering; BackgroundEvent now wired via onDone callback.
 
 ## Queue (audit order — closest-to-release first)
 
