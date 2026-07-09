@@ -54,6 +54,7 @@ import { getOfflineStore } from '@/lib/offline';
 import { getCachedDailyPuzzle } from '@/lib/offline/prefetchDaily';
 import { usePrefetchDailyContent } from '@/hooks/usePrefetchDailyContent';
 import DailyOfflineFallback from '@/components/offline/DailyOfflineFallback';
+import { FlowContinueBar } from './flow/FlowContinueBar';
 import type { LetterGrid, Language } from '@/types';
 
 export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played' | 'offline-miss';
@@ -79,6 +80,11 @@ const DailyChallenge: React.FC = () => {
   const dateParam = searchParams.get('date');
   const catchupDate = dateParam && isCatchUpDate(getDailyChallengeDate(), dateParam) ? dateParam : null;
   const isCatchup = !!catchupDate;
+
+  // In-flow: launched from the Daily Flow (`?flow=1`). On results we surface a
+  // "continue the flow" bar that hands the player back to the breather instead
+  // of the hub, so the chained run keeps its momentum.
+  const inFlow = searchParams.get('flow') === '1';
 
   // Game language state
   const urlLocale = language as Language;
@@ -641,6 +647,8 @@ const DailyChallenge: React.FC = () => {
       {showTutorial && (
         <DailyChallengeTutorial onComplete={handleTutorialComplete} onSkip={handleTutorialSkip} />
       )}
+
+      <FlowContinueBar active={inFlow && (phase === 'completed' || phase === 'already-played')} />
 
     </div>
   );

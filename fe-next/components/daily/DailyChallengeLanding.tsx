@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
 import { Timer, CircleDot, Check, X, Eye } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -24,6 +24,10 @@ import { FloatingDecorations } from './landing/FloatingDecorations';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
 import DailyInsightStack from './DailyInsightStack';
+import { HoldToStartFlow } from './flow/HoldToStartFlow';
+import { FlowResumeBanner } from './flow/FlowResumeBanner';
+import { DEFAULT_FLOW_STEPS, readPlayedMap, flowStepHref } from './flow/flowSteps';
+import { startDailyFlow, getDailyFlowSession, nextFlowStep } from '@/utils/dailyChallenge/flow';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
@@ -47,7 +51,35 @@ export function DailyChallengeLanding({
   // no hub edits. See lib/auth/inWorkModeAccess.ts.
   const adminModes = canSeeInWorkModes ? adminOnlyDailyModes() : [];
   const pathname = usePathname();
+  const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Whether an in-progress Daily Flow exists with a step still to play. Drives
+  // the swap between the "start the flow" CTA and the "resume your flow" banner.
+  // Resolved after mount (localStorage) to avoid a hydration mismatch.
+  const [flowInProgress, setFlowInProgress] = useState(false);
+  const refreshFlowState = useCallback(() => {
+    const session = getDailyFlowSession();
+    if (!session) {
+      setFlowInProgress(false);
+      return;
+    }
+    const played = readPlayedMap(session.steps, session.language);
+    setFlowInProgress(nextFlowStep(session, played) !== null);
+  }, []);
+
+  const handleStartFlow = useCallback(
+    (fast: boolean) => {
+      const session = startDailyFlow({ language: currentLanguage, steps: DEFAULT_FLOW_STEPS, fast });
+      // One gesture → straight into the first unplayed challenge. The breather
+      // (/daily/flow) only surfaces BETWEEN rounds. If everything's somehow
+      // already cleared, let the controller show the finale instead.
+      const played = readPlayedMap(session.steps, session.language);
+      const first = nextFlowStep(session, played);
+      router.push(first ? flowStepHref(first, currentLanguage) : `/${currentLanguage}/daily/flow`);
+    },
+    [currentLanguage, router],
+  );
 
   // Pre-game gauntlet banner. Reads the same rival contract the share link emits
   // (whName/whScore/whEmoji) and the results head-to-head card consumes — one
@@ -92,6 +124,7 @@ export function DailyChallengeLanding({
   // Initial check
   useEffect(() => {
     checkWordWheelStatus();
+    refreshFlowState();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
 
@@ -101,6 +134,7 @@ export function DailyChallengeLanding({
       if (document.visibilityState === 'visible') {
         checkWordWheelStatus();
         dailyStatus.refresh();
+        refreshFlowState();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -113,6 +147,7 @@ export function DailyChallengeLanding({
     const handlePopState = () => {
       checkWordWheelStatus();
       dailyStatus.refresh();
+      refreshFlowState();
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -149,6 +184,22 @@ export function DailyChallengeLanding({
 
       {/* Missions Header: XP bar + countdown */}
       <DailyMissionsHeader completedCount={completedCount} />
+
+      {/* Daily Flow entry — one gesture to chain every daily challenge. Shows the
+          resume banner when a run is already in progress, otherwise the
+          tap-or-hold start control (hold = fast flow). Hidden once everything's
+          cleared (nothing left to flow through). */}
+      {flowInProgress ? (
+        <FlowResumeBanner />
+      ) : (
+        !(wordHuntPlayed && wordWheelPlayed) && (
+          <HoldToStartFlow
+            onStart={handleStartFlow}
+            label={t('daily.flow.startLabel', 'Play all challenges')}
+            holdHint={t('daily.flow.startHint', 'Tap to start · hold for fast flow')}
+          />
+        )
+      )}
 
       {/* Score Gauntlet Banner: shown when arriving via a challenge share link */}
       <ScoreGauntletBanner
