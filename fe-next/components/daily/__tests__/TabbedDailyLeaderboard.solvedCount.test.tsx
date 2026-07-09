@@ -28,6 +28,7 @@ vi.mock('framer-motion', () => ({
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <button {...props}>{children}</button>,
   },
   AnimatePresence: ({ children }: React.PropsWithChildren<Record<string, unknown>>) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 // Mock avatar config utilities
@@ -277,7 +278,7 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
     expect(headerElement?.textContent).not.toMatch(/guest/i);
   });
 
-  it('should display solved count in emerald green color', async () => {
+  it('should display solved count in the brand success color (neo-lime)', async () => {
     // GIVEN: API returns data
     (global.fetch as jest.Mock).mockImplementation((url: string) => {
       if (url.includes('/word-hunt/leaderboard')) {
@@ -311,14 +312,14 @@ describe('TabbedDailyLeaderboard - Solved Count Display', () => {
       />
     );
 
-    // THEN: The solved count should have emerald color class
+    // THEN: The solved count should have the brand success color class
     await waitFor(() => {
       expect(screen.getByText('8 solved')).toBeInTheDocument();
     });
 
-    // Find the element containing solved count and verify it has the emerald class
+    // Find the element containing solved count and verify it has the neo-lime class
     const solvedElement = screen.getByText('8 solved');
-    expect(solvedElement.className).toMatch(/emerald/);
+    expect(solvedElement.className).toMatch(/neo-lime/);
   });
 
   it('should only show solved players in the ranked list (not failed attempts)', async () => {

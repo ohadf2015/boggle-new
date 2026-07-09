@@ -11,6 +11,7 @@ vi.mock('framer-motion', () => ({
     get: () => ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
   }),
   AnimatePresence: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 // eslint-disable-next-line @next/next/no-img-element
 vi.mock('next/image', () => ({ __esModule: true, default: ({ alt }: { alt: string }) => <img alt={alt} /> }));

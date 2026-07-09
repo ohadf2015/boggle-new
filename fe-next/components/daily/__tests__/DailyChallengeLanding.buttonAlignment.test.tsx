@@ -65,6 +65,8 @@ vi.mock('framer-motion', () => ({
       <span className={className} {...props}>{children}</span>
     ),
   },
+  AnimatePresence: ({ children }: any) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 // Mock fetch for API calls
