@@ -13,6 +13,7 @@ import logger from '@/utils/logger';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
 import WordWheelResults from './WordWheelResults';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+import { FlowContinueBar } from './flow/FlowContinueBar';
 import {
   generateWordWheelPuzzle,
   type WordWheelPuzzle,
@@ -122,6 +123,8 @@ const WordWheelChallenge: React.FC = () => {
   const dateParam = searchParams.get('date');
   const catchupDate = dateParam && isCatchUpDate(getDailyChallengeDate(), dateParam) ? dateParam : null;
   const isCatchup = !!catchupDate;
+  // In-flow (`?flow=1`): on results, hand back to the Daily Flow breather.
+  const inFlow = searchParams.get('flow') === '1';
 
   const [phase, setPhase] = useState<WordWheelPhase>('loading');
   const [puzzle, setPuzzle] = useState<WordWheelPuzzle | null>(null);
@@ -705,6 +708,8 @@ const WordWheelChallenge: React.FC = () => {
         variant="danger"
         analyticsId="word_wheel_quit_confirm"
       />
+
+      <FlowContinueBar active={inFlow && (phase === 'completed' || phase === 'already-played')} />
     </div>
   );
 };
