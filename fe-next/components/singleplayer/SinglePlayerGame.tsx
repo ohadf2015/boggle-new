@@ -96,7 +96,7 @@ function SinglePlayerGame({
       trackGrowthEvent('first_word_found', { mode: settings.mode });
     }
     prevWordCountRef.current = wordCount;
-  }, [core.foundWords.length, encouragement]);
+  }, [core.foundWords.length, encouragement, settings.mode]);
 
   // Show toast notifications for achievements (same as multiplayer)
   const { queueAchievement } = useAchievementQueue();
