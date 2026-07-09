@@ -54,6 +54,11 @@ export interface WordTowerNoticeColumnProps {
   wreckReport: { names: string[]; floors: number } | null;
   reducedMotion: boolean;
   t: (key: string, params?: Record<string, string | number>) => string;
+  /** Dedicated notice band top (px) from {@link playChromeFrame} — keeps banners
+   *  in the sky above the construction zone instead of a hardcoded mid-screen. */
+  noticeTopPx?: number;
+  /** Max height of the notice stack so it never permanently occludes the tower. */
+  noticeMaxHeightPx?: number;
 }
 
 /**
@@ -68,12 +73,20 @@ export function WordTowerNoticeColumn({
   verdict, lastResultTier, hazard, clutch, critical, newBest, zone, tease,
   reward, sabEarned, sabAdEarned, skinUnlock, surprise, combo, milestone,
   landmark, ach, wreckReport, reducedMotion, t,
+  noticeTopPx, noticeMaxHeightPx,
 }: WordTowerNoticeColumnProps) {
   const { language } = useLanguage();
   const fxClass = (exiting: boolean, enter: string) => (reducedMotion ? '' : exiting ? 'wt-toast-out' : enter);
 
   return (
-    <div className="pointer-events-none absolute inset-x-0 top-[8.75rem] z-30 flex flex-col items-center gap-1.5 px-3">
+    <div
+      data-testid="wt-notice-column"
+      className="pointer-events-none absolute inset-x-0 z-30 flex flex-col items-center gap-1.5 overflow-hidden px-3"
+      style={{
+        top: noticeTopPx ?? '8.75rem',
+        maxHeight: noticeMaxHeightPx ?? undefined,
+      }}
+    >
       {/* Unmistakable DROP VERDICT — the single big beat that answers "did I
           nail it?". Band-coloured headline (PERFECT/NICE/SLOPPY/MISSED) + the
           metres actually gained. Leads the column so it can't be missed AND

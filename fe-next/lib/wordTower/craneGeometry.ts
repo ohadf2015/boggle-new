@@ -14,12 +14,44 @@
 
 /** Total crane chrome height (px) — wrapper top offset + shadow + reticle room. */
 export const CRANE_CHROME_H_PX = 280;
-/** Where the landing shadow (and therefore the girder's landing line) sits. */
+/**
+ * Landing shadow Y from the TROLLEY WRAPPER top (px). Pure hang/fall math uses
+ * this origin — see {@link craneFallPx}.
+ */
 export const CRANE_SHADOW_Y_PX = 246;
 /** Trolley carriage height (px) — the block the cable hangs from. */
 export const CRANE_CARRIAGE_H_PX = 12;
 /** Hook height (px) between cable end and girder top. */
 export const CRANE_HOOK_H_PX = 12;
+
+// ── Outer overlay → shadow screen path (must match WordTowerCrane DOM) ──
+// outer top
+//   + stability meter (variable height)
+//   + flex gap-3 (12px)
+//   + chrome
+//       + trolley wrapper top-[20px]
+//       + shadow top: CRANE_SHADOW_Y_PX - 4  (visual nudge to ellipse centre)
+/** Flex gap between stability meter and chrome (`gap-3`). */
+export const CRANE_OUTER_GAP_PX = 12;
+/** Trolley sweep wrapper offset from chrome top (`top-[20px]`). */
+export const CRANE_TROLLEY_TOP_PX = 20;
+/** Shadow is drawn 4px above the pure hang line so the ellipse centre reads as the mark. */
+export const CRANE_SHADOW_VISUAL_NUDGE_PX = 4;
+
+/**
+ * Screen-Y of the landing shadow relative to the outer crane overlay top.
+ * Encodes the real WordTowerCrane DOM path so playChromeFrame can pin the
+ * shadow on the shared build line (not a simplified chrome-only model).
+ */
+export function craneShadowOffsetFromOuterTop(meterHPx: number): number {
+  return (
+    Math.max(0, meterHPx) +
+    CRANE_OUTER_GAP_PX +
+    CRANE_TROLLEY_TOP_PX +
+    CRANE_SHADOW_Y_PX -
+    CRANE_SHADOW_VISUAL_NUDGE_PX
+  );
+}
 
 const CABLE_MIN_PX = 18;
 const CABLE_MAX_PX = 64;

@@ -65,7 +65,8 @@ describe('WordTowerCrane — tap-to-drop placement overlay', () => {
       <WordTowerCrane word="TREE" consecutiveSloppy={0} onDrop={onDrop} t={t} getOffset={() => 0} />,
     );
     fireEvent.click(screen.getByTestId('crane-drop'));
-    act(() => { vi.advanceTimersByTime(300); });
+    // Fall window is depth-scaled (fallDurationMs) — advance past FALL_MAX.
+    act(() => { vi.advanceTimersByTime(600); });
     expect(onDrop).toHaveBeenCalledTimes(1);
     expect(onDrop.mock.calls[0][0].quality).toBe('perfect');
     expect(onDrop.mock.calls[0][0].heightMultiplier).toBeGreaterThan(1);
@@ -77,7 +78,7 @@ describe('WordTowerCrane — tap-to-drop placement overlay', () => {
       <WordTowerCrane word="TREE" consecutiveSloppy={0} onDrop={onDrop} t={t} getOffset={() => 0.9} />,
     );
     fireEvent.click(screen.getByTestId('crane-drop'));
-    act(() => { vi.advanceTimersByTime(300); });
+    act(() => { vi.advanceTimersByTime(600); });
     expect(onDrop.mock.calls[0][0].quality).toBe('miss');
   });
 
@@ -89,7 +90,7 @@ describe('WordTowerCrane — tap-to-drop placement overlay', () => {
     const btn = screen.getByTestId('crane-drop');
     fireEvent.click(btn);
     fireEvent.click(btn); // ignored — already falling
-    act(() => { vi.advanceTimersByTime(300); });
+    act(() => { vi.advanceTimersByTime(600); });
     expect(onDrop).toHaveBeenCalledTimes(1);
   });
 

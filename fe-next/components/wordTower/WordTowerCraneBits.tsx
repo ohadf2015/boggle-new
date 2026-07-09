@@ -2,7 +2,11 @@
 
 import { cn } from '@/lib/utils';
 import { TOPPLE_AFTER_SLOPPY, type PlacementOutcome } from '@/lib/wordTower/cranePlacement';
-import type { ReleaseFx } from '@/lib/wordTower/craneReleaseFx';
+/** Minimal spark burst props — shared by releaseFx and landFeedback. */
+interface SparkBurstFx {
+  sparkles: number;
+  glow: boolean;
+}
 
 const QUALITY_STYLE: Record<string, string> = {
   perfect: 'bg-neo-lime text-neo-black',
@@ -50,7 +54,7 @@ export function CraneStabilityMeter({
 
 /** Sparkle burst scattered around the landed girder when the drop scored well.
  *  Pure CSS; count + reach scale with how clean it was. */
-export function CraneSparkBurst({ release }: { release: ReleaseFx }) {
+export function CraneSparkBurst({ release }: { release: SparkBurstFx }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-10" aria-hidden>
       {Array.from({ length: release.sparkles }).map((_, i) => {

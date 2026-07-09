@@ -56,6 +56,7 @@ import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
 import { buildDropVerdict, formatHeightGain, type DropVerdict } from '@/lib/wordTower/dropVerdict';
 import type { PlacementOutcome } from '@/lib/wordTower/cranePlacement';
+import { playChromeFrame, DEFAULT_TOP_CHROME_PX } from '@/lib/wordTower/playChromeFrame';
 import { useWordTowerPerks } from './useWordTowerPerks';
 import { useRunStreakPerk } from '@/lib/wordTower/useRunStreakPerk';
 import { WordTowerPerkDraft } from './WordTowerPerkDraft';
@@ -692,6 +693,29 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
   // Control-deck height (measured by the HUD) → the tower grounds just above it.
   const [deckHeight, setDeckHeight] = useState(220);
+  // Play surface height — drives shared chrome framing (notice band + crane top).
+  const playRootRef = useRef<HTMLDivElement>(null);
+  const [playH, setPlayH] = useState(
+    typeof window !== 'undefined' ? window.innerHeight : 800,
+  );
+  useEffect(() => {
+    const el = playRootRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      if (entry) setPlayH(entry.contentRect.height);
+    });
+    ro.observe(el);
+    setPlayH(el.clientHeight || window.innerHeight);
+    return () => ro.disconnect();
+  }, []);
+  const chromeFrame = useMemo(
+    () => playChromeFrame({
+      viewportH: playH,
+      topChromePx: DEFAULT_TOP_CHROME_PX,
+      deckHeightPx: deckHeight,
+    }),
+    [playH, deckHeight],
+  );
   const onDeckHeight = useCallback((px: number) => setDeckHeight(px), []);
 
   // ── persistence: build payload + save (fetch or beacon) ──
@@ -858,7 +882,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   }, [game.tray, tower, selectTileHaptic]);
 
   return (
-    <div className="relative min-h-[100dvh] w-full overflow-hidden bg-neo-navy" dir={dir}>
+    <div ref={playRootRef} className="relative min-h-[100dvh] w-full overflow-hidden bg-neo-navy" dir={dir}>
       <WordTowerScene
         floors={game.floors}
         biomeId={biomeId}
@@ -1023,13 +1047,15 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           perfectBandBonus={upgradeEffects.perfectBandBonus}
           blockColorHex={blockColorHex}
           blockTextHex={blockTextHex}
+          craneTopPx={chromeFrame.craneTopPx}
           hideOwnButton
         />
       )}
 
       {/* ── Notice column ── every transient banner (verdict, alarms,
           celebrations, rewards, scenic beats) stacks here in priority order.
-          See WordTowerNoticeColumn for the rationale + ordering. */}
+          Framed into the sky band above the construction zone so banners never
+          permanently occlude the active floors / drop path. */}
       <WordTowerNoticeColumn
         verdict={verdictR}
         lastResultTier={tower.state.lastResult?.tier ?? null}
@@ -1051,6 +1077,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         wreckReport={wreckReport}
         reducedMotion={reducedMotion}
         t={t}
+        noticeTopPx={chromeFrame.noticeTopPx}
+        noticeMaxHeightPx={chromeFrame.noticeMaxHeightPx}
       />
 
       {/* Daily mutator intro — the day's shared twist, popped once on entry. */}

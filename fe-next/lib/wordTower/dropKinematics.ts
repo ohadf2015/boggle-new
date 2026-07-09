@@ -8,12 +8,17 @@
  * projection so the preview can never disagree with the verdict.
  */
 
-/** Fraction of the ballistic drift actually applied (tuned for fairness). */
-export const CARRY_FACTOR = 0.5;
+/** Fraction of the ballistic drift actually applied. Bumped 0.5→0.58 so
+ *  release-before-center (the Tower Bloxx skill) is legible without runaway. */
+export const CARRY_FACTOR = 0.58;
 /** Hard cap on momentum drift in normalized offset units. */
-export const MAX_DRIFT = 0.35;
-/** Fall duration — MUST match the crane's fall animation window (300ms). */
-export const FALL_MS = 300;
+export const MAX_DRIFT = 0.38;
+/**
+ * Default fall duration (ms). Crane may use a depth-scaled value from
+ * {@link fallDurationMs}; when it does, pass the same ms into
+ * {@link landingOffset} so the visual and the verdict stay locked.
+ */
+export const FALL_MS = 320;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 

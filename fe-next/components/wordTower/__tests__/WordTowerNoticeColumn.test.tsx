@@ -47,7 +47,7 @@ describe('WordTowerNoticeColumn', () => {
       />,
     );
     // All four beats share one flex-column container — the anti-pile-up contract.
-    const column = container.firstElementChild as HTMLElement;
+    const column = container.querySelector('[data-testid="wt-notice-column"]') as HTMLElement;
     expect(column.className).toContain('flex-col');
     const beats = column.querySelectorAll(':scope > [role="status"]');
     expect(beats.length).toBe(4);
@@ -58,6 +58,17 @@ describe('WordTowerNoticeColumn', () => {
     expect(column.textContent).toContain('SKY');
     expect(column.textContent).toContain('+32');
     expect(column.textContent).toContain('wordTower.sabotage.earned');
+  });
+
+  it('applies the dedicated notice band from shared chrome framing', () => {
+    const { container } = render(
+      <WordTowerNoticeColumn {...baseProps} noticeTopPx={120} noticeMaxHeightPx={180} />,
+    );
+    const column = container.querySelector('[data-testid="wt-notice-column"]') as HTMLElement;
+    expect(column.style.top).toBe('120px');
+    expect(column.style.maxHeight).toBe('180px');
+    // Overflow clip keeps stacked banners from spilling over the tower.
+    expect(column.className).toContain('overflow-hidden');
   });
 
   it('shows the tier kicker on a celebration verdict, never on a miss', () => {

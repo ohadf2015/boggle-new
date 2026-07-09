@@ -6,10 +6,14 @@ import {
   CRANE_SHADOW_Y_PX,
   CRANE_CARRIAGE_H_PX,
   CRANE_HOOK_H_PX,
+  CRANE_OUTER_GAP_PX,
+  CRANE_TROLLEY_TOP_PX,
+  CRANE_SHADOW_VISUAL_NUDGE_PX,
   craneCableLenPx,
   craneBeamBottomPx,
   craneFallPx,
   craneArmPx,
+  craneShadowOffsetFromOuterTop,
 } from '../craneGeometry';
 
 /** Beam pixel heights for realistic word lengths (3..10 letters). */
@@ -62,5 +66,15 @@ describe('craneGeometry', () => {
     expect(craneCableLenPx(0)).toBeLessThanOrEqual(64);
     expect(craneFallPx(0)).toBeGreaterThanOrEqual(44);
     expect(craneBeamBottomPx(-5)).toBe(CRANE_CARRIAGE_H_PX + craneCableLenPx(-5) + CRANE_HOOK_H_PX);
+  });
+
+  it('craneShadowOffsetFromOuterTop encodes the WordTowerCrane DOM path', () => {
+    // outer → meter → gap-3 → trolley top-[20] → shadow (CRANE_SHADOW_Y_PX - 4)
+    const meter = 32;
+    expect(craneShadowOffsetFromOuterTop(meter)).toBe(
+      meter + CRANE_OUTER_GAP_PX + CRANE_TROLLEY_TOP_PX + CRANE_SHADOW_Y_PX - CRANE_SHADOW_VISUAL_NUDGE_PX,
+    );
+    // DOM extras beyond a naive meter+shadow model: 12+20-4 = 28
+    expect(craneShadowOffsetFromOuterTop(meter)).toBe(meter + CRANE_SHADOW_Y_PX + 28);
   });
 });

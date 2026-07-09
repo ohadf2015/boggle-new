@@ -34,7 +34,8 @@ import { WordTowerSighting } from './WordTowerSighting';
 import { WordTowerMascot } from './WordTowerMascot';
 import { WordTowerMinimap } from './WordTowerMinimap';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
-import { dropQualityIntensity, type PlacementQuality } from '@/lib/wordTower/cranePlacement';
+import type { PlacementQuality } from '@/lib/wordTower/cranePlacement';
+import { landFeedback } from '@/lib/wordTower/landFeedback';
 
 /** Pixi particle presets carry bare 6-char hex strings ('00ffff'); the biome
  *  palettes are hex ints. Convert int → bare-hex string for `burst({colors})`. */
@@ -362,28 +363,30 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       const startDeg = swivelStartDeg(leanRef.current, topDy, impactQualityRef.current ?? 'good');
       const durMs = swivelDurationMs(committing.length);
       const baseColor = committing[0].color;
-      // Drop-quality intensity drives the physical response: squash depth on the
-      // landing bricks + how hard the whole tower compresses underneath.
-      const impactIntensity = dropQualityIntensity(impactQualityRef.current ?? 'good');
+      // Event-driven land feedback — quality + word heft drive squash, punch,
+      // rings, particles, and shake. Reduced-motion collapses to static zeros.
+      const land = landFeedback(impactQualityRef.current ?? 'good', {
+        depthFloors: committing.length,
+        reducedMotion,
+      });
       swivelWordIn(committing, pivotX, pivotY, startDeg, durMs, (i) => {
         const { tile } = committing[i];
-        squashLandScaled(tile, impactIntensity); // lands with quality-scaled weight
+        squashLandScaled(tile, land.impactIntensity); // lands with quality-scaled weight
         if (i === 0) {
           // Kick off the whole-tower compression rebound (consumed by the tick loop).
-          impactRef.current = { at: performance.now(), intensity: impactIntensity };
-          // Perfect drops also earn the zoom punch — the crisp "nailed it" kiss.
-          if (impactQualityRef.current === 'perfect') {
-            punchRef.current = { at: performance.now(), intensity: 0.8 };
+          impactRef.current = { at: performance.now(), intensity: land.impactIntensity };
+          // Success punch — perfect (1.0) / good (0.35) / others 0.
+          if (land.punchIntensity > 0) {
+            punchRef.current = { at: performance.now(), intensity: land.punchIntensity };
           }
-          // A heavy, layered thud where the girder bites in: a fat outer ring + a
-          // tight inner ring read as a real shock-wave, a dust burst that scales
-          // with the word's heft, and a camera kick. Punchier than the old single
-          // ring so the placement lands with weight (founder: more satisfying FX).
+          // Layered thud: dual rings + dust + kick, all quality-scaled.
           const heft = committing.length;
-          impactRing(tilt, pivotX, pivotY, half, baseColor, 1.6);
-          impactRing(tilt, pivotX, pivotY, half, baseColor, 0.85);
-          engine.particles.burst(COMBO_FLASH, pivotX, pivotY, 14 + heft * 3);
-          engine.shake.shake({ intensity: Math.min(13, 5 + heft * 1.6), duration: 0.24, decay: 'exponential' });
+          impactRing(tilt, pivotX, pivotY, half, baseColor, land.ringScale);
+          impactRing(tilt, pivotX, pivotY, half, baseColor, land.ringScale * 0.55);
+          engine.particles.burst(COMBO_FLASH, pivotX, pivotY, land.particles + heft);
+          if (land.shakePx > 0) {
+            engine.shake.shake({ intensity: land.shakePx, duration: 0.24, decay: 'exponential' });
+          }
         }
       });
 
@@ -507,8 +510,9 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         const inst0 = instabilityRef.current;
         const groundLocal = groundYRef.current - cc.y;
         tl.pivot.set(centerXRef.current, groundLocal);
-        // Landing compression — the whole tower dips + rebounds under a fresh
-        // block (impactDipPx returns 0 outside its damped-spring window).
+        // Landing compression — whole tower dips + rebounds (Tower Bloxx
+        // compress). Peak dip is MAX_DIP_PX × intensity; impactDipPx returns 0
+        // outside its damped-spring window.
         const imp = impactRef.current;
         const dip = imp ? impactDipPx(0, now - imp.at, imp.intensity) : 0;
         tl.position.set(centerXRef.current, groundLocal + dip);
@@ -574,30 +578,30 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     if (resultKey === 0 || !lastResult || reducedMotion) return;
     const { width: W, height: H } = engine;
     const x = W / 2;
+    // Fire success FX in the sky band above the build line (not over the tower).
     const y = H * 0.22;
     const q = dropQualityRef.current ?? 'good';
+    const land = landFeedback(q);
     const biomePal = BIOME_THEME[biomeIdRef.current].particles.map(toHexStr);
     if (q === 'perfect') {
-      // Triumph — a bright lime wash, a fat biome-tinted star shower + confetti
-      // double-burst, and a satisfying kick so nailing the green sweet-spot really
-      // feels like a win (founder 2026-06-25: "really celebrate" the good drop).
-      engine.flash.flash({ color: 0xbfff00, duration: 0.36, intensity: 0.4 });
-      engine.particles.burst({ ...GOLD_STARS, colors: biomePal }, x, y, 64);
-      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, 30);
-      engine.shake.shake({ intensity: 10, duration: 0.34, decay: 'exponential' });
+      // Triumph — lime wash + star shower scaled by landFeedback.
+      engine.flash.flash({ color: 0xbfff00, duration: 0.36, intensity: land.flashIntensity });
+      engine.particles.burst({ ...GOLD_STARS, colors: biomePal }, x, y, 48 + land.sparkles);
+      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, land.particles);
+      engine.shake.shake({ intensity: land.shakePx, duration: 0.34, decay: 'exponential' });
     } else if (q === 'good') {
-      // Solid — a cool cyan wash + a biome-tinted confetti pop.
-      engine.flash.flash({ color: 0x22d3ee, duration: 0.26, intensity: 0.22 });
-      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, 26);
+      engine.flash.flash({ color: 0x22d3ee, duration: 0.26, intensity: land.flashIntensity });
+      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, land.particles);
+      if (land.shakePx > 0) {
+        engine.shake.shake({ intensity: land.shakePx * 0.5, duration: 0.22, decay: 'exponential' });
+      }
     } else if (q === 'sloppy') {
-      // Just ok — a brief amber blink + a small puff, no celebration.
-      engine.flash.flash({ color: 0xffe135, duration: 0.22, intensity: 0.18 });
-      engine.particles.burst(COMBO_FLASH, x, y, 12);
+      engine.flash.flash({ color: 0xffe135, duration: 0.22, intensity: land.flashIntensity });
+      engine.particles.burst(COMBO_FLASH, x, y, land.particles);
     } else {
-      // Bad — a red warning wash + a sharp jolt so a fumbled drop clearly stings.
-      engine.flash.flash({ color: 0xff3366, duration: 0.3, intensity: 0.3 });
-      engine.particles.burst(COMBO_FLASH, x, y, 8);
-      engine.shake.shake({ intensity: 5, duration: 0.26, decay: 'exponential' });
+      engine.flash.flash({ color: 0xff3366, duration: 0.3, intensity: land.flashIntensity });
+      engine.particles.burst(COMBO_FLASH, x, y, land.particles);
+      engine.shake.shake({ intensity: land.shakePx, duration: 0.26, decay: 'exponential' });
     }
     // Word-length tier flourish on top of the quality cue (longer build = more).
     if (lastResult.tier === 'skyscraper') {

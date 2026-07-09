@@ -5,9 +5,10 @@
  * dilation would desync the crane and the tower). Cosmetic only.
  */
 
-/** Zoom-punch window (ms). */
-export const PUNCH_MS = 260;
-const MAX_PUNCH = 0.04;
+/** Zoom-punch window (ms) — long enough to read as hitstop without freezing the clock. */
+export const PUNCH_MS = 300;
+/** Peak scale boost (0.07 → ~7%) — was 0.04 (too micro for "nailed it"). */
+export const MAX_PUNCH = 0.07;
 
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
 

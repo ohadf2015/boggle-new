@@ -4,7 +4,7 @@
  * itself squash-stretches. Purely cosmetic — never feeds the verdict.
  */
 import { describe, it, expect } from 'vitest';
-import { impactDipPx, squashScale, IMPACT_MS, IMPACT_DEPTH } from '../landingImpact';
+import { impactDipPx, squashScale, IMPACT_MS, IMPACT_DEPTH, MAX_DIP_PX } from '../landingImpact';
 
 describe('impactDipPx (compression wave)', () => {
   it('is 0 before contact and after settling', () => {
@@ -26,9 +26,9 @@ describe('impactDipPx (compression wave)', () => {
     expect(impactDipPx(0, t, 1)).toBeGreaterThan(impactDipPx(0, t, 0.3));
   });
 
-  it('never dips more than a tile-safe bound (≤ 8px)', () => {
+  it('never dips more than the MAX_DIP_PX tile-safe bound', () => {
     for (let t = 0; t <= IMPACT_MS; t += 25) {
-      expect(impactDipPx(0, t, 1)).toBeLessThanOrEqual(8);
+      expect(impactDipPx(0, t, 1)).toBeLessThanOrEqual(MAX_DIP_PX);
     }
   });
 });

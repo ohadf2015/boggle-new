@@ -5,11 +5,16 @@
  * verdict or the height math.
  */
 
-/** Total impact window (ms). */
-export const IMPACT_MS = 550;
+/** Total impact window (ms). Slightly longer than the old 550 so the rebound
+ *  reads as a heavy girder settling (Tower Bloxx compress-spring). */
+export const IMPACT_MS = 620;
 /** How many floors below the landing the compression wave reaches. */
 export const IMPACT_DEPTH = 4;
-const MAX_DIP_PX = 7;
+/** Peak whole-tower dip envelope (px). Actual peak is lower after the
+ *  damped-spring envelope (~0.67×) so set 16 → ~10–11px visible compress. */
+export const MAX_DIP_PX = 16;
+/** Peak block squash amp at full intensity (sx = 1 + this). */
+export const SQUASH_AMP = 0.26;
 const OMEGA = (Math.PI * 5) / IMPACT_MS; // ~2.5 rebounds over the window
 
 const clamp01 = (n: number) => Math.max(0, Math.min(1, n));
@@ -34,7 +39,7 @@ export function impactDipPx(floorDepth: number, tMs: number, intensity: number):
 export function squashScale(tMs: number, intensity: number): { sx: number; sy: number } {
   const k = clamp01(tMs / IMPACT_MS);
   const i = clamp01(intensity);
-  const amt = 0.18 * i * (1 - k) * Math.cos(Math.PI * 1.5 * k) ** 2;
+  const amt = SQUASH_AMP * i * (1 - k) * Math.cos(Math.PI * 1.5 * k) ** 2;
   const sx = 1 + amt;
   return { sx, sy: 1 / sx };
 }

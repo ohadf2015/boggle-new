@@ -65,13 +65,13 @@ export function swivelDescent(k: number): number {
 }
 
 /** How drop quality scales the settle wobble: a PERFECT drop snaps in tight
- *  and confident, a sloppy/missed one visibly staggers in. `good` (and the
- *  quality-less legacy call) keeps the tuned base feel. */
+ *  and confident (Bloxx "nailed it"), a sloppy/missed one visibly staggers.
+ *  `good` (and the quality-less legacy call) keeps the tuned base feel. */
 const QUALITY_SWIVEL_MULT: Record<SwivelQuality, number> = {
-  perfect: 0.6,
+  perfect: 0.45,
   good: 1,
-  sloppy: 1.5,
-  miss: 1.5,
+  sloppy: 1.55,
+  miss: 1.65,
 };
 
 export type SwivelQuality = 'perfect' | 'good' | 'sloppy' | 'miss';

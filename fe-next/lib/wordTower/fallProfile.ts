@@ -10,8 +10,8 @@
  * harder landing). Reduced-motion callers skip the animation and place instantly.
  */
 
-/** Animation duration bounds (ms). */
-export const FALL_MIN_MS = 260;
+/** Animation duration bounds (ms). Floor raised so a short hang still feels weighty. */
+export const FALL_MIN_MS = 300;
 export const FALL_MAX_MS = 520;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
