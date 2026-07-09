@@ -14278,7 +14278,10 @@ const sv = {
       "uniqueLabel": "Unik",
       "clashLabel": "Krock",
       "passLabel": "Pass",
-      "shareCta": "Dela poäng"
+      "shareCta": "Dela poäng",
+      "cashOut": "Lös in",
+      "chips": "marker",
+      "coins": "mynt"
     }
   }
 };

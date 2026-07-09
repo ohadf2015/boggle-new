@@ -14730,7 +14730,10 @@ const he = {
       "uniqueLabel": "ייחודי",
       "clashLabel": "התנגשות",
       "passLabel": "פאס",
-      "shareCta": "שתף תוצאה"
+      "shareCta": "שתף תוצאה",
+      "cashOut": "פדיון",
+      "chips": "ז'טונים",
+      "coins": "מטבעות"
     }
   }
 };

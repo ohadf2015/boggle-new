@@ -14365,7 +14365,10 @@ const es = {
       "uniqueLabel": "Único",
       "clashLabel": "Choque",
       "passLabel": "Paso",
-      "shareCta": "Compartir puntuación"
+      "shareCta": "Compartir puntuación",
+      "cashOut": "Cobrar",
+      "chips": "fichas",
+      "coins": "monedas"
     }
   }
 };

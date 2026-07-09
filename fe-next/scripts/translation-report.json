@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 5866,
+    "totalKeysInCode": 5871,
     "keyCountByLanguage": {
-      "en": 11651,
-      "es": 11739,
-      "he": 11734,
-      "ja": 11715,
-      "ru": 11538,
-      "sv": 11714
+      "en": 11670,
+      "es": 11758,
+      "he": 11753,
+      "ja": 11734,
+      "ru": 11688,
+      "sv": 11733
     },
-    "missingFromEnglish": 11,
+    "missingFromEnglish": 0,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 23,
@@ -379,111 +379,7 @@
     "ru": [],
     "sv": []
   },
-  "missingFromEnglish": [
-    {
-      "key": "sealedBid.badge",
-      "usages": [
-        {
-          "file": "app/[locale]/sealed-bid/page.tsx",
-          "line": 215
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.chipStack",
-      "usages": [
-        {
-          "file": "app/[locale]/sealed-bid/page.tsx",
-          "line": 227
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.draw",
-      "usages": [
-        {
-          "file": "components/sealedBid/Showdown.tsx",
-          "line": 42
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.lockIn",
-      "usages": [
-        {
-          "file": "app/[locale]/sealed-bid/page.tsx",
-          "line": 244
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.roundLabel",
-      "usages": [
-        {
-          "file": "app/[locale]/sealed-bid/page.tsx",
-          "line": 221
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.session.cashOut",
-      "usages": [
-        {
-          "file": "components/sealedBid/SealedBidSessionSummary.tsx",
-          "line": 98
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.session.chips",
-      "usages": [
-        {
-          "file": "components/sealedBid/SealedBidSessionSummary.tsx",
-          "line": 100
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.session.coins",
-      "usages": [
-        {
-          "file": "components/sealedBid/SealedBidSessionSummary.tsx",
-          "line": 100
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.title",
-      "usages": [
-        {
-          "file": "app/[locale]/sealed-bid/page.tsx",
-          "line": 208
-        },
-        {
-          "file": "app/[locale]/sealed-bid/page.tsx",
-          "line": 211
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.youLose",
-      "usages": [
-        {
-          "file": "components/sealedBid/Showdown.tsx",
-          "line": 41
-        }
-      ]
-    },
-    {
-      "key": "sealedBid.youWin",
-      "usages": [
-        {
-          "file": "components/sealedBid/Showdown.tsx",
-          "line": 39
-        }
-      ]
-    }
-  ],
+  "missingFromEnglish": [],
   "missingByLanguage": {
     "es": [
       "sealedBidLegacy.chipStack",
@@ -1174,144 +1070,7 @@
       "vs.charitableDonation",
       "vs.bestFor"
     ],
-    "ru": [
-      "sealedBidLegacy.badge",
-      "sealedBidLegacy.title",
-      "sealedBidLegacy.instructions",
-      "sealedBidLegacy.roundLabel",
-      "sealedBidLegacy.totalScore",
-      "sealedBidLegacy.chipStack",
-      "sealedBidLegacy.timerLabel",
-      "sealedBidLegacy.sealPhase",
-      "sealedBidLegacy.tapHint",
-      "sealedBidLegacy.backspace",
-      "sealedBidLegacy.clear",
-      "sealedBidLegacy.revealPhase",
-      "sealedBidLegacy.showdown",
-      "sealedBidLegacy.lockIn",
-      "sealedBidLegacy.skip",
-      "sealedBidLegacy.youPicked",
-      "sealedBidLegacy.botPicked",
-      "sealedBidLegacy.resultUnique",
-      "sealedBidLegacy.resultShared",
-      "sealedBidLegacy.resultNone",
-      "sealedBidLegacy.pointsEarned",
-      "sealedBidLegacy.nextRound",
-      "sealedBidLegacy.finalScore",
-      "sealedBidLegacy.gameOver",
-      "sealedBidLegacy.busted",
-      "sealedBidLegacy.playAgain",
-      "sealedBidLegacy.adminOnly",
-      "sealedBidLegacy.shareCard.title",
-      "sealedBidLegacy.shareCard.cta",
-      "sealedBidLegacy.shareCard.copied",
-      "sealedBidLegacy.session.title",
-      "sealedBidLegacy.session.outsmarted",
-      "sealedBidLegacy.session.uniqueLabel",
-      "sealedBidLegacy.session.clashLabel",
-      "sealedBidLegacy.session.passLabel",
-      "sealedBidLegacy.session.shareCta",
-      "sealedBidLegacy.session.cashOut",
-      "sealedBidLegacy.session.chips",
-      "sealedBidLegacy.session.coins",
-      "sealedBidLegacy.err.notInRack",
-      "sealedBidLegacy.err.notWord",
-      "sealedBidLegacy.allIn",
-      "sealedBidLegacy.currentStake",
-      "sealedBidLegacy.balance",
-      "sealedBidLegacy.stake",
-      "sealedBidLegacy.uniquePays",
-      "sealedBidLegacy.potentialPayout",
-      "sealedBidLegacy.lockBid",
-      "sealedBidLegacy.pass",
-      "sealedBidLegacy.unique",
-      "sealedBidLegacy.clash",
-      "sealedBidLegacy.notAWord",
-      "sealedBidLegacy.cashOut",
-      "sealedBidLegacy.chips",
-      "sealedBidLegacy.round",
-      "sealedBidLegacy.youWin",
-      "sealedBidLegacy.continue",
-      "seo.quickPlay.title",
-      "seo.quickPlay.description",
-      "seo.quickPlay.ogTitle",
-      "seo.quickPlay.ogDescription",
-      "results.challengeCta",
-      "results.challengeCtaSubtext",
-      "daily.flow.startLabel",
-      "daily.flow.introHint",
-      "daily.flow.startHint",
-      "daily.flow.holdingHint",
-      "daily.flow.title",
-      "daily.flow.readyTitle",
-      "daily.flow.nextTitle",
-      "daily.flow.progress",
-      "daily.flow.nextUp",
-      "daily.flow.startCta",
-      "daily.flow.continueCta",
-      "daily.flow.autoAdvance",
-      "daily.flow.takeBreak",
-      "daily.flow.barNext",
-      "daily.flow.barFinish",
-      "daily.flow.resumeTitle",
-      "daily.flow.resumeSubtitle",
-      "daily.flow.resumeCta",
-      "daily.flow.doneTitle",
-      "daily.flow.doneSubtitle",
-      "daily.flow.doneCta",
-      "daily.catchUp.appTitle",
-      "daily.catchUp.appSubtitle",
-      "daily.catchUp.appCta",
-      "adventure.boss.combat.abilityBar",
-      "adventure.boss.combat.charge",
-      "adventure.boss.combat.weakLabel",
-      "adventure.boss.combat.weaknessHit",
-      "adventure.boss.combat.weakness.length",
-      "adventure.boss.combat.weakness.lengthLong",
-      "adventure.boss.combat.weakness.lengthEpic",
-      "adventure.boss.combat.weakness.doubleLetter",
-      "adventure.boss.combat.weakness.palindrome",
-      "adventure.boss.combat.weakness.rareLetter",
-      "adventure.boss.combat.weakness.vowelHeavy",
-      "adventure.boss.combat.parry.hint",
-      "adventure.boss.combat.parry.success",
-      "adventure.boss.combat.ability.smite.name",
-      "adventure.boss.combat.ability.smite.desc",
-      "adventure.boss.combat.ability.ward.name",
-      "adventure.boss.combat.ability.ward.desc",
-      "adventure.boss.combat.ability.focus.name",
-      "adventure.boss.combat.ability.focus.desc",
-      "wordForge.ironStreak",
-      "wordForge.scoreTier.good",
-      "wordForge.scoreTier.great",
-      "wordForge.scoreTier.blazing",
-      "vs.feature",
-      "vs.gamesPerDay",
-      "vs.multiplayer",
-      "vs.gameType",
-      "vs.freeToPlay",
-      "vs.noDownload",
-      "vs.languages",
-      "vs.adventureMode",
-      "vs.dailyChallenge",
-      "vs.brainTraining",
-      "vs.streakSystem",
-      "vs.shareableResults",
-      "vs.accountRequired",
-      "vs.sideBySide",
-      "vs.whatLexiDoes",
-      "vs.free",
-      "vs.noStudentLogin",
-      "vs.coreFormat",
-      "vs.liveWholeClassMultiplayer",
-      "vs.oneVOneDuels",
-      "vs.teacherDashboard",
-      "vs.customWordLists",
-      "vs.wordFormation",
-      "vs.fiveLanguages",
-      "vs.charitableDonation",
-      "vs.bestFor"
-    ],
+    "ru": [],
     "sv": [
       "sealedBidLegacy.chipStack",
       "sealedBidLegacy.gameOver",
@@ -2501,17 +2260,12 @@
       "wordForge.perfectCraft"
     ],
     "ru": [
-      "sealedBid.badge",
-      "sealedBid.title",
       "sealedBid.instructions",
-      "sealedBid.roundLabel",
       "sealedBid.totalScore",
       "sealedBid.timerLabel",
       "sealedBid.sealPhase",
-      "sealedBid.tapHint",
       "sealedBid.backspace",
       "sealedBid.revealPhase",
-      "sealedBid.lockIn",
       "sealedBid.skip",
       "sealedBid.youPicked",
       "sealedBid.botPicked",

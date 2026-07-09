@@ -14656,7 +14656,10 @@ const en = {
       "uniqueLabel": "Unique",
       "clashLabel": "Clash",
       "passLabel": "Pass",
-      "shareCta": "Share Score"
+      "shareCta": "Share Score",
+      "cashOut": "Cash out",
+      "chips": "chips",
+      "coins": "coins"
     }
   }
 };

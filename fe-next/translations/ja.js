@@ -14286,7 +14286,10 @@ const ja = {
       "uniqueLabel": "ユニーク",
       "clashLabel": "クラッシュ",
       "passLabel": "パス",
-      "shareCta": "スコアをシェア"
+      "shareCta": "スコアをシェア",
+      "cashOut": "換金",
+      "chips": "チップ",
+      "coins": "コイン"
     }
   }
 };
