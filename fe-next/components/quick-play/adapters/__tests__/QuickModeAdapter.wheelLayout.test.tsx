@@ -3,6 +3,10 @@ import '@testing-library/jest-dom';
 import { QuickModeAdapter } from '../QuickModeAdapter';
 import type { QuickRoundConfig } from '../../types';
 
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
+}));
+
 // Mock the (dynamically imported) Word Wheel so we can assert the wrapper the
 // adapter mounts it into, not the wheel's internals.
 vi.mock('@/components/daily/WordWheelGame', () => ({

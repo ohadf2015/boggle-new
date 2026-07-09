@@ -43,9 +43,12 @@ export default function QuickPlayPageClient() {
           same chain the Daily Challenge route relies on. A `min-h-screen` block
           here (the old shell) breaks that chain: the Word Wheel's `flex-1` root
           becomes inert and its `[container-type:size]` wheel cluster collapses,
-          crushing the board into the top HUD. `overflow-y-auto` keeps shorter
-          phases (wheel select / results) scrollable within the bounded height. */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-neo-navy">
+          crushing the board into the top HUD.
+          overflow-hidden (not overflow-y-auto): nested STAGE/game scrollers own
+          overflow. A page-level scroller was stacking with STAGE scroll and
+          fighting definite-height flex for boards. Hub wheel/results use
+          min-h-full + their own scroll when content is tall. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden bg-neo-navy">
         <QuickPlayGate />
       </div>
     </Suspense>

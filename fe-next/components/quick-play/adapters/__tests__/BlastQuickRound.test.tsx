@@ -42,4 +42,20 @@ describe('BlastQuickRound', () => {
     await waitFor(() => expect(lastBlastGameProps.current).not.toBeNull());
     expect(lastBlastGameProps.current.config.boardClearMode).toBe('shrink');
   });
+
+  it('passes totalTime so the MP HUD countdown is visible', async () => {
+    render(<BlastQuickRound config={config} onDone={vi.fn()} onQuit={vi.fn()} />);
+    await waitFor(() => expect(lastBlastGameProps.current).not.toBeNull());
+    expect(lastBlastGameProps.current.totalTime).toBe(60);
+    expect(lastBlastGameProps.current.remainingTime).toBe(60);
+  });
+
+  it('feeds a synthetic solo leaderboard so HUD score is not stuck at 0', async () => {
+    render(<BlastQuickRound config={config} onDone={vi.fn()} onQuit={vi.fn()} />);
+    await waitFor(() => expect(lastBlastGameProps.current).not.toBeNull());
+    expect(lastBlastGameProps.current.username).toBe('you');
+    expect(lastBlastGameProps.current.leaderboard).toEqual([
+      expect.objectContaining({ username: 'you', score: 0, wordCount: 0 }),
+    ]);
+  });
 });

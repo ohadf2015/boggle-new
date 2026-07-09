@@ -283,7 +283,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
 
   return (
     <div
-      className="relative flex min-h-full flex-col overflow-x-hidden bg-neo-navy pb-8 animate-[fadeInUp_0.25s_ease-out_0s_both]"
+      className="relative flex min-h-0 flex-1 flex-col overflow-x-hidden overflow-y-auto bg-neo-navy pb-8 animate-[fadeInUp_0.25s_ease-out_0s_both]"
       data-testid="quick-play-hub"
     >
       {/* Arcade atmosphere — soft color blobs, non-interactive */}

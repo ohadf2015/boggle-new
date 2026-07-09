@@ -7,21 +7,44 @@
  * double-submit incident).
  *
  * All four modes pass hideModeCoach so ModeCoach FTUE never blocks the arcade
- * loop (returning + first-time players play immediately).
+ * loop. Stages are mode-specific: fill games (classic/blast/hunt) get a locked
+ * height column with no nested page scroll; wheel keeps a scrollable stage so
+ * short viewports can still reach the found-words list.
  */
-import { useRef, useCallback } from 'react';
+import { useRef, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import type { QuickRoundConfig, QuickRoundResult } from '../types';
 import { BlastQuickRound } from './BlastQuickRound';
 import { fromWordWheel, fromSurvival, fromSinglePlayer } from './normalizeResult';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 
 const SinglePlayerGame = dynamic(() => import('@/components/singleplayer/SinglePlayerGame'), { ssr: false });
 const DailyWordHuntSurvival = dynamic(() => import('@/components/daily/DailyWordHuntSurvival'), { ssr: false });
 const WordWheelGame = dynamic(() => import('@/components/daily/WordWheelGame'), { ssr: false });
 
-/** Shared stage shell — bounded flex column so boards don't crush into HUD. */
-const STAGE =
-  'relative flex flex-1 flex-col items-center justify-start min-h-0 overflow-y-auto overscroll-contain pt-3 sm:pt-4 pb-bottom-stack w-full';
+/**
+ * Shared locked column. items-stretch so game roots get full width (items-center
+ * was crushing classic/blast/hunt to content width). overflow-hidden for fill
+ * games; wheel uses STAGE_SCROLL so the cluster can scroll on short phones.
+ */
+const STAGE_BASE =
+  'relative flex flex-1 flex-col items-stretch min-h-0 w-full bg-neo-navy';
+
+/** Classic / blast — game owns overflow; definite height for flex-1 boards. */
+const STAGE_FILL = `${STAGE_BASE} overflow-hidden`;
+
+/**
+ * Word hunt — survival already scrolls + pads; STAGE must not double that.
+ */
+const STAGE_HUNT = `${STAGE_BASE} overflow-hidden`;
+
+/**
+ * Wheel — parity with Daily WordWheelChallenge playing wrapper: bounded flex
+ * column + scroll so container-type:size has a real height and short phones
+ * can scroll the found-words list.
+ */
+const STAGE_WHEEL =
+  `${STAGE_BASE} justify-start overflow-y-auto overscroll-contain pt-3 sm:pt-4 pb-bottom-stack`;
 
 interface QuickModeAdapterProps {
   config: QuickRoundConfig;
@@ -32,6 +55,13 @@ interface QuickModeAdapterProps {
 export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterProps) {
   const doneRef = useRef(false);
   const wordSet = useRef<Set<string> | null>(null);
+  // Lock body height + hide bottom nav for the whole arcade round (classic /
+  // wheel / blast never did this themselves — only word-hunt via Survival).
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   const finish = useCallback(
     (result: QuickRoundResult) => {
@@ -45,12 +75,8 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
   switch (config.mode) {
     case 'wheel-rush': {
       if (!wordSet.current) wordSet.current = new Set(config.words ?? []);
-      // Bounded flex-column stage — parity with the Daily Challenge playing
-      // wrapper (WordWheelChallenge). WordWheelGame's mobile root is `flex-1`
-      // and its wheel cluster uses `[container-type:size]`; both need a
-      // definite-height flex-column ancestor.
       return (
-        <div className={STAGE} data-testid="quick-stage-wheel-rush">
+        <div className={STAGE_WHEEL} data-testid="quick-stage-wheel-rush">
           <WordWheelGame
             puzzle={config.wheel as never}
             duration={config.durationSec}
@@ -69,7 +95,7 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
     }
     case 'word-hunt':
       return (
-        <div className={STAGE} data-testid="quick-stage-word-hunt">
+        <div className={STAGE_HUNT} data-testid="quick-stage-word-hunt">
           <DailyWordHuntSurvival
             grid={config.grid}
             puzzleNumber={0}
@@ -86,31 +112,38 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
       );
     case 'blast':
       return (
-        <div className={STAGE} data-testid="quick-stage-blast">
-          <BlastQuickRound config={config} onDone={finish} onQuit={onQuit} hideModeCoach />
+        <div className={STAGE_FILL} data-testid="quick-stage-blast">
+          <div className="relative flex h-full min-h-0 w-full flex-1 flex-col">
+            <BlastQuickRound config={config} onDone={finish} onQuit={onQuit} hideModeCoach />
+          </div>
         </div>
       );
     case 'classic':
     default:
       return (
-        <div className={STAGE} data-testid="quick-stage-classic">
-          <SinglePlayerGame
-            settings={{
-              mode: 'challenge',
-              difficulty: 'MEDIUM',
-              language: config.language as never,
-              grid: config.grid as never,
-              timerSeconds: config.durationSec,
-              bots: [], // quick play is bot-free by design
-              minWordLength: 3,
-            }}
-            targetHighScore={config.perfectScore}
-            hideModeCoach
-            onGameEnd={(r: { playerScore: number; playerWords: string[] }) =>
-              finish(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config))
-            }
-            onQuit={onQuit}
-          />
+        <div className={STAGE_FILL} data-testid="quick-stage-classic">
+          {/* PortraitGameLayout needs flex-1 h-full ancestors to size the board CQ. */}
+          <div className="relative flex h-full min-h-0 w-full flex-1 flex-col px-2 sm:px-3">
+            <SinglePlayerGame
+              settings={{
+                mode: 'challenge',
+                difficulty: 'MEDIUM',
+                language: config.language as never,
+                grid: config.grid as never,
+                timerSeconds: config.durationSec,
+                bots: [], // quick play is bot-free by design
+                minWordLength: 3,
+              }}
+              // Don't surface "beat the perfect score" challenge tracker —
+              // arcade rounds are about your score this round, not a HS race.
+              targetHighScore={null}
+              hideModeCoach
+              onGameEnd={(r: { playerScore: number; playerWords: string[] }) =>
+                finish(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config))
+              }
+              onQuit={onQuit}
+            />
+          </div>
         </div>
       );
   }

@@ -189,10 +189,16 @@ export const BlastStage = memo(function BlastStage({
   // MP Blast has timer props; SP Blast doesn't. Timer-era games hide the wave chip.
   const isMultiplayer = remainingTime !== null && remainingTime !== undefined;
 
-  // In MP the local engine never scores (server-authoritative cascades), so the
-  // engine's `score` stays 0 the whole game. Read the player's live score from
-  // the broadcast leaderboard instead. SP keeps the local engine score.
-  const displayScore = isMultiplayer ? selectMyBlastScore(leaderboard, username) : score;
+  // In real MP the local engine never scores (server-authoritative cascades), so
+  // the engine's `score` stays 0. Read the player's live score from the broadcast
+  // leaderboard instead. When no LB is wired (solo timer / Quick Play before the
+  // synthetic LB lands), fall back to the engine score so the HUD is never stuck
+  // at 0 with a visible timer.
+  const displayScore = isMultiplayer
+    ? leaderboard && leaderboard.length > 0 && username
+      ? selectMyBlastScore(leaderboard, username)
+      : score
+    : score;
 
   // Live "closest rivals" slice for the desktop side rail. Identity is keyed by
   // username (blast's identity scheme). Returns null in solo blast (no leaderboard).

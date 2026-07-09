@@ -8,6 +8,10 @@ import '@testing-library/jest-dom';
 import { QuickModeAdapter } from '../QuickModeAdapter';
 import type { QuickRoundConfig } from '../../types';
 
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
+}));
+
 const classicProps: Record<string, unknown>[] = [];
 const huntProps: Record<string, unknown>[] = [];
 const wheelProps: Record<string, unknown>[] = [];

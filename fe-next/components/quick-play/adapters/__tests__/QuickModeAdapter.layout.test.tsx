@@ -1,11 +1,16 @@
 /**
  * All four quick modes get a bounded flex-column stage so boards/wheels
- * don't crush into the HUD (parity with the wheel-rush fix).
+ * don't crush into the HUD. Fill modes (classic/blast/hunt) use
+ * overflow-hidden + items-stretch; wheel keeps a scrollable stage.
  */
 import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { QuickModeAdapter } from '../QuickModeAdapter';
 import type { QuickRoundConfig } from '../../types';
+
+vi.mock('@/contexts/NavigationContext', () => ({
+  useHideNavigation: () => vi.fn(),
+}));
 
 vi.mock('@/components/daily/WordWheelGame', () => ({
   __esModule: true,
@@ -37,15 +42,15 @@ const base = {
   perfectScore: 100,
 } as const;
 
-function assertStage(el: HTMLElement) {
+function assertBaseStage(el: HTMLElement) {
   expect(el.className).toMatch(/(^|\s)flex-1(\s|$)/);
   expect(el.className).toMatch(/flex-col/);
   expect(el.className).toMatch(/min-h-0/);
-  expect(el.className).toMatch(/overflow-y-auto/);
+  expect(el.className).toMatch(/items-stretch/);
 }
 
 describe('QuickModeAdapter — playable stage for all modes', () => {
-  it('wheel-rush stage is a non-collapsing flex column', async () => {
+  it('wheel-rush stage is a scrollable flex column (daily-playing parity)', async () => {
     render(
       <QuickModeAdapter
         config={
@@ -68,10 +73,11 @@ describe('QuickModeAdapter — playable stage for all modes', () => {
       />
     );
     const stage = await screen.findByTestId('quick-stage-wheel-rush');
-    assertStage(stage);
+    assertBaseStage(stage);
+    expect(stage.className).toMatch(/overflow-y-auto/);
   });
 
-  it('classic stage is a non-collapsing flex column', async () => {
+  it('classic stage is a locked fill column (no nested page scroll)', async () => {
     render(
       <QuickModeAdapter
         config={{ mode: 'classic', ...base } as QuickRoundConfig}
@@ -79,10 +85,17 @@ describe('QuickModeAdapter — playable stage for all modes', () => {
         onQuit={vi.fn()}
       />
     );
-    assertStage(await screen.findByTestId('quick-stage-classic'));
+    const stage = await screen.findByTestId('quick-stage-classic');
+    assertBaseStage(stage);
+    expect(stage.className).toMatch(/overflow-hidden/);
+    // Inner wrap gives PortraitGameLayout a real h-full flex ancestor
+    const wrap = stage.firstElementChild as HTMLElement;
+    expect(wrap.className).toMatch(/h-full/);
+    expect(wrap.className).toMatch(/flex-1/);
+    expect(wrap.className).toMatch(/w-full/);
   });
 
-  it('blast stage is a non-collapsing flex column', async () => {
+  it('blast stage is a locked fill column with full-height wrap', async () => {
     render(
       <QuickModeAdapter
         config={{ mode: 'blast', ...base } as QuickRoundConfig}
@@ -90,10 +103,15 @@ describe('QuickModeAdapter — playable stage for all modes', () => {
         onQuit={vi.fn()}
       />
     );
-    assertStage(await screen.findByTestId('quick-stage-blast'));
+    const stage = await screen.findByTestId('quick-stage-blast');
+    assertBaseStage(stage);
+    expect(stage.className).toMatch(/overflow-hidden/);
+    const wrap = stage.firstElementChild as HTMLElement;
+    expect(wrap.className).toMatch(/h-full/);
+    expect(wrap.className).toMatch(/w-full/);
   });
 
-  it('word-hunt stage is a non-collapsing flex column', async () => {
+  it('word-hunt stage is a locked fill column (survival owns scroll)', async () => {
     render(
       <QuickModeAdapter
         config={{ mode: 'word-hunt', ...base, targetWord: 'TEST' } as QuickRoundConfig}
@@ -101,6 +119,10 @@ describe('QuickModeAdapter — playable stage for all modes', () => {
         onQuit={vi.fn()}
       />
     );
-    assertStage(await screen.findByTestId('quick-stage-word-hunt'));
+    const stage = await screen.findByTestId('quick-stage-word-hunt');
+    assertBaseStage(stage);
+    expect(stage.className).toMatch(/overflow-hidden/);
+    // No double STAGE pad/scroll — hunt owns that
+    expect(stage.className).not.toMatch(/overflow-y-auto/);
   });
 });

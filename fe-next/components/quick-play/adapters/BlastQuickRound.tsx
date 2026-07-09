@@ -5,12 +5,15 @@
  * that arm is timer-era — no waves, no levels, no objectives, no lives/shop —
  * which is exactly the bare board quick play wants. MP mode expects the
  * PARENT to own the clock and the end-of-round, so this wrapper:
- *  - ticks remainingTime down from durationSec,
- *  - tracks accepted words (onWordWithComboType) and scores them with the
- *    same canonical scoring the perfect total uses,
+ *  - ticks remainingTime down from durationSec (and passes totalTime so HUD
+ *    shows the countdown),
+ *  - feeds a synthetic solo leaderboard so the MP score path doesn't stay 0
+ *    (selectMyBlastScore returns 0 without username/LB),
+ *  - tracks accepted words and scores them with the same canonical scoring
+ *    the perfect total uses,
  *  - finishes on timer 0, dead-end, or board clear — whichever first.
  */
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { hashString } from '@/utils/dailyChallenge/prng';
 import { calculateWordScore } from '@/shared/utils/scoring';
@@ -22,6 +25,9 @@ const BlastGame = dynamic(
   { ssr: false }
 );
 
+/** Identity used for the synthetic solo leaderboard (HUD score path). */
+export const BLAST_QUICK_SOLO_USERNAME = 'you';
+
 interface BlastQuickRoundProps {
   config: QuickRoundConfig;
   onDone: (result: QuickRoundResult) => void;
@@ -32,8 +38,25 @@ interface BlastQuickRoundProps {
 
 export function BlastQuickRound({ config, onDone, onQuit }: BlastQuickRoundProps) {
   const [remaining, setRemaining] = useState(config.durationSec);
+  const [foundWords, setFoundWords] = useState<string[]>([]);
   const wordsRef = useRef<string[]>([]);
   const doneRef = useRef(false);
+
+  const liveScore = useMemo(
+    () => foundWords.reduce((sum, w) => sum + calculateWordScore(w, 0), 0),
+    [foundWords]
+  );
+
+  const soloLeaderboard = useMemo(
+    () => [
+      {
+        username: BLAST_QUICK_SOLO_USERNAME,
+        score: liveScore,
+        wordCount: foundWords.length,
+      },
+    ],
+    [liveScore, foundWords.length]
+  );
 
   const finish = () => {
     if (doneRef.current) return;
@@ -75,8 +98,14 @@ export function BlastQuickRound({ config, onDone, onQuit }: BlastQuickRoundProps
       serverGrid={config.grid as never}
       blastSeed={hashString(config.seed)}
       remainingTime={remaining}
+      // Required for BlastHUD to show the countdown (showTimer needs totalTime > 0).
+      totalTime={config.durationSec}
+      // Synthetic solo LB so MP displayScore path is non-zero without a server.
+      username={BLAST_QUICK_SOLO_USERNAME}
+      leaderboard={soloLeaderboard}
       onWordWithComboType={(word: string) => {
         wordsRef.current.push(word);
+        setFoundWords((prev) => [...prev, word]);
       }}
       onMPDeadEnd={() => finishRef.current()}
       onMPBoardCleared={() => finishRef.current()}
