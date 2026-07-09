@@ -4,18 +4,15 @@
  * Quick Play mode wheel — the feature's identity interaction.
  * Tap a mode node, or drag the center knob toward one and release, to play it
  * immediately — no separate confirm step. Release the knob without dragging
- * (or drop it inside the dead zone) to play Random. Deliberately NOT a card
- * grid: card grids are multiplayer's mode-select language, quick play must
- * feel physical/arcade.
+ * (or drop it inside the dead zone) to play Random.
  *
- * Responsive: scales ring/nodes/knob via scaleWheelLayout so ~360px phones
- * keep all four nodes + knob fully on-screen with tappable hit targets.
- * Motion: entrance pops + ambient orbit glow; all continuous motion gated
- * behind prefers-reduced-motion.
+ * On select the hub keeps this wheel mounted with strikeMode + isLoading:
+ * electric lightning bolt hub→mode, shockwave rings, then board fetch hold
+ * before gameplay mounts (so the transition never feels instant).
  */
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react';
 import Image from 'next/image';
-import { Shuffle, Sparkles } from 'lucide-react';
+import { Shuffle, Sparkles, Zap } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics/HapticsManager';
@@ -27,10 +24,10 @@ import {
   type WheelSelection,
   type WheelLayout,
 } from './wheelGeometry';
+import { QuickPlayStrikeFx } from './QuickPlayStrikeFx';
 import { QUICK_MODES, type QuickMode } from './types';
 import { NODE_COLORS } from './modeColors';
 
-// Custom sticker-style mode icons (distinct illustrated identity per mode).
 const MODE_ICON_SRC: Record<QuickMode, string> = {
   classic: '/modes/quickplay-icons/classic.webp',
   blast: '/modes/quickplay-icons/blast.webp',
@@ -41,6 +38,10 @@ const MODE_ICON_SRC: Record<QuickMode, string> = {
 interface QuickPlayWheelProps {
   selection: WheelSelection;
   onSelect: (selection: WheelSelection, method: 'drag' | 'tap') => void;
+  /** Mode receiving the electric strike (resolved mode, never 'random'). */
+  strikeMode?: QuickMode | null;
+  /** Hub is fetching the board — block input, keep strike + loading chrome. */
+  isLoading?: boolean;
 }
 
 function usePrefersReducedMotion(): boolean {
@@ -60,7 +61,6 @@ function useWheelLayout(): WheelLayout {
   const [width, setWidth] = useState(376);
   useEffect(() => {
     const measure = () => {
-      // Hub uses px-5 (20px) each side + a little breathing room.
       const w = typeof window !== 'undefined' ? window.innerWidth : 376;
       setWidth(Math.max(280, w - 40));
     };
@@ -71,7 +71,12 @@ function useWheelLayout(): WheelLayout {
   return useMemo(() => scaleWheelLayout(width), [width]);
 }
 
-export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
+export function QuickPlayWheel({
+  selection,
+  onSelect,
+  strikeMode = null,
+  isLoading = false,
+}: QuickPlayWheelProps) {
   const { t } = useLanguage();
   const { playSound } = useSoundEffects();
   const layout = useWheelLayout();
@@ -81,6 +86,7 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
   const rafId = useRef(0);
   const [hovered, setHovered] = useState<WheelSelection | null>(null);
   const [entered, setEntered] = useState(reduceMotion);
+  const strikeFired = useRef<string | null>(null);
 
   useEffect(() => {
     if (reduceMotion) {
@@ -91,17 +97,46 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
     return () => cancelAnimationFrame(id);
   }, [reduceMotion]);
 
+  // Haptic + sound once when a new strike locks in
+  useEffect(() => {
+    if (!strikeMode) {
+      strikeFired.current = null;
+      return;
+    }
+    if (strikeFired.current === strikeMode) return;
+    strikeFired.current = strikeMode;
+    try {
+      const r = haptics.success() as void | Promise<void>;
+      if (r && typeof (r as Promise<void>).then === 'function') {
+        void (r as Promise<void>).catch(() => undefined);
+      }
+    } catch {
+      /* haptics optional in tests */
+    }
+    void playSound('message', { requiresGameActive: false, volume: 0.55 });
+  }, [strikeMode, playSound]);
+
+  const locked = isLoading || Boolean(strikeMode);
+
+  const commit = useCallback(
+    (sel: WheelSelection, method: 'drag' | 'tap') => {
+      if (locked) return;
+      onSelect(sel, method);
+    },
+    [locked, onSelect]
+  );
+
   const moveKnob = useCallback(
     (dx: number, dy: number) => {
       const knob = knobRef.current;
-      if (!knob) return;
+      if (!knob || locked) return;
       const dist = Math.hypot(dx, dy);
       const max = layout.knobTravel;
       const scale = dist > max ? max / dist : 1;
       knob.style.transition = 'none';
       knob.style.translate = `${dx * scale}px ${dy * scale}px`;
     },
-    [layout.knobTravel]
+    [layout.knobTravel, locked]
   );
 
   const resetKnob = useCallback(() => {
@@ -113,14 +148,18 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
     knob.style.translate = '0px 0px';
   }, [reduceMotion]);
 
-  const handlePointerDown = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
-    dragOrigin.current = { x: e.clientX, y: e.clientY };
-    knobRef.current?.setPointerCapture?.(e.pointerId);
-  }, []);
+  const handlePointerDown = useCallback(
+    (e: React.PointerEvent<HTMLButtonElement>) => {
+      if (locked) return;
+      dragOrigin.current = { x: e.clientX, y: e.clientY };
+      knobRef.current?.setPointerCapture?.(e.pointerId);
+    },
+    [locked]
+  );
 
   const handlePointerMove = useCallback(
     (e: React.PointerEvent<HTMLButtonElement>) => {
-      if (!dragOrigin.current) return;
+      if (!dragOrigin.current || locked) return;
       const dx = e.clientX - dragOrigin.current.x;
       const dy = e.clientY - dragOrigin.current.y;
       cancelAnimationFrame(rafId.current);
@@ -134,7 +173,7 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
         return next;
       });
     },
-    [moveKnob, playSound, layout.deadZone]
+    [moveKnob, playSound, layout.deadZone, locked]
   );
 
   const handlePointerUp = useCallback(
@@ -146,12 +185,13 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
       cancelAnimationFrame(rafId.current);
       resetKnob();
       setHovered(null);
-      onSelect(nearestNode(dx, dy, layout.deadZone), 'drag');
+      if (locked) return;
+      commit(nearestNode(dx, dy, layout.deadZone), 'drag');
     },
-    [onSelect, resetKnob, layout.deadZone]
+    [commit, resetKnob, layout.deadZone, locked]
   );
 
-  const active = hovered ?? selection;
+  const active: WheelSelection = strikeMode ?? hovered ?? selection;
   const size = layout.containerSize;
   const iconPx = Math.round(layout.iconSize);
 
@@ -160,41 +200,49 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
       className="flex flex-col items-center gap-5 bg-neo-navy sm:gap-6"
       data-testid="quick-play-wheel"
       data-wheel-scale={layout.scale.toFixed(3)}
+      data-loading={isLoading ? 'true' : 'false'}
+      aria-busy={isLoading || undefined}
     >
       <div
         className="relative mx-auto"
         data-testid="quick-wheel-stage"
         style={{ width: size, height: size }}
       >
-        {/* Ambient outer glow — static under reduced motion */}
         <div
           aria-hidden
           data-testid="quick-wheel-ambient"
           className={`pointer-events-none absolute inset-[8%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,214,102,0.18)_0%,transparent_62%)] ${
-            !reduceMotion ? 'animate-pulse' : ''
+            !reduceMotion && !strikeMode ? 'animate-pulse' : ''
           }`}
         />
-
-        {/* Solid energy ring */}
         <div
           aria-hidden
           className="absolute inset-[12%] rounded-full border-[3px] border-neo-cozy/40 shadow-[0_0_24px_rgba(255,214,102,0.15)]"
         />
-        {/* Dashed orbit track */}
         <div
           aria-hidden
           data-testid="quick-wheel-orbit"
           className={`absolute inset-[14%] rounded-full border-[3px] border-dashed border-neo-white/25 ${
-            !reduceMotion ? 'wt-wheel-orbit' : ''
+            !reduceMotion && !strikeMode ? 'wt-wheel-orbit' : ''
           }`}
         />
-        {/* Inner hub plate */}
         <div
           aria-hidden
           className="absolute inset-[28%] rounded-full border-2 border-black/40 bg-neo-navy-elevated/80 shadow-hard-sm"
         />
 
-        {active !== 'random' && (
+        {strikeMode && (
+          <QuickPlayStrikeFx
+            mode={strikeMode}
+            size={size}
+            ringRadius={layout.ringRadius}
+            scale={layout.scale}
+            knobSize={layout.knobSize}
+            reduceMotion={reduceMotion}
+          />
+        )}
+
+        {active !== 'random' && !strikeMode && (
           <div
             aria-hidden
             data-testid="quick-wheel-tether"
@@ -211,24 +259,26 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
         {QUICK_MODES.map((mode, idx) => {
           const { x, y } = nodeOffset(mode, layout.ringRadius);
           const isActive = active === mode;
+          const isStrike = strikeMode === mode;
           const node = layout.nodeSize;
           return (
             <button
               key={mode}
               type="button"
               data-testid={`quick-wheel-node-${mode}`}
-              onClick={() => onSelect(mode, 'tap')}
+              onClick={() => commit(mode, 'tap')}
+              disabled={locked}
               aria-label={t(`quickPlay.solo.mode.${mode}`)}
               aria-pressed={isActive}
-              className={`absolute left-1/2 top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2 touch-manipulation ${
-                entered && !reduceMotion ? 'animate-neo-pop' : ''
-              } ${isActive ? 'z-10' : ''}`}
+              className={`absolute left-1/2 top-1/2 z-[2] -translate-x-1/2 -translate-y-1/2 touch-manipulation disabled:cursor-wait ${
+                entered && !reduceMotion && !strikeMode ? 'animate-neo-pop' : ''
+              } ${isActive || isStrike ? 'z-10' : ''} ${isStrike && !reduceMotion ? 'quick-node-zap' : ''}`}
               style={{
                 width: node,
                 height: node,
                 marginLeft: x,
                 marginTop: y,
-                animationDelay: reduceMotion ? undefined : `${idx * 90}ms`,
+                animationDelay: reduceMotion || strikeMode ? undefined : `${idx * 90}ms`,
                 animationFillMode: 'both',
                 transform: isActive && !reduceMotion ? 'scale(1.12)' : undefined,
                 transition: reduceMotion ? undefined : 'transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -236,10 +286,12 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
             >
               <span
                 className={`flex h-full w-full flex-col items-center justify-center gap-0.5 overflow-hidden rounded-2xl border-neo-thick border-black font-neo-display font-bold text-black ${
-                  isActive
+                  isActive || isStrike
                     ? `shadow-hard-lg ring-4 ${NODE_COLORS[mode].ring}`
                     : 'shadow-hard'
-                } ${NODE_COLORS[mode].bg}`}
+                } ${NODE_COLORS[mode].bg} ${isStrike ? 'brightness-110' : ''} ${
+                  locked && !isStrike ? 'opacity-45' : ''
+                }`}
                 data-testid={`quick-wheel-node-face-${mode}`}
               >
                 <span
@@ -272,6 +324,7 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
           ref={knobRef}
           type="button"
           data-testid="quick-wheel-knob"
+          disabled={locked}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -283,44 +336,81 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
           onKeyDown={(e) => {
             if (e.key === 'Enter' || e.key === ' ') {
               e.preventDefault();
-              onSelect('random', 'tap');
+              commit('random', 'tap');
             }
           }}
           aria-label={t('quickPlay.solo.random')}
-          className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 touch-none"
+          className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 touch-none disabled:cursor-wait"
           style={{ width: layout.knobSize, height: layout.knobSize }}
         >
           <span
-            className={`flex h-full w-full flex-col items-center justify-center gap-0.5 rounded-full border-4 border-black bg-neo-navy-elevated text-neo-cream shadow-hard-lg ring-[3px] ring-inset ring-neo-cozy ${
-              entered && !reduceMotion ? 'animate-neo-pop' : ''
+            className={`flex h-full w-full flex-col items-center justify-center gap-0.5 rounded-full border-4 border-black bg-neo-navy-elevated text-neo-cream shadow-hard-lg ring-[3px] ring-inset ${
+              strikeMode ? 'ring-neo-yellow' : 'ring-neo-cozy'
+            } ${entered && !reduceMotion && !strikeMode ? 'animate-neo-pop' : ''} ${
+              strikeMode && !reduceMotion ? 'quick-knob-pulse' : ''
             }`}
             style={{
-              animationDelay: reduceMotion ? undefined : '360ms',
+              animationDelay: reduceMotion || strikeMode ? undefined : '360ms',
               animationFillMode: 'both',
             }}
           >
-            <Sparkles
-              className={`text-neo-cozy ${selection === 'random' && !reduceMotion ? 'animate-pulse' : ''}`}
-              style={{ width: layout.iconSize * 0.55, height: layout.iconSize * 0.55 }}
-              aria-hidden
-            />
-            <Shuffle
-              className={selection === 'random' && !reduceMotion ? 'animate-pulse' : ''}
-              style={{ width: layout.iconSize * 0.7, height: layout.iconSize * 0.7 }}
-            />
+            {isLoading ? (
+              <Zap
+                className={`text-neo-yellow ${!reduceMotion ? 'animate-pulse' : ''}`}
+                style={{ width: layout.iconSize * 0.75, height: layout.iconSize * 0.75 }}
+                aria-hidden
+              />
+            ) : (
+              <>
+                <Sparkles
+                  className={`text-neo-cozy ${selection === 'random' && !reduceMotion ? 'animate-pulse' : ''}`}
+                  style={{ width: layout.iconSize * 0.55, height: layout.iconSize * 0.55 }}
+                  aria-hidden
+                />
+                <Shuffle
+                  className={selection === 'random' && !reduceMotion ? 'animate-pulse' : ''}
+                  style={{ width: layout.iconSize * 0.7, height: layout.iconSize * 0.7 }}
+                />
+              </>
+            )}
             <span
-              className={`font-neo-display font-semibold tracking-wide text-neo-cozy ${
-                selection === 'random' && !reduceMotion ? 'animate-pulse' : ''
-              }`}
+              className={`font-neo-display font-semibold tracking-wide ${
+                isLoading ? 'text-neo-yellow' : 'text-neo-cozy'
+              } ${selection === 'random' && !isLoading && !reduceMotion ? 'animate-pulse' : ''}`}
               style={{ fontSize: Math.max(9, Math.round(11 * layout.scale)) }}
             >
-              {selection === 'random' ? t('quickPlay.solo.random') : t('quickPlay.solo.dragMe')}
+              {isLoading
+                ? t('quickPlay.solo.loading')
+                : selection === 'random'
+                  ? t('quickPlay.solo.random')
+                  : t('quickPlay.solo.dragMe')}
             </span>
           </span>
         </button>
       </div>
 
-      <p className="px-4 text-center text-sm text-neo-white/55">{t('quickPlay.solo.dragHint')}</p>
+      {isLoading ? (
+        <p
+          className="flex items-center gap-2 px-4 text-center font-neo-display text-sm font-semibold text-neo-yellow"
+          data-testid="quick-play-loading"
+          role="status"
+          aria-live="polite"
+        >
+          <span
+            aria-hidden
+            className={`inline-block h-2.5 w-2.5 rounded-full bg-neo-yellow ${!reduceMotion ? 'animate-ping' : ''}`}
+          />
+          {t('quickPlay.solo.loading')}
+          {strikeMode ? (
+            <>
+              {' · '}
+              <span className={NODE_COLORS[strikeMode].text}>{t(`quickPlay.solo.mode.${strikeMode}`)}</span>
+            </>
+          ) : null}
+        </p>
+      ) : (
+        <p className="px-4 text-center text-sm text-neo-white/55">{t('quickPlay.solo.dragHint')}</p>
+      )}
 
       <div className="flex w-full flex-col items-center gap-2 px-5 sm:gap-3">
         <p className="flex items-center justify-center gap-2.5 font-neo-display text-[15px] text-neo-cream">
@@ -333,7 +423,9 @@ export function QuickPlayWheel({ selection, onSelect }: QuickPlayWheelProps) {
             {t(active === 'random' ? 'quickPlay.solo.random' : `quickPlay.solo.mode.${active}`)}
           </b>
         </p>
-        <p className="text-xs text-neo-white/50">{t('quickPlay.solo.subCaption')}</p>
+        {!isLoading && (
+          <p className="text-xs text-neo-white/50">{t('quickPlay.solo.subCaption')}</p>
+        )}
       </div>
     </div>
   );

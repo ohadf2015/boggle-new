@@ -19,13 +19,25 @@ vi.mock('../QuickPlayWheel', () => ({
   // The real wheel plays immediately on select (tap a node / release a drag) —
   // there's no separate PLAY button anymore. mock-play stands in for
   // "release on random", the old default when PLAY was pressed with no pick.
-  QuickPlayWheel: ({ onSelect }: any) => (
-    <div>
+  QuickPlayWheel: ({ onSelect, isLoading, strikeMode }: any) => (
+    <div data-testid="mock-wheel" data-loading={String(!!isLoading)} data-strike={strikeMode ?? ''}>
       <button data-testid="mock-select" onClick={() => onSelect('blast', 'drag')}>sel</button>
       <button data-testid="mock-play" onClick={() => onSelect('random', 'tap')}>play</button>
+      {isLoading && <div data-testid="quick-play-loading">loading</div>}
     </div>
   ),
 }));
+
+// Speed up the strike/loading hold so tests stay snappy; still assert it runs.
+vi.mock('../lightningPath', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../lightningPath')>();
+  return {
+    ...actual,
+    strikeHoldMs: () => 40,
+    STRIKE_HOLD_MS: 40,
+    STRIKE_HOLD_REDUCED_MS: 20,
+  };
+});
 vi.mock('../adapters/QuickModeAdapter', () => ({
   QuickModeAdapter: ({ config, onDone }: any) => (
     <button
@@ -96,13 +108,35 @@ describe('QuickPlayHub', () => {
   it('random PLAY resolves a mode, fetches round, mounts adapter', async () => {
     render(<QuickPlayHub />);
     fireEvent.click(screen.getByTestId('mock-play'));
-    await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy());
+    // Loading hold keeps the wheel visible before enter — must not jump straight in.
+    expect(screen.getByTestId('quick-play-loading')).toBeTruthy();
+    expect(screen.getByTestId('mock-wheel').getAttribute('data-loading')).toBe('true');
+    await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
     expect(vi.mocked(posthog.capture)).toHaveBeenCalledWith(
       'quick_play_mode_selected',
       expect.objectContaining({ method: 'random' })
     );
     const roundCall = fetchMock.mock.calls.find((c) => String(c[0]).includes('/round'));
     expect(roundCall).toBeTruthy();
+  });
+
+  it('shows loading + strike on the wheel before mounting the game', async () => {
+    let resolveRound: (v: unknown) => void = () => undefined;
+    fetchMock.mockImplementation((url: string) => {
+      if (String(url).includes('/round')) {
+        return new Promise((resolve) => {
+          resolveRound = resolve;
+        });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    });
+    render(<QuickPlayHub />);
+    fireEvent.click(screen.getByTestId('mock-select'));
+    await waitFor(() => expect(screen.getByTestId('quick-play-loading')).toBeTruthy());
+    expect(screen.queryByTestId('mock-finish')).toBeNull();
+    expect(screen.getByTestId('mock-wheel').getAttribute('data-strike')).toBe('blast');
+    resolveRound({ ok: true, json: async () => roundPayload });
+    await waitFor(() => expect(screen.getByTestId('mock-finish')).toBeTruthy(), { timeout: 3000 });
   });
 
   it('round completion submits and shows results, then next round returns to wheel', async () => {

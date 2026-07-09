@@ -7,8 +7,16 @@ vi.mock('@/contexts/LanguageContext', () => ({
 }));
 
 vi.mock('@/utils/haptics/HapticsManager', () => ({
-  default: { selection: vi.fn(), tap: vi.fn(), success: vi.fn() },
-  haptics: { selection: vi.fn(), tap: vi.fn(), success: vi.fn() },
+  default: {
+    selection: vi.fn(() => Promise.resolve()),
+    tap: vi.fn(() => Promise.resolve()),
+    success: vi.fn(() => Promise.resolve()),
+  },
+  haptics: {
+    selection: vi.fn(() => Promise.resolve()),
+    tap: vi.fn(() => Promise.resolve()),
+    success: vi.fn(() => Promise.resolve()),
+  },
 }));
 
 describe('QuickPlayWheel', () => {
@@ -93,5 +101,22 @@ describe('QuickPlayWheel', () => {
     // Design max is 376; on 360 viewport (minus padding) must be ≤ 360
     expect(w).toBeGreaterThan(0);
     expect(w).toBeLessThanOrEqual(376);
+  });
+
+  it('renders electric lightning strike + shockwave toward strikeMode', () => {
+    render(
+      <QuickPlayWheel selection="blast" strikeMode="blast" isLoading onSelect={onSelect} />
+    );
+    expect(screen.getByTestId('quick-wheel-lightning')).toBeTruthy();
+    expect(screen.getByTestId('quick-wheel-shockwave')).toBeTruthy();
+    expect(screen.getByTestId('quick-play-loading')).toBeTruthy();
+  });
+
+  it('blocks further selects while loading (strike hold)', () => {
+    render(
+      <QuickPlayWheel selection="classic" strikeMode="classic" isLoading onSelect={onSelect} />
+    );
+    fireEvent.click(screen.getByTestId('quick-wheel-node-blast'));
+    expect(onSelect).not.toHaveBeenCalled();
   });
 });

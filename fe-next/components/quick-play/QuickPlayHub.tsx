@@ -18,9 +18,19 @@ import { quickRank } from './quickRank';
 import { BackButton } from '@/components/ui/BackButton';
 import { useBackOneLevel } from '@/hooks/useBackOneLevel';
 import type { WheelSelection } from './wheelGeometry';
+import { strikeHoldMs } from './lightningPath';
 import { QUICK_MODES, type QuickMode, type QuickRoundConfig, type QuickRoundResult, type QuickSubmitOutcome } from './types';
 
 type HubPhase = 'wheel' | 'loading' | 'playing' | 'results';
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 interface ChallengeInfo {
   id: string;
@@ -49,8 +59,11 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   const [answered, setAnswered] = useState<{ name: string; theirPct: number; yourPct: number } | null>(null);
   const [totalPoints, setTotalPoints] = useState<number | null>(null);
   const [loadError, setLoadError] = useState(false);
+  /** Resolved mode the lightning bolt is locked onto during loading. */
+  const [strikeMode, setStrikeMode] = useState<QuickMode | null>(null);
   const goBack = useBackOneLevel();
   const submitting = useRef(false);
+  const loadingRef = useRef(false);
   const wheelHeadingRef = useRef<HTMLHeadingElement>(null);
 
   // Phase changes swap the whole screen with no page navigation, so screen
@@ -106,24 +119,28 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
     };
   }, [challengeId]);
 
-  // Tapping a mode node or releasing the drag knob on one plays it
-  // immediately — there's no separate confirm step. handlePlay takes the
-  // picked selection as an argument rather than reading `selection` state,
-  // since setSelection(sel) below wouldn't be visible yet to a closure over
-  // the pre-update state.
+  // Tapping a mode node or releasing the drag knob fires an electric strike
+  // toward that mode, holds a visible loading state on the wheel, then enters
+  // play after board fetch + a minimum hold (so fast APIs don't skip the beat).
   const handlePlay = useCallback(async (sel: WheelSelection, method: 'drag' | 'tap') => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
     const mode: QuickMode =
       challenge?.mode ??
       (sel === 'random'
         ? QUICK_MODES[Math.floor(Math.random() * QUICK_MODES.length)]
         : sel);
-    setSelection(sel);
+    // Lock UI to the resolved mode (for Random, show the picked mode on the bolt).
+    setSelection(mode);
+    setStrikeMode(mode);
     posthog.capture('quick_play_mode_selected', { mode: sel, method, roundIndex });
     if (sel === 'random' && !challenge) {
       posthog.capture('quick_play_mode_selected', { mode, method: 'random', roundIndex });
     }
     setPhase('loading');
     setLoadError(false);
+    const hold = strikeHoldMs(prefersReducedMotion());
+    const started = Date.now();
     try {
       const res = await fetch('/api/quick-play/round', {
         method: 'POST',
@@ -132,13 +149,19 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       });
       if (!res.ok) throw new Error(`round fetch ${res.status}`);
       const round = (await res.json()) as QuickRoundConfig;
+      const elapsed = Date.now() - started;
+      if (elapsed < hold) await sleep(hold - elapsed);
       setConfig(round);
+      setStrikeMode(null);
       setPhase('playing');
     } catch {
       // Silent no-op on error is forbidden — surface it (a dead-looking wheel
       // tap is indistinguishable from a bug).
       setLoadError(true);
+      setStrikeMode(null);
       setPhase('wheel');
+    } finally {
+      loadingRef.current = false;
     }
   }, [challenge, language, roundIndex]);
 
@@ -232,6 +255,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
     setRival(null);
     setChallenge(null); // challenge is a one-round contract
     setSelection('random');
+    setStrikeMode(null);
     setPhase('wheel');
   }, []);
 
@@ -328,13 +352,14 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
       )}
 
       <div className="relative z-[1] flex min-h-0 flex-1 items-center justify-center overflow-x-hidden px-1 py-4 sm:py-6">
-        {phase === 'loading' ? (
-          <div className="font-neo-display text-lg text-neo-cozy" data-testid="quick-play-loading">
-            {t('quickPlay.solo.loading')}
-          </div>
-        ) : (
-          <QuickPlayWheel selection={selection} onSelect={handlePlay} />
-        )}
+        {/* Wheel stays mounted during loading so the lightning strike is visible
+            before gameplay mounts — never jump straight into the board. */}
+        <QuickPlayWheel
+          selection={selection}
+          onSelect={handlePlay}
+          strikeMode={strikeMode}
+          isLoading={phase === 'loading'}
+        />
       </div>
     </div>
   );
