@@ -18,16 +18,16 @@ vi.mock('../../../../components/daily/WordWheelPixiRing', () => ({
   default: () => null,
 }));
 
-vi.mock('../../../../components/sealedBid/SealedBidWheel', () => ({
-  default: () => <div data-testid="sealed-bid-wheel">Wheel</div>,
-}));
-
-vi.mock('../../../../components/sealedBid/OddsBoard', () => ({
-  default: () => <div data-testid="odds-board">Odds</div>,
-}));
-
-vi.mock('../../../../components/sealedBid/ChipTray', () => ({
-  default: () => <div data-testid="chip-tray">Chips</div>,
+vi.mock('../../../../components/sealedBid/SealedBidTable', () => ({
+  default: () => (
+    <div data-testid="sb-table">
+      <div data-testid="sb-felt">Felt</div>
+      <div data-testid="chip-tray">Chips</div>
+      <button type="button" data-testid="sb-lock" disabled>
+        Lock bid
+      </button>
+    </div>
+  ),
 }));
 
 vi.mock('../../../../components/sealedBid/Showdown', () => ({
@@ -126,18 +126,22 @@ describe('SealedBidFlow (smoke test)', () => {
     });
   });
 
-  it('renders bidding phase with wheel and chip tray', async () => {
+  it('renders bidding phase with simplified HUD + casino table', async () => {
     render(<SealedBidPage />);
     await waitFor(() => {
-      // Check for game stage / round counter
-      expect(screen.getByText(/Round/i)).toBeInTheDocument();
+      expect(screen.getByTestId('sb-hud')).toBeInTheDocument();
+      expect(screen.getByTestId('sb-round')).toBeInTheDocument();
+      expect(screen.getByTestId('sb-chip-stack')).toBeInTheDocument();
+      expect(screen.getByTestId('sb-table')).toBeInTheDocument();
+      expect(screen.getByTestId('sb-felt')).toBeInTheDocument();
     });
+    // No dual title / badge chrome
+    expect(screen.queryByText(/sealedBid\.badge/i)).not.toBeInTheDocument();
   });
 
   it('does not gate page for non-admin users (ungate check)', async () => {
     render(<SealedBidPage />);
     await waitFor(() => {
-      // Should NOT show admin-only message
       expect(screen.queryByText(/adminOnly/i)).not.toBeInTheDocument();
     });
   });

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
@@ -14,6 +14,8 @@ export interface SealedBidWheelProps {
   onSubmit: (word: string, indices: number[]) => void;
   reducedMotion?: boolean;
   dir?: 'ltr' | 'rtl';
+  /** Fluid smaller wheel for table layout (default full). */
+  compact?: boolean;
 }
 
 export default function SealedBidWheel({
@@ -23,120 +25,147 @@ export default function SealedBidWheel({
   onSubmit,
   reducedMotion = false,
   dir = 'ltr',
+  compact = false,
 }: SealedBidWheelProps) {
   const { t } = useLanguage();
   const [picks, setPicks] = useState<number[]>([]);
+  const [radius, setRadius] = useState(compact ? 100 : 140);
 
   const draggingRef = useRef(false);
   const pointerPosRef = useRef<{ x: number; y: number } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const wheelBoxRef = useRef<HTMLDivElement>(null);
 
-  // Compute built word from picks
-  const word = picks.map(i => letters[i]).join('');
+  const word = picks.map((i) => letters[i]).join('');
 
-  // Wire useWheelDragSpell
   const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
     draggingRef,
     pointerPosRef,
     minLength: 3,
     isIndexUsed: (i) => picks.includes(i),
     addLetter: (i) => {
+      if (disabled) return;
       if (!picks.includes(i)) {
-        setPicks(p => [...p, i]);
+        setPicks((p) => [...p, i]);
       }
     },
     getBuiltLength: () => picks.length,
     submit: () => {
+      if (disabled) return;
       onSubmit(word, picks);
     },
   });
 
-  // Call onChange whenever picks change
   useEffect(() => {
     onChange(word, picks);
   }, [picks, word, onChange]);
 
-  // Handle tap on tile
-  const handleTilePress = (letter: string, index: number) => {
+  // Fluid radius from container size — avoids fixed 384px overflow on phones
+  useEffect(() => {
+    const el = wheelBoxRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+
+    const measure = () => {
+      const size = Math.min(el.clientWidth, el.clientHeight);
+      // Leave room for tile extent (~36–40px half)
+      const next = Math.max(72, Math.min(compact ? 120 : 140, Math.floor(size * 0.38)));
+      setRadius(next);
+    };
+
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [compact]);
+
+  // Reset picks when letters change (new round)
+  const lettersKey = useMemo(() => letters.join(''), [letters]);
+  useEffect(() => {
+    setPicks([]);
+  }, [lettersKey]);
+
+  const handleTilePress = (_letter: string, index: number) => {
+    if (disabled) return;
     if (picks.includes(index)) {
-      // Remove the letter
-      setPicks(p => p.filter(i => i !== index));
+      setPicks((p) => p.filter((i) => i !== index));
     } else {
-      // Add the letter
-      setPicks(p => [...p, index]);
+      setPicks((p) => [...p, index]);
     }
   };
 
-  // Clear button
   const handleClear = () => {
+    if (disabled) return;
     setPicks([]);
   };
 
-  // Wheel layout: 7 letters in a circle
-  const RADIUS = 140;
   const TILES_COUNT = 7;
+  const wheelSizeClass = compact
+    ? 'w-[min(100%,280px)] aspect-square max-h-[min(42dvh,280px)]'
+    : 'w-[min(100%,360px)] aspect-square max-h-[min(50dvh,360px)]';
 
   return (
     <div
       ref={containerRef}
+      data-testid="sealed-bid-wheel"
       className={cn(
-        'relative w-full h-96 flex flex-col items-center justify-center select-none',
-        dir === 'rtl' && 'rtl'
+        'relative flex w-full flex-col items-center justify-center select-none',
+        compact ? 'min-h-0 py-1' : 'h-auto min-h-[240px]',
+        dir === 'rtl' && 'rtl',
+        disabled && 'pointer-events-none opacity-60'
       )}
       dir={dir}
-      onPointerDown={handlePointerDown}
-      onPointerMove={handlePointerMove}
-      onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+      onPointerDown={disabled ? undefined : handlePointerDown}
+      onPointerMove={disabled ? undefined : handlePointerMove}
+      onPointerUp={disabled ? undefined : handlePointerUp}
+      onPointerLeave={disabled ? undefined : handlePointerUp}
     >
-      {/* WordWheelPixiRing behind the tiles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {!reducedMotion && (
-          <WordWheelPixiRing
-            selectedIndices={picks}
-            radius={RADIUS}
-            combo={0}
-            pointerPosRef={pointerPosRef}
-            isDraggingRef={draggingRef}
-          />
-        )}
-      </div>
-
-      {/* Wheel letter tiles */}
-      <div className="relative w-96 h-96">
-        {letters.map((letter, index) => {
-          const angle = (index / TILES_COUNT) * 360;
-          return (
-            <WheelLetter
-              key={index}
-              letter={letter}
-              isCenter={false}
-              angle={angle}
-              radius={RADIUS}
-              index={index}
-              isUsed={picks.includes(index)}
-              onPress={handleTilePress}
-              reducedMotion={reducedMotion}
+      <div className={cn('relative', wheelSizeClass)} ref={wheelBoxRef}>
+        <div className="absolute inset-0 pointer-events-none">
+          {!reducedMotion && (
+            <WordWheelPixiRing
+              selectedIndices={picks}
+              radius={radius}
+              combo={0}
+              pointerPosRef={pointerPosRef}
+              isDraggingRef={draggingRef}
             />
-          );
-        })}
+          )}
+        </div>
+
+        <div className="relative h-full w-full">
+          {letters.map((letter, index) => {
+            const angle = (index / TILES_COUNT) * 360;
+            return (
+              <WheelLetter
+                key={`${lettersKey}-${index}`}
+                letter={letter}
+                isCenter={false}
+                angle={angle}
+                radius={radius}
+                index={index}
+                isUsed={picks.includes(index)}
+                onPress={handleTilePress}
+                reducedMotion={reducedMotion}
+              />
+            );
+          })}
+        </div>
       </div>
 
-      {/* Clear button */}
       {picks.length > 0 && (
         <button
           type="button"
           onClick={handleClear}
           disabled={disabled}
           className={cn(
-            'mt-6 px-6 py-2 rounded-neo border-neo-thick border-neo-black font-neo-display font-bold',
-            'bg-neo-red text-neo-white shadow-hard',
-            'hover:bg-neo-red/90 active:shadow-hard-pressed',
-            disabled && 'opacity-50 cursor-not-allowed'
+            'mt-2 min-h-9 rounded-neo border-2 border-black px-4 py-1.5 font-neo-display text-xs font-bold',
+            'bg-neo-red text-neo-white shadow-hard-sm',
+            'active:shadow-hard-pressed',
+            disabled && 'cursor-not-allowed opacity-50'
           )}
-          aria-label={t('sealedBid.clear') || 'Clear'}
+          aria-label={t('sealedBid.clear')}
         >
-          {t('sealedBid.clear') || 'Clear'}
+          {t('sealedBid.clear')}
         </button>
       )}
     </div>

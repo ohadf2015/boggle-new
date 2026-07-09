@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-hidden="true">
+  <title>Casino felt tile</title>
+  <defs>
+    <pattern id="dots" width="8" height="8" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="0.9" fill="oklch(0.42 0.07 155)" opacity="0.45"/>
+      <circle cx="5.5" cy="5.5" r="0.7" fill="oklch(0.28 0.05 160)" opacity="0.35"/>
+    </pattern>
+    <pattern id="fibers" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M0 8h32M0 24h32" stroke="oklch(0.25 0.04 155)" stroke-width="0.4" opacity="0.25"/>
+      <path d="M8 0v32M24 0v32" stroke="oklch(0.35 0.06 160)" stroke-width="0.3" opacity="0.18"/>
+    </pattern>
+    <radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="oklch(0.34 0.07 155)" stop-opacity="0"/>
+      <stop offset="100%" stop-color="oklch(0.16 0.03 250)" stop-opacity="0.55"/>
+    </radialGradient>
+  </defs>
+  <rect width="128" height="128" fill="oklch(0.28 0.06 155)"/>
+  <rect width="128" height="128" fill="url(#dots)"/>
+  <rect width="128" height="128" fill="url(#fibers)"/>
+  <rect width="128" height="128" fill="url(#vignette)"/>
+</svg>

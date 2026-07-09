@@ -5,6 +5,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { Settlement } from '../../lib/sealedBid/sp/wager';
 import { SharedFxApp } from '../../lib/pixiFx/SharedFxApp';
 import gsap from 'gsap';
+import { SEALED_BID_ASSETS } from './sealedBidAssets';
 
 export interface ShowdownProps {
   playerWord: string | null;
@@ -12,7 +13,7 @@ export interface ShowdownProps {
   settlement: Settlement;
   reducedMotion?: boolean;
   onDone: () => void;
-  payoutTargetRef?: React.RefObject<HTMLElement>;
+  payoutTargetRef?: React.RefObject<HTMLElement | null>;
 }
 
 export default function Showdown({
@@ -22,62 +23,50 @@ export default function Showdown({
   reducedMotion = false,
   onDone,
   payoutTargetRef,
-}: ShowdownProps): React.ReactNode {
+}: ShowdownProps): ReactNode {
   const { t } = useLanguage();
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [revealed, setRevealed] = useState(reducedMotion);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Determine banner styling and text based on outcome
-  const isBanner = {
-    unique: settlement.outcome === 'unique',
-    clash: settlement.outcome === 'clash',
-    neutral: settlement.outcome === 'none',
-  };
-
-  const bannerText = isBanner.unique
-    ? t('sealedBid.youWin') || 'You Win!'
-    : isBanner.clash
-      ? t('sealedBid.youLose') || 'Clashed'
-      : t('sealedBid.draw') || 'Draw';
+  const outcome = settlement.outcome; // unique | clash | none
+  const bannerText =
+    outcome === 'unique'
+      ? t('sealedBid.youWin') || t('sealedBid.unique')
+      : outcome === 'clash'
+        ? t('sealedBid.youLose') || t('sealedBid.clash')
+        : t('sealedBid.draw') || t('sealedBid.pass');
 
   const deltaText = `${settlement.delta >= 0 ? '+' : ''}${settlement.delta}`;
 
-  // Animate cards flipping when not reducedMotion
   useEffect(() => {
     if (reducedMotion) {
       setRevealed(true);
       return;
     }
 
-    // Staggered flip animation for each card
     cardRefs.current.forEach((card, index) => {
       if (!card) return;
-      const flipDuration = 0.6;
-      const staggerDelay = index * 0.15;
-
-      gsap.to(card, {
-        rotationY: 180,
-        duration: flipDuration,
-        delay: staggerDelay + 0.3,
-        ease: 'back.out',
-      });
+      gsap.fromTo(
+        card,
+        { rotateY: 0 },
+        {
+          rotateY: 180,
+          duration: 0.55,
+          delay: index * 0.12 + 0.2,
+          ease: 'power2.out',
+        }
+      );
     });
 
-    // Mark as revealed after first card flip completes
-    const revealTimeout = setTimeout(() => {
-      setRevealed(true);
-    }, 500);
-
+    const revealTimeout = setTimeout(() => setRevealed(true), 450);
     return () => clearTimeout(revealTimeout);
   }, [reducedMotion]);
 
-  // Spawn coin stream FX on unique win
   useEffect(() => {
     if (reducedMotion || settlement.outcome !== 'unique' || !revealed) return;
 
     const triggerFX = async () => {
-      // Find the winning card center (first bot card or player area)
       let sourceRect: DOMRect | null = null;
       if (cardRefs.current[0]) {
         sourceRect = cardRefs.current[0].getBoundingClientRect();
@@ -85,29 +74,29 @@ export default function Showdown({
 
       if (sourceRect && payoutTargetRef?.current) {
         const targetRect = payoutTargetRef.current.getBoundingClientRect();
-        const source = {
-          x: sourceRect.left + sourceRect.width / 2,
-          y: sourceRect.top + sourceRect.height / 2,
-        };
-        const target = {
-          x: targetRect.left + targetRect.width / 2,
-          y: targetRect.top + targetRect.height / 2,
-        };
-
-        // Spawn coin stream
         SharedFxApp.spawnCoinStream({
-          source,
-          target,
+          source: {
+            x: sourceRect.left + sourceRect.width / 2,
+            y: sourceRect.top + sourceRect.height / 2,
+          },
+          target: {
+            x: targetRect.left + targetRect.width / 2,
+            y: targetRect.top + targetRect.height / 2,
+          },
           count: 8,
           duration: 900,
         });
 
-        // Jackpot burst if word is 7 letters
         if (playerWord && playerWord.length === 7) {
-          SharedFxApp.spawnBurst('burst', source.x, source.y, {
-            count: 12,
-            colors: ['#BFFF00', '#FFE135'], // neo-lime + neo-yellow
-          });
+          SharedFxApp.spawnBurst(
+            'burst',
+            sourceRect.left + sourceRect.width / 2,
+            sourceRect.top + sourceRect.height / 2,
+            {
+              count: 12,
+              colors: ['#BFFF00', '#FFE135'],
+            }
+          );
         }
       }
     };
@@ -115,7 +104,6 @@ export default function Showdown({
     triggerFX();
   }, [revealed, settlement.outcome, reducedMotion, playerWord, payoutTargetRef]);
 
-  // Auto-call onDone after reveal window
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {
       onDone();
@@ -126,78 +114,105 @@ export default function Showdown({
     };
   }, [onDone]);
 
+  const bannerTone =
+    outcome === 'unique'
+      ? 'border-neo-yellow bg-neo-yellow text-neo-navy'
+      : outcome === 'clash'
+        ? 'border-neo-red bg-neo-red text-neo-white'
+        : 'border-neo-cream bg-neo-navy-light text-neo-cream';
+
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-neo-navy/95 p-4">
-      {/* Outcome Banner */}
+    <div
+      data-testid="showdown"
+      className="flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-4 px-1 py-2"
+    >
+      {/* Outcome banner — casino result plaque */}
       <div
-        className={`flex flex-col items-center gap-2 rounded-neo border-neo-thick px-6 py-4 text-center font-neo-display text-xl ${
-          isBanner.unique
-            ? 'border-neo-yellow bg-neo-navy text-neo-yellow'
-            : isBanner.clash
-              ? 'border-neo-red bg-neo-navy text-neo-red'
-              : 'border-neo-white bg-neo-navy text-neo-white'
-        }`}
+        data-testid="showdown-outcome"
+        data-outcome={outcome}
+        className={`flex w-full max-w-sm flex-col items-center gap-1 rounded-neo border-3 px-5 py-3 text-center shadow-hard ${bannerTone}`}
       >
-        <div>{bannerText}</div>
-        <div className="text-2xl font-bold">{deltaText}</div>
+        <div className="font-neo-display text-xs font-black uppercase tracking-[0.2em] opacity-80">
+          {t('sealedBid.showdown')}
+        </div>
+        <div className="font-neo-display text-2xl font-black uppercase tracking-wide">
+          {bannerText}
+        </div>
+        <div
+          data-testid="showdown-delta"
+          className="font-neo-display text-3xl font-black tabular-nums"
+        >
+          {deltaText}
+        </div>
+        <div className="font-neo-body text-xs font-bold uppercase opacity-80">
+          {t('sealedBid.chips')}
+        </div>
       </div>
 
-      {/* Opponent Cards Grid */}
-      <div className="flex flex-wrap justify-center gap-6">
+      {/* Player word card */}
+      <div
+        data-testid="showdown-player-word"
+        className="rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-neo-display text-lg font-black uppercase tracking-wider text-neo-navy shadow-hard-sm"
+      >
+        {playerWord || '—'}
+      </div>
+
+      {/* Rival cards */}
+      <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
         {bots.map((bot, index) => (
           <div
-            key={index}
-            ref={(el) => {
-              cardRefs.current[index] = el;
-            }}
-            className="h-48 w-32 rounded-neo border-neo-thick border-neo-white bg-neo-navy shadow-hard-lg"
-            style={{
-              perspective: '1000px',
-              transformStyle: 'preserve-3d',
-            }}
+            key={`${bot.name}-${index}`}
+            className="h-36 w-24 [perspective:800px] sm:h-44 sm:w-28"
           >
             <div
-              className="h-full w-full"
+              ref={(el) => {
+                cardRefs.current[index] = el;
+              }}
+              className="relative h-full w-full rounded-neo border-3 border-black shadow-hard-lg transition-transform [transform-style:preserve-3d]"
               style={{
-                transformStyle: 'preserve-3d',
-                transform: revealed ? 'rotationY(180deg)' : 'rotationY(0deg)',
-                transition: reducedMotion ? 'none' : 'transform 0.6s ease-out',
+                transform: reducedMotion || revealed ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                transition: reducedMotion ? 'none' : undefined,
               }}
             >
-              {/* Face-down (back) */}
+              {/* Back — branded card asset */}
               <div
-                className="flex h-full w-full items-center justify-center bg-gradient-to-br from-neo-navy to-neo-navy-light"
-                style={{
-                  backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
-                }}
+                className="absolute inset-0 overflow-hidden rounded-neo bg-neo-navy"
+                style={{ backfaceVisibility: 'hidden' }}
               >
-                <div className="text-4xl">🂠</div>
+                {/* eslint-disable-next-line @next/next/no-img-element -- static SVG asset */}
+                <img
+                  src={SEALED_BID_ASSETS.cardBack}
+                  alt=""
+                  draggable={false}
+                  className="h-full w-full object-cover"
+                />
               </div>
-
-              {/* Face-up (word revealed) */}
+              {/* Face */}
               <div
-                className="flex h-full w-full flex-col items-center justify-center gap-2 bg-neo-cream p-2"
+                className="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-neo bg-neo-cream p-2"
                 style={{
                   backfaceVisibility: 'hidden',
-                  WebkitBackfaceVisibility: 'hidden',
                   transform: 'rotateY(180deg)',
                 }}
               >
-                <div className="text-sm font-neo-body text-neo-navy">{bot.name}</div>
-                <div className="text-xl font-neo-display font-bold text-neo-navy">{bot.word}</div>
+                <div className="font-neo-body text-[10px] font-bold uppercase text-neo-navy/60">
+                  {bot.name}
+                </div>
+                <div className="break-all text-center font-neo-display text-base font-black text-neo-navy sm:text-lg">
+                  {bot.word}
+                </div>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Continue Button */}
       <button
+        type="button"
         onClick={onDone}
-        className="rounded-neo border-neo-thick border-neo-lime bg-neo-lime px-6 py-3 font-neo-display font-bold text-neo-navy shadow-hard-lg transition-all hover:shadow-hard active:shadow-hard-pressed"
+        className="min-h-12 w-full max-w-sm rounded-neo border-3 border-black bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-0.5"
       >
-        {t('sealedBid.continue') || 'Continue'}
+        {t('sealedBid.continue')}
       </button>
     </div>
   );

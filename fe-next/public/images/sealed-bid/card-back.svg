@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="280" viewBox="0 0 200 280" role="img" aria-hidden="true">
+  <title>Sealed bid card back</title>
+  <defs>
+    <pattern id="diamonds" width="20" height="20" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect x="7" y="7" width="6" height="6" fill="none" stroke="#FFE135" stroke-width="1" opacity="0.55"/>
+    </pattern>
+    <linearGradient id="face" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="50%" stop-color="#16213e"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+  </defs>
+  <!-- Outer neo border -->
+  <rect x="2" y="2" width="196" height="276" rx="14" fill="#0d0d1a" stroke="#000" stroke-width="4"/>
+  <rect x="10" y="10" width="180" height="260" rx="10" fill="url(#face)" stroke="#FFE135" stroke-width="3"/>
+  <rect x="18" y="18" width="164" height="244" rx="8" fill="url(#diamonds)" stroke="#BFFF00" stroke-width="2" opacity="0.95"/>
+  <!-- Center monogram plate -->
+  <rect x="50" y="100" width="100" height="80" rx="10" fill="#1a1a2e" stroke="#000" stroke-width="3"/>
+  <rect x="56" y="106" width="88" height="68" rx="8" fill="#BFFF00" stroke="#000" stroke-width="2"/>
+  <text x="100" y="148" text-anchor="middle" font-family="system-ui, sans-serif" font-size="28" font-weight="900" fill="#1a1a2e">LC</text>
+  <!-- Corner pips -->
+  <text x="28" y="44" font-size="18" fill="#FFE135">♠</text>
+  <text x="158" y="250" font-size="18" fill="#FFE135" transform="rotate(180 172 242)">♠</text>
+</svg>
