@@ -24,10 +24,21 @@ vi.mock('@/components/motion/AdaptiveMotion', () => {
 vi.mock('../AvatarRenderer', () => ({ __esModule: true, default: () => <div data-testid="avatar-renderer" /> }));
 vi.mock('../PartPreview', () => ({ __esModule: true, default: () => <div data-testid="part-preview" /> }));
 
+// The relocated "watch ad → unlock a premium part" reward now lives in the
+// builder. Stub it (heavy ad/auth deps) — the builder just needs to mount it.
+vi.mock('../LobbyAvatarRewardButton', () => ({
+  LobbyAvatarRewardButton: () => <div data-testid="avatar-daily-reward" />,
+}));
+
 describe('AvatarBuilderModal', () => {
   const defaultProps = { isOpen: true, onClose: vi.fn(), onSave: vi.fn(), premium: null as null };
 
   beforeEach(() => vi.clearAllMocks());
+
+  it('surfaces the daily avatar-part reward inside the builder', () => {
+    render(<AvatarBuilderModal {...defaultProps} />);
+    expect(screen.getByTestId('avatar-daily-reward')).toBeInTheDocument();
+  });
 
   it('renders when isOpen=true', () => {
     render(<AvatarBuilderModal {...defaultProps} />);

@@ -217,6 +217,19 @@ describe('PlayerWaitingView', () => {
     });
   });
 
+  describe('Lobby cleanup — removed reward/daily clutter', () => {
+    it('does NOT render the redundant "+20 gold" reward cluster', () => {
+      // The gold ad was removed; the avatar-part reward moved into the builder.
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.queryByTestId('lobby-reward-cluster')).not.toBeInTheDocument();
+    });
+
+    it('does NOT render the daily-challenge promotion ember', () => {
+      render(<PlayerWaitingView {...defaultProps} />);
+      expect(screen.queryByTestId('lobby-daily-ember-slot')).not.toBeInTheDocument();
+    });
+  });
+
   describe('Existing Functionality', () => {
     it('should not render room code in header (removed)', () => {
       render(<PlayerWaitingView {...defaultProps} />);
