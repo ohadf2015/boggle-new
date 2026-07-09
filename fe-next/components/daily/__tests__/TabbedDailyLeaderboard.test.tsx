@@ -37,6 +37,7 @@ vi.mock('framer-motion', () => ({
     button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <button {...props}>{children}</button>,
   },
   AnimatePresence: ({ children }: React.PropsWithChildren<Record<string, unknown>>) => <>{children}</>,
+  useReducedMotion: () => false,
 }));
 
 // Mock Avatar component

@@ -308,9 +308,9 @@ const RanksTabContent: React.FC<{
           >
             <span className={cn(
               'w-5 text-center font-black text-[10px] shrink-0',
-              entry.rank === 1 ? 'text-neo-yellow' :
-              entry.rank === 2 ? 'text-gray-300' :
-              entry.rank === 3 ? 'text-amber-600' :
+              entry.rank === 1 ? 'text-tier-gold' :
+              entry.rank === 2 ? 'text-tier-silver' :
+              entry.rank === 3 ? 'text-tier-bronze' :
               'text-neo-white'
             )}>
               {getRankDisplay(entry.rank)}

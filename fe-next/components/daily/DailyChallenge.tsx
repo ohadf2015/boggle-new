@@ -569,7 +569,7 @@ const DailyChallenge: React.FC = () => {
 
   return (
     <div
-      className={`flex-1 flex flex-col min-h-0 h-dvh max-h-dvh w-full max-w-[100vw] bg-gray-100 dark:bg-neo-navy relative overflow-x-clip overflow-hidden ${seasonSkin}`}
+      className={`flex-1 flex flex-col min-h-0 h-dvh max-h-dvh w-full max-w-[100vw] bg-neo-navy relative overflow-x-clip overflow-hidden ${seasonSkin}`}
     >
       {/* Collapse the in-game header spacer so the focused Word Hunt screen has no
           empty band at the top (the header is hidden during play anyway). */}

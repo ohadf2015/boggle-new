@@ -32,16 +32,22 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
     onClick={onClick}
   >
     {solved ? (
-      <GameBadge variant="score-success" icon={Trophy} size="lg" animate={false}>
+      <GameBadge variant="score-success" icon={Trophy} size="lg" animate="pop">
         {attemptsUsed}/10
       </GameBadge>
     ) : (
-      <GameBadge variant="score-fail" icon={X} size="lg" animate={false}>
+      <GameBadge variant="score-fail" icon={X} size="lg" animate="pop">
         X/10
       </GameBadge>
     )}
     {streakDays > 0 && (
-      <GameBadge variant="streak" size="sm" animate={false} className="text-xs">
+      <GameBadge
+        variant="streak"
+        size="sm"
+        animate="pop"
+        className="text-xs"
+        transition={{ type: 'spring', delay: 0.25 }}
+      >
         🔥{streakDays}
       </GameBadge>
     )}

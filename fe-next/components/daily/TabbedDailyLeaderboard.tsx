@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, memo, useMemo, useRef } from 'react';
 import { useSafeInterval } from '@/hooks/useSafeTimeout';
-import { m, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Trophy, ChevronDown, ChevronUp, Crown, Calendar, Users, Target, CircleDot } from 'lucide-react';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { useFriends } from '@/hooks/useFriends';
@@ -98,7 +98,7 @@ const LeaderboardTabs = memo<{
       type="single"
       value={activeTab}
       onValueChange={(value) => value && onTabChange(value as LeaderboardTab)}
-      className="bg-slate-100 dark:bg-neo-navy-light p-1 rounded-neo border-2 border-neo-black"
+      className="bg-neo-navy-light p-1 rounded-neo border-2 border-neo-black"
     >
       <ToggleGroupItem value="today" size="sm" className="text-xs px-3">
         <Calendar className="w-3.5 h-3.5 me-1.5" />
@@ -521,6 +521,25 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
 
   const isLoading = loading && participants.length === 0;
   const isEmpty = !loading && participants.length === 0;
+  const prefersReducedMotion = useReducedMotion();
+
+  // Crossfade+scale between loading/error/empty/list so switching tabs never
+  // hard-cuts the content pane — the participant rows already animate their
+  // own add/remove via the inner AnimatePresence below, but the branch itself
+  // (e.g. loading -> list, or list -> empty when Friends has no one) swapped
+  // instantly with zero transition. Keyed per branch + tab so every real state
+  // change gets its own crossfade; reduced-motion collapses it to an instant cut.
+  const contentKey = isLoading ? 'loading' : error ? 'error' : isEmpty ? `empty-${activeTab}` : `list-${activeTab}`;
+  const contentTransition = prefersReducedMotion
+    ? { duration: 0 }
+    : { duration: 0.2, ease: [0.25, 0.1, 0.25, 1] as const };
+  const contentVariants = prefersReducedMotion
+    ? { enter: {}, center: {}, exit: {} }
+    : {
+        enter: { opacity: 0, scale: 0.98 },
+        center: { opacity: 1, scale: 1 },
+        exit: { opacity: 0, scale: 0.98 },
+      };
 
   // Render content based on state
   const renderContent = () => {
@@ -538,12 +557,12 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     // Error state
     if (error) {
       return (
-        <div className="text-center text-red-500 py-4 text-sm">
+        <div className="text-center text-neo-red py-4 text-sm">
           {error}
           <button
             type="button"
             onClick={activeTab === 'today' ? fetchTodayLeaderboard : fetchAllTimeLeaderboard}
-            className="block mx-auto mt-2 text-neo-cyan underline"
+            className="block mx-auto mt-3 px-4 py-1.5 text-xs font-bold uppercase rounded-neo border-2 border-neo-black bg-neo-cyan text-neo-black shadow-hard-sm hover:shadow-hard active:translate-y-0.5 active:shadow-none transition-all"
           >
             {t('common.retry')}
           </button>
@@ -555,10 +574,10 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     if (isEmpty) {
       return (
         <div className="text-center py-6">
-          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-indigo-500 to-purple-600 text-white border-2 border-indigo-600 shadow-md">
-            <Trophy aria-hidden className="h-7 w-7 text-amber-300" />
+          <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-neo-lg bg-neo-purple border-2 border-neo-black shadow-hard-sm">
+            <Trophy aria-hidden className="h-7 w-7 text-neo-yellow" />
           </div>
-          <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
+          <p className="text-neo-white/80 font-bold text-sm sm:text-base">
             {activeTab === 'friends'
               ? t('leaderboard.noFriendsPlayed')
               : activeTab === 'today'
@@ -570,7 +589,7 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
     }
 
     // Participants list with windowed pagination (load-above + load-below)
-    const loadMoreClass = 'w-full py-2 text-xs sm:text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center justify-center gap-1.5 transition-colors rounded-xl bg-indigo-50/50 dark:bg-indigo-900/20 hover:bg-indigo-100/70 dark:hover:bg-indigo-900/30 border border-indigo-200/50 dark:border-indigo-700/30';
+    const loadMoreClass = 'w-full py-2 text-xs sm:text-sm font-bold text-neo-purple hover:text-neo-white flex items-center justify-center gap-1.5 transition-colors rounded-neo bg-neo-purple/10 hover:bg-neo-purple/20 border border-neo-purple/40';
 
     return (
       <div className="space-y-2">
@@ -629,19 +648,18 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className={`
-        bg-white/95 dark:bg-neo-navy-light/95
-        rounded-2xl border-2 border-slate-200 dark:border-slate-700
+        bg-neo-navy-light rounded-neo-lg border-2 border-neo-black
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
-        shadow-lg
+        shadow-hard
       `}
     >
       {/* Header - always visible */}
       <div className="flex items-center gap-3 mb-3">
-        <div className="p-2 sm:p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
-          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
+        <div className="p-2 sm:p-2.5 bg-neo-purple rounded-neo border-2 border-neo-black shadow-hard-sm">
+          <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-neo-yellow" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-slate-800 dark:text-white flex items-center gap-2 flex-wrap">
+          <h3 className="font-black text-base sm:text-lg uppercase tracking-wide text-neo-white flex items-center gap-2 flex-wrap">
             <span>{t('wordHunt.leaderboard.title')}</span>
             <span
               className={`
@@ -652,58 +670,58 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
               `}
               title={
                 scope === 'combined'
-                  ? 'Combined score: Word Hunt + Word Wheel'
+                  ? t('wordHunt.leaderboard.scopeCombined')
                   : scope === 'word-hunt'
-                    ? 'Word Hunt only'
-                    : 'Word Wheel only'
+                    ? t('wordHunt.leaderboard.scopeWordHunt')
+                    : t('wordHunt.leaderboard.scopeWordWheel')
               }
             >
               {scope === 'combined' && (
                 <>
                   <Target aria-hidden className="w-3 h-3" />
                   <CircleDot aria-hidden className="w-3 h-3" />
-                  {t('wordHunt.leaderboard.scopeCombined') || 'Combined'}
+                  {t('wordHunt.leaderboard.scopeCombined')}
                 </>
               )}
               {scope === 'word-hunt' && (
                 <>
                   <Target aria-hidden className="w-3 h-3" />
-                  {t('wordHunt.leaderboard.scopeWordHunt') || 'Word Hunt'}
+                  {t('wordHunt.leaderboard.scopeWordHunt')}
                 </>
               )}
               {scope === 'word-wheel' && (
                 <>
                   <CircleDot aria-hidden className="w-3 h-3" />
-                  {t('wordHunt.leaderboard.scopeWordWheel') || 'Word Wheel'}
+                  {t('wordHunt.leaderboard.scopeWordWheel')}
                 </>
               )}
             </span>
           </h3>
           {!isLoading && !error && (
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium truncate">
+            <p className="text-xs sm:text-sm text-neo-white/60 font-medium truncate">
               {activeTab === 'today' && totalCount > 0 ? (
                 <>
                   <span>{totalCount} {t('wordHunt.leaderboard.played')}</span>
                   <span className="mx-1.5">•</span>
                   {scope === 'combined' && todayHuntSolved > 0 && todayWheelSolved > 0 ? (
                     <>
-                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                      <span className="inline-flex items-center gap-1 text-neo-lime">
                         <Target aria-hidden className="w-3.5 h-3.5" />
                         {todayHuntSolved} {t('wordHunt.leaderboard.solved')}
                       </span>
                       <span className="mx-1.5">•</span>
-                      <span className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400">
+                      <span className="inline-flex items-center gap-1 text-neo-lime">
                         <CircleDot aria-hidden className="w-3.5 h-3.5" />
                         {todayWheelSolved} {t('wordHunt.leaderboard.solved')}
                       </span>
                     </>
                   ) : (
-                    <span className="text-emerald-600 dark:text-emerald-400">{totalSolvedCount} {t('wordHunt.leaderboard.solved')}</span>
+                    <span className="text-neo-lime">{totalSolvedCount} {t('wordHunt.leaderboard.solved')}</span>
                   )}
                   {todayGuestCount > 0 && (
                     <>
                       <span className="mx-1.5">•</span>
-                      <span className="text-slate-500 dark:text-slate-400">
+                      <span className="text-neo-white/50">
                         {todayGuestCount} {todayGuestCount === 1 ? t('daily.guestSingular') : t('daily.guestsPlural')}
                       </span>
                     </>
@@ -722,8 +740,20 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
         <LeaderboardTabs activeTab={activeTab} onTabChange={setActiveTab} t={t} />
       </div>
 
-      {/* Content area - loading/empty/participants */}
-      {renderContent()}
+      {/* Content area - loading/empty/participants. Crossfades between branches
+          (see contentKey/contentVariants above) so tab switches never hard-cut. */}
+      <AnimatePresence mode="wait">
+        <m.div
+          key={contentKey}
+          variants={contentVariants}
+          initial="enter"
+          animate="center"
+          exit="exit"
+          transition={contentTransition}
+        >
+          {renderContent()}
+        </m.div>
+      </AnimatePresence>
     </m.div>
 
     <WordWheelWordsModal

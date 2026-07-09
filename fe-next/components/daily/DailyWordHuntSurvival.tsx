@@ -572,12 +572,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
                 transition={{ duration: 0.25, ease: 'easeOut' }}
                 className={`relative text-xs font-bold px-2.5 py-0.5 rounded-full ${
                   state.feedbackType === 'valid-word'
-                    ? 'bg-green-500/15 text-green-400 drop-shadow-[0_0_8px_rgba(34,197,94,0.4)]'
+                    ? 'bg-neo-lime/15 text-neo-lime drop-shadow-[0_0_8px_rgba(191,255,0,0.4)]'
                     : state.feedbackType === 'duplicate'
-                      ? 'bg-yellow-500/15 text-yellow-400 drop-shadow-[0_0_8px_rgba(234,179,8,0.3)]'
+                      ? 'bg-neo-orange/15 text-neo-orange drop-shadow-[0_0_8px_rgba(255,107,53,0.35)]'
                       : state.feedbackType === 'target-found'
                         ? 'bg-neo-lime/20 text-neo-lime drop-shadow-[0_0_12px_rgba(191,255,0,0.5)]'
-                        : 'bg-red-500/15 text-red-400 drop-shadow-[0_0_8px_rgba(239,68,68,0.3)]'
+                        : 'bg-neo-red/15 text-neo-red drop-shadow-[0_0_8px_rgba(255,51,102,0.35)]'
                 }`}
               >
                 {state.feedbackWord && state.feedbackType === 'valid-word' && (
@@ -624,17 +624,17 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           a hint mid-round doesn't shift the grid below (Class-5 layout shift). */}
       <div className="min-h-[22px] mb-0.5" data-testid="wordhunt-category-slot">
         {state.showCategory && (
-          <div className="text-[11px] bg-purple-50 dark:bg-purple-900/30 border border-purple-300 dark:border-purple-600 rounded px-2 py-0.5 max-w-3xl mx-auto w-full text-purple-900 dark:text-purple-100">
+          <div className="text-[11px] bg-neo-purple/15 border border-neo-purple/50 rounded px-2 py-0.5 max-w-3xl mx-auto w-full text-neo-white/90">
             <span className="font-bold">
               {t('wordHunt.survival.category')?.replace('{category}', state.category) ||
-                `Category: ${state.category}`}
+                state.category}
             </span>
           </div>
         )}
       </div>
       <div className="min-h-[22px] mb-0.5" data-testid="wordhunt-example-slot">
         {state.showExample && (
-          <div className="text-[11px] bg-green-50 dark:bg-green-900/30 border border-green-300 dark:border-green-600 rounded px-2 py-0.5 max-w-3xl mx-auto w-full text-green-900 dark:text-green-100">
+          <div className="text-[11px] bg-neo-lime/15 border border-neo-lime/50 rounded px-2 py-0.5 max-w-3xl mx-auto w-full text-neo-white/90">
             <span className="font-bold">{t('wordHunt.survival.exampleSentence')}</span>{' '}
             {state.exampleSentence.replace(new RegExp(targetWord, 'gi'), '____')}
           </div>

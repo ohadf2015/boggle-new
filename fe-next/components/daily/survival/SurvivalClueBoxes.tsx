@@ -87,7 +87,7 @@ export const SurvivalClueBoxes = forwardRef<HTMLDivElement, SurvivalClueBoxesPro
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         "mx-auto max-w-3xl w-full transition-all duration-300",
-        "bg-neo-navy/30 dark:bg-neo-navy/50 border-neo-black/20",
+        "bg-neo-navy/50 border-neo-black/20",
         compact
           ? "px-1.5 py-px mb-0 border rounded-md"
           : "px-3 py-2 mb-0.5 border-2 rounded-neo-lg [@media(max-height:560px)]:py-px [@media(max-height:560px)]:px-1.5 [@media(max-height:560px)]:mb-0 [@media(max-height:560px)]:border [@media(max-height:560px)]:rounded-md",

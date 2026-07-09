@@ -127,9 +127,9 @@ export const SurvivalLiveRanks: React.FC<SurvivalLiveRanksProps> = ({
               {/* Rank */}
               <span className={cn(
                 'w-6 text-center font-black text-sm tabular-nums shrink-0',
-                entry.rank === 1 ? 'text-neo-yellow' :
-                entry.rank === 2 ? 'text-gray-300' :
-                entry.rank === 3 ? 'text-amber-600' :
+                entry.rank === 1 ? 'text-tier-gold' :
+                entry.rank === 2 ? 'text-tier-silver' :
+                entry.rank === 3 ? 'text-tier-bronze' :
                 'text-neo-white'
               )}>
                 {getRankDisplay(entry.rank)}

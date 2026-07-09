@@ -157,10 +157,10 @@ export const AutoClueNotification: React.FC<AutoClueNotificationProps> = ({
             'rounded-full',
             'border-2 border-white',
             'shadow-hard-sm',
-            'hover:bg-red-500 transition-colors',
+            'hover:bg-neo-red transition-colors',
             'focus:outline-hidden focus:ring-2 focus:ring-neo-pink'
           )}
-          aria-label="Dismiss notification"
+          aria-label={t('common.dismiss')}
         >
           <X className="w-3.5 h-3.5" />
         </button>

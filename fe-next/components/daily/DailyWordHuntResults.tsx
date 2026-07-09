@@ -140,8 +140,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const showEncouraging = efficiency < ENCOURAGING_SCORE_THRESHOLD;
 
   const displayName = isAuthenticated && profile
-    ? profile.display_name || profile.username || 'Player'
-    : guestPlayer?.displayName || 'Player';
+    ? profile.display_name || profile.username || t('common.player')
+    : guestPlayer?.displayName || t('common.player');
   const avatarEmoji = isAuthenticated && profile
     ? profile.avatar_emoji || '🎯'
     : guestPlayer?.avatarEmoji || '🎯';
@@ -361,7 +361,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       <div className="shrink-0 px-3 py-2 border-b border-slate-700/50 bg-neo-navy">
         <div className="max-w-md mx-auto lg:max-w-5xl xl:max-w-6xl">
           <div className="flex items-center justify-between gap-2">
-            <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-white -ms-2 py-1">
+            <Button variant="ghost" size="sm" onClick={onBack} className="text-neo-white/60 hover:text-neo-white -ms-2 py-1">
               <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
               {t('common.back')}
             </Button>

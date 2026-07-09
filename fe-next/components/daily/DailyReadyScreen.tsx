@@ -146,7 +146,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           variant="ghost"
           size="sm"
           onClick={onBack}
-          className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+          className="text-neo-white/70 hover:text-neo-white"
         >
           <ArrowLeft className="me-2 rtl:rotate-180" />
           {t('daily.home')}
@@ -175,17 +175,17 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.05, type: 'spring', stiffness: 300, damping: 26 }}
-            className="w-full max-w-sm mx-auto bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-400 p-3 text-center cursor-pointer hover:border-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+            className="w-full max-w-sm mx-auto bg-neo-orange/10 rounded-neo border-2 border-neo-orange p-3 text-center cursor-pointer hover:bg-neo-orange/15 transition-colors"
             onClick={() => setShowAuthModal(true)}
             role="button"
             tabIndex={0}
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowAuthModal(true); }}
           >
-            <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-300 text-sm font-bold">
+            <div className="flex items-center justify-center gap-2 text-neo-orange text-sm font-bold">
               <UserCircle2 className="w-4 h-4" />
               <span>{t('daily.guestModeNotice')}</span>
             </div>
-            <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+            <p className="text-xs text-neo-white/70 mt-1">
               {t('daily.guestModeBenefits')}
             </p>
           </m.div>
@@ -197,7 +197,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             initial={{ scale: 0.8, opacity: 0, y: -20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ delay: 0.05, type: 'spring', stiffness: 400, damping: 22 }}
-            className="w-full max-w-sm mx-auto bg-indigo-600 rounded-neo border-3 border-neo-black shadow-hard p-4"
+            className="w-full max-w-sm mx-auto bg-neo-pink rounded-neo border-3 border-neo-black shadow-hard p-4"
           >
             <div className="flex items-center justify-center gap-2 mb-2">
               <span className="text-2xl">🎯</span>
@@ -238,15 +238,15 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             className="inline-flex items-center gap-2"
           >
             <Target className="w-6 h-6 text-amber-500" />
-            <span className="text-2xl font-black text-neo-black dark:text-white uppercase tracking-wide">
+            <span className="text-2xl font-black text-neo-white uppercase tracking-wide">
               {t('daily.badge')}
             </span>
           </m.div>
 
           {/* Challenge number and date - subtle styling */}
-          <div className="flex items-center justify-center gap-2 text-gray-400 dark:text-gray-500">
+          <div className="flex items-center justify-center gap-2 text-neo-white/50">
             <span className="text-lg font-bold">#{puzzleNumber}</span>
-            <span className="text-gray-300 dark:text-gray-600">•</span>
+            <span className="text-neo-white/30">•</span>
             <span className="text-sm">{formattedDate}</span>
           </div>
         </m.div>
@@ -299,7 +299,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <button
               type="button"
               onClick={() => setShowLeaderboard(!showLeaderboard)}
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors"
             >
               <Trophy className="w-4 h-4" />
               {t('daily.todaysPlayers')}
@@ -307,7 +307,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
             <button
               type="button"
               onClick={onShowTutorial}
-              className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors"
             >
               <HelpCircle className="w-4 h-4" />
               {t('daily.howToPlay')}
@@ -333,14 +333,14 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
               <button
                 type="button"
                 onClick={() => setShowLeaderboard(!showLeaderboard)}
-                className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+                className="text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
               >
                 <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
               </button>
               <button
                 type="button"
                 onClick={onShowTutorial}
-                className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+                className="text-sm font-bold text-neo-white/60 hover:text-neo-white transition-colors flex items-center gap-1"
               >
                 <HelpCircle className="w-3 h-3" /> {t('daily.howToPlay')}
               </button>
@@ -377,7 +377,7 @@ const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
-          className="text-xs text-gray-500 dark:text-gray-400"
+          className="text-xs text-neo-white/50"
         >
           {t('daily.samePuzzle')}
         </m.p>
