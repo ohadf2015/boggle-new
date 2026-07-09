@@ -51,7 +51,10 @@ describe('pickTowerSurprise', () => {
   });
 
   it('only ever returns known events', () => {
-    const known: TowerSurpriseEvent[] = ['surge', 'windfall', 'updraft', 'crystal', 'golden_floor'];
+    const known: TowerSurpriseEvent[] = [
+      'surge', 'windfall', 'updraft', 'crystal', 'echo',
+      'meteor_strike', 'phantom_floor', 'golden_floor',
+    ];
     for (let i = 0; i < 50; i++) {
       expect(known).toContain(pickTowerSurprise(i / 50));
     }
@@ -188,7 +191,10 @@ describe('seed helpers', () => {
 
 describe('TOWER_SURPRISE_META', () => {
   it('has display + audio metadata (emoji + i18n key + sound) for every event', () => {
-    const events: TowerSurpriseEvent[] = ['surge', 'windfall', 'updraft', 'crystal', 'golden_floor'];
+    const events: TowerSurpriseEvent[] = [
+      'surge', 'windfall', 'updraft', 'crystal', 'echo',
+      'meteor_strike', 'phantom_floor', 'golden_floor',
+    ];
     const validSounds = ['powerUp', 'gift', 'timeBonus', 'rare', 'chest'];
     for (const e of events) {
       expect(TOWER_SURPRISE_META[e].emoji).toBeTruthy();

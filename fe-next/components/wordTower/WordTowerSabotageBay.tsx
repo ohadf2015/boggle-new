@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import Avatar from '@/components/Avatar';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import { WordTowerSmashScene } from './WordTowerSmashScene';
 
@@ -115,19 +116,42 @@ export function WordTowerSabotageBay({
           type="button"
           onClick={onOpen}
           aria-label={t('wordTower.sabotage.chip')}
+          data-wreck-ready="true"
           className={cn(
-            'pointer-events-auto flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform hover:scale-105 active:translate-y-px',
+            'pointer-events-auto relative flex items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-pink px-2.5 py-1.5 font-neo-display text-sm font-black uppercase text-neo-white shadow-hard transition-transform hover:scale-105 active:translate-y-px',
             !inline && 'absolute start-3 top-16 z-40',
             !reducedMotion && 'animate-neo-pop',
           )}
         >
-          <span aria-hidden>🎯</span>
+          {/* Ready pulse ring — stronger "you have a ball / targets vulnerable" signal. */}
+          {!reducedMotion && (
+            <span
+              className="pointer-events-none absolute -inset-1 rounded-neo border-2 border-neo-yellow/80 opacity-80"
+              style={{ animation: 'wt-wreck-ready-pulse 1.4s ease-out infinite' }}
+              aria-hidden
+            />
+          )}
+          <span
+            data-testid="wt-wreck-ball-icon"
+            className="relative flex h-6 w-6 items-center justify-center rounded-full border-neo border-black bg-neo-navy shadow-hard-sm"
+            aria-hidden
+          >
+            <span className="block h-3.5 w-3.5 rounded-full bg-neo-pink ring-2 ring-neo-yellow" />
+            <span className="absolute -top-0.5 h-2 w-0.5 bg-neo-yellow" />
+          </span>
           {/* Inline (left-rail) mode keeps the chip icon-first so centred notice
               banners never collide with a wide label on narrow phones. */}
           <span className={cn(inline && 'hidden sm:inline')}>{t('wordTower.sabotage.chip')}</span>
           <span className="flex h-5 min-w-5 items-center justify-center rounded-full border border-black bg-neo-yellow px-1 font-neo-display text-[11px] font-black text-black">
             {tokens}
           </span>
+          <style>{`
+            @keyframes wt-wreck-ready-pulse {
+              0% { transform: scale(1); opacity: 0.9; }
+              70% { transform: scale(1.12); opacity: 0; }
+              100% { transform: scale(1.12); opacity: 0; }
+            }
+          `}</style>
         </button>
       )}
 
@@ -231,12 +255,14 @@ export function WordTowerSabotageBay({
                       onClick={() => handlePickRival(r)}
                       className="flex w-full items-center gap-3 rounded-neo border-neo-thick border-black bg-neo-pink px-3 py-2.5 text-start font-neo-display text-base font-black uppercase text-neo-white shadow-hard transition-transform active:translate-y-px"
                     >
-                      <span
-                        className="flex h-7 w-7 items-center justify-center rounded-full border border-black bg-neo-navy text-base"
-                        style={{ background: r.avatarColor ?? '#2a2a40' }}
-                      >
-                        {r.avatarEmoji ?? '🧗'}
-                      </span>
+                      {/* Real custom/seeded Avatar only — never emoji-face placeholders. */}
+                      <Avatar
+                        customAvatar={r.customAvatar ?? undefined}
+                        userId={r.playerId ?? r.id}
+                        pixelSize={28}
+                        disableEffects
+                        className="shrink-0 rounded-full border border-black"
+                      />
                       <span className="flex-1 truncate">{r.name}</span>
                       <span className="font-neo-body text-xs font-bold text-neo-white/80">
                         {Math.round(r.heightM)}m

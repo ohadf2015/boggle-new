@@ -17,7 +17,7 @@ import { dailyBestKey, mergeDailyBest } from '@/lib/wordTower/dailyBest';
 import { useDailyStreak } from '@/lib/wordTower/useDailyStreak';
 import { WordTowerPlay } from './WordTowerPlay';
 import { WordTowerLeaderboard } from './WordTowerLeaderboard';
-import { Flame, CalendarDays, Infinity as InfinityIcon } from 'lucide-react';
+import { Flame, CalendarDays } from 'lucide-react';
 
 const SUPPORTED: SupportedLocale[] = ['en', 'he', 'sv', 'es', 'ja'];
 
@@ -174,34 +174,24 @@ export function WordTowerGame() {
         onNewDailyBest={persistDailyBest}
       />
 
-      {/* Daily badge + streak + mode toggle — the routine hook. Top-centre, dropped
-          one row (top-14) so the top band is free for the header actions row that
-          now shares the mute-FAB line (#4). */}
-      <div className="pointer-events-none fixed inset-x-0 top-14 z-50 flex justify-center px-2" dir={dir}>
-        <div className="pointer-events-auto flex items-center gap-1.5">
-          {daily && (
+      {/* Daily badge + streak only when already in daily mode (non-action). No
+          mid-run daily↔endless switch — daily entry stays on hub/URL (`?daily=1`). */}
+      {daily && (
+        <div className="pointer-events-none fixed inset-x-0 top-14 z-50 flex justify-center px-2" dir={dir}>
+          <div className="pointer-events-none flex items-center gap-1.5">
             <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-2 py-1 font-neo-display text-[11px] font-black uppercase tracking-wide text-black shadow-hard-sm">
               <CalendarDays className="h-3 w-3" />
               {t('wordTower.daily.badge', { date: utcDateKey() })}
             </span>
-          )}
-          {daily && streak > 0 && (
-            <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-orange px-2 py-1 font-neo-display text-[11px] font-black text-black shadow-hard-sm">
-              <Flame className="h-3 w-3" />
-              {t('wordTower.daily.streak', { n: streak })}
-            </span>
-          )}
-          {/* Hard nav (plain <a>) so the run remounts fresh in the chosen mode —
-              a client <Link> wouldn't re-read the query and the mode would stick. */}
-          <a
-            href={daily ? '?' : '?daily=1'}
-            className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-cyan px-2 py-1 font-neo-display text-[11px] font-black uppercase tracking-wide text-black shadow-hard-sm transition-transform active:translate-y-px"
-          >
-            {daily ? <InfinityIcon className="h-3 w-3" /> : <CalendarDays className="h-3 w-3" />}
-            {daily ? t('wordTower.daily.toEndless') : t('wordTower.daily.toDaily')}
-          </a>
+            {streak > 0 && (
+              <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-orange px-2 py-1 font-neo-display text-[11px] font-black text-black shadow-hard-sm">
+                <Flame className="h-3 w-3" />
+                {t('wordTower.daily.streak', { n: streak })}
+              </span>
+            )}
+          </div>
         </div>
-      </div>
+      )}
 
       {showLeaderboard && <WordTowerLeaderboard onClose={closeLeaderboard} t={t} dir={dir} />}
 

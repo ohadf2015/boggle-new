@@ -20,7 +20,7 @@ describe('pickSighting', () => {
 
   it('returns a valid kind inside the chance window at altitude', () => {
     const kind = pickSighting(0.01, 500);
-    expect(['whale', 'satellite', 'shootingStar']).toContain(kind);
+    expect(['whale', 'satellite', 'shootingStar', 'blimp', 'auroraRibbon', 'constellation']).toContain(kind);
   });
 
   it('reserves the whale for the deep biomes', () => {

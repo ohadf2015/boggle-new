@@ -368,7 +368,7 @@ const ja = {
     "landmark": { "skyscraper": "超高層ビルの上", "cloudBase": "雲の底", "mountainTop": "山頂", "jetStream": "ジェット気流", "stormTops": "雷雲の頂", "weatherBalloon": "気象観測気球", "earthCurve": "地球の弧", "karman": "宇宙の境界", "meteorBelt": "流星帯", "aurora": "オーロラ", "deepSpace": "深宇宙" },
     "hazard": { "bomb": "爆弾", "hurricane": "ハリケーン", "wobble": "ぐらつき", "sabotage": "妨害", "lost": "{kind}！{n}階崩落" },
     "clutch": { "save": "ギリギリセーフ！", "critical": "ぐらぐら — きれいに着地！" },
-    "surprise": { "nextWord": "次の単語", "surge": "サージ！", "windfall": "棚ぼた！", "updraft": "上昇気流！次の単語が強化", "crystal": "クリスタル発見！", "goldenFloor": "黄金の階！" },
+    "surprise": { "nextWord": "次の単語", "surge": "サージ！", "windfall": "棚ぼた！", "updraft": "上昇気流！次の単語が強化", "crystal": "クリスタル発見！", "echo": "エコーブースト！", "meteorStrike": "メテオストライク！", "phantomFloor": "ファントムフロア！", "goldenFloor": "黄金の階！" },
     "daily": { "badge": "デイリー · {date}", "streak": "{n}日連続", "toDaily": "デイリー", "toEndless": "エンドレス", "newBest": "デイリー自己ベスト更新！", "questTitle": "ワードタワー", "questDesc": "言葉を高く積み上げよう — 今日はみんな同じ文字。" },
     "perk": { "title": "ボーナスを選ぶ", "subtitle": "1つ選択 — この登攀の間ずっと有効", "skip": "今回はスキップ", "masterCrane": { "name": "マスタークレーン", "desc": "パーフェクト時の報酬アップ" }, "tallTimber": { "name": "ノッポ材木", "desc": "全階の高さ+12%" }, "featherfall": { "name": "フェザーフォール", "desc": "崩落で失う階が1つ減る" }, "reinforced": { "name": "補強済み", "desc": "崖っぷちまでの猶予が増える" }, "cushion": { "name": "安全クッション", "desc": "クレーンのぐらつきで階が落ちない" } },
     "runPerk": { "hotStreak": { "a11y": "ホットストリーク：残り{n}ドロップ" } },

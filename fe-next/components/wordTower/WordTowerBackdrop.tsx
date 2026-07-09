@@ -48,7 +48,8 @@ export function WordTowerBackdrop({
   reducedMotion?: boolean;
 }) {
   const b = biomeBackdrop(biomeId);
-  const stars = BIOME_THEME[biomeId].stars;
+  const theme = BIOME_THEME[biomeId];
+  const stars = theme.stars;
   const sun = Math.max(0, 1 - stars * 2.2); // daytime sun, gone by deep space
   // High-altitude cirrus wisps: build through the stratosphere/orbit, fade out
   // by the galaxy (where the aurora + dense stars carry the sky instead).
@@ -67,8 +68,11 @@ export function WordTowerBackdrop({
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
       aria-hidden
+      data-biome-backdrop={biomeId}
       style={{ transform: `scale(${dolly})`, transformOrigin: '50% 100%', transition: reducedMotion ? 'none' : `transform 1000ms ${EASE}` }}
     >
+      {/* Per-biome accent wash — graphic identity beyond a pure colour remap. */}
+      <div className="absolute inset-0" style={{ background: theme.accentGlow, opacity: 0.9 }} />
       {/* Slow drifting aurora — gives the sky life + a sense of "changing"
           weather. Soft electric tints, stronger as you climb into the dark. */}
       <div className="wt-aurora absolute" style={{ opacity: 0.18 + stars * 0.42 }} />
@@ -168,6 +172,26 @@ export function WordTowerBackdrop({
       >
         <path fill="#1c2c4a" d={SKYLINE} />
       </svg>
+
+      {/* Ground / horizon fog — city haze thins into space mist. */}
+      <div
+        className="absolute inset-x-0 bottom-0 h-[38%]"
+        style={{
+          opacity: theme.groundFog,
+          background: 'linear-gradient(180deg, transparent 0%, rgba(214,238,255,0.35) 45%, rgba(20,32,46,0.45) 100%)',
+          transition: FLOW,
+        }}
+      />
+
+      {/* Edge vignette — stronger in deep biomes for graphic immersion. */}
+      <div
+        className="absolute inset-0"
+        style={{
+          opacity: theme.vignette,
+          background: 'radial-gradient(ellipse at center, transparent 42%, rgba(0,0,0,0.55) 100%)',
+          transition: FLOW,
+        }}
+      />
 
       <style>{`
         /* Puffy cloud: a flat-bottomed body with two lobes on top (pseudo-els),

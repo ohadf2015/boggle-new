@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { Container, Graphics } from 'pixi.js';
 import { cn } from '@/lib/utils';
+import Avatar from '@/components/Avatar';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine';
 import type { ParticleConfig } from '@/lib/gameEngine/types';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
@@ -44,20 +45,38 @@ const C = {
 
 /** Brick-chunk debris — opaque rect shards in tower-block colours. */
 const BRICK_DEBRIS: ParticleConfig = {
-  maxParticles: 60,
+  maxParticles: 110,
   frequency: 0.001,
-  emitterLifetime: 0.12,
-  particlesPerWave: 60,
-  lifetime: { min: 0.4, max: 1.0 },
-  speed: { min: 220, max: 620 },
-  gravity: { x: 0, y: 900 },
-  scale: { start: 1.3, end: 0.2 },
+  emitterLifetime: 0.16,
+  particlesPerWave: 90,
+  lifetime: { min: 0.5, max: 1.35 },
+  speed: { min: 280, max: 820 },
+  gravity: { x: 0, y: 980 },
+  scale: { start: 1.6, end: 0.15 },
   alpha: { start: 1, end: 0 },
-  rotationSpeed: { min: -360, max: 360 },
-  colors: ['ffe135', 'ff1493', 'ff3366', 'ffffff', 'bfff00'],
+  rotationSpeed: { min: -480, max: 480 },
+  colors: ['ffe135', 'ff1493', 'ff3366', 'ffffff', 'bfff00', '00ffff'],
   spawnShape: 'burst',
-  spawnConfig: { directions: 22 },
+  spawnConfig: { directions: 28 },
   shape: 'rect',
+};
+
+/** Secondary dust / spark ring for the perfect smash aftershock. */
+const IMPACT_SPARKS: ParticleConfig = {
+  maxParticles: 80,
+  frequency: 0.001,
+  emitterLifetime: 0.1,
+  particlesPerWave: 70,
+  lifetime: { min: 0.25, max: 0.7 },
+  speed: { min: 160, max: 540 },
+  gravity: { x: 0, y: 200 },
+  scale: { start: 1.1, end: 0.05 },
+  alpha: { start: 1, end: 0 },
+  rotationSpeed: { min: -200, max: 200 },
+  colors: ['ffffff', 'ffe135', '00ffff', 'bfff00'],
+  spawnShape: 'burst',
+  spawnConfig: { directions: 24 },
+  shape: 'circle',
 };
 
 /** Power oscillator — smooth 0→1→0 sweep; `speed` is cycles/sec. */
@@ -139,19 +158,69 @@ export function WordTowerSmashScene({
 
   return (
     <div
-      className="pointer-events-auto fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/75 backdrop-blur-sm p-4"
+      className={cn(
+        'pointer-events-auto fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm p-4',
+        phase === 'impact' && !reducedMotion && 'wt-smash-screen-shake',
+      )}
       role="dialog"
       aria-modal="true"
       aria-label={t('wordTower.sabotage.smashTitle')}
+      data-testid="wt-smash-stage"
+      data-phase={phase}
     >
-      <div className="flex w-full max-w-md flex-col items-center gap-4 rounded-neo border-neo-thick border-black bg-neo-navy p-5 shadow-hard">
-        <div className="w-full text-center">
+      <style>{`
+        @keyframes wt-smash-screen-shake {
+          0%,100% { transform: translate(0,0); }
+          20% { transform: translate(-6px, 3px); }
+          40% { transform: translate(7px, -4px); }
+          60% { transform: translate(-5px, -2px); }
+          80% { transform: translate(4px, 5px); }
+        }
+        .wt-smash-screen-shake { animation: wt-smash-screen-shake 0.45s ease-out; }
+      `}</style>
+      <div className="relative flex w-full max-w-md flex-col items-center gap-4 rounded-neo border-neo-thick border-black bg-neo-navy p-5 shadow-hard">
+        {(phase === 'impact' || phase === 'result') && (
+          <div
+            data-testid="wt-smash-debris"
+            className="pointer-events-none absolute inset-0 overflow-hidden rounded-neo"
+            aria-hidden
+          >
+            {!reducedMotion &&
+              Array.from({ length: 14 }).map((_, i) => (
+                <span
+                  key={i}
+                  className="absolute h-2 w-2 rounded-[2px] border border-black bg-neo-yellow"
+                  style={{
+                    left: `${8 + (i * 7) % 84}%`,
+                    top: `${20 + (i * 11) % 50}%`,
+                    animation: `wt-debris-fall 0.7s ease-in both`,
+                    animationDelay: `${i * 0.03}s`,
+                    backgroundColor: ['#ffe135', '#ff1493', '#00ffff', '#bfff00'][i % 4],
+                  }}
+                />
+              ))}
+            <style>{`
+              @keyframes wt-debris-fall {
+                0% { transform: translateY(-12px) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(90px) rotate(220deg); opacity: 0; }
+              }
+            `}</style>
+          </div>
+        )}
+        <div className="flex w-full flex-col items-center gap-1.5 text-center">
+          <Avatar
+            customAvatar={target.customAvatar ?? undefined}
+            userId={target.playerId ?? target.id}
+            pixelSize={40}
+            disableEffects
+            className="rounded-full border-neo border-black shadow-hard-sm"
+          />
           <h2 className="font-neo-display text-lg font-black uppercase text-neo-white">
             {phase === 'result'
               ? t('wordTower.sabotage.floorsDestroyed', { n: floors })
               : t('wordTower.sabotage.smashTitle')}
           </h2>
-          <p className="mt-0.5 font-neo-body text-sm text-neo-white/70">{target.name}</p>
+          <p className="font-neo-body text-sm text-neo-white/70">{target.name}</p>
         </div>
 
         {reducedMotion ? (
@@ -179,7 +248,7 @@ export function WordTowerSmashScene({
 
         {phase === 'result' && (
           <div className="flex w-full flex-col items-center gap-1.5">
-            <div className={cn('font-neo-display text-2xl font-black uppercase', verdictColor)}>
+            <div className={cn('font-neo-display text-2xl font-black uppercase', verdictColor, !reducedMotion && 'animate-neo-pop')}>
               {t(`wordTower.sabotage.verdict.${verdict}`)}
             </div>
             <div className="flex items-center gap-2 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-1.5">
@@ -382,28 +451,55 @@ function SmashStage({ phase, powerRef, floors, blockCount, onImpactDone }: Stage
       },
     });
 
-    // Impact: FX + shatter the top `n` blocks.
+    // Impact: bigger FX + shatter the top `n` blocks with cascading debris.
     tl.add(() => {
-      engine.particles.burst(BRICK_DEBRIS, impactX, r.blocks[r.blocks.length - 1].y - 10, 30 + n * 12);
-      engine.flash.flash({ color: 0xffe135, duration: 0.18, intensity: 0.25 + power * 0.2 });
-      engine.shake.shake({ intensity: 6 + n * 3, duration: 0.35, decay: 'exponential' });
+      const hitY = r.blocks[r.blocks.length - 1].y - 10;
+      const burstN = 48 + n * 18 + Math.round(power * 24);
+      engine.particles.burst(BRICK_DEBRIS, impactX, hitY, burstN);
+      engine.particles.burst(IMPACT_SPARKS, impactX, hitY, 30 + Math.round(power * 40));
+      // Dual flash — white core + pink rim for a heavier "demolition" beat.
+      engine.flash.flash({ color: 0xffffff, duration: 0.12, intensity: 0.45 + power * 0.35 });
+      engine.flash.flash({ color: 0xffe135, duration: 0.28, intensity: 0.3 + power * 0.35 });
+      engine.shake.shake({
+        intensity: 12 + n * 4 + power * 10,
+        duration: 0.55 + power * 0.25,
+        decay: 'exponential',
+      });
       for (let k = 0; k < n; k++) {
         const b = r.blocks[r.blocks.length - 1 - k];
         if (!b || b.destroyed) continue;
         gsap.to(b, {
-          x: b.x + (Math.random() - 0.5) * r.blockW * 2.4,
-          y: b.y - 40 - Math.random() * 120,
-          rotation: (Math.random() - 0.5) * 5,
+          x: b.x + (Math.random() - 0.5) * r.blockW * 3.2,
+          y: b.y - 60 - Math.random() * 180,
+          rotation: (Math.random() - 0.5) * 8,
           alpha: 0,
-          duration: 0.55,
-          ease: 'power2.out',
-          delay: k * 0.05,
+          duration: 0.7,
+          ease: 'power3.out',
+          delay: k * 0.04,
+        });
+      }
+      // Secondary aftershock burst for solid/perfect power — extra spectacle without
+      // changing the authoritative floors count (already computed from accuracy).
+      if (power >= SMASH_SWEET_SPOT) {
+        gsap.delayedCall(0.12, () => {
+          engine.particles.burst(BRICK_DEBRIS, impactX + 10, hitY + 18, 28 + n * 8);
+          engine.shake.shake({ intensity: 8 + n * 2, duration: 0.28, decay: 'exponential' });
         });
       }
     });
 
-    // Ball rebounds down + fades.
-    tl.to(r.ball, { y: `+=${Math.round(engine.height * 0.25)}`, alpha: 0, duration: 0.5, ease: 'power1.in' }, '>-0.1');
+    // Ball rebounds down + fades with a heavier spin.
+    tl.to(
+      r.ball,
+      {
+        y: `+=${Math.round(engine.height * 0.28)}`,
+        rotation: '+=3.5',
+        alpha: 0,
+        duration: 0.55,
+        ease: 'power1.in',
+      },
+      '>-0.05',
+    );
 
     return () => {
       tl.kill();
@@ -446,26 +542,29 @@ function SmashDomFallback({ phase, powerRef, blockCount, floors }: FallbackProps
   }, [phase, powerRef]);
 
   return (
-    <div className="flex w-full flex-col items-center gap-4 py-2">
+    <div className="relative flex w-full flex-col items-center gap-4 py-2">
       <div className="flex flex-col gap-1">
         {Array.from({ length: blockCount }).map((_, i) => {
           const doomed = phase !== 'aim' && i >= blockCount - floors;
+          const vulnerable = phase === 'aim' && i >= blockCount - Math.max(1, floors || 1);
           return (
             <div
               key={i}
               className={cn(
-                'h-4 w-20 rounded-sm border-neo border-black shadow-hard transition-colors',
-                doomed ? 'bg-neo-navy/40' : i >= blockCount - floors ? 'bg-neo-red/70' : 'bg-neo-yellow',
+                'h-4 w-20 rounded-sm border-neo border-black shadow-hard transition-all duration-300',
+                doomed && 'translate-x-3 -translate-y-2 rotate-12 scale-75 bg-neo-navy/30 opacity-40',
+                !doomed && vulnerable && 'bg-neo-red/80 ring-2 ring-neo-yellow/60',
+                !doomed && !vulnerable && 'bg-neo-yellow',
               )}
             />
           );
         })}
       </div>
       {phase === 'aim' && (
-        <div className="relative h-4 w-full max-w-xs overflow-hidden rounded-neo border-neo border-black bg-neo-navy">
-          {/* green sweet-spot band */}
+        <div className="relative h-5 w-full max-w-xs overflow-hidden rounded-neo border-neo-thick border-black bg-neo-navy shadow-hard-sm">
+          {/* green sweet-spot band — thicker, higher-contrast vulnerable signal */}
           <div
-            className="absolute inset-y-0 bg-neo-lime/30"
+            className="absolute inset-y-0 bg-neo-lime/45"
             style={{ left: `${SMASH_SWEET_SPOT * 100}%`, right: 0 }}
           />
           <div ref={fillRef} className="h-full bg-neo-cyan" style={{ width: '0%' }} />

@@ -34,7 +34,10 @@ export type TowerSurpriseEvent =
   | 'windfall' // a cache of free scrambles (the resource economy)
   | 'updraft' // charges the NEXT word with a height multiplier (anticipation)
   | 'crystal' // bonus height + a scramble (mid-tier mixed payout)
-  | 'golden_floor'; // rare jackpot: a big height surge AND a scramble
+  | 'golden_floor' // rare jackpot: a big height surge AND a scramble
+  | 'echo' // double-tap: modest height now + a small next-word mult (surprise loop)
+  | 'meteor_strike' // flash of bonus height (spectacle payout)
+  | 'phantom_floor'; // free scramble + a thin height bump (ghost floor)
 
 /** Floors placed before surprises arm. The opening climb teaches the core
  *  chain/build loop; a reward pop on word #1 would muddy that first lesson. */
@@ -75,15 +78,18 @@ export function towerSurpriseChance(ctx: TowerSurpriseContext): number {
   return Math.min(MAX_SCALED_CHANCE, BASE_CHANCE + lenBoost + comboBoost);
 }
 
-// Weighted table — surge is the everyday pop, golden_floor is the rare jackpot
-// players come to hope for. Tuned so the jackpot lands often enough to feel
-// reachable (~6%) but rare enough to stay special.
+// Weighted table — surge is the everyday pop, golden_floor is the rare jackpot.
+// Extra kinds (echo / meteor / phantom) keep climbs surprising without drowning
+// the classic set. Jackpot ~5%; new kinds collectively ~16%.
 const WEIGHTS: ReadonlyArray<readonly [TowerSurpriseEvent, number]> = [
-  ['surge', 36],
-  ['windfall', 22],
-  ['updraft', 18],
-  ['crystal', 18],
-  ['golden_floor', 6],
+  ['surge', 30],
+  ['windfall', 18],
+  ['updraft', 14],
+  ['crystal', 15],
+  ['echo', 8],
+  ['meteor_strike', 5],
+  ['phantom_floor', 5],
+  ['golden_floor', 5],
 ] as const;
 
 const TOTAL_WEIGHT = WEIGHTS.reduce((s, [, w]) => s + w, 0);
@@ -142,6 +148,12 @@ export function towerSurpriseReward(
       return { bonusMeters: 0, bonusScrambles: 0, nextWordHeightMult: UPDRAFT_MULT };
     case 'crystal':
       return { bonusMeters: Math.round(base * 0.4), bonusScrambles: 1, nextWordHeightMult: 1 };
+    case 'echo':
+      return { bonusMeters: Math.round(base * 0.35), bonusScrambles: 0, nextWordHeightMult: 1.25 };
+    case 'meteor_strike':
+      return { bonusMeters: Math.round(base * 0.95), bonusScrambles: 0, nextWordHeightMult: 1 };
+    case 'phantom_floor':
+      return { bonusMeters: Math.round(base * 0.25), bonusScrambles: 1, nextWordHeightMult: 1 };
     case 'golden_floor':
       return { bonusMeters: Math.round(base * 1.6), bonusScrambles: 1, nextWordHeightMult: 1 };
   }
@@ -286,5 +298,8 @@ export const TOWER_SURPRISE_META: Record<
   windfall: { emoji: '🪂', key: 'windfall', sound: 'gift' },
   updraft: { emoji: '🌬️', key: 'updraft', sound: 'timeBonus' },
   crystal: { emoji: '💎', key: 'crystal', sound: 'rare' },
+  echo: { emoji: '🔁', key: 'echo', sound: 'timeBonus' },
+  meteor_strike: { emoji: '☄️', key: 'meteorStrike', sound: 'rare' },
+  phantom_floor: { emoji: '👻', key: 'phantomFloor', sound: 'gift' },
   golden_floor: { emoji: '🌟', key: 'goldenFloor', sound: 'chest' },
 };
