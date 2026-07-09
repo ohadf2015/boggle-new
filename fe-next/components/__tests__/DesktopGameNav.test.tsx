@@ -9,6 +9,7 @@ import { DesktopGameNav } from '@/components/DesktopGameNav';
 let mockIsInGame = false;
 let mockIsOnCG = false;
 let mockIsVeteran = true;
+let mockCanSeeInWorkModes = false;
 let mockPathname = '/en';
 const mockPush = vi.fn();
 
@@ -20,6 +21,9 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, language: 'en' }),
+}));
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ canSeeInWorkModes: mockCanSeeInWorkModes }),
 }));
 vi.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
@@ -34,6 +38,7 @@ describe('DesktopGameNav practice gate', () => {
     mockIsInGame = false;
     mockIsOnCG = false;
     mockIsVeteran = true;
+    mockCanSeeInWorkModes = false;
     mockPathname = '/en';
     mockPush.mockClear();
   });
@@ -82,6 +87,7 @@ describe('DesktopGameNav navigation targets', () => {
     mockIsInGame = false;
     mockIsOnCG = false;
     mockIsVeteran = true;
+    mockCanSeeInWorkModes = false;
     mockPathname = '/en';
     mockPush.mockClear();
   });
@@ -92,11 +98,20 @@ describe('DesktopGameNav navigation targets', () => {
   // immediately throws a redirect failed the client RSC fetch → browser-level
   // "page couldn't load". Point the tab at the canonical destination directly so
   // there is no redirect hop. (Class 3 — asymmetric path through a redirect stub.)
-  it('routes Quick Play straight to the multiplayer quick-play flow (no /singleplayer redirect hop)', () => {
+  it('routes public Quick Play to multiplayer quick-play (no /singleplayer redirect hop)', () => {
+    mockCanSeeInWorkModes = false;
     const { getByText } = render(<DesktopGameNav />);
     fireEvent.click(getByText('nav.singleplayer'));
     expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?quickPlay=true');
     expect(mockPush).not.toHaveBeenCalledWith('/en/singleplayer');
+  });
+
+  it('routes beta/admin Quick Play to the solo wheel hub (/quick-play)', () => {
+    mockCanSeeInWorkModes = true;
+    const { getByText } = render(<DesktopGameNav />);
+    fireEvent.click(getByText('nav.singleplayer'));
+    expect(mockPush).toHaveBeenCalledWith('/en/quick-play');
+    expect(mockPush).not.toHaveBeenCalledWith('/en/multiplayer?quickPlay=true');
   });
 
   it('routes the remaining tabs to their real pages', () => {

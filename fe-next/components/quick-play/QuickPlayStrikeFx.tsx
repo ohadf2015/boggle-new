@@ -94,31 +94,34 @@ export function QuickPlayStrikeFx({
             </feMerge>
           </filter>
         </defs>
+        {/* Outer bloom */}
         <polyline
           points={boltPoints}
           fill="none"
           stroke={hex}
-          strokeWidth={10 * scale}
+          strokeWidth={Math.max(14, 18 * scale)}
           strokeLinecap="round"
           strokeLinejoin="round"
-          opacity={0.35}
+          opacity={0.45}
           filter={`url(#quick-bolt-glow-${mode})`}
         />
+        {/* Colored core */}
         <polyline
           points={boltPoints}
           fill="none"
           stroke={hex}
-          strokeWidth={4.5 * scale}
+          strokeWidth={Math.max(5, 7 * scale)}
           strokeLinecap="round"
           strokeLinejoin="round"
           className={reduceMotion ? undefined : 'quick-bolt-draw'}
           filter={`url(#quick-bolt-glow-${mode})`}
         />
+        {/* Hot white core */}
         <polyline
           points={boltPoints}
           fill="none"
-          stroke="#fff8e7"
-          strokeWidth={1.8 * scale}
+          stroke="#ffffff"
+          strokeWidth={Math.max(2, 2.6 * scale)}
           strokeLinecap="round"
           strokeLinejoin="round"
           className={reduceMotion ? undefined : 'quick-bolt-draw'}
@@ -132,13 +135,13 @@ export function QuickPlayStrikeFx({
           100% { transform: scale(4.2); opacity: 0; }
         }
         @keyframes quick-bolt-draw-kf {
-          from { stroke-dashoffset: 280; }
-          to { stroke-dashoffset: 0; }
+          from { stroke-dashoffset: 320; opacity: 0.2; }
+          to { stroke-dashoffset: 0; opacity: 1; }
         }
         .quick-bolt-draw {
-          stroke-dasharray: 280;
-          stroke-dashoffset: 280;
-          animation: quick-bolt-draw-kf 0.28s ease-out forwards;
+          stroke-dasharray: 320;
+          stroke-dashoffset: 320;
+          animation: quick-bolt-draw-kf 0.35s ease-out forwards;
         }
         @keyframes quick-node-zap-kf {
           0%, 100% { filter: brightness(1.05); }
