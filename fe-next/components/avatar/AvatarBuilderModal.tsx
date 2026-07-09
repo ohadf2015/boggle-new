@@ -13,6 +13,7 @@ import AvatarRenderer from './AvatarRenderer';
 import { getAvatarTier, type Tier } from './AvatarTierEffects';
 import AvatarEquipBurst from './AvatarEquipBurst';
 import GlowUpButton from './GlowUpButton';
+import { LobbyAvatarRewardButton } from './LobbyAvatarRewardButton';
 import { planEquipBurst, type EquipBurst } from '@/lib/avatar/equipBurst';
 import FloatingCoinAnimation from '@/components/game/FloatingCoinAnimation';
 import CategoryOptions from './AvatarBuilderCategoryOptions';
@@ -243,6 +244,15 @@ export default function AvatarBuilderModal({
 
         {/* Admin-only: AI Glow-Up of the built avatar (Track B) */}
         <GlowUpButton previewRef={previewRef} config={config} />
+
+        {/* Optional reward: watch a short ad to unlock a random premium avatar
+            part (1/day). This is where the old lobby "watch ad" CTA now lives —
+            in-context, right where you're browsing parts, and purely opt-in.
+            Self-hides when unavailable (no ad provider / anon / all owned), so
+            the row collapses cleanly. */}
+        <div className="flex justify-center px-3 pb-1 shrink-0 empty:hidden" data-testid="avatar-builder-reward-slot">
+          <LobbyAvatarRewardButton />
+        </div>
 
         {/* Category Tabs — scroll-snap row, icon-only on narrow, icon+label when room */}
         <div className="relative shrink-0">

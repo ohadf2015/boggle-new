@@ -8,7 +8,6 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useSocket } from '../../utils/SocketContext';
 import { useGameActions, useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
 import { useAuth } from '@/contexts/AuthContext';
-import { LobbyAvatarRewardButton } from '@/components/avatar/LobbyAvatarRewardButton';
 import { EmoteTray } from '@/player/components/lobby/EmoteTray';
 import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
 import { useLobbyAdGate } from '@/hooks/useLobbyAdGate';
@@ -209,14 +208,13 @@ function HostPreGameView({
   // the expression lives ON the avatar, the same affordance every player has.
   const { sendEmote, cooldownActive } = useLobbyEmotes({ socket });
 
-  // Self-only lobby actions rendered beneath the roster avatars: an emote picker
-  // (change your avatar's emotion) + the rewarded daily-avatar-part claim. The
-  // avatar-part ad replaces the redundant "+20 gold" lobby ad — an ad that earns
-  // a piece of the avatar, surfaced right where the avatar lives.
+  // Self-only lobby action rendered beneath the roster avatars: an emote picker
+  // that changes your avatar's emotion (server-echoed to the room). The rewarded
+  // daily-avatar-part claim moved OUT of the lobby and INTO the avatar builder —
+  // in-context, opt-in, and no longer competing with the emote for attention.
   const selfRosterActions = (
     <div className="flex flex-col items-center gap-2 pt-1">
       <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />
-      <LobbyAvatarRewardButton />
     </div>
   );
 

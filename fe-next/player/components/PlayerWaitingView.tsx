@@ -8,8 +8,6 @@ import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap } from '
 import Avatar from '../../components/Avatar';
 import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
 import { useAvatarPremium } from '@/hooks/useAvatarPremium';
-import { LobbyRewardCluster } from '@/components/lobby/LobbyRewardCluster';
-import { LobbyDailyEmber } from '@/components/lobby/LobbyDailyEmber';
 import { LobbyAutoStartStatus } from '@/components/lobby/LobbyAutoStartStatus';
 import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
 import RoomChat from '../../components/RoomChat';
@@ -175,6 +173,9 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
               customAvatar={currentAvatar}
               size="2xl"
               className="w-full h-full"
+              // Mirror the player's own lobby emote on the big hero face so a
+              // tapped emote (tray just below) has an obvious, immediate effect.
+              mood={emotesByUsername[username]?.emote}
             />
           </div>
           <div className="absolute inset-0 rounded-full bg-neo-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -262,19 +263,17 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
 
           <LobbyAutoStartStatus readyCount={readyCount} readyTotal={readyTotal} t={t} />
 
-          <LobbyRewardCluster surface="player_waiting" className="mt-3" />
+          {/* Emote picker sits right beside your avatar+name so it reads as
+              "react as ME" — tapping a face swaps the hero avatar above (and
+              your roster tile) for the whole room. Compact: a single trigger
+              that expands the emoji row inline on tap. Was previously buried
+              under the roster, where its link to your own avatar was unclear. */}
+          <div className="mt-3">
+            <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />
+          </div>
         </div>
       </div>
     </m.div>
-  );
-
-  // Ambient daily-challenge awareness. Rendered as a SIBLING of the hero card
-  // (not inside it) because the hero card is `overflow-hidden` — nesting would
-  // clip the tap-popover. Own status only; never navigates out of the room.
-  const renderDailyEmber = (): React.ReactElement => (
-    <div className="px-1" data-testid="lobby-daily-ember-slot">
-      <LobbyDailyEmber />
-    </div>
   );
 
   // ==================== Player Roster ====================
@@ -372,14 +371,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
           </div>
         ))}
       </div>
-
-      {/* Compact emote — one button that expands the emoji row on tap; tapping a
-          face reacts on your own avatar (above) for the whole room. No permanent
-          labelled row. Lives here (not the overflow-hidden hero card) so the
-          expanded row isn't clipped. */}
-      <div className="px-1 pt-1">
-        <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} compact />
-      </div>
     </section>
   );
 
@@ -411,10 +402,13 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   const renderMobileContent = (): React.ReactElement => (
     <div className="flex-1 flex flex-col overflow-hidden px-3 py-2 gap-2 min-h-0">
       <section className="shrink-0">{renderHeroCard()}</section>
-      <div className="shrink-0">{renderDailyEmber()}</div>
       <div className="shrink-0">{renderPlayerRoster()}</div>
       <div className="shrink-0">{renderModeTips()}</div>
-      <section className="flex-1 min-h-0 pb-1">
+      {/* Chat gets the tallest slot in the column: it's the only flex-1 child and
+          carries a min height so it stays comfortably usable even before the
+          fixed sections above collapse. Removing the daily-ember + reward rows
+          freed the vertical space it now claims. */}
+      <section className="flex-1 min-h-[38vh] pb-1">
         {/* overflow-y-auto (not -hidden): on a short screen the chat panel is the
             flex-fill that gets squeezed — its content (e.g. the guest age-gate)
             then scrolls WITHIN the panel instead of being clipped. The page itself
@@ -482,7 +476,6 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
             leftContent={
               <>
                 {renderHeroCard()}
-                {renderDailyEmber()}
                 {renderPlayerRoster()}
                 {renderModeTips()}
               </>
