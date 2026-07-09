@@ -3,7 +3,7 @@
 /**
  * SealedBidTable — single casino play surface for solo sealed-bid.
  * One path: form word → set stake → lock (or pass).
- * Felt + pot + chips + primary CTA; no nested card chrome.
+ * Wood-rail felt + pot + chips + primary CTA.
  */
 
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -11,7 +11,7 @@ import { canLockBid, lockDisabledReason } from '@/lib/sealedBid/sp/lockGate';
 import SealedBidWheel from './SealedBidWheel';
 import OddsBoard from './OddsBoard';
 import ChipTray from './ChipTray';
-import { SEALED_BID_ASSETS } from './sealedBidAssets';
+import SealedBidFeltShell from './SealedBidFeltShell';
 
 export interface SealedBidTableProps {
   letters: string[];
@@ -65,47 +65,28 @@ export default function SealedBidTable({
   return (
     <div
       data-testid="sb-table"
-      className="flex w-full max-w-lg flex-1 flex-col gap-3 min-h-0 mx-auto"
+      className="mx-auto flex w-full max-w-lg min-h-0 flex-1 flex-col gap-3"
     >
-      {/* Felt play zone: wheel + word pot */}
-      <div
-        data-testid="sb-felt"
-        className="relative flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-neo border-3 border-black shadow-hard-lg"
-        style={{
-          backgroundColor: 'oklch(0.22 0.05 160)',
-          backgroundImage: [
-            `url(${SEALED_BID_ASSETS.feltTile})`,
-            'radial-gradient(ellipse at center, oklch(0.34 0.07 155 / 0.55) 0%, oklch(0.16 0.03 250 / 0.85) 100%)',
-          ].join(', '),
-          backgroundSize: '128px 128px, cover',
-          backgroundBlendMode: 'normal, multiply',
-        }}
-      >
-        {/* Soft vignette rim */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 shadow-[inset_0_0_48px_oklch(0.12_0.03_250/0.75)]"
-        />
-
-        {/* Built word / empty prompt — the "pot" label strip */}
-        <div className="relative z-10 w-full px-3 pt-3">
+      <SealedBidFeltShell className="min-h-[min(52dvh,420px)]">
+        {/* Built word / empty prompt */}
+        <div className="w-full px-3 pt-3">
           <div
             data-testid="sb-word-display"
-            className="mx-auto flex min-h-11 max-w-xs items-center justify-center rounded-neo border-2 border-black bg-neo-navy/80 px-3 py-2 text-center shadow-hard-sm"
+            className="mx-auto flex min-h-11 max-w-xs items-center justify-center rounded-neo border-2 border-black bg-black/45 px-3 py-2 text-center shadow-hard-sm backdrop-blur-[1px]"
           >
             {word ? (
-              <span className="font-neo-display text-xl font-black tracking-[0.2em] text-neo-yellow uppercase sm:text-2xl">
+              <span className="font-neo-display text-xl font-black uppercase tracking-[0.2em] text-neo-yellow sm:text-2xl">
                 {word}
               </span>
             ) : (
-              <span className="font-neo-body text-xs font-medium text-neo-cream/70 sm:text-sm">
+              <span className="font-neo-body text-xs font-medium text-white/75 sm:text-sm">
                 {t('sealedBid.tapHint') || t('sealedBid.yourWord')}
               </span>
             )}
           </div>
         </div>
 
-        <div className="relative z-10 flex w-full flex-1 items-center justify-center px-2 py-1 min-h-0">
+        <div className="flex min-h-0 w-full flex-1 items-center justify-center px-2 py-1">
           <SealedBidWheel
             letters={letters}
             onChange={onWordChange}
@@ -117,8 +98,8 @@ export default function SealedBidTable({
           />
         </div>
 
-        {/* Stake pot + odds strip on the felt rim */}
-        <div className="relative z-10 w-full space-y-2 px-3 pb-3">
+        {/* Stake pot + odds on felt rim */}
+        <div className="w-full space-y-2 px-3 pb-3">
           <div
             data-testid="sb-stake-pot"
             className="mx-auto flex max-w-xs items-center justify-center gap-2 rounded-full border-2 border-black bg-neo-yellow px-4 py-1.5 shadow-hard-sm"
@@ -126,7 +107,7 @@ export default function SealedBidTable({
             <span className="font-neo-body text-[10px] font-bold uppercase tracking-wide text-neo-navy/70">
               {t('sealedBid.currentStake')}
             </span>
-            <span className="font-neo-display text-lg font-black text-neo-navy tabular-nums">
+            <span className="font-neo-display text-lg font-black tabular-nums text-neo-navy">
               {stake}
             </span>
             <span className="font-neo-body text-[10px] font-bold uppercase text-neo-navy/70">
@@ -138,9 +119,8 @@ export default function SealedBidTable({
             <OddsBoard word={word} stake={stake} reducedMotion={reducedMotion} compact />
           )}
         </div>
-      </div>
+      </SealedBidFeltShell>
 
-      {/* Chip tray — round casino chips, no balance dupe */}
       <ChipTray
         balance={balance}
         stake={stake}
@@ -152,7 +132,6 @@ export default function SealedBidTable({
         chipStyle
       />
 
-      {/* Action row */}
       <div className="flex shrink-0 flex-col gap-1.5">
         {hintKey && (
           <p

@@ -35,6 +35,8 @@ describe('SealedBidVersus', () => {
 
   it('renders the rack and a disabled lock until a 3+ letter word is built', () => {
     render(<SealedBidVersus socket={null} username="me" />);
+    // Casino felt shell shared with solo
+    expect(screen.getByTestId('sb-versus-felt')).toBeInTheDocument();
     // 7 rack tiles
     expect(screen.getByLabelText('T')).toBeInTheDocument();
     const lock = screen.getByText('sealedBidMp.lock');
