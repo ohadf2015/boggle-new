@@ -5,6 +5,9 @@
  * native completion payload into QuickRoundResult. One onDone, fired once —
  * re-entrancy guarded (lagged input-disable is not a guarantee; see blast
  * double-submit incident).
+ *
+ * All four modes pass hideModeCoach so ModeCoach FTUE never blocks the arcade
+ * loop (returning + first-time players play immediately).
  */
 import { useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
@@ -15,6 +18,11 @@ import { fromWordWheel, fromSurvival, fromSinglePlayer } from './normalizeResult
 const SinglePlayerGame = dynamic(() => import('@/components/singleplayer/SinglePlayerGame'), { ssr: false });
 const DailyWordHuntSurvival = dynamic(() => import('@/components/daily/DailyWordHuntSurvival'), { ssr: false });
 const WordWheelGame = dynamic(() => import('@/components/daily/WordWheelGame'), { ssr: false });
+
+/** Shared stage shell — bounded flex column so boards don't crush into HUD. */
+const STAGE =
+  'relative flex flex-1 flex-col items-center justify-start min-h-0 overflow-y-auto overscroll-contain pt-3 sm:pt-4 pb-bottom-stack w-full';
+
 interface QuickModeAdapterProps {
   config: QuickRoundConfig;
   onDone: (result: QuickRoundResult) => void;
@@ -40,20 +48,15 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
       // Bounded flex-column stage — parity with the Daily Challenge playing
       // wrapper (WordWheelChallenge). WordWheelGame's mobile root is `flex-1`
       // and its wheel cluster uses `[container-type:size]`; both need a
-      // definite-height flex-column ancestor. Rendered bare (the old Quick Game
-      // path) the container-query block-size collapses to ~0 and the board flies
-      // up into the timer/HUD — the crush this route showed under RTL/Hebrew.
-      // `justify-start pt-3` gives clearance from the top HUD, `overflow-y-auto
-      // overscroll-contain` lets it scroll on short viewports instead of
-      // overlapping, and `pb-bottom-stack` keeps the found-words list clear of
-      // the bottom nav/banner. Direction-agnostic: fixes LTR and RTL alike.
+      // definite-height flex-column ancestor.
       return (
-        <div className="relative flex flex-1 flex-col items-center justify-start min-h-0 overflow-y-auto overscroll-contain pt-3 sm:pt-4 pb-bottom-stack">
+        <div className={STAGE} data-testid="quick-stage-wheel-rush">
           <WordWheelGame
             puzzle={config.wheel as never}
             duration={config.durationSec}
             language={config.language as never}
             hideCompetitive
+            hideModeCoach
             onEffect={() => undefined}
             onValidateWord={async (word: string) => wordSet.current!.has(word.toLowerCase())}
             onComplete={(r: { wordsFound: string[]; score: number; timeSeconds: number }) =>
@@ -66,39 +69,49 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
     }
     case 'word-hunt':
       return (
-        <DailyWordHuntSurvival
-          grid={config.grid}
-          puzzleNumber={0}
-          language={config.language as never}
-          targetWord={config.targetWord ?? ''}
-          practice
-          onComplete={(r: { wordsDiscovered: Array<{ word: string }> }) =>
-            finish(fromSurvival(r, config))
-          }
-          onQuit={onQuit}
-        />
+        <div className={STAGE} data-testid="quick-stage-word-hunt">
+          <DailyWordHuntSurvival
+            grid={config.grid}
+            puzzleNumber={0}
+            language={config.language as never}
+            targetWord={config.targetWord ?? ''}
+            practice
+            hideModeCoach
+            onComplete={(r: { wordsDiscovered: Array<{ word: string }> }) =>
+              finish(fromSurvival(r, config))
+            }
+            onQuit={onQuit}
+          />
+        </div>
       );
     case 'blast':
-      return <BlastQuickRound config={config} onDone={finish} onQuit={onQuit} />;
+      return (
+        <div className={STAGE} data-testid="quick-stage-blast">
+          <BlastQuickRound config={config} onDone={finish} onQuit={onQuit} hideModeCoach />
+        </div>
+      );
     case 'classic':
     default:
       return (
-        <SinglePlayerGame
-          settings={{
-            mode: 'challenge',
-            difficulty: 'MEDIUM',
-            language: config.language as never,
-            grid: config.grid as never,
-            timerSeconds: config.durationSec,
-            bots: [], // quick play is bot-free by design
-            minWordLength: 3,
-          }}
-          targetHighScore={config.perfectScore}
-          onGameEnd={(r: { playerScore: number; playerWords: string[] }) =>
-            finish(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config))
-          }
-          onQuit={onQuit}
-        />
+        <div className={STAGE} data-testid="quick-stage-classic">
+          <SinglePlayerGame
+            settings={{
+              mode: 'challenge',
+              difficulty: 'MEDIUM',
+              language: config.language as never,
+              grid: config.grid as never,
+              timerSeconds: config.durationSec,
+              bots: [], // quick play is bot-free by design
+              minWordLength: 3,
+            }}
+            targetHighScore={config.perfectScore}
+            hideModeCoach
+            onGameEnd={(r: { playerScore: number; playerWords: string[] }) =>
+              finish(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config))
+            }
+            onQuit={onQuit}
+          />
+        </div>
       );
   }
 }

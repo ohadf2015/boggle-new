@@ -68,6 +68,11 @@ interface DailyWordHuntSurvivalProps {
   currentGuestFingerprint?: string | null;
   /** Practice mode: suppress life drain + extra-life monetization. */
   practice?: boolean;
+  /**
+   * Suppress ModeCoach FTUE and PracticeCoachTip (Quick Play arcade).
+   * Independent of `practice` so life-drain can stay off without coach UI.
+   */
+  hideModeCoach?: boolean;
 }
 
 /**
@@ -87,6 +92,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   currentPlayerId,
   currentGuestFingerprint,
   practice = false,
+  hideModeCoach = false,
 }) => {
   const { t } = useLanguage();
   const { isDesktop, isTv } = useDesktopLayout();
@@ -423,12 +429,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       <div ref={containerRef} className="relative w-full h-full">
         {pixiOverlay}
         <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
-        {practice && (
+        {practice && !hideModeCoach && (
           <div className="absolute top-2 inset-x-0 z-30 px-3 pointer-events-auto">
             <PracticeCoachTip mode="wordHunt" wordsFound={state.discoveredWords.length} />
           </div>
         )}
-        {!practice && <ModeCoach mode="wordHunt" />}
+        {!practice && !hideModeCoach && <ModeCoach mode="wordHunt" />}
         {/* react-rewards anchor — must exist in DOM for reward confetti to target */}
         <span id={rewardId} className="fixed top-1/2 left-1/2 pointer-events-none" />
         <SurvivalDesktopLayout
@@ -524,12 +530,12 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       <ScreenFlashOverlay trigger={flashTrigger} colorClass={flashColor} />
 
       {/* Practice-mode coaching strip — auto-hides on first discovery. */}
-      {practice && (
+      {practice && !hideModeCoach && (
         <div className="px-1 pt-1 pb-2">
           <PracticeCoachTip mode="wordHunt" wordsFound={state.discoveredWords.length} />
         </div>
       )}
-      {!practice && <ModeCoach mode="wordHunt" />}
+      {!practice && !hideModeCoach && <ModeCoach mode="wordHunt" />}
 
       {/* Top bar */}
       <SurvivalHeader

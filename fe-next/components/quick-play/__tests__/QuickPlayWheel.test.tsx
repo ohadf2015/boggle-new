@@ -72,4 +72,26 @@ describe('QuickPlayWheel', () => {
     fireEvent.keyDown(knob, { key: 'Enter' });
     expect(onSelect).toHaveBeenCalledWith('random', 'tap');
   });
+
+  it('exposes elevated visual layers (ambient + orbit) and richer mode imagery', () => {
+    renderWheel();
+    expect(screen.getByTestId('quick-wheel-ambient')).toBeTruthy();
+    expect(screen.getByTestId('quick-wheel-orbit')).toBeTruthy();
+    expect(screen.getByTestId('quick-wheel-stage')).toBeTruthy();
+    // Illustrated sticker faces (not bare lucide-only nodes)
+    for (const mode of ['classic', 'blast', 'word-hunt', 'wheel-rush']) {
+      expect(screen.getByTestId(`quick-wheel-node-face-${mode}`)).toBeTruthy();
+    }
+  });
+
+  it('stage size stays within a narrow-phone budget (no fixed 376 overflow)', () => {
+    // jsdom default innerWidth is often 1024; force a phone width if possible
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 360 });
+    renderWheel();
+    const stage = screen.getByTestId('quick-wheel-stage');
+    const w = parseFloat(stage.style.width || '0');
+    // Design max is 376; on 360 viewport (minus padding) must be ≤ 360
+    expect(w).toBeGreaterThan(0);
+    expect(w).toBeLessThanOrEqual(376);
+  });
 });

@@ -47,6 +47,11 @@ interface WordWheelGameProps {
   /** Practice mode: suppress countdown timer + show manual "end practice" CTA. */
   practice?: boolean;
   /**
+   * Suppress ModeCoach FTUE and PracticeCoachTip without enabling practice
+   * gameplay changes (timer off, etc.). Used by Quick Play arcade rounds.
+   */
+  hideModeCoach?: boolean;
+  /**
    * Hide all competitive chrome — leaderboard fetch, rival pill, pass toasts,
    * the combo counter, and the game_started funnel event. Lets the practice
    * hub reuse the real wheel gameplay without the live-game social layer.
@@ -88,6 +93,7 @@ interface RivalScore {
 
 const WordWheelGame: React.FC<WordWheelGameProps> = ({
   puzzle, duration, onComplete, onValidateWord, onEffect, language, paused = false, practice = false,
+  hideModeCoach = false,
   hideCompetitive = false, onWordFound, isDesktop = false,
   puzzleDate, currentPlayerId = null, currentGuestFingerprint = null, onExit,
 }) => {
@@ -805,14 +811,14 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
       <WheelRushCelebration celebration={celebration} t={t} prefersReduced={prefersReducedMotion} />
 
       {/* Practice-mode coach — auto-hides on first found word. */}
-      {practice && (
+      {practice && !hideModeCoach && (
         <div className="w-full pb-2">
           <PracticeCoachTip mode="wheelRush" wordsFound={wordsFound.length} />
         </div>
       )}
 
-      {/* Mode coach for non-practice mode. */}
-      {!practice && <ModeCoach mode="wheelRush" />}
+      {/* Mode coach for non-practice mode. Suppressed by hideModeCoach (Quick Play). */}
+      {!practice && !hideModeCoach && <ModeCoach mode="wheelRush" />}
 
       {/* ── Timer & Score Bar ── */}
       <div className="w-full space-y-1.5">

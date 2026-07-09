@@ -258,11 +258,29 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
   }
 
   return (
-    <div className="flex min-h-full flex-col bg-neo-navy pb-8 animate-[fadeInUp_0.2s_ease-out_0s_both]" data-testid="quick-play-hub">
-      <header className="flex items-center justify-between px-5 pt-6">
+    <div
+      className="relative flex min-h-full flex-col overflow-x-hidden bg-neo-navy pb-8 animate-[fadeInUp_0.25s_ease-out_0s_both]"
+      data-testid="quick-play-hub"
+    >
+      {/* Arcade atmosphere — soft color blobs, non-interactive */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        data-testid="quick-hub-atmosphere"
+      >
+        <div className="absolute -left-16 top-24 h-48 w-48 rounded-full bg-neo-lime/10 blur-3xl" />
+        <div className="absolute -right-12 top-40 h-56 w-56 rounded-full bg-neo-pink/10 blur-3xl" />
+        <div className="absolute bottom-24 left-1/3 h-40 w-40 rounded-full bg-neo-purple/10 blur-3xl" />
+      </div>
+
+      <header className="relative z-[1] flex items-center justify-between px-4 pt-5 sm:px-5 sm:pt-6">
         <BackButton onClick={goBack} label={t('common.back')} isDarkMode />
         <div className="text-center">
-          <h1 ref={wheelHeadingRef} tabIndex={-1} className="font-neo-display text-2xl font-bold tracking-wide text-neo-cream outline-none">
+          <h1
+            ref={wheelHeadingRef}
+            tabIndex={-1}
+            className="font-neo-display text-xl font-bold tracking-wide text-neo-cream outline-none drop-shadow-[0_2px_0_rgba(0,0,0,0.45)] sm:text-2xl"
+          >
             {t('quickPlay.solo.title')}
           </h1>
           <span className="inline-block -rotate-2 rounded-lg border-2 border-black bg-neo-yellow px-2 py-0.5 text-[10px] font-bold tracking-[2px] text-black shadow-hard-sm">
@@ -309,7 +327,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
         </div>
       )}
 
-      <div className="flex flex-1 items-center justify-center py-6">
+      <div className="relative z-[1] flex min-h-0 flex-1 items-center justify-center overflow-x-hidden px-1 py-4 sm:py-6">
         {phase === 'loading' ? (
           <div className="font-neo-display text-lg text-neo-cozy" data-testid="quick-play-loading">
             {t('quickPlay.solo.loading')}

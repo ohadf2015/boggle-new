@@ -32,6 +32,11 @@ interface SinglePlayerGameProps {
   targetHighScore: number | null;
   onGameEnd: (results: SinglePlayerResultsData) => void;
   onQuit: () => void;
+  /**
+   * Suppress ModeCoach FTUE (and practice tip). Used by Quick Play arcade loop
+   * so every round starts immediately without coach stacking.
+   */
+  hideModeCoach?: boolean;
 }
 
 /**
@@ -43,6 +48,7 @@ function SinglePlayerGame({
   targetHighScore,
   onGameEnd,
   onQuit,
+  hideModeCoach = false,
 }: SinglePlayerGameProps): React.ReactElement {
   const core = useSinglePlayerCore({
     settings,
@@ -358,15 +364,18 @@ function SinglePlayerGame({
   ) : null;
 
   // In-game coaching strip for practice mode — auto-hides after first word found.
-  const practiceCoachElement = settings.mode === 'practice' ? (
-    <div className="absolute top-2 inset-x-0 z-30 px-3 pointer-events-auto">
-      <PracticeCoachTip mode="classic" wordsFound={core.foundWords.length} />
-    </div>
-  ) : null;
+  // hideModeCoach (Quick Play) suppresses both ModeCoach and practice tip.
+  const practiceCoachElement =
+    settings.mode === 'practice' && !hideModeCoach ? (
+      <div className="absolute top-2 inset-x-0 z-30 px-3 pointer-events-auto">
+        <PracticeCoachTip mode="classic" wordsFound={core.foundWords.length} />
+      </div>
+    ) : null;
 
-  const modeCoachElement = settings.mode !== 'practice' ? (
-    <ModeCoach mode="classic" />
-  ) : null;
+  const modeCoachElement =
+    settings.mode !== 'practice' && !hideModeCoach ? (
+      <ModeCoach mode="classic" />
+    ) : null;
 
   // Landscape layout
   if (core.isLandscape) {

@@ -26,6 +26,8 @@ interface BlastQuickRoundProps {
   config: QuickRoundConfig;
   onDone: (result: QuickRoundResult) => void;
   onQuit: () => void;
+  /** Parity with other quick modes — BlastGame has no ModeCoach; accepted for contract tests. */
+  hideModeCoach?: boolean;
 }
 
 export function BlastQuickRound({ config, onDone, onQuit }: BlastQuickRoundProps) {
