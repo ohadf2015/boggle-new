@@ -38,6 +38,26 @@ const FLAG_BY_LANGUAGE: Record<string, string> = {
     en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸', ru: '🇷🇺',
 };
 
+/**
+ * Replace ${var}, {{var}}, and {var} placeholders with params. Applied at every
+ * `t()` return point — including the fallback branches — so a fallback string
+ * with placeholders never leaks literal "{done}"/"{total}" text just because
+ * the real translation key was missing or not loaded yet.
+ */
+function interpolate(template: string, params: Record<string, string | number>): string {
+    if (Object.keys(params).length === 0) return template;
+    let result = template.replace(/\$\{(\w+)\}/g, (match, key) => (
+        params[key] !== undefined ? String(params[key]) : match
+    ));
+    result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => (
+        params[key] !== undefined ? String(params[key]) : match
+    ));
+    result = result.replace(/\{(\w+)\}/g, (match, key) => (
+        params[key] !== undefined ? String(params[key]) : match
+    ));
+    return result;
+}
+
 const parseLocaleFromPath = (pathname: string): Language | null => {
     if (!pathname) return null;
     const segments = pathname.split('/');
@@ -314,15 +334,15 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
         let current: unknown = translationsRef.current;
 
         if (!current) {
-            // Translations not loaded yet — return fallback or key
-            return fallback || path;
+            // Translations not loaded yet — return fallback or key, still interpolated
+            return interpolate(fallback || path, params);
         }
 
         for (const key of keys) {
             if (typeof current !== 'object' || current === null || !(key in current)) {
                 // Use fallback if provided, otherwise return the path
                 if (fallback) {
-                    return fallback;
+                    return interpolate(fallback, params);
                 }
                 // DO NOT demote to debug. User mandate 2026-05-01: missing keys are real bugs and must page Sentry.
                 logger.warn(`Translation missing for key: ${path} in language: ${language}`);
@@ -334,24 +354,7 @@ export const LanguageProvider = ({ children, initialLanguage, initialTranslation
             current = (current as Record<string, unknown>)[key];
         }
 
-        // Replace template variables like ${varName}, {{varName}}, or {varName} with params
-        if (typeof current === 'string' && Object.keys(params).length > 0) {
-            // First handle ${varName} format
-            let result = current.replace(/\$\{(\w+)\}/g, (match, key) => {
-                return params[key] !== undefined ? String(params[key]) : match;
-            });
-            // Then handle {{varName}} format (i18next-style double braces)
-            result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-                return params[key] !== undefined ? String(params[key]) : match;
-            });
-            // Finally handle {varName} format (single braces)
-            result = result.replace(/\{(\w+)\}/g, (match, key) => {
-                return params[key] !== undefined ? String(params[key]) : match;
-            });
-            return result;
-        }
-
-        return typeof current === 'string' ? current : (fallback || path);
+        return typeof current === 'string' ? interpolate(current, params) : interpolate(fallback || path, params);
     }, [language]);
 
     // Memoize context value — depends on translationsReady (boolean) not currentTranslations (object).
@@ -399,14 +402,13 @@ const createFallbackT = (_lang: Language = 'en') => (
 ): string => {
     // Fallback t() — translations may not be loaded yet, return key or fallback
     const fallback = typeof fallbackOrParams === 'string' ? fallbackOrParams : undefined;
-
-    // Try to use cached translations if available
-    const cached = getCachedTranslation(_lang);
-    if (!cached) return fallback || path;
-
     const params: Record<string, string | number> = typeof fallbackOrParams === 'object' && fallbackOrParams !== null
         ? fallbackOrParams
         : (_paramsWhenFallback || {});
+
+    // Try to use cached translations if available
+    const cached = getCachedTranslation(_lang);
+    if (!cached) return interpolate(fallback || path, params);
 
     try {
         const keys = path.split('.');
@@ -414,27 +416,14 @@ const createFallbackT = (_lang: Language = 'en') => (
 
         for (const key of keys) {
             if (typeof current !== 'object' || current === null || !(key in current)) {
-                return fallback || path;
+                return interpolate(fallback || path, params);
             }
             current = (current as Record<string, unknown>)[key];
         }
 
-        if (typeof current === 'string' && Object.keys(params).length > 0) {
-            let result = current.replace(/\$\{(\w+)\}/g, (match, key) => {
-                return params[key] !== undefined ? String(params[key]) : match;
-            });
-            result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
-                return params[key] !== undefined ? String(params[key]) : match;
-            });
-            result = result.replace(/\{(\w+)\}/g, (match, key) => {
-                return params[key] !== undefined ? String(params[key]) : match;
-            });
-            return result;
-        }
-
-        return typeof current === 'string' ? current : (fallback || path);
+        return typeof current === 'string' ? interpolate(current, params) : interpolate(fallback || path, params);
     } catch {
-        return fallback || path;
+        return interpolate(fallback || path, params);
     }
 };
 

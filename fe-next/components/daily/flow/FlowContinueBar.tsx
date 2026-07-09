@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { m } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { ArrowRight } from 'lucide-react';
@@ -35,7 +35,7 @@ export function FlowContinueBar({ active }: FlowContinueBarProps) {
 
   const [info, setInfo] = useState<{ done: number; total: number; last: boolean } | null>(null);
 
-  useEffect(() => {
+  const refresh = useCallback(() => {
     if (!active) {
       setInfo(null);
       return;
@@ -51,6 +51,18 @@ export function FlowContinueBar({ active }: FlowContinueBarProps) {
     const last = isFlowComplete(session, played) || nextFlowStep(session, played) === null;
     setInfo({ done, total, last });
   }, [active]);
+
+  useEffect(() => {
+    refresh();
+    // The session lives in localStorage — re-read it whenever the tab regains
+    // focus so a change made elsewhere (another tab, a delayed sync) doesn't
+    // leave this bar showing stale progress for the rest of the visit.
+    const onVis = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    document.addEventListener('visibilitychange', onVis);
+    return () => document.removeEventListener('visibilitychange', onVis);
+  }, [refresh]);
 
   if (!info) return null;
 
