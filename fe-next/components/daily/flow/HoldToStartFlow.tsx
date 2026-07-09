@@ -21,6 +21,8 @@ export interface HoldToStartFlowProps {
   label: string;
   /** Sub-hint describing the hold gesture (e.g. "Hold for fast flow"). */
   holdHint: string;
+  /** Sub-hint shown once the hold has visibly started. Falls back to holdHint. */
+  holdingHint?: string;
   /** How long the hold must last to arm the fast flow. */
   holdMs?: number;
   className?: string;
@@ -39,6 +41,7 @@ export function HoldToStartFlow({
   onStart,
   label,
   holdHint,
+  holdingHint = holdHint,
   holdMs = 850,
   className,
 }: HoldToStartFlowProps) {
@@ -232,7 +235,7 @@ export function HoldToStartFlow({
             {label}
           </span>
           <span className="block text-xs font-bold text-neo-black/70">
-            {holding && holdProgress > 0.05 ? holdHint : holdHint}
+            {holding && holdProgress > 0.05 ? holdingHint : holdHint}
           </span>
         </span>
       </button>

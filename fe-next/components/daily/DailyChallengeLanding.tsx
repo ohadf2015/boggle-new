@@ -25,6 +25,7 @@ import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
 import DailyInsightStack from './DailyInsightStack';
 import { HoldToStartFlow } from './flow/HoldToStartFlow';
+import { FlowIntroHint } from './flow/FlowIntroHint';
 import { FlowResumeBanner } from './flow/FlowResumeBanner';
 import { DEFAULT_FLOW_STEPS, readPlayedMap, flowStepHref } from './flow/flowSteps';
 import { startDailyFlow, getDailyFlowSession, nextFlowStep } from '@/utils/dailyChallenge/flow';
@@ -197,8 +198,12 @@ export function DailyChallengeLanding({
             onStart={handleStartFlow}
             label={t('daily.flow.startLabel', 'Play all challenges')}
             holdHint={t('daily.flow.startHint', 'Tap to start · hold for fast flow')}
+            holdingHint={t('daily.flow.holdingHint', 'Keep holding for fast flow…')}
           />
         )
+      )}
+      {!flowInProgress && !(wordHuntPlayed && wordWheelPlayed) && (
+        <FlowIntroHint />
       )}
 
       {/* Score Gauntlet Banner: shown when arriving via a challenge share link */}

@@ -60,4 +60,35 @@ describe('HoldToStartFlow', () => {
     expect(onStart).toHaveBeenCalledTimes(1);
     expect(onStart).toHaveBeenCalledWith(true);
   });
+
+  it('swaps to the holding-state hint once the hold has visibly started', () => {
+    render(
+      <HoldToStartFlow
+        onStart={vi.fn()}
+        label="Start Flow"
+        holdHint="Hold for fast"
+        holdingHint="Keep holding for fast flow"
+        holdMs={800}
+      />,
+    );
+
+    const btn = screen.getByRole('button');
+    expect(screen.getByText('Hold for fast')).toBeInTheDocument();
+
+    fireEvent.pointerDown(btn);
+    act(() => { vi.advanceTimersByTime(100); });
+
+    expect(screen.getByText('Keep holding for fast flow')).toBeInTheDocument();
+    expect(screen.queryByText('Hold for fast')).not.toBeInTheDocument();
+  });
+
+  it('falls back to holdHint when holdingHint is not provided', () => {
+    render(<HoldToStartFlow onStart={vi.fn()} label="Start Flow" holdHint="Hold for fast" holdMs={800} />);
+
+    const btn = screen.getByRole('button');
+    fireEvent.pointerDown(btn);
+    act(() => { vi.advanceTimersByTime(100); });
+
+    expect(screen.getByText('Hold for fast')).toBeInTheDocument();
+  });
 });

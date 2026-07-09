@@ -6060,7 +6060,9 @@ const en = {
     "badge": "DAILY",
     "flow": {
       "startLabel": "Play all challenges",
+      "introHint": "Daily Flow chains today's challenges into one tap-through run — hold the button to skip the breathers.",
       "startHint": "Tap to start · hold for fast flow",
+      "holdingHint": "Keep holding for fast flow…",
       "title": "Daily Flow",
       "readyTitle": "Let's go!",
       "nextTitle": "Nice — keep the flow going",
