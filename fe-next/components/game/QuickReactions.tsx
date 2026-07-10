@@ -19,6 +19,7 @@ export const REACTIONS: Reaction[] = [
   { id: 'dead', emoji: '\u{1F480}', labelKey: 'reactions.dead' },
   { id: 'crown', emoji: '\u{1F451}', labelKey: 'reactions.crown' },
   { id: 'zap', emoji: '\u{2620}\u{FE0F}', labelKey: 'reactions.zap' },
+  { id: 'love', emoji: '\u{2764}\u{FE0F}', labelKey: 'reactions.love' },
 ];
 
 // Fix: zap should be lightning bolt

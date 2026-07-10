@@ -17,6 +17,8 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { biomeForHeight } from '@/lib/wordTower/wordTowerManager';
 import { bankedBombs } from '@/lib/wordTower/versus';
 import { useWordTowerVersus, type VersusSocket } from '@/lib/wordTower/useWordTowerVersus';
+import { useQuickReactions } from '@/hooks/useQuickReactions';
+import { QuickReactions, FloatingReaction } from '@/components/game/QuickReactions';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerVersusRail } from './WordTowerVersusRail';
 
@@ -53,6 +55,11 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
   const canSubmit = tower.word.length >= 3;
   const banked = bankedBombs(you?.bombCharge ?? 0);
 
+  // Quick reactions (fire/clap/.../love) — cheer a rival's climb mid-match.
+  // Reuses the shared lobby/results reaction plumbing (same socket event, no
+  // gameState gate), so no backend changes were needed for this screen.
+  const { floatingReactions, sendReaction, dismissReaction } = useQuickReactions({ socket, username });
+
   // Bomb-hit shake — armed per bombKey, released after the keyframe so the
   // class re-toggles (and thus replays) on every subsequent hit.
   const [bombShake, setBombShake] = useState(false);
@@ -85,6 +92,14 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
         <div key={`bomb-${tower.state.bombKey}`} className="pointer-events-none absolute inset-0 z-20 animate-[fadeInUp_0.5s_ease-out] bg-neo-red/30" aria-hidden />
       )}
 
+      {/* Quick reactions — floating emoji (incl. love ❤️) from either player,
+          drifting up over the whole battlefield. */}
+      <div className="pointer-events-none fixed inset-0 z-40 overflow-hidden" aria-hidden="true" data-testid="wt-versus-reactions-overlay">
+        {floatingReactions.map((r) => (
+          <FloatingReaction key={r.id} id={r.id} emoji={r.emoji} username={r.username} x={r.x} y={r.y} onComplete={dismissReaction} />
+        ))}
+      </div>
+
       {/* Top: timer + rival rail */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 flex items-start justify-between gap-2 p-3">
         <div className="pointer-events-auto flex items-center gap-2">
@@ -95,6 +110,7 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
             <div className="font-neo-display text-2xl font-bold text-neo-white tabular-nums">{Math.round(you.heightM)}<span className="text-sm text-neo-cyan"> m</span></div>
             {secondsLeft !== null && <div className="font-neo-body text-xs font-bold text-neo-orange tabular-nums">{secondsLeft}s</div>}
           </div>
+          <QuickReactions onReaction={sendReaction} layout="bar" />
         </div>
         <div className="w-44 max-w-[45%]">
           <WordTowerVersusRail

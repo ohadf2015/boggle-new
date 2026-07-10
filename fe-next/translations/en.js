@@ -2747,6 +2747,7 @@ const en = {
     "dead": "Dead",
     "crown": "Crown",
     "zap": "Zap",
+    "love": "Love",
     "label": "Quick reactions"
   },
   "chat": {

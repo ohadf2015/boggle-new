@@ -43,6 +43,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
         'reactions.dead': 'Dead',
         'reactions.crown': 'Crown',
         'reactions.zap': 'Zap',
+        'reactions.love': 'Love',
         'reactions.label': 'Quick reactions',
       };
       return translations[key] || key;
@@ -70,7 +71,7 @@ describe('QuickReactions', () => {
     expect(screen.queryByLabelText('Fire')).not.toBeInTheDocument();
   });
 
-  it('should expand to show 6 emoji buttons when trigger is clicked', () => {
+  it('should expand to show 7 emoji buttons when trigger is clicked', () => {
     render(<QuickReactions onReaction={mockOnReaction} />);
     const trigger = screen.getByRole('button', { name: 'Quick reactions' });
     fireEvent.click(trigger);
@@ -78,7 +79,7 @@ describe('QuickReactions', () => {
     const reactionButtons = REACTIONS.map(r =>
       screen.getByLabelText(r.labelKey.replace('reactions.', '').charAt(0).toUpperCase() + r.labelKey.replace('reactions.', '').slice(1))
     );
-    expect(reactionButtons).toHaveLength(6);
+    expect(reactionButtons).toHaveLength(7);
   });
 
   it('should call onReaction and close tray when a reaction is clicked', () => {
@@ -195,12 +196,18 @@ describe('FloatingReaction', () => {
 });
 
 describe('REACTIONS constant', () => {
-  it('should have 6 reactions', () => {
-    expect(REACTIONS).toHaveLength(6);
+  it('should have 7 reactions', () => {
+    expect(REACTIONS).toHaveLength(7);
   });
 
   it('should have expected reaction ids', () => {
     const ids = REACTIONS.map(r => r.id);
-    expect(ids).toEqual(['fire', 'clap', 'wow', 'dead', 'crown', 'zap']);
+    expect(ids).toEqual(['fire', 'clap', 'wow', 'dead', 'crown', 'zap', 'love']);
+  });
+
+  it('the love reaction is a heart', () => {
+    const love = REACTIONS.find(r => r.id === 'love');
+    expect(love?.emoji).toBe('\u{2764}\u{FE0F}');
+    expect(love?.labelKey).toBe('reactions.love');
   });
 });

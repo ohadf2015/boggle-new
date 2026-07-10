@@ -39,10 +39,15 @@ const baseProps = (over: Partial<WordTowerHudProps> = {}): WordTowerHudProps => 
 });
 
 describe('WordTowerHud deck', () => {
-  it('renders the tray tools (scramble + backspace)', () => {
+  it('renders the backspace tool; scramble stays hidden until the player is stuck', () => {
     render(<WordTowerHud {...baseProps()} />);
-    expect(screen.getByLabelText('wordTower.hud.scramble')).toBeTruthy();
     expect(screen.getByLabelText('wordTower.hud.backspace')).toBeTruthy();
+    expect(screen.queryByLabelText('wordTower.hud.scramble')).toBeNull();
+  });
+
+  it('shows the scramble tool once the wheel has zero buildable words', () => {
+    render(<WordTowerHud {...baseProps({ possibleWords: 0 })} />);
+    expect(screen.getByLabelText('wordTower.hud.scramble')).toBeTruthy();
   });
 
   it('keeps the BUILD action OUT of the bottom deck while no word is spelled', () => {

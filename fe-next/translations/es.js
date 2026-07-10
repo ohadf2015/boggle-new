@@ -2526,6 +2526,7 @@ const es = {
     "dead": "Muerto",
     "crown": "Corona",
     "zap": "Rayo",
+    "love": "Amor",
     "label": "Reacciones rápidas"
   },
   "chat": {

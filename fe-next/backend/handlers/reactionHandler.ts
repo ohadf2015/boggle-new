@@ -12,7 +12,7 @@ import { inc } from '../utils/metrics';
 import logger from '../utils/logger';
 import { isSocketMigrating } from './shared';
 
-const VALID_REACTION_IDS = new Set(['fire', 'clap', 'wow', 'dead', 'crown', 'zap']);
+const VALID_REACTION_IDS = new Set(['fire', 'clap', 'wow', 'dead', 'crown', 'zap', 'love']);
 const REACTION_WEIGHT = 1;
 
 interface QuickReactionData {
