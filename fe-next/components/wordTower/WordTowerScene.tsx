@@ -97,6 +97,11 @@ interface SceneProps {
    *  matching offset) it moves the landing target so placing is genuinely harder.
    *  0 = rock-steady, no sway. */
   instability?: number;
+  /** Bumps every time the wrecking-ball mini-game's full-screen overlay closes.
+   *  Snaps the camera back to the build line + flashes, so the player's own
+   *  tower (an easy-to-miss small tile stack) is back in focus immediately —
+   *  not left scrolled wherever the camera happened to be under the overlay. */
+  wreckDoneKey?: number;
 }
 
 /** Shared camera-pan state between the DOM gesture layer and the Pixi layer. */
@@ -163,7 +168,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, locale = 'en', panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, locale = 'en', wreckDoneKey = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   // OUTER container — owns ONLY the vertical translation (climb-follow + user pan).
   const containerRef = useRef<Container | null>(null);
@@ -630,6 +635,16 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clutchSaveKey]);
 
+  // Wrecking-ball overlay closed — a bright cyan flash draws the eye straight
+  // back to the player's own tower (paired with the camera snap-to-build-line
+  // above), so returning from the big full-screen smash never reads as "where
+  // did my tower go".
+  useEffect(() => {
+    if (wreckDoneKey === 0 || reducedMotion) return;
+    engine.flash.flash({ color: 0x00ffff, duration: 0.4, intensity: 0.35 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wreckDoneKey]);
+
   return null;
 }
 
@@ -741,6 +756,18 @@ export function WordTowerScene(props: SceneProps) {
     setPannedDown(false);
     onViewAltChange?.(heightM); // rails snap back to the live top with the camera
   }, [heightM, onViewAltChange, stopMomentum]);
+
+  // Wrecking-ball mini-game closed — pull the camera back to the build line so
+  // the player's own tower (easy to lose track of after the big full-screen
+  // smash overlay) is immediately back in view, regardless of where the
+  // camera happened to be panned when the overlay opened.
+  const wreckDoneKey = props.wreckDoneKey ?? 0;
+  const skipInitialWreckReset = useRef(true);
+  useEffect(() => {
+    if (skipInitialWreckReset.current) { skipInitialWreckReset.current = false; return; }
+    scrollToTop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [wreckDoneKey]);
 
   const config = useMemo(
     () => (size ? { width: size.w, height: size.h, background: 0x000000, backgroundAlpha: 0 } : null),

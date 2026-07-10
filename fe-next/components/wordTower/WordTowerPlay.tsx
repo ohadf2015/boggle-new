@@ -592,6 +592,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     rivals,
     tower.hazard,
   );
+  // Bumped every time the wrecking-ball mini-game finishes and its full-screen
+  // overlay closes — WordTowerScene watches this to snap the camera back to
+  // the build line and flash, so the player's own tower (a small tile stack
+  // easy to lose track of after the big dramatic smash overlay) is the first
+  // thing back in focus, not a blank scroll position.
+  const [wreckDoneKey, setWreckDoneKey] = useState(0);
   const sendWreck = useCallback(
     (rivalId: string, rivalName: string, accuracy: number) => {
       const rival = rivals.find((r) => r.id === rivalId);
@@ -599,6 +605,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       // so the optimistic local rail drop matches what the server will apply.
       const floors = asyncWreckDamageFloors(personalBest, rival?.heightM ?? 0, accuracy);
       sab.sabotage(rivalId, rivalName, floors); // local beat + spend a charge
+      setWreckDoneKey((k) => k + 1);
       if (!daily && rival?.playerId) {
         // The server re-derives heights from the authoritative progress table and
         // re-clamps the damage; we only name the target + report the strike
@@ -904,6 +911,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         toppleKey={tower.state.hazardKey}
         nearMissKey={nearMissKey}
         toppleFloors={tower.state.lastHazard?.removed ?? 1}
+        wreckDoneKey={wreckDoneKey}
         t={t}
         locale={language}
         onViewAltChange={setViewAlt}
