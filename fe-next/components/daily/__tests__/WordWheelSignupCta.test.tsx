@@ -133,6 +133,14 @@ describe('WordWheelSignupCta', () => {
     );
   });
 
+  it('lists the value-exchange benefits (what signing up gets you) on the collapsed card', () => {
+    render(<WordWheelSignupCta {...guestStreak} />);
+    const benefits = screen.getByTestId('wheel-signup-benefits');
+    expect(benefits).toHaveTextContent('wordWheel.signup.benefitStreak');
+    expect(benefits).toHaveTextContent('wordWheel.signup.benefitStats');
+    expect(benefits).toHaveTextContent('wordWheel.signup.benefitBoard');
+  });
+
   it('keeps the generic offer headline when the rank is not worth bragging (deep / unknown)', () => {
     render(<WordWheelSignupCta {...guestStreak} rank={250} totalPlayers={1000} />);
     expect(screen.getByTestId('wheel-signup-cta-button')).toHaveTextContent(

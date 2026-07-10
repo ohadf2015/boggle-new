@@ -1,145 +1,145 @@
 {
-  "generatedAt": "2026-07-06T07:12:06.252Z",
+  "generatedAt": "2026-07-10T09:26:54.166Z",
   "commits": [
     {
-      "sha": "6636b327704001efa3ff556d4fab0f83d7c7e2c6",
-      "shortSha": "6636b32",
-      "subject": "fix(sealed-bid): invalid-word ante + clear showdown outcome labels",
+      "sha": "869a7c4657540510d8b61021290a312baf3be8ba",
+      "shortSha": "869a7c4",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-10",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T09:57:44+03:00"
+      "date": "2026-07-10T04:26:59+03:00"
     },
     {
-      "sha": "8d3e2adb27e5e5bc7088e38af77b46a5fb1c1d94",
-      "shortSha": "8d3e2ad",
-      "subject": "chore(nightly): restore gate-dropped lane code from 2026-07-06 run",
+      "sha": "d80d2d11379f45f22f09e9d1188e1217d3233510",
+      "shortSha": "d80d2d1",
+      "subject": "fix(quick-play): lock in-game layout for all four modes",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T09:40:37+03:00"
+      "date": "2026-07-10T00:45:44+03:00"
     },
     {
-      "sha": "3171ef7738298abd329ba82e37821c876073bed3",
-      "shortSha": "3171ef7",
-      "subject": "feat(landing): move Blast into the calm no-timer room + guard mobile orphan tiles",
+      "sha": "8613eb99d5c0fce29c4c5ccdb0218ad0042414dd",
+      "shortSha": "8613eb9",
+      "subject": "fix(i18n): fill 144 missing RU keys + 3 undefined sealedBid.session keys",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T09:37:50+03:00"
+      "date": "2026-07-10T00:38:41+03:00"
     },
     {
-      "sha": "0a9b8089a8d123e2a8db42dcc8419c56d8e40922",
-      "shortSha": "0a9b808",
-      "subject": "feat(sealed-bid): poker wager overhaul — word wheel, chip betting, showdown, ungate",
-      "author": "Ohad Fisher",
-      "date": "2026-07-06T09:14:39+03:00"
+      "sha": "50a0c22dae5a1f9312c9d87a2bb1a2441e2b3be0",
+      "shortSha": "50a0c22",
+      "subject": "refactor(lobby): declutter waiting room — emote by avatar, ad→builder, drop daily promo (#717)",
+      "author": "ohadf2015",
+      "date": "2026-07-10T00:02:38+03:00"
     },
     {
-      "sha": "8017bce0259fa96bc32238d857e89c2e0e3e9cbd",
-      "shortSha": "8017bce",
-      "subject": "chore(nightly): autonomous improvement loop 2026-07-06",
+      "sha": "80412bdd7a5030ee9339ce9d56ff61030f7bbed0",
+      "shortSha": "80412bd",
+      "subject": "fix(sealed-bid): visible felt table shell for solo + multiplayer",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T04:23:00+03:00"
+      "date": "2026-07-09T23:59:48+03:00"
     },
     {
-      "sha": "fedb27942514bbb7c7de7f3a019ac304a9357225",
-      "shortSha": "fedb279",
-      "subject": "feat(word-tower): overhaul HUD, daily wheel, crane build, pixel tower",
+      "sha": "0516750993944b578ceb56881807107a5d02d180",
+      "shortSha": "0516750",
+      "subject": "fix(quick-play): route beta nav to solo hub; hard-hex lightning",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T02:35:48+03:00"
+      "date": "2026-07-09T23:10:21+03:00"
     },
     {
-      "sha": "76b77e67e05cc4844af40e8578a221d52688ca17",
-      "shortSha": "76b77e6",
-      "subject": "fix(word-craft): surface Challenge-a-Friend invite in-game",
+      "sha": "2ec58559d764df3fd87415cd813dab95b7542968",
+      "shortSha": "2ec5855",
+      "subject": "feat(quick-play): electric strike on mode select + loading hold",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T02:34:37+03:00"
+      "date": "2026-07-09T22:32:24+03:00"
     },
     {
-      "sha": "4c09a2f48c1194075944e3074a4b05e3705ab2e7",
-      "shortSha": "4c09a2f",
-      "subject": "feat(word-tower): real wrecking-ball skill mini-game (Pixi)",
+      "sha": "b99811d4ffeb95d021726e1c8b4276d0dd26ac68",
+      "shortSha": "b99811d",
+      "subject": "fix(singleplayer): satisfy exhaustive-deps for first-word tracking",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T02:27:48+03:00"
+      "date": "2026-07-09T22:00:54+03:00"
     },
     {
-      "sha": "078db4956b15b000410e51699bee5fe291be55d2",
-      "shortSha": "078db49",
-      "subject": "feat(coins): thousands-separator formatting on all coin/currency displays",
+      "sha": "d5f4f5a6b4394bea63b79c016e350f83c73127c0",
+      "shortSha": "d5f4f5a",
+      "subject": "feat(sealed-bid): table layout polish, lock gate, assets, i18n",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T02:23:28+03:00"
+      "date": "2026-07-09T21:50:11+03:00"
     },
     {
-      "sha": "1d0cbbd74b3e55df97b3afe7d82a7c125fd72d6c",
-      "shortSha": "1d0cbbd",
-      "subject": "fix(quests): open quest page from side menu, gate beta modes, cap word length",
+      "sha": "374bc7e3e15d5b08475d459b55e75ef06c87d20f",
+      "shortSha": "374bc7e",
+      "subject": "feat(quick-play): suppress coach, responsive wheel, richer picker",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T01:45:53+03:00"
+      "date": "2026-07-09T21:50:05+03:00"
     },
     {
-      "sha": "a39bd07c5e46c3ce537cb3c0663a932f22a83d65",
-      "shortSha": "a39bd07",
-      "subject": "fix(rtl): flip admin/app-level back arrows, route through DirectionalIcon",
+      "sha": "3c08b5377fbbb95bdecf597b9016deed65570dda",
+      "shortSha": "3c08b53",
+      "subject": "feat(word-tower): feel pass — no mid-run daily toggle, real avatars, smash spectacle",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T01:38:20+03:00"
+      "date": "2026-07-09T21:05:12+03:00"
     },
     {
-      "sha": "cea85284d3b63b5dc3dd8f381fb44b811c8405a9",
-      "shortSha": "cea8528",
-      "subject": "refactor(rtl): clarity polish on DirectionalIcon call sites",
+      "sha": "aca0297b7907b589f8e8ad4b9818a00ad4086bc3",
+      "shortSha": "aca0297",
+      "subject": "feat(word-tower): Tower Bloxx feel + shared play framing",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T01:18:55+03:00"
+      "date": "2026-07-09T17:36:26+03:00"
     },
     {
-      "sha": "3f8b260cf3a71f616fb1ff4665c1c140ff4df975",
-      "shortSha": "3f8b260",
-      "subject": "feat(landing): group calm no-timer modes into a distinct homepage section",
+      "sha": "751c3b6c0b5de0333e533d5b9eda6ce3b3a1e513",
+      "shortSha": "751c3b6",
+      "subject": "fix(i18n): interpolate params on t() fallback paths, fix stale flow progress",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T01:10:01+03:00"
+      "date": "2026-07-09T16:43:35+03:00"
     },
     {
-      "sha": "11d8014b55f0b17f087fe8e191ce0a118144eb44",
-      "shortSha": "11d8014",
-      "subject": "refactor(rtl): add DirectionalIcon component, adopt across back/exit arrows",
+      "sha": "a6507f390b5493ba9ce38bd8f5b70282ad0d37b1",
+      "shortSha": "a6507f3",
+      "subject": "fix(daily): translate Daily Flow to all locales, fix hold-hint bug, add intro copy",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T01:09:13+03:00"
+      "date": "2026-07-09T16:24:47+03:00"
     },
     {
-      "sha": "d5955d128be296447befe5528c6543fffe82628c",
-      "shortSha": "d5955d1",
-      "subject": "feat(mp-lobby): compact emote, collapsible how-to-play, clearer ready states, no-scroll fit",
+      "sha": "ddc3a3b33dcb10120f46c55a67128a8671ac131d",
+      "shortSha": "ddc3a3b",
+      "subject": "test(daily): fix framer-motion mocks broken by useReducedMotion + AnimatePresence additions",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T01:04:23+03:00"
+      "date": "2026-07-09T13:19:54+03:00"
     },
     {
-      "sha": "38d0ad46d116faf81dbd12ba8b2be095a4e06bc9",
-      "shortSha": "38d0ad4",
-      "subject": "fix(rtl): flip in-game back/exit arrows in RTL locales",
+      "sha": "1e69d9a8a4e78f5e2d7fba654c73e90075587e8b",
+      "shortSha": "1e69d9a",
+      "subject": "fix(daily): fix FOUC/token drift + add motion polish to daily challenge flow",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T00:56:53+03:00"
+      "date": "2026-07-09T12:56:27+03:00"
     },
     {
-      "sha": "a79c5b3eb84839cc70690fc555392b3706936c3e",
-      "shortSha": "a79c5b3",
-      "subject": "fix(wordfall): pin tile column to full grid height so cleared columns stay bottom-aligned",
-      "author": "Ohad Fisher",
-      "date": "2026-07-06T00:18:56+03:00"
+      "sha": "c7046dd09afbc7cefb32fc3e287b3186fc1a8dd8",
+      "shortSha": "c7046dd",
+      "subject": "feat(daily): one-tap Daily Flow chaining all daily challenges (#715)",
+      "author": "ohadf2015",
+      "date": "2026-07-09T10:32:47+03:00"
     },
     {
-      "sha": "aff53e96d716446c4c2428957179816f0a45232d",
-      "shortSha": "aff53e9",
-      "subject": "fix(ads): guard AdMob banner listeners against unregistered-plugin thenable rejection",
+      "sha": "6d87ba2f9f7265b606e29130950ad5f03d57c6ed",
+      "shortSha": "6d87ba2",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-09",
       "author": "Ohad Fisher",
-      "date": "2026-07-06T00:04:59+03:00"
+      "date": "2026-07-09T05:21:40+03:00"
     },
     {
-      "sha": "285ab14d306a8f914ff2067e7a892a09a99fecce",
-      "shortSha": "285ab14",
-      "subject": "fix(i18n): remove duplicate quickPlay block dropping es/ja/sv seekingMatch keys",
-      "author": "Ohad Fisher",
-      "date": "2026-07-05T10:01:57+03:00"
+      "sha": "cfba454a7b602b8075f1f220c6d96902f7ad90b2",
+      "shortSha": "cfba454",
+      "subject": "Merge pull request #713 from ohadf2015/claude/daily-hub-state-lock-fix-7i5z37",
+      "author": "Eden Ekdahl",
+      "date": "2026-07-08T11:24:49+02:00"
     },
     {
-      "sha": "eb3551526da44cea8ae9708416241c447b5e1b8f",
-      "shortSha": "eb35515",
-      "subject": "fix(word-wheel): try/catch the Pixi ring draw loop against post-destroy null context",
-      "author": "Ohad Fisher",
-      "date": "2026-07-05T10:01:51+03:00"
+      "sha": "e65ca13bc4e1c098e7ffb9affec8fb10c855f265",
+      "shortSha": "e65ca13",
+      "subject": "Merge pull request #712 from ohadf2015/claude/word-wheel-hebrew-layout-mqfc1l",
+      "author": "Eden Ekdahl",
+      "date": "2026-07-08T11:13:43+02:00"
     }
   ]
 }

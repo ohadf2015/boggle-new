@@ -49,6 +49,9 @@ interface WordWheelResultsProps {
   alreadyPlayed?: boolean;
   /** True when this was a catch-up play (past day) — shows catch-up suggestion. */
   isCatchup?: boolean;
+  /** Practice only: starts a fresh practice wheel (new random puzzle). When
+   *  absent the button is hidden — old callers stay valid. */
+  onPracticeAgain?: () => void;
 }
 
 function getResultTier(score: number): {
@@ -132,7 +135,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   result, puzzleNumber, puzzleDate, language: gameLang, hasPlayedWordHunt,
   currentPlayerId, currentGuestFingerprint,
   isAuthenticated = false, streakDays = 0, isFirstCompletion = false, alreadyPlayed = false,
-  isCatchup = false,
+  isCatchup = false, onPracticeAgain,
 }) => {
   const { t, language } = useLanguage();
   const { submitLeaderboardScore } = useCrazyGames();
@@ -428,6 +431,19 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
         >
+          {/* Primary next action: another wheel, right now. Without this the
+              chain CTA (wheelRush = last mode → hub link) is a dead-end for a
+              player who wants to keep spinning. */}
+          {onPracticeAgain && (
+            <button
+              type="button"
+              data-testid="wheel-practice-again"
+              onClick={onPracticeAgain}
+              className="w-full mb-2 py-3 rounded-neo border-3 border-neo-black bg-neo-purple text-neo-white font-neo-display font-black text-base shadow-hard active:shadow-hard-pressed active:translate-x-[1px] active:translate-y-[1px]"
+            >
+              {t('wordWheel.practice.again')}
+            </button>
+          )}
           <PracticeChainCta currentMode="wheelRush" />
         </m.div>
       )}

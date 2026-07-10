@@ -186,6 +186,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
 
   const { variant: feedbackPosition } = useExperiment('exp-mp-round-feedback-top-v1');
   const { variant: gapNudgeVariant } = useExperiment('exp-mp-score-gap-nudge-v1');
+  const { variant: progressHeaderVariant } = useExperiment('exp-mp-round-progress-header-v1');
 
   useEffect(() => {
     if (isMultiplayer) {
@@ -352,6 +353,17 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
     <div className="space-y-6">
       {/* Win streak now lives inside ImprovementPanel ("Your Progress") below —
           a single home for streak + XP + level avoids showing the streak twice. */}
+
+      {/* exp-mp-round-progress-header-v1: compact series-progress pill above hero */}
+      {progressHeaderVariant === 'progress-header' &&
+        isMultiplayer &&
+        seriesRoundNumber != null &&
+        seriesTotalGames != null &&
+        seriesRoundNumber < seriesTotalGames && (
+          <div className="text-center text-xs font-neo-body font-semibold text-neo-white/70 bg-neo-navy-light border border-neo-white/20 rounded-neo px-3 py-1.5 tracking-wide">
+            {t('results.series.gameXofY', { current: seriesRoundNumber, total: seriesTotalGames })}
+          </div>
+        )}
 
       {/* exp-mp-round-feedback-top-v1: top-prompt shows feedback above the fold */}
       {feedbackPosition === 'top-prompt' && (

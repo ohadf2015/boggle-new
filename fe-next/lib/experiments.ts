@@ -655,6 +655,25 @@ export const EXPERIMENTS = {
     description:
       'Connections hint fallback after 3 wrong attempts. after-3-wrong = hint button surfaces after 3+ wrong attempts even without ad eligibility (free hint). Targets rage-click #1 surface connections/play. Conversion = game_completed (connections). Guardrail = connections_hint_used must rise.',
   }),
+
+  /**
+   * MP between-round progress header. Baseline: mp_round sentiment avg 1.5/3
+   * (game_feedback, 2026-07-10). Hypothesis: players feel disoriented because
+   * round progress context (SeriesStandingsBanner) sits mid-page — below the
+   * fold on mobile. Surfacing a compact "Game X of Y" pill at the TOP of mp
+   * results before the hero section helps players orient → improves sentiment.
+   *
+   * Wire: ResultsMainContent — pill shown when variant='progress-header' +
+   *   isMultiplayer + seriesRoundNumber != null + not the final round.
+   * Primary metric: game_feedback avg rating on mp_round (surface='mp_round').
+   * Guardrail: mp_results_exit_clicked must not rise.
+   */
+  'exp-mp-round-progress-header-v1': defineExperiment({
+    variants: ['control', 'progress-header'] as const,
+    default: 'control',
+    description:
+      'MP between-round progress header. progress-header = compact series-progress pill at top of mp results (above hero). Targets mp_round sentiment (baseline 1.5/3 avg). Conversion = game_feedback avg rating on mp_round. Guardrail = mp_results_exit_clicked stable.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

@@ -237,7 +237,14 @@ export type GrowthEvent =
   //   mp_results_challenge_cta: player tapped the explicit "Challenge a friend" CTA
   //     on the MP results brag card (opens UnifiedShareModal in challenge mode).
   //     Props: { surface: 'mp_results' }.
-  | 'mp_results_challenge_cta';
+  | 'mp_results_challenge_cta'
+  // exp-mp-round-progress-header-v1 instrumentation.
+  //   mp_round_gap_nudge_seen: gap-nudge pill rendered in mp results.
+  //     Props: { gap: number, language }. Measures nudge exposure rate.
+  //   mp_round_progress_header_shown: progress-header pill rendered.
+  //     Props: { roundNumber: number, totalRounds: number }. Experiment impression.
+  | 'mp_round_gap_nudge_seen'
+  | 'mp_round_progress_header_shown';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

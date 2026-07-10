@@ -6543,7 +6543,13 @@ const es = {
       "rankTopTenTitle": "¡Estás en el top {rank} de hoy! Reclama tu lugar",
       "firstTitle": "Guarda tu primer resultado",
       "subtitle": "Regístrate gratis — juega en cualquier dispositivo",
-      "cta": "Regístrate gratis"
+      "cta": "Regístrate gratis",
+      "benefitStreak": "Tu racha, a salvo en todos tus dispositivos",
+      "benefitStats": "Estadísticas y récords personales",
+      "benefitBoard": "Tu nombre en la clasificación diaria"
+    },
+    "practice": {
+      "again": "Gira otra rueda"
     },
     "replay": {
       "title": "Juega ruedas de práctica ilimitadas",
@@ -13910,6 +13916,18 @@ const es = {
       "error": {
         "insufficientGems": "Gemas insuficientes para esa habilidad.",
         "cannotTransmute": "Necesitas 3 de la misma rareza para combinar."
+      },
+      "dice": {
+        "title": "Tu tirada de bono",
+        "subtitle": "Las palabras con esta familia de letras puntúan ×3",
+        "skip": "Jugar sin bono",
+        "active": "{{family}} ×3",
+        "families": {
+          "vowels": "Explosión vocal",
+          "common": "Toque común",
+          "rare": "Hallazgo raro",
+          "power": "Letras de poder"
+        }
       }
     }
   },

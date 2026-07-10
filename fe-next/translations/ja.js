@@ -368,7 +368,7 @@ const ja = {
     "landmark": { "skyscraper": "超高層ビルの上", "cloudBase": "雲の底", "mountainTop": "山頂", "jetStream": "ジェット気流", "stormTops": "雷雲の頂", "weatherBalloon": "気象観測気球", "earthCurve": "地球の弧", "karman": "宇宙の境界", "meteorBelt": "流星帯", "aurora": "オーロラ", "deepSpace": "深宇宙" },
     "hazard": { "bomb": "爆弾", "hurricane": "ハリケーン", "wobble": "ぐらつき", "sabotage": "妨害", "lost": "{kind}！{n}階崩落" },
     "clutch": { "save": "ギリギリセーフ！", "critical": "ぐらぐら — きれいに着地！" },
-    "surprise": { "nextWord": "次の単語", "surge": "サージ！", "windfall": "棚ぼた！", "updraft": "上昇気流！次の単語が強化", "crystal": "クリスタル発見！", "echo": "エコーブースト！", "meteorStrike": "メテオストライク！", "phantomFloor": "ファントムフロア！", "goldenFloor": "黄金の階！" },
+    "surprise": { "nextWord": "次の単語", "surge": "サージ！", "windfall": "棚ぼた！", "updraft": "上昇気流！次の単語が強化", "crystal": "クリスタル発見！", "goldenFloor": "黄金の階！" },
     "daily": { "badge": "デイリー · {date}", "streak": "{n}日連続", "toDaily": "デイリー", "toEndless": "エンドレス", "newBest": "デイリー自己ベスト更新！", "questTitle": "ワードタワー", "questDesc": "言葉を高く積み上げよう — 今日はみんな同じ文字。" },
     "perk": { "title": "ボーナスを選ぶ", "subtitle": "1つ選択 — この登攀の間ずっと有効", "skip": "今回はスキップ", "masterCrane": { "name": "マスタークレーン", "desc": "パーフェクト時の報酬アップ" }, "tallTimber": { "name": "ノッポ材木", "desc": "全階の高さ+12%" }, "featherfall": { "name": "フェザーフォール", "desc": "崩落で失う階が1つ減る" }, "reinforced": { "name": "補強済み", "desc": "崖っぷちまでの猶予が増える" }, "cushion": { "name": "安全クッション", "desc": "クレーンのぐらつきで階が落ちない" } },
     "runPerk": { "hotStreak": { "a11y": "ホットストリーク：残り{n}ドロップ" } },
@@ -6175,29 +6175,6 @@ const ja = {
       "feature3": "グローバルランキング"
     },
     "badge": "デイリーチャレンジ",
-    "flow": {
-      "startLabel": "全チャレンジに挑戦",
-      "introHint": "デイリーフローは今日のチャレンジを1本の流れでつなげてくれるよ。ボタンを長押しすれば休憩をスキップできる。",
-      "startHint": "タップで開始・長押しで一気に",
-      "holdingHint": "そのまま長押しでスピード進行…",
-      "title": "デイリーフロー",
-      "readyTitle": "よし、いくぞ!",
-      "nextTitle": "ナイス、その調子で!",
-      "progress": "{total}個中{done}個クリア",
-      "nextUp": "次はこれ",
-      "startCta": "スタート",
-      "continueCta": "続ける",
-      "autoAdvance": "{n}秒後に自動で次へ・タップで一旦停止",
-      "takeBreak": "休憩してもOK・いつでも再開できるよ",
-      "barNext": "次のチャレンジへ",
-      "barFinish": "フローを完了する",
-      "resumeTitle": "フローを再開",
-      "resumeSubtitle": "{done}/{total}クリア・次は{mode}",
-      "resumeCta": "再開する",
-      "doneTitle": "フロー完了!",
-      "doneSubtitle": "デイリーチャレンジを全部クリアしたよ。明日また新しいセットが待ってる。",
-      "doneCta": "デイリーハブに戻る"
-    },
     "puzzleNumber": "デイリー #{number}",
     "playButton": "今日のパズルをプレイ",
     "loadingWordHunt": "ワードハント読込中...",
@@ -6565,7 +6542,13 @@ const ja = {
       "rankTopTenTitle": "今日はトップ{rank}！順位を確保しよう",
       "firstTitle": "最初の結果を保存しよう",
       "subtitle": "無料登録 — どの端末でもプレイ",
-      "cta": "無料で登録"
+      "cta": "無料で登録",
+      "benefitStreak": "連続記録をどの端末でも保存",
+      "benefitStats": "成績とベストスコアを記録",
+      "benefitBoard": "デイリーランキングに名前が載る"
+    },
+    "practice": {
+      "again": "もう一度まわす"
     },
     "replay": {
       "title": "練習ホイールを無制限にプレイ",
@@ -13759,6 +13742,18 @@ const ja = {
       "error": {
         "insufficientGems": "アビリティ用のジェムが足りません。",
         "cannotTransmute": "合成には同レアリティが3つ必要です。"
+      },
+      "dice": {
+        "title": "ボーナスロール",
+        "subtitle": "この文字グループを含む単語は×3スコア",
+        "skip": "ボーナスなしでプレイ",
+        "active": "{{family}} ×3",
+        "families": {
+          "vowels": "母音サージ",
+          "common": "コモンタッチ",
+          "rare": "レアファインド",
+          "power": "パワーレター"
+        }
       }
     }
   },
@@ -14241,19 +14236,6 @@ const ja = {
     }
   },
   "sealedBid": {
-    "title": "封印入札",
-    "badge": "封印入札",
-    "roundLabel": "{n}/{total} ラウンド",
-    "chipStack": "{chips}",
-    "lockIn": "入札確定",
-    "youWin": "勝ち！",
-    "youLose": "バッティング",
-    "draw": "パス",
-    "tapHint": "文字をタップして単語を作る",
-    "yourWord": "あなたの単語",
-    "needWord": "3文字以上の単語を作って",
-    "needStake": "まずチップを賭ける",
-    "botRival": "ライバル {n}",
     "allIn": "全て投入",
     "clear": "クリア",
     "currentStake": "現在の賭け金",
@@ -14286,10 +14268,15 @@ const ja = {
       "uniqueLabel": "ユニーク",
       "clashLabel": "クラッシュ",
       "passLabel": "パス",
-      "shareCta": "スコアをシェア",
-      "cashOut": "換金",
-      "chips": "チップ",
-      "coins": "コイン"
+      "shareCta": "スコアをシェア"
+    }
+  },
+  "supporter": {
+    "card": {
+      "title": "LexiClashを楽しんでいますか？",
+      "body": "LexiClashを無料・広告なしで維持するためにご支援ください。サポータープランは近日公開予定です。",
+      "cta": "興味があります",
+      "thanks": "リストに追加しました！サポータープランが開始されたらお知らせします。"
     }
   }
 };

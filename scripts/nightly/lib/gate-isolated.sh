@@ -401,14 +401,23 @@ nightly_parse_test_failures() {
 # stops zero-code nights. So: an Unhandled REJECTION always blocks; an Unhandled ERROR blocks
 # ONLY when it is not a worker-OOM/crash. OOM-only inconclusiveness is handled elsewhere via
 # the rc=3 timeout routing, not here. Returns 1 (false) on empty/missing output.
+#
+# 2026-07-10 recurring-nightly-drop incident: an enumerated list of exact worker-crash
+# messages (`Worker terminated`/`ERR_WORKER_OUT_OF_MEMORY`/`Failed to start … worker`) missed
+# two other vitest-pool-internal phrasings — `Worker forks emitted error.` and
+# `Failed to terminate forks worker …` — which fired this guard on 4+ consecutive nights
+# and salvaged every lane's real, working code to docs-only. Every one of these variants is
+# namespaced under vitest's own `[vitest-pool]:` / `[vitest-pool-runner]:` prefix (vitest's
+# worker-process lifecycle logging), so match the NAMESPACE rather than enumerating each
+# message vitest happens to print — any future worker-lifecycle wording is covered for free.
 nightly_gate_has_unattributed_failures() {
   local out="$1"
   [ -n "$out" ] && [ -s "$out" ] || return 1
   # A rejected promise (e.g. a mock missing an export) — always a code-level hidden failure.
   LC_ALL=C grep -qaE 'Unhandled Rejection' "$out" 2>/dev/null && return 0
-  # An unhandled error that is NOT a vitest worker OOM/startup crash is also code-level.
+  # An unhandled error that is NOT a vitest worker-pool lifecycle crash is also code-level.
   if LC_ALL=C grep -qaE 'Unhandled Error' "$out" 2>/dev/null; then
-    LC_ALL=C grep -qaE 'ERR_WORKER_OUT_OF_MEMORY|Worker terminated|Failed to start [^[:space:]]* worker' "$out" 2>/dev/null || return 0
+    LC_ALL=C grep -qaE '\[vitest-pool(-runner)?\]:' "$out" 2>/dev/null || return 0
   fi
   return 1
 }

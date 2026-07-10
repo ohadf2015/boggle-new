@@ -204,6 +204,7 @@ export function PageClient() {
 
       {!hasTeacherAccess && (
         <>
+          <DistrictUpsellStrip />
           <section className="mx-auto max-w-3xl px-4 py-12 sm:py-16">
             <h2 className="text-3xl font-neo-display font-black text-neo-white">
               {t('education.landing.trust.title')}
@@ -225,7 +226,6 @@ export function PageClient() {
           </section>
 
           <EducationFAQ />
-          <DistrictUpsellStrip />
         </>
       )}
 

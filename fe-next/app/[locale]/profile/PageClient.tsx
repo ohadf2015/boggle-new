@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { SupporterInterestCard } from '@/components/monetization/SupporterInterestCard';
 import { useAuth } from '@/contexts/AuthContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 
@@ -501,6 +502,7 @@ export default function ProfilePageClient(): React.JSX.Element {
             </m.div>
           )}
 
+          <SupporterInterestCard />
           <ProfileBackButtons activeGameSession={activeGameSession} isDarkMode={isDarkMode} />
         </div>
 

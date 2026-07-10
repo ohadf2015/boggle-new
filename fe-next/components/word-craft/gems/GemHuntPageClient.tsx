@@ -30,6 +30,14 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
 import type { SoundEffectKey } from '@/lib/audio/soundEffectsConfig';
 
+const LETTER_FAMILIES = [
+  { id: 'vowels', letters: new Set(['A', 'E', 'I', 'O', 'U']), multiplier: 3 },
+  { id: 'common', letters: new Set(['R', 'S', 'T', 'L', 'N']), multiplier: 3 },
+  { id: 'rare',   letters: new Set(['J', 'K', 'Q', 'X', 'Z']), multiplier: 3 },
+  { id: 'power',  letters: new Set(['B', 'C', 'D', 'F', 'G']), multiplier: 3 },
+];
+type DiceFamily = { id: string; letters: Set<string>; multiplier: number };
+
 export default function GemHuntPageClient() {
   const router = useRouter();
   const { t, language } = useLanguage();
@@ -59,7 +67,21 @@ export default function GemHuntPageClient() {
     return fromUrl ? Number(fromUrl) : Math.floor(Math.random() * 1_000_000);
   });
 
-  const hunt = useGemHunt({ seed, dict, locale, boardSize: 11 });
+  const [sessionDice, setSessionDice] = useState<DiceFamily | 'none' | null>(null);
+
+  const diceOptions = useMemo(() => {
+    const offset = seed % LETTER_FAMILIES.length;
+    return [0, 1, 2].map((i) => LETTER_FAMILIES[(offset + i) % LETTER_FAMILIES.length]);
+  }, [seed]);
+
+  const scoreBonusForHunt = useMemo(
+    () => sessionDice && sessionDice !== 'none'
+      ? { letters: sessionDice.letters, multiplier: sessionDice.multiplier }
+      : null,
+    [sessionDice],
+  );
+
+  const hunt = useGemHunt({ seed, dict, locale, boardSize: 11, scoreBonus: scoreBonusForHunt });
   const { state } = hunt;
   const { cosyMode } = useAccessibility();
 
@@ -270,6 +292,9 @@ export default function GemHuntPageClient() {
           totalScore={state.totalScore}
           tilesRemaining={tilesRemaining}
           turnIndex={state.turnIndex}
+          diceBonusLabel={sessionDice && sessionDice !== 'none'
+            ? t('wordcraft.gems.dice.active', { family: t(`wordcraft.gems.dice.families.${sessionDice.id}`) })
+            : null}
           labels={{
             crownsWon: t('wordcraft.gems.hud.crownsWon'),
             score: t('wordcraft.gems.hud.score'),
@@ -355,6 +380,56 @@ export default function GemHuntPageClient() {
           </button>
         </div>
       </main>
+
+      {sessionDice === null && state.turnIndex === 0 && state.outcome === null && dict ? (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center gap-4 bg-neo-navy/95 px-4 py-6">
+          <div className="text-center">
+            <h2 className="font-neo-display text-xl font-black uppercase tracking-widest text-neo-white">
+              {t('wordcraft.gems.dice.title')}
+            </h2>
+            <p className="mt-1 text-xs text-neo-white/70">{t('wordcraft.gems.dice.subtitle')}</p>
+          </div>
+          <div className="grid grid-cols-3 gap-3 w-full max-w-xs">
+            {diceOptions.map((fam, idx) => (
+              <button
+                key={fam.id}
+                type="button"
+                onClick={() => setSessionDice(fam)}
+                className={cn(
+                  'flex flex-col items-center gap-1.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-2 py-3 shadow-hard',
+                  'active:translate-y-0.5 active:shadow-hard-pressed',
+                  idx === 0 && '-rotate-2',
+                  idx === 2 && 'rotate-1',
+                )}
+              >
+                <div className="flex flex-wrap justify-center gap-0.5">
+                  {[...fam.letters].slice(0, 4).map((letter) => (
+                    <span
+                      key={letter}
+                      className="inline-flex h-5 w-5 items-center justify-center rounded border border-black bg-neo-yellow font-neo-display text-[10px] font-black text-neo-navy shadow-hard-sm"
+                    >
+                      {letter}
+                    </span>
+                  ))}
+                </div>
+                <span className="font-neo-display text-[10px] font-black uppercase tracking-wider text-neo-white">
+                  {t(`wordcraft.gems.dice.families.${fam.id}`)}
+                </span>
+                <span className="rounded-neo border border-black bg-neo-purple px-1.5 py-0.5 font-neo-display text-xs font-black text-neo-white shadow-hard-sm">
+                  ×{fam.multiplier}
+                </span>
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => setSessionDice('none')}
+            className="text-xs text-neo-white/50 underline underline-offset-2"
+          >
+            {t('wordcraft.gems.dice.skip')}
+          </button>
+        </div>
+      ) : null}
 
       {errorMessage ? (
         <div

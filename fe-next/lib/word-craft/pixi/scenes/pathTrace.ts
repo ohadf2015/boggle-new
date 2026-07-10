@@ -32,6 +32,7 @@ export function playPathTrace(ctx: SceneCtx, input: PathTraceInput): Promise<voi
     const line = new Graphics();
     ctx.eventLayer.addChild(line);
     const draw = (t: number) => {
+      if (line.destroyed) return; // GSAP onUpdate can fire after Pixi context is nulled (Sentry 1PV)
       line.clear();
       line.moveTo(centers[0].x, centers[0].y);
       const totalSegs = centers.length - 1;

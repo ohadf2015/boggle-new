@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 5871,
+    "totalKeysInCode": 5859,
     "keyCountByLanguage": {
-      "en": 11670,
-      "es": 11758,
-      "he": 11753,
-      "ja": 11734,
-      "ru": 11688,
-      "sv": 11733
+      "en": 11646,
+      "es": 11770,
+      "he": 11729,
+      "ja": 11710,
+      "ru": 11692,
+      "sv": 11709
     },
-    "missingFromEnglish": 0,
+    "missingFromEnglish": 11,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 23,
@@ -379,7 +379,107 @@
     "ru": [],
     "sv": []
   },
-  "missingFromEnglish": [],
+  "missingFromEnglish": [
+    {
+      "key": "sealedBid.botRival",
+      "usages": [
+        {
+          "file": "app/[locale]/sealed-bid/page.tsx",
+          "line": 280
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.chipStack",
+      "usages": [
+        {
+          "file": "app/[locale]/sealed-bid/page.tsx",
+          "line": 229
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.draw",
+      "usages": [
+        {
+          "file": "components/sealedBid/Showdown.tsx",
+          "line": 38
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.roundLabel",
+      "usages": [
+        {
+          "file": "app/[locale]/sealed-bid/page.tsx",
+          "line": 211
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.session.cashOut",
+      "usages": [
+        {
+          "file": "components/sealedBid/SealedBidSessionSummary.tsx",
+          "line": 98
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.session.chips",
+      "usages": [
+        {
+          "file": "components/sealedBid/SealedBidSessionSummary.tsx",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.session.coins",
+      "usages": [
+        {
+          "file": "components/sealedBid/SealedBidSessionSummary.tsx",
+          "line": 100
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.tapHint",
+      "usages": [
+        {
+          "file": "components/sealedBid/SealedBidTable.tsx",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.youLose",
+      "usages": [
+        {
+          "file": "components/sealedBid/Showdown.tsx",
+          "line": 37
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.yourWord",
+      "usages": [
+        {
+          "file": "components/sealedBid/SealedBidTable.tsx",
+          "line": 83
+        }
+      ]
+    },
+    {
+      "key": "sealedBid.youWin",
+      "usages": [
+        {
+          "file": "components/sealedBid/Showdown.tsx",
+          "line": 35
+        }
+      ]
+    }
+  ],
   "missingByLanguage": {
     "es": [
       "sealedBidLegacy.chipStack",
@@ -637,7 +737,11 @@
       "vs.wordFormation",
       "vs.fiveLanguages",
       "vs.charitableDonation",
-      "vs.bestFor"
+      "vs.bestFor",
+      "supporter.card.title",
+      "supporter.card.body",
+      "supporter.card.cta",
+      "supporter.card.thanks"
     ],
     "he": [
       "sealedBidLegacy.chipStack",
@@ -1070,7 +1174,20 @@
       "vs.charitableDonation",
       "vs.bestFor"
     ],
-    "ru": [],
+    "ru": [
+      "wordcraft.gems.dice.title",
+      "wordcraft.gems.dice.subtitle",
+      "wordcraft.gems.dice.skip",
+      "wordcraft.gems.dice.active",
+      "wordcraft.gems.dice.families.vowels",
+      "wordcraft.gems.dice.families.common",
+      "wordcraft.gems.dice.families.rare",
+      "wordcraft.gems.dice.families.power",
+      "supporter.card.title",
+      "supporter.card.body",
+      "supporter.card.cta",
+      "supporter.card.thanks"
+    ],
     "sv": [
       "sealedBidLegacy.chipStack",
       "sealedBidLegacy.gameOver",
@@ -1336,6 +1453,9 @@
   },
   "keysNotInEnglish": {
     "es": [
+      "wordTower.surprise.echo",
+      "wordTower.surprise.meteorStrike",
+      "wordTower.surprise.phantomFloor",
       "hostView.progressAnnouncement",
       "playerView.loadFailed",
       "howToPlay.steps.mpResults.boardCleared",
@@ -1433,6 +1553,27 @@
       "practice.wheelRush.submit",
       "practice.wheelRush.tooShort",
       "practice.wheelRush.foundWordsLabel",
+      "daily.flow.startLabel",
+      "daily.flow.introHint",
+      "daily.flow.startHint",
+      "daily.flow.holdingHint",
+      "daily.flow.title",
+      "daily.flow.readyTitle",
+      "daily.flow.nextTitle",
+      "daily.flow.progress",
+      "daily.flow.nextUp",
+      "daily.flow.startCta",
+      "daily.flow.continueCta",
+      "daily.flow.autoAdvance",
+      "daily.flow.takeBreak",
+      "daily.flow.barNext",
+      "daily.flow.barFinish",
+      "daily.flow.resumeTitle",
+      "daily.flow.resumeSubtitle",
+      "daily.flow.resumeCta",
+      "daily.flow.doneTitle",
+      "daily.flow.doneSubtitle",
+      "daily.flow.doneCta",
       "wordHunt.survival.mpResults.boardCleared",
       "wordHunt.score.mpResults.boardCleared",
       "admin.welcome",
@@ -1679,7 +1820,23 @@
       "reengagement.bonusRewards",
       "reengagement.coins",
       "reengagement.streakFreeze",
-      "reengagement.premiumDays"
+      "reengagement.premiumDays",
+      "sealedBid.title",
+      "sealedBid.badge",
+      "sealedBid.roundLabel",
+      "sealedBid.chipStack",
+      "sealedBid.lockIn",
+      "sealedBid.youWin",
+      "sealedBid.youLose",
+      "sealedBid.draw",
+      "sealedBid.tapHint",
+      "sealedBid.yourWord",
+      "sealedBid.needWord",
+      "sealedBid.needStake",
+      "sealedBid.botRival",
+      "sealedBid.session.cashOut",
+      "sealedBid.session.chips",
+      "sealedBid.session.coins"
     ],
     "he": [
       "leadChange.tookTheLeadVerb",
@@ -2260,12 +2417,41 @@
       "wordForge.perfectCraft"
     ],
     "ru": [
+      "wordTower.surprise.echo",
+      "wordTower.surprise.meteorStrike",
+      "wordTower.surprise.phantomFloor",
+      "daily.flow.startLabel",
+      "daily.flow.introHint",
+      "daily.flow.startHint",
+      "daily.flow.holdingHint",
+      "daily.flow.title",
+      "daily.flow.readyTitle",
+      "daily.flow.nextTitle",
+      "daily.flow.progress",
+      "daily.flow.nextUp",
+      "daily.flow.startCta",
+      "daily.flow.continueCta",
+      "daily.flow.autoAdvance",
+      "daily.flow.takeBreak",
+      "daily.flow.barNext",
+      "daily.flow.barFinish",
+      "daily.flow.resumeTitle",
+      "daily.flow.resumeSubtitle",
+      "daily.flow.resumeCta",
+      "daily.flow.doneTitle",
+      "daily.flow.doneSubtitle",
+      "daily.flow.doneCta",
+      "sealedBid.badge",
+      "sealedBid.title",
       "sealedBid.instructions",
+      "sealedBid.roundLabel",
       "sealedBid.totalScore",
       "sealedBid.timerLabel",
       "sealedBid.sealPhase",
+      "sealedBid.tapHint",
       "sealedBid.backspace",
       "sealedBid.revealPhase",
+      "sealedBid.lockIn",
       "sealedBid.skip",
       "sealedBid.youPicked",
       "sealedBid.botPicked",
@@ -2276,8 +2462,19 @@
       "sealedBid.nextRound",
       "sealedBid.finalScore",
       "sealedBid.adminOnly",
+      "sealedBid.session.cashOut",
+      "sealedBid.session.chips",
+      "sealedBid.session.coins",
       "sealedBid.err.notInRack",
-      "sealedBid.err.notWord"
+      "sealedBid.err.notWord",
+      "sealedBid.chipStack",
+      "sealedBid.youWin",
+      "sealedBid.youLose",
+      "sealedBid.draw",
+      "sealedBid.yourWord",
+      "sealedBid.needWord",
+      "sealedBid.needStake",
+      "sealedBid.botRival"
     ],
     "sv": [
       "leadChange.tookTheLeadVerb",

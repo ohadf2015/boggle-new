@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return {
     title: c.metaTitle,
     description: c.metaDescription,
-    keywords: 'esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners',
+    keywords: 'esl word games online, esl word games free, free esl games online, esl vocabulary games, english word games for esl students, free esl games for english learners, efl word games, esl spelling games, vocabulary games for english learners, juegos en ingles, juegos de ingles gratis, juegos para aprender ingles, juegos interactivos en ingles, juegos de palabras en ingles',
     openGraph: {
       title: c.ogTitle,
       description: c.ogDescription,

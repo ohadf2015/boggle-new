@@ -368,7 +368,7 @@ const he = {
     "landmark": { "skyscraper": "פסגת גורד שחקים", "cloudBase": "בסיס העננים", "mountainTop": "פסגת ההר", "jetStream": "זרם הסילון", "stormTops": "ראש הסערה", "weatherBalloon": "בלון מזג אוויר", "earthCurve": "עקמומיות כדור הארץ", "karman": "קצה החלל", "meteorBelt": "חגורת המטאורים", "aurora": "זוהר קוטבי", "deepSpace": "חלל עמוק" },
     "hazard": { "bomb": "פצצה", "hurricane": "סופה", "wobble": "רעד", "sabotage": "חבלה", "lost": "{kind}! נפלו {n} קומות" },
     "clutch": { "save": "הצלה ברגע האחרון!", "critical": "מתנדנד — נחיתה נקייה!" },
-    "surprise": { "nextWord": "המילה הבאה", "surge": "זינוק!", "windfall": "מתנה!", "updraft": "רוח נושאת! המילה הבאה מוגברת", "crystal": "גביש נדיר!", "echo": "הד מאיץ!", "meteorStrike": "מכת מטאור!", "phantomFloor": "קומת רפאים!", "goldenFloor": "קומת זהב!" },
+    "surprise": { "nextWord": "המילה הבאה", "surge": "זינוק!", "windfall": "מתנה!", "updraft": "רוח נושאת! המילה הבאה מוגברת", "crystal": "גביש נדיר!", "goldenFloor": "קומת זהב!" },
     "daily": { "badge": "יומי · {date}", "streak": "רצף {n} ימים", "toDaily": "יומי", "toEndless": "אינסופי", "newBest": "שיא יומי חדש!", "questTitle": "מגדל מילים", "questDesc": "בנו מגדל ממילים עד השמיים — אותן אותיות לכולם היום." },
     "perk": { "title": "בחרו מתנה", "subtitle": "בחרו אחת — היא נשארת לכל הטיפוס", "skip": "דלגו בינתיים", "masterCrane": { "name": "מנופאי מומחה", "desc": "תגמול גדול יותר על הנחה מושלמת" }, "tallTimber": { "name": "קורות גבוהות", "desc": "+12% גובה בכל קומה" }, "featherfall": { "name": "נפילת נוצה", "desc": "התמוטטות מפילה קומה אחת פחות" }, "reinforced": { "name": "מחוזק", "desc": "יותר התנדנדות לפני הסכנה" }, "cushion": { "name": "כרית ביטחון", "desc": "התנדנדות מנוף לא מפילה קומות" } },
     "runPerk": { "hotStreak": { "a11y": "ריצה לוהטת: נותרו {n} ירידות" } },
@@ -6133,29 +6133,6 @@ const he = {
   "daily": {
     "title": "אתגר יומי",
     "badge": "אתגר יומי",
-    "flow": {
-      "startLabel": "שחקו את כל האתגרים",
-      "introHint": "רצף יומי מחבר את כל אתגרי היום לריצה אחת רצופה · החזיקו את הכפתור כדי לדלג על ההפסקות.",
-      "startHint": "הקישו כדי להתחיל · החזיקו כדי לדלג ישר לסוף",
-      "holdingHint": "המשיכו להחזיק למעבר מהיר…",
-      "title": "רצף יומי",
-      "readyTitle": "יאללה, מתחילים!",
-      "nextTitle": "מעולה — תמשיכו ברצף",
-      "progress": "{done} מתוך {total} הושלמו",
-      "nextUp": "הבא בתור",
-      "startCta": "התחלה",
-      "continueCta": "המשך",
-      "autoAdvance": "עוברים אוטומטית בעוד {n} שניות · הקישו לעצירה",
-      "takeBreak": "תעשו הפסקה · תמיד אפשר לחזור",
-      "barNext": "לאתגר הבא",
-      "barFinish": "סיימו את הרצף",
-      "resumeTitle": "חזרה לרצף",
-      "resumeSubtitle": "{done}/{total} הושלמו · הבא: {mode}",
-      "resumeCta": "חזרה לרצף",
-      "doneTitle": "הרצף הושלם!",
-      "doneSubtitle": "סיימתם את כל האתגרים היומיים. חזרו מחר לסבב טרי.",
-      "doneCta": "חזרה לאתגר היומי"
-    },
     "puzzleNumber": "יומי #{number}",
     "playButton": "שחקו את החידה של היום",
     "loadingWordHunt": "טוען ציד מילים...",
@@ -6599,7 +6576,13 @@ const he = {
       "rankTopTenTitle": "אתם בעשירייה המובילה היום — תפסו את המקום!",
       "firstTitle": "שמרו את התוצאה הראשונה שלכם",
       "subtitle": "הרשמה חינם — לשחק מכל מכשיר",
-      "cta": "הרשמה חינם"
+      "cta": "הרשמה חינם",
+      "benefitStreak": "הרצף שלכם נשמר בכל מכשיר",
+      "benefitStats": "סטטיסטיקות ושיאים אישיים",
+      "benefitBoard": "השם שלכם בטבלת המובילים היומית"
+    },
+    "practice": {
+      "again": "סובבו גלגל נוסף"
     },
     "replay": {
       "title": "לשחק גלגלי תרגול ללא הגבלה",
@@ -14343,6 +14326,18 @@ const he = {
       "error": {
         "insufficientGems": "אין מספיק אבנים ליכולת.",
         "cannotTransmute": "נדרשות 3 מאותה דרגה לשילוב."
+      },
+      "dice": {
+        "title": "גלגול הבונוס שלך",
+        "subtitle": "מילים עם משפחת אותיות זו מקבלות ×3",
+        "skip": "שחק ללא בונוס",
+        "active": "{{family}} ×3",
+        "families": {
+          "vowels": "גאות תנועות",
+          "common": "מגע נפוץ",
+          "rare": "מציאה נדירה",
+          "power": "אותיות עוצמה"
+        }
       }
     }
   },
@@ -14685,19 +14680,6 @@ const he = {
     "bestFor": "הכי מתאים ל"
   },
   "sealedBid": {
-    "title": "הצעה סמויה",
-    "badge": "הצעה סמויה",
-    "roundLabel": "סיבוב {n}/{total}",
-    "chipStack": "{chips}",
-    "lockIn": "נעל הצעה",
-    "youWin": "ניצחת!",
-    "youLose": "התנגשות",
-    "draw": "פספוס",
-    "tapHint": "הקש אותיות לבניית מילה",
-    "yourWord": "המילה שלך",
-    "needWord": "בנה מילה של 3+ אותיות",
-    "needStake": "הגדר הימור קודם",
-    "botRival": "יריב {n}",
     "allIn": "הכל פנימה",
     "clear": "נקה",
     "currentStake": "ההימור הנוכחי",
@@ -14730,10 +14712,15 @@ const he = {
       "uniqueLabel": "ייחודי",
       "clashLabel": "התנגשות",
       "passLabel": "פאס",
-      "shareCta": "שתף תוצאה",
-      "cashOut": "פדיון",
-      "chips": "ז'טונים",
-      "coins": "מטבעות"
+      "shareCta": "שתף תוצאה"
+    }
+  },
+  "supporter": {
+    "card": {
+      "title": "נהנה מLexiClash?",
+      "body": "עזור לשמור את LexiClash חינמי. תוכניות תומכים מגיעות בקרוב.",
+      "cta": "אני מעוניין",
+      "thanks": "אתה ברשימה! נעדכן אותך כשתוכניות התמיכה יושקו."
     }
   }
 };

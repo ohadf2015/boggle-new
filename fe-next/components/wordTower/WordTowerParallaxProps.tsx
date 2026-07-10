@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { gsap } from 'gsap';
 import { visiblePropsAt, type ActiveParallaxProp } from '@/lib/wordTower/parallaxProps';
@@ -93,15 +93,17 @@ function FloatingProp({ prop, reducedMotion }: { prop: ActiveParallaxProp; reduc
  * Transient background event (shooting star, plane flyby, etc). Pure CSS + GSAP,
  * no image load — animates and self-destructs. Respects reducedMotion.
  */
-function BackgroundEvent({ eventType, reducedMotion }: { eventType: BiomeEvent; reducedMotion: boolean }) {
+function BackgroundEvent({ eventType, reducedMotion, onDone }: { eventType: BiomeEvent; reducedMotion: boolean; onDone: () => void }) {
   const elementRef = useRef<HTMLDivElement>(null);
+  const onDoneRef = useRef(onDone);
+  onDoneRef.current = onDone;
 
   useEffect(() => {
     if (reducedMotion) return;
     const el = elementRef.current;
     if (!el) return;
 
-    const tl = gsap.timeline({ onComplete: () => el.remove() });
+    const tl = gsap.timeline({ onComplete: () => onDoneRef.current() });
 
     switch (eventType) {
       case 'shootingStar': {
@@ -203,8 +205,8 @@ function BackgroundEvent({ eventType, reducedMotion }: { eventType: BiomeEvent; 
  * current biome. Emits transient animations at random intervals.
  */
 function BiomeEventEmitter({ heightM = 0, reducedMotion = false }: { heightM?: number; reducedMotion?: boolean }) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const activeEventsRef = useRef<Set<string>>(new Set());
+  const [events, setEvents] = useState<Array<{ key: string; type: BiomeEvent }>>([]);
+  const countRef = useRef(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
 
   useEffect(() => {
@@ -218,44 +220,32 @@ function BiomeEventEmitter({ heightM = 0, reducedMotion = false }: { heightM?: n
     if (eventTypes.length === 0) return;
 
     // ponytail: cap concurrent events to 2 so screen never feels busy
-    const maxConcurrent = 2;
-    const scheduleNextEvent = () => {
-      if (activeEventsRef.current.size >= maxConcurrent) return;
-
-      const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
-      const eventKey = `${eventType}-${Date.now()}-${Math.random()}`;
-      activeEventsRef.current.add(eventKey);
-
-      const div = document.createElement('div');
-      div.dataset.eventKey = eventKey;
-      containerRef.current?.appendChild(div);
-
-      // Self-clean when the event animation completes
-      const cleanup = () => {
-        activeEventsRef.current.delete(eventKey);
-      };
-
-      // Rough time-to-removal based on event type (actual cleanup happens via timeline.onComplete)
-      const removalTimes: Record<BiomeEvent, number> = {
-        shootingStar: 1200, planeFlyby: 2500, helicopterPass: 3000, ufoZoom: 1800,
-        meteorShower: 2500, starTwinkle: 2500, satelliteGlint: 4500, cometStreak: 1800,
-        auroraFlare: 2500,
-      };
-      setTimeout(cleanup, removalTimes[eventType]);
+    const MAX = 2;
+    const schedule = () => {
+      setEvents((prev) => {
+        if (prev.length >= MAX) return prev;
+        const type = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+        const key = `${type}-${++countRef.current}`;
+        return [...prev, { key, type }];
+      });
     };
 
-    // Schedule the first event immediately, then recurring
-    scheduleNextEvent();
-    intervalRef.current = setInterval(scheduleNextEvent, intervalMs);
+    schedule();
+    intervalRef.current = setInterval(schedule, intervalMs);
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { clearInterval(intervalRef.current); };
   }, [heightM, reducedMotion]);
 
   return (
-    <div ref={containerRef} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
-      {/* Events are injected as div children + immediately removed after animation */}
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {events.map((e) => (
+        <BackgroundEvent
+          key={e.key}
+          eventType={e.type}
+          reducedMotion={reducedMotion}
+          onDone={() => setEvents((prev) => prev.filter((x) => x.key !== e.key))}
+        />
+      ))}
     </div>
   );
 }

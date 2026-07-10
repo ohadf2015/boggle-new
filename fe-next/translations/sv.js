@@ -540,7 +540,7 @@ const sv = {
     "landmark": { "skyscraper": "Skyskrapans topp", "cloudBase": "Molnbas", "mountainTop": "Bergstopp", "jetStream": "Jetström", "stormTops": "Stormtoppar", "weatherBalloon": "Väderballong", "earthCurve": "Jordens krökning", "karman": "Rymdens kant", "meteorBelt": "Meteorbälte", "aurora": "Norrsken", "deepSpace": "Yttre rymden" },
     "hazard": { "bomb": "Bomb", "hurricane": "Orkan", "wobble": "Vingel", "sabotage": "Sabotage", "lost": "{kind}! −{n} våningar" },
     "clutch": { "save": "Räddning i sista stund!", "critical": "Vacklar — landa rent!" },
-    "surprise": { "nextWord": "Nästa ord", "surge": "Stöt!", "windfall": "Skänk!", "updraft": "Uppvind! Nästa ord boostat", "crystal": "Kristallfynd!", "echo": "Eko-boost!", "meteorStrike": "Meteorträff!", "phantomFloor": "Spökvåning!", "goldenFloor": "Gyllene våning!" },
+    "surprise": { "nextWord": "Nästa ord", "surge": "Stöt!", "windfall": "Skänk!", "updraft": "Uppvind! Nästa ord boostat", "crystal": "Kristallfynd!", "goldenFloor": "Gyllene våning!" },
     "daily": { "badge": "Daglig · {date}", "streak": "{n} dagar i rad", "toDaily": "Daglig", "toEndless": "Oändlig", "newBest": "Nytt dagsrekord!", "questTitle": "Ordtorn", "questDesc": "Stapla ord mot skyn — samma bokstäver för alla idag." },
     "perk": { "title": "Välj en förmån", "subtitle": "Välj en — den varar hela klättringen", "skip": "Hoppa över", "masterCrane": { "name": "Mästarkran", "desc": "Större belöning vid perfekta släpp" }, "tallTimber": { "name": "Högt virke", "desc": "+12% höjd på varje våning" }, "featherfall": { "name": "Fjäderfall", "desc": "Ras kostar en våning mindre" }, "reinforced": { "name": "Förstärkt", "desc": "Mer vinglande innan kanten" }, "cushion": { "name": "Säkerhetsdyna", "desc": "Kranvinglande tappar aldrig en våning" } },
     "runPerk": { "hotStreak": { "a11y": "Varm streak: {n} kast kvar" } },
@@ -6259,29 +6259,6 @@ const sv = {
   "daily": {
     "title": "Daglig utmaning",
     "badge": "DAGLIG UTMANING",
-    "flow": {
-      "startLabel": "Kör alla utmaningar",
-      "introHint": "Dagligt flöde kedjar ihop dagens utmaningar till en enda körning — håll in knappen för att hoppa över pauserna.",
-      "startHint": "Tryck för att starta · håll in för att köra på",
-      "holdingHint": "Håll kvar för snabbt läge…",
-      "title": "Dagligt flöde",
-      "readyTitle": "Nu kör vi!",
-      "nextTitle": "Snyggt — kör vidare i flödet",
-      "progress": "{done} av {total} klara",
-      "nextUp": "Nästa",
-      "startCta": "Starta",
-      "continueCta": "Fortsätt",
-      "autoAdvance": "Fortsätter om {n}s — tryck för att pausa",
-      "takeBreak": "Ta en paus — fortsätt när du vill",
-      "barNext": "Nästa utmaning",
-      "barFinish": "Avsluta flödet",
-      "resumeTitle": "Fortsätt ditt flöde",
-      "resumeSubtitle": "{done}/{total} klara · näst: {mode}",
-      "resumeCta": "Fortsätt",
-      "doneTitle": "Flödet klart!",
-      "doneSubtitle": "Du klarade alla dagens utmaningar. Kom tillbaka imorgon för en ny runda.",
-      "doneCta": "Tillbaka till Daglig utmaning"
-    },
     "puzzleNumber": "Daglig #{number}",
     "playButton": "Spela dagens pussel",
     "loadingWordHunt": "Laddar Ordjakt...",
@@ -6686,7 +6663,13 @@ const sv = {
       "rankTopTenTitle": "Du är topp {rank} idag — ta din plats!",
       "firstTitle": "Spara ditt första resultat",
       "subtitle": "Registrera dig gratis — spela på valfri enhet",
-      "cta": "Registrera dig gratis"
+      "cta": "Registrera dig gratis",
+      "benefitStreak": "Din svit sparas på alla enheter",
+      "benefitStats": "Personlig statistik och rekord",
+      "benefitBoard": "Ditt namn på dagens topplista"
+    },
+    "practice": {
+      "again": "Snurra ett nytt hjul"
     },
     "replay": {
       "title": "Spela obegränsade övningshjul",
@@ -13923,6 +13906,18 @@ const sv = {
       "error": {
         "insufficientGems": "Inte tillräckligt med stenar för förmågan.",
         "cannotTransmute": "Behöver 3 av samma sällsynthet för att kombinera."
+      },
+      "dice": {
+        "title": "Din bonusrullning",
+        "subtitle": "Ord med denna bokstavsfamilj ger ×3",
+        "skip": "Spela utan bonus",
+        "active": "{{family}} ×3",
+        "families": {
+          "vowels": "Vokalvåg",
+          "common": "Vanlig touch",
+          "rare": "Sällsynt fynd",
+          "power": "Kraftbokstäver"
+        }
       }
     }
   },
@@ -14233,19 +14228,6 @@ const sv = {
     "errorGeneric": "Nedladdningen misslyckades. Försök igen."
   },
   "sealedBid": {
-    "title": "Hemligt bud",
-    "badge": "Hemligt bud",
-    "roundLabel": "Runda {n}/{total}",
-    "chipStack": "{chips}",
-    "lockIn": "Lås bud",
-    "youWin": "Du vinner!",
-    "youLose": "Krock",
-    "draw": "Pass",
-    "tapHint": "Tryck bokstäver för att bygga ord",
-    "yourWord": "Ditt ord",
-    "needWord": "Bygg ett ord med 3+ bokstäver",
-    "needStake": "Sätt en insats först",
-    "botRival": "Rival {n}",
     "allIn": "Allt in",
     "clear": "Rensa",
     "currentStake": "Nuvarande insats",
@@ -14278,10 +14260,15 @@ const sv = {
       "uniqueLabel": "Unik",
       "clashLabel": "Krock",
       "passLabel": "Pass",
-      "shareCta": "Dela poäng",
-      "cashOut": "Lös in",
-      "chips": "marker",
-      "coins": "mynt"
+      "shareCta": "Dela poäng"
+    }
+  },
+  "supporter": {
+    "card": {
+      "title": "Gillar du LexiClash?",
+      "body": "Hjälp oss hålla LexiClash gratis och reklamfritt. Supporterplaner kommer snart.",
+      "cta": "Jag är intresserad",
+      "thanks": "Du är på listan! Vi meddelar dig när supporterplanerna lanseras."
     }
   }
 };

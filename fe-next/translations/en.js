@@ -381,7 +381,7 @@ const en = {
     "landmark": { "skyscraper": "Skyscraper top", "cloudBase": "Cloud base", "mountainTop": "Mountain peak", "jetStream": "Jet stream", "stormTops": "Storm tops", "weatherBalloon": "Weather balloon", "earthCurve": "Earth's curve", "karman": "Edge of space", "meteorBelt": "Meteor belt", "aurora": "Aurora", "deepSpace": "Deep space" },
     "hazard": { "bomb": "Bomb", "hurricane": "Hurricane", "wobble": "Wobble", "sabotage": "Sabotage", "lost": "{kind}! −{n} floors" },
     "clutch": { "save": "Clutch save!", "critical": "Wobbling — land it clean!" },
-    "surprise": { "nextWord": "Next word", "surge": "Surge!", "windfall": "Windfall!", "updraft": "Updraft! Next word boosted", "crystal": "Crystal find!", "echo": "Echo boost!", "meteorStrike": "Meteor strike!", "phantomFloor": "Phantom floor!", "goldenFloor": "Golden floor!" },
+    "surprise": { "nextWord": "Next word", "surge": "Surge!", "windfall": "Windfall!", "updraft": "Updraft! Next word boosted", "crystal": "Crystal find!", "goldenFloor": "Golden floor!" },
     "daily": { "badge": "Daily · {date}", "streak": "{n}-day streak", "toDaily": "Daily", "toEndless": "Endless", "newBest": "New daily best!", "questTitle": "Word Tower", "questDesc": "Stack words sky-high — same letters for everyone today." },
     "perk": { "title": "Choose a boon", "subtitle": "Pick one — it lasts this climb", "skip": "Skip for now", "masterCrane": { "name": "Master Crane", "desc": "Bigger reward on perfect drops" }, "tallTimber": { "name": "Tall Timber", "desc": "+12% height on every floor" }, "featherfall": { "name": "Featherfall", "desc": "Topples cost one fewer floor" }, "reinforced": { "name": "Reinforced", "desc": "More wobble before the brink" }, "cushion": { "name": "Safety Cushion", "desc": "Crane wobbles never drop a floor" } },
     "runPerk": { "hotStreak": { "a11y": "Hot Streak: {n} drops remaining" } },
@@ -6058,29 +6058,6 @@ const en = {
   "daily": {
     "title": "Daily Challenge",
     "badge": "DAILY",
-    "flow": {
-      "startLabel": "Play all challenges",
-      "introHint": "Daily Flow chains today's challenges into one tap-through run — hold the button to skip the breathers.",
-      "startHint": "Tap to start · hold for fast flow",
-      "holdingHint": "Keep holding for fast flow…",
-      "title": "Daily Flow",
-      "readyTitle": "Let's go!",
-      "nextTitle": "Nice — keep the flow going",
-      "progress": "{done} of {total} cleared",
-      "nextUp": "Next up",
-      "startCta": "Start",
-      "continueCta": "Continue",
-      "autoAdvance": "Auto-continuing in {n}s — tap to hold",
-      "takeBreak": "Take a break — resume anytime",
-      "barNext": "Next challenge",
-      "barFinish": "Finish the flow",
-      "resumeTitle": "Resume your flow",
-      "resumeSubtitle": "{done}/{total} done · next: {mode}",
-      "resumeCta": "Resume",
-      "doneTitle": "Flow complete!",
-      "doneSubtitle": "You cleared every daily challenge. Come back tomorrow for a fresh run.",
-      "doneCta": "Back to Daily Hub"
-    },
     "chooseChallengeHint": "Pick your quest",
     "chooseQuest": "Choose Your Quest",
     "dailyMissions": "Daily Missions",
@@ -6532,7 +6509,13 @@ const en = {
       "rankTopTenTitle": "You're top {rank} today — claim your spot!",
       "firstTitle": "Save your first result",
       "subtitle": "Sign up free — play on any device",
-      "cta": "Sign up free"
+      "cta": "Sign up free",
+      "benefitStreak": "Your streak, safe on every device",
+      "benefitStats": "Personal stats and best scores",
+      "benefitBoard": "Your name on the daily leaderboard"
+    },
+    "practice": {
+      "again": "Spin another wheel"
     },
     "replay": {
       "title": "Play unlimited practice wheels",
@@ -13721,6 +13704,18 @@ const en = {
       "error": {
         "insufficientGems": "Not enough gems for that ability.",
         "cannotTransmute": "Need 3 of the same rarity to combine."
+      },
+      "dice": {
+        "title": "Your Bonus Roll",
+        "subtitle": "Words with this letter family score ×3",
+        "skip": "Play without bonus",
+        "active": "{{family}} ×3",
+        "families": {
+          "vowels": "Vowel Surge",
+          "common": "Common Touch",
+          "rare": "Rare Find",
+          "power": "Power Letters"
+        }
       }
     }
   },
@@ -14611,19 +14606,6 @@ const en = {
     "bestFor": "Best for"
   },
   "sealedBid": {
-    "title": "Sealed Bid",
-    "badge": "Sealed Bid",
-    "roundLabel": "Round {n}/{total}",
-    "chipStack": "{chips}",
-    "lockIn": "Lock bid",
-    "youWin": "You win!",
-    "youLose": "Clashed",
-    "draw": "Pass",
-    "tapHint": "Tap letters to build a word",
-    "yourWord": "Your word",
-    "needWord": "Build a 3+ letter word",
-    "needStake": "Set a stake first",
-    "botRival": "Rival {n}",
     "allIn": "All in",
     "clear": "Clear",
     "currentStake": "Current stake",
@@ -14656,10 +14638,15 @@ const en = {
       "uniqueLabel": "Unique",
       "clashLabel": "Clash",
       "passLabel": "Pass",
-      "shareCta": "Share Score",
-      "cashOut": "Cash out",
-      "chips": "chips",
-      "coins": "coins"
+      "shareCta": "Share Score"
+    }
+  },
+  "supporter": {
+    "card": {
+      "title": "Enjoying LexiClash?",
+      "body": "Help keep LexiClash free and ad-free. Supporter plans are coming soon.",
+      "cta": "I'm interested",
+      "thanks": "You're on the list! We'll let you know when supporter plans launch."
     }
   }
 };

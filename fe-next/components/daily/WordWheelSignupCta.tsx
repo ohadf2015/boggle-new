@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Flame, Trophy, Crown, Sparkles, ArrowRight } from 'lucide-react';
+import { Flame, Trophy, Crown, Sparkles, ArrowRight, Check } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useExperiment } from '@/hooks/useExperiment';
 import { trackGrowthEvent } from '@/utils/growthTracking';
@@ -217,6 +217,17 @@ const WordWheelSignupCta: React.FC<WordWheelSignupCtaProps> = ({
                 </span>
                 <span className="block text-neo-black/70 text-xs mt-0.5">
                   {t('wordWheel.signup.subtitle')}
+                </span>
+                {/* Value exchange — the concrete "what you get" for the account.
+                    Honest, value-led (Families policy): all three already exist
+                    server-side; signing up just makes them durable. */}
+                <span data-testid="wheel-signup-benefits" className="block mt-1.5 space-y-0.5">
+                  {(['benefitStreak', 'benefitStats', 'benefitBoard'] as const).map((key) => (
+                    <span key={key} className="flex items-center gap-1.5 text-neo-black/80 text-xs">
+                      <Check className="w-3 h-3 shrink-0" strokeWidth={3} aria-hidden />
+                      {t(`wordWheel.signup.${key}`)}
+                    </span>
+                  ))}
                 </span>
               </span>
             </span>

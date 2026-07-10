@@ -136,10 +136,20 @@ const seoContent: Record<string, {
   },
 };
 
+const SITE_URL = 'https://www.lexiclash.live';
+
 export default async function LeaderboardPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const content = seoContent[locale] ?? seoContent.en;
   const faqJsonLd = buildLeaderboardFaqJsonLd(locale, content.faq);
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${SITE_URL}/${locale}` },
+      { '@type': 'ListItem', position: 2, name: 'Leaderboard', item: `${SITE_URL}/${locale}/leaderboard` },
+    ],
+  };
   return (
     <>
       <LeaderboardPageClient />
@@ -149,6 +159,7 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ lo
         features={content.features}
         faq={content.faq}
       />
+      <script type="application/ld+json">{encodeJsonLd(breadcrumbJsonLd)}</script>
       {faqJsonLd && (
         <script type="application/ld+json">{encodeJsonLd(faqJsonLd)}</script>
       )}

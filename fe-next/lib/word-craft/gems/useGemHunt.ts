@@ -18,9 +18,10 @@ export interface UseGemHuntOptions {
   dict: Set<string> | null;
   locale?: SupportedLocale;
   boardSize?: BoardSize;
+  scoreBonus?: { letters: Set<string>; multiplier: number } | null;
 }
 
-export function useGemHunt({ seed = 1, dict, locale = 'en', boardSize = 11 }: UseGemHuntOptions) {
+export function useGemHunt({ seed = 1, dict, locale = 'en', boardSize = 11, scoreBonus = null }: UseGemHuntOptions) {
   const initialState = useMemo(
     () => buildInitialGemHunt({ seed, locale, boardSize }),
     // initial state captured once at mount; flips trigger RESET in the effect below
@@ -89,8 +90,13 @@ export function useGemHunt({ seed = 1, dict, locale = 'en', boardSize = 11 }: Us
     if (!dict) { dispatch({ type: 'SET_ERROR', message: 'DICT_LOADING' }); return; }
     const result = validateGemMove(state.board, state.pendingPlacements, isWordValid);
     if (!result.ok) { dispatch({ type: 'SET_ERROR', message: result.reason }); return; }
-    dispatch({ type: 'COMMIT', words: result.words, score: result.score });
-  }, [dict, state.outcome, state.board, state.pendingPlacements, isWordValid]);
+    let score = result.score;
+    if (scoreBonus) {
+      const hasBonus = state.pendingPlacements.some((p) => scoreBonus.letters.has(p.letter.toUpperCase()));
+      if (hasBonus) score = Math.round(score * scoreBonus.multiplier);
+    }
+    dispatch({ type: 'COMMIT', words: result.words, score });
+  }, [dict, state.outcome, state.board, state.pendingPlacements, isWordValid, scoreBonus]);
 
   const buyAbility = useCallback((card: AbilityCard) => dispatch({ type: 'BUY_ABILITY', card }), []);
   const rerollShop = useCallback((card: AbilityCard) => dispatch({ type: 'REROLL_SHOP', card }), []);
