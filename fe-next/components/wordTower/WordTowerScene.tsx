@@ -70,6 +70,8 @@ interface SceneProps {
   rivals?: RivalMarker[];
   /** Translator — for the minimap + back-to-top affordance labels. */
   t?: (key: string, params?: Record<string, string | number>) => string;
+  /** Current locale (e.g. 'en', 'he', 'sv') — determines font stack for canvas glyphs. */
+  locale?: string;
   /** Fires with the altitude the camera is *looking at* (live height, or lower
    *  while panned) so sibling layers — landmark + rival rails — track the scroll
    *  too instead of freezing at the live height and leaving blank sky on the way
@@ -161,7 +163,7 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
  * recolours in place, removed pending tiles pop out, survivors slide. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, locale = 'en', panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
   // OUTER container — owns ONLY the vertical translation (climb-follow + user pan).
   const containerRef = useRef<Container | null>(null);
@@ -311,7 +313,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       const y = localY(l.pos);
       const existing = registry.current.get(l.key);
       if (!existing) {
-        const tile = makeTile(l.char, size, l.color, l.pending, l.shared, l.pos, l.surface);
+        const tile = makeTile(l.char, size, l.color, l.pending, l.shared, l.pos, l.surface, locale);
         tile.x = centerX;
         tile.zIndex = l.pos;
         tilt.addChild(tile);
@@ -435,7 +437,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     firstRender.current = false;
     prevMaxPos.current = maxPos;
     topPosRef.current = maxPos; // shaft-wind tick reads this
-  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId, palette]);
+  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId, palette, locale]);
 
   // A rejected WORD is an INPUT mistake, not tower damage — so the error feel
   // lives on the word-builder (HUD: red shake + message + haptic/sound), NOT on
@@ -707,7 +709,8 @@ export function WordTowerScene(props: SceneProps) {
   // backdrop + rails track the glide exactly like a manual drag.
   const startMomentum = (v0: number) => {
     stopMomentum();
-    if (pan.current.panMin === 0) return; // tower fits → nothing to fling
+    // Remove the panMin === 0 guard to avoid silently swallowing a fling after
+    // a resize when panMin is stale. stepMomentum will clamp to bounds anyway.
     let vel = v0;
     let last = performance.now();
     const tick = (now: number) => {
@@ -810,7 +813,8 @@ export function WordTowerScene(props: SceneProps) {
       <div
         className="absolute inset-0 touch-none"
         onPointerDown={(e) => {
-          if (pan.current.panMin === 0) return;
+          // Allow drag initiation; clampPan will enforce bounds. Avoids silently
+          // swallowing the gesture if panMin is stale due to a viewport resize.
           stopMomentum(); // grabbing the tower halts any glide in progress
           try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* */ }
           pan.current.dragging = true;
@@ -831,7 +835,7 @@ export function WordTowerScene(props: SceneProps) {
           if (d && Math.abs(d.vel) > 0) startMomentum(clampFlickVelocity(d.vel)); // let go with speed → glide
         }}
         onPointerCancel={() => { pan.current.dragging = false; drag.current = null; }}
-        onWheel={(e) => { if (pan.current.panMin !== 0) { stopMomentum(); applyPan(pan.current.y - e.deltaY * WHEEL_SCALE); } }}
+        onWheel={(e) => { stopMomentum(); applyPan(pan.current.y - e.deltaY * WHEEL_SCALE); }}
       />
     </div>
   );

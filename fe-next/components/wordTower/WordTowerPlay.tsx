@@ -905,6 +905,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         nearMissKey={nearMissKey}
         toppleFloors={tower.state.lastHazard?.removed ?? 1}
         t={t}
+        locale={language}
         onViewAltChange={setViewAlt}
       />
 

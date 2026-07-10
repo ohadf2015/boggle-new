@@ -9,7 +9,7 @@ vi.mock('pixi.js', () => ({
   TextStyle: class {},
 }));
 
-import { paintTile, drawBlockSurface, type TileSprite } from './towerSprites';
+import { paintTile, drawBlockSurface, getFontStackForLocale, type TileSprite } from './towerSprites';
 
 // Minimal stand-in for a TileSprite. The unguarded paintTile mutates
 // color/pending then dereferences tile.shadow / tile.face — so a null on
@@ -85,5 +85,81 @@ describe('drawBlockSurface', () => {
 
   it('never throws on a torn-down graphics (defensive, like paintTile)', () => {
     expect(() => drawBlockSurface(null as unknown as never, 48, 'windows')).not.toThrow();
+  });
+});
+
+describe('getFontStackForLocale', () => {
+  it('should return Hebrew-capable font stack for Hebrew locale', () => {
+    const fontStack = getFontStackForLocale('he');
+
+    // Hebrew fonts should come first (Heebo is designed for Hebrew)
+    // Rubik also supports Hebrew
+    expect(fontStack).toContain('Heebo');
+    expect(fontStack).toContain('Rubik');
+
+    // Should fall back to sans-serif eventually
+    expect(fontStack).toContain('sans-serif');
+  });
+
+  it('should return Latin font stack for English locale', () => {
+    const fontStack = getFontStackForLocale('en');
+
+    // Fredoka and Rubik should be in the stack for Latin
+    expect(fontStack).toContain('Fredoka');
+    expect(fontStack).toContain('Rubik');
+    expect(fontStack).toContain('sans-serif');
+  });
+
+  it('should return Latin font stack for Swedish locale', () => {
+    const fontStack = getFontStackForLocale('sv');
+    expect(fontStack).toContain('Fredoka');
+    expect(fontStack).toContain('Rubik');
+  });
+
+  it('should return Latin font stack for Japanese locale', () => {
+    const fontStack = getFontStackForLocale('ja');
+    expect(fontStack).toContain('Fredoka');
+    expect(fontStack).toContain('Rubik');
+  });
+
+  it('should return Latin font stack for Spanish locale', () => {
+    const fontStack = getFontStackForLocale('es');
+    expect(fontStack).toContain('Fredoka');
+    expect(fontStack).toContain('Rubik');
+  });
+
+  it('should return Cyrillic-capable font stack for Russian locale', () => {
+    const fontStack = getFontStackForLocale('ru');
+    // Russian needs Cyrillic support, but can use Rubik
+    expect(fontStack).toContain('Rubik');
+    expect(fontStack).toContain('sans-serif');
+  });
+
+  it('should default to Latin font stack for unknown locale', () => {
+    const fontStack = getFontStackForLocale('unknown');
+    expect(fontStack).toContain('Fredoka');
+    expect(fontStack).toContain('Rubik');
+  });
+
+  it('should prefer Heebo for Hebrew (better coverage than Fredoka/Rubik)', () => {
+    const fontStack = getFontStackForLocale('he');
+    const heeboIndex = fontStack.indexOf('Heebo');
+    const fredokaIndex = fontStack.indexOf('Fredoka');
+
+    // Heebo should come before Fredoka for Hebrew text
+    if (fredokaIndex !== -1) {
+      expect(heeboIndex).toBeLessThan(fredokaIndex);
+    }
+  });
+
+  it('returned font stack should be a valid CSS font-family string', () => {
+    const fontStack = getFontStackForLocale('he');
+
+    // Should be comma-separated and not have double commas
+    expect(fontStack).not.toContain(',,');
+    // Should not have trailing comma
+    expect(fontStack).not.toMatch(/,\s*$/);
+    // Should not have leading comma
+    expect(fontStack).not.toMatch(/^\s*,/);
   });
 });
