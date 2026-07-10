@@ -30,7 +30,7 @@ interface WordTowerVersusProps {
 }
 
 export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusProps) {
-  const { t, dir } = useLanguage();
+  const { t, dir, language } = useLanguage();
   const selfId = username;
 
   const versusSocket = socket as unknown as VersusSocket | null;
@@ -84,7 +84,7 @@ export function WordTowerVersus({ socket, username, onQuit }: WordTowerVersusPro
           flash alone read as a UI glitch, not a HIT). Class toggles on/off per
           bombKey so the keyframe replays without remounting the Pixi scene. */}
       <div className={bombShake ? 'animate-neo-shake motion-reduce:animate-none' : ''}>
-        <WordTowerScene floors={floors} biomeId={biomeId} heightM={you?.heightM ?? 0} pendingWord="" resultKey={tower.state.resultKey} errorKey={tower.state.errorKey} lastResult={null} />
+        <WordTowerScene floors={floors} biomeId={biomeId} heightM={you?.heightM ?? 0} pendingWord="" resultKey={tower.state.resultKey} errorKey={tower.state.errorKey} lastResult={null} locale={language} />
       </div>
 
       {/* Incoming-bomb red flash */}

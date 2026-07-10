@@ -16,7 +16,35 @@ import { tumbleAt, TUMBLE_MS, type TumbleParams } from '@/lib/wordTower/tumbleAr
 import { tileVariation, type TileVariation } from './tileVariation';
 import { pickGreeble, type Greeble } from '@/lib/wordTower/greebles';
 
-const FONT = 'Fredoka, Rubik, sans-serif';
+const DEFAULT_FONT = 'Fredoka, Rubik, sans-serif';
+
+/**
+ * Returns the appropriate font stack for a given locale.
+ * Hebrew text requires Heebo (designed for Hebrew) to render glyphs correctly.
+ * Latin locales use Fredoka + Rubik. Russian uses Rubik (has Cyrillic support).
+ *
+ * This is used by Pixi Text objects, which render on canvas and cannot use CSS
+ * variables — they need the actual font-family names of loaded fonts.
+ */
+export function getFontStackForLocale(locale: string): string {
+  switch (locale) {
+    case 'he':
+      // Heebo is specifically designed for Hebrew. Rubik is secondary fallback.
+      return 'Heebo, Rubik, sans-serif';
+    case 'ru':
+      // Rubik has Cyrillic support; Fredoka+Comfortaa (Cyrillic) already loaded globally
+      return 'Rubik, sans-serif';
+    case 'en':
+    case 'sv':
+    case 'ja':
+    case 'es':
+    default:
+      // Latin/mixed locales: Fredoka for display, Rubik for fallback
+      return DEFAULT_FONT;
+  }
+}
+
+const FONT = DEFAULT_FONT;
 
 /** A column tile: square face + hard shadow + (optional) glyph. Extra fields
  *  track the live colour/pending state and the cancellation token. */
@@ -300,8 +328,9 @@ export function drawGreeble(g: Graphics | null, size: number, greeble: Greeble, 
 
 /** Build a tile. `char === null` → a label-less brick (versus spoiler-free row).
  *  `pos` (position from the base) seeds the deterministic per-tile variation.
- *  `surface` paints the zone decoration once (skipped for bricks). */
-export function makeTile(char: string | null, size: number, color: number, pending: boolean, shared = false, pos?: number, surface?: BlockSurface): TileSprite {
+ *  `surface` paints the zone decoration once (skipped for bricks).
+ *  `locale` determines the font stack for glyph rendering (e.g. 'he' uses Heebo for Hebrew). */
+export function makeTile(char: string | null, size: number, color: number, pending: boolean, shared = false, pos?: number, surface?: BlockSurface, locale: string = 'en'): TileSprite {
   const tile = new Container() as TileSprite;
   tile.size = size;
   tile.color = color;
@@ -311,8 +340,9 @@ export function makeTile(char: string | null, size: number, color: number, pendi
   tile.shadow = new Graphics();
   tile.face = new Graphics();
   tile.detail = surface ? new Graphics() : null;
+  const fontStack = getFontStackForLocale(locale);
   tile.glyph = char != null
-    ? new Text({ text: char, style: new TextStyle({ fontFamily: FONT, fontSize: Math.min(size * 0.62, 40), fontWeight: '700', fill: 0x000000 }) })
+    ? new Text({ text: char, style: new TextStyle({ fontFamily: fontStack, fontSize: Math.min(size * 0.62, 40), fontWeight: '700', fill: 0x000000 }) })
     : null;
   tile.addChild(tile.shadow, tile.face);
   if (tile.detail) {
