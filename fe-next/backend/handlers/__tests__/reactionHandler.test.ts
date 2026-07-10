@@ -73,6 +73,15 @@ describe('reactionHandler', () => {
     expect(toEmit).toHaveBeenCalledWith('quickReaction', { reactionId: 'clap', username: 'Alice' });
   });
 
+  it('should broadcast the love reaction (heart)', async () => {
+    const { socket, handlers, toEmit } = createMockSocket();
+    registerReactionHandlers(mockIo, socket as any);
+
+    await handlers['quickReaction']({ reactionId: 'love', username: 'Alice' });
+
+    expect(toEmit).toHaveBeenCalledWith('quickReaction', { reactionId: 'love', username: 'Alice' });
+  });
+
   it('should reject invalid reactionId', () => {
     const { socket, handlers, toEmit } = createMockSocket();
     registerReactionHandlers(mockIo, socket as any);

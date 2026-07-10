@@ -4,9 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import type { HazardKind } from '@/lib/wordTower/hazards';
 import {
-  SABOTAGE_PERFECT_THRESHOLD,
   SABOTAGE_M_PER_FLOOR,
-  awardSabotageToken,
   awardSabotageTokenViaAd,
   canSabotage,
   sabotageFloorsFor,
@@ -26,12 +24,13 @@ interface SentHit {
 /**
  * useSabotage — owns the wrecking-ball mechanic for the climber.
  *
- * - Wrecking-ball charges earn from PROGRESSION — reaching a new height zone or
- *   unlocking an achievement (founder brief). The caller passes the cumulative
- *   count of those earn-events this run (`progressEarnEvents`); crediting is
- *   idempotent and spend-safe via {@link wreckingBallEarn}.
- * - Perfect-drop streaks remain a secondary earn path (capped) — caller passes
- *   the LIVE `perfectStreak` from useCraneDrop.
+ * - Wrecking-ball charges earn ONLY from PROGRESSION — reaching a new height
+ *   zone or unlocking an achievement (founder brief). The caller passes the
+ *   cumulative count of those earn-events this run (`progressEarnEvents`);
+ *   crediting is idempotent and spend-safe via {@link wreckingBallEarn}.
+ *   (A perfect-drop-streak earn path used to run alongside this one — removed
+ *   because streaks of 3 are common for a competent player, so it regenerated
+ *   a charge almost every word instead of on the intended rarer milestones.)
  * - `openPicker` / `closePicker` toggle the rival picker overlay.
  * - `sabotage` records a hit locally (drives the rail's ghost-tower drop + the
  *   wrecking-ball animation/toast). The async cross-player POST is fired by the
@@ -40,7 +39,7 @@ interface SentHit {
  * Pure-ish: side effects limited to a one-shot localStorage breadcrumb so
  * the founder can confirm spend counts during playtests.
  */
-export function useSabotage(perfectStreak: number, progressEarnEvents = 0) {
+export function useSabotage(_perfectStreak: number, progressEarnEvents = 0) {
   const [tokens, setTokens] = useState(0);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [lastHit, setLastHit] = useState<SentHit | null>(null);
@@ -48,23 +47,8 @@ export function useSabotage(perfectStreak: number, progressEarnEvents = 0) {
   const [hitsByRival, setHitsByRival] = useState<Record<string, number>>({});
   const [earnedToast, setEarnedToast] = useState<number | null>(null);
   const [adEarnedToast, setAdEarnedToast] = useState(false);
-  const lastEarnedRef = useRef(0);
   // How many progression earn-events (zones + achievements) we've credited.
   const creditedRef = useRef(0);
-
-  // Token earn driven by the perfect-streak; idempotent.
-  useEffect(() => {
-    const next = awardSabotageToken(tokens, perfectStreak);
-    if (next > tokens) {
-      setTokens(next);
-      // Surface the earn toast ONLY on a real new earn (skip the cap-noop).
-      if (perfectStreak > lastEarnedRef.current) {
-        lastEarnedRef.current = perfectStreak;
-        setEarnedToast(perfectStreak);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [perfectStreak]);
 
   // Charge earn driven by PROGRESSION (new zone / new achievement). Credits only
   // the new delta and is spend-safe, so a charge spent on a wreck is never
@@ -130,8 +114,6 @@ export function useSabotage(perfectStreak: number, progressEarnEvents = 0) {
     dismissAdEarned,
     earnTokenViaAd,
     canSabotageNow: (rivalCount: number) => canSabotage(tokens, rivalCount),
-    /** Public for tests: how many perfects until the next token. */
-    perfectsPerToken: SABOTAGE_PERFECT_THRESHOLD,
   };
 }
 
@@ -139,9 +121,11 @@ export function useSabotage(perfectStreak: number, progressEarnEvents = 0) {
  * useSabotageIntegration — wraps useSabotage with rival-rail display math +
  * the receiver-side simulator (URL-flag) so WordTowerPlay can stay slim.
  *
- * @param perfectStreak       current perfect-drop streak from useCraneDrop
+ * @param perfectStreak       current perfect-drop streak from useCraneDrop —
+ *                            no longer an earn source, kept for signature
+ *                            stability with the caller
  * @param progressEarnEvents  cumulative zone-entries + achievement-unlocks this
- *                            run — the primary wrecking-ball earn source
+ *                            run — the ONLY wrecking-ball earn source
  * @param rivals              leaderboard markers (untouched)
  * @param fireHazard          tower.hazard fn — used by the receiver-side simulator
  */

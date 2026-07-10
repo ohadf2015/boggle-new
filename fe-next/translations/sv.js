@@ -2831,6 +2831,7 @@ const sv = {
     "dead": "Död",
     "crown": "Krona",
     "zap": "Blixt",
+    "love": "Kärlek",
     "label": "Snabbreaktioner"
   },
   "chat": {

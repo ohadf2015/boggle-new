@@ -9747,6 +9747,7 @@ const ru = {
     "dead": "Мёртв",
     "crown": "Корона",
     "zap": "Молния",
+    "love": "Любовь",
     "label": "Быстрые реакции"
   },
   "encouragement": {

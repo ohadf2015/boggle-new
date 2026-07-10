@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { ChevronsDown, ArrowUp } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useWheelDragSpell } from '@/hooks/useWheelDragSpell';
@@ -74,6 +74,9 @@ export function WordTowerWheel({
   // Latest selection in a ref so the drag hook reads a fresh length at pointer-up.
   const selectedRef = useRef(selected);
   selectedRef.current = selected;
+  // Guards the auto-build timer (below) from double-firing onSubmit after a
+  // manual BUILD tap or a drag-release already submitted this word.
+  const submittedRef = useRef(false);
 
   const { handlePointerDown, handlePointerMove, handlePointerUp } = useWheelDragSpell({
     draggingRef,
@@ -82,7 +85,7 @@ export function WordTowerWheel({
     isIndexUsed: (i) => selectedRef.current.includes(i),
     addLetter: (i) => { addedDuringDragRef.current = true; onSelectTile(i); },
     getBuiltLength: () => selectedRef.current.length,
-    submit: onSubmit,
+    submit: () => { submittedRef.current = true; onSubmit(); },
   });
 
   const onDown = (e: React.PointerEvent) => {
@@ -90,6 +93,26 @@ export function WordTowerWheel({
     addedDuringDragRef.current = false;
     handlePointerDown(e);
   };
+
+  // Auto-build: tapping letters one-by-one used to need an EXTRA manual BUILD
+  // tap before the DROP tap — a "two taps to place a word" flow. Once the
+  // spelled word is buildable, wait 1s of no further tile selection then
+  // auto-fire onSubmit (same effect as tapping BUILD) so the hub morphs
+  // straight to DROP. A fresh tile pick before the second elapses cancels and
+  // restarts the wait (join() gives a stable dep key on the selection content,
+  // not the array reference).
+  const selectedKey = selected.join(',');
+  useEffect(() => {
+    submittedRef.current = false;
+    if (!canBuild || placing) return;
+    const id = setTimeout(() => {
+      if (submittedRef.current) return;
+      submittedRef.current = true;
+      onSubmit();
+    }, 1000);
+    return () => clearTimeout(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedKey, canBuild, placing]);
 
   const tapLetter = (i: number) => {
     // The drag hook already added letters this gesture — swallow the trailing click.
@@ -288,7 +311,7 @@ export function WordTowerWheel({
         ) : canBuild ? (
           <button
             type="button"
-            onClick={onSubmit}
+            onClick={() => { submittedRef.current = true; onSubmit(); }}
             aria-label={t('wordTower.hud.build')}
             className={cn(
               'pointer-events-auto flex h-[66px] min-w-[66px] max-w-[78%] flex-col items-center justify-center gap-0.5 rounded-full border-neo-thick border-black bg-gradient-to-b from-neo-cyan-light to-neo-cyan px-3 font-neo-display font-black uppercase leading-none text-black shadow-hard active:translate-y-0.5',

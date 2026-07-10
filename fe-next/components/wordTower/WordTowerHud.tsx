@@ -5,8 +5,7 @@ import { Delete, Shuffle, Lightbulb, ChevronDown, ChevronUp, RotateCw, Coins } f
 import { cn } from '@/lib/utils';
 import { type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
-import { utcDateKey } from '@/lib/wordTower/dailySeed';
-import { freeClueUsedToday, markFreeClueUsed } from '@/lib/wordTower/clueGate';
+import { canRequestClue } from '@/lib/wordTower/clueGate';
 import { type ActiveRunPerk } from '@/lib/wordTower/useRunStreakPerk';
 import { WordTowerWheel } from './WordTowerWheel';
 
@@ -98,6 +97,9 @@ export function WordTowerHud(props: WordTowerHudProps) {
   const hasBonusScramble = scramblesLeft > 0;
   const canBuyScramble = scrambleCost > 0 && coinBalance >= scrambleCost;
   const canScramble = hasBonusScramble || canBuyScramble;
+  // Scramble is a "need a revenge" tool, not an anytime reroll — only show it
+  // once the current wheel has zero buildable words.
+  const isStuck = possibleWords === 0;
 
   // Clue: reveal a sample word on demand; reset when the wheel changes.
   const wheelKey = tray.join('');
@@ -105,11 +107,20 @@ export function WordTowerHud(props: WordTowerHudProps) {
   useEffect(() => { setClueShown(false); }, [wheelKey]);
   const maskedClue = clueWord ?? ''; // reveal the FULL word — a masked clue led to wrong last-letter guesses ("not in dictionary")
 
-  // Clue gating (#6): ONE clue is free each UTC day; every clue after that costs
-  // a rewarded ad. The "N words possible" count stays free (it doesn't solve).
-  const dateKey = utcDateKey();
-  const needsAd = !clueShown && freeClueUsedToday(dateKey);
-  const revealClue = useCallback(() => setClueShown(true), []);
+  // Clue gating: capped at CLUE_RUN_CAP clues per run; every clue (including
+  // the first) costs a rewarded ad. The "N words possible" count stays free
+  // (it doesn't solve). The used-count is a ref (persists across the
+  // per-wheel `clueShown` resets above) mirrored into state so the disabled
+  // button re-renders once the cap is hit.
+  const cluesUsedRef = useRef(0);
+  const [cluesUsed, setCluesUsed] = useState(0);
+  const needsAd = !clueShown;
+  const capReached = !canRequestClue(cluesUsed);
+  const revealClue = useCallback(() => {
+    cluesUsedRef.current += 1;
+    setCluesUsed(cluesUsedRef.current);
+    setClueShown(true);
+  }, []);
   const clueAd = useRewardedAd({
     surface: 'hint',
     rewardKind: 'feature',
@@ -117,13 +128,9 @@ export function WordTowerHud(props: WordTowerHudProps) {
     onAdError: revealClue, // web / no fill → still reveal (never punish non-native)
   });
   const requestClue = useCallback(() => {
-    if (!freeClueUsedToday(dateKey)) {
-      markFreeClueUsed(dateKey);
-      setClueShown(true);
-    } else {
-      clueAd.showAd();
-    }
-  }, [dateKey, clueAd]);
+    if (!canRequestClue(cluesUsedRef.current)) return;
+    clueAd.showAd();
+  }, [clueAd]);
   const clueBusy = clueAd.status === 'loading' || clueAd.status === 'showing';
 
   // Mobile drawer: the deck collapses to a peek bar to free the screen for the tower.
@@ -259,7 +266,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
               <button
                 type="button"
                 onClick={requestClue}
-                disabled={!clueWord || clueShown || clueBusy}
+                disabled={!clueWord || clueShown || clueBusy || capReached}
                 aria-label={t('wordTower.hud.possible', { n: possibleWords })}
                 title={t('wordTower.hud.clue')}
                 className="relative flex h-9 w-9 items-center justify-center rounded-full border-neo border-black bg-neo-navy-light/70 text-neo-cyan shadow-hard-sm transition-transform active:translate-y-0.5 disabled:opacity-60"
@@ -270,9 +277,9 @@ export function WordTowerHud(props: WordTowerHudProps) {
                     {possibleWords}
                   </span>
                 )}
-                {/* After today's free clue is spent, the next one costs a rewarded
-                    ad — a small 📺 marks the button so the cost is obvious. */}
-                {needsAd && (
+                {/* Every clue costs a rewarded ad (capped at CLUE_RUN_CAP/run) — a
+                    small 📺 marks the button so the cost is obvious. */}
+                {needsAd && !capReached && (
                   <span className="absolute -bottom-1.5 -start-1.5 text-[10px] leading-none">📺</span>
                 )}
               </button>
@@ -293,24 +300,26 @@ export function WordTowerHud(props: WordTowerHudProps) {
             hub. Tools are disabled while a word is in flight. RTL: the flex row
             mirrors automatically, so scramble/delete swap sides cleanly. */}
         <div className="mx-auto flex max-w-md items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={onScramble}
-            disabled={!canScramble || isPlacing}
-            className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-purple px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
-            aria-label={t('wordTower.hud.scramble')}
-          >
-            <Shuffle className="h-5 w-5" />
-            {hasBonusScramble ? (
-              // Free bonus scramble in the bank — show how many remain.
-              <span className="tabular-nums">{scramblesLeft}</span>
-            ) : (
-              // Out of bonuses → the coin price to buy a fresh wheel.
-              <span className="flex items-center gap-0.5 tabular-nums">
-                <Coins className="h-3 w-3" aria-hidden />{scrambleCost}
-              </span>
-            )}
-          </button>
+          {isStuck && (
+            <button
+              type="button"
+              onClick={onScramble}
+              disabled={!canScramble || isPlacing}
+              className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-purple px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+              aria-label={t('wordTower.hud.scramble')}
+            >
+              <Shuffle className="h-5 w-5" />
+              {hasBonusScramble ? (
+                // Free bonus scramble in the bank — show how many remain.
+                <span className="tabular-nums">{scramblesLeft}</span>
+              ) : (
+                // Out of bonuses → the coin price to buy a fresh wheel.
+                <span className="flex items-center gap-0.5 tabular-nums">
+                  <Coins className="h-3 w-3" aria-hidden />{scrambleCost}
+                </span>
+              )}
+            </button>
+          )}
           <div className={cn('flex-1 transition-[filter] duration-300', lastError && errorKey > 0 && 'animate-neo-shake')}>
             <WordTowerWheel
               tray={tray}

@@ -3,9 +3,16 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { WordTowerHud, type WordTowerHudProps } from '../WordTowerHud';
 
 // Rewarded ad (clue gate) — mocked; the real hook needs AdMobProvider (global
-// in prod via essential-providers, absent in unit tests).
+// in prod via essential-providers, absent in unit tests). `showAd` calls the
+// reward callback synchronously so tests can simulate a completed ad watch.
 vi.mock('@/hooks/useRewardedAd', () => ({
-  useRewardedAd: () => ({ showAd: vi.fn(), isAdAvailable: false, status: 'idle' as const, rewardAmount: 0, preload: vi.fn() }),
+  useRewardedAd: (opts: { onRewardEarned: () => void }) => ({
+    showAd: vi.fn(() => opts.onRewardEarned()),
+    isAdAvailable: false,
+    status: 'idle' as const,
+    rewardAmount: 0,
+    preload: vi.fn(),
+  }),
 }));
 
 // t echoes key + params so labels are distinguishable in queries.
@@ -60,11 +67,24 @@ describe('WordTowerHud', () => {
     expect(screen.getByRole('button', { name: /wordTower\.hud\.build/ })).toBeEnabled();
   });
 
-  it('disables Scramble when no scrambles remain', () => {
-    const { rerender } = render(<WordTowerHud {...makeProps({ scramblesLeft: 0 })} />);
+  it('disables Scramble when no scrambles remain (while stuck)', () => {
+    const { rerender } = render(<WordTowerHud {...makeProps({ scramblesLeft: 0, possibleWords: 0 })} />);
     expect(screen.getByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeDisabled();
-    rerender(<WordTowerHud {...makeProps({ scramblesLeft: 2 })} />);
+    rerender(<WordTowerHud {...makeProps({ scramblesLeft: 2, possibleWords: 0 })} />);
     expect(screen.getByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeEnabled();
+  });
+
+  it('hides the Scramble button unless the player is stuck (no buildable words)', () => {
+    // Scramble used to always show; it should only appear as the "need a
+    // revenge" tool once the wheel has zero buildable words.
+    const { rerender } = render(<WordTowerHud {...makeProps({ possibleWords: 3 })} />);
+    expect(screen.queryByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeNull();
+
+    rerender(<WordTowerHud {...makeProps({ possibleWords: null })} />);
+    expect(screen.queryByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeNull();
+
+    rerender(<WordTowerHud {...makeProps({ possibleWords: 0 })} />);
+    expect(screen.getByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeInTheDocument();
   });
 
   it('fires onSelectTile when a tray tile is tapped', () => {
@@ -109,10 +129,45 @@ describe('WordTowerHud', () => {
 
   it('locks the tray + edit buttons while a word is pending placement', () => {
     render(
-      <WordTowerHud {...makeProps({ word: 'CAT', selected: [0, 1, 2], pendingWord: 'CCAT' })} />,
+      <WordTowerHud {...makeProps({ word: 'CAT', selected: [0, 1, 2], pendingWord: 'CCAT', possibleWords: 0 })} />,
     );
     expect(screen.getByRole('button', { name: 'wordTower.a11y.tile:R' })).toBeDisabled();
     expect(screen.getByRole('button', { name: /wordTower\.hud\.backspace/ })).toBeDisabled();
     expect(screen.getByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeDisabled();
+  });
+});
+
+describe('WordTowerHud — clue run cap', () => {
+  const clueButtonName = /wordTower\.hud\.possible/;
+
+  it('every clue reveal costs a rewarded ad — no free first clue', () => {
+    render(<WordTowerHud {...makeProps({ possibleWords: 2, clueWord: 'CATS' })} />);
+    // Ad-cost marker shows on the very first clue (no free daily clue anymore).
+    expect(screen.getByText('📺')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: clueButtonName }));
+    expect(screen.getByText('CATS')).toBeInTheDocument();
+  });
+
+  it('locks the clue button after CLUE_RUN_CAP reveals across different wheels', () => {
+    const trayA = ['C', 'A', 'T', 'S', 'X', 'Y', 'Z'];
+    const trayB = ['D', 'O', 'G', 'S', 'X', 'Y', 'Z'];
+    const trayC = ['B', 'I', 'R', 'D', 'X', 'Y', 'Z'];
+    const trayD = ['F', 'I', 'S', 'H', 'X', 'Y', 'Z'];
+    const { rerender } = render(
+      <WordTowerHud {...makeProps({ tray: trayA, possibleWords: 1, clueWord: 'CATS' })} />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: clueButtonName })); // clue 1
+
+    rerender(<WordTowerHud {...makeProps({ tray: trayB, possibleWords: 1, clueWord: 'DOGS' })} />);
+    fireEvent.click(screen.getByRole('button', { name: clueButtonName })); // clue 2
+
+    rerender(<WordTowerHud {...makeProps({ tray: trayC, possibleWords: 1, clueWord: 'BIRD' })} />);
+    fireEvent.click(screen.getByRole('button', { name: clueButtonName })); // clue 3 — hits CLUE_RUN_CAP
+
+    rerender(<WordTowerHud {...makeProps({ tray: trayD, possibleWords: 1, clueWord: 'FISH' })} />);
+    // 4th wheel, cap already spent — button is disabled, no reveal fires.
+    expect(screen.getByRole('button', { name: clueButtonName })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: clueButtonName }));
+    expect(screen.queryByText('FISH')).toBeNull();
   });
 });

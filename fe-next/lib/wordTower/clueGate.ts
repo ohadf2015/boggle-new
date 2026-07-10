@@ -1,27 +1,15 @@
 /**
- * Word Tower — daily clue gate (#6).
+ * Word Tower — clue gate.
  *
- * One clue reveal is FREE each UTC day; every clue after that costs a rewarded
- * ad. We persist only a single "free clue used today" flag per date in
- * localStorage — the ad path is not tracked (each ad watch is its own cost).
+ * Clues were unlimited (ad-gated after a free daily one, but no cap on how
+ * many ad-watches could refill it). Capped at CLUE_RUN_CAP per run — every
+ * clue, including the first, costs a rewarded ad watch.
  */
 
-const key = (dateKey: string) => `wt-clue-free-used-${dateKey}`;
+/** Max clues a player can reveal in a single run. */
+export const CLUE_RUN_CAP = 3;
 
-/** Has today's ONE free clue already been spent? */
-export function freeClueUsedToday(dateKey: string): boolean {
-  try {
-    return localStorage.getItem(key(dateKey)) === '1';
-  } catch {
-    return false;
-  }
-}
-
-/** Mark today's free clue as spent (idempotent). */
-export function markFreeClueUsed(dateKey: string): void {
-  try {
-    localStorage.setItem(key(dateKey), '1');
-  } catch {
-    /* best-effort */
-  }
+/** Can the player request another clue this run? */
+export function canRequestClue(cluesUsedThisRun: number): boolean {
+  return cluesUsedThisRun < CLUE_RUN_CAP;
 }
