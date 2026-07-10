@@ -45,6 +45,12 @@ import BrainScoreShareCard from '@/components/brain/BrainScoreShareCard';
 // nothing when closed, so first-paint HTML is unchanged.
 const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 import PageLoader from '@/components/ui/PageLoader';
+// Same reusable bottom banner slot the home dashboard/landing screen uses. On
+// native it reserves its own in-flow height and overlays the AdMob banner; on
+// web it renders the dev-only placeholder (null in production). Embedded at the
+// structural bottom of the hub so it never covers a drill card, the score hero,
+// or the analytics charts.
+import InlineBannerAd from '@/components/ads/InlineBannerAd';
 
 /**
  * Header component for Brain Training page
@@ -511,6 +517,12 @@ export default function BrainTrainingPageClient() {
         >
           <ScientificTipsCarousel />
         </m.div>
+
+        {/* Global bottom banner — reused from the home dashboard. The content
+            container already reserves the fixed-bottom stack (nav + banner) via
+            body.screen-fit, and the slot below adds its own in-flow height, so
+            the ad never overlaps the tips carousel or the charts above it. */}
+        <InlineBannerAd variant="content" webZone="menu" className="mt-2" />
       </div>
 
       {/* First Game Celebration Modal */}
