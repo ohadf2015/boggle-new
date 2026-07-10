@@ -107,6 +107,7 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
               finish(fromSurvival(r, config))
             }
             onQuit={onQuit}
+            quitStaysOnPage
           />
         </div>
       );
@@ -142,6 +143,7 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
                 finish(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config))
               }
               onQuit={onQuit}
+              quitStaysOnPage
             />
           </div>
         </div>

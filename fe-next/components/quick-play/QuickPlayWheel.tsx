@@ -18,19 +18,19 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { haptics } from '@/utils/haptics/HapticsManager';
 import {
   nearestNode,
-  NODE_ANGLES,
   scaleWheelLayout,
   nodeOffset,
   type WheelSelection,
   type WheelLayout,
 } from './wheelGeometry';
 import { QuickPlayStrikeFx } from './QuickPlayStrikeFx';
+import { QuickPlayTetherFx } from './QuickPlayTetherFx';
 import { QUICK_MODES, type QuickMode } from './types';
 import { NODE_COLORS } from './modeColors';
 
 const MODE_ICON_SRC: Record<QuickMode, string> = {
-  classic: '/modes/quickplay-icons/classic.webp',
-  blast: '/modes/quickplay-icons/blast.webp',
+  classic: '/modes/quickplay-icons/classic-v2.webp',
+  blast: '/modes/quickplay-icons/blast-v2.webp',
   'word-hunt': '/modes/quickplay-icons/hunt.webp',
   'wheel-rush': '/modes/quickplay-icons/wheel.webp',
 };
@@ -243,16 +243,12 @@ export function QuickPlayWheel({
         )}
 
         {active !== 'random' && !strikeMode && (
-          <div
-            aria-hidden
-            data-testid="quick-wheel-tether"
-            className={`absolute left-1/2 top-1/2 z-[1] w-1.5 origin-top border-2 border-black ${NODE_COLORS[active].tether} ${
-              !reduceMotion ? 'transition-transform duration-200' : ''
-            }`}
-            style={{
-              height: layout.tetherHeight,
-              transform: `translateX(-50%) rotate(${NODE_ANGLES[active] - 180}deg)`,
-            }}
+          <QuickPlayTetherFx
+            mode={active}
+            size={size}
+            ringRadius={layout.ringRadius}
+            scale={layout.scale}
+            reduceMotion={reduceMotion}
           />
         )}
 

@@ -73,6 +73,12 @@ interface DailyWordHuntSurvivalProps {
    * Independent of `practice` so life-drain can stay off without coach UI.
    */
   hideModeCoach?: boolean;
+  /**
+   * True when `onQuit` resets state and stays on this page (Quick Play)
+   * instead of navigating away (standalone Daily Word Hunt). Flips the nav
+   * guard's phantom-history handling below — see the `leaving` comment.
+   */
+  quitStaysOnPage?: boolean;
 }
 
 /**
@@ -93,6 +99,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
   currentGuestFingerprint,
   practice = false,
   hideModeCoach = false,
+  quitStaysOnPage = false,
 }) => {
   const { t } = useLanguage();
   const { isDesktop, isTv } = useDesktopLayout();
@@ -177,7 +184,9 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     // `leaving` tells the guard's teardown NOT to pop its phantom history entry:
     // confirming quit fires router.push('/daily') in the same handler, and a
     // go(-1) cleanup would race-cancel that push — black screen on native exit.
-    leaving: quitting,
+    // Quick Play's onQuit stays on this page instead, so it needs the phantom
+    // popped (leaving=false) or every quit strands an extra history entry.
+    leaving: quitting && !quitStaysOnPage,
     message: t('wordHunt.quitConfirmMessage'),
     onNavigationAttempt: () => {
       actions.setShowQuitConfirm(true);

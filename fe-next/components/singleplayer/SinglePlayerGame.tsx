@@ -37,6 +37,8 @@ interface SinglePlayerGameProps {
    * so every round starts immediately without coach stacking.
    */
   hideModeCoach?: boolean;
+  /** True when `onQuit` resets state and stays on this page (Quick Play). See useSinglePlayerCore. */
+  quitStaysOnPage?: boolean;
 }
 
 /**
@@ -49,12 +51,14 @@ function SinglePlayerGame({
   onGameEnd,
   onQuit,
   hideModeCoach = false,
+  quitStaysOnPage = false,
 }: SinglePlayerGameProps): React.ReactElement {
   const core = useSinglePlayerCore({
     settings,
     targetHighScore,
     onGameEnd,
     onQuit,
+    quitStaysOnPage,
   });
 
   // Funnel parity: emit game_started once on mount to pair with emitSinglePlayerGameEnd('singleplayer', settings.mode, ...)
@@ -420,7 +424,7 @@ function SinglePlayerGame({
 
   // Portrait layout (default)
   return (
-    <div className="relative" translate="no">
+    <div className="relative h-full" translate="no">
       {encouragementBanner}
       {scorePopupElement}
       {practicePromptElement}

@@ -53,6 +53,15 @@ interface UseSinglePlayerCoreOptions {
   targetHighScore: number | null;
   onGameEnd: (results: SinglePlayerResultsData) => void;
   onQuit: () => void;
+  /**
+   * True when `onQuit` resets in-app state and stays on the same URL (e.g.
+   * Quick Play's arcade loop) rather than navigating away. Callers that
+   * navigate (the default) must skip the guard's phantom history.go(-1) on
+   * teardown — it would race the in-flight router.push and blank a Capacitor
+   * WebView. Callers that stay on the page need the opposite: the phantom
+   * MUST be popped, or every quit strands an extra same-URL history entry.
+   */
+  quitStaysOnPage?: boolean;
 }
 
 interface AvailableWords {
@@ -68,7 +77,7 @@ const MIN_TRACKED_WORD_LENGTH = 5;
  * Consolidates all state management, effects, and handlers
  */
 export function useSinglePlayerCore({
-  settings, targetHighScore, onGameEnd, onQuit,
+  settings, targetHighScore, onGameEnd, onQuit, quitStaysOnPage = false,
 }: UseSinglePlayerCoreOptions) {
   const { t } = useLanguage();
   // Cozy / Calm Mode (single-player only): calmer bot pacing + no urgency cues.
@@ -204,7 +213,10 @@ export function useSinglePlayerCore({
 
   useNavigationGuard({
     enabled: !!grid && !isGameOver && score > 0 && !quitting,
-    leaving: quitting,
+    // Only skip the phantom pop when quitting actually navigates away — a
+    // caller that stays on the page (quitStaysOnPage) must have it popped,
+    // or every confirmed quit strands an extra same-URL history entry.
+    leaving: quitting && !quitStaysOnPage,
     message: t('singlePlayer.quitConfirmMessage') || 'You will lose your current progress. Are you sure you want to quit?',
     onNavigationAttempt: () => { setShowQuitConfirm(true); return false; },
   });
