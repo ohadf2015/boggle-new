@@ -13,7 +13,6 @@ import logger from '@/utils/logger';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
 import WordWheelResults from './WordWheelResults';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
-import { FlowContinueBar } from './flow/FlowContinueBar';
 import {
   generateWordWheelPuzzle,
   type WordWheelPuzzle,
@@ -123,8 +122,6 @@ const WordWheelChallenge: React.FC = () => {
   const dateParam = searchParams.get('date');
   const catchupDate = dateParam && isCatchUpDate(getDailyChallengeDate(), dateParam) ? dateParam : null;
   const isCatchup = !!catchupDate;
-  // In-flow (`?flow=1`): on results, hand back to the Daily Flow breather.
-  const inFlow = searchParams.get('flow') === '1';
 
   const [phase, setPhase] = useState<WordWheelPhase>('loading');
   const [puzzle, setPuzzle] = useState<WordWheelPuzzle | null>(null);
@@ -470,6 +467,16 @@ const WordWheelChallenge: React.FC = () => {
     setPhase('completed');
   }, [language, puzzle, puzzleNumber, setGameActive, isAuthenticated, profile, isPractice, catchupDate, isCatchup]);
 
+  // Practice dead-end fix: results screen offers "spin another wheel" — fresh
+  // RANDOM puzzle (the mount path seeds by date, so re-entering would serve the
+  // identical wheel) and back to the ready screen. Practice-only.
+  const handlePracticeAgain = useCallback(() => {
+    const seed = Math.random().toString(36).slice(2);
+    setPuzzle(generateWordWheelPuzzle(seed, language as Language));
+    setGameResult(null);
+    setPhase('ready');
+  }, [language]);
+
   const handleEffect = useCallback((effect: WordWheelEffect) => {
     setEffects(prev => [...prev, effect]);
   }, []);
@@ -689,6 +696,7 @@ const WordWheelChallenge: React.FC = () => {
               isFirstCompletion={getDailyStreak().totalDailiesCompleted <= 1}
               alreadyPlayed={phase === 'already-played'}
               isCatchup={isCatchup}
+              onPracticeAgain={isPractice ? handlePracticeAgain : undefined}
             />
           </m.div>
         )}
@@ -708,8 +716,6 @@ const WordWheelChallenge: React.FC = () => {
         variant="danger"
         analyticsId="word_wheel_quit_confirm"
       />
-
-      <FlowContinueBar active={inFlow && (phase === 'completed' || phase === 'already-played')} />
     </div>
   );
 };

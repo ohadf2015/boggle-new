@@ -1,9 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { m } from 'framer-motion';
-import { Timer, CircleDot, Check, X, Eye } from 'lucide-react';
+import { Timer, CircleDot, Check, X, Eye, Sparkles } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
@@ -24,11 +24,6 @@ import { FloatingDecorations } from './landing/FloatingDecorations';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
 import DailyInsightStack from './DailyInsightStack';
-import { HoldToStartFlow } from './flow/HoldToStartFlow';
-import { FlowIntroHint } from './flow/FlowIntroHint';
-import { FlowResumeBanner } from './flow/FlowResumeBanner';
-import { DEFAULT_FLOW_STEPS, readPlayedMap, flowStepHref } from './flow/flowSteps';
-import { startDailyFlow, getDailyFlowSession, nextFlowStep } from '@/utils/dailyChallenge/flow';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
@@ -52,35 +47,7 @@ export function DailyChallengeLanding({
   // no hub edits. See lib/auth/inWorkModeAccess.ts.
   const adminModes = canSeeInWorkModes ? adminOnlyDailyModes() : [];
   const pathname = usePathname();
-  const router = useRouter();
   const searchParams = useSearchParams();
-
-  // Whether an in-progress Daily Flow exists with a step still to play. Drives
-  // the swap between the "start the flow" CTA and the "resume your flow" banner.
-  // Resolved after mount (localStorage) to avoid a hydration mismatch.
-  const [flowInProgress, setFlowInProgress] = useState(false);
-  const refreshFlowState = useCallback(() => {
-    const session = getDailyFlowSession();
-    if (!session) {
-      setFlowInProgress(false);
-      return;
-    }
-    const played = readPlayedMap(session.steps, session.language);
-    setFlowInProgress(nextFlowStep(session, played) !== null);
-  }, []);
-
-  const handleStartFlow = useCallback(
-    (fast: boolean) => {
-      const session = startDailyFlow({ language: currentLanguage, steps: DEFAULT_FLOW_STEPS, fast });
-      // One gesture → straight into the first unplayed challenge. The breather
-      // (/daily/flow) only surfaces BETWEEN rounds. If everything's somehow
-      // already cleared, let the controller show the finale instead.
-      const played = readPlayedMap(session.steps, session.language);
-      const first = nextFlowStep(session, played);
-      router.push(first ? flowStepHref(first, currentLanguage) : `/${currentLanguage}/daily/flow`);
-    },
-    [currentLanguage, router],
-  );
 
   // Pre-game gauntlet banner. Reads the same rival contract the share link emits
   // (whName/whScore/whEmoji) and the results head-to-head card consumes — one
@@ -125,7 +92,6 @@ export function DailyChallengeLanding({
   // Initial check
   useEffect(() => {
     checkWordWheelStatus();
-    refreshFlowState();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentLanguage, user?.id]);
 
@@ -135,7 +101,6 @@ export function DailyChallengeLanding({
       if (document.visibilityState === 'visible') {
         checkWordWheelStatus();
         dailyStatus.refresh();
-        refreshFlowState();
       }
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -148,7 +113,6 @@ export function DailyChallengeLanding({
     const handlePopState = () => {
       checkWordWheelStatus();
       dailyStatus.refresh();
-      refreshFlowState();
     };
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
@@ -185,26 +149,6 @@ export function DailyChallengeLanding({
 
       {/* Missions Header: XP bar + countdown */}
       <DailyMissionsHeader completedCount={completedCount} />
-
-      {/* Daily Flow entry — one gesture to chain every daily challenge. Shows the
-          resume banner when a run is already in progress, otherwise the
-          tap-or-hold start control (hold = fast flow). Hidden once everything's
-          cleared (nothing left to flow through). */}
-      {flowInProgress ? (
-        <FlowResumeBanner />
-      ) : (
-        !(wordHuntPlayed && wordWheelPlayed) && (
-          <HoldToStartFlow
-            onStart={handleStartFlow}
-            label={t('daily.flow.startLabel', 'Play all challenges')}
-            holdHint={t('daily.flow.startHint', 'Tap to start · hold for fast flow')}
-            holdingHint={t('daily.flow.holdingHint', 'Keep holding for fast flow…')}
-          />
-        )
-      )}
-      {!flowInProgress && !(wordHuntPlayed && wordWheelPlayed) && (
-        <FlowIntroHint />
-      )}
 
       {/* Score Gauntlet Banner: shown when arriving via a challenge share link */}
       <ScoreGauntletBanner
@@ -262,17 +206,18 @@ export function DailyChallengeLanding({
                 {t('daily.wordHunt.title')}
               </h2>
               <span className={cn(
-                'inline-block mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2',
+                'inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2',
                 wordHuntStatus === 'won'
                   ? 'bg-neo-lime/20 text-neo-lime border-neo-lime/40'
                   : 'bg-neo-pink/20 text-neo-pink border-neo-pink/40'
               )}>
+                {wordHuntStatus === 'won' && <Sparkles className="w-2.5 h-2.5" strokeWidth={3} aria-hidden />}
                 {wordHuntStatus === 'won' ? t('daily.cleared') : t('daily.wordHunt.title')}
               </span>
             </div>
             <div className={cn(
               'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
-              'bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard-sm',
+              'bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm',
               'active:translate-y-0.5 active:shadow-none transition-all',
               'flex items-center gap-1.5 group-hover:scale-105'
             )}>
@@ -329,18 +274,18 @@ export function DailyChallengeLanding({
               'relative w-full rounded-xl border-3 border-neo-black',
               'shadow-hard overflow-hidden cursor-pointer p-4',
               'flex items-center gap-4',
-              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan',
+              'focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime',
               'transition-all duration-200 group',
-              'bg-neo-cyan/[0.06] hover:bg-neo-cyan/[0.1]'
+              'bg-neo-lime/[0.06] hover:bg-neo-lime/[0.1]'
             )}
           >
-            <div className="absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg bg-neo-cyan" />
+            <div className="absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg bg-neo-lime" />
             <m.div
               data-testid="wheel-cleared-badge"
               className={cn(
                 'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
                 'flex items-center justify-center shadow-hard-xs',
-                'bg-neo-cyan'
+                'bg-neo-lime'
               )}
               initial={{ scale: 0, rotate: -180 }}
               animate={{ scale: 1, rotate: 0 }}
@@ -352,7 +297,8 @@ export function DailyChallengeLanding({
               <h2 className="text-xl font-neo-display font-black text-neo-white leading-none">
                 {t('wordWheel.hub.wordWheelQuest')}
               </h2>
-              <span className="inline-block mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2 bg-neo-cyan/20 text-neo-cyan border-neo-cyan/40">
+              <span className="inline-flex items-center gap-1 mt-1.5 px-2.5 py-0.5 text-[10px] font-black uppercase rounded-md border-2 bg-neo-lime/20 text-neo-lime border-neo-lime/40">
+                <Sparkles className="w-2.5 h-2.5" strokeWidth={3} aria-hidden />
                 {t('daily.cleared')}
               </span>
             </div>
