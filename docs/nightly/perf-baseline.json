@@ -1,9 +1,9 @@
 {
-  "date": "2026-07-09",
-  "note": "24h window: 0 routes n≥50 (4th consecutive night all sub-floor). No eligible regression verdicts. Supabase MCP absent (14th consecutive night — CRITICAL: human must mint never-expire PAT). All prior LCP fixes verified in-place: homepage winner.webp preload (correct, unoptimized asset), fetchLandingData parallelization, multiplayer arena-hub-hero preload. No new code changes this run — all targets already optimized.",
+  "date": "2026-07-10",
+  "note": "24h window: 0 routes n≥50 (5th consecutive night all sub-floor). No eligible regression verdicts. Supabase MCP absent (15th consecutive night — CRITICAL: human must mint never-expire PAT). VirtualGamesList.tsx:39:23 lint error confirmed RESOLVED (single-file eslint exit 0 — was blocking gate 07-03/07-06). Multiplayer hero (n.jpg) already has priority prop set (RoomListView.tsx:201). All prior LCP fixes verified in-place.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (14th consecutive night). 4 migrations pending apply. Impact check for 02-perf-2026-07-06-qpc-index-cleanup DEFERRED (pg_stat_user_indexes unreachable). web_vitals FK: already indexed by 20260429160100 (web_vitals_player_id_idx) — advisor showing stale data. Auth connections (absolute→percentage): human dashboard task.",
+    "note": "Supabase MCP absent (15th consecutive night). 4 migrations pending apply. RLS initplan verdict: DEFERRED (migration 20260707020000 written but not applied — no observable change). web_vitals FK: already indexed by 20260429160100 (advisor stale). Auth connections (absolute→percentage): human dashboard task.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
@@ -13,16 +13,16 @@
           "RLS initplan fix: (select auth.role()) on quest_achievement_feed policy",
           "CREATE INDEX IF NOT EXISTS idx_word_clubs_owner_id ON public.word_clubs(owner_id)"
         ],
-        "carry_count": 13,
-        "status": "WRITTEN — pending apply (13th night)"
+        "carry_count": 14,
+        "status": "WRITTEN — pending apply (14th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
         "items": [
           "DROP INDEX IF EXISTS public.idx_word_wheel_attempts_catchup"
         ],
-        "carry_count": 8,
-        "status": "WRITTEN — pending apply (8th night)"
+        "carry_count": 9,
+        "status": "WRITTEN — pending apply (9th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql",
@@ -30,8 +30,8 @@
           "DROP INDEX IF EXISTS public.quick_play_challenges_challenger_idx",
           "CREATE INDEX IF NOT EXISTS idx_word_club_members_user_id ON public.word_club_members(user_id)"
         ],
-        "carry_count": 3,
-        "status": "WRITTEN — pending apply (3rd night)"
+        "carry_count": 4,
+        "status": "WRITTEN — pending apply (4th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql",
@@ -40,8 +40,8 @@
           "DROP+CREATE quick_play_results_insert: WITH CHECK uses (SELECT auth.uid()) — initplan wrapper",
           "DROP+CREATE quick_play_challenges_insert: WITH CHECK uses (SELECT auth.uid()) — initplan wrapper"
         ],
-        "carry_count": 2,
-        "status": "WRITTEN — pending apply (2nd night)"
+        "carry_count": 3,
+        "status": "WRITTEN — pending apply (3rd night)"
       }
     ],
     "remaining_advisor_items": [
@@ -49,63 +49,57 @@
         "id": "auth_rls_initplan_quick_play_challenges",
         "table": "quick_play_challenges",
         "policy": "quick_play_challenges_accept + insert policies",
-        "status": "Migration 20260707020000 written. Pending apply.",
+        "status": "Migration 20260707020000 written. Pending apply. Verdict: neutral (not applied).",
         "priority": "MEDIUM",
-        "carry_count": 2
+        "carry_count": 3
       },
       {
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config (Auth Settings → Connection pooler strategy: absolute→percentage). MCP absent.",
         "priority": "LOW",
-        "carry_count": 13
+        "carry_count": 14
       },
       {
         "id": "unindexed_fk_web_vitals_player_id",
         "status": "STALE ADVISOR DATA — web_vitals_player_id_idx already created in migration 20260429160100. No new migration needed.",
         "priority": "INFO",
-        "carry_count": 2
+        "carry_count": 3
       }
     ]
   },
   "frontend": {
-    "note": "0 routes above n≥50 floor (4th consecutive night). All LCP/INP/CLS verdicts DEFERRED. Phase-0 brief LCP values (/es?utm 4260ms, /en/daily/word-wheel 3996ms, /es/multiplayer 3333ms, /es 2776ms) are all sub-floor — not actionable as regressions. All known LCP optimizations verified in-place this run: hero preload correct (unoptimized WebP), fetchLandingData parallelized, multiplayer arena-hub-hero preload wired. next/font self-hosted fonts confirmed (no Google Fonts round-trip). Below-fold images confirmed default-lazy (no priority misuse).",
+    "note": "0 routes above n≥50 floor (5th consecutive night). All LCP/INP/CLS verdicts DEFERRED. Phase-0 brief LCP values (/en/multiplayer?room=LSNM3J 4628ms, /en/daily/word-wheel 3784ms, /en/multiplayer?room=P5HM9V 3677ms, /en/friends 3655ms) are all sub-floor single samples — not actionable as regressions. Multiplayer hero (n.jpg in RoomListView.tsx:201) confirmed has priority prop — no fix needed. MultiplayerFlow already uses ssr:true for lobby (confirmed correct — documented optimization). Multiplayer PageClient has no unoptimized images.",
     "by_route": [
       {
-        "route": "/es",
+        "route": "/en/multiplayer?room=*",
         "p75_lcp_ms": null,
         "n_24h": "sub-50",
-        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 2776ms. Homepage: winner.webp preloaded + priority set, fetchLandingData parallelized."
-      },
-      {
-        "route": "/es (utm_source=chatgpt.com)",
-        "p75_lcp_ms": null,
-        "n_24h": "sub-50",
-        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 4260ms. Same page as /es — UTM param does not affect ISR cache. Likely cold-visitor (first visit, no mascot cached)."
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 4628ms. Hero n.jpg has priority prop (RoomListView.tsx:201). MultiplayerFlow ssr:true for lobby FCP. Already optimized."
       },
       {
         "route": "/en/daily/word-wheel",
         "p75_lcp_ms": null,
         "n_24h": "sub-floor (n<50)",
-        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 3996ms. noIndex game shell. Dynamic import loading state uses priority-mascot (fast). Actual delay = JS download + dynamic resolve."
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 3784ms. WordWheelChallenge dynamic import, no above-fold image identified."
       },
       {
-        "route": "/es/multiplayer",
+        "route": "/en/friends",
         "p75_lcp_ms": null,
         "n_24h": "sub-floor (n<50)",
-        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 3333ms. arena-hub-hero.jpg preload wired correctly."
+        "lcp_status": "DEFERRED — sub-floor. Phase-0 single-sample: 3655ms. Client-only auth component, no above-fold images."
       }
     ],
     "shipped_this_run": []
   },
   "bundle": {
     "total_kb_uncompressed": null,
-    "note": "Top chunks unchanged vs 2026-07-08 baseline within 3KB — no regression. Chunk hashes changed (fresh build from prior lanes), sizes stable.",
+    "note": "Top chunks stable vs 2026-07-09 baseline within <15KB — no regression. Dictionary chunk (8aafd928) still largest at 6449KB (LAZY confirmed). No new >50KB regression chunks found.",
     "top_chunks": [
-      { "name": "8aafd928.bc81927d996732a9.js", "kb": 6452, "note": "Word dictionary — LAZY" },
+      { "name": "8aafd928.bc81927d996732a9.js", "kb": 6449, "note": "Word dictionary — LAZY" },
       { "name": "6c0d0f8e.e929edfbc529ee96.js", "kb": 3284 },
-      { "name": "62013-966f6608ee5cbc47.js", "kb": 856 },
-      { "name": "60150.6f0277a1c4778f3c.js", "kb": 712 },
-      { "name": "26644.51104cd213c865d8.js", "kb": 612 }
+      { "name": "62013-966f6608ee5cbc47.js", "kb": 854 },
+      { "name": "60150.55a27748f4a47bec.js", "kb": 710 },
+      { "name": "26644.51104cd213c865d8.js", "kb": 609 }
     ]
   }
 }

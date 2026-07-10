@@ -1418,3 +1418,17 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
 - `share-prompt-timing` (created 2026-03-31, 100d) — A/B share prompt timing; needs winner determination + code cleanup
 - `show-signup-after-first-win` (created 2026-03-31, 100d) — A/B signup prompt timing; same
 - `mp-signup-nudge-copy-v1` (created 2026-05-08, 62d) — MP signup nudge copy variants; 0/77 converts on control noted in flag description
+
+## 2026-07-10
+- [Supabase] Signed-In Users Can Execute SECURITY DEFINER Function: upsert_push_token
+  - first seen: ongoing advisor flag; count: persistent; userCount: all authenticated users
+  - link: supabase:advisor:security:authenticated_security_definer_function_executable
+  - status: deferred — migration 20260628010000_revoke_push_token_fn_from_public.sql written and committed, but UNAPPLIED (Supabase MCP token drought). Migration is ready; only blocked on MCP connectivity.
+  - why: Supabase MCP unavailable; migration exists at fe-next/supabase/migrations/20260628010000_revoke_push_token_fn_from_public.sql
+  - recommended owner: review-by-eod (apply migration when MCP available — run `supabase db push` or use MCP apply_migration)
+
+- [Supabase] RLS Policy Always True: teacher_access_requests tar_insert_any
+  - link: supabase:advisor:security:rls_policy_always_true
+  - status: deferred — need design call: should INSERT be restricted by student email domain or school association?
+  - why: ambiguous root cause requiring design
+  - recommended owner: backend + design
