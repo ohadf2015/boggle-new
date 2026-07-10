@@ -158,10 +158,10 @@ export function getRotatedTodayWord(locale: Locale, dateKey: string): WordEntry 
   const words = localeWords(locale);
   const exact = words.find((w) => w.dateKey === dateKey);
   if (exact) return exact;
-  if (!ISO_DATE_RE.test(dateKey)) return words[0];
+  if (!ISO_DATE_RE.test(dateKey)) return { ...words[0], dateKey };
   const dayIndex = Math.floor((Date.parse(dateKey + 'T00:00:00Z') - ROTATION_EPOCH_MS) / MS_PER_DAY);
   const idx = ((dayIndex % words.length) + words.length) % words.length;
-  return words[idx];
+  return { ...words[idx], dateKey };
 }
 
 export function getTodayWord(locale: Locale): WordEntry {
