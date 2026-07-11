@@ -20,6 +20,7 @@ import { ScreenShake } from './ScreenShake';
 import { ScreenFlash } from './ScreenFlash';
 import { TimeDilation } from './TimeDilation';
 import type { GameCanvasConfig, PhysicsConfig } from './types';
+import logger from '@/utils/logger';
 
 // ─── Context ──────────────────────────────────────────────────────────
 
@@ -107,14 +108,25 @@ export function GameCanvas({
       // propagates out of _tick and Ticker never reaches the line that
       // reschedules its own requestAnimationFrame. The whole engine (physics,
       // particles, every consumer's own ticker.add callback) freezes dead for
-      // the rest of the session, not just one dropped frame (Sentry 1RP: DAU
-      // crash pattern, /:locale/word-tower — matches the 1CK/1CW/1PV destroy-
-      // vs-render race class already hardened elsewhere in this engine). Swap
-      // Pixi's raw listener for an identical one wrapped in try/catch, at the
-      // same priority, so a lost frame can never take down the ticker.
+      // the rest of the session, not just one dropped frame (matches Sentry
+      // JAVASCRIPT-NEXTJS-1RP, /:locale/word-tower — same destroy-vs-render
+      // race class as 1CK/1CW/1PV already hardened elsewhere in this engine).
+      // Swap Pixi's raw listener for an identical one wrapped in try/catch, at
+      // the same priority, so a lost frame can never take down the ticker.
+      // Logged (once per mount, not every frame) rather than silently
+      // swallowed — an empty catch here would make 1RP go quiet in Sentry
+      // whether or not the underlying render is actually fixed.
+      let renderErrorLogged = false;
       app.ticker.remove(app.render, app);
       app.ticker.add(() => {
-        try { app.render(); } catch { /* post-destroy render race — skip this frame */ }
+        try {
+          app.render();
+        } catch (err) {
+          if (!renderErrorLogged) {
+            renderErrorLogged = true;
+            logger.warn('[GameCanvas] render threw mid-frame, skipping frame:', err);
+          }
+        }
       }, app, UPDATE_PRIORITY.LOW);
 
       const camera = new Container();
@@ -139,13 +151,16 @@ export function GameCanvas({
       const flash = new ScreenFlash(app.stage, config.width, config.height);
       const timeDilation = new TimeDilation();
 
+      let updateErrorLogged = false;
       app.ticker.add((ticker) => {
         if (destroyed) return;
         // Same freeze risk as the render listener above: an uncaught throw
         // here (e.g. a subsystem touching an object a same-frame destroy()
         // just nulled, or a consumer's onTick) would stop this ticker from
         // ever rescheduling itself — try/catch turns that into one skipped
-        // frame instead of a permanently dead engine.
+        // frame instead of a permanently dead engine. Logged once per mount
+        // so a persistent failure stays visible instead of silently skipping
+        // every frame forever.
         try {
           const rawDelta = ticker.deltaMS / 1000;
           // Apply time dilation to all game systems (not real-time UI)
@@ -160,7 +175,12 @@ export function GameCanvas({
             camera.y = shake.offset.y;
           }
           onTickRef.current?.(deltaSec);
-        } catch { /* post-destroy update race — skip this frame */ }
+        } catch (err) {
+          if (!updateErrorLogged) {
+            updateErrorLogged = true;
+            logger.warn('[GameCanvas] tick update threw mid-frame, skipping frame:', err);
+          }
+        }
       });
 
       const ctx: GameEngineContext = {

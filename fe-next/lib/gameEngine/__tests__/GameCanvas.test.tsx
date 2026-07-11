@@ -9,15 +9,21 @@
  * propagates out of _tick and the ticker never reaches the line that
  * reschedules its own requestAnimationFrame. That freezes the WHOLE engine
  * (every consumer's ticker.add callback) for the rest of the session, not
- * just one dropped frame — the DAU-crash pattern behind 1RP.
+ * just one dropped frame.
  *
  * GameCanvas now swaps Pixi's raw render listener for a try/catch-wrapped
- * one and wraps its own subsystem-update listener the same way. These tests
- * assert both survive a throw instead of propagating.
+ * one and wraps its own subsystem-update listener the same way, each logging
+ * once per mount via `logger.warn` (not swallowing silently — an empty catch
+ * would make 1RP go quiet in Sentry whether or not the render is actually
+ * fixed). These tests assert both survive a throw instead of propagating,
+ * and that the first throw gets reported.
  */
 import React from 'react';
 import { render, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+const loggerMock = vi.hoisted(() => ({ warn: vi.fn() }));
+vi.mock('@/utils/logger', () => ({ default: loggerMock }));
 
 const captured = vi.hoisted(() => ({
   tickerListeners: [] as Array<{ fn: (...args: unknown[]) => void; context: unknown; priority: number }>,
@@ -91,6 +97,7 @@ import { GameCanvas } from '../GameCanvas';
 beforeEach(() => {
   captured.tickerListeners.length = 0;
   captured.appInstances.length = 0;
+  loggerMock.warn.mockClear();
 });
 
 const baseConfig = { width: 300, height: 300, background: 0x000000 };
@@ -118,6 +125,12 @@ describe('GameCanvas — ticker survives a mid-frame throw (Sentry 1RP)', () => 
     const renderListener = captured.tickerListeners.find((l) => l.priority === -25)!;
 
     expect(() => renderListener.fn()).not.toThrow();
+    expect(loggerMock.warn).toHaveBeenCalledTimes(1);
+    // A persistent failure must still report ONCE, not spam a log line every
+    // frame for the rest of the session.
+    renderListener.fn();
+    renderListener.fn();
+    expect(loggerMock.warn).toHaveBeenCalledTimes(1);
   });
 
   it('does not throw when a subsystem update throws mid-frame', async () => {
@@ -129,5 +142,6 @@ describe('GameCanvas — ticker survives a mid-frame throw (Sentry 1RP)', () => 
 
     const badTicker = { deltaMS: 16 };
     expect(() => updateListener.fn(badTicker)).not.toThrow();
+    expect(loggerMock.warn).toHaveBeenCalledTimes(1);
   });
 });
