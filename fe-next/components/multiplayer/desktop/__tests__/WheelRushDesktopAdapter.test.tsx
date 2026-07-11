@@ -68,4 +68,14 @@ describe('WheelRushDesktopAdapter', () => {
     render(<WheelRushDesktopAdapter {...mkProps()} meId="u2" />);
     expect(screen.queryByTestId('closest-rivals-panel')).not.toBeInTheDocument();
   });
+
+  it('hides the keyboard hint strip once the player has found a word', () => {
+    render(<WheelRushDesktopAdapter {...mkProps()} />); // mkProps foundWords has 1 entry
+    expect(screen.queryByTestId('kb-hint-submit')).not.toBeInTheDocument();
+  });
+
+  it('shows the keyboard hint strip before any word is found', () => {
+    render(<WheelRushDesktopAdapter {...mkProps()} foundWords={[]} />);
+    expect(screen.getByTestId('kb-hint-submit')).toBeInTheDocument();
+  });
 });

@@ -85,4 +85,34 @@ describe('WordHuntDesktopAdapter', () => {
     );
     expect(screen.queryByTestId('closest-rivals-panel')).not.toBeInTheDocument();
   });
+
+  it('hides the keyboard hint strip once the player has found a word', () => {
+    render(
+      <WordHuntDesktopAdapter
+        roomId="r1"
+        leaderboard={[]}
+        foundWords={[{ word: 'CAT', score: 3, ts: 0, userId: 'u1' }]}
+        remainingTime={30}
+        totalTime={60}
+        targetCategory="animals"
+        canvas={<div />}
+      />,
+    );
+    expect(screen.queryByTestId('kb-hint-submit')).not.toBeInTheDocument();
+  });
+
+  it('shows the keyboard hint strip before any word is found', () => {
+    render(
+      <WordHuntDesktopAdapter
+        roomId="r1"
+        leaderboard={[]}
+        foundWords={[]}
+        remainingTime={30}
+        totalTime={60}
+        targetCategory="animals"
+        canvas={<div />}
+      />,
+    );
+    expect(screen.getByTestId('kb-hint-submit')).toBeInTheDocument();
+  });
 });

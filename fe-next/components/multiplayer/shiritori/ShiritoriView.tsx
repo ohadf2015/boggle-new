@@ -74,88 +74,96 @@ export default function ShiritoriView({
   };
 
   return (
-    <div className="mx-auto flex max-w-xl flex-col gap-4 p-4">
-      {/* Turn rail */}
-      <ul className="flex flex-wrap gap-2" aria-label={t('shiritori.players')}>
-        {players.map((p) => (
-          <li
-            key={p.username}
-            data-active={!finished && currentPlayer === p.username}
-            className={`rounded-neo border-neo border-black px-3 py-1 font-neo-display text-sm shadow-hard ${
-              p.eliminated
-                ? 'bg-neo-navy-light text-neo-white line-through'
-                : !finished && currentPlayer === p.username
-                  ? 'bg-neo-lime text-black'
-                  : 'bg-neo-navy-light text-neo-white'
-            }`}
-          >
-            {p.username}
-          </li>
-        ))}
-      </ul>
-
-      {/* Required head prompt */}
-      {!finished && (
-        <div className="text-center">
-          <p className="font-neo-body text-sm text-neo-white">{t('shiritori.nextStartsWith')}</p>
-          <p className="font-neo-display text-5xl font-bold text-neo-cyan" data-testid="required-head">
-            {requiredHead ?? '—'}
-          </p>
-        </div>
-      )}
-
-      {/* Chain history */}
-      <ol className="flex flex-wrap items-center gap-2" aria-label={t('shiritori.chain')}>
-        {chain.map((w, i) => (
-          <li
-            key={`${w}-${i}`}
-            className="shiritori-chip animate-neo-pop rounded-neo border-neo border-black bg-neo-pink px-3 py-1 font-neo-display text-black shadow-hard motion-reduce:animate-none"
-          >
-            {w}
-          </li>
-        ))}
-      </ol>
-
-      {/* Game over */}
-      {finished ? (
-        <div className="rounded-neo border-neo-thick border-black bg-neo-yellow p-4 text-center font-neo-display text-xl font-bold text-black shadow-hard" role="status">
-          {winner === me ? t('shiritori.youWin') : `${winner ?? ''} ${t('shiritori.wins')}`}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-2">
-          <div className="flex gap-2">
-            <input
-              ref={inputRef}
-              type="text"
-              inputMode="text"
-              lang="ja"
-              autoComplete="off"
-              disabled={!isMyTurn}
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              onCompositionStart={() => { composingRef.current = true; }}
-              onCompositionEnd={(e: CompositionEvent<HTMLInputElement>) => { composingRef.current = false; setValue(e.currentTarget.value); }}
-              onKeyDown={onKeyDown}
-              placeholder={isMyTurn ? t('shiritori.yourTurn') : t('shiritori.waitTurn')}
-              aria-label={t('shiritori.inputLabel')}
-              className="flex-1 rounded-neo border-neo-thick border-black bg-neo-cream px-4 py-3 font-neo-body text-black shadow-hard disabled:opacity-50"
-            />
-            <button
-              type="button"
-              onClick={submit}
-              disabled={!isMyTurn || value.trim().length === 0}
-              className="rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-3 font-neo-display font-bold text-black shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50"
+    <div className="mx-auto flex w-full max-w-xl flex-col gap-4 p-4 lg:max-w-3xl lg:grid lg:grid-cols-[1fr_11rem] lg:items-start lg:gap-6">
+      {/* Turn rail — stacks on top on mobile, becomes a right sidebar at lg so
+          wide desktop viewports don't leave the chain floating in dead space. */}
+      <aside className="lg:col-start-2 lg:row-start-1" data-testid="shiritori-turn-rail">
+        <h3 className="mb-1.5 hidden font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-cream/70 lg:block">
+          {t('shiritori.players')}
+        </h3>
+        <ul className="flex flex-wrap gap-2 lg:flex-col" aria-label={t('shiritori.players')}>
+          {players.map((p) => (
+            <li
+              key={p.username}
+              data-active={!finished && currentPlayer === p.username}
+              className={`rounded-neo border-neo border-black px-3 py-1 font-neo-display text-sm shadow-hard ${
+                p.eliminated
+                  ? 'bg-neo-navy-light text-neo-white line-through'
+                  : !finished && currentPlayer === p.username
+                    ? 'bg-neo-lime text-black'
+                    : 'bg-neo-navy-light text-neo-white'
+              }`}
             >
-              {t('shiritori.submit')}
-            </button>
-          </div>
-          {lastError && (
-            <p className="font-neo-body text-sm text-neo-red" role="alert">
-              {t(`shiritori.error.${lastError}`)}
+              {p.username}
+            </li>
+          ))}
+        </ul>
+      </aside>
+
+      <div className="flex flex-col gap-4 lg:col-start-1 lg:row-start-1">
+        {/* Required head prompt */}
+        {!finished && (
+          <div className="text-center">
+            <p className="font-neo-body text-sm text-neo-white">{t('shiritori.nextStartsWith')}</p>
+            <p className="font-neo-display text-5xl font-bold text-neo-cyan" data-testid="required-head">
+              {requiredHead ?? '—'}
             </p>
-          )}
-        </div>
-      )}
+          </div>
+        )}
+
+        {/* Chain history */}
+        <ol className="flex flex-wrap items-center gap-2" aria-label={t('shiritori.chain')}>
+          {chain.map((w, i) => (
+            <li
+              key={`${w}-${i}`}
+              className="shiritori-chip animate-neo-pop rounded-neo border-neo border-black bg-neo-pink px-3 py-1 font-neo-display text-black shadow-hard motion-reduce:animate-none"
+            >
+              {w}
+            </li>
+          ))}
+        </ol>
+
+        {/* Game over */}
+        {finished ? (
+          <div className="rounded-neo border-neo-thick border-black bg-neo-yellow p-4 text-center font-neo-display text-xl font-bold text-black shadow-hard" role="status">
+            {winner === me ? t('shiritori.youWin') : `${winner ?? ''} ${t('shiritori.wins')}`}
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <input
+                ref={inputRef}
+                type="text"
+                inputMode="text"
+                lang="ja"
+                autoComplete="off"
+                disabled={!isMyTurn}
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onCompositionStart={() => { composingRef.current = true; }}
+                onCompositionEnd={(e: CompositionEvent<HTMLInputElement>) => { composingRef.current = false; setValue(e.currentTarget.value); }}
+                onKeyDown={onKeyDown}
+                placeholder={isMyTurn ? t('shiritori.yourTurn') : t('shiritori.waitTurn')}
+                aria-label={t('shiritori.inputLabel')}
+                className="flex-1 rounded-neo border-neo-thick border-black bg-neo-cream px-4 py-3 font-neo-body text-black shadow-hard disabled:opacity-50"
+              />
+              <button
+                type="button"
+                onClick={submit}
+                disabled={!isMyTurn || value.trim().length === 0}
+                className="rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-3 font-neo-display font-bold text-black shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50"
+              >
+                {t('shiritori.submit')}
+              </button>
+            </div>
+            {lastError && (
+              <p className="font-neo-body text-sm text-neo-red" role="alert">
+                {t(`shiritori.error.${lastError}`)}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

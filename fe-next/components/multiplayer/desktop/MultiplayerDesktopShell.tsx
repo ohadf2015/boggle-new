@@ -42,7 +42,7 @@ export const MultiplayerDesktopShell = memo<MultiplayerDesktopShellProps>(({ slo
           <div data-slot="left-mode-badge">{slots.left.modeBadge}</div>
           <div data-slot="left-roster" className="flex-1 min-h-0 overflow-y-auto">{slots.left.roster}</div>
           <div data-slot="left-secondary" aria-hidden={!slots.left.secondary}>
-            {slots.left.secondary ?? <span className="opacity-30">—</span>}
+            {slots.left.secondary ?? <span className="opacity-60">—</span>}
           </div>
         </aside>
 

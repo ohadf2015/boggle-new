@@ -61,4 +61,11 @@ describe('ShiritoriView', () => {
     render(<ShiritoriView {...baseProps({ finished: true, winner: 'me' })} />);
     expect(screen.getByText('shiritori.youWin')).toBeTruthy();
   });
+
+  it('renders the turn rail inside a desktop sidebar so wide viewports use the width', () => {
+    render(<ShiritoriView {...baseProps()} />);
+    const sidebar = screen.getByTestId('shiritori-turn-rail');
+    expect(sidebar).toBeTruthy();
+    expect(sidebar.querySelector('[aria-label="shiritori.players"]')).toBeTruthy();
+  });
 });

@@ -54,7 +54,7 @@ export function WordHuntDesktopAdapter(props: WordHuntDesktopAdapterProps) {
               colorFamily="purple"
             />
             <div className="flex flex-col">
-              <span className="text-[10px] font-mono opacity-50">MP</span>
+              <span className="text-[10px] font-mono opacity-70">MP</span>
               <span className="font-neo-display font-bold uppercase text-xl tracking-wide">
                 {t('mp.modeName.wordHunt')}
               </span>
@@ -96,7 +96,7 @@ export function WordHuntDesktopAdapter(props: WordHuntDesktopAdapterProps) {
               currentPlayerName={props.meId}
             />
           )}
-          <KeyboardHintStrip />
+          {props.foundWords.length === 0 && <KeyboardHintStrip />}
         </div>
       ),
     },

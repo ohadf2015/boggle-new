@@ -74,7 +74,7 @@ function StandardDesktopAdapterImpl(props: StandardDesktopAdapterProps) {
             colorFamily="cyan"
           />
           <div className="flex flex-col">
-            <span className="text-[10px] font-mono opacity-50">MP</span>
+            <span className="text-[10px] font-mono opacity-70">MP</span>
             <span className="font-neo-display font-bold text-xl uppercase tracking-wide">
               {t('mp.modeName.classic')}
             </span>
@@ -124,10 +124,10 @@ function StandardDesktopAdapterImpl(props: StandardDesktopAdapterProps) {
             currentPlayerName={meId}
           />
         )}
-        <KeyboardHintStrip />
+        {foundWords.length === 0 && <KeyboardHintStrip />}
       </div>
     ),
-    [leaderboard, meId, socket],
+    [leaderboard, meId, socket, foundWords.length],
   );
 
   const slots: ShellSlots = useMemo(

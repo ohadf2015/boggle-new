@@ -73,4 +73,11 @@ describe('SealedBidVersus', () => {
     render(<SealedBidVersus socket={null} username="me" />);
     expect(screen.getByText('sealedBidMp.youWin')).toBeInTheDocument();
   });
+
+  it('renders round + scores inside a desktop sidebar so wide viewports use the width', () => {
+    render(<SealedBidVersus socket={null} username="me" />);
+    const sidebar = screen.getByTestId('sb-standings-rail');
+    expect(sidebar).toBeTruthy();
+    expect(sidebar).toHaveTextContent('sealedBidMp.round');
+  });
 });

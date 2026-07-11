@@ -75,31 +75,39 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
         </div>
       )}
 
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-3 pt-12">
-        {/* HUD: round + scores */}
-        <div className="flex items-center justify-between gap-2">
-          <span className="rounded-neo border-2 border-black bg-neo-navy-light px-3 py-1.5 font-neo-display text-xs font-black uppercase tracking-wide text-neo-white shadow-hard-sm">
-            {t('sealedBidMp.round', { n: game.index + 1, total: game.totalRounds })}
-          </span>
-          <ul
-            className="flex flex-wrap justify-end gap-1.5"
-            aria-label={t('sealedBidMp.scores')}
-          >
-            {sortedScores.map(([u, s]) => (
-              <li
-                key={u}
-                className={`rounded-full border-2 border-black px-2.5 py-1 font-neo-display text-xs font-bold shadow-hard-sm ${
-                  u === username
-                    ? 'bg-neo-pink text-black'
-                    : 'bg-neo-navy-light text-neo-white'
-                }`}
-              >
-                {u} <span className="tabular-nums">{s}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col gap-3 pt-12 lg:max-w-4xl lg:grid lg:grid-cols-[1fr_11rem] lg:items-start lg:gap-6">
+        {/* Standings sidebar: round + scores. Stacks on top on mobile, becomes
+            a right sidebar at lg so wide desktop viewports don't leave the
+            felt table floating in dead space. */}
+        <aside className="lg:col-start-2 lg:row-start-1" data-testid="sb-standings-rail">
+          <h3 className="mb-1.5 hidden font-neo-display text-[11px] font-bold uppercase tracking-wide text-neo-cream/70 lg:block">
+            {t('sealedBidMp.scores')}
+          </h3>
+          <div className="flex items-center justify-between gap-2 lg:flex-col lg:items-stretch">
+            <span className="rounded-neo border-2 border-black bg-neo-navy-light px-3 py-1.5 font-neo-display text-xs font-black uppercase tracking-wide text-neo-white shadow-hard-sm">
+              {t('sealedBidMp.round', { n: game.index + 1, total: game.totalRounds })}
+            </span>
+            <ul
+              className="flex flex-wrap justify-end gap-1.5 lg:flex-col lg:items-stretch lg:justify-start"
+              aria-label={t('sealedBidMp.scores')}
+            >
+              {sortedScores.map(([u, s]) => (
+                <li
+                  key={u}
+                  className={`rounded-full border-2 border-black px-2.5 py-1 font-neo-display text-xs font-bold shadow-hard-sm lg:rounded-neo lg:flex lg:items-center lg:justify-between ${
+                    u === username
+                      ? 'bg-neo-pink text-black'
+                      : 'bg-neo-navy-light text-neo-white'
+                  }`}
+                >
+                  {u} <span className="tabular-nums">{s}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </aside>
 
+        <div className="flex flex-col gap-3 lg:col-start-1 lg:row-start-1">
         {game.phase === 'done' ? (
           <div
             className="rounded-neo border-3 border-black bg-neo-yellow p-5 text-center font-neo-display text-2xl font-bold text-black shadow-hard"
@@ -236,6 +244,7 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
             )}
           </>
         )}
+        </div>
       </div>
     </div>
   );

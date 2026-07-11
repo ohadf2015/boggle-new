@@ -63,4 +63,14 @@ describe('StandardDesktopAdapter', () => {
     expect(ladderRenderCount.mock.calls.length).toBe(ladderInitial);
     expect(rosterRenderCount.mock.calls.length).toBe(rosterInitial);
   });
+
+  it('hides the keyboard hint strip once the player has found a word', () => {
+    render(<StandardDesktopAdapter {...mkProps()} />); // mkProps foundWords has 1 entry
+    expect(screen.queryByTestId('kb-hint-submit')).not.toBeInTheDocument();
+  });
+
+  it('shows the keyboard hint strip before any word is found', () => {
+    render(<StandardDesktopAdapter {...mkProps()} foundWords={[]} />);
+    expect(screen.getByTestId('kb-hint-submit')).toBeInTheDocument();
+  });
 });

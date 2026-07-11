@@ -88,7 +88,7 @@ function Stat({ label, value, sub, testId }: { label: string; value: string; sub
     <div className="flex flex-col items-center" data-testid={testId}>
       <span className="text-[10px] uppercase opacity-60 truncate max-w-full">{label}</span>
       <span className="text-sm font-bold tabular-nums truncate max-w-full">{value}</span>
-      <span className="text-[10px] opacity-50 tabular-nums">{sub}</span>
+      <span className="text-[10px] opacity-70 tabular-nums">{sub}</span>
     </div>
   );
 }

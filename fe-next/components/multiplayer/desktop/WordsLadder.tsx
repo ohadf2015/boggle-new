@@ -33,7 +33,7 @@ function WordsLadderImpl({ words, meId }: WordsLadderProps) {
 
   if (sorted.length === 0) {
     return (
-      <div data-testid="ladder-empty" className="p-4 text-center opacity-50 text-sm">
+      <div data-testid="ladder-empty" className="p-4 text-center opacity-70 text-sm">
         {t('mp.ladder.empty')}
       </div>
     );

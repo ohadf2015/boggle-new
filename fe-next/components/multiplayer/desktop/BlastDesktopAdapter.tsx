@@ -61,7 +61,7 @@ export function BlastDesktopAdapter(props: BlastDesktopAdapterProps) {
               colorFamily="lime"
             />
             <div className="flex flex-col flex-1 min-w-0">
-              <span className="text-[10px] font-mono opacity-50">MP</span>
+              <span className="text-[10px] font-mono opacity-70">MP</span>
               <span className="font-neo-display font-bold uppercase text-xl tracking-wide truncate">
                 {t('mp.modeName.blast')}
               </span>
@@ -105,7 +105,7 @@ export function BlastDesktopAdapter(props: BlastDesktopAdapterProps) {
               currentPlayerName={props.meId}
             />
           )}
-          <KeyboardHintStrip />
+          {props.foundWords.length === 0 && <KeyboardHintStrip />}
         </div>
       ),
     },

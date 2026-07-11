@@ -41,7 +41,7 @@ export function OpponentInsightFeed({ opponentWords, mode, maxItems = 3 }: Oppon
         header={t('mp.insights.opponentInsightHeader')}
         testId="opponent-insight-feed"
       >
-        <div className="text-xs opacity-50 text-center py-2" data-testid="opponent-feed-empty">
+        <div className="text-xs opacity-70 text-center py-2" data-testid="opponent-feed-empty">
           {t('mp.insights.opponentInsightEmpty')}
         </div>
       </ThemedPanel>
@@ -67,7 +67,7 @@ export function OpponentInsightFeed({ opponentWords, mode, maxItems = 3 }: Oppon
             >
               <span className="font-mono truncate">⚡ {display}</span>
               <span className="flex items-center gap-1 shrink-0">
-                <span className="opacity-50 truncate max-w-[80px]">{w.byUsername}</span>
+                <span className="opacity-70 truncate max-w-[80px]">{w.byUsername}</span>
                 <span className="tabular-nums font-bold">+{w.score}</span>
               </span>
             </li>

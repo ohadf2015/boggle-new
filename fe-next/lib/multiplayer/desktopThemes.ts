@@ -42,7 +42,7 @@ const COLOR_TOKEN: Record<MpThemeColor, Omit<MpDesktopTheme, 'mode' | 'mascot' |
     borderClass: 'border-neo-purple',
     bgTintClass: 'bg-neo-purple/5',
     textClass: 'text-neo-purple',
-    shadowClass: 'shadow-hard',
+    shadowClass: 'shadow-hard-purple',
     ringClass: 'ring-neo-purple',
     textureClass: 'texture-halftone-comic-light',
   },

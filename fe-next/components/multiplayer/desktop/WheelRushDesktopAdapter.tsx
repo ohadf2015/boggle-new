@@ -74,7 +74,7 @@ export function WheelRushDesktopAdapter(props: WheelRushDesktopAdapterProps) {
               <span className="text-xs font-neo-display font-bold uppercase opacity-60 tracking-wide">
                 {t('mp.insights.fogLabel')}
               </span>
-              <span className={cn('text-xs tabular-nums font-bold', fogPct > 0 ? 'text-neo-pink' : 'opacity-30')}>
+              <span className={cn('text-xs tabular-nums font-bold', fogPct > 0 ? 'text-neo-pink' : 'opacity-60')}>
                 {fogPct > 0 ? `${Math.round(fogPct)}%` : '—'}
               </span>
             </div>
@@ -117,7 +117,7 @@ export function WheelRushDesktopAdapter(props: WheelRushDesktopAdapterProps) {
               currentPlayerName={props.meId}
             />
           )}
-          <KeyboardHintStrip />
+          {props.foundWords.length === 0 && <KeyboardHintStrip />}
         </div>
       ),
     },

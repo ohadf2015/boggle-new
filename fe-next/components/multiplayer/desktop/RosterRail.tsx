@@ -67,7 +67,7 @@ function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
                   <span className="sr-only">{p.rank}</span>
                 </>
               ) : (
-                <span className="opacity-50">{p.rank}</span>
+                <span className="opacity-70">{p.rank}</span>
               )}
             </span>
             <div className="relative shrink-0">
@@ -93,7 +93,7 @@ function RosterRailImpl({ players }: { players: RosterPlayer[] }) {
                 {p.score}
               </motion.span>
               {p.wordCount != null && p.wordCount > 0 && (
-                <span className="text-[10px] opacity-50 tabular-nums">{p.wordCount}w</span>
+                <span className="text-[10px] opacity-70 tabular-nums">{p.wordCount}w</span>
               )}
             </div>
           </div>
