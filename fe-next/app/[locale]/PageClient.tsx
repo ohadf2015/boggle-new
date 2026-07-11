@@ -8,6 +8,7 @@ import { LoadingDancer } from '@/components/ui/LoadingDancer';
 import { hasCompletedOnboarding, hasSupabaseSession, savePendingRoomInvite } from '@/utils/onboardingStorage';
 import { trackInviteLanded, trackInviteRedirectFired, trackGrowthEvent } from '@/utils/growthTracking';
 import { isOnboardingAllowedRoute } from '@/lib/onboarding/allowedRoutes';
+import { isQrScanArrival } from '@/utils/utmCapture';
 import { isCrawler } from '@/lib/seo/isCrawler';
 import { LandingView } from '@/components/landing';
 import { useExperiment } from '@/hooks/useExperiment';
@@ -63,8 +64,8 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // the friends activity feed) and drop straight into the MP lobby. New users
   // still flow through FTUE — `useInviteOnboardingMode` consumes the invite
   // from sessionStorage and routes after profile completion.
-  const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null; inviteRoomCode: string | null }>(() => {
-    if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null, inviteRoomCode: null };
+  const [initialState] = useState<{ isNewUser: boolean; inviteRedirectUrl: string | null; inviteRoomCode: string | null; qrRedirectUrl: string | null }>(() => {
+    if (typeof window === 'undefined') return { isNewUser: false, inviteRedirectUrl: null, inviteRoomCode: null, qrRedirectUrl: null };
     const returning = hasCompletedOnboarding() || hasSupabaseSession();
     const params = new URLSearchParams(window.location.search);
     const roomCode = params.get('room');
@@ -87,9 +88,23 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
         inviteRedirectUrl = `/${locale}/multiplayer?${redirectParams.toString()}`;
       }
     }
-    return { isNewUser: !returning, inviteRedirectUrl, inviteRoomCode: roomCode };
+
+    // Printed QR / barcode landing (`?utm_source=barcode`) → warp straight to the
+    // daily challenge with a witty "you scanned in" welcome. A live room invite
+    // always wins (a QR could also be an invite poster), so only route to /daily
+    // when there's no invite in play. UTM is already persisted to localStorage by
+    // initUtmCapture (essential-providers) on load, so attribution still reaches
+    // the admin dashboard even though we navigate away from the landing URL.
+    let qrRedirectUrl: string | null = null;
+    if (!roomCode && isQrScanArrival()) {
+      const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+      const locale = localeMatch?.[1] || 'en';
+      qrRedirectUrl = `/${locale}/daily?from=qr`;
+    }
+
+    return { isNewUser: !returning, inviteRedirectUrl, inviteRoomCode: roomCode, qrRedirectUrl };
   });
-  const { isNewUser, inviteRedirectUrl, inviteRoomCode } = initialState;
+  const { isNewUser, inviteRedirectUrl, inviteRoomCode, qrRedirectUrl } = initialState;
 
   const { variant: clarityVariant, trackExposure: trackClarityExposure } = useExperiment('exp-invite-arrival-clarity-v1');
   const { t } = useLanguage();
@@ -146,10 +161,10 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // homepage (not redirects, not crawlers). Fills the funnel's top-step gap
   // (landing_view = 0 in PostHog because no call site existed here before).
   useEffect(() => {
-    if (!mounted || inviteRedirectUrl) return;
+    if (!mounted || inviteRedirectUrl || qrRedirectUrl) return;
     if (isCrawler()) return;
     trackGrowthEvent('landing_view', { is_new_user: isNewUser });
-  }, [mounted, inviteRedirectUrl, isNewUser]);
+  }, [mounted, inviteRedirectUrl, qrRedirectUrl, isNewUser]);
   // Defensive route allowlist: FTUE may only render on locale homepage.
   // PageClient is mounted only at /[locale]/page.tsx today, so this is dormant
   // for current users — but guards against a future hoist that would leak the
@@ -175,6 +190,15 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     }
   }, [inviteRedirectUrl, inviteRoomCode, clarityVariant, trackClarityExposure, router]);
 
+  // QR / barcode arrival → warp to the daily challenge. `replace` (not push) so
+  // the barcode-param landing URL never sits in history to loop back onto.
+  useEffect(() => {
+    if (qrRedirectUrl) {
+      trackGrowthEvent('qr_scan_landed', { destination: 'daily' });
+      router.replace(qrRedirectUrl);
+    }
+  }, [qrRedirectUrl, router]);
+
   if (mounted && inviteRedirectUrl) {
     if (clarityVariant === 'status-card') {
       return (
@@ -194,6 +218,19 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-4 border-neo-lime border-t-transparent animate-spin" />
           <span className="font-neo-body text-neo-cream text-sm">{t('joinView.connectingToRoom')}</span>
+        </div>
+      </div>
+    );
+  }
+
+  // QR/barcode arrival: show alive feedback while router.replace → /daily
+  // resolves (never a contentless dark screen, same discipline as the invite hop).
+  if (mounted && qrRedirectUrl) {
+    return (
+      <div className="fixed inset-0 bg-neo-navy z-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-8 h-8 rounded-full border-4 border-neo-cyan border-t-transparent animate-spin" />
+          <span className="font-neo-body text-neo-cream text-sm">{t('daily.qrWelcome.warping')}</span>
         </div>
       </div>
     );

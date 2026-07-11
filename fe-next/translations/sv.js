@@ -6288,6 +6288,11 @@ const sv = {
     "timedQuest": "Tidsbegränsat",
     "untimedQuest": "Utan Timer",
     "startQuest": "STARTA QUEST",
+    "qrWelcome": {
+      "badge": "Inskannad",
+      "line": "Snyggt skannat — vi teleporterade dig rakt till dagens utmaning.",
+      "warping": "Teleporterar in dig…"
+    },
     "adminBeta": "Beta",
     "replay": "Spela Igen",
     "cleared": "Klarat!",

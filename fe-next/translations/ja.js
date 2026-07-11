@@ -6146,6 +6146,11 @@ const ja = {
     "timedQuest": "タイムクエスト",
     "untimedQuest": "フリークエスト",
     "startQuest": "クエスト開始",
+    "qrWelcome": {
+      "badge": "スキャン完了",
+      "line": "ナイススキャン！本日のチャレンジへワープしました。",
+      "warping": "ワープ中…"
+    },
     "adminBeta": "ベータ",
     "replay": "もう一度",
     "cleared": "クリア！",

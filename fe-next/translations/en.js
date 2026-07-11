@@ -6068,6 +6068,11 @@ const en = {
     "timedQuest": "Timed Quest",
     "untimedQuest": "Untimed Quest",
     "startQuest": "START QUEST",
+    "qrWelcome": {
+      "badge": "Scanned in",
+      "line": "Nice scan — we warped you straight to today's challenge.",
+      "warping": "Beaming you in…"
+    },
     "adminBeta": "Beta",
     "replay": "Replay",
     "cleared": "Cleared!",

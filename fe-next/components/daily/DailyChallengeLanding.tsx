@@ -15,6 +15,7 @@ import type { PendingChest } from '@/hooks/useWeeklyChest';
 
 import { adminOnlyDailyModes } from '@/lib/dailyModes';
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
+import { QrWelcomeBanner } from './QrWelcomeBanner';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
 import { QuestCard } from './landing/QuestCard';
 import { AdminDailyModeCard } from './landing/AdminDailyModeCard';
@@ -62,6 +63,10 @@ export function DailyChallengeLanding({
     ? Number(searchParams.get('whScore'))
     : null;
   const challengerEmoji = searchParams?.get('whEmoji') || null;
+
+  // Witty welcome for players warped here by scanning a printed QR / barcode.
+  // Set by the homepage redirect (utmCapture.isQrScanArrival → /daily?from=qr).
+  const cameFromQrScan = searchParams?.get('from') === 'qr';
 
   // Use the centralized hook for Word Hunt status + streak (fetches from server for authed users)
   const dailyStatus = useDailyChallengeStatus(currentLanguage);
@@ -150,6 +155,9 @@ export function DailyChallengeLanding({
       {/* Ambient effects */}
       <ConfettiBackground />
       <FloatingDecorations />
+
+      {/* QR / barcode arrival: witty "you scanned in" welcome */}
+      <QrWelcomeBanner show={cameFromQrScan} t={t} />
 
       {/* Missions Header: XP bar + countdown */}
       <DailyMissionsHeader completedCount={completedCount} />

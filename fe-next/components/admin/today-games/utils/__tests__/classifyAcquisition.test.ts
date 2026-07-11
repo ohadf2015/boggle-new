@@ -30,6 +30,27 @@ describe('classifyAcquisition', () => {
     expect(classifyAcquisition({ referrer_source: 'https://www.crazygames.com/game/lexiclash' }).kind).toBe('portal');
   });
 
+  // Physical QR / barcode scans (stickers, posters, printed codes) are a real
+  // acquisition channel — they must surface distinctly, not fall into 'unknown'.
+  it('classifies utm_source=barcode as qr', () => {
+    const tag = classifyAcquisition({ utm_source: 'barcode' });
+    expect(tag.kind).toBe('qr');
+    expect(tag.rawLabel).toBe('barcode');
+  });
+
+  it('classifies utm_source=qr and qrcode as qr', () => {
+    expect(classifyAcquisition({ utm_source: 'qr' }).kind).toBe('qr');
+    expect(classifyAcquisition({ utm_source: 'qrcode' }).kind).toBe('qr');
+  });
+
+  it('classifies utm_source=sticker as qr', () => {
+    expect(classifyAcquisition({ utm_source: 'sticker' }).kind).toBe('qr');
+  });
+
+  it('classifies utm_medium=irl (printed swag) as qr', () => {
+    expect(classifyAcquisition({ utm_source: 'mascot', utm_medium: 'irl' }).kind).toBe('qr');
+  });
+
   it('classifies utm_medium=email as email', () => {
     expect(classifyAcquisition({ utm_source: 'newsletter', utm_medium: 'email' }).kind).toBe('email');
   });

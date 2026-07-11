@@ -31,6 +31,7 @@ export type GrowthEvent =
   // Acquisition
   | 'page_view'
   | 'landing_view'
+  | 'qr_scan_landed' // Printed QR/barcode scan landed → redirected to daily challenge
   | 'referral_link_clicked'
   | 'room_joined_via_link'
   | 'room_joined_via_code'
