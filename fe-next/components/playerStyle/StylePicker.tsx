@@ -120,8 +120,8 @@ export function StylePicker({
         // region scrolls on touch devices.
         className={
           isInline
-            ? 'grid grid-cols-2 content-start gap-3 px-4 pb-1 pt-4 sm:grid-cols-3'
-            : 'grid min-h-0 flex-1 grid-cols-2 content-start gap-3 overflow-y-auto overscroll-contain px-4 pb-1 pt-4 [transform:translateZ(0)] [backface-visibility:hidden] sm:grid-cols-3'
+            ? 'grid grid-cols-2 content-start gap-3 px-4 pb-1 pt-4 sm:grid-cols-3 lg:grid-cols-4'
+            : 'grid min-h-0 flex-1 grid-cols-2 content-start gap-3 overflow-y-auto overscroll-contain px-4 pb-1 pt-4 [transform:translateZ(0)] [backface-visibility:hidden] sm:grid-cols-3 lg:grid-cols-4'
         }
         role="radiogroup"
         aria-label={t('playerStyle.picker.title')}

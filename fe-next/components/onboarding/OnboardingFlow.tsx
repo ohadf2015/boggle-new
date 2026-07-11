@@ -246,8 +246,8 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   );
 
   // Final step: style picked (or skipped) → finish onboarding and route to the
-  // practice hub. The StylePicker already persisted the chosen style; this only
-  // records completion and navigates.
+  // Daily Challenge (the priority first game, not Practice). The StylePicker
+  // already persisted the chosen style; this only records completion and navigates.
   const handleStyleComplete = useCallback(() => {
     if (isNavigating) return;
     setIsNavigating(true);
@@ -263,7 +263,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     if (pendingRoom) {
       router.push(`/${language}/multiplayer?room=${pendingRoom}`);
     } else {
-      router.push(`/${language}/practice`);
+      // Daily Challenge is the priority destination for brand-new players —
+      // Practice Mode is opt-in only (reachable from Home), never auto-pushed.
+      router.push(`/${language}/daily`);
     }
     emitCompleted({ via: 'style' });
     onComplete();
@@ -432,8 +434,11 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
       // viewport `interactiveWidget: resizes-content`), and on small screens we
       // top-align + scroll instead of hard-centering — otherwise the vertically
       // centered card pushes the "Continue" CTA under the keyboard. Desktop keeps
-      // the centered presentation (no keyboard inset there).
-      className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-start sm:justify-center overflow-y-auto py-[max(env(safe-area-inset-top),1rem)]"
+      // the centered presentation (no keyboard inset there) — `safe center` (not
+      // plain `center`) so a step whose content is taller than the viewport (e.g.
+      // the style grid on a tablet-height screen) falls back to top-alignment
+      // instead of centering the box and pushing its heading off the top edge.
+      className="fixed inset-0 z-[100] bg-neo-navy flex flex-col items-center justify-start sm:[justify-content:safe_center] overflow-y-auto py-[max(env(safe-area-inset-top),1rem)]"
       style={{ minHeight: '100dvh' }}
       dir={dir}
     >

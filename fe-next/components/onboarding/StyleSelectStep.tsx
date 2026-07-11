@@ -13,6 +13,7 @@
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { StylePicker } from '@/components/playerStyle/StylePicker';
+import { cn } from '@/lib/utils';
 
 interface StyleSelectStepProps {
   /** Called once the player commits a style or chooses to skip. */
@@ -25,7 +26,19 @@ const StyleSelectStep: React.FC<StyleSelectStepProps> = ({ onComplete }) => {
   return (
     <div
       data-testid="style-select-step"
-      className="flex max-h-[80vh] min-h-0 w-full flex-col text-center"
+      className={cn(
+        // max-h-[80vh] caps the mobile keyboard-safe modal so the pinned footer
+        // stays reachable via the picker's own inner scroll. From md (tablet) up,
+        // the outer OnboardingFlow shell already scrolls the whole page
+        // (overflow-y-auto), so the cap is dropped there — the grid lays out at
+        // natural height instead of clipping mid-row inside a too-short inner
+        // scroll box. No text input on this step, so there's no on-screen
+        // keyboard to guard against above phone width.
+        'flex max-h-[80vh] min-h-0 w-full flex-col text-center md:max-h-none',
+        // Desktop/tablet only: frame in a bounded panel, matching the other FTUE
+        // steps — mobile stays full-bleed (unchanged).
+        'sm:rounded-neo-lg sm:border-3 sm:border-neo-black sm:bg-neo-navy-light sm:shadow-hard-lg sm:p-6 lg:p-8'
+      )}
     >
       <h1 className="font-neo-display text-3xl font-black uppercase tracking-tight text-neo-white sm:text-4xl">
         {t('onboarding.style.title')}

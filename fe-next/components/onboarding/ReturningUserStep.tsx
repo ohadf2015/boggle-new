@@ -5,6 +5,7 @@ import { m, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { markOnboardingSkipped } from '@/utils/onboardingStorage';
 import { SilentVideo } from '@/components/ui/SilentVideo';
+import { cn } from '@/lib/utils';
 
 interface ReturningUserStepProps {
   onHaveAccount: () => void;
@@ -42,7 +43,14 @@ const ReturningUserStep: React.FC<ReturningUserStepProps> = ({
   };
 
   return (
-    <div className="relative flex flex-col items-center justify-center gap-10 text-center px-5 py-10">
+    <div
+      className={cn(
+        'relative flex flex-col items-center justify-center gap-10 text-center px-5 py-10',
+        // Desktop/tablet only: frame in a bounded panel, matching the other FTUE
+        // steps — mobile stays full-bleed (unchanged).
+        'sm:rounded-neo-lg sm:border-3 sm:border-neo-black sm:bg-neo-navy-light sm:shadow-hard-lg sm:px-12 sm:py-14'
+      )}
+    >
       {/* Hero */}
       <m.div
         variants={containerVariants}

@@ -98,7 +98,7 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
     initialSuggestionRef.current = next;
     setName(next);
     previouslyValidRef.current = false;
-  }, [language]);
+  }, [language, setName]);
 
   const handleBuilderSave = useCallback((config: CustomAvatarConfig) => {
     setAvatar(config);
@@ -138,10 +138,10 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
       initial={{ y: 60, opacity: 0, scale: 0.95 }}
       animate={{ y: 0, opacity: 1, scale: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 26 }}
-      className="w-full max-w-sm lg:max-w-md mx-auto"
+      className="w-full max-w-sm lg:max-w-lg mx-auto"
       dir={dir}
     >
-      <NeoPanel tone="cream" shadow="md" className="p-6 sm:p-7">
+      <NeoPanel tone="cream" shadow="md" className="p-6 sm:p-7 lg:p-9">
         {inviteContext && onSkipInvite && (
           <InviteContextBanner
             roomCode={inviteContext.roomCode}

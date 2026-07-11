@@ -45,7 +45,15 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
   }, [selected, language, setLanguage, onSelect]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-sm lg:max-w-2xl mx-auto gap-5 lg:gap-7">
+    <div
+      className={cn(
+        'flex flex-col items-center justify-center min-h-[60vh] max-w-sm lg:max-w-2xl mx-auto gap-5 lg:gap-7',
+        // Desktop/tablet only: frame the step in a bounded panel so it reads as an
+        // intentional card instead of buttons floating in an empty viewport. Mobile
+        // stays full-bleed (unchanged) — it's already sized right for a small screen.
+        'sm:rounded-neo-lg sm:border-3 sm:border-neo-black sm:bg-neo-navy-light sm:shadow-hard-lg sm:px-10 sm:py-12 lg:px-14 lg:py-16'
+      )}
+    >
       {/* Brand hero — animated LexiClash wordmark */}
       <m.div
         initial={{ opacity: 0, y: -16, scale: 0.92 }}
