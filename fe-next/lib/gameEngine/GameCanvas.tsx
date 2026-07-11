@@ -13,7 +13,7 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import { Application, Container } from 'pixi.js';
+import { Application, Container, UPDATE_PRIORITY } from 'pixi.js';
 import { PhysicsWorld } from './PhysicsWorld';
 import { ParticlePool } from './ParticleSystem';
 import { ScreenShake } from './ScreenShake';
@@ -99,6 +99,24 @@ export function GameCanvas({
 
       container.appendChild(app.canvas);
 
+      // Pixi's TickerPlugin registers its OWN render-every-tick listener on
+      // app.ticker (at UPDATE_PRIORITY.LOW), outside our control. Ticker._tick
+      // never wraps its listener loop in try/catch, so if ANY listener throws
+      // mid-frame — most often this internal render call hitting a Graphics/
+      // Container a concurrent destroy() just nulled out — the exception
+      // propagates out of _tick and Ticker never reaches the line that
+      // reschedules its own requestAnimationFrame. The whole engine (physics,
+      // particles, every consumer's own ticker.add callback) freezes dead for
+      // the rest of the session, not just one dropped frame (Sentry 1RP: DAU
+      // crash pattern, /:locale/word-tower — matches the 1CK/1CW/1PV destroy-
+      // vs-render race class already hardened elsewhere in this engine). Swap
+      // Pixi's raw listener for an identical one wrapped in try/catch, at the
+      // same priority, so a lost frame can never take down the ticker.
+      app.ticker.remove(app.render, app);
+      app.ticker.add(() => {
+        try { app.render(); } catch { /* post-destroy render race — skip this frame */ }
+      }, app, UPDATE_PRIORITY.LOW);
+
       const camera = new Container();
       app.stage.addChild(camera);
 
@@ -123,19 +141,26 @@ export function GameCanvas({
 
       app.ticker.add((ticker) => {
         if (destroyed) return;
-        const rawDelta = ticker.deltaMS / 1000;
-        // Apply time dilation to all game systems (not real-time UI)
-        timeDilation.update(rawDelta);
-        const deltaSec = timeDilation.apply(rawDelta);
-        if (enablePhysics && physics) physics.update(deltaSec * 1000);
-        particles.update(deltaSec);
-        shake.update(rawDelta); // Shake uses real time for consistent feel
-        flash.update(rawDelta); // Flash uses real time
-        if (camera && !camera.destroyed && camera.position) {
-          camera.x = shake.offset.x;
-          camera.y = shake.offset.y;
-        }
-        onTickRef.current?.(deltaSec);
+        // Same freeze risk as the render listener above: an uncaught throw
+        // here (e.g. a subsystem touching an object a same-frame destroy()
+        // just nulled, or a consumer's onTick) would stop this ticker from
+        // ever rescheduling itself — try/catch turns that into one skipped
+        // frame instead of a permanently dead engine.
+        try {
+          const rawDelta = ticker.deltaMS / 1000;
+          // Apply time dilation to all game systems (not real-time UI)
+          timeDilation.update(rawDelta);
+          const deltaSec = timeDilation.apply(rawDelta);
+          if (enablePhysics && physics) physics.update(deltaSec * 1000);
+          particles.update(deltaSec);
+          shake.update(rawDelta); // Shake uses real time for consistent feel
+          flash.update(rawDelta); // Flash uses real time
+          if (camera && !camera.destroyed && camera.position) {
+            camera.x = shake.offset.x;
+            camera.y = shake.offset.y;
+          }
+          onTickRef.current?.(deltaSec);
+        } catch { /* post-destroy update race — skip this frame */ }
       });
 
       const ctx: GameEngineContext = {
