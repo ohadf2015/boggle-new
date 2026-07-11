@@ -6,6 +6,7 @@ import { ConditionalProviders } from '../conditional-providers';
 import { loadTranslation } from '@/translations/loadTranslation';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
+import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
 import InGameAudioButton from '@/components/InGameAudioButton';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
@@ -646,6 +647,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     </ul>
                 </nav>
                 <ConditionalProviders lang={validLocale} initialTranslations={initialTranslations}>
+                    {/* Pin every new route to the top of the page — the app's scroll
+                        container is <body class="screen-fit">, so without this a stale
+                        offset (or a child's mount-time auto-scroll) can open a page at
+                        the footer. */}
+                    <ScrollToTopOnNavigate />
                     {/* VersionChecker needs to be inside providers to access LanguageContext */}
                     <VersionChecker />
                     {/* Auto-recovers stale-deploy chunk 404s that escape error boundaries
