@@ -37,4 +37,20 @@ describe('WordCraftScorePreviewBadge (Conquest territory preview)', () => {
     render(<WordCraftScorePreviewBadge board={board} placements={placements} />);
     expect(screen.getByText('Claim 3')).toBeInTheDocument();
   });
+
+  it('shows dice bonus chip when a pending tile letter is in the bonus family', () => {
+    const board = createBoard(11, { premiums: false });
+    const placements: PlacedTile[] = [t('1', 5, 5, 'A', 1)];
+    const diceBonus = { letters: new Set(['A', 'E', 'I', 'O', 'U']), multiplier: 3 };
+    render(<WordCraftScorePreviewBadge board={board} placements={placements} diceBonus={diceBonus} />);
+    expect(screen.getByText(/🎲/)).toBeInTheDocument();
+  });
+
+  it('hides dice bonus chip when no pending tile matches the bonus family', () => {
+    const board = createBoard(11, { premiums: false });
+    const placements: PlacedTile[] = [t('1', 5, 5, 'B', 3)];
+    const diceBonus = { letters: new Set(['A', 'E', 'I', 'O', 'U']), multiplier: 3 };
+    render(<WordCraftScorePreviewBadge board={board} placements={placements} diceBonus={diceBonus} />);
+    expect(screen.queryByText(/🎲/)).toBeNull();
+  });
 });

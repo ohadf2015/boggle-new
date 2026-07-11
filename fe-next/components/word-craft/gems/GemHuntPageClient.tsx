@@ -336,7 +336,7 @@ export default function GemHuntPageClient() {
               locale={locale}
             />
             <GemCellOverlay gemCells={state.gemCells} />
-            <WordCraftScorePreviewBadge board={state.board} placements={state.pendingPlacements} />
+            <WordCraftScorePreviewBadge board={state.board} placements={state.pendingPlacements} diceBonus={scoreBonusForHunt} />
           </div>
         </div>
 

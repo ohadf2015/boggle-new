@@ -757,3 +757,5 @@ endast
 motsats
 innanför
 utanför
+kunde
+medan

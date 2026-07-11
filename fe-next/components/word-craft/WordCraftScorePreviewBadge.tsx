@@ -7,6 +7,7 @@ import type { PlacedTile } from '@/lib/word-craft/types';
 interface Props {
   board: Board;
   placements: readonly PlacedTile[];
+  diceBonus?: { letters: Set<string>; multiplier: number } | null;
 }
 
 // Conquest preview: how much TERRITORY the pending word will claim if
@@ -20,22 +21,34 @@ function tintForCells(cells: number): string {
   return 'bg-neo-cream text-neo-navy';
 }
 
-export function WordCraftScorePreviewBadge({ board: _board, placements }: Props) {
+export function WordCraftScorePreviewBadge({ board: _board, placements, diceBonus }: Props) {
   const { t } = useLanguage();
   const cells = placements.length;
   if (cells < 1) return null;
+
+  const bonusFires =
+    diceBonus != null &&
+    placements.some((p) => diceBonus.letters.has(p.letter.toUpperCase()));
 
   return (
     <div
       role="status"
       aria-live="polite"
-      className="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2 z-30"
+      className="pointer-events-none absolute left-1/2 top-2 -translate-x-1/2 z-30 flex flex-col items-center gap-1"
     >
       <div
         className={`rounded-neo border-neo-thick px-3 py-1 font-neo-display text-base font-black shadow-hard ${tintForCells(cells)}`}
       >
         {t('wordcraft.territory.claimPreview', { count: cells })}
       </div>
+      {bonusFires ? (
+        <div
+          aria-hidden
+          className="rounded-neo border border-black bg-neo-purple px-1.5 py-0.5 font-neo-display text-[9px] font-black uppercase tracking-widest text-neo-white shadow-hard-sm"
+        >
+          🎲 ×{diceBonus.multiplier}
+        </div>
+      ) : null}
     </div>
   );
 }

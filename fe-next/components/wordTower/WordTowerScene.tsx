@@ -513,7 +513,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       // swing about the canvas's top-left corner that flung the tower off to one
       // side and made it "go crazy" when shaky. The pivot tracks the live scroll
       // (cc.y) so it stays under the base through pans and climbs.
-      if (cc && tl) {
+      if (cc && tl && !cc.destroyed && !tl.destroyed) {
         const inst0 = instabilityRef.current;
         const groundLocal = groundYRef.current - cc.y;
         tl.pivot.set(centerXRef.current, groundLocal);

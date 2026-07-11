@@ -153,6 +153,11 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   const [currentRank, setCurrentRank] = useState<number | null>(null);
   const [totalPlayers, setTotalPlayers] = useState(0);
 
+  // Funnel anchor: fire once on mount so PostHog can measure results-page drop-off
+  useEffect(() => {
+    trackGrowthEvent('results_viewed', { mode: 'word-wheel', score: result.score });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Rarest-find celebration: pull the day's distinct-player count per word and
   // surface the player's rarest find ("only you found X — so far" / "rare find").
   // Skipped in practice (no shared field to compare against). Best-effort: any

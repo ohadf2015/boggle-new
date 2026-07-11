@@ -224,3 +224,28 @@ PostHog p75=0.882 is skewed by admin sessions (same player as /he CLS issue). Re
 - Possible causes: late-rendering ads (AdSense), socket-driven player list inserting content above fold, font-swap on Spanish locale.
 - Action: Chrome DevTools CLS attribution on /es/multiplayer — identify which element shifts and when.
 - Owner: human — needs visual verification.
+
+## 2026-07-11 — CLS regression: /en/multiplayer + /es/multiplayer + /he
+
+**Source:** PostHog `$web_vitals`, 7-day window, n≥50.
+
+| Route | p75 LCP | p75 INP | p75 CLS | n |
+|---|---|---|---|---|
+| /es/multiplayer | 2694ms | 420ms | **0.681** | 54 |
+| /en/multiplayer | 2459ms | 264ms | **0.575** | 87 |
+| /he | 2328ms | 160ms | **1.043** | 59 |
+
+**Thresholds:** LCP>2500ms=poor, INP>200ms=needs-improvement, CLS>0.1=poor.
+
+**CLS suspects (all multiplayer):**
+- `ClassroomModeBanner` + `EducationHeader` render conditionally after auth → shift
+- `AutoHideHeader` / `ConnectionBanner` / `SpectatorBanner` injected into DOM after hydration
+- `ViewLoadingSkeleton` replaced by real view (known layout shift pattern)
+
+**Action needed:**
+1. Reserve header height via `min-h` in the top shell so auth-conditional banners don't shift content
+2. Or: add `min-h` to the `ViewLoadingSkeleton` container matching the real view's height
+3. `/he` CLS=1.043 likely from RTL layout + missing image dimensions in blog/landing components
+
+**Not fixed tonight:** multiplayer PageClient is 671 lines, blast radius too high to fix without thorough testing. Human review recommended.
+

@@ -127,4 +127,25 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     render(<EducationPageClient />);
     expect(screen.queryByTestId('auth-dashboard-shortcut')).not.toBeInTheDocument();
   });
+
+  it('shows for-schools link for authenticated teachers', () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      loading: false,
+      profile: { display_name: 'Mr. Smith', user_role: 'teacher' },
+    });
+    render(<EducationPageClient />);
+    const link = screen.getByTestId('teacher-hub-for-schools-link');
+    expect(link).toHaveAttribute('href', '/en/education/for-schools');
+  });
+
+  it('does NOT show for-schools link for unauthenticated visitors', () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      loading: false,
+      profile: null,
+    });
+    render(<EducationPageClient />);
+    expect(screen.queryByTestId('teacher-hub-for-schools-link')).not.toBeInTheDocument();
+  });
 });

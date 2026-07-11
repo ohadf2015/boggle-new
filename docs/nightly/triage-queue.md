@@ -1432,3 +1432,55 @@ Retire procedure: grep each key in fe-next (excl experiments.ts/tests), replace 
   - status: deferred — need design call: should INSERT be restricted by student email domain or school association?
   - why: ambiguous root cause requiring design
   - recommended owner: backend + design
+
+## 2026-07-11
+- [Sentry] TypeError: Cannot read properties of null (reading 'geometry') (JAVASCRIPT-NEXTJS-1RP)
+  - first seen: 2026-07-09, last seen: 2026-07-10, count: 6, users: 2
+  - link: https://lexiclash.sentry.io/issues/133301270/
+  - status: shipped (WordTowerScene.tsx:516 — added !cc.destroyed && !tl.destroyed guard)
+  - why: rAF tick reads containerRef/tiltRef after Pixi destroy() but before null assignment; objects truthy but destroyed → .geometry null crash
+  - recommended owner: review-by-eod
+
+- [Sentry] Error: "CapacitorGameConnect.then()" is not implemented on android (JAVASCRIPT-NEXTJS-1PH)
+  - first seen: 2026-07-04, last seen: 2026-07-05, count: 153, users: 7
+  - link: https://lexiclash.sentry.io/issues/132085085/
+  - status: shipped (d2fb54b03 — Capacitor.isPluginAvailable guard in nativePGS.ts, committed prior run)
+  - why: already fixed, no new events since 07-05; gate may not have deployed it yet
+  - recommended owner: review-by-eod
+
+- [Sentry] TypeError: Cannot read properties of null (reading 'clear') (JAVASCRIPT-NEXTJS-1PV)
+  - first seen: 2026-07-04, last seen: 2026-07-06, count: 8, users: 6
+  - link: https://lexiclash.sentry.io/issues/132119253/
+  - status: shipped (eb3551526 — try/catch + destroyed flag guard in WordWheelPixiRing.tsx, committed prior run)
+  - why: already fixed, no new events since 07-06
+  - recommended owner: review-by-eod
+
+- [Supabase] Signed-In Users Can Execute SECURITY DEFINER Function: upsert_push_token
+  - link: https://supabase.com/dashboard/project/*/database/linter
+  - status: deferred (false positive — migration 20260628010000 already applied; anon REVOKED, authenticated access intentional for push token registration)
+  - why: authenticated callers call this from app/api/player/push-token/route.ts legitimately
+  - recommended owner: review-by-eod (confirm intentional, add comment to DB function)
+
+- [Supabase] RLS Policy Always True: teacher_access_requests INSERT (tar_insert_any)
+  - status: deferred
+  - why: public INSERT for teacher signup requests is likely intentional (anyone can request teacher access); tightening could break the signup flow silently
+  - recommended owner: backend (confirm intent, restrict to anon+authenticated if desired)
+
+## Stale experiments — flag for human review (>14 days, inconclusive, added 2026-07-11)
+
+The following PostHog experiments have been running >14 days with no retirement action. Each has active code call sites. Needs manual review in PostHog for statistical significance (p<0.05, n≥1000/arm); retire winning branch and delete losing code if decided.
+
+| Flag key | Age (days) | Call site count | Metric |
+|---|---|---|---|
+| `landing-modes-cubes-v1` | 30 | 3 | landing_cta_clicked |
+| `exp-results-replay-cta-v1` | 39 | 3 | replay_clicked |
+| `mp-signup-nudge-copy-v1` | 64 | 5 | signup_completed |
+| `exp-wordhunt-hint-v1` | 21 | 2 | game_completed (wordhunt) |
+| `wheel-replay-cta-v1` | 21 | 4 | practice_started |
+| `wheel-signup-offer-v1` | 21 | 4 | signup_completed |
+| `exp-leaderboard-play-cta-v1` | 22 | 6 | game_started |
+| `exp-game-abandon-confirm-v1` | 22 | 6 | game_completed |
+| `exp-practice-wheel-cta-v1` | 22 | 3 | practice_started |
+| `exp-mp-round-feedback-top-v1` | 18 | 2 | game_feedback mp_round avg |
+
+_Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all flags active=true, rollout=100%._
