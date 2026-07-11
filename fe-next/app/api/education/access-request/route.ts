@@ -17,14 +17,12 @@ export async function POST(req: Request) {
   let body: any;
   try { body = await req.json(); } catch { return bad('invalid json'); }
 
-  const { full_name, role, locale, use_case, school_or_org, country } = body || {};
+  const { role, locale, use_case, school_or_org } = body || {};
 
-  if (!full_name || typeof full_name !== 'string' || full_name.length < 2 || full_name.length > 120) return bad('invalid full_name');
   if (!ROLES.includes(role)) return bad('invalid role');
   if (!LOCALES.includes(locale)) return bad('invalid locale');
   if (typeof use_case !== 'string' || use_case.length < 10 || use_case.length > 800) return bad('use_case must be 10-800 chars');
   if (school_or_org && (typeof school_or_org !== 'string' || school_or_org.length > 200)) return bad('invalid school_or_org');
-  if (country && (typeof country !== 'string' || country.length > 80)) return bad('invalid country');
 
   const sb = await createClient();
 
@@ -37,6 +35,23 @@ export async function POST(req: Request) {
   if (!user.email_confirmed_at) return bad('verify your email address first', 403);
   if (!user.email || !EMAIL_RE.test(user.email)) return bad('account has no verified email', 403);
   const email = user.email;
+
+  // Name and country are already captured at signup — never re-asked in the
+  // form. Derive them from the account/profile so the stored request stays
+  // consistent with the verified identity (single source of truth).
+  const { data: profile } = await sb
+    .from('profiles')
+    .select('display_name, username, country_code')
+    .eq('id', user.id)
+    .maybeSingle();
+  const metaName =
+    (user.user_metadata?.full_name as string | undefined) ||
+    (user.user_metadata?.name as string | undefined) ||
+    '';
+  const full_name = (profile?.display_name || profile?.username || metaName || email.split('@')[0])
+    .toString()
+    .slice(0, 120);
+  const country = profile?.country_code || undefined;
 
   const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const recent = await sb
