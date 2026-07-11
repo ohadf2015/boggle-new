@@ -2,10 +2,19 @@
 import { useState } from 'react';
 import { m, useReducedMotion, type Variants } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { TeacherAccessFormPayload, TeacherAccessRole, TeacherLocale } from '@/lib/education/types';
+import type { TeacherAccessSubmission, TeacherAccessRole, TeacherLocale } from '@/lib/education/types';
 
-const ROLES: TeacherAccessRole[] = ['teacher', 'tutor', 'admin', 'parent', 'researcher', 'other'];
+/** Fun emoji per role — turns a boring dropdown into a tap-to-pick card grid. */
+const ROLE_OPTIONS: { value: TeacherAccessRole; emoji: string }[] = [
+  { value: 'teacher', emoji: '🍎' },
+  { value: 'tutor', emoji: '📚' },
+  { value: 'admin', emoji: '🏫' },
+  { value: 'parent', emoji: '🏡' },
+  { value: 'researcher', emoji: '🔬' },
+  { value: 'other', emoji: '✨' },
+];
+
+const USE_CASE_EXAMPLE_KEYS = ['use_case_ex1', 'use_case_ex2', 'use_case_ex3'] as const;
 
 const FIELD_CLASS =
   'mt-1 w-full rounded-neo border-neo bg-neo-navy text-neo-white placeholder-neo-white/40 p-3 ' +
@@ -13,24 +22,34 @@ const FIELD_CLASS =
   'focus:border-neo-lime focus:shadow-hard focus:-translate-y-0.5';
 const LABEL_CLASS = 'block text-sm font-semibold text-neo-white font-neo-display';
 
-export function AccessRequestForm({ lockedEmail }: { lockedEmail?: string } = {}) {
+/**
+ * Teacher-access request form.
+ *
+ * The gate ({@link AccessRequestGate}) only renders this for a signed-up,
+ * email-verified account, so we ALREADY know the applicant's name and email
+ * from signup — we never ask for them again. The server derives name, email,
+ * and country from the account itself; this form collects only the two things
+ * signup doesn't capture: who they are (role) and how they'll use LexiClash.
+ */
+export function AccessRequestForm({
+  knownName,
+  knownEmail,
+}: { knownName?: string; knownEmail?: string } = {}) {
   const { t, language } = useLanguage();
   const shouldReduceMotion = useReducedMotion();
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState(lockedEmail ?? '');
-  const [school, setSchool] = useState('');
-  const [country, setCountry] = useState('');
-  const [role, setRole] = useState<TeacherAccessRole>('teacher');
+  const [role, setRole] = useState<TeacherAccessRole | null>(null);
   const [useCase, setUseCase] = useState('');
+  const [school, setSchool] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
-  const nameOk = fullName.trim().length >= 2;
-  const emailOk = /\S+@\S+\.\S+/.test(email);
+  const firstName = (knownName ?? '').trim().split(/\s+/)[0] || '';
+  const roleOk = role !== null;
   const useCaseOk = useCase.trim().length >= 10;
-  const completed = [nameOk, emailOk, useCaseOk];
-  const canSubmit = nameOk && emailOk && useCaseOk && !submitting;
+  const remaining = Math.max(0, 10 - useCase.trim().length);
+  const completed = [roleOk, useCaseOk];
+  const canSubmit = roleOk && useCaseOk && !submitting;
 
   // Entrance distance collapses to 0 under reduced-motion (compositor-only: opacity + y).
   const container: Variants = {
@@ -44,6 +63,7 @@ export function AccessRequestForm({ lockedEmail }: { lockedEmail?: string } = {}
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canSubmit || !role) return;
     setError(null);
     setSubmitting(true);
     try {
@@ -51,11 +71,11 @@ export function AccessRequestForm({ lockedEmail }: { lockedEmail?: string } = {}
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({
-          email, full_name: fullName, role, locale: language as TeacherLocale,
+          role,
+          locale: language as TeacherLocale,
           use_case: useCase,
           school_or_org: school || undefined,
-          country: country || undefined,
-        } satisfies TeacherAccessFormPayload),
+        } satisfies TeacherAccessSubmission),
       });
       if (!res.ok) {
         setError(res.status === 429 ? t('education.access.rate_limited') : t('education.access.submit_error'));
@@ -103,12 +123,34 @@ export function AccessRequestForm({ lockedEmail }: { lockedEmail?: string } = {}
   return (
     <m.form
       onSubmit={handleSubmit}
-      className="space-y-4"
+      className="space-y-5"
       variants={container}
       initial="hidden"
       animate="show"
     >
-      {/* Decorative completeness meter — 3 required fields. Hidden from assistive tech. */}
+      {/* Friendly greeting — signals we already have their details from signup. */}
+      <m.div variants={item}>
+        <h2 className="text-2xl font-bold font-neo-display text-neo-white">
+          {firstName
+            ? t('education.access.greeting', { name: firstName })
+            : t('education.access.greeting_noname')}
+        </h2>
+        <p className="mt-1 text-neo-white/80">{t('education.access.greeting_sub')}</p>
+        {knownEmail && (
+          <div
+            data-testid="applying-as"
+            className="mt-3 inline-flex items-center gap-2 rounded-neo border-neo bg-neo-navy px-3 py-1.5 text-sm text-neo-white/80 shadow-hard-sm"
+          >
+            <span aria-hidden="true">📇</span>
+            <span className="font-semibold text-neo-white/60">{t('education.access.applying_as')}</span>
+            <span className="font-semibold text-neo-white">
+              {knownName ? `${knownName} · ` : ''}{knownEmail}
+            </span>
+          </div>
+        )}
+      </m.div>
+
+      {/* Decorative completeness meter — 2 steps (pick a role, tell us why). */}
       <m.div variants={item} data-testid="access-form-progress" aria-hidden="true" className="flex gap-2">
         {completed.map((done, i) => (
           <m.span
@@ -124,46 +166,72 @@ export function AccessRequestForm({ lockedEmail }: { lockedEmail?: string } = {}
         ))}
       </m.div>
 
+      {/* Role — tap-to-pick emoji cards instead of a dropdown. */}
+      <m.fieldset variants={item} className="space-y-2">
+        <legend className={LABEL_CLASS}>{t('education.access.role_q')}</legend>
+        <div role="radiogroup" aria-label={t('education.access.role_q')} className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+          {ROLE_OPTIONS.map(({ value, emoji }) => {
+            const selected = role === value;
+            return (
+              <m.button
+                key={value}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => setRole(value)}
+                whileTap={shouldReduceMotion ? undefined : { scale: 0.96 }}
+                className={`flex items-center gap-2 rounded-neo border-neo p-3 text-left font-semibold font-neo-display shadow-hard-sm transition-all ${
+                  selected
+                    ? 'bg-neo-lime text-neo-navy -translate-y-0.5 shadow-hard'
+                    : 'bg-neo-navy text-neo-white hover:-translate-y-0.5 hover:shadow-hard'
+                }`}
+              >
+                <span className="text-xl" aria-hidden="true">{emoji}</span>
+                <span className="text-sm">{t(`education.access.role_${value}`)}</span>
+              </m.button>
+            );
+          })}
+        </div>
+      </m.fieldset>
+
+      {/* Use case — the one thing only they can tell us. */}
       <m.div variants={item}>
-        <label htmlFor="tar-full_name" className={LABEL_CLASS}>{t('education.access.full_name')}</label>
-        <input id="tar-full_name" required value={fullName} onChange={(e) => setFullName(e.target.value)}
-          className={FIELD_CLASS} />
-      </m.div>
-      <m.div variants={item}>
-        <label htmlFor="tar-email" className={LABEL_CLASS}>{t('education.access.email')}</label>
-        <input id="tar-email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-          readOnly={!!lockedEmail} aria-readonly={lockedEmail ? true : undefined}
-          className={`${FIELD_CLASS}${lockedEmail ? ' opacity-70 cursor-not-allowed' : ''}`} />
-        {lockedEmail && (
-          <p className="mt-1 text-xs text-neo-white/60">{t('education.access.email_locked_hint')}</p>
-        )}
-      </m.div>
-      <m.div variants={item}>
-        <label htmlFor="tar-role" className={LABEL_CLASS}>{t('education.access.role')}</label>
-        <Select value={role} onValueChange={(v) => setRole(v as TeacherAccessRole)}>
-          <SelectTrigger id="tar-role" className={FIELD_CLASS}><SelectValue /></SelectTrigger>
-          <SelectContent>
-            {ROLES.map((r) => <SelectItem key={r} value={r}>{t(`education.access.role_${r}`)}</SelectItem>)}
-          </SelectContent>
-        </Select>
-      </m.div>
-      <m.div variants={item}>
-        <label htmlFor="tar-school" className={LABEL_CLASS}>{t('education.access.school_or_org')}</label>
-        <input id="tar-school" value={school} onChange={(e) => setSchool(e.target.value)}
-          className={FIELD_CLASS} />
-      </m.div>
-      <m.div variants={item}>
-        <label htmlFor="tar-country" className={LABEL_CLASS}>{t('education.access.country')}</label>
-        <input id="tar-country" value={country} onChange={(e) => setCountry(e.target.value)}
-          className={FIELD_CLASS} />
-      </m.div>
-      <m.div variants={item}>
-        <label htmlFor="tar-use_case" className={LABEL_CLASS}>{t('education.access.use_case')}</label>
+        <label htmlFor="tar-use_case" className={LABEL_CLASS}>{t('education.access.use_case_q')}</label>
+        <p className="mt-0.5 text-sm text-neo-white/70">{t('education.access.use_case_hint')}</p>
         <textarea id="tar-use_case" required minLength={10} maxLength={800} rows={4}
+          placeholder={t('education.access.use_case_placeholder')}
           value={useCase} onChange={(e) => setUseCase(e.target.value)}
-          className={FIELD_CLASS} />
-        <p className={`text-xs mt-1 ${useCaseOk ? 'text-neo-lime' : 'text-neo-white'}`}>{useCase.length}/800</p>
+          className={`${FIELD_CLASS} mt-2`} />
+        <div className="mt-1 flex items-center justify-between gap-2">
+          <p className={`text-xs ${useCaseOk ? 'text-neo-lime' : 'text-neo-white/70'}`}>
+            {useCaseOk ? t('education.access.use_case_ready') : t('education.access.use_case_remaining', { count: remaining })}
+          </p>
+          <p className="text-xs text-neo-white/50">{useCase.length}/800</p>
+        </div>
+        {/* Quick-fill sparks — one tap drops in a starting sentence. */}
+        <div className="mt-2 flex flex-wrap items-center gap-1.5">
+          <span className="text-xs text-neo-white/60">{t('education.access.use_case_spark')}</span>
+          {USE_CASE_EXAMPLE_KEYS.map((k) => (
+            <button
+              key={k}
+              type="button"
+              onClick={() => setUseCase(t(`education.access.${k}`))}
+              className="rounded-neo border-neo bg-neo-navy px-2 py-1 text-xs text-neo-white shadow-hard-sm transition-all hover:-translate-y-0.5 hover:bg-neo-cyan hover:text-neo-navy"
+            >
+              {t(`education.access.${k}`)}
+            </button>
+          ))}
+        </div>
       </m.div>
+
+      {/* School / org — optional; not captured at signup. */}
+      <m.div variants={item}>
+        <label htmlFor="tar-school" className={LABEL_CLASS}>{t('education.access.school_q')}</label>
+        <input id="tar-school" value={school} onChange={(e) => setSchool(e.target.value)}
+          placeholder={t('education.access.school_placeholder')}
+          className={FIELD_CLASS} />
+      </m.div>
+
       {error && <p role="alert" aria-live="polite" className="text-neo-red font-semibold">{error}</p>}
       <m.button type="submit" disabled={!canSubmit} variants={item}
         whileHover={canSubmit && !shouldReduceMotion ? { y: -2 } : undefined}

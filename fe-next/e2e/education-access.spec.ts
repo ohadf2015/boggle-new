@@ -8,8 +8,9 @@ test.describe('Education access gate', () => {
 
   test('apply form submission shows success state', async ({ page }) => {
     await page.goto('http://localhost:3001/en/education/access');
-    await page.fill('#tar-full_name', 'E2E Tester');
-    await page.fill('#tar-email', `e2e-${Date.now()}@example.com`);
+    // Name + email come from the signed-up account — the form only asks for
+    // role and use case now.
+    await page.getByRole('radio', { name: /Teacher/i }).first().click();
     await page.fill('#tar-use_case', 'This is an E2E test use case description.');
     await page.click('button[type=submit]');
     await expect(page.getByRole('status')).toContainText(/Application sent|sent/i);

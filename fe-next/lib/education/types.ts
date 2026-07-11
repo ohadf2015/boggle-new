@@ -21,12 +21,21 @@ export interface TeacherAccessRequest {
   created_at: string;
 }
 
-export interface TeacherAccessFormPayload {
-  email: string;
-  full_name: string;
-  school_or_org?: string;
-  country?: string;
+/**
+ * What the client sends. Name, email, and country are NOT included — they're
+ * already known from signup and derived server-side from the verified account,
+ * so applicants never re-enter them.
+ */
+export interface TeacherAccessSubmission {
   role: TeacherAccessRole;
   locale: TeacherLocale;
   use_case: string;
+  school_or_org?: string;
+}
+
+/** The full persisted/notification shape, assembled server-side. */
+export interface TeacherAccessFormPayload extends TeacherAccessSubmission {
+  email: string;
+  full_name: string;
+  country?: string;
 }

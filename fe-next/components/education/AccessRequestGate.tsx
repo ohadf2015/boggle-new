@@ -23,7 +23,7 @@ const CTA_CLASS =
  */
 export function AccessRequestGate() {
   const { t } = useLanguage();
-  const { user, loading } = useAuth();
+  const { user, profile, loading } = useAuth();
   const [showAuth, setShowAuth] = useState(false);
   const [resend, setResend] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
 
@@ -94,6 +94,9 @@ export function AccessRequestGate() {
     );
   }
 
-  // Signed in and verified — email is locked to the proven account address.
-  return <AccessRequestForm lockedEmail={user.email ?? undefined} />;
+  // Signed in and verified — we already have name + email from signup, so the
+  // form asks only for role and use case. Pass the known details for a friendly
+  // greeting; the server derives them authoritatively from the account.
+  const knownName = profile?.display_name || profile?.username || undefined;
+  return <AccessRequestForm knownName={knownName} knownEmail={user.email ?? undefined} />;
 }

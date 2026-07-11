@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-let mockAuth: { user: any; loading: boolean } = { user: null, loading: false };
+let mockAuth: { user: any; profile?: any; loading: boolean } = { user: null, loading: false };
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => mockAuth }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string, p?: any) => (p?.email ? `${k}:${p.email}` : k), language: 'en' }),
@@ -13,8 +13,8 @@ vi.mock('@/lib/supabase', () => ({ resendEmailVerification: (...a: any[]) => res
 
 // Stub the heavy form + modal so the gate is tested in isolation.
 vi.mock('../AccessRequestForm', () => ({
-  AccessRequestForm: ({ lockedEmail }: { lockedEmail?: string }) => (
-    <div data-testid="access-form">form:{lockedEmail}</div>
+  AccessRequestForm: ({ knownName, knownEmail }: { knownName?: string; knownEmail?: string }) => (
+    <div data-testid="access-form">form:{knownEmail}:{knownName}</div>
   ),
 }));
 vi.mock('@/components/auth/AuthModal', () => ({ default: () => <div data-testid="auth-modal" /> }));
@@ -48,12 +48,13 @@ describe('<AccessRequestGate>', () => {
     expect(resendMock).toHaveBeenCalledWith('jane@school.edu');
   });
 
-  it('renders the form with a locked email for verified users', () => {
+  it('renders the form with known account details for verified users', () => {
     mockAuth = {
       user: { email: 'jane@school.edu', email_confirmed_at: '2026-01-01T00:00:00Z' },
+      profile: { display_name: 'Jane', username: 'janed' },
       loading: false,
     };
     render(<AccessRequestGate />);
-    expect(screen.getByTestId('access-form')).toHaveTextContent('form:jane@school.edu');
+    expect(screen.getByTestId('access-form')).toHaveTextContent('form:jane@school.edu:Jane');
   });
 });
