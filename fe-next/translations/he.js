@@ -6317,6 +6317,11 @@ const he = {
     "timedQuest": "משימה בזמן",
     "untimedQuest": "משימה חופשית",
     "startQuest": "התחילו משימה",
+    "qrWelcome": {
+      "badge": "נסרקתם פנימה",
+      "line": "סריקה יפה! שיגרנו אתכם ישר לאתגר היומי.",
+      "warping": "משגרים אתכם פנימה…"
+    },
     "adminBeta": "ביתא",
     "replay": "שחקו שוב",
     "cleared": "הושלם!",

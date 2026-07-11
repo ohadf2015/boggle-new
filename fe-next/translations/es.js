@@ -6329,6 +6329,11 @@ const es = {
     "timedQuest": "Misión con Tiempo",
     "untimedQuest": "Misión Libre",
     "startQuest": "INICIAR MISIÓN",
+    "qrWelcome": {
+      "badge": "Escaneado",
+      "line": "¡Buen escaneo! Te teletransportamos directo al reto de hoy.",
+      "warping": "Teletransportando…"
+    },
     "adminBeta": "Beta",
     "replay": "Repetir",
     "cleared": "¡Completado!",

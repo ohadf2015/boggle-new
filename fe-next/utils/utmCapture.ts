@@ -180,6 +180,28 @@ export function getUtmSourceForTracking(): string | null {
 }
 
 /**
+ * utm_source values that identify a physical QR / barcode scan (printed
+ * stickers, posters, table tents). Kept in sync with the admin-dashboard
+ * classifier's QR bucket so a scan is both attributed AND funnel-routed the
+ * same way. Deliberately narrower than the classifier list: we only auto-redirect
+ * the explicit "scan me" codes, not every offline touchpoint.
+ */
+export const QR_SCAN_UTM_SOURCES = ['barcode', 'qr', 'qrcode', 'qr-code'] as const;
+
+/**
+ * True when the CURRENT URL indicates the visitor arrived by scanning a printed
+ * QR / barcode (e.g. `?utm_source=barcode`). Reads the live URL (not stored UTM)
+ * so it only fires on the actual landing hop, never on later in-app navigation.
+ */
+export function isQrScanArrival(): boolean {
+  if (typeof window === 'undefined') return false;
+  const source = new URLSearchParams(window.location.search)
+    .get('utm_source')?.toLowerCase().trim();
+  if (!source) return false;
+  return (QR_SCAN_UTM_SOURCES as readonly string[]).includes(source);
+}
+
+/**
  * Check if user came from WhatsApp (detected via referrer)
  */
 export function isWhatsAppReferral(): boolean {
@@ -211,6 +233,7 @@ const utmCapture = {
   getUtmDataForProfile,
   getUtmSourceForTracking,
   isWhatsAppReferral,
+  isQrScanArrival,
   initUtmCapture,
   extractUtmFromUrl,
   getReferrerDomain,

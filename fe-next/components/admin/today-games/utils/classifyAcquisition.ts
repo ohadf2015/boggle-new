@@ -6,6 +6,7 @@ export type AcquisitionKind =
   | 'email'
   | 'push'
   | 'ads'
+  | 'qr'
   | 'referral'
   | 'direct'
   | 'unknown';
@@ -36,6 +37,11 @@ const PORTAL = [
   'y8', 'armorgames', 'addictinggames', 'silvergames', 'lagged', 'coolmathgames',
 ];
 const MAIL = ['gmail', 'mail.google', 'outlook', 'hotmail', 'yahoo mail', 'mail.yahoo', 'mail.ru', 'proton', 'protonmail'];
+// Physical / offline scan sources — printed QR & barcode swag (stickers, posters,
+// flyers, table tents). A scan is a deliberate, high-intent acquisition; keep it
+// its own channel so IRL campaigns are measurable instead of lost in 'unknown'.
+const QR = ['barcode', 'qr', 'qrcode', 'qr-code', 'sticker', 'poster', 'flyer'];
+const QR_MEDIUM = ['qr', 'irl', 'print', 'offline'];
 // Internal app navigation / share tokens that leak into utm_source — NOT acquisition
 // channels. Verified live (2026-05-30): mobile-lobby / solo-confirm / copy. Collapse
 // to 'direct' so the host-acquisition view stays a clean channel breakdown.
@@ -79,6 +85,12 @@ export function classifyAcquisition(input: ClassifyInput): AcquisitionTag {
     return { kind: 'ads', rawLabel: campaign || utm || null, tooltip };
   }
 
+  // Physical QR / barcode scans — matched before the host-based buckets so a
+  // printed source name never gets mistaken for a search/social/referrer host.
+  if (QR_MEDIUM.includes(medium) || matches(utm, QR)) {
+    return { kind: 'qr', rawLabel: utm || campaign || null, tooltip };
+  }
+
   // Internal app navigation / share tokens are not acquisition channels → direct.
   if (utm && INTERNAL.includes(utm)) {
     return { kind: 'direct', rawLabel: null, tooltip };
@@ -116,6 +128,7 @@ export const ACQUISITION_TONE: Record<AcquisitionKind, string> = {
   email: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
   push: 'bg-orange-500/20 text-orange-300 border-orange-500/40',
   ads: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+  qr: 'bg-teal-500/20 text-teal-300 border-teal-500/40',
   referral: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
   direct: 'bg-slate-600/40 text-slate-300 border-slate-500/50',
   unknown: 'bg-slate-700/40 text-slate-400 border-slate-600/50',
