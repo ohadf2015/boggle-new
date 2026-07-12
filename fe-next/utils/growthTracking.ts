@@ -119,6 +119,11 @@ export type GrowthEvent =
   | 'rewarded_ad_offered'
   | 'rewarded_ad_watched'
   | 'rewarded_ad_declined'
+  // Age-gate prompt funnel (AgeGatePromptWrapper), tagged { stage }. Declared
+  // 13+ unlocks interstitials + personalized ads; 'dismissed' users get
+  // re-asked after RE_PROMPT_INTERVAL_MS. Shipped blind on 2026-07-03 — zero
+  // interstitial requests for 39 days looked identical to "working".
+  | 'age_gate'
   // Native rewarded-ad lifecycle breadcrumb. One event per stage transition in
   // useAdMob.showRewarded, tagged { stage, surface }. Diagnoses the "ad won't
   // close / no reward" report: production traffic shows whether sessions reach
@@ -1205,6 +1210,13 @@ export const trackRewardedLifecycle = (
   surface: string,
 ): void => {
   trackGrowthEvent('rewarded_ad_lifecycle', { stage, surface });
+};
+
+/** Age-gate prompt funnel stages (AgeGatePromptWrapper). */
+export type AgeGateStage = 'shown' | 'declared' | 'dismissed';
+
+export const trackAgeGate = (stage: AgeGateStage): void => {
+  trackGrowthEvent('age_gate', { stage });
 };
 
 /** Stages of the native interstitial-ad lifecycle (useAdMob.showInterstitial). */

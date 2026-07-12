@@ -23,6 +23,7 @@ import {
   writeSafetyAck,
   GUEST_AGE_CHANGED_EVENT,
 } from '@/lib/families/guestAge';
+import { resolveGrandfatheredAdult } from '@/lib/families/grandfather';
 
 export interface UseSocialCapabilities {
   tier: SocialTier;
@@ -52,6 +53,12 @@ export function useSocialCapabilities(): UseSocialCapabilities {
     readGuestBirthYear(),
   );
   const [safetyAcknowledged, setSafetyAcknowledged] = useState<boolean>(() => readSafetyAck());
+  // Guest grandfather decision is made once per mount (the first call after
+  // this ships persists '1'/'0' — see lib/families/grandfather.ts). Lazy state
+  // keeps the localStorage write out of the render path on re-renders.
+  const [guestGrandfathered] = useState<boolean>(() =>
+    resolveGrandfatheredAdult({ isAuthenticated: false }),
+  );
 
   // Re-read when ANOTHER instance declares the guest age (same-tab custom event)
   // or another tab writes it (cross-tab `storage`). Without this, instances that
@@ -69,7 +76,19 @@ export function useSocialCapabilities(): UseSocialCapabilities {
 
   const currentYear = new Date().getFullYear();
   const birthYear = isAuthenticated ? profile?.birth_year ?? null : guestBirthYear;
-  const tier = computeSocialTier(birthYear, currentYear);
+  const computedTier = computeSocialTier(birthYear, currentYear);
+  // Grandfather (2026-07-13): existing users — pre-cutoff signups and
+  // pre-existing installs — are adults; only NEW users get the age gate.
+  // Upgrades 'unknown' ONLY: a declared child stays a child.
+  const grandfathered =
+    computedTier === 'unknown' &&
+    (isAuthenticated
+      ? resolveGrandfatheredAdult({
+          isAuthenticated: true,
+          profileCreatedAt: profile?.created_at ?? null,
+        })
+      : guestGrandfathered);
+  const tier: SocialTier = grandfathered ? 'adult' : computedTier;
 
   const override =
     isAuthenticated && profile?.social_features_override
@@ -78,6 +97,8 @@ export function useSocialCapabilities(): UseSocialCapabilities {
 
   const caps = useMemo(() => resolveSocialCapabilities(tier, override), [tier, override]);
 
+  // ageKnown stays honest (grandfathered users never declared an age); the
+  // behavioral switch is needsAgeGate — grandfathered users are never asked.
   const ageKnown = birthYear != null && tier !== 'unknown';
 
   const setGuestBirthYear = useCallback((year: number) => {
@@ -95,7 +116,7 @@ export function useSocialCapabilities(): UseSocialCapabilities {
     caps,
     authResolved: !loading,
     ageKnown,
-    needsAgeGate: !ageKnown,
+    needsAgeGate: !ageKnown && !grandfathered,
     safetyAcknowledged,
     setGuestBirthYear,
     acknowledgeSafety,

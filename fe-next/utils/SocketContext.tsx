@@ -7,6 +7,7 @@ import { sanitizeRoomName } from '@/utils/consts';
 import { computeReconnectDelay } from '@/utils/reconnectDelay';
 import { getRejoinIntent, planReconnectRejoin } from '@/utils/socketRejoin';
 import { readGuestBirthYear } from '@/lib/families/guestAge';
+import { resolveGrandfatheredAdult } from '@/lib/families/grandfather';
 import type { LetterGrid, Language, Avatar } from '@/types';
 
 // Socket.IO Context Value Type
@@ -160,10 +161,15 @@ export function getSharedSocket(): Socket {
       auth: (cb: (data: Record<string, string>) => void) => {
         Promise.all([getAuthToken(), getCrazyGamesToken()]).then(([token, cgToken]) => {
           const declaredBirthYear = !token ? readGuestBirthYear() : null;
+          // Grandfather claim (2026-07-13): pre-existing guest installs are
+          // adults without a declaration. Same trust level as declaredBirthYear.
+          const grandfathered =
+            !token && !declaredBirthYear && resolveGrandfatheredAdult({ isAuthenticated: false });
           cb({
             ...(token ? { token } : {}),
             ...(cgToken ? { crazyGamesToken: cgToken } : {}),
             ...(declaredBirthYear ? { declaredBirthYear: String(declaredBirthYear) } : {}),
+            ...(grandfathered ? { grandfathered: '1' } : {}),
           });
         }).catch(() => cb({}));
       },

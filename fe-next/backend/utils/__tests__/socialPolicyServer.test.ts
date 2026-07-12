@@ -31,10 +31,19 @@ interface FakeSocket {
   handshake: { auth: Record<string, unknown> };
 }
 
-function makeSocket(opts: { verifiedUserId?: string | null; declaredBirthYear?: number }): FakeSocket {
+function makeSocket(opts: {
+  verifiedUserId?: string | null;
+  declaredBirthYear?: number;
+  grandfathered?: string;
+}): FakeSocket {
   return {
     data: { verifiedUserId: opts.verifiedUserId ?? null },
-    handshake: { auth: opts.declaredBirthYear ? { declaredBirthYear: opts.declaredBirthYear } : {} },
+    handshake: {
+      auth: {
+        ...(opts.declaredBirthYear ? { declaredBirthYear: opts.declaredBirthYear } : {}),
+        ...(opts.grandfathered != null ? { grandfathered: opts.grandfathered } : {}),
+      },
+    },
   };
 }
 
@@ -111,6 +120,71 @@ describe('resolveSocketSocialContext — guests', () => {
     const ctx = await resolveSocketSocialContext(socket as never);
     expect(ctx.tier).toBe('child');
     expect(ctx.caps.publicRoomChat).toBe(false);
+  });
+});
+
+describe('grandfathering — existing users are adults (2026-07-13 cutoff)', () => {
+  it('grandfathers an authed profile with no birth_year created before the cutoff', async () => {
+    getSupabaseMock.mockReturnValue(
+      fakeSupabaseReturning({
+        birth_year: null,
+        social_features_override: null,
+        created_at: '2026-06-01T00:00:00.000Z',
+      }),
+    );
+    const socket = makeSocket({ verifiedUserId: 'u1' });
+    const ctx = await resolveSocketSocialContext(socket as never);
+    expect(ctx.tier).toBe('adult');
+    expect(ctx.caps.publicRoomChat).toBe(true);
+  });
+
+  it('does NOT grandfather an authed profile created after the cutoff', async () => {
+    getSupabaseMock.mockReturnValue(
+      fakeSupabaseReturning({
+        birth_year: null,
+        social_features_override: null,
+        created_at: '2026-08-01T00:00:00.000Z',
+      }),
+    );
+    const socket = makeSocket({ verifiedUserId: 'u1' });
+    const ctx = await resolveSocketSocialContext(socket as never);
+    expect(ctx.tier).toBe('unknown');
+  });
+
+  it('never upgrades a declared child, regardless of created_at', async () => {
+    getSupabaseMock.mockReturnValue(
+      fakeSupabaseReturning({
+        birth_year: CURRENT_YEAR - 9,
+        social_features_override: null,
+        created_at: '2026-06-01T00:00:00.000Z',
+      }),
+    );
+    const socket = makeSocket({ verifiedUserId: 'u1' });
+    const ctx = await resolveSocketSocialContext(socket as never);
+    expect(ctx.tier).toBe('child');
+  });
+
+  it('honors a guest grandfather handshake claim (no declared age)', async () => {
+    const socket = makeSocket({ verifiedUserId: null, grandfathered: '1' });
+    const ctx = await resolveSocketSocialContext(socket as never);
+    expect(ctx.tier).toBe('adult');
+    expect(ctx.caps.publicRoomChat).toBe(true);
+  });
+
+  it('a declared child guest stays a child even with a grandfather claim', async () => {
+    const socket = makeSocket({
+      verifiedUserId: null,
+      declaredBirthYear: CURRENT_YEAR - 8,
+      grandfathered: '1',
+    });
+    const ctx = await resolveSocketSocialContext(socket as never);
+    expect(ctx.tier).toBe('child');
+  });
+
+  it('ignores a non-"1" grandfather claim', async () => {
+    const socket = makeSocket({ verifiedUserId: null, grandfathered: '0' });
+    const ctx = await resolveSocketSocialContext(socket as never);
+    expect(ctx.tier).toBe('unknown');
   });
 });
 

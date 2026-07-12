@@ -32,6 +32,10 @@ function setStoredBirthYear(year) {
   mockSingle.mockResolvedValue({ data: { birth_year: year }, error: null });
 }
 
+function setStoredProfile(row) {
+  mockSingle.mockResolvedValue({ data: row, error: null });
+}
+
 beforeEach(() => {
   vi.clearAllMocks();
   mockGetUser.mockResolvedValue({ data: { user: { id: 'uid-1' } }, error: null });
@@ -80,6 +84,18 @@ describe('POST /api/account/social-settings', () => {
     expect(mockUpdateEq).toHaveBeenCalledWith('id', 'uid-1');
     expect(res.data.tier).toBe('adult');
     expect(res.data.capabilities.friendMessaging).toBe(true);
+  });
+
+  it('authorizes a grandfathered account: no birth_year but created before the 2026-07-13 cutoff', async () => {
+    setStoredProfile({ birth_year: null, created_at: '2026-06-01T00:00:00.000Z' });
+    const res = await POST(makeRequest({ override: { friendMessaging: true } }));
+    expect(res.status).toBe(200);
+  });
+
+  it('refuses an undeclared account created after the cutoff', async () => {
+    setStoredProfile({ birth_year: null, created_at: '2026-08-01T00:00:00.000Z' });
+    const res = await POST(makeRequest({ override: { friendMessaging: true } }));
+    expect(res.status).toBe(403);
   });
 
   it('returns 500 when the profile read fails (cannot authorize)', async () => {

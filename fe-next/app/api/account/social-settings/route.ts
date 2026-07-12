@@ -7,6 +7,7 @@ import {
   ADULT_CAPABILITIES,
   type SocialCapabilities,
 } from '@/lib/families/socialPolicy';
+import { isGrandfatheredCreatedAt } from '@/lib/families/grandfather';
 
 /**
  * Families Policy — adult management of social features (self-service).
@@ -52,7 +53,7 @@ export async function POST(request: Request) {
     // (Trusting a body-supplied birth year let a child self-elevate to adult.)
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('birth_year')
+      .select('birth_year, created_at')
       .eq('id', user.id)
       .single();
 
@@ -61,7 +62,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Failed to load account' }, { status: 500 });
     }
 
-    const tier = computeSocialTier(profile?.birth_year ?? null, currentYear);
+    const computedTier = computeSocialTier(profile?.birth_year ?? null, currentYear);
+    // Grandfather (2026-07-13): pre-cutoff accounts with no declared age are
+    // adults. Upgrades 'unknown' only — a declared child can never self-elevate.
+    const tier =
+      computedTier === 'unknown' && isGrandfatheredCreatedAt(profile?.created_at ?? null)
+        ? 'adult'
+        : computedTier;
     if (tier !== 'adult') {
       return NextResponse.json({ error: 'Adult verification required' }, { status: 403 });
     }
