@@ -10,7 +10,7 @@
  * rather than a muted system notification.
  */
 
-import { useState, useEffect, useRef, useMemo, type ComponentType } from 'react';
+import { memo, useState, useEffect, useRef, useMemo, type ComponentType } from 'react';
 import {
   Sparkles, Flame, Zap, Gem, Trophy, Target, TrendingUp, Rocket, Star,
 } from 'lucide-react';
@@ -121,7 +121,7 @@ interface BlastScoreMilestoneProps {
   seed?: number;
 }
 
-export function BlastScoreMilestone({ score, t, seed }: BlastScoreMilestoneProps) {
+export const BlastScoreMilestone = memo(function BlastScoreMilestone({ score, t, seed }: BlastScoreMilestoneProps) {
   const [activeMilestone, setActiveMilestone] = useState<MilestoneConfig | null>(null);
   const lastMilestoneRef = useRef(0);
   const entranceRef = useRef(getRandomMilestoneEntrance());
@@ -189,4 +189,4 @@ export function BlastScoreMilestone({ score, t, seed }: BlastScoreMilestoneProps
       )}
     </AdaptiveAnimatePresence>
   );
-}
+});
