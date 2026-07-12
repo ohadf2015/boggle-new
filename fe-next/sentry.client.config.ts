@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/nextjs";
-import { WASM_STREAMING_COMPILE_FAILED } from "@/lib/sentry/benignErrorPatterns";
+import { WASM_STREAMING_COMPILE_FAILED, isStaleAssetLinkRejection } from "@/lib/sentry/benignErrorPatterns";
 
 const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN;
 
@@ -71,6 +71,13 @@ Sentry.init({
       ) {
         return null;
       }
+    }
+
+    // Next.js internal <link>/<script> prefetch rejects with a raw DOM Event —
+    // surfaces as `<unknown>` (JAVASCRIPT-NEXTJS-1R3). Recovery already handled
+    // by ChunkErrorRecovery's synchronous error listener; drop the duplicate noise.
+    if (isStaleAssetLinkRejection(error)) {
+      return null;
     }
 
     return event;
@@ -330,6 +337,9 @@ Sentry.init({
     /LogRocket.*Navigation rate limit/i,
     /LogRocket is using too much memory/i,
     /Navigation rate limit exceeded/i,
+    // LogRocket mirror-metadata timeout on rapid style changes — third-party
+    // replay-recording internals, doesn't affect the app (JAVASCRIPT-NEXTJS-1KG)
+    /LogRocket.*Timed out waiting for mirror metadata/i,
     // Coin sync rate-limits — policy, not bug. Downgraded at source but defense in depth (JAVASCRIPT-NEXTJS-15F, 15G)
     /\[CoinContext\] Failed to add coins:.*TOO_MANY_REQUESTS/i,
     /Coin sync API error:.*TOO_MANY_REQUESTS/i,
