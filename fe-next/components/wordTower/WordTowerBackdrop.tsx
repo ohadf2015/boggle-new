@@ -1,6 +1,6 @@
 'use client';
 
-import type { CSSProperties } from 'react';
+import { memo, type CSSProperties } from 'react';
 import { biomeBackdrop } from '@/lib/wordTower/towerLayout';
 import { dollyScaleFor } from '@/lib/wordTower/dollyZoom';
 import { BIOME_THEME } from './biomeTheme';
@@ -38,7 +38,7 @@ function starSheet(size: number, dot: number, seed: number): CSSProperties {
   };
 }
 
-export function WordTowerBackdrop({
+export const WordTowerBackdrop = memo(function WordTowerBackdrop({
   biomeId,
   heightM = 0,
   reducedMotion = false,
@@ -284,4 +284,4 @@ export function WordTowerBackdrop({
       `}</style>
     </div>
   );
-}
+});
