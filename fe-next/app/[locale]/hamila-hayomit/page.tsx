@@ -23,8 +23,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   // Definition/guide intent — deliberately NOT a second "play here" title, so this
   // page does not cannibalize /he/daily (the play-intent doorway) on the SERP.
-  const title = 'מה זה "המילה היומית"? מדריך + פאזל מילת היום החינמי | LexiClash';
-  const description = 'מה זה "המילה היומית"? כל מה שצריך לדעת על מילת היום — פאזל המילים היומי החינמי של LexiClash: אותו לוח לכל העולם, ציד מילים וגלגל מילים, שיתוף תוצאות וטבלת מובילים. הסבר מלא + משחק, ללא הרשמה.';
+  const title = 'המילה היומית — מדריך + פאזל מילים יומי חינמי | LexiClash';
+  const description = 'המילה היומית של LexiClash — פאזל מילים חינמי ללא הרשמה. אותו לוח לכל העולם בחצות, ציד מילים וגלגל מילים, שיתוף תוצאות וטבלת מובילים. מדריך מלא + משחק.';
 
   return {
     title,
