@@ -1,31 +1,31 @@
 {
-  "date": "2026-07-11",
-  "note": "24h window: 0 routes n≥50 (6th consecutive night all sub-floor). 7-day window: 3 routes above floor — /en/multiplayer (n=87), /es/multiplayer (n=54), /he (n=59). CLS critically poor on all 3 (0.575/0.681/1.043). INP failing on multiplayer (264ms/420ms). LCP OK on all 3 (under 2700ms). Impact check: fetchLanding parallel ship (2026-07-08) verdict=improved, /en p75 LCP 2308ms vs 6904ms baseline (n=23, sub-floor). Supabase MCP absent (16th consecutive night — CRITICAL: human must mint never-expire PAT). 4 migrations pending apply.",
+  "date": "2026-07-12",
+  "note": "7-day window: 2 routes above n≥50 floor. CLS critically poor on multiplayer routes. Fix shipped: removed collapseSpacerWhenHidden={showResults} from PageClient.tsx — expected CLS improvement from 0.574 toward ~0.29 on /en/multiplayer. Supabase MCP absent (17th consecutive night). 4 migrations still pending apply.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (16th consecutive night). 4 migrations pending apply. RLS initplan verdict: DEFERRED. web_vitals FK: already indexed (advisor stale). Auth connections: human dashboard task.",
+    "note": "Supabase MCP absent (17th consecutive night). 4 migrations pending apply. web_vitals FK: stale advisor (already indexed). Auth connections: human dashboard task.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
       {
         "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
-        "carry_count": 15,
-        "status": "WRITTEN — pending apply (15th night)"
+        "carry_count": 16,
+        "status": "WRITTEN — pending apply (16th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
-        "carry_count": 10,
-        "status": "WRITTEN — pending apply (10th night)"
+        "carry_count": 11,
+        "status": "WRITTEN — pending apply (11th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql",
-        "carry_count": 5,
-        "status": "WRITTEN — pending apply (5th night)"
+        "carry_count": 6,
+        "status": "WRITTEN — pending apply (6th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql",
-        "carry_count": 4,
-        "status": "WRITTEN — pending apply (4th night)"
+        "carry_count": 5,
+        "status": "WRITTEN — pending apply (5th night)"
       }
     ],
     "remaining_advisor_items": [
@@ -33,75 +33,65 @@
         "id": "auth_rls_initplan_quick_play_challenges",
         "status": "Migration 20260707020000 written. Pending apply.",
         "priority": "MEDIUM",
-        "carry_count": 4
+        "carry_count": 5
       },
       {
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config.",
         "priority": "LOW",
-        "carry_count": 15
+        "carry_count": 16
       },
       {
         "id": "unindexed_fk_web_vitals_player_id",
         "status": "STALE ADVISOR DATA — already indexed in migration 20260429160100.",
         "priority": "INFO",
-        "carry_count": 4
+        "carry_count": 5
       }
     ]
   },
   "frontend": {
-    "note_24h": "0 routes above n≥50 floor (6th consecutive night). All LCP/INP/CLS verdicts DEFERRED for 24h window.",
-    "note_7d": "3 routes above n≥50 floor in 7-day window. CLS critically poor on /en/multiplayer (0.575), /es/multiplayer (0.681), /he (1.043). INP failing on multiplayer. Documented in perf-watch.md. Suspected cause: conditional banners (ClassroomModeBanner/EducationHeader/SpectatorBanner) rendering after hydration.",
+    "note_24h": "0 routes above n≥50 floor. All 24h LCP/INP/CLS verdicts DEFERRED.",
+    "note_7d": "2 routes above n≥50 floor. CLS critically poor on both multiplayer routes. INP failing. Fix shipped this run targeting the spacer-collapse CLS source. Secondary CLS contributors (SpectatorBanner y:-100 animation, ConnectionStatusIndicator 1.5s delayed banner) noted for next run.",
     "by_route_7d": [
       {
-        "route": "/es/multiplayer",
-        "p75_lcp_ms": 2694,
-        "p75_inp_ms": 420,
-        "p75_cls": 0.681,
-        "n_7d": 54,
-        "lcp_status": "POOR (>2500ms threshold)",
-        "inp_status": "POOR (>200ms)",
-        "cls_status": "CRITICAL (>0.1)"
-      },
-      {
         "route": "/en/multiplayer",
-        "p75_lcp_ms": 2459,
-        "p75_inp_ms": 264,
-        "p75_cls": 0.575,
-        "n_7d": 87,
-        "lcp_status": "BORDERLINE (2459ms)",
+        "p75_lcp_ms": 2707,
+        "p75_inp_ms": 268,
+        "p75_cls": 0.574,
+        "n_7d": 80,
+        "lcp_status": "POOR (>2500ms)",
         "inp_status": "NEEDS-IMPROVEMENT (>200ms)",
-        "cls_status": "CRITICAL (>0.1)"
+        "cls_status": "CRITICAL (>0.1) — fix shipped this run, expect improvement in 3-day window"
       },
       {
-        "route": "/he",
-        "p75_lcp_ms": 2328,
-        "p75_inp_ms": 160,
-        "p75_cls": 1.043,
+        "route": "/es/multiplayer",
+        "p75_lcp_ms": 2273,
+        "p75_inp_ms": 318,
+        "p75_cls": 0.254,
         "n_7d": 59,
         "lcp_status": "GOOD (<2500ms)",
-        "inp_status": "GOOD (<200ms)",
-        "cls_status": "CRITICAL (>0.1)"
+        "inp_status": "POOR (>200ms)",
+        "cls_status": "CRITICAL (>0.1) — partial improvement expected"
       }
     ],
     "impact_check": {
-      "change": "fetchLanding parallel (2026-07-08)",
-      "route": "/en",
-      "baseline_ms": 6904,
-      "measured_ms": 2308,
-      "n_7d": 23,
+      "change": "LCP h1 animation delay removal (2026-07-05)",
+      "route": "/",
+      "baseline_ms": 6522,
+      "measured_ms": 1921,
+      "n_7d": 28,
       "verdict": "improved",
-      "note": "66% LCP improvement. n=23 sub-floor but consistent direction."
+      "note": "70% LCP improvement. n=28 sub-floor — direction clear and consistent."
     }
   },
   "bundle": {
-    "note": "Stable vs 2026-07-10. 60150 chunk hash rotated (+10KB from lane-01 WordTowerScene null-guard). No regression above 50KB threshold.",
+    "note": "Stable vs 2026-07-11. PageClient.tsx prop removal is one-character change — no chunk size impact.",
     "top_chunks": [
-      { "name": "8aafd928.bc81927d996732a9.js", "kb": 6452, "note": "Word dictionary — LAZY" },
-      { "name": "6c0d0f8e.e929edfbc529ee96.js", "kb": 3284 },
-      { "name": "62013-966f6608ee5cbc47.js", "kb": 856 },
-      { "name": "60150.0bee0961dc61310b.js", "kb": 720, "note": "Hash rotated vs yesterday (WordTowerScene guard). +10KB — within noise." },
-      { "name": "26644.51104cd213c865d8.js", "kb": 612 }
+      { "name": "8aafd928.*.js", "kb": 6452, "note": "Word dictionary — LAZY" },
+      { "name": "6c0d0f8e.*.js", "kb": 3284 },
+      { "name": "62013-*.js", "kb": 856 },
+      { "name": "60150.*.js", "kb": 720 },
+      { "name": "26644.*.js", "kb": 612 }
     ]
   }
 }

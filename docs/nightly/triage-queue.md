@@ -1484,3 +1484,33 @@ The following PostHog experiments have been running >14 days with no retirement 
 | `exp-mp-round-feedback-top-v1` | 18 | 2 | game_feedback mp_round avg |
 
 _Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all flags active=true, rollout=100%._
+
+## 2026-07-12
+- [Sentry] JAVASCRIPT-NEXTJS-1R3 `<unknown>` on multiplayer page (/:locale/juego-de-palabras-multijugador)
+  - first/last seen: 2026-07-06 / 2026-07-11, count=83, userCount=0
+  - link: https://lexiclash.sentry.io/issues/132569197/
+  - status: deferred
+  - why: no stack trace — `head > link` resource load error on iOS Safari, likely CDN/font preload failure. No code change can fix without identifying the failing resource. Monitor for user impact increase.
+  - recommended owner: backend/infra review-by-eod
+
+- [Sentry] JAVASCRIPT-NEXTJS-1RT `[GSI_LOGGER]: Check credential status returns invalid response`
+  - first/last seen: 11h ago (2026-07-12), count=1, userCount=0
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1RT
+  - status: deferred
+  - why: Google Sign-In internal logger noise, single occurrence, 0 users affected
+  - recommended owner: self (monitor for recurrence)
+
+- [Supabase] upsert_push_token SECURITY DEFINER callable by authenticated role
+  - status: deferred
+  - why: Route at app/api/player/push-token/route.ts uses createClient() (session-scoped authenticated client) to call the RPC. REVOKE from authenticated would break the API. Fix options: (a) switch route to service-role client + REVOKE from authenticated, or (b) switch function to SECURITY INVOKER if user_push_tokens has RLS. Needs schema review.
+  - recommended owner: review-by-eod
+
+- [Supabase] add_league_xp SECURITY DEFINER callable by authenticated role
+  - status: deferred
+  - why: Called from backend/modules/leagueManager.ts via getSupabase() — need to confirm whether this uses service role or session client before REVOKE decision.
+  - recommended owner: review-by-eod
+
+- [Supabase] teacher_access_requests RLS policy tar_insert_any (WITH CHECK always true)
+  - status: deferred
+  - why: INSERT with no restrictions is likely intentional (any authenticated user can submit a teacher access request). Changing would require UX review.
+  - recommended owner: design review-by-eod
