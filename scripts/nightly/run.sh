@@ -92,10 +92,14 @@ export NIGHTLY_DISABLED
 # A hung Sentry/Supabase MCP call now aborts in ~60s with a tool error instead of
 # stalling a lane until its multi-minute wall-clock ceiling (exit 124).
 export MCP_TOOL_TIMEOUT="${MCP_TOOL_TIMEOUT:-60000}"
-# Startup budget 20s→45s (2026-06-17): npx-stdio MCP boot (supabase/sentry) does an
+# Startup budget 20s→45s→90s (2026-07-13): npx-stdio MCP boot (supabase/sentry) does an
 # npm-registry resolve per boot that can exceed 20s on a slow-registry night → server
 # dropped → lane reports "MCP unavailable". See lib/headless.sh for full rationale.
-export MCP_TIMEOUT="${MCP_TIMEOUT:-45000}"
+# 45s (2026-06-17) itself proved too tight — same root cause diagnosed at the gate/lane
+# idle-timeouts this session (this machine runs chronically loaded, load avg 8-13 at
+# 1am), impact-ledger showed Supabase MCP absent 14+ consecutive nights and logs showed
+# repeated npx transport-connect failures. Doubled again to keep pace.
+export MCP_TIMEOUT="${MCP_TIMEOUT:-90000}"
 
 # Self-heal claude's bundled ripgrep exec bit. A claude update reinstalls the npm
 # package with the vendored `rg` as -rw-r--r-- (not +x) — every lane's Grep/Glob then

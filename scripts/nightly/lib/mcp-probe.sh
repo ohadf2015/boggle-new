@@ -34,10 +34,11 @@ _mcp_server_field() { jq -r ".mcpServers.\"$2\"$3 // empty" "$1" 2>/dev/null; }
 # configured (command+args+env) and pipe an MCP `initialize`; print "ok"/"fail:…" verdict.
 # Returns 0 on ok/skip (non-fatal), 1 on a live transport/handshake failure.
 probe_mcp_server_boot() {
-  # Default 45s (was 30s): npx-stdio MCP boot (supabase/sentry) does an npm-registry resolve
-  # per cold boot that can exceed 30s under lane-warmup load → false "no response" timeout
-  # (supabase probe fail, 2026-06-28). 45s matches run.sh's MCP_TIMEOUT=45000 intent.
-  local server="$1" cj="${2:-${CLAUDE_CONFIG_JSON:-$HOME/.claude.json}}" to="${3:-45}"
+  # Default 90s (was 45s, was 30s, 2026-07-13): npx-stdio MCP boot (supabase/sentry) does an
+  # npm-registry resolve per cold boot that can exceed 30s under lane-warmup load → false
+  # "no response" timeout (supabase probe fail, 2026-06-28). Matches run.sh's MCP_TIMEOUT
+  # intent — kept in sync with that default, see its comment for the 45s→90s rationale.
+  local server="$1" cj="${2:-${CLAUDE_CONFIG_JSON:-$HOME/.claude.json}}" to="${3:-90}"
   command -v jq  >/dev/null 2>&1 || { printf '%s MCP probe: skip(no jq)\n' "$server";        return 0; }
   command -v npx >/dev/null 2>&1 || { printf '%s MCP probe: skip(no npx)\n' "$server";       return 0; }
   [ -f "$cj" ]                   || { printf '%s MCP probe: skip(no claude.json)\n' "$server"; return 0; }

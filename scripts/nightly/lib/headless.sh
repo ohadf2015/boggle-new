@@ -320,13 +320,26 @@ PY
   # Bounding policy (2026-06-07): a PROGRESS watchdog, NOT a fixed wall-clock cap.
   # The old `gtimeout ${timeout_sec}s` SIGKILLed lanes that were still emitting
   # stream-json (4 lanes cut mid-edit on 2026-06-07). A lane streams a tool event on
-  # every action, so "no new output for LANE_IDLE_SECS" (default 300s = 5min) is a
-  # true wedge — a hung MCP call / dead loop — and the ONLY thing we kill on. The
-  # per-lane `timeout_sec` arg + LANE_MAX_SECS (default 1800s) are kept only as a
-  # far-out absolute backstop against a busy-but-useless lane (launchd's TimeOut is
-  # advisory and won't stop a hang). A productive lane now runs to natural completion.
+  # every action, so "no new output for LANE_IDLE_SECS" is meant to mean a true
+  # wedge — a hung MCP call / dead loop. The per-lane `timeout_sec` arg +
+  # LANE_MAX_SECS (default 1800s) are kept only as a far-out absolute backstop
+  # against a busy-but-useless lane (launchd's TimeOut is advisory and won't stop
+  # a hang). A productive lane now runs to natural completion.
+  #
+  # IDLE DEFAULT 300s→900s (2026-07-13): same false-positive-kill root cause as the
+  # gate fix (see gate-isolated.sh) hits lanes too — 112 lane-level rc=124s across
+  # 10 lanes in the prior 2 weeks, worst on MCP-using lanes (05-landing: 20). The
+  # 2026-06-20 fix already documented WHY: under load, the Claude SDK can silently
+  # back off on a rate-limit at the FIRST token, producing an empty/stalled sidecar
+  # before any output — indistinguishable from a hang at 300s. That fix only widened
+  # the leash for zero-MCP lanes (LANE_IDLE_SECS_NO_MCP, since those truly cannot
+  # hang on an MCP call) but left MCP-using lanes at the tight 300s default — backwards,
+  # since MCP-using lanes ALSO have legitimately-slow tool calls (a slow PostHog/
+  # Supabase query, a WebFetch) on top of the same SDK backoff exposure. 900s gives
+  # 3x headroom, matching the gate fix's ratio; LANE_MAX_SECS (total per-lane runtime
+  # ceiling, unrelated to silence detection) is untouched.
   local lane_idle lane_max
-  lane_idle="${LANE_IDLE_SECS:-300}"
+  lane_idle="${LANE_IDLE_SECS:-900}"
   lane_max="${LANE_MAX_SECS:-1800}"
   [ "$timeout_sec" -gt "$lane_max" ] && lane_max="$timeout_sec"
 
@@ -368,7 +381,10 @@ PY
   # instead of an unclassifiable empty-sidecar death. Only applied when the scope is
   # provably empty (count 0); a full-MCP fallback (count -1) keeps the strict 300s.
   if [ "$mcp_scope_count" = "0" ]; then
-    local _no_mcp_idle="${LANE_IDLE_SECS_NO_MCP:-600}"
+    # 600s→1500s (2026-07-13): must stay above the new 900s LANE_IDLE_SECS base or
+    # this leash-widen never fires (the `-gt lane_idle` check below would always be
+    # false) — kept comfortably under the 1800s LANE_MAX_SECS backstop.
+    local _no_mcp_idle="${LANE_IDLE_SECS_NO_MCP:-1500}"
     if [ "$_no_mcp_idle" -gt "$lane_idle" ]; then
       lane_idle="$_no_mcp_idle"
       echo "headless: lane=$lane_id no MCP → idle leash raised to ${lane_idle}s (silent rate-limit-backoff tolerance)" | tee -a "$log_file"
