@@ -144,7 +144,7 @@ export function InviteCard({
             making the card feel like a feature, not a settings strip. */}
         <div className="relative w-full h-[120px] overflow-hidden border-b-3 border-neo-black">
           <Image
-            src="/images/invite-hero.jpg"
+            src="/images/invite-hero.webp"
             alt=""
             fill
             sizes="(min-width: 1024px) 360px, 100vw"

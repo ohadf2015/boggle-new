@@ -106,7 +106,7 @@ export const MobileShareSection = memo<MobileShareSectionProps>(function MobileS
           {/* Hero illustration */}
           <div className="relative w-full h-[140px] overflow-hidden border-b-3 border-neo-black">
             <Image
-              src="/images/invite-hero.jpg"
+              src="/images/invite-hero.webp"
               alt=""
               fill
               className="object-cover"
