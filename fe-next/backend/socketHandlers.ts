@@ -74,6 +74,15 @@ function initializeSocketHandlers(io: Server): void {
     // Initialize rate limiting for this socket with IP tracking
     initRateLimit(socket);
 
+    // Multi-tab takeover guard: once a session moves to another tab, the old
+    // socket stays connected briefly (so 'sessionTakenOver' can flush) and its
+    // migrating flag may persist up to 10s. Drop ALL incoming events from it —
+    // otherwise the old tab can still submit words/ready-state as the player.
+    socket.use((_packet, next) => {
+      if (socket.data?.migrating) return; // silent drop
+      next();
+    });
+
     // Auto-join user room for authenticated sockets so social features
     // (gifts, friend challenges, messaging) can broadcast via `user:<id>` room.
     // verifiedUserId is set by JWT middleware in socketSetup.ts.
