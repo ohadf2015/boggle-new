@@ -29,6 +29,7 @@ import { NativeLanguageBanner } from '@/components/NativeLanguageBanner';
 import { FirstGameLanguageNotice } from '@/components/FirstGameLanguageNotice';
 import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
 import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
+import { ANDROID_PACKAGE } from '@/utils/androidApp';
 import type { Language } from '@/shared/types/game';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic } from '../fonts';
@@ -209,6 +210,13 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
             'geo.placename': 'Israel',
             // Content-Language hints for search engines (supplements html lang attr)
             'content-language': validLocale === 'he' ? 'he-IL' : validLocale,
+            // App Links: lets Facebook/Twitter/LinkedIn/Slack link previews render
+            // an "Open in App" / install action pointing at the Play listing when
+            // this page is shared, instead of a plain web card.
+            'al:android:package': ANDROID_PACKAGE,
+            'al:android:app_name': 'LexiClash',
+            'al:android:url': `https://www.lexiclash.live${localePath}`,
+            'al:web:should_fallback': 'true',
         },
     };
 }

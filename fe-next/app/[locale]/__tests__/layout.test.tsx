@@ -145,3 +145,24 @@ describe('LocaleLayout Hydration', () => {
     });
 
 });
+
+describe('generateMetadata App Links (al:android)', () => {
+    it('includes al:android meta tags pointing at the Play Store package, so social shares (Facebook/Twitter/Slack) render an Open-in-App action', async () => {
+        const { generateMetadata } = await import('../layout');
+
+        const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'en' }) } as Parameters<typeof generateMetadata>[0]);
+
+        expect(metadata.other?.['al:android:package']).toBe('live.lexiclash.app');
+        expect(metadata.other?.['al:android:app_name']).toBe('LexiClash');
+        expect(metadata.other?.['al:android:url']).toBe('https://www.lexiclash.live/en');
+        expect(metadata.other?.['al:web:should_fallback']).toBe('true');
+    });
+
+    it('points al:android:url at the locale-specific page', async () => {
+        const { generateMetadata } = await import('../layout');
+
+        const metadata = await generateMetadata({ params: Promise.resolve({ locale: 'he' }) } as Parameters<typeof generateMetadata>[0]);
+
+        expect(metadata.other?.['al:android:url']).toBe('https://www.lexiclash.live/he');
+    });
+});
