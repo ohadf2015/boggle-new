@@ -14,10 +14,11 @@ import { he } from '@/translations/he.js';
 import { sv } from '@/translations/sv.js';
 import { ja } from '@/translations/ja.js';
 import { es } from '@/translations/es.js';
+import { ru } from '@/translations/ru.js';
 
 type Dict = Record<string, unknown>;
 
-const DICTS: Record<string, Dict> = { en, he, sv, ja, es };
+const DICTS: Record<string, Dict> = { en, he, sv, ja, es, ru };
 
 /** Walk a dotted path; return the string leaf, or undefined if missing/non-leaf. */
 function walk(dict: Dict | undefined, key: string): string | undefined {
