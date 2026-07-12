@@ -53,10 +53,39 @@ const BRIDGE_WINDOW = 4;
 const THEME_WINDOW = 2;
 const STEM_WINDOW = 3;
 
+/**
+ * mulberry32 — tiny deterministic PRNG. Used to vary the greedy's base order
+ * per player (seed from playerSeed.ts) so two players don't walk an identical
+ * level path, while every anti-adjacency guarantee below still holds.
+ */
+function mulberry32(seed: number): () => number {
+  let a = seed >>> 0;
+  return () => {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+function seededShuffle<T>(items: T[], seed: number): T[] {
+  const rand = mulberry32(seed);
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
 /** Exported for tests — production callers go through the ordered level path. */
-export function interleaveByBridge(items: ConnectionPuzzle[]): ConnectionPuzzle[] {
-  // Stable, deterministic base order; greedy reorders from here.
-  const remaining = [...items].sort((a, b) => a.id.localeCompare(b.id));
+export function interleaveByBridge(items: ConnectionPuzzle[], seed = 0): ConnectionPuzzle[] {
+  // Stable, deterministic base order; greedy reorders from here. A non-zero
+  // seed shuffles the base deterministically, so ties in the greedy resolve
+  // differently per player — same puzzles, personal order.
+  let remaining = [...items].sort((a, b) => a.id.localeCompare(b.id));
+  if (seed !== 0) remaining = seededShuffle(remaining, seed);
   const themeOf = new Map(remaining.map((p) => [p.id, inferTheme(p)] as const));
 
   const out: ConnectionPuzzle[] = [];
@@ -192,30 +221,34 @@ export const CURATED_OPENING: Partial<Record<PuzzleLocale, readonly string[]>> =
  * the easy band, plus medium and hard, interleave as before. Built once at module
  * load — pools are import-time constants.
  */
-const ORDERED_BY_LOCALE: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = (() => {
-  const out: Partial<Record<PuzzleLocale, ConnectionPuzzle[]>> = {};
-  for (const locale of Object.keys(PUZZLES_BY_LOCALE) as PuzzleLocale[]) {
-    const all = PUZZLES_BY_LOCALE[locale] ?? [];
-    const easyAll = all.filter((p) => p.difficulty === 'easy');
+const orderedCache = new Map<string, ConnectionPuzzle[]>();
 
-    // Pin curated openers to the front (verbatim, in listed order), keeping only
-    // ids that resolve to an actual easy puzzle. Everything else interleaves.
-    const byId = new Map(easyAll.map((p) => [p.id, p] as const));
-    const opening = (CURATED_OPENING[locale] ?? [])
-      .map((id) => byId.get(id))
-      .filter((p): p is ConnectionPuzzle => !!p);
-    const openSet = new Set(opening.map((p) => p.id));
-    const easyRest = easyAll.filter((p) => !openSet.has(p.id));
+function orderedFor(locale: PuzzleLocale, seed: number): ConnectionPuzzle[] {
+  const key = `${locale}:${seed}`;
+  const cached = orderedCache.get(key);
+  if (cached) return cached;
 
-    out[locale] = [
-      ...opening,
-      ...interleaveByBridge(easyRest),
-      ...interleaveByBridge(all.filter((p) => p.difficulty === 'medium')),
-      ...interleaveByBridge(all.filter((p) => p.difficulty === 'hard')),
-    ];
-  }
-  return out;
-})();
+  const all = PUZZLES_BY_LOCALE[locale] ?? [];
+  const easyAll = all.filter((p) => p.difficulty === 'easy');
+
+  // Pin curated openers to the front (verbatim, in listed order), keeping only
+  // ids that resolve to an actual easy puzzle. Everything else interleaves.
+  const byId = new Map(easyAll.map((p) => [p.id, p] as const));
+  const opening = (CURATED_OPENING[locale] ?? [])
+    .map((id) => byId.get(id))
+    .filter((p): p is ConnectionPuzzle => !!p);
+  const openSet = new Set(opening.map((p) => p.id));
+  const easyRest = easyAll.filter((p) => !openSet.has(p.id));
+
+  const ordered = [
+    ...opening,
+    ...interleaveByBridge(easyRest, seed),
+    ...interleaveByBridge(all.filter((p) => p.difficulty === 'medium'), seed),
+    ...interleaveByBridge(all.filter((p) => p.difficulty === 'hard'), seed),
+  ];
+  orderedCache.set(key, ordered);
+  return ordered;
+}
 
 /** Map a UI locale to a locale we have a native pool for; otherwise fall back to 'en'. */
 function resolveLocale(locale: string): PuzzleLocale {
@@ -226,14 +259,18 @@ export function getPuzzlesForLocale(locale: string): ConnectionPuzzle[] {
   return PUZZLES_BY_LOCALE[resolveLocale(locale)] ?? PUZZLES_BY_LOCALE.en ?? [];
 }
 
-function activeOrdered(locale: PuzzleLocale, banned?: ReadonlySet<string>): ConnectionPuzzle[] {
-  const ordered = ORDERED_BY_LOCALE[locale] ?? ORDERED_BY_LOCALE.en ?? [];
+function activeOrdered(
+  locale: PuzzleLocale,
+  banned?: ReadonlySet<string>,
+  seed = 0,
+): ConnectionPuzzle[] {
+  const ordered = orderedFor(locale, seed);
   if (!banned || banned.size === 0) return ordered;
   return ordered.filter((p) => !banned.has(p.id));
 }
 
-export function getTotalLevels(locale: string, banned?: ReadonlySet<string>): number {
-  return activeOrdered(resolveLocale(locale), banned).length;
+export function getTotalLevels(locale: string, banned?: ReadonlySet<string>, seed = 0): number {
+  return activeOrdered(resolveLocale(locale), banned, seed).length;
 }
 
 /**
@@ -248,8 +285,9 @@ export function getPuzzleForLevel(
   locale: string,
   level: number,
   banned?: ReadonlySet<string>,
+  seed = 0,
 ): ConnectionPuzzle | null {
-  const ordered = activeOrdered(resolveLocale(locale), banned);
+  const ordered = activeOrdered(resolveLocale(locale), banned, seed);
   if (ordered.length === 0) return null;
   const lvl = Math.max(1, Math.floor(level));
   const idx = (lvl - 1) % ordered.length;

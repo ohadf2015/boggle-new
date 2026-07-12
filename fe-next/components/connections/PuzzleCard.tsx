@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useExperiment } from '@/hooks/useExperiment';
 import { m, AnimatePresence, useAnimationControls } from 'framer-motion';
 import { ThumbsUp, ThumbsDown, ArrowRight, Flag, Check, Lightbulb, Eye } from 'lucide-react';
@@ -11,6 +11,7 @@ import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connection
 import ConnectionsKeyboard from './ConnectionsKeyboard';
 import { getKeyboardLetters, appendLetter, backspace, localeNeedsIME, MAX_GUESS_LEN } from '@/lib/connections/keyboard';
 import { whyItWorks } from '@/lib/connections/whyItWorks';
+import { freeHintsRemaining, consumeFreeHint } from '@/lib/connections/freeHints';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 
 interface PuzzleCardProps {
@@ -23,6 +24,8 @@ interface PuzzleCardProps {
   onRevealHint: () => void;
   onRate: (rating: PuzzleRating) => void;
   onNext: () => void;
+  /** Pyramid stages pass false — their onRate is a no-op, so the CTAs were dead noise. */
+  showRating?: boolean;
 }
 
 const CARD_SPRING = { type: 'spring' as const, stiffness: 320, damping: 26 };
@@ -72,6 +75,7 @@ export default function PuzzleCard({
   onRevealHint,
   onRate,
   onNext,
+  showRating = true,
 }: PuzzleCardProps) {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
@@ -105,6 +109,13 @@ export default function PuzzleCard({
     disabled: isAdmin || isDisabled,
     context: { puzzleId: puzzle.id, difficulty: puzzle.difficulty },
   });
+
+  // Every player gets FREE_HINTS_PER_DAY free reveals before the ad gate.
+  const [freeHints, setFreeHints] = useState(() => freeHintsRemaining());
+  const handleFreeHint = () => {
+    setFreeHints(consumeFreeHint());
+    onRevealHint();
+  };
 
   // Rewarded-ad gate for non-admin reveal-hint
   const revealHintAd = useRewardedFeatureUnlock({
@@ -422,6 +433,17 @@ export default function PuzzleCard({
                   <Lightbulb className="w-4 h-4" aria-hidden="true" />
                   {t('connections.revealHint')}
                 </m.button>
+              ) : freeHints > 0 ? (
+                <m.button
+                  type="button"
+                  onClick={handleFreeHint}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-yellow/70 bg-transparent text-neo-yellow font-neo-body text-sm px-4 py-2 hover:bg-neo-yellow/10 transition-colors"
+                >
+                  <Lightbulb className="w-4 h-4" aria-hidden="true" />
+                  {t('connections.freeHint', { count: freeHints })}
+                </m.button>
               ) : (revealHintAd.canShowAd || showFallbackHint) ? (
                 <m.button
                   type="button"
@@ -470,7 +492,7 @@ export default function PuzzleCard({
             transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 22 }}
             className="mt-4 flex flex-col items-center gap-2"
           >
-            {!hasRated ? (
+            {!showRating ? null : !hasRated ? (
               <div className="flex items-center gap-2">
                 <span className="text-neo-white/45 text-[0.7rem] font-neo-body">
                   {t('connections.rateThis')}

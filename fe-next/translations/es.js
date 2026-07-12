@@ -14026,6 +14026,7 @@ const es = {
       "title": "Pirámide de Puentes de Palabras",
       "cta": "Pirámide",
       "tagline": "3 acertijos. 1 palabra los une a todos.",
+      "explainer": "Resuelve los 3 acertijos de abajo: sus respuestas desbloquean la palabra de la cima.",
       "finale": "Final",
       "finalePrompt": "¿Qué palabra conecta las tres?",
       "cluesLabel": "Encuentra la palabra que une cada puente:",
@@ -14049,6 +14050,7 @@ const es = {
     "quitToMenu": "Volver al menú",
     "noAdAvailable": "No hay anuncio disponible ahora. Inténtalo más tarde.",
     "revealHint": "Revelar pista",
+    "freeHint": "Pista gratis (quedan {count})",
     "revealHintAd": "Ver anuncio por pista",
     "revealAnswerAd": "Ver anuncio para revelar respuesta",
     "adminGiveUp": "Saltar puzzle (admin)"

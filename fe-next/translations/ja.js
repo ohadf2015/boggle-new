@@ -13926,6 +13926,7 @@ const ja = {
       "title": "ワードブリッジピラミッド",
       "cta": "ピラミッド",
       "tagline": "謎は3つ、つなぐ言葉は1つ。",
+      "explainer": "下の3つの謎を解こう——その答えが頂上の言葉への鍵になる。",
       "finale": "フィナーレ",
       "finalePrompt": "3つ全てとつながる言葉は？",
       "cluesLabel": "各橋とつながる言葉を見つけよう:",
@@ -13949,6 +13950,7 @@ const ja = {
     "quitToMenu": "メニューに戻る",
     "noAdAvailable": "現在広告がありません。後でもう一度お試しください。",
     "revealHint": "ヒントを表示",
+    "freeHint": "無料ヒント（残り{count}回）",
     "revealHintAd": "広告を見てヒント",
     "revealAnswerAd": "広告を見て答えを表示",
     "adminGiveUp": "パズルをスキップ（管理者）"

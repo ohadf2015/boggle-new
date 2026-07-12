@@ -266,6 +266,7 @@ const sv = {
       "title": "Ordbro-pyramiden",
       "cta": "Pyramid",
       "tagline": "3 gåtor. 1 ord binder ihop allt.",
+      "explainer": "Lös de 3 gåtorna längst ner — svaren låser upp ordet på toppen.",
       "finale": "Final",
       "finalePrompt": "Vilket ord förbinder alla tre?",
       "cluesLabel": "Hitta ordet som kopplar varje bro:",
@@ -289,6 +290,7 @@ const sv = {
     "quitToMenu": "Tillbaka till menyn",
     "noAdAvailable": "Ingen annons tillgänglig just nu. Försök igen senare.",
     "revealHint": "Visa ledtråd",
+    "freeHint": "Gratis ledtråd ({count} kvar)",
     "revealHintAd": "Se annons för ledtråd",
     "revealAnswerAd": "Se annons för att visa svar",
     "adminGiveUp": "Hoppa över (admin)"

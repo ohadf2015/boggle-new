@@ -152,7 +152,7 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
       });
     }
     prevStatusRef.current = pyramidState.status;
-  }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, sfx, haptic, customHaptic, prefersReducedMotion]);
+  }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion]);
 
   const handleInput = useCallback((value: string) => setInput(value), []);
   const handleSubmit = useCallback(() => {
@@ -222,16 +222,26 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
           initial={{ opacity: 0, y: 16, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ type: 'spring', stiffness: 320, damping: 22 }}
-          className="rounded-neo border-neo-thick border-neo-lime bg-neo-navy-light p-5 text-center shadow-hard"
+          className={[
+            'rounded-neo border-neo-thick bg-neo-navy-light p-5 text-center shadow-hard',
+            pyramidState.status === 'won' ? 'border-neo-lime' : 'border-neo-red',
+          ].join(' ')}
         >
-          <h1 className="font-neo-display text-2xl font-black text-neo-white">
+          <PyramidProgress
+            stage={3}
+            solvedBridges={pyramidState.solvedBridges}
+            gaveUpBase={pyramidState.gaveUpBase}
+            metaAnswer={pyramid.metaAnswer}
+            won={pyramidState.status === 'won'}
+          />
+          <h1 className="mt-4 font-neo-display text-2xl font-black text-neo-white">
             {pyramidState.status === 'won' ? t('connections.pyramid.won') : t('connections.pyramid.lost')}
           </h1>
-          <div className="mt-3 flex items-center justify-center gap-4">
-            <span className="inline-flex items-center gap-1.5 font-neo-display text-lg font-black text-neo-cyan">
-              Score:
+          <div className="mt-2 flex items-center justify-center gap-2">
+            <span className="font-neo-display text-lg font-black text-neo-white/70">
+              {t('connections.score')}
             </span>
-            <span className="inline-flex items-center gap-1.5 font-neo-display text-lg font-black text-neo-white">
+            <span className="font-neo-display text-xl font-black text-neo-yellow tabular-nums">
               {pyramidState.score}
             </span>
           </div>
@@ -294,12 +304,12 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4" data-testid="pyramid-root">
       <header className="flex flex-col gap-2">
-        <div className="flex items-center justify-between">
-          <h1 className="font-neo-display text-lg font-black text-neo-white">{t('connections.pyramid.title')}</h1>
-          <span className="font-mono text-sm font-bold text-neo-cyan tabular-nums">
-            {pyramidState.stage < 3 ? `${pyramidState.stage + 1} / 3` : t('connections.pyramid.finale')}
-          </span>
-        </div>
+        <h1 className="text-center font-neo-display text-lg font-black text-neo-white">
+          {t('connections.pyramid.title')}
+        </h1>
+        <p className="text-center font-neo-body text-xs text-neo-white/60">
+          {baseStage ? t('connections.pyramid.explainer') : t('connections.pyramid.finalePrompt')}
+        </p>
         <PyramidProgress
           stage={pyramidState.stage}
           solvedBridges={pyramidState.solvedBridges}
@@ -321,6 +331,7 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
             onRevealHint={handleRevealHint}
             onRate={() => {}}
             onNext={handleAdvance}
+            showRating={false}
           />
         </>
       ) : (
@@ -335,6 +346,7 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
           onSubmit={handleSubmit}
           onGiveUp={handleGiveUp}
           onRevealHint={handleRevealHint}
+          onNext={handleAdvance}
           isAdmin={isAdmin}
         />
       )}

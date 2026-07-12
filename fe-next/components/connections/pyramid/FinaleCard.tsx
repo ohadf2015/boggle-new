@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { m, AnimatePresence, useAnimationControls } from 'framer-motion';
 import { ArrowRight, Flag, Check, Lightbulb } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -10,6 +10,7 @@ import type { PyramidPuzzle } from '@/lib/connections/pyramid/types';
 import { localeNeedsIME, MAX_GUESS_LEN, getKeyboardLetters, appendLetter, backspace } from '@/lib/connections/keyboard';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import ConnectionsKeyboard from '../ConnectionsKeyboard';
+import { freeHintsRemaining, consumeFreeHint } from '@/lib/connections/freeHints';
 
 interface FinaleCardProps {
   bridges: string[];
@@ -22,6 +23,7 @@ interface FinaleCardProps {
   onSubmit: () => void;
   onGiveUp: () => void;
   onRevealHint: () => void;
+  onNext: () => void;
   isAdmin: boolean;
 }
 
@@ -53,6 +55,7 @@ export default function FinaleCard({
   onSubmit,
   onGiveUp,
   onRevealHint,
+  onNext,
   isAdmin,
 }: FinaleCardProps) {
   const { t, language } = useLanguage();
@@ -71,6 +74,13 @@ export default function FinaleCard({
   const handleLetter = (letter: string) => onInputChange(appendLetter(input, letter));
   const handleBackspace = () => onInputChange(backspace(input));
   const bufferDisplay = isRTL ? applyHebrewFinalLetters(input) : input;
+
+  // Free daily hint allowance comes before the ad gate (parity with PuzzleCard).
+  const [freeHints, setFreeHints] = useState(() => freeHintsRemaining());
+  const handleFreeHint = () => {
+    setFreeHints(consumeFreeHint());
+    onRevealHint();
+  };
 
   // Rewarded-ad gate for hint
   const revealHintAd = useRewardedFeatureUnlock({
@@ -294,6 +304,17 @@ export default function FinaleCard({
                   <Lightbulb className="w-4 h-4" aria-hidden="true" />
                   {t('connections.revealHint')}
                 </m.button>
+              ) : freeHints > 0 ? (
+                <m.button
+                  type="button"
+                  onClick={handleFreeHint}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  className="inline-flex items-center gap-2 rounded-neo border-neo border-neo-yellow/70 bg-transparent text-neo-yellow font-neo-body text-sm px-4 py-2 hover:bg-neo-yellow/10 transition-colors"
+                >
+                  <Lightbulb className="w-4 h-4" aria-hidden="true" />
+                  {t('connections.freeHint', { count: freeHints })}
+                </m.button>
               ) : revealHintAd.canShowAd ? (
                 <m.button
                   type="button"
@@ -341,9 +362,7 @@ export default function FinaleCard({
             className="mt-4 flex flex-col items-center gap-2"
           >
             <m.button
-              onClick={() => {
-                // Next button should be handled by parent
-              }}
+              onClick={onNext}
               whileHover={{ scale: 1.05, y: -1 }}
               whileTap={{ scale: 0.96 }}
               className="rounded-neo border-neo-thick border-neo-cyan bg-neo-cyan text-neo-navy font-neo-display font-bold px-6 py-2 shadow-hard inline-flex items-center gap-2"

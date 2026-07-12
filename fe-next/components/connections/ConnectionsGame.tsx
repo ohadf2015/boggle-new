@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useGameExitGuard } from '@/hooks/useGameExitGuard';
 import { getPuzzleForLevel, getTotalLevels } from '@/lib/connections/puzzles';
+import { getPlayerSeed } from '@/lib/connections/playerSeed';
 import {
   initGameState,
   applyGuess,
@@ -89,10 +90,13 @@ export default function ConnectionsGame() {
   // from `v_connections_banned_puzzles` in the background.
   const [bannedIds, setBannedIds] = useState<ReadonlySet<string>>(() => getCachedBannedIds());
 
+  // Per-device shuffle seed — same puzzles, personal order (0 on SSR = legacy order).
+  const [seed] = useState<number>(() => getPlayerSeed());
+
   // Each level renders one puzzle. Level number + lives persist in localStorage per locale.
   const [level, setLevel] = useState<number>(() => getCurrentLevel(language));
-  const totalLevels = getTotalLevels(language, bannedIds);
-  const initialPuzzle = getPuzzleForLevel(language, level, bannedIds);
+  const totalLevels = getTotalLevels(language, bannedIds, seed);
+  const initialPuzzle = getPuzzleForLevel(language, level, bannedIds, seed);
   const initialPuzzles: ConnectionPuzzle[] = initialPuzzle ? [initialPuzzle] : [];
 
   const [state, dispatch] = useReducer(
@@ -161,7 +165,7 @@ export default function ConnectionsGame() {
   useEffect(() => {
     const newLevel = getCurrentLevel(language);
     setLevel(newLevel);
-    const puzzle = getPuzzleForLevel(language, newLevel, bannedIds);
+    const puzzle = getPuzzleForLevel(language, newLevel, bannedIds, seed);
     dispatch({
       type: 'RESET',
       puzzles: puzzle ? [puzzle] : [],
@@ -177,7 +181,7 @@ export default function ConnectionsGame() {
   useEffect(() => {
     const cur = state.puzzles[state.currentIndex];
     if (!cur || !bannedIds.has(cur.id)) return;
-    const replacement = getPuzzleForLevel(language, level, bannedIds);
+    const replacement = getPuzzleForLevel(language, level, bannedIds, seed);
     if (replacement && replacement.id !== cur.id) {
       dispatch({ type: 'RESET', puzzles: [replacement], initialLives: state.lives });
     }
@@ -270,7 +274,7 @@ export default function ConnectionsGame() {
     const nextLevel = level + 1;
     setCurrentLevel(language, nextLevel);
     setLevel(nextLevel);
-    const puzzle = getPuzzleForLevel(language, nextLevel, bannedIds);
+    const puzzle = getPuzzleForLevel(language, nextLevel, bannedIds, seed);
     if (puzzle) {
       // Carry surviving lives across levels so they actually gate progress.
       dispatch({ type: 'RESET', puzzles: [puzzle], initialLives: state.lives });
@@ -286,7 +290,7 @@ export default function ConnectionsGame() {
       const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
       window.dispatchEvent(new CustomEvent('connections:levelUp', { detail: { x, y, level: nextLevel } }));
     }
-  }, [language, level, state.lives, prefersReducedMotion, bannedIds, sfx, customHaptic]);
+  }, [language, level, state.lives, prefersReducedMotion, bannedIds, seed, sfx, customHaptic]);
 
   const handleInput = useCallback((value: string) => {
     dispatch({ type: 'SET_INPUT', input: value });
@@ -352,12 +356,12 @@ export default function ConnectionsGame() {
   const handlePlayAgain = useCallback(() => {
     setCurrentLevel(language, 1);
     setLevel(1);
-    const puzzle = getPuzzleForLevel(language, 1, bannedIds);
+    const puzzle = getPuzzleForLevel(language, 1, bannedIds, seed);
     dispatch({ type: 'RESET', puzzles: puzzle ? [puzzle] : [], initialLives: MAX_LIVES });
     setSessionScore(0);
     setXpEarned(0);
     xpAwardedIdsRef.current = new Set();
-  }, [language, bannedIds]);
+  }, [language, bannedIds, seed]);
 
   if (!currentPuzzle) {
     const cleared = level > 1 && totalLevels > 0;
