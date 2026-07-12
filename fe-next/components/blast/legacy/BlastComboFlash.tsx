@@ -1,7 +1,7 @@
 'use client';
 'use no memo'; // Disable React Compiler memoization — manual memoization with optional-chained deps incompatible
 
-import React, { useMemo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { AdaptiveMotion, AdaptiveAnimatePresence, useSkipAnimations } from '@/components/motion/AdaptiveMotion';
 import { getRandomComboFlash, generateAccentParticles, type ComboFlashVariation } from './blastEffectVariations';
@@ -36,7 +36,7 @@ function buildFlashBg(cfg: { color: string }, isGradient: boolean, variation: Co
     : `radial-gradient(circle${rot}, ${cfg.color}, transparent 60%)`;
 }
 
-export function BlastComboFlash({ flash, onComplete, comboTypeName }: BlastComboFlashProps) {
+export const BlastComboFlash = memo(function BlastComboFlash({ flash, onComplete, comboTypeName }: BlastComboFlashProps) {
   // Dismissal is driven entirely by onAnimationComplete on the animated path.
   // AdaptiveMotion replaces that path with a static element (no animation, no
   // onAnimationComplete) whenever useSkipAnimations() is true — cosy mode,
@@ -257,7 +257,7 @@ export function BlastComboFlash({ flash, onComplete, comboTypeName }: BlastCombo
       </AdaptiveMotion.div>
     </AdaptiveAnimatePresence>
   );
-}
+});
 
 function ReducedMotionFlash({ onComplete }: { onComplete: () => void }) {
   React.useEffect(() => { onComplete(); }, [onComplete]);
