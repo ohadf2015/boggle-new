@@ -261,7 +261,19 @@ run_isolated_gate() {
   # returns 124 → the rc=3 INCONCLUSIVE path below fires exactly as before.
   # shellcheck source=/dev/null
   . "$(dirname "${BASH_SOURCE[0]}")/idle-timeout.sh"
-  local _gidle="${NIGHTLY_GATE_IDLE_SECS:-900}" _gmax="${NIGHTLY_GATE_TIMEOUT:-5400}"
+  # IDLE DEFAULT 900s→2700s (2026-07-13): every tier above (full/build-only/typecheck/
+  # typeonly) kept wedging on the SAME trigger even after each got promoted to a
+  # "faster" tsc-only path — the 2026-07-12 night wedged on ALL FOUR tiers, including
+  # the ~54s-cold typeonly tier. Root cause was never next-build's TS phase specifically;
+  # it's that this machine runs a permanently-loaded dev workstation (concurrent Claude
+  # Code worktree agents, ~6 duplicate MCP-server sets, stale dev-server processes —
+  # load average 8-13 observed at 1am gate time), so a cold tsc/build that benchmarks
+  # ~54s idle-machine can go silent 15-20+ min under real contention with zero actual
+  # hang. 900s was tuned for a quiet machine that doesn't exist here and false-positive
+  # killed real progress every night, cascading through every fallback tier to
+  # docs-only salvage. 2700s gives ~2x headroom over the worst observed silent stretch
+  # (~19min) while the unchanged 5400s max backstop still catches a genuine infinite hang.
+  local _gidle="${NIGHTLY_GATE_IDLE_SECS:-2700}" _gmax="${NIGHTLY_GATE_TIMEOUT:-5400}"
   if [ -n "${NIGHTLY_GATE_CMD:-}" ]; then
     # Test seam: a deterministic command run inside the worktree's fe-next, watched by
     # the same idle/max watchdog so a silent `sleep` exercises the idle-kill rc=3 path.
@@ -284,7 +296,7 @@ run_isolated_gate() {
     # verdict is UNKNOWN, not a content failure. The old code only special-cased 124, so
     # a 137 wedge silently fell through to rc=1 → docs-only drop-all (the catastrophe in
     # a different exit code). "timeout-or-OOM" keeps a recurring OOM visible vs a slow night.
-    log "isolated-gate: did NOT complete (rc=${rc:-0}: wedged ${NIGHTLY_GATE_IDLE_SECS:-900}s idle, or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop) — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    log "isolated-gate: did NOT complete (rc=${rc:-0}: wedged ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle, or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop) — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
     rc=3
   elif [ "${rc:-0}" != "0" ]; then
     rc=1
@@ -406,10 +418,16 @@ nightly_parse_test_failures() {
 # messages (`Worker terminated`/`ERR_WORKER_OUT_OF_MEMORY`/`Failed to start … worker`) missed
 # two other vitest-pool-internal phrasings — `Worker forks emitted error.` and
 # `Failed to terminate forks worker …` — which fired this guard on 4+ consecutive nights
-# and salvaged every lane's real, working code to docs-only. Every one of these variants is
-# namespaced under vitest's own `[vitest-pool]:` / `[vitest-pool-runner]:` prefix (vitest's
-# worker-process lifecycle logging), so match the NAMESPACE rather than enumerating each
-# message vitest happens to print — any future worker-lifecycle wording is covered for free.
+# and salvaged every lane's real, working code to docs-only. Both variants are namespaced
+# under vitest's own `[vitest-pool]:` / `[vitest-pool-runner]:` prefix (vitest's
+# worker-process lifecycle logging), so that namespace is ALSO matched — but the namespace
+# alone (2026-07-10's fix) turned out NOT to cover the original enumerated messages: real
+# `Worker terminated due to reaching memory limit` / `ERR_WORKER_OUT_OF_MEMORY` output has
+# no `[vitest-pool]:` tag on it, so the namespace-only match silently stopped exempting the
+# OOM crash this function exists for — misclassifying it as a hidden authored break and
+# blocking ship on worker-OOM-only red nights (2026-07-13: caught by gate-isolated.test.sh
+# going red, never actually observed live because no lane ran it). Match BOTH: the known
+# infra-crash phrasings AND the vitest-pool namespace, so future wordings are still covered.
 nightly_gate_has_unattributed_failures() {
   local out="$1"
   [ -n "$out" ] && [ -s "$out" ] || return 1
@@ -417,7 +435,7 @@ nightly_gate_has_unattributed_failures() {
   LC_ALL=C grep -qaE 'Unhandled Rejection' "$out" 2>/dev/null && return 0
   # An unhandled error that is NOT a vitest worker-pool lifecycle crash is also code-level.
   if LC_ALL=C grep -qaE 'Unhandled Error' "$out" 2>/dev/null; then
-    LC_ALL=C grep -qaE '\[vitest-pool(-runner)?\]:' "$out" 2>/dev/null || return 0
+    LC_ALL=C grep -qaE 'Worker terminated|ERR_WORKER_OUT_OF_MEMORY|Failed to start .*worker|Worker forks emitted error|Failed to terminate forks worker|\[vitest-pool(-runner)?\]:' "$out" 2>/dev/null || return 0
   fi
   return 1
 }

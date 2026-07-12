@@ -72,7 +72,10 @@ Read `docs/nightly/perf-baseline.json`. If the `"date"` field is `"1970-01-01"` 
 
 If a real baseline exists, compare today's `du -sb .next/static/chunks/*.js | sort -nr | head -20` against baseline `bundle.top_chunks`. Flag any chunk >50KB heavier (likely a new dependency or barrel-import regression).
 
-If a regression chunk is yours from earlier in this lane → fix in place. If from elsewhere → log to `docs/nightly/perf-watch.md` for human review.
+If a regression chunk is yours from earlier in this lane → fix in place. If from elsewhere, don't just log it — investigate first: `git log -p --since="24 hours ago" -- fe-next/` (or `git blame` the importing file) to find the introducing commit, then classify:
+  - **Mechanical bloat** (a new barrel import pulling in a whole module instead of the specific export, a duplicate/near-duplicate dependency, an accidentally-unstripped dev-only import, a component importing a heavy library it doesn't use) → fix it directly (narrow the import, dedupe the dependency). This is the common case — ship it like any other perf fix; the existing nightly gate is what verifies you didn't break the build, same safety net as your own fixes.
+  - **Genuine feature growth** (the chunk is bigger because a real shipped feature needs the code) → this IS a founder tradeoff call, not yours to revert. Log it to `docs/nightly/perf-watch.md` for human review, same as before.
+If you can't tell which it is within one quick look, treat it as genuine feature growth and log it — never silently revert another lane's shipped feature on a guess.
 
 ═══ STEP 4 — Update perf-baseline.json ═══
 Rewrite `docs/nightly/perf-baseline.json` with today's snapshot:

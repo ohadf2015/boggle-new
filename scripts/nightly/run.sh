@@ -619,18 +619,18 @@ if [ "$gate_ok" = "0" ]; then
         # with a loud TESTS-INCONCLUSIVE alert (mirrors the baseline-red ship path:
         # build-verified work ships; the gate ran at reduced strength, so shout).
         gate_ok=1
-        log "gate-timeout: authored set BUILDS clean (lint+type+next-build) — shipping it; the full test suite wedged ${NIGHTLY_GATE_IDLE_SECS:-900}s idle or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop and is UNVERIFIED this run"
+        log "gate-timeout: authored set BUILDS clean (lint+type+next-build) — shipping it; the full test suite wedged ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop and is UNVERIFIED this run"
         mkdir -p docs/nightly 2>/dev/null || true
         {
           echo "# Nightly TESTS-INCONCLUSIVE alert — ${TODAY}"
           echo
-          echo "The integration gate's test suite went silent past the ${NIGHTLY_GATE_IDLE_SECS:-900}s idle"
+          echo "The integration gate's test suite went silent past the ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle"
           echo "watchdog (or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s absolute backstop), so the authored"
           echo "set's TESTS are UNVERIFIED tonight. A build-only re-gate (lint + type-check +"
           echo "next build) PASSED, so the code compiles and type-checks; it shipped at"
           echo "reduced gate strength."
           echo
-          echo "ACTION: a silent-for-${NIGHTLY_GATE_IDLE_SECS:-900}s gate means a hung/OOMing test, not just"
+          echo "ACTION: a silent-for-${NIGHTLY_GATE_IDLE_SECS:-2700}s gate means a hung/OOMing test, not just"
           echo "a slow one — investigate (e.g. useBlastEngine.mpGrid OOM) or, if genuinely"
           echo "slow-but-progressing, raise NIGHTLY_GATE_IDLE_SECS / NIGHTLY_GATE_TIMEOUT."
         } > "docs/nightly/TESTS-INCONCLUSIVE-${TODAY}.md" 2>/dev/null || true
@@ -652,7 +652,7 @@ if [ "$gate_ok" = "0" ]; then
         # signal, but it is conclusive and unwedgeable, and strictly better than the old
         # path that DROPPED all code on this wedge. Run it (tsc --noEmit + test:changed,
         # lane-scoped) before docs-only; ship on green at reduced strength with a loud alert.
-        log "gate-timeout: build-only re-gate ALSO wedged (idle ${NIGHTLY_GATE_IDLE_SECS:-900}s / backstop ${NIGHTLY_GATE_TIMEOUT:-5400}s) — next-build's TS phase is the wedge; running the conclusive standalone typecheck tier (tsc --noEmit + test:changed, ~1min)"
+        log "gate-timeout: build-only re-gate ALSO wedged (idle ${NIGHTLY_GATE_IDLE_SECS:-2700}s / backstop ${NIGHTLY_GATE_TIMEOUT:-5400}s) — next-build's TS phase is the wedge; running the conclusive standalone typecheck tier (tsc --noEmit + test:changed, ~1min)"
         run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 0 1; _to_tc_rc=$?
         _tc_route=$(nightly_gate_typecheck_route "$_to_tc_rc")
         if [ "$_tc_route" = "ship" ]; then
@@ -666,7 +666,7 @@ if [ "$gate_ok" = "0" ]; then
             echo "# Nightly TYPECHECK-TIER ship — ${TODAY}"
             echo
             echo "Both the full integration gate AND the build-only re-gate wedged in"
-            echo "next-build's silent \"Running TypeScript\" phase (idle ${NIGHTLY_GATE_IDLE_SECS:-900}s /"
+            echo "next-build's silent \"Running TypeScript\" phase (idle ${NIGHTLY_GATE_IDLE_SECS:-2700}s /"
             echo "backstop ${NIGHTLY_GATE_TIMEOUT:-5400}s). A standalone conclusive tier —"
             echo "\`build:schemas && tsc --noEmit && test:changed\` (~1 min) — PASSED, so the"
             echo "authored set type-checks (standalone tsc, committed tsconfig) and its"
@@ -1037,7 +1037,7 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
       # ladder uses (run.sh:599-640): a standalone build:schemas + tsc --noEmit + test:changed
       # tier (~1min, unwedgeable). Ship the kept set on green; peel again if it names an
       # offender; only fall to docs-only if that conclusive tier ALSO wedges.
-      log "drop-and-re-gate round $_round: re-gate INCONCLUSIVE (wedged ${NIGHTLY_GATE_IDLE_SECS:-900}s idle / ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop) — running the conclusive standalone typecheck tier before dropping any more BUILD-CLEAN code"
+      log "drop-and-re-gate round $_round: re-gate INCONCLUSIVE (wedged ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle / ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop) — running the conclusive standalone typecheck tier before dropping any more BUILD-CLEAN code"
       run_isolated_gate "$NIGHTLY_AUTHORED_FILE" 0 0 0 1; _pl_tc_rc=$?
       case "$(nightly_gate_typecheck_route "$_pl_tc_rc")" in
         ship)

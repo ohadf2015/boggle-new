@@ -78,6 +78,7 @@ Driving users to the EDUCATION module is a top growth goal. When choosing this r
 Take a landing-CVR night INSTEAD of a mode improvement ONLY if BOTH hold: (a) an admin-beta mode was improved on ≥6 of the last 7 nights (`grep -l "#### Mode improvement shipped" docs/nightly/reports/*.md | tail -7 | wc -l` → ≥6), AND (b) a landing page converts <40% with ≥200 sessions. Otherwise STAY in STEP 0. **ONLY ONE landing variant per week** — if any `landing_variant_*_v1` flag is <7 days old, do not ship another; stay in STEP 0.
 
 ═══ HARD RULES ═══
+- **Research-only nights are BANNED.** Writing only a spec/plan doc to `docs/nightly/artifacts/` with zero shipped code (2026-07-12 did this) is not an acceptable outcome — it wastes the whole run's budget for nothing gated-testable. If you're low on time, this is what the SCOPE CEILING's "ship the working part" clause is FOR: drop to the smallest real, shippable diff (a single copy tweak, one flag-gated CSS/spacing fix, one CTA wording change) instead of writing prose about what you would have done. A trivial shipped change beats a detailed unshipped plan every night.
 - **Ground-truth audit** before writing copy: read `fe-next/public/llms.txt`, `fe-next/app/sitemap.ts`, and the actual mode pages your copy references. No fabricated features, modes, languages.
 - **NO fake stats** ("10K+ players", "4.8★ rating") and **no `aggregateRating` JSON-LD**.
 - **POSITIVE framing** — never "0 downloads"/"0 ads"; "browser-based", "ad-free", "free".
