@@ -9,7 +9,6 @@ import { ArrowLeft, RefreshCw, HelpCircle, Sword, Bomb, Search, CircleDot, Chevr
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { useExperiment } from '@/hooks/useExperiment';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
@@ -132,11 +131,8 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   onCreateRoom,
   onQuickPlay,
   isQuickPlayLoading = false,
-  joiningRoomCode = null,
 }) => {
   const { t, dir, language } = useLanguage();
-  const { variant: joinLoadingVariant } = useExperiment('exp-mp-room-join-loading-v1');
-  const showJoinLoading = joinLoadingVariant === 'loading-state';
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [showHowToPlay, setShowHowToPlay] = useState(false);
   const hasMountedRef = useRef(false);
@@ -352,7 +348,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                     const mode = MODE_CONFIG[room.gameMode || ''] || DEFAULT_MODE_CONFIG;
                     const ModeIcon = mode.icon;
 
-                    const isThisRoomJoining = showJoinLoading && joiningRoomCode === room.gameCode;
                     return (
                       <m.button
                         key={room.gameCode}
@@ -361,7 +356,6 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                         variants={roomCardVariants}
                         exit="exit"
                         layout
-                        disabled={isThisRoomJoining}
                         onClick={() => onRoomClick(room)}
                         onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
                           if (e.key === 'Enter' || e.key === ' ') {
@@ -381,15 +375,12 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                           transition: { type: 'spring' as const, stiffness: 400, damping: 20 },
                         }}
                         whileTap={{ scale: 0.98 }}
-                        className={`flex items-center gap-3 p-3 rounded-xl border-2 border-neo-black border-s-4 ${mode.borderColor} bg-neo-navy-light/40 hover:bg-neo-navy-light transition-colors text-start group relative overflow-hidden focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime cursor-pointer disabled:opacity-60 disabled:cursor-wait`}
+                        className={`flex items-center gap-3 p-3 rounded-xl border-2 border-neo-black border-s-4 ${mode.borderColor} bg-neo-navy-light/40 hover:bg-neo-navy-light transition-colors text-start group relative overflow-hidden focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime cursor-pointer`}
                       >
                         {/* Left: Mode icon + info */}
                         <div className="flex items-center gap-3 flex-1 min-w-0">
-                          {/* Mode icon box — shows spinner while join in-flight (loading-state variant) */}
                           <div className={`w-10 h-10 ${mode.iconBg} border-2 border-neo-black rounded-lg flex items-center justify-center shrink-0 shadow-hard-sm`}>
-                            {isThisRoomJoining
-                              ? <Loader className="w-5 h-5" />
-                              : <ModeIcon className={`w-5 h-5 ${mode.iconColor}`} />}
+                            <ModeIcon className={`w-5 h-5 ${mode.iconColor}`} />
                           </div>
 
                           {/* Room info */}

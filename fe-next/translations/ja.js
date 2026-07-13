@@ -105,7 +105,11 @@ const ja = {
     "streakLabel": "{count}日連続",
     "nextPuzzlePrompt": "次のパズル",
     "freeplayEdition": "練習 #{count}",
-    "generating": "盤面を準備中…"
+    "generating": "盤面を準備中…",
+    "scramble": {
+      "title": "並べ替えて！",
+      "skip": "スキップ"
+    }
   },
   "rank": {
     "seasonTitle": "シーズン順位",
@@ -5702,6 +5706,7 @@ const ja = {
     "needHint": "ヒントが必要?",
     "getHint": "ヒントを見る",
     "dragInstruction": "文字をなぞって単語を作ろう！",
+    "wordGoalUnit": "単語",
     "botWords": "発見した単語",
     "beatYourRecord": "記録を更新しました！",
     "soloVsBots": "ソロ vs ボット",
@@ -6146,11 +6151,6 @@ const ja = {
     "timedQuest": "タイムクエスト",
     "untimedQuest": "フリークエスト",
     "startQuest": "クエスト開始",
-    "qrWelcome": {
-      "badge": "スキャン完了",
-      "line": "ナイススキャン！本日のチャレンジへワープしました。",
-      "warping": "ワープ中…"
-    },
     "adminBeta": "ベータ",
     "replay": "もう一度",
     "cleared": "クリア！",
@@ -11537,7 +11537,8 @@ const ja = {
         "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。5言語にネイティブ対応、先生は無料。",
         "cta_primary": "先生アクセスを申請する",
         "cta_secondary": "デモを見る",
-        "cta_note": "先生は無料 • 約24時間で承認"
+        "cta_note": "先生は無料 • 約24時間で承認",
+        "cta_schools": "学校または学区のご担当者様はこちら →"
       },
       "mock": {
         "tab": "クラスゲーム",
@@ -13926,7 +13927,6 @@ const ja = {
       "title": "ワードブリッジピラミッド",
       "cta": "ピラミッド",
       "tagline": "謎は3つ、つなぐ言葉は1つ。",
-      "explainer": "下の3つの謎を解こう——その答えが頂上の言葉への鍵になる。",
       "finale": "フィナーレ",
       "finalePrompt": "3つ全てとつながる言葉は？",
       "cluesLabel": "各橋とつながる言葉を見つけよう:",
@@ -13950,7 +13950,6 @@ const ja = {
     "quitToMenu": "メニューに戻る",
     "noAdAvailable": "現在広告がありません。後でもう一度お試しください。",
     "revealHint": "ヒントを表示",
-    "freeHint": "無料ヒント（残り{count}回）",
     "revealHintAd": "広告を見てヒント",
     "revealAnswerAd": "広告を見て答えを表示",
     "adminGiveUp": "パズルをスキップ（管理者）"

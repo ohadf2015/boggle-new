@@ -650,7 +650,7 @@ export default function MultiplayerPageClient(): React.JSX.Element {
             // was still reserving a header-tall empty band at the top — collapse
             // it there so results content starts under the floating mute FAB
             // instead of below dead space. The room list keeps the spacer.
-            (isActive && !showResults) ? null : <AutoHideHeader collapseSpacerWhenHidden={showResults} />
+            (isActive && !showResults) ? null : <AutoHideHeader />
           )}
           {renderView()}
           <HostLeftGraceModal

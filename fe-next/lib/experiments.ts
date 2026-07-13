@@ -595,25 +595,6 @@ export const EXPERIMENTS = {
   }),
 
   /**
-   * MP room-join loading state. Rage-click signal on /en/multiplayer (PostHog
-   * 24h data). Root cause: room card buttons have no disabled/loading state while
-   * `joiningRoomCode` is set — user clicks, async join fires, nothing changes
-   * visually → rage-clicks. `loading-state` arm disables the clicked card and
-   * shows a spinner while the join is in-flight; control = current no-feedback
-   * behaviour.
-   *
-   * Conversion = room_join_rage_click rate must drop.
-   * Guardrail = mp_room_joined rate must not drop.
-   * PostHog flag key = 'exp-mp-room-join-loading-v1', 50/50 rollout.
-   */
-  'exp-mp-room-join-loading-v1': defineExperiment({
-    variants: ['control', 'loading-state'] as const,
-    default: 'control',
-    description:
-      'MP room-card join loading state. loading-state = disables clicked room card + shows spinner while join is in-flight. control = current no-feedback behaviour. Targets rage-clicks on /en/multiplayer.',
-  }),
-
-  /**
    * Classic/survival word-count goal badge. Classic mode 7d completion = 16%
    * (73 started, 12 completed) — worst of all modes. Hypothesis: players
    * abandon because there is no concrete progress anchor (only a timer). The

@@ -71,6 +71,7 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
   const [edition, setEdition] = useState<Edition>({ isDaily: true, label: '' });
   const [streak, setStreak] = useState<StreakState>(emptyStreak());
   const [generating, setGenerating] = useState(false);
+  const [genError, setGenError] = useState<boolean>(false);
   const seqRef = useRef(0); // guards against out-of-order async results
 
   const dailyEditionLabel = useMemo(() => {
@@ -92,15 +93,23 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
     let cancelled = false;
     const seq = ++seqRef.current;
     setGenerating(true);
+    setGenError(false);
     (async () => {
-      const cached = readDailyCache(today, locale);
-      const p = cached ?? (await generateDailyPuzzle(today, locale));
-      if (!cached && p) writeDailyCache(today, locale, p);
-      if (cancelled || seq !== seqRef.current) return;
-      setPuzzle(p);
-      setEdition({ isDaily: true, label: dailyEditionLabel });
-      setStreak(loadStreak());
-      setGenerating(false);
+      try {
+        const cached = readDailyCache(today, locale);
+        const p = cached ?? (await generateDailyPuzzle(today, locale));
+        if (!p) throw new Error('no puzzle generated');
+        if (!cached) writeDailyCache(today, locale, p);
+        if (cancelled || seq !== seqRef.current) return;
+        setPuzzle(p);
+        setEdition({ isDaily: true, label: dailyEditionLabel });
+        setStreak(loadStreak());
+      } catch {
+        if (cancelled || seq !== seqRef.current) return;
+        setGenError(true);
+      } finally {
+        if (!cancelled) setGenerating(false);
+      }
     })();
     return () => {
       cancelled = true;
@@ -111,18 +120,27 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
     (difficulty?: Difficulty) => {
       const seq = ++seqRef.current;
       setGenerating(true);
+      setGenError(false);
       const count = nextFreeplayCount();
       // Yield a frame so the (compositor-animated) loader paints before the synchronous fill runs.
       setTimeout(() => {
         void (async () => {
-          const seed = count * 2654435761; // spread counters across the seed space
-          const p = await generateFreeplayPuzzle(seed, locale, difficulty);
-          if (seq !== seqRef.current) return;
-          if (p) {
-            setPuzzle(p);
-            setEdition({ isDaily: false, label: t('crossword.freeplayEdition', { count }) });
+          try {
+            const seed = count * 2654435761; // spread counters across the seed space
+            const p = await generateFreeplayPuzzle(seed, locale, difficulty);
+            if (seq !== seqRef.current) return;
+            if (p) {
+              setPuzzle(p);
+              setEdition({ isDaily: false, label: t('crossword.freeplayEdition', { count }) });
+            } else {
+              setGenError(true);
+            }
+          } catch {
+            if (seq !== seqRef.current) return;
+            setGenError(true);
+          } finally {
+            setGenerating(false);
           }
-          setGenerating(false);
         })();
       }, 16);
     },
@@ -132,6 +150,24 @@ export function CrosswordPageClient({ locale }: { locale: PuzzleLocale }) {
   const handleDailySolved = useCallback(() => {
     setStreak(persistSolve(today));
   }, [today]);
+
+  if (genError) {
+    return (
+      <main className="min-h-dvh bg-neo-navy texture-halftone flex items-center justify-center p-6">
+        <div className="bg-neo-navy-light border-neo border-black rounded-neo shadow-hard px-8 py-7 text-center max-w-xs w-full">
+          <p className="font-neo-display font-bold text-neo-white text-lg mb-1">{t('common.error')}</p>
+          <p className="font-neo-body text-sm text-neo-white/70 mb-4">{t('common.errorOccurred')}</p>
+          <button
+            type="button"
+            onClick={() => handleNewPuzzle()}
+            className="font-neo-display font-bold bg-neo-cyan text-neo-navy border-neo border-black rounded-neo shadow-hard px-5 py-2.5 active:translate-y-[1px] active:shadow-hard-pressed"
+          >
+            {t('common.retry')}
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   if (!puzzle) {
     return <CrosswordLoader label={t('crossword.generating')} />;

@@ -595,21 +595,6 @@ const BATCH_SIZE = 500;
  *
  * NOTE: This now writes to daily_challenge_word_bank (unified) instead of wikipedia_word_candidates (staging)
  */
-/**
- * Validate if a word meets the daily challenge length constraint
- * for status='active'. Mirrors the DB constraint from migration
- * 20260625000000_enforce_word_hunt_target_5to7.sql:
- * - Japanese (ja): 2-4 characters
- * - All others: 5-7 characters
- */
-function isValidWordLength(word: string, language: Language): boolean {
-  const len = word.length;
-  if (language === 'ja') {
-    return len >= 2 && len <= 4;
-  }
-  return len >= 5 && len <= 7;
-}
-
 export async function storeWikipediaWordCandidates(
   language: Language,
   _date: Date,
@@ -634,44 +619,26 @@ export async function storeWikipediaWordCandidates(
     // source_article_url/interestingness_score/fetch_date, none of which are
     // real columns, so Supabase rejected every upsert (Sentry: "[Wikipedia]
     // Batch upsert error" + "Stored 0/50 candidates" for en/es/sv/he).
-    const allMappedData = candidates.map(c => ({
-      word: c.word.toUpperCase(),
-      language,
-      source: 'wikipedia' as const,
-      status: 'active' as const,
-    }));
-
-    // Filter candidates that violate the word length constraint. One invalid
-    // candidate per batch causes the entire all-or-nothing upsert to fail,
-    // resulting in zero rows stored. Filter before upsert to prevent this.
-    const validWords = allMappedData.filter(row => isValidWordLength(row.word, language));
-    const skippedCount = allMappedData.length - validWords.length;
-
-    if (skippedCount > 0) {
-      const skippedWords = allMappedData
-        .filter(row => !isValidWordLength(row.word, language))
-        .map(row => row.word);
-      logger.warn(
-        'Wikipedia',
-        `Skipped ${skippedCount} candidates violating word length constraint for ${language}: ${skippedWords.join(', ')}`,
-        { skipped: skippedWords }
-      );
-    }
-
-    // If all candidates were filtered out, log and return
-    if (validWords.length === 0) {
-      logger.warn('Wikipedia', `No valid candidates to store for ${language} after length filtering`);
-      return;
-    }
-
-    const insertData = validWords;
+    // Filter to words within the DB check_word_length constraint before upserting.
+    // ja: 2-4 chars; all others: 5-7 chars (mirrors wordBankData.WORD_LENGTH_RANGE).
+    const insertData = candidates
+      .filter(c => {
+        const len = c.word.length;
+        return language === 'ja' ? len >= 2 && len <= 4 : len >= 5 && len <= 7;
+      })
+      .map(c => ({
+        word: c.word.toUpperCase(),
+        language,
+        source: 'wikipedia' as const,
+        status: 'active' as const,
+      }));
 
     // Process in batches to prevent timeout on large datasets
     const totalBatches = Math.ceil(insertData.length / BATCH_SIZE);
     let successCount = 0;
     let errorCount = 0;
 
-    logger.info('Wikipedia', `Storing ${insertData.length}/${candidates.length} candidates for ${language} in ${totalBatches} batch(es) to unified word bank`);
+    logger.info('Wikipedia', `Storing ${candidates.length} candidates for ${language} in ${totalBatches} batch(es) to unified word bank`);
 
     for (let i = 0; i < insertData.length; i += BATCH_SIZE) {
       const batch = insertData.slice(i, i + BATCH_SIZE);
@@ -704,9 +671,9 @@ export async function storeWikipediaWordCandidates(
     }
 
     if (errorCount > 0) {
-      logger.warn('Wikipedia', `Stored ${successCount}/${insertData.length} candidates for ${language}`, { errorCount });
+      logger.warn('Wikipedia', `Stored ${successCount}/${candidates.length} candidates for ${language}`, { errorCount });
     } else {
-      logger.info('Wikipedia', `Stored ${insertData.length} word candidates for ${language} in unified word bank`);
+      logger.info('Wikipedia', `Stored ${candidates.length} word candidates for ${language} in unified word bank`);
     }
 
   } catch (error) {

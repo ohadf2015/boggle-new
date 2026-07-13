@@ -29,6 +29,7 @@ import {
   findRarestWord,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { fireConfetti } from '@/utils/confettiUtils';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import StreakSavedCelebration from './StreakSavedCelebration';
@@ -87,6 +88,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     if (result.efficiencyScore != null && result.efficiencyScore > 0) {
       submitLeaderboardScore(result.efficiencyScore);
     }
+    trackGrowthEvent('results_viewed', { mode: 'word-hunt', score: result.efficiencyScore ?? 0 });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Show win cinematic for new completions before revealing results
@@ -388,9 +390,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             <PracticeChainCta currentMode="wordHunt" />
           </div>
         )}
-        {/* Mobile: Tab-based content. min-h floors the swap so switching tabs
-            doesn't collapse-then-reflow when the incoming tab is shorter. */}
-        <div className="max-w-md mx-auto pt-4 md:hidden min-h-[50vh]">
+        {/* Mobile: Tab-based content */}
+        <div className="max-w-md mx-auto pt-4 md:hidden">
           {activeTab === 'results' && <WordHuntResultsContent {...resultsContentProps} />}
           {activeTab === 'stats' && renderStatsContent()}
         </div>

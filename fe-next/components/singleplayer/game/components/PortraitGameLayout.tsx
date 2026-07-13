@@ -10,6 +10,7 @@ import GridComponent from '@/components/GridComponent';
 import CircularTimer from '@/components/CircularTimer';
 import { ConfirmationDialog } from '@/components/ui/ConfirmationDialog';
 import { useQuitConfirmDescription } from '@/hooks/useQuitConfirmDescription';
+import { useExperiment } from '@/hooks/useExperiment';
 import { TrainingProgressBar } from '@/components/training';
 import { shouldShowKeyboardTrails } from '@/components/game/keyboardTrailsUtils';
 import { cn } from '@/lib/utils';
@@ -167,6 +168,8 @@ export function PortraitGameLayout({
   const tSafe = React.useCallback((key: string) => t(key) || key, [t]);
   const isPracticeMode = mode === 'practice';
   const isChallengeMode = mode === 'challenge';
+  const { variant: wordGoalVariant } = useExperiment('exp-singleplayer-word-goal-v1');
+  const showWordGoalBadge = wordGoalVariant === 'word-goal' && (mode === 'classic' || mode === 'survival');
 
   // Compute highlighted path for grid
   const gridHighlightedPath = shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTimeRef.current, undefined)
@@ -440,6 +443,11 @@ export function PortraitGameLayout({
             language={language}
             isTypingMode={keyboardInput.isTypingMode}
           />
+          {showWordGoalBadge && (
+            <div className="absolute bottom-1 end-1 z-20 bg-neo-navy border-2 border-neo-cyan text-neo-cyan text-xs font-bold px-2 py-1 rounded-md shadow-hard-sm select-none pointer-events-none">
+              {validWordCount} / 10 {t('singlePlayer.wordGoalUnit')}
+            </div>
+          )}
         </div>
       </div>
 

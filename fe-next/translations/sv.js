@@ -177,7 +177,11 @@ const sv = {
     "streakLabel": "{count}-dagars serie",
     "nextPuzzlePrompt": "Nästa pussel",
     "freeplayEdition": "Träning #{count}",
-    "generating": "Bygger rutnätet…"
+    "generating": "Bygger rutnätet…",
+    "scramble": {
+      "title": "Avkoda!",
+      "skip": "Hoppa"
+    }
   },
   "rank": {
     "seasonTitle": "Säsongsrank",
@@ -266,7 +270,6 @@ const sv = {
       "title": "Ordbro-pyramiden",
       "cta": "Pyramid",
       "tagline": "3 gåtor. 1 ord binder ihop allt.",
-      "explainer": "Lös de 3 gåtorna längst ner — svaren låser upp ordet på toppen.",
       "finale": "Final",
       "finalePrompt": "Vilket ord förbinder alla tre?",
       "cluesLabel": "Hitta ordet som kopplar varje bro:",
@@ -290,7 +293,6 @@ const sv = {
     "quitToMenu": "Tillbaka till menyn",
     "noAdAvailable": "Ingen annons tillgänglig just nu. Försök igen senare.",
     "revealHint": "Visa ledtråd",
-    "freeHint": "Gratis ledtråd ({count} kvar)",
     "revealHintAd": "Se annons för ledtråd",
     "revealAnswerAd": "Se annons för att visa svar",
     "adminGiveUp": "Hoppa över (admin)"
@@ -5876,6 +5878,7 @@ const sv = {
     "needHint": "Behöver du en ledtråd?",
     "getHint": "FÅ LEDTRÅD",
     "dragInstruction": "Dra över bokstäver för att bilda ord!",
+    "wordGoalUnit": "ord",
     "botWords": "Hittade ord",
     "beatYourRecord": "Du slog ditt rekord!",
     "soloVsBots": "Solo mot Bottar",
@@ -6290,11 +6293,6 @@ const sv = {
     "timedQuest": "Tidsbegränsat",
     "untimedQuest": "Utan Timer",
     "startQuest": "STARTA QUEST",
-    "qrWelcome": {
-      "badge": "Inskannad",
-      "line": "Snyggt skannat — vi teleporterade dig rakt till dagens utmaning.",
-      "warping": "Teleporterar in dig…"
-    },
     "adminBeta": "Beta",
     "replay": "Spela Igen",
     "cleared": "Klarat!",
@@ -11653,7 +11651,8 @@ const sv = {
         "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 5 språk, gratis för lärare.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo",
-        "cta_note": "Gratis för lärare • Godkänd inom ~24 h"
+        "cta_note": "Gratis för lärare • Godkänd inom ~24 h",
+        "cta_schools": "Skola eller distrikt? Se planer →"
       },
       "mock": {
         "tab": "Klassrumsspel",

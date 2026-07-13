@@ -105,7 +105,11 @@ const en = {
     "streakLabel": "{count}-day streak",
     "nextPuzzlePrompt": "Next puzzle",
     "freeplayEdition": "Freeplay #{count}",
-    "generating": "Setting the grid…"
+    "generating": "Setting the grid…",
+    "scramble": {
+      "title": "Unscramble!",
+      "skip": "Skip"
+    }
   },
   "rank": {
     "seasonTitle": "Season Rank",
@@ -5737,6 +5741,7 @@ const en = {
     "needHint": "Need a hint?",
     "getHint": "GET HINT",
     "dragInstruction": "Drag across letters to form words!",
+    "wordGoalUnit": "words",
     "botWords": "Words",
     "beatYourRecord": "New record!",
     "soloVsBots": "Solo vs Bots",
@@ -6068,11 +6073,6 @@ const en = {
     "timedQuest": "Timed Quest",
     "untimedQuest": "Untimed Quest",
     "startQuest": "START QUEST",
-    "qrWelcome": {
-      "badge": "Scanned in",
-      "line": "Nice scan — we warped you straight to today's challenge.",
-      "warping": "Beaming you in…"
-    },
     "adminBeta": "Beta",
     "replay": "Replay",
     "cleared": "Cleared!",
@@ -11238,7 +11238,8 @@ const en = {
         "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages, free for teachers.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
-        "cta_note": "Free for teachers • Approved in ~24h"
+        "cta_note": "Free for teachers • Approved in ~24h",
+        "cta_schools": "School or district? See plans →"
       },
       "mock": {
         "tab": "Class Game",
@@ -13226,7 +13227,6 @@ const en = {
       "title": "Word Bridge Pyramid",
       "cta": "Pyramid",
       "tagline": "3 riddles. 1 word connects them all.",
-      "explainer": "Solve the 3 bottom riddles — their answers unlock the word at the top.",
       "finale": "Finale",
       "finalePrompt": "Which word connects all three?",
       "cluesLabel": "Find the word that pairs with each bridge:",
@@ -13250,7 +13250,6 @@ const en = {
     "quitToMenu": "Back to menu",
     "noAdAvailable": "No ad available right now. Try again later.",
     "revealHint": "Reveal hint",
-    "freeHint": "Free hint ({count} left)",
     "revealHintAd": "Watch ad for hint",
     "revealAnswerAd": "Watch ad to reveal answer",
     "adminGiveUp": "Skip puzzle (admin)",

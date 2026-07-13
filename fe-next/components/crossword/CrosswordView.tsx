@@ -8,7 +8,8 @@ import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
 import { crosswordStats } from '@/lib/crossword/stats';
-import type { CrosswordPuzzle, Difficulty } from '@/lib/crossword/types';
+import type { CrosswordPuzzle, Difficulty, Slot } from '@/lib/crossword/types';
+import { ClueScramble } from './ClueScramble';
 import { CrosswordGrid } from './CrosswordGrid';
 import { CrosswordKeyboard } from './CrosswordKeyboard';
 import { CrosswordMasthead } from './CrosswordMasthead';
@@ -99,6 +100,32 @@ export function CrosswordView({
   const overlayRef = useRef<HTMLDivElement>(null);
   const stats = useMemo(() => crosswordStats(state), [state]);
   const hintsUsed = state.revealed.length;
+
+  // Clue Scramble: show a 10s mini-overlay on first clue selection per slot.
+  const [pendingSlot, setPendingSlot] = useState<Slot | null>(null);
+  const [clueStreak, setClueStreak] = useState(0);
+  const scrambleAttempted = useRef(new Set<string>());
+
+  const handleClueSelect = useCallback(
+    (slot: Slot) => {
+      if (solved || scrambleAttempted.current.has(slot.id)) {
+        focusSlot(slot.id);
+      } else {
+        scrambleAttempted.current.add(slot.id);
+        setPendingSlot(slot);
+      }
+    },
+    [solved, focusSlot],
+  );
+
+  const handleScrambleResult = useCallback(
+    (didSolve: boolean) => {
+      if (didSolve) setClueStreak((n) => n + 1);
+      if (pendingSlot) focusSlot(pendingSlot.id);
+      setPendingSlot(null);
+    },
+    [pendingSlot, focusSlot],
+  );
 
   // Solo Daily layer: shared per-day modifier + once-per-day coin award on solve.
   const today = useMemo(() => getSoloDateISO(), []);
@@ -267,7 +294,7 @@ export function CrosswordView({
                 <CrosswordClueList
                   slots={puzzle.slots}
                   activeSlotId={activeSlot?.id ?? null}
-                  onSelect={(slot) => focusSlot(slot.id)}
+                  onSelect={handleClueSelect}
                   t={t}
                 />
               </div>
@@ -305,12 +332,27 @@ export function CrosswordView({
           <CrosswordClueList
             slots={puzzle.slots}
             activeSlotId={activeSlot?.id ?? null}
-            onSelect={(slot) => focusSlot(slot.id)}
+            onSelect={handleClueSelect}
             t={t}
             columns="stacked"
           />
         </aside>
       </div>
+
+      {/* Clue Scramble overlay — shown once per slot, before focusing it */}
+      {pendingSlot && (
+        <ClueScramble answer={pendingSlot.answer} onResult={handleScrambleResult} />
+      )}
+
+      {/* Streak badge — fades in after first scramble solve */}
+      {clueStreak > 0 && (
+        <div
+          aria-label={`Clue streak: ${clueStreak}`}
+          className="fixed top-4 end-4 z-[60] flex items-center gap-1 bg-neo-navy border-neo border-black rounded-neo shadow-hard px-2.5 py-1 font-neo-display font-bold text-neo-lime text-sm pointer-events-none"
+        >
+          🔥 {clueStreak}
+        </div>
+      )}
 
       {solved && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/75 p-6">

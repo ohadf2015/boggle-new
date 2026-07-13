@@ -105,7 +105,11 @@ const es = {
     "streakLabel": "racha de {count} días",
     "nextPuzzlePrompt": "Siguiente acertijo",
     "freeplayEdition": "Práctica #{count}",
-    "generating": "Preparando la cuadrícula…"
+    "generating": "Preparando la cuadrícula…",
+    "scramble": {
+      "title": "¡Descifra!",
+      "skip": "Omitir"
+    }
   },
   "rank": {
     "seasonTitle": "Rango de temporada",
@@ -5734,6 +5738,7 @@ const es = {
     "needHint": "¿Necesitas una pista?",
     "getHint": "OBTENER PISTA",
     "dragInstruction": "¡Arrastra sobre las letras para formar palabras!",
+    "wordGoalUnit": "palabras",
     "botWords": "Palabras encontradas",
     "beatYourRecord": "¡Superaste tu récord!",
     "soloVsBots": "Solo vs Bots",
@@ -6329,11 +6334,6 @@ const es = {
     "timedQuest": "Misión con Tiempo",
     "untimedQuest": "Misión Libre",
     "startQuest": "INICIAR MISIÓN",
-    "qrWelcome": {
-      "badge": "Escaneado",
-      "line": "¡Buen escaneo! Te teletransportamos directo al reto de hoy.",
-      "warping": "Teletransportando…"
-    },
     "adminBeta": "Beta",
     "replay": "Repetir",
     "cleared": "¡Completado!",
@@ -11572,7 +11572,8 @@ const es = {
         "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 5 idiomas, gratis para docentes.",
         "cta_primary": "Solicitar acceso como docente",
         "cta_secondary": "Ver demo",
-        "cta_note": "Gratis para docentes • Aprobado en ~24 h"
+        "cta_note": "Gratis para docentes • Aprobado en ~24 h",
+        "cta_schools": "¿Escuela o distrito? Ver planes →"
       },
       "mock": {
         "tab": "Juego de clase",
@@ -14026,7 +14027,6 @@ const es = {
       "title": "Pirámide de Puentes de Palabras",
       "cta": "Pirámide",
       "tagline": "3 acertijos. 1 palabra los une a todos.",
-      "explainer": "Resuelve los 3 acertijos de abajo: sus respuestas desbloquean la palabra de la cima.",
       "finale": "Final",
       "finalePrompt": "¿Qué palabra conecta las tres?",
       "cluesLabel": "Encuentra la palabra que une cada puente:",
@@ -14050,7 +14050,6 @@ const es = {
     "quitToMenu": "Volver al menú",
     "noAdAvailable": "No hay anuncio disponible ahora. Inténtalo más tarde.",
     "revealHint": "Revelar pista",
-    "freeHint": "Pista gratis (quedan {count})",
     "revealHintAd": "Ver anuncio por pista",
     "revealAnswerAd": "Ver anuncio para revelar respuesta",
     "adminGiveUp": "Saltar puzzle (admin)"
