@@ -1,31 +1,31 @@
 {
-  "date": "2026-07-12",
-  "note": "7-day window: 2 routes above n≥50 floor. CLS critically poor on multiplayer routes. Fix shipped: removed collapseSpacerWhenHidden={showResults} from PageClient.tsx — expected CLS improvement from 0.574 toward ~0.29 on /en/multiplayer. Supabase MCP absent (17th consecutive night). 4 migrations still pending apply.",
+  "date": "2026-07-13",
+  "note": "7-day window: 2 routes above n≥50 floor. CLS still poor on multiplayer routes — 07-12 spacer-collapse fix not yet reflected (7d window includes pre-fix data; verify in tomorrow's 24h window). /es/multiplayer INP regression 318→414ms (+30%) attributable to exp-mp-room-join-loading-v1 disabled-button overhead active for most of 7d window; revert landed 07-12. Supabase MCP absent (18th consecutive night). 4 migrations still pending apply.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (17th consecutive night). 4 migrations pending apply. web_vitals FK: stale advisor (already indexed). Auth connections: human dashboard task.",
+    "note": "Supabase MCP absent (18th consecutive night). 4 migrations pending apply. web_vitals FK: stale advisor (already indexed). Auth connections: human dashboard task. Unused idx_word_wheel_attempts_catchup: migration written, pending apply.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
       {
         "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
-        "carry_count": 16,
-        "status": "WRITTEN — pending apply (16th night)"
+        "carry_count": 17,
+        "status": "WRITTEN — pending apply (17th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
-        "carry_count": 11,
-        "status": "WRITTEN — pending apply (11th night)"
+        "carry_count": 12,
+        "status": "WRITTEN — pending apply (12th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql",
-        "carry_count": 6,
-        "status": "WRITTEN — pending apply (6th night)"
+        "carry_count": 7,
+        "status": "WRITTEN — pending apply (7th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql",
-        "carry_count": 5,
-        "status": "WRITTEN — pending apply (5th night)"
+        "carry_count": 6,
+        "status": "WRITTEN — pending apply (6th night)"
       }
     ],
     "remaining_advisor_items": [
@@ -33,59 +33,57 @@
         "id": "auth_rls_initplan_quick_play_challenges",
         "status": "Migration 20260707020000 written. Pending apply.",
         "priority": "MEDIUM",
-        "carry_count": 5
+        "carry_count": 6
       },
       {
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config.",
         "priority": "LOW",
-        "carry_count": 16
+        "carry_count": 17
       },
       {
         "id": "unindexed_fk_web_vitals_player_id",
         "status": "STALE ADVISOR DATA — already indexed in migration 20260429160100.",
         "priority": "INFO",
-        "carry_count": 5
+        "carry_count": 6
       }
     ]
   },
   "frontend": {
-    "note_24h": "0 routes above n≥50 floor. All 24h LCP/INP/CLS verdicts DEFERRED.",
-    "note_7d": "2 routes above n≥50 floor. CLS critically poor on both multiplayer routes. INP failing. Fix shipped this run targeting the spacer-collapse CLS source. Secondary CLS contributors (SpectatorBanner y:-100 animation, ConnectionStatusIndicator 1.5s delayed banner) noted for next run.",
+    "note_24h": "0 routes above n≥50 floor (low traffic window). All 24h LCP/INP/CLS verdicts DEFERRED.",
+    "note_7d": "2 routes above n≥50 floor. /es/multiplayer INP regression flagged (+30% vs baseline, n=66 clears floor). Root cause: exp-mp-room-join-loading-v1 disabled room buttons during join; revert landed 07-12. CLS still reading 0.574 on /en/multiplayer in 7d window — includes pre-fix data. Expect improvement in tomorrow's 24h window after 07-12 spacer-collapse fix settles.",
     "by_route_7d": [
       {
         "route": "/en/multiplayer",
-        "p75_lcp_ms": 2707,
-        "p75_inp_ms": 268,
+        "p75_lcp_ms": 2459,
+        "p75_inp_ms": 284,
         "p75_cls": 0.574,
-        "n_7d": 80,
-        "lcp_status": "POOR (>2500ms)",
+        "n_7d": 76,
+        "lcp_status": "GOOD (<2500ms)",
         "inp_status": "NEEDS-IMPROVEMENT (>200ms)",
-        "cls_status": "CRITICAL (>0.1) — fix shipped this run, expect improvement in 3-day window"
+        "cls_status": "CRITICAL (>0.1) — 07-12 fix in 7d window; verify tomorrow"
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 2273,
-        "p75_inp_ms": 318,
-        "p75_cls": 0.254,
-        "n_7d": 59,
+        "p75_lcp_ms": 2380,
+        "p75_inp_ms": 414,
+        "p75_cls": 0.369,
+        "n_7d": 66,
         "lcp_status": "GOOD (<2500ms)",
-        "inp_status": "POOR (>200ms)",
-        "cls_status": "CRITICAL (>0.1) — partial improvement expected"
+        "inp_status": "POOR (>200ms) — REGRESSION (+30% vs 318ms baseline, n=66 clears floor; attributable to exp-mp-room-join-loading-v1 revert lag; recheck tomorrow)",
+        "cls_status": "CRITICAL (>0.1) — pre-fix data in window; expect improvement tomorrow"
       }
     ],
-    "impact_check": {
-      "change": "LCP h1 animation delay removal (2026-07-05)",
-      "route": "/",
-      "baseline_ms": 6522,
-      "measured_ms": 1921,
-      "n_7d": 28,
-      "verdict": "improved",
-      "note": "70% LCP improvement. n=28 sub-floor — direction clear and consistent."
+    "homepage_lcp_note": "Intelligence brief: homepage LCP 6319ms (broader window source). Server-rendered preload of /mascot/winner.webp (393KB animated WebP) is wired correctly. SSR_LANDING_DATA_BUDGET_MS=1500ms cache-miss budget is the dominant TTFB contributor on cold renders. Static poster swap would reduce payload 2×+ (play.webp is 191KB) — no static winner.png exists yet; requires image generation, human task.",
+    "impact_check_07_12_cls": {
+      "change": "Removed collapseSpacerWhenHidden={showResults} from AutoHideHeader in PageClient.tsx",
+      "route": "/en/multiplayer",
+      "baseline_cls": 0.574,
+      "verdict": "PENDING — 7d window still includes pre-fix data; check tomorrow's 24h window"
     }
   },
   "bundle": {
-    "note": "Stable vs 2026-07-11. PageClient.tsx prop removal is one-character change — no chunk size impact.",
+    "note": "No chunk builds available in local .next (dev mode). Carries forward 07-12 snapshot.",
     "top_chunks": [
       { "name": "8aafd928.*.js", "kb": 6452, "note": "Word dictionary — LAZY" },
       { "name": "6c0d0f8e.*.js", "kb": 3284 },

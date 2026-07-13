@@ -4,6 +4,12 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-07-13 (correction — stale doc, verified against live PostHog)
+
+### [Correction] exp-mp-quickplay-wait-v1 / exp-invite-arrival-clarity-v1 — flags DO exist, do not re-flag
+- Multiple entries below (06-08 through 06-15) say these two flags were "NOT YET CREATED" / "ACTION REQUIRED". That was true when written but went stale: both were created directly in PostHog on **2026-06-16** (ids 206583/206584), ACTIVE, correct 50/50 `control`/variant split, and `exp-invite-arrival-clarity-v1` was evaluated as recently as 2026-07-12. No entry after 06-16 repeats the claim, so this was already dormant — noting it explicitly so a future audit doesn't resurrect it from the older entries below without checking live state first.
+- **Lesson for future triage passes**: this doc is an append-only log of what was true WHEN WRITTEN, not current state. Before treating any entry here as an open action item, verify against live PostHog (`feature-flag-get-all` search by key) rather than trusting the doc — same class of staleness risk as any other dual-source-of-truth.
+
 ### [Flag Retirement] mp-signup-nudge-copy-v1 — 54 days, inconclusive
 - Created 2026-05-08, active, rollout 100%. Wired in useMultiplayerSignupNudge.ts.
 - Variants: control (sheet+toast) vs toast-disabled (sheet only). 54-day window with no winner surfaced.
@@ -1514,3 +1520,39 @@ _Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all fl
   - status: deferred
   - why: INSERT with no restrictions is likely intentional (any authenticated user can submit a teacher access request). Changing would require UX review.
   - recommended owner: design review-by-eod
+
+## 2026-07-13
+- [Supabase] upsert_push_token SECURITY DEFINER callable by authenticated role
+  - first seen: ongoing advisor warning
+  - link: supabase:advisor:security:authenticated_security_definer_function_executable
+  - status: deferred
+  - why: no client callsite found in repo — may be called from native Capacitor plugin via REST. Changing SECURITY DEFINER→INVOKER could break push-token upsert if function needs elevated privileges. Needs review of DB function body + push notification service.
+  - recommended owner: backend review-by-eod
+
+- [Supabase] teacher_access_requests RLS INSERT policy tar_insert_any always-true
+  - first seen: ongoing advisor warning
+  - link: supabase:advisor:security:rls_policy_always_true
+  - status: deferred
+  - why: INSERT WITH CHECK (true) is intentional — anyone (pre-auth) can submit a teacher access request. Not a real security gap; this is the design. Could add email/captcha gate in the future.
+  - recommended owner: design review-optional
+
+- [Sentry 1PH] CapacitorGameConnect.then() not implemented on android
+  - first seen: 2026-07-04, last seen: 2026-07-05, 153 events, 7 users
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1PH
+  - status: deferred (no callsite in codebase — plugin-layer fix likely already applied)
+  - why: zero CapacitorGameConnect references in repo; error last fired 8d ago; matches 07-05 memory entry. Sentry issue still "unresolved" but no new occurrences. Recommend marking resolved in Sentry.
+  - recommended owner: self (mark resolved in Sentry)
+
+- [PostHog] exp-mp-room-join-loading-v1 zombie flag — deactivate in PostHog
+  - first seen: 2026-07-13
+  - evidence: code reverted 07-12 (16 rageclicks/7d vs 1 baseline, /es-heavy); flag still active in PostHog (id:219697)
+  - status: deferred
+  - why: flag has 0 call sites in code — it's serving a variant that changes nothing. Needs manual PostHog deactivation.
+  - recommended owner: lane-03 / human (PostHog UI)
+
+- [Flags >14d unwired] exp-results-replay-cta-v1 (40d), exp-leaderboard-play-cta-v1 (24d), exp-mp-quickplay-wait-v1 (27d), exp-invite-arrival-clarity-v1 (27d) — human review for statistical significance
+  - first seen: 2026-07-13
+  - evidence: all wired, all >14d old, but no PostHog stats available in automated lane
+  - status: deferred
+  - why: cannot determine p<0.05 from shell; need human to check PostHog experiment results and retire winners
+  - recommended owner: human (PostHog experiments UI)

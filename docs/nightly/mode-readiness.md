@@ -11,13 +11,15 @@
 
 ## Current (in progress)
 
-### crossword — readiness: 55% — status: IN PROGRESS
+### crossword — readiness: 75% — status: IN PROGRESS
 - **Why next:** standalone route, recently made endless; verify generator + newspaper UX + i18n + a11y.
 - **Reach for QA:** `/en/crossword` (no admin gate — publicly accessible; noindexed only).
 - **Key files:** `components/crossword/*`, `lib/crossword/*`, `app/[locale]/crossword/{page,PageClient}.tsx`.
-- **Last audited:** 2026-07-12
+- **Last audited:** 2026-07-13
 
-### Audit areas covered (2026-07-12 — first pass)
+### Audit areas covered
+
+**2026-07-12 — first pass**
 - ✅ **i18n** — all 31 crossword keys present in all 6 locales (en/he/sv/ja/es/ru). CLEAN.
 - ✅ **a11y** — `role="grid"`, `aria-label` on every cell, progress bar ARIA, `aria-pressed` on direction toggle, `aria-label` on tool/nav buttons. CLEAN.
 - ✅ **Perf** — `CrosswordView` dynamic-imported SSR:false; `CrosswordCell` memo'd; `activeSlotCells`/`wordEndCells` useMemo'd; GSAP loaded lazily. CLEAN.
@@ -27,21 +29,25 @@
 - ✅ **Timer flush** — elapsed time flushed on unmount via cleanup effect. CLEAN.
 - ✅ **LocalStorage cache** — daily puzzle cached client-side; silently falls back on storage full. CLEAN.
 - ✅ **Keyboard navigation** — hardware keyboard: A-Z, Backspace, Arrow, Tab (next slot), Space (toggle dir). CLEAN.
-- 🔧 **Error state** — FIXED: generation async had no try/catch; user stuck on loader forever on throw. Fixed in `CrosswordPageClient.tsx` with try/catch/finally + error UI using `common.error/errorOccurred/retry` keys.
-- ⬜ **Bugs/correctness (deep)** — gameState logic, slot ordering, answer checking: not yet audited.
-- ⬜ **Edge cases** — no valid words, empty board, very long slot, double-solve, network drop: not yet audited.
-- ⬜ **Visual QA** — not captured (code audit only this run).
-- ⬜ **Puzzle content quality** — ja/ru fall back to English; he/es/sv use native banks. Content depth/clue quality not yet audited.
+- 🔧 **Error state (partial)** — FIXED: generation async had no try/catch; user stuck on loader forever on throw. Fixed in `CrosswordPageClient.tsx` with try/catch/finally + error UI using `common.error/errorOccurred/retry` keys.
+
+**2026-07-13 — second pass**
+- ✅ **Bugs/correctness (deep)** — `gameState.ts` pure state machine audited: cursor advance, backspace, reveal, check, warmth hint — all correct. `answer.ts`: locale-aware normalization, Hebrew sofit, Spanish accent fold — clean. `progress.ts`: SSR-safe, quota-tolerant — clean.
+- ✅ **Generator correctness** — `generate.core.ts`: CSP backtracking filler with MRV heuristic, de-dup set, bounded steps — no infinite loop. `generate.daily.ts`: deterministic seeding, fallback chain. `generate.runtime.ts`: 60-retry × 5000-step cap, prefer-set difficulty lever — clean.
+- ✅ **CrosswordView.tsx** — double-solve guarded (`solvedFiredRef`), all cleanup correct, `crosswordScore` always returns number, solved state renders buttons, no hard-coded strings (decorative emoji/separators only).
+- ✅ **Edge cases** — null generation caught + shows error UI (fixed tonight); backtracking cap prevents hangs; pool-too-thin guard (`fillPool.length < 50`); all-blocks / no-templates returns null immediately.
+- 🔧 **Null puzzle stuck loader** — FIXED: `generateDailyPuzzle` returning null (all retries + no static fallback) fell through to `setPuzzle(null)` without setting `genError` → user stuck on loader with no retry. Added `if (!p) throw new Error(...)` to trigger catch → error UI. Also: freeplay null now sets `genError` so retry button re-appears.
 
 ### Open issues
 | # | Severity | File | Issue | Owner |
 |---|----------|------|-------|-------|
 | 1 | minor | `CrosswordKeyboard.tsx:6` | ja/ru have no native keyboard layout — fall back to QWERTY. Technically correct since puzzles are English, but jarring for Cyrillic users. | review-by-eod |
-| 2 | minor | `ClueBar.tsx:52` | Clue text area is a `<button onClick={onToggleDir}>` — clicking the clue accidentally toggles Across/Down. Unexpected; a brand-new user has no reason to expect that tap. | review-by-eod |
-| 3 | minor | `CrosswordView.tsx:104` | `opts` object literal recreated on every render → `useEffect([state, opts])` runs more often than needed. Guards (wordsSolvedRef, solvedFiredRef) prevent double-fire but it's wasteful. | review-by-eod |
-| 4 | minor | `CrosswordMasthead.tsx:47` | Uses generic `font-serif` (not a design-system token). Intentional newspaper aesthetic but could render inconsistently across devices. | review-by-eod |
+| 2 | minor | `ClueBar.tsx:51` | Clue text area is a `<button onClick={onToggleDir}>` — tapping the clue text accidentally toggles Across/Down. Unexpected for new users; the explicit Axis Icon button already handles this. | review-by-eod |
+| 3 | minor | `CrosswordView.tsx:~104` | `opts` object literal recreated on every render → `useEffect([state, opts])` runs more often than needed. Guards prevent double-fire but wasteful. | review-by-eod |
+| 4 | minor | `CrosswordMasthead.tsx:47` | Uses generic `font-serif` (not a design-system token). Intentional newspaper aesthetic but inconsistent rendering risk. | review-by-eod |
 | 5 | info | `page.tsx:11` | noindex in place — crossword not discoverable via search. Intentional until a landing surface is added. | founder call |
 | 6 | info | `generate.daily.ts:35` | ja/ru locale players receive English-language puzzles (no native crossword bank). Expected; noted for future content work. | future |
+| 7 | minor | `stats.ts:43` | `puzzle.cells.find(...)` inside per-slot-cell loop = O(n²). Negligible at 5×5 puzzle scale; precompute a cell map if scale increases. | future |
 
 ## Queue (audit order — closest-to-release first)
 
