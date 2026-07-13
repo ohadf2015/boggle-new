@@ -4,6 +4,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState, type CSSProper
 import { Capacitor } from '@capacitor/core';
 import { MascotHaloGlow, type HaloIntensity, type HaloTone } from './MascotHaloGlow';
 import { pickCelebrationSrc } from '@/lib/results/celebrationVariant';
+import { getAssetUrl } from '@/lib/assets/cdn';
 
 /**
  * The celebration's animated garnish (edge glow, title, sparkles) hints
@@ -215,7 +216,7 @@ export const MascotCelebrationVideo = memo(function MascotCelebrationVideo({
   // same clip for the life of this celebration instead of reshuffling.
   const [clipSeed] = useState(() => Math.floor(Math.random() * 1e9));
   const src = useMemo(
-    () => (forceSrc ? forceSrc : pickCelebrationSrc(variant.srcs, clipSeed)),
+    () => getAssetUrl(forceSrc ? forceSrc : pickCelebrationSrc(variant.srcs, clipSeed)),
     [variant.srcs, clipSeed, forceSrc]
   );
   const videoRef = useRef<HTMLVideoElement | null>(null);
