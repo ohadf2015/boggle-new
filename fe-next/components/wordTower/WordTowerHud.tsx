@@ -5,7 +5,7 @@ import { Delete, Shuffle, Lightbulb, ChevronDown, ChevronUp, RotateCw, Coins } f
 import { cn } from '@/lib/utils';
 import { type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
-import { canRequestClue } from '@/lib/wordTower/clueGate';
+import { canRequestClue, CLUE_RUN_CAP } from '@/lib/wordTower/clueGate';
 import { type ActiveRunPerk } from '@/lib/wordTower/useRunStreakPerk';
 import { WordTowerWheel } from './WordTowerWheel';
 
@@ -267,14 +267,17 @@ export function WordTowerHud(props: WordTowerHudProps) {
                 type="button"
                 onClick={requestClue}
                 disabled={!clueWord || clueShown || clueBusy || capReached}
-                aria-label={t('wordTower.hud.possible', { n: possibleWords })}
+                aria-label={t('wordTower.hud.cluesLeft', { n: CLUE_RUN_CAP - cluesUsed })}
                 title={t('wordTower.hud.clue')}
                 className="relative flex h-9 w-9 items-center justify-center rounded-full border-neo border-black bg-neo-navy-light/70 text-neo-cyan shadow-hard-sm transition-transform active:translate-y-0.5 disabled:opacity-60"
               >
                 <Lightbulb className="h-4 w-4" />
-                {possibleWords > 0 && (
+                {/* Badge shows clues the PLAYER has left this run, not how many
+                    buildable words exist in the dictionary (founder: the old
+                    possibleWords count read as a clue tally and confused players). */}
+                {CLUE_RUN_CAP - cluesUsed > 0 && (
                   <span className="absolute -end-1.5 -top-1.5 min-w-[1.1rem] rounded-full border border-black bg-neo-cyan px-1 text-center font-neo-body text-[10px] font-black leading-4 text-black tabular-nums">
-                    {possibleWords}
+                    {CLUE_RUN_CAP - cluesUsed}
                   </span>
                 )}
                 {/* Every clue costs a rewarded ad (capped at CLUE_RUN_CAP/run) — a

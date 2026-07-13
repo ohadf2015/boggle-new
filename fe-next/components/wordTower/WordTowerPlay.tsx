@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { ArrowLeft, Trophy, Flame, Sparkles } from 'lucide-react';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
+import { subscribeToWordTowerWrecks } from '@/lib/wordTower/wreckLive';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useHaptics } from '@/hooks/useHaptics';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -620,15 +622,23 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     [sab, rivals, daily, personalBest],
   );
 
-  // Apply any pending async wrecks ONCE on session start (endless only): fold
-  // them into the restored tower (SESSION state only — never the protected
-  // best_*), surface a Wreck Report, and hand the defender compensation
-  // scrambles so the beat feels fair, not punitive.
+  // Apply any pending async wrecks: fold them into the restored tower (SESSION
+  // state only — never the protected best_*), surface a Wreck Report, and hand
+  // the defender compensation scrambles so the beat feels fair, not punitive.
+  // Runs once on session start AND again live (see the realtime subscription
+  // below) — a rival that raids you WHILE you're mid-session shows the same
+  // scene immediately instead of waiting for your next reload.
   const [wreckReport, setWreckReport] = useState<{ names: string[]; floors: number } | null>(null);
-  const wreckCheckedRef = useRef(false);
-  useEffect(() => {
-    if (daily || wreckCheckedRef.current) return;
-    wreckCheckedRef.current = true;
+  const { user } = useAuth();
+  // Refs (not deps) for tower.restore/haptics — checkWrecks is handed to a
+  // long-lived realtime subscription below; if it depended on `tower`
+  // directly (a fresh object every render) the channel would tear down and
+  // resubscribe on every render instead of staying open for the session.
+  const towerRestoreRef = useRef(tower.restore);
+  towerRestoreRef.current = tower.restore;
+  const hapticsRef = useRef(haptics);
+  hapticsRef.current = haptics;
+  const checkWrecks = useCallback(() => {
     void fetch('/api/word-tower/wreck')
       .then((r) => (r.ok ? r.json() : null))
       .then((data: { wrecks?: PendingWreck[] } | null) => {
@@ -638,13 +648,26 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         // the fetch resolves after the player has already placed a word, we
         // knock floors off what's actually there instead of discarding progress.
         const res = applyAsyncWrecks(gameRef.current, wrecks);
-        tower.restore(res.state);
+        towerRestoreRef.current(res.state);
         setWreckReport({ names: res.attackerNames, floors: res.totalFloorsRemoved });
-        haptics.error();
+        hapticsRef.current.error();
       })
       .catch(() => { /* best-effort */ });
+  }, []);
+  const wreckCheckedRef = useRef(false);
+  useEffect(() => {
+    if (daily || wreckCheckedRef.current) return;
+    wreckCheckedRef.current = true;
+    checkWrecks();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // Live doorbell: a fresh row for this defender re-runs the SAME trusted GET
+  // claim above — the realtime payload itself is never trusted as game state,
+  // it only tells us to go re-fetch (server stays the sole damage authority).
+  useEffect(() => {
+    if (daily || !user?.id) return;
+    return subscribeToWordTowerWrecks(user.id, checkWrecks);
+  }, [daily, user?.id, checkWrecks]);
   useAutoDismiss(wreckReport, () => setWreckReport(null), WRECK_REPORT_MS);
 
   // Environmental hazards strike at fixed altitudes → topple floors; firedHazards guards re-fire.

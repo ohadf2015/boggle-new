@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useAutoDismiss } from '@/components/wordTower/useAutoDismiss';
 
 /**
  * Reveal-on-event gate. Returns `true` for `ms` after `triggerKey` increments,
@@ -8,18 +9,22 @@ import { useEffect, useRef, useState } from 'react';
  * Used to surface the Word Tower mascot only when the player completes a word
  * (founder: the mascot was huge and always on-screen) — it pops in, celebrates,
  * and tucks away again.
+ *
+ * Dismiss is delegated to {@link useAutoDismiss} (rAF watchdog + visibilitychange
+ * recovery) instead of a bare `setTimeout` — this hook used to strand the mascot
+ * on screen the same way the pre-fix toasts did (see useAutoDismiss's docstring).
  */
 export function useTimedReveal(triggerKey: number, ms: number): boolean {
   const [revealed, setRevealed] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevKey = useRef(triggerKey);
 
   useEffect(() => {
-    if (triggerKey === 0) return; // initial mount — no event yet
+    if (triggerKey === 0 || triggerKey === prevKey.current) return; // no new event
+    prevKey.current = triggerKey;
     setRevealed(true);
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setRevealed(false), ms);
-    return () => { if (timer.current) clearTimeout(timer.current); };
-  }, [triggerKey, ms]);
+  }, [triggerKey]);
+
+  useAutoDismiss(revealed ? triggerKey : null, () => setRevealed(false), ms);
 
   return revealed;
 }

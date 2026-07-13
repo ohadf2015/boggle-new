@@ -8,6 +8,7 @@ import Avatar from '@/components/Avatar';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine';
 import type { ParticleConfig } from '@/lib/gameEngine/types';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
+import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import {
   asyncWreckDamageFloors,
   smashVerdict,
@@ -241,6 +242,7 @@ export function WordTowerSmashScene({
               powerRef={powerRef}
               floors={floors}
               blockCount={heightToBlocks(target.heightM)}
+              material={blockMaterial(target.highestBiome ?? 'city')}
               onImpactDone={handleImpactDone}
             />
           </GameCanvas>
@@ -297,12 +299,15 @@ interface StageProps {
   powerRef: React.RefObject<number>;
   floors: number;
   blockCount: number;
+  /** The rival's actual highest-zone material colour (from {@link blockMaterial})
+   *  so the mini-game shows THEIR building, not a generic yellow stand-in. */
+  material: number;
   onImpactDone: () => void;
 }
 
 /** The WebGL scene: crane + swinging ball + rival tower + power meter, plus the
  *  impact choreography. Lives inside <GameCanvas> so it can pull the engine. */
-function SmashStage({ phase, powerRef, floors, blockCount, onImpactDone }: StageProps) {
+function SmashStage({ phase, powerRef, floors, blockCount, material, onImpactDone }: StageProps) {
   const engine = useGameEngine();
   const phaseRef = useRef(phase);
   phaseRef.current = phase;
@@ -311,6 +316,7 @@ function SmashStage({ phase, powerRef, floors, blockCount, onImpactDone }: Stage
 
   // Persistent scene refs across ticker frames.
   const refs = useRef<{
+    root: Container;
     ball: Container;
     chain: Graphics;
     meterFill: Graphics;
@@ -335,7 +341,9 @@ function SmashStage({ phase, powerRef, floors, blockCount, onImpactDone }: Stage
     ground.rect(0, groundY, W, 5).fill(C.navy);
     root.addChild(ground);
 
-    // Rival tower — stacked blocks, top `floors` tinted danger-red.
+    // Rival tower — stacked blocks in THEIR actual highest-zone material (not a
+    // generic yellow stand-in), top `floors` tinted danger-red so the doomed
+    // floors read clearly against their real building's colour.
     const blockW = Math.round(W * 0.24);
     const blockH = Math.round(H * 0.06);
     const baseX = Math.round(W * 0.6);
@@ -344,9 +352,15 @@ function SmashStage({ phase, powerRef, floors, blockCount, onImpactDone }: Stage
     for (let i = 0; i < blockCount; i++) {
       const g = new Graphics();
       const doomed = i >= blockCount - floorsRef.current;
+      const fill = doomed ? C.red : material;
       g.roundRect(-blockW / 2, -blockH, blockW, blockH - 3, 4)
-        .fill(doomed ? C.red : C.yellow)
+        .fill(fill)
         .stroke({ width: 3, color: C.black });
+      // Pixel-block bevel — light top edge, dark bottom edge — matching the
+      // real tower tiles' inset-highlight look so this reads as the SAME
+      // material, not a flat mini-game placeholder.
+      g.rect(-blockW / 2, -blockH, blockW, 3).fill({ color: C.white, alpha: 0.28 });
+      g.rect(-blockW / 2, -6, blockW, 3).fill({ color: C.black, alpha: 0.3 });
       g.x = baseX;
       g.y = baseY - i * blockH;
       root.addChild(g);
@@ -383,7 +397,7 @@ function SmashStage({ phase, powerRef, floors, blockCount, onImpactDone }: Stage
     const meterFill = new Graphics();
     root.addChild(track, sweet, meterFill);
 
-    refs.current = { ball, chain, meterFill, blocks, pivot, chainLen, blockW, meter, elapsed: 0 };
+    refs.current = { root, ball, chain, meterFill, blocks, pivot, chainLen, blockW, meter, elapsed: 0 };
 
     // Aim + swing ticker.
     const tick = (ticker: { deltaMS: number }) => {
@@ -465,6 +479,33 @@ function SmashStage({ phase, powerRef, floors, blockCount, onImpactDone }: Stage
         duration: 0.55 + power * 0.25,
         decay: 'exponential',
       });
+
+      // Ball squash-stretch on collision — a heavy object hitting a solid wall
+      // deforms for a couple frames before rebounding; sells weight far better
+      // than the swing alone.
+      if (!r.ball.destroyed) {
+        gsap
+          .timeline()
+          .to(r.ball.scale, { x: 1.6, y: 0.5, duration: 0.07, ease: 'power2.out' })
+          .to(r.ball.scale, { x: 0.85, y: 1.15, duration: 0.1, ease: 'power1.inOut' })
+          .to(r.ball.scale, { x: 1, y: 1, duration: 0.18, ease: 'elastic.out(1,0.5)' });
+      }
+
+      // Shockwave ring — an expanding, fading stroke from the impact point so
+      // the hit reads as striking a SOLID structure, not empty air.
+      const ring = new Graphics();
+      ring.circle(0, 0, 30).stroke({ width: 6, color: C.white, alpha: 0.9 });
+      ring.x = impactX;
+      ring.y = hitY;
+      r.root.addChild(ring);
+      gsap.to(ring.scale, { x: 3.4, y: 3.4, duration: 0.5, ease: 'power2.out' });
+      gsap.to(ring, {
+        alpha: 0,
+        duration: 0.5,
+        ease: 'power2.out',
+        onComplete: () => { if (!ring.destroyed) ring.destroy(); },
+      });
+
       for (let k = 0; k < n; k++) {
         const b = r.blocks[r.blocks.length - 1 - k];
         if (!b || b.destroyed) continue;
@@ -478,6 +519,25 @@ function SmashStage({ phase, powerRef, floors, blockCount, onImpactDone }: Stage
           delay: k * 0.04,
         });
       }
+
+      // Structural shudder — the SURVIVING floors below the hit visibly rock
+      // sideways, strongest right under the impact and decaying with depth, so
+      // the whole building reacts instead of only the destroyed blocks moving
+      // (founder ask: "should look like it is hurting the real building").
+      const survivors = r.blocks.length - n;
+      for (let s = 0; s < survivors; s++) {
+        const b = r.blocks[survivors - 1 - s];
+        if (!b || b.destroyed) continue;
+        const mag = (6 - s) * 1.6 * (0.4 + power * 0.6);
+        if (mag < 0.5) break; // decayed to nothing — deeper floors stay still
+        const restX = b.x;
+        gsap
+          .timeline({ delay: s * 0.025 })
+          .to(b, { x: restX + mag, duration: 0.06, ease: 'power1.out' })
+          .to(b, { x: restX - mag * 0.6, duration: 0.08, ease: 'power1.inOut' })
+          .to(b, { x: restX, duration: 0.14, ease: 'elastic.out(1,0.4)' });
+      }
+
       // Secondary aftershock burst for solid/perfect power — extra spectacle without
       // changing the authoritative floors count (already computed from accuracy).
       if (power >= SMASH_SWEET_SPOT) {

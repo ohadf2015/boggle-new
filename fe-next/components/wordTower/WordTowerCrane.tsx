@@ -348,12 +348,24 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
         className="relative flex w-full max-w-md flex-col items-center"
         style={{ height: `${CRANE_CHROME_H_PX}px` }}
       >
-        {/* Left mast */}
-        <div className="absolute start-2 top-0 h-[90px] w-3 rounded-b-neo border-neo border-black bg-neo-yellow shadow-hard" aria-hidden />
-        {/* Diagonal mast brace */}
+        {/* Left mast — same pixel-block bevel as the tower bricks (inset
+            highlight/shadow) so the crane reads as one material with the
+            tower it's building, not a flat colour cutout. */}
         <div
-          className="absolute start-3 top-12 h-1 w-12 origin-top-left rounded-sm bg-neo-yellow border border-black"
+          className="absolute start-2 top-0 h-[90px] w-3 rounded-b-neo border-neo border-black bg-neo-yellow shadow-hard"
+          style={{ boxShadow: 'inset 2px 0 0 rgba(255,255,255,0.4), inset -2px 0 0 rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.85)' }}
+          aria-hidden
+        />
+        {/* X-cross lattice bracing — a real tower-crane mast reads as a truss,
+            not a single stick; two crossing struts sell "riveted steel". */}
+        <div
+          className="absolute start-3 top-12 h-1 w-12 origin-top-left rounded-sm bg-neo-yellow-hover border border-black"
           style={{ transform: 'rotate(28deg)' }}
+          aria-hidden
+        />
+        <div
+          className="absolute start-3 top-[88px] h-1 w-12 origin-bottom-left rounded-sm bg-neo-yellow-hover border border-black"
+          style={{ transform: 'rotate(-28deg)' }}
           aria-hidden
         />
         {/* Operator cab — sticker art riding the mast top (decorative). Faces the
@@ -367,13 +379,19 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
           className="absolute -top-2 start-0 z-0 h-10 w-auto select-none"
           draggable={false}
         />
-        {/* Horizontal jib (the arm) — spans the bay */}
-        <div className="absolute top-[18px] z-10 h-3 w-[90%] rounded-neo border-neo-thick border-black bg-neo-yellow shadow-hard" aria-hidden>
-          {/* Jib bracing pattern */}
-          <div className="flex h-full items-center justify-between px-2 text-[8px] text-black/40">
-            <span>▲▼▲▼▲▼</span>
-          </div>
-        </div>
+        {/* Horizontal jib (the arm) — spans the bay. A diagonal criss-cross
+            lattice (matching the rival-rail tower's texture technique) reads
+            as a real steel truss instead of the old flat bar + tiny glyph
+            placeholder text that was illegible at game scale. */}
+        <div
+          className="absolute top-[18px] z-10 h-3 w-[90%] overflow-hidden rounded-neo border-neo-thick border-black bg-neo-yellow shadow-hard"
+          style={{
+            boxShadow: 'inset 0 2px 0 rgba(255,255,255,0.4), inset 0 -2px 0 rgba(0,0,0,0.3), 2px 2px 0 rgba(0,0,0,0.85)',
+            backgroundImage:
+              'repeating-linear-gradient(45deg, rgba(0,0,0,0.3) 0 1.5px, transparent 1.5px 9px), repeating-linear-gradient(-45deg, rgba(0,0,0,0.3) 0 1.5px, transparent 1.5px 9px)',
+          }}
+          aria-hidden
+        />
         {/* Trolley sweep wrapper — translateX only. The landing shadow lives in
             here too, so it shares the EXACT horizontal offset + centring as the
             beam and stays glued under it (no abspos-in-flex drift). The inner div
@@ -400,8 +418,12 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
               transformOrigin: 'top center',
             }}
           >
-            {/* Trolley carriage — the fixed joint the load hangs + swings from. */}
-            <div className="mx-auto h-3 w-9 rounded-sm border border-black bg-neo-navy-light shadow-hard" aria-hidden />
+            {/* Trolley carriage — the fixed joint the load hangs + swings from.
+                A pulley wheel riding on top sells "runs along the jib" instead
+                of reading as a floating box with a string. */}
+            <div className="relative mx-auto h-3 w-9 rounded-sm border border-black bg-neo-navy-light shadow-hard" aria-hidden>
+              <span className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full border border-black bg-neo-yellow-hover shadow-hard-sm" />
+            </div>
             {/* Pendulum group — cable + hook + beam swing as ONE rigid load around
                 the carriage joint (transform-origin top). The tilt LAGS the trolley
                 so the block reads as a heavy thing under gravity; it settles to

@@ -329,7 +329,15 @@ export function WordTowerWheel({
           </button>
         ) : (
           <div
-            className="flex h-[34%] min-h-[44px] min-w-[44px] max-w-[60%] items-center justify-center rounded-full border-neo border-black/40 bg-neo-navy/70 px-3 text-center font-neo-display text-xl font-black uppercase tracking-wide text-neo-white backdrop-blur-sm"
+            className={cn(
+              'flex h-[34%] min-h-[44px] min-w-[44px] max-w-[60%] items-center justify-center rounded-full border-neo px-3 text-center font-neo-display text-xl font-black uppercase tracking-wide text-neo-white backdrop-blur-sm transition-colors duration-300',
+              // Idle "waiting for a letter" state used to read as disabled/washed-out
+              // next to the ring's glow + sparks — a soft breathing pulse on the
+              // border invites the first tap instead of looking inert.
+              word.length > 0
+                ? 'border-black/40 bg-neo-navy/70'
+                : cn('border-neo-lime/50 bg-neo-navy/70', !reducedMotion && 'animate-pulse'),
+            )}
           >
             {word.length > 0
               ? word

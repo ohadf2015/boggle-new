@@ -1,10 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { cn } from '@/lib/utils';
 import Avatar from '@/components/Avatar';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import { WordTowerSmashScene } from './WordTowerSmashScene';
+import { useAutoDismiss } from './useAutoDismiss';
 
 interface Props {
   tokens: number;
@@ -80,27 +81,13 @@ export function WordTowerSabotageBay({
       setSmashTarget(null);
     }
   }, [smashTarget, onSend]);
-  // Auto-dismiss the earn toast after 2.6s — long enough to read, short enough
-  // not to crowd the next action.
-  useEffect(() => {
-    if (earnedToast == null) return;
-    const id = setTimeout(onDismissEarned, 2600);
-    return () => clearTimeout(id);
-  }, [earnedToast, onDismissEarned]);
-
-  // Auto-dismiss the sent-hit toast after the wrecking ball animation + a beat.
-  useEffect(() => {
-    if (!lastHit) return;
-    const id = setTimeout(onDismissHit, 2200);
-    return () => clearTimeout(id);
-  }, [lastHit, onDismissHit]);
-
-  // Auto-dismiss the ad-earn toast.
-  useEffect(() => {
-    if (!adEarnedToast) return;
-    const id = setTimeout(() => onDismissAdEarned?.(), 2600);
-    return () => clearTimeout(id);
-  }, [adEarnedToast, onDismissAdEarned]);
+  // Auto-dismiss via the shared hook (rAF watchdog + visibilitychange recovery)
+  // — these toasts fire right as the Pixi smash scene is animating, exactly the
+  // busy-main-thread condition useAutoDismiss was hardened against, so a bare
+  // setTimeout here could strand the toast the same way the pre-fix ones did.
+  useAutoDismiss(earnedToast, onDismissEarned, 2600);
+  useAutoDismiss(lastHit?.id ?? null, onDismissHit, 2200);
+  useAutoDismiss(adEarnedToast || null, () => onDismissAdEarned?.(), 2600);
 
   const hasTokens = tokens > 0;
 

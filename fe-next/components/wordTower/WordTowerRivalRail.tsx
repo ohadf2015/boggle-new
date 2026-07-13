@@ -5,6 +5,7 @@ import { railRivals, rivalsPassed, type RivalMarker } from '@/lib/wordTower/riva
 import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import { PROP_PX_PER_M } from '@/lib/wordTower/parallaxProps';
 import Avatar from '@/components/Avatar';
+import { useAutoDismiss } from './useAutoDismiss';
 import { WORD_TOWER_BUILD_LINE_FRACTION as BUILD_LINE_FRACTION } from '@/lib/wordTower/towerLayout';
 const LINE_FLOW = 'top 900ms cubic-bezier(0.22,1,0.36,1)';
 /** How long the "passed!" cheer stays up before it auto-dismisses. */
@@ -51,13 +52,9 @@ export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: 
     if (crossed.length > 0) setPassed(crossed[crossed.length - 1]!.name);
   }, [viewerHeightM, rivals]);
 
-  // Auto-dismiss lives in its OWN effect keyed on `passed`, so building more words
-  // (which re-runs the crossing effect above) can't cancel the pending dismissal.
-  useEffect(() => {
-    if (passed == null) return;
-    const id = setTimeout(() => setPassed(null), PASS_TOAST_MS);
-    return () => clearTimeout(id);
-  }, [passed]);
+  // Auto-dismiss via the shared hook (rAF watchdog + visibilitychange recovery)
+  // so the "passed!" cheer can't strand on screen the way a bare setTimeout can.
+  useAutoDismiss(passed, () => setPassed(null), PASS_TOAST_MS);
 
   const buildLineY = h * BUILD_LINE_FRACTION;
   // Every rival, always drawn + clamped so none sits below our tower top (#2).

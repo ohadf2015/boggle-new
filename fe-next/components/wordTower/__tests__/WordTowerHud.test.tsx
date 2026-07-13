@@ -138,7 +138,7 @@ describe('WordTowerHud', () => {
 });
 
 describe('WordTowerHud — clue run cap', () => {
-  const clueButtonName = /wordTower\.hud\.possible/;
+  const clueButtonName = /wordTower\.hud\.cluesLeft/;
 
   it('every clue reveal costs a rewarded ad — no free first clue', () => {
     render(<WordTowerHud {...makeProps({ possibleWords: 2, clueWord: 'CATS' })} />);
