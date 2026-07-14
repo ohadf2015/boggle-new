@@ -108,7 +108,8 @@ const he = {
     "generating": "מכינים את התשבץ…",
     "scramble": {
       "title": "פתור את הסידור!",
-      "skip": "דלג"
+      "skip": "דלג",
+      "streakAria": "רצף רמזים: {count}"
     }
   },
   "rank": {
@@ -364,7 +365,7 @@ const he = {
     "retry": "נסה שוב",
     "biome": { "city": "קרקע", "sky": "שמיים", "stratosphere": "סטרטוספירה", "orbit": "מסלול", "nebula": "ערפילית", "galaxy": "גלקסיה" },
     "tier": { "apprentice": "מתחיל", "journeyman": "מיומן", "master": "אדריכל מאסטר" },
-    "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "restartConfirm": "בטוח?", "best": "שיא {m} מ'", "possible": "{n} מילים", "clue": "רמז", "cluesLeft": "נותרו {n}", "collapse": "כיווץ", "expand": "הרחבה", "rivalPassed": "עברת את {name}!", "stuck": "תקוע? אות חדשה", "backToTop": "למעלה", "pickLetters": "בחרו אותיות", "dragToBuild": "גררו או הקישו לאיות", "chaseGap": "+{m} מ'", "chaseAria": "המתחרה הבא מעליך: {name}, עוד {m} מטר לעקיפה" },
+    "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "restartConfirm": "בטוח?", "best": "שיא {m} מ'", "possible": "{n} מילים", "clue": "רמז", "collapse": "כיווץ", "expand": "הרחבה", "rivalPassed": "עברת את {name}!", "stuck": "תקוע? אות חדשה", "backToTop": "למעלה", "pickLetters": "בחרו אותיות", "dragToBuild": "גררו או הקישו לאיות", "chaseGap": "+{m} מ'", "chaseAria": "המתחרה הבא מעליך: {name}, עוד {m} מטר לעקיפה" },
     "minimap": { "label": "מפת המגדל — {m} מ', הקש לחזרה למעלה" },
     "milestone": { "m50": "מעל צמרות העצים! 🌳", "m150": "אזור העננים ☁️", "m400": "הציפורים מקנאות 🐦", "m250": "מעל הרחפנים 🛸", "m650": "אווירה ערפילית 🌌", "m900": "טוק טוק, חלל? 🚀", "m1300": "תושב החלל העמוק 👽", "m1800": "כמעט אסטרונאוט ✨" },
     "ach": { "unlocked": "הישג!", "firstFloor": "קומה ראשונה", "tenFloors": "בניין", "skyHigh": "גבוה בשמיים", "wordsmith": "אמן מילים", "comboKing": "מלך הקומבו", "rivalCrusher": "מנצח יריבים", "unstoppable": "בלתי עציר", "toTheMoon": "אל הירח", "skylineKing": "מלך קו הרקיע", "centurion": "מאה קומות", "comboGod": "אל הקומבו", "wordWizard": "קוסם המילים", "galaxyClass": "דרגת גלקסיה", "deepSpace": "חלל עמוק" },
@@ -13866,6 +13867,7 @@ const he = {
     "quitToMenu": "חזרה לתפריט",
     "noAdAvailable": "אין פרסומת זמינה כרגע. נסה שוב.",
     "revealHint": "הצג רמז",
+    "freeHint": "רמז חינם (נשארו {count})",
     "revealHintAd": "צפה בפרסומת לרמז",
     "revealAnswerAd": "צפה בפרסומת לחשיפת התשובה",
     "adminGiveUp": "דלג על חידה (אדמין)",

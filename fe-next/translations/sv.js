@@ -180,7 +180,8 @@ const sv = {
     "generating": "Bygger rutnätet…",
     "scramble": {
       "title": "Avkoda!",
-      "skip": "Hoppa"
+      "skip": "Hoppa",
+      "streakAria": "Ledtrådssvit: {count}"
     }
   },
   "rank": {
@@ -293,6 +294,7 @@ const sv = {
     "quitToMenu": "Tillbaka till menyn",
     "noAdAvailable": "Ingen annons tillgänglig just nu. Försök igen senare.",
     "revealHint": "Visa ledtråd",
+    "freeHint": "Gratis ledtråd ({count} kvar)",
     "revealHintAd": "Se annons för ledtråd",
     "revealAnswerAd": "Se annons för att visa svar",
     "adminGiveUp": "Hoppa över (admin)"
@@ -536,7 +538,7 @@ const sv = {
     "retry": "Försök igen",
     "biome": { "city": "Mark", "sky": "Himmel", "stratosphere": "Stratosfär", "orbit": "Omloppsbana", "nebula": "Nebulosa", "galaxy": "Galax" },
     "tier": { "apprentice": "Lärling", "journeyman": "Gesäll", "master": "Mästararkitekt" },
-    "hud": { "floors": "{n} våningar", "combo": "{n} kedja", "scramble": "Blanda", "backspace": "Radera", "build": "Bygg", "restart": "Börja om", "restartConfirm": "Säker?", "best": "Bästa {m} m", "possible": "{n} ord", "clue": "Ledtråd", "cluesLeft": "{n} kvar", "collapse": "Fäll ihop", "expand": "Expandera", "rivalPassed": "Förbi {name}!", "stuck": "Fast? Ny bokstav", "backToTop": "Toppen", "pickLetters": "Välj bokstäver", "dragToBuild": "Dra eller tryck för att stava", "chaseGap": "+{m} m", "chaseAria": "Nästa rival ovanför: {name}, {m} meter kvar att passera" },
+    "hud": { "floors": "{n} våningar", "combo": "{n} kedja", "scramble": "Blanda", "backspace": "Radera", "build": "Bygg", "restart": "Börja om", "restartConfirm": "Säker?", "best": "Bästa {m} m", "possible": "{n} ord", "clue": "Ledtråd", "collapse": "Fäll ihop", "expand": "Expandera", "rivalPassed": "Förbi {name}!", "stuck": "Fast? Ny bokstav", "backToTop": "Toppen", "pickLetters": "Välj bokstäver", "dragToBuild": "Dra eller tryck för att stava", "chaseGap": "+{m} m", "chaseAria": "Nästa rival ovanför: {name}, {m} meter kvar att passera" },
     "minimap": { "label": "Tornkarta — {m} m, tryck för toppen" },
     "milestone": { "m50": "Över trädtopparna! 🌳", "m150": "Molnland ☁️", "m400": "Fåglarna är avundsjuka 🐦", "m250": "Högre än drönarna 🛸", "m650": "Nebulosakänsla 🌌", "m900": "Knack knack, rymden? 🚀", "m1300": "Bor i yttre rymden 👽", "m1800": "Nästan astronaut nu ✨" },
     "ach": { "unlocked": "Bedrift!", "firstFloor": "Första våningen", "tenFloors": "Höghus", "skyHigh": "Skyhögt", "wordsmith": "Ordkonstnär", "comboKing": "Combo-kung", "rivalCrusher": "Rivalkrossare", "unstoppable": "Ostoppbar", "toTheMoon": "Till månen", "skylineKing": "Skyline-kung", "centurion": "Centurion", "comboGod": "Combo-gud", "wordWizard": "Ordtrollkarl", "galaxyClass": "Galaxklass", "deepSpace": "Yttre rymden" },

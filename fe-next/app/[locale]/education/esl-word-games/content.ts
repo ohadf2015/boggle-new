@@ -157,8 +157,8 @@ const content: Record<EducationLocale, LocaleContent> = {
     ],
   },
   es: {
-    metaTitle: 'Juegos en Inglés Gratis — Aprende Inglés con Juegos Online | LexiClash',
-    metaDescription: 'Juegos para aprender inglés en línea: multijugador en vivo, duelos 1v1, listas de palabras propias. Sin registro, sin descarga. Panel del maestro incluido. 5 idiomas.',
+    metaTitle: 'Juegos de Inglés y Vocabulario Gratis Online | LexiClash',
+    metaDescription: 'Juegos de vocabulario en inglés en línea: multijugador en vivo, duelos 1v1, listas de palabras. Sin registro, sin descarga. Panel del maestro. 5 idiomas.',
     ogTitle: 'Juegos de Inglés Gratis',
     ogDescription: 'Juegos de palabras en vivo para estudiantes de inglés. Cuentas gratis, 5 diccionarios, panel de maestro.',
     twitterDescription: 'Juegos de inglés multijugador gratis para la clase.',

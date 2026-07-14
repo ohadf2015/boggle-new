@@ -1,4 +1,4 @@
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { BlastResultsSummary } from '../BlastResultsSummary';
 import type { BlastResultsData } from '../types';
@@ -26,7 +26,12 @@ vi.mock('../hooks/useBlastBadgeUnlocks', () => ({
   useBlastBadgeUnlocks: vi.fn(() => []),
 }));
 
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: vi.fn(),
+}));
+
 import { useBlastBadgeUnlocks } from '../hooks/useBlastBadgeUnlocks';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 const t = (key: string, vars?: Record<string, string | number>) => {
   if (!vars) return key;
@@ -430,5 +435,13 @@ describe('per-objective summary', () => {
       <BlastResultsSummary results={makeResults()} t={t} onPlayAgain={noop} onQuit={noop} />,
     );
     expect(screen.queryByTestId('blast-objective-summary-row')).toBeNull();
+  });
+
+  it('fires canonical results_viewed on mount', () => {
+    vi.clearAllMocks();
+    render(
+      <BlastResultsSummary results={makeResults({ finalScore: 5000 })} t={t} onPlayAgain={noop} onQuit={noop} />,
+    );
+    expect(trackGrowthEvent).toHaveBeenCalledWith('results_viewed', expect.objectContaining({ mode: 'blast', score: 5000 }));
   });
 });

@@ -48,10 +48,9 @@ export function ClueBar({ slot, rtl, onPrev, onNext, onToggleDir, t }: ClueBarPr
         </span>
       </button>
 
-      <button
-        type="button"
-        onClick={onToggleDir}
-        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 bg-[#ffe9a8] text-neo-navy border-2 border-black rounded-none shadow-hard text-start active:translate-y-[1px] active:shadow-hard-pressed"
+      {/* Clue display — read-only. Use the AxisIcon button (left) to toggle direction. */}
+      <div
+        className="flex-1 flex items-center gap-2.5 px-3 py-2.5 bg-[#ffe9a8] text-neo-navy border-2 border-black rounded-none shadow-hard"
       >
         {slot && (
           <span className="shrink-0 inline-flex items-center font-neo-display font-extrabold text-xs uppercase tracking-wide bg-neo-navy text-neo-cream rounded-none px-2 py-1">
@@ -61,7 +60,7 @@ export function ClueBar({ slot, rtl, onPrev, onNext, onToggleDir, t }: ClueBarPr
         <span className="font-neo-body font-semibold text-[0.95rem] leading-snug">
           {slot?.clue || t('crossword.noClue')}
         </span>
-      </button>
+      </div>
 
       <button
         type="button"

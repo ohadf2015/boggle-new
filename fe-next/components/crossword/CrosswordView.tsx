@@ -347,7 +347,7 @@ export function CrosswordView({
       {/* Streak badge — fades in after first scramble solve */}
       {clueStreak > 0 && (
         <div
-          aria-label={`Clue streak: ${clueStreak}`}
+          aria-label={t('crossword.scramble.streakAria', { count: clueStreak })}
           className="fixed top-4 end-4 z-[60] flex items-center gap-1 bg-neo-navy border-neo border-black rounded-neo shadow-hard px-2.5 py-1 font-neo-display font-bold text-neo-lime text-sm pointer-events-none"
         >
           🔥 {clueStreak}

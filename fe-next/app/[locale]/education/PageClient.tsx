@@ -202,6 +202,14 @@ export function PageClient() {
               >
                 {t('education.landing.teacherLeadCta.button')}
               </Link>
+              <Link
+                href={`/${language}/education/for-schools`}
+                data-testid="district-role-card-link"
+                onClick={() => trackGrowthEvent('landing_cta_clicked', { cta: 'district_role_card' })}
+                className="self-start text-sm font-bold text-neo-purple underline underline-offset-2 hover:text-neo-purple/80 transition-colors"
+              >
+                {t('education.landing.districtCta.title')} →
+              </Link>
             </div>
             {/* Student card */}
             <div className="rounded-neo border-neo border-neo-cyan bg-neo-navy-light p-6 shadow-hard">

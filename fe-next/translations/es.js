@@ -108,7 +108,8 @@ const es = {
     "generating": "Preparando la cuadrícula…",
     "scramble": {
       "title": "¡Descifra!",
-      "skip": "Omitir"
+      "skip": "Omitir",
+      "streakAria": "Racha de pistas: {count}"
     }
   },
   "rank": {
@@ -350,7 +351,7 @@ const es = {
     "loadError": "No se pudo cargar el diccionario — toca para reintentar",
     "retry": "Intentar de nuevo",
     "biome": { "city": "Suelo", "sky": "Cielo", "stratosphere": "Estratosfera", "orbit": "Órbita", "nebula": "Nebulosa", "galaxy": "Galaxia" },
-    "hud": { "floors": "{n} pisos", "combo": "cadena {n}", "scramble": "Mezclar", "backspace": "Borrar", "build": "Construir", "restart": "Reiniciar", "restartConfirm": "¿Seguro?", "best": "Mejor {m} m", "possible": "{n} palabras", "clue": "Pista", "cluesLeft": "{n} quedan", "collapse": "Contraer", "expand": "Expandir", "rivalPassed": "¡Superaste a {name}!", "stuck": "¿Atascado? Nueva letra", "backToTop": "Arriba", "pickLetters": "Elige letras", "dragToBuild": "Arrastra o toca para formar", "chaseGap": "+{m} m", "chaseAria": "Próximo rival arriba: {name}, faltan {m} metros para superarlo" },
+    "hud": { "floors": "{n} pisos", "combo": "cadena {n}", "scramble": "Mezclar", "backspace": "Borrar", "build": "Construir", "restart": "Reiniciar", "restartConfirm": "¿Seguro?", "best": "Mejor {m} m", "possible": "{n} palabras", "clue": "Pista", "collapse": "Contraer", "expand": "Expandir", "rivalPassed": "¡Superaste a {name}!", "stuck": "¿Atascado? Nueva letra", "backToTop": "Arriba", "pickLetters": "Elige letras", "dragToBuild": "Arrastra o toca para formar", "chaseGap": "+{m} m", "chaseAria": "Próximo rival arriba: {name}, faltan {m} metros para superarlo" },
     "minimap": { "label": "Mapa de la torre — {m} m, toca para subir" },
     "milestone": { "m50": "¡Sobre las copas! 🌳", "m150": "Zona de nubes ☁️", "m400": "Los pájaros tienen envidia 🐦", "m250": "Más alto que los drones 🛸", "m650": "Ambiente de nebulosa 🌌", "m900": "Tocando el espacio 🚀", "m1300": "Habitante del espacio profundo 👽", "m1800": "Casi astronauta ✨" },
     "ach": { "unlocked": "¡Logro!", "firstFloor": "Primer piso", "tenFloors": "Edificio", "skyHigh": "Por las nubes", "wordsmith": "Maestro de palabras", "comboKing": "Rey del combo", "rivalCrusher": "Aplasta-rivales", "unstoppable": "Imparable", "toTheMoon": "A la luna", "skylineKing": "Rey del horizonte", "centurion": "Centurión", "comboGod": "Dios del combo", "wordWizard": "Mago de palabras", "galaxyClass": "Clase galaxia", "deepSpace": "Espacio profundo" },
@@ -14050,6 +14051,7 @@ const es = {
     "quitToMenu": "Volver al menú",
     "noAdAvailable": "No hay anuncio disponible ahora. Inténtalo más tarde.",
     "revealHint": "Revelar pista",
+    "freeHint": "Pista gratis ({count} restantes)",
     "revealHintAd": "Ver anuncio por pista",
     "revealAnswerAd": "Ver anuncio para revelar respuesta",
     "adminGiveUp": "Saltar puzzle (admin)"

@@ -413,10 +413,13 @@ function SmashStage({ phase, powerRef, floors, blockCount, material, onImpactDon
       r.ball.x = r.pivot.x + Math.sin(a) * r.chainLen;
       r.ball.y = r.pivot.y + Math.cos(a) * r.chainLen;
 
-      r.chain.clear();
-      r.chain.moveTo(r.pivot.x, r.pivot.y).lineTo(r.ball.x, r.ball.y).stroke({ width: 3, color: C.black });
+      if (!r.chain.destroyed) {
+        r.chain.clear();
+        r.chain.moveTo(r.pivot.x, r.pivot.y).lineTo(r.ball.x, r.ball.y).stroke({ width: 3, color: C.black });
+      }
 
       const inSweet = p >= SMASH_SWEET_SPOT;
+      if (r.meterFill.destroyed) return;
       r.meterFill.clear();
       r.meterFill
         .roundRect(r.meter.x + 2, r.meter.y + 2, Math.max(0, (r.meter.w - 4) * p), r.meter.h - 4, 4)

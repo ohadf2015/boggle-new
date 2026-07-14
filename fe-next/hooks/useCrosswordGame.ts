@@ -62,6 +62,12 @@ export function useCrosswordGame(
   // state so a resume doesn't replay a ding for words already done.
   const wordsSolvedRef = useRef<number>(crosswordStats(state).wordsSolved);
 
+  // Stable refs for caller callbacks so effects don't re-run on inline object identity changes.
+  const onSolvedRef = useRef(opts.onSolved);
+  onSolvedRef.current = opts.onSolved;
+  const onWordSolvedRef = useRef(opts.onWordSolved);
+  onWordSolvedRef.current = opts.onWordSolved;
+
   const startRef = useRef<number>(now());
   const baseElapsedRef = useRef<number>(loadProgress(puzzle.id)?.elapsedMs ?? 0);
   const [elapsedMs, setElapsedMs] = useState<number>(baseElapsedRef.current);
@@ -109,15 +115,15 @@ export function useCrosswordGame(
   }, [puzzle.id]);
 
   // Fire onWordSolved each time a new word becomes fully correct (excluding the
-  // final solve, which fires onSolved). The ref guards against re-running when
-  // opts identity changes without a real count increase.
+  // final solve, which fires onSolved). Refs avoid spurious re-runs when the
+  // caller passes an inline opts object that changes identity every render.
   useEffect(() => {
     const solved = crosswordStats(state).wordsSolved;
     if (solved > wordsSolvedRef.current && state.status !== 'solved') {
-      opts.onWordSolved?.();
+      onWordSolvedRef.current?.();
     }
     wordsSolvedRef.current = solved;
-  }, [state, opts]);
+  }, [state]);
 
   // Fire onSolved once.
   useEffect(() => {
@@ -126,9 +132,9 @@ export function useCrosswordGame(
       // Record completion to analytics_events so solved puzzles appear in the
       // admin game log (read from elapsedRef so the duration is current).
       emitCrosswordGameEnd(puzzle, elapsedRef.current);
-      opts.onSolved?.();
+      onSolvedRef.current?.();
     }
-  }, [state.status, opts, puzzle]);
+  }, [state.status, puzzle]);
 
   const focusCell = useCallback((row: number, col: number) => {
     setState((s) => focusCellFn(s, row, col));

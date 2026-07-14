@@ -59,6 +59,30 @@ export function installAbandonOnPagehide(): () => void {
   };
 }
 
+/**
+ * Emit abandon when a React component unmounts mid-game (SPA navigation).
+ * Distinct from the pagehide listener which only fires on tab close/background.
+ * Guard: `active` is null after `markGameInactive()` (game completed normally),
+ * so this is a no-op for games that reached the results screen.
+ */
+export function emitAbandonOnSpaNavigate(): void {
+  if (!active || alreadyEmitted) return;
+  const durationMs = Date.now() - active.startedAt;
+  if (durationMs < MIN_ENGAGED_MS) return;
+
+  alreadyEmitted = true;
+  try {
+    posthog.capture('growth:game_abandoned', {
+      mode: active.mode,
+      gameMode: active.mode,
+      durationSec: Math.round(durationMs / 1000),
+      reason: 'spa_navigate',
+    });
+  } catch {
+    // PostHog not initialized — analytics never block UX
+  }
+}
+
 /** @internal Test-only reset hook. */
 export function __resetAbandonStateForTests(): void {
   active = null;

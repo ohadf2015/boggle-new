@@ -148,4 +148,15 @@ describe('Education Landing — authenticated dashboard shortcut', () => {
     render(<EducationPageClient />);
     expect(screen.queryByTestId('teacher-hub-for-schools-link')).not.toBeInTheDocument();
   });
+
+  it('shows district role card link to for-schools for unauthenticated visitors', () => {
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: false,
+      loading: false,
+      profile: null,
+    });
+    render(<EducationPageClient />);
+    const link = screen.getByTestId('district-role-card-link');
+    expect(link).toHaveAttribute('href', '/en/education/for-schools');
+  });
 });

@@ -497,6 +497,7 @@ const ru = {
     "quitToMenu": "Вернуться в меню",
     "noAdAvailable": "Реклама недоступна прямо сейчас. Попробуй позже.",
     "revealHint": "Открыть подсказку",
+    "freeHint": "Бесплатная подсказка (осталось {count})",
     "revealHintAd": "Посмотреть рекламу за подсказку",
     "revealAnswerAd": "Посмотреть рекламу, чтобы открыть ответ",
     "adminGiveUp": "Пропустить головоломку (администратор)",
@@ -2485,7 +2486,6 @@ const ru = {
       "best": "Макс {m} м",
       "possible": "{n} слов",
       "clue": "Подсказка",
-      "cluesLeft": "Осталось {n}",
       "collapse": "Свернуть",
       "expand": "Развернуть",
       "rivalPassed": "Обогнал {name}!",
@@ -3492,7 +3492,12 @@ const ru = {
     "streakLabel": "{count}-дневная серия",
     "nextPuzzlePrompt": "Следующая головоломка",
     "freeplayEdition": "Свободная игра #{count}",
-    "generating": "Установка сетки…"
+    "generating": "Установка сетки…",
+    "scramble": {
+      "title": "Расшифруй!",
+      "skip": "Пропустить",
+      "streakAria": "Серия подсказок: {count}"
+    }
   },
   "solo": {
     "reward": {

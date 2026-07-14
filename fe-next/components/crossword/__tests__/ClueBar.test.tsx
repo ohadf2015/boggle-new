@@ -44,4 +44,14 @@ describe('ClueBar direction toggle (discoverable horizontal↔vertical switch)',
     const toggle = screen.getByRole('button', { name: 'crossword.switchDir' });
     expect(toggle.textContent).toContain('crossword.dir.down');
   });
+
+  it('does NOT fire onToggleDir when tapping the clue text area (read-only, not a toggle)', () => {
+    // The clue text is for reading — tapping it to read should never change direction.
+    // Only the explicit AxisIcon button should toggle.
+    const onToggleDir = vi.fn();
+    render(<ClueBar slot={slot} rtl={false} onPrev={vi.fn()} onNext={vi.fn()} onToggleDir={onToggleDir} t={t} />);
+    // The clue text must NOT be a button role — it's a passive display area.
+    expect(screen.queryByRole('button', { name: 'Feline pet' })).toBeNull();
+    expect(onToggleDir).not.toHaveBeenCalled();
+  });
 });

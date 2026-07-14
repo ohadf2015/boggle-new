@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 5859,
+    "totalKeysInCode": 5872,
     "keyCountByLanguage": {
-      "en": 11646,
-      "es": 11770,
-      "he": 11729,
-      "ja": 11710,
-      "ru": 11692,
-      "sv": 11709
+      "en": 11667,
+      "es": 11791,
+      "he": 11750,
+      "ja": 11731,
+      "ru": 11710,
+      "sv": 11730
     },
-    "missingFromEnglish": 11,
+    "missingFromEnglish": 17,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 23,
@@ -381,6 +381,55 @@
   },
   "missingFromEnglish": [
     {
+      "key": "connections.freeHint",
+      "usages": [
+        {
+          "file": "components/connections/PuzzleCard.tsx",
+          "line": 445
+        },
+        {
+          "file": "components/connections/pyramid/FinaleCard.tsx",
+          "line": 316
+        }
+      ]
+    },
+    {
+      "key": "connections.pyramid.explainer",
+      "usages": [
+        {
+          "file": "components/connections/pyramid/PyramidChallenge.tsx",
+          "line": 311
+        }
+      ]
+    },
+    {
+      "key": "daily.qrWelcome.badge",
+      "usages": [
+        {
+          "file": "components/daily/QrWelcomeBanner.tsx",
+          "line": 33
+        }
+      ]
+    },
+    {
+      "key": "daily.qrWelcome.line",
+      "usages": [
+        {
+          "file": "components/daily/QrWelcomeBanner.tsx",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "key": "daily.qrWelcome.warping",
+      "usages": [
+        {
+          "file": "app/[locale]/PageClient.tsx",
+          "line": 233
+        }
+      ]
+    },
+    {
       "key": "sealedBid.botRival",
       "usages": [
         {
@@ -476,6 +525,15 @@
         {
           "file": "components/sealedBid/Showdown.tsx",
           "line": 35
+        }
+      ]
+    },
+    {
+      "key": "wordTower.hud.cluesLeft",
+      "usages": [
+        {
+          "file": "components/wordTower/WordTowerHud.tsx",
+          "line": 270
         }
       ]
     }
@@ -1175,6 +1233,9 @@
       "vs.bestFor"
     ],
     "ru": [
+      "crossword.scramble.title",
+      "crossword.scramble.skip",
+      "singlePlayer.wordGoalUnit",
       "wordcraft.gems.dice.title",
       "wordcraft.gems.dice.subtitle",
       "wordcraft.gems.dice.skip",

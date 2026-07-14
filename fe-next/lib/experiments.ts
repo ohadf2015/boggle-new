@@ -655,6 +655,25 @@ export const EXPERIMENTS = {
     description:
       'MP between-round progress header. progress-header = compact series-progress pill at top of mp results (above hero). Targets mp_round sentiment (baseline 1.5/3 avg). Conversion = game_feedback avg rating on mp_round. Guardrail = mp_results_exit_clicked stable.',
   }),
+
+  /**
+   * Homepage mode-card click feedback. Baseline: 27 rage clicks on lexiclash.live
+   * homepage in 7d (2026-07-14 PostHog), 20/27 with null el_text (icon/card clicks
+   * getting no visual response). Hypothesis: adding immediate press feedback
+   * (scale + brightness pulse on click) makes cards feel responsive → reduces
+   * rage-clicks and improves homepage→game_started conversion.
+   *
+   * Wire: LandingModesSection / mode-card component — apply `animate-neo-press`
+   *   + `active:scale-95 transition-transform` on click when variant='click-feedback'.
+   * Primary metric: homepage rage-click count (PostHog $rageclick on /en, /).
+   * Guardrail: game_started count must not fall.
+   */
+  'exp-homepage-click-feedback-v1': defineExperiment({
+    variants: ['control', 'click-feedback'] as const,
+    default: 'control',
+    description:
+      'Homepage mode-card click feedback. click-feedback = immediate press animation (scale+brightness) on card click. Targets homepage rage-clicks (27 in 7d, 20 null-el_text). Conversion = rageclick rate falls on /en + /. Guardrail = game_started stable.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

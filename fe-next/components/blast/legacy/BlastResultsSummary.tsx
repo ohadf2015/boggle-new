@@ -1,6 +1,7 @@
 'use client';
 
-import { type ComponentType } from 'react';
+import { type ComponentType, useEffect } from 'react';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import {
   Trophy, Star, Sparkles, Waves, Flag, Link as LinkIcon, Crown,
   BookOpen, Target, TrendingUp, Award, Zap, LayoutGrid, Check, X,
@@ -55,6 +56,12 @@ export function BlastResultsSummary({
       ? results.finalScore - results.previousBest
       : null;
   const isNewRecord = pbDelta != null;
+
+  useEffect(() => {
+    trackGrowthEvent('results_viewed', { mode: 'blast', score: results.finalScore });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const bestWave = results.bestWave
     ?? (results.waveResults.length > 0
       ? results.waveResults.reduce((a, b) => (b.score > a.score ? b : a))
