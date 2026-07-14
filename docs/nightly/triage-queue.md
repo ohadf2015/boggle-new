@@ -968,15 +968,11 @@ FLAG NEEDED: exp-practice-wheel-cta-v1  variants=[control, retry-cta]  50/50
 
 - [Supabase] SECURITY DEFINER: update_difficulty_after_game callable by authenticated
   - link: supabase advisor security:authenticated_security_definer_function_executable
-  - status: deferred — migration SQL written at supabase/migrations/20260619030000_security_hardening_advisors.sql
-  - why: Supabase MCP unauthorized (SUPABASE_ACCESS_TOKEN not set); requires manual apply + function body inspection before adding auth.uid() guard
-  - recommended owner: review-by-eod; inspect function body via SQL editor, then apply migration
+  - status: RESOLVED (verified 2026-07-14) — REVOKE on anon/public already applied out-of-band (has_function_privilege confirms both false); Step A of 20260619030000 is a no-op now. Step B (auth.uid() ownership guard inside the function body) was never more than a commented-out template in that file — never executed. No action.
 
 - [Supabase] RLS always-true: teacher_access_requests tar_insert_any INSERT policy
   - link: supabase advisor security:rls_policy_always_true
-  - status: deferred — tightened policy SQL written at supabase/migrations/20260619030000_security_hardening_advisors.sql
-  - why: Supabase MCP unauthorized; policy replacement (not addition) — DEFER per autonomy matrix
-  - recommended owner: review-by-eod; anon path preserved, authenticated path restricted to own user_id
+  - status: DO NOT APPLY — 20260619030000's tightened policy contradicts the later, deliberate fix in `fe-next/supabase/migrations/20260617120000_restore_teacher_access_anon_insert.sql` (WITH CHECK true is required: the public teacher-access apply form is submitted by signed-out applicants by design; tightening this broke it in production once already, see that file's header). Live policy correctly still WITH CHECK (true) — verified 2026-07-14. 20260619030000 is stale/superseded on this point; do not resurrect it.
 
 ---
 

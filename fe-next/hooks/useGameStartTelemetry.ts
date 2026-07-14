@@ -13,6 +13,7 @@
 
 import { useEffect, useRef } from 'react';
 import { trackGameStart } from '@/utils/growthTracking';
+import { emitAbandonOnSpaNavigate } from '@/utils/abandonOnPagehide';
 
 interface UseGameStartTelemetryArgs {
   /** Engine mode (e.g. 'multiplayer', 'word-hunt', 'blast', 'wheel-rush'). Required — null/undefined skips emit so we never pollute funnel with mode=null. */
@@ -42,4 +43,16 @@ export function useGameStartTelemetry({ mode, isGameActive, ready = true, extras
     firedRef.current = true;
     trackGameStart(mode, extras ?? {});
   }, [mode, isGameActive, ready, extras]);
+
+  // SPA-navigation abandon: fires when player navigates away mid-game without
+  // closing the tab (pagehide doesn't fire for in-app back-button / logo tap).
+  // Guard lives in emitAbandonOnSpaNavigate: no-op if markGameInactive() already
+  // cleared `active` (i.e. game completed normally via useGameEndTelemetry).
+  useEffect(() => {
+    return () => {
+      if (firedRef.current) {
+        emitAbandonOnSpaNavigate();
+      }
+    };
+  }, []);
 }

@@ -1,3 +1,8 @@
+-- RESOLVED (verified 2026-07-14): all policy/index changes here were already applied
+-- out-of-band except the idx_word_pacts_player2_id drop, which was applied separately
+-- as migration `drop_unused_index_word_pacts_player2`. Kept on disk for history; no
+-- further action needed on this file.
+--
 -- Performance: consolidate multiple permissive policies → single policy per action
 -- Supabase advisor: multiple_permissive_policies (WARN) on teacher_access_allowlist (15)
 --                  and teacher_access_requests (5).

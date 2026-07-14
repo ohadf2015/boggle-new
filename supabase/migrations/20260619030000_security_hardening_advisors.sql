@@ -1,3 +1,11 @@
+-- SUPERSEDED — DO NOT APPLY (verified 2026-07-14, see docs/nightly/triage-queue.md)
+-- Step A (REVOKE on update_difficulty_after_game) was already applied out-of-band; no-op now.
+-- Step 2 (tighten tar_insert_any) is WRONG: contradicts the deliberate fix in
+-- fe-next/supabase/migrations/20260617120000_restore_teacher_access_anon_insert.sql —
+-- the public teacher-access apply form requires anon INSERT (WITH CHECK true) by design.
+-- Kept on disk for history only. File is intentionally never referenced by db:migrate
+-- (that script reads fe-next/supabase/migrations/, not this legacy top-level dir).
+--
 -- Security hardening: Supabase advisor findings 2026-06-19
 -- Ref: supabase:advisor:security:authenticated_security_definer_function_executable
 -- Ref: supabase:advisor:security:rls_policy_always_true

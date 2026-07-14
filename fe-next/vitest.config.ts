@@ -138,7 +138,12 @@ export default defineConfig({
     ],
     testTimeout: 30000,
     pool: 'forks',
-    maxForks: 8,
+    // ponytail: 8×5120MB=40GB ceiling exceeded the nightly box's 32GB RAM under
+    // chronic load (avg 6-13, see 60-recurring-pitfalls.md) → forks timed out
+    // spawning, wedging every 2026-07-13/07-14 gate tier. 4×5120=20GB leaves
+    // headroom. Raise again only if a real single-file OOM reappears (shard-6
+    // history: heap size wasn't the cause there — a teardown crash was).
+    maxForks: 4,
     minForks: 2,
     poolOptions: {
       forks: {
