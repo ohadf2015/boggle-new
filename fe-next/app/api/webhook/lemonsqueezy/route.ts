@@ -6,7 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { LemonSqueezyClient } from '@/lib/lemonsqueezy'
-import { upsertSubscription, logSubscriptionEvent, type Tier } from '@/lib/subscriptions'
+import { upsertSubscription, logSubscriptionEvent, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 
 // Webhook payload shape — using `any` for relationships to allow flexible access
 type WebhookPayload = any
