@@ -59,7 +59,7 @@ export function useBlastSounds() {
         audioCtxRef.current = new (window.AudioContext || WebkitAudioCtx!)();
       }
       const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state === 'suspended') ctx.resume().catch(() => undefined);
       return ctx;
     } catch { return null; }
   }, []);
@@ -198,7 +198,7 @@ export function useBlastSounds() {
         audioCtxRef.current = new (window.AudioContext || WebkitAudioCtx!)();
       }
       const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') ctx.resume();
+      if (ctx.state === 'suspended') ctx.resume().catch(() => undefined);
 
       const freq = PATH_TONE_FREQUENCIES[Math.min(pathLength - 1, PATH_TONE_FREQUENCIES.length - 1)];
       const osc = ctx.createOscillator();
