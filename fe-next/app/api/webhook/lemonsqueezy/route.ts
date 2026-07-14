@@ -9,7 +9,6 @@ import { LemonSqueezyClient } from '@/lib/lemonsqueezy'
 import { upsertSubscription, logSubscriptionEvent, type Tier, type SubscriptionStatus } from '@/lib/subscriptions'
 
 // Webhook payload shape — using `any` for relationships to allow flexible access
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type WebhookPayload = any
 
 /** Safely extract variant ID from various payload shapes */
@@ -162,7 +161,7 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
     await upsertSubscription({
       userId: fallbackUserId,
       tier,
-      status: status as Tier['status'],
+      status: status as SubscriptionStatus,
       lemonSqueezySubscriptionId: subscriptionId,
       lemonSqueezyVariantId: variantId,
       currentPeriodEnd,
@@ -174,7 +173,7 @@ async function handleSubscriptionUpdated(payload: WebhookPayload, userId?: strin
   await upsertSubscription({
     userId,
     tier,
-    status: status as Tier['status'],
+    status: status as SubscriptionStatus,
     lemonSqueezySubscriptionId: subscriptionId,
     lemonSqueezyVariantId: variantId,
     currentPeriodEnd,
