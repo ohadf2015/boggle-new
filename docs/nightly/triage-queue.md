@@ -1556,3 +1556,14 @@ _Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all fl
   - status: deferred
   - why: cannot determine p<0.05 from shell; need human to check PostHog experiment results and retire winners
   - recommended owner: human (PostHog experiments UI)
+
+## 2026-07-14
+- [Sentry] JAVASCRIPT-NEXTJS-1PH — "CapacitorGameConnect.then() is not implemented on android"
+  - last seen: 2026-07-05, reach=7 (historical), code fix already in nativePGS.ts (Capacitor.isPluginAvailable guard + returns boolean not proxy)
+  - status: deferred (Sentry MCP unavailable to resolve)
+  - why: needs Sentry manual resolution (issue is fixed in code, just needs closing)
+  - recommended owner: review-by-eod — mark resolved in Sentry UI
+- [Sentry] JAVASCRIPT-NEXTJS-1R3 — unknown error
+  - evidence: https://lexiclash.sentry.io/issues/132569197/
+  - status: deferred (Sentry MCP unavailable, score=0.16 low priority)
+  - recommended owner: backend

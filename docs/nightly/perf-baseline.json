@@ -1,31 +1,31 @@
 {
-  "date": "2026-07-13",
-  "note": "7-day window: 2 routes above n≥50 floor. CLS still poor on multiplayer routes — 07-12 spacer-collapse fix not yet reflected (7d window includes pre-fix data; verify in tomorrow's 24h window). /es/multiplayer INP regression 318→414ms (+30%) attributable to exp-mp-room-join-loading-v1 disabled-button overhead active for most of 7d window; revert landed 07-12. Supabase MCP absent (18th consecutive night). 4 migrations still pending apply.",
+  "date": "2026-07-14",
+  "note": "7-day window: 2 routes above n≥50 floor (both multiplayer). /es/multiplayer CLS improved 0.369→0.296 (-20%) — 07-12 spacer-collapse fix confirmed working. /en/multiplayer CLS unchanged at 0.574 (different CLS source active on /en path, likely async isActive→AutoHideHeader toggle after socket roundtrip >500ms after click). Supabase MCP absent (19th consecutive night). 4 migrations still pending apply. Homepage INP 648ms + CLS 0.886 at n=31 (below floor — flagged for investigation, not regression verdict). Bundle unchanged vs 07-13 baseline.",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (18th consecutive night). 4 migrations pending apply. web_vitals FK: stale advisor (already indexed). Auth connections: human dashboard task. Unused idx_word_wheel_attempts_catchup: migration written, pending apply.",
+    "note": "Supabase MCP absent (19th consecutive night). 4 migrations pending apply. web_vitals FK: stale advisor (already indexed). Auth connections: human dashboard task. Unused idx_word_wheel_attempts_catchup: migration written, pending apply.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
       {
         "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
-        "carry_count": 17,
-        "status": "WRITTEN — pending apply (17th night)"
+        "carry_count": 18,
+        "status": "WRITTEN — pending apply (18th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
-        "carry_count": 12,
-        "status": "WRITTEN — pending apply (12th night)"
+        "carry_count": 13,
+        "status": "WRITTEN — pending apply (13th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql",
-        "carry_count": 7,
-        "status": "WRITTEN — pending apply (7th night)"
+        "carry_count": 8,
+        "status": "WRITTEN — pending apply (8th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql",
-        "carry_count": 6,
-        "status": "WRITTEN — pending apply (6th night)"
+        "carry_count": 7,
+        "status": "WRITTEN — pending apply (7th night)"
       }
     ],
     "remaining_advisor_items": [
@@ -33,57 +33,92 @@
         "id": "auth_rls_initplan_quick_play_challenges",
         "status": "Migration 20260707020000 written. Pending apply.",
         "priority": "MEDIUM",
-        "carry_count": 6
+        "carry_count": 7
       },
       {
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config.",
         "priority": "LOW",
-        "carry_count": 17
+        "carry_count": 18
       },
       {
         "id": "unindexed_fk_web_vitals_player_id",
         "status": "STALE ADVISOR DATA — already indexed in migration 20260429160100.",
         "priority": "INFO",
-        "carry_count": 6
+        "carry_count": 7
       }
     ]
   },
   "frontend": {
-    "note_24h": "0 routes above n≥50 floor (low traffic window). All 24h LCP/INP/CLS verdicts DEFERRED.",
-    "note_7d": "2 routes above n≥50 floor. /es/multiplayer INP regression flagged (+30% vs baseline, n=66 clears floor). Root cause: exp-mp-room-join-loading-v1 disabled room buttons during join; revert landed 07-12. CLS still reading 0.574 on /en/multiplayer in 7d window — includes pre-fix data. Expect improvement in tomorrow's 24h window after 07-12 spacer-collapse fix settles.",
+    "note_24h": "0 routes above n≥50 floor (low traffic window). All 24h verdicts DEFERRED.",
+    "note_7d": "2 routes above n≥50 floor. /es/multiplayer CLS IMPROVED: 0.369→0.296 (-20%), 07-12 spacer fix confirmed. /en/multiplayer CLS unchanged 0.574 — additional CLS source active (isActive toggle removes AutoHideHeader from document flow after socket roundtrip delay >500ms). /en/multiplayer INP IMPROVED: 284→278ms (slight). /es/multiplayer INP: 414→478ms (+15.5%, below 20% regression threshold — DEFERRED). Below-floor investigation leads: / INP 648ms (n=31), /en CLS 1.508 (n=28), /es CLS 1.041 (n=31), /he CLS 1.043 (n=37).",
     "by_route_7d": [
       {
         "route": "/en/multiplayer",
         "p75_lcp_ms": 2459,
-        "p75_inp_ms": 284,
+        "p75_inp_ms": 278,
         "p75_cls": 0.574,
-        "n_7d": 76,
+        "n_7d": 80,
         "lcp_status": "GOOD (<2500ms)",
-        "inp_status": "NEEDS-IMPROVEMENT (>200ms)",
-        "cls_status": "CRITICAL (>0.1) — 07-12 fix in 7d window; verify tomorrow"
+        "inp_status": "NEEDS-IMPROVEMENT (>200ms) — slight improvement from 284ms",
+        "cls_status": "CRITICAL (>0.1) — unchanged; root cause: isActive toggle removes AutoHideHeader after socket roundtrip >500ms (counts as CLS, not interaction-excluded); architectural fix needed"
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 2380,
-        "p75_inp_ms": 414,
-        "p75_cls": 0.369,
-        "n_7d": 66,
+        "p75_lcp_ms": 2452,
+        "p75_inp_ms": 478,
+        "p75_cls": 0.296,
+        "n_7d": 72,
         "lcp_status": "GOOD (<2500ms)",
-        "inp_status": "POOR (>200ms) — REGRESSION (+30% vs 318ms baseline, n=66 clears floor; attributable to exp-mp-room-join-loading-v1 revert lag; recheck tomorrow)",
-        "cls_status": "CRITICAL (>0.1) — pre-fix data in window; expect improvement tomorrow"
+        "inp_status": "POOR (>200ms) — +15.5% vs 414ms baseline, below 20% regression threshold, DEFERRED",
+        "cls_status": "NEEDS-IMPROVEMENT (>0.1) — IMPROVED from 0.369 (-20%); 07-12 spacer-collapse fix confirmed working"
       }
     ],
-    "homepage_lcp_note": "Intelligence brief: homepage LCP 6319ms (broader window source). Server-rendered preload of /mascot/winner.webp (393KB animated WebP) is wired correctly. SSR_LANDING_DATA_BUDGET_MS=1500ms cache-miss budget is the dominant TTFB contributor on cold renders. Static poster swap would reduce payload 2×+ (play.webp is 191KB) — no static winner.png exists yet; requires image generation, human task.",
+    "below_floor_watch": [
+      {
+        "route": "/",
+        "p75_lcp_ms": 3604,
+        "p75_inp_ms": 648,
+        "p75_cls": 0.886,
+        "n_7d": 31,
+        "note": "INP 648ms is severe — homepage click handlers (mode card selection, lobby entry) likely cause. Watch for n≥50."
+      },
+      {
+        "route": "/en",
+        "p75_lcp_ms": 3715,
+        "p75_inp_ms": 240,
+        "p75_cls": 1.508,
+        "n_7d": 28,
+        "note": "CLS > 1.0 is catastrophic. Below floor — monitor."
+      },
+      {
+        "route": "/es",
+        "p75_lcp_ms": 4128,
+        "p75_inp_ms": 224,
+        "p75_cls": 1.041,
+        "n_7d": 31,
+        "note": "LCP 4128ms and CLS > 1.0. Below floor — monitor."
+      },
+      {
+        "route": "/he",
+        "p75_lcp_ms": 2295,
+        "p75_inp_ms": 94,
+        "p75_cls": 1.043,
+        "n_7d": 37,
+        "note": "CLS > 1.0 despite good LCP/INP. Below floor — monitor."
+      }
+    ],
     "impact_check_07_12_cls": {
       "change": "Removed collapseSpacerWhenHidden={showResults} from AutoHideHeader in PageClient.tsx",
-      "route": "/en/multiplayer",
-      "baseline_cls": 0.574,
-      "verdict": "PENDING — 7d window still includes pre-fix data; check tomorrow's 24h window"
+      "route": "/es/multiplayer",
+      "baseline_cls": 0.369,
+      "current_cls": 0.296,
+      "verdict": "CONFIRMED — CLS improved -20% on /es/multiplayer. /en/multiplayer unchanged (different CLS source active)."
     }
   },
   "bundle": {
-    "note": "No chunk builds available in local .next (dev mode). Carries forward 07-12 snapshot.",
+    "note": "462 chunks in .next/static/chunks. Matches 07-13 baseline exactly — no regression.",
+    "total_kb": 30832,
     "top_chunks": [
       { "name": "8aafd928.*.js", "kb": 6452, "note": "Word dictionary — LAZY" },
       { "name": "6c0d0f8e.*.js", "kb": 3284 },

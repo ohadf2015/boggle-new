@@ -11,11 +11,11 @@
 
 ## Current (in progress)
 
-### crossword — readiness: 75% — status: IN PROGRESS
+### crossword — readiness: 85% — status: IN PROGRESS
 - **Why next:** standalone route, recently made endless; verify generator + newspaper UX + i18n + a11y.
 - **Reach for QA:** `/en/crossword` (no admin gate — publicly accessible; noindexed only).
 - **Key files:** `components/crossword/*`, `lib/crossword/*`, `app/[locale]/crossword/{page,PageClient}.tsx`.
-- **Last audited:** 2026-07-13
+- **Last audited:** 2026-07-14
 
 ### Audit areas covered
 
@@ -31,6 +31,11 @@
 - ✅ **Keyboard navigation** — hardware keyboard: A-Z, Backspace, Arrow, Tab (next slot), Space (toggle dir). CLEAN.
 - 🔧 **Error state (partial)** — FIXED: generation async had no try/catch; user stuck on loader forever on throw. Fixed in `CrosswordPageClient.tsx` with try/catch/finally + error UI using `common.error/errorOccurred/retry` keys.
 
+**2026-07-14 — third pass**
+- 🔧 **ClueBar accidental toggle** — FIXED: clue text area was `<button onClick={onToggleDir}>` — tapping to read fired direction flip. Changed to `<div>`. Added failing-first test to pin behavior.
+- 🔧 **useCrosswordGame opts spurious effect runs** — FIXED: inline `opts` object in CrosswordView.tsx:63 caused `[state, opts]`/`[state.status, opts, puzzle]` deps to fire extra times each render. Added `onSolvedRef`/`onWordSolvedRef` stable refs; removed `opts` from both deps arrays.
+- ✅ **Open issue review** — remaining 5 items all non-blocking: QWERTY fallback (expected), font-serif (intentional), noindex (founder call), ja/ru English puzzles (expected), O(n²) stats.ts (negligible at 5×5).
+
 **2026-07-13 — second pass**
 - ✅ **Bugs/correctness (deep)** — `gameState.ts` pure state machine audited: cursor advance, backspace, reveal, check, warmth hint — all correct. `answer.ts`: locale-aware normalization, Hebrew sofit, Spanish accent fold — clean. `progress.ts`: SSR-safe, quota-tolerant — clean.
 - ✅ **Generator correctness** — `generate.core.ts`: CSP backtracking filler with MRV heuristic, de-dup set, bounded steps — no infinite loop. `generate.daily.ts`: deterministic seeding, fallback chain. `generate.runtime.ts`: 60-retry × 5000-step cap, prefer-set difficulty lever — clean.
@@ -41,13 +46,11 @@
 ### Open issues
 | # | Severity | File | Issue | Owner |
 |---|----------|------|-------|-------|
-| 1 | minor | `CrosswordKeyboard.tsx:6` | ja/ru have no native keyboard layout — fall back to QWERTY. Technically correct since puzzles are English, but jarring for Cyrillic users. | review-by-eod |
-| 2 | minor | `ClueBar.tsx:51` | Clue text area is a `<button onClick={onToggleDir}>` — tapping the clue text accidentally toggles Across/Down. Unexpected for new users; the explicit Axis Icon button already handles this. | review-by-eod |
-| 3 | minor | `CrosswordView.tsx:~104` | `opts` object literal recreated on every render → `useEffect([state, opts])` runs more often than needed. Guards prevent double-fire but wasteful. | review-by-eod |
-| 4 | minor | `CrosswordMasthead.tsx:47` | Uses generic `font-serif` (not a design-system token). Intentional newspaper aesthetic but inconsistent rendering risk. | review-by-eod |
-| 5 | info | `page.tsx:11` | noindex in place — crossword not discoverable via search. Intentional until a landing surface is added. | founder call |
-| 6 | info | `generate.daily.ts:35` | ja/ru locale players receive English-language puzzles (no native crossword bank). Expected; noted for future content work. | future |
-| 7 | minor | `stats.ts:43` | `puzzle.cells.find(...)` inside per-slot-cell loop = O(n²). Negligible at 5×5 puzzle scale; precompute a cell map if scale increases. | future |
+| 1 | minor | `CrosswordKeyboard.tsx:6` | ja/ru fall back to QWERTY — expected since puzzles are English. | expected |
+| 2 | minor | `CrosswordMasthead.tsx:47` | `font-serif` is generic browser default, not a design-system token. Intentional newspaper aesthetic — accepted design decision. | accepted |
+| 3 | info | `page.tsx:11` | noindex in place — intentional until a landing surface is added. | founder call |
+| 4 | info | `generate.daily.ts:35` | ja/ru locale players receive English-language puzzles (no native crossword bank). Expected. | future |
+| 5 | negligible | `stats.ts:43` | O(n²) `puzzle.cells.find(...)` inside per-slot loop. Trivial at 5×5 scale. | future |
 
 ## Queue (audit order — closest-to-release first)
 
