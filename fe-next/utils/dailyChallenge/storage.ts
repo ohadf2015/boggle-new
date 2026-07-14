@@ -19,6 +19,7 @@ import {
   DAILY_STORAGE_KEY,
   WORD_HUNT_STORAGE_KEY,
   WORD_HUNT_FORFEIT_KEY,
+  WORD_WHEEL_STORAGE_KEY,
   getWordHuntResultKey,
   getWordWheelResultKey,
 } from './constants';
@@ -309,6 +310,43 @@ export function getAllWordHuntResults(language: Language): StoredWordHuntResult[
   return results.sort((a, b) => b.date.localeCompare(a.date));
 }
 
+/**
+ * Whether the player has ever completed a Word Hunt daily challenge (any date)
+ * on this device. Used to skip the intro/ready screen for returning players.
+ */
+export function hasEverPlayedWordHunt(language: Language): boolean {
+  if (typeof window === 'undefined') return false;
+
+  const prefix = `${WORD_HUNT_STORAGE_KEY}_${language}_`;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(prefix)) return true;
+  }
+  return false;
+}
+
+export interface PastWordHuntPerformance {
+  bestScore: number;
+  avgScore: number;
+  playCount: number;
+}
+
+/**
+ * Best/average efficiency score across prior Word Hunt plays, excluding the
+ * given (current) puzzle date. Powers the results-page "vs your past" comparison.
+ * Returns null when there is no prior history.
+ */
+export function getPastWordHuntPerformance(language: Language, excludeDate: string): PastWordHuntPerformance | null {
+  const priorResults = getAllWordHuntResults(language).filter((r) => r.date !== excludeDate);
+  if (priorResults.length === 0) return null;
+
+  const scores = priorResults.map((r) => r.result.efficiencyScore || 0);
+  const bestScore = Math.max(...scores);
+  const avgScore = Math.round(scores.reduce((sum, s) => sum + s, 0) / scores.length);
+
+  return { bestScore, avgScore, playCount: priorResults.length };
+}
+
 // ==========================================
 // Word Wheel Storage
 // ==========================================
@@ -356,6 +394,21 @@ export function saveWordWheelResult(result: WordWheelResult): void {
   };
 
   saveJsonToLocalStorage(key, storedResult);
+}
+
+/**
+ * Whether the player has ever completed a Word Wheel daily challenge (any date)
+ * on this device. Used to skip the intro/ready screen for returning players.
+ */
+export function hasEverPlayedWordWheel(language: Language): boolean {
+  if (typeof window === 'undefined') return false;
+
+  const prefix = `${WORD_WHEEL_STORAGE_KEY}_${language}_`;
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith(prefix)) return true;
+  }
+  return false;
 }
 
 /**

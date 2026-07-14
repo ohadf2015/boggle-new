@@ -58,6 +58,7 @@ vi.mock('@/contexts/NavigationContext', () => ({
 }));
 
 vi.mock('@/utils/dailyChallenge', () => ({
+  hasEverPlayedWordWheel: () => false,
   getDailyChallengeDate: () => '2026-04-25',
   getPuzzleNumber: () => 117,
   hasPlayedWordWheelToday: () => false,

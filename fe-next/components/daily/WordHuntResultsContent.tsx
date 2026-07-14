@@ -9,7 +9,7 @@
  * leaderboard, and more options.
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { m } from 'framer-motion';
 import { Eye, CircleDot, ArrowRight, CheckCircle2, Home, BookOpen } from 'lucide-react';
 import Link from 'next/link';
@@ -27,9 +27,9 @@ import { hasPlayedConnectionsToday } from '@/lib/connections/dailyClient';
 import { useDailyModePlayed } from '@/hooks/useDailyModePlayed';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
-import { MascotWithEntrance } from '@/components/ui/Mascot';
 import RivalCompareCard from './RivalCompareCard';
 import { useDailyRivalCompare } from '@/hooks/useDailyRivalCompare';
+import { getPastWordHuntPerformance } from '@/utils/dailyChallenge';
 import type { WordHuntResult } from '@/utils/dailyChallenge/types';
 import type { Language } from '@/shared/types/game';
 import {
@@ -37,6 +37,7 @@ import {
   PerformanceSection,
   RankBadge,
   StatsBlurb,
+  PastPerformanceCompare,
   DailyWordHuntFacts,
   ShareSection,
   CoinUnlockCard,
@@ -53,8 +54,6 @@ export interface WordHuntResultsContentProps {
   language: Language;
   countdown: string;
   isNewCompletion?: boolean;
-  showFlexing: boolean;
-  showEncouraging: boolean;
   survivalBonusTime: number;
   rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
   emojiWords: Array<{ word: string; found: boolean }>;
@@ -113,8 +112,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   language,
   countdown,
   isNewCompletion: _isNewCompletion,
-  showFlexing,
-  showEncouraging,
   survivalBonusTime,
   rarestWord,
   emojiWords: _emojiWords,
@@ -186,6 +183,12 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trackHintExposure]);
+
+  // Local play history vs today's result — powers the "vs your past" comparison.
+  const pastPerformance = useMemo(
+    () => getPastWordHuntPerformance(language, puzzleDate),
+    [language, puzzleDate],
+  );
 
   const wheelCtaNode = !wordWheelPlayed && (
     <m.div
@@ -268,18 +271,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
   return (
   <div className="space-y-4">
-    {/* Performance mascot — reacts to how many words the player found */}
-    {showFlexing && (
-      <div className="flex justify-center mb-3">
-        <MascotWithEntrance variant="flexing" size="md" delay={0.2} clipBorder="none" />
-      </div>
-    )}
-    {showEncouraging && (
-      <div className="flex justify-center mb-3">
-        <MascotWithEntrance variant="encouraging" size="sm" delay={0.2} clipBorder="none" />
-      </div>
-    )}
-
     {/* Hero Result Display */}
     <ResultDisplay
       solved={result.solved}
@@ -293,6 +284,16 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       wordsDiscovered={result.wordsDiscovered?.length || 0}
       currentUserId={profile?.id}
       meaning={result.meaning}
+      t={t}
+    />
+
+    {/* Vs your own past plays — placement/score is above, this is the
+        "how do I compare to how I usually do" the player cares about next.
+        Also carries a small randomized celebratory flourish (variable reward). */}
+    <PastPerformanceCompare
+      currentScore={result.efficiencyScore ?? 0}
+      solved={result.solved}
+      past={pastPerformance}
       t={t}
     />
 
@@ -368,6 +369,35 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </m.div>
     )}
 
+    {/* Primary next-step: back-to-daily (wheel already done) or a
+        variant-controlled wheel cross-promo, right above the leaderboard so
+        the player sees a clear next step alongside "who else played". */}
+    {backToDailyCtaNode}
+    {!wordWheelPlayed && crossPromoOrder === 'wheel-first' && wheelCtaNode}
+
+    {/* Leaderboard — who else played, and how you stack up. Sits with
+        rank/placement/vs-past so the "what matters" cluster (score,
+        placement, vs others, vs your past) is together before promo/CTA noise. */}
+    {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
+    <div onClick={() => trackGrowthEvent('wordhunt_leaderboard_tap', { language, solved: result.solved })}>
+    <TabbedDailyLeaderboard
+      key={leaderboardKey}
+      puzzleDate={puzzleDate}
+      language={language}
+      currentPlayerId={isAuthenticated && profile ? profile.id : null}
+      currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+      maxVisible={3}
+      compact
+      t={t}
+      defaultTab="today"
+      scope="word-hunt"
+      myHuntWordsDiscovered={result.wordsDiscovered?.map(w => w.word)}
+    />
+    </div>
+
+    {/* SECONDARY CROSS-PROMO (variant): Word Wheel CTA below leaderboard. */}
+    {crossPromoOrder === 'leaderboard-first' && wheelCtaNode}
+
     {/* Actionable "score more next time" insight — guess-efficiency aware.
         attemptsToFind = guesses used; a fast solve gets a positive nudge, a blind
         solve learns the word→clue loop, a slow solve learns to trust its clues. */}
@@ -405,14 +435,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
 
     {/* Daily Insight Cards — personalized analytics on challenge performance */}
     <DailyInsightStack mode="word_hunt" date={puzzleDate} />
-
-    {/* PRIMARY CTA above leaderboard.
-        - If the wheel is still to-do → variant-controlled wheel cross-promo.
-        - If the wheel is already done → back-to-daily (to see the leaderboard).
-        The back-to-daily card always sits above the leaderboard so the player
-        sees a clear, useful next step instead of a stale cross-promo. */}
-    {backToDailyCtaNode}
-    {!wordWheelPlayed && crossPromoOrder === 'wheel-first' && wheelCtaNode}
 
     {/* Multiplayer cross-promo — surfaced once today's daily pair is complete, so
         it never competes with the daily↔daily "finish today's challenge" CTA. */}
@@ -489,28 +511,6 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         )}
       </div>
     )}
-
-    {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
-
-    {/* Leaderboard — in place of the removed emoji share section */}
-    <div onClick={() => trackGrowthEvent('wordhunt_leaderboard_tap', { language, solved: result.solved })}>
-    <TabbedDailyLeaderboard
-      key={leaderboardKey}
-      puzzleDate={puzzleDate}
-      language={language}
-      currentPlayerId={isAuthenticated && profile ? profile.id : null}
-      currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-      maxVisible={3}
-      compact
-      t={t}
-      defaultTab="today"
-      scope="word-hunt"
-      myHuntWordsDiscovered={result.wordsDiscovered?.map(w => w.word)}
-    />
-    </div>
-
-    {/* SECONDARY CROSS-PROMO (variant): Word Wheel CTA below leaderboard. */}
-    {crossPromoOrder === 'leaderboard-first' && wheelCtaNode}
 
     {/* Share/Retry Section */}
     <m.div

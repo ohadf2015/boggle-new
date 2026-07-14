@@ -44,6 +44,7 @@ vi.mock('@/contexts/auth/authUtils', () => ({
 
 // ── Daily challenge utilities ────────────────────────────────────────────────
 vi.mock('@/utils/dailyChallenge', () => ({
+  getPastWordHuntPerformance: () => null,
   getGuestFingerprint: vi.fn().mockResolvedValue('test-fp'),
   getGuestDailyPlayer: vi.fn().mockResolvedValue({
     displayName: 'TestGuest',
@@ -128,6 +129,7 @@ vi.mock('../results', () => ({
   useStreakFreezeStatus: () => ({ freezesAvailable: 0, isStreakProtected: false }),
   ScoreBadge: () => <div data-testid="score-badge" />,
   ResultDisplay: () => <div data-testid="result-display" />,
+  PastPerformanceCompare: () => <div data-testid="past-performance-compare" />,
   PerformanceSection: () => <div data-testid="performance-section" />,
   CoinUnlockCard: () => <div data-testid="coin-unlock-card" />,
   ShareSection: () => <div data-testid="share-section" />,
@@ -262,37 +264,18 @@ describe('DailyWordHuntResults - mascots', () => {
     vi.clearAllMocks();
   });
 
-  it('shows flexing mascot when efficiency score is high (>= 0.6)', () => {
-    render(
-      <DailyWordHuntResults
-        {...baseProps}
-        result={{ ...baseResult, efficiencyScore: 0.75 }}
-      />
-    );
-    // Component renders content twice (mobile + desktop), so multiple elements are expected
-    expect(screen.getAllByTestId('mascot-flexing').length).toBeGreaterThan(0);
-  });
-
-  it('shows encouraging mascot when efficiency score is low (< 0.4)', () => {
-    render(
-      <DailyWordHuntResults
-        {...baseProps}
-        result={{ ...baseResult, efficiencyScore: 0.3 }}
-      />
-    );
-    // Component renders content twice (mobile + desktop), so multiple elements are expected
-    expect(screen.getAllByTestId('mascot-encouraging').length).toBeGreaterThan(0);
-  });
-
-  it('shows neither mascot at neutral score (0.4–0.6)', () => {
-    render(
-      <DailyWordHuntResults
-        {...baseProps}
-        result={{ ...baseResult, efficiencyScore: 0.5 }}
-      />
-    );
-    expect(screen.queryAllByTestId('mascot-flexing')).toHaveLength(0);
-    expect(screen.queryAllByTestId('mascot-encouraging')).toHaveLength(0);
+  it('never renders a mascot above the score, at any efficiency score (removed — looked weird over the score hero)', () => {
+    for (const efficiencyScore of [0.75, 0.5, 0.3]) {
+      const { unmount } = render(
+        <DailyWordHuntResults
+          {...baseProps}
+          result={{ ...baseResult, efficiencyScore }}
+        />
+      );
+      expect(screen.queryAllByTestId('mascot-flexing')).toHaveLength(0);
+      expect(screen.queryAllByTestId('mascot-encouraging')).toHaveLength(0);
+      unmount();
+    }
   });
 
   it('does NOT render MascotCelebrationVideo fanfare overlay even for high-score returning visits that would trigger bingo kind (replaced: AI video was weird + too distracting for daily results focus)', () => {

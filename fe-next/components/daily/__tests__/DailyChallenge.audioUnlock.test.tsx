@@ -141,6 +141,7 @@ vi.mock('next/navigation', () => ({
 
 // Mock utils
 vi.mock('@/utils/dailyChallenge', () => ({
+  hasEverPlayedWordHunt: vi.fn(() => false),
   generateDailyPuzzle: vi.fn(() => ({
     grid: [
       ['A', 'B', 'C', 'D', 'E'],

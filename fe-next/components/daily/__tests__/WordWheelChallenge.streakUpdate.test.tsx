@@ -55,6 +55,7 @@ const updateDailyStreakMock = vi.fn(() => ({
   totalDailiesCompleted: 5,
 }));
 vi.mock('@/utils/dailyChallenge', () => ({
+  hasEverPlayedWordWheel: () => false,
   getDailyChallengeDate: () => '2026-04-27',
   getPuzzleNumber: () => 119,
   hasPlayedWordWheelToday: () => false,

@@ -11,6 +11,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: () => true,
   hasPlayedWordHuntToday: () => false,
+  getPastWordHuntPerformance: () => null,
 }));
 
 const mockHasPlayedConnections = vi.fn(() => false);
@@ -33,6 +34,7 @@ vi.mock('../results', () => ({
   PerformanceSection: () => <div data-testid="performance-section" />,
   RankBadge: () => <div data-testid="rank-badge" />,
   StatsBlurb: () => <div data-testid="stats-blurb" />,
+  PastPerformanceCompare: () => <div data-testid="past-performance-compare" />,
   DailyWordHuntFacts: () => <div data-testid="facts" />,
   EmojiShareCard: () => <div data-testid="emoji-share" />,
   ShareSection: () => <div data-testid="share-section" />,
@@ -69,8 +71,6 @@ const baseProps: WordHuntResultsContentProps = {
   language: 'en',
   countdown: '23:59:59',
   isNewCompletion: true,
-  showFlexing: false,
-  showEncouraging: false,
   survivalBonusTime: 2,
   rarestWord: null,
   emojiWords: [],

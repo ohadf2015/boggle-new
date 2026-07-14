@@ -90,6 +90,9 @@ export type { DesktopStatsCardProps } from './DesktopStatsCard';
 export { RankBadge } from './RankBadge';
 export type { RankBadgeProps } from './RankBadge';
 
+export { PastPerformanceCompare } from './PastPerformanceCompare';
+export type { PastPerformanceCompareProps, PerformanceComparison } from './PastPerformanceCompare';
+
 export { TryAnotherLanguage } from './TryAnotherLanguage';
 export { SharePanel } from './SharePanel';
 export { LeaderboardTeaser } from './LeaderboardTeaser';

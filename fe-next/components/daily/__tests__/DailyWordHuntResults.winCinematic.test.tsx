@@ -56,6 +56,7 @@ vi.mock('@/contexts/auth/authUtils', () => ({
 
 // ── Daily challenge utilities ─────────────────────────────────────────────────
 vi.mock('@/utils/dailyChallenge', () => ({
+  getPastWordHuntPerformance: () => null,
   getGuestFingerprint: vi.fn().mockResolvedValue('test-fp'),
   getGuestDailyPlayer: vi.fn().mockResolvedValue({
     displayName: 'TestGuest',
@@ -148,6 +149,7 @@ vi.mock('../results', () => ({
   useStreakFreezeStatus: () => ({ freezesAvailable: 0, isStreakProtected: false }),
   ScoreBadge: () => <div data-testid="score-badge" />,
   ResultDisplay: () => <div data-testid="result-display" />,
+  PastPerformanceCompare: () => <div data-testid="past-performance-compare" />,
   PerformanceSection: () => <div data-testid="performance-section" />,
   CoinUnlockCard: () => <div data-testid="coin-unlock-card" />,
   ShareSection: () => <div data-testid="share-section" />,

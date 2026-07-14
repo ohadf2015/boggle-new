@@ -74,6 +74,7 @@ vi.mock('next/navigation', () => ({
 }));
 
 vi.mock('@/utils/dailyChallenge', () => ({
+  hasEverPlayedWordHunt: vi.fn(() => false),
   generateDailyPuzzle: vi.fn(() => ({
     grid: [['A', 'B', 'C', 'D', 'E'], ['F', 'G', 'H', 'I', 'J'], ['K', 'L', 'M', 'N', 'O'], ['P', 'Q', 'R', 'S', 'T'], ['U', 'V', 'W', 'X', 'Y']],
     targetWord: 'TEST', seedWords: ['TEST'], validWords: ['TEST'], allValidWords: ['TEST'],

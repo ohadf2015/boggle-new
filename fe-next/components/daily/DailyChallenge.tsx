@@ -34,6 +34,7 @@ import {
   markWordHuntForfeitToday,
   hasWordHuntForfeitToday,
   clearWordHuntForfeitToday,
+  hasEverPlayedWordHunt,
   type WordHuntResult,
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
@@ -433,6 +434,28 @@ const DailyChallenge: React.FC = () => {
 
     startPlaying();
   }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, isCatchup, catchupDate, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd, isCatchUpAdAvailable, isCatchUpPlaceholderCooldown, showCatchUpAd, startPlaying]);
+
+  // Returning players ("already play this kind of challenge") don't need the
+  // intro/ready page — jump straight into gameplay. First-time players and
+  // incoming friend-challenge deep links still see the ready screen (the
+  // challenge banner needs to render). Guarded by a ref so it only fires once
+  // per puzzle load, not on every re-render while phase stays 'ready'.
+  const autoSkippedReadyRef = useRef(false);
+  useEffect(() => {
+    autoSkippedReadyRef.current = false;
+  }, [gameLanguage, catchupDate]);
+
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    if (isPractice || isCatchup) return;
+    if (autoSkippedReadyRef.current) return;
+    const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
+    if (isValidChallenge) return;
+    if (!hasEverPlayedWordHunt(gameLanguage)) return;
+
+    autoSkippedReadyRef.current = true;
+    handleStartGame();
+  }, [phase, isPractice, isCatchup, challengeData, puzzleNumber, gameLanguage, handleStartGame]);
 
   // Handle game completion
   const handleGameComplete = useCallback((result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => {

@@ -22,6 +22,7 @@ vi.mock('@/components/ui/Mascot', () => ({
 }));
 vi.mock('../results', () => ({
   ResultDisplay: () => <div data-testid="result-display" />,
+  PastPerformanceCompare: () => <div data-testid="past-performance-compare" />,
   PerformanceSection: () => <div data-testid="performance-section" />,
   RankBadge: () => <div data-testid="rank-badge" />,
   DailyWordHuntFacts: () => <div data-testid="facts" />,
@@ -56,8 +57,6 @@ const baseProps: WordHuntResultsContentProps = {
   language: 'en' as const,
   countdown: '23:59:59',
   isNewCompletion: true,
-  showFlexing: true,
-  showEncouraging: false,
   survivalBonusTime: 2,
   rarestWord: null,
   emojiWords: [{ word: 'HELLO', found: true }],
@@ -106,6 +105,7 @@ const baseProps: WordHuntResultsContentProps = {
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: vi.fn(() => false),
   hasPlayedWordHuntToday: vi.fn(() => false),
+  getPastWordHuntPerformance: () => null,
 }));
 
 import { hasPlayedWordWheelToday } from '@/utils/dailyChallenge/storage';
@@ -119,9 +119,9 @@ describe('WordHuntResultsContent', () => {
     expect(screen.getByTestId('more-options')).toBeInTheDocument();
   });
 
-  it('renders mascot when showFlexing is true', () => {
-    render(<WordHuntResultsContent {...baseProps} showFlexing={true} showEncouraging={false} />);
-    expect(screen.getByTestId('mascot')).toBeInTheDocument();
+  it('never renders a mascot (removed — looked weird over the score hero)', () => {
+    render(<WordHuntResultsContent {...baseProps} />);
+    expect(screen.queryByTestId('mascot')).toBeNull();
   });
 
   it('renders inline signup for guests when not dismissed', () => {

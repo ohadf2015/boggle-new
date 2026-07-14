@@ -57,6 +57,7 @@ vi.mock('@/contexts/NavigationContext', () => ({ useHideNavigation: () => vi.fn(
 vi.mock('@/utils/growthTracking', () => ({ trackModalInteraction: vi.fn() }));
 
 vi.mock('@/utils/dailyChallenge', () => ({
+  hasEverPlayedWordWheel: () => false,
   getDailyChallengeDate: () => '2026-04-15',
   getPuzzleNumber: () => 42,
   hasPlayedWordWheelToday: () => false,

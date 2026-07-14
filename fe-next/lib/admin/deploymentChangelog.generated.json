@@ -1,6 +1,41 @@
 {
-  "generatedAt": "2026-07-13T22:48:41.969Z",
+  "generatedAt": "2026-07-14T21:52:08.777Z",
   "commits": [
+    {
+      "sha": "c3973c715b54020b3d73e3894fe29d6e731736c6",
+      "shortSha": "c3973c7",
+      "subject": "fix(nightly): stop vitest fork oversubscription wedging the gate, drain migration backlog",
+      "author": "Ohad Fisher",
+      "date": "2026-07-14T10:18:25+03:00"
+    },
+    {
+      "sha": "acc4ac1339f729c9f944f887b59f814cc0f1f13a",
+      "shortSha": "acc4ac1",
+      "subject": "fix(blast): catch AudioContext.resume() rejection in legacy sounds hook",
+      "author": "Ohad Fisher",
+      "date": "2026-07-14T10:04:29+03:00"
+    },
+    {
+      "sha": "2270e1de80739abb2c902a74cfb8ef2975566d5e",
+      "shortSha": "2270e1d",
+      "subject": "fix(nightly): restore 07-14 lane code dropped by a false-negative gate",
+      "author": "Ohad Fisher",
+      "date": "2026-07-14T09:50:37+03:00"
+    },
+    {
+      "sha": "a3eae6c18de42f2c28964cb40e6eaaa3dbf40404",
+      "shortSha": "a3eae6c",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-14",
+      "author": "Ohad Fisher",
+      "date": "2026-07-14T08:28:16+03:00"
+    },
+    {
+      "sha": "82b3bc6dd9e28f11b004459ceb34f8359c76d827",
+      "shortSha": "82b3bc6",
+      "subject": "perf(mascot): serve celebration videos from CDN bucket",
+      "author": "Ohad Fisher",
+      "date": "2026-07-14T01:59:30+03:00"
+    },
     {
       "sha": "e07e9b25316ff1095f617bb4d2c04144dc5648fa",
       "shortSha": "e07e9b2",
@@ -105,41 +140,6 @@
       "subject": "fix: resolve Wikipedia batch-upsert outage + Sentry noise (1R3, 1KG)",
       "author": "Ohad Fisher",
       "date": "2026-07-12T18:00:57+03:00"
-    },
-    {
-      "sha": "df0e14490cf08890595f19d094fa18393775ffd1",
-      "shortSha": "df0e144",
-      "subject": "feat: add Android App Links meta tags for social-share install attribution",
-      "author": "Ohad Fisher",
-      "date": "2026-07-12T13:38:35+03:00"
-    },
-    {
-      "sha": "fa26b8ea641e2b1f923e2bf83ddd4c3c8a1142d6",
-      "shortSha": "fa26b8e",
-      "subject": "chore(nightly): autonomous improvement loop 2026-07-12",
-      "author": "Ohad Fisher",
-      "date": "2026-07-12T07:27:19+03:00"
-    },
-    {
-      "sha": "a797e3f35e2fee774f7048fb7fcfe5daef023c35",
-      "shortSha": "a797e3f",
-      "subject": "feat: track QR/barcode UTM in admin + redirect scans to daily challenge (#725)",
-      "author": "ohadf2015",
-      "date": "2026-07-11T12:40:13+03:00"
-    },
-    {
-      "sha": "cfbbbf92ed66fbcde3fbab853ca8be3673581ee2",
-      "shortSha": "cfbbbf9",
-      "subject": "fix(engine): report ticker-freeze errors instead of swallowing them",
-      "author": "Ohad Fisher",
-      "date": "2026-07-11T07:53:00+03:00"
-    },
-    {
-      "sha": "3842999c9b9536ff78f62cd5f1d5ca23af7db0b5",
-      "shortSha": "3842999",
-      "subject": "fix(engine): survive a mid-frame throw in the shared Pixi ticker",
-      "author": "Ohad Fisher",
-      "date": "2026-07-11T07:44:54+03:00"
     }
   ]
 }

@@ -27,6 +27,7 @@ import {
   updateDailyStreak,
   hasPlayedWordWheel,
   getWordWheelResultForDate,
+  hasEverPlayedWordWheel,
 } from '@/utils/dailyChallenge';
 import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
 import type { Language } from '@/types';
@@ -360,6 +361,25 @@ const WordWheelChallenge: React.FC = () => {
     }
     startPlaying();
   }, [isCatchup, isCatchUpAdAvailable, isCatchUpPlaceholderCooldown, showCatchUpAd, startPlaying]);
+
+  // Returning players ("already play this kind of challenge") don't need the
+  // intro/ready page — jump straight into gameplay. Guarded by a ref so it
+  // only fires once per puzzle load, not on every re-render while phase stays
+  // 'ready'.
+  const autoSkippedReadyRef = useRef(false);
+  useEffect(() => {
+    autoSkippedReadyRef.current = false;
+  }, [language, catchupDate]);
+
+  useEffect(() => {
+    if (phase !== 'ready') return;
+    if (isPractice || isCatchup) return;
+    if (autoSkippedReadyRef.current) return;
+    if (!hasEverPlayedWordWheel(language as Language)) return;
+
+    autoSkippedReadyRef.current = true;
+    handleStart();
+  }, [phase, isPractice, isCatchup, language, handleStart]);
 
   const handleComplete = useCallback((result: WordWheelGameResult) => {
     setGameActive(false);

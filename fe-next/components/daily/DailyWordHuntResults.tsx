@@ -37,7 +37,6 @@ import CustomPuzzleCreator from '@/components/custom-puzzle/CustomPuzzleCreator'
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { FLEXING_SCORE_THRESHOLD, ENCOURAGING_SCORE_THRESHOLD } from '@/utils/mascotConfig';
 import { WinCinematic } from './WinCinematic';
 import { WordHuntResultsContent } from './WordHuntResultsContent';
 import { usePracticeFlag } from '@/hooks/usePracticeFlag';
@@ -136,10 +135,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       found: true,
     }));
   }, [result.attempts, result.wordsDiscovered]);
-
-  const efficiency = result.efficiencyScore ?? 0;
-  const showFlexing = efficiency >= FLEXING_SCORE_THRESHOLD;
-  const showEncouraging = efficiency < ENCOURAGING_SCORE_THRESHOLD;
 
   const displayName = isAuthenticated && profile
     ? profile.display_name || profile.username || t('common.player')
@@ -299,8 +294,6 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     language,
     countdown,
     isNewCompletion,
-    showFlexing,
-    showEncouraging,
     survivalBonusTime,
     rarestWord,
     emojiWords,

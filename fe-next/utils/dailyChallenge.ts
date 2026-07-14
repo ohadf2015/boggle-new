@@ -93,8 +93,11 @@ export {
   saveWordWheelResult,
   hasPlayedWordWheel,
   getWordWheelResultForDate,
+  hasEverPlayedWordHunt,
+  getPastWordHuntPerformance,
+  hasEverPlayedWordWheel,
 } from './dailyChallenge/storage';
-export type { ServerWordHuntResult } from './dailyChallenge/storage';
+export type { ServerWordHuntResult, PastWordHuntPerformance } from './dailyChallenge/storage';
 
 // Streaks
 export {
