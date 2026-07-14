@@ -205,8 +205,8 @@ export class LemonSqueezyClient {
   static validateWebhookSignature(rawBody: string, signature: string): boolean {
     const secret = process.env.LEMONSQUEEZY_WEBHOOK_SECRET
     if (!secret) {
-      console.warn('[LemonSqueezy] WEBHOOK_SECRET not configured — skipping signature validation')
-      return true
+      console.error('[LemonSqueezy] WEBHOOK_SECRET not configured — rejecting webhook')
+      return false
     }
 
     const hmac = createHmac('sha256', secret)
