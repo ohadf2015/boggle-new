@@ -42,6 +42,11 @@ export async function promoteWordToScores(
       dislikes_count: 0,
       first_submitter: submitter,
       last_voted_at: new Date().toISOString(),
+      // word_scores_promote_on_threshold() only flips this on 2+ DISTINCT
+      // real word_votes rows, which this path never writes (the word was
+      // already externally verified or admin-approved, not peer-voted) —
+      // set it explicitly or the row silently never validates live.
+      is_potentially_valid: true,
     },
     { onConflict: 'word,language' }
   );

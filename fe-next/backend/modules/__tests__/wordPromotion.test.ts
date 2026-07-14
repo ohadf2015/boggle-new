@@ -52,6 +52,19 @@ describe('promoteWordToScores', () => {
     expect(row.likes_count).toBe(10);
   });
 
+  it('marks the row immediately valid — externally-verified/admin-approved words must not depend on the real-voter threshold trigger', async () => {
+    // Regression: word_scores_promote_on_threshold() only flips
+    // is_potentially_valid on 2+ DISTINCT real `word_votes` rows, which
+    // auto-promotion never writes. Without setting this explicitly, every
+    // auto/admin-promoted word across every language stayed invisible to
+    // live validation (checkCommunityWord / isWordCommunityValid) forever.
+    await promoteWordToScores(mockSupabase, 'battle', 'en', { votes: 20, submitter: 'admin_approved' });
+    expect(mockUpsert.mock.calls[0][0].is_potentially_valid).toBe(true);
+
+    await promoteWordToScores(mockSupabase, 'unit', 'en', { votes: 10, submitter: 'auto_promoted' });
+    expect(mockUpsert.mock.calls[1][0].is_potentially_valid).toBe(true);
+  });
+
   it('propagates supabase upsert errors', async () => {
     mockUpsert.mockResolvedValueOnce({ error: { message: 'db down' } });
 

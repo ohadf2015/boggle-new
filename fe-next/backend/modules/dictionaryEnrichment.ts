@@ -21,13 +21,14 @@ export function normalizeHebrewWordForDictionary(word: string): string {
 }
 
 /**
- * Get the path to the Hebrew approved words file
+ * Get the path to the Hebrew approved words file.
+ * __dirname is unreliable inside a Next.js/Turbopack bundle (points into the
+ * bundler's chunk layout, not backend/ on disk — see dictionaryLoaders.ts);
+ * process.cwd() is always the project root (fe-next/) for both the custom
+ * tsx server and Next itself, so anchor there instead.
  */
-function getHebrewApprovedPath(): string {
-  // Try __dirname first (Docker: dist/), then parent (dev: backend/modules/ → backend/)
-  const direct = path.resolve(__dirname, 'hebrew_words_approved.txt');
-  try { require('fs').accessSync(direct); return direct; } catch { /* fallback */ }
-  return path.resolve(__dirname, '..', 'hebrew_words_approved.txt');
+export function getHebrewApprovedPath(): string {
+  return path.join(process.cwd(), 'backend', 'hebrew_words_approved.txt');
 }
 
 /**
@@ -154,6 +155,7 @@ export async function runDictionaryEnrichment(): Promise<{
   const { processMilogVerificationQueue } = await import('../services/milogWordVerifier');
   const { processWiktionaryEnVerificationQueue } = await import('../services/wiktionaryEnVerifier');
   const { processWiktionaryEsVerificationQueue } = await import('../services/wiktionaryEsVerifier');
+  const { runAutoPromotion } = await import('./autoPromotion');
 
   logger.info('DICT_ENRICH', '=== Starting Dictionary Enrichment ===');
 
@@ -169,9 +171,22 @@ export async function runDictionaryEnrichment(): Promise<{
   logger.info('DICT_ENRICH', 'Step 1c: Processing wiktionary (es) verification queue...');
   const wiktionaryEsResult = await processWiktionaryEsVerificationQueue();
 
-  // Step 2: Promote verified Hebrew words (Wiktionary-verified EN+ES handled by auto-promotion cron)
-  logger.info('DICT_ENRICH', 'Step 2: Promoting verified Hebrew words to dictionary...');
-  const promotionResult = await promoteVerifiedWordsToDictionary();
+  // Step 2: Promote verified words via the shared, DB-backed auto-promoter
+  // (same path used for en/es/sv/ja). This USED to call
+  // promoteVerifiedWordsToDictionary() directly, which raced
+  // startAutoPromotionCron() (every 4h) for the same `approved_at IS NULL`
+  // rows: whichever cron won marked the row promoted, so when this one won
+  // the word vanished into a silently-failing __dirname file write instead of
+  // reaching word_scores — 1085 verified Hebrew words got stuck rejected in
+  // live gameplay this way (2026-07-15 incident). runAutoPromotion() is
+  // lock-guarded (isRunning), so calling it here instead is race-safe.
+  logger.info('DICT_ENRICH', 'Step 2: Promoting verified words via auto-promotion...');
+  const autoPromoResult = await runAutoPromotion();
+  const promotionResult: PromotionResult = {
+    promoted: autoPromoResult.words.milogBased.length,
+    failed: autoPromoResult.failed,
+    words: autoPromoResult.words.milogBased,
+  };
 
   const totalProcessed = milogResult.processed + wiktionaryResult.processed + wiktionaryEsResult.processed;
   const totalVerified = milogResult.verified + wiktionaryResult.verified + wiktionaryEsResult.verified;
@@ -180,7 +195,7 @@ export async function runDictionaryEnrichment(): Promise<{
   logger.info('DICT_ENRICH', `Milog: ${milogResult.verified} verified / ${milogResult.processed} processed`);
   logger.info('DICT_ENRICH', `Wiktionary EN: ${wiktionaryResult.verified} verified / ${wiktionaryResult.processed} processed`);
   logger.info('DICT_ENRICH', `Wiktionary ES: ${wiktionaryEsResult.verified} verified / ${wiktionaryEsResult.processed} processed`);
-  logger.info('DICT_ENRICH', `Promotion: ${promotionResult.promoted} promoted, ${promotionResult.failed} failed`);
+  logger.info('DICT_ENRICH', `Promotion (he): ${promotionResult.promoted} promoted, ${promotionResult.failed} failed (cross-lang total)`);
 
   return {
     verification: {
