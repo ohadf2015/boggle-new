@@ -14679,6 +14679,25 @@ const en = {
       "cta": "I'm interested",
       "thanks": "You're on the list! We'll let you know when supporter plans launch."
     }
+  },
+  "pricing": {
+    "title": "Choose Your Plan",
+    "subtitle": "Unlock classroom features for teachers and schools",
+    "free": "Free",
+    "pro": "Pro",
+    "month": "month",
+    "recommended": "Recommended",
+    "free_1": "Up to 5 students per class",
+    "free_2": "1 class room",
+    "free_3": "Basic game modes",
+    "pro_1": "Unlimited students per class",
+    "pro_2": "Unlimited classrooms",
+    "pro_3": "Advanced game modes + custom words",
+    "pro_4": "Student progress reports & analytics",
+    "current_plan": "Current Plan",
+    "sign_up_free": "Sign Up Free",
+    "subscribe": "Subscribe Now",
+    "error": "Something went wrong. Please try again."
   }
 };
 
