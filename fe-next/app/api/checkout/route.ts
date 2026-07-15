@@ -20,6 +20,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ url: checkoutUrl })
   } catch (error) {
     console.error('Checkout error:', error)
-    return NextResponse.json({ error: 'Checkout failed' }, { status: 500 })
+    return NextResponse.json({ error: 'Checkout failed', message: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 })
   }
 }

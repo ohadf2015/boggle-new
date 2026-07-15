@@ -82,7 +82,7 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
       'Export data (CSV/PDF)',
       'Classroom duel mode',
     ],
-    variantId: process.env.LEMONSQUEEZY_VARIANT_ID_PRO,
+    variantId: process.env.LEMONSQUEEZY_PRO_VARIANT_ID,
   },
 }
 
@@ -171,7 +171,7 @@ export class LemonSqueezyClient {
               redirect_url: redirectUrl || `${process.env.NEXT_PUBLIC_APP_URL}/teacher?checkout=success`,
             },
             checkout_data: {
-              email: email ?? '',
+              ...(email ? { email } : {}),
               custom: {
                 user_id: userId,
               },
