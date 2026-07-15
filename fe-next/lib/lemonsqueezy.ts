@@ -70,7 +70,7 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
   pro: {
     id: 'pro',
     name: 'Teacher Pro',
-    price_monthly_usd: 5,
+    price_monthly_usd: 9,
     classes_limit: null,
     students_limit_per_class: null,
     features: [
@@ -78,11 +78,9 @@ const TIER_CONFIGS: Record<TierId, TierConfig> = {
       'Unlimited students',
       'Advanced analytics',
       'Custom word lists',
-      'Priority support',
-      'Export data (CSV/PDF)',
       'Classroom duel mode',
     ],
-    variantId: process.env.LEMONSQUEEZY_PRO_VARIANT_ID,
+    variantId: process.env.LEMONSQUEEZY_VARIANT_ID_PRO,
   },
 }
 
@@ -196,6 +194,13 @@ export class LemonSqueezyClient {
     })
 
     return response.data.attributes.url
+  }
+
+  /**
+   * Get subscription details from Lemon Squeezy
+   */
+  async getSubscription(subscriptionId: string): Promise<any> {
+    return this.request(`/subscriptions/${subscriptionId}`)
   }
 
   /**

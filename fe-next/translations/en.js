@@ -519,6 +519,18 @@ const en = {
       "ogTitle": "Contact LexiClash - We'd Love to Hear From You",
       "ogDescription": "Get in touch with the LexiClash team. Send feedback, report issues, or just say hello."
     },
+    "teacherUpgrade": {
+      "title": "Teacher Pro - Unlimited Classes & Students | LexiClash",
+      "description": "Upgrade to Teacher Pro for unlimited classrooms and unlimited students per class. $9/month. Manage your entire school vocabulary program with one subscription.",
+      "ogTitle": "Upgrade to Teacher Pro - Unlimited Classes",
+      "ogDescription": "Manage unlimited classrooms and students for $9/month. Scale your classroom vocabulary teaching with LexiClash Pro."
+    },
+    "refund": {
+      "title": "Refund & Cancellation Policy - LexiClash",
+      "description": "Learn about our refund and cancellation policy for LexiClash Pro subscriptions. Cancel anytime. Your data stays safe.",
+      "ogTitle": "Refund & Cancellation Policy",
+      "ogDescription": "Cancel your LexiClash Pro subscription anytime. Your data is safe. See our full refund policy."
+    },
     "faq": {
       "title": "Frequently Asked Questions About LexiClash Word Game",
       "description": "Find answers to common questions about LexiClash word game. Learn about gameplay, scoring, account management, multiplayer features, and technical support.",
@@ -4112,6 +4124,7 @@ const en = {
     "title": "Legal",
     "termsOfService": "Terms of Service",
     "privacyPolicy": "Privacy Policy",
+    "refundPolicy": "Refund & Cancellation Policy",
     "backToGame": "Back to Game",
     "lastUpdated": "Last updated",
     "lastUpdatedDate": "January 26, 2026",
@@ -11033,6 +11046,43 @@ const en = {
       },
       "standard": "Curriculum Standard",
       "lastUpdated": "Last Updated"
+    },
+    "subscription": {
+      "classLimitTitle": "You've Reached Your Class Limit",
+      "classLimitMessage": "You've created {{current}} of {{limit}} free classes. Upgrade to Pro for unlimited classes and students.",
+      "upgradeProDescription": "Pro gives you unlimited classrooms and unlimited students per class — no limits to grow your teaching.",
+      "proFeatures": "Pro Includes",
+      "unlimitedClasses": "Unlimited classrooms",
+      "unlimitedStudents": "Unlimited students per classroom",
+      "priceUSD": "Pro Subscription",
+      "perMonth": "/month",
+      "autoRenew": "Renews automatically each month. Cancel anytime.",
+      "upgradeNow": "Upgrade to Pro Now",
+      "checkoutError": "Failed to start checkout. Please try again.",
+      "currentPlan": "You're on this plan",
+      "upgradePricingTitle": "Upgrade to Teacher Pro",
+      "upgradePricingSubtitle": "Manage unlimited classrooms and students",
+      "freePlanName": "Free",
+      "freeForever": "Forever free, always available",
+      "free2Classes": "Up to 2 classes",
+      "free30Students": "Up to 30 students per class",
+      "basicWordTracking": "Basic word tracking",
+      "dailyProgressReports": "Daily progress reports",
+      "proPlanName": "Teacher Pro",
+      "unlimitedAccess": "Everything you need to scale",
+      "popular": "Most Popular",
+      "faqTitle": "Frequently Asked Questions",
+      "faqCancel": "Can I cancel anytime?",
+      "faqCancelAnswer": "Yes! Cancel your subscription anytime from your billing portal. Your Pro access continues through the end of the current month.",
+      "faqAutoRenew": "Will I be charged automatically?",
+      "faqAutoRenewAnswer": "Yes, your subscription renews monthly. You'll receive a reminder email before each renewal. Cancel anytime to stop future charges.",
+      "faqDataLoss": "Will I lose my data if I cancel?",
+      "faqDataLossAnswer": "No. If you cancel, your classrooms, lessons, and student data remain safe. You'll just revert to free-plan limits (2 classes, 30 students per class).",
+      "legalNote": "By upgrading, you agree to our Terms of Service and understand our Refund Policy.",
+      "refundPolicy": "Refund Policy",
+      "renewsOn": "Next renewal",
+      "canceledAt": "Cancellation pending at end of current period",
+      "manageSubscription": "Manage Subscription"
     }
   },
   "education": {

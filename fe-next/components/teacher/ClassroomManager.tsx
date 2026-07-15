@@ -13,6 +13,7 @@ import { Plus, Copy, Link2, Edit2, Trash2, Users, X, ChevronDown, ChevronUp } fr
 import toast from 'react-hot-toast';
 import type { Language } from '@/lib/supabase/education';
 import ClassroomStudentList from './ClassroomStudentList';
+import ClassLimitUpsellModal from './ClassLimitUpsellModal';
 import { ClassroomCardSkeleton, SkeletonGrid } from '@/components/ui/EducationSkeletons';
 
 export default function ClassroomManager() {
@@ -24,10 +25,12 @@ export default function ClassroomManager() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isUpsellModalOpen, setIsUpsellModalOpen] = useState(false);
   const [selectedClassroomId, setSelectedClassroomId] = useState<string | null>(null);
   const [expandedClassroomId, setExpandedClassroomId] = useState<string | null>(null);
   const [formData, setFormData] = useState({ name: '', language: language as Language });
   const [isSaving, setIsSaving] = useState(false);
+  const [upsellData, setUpsellData] = useState<{ currentCount: number; limit: number } | null>(null);
 
   const selectedClassroom = classrooms.find((c) => c.id === selectedClassroomId);
 
@@ -45,6 +48,11 @@ export default function ClassroomManager() {
       toast.success(t('teacher.classroom.created', { date: 'just now' }));
       setIsCreateDialogOpen(false);
       setFormData({ name: '', language: language as Language });
+    } else if (result.code === 'CLASS_LIMIT_REACHED' && result.currentCount !== undefined && result.limit !== undefined) {
+      // Show upsell modal for class limit
+      setUpsellData({ currentCount: result.currentCount, limit: result.limit ?? 2 });
+      setIsUpsellModalOpen(true);
+      setIsCreateDialogOpen(false);
     } else {
       toast.error(result.error || t('teacher.classroom.error.createFailed'));
     }
@@ -407,6 +415,16 @@ export default function ClassroomManager() {
           </AlertDialog.Content>
         </AlertDialog.Portal>
       </AlertDialog.Root>
+
+      {/* Class Limit Upsell Modal */}
+      {upsellData && (
+        <ClassLimitUpsellModal
+          isOpen={isUpsellModalOpen}
+          onClose={() => setIsUpsellModalOpen(false)}
+          currentCount={upsellData.currentCount}
+          limit={upsellData.limit}
+        />
+      )}
     </div>
   );
 }

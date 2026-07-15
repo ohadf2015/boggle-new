@@ -116,6 +116,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               <li><Link prefetch={false} href={`/${language}/legal`} className={legalLinkClass}>{t('legal.title')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/legal/privacy`} className={legalLinkClass}>{t('legal.privacyPolicy')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/legal/terms`} className={legalLinkClass}>{t('legal.termsOfService')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/legal/refund`} className={legalLinkClass}>{t('legal.refundPolicy')}</Link></li>
               <li><ManageCookiesButton /></li>
             </ul>
           </nav>

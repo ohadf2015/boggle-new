@@ -14,7 +14,7 @@ export type TermsContent = {
 export const contentByLocale: Record<string, TermsContent> = {
   en: {
     title: 'Terms of Service',
-    intro: 'Welcome to LexiClash. These Terms of Service govern your use of our multiplayer word game platform at lexiclash.live.',
+    intro: 'Welcome to LexiClash, a multiplayer word game and classroom platform at lexiclash.live, operated by Ohad Fisher, an individual sole proprietor based in Israel ("we", "us"). These Terms of Service govern your use of the service. Note: this document is not legal advice.',
     sections: [
       {
         title: '1. Acceptance of Terms',
@@ -26,7 +26,7 @@ export const contentByLocale: Record<string, TermsContent> = {
       },
       {
         title: '3. User Accounts',
-        content: 'You may create an account using Google or Discord authentication. You are responsible for maintaining the confidentiality of your account and for all activities that occur under your account. You must be at least 13 years old to create an account. You agree to provide accurate information and to update it as necessary.',
+        content: 'You may create an account using Google or Discord authentication. You are responsible for maintaining the confidentiality of your account and for all activities that occur under your account. You must be at least 13 years old to create your own account. Students under that age may only use LexiClash through a classroom managed by a teacher or school that has obtained any parental/guardian consent required by law. You agree to provide accurate information and to update it as necessary.',
       },
       {
         title: '4. User Conduct',
@@ -38,7 +38,7 @@ export const contentByLocale: Record<string, TermsContent> = {
       },
       {
         title: '6. Intellectual Property',
-        content: 'LexiClash and its original content, features, and functionality are owned by LexiClash Ltd and are protected by international copyright, trademark, and other intellectual property laws. Our trademarks and trade dress may not be used in connection with any product or service without our prior written consent.',
+        content: 'LexiClash and its original content, features, and functionality are owned by Ohad Fisher (operator of LexiClash) and are protected by international copyright, trademark, and other intellectual property laws. Our trademarks and trade dress may not be used in connection with any product or service without our prior written consent.',
       },
       {
         title: '7. Disclaimers',
@@ -46,11 +46,11 @@ export const contentByLocale: Record<string, TermsContent> = {
       },
       {
         title: '8. Limitation of Liability',
-        content: 'To the maximum extent permitted by law, LexiClash Ltd shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or goodwill, arising from your use of or inability to use the service. Our total liability shall not exceed the amount you paid us in the past twelve months.',
+        content: 'To the maximum extent permitted by law, Ohad Fisher (operator of LexiClash) shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including but not limited to loss of profits, data, or goodwill, arising from your use of or inability to use the service. Our total liability shall not exceed the amount you paid us in the past twelve months.',
       },
       {
         title: '9. Indemnification',
-        content: "You agree to defend, indemnify, and hold harmless LexiClash Ltd and its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including reasonable attorneys' fees) arising from your use of the service, your violation of these terms, or your violation of any rights of another.",
+        content: "You agree to defend, indemnify, and hold harmless Ohad Fisher (operator of LexiClash) and its officers, directors, employees, and agents from any claims, damages, losses, or expenses (including reasonable attorneys' fees) arising from your use of the service, your violation of these terms, or your violation of any rights of another.",
       },
       {
         title: '10. Termination',
@@ -71,6 +71,14 @@ export const contentByLocale: Record<string, TermsContent> = {
       {
         title: '14. Severability',
         content: 'If any provision of these terms is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary so that these terms shall otherwise remain in full force and effect. The failure to enforce any right or provision of these terms shall not be deemed a waiver of such right or provision.',
+      },
+      {
+        title: '15. Subscriptions, Billing & Cancellation',
+        content: 'Certain features ("Pro") require a paid subscription. Current plans and prices are shown at checkout and on our pricing page and may change on prospective notice. Payments are processed by Lemon Squeezy, which acts as the Merchant of Record / authorized reseller for LexiClash; your purchase is also subject to Lemon Squeezy\'s terms, and Lemon Squeezy handles billing and applicable taxes (e.g. VAT/sales tax). Subscriptions renew automatically each period at the then-current price until cancelled. You may cancel at any time through the billing/customer portal linked in your account and order-confirmation email; cancellation stops future renewals and your Pro access continues until the end of the current paid period. We do not store your full payment-card details. Refunds are governed by our Refund Policy.',
+      },
+      {
+        title: '16. Teacher & Classroom Use',
+        content: 'If you use LexiClash as a teacher, school, or organization, you represent that you are authorized to do so and to invite the students you add, and you are responsible for obtaining any parental/guardian consent required by law (e.g. COPPA, GDPR/GDPR-K, or local equivalents) before students use the service. You will submit only student personal data that is necessary and permitted, and you instruct us to process it to provide the service as described in our Privacy Policy. You agree to indemnify us for claims arising from your failure to obtain required consents.',
       },
     ],
   },

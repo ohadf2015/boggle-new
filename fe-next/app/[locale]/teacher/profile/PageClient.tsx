@@ -14,6 +14,7 @@ import { useClassrooms } from '@/hooks/useClassroom';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { NeoPanel } from '@/components/ui/panel';
+import SubscriptionStatusCard from '@/components/teacher/SubscriptionStatusCard';
 import { cn } from '@/lib/utils';
 import { GraduationCap, Users, BookOpen, Mail, ShieldCheck } from 'lucide-react';
 
@@ -165,6 +166,11 @@ function TeacherProfileInner() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Subscription Status Card */}
+        <div className="mb-8">
+          <SubscriptionStatusCard />
         </div>
 
         {/* Email Info */}

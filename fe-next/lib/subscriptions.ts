@@ -64,6 +64,13 @@ export async function checkTeacherSubscription(
 
 /**
  * Check if a teacher can create a new class.
+ *
+ * Grandfathering rule: caps apply only to NEW classes going forward.
+ * A free teacher with 0-1 classes can create up to 2.
+ * A free teacher at 2+ classes is blocked from adding more, but keeps their existing count.
+ * (This is equivalent to: allow iff currentCount < freeLimit, since at enforcement time
+ * currentCount is their actual existing count.)
+ *
  * Returns { allowed, reason, currentCount, limit }.
  */
 export async function canCreateClass(
@@ -79,23 +86,89 @@ export async function canCreateClass(
 
   // Count current classes
   const { count } = await supabase
-    .from('classes')
+    .from('classrooms')
     .select('*', { count: 'exact', head: true })
     .eq('teacher_id', userId)
 
   const currentCount = count || 0
 
-  // Pro users have unlimited classes
+  // Pro users (active subscription) have unlimited classes
   if (subscription.has_pro) {
     return { allowed: true, currentCount, limit: null }
   }
 
   const limit = subscription.classes_limit ?? 2
 
+  // Grandfathering: allow creation only if under the free limit
   if (currentCount >= limit) {
     return {
       allowed: false,
       reason: `You've reached the free tier limit of ${limit} classes. Upgrade to Pro for unlimited classes.`,
+      currentCount,
+      limit,
+    }
+  }
+
+  return { allowed: true, currentCount, limit }
+}
+
+/**
+ * Check if a teacher can add a student to a classroom.
+ *
+ * Grandfathering rule: caps apply only to NEW students going forward.
+ * A free teacher's classroom can have 0-29 students and accept one more.
+ * A free teacher's classroom at 30+ students is blocked from adding more.
+ *
+ * Returns { allowed, reason, currentCount, limit }.
+ */
+export async function canAddStudent(
+  classroomId: string
+): Promise<{
+  allowed: boolean
+  reason?: string
+  currentCount: number
+  limit: number | null
+}> {
+  const supabase = await createClient()
+
+  // Get the classroom to find its teacher
+  const { data: classroomData, error: classroomError } = await supabase
+    .from('classrooms')
+    .select('teacher_id')
+    .eq('id', classroomId)
+
+  if (classroomError || !classroomData || classroomData.length === 0) {
+    return {
+      allowed: false,
+      reason: 'Classroom not found',
+      currentCount: 0,
+      limit: 30,
+    }
+  }
+
+  const teacherId = classroomData[0].teacher_id
+  const subscription = await checkTeacherSubscription(teacherId)
+
+  // Count current students in this classroom
+  const { count } = await supabase
+    .from('classroom_memberships')
+    .select('*', { count: 'exact', head: true })
+    .eq('classroom_id', classroomId)
+
+  const currentCount = count || 0
+
+  // Pro users (active subscription) have unlimited students
+  if (subscription.has_pro) {
+    return { allowed: true, currentCount, limit: null }
+  }
+
+  const limit = subscription.students_limit_per_class ?? 30
+
+  // Grandfathering: allow addition only if under the free limit
+  if (currentCount >= limit) {
+    return {
+      allowed: false,
+      reason: `This classroom has reached the free tier limit of ${limit} students.`,
       currentCount,
       limit,
     }

@@ -16,7 +16,7 @@ export type PrivacyContent = {
 export const contentByLocale: Record<string, PrivacyContent> = {
   en: {
     title: 'Privacy Policy',
-    intro: 'This Privacy Policy explains how LexiClash Ltd collects, uses, and protects your personal information when you use our multiplayer word game at lexiclash.live.',
+    intro: 'This Privacy Policy explains how LexiClash — operated by Ohad Fisher, an individual sole proprietor based in Israel ("we", "us") — collects, uses, and protects your personal information when you use our multiplayer word game and classroom platform at lexiclash.live. This document is not legal advice.',
     sections: [
       {
         title: '1. Information We Collect',
@@ -109,6 +109,10 @@ export const contentByLocale: Record<string, PrivacyContent> = {
           'No sale of children\'s data — we never sell, rent, or share personal information of any user, including children, to third parties for marketing purposes',
           'Parent/guardian contact — parents or guardians may contact us at lexiclash.game@gmail.com to review, delete, or manage their child\'s information',
         ],
+      },
+      {
+        title: '13. Payments & Subscriptions',
+        content: 'When you purchase a Pro subscription, payment is processed by Lemon Squeezy, which acts as the Merchant of Record for LexiClash. We receive confirmation of your subscription (plan, status, and billing period) but we do not receive or store your full payment-card details, which are handled by Lemon Squeezy and its payment processors. Lemon Squeezy also handles applicable taxes. For classroom/teacher accounts, we process the student data you provide on your instruction to deliver the service, as described in these policies and our Terms of Service.',
       },
     ],
   },

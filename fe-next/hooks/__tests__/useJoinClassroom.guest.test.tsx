@@ -1,9 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook } from '@testing-library/react';
 
-const { mockUseAuth, mockJoinClassroomAPI, mockSignInAsGuest, mockWaitForProfile, mockCreateClient } = vi.hoisted(() => ({
+const { mockUseAuth, mockSignInAsGuest, mockWaitForProfile, mockCreateClient } = vi.hoisted(() => ({
   mockUseAuth: vi.fn(),
-  mockJoinClassroomAPI: vi.fn(),
   mockSignInAsGuest: vi.fn(),
   mockWaitForProfile: vi.fn(),
   mockCreateClient: vi.fn(() => ({ __client: true })),
@@ -23,27 +22,44 @@ vi.mock('@/lib/supabase/education', () => ({
   createClassroom: vi.fn(),
   updateClassroom: vi.fn(),
   deleteClassroom: vi.fn(),
-  joinClassroom: mockJoinClassroomAPI,
+  joinClassroom: vi.fn(),
 }));
 
 import { useJoinClassroom } from '../useClassroom';
 
+const JOIN_ROUTE = '/api/education/classroom/join';
+
 describe('useJoinClassroom — guest (account-less) path', () => {
+  let fetchMock: ReturnType<typeof vi.fn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
-    mockJoinClassroomAPI.mockResolvedValue({ data: { classroom_id: 'class-1' }, error: null });
     mockSignInAsGuest.mockResolvedValue({ user: { id: 'anon-1' }, error: null });
     mockWaitForProfile.mockResolvedValue(true);
+    // The join now goes through the cap-enforcing server route.
+    fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ classroomId: 'class-1' }),
+    });
+    vi.stubGlobal('fetch', fetchMock);
   });
 
-  it('logged-in student joins with their own id (no anonymous sign-in)', async () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('logged-in student joins via the server route (no anonymous sign-in)', async () => {
     mockUseAuth.mockReturnValue({ user: { id: 'real-1' } });
     const { result } = renderHook(() => useJoinClassroom());
 
     const res = await result.current.joinClassroom('ABC123');
 
     expect(mockSignInAsGuest).not.toHaveBeenCalled();
-    expect(mockJoinClassroomAPI).toHaveBeenCalledWith('ABC123', 'real-1');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const [url, init] = fetchMock.mock.calls[0];
+    expect(url).toBe(JOIN_ROUTE);
+    expect(JSON.parse(init.body)).toMatchObject({ joinCode: 'ABC123' });
     expect(res).toEqual({ success: true, classroomId: 'class-1' });
   });
 
@@ -54,9 +70,10 @@ describe('useJoinClassroom — guest (account-less) path', () => {
     const res = await result.current.joinClassroom('ABC123', { guestName: 'Maya' });
 
     expect(mockSignInAsGuest).toHaveBeenCalledWith({ __client: true }, 'Maya');
-    // Race-safe: profile awaited BEFORE join + navigation.
+    // Race-safe: profile awaited BEFORE the join request.
     expect(mockWaitForProfile).toHaveBeenCalledWith({ __client: true }, 'anon-1');
-    expect(mockJoinClassroomAPI).toHaveBeenCalledWith('ABC123', 'anon-1');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0][0]).toBe(JOIN_ROUTE);
     expect(res).toEqual({ success: true, classroomId: 'class-1' });
   });
 
@@ -67,7 +84,7 @@ describe('useJoinClassroom — guest (account-less) path', () => {
     const res = await result.current.joinClassroom('ABC123');
 
     expect(mockSignInAsGuest).not.toHaveBeenCalled();
-    expect(mockJoinClassroomAPI).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
     expect(res.success).toBe(false);
   });
 
@@ -78,8 +95,23 @@ describe('useJoinClassroom — guest (account-less) path', () => {
 
     const res = await result.current.joinClassroom('ABC123', { guestName: 'Maya' });
 
-    expect(mockJoinClassroomAPI).not.toHaveBeenCalled();
+    expect(fetchMock).not.toHaveBeenCalled();
     expect(res.success).toBe(false);
     expect(res.error).toContain('disabled');
+  });
+
+  it('surfaces the free-tier student cap (403) without an upgrade message', async () => {
+    mockUseAuth.mockReturnValue({ user: { id: 'real-1' } });
+    fetchMock.mockResolvedValueOnce({
+      ok: false,
+      status: 403,
+      json: async () => ({ error: 'STUDENT_LIMIT_REACHED', message: 'This classroom has reached its capacity. Please contact your teacher.' }),
+    });
+    const { result } = renderHook(() => useJoinClassroom());
+
+    const res = await result.current.joinClassroom('ABC123');
+
+    expect(res.success).toBe(false);
+    expect(res.error).toContain('capacity');
   });
 });

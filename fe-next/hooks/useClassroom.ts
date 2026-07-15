@@ -26,7 +26,7 @@ interface UseClassroomsState {
 
 interface UseClassroomsActions {
   refresh: () => Promise<void>;
-  createClassroom: (name: string, language: Language) => Promise<{ success: boolean; data?: Classroom; error?: string }>;
+  createClassroom: (name: string, language: Language) => Promise<{ success: boolean; data?: Classroom; error?: string; code?: string; currentCount?: number; limit?: number | null }>;
   updateClassroom: (id: string, updates: { name?: string; language?: Language }) => Promise<{ success: boolean; error?: string }>;
   deleteClassroom: (id: string) => Promise<{ success: boolean; error?: string }>;
 }
@@ -90,35 +90,52 @@ export function useClassrooms(): UseClassroomsReturn {
     await fetchClassrooms();
   }, [fetchClassrooms]);
 
-  // Create new classroom
+  // Create new classroom (calls server-side API route for enforcement)
   const createClassroom = useCallback(async (
     name: string,
     language: Language
-  ): Promise<{ success: boolean; data?: Classroom; error?: string }> => {
+  ): Promise<{ success: boolean; data?: Classroom; error?: string; code?: string; currentCount?: number; limit?: number | null }> => {
     if (!user) {
       return { success: false, error: 'Not authenticated' };
     }
 
     try {
-      const { data, error } = await createClassroomAPI({
-        teacher_id: user.id,
-        name,
-        language,
+      // Call server-side API route which enforces subscription limits
+      const response = await fetch('/api/education/classroom/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, language }),
       });
 
-      if (error) {
-        return { success: false, error: error.message };
+      if (response.status === 403) {
+        const data = await response.json();
+        return {
+          success: false,
+          error: data.message || 'Classroom limit reached. Upgrade to Pro for unlimited classrooms.',
+          code: data.error,
+          currentCount: data.currentCount,
+          limit: data.limit,
+        };
       }
 
+      if (!response.ok) {
+        const data = await response.json();
+        return { success: false, error: data.error || 'Failed to create classroom' };
+      }
+
+      const { data: classroom } = await response.json();
+
       // Optimistically update state
-      if (isMounted.current && data) {
+      if (isMounted.current && classroom) {
         setState(prev => ({
           ...prev,
-          classrooms: [{ ...data, member_count: 0 }, ...prev.classrooms],
+          classrooms: [{ ...classroom, member_count: 0 }, ...prev.classrooms],
         }));
       }
 
-      return { success: true, data: data || undefined };
+      return { success: true, data: classroom };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to create classroom';
       logger.error('Exception in createClassroom:', error);
@@ -366,14 +383,11 @@ export function useJoinClassroom() {
     options?: { guestName?: string }
   ): Promise<{ success: boolean; classroomId?: string; error?: string }> => {
     try {
-      let studentId = user?.id;
-
       // Account-less path: a logged-out student who supplied a name joins as an
-      // anonymous guest. We mint the anon identity, await the trigger-created
-      // profile (race-safe — the hub guard checks user && profile), then join
-      // with the new id. Without a name we keep the original not-authenticated
-      // guard so existing callers are unaffected.
-      if (!studentId) {
+      // anonymous guest. We mint the anon identity and await the trigger-created
+      // profile (race-safe) BEFORE joining, so the server route sees an
+      // authenticated session. Without a name we keep the not-authenticated guard.
+      if (!user?.id) {
         const guestName = options?.guestName?.trim();
         if (!guestName) {
           return { success: false, error: 'Not authenticated' };
@@ -384,16 +398,38 @@ export function useJoinClassroom() {
           return { success: false, error: guest.error || 'Failed to start guest session' };
         }
         await waitForProfile(supabase, guest.user.id);
-        studentId = guest.user.id;
       }
 
-      const { data, error } = await joinClassroomAPI(joinCode, studentId);
+      // Server-side API route enforces the free-tier student cap and reads the
+      // (now authenticated, possibly guest) session to identify the student.
+      const response = await fetch('/api/education/classroom/join', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          joinCode,
+          guestName: options?.guestName,
+        }),
+      });
 
-      if (error) {
-        return { success: false, error: error.message };
+      if (response.status === 403) {
+        const data = await response.json();
+        // Don't show upgrade message to students joining - it's not in their control
+        return {
+          success: false,
+          error: data.message || 'This classroom has reached its capacity. Please contact your teacher.',
+        };
       }
 
-      return { success: true, classroomId: data?.classroom_id };
+      if (!response.ok) {
+        const data = await response.json();
+        return { success: false, error: data.error || 'Failed to join classroom' };
+      }
+
+      const { classroomId } = await response.json();
+
+      return { success: true, classroomId };
     } catch (err) {
       const error = err instanceof Error ? err.message : 'Failed to join classroom';
       logger.error('Exception in joinClassroom:', error);
