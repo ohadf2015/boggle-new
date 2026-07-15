@@ -11,11 +11,11 @@
 
 ## Current (in progress)
 
-### crossword — readiness: 85% — status: IN PROGRESS
+### crossword — readiness: 88% — status: IN PROGRESS
 - **Why next:** standalone route, recently made endless; verify generator + newspaper UX + i18n + a11y.
 - **Reach for QA:** `/en/crossword` (no admin gate — publicly accessible; noindexed only).
 - **Key files:** `components/crossword/*`, `lib/crossword/*`, `app/[locale]/crossword/{page,PageClient}.tsx`.
-- **Last audited:** 2026-07-14
+- **Last audited:** 2026-07-15
 
 ### Audit areas covered
 
@@ -36,6 +36,13 @@
 - 🔧 **useCrosswordGame opts spurious effect runs** — FIXED: inline `opts` object in CrosswordView.tsx:63 caused `[state, opts]`/`[state.status, opts, puzzle]` deps to fire extra times each render. Added `onSolvedRef`/`onWordSolvedRef` stable refs; removed `opts` from both deps arrays.
 - ✅ **Open issue review** — remaining 5 items all non-blocking: QWERTY fallback (expected), font-serif (intentional), noindex (founder call), ja/ru English puzzles (expected), O(n²) stats.ts (negligible at 5×5).
 
+**2026-07-15 — fourth pass**
+- 🔧 **ClueScramble 380ms timer cleanup** — FIXED: inline `setTimeout(() => onResultRef.current(true), 380)` in `handleChange` had no cleanup. Refactored to `useEffect` watching `success` state with `return () => clearTimeout(id)` — prevents stale `onResult(true)` call if component unmounts during the success delay.
+- 🔧 **ClueScramble scrambled-tiles aria-hidden** — FIXED: the display-only letter tiles div had no `aria-hidden`; screen readers would narrate scrambled chars (confusing). Added `aria-hidden="true"` on the tiles container. Input already has `aria-label`.
+- ✅ **ClueScramble i18n** — all 3 keys (`title`/`skip`/`streakAria`) verified in all 6 locales (en/he/sv/ja/es/ru). CLEAN.
+- ✅ **ClueScramble integration** — `handleScrambleResult` wiring, `pendingSlot` ref safety, `scrambleAttempted` Set (once-per-slot guard) — CLEAN.
+- ✅ **TDD** — added failing test `does NOT call onResult(true) if unmounted before the 380ms success delay` (RED before fix, GREEN after).
+
 **2026-07-13 — second pass**
 - ✅ **Bugs/correctness (deep)** — `gameState.ts` pure state machine audited: cursor advance, backspace, reveal, check, warmth hint — all correct. `answer.ts`: locale-aware normalization, Hebrew sofit, Spanish accent fold — clean. `progress.ts`: SSR-safe, quota-tolerant — clean.
 - ✅ **Generator correctness** — `generate.core.ts`: CSP backtracking filler with MRV heuristic, de-dup set, bounded steps — no infinite loop. `generate.daily.ts`: deterministic seeding, fallback chain. `generate.runtime.ts`: 60-retry × 5000-step cap, prefer-set difficulty lever — clean.
@@ -51,6 +58,8 @@
 | 3 | info | `page.tsx:11` | noindex in place — intentional until a landing surface is added. | founder call |
 | 4 | info | `generate.daily.ts:35` | ja/ru locale players receive English-language puzzles (no native crossword bank). Expected. | future |
 | 5 | negligible | `stats.ts:43` | O(n²) `puzzle.cells.find(...)` inside per-slot loop. Trivial at 5×5 scale. | future |
+| 6 | minor | `CrosswordView.tsx:350` | No UX explanation of what ClueScramble overlay is or what solving/skipping does — new players may be confused. Design call. | review-by-eod |
+| 7 | negligible | `ClueScramble.test.tsx:60` | Countdown test simplified from per-tick `act()` loop to single sync `advanceTimersByTime`. Works in React 18 auto-batching but less robust. | future |
 
 ## Queue (audit order — closest-to-release first)
 

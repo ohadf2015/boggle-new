@@ -1563,3 +1563,29 @@ _Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all fl
   - evidence: https://lexiclash.sentry.io/issues/132569197/
   - status: deferred (Sentry MCP unavailable, score=0.16 low priority)
   - recommended owner: backend
+
+## 2026-07-15
+- [Sentry] CapacitorGameConnect.then() not implemented on android (1PH)
+  - first_seen: ~2026-07-05, last_seen: 2026-07-14, count: 7 users
+  - link: https://lexiclash.sentry.io/issues/132085085/
+  - status: deferred (nativePGS.ts already has the fix; remaining 7 occurrences may be stale sessions or edge cases requiring device testing)
+  - why: root cause already fixed in utils/nativePGS.ts (Capacitor.isPluginAvailable guard + synchronous plugin read); persistent occurrences need device-level investigation
+  - recommended owner: review-by-eod
+
+- [Supabase] SECURITY DEFINER function upsert_push_token executable by authenticated role
+  - link: supabase:advisor:security:authenticated_security_definer_function_executable
+  - status: deferred (pending Sentry MCP availability to grep callsites + Supabase MCP to apply REVOKE)
+  - why: autonomy matrix SHIP (no anon callers found in lib/supabase/), but Supabase MCP unavailable tonight
+  - recommended owner: self (apply REVOKE on next MCP-available night)
+
+- [Supabase] RLS policy always true on teacher_access_requests INSERT (tar_insert_any)
+  - link: supabase:advisor:security:rls_policy_always_true
+  - status: deferred (pending Supabase MCP to apply fix)
+  - why: autonomy matrix SHIP (RLS policy ADDITION, reversible), but Supabase MCP unavailable
+  - recommended owner: self (apply on next MCP-available night)
+
+- [Sentry] <unknown> JAVASCRIPT-NEXTJS-1R3
+  - link: https://lexiclash.sentry.io/issues/132569197/
+  - status: deferred (Sentry MCP unavailable for stack trace; reach=0)
+  - why: reach=0 in last 24h, low priority
+  - recommended owner: review-by-eod
