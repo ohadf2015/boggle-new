@@ -58,6 +58,25 @@ Set these in GitHub repository settings → Secrets and variables → Actions:
 2. Create a new token with a descriptive name (e.g., "GitHub Actions")
 3. Copy the token and add it as `RAILWAY_TOKEN` secret in GitHub
 
+## Railway Runtime Environment Variables
+
+These are set **on the Railway service** (Variables tab), NOT as GitHub Actions
+secrets — they are read at runtime by the running app, not at build/deploy time.
+Missing any of them makes `/api/checkout` return `{"error":"Checkout failed"}`
+(the real cause — e.g. `LEMONSQUEEZY_API_KEY is not configured` — is logged
+server-side, not returned to the client).
+
+| Variable | Description | Consumed by |
+|----------|-------------|-------------|
+| `LEMONSQUEEZY_API_KEY` | Lemon Squeezy API key (secret) | `lib/lemonsqueezy.ts` — checkout |
+| `LEMONSQUEEZY_STORE_ID` | Store ID (`429079`) | `lib/lemonsqueezy.ts` — checkout |
+| `LEMONSQUEEZY_VARIANT_ID_PRO` | Teacher Pro variant ID (`1910376`) | `lib/lemonsqueezy.ts` — checkout |
+| `LEMONSQUEEZY_WEBHOOK_SECRET` | Webhook signing secret (secret) | `app/api/webhook/lemonsqueezy/route.ts` |
+
+The webhook (ID `119176`) points to
+`https://www.lexiclash.live/api/webhook/lemonsqueezy`; its signing secret must
+match `LEMONSQUEEZY_WEBHOOK_SECRET` or signature validation fails closed.
+
 ## Branch Protection Rules
 
 To enforce CI passing before merge:
