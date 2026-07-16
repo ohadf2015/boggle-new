@@ -97,7 +97,7 @@ const en: LocaleContent = {
     },
     {
       q: 'How much does it cost?',
-      a: 'Completely free. No ads, no login wall, no premium tier for teachers. Classroom play is forever free.'
+      a: 'Free to start — no ads, no login wall, no per-seat fees. Basic classroom play stays free for individual teachers; Teacher Pro ($9/mo) adds unlimited classes.'
     },
     {
       q: 'Will it work on our school WiFi?',
@@ -199,7 +199,7 @@ const sv: LocaleContent = {
     },
     {
       q: 'Hur mycket kostar det?',
-      a: 'Helt gratis. Inga annonser, ingen inloggningsvagg, ingen premiumniva for larare. Klassrumsspel ar alltid gratis.'
+      a: 'Gratis att börja — inga annonser, ingen inloggningsvägg, inga avgifter per elev. Det grundläggande klassrumsspelet är gratis för enskilda lärare; Teacher Pro ($9/mån) lägger till obegränsade klasser.'
     },
     {
       q: 'Fungerar det pa var skolans WiFi?',
@@ -301,7 +301,7 @@ const ja: LocaleContent = {
     },
     {
       q: 'それはいくらですか？',
-      a: '完全に無料です。広告なし、ログイン壁なし、教師向けのプレミアム層なし。クラスルームプレイは永遠に無料です。'
+      a: '無料で開始 — 広告なし、ログイン壁なし、生徒ごとの料金なし。基本的なクラスルームプレイは個人の先生向けに無料のまま。Teacher Pro（月$9）でクラスが無制限になります。'
     },
     {
       q: '学校のWiFiで動作しますか？',
@@ -403,7 +403,7 @@ const es: LocaleContent = {
     },
     {
       q: 'Cuanto cuesta?',
-      a: 'Completamente gratis. Sin anuncios, sin muro de inicio de sesion, sin nivel premium para maestros. El juego de aula es siempre gratis.'
+      a: 'Gratis para empezar — sin anuncios, sin muro de inicio de sesión, sin cargos por alumno. El juego básico de aula es gratis para docentes individuales; Teacher Pro ($9/mes) agrega clases ilimitadas.'
     },
     {
       q: 'Funcionara en nuestro WiFi escolar?',
@@ -505,7 +505,7 @@ const he: LocaleContent = {
     },
     {
       q: 'כמה זה עולה?',
-      a: 'לגמרי חינם. ללא מודעות, ללא קיר התחברות, ללא שכבת פרימיום למורים. משחק כיתה הוא תמיד חינם.'
+      a: 'חינם להתחלה — בלי מודעות, בלי קיר התחברות, בלי עלות לכל תלמיד. המשחק הכיתתי הבסיסי נשאר חינם למורים בודדים; מסלול Teacher Pro ($9 לחודש) מוסיף כיתות ללא הגבלה.'
     },
     {
       q: 'האם זה יעבוד ב-WiFi של בית הספר שלנו?',
@@ -607,7 +607,7 @@ const ru: LocaleContent = {
     },
     {
       q: 'Сколько это стоит?',
-      a: 'Полностью бесплатно. Нет объявлений, нет платежа, нет премиум-уровня для учителей. Классная игра всегда бесплатна.'
+      a: 'Бесплатно начать — без рекламы, без стены входа, без платы за ученика. Базовая классная игра бесплатна для отдельных учителей; Teacher Pro ($9 в месяц) добавляет неограниченные классы.'
     },
     {
       q: 'Будет ли работать на школьном WiFi?',

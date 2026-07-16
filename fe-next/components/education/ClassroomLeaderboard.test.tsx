@@ -547,7 +547,7 @@ describe('ClassroomLeaderboard', () => {
       );
 
       // THEN: Should have ARIA label
-      expect(screen.getByLabelText('Classroom leaderboard showing top students')).toBeInTheDocument();
+      expect(screen.getByLabelText('education.leaderboard.ariaLabel')).toBeInTheDocument();
     });
 
     it('includes alt text for avatars', () => {

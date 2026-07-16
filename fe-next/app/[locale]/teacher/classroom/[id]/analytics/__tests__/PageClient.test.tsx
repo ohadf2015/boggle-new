@@ -235,7 +235,7 @@ describe('AnalyticsPageClient', () => {
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
     expect(screen.getByText(/Alice/)).toBeInTheDocument();
-    expect(screen.getByText(/completed a lesson/)).toBeInTheDocument();
+    expect(screen.getByText(/activityCompletedLesson/)).toBeInTheDocument();
   });
 
   it('should show different connection statuses', () => {
@@ -306,9 +306,9 @@ describe('AnalyticsPageClient', () => {
 
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
-    expect(screen.getByText('Recent Activity')).toBeInTheDocument();
+    expect(screen.getByText('education.analytics.recentActivity')).toBeInTheDocument();
     expect(screen.getByText(/Bob/)).toBeInTheDocument();
-    expect(screen.getByText(/gained XP/)).toBeInTheDocument();
+    expect(screen.getByText(/activityGainedXp/)).toBeInTheDocument();
   });
 
   it('should limit recent activity to 5 items', () => {
@@ -327,7 +327,7 @@ describe('AnalyticsPageClient', () => {
     render(<AnalyticsPageClient classroomId="classroom-1" locale="en" />);
 
     // Should show max 5 activities
-    const activityElements = screen.getAllByText(/attempted a word/);
+    const activityElements = screen.getAllByText(/activityAttemptedWord/);
     expect(activityElements.length).toBeLessThanOrEqual(5);
   });
 });

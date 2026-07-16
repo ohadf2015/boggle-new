@@ -161,7 +161,7 @@ describe('EducationBadgeGrid', () => {
         />
       );
 
-      const progressBar = screen.getByRole('progressbar', { name: /overall progress/i });
+      const progressBar = screen.getByRole('progressbar', { name: /ariaOverallProgress/i });
       expect(progressBar).toBeInTheDocument();
       expect(progressBar).toHaveAttribute('aria-valuenow', '50');
       expect(progressBar).toHaveAttribute('aria-valuemax', '100');

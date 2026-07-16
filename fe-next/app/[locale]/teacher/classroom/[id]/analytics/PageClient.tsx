@@ -268,7 +268,7 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
             )}
           >
             <h3 className="text-lg font-neo-display text-neo-white mb-3">
-              Recent Activity
+              {t('education.analytics.recentActivity')}
             </h3>
             <div className="space-y-2">
               {recentActivity.slice(0, 5).map((activity, index) => (
@@ -280,10 +280,10 @@ function AnalyticsPageClientInner({ classroomId, locale }: AnalyticsPageClientPr
                     {activity.studentName}{' '}
                     <span className="text-neo-cyan">
                       {activity.activity === 'lesson_completed'
-                        ? 'completed a lesson'
+                        ? t('education.analytics.activityCompletedLesson')
                         : activity.activity === 'xp_gained'
-                        ? 'gained XP'
-                        : 'attempted a word'}
+                        ? t('education.analytics.activityGainedXp')
+                        : t('education.analytics.activityAttemptedWord')}
                     </span>
                   </span>
                   <span className="text-neo-white text-xs">

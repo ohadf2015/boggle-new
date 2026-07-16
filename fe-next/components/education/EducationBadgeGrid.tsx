@@ -154,7 +154,7 @@ export default function EducationBadgeGrid({
           <div
             className="h-4 bg-neo-navy-light border-neo border-neo-black rounded-neo overflow-hidden"
             role="progressbar"
-            aria-label="Overall progress"
+            aria-label={t('education.achievements.ariaOverallProgress')}
             aria-valuenow={completionPercent}
             aria-valuemax={100}
           >
@@ -302,7 +302,7 @@ export default function EducationBadgeGrid({
               type="button"
               onClick={clearError}
               className="font-bold hover:underline"
-              aria-label="Dismiss error"
+              aria-label={t('education.achievements.ariaDismissError')}
             >
               ×
             </button>

@@ -26,6 +26,14 @@ export type LocaleContent = {
     ctaPrimaryButtonLabel: string;
     ctaSecondaryButtonLabel: string;
   };
+  heroCtaStartGame: string;
+  heroCtaTeacherHub: string;
+  heroCtaTeacherHubSub: string;
+  whatYouGetTitle: string;
+  relatedResourcesAriaLabel: string;
+  relatedVocabLink: string;
+  relatedEslLink: string;
+  relatedEducationLink: string;
 };
 
 export const EDUCATION_LOCALES = ['en', 'he', 'es', 'sv', 'ja', 'ru'] as const;
@@ -101,6 +109,14 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
         a: 'No. Any device with a browser works: Chromebooks, iPads, laptops, or student phones. Works offline in classrooms with patchy WiFi via cached assets.',
       },
     ],
+    heroCtaStartGame: '▶ Start a Class Game',
+    heroCtaTeacherHub: '⚙ Teacher Hub',
+    heroCtaTeacherHubSub: 'Word lists · Dashboard',
+    whatYouGetTitle: 'What you get.',
+    relatedResourcesAriaLabel: 'Related education resources',
+    relatedVocabLink: '→ Classroom Vocabulary Games',
+    relatedEslLink: '→ ESL Word Games',
+    relatedEducationLink: '→ Education Hub',
   },
   he: {
     metaTitle: 'משחקי מילים חינמיים למורים — בלי הכנה, עם אנליטיקה | LexiClash',
@@ -171,6 +187,14 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
         a: 'לא. כל דפדפן מספיק: טלפונים, טאבלטים ומחשבים. עובד אפילו עם WiFi חלש.',
       },
     ],
+    heroCtaStartGame: '▶ התחל משחק כיתה',
+    heroCtaTeacherHub: '⚙ ממשק מורה',
+    heroCtaTeacherHubSub: 'רשימות מילים · לוח בקרה',
+    whatYouGetTitle: 'מה אתה מקבל.',
+    relatedResourcesAriaLabel: 'משאבי חינוך קשורים',
+    relatedVocabLink: '→ משחקי אוצר מילים לכיתה',
+    relatedEslLink: '→ משחקי מילים ESL',
+    relatedEducationLink: '→ מרכז החינוך',
   },
   es: {
     metaTitle: 'Juegos gratis para maestros — Sin preparación, análisis | LexiClash',
@@ -241,6 +265,14 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
         a: 'No. Cualquier dispositivo. Funciona hasta con WiFi deficiente.',
       },
     ],
+    heroCtaStartGame: '▶ Iniciar un juego de clase',
+    heroCtaTeacherHub: '⚙ Panel del maestro',
+    heroCtaTeacherHubSub: 'Listas de palabras · Panel de control',
+    whatYouGetTitle: 'Lo que obtienes.',
+    relatedResourcesAriaLabel: 'Recursos de educación relacionados',
+    relatedVocabLink: '→ Juegos de vocabulario en el aula',
+    relatedEslLink: '→ Juegos de palabras ESL',
+    relatedEducationLink: '→ Centro de educación',
   },
   sv: {
     metaTitle: 'Gratis ordspel för lärare — Ingen förberedelse, analys | LexiClash',
@@ -311,6 +343,14 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
         a: 'Nej. Alla enheter med en webbläsare fungerar: Chromebooks, iPad-skivor, bärbara datorer eller elevtelefoner. Fungerar i klassrum med instabil WiFi via cachade tillgångar.',
       },
     ],
+    heroCtaStartGame: '▶ Starta ett klassrumsspel',
+    heroCtaTeacherHub: '⚙ Lärarpanel',
+    heroCtaTeacherHubSub: 'Ordlistor · Kontrollpanel',
+    whatYouGetTitle: 'Vad du får.',
+    relatedResourcesAriaLabel: 'Relaterade utbildningsresurser',
+    relatedVocabLink: '→ Ordförrådsord för klassrum',
+    relatedEslLink: '→ ESL-ordspel',
+    relatedEducationLink: '→ Utbildningscentral',
   },
   ja: {
     metaTitle: '無料単語ゲーム — 先生向け、準備なし | LexiClash',
@@ -381,6 +421,14 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
         a: 'いいえ。ブラウザを備えたすべてのデバイスが機能します：Chromebook、iPad、ラップトップ、または生徒の携帯電話。WiFiが不安定な教室でもキャッシュされたアセットを通じて機能します。',
       },
     ],
+    heroCtaStartGame: '▶ クラスゲームを開始',
+    heroCtaTeacherHub: '⚙ 先生向けハブ',
+    heroCtaTeacherHubSub: '単語リスト · ダッシュボード',
+    whatYouGetTitle: '何が得られるか。',
+    relatedResourcesAriaLabel: '関連の教育リソース',
+    relatedVocabLink: '→ クラスルーム語彙ゲーム',
+    relatedEslLink: '→ ESL単語ゲーム',
+    relatedEducationLink: '→ 教育ハブ',
   },
   ru: {
     metaTitle: 'Бесплатные словесные игры для учителей — Без подготовки, аналитика | LexiClash',
@@ -451,6 +499,14 @@ const contentMap: Record<EducationLocale, LocaleContent> = {
         a: 'Нет. Работает на любом устройстве с браузером: Chromebook, iPad, ноутбуках или телефонах учеников. Функционирует даже в классах с нестабильным WiFi благодаря кэшированным ресурсам.',
       },
     ],
+    heroCtaStartGame: '▶ Начать игру для класса',
+    heroCtaTeacherHub: '⚙ Кабинет учителя',
+    heroCtaTeacherHubSub: 'Списки слов · Панель управления',
+    whatYouGetTitle: 'Что ты получаешь.',
+    relatedResourcesAriaLabel: 'Связанные образовательные ресурсы',
+    relatedVocabLink: '→ Игры на словарный запас в классе',
+    relatedEslLink: '→ Игры на английском языке',
+    relatedEducationLink: '→ Образовательный центр',
   },
 };
 

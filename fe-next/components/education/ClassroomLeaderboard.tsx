@@ -443,7 +443,7 @@ const ClassroomLeaderboard = memo<ClassroomLeaderboardProps>(
       <div
         data-testid="classroom-leaderboard"
         dir={isRTL ? 'rtl' : 'ltr'}
-        aria-label="Classroom leaderboard showing top students"
+        aria-label={t('education.leaderboard.ariaLabel')}
         className={cn('w-full space-y-4', className)}
       >
         {/* Header */}

@@ -11403,6 +11403,8 @@ const sv = {
       "backToClass": "Tillbaka till klassrum",
       "selectClassroom": "Välj klassrum",
       "loading": "Laddar rapport...",
+      "loadingClassrooms": "Laddar klassrum...",
+      "noClassroomsFound": "Inga klassrum hittades",
       "error": "Fel vid laddning av rapport",
       "noData": "Ingen data tillgänglig",
       "metrics": {
@@ -11523,6 +11525,8 @@ const sv = {
       "coinReward": "+{{amount}} mynt"
     },
     "achievements": {
+      "ariaDismissError": "Avfärda fel",
+      "ariaOverallProgress": "Övergripande framsteg",
       "completion": "{{percent}}% klart",
       "continue": "Fortsätt!",
       "earned": "{{count}} av {{total}} uppnådda",
@@ -11574,6 +11578,9 @@ const sv = {
     },
     "analytics": {
       "accuracy": "Träffsäkerhet",
+      "activityAttemptedWord": "försökte ett ord",
+      "activityCompletedLesson": "slutförde en lektion",
+      "activityGainedXp": "fick XP",
       "activeNow": "{{count}} online just nu",
       "activeStudentsToday": "Aktiva idag",
       "assignLessons": "Tilldela lektioner",
@@ -11605,6 +11612,7 @@ const sv = {
       "noVocabularyData": "Ingen ordförrådsdata",
       "offline": "Offline",
       "practiceToSee": "Gör övningar för att se statistik",
+      "recentActivity": "Senaste aktivitet",
       "retry": "Försök igen",
       "streak": "{{count}} dagars träning",
       "struggling": "Behöver stöd",
@@ -11708,11 +11716,11 @@ const sv = {
       "startGame": "Starta spel",
       "hero": {
         "eyebrow": "För ordundervisning på svenska, hebreiska, japanska, engelska och spanska",
-        "h1": "Gratis ordförrådsspel för ditt klassrum — utan elevkonton.",
-        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 5 språk, gratis för lärare.",
+        "h1": "Ordförrådsspel för ditt klassrum — utan elevkonton.",
+        "sub": "Ordspel med multiplayer för hela klassen och dina egna ordlistor. Inga konton, inga annonser, inga nedladdningar — spela i valfri webbläsare. Byggt nativt för 5 språk. Gratis basplan för lärare; Teacher Pro kostar $9/månad för obegränsade klasser och elever.",
         "cta_primary": "Få lärargång",
         "cta_secondary": "Visa demo",
-        "cta_note": "Gratis för lärare • Godkänd inom ~24 h",
+        "cta_note": "Gratis basplan att börja med • Godkänd inom ~24 h",
         "cta_schools": "Skola eller distrikt? Se planer →"
       },
       "mock": {
@@ -11801,7 +11809,7 @@ const sv = {
           "live_multiplayer": "Multiplayer ordspel",
           "brain_training": "Hjärnövningar (minne, fokus)",
           "game_variety": "6 olika spellägen",
-          "free_for_teachers": "Gratis för verifierade lärare"
+          "free_for_teachers": "Gratis basplan för lärare"
         }
       },
       "trust": {
@@ -11817,8 +11825,8 @@ const sv = {
           "a": "Ansök på education/access — det tar två minuter. Vi granskar och svarar oftast inom 24 timmar."
         },
         "q2": {
-          "q": "Kostar det något?",
-          "a": "Nej. Helt gratis för verifierade lärare. Noll kostnader, noll annonser."
+          "q": "Finns det en gratisplan?",
+          "a": "Ja — en gratis basplan för verifierade lärare: upp till 2 klasser, 30 elever var, inga annonser för elever. Teacher Pro ($9/månad) låser upp obegränsade klasser och elever."
         },
         "q3": {
           "q": "Stöder LexiClash hebreiska, japanska, svenska och spanska?",
@@ -11852,8 +11860,8 @@ const sv = {
       },
       "teacherLeadCta": {
         "title": "Är du lärare?",
-        "body": "LexiClash är gratis för enskilda lärare — få support och klassrumstips.",
-        "button": "Få gratis läraråtkomst"
+        "body": "LexiClash har en gratis basplan för lärare — uppgradera till Pro för obegränsade klasser.",
+        "button": "Få läraråtkomst"
       },
       "districtCta": {
         "title": "För skolor och distrikt",
@@ -11873,6 +11881,7 @@ const sv = {
     },
     "leaderboard": {
       "allTime": "All tid",
+      "ariaLabel": "Klassrummets topplista med de bästa eleverna",
       "inactive": "Inaktiv",
       "level": "Nivå {{level}}",
       "monthly": "Denna månad",

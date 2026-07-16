@@ -138,12 +138,12 @@ export default async function Page({ params }: PageProps) {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link href={`/${locale}/education/classroom-game`} className="rounded-neo border-4 border-neo-black bg-neo-purple px-7 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg transition-all hover:-translate-x-1 hover:-translate-y-1 hover:shadow-hard-xl">
-                <span className="block text-base sm:text-lg">▶ Start a Class Game</span>
+                <span className="block text-base sm:text-lg">{c.heroCtaStartGame}</span>
                 <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">{c.ctaSubLabel}</span>
               </Link>
               <Link href={`/${locale}/education`} className="rounded-neo border-4 border-neo-black bg-neo-cyan px-6 py-4 text-center font-neo-display font-black uppercase tracking-wider text-neo-navy shadow-hard transition-all hover:-translate-x-0.5 hover:-translate-y-0.5 hover:shadow-hard-lg sm:px-7">
-                <span className="block text-base sm:text-lg">⚙ Teacher Hub</span>
-                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">Word lists · Dashboard</span>
+                <span className="block text-base sm:text-lg">{c.heroCtaTeacherHub}</span>
+                <span className="block text-[10px] font-bold uppercase tracking-widest opacity-70">{c.heroCtaTeacherHubSub}</span>
               </Link>
             </div>
           </div>
@@ -151,7 +151,7 @@ export default async function Page({ params }: PageProps) {
 
         <ScrollRevealSection className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">
-            What you get.
+            {c.whatYouGetTitle}
           </h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {c.features.map((f, i) => (
@@ -196,10 +196,10 @@ export default async function Page({ params }: PageProps) {
           </div>
         </ScrollRevealSection>
 
-        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label="Related education resources">
-          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">→ Classroom Vocabulary Games</Link>
-          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">→ ESL Word Games</Link>
-          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">→ Education Hub</Link>
+        <nav className="mt-16 flex flex-wrap gap-3 text-sm font-bold" aria-label={c.relatedResourcesAriaLabel}>
+          <Link href={`/${locale}/education/vocabulary-games-classroom`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-lime transition-all hover:bg-neo-navy">{c.relatedVocabLink}</Link>
+          <Link href={`/${locale}/education/esl-word-games`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-cyan transition-all hover:bg-neo-navy">{c.relatedEslLink}</Link>
+          <Link href={`/${locale}/education`} className="rounded-neo border-2 border-neo-black bg-neo-navy-light px-4 py-2 text-neo-white transition-all hover:bg-neo-navy">{c.relatedEducationLink}</Link>
         </nav>
 
         <section className="mt-12 mb-12 rounded-neo border-4 border-neo-black bg-neo-purple p-8 text-neo-white shadow-hard-xl sm:p-12">

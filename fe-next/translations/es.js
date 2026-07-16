@@ -11249,6 +11249,8 @@ const es = {
       "backToClass": "Volver al Aula",
       "selectClassroom": "Seleccionar Aula",
       "loading": "Cargando reporte...",
+      "loadingClassrooms": "Cargando aulas...",
+      "noClassroomsFound": "No se encontraron aulas",
       "error": "Error al cargar reporte",
       "noData": "Sin datos disponibles",
       "metrics": {
@@ -11443,6 +11445,8 @@ const es = {
       "coinReward": "+{{amount}} monedas"
     },
     "achievements": {
+      "ariaDismissError": "Descartar error",
+      "ariaOverallProgress": "Progreso general",
       "completion": "{{percent}}% completado",
       "continue": "¡Sigue así!",
       "earned": "{{count}} de {{total}} obtenidos",
@@ -11494,6 +11498,9 @@ const es = {
     },
     "analytics": {
       "accuracy": "Precisión",
+      "activityAttemptedWord": "intentó una palabra",
+      "activityCompletedLesson": "completó una lección",
+      "activityGainedXp": "ganó XP",
       "activeNow": "{{count}} estudiantes activos",
       "activeStudentsToday": "Activos hoy",
       "assignLessons": "Asignar lecciones",
@@ -11525,6 +11532,7 @@ const es = {
       "noVocabularyData": "Sin datos de vocabulario",
       "offline": "Desconectado",
       "practiceToSee": "Los datos aparecen después de practicar",
+      "recentActivity": "Actividad Reciente",
       "retry": "Reintentar",
       "streak": "Racha: {{count}} días",
       "struggling": "Necesita apoyo",
@@ -11628,11 +11636,11 @@ const es = {
       "startGame": "Iniciar juego",
       "hero": {
         "eyebrow": "Para docentes de inglés, hebreo, sueco, japonés y español",
-        "h1": "Juegos de vocabulario gratis para tu aula — sin cuentas de estudiantes.",
-        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 5 idiomas, gratis para docentes.",
+        "h1": "Juegos de vocabulario para tu aula — sin cuentas de estudiantes.",
+        "sub": "Juegos de palabras multijugador para toda la clase con tus propias listas de palabras. Sin cuentas, sin anuncios, sin descargas — juega en cualquier navegador. Diseñado de forma nativa para 5 idiomas. Plan básico gratis para docentes; Teacher Pro cuesta $9/mes por clases y estudiantes ilimitados.",
         "cta_primary": "Solicitar acceso como docente",
         "cta_secondary": "Ver demo",
-        "cta_note": "Gratis para docentes • Aprobado en ~24 h",
+        "cta_note": "Plan gratis para empezar • Aprobado en ~24 h",
         "cta_schools": "¿Escuela o distrito? Ver planes →"
       },
       "mock": {
@@ -11721,7 +11729,7 @@ const es = {
           "live_multiplayer": "Multijugador en vivo + asincronos",
           "brain_training": "Ejercicios mentales integrados",
           "game_variety": "6 modos (no solo quizzes)",
-          "free_for_teachers": "Totalmente gratis para docentes"
+          "free_for_teachers": "Plan básico gratis para docentes"
         }
       },
       "trust": {
@@ -11737,8 +11745,8 @@ const es = {
           "a": "Ingresa en /education/access. Revisamos manualmente. Respuesta en menos de 24 horas."
         },
         "q2": {
-          "q": "¿Cuesta dinero?",
-          "a": "No. Totalmente gratis para docentes verificados. Cero costos ocultos."
+          "q": "¿Hay un plan gratis?",
+          "a": "Sí — un plan básico gratis para docentes verificados: hasta 2 clases, 30 estudiantes cada una, sin anuncios para estudiantes. Teacher Pro ($9/mes) desbloquea clases y estudiantes ilimitados."
         },
         "q3": {
           "q": "¿Soporta hebreo, japonés, sueco y español?",
@@ -11767,13 +11775,13 @@ const es = {
       },
       "cta": {
         "title": "¿Listo para traer LexiClash a tu aula?",
-        "body": "Solicita acceso gratis. 60 segundos. Aprobado en menos de 24 horas.",
+        "body": "Solicita acceso de docente. 60 segundos. Aprobado en menos de 24 horas.",
         "button": "Solicitar acceso como docente"
       },
       "teacherLeadCta": {
         "title": "¿Eres profesor?",
-        "body": "LexiClash es gratis para profesores individuales — obtén apoyo y consejos para el aula.",
-        "button": "Acceso gratuito para profesores"
+        "body": "LexiClash tiene un plan básico gratis para docentes — mejora a Pro para clases ilimitadas.",
+        "button": "Obtener acceso de docente"
       },
       "districtCta": {
         "title": "Para escuelas y distritos",
@@ -11793,6 +11801,7 @@ const es = {
     },
     "leaderboard": {
       "allTime": "Histórico",
+      "ariaLabel": "Tabla de clasificación del aula mostrando los mejores estudiantes",
       "inactive": "Inactivo",
       "level": "Nv. {{level}}",
       "monthly": "Mensual",

@@ -10959,6 +10959,8 @@ const en = {
       "backToClass": "Back to Classroom",
       "selectClassroom": "Select Classroom",
       "loading": "Loading report...",
+      "loadingClassrooms": "Loading classrooms...",
+      "noClassroomsFound": "No classrooms found",
       "error": "Error loading report",
       "noData": "No data available",
       "metrics": {
@@ -11115,6 +11117,8 @@ const en = {
       "coinReward": "+{{amount}} coins"
     },
     "achievements": {
+      "ariaDismissError": "Dismiss error",
+      "ariaOverallProgress": "Overall progress",
       "completion": "{{percent}}% complete",
       "continue": "Keep going!",
       "earned": "{{count}} of {{total}} Earned",
@@ -11166,6 +11170,9 @@ const en = {
     },
     "analytics": {
       "accuracy": "Accuracy",
+      "activityAttemptedWord": "attempted a word",
+      "activityCompletedLesson": "completed a lesson",
+      "activityGainedXp": "gained XP",
       "activeNow": "{{count}} active now",
       "activeStudentsToday": "Active Today",
       "assignLessons": "Assign Lessons",
@@ -11197,6 +11204,7 @@ const en = {
       "noVocabularyData": "No vocabulary data",
       "offline": "Offline",
       "practiceToSee": "Practice to see stats",
+      "recentActivity": "Recent Activity",
       "retry": "Retry",
       "streak": "{{count}}-day streak",
       "struggling": "Needs Help",
@@ -11300,11 +11308,11 @@ const en = {
       "startGame": "Start Game",
       "hero": {
         "eyebrow": "For teachers in EN / HE / SV / JA / ES classrooms",
-        "h1": "Free vocabulary games for your classroom — no student logins.",
-        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages, free for teachers.",
+        "h1": "Vocabulary games for your classroom — no student logins.",
+        "sub": "Whole-class multiplayer word games with your own word lists. No accounts, no ads, no downloads — play in any browser. Built natively for 5 languages. Free basic plan for teachers; Teacher Pro is $9/month for unlimited classes and students.",
         "cta_primary": "Request Teacher Access",
         "cta_secondary": "See it in action",
-        "cta_note": "Free for teachers • Approved in ~24h",
+        "cta_note": "Free plan to start • Approved in ~24h",
         "cta_schools": "School or district? See plans →"
       },
       "mock": {
@@ -11393,7 +11401,7 @@ const en = {
           "live_multiplayer": "Live multiplayer",
           "brain_training": "Brain training drills",
           "game_variety": "6+ game modes",
-          "free_for_teachers": "Free for verified teachers"
+          "free_for_teachers": "Free basic plan for teachers"
         }
       },
       "trust": {
@@ -11409,8 +11417,8 @@ const en = {
           "a": "Apply at /education/access — we review by email and typically respond within 24 hours."
         },
         "q2": {
-          "q": "Is it really free for classrooms?",
-          "a": "Yes. Free for verified teachers, no ads on student-facing routes."
+          "q": "Is there a free plan?",
+          "a": "Yes — a free basic plan for verified teachers: up to 2 classes, 30 students each, no ads on student-facing routes. Teacher Pro ($9/month) unlocks unlimited classes and students."
         },
         "q3": {
           "q": "Does it work in Hebrew, Japanese, Swedish, and Spanish?",
@@ -11439,13 +11447,13 @@ const en = {
       },
       "cta": {
         "title": "Ready to bring LexiClash to your classroom?",
-        "body": "Apply for free teacher access — takes 60 seconds, typically approved within 24 hours.",
+        "body": "Apply for teacher access — takes 60 seconds, typically approved within 24 hours.",
         "button": "Request Teacher Access"
       },
       "teacherLeadCta": {
         "title": "Are you a teacher?",
-        "body": "LexiClash is free for individual teachers — get classroom support & tips.",
-        "button": "Get Free Teacher Access"
+        "body": "LexiClash has a free basic plan for teachers — upgrade to Pro for unlimited classes.",
+        "button": "Get Teacher Access"
       },
       "districtCta": {
         "title": "For schools & districts",
@@ -11465,6 +11473,7 @@ const en = {
     },
     "leaderboard": {
       "allTime": "All Time",
+      "ariaLabel": "Classroom leaderboard showing top students",
       "inactive": "Inactive",
       "level": "Lvl {{level}}",
       "monthly": "Monthly",

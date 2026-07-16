@@ -96,7 +96,7 @@ function TeacherReportsInner() {
           </h2>
 
           {classroomsLoading ? (
-            <div className="text-neo-gray animate-pulse">Loading classrooms...</div>
+            <div className="text-neo-gray animate-pulse">{t('teacher.reports.loadingClassrooms')}</div>
           ) : classrooms && classrooms.length > 0 ? (
             <div className="space-y-3">
               {classrooms.map((classroom) => (
@@ -113,7 +113,7 @@ function TeacherReportsInner() {
               ))}
             </div>
           ) : (
-            <div className="text-neo-gray">No classrooms found</div>
+            <div className="text-neo-gray">{t('teacher.reports.noClassroomsFound')}</div>
           )}
         </div>
       </div>

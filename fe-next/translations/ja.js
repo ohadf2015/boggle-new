@@ -11288,6 +11288,8 @@ const ja = {
       "backToClass": "クラスに戻る",
       "selectClassroom": "クラスルームを選択",
       "loading": "レポート読み込み中...",
+      "loadingClassrooms": "クラスルームを読み込み中...",
+      "noClassroomsFound": "クラスルームが見つかりません",
       "error": "レポートの読み込みエラー",
       "noData": "データがありません",
       "metrics": {
@@ -11408,6 +11410,8 @@ const ja = {
       "coinReward": "+{{amount}} コイン"
     },
     "achievements": {
+      "ariaDismissError": "エラーを消す",
+      "ariaOverallProgress": "全体的な進捗",
       "completion": "{{percent}}%達成",
       "continue": "この調子で！",
       "earned": "{{total}}個中{{count}}個獲得",
@@ -11459,6 +11463,9 @@ const ja = {
     },
     "analytics": {
       "accuracy": "正解率",
+      "activityAttemptedWord": "単語を試しました",
+      "activityCompletedLesson": "レッスンを完了しました",
+      "activityGainedXp": "XPを獲得しました",
       "activeNow": "{{count}}人がアクティブ",
       "activeStudentsToday": "今日アクティブ",
       "assignLessons": "レッスンを割り当て",
@@ -11490,6 +11497,7 @@ const ja = {
       "noVocabularyData": "語彙データなし",
       "offline": "オフライン",
       "practiceToSee": "練習すると表示されます",
+      "recentActivity": "最近のアクティビティ",
       "retry": "リトライ",
       "streak": "{{count}}日連続",
       "struggling": "サポートが必要",
@@ -11593,11 +11601,11 @@ const ja = {
       "startGame": "ゲーム開始",
       "hero": {
         "eyebrow": "英語・ヘブライ語・スウェーデン語・日本語・スペイン語対応",
-        "h1": "教室向けの無料語彙ゲーム — 生徒のログイン不要。",
-        "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。5言語にネイティブ対応、先生は無料。",
+        "h1": "教室向けの語彙ゲーム — 生徒のログイン不要。",
+        "sub": "自分の単語リストで遊べる、クラス全体のマルチプレイ単語ゲーム。アカウント不要、広告なし、ダウンロード不要 — どのブラウザでもプレイ可能。5言語にネイティブ対応。先生は無料の基本プランを利用でき、Teacher Proは月$9でクラスと生徒数が無制限になります。",
         "cta_primary": "先生アクセスを申請する",
         "cta_secondary": "デモを見る",
-        "cta_note": "先生は無料 • 約24時間で承認",
+        "cta_note": "無料プランで開始 • 約24時間で承認",
         "cta_schools": "学校または学区のご担当者様はこちら →"
       },
       "mock": {
@@ -11686,7 +11694,7 @@ const ja = {
           "live_multiplayer": "リアルタイム対戦ゲーム",
           "brain_training": "脳トレドリル搭載",
           "game_variety": "6つ以上のモード",
-          "free_for_teachers": "認定教師は完全無料"
+          "free_for_teachers": "先生向け無料基本プラン"
         }
       },
       "trust": {
@@ -11702,8 +11710,8 @@ const ja = {
           "a": "/education/access で情報を入力。60秒で完了。通常24時間以内にメールで承認をお知らせします。"
         },
         "q2": {
-          "q": "永遠に無料ですか？",
-          "a": "はい。認定教師なら永遠に無料。生徒も広告なし。有料化の予定はありません。"
+          "q": "無料プランはありますか？",
+          "a": "はい — 認定教師向けの無料基本プラン：最大2クラス、各30人まで、生徒への広告なし。Teacher Pro（月$9）でクラスと生徒数が無制限になります。"
         },
         "q3": {
           "q": "本当にヘブライ語・日本語・スウェーデン語・スペイン語に対応していますか？",
@@ -11737,8 +11745,8 @@ const ja = {
       },
       "teacherLeadCta": {
         "title": "先生ですか？",
-        "body": "LexiClash は個人の先生向けに無料です — サポートとクラスルームのヒントを入手。",
-        "button": "無料の先生アクセスを取得"
+        "body": "LexiClash には先生向けの無料基本プランがあります — Proにアップグレードするとクラスが無制限に。",
+        "button": "先生アクセスを取得"
       },
       "districtCta": {
         "title": "学校・学区向け",
@@ -11758,6 +11766,7 @@ const ja = {
     },
     "leaderboard": {
       "allTime": "全期間",
+      "ariaLabel": "上位の学生を表示するクラスルーム順位表",
       "inactive": "非アクティブ",
       "level": "Lv.{{level}}",
       "monthly": "月間",

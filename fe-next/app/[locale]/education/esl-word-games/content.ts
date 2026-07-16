@@ -49,7 +49,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: 'Three game modes: Boggle grid, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Works on any phone, tablet, Chromebook, or laptop browser' },
       { icon: '⏱️', text: '5-minute warm-up format fits any lesson plan' },
-      { icon: '💸', text: 'Completely free — no premium tier, no per-seat fee' },
+      { icon: '💸', text: 'Free to play — no per-seat fee, no student logins' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Beginner', desc: '3-4 letter words, longer timer, sight-word focus. Use the Word Wheel mode for guided practice.' },
@@ -114,7 +114,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: '3 משחקים: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'טלפון, טאבלט, Chromebook, כל דפדפן' },
       { icon: '⏱️', text: 'חימום של 5 דקות — לכל תוכנית שיעור' },
-      { icon: '💸', text: 'הכל חינם — בלי פרימיום' },
+      { icon: '💸', text: 'חינם לשחק — בלי עלות לכל תלמיד, בלי חשבונות' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'מתחילים', desc: 'מילים קצרות, טיימר ארוך, מילים נפוצות. Word Wheel לתרגול מודרך.' },
@@ -179,7 +179,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: '3 juegos: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Teléfono, tableta, Chromebook, cualquier navegador' },
       { icon: '⏱️', text: 'Calentamiento de 5 minutos — cualquier plan' },
-      { icon: '💸', text: 'Todo gratis — sin premium' },
+      { icon: '💸', text: 'Gratis para jugar — sin cargo por alumno, sin cuentas' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Principiante', desc: 'Palabras cortas, tiempo largo, palabras de vista. Word Wheel para práctica guiada.' },
@@ -244,7 +244,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: '3 spel: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Telefon, surfplatta, Chromebook, vilken webbläsare som helst' },
       { icon: '⏱️', text: 'Uppvärmning på 5 minuter — vilken lektion som helst' },
-      { icon: '💸', text: 'Helt gratis — ingen premium' },
+      { icon: '💸', text: 'Gratis att spela — ingen avgift per elev, inga konton' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Nybörjare', desc: 'Korta ord, längre timer, sight-ord. Word Wheel för guidad övning.' },
@@ -309,7 +309,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: '3つのゲーム：Boggle、Word Hunt、Word Wheel' },
       { icon: '📱', text: 'スマホ、タブレット、Chromebook、どのブラウザでも' },
       { icon: '⏱️', text: '5分ウォームアップ — どの授業でも合う' },
-      { icon: '💸', text: '完全無料 — プレミアムなし' },
+      { icon: '💸', text: '無料でプレイ — 生徒ごとの料金なし、アカウント不要' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: '初級', desc: '短い単語、長いタイマー、sight-word。Word Wheel でガイド付き。' },
@@ -374,7 +374,7 @@ const content: Record<EducationLocale, LocaleContent> = {
       { icon: '🎯', text: 'Три игровых режима: Boggle, Word Hunt, Word Wheel' },
       { icon: '📱', text: 'Работает на любом телефоне, планшете, Chromebook или веб-браузере' },
       { icon: '⏱️', text: 'Формат 5 минут подходит для любого плана урока' },
-      { icon: '💸', text: 'Полностью бесплатно — нет премиум-версии, нет комиссии на ученика' },
+      { icon: '💸', text: 'Бесплатно играть — без платы за ученика, без аккаунтов' },
     ],
     proficiencyLevels: [
       { tag: 'A1-A2', title: 'Начинающий', desc: 'Слова из 3–4 букв, более длительный таймер, обычные слова. Word Wheel для направленной практики.' },
