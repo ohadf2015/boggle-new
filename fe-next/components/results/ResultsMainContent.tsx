@@ -189,6 +189,13 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   const { variant: progressHeaderVariant } = useExperiment('exp-mp-round-progress-header-v1');
 
   useEffect(() => {
+    // Canonical funnel event — same shape as word-wheel / word-hunt / blast so
+    // PostHog mode-split dashboards include classic / survival / wheel-rush.
+    // Fires for every ResultsMainContent mount (MP results path for those modes).
+    trackGrowthEvent('results_viewed', {
+      mode: gameMode ?? 'unknown',
+      score: currentPlayerData?.score ?? 0,
+    });
     if (isMultiplayer) {
       trackGrowthEvent('mp_results_viewed', { gameMode: gameMode ?? 'unknown', language });
     }
