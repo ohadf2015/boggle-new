@@ -428,6 +428,12 @@ const ja = {
     "clash": "Clash"
   },
   "seo": {
+    "teacherUpgrade": {
+      "title": "Teacher Pro - クラスと生徒が無制限 | LexiClash",
+      "description": "Teacher Proにアップグレードすると、クラスも1クラスあたりの生徒数も無制限。月額$9。学校全体の語彙プログラムを1つのサブスクリプションで管理。",
+      "ogTitle": "Teacher Proにアップグレード - 無制限のクラス",
+      "ogDescription": "月額$9で無制限のクラスと生徒を管理。LexiClash Proで語彙指導を拡大しましょう。"
+    },
     "title": "LexiClash — 無料マルチプレイヤー単語ゲーム、2-20人、8モード、ダウンロード不要",
     "description": "リアルタイム対戦の単語ゲーム。2-20人で同時プレイ、8つのゲームモード、10,000語以上、登録・ダウンロード不要。部屋を作ってリンクを共有、ブラウザで即プレイ。無料！",
     "keywords": "マルチプレイヤーワードゲーム, リアルタイムワードゲーム, オンラインワードバトル, パーティーゲーム, 対戦ワードゲーム, 速いワードゲーム, ワードパズルマルチプレイヤー, Alias, Kahoot, ファミリーゲームナイト, チームビルディング, 単語対戦, ライブワードゲーム, ワードレース, 語彙ゲーム, 無料オンラインゲーム, ボグル 無料 ダウンロード不要, ワードホイール, 世界記録 ワードゲーム, 文字ゲーム 無料, ワードゲーム ダウンロード不要, 言葉遊び オンライン, 語彙力 ゲーム, ワードアドベンチャー ゲーム",
@@ -4824,6 +4830,7 @@ const ja = {
   "legal": {
     "title": "法的情報",
     "termsOfService": "利用規約",
+    "refundPolicy": "返金・キャンセルポリシー",
     "privacyPolicy": "プライバシーポリシー",
     "backToGame": "ゲームに戻る",
     "lastUpdated": "最終更新日",
@@ -10914,6 +10921,51 @@ const ja = {
     "notYou": "別の人ですか？最初から始める"
   },
   "teacher": {
+    "subscription": {
+      "classLimitTitle": "クラスの上限に達しました",
+      "classLimitMessage": "無料クラスを{{limit}}個中{{current}}個作成しました。Proにアップグレードすると、クラスと生徒が無制限になります。",
+      "upgradeProDescription": "Proなら、クラス数も1クラスあたりの生徒数も無制限。指導の拡大に制限はありません。",
+      "proFeatures": "Proに含まれるもの",
+      "unlimitedClasses": "無制限のクラス",
+      "unlimitedStudents": "1クラスあたり無制限の生徒",
+      "priceUSD": "Proサブスクリプション",
+      "perMonth": "/月",
+      "autoRenew": "毎月自動更新されます。いつでも解約できます。",
+      "upgradeNow": "今すぐProにアップグレード",
+      "checkoutError": "決済を開始できませんでした。もう一度お試しください。",
+      "currentPlan": "現在のプランです",
+      "upgradePricingTitle": "Teacher Proにアップグレード",
+      "upgradePricingSubtitle": "無制限のクラスと生徒を管理",
+      "upgradePricingReassure": "いつでも解約可能 — クラス、レッスン、生徒データは常に安全に保たれます。",
+      "pricePerDay": "1日あたり約$0.30",
+      "everythingInFree": "無料プランのすべてに加えて：",
+      "freeStartNote": "お試しに最適ですが、多くの先生はすぐに2クラスの上限を超えます。",
+      "proCtaSubtext": "30秒で設定 · いつでも解約可能",
+      "trustCancel": "いつでも解約、契約の縛りなし",
+      "trustDataSafe": "データは安全に保たれます",
+      "trustReminder": "各請求の前にリマインダーメール",
+      "freePlanName": "無料",
+      "freeForever": "ずっと無料、いつでも利用可能",
+      "free2Classes": "最大2クラス",
+      "free30Students": "1クラスあたり最大30人",
+      "basicWordTracking": "基本的な単語トラッキング",
+      "dailyProgressReports": "毎日の進捗レポート",
+      "proPlanName": "Teacher Pro",
+      "unlimitedAccess": "拡大に必要なすべて",
+      "popular": "一番人気",
+      "faqTitle": "よくある質問",
+      "faqCancel": "いつでも解約できますか？",
+      "faqCancelAnswer": "はい！請求ポータルからいつでも解約できます。Proへのアクセスは当月末まで継続します。",
+      "faqAutoRenew": "自動的に請求されますか？",
+      "faqAutoRenewAnswer": "はい、サブスクリプションは毎月更新されます。更新前にリマインダーメールが届きます。いつでも解約して今後の請求を停止できます。",
+      "faqDataLoss": "解約するとデータは失われますか？",
+      "faqDataLossAnswer": "いいえ。解約しても、クラス、レッスン、生徒データは安全に保たれます。無料プランの上限（2クラス、1クラス30人）に戻るだけです。",
+      "legalNote": "アップグレードすると、利用規約に同意し、返金ポリシーを理解したものとみなされます。",
+      "refundPolicy": "返金ポリシー",
+      "renewsOn": "次回の更新",
+      "canceledAt": "現在の期間終了時に解約予定",
+      "manageSubscription": "サブスクリプションを管理"
+    },
     "teacher": {
       "activeGames": "進行中のゲーム",
       "noActiveGames": "進行中のゲームはありません"

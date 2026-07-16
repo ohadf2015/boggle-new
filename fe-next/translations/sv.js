@@ -601,6 +601,12 @@ const sv = {
     "clash": "Clash"
   },
   "seo": {
+    "teacherUpgrade": {
+      "title": "Teacher Pro – obegränsat antal klasser och elever | LexiClash",
+      "description": "Uppgradera till Teacher Pro för obegränsat antal klassrum och elever per klass. $9/månad. Hantera hela skolans ordförrådsprogram med en prenumeration.",
+      "ogTitle": "Uppgradera till Teacher Pro – obegränsat antal klasser",
+      "ogDescription": "Hantera obegränsat antal klassrum och elever för $9/månad. Väx din ordförrådsundervisning med LexiClash Pro."
+    },
     "title": "LexiClash — Scrabble-Alternativ på Svenska, 2-20 Spelare, Gratis Online",
     "description": "Scrabble-alternativ på svenska: 2-20 spelare i realtid, 8 spellägen, 10 000+ svenska ord, ingen nedladdning. Skapa rum, dela länken med vänner, tävla direkt i webbläsaren. Gratis!",
     "keywords": "multiplayer ordspel, realtids ordspel, online ordstrid, festspel, tävlings ordspel, snabbt ordspel, ordpussel multiplayer, alias spel, kahoot alternativ, familjespelkväll, festspel, teambuilding, ordtävling, live ordspel, ordrace, ordförrådsspel, gratis onlinespel, alfapet online gratis, ordspel utan nedladdning, ordspel för fester, dagligt ordpussel, ordlek med vänner, ordäventyr spel",
@@ -4997,6 +5003,7 @@ const sv = {
   "legal": {
     "title": "Juridiskt",
     "termsOfService": "Användarvillkor",
+    "refundPolicy": "Återbetalnings- och avbokningspolicy",
     "privacyPolicy": "Integritetspolicy",
     "backToGame": "Tillbaka till spelet",
     "lastUpdated": "Senast uppdaterad",
@@ -11029,6 +11036,51 @@ const sv = {
     "notYou": "Inte du? Börja om"
   },
   "teacher": {
+    "subscription": {
+      "classLimitTitle": "Du har nått din klassgräns",
+      "classLimitMessage": "Du har skapat {{current}} av {{limit}} gratisklasser. Uppgradera till Pro för obegränsat antal klasser och elever.",
+      "upgradeProDescription": "Pro ger dig obegränsat antal klassrum och elever per klass — inga gränser för att växa din undervisning.",
+      "proFeatures": "Pro innehåller",
+      "unlimitedClasses": "Obegränsat antal klassrum",
+      "unlimitedStudents": "Obegränsat antal elever per klassrum",
+      "priceUSD": "Pro-prenumeration",
+      "perMonth": "/månad",
+      "autoRenew": "Förnyas automatiskt varje månad. Avsluta när du vill.",
+      "upgradeNow": "Uppgradera till Pro nu",
+      "checkoutError": "Det gick inte att starta betalningen. Försök igen.",
+      "currentPlan": "Du har den här planen",
+      "upgradePricingTitle": "Uppgradera till Teacher Pro",
+      "upgradePricingSubtitle": "Hantera obegränsat antal klassrum och elever",
+      "upgradePricingReassure": "Avsluta när du vill — dina klassrum, lektioner och elevdata är alltid säkra.",
+      "pricePerDay": "Ungefär $0,30 per dag",
+      "everythingInFree": "Allt i Free, plus:",
+      "freeStartNote": "Perfekt för att testa — men de flesta lärare växer snabbt ur gränsen på 2 klasser.",
+      "proCtaSubtext": "Klart på 30 sekunder · Avsluta när du vill",
+      "trustCancel": "Avsluta när du vill, ingen bindningstid",
+      "trustDataSafe": "Dina data är säkra",
+      "trustReminder": "Påminnelse via e-post före varje betalning",
+      "freePlanName": "Free",
+      "freeForever": "Gratis för alltid, alltid tillgänglig",
+      "free2Classes": "Upp till 2 klasser",
+      "free30Students": "Upp till 30 elever per klass",
+      "basicWordTracking": "Grundläggande ordspårning",
+      "dailyProgressReports": "Dagliga framstegsrapporter",
+      "proPlanName": "Teacher Pro",
+      "unlimitedAccess": "Allt du behöver för att växa",
+      "popular": "Populärast",
+      "faqTitle": "Vanliga frågor",
+      "faqCancel": "Kan jag avsluta när som helst?",
+      "faqCancelAnswer": "Ja! Avsluta din prenumeration när du vill via din betalningsportal. Din Pro-åtkomst fortsätter till slutet av innevarande månad.",
+      "faqAutoRenew": "Dras betalningen automatiskt?",
+      "faqAutoRenewAnswer": "Ja, din prenumeration förnyas varje månad. Du får ett påminnelsemail före varje förnyelse. Avsluta när du vill för att stoppa framtida betalningar.",
+      "faqDataLoss": "Förlorar jag mina data om jag avslutar?",
+      "faqDataLossAnswer": "Nej. Om du avslutar förblir dina klassrum, lektioner och elevdata säkra. Du återgår bara till gratisplanens gränser (2 klasser, 30 elever per klass).",
+      "legalNote": "Genom att uppgradera godkänner du våra Användarvillkor och förstår vår Återbetalningspolicy.",
+      "refundPolicy": "Återbetalningspolicy",
+      "renewsOn": "Nästa förnyelse",
+      "canceledAt": "Avslut väntar vid slutet av innevarande period",
+      "manageSubscription": "Hantera prenumeration"
+    },
     "teacher": {
       "activeGames": "Aktiva spel",
       "noActiveGames": "Inga aktiva spel"
