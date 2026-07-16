@@ -217,6 +217,8 @@ export type GrowthEvent =
   | 'wordhunt_results_loaded'
   | 'wordhunt_leaderboard_tap'
   // Multiplayer results page funnel — fills mp_round blind spots.
+  //   results_viewed: also fired on ResultsMainContent mount (canonical mode funnel;
+  //     props { mode, score }) so classic/survival/wheel-rush join word-wheel/blast.
   //   mp_results_viewed: fires on ResultsMainContent mount (isMultiplayer=true).
   //     Props: { gameMode, language }. Baseline reach for round-result funnel.
   //   mp_round_ready_clicked: fires when player marks ready for next round.
