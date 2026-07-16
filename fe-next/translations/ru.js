@@ -3501,6 +3501,7 @@ const ru = {
     "generating": "Установка сетки…",
     "scramble": {
       "title": "Расшифруй!",
+      "subtitle": "Решите для бонуса серии!",
       "skip": "Пропустить",
       "streakAria": "Серия подсказок: {count}"
     }

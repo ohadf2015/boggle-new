@@ -1589,3 +1589,17 @@ _Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all fl
   - status: deferred (Sentry MCP unavailable for stack trace; reach=0)
   - why: reach=0 in last 24h, low priority
   - recommended owner: review-by-eod
+
+## 2026-07-16
+- [Supabase] `upsert_push_token` SECURITY DEFINER callable by authenticated
+  - status: false-positive (intentional — migration 20260628010000 revoked from PUBLIC, granted to authenticated; push token registration requires SECURITY DEFINER)
+  - recommended owner: self (no action needed)
+- [Supabase] `teacher_access_requests` tar_insert_any WITH CHECK (true)
+  - status: false-positive (intentional — anonymous teacher application form cannot require auth; restored in migration 20260617120000 after prior erroneous fix broke real applicant submissions)
+  - recommended owner: self (no action needed)
+- [Sentry] 1PH CapacitorGameConnect.then() not implemented (reach=7)
+  - status: already fixed in d2fb54b03 (Capacitor.isPluginAvailable guard in nativePGS.ts:85)
+  - recommended owner: self (close in Sentry)
+- [Sentry] 1PV TypeError null.clear() on /daily/word-wheel (reach=6)
+  - last seen: 2026-07-06 — already fixed in WordWheelPixiRing.tsx:106 (.destroyed guard + try/catch)
+  - recommended owner: self (close in Sentry)

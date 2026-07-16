@@ -70,9 +70,14 @@ export function ClueScramble({ answer, onResult }: ClueScrambleProps) {
       >
         {/* Header row */}
         <div className="flex items-center justify-between">
-          <span className="font-neo-display font-bold text-neo-lime text-lg leading-none">
-            {t('crossword.scramble.title')}
-          </span>
+          <div className="flex flex-col gap-0.5">
+            <span className="font-neo-display font-bold text-neo-lime text-lg leading-none">
+              {t('crossword.scramble.title')}
+            </span>
+            <span className="font-neo-body text-xs text-neo-white/50 leading-none">
+              {t('crossword.scramble.subtitle')}
+            </span>
+          </div>
           <span
             className={`font-neo-display font-bold text-lg tabular-nums leading-none transition-colors ${
               remaining <= 3 ? 'text-neo-red animate-pulse' : 'text-neo-white/50'

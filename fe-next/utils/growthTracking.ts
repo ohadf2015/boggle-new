@@ -250,7 +250,17 @@ export type GrowthEvent =
   //   mp_round_progress_header_shown: progress-header pill rendered.
   //     Props: { roundNumber: number, totalRounds: number }. Experiment impression.
   | 'mp_round_gap_nudge_seen'
-  | 'mp_round_progress_header_shown';
+  | 'mp_round_progress_header_shown'
+  // Homepage mode-cube rapid re-click (rage-click signal).
+  //   Fires when the same cube is clicked twice within 1.5s.
+  //   Props: { mode: string, locale: string }.
+  //   Funnel: mode_card_rapid_reclick → (no game_started) = rage-click confirmed.
+  | 'mode_card_rapid_reclick'
+  // ES/daily multiplayer join-attempt funnel gap.
+  //   Fires on every join/start button tap in the MP lobby.
+  //   Props: { locale: string, socketReady: boolean, action: 'create' | 'join' }.
+  //   High socketReady=false rate = socket latency root cause for rage-clicks.
+  | 'mp_lobby_join_attempted';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

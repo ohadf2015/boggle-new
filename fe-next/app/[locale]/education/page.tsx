@@ -105,6 +105,25 @@ const RESOURCE_TITLES: Record<string, { heading: string; subhead: string; cards:
   },
 };
 
+// Comparison page earns organic traffic for "LexiClash vs Kahoot" but is under-linked
+// from high-authority education hub — text link adds PageRank flow with zero layout change.
+const COMPARE_LINK_TEXT: Record<string, string> = {
+  en: 'See how LexiClash compares: LexiClash vs Kahoot — features, price, and classroom fit.',
+  he: 'ראו איך LexiClash משתווה: LexiClash מול Kahoot — תכונות, מחיר והתאמה לכיתה.',
+  sv: 'Se hur LexiClash jämförs: LexiClash vs Kahoot — funktioner, pris och klassrumsanpassning.',
+  ja: 'LexiClashの比較を見る：LexiClash対Kahoot — 機能、価格、教室への適合性。',
+  es: 'Compara LexiClash: LexiClash vs Kahoot — funciones, precio y uso en el aula.',
+  ru: 'Сравните LexiClash: LexiClash против Kahoot — функции, цена и применение в классе.',
+};
+const COMPARE_LINK_ANCHOR: Record<string, string> = {
+  en: 'LexiClash vs Kahoot',
+  he: 'LexiClash מול Kahoot',
+  sv: 'LexiClash vs Kahoot',
+  ja: 'LexiClash対Kahoot',
+  es: 'LexiClash vs Kahoot',
+  ru: 'LexiClash против Kahoot',
+};
+
 type ResourceCard = { badge: string; title: string; desc: string };
 const RESOURCE_CARDS: Record<string, { heading: string; subhead: string; vocab: ResourceCard; esl: ResourceCard; teachers: ResourceCard; spelling: ResourceCard; forSchools: ResourceCard }> = {
   en: {
@@ -243,6 +262,23 @@ function EducationResourceLinks({ locale }: { locale: string }) {
           <p className="mt-2 text-xs text-black/70">{rc.forSchools.desc}</p>
         </Link>
       </div>
+
+      <p className="mt-6 text-sm text-neo-gray-300">
+        {(() => {
+          const full = COMPARE_LINK_TEXT[lang] ?? COMPARE_LINK_TEXT.en;
+          const anchor = COMPARE_LINK_ANCHOR[lang] ?? COMPARE_LINK_ANCHOR.en;
+          const [before, after] = full.split(anchor);
+          return (
+            <>
+              {before}
+              <Link href={`/${locale}/lexiclash-vs-kahoot`} className="underline underline-offset-2 hover:text-neo-white">
+                {anchor}
+              </Link>
+              {after ?? ''}
+            </>
+          );
+        })()}
+      </p>
     </section>
   );
 }

@@ -108,6 +108,7 @@ const ja = {
     "generating": "盤面を準備中…",
     "scramble": {
       "title": "並べ替えて！",
+      "subtitle": "解いてボーナス獲得！",
       "skip": "スキップ",
       "streakAria": "ヒント連続: {count}"
     }

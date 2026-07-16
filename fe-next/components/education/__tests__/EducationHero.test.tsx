@@ -46,4 +46,16 @@ describe('EducationHero', () => {
     render(<EducationHero />);
     expect(screen.getByTestId('mock-join-code')).toBeInTheDocument();
   });
+
+  it('renders a secondary schools link pointing to the for-schools page', () => {
+    render(<EducationHero />);
+    const link = screen.getByRole('link', { name: /education\.landing\.hero\.cta_schools/ });
+    expect(link).toHaveAttribute('href', '/en/education/for-schools');
+  });
+
+  it('tracks hero_for_schools when the schools link is clicked', () => {
+    render(<EducationHero />);
+    fireEvent.click(screen.getByRole('link', { name: /education\.landing\.hero\.cta_schools/ }));
+    expect(mockTrackLandingCtaClick).toHaveBeenCalledWith('hero_for_schools');
+  });
 });

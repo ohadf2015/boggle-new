@@ -126,6 +126,13 @@ export function EducationHero() {
             <p className="text-xs font-bold uppercase tracking-wider text-neo-navy/60">
               {t('education.landing.hero.cta_note')}
             </p>
+            <Link
+              href={`/${language}/education/for-schools`}
+              onClick={() => trackLandingCtaClick('hero_for_schools')}
+              className="text-xs font-bold text-neo-navy/70 underline underline-offset-2 hover:text-neo-navy transition-colors"
+            >
+              {t('education.landing.hero.cta_schools')}
+            </Link>
           </div>
         </div>
 

@@ -108,6 +108,7 @@ const he = {
     "generating": "מכינים את התשבץ…",
     "scramble": {
       "title": "פתור את הסידור!",
+      "subtitle": "פתור לבונוס רצף!",
       "skip": "דלג",
       "streakAria": "רצף רמזים: {count}"
     }

@@ -108,6 +108,7 @@ const es = {
     "generating": "Preparando la cuadrícula…",
     "scramble": {
       "title": "¡Descifra!",
+      "subtitle": "¡Resuelve para un bonus de racha!",
       "skip": "Omitir",
       "streakAria": "Racha de pistas: {count}"
     }

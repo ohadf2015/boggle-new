@@ -108,6 +108,7 @@ const en = {
     "generating": "Setting the grid…",
     "scramble": {
       "title": "Unscramble!",
+      "subtitle": "Solve for a streak bonus!",
       "skip": "Skip",
       "streakAria": "Clue streak: {count}"
     }
@@ -14708,6 +14709,7 @@ const en = {
     "playAgain": "Play again",
     "notAWord": "Not a word",
     "continue": "Continue",
+    "revealing": "Revealing…",
     "shareCard": {
       "title": "Your bluffing story",
       "cta": "Share result",

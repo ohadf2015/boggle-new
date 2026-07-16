@@ -14,7 +14,7 @@
  * the browser supports scroll timelines and the user allows motion.
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, ArrowLeft, Lock, ChevronDown, Sparkles, TimerOff } from 'lucide-react';
@@ -22,6 +22,8 @@ import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { CUBE_BLUR_DATA_URL, type ModeCubeModel, type ModeCubeVariant } from '@/lib/landing/modeMeta';
 import { formatLiveShort } from '@/lib/landing/homeHubFormat';
+import { useExperiment } from '@/hooks/useExperiment';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 interface VariantStyle {
   /** solid colour fill (anchor) */
@@ -105,6 +107,10 @@ interface CubeProps {
       reverts to a square once its grid leaves 2-col — at `sm` for the calm
       auto-fit grid, at `md` for the fast bento's 4-col grid. */
   wideOrphan?: false | 'sm' | 'md';
+  /** exp-homepage-click-feedback-v1: when true, a brief brightness drop persists
+      ~350ms after click so players get confirmed visual feedback even when
+      navigation starts immediately (CSS :active disappears on mouseup). */
+  pressHighlight?: boolean;
 }
 
 function StartHerePill({ label, compact }: { label: string; compact?: boolean }) {
@@ -128,7 +134,7 @@ const WIDE_ORPHAN: Record<'sm' | 'md', string> = {
   md: 'col-span-2 aspect-[5/2] md:col-span-1 md:aspect-square',
 };
 
-function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', wideOrphan = false }: CubeProps) {
+function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', wideOrphan = false, pressHighlight = false }: CubeProps) {
   const { dir } = useLanguage();
   const Arrow = dir === 'rtl' ? ArrowLeft : ArrowRight;
   const v = VARIANT[model.variant];
@@ -137,11 +143,25 @@ function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', w
   const locked = !!model.locked;
   const [imgFailed, setImgFailed] = useState(false);
   const hasArt = !!model.genIcon && !imgFailed;
+  const [pressed, setPressed] = useState(false);
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastClickMs = useRef<number>(0);
+  useEffect(() => () => { if (pressTimer.current) clearTimeout(pressTimer.current); }, []);
 
   const handleClick = (e: React.MouseEvent) => {
     if (locked) {
       e.preventDefault();
       return;
+    }
+    if (pressHighlight) {
+      const now = Date.now();
+      if (now - lastClickMs.current < 1500) {
+        trackGrowthEvent('mode_card_rapid_reclick', { mode: model.key });
+      }
+      lastClickMs.current = now;
+      setPressed(true);
+      if (pressTimer.current) clearTimeout(pressTimer.current);
+      pressTimer.current = setTimeout(() => setPressed(false), 350);
     }
     model.onClick();
   };
@@ -186,6 +206,9 @@ function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', w
         // room reads quiet.
         'motion-safe:transition-[filter] motion-safe:duration-200',
         !calm && 'motion-safe:hover:drop-shadow-[0_0_16px_var(--cube-glow)] motion-safe:focus-visible:drop-shadow-[0_0_16px_var(--cube-glow)]',
+        // exp-homepage-click-feedback-v1: brightness drop persists 350ms post-click
+        // so players see confirmed feedback even when navigation starts immediately.
+        pressHighlight && pressed && 'brightness-[0.72]',
         anchor
           ? bigAnchor
             ? 'col-span-2 md:row-span-2 aspect-[16/9] sm:aspect-[2/1] md:aspect-square'
@@ -357,6 +380,10 @@ export function LandingModeCubes({
   layout = 'bento',
   liveCount,
 }: LandingModeCubesProps) {
+  const { variant: clickFbVariant, trackExposure: trackClickFbExposure } = useExperiment('exp-homepage-click-feedback-v1');
+  useEffect(() => { trackClickFbExposure(); }, [trackClickFbExposure]);
+  const pressHighlight = clickFbVariant === 'click-feedback';
+
   const anchor = models.find((m) => m.role === 'anchor') ?? models[0];
   const rest = models.filter((m) => m !== anchor);
   const hasExtras = extras.length > 0;
@@ -394,7 +421,7 @@ export function LandingModeCubes({
           </div>
         )}
         <div className="grid auto-rows-fr grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
-          {anchor && <Cube model={anchor} index={0} anchor bigAnchor={bigAnchor} />}
+          {anchor && <Cube model={anchor} index={0} anchor bigAnchor={bigAnchor} pressHighlight={pressHighlight} />}
           {rest.map((m, i) => (
             // Odd rest ⇒ the last cube would sit alone at 50% on the 2-col mobile
             // grid; span it full-width (reverts to a square once the bento goes
@@ -404,6 +431,7 @@ export function LandingModeCubes({
               model={m}
               index={i + 1}
               wideOrphan={rest.length % 2 === 1 && i === rest.length - 1 ? 'md' : false}
+              pressHighlight={pressHighlight}
             />
           ))}
         </div>
@@ -452,6 +480,7 @@ export function LandingModeCubes({
                 index={i}
                 tone="calm"
                 wideOrphan={calmModels.length % 2 === 1 && i === calmModels.length - 1 ? 'sm' : false}
+                pressHighlight={pressHighlight}
               />
             ))}
           </div>
@@ -489,7 +518,7 @@ export function LandingModeCubes({
           </summary>
           <div className="grid auto-rows-fr grid-cols-2 gap-3 px-4 pb-4 pt-2 sm:gap-4 md:grid-cols-4">
             {extras.map((m, i) => (
-              <Cube key={m.key} model={m} index={i} />
+              <Cube key={m.key} model={m} index={i} pressHighlight={pressHighlight} />
             ))}
           </div>
         </details>

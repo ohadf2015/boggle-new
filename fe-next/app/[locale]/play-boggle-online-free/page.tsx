@@ -80,6 +80,10 @@ const faqs = [
     q: 'Does it work on mobile without downloading an app?',
     a: "Yes! LexiClash works perfectly in your mobile browser — no app download needed. It's optimized for touch screens and works on iOS and Android. You can also install it as a Progressive Web App (PWA) from your browser for an app-like experience.",
   },
+  {
+    q: 'Can students play Boggle online free in a classroom?',
+    a: 'Yes! LexiClash works great as a free classroom Boggle game — no accounts, no downloads, no setup. Teachers create a room in seconds and share the link or QR code. Up to 20+ students compete simultaneously on the word grid, making it ideal for vocabulary practice, spelling drills, and ESL classes.',
+  },
 ];
 
 const faqJsonLd = JSON.stringify({

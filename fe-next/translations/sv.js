@@ -180,6 +180,7 @@ const sv = {
     "generating": "Bygger rutnätet…",
     "scramble": {
       "title": "Avkoda!",
+      "subtitle": "Lös för bonuspoäng!",
       "skip": "Hoppa",
       "streakAria": "Ledtrådssvit: {count}"
     }

@@ -26,7 +26,7 @@ export default function Showdown({
 }: ShowdownProps): ReactNode {
   const { t } = useLanguage();
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
-  const [revealed, setRevealed] = useState(reducedMotion);
+  const [bannerVisible, setBannerVisible] = useState(reducedMotion);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const outcome = settlement.outcome; // unique | clash | none
@@ -41,7 +41,7 @@ export default function Showdown({
 
   useEffect(() => {
     if (reducedMotion) {
-      setRevealed(true);
+      setBannerVisible(true);
       return;
     }
 
@@ -53,18 +53,20 @@ export default function Showdown({
         {
           rotateY: 180,
           duration: 0.55,
-          delay: index * 0.12 + 0.2,
+          delay: index * 0.4 + 0.3,
           ease: 'power2.out',
         }
       );
     });
 
-    const revealTimeout = setTimeout(() => setRevealed(true), 450);
+    // wait for last card to finish flipping before showing outcome
+    const bannerDelay = bots.length * 400 + 550;
+    const revealTimeout = setTimeout(() => setBannerVisible(true), bannerDelay);
     return () => clearTimeout(revealTimeout);
-  }, [reducedMotion]);
+  }, [reducedMotion, bots.length]);
 
   useEffect(() => {
-    if (reducedMotion || settlement.outcome !== 'unique' || !revealed) return;
+    if (reducedMotion || settlement.outcome !== 'unique' || !bannerVisible) return;
 
     const triggerFX = async () => {
       let sourceRect: DOMRect | null = null;
@@ -102,17 +104,17 @@ export default function Showdown({
     };
 
     triggerFX();
-  }, [revealed, settlement.outcome, reducedMotion, playerWord, payoutTargetRef]);
+  }, [bannerVisible, settlement.outcome, reducedMotion, playerWord, payoutTargetRef]);
 
   useEffect(() => {
+    if (!bannerVisible) return;
     timeoutRef.current = setTimeout(() => {
       onDone();
     }, 2500);
-
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [onDone]);
+  }, [bannerVisible, onDone]);
 
   const bannerTone =
     outcome === 'unique'
@@ -126,28 +128,40 @@ export default function Showdown({
       data-testid="showdown"
       className="flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-4 px-1 py-2"
     >
-      {/* Outcome banner — casino result plaque */}
-      <div
-        data-testid="showdown-outcome"
-        data-outcome={outcome}
-        className={`flex w-full max-w-sm flex-col items-center gap-1 rounded-neo border-3 px-5 py-3 text-center shadow-hard ${bannerTone}`}
-      >
-        <div className="font-neo-display text-xs font-black uppercase tracking-[0.2em] opacity-80">
-          {t('sealedBid.showdown')}
-        </div>
-        <div className="font-neo-display text-2xl font-black uppercase tracking-wide">
-          {bannerText}
-        </div>
+      {/* Suspense pulse while bot cards flip */}
+      {!bannerVisible && !reducedMotion && (
         <div
-          data-testid="showdown-delta"
-          className="font-neo-display text-3xl font-black tabular-nums"
+          data-testid="showdown-suspense"
+          className="animate-pulse text-center font-neo-display text-sm font-black uppercase tracking-widest text-neo-cream/60"
         >
-          {deltaText}
+          {t('sealedBid.revealing') || 'Revealing…'}
         </div>
-        <div className="font-neo-body text-xs font-bold uppercase opacity-80">
-          {t('sealedBid.chips')}
+      )}
+
+      {/* Outcome banner — casino result plaque, shown only after all cards flip */}
+      {bannerVisible && (
+        <div
+          data-testid="showdown-outcome"
+          data-outcome={outcome}
+          className={`animate-neo-pop flex w-full max-w-sm flex-col items-center gap-1 rounded-neo border-3 px-5 py-3 text-center shadow-hard ${bannerTone}`}
+        >
+          <div className="font-neo-display text-xs font-black uppercase tracking-[0.2em] opacity-80">
+            {t('sealedBid.showdown')}
+          </div>
+          <div className="font-neo-display text-2xl font-black uppercase tracking-wide">
+            {bannerText}
+          </div>
+          <div
+            data-testid="showdown-delta"
+            className="font-neo-display text-3xl font-black tabular-nums"
+          >
+            {deltaText}
+          </div>
+          <div className="font-neo-body text-xs font-bold uppercase opacity-80">
+            {t('sealedBid.chips')}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Player word card */}
       <div
@@ -170,7 +184,7 @@ export default function Showdown({
               }}
               className="relative h-full w-full rounded-neo border-3 border-black shadow-hard-lg transition-transform [transform-style:preserve-3d]"
               style={{
-                transform: reducedMotion || revealed ? 'rotateY(180deg)' : 'rotateY(0deg)',
+                transform: reducedMotion || bannerVisible ? 'rotateY(180deg)' : 'rotateY(0deg)',
                 transition: reducedMotion ? 'none' : undefined,
               }}
             >
@@ -207,13 +221,15 @@ export default function Showdown({
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={onDone}
-        className="min-h-12 w-full max-w-sm rounded-neo border-3 border-black bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-0.5"
-      >
-        {t('sealedBid.continue')}
-      </button>
+      {bannerVisible && (
+        <button
+          type="button"
+          onClick={onDone}
+          className="min-h-12 w-full max-w-sm rounded-neo border-3 border-black bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-transform active:translate-y-0.5"
+        >
+          {t('sealedBid.continue')}
+        </button>
+      )}
     </div>
   );
 }

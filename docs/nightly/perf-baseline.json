@@ -1,34 +1,39 @@
 {
-  "date": "2026-07-15",
-  "note": "7-day window: 2 routes above n≥50 floor (both multiplayer). /en/multiplayer CLS neutral 0.574→0.576 (within noise) — 07-12 spacer fix still holds. /es/multiplayer CLS regression watch: 0.296→0.421 (+42%, both n>50 — exceeds threshold) but NO code changes to multiplayer in last 48h, spacer fix still in place; likely statistical variance in n~71 window. Supabase MCP absent (20th consecutive night). word_pacts player2_id FK index migration written (pending apply). Bundle unchanged.",
+  "date": "2026-07-16",
+  "note": "7-day window: 3 routes above n≥50 floor. Homepage / newly above floor (n=60) with terrible metrics — LCP 4880ms, INP 992ms, CLS 0.865. /en/multiplayer CLS REGRESSION: 0.576→0.976 (+70%, n=105) — root cause pre-existing async socket state (ConnectionBanner/SpectatorBanner null→visible shift during hydration); no new code change identified. /es/multiplayer CLS REGRESSION: 0.421→0.716 (+70%, n=70). Backend: web_vitals FK index migration written (20260716020000). Supabase MCP absent (21st consecutive night). Dev build only — bundle comparison unavailable.",
   "backend": {
     "advisor_warnings_count": 2,
-    "note": "Supabase MCP absent (20th consecutive night). word_pacts player2_id FK index migration written (20260715020000). 4 prior migrations still pending apply. Auth connections: human dashboard task.",
+    "note": "Supabase MCP absent (21st consecutive night). web_vitals player_id FK index migration written tonight (20260716020000). word_pacts player2_id FK index migration still pending apply (20260715020000). 6 migrations pending apply total. Auth connections: human dashboard task.",
     "top_queries": [],
     "migrations_applied_this_run": [],
     "migrations_pending_apply": [
       {
         "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql",
-        "carry_count": 19,
-        "status": "WRITTEN — pending apply (19th night)"
+        "carry_count": 20,
+        "status": "WRITTEN — pending apply (20th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql",
-        "carry_count": 14,
-        "status": "WRITTEN — pending apply (14th night)"
+        "carry_count": 15,
+        "status": "WRITTEN — pending apply (15th night)"
       },
       {
         "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql",
+        "carry_count": 10,
+        "status": "WRITTEN — pending apply (10th night)"
+      },
+      {
+        "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql",
         "carry_count": 9,
         "status": "WRITTEN — pending apply (9th night)"
       },
       {
-        "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql",
-        "carry_count": 8,
-        "status": "WRITTEN — pending apply (8th night)"
+        "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql",
+        "carry_count": 2,
+        "status": "WRITTEN — pending apply (2nd night)"
       },
       {
-        "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql",
+        "file": "fe-next/supabase/migrations/20260716020000_web_vitals_player_id_fk_index.sql",
         "carry_count": 1,
         "status": "WRITTEN TONIGHT — pending apply (1st night)"
       }
@@ -38,56 +43,60 @@
         "id": "auth_db_connections_absolute",
         "status": "DEFERRED — human dashboard config.",
         "priority": "LOW",
-        "carry_count": 19
+        "carry_count": 20
       },
       {
         "id": "unindexed_fk_word_pacts_player2_id",
-        "status": "Migration 20260715020000 written tonight. Pending apply.",
+        "status": "Migration 20260715020000 written. Pending apply.",
+        "priority": "MEDIUM",
+        "carry_count": 2
+      },
+      {
+        "id": "unindexed_fk_web_vitals_player_id",
+        "status": "Migration 20260716020000 written tonight. Pending apply.",
         "priority": "MEDIUM",
         "carry_count": 1
       }
     ]
   },
   "frontend": {
-    "note_7d": "2 routes above n≥50 floor. /en/multiplayer CLS NEUTRAL: 0.574→0.576 (within noise, n=99) — 07-12 spacer fix confirmed still holding. /es/multiplayer CLS REGRESSION WATCH: 0.296→0.421 (+42%, n=71) — no code changes to multiplayer, likely variance; monitor next 2 nights. /en/multiplayer INP DEGRADED: 278→306ms (+10%, below 20% threshold — DEFERRED). /es/multiplayer LCP IMPROVED: 2452→2250ms (-8%).",
+    "note_7d": "3 routes above n≥50 floor. Homepage (/) newly above floor at n=60 — all metrics POOR/CRITICAL (no prior baseline). /en/multiplayer CLS REGRESSION confirmed: 0.576→0.976 (+70%, both n≥50). /es/multiplayer CLS REGRESSION confirmed: 0.421→0.716 (+70%, both n≥50). Root cause of multiplayer CLS: pre-existing async socket state (ConnectionBanner/SpectatorBanner render null then shift on socket connect). No new code change caused the jump. Logged to perf-watch.md for human review.",
     "by_route_7d": [
       {
+        "route": "/",
+        "p75_lcp_ms": 4880,
+        "p75_inp_ms": 992,
+        "p75_cls": 0.865,
+        "n_7d": 60,
+        "lcp_status": "POOR (>4000ms) — first time above n≥50 floor; hero image already priority=true + preload; likely TTFB-dominant",
+        "inp_status": "POOR (>500ms) — first above floor",
+        "cls_status": "CRITICAL — first above floor; root cause unknown without browser trace"
+      },
+      {
         "route": "/en/multiplayer",
-        "p75_lcp_ms": 2806,
-        "p75_inp_ms": 306,
-        "p75_cls": 0.576,
-        "n_7d": 99,
-        "lcp_status": "NEEDS-IMPROVEMENT (>2500ms) — slight degradation from 2459ms (+14%, below 20% threshold)",
-        "inp_status": "NEEDS-IMPROVEMENT (>200ms) — 278→306ms (+10%, below 20% threshold, DEFERRED)",
-        "cls_status": "CRITICAL (>0.1) — unchanged from 0.574 baseline; root cause: null conditional in PageClient.tsx removes AutoHideHeader spacer on async isActive flip"
+        "p75_lcp_ms": 2818,
+        "p75_inp_ms": 312,
+        "p75_cls": 0.976,
+        "n_7d": 105,
+        "lcp_status": "NEEDS-IMPROVEMENT — 2806→2818ms (+0.4%, within noise)",
+        "inp_status": "NEEDS-IMPROVEMENT — 306→312ms (+2%, within noise, DEFERRED)",
+        "cls_status": "CRITICAL — REGRESSION: 0.576→0.976 (+70%, both n≥50 confirmed). Root cause: async socket null→visible shift."
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 2250,
-        "p75_inp_ms": 472,
-        "p75_cls": 0.421,
-        "n_7d": 71,
-        "lcp_status": "GOOD (<2500ms) — IMPROVED from 2452ms (-8%)",
-        "inp_status": "POOR (>200ms) — 478→472ms (flat, DEFERRED)",
-        "cls_status": "NEEDS-IMPROVEMENT (>0.1) — REGRESSION WATCH: 0.296→0.421 (+42%); no code change found; monitor 2 more nights"
-      }
-    ],
-    "below_floor_watch": [
-      {
-        "route": "/",
-        "note": "INP likely high (n<50 in 7d window). Monitor."
+        "p75_lcp_ms": 2284,
+        "p75_inp_ms": 688,
+        "p75_cls": 0.716,
+        "n_7d": 70,
+        "lcp_status": "GOOD — 2250→2284ms (+1.5%, within noise)",
+        "inp_status": "POOR — 472→688ms (+46%, DEFERRED high variance)",
+        "cls_status": "CRITICAL — REGRESSION: 0.421→0.716 (+70%, both n≥50 confirmed). Same root cause."
       }
     ]
   },
   "bundle": {
-    "note": "462 chunks in .next/static/chunks. Top chunks match 07-14 baseline exactly — no regression.",
-    "total_kb": 41076,
-    "top_chunks": [
-      { "name": "8aafd928.*.js", "kb": 6452, "note": "Word dictionary — LAZY" },
-      { "name": "6c0d0f8e.*.js", "kb": 3284 },
-      { "name": "62013.*.js", "kb": 856 },
-      { "name": "60150.*.js", "kb": 720 },
-      { "name": "26644.*.js", "kb": 612 }
-    ]
+    "note": "Dev build only — production bundle comparison unavailable. Prior baseline: 41076 KB total, top chunk 8aafd928 6452 KB (dictionary, lazy). No new dependencies in recent commits.",
+    "total_kb": null,
+    "top_chunks": []
   }
 }
