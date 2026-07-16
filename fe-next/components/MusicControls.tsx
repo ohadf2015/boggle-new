@@ -9,6 +9,7 @@ import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from './ui/button';
 import { useHapticsConfig } from '../contexts/HapticsContext';
+import { useRegisterHeaderAudioControl } from '@/contexts/NavigationContext';
 import { resolveMasterMuteClick } from '@/lib/audio/masterMuteToggle';
 import { Reveal } from '@/components/ui/Reveal';
 
@@ -26,6 +27,15 @@ const MusicControls: React.FC = memo(() => {
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, right: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const isRTL = language === 'he';
+
+  // This IS the header's on-screen sound control. Register it so the global
+  // in-game mute FAB (InGameAudioButton) stands down while a header sound
+  // control is visible. Without this hand-off, screens that render <Header />
+  // directly (landing, word-craft, gem-hunt) keep the header — and this
+  // control — visible while `isInGame` is true, so the fixed FAB would show a
+  // SECOND mute control that overlaps the menu button. Degrades to a no-op
+  // outside a NavigationProvider (isolated tests).
+  useRegisterHeaderAudioControl();
 
   // Prevent hydration mismatch by only rendering dynamic icon after mount
   useEffect(() => {
