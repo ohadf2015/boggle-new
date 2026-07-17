@@ -40,6 +40,11 @@ export interface WordTowerWheelProps {
   onDrop: () => void;
 }
 
+/** How long (ms) a buildable word rests untouched before it auto-hands to the
+ *  crane. ~700 ms feels responsive without snatching the word away mid-thought;
+ *  the DROP → "keep building" escape hatch covers the case where it fires early. */
+const AUTO_BUILD_MS = 700;
+
 /** Ring radius as a percentage of half the stage (letters sit on this circle).
  *  Founder ask (2026-06-19): tighten the circle (smaller ring) while the letter
  *  tiles themselves get BIGGER — a denser, punchier wheel that also frees deck
@@ -96,11 +101,13 @@ export function WordTowerWheel({
 
   // Auto-build: tapping letters one-by-one used to need an EXTRA manual BUILD
   // tap before the DROP tap — a "two taps to place a word" flow. Once the
-  // spelled word is buildable, wait 1s of no further tile selection then
-  // auto-fire onSubmit (same effect as tapping BUILD) so the hub morphs
-  // straight to DROP. A fresh tile pick before the second elapses cancels and
-  // restarts the wait (join() gives a stable dep key on the selection content,
-  // not the array reference).
+  // spelled word is buildable, wait AUTO_BUILD_MS of no further tile selection
+  // then auto-fire onSubmit (same effect as tapping BUILD) so the hub morphs
+  // straight to DROP. A fresh tile pick before it elapses cancels and restarts
+  // the wait (join() gives a stable dep key on the selection content, not the
+  // array reference). Snappier than the old 1 s so the crane hand-off feels
+  // responsive, while still leaving a beat to add another letter (founder ask
+  // 2026-07-17); if the beat is too tight the player can DROP → keep building.
   const selectedKey = selected.join(',');
   useEffect(() => {
     submittedRef.current = false;
@@ -109,7 +116,7 @@ export function WordTowerWheel({
       if (submittedRef.current) return;
       submittedRef.current = true;
       onSubmit();
-    }, 1000);
+    }, AUTO_BUILD_MS);
     return () => clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedKey, canBuild, placing]);

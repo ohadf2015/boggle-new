@@ -1,29 +1,38 @@
 'use client';
 
+import { useRef } from 'react';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import { useTimedReveal } from '@/lib/wordTower/useTimedReveal';
 import type { ApplyResult } from '@/lib/wordTower/wordTowerManager';
 import { reactionMascotPose } from '@/lib/wordTower/mascotPose';
 
 interface WordTowerMascotProps {
-  /** Bumps on each accepted word → the mascot pops in to cheer, then tucks away. */
+  /** Bumps on each accepted word. */
   resultKey: number;
   lastResult: ApplyResult | null;
   reducedMotion?: boolean;
 }
 
-/** How long the mascot stays on-screen after a word is built. */
+/** How long the mascot stays on-screen after a notable word is built. */
 const REVEAL_MS = 1500;
 
 /**
  * The brand climb companion — a small, circular LexiClash mascot that pops in
- * beside the build line ONLY when you complete a word (founder: the old mascot
- * was huge and always on-screen). It cheers based on word quality, then tucks
- * away. Purely decorative (`pointer-events-none`, `aria-hidden`); the pop is
- * suppressed under reduced-motion (it simply appears/disappears).
+ * beside the build line to cheer. Founder ask (2026-07-17): it was popping on
+ * EVERY drop, which — alongside the confetti — buried the physics/drop feel in
+ * celebration noise. It now only appears for a NOTABLE build (a long-enough word
+ * that earns a tier: high-rise / tall / skyscraper); ordinary short drops stay
+ * quiet so the crane + landing physics are the star. Purely decorative
+ * (`pointer-events-none`, `aria-hidden`); the pop is suppressed under
+ * reduced-motion (it simply appears/disappears).
  */
 export function WordTowerMascot({ resultKey, lastResult, reducedMotion }: WordTowerMascotProps) {
-  const visible = useTimedReveal(resultKey, REVEAL_MS);
+  // Gate the reveal to notable results only: advance the key the reveal watches
+  // just for tiered (long) words, so a plain drop never triggers the companion.
+  const notableKeyRef = useRef(0);
+  const notable = resultKey > 0 && !!lastResult && lastResult.tier !== 'none';
+  if (notable) notableKeyRef.current = resultKey;
+  const visible = useTimedReveal(notableKeyRef.current, REVEAL_MS);
   if (!visible) return null;
 
   const pose = reactionMascotPose(lastResult?.tier ?? 'none');

@@ -27,10 +27,10 @@ describe('WordTowerWheel — auto-build after idle', () => {
   beforeEach(() => vi.useFakeTimers());
   afterEach(() => vi.useRealTimers());
 
-  it('auto-fires onSubmit 1s after the word becomes buildable with no further taps', () => {
+  it('auto-fires onSubmit ~700ms after the word becomes buildable with no further taps', () => {
     const onSubmit = vi.fn();
     render(<WordTowerWheel {...makeProps({ selected: [0, 1, 2], word: 'CAT', canBuild: true, onSubmit })} />);
-    vi.advanceTimersByTime(999);
+    vi.advanceTimersByTime(699);
     expect(onSubmit).not.toHaveBeenCalled();
     vi.advanceTimersByTime(1);
     expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -41,11 +41,11 @@ describe('WordTowerWheel — auto-build after idle', () => {
     const { rerender } = render(
       <WordTowerWheel {...makeProps({ selected: [0, 1, 2], word: 'CAT', canBuild: true, onSubmit })} />,
     );
-    vi.advanceTimersByTime(900);
-    // Player picks another letter before the 1s auto-build fires.
+    vi.advanceTimersByTime(600);
+    // Player picks another letter before the auto-build fires.
     rerender(<WordTowerWheel {...makeProps({ selected: [0, 1, 2, 3], word: 'CATS', canBuild: true, onSubmit })} />);
-    vi.advanceTimersByTime(900);
-    expect(onSubmit).not.toHaveBeenCalled(); // only 900ms since the reset
+    vi.advanceTimersByTime(600);
+    expect(onSubmit).not.toHaveBeenCalled(); // only 600ms since the reset
     vi.advanceTimersByTime(100);
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });

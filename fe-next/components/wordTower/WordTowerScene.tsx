@@ -133,6 +133,16 @@ const MAX_PENDING_PREVIEW = 2;
 /** How far the user must scroll down (px) before the back-to-top button shows. */
 const BACK_TO_TOP_REVEAL_PX = 90;
 
+/** Quantise the *viewed* altitude before it drives React state during a pan.
+ *  The pan runs a rAF every frame; feeding a fresh float into `setPanAltitude`
+ *  (and `onViewAltChange`) each frame re-rendered the WHOLE scene + sibling rails
+ *  ~60×/s, which janked + flickered the scroll (founder 2026-07-17: "scrolling
+ *  flashes and feels stuck"). Snapping to a few-metre grid collapses that to a
+ *  handful of renders per drag; the backdrop's own CSS transitions ease across
+ *  the steps so the parallax still reads as smooth. */
+const VIEW_ALT_QUANTUM_M = 4;
+const quantizeAlt = (m: number) => Math.round(m / VIEW_ALT_QUANTUM_M) * VIEW_ALT_QUANTUM_M;
+
 /** One live row in the unified (committed ++ pending) stack. */
 interface LiveCell {
   key: string;
@@ -597,11 +607,12 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, land.particles);
       engine.shake.shake({ intensity: land.shakePx, duration: 0.34, decay: 'exponential' });
     } else if (q === 'good') {
-      engine.flash.flash({ color: 0x22d3ee, duration: 0.26, intensity: land.flashIntensity });
-      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, land.particles);
-      if (land.shakePx > 0) {
-        engine.shake.shake({ intensity: land.shakePx * 0.5, duration: 0.22, decay: 'exponential' });
-      }
+      // A plain good drop leans on the LANDING PHYSICS (swivel + squash + impact
+      // ring, fired at the tile in the diff effect) for its payoff — just a soft
+      // cyan flash here, no extra confetti shower, so the drop feel stays clean
+      // and the physics reads (founder ask 2026-07-17: focus on the drop effect,
+      // reserve confetti for standout beats).
+      engine.flash.flash({ color: 0x22d3ee, duration: 0.22, intensity: land.flashIntensity * 0.7 });
     } else if (q === 'sloppy') {
       engine.flash.flash({ color: 0xffe135, duration: 0.22, intensity: land.flashIntensity });
       engine.particles.burst(COMBO_FLASH, x, y, land.particles);
@@ -665,6 +676,9 @@ export function WordTowerScene(props: SceneProps) {
   // the back-to-top button. Reset whenever a committed word snaps us back up.
   const [pannedDown, setPannedDown] = useState(false);
   const rafRef = useRef<number | null>(null);
+  // Last quantised altitude actually pushed to state — lets the pan rAF skip the
+  // setState/onViewAltChange churn when the view hasn't moved a whole grid step.
+  const lastViewAltRef = useRef<number | null>(null);
   // Inertial fling: a flicked drag keeps gliding after release (momentumRaf) so a
   // tall tower scrolls fast + feels alive, instead of a 1:1 finger-drag slog.
   const momentumRaf = useRef<number | null>(null);
@@ -676,6 +690,7 @@ export function WordTowerScene(props: SceneProps) {
   const { heightM, onViewAltChange } = props;
   useEffect(() => {
     stopMomentum(); // a commit yanks the camera to the build line — kill any fling
+    lastViewAltRef.current = null; // forget the panned altitude; we're back at the top
     setPanAltitude(null);
     setPannedDown(false);
     onViewAltChange?.(heightM); // snap sibling rails back to the live height
@@ -711,10 +726,15 @@ export function WordTowerScene(props: SceneProps) {
     if (rafRef.current == null) {
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
-        const alt = viewAltitudeFor(heightM, pan.current.y, pan.current.panMin);
-        setPanAltitude(alt);
-        setPannedDown(pan.current.y < -BACK_TO_TOP_REVEAL_PX);
-        onViewAltChange?.(alt); // landmark + rival rails follow the scroll down
+        const alt = quantizeAlt(viewAltitudeFor(heightM, pan.current.y, pan.current.panMin));
+        // Only touch React state when the view crossed a whole grid step — this is
+        // what keeps a fast drag from re-rendering the scene + rails every frame.
+        if (alt !== lastViewAltRef.current) {
+          lastViewAltRef.current = alt;
+          setPanAltitude(alt);
+          onViewAltChange?.(alt); // landmark + rival rails follow the scroll down
+        }
+        setPannedDown(pan.current.y < -BACK_TO_TOP_REVEAL_PX); // no-op re-render if unchanged
       });
     }
   };

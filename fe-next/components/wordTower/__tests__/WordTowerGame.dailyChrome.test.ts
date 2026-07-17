@@ -1,8 +1,10 @@
 /**
- * Word Tower in-game chrome — no mid-run daily↔endless switch.
+ * Word Tower in-game chrome — DAILY-ONLY.
  *
- * Daily mode still enters via `?daily=1` (hub/URL); the play surface must not
- * offer a control that flips modes mid-climb.
+ * The standalone endless run was retired (founder 2026-07-17: "the word tower
+ * should be the same word tower of the daily challenge — we shouldn't maintain
+ * both modes"). The play surface must not offer a mode toggle, and must not carry
+ * the endless-only server-progress fetch.
  */
 import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
@@ -10,23 +12,25 @@ import { resolve } from 'node:path';
 
 const src = readFileSync(resolve(__dirname, '../WordTowerGame.tsx'), 'utf8');
 
-describe('WordTowerGame daily chrome (no mid-run mode switch)', () => {
+describe('WordTowerGame daily chrome (daily-only, no mode switch)', () => {
   it('does not render a daily↔endless toggle control (toDaily / toEndless)', () => {
     expect(src).not.toMatch(/wordTower\.daily\.toDaily/);
     expect(src).not.toMatch(/wordTower\.daily\.toEndless/);
   });
 
   it('does not ship a mid-play href that flips daily mode (?daily=1 toggle link)', () => {
-    // Entry still reads `?daily=1` in useDailyMode; the control was a plain <a href=…>.
     expect(src).not.toMatch(/href=\{daily \? ['"]\?['"] : ['"]\?daily=1['"]\}/);
     expect(src).not.toMatch(/href=\{daily \? ['"]\?daily=1['"] : ['"]\?['"]\}/);
   });
 
-  it('still supports daily entry via query (useDailyMode reads daily=1)', () => {
-    expect(src).toMatch(/get\(['"]daily['"]\)\s*===\s*['"]1['"]/);
+  it('runs the tower in daily mode unconditionally (no endless branch)', () => {
+    expect(src).toMatch(/const daily = true/);
+    // The retired endless run fetched saved server progress — it must be gone.
+    expect(src).not.toMatch(/api\/word-tower\/progress/);
+    expect(src).not.toMatch(/useDailyMode/);
   });
 
-  it('keeps optional non-action daily badge when already in daily mode', () => {
+  it('always shows the non-action daily badge', () => {
     expect(src).toMatch(/wordTower\.daily\.badge/);
   });
 });

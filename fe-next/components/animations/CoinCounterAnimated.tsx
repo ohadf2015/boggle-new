@@ -150,7 +150,7 @@ export const CoinCounterAnimated = forwardRef<HTMLDivElement, CoinCounterAnimate
     };
 
     return (
-      <div ref={ref} className={cn('relative inline-block', className)}>
+      <div ref={ref} data-coin-counter="true" className={cn('relative inline-block', className)}>
         {/* Impact pulse ring */}
         <AnimatePresence>
           {showPulse && enableGlowEffects && !isLowEnd && (

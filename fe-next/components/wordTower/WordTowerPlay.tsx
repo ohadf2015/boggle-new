@@ -32,7 +32,7 @@ import WordTowerCrane, { type WordTowerCraneHandle } from './WordTowerCrane';
 import { useCraneDrop } from './useCraneDrop';
 import { useAutoDismiss } from './useAutoDismiss';
 import { useExitReveal } from './useExitReveal';
-import { sweepPeriodMs, SWEEP_PERIOD_FLOOR_MS } from '@/lib/wordTower/craneSweep';
+import { effectiveSweepPeriodMs } from '@/lib/wordTower/craneSweep';
 import { isNearMiss } from '@/lib/wordTower/towerLean';
 import {
   mutatorForDate,
@@ -53,6 +53,7 @@ import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import { newlyUnlockedSkin, type TowerSkin } from '@/lib/wordTower/skins';
 import { useTowerSkin } from './useTowerSkin';
 import { WordTowerSkinPicker } from './WordTowerSkinPicker';
+import { WordTowerActionMenu } from './WordTowerActionMenu';
 import { WordTowerFlowFrame } from './WordTowerFlowFrame';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
@@ -73,6 +74,7 @@ import { WordTowerStatHud } from './WordTowerStatHud';
 import { getTowerArchitectTier } from '@/lib/wordTower/architectTier';
 import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
 import { addCoins, getCoins, spendCoins } from '@/utils/coinManager';
+import { DomCoinBurst } from '@/components/animations/DomCoinBurst';
 import {
   rollTowerReward,
   nextDryStreak,
@@ -258,6 +260,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // Per-mount seed so each climb's reward tiers vary (the static gameCode can't).
   const rewardRunSeed = useRef(typeof window !== 'undefined' ? String(Date.now()) : 'ssr');
   const [rewardFx, setRewardFx] = useState<RewardRevealPayload | null>(null);
+  // "Coins collected" fly — a burst of coins streams from the reward beat up into
+  // the wallet counter, which then pulses + rolls the new total (founder ask
+  // 2026-07-17). Self-contained (DomCoinBurst) with the counter's real on-screen
+  // position, so it can't drift from the true balance the way the shared global
+  // coin HUD (server/guest total) could on this local-coin surface.
+  const [coinFly, setCoinFly] = useState<{ source: { x: number; y: number }; target: { x: number; y: number }; count: number; key: number } | null>(null);
   // Cumulative progression earn-events (new zones + achievements) this run —
   // the primary source of wrecking-ball charges.
   const [earnEvents, setEarnEvents] = useState(0);
@@ -278,6 +286,22 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       setCoinBalance(getCoins());
       setRewardFx({ coins, tier: reward.tier, source, key: Date.now() });
       playCoinCollectSound();
+      // "Coins collected" fly: stream a few coins from the reward beat (upper
+      // centre) into the wallet counter, which then pulses + rolls up. Skipped
+      // under reduced motion (the counter's +N/roll still reads the gain).
+      if (typeof window !== 'undefined' && !reducedMotion) {
+        const counterEl = document.querySelector<HTMLElement>('[data-coin-counter="true"]');
+        const r = counterEl?.getBoundingClientRect();
+        const target = r
+          ? { x: r.left + r.width / 2, y: r.top + r.height / 2 }
+          : { x: window.innerWidth - 48, y: 56 };
+        setCoinFly({
+          source: { x: window.innerWidth / 2, y: window.innerHeight * 0.32 },
+          target,
+          count: Math.max(4, Math.min(12, Math.round(coins / 6))),
+          key: Date.now(),
+        });
+      }
       // Rare/epic drops get a PHYSICAL payoff beyond the chip — a confetti
       // burst scaled to tier + the chest sting on epic — so the controlled-
       // rarity moment is felt, not just read. Commons stay quiet by design
@@ -435,12 +459,15 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // Sweep period RAMPS with tower height (slow + learnable near the ground,
   // faster the taller you climb) — escalating challenge, not a flat speed.
   // Tailwind day slows the sweep (more dwell = easier perfects); other days = 1×.
-  // Clamped to the floor so a future "gale" mutator can't drive it impossibly fast.
-  // Steady Cable upgrade slows the sweep (÷ sweepSpeedMult<1 lengthens the
-  // period → more dwell, easier timing) on top of the height/mutator pacing.
-  const sweepMs = Math.max(
-    SWEEP_PERIOD_FLOOR_MS,
-    (sweepPeriodMs(game.floors.length) * (mutator ? mutatorSweepMult(mutator) : 1)) / upgradeEffects.sweepSpeedMult,
+  // Steady Cable upgrade slows the sweep too. `effectiveSweepPeriodMs` clamps the
+  // combined result to a sane band: never faster than the comfortable floor, and
+  // never SLOWER than the ground-floor default — so even a fully-upgraded crane
+  // stays a normal pace instead of the old super-slow ~5.7 s crawl (founder ask
+  // 2026-07-17).
+  const sweepMs = effectiveSweepPeriodMs(
+    game.floors.length,
+    upgradeEffects.sweepSpeedMult,
+    mutator ? mutatorSweepMult(mutator) : 1,
   );
   // How shaky the tower is (0..1) — drives the continuous SWING and, via the
   // crane's matching offset, makes placing on an unstable tower genuinely harder.
@@ -502,10 +529,13 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     const gain = game.heightM - prevVerdictHeight.current;
     prevVerdictHeight.current = game.heightM;
     setVerdict({ v: buildDropVerdict(o, gain), key: tower.state.resultKey });
-    // PERFECT landings pay a small sharp burst at the tower line — kept to the
-    // flawless band only so it stays a skill signal, not per-drop noise.
-    if (o.quality === 'perfect' && !reducedMotion) {
-      fireConfetti({ particleCount: 24, spread: 60, startVelocity: 28, scalar: 0.8, origin: { y: 0.42 } });
+    // Confetti is reserved for the standout beats now — a genuinely LONG word
+    // (skyscraper tier) — instead of firing on every perfect drop. Ordinary drops
+    // lean on the crane + landing physics + verdict pop for feedback, so the burst
+    // stays a rare "wow", not per-drop noise (founder ask 2026-07-17). Streaks get
+    // their own burst via the combo-milestone effect below.
+    if (tower.state.lastResult?.tier === 'skyscraper' && !reducedMotion) {
+      fireConfetti({ particleCount: 60, spread: 80, startVelocity: 34, origin: { y: 0.4 } });
     }
   }, [tower.state.resultKey]); // eslint-disable-line react-hooks/exhaustive-deps
   // Dismiss via the shared hook (keyed on the verdict's own resultKey) rather than
@@ -945,13 +975,16 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           *viewed* altitude so panning down reveals the marks at that height. */}
       <WordTowerLandmarkRail viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
 
-      {/* Rival rail — read-only leaderboard ghosts to climb past. */}
-      <WordTowerRivalRail rivals={displayRivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
-
-      {/* Persistent chase chip — the closest record still ABOVE you (the rail only
-          draws on-screen ghosts, so the real target is usually off-screen up).
-          Keyed off the live climb height, not the panned view. */}
-      <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
+      {/* Rival rail + chase chip — the read-only leaderboard-ghost meta belongs to
+          the (retired) endless mode. The tower is daily-only now, so these never
+          render (displayRivals is empty in daily anyway); gating them out also
+          clears the top-right rival chip that overlapped the header. */}
+      {!daily && (
+        <>
+          <WordTowerRivalRail rivals={displayRivals} viewerHeightM={viewAlt} reducedMotion={reducedMotion} t={t} />
+          <WordTowerNextRivalChip rivals={displayRivals} viewerHeightM={game.heightM} reducedMotion={reducedMotion} t={t} dir={dir} />
+        </>
+      )}
 
       {/* ── Left utility rail ── persistent state chips (wrecking ball + watch-ad,
           steady-hands streak, active mutator, owned perks) stack in ONE flex
@@ -971,27 +1004,29 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.30) 0 2px, transparent 2px 9px), linear-gradient(90deg, rgba(255,255,255,0.35), transparent)',
           }}
         />
-        {/* Wrecking Ball bay — token chip + rival picker + the wrecking-ball arc.
-            Earned by reaching new zones / unlocking achievements; spent to raid a
-            rival's tower. Chips render inline here; overlays stay fullscreen. */}
-        <WordTowerSabotageBay
-          inline
-          tokens={sab.tokens}
-          rivals={displayRivals}
-          pickerOpen={sab.pickerOpen}
-          onOpen={sab.openPicker}
-          onClose={sab.closePicker}
-          onSend={sendWreck}
-          attackerHeightM={personalBest}
-          lastHit={sab.lastHit}
-          onDismissHit={sab.dismissHit}
-          earnedToast={sab.earnedToast}
-          onDismissEarned={sab.dismissEarned}
-          adEarnedToast={sab.adEarnedToast}
-          onDismissAdEarned={sab.dismissAdEarned}
-          t={t}
-          reducedMotion={reducedMotion}
-        />
+        {/* Wrecking Ball bay — rival-raid meta, endless-only. Hidden in the
+            daily-only tower (no rivals to raid); keeps the left rail to the
+            steady-hands / mutator / perk chips that matter to a daily climb. */}
+        {!daily && (
+          <WordTowerSabotageBay
+            inline
+            tokens={sab.tokens}
+            rivals={displayRivals}
+            pickerOpen={sab.pickerOpen}
+            onOpen={sab.openPicker}
+            onClose={sab.closePicker}
+            onSend={sendWreck}
+            attackerHeightM={personalBest}
+            lastHit={sab.lastHit}
+            onDismissHit={sab.dismissHit}
+            earnedToast={sab.earnedToast}
+            onDismissEarned={sab.dismissEarned}
+            adEarnedToast={sab.adEarnedToast}
+            onDismissAdEarned={sab.dismissAdEarned}
+            t={t}
+            reducedMotion={reducedMotion}
+          />
+        )}
 
         {/* Steady-hands FLOW chip — the positive crane-skill beat: a run of
             perfect drops calms the tower (see instability) and escalates this
@@ -1098,8 +1133,8 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         zone={zoneR}
         tease={zoneText ? null : tease}
         reward={rewardFx}
-        sabEarned={sab.earnedToast}
-        sabAdEarned={!!sab.adEarnedToast}
+        sabEarned={daily ? null : sab.earnedToast}
+        sabAdEarned={!daily && !!sab.adEarnedToast}
         skinUnlock={skinUnlockR}
         surprise={surpriseR}
         combo={comboR}
@@ -1147,31 +1182,34 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
             <span className="hidden min-[380px]:inline">{t('common.backToHome')}</span>
           </Link>
+          {/* Top-right cluster: the wallet stays ALWAYS visible (rewards count up
+              where the player looks), and every secondary action folds behind ONE
+              expanding menu button so the header stops overlapping itself
+              (founder 2026-07-17). */}
           <div className="pointer-events-auto me-12 flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setShowUpgrades(true)}
-              aria-label={t('wordTower.upgrade.title')}
-              className="rounded-neo border-neo-thick border-black bg-neo-cyan p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
-            >
-              <Sparkles className="h-4 w-4" />
-            </button>
-            {/* Tower-skin picker (founder ask: keep skin selection in the top bar). */}
-            <WordTowerSkinPicker inline skin={skin} bestHeightM={personalBest} t={t} dir={dir} reducedMotion={reducedMotion} />
-            <button
-              type="button"
-              onClick={onOpenLeaderboard}
-              aria-label={t('wordTower.leaderboard.title')}
-              className="rounded-neo border-neo-thick border-black bg-neo-yellow p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
-            >
-              <Trophy className="h-4 w-4" />
-            </button>
-            {/* Compact wallet rides the same row so rewards count up where the
-                player is already looking, without a dedicated card. LazyMotion:
-                the counter uses framer `m.` primitives that need a features provider. */}
             <LazyMotion features={domAnimation}>
-              <CoinCounterAnimated value={coinBalance} size="xs" animateOnMount={false} />
+              <CoinCounterAnimated value={coinBalance} size="sm" animateOnMount={false} />
             </LazyMotion>
+            <WordTowerActionMenu t={t} reducedMotion={reducedMotion}>
+              <button
+                type="button"
+                onClick={() => setShowUpgrades(true)}
+                aria-label={t('wordTower.upgrade.title')}
+                className="rounded-neo border-neo-thick border-black bg-neo-cyan p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+              >
+                <Sparkles className="h-4 w-4" />
+              </button>
+              {/* Tower-skin picker (founder ask: keep skin selection reachable). */}
+              <WordTowerSkinPicker inline skin={skin} bestHeightM={personalBest} t={t} dir={dir} reducedMotion={reducedMotion} />
+              <button
+                type="button"
+                onClick={onOpenLeaderboard}
+                aria-label={t('wordTower.leaderboard.title')}
+                className="rounded-neo border-neo-thick border-black bg-neo-yellow p-2 text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+              >
+                <Trophy className="h-4 w-4" />
+              </button>
+            </WordTowerActionMenu>
           </div>
         </div>
         {/* Simplified altitude readout — its own centred row below the dropped
@@ -1225,6 +1263,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           }
           pendingWord={tower.state.pendingWord}
           onCraneDrop={triggerCraneDrop}
+          onCancelPlacement={tower.cancelPlacement}
           accentHex={blockColorHex}
           reducedMotion={reducedMotion}
           runPerks={runStreak.perks}
@@ -1232,6 +1271,18 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           dir={dir}
         />
       </div>
+
+      {/* Coins-collected fly — streams from the reward beat into the wallet
+          counter (which pulses + rolls the new total). Self-removing. */}
+      {coinFly && (
+        <DomCoinBurst
+          key={coinFly.key}
+          source={coinFly.source}
+          target={coinFly.target}
+          count={coinFly.count}
+          onDone={() => setCoinFly(null)}
+        />
+      )}
     </div>
   );
 }
