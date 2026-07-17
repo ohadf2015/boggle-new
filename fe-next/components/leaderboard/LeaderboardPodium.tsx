@@ -2,7 +2,7 @@
 
 import React, { memo, useMemo } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
-import { Crown } from 'lucide-react';
+import { Crown, Star } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -26,13 +26,57 @@ interface LeaderboardPodiumProps {
   className?: string;
 }
 
-/** Per-rank visual identity. BLACK ink on every fill — accent colors are
+/** Per-rank visual identity. BLACK ink on every fill — accent colours are
  *  invisible under white text (neo contrast rule). */
 const RANK_STYLE: Record<1 | 2 | 3, { pedestal: string; medal: string; ring: string; pedH: string; score: string }> = {
   1: { pedestal: 'bg-neo-yellow', medal: 'bg-neo-yellow', ring: 'ring-neo-yellow', pedH: 'h-20 sm:h-24', score: 'text-neo-yellow' },
   2: { pedestal: 'bg-slate-300', medal: 'bg-slate-300', ring: 'ring-slate-300', pedH: 'h-14 sm:h-16', score: 'text-neo-cream' },
   3: { pedestal: 'bg-neo-orange', medal: 'bg-neo-orange', ring: 'ring-neo-orange', pedH: 'h-10 sm:h-12', score: 'text-neo-orange' },
 };
+
+/** Floating confetti particles for the champion */
+const ConfettiParticles = memo(() => {
+  const reduce = useReducedMotion();
+  if (reduce) return null;
+
+  const colors = ['bg-neo-yellow', 'bg-neo-pink', 'bg-neo-cyan', 'bg-neo-lime', 'bg-neo-orange', 'bg-neo-purple'];
+  const particles = useMemo(() =>
+    Array.from({ length: 12 }, (_, i) => ({
+      id: i,
+      color: colors[i % colors.length],
+      x: (i % 6) * 18 - 54,
+      delay: i * 0.15,
+      rotate: i * 37,
+    })),
+  []);
+
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
+      {particles.map((p) => (
+        <m.div
+          key={p.id}
+          className={cn('absolute w-1.5 h-1.5 rounded-full', p.color)}
+          style={{ left: '50%', top: '10%', marginLeft: p.x }}
+          initial={{ opacity: 0, y: 0, scale: 0, rotate: 0 }}
+          animate={{
+            opacity: [0, 1, 1, 0],
+            y: [0, -20, -40, -60],
+            scale: [0, 1, 0.8, 0],
+            rotate: [0, p.rotate, p.rotate * 2, p.rotate * 3],
+          }}
+          transition={{
+            duration: 2.5,
+            delay: p.delay,
+            repeat: Infinity,
+            repeatDelay: 3,
+            ease: 'easeOut',
+          }}
+        />
+      ))}
+    </div>
+  );
+});
+ConfettiParticles.displayName = 'ConfettiParticles';
 
 /**
  * LeaderboardPodium — celebratory top-three treatment for the global leaderboard.
@@ -81,10 +125,22 @@ const LeaderboardPodium = memo<LeaderboardPodiumProps>(({ entries, language, cur
           >
             {/* Crown for the champion */}
             <Crown
-              className={cn('w-5 h-5 mb-0.5 text-neo-yellow', !isChampion && 'invisible')}
+              className={cn('w-5 h-5 mb-0.5 text-neo-yellow drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]', !isChampion && 'invisible')}
               fill="currentColor"
               aria-hidden={!isChampion}
             />
+
+            {/* Confetti bursts around champion */}
+            {isChampion && <ConfettiParticles />}
+
+            {/* Pulsing glow ring behind champion avatar */}
+            {isChampion && (
+              <m.div
+                className="absolute inset-0 rounded-full bg-neo-yellow/20 blur-xl"
+                animate={{ scale: [1, 1.15, 1], opacity: [0.3, 0.6, 0.3] }}
+                transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+              />
+            )}
 
             {/* Avatar with rank-coloured ring; cyan ring + YOU chip for current user */}
             <div className="relative">
