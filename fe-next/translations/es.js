@@ -1,5 +1,24 @@
 // Es translations
 const es = {
+  "pricing": {
+    "title": "Elige tu plan",
+    "subtitle": "Funciones de aula para profes y colegios",
+    "free": "Gratis",
+    "pro": "Pro",
+    "month": "mes",
+    "recommended": "Recomendado",
+    "free_1": "Hasta 5 alumnos por clase",
+    "free_2": "1 aula",
+    "free_3": "Modos de juego básicos",
+    "pro_1": "Alumnos ilimitados por clase",
+    "pro_2": "Aulas ilimitadas",
+    "pro_3": "Modos avanzados + palabras propias",
+    "pro_4": "Informes de progreso y analíticas del alumnado",
+    "current_plan": "Plan actual",
+    "sign_up_free": "Regístrate gratis",
+    "subscribe": "Suscríbete ya",
+    "error": "Algo salió mal. Inténtalo de nuevo."
+  },
   "report": {
     "title": "Reportar",
     "reason": "¿Cuál es el problema?",

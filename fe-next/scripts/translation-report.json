@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 5925,
+    "totalKeysInCode": 5931,
     "keyCountByLanguage": {
-      "en": 11755,
-      "es": 11857,
-      "he": 11816,
-      "ja": 11797,
-      "ru": 11778,
-      "sv": 11796
+      "en": 11763,
+      "es": 11882,
+      "he": 11841,
+      "ja": 11822,
+      "ru": 11803,
+      "sv": 11821
     },
     "missingFromEnglish": 16,
     "problematicFlatKeys": 0,
@@ -520,7 +520,7 @@
       "usages": [
         {
           "file": "components/wordTower/WordTowerHud.tsx",
-          "line": 270
+          "line": 273
         }
       ]
     }
@@ -791,24 +791,7 @@
       "supporter.card.title",
       "supporter.card.body",
       "supporter.card.cta",
-      "supporter.card.thanks",
-      "pricing.title",
-      "pricing.subtitle",
-      "pricing.free",
-      "pricing.pro",
-      "pricing.month",
-      "pricing.recommended",
-      "pricing.free_1",
-      "pricing.free_2",
-      "pricing.free_3",
-      "pricing.pro_1",
-      "pricing.pro_2",
-      "pricing.pro_3",
-      "pricing.pro_4",
-      "pricing.current_plan",
-      "pricing.sign_up_free",
-      "pricing.subscribe",
-      "pricing.error"
+      "supporter.card.thanks"
     ],
     "he": [
       "sealedBidLegacy.chipStack",
@@ -979,24 +962,7 @@
       "admin.actionUrlLabel",
       "admin.sendSuccess",
       "admin.sendError",
-      "sealedBid.revealing",
-      "pricing.title",
-      "pricing.subtitle",
-      "pricing.free",
-      "pricing.pro",
-      "pricing.month",
-      "pricing.recommended",
-      "pricing.free_1",
-      "pricing.free_2",
-      "pricing.free_3",
-      "pricing.pro_1",
-      "pricing.pro_2",
-      "pricing.pro_3",
-      "pricing.pro_4",
-      "pricing.current_plan",
-      "pricing.sign_up_free",
-      "pricing.subscribe",
-      "pricing.error"
+      "sealedBid.revealing"
     ],
     "ja": [
       "sealedBidLegacy.chipStack",
@@ -1266,24 +1232,7 @@
       "vs.fiveLanguages",
       "vs.charitableDonation",
       "vs.bestFor",
-      "sealedBid.revealing",
-      "pricing.title",
-      "pricing.subtitle",
-      "pricing.free",
-      "pricing.pro",
-      "pricing.month",
-      "pricing.recommended",
-      "pricing.free_1",
-      "pricing.free_2",
-      "pricing.free_3",
-      "pricing.pro_1",
-      "pricing.pro_2",
-      "pricing.pro_3",
-      "pricing.pro_4",
-      "pricing.current_plan",
-      "pricing.sign_up_free",
-      "pricing.subscribe",
-      "pricing.error"
+      "sealedBid.revealing"
     ],
     "ru": [
       "seo.refund.title",
@@ -1303,24 +1252,7 @@
       "supporter.card.title",
       "supporter.card.body",
       "supporter.card.cta",
-      "supporter.card.thanks",
-      "pricing.title",
-      "pricing.subtitle",
-      "pricing.free",
-      "pricing.pro",
-      "pricing.month",
-      "pricing.recommended",
-      "pricing.free_1",
-      "pricing.free_2",
-      "pricing.free_3",
-      "pricing.pro_1",
-      "pricing.pro_2",
-      "pricing.pro_3",
-      "pricing.pro_4",
-      "pricing.current_plan",
-      "pricing.sign_up_free",
-      "pricing.subscribe",
-      "pricing.error"
+      "supporter.card.thanks"
     ],
     "sv": [
       "sealedBidLegacy.chipStack",
@@ -1587,24 +1519,7 @@
       "vs.fiveLanguages",
       "vs.charitableDonation",
       "vs.bestFor",
-      "sealedBid.revealing",
-      "pricing.title",
-      "pricing.subtitle",
-      "pricing.free",
-      "pricing.pro",
-      "pricing.month",
-      "pricing.recommended",
-      "pricing.free_1",
-      "pricing.free_2",
-      "pricing.free_3",
-      "pricing.pro_1",
-      "pricing.pro_2",
-      "pricing.pro_3",
-      "pricing.pro_4",
-      "pricing.current_plan",
-      "pricing.sign_up_free",
-      "pricing.subscribe",
-      "pricing.error"
+      "sealedBid.revealing"
     ]
   },
   "keysNotInEnglish": {

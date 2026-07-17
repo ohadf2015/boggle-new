@@ -844,6 +844,44 @@ function main() {
     if (process.env.TRANSLATIONS_STRICT === '1') return 1;
   }
 
+  // Ratchet gate on missingByLanguage: fail only on keys that are NEWLY missing
+  // vs a committed baseline. This is the durable fix for the recurring class
+  // "key added to en, forgotten in other locales" that renders raw key paths to
+  // users and floods Sentry with "Translation missing". Unlike missingFromEnglish
+  // (advisory above — polluted by dynamic template keys + code-vs-snapshot
+  // deploy-lag), missingByLanguage compares en dict vs locale dict in the SAME
+  // snapshot, so there are no such false positives — safe to hard-gate.
+  // The baseline holds the current (large) backlog so CI doesn't red-fail on it;
+  // any NEW omission fails immediately. Regenerate intentionally with
+  // TRANSLATIONS_UPDATE_BASELINE=1 (e.g. after deleting a feature's en keys).
+  const baselinePath = path.join(PROJECT_ROOT, 'scripts/translation-missing-baseline.json');
+  const currentMissing = report.missingByLanguage; // { lang: [keyPaths] }
+  if (process.env.TRANSLATIONS_UPDATE_BASELINE === '1') {
+    fs.writeFileSync(baselinePath, JSON.stringify(currentMissing, null, 2) + '\n');
+    console.log(`\n✅ Missing-translation baseline updated: ${baselinePath}`);
+    return 0;
+  }
+  if (!fs.existsSync(baselinePath)) {
+    fs.writeFileSync(baselinePath, JSON.stringify(currentMissing, null, 2) + '\n');
+    console.log(`\n📌 Missing-translation baseline created (bootstrap): ${baselinePath}`);
+    return 0;
+  }
+  const baseline = JSON.parse(fs.readFileSync(baselinePath, 'utf8'));
+  const regressions = [];
+  for (const [lang, keys] of Object.entries(currentMissing)) {
+    const known = new Set(baseline[lang] || []);
+    for (const k of keys) if (!known.has(k)) regressions.push(`${lang}: ${k}`);
+  }
+  if (regressions.length > 0) {
+    console.log(`\n❌ ${regressions.length} NEW missing translation(s) vs baseline.`);
+    console.log('   Add the key to the listed translations/<lang>.js file(s),');
+    console.log('   or re-run with TRANSLATIONS_UPDATE_BASELINE=1 if this omission is intentional:');
+    regressions.slice(0, 50).forEach(r => console.log(`   - ${r}`));
+    if (regressions.length > 50) console.log(`   …and ${regressions.length - 50} more`);
+    return 1;
+  }
+  console.log('\n✅ No new missing translations vs baseline.');
+
   return 0;
 }
 

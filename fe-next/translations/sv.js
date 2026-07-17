@@ -1,5 +1,24 @@
 // Sv translations
 const sv = {
+  "pricing": {
+    "title": "Välj din plan",
+    "subtitle": "Klassrumsfunktioner för lärare och skolor",
+    "free": "Gratis",
+    "pro": "Pro",
+    "month": "månad",
+    "recommended": "Rekommenderas",
+    "free_1": "Upp till 5 elever per klass",
+    "free_2": "1 klassrum",
+    "free_3": "Grundläggande spellägen",
+    "pro_1": "Obegränsat antal elever per klass",
+    "pro_2": "Obegränsat antal klassrum",
+    "pro_3": "Avancerade spellägen + egna ord",
+    "pro_4": "Elevrapporter och statistik",
+    "current_plan": "Nuvarande plan",
+    "sign_up_free": "Registrera dig gratis",
+    "subscribe": "Prenumerera nu",
+    "error": "Något gick fel. Försök igen."
+  },
   "report": {
     "title": "Rapportera",
     "reason": "Vad är problemet?",

@@ -1,5 +1,24 @@
 // Ja translations
 const ja = {
+  "pricing": {
+    "title": "プランを選ぶ",
+    "subtitle": "先生と学校向けの授業機能",
+    "free": "無料",
+    "pro": "Pro",
+    "month": "月",
+    "recommended": "おすすめ",
+    "free_1": "1クラス最大5人まで",
+    "free_2": "クラス1つ",
+    "free_3": "基本のゲームモード",
+    "pro_1": "1クラスの人数は無制限",
+    "pro_2": "クラス数は無制限",
+    "pro_3": "上級ゲームモード＋オリジナル単語",
+    "pro_4": "生徒の学習レポートと分析",
+    "current_plan": "現在のプラン",
+    "sign_up_free": "無料で登録",
+    "subscribe": "今すぐ登録",
+    "error": "問題が発生しました。もう一度お試しください。"
+  },
   "report": {
     "title": "報告",
     "reason": "問題の内容は？",
