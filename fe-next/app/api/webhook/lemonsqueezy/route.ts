@@ -23,7 +23,7 @@ function getVariantId(p: WebhookPayload): string | undefined {
 /** Map Lemon Squeezy variant IDs to tier names */
 function getTierFromVariantId(variantId: string | undefined): Tier {
   if (!variantId) return 'free'
-  const proVariantId = process.env.LEMONSQUEEZY_VARIANT_ID_PRO
+  const proVariantId = process.env.LEMONSQUEEZY_PRO_VARIANT_ID
   if (proVariantId && variantId === proVariantId) return 'pro'
   return 'free'
 }
