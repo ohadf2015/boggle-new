@@ -111,7 +111,11 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
       if (!v.accepted) {
         return { ...state, lastError: v.error ?? null, errorKey: state.errorKey + 1, selected: [] };
       }
-      return { ...state, pendingWord: word, selected: [], lastError: null };
+      // KEEP the selection (don't clear it) so the player can bail back out of the
+      // crane and CONTINUE BUILDING the same word — cancelPlacement just drops the
+      // pending flag and the spell path is exactly where they left it (founder ask
+      // 2026-07-17). The selection is cleared for real on commit.
+      return { ...state, pendingWord: word, lastError: null };
     }
     case 'commitPlacement': {
       // Crane step 2: drop. Apply the held word scaled by the placement quality.
@@ -122,12 +126,15 @@ function reducer(state: WordTowerUIState, action: Action): WordTowerUIState {
       // drop re-fires), refuse it here so a duplicate can NEVER land twice. Normal
       // play is unaffected — a freshly-held word is never in usedWords yet.
       if (isTowerWordUsed(state.game, state.pendingWord)) {
-        return { ...state, pendingWord: null, lastError: 'duplicate', errorKey: state.errorKey + 1 };
+        return { ...state, pendingWord: null, selected: [], lastError: 'duplicate', errorKey: state.errorKey + 1 };
       }
       const { state: nextGame, result } = applyTowerWord(state.game, state.pendingWord, action.multiplier);
       return {
         ...state,
         game: nextGame,
+        // Selection is held through the crane step (so the player can keep
+        // building); clear it now that the word has actually landed.
+        selected: [],
         pendingWord: null,
         lastResult: result,
         resultKey: state.resultKey + 1,

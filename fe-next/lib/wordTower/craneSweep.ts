@@ -23,6 +23,14 @@ export const SWEEP_PERIOD_START_MS = 3400;
 /** Floor on the period (ms) — the fastest the sweep ever gets, however tall.
  *  Raised so even a tall tower never sweeps faster than a comfortably-timed tap. */
 export const SWEEP_PERIOD_FLOOR_MS = 2200;
+/** Ceiling on the EFFECTIVE period (ms) — the SLOWEST the sweep can ever get,
+ *  however many crane-slowing upgrades/mutators stack. Founder ask (2026-07-17):
+ *  "the crane speed shouldn't be so slow even with the upgrades — the minimum
+ *  speed should be normal, not super slow." Steady Cable + a tailwind day used to
+ *  balloon the ground period to ~5.7 s, which crawled. Capping at the ground-floor
+ *  default means the crane never sweeps slower than its normal, unupgraded pace —
+ *  upgrades now only claw the FASTER high-floor pace back toward comfortable. */
+export const SWEEP_PERIOD_CEILING_MS = SWEEP_PERIOD_START_MS;
 /** How many ms shorter (faster) the sweep gets per floor climbed. Gentled so the
  *  difficulty ramp is slower — the climb stays fair far higher up. */
 export const SWEEP_PERIOD_STEP_MS = 40;
@@ -75,4 +83,30 @@ export function sweepPeriodMs(towerHeightFloors: number): number {
     SWEEP_PERIOD_FLOOR_MS,
     SWEEP_PERIOD_START_MS,
   );
+}
+
+/**
+ * The FINAL sweep period the crane actually uses, after folding in the run's
+ * crane-slowing modifiers, then clamped to a sane band.
+ *
+ * @param towerHeightFloors  drives the base height ramp ({@link sweepPeriodMs}).
+ * @param sweepSpeedMult     Steady Cable upgrade (<1 slows → longer period).
+ * @param sweepMult          daily mutator sweep factor (>1 slows, e.g. tailwind).
+ *
+ * The result is clamped to [{@link SWEEP_PERIOD_FLOOR_MS}, {@link SWEEP_PERIOD_CEILING_MS}]
+ * so that:
+ *  - a very tall tower never sweeps FASTER than the comfortable floor, and
+ *  - no stack of slow-down bonuses can ever push it SLOWER than the ground-floor
+ *    default (the "minimum speed stays normal" fix) — upgrades only help by
+ *    pulling the faster high-floor pace back toward that comfortable ceiling.
+ */
+export function effectiveSweepPeriodMs(
+  towerHeightFloors: number,
+  sweepSpeedMult = 1,
+  sweepMult = 1,
+): number {
+  const speed = Number.isFinite(sweepSpeedMult) && sweepSpeedMult > 0 ? sweepSpeedMult : 1;
+  const mult = Number.isFinite(sweepMult) && sweepMult > 0 ? sweepMult : 1;
+  const raw = (sweepPeriodMs(towerHeightFloors) * mult) / speed;
+  return clamp(raw, SWEEP_PERIOD_FLOOR_MS, SWEEP_PERIOD_CEILING_MS);
 }

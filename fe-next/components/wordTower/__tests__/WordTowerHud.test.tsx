@@ -127,13 +127,23 @@ describe('WordTowerHud', () => {
     expect(onSubmit).not.toHaveBeenCalled();
   });
 
-  it('locks the tray + edit buttons while a word is pending placement', () => {
+  it('locks the tray while placing but offers an enabled KEEP BUILDING escape', () => {
+    const onCancelPlacement = vi.fn();
     render(
-      <WordTowerHud {...makeProps({ word: 'CAT', selected: [0, 1, 2], pendingWord: 'CCAT', possibleWords: 0 })} />,
+      <WordTowerHud {...makeProps({ word: 'CAT', selected: [0, 1, 2], pendingWord: 'CCAT', possibleWords: 0, onCancelPlacement })} />,
     );
+    // Tray letters + scramble stay locked so the armed word can't change under
+    // the crane...
     expect(screen.getByRole('button', { name: 'wordTower.a11y.tile:R' })).toBeDisabled();
-    expect(screen.getByRole('button', { name: /wordTower\.hud\.backspace/ })).toBeDisabled();
     expect(screen.getByRole('button', { name: /wordTower\.hud\.scramble/ })).toBeDisabled();
+    // ...but the backspace slot flips to an ENABLED "keep building" button that
+    // bails back to the builder (the continue-building escape hatch), so there is
+    // no disabled backspace button here any more.
+    expect(screen.queryByRole('button', { name: /wordTower\.hud\.backspace/ })).toBeNull();
+    const keep = screen.getByRole('button', { name: /wordTower\.hud\.keepBuilding/ });
+    expect(keep).toBeEnabled();
+    fireEvent.click(keep);
+    expect(onCancelPlacement).toHaveBeenCalledTimes(1);
   });
 });
 

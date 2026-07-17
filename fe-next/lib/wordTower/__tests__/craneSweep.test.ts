@@ -3,8 +3,10 @@ import {
   craneOffsetAt,
   craneSwingFactor,
   sweepPeriodMs,
+  effectiveSweepPeriodMs,
   SWEEP_PERIOD_START_MS,
   SWEEP_PERIOD_FLOOR_MS,
+  SWEEP_PERIOD_CEILING_MS,
 } from '../craneSweep';
 
 describe('craneSwingFactor — swing widens per letter, capped (#9)', () => {
@@ -115,5 +117,37 @@ describe('sweepPeriodMs — height-ramped difficulty', () => {
       expect(cur).toBeLessThanOrEqual(prev);
       prev = cur;
     }
+  });
+});
+
+describe('effectiveSweepPeriodMs — crane never crawls, even fully upgraded', () => {
+  it('equals the base period with no modifiers', () => {
+    expect(effectiveSweepPeriodMs(0)).toBe(sweepPeriodMs(0));
+    expect(effectiveSweepPeriodMs(10)).toBe(sweepPeriodMs(10));
+  });
+
+  it('caps the SLOWEST sweep at the ground-floor default however many slow-downs stack', () => {
+    // Steady Cable maxed (0.6) + a tailwind-style sweep mult (1.25) would blow the
+    // ground period out to ~7 s. The ceiling holds it to the normal ground pace.
+    const superSlow = effectiveSweepPeriodMs(0, 0.5, 1.4);
+    expect(superSlow).toBe(SWEEP_PERIOD_CEILING_MS);
+    expect(superSlow).toBeLessThanOrEqual(SWEEP_PERIOD_START_MS);
+  });
+
+  it('lets crane-slowing upgrades pull the fast high-floor pace back toward comfortable', () => {
+    const upgraded = effectiveSweepPeriodMs(60, 0.6, 1); // slow the fast top-floor sweep
+    expect(upgraded).toBeGreaterThan(sweepPeriodMs(60)); // slower than un-upgraded
+    expect(upgraded).toBeLessThanOrEqual(SWEEP_PERIOD_CEILING_MS); // but never a crawl
+  });
+
+  it('still respects the fast floor for a very tall tower', () => {
+    expect(effectiveSweepPeriodMs(9999, 1, 1)).toBe(SWEEP_PERIOD_FLOOR_MS);
+    expect(effectiveSweepPeriodMs(9999, 1, 1)).toBeGreaterThanOrEqual(SWEEP_PERIOD_FLOOR_MS);
+  });
+
+  it('guards against garbage multipliers (0 / negative / NaN → treated as 1×)', () => {
+    expect(effectiveSweepPeriodMs(5, 0, 1)).toBe(effectiveSweepPeriodMs(5, 1, 1));
+    expect(effectiveSweepPeriodMs(5, -2, 1)).toBe(effectiveSweepPeriodMs(5, 1, 1));
+    expect(effectiveSweepPeriodMs(5, NaN, NaN)).toBe(effectiveSweepPeriodMs(5, 1, 1));
   });
 });

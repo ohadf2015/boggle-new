@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Delete, Shuffle, Lightbulb, ChevronDown, ChevronUp, RotateCw, Coins } from 'lucide-react';
+import { Delete, Shuffle, Lightbulb, ChevronDown, ChevronUp, RotateCw, Coins, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type ApplyResult, type ValidationError } from '@/lib/wordTower/wordTowerManager';
 import { useRewardedAd } from '@/hooks/useRewardedAd';
@@ -48,6 +48,9 @@ export interface WordTowerHudProps {
   /** Triggered by the swapped-in DROP CTA — wires through to the crane's
    *  imperative `drop()`. */
   onCraneDrop?: () => void;
+  /** Bail out of the crane hand-off back to the word builder, KEEPING the spell
+   *  path intact so the player can continue building the same word. */
+  onCancelPlacement?: () => void;
   onSelectTile: (i: number) => void;
   /** Tap an already-selected wheel tile to unselect it. */
   onDeselectTile?: (i: number) => void;
@@ -78,7 +81,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
     tray, selected, word, heightM, combo, scramblesLeft, scrambleCost = 0, coinBalance = 0,
     accentHex = '#7c8a99', reducedMotion = false,
     possibleWords, clueWord, onReroll, goldenLetter, lastError, errorKey, lastResult, resultKey,
-    pendingWord, gainPreview, onCraneDrop,
+    pendingWord, gainPreview, onCraneDrop, onCancelPlacement,
     onSelectTile, onDeselectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, runPerks, t, dir,
   } = props;
   void onClear;
@@ -343,15 +346,31 @@ export function WordTowerHud(props: WordTowerHudProps) {
               onDrop={() => onCraneDrop?.()}
             />
           </div>
-          <button
-            type="button"
-            onClick={onBackspace}
-            disabled={selected.length === 0 || isPlacing}
-            className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
-            aria-label={t('wordTower.hud.backspace')}
-          >
-            <Delete className="h-5 w-5" />
-          </button>
+          {/* While a word is armed on the crane this button flips to KEEP
+              BUILDING — bail back to the wheel with the spell path intact so the
+              player can add/remove letters instead of being forced to drop the
+              word the auto-hand-off grabbed (founder ask 2026-07-17). */}
+          {isPlacing ? (
+            <button
+              type="button"
+              onClick={onCancelPlacement}
+              className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-cyan px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+              aria-label={t('wordTower.hud.keepBuilding')}
+              title={t('wordTower.hud.keepBuilding')}
+            >
+              <Pencil className="h-5 w-5" />
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={onBackspace}
+              disabled={selected.length === 0}
+              className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+              aria-label={t('wordTower.hud.backspace')}
+            >
+              <Delete className="h-5 w-5" />
+            </button>
+          )}
         </div>
         </div>
         )}

@@ -2506,6 +2506,9 @@ const ru = {
       "backToTop": "Вверх",
       "pickLetters": "Выбери буквы",
       "dragToBuild": "Тащи или нажимай для составления",
+      "keepBuilding": "Продолжить сборку",
+      "menuOpen": "Ещё действия",
+      "menuClose": "Закрыть меню",
       "chaseGap": "+{m} м",
       "chaseAria": "Соперник выше: {name}, {m} метров до него"
     },

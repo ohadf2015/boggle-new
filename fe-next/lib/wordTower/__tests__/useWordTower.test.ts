@@ -60,7 +60,31 @@ describe('useWordTower', () => {
 
       expect(result.current.state.pendingWord).toBe(expected);
       expect(result.current.state.game.floors).toHaveLength(0); // not committed yet
-      expect(result.current.state.selected).toEqual([]);        // tiles taken by the crane
+      // Selection is PRESERVED through the crane hand-off so the player can bail
+      // back and keep building the same word (cancelPlacement) — it only clears
+      // once the word actually lands (commitPlacement, asserted below).
+      expect(result.current.state.selected).toEqual([0, 1, 2]);
+    });
+
+    it('cancelPlacement returns to the builder KEEPING the spell path (continue building)', () => {
+      const { result } = setup(acceptAll);
+      pick(result, [0, 1, 2]);
+      act(() => result.current.hold());
+      act(() => result.current.cancelPlacement());
+
+      expect(result.current.state.pendingWord).toBeNull();
+      expect(result.current.state.selected).toEqual([0, 1, 2]); // word intact
+      expect(result.current.state.game.floors).toHaveLength(0);  // nothing placed
+    });
+
+    it('commitPlacement clears the preserved selection once the word lands', () => {
+      const { result } = setup(acceptAll);
+      pick(result, [0, 1, 2]);
+      act(() => result.current.hold());
+      act(() => result.current.commitPlacement(1));
+
+      expect(result.current.state.selected).toEqual([]);
+      expect(result.current.state.game.floors).toHaveLength(1);
     });
 
     it('a rejected hold errors and stashes nothing (no crane for a bad word)', () => {
