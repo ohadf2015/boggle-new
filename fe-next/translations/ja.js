@@ -100,9 +100,16 @@ const ja = {
     "timer": "タイム",
     "gridLabel": "クロスワードの盤面",
     "cellLabel": "{row}行 {col}列",
-    "dir": { "across": "ヨコ", "down": "タテ" },
+    "dir": {
+      "across": "ヨコ",
+      "down": "タテ"
+    },
     "switchDir": "方向を切り替え",
-    "difficulty": { "easy": "かんたん", "medium": "ふつう", "hard": "むずかしい" },
+    "difficulty": {
+      "easy": "かんたん",
+      "medium": "ふつう",
+      "hard": "むずかしい"
+    },
     "acrossHeading": "ヨコのカギ",
     "downHeading": "タテのカギ",
     "prevClue": "前のヒント",
@@ -171,7 +178,9 @@ const ja = {
       "not-your-turn": "順番をお待ちください。"
     },
     "solo": {
-      "category": { "hit": "✨ +2× {category}!" },
+      "category": {
+        "hit": "✨ +2× {category}!"
+      },
       "howTo": {
         "title": "遊び方",
         "cta": "OK！",
@@ -196,7 +205,11 @@ const ja = {
       "lost": "ラウンド終了",
       "botThinking": "ボットが考え中…",
       "difficultyLabel": "ボットの難易度",
-      "difficulty": {"easy": "やさしい", "medium": "ふつう", "hard": "むずかしい"},
+      "difficulty": {
+        "easy": "やさしい",
+        "medium": "ふつう",
+        "hard": "むずかしい"
+      },
       "err": {
         "not-hiragana": "ひらがなのみ（例：ねこ）。",
         "wrong-head": "最初の文字が違います — 表示された文字から始めてください。",
@@ -233,24 +246,60 @@ const ja = {
     "modifier": {
       "todaysTwist": "今日のひねり",
       "shiritori": {
-        "longWords": { "label": "長くて強い", "desc": "大きく大胆な言葉を伸ばす日。" },
-        "noRepeatVowel": { "label": "母音不足", "desc": "母音を新鮮で多様に保とう。" },
-        "speedDemon": { "label": "スピード鬼", "desc": "速い思考がチェーンを支配する今日。" }
+        "longWords": {
+          "label": "長くて強い",
+          "desc": "大きく大胆な言葉を伸ばす日。"
+        },
+        "noRepeatVowel": {
+          "label": "母音不足",
+          "desc": "母音を新鮮で多様に保とう。"
+        },
+        "speedDemon": {
+          "label": "スピード鬼",
+          "desc": "速い思考がチェーンを支配する今日。"
+        }
       },
       "sealedBid": {
-        "noClashPenalty": { "label": "休戦の日", "desc": "より友好的な市場 — 自由に入札しよう。" },
-        "vowelTax": { "label": "母音税", "desc": "母音は今日のホットコモディティ。" },
-        "highStakes": { "label": "ハイステークス", "desc": "大胆でユニークな入札が今日を定義する。" }
+        "noClashPenalty": {
+          "label": "休戦の日",
+          "desc": "より友好的な市場 — 自由に入札しよう。"
+        },
+        "vowelTax": {
+          "label": "母音税",
+          "desc": "母音は今日のホットコモディティ。"
+        },
+        "highStakes": {
+          "label": "ハイステークス",
+          "desc": "大胆でユニークな入札が今日を定義する。"
+        }
       },
       "wordAlchemy": {
-        "doubleCatalyst": { "label": "ダブル触媒", "desc": "触媒は今日特に活気に満ちている。" },
-        "heatDecay": { "label": "冷却ラボ", "desc": "冷えたラボ — 反応をペースして。" },
-        "pureTransmute": { "label": "純粋な変換", "desc": "真の錬金術の日。" }
+        "doubleCatalyst": {
+          "label": "ダブル触媒",
+          "desc": "触媒は今日特に活気に満ちている。"
+        },
+        "heatDecay": {
+          "label": "冷却ラボ",
+          "desc": "冷えたラボ — 反応をペースして。"
+        },
+        "pureTransmute": {
+          "label": "純粋な変換",
+          "desc": "真の錬金術の日。"
+        }
       },
       "crossword": {
-        "themedGrid": { "label": "テーマの日", "desc": "隠れたテーマが今日のグリッドを貫く。" },
-        "noCheck": { "label": "ピーク禁止", "desc": "今日は本能を信じよう。" },
-        "timeAttack": { "label": "時間攻撃", "desc": "時計が刻む — すばやく解こう。" }
+        "themedGrid": {
+          "label": "テーマの日",
+          "desc": "隠れたテーマが今日のグリッドを貫く。"
+        },
+        "noCheck": {
+          "label": "ピーク禁止",
+          "desc": "今日は本能を信じよう。"
+        },
+        "timeAttack": {
+          "label": "時間攻撃",
+          "desc": "時計が刻む — すばやく解こう。"
+        }
       }
     }
   },
@@ -262,7 +311,11 @@ const ja = {
     "wins": "がオークションに勝利！",
     "bidPrompt": "ラックから単語を作ろう — 誰も選ばない単語を！",
     "results": "入札結果を公開",
-    "outcome": { "unique": "ユニーク ×2", "clash": "衝突 ÷2", "none": "入札なし" },
+    "outcome": {
+      "unique": "ユニーク ×2",
+      "clash": "衝突 ÷2",
+      "none": "入札なし"
+    },
     "locked": "入札を確定 — 対戦相手を待っています…",
     "lockProgress": "{{locked}}/{{total}} 人が確定",
     "clear": "クリア",
@@ -354,21 +407,63 @@ const ja = {
     },
     "wildcardFound": "賢者の石発見！",
     "wildcardSkip": "一段階スキップ — 錬金術の奇跡",
-    "heat": {"label": "熱量","rush": "発熱ラッシュ！","rushAria": "熱量満タン — 次の正解でボーナス獲得！"},
-    "share": {"copy": "結果をコピー","copied": "コピーしました！","emojiRowAria": "プレイ結果の絵文字サマリー","captionPerfect": "完璧な錬成！🧪","captionWild": "触媒が大活躍！🔮","captionGood": "見事な錬金術！🌡️","captionHard": "今日は元素が手強かった 😅"}
+    "heat": {
+      "label": "熱量",
+      "rush": "発熱ラッシュ！",
+      "rushAria": "熱量満タン — 次の正解でボーナス獲得！"
+    },
+    "share": {
+      "copy": "結果をコピー",
+      "copied": "コピーしました！",
+      "emojiRowAria": "プレイ結果の絵文字サマリー",
+      "captionPerfect": "完璧な錬成！🧪",
+      "captionWild": "触媒が大活躍！🔮",
+      "captionGood": "見事な錬金術！🌡️",
+      "captionHard": "今日は元素が手強かった 😅"
+    }
   },
-  "gameFeedback": {"prompt":"今のラウンドはどうだった？","bad":"うーん","ok":"良かった","great":"最高！","thanks":"フィードバックありがとう！","dismiss":"閉じる"},
+  "gameFeedback": {
+    "prompt": "今のラウンドはどうだった？",
+    "bad": "うーん",
+    "ok": "良かった",
+    "great": "最高！",
+    "thanks": "フィードバックありがとう！",
+    "dismiss": "閉じる"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "今日のひねり",
-      "goldenLetter": { "name": "ゴールデン文字", "desc": "{letter} を含む単語は60%高く積める" },
-      "vowelGale": { "name": "母音の風", "desc": "母音ごとに高さアップ" },
-      "longAndStrong": { "name": "長くて強い", "desc": "6文字以上の単語は50%高く積める" },
-      "skylineRush": { "name": "スカイラインラッシュ", "desc": "どの階も15%高く積める" },
-      "tailwind": { "name": "追い風", "desc": "クレーンの動きが速くなる" },
-      "featherday": { "name": "フェザーデー", "desc": "崩れるまでに揺れが1回多い" }
+      "goldenLetter": {
+        "name": "ゴールデン文字",
+        "desc": "{letter} を含む単語は60%高く積める"
+      },
+      "vowelGale": {
+        "name": "母音の風",
+        "desc": "母音ごとに高さアップ"
+      },
+      "longAndStrong": {
+        "name": "長くて強い",
+        "desc": "6文字以上の単語は50%高く積める"
+      },
+      "skylineRush": {
+        "name": "スカイラインラッシュ",
+        "desc": "どの階も15%高く積める"
+      },
+      "tailwind": {
+        "name": "追い風",
+        "desc": "クレーンの動きが速くなる"
+      },
+      "featherday": {
+        "name": "フェザーデー",
+        "desc": "崩れるまでに揺れが1回多い"
+      }
     },
-    "combo": { "roll": "連続！", "fire": "ヒート！", "blaze": "大炎上！", "inferno": "インフェルノ！" },
+    "combo": {
+      "roll": "連続！",
+      "fire": "ヒート！",
+      "blaze": "大炎上！",
+      "inferno": "インフェルノ！"
+    },
     "howTo": {
       "title": "遊び方",
       "cta": "OK！",
@@ -383,32 +478,303 @@ const ja = {
     "loading": "辞書を読み込み中…",
     "loadError": "辞書を読み込めませんでした — タップして再試行",
     "retry": "もう一度",
-    "biome": { "city": "地上", "sky": "空", "stratosphere": "成層圏", "orbit": "軌道", "nebula": "星雲", "galaxy": "銀河" },
-    "tier": { "apprentice": "見習い", "journeyman": "職人", "master": "マスター建築家" },
-    "hud": { "floors": "{n} 階", "combo": "{n} 連鎖", "scramble": "シャッフル", "backspace": "削除", "build": "建てる", "restart": "やり直す", "restartConfirm": "本当に？", "best": "ベスト {m} m", "possible": "{n} 単語", "clue": "ヒント", "collapse": "閉じる", "expand": "開く", "rivalPassed": "{name} を抜いた！", "stuck": "詰まった？新しい文字", "backToTop": "上へ", "pickLetters": "文字を選ぶ", "dragToBuild": "なぞるかタップして綴る", "keepBuilding": "続けて作る", "menuOpen": "その他の操作", "menuClose": "メニューを閉じる", "chaseGap": "+{m} m", "chaseAria": "次のライバル: {name}、抜くまであと {m} m" },
-    "minimap": { "label": "タワーマップ — {m} m、タップで頂上へ" },
-    "milestone": { "m50": "木のてっぺん超え！🌳", "m150": "雲の中へ ☁️", "m400": "鳥もうらやむ 🐦", "m250": "ドローンより上だ 🛸", "m650": "星雲の気分 🌌", "m900": "宇宙までもうすぐ 🚀", "m1300": "深宇宙の住人 👽", "m1800": "ほぼ宇宙飛行士 ✨" },
-    "ach": { "unlocked": "実績解除！", "firstFloor": "最初の階", "tenFloors": "高層ビル", "skyHigh": "空高く", "wordsmith": "言葉の達人", "comboKing": "コンボ王", "rivalCrusher": "ライバル撃破", "unstoppable": "止まらない", "toTheMoon": "月まで", "skylineKing": "スカイラインの王", "centurion": "百階の戦士", "comboGod": "コンボの神", "wordWizard": "言葉の魔法使い", "galaxyClass": "ギャラクシー級", "deepSpace": "深宇宙" },
-    "zone": { "entered": "新エリア", "next": "次: {zone} · あと{m}m" },
-    "landmark": { "skyscraper": "超高層ビルの上", "cloudBase": "雲の底", "mountainTop": "山頂", "jetStream": "ジェット気流", "stormTops": "雷雲の頂", "weatherBalloon": "気象観測気球", "earthCurve": "地球の弧", "karman": "宇宙の境界", "meteorBelt": "流星帯", "aurora": "オーロラ", "deepSpace": "深宇宙" },
-    "hazard": { "bomb": "爆弾", "hurricane": "ハリケーン", "wobble": "ぐらつき", "sabotage": "妨害", "lost": "{kind}！{n}階崩落" },
-    "clutch": { "save": "ギリギリセーフ！", "critical": "ぐらぐら — きれいに着地！" },
-    "surprise": { "nextWord": "次の単語", "surge": "サージ！", "windfall": "棚ぼた！", "updraft": "上昇気流！次の単語が強化", "crystal": "クリスタル発見！", "goldenFloor": "黄金の階！" },
-    "daily": { "badge": "デイリー · {date}", "streak": "{n}日連続", "toDaily": "デイリー", "toEndless": "エンドレス", "newBest": "デイリー自己ベスト更新！", "questTitle": "ワードタワー", "questDesc": "言葉を高く積み上げよう — 今日はみんな同じ文字。" },
-    "perk": { "title": "ボーナスを選ぶ", "subtitle": "1つ選択 — この登攀の間ずっと有効", "skip": "今回はスキップ", "masterCrane": { "name": "マスタークレーン", "desc": "パーフェクト時の報酬アップ" }, "tallTimber": { "name": "ノッポ材木", "desc": "全階の高さ+12%" }, "featherfall": { "name": "フェザーフォール", "desc": "崩落で失う階が1つ減る" }, "reinforced": { "name": "補強済み", "desc": "崖っぷちまでの猶予が増える" }, "cushion": { "name": "安全クッション", "desc": "クレーンのぐらつきで階が落ちない" } },
-    "runPerk": { "hotStreak": { "a11y": "ホットストリーク：残り{n}ドロップ" } },
-    "crane": { "place": "単語を置く", "steer": "操作して落とす", "tapToDrop": "タップして落とす", "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらぐら", "miss": "おっと！", "stability": "安定", "steady": "安定", "onFire": "絶好調", "steadyAria": "安定した手のストリーク：パーフェクト{n}回" },
-    "upgrade": { "categories": { "crane": "クレーン", "stability": "安定", "boost": "ブースト" }, "recommended": "おすすめ", "title": "タワーアップグレード", "subtitle": "永続強化 — コインで購入", "open": "強化", "balance": "{n}コイン", "buy": "購入", "max": "最大", "level": "Lv {n}/{max}", "owned": "所持", "close": "完了", "broke": "コインが足りません", "steadyCable": { "name": "安定ケーブル", "desc": "クレーンの揺れを抑えてタイミングを取りやすく" }, "wideFooting": { "name": "ワイド基礎", "desc": "パーフェクト着地の判定を広げる" }, "windbreak": { "name": "防風", "desc": "高高度の風を和らげる" }, "masterArchitect": { "name": "マスター建築家", "desc": "ドロップごとのコイン報酬が増加" }, "reinforcedCore": { "name": "強化コア", "desc": "崩れる前にもう一度ぐらつきに耐える" }, "quickRecovery": { "name": "クイック回復", "desc": "タワーが早く立て直す" }, "tailwind": { "name": "追い風", "desc": "各フロアが少し高く積み上がる" }, "salvage": { "name": "サルベージ", "desc": "崩落で失うフロアが減る" }, "momentum": { "name": "モメンタム", "desc": "パーフェクト連続の報酬がさらに増加" }, "centerMagnet": { "name": "重力コア", "desc": "失敗しても塔が中央に引き戻される" } },
-    "verdict": { "perfect": "パーフェクト！", "good": "ナイス！", "sloppy": "ぐらっ", "miss": "ミス！" },
-    "sabotage": { "chip": "鉄球", "tokens": "{n}", "pickTarget": "ライバルを選ぶ", "noTargets": "まだ標的がいません", "confirm": "{name}に鉄球を送る？", "send": "送る", "cancel": "キャンセル", "sentTo": "💥 {name}に命中 — −1m", "incoming": "🚨 {name}から妨害が来ます！", "recovered": "塔は健在。登り続けよう。", "earned": "🎯 鉄球を獲得！", "earnedHint": "新エリアまたは実績！", "watchAd": "📺 広告を見る +1", "adEarned": "🎯 広告でトークンゲット！", "smashTitle": "玉を放て！", "smashCta": "スマッシュ！", "smashReleasing": "放つ…", "floorsDestroyed": "−{n} 階破壊！", "newHeight": "新しい高さ:", "strikeCta": "打て！", "strikeHint": "メーターが緑ゾーンに入ったらタップ", "verdict": { "perfect": "パーフェクト！", "solid": "ナイスヒット", "weak": "かすり当たり" }, "done": "完了" },
-    "reward": { "tier": { "common": "コイン", "uncommon": "いい収穫！", "rare": "レアな発見！", "epic": "ジャックポット！" } },
-    "wreck": { "reportTitle": "塔が襲撃された！", "reportBody": "留守中に{name}が{floors}階を崩した — 反撃用のシャッフルをどうぞ。", "defaultName": "ライバル" },
-    "error": { "too_short": "短すぎます — 3文字以上", "bad_chain": "光る文字で始めてください", "not_buildable": "トレイの文字を使ってください", "duplicate": "その単語は使用済みです", "not_in_dictionary": "辞書にありません" },
-    "celebration": { "highRise": "ハイライズ！", "tall": "そびえ立つ！", "skyscraper": "摩天楼！" },
-    "leaderboard": { "title": "トップタワー", "error": "ランキングを読み込めません", "empty": "まだ塔がありません — 最初の一人に！" },
-    "share": { "title": "ワードタワー", "button": "シェア", "text": "ワードタワーで {m}m 達成 — 私の塔を超えてみて！" },
-    "versus": { "title": "タワーラッシュ", "bomb": "{name} を爆撃", "waiting": "対戦相手を待っています…", "incoming": "爆弾が来る！", "won": "勝利！", "lost": "{name} の勝ち" },
-    "a11y": { "height": "高さ {m} メートル", "combo": "連鎖 {n}", "tile": "文字 {letter}", "goldenTile": "ゴールデン文字 {letter}" },
+    "biome": {
+      "city": "地上",
+      "sky": "空",
+      "stratosphere": "成層圏",
+      "orbit": "軌道",
+      "nebula": "星雲",
+      "galaxy": "銀河"
+    },
+    "tier": {
+      "apprentice": "見習い",
+      "journeyman": "職人",
+      "master": "マスター建築家"
+    },
+    "hud": {
+      "floors": "{n} 階",
+      "combo": "{n} 連鎖",
+      "scramble": "シャッフル",
+      "backspace": "削除",
+      "build": "建てる",
+      "restart": "やり直す",
+      "restartConfirm": "本当に？",
+      "best": "ベスト {m} m",
+      "possible": "{n} 単語",
+      "clue": "ヒント",
+      "collapse": "閉じる",
+      "expand": "開く",
+      "rivalPassed": "{name} を抜いた！",
+      "stuck": "詰まった？新しい文字",
+      "backToTop": "上へ",
+      "pickLetters": "文字を選ぶ",
+      "dragToBuild": "なぞるかタップして綴る",
+      "keepBuilding": "続けて作る",
+      "menuOpen": "その他の操作",
+      "menuClose": "メニューを閉じる",
+      "chaseGap": "+{m} m",
+      "chaseAria": "次のライバル: {name}、抜くまであと {m} m"
+    },
+    "minimap": {
+      "label": "タワーマップ — {m} m、タップで頂上へ"
+    },
+    "milestone": {
+      "m50": "木のてっぺん超え！🌳",
+      "m150": "雲の中へ ☁️",
+      "m400": "鳥もうらやむ 🐦",
+      "m250": "ドローンより上だ 🛸",
+      "m650": "星雲の気分 🌌",
+      "m900": "宇宙までもうすぐ 🚀",
+      "m1300": "深宇宙の住人 👽",
+      "m1800": "ほぼ宇宙飛行士 ✨"
+    },
+    "ach": {
+      "unlocked": "実績解除！",
+      "firstFloor": "最初の階",
+      "tenFloors": "高層ビル",
+      "skyHigh": "空高く",
+      "wordsmith": "言葉の達人",
+      "comboKing": "コンボ王",
+      "rivalCrusher": "ライバル撃破",
+      "unstoppable": "止まらない",
+      "toTheMoon": "月まで",
+      "skylineKing": "スカイラインの王",
+      "centurion": "百階の戦士",
+      "comboGod": "コンボの神",
+      "wordWizard": "言葉の魔法使い",
+      "galaxyClass": "ギャラクシー級",
+      "deepSpace": "深宇宙"
+    },
+    "zone": {
+      "entered": "新エリア",
+      "next": "次: {zone} · あと{m}m"
+    },
+    "landmark": {
+      "skyscraper": "超高層ビルの上",
+      "cloudBase": "雲の底",
+      "mountainTop": "山頂",
+      "jetStream": "ジェット気流",
+      "stormTops": "雷雲の頂",
+      "weatherBalloon": "気象観測気球",
+      "earthCurve": "地球の弧",
+      "karman": "宇宙の境界",
+      "meteorBelt": "流星帯",
+      "aurora": "オーロラ",
+      "deepSpace": "深宇宙"
+    },
+    "hazard": {
+      "bomb": "爆弾",
+      "hurricane": "ハリケーン",
+      "wobble": "ぐらつき",
+      "sabotage": "妨害",
+      "lost": "{kind}！{n}階崩落"
+    },
+    "clutch": {
+      "save": "ギリギリセーフ！",
+      "critical": "ぐらぐら — きれいに着地！"
+    },
+    "surprise": {
+      "nextWord": "次の単語",
+      "surge": "サージ！",
+      "windfall": "棚ぼた！",
+      "updraft": "上昇気流！次の単語が強化",
+      "crystal": "クリスタル発見！",
+      "goldenFloor": "黄金の階！"
+    },
+    "daily": {
+      "badge": "デイリー · {date}",
+      "streak": "{n}日連続",
+      "toDaily": "デイリー",
+      "toEndless": "エンドレス",
+      "newBest": "デイリー自己ベスト更新！",
+      "questTitle": "ワードタワー",
+      "questDesc": "言葉を高く積み上げよう — 今日はみんな同じ文字。"
+    },
+    "perk": {
+      "title": "ボーナスを選ぶ",
+      "subtitle": "1つ選択 — この登攀の間ずっと有効",
+      "skip": "今回はスキップ",
+      "masterCrane": {
+        "name": "マスタークレーン",
+        "desc": "パーフェクト時の報酬アップ"
+      },
+      "tallTimber": {
+        "name": "ノッポ材木",
+        "desc": "全階の高さ+12%"
+      },
+      "featherfall": {
+        "name": "フェザーフォール",
+        "desc": "崩落で失う階が1つ減る"
+      },
+      "reinforced": {
+        "name": "補強済み",
+        "desc": "崖っぷちまでの猶予が増える"
+      },
+      "cushion": {
+        "name": "安全クッション",
+        "desc": "クレーンのぐらつきで階が落ちない"
+      }
+    },
+    "runPerk": {
+      "hotStreak": {
+        "a11y": "ホットストリーク：残り{n}ドロップ"
+      }
+    },
+    "crane": {
+      "place": "単語を置く",
+      "steer": "操作して落とす",
+      "tapToDrop": "タップして落とす",
+      "perfect": "パーフェクト！",
+      "good": "ナイス！",
+      "sloppy": "ぐらぐら",
+      "miss": "おっと！",
+      "stability": "安定",
+      "steady": "安定",
+      "onFire": "絶好調",
+      "steadyAria": "安定した手のストリーク：パーフェクト{n}回"
+    },
+    "upgrade": {
+      "categories": {
+        "crane": "クレーン",
+        "stability": "安定",
+        "boost": "ブースト"
+      },
+      "recommended": "おすすめ",
+      "title": "タワーアップグレード",
+      "subtitle": "永続強化 — コインで購入",
+      "open": "強化",
+      "balance": "{n}コイン",
+      "buy": "購入",
+      "max": "最大",
+      "level": "Lv {n}/{max}",
+      "owned": "所持",
+      "close": "完了",
+      "broke": "コインが足りません",
+      "steadyCable": {
+        "name": "安定ケーブル",
+        "desc": "クレーンの揺れを抑えてタイミングを取りやすく"
+      },
+      "wideFooting": {
+        "name": "ワイド基礎",
+        "desc": "パーフェクト着地の判定を広げる"
+      },
+      "windbreak": {
+        "name": "防風",
+        "desc": "高高度の風を和らげる"
+      },
+      "masterArchitect": {
+        "name": "マスター建築家",
+        "desc": "ドロップごとのコイン報酬が増加"
+      },
+      "reinforcedCore": {
+        "name": "強化コア",
+        "desc": "崩れる前にもう一度ぐらつきに耐える"
+      },
+      "quickRecovery": {
+        "name": "クイック回復",
+        "desc": "タワーが早く立て直す"
+      },
+      "tailwind": {
+        "name": "追い風",
+        "desc": "各フロアが少し高く積み上がる"
+      },
+      "salvage": {
+        "name": "サルベージ",
+        "desc": "崩落で失うフロアが減る"
+      },
+      "momentum": {
+        "name": "モメンタム",
+        "desc": "パーフェクト連続の報酬がさらに増加"
+      },
+      "centerMagnet": {
+        "name": "重力コア",
+        "desc": "失敗しても塔が中央に引き戻される"
+      }
+    },
+    "verdict": {
+      "perfect": "パーフェクト！",
+      "good": "ナイス！",
+      "sloppy": "ぐらっ",
+      "miss": "ミス！"
+    },
+    "sabotage": {
+      "chip": "鉄球",
+      "tokens": "{n}",
+      "pickTarget": "ライバルを選ぶ",
+      "noTargets": "まだ標的がいません",
+      "confirm": "{name}に鉄球を送る？",
+      "send": "送る",
+      "cancel": "キャンセル",
+      "sentTo": "💥 {name}に命中 — −1m",
+      "incoming": "🚨 {name}から妨害が来ます！",
+      "recovered": "塔は健在。登り続けよう。",
+      "earned": "🎯 鉄球を獲得！",
+      "earnedHint": "新エリアまたは実績！",
+      "watchAd": "📺 広告を見る +1",
+      "adEarned": "🎯 広告でトークンゲット！",
+      "smashTitle": "玉を放て！",
+      "smashCta": "スマッシュ！",
+      "smashReleasing": "放つ…",
+      "floorsDestroyed": "−{n} 階破壊！",
+      "newHeight": "新しい高さ:",
+      "strikeCta": "打て！",
+      "strikeHint": "メーターが緑ゾーンに入ったらタップ",
+      "verdict": {
+        "perfect": "パーフェクト！",
+        "solid": "ナイスヒット",
+        "weak": "かすり当たり"
+      },
+      "done": "完了"
+    },
+    "reward": {
+      "tier": {
+        "common": "コイン",
+        "uncommon": "いい収穫！",
+        "rare": "レアな発見！",
+        "epic": "ジャックポット！"
+      }
+    },
+    "wreck": {
+      "reportTitle": "塔が襲撃された！",
+      "reportBody": "留守中に{name}が{floors}階を崩した — 反撃用のシャッフルをどうぞ。",
+      "defaultName": "ライバル"
+    },
+    "error": {
+      "too_short": "短すぎます — 3文字以上",
+      "bad_chain": "光る文字で始めてください",
+      "not_buildable": "トレイの文字を使ってください",
+      "duplicate": "その単語は使用済みです",
+      "not_in_dictionary": "辞書にありません"
+    },
+    "celebration": {
+      "highRise": "ハイライズ！",
+      "tall": "そびえ立つ！",
+      "skyscraper": "摩天楼！"
+    },
+    "leaderboard": {
+      "title": "トップタワー",
+      "error": "ランキングを読み込めません",
+      "empty": "まだ塔がありません — 最初の一人に！"
+    },
+    "share": {
+      "title": "ワードタワー",
+      "button": "シェア",
+      "text": "ワードタワーで {m}m 達成 — 私の塔を超えてみて！"
+    },
+    "versus": {
+      "title": "タワーラッシュ",
+      "bomb": "{name} を爆撃",
+      "waiting": "対戦相手を待っています…",
+      "incoming": "爆弾が来る！",
+      "won": "勝利！",
+      "lost": "{name} の勝ち"
+    },
+    "a11y": {
+      "height": "高さ {m} メートル",
+      "combo": "連鎖 {n}",
+      "tile": "文字 {letter}",
+      "goldenTile": "ゴールデン文字 {letter}"
+    },
     "skin": {
       "pickerTitle": "タワースキン",
       "open": "タワースキン",
@@ -416,12 +782,30 @@ const ja = {
       "equip": "装備",
       "equipped": "装備済み",
       "unlockedToast": "新スキン解放！",
-      "classic": { "name": "スタンダード", "blurb": "正直なコンクリートと鋼。" },
-      "copper": { "name": "銅", "blurb": "酸化した手作りの温もり。" },
-      "marble": { "name": "大理石", "blurb": "淡い石、静脈と涼しさ。" },
-      "gold": { "name": "ゴールドラッシュ", "blurb": "ブラッシュ金、苦労して獲得。" },
-      "onyx": { "name": "オニキス", "blurb": "黒鉛から黒いガラスへ。" },
-      "aurora": { "name": "オーロラ", "blurb": "星雲をつかむ合金。" }
+      "classic": {
+        "name": "スタンダード",
+        "blurb": "正直なコンクリートと鋼。"
+      },
+      "copper": {
+        "name": "銅",
+        "blurb": "酸化した手作りの温もり。"
+      },
+      "marble": {
+        "name": "大理石",
+        "blurb": "淡い石、静脈と涼しさ。"
+      },
+      "gold": {
+        "name": "ゴールドラッシュ",
+        "blurb": "ブラッシュ金、苦労して獲得。"
+      },
+      "onyx": {
+        "name": "オニキス",
+        "blurb": "黒鉛から黒いガラスへ。"
+      },
+      "aurora": {
+        "name": "オーロラ",
+        "blurb": "星雲をつかむ合金。"
+      }
     }
   },
   "flag": "🇯🇵",
@@ -545,10 +929,10 @@ const ja = {
       "ogDescription": "ワードゲームスキルを向上させるための専門的なヒント、戦略、洞察。"
     },
     "adventure": {
-        "title": "ワードアドベンチャーゲーム - RPGワードパズル無料",
-        "description": "壮大なワードアドベンチャーに出発！ボスと戦い、10のテーマワールドで100レベルを征服。特殊タイルとパワーアップ付きの無料RPGワードパズルゲーム。",
-        "ogTitle": "LexiClash アドベンチャー - RPGワードパズル",
-        "ogDescription": "壮大なワードアドベンチャーでボスと戦おう！100レベル、10ワールド。無料でプレイ！"
+      "title": "ワードアドベンチャーゲーム - RPGワードパズル無料",
+      "description": "壮大なワードアドベンチャーに出発！ボスと戦い、10のテーマワールドで100レベルを征服。特殊タイルとパワーアップ付きの無料RPGワードパズルゲーム。",
+      "ogTitle": "LexiClash アドベンチャー - RPGワードパズル",
+      "ogDescription": "壮大なワードアドベンチャーでボスと戦おう！100レベル、10ワールド。無料でプレイ！"
     },
     "blast": {
       "title": "ブラストモード - 言葉を連鎖して爆発コンボ | LexiClash",
@@ -964,7 +1348,6 @@ const ja = {
     "sending": "送信中...",
     "coins": "コイン",
     "xp": "XP",
-    "chat": "チャット",
     "connecting": "接続中...",
     "signIn": "サインイン",
     "connectedToServer": "バトル準備OK！",
@@ -1643,13 +2026,13 @@ const ja = {
       "expressions": "表情",
       "eyeColor": "目の色",
       "nose": "鼻",
-      bodyStyles: {
-        default: "デフォルト",
-        hoodie: "パーカー",
-        suit: "スーツ",
-        turtleneck: "タートルネック",
-        offShoulder: "オフショルダー",
-        cropTop: "クロップトップ"
+      "bodyStyles": {
+        "default": "デフォルト",
+        "hoodie": "パーカー",
+        "suit": "スーツ",
+        "turtleneck": "タートルネック",
+        "offShoulder": "オフショルダー",
+        "cropTop": "クロップトップ"
       }
     },
     "premium": {
@@ -2253,23 +2636,142 @@ const ja = {
       "andMore": "他{count}人",
       "andMorePlural": "他{count}人",
       "archetypes": {
-        "the-ghost": { "title": "ゴースト", "stat": "ユニーク発見", "quip1": "他のプレイヤーの悪夢にすら存在しない単語を見つけた。", "quip2": "自分だけが見える次元で活動中。", "quip3": "競争相手には見えない。スコアボードでは致命的。", "quip4": "ボードに単語があって一人だけが見つけたら...本当にそこにあったのか？" },
-        "the-sniper": { "title": "スナイパー", "stat": "精度", "quip1": "他のプレイヤーは推測する。この人は知っている。", "quip2": "外さない。ためらわない。ゴミを送信しない。", "quip3": "すべての単語が的中。すべてのキー入力が意図的。", "quip4": "外科的精度。無駄な動きなし。" },
-        "the-philosopher": { "title": "哲学者", "stat": "平均長さ", "quip1": "長い単語の方がうまくいくのに、なぜ短い単語を使うの？", "quip2": "考える人のプレイヤー。大きな単語、大きな脳。", "quip3": "他の人が「猫」と打っている間、この人は「大惨事」と打っていた。", "quip4": "量より質。常に。" },
-        "the-one-hit-wonder": { "title": "一発屋", "stat": "最高の単語", "quip1": "すべてを支配する一つの単語。", "quip2": "一つの単語のために来た。価値あるものにした。", "quip3": "時には完璧な一撃だけで十分。", "quip4": "少ない単語、でもなんという単語だったか。" },
-        "the-silent-assassin": { "title": "サイレントアサシン", "stat": "点/単語", "quip1": "少ない単語、最大のダメージ。", "quip2": "静かだが致命的。スコアボードが物語る。", "quip3": "動きの経済学。すべての単語が精密打撃。", "quip4": "静かに話し、巨大な語彙を持つ。" },
-        "the-sleeping-giant": { "title": "眠れる巨人", "stat": "後半得点", "quip1": "昼寝を始めて、目覚めて暴力を選んだ。", "quip2": "遅いスタート？いいえ。戦略的忍耐。", "quip3": "誰も予想しなかったカムバック。", "quip4": "ロケットのように...ただもっと長いカウントダウンが必要だった。" },
-        "the-frontrunner": { "title": "先頭走者", "stat": "前半得点", "quip1": "全力で飛び出し、振り返らなかった。", "quip2": "他の人がまだウォーミングアップしている間にスプリント。", "quip3": "最初にボードを攻撃。最初に支配。", "quip4": "ペースを設定。残りは追いかけた。" },
-        "the-speed-runner": { "title": "スピードランナー", "stat": "語/分", "quip1": "目が追いつかないほど速い指。", "quip2": "連射。短いバースト。壊滅的な結果。", "quip3": "思考の速度でタイピング。", "quip4": "速い単語、速い勝利。" },
-        "the-machine-gun": { "title": "マシンガン", "stat": "総単語数", "quip1": "量はそれ自体が質。この伝説に聞いてみて。", "quip2": "辞書より多い単語。止められない出力。", "quip3": "このボリュームに対してグリッドに勝ち目はなかった。", "quip4": "ブルルルル。単語が送信される音です。" },
-        "the-metronome": { "title": "メトロノーム", "stat": "ペース", "quip1": "チク。単語。タク。単語。時計のように。", "quip2": "一貫性は誰も語らない秘密兵器。", "quip3": "時計を合わせられるほど安定したリズム。", "quip4": "焦らない。パニックなし。純粋で安定した出力。" },
-        "the-wildcard": { "title": "ワイルドカード", "stat": "長さの多様性", "quip1": "短い単語、長い単語、中くらいの単語 — すべての単語。", "quip2": "予測不能。分類不能。止められない。", "quip3": "唯一の戦略は戦略がないこと。", "quip4": "あらゆる長さのマスター、混乱の王。" },
-        "the-marathon-runner": { "title": "マラソンランナー", "stat": "カバー率", "quip1": "最初に始め、最後に止まる。持久力チャンピオン。", "quip2": "他の人が休憩を取っている間もまだ走っていた。", "quip3": "最初の一秒から最後まで。止まらなかった。", "quip4": "ウサギでもあったカメ。" },
-        "the-combo-master": { "title": "コンボマスター", "stat": "最大コンボ", "quip1": "コ-コ-コ-コンボブレイカー！いや、コンボビルダー。", "quip2": "マシンのように単語を連鎖させた。", "quip3": "波に乗っているとき、なぜ止まる？", "quip4": "コンボレベル：伝説的。対戦相手：震えている。" },
-        "the-fire-walker": { "title": "ファイアウォーカー", "stat": "炎ボーナス", "quip1": "熱が上がると力を発揮する。文字通り。", "quip2": "炎ラウンド？彼らのラウンドの方が正しい。", "quip3": "炎を恐れるプレイヤーもいる。この人は炎の中で踊る。", "quip4": "熱い手、もっと熱いスコア。" },
-        "the-social-butterfly": { "title": "社交蝶", "stat": "人気の選択", "quip1": "偉大な心は同じように考える — この人は皆と同じように考える。", "quip2": "みんなが見つけた単語をすべて見つけた、プラスバイブス。", "quip3": "人気の単語選び？このプレイヤーには群衆のお気に入りがある。", "quip4": "常にグループと同じ波長。" },
-        "the-underdog": { "title": "アンダードッグ", "stat": "精度", "quip1": "ランキングは低いが、精度は高い。リスペクト。", "quip2": "スコアがすべてを語るわけではない。", "quip3": "一位ではないが、確実に心では一位。", "quip4": "ランキングがすべてではない証拠。" },
-        "the-participant": { "title": "参加者", "stat": "単語", "quip1": "すべてのヒーローがマントを着ているわけではない。単語を送信するだけの人もいる。", "quip2": "来た。プレイした。それが大事。", "quip3": "謎のプレイヤー。伝説の卵。", "quip4": "千の単語の旅は一つから始まる。" }
+        "the-ghost": {
+          "title": "ゴースト",
+          "stat": "ユニーク発見",
+          "quip1": "他のプレイヤーの悪夢にすら存在しない単語を見つけた。",
+          "quip2": "自分だけが見える次元で活動中。",
+          "quip3": "競争相手には見えない。スコアボードでは致命的。",
+          "quip4": "ボードに単語があって一人だけが見つけたら...本当にそこにあったのか？"
+        },
+        "the-sniper": {
+          "title": "スナイパー",
+          "stat": "精度",
+          "quip1": "他のプレイヤーは推測する。この人は知っている。",
+          "quip2": "外さない。ためらわない。ゴミを送信しない。",
+          "quip3": "すべての単語が的中。すべてのキー入力が意図的。",
+          "quip4": "外科的精度。無駄な動きなし。"
+        },
+        "the-philosopher": {
+          "title": "哲学者",
+          "stat": "平均長さ",
+          "quip1": "長い単語の方がうまくいくのに、なぜ短い単語を使うの？",
+          "quip2": "考える人のプレイヤー。大きな単語、大きな脳。",
+          "quip3": "他の人が「猫」と打っている間、この人は「大惨事」と打っていた。",
+          "quip4": "量より質。常に。"
+        },
+        "the-one-hit-wonder": {
+          "title": "一発屋",
+          "stat": "最高の単語",
+          "quip1": "すべてを支配する一つの単語。",
+          "quip2": "一つの単語のために来た。価値あるものにした。",
+          "quip3": "時には完璧な一撃だけで十分。",
+          "quip4": "少ない単語、でもなんという単語だったか。"
+        },
+        "the-silent-assassin": {
+          "title": "サイレントアサシン",
+          "stat": "点/単語",
+          "quip1": "少ない単語、最大のダメージ。",
+          "quip2": "静かだが致命的。スコアボードが物語る。",
+          "quip3": "動きの経済学。すべての単語が精密打撃。",
+          "quip4": "静かに話し、巨大な語彙を持つ。"
+        },
+        "the-sleeping-giant": {
+          "title": "眠れる巨人",
+          "stat": "後半得点",
+          "quip1": "昼寝を始めて、目覚めて暴力を選んだ。",
+          "quip2": "遅いスタート？いいえ。戦略的忍耐。",
+          "quip3": "誰も予想しなかったカムバック。",
+          "quip4": "ロケットのように...ただもっと長いカウントダウンが必要だった。"
+        },
+        "the-frontrunner": {
+          "title": "先頭走者",
+          "stat": "前半得点",
+          "quip1": "全力で飛び出し、振り返らなかった。",
+          "quip2": "他の人がまだウォーミングアップしている間にスプリント。",
+          "quip3": "最初にボードを攻撃。最初に支配。",
+          "quip4": "ペースを設定。残りは追いかけた。"
+        },
+        "the-speed-runner": {
+          "title": "スピードランナー",
+          "stat": "語/分",
+          "quip1": "目が追いつかないほど速い指。",
+          "quip2": "連射。短いバースト。壊滅的な結果。",
+          "quip3": "思考の速度でタイピング。",
+          "quip4": "速い単語、速い勝利。"
+        },
+        "the-machine-gun": {
+          "title": "マシンガン",
+          "stat": "総単語数",
+          "quip1": "量はそれ自体が質。この伝説に聞いてみて。",
+          "quip2": "辞書より多い単語。止められない出力。",
+          "quip3": "このボリュームに対してグリッドに勝ち目はなかった。",
+          "quip4": "ブルルルル。単語が送信される音です。"
+        },
+        "the-metronome": {
+          "title": "メトロノーム",
+          "stat": "ペース",
+          "quip1": "チク。単語。タク。単語。時計のように。",
+          "quip2": "一貫性は誰も語らない秘密兵器。",
+          "quip3": "時計を合わせられるほど安定したリズム。",
+          "quip4": "焦らない。パニックなし。純粋で安定した出力。"
+        },
+        "the-wildcard": {
+          "title": "ワイルドカード",
+          "stat": "長さの多様性",
+          "quip1": "短い単語、長い単語、中くらいの単語 — すべての単語。",
+          "quip2": "予測不能。分類不能。止められない。",
+          "quip3": "唯一の戦略は戦略がないこと。",
+          "quip4": "あらゆる長さのマスター、混乱の王。"
+        },
+        "the-marathon-runner": {
+          "title": "マラソンランナー",
+          "stat": "カバー率",
+          "quip1": "最初に始め、最後に止まる。持久力チャンピオン。",
+          "quip2": "他の人が休憩を取っている間もまだ走っていた。",
+          "quip3": "最初の一秒から最後まで。止まらなかった。",
+          "quip4": "ウサギでもあったカメ。"
+        },
+        "the-combo-master": {
+          "title": "コンボマスター",
+          "stat": "最大コンボ",
+          "quip1": "コ-コ-コ-コンボブレイカー！いや、コンボビルダー。",
+          "quip2": "マシンのように単語を連鎖させた。",
+          "quip3": "波に乗っているとき、なぜ止まる？",
+          "quip4": "コンボレベル：伝説的。対戦相手：震えている。"
+        },
+        "the-fire-walker": {
+          "title": "ファイアウォーカー",
+          "stat": "炎ボーナス",
+          "quip1": "熱が上がると力を発揮する。文字通り。",
+          "quip2": "炎ラウンド？彼らのラウンドの方が正しい。",
+          "quip3": "炎を恐れるプレイヤーもいる。この人は炎の中で踊る。",
+          "quip4": "熱い手、もっと熱いスコア。"
+        },
+        "the-social-butterfly": {
+          "title": "社交蝶",
+          "stat": "人気の選択",
+          "quip1": "偉大な心は同じように考える — この人は皆と同じように考える。",
+          "quip2": "みんなが見つけた単語をすべて見つけた、プラスバイブス。",
+          "quip3": "人気の単語選び？このプレイヤーには群衆のお気に入りがある。",
+          "quip4": "常にグループと同じ波長。"
+        },
+        "the-underdog": {
+          "title": "アンダードッグ",
+          "stat": "精度",
+          "quip1": "ランキングは低いが、精度は高い。リスペクト。",
+          "quip2": "スコアがすべてを語るわけではない。",
+          "quip3": "一位ではないが、確実に心では一位。",
+          "quip4": "ランキングがすべてではない証拠。"
+        },
+        "the-participant": {
+          "title": "参加者",
+          "stat": "単語",
+          "quip1": "すべてのヒーローがマントを着ているわけではない。単語を送信するだけの人もいる。",
+          "quip2": "来た。プレイした。それが大事。",
+          "quip3": "謎のプレイヤー。伝説の卵。",
+          "quip4": "千の単語の旅は一つから始まる。"
+        }
       }
     }
   },
@@ -2454,18 +2956,42 @@ const ja = {
           "success": "パリィ成功！"
         },
         "ability": {
-          "smite": { "name": "スマイト", "desc": "ボスに大ダメージを叩き込む" },
-          "ward": { "name": "ガード", "desc": "ボスの次の攻撃を防ぐ" },
-          "focus": { "name": "フォーカス", "desc": "次の単語がボーナスダメージを与える" }
+          "smite": {
+            "name": "スマイト",
+            "desc": "ボスに大ダメージを叩き込む"
+          },
+          "ward": {
+            "name": "ガード",
+            "desc": "ボスの次の攻撃を防ぐ"
+          },
+          "focus": {
+            "name": "フォーカス",
+            "desc": "次の単語がボーナスダメージを与える"
+          }
         }
       }
     },
     "surprise": {
-      "doubleGold": { "label": "ゴールド2倍！", "desc": "このレベルはゴールドが2倍。" },
-      "bonusChest": { "label": "ボーナス宝箱！", "desc": "追加の宝箱が出現。" },
-      "luckyGems": { "label": "ラッキージェム！", "desc": "ジェムの大当たり。" },
-      "goldenWord": { "label": "ゴールデンワード！", "desc": "隠れた単語が大当たりだった。" },
-      "comboFrenzy": { "label": "コンボフレンジー！", "desc": "このレベルはコンボ報酬が2倍。" }
+      "doubleGold": {
+        "label": "ゴールド2倍！",
+        "desc": "このレベルはゴールドが2倍。"
+      },
+      "bonusChest": {
+        "label": "ボーナス宝箱！",
+        "desc": "追加の宝箱が出現。"
+      },
+      "luckyGems": {
+        "label": "ラッキージェム！",
+        "desc": "ジェムの大当たり。"
+      },
+      "goldenWord": {
+        "label": "ゴールデンワード！",
+        "desc": "隠れた単語が大当たりだった。"
+      },
+      "comboFrenzy": {
+        "label": "コンボフレンジー！",
+        "desc": "このレベルはコンボ報酬が2倍。"
+      }
     },
     "welcome": {
       "title": "LexiClashへようこそ！",
@@ -2642,7 +3168,6 @@ const ja = {
     "buildAvatar": "先にアバターを作る？",
     "step": "ステップ {current} / {total}"
   },
-
   "tips": {
     "header": "プロのコツ",
     "tryIt": "やってみよう！"
@@ -2757,7 +3282,7 @@ const ja = {
     "share": "自慢する",
     "yourProgress": "今回の成績",
     "topPlayers": "表彰台",
-    "yourPerformance": "あなたのゲーム",
+    "yourPerformance": "あなたの成績",
     "viewDetails": "くわしく見る",
     "viewAllWords": "すべての単語",
     "viewXpBreakdown": "XP内訳",
@@ -2806,7 +3331,7 @@ const ja = {
     "largeRoomMode": "大規模ルームモード",
     "duplicateRuleDisabled": "8人以上のプレイヤーでは、重複単語もカウントされます！",
     "longest": "最長",
-    "accuracy": "正確性",
+    "accuracy": "正確率",
     "rankings": "ランキング",
     "yourWords": "あなたの単語",
     "fireRoundBonus": "ファイアラウンド",
@@ -2817,8 +3342,6 @@ const ja = {
     "coinsEarned": "獲得コイン",
     "detailedAnalysis": "詳細分析",
     "gameStats": "ゲーム統計",
-    "accuracy": "正確率",
-    "yourPerformance": "あなたの成績",
     "rewards": "報酬",
     "standings": "順位",
     "guestSavePrompt": "ログインして報酬を保存しよう！",
@@ -2831,7 +3354,7 @@ const ja = {
     "time": "時間",
     "place": "位",
     "words": "単語",
-    "bestWord": "ベスト",
+    "bestWord": "ベストワード",
     "bestCombo": "ベストコンボ",
     "playersReady": "{count}/{total} 準備完了",
     "missedWords": "見逃した単語",
@@ -2851,8 +3374,8 @@ const ja = {
     "crowns": {
       "sniper": "スナイパー",
       "speedDemon": "スピードデーモン",
-      "explorer": "探検家",
-      "scholar": "学者",
+      "explorer": "エクスプローラー",
+      "scholar": "スカラー",
       "clutch": "クラッチプレイヤー",
       "tank": "タンク"
     },
@@ -2865,8 +3388,8 @@ const ja = {
       "tank": "ブレない安定感。鉄壁。"
     },
     "everyoneReady": "全員準備完了！",
-    "waitingForPlayers": "プレイヤーを待っています",
-    "ready": "準備完了！",
+    "waitingForPlayers": "プレイヤーの準備を待っています...",
+    "ready": "準備完了",
     "waiting": "待機中...",
     "imReady": "次のゲーム準備完了",
     "youAreReady": "準備完了！",
@@ -2883,14 +3406,14 @@ const ja = {
     "leadChanges": "このゲームで{{count}}回リードが入れ替わった",
     "shareNarrativeWin": "LexiClashで{{word}}を見つけて{{score}}点獲得！",
     "shareNarrativeLoss": "LexiClashで{{words}}語見つけて{{score}}点獲得！",
-    "revengeRematch": "{{player}}にリベンジ？",
+    "revengeRematch": "リマッチ",
     "markReadyDescription": "ボタンをタップして次のゲームの準備完了を伝えましょう",
     "allReadyHostCanStart": "🎉 全員準備完了！次のラウンドを開始できます。",
     "allPlayersReadyWaitingHost": "✓ 全員準備完了 — ホストの開始を待っています",
     "hostWillStartWhenReady": "全員が準備完了したらホストが次のラウンドを開始します",
     "performanceHistory": "パフォーマンス履歴",
     "goToLobby": "ロビーへ",
-    "you": "(あなた)",
+    "you": "あなた",
     "betterLuckNextTime": "次はきっとうまくいく！",
     "loserFeedback": {
       "almostPodium": "もう少しで表彰台！",
@@ -2903,8 +3426,8 @@ const ja = {
     "nextRoundMode": "次のラウンドのモード",
     "hostStartDescription": "全員の準備ができたら新しいゲームを始めよう！",
     "readyExplanation": "タップしてホストに「もう一回やりたい！」を伝えよう",
-    "defendTitle": "王座を守れ！",
-    "aheadOf": "{player}より上",
+    "defendTitle": "タイトル防衛",
+    "aheadOf": "{player}に差をつけて",
     "findingWouldHaveTied": "{words}を見つけていれば同点だった！",
     "showAllRankings": "+{count}人のプレイヤー",
     "revenge": {
@@ -2932,14 +3455,13 @@ const ja = {
     "battleRankings": "バトルランキング",
     "players": "プレイヤー",
     "survivors": "生存者",
-    "eliminated": "脱落",
+    "eliminated": "敗退",
     "targetWord": "ターゲットワード",
     "foundByYou": "あなたが発見！",
     "survived": "生存",
     "ultimateChampion": "究極のチャンピオン",
     "risingContender": "挑戦者",
     "surviveLongerThan": "@{player}より長く生き残れ！",
-    "waitingForPlayers": "プレイヤーの準備を待っています...",
     "waitingForHost": "ホストが次のラウンドを始めるのを待っています...",
     "scoringTip": "スコアのコツ",
     "scoringTipText": "連続で単語を見つけてコンボボーナス(⚡)ゲット！長い単語はポイント爆上げだよ！",
@@ -2980,40 +3502,15 @@ const ja = {
     "target": "ターゲット",
     "totalPoints": "合計ポイント",
     "revengeVs": "{player}にリベンジ",
-    "defendTitle": "タイトル防衛",
-    "revengeRematch": "リマッチ",
-    "bestWord": "ベストワード",
     "wordsFound": "見つけた単語",
     "score": "スコア",
-    "ready": "準備完了",
-    "aheadOf": "{player}に差をつけて",
-    "you": "あなた",
-    "words": "単語",
     "matchResults": "表彰台",
-    "eliminated": "敗退",
-    "survived": "生存",
     "ordinal1": "1位",
     "ordinal2": "2位",
     "ordinal3": "3位",
     "ordinal4": "4位",
     "ordinalN": "{n}位",
     "soClose": "悔しいほど惜しい——王座まであと{points}点。",
-    "crowns": {
-      "sniper": "スナイパー",
-      "speedDemon": "スピードデーモン",
-      "explorer": "エクスプローラー",
-      "scholar": "スカラー",
-      "clutch": "クラッチプレイヤー",
-      "tank": "タンク"
-    },
-    "crownDesc": {
-      "sniper": "1語あたりの得点が最高。職人技。",
-      "speedDemon": "誰よりも多くの単語を発見。",
-      "explorer": "誰も気づかない単語を発掘。",
-      "scholar": "平均が一番長い。さすが。",
-      "clutch": "一番大きな単語を決めた。",
-      "tank": "ブレない安定感。鉄壁。"
-    },
     "potentialScore": "+{points}点の可能性",
     "comparativeInsights": {
       "title": "あなたの比較",
@@ -3051,7 +3548,6 @@ const ja = {
       "newSeries": "新しいシリーズ",
       "waitingNewSeries": "ホストを待っています..."
     },
-    "wordsFound": "見つけた単語",
     "shareVictoryPrompt": "勝利をシェアしよう！",
     "victory": "勝利！",
     "wellPlayed": "ナイスプレイ！",
@@ -3150,17 +3646,18 @@ const ja = {
     "skip": "結果を見る"
   },
   "almostFound": {
-    "title": "もう少しで見つかった...",
+    "title": "もう少しで見つけられた...",
     "matchPercent": "{percent}%一致",
-    "wouldHaveScored": "+{score}点"
+    "wouldHaveScored": "+{score}ポイント"
   },
   "closeLoss": {
-    "soClose": "惜しい!",
-    "justPoints": "あと{points}ポイントだった!",
-    "rematch": "リマッチ!",
-    "rematchQuestion": "リマッチする?",
-    "almostHadIt": "もう少しだった!",
-    "nailBiter": "手に汗握る展開!"
+    "soClose": "惜しい！",
+    "justPoints": "あと{points}ポイントだった！",
+    "rematch": "リマッチ！",
+    "rematchQuestion": "もう一回？",
+    "almostHadIt": "もう少しだった！",
+    "nailBiter": "接戦でした！",
+    "challengeBot": "ボットに挑戦"
   },
   "player": {
     "new": "NEW"
@@ -3902,20 +4399,6 @@ const ja = {
     "defaultTitle": "もう1ゲーム？",
     "defaultMessage": "連続記録を続けよう — もう1回プレイ！"
   },
-  "almostFound": {
-    "title": "もう少しで見つけられた...",
-    "matchPercent": "{percent}%一致",
-    "wouldHaveScored": "+{score}ポイント"
-  },
-  "closeLoss": {
-    "soClose": "惜しい！",
-    "justPoints": "あと{points}ポイントだった！",
-    "rematch": "リマッチ！",
-    "rematchQuestion": "もう一回？",
-    "almostHadIt": "もう少しだった！",
-    "nailBiter": "接戦でした！",
-    "challengeBot": "ボットに挑戦"
-  },
   "mysteryReward": {
     "title": "ミステリー報酬",
     "youFound": "ミステリー報酬を見つけました！",
@@ -4183,7 +4666,7 @@ const ja = {
       "winRate": "勝率"
     },
     "coins": "コイン",
-    "viewProfile": "プロフィールへ",
+    "viewProfile": "プロフィールを見る",
     "viewCoins": "コインを確認",
     "sections": {
       "overview": "概要",
@@ -4259,7 +4742,6 @@ const ja = {
     "addFriend": "フレンド追加",
     "friends": "フレンド",
     "requestSent": "リクエスト送信済み",
-    "viewProfile": "プロフィールを見る",
     "viewPublicProfile": "公開プロフィールを見る",
     "games": "ゲーム"
   },
@@ -5216,18 +5698,54 @@ const ja = {
   },
   "season": {
     "twist": {
-      "double-down": { "title": "ダブルダウン", "blurb": "長い単語が一番輝く季節。" },
-      "crown-rush": { "title": "クラウンラッシュ", "blurb": "どの文字も武器。王座をつかめ。" },
-      "rare-find": { "title": "レアな一語", "blurb": "珍しい言葉の出番。眠った語彙を呼び覚ませ。" },
-      "combo-beat": { "title": "コンボビート", "blurb": "音節を積み、コンボに乗り、テンポを刻め。" },
-      "sound-wave": { "title": "サウンドウェーブ", "blurb": "ビートと文字を混ぜてヒットを飛ばせ。" },
-      "throne-climb": { "title": "玉座への階段", "blurb": "知る言葉すべてで玉座を築け。" },
-      "frostbite": { "title": "フロストバイト", "blurb": "盤が凍りつく中、連勝の熱を絶やすな。" },
-      "afterglow": { "title": "アフターグロウ", "blurb": "見つけた単語をネオンの軌跡が追う。" },
-      "heatwave": { "title": "ヒートウェーブ", "blurb": "連勝が続くほど、盤は熱く輝く。" },
-      "bloom": { "title": "ブルーム", "blurb": "ひと言ごとに次が芽吹く。スコアを咲かせろ。" },
-      "stardust": { "title": "スターダスト", "blurb": "文字が星座のように盤を漂う。" },
-      "final-bell": { "title": "ファイナルベル", "blurb": "一年の締め。すべての得点が記録に残る。" }
+      "double-down": {
+        "title": "ダブルダウン",
+        "blurb": "長い単語が一番輝く季節。"
+      },
+      "crown-rush": {
+        "title": "クラウンラッシュ",
+        "blurb": "どの文字も武器。王座をつかめ。"
+      },
+      "rare-find": {
+        "title": "レアな一語",
+        "blurb": "珍しい言葉の出番。眠った語彙を呼び覚ませ。"
+      },
+      "combo-beat": {
+        "title": "コンボビート",
+        "blurb": "音節を積み、コンボに乗り、テンポを刻め。"
+      },
+      "sound-wave": {
+        "title": "サウンドウェーブ",
+        "blurb": "ビートと文字を混ぜてヒットを飛ばせ。"
+      },
+      "throne-climb": {
+        "title": "玉座への階段",
+        "blurb": "知る言葉すべてで玉座を築け。"
+      },
+      "frostbite": {
+        "title": "フロストバイト",
+        "blurb": "盤が凍りつく中、連勝の熱を絶やすな。"
+      },
+      "afterglow": {
+        "title": "アフターグロウ",
+        "blurb": "見つけた単語をネオンの軌跡が追う。"
+      },
+      "heatwave": {
+        "title": "ヒートウェーブ",
+        "blurb": "連勝が続くほど、盤は熱く輝く。"
+      },
+      "bloom": {
+        "title": "ブルーム",
+        "blurb": "ひと言ごとに次が芽吹く。スコアを咲かせろ。"
+      },
+      "stardust": {
+        "title": "スターダスト",
+        "blurb": "文字が星座のように盤を漂う。"
+      },
+      "final-bell": {
+        "title": "ファイナルベル",
+        "blurb": "一年の締め。すべての得点が記録に残る。"
+      }
     },
     "name": "シーズン{{number}}: {{theme}}",
     "endingSoon": "シーズンまもなく終了！",
@@ -5464,8 +5982,8 @@ const ja = {
     "welcomeTitle": "言葉。仲間。勝利。",
     "welcomeSubtitle": "無料。登録不要。ペイ・トゥ・ウィンなし。",
     "playTodayChallenge": "今日のチャレンジをプレイ",
-    "moreGameModes": "その他のゲームモード",
-    "moreGameModesHint": "タップして探索",
+    "moreGameModes": "他のゲームモード",
+    "moreGameModesHint": "タップして見る",
     "calmSectionTitle": "じっくりプレイ",
     "calmSectionSubtitle": "のんびり解けるパズル",
     "singlePlayer": "クイックプレイ",
@@ -5481,8 +5999,6 @@ const ja = {
     "sectionMultiplayerSubtitle": "リアルプレイヤーと即バトル",
     "sectionSoloTitle": "ひとり",
     "sectionSoloSubtitle": "鍛えて、伸ばして、自己ベスト更新",
-    "moreGameModes": "他のゲームモード",
-    "moreGameModesHint": "タップして見る",
     "arena": "マルチプレイヤー",
     "arenaDesc": "ソロでもフレンドとでも！",
     "offlineLocked": "インターネットが必要",
@@ -5524,7 +6040,6 @@ const ja = {
     "signInToUnlock": "ログインして解除",
     "openRooms": "部屋が開放中",
     "playersLive": "プレイ中",
-    "playingNow": "プレイ中",
     "tutorial": "チュートリアル",
     "personalBest": "自己ベスト",
     "shareModalTitle": "友達を招待してXPを獲得",
@@ -5585,7 +6100,6 @@ const ja = {
     "hallOfFame": "殿堂入り",
     "careerPoints": "キャリアポイント",
     "gamesToday": "今日のゲーム数",
-    "gameModes": "ゲームモード",
     "freeToPlay": "無料プレイ",
     "wordHuntMode": "ワードハント",
     "wordHuntModeDesc": "できるだけ早くターゲットワードを見つけよう — 毎日新しいパズル！",
@@ -6198,15 +6712,16 @@ const ja = {
     "takeYourTime": "時間無制限",
     "play": "プレイ",
     "viewResults": "結果を見る",
-    "solved": "クリア",
+    "solved": "解決済み",
     "failed": "失敗",
-"wordHunt": {
+    "wordHunt": {
       "title": "ワードハント",
       "subtitle": "サバイバルモード",
-      "desc": "時間との勝負！制限時間内にできるだけ多くの単語を見つけよう！",
+      "desc": "単語を当てろ。10回のチャンス。",
       "feature1": "90秒",
       "feature2": "コンボシステム",
-      "feature3": "グローバルランキング"
+      "feature3": "グローバルランキング",
+      "details": "10回の推測、色ヒント、90秒。ボーナスワードでライフ追加！"
     },
     "badge": "デイリーチャレンジ",
     "puzzleNumber": "デイリー #{number}",
@@ -6328,7 +6843,6 @@ const ja = {
     "challengeStats": "チャレンジ統計",
     "targetWord": "目標単語",
     "totalPlayers": "総プレイヤー数",
-    "solved": "解決済み",
     "solveRate": "解決率",
     "beatCreator": "作成者に勝利",
     "attemptDistribution": "試行回数分布",
@@ -6383,15 +6897,6 @@ const ja = {
       "startTraining": "練習を始める",
       "skipToDaily": "スキップして始める",
       "redirecting": "デイリーチャレンジに移動中..."
-    },
-    "wordHunt": {
-      "title": "ワードハント",
-      "subtitle": "サバイバルモード",
-      "desc": "単語を当てろ。10回のチャンス。",
-      "feature1": "90秒",
-      "feature2": "コンボシステム",
-      "feature3": "グローバルランキング",
-      "details": "10回の推測、色ヒント、90秒。ボーナスワードでライフ追加！"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ デイリーワードハントが待っています！",
@@ -6456,12 +6961,30 @@ const ja = {
       }
     },
     "insights": {
-      "personalBest": { "headline": "自己ベスト更新！", "sub": "記録より+{n}ポイント" },
-      "percentile": { "headline": "今日はエリート！", "sub": "全プレイヤーのトップ{n}%" },
-      "speed": { "headline": "スピードスター！", "sub": "平均より{n}%速い" },
-      "firstTry": { "headline": "一発正解！", "sub": "{n}%のみが1回で解けた" },
-      "streakComplete": { "headline": "1週間達成！", "sub": "チェストを開ける準備ができました" },
-      "improved": { "headline": "成長中！", "sub": "昨日より上達" }
+      "personalBest": {
+        "headline": "自己ベスト更新！",
+        "sub": "記録より+{n}ポイント"
+      },
+      "percentile": {
+        "headline": "今日はエリート！",
+        "sub": "全プレイヤーのトップ{n}%"
+      },
+      "speed": {
+        "headline": "スピードスター！",
+        "sub": "平均より{n}%速い"
+      },
+      "firstTry": {
+        "headline": "一発正解！",
+        "sub": "{n}%のみが1回で解けた"
+      },
+      "streakComplete": {
+        "headline": "1週間達成！",
+        "sub": "チェストを開ける準備ができました"
+      },
+      "improved": {
+        "headline": "成長中！",
+        "sub": "昨日より上達"
+      }
     }
   },
   "dailyWordWheelLanding": {
@@ -6473,21 +6996,51 @@ const ja = {
       "leaderboard": "世界記録を見る"
     },
     "steps": {
-      "heading": "デイリーワードホイールの遊び方",
-      "1": { "title": "毎日新しいパズル", "desc": "毎日UTC午前0時に新しい文字ホイールが登場。世界中のプレイヤーが同じ文字でプレイします。" },
-      "2": { "title": "単語を見つける", "desc": "ホイールの文字で単語を作ろう。すべての単語に中央の文字を含め、3文字以上である必要があります。長い単語 = 高得点。" },
-      "3": { "title": "時間に勝つ", "desc": "制限時間内にできるだけ多くの単語を見つけよう。スピードと語彙力の両方が問われます。" },
-      "4": { "title": "世界と比較", "desc": "デイリーリーダーボードでランキングを確認。世界記録に挑戦し、連続記録を追跡しよう。" }
+      "1": {
+        "title": "毎日新しいパズル",
+        "desc": "毎日UTC午前0時に新しい文字ホイールが登場。世界中のプレイヤーが同じ文字でプレイします。"
+      },
+      "2": {
+        "title": "単語を見つける",
+        "desc": "ホイールの文字で単語を作ろう。すべての単語に中央の文字を含め、3文字以上である必要があります。長い単語 = 高得点。"
+      },
+      "3": {
+        "title": "時間に勝つ",
+        "desc": "制限時間内にできるだけ多くの単語を見つけよう。スピードと語彙力の両方が問われます。"
+      },
+      "4": {
+        "title": "世界と比較",
+        "desc": "デイリーリーダーボードでランキングを確認。世界記録に挑戦し、連続記録を追跡しよう。"
+      },
+      "heading": "デイリーワードホイールの遊び方"
     },
     "faq": {
       "heading": "よくある質問",
       "items": [
-        { "q": "デイリーワードホイールとは？", "a": "デイリーワードホイールはLexiClashの無料日替わりワードパズルです。毎日UTC午前0時に新しい文字ホイールが出題されます。世界中のプレイヤーが同じパズルに挑戦します。" },
-        { "q": "遊び方は？", "a": "ホイールに配置された文字と中央の文字が与えられます。単語を作ろう — すべての単語に中央の文字を含め、3文字以上である必要があります。制限時間内にできるだけ多くの単語を見つけましょう。" },
-        { "q": "無料ですか？", "a": "はい、完全無料です。ダウンロード不要、登録不要、広告なし。どのデバイスのブラウザでもプレイできます。" },
-        { "q": "世界記録は見られますか？", "a": "はい！パズル完了後、その日のトップスコアを示すグローバルリーダーボードを確認できます。" },
-        { "q": "すべての単語に中央の文字が必要ですか？", "a": "はい！提出するすべての単語にホイールの中央の文字を含める必要があります。これがパズルを難しくする核心的なルールです。" },
-        { "q": "どの言語で遊べますか？", "a": "デイリーワードホイールは英語、ヘブライ語、スウェーデン語、日本語、スペイン語で遊べます。各言語に独自の辞書とリーダーボードがあります。" }
+        {
+          "q": "デイリーワードホイールとは？",
+          "a": "デイリーワードホイールはLexiClashの無料日替わりワードパズルです。毎日UTC午前0時に新しい文字ホイールが出題されます。世界中のプレイヤーが同じパズルに挑戦します。"
+        },
+        {
+          "q": "遊び方は？",
+          "a": "ホイールに配置された文字と中央の文字が与えられます。単語を作ろう — すべての単語に中央の文字を含め、3文字以上である必要があります。制限時間内にできるだけ多くの単語を見つけましょう。"
+        },
+        {
+          "q": "無料ですか？",
+          "a": "はい、完全無料です。ダウンロード不要、登録不要、広告なし。どのデバイスのブラウザでもプレイできます。"
+        },
+        {
+          "q": "世界記録は見られますか？",
+          "a": "はい！パズル完了後、その日のトップスコアを示すグローバルリーダーボードを確認できます。"
+        },
+        {
+          "q": "すべての単語に中央の文字が必要ですか？",
+          "a": "はい！提出するすべての単語にホイールの中央の文字を含める必要があります。これがパズルを難しくする核心的なルールです。"
+        },
+        {
+          "q": "どの言語で遊べますか？",
+          "a": "デイリーワードホイールは英語、ヘブライ語、スウェーデン語、日本語、スペイン語で遊べます。各言語に独自の辞書とリーダーボードがあります。"
+        }
       ]
     },
     "finalCta": {
@@ -6638,7 +7191,7 @@ const ja = {
       "lifePoints": "ライフポイント",
       "eliminated": "脱落",
       "guessTarget": "ターゲットを推測",
-      "submit": "推測を送信",
+      "submit": "推測を送信"
     },
     "mp": {
       "players": "プレイヤー",
@@ -6654,12 +7207,12 @@ const ja = {
       "viewBoard": "ボード表示",
       "boardReview": "ボードレビュー",
       "ladder": {
-        "empty": "まだ単語がありません — 最初の一つを見つけよう！",
+        "empty": "まだ単語がありません — 最初の一つを見つけよう！"
       },
       "kbHint": {
         "submit": "送信",
         "pop": "最後を削除",
-        "clear": "クリア",
+        "clear": "クリア"
       },
       "stopGameConfirm": "全員のゲームを終了しますか？",
       "stopGameYes": "ゲーム終了",
@@ -6889,7 +7442,8 @@ const ja = {
       "backToDailyDesc": "今日のリーダーボードを見る",
       "playerWordsTitle": "{{name}}のルート",
       "youMissedWords": "見逃した単語",
-      "tapPlayerHint": "プレイヤーをタップしてルートを確認"
+      "tapPlayerHint": "プレイヤーをタップしてルートを確認",
+      "wordsFound": "見つかった単語"
     },
     "score": {
       "title": "あなたのスコア",
@@ -7070,7 +7624,9 @@ const ja = {
     "botsJoined": "{{count}}人の対戦相手が参加 — 人がいないからボットが来たよ！",
     "winStreak": "{{count}}連勝！",
     "oneMoreWin": "あと1勝！",
-    "nearRank": "ランクアップまでもう少し！"
+    "nearRank": "ランクアップまでもう少し！",
+    "rankUp": "ランクアップ!",
+    "welcomeToTier": "{{tier}}へようこそ!"
   },
   "stats": {
     "games": "ゲーム",
@@ -7102,7 +7658,7 @@ const ja = {
     "acceptRequest": "承認",
     "declineRequest": "拒否",
     "sendGift": "ギフトを送る",
-    "blocked": "ブロック済み",
+    "blocked": "ブロック中",
     "blockedUsers": "ブロックしたユーザー",
     "unblock": "ブロック解除",
     "messages": "メッセージ",
@@ -7220,10 +7776,7 @@ const ja = {
     "confirmBlock": "ブロックしますか？連絡できなくなります。",
     "block": "ブロック",
     "filterFriends": "フレンドを検索...",
-    "noMatchingFriends": "該当するフレンドがいません",
-    "blocked": "ブロック中",
-    "blockedUsers": "ブロックしたユーザー",
-    "unblock": "ブロック解除"
+    "noMatchingFriends": "該当するフレンドがいません"
   },
   "reveal": {
     "revealWord": "表示",
@@ -7695,10 +8248,22 @@ const ja = {
       "timeUpHaul": "時間切れ — いい収穫！",
       "firstMissFree": "ウォーミングアップで外しちゃった — 大丈夫。君ならできる！",
       "badge": {
-        "bronze": { "name": "ブロンズ", "title": "回数こなした！" },
-        "silver": { "name": "シルバー", "title": "そこそこ上出来！" },
-        "gold": { "name": "ゴールド", "title": "今日は絶好調！" },
-        "platinum": { "name": "プラチナ", "title": "ケタ違い！" }
+        "bronze": {
+          "name": "ブロンズ",
+          "title": "回数こなした！"
+        },
+        "silver": {
+          "name": "シルバー",
+          "title": "そこそこ上出来！"
+        },
+        "gold": {
+          "name": "ゴールド",
+          "title": "今日は絶好調！"
+        },
+        "platinum": {
+          "name": "プラチナ",
+          "title": "ケタ違い！"
+        }
       },
       "rarity": {
         "common": "普通",
@@ -7832,7 +8397,7 @@ const ja = {
     "help": "チュートリアルを表示"
   },
   "quickPlay": {
-"solo": {
+    "solo": {
       "title": "クイックプレイ",
       "round": "ラウンド",
       "random": "ランダム",
@@ -7868,7 +8433,15 @@ const ja = {
       "rankProgress": "{points} / {next}（{rank}まで）",
       "rankMax": "最高ランク到達",
       "rankGained": "このラウンドで+{pts}ランクポイント",
-      "rank": {"rookie": "ルーキー", "bronze": "ブロンズ", "silver": "シルバー", "gold": "ゴールド", "platinum": "プラチナ", "diamond": "ダイヤ", "legend": "ワードレジェンド"},
+      "rank": {
+        "rookie": "ルーキー",
+        "bronze": "ブロンズ",
+        "silver": "シルバー",
+        "gold": "ゴールド",
+        "platinum": "プラチナ",
+        "diamond": "ダイヤ",
+        "legend": "ワードレジェンド"
+      },
       "shareTitle": "LexiClash クイックプレイ",
       "shareText": "このボードでパーフェクトの{pct}%を達成。同じボードで挑戦を:"
     },
@@ -8030,7 +8603,12 @@ const ja = {
     "teacherAccess": {
       "empty": "リクエストはありません",
       "title": "先生アクセスリクエスト",
-      "count": { "pending": "保留中", "approved": "承認済み", "declined": "却下", "total": "合計" },
+      "count": {
+        "pending": "保留中",
+        "approved": "承認済み",
+        "declined": "却下",
+        "total": "合計"
+      },
       "filter_status": "ステータス",
       "filter_status_all": "すべて",
       "filter_locale": "言語",
@@ -8039,9 +8617,27 @@ const ja = {
       "row_open": "{name}さんのリクエストを開く",
       "page": "ページ",
       "export_csv": "CSVエクスポート",
-      "col": { "name": "名前", "email": "メール", "role": "役割", "locale": "言語", "country": "国", "status": "ステータス", "submitted": "提出" },
+      "col": {
+        "name": "名前",
+        "email": "メール",
+        "role": "役割",
+        "locale": "言語",
+        "country": "国",
+        "status": "ステータス",
+        "submitted": "提出"
+      },
       "drawer_title": "リクエスト詳細",
-      "field": { "name": "名前", "email": "メール", "role": "役割", "locale": "言語", "country": "国", "school": "学校", "status": "ステータス", "submitted": "提出", "use_case": "ユースケース" },
+      "field": {
+        "name": "名前",
+        "email": "メール",
+        "role": "役割",
+        "locale": "言語",
+        "country": "国",
+        "school": "学校",
+        "status": "ステータス",
+        "submitted": "提出",
+        "use_case": "ユースケース"
+      },
       "admin_note": "申請者へのメモ(任意)",
       "note_hint": "承認時はこのメモが申請者への歓迎メールに含まれます。却下時は理由として使用されます。",
       "show_preview": "メールをプレビュー",
@@ -8547,7 +9143,25 @@ const ja = {
     "milogWords": {
       "title": "Milog辞書エンリッチメント",
       "subtitle": "milog.co.ilで検証されたヘブライ語単語"
-    }
+    },
+    "sendTitle": "通知を送信",
+    "selectPlayers": "受信者を選択",
+    "chooseType": "タイプを選択",
+    "writeMessage": "メッセージを入力",
+    "preview": "プレビュー",
+    "send": "送信",
+    "sending": "送信中...",
+    "sent": "通知を送信しました!",
+    "recipients": "受信者",
+    "type": "タイプ",
+    "sendingTo": "送信先",
+    "titleLabel": "タイトル",
+    "titlePlaceholder": "通知タイトル...",
+    "bodyLabel": "メッセージ",
+    "bodyPlaceholder": "通知メッセージ...",
+    "actionUrlLabel": "アクションURL",
+    "sendSuccess": "通知を送信しました!",
+    "sendError": "通知の送信に失敗しました。もう一度試してください。"
   },
   "gift": {
     "rewards": "報酬",
@@ -8676,17 +9290,14 @@ const ja = {
       "forge": "ワードフォージ"
     },
     "mastery": {
-      "title": "アーキタイプ熟練度",
+      "label": "マスタリー",
       "tier": {
-        "none": "ランクなし",
         "bronze": "ブロンズ",
         "silver": "シルバー",
         "gold": "ゴールド",
+        "platinum": "プラチナ",
         "diamond": "ダイヤモンド"
-      },
-      "progress": "{current}/{target} スター",
-      "bonusUnlocked": "ボーナス解放: {description}",
-      "nextTier": "次のティア: {tier} (あと{remaining}スター)"
+      }
     },
     "runes": {
       "title": "ルーンコレクション",
@@ -8708,27 +9319,135 @@ const ja = {
         "epic": "エピック",
         "legendary": "レジェンダリー"
       },
-      "ember": { "name": "エンバールーン", "desc": "+10% スコアボーナス" },
-      "inferno": { "name": "インフェルノルーン", "desc": "+25% スコアボーナス" },
-      "midas": { "name": "ミダスルーン", "desc": "+15% ゴールドボーナス" },
-      "fortune": { "name": "フォーチュンルーン", "desc": "+40% ゴールドボーナス" },
-      "hourglass": { "name": "砂時計ルーン", "desc": "+5秒ボーナスタイム" },
-      "eternity": { "name": "エタニティルーン", "desc": "+12秒ボーナスタイム" },
-      "flow": { "name": "フロールーン", "desc": "コンボ減衰15%緩和" },
-      "torrent": { "name": "トレントルーン", "desc": "コンボ減衰35%緩和" },
-      "insight": { "name": "インサイトルーン", "desc": "+1 ヒント" },
-      "oracle": { "name": "オラクルルーン", "desc": "+2 ヒント" },
-      "valor": { "name": "ヴァラールーン", "desc": "+20% ボスダメージ" },
-      "dragonslayer": { "name": "ドラゴンスレイヤールーン", "desc": "+50% ボスダメージ" }
+      "ember": {
+        "name": "エンバールーン",
+        "desc": "+10% スコアボーナス"
+      },
+      "inferno": {
+        "name": "インフェルノルーン",
+        "desc": "+25% スコアボーナス"
+      },
+      "midas": {
+        "name": "ミダスルーン",
+        "desc": "+15% ゴールドボーナス"
+      },
+      "fortune": {
+        "name": "フォーチュンルーン",
+        "desc": "+40% ゴールドボーナス"
+      },
+      "hourglass": {
+        "name": "砂時計ルーン",
+        "desc": "+5秒ボーナスタイム"
+      },
+      "eternity": {
+        "name": "エタニティルーン",
+        "desc": "+12秒ボーナスタイム"
+      },
+      "flow": {
+        "name": "フロールーン",
+        "desc": "コンボ減衰15%緩和"
+      },
+      "torrent": {
+        "name": "トレントルーン",
+        "desc": "コンボ減衰35%緩和"
+      },
+      "insight": {
+        "name": "インサイトルーン",
+        "desc": "+1 ヒント"
+      },
+      "oracle": {
+        "name": "オラクルルーン",
+        "desc": "+2 ヒント"
+      },
+      "valor": {
+        "name": "ヴァラールーン",
+        "desc": "+20% ボスダメージ"
+      },
+      "dragonslayer": {
+        "name": "ドラゴンスレイヤールーン",
+        "desc": "+50% ボスダメージ"
+      }
     },
     "achievements": {
       "title": "実績",
       "earned": "獲得済み",
+      "hidden": "非公開",
+      "unlocked": "実績解除！",
+      "upgraded": "実績アップグレード！",
+      "progress": "進捗",
       "categories": {
         "gameplay": "ゲームプレイ",
-        "bosses": "ボス",
+        "bosses": "ボスバトル",
         "progression": "進行",
         "mastery": "マスタリー"
+      },
+      "firstWord": {
+        "name": "最初の一歩",
+        "desc": "最初の単語を見つける"
+      },
+      "wordStreak5": {
+        "name": "ホットストリーク",
+        "desc": "5倍コンボを達成"
+      },
+      "wordStreak10": {
+        "name": "止められない",
+        "desc": "10倍コンボを達成"
+      },
+      "longWord6": {
+        "name": "言葉職人",
+        "desc": "6文字以上の単語を見つける"
+      },
+      "longWord8": {
+        "name": "言語学者",
+        "desc": "8文字以上の単語を見つける"
+      },
+      "perfectLevel": {
+        "name": "パーフェクトスター",
+        "desc": "レベルを星3つでクリア"
+      },
+      "bossSlayer": {
+        "name": "ボススレイヤー",
+        "desc": "ボスを倒す"
+      },
+      "bossSpeedrun": {
+        "name": "スピードデーモン",
+        "desc": "30秒以上残してボスを倒す"
+      },
+      "bossNoDamage": {
+        "name": "無傷",
+        "desc": "単語を間違えずにボスを倒す"
+      },
+      "allBosses": {
+        "name": "チャンピオン",
+        "desc": "すべてのボスを倒す"
+      },
+      "worldComplete": {
+        "name": "ワールドトラベラー",
+        "desc": "ワールドをクリア"
+      },
+      "starCollector50": {
+        "name": "スターコレクター",
+        "desc": "50個の星を集める"
+      },
+      "starCollector100": {
+        "name": "星座",
+        "desc": "100個の星を集める"
+      },
+      "levelMaster": {
+        "name": "レベルマスター",
+        "desc": "10レベルで星3つを獲得"
+      },
+      "skillUnlocked": {
+        "name": "生徒",
+        "desc": "スキルを解放"
+      },
+      "skillPathComplete": {
+        "name": "スペシャリスト",
+        "desc": "スキルパスを完了"
+      },
+      "comboKing": {
+        "name": "コンボキング",
+        "desc": "15倍コンボを達成"
       }
     },
     "worldMap": "ワールドマップ",
@@ -8746,7 +9465,38 @@ const ja = {
       "achievements": "実績"
     },
     "worldLabel": "ワールド",
-    "world": "ワールド",
+    "world": {
+      "1": {
+        "theme": "自然と庭園"
+      },
+      "2": {
+        "theme": "水と流れ"
+      },
+      "3": {
+        "theme": "大地と鉱物"
+      },
+      "4": {
+        "theme": "海と旅"
+      },
+      "5": {
+        "theme": "建築と工芸"
+      },
+      "6": {
+        "theme": "謎とパズル"
+      },
+      "7": {
+        "theme": "光と反射"
+      },
+      "8": {
+        "theme": "宇宙と科学"
+      },
+      "9": {
+        "theme": "文化と言語"
+      },
+      "10": {
+        "theme": "力と知識"
+      }
+    },
     "stars": "スター",
     "levelsCompleted": "レベルクリア",
     "locked": "ロック中",
@@ -8787,9 +9537,12 @@ const ja = {
       "bossRushLocked": "全ボスを倒してボスラッシュを解放"
     },
     "share": {
+      "bossDefeated": "{{world}}で{{boss}}を倒した！",
+      "wordsFound": "個見つけた",
       "perfectClear": "パーフェクトクリア",
       "bestWord": "ベストワード",
-      "wordsFound": "発見した単語"
+      "shareCard": "勝利をシェア",
+      "killingWord": "決め技ワード"
     },
     "streak": {
       "days": "日連続",
@@ -8860,24 +9613,6 @@ const ja = {
       "totalScore": "合計スコア",
       "timeTaken": "タイム"
     },
-    "mastery": {
-      "label": "マスタリー",
-      "tier": {
-        "bronze": "ブロンズ",
-        "silver": "シルバー",
-        "gold": "ゴールド",
-        "platinum": "プラチナ",
-        "diamond": "ダイヤモンド"
-      }
-    },
-    "share": {
-      "bossDefeated": "{{world}}で{{boss}}を倒した！",
-      "wordsFound": "個見つけた",
-      "perfectClear": "パーフェクトクリア",
-      "bestWord": "ベストワード",
-      "shareCard": "勝利をシェア",
-      "killingWord": "決め技ワード"
-    },
     "weeklyChallenge": {
       "title": "ウィークリーチャレンジ",
       "description": "全員同じグリッド — 最高スコアを競おう！",
@@ -8909,8 +9644,20 @@ const ja = {
       "confirm": "本当にリセットしますか？ワールドの進捗はリセットされますが、アップグレード、ゴールド、ワードアルバムは保持されます。",
       "activate": "プレステージする",
       "cancel": "まだしない",
-      "ranks": { "bronze": "ブロンズ", "silver": "シルバー", "gold": "ゴールド", "platinum": "プラチナ", "diamond": "ダイヤモンド" },
-      "titles": { "wordSmith": "ワードスミス", "lexiconAdept": "レキシコンの達人", "wordMaster": "ワードマスター", "grandLexicon": "グランドレキシコン", "eternalWordsmith": "永遠のワードスミス" },
+      "ranks": {
+        "bronze": "ブロンズ",
+        "silver": "シルバー",
+        "gold": "ゴールド",
+        "platinum": "プラチナ",
+        "diamond": "ダイヤモンド"
+      },
+      "titles": {
+        "wordSmith": "ワードスミス",
+        "lexiconAdept": "レキシコンの達人",
+        "wordMaster": "ワードマスター",
+        "grandLexicon": "グランドレキシコン",
+        "eternalWordsmith": "永遠のワードスミス"
+      },
       "bonusXp": "+{{percent}}% XP",
       "bonusGold": "+{{percent}}% ゴールド",
       "keeps": "保持されるもの",
@@ -9110,18 +9857,6 @@ const ja = {
     "toast": {
       "themedWord": "テーマワードボーナス！"
     },
-    "world": {
-      "1": { "theme": "自然と庭園" },
-      "2": { "theme": "水と流れ" },
-      "3": { "theme": "大地と鉱物" },
-      "4": { "theme": "海と旅" },
-      "5": { "theme": "建築と工芸" },
-      "6": { "theme": "謎とパズル" },
-      "7": { "theme": "光と反射" },
-      "8": { "theme": "宇宙と科学" },
-      "9": { "theme": "文化と言語" },
-      "10": { "theme": "力と知識" }
-    },
     "mode": {
       "classic": "クラシック",
       "blast": "ブラスト",
@@ -9185,10 +9920,10 @@ const ja = {
       "validationCancelled": "検証がキャンセルされました",
       "missingCenterLetter": "中心の文字を含める必要があります！"
     },
-"live": {
+    "live": {
       "wordFound": "{{word}} 発見、{{points}}ポイント獲得"
     },
-"game": {
+    "game": {
       "title": "アドベンチャーモード",
       "hud": "アドベンチャーHUD",
       "retryOptions": "リトライオプション",
@@ -9803,88 +10538,6 @@ const ja = {
       "danger": "危険！",
       "healthLabel": "プレイヤーの体力: {{current}} / {{max}} ({{percentage}}%)"
     },
-    "achievements": {
-      "title": "実績",
-      "earned": "獲得済み",
-      "hidden": "非公開",
-      "unlocked": "実績解除！",
-      "upgraded": "実績アップグレード！",
-      "progress": "進捗",
-      "categories": {
-        "gameplay": "ゲームプレイ",
-        "bosses": "ボスバトル",
-        "progression": "進行",
-        "mastery": "マスタリー"
-      },
-      "firstWord": {
-        "name": "最初の一歩",
-        "desc": "最初の単語を見つける"
-      },
-      "wordStreak5": {
-        "name": "ホットストリーク",
-        "desc": "5倍コンボを達成"
-      },
-      "wordStreak10": {
-        "name": "止められない",
-        "desc": "10倍コンボを達成"
-      },
-      "longWord6": {
-        "name": "言葉職人",
-        "desc": "6文字以上の単語を見つける"
-      },
-      "longWord8": {
-        "name": "言語学者",
-        "desc": "8文字以上の単語を見つける"
-      },
-      "perfectLevel": {
-        "name": "パーフェクトスター",
-        "desc": "レベルを星3つでクリア"
-      },
-      "bossSlayer": {
-        "name": "ボススレイヤー",
-        "desc": "ボスを倒す"
-      },
-      "bossSpeedrun": {
-        "name": "スピードデーモン",
-        "desc": "30秒以上残してボスを倒す"
-      },
-      "bossNoDamage": {
-        "name": "無傷",
-        "desc": "単語を間違えずにボスを倒す"
-      },
-      "allBosses": {
-        "name": "チャンピオン",
-        "desc": "すべてのボスを倒す"
-      },
-      "worldComplete": {
-        "name": "ワールドトラベラー",
-        "desc": "ワールドをクリア"
-      },
-      "starCollector50": {
-        "name": "スターコレクター",
-        "desc": "50個の星を集める"
-      },
-      "starCollector100": {
-        "name": "星座",
-        "desc": "100個の星を集める"
-      },
-      "levelMaster": {
-        "name": "レベルマスター",
-        "desc": "10レベルで星3つを獲得"
-      },
-      "skillUnlocked": {
-        "name": "生徒",
-        "desc": "スキルを解放"
-      },
-      "skillPathComplete": {
-        "name": "スペシャリスト",
-        "desc": "スキルパスを完了"
-      },
-      "comboKing": {
-        "name": "コンボキング",
-        "desc": "15倍コンボを達成"
-      }
-    },
     "skills": {
       "title": "スキルツリー",
       "points": "スキルポイント",
@@ -10026,27 +10679,108 @@ const ja = {
       "worldEssence": "ワールドエッセンス",
       "ancientRelic": "古代の遺物",
       "cosmicShard": "宇宙の欠片",
-      "total": "合計"
+      "total": "合計",
+      "fragment": "かけら",
+      "luckyBonus": "ラッキーボーナス!"
     },
     "collection": {
       "title": "コレクション",
       "collected": "収集済み",
       "items": "アイテム",
-      "category": { "trophy": "トロフィー", "scroll": "巻物", "rune": "ルーン", "relic": "遺物" },
-      "rarity": { "common": "コモン", "rare": "レア", "epic": "エピック", "legendary": "レジェンダリー" },
+      "category": {
+        "trophy": "トロフィー",
+        "scroll": "巻物",
+        "rune": "ルーン",
+        "relic": "遺物"
+      },
+      "rarity": {
+        "common": "コモン",
+        "rare": "レア",
+        "epic": "エピック",
+        "legendary": "レジェンダリー"
+      },
       "runeFragment": "ルーンの欠片",
       "runeFragmentDesc": "古代の力が宿る光る欠片",
       "goldenQuill": "黄金の羽ペン",
       "goldenQuillDesc": "初回パーフェクトクリアの証",
       "cosmicShard": "宇宙の欠片",
       "cosmicShardDesc": "最も希少な宝物 — 宇宙そのものの断片",
-      "bossTrophy": { "w1": "森の守護者トロフィー", "w2": "砂漠のファラオトロフィー", "w3": "海のリヴァイアサントロフィー", "w4": "山のタイタントロフィー", "w5": "ジャングルの蛇トロフィー", "w6": "ツンドラのイエティトロフィー", "w7": "火山のドラゴントロフィー", "w8": "空のグリフォントロフィー", "w9": "影のレイストロフィー", "w10": "宇宙の支配者トロフィー" },
-      "bossTrophyDesc": { "w1": "森の守護者を倒した", "w2": "砂漠のファラオを倒した", "w3": "海のリヴァイアサンを倒した", "w4": "山のタイタンを倒した", "w5": "ジャングルの蛇を倒した", "w6": "ツンドラのイエティを倒した", "w7": "火山のドラゴンを倒した", "w8": "空のグリフォンを倒した", "w9": "影のレイスを倒した", "w10": "宇宙の支配者を倒した" },
-      "loreScroll": { "w1": "森の巻物", "w2": "砂漠の巻物", "w3": "海の巻物", "w4": "山の巻物", "w5": "ジャングルの巻物", "w6": "ツンドラの巻物", "w7": "火山の巻物", "w8": "空の巻物", "w9": "影の巻物", "w10": "宇宙の巻物" },
-      "worldEssence": { "w1": "森のエッセンス", "w2": "砂漠のエッセンス", "w3": "海のエッセンス", "w4": "山のエッセンス", "w5": "ジャングルのエッセンス", "w6": "ツンドラのエッセンス", "w7": "火山のエッセンス", "w8": "空のエッセンス", "w9": "影のエッセンス", "w10": "宇宙のエッセンス" },
-      "worldEssenceDesc": { "w1": "魔法の森の精霊", "w2": "砂漠の燃える心臓", "w3": "太古の海の一滴", "w4": "山の不壊の核", "w5": "ジャングルの野生の脈動", "w6": "永遠の冬の凍った結晶", "w7": "火山の心臓からの火花", "w8": "最も高い雲からの羽", "w9": "影の領域からの囁き", "w10": "宇宙そのものの断片" },
-      "ancientRelic": { "w5": "ジャングルの偶像", "w6": "凍った方位磁石", "w7": "黒曜石の仮面", "w8": "風鈴", "w9": "影の鏡", "w10": "星図" },
-      "ancientRelicDesc": { "w5": "ジャングルの奥深くにある古代の偶像", "w6": "常に最も寒い場所を指す方位磁石", "w7": "火山の心臓で鍛えられた仮面", "w8": "風の歌を奏でる鈴", "w9": "過去を映す鏡", "w10": "星々の間の道を示す地図" }
+      "bossTrophy": {
+        "w1": "森の守護者トロフィー",
+        "w2": "砂漠のファラオトロフィー",
+        "w3": "海のリヴァイアサントロフィー",
+        "w4": "山のタイタントロフィー",
+        "w5": "ジャングルの蛇トロフィー",
+        "w6": "ツンドラのイエティトロフィー",
+        "w7": "火山のドラゴントロフィー",
+        "w8": "空のグリフォントロフィー",
+        "w9": "影のレイストロフィー",
+        "w10": "宇宙の支配者トロフィー"
+      },
+      "bossTrophyDesc": {
+        "w1": "森の守護者を倒した",
+        "w2": "砂漠のファラオを倒した",
+        "w3": "海のリヴァイアサンを倒した",
+        "w4": "山のタイタンを倒した",
+        "w5": "ジャングルの蛇を倒した",
+        "w6": "ツンドラのイエティを倒した",
+        "w7": "火山のドラゴンを倒した",
+        "w8": "空のグリフォンを倒した",
+        "w9": "影のレイスを倒した",
+        "w10": "宇宙の支配者を倒した"
+      },
+      "loreScroll": {
+        "w1": "森の巻物",
+        "w2": "砂漠の巻物",
+        "w3": "海の巻物",
+        "w4": "山の巻物",
+        "w5": "ジャングルの巻物",
+        "w6": "ツンドラの巻物",
+        "w7": "火山の巻物",
+        "w8": "空の巻物",
+        "w9": "影の巻物",
+        "w10": "宇宙の巻物"
+      },
+      "worldEssence": {
+        "w1": "森のエッセンス",
+        "w2": "砂漠のエッセンス",
+        "w3": "海のエッセンス",
+        "w4": "山のエッセンス",
+        "w5": "ジャングルのエッセンス",
+        "w6": "ツンドラのエッセンス",
+        "w7": "火山のエッセンス",
+        "w8": "空のエッセンス",
+        "w9": "影のエッセンス",
+        "w10": "宇宙のエッセンス"
+      },
+      "worldEssenceDesc": {
+        "w1": "魔法の森の精霊",
+        "w2": "砂漠の燃える心臓",
+        "w3": "太古の海の一滴",
+        "w4": "山の不壊の核",
+        "w5": "ジャングルの野生の脈動",
+        "w6": "永遠の冬の凍った結晶",
+        "w7": "火山の心臓からの火花",
+        "w8": "最も高い雲からの羽",
+        "w9": "影の領域からの囁き",
+        "w10": "宇宙そのものの断片"
+      },
+      "ancientRelic": {
+        "w5": "ジャングルの偶像",
+        "w6": "凍った方位磁石",
+        "w7": "黒曜石の仮面",
+        "w8": "風鈴",
+        "w9": "影の鏡",
+        "w10": "星図"
+      },
+      "ancientRelicDesc": {
+        "w5": "ジャングルの奥深くにある古代の偶像",
+        "w6": "常に最も寒い場所を指す方位磁石",
+        "w7": "火山の心臓で鍛えられた仮面",
+        "w8": "風の歌を奏でる鈴",
+        "w9": "過去を映す鏡",
+        "w10": "星々の間の道を示す地図"
+      }
     },
     "later": "あとで",
     "nextLevel": "次: レベル",
@@ -10065,16 +10799,46 @@ const ja = {
       "prestigeCosmic": "コスミックプレステージ"
     },
     "weekly": {
-      "speedDemon": { "name": "スピードデーモン", "desc": "タイマー短縮・スコア×1.5" },
-      "longWords": { "name": "ロングワード", "desc": "4文字以上・ゴールド×1.5" },
-      "goldRush": { "name": "ゴールドラッシュ", "desc": "ゴールド×2・タイマー短縮" },
-      "iceAge": { "name": "アイスエイジ", "desc": "特殊タイル×2・スコア×1.3" },
-      "marathon": { "name": "マラソン", "desc": "タイマー延長・スコア×0.8" },
-      "doubleOrNothing": { "name": "ダブルオアナッシング", "desc": "スコア×2・タイマー半減" },
-      "wordSmith": { "name": "ワードスミス", "desc": "5文字以上・スコア×2" },
-      "treasureHunter": { "name": "トレジャーハンター", "desc": "ゴールド×1.8・特殊タイル×1.5" },
-      "blitz": { "name": "ブリッツ", "desc": "タイマー短縮・スコア×3" },
-      "zenMode": { "name": "禅モード", "desc": "ゆとりタイマー・ゴールド半減" }
+      "speedDemon": {
+        "name": "スピードデーモン",
+        "desc": "タイマー短縮・スコア×1.5"
+      },
+      "longWords": {
+        "name": "ロングワード",
+        "desc": "4文字以上・ゴールド×1.5"
+      },
+      "goldRush": {
+        "name": "ゴールドラッシュ",
+        "desc": "ゴールド×2・タイマー短縮"
+      },
+      "iceAge": {
+        "name": "アイスエイジ",
+        "desc": "特殊タイル×2・スコア×1.3"
+      },
+      "marathon": {
+        "name": "マラソン",
+        "desc": "タイマー延長・スコア×0.8"
+      },
+      "doubleOrNothing": {
+        "name": "ダブルオアナッシング",
+        "desc": "スコア×2・タイマー半減"
+      },
+      "wordSmith": {
+        "name": "ワードスミス",
+        "desc": "5文字以上・スコア×2"
+      },
+      "treasureHunter": {
+        "name": "トレジャーハンター",
+        "desc": "ゴールド×1.8・特殊タイル×1.5"
+      },
+      "blitz": {
+        "name": "ブリッツ",
+        "desc": "タイマー短縮・スコア×3"
+      },
+      "zenMode": {
+        "name": "禅モード",
+        "desc": "ゆとりタイマー・ゴールド半減"
+      }
     },
     "saveFailedWarning": "進行状況が保存されませんでした — 接続を確認してください",
     "retrySave": "再試行",
@@ -10130,24 +10894,113 @@ const ja = {
       "level10": "超越者"
     },
     "consumables": {
-      "bossRevive": { "name": "ボス復活" },
-      "bossShield": { "name": "ボスシールド" },
-      "doubleGold": { "name": "ゴールド2倍" },
-      "extraHint": { "name": "追加ヒント" },
-      "gridReroll": { "name": "グリッド再生成" },
-      "objectiveSkip": { "name": "目標スキップ" },
-      "perfectStar": { "name": "パーフェクトスター" },
-      "timerExtension": { "name": "時間延長" }
+      "bossRevive": {
+        "name": "ボス復活"
+      },
+      "bossShield": {
+        "name": "ボスシールド"
+      },
+      "doubleGold": {
+        "name": "ゴールド2倍"
+      },
+      "extraHint": {
+        "name": "追加ヒント"
+      },
+      "gridReroll": {
+        "name": "グリッド再生成"
+      },
+      "objectiveSkip": {
+        "name": "目標スキップ"
+      },
+      "perfectStar": {
+        "name": "パーフェクトスター"
+      },
+      "timerExtension": {
+        "name": "時間延長"
+      }
     },
     "mutators": {
-      "blindMode": { "name": "ブラインドモード" },
-      "chaosGrid": { "name": "カオスグリッド" },
-      "fragile": { "name": "フラジャイル" },
-      "ironMan": { "name": "アイアンマン" },
-      "minimalist": { "name": "ミニマリスト" },
-      "noHints": { "name": "ヒントなし" },
-      "speedRun": { "name": "スピードラン" },
-      "wordMaster": { "name": "ワードマスター" }
+      "blindMode": {
+        "name": "ブラインドモード"
+      },
+      "chaosGrid": {
+        "name": "カオスグリッド"
+      },
+      "fragile": {
+        "name": "フラジャイル"
+      },
+      "ironMan": {
+        "name": "アイアンマン"
+      },
+      "minimalist": {
+        "name": "ミニマリスト"
+      },
+      "noHints": {
+        "name": "ヒントなし"
+      },
+      "speedRun": {
+        "name": "スピードラン"
+      },
+      "wordMaster": {
+        "name": "ワードマスター"
+      }
+    },
+    "boss": {
+      "combat": {
+        "abilityBar": "あなたのスキル",
+        "charge": "スキルチャージ",
+        "weakLabel": "弱点",
+        "weaknessHit": "弱点を突いた!",
+        "weakness": {
+          "length": "長い単語",
+          "lengthLong": "もっと長い単語",
+          "lengthEpic": "超長い単語",
+          "doubleLetter": "二重文字",
+          "palindrome": "回文",
+          "rareLetter": "珍しい文字",
+          "vowelHeavy": "母音たっぷりの単語"
+        },
+        "parry": {
+          "hint": "守れ!大きな単語で素早く!",
+          "success": "守った!"
+        },
+        "ability": {
+          "smite": {
+            "name": "スマイト",
+            "desc": "ボスに一気にダメージを放つ"
+          },
+          "ward": {
+            "name": "ワード",
+            "desc": "ボスの次の攻撃をブロック"
+          },
+          "focus": {
+            "name": "フォーカス",
+            "desc": "次の単語にボーナスダメージを与える"
+          }
+        }
+      }
+    },
+    "surprise": {
+      "doubleGold": {
+        "label": "ゴールド2倍!",
+        "desc": "このレベルはゴールドが2倍"
+      },
+      "bonusChest": {
+        "label": "ボーナス宝箱!",
+        "desc": "お宝がもう1つ出現"
+      },
+      "luckyGems": {
+        "label": "ラッキージェム!",
+        "desc": "思わぬジェムの収穫"
+      },
+      "goldenWord": {
+        "label": "ゴールデンワード!",
+        "desc": "隠れた単語が大当たり"
+      },
+      "comboFrenzy": {
+        "label": "コンボフレンジー!",
+        "desc": "このレベルはコンボボーナスが2倍"
+      }
     }
   },
   "wheelRush": {
@@ -10174,17 +11027,68 @@ const ja = {
   "blast": {
     "toCatchUp": "追いつくまで",
     "leadingBy": "リード",
-    "firstUse": { "gotIt": "了解" },
+    "firstUse": {
+      "gotIt": "了解"
+    },
     "level": "レベル{n}",
     "results": {
+      "boardDomination": "ボード制覇",
+      "matchRecap": "ブラストマッチ要約",
+      "totalTilesDemolished": "破壊タイル",
+      "intensity": "激しさ",
+      "peakCombo": "最高コンボ",
+      "totalGems": "宝石",
+      "demolitionKing": "破壊王",
+      "comboMaster": "コンボマスター",
+      "gemCollector": "宝石コレクター",
+      "wordsmith": "言葉の達人",
+      "tilesCleared": "クリアしたタイル",
+      "maxCombo": "最大コンボ",
+      "gemsCollected": "宝石",
+      "bestWord": "ベストワード",
+      "tiles": "タイル",
+      "newRecord": "新記録！",
+      "yourRank": "あなたのランク",
+      "topPercent": "今週トップ{pct}%",
+      "pbDelta": "自己ベスト+{delta}",
+      "fromBest": "前回のベストから",
+      "biggestCombo": "最大コンボ",
+      "bestWave": "ベストウェーブ",
+      "wave": "ウェーブ{n}",
+      "badgesEarned": "獲得バッジ",
+      "newBadge": "NEW",
+      "waveFailed": "ウェーブ失敗",
+      "needClearPct": "{required}%クリアが必要 — 結果は{got}%",
+      "tilesShort": "あと{count}タイルだった!",
+      "failHint": "進むにはボードの90%以上をクリアしてください",
+      "tryAgain": "もう一度",
+      "share": "共有",
       "sceneTitle": "ブラスト結果",
-      "finalScore": "スコア",
-      "comboChain": "最高コンボ",
-      "boardClears": "ボードクリア",
-      "gemsCollected": "ジェム",
-      "tilesCleared": "タイル",
-      "bestWord": "最高の単語",
-      "rank": "順位"
+      "finalScore": "最終スコア",
+      "comboChain": "コンボ",
+      "boardClears": "クリア",
+      "brag": {
+        "legend": "レジェンド",
+        "elite": "エリート",
+        "great": "素晴らしいラン",
+        "solid": "堅実",
+        "nice": "ナイストライ",
+        "beats": "プレイヤーの{pct}%を超えた",
+        "weeklyCohort": "今週のグローバル集団",
+        "score": "スコア",
+        "combo": "コンボ",
+        "bestWord": "ベストワード",
+        "share": "自慢",
+        "shareAria": "結果を共有",
+        "shareTitle": "LexiClash Blast",
+        "shareScore": "ブラストモードで{score}点",
+        "shareRank": "今週上位{pct}%",
+        "copied": "クリップボードにコピーしました！",
+        "copyFailed": "コピーできませんでした — もう一度"
+      },
+      "mpResults": {
+        "boardCleared": "ボード クリア!"
+      }
     },
     "intro": {
       "level": "レベル{n}",
@@ -10192,29 +11096,77 @@ const ja = {
     },
     "modifier": {
       "incoming": "特殊ルール",
-      "goldRush": { "name": "ゴールドラッシュ", "desc": "ゴールドタイルが大量に出現、スコアもアップ。" },
-      "chainFrenzy": { "name": "チェインフレンジー", "desc": "連鎖ボーナスが2倍、つなげよう！" },
-      "doubleDown": { "name": "ダブルダウン", "desc": "全ての単語が2倍スコア、ただし手数は1つ減少。" },
-      "featherfall": { "name": "フェザーフォール", "desc": "ゆったり——手数が2つ増える。" },
-      "bombParty": { "name": "ボムパーティー", "desc": "ボムが大幅に増加。" },
-      "luckyVowels": { "name": "ラッキーチャンス", "desc": "氷の障害が減り、ゴールドも少し増加。" },
-      "megaCombo": { "name": "メガコンボ", "desc": "コンボの威力が増してボーナス点。" },
-      "gemRush": { "title": "ジェムラッシュ", "sub": "ボード上のジェム増加" },
-      "coinBonanza": { "title": "コイン大量発生", "sub": "今ラウンドはコイン増" },
-      "bonusStorm": { "title": "ボーナスストーム", "sub": "ダブルボーナスタイル解放" }
+      "goldRush": {
+        "name": "ゴールドラッシュ",
+        "desc": "ゴールドタイルが大量に出現、スコアもアップ。"
+      },
+      "chainFrenzy": {
+        "name": "チェインフレンジー",
+        "desc": "連鎖ボーナスが2倍、つなげよう！"
+      },
+      "doubleDown": {
+        "name": "ダブルダウン",
+        "desc": "全ての単語が2倍スコア、ただし手数は1つ減少。"
+      },
+      "featherfall": {
+        "name": "フェザーフォール",
+        "desc": "ゆったり——手数が2つ増える。"
+      },
+      "bombParty": {
+        "name": "ボムパーティー",
+        "desc": "ボムが大幅に増加。"
+      },
+      "luckyVowels": {
+        "name": "ラッキーチャンス",
+        "desc": "氷の障害が減り、ゴールドも少し増加。"
+      },
+      "megaCombo": {
+        "name": "メガコンボ",
+        "desc": "コンボの威力が増してボーナス点。"
+      },
+      "gemRush": {
+        "title": "ジェムラッシュ",
+        "sub": "ボード上のジェム増加"
+      },
+      "coinBonanza": {
+        "title": "コイン大量発生",
+        "sub": "今ラウンドはコイン増"
+      },
+      "bonusStorm": {
+        "title": "ボーナスストーム",
+        "sub": "ダブルボーナスタイル解放"
+      }
     },
     "surprise": {
-      "coinBurst": { "title": "コインバースト！" },
-      "gemShower": { "title": "ジェムシャワー！" },
-      "chainCharge": { "title": "チェインチャージ！" },
-      "luckyDouble": { "title": "ラッキーダブル！" },
-      "goldenWord": { "title": "ゴールデンワード！" },
+      "coinBurst": {
+        "title": "コインバースト！"
+      },
+      "gemShower": {
+        "title": "ジェムシャワー！"
+      },
+      "chainCharge": {
+        "title": "チェインチャージ！"
+      },
+      "luckyDouble": {
+        "title": "ラッキーダブル！"
+      },
+      "goldenWord": {
+        "title": "ゴールデンワード！"
+      },
       "nextWordDouble": "次の単語 ×2",
       "chargedChip": "✨ ×2 チャージ"
     },
     "quip": {
-      "big": ["いいチェーン!", "燃えてる!", "続けて!"],
-      "mega": ["止まらない!", "伝説!", "メガコンボ!"]
+      "big": [
+        "いいチェーン!",
+        "燃えてる!",
+        "続けて!"
+      ],
+      "mega": [
+        "止まらない!",
+        "伝説!",
+        "メガコンボ!"
+      ]
     },
     "chestMilestone": {
       "title": "節目のチェスト",
@@ -10274,6 +11226,10 @@ const ja = {
       },
       "mpResults": {
         "boardCleared": "ボード クリア!"
+      },
+      "unlock": {
+        "gotIt": "わかった",
+        "skipFuture": "今後のチュートリアルをスキップ"
       }
     },
     "adBadge": "広告",
@@ -10339,28 +11295,94 @@ const ja = {
       "5000": "5000＋"
     },
     "tile": {
-      "gold":      { "name": "ゴールド",    "desc": "スコア3倍 + ボーナス1手。" },
-      "silver":    { "name": "シルバー",    "desc": "スコア1.5倍。カウントダウンを1手延長。" },
-      "diamond":   { "name": "ダイヤモンド", "desc": "スコア5倍。フロスト内容を3ターン公開。" },
-      "bomb":      { "name": "ボム",        "desc": "周囲3×3をクリア。近くのボムに連鎖。" },
-      "lightning": { "name": "ライトニング", "desc": "列全体を即座にクリア。" },
-      "prism":     { "name": "プリズム",    "desc": "2回。行と列を全クリア。ボムとライトニングに連鎖。" },
-      "rainbow":   { "name": "レインボー",  "desc": "最強スペシャルをコピー＆倍増。単独: 2倍スコア。" },
-      "ice":       { "name": "アイス",      "desc": "2回で破壊。複数ヒット防御タイル。" },
-      "gem":       { "name": "ジェム",      "desc": "3回で収集。完了時にスペシャル2個生成。" },
-      "frozen":    { "name": "フロスト",    "desc": "2回。内部にスペシャルを隠す — ボム、ライトニング、プリズム、ジェム、レインボー。" },
-      "magnet":    { "name": "ボルテックス", "desc": "近くのタイルを引き寄せ、エリアを爆発。" },
-      "mirror":    { "name": "ミラー",      "desc": "単語内の最初の攻撃スペシャルをコピー。単独: 2倍スコア。" },
-      "wildcard":  { "name": "ワイルド",    "desc": "どの文字にもなれる。使用文字のスクラブル値でスコア。" },
-      "countdown": { "name": "カウントダウン", "desc": "毎手減少。単語で解除: +15点と2ボーナス手。期限切れ: -50点と3×3爆発。" },
-      "shuffle":   { "name": "シャッフル",  "desc": "クリア時にボード上の残り文字を全て並べ替える。" },
-      "magma":     { "name": "マグマ",      "desc": "両対角線（X字パターン）をクリアし、スコア2倍。" },
-      "portal":    { "name": "ポータル",    "desc": "リンクペアを通じてワードパスをテレポート。両方クリア。スコア2倍。+5ボーナス。" },
-      "catalyst":  { "name": "触媒",        "desc": "+10点。隣接する通常タイルをスペシャルに昇格。" },
-      "crystal":   { "name": "クリスタル",  "desc": "未使用のターンごとに×1成長（最大×5）。使用時に単語スコアを倍増。" },
-      "fuse":      { "name": "導火線",      "desc": "連結ペア。片方を消すと相方に火がつく — 3ターン以内に解除すれば+15点と+2手、失敗すると3×3爆発で-50点。" },
-      "anchor":    { "name": "アンカー",    "desc": "長い単語を報酬化。消去時、単語の文字数×+3点を加算。" },
-      "mystery":   { "name": "ミステリー", "desc": "ランダムな驚き！スコアバースト、新特別タイル、ミニポップ、またはメガ+150。" }
+      "gold": {
+        "name": "ゴールド",
+        "desc": "スコア3倍 + ボーナス1手。"
+      },
+      "silver": {
+        "name": "シルバー",
+        "desc": "スコア1.5倍。カウントダウンを1手延長。"
+      },
+      "diamond": {
+        "name": "ダイヤモンド",
+        "desc": "スコア5倍。フロスト内容を3ターン公開。"
+      },
+      "bomb": {
+        "name": "ボム",
+        "desc": "周囲3×3をクリア。近くのボムに連鎖。"
+      },
+      "lightning": {
+        "name": "ライトニング",
+        "desc": "列全体を即座にクリア。"
+      },
+      "prism": {
+        "name": "プリズム",
+        "desc": "2回。行と列を全クリア。ボムとライトニングに連鎖。"
+      },
+      "rainbow": {
+        "name": "レインボー",
+        "desc": "最強スペシャルをコピー＆倍増。単独: 2倍スコア。"
+      },
+      "ice": {
+        "name": "アイス",
+        "desc": "2回で破壊。複数ヒット防御タイル。"
+      },
+      "gem": {
+        "name": "ジェム",
+        "desc": "3回で収集。完了時にスペシャル2個生成。"
+      },
+      "frozen": {
+        "name": "フロスト",
+        "desc": "2回。内部にスペシャルを隠す — ボム、ライトニング、プリズム、ジェム、レインボー。"
+      },
+      "magnet": {
+        "name": "ボルテックス",
+        "desc": "近くのタイルを引き寄せ、エリアを爆発。"
+      },
+      "mirror": {
+        "name": "ミラー",
+        "desc": "単語内の最初の攻撃スペシャルをコピー。単独: 2倍スコア。"
+      },
+      "wildcard": {
+        "name": "ワイルド",
+        "desc": "どの文字にもなれる。使用文字のスクラブル値でスコア。"
+      },
+      "countdown": {
+        "name": "カウントダウン",
+        "desc": "毎手減少。単語で解除: +15点と2ボーナス手。期限切れ: -50点と3×3爆発。"
+      },
+      "shuffle": {
+        "name": "シャッフル",
+        "desc": "クリア時にボード上の残り文字を全て並べ替える。"
+      },
+      "magma": {
+        "name": "マグマ",
+        "desc": "両対角線（X字パターン）をクリアし、スコア2倍。"
+      },
+      "portal": {
+        "name": "ポータル",
+        "desc": "リンクペアを通じてワードパスをテレポート。両方クリア。スコア2倍。+5ボーナス。"
+      },
+      "catalyst": {
+        "name": "触媒",
+        "desc": "+10点。隣接する通常タイルをスペシャルに昇格。"
+      },
+      "crystal": {
+        "name": "クリスタル",
+        "desc": "未使用のターンごとに×1成長（最大×5）。使用時に単語スコアを倍増。"
+      },
+      "fuse": {
+        "name": "導火線",
+        "desc": "連結ペア。片方を消すと相方に火がつく — 3ターン以内に解除すれば+15点と+2手、失敗すると3×3爆発で-50点。"
+      },
+      "anchor": {
+        "name": "アンカー",
+        "desc": "長い単語を報酬化。消去時、単語の文字数×+3点を加算。"
+      },
+      "mystery": {
+        "name": "ミステリー",
+        "desc": "ランダムな驚き！スコアバースト、新特別タイル、ミニポップ、またはメガ+150。"
+      }
     },
     "title": "ブラストモード",
     "description": "ボードをクリア！単語でタイルを爆破。",
@@ -10384,7 +11406,11 @@ const ja = {
       "home": "ホーム",
       "recordBest": "ベスト",
       "recordFast": "最速",
-      "recordBonus": "ボーナス"
+      "recordBonus": "ボーナス",
+      "chainLabel": "ベストチェーン",
+      "gemsLabel": "ジェム",
+      "timeLabel": "タイム",
+      "wordsLabel": "単語"
     },
     "failed": {
       "title": "ヒント切れ！",
@@ -10406,8 +11432,20 @@ const ja = {
       "bonusCount": "⭐ ボーナス {count}"
     },
     "hint": {
+      "free": "無料",
+      "ad": "ヒント",
+      "aria": {
+        "free": "無料ヒント — 25点減点",
+        "ad": "広告を見てヒントを取得 — 25点減点"
+      },
+      "toast": {
+        "targetWord": "作ってみよう: {word}",
+        "colorPower": "{color}のタイルを探そう",
+        "collectType": "{tileType}をもっと見つけよう",
+        "clearAllType": "残りの{tileType}をクリア"
+      },
       "label": "ヒント",
-      "aria": "単語を表示 — 星を1つ消費"
+      "revealAria": "単語を表示 — 星を1つ消費"
     },
     "noMoreWords": "もう単語がありません",
     "giveUp": "ゲーム終了",
@@ -10460,7 +11498,7 @@ const ja = {
     "moreLevelsComingSoon": "新しいレベルを準備中です。",
     "allCleared": "すべてのレベルをクリア！",
     "loadingProgress": "進行状況を読み込み中…",
-    "playAgain": "レベル1から再挑戦",
+    "playAgain": "もう一度",
     "shuffle": "シャッフル",
     "morePoints": "ポイント追加",
     "needScore": "{score}必要",
@@ -10483,66 +11521,7 @@ const ja = {
       "gems": "宝石",
       "bestWord": "ベストワード",
       "wordsFoundCount": "単語数",
-      "playerStats": "プレイヤー統計",
-    },
-    "results": {
-      "boardDomination": "ボード制覇",
-      "matchRecap": "ブラストマッチ要約",
-      "totalTilesDemolished": "破壊タイル",
-      "intensity": "激しさ",
-      "peakCombo": "最高コンボ",
-      "totalGems": "宝石",
-      "demolitionKing": "破壊王",
-      "comboMaster": "コンボマスター",
-      "gemCollector": "宝石コレクター",
-      "wordsmith": "言葉の達人",
-      "tilesCleared": "クリアしたタイル",
-      "maxCombo": "最大コンボ",
-      "gemsCollected": "宝石",
-      "bestWord": "ベストワード",
-      "tiles": "タイル",
-      "newRecord": "新記録！",
-      "yourRank": "あなたのランク",
-      "topPercent": "今週トップ{pct}%",
-      "pbDelta": "自己ベスト+{delta}",
-      "fromBest": "前回のベストから",
-      "biggestCombo": "最大コンボ",
-      "bestWave": "ベストウェーブ",
-      "wave": "ウェーブ{n}",
-      "badgesEarned": "獲得バッジ",
-      "newBadge": "NEW",
-      "waveFailed": "ウェーブ失敗",
-      "needClearPct": "{required}%クリアが必要 — 結果は{got}%",
-      "tilesShort": "あと{count}タイルだった!",
-      "failHint": "進むにはボードの90%以上をクリアしてください",
-      "tryAgain": "もう一度",
-      "share": "共有",
-      "sceneTitle": "ブラスト結果",
-      "finalScore": "最終スコア",
-      "comboChain": "コンボ",
-      "boardClears": "クリア",
-      "brag": {
-        "legend": "レジェンド",
-        "elite": "エリート",
-        "great": "素晴らしいラン",
-        "solid": "堅実",
-        "nice": "ナイストライ",
-        "beats": "プレイヤーの{pct}%を超えた",
-        "weeklyCohort": "今週のグローバル集団",
-        "score": "スコア",
-        "combo": "コンボ",
-        "bestWord": "ベストワード",
-        "share": "自慢",
-        "shareAria": "結果を共有",
-        "shareTitle": "LexiClash Blast",
-        "shareScore": "ブラストモードで{score}点",
-        "shareRank": "今週上位{pct}%",
-        "copied": "クリップボードにコピーしました！",
-        "copyFailed": "コピーできませんでした — もう一度"
-      },
-      "mpResults": {
-        "boardCleared": "ボード クリア!"
-      }
+      "playerStats": "プレイヤー統計"
     },
     "badges": {
       "firstBlast": "ファーストブラスト",
@@ -10610,7 +11589,6 @@ const ja = {
       "rule3": "特殊タイルは爆発・凍結・倍増効果あり",
       "rule4": "ボードをクリアして次へ進もう"
     },
-    "hint": "ヒント",
     "undo": "取り消し",
     "undoTooltip": "直前の操作を取り消す",
     "undoAdGate": {
@@ -10689,22 +11667,6 @@ const ja = {
       "comebackKid": "逆転 — プレッシャー下で {pct}% 💪",
       "survivor": "生存 — {pct}% クリア 👊"
     },
-    "hint": {
-      "free": "無料",
-      "ad": "ヒント",
-      "aria": {
-        "free": "無料ヒント — 25点減点",
-        "ad": "広告を見てヒントを取得 — 25点減点"
-      },
-      "toast": {
-        "targetWord": "作ってみよう: {word}",
-        "colorPower": "{color}のタイルを探そう",
-        "collectType": "{tileType}をもっと見つけよう",
-        "clearAllType": "残りの{tileType}をクリア"
-      },
-      "label": "ヒント",
-      "revealAria": "単語を表示 — 星を1つ消費"
-    },
     "combo": {
       "bomb_bomb": "メガブラスト！",
       "bomb_lightning": "サンダーボム！",
@@ -10766,32 +11728,100 @@ const ja = {
     "gameOver": "ゲームオーバー",
     "waves": "ウェーブ",
     "bestWord": "ベスト",
-    "playAgain": "もう一度",
     "tileGuide": {
       "title": "タイルガイド",
-      "standard": { "name": "通常", "desc": "基本タイル — 特殊効果なし" },
-      "gold": { "name": "ゴールド", "desc": "×3スコア + ボーナス1手" },
-      "silver": { "name": "シルバー", "desc": "×1.5スコア + カウントダウンを1延長" },
-      "diamond": { "name": "ダイヤモンド", "desc": "×5スコア + 凍結タイルの中身を3ターン表示" },
-      "bomb": { "name": "ボム", "desc": "3×3エリアをクリア — 近くのボムに連鎖" },
-      "lightning": { "name": "ライトニング", "desc": "列全体をクリア — 他のライトニングに連鎖" },
-      "prism": { "name": "プリズム", "desc": "2回 — 行+列クリア、スペシャル2つ生成" },
-      "rainbow": { "name": "レインボー", "desc": "単語内の最強スペシャルをコピー、または×2スコア" },
-      "ice": { "name": "アイス", "desc": "2回で破壊。複数ヒット防御タイル。" },
-      "frozen": { "name": "フローズン", "desc": "2回 — 中に隠されたスペシャルを解放" },
-      "gem": { "name": "ジェム", "desc": "3回 — スペシャル2つ + ボーナス2手" },
-      "mirror": { "name": "ミラー", "desc": "単語内の最初の攻撃スペシャルをコピー" },
-      "magnet": { "name": "マグネット", "desc": "近くのタイルを引き寄せ、3×3を爆発" },
-      "wildcard": { "name": "ワイルドカード", "desc": "どの文字にもなる — レア度でスコア" },
-      "countdown": { "name": "カウントダウン", "desc": "0になる前に解除！+2手 — さもなくば50点ペナルティ" },
-      "shuffle": { "name": "シャッフル", "desc": "クリア時にボード上の残り文字を全て並べ替える" },
-      "magma": { "name": "マグマ", "desc": "両対角線（X字パターン）をクリアし、スコア2倍" },
-      "portal": { "name": "ポータル", "desc": "ペア間テレポート — 両方消去、単語スコア×2" },
-      "catalyst": { "name": "カタリスト", "desc": "隣接タイルを全てランダムなスペシャルに昇格" },
-      "crystal": { "name": "クリスタル", "desc": "未使用ターン毎に+×1（最大×5） — 単語スコアを倍増" },
-      "fuse": { "name": "導火線", "desc": "連結ペア — 片方を消すと相方に火がつく、3ターン以内に解除しないと爆発" },
-      "anchor": { "name": "アンカー", "desc": "長単語ボーナス — 消去時、単語の文字数×+3点" },
-      "mystery": { "name": "ミステリー", "desc": "ランダムな驚き — スコアバースト、新特別、ミニポップ、またはメガ+150" }
+      "standard": {
+        "name": "通常",
+        "desc": "基本タイル — 特殊効果なし"
+      },
+      "gold": {
+        "name": "ゴールド",
+        "desc": "×3スコア + ボーナス1手"
+      },
+      "silver": {
+        "name": "シルバー",
+        "desc": "×1.5スコア + カウントダウンを1延長"
+      },
+      "diamond": {
+        "name": "ダイヤモンド",
+        "desc": "×5スコア + 凍結タイルの中身を3ターン表示"
+      },
+      "bomb": {
+        "name": "ボム",
+        "desc": "3×3エリアをクリア — 近くのボムに連鎖"
+      },
+      "lightning": {
+        "name": "ライトニング",
+        "desc": "列全体をクリア — 他のライトニングに連鎖"
+      },
+      "prism": {
+        "name": "プリズム",
+        "desc": "2回 — 行+列クリア、スペシャル2つ生成"
+      },
+      "rainbow": {
+        "name": "レインボー",
+        "desc": "単語内の最強スペシャルをコピー、または×2スコア"
+      },
+      "ice": {
+        "name": "アイス",
+        "desc": "2回で破壊。複数ヒット防御タイル。"
+      },
+      "frozen": {
+        "name": "フローズン",
+        "desc": "2回 — 中に隠されたスペシャルを解放"
+      },
+      "gem": {
+        "name": "ジェム",
+        "desc": "3回 — スペシャル2つ + ボーナス2手"
+      },
+      "mirror": {
+        "name": "ミラー",
+        "desc": "単語内の最初の攻撃スペシャルをコピー"
+      },
+      "magnet": {
+        "name": "マグネット",
+        "desc": "近くのタイルを引き寄せ、3×3を爆発"
+      },
+      "wildcard": {
+        "name": "ワイルドカード",
+        "desc": "どの文字にもなる — レア度でスコア"
+      },
+      "countdown": {
+        "name": "カウントダウン",
+        "desc": "0になる前に解除！+2手 — さもなくば50点ペナルティ"
+      },
+      "shuffle": {
+        "name": "シャッフル",
+        "desc": "クリア時にボード上の残り文字を全て並べ替える"
+      },
+      "magma": {
+        "name": "マグマ",
+        "desc": "両対角線（X字パターン）をクリアし、スコア2倍"
+      },
+      "portal": {
+        "name": "ポータル",
+        "desc": "ペア間テレポート — 両方消去、単語スコア×2"
+      },
+      "catalyst": {
+        "name": "カタリスト",
+        "desc": "隣接タイルを全てランダムなスペシャルに昇格"
+      },
+      "crystal": {
+        "name": "クリスタル",
+        "desc": "未使用ターン毎に+×1（最大×5） — 単語スコアを倍増"
+      },
+      "fuse": {
+        "name": "導火線",
+        "desc": "連結ペア — 片方を消すと相方に火がつく、3ターン以内に解除しないと爆発"
+      },
+      "anchor": {
+        "name": "アンカー",
+        "desc": "長単語ボーナス — 消去時、単語の文字数×+3点"
+      },
+      "mystery": {
+        "name": "ミステリー",
+        "desc": "ランダムな驚き — スコアバースト、新特別、ミニポップ、またはメガ+150"
+      }
     },
     "highlight": {
       "captions": {
@@ -10826,6 +11856,36 @@ const ja = {
         "name": "セーフティネット",
         "desc": "詰まった時の無料救助がレベルあたり+1"
       }
+    },
+    "chest": {
+      "avatarSuffix": "アバター",
+      "boostSuffix": "ブースト",
+      "coins": "コイン",
+      "coinsSuffix": "コイン",
+      "continue": "続ける",
+      "opened": "宝箱オープン!",
+      "opening": "開いてます…",
+      "preview": "宝箱プレビュー",
+      "tier": {
+        "label": "ランク"
+      },
+      "title": "報酬宝箱"
+    },
+    "close": "閉じる",
+    "concept": {
+      "gotIt": "よし行こう",
+      "tag": "新",
+      "anyRow": {
+        "title": "単語はどこにでもある",
+        "body": "下の列だけじゃない — 盤全体から単語を探そう"
+      },
+      "verticalWords": {
+        "title": "縦の単語もあり",
+        "body": "下へ(または上へ)ドラッグして縦の単語を作ろう"
+      }
+    },
+    "settings": {
+      "tutorials": "チュートリアルを再生"
     }
   },
   "student": {
@@ -12258,6 +13318,64 @@ const ja = {
       "streakWarning": "ストリーク危険警告",
       "friendInvites": "フレンドチャレンジ招待",
       "weeklySummary": "週間サマリー"
+    },
+    "teacherAccess": {
+      "title": "先生アクセスリクエスト",
+      "count": {
+        "pending": "待機中",
+        "approved": "承認済み",
+        "declined": "却下済み",
+        "total": "合計"
+      },
+      "filter_status": "ステータス",
+      "filter_status_all": "すべてのステータス",
+      "filter_locale": "言語",
+      "filter_country": "国",
+      "refresh": "更新",
+      "row_open": "{name}からのリクエストを開く",
+      "col": {
+        "name": "名前",
+        "email": "メール",
+        "role": "役割",
+        "locale": "言語",
+        "country": "国",
+        "status": "ステータス",
+        "submitted": "送信済み"
+      },
+      "page": "ページ",
+      "export_csv": "CSVをエクスポート",
+      "close": "閉じる",
+      "drawer_title": "先生アクセスリクエスト詳細",
+      "field": {
+        "name": "名前",
+        "email": "メール",
+        "role": "役割",
+        "locale": "言語",
+        "country": "国",
+        "school": "学校/組織",
+        "status": "ステータス",
+        "submitted": "送信済み",
+        "use_case": "用途"
+      },
+      "admin_note": "管理者メモ",
+      "note_hint": "承認時はこのメモをウェルカムメールに含めます。却下時は却下理由として使用されます。",
+      "show_preview": "メールをプレビュー",
+      "hide_preview": "プレビューを非表示",
+      "preview_title": "メールプレビュー",
+      "preview_subject": "件名",
+      "copy_email": "メールHTMLをコピー",
+      "copy_success": "メールHTMLをクリップボードにコピーしました",
+      "copy_error": "メールのコピーに失敗しました",
+      "approve": "承認",
+      "decline": "却下",
+      "approveSuccess": "リクエストを承認しました",
+      "resend": "ウェルカムメールを再送",
+      "resend_hint": "上記のメモ付きウェルカムメールを申請者に再送します。アクセスは変わりません。",
+      "resendSuccess": "ウェルカムメールを再送しました",
+      "resendError": "メール再送に失敗しました",
+      "declineSuccess": "リクエストを却下しました",
+      "approveError": "承認に失敗しました",
+      "declineError": "却下に失敗しました"
     }
   },
   "native": {
@@ -12322,78 +13440,164 @@ const ja = {
     "newVersionAvailable": "新しいバージョンがあります",
     "refreshToUpdate": "更新する"
   },
-
-  // チャレンジシステム（デイリー＋ウィークリー）
-  challenges: {
-    daily: {
-      title: "デイリーチャレンジ",
-      resetsIn: "リセットまで {{time}}",
-      claim: "報酬を受け取る",
-      claimed: "受取済み!",
-      completed: "完了",
-      progress: "{current} / {target}",
-      xpReward: "+{xp} XP",
-      practiceSessions: "練習セッション",
-      practiceSessionsDesc: "今日{target}回練習する",
-      wordsMastered: "単語マスター",
-      wordsMasteredDesc: "今日{target}個の新しい単語をマスター",
-      duelPlayed: "デュエルプレイヤー",
-      duelPlayedDesc: "今日{target}回デュエルする",
-      duelWins: "デュエル勝者",
-      duelWinsDesc: "今日{target}回デュエルに勝つ",
-      perfectAccuracy: "完璧な正確さ",
-      perfectAccuracyDesc: "100%の正確さで{target}セッション完了",
-      blitzHighScore: "ブリッツチャンピオン",
-      blitzHighScoreDesc: "ブリッツモードで{target}点獲得",
-      xpEarned: "XPハンター",
-      xpEarnedDesc: "今日{target} XPを獲得",
-      duelStreak: "デュエル連勝",
-      duelStreakDesc: "{target}連勝する",
-      spellingPerfect: "スペリングビー",
-      spellingPerfectDesc: "{target}セッションで完璧なスペリング",
+  "challenges": {
+    "daily": {
+      "title": "デイリーチャレンジ",
+      "resetsIn": "リセットまで {{time}}",
+      "claim": "報酬を受け取る",
+      "claimed": "受取済み!",
+      "completed": "完了",
+      "progress": "{current} / {target}",
+      "xpReward": "+{xp} XP",
+      "practiceSessions": "練習セッション",
+      "practiceSessionsDesc": "今日{target}回練習する",
+      "wordsMastered": "単語マスター",
+      "wordsMasteredDesc": "今日{target}個の新しい単語をマスター",
+      "duelPlayed": "デュエルプレイヤー",
+      "duelPlayedDesc": "今日{target}回デュエルする",
+      "duelWins": "デュエル勝者",
+      "duelWinsDesc": "今日{target}回デュエルに勝つ",
+      "perfectAccuracy": "完璧な正確さ",
+      "perfectAccuracyDesc": "100%の正確さで{target}セッション完了",
+      "blitzHighScore": "ブリッツチャンピオン",
+      "blitzHighScoreDesc": "ブリッツモードで{target}点獲得",
+      "xpEarned": "XPハンター",
+      "xpEarnedDesc": "今日{target} XPを獲得",
+      "duelStreak": "デュエル連勝",
+      "duelStreakDesc": "{target}連勝する",
+      "spellingPerfect": "スペリングビー",
+      "spellingPerfectDesc": "{target}セッションで完璧なスペリング"
     },
-    weekly: {
-      title: "ウィークリークエスト",
-      claim: "報酬を受け取る",
-      claimed: "受取済み!",
-      thisWeek: "今週",
-      progress: "{current} / {target}",
-      masterWords: "週間単語マスタリー",
-      masterWordsDesc: "今週{target}つの単語をマスターする",
+    "weekly": {
+      "title": "ウィークリークエスト",
+      "claim": "報酬を受け取る",
+      "claimed": "受取済み!",
+      "thisWeek": "今週",
+      "progress": "{current} / {target}",
+      "masterWords": "週間単語マスタリー",
+      "masterWordsDesc": "今週{target}つの単語をマスターする"
     },
-    claim: "受け取る",
-    claimed: "受取済み",
-    loading: "チャレンジを読み込み中...",
-    noChallenges: "チャレンジはありません",
-    completed: "完了",
-    easy: "簡単",
-    medium: "普通",
-    hard: "難しい",
-    watchAdRetry: "広告を見てリトライ"
+    "claim": "受け取る",
+    "claimed": "受取済み",
+    "loading": "チャレンジを読み込み中...",
+    "noChallenges": "チャレンジはありません",
+    "completed": "完了",
+    "easy": "簡単",
+    "medium": "普通",
+    "hard": "難しい",
+    "watchAdRetry": "広告を見てリトライ"
   },
-  quests: {
-    weeklyWordMastery: "週間単語習得",
-    weeklyWordMasteryDesc: "今週{target}単語を習得する"
+  "quests": {
+    "title": "クエスト",
+    "dailyTitle": "今日のクエスト",
+    "weeklyTitle": "ウィークリークエスト",
+    "grandSlam": "グランドスラム！",
+    "grandSlamBonus": "+500 XPボーナス",
+    "grandSlamAvatar": "+1 アバターパーツ",
+    "allComplete": "クエストマスター！",
+    "allCompleteDesc": "デイリー＋ウィークリー全達成！絶好調！",
+    "avatarReward": "+1 アバターパーツ",
+    "avatarPartCategory": {
+      "eyes": "目",
+      "mouth": "口",
+      "accessory": "アクセサリー",
+      "hair": "髪",
+      "eyebrows": "眉毛",
+      "facialHair": "ひげ"
+    },
+    "completedAll": "今日は全て完了！",
+    "progress": "{{completed}}/{{total}}",
+    "go": "GO",
+    "done": "完了！",
+    "feed": {
+      "title": "最近の勝利",
+      "pvp": "{{name}} は本物のライバルを倒した",
+      "grandSlam": "{{name}} が3つ全ての日次クエストをクリアした"
+    },
+    "daily": {
+      "long_word_6": {
+        "title": "単語建築家",
+        "desc": "6文字以上の単語を見つけよう"
+      },
+      "long_word_7": {
+        "title": "語彙の巨人",
+        "desc": "7文字以上の単語を見つけよう"
+      },
+      "score_300": {
+        "title": "狙撃手",
+        "desc": "1ゲームで300点以上稼ぐ"
+      },
+      "score_500": {
+        "title": "ハイローラー",
+        "desc": "1ゲームで500点以上稼ぐ"
+      },
+      "words_15": {
+        "title": "言葉職人",
+        "desc": "1ゲームで15個以上の単語を見つけよう"
+      },
+      "combo_4": {
+        "title": "コンボスタート",
+        "desc": "1ゲームで4×コンボを達成"
+      },
+      "combo_6": {
+        "title": "コンボキング",
+        "desc": "1ゲームで6×コンボを達成"
+      },
+      "mp_win": {
+        "title": "チャンピオン",
+        "desc": "マルチプレイマッチに勝利"
+      },
+      "beat_human": {
+        "title": "ライバル撃破",
+        "desc": "実際のプレイヤーを倒す"
+      },
+      "play_mp": {
+        "title": "アリーナ参戦",
+        "desc": "マルチプレイマッチをプレイ"
+      },
+      "play_brain": {
+        "title": "脳トレ",
+        "desc": "ブレインドリルを完了"
+      },
+      "play_wordhunt": {
+        "title": "狩猟開始",
+        "desc": "今日のワードハントをプレイ"
+      }
+    },
+    "reward": {
+      "xp": "+{{xp}} XP",
+      "gold": "+{{gold}} ゴールド"
+    },
+    "weeklyWordMastery": "週間単語習得",
+    "weeklyWordMasteryDesc": "今週{target}単語を習得する",
+    "questOptions": "クエスト選択肢",
+    "completion": {
+      "title": "クエスト完了！",
+      "grandSlam": "グランドスラム！",
+      "grandSlamDesc": "デイリーミッション全制覇！",
+      "xpReward": "+{{xp}} XP",
+      "goldReward": "+{{gold}} ゴールド"
+    }
   },
-  ads: {
-    label: "広告",
-    rewarded: {
-      watchForGold: "広告を見て+{amount}ゴールド",
-      earning: "視聴中...",
-      earned: "+{amount}ゴールド獲得！",
-      cooldown: "まもなく利用可能",
-      blocked: "広告ブロッカーが報酬を妨げています。lexiclash.liveで無効にしてゴールドを獲得してください。"
+  "ads": {
+    "label": "広告",
+    "rewarded": {
+      "watchForGold": "広告を見て+{amount}ゴールド",
+      "earning": "視聴中...",
+      "earned": "+{amount}ゴールド獲得！",
+      "cooldown": "まもなく利用可能",
+      "blocked": "広告ブロッカーが報酬を妨げています。lexiclash.liveで無効にしてゴールドを獲得してください。"
     },
-    doubleGold: {
-      cta: "報酬2倍 +{amount}",
-      earning: "倍増中..."
+    "doubleGold": {
+      "cta": "報酬2倍 +{amount}",
+      "earning": "倍増中..."
     },
-    reveal: {
-      freeViaAd: "無料公開（広告）"
+    "reveal": {
+      "freeViaAd": "無料公開（広告）"
     },
-    timeLow: {
-      cta: "+{seconds}秒追加",
-      earning: "時間追加中..."
+    "timeLow": {
+      "cta": "+{seconds}秒追加",
+      "earning": "時間追加中..."
     }
   },
   "features": {
@@ -12408,152 +13612,163 @@ const ja = {
       "advancedSettingsDesc": "ゲーム体験を細かく調整"
     }
   },
-  wordHuntAnnouncement: {
-    badge: "マルチプレイヤーに新登場",
-    title: "ワードハントモードを試そう！",
-    subtitle: "隠されたターゲットワードを見つけるレース",
+  "wordHuntAnnouncement": {
+    "badge": "マルチプレイヤーに新登場",
+    "title": "ワードハントモードを試そう！",
+    "subtitle": "隠されたターゲットワードを見つけるレース"
   },
-  wordHuntTips: {
-    needMoreWords: "見つけた単語は{{count}}個だけ。各単語でライフが回復するよ — ターゲットを推測する前に、行や対角線で3文字の単語をスキャンしよう。",
-    accuracyDrainsLife: "無効な単語が{{invalid}}個（正確度{{accuracy}}%）— ミスするたびにライフが減るよ。確実な単語を優先して、リスクのある推測はライフが満タンの時だけにしよう。",
-    longerWordsSurvive: "平均単語長は{{avg}}文字。5文字以上の単語は2-3倍のスコアとライフ回復がもらえるよ。",
-    shortWordsBetweenGuesses: "ターゲット推測の間に、2-3個の短い単語を見つけてライフを補充しよう。そのバッファーで間違った推測を乗り越えられるよ。",
-    firstFinderPush: "{{words}}個の単語で最初に見つけた！さらに高スコアを狙うなら、ターゲットを狙う前に発見単語を集めよう。",
-    winnerLongerWords: "勝利！でも平均単語長は{{avg}}文字。5文字以上を狙えばスコアが2-3倍になるよ。",
-    winnerMoreWords: "{{count}}個の単語で勝利。ボードをもっと速くスキャンしよう — 対角線や逆読みも試してみて。",
-    tooManyInvalid: "無効な試行が{{invalid}}回（正確度{{accuracy}}%）。ミスするたびにライフが減る。まず確実な単語に集中しよう。",
-    lifeManagement: "ライフ{{life}}%で終了 — あと1ミスでアウトだったよ。ターゲット推測の間に短い単語を混ぜてライフを維持しよう。",
-    pushWordLength: "平均{{avg}}文字（最長: {{longest}}文字）。短い単語を発展させてみよう — 「走」を見つけたら近くに「走者」がないか探してみて。",
-    scanMoreWords: "見つけた単語は{{count}}個だけ。ターゲットを推測する前に15-20秒かけて簡単な3-4文字の単語をスキャン — ライフとヒントがもらえるよ。",
-    pushForFirst: "{{rank}}位でフィニッシュ。差を縮めるには、長い単語（5文字以上）を見つけて正確度を高く保とう。",
-    spellWordsFirst: "グリッド上の単語を綴ってから — 各単語が隠された単語の1文字を表示します。",
-    fastSolveFarmMore: "{{attempts}}回で解きました！閃光のように速い。次は何個かグリッド単語を稼いでボーナスをゲット。",
-    trustCluesSooner: "{{attempts}}回の推測でした — 示されたヒントを信じて、もっと早く決断してより多くのポイントをゲットしましょう。",
+  "wordHuntTips": {
+    "needMoreWords": "見つけた単語は{{count}}個だけ。各単語でライフが回復するよ — ターゲットを推測する前に、行や対角線で3文字の単語をスキャンしよう。",
+    "accuracyDrainsLife": "無効な単語が{{invalid}}個（正確度{{accuracy}}%）— ミスするたびにライフが減るよ。確実な単語を優先して、リスクのある推測はライフが満タンの時だけにしよう。",
+    "longerWordsSurvive": "平均単語長は{{avg}}文字。5文字以上の単語は2-3倍のスコアとライフ回復がもらえるよ。",
+    "shortWordsBetweenGuesses": "ターゲット推測の間に、2-3個の短い単語を見つけてライフを補充しよう。そのバッファーで間違った推測を乗り越えられるよ。",
+    "firstFinderPush": "{{words}}個の単語で最初に見つけた！さらに高スコアを狙うなら、ターゲットを狙う前に発見単語を集めよう。",
+    "winnerLongerWords": "勝利！でも平均単語長は{{avg}}文字。5文字以上を狙えばスコアが2-3倍になるよ。",
+    "winnerMoreWords": "{{count}}個の単語で勝利。ボードをもっと速くスキャンしよう — 対角線や逆読みも試してみて。",
+    "tooManyInvalid": "無効な試行が{{invalid}}回（正確度{{accuracy}}%）。ミスするたびにライフが減る。まず確実な単語に集中しよう。",
+    "lifeManagement": "ライフ{{life}}%で終了 — あと1ミスでアウトだったよ。ターゲット推測の間に短い単語を混ぜてライフを維持しよう。",
+    "pushWordLength": "平均{{avg}}文字（最長: {{longest}}文字）。短い単語を発展させてみよう — 「走」を見つけたら近くに「走者」がないか探してみて。",
+    "scanMoreWords": "見つけた単語は{{count}}個だけ。ターゲットを推測する前に15-20秒かけて簡単な3-4文字の単語をスキャン — ライフとヒントがもらえるよ。",
+    "pushForFirst": "{{rank}}位でフィニッシュ。差を縮めるには、長い単語（5文字以上）を見つけて正確度を高く保とう。",
+    "spellWordsFirst": "グリッド上の単語を綴ってから — 各単語が隠された単語の1文字を表示します。",
+    "fastSolveFarmMore": "{{attempts}}回で解きました！閃光のように速い。次は何個かグリッド単語を稼いでボーナスをゲット。",
+    "trustCluesSooner": "{{attempts}}回の推測でした — 示されたヒントを信じて、もっと早く決断してより多くのポイントをゲットしましょう。"
   },
-  wordHuntDeathRecap: {
-    causeLifeDrain: "ライフが尽きた",
-    causeWrongGuess: "間違った推測で脱落",
-    statWords: "単語",
-    statWrongGuesses: "ミス",
-    statSurvival: "生存",
-    eliminatedOrder: "{{total}}人中 #{{order}}で脱落",
-    lessonWrongGuess: "間違った推測は{{penalty}}ライフ消費！{{guesses}}回ミスしました。推測前にボード上の単語を見つけよう。",
-    lessonNoWords: "{{count}}個しか見つけていません！ボード上の単語をスワイプすると回復します。3文字の短い単語で生き延びよう。",
-    lessonShortWords: "平均{{avg}}文字でした。長い単語ほど多く回復 — 5文字で+8、3文字で+3ライフ。",
-    lessonTooManyGuesses: "{{guesses}}回のミスで合計{{cost}}ライフ消費。十分なヒントが集まってから推測しよう。",
-    lessonPacing: "推測の間に2-3個の単語を見つけよう。回復しながら隠された単語のヒントも得られます。",
+  "wordHuntDeathRecap": {
+    "causeLifeDrain": "ライフが尽きた",
+    "causeWrongGuess": "間違った推測で脱落",
+    "statWords": "単語",
+    "statWrongGuesses": "ミス",
+    "statSurvival": "生存",
+    "eliminatedOrder": "{{total}}人中 #{{order}}で脱落",
+    "lessonWrongGuess": "間違った推測は{{penalty}}ライフ消費！{{guesses}}回ミスしました。推測前にボード上の単語を見つけよう。",
+    "lessonNoWords": "{{count}}個しか見つけていません！ボード上の単語をスワイプすると回復します。3文字の短い単語で生き延びよう。",
+    "lessonShortWords": "平均{{avg}}文字でした。長い単語ほど多く回復 — 5文字で+8、3文字で+3ライフ。",
+    "lessonTooManyGuesses": "{{guesses}}回のミスで合計{{cost}}ライフ消費。十分なヒントが集まってから推測しよう。",
+    "lessonPacing": "推測の間に2-3個の単語を見つけよう。回復しながら隠された単語のヒントも得られます。"
   },
-  wordHuntRules: {
-    panel1Title: "隠された単語を見つけよう",
-    panel1Desc: "秘密のターゲット単語が隠されています。上のヒントボックスを使って解き明かそう。",
-    panel2Title: "ライフが減り続ける",
-    panel2Desc: "ライフバーは毎秒減少。ボード上の単語をスワイプして回復し、生き延びよう。",
-    panel3Title: "単語がヒントを明かす",
-    panel3Desc: "ターゲットと同じ文字を含むボード単語が緑や黄色のヒントを表示します。活用しよう！",
-    panel4Title: "間違った推測はライフ消費",
-    panel4Desc: "ターゲットを間違えると15ライフ消費。ヒントを集めてから推測しよう。",
-    goToPanel: "ルール{{panel}}へ",
-    gotIt: "わかった！",
-    skip: "スキップ",
-    quickTipsTitle: "クイックヒント",
+  "wordHuntRules": {
+    "panel1Title": "隠された単語を見つけよう",
+    "panel1Desc": "秘密のターゲット単語が隠されています。上のヒントボックスを使って解き明かそう。",
+    "panel2Title": "ライフが減り続ける",
+    "panel2Desc": "ライフバーは毎秒減少。ボード上の単語をスワイプして回復し、生き延びよう。",
+    "panel3Title": "単語がヒントを明かす",
+    "panel3Desc": "ターゲットと同じ文字を含むボード単語が緑や黄色のヒントを表示します。活用しよう！",
+    "panel4Title": "間違った推測はライフ消費",
+    "panel4Desc": "ターゲットを間違えると15ライフ消費。ヒントを集めてから推測しよう。",
+    "goToPanel": "ルール{{panel}}へ",
+    "gotIt": "わかった！",
+    "skip": "スキップ",
+    "quickTipsTitle": "クイックヒント"
   },
-  wordHuntNudge: {
-    lifeDrop: "ボード上の単語をスワイプして回復！各単語でライフが戻ります。",
-    firstClue: "その単語がターゲットのヒントを明かした！上のボックスを確認。",
-    wrongGuess: "間違った推測は-15ライフ！先にヒントを集めよう。",
+  "wordHuntNudge": {
+    "lifeDrop": "ボード上の単語をスワイプして回復！各単語でライフが戻ります。",
+    "firstClue": "その単語がターゲットのヒントを明かした！上のボックスを確認。",
+    "wrongGuess": "間違った推測は-15ライフ！先にヒントを集めよう。"
   },
-  wordHuntPromo: {
-    title: "ワードハントモードを試そう！",
-    subtitle: "マルチプレイヤーで隠されたターゲットワードを見つけよう",
-    cta: "ワードハントをプレイ",
-    dismiss: "あとで",
-    imageAlt: "ワードハント マルチプレイヤーデュエル",
+  "wordHuntPromo": {
+    "title": "ワードハントモードを試そう！",
+    "subtitle": "マルチプレイヤーで隠されたターゲットワードを見つけよう",
+    "cta": "ワードハントをプレイ",
+    "dismiss": "あとで",
+    "imageAlt": "ワードハント マルチプレイヤーデュエル"
   },
-  gameModes: {
-    classic: {
-      name: "クラシック",
-      description: "できるだけ多くの単語を見つけよう！",
-      feature1: "タイム制",
-      feature2: "スコア制",
-      feature3: "自由形式",
-      intro: { greet: "ゆっくりで大丈夫。言葉だけ。" },
-      tutorial: {
-        tip1: "隣り合うタイルをタップして単語を作る",
-        tip2: "長い単語のほうが目立つ",
-        tip3: "タイマーなし — のんびり探そう"
+  "gameModes": {
+    "classic": {
+      "name": "クラシック",
+      "description": "できるだけ多くの単語を見つけよう！",
+      "feature1": "タイム制",
+      "feature2": "スコア制",
+      "feature3": "自由形式",
+      "intro": {
+        "greet": "ゆっくりで大丈夫。言葉だけ。"
+      },
+      "tutorial": {
+        "tip1": "隣り合うタイルをタップして単語を作る",
+        "tip2": "長い単語のほうが目立つ",
+        "tip3": "タイマーなし — のんびり探そう"
       }
     },
-    blast: {
-      name: "ブラスト",
-      description: "コンボと特殊パワーでタイルをクリア！",
-      feature1: "チェーンコンボ",
-      feature2: "特殊タイル",
-      feature3: "カスケード",
-      intro: { greet: "タップ、スワイプ、呼吸。急がなくていい。" },
-      results: {
-        sceneTitle: "ブラスト結果",
-        finalScore: "最終スコア",
-        comboChain: "最高コンボ",
-        boardClears: "ボードクリア",
-        gemsCollected: "ジェム",
-        tilesCleared: "クリアタイル",
-        bestWord: "ベストワード",
-        rank: "ランク"
+    "blast": {
+      "name": "ブラスト",
+      "description": "コンボと特殊パワーでタイルをクリア！",
+      "feature1": "チェーンコンボ",
+      "feature2": "特殊タイル",
+      "feature3": "カスケード",
+      "intro": {
+        "greet": "タップ、スワイプ、呼吸。急がなくていい。"
+      },
+      "results": {
+        "sceneTitle": "ブラスト結果",
+        "finalScore": "最終スコア",
+        "comboChain": "最高コンボ",
+        "boardClears": "ボードクリア",
+        "gemsCollected": "ジェム",
+        "tilesCleared": "クリアタイル",
+        "bestWord": "ベストワード",
+        "rank": "ランク"
+      },
+      "mpResults": {
+        "boardCleared": "盤クリア!"
       }
     },
-    wordHunt: {
-      name: "ワードハント",
-      description: "ターゲットの単語を最速で見つけよう！",
-      feature1: "ターゲット単語",
-      feature2: "スピードレース",
-      feature3: "ヒント",
-      intro: { greet: "一語ずつ。きっとできる。" },
-      tutorial: {
-        tip1: "つながった文字をドラッグして目標の単語を作る",
-        tip2: "ボーナス単語もカウント — 好きなだけ集めよう",
-        tip3: "タイマーもライフバーもなし — 自由に探索"
+    "wordHunt": {
+      "name": "ワードハント",
+      "description": "ターゲットの単語を最速で見つけよう！",
+      "feature1": "ターゲット単語",
+      "feature2": "スピードレース",
+      "feature3": "ヒント",
+      "intro": {
+        "greet": "一語ずつ。きっとできる。"
+      },
+      "tutorial": {
+        "tip1": "つながった文字をドラッグして目標の単語を作る",
+        "tip2": "ボーナス単語もカウント — 好きなだけ集めよう",
+        "tip3": "タイマーもライフバーもなし — 自由に探索"
       }
     },
-    wheelRush: {
-      name: "ホイールラッシュ",
-      description: "ホイールで競争 — 単語を奪って勝利！",
-      feature1: "ロック窓",
-      feature2: "戦場の霧",
-      feature3: "パングラムボーナス",
-      intro: { greet: "そっと回そう。言葉は来る。" },
-      tutorial: {
-        tip1: "ライム色の中央の文字をタップ — 全ての単語に必要",
-        tip2: "周りの文字は順不同でタップ",
-        tip3: "複数形を試して単語を伸ばす"
+    "wheelRush": {
+      "name": "ホイールラッシュ",
+      "description": "ホイールで競争 — 単語を奪って勝利！",
+      "feature1": "ロック窓",
+      "feature2": "戦場の霧",
+      "feature3": "パングラムボーナス",
+      "intro": {
+        "greet": "そっと回そう。言葉は来る。"
+      },
+      "tutorial": {
+        "tip1": "ライム色の中央の文字をタップ — 全ての単語に必要",
+        "tip2": "周りの文字は順不同でタップ",
+        "tip3": "複数形を試して単語を伸ばす"
       }
     },
-    shiritori: {
-      name: "しりとり",
-      description: "前の言葉の最後の文字から始めよう！"
+    "shiritori": {
+      "name": "しりとり",
+      "description": "前の言葉の最後の文字から始めよう！"
     },
-    sealedBid: {
-      name: "封印入札",
-      description: "他の誰も選ばない単語を入札 — ユニークな入札は得点2倍！"
+    "sealedBid": {
+      "name": "封印入札",
+      "description": "他の誰も選ばない単語を入札 — ユニークな入札は得点2倍！"
     },
-    crossword: {
-      name: "クロスワード",
-      description: "同じクロスワードを解く競争 — 最速で完成した人が勝ち！"
+    "crossword": {
+      "name": "クロスワード",
+      "description": "同じクロスワードを解く競争 — 最速で完成した人が勝ち！"
     },
-    intro: {
-      cta: "はじめよう",
-      skip: "チュートリアルをスキップ"
+    "intro": {
+      "cta": "はじめよう",
+      "skip": "チュートリアルをスキップ"
     },
-    tutorial: {
-      title: "遊び方",
-      cta: "プレイしよう！"
+    "tutorial": {
+      "title": "遊び方",
+      "cta": "プレイしよう！"
     },
-    random: "ランダム",
-    randomDescription: "お楽しみに！毎ラウンド違うモードを選びます。",
-    randomFeature1: "バラエティ",
-    randomFeature2: "サプライズ",
-    randomFeature3: "ミックスルール",
-    nextMode: "次のモード",
-    randomizing: "ランダム選択中..."
+    "random": "ランダム",
+    "randomDescription": "お楽しみに！毎ラウンド違うモードを選びます。",
+    "randomFeature1": "バラエティ",
+    "randomFeature2": "サプライズ",
+    "randomFeature3": "ミックスルール",
+    "nextMode": "次のモード",
+    "randomizing": "ランダム選択中..."
   },
   "presets": {
     "fast": "クイック",
@@ -12672,33 +13887,11 @@ const ja = {
     "spotsFromPromotion": "昇格まであと{n}人"
   },
   "leagueRivals": {
-    "title": "ウィークリーリーグ",
-    "bronze": "ブロンズ",
-    "silver": "シルバー",
-    "gold": "ゴールド",
-    "diamond": "ダイヤモンド",
-    "ruby": "ルビー",
-    "position": "順位",
-    "xp": "XP",
-    "promotionZone": "昇格ゾーン",
-    "safeZone": "セーフゾーン",
-    "relegationZone": "降格ゾーン",
-    "promoted": "昇格!",
-    "relegated": "降格",
-    "stayed": "残留",
-    "weeklyRewards": "週間報酬",
-    "coinsEarned": "獲得コイン",
-    "newWeekIn": "新しい週まで",
-    "joinLeague": "リーグに参加",
-    "yourPosition": "あなたの順位",
-    "top": "トップ",
-    "standings": "順位表",
-    "noLeague": "リーグに参加して競争しよう!",
-    "finalResults": "最終結果",
-    "viewStandings": "順位表を見る",
-    "xpToPromote": "昇格まで{xp} XP",
-    "xpAboveRelegation": "降格まで{xp} XP余裕",
-    "positionOf": "#{position} / {total}人中"
+    "title": "リーグライバル",
+    "ahead": "{{pts}}ポイント上",
+    "behind": "{{pts}}ポイント下",
+    "you": "あなた",
+    "noRivals": "リーグを上がってライバルを見つけよう！"
   },
   "socialGift": {
     "title": "ギフトを送る",
@@ -12769,57 +13962,62 @@ const ja = {
       "optOut": "一部のデータ収集はゲームの機能に必要です（ユーザー名やスコアなど）が、設定 > プライバシーで分析とパーソナライズ広告をオプトアウトできます。"
     }
   },
-  avatarBuilder: {
-    glowUp: { button: "グロウアップ", loading: "生成中…", adminTag: "管理者", resultTitle: "あなたのグロウアップ" },
-    title: "アバタービルダー",
-    base: "形",
-    hair: "髪",
-    eyes: "目",
-    mouth: "口",
-    facialHair: "ひげ",
-    accessories: "アクセサリー",
-    background: "背景",
-    skinColor: "肌の色",
-    hairColor: "髪の色",
-    accessoryColor: "色",
-    shirtColor: "シャツの色",
-    eyeColor: "目の色",
-    randomize: "ランダム",
-    undo: "元に戻す",
-    restorePrevious: "前のアバターに戻す",
-    download: "ダウンロード",
-    save: "保存",
-    cancel: "キャンセル",
-    buildCustom: "自分だけのアバター",
-    bgColor: "背景",
-    gender: "体型",
-    male: "男性",
-    female: "女性",
-    shape: "形",
-    style: "スタイル",
-    none: "なし",
-    type: "種類",
-    nose: "鼻",
-    eyebrows: "眉",
-    expressions: "表情",
-    facialHairStyle: "スタイル",
-    colorTheme: "カラーテーマ",
-    bodyStyle: "服装",
-    bodyStyles: {
-      default: "デフォルト",
-      hoodie: "パーカー",
-      suit: "スーツ",
-      turtleneck: "タートルネック",
-      offShoulder: "オフショルダー",
-      cropTop: "クロップトップ"
+  "avatarBuilder": {
+    "glowUp": {
+      "button": "グロウアップ",
+      "loading": "生成中…",
+      "adminTag": "管理者",
+      "resultTitle": "あなたのグロウアップ"
     },
-    theme: {
-      classic: "クラシック",
-      fire: "ファイア",
-      electric: "エレクトリック",
-      toxic: "トキシック",
-      royal: "ロイヤル",
-      pop: "ポップ"
+    "title": "アバタービルダー",
+    "base": "形",
+    "hair": "髪",
+    "eyes": "目",
+    "mouth": "口",
+    "facialHair": "ひげ",
+    "accessories": "アクセサリー",
+    "background": "背景",
+    "skinColor": "肌の色",
+    "hairColor": "髪の色",
+    "accessoryColor": "色",
+    "shirtColor": "シャツの色",
+    "eyeColor": "目の色",
+    "randomize": "ランダム",
+    "undo": "元に戻す",
+    "restorePrevious": "前のアバターに戻す",
+    "download": "ダウンロード",
+    "save": "保存",
+    "cancel": "キャンセル",
+    "buildCustom": "自分だけのアバター",
+    "bgColor": "背景",
+    "gender": "体型",
+    "male": "男性",
+    "female": "女性",
+    "shape": "形",
+    "style": "スタイル",
+    "none": "なし",
+    "type": "種類",
+    "nose": "鼻",
+    "eyebrows": "眉",
+    "expressions": "表情",
+    "facialHairStyle": "スタイル",
+    "colorTheme": "カラーテーマ",
+    "bodyStyle": "服装",
+    "bodyStyles": {
+      "default": "デフォルト",
+      "hoodie": "パーカー",
+      "suit": "スーツ",
+      "turtleneck": "タートルネック",
+      "offShoulder": "オフショルダー",
+      "cropTop": "クロップトップ"
+    },
+    "theme": {
+      "classic": "クラシック",
+      "fire": "ファイア",
+      "electric": "エレクトリック",
+      "toxic": "トキシック",
+      "royal": "ロイヤル",
+      "pop": "ポップ"
     }
   },
   "encouragement": {
@@ -12882,92 +14080,6 @@ const ja = {
     "completed": "完了！",
     "progress": "{{current}}/3 ミッション"
   },
-  "quests": {
-    "title": "クエスト",
-    "dailyTitle": "今日のクエスト",
-    "weeklyTitle": "ウィークリークエスト",
-    "grandSlam": "グランドスラム！",
-    "grandSlamBonus": "+500 XPボーナス",
-    "grandSlamAvatar": "+1 アバターパーツ",
-    "allComplete": "クエストマスター！",
-    "allCompleteDesc": "デイリー＋ウィークリー全達成！絶好調！",
-    "avatarReward": "+1 アバターパーツ",
-    "avatarPartCategory": {
-      "eyes": "目",
-      "mouth": "口",
-      "accessory": "アクセサリー",
-      "hair": "髪",
-      "eyebrows": "眉毛",
-      "facialHair": "ひげ"
-    },
-    "completedAll": "今日は全て完了！",
-    "progress": "{{completed}}/{{total}}",
-    "go": "GO",
-    "done": "完了！",
-    "feed": {
-      "title": "最近の勝利",
-      "pvp": "{{name}} は本物のライバルを倒した",
-      "grandSlam": "{{name}} が3つ全ての日次クエストをクリアした"
-    },
-    "daily": {
-      "long_word_6": {
-        "title": "単語建築家",
-        "desc": "6文字以上の単語を見つけよう"
-      },
-      "long_word_7": {
-        "title": "語彙の巨人",
-        "desc": "7文字以上の単語を見つけよう"
-      },
-      "score_300": {
-        "title": "狙撃手",
-        "desc": "1ゲームで300点以上稼ぐ"
-      },
-      "score_500": {
-        "title": "ハイローラー",
-        "desc": "1ゲームで500点以上稼ぐ"
-      },
-      "words_15": {
-        "title": "言葉職人",
-        "desc": "1ゲームで15個以上の単語を見つけよう"
-      },
-      "combo_4": { "title": "コンボスタート", "desc": "1ゲームで4×コンボを達成" },
-      "combo_6": { "title": "コンボキング", "desc": "1ゲームで6×コンボを達成" },
-      "mp_win": {
-        "title": "チャンピオン",
-        "desc": "マルチプレイマッチに勝利"
-      },
-      "beat_human": {
-        "title": "ライバル撃破",
-        "desc": "実際のプレイヤーを倒す"
-      },
-      "play_mp": {
-        "title": "アリーナ参戦",
-        "desc": "マルチプレイマッチをプレイ"
-      },
-      "play_brain": {
-        "title": "脳トレ",
-        "desc": "ブレインドリルを完了"
-      },
-      "play_wordhunt": {
-        "title": "狩猟開始",
-        "desc": "今日のワードハントをプレイ"
-      }
-    },
-    "reward": {
-      "xp": "+{{xp}} XP",
-      "gold": "+{{gold}} ゴールド"
-    },
-    "weeklyWordMastery": "週間単語習得",
-    "weeklyWordMasteryDesc": "今週{target}単語を習得する",
-    "questOptions": "クエスト選択肢",
-    "completion": {
-      "title": "クエスト完了！",
-      "grandSlam": "グランドスラム！",
-      "grandSlamDesc": "デイリーミッション全制覇！",
-      "xpReward": "+{{xp}} XP",
-      "goldReward": "+{{gold}} ゴールド"
-    }
-  },
   "wotd": {
     "title": "今日の単語",
     "teaser": "今日の単語",
@@ -12990,13 +14102,6 @@ const ja = {
     "forgot": "忘れた",
     "reviewComplete": "復習完了！",
     "empty": "ゲームをプレイしてレアな単語を発見しよう！"
-  },
-  "leagueRivals": {
-    "title": "リーグライバル",
-    "ahead": "{{pts}}ポイント上",
-    "behind": "{{pts}}ポイント下",
-    "you": "あなた",
-    "noRivals": "リーグを上がってライバルを見つけよう！"
   },
   "powerHour": {
     "activated": "パワーアワー発動！",
@@ -13130,7 +14235,24 @@ const ja = {
     "emptyCta": "友達にボードチャレンジを送ろう！",
     "resultTitle": "チャレンジ結果",
     "bestWord": "ベストワード: {{word}}",
-    "wordsFound": "{{count}}語発見"
+    "wordsFound": "{{count}}語発見",
+    "mode": {
+      "classic": "クラシック",
+      "blast": "ブラスト",
+      "word-hunt": "ワードハント"
+    },
+    "received": {
+      "title": "{sender}があなたを挑戦した",
+      "body": "{mode}で{score}を倒そう"
+    },
+    "result": {
+      "titleWin": "{opponent}に勝った!",
+      "titleLoss": "{opponent}に負けた",
+      "titleTie": "{opponent}と同点",
+      "bodyWin": "{mine} vs {theirs}",
+      "bodyLoss": "{mine} vs {theirs}",
+      "bodyTie": "{mine} vs {theirs}"
+    }
   },
   "wordClub": {
     "title": "ワードクラブ",
@@ -13554,7 +14676,9 @@ const ja = {
       "playMicrocopy": "GO!",
       "browseRooms": "ルームを見る ↓",
       "liveBadge": "ライブ",
-      "aria": { "section": "CrazyGamesウェルカム" }
+      "aria": {
+        "section": "CrazyGamesウェルカム"
+      }
     }
   },
   "dailyInvite": {
@@ -13609,12 +14733,64 @@ const ja = {
     "playAgain": "もう一度",
     "home": "ホーム",
     "finalTiles": "最後のタイル!",
-    "difficulty": { "label": "難易度", "easy": "やさしい", "medium": "ふつう", "hard": "むずかしい" },
-    "clue": { "button": "ヒント", "reveal": "試して: {{word}}", "none": "手が見つかりません — 交換してみよう", "granted": "ヒント+1!", "adFailed": "広告を利用できません — もう一度" },
-    "modifier": { "bingo_bonanza": "ビンゴ祭り", "long_words": "ロングワード", "rich_letters": "高得点タイル", "land_grab": "陣取り", "quick_draw": "早撃ち", "golden_tiles": "黄金タイル", "none": "", "desc": { "bingo_bonanza": "ビンゴは+90点", "long_words": "5文字以上の語に+15", "rich_letters": "レアタイルは2倍", "land_grab": "占領が隣のマスへ広がる", "quick_draw": "手札5枚でテンポよく", "golden_tiles": "✦タイルは周囲のマスを占領" } },
-    "setup": { "title": "対戦のセットアップ", "opponent": { "label": "対戦相手", "bot": "ボット対戦", "botDesc": "WordBotと対戦", "hotseat": "交代プレイ", "hotseatDesc": "1台で2人対戦", "friend": "フレンドに挑戦", "friendDesc": "スコア対決リンクを送ろう" }, "difficulty": { "label": "ボットの強さ" }, "twist": { "label": "ツイスト", "surprise": "おまかせ" }, "start": "ゲーム開始", "challengeHint": "フレンド対戦リンクはリザルト画面から", "sendChallengeNow": "さあ、挑戦状を送ろう！" },
+    "difficulty": {
+      "label": "難易度",
+      "easy": "やさしい",
+      "medium": "ふつう",
+      "hard": "むずかしい"
+    },
+    "clue": {
+      "button": "ヒント",
+      "reveal": "試して: {{word}}",
+      "none": "手が見つかりません — 交換してみよう",
+      "granted": "ヒント+1!",
+      "adFailed": "広告を利用できません — もう一度"
+    },
+    "modifier": {
+      "bingo_bonanza": "ビンゴ祭り",
+      "long_words": "ロングワード",
+      "rich_letters": "高得点タイル",
+      "land_grab": "陣取り",
+      "quick_draw": "早撃ち",
+      "golden_tiles": "黄金タイル",
+      "none": "",
+      "desc": {
+        "bingo_bonanza": "ビンゴは+90点",
+        "long_words": "5文字以上の語に+15",
+        "rich_letters": "レアタイルは2倍",
+        "land_grab": "占領が隣のマスへ広がる",
+        "quick_draw": "手札5枚でテンポよく",
+        "golden_tiles": "✦タイルは周囲のマスを占領"
+      }
+    },
+    "setup": {
+      "title": "対戦のセットアップ",
+      "opponent": {
+        "label": "対戦相手",
+        "bot": "ボット対戦",
+        "botDesc": "WordBotと対戦",
+        "hotseat": "交代プレイ",
+        "hotseatDesc": "1台で2人対戦",
+        "friend": "フレンドに挑戦",
+        "friendDesc": "スコア対決リンクを送ろう"
+      },
+      "difficulty": {
+        "label": "ボットの強さ"
+      },
+      "twist": {
+        "label": "ツイスト",
+        "surprise": "おまかせ"
+      },
+      "start": "ゲーム開始",
+      "challengeHint": "フレンド対戦リンクはリザルト画面から",
+      "sendChallengeNow": "さあ、挑戦状を送ろう！"
+    },
     "squares": "マス",
-    "place": { "step1": "文字をタップ", "step2": "マスをタップ", "step3": "送信" },
+    "place": {
+      "step1": "文字をタップ",
+      "step2": "マスをタップ",
+      "step3": "送信"
+    },
     "newBest": "自己ベスト更新!",
     "bagRemaining": "袋",
     "yourRack": "あなたのラック",
@@ -13711,7 +14887,6 @@ const ja = {
       "axisDownLocked": "縦方向にロック",
       "axisUnlocked": "単語の向きを解除"
     },
-    // FLAG_FOR_NATIVE_REVIEW: 2026-05-11 wordcraft-mobile-fun (legend + scoreDot + tilesLeft)
     "tilesLeft": "残りタイル",
     "legend": {
       "title": "ボーナス",
@@ -13742,7 +14917,11 @@ const ja = {
       "score": "スコア",
       "target": "目標",
       "runTotal": "ラン合計",
-      "feedback": { "nice": "ナイス！", "great": "すごい！", "huge": "特大！" },
+      "feedback": {
+        "nice": "ナイス！",
+        "great": "すごい！",
+        "huge": "特大！"
+      },
       "submit": "単語を送信",
       "recall": "戻す",
       "endRound": "ラウンド終了",
@@ -13773,18 +14952,54 @@ const ja = {
         "share": "WordCraft ラン: {{score}}"
       },
       "card": {
-        "vowelPower": { "name": "母音パワー", "desc": "母音は1つにつき+2チップ。" },
-        "longGame": { "name": "ロングゲーム", "desc": "5文字以上の単語はスコア2倍。" },
-        "combo": { "name": "コンボチェーン", "desc": "ラウンド内で最初の単語以降、1語ごとに倍率+1。" },
-        "premiumHunter": { "name": "プレミアムハンター", "desc": "使ったプレミアムマスごとに倍率+1。" },
-        "wildcardStash": { "name": "ワイルドカード備蓄", "desc": "毎ラウンド、空白タイルを1枚持って開始。" },
-        "quickHands": { "name": "クイックハンド", "desc": "毎ラウンドの袋にタイルを4枚追加。" },
-        "doubleDown": { "name": "ダブルダウン", "desc": "毎ラウンド最初の単語はスコア3倍。" },
-        "rareLetters": { "name": "レアレター", "desc": "4点以上のタイルは1枚につき+3チップ。" },
-        "shortSweet": { "name": "ショート＆スイート", "desc": "3文字の単語に+15チップ。" },
-        "steadyBuild": { "name": "ステディビルド", "desc": "すべての単語に固定+5チップ。" },
-        "overflow": { "name": "オーバーフロー", "desc": "目標を超えたスコアの10%をボーナスとして獲得。" },
-        "letterHoard": { "name": "レターホード", "desc": "ラックが8枚ではなく10枚になる。" }
+        "vowelPower": {
+          "name": "母音パワー",
+          "desc": "母音は1つにつき+2チップ。"
+        },
+        "longGame": {
+          "name": "ロングゲーム",
+          "desc": "5文字以上の単語はスコア2倍。"
+        },
+        "combo": {
+          "name": "コンボチェーン",
+          "desc": "ラウンド内で最初の単語以降、1語ごとに倍率+1。"
+        },
+        "premiumHunter": {
+          "name": "プレミアムハンター",
+          "desc": "使ったプレミアムマスごとに倍率+1。"
+        },
+        "wildcardStash": {
+          "name": "ワイルドカード備蓄",
+          "desc": "毎ラウンド、空白タイルを1枚持って開始。"
+        },
+        "quickHands": {
+          "name": "クイックハンド",
+          "desc": "毎ラウンドの袋にタイルを4枚追加。"
+        },
+        "doubleDown": {
+          "name": "ダブルダウン",
+          "desc": "毎ラウンド最初の単語はスコア3倍。"
+        },
+        "rareLetters": {
+          "name": "レアレター",
+          "desc": "4点以上のタイルは1枚につき+3チップ。"
+        },
+        "shortSweet": {
+          "name": "ショート＆スイート",
+          "desc": "3文字の単語に+15チップ。"
+        },
+        "steadyBuild": {
+          "name": "ステディビルド",
+          "desc": "すべての単語に固定+5チップ。"
+        },
+        "overflow": {
+          "name": "オーバーフロー",
+          "desc": "目標を超えたスコアの10%をボーナスとして獲得。"
+        },
+        "letterHoard": {
+          "name": "レターホード",
+          "desc": "ラックが8枚ではなく10枚になる。"
+        }
       }
     },
     "territory": {
@@ -13873,77 +15088,81 @@ const ja = {
       }
     }
   },
-  mp: {
-    quality: { degraded: "接続が不安定です", reconnecting: "再接続中…", weak: "接続が弱いです" },
-    stopGameConfirm: "全員のゲームを終了しますか？",
-    stopGameYes: "ゲーム終了",
-    noRoomsYet: "進行中のバトルはありません",
-    emptyStateCaption: "今すぐ始めよう — 空席はボットが埋めます！",
-    quickPlayAction: "クイックプレイ",
-    dailyChallengeAction: "デイリーチャレンジ",
-    reconnect: {
-      title: "再接続中…",
-      attempt: "再接続しています…",
-      giveUp: "ゲームを退出"
+  "mp": {
+    "quality": {
+      "degraded": "接続が不安定です",
+      "reconnecting": "再接続中…",
+      "weak": "接続が弱いです"
     },
-    abort: {
-      title: "ゲーム終了",
-      body: "ホストがマッチを終了しました。",
-      continueSolo: "ソロで続ける",
-      returnToLobby: "ロビーに戻る"
+    "stopGameConfirm": "全員のゲームを終了しますか？",
+    "stopGameYes": "ゲーム終了",
+    "noRoomsYet": "進行中のバトルはありません",
+    "emptyStateCaption": "今すぐ始めよう — 空席はボットが埋めます！",
+    "quickPlayAction": "クイックプレイ",
+    "dailyChallengeAction": "デイリーチャレンジ",
+    "reconnect": {
+      "title": "再接続中…",
+      "attempt": "再接続しています…",
+      "giveUp": "ゲームを退出"
     },
-    kbHint: {
-      submit: "送信",
-      pop: "末尾削除",
-      clear: "クリア"
+    "abort": {
+      "title": "ゲーム終了",
+      "body": "ホストがマッチを終了しました。",
+      "continueSolo": "ソロで続ける",
+      "returnToLobby": "ロビーに戻る"
     },
-    ladder: {
-      empty: "まだ単語なし — 最初の一つを見つけよう！"
+    "kbHint": {
+      "submit": "送信",
+      "pop": "末尾削除",
+      "clear": "クリア"
     },
-    modeName: {
-      classic: "スタンダード",
-      wheelRush: "ホイールラッシュ",
-      wordHunt: "ワードハント",
-      blast: "ブラスト"
+    "ladder": {
+      "empty": "まだ単語なし — 最初の一つを見つけよう！"
     },
-    rivals: {
-      header: "接戦",
-      you: "あなた",
-      playersCount: "{n}人",
-      toCatch: "あと{n}",
-      ahead: "{n}リード",
-      tie: "同点",
-      aria: "接戦の相手"
+    "modeName": {
+      "classic": "スタンダード",
+      "wheelRush": "ホイールラッシュ",
+      "wordHunt": "ワードハント",
+      "blast": "ブラスト"
     },
-    insights: {
-      rosterHeader: "プレイヤー",
-      foundHeader: "発見",
-      fogHeader: "霧",
-      fogLabel: "戦場の霧",
-      myStatsHeader: "あなたの統計",
-      bestWord: "ベスト",
-      wordsPerMin: "ペース",
-      kbBonusUses: "キー",
-      opponentInsightHeader: "ライバル",
-      opponentInsightEmpty: "まだ静か…",
-      paceDeltaPositive: "リード",
-      paceDeltaNegative: "遅れ",
-      paceDeltaTied: "同点",
-      categoryHeader: "ターゲット",
-      huntProgressHeader: "進捗",
-      goalTypeTargetWord: "ターゲット語",
-      goalTypeColorPower: "カラーパワー",
-      goalTypeClassic: "目標",
-      comboCounterHeader: "コンボ",
-      comboMultiplierSuffix: "ブースト",
-      retiredTiles: "撤退",
-      luckyBoost: "ラッキーブースト",
-      spinCounterAria: "スピン {current} / {total}",
-      rarity: {
-        common: "ふつう",
-        uncommon: "あまりない",
-        rare: "レア",
-        legendary: "伝説"
+    "rivals": {
+      "header": "接戦",
+      "you": "あなた",
+      "playersCount": "{n}人",
+      "toCatch": "あと{n}",
+      "ahead": "{n}リード",
+      "tie": "同点",
+      "aria": "接戦の相手"
+    },
+    "insights": {
+      "rosterHeader": "プレイヤー",
+      "foundHeader": "発見",
+      "fogHeader": "霧",
+      "fogLabel": "戦場の霧",
+      "myStatsHeader": "あなたの統計",
+      "bestWord": "ベスト",
+      "wordsPerMin": "ペース",
+      "kbBonusUses": "キー",
+      "opponentInsightHeader": "ライバル",
+      "opponentInsightEmpty": "まだ静か…",
+      "paceDeltaPositive": "リード",
+      "paceDeltaNegative": "遅れ",
+      "paceDeltaTied": "同点",
+      "categoryHeader": "ターゲット",
+      "huntProgressHeader": "進捗",
+      "goalTypeTargetWord": "ターゲット語",
+      "goalTypeColorPower": "カラーパワー",
+      "goalTypeClassic": "目標",
+      "comboCounterHeader": "コンボ",
+      "comboMultiplierSuffix": "ブースト",
+      "retiredTiles": "撤退",
+      "luckyBoost": "ラッキーブースト",
+      "spinCounterAria": "スピン {current} / {total}",
+      "rarity": {
+        "common": "ふつう",
+        "uncommon": "あまりない",
+        "rare": "レア",
+        "legendary": "伝説"
       }
     }
   },
@@ -14028,7 +15247,11 @@ const ja = {
       "reveal": "答えは",
       "acceptLoss": "敗北を受け入れる"
     },
-    "difficulty": { "easy": "かんたん", "medium": "ふつう", "hard": "むずかしい" },
+    "difficulty": {
+      "easy": "かんたん",
+      "medium": "ふつう",
+      "hard": "むずかしい"
+    },
     "like": "いいね",
     "dislike": "よくない",
     "next": "次へ",
@@ -14046,7 +15269,88 @@ const ja = {
     "freeHint": "無料ヒント（残り{count}回）",
     "revealHintAd": "広告を見てヒント",
     "revealAnswerAd": "広告を見て答えを表示",
-    "adminGiveUp": "パズルをスキップ（管理者）"
+    "adminGiveUp": "パズルをスキップ（管理者）",
+    "landing": {
+      "metaTitle": "ワードブリッジ — つながる単語を見つけよう | LexiClash",
+      "metaDescription": "2つの単語をつなぐ橋を見つけるフリー単語パズル。登録不要、ダウンロード不要。",
+      "metaKeywords": "単語橋パズル、単語連想ゲーム、橋単語ゲーム、ロシュ・ザナヴ、単語リンクパズル、無料単語ゲーム、脳トレゲーム",
+      "ogTitle": "ワードブリッジ — つながる単語を見つけよう",
+      "ogDescription": "2つの単語、1つの橋。古典的な単語連想パズル、無料でプレイできます。",
+      "twitterTitle": "ワードブリッジ — フリーオンラインパズル",
+      "twitterDescription": "2つの単語、1つの橋。何がつなぐ?",
+      "badge": "無料・登録不要",
+      "h1Pre": "2つの単語、1つの橋",
+      "h1Highlight": "つながりを見つけよう",
+      "h1Sub": "ワードブリッジ — イスラエルの古典ゲーム「ロシュ・ザナヴ」の単語版",
+      "introP1": "ワードブリッジは2つの単語をくれる。あなたの仕事:その2つをつなぐ1つの単語を見つけること。火+エンジン?トラック。太陽+輝く?光。シンプルに見えて奥が深い。",
+      "introP2": "脳が喜ぶゲーム — サクサク進んで、ひらめきがスッキリ、語彙が自然に増える。無料、ブラウザで、ダウンロード不要。",
+      "ctaPrimary": "今すぐプレイ",
+      "ctaSecondary": "やり方を見る ↓",
+      "demoLabel": "試してみる — 真ん中を タップ",
+      "demoReveal": "橋を見せる",
+      "demoSuccess": "これが橋の単語だ!",
+      "samplesHeading": "3問トライアル",
+      "samplesSub": "カードをタップして橋を見る",
+      "samplesEasy": "かんたん",
+      "samplesMedium": "ふつう",
+      "samplesHard": "むずかしい",
+      "samplesReveal": "タップで見る",
+      "whyHeading": "脳にいい理由",
+      "whyVocab": {
+        "title": "語彙が急速に増える",
+        "body": "パズルは毎回別のテーマ。単語同士のつながりが自然に頭に入る。"
+      },
+      "whyLateral": {
+        "title": "連想力が鍛えられる",
+        "body": "答えは1つじゃない。類義語、複合語、慣用句を素早くスキャンする脳が育つ。"
+      },
+      "whyMemory": {
+        "title": "言葉の知識が深くなる",
+        "body": "橋探しは思い出す力+つなぐ力 — 機転や「ああ!」という思い出しの土台になる。"
+      },
+      "compareHeading": "他のゲームとの違い",
+      "compareSub": "ワードブリッジは違うを大事にしてる",
+      "compareCol1": "ゲーム",
+      "compareCol2": "やること",
+      "compareCol3": "時間",
+      "compareCol4": "鍛える力",
+      "compareRow1Name": "ワードブリッジ(このゲーム)",
+      "compareRow1Do": "2つの単語をつなぐ1語を見つけ",
+      "compareRow1Len": "1問30秒",
+      "compareRow1Skill": "連想+語彙",
+      "compareRow2Name": "NYT Connections",
+      "compareRow2Do": "16個の単語を4つのテーマに分類",
+      "compareRow2Len": "5~15分",
+      "compareRow2Skill": "カテゴリ分け",
+      "compareRow3Name": "Wordle",
+      "compareRow3Do": "5文字の単語を6回で当てる",
+      "compareRow3Len": "3~5分",
+      "compareRow3Skill": "文字ロジック",
+      "compareRow4Name": "クロスワード",
+      "compareRow4Do": "ヒントからマスを埋める",
+      "compareRow4Len": "10~60分",
+      "compareRow4Skill": "トリビア+スペル",
+      "faqHeading": "よくある質問",
+      "faq1Q": "ワードブリッジってなに?",
+      "faq1A": "単語連想パズル。2つの単語が与えられて、その2つをつなぐ1つの単語を見つけるゲーム。例:交通+嵐→雨(交通雨、雨嵐)。両方の方向で意味が通じる必要がある。",
+      "faq2Q": "NYT Connectionsですか?",
+      "faq2A": "ちがう。NYT Connectionsは16個の単語を4つのテーマに分ける。ワードブリッジは2つの単語をつなぐ1語を見つける。別のゲーム、どっちも楽しい。",
+      "faq3Q": "本当に無料?",
+      "faq3A": "本当に無料。登録も、課金も、ナシ。詰まった時のヒントは動画広告またはコインで見られます。",
+      "faq4Q": "ロシュ・ザナヴってなに?",
+      "faq4A": "ヘブライ語で「頭-尾」。イスラエルの古い車の中でやるゲーム。1人が単語を言って、次の人が関連する単語を言う連鎖ゲーム。ワードブリッジはそのパズル版。",
+      "faq5Q": "ヘブライ語でプレイできる?",
+      "faq5A": "できます。言語を切り替えればヘブライ語の完全なパズルバンクがプレイできます。",
+      "faq6Q": "ヒントはどう使う?",
+      "faq6A": "1問につきヒント1つは無料。その後は短い動画広告を見るか、コインを使う。ヒントは答えをそのまま言わず、方向を示してくれます。",
+      "stickyCta": "ワードブリッジをプレイ",
+      "footerCtaHeading": "橋を見つけたい?",
+      "footerCtaBody": "無料・ブラウザ・ダウンロードなし",
+      "footerCtaButton": "プレイ開始",
+      "crossPromoTitle": "ワードブリッジを試す",
+      "crossPromoBody": "2つの単語、1つの橋、無料。",
+      "crossPromoCta": "プレイ"
+    }
   },
   "showcase3d": {
     "heroBadge": "言葉の世界",
@@ -14165,10 +15469,19 @@ const ja = {
       "nextMilestone": "{points}ポイント → {coins}コイン"
     },
     "tier": {
-      "label": "権限レベル",
-      "1": { "label": "モデレーター", "desc": "無効な単語を報告し、不正な投稿を審査に回せます。" },
-      "2": { "label": "エディター", "desc": "モデレーターの全機能に加え、正しい単語を辞書に承認できます。" },
-      "3": { "label": "リード", "desc": "エディターの全機能に加え、パズル品質の判定を行えます。" }
+      "1": {
+        "label": "モデレーター",
+        "desc": "無効な単語を報告し、不正な投稿を審査に回せます。"
+      },
+      "2": {
+        "label": "エディター",
+        "desc": "モデレーターの全機能に加え、正しい単語を辞書に承認できます。"
+      },
+      "3": {
+        "label": "リード",
+        "desc": "エディターの全機能に加え、パズル品質の判定を行えます。"
+      },
+      "label": "権限レベル"
     },
     "levels": {
       "title": "各アクセスレベルでできること",
@@ -14269,7 +15582,17 @@ const ja = {
     "loadingText7": "トリプルワードを解読中…",
     "loadingText8": "言葉の魔法使いを起こしています…"
   },
-  "offerwall": { "cta": { "label": "無料コインを獲得", "aria": "オファーを完了して無料コインを獲得" }, "modal": { "title": "無料コイン", "subtitle": "オファーを完了すると、コインが自動で追加されます。", "close": "閉じる" } },
+  "offerwall": {
+    "cta": {
+      "label": "無料コインを獲得",
+      "aria": "オファーを完了して無料コインを獲得"
+    },
+    "modal": {
+      "title": "無料コイン",
+      "subtitle": "オファーを完了すると、コインが自動で追加されます。",
+      "close": "閉じる"
+    }
+  },
   "offlineDownload": {
     "title": "オフライン用にダウンロード",
     "description": "言語の辞書をダウンロードしてオフラインでプレイできます。辞書データはゲームの公開情報です。",
@@ -14386,7 +15709,10 @@ const ja = {
       "clashLabel": "クラッシュ",
       "passLabel": "パス",
       "shareCta": "スコアをシェア"
-    }
+    },
+    "revealing": "公開中…",
+    "roundLabel": "ラウンド {n}/{total}",
+    "chipStack": "チップ: {chips}"
   },
   "supporter": {
     "card": {

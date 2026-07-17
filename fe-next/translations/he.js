@@ -100,9 +100,16 @@ const he = {
     "timer": "זמן",
     "gridLabel": "לוח תשבץ",
     "cellLabel": "שורה {row}, עמודה {col}",
-    "dir": { "across": "מאוזן", "down": "מאונך" },
+    "dir": {
+      "across": "מאוזן",
+      "down": "מאונך"
+    },
     "switchDir": "החלף כיוון",
-    "difficulty": { "easy": "קל", "medium": "בינוני", "hard": "קשה" },
+    "difficulty": {
+      "easy": "קל",
+      "medium": "בינוני",
+      "hard": "קשה"
+    },
     "acrossHeading": "מאוזן",
     "downHeading": "מאונך",
     "prevClue": "רמז קודם",
@@ -171,7 +178,9 @@ const he = {
       "not-your-turn": "המתן לתורך."
     },
     "solo": {
-      "category": { "hit": "✨ +2× {category}!" },
+      "category": {
+        "hit": "✨ +2× {category}!"
+      },
       "howTo": {
         "title": "איך משחקים",
         "cta": "הבנתי!",
@@ -196,7 +205,11 @@ const he = {
       "lost": "הסיבוב נגמר",
       "botThinking": "הבוט חושב…",
       "difficultyLabel": "רמת קושי",
-      "difficulty": {"easy": "קל", "medium": "בינוני", "hard": "קשה"},
+      "difficulty": {
+        "easy": "קל",
+        "medium": "בינוני",
+        "hard": "קשה"
+      },
       "err": {
         "not-hiragana": "רק יראגנה (לדוגמה ねこ).",
         "wrong-head": "אות פתיחה שגויה — התחילו מהאות המודגשת.",
@@ -233,24 +246,60 @@ const he = {
     "modifier": {
       "todaysTwist": "טוויסט היום",
       "shiritori": {
-        "longWords": { "label": "ארוכות וחזקות", "desc": "יום למילים גדולות ועז." },
-        "noRepeatVowel": { "label": "מחסור בתנועות", "desc": "שמרו את התנועות שלכם טריות ומגוונות." },
-        "speedDemon": { "label": "דמון המהירות", "desc": "התחשבות מהירה תשלוט בשרשרת היום." }
+        "longWords": {
+          "label": "ארוכות וחזקות",
+          "desc": "יום למילים גדולות ועז."
+        },
+        "noRepeatVowel": {
+          "label": "מחסור בתנועות",
+          "desc": "שמרו את התנועות שלכם טריות ומגוונות."
+        },
+        "speedDemon": {
+          "label": "דמון המהירות",
+          "desc": "התחשבות מהירה תשלוט בשרשרת היום."
+        }
       },
       "sealedBid": {
-        "noClashPenalty": { "label": "יום שלום", "desc": "שוק ידידותי יותר — הציעו בחופשיות." },
-        "vowelTax": { "label": "מס תנועות", "desc": "תנועות הם הסחורה החמה היום." },
-        "highStakes": { "label": "הימורים גבוהים", "desc": "הצעות עז וייחודיות מגדירות את היום." }
+        "noClashPenalty": {
+          "label": "יום שלום",
+          "desc": "שוק ידידותי יותר — הציעו בחופשיות."
+        },
+        "vowelTax": {
+          "label": "מס תנועות",
+          "desc": "תנועות הם הסחורה החמה היום."
+        },
+        "highStakes": {
+          "label": "הימורים גבוהים",
+          "desc": "הצעות עז וייחודיות מגדירות את היום."
+        }
       },
       "wordAlchemy": {
-        "doubleCatalyst": { "label": "קטליזטור כפול", "desc": "קטליזטורים חיים והופעיל היום." },
-        "heatDecay": { "label": "מעבדה צוננת", "desc": "מעבדה קרירה — קצבו את התגובות שלכם." },
-        "pureTransmute": { "label": "שינוי טהור", "desc": "יום לשינויים אמתיים." }
+        "doubleCatalyst": {
+          "label": "קטליזטור כפול",
+          "desc": "קטליזטורים חיים והופעיל היום."
+        },
+        "heatDecay": {
+          "label": "מעבדה צוננת",
+          "desc": "מעבדה קרירה — קצבו את התגובות שלכם."
+        },
+        "pureTransmute": {
+          "label": "שינוי טהור",
+          "desc": "יום לשינויים אמתיים."
+        }
       },
       "crossword": {
-        "themedGrid": { "label": "יום תמה", "desc": "תמה נסתרת רצה בתוך לוח היום." },
-        "noCheck": { "label": "אין הצצה", "desc": "סמכו על ההזדקות שלכם היום." },
-        "timeAttack": { "label": "התקפת זמן", "desc": "השעון קוקק — פתרו במהירות." }
+        "themedGrid": {
+          "label": "יום תמה",
+          "desc": "תמה נסתרת רצה בתוך לוח היום."
+        },
+        "noCheck": {
+          "label": "אין הצצה",
+          "desc": "סמכו על ההזדקות שלכם היום."
+        },
+        "timeAttack": {
+          "label": "התקפת זמן",
+          "desc": "השעון קוקק — פתרו במהירות."
+        }
       }
     }
   },
@@ -262,7 +311,11 @@ const he = {
     "wins": "זכה במכרז!",
     "bidPrompt": "בנו מילה מהאותיות — בחרו אחת שאף יריב לא יבחר!",
     "results": "ההצעות נחשפו",
-    "outcome": { "unique": "ייחודי ×2", "clash": "התנגשות ÷2", "none": "אין הצעה" },
+    "outcome": {
+      "unique": "ייחודי ×2",
+      "clash": "התנגשות ÷2",
+      "none": "אין הצעה"
+    },
     "locked": "ההצעה ננעלה — ממתינים ליריבים…",
     "lockProgress": "{{locked}}/{{total}} ננעלו",
     "clear": "נקה",
@@ -354,21 +407,63 @@ const he = {
     },
     "wildcardFound": "אבן הפילוסוף!",
     "wildcardSkip": "שלב אחד עבר טרנסמוטציה — קסם קורה",
-    "heat": {"label": "חום","rush": "!פריצת חום","rushAria": "מד החום מלא — המילה הנכונה הבאה מזכה בבונוס!"},
-    "share": {"copy": "העתק תוצאה","copied": "הועתק!","emojiRowAria": "סיכום אמוג׳י של המשחק שלך","captionPerfect": "טרנסמוטציה ללא דופי! 🧪","captionWild": "הקטליזטור הציל! 🔮","captionGood": "כימיה טובה! 🌡️","captionHard": "היסודות התנגדו היום 😅"}
+    "heat": {
+      "label": "חום",
+      "rush": "!פריצת חום",
+      "rushAria": "מד החום מלא — המילה הנכונה הבאה מזכה בבונוס!"
+    },
+    "share": {
+      "copy": "העתק תוצאה",
+      "copied": "הועתק!",
+      "emojiRowAria": "סיכום אמוג׳י של המשחק שלך",
+      "captionPerfect": "טרנסמוטציה ללא דופי! 🧪",
+      "captionWild": "הקטליזטור הציל! 🔮",
+      "captionGood": "כימיה טובה! 🌡️",
+      "captionHard": "היסודות התנגדו היום 😅"
+    }
   },
-  "gameFeedback": {"prompt":"איך היה הסיבוב?","bad":"ככה ככה","ok":"טוב","great":"אהבתי!","thanks":"תודה על המשוב!","dismiss":"סגירה"},
+  "gameFeedback": {
+    "prompt": "איך היה הסיבוב?",
+    "bad": "ככה ככה",
+    "ok": "טוב",
+    "great": "אהבתי!",
+    "thanks": "תודה על המשוב!",
+    "dismiss": "סגירה"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "הטוויסט של היום",
-      "goldenLetter": { "name": "אות זהב", "desc": "מילים עם {letter} מטפסות 60% גבוה יותר" },
-      "vowelGale": { "name": "סופת תנועות", "desc": "כל תנועה מוסיפה עוד גובה" },
-      "longAndStrong": { "name": "ארוך וחזק", "desc": "מילים מ-6 אותיות מטפסות 50% יותר" },
-      "skylineRush": { "name": "זינוק לגובה", "desc": "כל קומה עולה 15% יותר" },
-      "tailwind": { "name": "רוח גבית", "desc": "המנוף נע מהר יותר" },
-      "featherday": { "name": "יום נוצה", "desc": "התנודדות אחת נוספת לפני קריסה" }
+      "goldenLetter": {
+        "name": "אות זהב",
+        "desc": "מילים עם {letter} מטפסות 60% גבוה יותר"
+      },
+      "vowelGale": {
+        "name": "סופת תנועות",
+        "desc": "כל תנועה מוסיפה עוד גובה"
+      },
+      "longAndStrong": {
+        "name": "ארוך וחזק",
+        "desc": "מילים מ-6 אותיות מטפסות 50% יותר"
+      },
+      "skylineRush": {
+        "name": "זינוק לגובה",
+        "desc": "כל קומה עולה 15% יותר"
+      },
+      "tailwind": {
+        "name": "רוח גבית",
+        "desc": "המנוף נע מהר יותר"
+      },
+      "featherday": {
+        "name": "יום נוצה",
+        "desc": "התנודדות אחת נוספת לפני קריסה"
+      }
     },
-    "combo": { "roll": "ברצף!", "fire": "בוערים!", "blaze": "להבות!", "inferno": "אינפרנו!" },
+    "combo": {
+      "roll": "ברצף!",
+      "fire": "בוערים!",
+      "blaze": "להבות!",
+      "inferno": "אינפרנו!"
+    },
     "howTo": {
       "title": "איך משחקים",
       "cta": "הבנתי!",
@@ -383,32 +478,303 @@ const he = {
     "loading": "טוען מילון…",
     "loadError": "לא ניתן לטעון את המילון — הקש לנסות שוב",
     "retry": "נסה שוב",
-    "biome": { "city": "קרקע", "sky": "שמיים", "stratosphere": "סטרטוספירה", "orbit": "מסלול", "nebula": "ערפילית", "galaxy": "גלקסיה" },
-    "tier": { "apprentice": "מתחיל", "journeyman": "מיומן", "master": "אדריכל מאסטר" },
-    "hud": { "floors": "{n} קומות", "combo": "שרשרת {n}", "scramble": "ערבוב", "backspace": "מחיקה", "build": "בנייה", "restart": "מחדש", "restartConfirm": "בטוח?", "best": "שיא {m} מ'", "possible": "{n} מילים", "clue": "רמז", "collapse": "כיווץ", "expand": "הרחבה", "rivalPassed": "עברת את {name}!", "stuck": "תקוע? אות חדשה", "backToTop": "למעלה", "pickLetters": "בחרו אותיות", "dragToBuild": "גררו או הקישו לאיות", "keepBuilding": "המשיכו לבנות", "menuOpen": "עוד פעולות", "menuClose": "סגירת התפריט", "chaseGap": "+{m} מ'", "chaseAria": "המתחרה הבא מעליך: {name}, עוד {m} מטר לעקיפה" },
-    "minimap": { "label": "מפת המגדל — {m} מ', הקש לחזרה למעלה" },
-    "milestone": { "m50": "מעל צמרות העצים! 🌳", "m150": "אזור העננים ☁️", "m400": "הציפורים מקנאות 🐦", "m250": "מעל הרחפנים 🛸", "m650": "אווירה ערפילית 🌌", "m900": "טוק טוק, חלל? 🚀", "m1300": "תושב החלל העמוק 👽", "m1800": "כמעט אסטרונאוט ✨" },
-    "ach": { "unlocked": "הישג!", "firstFloor": "קומה ראשונה", "tenFloors": "בניין", "skyHigh": "גבוה בשמיים", "wordsmith": "אמן מילים", "comboKing": "מלך הקומבו", "rivalCrusher": "מנצח יריבים", "unstoppable": "בלתי עציר", "toTheMoon": "אל הירח", "skylineKing": "מלך קו הרקיע", "centurion": "מאה קומות", "comboGod": "אל הקומבו", "wordWizard": "קוסם המילים", "galaxyClass": "דרגת גלקסיה", "deepSpace": "חלל עמוק" },
-    "zone": { "entered": "אזור חדש", "next": "הבא: {zone} · {m}מ'" },
-    "landmark": { "skyscraper": "פסגת גורד שחקים", "cloudBase": "בסיס העננים", "mountainTop": "פסגת ההר", "jetStream": "זרם הסילון", "stormTops": "ראש הסערה", "weatherBalloon": "בלון מזג אוויר", "earthCurve": "עקמומיות כדור הארץ", "karman": "קצה החלל", "meteorBelt": "חגורת המטאורים", "aurora": "זוהר קוטבי", "deepSpace": "חלל עמוק" },
-    "hazard": { "bomb": "פצצה", "hurricane": "סופה", "wobble": "רעד", "sabotage": "חבלה", "lost": "{kind}! נפלו {n} קומות" },
-    "clutch": { "save": "הצלה ברגע האחרון!", "critical": "מתנדנד — נחיתה נקייה!" },
-    "surprise": { "nextWord": "המילה הבאה", "surge": "זינוק!", "windfall": "מתנה!", "updraft": "רוח נושאת! המילה הבאה מוגברת", "crystal": "גביש נדיר!", "goldenFloor": "קומת זהב!" },
-    "daily": { "badge": "יומי · {date}", "streak": "רצף {n} ימים", "toDaily": "יומי", "toEndless": "אינסופי", "newBest": "שיא יומי חדש!", "questTitle": "מגדל מילים", "questDesc": "בנו מגדל ממילים עד השמיים — אותן אותיות לכולם היום." },
-    "perk": { "title": "בחרו מתנה", "subtitle": "בחרו אחת — היא נשארת לכל הטיפוס", "skip": "דלגו בינתיים", "masterCrane": { "name": "מנופאי מומחה", "desc": "תגמול גדול יותר על הנחה מושלמת" }, "tallTimber": { "name": "קורות גבוהות", "desc": "+12% גובה בכל קומה" }, "featherfall": { "name": "נפילת נוצה", "desc": "התמוטטות מפילה קומה אחת פחות" }, "reinforced": { "name": "מחוזק", "desc": "יותר התנדנדות לפני הסכנה" }, "cushion": { "name": "כרית ביטחון", "desc": "התנדנדות מנוף לא מפילה קומות" } },
-    "runPerk": { "hotStreak": { "a11y": "ריצה לוהטת: נותרו {n} ירידות" } },
-    "crane": { "place": "הנח את המילה", "steer": "כוונו ושחררו", "tapToDrop": "הקש כדי לשחרר", "perfect": "מושלם!", "good": "יפה!", "sloppy": "מתנדנד", "miss": "אופס!", "stability": "יציבות", "steady": "יציב", "onFire": "בוער", "steadyAria": "רצף יד יציבה: {n} הנחות מושלמות" },
-    "upgrade": { "categories": { "crane": "מנוף", "stability": "יציבות", "boost": "האצה" }, "recommended": "הכי משתלם", "title": "שדרוגי מגדל", "subtitle": "שיפורים קבועים — בזבזו את המטבעות", "open": "שדרוגים", "balance": "{n} מטבעות", "buy": "קנה", "max": "מקסימום", "level": "דרגה {n}/{max}", "owned": "ברשותך", "close": "סיום", "broke": "אין מספיק מטבעות", "steadyCable": { "name": "כבל יציב", "desc": "מאט את תנופת המנוף לתזמון קל יותר" }, "wideFooting": { "name": "בסיס רחב", "desc": "מרחיב את חלון הנחיתה המושלמת" }, "windbreak": { "name": "שובר רוח", "desc": "מרגיע את הרוח בגובה רב" }, "masterArchitect": { "name": "אדריכל-על", "desc": "תגמול מטבעות גדול יותר בכל הנחה" }, "reinforcedCore": { "name": "ליבה מחוזקת", "desc": "שרדו רעידה אחת נוספת לפני קריסה" }, "quickRecovery": { "name": "התאוששות מהירה", "desc": "המגדל מתיישר מהר יותר" }, "tailwind": { "name": "רוח גבית", "desc": "כל קומה מטפסת מעט גבוה יותר" }, "salvage": { "name": "מנוף חילוץ", "desc": "התמוטטות מפילה פחות קומות" }, "momentum": { "name": "מומנטום", "desc": "רצף הנחות מושלמות משתלם אף יותר" }, "centerMagnet": { "name": "ליבת כבידה", "desc": "אפילו הנחות גרועות מושכות את המגדל חזרה למרכז" } },
-    "verdict": { "perfect": "מושלם!", "good": "יפה!", "sloppy": "רשלני", "miss": "פספוס!" },
-    "sabotage": { "chip": "כדור הריסה", "tokens": "{n}", "pickTarget": "בחר יריב", "noTargets": "אין יריבים לכיוון כרגע", "confirm": "לשלוח כדור הריסה אל {name}?", "send": "שלח", "cancel": "ביטול", "sentTo": "💥 פגעת ב-{name} — מטר אחד פחות", "incoming": "🚨 חבלה מתקרבת מ-{name}!", "recovered": "המגדל עומד. תמשיכו לטפס.", "earned": "🎯 השגת כדור הריסה!", "earnedHint": "אזור חדש או הישג!", "watchAd": "📺 פרסומת לטוקן", "adEarned": "🎯 טוקן מפרסומת!", "smashTitle": "שחרר את הכדור!", "smashCta": "סוחף!", "smashReleasing": "משחרר…", "floorsDestroyed": "−{n} קומות!", "newHeight": "גובה חדש:", "strikeCta": "חבטה!", "strikeHint": "הקישו כשהמד נכנס לאזור הירוק", "verdict": { "perfect": "חבטה מושלמת!", "solid": "פגיעה חזקה", "weak": "פגיעה חלשה" }, "done": "סיום" },
-    "reward": { "tier": { "common": "מטבעות", "uncommon": "שלל יפה!", "rare": "מציאה נדירה!", "epic": "ג'קפוט!" } },
-    "wreck": { "reportTitle": "המגדל הותקף!", "reportBody": "{name} הפיל לך {floors} קומות בזמן שלא היית — הנה ערבוב כדי להחזיר מלחמה.", "defaultName": "יריב" },
-    "error": { "too_short": "קצר מדי — 3 אותיות לפחות", "bad_chain": "התחילו באות הזוהרת", "not_buildable": "השתמשו באותיות המגש", "duplicate": "כבר השתמשת במילה הזו", "not_in_dictionary": "לא במילון" },
-    "celebration": { "highRise": "רב קומות!", "tall": "מתנשא לגובה!", "skyscraper": "גורד שחקים!" },
-    "leaderboard": { "title": "המגדלים המובילים", "error": "טעינת הלוח נכשלה", "empty": "אין עדיין מגדלים — היו הראשונים!" },
-    "share": { "title": "מגדל מילים", "button": "שיתוף", "text": "הגעתי ל-{m} מ' במגדל מילים — נסו לעקוף את המגדל שלי!" },
-    "versus": { "title": "מירוץ מגדלים", "bomb": "הפצצה על {name}", "waiting": "ממתינים ליריבים…", "incoming": "פצצה מתקרבת!", "won": "ניצחת!", "lost": "{name} ניצח" },
-    "a11y": { "height": "גובה {m} מטר", "combo": "שרשרת {n}", "tile": "אות {letter}", "goldenTile": "אות זהב {letter}" },
+    "biome": {
+      "city": "קרקע",
+      "sky": "שמיים",
+      "stratosphere": "סטרטוספירה",
+      "orbit": "מסלול",
+      "nebula": "ערפילית",
+      "galaxy": "גלקסיה"
+    },
+    "tier": {
+      "apprentice": "מתחיל",
+      "journeyman": "מיומן",
+      "master": "אדריכל מאסטר"
+    },
+    "hud": {
+      "floors": "{n} קומות",
+      "combo": "שרשרת {n}",
+      "scramble": "ערבוב",
+      "backspace": "מחיקה",
+      "build": "בנייה",
+      "restart": "מחדש",
+      "restartConfirm": "בטוח?",
+      "best": "שיא {m} מ'",
+      "possible": "{n} מילים",
+      "clue": "רמז",
+      "collapse": "כיווץ",
+      "expand": "הרחבה",
+      "rivalPassed": "עברת את {name}!",
+      "stuck": "תקוע? אות חדשה",
+      "backToTop": "למעלה",
+      "pickLetters": "בחרו אותיות",
+      "dragToBuild": "גררו או הקישו לאיות",
+      "keepBuilding": "המשיכו לבנות",
+      "menuOpen": "עוד פעולות",
+      "menuClose": "סגירת התפריט",
+      "chaseGap": "+{m} מ'",
+      "chaseAria": "המתחרה הבא מעליך: {name}, עוד {m} מטר לעקיפה"
+    },
+    "minimap": {
+      "label": "מפת המגדל — {m} מ', הקש לחזרה למעלה"
+    },
+    "milestone": {
+      "m50": "מעל צמרות העצים! 🌳",
+      "m150": "אזור העננים ☁️",
+      "m400": "הציפורים מקנאות 🐦",
+      "m250": "מעל הרחפנים 🛸",
+      "m650": "אווירה ערפילית 🌌",
+      "m900": "טוק טוק, חלל? 🚀",
+      "m1300": "תושב החלל העמוק 👽",
+      "m1800": "כמעט אסטרונאוט ✨"
+    },
+    "ach": {
+      "unlocked": "הישג!",
+      "firstFloor": "קומה ראשונה",
+      "tenFloors": "בניין",
+      "skyHigh": "גבוה בשמיים",
+      "wordsmith": "אמן מילים",
+      "comboKing": "מלך הקומבו",
+      "rivalCrusher": "מנצח יריבים",
+      "unstoppable": "בלתי עציר",
+      "toTheMoon": "אל הירח",
+      "skylineKing": "מלך קו הרקיע",
+      "centurion": "מאה קומות",
+      "comboGod": "אל הקומבו",
+      "wordWizard": "קוסם המילים",
+      "galaxyClass": "דרגת גלקסיה",
+      "deepSpace": "חלל עמוק"
+    },
+    "zone": {
+      "entered": "אזור חדש",
+      "next": "הבא: {zone} · {m}מ'"
+    },
+    "landmark": {
+      "skyscraper": "פסגת גורד שחקים",
+      "cloudBase": "בסיס העננים",
+      "mountainTop": "פסגת ההר",
+      "jetStream": "זרם הסילון",
+      "stormTops": "ראש הסערה",
+      "weatherBalloon": "בלון מזג אוויר",
+      "earthCurve": "עקמומיות כדור הארץ",
+      "karman": "קצה החלל",
+      "meteorBelt": "חגורת המטאורים",
+      "aurora": "זוהר קוטבי",
+      "deepSpace": "חלל עמוק"
+    },
+    "hazard": {
+      "bomb": "פצצה",
+      "hurricane": "סופה",
+      "wobble": "רעד",
+      "sabotage": "חבלה",
+      "lost": "{kind}! נפלו {n} קומות"
+    },
+    "clutch": {
+      "save": "הצלה ברגע האחרון!",
+      "critical": "מתנדנד — נחיתה נקייה!"
+    },
+    "surprise": {
+      "nextWord": "המילה הבאה",
+      "surge": "זינוק!",
+      "windfall": "מתנה!",
+      "updraft": "רוח נושאת! המילה הבאה מוגברת",
+      "crystal": "גביש נדיר!",
+      "goldenFloor": "קומת זהב!"
+    },
+    "daily": {
+      "badge": "יומי · {date}",
+      "streak": "רצף {n} ימים",
+      "toDaily": "יומי",
+      "toEndless": "אינסופי",
+      "newBest": "שיא יומי חדש!",
+      "questTitle": "מגדל מילים",
+      "questDesc": "בנו מגדל ממילים עד השמיים — אותן אותיות לכולם היום."
+    },
+    "perk": {
+      "title": "בחרו מתנה",
+      "subtitle": "בחרו אחת — היא נשארת לכל הטיפוס",
+      "skip": "דלגו בינתיים",
+      "masterCrane": {
+        "name": "מנופאי מומחה",
+        "desc": "תגמול גדול יותר על הנחה מושלמת"
+      },
+      "tallTimber": {
+        "name": "קורות גבוהות",
+        "desc": "+12% גובה בכל קומה"
+      },
+      "featherfall": {
+        "name": "נפילת נוצה",
+        "desc": "התמוטטות מפילה קומה אחת פחות"
+      },
+      "reinforced": {
+        "name": "מחוזק",
+        "desc": "יותר התנדנדות לפני הסכנה"
+      },
+      "cushion": {
+        "name": "כרית ביטחון",
+        "desc": "התנדנדות מנוף לא מפילה קומות"
+      }
+    },
+    "runPerk": {
+      "hotStreak": {
+        "a11y": "ריצה לוהטת: נותרו {n} ירידות"
+      }
+    },
+    "crane": {
+      "place": "הנח את המילה",
+      "steer": "כוונו ושחררו",
+      "tapToDrop": "הקש כדי לשחרר",
+      "perfect": "מושלם!",
+      "good": "יפה!",
+      "sloppy": "מתנדנד",
+      "miss": "אופס!",
+      "stability": "יציבות",
+      "steady": "יציב",
+      "onFire": "בוער",
+      "steadyAria": "רצף יד יציבה: {n} הנחות מושלמות"
+    },
+    "upgrade": {
+      "categories": {
+        "crane": "מנוף",
+        "stability": "יציבות",
+        "boost": "האצה"
+      },
+      "recommended": "הכי משתלם",
+      "title": "שדרוגי מגדל",
+      "subtitle": "שיפורים קבועים — בזבזו את המטבעות",
+      "open": "שדרוגים",
+      "balance": "{n} מטבעות",
+      "buy": "קנה",
+      "max": "מקסימום",
+      "level": "דרגה {n}/{max}",
+      "owned": "ברשותך",
+      "close": "סיום",
+      "broke": "אין מספיק מטבעות",
+      "steadyCable": {
+        "name": "כבל יציב",
+        "desc": "מאט את תנופת המנוף לתזמון קל יותר"
+      },
+      "wideFooting": {
+        "name": "בסיס רחב",
+        "desc": "מרחיב את חלון הנחיתה המושלמת"
+      },
+      "windbreak": {
+        "name": "שובר רוח",
+        "desc": "מרגיע את הרוח בגובה רב"
+      },
+      "masterArchitect": {
+        "name": "אדריכל-על",
+        "desc": "תגמול מטבעות גדול יותר בכל הנחה"
+      },
+      "reinforcedCore": {
+        "name": "ליבה מחוזקת",
+        "desc": "שרדו רעידה אחת נוספת לפני קריסה"
+      },
+      "quickRecovery": {
+        "name": "התאוששות מהירה",
+        "desc": "המגדל מתיישר מהר יותר"
+      },
+      "tailwind": {
+        "name": "רוח גבית",
+        "desc": "כל קומה מטפסת מעט גבוה יותר"
+      },
+      "salvage": {
+        "name": "מנוף חילוץ",
+        "desc": "התמוטטות מפילה פחות קומות"
+      },
+      "momentum": {
+        "name": "מומנטום",
+        "desc": "רצף הנחות מושלמות משתלם אף יותר"
+      },
+      "centerMagnet": {
+        "name": "ליבת כבידה",
+        "desc": "אפילו הנחות גרועות מושכות את המגדל חזרה למרכז"
+      }
+    },
+    "verdict": {
+      "perfect": "מושלם!",
+      "good": "יפה!",
+      "sloppy": "רשלני",
+      "miss": "פספוס!"
+    },
+    "sabotage": {
+      "chip": "כדור הריסה",
+      "tokens": "{n}",
+      "pickTarget": "בחר יריב",
+      "noTargets": "אין יריבים לכיוון כרגע",
+      "confirm": "לשלוח כדור הריסה אל {name}?",
+      "send": "שלח",
+      "cancel": "ביטול",
+      "sentTo": "💥 פגעת ב-{name} — מטר אחד פחות",
+      "incoming": "🚨 חבלה מתקרבת מ-{name}!",
+      "recovered": "המגדל עומד. תמשיכו לטפס.",
+      "earned": "🎯 השגת כדור הריסה!",
+      "earnedHint": "אזור חדש או הישג!",
+      "watchAd": "📺 פרסומת לטוקן",
+      "adEarned": "🎯 טוקן מפרסומת!",
+      "smashTitle": "שחרר את הכדור!",
+      "smashCta": "סוחף!",
+      "smashReleasing": "משחרר…",
+      "floorsDestroyed": "−{n} קומות!",
+      "newHeight": "גובה חדש:",
+      "strikeCta": "חבטה!",
+      "strikeHint": "הקישו כשהמד נכנס לאזור הירוק",
+      "verdict": {
+        "perfect": "חבטה מושלמת!",
+        "solid": "פגיעה חזקה",
+        "weak": "פגיעה חלשה"
+      },
+      "done": "סיום"
+    },
+    "reward": {
+      "tier": {
+        "common": "מטבעות",
+        "uncommon": "שלל יפה!",
+        "rare": "מציאה נדירה!",
+        "epic": "ג'קפוט!"
+      }
+    },
+    "wreck": {
+      "reportTitle": "המגדל הותקף!",
+      "reportBody": "{name} הפיל לך {floors} קומות בזמן שלא היית — הנה ערבוב כדי להחזיר מלחמה.",
+      "defaultName": "יריב"
+    },
+    "error": {
+      "too_short": "קצר מדי — 3 אותיות לפחות",
+      "bad_chain": "התחילו באות הזוהרת",
+      "not_buildable": "השתמשו באותיות המגש",
+      "duplicate": "כבר השתמשת במילה הזו",
+      "not_in_dictionary": "לא במילון"
+    },
+    "celebration": {
+      "highRise": "רב קומות!",
+      "tall": "מתנשא לגובה!",
+      "skyscraper": "גורד שחקים!"
+    },
+    "leaderboard": {
+      "title": "המגדלים המובילים",
+      "error": "טעינת הלוח נכשלה",
+      "empty": "אין עדיין מגדלים — היו הראשונים!"
+    },
+    "share": {
+      "title": "מגדל מילים",
+      "button": "שיתוף",
+      "text": "הגעתי ל-{m} מ' במגדל מילים — נסו לעקוף את המגדל שלי!"
+    },
+    "versus": {
+      "title": "מירוץ מגדלים",
+      "bomb": "הפצצה על {name}",
+      "waiting": "ממתינים ליריבים…",
+      "incoming": "פצצה מתקרבת!",
+      "won": "ניצחת!",
+      "lost": "{name} ניצח"
+    },
+    "a11y": {
+      "height": "גובה {m} מטר",
+      "combo": "שרשרת {n}",
+      "tile": "אות {letter}",
+      "goldenTile": "אות זהב {letter}"
+    },
     "skin": {
       "pickerTitle": "עיצובי מגדל",
       "open": "עיצובי מגדל",
@@ -416,12 +782,30 @@ const he = {
       "equip": "חליפה",
       "equipped": "חובש",
       "unlockedToast": "עיצוב חדש נפתח!",
-      "classic": { "name": "סטנדרטי", "blurb": "בטון ופלדה כנים." },
-      "copper": { "name": "נחושת", "blurb": "חום מחומצן, מעוצב ביד." },
-      "marble": { "name": "שיש", "blurb": "אבן בהירה, רידות קרות." },
-      "gold": { "name": "גולד ראש", "blurb": "זהב מברוש, הרווח בקשה." },
-      "onyx": { "name": "אוניקס", "blurb": "גרפיט לעד שחור." },
-      "aurora": { "name": "זוהר קוטבי", "blurb": "סגסוגת תופסת ערפילית." }
+      "classic": {
+        "name": "סטנדרטי",
+        "blurb": "בטון ופלדה כנים."
+      },
+      "copper": {
+        "name": "נחושת",
+        "blurb": "חום מחומצן, מעוצב ביד."
+      },
+      "marble": {
+        "name": "שיש",
+        "blurb": "אבן בהירה, רידות קרות."
+      },
+      "gold": {
+        "name": "גולד ראש",
+        "blurb": "זהב מברוש, הרווח בקשה."
+      },
+      "onyx": {
+        "name": "אוניקס",
+        "blurb": "גרפיט לעד שחור."
+      },
+      "aurora": {
+        "name": "זוהר קוטבי",
+        "blurb": "סגסוגת תופסת ערפילית."
+      }
     }
   },
   "flag": "🇮🇱",
@@ -1943,7 +2327,9 @@ const he = {
     "botsJoined": "{{count}} יריבים הצטרפו — אין אנשים אמיתיים, אז קיבלתם בוטים!",
     "winStreak": "{{count}} ניצחונות ברצף!",
     "oneMoreWin": "עוד ניצחון אחד!",
-    "nearRank": "כל כך קרוב לעלייה בדרגה!"
+    "nearRank": "כל כך קרוב לעלייה בדרגה!",
+    "rankUp": "עלית דרגה!",
+    "welcomeToTier": "ברוכים הבאים ל{{tier}}!"
   },
   "stats": {
     "games": "משחקים",
@@ -2612,18 +2998,42 @@ const he = {
           "success": "נחסם!"
         },
         "ability": {
-          "smite": { "name": "מכה", "desc": "שחרר מכת נזק עוצמתית על הבוס" },
-          "ward": { "name": "מגן", "desc": "חסום את המתקפה הבאה של הבוס" },
-          "focus": { "name": "מיקוד", "desc": "המילה הבאה שלך פוגעת בנזק בונוס" }
+          "smite": {
+            "name": "מכה",
+            "desc": "שחרר מכת נזק עוצמתית על הבוס"
+          },
+          "ward": {
+            "name": "מגן",
+            "desc": "חסום את המתקפה הבאה של הבוס"
+          },
+          "focus": {
+            "name": "מיקוד",
+            "desc": "המילה הבאה שלך פוגעת בנזק בונוס"
+          }
         }
       }
     },
     "surprise": {
-      "doubleGold": { "label": "זהב כפול!", "desc": "השלב הזה משלם זהב כפול." },
-      "bonusChest": { "label": "תיבת בונוס!", "desc": "תיבת אוצר נוספת מופיעה." },
-      "luckyGems": { "label": "אבני חן ממזל!", "desc": "מבול של אבני חן." },
-      "goldenWord": { "label": "מילת זהב!", "desc": "מילה נסתרת שווה ג'קפוט." },
-      "comboFrenzy": { "label": "טירוף קומבו!", "desc": "תגמולי הקומבו נספרו כפול בשלב הזה." }
+      "doubleGold": {
+        "label": "זהב כפול!",
+        "desc": "השלב הזה משלם זהב כפול."
+      },
+      "bonusChest": {
+        "label": "תיבת בונוס!",
+        "desc": "תיבת אוצר נוספת מופיעה."
+      },
+      "luckyGems": {
+        "label": "אבני חן ממזל!",
+        "desc": "מבול של אבני חן."
+      },
+      "goldenWord": {
+        "label": "מילת זהב!",
+        "desc": "מילה נסתרת שווה ג'קפוט."
+      },
+      "comboFrenzy": {
+        "label": "טירוף קומבו!",
+        "desc": "תגמולי הקומבו נספרו כפול בשלב הזה."
+      }
     },
     "welcome": {
       "title": "ברוכים הבאים ל-LexiClash!",
@@ -5330,18 +5740,54 @@ const he = {
   },
   "season": {
     "twist": {
-      "double-down": { "title": "כפול או כלום", "blurb": "החודש המילים הארוכות שולטות." },
-      "crown-rush": { "title": "מירוץ הכתרים", "blurb": "כל אות היא נשק. כבשו את הכס." },
-      "rare-find": { "title": "מציאה נדירה", "blurb": "נערו את האבק מהמילים הנדירות — זה החודש שלהן." },
-      "combo-beat": { "title": "קצב קומבו", "blurb": "ערמו הברות, רכבו על הקומבו, שמרו על הקצב." },
-      "sound-wave": { "title": "גל קול", "blurb": "ערבבו ביטים ואותיות למהלכים מנצחים." },
-      "throne-climb": { "title": "טיפוס אל הכס", "blurb": "בנו את הכס שלכם מכל מילה שאתם יודעים." },
-      "frostbite": { "title": "כפור נושך", "blurb": "שמרו על הרצף חם בזמן שהלוח קופא." },
-      "afterglow": { "title": "זוהר ניאון", "blurb": "שובל ניאון נמשך אחרי כל מילה שתמצאו." },
-      "heatwave": { "title": "גל חום", "blurb": "ככל שהרצף ארוך יותר, הלוח לוהט יותר." },
-      "bloom": { "title": "פריחה", "blurb": "כל מציאה זורעת את הבאה. צפו בניקוד פורח." },
-      "stardust": { "title": "אבק כוכבים", "blurb": "האותיות נעות כמו כוכבים על פני הלוח." },
-      "final-bell": { "title": "הצלצול האחרון", "blurb": "השנה נסגרת — כל נקודה נכנסת לספרי השיאים." }
+      "double-down": {
+        "title": "כפול או כלום",
+        "blurb": "החודש המילים הארוכות שולטות."
+      },
+      "crown-rush": {
+        "title": "מירוץ הכתרים",
+        "blurb": "כל אות היא נשק. כבשו את הכס."
+      },
+      "rare-find": {
+        "title": "מציאה נדירה",
+        "blurb": "נערו את האבק מהמילים הנדירות — זה החודש שלהן."
+      },
+      "combo-beat": {
+        "title": "קצב קומבו",
+        "blurb": "ערמו הברות, רכבו על הקומבו, שמרו על הקצב."
+      },
+      "sound-wave": {
+        "title": "גל קול",
+        "blurb": "ערבבו ביטים ואותיות למהלכים מנצחים."
+      },
+      "throne-climb": {
+        "title": "טיפוס אל הכס",
+        "blurb": "בנו את הכס שלכם מכל מילה שאתם יודעים."
+      },
+      "frostbite": {
+        "title": "כפור נושך",
+        "blurb": "שמרו על הרצף חם בזמן שהלוח קופא."
+      },
+      "afterglow": {
+        "title": "זוהר ניאון",
+        "blurb": "שובל ניאון נמשך אחרי כל מילה שתמצאו."
+      },
+      "heatwave": {
+        "title": "גל חום",
+        "blurb": "ככל שהרצף ארוך יותר, הלוח לוהט יותר."
+      },
+      "bloom": {
+        "title": "פריחה",
+        "blurb": "כל מציאה זורעת את הבאה. צפו בניקוד פורח."
+      },
+      "stardust": {
+        "title": "אבק כוכבים",
+        "blurb": "האותיות נעות כמו כוכבים על פני הלוח."
+      },
+      "final-bell": {
+        "title": "הצלצול האחרון",
+        "blurb": "השנה נסגרת — כל נקודה נכנסת לספרי השיאים."
+      }
     },
     "name": "עונה {{number}}: {{theme}}",
     "endingSoon": "העונה מסתיימת בקרוב!",
@@ -7685,10 +8131,22 @@ const he = {
       "timeUpHaul": "הזמן נגמר — שלל יפה!",
       "firstMissFree": "טעות חימום — בלי נזק. אתה תסתדר!",
       "badge": {
-        "bronze": { "name": "ברונזה", "title": "צברת חזרות!" },
-        "silver": { "name": "כסף", "title": "עבודה מוצקה!" },
-        "gold": { "name": "זהב", "title": "אתה בוער!" },
-        "platinum": { "name": "פלטינה", "title": "יחידת על!" }
+        "bronze": {
+          "name": "ברונזה",
+          "title": "צברת חזרות!"
+        },
+        "silver": {
+          "name": "כסף",
+          "title": "עבודה מוצקה!"
+        },
+        "gold": {
+          "name": "זהב",
+          "title": "אתה בוער!"
+        },
+        "platinum": {
+          "name": "פלטינה",
+          "title": "יחידת על!"
+        }
       },
       "rarity": {
         "common": "רגיל",
@@ -8425,7 +8883,25 @@ const he = {
     "milogWords": {
       "title": "העשרת מילון מילוג",
       "subtitle": "מילים בעברית שאומתו מול milog.co.il"
-    }
+    },
+    "sendTitle": "שלח הודעה",
+    "selectPlayers": "בחר מקבלים",
+    "chooseType": "בחר סוג",
+    "writeMessage": "כתוב הודעה",
+    "preview": "תצוגה מקדימה",
+    "send": "שלח",
+    "sending": "משלח...",
+    "sent": "הודעה נשלחה!",
+    "recipients": "מקבלים",
+    "type": "סוג",
+    "sendingTo": "משלח ל",
+    "titleLabel": "כותרת",
+    "titlePlaceholder": "כותרת הודעה...",
+    "bodyLabel": "הודעה",
+    "bodyPlaceholder": "תוכן הודעה...",
+    "actionUrlLabel": "כתובת URL של פעולה",
+    "sendSuccess": "הודעה נשלחה בהצלחה!",
+    "sendError": "שליחת ההודעה נכשלה. אנא נסה שוב."
   },
   "tvTutorial": {
     "welcome": {
@@ -8457,7 +8933,7 @@ const he = {
     "help": "הצג מדריך"
   },
   "quickPlay": {
-"solo": {
+    "solo": {
       "title": "משחק מהיר",
       "round": "סיבוב",
       "random": "אקראי",
@@ -8493,7 +8969,15 @@ const he = {
       "rankProgress": "{points} / {next} עד {rank}",
       "rankMax": "הדרגה הגבוהה ביותר",
       "rankGained": "+{pts} נקודות דרגה בסיבוב הזה",
-      "rank": {"rookie": "טירון", "bronze": "ארד", "silver": "כסף", "gold": "זהב", "platinum": "פלטינה", "diamond": "יהלום", "legend": "אגדת מילים"},
+      "rank": {
+        "rookie": "טירון",
+        "bronze": "ארד",
+        "silver": "כסף",
+        "gold": "זהב",
+        "platinum": "פלטינה",
+        "diamond": "יהלום",
+        "legend": "אגדת מילים"
+      },
       "shareTitle": "משחק מהיר בלקסיקלאש",
       "shareText": "התוצאה שלי: {pct}% מהמושלם בלוח הזה. אותו לוח, תורכם:"
     },
@@ -10063,7 +10547,9 @@ const he = {
       "worldEssence": "תמצית עולם",
       "ancientRelic": "שריד עתיק",
       "cosmicShard": "רסיס קוסמי",
-      "total": "סה״כ"
+      "total": "סה״כ",
+      "fragment": "שבר",
+      "luckyBonus": "בונוס בר מזל!"
     },
     "collection": {
       "title": "אוסף",
@@ -10261,6 +10747,127 @@ const he = {
       "huntSuccess": "מילת היעד נמצאה ב-{{attempts}} ניסיונות!",
       "huntFailed": "מילת היעד לא נמצאה",
       "wheelWords": "{{center}}/{{total}} מילים עם האות המרכזית"
+    },
+    "boss": {
+      "combat": {
+        "abilityBar": "היכולות שלך",
+        "charge": "טעינת היכולת",
+        "weakLabel": "חלש ל",
+        "weaknessHit": "חולשה!",
+        "weakness": {
+          "length": "מילים ארוכות",
+          "lengthLong": "מילים ארוכות יותר",
+          "lengthEpic": "מילים ענקיות",
+          "doubleLetter": "אותיות כפולות",
+          "palindrome": "מילים סימטריות",
+          "rareLetter": "אותיות נדירות",
+          "vowelHeavy": "מילים עשירות בתנועות"
+        },
+        "parry": {
+          "hint": "הגנה! מילה גדולה, מהר!",
+          "success": "הגנת בהצלחה!"
+        },
+        "ability": {
+          "smite": {
+            "name": "מכת אלוהית",
+            "desc": "שחרור התפרצות נזק על הבוס"
+          },
+          "ward": {
+            "name": "ביטחון",
+            "desc": "חסום את ההתקפה הבאה של הבוס"
+          },
+          "focus": {
+            "name": "ריכוז",
+            "desc": "המילה הבאה שלך תכה בנזק בונוס"
+          }
+        }
+      }
+    },
+    "surprise": {
+      "doubleGold": {
+        "label": "זהב כפול!",
+        "desc": "הרמה הזו משלמת זהב כפול."
+      },
+      "bonusChest": {
+        "label": "חזה בונוס!",
+        "desc": "חזה אוצר נוסף מופיע."
+      },
+      "luckyGems": {
+        "label": "אבנים בר מזל!",
+        "desc": "מנה מזלית של אבנים."
+      },
+      "goldenWord": {
+        "label": "מילה זהובה!",
+        "desc": "מילה מוסתרת שווה ג'קפוט."
+      },
+      "comboFrenzy": {
+        "label": "טירוף הקומבו!",
+        "desc": "תגמולי קומבו נספרו כפול ברמה זו."
+      }
+    },
+    "ascension": {
+      "level1": "מתחיל",
+      "level2": "חניך",
+      "level3": "מומחה",
+      "level4": "מיומן",
+      "level5": "מומחה בכיר",
+      "level6": "מנהל",
+      "level7": "אב-טיפוס",
+      "level8": "אגדה",
+      "level9": "מיתולוגי",
+      "level10": "מתעלה"
+    },
+    "consumables": {
+      "bossRevive": {
+        "name": "החיאת בוס"
+      },
+      "bossShield": {
+        "name": "מגן בוס"
+      },
+      "doubleGold": {
+        "name": "זהב כפול"
+      },
+      "extraHint": {
+        "name": "רמז נוסף"
+      },
+      "gridReroll": {
+        "name": "ריפול רשת"
+      },
+      "objectiveSkip": {
+        "name": "דילוג יעד"
+      },
+      "perfectStar": {
+        "name": "כוכב מושלם"
+      },
+      "timerExtension": {
+        "name": "הרחבת טיימר"
+      }
+    },
+    "mutators": {
+      "blindMode": {
+        "name": "מצב עיוורון"
+      },
+      "chaosGrid": {
+        "name": "רשת כאוס"
+      },
+      "fragile": {
+        "name": "שביר"
+      },
+      "ironMan": {
+        "name": "גבר ברזל"
+      },
+      "minimalist": {
+        "name": "מינימליסט"
+      },
+      "noHints": {
+        "name": "ללא רמזים"
+      },
+      "speedRun": {
+        "name": "ריצה מהירה"
+      },
+      "wordMaster": {
+        "name": "מלך המילים"
+      }
     }
   },
   "wheelRush": {
@@ -10287,7 +10894,9 @@ const he = {
   "blast": {
     "toCatchUp": "כדי להשיג",
     "leadingBy": "יתרון של",
-    "firstUse": { "gotIt": "הבנתי" },
+    "firstUse": {
+      "gotIt": "הבנתי"
+    },
     "level": "שלב {n}",
     "results": {
       "boardDomination": "שליטה בלוח",
@@ -10354,29 +10963,77 @@ const he = {
     },
     "modifier": {
       "incoming": "טוויסט",
-      "goldRush": { "name": "בהלת זהב", "desc": "אריחי זהב בכל מקום — וניקוד גבוה יותר." },
-      "chainFrenzy": { "name": "טירוף שרשרת", "desc": "מפלי השרשרת שווים כפול — תחברו אותם!" },
-      "doubleDown": { "name": "כפול או כלום", "desc": "כל מילה שווה פי 2 — אבל מהלך אחד פחות." },
-      "featherfall": { "name": "נפילת נוצה", "desc": "בנחת — שני מהלכים נוספים לעבוד איתם." },
-      "bombParty": { "name": "מסיבת פצצות", "desc": "הרבה יותר פצצות על הלוח." },
-      "luckyVowels": { "name": "מכת מזל", "desc": "פחות מכשולי קרח וקצת זהב נוסף." },
-      "megaCombo": { "name": "מגה קומבו", "desc": "קומבואים מכים חזק יותר לבונוס נקודות." },
-      "gemRush": { "title": "פריצת יהלומים", "sub": "עוד יהלומים על הלוח" },
-      "coinBonanza": { "title": "מטחנת מטבעות", "sub": "עוד מטבעות הסיבוב הזה" },
-      "bonusStorm": { "title": "סופת בונוס", "sub": "אריחי בונוס כפול שוחררו" }
+      "goldRush": {
+        "name": "בהלת זהב",
+        "desc": "אריחי זהב בכל מקום — וניקוד גבוה יותר."
+      },
+      "chainFrenzy": {
+        "name": "טירוף שרשרת",
+        "desc": "מפלי השרשרת שווים כפול — תחברו אותם!"
+      },
+      "doubleDown": {
+        "name": "כפול או כלום",
+        "desc": "כל מילה שווה פי 2 — אבל מהלך אחד פחות."
+      },
+      "featherfall": {
+        "name": "נפילת נוצה",
+        "desc": "בנחת — שני מהלכים נוספים לעבוד איתם."
+      },
+      "bombParty": {
+        "name": "מסיבת פצצות",
+        "desc": "הרבה יותר פצצות על הלוח."
+      },
+      "luckyVowels": {
+        "name": "מכת מזל",
+        "desc": "פחות מכשולי קרח וקצת זהב נוסף."
+      },
+      "megaCombo": {
+        "name": "מגה קומבו",
+        "desc": "קומבואים מכים חזק יותר לבונוס נקודות."
+      },
+      "gemRush": {
+        "title": "פריצת יהלומים",
+        "sub": "עוד יהלומים על הלוח"
+      },
+      "coinBonanza": {
+        "title": "מטחנת מטבעות",
+        "sub": "עוד מטבעות הסיבוב הזה"
+      },
+      "bonusStorm": {
+        "title": "סופת בונוס",
+        "sub": "אריחי בונוס כפול שוחררו"
+      }
     },
     "surprise": {
-      "coinBurst": { "title": "מטר מטבעות!" },
-      "gemShower": { "title": "מקלחת יהלומים!" },
-      "chainCharge": { "title": "טעינת שרשרת!" },
-      "luckyDouble": { "title": "כפל מזל!" },
-      "goldenWord": { "title": "מילת זהב!" },
+      "coinBurst": {
+        "title": "מטר מטבעות!"
+      },
+      "gemShower": {
+        "title": "מקלחת יהלומים!"
+      },
+      "chainCharge": {
+        "title": "טעינת שרשרת!"
+      },
+      "luckyDouble": {
+        "title": "כפל מזל!"
+      },
+      "goldenWord": {
+        "title": "מילת זהב!"
+      },
       "nextWordDouble": "המילה הבאה ×2",
       "chargedChip": "✨ ×2 טעון"
     },
     "quip": {
-      "big": ["שרשרת יפה!", "בוערים!", "תמשיכו!"],
-      "mega": ["בלתי עצירים!", "אגדה!", "קומבו ענק!"]
+      "big": [
+        "שרשרת יפה!",
+        "בוערים!",
+        "תמשיכו!"
+      ],
+      "mega": [
+        "בלתי עצירים!",
+        "אגדה!",
+        "קומבו ענק!"
+      ]
     },
     "chestMilestone": {
       "title": "תיבת אבן דרך",
@@ -12525,6 +13182,64 @@ const he = {
       "streakWarning": "אזהרת רצף בסיכון",
       "friendInvites": "הזמנות אתגר מחברים",
       "weeklySummary": "סיכום שבועי"
+    },
+    "teacherAccess": {
+      "title": "בקשות גישה למורה",
+      "count": {
+        "pending": "בהמתנה",
+        "approved": "אושר",
+        "declined": "נדחה",
+        "total": "סך הכל"
+      },
+      "filter_status": "סטטוס",
+      "filter_status_all": "כל הסטטוסים",
+      "filter_locale": "שפה",
+      "filter_country": "מדינה",
+      "refresh": "רענן",
+      "row_open": "בקשה פתוחה מ{name}",
+      "col": {
+        "name": "שם",
+        "email": "דוא״ל",
+        "role": "תפקיד",
+        "locale": "שפה",
+        "country": "מדינה",
+        "status": "סטטוס",
+        "submitted": "הוגש"
+      },
+      "page": "עמוד",
+      "export_csv": "ייצוא CSV",
+      "close": "סגור",
+      "drawer_title": "פרטי בקשת גישה למורה",
+      "field": {
+        "name": "שם",
+        "email": "דוא״ל",
+        "role": "תפקיד",
+        "locale": "שפה",
+        "country": "מדינה",
+        "school": "בית ספר/ארגון",
+        "status": "סטטוס",
+        "submitted": "הוגש",
+        "use_case": "שימוש"
+      },
+      "admin_note": "הערת מנהל",
+      "note_hint": "בעת אישור, הערה זו כלולה בדוא״ל ברוכים הבאים ללמונה. בעת דחייה, היא משמשת כהסיבה.",
+      "show_preview": "תצוגה מקדימה של דוא״ל",
+      "hide_preview": "הסתר תצוגה מקדימה",
+      "preview_title": "תצוגה מקדימה של דוא״ל",
+      "preview_subject": "נושא",
+      "copy_email": "העתק HTML של דוא״ל",
+      "copy_success": "HTML של דוא״ל הועתק ללוח",
+      "copy_error": "ההעתקה של דוא״ל נכשלה",
+      "approve": "אשר",
+      "decline": "דחה",
+      "approveSuccess": "הבקשה אושרה בהצלחה",
+      "resend": "שלח שוב דוא״ל אישור",
+      "resend_hint": "משלח מחדש את דוא״ל ברוכים הבאים (עם ההערה לעיל) ללמונה. לא משנה את גישתם.",
+      "resendSuccess": "דוא״ל האישור נשלח שוב",
+      "resendError": "שליחה מחדש של דוא״ל אישור נכשלה",
+      "declineSuccess": "הבקשה נדחתה בהצלחה",
+      "approveError": "אישור הבקשה נכשל",
+      "declineError": "דחיית הבקשה נכשלה"
     }
   },
   "native": {
@@ -12735,8 +13450,14 @@ const he = {
         "title": "מכונת מילים",
         "desc": "מצאו 15+ מילים במשחק אחד"
       },
-      "combo_4": { "title": "פותח קומבו", "desc": "השיגו קומבו 4x במשחק אחד" },
-      "combo_6": { "title": "מלך הקומבו", "desc": "השיגו קומבו 6x במשחק אחד" },
+      "combo_4": {
+        "title": "פותח קומבו",
+        "desc": "השיגו קומבו 4x במשחק אחד"
+      },
+      "combo_6": {
+        "title": "מלך הקומבו",
+        "desc": "השיגו קומבו 6x במשחק אחד"
+      },
       "mp_win": {
         "title": "אלוף",
         "desc": "ניצחו במשחק מרובה משתתפים"
@@ -13229,7 +13950,12 @@ const he = {
     }
   },
   "avatarBuilder": {
-    "glowUp": { "button": "שדרוג זוהר", "loading": "משדרג…", "adminTag": "מנהל", "resultTitle": "האווטאר המשודרג" },
+    "glowUp": {
+      "button": "שדרוג זוהר",
+      "loading": "משדרג…",
+      "adminTag": "מנהל",
+      "resultTitle": "האווטאר המשודרג"
+    },
     "title": "בונה דמויות",
     "base": "צורה",
     "hair": "שיער",
@@ -13496,7 +14222,24 @@ const he = {
     "emptyCta": "שלח אתגר לוח לחבר!",
     "resultTitle": "תוצאת האתגר",
     "bestWord": "המילה הטובה ביותר: {{word}}",
-    "wordsFound": "{{count}} מילים נמצאו"
+    "wordsFound": "{{count}} מילים נמצאו",
+    "mode": {
+      "classic": "קלאסי",
+      "blast": "פיצוץ",
+      "word-hunt": "ציד מילים"
+    },
+    "received": {
+      "title": "{sender} אתגר אתכם",
+      "body": "הביסו {score} ב{mode}"
+    },
+    "result": {
+      "titleWin": "הכנסתם את {opponent}!",
+      "titleLoss": "{opponent} הביסו אתכם",
+      "titleTie": "קשור עם {opponent}",
+      "bodyWin": "{mine} מול {theirs}",
+      "bodyLoss": "{mine} מול {theirs}",
+      "bodyTie": "{mine} מול {theirs}"
+    }
   },
   "wordClub": {
     "title": "מועדון מילים",
@@ -13944,7 +14687,11 @@ const he = {
       "reveal": "התשובה הייתה",
       "acceptLoss": "קבל הפסד"
     },
-    "difficulty": { "easy": "קל", "medium": "בינוני", "hard": "קשה" },
+    "difficulty": {
+      "easy": "קל",
+      "medium": "בינוני",
+      "hard": "קשה"
+    },
     "like": "אהבתי",
     "dislike": "לא אהבתי",
     "next": "הבא",
@@ -14159,12 +14906,64 @@ const he = {
     "playAgain": "שחק שוב",
     "home": "בית",
     "finalTiles": "אריחים אחרונים!",
-    "difficulty": { "label": "רמת קושי", "easy": "קל", "medium": "בינוני", "hard": "קשה" },
-    "clue": { "button": "רמז", "reveal": "נסה: {{word}}", "none": "לא נמצא מהלך — נסה להחליף", "granted": "‎+1 רמז!", "adFailed": "הפרסומת לא זמינה — נסה שוב" },
-    "modifier": { "bingo_bonanza": "בונוס בינגו", "long_words": "מילים ארוכות", "rich_letters": "אותיות יקרות", "land_grab": "כיבוש שטח", "quick_draw": "שליפה מהירה", "golden_tiles": "אריחי זהב", "none": "", "desc": { "bingo_bonanza": "בינגו שווה ‎+90", "long_words": "מילים מ‎-5 אותיות ‎+15", "rich_letters": "אותיות נדירות שוות כפול", "land_grab": "כיבושים מתפשטים לשכנים", "quick_draw": "מגש של 5 אותיות — תורות מהירים", "golden_tiles": "אריחי ✦ כובשים את המשבצות שסביבם" } },
-    "setup": { "title": "מכינים את המשחק", "opponent": { "label": "יריב", "bot": "נגד בוט", "botDesc": "משחק מול וורדבוט", "hotseat": "מסך משותף", "hotseatDesc": "שני שחקנים, מכשיר אחד", "friend": "אתגר לחבר", "friendDesc": "שולחים קישור למרחוק — מי ינצח?" }, "difficulty": { "label": "רמת הבוט" }, "twist": { "label": "טוויסט", "surprise": "תפתיעו אותי" }, "start": "מתחילים", "challengeHint": "אתגר-חבר מחכה במסך התוצאות", "sendChallengeNow": "עכשיו שולחים את האתגר!" },
+    "difficulty": {
+      "label": "רמת קושי",
+      "easy": "קל",
+      "medium": "בינוני",
+      "hard": "קשה"
+    },
+    "clue": {
+      "button": "רמז",
+      "reveal": "נסה: {{word}}",
+      "none": "לא נמצא מהלך — נסה להחליף",
+      "granted": "‎+1 רמז!",
+      "adFailed": "הפרסומת לא זמינה — נסה שוב"
+    },
+    "modifier": {
+      "bingo_bonanza": "בונוס בינגו",
+      "long_words": "מילים ארוכות",
+      "rich_letters": "אותיות יקרות",
+      "land_grab": "כיבוש שטח",
+      "quick_draw": "שליפה מהירה",
+      "golden_tiles": "אריחי זהב",
+      "none": "",
+      "desc": {
+        "bingo_bonanza": "בינגו שווה ‎+90",
+        "long_words": "מילים מ‎-5 אותיות ‎+15",
+        "rich_letters": "אותיות נדירות שוות כפול",
+        "land_grab": "כיבושים מתפשטים לשכנים",
+        "quick_draw": "מגש של 5 אותיות — תורות מהירים",
+        "golden_tiles": "אריחי ✦ כובשים את המשבצות שסביבם"
+      }
+    },
+    "setup": {
+      "title": "מכינים את המשחק",
+      "opponent": {
+        "label": "יריב",
+        "bot": "נגד בוט",
+        "botDesc": "משחק מול וורדבוט",
+        "hotseat": "מסך משותף",
+        "hotseatDesc": "שני שחקנים, מכשיר אחד",
+        "friend": "אתגר לחבר",
+        "friendDesc": "שולחים קישור למרחוק — מי ינצח?"
+      },
+      "difficulty": {
+        "label": "רמת הבוט"
+      },
+      "twist": {
+        "label": "טוויסט",
+        "surprise": "תפתיעו אותי"
+      },
+      "start": "מתחילים",
+      "challengeHint": "אתגר-חבר מחכה במסך התוצאות",
+      "sendChallengeNow": "עכשיו שולחים את האתגר!"
+    },
     "squares": "משבצות",
-    "place": { "step1": "הקישו על אות", "step2": "הקישו על משבצת", "step3": "שלחו" },
+    "place": {
+      "step1": "הקישו על אות",
+      "step2": "הקישו על משבצת",
+      "step3": "שלחו"
+    },
     "newBest": "שיא חדש!",
     "bagRemaining": "שק",
     "yourRack": "האותיות שלך",
@@ -14291,7 +15090,11 @@ const he = {
       "score": "ניקוד",
       "target": "יעד",
       "runTotal": "ניקוד כולל",
-      "feedback": { "nice": "יפה!", "great": "מעולה!", "huge": "ענק!" },
+      "feedback": {
+        "nice": "יפה!",
+        "great": "מעולה!",
+        "huge": "ענק!"
+      },
       "submit": "שלחו מילה",
       "recall": "החזרה",
       "endRound": "סיום סבב",
@@ -14653,10 +15456,19 @@ const he = {
       "nextMilestone": "{points} נקודות → {coins} מטבעות"
     },
     "tier": {
-      "label": "רמת יכולת",
-      "1": { "label": "סינון", "desc": "סימון מילים לא תקינות ודחיית הגשות זבל לבדיקה." },
-      "2": { "label": "עריכה", "desc": "כל מה שבסינון, ובנוסף אישור מילים אמיתיות למילון." },
-      "3": { "label": "ראש צוות", "desc": "כל מה שבעריכה, ובנוסף הכרעה במחלוקות על איכות חידות." }
+      "1": {
+        "label": "סינון",
+        "desc": "סימון מילים לא תקינות ודחיית הגשות זבל לבדיקה."
+      },
+      "2": {
+        "label": "עריכה",
+        "desc": "כל מה שבסינון, ובנוסף אישור מילים אמיתיות למילון."
+      },
+      "3": {
+        "label": "ראש צוות",
+        "desc": "כל מה שבעריכה, ובנוסף הכרעה במחלוקות על איכות חידות."
+      },
+      "label": "רמת יכולת"
     },
     "levels": {
       "title": "מה כל רמת גישה מעניקה",
@@ -14757,7 +15569,17 @@ const he = {
     "loadingText7": "מפענחים ניקוד משולש…",
     "loadingText8": "מעירים את אשף המילים…"
   },
-  "offerwall": { "cta": { "label": "מטבעות חינם", "aria": "צברו מטבעות חינם בהשלמת משימות" }, "modal": { "title": "מטבעות חינם", "subtitle": "השלימו משימה — המטבעות יתווספו אוטומטית.", "close": "סגירה" } },
+  "offerwall": {
+    "cta": {
+      "label": "מטבעות חינם",
+      "aria": "צברו מטבעות חינם בהשלמת משימות"
+    },
+    "modal": {
+      "title": "מטבעות חינם",
+      "subtitle": "השלימו משימה — המטבעות יתווספו אוטומטית.",
+      "close": "סגירה"
+    }
+  },
   "offlineDownload": {
     "title": "הורדה לשימוש בלא אינטרנט",
     "description": "הורידו מילונים לשפות שונות וגרו משחק ללא חיבור לאינטרנט. נתוני המילון הם מידע ציבורי של המשחק.",
@@ -14830,7 +15652,10 @@ const he = {
       "clashLabel": "התנגשות",
       "passLabel": "פאס",
       "shareCta": "שתף תוצאה"
-    }
+    },
+    "revealing": "חושף…",
+    "roundLabel": "סבב {n} מתוך {total}",
+    "chipStack": "אסימונים: {chips}"
   },
   "supporter": {
     "card": {

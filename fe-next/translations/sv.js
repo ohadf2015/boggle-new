@@ -172,9 +172,16 @@ const sv = {
     "timer": "Tid",
     "gridLabel": "Korsordsrutnät",
     "cellLabel": "Rad {row}, kolumn {col}",
-    "dir": { "across": "Vågrätt", "down": "Lodrätt" },
+    "dir": {
+      "across": "Vågrätt",
+      "down": "Lodrätt"
+    },
     "switchDir": "Byt riktning",
-    "difficulty": { "easy": "Lätt", "medium": "Medel", "hard": "Svår" },
+    "difficulty": {
+      "easy": "Lätt",
+      "medium": "Medel",
+      "hard": "Svår"
+    },
     "acrossHeading": "Vågrätt",
     "downHeading": "Lodrätt",
     "prevClue": "Föregående ledtråd",
@@ -299,7 +306,11 @@ const sv = {
       "reveal": "Svaret var",
       "acceptLoss": "Godkänn förlust"
     },
-    "difficulty": { "easy": "Lätt", "medium": "Medel", "hard": "Svår" },
+    "difficulty": {
+      "easy": "Lätt",
+      "medium": "Medel",
+      "hard": "Svår"
+    },
     "like": "Gilla",
     "dislike": "Ogilla",
     "next": "Nästa",
@@ -317,7 +328,88 @@ const sv = {
     "freeHint": "Gratis ledtråd ({count} kvar)",
     "revealHintAd": "Se annons för ledtråd",
     "revealAnswerAd": "Se annons för att visa svar",
-    "adminGiveUp": "Hoppa över (admin)"
+    "adminGiveUp": "Hoppa över (admin)",
+    "landing": {
+      "metaTitle": "Word Bridge — Hitta det förbindande ordet | LexiClash",
+      "metaDescription": "Gratis ordpussel online. Två ord, en bro — hitta ordet som länkar dem. Även känt som rosh-zanav, det klassiska israeliska ordspelet. Ingen registrering, inga nedladdningar.",
+      "metaKeywords": "word bridge pussel, ordassociationsspel, broordspel, rosh zanav, ordlänkpussel, gratis ordspel online, hjärnordpussel",
+      "ogTitle": "Word Bridge — Hitta det förbindande ordet",
+      "ogDescription": "Två ord, en bro. Det klassiska ordassociationsspelet, gratis online.",
+      "twitterTitle": "Word Bridge — Gratis ordpussel online",
+      "twitterDescription": "Två ord, en bro. Hitta vad som länkar dem.",
+      "badge": "GRATIS • INGEN REGISTRERING",
+      "h1Pre": "Två ord. En bro.",
+      "h1Highlight": "Hitta vad som länkar dem.",
+      "h1Sub": "Word Bridge — även känt som rosh-zanav, det klassiska israeliska ordspelet",
+      "introP1": "Word Bridge ger dig två ord. Din uppgift: hitta det enda ordet som förbinder dem. BRAND + MOTOR? LASTBIL. SOL + GLANS? LJUS. Lätt att lära, svårt att behärska.",
+      "introP2": "Det är den sortens spel som din hjärna vaknar för — snabba omgångar, tydliga \"aha\"-stunder och en ordförrådsträning i förklädnad. Gratis, webbaserat, inga nedladdningar.",
+      "ctaPrimary": "Spela gratis nu",
+      "ctaSecondary": "Hur det fungerar ↓",
+      "demoLabel": "Prova en — klicka på mittplatsen",
+      "demoReveal": "Avslöja bro",
+      "demoSuccess": "Det är ett broord!",
+      "samplesHeading": "Tre att prova",
+      "samplesSub": "Klicka på ett kort för att avslöja bron",
+      "samplesEasy": "Lätt",
+      "samplesMedium": "Medel",
+      "samplesHard": "Svår",
+      "samplesReveal": "Klicka för att avslöja",
+      "whyHeading": "Varför det är bra för din hjärna",
+      "whyVocab": {
+        "title": "Bygger ordförråd snabbt",
+        "body": "Varje pussel hämtar från en annan semantisk miljö. Du absorberar ordrelationer utan att försöka."
+      },
+      "whyLateral": {
+        "title": "Tränar lateralt tänkande",
+        "body": "Det finns sällan bara en väg. Din hjärna lär sig att söka igenom synonymer, sammansatta ord och idiom i högt tempo."
+      },
+      "whyMemory": {
+        "title": "Stärker semantiskt minne",
+        "body": "Broletande är återkallelse + förening tillsammans — samma förmåga bakom snabbt slagfärdigt svar och ordet-på-tungan-tips."
+      },
+      "compareHeading": "Hur jämför det sig?",
+      "compareSub": "Vi byggde Word Bridge för att vara annorlunda med intention",
+      "compareCol1": "Spel",
+      "compareCol2": "Vad du gör",
+      "compareCol3": "Längd",
+      "compareCol4": "Förmåga som testas",
+      "compareRow1Name": "Word Bridge (det här spelet)",
+      "compareRow1Do": "Hitta ordet som förbinder två givna ord",
+      "compareRow1Len": "30 sek / pussel",
+      "compareRow1Skill": "Förening + ordförråd",
+      "compareRow2Name": "NYT Connections",
+      "compareRow2Do": "Sortera 16 ord i 4 tematiska grupper",
+      "compareRow2Len": "5–15 min",
+      "compareRow2Skill": "Kategorisering",
+      "compareRow3Name": "Wordle",
+      "compareRow3Do": "Gissa ett 5-bokstavsord på 6 försök",
+      "compareRow3Len": "3–5 min",
+      "compareRow3Skill": "Bokstavslogik",
+      "compareRow4Name": "Korsord",
+      "compareRow4Do": "Fyll ett rutnät baserat på ledtrådar",
+      "compareRow4Len": "10–60 min",
+      "compareRow4Skill": "Trivia + stavning",
+      "faqHeading": "Ofta ställda frågor",
+      "faq1Q": "Vad är Word Bridge?",
+      "faq1A": "Ett ordassociationspussel. Du ser två ord och hittar det enda ordet som förbinder dem. Exempel: TRAFIK + STORM → TRAFIKKAOS (trafikkaos, kaossturm). Båda riktningarna måste vara meningsfulla.",
+      "faq2Q": "Är det här NYT Connections?",
+      "faq2A": "Nej. NYT Connections ber dig sortera 16 ord i 4 tematiska grupper. Word Bridge ger dig två ord och frågar efter det förbindande ordet. Annan mekanik, båda roliga.",
+      "faq3Q": "Är det verkligen gratis?",
+      "faq3A": "Ja. Ingen registrering krävs, ingen betalvägg. Valfria belönade annonser låter dig få ledtrådar om du fastnar.",
+      "faq4Q": "Vad betyder 'rosh-zanav'?",
+      "faq4A": "Hebreiska för \"huvud-svans\" (ראש זנב). Det är ett klassiskt israeliskt bilutflyktsspel där en spelare säger ett ord och nästa måste fortsätta med ett relaterat ord. Word Bridge är dess pusselkusin.",
+      "faq5Q": "Kan jag spela på hebreiska?",
+      "faq5A": "Ja. Byt språk och du får en komplett hebreisk pusselbas med autentisk formulering.",
+      "faq6Q": "Hur fungerar ledtrådar?",
+      "faq6A": "En gratis ledtråd per pussel. Titta på en snabb belönad annons eller spendera mynt för att avslöja den. Ledtråden avslöjar aldrig svaret direkt — bara puffar dig åt rätt håll.",
+      "stickyCta": "Spela Word Bridge",
+      "footerCtaHeading": "Redo att hitta några broar?",
+      "footerCtaBody": "Gratis. Webbaserat. Inga nedladdningar.",
+      "footerCtaButton": "Börja spela",
+      "crossPromoTitle": "Prova Word Bridge",
+      "crossPromoBody": "Två ord. En bro. Gratis.",
+      "crossPromoCta": "Spela"
+    }
   },
   "cosy": {
     "wellDone": "Bra jobbat",
@@ -344,7 +436,9 @@ const sv = {
       "not-your-turn": "Vänta på din tur."
     },
     "solo": {
-      "category": { "hit": "✨ +2× {category}!" },
+      "category": {
+        "hit": "✨ +2× {category}!"
+      },
       "howTo": {
         "title": "Så spelar du",
         "cta": "Uppfattat!",
@@ -369,7 +463,11 @@ const sv = {
       "lost": "Rundan är slut",
       "botThinking": "Boten tänker…",
       "difficultyLabel": "Botens svårighetsgrad",
-      "difficulty": {"easy": "Lätt", "medium": "Medel", "hard": "Svår"},
+      "difficulty": {
+        "easy": "Lätt",
+        "medium": "Medel",
+        "hard": "Svår"
+      },
       "err": {
         "not-hiragana": "Endast hiragana (t.ex. ねこ).",
         "wrong-head": "Fel inledande kana — börja med den markerade kana.",
@@ -406,24 +504,60 @@ const sv = {
     "modifier": {
       "todaysTwist": "Dagens twist",
       "shiritori": {
-        "longWords": { "label": "Långa & Starka", "desc": "En dag för att sträcka ut stora, djärva ord." },
-        "noRepeatVowel": { "label": "Vokalstöt", "desc": "Håll dina vokaler färska och varierande." },
-        "speedDemon": { "label": "Snabbets demon", "desc": "Snabb tänkande styr kedjan idag." }
+        "longWords": {
+          "label": "Långa & Starka",
+          "desc": "En dag för att sträcka ut stora, djärva ord."
+        },
+        "noRepeatVowel": {
+          "label": "Vokalstöt",
+          "desc": "Håll dina vokaler färska och varierande."
+        },
+        "speedDemon": {
+          "label": "Snabbets demon",
+          "desc": "Snabb tänkande styr kedjan idag."
+        }
       },
       "sealedBid": {
-        "noClashPenalty": { "label": "Fredsdag", "desc": "En vänligare marknad — bjud fritt." },
-        "vowelTax": { "label": "Vokalskat", "desc": "Vokaler är dagens heta handelsvara." },
-        "highStakes": { "label": "Höga insatser", "desc": "Djärva, unika bud definierar dagen." }
+        "noClashPenalty": {
+          "label": "Fredsdag",
+          "desc": "En vänligare marknad — bjud fritt."
+        },
+        "vowelTax": {
+          "label": "Vokalskat",
+          "desc": "Vokaler är dagens heta handelsvara."
+        },
+        "highStakes": {
+          "label": "Höga insatser",
+          "desc": "Djärva, unika bud definierar dagen."
+        }
       },
       "wordAlchemy": {
-        "doubleCatalyst": { "label": "Dubbel katalysator", "desc": "Katalysatorer är extra livfulla idag." },
-        "heatDecay": { "label": "Kyld lab", "desc": "Ett kallare labb — ta din tid med reaktionerna." },
-        "pureTransmute": { "label": "Ren transmutation", "desc": "En dag för verklig transmutation." }
+        "doubleCatalyst": {
+          "label": "Dubbel katalysator",
+          "desc": "Katalysatorer är extra livfulla idag."
+        },
+        "heatDecay": {
+          "label": "Kyld lab",
+          "desc": "Ett kallare labb — ta din tid med reaktionerna."
+        },
+        "pureTransmute": {
+          "label": "Ren transmutation",
+          "desc": "En dag för verklig transmutation."
+        }
       },
       "crossword": {
-        "themedGrid": { "label": "Temadag", "desc": "Ett dolt tema löper genom dagens rutnät." },
-        "noCheck": { "label": "Ingen kontroll", "desc": "Lita på dina instinkter idag." },
-        "timeAttack": { "label": "Tidsattack", "desc": "Klockan tickar — lös snabbt." }
+        "themedGrid": {
+          "label": "Temadag",
+          "desc": "Ett dolt tema löper genom dagens rutnät."
+        },
+        "noCheck": {
+          "label": "Ingen kontroll",
+          "desc": "Lita på dina instinkter idag."
+        },
+        "timeAttack": {
+          "label": "Tidsattack",
+          "desc": "Klockan tickar — lös snabbt."
+        }
       }
     }
   },
@@ -435,7 +569,11 @@ const sv = {
     "wins": "vann auktionen!",
     "bidPrompt": "Bygg ett ord från brickorna — välj ett ingen annan väljer!",
     "results": "Buden avslöjade",
-    "outcome": { "unique": "Unikt ×2", "clash": "Krock ÷2", "none": "Inget bud" },
+    "outcome": {
+      "unique": "Unikt ×2",
+      "clash": "Krock ÷2",
+      "none": "Inget bud"
+    },
     "locked": "Budet är låst — väntar på motståndare…",
     "lockProgress": "{{locked}}/{{total}} låsta",
     "clear": "Rensa",
@@ -527,21 +665,63 @@ const sv = {
     },
     "wildcardFound": "Filosofens sten!",
     "wildcardSkip": "Ett steg förvandlades — magi sker",
-    "heat": {"label": "Värme","rush": "Exoterm Rusning!","rushAria": "Värme full — nästa rätta ord ger bonus!"},
-    "share": {"copy": "Kopiera resultat","copied": "Kopierat!","emojiRowAria": "Emoji-sammanfattning av din runda","captionPerfect": "Felfri transmutation! 🧪","captionWild": "Katalysatorn räddade dagen! 🔮","captionGood": "Solid alkemi! 🌡️","captionHard": "Elementen kämpade emot idag 😅"}
+    "heat": {
+      "label": "Värme",
+      "rush": "Exoterm Rusning!",
+      "rushAria": "Värme full — nästa rätta ord ger bonus!"
+    },
+    "share": {
+      "copy": "Kopiera resultat",
+      "copied": "Kopierat!",
+      "emojiRowAria": "Emoji-sammanfattning av din runda",
+      "captionPerfect": "Felfri transmutation! 🧪",
+      "captionWild": "Katalysatorn räddade dagen! 🔮",
+      "captionGood": "Solid alkemi! 🌡️",
+      "captionHard": "Elementen kämpade emot idag 😅"
+    }
   },
-  "gameFeedback": {"prompt":"Hur var rundan?","bad":"Sådär","ok":"Bra","great":"Älskade den!","thanks":"Tack för din feedback!","dismiss":"Stäng"},
+  "gameFeedback": {
+    "prompt": "Hur var rundan?",
+    "bad": "Sådär",
+    "ok": "Bra",
+    "great": "Älskade den!",
+    "thanks": "Tack för din feedback!",
+    "dismiss": "Stäng"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "DAGENS TWIST",
-      "goldenLetter": { "name": "Gyllene bokstav", "desc": "Ord med {letter} klättrar 60% högre" },
-      "vowelGale": { "name": "Vokalstorm", "desc": "Varje vokal ger extra lyft" },
-      "longAndStrong": { "name": "Lång och stark", "desc": "Ord med 6+ bokstäver klättrar 50% högre" },
-      "skylineRush": { "name": "Skyline-rush", "desc": "Varje våning klättrar 15% högre" },
-      "tailwind": { "name": "Medvind", "desc": "Kranen sveper snabbare" },
-      "featherday": { "name": "Fjäderdag", "desc": "En extra vingling innan ras" }
+      "goldenLetter": {
+        "name": "Gyllene bokstav",
+        "desc": "Ord med {letter} klättrar 60% högre"
+      },
+      "vowelGale": {
+        "name": "Vokalstorm",
+        "desc": "Varje vokal ger extra lyft"
+      },
+      "longAndStrong": {
+        "name": "Lång och stark",
+        "desc": "Ord med 6+ bokstäver klättrar 50% högre"
+      },
+      "skylineRush": {
+        "name": "Skyline-rush",
+        "desc": "Varje våning klättrar 15% högre"
+      },
+      "tailwind": {
+        "name": "Medvind",
+        "desc": "Kranen sveper snabbare"
+      },
+      "featherday": {
+        "name": "Fjäderdag",
+        "desc": "En extra vingling innan ras"
+      }
     },
-    "combo": { "roll": "På rad!", "fire": "Eld!", "blaze": "Brinner!", "inferno": "Inferno!" },
+    "combo": {
+      "roll": "På rad!",
+      "fire": "Eld!",
+      "blaze": "Brinner!",
+      "inferno": "Inferno!"
+    },
     "howTo": {
       "title": "Så spelar du",
       "cta": "Uppfattat!",
@@ -556,32 +736,303 @@ const sv = {
     "loading": "Laddar ordlista…",
     "loadError": "Det gick inte att ladda ordlistan — tryck för att försöka igen",
     "retry": "Försök igen",
-    "biome": { "city": "Mark", "sky": "Himmel", "stratosphere": "Stratosfär", "orbit": "Omloppsbana", "nebula": "Nebulosa", "galaxy": "Galax" },
-    "tier": { "apprentice": "Lärling", "journeyman": "Gesäll", "master": "Mästararkitekt" },
-    "hud": { "floors": "{n} våningar", "combo": "{n} kedja", "scramble": "Blanda", "backspace": "Radera", "build": "Bygg", "restart": "Börja om", "restartConfirm": "Säker?", "best": "Bästa {m} m", "possible": "{n} ord", "clue": "Ledtråd", "collapse": "Fäll ihop", "expand": "Expandera", "rivalPassed": "Förbi {name}!", "stuck": "Fast? Ny bokstav", "backToTop": "Toppen", "pickLetters": "Välj bokstäver", "dragToBuild": "Dra eller tryck för att stava", "keepBuilding": "Fortsätt bygga", "menuOpen": "Fler åtgärder", "menuClose": "Stäng meny", "chaseGap": "+{m} m", "chaseAria": "Nästa rival ovanför: {name}, {m} meter kvar att passera" },
-    "minimap": { "label": "Tornkarta — {m} m, tryck för toppen" },
-    "milestone": { "m50": "Över trädtopparna! 🌳", "m150": "Molnland ☁️", "m400": "Fåglarna är avundsjuka 🐦", "m250": "Högre än drönarna 🛸", "m650": "Nebulosakänsla 🌌", "m900": "Knack knack, rymden? 🚀", "m1300": "Bor i yttre rymden 👽", "m1800": "Nästan astronaut nu ✨" },
-    "ach": { "unlocked": "Bedrift!", "firstFloor": "Första våningen", "tenFloors": "Höghus", "skyHigh": "Skyhögt", "wordsmith": "Ordkonstnär", "comboKing": "Combo-kung", "rivalCrusher": "Rivalkrossare", "unstoppable": "Ostoppbar", "toTheMoon": "Till månen", "skylineKing": "Skyline-kung", "centurion": "Centurion", "comboGod": "Combo-gud", "wordWizard": "Ordtrollkarl", "galaxyClass": "Galaxklass", "deepSpace": "Yttre rymden" },
-    "zone": { "entered": "Ny zon", "next": "Nästa: {zone} · {m}m" },
-    "landmark": { "skyscraper": "Skyskrapans topp", "cloudBase": "Molnbas", "mountainTop": "Bergstopp", "jetStream": "Jetström", "stormTops": "Stormtoppar", "weatherBalloon": "Väderballong", "earthCurve": "Jordens krökning", "karman": "Rymdens kant", "meteorBelt": "Meteorbälte", "aurora": "Norrsken", "deepSpace": "Yttre rymden" },
-    "hazard": { "bomb": "Bomb", "hurricane": "Orkan", "wobble": "Vingel", "sabotage": "Sabotage", "lost": "{kind}! −{n} våningar" },
-    "clutch": { "save": "Räddning i sista stund!", "critical": "Vacklar — landa rent!" },
-    "surprise": { "nextWord": "Nästa ord", "surge": "Stöt!", "windfall": "Skänk!", "updraft": "Uppvind! Nästa ord boostat", "crystal": "Kristallfynd!", "goldenFloor": "Gyllene våning!" },
-    "daily": { "badge": "Daglig · {date}", "streak": "{n} dagar i rad", "toDaily": "Daglig", "toEndless": "Oändlig", "newBest": "Nytt dagsrekord!", "questTitle": "Ordtorn", "questDesc": "Stapla ord mot skyn — samma bokstäver för alla idag." },
-    "perk": { "title": "Välj en förmån", "subtitle": "Välj en — den varar hela klättringen", "skip": "Hoppa över", "masterCrane": { "name": "Mästarkran", "desc": "Större belöning vid perfekta släpp" }, "tallTimber": { "name": "Högt virke", "desc": "+12% höjd på varje våning" }, "featherfall": { "name": "Fjäderfall", "desc": "Ras kostar en våning mindre" }, "reinforced": { "name": "Förstärkt", "desc": "Mer vinglande innan kanten" }, "cushion": { "name": "Säkerhetsdyna", "desc": "Kranvinglande tappar aldrig en våning" } },
-    "runPerk": { "hotStreak": { "a11y": "Varm streak: {n} kast kvar" } },
-    "crane": { "place": "Placera ditt ord", "steer": "Styr & släpp", "tapToDrop": "Tryck för att släppa", "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Vingligt", "miss": "Hoppsan!", "stability": "Stabilitet", "steady": "Stadig", "onFire": "På gång", "steadyAria": "Stadig hand-svit: {n} perfekta släpp" },
-    "upgrade": { "categories": { "crane": "Kran", "stability": "Stabilitet", "boost": "Boost" }, "recommended": "Bästa valet", "title": "Tornuppgraderingar", "subtitle": "Permanenta boostar — spendera dina mynt", "open": "Uppgraderingar", "balance": "{n} mynt", "buy": "Köp", "max": "MAX", "level": "Nivå {n}/{max}", "owned": "Ägd", "close": "Klar", "broke": "Inte tillräckligt med mynt", "steadyCable": { "name": "Stadig vajer", "desc": "Saktar kranens sving för enklare tajming" }, "wideFooting": { "name": "Brett fundament", "desc": "Breddar fönstret för perfekt landning" }, "windbreak": { "name": "Vindskydd", "desc": "Lugnar vinden på hög höjd" }, "masterArchitect": { "name": "Mästararkitekt", "desc": "Större myntbelöningar vid varje släpp" }, "reinforcedCore": { "name": "Förstärkt kärna", "desc": "Överlev en vingling till innan tornet välter" }, "quickRecovery": { "name": "Snabb återhämtning", "desc": "Tornet rätar upp sig snabbare" }, "tailwind": { "name": "Medvind", "desc": "Varje våning klättrar lite högre" }, "salvage": { "name": "Bärgningsrigg", "desc": "Ett ras fäller färre våningar" }, "momentum": { "name": "Momentum", "desc": "Perfekta släpp i rad ger ännu mer" }, "centerMagnet": { "name": "Gravitationskärna", "desc": "Dåliga släpp drar ändå tornet tillbaka mot mitten" } },
-    "verdict": { "perfect": "Perfekt!", "good": "Snyggt!", "sloppy": "Slarvigt", "miss": "Miss!" },
-    "sabotage": { "chip": "Rivningskula", "tokens": "{n}", "pickTarget": "Välj en rival", "noTargets": "Inga rivaler att rikta sig mot än", "confirm": "Skicka rivningskula till {name}?", "send": "Skicka", "cancel": "Avbryt", "sentTo": "💥 Träffade {name} — −1m", "incoming": "🚨 Sabotage på väg från {name}!", "recovered": "Tornet står. Klättra på.", "earned": "🎯 Rivningskula intjänad!", "earnedHint": "Ny zon eller bedrift!", "watchAd": "📺 Se annons +1", "adEarned": "🎯 Token via annons!", "smashTitle": "Släpp kula!", "smashCta": "SMASH!", "smashReleasing": "Släpper…", "floorsDestroyed": "−{n} VÅNINGAR!", "newHeight": "Ny höjd:", "strikeCta": "SLÅ!", "strikeHint": "Tryck när mätaren når det gröna fältet", "verdict": { "perfect": "PERFEKT TRÄFF!", "solid": "BRA TRÄFF", "weak": "SNUDDTRÄFF" }, "done": "KLART" },
-    "reward": { "tier": { "common": "Mynt", "uncommon": "Fin fångst!", "rare": "Sällsynt fynd!", "epic": "JACKPOT!" } },
-    "wreck": { "reportTitle": "Tornet raidat!", "reportBody": "{name} slog ner {floors} våningar medan du var borta — här är en omblandning för att slå tillbaka.", "defaultName": "En rival" },
-    "error": { "too_short": "För kort — minst 3 bokstäver", "bad_chain": "Börja på den lysande bokstaven", "not_buildable": "Använd brickornas bokstäver", "duplicate": "Ordet är redan använt", "not_in_dictionary": "Inte i ordlistan" },
-    "celebration": { "highRise": "Höghus!", "tall": "Skyhögt!", "skyscraper": "SKYSKRAPA!" },
-    "leaderboard": { "title": "Topptorn", "error": "Kunde inte ladda topplistan", "empty": "Inga torn än — bli först!" },
-    "share": { "title": "Ordtorn", "button": "Dela", "text": "Jag nådde {m} m i Ordtorn — slå mitt torn!" },
-    "versus": { "title": "Tornrace", "bomb": "Bomba {name}", "waiting": "Väntar på motståndare…", "incoming": "Inkommande bomb!", "won": "Du vann!", "lost": "{name} vann" },
-    "a11y": { "height": "Höjd {m} meter", "combo": "kedja {n}", "tile": "Bokstav {letter}", "goldenTile": "Gyllene bokstav {letter}" },
+    "biome": {
+      "city": "Mark",
+      "sky": "Himmel",
+      "stratosphere": "Stratosfär",
+      "orbit": "Omloppsbana",
+      "nebula": "Nebulosa",
+      "galaxy": "Galax"
+    },
+    "tier": {
+      "apprentice": "Lärling",
+      "journeyman": "Gesäll",
+      "master": "Mästararkitekt"
+    },
+    "hud": {
+      "floors": "{n} våningar",
+      "combo": "{n} kedja",
+      "scramble": "Blanda",
+      "backspace": "Radera",
+      "build": "Bygg",
+      "restart": "Börja om",
+      "restartConfirm": "Säker?",
+      "best": "Bästa {m} m",
+      "possible": "{n} ord",
+      "clue": "Ledtråd",
+      "collapse": "Fäll ihop",
+      "expand": "Expandera",
+      "rivalPassed": "Förbi {name}!",
+      "stuck": "Fast? Ny bokstav",
+      "backToTop": "Toppen",
+      "pickLetters": "Välj bokstäver",
+      "dragToBuild": "Dra eller tryck för att stava",
+      "keepBuilding": "Fortsätt bygga",
+      "menuOpen": "Fler åtgärder",
+      "menuClose": "Stäng meny",
+      "chaseGap": "+{m} m",
+      "chaseAria": "Nästa rival ovanför: {name}, {m} meter kvar att passera"
+    },
+    "minimap": {
+      "label": "Tornkarta — {m} m, tryck för toppen"
+    },
+    "milestone": {
+      "m50": "Över trädtopparna! 🌳",
+      "m150": "Molnland ☁️",
+      "m400": "Fåglarna är avundsjuka 🐦",
+      "m250": "Högre än drönarna 🛸",
+      "m650": "Nebulosakänsla 🌌",
+      "m900": "Knack knack, rymden? 🚀",
+      "m1300": "Bor i yttre rymden 👽",
+      "m1800": "Nästan astronaut nu ✨"
+    },
+    "ach": {
+      "unlocked": "Bedrift!",
+      "firstFloor": "Första våningen",
+      "tenFloors": "Höghus",
+      "skyHigh": "Skyhögt",
+      "wordsmith": "Ordkonstnär",
+      "comboKing": "Combo-kung",
+      "rivalCrusher": "Rivalkrossare",
+      "unstoppable": "Ostoppbar",
+      "toTheMoon": "Till månen",
+      "skylineKing": "Skyline-kung",
+      "centurion": "Centurion",
+      "comboGod": "Combo-gud",
+      "wordWizard": "Ordtrollkarl",
+      "galaxyClass": "Galaxklass",
+      "deepSpace": "Yttre rymden"
+    },
+    "zone": {
+      "entered": "Ny zon",
+      "next": "Nästa: {zone} · {m}m"
+    },
+    "landmark": {
+      "skyscraper": "Skyskrapans topp",
+      "cloudBase": "Molnbas",
+      "mountainTop": "Bergstopp",
+      "jetStream": "Jetström",
+      "stormTops": "Stormtoppar",
+      "weatherBalloon": "Väderballong",
+      "earthCurve": "Jordens krökning",
+      "karman": "Rymdens kant",
+      "meteorBelt": "Meteorbälte",
+      "aurora": "Norrsken",
+      "deepSpace": "Yttre rymden"
+    },
+    "hazard": {
+      "bomb": "Bomb",
+      "hurricane": "Orkan",
+      "wobble": "Vingel",
+      "sabotage": "Sabotage",
+      "lost": "{kind}! −{n} våningar"
+    },
+    "clutch": {
+      "save": "Räddning i sista stund!",
+      "critical": "Vacklar — landa rent!"
+    },
+    "surprise": {
+      "nextWord": "Nästa ord",
+      "surge": "Stöt!",
+      "windfall": "Skänk!",
+      "updraft": "Uppvind! Nästa ord boostat",
+      "crystal": "Kristallfynd!",
+      "goldenFloor": "Gyllene våning!"
+    },
+    "daily": {
+      "badge": "Daglig · {date}",
+      "streak": "{n} dagar i rad",
+      "toDaily": "Daglig",
+      "toEndless": "Oändlig",
+      "newBest": "Nytt dagsrekord!",
+      "questTitle": "Ordtorn",
+      "questDesc": "Stapla ord mot skyn — samma bokstäver för alla idag."
+    },
+    "perk": {
+      "title": "Välj en förmån",
+      "subtitle": "Välj en — den varar hela klättringen",
+      "skip": "Hoppa över",
+      "masterCrane": {
+        "name": "Mästarkran",
+        "desc": "Större belöning vid perfekta släpp"
+      },
+      "tallTimber": {
+        "name": "Högt virke",
+        "desc": "+12% höjd på varje våning"
+      },
+      "featherfall": {
+        "name": "Fjäderfall",
+        "desc": "Ras kostar en våning mindre"
+      },
+      "reinforced": {
+        "name": "Förstärkt",
+        "desc": "Mer vinglande innan kanten"
+      },
+      "cushion": {
+        "name": "Säkerhetsdyna",
+        "desc": "Kranvinglande tappar aldrig en våning"
+      }
+    },
+    "runPerk": {
+      "hotStreak": {
+        "a11y": "Varm streak: {n} kast kvar"
+      }
+    },
+    "crane": {
+      "place": "Placera ditt ord",
+      "steer": "Styr & släpp",
+      "tapToDrop": "Tryck för att släppa",
+      "perfect": "Perfekt!",
+      "good": "Snyggt!",
+      "sloppy": "Vingligt",
+      "miss": "Hoppsan!",
+      "stability": "Stabilitet",
+      "steady": "Stadig",
+      "onFire": "På gång",
+      "steadyAria": "Stadig hand-svit: {n} perfekta släpp"
+    },
+    "upgrade": {
+      "categories": {
+        "crane": "Kran",
+        "stability": "Stabilitet",
+        "boost": "Boost"
+      },
+      "recommended": "Bästa valet",
+      "title": "Tornuppgraderingar",
+      "subtitle": "Permanenta boostar — spendera dina mynt",
+      "open": "Uppgraderingar",
+      "balance": "{n} mynt",
+      "buy": "Köp",
+      "max": "MAX",
+      "level": "Nivå {n}/{max}",
+      "owned": "Ägd",
+      "close": "Klar",
+      "broke": "Inte tillräckligt med mynt",
+      "steadyCable": {
+        "name": "Stadig vajer",
+        "desc": "Saktar kranens sving för enklare tajming"
+      },
+      "wideFooting": {
+        "name": "Brett fundament",
+        "desc": "Breddar fönstret för perfekt landning"
+      },
+      "windbreak": {
+        "name": "Vindskydd",
+        "desc": "Lugnar vinden på hög höjd"
+      },
+      "masterArchitect": {
+        "name": "Mästararkitekt",
+        "desc": "Större myntbelöningar vid varje släpp"
+      },
+      "reinforcedCore": {
+        "name": "Förstärkt kärna",
+        "desc": "Överlev en vingling till innan tornet välter"
+      },
+      "quickRecovery": {
+        "name": "Snabb återhämtning",
+        "desc": "Tornet rätar upp sig snabbare"
+      },
+      "tailwind": {
+        "name": "Medvind",
+        "desc": "Varje våning klättrar lite högre"
+      },
+      "salvage": {
+        "name": "Bärgningsrigg",
+        "desc": "Ett ras fäller färre våningar"
+      },
+      "momentum": {
+        "name": "Momentum",
+        "desc": "Perfekta släpp i rad ger ännu mer"
+      },
+      "centerMagnet": {
+        "name": "Gravitationskärna",
+        "desc": "Dåliga släpp drar ändå tornet tillbaka mot mitten"
+      }
+    },
+    "verdict": {
+      "perfect": "Perfekt!",
+      "good": "Snyggt!",
+      "sloppy": "Slarvigt",
+      "miss": "Miss!"
+    },
+    "sabotage": {
+      "chip": "Rivningskula",
+      "tokens": "{n}",
+      "pickTarget": "Välj en rival",
+      "noTargets": "Inga rivaler att rikta sig mot än",
+      "confirm": "Skicka rivningskula till {name}?",
+      "send": "Skicka",
+      "cancel": "Avbryt",
+      "sentTo": "💥 Träffade {name} — −1m",
+      "incoming": "🚨 Sabotage på väg från {name}!",
+      "recovered": "Tornet står. Klättra på.",
+      "earned": "🎯 Rivningskula intjänad!",
+      "earnedHint": "Ny zon eller bedrift!",
+      "watchAd": "📺 Se annons +1",
+      "adEarned": "🎯 Token via annons!",
+      "smashTitle": "Släpp kula!",
+      "smashCta": "SMASH!",
+      "smashReleasing": "Släpper…",
+      "floorsDestroyed": "−{n} VÅNINGAR!",
+      "newHeight": "Ny höjd:",
+      "strikeCta": "SLÅ!",
+      "strikeHint": "Tryck när mätaren når det gröna fältet",
+      "verdict": {
+        "perfect": "PERFEKT TRÄFF!",
+        "solid": "BRA TRÄFF",
+        "weak": "SNUDDTRÄFF"
+      },
+      "done": "KLART"
+    },
+    "reward": {
+      "tier": {
+        "common": "Mynt",
+        "uncommon": "Fin fångst!",
+        "rare": "Sällsynt fynd!",
+        "epic": "JACKPOT!"
+      }
+    },
+    "wreck": {
+      "reportTitle": "Tornet raidat!",
+      "reportBody": "{name} slog ner {floors} våningar medan du var borta — här är en omblandning för att slå tillbaka.",
+      "defaultName": "En rival"
+    },
+    "error": {
+      "too_short": "För kort — minst 3 bokstäver",
+      "bad_chain": "Börja på den lysande bokstaven",
+      "not_buildable": "Använd brickornas bokstäver",
+      "duplicate": "Ordet är redan använt",
+      "not_in_dictionary": "Inte i ordlistan"
+    },
+    "celebration": {
+      "highRise": "Höghus!",
+      "tall": "Skyhögt!",
+      "skyscraper": "SKYSKRAPA!"
+    },
+    "leaderboard": {
+      "title": "Topptorn",
+      "error": "Kunde inte ladda topplistan",
+      "empty": "Inga torn än — bli först!"
+    },
+    "share": {
+      "title": "Ordtorn",
+      "button": "Dela",
+      "text": "Jag nådde {m} m i Ordtorn — slå mitt torn!"
+    },
+    "versus": {
+      "title": "Tornrace",
+      "bomb": "Bomba {name}",
+      "waiting": "Väntar på motståndare…",
+      "incoming": "Inkommande bomb!",
+      "won": "Du vann!",
+      "lost": "{name} vann"
+    },
+    "a11y": {
+      "height": "Höjd {m} meter",
+      "combo": "kedja {n}",
+      "tile": "Bokstav {letter}",
+      "goldenTile": "Gyllene bokstav {letter}"
+    },
     "skin": {
       "pickerTitle": "Tornskal",
       "open": "Tornskal",
@@ -589,12 +1040,30 @@ const sv = {
       "equip": "Utrusta",
       "equipped": "Utrustad",
       "unlockedToast": "Nytt skal upplåst!",
-      "classic": { "name": "Klassisk", "blurb": "Ärlig betong och stål." },
-      "copper": { "name": "Koppar", "blurb": "Oxiderad, handsmidbar värme." },
-      "marble": { "name": "Marmor", "blurb": "Blekt sten, ådrig och cool." },
-      "gold": { "name": "Guldrus", "blurb": "Borstlat guld, väl förtjänat." },
-      "onyx": { "name": "Onyx", "blurb": "Grafit till svart glas." },
-      "aurora": { "name": "Aurora", "blurb": "Legering som fångar nebulosan." }
+      "classic": {
+        "name": "Klassisk",
+        "blurb": "Ärlig betong och stål."
+      },
+      "copper": {
+        "name": "Koppar",
+        "blurb": "Oxiderad, handsmidbar värme."
+      },
+      "marble": {
+        "name": "Marmor",
+        "blurb": "Blekt sten, ådrig och cool."
+      },
+      "gold": {
+        "name": "Guldrus",
+        "blurb": "Borstlat guld, väl förtjänat."
+      },
+      "onyx": {
+        "name": "Onyx",
+        "blurb": "Grafit till svart glas."
+      },
+      "aurora": {
+        "name": "Aurora",
+        "blurb": "Legering som fångar nebulosan."
+      }
     }
   },
   "flag": "🇸🇪",
@@ -718,10 +1187,10 @@ const sv = {
       "ogDescription": "Experttips, strategier och insikter för att förbättra dina ordspelsfärdigheter."
     },
     "adventure": {
-        "title": "Ordäventyrsspel - RPG Ordpussel Gratis",
-        "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 100 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
-        "ogTitle": "LexiClash Äventyr - RPG Ordpussel",
-        "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 100 nivåer, 10 världar. Spela gratis!"
+      "title": "Ordäventyrsspel - RPG Ordpussel Gratis",
+      "description": "Ge dig ut på ett episkt ordäventyr! Slåss mot bossar, erövra 100 nivåer i 10 temavärldar. Gratis RPG-ordpussel med specialbrickor och power-ups.",
+      "ogTitle": "LexiClash Äventyr - RPG Ordpussel",
+      "ogDescription": "Slåss mot bossar i ett episkt ordäventyr! 100 nivåer, 10 världar. Spela gratis!"
     },
     "blast": {
       "title": "Blast-läge - Kedja Ord Till Explosiva Kombos | LexiClash",
@@ -1129,7 +1598,6 @@ const sv = {
     "opponent": "Motståndare",
     "coins": "mynt",
     "xp": "XP",
-    "chat": "Chatt",
     "connecting": "Ansluter...",
     "signIn": "Logga in",
     "connectedToServer": "Redo!",
@@ -1816,13 +2284,13 @@ const sv = {
       "expressions": "Uttryck",
       "eyeColor": "Ögonfärg",
       "nose": "Näsa",
-      bodyStyles: {
-        default: "Standard",
-        hoodie: "Hoodie",
-        suit: "Kostym",
-        turtleneck: "Polotröja",
-        offShoulder: "Off-Shoulder",
-        cropTop: "Crop Top"
+      "bodyStyles": {
+        "default": "Standard",
+        "hoodie": "Hoodie",
+        "suit": "Kostym",
+        "turtleneck": "Polotröja",
+        "offShoulder": "Off-Shoulder",
+        "cropTop": "Crop Top"
       }
     },
     "premium": {
@@ -2426,23 +2894,142 @@ const sv = {
       "andMore": "och {count} spelare till",
       "andMorePlural": "och {count} spelare till",
       "archetypes": {
-        "the-ghost": { "title": "SPÖKET", "stat": "unika fynd", "quip1": "Hittade ord som inte ens finns i andra spelares mardrömmar.", "quip2": "Verkar i en dimension bara de kan se.", "quip3": "Osynlig för konkurrenterna. Dödlig på poängtavlan.", "quip4": "Om ett ord finns på brädet och bara en spelare hittar det... fanns det verkligen där?" },
-        "the-sniper": { "title": "PRICKSKYTTEN", "stat": "precision", "quip1": "Andra spelare gissar. Den här VET.", "quip2": "Missar inte. Tvekar inte. Skickar inte skräp.", "quip3": "Varje ord en fullträff. Varje tangenttryck avsiktligt.", "quip4": "Kirurgisk precision. Inga slösade drag." },
-        "the-philosopher": { "title": "FILOSOFEN", "stat": "snittlängd", "quip1": "Varför använda korta ord när långa fungerar bättre?", "quip2": "Tänkarens spelare. Stora ord, stor hjärna.", "quip3": "Medan andra skrev 'katt', skrev den här 'katastrof'.", "quip4": "Kvalitet framför kvantitet. Alltid." },
-        "the-one-hit-wonder": { "title": "ENGÅNGSUNDRET", "stat": "bästa ord", "quip1": "Ett ord för att styra dem alla.", "quip2": "Kom för ett ord. Fick det att räknas.", "quip3": "Ibland behöver man bara ett perfekt skott.", "quip4": "Få ord, men vilket ord det var." },
-        "the-silent-assassin": { "title": "TYSTA LÖNNMÖRDAREN", "stat": "poäng/ord", "quip1": "Färre ord, maximal skada.", "quip2": "Tyst men dödlig. Poängtavlan berättar historien.", "quip3": "Ekonomi i rörelse. Varje ord ett precisionsslag.", "quip4": "Talar tyst, bär ett massivt ordförråd." },
-        "the-sleeping-giant": { "title": "SOVANDE JÄTTEN", "stat": "2:a halvlek poäng", "quip1": "Började ta en tupplur, vaknade sedan och valde våld.", "quip2": "Långsam start? Nej. Strategiskt tålamod.", "quip3": "Comebacken ingen såg komma.", "quip4": "Som en raket... behövde bara en längre nedräkning." },
-        "the-frontrunner": { "title": "LEDAREN", "stat": "1:a halvlek poäng", "quip1": "Kom ut slagandes och tittade aldrig tillbaka.", "quip2": "Sprintade medan andra fortfarande värmde upp.", "quip3": "Först att attackera brädet. Först att dominera.", "quip4": "Satte tempot. Resten jagade ikapp." },
-        "the-speed-runner": { "title": "SNABBSPRINTERN", "stat": "ord/min", "quip1": "Fingrar snabbare än ögat kan följa.", "quip2": "Snabba skurar. Korta salvor. Förödande resultat.", "quip3": "Skriver i tankens hastighet.", "quip4": "Snabba ord, snabba vinster." },
-        "the-machine-gun": { "title": "KULSPRUTAN", "stat": "totalt antal ord", "quip1": "Kvantitet är en kvalitet i sig. Fråga bara den här legenden.", "quip2": "Fler ord än en ordbok. Ostoppbar produktion.", "quip3": "Brädet hade ingen chans mot denna volym.", "quip4": "Brrrrrt. Det är ljudet av ord som skickas in." },
-        "the-metronome": { "title": "METRONOMEN", "stat": "takt", "quip1": "Tick. Ord. Tock. Ord. Som ett urverk.", "quip2": "Konsekvens är det hemliga vapnet ingen pratar om.", "quip3": "En rytm så stadig att man kan ställa klockan efter den.", "quip4": "Ingen brådska. Ingen panik. Bara ren, stadig produktion." },
-        "the-wildcard": { "title": "JOKERN", "stat": "längdvariation", "quip1": "Korta ord, långa ord, medellånga ord — ALLA ord.", "quip2": "Oförutsägbar. Oklassificerbar. Ostoppbar.", "quip3": "Den enda strategin är att inte ha en strategi.", "quip4": "Mästare på alla längder, kung av förvirring." },
-        "the-marathon-runner": { "title": "MARATONLÖPAREN", "stat": "täckning", "quip1": "Först att starta, sist att sluta. Uthållighetsmästare.", "quip2": "Fortsatte medan andra tog pauser.", "quip3": "Från första sekunden till sista. Slutade aldrig.", "quip4": "Sköldpaddan som också råkade vara en hare." },
-        "the-combo-master": { "title": "KOMBOMÄSTAREN", "stat": "max combo", "quip1": "K-K-K-KOMBOBRYTARE! Nej vänta, kombo-BYGGARE.", "quip2": "Kedjade ord som en ordmaskin.", "quip3": "När du är på en svit, varför sluta?", "quip4": "Kombonivå: legendarisk. Motstånd: skakande." },
-        "the-fire-walker": { "title": "ELDVANDRAREN", "stat": "eldbonus", "quip1": "Trivs när hettan är på. Bokstavligt.", "quip2": "Eldrundan? Mer som DERAS runda.", "quip3": "Vissa spelare fruktar elden. Den här dansar i den.", "quip4": "Heta händer, hetare poäng." },
-        "the-social-butterfly": { "title": "SOCIALA FJÄRILEN", "stat": "populära val", "quip1": "Stora hjärnor tänker lika — och den här tänker som alla.", "quip2": "Hittade alla ord som alla andra hittade, plus vibbar.", "quip3": "Populära ordval? Den här spelaren har publikfavoriterna.", "quip4": "Alltid på samma våglängd som gruppen." },
-        "the-underdog": { "title": "UNDERDOGEN", "stat": "precision", "quip1": "Lågt i rankingen, högt i precision. Respekt.", "quip2": "Poängen berättar inte hela historien.", "quip3": "Inte förstaplats, men definitivt först i hjärtat.", "quip4": "Bevis på att rankingar inte är allt." },
-        "the-participant": { "title": "DELTAGAREN", "stat": "ord", "quip1": "Inte alla hjältar bär mantel. Vissa skickar bara ord.", "quip2": "Dök upp. Spelade spelet. Det är vad som räknas.", "quip3": "En mystisk spelare. En legend i vardande.", "quip4": "Resan på tusen ord börjar med ett." }
+        "the-ghost": {
+          "title": "SPÖKET",
+          "stat": "unika fynd",
+          "quip1": "Hittade ord som inte ens finns i andra spelares mardrömmar.",
+          "quip2": "Verkar i en dimension bara de kan se.",
+          "quip3": "Osynlig för konkurrenterna. Dödlig på poängtavlan.",
+          "quip4": "Om ett ord finns på brädet och bara en spelare hittar det... fanns det verkligen där?"
+        },
+        "the-sniper": {
+          "title": "PRICKSKYTTEN",
+          "stat": "precision",
+          "quip1": "Andra spelare gissar. Den här VET.",
+          "quip2": "Missar inte. Tvekar inte. Skickar inte skräp.",
+          "quip3": "Varje ord en fullträff. Varje tangenttryck avsiktligt.",
+          "quip4": "Kirurgisk precision. Inga slösade drag."
+        },
+        "the-philosopher": {
+          "title": "FILOSOFEN",
+          "stat": "snittlängd",
+          "quip1": "Varför använda korta ord när långa fungerar bättre?",
+          "quip2": "Tänkarens spelare. Stora ord, stor hjärna.",
+          "quip3": "Medan andra skrev 'katt', skrev den här 'katastrof'.",
+          "quip4": "Kvalitet framför kvantitet. Alltid."
+        },
+        "the-one-hit-wonder": {
+          "title": "ENGÅNGSUNDRET",
+          "stat": "bästa ord",
+          "quip1": "Ett ord för att styra dem alla.",
+          "quip2": "Kom för ett ord. Fick det att räknas.",
+          "quip3": "Ibland behöver man bara ett perfekt skott.",
+          "quip4": "Få ord, men vilket ord det var."
+        },
+        "the-silent-assassin": {
+          "title": "TYSTA LÖNNMÖRDAREN",
+          "stat": "poäng/ord",
+          "quip1": "Färre ord, maximal skada.",
+          "quip2": "Tyst men dödlig. Poängtavlan berättar historien.",
+          "quip3": "Ekonomi i rörelse. Varje ord ett precisionsslag.",
+          "quip4": "Talar tyst, bär ett massivt ordförråd."
+        },
+        "the-sleeping-giant": {
+          "title": "SOVANDE JÄTTEN",
+          "stat": "2:a halvlek poäng",
+          "quip1": "Började ta en tupplur, vaknade sedan och valde våld.",
+          "quip2": "Långsam start? Nej. Strategiskt tålamod.",
+          "quip3": "Comebacken ingen såg komma.",
+          "quip4": "Som en raket... behövde bara en längre nedräkning."
+        },
+        "the-frontrunner": {
+          "title": "LEDAREN",
+          "stat": "1:a halvlek poäng",
+          "quip1": "Kom ut slagandes och tittade aldrig tillbaka.",
+          "quip2": "Sprintade medan andra fortfarande värmde upp.",
+          "quip3": "Först att attackera brädet. Först att dominera.",
+          "quip4": "Satte tempot. Resten jagade ikapp."
+        },
+        "the-speed-runner": {
+          "title": "SNABBSPRINTERN",
+          "stat": "ord/min",
+          "quip1": "Fingrar snabbare än ögat kan följa.",
+          "quip2": "Snabba skurar. Korta salvor. Förödande resultat.",
+          "quip3": "Skriver i tankens hastighet.",
+          "quip4": "Snabba ord, snabba vinster."
+        },
+        "the-machine-gun": {
+          "title": "KULSPRUTAN",
+          "stat": "totalt antal ord",
+          "quip1": "Kvantitet är en kvalitet i sig. Fråga bara den här legenden.",
+          "quip2": "Fler ord än en ordbok. Ostoppbar produktion.",
+          "quip3": "Brädet hade ingen chans mot denna volym.",
+          "quip4": "Brrrrrt. Det är ljudet av ord som skickas in."
+        },
+        "the-metronome": {
+          "title": "METRONOMEN",
+          "stat": "takt",
+          "quip1": "Tick. Ord. Tock. Ord. Som ett urverk.",
+          "quip2": "Konsekvens är det hemliga vapnet ingen pratar om.",
+          "quip3": "En rytm så stadig att man kan ställa klockan efter den.",
+          "quip4": "Ingen brådska. Ingen panik. Bara ren, stadig produktion."
+        },
+        "the-wildcard": {
+          "title": "JOKERN",
+          "stat": "längdvariation",
+          "quip1": "Korta ord, långa ord, medellånga ord — ALLA ord.",
+          "quip2": "Oförutsägbar. Oklassificerbar. Ostoppbar.",
+          "quip3": "Den enda strategin är att inte ha en strategi.",
+          "quip4": "Mästare på alla längder, kung av förvirring."
+        },
+        "the-marathon-runner": {
+          "title": "MARATONLÖPAREN",
+          "stat": "täckning",
+          "quip1": "Först att starta, sist att sluta. Uthållighetsmästare.",
+          "quip2": "Fortsatte medan andra tog pauser.",
+          "quip3": "Från första sekunden till sista. Slutade aldrig.",
+          "quip4": "Sköldpaddan som också råkade vara en hare."
+        },
+        "the-combo-master": {
+          "title": "KOMBOMÄSTAREN",
+          "stat": "max combo",
+          "quip1": "K-K-K-KOMBOBRYTARE! Nej vänta, kombo-BYGGARE.",
+          "quip2": "Kedjade ord som en ordmaskin.",
+          "quip3": "När du är på en svit, varför sluta?",
+          "quip4": "Kombonivå: legendarisk. Motstånd: skakande."
+        },
+        "the-fire-walker": {
+          "title": "ELDVANDRAREN",
+          "stat": "eldbonus",
+          "quip1": "Trivs när hettan är på. Bokstavligt.",
+          "quip2": "Eldrundan? Mer som DERAS runda.",
+          "quip3": "Vissa spelare fruktar elden. Den här dansar i den.",
+          "quip4": "Heta händer, hetare poäng."
+        },
+        "the-social-butterfly": {
+          "title": "SOCIALA FJÄRILEN",
+          "stat": "populära val",
+          "quip1": "Stora hjärnor tänker lika — och den här tänker som alla.",
+          "quip2": "Hittade alla ord som alla andra hittade, plus vibbar.",
+          "quip3": "Populära ordval? Den här spelaren har publikfavoriterna.",
+          "quip4": "Alltid på samma våglängd som gruppen."
+        },
+        "the-underdog": {
+          "title": "UNDERDOGEN",
+          "stat": "precision",
+          "quip1": "Lågt i rankingen, högt i precision. Respekt.",
+          "quip2": "Poängen berättar inte hela historien.",
+          "quip3": "Inte förstaplats, men definitivt först i hjärtat.",
+          "quip4": "Bevis på att rankingar inte är allt."
+        },
+        "the-participant": {
+          "title": "DELTAGAREN",
+          "stat": "ord",
+          "quip1": "Inte alla hjältar bär mantel. Vissa skickar bara ord.",
+          "quip2": "Dök upp. Spelade spelet. Det är vad som räknas.",
+          "quip3": "En mystisk spelare. En legend i vardande.",
+          "quip4": "Resan på tusen ord börjar med ett."
+        }
       }
     }
   },
@@ -2628,18 +3215,42 @@ const sv = {
           "success": "PARERAT!"
         },
         "ability": {
-          "smite": { "name": "Slag", "desc": "Släpp loss en explosion av skada på bossen" },
-          "ward": { "name": "Sköld", "desc": "Blockera bossens nästa attack" },
-          "focus": { "name": "Fokus", "desc": "Ditt nästa ord slår med bonusskada" }
+          "smite": {
+            "name": "Slag",
+            "desc": "Släpp loss en explosion av skada på bossen"
+          },
+          "ward": {
+            "name": "Sköld",
+            "desc": "Blockera bossens nästa attack"
+          },
+          "focus": {
+            "name": "Fokus",
+            "desc": "Ditt nästa ord slår med bonusskada"
+          }
         }
       }
     },
     "surprise": {
-      "doubleGold": { "label": "Dubbelt Guld!", "desc": "Den här nivån ger dubbelt guld." },
-      "bonusChest": { "label": "Bonuskista!", "desc": "En extra skattkista dyker upp." },
-      "luckyGems": { "label": "Turädelstenar!", "desc": "Ett regn av ädelstenar." },
-      "goldenWord": { "label": "Gyllene Ord!", "desc": "Ett dolt ord var värt en jackpott." },
-      "comboFrenzy": { "label": "Combo-frenesi!", "desc": "Combo-belöningar räknades dubbelt på den här nivån." }
+      "doubleGold": {
+        "label": "Dubbelt Guld!",
+        "desc": "Den här nivån ger dubbelt guld."
+      },
+      "bonusChest": {
+        "label": "Bonuskista!",
+        "desc": "En extra skattkista dyker upp."
+      },
+      "luckyGems": {
+        "label": "Turädelstenar!",
+        "desc": "Ett regn av ädelstenar."
+      },
+      "goldenWord": {
+        "label": "Gyllene Ord!",
+        "desc": "Ett dolt ord var värt en jackpott."
+      },
+      "comboFrenzy": {
+        "label": "Combo-frenesi!",
+        "desc": "Combo-belöningar räknades dubbelt på den här nivån."
+      }
     },
     "welcome": {
       "title": "Välkommen till LexiClash!",
@@ -2931,7 +3542,7 @@ const sv = {
     "topPlayers": "Pallen",
     "otherPlayers": "Andra spelare",
     "foundWords": "hittade",
-    "yourPerformance": "Ditt spel",
+    "yourPerformance": "Din prestation",
     "viewDetails": "Djupdykning",
     "viewAllWords": "Alla ord",
     "viewXpBreakdown": "XP-uppdelning",
@@ -2989,8 +3600,6 @@ const sv = {
     "coinsEarned": "Mynt intjänade",
     "detailedAnalysis": "Detaljerad analys",
     "gameStats": "Spelstatistik",
-    "accuracy": "Precision",
-    "yourPerformance": "Din prestation",
     "rewards": "Belöningar",
     "standings": "Ställning",
     "guestSavePrompt": "Logga in för att spara belöningar",
@@ -3003,7 +3612,7 @@ const sv = {
     "time": "Tid",
     "place": "Plats",
     "words": "Ord",
-    "bestWord": "Bästa",
+    "bestWord": "Bästa Ord",
     "bestCombo": "Bästa Combo",
     "playersReady": "{count}/{total} Redo",
     "missedWords": "Ord du missade",
@@ -3022,11 +3631,11 @@ const sv = {
     },
     "crowns": {
       "sniper": "Prickskytten",
-      "speedDemon": "Snabbansen",
+      "speedDemon": "Blixtsnabb",
       "explorer": "Utforskaren",
-      "scholar": "Den lärde",
-      "clutch": "Avgörande spelaren",
-      "tank": "Stridsvagnen"
+      "scholar": "Akademikern",
+      "clutch": "Clutchspelaren",
+      "tank": "Pansarvagnen"
     },
     "crownDesc": {
       "sniper": "Flest poäng per ord. Kirurgiskt.",
@@ -3037,8 +3646,8 @@ const sv = {
       "tank": "Missade aldrig ett slag. Stabilt."
     },
     "everyoneReady": "Alla redo!",
-    "waitingForPlayers": "Väntar på spelare",
-    "ready": "Redo!",
+    "waitingForPlayers": "Väntar på att spelare ska bli redo...",
+    "ready": "Redo",
     "waiting": "Väntar...",
     "imReady": "Redo för nästa spel",
     "youAreReady": "Du är redo!",
@@ -3055,14 +3664,14 @@ const sv = {
     "leadChanges": "{{count}} ledningsbyten i spelet",
     "shareNarrativeWin": "Jag hittade {{word}} och fick {{score}} poäng i LexiClash!",
     "shareNarrativeLoss": "Jag hittade {{words}} ord för {{score}} poäng i LexiClash!",
-    "revengeRematch": "Revansch mot {{player}}?",
+    "revengeRematch": "RETURMATCH",
     "markReadyDescription": "Tryck på knappen för att markera dig redo för nästa spel",
     "allReadyHostCanStart": "🎉 Alla spelare redo! Du kan starta nästa runda.",
     "allPlayersReadyWaitingHost": "✓ Alla spelare redo — väntar på att värden startar",
     "hostWillStartWhenReady": "Värden startar nästa runda när alla är redo",
     "performanceHistory": "Prestationshistorik",
     "goToLobby": "Gå till lobby",
-    "you": "(Du)",
+    "you": "DU",
     "betterLuckNextTime": "Nästa runda!",
     "loserFeedback": {
       "almostPodium": "Nästan på prispallen!",
@@ -3075,7 +3684,7 @@ const sv = {
     "nextRoundMode": "Nästa rundas läge",
     "hostStartDescription": "Starta ett nytt spel när alla är redo!",
     "readyExplanation": "Tryck för att visa att du vill köra igen",
-    "defendTitle": "Försvara din titel!",
+    "defendTitle": "FÖRSVARA TITELN",
     "aheadOf": "före {player}",
     "findingWouldHaveTied": "Att hitta {words} hade gett oavgjort!",
     "showAllRankings": "+{count} fler spelare",
@@ -3104,14 +3713,13 @@ const sv = {
     "battleRankings": "Stridsranking",
     "players": "Spelare",
     "survivors": "Överlevande",
-    "eliminated": "Eliminerade",
+    "eliminated": "ELIMINERAD",
     "targetWord": "Målord",
     "foundByYou": "Hittad av dig!",
-    "survived": "Överlevde",
+    "survived": "ÖVERLEVDE",
     "ultimateChampion": "ULTIMAT MÄSTARE",
     "risingContender": "STIGANDE UTMANARE",
     "surviveLongerThan": "Överlev längre än @{player}!",
-    "waitingForPlayers": "Väntar på att spelare ska bli redo...",
     "waitingForHost": "Väntar på att värden startar nästa runda...",
     "scoringTip": "Poängtips",
     "scoringTipText": "Hitta ord snabbt i rad för kombobonus (⚡). Längre ord ger mycket mer poäng!",
@@ -3152,40 +3760,15 @@ const sv = {
     "target": "Mål",
     "totalPoints": "Totala Poäng",
     "revengeVs": "REVANSCH mot {player}",
-    "defendTitle": "FÖRSVARA TITELN",
-    "revengeRematch": "RETURMATCH",
-    "bestWord": "Bästa Ord",
-    "wordsFound": "Ord Hittade",
+    "wordsFound": "Ord hittade",
     "score": "Poäng",
-    "ready": "Redo",
-    "aheadOf": "före {player}",
-    "you": "DU",
-    "words": "Ord",
     "matchResults": "Prispallen",
-    "eliminated": "ELIMINERAD",
-    "survived": "ÖVERLEVDE",
     "ordinal1": "1:A PLATS",
     "ordinal2": "2:A PLATS",
     "ordinal3": "3:E PLATS",
     "ordinal4": "4:E PLATS",
     "ordinalN": "{n}:E PLATS",
     "soClose": "Så nära att det svider — {points} poäng från toppen.",
-    "crowns": {
-      "sniper": "Prickskytten",
-      "speedDemon": "Blixtsnabb",
-      "explorer": "Utforskaren",
-      "scholar": "Akademikern",
-      "clutch": "Clutchspelaren",
-      "tank": "Pansarvagnen"
-    },
-    "crownDesc": {
-      "sniper": "Flest poäng per ord. Kirurgiskt.",
-      "speedDemon": "Hittade fler ord än alla andra.",
-      "explorer": "Grävde fram ord ingen annan såg.",
-      "scholar": "Längst ord i snitt. Skrytmåns.",
-      "clutch": "Släppte det enskilt största ordet.",
-      "tank": "Missade aldrig ett slag. Stabilt."
-    },
     "potentialScore": "+{points} möjliga poäng",
     "comparativeInsights": {
       "title": "Hur du jämförde dig",
@@ -3223,7 +3806,6 @@ const sv = {
       "newSeries": "Ny serie",
       "waitingNewSeries": "Väntar på värd..."
     },
-    "wordsFound": "Ord hittade",
     "shareVictoryPrompt": "Dela din seger!",
     "victory": "SEGER!",
     "wellPlayed": "BRA SPELAT!",
@@ -3322,17 +3904,18 @@ const sv = {
     "skip": "Visa resultat"
   },
   "almostFound": {
-    "title": "Du hittade nästan...",
+    "title": "Du hittade nastan...",
     "matchPercent": "{percent}% matchning",
-    "wouldHaveScored": "+{score} poäng"
+    "wouldHaveScored": "+{score} poang"
   },
   "closeLoss": {
-    "soClose": "Så nära!",
-    "justPoints": "Bara {points} poäng ifrån!",
+    "soClose": "Sa nara!",
+    "justPoints": "Bara {points} poang bort!",
     "rematch": "Returmatch!",
     "rematchQuestion": "Returmatch?",
-    "almostHadIt": "Du hade det nästan!",
-    "nailBiter": "Vilken rysare!"
+    "almostHadIt": "Du hade nastan det!",
+    "nailBiter": "Vilken nagelbitare!",
+    "challengeBot": "Utmana en bot"
   },
   "player": {
     "new": "NY"
@@ -4074,20 +4657,6 @@ const sv = {
     "defaultTitle": "Ännu ett spel?",
     "defaultMessage": "Håll igång serien — spela igen!"
   },
-  "almostFound": {
-    "title": "Du hittade nastan...",
-    "matchPercent": "{percent}% matchning",
-    "wouldHaveScored": "+{score} poang"
-  },
-  "closeLoss": {
-    "soClose": "Sa nara!",
-    "justPoints": "Bara {points} poang bort!",
-    "rematch": "Returmatch!",
-    "rematchQuestion": "Returmatch?",
-    "almostHadIt": "Du hade nastan det!",
-    "nailBiter": "Vilken nagelbitare!",
-    "challengeBot": "Utmana en bot"
-  },
   "mysteryReward": {
     "title": "Mysteriebelöning",
     "youFound": "Du hittade en mysteriebelöning!",
@@ -4278,7 +4847,7 @@ const sv = {
       "winRate": "vinstprocent"
     },
     "coins": "Mynt",
-    "viewProfile": "Visa Profil",
+    "viewProfile": "Visa profil",
     "viewCoins": "Se dina mynt",
     "sections": {
       "overview": "Översikt",
@@ -4354,7 +4923,6 @@ const sv = {
     "addFriend": "Lägg till vän",
     "friends": "Vänner",
     "requestSent": "Förfrågan skickad",
-    "viewProfile": "Visa profil",
     "viewPublicProfile": "Visa offentlig profil",
     "games": "Spel"
   },
@@ -5389,18 +5957,54 @@ const sv = {
   },
   "season": {
     "twist": {
-      "double-down": { "title": "Dubbel insats", "blurb": "Långa ord ger som mest den här säsongen." },
-      "crown-rush": { "title": "Kronjakt", "blurb": "Varje bokstav är ett vapen. Ta tronen." },
-      "rare-find": { "title": "Sällsynt fynd", "blurb": "Damma av de ovanliga orden – det här är deras månad." },
-      "combo-beat": { "title": "Combo-takt", "blurb": "Stapla stavelser, rid på combon, håll takten." },
-      "sound-wave": { "title": "Ljudvåg", "blurb": "Blanda beats och bokstäver till listettor." },
-      "throne-climb": { "title": "Tronbestigning", "blurb": "Bygg din tron av varje ord du kan." },
-      "frostbite": { "title": "Frostbett", "blurb": "Håll din svit varm medan brädet fryser till." },
-      "afterglow": { "title": "Efterglöd", "blurb": "Neonspår följer varje ord du hittar." },
-      "heatwave": { "title": "Värmebölja", "blurb": "Ju längre svit, desto hetare glöder brädet." },
-      "bloom": { "title": "Blomning", "blurb": "Varje fynd sår nästa. Se din poäng blomstra." },
-      "stardust": { "title": "Stjärnstoft", "blurb": "Bokstäver driver som stjärnbilder över brädet." },
-      "final-bell": { "title": "Sista klockan", "blurb": "Året tar slut – varje poäng skrivs in i rekordböckerna." }
+      "double-down": {
+        "title": "Dubbel insats",
+        "blurb": "Långa ord ger som mest den här säsongen."
+      },
+      "crown-rush": {
+        "title": "Kronjakt",
+        "blurb": "Varje bokstav är ett vapen. Ta tronen."
+      },
+      "rare-find": {
+        "title": "Sällsynt fynd",
+        "blurb": "Damma av de ovanliga orden – det här är deras månad."
+      },
+      "combo-beat": {
+        "title": "Combo-takt",
+        "blurb": "Stapla stavelser, rid på combon, håll takten."
+      },
+      "sound-wave": {
+        "title": "Ljudvåg",
+        "blurb": "Blanda beats och bokstäver till listettor."
+      },
+      "throne-climb": {
+        "title": "Tronbestigning",
+        "blurb": "Bygg din tron av varje ord du kan."
+      },
+      "frostbite": {
+        "title": "Frostbett",
+        "blurb": "Håll din svit varm medan brädet fryser till."
+      },
+      "afterglow": {
+        "title": "Efterglöd",
+        "blurb": "Neonspår följer varje ord du hittar."
+      },
+      "heatwave": {
+        "title": "Värmebölja",
+        "blurb": "Ju längre svit, desto hetare glöder brädet."
+      },
+      "bloom": {
+        "title": "Blomning",
+        "blurb": "Varje fynd sår nästa. Se din poäng blomstra."
+      },
+      "stardust": {
+        "title": "Stjärnstoft",
+        "blurb": "Bokstäver driver som stjärnbilder över brädet."
+      },
+      "final-bell": {
+        "title": "Sista klockan",
+        "blurb": "Året tar slut – varje poäng skrivs in i rekordböckerna."
+      }
     },
     "name": "Säsong {{number}}: {{theme}}",
     "endingSoon": "Säsongen slutar snart!",
@@ -5633,7 +6237,7 @@ const sv = {
       "vaultTitle": "Myntvalv",
       "vaultSubtitle": "Samla mynt, lås upp belöningar"
     },
-    "playingNow": "Spelar Nu",
+    "playingNow": "spelar",
     "welcomeTitle": "Ord. Vänner. Seger.",
     "welcomeSubtitle": "Gratis. Ingen registrering. Inget pay-to-win.",
     "playTodayChallenge": "Spela dagens utmaning",
@@ -5654,8 +6258,6 @@ const sv = {
     "sectionMultiplayerSubtitle": "Live, snabbt, riktiga spelare",
     "sectionSoloTitle": "Ensam",
     "sectionSoloSubtitle": "Träna. Klättra. Slå ditt rekord.",
-    "moreGameModes": "Fler spellägen",
-    "moreGameModesHint": "Tryck för att utforska",
     "arena": "Multiplayer",
     "arenaDesc": "Spela ensam eller utmana vänner!",
     "offlineLocked": "Kräver internet",
@@ -5697,7 +6299,6 @@ const sv = {
     "signInToUnlock": "Logga in för att låsa upp",
     "openRooms": "öppna rum",
     "playersLive": "spelar nu",
-    "playingNow": "spelar",
     "tutorial": "Handledning",
     "personalBest": "personligt bästa",
     "shareModalTitle": "Bjud in vänner & tjäna XP",
@@ -5758,7 +6359,6 @@ const sv = {
     "hallOfFame": "Ärepallen",
     "careerPoints": "Karriärpoäng",
     "gamesToday": "Spel idag",
-    "gameModes": "Spellägen",
     "freeToPlay": "Gratis att spela",
     "wordHuntMode": "Ordjakt",
     "wordHuntModeDesc": "Hitta målordet så snabbt du kan — ett nytt pussel varje dag!",
@@ -6343,13 +6943,14 @@ const sv = {
     "viewResults": "VISA RESULTAT",
     "solved": "Löst",
     "failed": "Misslyckades",
-"wordHunt": {
-      "title": "Ordjakt",
+    "wordHunt": {
+      "title": "Word Hunt",
       "subtitle": "Överlevnadsläge",
-      "desc": "Snabb ordjakt mot klockan. Hitta så många ord du kan innan tiden rinner ut!",
+      "desc": "Knäck ordet. 10 försök.",
       "feature1": "90 sekunder",
       "feature2": "Kombosystem",
-      "feature3": "Global topplista"
+      "feature3": "Global topplista",
+      "details": "10 gissningar, färgledtrådar, 90 sekunder. Hitta bonusord för extra liv!"
     },
     "quitConfirm": "Dina framsteg sparas inte. Du måste titta på en annons för att spela igen idag.",
     "quitConfirmTitle": "Lämna mitt i spelet?",
@@ -6446,7 +7047,6 @@ const sv = {
     "challengeStats": "Utmaningsstatistik",
     "targetWord": "Målord",
     "totalPlayers": "Totalt spelare",
-    "solved": "Löst",
     "solveRate": "Lösningsgrad",
     "beatCreator": "Slog skaparen",
     "attemptDistribution": "Försöksfördelning",
@@ -6501,15 +7101,6 @@ const sv = {
       "startTraining": "Starta träning",
       "skipToDaily": "Hoppa över, jag klarar mig",
       "redirecting": "På väg till daglig utmaning..."
-    },
-    "wordHunt": {
-      "title": "Word Hunt",
-      "subtitle": "Överlevnadsläge",
-      "desc": "Knäck ordet. 10 försök.",
-      "feature1": "90 sekunder",
-      "feature2": "Kombosystem",
-      "feature3": "Global topplista",
-      "details": "10 gissningar, färgledtrådar, 90 sekunder. Hitta bonusord för extra liv!"
     },
     "nextChallenge": {
       "wordHuntTitle": "⚡ Daglig Word Hunt Väntar!",
@@ -6578,12 +7169,30 @@ const sv = {
       }
     },
     "insights": {
-      "personalBest": { "headline": "Nytt personbästa!", "sub": "+{n} poäng över ditt rekord" },
-      "percentile": { "headline": "Elit idag!", "sub": "Topp {n}% av alla spelare" },
-      "speed": { "headline": "Snabbast!", "sub": "{n}% snabbare än ditt snitt" },
-      "firstTry": { "headline": "Första försöket!", "sub": "Bara {n}% löste det på ett försök" },
-      "streakComplete": { "headline": "Veckan klar!", "sub": "Din kista är klar att öppna" },
-      "improved": { "headline": "Blir skarpare!", "sub": "Bättre än igår" }
+      "personalBest": {
+        "headline": "Nytt personbästa!",
+        "sub": "+{n} poäng över ditt rekord"
+      },
+      "percentile": {
+        "headline": "Elit idag!",
+        "sub": "Topp {n}% av alla spelare"
+      },
+      "speed": {
+        "headline": "Snabbast!",
+        "sub": "{n}% snabbare än ditt snitt"
+      },
+      "firstTry": {
+        "headline": "Första försöket!",
+        "sub": "Bara {n}% löste det på ett försök"
+      },
+      "streakComplete": {
+        "headline": "Veckan klar!",
+        "sub": "Din kista är klar att öppna"
+      },
+      "improved": {
+        "headline": "Blir skarpare!",
+        "sub": "Bättre än igår"
+      }
     }
   },
   "dailyWordWheelLanding": {
@@ -6595,21 +7204,51 @@ const sv = {
       "leaderboard": "Visa Världsrekordet"
     },
     "steps": {
-      "heading": "Så Fungerar Dagliga Ordhjulet",
-      "1": { "title": "Nytt pussel varje dag", "desc": "Ett nytt hjul med bokstäver dyker upp varje dag vid midnatt UTC. Alla spelare världen över får samma bokstäver." },
-      "2": { "title": "Hitta ord", "desc": "Bilda ord med hjulets bokstäver. Varje ord måste innehålla mittenbokstaven och vara minst 3 bokstäver långt. Längre ord = fler poäng." },
-      "3": { "title": "Slå klockan", "desc": "Hitta så många ord som möjligt innan tiden tar slut. Både snabbhet och ordförråd räknas." },
-      "4": { "title": "Jämför globalt", "desc": "Se hur du rankas på den dagliga topplistan. Jaga världsrekordet och följ din svit." }
+      "1": {
+        "title": "Nytt pussel varje dag",
+        "desc": "Ett nytt hjul med bokstäver dyker upp varje dag vid midnatt UTC. Alla spelare världen över får samma bokstäver."
+      },
+      "2": {
+        "title": "Hitta ord",
+        "desc": "Bilda ord med hjulets bokstäver. Varje ord måste innehålla mittenbokstaven och vara minst 3 bokstäver långt. Längre ord = fler poäng."
+      },
+      "3": {
+        "title": "Slå klockan",
+        "desc": "Hitta så många ord som möjligt innan tiden tar slut. Både snabbhet och ordförråd räknas."
+      },
+      "4": {
+        "title": "Jämför globalt",
+        "desc": "Se hur du rankas på den dagliga topplistan. Jaga världsrekordet och följ din svit."
+      },
+      "heading": "Så Fungerar Dagliga Ordhjulet"
     },
     "faq": {
       "heading": "Vanliga Frågor",
       "items": [
-        { "q": "Vad är Dagliga Ordhjulet?", "a": "Dagliga Ordhjulet är ett gratis dagligt ordpussel på LexiClash. Varje dag vid midnatt UTC dyker ett nytt hjul av bokstäver upp. Målet är att hitta så många ord som möjligt. Alla spelare världen över spelar samma pussel." },
-        { "q": "Hur spelar man?", "a": "Du får bokstäver arrangerade i ett hjul med en mittenbokstav. Bilda ord — varje ord måste innehålla mittenbokstaven och vara minst 3 bokstäver långt. Hitta så många ord som möjligt innan tiden tar slut." },
-        { "q": "Är det gratis?", "a": "Ja, helt gratis. Ingen nedladdning, ingen registrering, inga annonser. Spela i webbläsaren på valfri enhet." },
-        { "q": "Kan jag se världsrekordet?", "a": "Ja! Efter att du löst pusslet kan du se den globala topplistan med dagens högsta poäng." },
-        { "q": "Måste alla ord ha mittenbokstaven?", "a": "Ja! Varje ord du skickar in måste innehålla mittenbokstaven i hjulet. Det är den centrala utmaningen." },
-        { "q": "Vilka språk finns?", "a": "Dagliga Ordhjulet finns på engelska, hebreiska, svenska, japanska och spanska. Varje språk har eget lexikon och topplista." }
+        {
+          "q": "Vad är Dagliga Ordhjulet?",
+          "a": "Dagliga Ordhjulet är ett gratis dagligt ordpussel på LexiClash. Varje dag vid midnatt UTC dyker ett nytt hjul av bokstäver upp. Målet är att hitta så många ord som möjligt. Alla spelare världen över spelar samma pussel."
+        },
+        {
+          "q": "Hur spelar man?",
+          "a": "Du får bokstäver arrangerade i ett hjul med en mittenbokstav. Bilda ord — varje ord måste innehålla mittenbokstaven och vara minst 3 bokstäver långt. Hitta så många ord som möjligt innan tiden tar slut."
+        },
+        {
+          "q": "Är det gratis?",
+          "a": "Ja, helt gratis. Ingen nedladdning, ingen registrering, inga annonser. Spela i webbläsaren på valfri enhet."
+        },
+        {
+          "q": "Kan jag se världsrekordet?",
+          "a": "Ja! Efter att du löst pusslet kan du se den globala topplistan med dagens högsta poäng."
+        },
+        {
+          "q": "Måste alla ord ha mittenbokstaven?",
+          "a": "Ja! Varje ord du skickar in måste innehålla mittenbokstaven i hjulet. Det är den centrala utmaningen."
+        },
+        {
+          "q": "Vilka språk finns?",
+          "a": "Dagliga Ordhjulet finns på engelska, hebreiska, svenska, japanska och spanska. Varje språk har eget lexikon och topplista."
+        }
       ]
     },
     "finalCta": {
@@ -6760,7 +7399,7 @@ const sv = {
       "lifePoints": "Livspoäng",
       "eliminated": "Eliminerad",
       "guessTarget": "Gissa målordet",
-      "submit": "Skicka gissning",
+      "submit": "Skicka gissning"
     },
     "mp": {
       "players": "Spelare",
@@ -6776,12 +7415,12 @@ const sv = {
       "viewBoard": "Visa bräde",
       "boardReview": "Brädesöversikt",
       "ladder": {
-        "empty": "Inga ord ännu — hitta det första!",
+        "empty": "Inga ord ännu — hitta det första!"
       },
       "kbHint": {
         "submit": "skicka",
         "pop": "ta bort sista",
-        "clear": "rensa",
+        "clear": "rensa"
       },
       "stopGameConfirm": "Avsluta spelet för alla?",
       "stopGameYes": "Avsluta spelet",
@@ -7011,7 +7650,8 @@ const sv = {
       "backToDailyDesc": "Se dagens topplista",
       "playerWordsTitle": "{{name}}s väg",
       "youMissedWords": "Ord du missade",
-      "tapPlayerHint": "Tryck på en spelare för att se deras väg"
+      "tapPlayerHint": "Tryck på en spelare för att se deras väg",
+      "wordsFound": "Hittade ord"
     },
     "score": {
       "title": "Din Poäng",
@@ -7303,9 +7943,7 @@ const sv = {
     "block": "Blockera",
     "filterFriends": "Sök vänner...",
     "noMatchingFriends": "Inga matchande vänner",
-    "blocked": "Blockerad",
-    "blockedUsers": "Blockerade användare",
-    "unblock": "Avblockera"
+    "backToFriends": "Tillbaka till vänner"
   },
   "multiplayer": {
     "rank": {
@@ -7819,10 +8457,22 @@ const sv = {
       "timeUpHaul": "Tiden är ute — fin fångst!",
       "firstMissFree": "Uppvärmning — ingen skada. Du fixar det här!",
       "badge": {
-        "bronze": { "name": "Brons", "title": "Rep bankad!" },
-        "silver": { "name": "Silver", "title": "Bra jobbat!" },
-        "gold": { "name": "Guld", "title": "Du brinner!" },
-        "platinum": { "name": "Platina", "title": "En maskin!" }
+        "bronze": {
+          "name": "Brons",
+          "title": "Rep bankad!"
+        },
+        "silver": {
+          "name": "Silver",
+          "title": "Bra jobbat!"
+        },
+        "gold": {
+          "name": "Guld",
+          "title": "Du brinner!"
+        },
+        "platinum": {
+          "name": "Platina",
+          "title": "En maskin!"
+        }
       },
       "rarity": {
         "common": "vanlig",
@@ -8037,7 +8687,12 @@ const sv = {
     "teacherAccess": {
       "empty": "Inga begäranden",
       "title": "Lägaråtkomstbegäranden",
-      "count": { "pending": "Väntande", "approved": "Godkänd", "declined": "Avvisad", "total": "Totalt" },
+      "count": {
+        "pending": "Väntande",
+        "approved": "Godkänd",
+        "declined": "Avvisad",
+        "total": "Totalt"
+      },
       "filter_status": "Status",
       "filter_status_all": "Allt",
       "filter_locale": "Språk",
@@ -8046,9 +8701,27 @@ const sv = {
       "row_open": "Öppna ansökan från {name}",
       "page": "Sida",
       "export_csv": "Exportera CSV",
-      "col": { "name": "Namn", "email": "E-post", "role": "Roll", "locale": "Språk", "country": "Land", "status": "Status", "submitted": "Skickad" },
+      "col": {
+        "name": "Namn",
+        "email": "E-post",
+        "role": "Roll",
+        "locale": "Språk",
+        "country": "Land",
+        "status": "Status",
+        "submitted": "Skickad"
+      },
       "drawer_title": "Begärinformation",
-      "field": { "name": "Namn", "email": "E-post", "role": "Roll", "locale": "Språk", "country": "Land", "school": "Skola", "status": "Status", "submitted": "Skickad", "use_case": "Användningsfall" },
+      "field": {
+        "name": "Namn",
+        "email": "E-post",
+        "role": "Roll",
+        "locale": "Språk",
+        "country": "Land",
+        "school": "Skola",
+        "status": "Status",
+        "submitted": "Skickad",
+        "use_case": "Användningsfall"
+      },
       "admin_note": "Anteckning till sökanden (valfritt)",
       "note_hint": "Vid godkännande inkluderas anteckningen i välkomstmejlet till sökanden. Vid avslag används den som orsak.",
       "show_preview": "Förhandsgranska mejl",
@@ -8554,7 +9227,25 @@ const sv = {
     "milogWords": {
       "title": "Milog-ordboksanrikning",
       "subtitle": "Hebreiska ord verifierade mot milog.co.il"
-    }
+    },
+    "sendTitle": "Skicka meddelande",
+    "selectPlayers": "Välj mottagare",
+    "chooseType": "Välj typ",
+    "writeMessage": "Skriv meddelande",
+    "preview": "Förhandsgranskning",
+    "send": "Skicka",
+    "sending": "Skickar...",
+    "sent": "Meddelande skickat!",
+    "recipients": "Mottagare",
+    "type": "Typ",
+    "sendingTo": "Skickar till",
+    "titleLabel": "Titel",
+    "titlePlaceholder": "Meddelandetitel...",
+    "bodyLabel": "Meddelande",
+    "bodyPlaceholder": "Meddelandetext...",
+    "actionUrlLabel": "Åtgärds-URL",
+    "sendSuccess": "Meddelandet skickades!",
+    "sendError": "Misslyckades att skicka meddelandet. Försök igen."
   },
   "tvTutorial": {
     "welcome": {
@@ -8586,7 +9277,7 @@ const sv = {
     "help": "Visa handledning"
   },
   "quickPlay": {
-"solo": {
+    "solo": {
       "title": "Snabbspel",
       "round": "Runda",
       "random": "Slumpa",
@@ -8622,7 +9313,15 @@ const sv = {
       "rankProgress": "{points} / {next} till {rank}",
       "rankMax": "Högsta rangen nådd",
       "rankGained": "+{pts} rangpoäng denna runda",
-      "rank": {"rookie": "Nybörjare", "bronze": "Brons", "silver": "Silver", "gold": "Guld", "platinum": "Platina", "diamond": "Diamant", "legend": "Ordlegend"},
+      "rank": {
+        "rookie": "Nybörjare",
+        "bronze": "Brons",
+        "silver": "Silver",
+        "gold": "Guld",
+        "platinum": "Platina",
+        "diamond": "Diamant",
+        "legend": "Ordlegend"
+      },
       "shareTitle": "LexiClash Snabbspel",
       "shareText": "Jag fick {pct}% av perfekt på den här brädan. Samma bräda, din tur:"
     },
@@ -8799,17 +9498,14 @@ const sv = {
       "forge": "Ordsmide"
     },
     "mastery": {
-      "title": "Arketypbehärskning",
+      "label": "Mästerskap",
       "tier": {
-        "none": "Orankad",
         "bronze": "Brons",
         "silver": "Silver",
         "gold": "Guld",
+        "platinum": "Platina",
         "diamond": "Diamant"
-      },
-      "progress": "{current}/{target} stjärnor",
-      "bonusUnlocked": "Bonus upplåst: {description}",
-      "nextTier": "Nästa nivå: {tier} ({remaining} stjärnor kvar)"
+      }
     },
     "runes": {
       "title": "Runsamling",
@@ -8831,27 +9527,135 @@ const sv = {
         "epic": "Episk",
         "legendary": "Legendarisk"
       },
-      "ember": { "name": "Glödruna", "desc": "+10% poängbonus" },
-      "inferno": { "name": "Infernaruna", "desc": "+25% poängbonus" },
-      "midas": { "name": "Midasruna", "desc": "+15% guldbonus" },
-      "fortune": { "name": "Lyckosruna", "desc": "+40% guldbonus" },
-      "hourglass": { "name": "Timglasruna", "desc": "+5s bonustid" },
-      "eternity": { "name": "Evighetsruna", "desc": "+12s bonustid" },
-      "flow": { "name": "Flödesruna", "desc": "15% långsammare komboförlust" },
-      "torrent": { "name": "Forsenruna", "desc": "35% långsammare komboförlust" },
-      "insight": { "name": "Insiktsruna", "desc": "+1 ledtråd" },
-      "oracle": { "name": "Orakelruna", "desc": "+2 ledtrådar" },
-      "valor": { "name": "Modsruna", "desc": "+20% bossskada" },
-      "dragonslayer": { "name": "Drakdödarruna", "desc": "+50% bossskada" }
+      "ember": {
+        "name": "Glödruna",
+        "desc": "+10% poängbonus"
+      },
+      "inferno": {
+        "name": "Infernaruna",
+        "desc": "+25% poängbonus"
+      },
+      "midas": {
+        "name": "Midasruna",
+        "desc": "+15% guldbonus"
+      },
+      "fortune": {
+        "name": "Lyckosruna",
+        "desc": "+40% guldbonus"
+      },
+      "hourglass": {
+        "name": "Timglasruna",
+        "desc": "+5s bonustid"
+      },
+      "eternity": {
+        "name": "Evighetsruna",
+        "desc": "+12s bonustid"
+      },
+      "flow": {
+        "name": "Flödesruna",
+        "desc": "15% långsammare komboförlust"
+      },
+      "torrent": {
+        "name": "Forsenruna",
+        "desc": "35% långsammare komboförlust"
+      },
+      "insight": {
+        "name": "Insiktsruna",
+        "desc": "+1 ledtråd"
+      },
+      "oracle": {
+        "name": "Orakelruna",
+        "desc": "+2 ledtrådar"
+      },
+      "valor": {
+        "name": "Modsruna",
+        "desc": "+20% bossskada"
+      },
+      "dragonslayer": {
+        "name": "Drakdödarruna",
+        "desc": "+50% bossskada"
+      }
     },
     "achievements": {
       "title": "Prestationer",
-      "earned": "uppnådda",
+      "progress": "{current}/{next}",
+      "earned": "intjänade",
+      "hidden": "Dold",
+      "unlocked": "Prestation upplåst!",
+      "upgraded": "Prestation uppgraderad!",
       "categories": {
         "gameplay": "Spelande",
-        "bosses": "Bossar",
+        "bosses": "Bossstrider",
         "progression": "Framsteg",
         "mastery": "Mästerskap"
+      },
+      "firstWord": {
+        "name": "Första stegen",
+        "desc": "Hitta ditt första ord"
+      },
+      "wordStreak5": {
+        "name": "Het serie",
+        "desc": "Bygg en 5x kombo"
+      },
+      "wordStreak10": {
+        "name": "Ostoppbar",
+        "desc": "Bygg en 10x kombo"
+      },
+      "longWord6": {
+        "name": "Ordsmed",
+        "desc": "Hitta ett ord med 6+ bokstäver"
+      },
+      "longWord8": {
+        "name": "Lingvist",
+        "desc": "Hitta ett ord med 8+ bokstäver"
+      },
+      "perfectLevel": {
+        "name": "Perfekt stjärna",
+        "desc": "Klara en nivå med 3 stjärnor"
+      },
+      "bossSlayer": {
+        "name": "Bossdräpare",
+        "desc": "Besegra en boss"
+      },
+      "bossSpeedrun": {
+        "name": "Snabbdemon",
+        "desc": "Besegra en boss med 30+ sekunder kvar"
+      },
+      "bossNoDamage": {
+        "name": "Orörd",
+        "desc": "Besegra en boss utan att missa ett ord"
+      },
+      "allBosses": {
+        "name": "Mästare",
+        "desc": "Besegra alla bossar"
+      },
+      "worldComplete": {
+        "name": "Världsresenär",
+        "desc": "Klara en värld"
+      },
+      "starCollector50": {
+        "name": "Stjärnsamlare",
+        "desc": "Samla 50 stjärnor"
+      },
+      "starCollector100": {
+        "name": "Konstellation",
+        "desc": "Samla 100 stjärnor"
+      },
+      "levelMaster": {
+        "name": "Nivåmästare",
+        "desc": "Få 3 stjärnor på 10 nivåer"
+      },
+      "skillUnlocked": {
+        "name": "Elev",
+        "desc": "Lås upp en färdighet"
+      },
+      "skillPathComplete": {
+        "name": "Specialist",
+        "desc": "Slutför en färdighetsväg"
+      },
+      "comboKing": {
+        "name": "Kombokung",
+        "desc": "Bygg en 15x kombo"
       }
     },
     "worldMap": "Världskarta",
@@ -8869,7 +9673,38 @@ const sv = {
       "achievements": "Prestationer"
     },
     "worldLabel": "Värld",
-    "world": "Värld",
+    "world": {
+      "1": {
+        "theme": "Natur & Trädgård"
+      },
+      "2": {
+        "theme": "Vatten & Flöde"
+      },
+      "3": {
+        "theme": "Jord & Mineraler"
+      },
+      "4": {
+        "theme": "Hav & Resor"
+      },
+      "5": {
+        "theme": "Bygg & Hantverk"
+      },
+      "6": {
+        "theme": "Mysterium & Pussel"
+      },
+      "7": {
+        "theme": "Ljus & Reflektion"
+      },
+      "8": {
+        "theme": "Rymd & Vetenskap"
+      },
+      "9": {
+        "theme": "Kultur & Språk"
+      },
+      "10": {
+        "theme": "Makt & Kunskap"
+      }
+    },
     "stars": "stjärnor",
     "levelsCompleted": "nivåer klara",
     "locked": "Låst",
@@ -8978,16 +9813,6 @@ const sv = {
       "totalScore": "Totalpoäng",
       "timeTaken": "Tid"
     },
-    "mastery": {
-      "label": "Mästerskap",
-      "tier": {
-        "bronze": "Brons",
-        "silver": "Silver",
-        "gold": "Guld",
-        "platinum": "Platina",
-        "diamond": "Diamant"
-      }
-    },
     "share": {
       "bossDefeated": "Jag besegrade {{boss}} i {{world}}!",
       "shareCard": "Dela seger",
@@ -9027,8 +9852,20 @@ const sv = {
       "confirm": "Är du säker? Dina världsframsteg återställs, men du behåller uppgraderingar, guld och ditt ordalbum.",
       "activate": "Prestige nu",
       "cancel": "Inte än",
-      "ranks": { "bronze": "Brons", "silver": "Silver", "gold": "Guld", "platinum": "Platina", "diamond": "Diamant" },
-      "titles": { "wordSmith": "Ordsmed", "lexiconAdept": "Lexikonadept", "wordMaster": "Ordmästare", "grandLexicon": "Storlexikon", "eternalWordsmith": "Evig ordsmed" },
+      "ranks": {
+        "bronze": "Brons",
+        "silver": "Silver",
+        "gold": "Guld",
+        "platinum": "Platina",
+        "diamond": "Diamant"
+      },
+      "titles": {
+        "wordSmith": "Ordsmed",
+        "lexiconAdept": "Lexikonadept",
+        "wordMaster": "Ordmästare",
+        "grandLexicon": "Storlexikon",
+        "eternalWordsmith": "Evig ordsmed"
+      },
       "bonusXp": "+{{percent}}% XP",
       "bonusGold": "+{{percent}}% Guld",
       "keeps": "Du behåller",
@@ -9072,7 +9909,6 @@ const sv = {
     },
     "score": "Poäng",
     "victory": "Seger!",
-    "world": "Värld",
     "hint": {
       "title": "Ledtråd"
     },
@@ -9229,18 +10065,6 @@ const sv = {
     "toast": {
       "themedWord": "Temaord-bonus!"
     },
-    "world": {
-      "1": { "theme": "Natur & Trädgård" },
-      "2": { "theme": "Vatten & Flöde" },
-      "3": { "theme": "Jord & Mineraler" },
-      "4": { "theme": "Hav & Resor" },
-      "5": { "theme": "Bygg & Hantverk" },
-      "6": { "theme": "Mysterium & Pussel" },
-      "7": { "theme": "Ljus & Reflektion" },
-      "8": { "theme": "Rymd & Vetenskap" },
-      "9": { "theme": "Kultur & Språk" },
-      "10": { "theme": "Makt & Kunskap" }
-    },
     "mode": {
       "classic": "Klassisk",
       "blast": "Blast",
@@ -9304,10 +10128,10 @@ const sv = {
       "validationCancelled": "Valideringen avbröts",
       "missingCenterLetter": "Måste inkludera mittenbokstaven!"
     },
-"live": {
+    "live": {
       "wordFound": "{{word}} hittat, plus {{points}} poäng"
     },
-"game": {
+    "game": {
       "title": "Äventyrsläge",
       "hud": "Äventyrs-HUD",
       "retryOptions": "Försök igen-alternativ",
@@ -9922,88 +10746,6 @@ const sv = {
       "danger": "FARA!",
       "healthLabel": "Spelarens hälsa: {{current}} / {{max}} ({{percentage}}%)"
     },
-    "achievements": {
-      "title": "Prestationer",
-      "progress": "{current}/{next}",
-      "earned": "intjänade",
-      "hidden": "Dold",
-      "unlocked": "Prestation upplåst!",
-      "upgraded": "Prestation uppgraderad!",
-      "categories": {
-        "gameplay": "Spelande",
-        "bosses": "Bossstrider",
-        "progression": "Framsteg",
-        "mastery": "Mästerskap"
-      },
-      "firstWord": {
-        "name": "Första stegen",
-        "desc": "Hitta ditt första ord"
-      },
-      "wordStreak5": {
-        "name": "Het serie",
-        "desc": "Bygg en 5x kombo"
-      },
-      "wordStreak10": {
-        "name": "Ostoppbar",
-        "desc": "Bygg en 10x kombo"
-      },
-      "longWord6": {
-        "name": "Ordsmed",
-        "desc": "Hitta ett ord med 6+ bokstäver"
-      },
-      "longWord8": {
-        "name": "Lingvist",
-        "desc": "Hitta ett ord med 8+ bokstäver"
-      },
-      "perfectLevel": {
-        "name": "Perfekt stjärna",
-        "desc": "Klara en nivå med 3 stjärnor"
-      },
-      "bossSlayer": {
-        "name": "Bossdräpare",
-        "desc": "Besegra en boss"
-      },
-      "bossSpeedrun": {
-        "name": "Snabbdemon",
-        "desc": "Besegra en boss med 30+ sekunder kvar"
-      },
-      "bossNoDamage": {
-        "name": "Orörd",
-        "desc": "Besegra en boss utan att missa ett ord"
-      },
-      "allBosses": {
-        "name": "Mästare",
-        "desc": "Besegra alla bossar"
-      },
-      "worldComplete": {
-        "name": "Världsresenär",
-        "desc": "Klara en värld"
-      },
-      "starCollector50": {
-        "name": "Stjärnsamlare",
-        "desc": "Samla 50 stjärnor"
-      },
-      "starCollector100": {
-        "name": "Konstellation",
-        "desc": "Samla 100 stjärnor"
-      },
-      "levelMaster": {
-        "name": "Nivåmästare",
-        "desc": "Få 3 stjärnor på 10 nivåer"
-      },
-      "skillUnlocked": {
-        "name": "Elev",
-        "desc": "Lås upp en färdighet"
-      },
-      "skillPathComplete": {
-        "name": "Specialist",
-        "desc": "Slutför en färdighetsväg"
-      },
-      "comboKing": {
-        "name": "Kombokung",
-        "desc": "Bygg en 15x kombo"
-      }
-    },
     "skills": {
       "title": "Färdighetsträd",
       "points": "Färdighetspoäng",
@@ -10150,51 +10892,167 @@ const sv = {
       "total": "Totalt"
     },
     "ascension": {
-      "level1": "Nybörjare", "level2": "Lärling", "level3": "Adept",
-      "level4": "Skicklig", "level5": "Expert", "level6": "Mästare",
-      "level7": "Stormästare", "level8": "Legend", "level9": "Mytisk",
+      "level1": "Nybörjare",
+      "level2": "Lärling",
+      "level3": "Adept",
+      "level4": "Skicklig",
+      "level5": "Expert",
+      "level6": "Mästare",
+      "level7": "Stormästare",
+      "level8": "Legend",
+      "level9": "Mytisk",
       "level10": "Transcendent"
     },
     "consumables": {
-      "bossRevive": { "name": "Bossliv" },
-      "bossShield": { "name": "Bosssköld" },
-      "doubleGold": { "name": "Dubbelt guld" },
-      "extraHint": { "name": "Extra tips" },
-      "gridReroll": { "name": "Rutnätsomrullning" },
-      "objectiveSkip": { "name": "Hoppa mål" },
-      "perfectStar": { "name": "Perfekt stjärna" },
-      "timerExtension": { "name": "Tidförlängning" }
+      "bossRevive": {
+        "name": "Bossliv"
+      },
+      "bossShield": {
+        "name": "Bosssköld"
+      },
+      "doubleGold": {
+        "name": "Dubbelt guld"
+      },
+      "extraHint": {
+        "name": "Extra tips"
+      },
+      "gridReroll": {
+        "name": "Rutnätsomrullning"
+      },
+      "objectiveSkip": {
+        "name": "Hoppa mål"
+      },
+      "perfectStar": {
+        "name": "Perfekt stjärna"
+      },
+      "timerExtension": {
+        "name": "Tidförlängning"
+      }
     },
     "mutators": {
-      "blindMode": { "name": "Blindläge" },
-      "chaosGrid": { "name": "Kaosrutnät" },
-      "fragile": { "name": "Skör" },
-      "ironMan": { "name": "Järnman" },
-      "minimalist": { "name": "Minimalist" },
-      "noHints": { "name": "Inga tips" },
-      "speedRun": { "name": "Speedrun" },
-      "wordMaster": { "name": "Ordmästare" }
+      "blindMode": {
+        "name": "Blindläge"
+      },
+      "chaosGrid": {
+        "name": "Kaosrutnät"
+      },
+      "fragile": {
+        "name": "Skör"
+      },
+      "ironMan": {
+        "name": "Järnman"
+      },
+      "minimalist": {
+        "name": "Minimalist"
+      },
+      "noHints": {
+        "name": "Inga tips"
+      },
+      "speedRun": {
+        "name": "Speedrun"
+      },
+      "wordMaster": {
+        "name": "Ordmästare"
+      }
     },
     "collection": {
       "title": "Samling",
-      "title": "Samling",
       "collected": "samlade",
       "items": "föremål",
-      "category": { "trophy": "Troféer", "scroll": "Rullar", "rune": "Runor", "relic": "Reliker" },
-      "rarity": { "common": "Vanlig", "rare": "Sällsynt", "epic": "Episk", "legendary": "Legendarisk" },
+      "category": {
+        "trophy": "Troféer",
+        "scroll": "Rullar",
+        "rune": "Runor",
+        "relic": "Reliker"
+      },
+      "rarity": {
+        "common": "Vanlig",
+        "rare": "Sällsynt",
+        "epic": "Episk",
+        "legendary": "Legendarisk"
+      },
       "runeFragment": "Runfragment",
       "runeFragmentDesc": "En glödande skärva av uråldrig kraft",
       "goldenQuill": "Gyllene fjäderpenna",
       "goldenQuillDesc": "Belöning för en perfekt första genomspelning",
       "cosmicShard": "Kosmisk skärva",
       "cosmicShardDesc": "Den sällsyntaste skatten — ett fragment av kosmos",
-      "bossTrophy": { "w1": "Skogsväktarens trofé", "w2": "Ökenfaraons trofé", "w3": "Havets leviatan-trofé", "w4": "Bergstitan-trofé", "w5": "Djungelormens trofé", "w6": "Tundra-yetins trofé", "w7": "Vulkandrakens trofé", "w8": "Himmelsgripens trofé", "w9": "Skuggvålnadens trofé", "w10": "Kosmiska härskarens trofé" },
-      "bossTrophyDesc": { "w1": "Besegrade skogsväktaren", "w2": "Besegrade ökenfaraon", "w3": "Besegrade havets leviatan", "w4": "Besegrade bergstitanen", "w5": "Besegrade djungelormen", "w6": "Besegrade tundra-yetin", "w7": "Besegrade vulkandraken", "w8": "Besegrade himmelsgripen", "w9": "Besegrade skuggvålnaden", "w10": "Besegrade kosmiska härskaren" },
-      "loreScroll": { "w1": "Skogsrulle", "w2": "Ökenrulle", "w3": "Havsrulle", "w4": "Bergsrulle", "w5": "Djungelrulle", "w6": "Tundrarulle", "w7": "Vulkanrulle", "w8": "Himmelsrulle", "w9": "Skuggrulle", "w10": "Kosmisk rulle" },
-      "worldEssence": { "w1": "Skogsessens", "w2": "Ökenessens", "w3": "Havsessens", "w4": "Bergsessens", "w5": "Djungelessens", "w6": "Tundraessens", "w7": "Vulkanessens", "w8": "Himmelsessens", "w9": "Skuggessens", "w10": "Kosmisk essens" },
-      "worldEssenceDesc": { "w1": "Den förtrollade skogens ande", "w2": "Öknens brinnande hjärta", "w3": "En droppe från urhavet", "w4": "Bergets obrytbara kärna", "w5": "Djungelns vilda puls", "w6": "En frusen kristall av evig vinter", "w7": "En gnista från vulkanens hjärta", "w8": "En fjäder från de högsta molnen", "w9": "En viskning från skuggriket", "w10": "Ett fragment av kosmos" },
-      "ancientRelic": { "w5": "Djungelidol", "w6": "Frusen kompass", "w7": "Obsidianmask", "w8": "Vindklocka", "w9": "Skuggspegel", "w10": "Stjärnkarta" },
-      "ancientRelicDesc": { "w5": "En uråldrig idol från djungelns djup", "w6": "En kompass som alltid pekar mot det kallaste stället", "w7": "En mask smidda i vulkanens hjärta", "w8": "En klocka som spelar vindens sång", "w9": "En spegel som reflekterar det som var", "w10": "En karta som visar vägar mellan stjärnorna" }
+      "bossTrophy": {
+        "w1": "Skogsväktarens trofé",
+        "w2": "Ökenfaraons trofé",
+        "w3": "Havets leviatan-trofé",
+        "w4": "Bergstitan-trofé",
+        "w5": "Djungelormens trofé",
+        "w6": "Tundra-yetins trofé",
+        "w7": "Vulkandrakens trofé",
+        "w8": "Himmelsgripens trofé",
+        "w9": "Skuggvålnadens trofé",
+        "w10": "Kosmiska härskarens trofé"
+      },
+      "bossTrophyDesc": {
+        "w1": "Besegrade skogsväktaren",
+        "w2": "Besegrade ökenfaraon",
+        "w3": "Besegrade havets leviatan",
+        "w4": "Besegrade bergstitanen",
+        "w5": "Besegrade djungelormen",
+        "w6": "Besegrade tundra-yetin",
+        "w7": "Besegrade vulkandraken",
+        "w8": "Besegrade himmelsgripen",
+        "w9": "Besegrade skuggvålnaden",
+        "w10": "Besegrade kosmiska härskaren"
+      },
+      "loreScroll": {
+        "w1": "Skogsrulle",
+        "w2": "Ökenrulle",
+        "w3": "Havsrulle",
+        "w4": "Bergsrulle",
+        "w5": "Djungelrulle",
+        "w6": "Tundrarulle",
+        "w7": "Vulkanrulle",
+        "w8": "Himmelsrulle",
+        "w9": "Skuggrulle",
+        "w10": "Kosmisk rulle"
+      },
+      "worldEssence": {
+        "w1": "Skogsessens",
+        "w2": "Ökenessens",
+        "w3": "Havsessens",
+        "w4": "Bergsessens",
+        "w5": "Djungelessens",
+        "w6": "Tundraessens",
+        "w7": "Vulkanessens",
+        "w8": "Himmelsessens",
+        "w9": "Skuggessens",
+        "w10": "Kosmisk essens"
+      },
+      "worldEssenceDesc": {
+        "w1": "Den förtrollade skogens ande",
+        "w2": "Öknens brinnande hjärta",
+        "w3": "En droppe från urhavet",
+        "w4": "Bergets obrytbara kärna",
+        "w5": "Djungelns vilda puls",
+        "w6": "En frusen kristall av evig vinter",
+        "w7": "En gnista från vulkanens hjärta",
+        "w8": "En fjäder från de högsta molnen",
+        "w9": "En viskning från skuggriket",
+        "w10": "Ett fragment av kosmos"
+      },
+      "ancientRelic": {
+        "w5": "Djungelidol",
+        "w6": "Frusen kompass",
+        "w7": "Obsidianmask",
+        "w8": "Vindklocka",
+        "w9": "Skuggspegel",
+        "w10": "Stjärnkarta"
+      },
+      "ancientRelicDesc": {
+        "w5": "En uråldrig idol från djungelns djup",
+        "w6": "En kompass som alltid pekar mot det kallaste stället",
+        "w7": "En mask smidda i vulkanens hjärta",
+        "w8": "En klocka som spelar vindens sång",
+        "w9": "En spegel som reflekterar det som var",
+        "w10": "En karta som visar vägar mellan stjärnorna"
+      }
     },
     "later": "Senare",
     "nextLevel": "Nästa: Nivå",
@@ -10213,16 +11071,46 @@ const sv = {
       "prestigeCosmic": "Kosmisk Prestige"
     },
     "weekly": {
-      "speedDemon": { "name": "Fartdemon", "desc": "Snabbare timer · ×1.5 poäng" },
-      "longWords": { "name": "Långa Ord", "desc": "4+ bokstäver · ×1.5 guld" },
-      "goldRush": { "name": "Guldrush", "desc": "×2 guld · snabbare timer" },
-      "iceAge": { "name": "Istiden", "desc": "Specialrutor ×2 · ×1.3 poäng" },
-      "marathon": { "name": "Maraton", "desc": "Längre timer · ×0.8 poäng" },
-      "doubleOrNothing": { "name": "Dubbelt eller Inget", "desc": "×2 poäng · halv timer" },
-      "wordSmith": { "name": "Ordsmed", "desc": "5+ bokstäver · ×2 poäng" },
-      "treasureHunter": { "name": "Skattjägare", "desc": "×1.8 guld · ×1.5 specialrutor" },
-      "blitz": { "name": "Blixt", "desc": "Snabb timer · ×3 poäng" },
-      "zenMode": { "name": "Zenläge", "desc": "Lugn timer · halvt guld" }
+      "speedDemon": {
+        "name": "Fartdemon",
+        "desc": "Snabbare timer · ×1.5 poäng"
+      },
+      "longWords": {
+        "name": "Långa Ord",
+        "desc": "4+ bokstäver · ×1.5 guld"
+      },
+      "goldRush": {
+        "name": "Guldrush",
+        "desc": "×2 guld · snabbare timer"
+      },
+      "iceAge": {
+        "name": "Istiden",
+        "desc": "Specialrutor ×2 · ×1.3 poäng"
+      },
+      "marathon": {
+        "name": "Maraton",
+        "desc": "Längre timer · ×0.8 poäng"
+      },
+      "doubleOrNothing": {
+        "name": "Dubbelt eller Inget",
+        "desc": "×2 poäng · halv timer"
+      },
+      "wordSmith": {
+        "name": "Ordsmed",
+        "desc": "5+ bokstäver · ×2 poäng"
+      },
+      "treasureHunter": {
+        "name": "Skattjägare",
+        "desc": "×1.8 guld · ×1.5 specialrutor"
+      },
+      "blitz": {
+        "name": "Blixt",
+        "desc": "Snabb timer · ×3 poäng"
+      },
+      "zenMode": {
+        "name": "Zenläge",
+        "desc": "Lugn timer · halvt guld"
+      }
     },
     "saveFailedWarning": "Framsteg ej sparat — kontrollera anslutningen",
     "retrySave": "Försök igen",
@@ -10263,6 +11151,63 @@ const sv = {
       "huntSuccess": "Målord hittat på {{attempts}} försök!",
       "huntFailed": "Målordet hittades inte",
       "wheelWords": "{{center}}/{{total}} ord med mittenbokstaven"
+    },
+    "boss": {
+      "combat": {
+        "abilityBar": "Dina förmågor",
+        "charge": "Förmågauppladdning",
+        "weakLabel": "Svag mot",
+        "weaknessHit": "SVAGHET!",
+        "weakness": {
+          "length": "LÅNGA ORD",
+          "lengthLong": "ÄNNU LÄNGRE ORD",
+          "lengthEpic": "GIGANTISKA ORD",
+          "doubleLetter": "DUBBLETTER",
+          "palindrome": "PALINDROMER",
+          "rareLetter": "SÄLLSYNTA BOKSTÄVER",
+          "vowelHeavy": "VOKALRIKA ORD"
+        },
+        "parry": {
+          "hint": "FÖRSVARA! Långt ord, snabbt!",
+          "success": "PARERAD!"
+        },
+        "ability": {
+          "smite": {
+            "name": "Slag",
+            "desc": "Skicka en skurkattack mot chefen"
+          },
+          "ward": {
+            "name": "Skydd",
+            "desc": "Blockera chefens nästa attack"
+          },
+          "focus": {
+            "name": "Fokus",
+            "desc": "Ditt nästa ord slår hårdare"
+          }
+        }
+      }
+    },
+    "surprise": {
+      "doubleGold": {
+        "label": "Dubbelt guld!",
+        "desc": "Den här nivån ger dubbelt guld."
+      },
+      "bonusChest": {
+        "label": "Bonuskista!",
+        "desc": "En extra skattkista dyker upp."
+      },
+      "luckyGems": {
+        "label": "Lyckets ädelstenar!",
+        "desc": "En överraskning av ädelstenar."
+      },
+      "goldenWord": {
+        "label": "Guldord!",
+        "desc": "Ett dolt ord var värt jackpot."
+      },
+      "comboFrenzy": {
+        "label": "Kombomani!",
+        "desc": "Kombinationsbelöningar räknades dubbel på denna nivå."
+      }
     }
   },
   "wheelRush": {
@@ -10289,17 +11234,68 @@ const sv = {
   "blast": {
     "toCatchUp": "för att komma ikapp",
     "leadingBy": "leder med",
-    "firstUse": { "gotIt": "Förstått" },
+    "firstUse": {
+      "gotIt": "Förstått"
+    },
     "level": "Nivå {n}",
     "results": {
-      "sceneTitle": "Blast-resultat",
-      "finalScore": "Poäng",
-      "comboChain": "Bästa combo",
-      "boardClears": "Brädet rensat",
+      "boardDomination": "Brädkontroll",
+      "matchRecap": "Blast Matchsammanfattning",
+      "totalTilesDemolished": "Brickor Rivna",
+      "intensity": "Intensitet",
+      "peakCombo": "Toppkombo",
+      "totalGems": "Ädelstenar",
+      "demolitionKing": "Rivningskung",
+      "comboMaster": "Kombomästare",
+      "gemCollector": "Ädelstenssamlare",
+      "wordsmith": "Ordsmed",
+      "tilesCleared": "Brickor rensade",
+      "maxCombo": "Max kombo",
       "gemsCollected": "Ädelstenar",
-      "tilesCleared": "Brickor",
       "bestWord": "Bästa ord",
-      "rank": "Placering"
+      "tiles": "brickor",
+      "newRecord": "NYTT REKORD!",
+      "yourRank": "Din rankning",
+      "topPercent": "Topp {pct}% denna vecka",
+      "pbDelta": "+{delta} över ditt bästa",
+      "fromBest": "från tidigare bästa",
+      "biggestCombo": "Största kombo",
+      "bestWave": "Bästa våg",
+      "wave": "Våg {n}",
+      "badgesEarned": "Märken intjänade",
+      "newBadge": "NY",
+      "waveFailed": "Våg misslyckades",
+      "needClearPct": "Behövde {required}% rensat — du fick {got}%",
+      "tilesShort": "Bara {count} brickor kvar!",
+      "failHint": "Rensa minst 90% av brädet för att gå vidare",
+      "tryAgain": "Försök igen",
+      "share": "Dela",
+      "sceneTitle": "Blast-resultat",
+      "finalScore": "Slutpoäng",
+      "comboChain": "Combo",
+      "boardClears": "Rensningar",
+      "brag": {
+        "legend": "Legend",
+        "elite": "Elit",
+        "great": "Grym Runda",
+        "solid": "Solid",
+        "nice": "Bra Försök",
+        "beats": "Du slog {pct}% av spelarna",
+        "weeklyCohort": "Veckans globala grupp",
+        "score": "Poäng",
+        "combo": "Kombo",
+        "bestWord": "Bästa Ord",
+        "share": "Skryt",
+        "shareAria": "Dela ditt resultat",
+        "shareTitle": "LexiClash Blast",
+        "shareScore": "Fick {score} i Blast-läge",
+        "shareRank": "Topp {pct}% denna vecka",
+        "copied": "Kopierat till urklipp!",
+        "copyFailed": "Kunde inte kopiera — försök igen"
+      },
+      "mpResults": {
+        "boardCleared": "BORD RENSAT!"
+      }
     },
     "intro": {
       "level": "Nivå {n}",
@@ -10307,29 +11303,77 @@ const sv = {
     },
     "modifier": {
       "incoming": "Twist",
-      "goldRush": { "name": "Guldrush", "desc": "Guldbrickor överallt — och högre poäng." },
-      "chainFrenzy": { "name": "Kedjeyra", "desc": "Kedjorna ger dubbelt — länka ihop dem!" },
-      "doubleDown": { "name": "Allt eller inget", "desc": "Varje ord ger 2× — men ett drag mindre." },
-      "featherfall": { "name": "Fjäderfall", "desc": "Ta det lugnt — två extra drag att jobba med." },
-      "bombParty": { "name": "Bombfest", "desc": "Mycket fler bomber i leken." },
-      "luckyVowels": { "name": "Turdrag", "desc": "Färre ishinder och en gnutta extra guld." },
-      "megaCombo": { "name": "Megakombo", "desc": "Kombos slår hårdare för bonuspoäng." },
-      "gemRush": { "title": "JUVELRUSH", "sub": "extra juveler på brädet" },
-      "coinBonanza": { "title": "MYNTREGN", "sub": "extra mynt denna runda" },
-      "bonusStorm": { "title": "BONUSSTORM", "sub": "dubbel-bonus-rutor släppta loss" }
+      "goldRush": {
+        "name": "Guldrush",
+        "desc": "Guldbrickor överallt — och högre poäng."
+      },
+      "chainFrenzy": {
+        "name": "Kedjeyra",
+        "desc": "Kedjorna ger dubbelt — länka ihop dem!"
+      },
+      "doubleDown": {
+        "name": "Allt eller inget",
+        "desc": "Varje ord ger 2× — men ett drag mindre."
+      },
+      "featherfall": {
+        "name": "Fjäderfall",
+        "desc": "Ta det lugnt — två extra drag att jobba med."
+      },
+      "bombParty": {
+        "name": "Bombfest",
+        "desc": "Mycket fler bomber i leken."
+      },
+      "luckyVowels": {
+        "name": "Turdrag",
+        "desc": "Färre ishinder och en gnutta extra guld."
+      },
+      "megaCombo": {
+        "name": "Megakombo",
+        "desc": "Kombos slår hårdare för bonuspoäng."
+      },
+      "gemRush": {
+        "title": "JUVELRUSH",
+        "sub": "extra juveler på brädet"
+      },
+      "coinBonanza": {
+        "title": "MYNTREGN",
+        "sub": "extra mynt denna runda"
+      },
+      "bonusStorm": {
+        "title": "BONUSSTORM",
+        "sub": "dubbel-bonus-rutor släppta loss"
+      }
     },
     "surprise": {
-      "coinBurst": { "title": "Myntregn!" },
-      "gemShower": { "title": "Juvelregn!" },
-      "chainCharge": { "title": "Kedjeladdning!" },
-      "luckyDouble": { "title": "Lyckodubbel!" },
-      "goldenWord": { "title": "Guldord!" },
+      "coinBurst": {
+        "title": "Myntregn!"
+      },
+      "gemShower": {
+        "title": "Juvelregn!"
+      },
+      "chainCharge": {
+        "title": "Kedjeladdning!"
+      },
+      "luckyDouble": {
+        "title": "Lyckodubbel!"
+      },
+      "goldenWord": {
+        "title": "Guldord!"
+      },
       "nextWordDouble": "Nästa ord ×2",
       "chargedChip": "✨ ×2 laddad"
     },
     "quip": {
-      "big": ["FIN KEDJA!", "I ELDEN!", "FORTSÄTT!"],
-      "mega": ["OSTOPPBAR!", "LEGENDARISKT!", "MEGA-COMBO!"]
+      "big": [
+        "FIN KEDJA!",
+        "I ELDEN!",
+        "FORTSÄTT!"
+      ],
+      "mega": [
+        "OSTOPPBAR!",
+        "LEGENDARISKT!",
+        "MEGA-COMBO!"
+      ]
     },
     "chestMilestone": {
       "title": "MILSTOLPS-KISTA",
@@ -10389,6 +11433,10 @@ const sv = {
       },
       "mpResults": {
         "boardCleared": "BORD RENSAT!"
+      },
+      "unlock": {
+        "gotIt": "Okej",
+        "skipFuture": "Hoppa över framtida guider"
       }
     },
     "adBadge": "ANNONS",
@@ -10454,28 +11502,94 @@ const sv = {
       "5000": "5000+"
     },
     "tile": {
-      "gold":      { "name": "Guld",      "desc": "3× poäng + 1 bonusdrag." },
-      "silver":    { "name": "Silver",    "desc": "1,5× poäng. Förlänger nedräkningar med 1." },
-      "diamond":   { "name": "Diamant",   "desc": "5× poäng. Avslöjar frostinnehåll i 3 turer." },
-      "bomb":      { "name": "Bomb",      "desc": "Rensar 3×3-yta. Kedjar till närliggande bomber." },
-      "lightning": { "name": "Blixt",     "desc": "Rensar hela kolumnen direkt." },
-      "prism":     { "name": "Prisma",    "desc": "2 träffar. Rensar hel rad + kolumn. Kedjar bomber och blixtar." },
-      "rainbow":   { "name": "Regnbåge",  "desc": "Kopierar och fördubblar bästa specialen. Ensam: 2× poäng." },
-      "ice":       { "name": "Is",        "desc": "2 träffar att krossa. Defensiv bricka med flera träffar." },
-      "gem":       { "name": "Ädelsten",  "desc": "3 träffar att samla. Skapar 2 nya specialer vid slutförande." },
-      "frozen":    { "name": "Frost",     "desc": "2 träffar. Döljer en special inuti — bomb, blixt, prisma, ädelsten eller regnbåge." },
-      "magnet":    { "name": "Virvel",    "desc": "Drar närliggande brickor inåt, sedan exploderar området." },
-      "mirror":    { "name": "Spegel",    "desc": "Kopierar den första offensiva specialen i ditt ord. Ensam: 2× poäng." },
-      "wildcard":  { "name": "Joker",     "desc": "Matchar vilken bokstav som helst. Poäng baserat på Scrabble-värde." },
-      "countdown": { "name": "Nedräkning","desc": "Tickar ner. Desarmera i ett ord: +15 p och 2 bonusdrag. Går ut: -50 p och 3×3 explosion." },
-      "shuffle":   { "name": "Blanda",    "desc": "Blandar om alla återstående bokstäver på brädet vid rensning." },
-      "magma":     { "name": "Magma",     "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator." },
-      "portal":    { "name": "Portal",    "desc": "Teleportera din ordstig genom länkade par. Rensar båda. 2× poäng. +5 bonus." },
-      "catalyst":  { "name": "Katalysator","desc": "+10 p. Uppgraderar intilliggande vanliga brickor till specialer." },
-      "crystal":   { "name": "Kristall",   "desc": "Växer +1× varje oanvänd tur (max 5×). Multiplicerar din ordpoäng när den används." },
-      "fuse":      { "name": "Stubin",     "desc": "Länkat par. Rensa en för att tända dess partner — desarmera inom 3 drag för +15 p och 2 drag, annars detonerar en 3×3-smäll för -50 p." },
-      "anchor":    { "name": "Ankare",     "desc": "Belönar långa ord. Ger +3 poäng per bokstav i ordet när den rensas." },
-      "mystery":   { "name": "Gåta",       "desc": "Överraskning! Slumpmässig effekt: poängburst, ny speciell, mini-pop eller mega +150." }
+      "gold": {
+        "name": "Guld",
+        "desc": "3× poäng + 1 bonusdrag."
+      },
+      "silver": {
+        "name": "Silver",
+        "desc": "1,5× poäng. Förlänger nedräkningar med 1."
+      },
+      "diamond": {
+        "name": "Diamant",
+        "desc": "5× poäng. Avslöjar frostinnehåll i 3 turer."
+      },
+      "bomb": {
+        "name": "Bomb",
+        "desc": "Rensar 3×3-yta. Kedjar till närliggande bomber."
+      },
+      "lightning": {
+        "name": "Blixt",
+        "desc": "Rensar hela kolumnen direkt."
+      },
+      "prism": {
+        "name": "Prisma",
+        "desc": "2 träffar. Rensar hel rad + kolumn. Kedjar bomber och blixtar."
+      },
+      "rainbow": {
+        "name": "Regnbåge",
+        "desc": "Kopierar och fördubblar bästa specialen. Ensam: 2× poäng."
+      },
+      "ice": {
+        "name": "Is",
+        "desc": "2 träffar att krossa. Defensiv bricka med flera träffar."
+      },
+      "gem": {
+        "name": "Ädelsten",
+        "desc": "3 träffar att samla. Skapar 2 nya specialer vid slutförande."
+      },
+      "frozen": {
+        "name": "Frost",
+        "desc": "2 träffar. Döljer en special inuti — bomb, blixt, prisma, ädelsten eller regnbåge."
+      },
+      "magnet": {
+        "name": "Virvel",
+        "desc": "Drar närliggande brickor inåt, sedan exploderar området."
+      },
+      "mirror": {
+        "name": "Spegel",
+        "desc": "Kopierar den första offensiva specialen i ditt ord. Ensam: 2× poäng."
+      },
+      "wildcard": {
+        "name": "Joker",
+        "desc": "Matchar vilken bokstav som helst. Poäng baserat på Scrabble-värde."
+      },
+      "countdown": {
+        "name": "Nedräkning",
+        "desc": "Tickar ner. Desarmera i ett ord: +15 p och 2 bonusdrag. Går ut: -50 p och 3×3 explosion."
+      },
+      "shuffle": {
+        "name": "Blanda",
+        "desc": "Blandar om alla återstående bokstäver på brädet vid rensning."
+      },
+      "magma": {
+        "name": "Magma",
+        "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator."
+      },
+      "portal": {
+        "name": "Portal",
+        "desc": "Teleportera din ordstig genom länkade par. Rensar båda. 2× poäng. +5 bonus."
+      },
+      "catalyst": {
+        "name": "Katalysator",
+        "desc": "+10 p. Uppgraderar intilliggande vanliga brickor till specialer."
+      },
+      "crystal": {
+        "name": "Kristall",
+        "desc": "Växer +1× varje oanvänd tur (max 5×). Multiplicerar din ordpoäng när den används."
+      },
+      "fuse": {
+        "name": "Stubin",
+        "desc": "Länkat par. Rensa en för att tända dess partner — desarmera inom 3 drag för +15 p och 2 drag, annars detonerar en 3×3-smäll för -50 p."
+      },
+      "anchor": {
+        "name": "Ankare",
+        "desc": "Belönar långa ord. Ger +3 poäng per bokstav i ordet när den rensas."
+      },
+      "mystery": {
+        "name": "Gåta",
+        "desc": "Överraskning! Slumpmässig effekt: poängburst, ny speciell, mini-pop eller mega +150."
+      }
     },
     "title": "Blast-läge",
     "description": "Rensa brädet! Ord spränger brickor.",
@@ -10499,7 +11613,11 @@ const sv = {
       "home": "Hem",
       "recordBest": "BÄST",
       "recordFast": "SNABBAST",
-      "recordBonus": "BONUS"
+      "recordBonus": "BONUS",
+      "chainLabel": "Bästa kedja",
+      "gemsLabel": "Ädelstenar",
+      "timeLabel": "Tid",
+      "wordsLabel": "Ord"
     },
     "failed": {
       "title": "Slut på gissningar!",
@@ -10521,8 +11639,20 @@ const sv = {
       "bonusCount": "⭐ {count} bonus"
     },
     "hint": {
+      "free": "GRATIS",
+      "ad": "TIPS",
+      "aria": {
+        "free": "Gratis tips — kostar 25 poäng",
+        "ad": "Se en annons för ett tips — kostar 25 poäng"
+      },
+      "toast": {
+        "targetWord": "Försök forma: {word}",
+        "colorPower": "Leta efter {color} brickor",
+        "collectType": "Hitta fler {tileType}",
+        "clearAllType": "Rensa kvarvarande {tileType}"
+      },
       "label": "Tips",
-      "aria": "Avslöja ett ord — kostar en stjärna"
+      "revealAria": "Avslöja ett ord — kostar en stjärna"
     },
     "noMoreWords": "Inga fler ord möjliga",
     "giveUp": "Avsluta spel",
@@ -10575,7 +11705,7 @@ const sv = {
     "moreLevelsComingSoon": "Fler nivåer är på gång.",
     "allCleared": "Du klarade alla nivåer!",
     "loadingProgress": "Laddar dina framsteg…",
-    "playAgain": "Spela från nivå 1",
+    "playAgain": "SPELA IGEN",
     "shuffle": "Blanda",
     "morePoints": "fler poäng",
     "needScore": "Behöver {score}",
@@ -10598,66 +11728,7 @@ const sv = {
       "gems": "Ädelstenar",
       "bestWord": "Bästa ord",
       "wordsFoundCount": "Ord",
-      "playerStats": "Spelarstatistik",
-    },
-    "results": {
-      "boardDomination": "Brädkontroll",
-      "matchRecap": "Blast Matchsammanfattning",
-      "totalTilesDemolished": "Brickor Rivna",
-      "intensity": "Intensitet",
-      "peakCombo": "Toppkombo",
-      "totalGems": "Ädelstenar",
-      "demolitionKing": "Rivningskung",
-      "comboMaster": "Kombomästare",
-      "gemCollector": "Ädelstenssamlare",
-      "wordsmith": "Ordsmed",
-      "tilesCleared": "Brickor rensade",
-      "maxCombo": "Max kombo",
-      "gemsCollected": "Ädelstenar",
-      "bestWord": "Bästa ord",
-      "tiles": "brickor",
-      "newRecord": "NYTT REKORD!",
-      "yourRank": "Din rankning",
-      "topPercent": "Topp {pct}% denna vecka",
-      "pbDelta": "+{delta} över ditt bästa",
-      "fromBest": "från tidigare bästa",
-      "biggestCombo": "Största kombo",
-      "bestWave": "Bästa våg",
-      "wave": "Våg {n}",
-      "badgesEarned": "Märken intjänade",
-      "newBadge": "NY",
-      "waveFailed": "Våg misslyckades",
-      "needClearPct": "Behövde {required}% rensat — du fick {got}%",
-      "tilesShort": "Bara {count} brickor kvar!",
-      "failHint": "Rensa minst 90% av brädet för att gå vidare",
-      "tryAgain": "Försök igen",
-      "share": "Dela",
-      "sceneTitle": "Blast-resultat",
-      "finalScore": "Slutpoäng",
-      "comboChain": "Combo",
-      "boardClears": "Rensningar",
-      "brag": {
-        "legend": "Legend",
-        "elite": "Elit",
-        "great": "Grym Runda",
-        "solid": "Solid",
-        "nice": "Bra Försök",
-        "beats": "Du slog {pct}% av spelarna",
-        "weeklyCohort": "Veckans globala grupp",
-        "score": "Poäng",
-        "combo": "Kombo",
-        "bestWord": "Bästa Ord",
-        "share": "Skryt",
-        "shareAria": "Dela ditt resultat",
-        "shareTitle": "LexiClash Blast",
-        "shareScore": "Fick {score} i Blast-läge",
-        "shareRank": "Topp {pct}% denna vecka",
-        "copied": "Kopierat till urklipp!",
-        "copyFailed": "Kunde inte kopiera — försök igen"
-      },
-      "mpResults": {
-        "boardCleared": "BORD RENSAT!"
-      }
+      "playerStats": "Spelarstatistik"
     },
     "badges": {
       "firstBlast": "Första Blasten",
@@ -10725,7 +11796,6 @@ const sv = {
       "rule3": "Specialbrickor spränger, fryser och multiplicerar",
       "rule4": "Rensa brädet för att avancera"
     },
-    "hint": "Tips",
     "undo": "Ångra",
     "undoTooltip": "Ångra senaste draget",
     "undoAdGate": {
@@ -10804,22 +11874,6 @@ const sv = {
       "comebackKid": "COMEBACK — {pct}% UNDER PRESS 💪",
       "survivor": "FORTFARANDE KVAR — {pct}% RENSAT 👊"
     },
-    "hint": {
-      "free": "GRATIS",
-      "ad": "TIPS",
-      "aria": {
-        "free": "Gratis tips — kostar 25 poäng",
-        "ad": "Se en annons för ett tips — kostar 25 poäng"
-      },
-      "toast": {
-        "targetWord": "Försök forma: {word}",
-        "colorPower": "Leta efter {color} brickor",
-        "collectType": "Hitta fler {tileType}",
-        "clearAllType": "Rensa kvarvarande {tileType}"
-      },
-      "label": "Tips",
-      "revealAria": "Avslöja ett ord — kostar en stjärna"
-    },
     "combo": {
       "bomb_bomb": "MEGASMALL!",
       "bomb_lightning": "ASKBOMB!",
@@ -10881,32 +11935,100 @@ const sv = {
     "gameOver": "SPELET SLUT",
     "waves": "vågor",
     "bestWord": "Bäst",
-    "playAgain": "SPELA IGEN",
     "tileGuide": {
       "title": "Brickguide",
-      "standard": { "name": "Standard", "desc": "Vanlig bricka — ingen specialeffekt" },
-      "gold": { "name": "Guld", "desc": "×3 poäng + 1 bonusdrag" },
-      "silver": { "name": "Silver", "desc": "×1,5 poäng + förlänger nedräkningar med 1" },
-      "diamond": { "name": "Diamant", "desc": "×5 poäng + avslöjar frusna i 3 turer" },
-      "bomb": { "name": "Bomb", "desc": "Rensar 3×3 — kedjar till närliggande bomber" },
-      "lightning": { "name": "Blixt", "desc": "Rensar hela kolumnen — kedjar till andra blixtar" },
-      "prism": { "name": "Prisma", "desc": "2 träffar — rensar rad + kolumn, skapar 2 special" },
-      "rainbow": { "name": "Regnbåge", "desc": "Kopierar bästa special i ditt ord, eller ×2 poäng" },
-      "ice": { "name": "Is", "desc": "2 träffar att krossa. Defensiv bricka med flera träffar." },
-      "frozen": { "name": "Frusen", "desc": "2 träffar — frigör dold special inuti" },
-      "gem": { "name": "Ädelsten", "desc": "3 träffar — skapar 2 special + 2 bonusdrag" },
-      "mirror": { "name": "Spegel", "desc": "Kopierar första offensiva special i ditt ord" },
-      "magnet": { "name": "Magnet", "desc": "Drar brickor inåt, sedan spränger 3×3" },
-      "wildcard": { "name": "Joker", "desc": "Matchar alla bokstäver — poäng efter bokstavens sällsynthet" },
-      "countdown": { "name": "Nedräkning", "desc": "Desarmera innan 0! +2 drag — eller 50p straff" },
-      "shuffle": { "name": "Blanda", "desc": "Blandar om alla återstående bokstäver på brädet vid rensning" },
-      "magma": { "name": "Magma", "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator" },
-      "portal": { "name": "Portal", "desc": "Teleportera genom par — rensar båda, ×2 ordpoäng" },
-      "catalyst": { "name": "Katalysator", "desc": "Uppgraderar alla intilliggande brickor till special" },
-      "crystal": { "name": "Kristall", "desc": "Växer +1× per oanvänd tur (max 5×) — multiplicerar ordpoäng" },
-      "fuse": { "name": "Stubin", "desc": "Länkat par — rensa en för att tända partnern, desarmera inom 3 drag annars smäller det" },
-      "anchor": { "name": "Ankare", "desc": "Långordsbonus — +3 p per bokstav i ordet när den rensas" },
-      "mystery": { "name": "Gåta", "desc": "Överraskning — poängburst, ny speciell, mini-pop eller mega +150" }
+      "standard": {
+        "name": "Standard",
+        "desc": "Vanlig bricka — ingen specialeffekt"
+      },
+      "gold": {
+        "name": "Guld",
+        "desc": "×3 poäng + 1 bonusdrag"
+      },
+      "silver": {
+        "name": "Silver",
+        "desc": "×1,5 poäng + förlänger nedräkningar med 1"
+      },
+      "diamond": {
+        "name": "Diamant",
+        "desc": "×5 poäng + avslöjar frusna i 3 turer"
+      },
+      "bomb": {
+        "name": "Bomb",
+        "desc": "Rensar 3×3 — kedjar till närliggande bomber"
+      },
+      "lightning": {
+        "name": "Blixt",
+        "desc": "Rensar hela kolumnen — kedjar till andra blixtar"
+      },
+      "prism": {
+        "name": "Prisma",
+        "desc": "2 träffar — rensar rad + kolumn, skapar 2 special"
+      },
+      "rainbow": {
+        "name": "Regnbåge",
+        "desc": "Kopierar bästa special i ditt ord, eller ×2 poäng"
+      },
+      "ice": {
+        "name": "Is",
+        "desc": "2 träffar att krossa. Defensiv bricka med flera träffar."
+      },
+      "frozen": {
+        "name": "Frusen",
+        "desc": "2 träffar — frigör dold special inuti"
+      },
+      "gem": {
+        "name": "Ädelsten",
+        "desc": "3 träffar — skapar 2 special + 2 bonusdrag"
+      },
+      "mirror": {
+        "name": "Spegel",
+        "desc": "Kopierar första offensiva special i ditt ord"
+      },
+      "magnet": {
+        "name": "Magnet",
+        "desc": "Drar brickor inåt, sedan spränger 3×3"
+      },
+      "wildcard": {
+        "name": "Joker",
+        "desc": "Matchar alla bokstäver — poäng efter bokstavens sällsynthet"
+      },
+      "countdown": {
+        "name": "Nedräkning",
+        "desc": "Desarmera innan 0! +2 drag — eller 50p straff"
+      },
+      "shuffle": {
+        "name": "Blanda",
+        "desc": "Blandar om alla återstående bokstäver på brädet vid rensning"
+      },
+      "magma": {
+        "name": "Magma",
+        "desc": "Rensar båda diagonalerna (X-mönster) med 2× poängmultiplikator"
+      },
+      "portal": {
+        "name": "Portal",
+        "desc": "Teleportera genom par — rensar båda, ×2 ordpoäng"
+      },
+      "catalyst": {
+        "name": "Katalysator",
+        "desc": "Uppgraderar alla intilliggande brickor till special"
+      },
+      "crystal": {
+        "name": "Kristall",
+        "desc": "Växer +1× per oanvänd tur (max 5×) — multiplicerar ordpoäng"
+      },
+      "fuse": {
+        "name": "Stubin",
+        "desc": "Länkat par — rensa en för att tända partnern, desarmera inom 3 drag annars smäller det"
+      },
+      "anchor": {
+        "name": "Ankare",
+        "desc": "Långordsbonus — +3 p per bokstav i ordet när den rensas"
+      },
+      "mystery": {
+        "name": "Gåta",
+        "desc": "Överraskning — poängburst, ny speciell, mini-pop eller mega +150"
+      }
     },
     "highlight": {
       "captions": {
@@ -10941,6 +12063,36 @@ const sv = {
         "name": "Säkerhetsnät",
         "desc": "+1 gratis räddning när du kör fast per nivå"
       }
+    },
+    "chest": {
+      "avatarSuffix": "avatardel",
+      "boostSuffix": "boost",
+      "coins": "Mynt",
+      "coinsSuffix": "mynt",
+      "continue": "Fortsätt",
+      "opened": "Kistan öppnades!",
+      "opening": "Öppnar kista…",
+      "preview": "Förhandsgranskning av kista",
+      "tier": {
+        "label": "Nivå"
+      },
+      "title": "Belöningskista"
+    },
+    "close": "Stäng",
+    "concept": {
+      "gotIt": "Kör på!",
+      "tag": "Nytt",
+      "anyRow": {
+        "title": "Ord kan ligga på vilken rad som helst",
+        "body": "Inte bara den nedersta raden — leta på hela spelbrädet efter ord."
+      },
+      "verticalWords": {
+        "title": "Ord kan också vara vertikala",
+        "body": "Dra rakt ned (eller upp) för att stava vertikala ord."
+      }
+    },
+    "settings": {
+      "tutorials": "Spela om guider"
     }
   },
   "student": {
@@ -11901,7 +13053,7 @@ const sv = {
         "course_desc": "Live och asynkrona ordspel med läraranalys — helt utan annonser för eleverna."
       },
       "welcomeBack": "Välkommen tillbaka!",
-        "openDashboard": "Öppna lärarpanelen"
+      "openDashboard": "Öppna lärarpanelen"
     },
     "leaderboard": {
       "allTime": "All tid",
@@ -12373,6 +13525,64 @@ const sv = {
       "streakWarning": "Varning för hotad svit",
       "friendInvites": "Kompis-utmaningar",
       "weeklySummary": "Veckosammanfattning"
+    },
+    "teacherAccess": {
+      "title": "Lärarförfrågningar",
+      "count": {
+        "pending": "Väntande",
+        "approved": "Godkänd",
+        "declined": "Avslad",
+        "total": "Totalt"
+      },
+      "filter_status": "Status",
+      "filter_status_all": "Alla statusar",
+      "filter_locale": "Språk",
+      "filter_country": "Land",
+      "refresh": "Uppdatera",
+      "row_open": "Öppna förfrågan från {name}",
+      "col": {
+        "name": "Namn",
+        "email": "E-post",
+        "role": "Roll",
+        "locale": "Språk",
+        "country": "Land",
+        "status": "Status",
+        "submitted": "Inlämnad"
+      },
+      "page": "Sida",
+      "export_csv": "Exportera CSV",
+      "close": "Stäng",
+      "drawer_title": "Lärarförfrågning — Detaljer",
+      "field": {
+        "name": "Namn",
+        "email": "E-post",
+        "role": "Roll",
+        "locale": "Språk",
+        "country": "Land",
+        "school": "Skola/Organisation",
+        "status": "Status",
+        "submitted": "Inlämnad",
+        "use_case": "Användningsfall"
+      },
+      "admin_note": "Administratörsanteckning",
+      "note_hint": "Vid godkännande ingår denna anteckning i välkomstmeddelandet till sökanden. Vid avslag används den som anledning.",
+      "show_preview": "Förhandsgranska e-post",
+      "hide_preview": "Dölj förhandsgranskning",
+      "preview_title": "E-postförhandsgranskning",
+      "preview_subject": "Ämne",
+      "copy_email": "Kopiera e-post HTML",
+      "copy_success": "E-post HTML kopierad till urklipp",
+      "copy_error": "Misslyckades att kopiera e-post",
+      "approve": "Godkänn",
+      "decline": "Avslå",
+      "approveSuccess": "Förfrågan godkänd",
+      "resend": "Skicka godkännande-e-post igen",
+      "resend_hint": "Skickar välkomstmeddelandet (med anteckningen ovan) till sökanden igen. Ändrar inte deras åtkomst.",
+      "resendSuccess": "Godkännande-e-post skickad igen",
+      "resendError": "Misslyckades att skicka godkännande-e-post igen",
+      "declineSuccess": "Förfrågan avslad",
+      "approveError": "Misslyckades att godkänna förfrågan",
+      "declineError": "Misslyckades att avslå förfrågan"
     }
   },
   "native": {
@@ -12488,78 +13698,164 @@ const sv = {
   "lostByForfeit": "Förlorad genom uppgivning",
   "realtimeDuel": "Realtidsduell",
   "duelComplete": "Duellen avslutad!",
-
-  // Utmaningssystem (Daglig + Veckovis)
-  challenges: {
-    daily: {
-      title: "Dagliga utmaningar",
-      resetsIn: "Återställs om {{time}}",
-      claim: "Hämta belöning",
-      claimed: "Hämtad!",
-      completed: "Slutförd",
-      progress: "{current} / {target}",
-      xpReward: "+{xp} XP",
-      practiceSessions: "Övningssessioner",
-      practiceSessionsDesc: "Genomför {target} övningssessioner idag",
-      wordsMastered: "Ordmästare",
-      wordsMasteredDesc: "Bemästra {target} nya ord idag",
-      duelPlayed: "Duellspelare",
-      duelPlayedDesc: "Spela {target} duell idag",
-      duelWins: "Duellvinnare",
-      duelWinsDesc: "Vinn {target} dueller idag",
-      perfectAccuracy: "Perfekt precision",
-      perfectAccuracyDesc: "Slutför {target} session med 100% precision",
-      blitzHighScore: "Blixtmästare",
-      blitzHighScoreDesc: "Få {target} poäng i Blitz-läge",
-      xpEarned: "XP-jägare",
-      xpEarnedDesc: "Tjäna {target} XP idag",
-      duelStreak: "Duellserie",
-      duelStreakDesc: "Vinn {target} dueller i rad",
-      spellingPerfect: "Stavningsbiet",
-      spellingPerfectDesc: "Få perfekt stavning i {target} sessioner",
+  "challenges": {
+    "daily": {
+      "title": "Dagliga utmaningar",
+      "resetsIn": "Återställs om {{time}}",
+      "claim": "Hämta belöning",
+      "claimed": "Hämtad!",
+      "completed": "Slutförd",
+      "progress": "{current} / {target}",
+      "xpReward": "+{xp} XP",
+      "practiceSessions": "Övningssessioner",
+      "practiceSessionsDesc": "Genomför {target} övningssessioner idag",
+      "wordsMastered": "Ordmästare",
+      "wordsMasteredDesc": "Bemästra {target} nya ord idag",
+      "duelPlayed": "Duellspelare",
+      "duelPlayedDesc": "Spela {target} duell idag",
+      "duelWins": "Duellvinnare",
+      "duelWinsDesc": "Vinn {target} dueller idag",
+      "perfectAccuracy": "Perfekt precision",
+      "perfectAccuracyDesc": "Slutför {target} session med 100% precision",
+      "blitzHighScore": "Blixtmästare",
+      "blitzHighScoreDesc": "Få {target} poäng i Blitz-läge",
+      "xpEarned": "XP-jägare",
+      "xpEarnedDesc": "Tjäna {target} XP idag",
+      "duelStreak": "Duellserie",
+      "duelStreakDesc": "Vinn {target} dueller i rad",
+      "spellingPerfect": "Stavningsbiet",
+      "spellingPerfectDesc": "Få perfekt stavning i {target} sessioner"
     },
-    weekly: {
-      title: "Veckouppdrag",
-      claim: "Hämta belöning",
-      claimed: "Hämtad!",
-      thisWeek: "Denna vecka",
-      progress: "{current} / {target}",
-      masterWords: "Veckovis Ordbehärskning",
-      masterWordsDesc: "Bemästra {target} ord denna vecka",
+    "weekly": {
+      "title": "Veckouppdrag",
+      "claim": "Hämta belöning",
+      "claimed": "Hämtad!",
+      "thisWeek": "Denna vecka",
+      "progress": "{current} / {target}",
+      "masterWords": "Veckovis Ordbehärskning",
+      "masterWordsDesc": "Bemästra {target} ord denna vecka"
     },
-    claim: "Hämta",
-    claimed: "Hämtad",
-    loading: "Laddar dina utmaningar...",
-    noChallenges: "Inga utmaningar tillgängliga",
-    completed: "Slutförd",
-    easy: "Lätt",
-    medium: "Medel",
-    hard: "Svår",
-    watchAdRetry: "Se reklam för att försöka igen"
+    "claim": "Hämta",
+    "claimed": "Hämtad",
+    "loading": "Laddar dina utmaningar...",
+    "noChallenges": "Inga utmaningar tillgängliga",
+    "completed": "Slutförd",
+    "easy": "Lätt",
+    "medium": "Medel",
+    "hard": "Svår",
+    "watchAdRetry": "Se reklam för att försöka igen"
   },
-  quests: {
-    weeklyWordMastery: "Veckans Ordmästerskap",
-    weeklyWordMasteryDesc: "Bemästra {target} ord den här veckan"
+  "quests": {
+    "title": "Uppdrag",
+    "dailyTitle": "Dagens uppdrag",
+    "weeklyTitle": "Veckouppdrag",
+    "grandSlam": "Grand Slam!",
+    "grandSlamBonus": "+500 XP Bonus",
+    "grandSlamAvatar": "+1 Avatardel",
+    "allComplete": "Uppdragsmästare!",
+    "allCompleteDesc": "Alla dagliga + veckouppdraget klara! Du är i elden!",
+    "avatarReward": "+1 Avatardel",
+    "avatarPartCategory": {
+      "eyes": "Ögon",
+      "mouth": "Mun",
+      "accessory": "Tillbehör",
+      "hair": "Hår",
+      "eyebrows": "Ögonbryn",
+      "facialHair": "Ansiktshår"
+    },
+    "completedAll": "Allt klart för idag!",
+    "progress": "{{completed}}/{{total}}",
+    "go": "KÖR",
+    "done": "Klart!",
+    "feed": {
+      "title": "Senaste Vinster",
+      "pvp": "{{name}} besegrade en riktig motståndare",
+      "grandSlam": "{{name}} klarade alla 3 dagliga uppdrag"
+    },
+    "daily": {
+      "long_word_6": {
+        "title": "Ordbyggare",
+        "desc": "Hitta ett ord med 6+ bokstäver"
+      },
+      "long_word_7": {
+        "title": "Språkjätte",
+        "desc": "Hitta ett ord med 7+ bokstäver"
+      },
+      "score_300": {
+        "title": "Precisionssskyttar",
+        "desc": "Poäng 300+ i ett spel"
+      },
+      "score_500": {
+        "title": "Högspel",
+        "desc": "Poäng 500+ i ett spel"
+      },
+      "words_15": {
+        "title": "Ordmaskin",
+        "desc": "Hitta 15+ ord i ett spel"
+      },
+      "combo_4": {
+        "title": "Combo Start",
+        "desc": "Nå 4x combo i ett spel"
+      },
+      "combo_6": {
+        "title": "Combo Kung",
+        "desc": "Nå 6x combo i ett spel"
+      },
+      "mp_win": {
+        "title": "Mästare",
+        "desc": "Vinna en multiplayer-match"
+      },
+      "beat_human": {
+        "title": "Rivalöverväldiga",
+        "desc": "Besegra en riktig motståndare"
+      },
+      "play_mp": {
+        "title": "Gå in på arenan",
+        "desc": "Spela en multiplayer-match"
+      },
+      "play_brain": {
+        "title": "Hjärnboost",
+        "desc": "Slutför en hjärnträning"
+      },
+      "play_wordhunt": {
+        "title": "I jakt",
+        "desc": "Spela dagens ordjakt"
+      }
+    },
+    "reward": {
+      "xp": "+{{xp}} XP",
+      "gold": "+{{gold}} Guld"
+    },
+    "weeklyWordMastery": "Veckans Ordmästerskap",
+    "weeklyWordMasteryDesc": "Bemästra {target} ord den här veckan",
+    "questOptions": "Uppdragsalternativ",
+    "completion": {
+      "title": "Uppdrag klart!",
+      "grandSlam": "Grand Slam!",
+      "grandSlamDesc": "Alla dagliga uppdrag avklarade!",
+      "xpReward": "+{{xp}} XP",
+      "goldReward": "+{{gold}} Guld"
+    }
   },
-  ads: {
-    label: "Annons",
-    rewarded: {
-      watchForGold: "Se reklam för +{amount} guld",
-      earning: "Tittar...",
-      earned: "+{amount} guld tjänat!",
-      cooldown: "Tillgänglig snart",
-      blocked: "Annonsblockerare hindrar belöningar. Inaktivera den för lexiclash.live för att tjäna guld."
+  "ads": {
+    "label": "Annons",
+    "rewarded": {
+      "watchForGold": "Se reklam för +{amount} guld",
+      "earning": "Tittar...",
+      "earned": "+{amount} guld tjänat!",
+      "cooldown": "Tillgänglig snart",
+      "blocked": "Annonsblockerare hindrar belöningar. Inaktivera den för lexiclash.live för att tjäna guld."
     },
-    doubleGold: {
-      cta: "Dubbla belöningar +{amount}",
-      earning: "Dubblar..."
+    "doubleGold": {
+      "cta": "Dubbla belöningar +{amount}",
+      "earning": "Dubblar..."
     },
-    reveal: {
-      freeViaAd: "Gratis avslöjande (annons)"
+    "reveal": {
+      "freeViaAd": "Gratis avslöjande (annons)"
     },
-    timeLow: {
-      cta: "Lägg till +{seconds}s",
-      earning: "Lägger till tid..."
+    "timeLow": {
+      "cta": "Lägg till +{seconds}s",
+      "earning": "Lägger till tid..."
     }
   },
   "features": {
@@ -12574,152 +13870,163 @@ const sv = {
       "advancedSettingsDesc": "Finjustera din spelupplevelse"
     }
   },
-  wordHuntAnnouncement: {
-    badge: "Nytt i Multiplayer",
-    title: "Testa Word Hunt-läget!",
-    subtitle: "Hitta det dolda målordet i en kapplöpning",
+  "wordHuntAnnouncement": {
+    "badge": "Nytt i Multiplayer",
+    "title": "Testa Word Hunt-läget!",
+    "subtitle": "Hitta det dolda målordet i en kapplöpning"
   },
-  wordHuntTips: {
-    needMoreWords: "Du hittade bara {{count}} ord. Varje ord fyller på ditt liv — skanna rader och diagonaler efter snabba 3-bokstavsord innan du gissar målet.",
-    accuracyDrainsLife: "{{invalid}} ogiltiga ord ({{accuracy}}% träffsäkerhet) — varje miss kostar liv. Satsa på säkra ord och spara riskfyllda gissningar tills livet är fullt.",
-    longerWordsSurvive: "Ditt snittord var {{avg}} bokstäver. Ord med 5+ bokstäver ger 2-3x mer poäng och mer liv tillbaka.",
-    shortWordsBetweenGuesses: "Mellan målgissningar, hitta 2-3 korta ord för att fylla på livet. Den bufferten låter dig överleva felgissningar.",
-    firstFinderPush: "Du hittade det först med {{words}} ord. För ännu högre poäng, samla upptäcktsord innan du går på målet.",
-    winnerLongerWords: "Du vann, men ditt snittord var {{avg}} bokstäver. Sikta på 5+ bokstäver — de ger 2-3x mer poäng.",
-    winnerMoreWords: "Du vann med {{count}} ord. Skanna brädet snabbare — prova diagonaler och baklänges.",
-    tooManyInvalid: "{{invalid}} ogiltiga försök ({{accuracy}}% träffsäkerhet). Varje miss dränerar liv. Fokusera på säkra ord först.",
-    lifeManagement: "Du slutade på {{life}}% liv — en miss till och du var ute. Blanda in korta ord mellan målgissningar.",
-    pushWordLength: "Ditt snitt var {{avg}} bokstäver (längsta: {{longest}}). Bygg vidare på korta ord — ser du \"RAN\", leta efter \"RANGE\" i närheten.",
-    scanMoreWords: "Bara {{count}} ord hittade. Innan du gissar målet, spendera 15-20 sekunder på att skanna efter enkla 3-4 bokstavsord.",
-    pushForFirst: "Du kom {{rank}}:a. För att stänga gapet, hitta längre ord (5+ bokstäver) och håll träffsäkerheten hög.",
-    spellWordsFirst: "Stava ord på rutorna först — varje ord avslöjar en bokstav i det dolda ordet.",
-    fastSolveFarmMore: "Löst på {{attempts}} försök! Blixtrande snabbt. Plocka ett par ord nästa gång för bonuspoäng.",
-    trustCluesSooner: "Det tog {{attempts}} gissningar — lita på dina avslöjade ledtrådar och ta risken tidigare för mer poäng.",
+  "wordHuntTips": {
+    "needMoreWords": "Du hittade bara {{count}} ord. Varje ord fyller på ditt liv — skanna rader och diagonaler efter snabba 3-bokstavsord innan du gissar målet.",
+    "accuracyDrainsLife": "{{invalid}} ogiltiga ord ({{accuracy}}% träffsäkerhet) — varje miss kostar liv. Satsa på säkra ord och spara riskfyllda gissningar tills livet är fullt.",
+    "longerWordsSurvive": "Ditt snittord var {{avg}} bokstäver. Ord med 5+ bokstäver ger 2-3x mer poäng och mer liv tillbaka.",
+    "shortWordsBetweenGuesses": "Mellan målgissningar, hitta 2-3 korta ord för att fylla på livet. Den bufferten låter dig överleva felgissningar.",
+    "firstFinderPush": "Du hittade det först med {{words}} ord. För ännu högre poäng, samla upptäcktsord innan du går på målet.",
+    "winnerLongerWords": "Du vann, men ditt snittord var {{avg}} bokstäver. Sikta på 5+ bokstäver — de ger 2-3x mer poäng.",
+    "winnerMoreWords": "Du vann med {{count}} ord. Skanna brädet snabbare — prova diagonaler och baklänges.",
+    "tooManyInvalid": "{{invalid}} ogiltiga försök ({{accuracy}}% träffsäkerhet). Varje miss dränerar liv. Fokusera på säkra ord först.",
+    "lifeManagement": "Du slutade på {{life}}% liv — en miss till och du var ute. Blanda in korta ord mellan målgissningar.",
+    "pushWordLength": "Ditt snitt var {{avg}} bokstäver (längsta: {{longest}}). Bygg vidare på korta ord — ser du \"RAN\", leta efter \"RANGE\" i närheten.",
+    "scanMoreWords": "Bara {{count}} ord hittade. Innan du gissar målet, spendera 15-20 sekunder på att skanna efter enkla 3-4 bokstavsord.",
+    "pushForFirst": "Du kom {{rank}}:a. För att stänga gapet, hitta längre ord (5+ bokstäver) och håll träffsäkerheten hög.",
+    "spellWordsFirst": "Stava ord på rutorna först — varje ord avslöjar en bokstav i det dolda ordet.",
+    "fastSolveFarmMore": "Löst på {{attempts}} försök! Blixtrande snabbt. Plocka ett par ord nästa gång för bonuspoäng.",
+    "trustCluesSooner": "Det tog {{attempts}} gissningar — lita på dina avslöjade ledtrådar och ta risken tidigare för mer poäng."
   },
-  wordHuntDeathRecap: {
-    causeLifeDrain: "Livet rann ut",
-    causeWrongGuess: "Fel gissning tog kål på dig",
-    statWords: "Ord",
-    statWrongGuesses: "Fel",
-    statSurvival: "Överlevde",
-    eliminatedOrder: "Ut #{{order}} av {{total}}",
-    lessonWrongGuess: "Varje fel gissning kostar {{penalty}} liv! Du förlorade {{guesses}} gissningar. Hitta ord på brädet innan du gissar.",
-    lessonNoWords: "Du hittade bara {{count}} ord! Att svepa ord på brädet läker dig. Hitta snabba 3-bokstavsord för att överleva.",
-    lessonShortWords: "Ditt snitt var {{avg}} bokstäver. Längre ord läker mer — 5-bokstavsord ger +8 liv mot +3 för 3-bokstavsord.",
-    lessonTooManyGuesses: "{{guesses}} felgissningar kostade dig {{cost}} liv totalt. Gissa bara när du har tillräckligt med ledtrådar.",
-    lessonPacing: "Hitta 2-3 ord mellan varje gissning. De både läker dig OCH avslöjar ledtrådar om det dolda ordet.",
+  "wordHuntDeathRecap": {
+    "causeLifeDrain": "Livet rann ut",
+    "causeWrongGuess": "Fel gissning tog kål på dig",
+    "statWords": "Ord",
+    "statWrongGuesses": "Fel",
+    "statSurvival": "Överlevde",
+    "eliminatedOrder": "Ut #{{order}} av {{total}}",
+    "lessonWrongGuess": "Varje fel gissning kostar {{penalty}} liv! Du förlorade {{guesses}} gissningar. Hitta ord på brädet innan du gissar.",
+    "lessonNoWords": "Du hittade bara {{count}} ord! Att svepa ord på brädet läker dig. Hitta snabba 3-bokstavsord för att överleva.",
+    "lessonShortWords": "Ditt snitt var {{avg}} bokstäver. Längre ord läker mer — 5-bokstavsord ger +8 liv mot +3 för 3-bokstavsord.",
+    "lessonTooManyGuesses": "{{guesses}} felgissningar kostade dig {{cost}} liv totalt. Gissa bara när du har tillräckligt med ledtrådar.",
+    "lessonPacing": "Hitta 2-3 ord mellan varje gissning. De både läker dig OCH avslöjar ledtrådar om det dolda ordet."
   },
-  wordHuntRules: {
-    panel1Title: "Hitta det dolda ordet",
-    panel1Desc: "Ett hemligt målord är gömt. Använd ledrådrutorna högst upp för att lista ut det.",
-    panel2Title: "Ditt liv rinner ut",
-    panel2Desc: "Livsmätaren tickar ner varje sekund. Svepa ord på brädet för att läka dig och överleva.",
-    panel3Title: "Ord avslöjar ledtrådar",
-    panel3Desc: "Brädord som delar bokstäver med målet lyser grönt och gult — använd dem!",
-    panel4Title: "Fel gissningar kostar liv",
-    panel4Desc: "Att gissa fel målord kostar 15 liv. Samla ledtrådar innan du gissar.",
-    goToPanel: "Gå till regel {{panel}}",
-    gotIt: "Fattar!",
-    skip: "Hoppa över",
-    quickTipsTitle: "Snabbtips",
+  "wordHuntRules": {
+    "panel1Title": "Hitta det dolda ordet",
+    "panel1Desc": "Ett hemligt målord är gömt. Använd ledrådrutorna högst upp för att lista ut det.",
+    "panel2Title": "Ditt liv rinner ut",
+    "panel2Desc": "Livsmätaren tickar ner varje sekund. Svepa ord på brädet för att läka dig och överleva.",
+    "panel3Title": "Ord avslöjar ledtrådar",
+    "panel3Desc": "Brädord som delar bokstäver med målet lyser grönt och gult — använd dem!",
+    "panel4Title": "Fel gissningar kostar liv",
+    "panel4Desc": "Att gissa fel målord kostar 15 liv. Samla ledtrådar innan du gissar.",
+    "goToPanel": "Gå till regel {{panel}}",
+    "gotIt": "Fattar!",
+    "skip": "Hoppa över",
+    "quickTipsTitle": "Snabbtips"
   },
-  wordHuntNudge: {
-    lifeDrop: "Svepa ord på brädet för att läka! Varje ord ger tillbaka liv.",
-    firstClue: "Det ordet avslöjade en ledtråd! Kolla rutorna ovan.",
-    wrongGuess: "Fel gissning kostar -15 liv! Samla ledtrådar först.",
+  "wordHuntNudge": {
+    "lifeDrop": "Svepa ord på brädet för att läka! Varje ord ger tillbaka liv.",
+    "firstClue": "Det ordet avslöjade en ledtråd! Kolla rutorna ovan.",
+    "wrongGuess": "Fel gissning kostar -15 liv! Samla ledtrådar först."
   },
-  wordHuntPromo: {
-    title: "Testa Word Hunt-läget!",
-    subtitle: "Hitta det dolda målordet i multiplayer",
-    cta: "Spela Word Hunt",
-    dismiss: "Kanske Senare",
-    imageAlt: "Word Hunt multiplayer-duell",
+  "wordHuntPromo": {
+    "title": "Testa Word Hunt-läget!",
+    "subtitle": "Hitta det dolda målordet i multiplayer",
+    "cta": "Spela Word Hunt",
+    "dismiss": "Kanske Senare",
+    "imageAlt": "Word Hunt multiplayer-duell"
   },
-  gameModes: {
-    classic: {
-      name: "Klassiskt",
-      description: "Hitta så många ord du kan!",
-      feature1: "Tidsbegränsat",
-      feature2: "Poängbaserat",
-      feature3: "Fritt",
-      intro: { greet: "Ta din tid. Bara ord." },
-      tutorial: {
-        tip1: "Tryck på intilliggande rutor för att stava",
-        tip2: "Längre ord visar mer",
-        tip3: "Ingen timer — utforska bara"
+  "gameModes": {
+    "classic": {
+      "name": "Klassiskt",
+      "description": "Hitta så många ord du kan!",
+      "feature1": "Tidsbegränsat",
+      "feature2": "Poängbaserat",
+      "feature3": "Fritt",
+      "intro": {
+        "greet": "Ta din tid. Bara ord."
+      },
+      "tutorial": {
+        "tip1": "Tryck på intilliggande rutor för att stava",
+        "tip2": "Längre ord visar mer",
+        "tip3": "Ingen timer — utforska bara"
       }
     },
-    blast: {
-      name: "Blast",
-      description: "Rensa brickor med kombos och specialkrafter!",
-      feature1: "Kedjekombos",
-      feature2: "Specialbrickor",
-      feature3: "Kaskad",
-      intro: { greet: "Tryck, dra, andas. Ingen brådska." },
-      results: {
-        sceneTitle: "Blast-resultat",
-        finalScore: "Slutpoäng",
-        comboChain: "Bästa combo",
-        boardClears: "Brädesrensningar",
-        gemsCollected: "Ädelstenar",
-        tilesCleared: "Rensade rutor",
-        bestWord: "Bästa ord",
-        rank: "Placering"
+    "blast": {
+      "name": "Blast",
+      "description": "Rensa brickor med kombos och specialkrafter!",
+      "feature1": "Kedjekombos",
+      "feature2": "Specialbrickor",
+      "feature3": "Kaskad",
+      "intro": {
+        "greet": "Tryck, dra, andas. Ingen brådska."
+      },
+      "results": {
+        "sceneTitle": "Blast-resultat",
+        "finalScore": "Slutpoäng",
+        "comboChain": "Bästa combo",
+        "boardClears": "Brädesrensningar",
+        "gemsCollected": "Ädelstenar",
+        "tilesCleared": "Rensade rutor",
+        "bestWord": "Bästa ord",
+        "rank": "Placering"
+      },
+      "mpResults": {
+        "boardCleared": "BRÄDET RENSAT!"
       }
     },
-    wordHunt: {
-      name: "Ordjakt",
-      description: "Tävla om att hitta målordet!",
-      feature1: "Målord",
-      feature2: "Snabblopp",
-      feature3: "Ledtrådar",
-      intro: { greet: "Ett ord i taget. Du fixar det." },
-      tutorial: {
-        tip1: "Dra anslutna bokstäver för att stava målordet",
-        tip2: "Bonusord räknas också — hitta så många du vill",
-        tip3: "Ingen timer, ingen livmätare — utforska fritt"
+    "wordHunt": {
+      "name": "Ordjakt",
+      "description": "Tävla om att hitta målordet!",
+      "feature1": "Målord",
+      "feature2": "Snabblopp",
+      "feature3": "Ledtrådar",
+      "intro": {
+        "greet": "Ett ord i taget. Du fixar det."
+      },
+      "tutorial": {
+        "tip1": "Dra anslutna bokstäver för att stava målordet",
+        "tip2": "Bonusord räknas också — hitta så många du vill",
+        "tip3": "Ingen timer, ingen livmätare — utforska fritt"
       }
     },
-    wheelRush: {
-      name: "Hjulrusning",
-      description: "Kapplöpning på hjulet — stjäl ord för att vinna!",
-      feature1: "Låsfönster",
-      feature2: "Stridsdimma",
-      feature3: "Pangrambonus",
-      intro: { greet: "Snurra lugnt. Orden kommer." },
-      tutorial: {
-        tip1: "Tryck på den limegröna mittbokstaven — den måste finnas i varje ord",
-        tip2: "Tryck på yttre bokstäver i valfri ordning",
-        tip3: "Prova pluralformer för att förlänga"
+    "wheelRush": {
+      "name": "Hjulrusning",
+      "description": "Kapplöpning på hjulet — stjäl ord för att vinna!",
+      "feature1": "Låsfönster",
+      "feature2": "Stridsdimma",
+      "feature3": "Pangrambonus",
+      "intro": {
+        "greet": "Snurra lugnt. Orden kommer."
+      },
+      "tutorial": {
+        "tip1": "Tryck på den limegröna mittbokstaven — den måste finnas i varje ord",
+        "tip2": "Tryck på yttre bokstäver i valfri ordning",
+        "tip3": "Prova pluralformer för att förlänga"
       }
     },
-    shiritori: {
-      name: "Shiritori",
-      description: "Kedja ord — varje ord börjar på förra ordets sista bokstav!"
+    "shiritori": {
+      "name": "Shiritori",
+      "description": "Kedja ord — varje ord börjar på förra ordets sista bokstav!"
     },
-    sealedBid: {
-      name: "Hemligt bud",
-      description: "Bjud ett ord ingen annan väljer — unika bud ger dubbla poäng!"
+    "sealedBid": {
+      "name": "Hemligt bud",
+      "description": "Bjud ett ord ingen annan väljer — unika bud ger dubbla poäng!"
     },
-    crossword: {
-      name: "Korsord",
-      description: "Kapplöpning att lösa samma korsord — snabbast vinner!"
+    "crossword": {
+      "name": "Korsord",
+      "description": "Kapplöpning att lösa samma korsord — snabbast vinner!"
     },
-    intro: {
-      cta: "Sätt igång",
-      skip: "Hoppa över guiden"
+    "intro": {
+      "cta": "Sätt igång",
+      "skip": "Hoppa över guiden"
     },
-    tutorial: {
-      title: "Så funkar det",
-      cta: "Nu kör vi!"
+    "tutorial": {
+      "title": "Så funkar det",
+      "cta": "Nu kör vi!"
     },
-    random: "Slumpmässigt",
-    randomDescription: "Överraska mig! Slumpa läge varje runda.",
-    randomFeature1: "Variation",
-    randomFeature2: "Överraskning",
-    randomFeature3: "Blandade regler",
-    nextMode: "Nästa läge",
-    randomizing: "Slumpar..."
+    "random": "Slumpmässigt",
+    "randomDescription": "Överraska mig! Slumpa läge varje runda.",
+    "randomFeature1": "Variation",
+    "randomFeature2": "Överraskning",
+    "randomFeature3": "Blandade regler",
+    "nextMode": "Nästa läge",
+    "randomizing": "Slumpar..."
   },
   "presets": {
     "fast": "Snabb",
@@ -12838,33 +14145,11 @@ const sv = {
     "spotsFromPromotion": "{n} platser från uppflyttning"
   },
   "leagueRivals": {
-    "title": "Veckoliga",
-    "bronze": "Brons",
-    "silver": "Silver",
-    "gold": "Guld",
-    "diamond": "Diamant",
-    "ruby": "Rubin",
-    "position": "Position",
-    "xp": "XP",
-    "promotionZone": "Uppflyttningszon",
-    "safeZone": "Säker zon",
-    "relegationZone": "Nedflyttningszon",
-    "promoted": "Uppflyttad!",
-    "relegated": "Nedflyttad",
-    "stayed": "Stannade",
-    "weeklyRewards": "Veckobelöningar",
-    "coinsEarned": "Mynt intjänade",
-    "newWeekIn": "Ny vecka börjar om",
-    "joinLeague": "Gå med i liga",
-    "yourPosition": "Din position",
-    "top": "Topp",
-    "standings": "Ställning",
-    "noLeague": "Gå med i en liga för att tävla!",
-    "finalResults": "Slutresultat",
-    "viewStandings": "Visa ställning",
-    "xpToPromote": "{xp} XP till uppflyttning",
-    "xpAboveRelegation": "{xp} XP över nedflyttning",
-    "positionOf": "#{position} av {total}"
+    "title": "Dina ligarivaler",
+    "ahead": "{{pts}} poäng före",
+    "behind": "{{pts}} poäng efter",
+    "you": "Du",
+    "noRivals": "Klättra i ligan för att hitta rivaler!"
   },
   "socialGift": {
     "title": "Skicka en gåva",
@@ -12935,57 +14220,62 @@ const sv = {
       "optOut": "Viss datainsamling är nödvändig för att spelet ska fungera (som ditt användarnamn och poäng), men du kan välja bort analys och personaliserade annonser i Inställningar > Integritet."
     }
   },
-  avatarBuilder: {
-    glowUp: { button: "Glow-up", loading: "Skapar…", adminTag: "Admin", resultTitle: "Din glow-up" },
-    title: "Avatarskapare",
-    base: "Form",
-    hair: "Hår",
-    eyes: "Ögon",
-    mouth: "Mun",
-    facialHair: "Ansiktshår",
-    accessories: "Tillbehör",
-    background: "Bakgrund",
-    skinColor: "Hudfärg",
-    hairColor: "Hårfärg",
-    accessoryColor: "Färg",
-    shirtColor: "Tröjfärg",
-    eyeColor: "Ögonfärg",
-    randomize: "Slumpa",
-    undo: "Ångra",
-    restorePrevious: "Återställ tidigare avatar",
-    download: "Ladda ner",
-    save: "Spara",
-    cancel: "Avbryt",
-    buildCustom: "Bygg din egen",
-    bgColor: "Bakgrund",
-    gender: "Kroppstyp",
-    male: "Man",
-    female: "Kvinna",
-    shape: "Form",
-    style: "Stil",
-    none: "Ingen",
-    type: "Typ",
-    nose: "Näsa",
-    eyebrows: "Ögonbryn",
-    expressions: "Uttryck",
-    facialHairStyle: "Stil",
-    colorTheme: "Färgtema",
-    bodyStyle: "Outfit",
-    bodyStyles: {
-      default: "Standard",
-      hoodie: "Huvtröja",
-      suit: "Kostym",
-      turtleneck: "Polotröja",
-      offShoulder: "Bara axlar",
-      cropTop: "Magtröja"
+  "avatarBuilder": {
+    "glowUp": {
+      "button": "Glow-up",
+      "loading": "Skapar…",
+      "adminTag": "Admin",
+      "resultTitle": "Din glow-up"
     },
-    theme: {
-      classic: "Klassisk",
-      fire: "Eld",
-      electric: "Elektrisk",
-      toxic: "Giftig",
-      royal: "Kunglig",
-      pop: "Pop"
+    "title": "Avatarskapare",
+    "base": "Form",
+    "hair": "Hår",
+    "eyes": "Ögon",
+    "mouth": "Mun",
+    "facialHair": "Ansiktshår",
+    "accessories": "Tillbehör",
+    "background": "Bakgrund",
+    "skinColor": "Hudfärg",
+    "hairColor": "Hårfärg",
+    "accessoryColor": "Färg",
+    "shirtColor": "Tröjfärg",
+    "eyeColor": "Ögonfärg",
+    "randomize": "Slumpa",
+    "undo": "Ångra",
+    "restorePrevious": "Återställ tidigare avatar",
+    "download": "Ladda ner",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "buildCustom": "Bygg din egen",
+    "bgColor": "Bakgrund",
+    "gender": "Kroppstyp",
+    "male": "Man",
+    "female": "Kvinna",
+    "shape": "Form",
+    "style": "Stil",
+    "none": "Ingen",
+    "type": "Typ",
+    "nose": "Näsa",
+    "eyebrows": "Ögonbryn",
+    "expressions": "Uttryck",
+    "facialHairStyle": "Stil",
+    "colorTheme": "Färgtema",
+    "bodyStyle": "Outfit",
+    "bodyStyles": {
+      "default": "Standard",
+      "hoodie": "Huvtröja",
+      "suit": "Kostym",
+      "turtleneck": "Polotröja",
+      "offShoulder": "Bara axlar",
+      "cropTop": "Magtröja"
+    },
+    "theme": {
+      "classic": "Klassisk",
+      "fire": "Eld",
+      "electric": "Elektrisk",
+      "toxic": "Giftig",
+      "royal": "Kunglig",
+      "pop": "Pop"
     }
   },
   "encouragement": {
@@ -13048,92 +14338,6 @@ const sv = {
     "completed": "Klart!",
     "progress": "{{current}}/3 Uppdrag"
   },
-  "quests": {
-    "title": "Uppdrag",
-    "dailyTitle": "Dagens uppdrag",
-    "weeklyTitle": "Veckouppdrag",
-    "grandSlam": "Grand Slam!",
-    "grandSlamBonus": "+500 XP Bonus",
-    "grandSlamAvatar": "+1 Avatardel",
-    "allComplete": "Uppdragsmästare!",
-    "allCompleteDesc": "Alla dagliga + veckouppdraget klara! Du är i elden!",
-    "avatarReward": "+1 Avatardel",
-    "avatarPartCategory": {
-      "eyes": "Ögon",
-      "mouth": "Mun",
-      "accessory": "Tillbehör",
-      "hair": "Hår",
-      "eyebrows": "Ögonbryn",
-      "facialHair": "Ansiktshår"
-    },
-    "completedAll": "Allt klart för idag!",
-    "progress": "{{completed}}/{{total}}",
-    "go": "KÖR",
-    "done": "Klart!",
-    "feed": {
-      "title": "Senaste Vinster",
-      "pvp": "{{name}} besegrade en riktig motståndare",
-      "grandSlam": "{{name}} klarade alla 3 dagliga uppdrag"
-    },
-    "daily": {
-      "long_word_6": {
-        "title": "Ordbyggare",
-        "desc": "Hitta ett ord med 6+ bokstäver"
-      },
-      "long_word_7": {
-        "title": "Språkjätte",
-        "desc": "Hitta ett ord med 7+ bokstäver"
-      },
-      "score_300": {
-        "title": "Precisionssskyttar",
-        "desc": "Poäng 300+ i ett spel"
-      },
-      "score_500": {
-        "title": "Högspel",
-        "desc": "Poäng 500+ i ett spel"
-      },
-      "words_15": {
-        "title": "Ordmaskin",
-        "desc": "Hitta 15+ ord i ett spel"
-      },
-      "combo_4": { "title": "Combo Start", "desc": "Nå 4x combo i ett spel" },
-      "combo_6": { "title": "Combo Kung", "desc": "Nå 6x combo i ett spel" },
-      "mp_win": {
-        "title": "Mästare",
-        "desc": "Vinna en multiplayer-match"
-      },
-      "beat_human": {
-        "title": "Rivalöverväldiga",
-        "desc": "Besegra en riktig motståndare"
-      },
-      "play_mp": {
-        "title": "Gå in på arenan",
-        "desc": "Spela en multiplayer-match"
-      },
-      "play_brain": {
-        "title": "Hjärnboost",
-        "desc": "Slutför en hjärnträning"
-      },
-      "play_wordhunt": {
-        "title": "I jakt",
-        "desc": "Spela dagens ordjakt"
-      }
-    },
-    "reward": {
-      "xp": "+{{xp}} XP",
-      "gold": "+{{gold}} Guld"
-    },
-    "weeklyWordMastery": "Veckans Ordmästerskap",
-    "weeklyWordMasteryDesc": "Bemästra {target} ord den här veckan",
-    "questOptions": "Uppdragsalternativ",
-    "completion": {
-      "title": "Uppdrag klart!",
-      "grandSlam": "Grand Slam!",
-      "grandSlamDesc": "Alla dagliga uppdrag avklarade!",
-      "xpReward": "+{{xp}} XP",
-      "goldReward": "+{{gold}} Guld"
-    }
-  },
   "wotd": {
     "title": "Dagens Ord",
     "teaser": "Dagens Ord",
@@ -13156,13 +14360,6 @@ const sv = {
     "forgot": "Glömt",
     "reviewComplete": "Repetition klar!",
     "empty": "Spela spel för att hitta sällsynta ord!"
-  },
-  "leagueRivals": {
-    "title": "Dina ligarivaler",
-    "ahead": "{{pts}} poäng före",
-    "behind": "{{pts}} poäng efter",
-    "you": "Du",
-    "noRivals": "Klättra i ligan för att hitta rivaler!"
   },
   "powerHour": {
     "activated": "Power Hour aktiverad!",
@@ -13296,7 +14493,24 @@ const sv = {
     "emptyCta": "Skicka en brädutmaning till en vän!",
     "resultTitle": "Utmaningsresultat",
     "bestWord": "Bästa ord: {{word}}",
-    "wordsFound": "{{count}} ord hittade"
+    "wordsFound": "{{count}} ord hittade",
+    "mode": {
+      "classic": "Klassisk",
+      "blast": "Blast",
+      "word-hunt": "Ordjakt"
+    },
+    "received": {
+      "title": "{sender} utmanade dig",
+      "body": "Slå {score} på {mode}"
+    },
+    "result": {
+      "titleWin": "Du slog {opponent}!",
+      "titleLoss": "{opponent} slog dig",
+      "titleTie": "Oavgjort med {opponent}",
+      "bodyWin": "{mine} vs {theirs}",
+      "bodyLoss": "{mine} vs {theirs}",
+      "bodyTie": "{mine} vs {theirs}"
+    }
   },
   "wordClub": {
     "title": "Ordklubb",
@@ -13719,7 +14933,9 @@ const sv = {
       "playMicrocopy": "KÖR!",
       "browseRooms": "Eller bläddra i rum ↓",
       "liveBadge": "LIVE",
-      "aria": { "section": "CrazyGames-välkomst" }
+      "aria": {
+        "section": "CrazyGames-välkomst"
+      }
     }
   },
   "dailyInvite": {
@@ -13774,12 +14990,64 @@ const sv = {
     "playAgain": "Spela igen",
     "home": "Hem",
     "finalTiles": "Sista brickorna!",
-    "difficulty": { "label": "Svårighetsgrad", "easy": "Lätt", "medium": "Medel", "hard": "Svår" },
-    "clue": { "button": "Ledtråd", "reveal": "Prova: {{word}}", "none": "Inget drag hittat — prova att byta", "granted": "+1 ledtråd!", "adFailed": "Annons otillgänglig — försök igen" },
-    "modifier": { "bingo_bonanza": "Bingo-bonanza", "long_words": "Långa ord", "rich_letters": "Dyra brickor", "land_grab": "Markrofferi", "quick_draw": "Snabbgiv", "golden_tiles": "Guldbrickor", "none": "", "desc": { "bingo_bonanza": "Bingo ger +90", "long_words": "Ord med 5+ bokstäver +15", "rich_letters": "Sällsynta brickor räknas dubbelt", "land_grab": "Erövringar sprids till grannrutor", "quick_draw": "5 brickor på stället — snabbare rundor", "golden_tiles": "✦-brickor erövrar rutorna runt omkring" } },
-    "setup": { "title": "Gör i ordning matchen", "opponent": { "label": "Motståndare", "bot": "Mot boten", "botDesc": "Spela mot WordBot", "hotseat": "Turas om", "hotseatDesc": "Två spelare, en enhet", "friend": "Utmana en vän", "friendDesc": "Skicka en slå-mitt-resultat-länk" }, "difficulty": { "label": "Botens nivå" }, "twist": { "label": "Twist", "surprise": "Överraska mig" }, "start": "Starta spelet", "challengeHint": "Utmana en vän från resultatskärmen", "sendChallengeNow": "Skicka din utmaning nu!" },
+    "difficulty": {
+      "label": "Svårighetsgrad",
+      "easy": "Lätt",
+      "medium": "Medel",
+      "hard": "Svår"
+    },
+    "clue": {
+      "button": "Ledtråd",
+      "reveal": "Prova: {{word}}",
+      "none": "Inget drag hittat — prova att byta",
+      "granted": "+1 ledtråd!",
+      "adFailed": "Annons otillgänglig — försök igen"
+    },
+    "modifier": {
+      "bingo_bonanza": "Bingo-bonanza",
+      "long_words": "Långa ord",
+      "rich_letters": "Dyra brickor",
+      "land_grab": "Markrofferi",
+      "quick_draw": "Snabbgiv",
+      "golden_tiles": "Guldbrickor",
+      "none": "",
+      "desc": {
+        "bingo_bonanza": "Bingo ger +90",
+        "long_words": "Ord med 5+ bokstäver +15",
+        "rich_letters": "Sällsynta brickor räknas dubbelt",
+        "land_grab": "Erövringar sprids till grannrutor",
+        "quick_draw": "5 brickor på stället — snabbare rundor",
+        "golden_tiles": "✦-brickor erövrar rutorna runt omkring"
+      }
+    },
+    "setup": {
+      "title": "Gör i ordning matchen",
+      "opponent": {
+        "label": "Motståndare",
+        "bot": "Mot boten",
+        "botDesc": "Spela mot WordBot",
+        "hotseat": "Turas om",
+        "hotseatDesc": "Två spelare, en enhet",
+        "friend": "Utmana en vän",
+        "friendDesc": "Skicka en slå-mitt-resultat-länk"
+      },
+      "difficulty": {
+        "label": "Botens nivå"
+      },
+      "twist": {
+        "label": "Twist",
+        "surprise": "Överraska mig"
+      },
+      "start": "Starta spelet",
+      "challengeHint": "Utmana en vän från resultatskärmen",
+      "sendChallengeNow": "Skicka din utmaning nu!"
+    },
     "squares": "rutor",
-    "place": { "step1": "Tryck på en bokstav", "step2": "Tryck på en ruta", "step3": "Skicka" },
+    "place": {
+      "step1": "Tryck på en bokstav",
+      "step2": "Tryck på en ruta",
+      "step3": "Skicka"
+    },
     "newBest": "Nytt rekord!",
     "bagRemaining": "Påse",
     "yourRack": "Ditt ställ",
@@ -13876,7 +15144,6 @@ const sv = {
       "axisDownLocked": "Lodrätt riktning låst",
       "axisUnlocked": "Ordriktning olåst"
     },
-    // FLAG_FOR_NATIVE_REVIEW: 2026-05-11 wordcraft-mobile-fun (legend + scoreDot + tilesLeft)
     "tilesLeft": "Brickor kvar",
     "legend": {
       "title": "Bonusar",
@@ -13907,7 +15174,11 @@ const sv = {
       "score": "Poäng",
       "target": "Mål",
       "runTotal": "Total poäng",
-      "feedback": { "nice": "Snyggt!", "great": "Toppen!", "huge": "Enormt!" },
+      "feedback": {
+        "nice": "Snyggt!",
+        "great": "Toppen!",
+        "huge": "Enormt!"
+      },
       "submit": "Skicka ord",
       "recall": "Ångra",
       "endRound": "Avsluta runda",
@@ -13938,18 +15209,54 @@ const sv = {
         "share": "WordCraft-runda: {{score}}"
       },
       "card": {
-        "vowelPower": { "name": "Vokalkraft", "desc": "Vokaler är värda +2 marker styck." },
-        "longGame": { "name": "Långt spel", "desc": "Ord med 5+ bokstäver ger dubbel poäng." },
-        "combo": { "name": "Combokedja", "desc": "Varje ord efter det första rundan ger +1 multiplikator." },
-        "premiumHunter": { "name": "Bonusjägare", "desc": "Varje bonusruta du använder ger +1 multiplikator." },
-        "wildcardStash": { "name": "Jokerförråd", "desc": "Börja varje runda med en blank bricka." },
-        "quickHands": { "name": "Snabba händer", "desc": "Lägger till 4 extra brickor i varje rundas påse." },
-        "doubleDown": { "name": "Dubbla upp", "desc": "Ditt första ord varje runda ger tredubbel poäng." },
-        "rareLetters": { "name": "Sällsynta bokstäver", "desc": "Brickor värda 4+ poäng ger +3 marker styck." },
-        "shortSweet": { "name": "Kort och gott", "desc": "Treboksstavsord får +15 marker." },
-        "steadyBuild": { "name": "Stadig bygge", "desc": "Varje ord får +5 fasta marker." },
-        "overflow": { "name": "Överflöd", "desc": "Poäng över målet ger 10% som bonus." },
-        "letterHoard": { "name": "Bokstavslager", "desc": "Ditt ställ rymmer 10 brickor istället för 8." }
+        "vowelPower": {
+          "name": "Vokalkraft",
+          "desc": "Vokaler är värda +2 marker styck."
+        },
+        "longGame": {
+          "name": "Långt spel",
+          "desc": "Ord med 5+ bokstäver ger dubbel poäng."
+        },
+        "combo": {
+          "name": "Combokedja",
+          "desc": "Varje ord efter det första rundan ger +1 multiplikator."
+        },
+        "premiumHunter": {
+          "name": "Bonusjägare",
+          "desc": "Varje bonusruta du använder ger +1 multiplikator."
+        },
+        "wildcardStash": {
+          "name": "Jokerförråd",
+          "desc": "Börja varje runda med en blank bricka."
+        },
+        "quickHands": {
+          "name": "Snabba händer",
+          "desc": "Lägger till 4 extra brickor i varje rundas påse."
+        },
+        "doubleDown": {
+          "name": "Dubbla upp",
+          "desc": "Ditt första ord varje runda ger tredubbel poäng."
+        },
+        "rareLetters": {
+          "name": "Sällsynta bokstäver",
+          "desc": "Brickor värda 4+ poäng ger +3 marker styck."
+        },
+        "shortSweet": {
+          "name": "Kort och gott",
+          "desc": "Treboksstavsord får +15 marker."
+        },
+        "steadyBuild": {
+          "name": "Stadig bygge",
+          "desc": "Varje ord får +5 fasta marker."
+        },
+        "overflow": {
+          "name": "Överflöd",
+          "desc": "Poäng över målet ger 10% som bonus."
+        },
+        "letterHoard": {
+          "name": "Bokstavslager",
+          "desc": "Ditt ställ rymmer 10 brickor istället för 8."
+        }
       }
     },
     "territory": {
@@ -14038,134 +15345,138 @@ const sv = {
       }
     }
   },
-  mp: {
-    quality: { degraded: "Anslutningen är instabil", reconnecting: "Återansluter…", weak: "Svag anslutning" },
-    stopGameConfirm: "Avsluta spelet för alla?",
-    stopGameYes: "Avsluta spelet",
-    noRoomsYet: "Inga strider pågår",
-    emptyStateCaption: "Starta en nu — vi fyller platserna med bottar!",
-    quickPlayAction: "Snabbspel",
-    dailyChallengeAction: "Daglig utmaning",
-    reconnect: {
-      title: "Återansluter…",
-      attempt: "Försöker återansluta…",
-      giveUp: "Lämna spelet"
+  "mp": {
+    "quality": {
+      "degraded": "Anslutningen är instabil",
+      "reconnecting": "Återansluter…",
+      "weak": "Svag anslutning"
     },
-    abort: {
-      title: "Matchen avslutades",
-      body: "Värden avslutade matchen.",
-      continueSolo: "Fortsätt själv",
-      returnToLobby: "Tillbaka till lobbyn"
+    "stopGameConfirm": "Avsluta spelet för alla?",
+    "stopGameYes": "Avsluta spelet",
+    "noRoomsYet": "Inga strider pågår",
+    "emptyStateCaption": "Starta en nu — vi fyller platserna med bottar!",
+    "quickPlayAction": "Snabbspel",
+    "dailyChallengeAction": "Daglig utmaning",
+    "reconnect": {
+      "title": "Återansluter…",
+      "attempt": "Försöker återansluta…",
+      "giveUp": "Lämna spelet"
     },
-    kbHint: {
-      submit: "skicka",
-      pop: "ta bort sista",
-      clear: "rensa"
+    "abort": {
+      "title": "Matchen avslutades",
+      "body": "Värden avslutade matchen.",
+      "continueSolo": "Fortsätt själv",
+      "returnToLobby": "Tillbaka till lobbyn"
     },
-    ladder: {
-      empty: "Inga ord än — hitta det första!"
+    "kbHint": {
+      "submit": "skicka",
+      "pop": "ta bort sista",
+      "clear": "rensa"
     },
-    modeName: {
-      classic: "Standard",
-      wheelRush: "Hjulet",
-      wordHunt: "Ordjakt",
-      blast: "Blast"
+    "ladder": {
+      "empty": "Inga ord än — hitta det första!"
     },
-    rivals: {
-      header: "Tät kamp",
-      you: "Du",
-      playersCount: "{n} spelare",
-      toCatch: "+{n} att ta",
-      ahead: "{n} före",
-      tie: "Dött lopp",
-      aria: "Närmaste rivaler"
+    "modeName": {
+      "classic": "Standard",
+      "wheelRush": "Hjulet",
+      "wordHunt": "Ordjakt",
+      "blast": "Blast"
     },
-    insights: {
-      rosterHeader: "Spelare",
-      foundHeader: "Hittade",
-      fogHeader: "Dimma",
-      fogLabel: "Krigsdimma",
-      myStatsHeader: "Din statistik",
-      bestWord: "Bäst",
-      wordsPerMin: "Tempo",
-      kbBonusUses: "Tangenter",
-      opponentInsightHeader: "Rivaler",
-      opponentInsightEmpty: "Tyst än så länge…",
-      paceDeltaPositive: "Leder",
-      paceDeltaNegative: "Efter",
-      paceDeltaTied: "Lika",
-      categoryHeader: "Mål",
-      huntProgressHeader: "Framsteg",
-      goalTypeTargetWord: "Målord",
-      goalTypeColorPower: "Färgkraft",
-      goalTypeClassic: "Mål",
-      comboCounterHeader: "Kombo",
-      comboMultiplierSuffix: "bonus",
-      retiredTiles: "Borta",
-      luckyBoost: "Lyckobonus",
-      spinCounterAria: "Snurr {current} av {total}",
-      rarity: {
-        common: "Vanlig",
-        uncommon: "Ovanlig",
-        rare: "Sällsynt",
-        legendary: "Legendarisk"
+    "rivals": {
+      "header": "Tät kamp",
+      "you": "Du",
+      "playersCount": "{n} spelare",
+      "toCatch": "+{n} att ta",
+      "ahead": "{n} före",
+      "tie": "Dött lopp",
+      "aria": "Närmaste rivaler"
+    },
+    "insights": {
+      "rosterHeader": "Spelare",
+      "foundHeader": "Hittade",
+      "fogHeader": "Dimma",
+      "fogLabel": "Krigsdimma",
+      "myStatsHeader": "Din statistik",
+      "bestWord": "Bäst",
+      "wordsPerMin": "Tempo",
+      "kbBonusUses": "Tangenter",
+      "opponentInsightHeader": "Rivaler",
+      "opponentInsightEmpty": "Tyst än så länge…",
+      "paceDeltaPositive": "Leder",
+      "paceDeltaNegative": "Efter",
+      "paceDeltaTied": "Lika",
+      "categoryHeader": "Mål",
+      "huntProgressHeader": "Framsteg",
+      "goalTypeTargetWord": "Målord",
+      "goalTypeColorPower": "Färgkraft",
+      "goalTypeClassic": "Mål",
+      "comboCounterHeader": "Kombo",
+      "comboMultiplierSuffix": "bonus",
+      "retiredTiles": "Borta",
+      "luckyBoost": "Lyckobonus",
+      "spinCounterAria": "Snurr {current} av {total}",
+      "rarity": {
+        "common": "Vanlig",
+        "uncommon": "Ovanlig",
+        "rare": "Sällsynt",
+        "legendary": "Legendarisk"
       }
     }
   },
-  showcase3d: {
-    heroBadge: "En värld av ord",
-    cap0Title: "Dra ordet",
-    cap0Body: "Dra över brädet — bokstäver lyser upp på vägen.",
-    cap1Title: "Kedja combos",
-    cap1Body: "Länka ord efter varandra — poängmultiplikatorn exploderar.",
-    cap2Title: "Besegra rummet",
-    cap2Body: "Slå tre rivaler på ett live-bräde.",
-    cap3Title: "Ta kronan",
-    cap3Body: "Klättra till toppen — och skryt om det.",
-    scrollHint: "Rulla för att spela",
-    loading: "Laddar brädet",
-    scoreLabel: "Poäng",
-    rail0: "Dra",
-    rail1: "Kedja",
-    rail2: "Besegra",
-    rail3: "Krona",
-    modesTitle: "Tre sätt att tävla",
-    modesSub: "Riktiga rundor, riktiga bräden — var och en glider in när du rullar.",
-    mode1Tag: "Dagligt · Solo",
-    mode1: "Ett bräde. Ett försök.",
-    mode1Body: "Samma dagliga bräde för alla världen över. Klättra i den globala rankningen före midnatt.",
-    mode2Tag: "Upp till 1v3",
-    mode2: "Partykamp i realtid",
-    mode2Body: "Fyra spelare, ett live-bräde, ingen nåd. Den högaste poängen vinner.",
-    mode3Tag: "5 språk",
-    mode3: "Spela på ditt språk",
-    mode3Body: "Svenska, engelska, hebreiska, japanska, spanska — dina ord, din arena.",
-    bottomTitle: "Din tur. Gör bult.",
-    bottomCta: "Spela gratis",
-    floatCta: "Spela gratis",
-    faqTitle: "Vanliga frågor",
-    faqQ1: "Är LexiClash gratis?",
-    faqA1: "Ja — LexiClash är ett gratis ordspel online som du spelar direkt i din webbläsare. Ingen nedladdning och ingen registrering: öppna sidan och du är redan i en runda.",
-    faqQ2: "Kan jag spela flerspelar-ordkamper med vänner?",
-    faqA2: "Ja. Hoppa in i realtids 1v3-ordkamper där upp till fyra spelare tävlar på ett live-bräde — flerspelarspelet du väljer istället för långsamma rundor.",
-    faqQ3: "Är det som Scrabble?",
-    faqA3: "Samma kärlek till ord, mycket snabbare. Istället för att placera brickor i turer drar du ord på ett live-bräde mot klockan — ett snabbt Scrabble-alternativ som du spelar online gratis.",
-    faqQ4: "Vilka språk kan jag spela på?",
-    faqA4: "Fem, var och en med sin egen ordbok: engelska, svenska, hebreiska, japanska och spanska. Spela ett ordspel på ditt eget språk.",
-    faqQ5: "Måste jag ladda ner eller registrera mig?",
-    faqA5: "Nej. LexiClash körs i vilken modern webbläsare som helst på telefon, surfplatta eller TV — ingen installation och inget konto behövs.",
-    faqQ6: "Finns det konkurrensmässiga rankinglistor?",
-    faqA6: "Ja — dagliga utmaningar och globala rankinglistor. Klättra i den dagliga rankningen, bygg combos och toppa listan i ett av de bästa kostnadsfria ordspelen online."
+  "showcase3d": {
+    "heroBadge": "En värld av ord",
+    "cap0Title": "Dra ordet",
+    "cap0Body": "Dra över brädet — bokstäver lyser upp på vägen.",
+    "cap1Title": "Kedja combos",
+    "cap1Body": "Länka ord efter varandra — poängmultiplikatorn exploderar.",
+    "cap2Title": "Besegra rummet",
+    "cap2Body": "Slå tre rivaler på ett live-bräde.",
+    "cap3Title": "Ta kronan",
+    "cap3Body": "Klättra till toppen — och skryt om det.",
+    "scrollHint": "Rulla för att spela",
+    "loading": "Laddar brädet",
+    "scoreLabel": "Poäng",
+    "rail0": "Dra",
+    "rail1": "Kedja",
+    "rail2": "Besegra",
+    "rail3": "Krona",
+    "modesTitle": "Tre sätt att tävla",
+    "modesSub": "Riktiga rundor, riktiga bräden — var och en glider in när du rullar.",
+    "mode1Tag": "Dagligt · Solo",
+    "mode1": "Ett bräde. Ett försök.",
+    "mode1Body": "Samma dagliga bräde för alla världen över. Klättra i den globala rankningen före midnatt.",
+    "mode2Tag": "Upp till 1v3",
+    "mode2": "Partykamp i realtid",
+    "mode2Body": "Fyra spelare, ett live-bräde, ingen nåd. Den högaste poängen vinner.",
+    "mode3Tag": "5 språk",
+    "mode3": "Spela på ditt språk",
+    "mode3Body": "Svenska, engelska, hebreiska, japanska, spanska — dina ord, din arena.",
+    "bottomTitle": "Din tur. Gör bult.",
+    "bottomCta": "Spela gratis",
+    "floatCta": "Spela gratis",
+    "faqTitle": "Vanliga frågor",
+    "faqQ1": "Är LexiClash gratis?",
+    "faqA1": "Ja — LexiClash är ett gratis ordspel online som du spelar direkt i din webbläsare. Ingen nedladdning och ingen registrering: öppna sidan och du är redan i en runda.",
+    "faqQ2": "Kan jag spela flerspelar-ordkamper med vänner?",
+    "faqA2": "Ja. Hoppa in i realtids 1v3-ordkamper där upp till fyra spelare tävlar på ett live-bräde — flerspelarspelet du väljer istället för långsamma rundor.",
+    "faqQ3": "Är det som Scrabble?",
+    "faqA3": "Samma kärlek till ord, mycket snabbare. Istället för att placera brickor i turer drar du ord på ett live-bräde mot klockan — ett snabbt Scrabble-alternativ som du spelar online gratis.",
+    "faqQ4": "Vilka språk kan jag spela på?",
+    "faqA4": "Fem, var och en med sin egen ordbok: engelska, svenska, hebreiska, japanska och spanska. Spela ett ordspel på ditt eget språk.",
+    "faqQ5": "Måste jag ladda ner eller registrera mig?",
+    "faqA5": "Nej. LexiClash körs i vilken modern webbläsare som helst på telefon, surfplatta eller TV — ingen installation och inget konto behövs.",
+    "faqQ6": "Finns det konkurrensmässiga rankinglistor?",
+    "faqA6": "Ja — dagliga utmaningar och globala rankinglistor. Klättra i den dagliga rankningen, bygg combos och toppa listan i ett av de bästa kostnadsfria ordspelen online."
   },
-  mascotCelebration: {
-    titleChampion: "MÄSTARE!",
-    titleRunnerUp: "PODIUM!",
-    titleDefeat: "GG",
-    titleBingo: "BINGO!",
-    titleKnight: "SEGER!",
-    titleStreak: "PÅ ELD!",
-    titleExplorer: "BRA FYND!",
-    titleMissionComplete: "ALLT KLART!"
+  "mascotCelebration": {
+    "titleChampion": "MÄSTARE!",
+    "titleRunnerUp": "PODIUM!",
+    "titleDefeat": "GG",
+    "titleBingo": "BINGO!",
+    "titleKnight": "SEGER!",
+    "titleStreak": "PÅ ELD!",
+    "titleExplorer": "BRA FYND!",
+    "titleMissionComplete": "ALLT KLART!"
   },
   "mpModeBreakdown": {
     "title": "Omgångsöversikt",
@@ -14229,10 +15540,19 @@ const sv = {
       "nextMilestone": "{points} poäng → {coins} mynt"
     },
     "tier": {
-      "label": "Behörighetsnivå",
-      "1": { "label": "Moderator", "desc": "Flagga ogiltiga ord och avvisa skräpinlägg för granskning." },
-      "2": { "label": "Redaktör", "desc": "Allt i Moderator, plus godkänna riktiga ord till ordlistan." },
-      "3": { "label": "Ledare", "desc": "Allt i Redaktör, plus avgöra tvister om pusselkvalitet." }
+      "1": {
+        "label": "Moderator",
+        "desc": "Flagga ogiltiga ord och avvisa skräpinlägg för granskning."
+      },
+      "2": {
+        "label": "Redaktör",
+        "desc": "Allt i Moderator, plus godkänna riktiga ord till ordlistan."
+      },
+      "3": {
+        "label": "Ledare",
+        "desc": "Allt i Redaktör, plus avgöra tvister om pusselkvalitet."
+      },
+      "label": "Behörighetsnivå"
     },
     "levels": {
       "title": "Vad varje åtkomstnivå ger",
@@ -14333,7 +15653,17 @@ const sv = {
     "loadingText7": "Reder ut trippelpoängen…",
     "loadingText8": "Väcker ordtrollkarlen…"
   },
-  "offerwall": { "cta": { "label": "Tjäna gratis mynt", "aria": "Tjäna gratis mynt genom att slutföra erbjudanden" }, "modal": { "title": "Gratis mynt", "subtitle": "Slutför ett erbjudande – mynten läggs till automatiskt.", "close": "Stäng" } },
+  "offerwall": {
+    "cta": {
+      "label": "Tjäna gratis mynt",
+      "aria": "Tjäna gratis mynt genom att slutföra erbjudanden"
+    },
+    "modal": {
+      "title": "Gratis mynt",
+      "subtitle": "Slutför ett erbjudande – mynten läggs till automatiskt.",
+      "close": "Stäng"
+    }
+  },
   "offlineDownload": {
     "title": "Ladda ned för offline",
     "description": "Ladda ned ordlistor för att kunna spela offline. Ordlistorna är offentlig spelinformation.",
@@ -14378,7 +15708,10 @@ const sv = {
       "clashLabel": "Krock",
       "passLabel": "Pass",
       "shareCta": "Dela poäng"
-    }
+    },
+    "revealing": "Avslöjar…",
+    "roundLabel": "Runda {n} av {total}",
+    "chipStack": "Marker: {chips}"
   },
   "supporter": {
     "card": {

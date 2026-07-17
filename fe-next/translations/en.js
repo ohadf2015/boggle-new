@@ -14727,6 +14727,8 @@ const en = {
     "showdown": "Showdown",
     "round": "Round",
     "vsRivals": "vs {a} & {b}",
+    "roundLabel": "Round {n} of {total}",
+    "chipStack": "Chips: {chips}",
     "gameOver": "Game over",
     "playAgain": "Play again",
     "notAWord": "Not a word",

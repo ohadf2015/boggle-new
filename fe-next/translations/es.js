@@ -100,9 +100,16 @@ const es = {
     "timer": "Tiempo",
     "gridLabel": "Cuadrícula del crucigrama",
     "cellLabel": "Fila {row}, columna {col}",
-    "dir": { "across": "Horizontal", "down": "Vertical" },
+    "dir": {
+      "across": "Horizontal",
+      "down": "Vertical"
+    },
     "switchDir": "Cambiar dirección",
-    "difficulty": { "easy": "Fácil", "medium": "Media", "hard": "Difícil" },
+    "difficulty": {
+      "easy": "Fácil",
+      "medium": "Media",
+      "hard": "Difícil"
+    },
     "acrossHeading": "Horizontales",
     "downHeading": "Verticales",
     "prevClue": "Pista anterior",
@@ -171,7 +178,9 @@ const es = {
       "not-your-turn": "Espera tu turno."
     },
     "solo": {
-      "category": { "hit": "✨ +2× {category}!" },
+      "category": {
+        "hit": "✨ +2× {category}!"
+      },
       "title": "Shiritori en solitario",
       "tagline": "Encadena palabras en hiragana contra el bot.",
       "back": "Volver a Shiritori",
@@ -187,7 +196,11 @@ const es = {
       "lost": "Ronda terminada",
       "botThinking": "El bot está pensando…",
       "difficultyLabel": "Dificultad del bot",
-      "difficulty": {"easy": "Fácil", "medium": "Media", "hard": "Difícil"},
+      "difficulty": {
+        "easy": "Fácil",
+        "medium": "Media",
+        "hard": "Difícil"
+      },
       "err": {
         "not-hiragana": "Solo hiragana (p. ej. ねこ).",
         "wrong-head": "Letra inicial incorrecta — empieza por la kana resaltada.",
@@ -204,7 +217,11 @@ const es = {
       "howTo": {
         "title": "Cómo jugar",
         "cta": "¡Entendido!",
-        "steps": ["🔤 Escribe una palabra en hiragana que empiece con el kana resaltado", "⛓️ Cada palabra debe empezar con el último kana de la anterior", "🚫 Pierdes si terminas en ん (n), ¡y nada de repetir palabras!"]
+        "steps": [
+          "🔤 Escribe una palabra en hiragana que empiece con el kana resaltado",
+          "⛓️ Cada palabra debe empezar con el último kana de la anterior",
+          "🚫 Pierdes si terminas en ん (n), ¡y nada de repetir palabras!"
+        ]
       },
       "combo": {
         "ariaLabel": "Profundidad de cadena: {{n}}",
@@ -229,24 +246,60 @@ const es = {
     "modifier": {
       "todaysTwist": "Giro de hoy",
       "shiritori": {
-        "longWords": { "label": "Largas y Fuertes", "desc": "Un día para palabras grandes y audaces." },
-        "noRepeatVowel": { "label": "Sequía de vocales", "desc": "Mantén tus vocales frescas y variadas." },
-        "speedDemon": { "label": "Demonio de velocidad", "desc": "El pensamiento rápido domina la cadena hoy." }
+        "longWords": {
+          "label": "Largas y Fuertes",
+          "desc": "Un día para palabras grandes y audaces."
+        },
+        "noRepeatVowel": {
+          "label": "Sequía de vocales",
+          "desc": "Mantén tus vocales frescas y variadas."
+        },
+        "speedDemon": {
+          "label": "Demonio de velocidad",
+          "desc": "El pensamiento rápido domina la cadena hoy."
+        }
       },
       "sealedBid": {
-        "noClashPenalty": { "label": "Día de tregua", "desc": "Un mercado más amistoso — puja libremente." },
-        "vowelTax": { "label": "Impuesto de vocales", "desc": "Las vocales son la mercancía del día." },
-        "highStakes": { "label": "Apuestas altas", "desc": "Las pujas audaces y únicas definen el día." }
+        "noClashPenalty": {
+          "label": "Día de tregua",
+          "desc": "Un mercado más amistoso — puja libremente."
+        },
+        "vowelTax": {
+          "label": "Impuesto de vocales",
+          "desc": "Las vocales son la mercancía del día."
+        },
+        "highStakes": {
+          "label": "Apuestas altas",
+          "desc": "Las pujas audaces y únicas definen el día."
+        }
       },
       "wordAlchemy": {
-        "doubleCatalyst": { "label": "Catalizador doble", "desc": "Los catalizadores son especialmente vivos hoy." },
-        "heatDecay": { "label": "Laboratorio frío", "desc": "Un laboratorio más frío — controla tus reacciones." },
-        "pureTransmute": { "label": "Transmutación pura", "desc": "Un día para transmutaciones verdaderas." }
+        "doubleCatalyst": {
+          "label": "Catalizador doble",
+          "desc": "Los catalizadores son especialmente vivos hoy."
+        },
+        "heatDecay": {
+          "label": "Laboratorio frío",
+          "desc": "Un laboratorio más frío — controla tus reacciones."
+        },
+        "pureTransmute": {
+          "label": "Transmutación pura",
+          "desc": "Un día para transmutaciones verdaderas."
+        }
       },
       "crossword": {
-        "themedGrid": { "label": "Día de tema", "desc": "Un tema oculto recorre la cuadrícula de hoy." },
-        "noCheck": { "label": "Sin verificación", "desc": "Confía en tu intuición hoy." },
-        "timeAttack": { "label": "Ataque de tiempo", "desc": "El reloj marca — resuelve rápido." }
+        "themedGrid": {
+          "label": "Día de tema",
+          "desc": "Un tema oculto recorre la cuadrícula de hoy."
+        },
+        "noCheck": {
+          "label": "Sin verificación",
+          "desc": "Confía en tu intuición hoy."
+        },
+        "timeAttack": {
+          "label": "Ataque de tiempo",
+          "desc": "El reloj marca — resuelve rápido."
+        }
       }
     }
   },
@@ -258,7 +311,11 @@ const es = {
     "wins": "gana la subasta!",
     "bidPrompt": "Forma una palabra con las letras — ¡elige una que nadie más elija!",
     "results": "Pujas reveladas",
-    "outcome": { "unique": "Única ×2", "clash": "Choque ÷2", "none": "Sin puja" },
+    "outcome": {
+      "unique": "Única ×2",
+      "clash": "Choque ÷2",
+      "none": "Sin puja"
+    },
     "locked": "Puja fijada — esperando a los rivales…",
     "lockProgress": "{{locked}}/{{total}} fijadas",
     "clear": "Limpiar",
@@ -341,61 +398,385 @@ const es = {
     "howTo": {
       "title": "Cómo jugar",
       "cta": "¡Entendido!",
-      "steps": ["🔤 Transforma una palabra en la siguiente, paso a paso", "💡 Cada pista indica el cambio: añadir, cambiar o quitar una letra", "🏆 Completa toda la cadena para resolver el puzle"]
+      "steps": [
+        "🔤 Transforma una palabra en la siguiente, paso a paso",
+        "💡 Cada pista indica el cambio: añadir, cambiar o quitar una letra",
+        "🏆 Completa toda la cadena para resolver el puzle"
+      ]
     },
     "wildcardFound": "¡La Piedra Filosofal!",
     "wildcardSkip": "¡Un paso transmutar — la magia ocurre!",
-    "heat": {"label": "Calor","rush": "¡Fiebre exotérmica!","rushAria": "¡Medidor lleno — la siguiente palabra correcta gana un bono!"},
-    "share": {"copy": "Copiar resultado","copied": "¡Copiado!","emojiRowAria": "Resumen emoji de tu partida","captionPerfect": "¡Transmutación impecable! 🧪","captionWild": "¡El catalizador llegó justo a tiempo! 🔮","captionGood": "¡Buena alquimia! 🌡️","captionHard": "Los elementos se resistieron hoy 😅"}
+    "heat": {
+      "label": "Calor",
+      "rush": "¡Fiebre exotérmica!",
+      "rushAria": "¡Medidor lleno — la siguiente palabra correcta gana un bono!"
+    },
+    "share": {
+      "copy": "Copiar resultado",
+      "copied": "¡Copiado!",
+      "emojiRowAria": "Resumen emoji de tu partida",
+      "captionPerfect": "¡Transmutación impecable! 🧪",
+      "captionWild": "¡El catalizador llegó justo a tiempo! 🔮",
+      "captionGood": "¡Buena alquimia! 🌡️",
+      "captionHard": "Los elementos se resistieron hoy 😅"
+    }
   },
-  "gameFeedback": {"prompt":"¿Qué te pareció la ronda?","bad":"Regular","ok":"Bien","great":"¡Me encantó!","thanks":"¡Gracias por tu opinión!","dismiss":"Cerrar"},
+  "gameFeedback": {
+    "prompt": "¿Qué te pareció la ronda?",
+    "bad": "Regular",
+    "ok": "Bien",
+    "great": "¡Me encantó!",
+    "thanks": "¡Gracias por tu opinión!",
+    "dismiss": "Cerrar"
+  },
   "wordTower": {
     "mutator": {
       "todaysTwist": "GIRO DE HOY",
-      "goldenLetter": { "name": "Letra dorada", "desc": "Las palabras con {letter} suben un 60% más" },
-      "vowelGale": { "name": "Vendaval de vocales", "desc": "Cada vocal da más impulso" },
-      "longAndStrong": { "name": "Largas y fuertes", "desc": "Palabras de 6+ letras suben un 50% más" },
-      "skylineRush": { "name": "Subida vertical", "desc": "Cada piso sube un 15% más" },
-      "tailwind": { "name": "Viento a favor", "desc": "La grúa se mueve más rápido" },
-      "featherday": { "name": "Día pluma", "desc": "Un bamboleo extra antes de caer" }
+      "goldenLetter": {
+        "name": "Letra dorada",
+        "desc": "Las palabras con {letter} suben un 60% más"
+      },
+      "vowelGale": {
+        "name": "Vendaval de vocales",
+        "desc": "Cada vocal da más impulso"
+      },
+      "longAndStrong": {
+        "name": "Largas y fuertes",
+        "desc": "Palabras de 6+ letras suben un 50% más"
+      },
+      "skylineRush": {
+        "name": "Subida vertical",
+        "desc": "Cada piso sube un 15% más"
+      },
+      "tailwind": {
+        "name": "Viento a favor",
+        "desc": "La grúa se mueve más rápido"
+      },
+      "featherday": {
+        "name": "Día pluma",
+        "desc": "Un bamboleo extra antes de caer"
+      }
     },
-    "combo": { "roll": "¡En racha!", "fire": "¡En llamas!", "blaze": "¡Ardiendo!", "inferno": "¡Infierno!" },
+    "combo": {
+      "roll": "¡En racha!",
+      "fire": "¡En llamas!",
+      "blaze": "¡Ardiendo!",
+      "inferno": "¡Infierno!"
+    },
     "cardTitle": "Torre de Palabras",
     "cardDesc": "Apila palabras hasta el cielo — vista de admin",
     "howTo": {
       "title": "Cómo jugar",
       "cta": "¡Entendido!",
-      "steps": ["🏗️ Toca el botón para soltar el bloque de palabra sobre la torre", "🎯 Aterriza centrado: las caídas descuidadas inclinan la torre", "🔤 Cada palabra válida apila un piso. ¡Construye lo más alto posible!"]
+      "steps": [
+        "🏗️ Toca el botón para soltar el bloque de palabra sobre la torre",
+        "🎯 Aterriza centrado: las caídas descuidadas inclinan la torre",
+        "🔤 Cada palabra válida apila un piso. ¡Construye lo más alto posible!"
+      ]
     },
     "loading": "Cargando diccionario…",
     "loadError": "No se pudo cargar el diccionario — toca para reintentar",
     "retry": "Intentar de nuevo",
-    "biome": { "city": "Suelo", "sky": "Cielo", "stratosphere": "Estratosfera", "orbit": "Órbita", "nebula": "Nebulosa", "galaxy": "Galaxia" },
-    "hud": { "floors": "{n} pisos", "combo": "cadena {n}", "scramble": "Mezclar", "backspace": "Borrar", "build": "Construir", "restart": "Reiniciar", "restartConfirm": "¿Seguro?", "best": "Mejor {m} m", "possible": "{n} palabras", "clue": "Pista", "collapse": "Contraer", "expand": "Expandir", "rivalPassed": "¡Superaste a {name}!", "stuck": "¿Atascado? Nueva letra", "backToTop": "Arriba", "pickLetters": "Elige letras", "dragToBuild": "Arrastra o toca para formar", "keepBuilding": "Seguir formando", "menuOpen": "Más acciones", "menuClose": "Cerrar menú", "chaseGap": "+{m} m", "chaseAria": "Próximo rival arriba: {name}, faltan {m} metros para superarlo" },
-    "minimap": { "label": "Mapa de la torre — {m} m, toca para subir" },
-    "milestone": { "m50": "¡Sobre las copas! 🌳", "m150": "Zona de nubes ☁️", "m400": "Los pájaros tienen envidia 🐦", "m250": "Más alto que los drones 🛸", "m650": "Ambiente de nebulosa 🌌", "m900": "Tocando el espacio 🚀", "m1300": "Habitante del espacio profundo 👽", "m1800": "Casi astronauta ✨" },
-    "ach": { "unlocked": "¡Logro!", "firstFloor": "Primer piso", "tenFloors": "Edificio", "skyHigh": "Por las nubes", "wordsmith": "Maestro de palabras", "comboKing": "Rey del combo", "rivalCrusher": "Aplasta-rivales", "unstoppable": "Imparable", "toTheMoon": "A la luna", "skylineKing": "Rey del horizonte", "centurion": "Centurión", "comboGod": "Dios del combo", "wordWizard": "Mago de palabras", "galaxyClass": "Clase galaxia", "deepSpace": "Espacio profundo" },
-    "zone": { "entered": "Nueva zona", "next": "Siguiente: {zone} · {m}m" },
-    "landmark": { "skyscraper": "Cima del rascacielos", "cloudBase": "Base de nubes", "mountainTop": "Pico de montaña", "jetStream": "Corriente en chorro", "stormTops": "Cima de tormenta", "weatherBalloon": "Globo meteorológico", "earthCurve": "Curvatura terrestre", "karman": "Borde del espacio", "meteorBelt": "Cinturón de meteoros", "aurora": "Aurora", "deepSpace": "Espacio profundo" },
-    "hazard": { "bomb": "Bomba", "hurricane": "Huracán", "wobble": "Tambaleo", "sabotage": "Sabotaje", "lost": "¡{kind}! −{n} pisos" },
-    "clutch": { "save": "¡Salvada increíble!", "critical": "¡Tambalea — aterriza limpio!" },
-    "surprise": { "nextWord": "Próxima palabra", "surge": "¡Subidón!", "windfall": "¡Regalo!", "updraft": "¡Corriente! Próxima palabra reforzada", "crystal": "¡Cristal raro!", "echo": "¡Eco impulsor!", "meteorStrike": "¡Golpe de meteorito!", "phantomFloor": "¡Piso fantasma!", "goldenFloor": "¡Piso dorado!" },
-    "daily": { "badge": "Diario · {date}", "streak": "racha de {n} días", "toDaily": "Diario", "toEndless": "Infinito", "newBest": "¡Nuevo récord diario!", "questTitle": "Torre de Palabras", "questDesc": "Apila palabras hasta el cielo: hoy las mismas letras para todos." },
-    "perk": { "title": "Elige un don", "subtitle": "Elige uno — dura toda la escalada", "skip": "Saltar por ahora", "masterCrane": { "name": "Grúa maestra", "desc": "Mayor recompensa en caídas perfectas" }, "tallTimber": { "name": "Madera alta", "desc": "+12% de altura en cada piso" }, "featherfall": { "name": "Caída de pluma", "desc": "Los derrumbes cuestan un piso menos" }, "reinforced": { "name": "Reforzado", "desc": "Más tambaleo antes del abismo" }, "cushion": { "name": "Cojín de seguridad", "desc": "El vaivén de la grúa nunca tira un piso" } },
-    "runPerk": { "hotStreak": { "a11y": "Racha caliente: quedan {n} caídas" } },
-    "crane": { "place": "Coloca tu palabra", "steer": "Dirige y suelta", "tapToDrop": "Toca para soltar", "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Tambaleante", "miss": "¡Ups!", "stability": "Estabilidad", "steady": "Firme", "onFire": "En racha", "steadyAria": "Racha de pulso firme: {n} caídas perfectas" },
-    "upgrade": { "categories": { "crane": "Grúa", "stability": "Estabilidad", "boost": "Impulso" }, "recommended": "Mejor opción", "title": "Mejoras de la torre", "subtitle": "Mejoras permanentes — gasta tus monedas", "open": "Mejoras", "balance": "{n} monedas", "buy": "Comprar", "max": "MÁX", "level": "Nv {n}/{max}", "owned": "Adquirida", "close": "Listo", "broke": "No hay monedas suficientes", "steadyCable": { "name": "Cable estable", "desc": "Ralentiza el vaivén de la grúa para mejor tempo" }, "wideFooting": { "name": "Base ancha", "desc": "Amplía la ventana de aterrizaje perfecto" }, "windbreak": { "name": "Cortavientos", "desc": "Calma el viento a gran altura" }, "masterArchitect": { "name": "Maestro arquitecto", "desc": "Mayores recompensas de monedas en cada caída" }, "reinforcedCore": { "name": "Núcleo reforzado", "desc": "Sobrevive a un tambaleo más antes de caer" }, "quickRecovery": { "name": "Recuperación rápida", "desc": "La torre se endereza más rápido" }, "tailwind": { "name": "Viento a favor", "desc": "Cada piso sube un poco más" }, "salvage": { "name": "Grúa de rescate", "desc": "Un derrumbe tira menos pisos" }, "momentum": { "name": "Impulso", "desc": "Las rachas perfectas rinden aún más" }, "centerMagnet": { "name": "Núcleo gravitatorio", "desc": "Los lanzamientos fallidos también empujan la torre al centro" } },
-    "verdict": { "perfect": "¡Perfecto!", "good": "¡Bien!", "sloppy": "Flojo", "miss": "¡Fallo!" },
-    "sabotage": { "chip": "Bola de demolición", "tokens": "{n}", "pickTarget": "Elige un rival", "noTargets": "Aún no hay rivales", "confirm": "¿Enviar bola de demolición a {name}?", "send": "Enviar", "cancel": "Cancelar", "sentTo": "💥 Golpeaste a {name} — −1m", "incoming": "🚨 ¡Sabotaje entrante de {name}!", "recovered": "La torre resiste. Sigue subiendo.", "earned": "🎯 ¡Bola de demolición ganada!", "earnedHint": "¡Nueva zona o logro!", "watchAd": "📺 Ver anuncio +1", "adEarned": "🎯 ¡Token ganado!", "smashTitle": "¡Suelta la bola!", "smashCta": "¡GOLPE!", "smashReleasing": "Soltando…", "floorsDestroyed": "¡−{n} PISOS!", "newHeight": "Nueva altura:", "strikeCta": "¡GOLPEA!", "strikeHint": "Toca cuando el medidor llegue a la zona verde", "verdict": { "perfect": "¡GOLPE PERFECTO!", "solid": "BUEN GOLPE", "weak": "GOLPE FLOJO" }, "done": "LISTO" },
-    "reward": { "tier": { "common": "Monedas", "uncommon": "¡Buen botín!", "rare": "¡Hallazgo raro!", "epic": "¡PREMIO GORDO!" } },
-    "wreck": { "reportTitle": "¡Torre asaltada!", "reportBody": "{name} te tiró {floors} pisos mientras no estabas — aquí tienes un revuelto para contraatacar.", "defaultName": "Un rival" },
-    "tier": { "apprentice": "Aprendiz", "journeyman": "Oficial", "master": "Maestro Constructor" },
-    "error": { "too_short": "Muy corta — 3+ letras", "bad_chain": "Empieza con la letra brillante", "not_buildable": "Usa las letras de la bandeja", "duplicate": "Ya usaste esa palabra", "not_in_dictionary": "No está en el diccionario" },
-    "celebration": { "highRise": "¡Edificio alto!", "tall": "¡Imponente!", "skyscraper": "¡RASCACIELOS!" },
-    "leaderboard": { "title": "Torres principales", "error": "No se pudo cargar la clasificación", "empty": "Aún no hay torres — ¡sé el primero!" },
-    "share": { "title": "Torre de Palabras", "button": "Compartir", "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!" },
-    "versus": { "title": "Carrera de Torres", "bomb": "Bombardear a {name}", "waiting": "Esperando rivales…", "incoming": "¡Bomba entrante!", "won": "¡Ganaste!", "lost": "Ganó {name}" },
-    "a11y": { "height": "Altura {m} metros", "combo": "cadena {n}", "tile": "Letra {letter}", "goldenTile": "Letra dorada {letter}" },
+    "biome": {
+      "city": "Suelo",
+      "sky": "Cielo",
+      "stratosphere": "Estratosfera",
+      "orbit": "Órbita",
+      "nebula": "Nebulosa",
+      "galaxy": "Galaxia"
+    },
+    "hud": {
+      "floors": "{n} pisos",
+      "combo": "cadena {n}",
+      "scramble": "Mezclar",
+      "backspace": "Borrar",
+      "build": "Construir",
+      "restart": "Reiniciar",
+      "restartConfirm": "¿Seguro?",
+      "best": "Mejor {m} m",
+      "possible": "{n} palabras",
+      "clue": "Pista",
+      "collapse": "Contraer",
+      "expand": "Expandir",
+      "rivalPassed": "¡Superaste a {name}!",
+      "stuck": "¿Atascado? Nueva letra",
+      "backToTop": "Arriba",
+      "pickLetters": "Elige letras",
+      "dragToBuild": "Arrastra o toca para formar",
+      "keepBuilding": "Seguir formando",
+      "menuOpen": "Más acciones",
+      "menuClose": "Cerrar menú",
+      "chaseGap": "+{m} m",
+      "chaseAria": "Próximo rival arriba: {name}, faltan {m} metros para superarlo"
+    },
+    "minimap": {
+      "label": "Mapa de la torre — {m} m, toca para subir"
+    },
+    "milestone": {
+      "m50": "¡Sobre las copas! 🌳",
+      "m150": "Zona de nubes ☁️",
+      "m400": "Los pájaros tienen envidia 🐦",
+      "m250": "Más alto que los drones 🛸",
+      "m650": "Ambiente de nebulosa 🌌",
+      "m900": "Tocando el espacio 🚀",
+      "m1300": "Habitante del espacio profundo 👽",
+      "m1800": "Casi astronauta ✨"
+    },
+    "ach": {
+      "unlocked": "¡Logro!",
+      "firstFloor": "Primer piso",
+      "tenFloors": "Edificio",
+      "skyHigh": "Por las nubes",
+      "wordsmith": "Maestro de palabras",
+      "comboKing": "Rey del combo",
+      "rivalCrusher": "Aplasta-rivales",
+      "unstoppable": "Imparable",
+      "toTheMoon": "A la luna",
+      "skylineKing": "Rey del horizonte",
+      "centurion": "Centurión",
+      "comboGod": "Dios del combo",
+      "wordWizard": "Mago de palabras",
+      "galaxyClass": "Clase galaxia",
+      "deepSpace": "Espacio profundo"
+    },
+    "zone": {
+      "entered": "Nueva zona",
+      "next": "Siguiente: {zone} · {m}m"
+    },
+    "landmark": {
+      "skyscraper": "Cima del rascacielos",
+      "cloudBase": "Base de nubes",
+      "mountainTop": "Pico de montaña",
+      "jetStream": "Corriente en chorro",
+      "stormTops": "Cima de tormenta",
+      "weatherBalloon": "Globo meteorológico",
+      "earthCurve": "Curvatura terrestre",
+      "karman": "Borde del espacio",
+      "meteorBelt": "Cinturón de meteoros",
+      "aurora": "Aurora",
+      "deepSpace": "Espacio profundo"
+    },
+    "hazard": {
+      "bomb": "Bomba",
+      "hurricane": "Huracán",
+      "wobble": "Tambaleo",
+      "sabotage": "Sabotaje",
+      "lost": "¡{kind}! −{n} pisos"
+    },
+    "clutch": {
+      "save": "¡Salvada increíble!",
+      "critical": "¡Tambalea — aterriza limpio!"
+    },
+    "surprise": {
+      "nextWord": "Próxima palabra",
+      "surge": "¡Subidón!",
+      "windfall": "¡Regalo!",
+      "updraft": "¡Corriente! Próxima palabra reforzada",
+      "crystal": "¡Cristal raro!",
+      "echo": "¡Eco impulsor!",
+      "meteorStrike": "¡Golpe de meteorito!",
+      "phantomFloor": "¡Piso fantasma!",
+      "goldenFloor": "¡Piso dorado!"
+    },
+    "daily": {
+      "badge": "Diario · {date}",
+      "streak": "racha de {n} días",
+      "toDaily": "Diario",
+      "toEndless": "Infinito",
+      "newBest": "¡Nuevo récord diario!",
+      "questTitle": "Torre de Palabras",
+      "questDesc": "Apila palabras hasta el cielo: hoy las mismas letras para todos."
+    },
+    "perk": {
+      "title": "Elige un don",
+      "subtitle": "Elige uno — dura toda la escalada",
+      "skip": "Saltar por ahora",
+      "masterCrane": {
+        "name": "Grúa maestra",
+        "desc": "Mayor recompensa en caídas perfectas"
+      },
+      "tallTimber": {
+        "name": "Madera alta",
+        "desc": "+12% de altura en cada piso"
+      },
+      "featherfall": {
+        "name": "Caída de pluma",
+        "desc": "Los derrumbes cuestan un piso menos"
+      },
+      "reinforced": {
+        "name": "Reforzado",
+        "desc": "Más tambaleo antes del abismo"
+      },
+      "cushion": {
+        "name": "Cojín de seguridad",
+        "desc": "El vaivén de la grúa nunca tira un piso"
+      }
+    },
+    "runPerk": {
+      "hotStreak": {
+        "a11y": "Racha caliente: quedan {n} caídas"
+      }
+    },
+    "crane": {
+      "place": "Coloca tu palabra",
+      "steer": "Dirige y suelta",
+      "tapToDrop": "Toca para soltar",
+      "perfect": "¡Perfecto!",
+      "good": "¡Bien!",
+      "sloppy": "Tambaleante",
+      "miss": "¡Ups!",
+      "stability": "Estabilidad",
+      "steady": "Firme",
+      "onFire": "En racha",
+      "steadyAria": "Racha de pulso firme: {n} caídas perfectas"
+    },
+    "upgrade": {
+      "categories": {
+        "crane": "Grúa",
+        "stability": "Estabilidad",
+        "boost": "Impulso"
+      },
+      "recommended": "Mejor opción",
+      "title": "Mejoras de la torre",
+      "subtitle": "Mejoras permanentes — gasta tus monedas",
+      "open": "Mejoras",
+      "balance": "{n} monedas",
+      "buy": "Comprar",
+      "max": "MÁX",
+      "level": "Nv {n}/{max}",
+      "owned": "Adquirida",
+      "close": "Listo",
+      "broke": "No hay monedas suficientes",
+      "steadyCable": {
+        "name": "Cable estable",
+        "desc": "Ralentiza el vaivén de la grúa para mejor tempo"
+      },
+      "wideFooting": {
+        "name": "Base ancha",
+        "desc": "Amplía la ventana de aterrizaje perfecto"
+      },
+      "windbreak": {
+        "name": "Cortavientos",
+        "desc": "Calma el viento a gran altura"
+      },
+      "masterArchitect": {
+        "name": "Maestro arquitecto",
+        "desc": "Mayores recompensas de monedas en cada caída"
+      },
+      "reinforcedCore": {
+        "name": "Núcleo reforzado",
+        "desc": "Sobrevive a un tambaleo más antes de caer"
+      },
+      "quickRecovery": {
+        "name": "Recuperación rápida",
+        "desc": "La torre se endereza más rápido"
+      },
+      "tailwind": {
+        "name": "Viento a favor",
+        "desc": "Cada piso sube un poco más"
+      },
+      "salvage": {
+        "name": "Grúa de rescate",
+        "desc": "Un derrumbe tira menos pisos"
+      },
+      "momentum": {
+        "name": "Impulso",
+        "desc": "Las rachas perfectas rinden aún más"
+      },
+      "centerMagnet": {
+        "name": "Núcleo gravitatorio",
+        "desc": "Los lanzamientos fallidos también empujan la torre al centro"
+      }
+    },
+    "verdict": {
+      "perfect": "¡Perfecto!",
+      "good": "¡Bien!",
+      "sloppy": "Flojo",
+      "miss": "¡Fallo!"
+    },
+    "sabotage": {
+      "chip": "Bola de demolición",
+      "tokens": "{n}",
+      "pickTarget": "Elige un rival",
+      "noTargets": "Aún no hay rivales",
+      "confirm": "¿Enviar bola de demolición a {name}?",
+      "send": "Enviar",
+      "cancel": "Cancelar",
+      "sentTo": "💥 Golpeaste a {name} — −1m",
+      "incoming": "🚨 ¡Sabotaje entrante de {name}!",
+      "recovered": "La torre resiste. Sigue subiendo.",
+      "earned": "🎯 ¡Bola de demolición ganada!",
+      "earnedHint": "¡Nueva zona o logro!",
+      "watchAd": "📺 Ver anuncio +1",
+      "adEarned": "🎯 ¡Token ganado!",
+      "smashTitle": "¡Suelta la bola!",
+      "smashCta": "¡GOLPE!",
+      "smashReleasing": "Soltando…",
+      "floorsDestroyed": "¡−{n} PISOS!",
+      "newHeight": "Nueva altura:",
+      "strikeCta": "¡GOLPEA!",
+      "strikeHint": "Toca cuando el medidor llegue a la zona verde",
+      "verdict": {
+        "perfect": "¡GOLPE PERFECTO!",
+        "solid": "BUEN GOLPE",
+        "weak": "GOLPE FLOJO"
+      },
+      "done": "LISTO"
+    },
+    "reward": {
+      "tier": {
+        "common": "Monedas",
+        "uncommon": "¡Buen botín!",
+        "rare": "¡Hallazgo raro!",
+        "epic": "¡PREMIO GORDO!"
+      }
+    },
+    "wreck": {
+      "reportTitle": "¡Torre asaltada!",
+      "reportBody": "{name} te tiró {floors} pisos mientras no estabas — aquí tienes un revuelto para contraatacar.",
+      "defaultName": "Un rival"
+    },
+    "tier": {
+      "apprentice": "Aprendiz",
+      "journeyman": "Oficial",
+      "master": "Maestro Constructor"
+    },
+    "error": {
+      "too_short": "Muy corta — 3+ letras",
+      "bad_chain": "Empieza con la letra brillante",
+      "not_buildable": "Usa las letras de la bandeja",
+      "duplicate": "Ya usaste esa palabra",
+      "not_in_dictionary": "No está en el diccionario"
+    },
+    "celebration": {
+      "highRise": "¡Edificio alto!",
+      "tall": "¡Imponente!",
+      "skyscraper": "¡RASCACIELOS!"
+    },
+    "leaderboard": {
+      "title": "Torres principales",
+      "error": "No se pudo cargar la clasificación",
+      "empty": "Aún no hay torres — ¡sé el primero!"
+    },
+    "share": {
+      "title": "Torre de Palabras",
+      "button": "Compartir",
+      "text": "¡Llegué a {m} m en Torre de Palabras — supera mi torre!"
+    },
+    "versus": {
+      "title": "Carrera de Torres",
+      "bomb": "Bombardear a {name}",
+      "waiting": "Esperando rivales…",
+      "incoming": "¡Bomba entrante!",
+      "won": "¡Ganaste!",
+      "lost": "Ganó {name}"
+    },
+    "a11y": {
+      "height": "Altura {m} metros",
+      "combo": "cadena {n}",
+      "tile": "Letra {letter}",
+      "goldenTile": "Letra dorada {letter}"
+    },
     "skin": {
       "pickerTitle": "Diseños de Torre",
       "open": "Diseños de Torre",
@@ -403,12 +784,30 @@ const es = {
       "equip": "Equipar",
       "equipped": "Equipado",
       "unlockedToast": "¡Nuevo diseño desbloqueado!",
-      "classic": { "name": "Estándar", "blurb": "Hormigón y acero honestos." },
-      "copper": { "name": "Cobre", "blurb": "Calidez oxidada, forjada a mano." },
-      "marble": { "name": "Mármol", "blurb": "Piedra pálida, veteada y fresca." },
-      "gold": { "name": "Fiebre del Oro", "blurb": "Oro cepillado, ganado a pulso." },
-      "onyx": { "name": "Ónix", "blurb": "Grafito a vidrio negro." },
-      "aurora": { "name": "Aurora", "blurb": "Aleación que captura la nebulosa." }
+      "classic": {
+        "name": "Estándar",
+        "blurb": "Hormigón y acero honestos."
+      },
+      "copper": {
+        "name": "Cobre",
+        "blurb": "Calidez oxidada, forjada a mano."
+      },
+      "marble": {
+        "name": "Mármol",
+        "blurb": "Piedra pálida, veteada y fresca."
+      },
+      "gold": {
+        "name": "Fiebre del Oro",
+        "blurb": "Oro cepillado, ganado a pulso."
+      },
+      "onyx": {
+        "name": "Ónix",
+        "blurb": "Grafito a vidrio negro."
+      },
+      "aurora": {
+        "name": "Aurora",
+        "blurb": "Aleación que captura la nebulosa."
+      }
     }
   },
   "flag": "🇪🇸",
@@ -951,7 +1350,6 @@ const es = {
     "sending": "Enviando...",
     "coins": "monedas",
     "xp": "XP",
-    "chat": "Chat",
     "connecting": "Conectando...",
     "signIn": "Iniciar Sesión",
     "connectedToServer": "¡Listo para la batalla!",
@@ -1501,11 +1899,21 @@ const es = {
       },
       "dataCollected": {
         "title": "Qué Datos Guardamos",
-        "items": ["Progreso de aprendizaje y puntuaciones","Palabras practicadas y dominadas","Tiempo dedicado al aprendizaje","Insignias y logros ganados"]
+        "items": [
+          "Progreso de aprendizaje y puntuaciones",
+          "Palabras practicadas y dominadas",
+          "Tiempo dedicado al aprendizaje",
+          "Insignias y logros ganados"
+        ]
       },
       "howWeUse": {
         "title": "Cómo Usamos Esta Info",
-        "items": ["Seguir el progreso educativo","Generar reportes para profes","Personalizar la experiencia de aprendizaje","Nunca se comparte con terceros para publicidad"]
+        "items": [
+          "Seguir el progreso educativo",
+          "Generar reportes para profes",
+          "Personalizar la experiencia de aprendizaje",
+          "Nunca se comparte con terceros para publicidad"
+        ]
       },
       "success": {
         "title": "¡Consentimiento Enviado!",
@@ -1679,13 +2087,13 @@ const es = {
       "colorTheme": "Tema de color",
       "bodyStyle": "Ropa",
       "download": "Descargar",
-      bodyStyles: {
-        default: "Normal",
-        hoodie: "Sudadera",
-        suit: "Traje",
-        turtleneck: "Cuello alto",
-        offShoulder: "Hombros al aire",
-        cropTop: "Crop Top"
+      "bodyStyles": {
+        "default": "Normal",
+        "hoodie": "Sudadera",
+        "suit": "Traje",
+        "turtleneck": "Cuello alto",
+        "offShoulder": "Hombros al aire",
+        "cropTop": "Crop Top"
       }
     },
     "premium": {
@@ -1771,7 +2179,38 @@ const es = {
     "changeAvatar": "Cambiar",
     "selectAvatar": "Selecciona un avatar",
     "playingAs": "Jugando como",
-    "defaultPlayerNames": ["Papa Astuta","Donut Travieso","Barón Waffle","Llama Dramática","Taco Turbo","Mochi Jefe","Pingüino Astuto","Morsa Sospechosa","Ganso Profesional","Capitán Pretzel","Aguacate Cósmico","Flamenco Loco","Dragón Secreto","Salmón Turbo","Oso Gruñón","Cebra Relajada","Koala Elegante","Mapache Chic","Hipo Híper","Medusa Relajada","Zorro Astuto","Galleta Junior","Perezoso Pro","Ninja Fideo","Pepinillo Disco","Falafel Royal","Robot Funky","Duque Donut","Banana Bandido","Tortuga Caótica"]
+    "defaultPlayerNames": [
+      "Papa Astuta",
+      "Donut Travieso",
+      "Barón Waffle",
+      "Llama Dramática",
+      "Taco Turbo",
+      "Mochi Jefe",
+      "Pingüino Astuto",
+      "Morsa Sospechosa",
+      "Ganso Profesional",
+      "Capitán Pretzel",
+      "Aguacate Cósmico",
+      "Flamenco Loco",
+      "Dragón Secreto",
+      "Salmón Turbo",
+      "Oso Gruñón",
+      "Cebra Relajada",
+      "Koala Elegante",
+      "Mapache Chic",
+      "Hipo Híper",
+      "Medusa Relajada",
+      "Zorro Astuto",
+      "Galleta Junior",
+      "Perezoso Pro",
+      "Ninja Fideo",
+      "Pepinillo Disco",
+      "Falafel Royal",
+      "Robot Funky",
+      "Duque Donut",
+      "Banana Bandido",
+      "Tortuga Caótica"
+    ]
   },
   "multiplayerFlow": {
     "host": "Anfitrión",
@@ -2683,7 +3122,6 @@ const es = {
     "coinsEarned": "Monedas Ganadas",
     "detailedAnalysis": "Análisis Detallado",
     "gameStats": "Estadísticas",
-    "accuracy": "Precisión",
     "rewards": "Recompensas",
     "standings": "Clasificación",
     "guestSavePrompt": "Inicia sesión para guardar recompensas",
@@ -2696,7 +3134,7 @@ const es = {
     "time": "Tiempo",
     "place": "Lugar",
     "words": "Palabras",
-    "bestWord": "Mejor",
+    "bestWord": "Mejor Palabra",
     "bestCombo": "Mejor Combo",
     "playersReady": "{count}/{total} Listos",
     "missedWords": "Palabras que Perdiste",
@@ -2718,7 +3156,7 @@ const es = {
       "speedDemon": "Demonio Veloz",
       "explorer": "El Explorador",
       "scholar": "El Erudito",
-      "clutch": "Jugador Decisivo",
+      "clutch": "Jugador Clutch",
       "tank": "El Tanque"
     },
     "crownDesc": {
@@ -2730,8 +3168,8 @@ const es = {
       "tank": "No falló ni una. Sólido como roca."
     },
     "everyoneReady": "¡Todos listos!",
-    "waitingForPlayers": "Esperando jugadores",
-    "ready": "¡Listo!",
+    "waitingForPlayers": "Esperando que los jugadores estén listos...",
+    "ready": "Listo",
     "waiting": "Esperando...",
     "imReady": "Listo para el siguiente",
     "youAreReady": "¡Estás listo!",
@@ -2748,14 +3186,14 @@ const es = {
     "leadChanges": "{{count}} cambios de líder en el juego",
     "shareNarrativeWin": "¡Encontré {{word}} y anoté {{score}} en LexiClash!",
     "shareNarrativeLoss": "¡Encontré {{words}} palabras por {{score}} pts en LexiClash!",
-    "revengeRematch": "¿Revancha contra {{player}}?",
+    "revengeRematch": "REVANCHA",
     "markReadyDescription": "Toca cuando estés listo",
     "allReadyHostCanStart": "¡Todos listos! Dale cuando quieras.",
     "allPlayersReadyWaitingHost": "✓ Todos los jugadores listos — esperando al anfitrión",
     "hostWillStartWhenReady": "El anfitrión arranca cuando estén listos",
     "performanceHistory": "Historial de Rendimiento",
     "goToLobby": "Ir al lobby",
-    "you": "(Tú)",
+    "you": "TÚ",
     "betterLuckNextTime": "¡La próxima te desquitas!",
     "loserFeedback": {
       "almostPodium": "¡Casi en el podio!",
@@ -2767,7 +3205,7 @@ const es = {
     "readyForNextRound": "¿Listos para la siguiente ronda?",
     "nextRoundMode": "Modo de la próxima ronda",
     "readyExplanation": "Marca listo para la siguiente ronda",
-    "defendTitle": "¡Defiende tu título!",
+    "defendTitle": "DEFENDER TÍTULO",
     "aheadOf": "por delante de {player}",
     "findingWouldHaveTied": "¡Encontrar {words} habría empatado!",
     "showAllRankings": "+{count} jugadores más",
@@ -2796,14 +3234,13 @@ const es = {
     "battleRankings": "Clasificación",
     "players": "Jugadores",
     "survivors": "Supervivientes",
-    "eliminated": "Eliminados",
+    "eliminated": "ELIMINADO",
     "targetWord": "Palabra objetivo",
     "foundByYou": "¡Encontrada por ti!",
-    "survived": "Sobrevivió",
+    "survived": "SOBREVIVIÓ",
     "ultimateChampion": "CAMPEÓN SUPREMO",
     "risingContender": "CONTENDIENTE EN ASCENSO",
     "surviveLongerThan": "¡Sobrevive más que @{player}!",
-    "waitingForPlayers": "Esperando que los jugadores estén listos...",
     "waitingForHost": "Esperando a que el anfitrión inicie la siguiente ronda...",
     "scoringTip": "Tip de puntuación",
     "scoringTipText": "Palabras más largas = más puntos",
@@ -2845,40 +3282,15 @@ const es = {
     "target": "Objetivo",
     "totalPoints": "Puntos Totales",
     "revengeVs": "REVANCHA vs {player}",
-    "defendTitle": "DEFENDER TÍTULO",
-    "revengeRematch": "REVANCHA",
-    "bestWord": "Mejor Palabra",
-    "wordsFound": "Palabras Encontradas",
+    "wordsFound": "Palabras encontradas",
     "score": "Puntuación",
-    "ready": "Listo",
-    "aheadOf": "por delante de {player}",
-    "you": "TÚ",
-    "words": "Palabras",
     "matchResults": "El podio",
-    "eliminated": "ELIMINADO",
-    "survived": "SOBREVIVIÓ",
     "ordinal1": "1ER LUGAR",
     "ordinal2": "2DO LUGAR",
     "ordinal3": "3ER LUGAR",
     "ordinal4": "4TO LUGAR",
     "ordinalN": "{n}TO LUGAR",
     "soClose": "Tan cerca que duele — {points} pts de la corona.",
-    "crowns": {
-      "sniper": "El Francotirador",
-      "speedDemon": "Demonio Veloz",
-      "explorer": "El Explorador",
-      "scholar": "El Erudito",
-      "clutch": "Jugador Clutch",
-      "tank": "El Tanque"
-    },
-    "crownDesc": {
-      "sniper": "Más puntos por palabra. Quirúrgico.",
-      "speedDemon": "Encontró más palabras que nadie.",
-      "explorer": "Sacó palabras que nadie más vio.",
-      "scholar": "Las palabras más largas de media. Presumido.",
-      "clutch": "Soltó la palabra más grande.",
-      "tank": "No falló ni una. Sólido como roca."
-    },
     "potentialScore": "+{points} pts potencial",
     "comparativeInsights": {
       "title": "Cómo te fue vs. los demás",
@@ -2916,7 +3328,6 @@ const es = {
       "newSeries": "Nueva serie",
       "waitingNewSeries": "Esperando al anfitrión..."
     },
-    "wordsFound": "Palabras encontradas",
     "shareVictoryPrompt": "¡Comparte tu victoria!",
     "victory": "¡VICTORIA!",
     "wellPlayed": "¡BIEN JUGADO!",
@@ -4177,7 +4588,7 @@ const es = {
       "winRate": "% victorias"
     },
     "coins": "Monedas",
-    "viewProfile": "Ver Perfil",
+    "viewProfile": "Ver perfil",
     "viewCoins": "Ver tus monedas",
     "sections": {
       "overview": "Resumen",
@@ -4253,7 +4664,6 @@ const es = {
     "addFriend": "Agregar amigo",
     "friends": "Amigos",
     "requestSent": "Solicitud enviada",
-    "viewProfile": "Ver perfil",
     "viewPublicProfile": "Ver perfil público",
     "games": "Partidas"
   },
@@ -4636,18 +5046,42 @@ const es = {
           "success": "¡PARADO!"
         },
         "ability": {
-          "smite": { "name": "Castigo", "desc": "Desata una ráfaga de daño sobre el jefe" },
-          "ward": { "name": "Guarda", "desc": "Bloquea el próximo ataque del jefe" },
-          "focus": { "name": "Enfoque", "desc": "Tu próxima palabra golpea con daño extra" }
+          "smite": {
+            "name": "Castigo",
+            "desc": "Desata una ráfaga de daño sobre el jefe"
+          },
+          "ward": {
+            "name": "Guarda",
+            "desc": "Bloquea el próximo ataque del jefe"
+          },
+          "focus": {
+            "name": "Enfoque",
+            "desc": "Tu próxima palabra golpea con daño extra"
+          }
         }
       }
     },
     "surprise": {
-      "doubleGold": { "label": "¡Oro Doble!", "desc": "Este nivel paga el doble de oro." },
-      "bonusChest": { "label": "¡Cofre Extra!", "desc": "Aparece un cofre de tesoro adicional." },
-      "luckyGems": { "label": "¡Gemas de la Suerte!", "desc": "Una lluvia de gemas." },
-      "goldenWord": { "label": "¡Palabra Dorada!", "desc": "Una palabra oculta valía un premio gordo." },
-      "comboFrenzy": { "label": "¡Frenesí de Combos!", "desc": "Las recompensas de combo contaron doble en este nivel." }
+      "doubleGold": {
+        "label": "¡Oro Doble!",
+        "desc": "Este nivel paga el doble de oro."
+      },
+      "bonusChest": {
+        "label": "¡Cofre Extra!",
+        "desc": "Aparece un cofre de tesoro adicional."
+      },
+      "luckyGems": {
+        "label": "¡Gemas de la Suerte!",
+        "desc": "Una lluvia de gemas."
+      },
+      "goldenWord": {
+        "label": "¡Palabra Dorada!",
+        "desc": "Una palabra oculta valía un premio gordo."
+      },
+      "comboFrenzy": {
+        "label": "¡Frenesí de Combos!",
+        "desc": "Las recompensas de combo contaron doble en este nivel."
+      }
     },
     "welcome": {
       "title": "¡Bienvenido a LexiClash!",
@@ -5249,18 +5683,54 @@ const es = {
   },
   "season": {
     "twist": {
-      "double-down": { "title": "Doble o nada", "blurb": "Las palabras largas brillan más esta temporada." },
-      "crown-rush": { "title": "Fiebre de coronas", "blurb": "Cada letra es un arma. Conquista el trono." },
-      "rare-find": { "title": "Hallazgo raro", "blurb": "Desempolva las palabras raras: este es su mes." },
-      "combo-beat": { "title": "Ritmo combo", "blurb": "Apila sílabas, monta el combo, marca el ritmo." },
-      "sound-wave": { "title": "Onda sonora", "blurb": "Mezcla ritmos y letras en jugadas de éxito." },
-      "throne-climb": { "title": "Ascenso al trono", "blurb": "Construye tu trono con cada palabra que sabes." },
-      "frostbite": { "title": "Mordida de hielo", "blurb": "Mantén tu racha caliente mientras el tablero se congela." },
-      "afterglow": { "title": "Resplandor", "blurb": "Estelas de neón siguen cada palabra que encuentras." },
-      "heatwave": { "title": "Ola de calor", "blurb": "Cuanto más larga tu racha, más arde el tablero." },
-      "bloom": { "title": "Floración", "blurb": "Cada hallazgo siembra el siguiente. Mira florecer tu puntaje." },
-      "stardust": { "title": "Polvo de estrellas", "blurb": "Las letras flotan como constelaciones por el tablero." },
-      "final-bell": { "title": "Campana final", "blurb": "El año cierra: cada punto entra en los libros de récords." }
+      "double-down": {
+        "title": "Doble o nada",
+        "blurb": "Las palabras largas brillan más esta temporada."
+      },
+      "crown-rush": {
+        "title": "Fiebre de coronas",
+        "blurb": "Cada letra es un arma. Conquista el trono."
+      },
+      "rare-find": {
+        "title": "Hallazgo raro",
+        "blurb": "Desempolva las palabras raras: este es su mes."
+      },
+      "combo-beat": {
+        "title": "Ritmo combo",
+        "blurb": "Apila sílabas, monta el combo, marca el ritmo."
+      },
+      "sound-wave": {
+        "title": "Onda sonora",
+        "blurb": "Mezcla ritmos y letras en jugadas de éxito."
+      },
+      "throne-climb": {
+        "title": "Ascenso al trono",
+        "blurb": "Construye tu trono con cada palabra que sabes."
+      },
+      "frostbite": {
+        "title": "Mordida de hielo",
+        "blurb": "Mantén tu racha caliente mientras el tablero se congela."
+      },
+      "afterglow": {
+        "title": "Resplandor",
+        "blurb": "Estelas de neón siguen cada palabra que encuentras."
+      },
+      "heatwave": {
+        "title": "Ola de calor",
+        "blurb": "Cuanto más larga tu racha, más arde el tablero."
+      },
+      "bloom": {
+        "title": "Floración",
+        "blurb": "Cada hallazgo siembra el siguiente. Mira florecer tu puntaje."
+      },
+      "stardust": {
+        "title": "Polvo de estrellas",
+        "blurb": "Las letras flotan como constelaciones por el tablero."
+      },
+      "final-bell": {
+        "title": "Campana final",
+        "blurb": "El año cierra: cada punto entra en los libros de récords."
+      }
     },
     "name": "Temporada {{number}}: {{theme}}",
     "endingSoon": "¡La temporada termina pronto!",
@@ -5514,8 +5984,6 @@ const es = {
     "sectionMultiplayerSubtitle": "Jugadores reales, en vivo",
     "sectionSoloTitle": "En solitario",
     "sectionSoloSubtitle": "Entrena. Sube. Supérate.",
-    "moreGameModes": "Más modos de juego",
-    "moreGameModesHint": "Toca para explorar",
     "arena": "Multijugador",
     "arenaDesc": "¡Juega solo o desafía amigos!",
     "offlineLocked": "Necesita internet",
@@ -5617,7 +6085,6 @@ const es = {
     "hallOfFame": "Salón de la Fama",
     "careerPoints": "Puntos de Carrera",
     "gamesToday": "Juegos hoy",
-    "gameModes": "Modos de juego",
     "freeToPlay": "Gratis para jugar",
     "wordHuntMode": "Caza de Palabras",
     "wordHuntModeDesc": "¡Encuentra la palabra objetivo lo más rápido posible — un nuevo rompecabezas cada día!",
@@ -6457,12 +6924,30 @@ const es = {
       }
     },
     "insights": {
-      "personalBest": { "headline": "¡Nuevo récord personal!", "sub": "+{n} pts sobre tu récord" },
-      "percentile": { "headline": "¡Élite hoy!", "sub": "Top {n}% de todos" },
-      "speed": { "headline": "¡Velocidad récord!", "sub": "{n}% más rápido que tu promedio" },
-      "firstTry": { "headline": "¡Al primer intento!", "sub": "Solo el {n}% lo resolvió en 1" },
-      "streakComplete": { "headline": "¡Semana completa!", "sub": "Tu cofre está listo para abrir" },
-      "improved": { "headline": "¡Cada vez mejor!", "sub": "Mejor que ayer" }
+      "personalBest": {
+        "headline": "¡Nuevo récord personal!",
+        "sub": "+{n} pts sobre tu récord"
+      },
+      "percentile": {
+        "headline": "¡Élite hoy!",
+        "sub": "Top {n}% de todos"
+      },
+      "speed": {
+        "headline": "¡Velocidad récord!",
+        "sub": "{n}% más rápido que tu promedio"
+      },
+      "firstTry": {
+        "headline": "¡Al primer intento!",
+        "sub": "Solo el {n}% lo resolvió en 1"
+      },
+      "streakComplete": {
+        "headline": "¡Semana completa!",
+        "sub": "Tu cofre está listo para abrir"
+      },
+      "improved": {
+        "headline": "¡Cada vez mejor!",
+        "sub": "Mejor que ayer"
+      }
     }
   },
   "dailyWordWheelLanding": {
@@ -6474,21 +6959,51 @@ const es = {
       "leaderboard": "Ver Récord Mundial"
     },
     "steps": {
-      "heading": "Cómo Funciona la Rueda de Palabras Diaria",
-      "1": { "title": "Nuevo puzzle diario", "desc": "Una nueva rueda de letras aparece cada día a medianoche UTC. Todos los jugadores del mundo reciben las mismas letras." },
-      "2": { "title": "Encuentra palabras", "desc": "Forma palabras con las letras de la rueda. Cada palabra debe incluir la letra central y tener al menos 3 letras. Palabras más largas = más puntos." },
-      "3": { "title": "Vence al reloj", "desc": "Encuentra tantas palabras como puedas antes de que se acabe el tiempo. Velocidad y vocabulario importan." },
-      "4": { "title": "Compara globalmente", "desc": "Ve tu posición en la tabla de clasificación diaria. Persigue el récord mundial y sigue tu racha." }
+      "1": {
+        "title": "Nuevo puzzle diario",
+        "desc": "Una nueva rueda de letras aparece cada día a medianoche UTC. Todos los jugadores del mundo reciben las mismas letras."
+      },
+      "2": {
+        "title": "Encuentra palabras",
+        "desc": "Forma palabras con las letras de la rueda. Cada palabra debe incluir la letra central y tener al menos 3 letras. Palabras más largas = más puntos."
+      },
+      "3": {
+        "title": "Vence al reloj",
+        "desc": "Encuentra tantas palabras como puedas antes de que se acabe el tiempo. Velocidad y vocabulario importan."
+      },
+      "4": {
+        "title": "Compara globalmente",
+        "desc": "Ve tu posición en la tabla de clasificación diaria. Persigue el récord mundial y sigue tu racha."
+      },
+      "heading": "Cómo Funciona la Rueda de Palabras Diaria"
     },
     "faq": {
       "heading": "Preguntas Frecuentes",
       "items": [
-        { "q": "¿Qué es la Rueda de Palabras Diaria?", "a": "La Rueda de Palabras Diaria es un puzzle de palabras gratuito en LexiClash. Cada día a medianoche UTC aparece una nueva rueda de letras. Tu objetivo es encontrar tantas palabras como sea posible. Todos juegan el mismo puzzle." },
-        { "q": "¿Cómo se juega?", "a": "Recibes letras dispuestas en una rueda con una letra central. Forma palabras — cada palabra debe incluir la letra central y tener al menos 3 letras. Encuentra tantas palabras como puedas antes de que se acabe el tiempo." },
-        { "q": "¿Es gratis?", "a": "Sí, completamente gratis. Sin descargas, sin registro, sin anuncios. Juega en el navegador de cualquier dispositivo." },
-        { "q": "¿Puedo ver el récord mundial?", "a": "¡Sí! Después de completar el puzzle, puedes ver la tabla de clasificación global con las puntuaciones más altas del día." },
-        { "q": "¿Todas las palabras necesitan la letra central?", "a": "¡Sí! Cada palabra que envíes debe incluir la letra central de la rueda. Es la restricción principal que hace el puzzle desafiante." },
-        { "q": "¿En qué idiomas está disponible?", "a": "La Rueda de Palabras Diaria está disponible en inglés, hebreo, sueco, japonés y español. Cada idioma tiene su propio diccionario y tabla de clasificación." }
+        {
+          "q": "¿Qué es la Rueda de Palabras Diaria?",
+          "a": "La Rueda de Palabras Diaria es un puzzle de palabras gratuito en LexiClash. Cada día a medianoche UTC aparece una nueva rueda de letras. Tu objetivo es encontrar tantas palabras como sea posible. Todos juegan el mismo puzzle."
+        },
+        {
+          "q": "¿Cómo se juega?",
+          "a": "Recibes letras dispuestas en una rueda con una letra central. Forma palabras — cada palabra debe incluir la letra central y tener al menos 3 letras. Encuentra tantas palabras como puedas antes de que se acabe el tiempo."
+        },
+        {
+          "q": "¿Es gratis?",
+          "a": "Sí, completamente gratis. Sin descargas, sin registro, sin anuncios. Juega en el navegador de cualquier dispositivo."
+        },
+        {
+          "q": "¿Puedo ver el récord mundial?",
+          "a": "¡Sí! Después de completar el puzzle, puedes ver la tabla de clasificación global con las puntuaciones más altas del día."
+        },
+        {
+          "q": "¿Todas las palabras necesitan la letra central?",
+          "a": "¡Sí! Cada palabra que envíes debe incluir la letra central de la rueda. Es la restricción principal que hace el puzzle desafiante."
+        },
+        {
+          "q": "¿En qué idiomas está disponible?",
+          "a": "La Rueda de Palabras Diaria está disponible en inglés, hebreo, sueco, japonés y español. Cada idioma tiene su propio diccionario y tabla de clasificación."
+        }
       ]
     },
     "finalCta": {
@@ -6804,7 +7319,8 @@ const es = {
       "backToDailyDesc": "Ver la tabla de clasificación de hoy",
       "playerWordsTitle": "El camino de {{name}}",
       "youMissedWords": "Palabras que te perdiste",
-      "tapPlayerHint": "Toca un jugador para ver su camino"
+      "tapPlayerHint": "Toca un jugador para ver su camino",
+      "wordsFound": "Palabras encontradas"
     },
     "score": {
       "title": "Tu Puntuación",
@@ -6940,15 +7456,15 @@ const es = {
       "viewBoard": "Ver tablero",
       "boardReview": "Revisión del tablero",
       "ladder": {
-        "empty": "¡Aún no hay palabras! Encuentra la primera.",
+        "empty": "¡Aún no hay palabras! Encuentra la primera."
       },
       "kbHint": {
         "submit": "enviar",
         "pop": "borrar última",
-        "clear": "limpiar",
+        "clear": "limpiar"
       },
       "stopGameConfirm": "¿Terminar el juego para todos?",
-      "stopGameYes": "Terminar Juego",
+      "stopGameYes": "Terminar Juego"
     },
     "facts": {
       "title": "Datos Curiosos",
@@ -7190,10 +7706,7 @@ const es = {
     "confirmBlock": "¿Bloquear usuario? No podrá contactarte.",
     "block": "Bloquear",
     "filterFriends": "Buscar amigos...",
-    "noMatchingFriends": "No se encontraron amigos",
-    "blocked": "Bloqueado",
-    "blockedUsers": "Usuarios bloqueados",
-    "unblock": "Desbloquear"
+    "noMatchingFriends": "No se encontraron amigos"
   },
   "multiplayer": {
     "rank": {
@@ -7694,10 +8207,22 @@ const es = {
       "timeUpHaul": "¡Se acabó el tiempo — buen botín!",
       "firstMissFree": "Error de calentamiento — no hay problema. ¡Tú puedes!",
       "badge": {
-        "bronze": { "name": "Bronce", "title": "¡Series acumuladas!" },
-        "silver": { "name": "Plata", "title": "¡Trabajo sólido!" },
-        "gold": { "name": "Oro", "title": "¡En llamas!" },
-        "platinum": { "name": "Platino", "title": "¡Una bestia absoluta!" }
+        "bronze": {
+          "name": "Bronce",
+          "title": "¡Series acumuladas!"
+        },
+        "silver": {
+          "name": "Plata",
+          "title": "¡Trabajo sólido!"
+        },
+        "gold": {
+          "name": "Oro",
+          "title": "¡En llamas!"
+        },
+        "platinum": {
+          "name": "Platino",
+          "title": "¡Una bestia absoluta!"
+        }
       },
       "rarity": {
         "common": "común",
@@ -7913,7 +8438,12 @@ const es = {
     "teacherAccess": {
       "title": "Solicitudes de acceso de maestro",
       "empty": "Sin solicitudes",
-      "count": { "pending": "Pendiente", "approved": "Aprobado", "declined": "Rechazado", "total": "Total" },
+      "count": {
+        "pending": "Pendiente",
+        "approved": "Aprobado",
+        "declined": "Rechazado",
+        "total": "Total"
+      },
       "filter_status": "Estado",
       "filter_status_all": "Todo",
       "filter_locale": "Idioma",
@@ -7922,9 +8452,27 @@ const es = {
       "row_open": "Abrir solicitud de {name}",
       "page": "Página",
       "export_csv": "Exportar CSV",
-      "col": { "name": "Nombre", "email": "Correo", "role": "Rol", "locale": "Idioma", "country": "País", "status": "Estado", "submitted": "Enviado" },
+      "col": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "locale": "Idioma",
+        "country": "País",
+        "status": "Estado",
+        "submitted": "Enviado"
+      },
       "drawer_title": "Detalles de solicitud",
-      "field": { "name": "Nombre", "email": "Correo", "role": "Rol", "locale": "Idioma", "country": "País", "school": "Escuela", "status": "Estado", "submitted": "Enviado", "use_case": "Caso de uso" },
+      "field": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "locale": "Idioma",
+        "country": "País",
+        "school": "Escuela",
+        "status": "Estado",
+        "submitted": "Enviado",
+        "use_case": "Caso de uso"
+      },
       "admin_note": "Nota para el solicitante (opcional)",
       "note_hint": "Al aprobar, esta nota se incluye en el correo de bienvenida al solicitante. Al rechazar, se usa como motivo.",
       "show_preview": "Previsualizar correo",
@@ -8430,7 +8978,25 @@ const es = {
     "milogWords": {
       "title": "Enriquecimiento del Diccionario Milog",
       "subtitle": "Palabras en hebreo verificadas contra milog.co.il"
-    }
+    },
+    "sendTitle": "Enviar Notificación",
+    "selectPlayers": "Seleccionar Destinatarios",
+    "chooseType": "Elegir Tipo",
+    "writeMessage": "Escribir Mensaje",
+    "preview": "Previsualización",
+    "send": "Enviar",
+    "sending": "Enviando...",
+    "sent": "¡Notificación Enviada!",
+    "recipients": "Destinatarios",
+    "type": "Tipo",
+    "sendingTo": "Enviando a",
+    "titleLabel": "Título",
+    "titlePlaceholder": "Título de notificación...",
+    "bodyLabel": "Mensaje",
+    "bodyPlaceholder": "Mensaje de notificación...",
+    "actionUrlLabel": "URL de Acción",
+    "sendSuccess": "¡Notificación enviada exitosamente!",
+    "sendError": "Error al enviar notificación. Por favor, intenta de nuevo."
   },
   "tvTutorial": {
     "welcome": {
@@ -8462,7 +9028,7 @@ const es = {
     "help": "Mostrar tutorial"
   },
   "quickPlay": {
-"solo": {
+    "solo": {
       "title": "Partida rápida",
       "round": "Ronda",
       "random": "Aleatorio",
@@ -8498,7 +9064,15 @@ const es = {
       "rankProgress": "{points} / {next} para {rank}",
       "rankMax": "Rango máximo alcanzado",
       "rankGained": "+{pts} puntos de rango en esta ronda",
-      "rank": {"rookie": "Novato", "bronze": "Bronce", "silver": "Plata", "gold": "Oro", "platinum": "Platino", "diamond": "Diamante", "legend": "Leyenda"},
+      "rank": {
+        "rookie": "Novato",
+        "bronze": "Bronce",
+        "silver": "Plata",
+        "gold": "Oro",
+        "platinum": "Platino",
+        "diamond": "Diamante",
+        "legend": "Leyenda"
+      },
       "shareTitle": "Partida rápida de LexiClash",
       "shareText": "Logré el {pct}% del perfecto en este tablero. Mismo tablero, tu turno:"
     },
@@ -8671,7 +9245,38 @@ const es = {
     "levelWithNumber": "Lv. {level}",
     "backToMap": "Volver al mapa del mundo",
     "worldLabel": "Mundo",
-    "world": "Mundo",
+    "world": {
+      "1": {
+        "theme": "Naturaleza y jardín"
+      },
+      "2": {
+        "theme": "Agua y flujo"
+      },
+      "3": {
+        "theme": "Tierra y minerales"
+      },
+      "4": {
+        "theme": "Océano y viaje"
+      },
+      "5": {
+        "theme": "Construcción y artesanía"
+      },
+      "6": {
+        "theme": "Misterio y rompecabezas"
+      },
+      "7": {
+        "theme": "Luz y reflejo"
+      },
+      "8": {
+        "theme": "Espacio y ciencia"
+      },
+      "9": {
+        "theme": "Cultura e idioma"
+      },
+      "10": {
+        "theme": "Poder y conocimiento"
+      }
+    },
     "stars": "estrellas",
     "levelsCompleted": "niveles completados",
     "locked": "Bloqueado",
@@ -8815,27 +9420,140 @@ const es = {
         "epic": "Épica",
         "legendary": "Legendaria"
       },
-      "ember": { "name": "Runa de Brasa", "desc": "+10% bonus de puntaje" },
-      "inferno": { "name": "Runa Infernal", "desc": "+25% bonus de puntaje" },
-      "midas": { "name": "Runa de Midas", "desc": "+15% bonus de oro" },
-      "fortune": { "name": "Runa de Fortuna", "desc": "+40% bonus de oro" },
-      "hourglass": { "name": "Runa de Reloj", "desc": "+5s tiempo bonus" },
-      "eternity": { "name": "Runa de Eternidad", "desc": "+12s tiempo bonus" },
-      "flow": { "name": "Runa de Flujo", "desc": "15% menos decaimiento de combo" },
-      "torrent": { "name": "Runa de Torrente", "desc": "35% menos decaimiento de combo" },
-      "insight": { "name": "Runa de Perspicacia", "desc": "+1 pista" },
-      "oracle": { "name": "Runa del Oráculo", "desc": "+2 pistas" },
-      "valor": { "name": "Runa de Valor", "desc": "+20% daño al jefe" },
-      "dragonslayer": { "name": "Runa Matadragones", "desc": "+50% daño al jefe" }
+      "ember": {
+        "name": "Runa de Brasa",
+        "desc": "+10% bonus de puntaje"
+      },
+      "inferno": {
+        "name": "Runa Infernal",
+        "desc": "+25% bonus de puntaje"
+      },
+      "midas": {
+        "name": "Runa de Midas",
+        "desc": "+15% bonus de oro"
+      },
+      "fortune": {
+        "name": "Runa de Fortuna",
+        "desc": "+40% bonus de oro"
+      },
+      "hourglass": {
+        "name": "Runa de Reloj",
+        "desc": "+5s tiempo bonus"
+      },
+      "eternity": {
+        "name": "Runa de Eternidad",
+        "desc": "+12s tiempo bonus"
+      },
+      "flow": {
+        "name": "Runa de Flujo",
+        "desc": "15% menos decaimiento de combo"
+      },
+      "torrent": {
+        "name": "Runa de Torrente",
+        "desc": "35% menos decaimiento de combo"
+      },
+      "insight": {
+        "name": "Runa de Perspicacia",
+        "desc": "+1 pista"
+      },
+      "oracle": {
+        "name": "Runa del Oráculo",
+        "desc": "+2 pistas"
+      },
+      "valor": {
+        "name": "Runa de Valor",
+        "desc": "+20% daño al jefe"
+      },
+      "dragonslayer": {
+        "name": "Runa Matadragones",
+        "desc": "+50% daño al jefe"
+      }
     },
     "achievements": {
       "title": "Logros",
-      "earned": "obtenidos",
+      "earned": "Ganado",
+      "hidden": "Oculto",
+      "unlocked": "¡Logro Desbloqueado!",
+      "upgraded": "¡Logro Mejorado!",
+      "cinematic": {
+        "unlocked": "¡LOGRO DESBLOQUEADO!",
+        "gold": "ORO",
+        "platinum": "PLATINO"
+      },
+      "progress": "Progreso de Logros",
       "categories": {
-        "gameplay": "Jugabilidad",
+        "gameplay": "Juego",
         "bosses": "Jefes",
         "progression": "Progresión",
         "mastery": "Maestría"
+      },
+      "firstWord": {
+        "name": "Primera Palabra",
+        "desc": "Encuentra tu primera palabra"
+      },
+      "wordStreak5": {
+        "name": "Racha de 5",
+        "desc": "Encuentra 5 palabras seguidas"
+      },
+      "wordStreak10": {
+        "name": "Racha de 10",
+        "desc": "Encuentra 10 palabras seguidas"
+      },
+      "longWord6": {
+        "name": "Palabra Larga",
+        "desc": "Encuentra una palabra de 6+ letras"
+      },
+      "longWord8": {
+        "name": "Palabra Épica",
+        "desc": "Encuentra una palabra de 8+ letras"
+      },
+      "perfectLevel": {
+        "name": "Nivel Perfecto",
+        "desc": "Completa un nivel sin recibir daño"
+      },
+      "bossSlayer": {
+        "name": "Cazajefes",
+        "desc": "Derrota tu primer jefe"
+      },
+      "bossSpeedrun": {
+        "name": "Speedrun de Jefe",
+        "desc": "Derrota un jefe en menos de 60s"
+      },
+      "bossNoDamage": {
+        "name": "Jefe sin Daño",
+        "desc": "Derrota un jefe sin recibir daño"
+      },
+      "allBosses": {
+        "name": "Maestro de Jefes",
+        "desc": "Derrota a todos los jefes"
+      },
+      "worldComplete": {
+        "name": "Mundo Completo",
+        "desc": "Completa todos los niveles de un mundo"
+      },
+      "starCollector50": {
+        "name": "Coleccionista de Estrellas",
+        "desc": "Gana 50 estrellas"
+      },
+      "starCollector100": {
+        "name": "Maestro Estelar",
+        "desc": "Gana 100 estrellas"
+      },
+      "levelMaster": {
+        "name": "Maestro de Niveles",
+        "desc": "Completa 20 niveles"
+      },
+      "skillUnlocked": {
+        "name": "Primera Habilidad",
+        "desc": "Desbloquea tu primera habilidad"
+      },
+      "skillPathComplete": {
+        "name": "Camino Completo",
+        "desc": "Completa una rama de habilidades"
+      },
+      "comboKing": {
+        "name": "Rey del Combo",
+        "desc": "Alcanza un combo de 10x"
       }
     },
     "share": {
@@ -8877,8 +9595,20 @@ const es = {
       "confirm": "¿Estás seguro? Tu progreso en los mundos se reiniciará, pero conservas mejoras, oro y tu álbum de palabras.",
       "activate": "Prestigiar ahora",
       "cancel": "Aún no",
-      "ranks": { "bronze": "Bronce", "silver": "Plata", "gold": "Oro", "platinum": "Platino", "diamond": "Diamante" },
-      "titles": { "wordSmith": "Forjador de palabras", "lexiconAdept": "Adepto del léxico", "wordMaster": "Maestro de palabras", "grandLexicon": "Gran léxico", "eternalWordsmith": "Forjador eterno" },
+      "ranks": {
+        "bronze": "Bronce",
+        "silver": "Plata",
+        "gold": "Oro",
+        "platinum": "Platino",
+        "diamond": "Diamante"
+      },
+      "titles": {
+        "wordSmith": "Forjador de palabras",
+        "lexiconAdept": "Adepto del léxico",
+        "wordMaster": "Maestro de palabras",
+        "grandLexicon": "Gran léxico",
+        "eternalWordsmith": "Forjador eterno"
+      },
       "bonusXp": "+{{percent}}% XP",
       "bonusGold": "+{{percent}}% Oro",
       "keeps": "Conservas",
@@ -9246,11 +9976,6 @@ const es = {
         }
       },
       "mechanicProgress": "Progreso de mecánica",
-      "phases": {
-        "phase1": "FASE 1",
-        "phase2": "FASE 2",
-        "phase2Banner": "¡FASE 2!"
-      },
       "telegraph": {
         "incoming": "¡Ataque entrante!",
         "warning": "¡Cuidado!",
@@ -9423,18 +10148,6 @@ const es = {
     },
     "toast": {
       "themedWord": "¡Bonificación por palabra temática!"
-    },
-    "world": {
-      "1": { "theme": "Naturaleza y jardín" },
-      "2": { "theme": "Agua y flujo" },
-      "3": { "theme": "Tierra y minerales" },
-      "4": { "theme": "Océano y viaje" },
-      "5": { "theme": "Construcción y artesanía" },
-      "6": { "theme": "Misterio y rompecabezas" },
-      "7": { "theme": "Luz y reflejo" },
-      "8": { "theme": "Espacio y ciencia" },
-      "9": { "theme": "Cultura e idioma" },
-      "10": { "theme": "Poder y conocimiento" }
     },
     "mode": {
       "classic": "Clásico",
@@ -9785,93 +10498,6 @@ const es = {
         "prepare": "¡Prepárate para nuevos desafíos!"
       }
     },
-    "achievements": {
-      "title": "Logros",
-      "earned": "Ganado",
-      "hidden": "Oculto",
-      "unlocked": "¡Logro Desbloqueado!",
-      "upgraded": "¡Logro Mejorado!",
-      "cinematic": {
-        "unlocked": "¡LOGRO DESBLOQUEADO!",
-        "gold": "ORO",
-        "platinum": "PLATINO"
-      },
-      "progress": "Progreso de Logros",
-      "categories": {
-        "gameplay": "Juego",
-        "bosses": "Jefes",
-        "progression": "Progresión",
-        "mastery": "Maestría"
-      },
-      "firstWord": {
-        "name": "Primera Palabra",
-        "desc": "Encuentra tu primera palabra"
-      },
-      "wordStreak5": {
-        "name": "Racha de 5",
-        "desc": "Encuentra 5 palabras seguidas"
-      },
-      "wordStreak10": {
-        "name": "Racha de 10",
-        "desc": "Encuentra 10 palabras seguidas"
-      },
-      "longWord6": {
-        "name": "Palabra Larga",
-        "desc": "Encuentra una palabra de 6+ letras"
-      },
-      "longWord8": {
-        "name": "Palabra Épica",
-        "desc": "Encuentra una palabra de 8+ letras"
-      },
-      "perfectLevel": {
-        "name": "Nivel Perfecto",
-        "desc": "Completa un nivel sin recibir daño"
-      },
-      "bossSlayer": {
-        "name": "Cazajefes",
-        "desc": "Derrota tu primer jefe"
-      },
-      "bossSpeedrun": {
-        "name": "Speedrun de Jefe",
-        "desc": "Derrota un jefe en menos de 60s"
-      },
-      "bossNoDamage": {
-        "name": "Jefe sin Daño",
-        "desc": "Derrota un jefe sin recibir daño"
-      },
-      "allBosses": {
-        "name": "Maestro de Jefes",
-        "desc": "Derrota a todos los jefes"
-      },
-      "worldComplete": {
-        "name": "Mundo Completo",
-        "desc": "Completa todos los niveles de un mundo"
-      },
-      "starCollector50": {
-        "name": "Coleccionista de Estrellas",
-        "desc": "Gana 50 estrellas"
-      },
-      "starCollector100": {
-        "name": "Maestro Estelar",
-        "desc": "Gana 100 estrellas"
-      },
-      "levelMaster": {
-        "name": "Maestro de Niveles",
-        "desc": "Completa 20 niveles"
-      },
-      "skillUnlocked": {
-        "name": "Primera Habilidad",
-        "desc": "Desbloquea tu primera habilidad"
-      },
-      "skillPathComplete": {
-        "name": "Camino Completo",
-        "desc": "Completa una rama de habilidades"
-      },
-      "comboKing": {
-        "name": "Rey del Combo",
-        "desc": "Alcanza un combo de 10x"
-      }
-    },
     "menu": {
       "skills": "Habilidades",
       "achievements": "Logros"
@@ -10064,21 +10690,100 @@ const es = {
       "title": "Colección",
       "collected": "recolectados",
       "items": "objetos",
-      "category": { "trophy": "Trofeos", "scroll": "Pergaminos", "rune": "Runas", "relic": "Reliquias" },
-      "rarity": { "common": "Común", "rare": "Raro", "epic": "Épico", "legendary": "Legendario" },
+      "category": {
+        "trophy": "Trofeos",
+        "scroll": "Pergaminos",
+        "rune": "Runas",
+        "relic": "Reliquias"
+      },
+      "rarity": {
+        "common": "Común",
+        "rare": "Raro",
+        "epic": "Épico",
+        "legendary": "Legendario"
+      },
       "runeFragment": "Fragmento de Runa",
       "runeFragmentDesc": "Un fragmento brillante de poder antiguo",
       "goldenQuill": "Pluma Dorada",
       "goldenQuillDesc": "Recompensa por un primer intento perfecto",
       "cosmicShard": "Fragmento Cósmico",
       "cosmicShardDesc": "El tesoro más raro — un fragmento del cosmos",
-      "bossTrophy": { "w1": "Trofeo del Guardián del Bosque", "w2": "Trofeo del Faraón del Desierto", "w3": "Trofeo del Leviatán del Océano", "w4": "Trofeo del Titán de la Montaña", "w5": "Trofeo de la Serpiente de la Selva", "w6": "Trofeo del Yeti de la Tundra", "w7": "Trofeo del Dragón del Volcán", "w8": "Trofeo del Grifo del Cielo", "w9": "Trofeo del Espectro de las Sombras", "w10": "Trofeo del Señor Cósmico" },
-      "bossTrophyDesc": { "w1": "Derrotaste al Guardián del Bosque", "w2": "Derrotaste al Faraón del Desierto", "w3": "Derrotaste al Leviatán del Océano", "w4": "Derrotaste al Titán de la Montaña", "w5": "Derrotaste a la Serpiente de la Selva", "w6": "Derrotaste al Yeti de la Tundra", "w7": "Derrotaste al Dragón del Volcán", "w8": "Derrotaste al Grifo del Cielo", "w9": "Derrotaste al Espectro de las Sombras", "w10": "Derrotaste al Señor Cósmico" },
-      "loreScroll": { "w1": "Pergamino del Bosque", "w2": "Pergamino del Desierto", "w3": "Pergamino del Océano", "w4": "Pergamino de la Montaña", "w5": "Pergamino de la Selva", "w6": "Pergamino de la Tundra", "w7": "Pergamino del Volcán", "w8": "Pergamino del Cielo", "w9": "Pergamino de las Sombras", "w10": "Pergamino Cósmico" },
-      "worldEssence": { "w1": "Esencia del Bosque", "w2": "Esencia del Desierto", "w3": "Esencia del Océano", "w4": "Esencia de la Montaña", "w5": "Esencia de la Selva", "w6": "Esencia de la Tundra", "w7": "Esencia del Volcán", "w8": "Esencia del Cielo", "w9": "Esencia de las Sombras", "w10": "Esencia Cósmica" },
-      "worldEssenceDesc": { "w1": "El espíritu del bosque encantado", "w2": "El corazón ardiente del desierto", "w3": "Una gota del océano primordial", "w4": "El núcleo irrompible de la montaña", "w5": "El pulso salvaje de la selva", "w6": "Un cristal congelado del invierno eterno", "w7": "Una chispa del corazón del volcán", "w8": "Una pluma de las nubes más altas", "w9": "Un susurro del reino de las sombras", "w10": "Un fragmento del cosmos" },
-      "ancientRelic": { "w5": "Ídolo de la Selva", "w6": "Brújula Congelada", "w7": "Máscara de Obsidiana", "w8": "Campanilla del Viento", "w9": "Espejo de Sombras", "w10": "Mapa Estelar" },
-      "ancientRelicDesc": { "w5": "Un ídolo antiguo de las profundidades de la selva", "w6": "Una brújula que siempre apunta al lugar más frío", "w7": "Una máscara forjada en el corazón del volcán", "w8": "Una campanilla que toca la canción del viento", "w9": "Un espejo que refleja lo que fue", "w10": "Un mapa que muestra caminos entre las estrellas" }
+      "bossTrophy": {
+        "w1": "Trofeo del Guardián del Bosque",
+        "w2": "Trofeo del Faraón del Desierto",
+        "w3": "Trofeo del Leviatán del Océano",
+        "w4": "Trofeo del Titán de la Montaña",
+        "w5": "Trofeo de la Serpiente de la Selva",
+        "w6": "Trofeo del Yeti de la Tundra",
+        "w7": "Trofeo del Dragón del Volcán",
+        "w8": "Trofeo del Grifo del Cielo",
+        "w9": "Trofeo del Espectro de las Sombras",
+        "w10": "Trofeo del Señor Cósmico"
+      },
+      "bossTrophyDesc": {
+        "w1": "Derrotaste al Guardián del Bosque",
+        "w2": "Derrotaste al Faraón del Desierto",
+        "w3": "Derrotaste al Leviatán del Océano",
+        "w4": "Derrotaste al Titán de la Montaña",
+        "w5": "Derrotaste a la Serpiente de la Selva",
+        "w6": "Derrotaste al Yeti de la Tundra",
+        "w7": "Derrotaste al Dragón del Volcán",
+        "w8": "Derrotaste al Grifo del Cielo",
+        "w9": "Derrotaste al Espectro de las Sombras",
+        "w10": "Derrotaste al Señor Cósmico"
+      },
+      "loreScroll": {
+        "w1": "Pergamino del Bosque",
+        "w2": "Pergamino del Desierto",
+        "w3": "Pergamino del Océano",
+        "w4": "Pergamino de la Montaña",
+        "w5": "Pergamino de la Selva",
+        "w6": "Pergamino de la Tundra",
+        "w7": "Pergamino del Volcán",
+        "w8": "Pergamino del Cielo",
+        "w9": "Pergamino de las Sombras",
+        "w10": "Pergamino Cósmico"
+      },
+      "worldEssence": {
+        "w1": "Esencia del Bosque",
+        "w2": "Esencia del Desierto",
+        "w3": "Esencia del Océano",
+        "w4": "Esencia de la Montaña",
+        "w5": "Esencia de la Selva",
+        "w6": "Esencia de la Tundra",
+        "w7": "Esencia del Volcán",
+        "w8": "Esencia del Cielo",
+        "w9": "Esencia de las Sombras",
+        "w10": "Esencia Cósmica"
+      },
+      "worldEssenceDesc": {
+        "w1": "El espíritu del bosque encantado",
+        "w2": "El corazón ardiente del desierto",
+        "w3": "Una gota del océano primordial",
+        "w4": "El núcleo irrompible de la montaña",
+        "w5": "El pulso salvaje de la selva",
+        "w6": "Un cristal congelado del invierno eterno",
+        "w7": "Una chispa del corazón del volcán",
+        "w8": "Una pluma de las nubes más altas",
+        "w9": "Un susurro del reino de las sombras",
+        "w10": "Un fragmento del cosmos"
+      },
+      "ancientRelic": {
+        "w5": "Ídolo de la Selva",
+        "w6": "Brújula Congelada",
+        "w7": "Máscara de Obsidiana",
+        "w8": "Campanilla del Viento",
+        "w9": "Espejo de Sombras",
+        "w10": "Mapa Estelar"
+      },
+      "ancientRelicDesc": {
+        "w5": "Un ídolo antiguo de las profundidades de la selva",
+        "w6": "Una brújula que siempre apunta al lugar más frío",
+        "w7": "Una máscara forjada en el corazón del volcán",
+        "w8": "Una campanilla que toca la canción del viento",
+        "w9": "Un espejo que refleja lo que fue",
+        "w10": "Un mapa que muestra caminos entre las estrellas"
+      }
     },
     "later": "Más tarde",
     "nextLevel": "Siguiente: Nivel",
@@ -10097,16 +10802,46 @@ const es = {
       "prestigeCosmic": "Prestigio Cósmico"
     },
     "weekly": {
-      "speedDemon": { "name": "Demonio Veloz", "desc": "Temporizador rápido · puntos ×1.5" },
-      "longWords": { "name": "Palabras Largas", "desc": "Palabras de 4+ letras · oro ×1.5" },
-      "goldRush": { "name": "Fiebre del Oro", "desc": "Oro ×2 · temporizador rápido" },
-      "iceAge": { "name": "Era de Hielo", "desc": "Fichas especiales ×2 · puntos ×1.3" },
-      "marathon": { "name": "Maratón", "desc": "Temporizador largo · puntos ×0.8" },
-      "doubleOrNothing": { "name": "Doble o Nada", "desc": "Puntos ×2 · medio temporizador" },
-      "wordSmith": { "name": "Forjador de Palabras", "desc": "Palabras de 5+ letras · puntos ×2" },
-      "treasureHunter": { "name": "Cazador de Tesoros", "desc": "Oro ×1.8 · fichas especiales ×1.5" },
-      "blitz": { "name": "Blitz", "desc": "Temporizador rápido · puntos ×3" },
-      "zenMode": { "name": "Modo Zen", "desc": "Temporizador relajado · medio oro" }
+      "speedDemon": {
+        "name": "Demonio Veloz",
+        "desc": "Temporizador rápido · puntos ×1.5"
+      },
+      "longWords": {
+        "name": "Palabras Largas",
+        "desc": "Palabras de 4+ letras · oro ×1.5"
+      },
+      "goldRush": {
+        "name": "Fiebre del Oro",
+        "desc": "Oro ×2 · temporizador rápido"
+      },
+      "iceAge": {
+        "name": "Era de Hielo",
+        "desc": "Fichas especiales ×2 · puntos ×1.3"
+      },
+      "marathon": {
+        "name": "Maratón",
+        "desc": "Temporizador largo · puntos ×0.8"
+      },
+      "doubleOrNothing": {
+        "name": "Doble o Nada",
+        "desc": "Puntos ×2 · medio temporizador"
+      },
+      "wordSmith": {
+        "name": "Forjador de Palabras",
+        "desc": "Palabras de 5+ letras · puntos ×2"
+      },
+      "treasureHunter": {
+        "name": "Cazador de Tesoros",
+        "desc": "Oro ×1.8 · fichas especiales ×1.5"
+      },
+      "blitz": {
+        "name": "Blitz",
+        "desc": "Temporizador rápido · puntos ×3"
+      },
+      "zenMode": {
+        "name": "Modo Zen",
+        "desc": "Temporizador relajado · medio oro"
+      }
     },
     "saveFailedWarning": "Progreso no guardado — verifica tu conexión",
     "retrySave": "Reintentar",
@@ -10161,24 +10896,113 @@ const es = {
       "level10": "Trascendente"
     },
     "consumables": {
-      "bossRevive": { "name": "Revivir al Jefe" },
-      "bossShield": { "name": "Escudo del Jefe" },
-      "doubleGold": { "name": "Oro Doble" },
-      "extraHint": { "name": "Pista Extra" },
-      "gridReroll": { "name": "Regenerar Cuadrícula" },
-      "objectiveSkip": { "name": "Saltar Objetivo" },
-      "perfectStar": { "name": "Estrella Perfecta" },
-      "timerExtension": { "name": "Extensión de Tiempo" }
+      "bossRevive": {
+        "name": "Revivir al Jefe"
+      },
+      "bossShield": {
+        "name": "Escudo del Jefe"
+      },
+      "doubleGold": {
+        "name": "Oro Doble"
+      },
+      "extraHint": {
+        "name": "Pista Extra"
+      },
+      "gridReroll": {
+        "name": "Regenerar Cuadrícula"
+      },
+      "objectiveSkip": {
+        "name": "Saltar Objetivo"
+      },
+      "perfectStar": {
+        "name": "Estrella Perfecta"
+      },
+      "timerExtension": {
+        "name": "Extensión de Tiempo"
+      }
     },
     "mutators": {
-      "blindMode": { "name": "Modo Ciego" },
-      "chaosGrid": { "name": "Cuadrícula del Caos" },
-      "fragile": { "name": "Frágil" },
-      "ironMan": { "name": "Hombre de Hierro" },
-      "minimalist": { "name": "Minimalista" },
-      "noHints": { "name": "Sin Pistas" },
-      "speedRun": { "name": "Velocidad" },
-      "wordMaster": { "name": "Maestro de Palabras" }
+      "blindMode": {
+        "name": "Modo Ciego"
+      },
+      "chaosGrid": {
+        "name": "Cuadrícula del Caos"
+      },
+      "fragile": {
+        "name": "Frágil"
+      },
+      "ironMan": {
+        "name": "Hombre de Hierro"
+      },
+      "minimalist": {
+        "name": "Minimalista"
+      },
+      "noHints": {
+        "name": "Sin Pistas"
+      },
+      "speedRun": {
+        "name": "Velocidad"
+      },
+      "wordMaster": {
+        "name": "Maestro de Palabras"
+      }
+    },
+    "boss": {
+      "combat": {
+        "abilityBar": "Tus habilidades",
+        "charge": "Carga de habilidad",
+        "weakLabel": "Débil a",
+        "weaknessHit": "¡PUNTO DÉBIL!",
+        "weakness": {
+          "length": "PALABRAS LARGAS",
+          "lengthLong": "PALABRAS MÁS LARGAS",
+          "lengthEpic": "PALABRAS ENORMES",
+          "doubleLetter": "LETRAS DOBLES",
+          "palindrome": "PALÍNDROMOS",
+          "rareLetter": "LETRAS RARAS",
+          "vowelHeavy": "PALABRAS CON MUCHAS VOCALES"
+        },
+        "parry": {
+          "hint": "¡DEFIENDE! Palabra larga, ¡rápido!",
+          "success": "¡BLOQUEADO!"
+        },
+        "ability": {
+          "smite": {
+            "name": "Golpe",
+            "desc": "Suelta una ráfaga de daño contra el jefe"
+          },
+          "ward": {
+            "name": "Protección",
+            "desc": "Bloquea el próximo ataque del jefe"
+          },
+          "focus": {
+            "name": "Enfoque",
+            "desc": "Tu próxima palabra golpea con daño extra"
+          }
+        }
+      }
+    },
+    "surprise": {
+      "doubleGold": {
+        "label": "¡Oro Doble!",
+        "desc": "Este nivel te da el doble de oro."
+      },
+      "bonusChest": {
+        "label": "¡Cofre Extra!",
+        "desc": "Aparece un cofre de tesoro adicional."
+      },
+      "luckyGems": {
+        "label": "¡Gemas de Suerte!",
+        "desc": "Una lluvia inesperada de gemas."
+      },
+      "goldenWord": {
+        "label": "¡Palabra Dorada!",
+        "desc": "Una palabra oculta valía un premio mayor."
+      },
+      "comboFrenzy": {
+        "label": "¡Frenesí de Combo!",
+        "desc": "Las recompensas de combo se multiplicaron por dos este nivel."
+      }
     }
   },
   "wheelRush": {
@@ -10205,17 +11029,68 @@ const es = {
   "blast": {
     "toCatchUp": "para alcanzar",
     "leadingBy": "con ventaja de",
-    "firstUse": { "gotIt": "Entendido" },
+    "firstUse": {
+      "gotIt": "Entendido"
+    },
     "level": "Nivel {n}",
     "results": {
-      "sceneTitle": "Resultados Blast",
-      "finalScore": "Puntuación",
-      "comboChain": "Mejor combo",
-      "boardClears": "Tableros limpiados",
+      "boardDomination": "Dominación del Tablero",
+      "matchRecap": "Resumen de Blast",
+      "totalTilesDemolished": "Fichas Destruidas",
+      "intensity": "Intensidad",
+      "peakCombo": "Mayor Combo",
+      "totalGems": "Gemas",
+      "demolitionKing": "Rey de la Demolición",
+      "comboMaster": "Maestro del Combo",
+      "gemCollector": "Recolector de Gemas",
+      "wordsmith": "Maestro de Palabras",
+      "tilesCleared": "Fichas eliminadas",
+      "maxCombo": "Combo máximo",
       "gemsCollected": "Gemas",
-      "tilesCleared": "Fichas",
-      "bestWord": "Mejor palabra",
-      "rank": "Puesto"
+      "bestWord": "Mejor Palabra",
+      "tiles": "fichas",
+      "newRecord": "¡NUEVO RÉCORD!",
+      "yourRank": "Tu Ranking",
+      "topPercent": "Top {pct}% esta semana",
+      "pbDelta": "+{delta} sobre tu mejor",
+      "fromBest": "desde tu mejor marca",
+      "biggestCombo": "Mayor Combo",
+      "bestWave": "Mejor Oleada",
+      "wave": "Oleada {n}",
+      "badgesEarned": "Insignias Ganadas",
+      "newBadge": "NUEVO",
+      "waveFailed": "Oleada Fallida",
+      "needClearPct": "Necesitabas {required}% despejado — lograste {got}%",
+      "tilesShort": "¡Solo {count} fichas más!",
+      "failHint": "Despeja al menos el 90% del tablero para avanzar",
+      "tryAgain": "Intentar de Nuevo",
+      "share": "Compartir",
+      "sceneTitle": "Resultados Blast",
+      "finalScore": "Puntuación final",
+      "comboChain": "Combo",
+      "boardClears": "Limpiadas",
+      "brag": {
+        "legend": "Leyenda",
+        "elite": "Élite",
+        "great": "Gran Partida",
+        "solid": "Sólido",
+        "nice": "Buen Intento",
+        "beats": "Venciste al {pct}% de los jugadores",
+        "weeklyCohort": "Grupo global de esta semana",
+        "score": "Puntaje",
+        "combo": "Combo",
+        "bestWord": "Mejor Palabra",
+        "share": "Presumir",
+        "shareAria": "Comparte tu resultado",
+        "shareTitle": "LexiClash Blast",
+        "shareScore": "Marqué {score} en Modo Blast",
+        "shareRank": "Top {pct}% esta semana",
+        "copied": "¡Copiado al portapapeles!",
+        "copyFailed": "No se pudo copiar — intenta de nuevo"
+      },
+      "mpResults": {
+        "boardCleared": "¡TABLERO DESPEJADO!"
+      }
     },
     "intro": {
       "level": "Nivel {n}",
@@ -10223,29 +11098,77 @@ const es = {
     },
     "modifier": {
       "incoming": "Modificador",
-      "goldRush": { "name": "Fiebre del Oro", "desc": "Fichas doradas por todas partes — y más puntos." },
-      "chainFrenzy": { "name": "Frenesí de Cadenas", "desc": "Las cadenas pagan el doble — ¡encadénalas!" },
-      "doubleDown": { "name": "Doble o Nada", "desc": "Cada palabra vale 2× — pero un movimiento menos." },
-      "featherfall": { "name": "Caída de Pluma", "desc": "Con calma — dos movimientos extra." },
-      "bombParty": { "name": "Fiesta de Bombas", "desc": "Muchas más bombas en juego." },
-      "luckyVowels": { "name": "Golpe de Suerte", "desc": "Menos obstáculos de hielo y un poco más de oro." },
-      "megaCombo": { "name": "Mega Combo", "desc": "Los combos pegan más fuerte por puntos extra." },
-      "gemRush": { "title": "AVALANCHA DE GEMAS", "sub": "más gemas en el tablero" },
-      "coinBonanza": { "title": "LLUVIA DE MONEDAS", "sub": "más monedas esta ronda" },
-      "bonusStorm": { "title": "TORMENTA BONUS", "sub": "fichas de doble bonus desatadas" }
+      "goldRush": {
+        "name": "Fiebre del Oro",
+        "desc": "Fichas doradas por todas partes — y más puntos."
+      },
+      "chainFrenzy": {
+        "name": "Frenesí de Cadenas",
+        "desc": "Las cadenas pagan el doble — ¡encadénalas!"
+      },
+      "doubleDown": {
+        "name": "Doble o Nada",
+        "desc": "Cada palabra vale 2× — pero un movimiento menos."
+      },
+      "featherfall": {
+        "name": "Caída de Pluma",
+        "desc": "Con calma — dos movimientos extra."
+      },
+      "bombParty": {
+        "name": "Fiesta de Bombas",
+        "desc": "Muchas más bombas en juego."
+      },
+      "luckyVowels": {
+        "name": "Golpe de Suerte",
+        "desc": "Menos obstáculos de hielo y un poco más de oro."
+      },
+      "megaCombo": {
+        "name": "Mega Combo",
+        "desc": "Los combos pegan más fuerte por puntos extra."
+      },
+      "gemRush": {
+        "title": "AVALANCHA DE GEMAS",
+        "sub": "más gemas en el tablero"
+      },
+      "coinBonanza": {
+        "title": "LLUVIA DE MONEDAS",
+        "sub": "más monedas esta ronda"
+      },
+      "bonusStorm": {
+        "title": "TORMENTA BONUS",
+        "sub": "fichas de doble bonus desatadas"
+      }
     },
     "surprise": {
-      "coinBurst": { "title": "¡Lluvia de monedas!" },
-      "gemShower": { "title": "¡Lluvia de gemas!" },
-      "chainCharge": { "title": "¡Carga en cadena!" },
-      "luckyDouble": { "title": "¡Doble suerte!" },
-      "goldenWord": { "title": "¡Palabra dorada!" },
+      "coinBurst": {
+        "title": "¡Lluvia de monedas!"
+      },
+      "gemShower": {
+        "title": "¡Lluvia de gemas!"
+      },
+      "chainCharge": {
+        "title": "¡Carga en cadena!"
+      },
+      "luckyDouble": {
+        "title": "¡Doble suerte!"
+      },
+      "goldenWord": {
+        "title": "¡Palabra dorada!"
+      },
       "nextWordDouble": "Próxima palabra ×2",
       "chargedChip": "✨ ×2 cargado"
     },
     "quip": {
-      "big": ["¡QUÉ CADENA!", "¡EN LLAMAS!", "¡SIGUE ASÍ!"],
-      "mega": ["¡IMPARABLE!", "¡LEGENDARIO!", "¡MEGA COMBO!"]
+      "big": [
+        "¡QUÉ CADENA!",
+        "¡EN LLAMAS!",
+        "¡SIGUE ASÍ!"
+      ],
+      "mega": [
+        "¡IMPARABLE!",
+        "¡LEGENDARIO!",
+        "¡MEGA COMBO!"
+      ]
     },
     "chestMilestone": {
       "title": "COFRE HITO",
@@ -10305,6 +11228,10 @@ const es = {
       },
       "mpResults": {
         "boardCleared": "¡TABLERO DESPEJADO!"
+      },
+      "unlock": {
+        "gotIt": "Entendido",
+        "skipFuture": "Saltar tutoriales futuros"
       }
     },
     "adBadge": "ANUNCIO",
@@ -10370,28 +11297,94 @@ const es = {
       "5000": "5000+"
     },
     "tile": {
-      "gold":      { "name": "Oro",        "desc": "Puntos ×3 + 1 movimiento extra." },
-      "silver":    { "name": "Plata",      "desc": "Puntos ×1.5. Extiende cuentas atrás en 1." },
-      "diamond":   { "name": "Diamante",   "desc": "Puntos ×5. Revela contenido de escarcha por 3 turnos." },
-      "bomb":      { "name": "Bomba",      "desc": "Limpia área 3×3. Encadena con bombas cercanas." },
-      "lightning": { "name": "Rayo",       "desc": "Limpia la columna entera al instante." },
-      "prism":     { "name": "Prisma",     "desc": "2 golpes. Limpia fila + columna. Encadena bombas y rayos." },
-      "rainbow":   { "name": "Arcoíris",   "desc": "Copia y duplica el mejor especial. Solo: puntos ×2." },
-      "ice":       { "name": "Hielo",      "desc": "2 golpes para romper. Ficha defensiva de múltiples golpes." },
-      "gem":       { "name": "Gema",       "desc": "3 golpes para recoger. Genera 2 especiales al completar." },
-      "frozen":    { "name": "Escarcha",   "desc": "2 golpes. Oculta un especial dentro — bomba, rayo, prisma, gema o arcoíris." },
-      "magnet":    { "name": "Vórtice",    "desc": "Atrae fichas cercanas y luego explota el área." },
-      "mirror":    { "name": "Espejo",     "desc": "Copia el primer especial ofensivo de tu palabra. Solo: puntos ×2." },
-      "wildcard":  { "name": "Comodín",    "desc": "Cualquier letra. Puntúa según valor Scrabble de la letra usada." },
-      "countdown": { "name": "Cuenta atrás","desc": "Cuenta movimientos. Desarma en palabra: +15 pts y 2 extras. Expira: -50 pts y explosión 3×3." },
-      "shuffle":   { "name": "Mezcla",     "desc": "Reorganiza todas las letras restantes del tablero al limpiar." },
-      "magma":     { "name": "Magma",      "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2." },
-      "portal":    { "name": "Portal",     "desc": "Teletransporta tu camino de palabras a través de pares vinculados. Limpia ambos. ×2 puntos. +5 bonus." },
-      "catalyst":  { "name": "Catalizador","desc": "+10 pts. Mejora fichas normales adyacentes a especiales." },
-      "crystal":   { "name": "Cristal",    "desc": "Crece +1× cada turno sin usar (máx 5×). Multiplica tu puntuación de palabra al usarlo." },
-      "fuse":      { "name": "Mecha",      "desc": "Par vinculado. Elimina una para encender su pareja — desactívala en 3 turnos para +15 pts y 2 movimientos, o detona un estallido 3×3 con -50 pts." },
-      "anchor":    { "name": "Ancla",      "desc": "Recompensa palabras largas. Suma +3 puntos por cada letra de la palabra al eliminarse." },
-      "mystery":   { "name": "Misterio",  "desc": "¡Sorpresa aleatoria! Ráfaga de puntos, nueva especial, mini-pop o mega +150." }
+      "gold": {
+        "name": "Oro",
+        "desc": "Puntos ×3 + 1 movimiento extra."
+      },
+      "silver": {
+        "name": "Plata",
+        "desc": "Puntos ×1.5. Extiende cuentas atrás en 1."
+      },
+      "diamond": {
+        "name": "Diamante",
+        "desc": "Puntos ×5. Revela contenido de escarcha por 3 turnos."
+      },
+      "bomb": {
+        "name": "Bomba",
+        "desc": "Limpia área 3×3. Encadena con bombas cercanas."
+      },
+      "lightning": {
+        "name": "Rayo",
+        "desc": "Limpia la columna entera al instante."
+      },
+      "prism": {
+        "name": "Prisma",
+        "desc": "2 golpes. Limpia fila + columna. Encadena bombas y rayos."
+      },
+      "rainbow": {
+        "name": "Arcoíris",
+        "desc": "Copia y duplica el mejor especial. Solo: puntos ×2."
+      },
+      "ice": {
+        "name": "Hielo",
+        "desc": "2 golpes para romper. Ficha defensiva de múltiples golpes."
+      },
+      "gem": {
+        "name": "Gema",
+        "desc": "3 golpes para recoger. Genera 2 especiales al completar."
+      },
+      "frozen": {
+        "name": "Escarcha",
+        "desc": "2 golpes. Oculta un especial dentro — bomba, rayo, prisma, gema o arcoíris."
+      },
+      "magnet": {
+        "name": "Vórtice",
+        "desc": "Atrae fichas cercanas y luego explota el área."
+      },
+      "mirror": {
+        "name": "Espejo",
+        "desc": "Copia el primer especial ofensivo de tu palabra. Solo: puntos ×2."
+      },
+      "wildcard": {
+        "name": "Comodín",
+        "desc": "Cualquier letra. Puntúa según valor Scrabble de la letra usada."
+      },
+      "countdown": {
+        "name": "Cuenta atrás",
+        "desc": "Cuenta movimientos. Desarma en palabra: +15 pts y 2 extras. Expira: -50 pts y explosión 3×3."
+      },
+      "shuffle": {
+        "name": "Mezcla",
+        "desc": "Reorganiza todas las letras restantes del tablero al limpiar."
+      },
+      "magma": {
+        "name": "Magma",
+        "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2."
+      },
+      "portal": {
+        "name": "Portal",
+        "desc": "Teletransporta tu camino de palabras a través de pares vinculados. Limpia ambos. ×2 puntos. +5 bonus."
+      },
+      "catalyst": {
+        "name": "Catalizador",
+        "desc": "+10 pts. Mejora fichas normales adyacentes a especiales."
+      },
+      "crystal": {
+        "name": "Cristal",
+        "desc": "Crece +1× cada turno sin usar (máx 5×). Multiplica tu puntuación de palabra al usarlo."
+      },
+      "fuse": {
+        "name": "Mecha",
+        "desc": "Par vinculado. Elimina una para encender su pareja — desactívala en 3 turnos para +15 pts y 2 movimientos, o detona un estallido 3×3 con -50 pts."
+      },
+      "anchor": {
+        "name": "Ancla",
+        "desc": "Recompensa palabras largas. Suma +3 puntos por cada letra de la palabra al eliminarse."
+      },
+      "mystery": {
+        "name": "Misterio",
+        "desc": "¡Sorpresa aleatoria! Ráfaga de puntos, nueva especial, mini-pop o mega +150."
+      }
     },
     "title": "Modo Blast",
     "description": "¡Limpia el tablero! Las palabras explotan fichas.",
@@ -10441,8 +11434,20 @@ const es = {
       "bonusCount": "⭐ {count} extra"
     },
     "hint": {
+      "free": "GRATIS",
+      "ad": "PISTA",
+      "aria": {
+        "free": "Pista gratis — cuesta 25 pts",
+        "ad": "Mira un anuncio para una pista — cuesta 25 pts"
+      },
+      "toast": {
+        "targetWord": "Intenta formar: {word}",
+        "colorPower": "Busca fichas {color}",
+        "collectType": "Encuentra más {tileType}",
+        "clearAllType": "Limpia los {tileType} restantes"
+      },
       "label": "Pista",
-      "aria": "Revela una palabra — cuesta una estrella"
+      "revealAria": "Revela una palabra — cuesta una estrella"
     },
     "noMoreWords": "No hay más palabras posibles",
     "giveUp": "Terminar juego",
@@ -10483,10 +11488,9 @@ const es = {
     "moreLevelsComingSoon": "Nuevos niveles están en camino.",
     "allCleared": "¡Completaste todos los niveles!",
     "loadingProgress": "Cargando tu progreso…",
-    "playAgain": "Jugar desde el nivel 1",
+    "playAgain": "JUGAR DE NUEVO",
     "shuffle": "Mezclar",
     "stuck": "¿Atascado?",
-    "hint": "Pista",
     "undo": "Deshacer",
     "undoTooltip": "Deshacer último movimiento",
     "undoAdGate": {
@@ -10517,65 +11521,6 @@ const es = {
       "bestWord": "Mejor Palabra",
       "wordsFoundCount": "Palabras",
       "playerStats": "Estadísticas de Jugadores"
-    },
-    "results": {
-      "boardDomination": "Dominación del Tablero",
-      "matchRecap": "Resumen de Blast",
-      "totalTilesDemolished": "Fichas Destruidas",
-      "intensity": "Intensidad",
-      "peakCombo": "Mayor Combo",
-      "totalGems": "Gemas",
-      "demolitionKing": "Rey de la Demolición",
-      "comboMaster": "Maestro del Combo",
-      "gemCollector": "Recolector de Gemas",
-      "wordsmith": "Maestro de Palabras",
-      "tilesCleared": "Fichas eliminadas",
-      "maxCombo": "Combo máximo",
-      "gemsCollected": "Gemas",
-      "bestWord": "Mejor Palabra",
-      "tiles": "fichas",
-      "newRecord": "¡NUEVO RÉCORD!",
-      "yourRank": "Tu Ranking",
-      "topPercent": "Top {pct}% esta semana",
-      "pbDelta": "+{delta} sobre tu mejor",
-      "fromBest": "desde tu mejor marca",
-      "biggestCombo": "Mayor Combo",
-      "bestWave": "Mejor Oleada",
-      "wave": "Oleada {n}",
-      "badgesEarned": "Insignias Ganadas",
-      "newBadge": "NUEVO",
-      "waveFailed": "Oleada Fallida",
-      "needClearPct": "Necesitabas {required}% despejado — lograste {got}%",
-      "tilesShort": "¡Solo {count} fichas más!",
-      "failHint": "Despeja al menos el 90% del tablero para avanzar",
-      "tryAgain": "Intentar de Nuevo",
-      "share": "Compartir",
-      "sceneTitle": "Resultados Blast",
-      "finalScore": "Puntuación final",
-      "comboChain": "Combo",
-      "boardClears": "Limpiadas",
-      "brag": {
-        "legend": "Leyenda",
-        "elite": "Élite",
-        "great": "Gran Partida",
-        "solid": "Sólido",
-        "nice": "Buen Intento",
-        "beats": "Venciste al {pct}% de los jugadores",
-        "weeklyCohort": "Grupo global de esta semana",
-        "score": "Puntaje",
-        "combo": "Combo",
-        "bestWord": "Mejor Palabra",
-        "share": "Presumir",
-        "shareAria": "Comparte tu resultado",
-        "shareTitle": "LexiClash Blast",
-        "shareScore": "Marqué {score} en Modo Blast",
-        "shareRank": "Top {pct}% esta semana",
-        "copied": "¡Copiado al portapapeles!",
-        "copyFailed": "No se pudo copiar — intenta de nuevo"
-      },
-      "mpResults": {
-        "boardCleared": "¡TABLERO DESPEJADO!"
-      }
     },
     "badges": {
       "firstBlast": "Primer Blast",
@@ -10723,22 +11668,6 @@ const es = {
       "comebackKid": "REMONTADA — {pct}% BAJO PRESIÓN 💪",
       "survivor": "SOBREVIVIENTE — {pct}% LIMPIO 👊"
     },
-    "hint": {
-      "free": "GRATIS",
-      "ad": "PISTA",
-      "aria": {
-        "free": "Pista gratis — cuesta 25 pts",
-        "ad": "Mira un anuncio para una pista — cuesta 25 pts"
-      },
-      "toast": {
-        "targetWord": "Intenta formar: {word}",
-        "colorPower": "Busca fichas {color}",
-        "collectType": "Encuentra más {tileType}",
-        "clearAllType": "Limpia los {tileType} restantes"
-      },
-      "label": "Pista",
-      "revealAria": "Revela una palabra — cuesta una estrella"
-    },
     "combo": {
       "bomb_bomb": "¡MEGA EXPLOSIÓN!",
       "bomb_lightning": "¡BOMBA TRUENO!",
@@ -10800,33 +11729,101 @@ const es = {
     "gameOver": "FIN DEL JUEGO",
     "waves": "oleadas",
     "bestWord": "Mejor",
-    "playAgain": "JUGAR DE NUEVO",
     "waveComplete": "¡Oleada {{wave}} completada!",
     "tileGuide": {
       "title": "Guía de fichas",
-      "standard": { "name": "Estándar", "desc": "Ficha básica — sin efecto especial" },
-      "gold": { "name": "Oro", "desc": "×3 puntos + 1 movimiento extra" },
-      "silver": { "name": "Plata", "desc": "×1.5 puntos + extiende cuentas regresivas en 1" },
-      "diamond": { "name": "Diamante", "desc": "×5 puntos + revela contenido congelado por 3 turnos" },
-      "bomb": { "name": "Bomba", "desc": "Limpia área 3×3 — encadena a bombas cercanas" },
-      "lightning": { "name": "Rayo", "desc": "Limpia columna entera — encadena a otros rayos" },
-      "prism": { "name": "Prisma", "desc": "2 golpes — limpia fila + columna, crea 2 especiales" },
-      "rainbow": { "name": "Arcoíris", "desc": "Copia el mejor especial en tu palabra, o ×2 puntos" },
-      "ice": { "name": "Hielo", "desc": "2 golpes para romper. Ficha defensiva de múltiples golpes." },
-      "frozen": { "name": "Congelado", "desc": "2 golpes — libera un especial oculto dentro" },
-      "gem": { "name": "Gema", "desc": "3 golpes — genera 2 especiales + 2 movimientos extra" },
-      "mirror": { "name": "Espejo", "desc": "Copia el primer especial ofensivo en tu palabra" },
-      "magnet": { "name": "Imán", "desc": "Atrae fichas cercanas hacia adentro, luego explota 3×3" },
-      "wildcard": { "name": "Comodín", "desc": "Coincide con cualquier letra — puntúa por rareza" },
-      "countdown": { "name": "Cuenta regresiva", "desc": "¡Desactiva antes de 0! +2 movimientos — o penalización de 50pts" },
-      "shuffle": { "name": "Mezcla", "desc": "Reorganiza todas las letras restantes del tablero al limpiar" },
-      "magma": { "name": "Magma", "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2" },
-      "portal": { "name": "Portal", "desc": "Teletransporta entre pares — limpia ambos, ×2 puntos" },
-      "catalyst": { "name": "Catalizador", "desc": "Mejora todas las fichas adyacentes a especiales aleatorias" },
-      "crystal": { "name": "Cristal", "desc": "Crece +1× por turno sin usar (máx 5×) — multiplica la puntuación" },
-      "fuse": { "name": "Mecha", "desc": "Par vinculado — enciende al eliminar uno, desactívala en 3 turnos o explota" },
-      "anchor": { "name": "Ancla", "desc": "Bonus de palabra larga — +3 pts por cada letra de la palabra al eliminarse" },
-      "mystery": { "name": "Misterio", "desc": "Sorpresa — ráfaga de puntos, nueva especial, mini-pop o mega +150" }
+      "standard": {
+        "name": "Estándar",
+        "desc": "Ficha básica — sin efecto especial"
+      },
+      "gold": {
+        "name": "Oro",
+        "desc": "×3 puntos + 1 movimiento extra"
+      },
+      "silver": {
+        "name": "Plata",
+        "desc": "×1.5 puntos + extiende cuentas regresivas en 1"
+      },
+      "diamond": {
+        "name": "Diamante",
+        "desc": "×5 puntos + revela contenido congelado por 3 turnos"
+      },
+      "bomb": {
+        "name": "Bomba",
+        "desc": "Limpia área 3×3 — encadena a bombas cercanas"
+      },
+      "lightning": {
+        "name": "Rayo",
+        "desc": "Limpia columna entera — encadena a otros rayos"
+      },
+      "prism": {
+        "name": "Prisma",
+        "desc": "2 golpes — limpia fila + columna, crea 2 especiales"
+      },
+      "rainbow": {
+        "name": "Arcoíris",
+        "desc": "Copia el mejor especial en tu palabra, o ×2 puntos"
+      },
+      "ice": {
+        "name": "Hielo",
+        "desc": "2 golpes para romper. Ficha defensiva de múltiples golpes."
+      },
+      "frozen": {
+        "name": "Congelado",
+        "desc": "2 golpes — libera un especial oculto dentro"
+      },
+      "gem": {
+        "name": "Gema",
+        "desc": "3 golpes — genera 2 especiales + 2 movimientos extra"
+      },
+      "mirror": {
+        "name": "Espejo",
+        "desc": "Copia el primer especial ofensivo en tu palabra"
+      },
+      "magnet": {
+        "name": "Imán",
+        "desc": "Atrae fichas cercanas hacia adentro, luego explota 3×3"
+      },
+      "wildcard": {
+        "name": "Comodín",
+        "desc": "Coincide con cualquier letra — puntúa por rareza"
+      },
+      "countdown": {
+        "name": "Cuenta regresiva",
+        "desc": "¡Desactiva antes de 0! +2 movimientos — o penalización de 50pts"
+      },
+      "shuffle": {
+        "name": "Mezcla",
+        "desc": "Reorganiza todas las letras restantes del tablero al limpiar"
+      },
+      "magma": {
+        "name": "Magma",
+        "desc": "Limpia ambas diagonales (patrón X) con multiplicador de puntos ×2"
+      },
+      "portal": {
+        "name": "Portal",
+        "desc": "Teletransporta entre pares — limpia ambos, ×2 puntos"
+      },
+      "catalyst": {
+        "name": "Catalizador",
+        "desc": "Mejora todas las fichas adyacentes a especiales aleatorias"
+      },
+      "crystal": {
+        "name": "Cristal",
+        "desc": "Crece +1× por turno sin usar (máx 5×) — multiplica la puntuación"
+      },
+      "fuse": {
+        "name": "Mecha",
+        "desc": "Par vinculado — enciende al eliminar uno, desactívala en 3 turnos o explota"
+      },
+      "anchor": {
+        "name": "Ancla",
+        "desc": "Bonus de palabra larga — +3 pts por cada letra de la palabra al eliminarse"
+      },
+      "mystery": {
+        "name": "Misterio",
+        "desc": "Sorpresa — ráfaga de puntos, nueva especial, mini-pop o mega +150"
+      }
     },
     "highlight": {
       "captions": {
@@ -10861,6 +11858,36 @@ const es = {
         "name": "Red de Seguridad",
         "desc": "+1 recuperación gratuita cuando quedas atascado por nivel"
       }
+    },
+    "chest": {
+      "avatarSuffix": "parte de avatar",
+      "boostSuffix": "impulso",
+      "coins": "Monedas",
+      "coinsSuffix": "monedas",
+      "continue": "Continuar",
+      "opened": "¡Cofre Abierto!",
+      "opening": "Abriendo cofre…",
+      "preview": "Previsualización del Cofre",
+      "tier": {
+        "label": "Nivel"
+      },
+      "title": "Cofre de Recompensas"
+    },
+    "close": "Cerrar",
+    "concept": {
+      "gotIt": "Vamos",
+      "tag": "Nuevo",
+      "anyRow": {
+        "title": "Las palabras pueden estar en cualquier fila",
+        "body": "No solo en la fila inferior — escanea todo el tablero buscando palabras."
+      },
+      "verticalWords": {
+        "title": "Las palabras también pueden ser verticales",
+        "body": "Arrastra hacia arriba o hacia abajo para deletrear palabras verticales."
+      }
+    },
+    "settings": {
+      "tutorials": "Repetir Tutoriales"
     }
   },
   "student": {
@@ -12291,6 +13318,64 @@ const es = {
       "streakWarning": "Advertencia de racha en riesgo",
       "friendInvites": "Invitaciones de desafío de amigos",
       "weeklySummary": "Resumen semanal"
+    },
+    "teacherAccess": {
+      "title": "Solicitudes de Acceso de Profesor",
+      "count": {
+        "pending": "Pendientes",
+        "approved": "Aprobadas",
+        "declined": "Rechazadas",
+        "total": "Total"
+      },
+      "filter_status": "Estado",
+      "filter_status_all": "Todos los estados",
+      "filter_locale": "Idioma",
+      "filter_country": "País",
+      "refresh": "Actualizar",
+      "row_open": "Abrir solicitud de {name}",
+      "col": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "locale": "Idioma",
+        "country": "País",
+        "status": "Estado",
+        "submitted": "Enviada"
+      },
+      "page": "Página",
+      "export_csv": "Exportar CSV",
+      "close": "Cerrar",
+      "drawer_title": "Detalles de Solicitud de Acceso de Profesor",
+      "field": {
+        "name": "Nombre",
+        "email": "Correo",
+        "role": "Rol",
+        "locale": "Idioma",
+        "country": "País",
+        "school": "Escuela/Organización",
+        "status": "Estado",
+        "submitted": "Enviada",
+        "use_case": "Caso de Uso"
+      },
+      "admin_note": "Nota del Administrador",
+      "note_hint": "Al aprobar, esta nota se incluye en el correo de bienvenida del solicitante. Al rechazar, se usa como razón.",
+      "show_preview": "Previsualizar correo",
+      "hide_preview": "Ocultar previsualización",
+      "preview_title": "Previsualización de correo",
+      "preview_subject": "Asunto",
+      "copy_email": "Copiar HTML del correo",
+      "copy_success": "HTML del correo copiado al portapapeles",
+      "copy_error": "Error al copiar el correo",
+      "approve": "Aprobar",
+      "decline": "Rechazar",
+      "approveSuccess": "Solicitud aprobada exitosamente",
+      "resend": "Reenviar correo de aprobación",
+      "resend_hint": "Reenvía el correo de bienvenida (con la nota anterior) al solicitante. No cambia su acceso.",
+      "resendSuccess": "Correo de aprobación reenviado",
+      "resendError": "Error al reenviar correo de aprobación",
+      "declineSuccess": "Solicitud rechazada exitosamente",
+      "approveError": "Error al aprobar la solicitud",
+      "declineError": "Error al rechazar la solicitud"
     }
   },
   "native": {
@@ -12357,7 +13442,8 @@ const es = {
       "watchForGold": "Ver anuncio por +{amount} oro",
       "earning": "Viendo...",
       "earned": "+{amount} oro ganado!",
-      "cooldown": "Disponible pronto"
+      "cooldown": "Disponible pronto",
+      "blocked": "El bloqueador de anuncios impide ganancias. Desactívalo en lexiclash.live para ganar oro."
     },
     "doubleGold": {
       "cta": "Recompensas dobles +{amount}",
@@ -12450,7 +13536,9 @@ const es = {
       "feature1": "Cronometrado",
       "feature2": "Puntuación",
       "feature3": "Libre",
-      "intro": { "greet": "Tómate tu tiempo. Solo palabras." },
+      "intro": {
+        "greet": "Tómate tu tiempo. Solo palabras."
+      },
       "tutorial": {
         "tip1": "Toca casillas adyacentes para deletrear",
         "tip2": "Las palabras largas lucen más",
@@ -12463,7 +13551,9 @@ const es = {
       "feature1": "Combos en cadena",
       "feature2": "Fichas especiales",
       "feature3": "Cascada",
-      "intro": { "greet": "Toca, desliza, respira. Sin prisa." },
+      "intro": {
+        "greet": "Toca, desliza, respira. Sin prisa."
+      },
       "results": {
         "sceneTitle": "Resultados de Blast",
         "finalScore": "Puntuación final",
@@ -12484,7 +13574,9 @@ const es = {
       "feature1": "Palabras objetivo",
       "feature2": "Carrera de velocidad",
       "feature3": "Pistas",
-      "intro": { "greet": "Una palabra a la vez. Tú puedes." },
+      "intro": {
+        "greet": "Una palabra a la vez. Tú puedes."
+      },
       "tutorial": {
         "tip1": "Arrastra letras conectadas para formar la palabra objetivo",
         "tip2": "Las palabras extra también cuentan — junta cuantas quieras",
@@ -12497,7 +13589,9 @@ const es = {
       "feature1": "Ventana de bloqueo",
       "feature2": "Niebla de guerra",
       "feature3": "Bonus pangrama",
-      "intro": { "greet": "Gira con calma. Las palabras llegan." },
+      "intro": {
+        "greet": "Gira con calma. Las palabras llegan."
+      },
       "tutorial": {
         "tip1": "Toca la letra lima del centro — debe estar en cada palabra",
         "tip2": "Toca las letras exteriores en cualquier orden",
@@ -12691,8 +13785,96 @@ const es = {
     "watchAdRetry": "Ver anuncio para reintentar"
   },
   "quests": {
+    "title": "Misiones",
+    "dailyTitle": "Misiones de hoy",
+    "weeklyTitle": "Misión semanal",
+    "grandSlam": "¡Grand Slam!",
+    "grandSlamBonus": "+500 XP Bonus",
+    "grandSlamAvatar": "+1 Parte de Avatar",
+    "allComplete": "¡Maestro de Misiones!",
+    "allCompleteDesc": "¡Todas las misiones diarias + semanales completadas! ¡Estás en racha!",
+    "avatarReward": "+1 Parte de Avatar",
+    "avatarPartCategory": {
+      "eyes": "Ojos",
+      "mouth": "Boca",
+      "accessory": "Accesorio",
+      "hair": "Cabello",
+      "eyebrows": "Cejas",
+      "facialHair": "Vello facial"
+    },
+    "completedAll": "¡Todo listo por hoy!",
+    "progress": "{{completed}}/{{total}}",
+    "go": "IR",
+    "done": "¡Hecho!",
+    "feed": {
+      "title": "Victorias Recientes",
+      "pvp": "{{name}} venció a un rival real",
+      "grandSlam": "{{name}} completó las 3 misiones diarias"
+    },
+    "daily": {
+      "long_word_6": {
+        "title": "Arquitecto de Palabras",
+        "desc": "Encuentra una palabra de 6+ letras"
+      },
+      "long_word_7": {
+        "title": "Coloso Léxico",
+        "desc": "Encuentra una palabra de 7+ letras"
+      },
+      "score_300": {
+        "title": "Tirador Certero",
+        "desc": "Anota 300+ puntos en un juego"
+      },
+      "score_500": {
+        "title": "Apostador Alto",
+        "desc": "Anota 500+ puntos en un juego"
+      },
+      "words_15": {
+        "title": "Máquina de Palabras",
+        "desc": "Encuentra 15+ palabras en un juego"
+      },
+      "combo_4": {
+        "title": "Combo Iniciador",
+        "desc": "Logra 4x combo en un juego"
+      },
+      "combo_6": {
+        "title": "Rey del Combo",
+        "desc": "Logra 6x combo en un juego"
+      },
+      "mp_win": {
+        "title": "Campeón",
+        "desc": "Gana una partida multijugador"
+      },
+      "beat_human": {
+        "title": "Aplasta Rivales",
+        "desc": "Vence a un jugador real"
+      },
+      "play_mp": {
+        "title": "Entra a la Arena",
+        "desc": "Juega una partida multijugador"
+      },
+      "play_brain": {
+        "title": "Potencia Mental",
+        "desc": "Completa un entreno cerebral"
+      },
+      "play_wordhunt": {
+        "title": "¡A Cazar!",
+        "desc": "Juega la Caza de Palabras diaria"
+      }
+    },
+    "reward": {
+      "xp": "+{{xp}} XP",
+      "gold": "+{{gold}} Oro"
+    },
     "weeklyWordMastery": "Maestría Semanal de Palabras",
-    "weeklyWordMasteryDesc": "Domina {target} palabras esta semana"
+    "weeklyWordMasteryDesc": "Domina {target} palabras esta semana",
+    "questOptions": "Opciones de misión",
+    "completion": {
+      "title": "¡Misión Cumplida!",
+      "grandSlam": "¡Grand Slam!",
+      "grandSlamDesc": "¡Todas las misiones diarias completadas!",
+      "xpReward": "+{{xp}} XP",
+      "goldReward": "+{{gold}} Oro"
+    }
   },
   "brag": {
     "headline": {
@@ -12774,33 +13956,11 @@ const es = {
     "spotsFromPromotion": "{n} puestos del ascenso"
   },
   "leagueRivals": {
-    "title": "Liga Semanal",
-    "bronze": "Bronce",
-    "silver": "Plata",
-    "gold": "Oro",
-    "diamond": "Diamante",
-    "ruby": "Rubí",
-    "position": "Posición",
-    "xp": "XP",
-    "promotionZone": "Zona de Ascenso",
-    "safeZone": "Zona Segura",
-    "relegationZone": "Zona de Descenso",
-    "promoted": "¡Ascendido!",
-    "relegated": "Descendido",
-    "stayed": "Se mantuvo",
-    "weeklyRewards": "Premios Semanales",
-    "coinsEarned": "Monedas Ganadas",
-    "newWeekIn": "Nueva semana en",
-    "joinLeague": "Unirse a Liga",
-    "yourPosition": "Tu Posición",
-    "top": "Top",
-    "standings": "Tabla",
-    "noLeague": "¡Únete a una liga para competir!",
-    "finalResults": "Resultados Finales",
-    "viewStandings": "Ver Tabla",
-    "xpToPromote": "{xp} XP para ascender",
-    "xpAboveRelegation": "{xp} XP sobre descenso",
-    "positionOf": "#{position} de {total}"
+    "title": "Tus rivales de liga",
+    "ahead": "{{pts}} pts adelante",
+    "behind": "{{pts}} pts detrás",
+    "you": "Tú",
+    "noRivals": "¡Sube en la liga para encontrar rivales!"
   },
   "socialGift": {
     "title": "Enviar Regalo",
@@ -12871,57 +14031,62 @@ const es = {
       "optOut": "Si bien cierta recopilación de datos es necesaria para el funcionamiento del juego (como tu nombre de usuario y puntuaciones), puedes optar por no participar en análisis y anuncios personalizados en Configuración > Privacidad."
     }
   },
-  avatarBuilder: {
-    glowUp: { button: "Mejorar", loading: "Mejorando…", adminTag: "Admin", resultTitle: "Tu avatar mejorado" },
-    title: "Constructor de Avatar",
-    base: "Forma",
-    hair: "Cabello",
-    eyes: "Ojos",
-    mouth: "Boca",
-    facialHair: "Barba",
-    accessories: "Accesorios",
-    background: "Fondo",
-    skinColor: "Color de piel",
-    hairColor: "Color de cabello",
-    accessoryColor: "Color",
-    shirtColor: "Color de camiseta",
-    eyeColor: "Color de ojos",
-    randomize: "Aleatorio",
-    undo: "Deshacer",
-    restorePrevious: "Restaurar avatar anterior",
-    download: "Descargar",
-    save: "Guardar",
-    cancel: "Cancelar",
-    buildCustom: "Crea el tuyo",
-    bgColor: "Fondo",
-    gender: "Tipo de cuerpo",
-    male: "Masculino",
-    female: "Femenino",
-    shape: "Forma",
-    style: "Estilo",
-    none: "Ninguno",
-    type: "Tipo",
-    nose: "Nariz",
-    eyebrows: "Cejas",
-    expressions: "Expresión",
-    facialHairStyle: "Estilo",
-    colorTheme: "Tema de color",
-    bodyStyle: "Atuendo",
-    bodyStyles: {
-      default: "Predeterminado",
-      hoodie: "Sudadera",
-      suit: "Traje",
-      turtleneck: "Cuello alto",
-      offShoulder: "Hombros descubiertos",
-      cropTop: "Top corto"
+  "avatarBuilder": {
+    "glowUp": {
+      "button": "Mejorar",
+      "loading": "Mejorando…",
+      "adminTag": "Admin",
+      "resultTitle": "Tu avatar mejorado"
     },
-    theme: {
-      classic: "Clásico",
-      fire: "Fuego",
-      electric: "Eléctrico",
-      toxic: "Tóxico",
-      royal: "Real",
-      pop: "Pop"
+    "title": "Constructor de Avatar",
+    "base": "Forma",
+    "hair": "Cabello",
+    "eyes": "Ojos",
+    "mouth": "Boca",
+    "facialHair": "Barba",
+    "accessories": "Accesorios",
+    "background": "Fondo",
+    "skinColor": "Color de piel",
+    "hairColor": "Color de cabello",
+    "accessoryColor": "Color",
+    "shirtColor": "Color de camiseta",
+    "eyeColor": "Color de ojos",
+    "randomize": "Aleatorio",
+    "undo": "Deshacer",
+    "restorePrevious": "Restaurar avatar anterior",
+    "download": "Descargar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "buildCustom": "Crea el tuyo",
+    "bgColor": "Fondo",
+    "gender": "Tipo de cuerpo",
+    "male": "Masculino",
+    "female": "Femenino",
+    "shape": "Forma",
+    "style": "Estilo",
+    "none": "Ninguno",
+    "type": "Tipo",
+    "nose": "Nariz",
+    "eyebrows": "Cejas",
+    "expressions": "Expresión",
+    "facialHairStyle": "Estilo",
+    "colorTheme": "Tema de color",
+    "bodyStyle": "Atuendo",
+    "bodyStyles": {
+      "default": "Predeterminado",
+      "hoodie": "Sudadera",
+      "suit": "Traje",
+      "turtleneck": "Cuello alto",
+      "offShoulder": "Hombros descubiertos",
+      "cropTop": "Top corto"
+    },
+    "theme": {
+      "classic": "Clásico",
+      "fire": "Fuego",
+      "electric": "Eléctrico",
+      "toxic": "Tóxico",
+      "royal": "Real",
+      "pop": "Pop"
     }
   },
   "features": {
@@ -12936,66 +14101,66 @@ const es = {
       "advancedSettingsDesc": "Ajusta tu experiencia de juego"
     }
   },
-  wordHuntAnnouncement: {
-    badge: "Nuevo en Multijugador",
-    title: "¡Prueba el Modo Word Hunt!",
-    subtitle: "Encuentra la palabra objetivo oculta en una carrera",
+  "wordHuntAnnouncement": {
+    "badge": "Nuevo en Multijugador",
+    "title": "¡Prueba el Modo Word Hunt!",
+    "subtitle": "Encuentra la palabra objetivo oculta en una carrera"
   },
-  wordHuntPromo: {
-    title: "¡Prueba el Modo Word Hunt!",
-    subtitle: "Encuentra la palabra objetivo oculta en multijugador",
-    cta: "Jugar Word Hunt",
-    dismiss: "Quizás Después",
-    imageAlt: "Duelo multijugador de Word Hunt",
+  "wordHuntPromo": {
+    "title": "¡Prueba el Modo Word Hunt!",
+    "subtitle": "Encuentra la palabra objetivo oculta en multijugador",
+    "cta": "Jugar Word Hunt",
+    "dismiss": "Quizás Después",
+    "imageAlt": "Duelo multijugador de Word Hunt"
   },
-  wordHuntTips: {
-    needMoreWords: "Solo encontraste {{count}} palabras. Cada palabra recarga tu vida — escanea filas y diagonales para palabras cortas de 3 letras antes de adivinar el objetivo.",
-    accuracyDrainsLife: "{{invalid}} palabras inválidas ({{accuracy}}% de precisión) — cada fallo cuesta vida. Usa palabras seguras y guarda las arriesgadas para cuando tu vida esté llena.",
-    longerWordsSurvive: "Tu promedio fue de {{avg}} letras. Las palabras de 5+ letras dan 2-3x más puntos y más vida.",
-    shortWordsBetweenGuesses: "Entre intentos del objetivo, encuentra 2-3 palabras cortas para recargar vida. Ese colchón te permite sobrevivir fallos.",
-    firstFinderPush: "La encontraste primero con {{words}} palabras. Para más puntos, acumula palabras de descubrimiento antes de ir por el objetivo.",
-    winnerLongerWords: "Ganaste, pero tu promedio fue {{avg}} letras. Apunta a 5+ letras — dan 2-3x más puntos.",
-    winnerMoreWords: "Ganaste con {{count}} palabras. Escanea el tablero más rápido — prueba diagonales y al revés.",
-    tooManyInvalid: "{{invalid}} intentos inválidos ({{accuracy}}% de precisión). Cada fallo drena vida. Enfócate primero en palabras seguras.",
-    lifeManagement: "Terminaste con {{life}}% de vida — un fallo más y estabas fuera. Mezcla palabras cortas entre intentos del objetivo.",
-    pushWordLength: "Tu promedio fue {{avg}} letras (más larga: {{longest}}). Intenta expandir palabras cortas — si ves \"MAR\", busca \"MARCA\" o \"MARCHA\" cerca.",
-    scanMoreWords: "Solo {{count}} palabras encontradas. Antes de adivinar el objetivo, dedica 15-20 segundos a escanear palabras fáciles de 3-4 letras — dan vida y pistas.",
-    pushForFirst: "Quedaste en el puesto #{{rank}}. Para cerrar la brecha, encuentra palabras más largas (5+ letras) y mantén alta la precisión.",
-    spellWordsFirst: "Deletrea palabras en la cuadrícula primero — cada una revela una letra de la palabra oculta.",
-    fastSolveFarmMore: "¡Resolviste en {{attempts}} intentos! Rápido como un rayo. La próxima acumula palabras del tablero para puntos extra.",
-    trustCluesSooner: "Te tomó {{attempts}} adivinanzas — confía en tus pistas reveladas y arriesgate antes para más puntos.",
+  "wordHuntTips": {
+    "needMoreWords": "Solo encontraste {{count}} palabras. Cada palabra recarga tu vida — escanea filas y diagonales para palabras cortas de 3 letras antes de adivinar el objetivo.",
+    "accuracyDrainsLife": "{{invalid}} palabras inválidas ({{accuracy}}% de precisión) — cada fallo cuesta vida. Usa palabras seguras y guarda las arriesgadas para cuando tu vida esté llena.",
+    "longerWordsSurvive": "Tu promedio fue de {{avg}} letras. Las palabras de 5+ letras dan 2-3x más puntos y más vida.",
+    "shortWordsBetweenGuesses": "Entre intentos del objetivo, encuentra 2-3 palabras cortas para recargar vida. Ese colchón te permite sobrevivir fallos.",
+    "firstFinderPush": "La encontraste primero con {{words}} palabras. Para más puntos, acumula palabras de descubrimiento antes de ir por el objetivo.",
+    "winnerLongerWords": "Ganaste, pero tu promedio fue {{avg}} letras. Apunta a 5+ letras — dan 2-3x más puntos.",
+    "winnerMoreWords": "Ganaste con {{count}} palabras. Escanea el tablero más rápido — prueba diagonales y al revés.",
+    "tooManyInvalid": "{{invalid}} intentos inválidos ({{accuracy}}% de precisión). Cada fallo drena vida. Enfócate primero en palabras seguras.",
+    "lifeManagement": "Terminaste con {{life}}% de vida — un fallo más y estabas fuera. Mezcla palabras cortas entre intentos del objetivo.",
+    "pushWordLength": "Tu promedio fue {{avg}} letras (más larga: {{longest}}). Intenta expandir palabras cortas — si ves \"MAR\", busca \"MARCA\" o \"MARCHA\" cerca.",
+    "scanMoreWords": "Solo {{count}} palabras encontradas. Antes de adivinar el objetivo, dedica 15-20 segundos a escanear palabras fáciles de 3-4 letras — dan vida y pistas.",
+    "pushForFirst": "Quedaste en el puesto #{{rank}}. Para cerrar la brecha, encuentra palabras más largas (5+ letras) y mantén alta la precisión.",
+    "spellWordsFirst": "Deletrea palabras en la cuadrícula primero — cada una revela una letra de la palabra oculta.",
+    "fastSolveFarmMore": "¡Resolviste en {{attempts}} intentos! Rápido como un rayo. La próxima acumula palabras del tablero para puntos extra.",
+    "trustCluesSooner": "Te tomó {{attempts}} adivinanzas — confía en tus pistas reveladas y arriesgate antes para más puntos."
   },
-  wordHuntDeathRecap: {
-    causeLifeDrain: "Se agotó tu vida",
-    causeWrongGuess: "Una respuesta incorrecta te eliminó",
-    statWords: "Palabras",
-    statWrongGuesses: "Errores",
-    statSurvival: "Sobreviviste",
-    eliminatedOrder: "Fuera #{{order}} de {{total}}",
-    lessonWrongGuess: "¡Cada respuesta incorrecta cuesta {{penalty}} de vida! Perdiste {{guesses}} intentos. Encuentra palabras en el tablero antes de adivinar.",
-    lessonNoWords: "¡Solo encontraste {{count}} palabras! Deslizar palabras en el tablero te cura. Encuentra palabras cortas de 3 letras para sobrevivir.",
-    lessonShortWords: "Tu promedio fue {{avg}} letras. Las palabras largas curan más — 5 letras dan +8 vida vs +3 por 3 letras.",
-    lessonTooManyGuesses: "{{guesses}} errores te costaron {{cost}} de vida total. Solo adivina cuando tengas suficientes pistas.",
-    lessonPacing: "Encuentra 2-3 palabras entre cada intento. Te curan Y revelan pistas sobre la palabra oculta.",
+  "wordHuntDeathRecap": {
+    "causeLifeDrain": "Se agotó tu vida",
+    "causeWrongGuess": "Una respuesta incorrecta te eliminó",
+    "statWords": "Palabras",
+    "statWrongGuesses": "Errores",
+    "statSurvival": "Sobreviviste",
+    "eliminatedOrder": "Fuera #{{order}} de {{total}}",
+    "lessonWrongGuess": "¡Cada respuesta incorrecta cuesta {{penalty}} de vida! Perdiste {{guesses}} intentos. Encuentra palabras en el tablero antes de adivinar.",
+    "lessonNoWords": "¡Solo encontraste {{count}} palabras! Deslizar palabras en el tablero te cura. Encuentra palabras cortas de 3 letras para sobrevivir.",
+    "lessonShortWords": "Tu promedio fue {{avg}} letras. Las palabras largas curan más — 5 letras dan +8 vida vs +3 por 3 letras.",
+    "lessonTooManyGuesses": "{{guesses}} errores te costaron {{cost}} de vida total. Solo adivina cuando tengas suficientes pistas.",
+    "lessonPacing": "Encuentra 2-3 palabras entre cada intento. Te curan Y revelan pistas sobre la palabra oculta."
   },
-  wordHuntRules: {
-    panel1Title: "Encuentra la palabra oculta",
-    panel1Desc: "Una palabra secreta está escondida. Usa las casillas de pistas arriba para descubrirla.",
-    panel2Title: "Tu vida se agota",
-    panel2Desc: "La barra de vida baja cada segundo. Desliza palabras en el tablero para curarte y sobrevivir.",
-    panel3Title: "Las palabras revelan pistas",
-    panel3Desc: "Las palabras del tablero que comparten letras con el objetivo muestran pistas verdes y amarillas — ¡úsalas!",
-    panel4Title: "Los errores cuestan vida",
-    panel4Desc: "Adivinar mal la palabra objetivo cuesta 15 de vida. Acumula pistas antes de intentar.",
-    goToPanel: "Ir a regla {{panel}}",
-    gotIt: "¡Entendido!",
-    skip: "Saltar",
-    quickTipsTitle: "Consejos rápidos",
+  "wordHuntRules": {
+    "panel1Title": "Encuentra la palabra oculta",
+    "panel1Desc": "Una palabra secreta está escondida. Usa las casillas de pistas arriba para descubrirla.",
+    "panel2Title": "Tu vida se agota",
+    "panel2Desc": "La barra de vida baja cada segundo. Desliza palabras en el tablero para curarte y sobrevivir.",
+    "panel3Title": "Las palabras revelan pistas",
+    "panel3Desc": "Las palabras del tablero que comparten letras con el objetivo muestran pistas verdes y amarillas — ¡úsalas!",
+    "panel4Title": "Los errores cuestan vida",
+    "panel4Desc": "Adivinar mal la palabra objetivo cuesta 15 de vida. Acumula pistas antes de intentar.",
+    "goToPanel": "Ir a regla {{panel}}",
+    "gotIt": "¡Entendido!",
+    "skip": "Saltar",
+    "quickTipsTitle": "Consejos rápidos"
   },
-  wordHuntNudge: {
-    lifeDrop: "¡Desliza palabras en el tablero para curarte! Cada palabra restaura vida.",
-    firstClue: "¡Esa palabra reveló una pista! Revisa las casillas de arriba.",
-    wrongGuess: "¡Error = -15 vida! Acumula pistas primero.",
+  "wordHuntNudge": {
+    "lifeDrop": "¡Desliza palabras en el tablero para curarte! Cada palabra restaura vida.",
+    "firstClue": "¡Esa palabra reveló una pista! Revisa las casillas de arriba.",
+    "wrongGuess": "¡Error = -15 vida! Acumula pistas primero."
   },
   "encouragement": {
     "gameStart": "¡Vamos! ¡Tú puedes! 🎯",
@@ -13057,92 +14222,6 @@ const es = {
     "completed": "¡Completado!",
     "progress": "{{current}}/3 Misiones"
   },
-  "quests": {
-    "title": "Misiones",
-    "dailyTitle": "Misiones de hoy",
-    "weeklyTitle": "Misión semanal",
-    "grandSlam": "¡Grand Slam!",
-    "grandSlamBonus": "+500 XP Bonus",
-    "grandSlamAvatar": "+1 Parte de Avatar",
-    "allComplete": "¡Maestro de Misiones!",
-    "allCompleteDesc": "¡Todas las misiones diarias + semanales completadas! ¡Estás en racha!",
-    "avatarReward": "+1 Parte de Avatar",
-    "avatarPartCategory": {
-      "eyes": "Ojos",
-      "mouth": "Boca",
-      "accessory": "Accesorio",
-      "hair": "Cabello",
-      "eyebrows": "Cejas",
-      "facialHair": "Vello facial"
-    },
-    "completedAll": "¡Todo listo por hoy!",
-    "progress": "{{completed}}/{{total}}",
-    "go": "IR",
-    "done": "¡Hecho!",
-    "feed": {
-      "title": "Victorias Recientes",
-      "pvp": "{{name}} venció a un rival real",
-      "grandSlam": "{{name}} completó las 3 misiones diarias"
-    },
-    "daily": {
-      "long_word_6": {
-        "title": "Arquitecto de Palabras",
-        "desc": "Encuentra una palabra de 6+ letras"
-      },
-      "long_word_7": {
-        "title": "Coloso Léxico",
-        "desc": "Encuentra una palabra de 7+ letras"
-      },
-      "score_300": {
-        "title": "Tirador Certero",
-        "desc": "Anota 300+ puntos en un juego"
-      },
-      "score_500": {
-        "title": "Apostador Alto",
-        "desc": "Anota 500+ puntos en un juego"
-      },
-      "words_15": {
-        "title": "Máquina de Palabras",
-        "desc": "Encuentra 15+ palabras en un juego"
-      },
-      "combo_4": { "title": "Combo Iniciador", "desc": "Logra 4x combo en un juego" },
-      "combo_6": { "title": "Rey del Combo", "desc": "Logra 6x combo en un juego" },
-      "mp_win": {
-        "title": "Campeón",
-        "desc": "Gana una partida multijugador"
-      },
-      "beat_human": {
-        "title": "Aplasta Rivales",
-        "desc": "Vence a un jugador real"
-      },
-      "play_mp": {
-        "title": "Entra a la Arena",
-        "desc": "Juega una partida multijugador"
-      },
-      "play_brain": {
-        "title": "Potencia Mental",
-        "desc": "Completa un entreno cerebral"
-      },
-      "play_wordhunt": {
-        "title": "¡A Cazar!",
-        "desc": "Juega la Caza de Palabras diaria"
-      }
-    },
-    "reward": {
-      "xp": "+{{xp}} XP",
-      "gold": "+{{gold}} Oro"
-    },
-    "weeklyWordMastery": "Maestría Semanal de Palabras",
-    "weeklyWordMasteryDesc": "Domina {target} palabras esta semana",
-    "questOptions": "Opciones de misión",
-    "completion": {
-      "title": "¡Misión Cumplida!",
-      "grandSlam": "¡Grand Slam!",
-      "grandSlamDesc": "¡Todas las misiones diarias completadas!",
-      "xpReward": "+{{xp}} XP",
-      "goldReward": "+{{gold}} Oro"
-    }
-  },
   "wotd": {
     "title": "Palabra del Día",
     "teaser": "Palabra del Día",
@@ -13165,13 +14244,6 @@ const es = {
     "forgot": "Olvidé",
     "reviewComplete": "¡Revisión completa!",
     "empty": "¡Juega para descubrir palabras raras!"
-  },
-  "leagueRivals": {
-    "title": "Tus rivales de liga",
-    "ahead": "{{pts}} pts adelante",
-    "behind": "{{pts}} pts detrás",
-    "you": "Tú",
-    "noRivals": "¡Sube en la liga para encontrar rivales!"
   },
   "powerHour": {
     "activated": "¡Hora de Poder activada!",
@@ -13305,7 +14377,24 @@ const es = {
     "emptyCta": "¡Envía un desafío de tablero a un amigo!",
     "resultTitle": "Resultado del desafío",
     "bestWord": "Mejor palabra: {{word}}",
-    "wordsFound": "{{count}} palabras encontradas"
+    "wordsFound": "{{count}} palabras encontradas",
+    "mode": {
+      "classic": "Clásico",
+      "blast": "Explosion",
+      "word-hunt": "Cacería de Palabras"
+    },
+    "received": {
+      "title": "{sender} te retó",
+      "body": "Supera {score} en {mode}"
+    },
+    "result": {
+      "titleWin": "¡Venciste a {opponent}!",
+      "titleLoss": "{opponent} te ganó",
+      "titleTie": "Empataste con {opponent}",
+      "bodyWin": "{mine} vs {theirs}",
+      "bodyLoss": "{mine} vs {theirs}",
+      "bodyTie": "{mine} vs {theirs}"
+    }
   },
   "wordClub": {
     "title": "Club de palabras",
@@ -13728,7 +14817,9 @@ const es = {
       "playMicrocopy": "¡VAMOS!",
       "browseRooms": "O explora salas ↓",
       "liveBadge": "EN VIVO",
-      "aria": { "section": "Bienvenida de CrazyGames" }
+      "aria": {
+        "section": "Bienvenida de CrazyGames"
+      }
     }
   },
   "dailyInvite": {
@@ -13783,12 +14874,64 @@ const es = {
     "playAgain": "Jugar de nuevo",
     "home": "Inicio",
     "finalTiles": "¡Últimas fichas!",
-    "difficulty": { "label": "Dificultad", "easy": "Fácil", "medium": "Media", "hard": "Difícil" },
-    "clue": { "button": "Pista", "reveal": "Prueba: {{word}}", "none": "Sin jugada — prueba a cambiar fichas", "granted": "¡+1 pista!", "adFailed": "Anuncio no disponible — reinténtalo" },
-    "modifier": { "bingo_bonanza": "Fiesta de bingos", "long_words": "Palabras largas", "rich_letters": "Fichas valiosas", "land_grab": "Conquista", "quick_draw": "Mano rápida", "golden_tiles": "Fichas doradas", "none": "", "desc": { "bingo_bonanza": "Los bingos suman +90", "long_words": "Palabras de 5+ letras +15", "rich_letters": "Las fichas raras valen el doble", "land_grab": "Las capturas se extienden a las vecinas", "quick_draw": "Atril de 5 fichas: turnos más rápidos", "golden_tiles": "Las fichas ✦ capturan las casillas de alrededor" } },
-    "setup": { "title": "Prepara tu partida", "opponent": { "label": "Rival", "bot": "Contra el bot", "botDesc": "Juega contra WordBot", "hotseat": "Pasa y juega", "hotseatDesc": "Dos jugadores, un dispositivo", "friend": "Reta a un amigo", "friendDesc": "Envía un enlace de reto a distancia" }, "difficulty": { "label": "Nivel del bot" }, "twist": { "label": "Giro", "surprise": "Sorpréndeme" }, "start": "Empezar partida", "challengeHint": "Reta a un amigo desde la pantalla de resultados", "sendChallengeNow": "¡Ahora envía tu reto!" },
+    "difficulty": {
+      "label": "Dificultad",
+      "easy": "Fácil",
+      "medium": "Media",
+      "hard": "Difícil"
+    },
+    "clue": {
+      "button": "Pista",
+      "reveal": "Prueba: {{word}}",
+      "none": "Sin jugada — prueba a cambiar fichas",
+      "granted": "¡+1 pista!",
+      "adFailed": "Anuncio no disponible — reinténtalo"
+    },
+    "modifier": {
+      "bingo_bonanza": "Fiesta de bingos",
+      "long_words": "Palabras largas",
+      "rich_letters": "Fichas valiosas",
+      "land_grab": "Conquista",
+      "quick_draw": "Mano rápida",
+      "golden_tiles": "Fichas doradas",
+      "none": "",
+      "desc": {
+        "bingo_bonanza": "Los bingos suman +90",
+        "long_words": "Palabras de 5+ letras +15",
+        "rich_letters": "Las fichas raras valen el doble",
+        "land_grab": "Las capturas se extienden a las vecinas",
+        "quick_draw": "Atril de 5 fichas: turnos más rápidos",
+        "golden_tiles": "Las fichas ✦ capturan las casillas de alrededor"
+      }
+    },
+    "setup": {
+      "title": "Prepara tu partida",
+      "opponent": {
+        "label": "Rival",
+        "bot": "Contra el bot",
+        "botDesc": "Juega contra WordBot",
+        "hotseat": "Pasa y juega",
+        "hotseatDesc": "Dos jugadores, un dispositivo",
+        "friend": "Reta a un amigo",
+        "friendDesc": "Envía un enlace de reto a distancia"
+      },
+      "difficulty": {
+        "label": "Nivel del bot"
+      },
+      "twist": {
+        "label": "Giro",
+        "surprise": "Sorpréndeme"
+      },
+      "start": "Empezar partida",
+      "challengeHint": "Reta a un amigo desde la pantalla de resultados",
+      "sendChallengeNow": "¡Ahora envía tu reto!"
+    },
     "squares": "casillas",
-    "place": { "step1": "Toca una letra", "step2": "Toca una casilla", "step3": "Enviar" },
+    "place": {
+      "step1": "Toca una letra",
+      "step2": "Toca una casilla",
+      "step3": "Enviar"
+    },
     "newBest": "¡Nuevo récord!",
     "bagRemaining": "Bolsa",
     "yourRack": "Tu atril",
@@ -13885,7 +15028,6 @@ const es = {
       "axisDownLocked": "Dirección vertical bloqueada",
       "axisUnlocked": "Dirección de la palabra desbloqueada"
     },
-    // FLAG_FOR_NATIVE_REVIEW: 2026-05-11 wordcraft-mobile-fun (legend + scoreDot + tilesLeft)
     "tilesLeft": "Fichas restantes",
     "legend": {
       "title": "Bonificaciones",
@@ -13916,7 +15058,11 @@ const es = {
       "score": "Puntos",
       "target": "Objetivo",
       "runTotal": "Total de la partida",
-      "feedback": { "nice": "¡Bien!", "great": "¡Genial!", "huge": "¡Enorme!" },
+      "feedback": {
+        "nice": "¡Bien!",
+        "great": "¡Genial!",
+        "huge": "¡Enorme!"
+      },
       "submit": "Enviar palabra",
       "recall": "Retirar",
       "endRound": "Terminar ronda",
@@ -13947,18 +15093,54 @@ const es = {
         "share": "Partida WordCraft: {{score}}"
       },
       "card": {
-        "vowelPower": { "name": "Poder Vocal", "desc": "Cada vocal vale +2 fichas." },
-        "longGame": { "name": "Juego Largo", "desc": "Las palabras de 5+ letras puntúan el doble." },
-        "combo": { "name": "Cadena de Combo", "desc": "Cada palabra después de la primera en la ronda suma +1 al multiplicador." },
-        "premiumHunter": { "name": "Cazador de Premios", "desc": "Cada casilla premium que uses suma +1 al multiplicador." },
-        "wildcardStash": { "name": "Reserva de Comodines", "desc": "Empieza cada ronda con una ficha en blanco." },
-        "quickHands": { "name": "Manos Rápidas", "desc": "Añade 4 fichas extra a la bolsa de cada ronda." },
-        "doubleDown": { "name": "Doble o Nada", "desc": "Tu primera palabra de cada ronda puntúa el triple." },
-        "rareLetters": { "name": "Letras Raras", "desc": "Las fichas de 4+ puntos dan +3 fichas cada una." },
-        "shortSweet": { "name": "Corto y Dulce", "desc": "Las palabras de tres letras reciben +15 fichas." },
-        "steadyBuild": { "name": "Construcción Firme", "desc": "Cada palabra recibe +5 fichas fijas." },
-        "overflow": { "name": "Desbordamiento", "desc": "Los puntos por encima del objetivo dan un 10% de bonificación." },
-        "letterHoard": { "name": "Reserva de Letras", "desc": "Tu atril tiene 10 fichas en lugar de 8." }
+        "vowelPower": {
+          "name": "Poder Vocal",
+          "desc": "Cada vocal vale +2 fichas."
+        },
+        "longGame": {
+          "name": "Juego Largo",
+          "desc": "Las palabras de 5+ letras puntúan el doble."
+        },
+        "combo": {
+          "name": "Cadena de Combo",
+          "desc": "Cada palabra después de la primera en la ronda suma +1 al multiplicador."
+        },
+        "premiumHunter": {
+          "name": "Cazador de Premios",
+          "desc": "Cada casilla premium que uses suma +1 al multiplicador."
+        },
+        "wildcardStash": {
+          "name": "Reserva de Comodines",
+          "desc": "Empieza cada ronda con una ficha en blanco."
+        },
+        "quickHands": {
+          "name": "Manos Rápidas",
+          "desc": "Añade 4 fichas extra a la bolsa de cada ronda."
+        },
+        "doubleDown": {
+          "name": "Doble o Nada",
+          "desc": "Tu primera palabra de cada ronda puntúa el triple."
+        },
+        "rareLetters": {
+          "name": "Letras Raras",
+          "desc": "Las fichas de 4+ puntos dan +3 fichas cada una."
+        },
+        "shortSweet": {
+          "name": "Corto y Dulce",
+          "desc": "Las palabras de tres letras reciben +15 fichas."
+        },
+        "steadyBuild": {
+          "name": "Construcción Firme",
+          "desc": "Cada palabra recibe +5 fichas fijas."
+        },
+        "overflow": {
+          "name": "Desbordamiento",
+          "desc": "Los puntos por encima del objetivo dan un 10% de bonificación."
+        },
+        "letterHoard": {
+          "name": "Reserva de Letras",
+          "desc": "Tu atril tiene 10 fichas en lugar de 8."
+        }
       }
     },
     "territory": {
@@ -14128,7 +15310,11 @@ const es = {
       "reveal": "La respuesta era",
       "acceptLoss": "Aceptar derrota"
     },
-    "difficulty": { "easy": "Fácil", "medium": "Media", "hard": "Difícil" },
+    "difficulty": {
+      "easy": "Fácil",
+      "medium": "Media",
+      "hard": "Difícil"
+    },
     "like": "Me gusta",
     "dislike": "No me gusta",
     "next": "Siguiente",
@@ -14146,10 +15332,95 @@ const es = {
     "freeHint": "Pista gratis ({count} restantes)",
     "revealHintAd": "Ver anuncio por pista",
     "revealAnswerAd": "Ver anuncio para revelar respuesta",
-    "adminGiveUp": "Saltar puzzle (admin)"
+    "adminGiveUp": "Saltar puzzle (admin)",
+    "landing": {
+      "metaTitle": "Puente de Palabras — Encuentra la Palabra Conectora | LexiClash",
+      "metaDescription": "Puzzle de palabras online gratis. Dos palabras, un puente — encuentra la palabra que las conecta. También conocido como rosh-zanav, el clásico juego de palabras israelí. Sin registro, sin descargas.",
+      "metaKeywords": "puzzle de puente de palabras, juego de asociación de palabras, juego de palabra puente, rosh zanav, puzzle de enlace de palabras, juegos de palabras online gratis, puzzle de palabras para el cerebro",
+      "ogTitle": "Puente de Palabras — Encuentra la Palabra Conectora",
+      "ogDescription": "Dos palabras, un puente. El clásico puzzle de asociación de palabras, online y gratis.",
+      "twitterTitle": "Puente de Palabras — Puzzle Online Gratis",
+      "twitterDescription": "Dos palabras, un puente. Encuentra qué las conecta.",
+      "badge": "GRATIS • SIN REGISTRO",
+      "h1Pre": "Dos palabras. Un puente.",
+      "h1Highlight": "Encuentra qué las conecta.",
+      "h1Sub": "Puente de Palabras — también conocido como rosh-zanav, el clásico juego de palabras israelí",
+      "introP1": "Puente de Palabras te da dos palabras. Tu misión: encuentra la palabra única que las conecta. ¿FUEGO + MOTOR? CAMIÓN. ¿SOL + BRILLO? LUZ. Fácil de aprender, difícil de dominar.",
+      "introP2": "Es el tipo de juego que despierta tu cerebro — rondas rápidas, momentos de «¡aja!» intensos, y un entrenamiento de vocabulario disfrazado de diversión. Gratis, basado en navegador, sin descargas.",
+      "ctaPrimary": "Juega Gratis Ahora",
+      "ctaSecondary": "Cómo funciona ↓",
+      "demoLabel": "Intenta uno — toca la ranura del medio",
+      "demoReveal": "Revelar puente",
+      "demoSuccess": "¡Eso es una palabra puente!",
+      "samplesHeading": "Tres para intentar",
+      "samplesSub": "Toca cualquier tarjeta para revelar el puente",
+      "samplesEasy": "Fácil",
+      "samplesMedium": "Medio",
+      "samplesHard": "Difícil",
+      "samplesReveal": "Toca para revelar",
+      "whyHeading": "Por qué es bueno para tu cerebro",
+      "whyVocab": {
+        "title": "Construye vocabulario rápidamente",
+        "body": "Cada puzzle viene de un vecindario semántico diferente. Absorbes relaciones de palabras sin pensar."
+      },
+      "whyLateral": {
+        "title": "Entrena el pensamiento lateral",
+        "body": "Raramente hay un solo camino. Tu cerebro aprende a escanear sinónimos, compuestos e idiomas a toda velocidad."
+      },
+      "whyMemory": {
+        "title": "Fortalece la memoria semántica",
+        "body": "Encontrar puentes es recordar + asociar juntos — la misma habilidad detrás de la agudeza verbal y rescatar esa palabra en la punta de la lengua."
+      },
+      "compareHeading": "¿Cómo se compara?",
+      "compareSub": "Construimos Puente de Palabras para ser diferente a propósito",
+      "compareCol1": "Juego",
+      "compareCol2": "Lo que haces",
+      "compareCol3": "Duración",
+      "compareCol4": "Habilidad probada",
+      "compareRow1Name": "Puente de Palabras (este juego)",
+      "compareRow1Do": "Encuentra la palabra que conecta dos palabras dadas",
+      "compareRow1Len": "30 seg / puzzle",
+      "compareRow1Skill": "Asociación + vocabulario",
+      "compareRow2Name": "NYT Connections",
+      "compareRow2Do": "Ordena 16 palabras en 4 grupos temáticos",
+      "compareRow2Len": "5–15 min",
+      "compareRow2Skill": "Categorización",
+      "compareRow3Name": "Wordle",
+      "compareRow3Do": "Adivina una palabra de 5 letras en 6 intentos",
+      "compareRow3Len": "3–5 min",
+      "compareRow3Skill": "Lógica de letras",
+      "compareRow4Name": "Crucigrama",
+      "compareRow4Do": "Completa una cuadrícula a partir de pistas",
+      "compareRow4Len": "10–60 min",
+      "compareRow4Skill": "Trivia + ortografía",
+      "faqHeading": "Preguntas frecuentes",
+      "faq1Q": "¿Qué es Puente de Palabras?",
+      "faq1A": "Un puzzle de asociación de palabras. Ves dos palabras y encuentras la palabra única que las puente. Ejemplo: TRÁFICO + TORMENTA → EMBOTELLAMIENTO (tráfico embotellado, tormenta embotellada). Ambas direcciones deben tener sentido.",
+      "faq2Q": "¿Es esto NYT Connections?",
+      "faq2A": "No. NYT Connections te pide ordenar 16 palabras en 4 grupos temáticos. Puente de Palabras te da dos palabras y te pide la palabra conectora. Mecánica diferente, ambas divertidas.",
+      "faq3Q": "¿Es realmente gratis?",
+      "faq3A": "Sí. Sin registro requerido, sin muro de pago. Anuncios recompensados opcionales te compran pistas si te atascas.",
+      "faq4Q": "¿Qué significa 'rosh-zanav'?",
+      "faq4A": "Hebreo para «cabeza-cola» (ראש זנב). Es un juego clásico de viaje en auto israelí donde un jugador dice una palabra y el siguiente debe encadenar una palabra relacionada. Puente de Palabras es su primo puzzle.",
+      "faq5Q": "¿Puedo jugar en hebreo?",
+      "faq5A": "Sí. Cambia el idioma y obtendrás un banco de puzzles hebreo completo con frases nativas.",
+      "faq6Q": "¿Cómo funcionan las pistas?",
+      "faq6A": "Una pista gratis por puzzle. Mira un anuncio rápido recompensado o gasta monedas para revelarla. La pista nunca regala la respuesta — solo te empuja en la dirección correcta.",
+      "stickyCta": "Juega Puente de Palabras",
+      "footerCtaHeading": "¿Listo para encontrar algunos puentes?",
+      "footerCtaBody": "Gratis. Basado en navegador. Sin descargas.",
+      "footerCtaButton": "Empezar a Jugar",
+      "crossPromoTitle": "Prueba Puente de Palabras",
+      "crossPromoBody": "Dos palabras. Un puente. Gratis.",
+      "crossPromoCta": "Jugar"
+    }
   },
   "mp": {
-    "quality": { "degraded": "Conexión inestable", "reconnecting": "Reconectando…", "weak": "Conexión débil" },
+    "quality": {
+      "degraded": "Conexión inestable",
+      "reconnecting": "Reconectando…",
+      "weak": "Conexión débil"
+    },
     "stopGameConfirm": "¿Terminar el juego para todos?",
     "stopGameYes": "Terminar juego",
     "kbHint": {
@@ -14339,10 +15610,19 @@ const es = {
       "nextMilestone": "{points} pts → {coins} monedas"
     },
     "tier": {
-      "label": "Nivel de capacidad",
-      "1": { "label": "Moderador", "desc": "Marca palabras no válidas y rechaza envíos basura para revisión." },
-      "2": { "label": "Editor", "desc": "Todo lo de Moderador, y además aprobar palabras reales al diccionario." },
-      "3": { "label": "Responsable", "desc": "Todo lo de Editor, y además resolver disputas de calidad de puzles." }
+      "1": {
+        "label": "Moderador",
+        "desc": "Marca palabras no válidas y rechaza envíos basura para revisión."
+      },
+      "2": {
+        "label": "Editor",
+        "desc": "Todo lo de Moderador, y además aprobar palabras reales al diccionario."
+      },
+      "3": {
+        "label": "Responsable",
+        "desc": "Todo lo de Editor, y además resolver disputas de calidad de puzles."
+      },
+      "label": "Nivel de capacidad"
     },
     "levels": {
       "title": "Qué otorga cada nivel de acceso",
@@ -14443,7 +15723,17 @@ const es = {
     "loadingText7": "Desenredando las palabras triples…",
     "loadingText8": "Despertando al mago de las palabras…"
   },
-  "offerwall": { "cta": { "label": "Gana monedas gratis", "aria": "Gana monedas gratis completando ofertas" }, "modal": { "title": "Monedas gratis", "subtitle": "Completa una oferta y tus monedas se añaden automáticamente.", "close": "Cerrar" } },
+  "offerwall": {
+    "cta": {
+      "label": "Gana monedas gratis",
+      "aria": "Gana monedas gratis completando ofertas"
+    },
+    "modal": {
+      "title": "Monedas gratis",
+      "subtitle": "Completa una oferta y tus monedas se añaden automáticamente.",
+      "close": "Cerrar"
+    }
+  },
   "offlineDownload": {
     "title": "Descargar para usar sin conexión",
     "description": "Descarga diccionarios de idiomas para jugar sin conexión. Los datos del diccionario son información pública del juego.",
@@ -14457,8 +15747,8 @@ const es = {
   "sealedBid": {
     "title": "Puja sellada",
     "badge": "Puja sellada",
-    "roundLabel": "Ronda {n}/{total}",
-    "chipStack": "{chips}",
+    "roundLabel": "Ronda {n} de {total}",
+    "chipStack": "Fichas: {chips}",
     "lockIn": "Cerrar puja",
     "youWin": "¡Ganaste!",
     "youLose": "Choque",
@@ -14504,6 +15794,15 @@ const es = {
       "cashOut": "Cobrar",
       "chips": "fichas",
       "coins": "monedas"
+    },
+    "revealing": "Revelando…"
+  },
+  "supporter": {
+    "card": {
+      "title": "¿Disfrutando LexiClash?",
+      "body": "Ayuda a mantener LexiClash gratis y sin anuncios. Los planes de apoyo vienen pronto.",
+      "cta": "Me interesa",
+      "thanks": "¡Estás en la lista! Te avisaremos cuando lancemos los planes de apoyo."
     }
   }
 };
