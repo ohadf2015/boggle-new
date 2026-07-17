@@ -34,7 +34,7 @@ Revenue ≈ `AU × sessions × ad-exposure% × impressions × eCPM × fill`. The
 
 ## Direct AdMob lever — needs your OK (outward-facing)
 
-**sellers.json → "Transparent".** The console recommends it. Transparent seller info draws more programmatic demand → higher eCPM, zero UX change. **Caveat:** it publishes your seller *name* publicly. Confirm it's a business name, not a personal legal name, before flipping. Not auto-toggled.
+**sellers.json → "Transparent".** The console recommends it. Transparent seller info draws more programmatic demand → higher eCPM, zero UX change. **Blocked on a name issue:** the seller name published in sellers.json is drawn from the **Google Payments profile** business name (payments.google.com, tied to legal/tax identity) — NOT a free-text field. On an individual profile it publishes the account holder's legal name. To show a trade name ("Fishgame Studios"), the payments profile must be a **business** profile registered under that name. Until then, kept **Confidential** (current — nothing exposed; minor programmatic-demand cost). Setting: AdMob → Settings → Account → Seller information (sellers.json).
 
 ## Deferred direct levers (deliberately NOT changed — documented)
 
