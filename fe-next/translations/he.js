@@ -7270,7 +7270,12 @@ const he = {
   "pwa": {
     "installTitle": "התקן את לקסיקלאש",
     "installDescription": "התקן את האפליקציה לגישה מהירה יותר, משחק אופליין וחוויה טובה יותר!",
-    "installButton": "התקן עכשיו"
+    "installButton": "התקן עכשיו",
+    "iosInstallTitle": "הוסיפו את לקסיקלאש למסך הבית",
+    "iosInstallDescription": "משחק במסך מלא, נפתח בנגיעה אחת — בלי App Store.",
+    "iosStepShare": "הקישו על כפתור השיתוף",
+    "iosStepAdd": "בחרו ב״הוספה למסך הבית״",
+    "iosGotIt": "הבנתי"
   },
   "newYear": {
     "comingSoon": "משהו מיוחד בדרך...",

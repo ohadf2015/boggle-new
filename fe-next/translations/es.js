@@ -7292,7 +7292,12 @@ const es = {
   "pwa": {
     "installTitle": "Instalar LexiClash",
     "installDescription": "¡Instala nuestra app para acceso más rápido, juego sin conexión y una mejor experiencia!",
-    "installButton": "Instalar ahora"
+    "installButton": "Instalar ahora",
+    "iosInstallTitle": "Añade LexiClash a tu pantalla de inicio",
+    "iosInstallDescription": "Juego a pantalla completa, se abre con un toque — sin App Store.",
+    "iosStepShare": "Toca el botón Compartir",
+    "iosStepAdd": "Elige «Añadir a pantalla de inicio»",
+    "iosGotIt": "Entendido"
   },
   "newYear": {
     "comingSoon": "Algo especial se acerca...",

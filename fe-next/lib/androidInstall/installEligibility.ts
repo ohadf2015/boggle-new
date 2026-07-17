@@ -7,11 +7,11 @@
  * route allowlist because it governs an UNSOLICITED auto-popup. The re-entry
  * surfaces are USER-INITIATED, so they stay available regardless of a prior
  * dismissal — we only filter out platforms where installing the native Android
- * app is impossible or pointless (desktop, iOS, the native shell, an installed
- * standalone PWA).
+ * app is impossible or pointless (iOS, the native shell, an installed standalone
+ * PWA). Desktop IS eligible — desktop players are a deliberate promo target.
  */
 
-import { isAndroidBrowser } from '@/utils/androidApp';
+import { isAndroidInstallPromoUA } from '@/utils/androidApp';
 
 export interface InstallEntryInput {
   /** navigator.userAgent */
@@ -25,5 +25,5 @@ export interface InstallEntryInput {
 export function isAndroidInstallEntryEligible(input: InstallEntryInput): boolean {
   if (input.isCapacitorNative) return false;
   if (input.isStandalone) return false;
-  return isAndroidBrowser(input.ua);
+  return isAndroidInstallPromoUA(input.ua);
 }

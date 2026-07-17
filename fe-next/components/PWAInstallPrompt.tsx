@@ -2,11 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
-import { Download, X } from 'lucide-react';
+import { Download, Share, Plus, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { gameEvents } from '@/components/GoogleAnalytics';
 import { isAndroidBrowser } from '@/utils/androidApp';
+import { isIOSSafari, shouldShowIOSInstallHint } from '@/utils/iosInstall';
+
+const PWA_DISMISS_KEY = 'pwa_install_dismissed_until';
+const PWA_DISMISS_MS = 7 * 24 * 60 * 60 * 1000;
+
+/** iOS-only: home-screen-installed check (Safari's non-standard flag + display-mode). */
+function isIOSStandalone(): boolean {
+  const nav = window.navigator as Navigator & { standalone?: boolean };
+  return nav.standalone === true || window.matchMedia('(display-mode: standalone)').matches;
+}
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -27,6 +37,9 @@ export function PWAInstallPrompt() {
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
+  // iOS Safari can't fire beforeinstallprompt — this shows the manual
+  // "Add to Home Screen" instructional banner instead (the iPhone install path).
+  const [iosHint, setIosHint] = useState(false);
 
   useEffect(() => {
     // On Android the native app promo (AndroidAppInstallPromo) owns the install
@@ -34,8 +47,26 @@ export function PWAInstallPrompt() {
     // where there is no native app, still gets the PWA banner.
     if (isAndroidBrowser(navigator.userAgent)) return;
 
+    // iOS Safari: no beforeinstallprompt event exists, so decide the manual
+    // Add-to-Home-Screen hint here and stop (no listener to attach).
+    if (isIOSSafari(navigator.userAgent)) {
+      const iosDismiss = localStorage.getItem(PWA_DISMISS_KEY);
+      if (
+        shouldShowIOSInstallHint({
+          ua: navigator.userAgent,
+          isStandalone: isIOSStandalone(),
+          gamesCompleted: parseInt(localStorage.getItem('games_completed_count') || '0', 10),
+          dismissedUntil: iosDismiss ? parseInt(iosDismiss, 10) : null,
+          now: Date.now(),
+        })
+      ) {
+        setIosHint(true);
+      }
+      return;
+    }
+
     // Check if user has dismissed prompt recently
-    const dismissedUntil = localStorage.getItem('pwa_install_dismissed_until');
+    const dismissedUntil = localStorage.getItem(PWA_DISMISS_KEY);
     if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) {
       return;
     }
@@ -97,14 +128,14 @@ export function PWAInstallPrompt() {
   // Handle dismiss
   const handleDismiss = () => {
     setShowPrompt(false);
-
+    setIosHint(false);
     // Don't show again for 7 days
-    const dismissedUntil = Date.now() + 7 * 24 * 60 * 60 * 1000;
-    localStorage.setItem('pwa_install_dismissed_until', dismissedUntil.toString());
+    localStorage.setItem(PWA_DISMISS_KEY, String(Date.now() + PWA_DISMISS_MS));
   };
 
   if (isOnCrazyGamesPlatform) return null;
-  if (!showPrompt || !deferredPrompt) return null;
+  const showAndroidChromePrompt = showPrompt && Boolean(deferredPrompt);
+  if (!showAndroidChromePrompt && !iosHint) return null;
 
   return (
     <AnimatePresence>
@@ -132,30 +163,59 @@ export function PWAInstallPrompt() {
             </div>
             <div className="flex-1">
               <h3 className="font-black text-neo-white text-lg mb-1">
-                {t('pwa.installTitle')}
+                {iosHint ? t('pwa.iosInstallTitle') : t('pwa.installTitle')}
               </h3>
               <p className="text-neo-white text-sm opacity-90">
-                {t('pwa.installDescription')}
+                {iosHint ? t('pwa.iosInstallDescription') : t('pwa.installDescription')}
               </p>
             </div>
           </div>
 
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={handleInstallClick}
-              className="flex-1 px-4 py-2.5 bg-accent text-accent-foreground font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
-            >
-              {t('pwa.installButton')}
-            </button>
-            <button
-              type="button"
-              onClick={handleDismiss}
-              className="px-4 py-2.5 bg-neo-white text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
-            >
-              {t('common.later')}
-            </button>
-          </div>
+          {iosHint ? (
+            <>
+              {/* iOS has no install trigger — coach the manual Share → Add flow. */}
+              <ol className="mb-3 space-y-1.5 text-neo-white text-sm font-medium">
+                <li className="flex items-center gap-2">
+                  <span className="font-black">1.</span>
+                  <span className="inline-flex items-center gap-1">
+                    {t('pwa.iosStepShare')}
+                    <Share size={16} className="inline" aria-hidden="true" />
+                  </span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="font-black">2.</span>
+                  <span className="inline-flex items-center gap-1">
+                    {t('pwa.iosStepAdd')}
+                    <Plus size={16} className="inline" aria-hidden="true" />
+                  </span>
+                </li>
+              </ol>
+              <button
+                type="button"
+                onClick={handleDismiss}
+                className="w-full px-4 py-2.5 bg-neo-white text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
+              >
+                {t('pwa.iosGotIt')}
+              </button>
+            </>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={handleInstallClick}
+                className="flex-1 px-4 py-2.5 bg-accent text-accent-foreground font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
+              >
+                {t('pwa.installButton')}
+              </button>
+              <button
+                type="button"
+                onClick={handleDismiss}
+                className="px-4 py-2.5 bg-neo-white text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
+              >
+                {t('common.later')}
+              </button>
+            </div>
+          )}
         </div>
       </m.div>
     </AnimatePresence>

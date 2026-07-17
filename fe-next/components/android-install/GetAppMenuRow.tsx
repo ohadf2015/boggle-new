@@ -8,9 +8,9 @@
  * promo no matter how many times the popup was dismissed. It bypasses the
  * 14-day cooldown because tapping it is an explicit, user-initiated request.
  *
- * Renders only on Android browsers where installing the native app is possible
- * — it returns null on desktop / iOS / the native shell / an installed PWA, so
- * it never clutters the menu for users who can't act on it.
+ * Renders wherever installing the native Android app is possible — desktop and
+ * Android / other mobile browsers — and returns null on iOS / the native shell /
+ * an installed PWA, so it never clutters the menu for users who can't act on it.
  */
 
 import { useMemo } from 'react';

@@ -7404,7 +7404,12 @@ const sv = {
   "pwa": {
     "installTitle": "Installera LexiClash",
     "installDescription": "Installera vår app för snabbare åtkomst, offlinespel och en bättre upplevelse!",
-    "installButton": "Installera nu"
+    "installButton": "Installera nu",
+    "iosInstallTitle": "Lägg till LexiClash på hemskärmen",
+    "iosInstallDescription": "Helskärmsspel, öppnas med ett tryck — ingen App Store behövs.",
+    "iosStepShare": "Tryck på Dela-knappen",
+    "iosStepAdd": "Välj ”Lägg till på hemskärmen”",
+    "iosGotIt": "Klart"
   },
   "newYear": {
     "comingSoon": "Något speciellt närmar sig...",

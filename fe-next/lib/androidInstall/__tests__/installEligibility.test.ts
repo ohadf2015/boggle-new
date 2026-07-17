@@ -17,11 +17,11 @@ describe('isAndroidInstallEntryEligible', () => {
     expect(isAndroidInstallEntryEligible({ ...base, ua: ANDROID_UA })).toBe(true);
   });
 
-  it('is not eligible on desktop', () => {
-    expect(isAndroidInstallEntryEligible({ ...base, ua: DESKTOP_UA })).toBe(false);
+  it('is eligible on desktop (promote the Android app to desktop players)', () => {
+    expect(isAndroidInstallEntryEligible({ ...base, ua: DESKTOP_UA })).toBe(true);
   });
 
-  it('is not eligible on iOS', () => {
+  it('is not eligible on iOS (no Android app to install)', () => {
     expect(isAndroidInstallEntryEligible({ ...base, ua: IOS_UA })).toBe(false);
   });
 

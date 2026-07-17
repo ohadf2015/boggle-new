@@ -49,6 +49,29 @@ export function isAndroidBrowser(ua: string): boolean {
   return true;
 }
 
+/**
+ * True for a User-Agent where promoting the native *Android* app makes sense:
+ * desktop and Android / other mobile browsers. Returns false where installing
+ * an Android app is impossible or the Play Store link is unreliable:
+ *  - iOS (iPhone/iPad/iPod) — there is no Android app to install there.
+ *  - Android WebViews (`; wv)`) and known in-app browsers (FB/IG/TikTok/WeChat/
+ *    Line) — Play Store navigation is blocked or flaky inside them.
+ *
+ * Unlike `isAndroidBrowser` (deep-link / PWA-precedence use), this deliberately
+ * INCLUDES desktop so the install promo reaches desktop players too.
+ *
+ * ponytail: iPadOS 13+ reports a Mac desktop UA, so an iPad reads as desktop and
+ * gets the promo — a harmless Play link the user can't act on. Acceptable; the
+ * ask is specifically "hide on iPhone". Tighten with maxTouchPoints only if iPad
+ * impressions prove noisy.
+ */
+export function isAndroidInstallPromoUA(ua: string): boolean {
+  if (/iPhone|iPad|iPod/i.test(ua)) return false;
+  if (/wv\)|; wv\)/.test(ua)) return false;
+  if (/FBAN|FBAV|Instagram|Line\/|TikTok|MicroMessenger/i.test(ua)) return false;
+  return true;
+}
+
 /** True when the page is running as an installed PWA (standalone display mode). */
 export function isStandaloneDisplay(): boolean {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return false;
@@ -101,7 +124,7 @@ export interface AndroidPromoGateInput {
  */
 export function shouldShowAndroidInstallPromo(input: AndroidPromoGateInput): boolean {
   if (input.isCapacitorNative) return false;
-  if (!isAndroidBrowser(input.ua)) return false;
+  if (!isAndroidInstallPromoUA(input.ua)) return false;
   if (input.isStandalone) return false;
   if (input.isInstalled) return false;
   if (!input.isAllowedRoute) return false;

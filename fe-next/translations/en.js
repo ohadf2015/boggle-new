@@ -7309,7 +7309,12 @@ const en = {
   "pwa": {
     "installTitle": "Get the App",
     "installDescription": "Faster play, works offline, no app store needed!",
-    "installButton": "Install"
+    "installButton": "Install",
+    "iosInstallTitle": "Add LexiClash to your Home Screen",
+    "iosInstallDescription": "Full-screen play, opens in one tap — no App Store needed.",
+    "iosStepShare": "Tap the Share button",
+    "iosStepAdd": "Then choose “Add to Home Screen”",
+    "iosGotIt": "Got it"
   },
   "newYear": {
     "comingSoon": "Something special coming soon...",

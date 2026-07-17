@@ -3,6 +3,7 @@ import {
   ANDROID_PACKAGE,
   PLAY_STORE_URL,
   isAndroidBrowser,
+  isAndroidInstallPromoUA,
   shouldShowAndroidInstallPromo,
   type AndroidPromoGateInput,
 } from '../androidApp';
@@ -19,6 +20,8 @@ const IPHONE_UA =
   'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 const DESKTOP_UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36';
+const IPAD_UA =
+  'Mozilla/5.0 (iPad; CPU OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1';
 
 describe('androidApp constants', () => {
   it('exposes the correct package id', () => {
@@ -62,6 +65,32 @@ describe('isAndroidBrowser', () => {
   });
 });
 
+describe('isAndroidInstallPromoUA', () => {
+  it('returns true for a regular Android Chrome browser', () => {
+    expect(isAndroidInstallPromoUA(ANDROID_CHROME_UA)).toBe(true);
+  });
+
+  it('returns true on desktop (promote the Android app there too)', () => {
+    expect(isAndroidInstallPromoUA(DESKTOP_UA)).toBe(true);
+  });
+
+  it('returns false on iPhone (no Android app to install)', () => {
+    expect(isAndroidInstallPromoUA(IPHONE_UA)).toBe(false);
+  });
+
+  it('returns false on iPad / iPod', () => {
+    expect(isAndroidInstallPromoUA(IPAD_UA)).toBe(false);
+  });
+
+  it('returns false inside the Instagram in-app browser', () => {
+    expect(isAndroidInstallPromoUA(ANDROID_INSTAGRAM_UA)).toBe(false);
+  });
+
+  it('returns false inside the Facebook in-app browser', () => {
+    expect(isAndroidInstallPromoUA(ANDROID_FB_UA)).toBe(false);
+  });
+});
+
 describe('shouldShowAndroidInstallPromo', () => {
   const base: AndroidPromoGateInput = {
     ua: ANDROID_CHROME_UA,
@@ -82,9 +111,17 @@ describe('shouldShowAndroidInstallPromo', () => {
     expect(shouldShowAndroidInstallPromo({ ...base, isCapacitorNative: true })).toBe(false);
   });
 
-  it('hides on iOS / desktop / non-Android browsers', () => {
+  it('hides on iOS (no Android app to install)', () => {
     expect(shouldShowAndroidInstallPromo({ ...base, ua: IPHONE_UA })).toBe(false);
-    expect(shouldShowAndroidInstallPromo({ ...base, ua: DESKTOP_UA })).toBe(false);
+    expect(shouldShowAndroidInstallPromo({ ...base, ua: IPAD_UA })).toBe(false);
+  });
+
+  it('shows on desktop (promote the Android app to desktop players)', () => {
+    expect(shouldShowAndroidInstallPromo({ ...base, ua: DESKTOP_UA })).toBe(true);
+  });
+
+  it('hides inside in-app webviews where Play navigation is unreliable', () => {
+    expect(shouldShowAndroidInstallPromo({ ...base, ua: ANDROID_FB_UA })).toBe(false);
   });
 
   it('hides when launched as an installed PWA (standalone display)', () => {

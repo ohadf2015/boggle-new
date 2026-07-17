@@ -78,7 +78,8 @@ export default function AndroidAppInstallPromo() {
     };
 
     // Cheap synchronous gates first — never probe for the installed app on
-    // iOS / desktop / native / PWA / disallowed routes / already-dismissed.
+    // iOS / native / PWA / disallowed routes / already-dismissed. (Desktop IS
+    // eligible now — it's a deliberate promo target.)
     if (!shouldShowAndroidInstallPromo(baseInput)) return;
 
     let cancelled = false;

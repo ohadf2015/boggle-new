@@ -3816,7 +3816,12 @@ const ru = {
   "pwa": {
     "installTitle": "Получи приложение",
     "installDescription": "Более быстрая игра, работает в автономном режиме, не нужен app store!",
-    "installButton": "Установить"
+    "installButton": "Установить",
+    "iosInstallTitle": "Добавьте LexiClash на главный экран",
+    "iosInstallDescription": "Полноэкранная игра, запуск одним касанием — без App Store.",
+    "iosStepShare": "Нажмите кнопку «Поделиться»",
+    "iosStepAdd": "Выберите «На экран Домой»",
+    "iosGotIt": "Понятно"
   },
   "home": {
     "singlePlayer": "Быстрая игра",

@@ -7281,7 +7281,12 @@ const ja = {
   "pwa": {
     "installTitle": "LexiClashをインストール",
     "installDescription": "より速いアクセス、オフラインプレイ、より良い体験のためにアプリをインストール！",
-    "installButton": "今すぐインストール"
+    "installButton": "今すぐインストール",
+    "iosInstallTitle": "LexiClashをホーム画面に追加",
+    "iosInstallDescription": "フルスクリーンでプレイ、ワンタップで起動。App Store不要。",
+    "iosStepShare": "共有ボタンをタップ",
+    "iosStepAdd": "「ホーム画面に追加」を選択",
+    "iosGotIt": "OK"
   },
   "newYear": {
     "comingSoon": "特別なことが近づいています...",
