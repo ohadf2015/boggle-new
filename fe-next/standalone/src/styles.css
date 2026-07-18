@@ -1,3 +1,18 @@
+/* Bundled brand fonts (self-contained — no Google Fonts CDN). Path is relative
+   to this CSS file's built location (dist/assets/) → dist/fonts/. */
+@font-face {
+  font-family: 'Fredoka';
+  src: url('../fonts/fredoka-latin.woff2') format('woff2');
+  font-weight: 300 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Rubik';
+  src: url('../fonts/rubik-latin.woff2') format('woff2');
+  font-weight: 300 900;
+  font-display: swap;
+}
+
 :root {
   --navy: #1a1a2e;
   --navy-light: #16213e;
@@ -8,7 +23,12 @@
   --yellow: #ffe135;
   --red: #ff3366;
   --ink: #000;
-  --font: "Fredoka", ui-rounded, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font: "Rubik", ui-rounded, "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-display: "Fredoka", var(--font);
+}
+
+.title, .logo, .tile, .hud-value, .final-score, .current-word, .toast, .btn {
+  font-family: var(--font-display);
 }
 
 * { box-sizing: border-box; }
@@ -46,7 +66,7 @@ body {
 
 /* ---------- buttons ---------- */
 .btn {
-  font-family: var(--font);
+  font-family: var(--font-display);
   font-weight: 800;
   font-size: 18px;
   color: var(--navy);

@@ -6,14 +6,24 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const src = join(here, '..', '..', 'public', 'dicts', 'en.dict.gz');
+const mainPublic = join(here, '..', '..', 'public');
 const destDir = join(here, '..', 'public');
-const dest = join(destDir, 'en.dict.gz');
 
-if (!existsSync(src)) {
-  console.error(`[copy-dict] source dictionary not found: ${src}`);
+// 1. Dictionary
+const dictSrc = join(mainPublic, 'dicts', 'en.dict.gz');
+if (!existsSync(dictSrc)) {
+  console.error(`[copy-assets] source dictionary not found: ${dictSrc}`);
   process.exit(1);
 }
 mkdirSync(destDir, { recursive: true });
-copyFileSync(src, dest);
-console.log(`[copy-dict] ${src} -> ${dest}`);
+copyFileSync(dictSrc, join(destDir, 'en.dict.gz'));
+console.log(`[copy-assets] dict -> public/en.dict.gz`);
+
+// 2. Fonts (EN-only build → latin woff2 for Fredoka display + Rubik body)
+mkdirSync(join(destDir, 'fonts'), { recursive: true });
+for (const f of ['fredoka-latin.woff2', 'rubik-latin.woff2']) {
+  const src = join(mainPublic, 'fonts', f);
+  if (!existsSync(src)) { console.error(`[copy-assets] missing font: ${src}`); process.exit(1); }
+  copyFileSync(src, join(destDir, 'fonts', f));
+  console.log(`[copy-assets] font -> public/fonts/${f}`);
+}

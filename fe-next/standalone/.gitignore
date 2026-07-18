@@ -2,6 +2,7 @@ node_modules
 dist
 dist-*
 *.zip
-# Dictionary is copied from ../public/dicts at build time (predev/prebuild) — not committed here.
+# Dict + fonts are copied from ../public at build time (predev/prebuild) — not committed here.
 public/en.dict.gz
+public/fonts/
 *.tsbuildinfo
