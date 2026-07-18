@@ -5079,6 +5079,15 @@ const ja = {
     "totalPoints": "合計",
     "topPercent": "トップ{percent}%",
     "noRankYet": "ゲームをプレイしてランク入り!",
+    "comingSoon": "近日公開！リーダーボードを準備中です。",
+    "referral": {
+      "inviteFriends": "友達を招待して報酬をゲット！",
+      "subtitle": "コードを共有すると、友達がプレイしたとき二人とも100XP＋50コイン獲得！",
+      "shareText": "🎮 LexiClashで一緒に遊ぼう！ワードゲームで勝負だ！",
+      "copied": "リンクをコピーしました！",
+      "friendsJoined": "人の友達が参加",
+      "noReferralsYet": "まだ招待はありません"
+    },
     "viewLeaderboard": "リーダーボードを見る",
     "friends": "フレンド",
     "noFriendsPlayed": "今日はまだフレンドが誰も遊んでいません！",

@@ -4994,6 +4994,7 @@ const en = {
     "totalPoints": "total pts",
     "topPercent": "Top {percent}%",
     "noRankYet": "Play games to get ranked!",
+    "comingSoon": "Coming soon! We're setting up the leaderboard.",
     "viewLeaderboard": "View Leaderboard",
     "friends": "Friends",
     "noFriendsPlayed": "None of your friends have played today yet!",

@@ -152,7 +152,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
             {t('leaderboard.title')}
           </h2>
           <p className={cn('text-lg', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
-            Coming soon! Leaderboard feature is being set up.
+            {t('leaderboard.comingSoon')}
           </p>
           <Button
             onClick={() => router.push(`/${language}`)}
@@ -213,7 +213,8 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                 'h-7 w-7 p-0 rounded-full',
                 isDarkMode ? 'hover:bg-neo-navy-elevated' : 'hover:bg-gray-100'
               )}
-              title="Refresh"
+              title={t('leaderboard.refresh')}
+              aria-label={t('leaderboard.refresh')}
               haptic
             >
               {loading ? (

@@ -3,6 +3,7 @@
 import React, { memo, useMemo } from 'react';
 import { m, useReducedMotion } from 'framer-motion';
 import { Crown } from 'lucide-react';
+import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -86,44 +87,55 @@ const LeaderboardPodium = memo<LeaderboardPodiumProps>(({ entries, language, cur
               aria-hidden={!isChampion}
             />
 
-            {/* Static golden glow behind champion avatar (CSS glow, no animation) */}
-            {isChampion && (
-              <div className="absolute inset-0 rounded-full bg-neo-yellow/15 blur-xl" />
-            )}
-
-            {/* Avatar with rank-coloured ring; cyan ring + YOU chip for current user */}
-            <div className="relative">
-              <div
-                className={cn(
-                  'rounded-full ring-3 ring-offset-2 ring-offset-neo-navy',
-                  isYou ? 'ring-neo-cyan' : style.ring,
+            <Link
+              href={`/${language}/player/${encodeURIComponent(entry.player_id)}`}
+              aria-label={name}
+              className="flex flex-col items-center w-full min-w-0 rounded-neo transition-transform hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+            >
+              {/* Avatar with rank-coloured ring; cyan ring + YOU chip for current user.
+                  `isolate` bounds the champion glow to this box so it never escapes
+                  to cover the page and swallow clicks. */}
+              <div className="relative isolate">
+                {/* Static golden glow behind champion avatar — bounded & non-interactive */}
+                {isChampion && (
+                  <div
+                    data-testid="podium-champion-glow"
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -z-10 rounded-full bg-neo-yellow/25 blur-xl"
+                  />
                 )}
-              >
-                <Avatar
-                  customAvatar={entry.avatar_config ?? undefined}
-                  avatarImage={entry.avatar_image ?? undefined}
-                  userId={entry.player_id}
-                  size={isChampion ? 'lg' : 'md'}
-                  tierMarker
-                  disableEffects
-                />
+                <div
+                  className={cn(
+                    'rounded-full ring-3 ring-offset-2 ring-offset-neo-navy',
+                    isYou ? 'ring-neo-cyan' : style.ring,
+                  )}
+                >
+                  <Avatar
+                    customAvatar={entry.avatar_config ?? undefined}
+                    avatarImage={entry.avatar_image ?? undefined}
+                    userId={entry.player_id}
+                    size={isChampion ? 'lg' : 'md'}
+                    tierMarker
+                    disableEffects
+                  />
+                </div>
+                {isYou && (
+                  <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-px rounded-md bg-neo-cyan text-neo-navy text-[9px] font-bold uppercase tracking-wide shadow-hard-sm">
+                    {t('mp.rivals.you')}
+                  </span>
+                )}
               </div>
-              {isYou && (
-                <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-1.5 py-px rounded-md bg-neo-cyan text-neo-navy text-[9px] font-bold uppercase tracking-wide shadow-hard-sm">
-                  {t('mp.rivals.you')}
-                </span>
-              )}
-            </div>
 
-            {/* Name */}
-            <span className={cn('mt-2 w-full truncate text-center font-bold text-xs sm:text-sm', isYou ? 'text-neo-cyan' : 'text-white')}>
-              {name}
-            </span>
+              {/* Name */}
+              <span className={cn('mt-2 w-full truncate text-center font-bold text-xs sm:text-sm', isYou ? 'text-neo-cyan' : 'text-white')}>
+                {name}
+              </span>
 
-            {/* Score */}
-            <span className={cn('font-mono tabular-nums font-black text-sm sm:text-base leading-none', style.score)}>
-              {safeToLocaleString(entry.total_score ?? 0, language)}
-            </span>
+              {/* Score */}
+              <span className={cn('font-mono tabular-nums font-black text-sm sm:text-base leading-none', style.score)}>
+                {safeToLocaleString(entry.total_score ?? 0, language)}
+              </span>
+            </Link>
 
             {/* Pedestal block — rank number in BLACK ink on the medal fill */}
             <div
