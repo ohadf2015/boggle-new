@@ -1603,3 +1603,25 @@ _Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all fl
 - [Sentry] 1PV TypeError null.clear() on /daily/word-wheel (reach=6)
   - last seen: 2026-07-06 — already fixed in WordWheelPixiRing.tsx:106 (.destroyed guard + try/catch)
   - recommended owner: self (close in Sentry)
+
+## 2026-07-18
+- [PostHog] TypeError: Load failed / Failed to fetch (019f34a3)
+  - first_seen: 2026-07-08, last_seen: 2026-07-17, occurrences: 45, users: 17
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f34a3-12d0-7820-a7d2-4b2d22556c1e
+  - status: deferred
+  - why: No stack trace — all events are generic unhandled network fetch failures on /es/multiplayer from Android Chrome 150. Cannot pinpoint which fetch call without a real stack. Likely WebSocket/Socket.IO connection drop on mobile network handoff.
+  - recommended owner: review-by-eod (check if socket reconnect is emitting proper errors)
+
+- [PostHog] React error #418 — hydration mismatch at <html> level (019f4747, 019f70e5)
+  - first_seen: 2026-07-09, last_seen: 2026-07-17, occurrences: 9, users: 7
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f4747-c11b-7430-8ac2-882649b49cbd
+  - status: deferred
+  - why: suppressHydrationWarning already present on <html> and <body>. React #418 is a CONTENT child mismatch (not attribute mismatch), so suppressHydrationWarning doesn't prevent it. All occurrences on Android Chrome 150 (Capacitor WebView). Suspected cause: Capacitor bridge script injecting DOM content before React hydrates, OR a client-only component in root layout rendering differently SSR vs client. Needs device-level debugging with non-minified build.
+  - recommended owner: review-by-eod (check root layout providers for typeof window !== 'undefined' patterns; test on Capacitor WebView)
+
+- [PostHog] TypeError: Failed to fetch (019f0ab7) — OBSERVATION
+  - first_seen: 2026-07-15, last_seen: 2026-07-17, occurrences: 32, users: 1 (single session!)
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f0ab7-c499-7580-bb4e-738802fea326
+  - source: layout chunk — layout-level fetch failure from one user, 32 times in 2 days. May be the same Android device as above. No stack trace.
+  - status: deferred — watch if user count grows (currently 1 user = device-specific issue, not systemic)
+  - recommended owner: review-by-eod

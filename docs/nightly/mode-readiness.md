@@ -11,11 +11,19 @@
 
 ## Current (in progress)
 
-### shiritori — readiness: 0% — status: IN PROGRESS
+### shiritori — readiness: 42% — status: IN PROGRESS
 - **Why next:** MP-wired recently; verify chain rules + bot-exclusion + i18n + edge cases.
-- **Reach for QA:** admin-gated — use admin account or `?shiritori=1` override.
-- **Key files:** `components/shiritori/*`, `lib/shiritori/*`, `app/[locale]/shiritori/{page,PageClient}.tsx`.
-- **Last audited:** (not yet)
+- **Reach:** JA MP is LIVE (ja board bypasses admin gate); solo is admin-preview; landing at `/[locale]/shiritori`.
+- **Key files:** `components/multiplayer/shiritori/*`, `lib/shiritori/sp/*`, `app/[locale]/shiritori/{page,solo/page}.tsx`, `backend/{handlers,modules}/shiritori*`, `shared/utils/shiritori.ts`.
+- **Last audited:** 2026-07-18
+- **Covered (2026-07-18):** chain engine, backend manager+handler, MP hook+view, solo engine+page, landing page, i18n ×6 locales.
+- **Not yet covered:** turn timer display (blocker), visual QA, tests audit.
+
+**Open issues:**
+- 🔴 BLOCKER: No turn-timer UI — 15s server deadline invisible to client; player gets silently eliminated. `ShiritoriView.tsx` needs a countdown. Owner: review-by-eod.
+- 🟡 MAJOR: `dictCheckJa` network error indistinguishable from invalid word (solo/page.tsx:71). Owner: review-by-eod.
+- ✅ FIXED: final loser never marked `eliminated:true` on game-over (`useShiritoriGame.ts:87`).
+- ✅ FIXED: init loading text semantics (`ShiritoriVersus.tsx:77`).
 
 ## Queue (audit order — closest-to-release first)
 
