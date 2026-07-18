@@ -188,6 +188,16 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     onComplete();
   }, [isNavigating, language, router, onComplete, emitSkipped, step]);
 
+  /** 🎯 "Play Now" — skip all remaining FTUE steps and jump straight into a practice game. */
+  const handlePlayNow = useCallback(() => {
+    if (isNavigating) return;
+    setIsNavigating(true);
+    markOnboardingSkipped();
+    emitSkipped(step);
+    router.push(`/${language}/practice/classic?play=1`);
+    onComplete();
+  }, [isNavigating, language, router, onComplete, emitSkipped, step]);
+
   // Step 2: Profile complete setup
   const playerNameEditedRef = useRef(false);
 
@@ -263,9 +273,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     if (pendingRoom) {
       router.push(`/${language}/multiplayer?room=${pendingRoom}`);
     } else {
-      // Daily Challenge is the priority destination for brand-new players —
-      // Practice Mode is opt-in only (reachable from Home), never auto-pushed.
-      router.push(`/${language}/daily`);
+      // 🎯 Route FTUE completers straight into a practice game — eliminates
+      // the 2-tap dead zone between onboarding and first play.
+      router.push(`/${language}/practice/classic?play=1`);
     }
     emitCompleted({ via: 'style' });
     onComplete();
@@ -330,15 +340,16 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           />
         );
       case 'language':
-        return <LanguageSelect onSelect={handleLanguageSelect} />;
+        return <LanguageSelect onSelect={handleLanguageSelect} onPlayNow={handlePlayNow} />;
       case 'calmMode':
         return <CalmModeChoice onChoose={handleCalmModeChoice} />;
       case 'style':
-        return <StyleSelectStep onComplete={handleStyleComplete} />;
+        return <StyleSelectStep onComplete={handleStyleComplete} onPlayNow={handlePlayNow} />;
       case 'profile':
         return (
           <QuickProfileSetup
             onComplete={handleProfileComplete}
+            onPlayNow={handlePlayNow}
             hasPendingInvite={hasPendingRoomInvite()}
             inviteContext={isInviteMode && inviteAtMount
               ? { roomCode: inviteAtMount.code, hostName: inviteAtMount.hostName }

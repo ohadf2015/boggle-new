@@ -17,6 +17,7 @@ import { NeoPanel } from '@/components/ui/panel';
 
 interface QuickProfileSetupProps {
   onComplete: (name: string, avatar: CustomAvatarConfig, nameEdited: boolean) => void;
+  onPlayNow?: () => void;
   onSkip?: () => void;
   hasPendingInvite?: boolean;
   inviteContext?: { roomCode: string; hostName?: string };
@@ -332,6 +333,17 @@ const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
             nameValid={isNameValid}
             nameEdited={trimmedName !== initialSuggestionRef.current.trim()}
           />
+        )}
+
+        {/* 🎯 "Play Now" skip — jump straight into a game, skip style step */}
+        {onPlayNow && (
+          <button
+            data-testid="play-now-skip"
+            onClick={onPlayNow}
+            className="mt-3 text-neo-white/40 hover:text-neo-lime text-xs font-neo-body underline underline-offset-2 transition-colors w-full text-center"
+          >
+            {t('onboarding.ftue.playNow', 'Skip → Play Now')}
+          </button>
         )}
       </NeoPanel>
     </m.div>

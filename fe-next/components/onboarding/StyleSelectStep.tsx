@@ -18,9 +18,11 @@ import { cn } from '@/lib/utils';
 interface StyleSelectStepProps {
   /** Called once the player commits a style or chooses to skip. */
   onComplete: () => void;
+  /** 🎯 "Play Now" skip — jump straight into a game instead of choosing a style. */
+  onPlayNow?: () => void;
 }
 
-const StyleSelectStep: React.FC<StyleSelectStepProps> = ({ onComplete }) => {
+const StyleSelectStep: React.FC<StyleSelectStepProps> = ({ onComplete, onPlayNow }) => {
   const { t } = useLanguage();
 
   return (
@@ -53,14 +55,26 @@ const StyleSelectStep: React.FC<StyleSelectStepProps> = ({ onComplete }) => {
           onConfirm={onComplete}
           confirmLabelKey="onboarding.style.confirm"
           footerExtra={
-            <button
-              type="button"
-              data-testid="onboarding-style-skip"
-              onClick={onComplete}
-              className="self-center min-h-[44px] px-3 font-neo-body text-sm font-bold uppercase tracking-wide text-neo-cream/70 underline-offset-4 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
-            >
-              {t('onboarding.style.skip')}
-            </button>
+            <div className="flex items-center justify-center gap-4">
+              {onPlayNow && (
+                <button
+                  type="button"
+                  data-testid="onboarding-style-play-now"
+                  onClick={onPlayNow}
+                  className="self-center min-h-[44px] px-3 font-neo-body text-sm font-bold uppercase tracking-wide text-neo-lime underline-offset-4 hover:text-neo-lime/80 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                >
+                  {t('onboarding.ftue.playNow', 'Skip → Play Now')}
+                </button>
+              )}
+              <button
+                type="button"
+                data-testid="onboarding-style-skip"
+                onClick={onComplete}
+                className="self-center min-h-[44px] px-3 font-neo-body text-sm font-bold uppercase tracking-wide text-neo-cream/70 underline-offset-4 hover:text-neo-white hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan"
+              >
+                {t('onboarding.style.skip')}
+              </button>
+            </div>
           }
         />
       </div>

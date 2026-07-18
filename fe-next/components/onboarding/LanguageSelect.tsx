@@ -11,6 +11,7 @@ import type { Language } from '@/types';
 
 interface LanguageSelectProps {
   onSelect: () => void;
+  onPlayNow?: () => void;
 }
 
 /**
@@ -156,6 +157,17 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
         {t('onboarding.ftue.letsPlay', "Let's Play")}
         <ArrowRight className="w-5 h-5" />
       </m.button>
+
+      {/* 🎯 "Play Now" skip — jump straight into a game, skip the rest of FTUE */}
+      {onPlayNow && (
+        <button
+          data-testid="play-now-skip"
+          onClick={onPlayNow}
+          className="mt-3 text-neo-white/40 hover:text-neo-lime text-xs font-neo-body underline underline-offset-2 transition-colors"
+        >
+          {t('onboarding.ftue.playNow', 'Skip → Play Now')}
+        </button>
+      )}
     </div>
   );
 };
