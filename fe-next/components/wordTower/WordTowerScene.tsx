@@ -2,9 +2,9 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from 'react';
 import { ChevronsUp } from 'lucide-react';
-import { Container } from 'pixi.js';
+import { Container, Graphics } from 'pixi.js';
 import { GameCanvas, useGameEngine } from '@/lib/gameEngine';
-import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS } from '@/lib/gameEngine/presets/particles';
+import { CONFETTI_BURST, COMBO_FLASH, GOLD_STARS, TOWER_EMBERS, TOWER_DUST, AIR_STREAKS, RUBBLE_BURST } from '@/lib/gameEngine/presets/particles';
 import { biomeForHeight, type WordTowerFloor, type ApplyResult } from '@/lib/wordTower/wordTowerManager';
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 import { buildTowerColumn, cellAltitudes, wordColor } from '@/lib/wordTower/towerColumn';
@@ -12,18 +12,18 @@ import { gradeBlockColor, blockSurface, ZONE_MATERIAL, type BlockSurface, type Z
 import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
-import { swayAngleAt, swayJitterDeg } from '@/lib/wordTower/towerSway';
+import { swayAngleAt, swayJitterDeg, wobbleImpulseDeg, WOBBLE_IMPULSE_MS } from '@/lib/wordTower/towerSway';
 import { useTowerUpgradeStore } from '@/lib/wordTower/useTowerUpgradeStore';
 import { swivelStartDeg, swivelDurationMs } from '@/lib/wordTower/swivelDrop';
-import { toppleCrashFx } from '@/lib/wordTower/crashFx';
+import { toppleCrashFx, CRASH_DARK_COLOR } from '@/lib/wordTower/crashFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
 import { stepMomentum, clampFlickVelocity, WHEEL_SCALE } from '@/lib/wordTower/scrollMomentum';
 import {
-  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLandScaled, impactRing, bumpScale, tumbleOut,
+  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLandScaled, impactRing, bumpScale, tumbleOut, drawGroundShadow,
   type TileSprite,
 } from './towerSprites';
-import { impactDipPx } from '@/lib/wordTower/landingImpact';
-import { tumbleParams } from '@/lib/wordTower/tumbleArc';
+import { impactDipPx, IMPACT_MS } from '@/lib/wordTower/landingImpact';
+import { tumbleBounceParams } from '@/lib/wordTower/tumbleArc';
 import { punchScaleAt } from '@/lib/wordTower/impactPunch';
 import { shaftWindX } from '@/lib/wordTower/shaftWind';
 import { resonanceSchedule } from '@/lib/wordTower/resonance';
@@ -33,9 +33,12 @@ import { WordTowerParallaxProps } from './WordTowerParallaxProps';
 import { WordTowerSighting } from './WordTowerSighting';
 import { WordTowerMascot } from './WordTowerMascot';
 import { WordTowerMinimap } from './WordTowerMinimap';
+import { WordTowerAmbient } from './WordTowerAmbient';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import type { PlacementQuality } from '@/lib/wordTower/cranePlacement';
 import { landFeedback } from '@/lib/wordTower/landFeedback';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+import { useParticleBudget } from '@/hooks/useParticleBudget';
 
 /** Pixi particle presets carry bare 6-char hex strings ('00ffff'); the biome
  *  palettes are hex ints. Convert int → bare-hex string for `burst({colors})`. */
@@ -143,6 +146,17 @@ const BACK_TO_TOP_REVEAL_PX = 90;
 const VIEW_ALT_QUANTUM_M = 4;
 const quantizeAlt = (m: number) => Math.round(m / VIEW_ALT_QUANTUM_M) * VIEW_ALT_QUANTUM_M;
 
+/** Ambient particle emit interval (ms). */
+const AMBIENT_EMBER_INTERVAL_MS = 180;
+const AMBIENT_DUST_INTERVAL_MS = 260;
+const AMBIENT_STREAK_INTERVAL_MS = 420;
+
+/** Cap a requested particle count by the active budget. */
+function capParticles(requested: number, budgetMax: number): number {
+  if (budgetMax <= 0) return 0;
+  return Math.min(requested, budgetMax);
+}
+
 /** One live row in the unified (committed ++ pending) stack. */
 interface LiveCell {
   key: string;
@@ -175,17 +189,23 @@ function snapContainerY(c: Container, toY: number, dur: number, cancelled: () =>
 /**
  * Imperatively draws the vertical letter-chain into the Pixi camera via a keyed
  * sprite registry (NO teardown per render): newcomers drop in, the connector
- * recolours in place, removed pending tiles pop out, survivors slide. Fires the
+ * recolours in place, removed pending tiles pop out, committed bricks tumble. Fires the
  * per-word celebration FX, and offsets the whole stack by the user's pan.
  */
-function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, locale = 'en', wreckDoneKey = 0, panState }: SceneProps & { panState: MutableRefObject<PanState> }) {
+function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult, dropQuality, reducedMotion, bottomInsetPx = 220, anchorLen = 1, leanDeg = 0, clutchSaveKey = 0, toppleKey = 0, toppleFloors = 1, instability = 0, palette = ZONE_MATERIAL, locale = 'en', wreckDoneKey = 0, panState, heightM }: SceneProps & { panState: MutableRefObject<PanState> }) {
   const engine = useGameEngine();
+  const perf = useDevicePerformance();
+  const particleBudget = useParticleBudget();
   // OUTER container — owns ONLY the vertical translation (climb-follow + user pan).
   const containerRef = useRef<Container | null>(null);
   // INNER container — holds every tile and owns the lean/sway ROTATION, pivoted at
   // the on-screen ground line so the tower tilts from its base and stays centred
   // instead of swinging in a wide arc about a far screen corner.
   const tiltRef = useRef<Container | null>(null);
+  // Ground shadow layer — sits at the screen ground line, under the tower.
+  const groundLayerRef = useRef<Container | null>(null);
+  // Directional light overlay — tints the tower column from the sun/moon side.
+  const lightOverlayRef = useRef<Graphics | null>(null);
   // Screen-y of the ground line the sway pivots about (deck top), kept fresh by
   // the diff effect so the rAF can pivot correctly even mid-pan.
   const groundYRef = useRef(0);
@@ -198,6 +218,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   // Zoom punch: perfect drops / clutch saves pump the tower's scale around its
   // ground pivot (hitstop feel without rescaling the phase-locked clock).
   const punchRef = useRef<{ at: number; intensity: number } | null>(null);
+  // One-off landing wobble impulse for sloppy/miss drops.
+  const wobbleRef = useRef<{ at: number; intensity: number; dir: number } | null>(null);
   const registry = useRef<Map<string, TileSprite>>(new Map());
   const firstRender = useRef(true);
   const prevMaxPos = useRef(-1);
@@ -209,8 +231,16 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   // finishes — duration-derived, NOT a fixed guess, so long words can't jump.
   const lastCommitRef = useRef(0);
   const commitDurRef = useRef(0);
+  // Ambient particle timers.
+  const lastEmberRef = useRef(0);
+  const lastDustRef = useRef(0);
+  const lastStreakRef = useRef(0);
+  // Device-performance flags collapse expensive effects.
+  const isLowEnd = perf.isLowEnd;
+  const enableComplex = perf.enableComplexAnimations && !reducedMotion;
+  const enableGlow = perf.enableGlowEffects && !reducedMotion;
 
-  // One persistent container for the whole tower.
+  // One persistent container for the whole tower + ground shadow + light overlay.
   useEffect(() => {
     const ps = panState.current; // stable object for the component's life
     const c = new Container();            // OUTER — translation only
@@ -219,15 +249,31 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     c.addChild(tilt);
     c.y = ps.shift + ps.y;
     engine.camera.addChild(c);
+
+    const ground = new Container();
+    ground.zIndex = -50;
+    engine.camera.addChild(ground);
+
+    const light = new Graphics();
+    light.zIndex = 500;
+    light.blendMode = 'screen';
+    engine.camera.addChild(light);
+
     containerRef.current = c;
     tiltRef.current = tilt;
+    groundLayerRef.current = ground;
+    lightOverlayRef.current = light;
     ps.container = c;
     const reg = registry.current;
     return () => {
       ps.container = null;
       try { c.destroy({ children: true }); } catch { /* */ }
+      try { ground.destroy({ children: true }); } catch { /* */ }
+      try { light.destroy(); } catch { /* */ }
       containerRef.current = null;
       tiltRef.current = null;
+      groundLayerRef.current = null;
+      lightOverlayRef.current = null;
       reg.clear();
       firstRender.current = true;
       prevMaxPos.current = -1;
@@ -238,12 +284,14 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   useEffect(() => {
     const c = containerRef.current;
     const tilt = tiltRef.current;
+    const ground = groundLayerRef.current;
     if (!c || !tilt) return;
 
     const { width: W, height: H } = engine;
     const centerX = W / 2;
     centerXRef.current = centerX; // shaft-wind tick reads this
-    groundYRef.current = H - bottomInsetPx; // sway/lean pivot rides the deck line
+    const groundScreenY = H - bottomInsetPx;
+    groundYRef.current = groundScreenY; // sway/lean pivot rides the deck line
 
     // Build the unified bottom→top stack: committed letters/bricks + pending ghosts.
     const committed = buildTowerColumn(floors);
@@ -312,7 +360,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     for (const [key, tile] of removed) {
       if (!reducedMotion && tile.pending) popOut(tile, () => { try { tile.destroy({ children: true }); } catch { /* */ } });
       else if (tumbling && !tile.pending) {
-        tumbleOut(tile, tumbleParams(key, Math.sign(leanRef.current) || 1), () => { try { tile.destroy({ children: true }); } catch { /* */ } });
+        tumbleOut(tile, tumbleBounceParams(key, Math.sign(leanRef.current) || 1), () => { try { tile.destroy({ children: true }); } catch { /* */ } });
       }
       else { try { tile.destroy({ children: true }); } catch { /* */ } }
     }
@@ -343,8 +391,10 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
           const depth = l.pending ? Math.max(0, l.pos - C) : 0;
           const fx = letterPlacementFx(depth);
           dropIn(tile, y, 0, () => {
+            if (!enableComplex) return;
             impactRing(tilt, centerX, y + half, half, l.color, fx.ringScale * 0.6);
-            engine.particles.burst(COMBO_FLASH, centerX, y + half, Math.round(fx.particles * 0.6)); // light puff
+            if (fx.dustPuff > 0) engine.particles.burst(TOWER_DUST, centerX, y + half, capParticles(fx.dustPuff, particleBudget.max));
+            engine.particles.burst(COMBO_FLASH, centerX, y + half, capParticles(Math.round(fx.particles * 0.6), particleBudget.max));
           });
         }
       } else {
@@ -368,7 +418,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       }
     }
 
-    // Swivel the committed word in as ONE rigid piece, hinged at its base joint.
+    // Swivel the committed word in as ONE rigid piece, hinged at the base joint.
     if (committing.length > 0 && !reducedMotion) {
       const restYs = committing.map((b) => b.restY);
       const baseRestY = Math.max(...restYs); // bottom-most new brick (largest y)
@@ -392,17 +442,29 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         if (i === 0) {
           // Kick off the whole-tower compression rebound (consumed by the tick loop).
           impactRef.current = { at: performance.now(), intensity: land.impactIntensity };
-          // Success punch — perfect (1.0) / good (0.35) / others 0.
-          if (land.punchIntensity > 0) {
+          // Success punch — perfect (1.0) / good (0.35) / miss shrink (-0.6).
+          if (land.punchIntensity !== 0) {
             punchRef.current = { at: performance.now(), intensity: land.punchIntensity };
+          }
+          // One-off wobble impulse for sloppy/miss drops.
+          if (land.wobbleImpulse > 0) {
+            wobbleRef.current = { at: performance.now(), intensity: land.wobbleImpulse, dir: Math.sign(leanRef.current) || 1 };
           }
           // Layered thud: dual rings + dust + kick, all quality-scaled.
           const heft = committing.length;
-          impactRing(tilt, pivotX, pivotY, half, baseColor, land.ringScale);
-          impactRing(tilt, pivotX, pivotY, half, baseColor, land.ringScale * 0.55);
-          engine.particles.burst(COMBO_FLASH, pivotX, pivotY, land.particles + heft);
+          const budget = particleBudget.max;
+          impactRing(tilt, pivotX, pivotY, half, land.ringColor, land.ringScale);
+          impactRing(tilt, pivotX, pivotY, half, land.ringColor, land.ringScale * 0.55);
+          engine.particles.burst(COMBO_FLASH, pivotX, pivotY, capParticles(land.particles + heft, budget));
+          if (land.dustPuff > 0) engine.particles.burst(TOWER_DUST, pivotX, pivotY + half, capParticles(land.dustPuff, budget));
+          if (land.debris > 0) engine.particles.burst(RUBBLE_BURST, pivotX, pivotY + half, capParticles(land.debris, budget));
           if (land.shakePx > 0) {
             engine.shake.shake({ intensity: land.shakePx, duration: 0.24, decay: 'exponential' });
+          }
+          // Perfect drops get a satisfying green expanding ring.
+          if (land.glow) {
+            impactRing(tilt, pivotX, pivotY, half, 0xbfff00, land.ringScale * 1.3);
+            engine.particles.burst(GOLD_STARS, pivotX, pivotY, capParticles(land.sparkles, budget));
           }
         }
       });
@@ -449,10 +511,19 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       }
     }
 
+    // Ground shadow under the tower base.
+    if (ground) {
+      ground.removeChildren();
+      if (C > 0 && enableGlow) {
+        const groundLocalY = groundScreenY - c.y;
+        drawGroundShadow(ground, centerX, groundLocalY, size, C, palette[biomeForHeight(alts[0] ?? 0)] ?? palette.city);
+      }
+    }
+
     firstRender.current = false;
     prevMaxPos.current = maxPos;
     topPosRef.current = maxPos; // shaft-wind tick reads this
-  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId, palette, locale]);
+  }, [floors, pendingWord, engine, reducedMotion, bottomInsetPx, anchorLen, panState, biomeId, palette, locale, enableComplex, enableGlow, particleBudget, heightM]);
 
   // A rejected WORD is an INPUT mistake, not tower damage — so the error feel
   // lives on the word-builder (HUD: red shake + message + haptic/sound), NOT on
@@ -469,16 +540,18 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     // A floor gave way — a real CRASH: hard camera shake + a shower of rubble
     // raining from the build line + a danger flash + a violent stack wobble, all
     // scaled by how many floors were lost.
-    const fx = toppleCrashFx(toppleFloorsRef.current);
+    const fx = toppleCrashFx(toppleFloorsRef.current, Math.sign(leanRef.current) || 1, CRASH_DARK_COLOR);
     const { width: W, height: H } = engine;
-    engine.shake.shake({ intensity: fx.shakePx, duration: fx.durationS, decay: 'exponential' });
-    engine.particles.burst(CONFETTI_BURST, W / 2, H * 0.22, fx.debris); // tumbling rubble
-    engine.particles.burst(COMBO_FLASH, W / 2, H * 0.24, Math.round(fx.debris / 2)); // dust puff
-    engine.flash.flash({ color: 0xff3366, duration: fx.durationS, intensity: fx.flashAlpha }); // danger jolt
+    const budget = particleBudget.max;
+    engine.shake.shake({ intensity: fx.shakePx, duration: fx.durationS, decay: 'exponential', bias: { x: fx.biasX * fx.shakePx * 0.35, y: 0 } });
+    engine.particles.burst(CONFETTI_BURST, W / 2, H * 0.22, capParticles(fx.debris, budget)); // tumbling rubble
+    engine.particles.burst(RUBBLE_BURST, W / 2, H * 0.24, capParticles(fx.rubble, budget)); // heavy chunks
+    engine.particles.burst(COMBO_FLASH, W / 2, H * 0.24, capParticles(Math.round(fx.debris / 2), budget)); // dust puff
+    engine.flash.flash({ color: fx.darkColor, duration: fx.durationS * 1.4, intensity: fx.flashAlpha }); // danger jolt
     const c = containerRef.current;
-    if (c) shakeX(c); // the whole stack lurches, not just the camera
+    if (c) shakeX(c, fx.shakePx * 0.5, Math.round(fx.durationS * 1000)); // the whole stack lurches, not just the camera
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [toppleKey]);
+  }, [toppleKey, reducedMotion]);
 
   // Visible instability — a static recent-weighted LEAN plus, once the tower is
   // unstable, a continuous SWING that oscillates around the base. The swing is
@@ -496,9 +569,16 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   // Windbreak upgrade calms it (read imperatively to avoid store-churn re-renders).
   const windMultRef = useRef(1);
   windMultRef.current = BIOME_THEME[biomeId].windMult * useTowerUpgradeStore.getState().effects().windMult;
+  const biomeIdRef = useRef(biomeId);
+  biomeIdRef.current = biomeId;
+  const starsRef = useRef(BIOME_THEME[biomeId].stars);
+  starsRef.current = BIOME_THEME[biomeId].stars;
+
   useEffect(() => {
     const c = containerRef.current;
     const tl0 = tiltRef.current;
+    const ground = groundLayerRef.current;
+    const light = lightOverlayRef.current;
     if (!c || !tl0) return;
     if (reducedMotion) { tl0.angle = 0; return; }
     let raf = 0;
@@ -532,11 +612,36 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
         // outside its damped-spring window.
         const imp = impactRef.current;
         const dip = imp ? impactDipPx(0, now - imp.at, imp.intensity) : 0;
-        tl.position.set(centerXRef.current, groundLocal + dip);
-        // Zoom punch — pumps the tower from its base on perfect/clutch beats.
+        // Zoom punch / miss shrink — pumps or compresses the tower from its base.
         const punch = punchRef.current;
-        tl.scale.set(punch ? punchScaleAt(now - punch.at, punch.intensity) : 1);
-        tl.angle = leanRef.current + swayAngleAt(now, inst0) + swayJitterDeg(now, inst0);
+        const baseScale = punch ? punchScaleAt(now - punch.at, punch.intensity) : 1;
+        // One-off landing wobble for sloppy/miss drops.
+        const wobble = wobbleRef.current;
+        const wobbleDeg = wobble ? wobble.dir * wobbleImpulseDeg(now - wobble.at, wobble.intensity) : 0;
+        tl.position.set(centerXRef.current, groundLocal + dip);
+        tl.scale.set(baseScale);
+        tl.angle = leanRef.current + swayAngleAt(now, inst0) + swayJitterDeg(now, inst0) + wobbleDeg;
+
+        // Update ground shadow position to stay pinned at the screen ground line.
+        if (ground && !ground.destroyed) {
+          ground.y = groundYRef.current;
+        }
+
+        // Dynamic light overlay: a soft directional wash from the sun/moon side.
+        if (light && !light.destroyed && enableGlow) {
+          const W = engine.width;
+          const H = engine.height;
+          const stars = starsRef.current;
+          const sunX = W * (0.72 - stars * 0.5);
+          const sunY = H * (0.68 - stars * 0.55);
+          try {
+            light.clear();
+            light.ellipse(sunX, sunY, W * 0.75, H * 0.85)
+              .fill({ color: BIOME_THEME[biomeIdRef.current].celestial.glow, alpha: 0.06 + stars * 0.08 });
+          } catch { /* context nulled post-destroy race */ }
+        } else if (light && !light.destroyed) {
+          try { light.clear(); } catch { /* */ }
+        }
       }
       // Upper-shaft wind: a tiny travelling x-sway on settled crown tiles so a
       // tall tower feels exposed and alive between drops. x-only (never y/scale),
@@ -553,11 +658,56 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
           tile.x = cx + shaftWindX(p, top, now, inst) * windMul;
         }
       }
+
+      // Ambient particles — embers/dust at the base, streaks near the crown.
+      if (enableComplex && registry.current.size > 0) {
+        const W = engine.width;
+        const H = engine.height;
+        const groundY = groundYRef.current;
+        const cx = centerXRef.current;
+        const budget = particleBudget.max;
+        // Embers rise from the base/warm band.
+        if (now - lastEmberRef.current > AMBIENT_EMBER_INTERVAL_MS) {
+          lastEmberRef.current = now;
+          const intensity = 1 - starsRef.current; // fewer embers high up
+          if (intensity > 0.25) {
+            engine.particles.burst(TOWER_EMBERS, cx + (Math.random() - 0.5) * sizeRef.current, groundY + sizeRef.current * 0.3, capParticles(Math.round(1 + intensity * 2), budget));
+          }
+        }
+        // Dust drifts near the base.
+        if (now - lastDustRef.current > AMBIENT_DUST_INTERVAL_MS) {
+          lastDustRef.current = now;
+          engine.particles.burst(TOWER_DUST, cx + (Math.random() - 0.5) * sizeRef.current, groundY + sizeRef.current * 0.2, capParticles(1, budget));
+        }
+        // Air streaks in the upper band.
+        if (starsRef.current > 0.2 && now - lastStreakRef.current > AMBIENT_STREAK_INTERVAL_MS) {
+          lastStreakRef.current = now;
+          const y = H * (0.2 + Math.random() * 0.35);
+          engine.particles.burst(AIR_STREAKS, Math.random() * W, y, capParticles(1, budget));
+        }
+      }
+
+      // Clear expired one-off wobble.
+      if (wobbleRef.current && now - wobbleRef.current.at >= WOBBLE_IMPULSE_MS) {
+        wobbleRef.current = null;
+      }
+
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reducedMotion]);
+  }, [reducedMotion, engine, enableComplex, enableGlow, particleBudget]);
+
+  // Keep the current tile size handy for ambient spawn sizing.
+  const sizeRef = useRef(48);
+  useEffect(() => {
+    const c = containerRef.current;
+    const tilt = tiltRef.current;
+    if (!c || !tilt) return;
+    const { height: H } = engine;
+    const { size } = towerRowLayout({ pinCount: floors.length, H, bottomInsetPx });
+    sizeRef.current = size;
+  }, [floors.length, engine, bottomInsetPx]);
 
   // Full-screen flash when crossing into a new biome.
   const prevBiome = useRef(biomeId);
@@ -571,12 +721,12 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
           { ...GOLD_STARS, colors: BIOME_THEME[biomeId].particles.map(toHexStr) },
           engine.width / 2,
           engine.height * 0.24,
-          34,
+          capParticles(34, particleBudget.max),
         );
       }
       prevBiome.current = biomeId;
     }
-  }, [biomeId, engine, reducedMotion]);
+  }, [biomeId, engine, reducedMotion, particleBudget]);
 
   // Celebration FX on each accepted word — COLOUR-CODED BY DROP QUALITY so the
   // player instantly SEES whether they landed good/ok/bad (founder 2026-06-19:
@@ -589,8 +739,6 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   // Keep the live biome id readable inside the [resultKey]-only FX effect so each
   // celebration burst spits THIS biome's palette (galaxy gold/purple, city
   // lime/white) instead of one generic confetti everywhere.
-  const biomeIdRef = useRef(biomeId);
-  biomeIdRef.current = biomeId;
   useEffect(() => {
     if (resultKey === 0 || !lastResult || reducedMotion) return;
     const { width: W, height: H } = engine;
@@ -600,33 +748,32 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     const q = dropQualityRef.current ?? 'good';
     const land = landFeedback(q);
     const biomePal = BIOME_THEME[biomeIdRef.current].particles.map(toHexStr);
+    const budget = particleBudget.max;
     if (q === 'perfect') {
       // Triumph — lime wash + star shower scaled by landFeedback.
-      engine.flash.flash({ color: 0xbfff00, duration: 0.36, intensity: land.flashIntensity });
-      engine.particles.burst({ ...GOLD_STARS, colors: biomePal }, x, y, 48 + land.sparkles);
-      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, land.particles);
+      engine.flash.flash({ color: land.flashColor, duration: 0.36, intensity: land.flashIntensity });
+      engine.particles.burst({ ...GOLD_STARS, colors: biomePal }, x, y, capParticles(48 + land.sparkles, budget));
+      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, capParticles(land.particles, budget));
       engine.shake.shake({ intensity: land.shakePx, duration: 0.34, decay: 'exponential' });
     } else if (q === 'good') {
-      // A plain good drop leans on the LANDING PHYSICS (swivel + squash + impact
-      // ring, fired at the tile in the diff effect) for its payoff — just a soft
-      // cyan flash here, no extra confetti shower, so the drop feel stays clean
-      // and the physics reads (founder ask 2026-07-17: focus on the drop effect,
-      // reserve confetti for standout beats).
-      engine.flash.flash({ color: 0x22d3ee, duration: 0.22, intensity: land.flashIntensity * 0.7 });
+      engine.flash.flash({ color: land.flashColor, duration: 0.22, intensity: land.flashIntensity * 0.7 });
+      engine.particles.burst({ ...CONFETTI_BURST, colors: biomePal }, x, y, capParticles(land.particles, budget));
     } else if (q === 'sloppy') {
-      engine.flash.flash({ color: 0xffe135, duration: 0.22, intensity: land.flashIntensity });
-      engine.particles.burst(COMBO_FLASH, x, y, land.particles);
+      engine.flash.flash({ color: land.flashColor, duration: 0.22, intensity: land.flashIntensity });
+      engine.particles.burst(COMBO_FLASH, x, y, capParticles(land.particles, budget));
+      if (land.debris > 0) engine.particles.burst(RUBBLE_BURST, x, H * 0.5, capParticles(land.debris, budget));
     } else {
-      engine.flash.flash({ color: 0xff3366, duration: 0.3, intensity: land.flashIntensity });
-      engine.particles.burst(COMBO_FLASH, x, y, land.particles);
+      engine.flash.flash({ color: land.flashColor, duration: 0.3, intensity: land.flashIntensity });
+      engine.particles.burst(COMBO_FLASH, x, y, capParticles(land.particles, budget));
+      if (land.debris > 0) engine.particles.burst(RUBBLE_BURST, x, H * 0.5, capParticles(land.debris, budget));
       engine.shake.shake({ intensity: land.shakePx, duration: 0.26, decay: 'exponential' });
     }
     // Word-length tier flourish on top of the quality cue (longer build = more).
     if (lastResult.tier === 'skyscraper') {
-      engine.particles.burst(GOLD_STARS, x, y, 30);
+      engine.particles.burst(GOLD_STARS, x, y, capParticles(30, budget));
       engine.shake.shake({ intensity: 9, duration: 0.34, decay: 'exponential' });
     } else if (lastResult.tier === 'highRise' || lastResult.tier === 'tall') {
-      engine.particles.burst(CONFETTI_BURST, x, y, 20);
+      engine.particles.burst(CONFETTI_BURST, x, y, capParticles(20, budget));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultKey]);
@@ -637,8 +784,9 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   useEffect(() => {
     if (clutchSaveKey === 0 || reducedMotion) return;
     const { width: W, height: H } = engine;
-    engine.particles.burst(GOLD_STARS, W / 2, H * 0.32, 56);
-    engine.particles.burst(CONFETTI_BURST, W / 2, H * 0.32, 28);
+    const budget = particleBudget.max;
+    engine.particles.burst(GOLD_STARS, W / 2, H * 0.32, capParticles(56, budget));
+    engine.particles.burst(CONFETTI_BURST, W / 2, H * 0.32, capParticles(28, budget));
     engine.flash.flash({ color: 0xbfff00, duration: 0.35, intensity: 0.4 });
     engine.shake.shake({ intensity: 14, duration: 0.45, decay: 'exponential' });
     // The biggest save in the game gets the biggest zoom punch.
@@ -664,6 +812,7 @@ export function WordTowerScene(props: SceneProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ w: number; h: number } | null>(null);
   const pan = useRef<PanState>({ y: 0, panMin: 0, shift: 0, dragging: false, container: null, bgEl: null });
+  const perf = useDevicePerformance();
 
   // The altitude the camera is *looking at* = committed climb, lowered by the
   // user's pan toward the base. While panned, the backdrop (sky/clouds/props)
@@ -821,6 +970,8 @@ export function WordTowerScene(props: SceneProps) {
         <WordTowerParallaxProps heightM={viewAlt} reducedMotion={props.reducedMotion} />
         {/* Rare drifting sightings (cosmic whale / satellite / shooting star). */}
         <WordTowerSighting heightM={viewAlt} reducedMotion={props.reducedMotion} />
+        {/* Ambient leaves / birds / ice crystals — disabled on low-end/reduced motion. */}
+        <WordTowerAmbient biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} enableComplexAnimations={perf.enableComplexAnimations} />
       </div>
       {/* Brand climb companion — pops in to cheer only when a word is built. */}
       <WordTowerMascot
@@ -852,7 +1003,7 @@ export function WordTowerScene(props: SceneProps) {
       )}
       {config && (
         <GameCanvas config={config} usePhysics={false} className="absolute inset-0">
-          <TowerCanvasLayer {...props} panState={pan} />
+          <TowerCanvasLayer {...props} panState={pan} heightM={props.heightM} />
         </GameCanvas>
       )}
       {/* Pan catcher — owns the drag/wheel gesture over the sky. The control deck

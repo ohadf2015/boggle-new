@@ -20,6 +20,10 @@ describe('landFeedback — drop/land + success params', () => {
     expect(f.impactIntensity).toBeLessThan(0.75); // still not a miss slam
     expect(f.ringScale).toBeGreaterThan(1.4);
     expect(f.flashIntensity).toBeGreaterThan(0.3);
+    expect(f.flashColor).toBeGreaterThan(0);
+    expect(f.ringColor).toBeGreaterThan(0);
+    expect(f.wobbleImpulse).toBe(0);
+    expect(f.celebrateTier).toBe('big');
   });
 
   it('good is a solid land with lighter success feedback than perfect', () => {
@@ -30,6 +34,8 @@ describe('landFeedback — drop/land + success params', () => {
     expect(g.sparkles).toBeLessThan(p.sparkles);
     expect(g.punchIntensity).toBeLessThan(p.punchIntensity);
     expect(g.punchIntensity).toBeGreaterThan(0);
+    expect(g.wobbleImpulse).toBe(0);
+    expect(g.celebrateTier).toBe('pop');
   });
 
   it('sloppy/miss never celebrate — impact weight still rises with severity', () => {
@@ -44,7 +50,13 @@ describe('landFeedback — drop/land + success params', () => {
     expect(m.impactIntensity).toBeGreaterThanOrEqual(s.impactIntensity);
     expect(m.impactIntensity).toBeCloseTo(1, 5);
     expect(s.punchIntensity).toBe(0);
-    expect(m.punchIntensity).toBe(0);
+    expect(m.punchIntensity).toBeLessThan(0); // negative = shrink/impact feel
+    expect(s.debris).toBeGreaterThan(0);
+    expect(m.debris).toBeGreaterThanOrEqual(s.debris);
+    expect(s.wobbleImpulse).toBeGreaterThan(0);
+    expect(m.wobbleImpulse).toBeGreaterThan(s.wobbleImpulse);
+    expect(s.celebrateTier).toBe('none');
+    expect(m.celebrateTier).toBe('none');
   });
 
   it('impact intensity is monotonic across quality (miss hits hardest)', () => {
@@ -73,6 +85,8 @@ describe('landFeedback — drop/land + success params', () => {
       expect(f.flashIntensity).toBe(0);
       expect(f.celebrate).toBe(false);
       expect(f.glow).toBe(false);
+      expect(f.debris).toBe(0);
+      expect(f.wobbleImpulse).toBe(0);
       // ringScale stays 1 so layout math never needs a special branch
       expect(f.ringScale).toBe(1);
     }
@@ -83,5 +97,15 @@ describe('landFeedback — drop/land + success params', () => {
     const g = landFeedback('good');
     expect(p.particles + p.sparkles).toBeGreaterThan(g.particles + g.sparkles);
     expect(p.flashIntensity).toBeGreaterThan(g.flashIntensity);
+  });
+
+  it('colours shift from green → cyan → orange → red across quality', () => {
+    const p = landFeedback('perfect');
+    const g = landFeedback('good');
+    const s = landFeedback('sloppy');
+    const m = landFeedback('miss');
+    expect(p.flashColor).not.toBe(g.flashColor);
+    expect(g.flashColor).not.toBe(s.flashColor);
+    expect(s.flashColor).not.toBe(m.flashColor);
   });
 });

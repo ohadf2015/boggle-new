@@ -1,6 +1,7 @@
 // ─── Screen Shake ─────────────────────────────────────────────────────
 // Camera shake effect applied to a PixiJS Container offset.
-// Supports multiple concurrent shakes that stack additively.
+// Supports multiple concurrent shakes that stack additively, plus an optional
+// directional bias so collapses can pull the camera toward the fall side.
 
 import type { ShakeConfig, Vector2 } from './types';
 
@@ -10,6 +11,7 @@ interface ActiveShake {
   elapsed: number;
   decay: 'linear' | 'exponential';
   frequency: number;
+  bias: Vector2;
 }
 
 export class ScreenShake {
@@ -28,6 +30,7 @@ export class ScreenShake {
       elapsed: 0,
       decay: config.decay ?? 'exponential',
       frequency: config.frequency ?? 30,
+      bias: config.bias ?? { x: 0, y: 0 },
     });
   }
 
@@ -70,8 +73,8 @@ export class ScreenShake {
       const phase = s.elapsed * s.frequency * Math.PI * 2;
 
       // Perlin-like 2D shake via phase-offset sin waves
-      totalX += Math.sin(phase) * currentIntensity;
-      totalY += Math.cos(phase * 1.3) * currentIntensity;
+      totalX += Math.sin(phase) * currentIntensity + s.bias.x * decay;
+      totalY += Math.cos(phase * 1.3) * currentIntensity + s.bias.y * decay;
     }
 
     this._offset = { x: Math.round(totalX), y: Math.round(totalY) };

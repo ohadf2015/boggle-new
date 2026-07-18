@@ -7,6 +7,9 @@ import {
   swayHeightDampen,
   steadyHandsDampen,
   effectiveDropError,
+  wobbleImpulseDeg,
+  WOBBLE_IMPULSE_MS,
+  WOBBLE_IMPULSE_MAX_DEG,
   SWAY_MAX_DEG,
   SWAY_START_INSTABILITY,
   STEADY_DAMPEN_MIN,
@@ -160,5 +163,32 @@ describe('steadyHandsDampen — skill calms the crane', () => {
 
   it('reaches the calm floor by STEADY_FULL_STREAK', () => {
     expect(steadyHandsDampen(STEADY_FULL_STREAK)).toBeCloseTo(STEADY_DAMPEN_MIN);
+  });
+});
+
+describe('wobbleImpulseDeg — one-off landing shudder', () => {
+  it('is zero before and after the impulse window', () => {
+    expect(wobbleImpulseDeg(0, 1)).toBe(0);
+    expect(wobbleImpulseDeg(WOBBLE_IMPULSE_MS, 1)).toBe(0);
+    expect(wobbleImpulseDeg(WOBBLE_IMPULSE_MS * 2, 1)).toBe(0);
+  });
+
+  it('is zero at zero intensity', () => {
+    expect(wobbleImpulseDeg(WOBBLE_IMPULSE_MS * 0.3, 0)).toBe(0);
+  });
+
+  it('oscillates within a bounded peak angle', () => {
+    let peak = 0;
+    for (let t = 0; t <= WOBBLE_IMPULSE_MS; t += 16) {
+      const v = Math.abs(wobbleImpulseDeg(t, 1));
+      if (v > peak) peak = v;
+    }
+    expect(peak).toBeGreaterThan(0);
+    expect(peak).toBeLessThanOrEqual(WOBBLE_IMPULSE_MAX_DEG + 1e-6);
+  });
+
+  it('scales monotonically with intensity', () => {
+    const t = WOBBLE_IMPULSE_MS * 0.25;
+    expect(Math.abs(wobbleImpulseDeg(t, 0.5))).toBeLessThan(Math.abs(wobbleImpulseDeg(t, 1)));
   });
 });

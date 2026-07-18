@@ -12,6 +12,10 @@ export interface PlacementFx {
   particles: number;
   /** Scale multiplier for the expanding impact ring. */
   ringScale: number;
+  /** Dust-puff particle count for the landing. */
+  dustPuff: number;
+  /** Tiny debris chips kicked out on later letters. */
+  debris: number;
 }
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
@@ -26,6 +30,8 @@ export function letterPlacementFx(depth: number): PlacementFx {
   return {
     particles: clamp(7 + d * 2, 7, 22),
     ringScale: clamp(1 + d * 0.1, 1, 1.7),
+    dustPuff: clamp(4 + d, 4, 14),
+    debris: d >= 3 ? Math.min(4, d - 2) : 0,
   };
 }
 

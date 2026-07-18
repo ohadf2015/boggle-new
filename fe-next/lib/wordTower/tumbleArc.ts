@@ -10,6 +10,10 @@ export const TUMBLE_MS = 900;
 const GRAVITY_PX_PER_MS2 = 0.0022;
 /** Fraction of the flight after which the block starts fading out. */
 const FADE_START = 0.75;
+/** Time of the ground bounce (as a fraction of total flight). */
+const BOUNCE_AT_K = 0.55;
+/** Velocity retained after the bounce (restitution). */
+const BOUNCE_REST = 0.45;
 
 export interface TumbleParams {
   dirX: -1 | 1;
@@ -19,6 +23,8 @@ export interface TumbleParams {
   vy: number;
   /** Spin rate (deg/ms, signed by dirX). */
   spinDegPerMs: number;
+  /** When true, the arc includes one ground bounce. */
+  bounces?: boolean;
 }
 
 /** FNV-1a — tiny stable hash for per-floor variation. */
@@ -45,6 +51,11 @@ export function tumbleParams(floorKey: string, leanSign: number): TumbleParams {
   };
 }
 
+/** Launch parameters with a single ground bounce for extra collapse drama. */
+export function tumbleBounceParams(floorKey: string, leanSign: number): TumbleParams {
+  return { ...tumbleParams(floorKey, leanSign), bounces: true };
+}
+
 /** Position/rotation/alpha of the tumbling block at `tMs` since launch. */
 export function tumbleAt(
   p: TumbleParams,
@@ -52,9 +63,34 @@ export function tumbleAt(
 ): { dx: number; dy: number; rotDeg: number; alpha: number } {
   const t = Math.max(0, Math.min(TUMBLE_MS, tMs));
   const k = t / TUMBLE_MS;
+
+  let dx: number;
+  let dy: number;
+
+  if (p.bounces) {
+    const tBounce = BOUNCE_AT_K * TUMBLE_MS;
+    const vx = p.vx;
+    if (t <= tBounce) {
+      // First arc: launch up, come down to "ground".
+      dx = vx * t;
+      dy = p.vy * t + 0.5 * GRAVITY_PX_PER_MS2 * t * t;
+    } else {
+      // Bounce arc: position at bounce, velocity reversed and scaled.
+      const xB = vx * tBounce;
+      const yB = p.vy * tBounce + 0.5 * GRAVITY_PX_PER_MS2 * tBounce * tBounce;
+      const vyAfter = -(p.vy + GRAVITY_PX_PER_MS2 * tBounce) * BOUNCE_REST;
+      const dt = t - tBounce;
+      dx = xB + vx * dt;
+      dy = yB + vyAfter * dt + 0.5 * GRAVITY_PX_PER_MS2 * dt * dt;
+    }
+  } else {
+    dx = p.vx * t;
+    dy = p.vy * t + 0.5 * GRAVITY_PX_PER_MS2 * t * t;
+  }
+
   return {
-    dx: p.vx * t,
-    dy: p.vy * t + 0.5 * GRAVITY_PX_PER_MS2 * t * t,
+    dx,
+    dy,
     rotDeg: p.spinDegPerMs * t,
     alpha: k <= FADE_START ? 1 : 1 - (k - FADE_START) / (1 - FADE_START),
   };

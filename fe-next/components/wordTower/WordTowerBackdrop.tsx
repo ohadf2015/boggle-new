@@ -27,6 +27,7 @@ const EASE = 'cubic-bezier(0.22,1,0.36,1)';
 const FLOW = `transform 900ms ${EASE}, background-position 900ms ${EASE}, opacity 1000ms ease-out`;
 
 const SKYLINE = 'M0 26 L0 14 L6 14 L6 8 L12 8 L12 16 L18 16 L18 5 L23 5 L23 16 L30 16 L30 11 L36 11 L36 18 L44 18 L44 7 L49 7 L49 18 L56 18 L56 13 L63 13 L63 4 L68 4 L68 15 L75 15 L75 9 L81 9 L81 17 L88 17 L88 6 L93 6 L93 16 L100 16 L100 26 Z';
+const MOUNTAINS = 'M0 26 L0 18 L8 10 L16 17 L24 7 L32 16 L40 11 L48 19 L56 9 L64 17 L72 12 L80 20 L88 13 L96 21 L100 26 Z';
 
 /** Repeating star-field gradient — `seed` shifts the pattern so layers differ. */
 function starSheet(size: number, dot: number, seed: number): CSSProperties {
@@ -64,6 +65,12 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
   // away") — vertigo with ZERO impact on the Pixi tower's camera/landing math.
   const dolly = reducedMotion ? 1 : dollyScaleFor(heightM);
 
+  // Dynamic sun/moon disc: arcs from low/right toward high/left as you climb,
+  // tinting the whole scene. Colour cools with altitude.
+  const celestialLeft = reducedMotion ? '72%' : `${72 - stars * 50}%`;
+  const celestialTop = reducedMotion ? '68%' : `${68 - stars * 55}%`;
+  const celestialSize = 96 + stars * 40;
+
   return (
     <div
       className="pointer-events-none absolute inset-0 overflow-hidden"
@@ -80,6 +87,22 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
       <div
         className="absolute inset-0 transition-opacity duration-1000"
         style={{ opacity: sun, background: 'radial-gradient(120% 70% at 82% 8%, rgba(255,247,214,0.85), rgba(255,236,180,0.25) 28%, transparent 55%)' }}
+      />
+
+      {/* Dynamic sun/moon disc + glow */}
+      <div
+        className="absolute rounded-full will-change-transform"
+        style={{
+          left: celestialLeft,
+          top: celestialTop,
+          width: celestialSize,
+          height: celestialSize,
+          transform: 'translate(-50%, -50%)',
+          transition: reducedMotion ? 'none' : `left 900ms ${EASE}, top 900ms ${EASE}, width 900ms ${EASE}, height 900ms ${EASE}`,
+          background: `radial-gradient(circle at 35% 30%, ${theme.celestial.core}, ${theme.celestial.glow} 55%, transparent 80%)`,
+          boxShadow: `0 0 ${60 + stars * 30}px ${theme.celestial.glow}`,
+          opacity: 0.6 + sun * 0.35,
+        }}
       />
 
       {/* Three parallax star sheets (far→near). Widely separated depths so the
@@ -106,6 +129,16 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
         <path fill="#7fa8d6" d={SKYLINE} />
       </svg>
 
+      {/* Distant mountain / landmark silhouettes — a second far depth layer. */}
+      <svg
+        className="absolute inset-x-0 bottom-[18%] h-[22%] w-full"
+        style={{ opacity: b.skyline * 0.55, transition: FLOW, transform: `translateY(${slide(0.55, 900)}px)` }}
+        viewBox="0 0 100 26"
+        preserveAspectRatio="none"
+      >
+        <path fill={theme.landmarkColor} d={MOUNTAINS} />
+      </svg>
+
       {/* High-altitude cirrus wisps — thin, biome-tinted streaks that keep the
           upper sky alive between the clouds (below) and deep space. They build
           through the stratosphere/orbit and fade out by the galaxy (the aurora
@@ -118,6 +151,19 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
         <div className="wt-wisp" style={{ top: '34%', width: 220, height: 11, animationDuration: '190s', animationDelay: '-80s' }} />
         <div className="wt-wisp" style={{ top: '52%', width: 320, height: 16, animationDuration: '230s', animationDelay: '-140s' }} />
       </div>
+
+      {/* Faint air-current streaks — horizontal speed lines in the upper bands. */}
+      {stars > 0.15 && (
+        <div
+          className="absolute inset-0"
+          style={{ opacity: Math.min(0.35, stars * 0.4), transition: FLOW }}
+        >
+          <div className="wt-streak" style={{ top: '28%', width: 180, animationDuration: '5s', animationDelay: '-1s' }} />
+          <div className="wt-streak" style={{ top: '44%', width: 240, animationDuration: '7s', animationDelay: '-3s' }} />
+          <div className="wt-streak" style={{ top: '62%', width: 160, animationDuration: '6s', animationDelay: '-5s' }} />
+          <div className="wt-streak" style={{ top: '78%', width: 200, animationDuration: '8s', animationDelay: '-2s' }} />
+        </div>
+      )}
 
       {/* Nebula-specific ambient wisps — drifting gas clouds in the nebula band.
           Adds to the alien/organic feel of the nebula biome. */}
@@ -220,6 +266,18 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
           animation-timing-function: linear;
           animation-iteration-count: infinite;
         }
+        /* Horizontal air-current streaks — faint speed lines. */
+        .wt-streak {
+          position: absolute;
+          left: 0;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45) 40%, rgba(255,255,255,0.45) 60%, transparent);
+          border-radius: 2px;
+          filter: blur(1px);
+          animation-name: wt-streak-drift;
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
+        }
         .wt-cloud::before,
         .wt-cloud::after {
           content: '';
@@ -230,6 +288,7 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
         .wt-cloud::before { width: 52%; height: 150%; left: 9%; top: -62%; }
         .wt-cloud::after  { width: 42%; height: 122%; right: 11%; top: -44%; }
         @keyframes wt-drift { from { transform: translateX(-30%); } to { transform: translateX(130vw); } }
+        @keyframes wt-streak-drift { from { transform: translateX(-40vw); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } to { transform: translateX(130vw); opacity: 0; } }
         /* Soft electric aurora that slowly drifts + breathes (no blur — neo). */
         .wt-aurora {
           inset: -25% -15%;
@@ -277,6 +336,7 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
         @media (prefers-reduced-motion: reduce) {
           .wt-cloud { animation: none !important; }
           .wt-wisp { animation: none !important; }
+          .wt-streak { animation: none !important; }
           .wt-aurora { animation: none !important; }
           .wt-nebula-wisp { animation: none !important; }
           .wt-galaxy-sparkle { animation: none !important; }
