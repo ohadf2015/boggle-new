@@ -5458,6 +5458,14 @@ const es = {
     "multiplayerTip": "¡En multijugador, la velocidad importa!",
     "wordsPerMin": "Palabras/min",
     "topCreators": "Mejores Creadores",
+    "referral": {
+      "inviteFriends": "¡Invita amigos y gana recompensas!",
+      "subtitle": "Comparte tu código y ambos ganáis 100 XP + 50 monedas cuando jueguen.",
+      "shareText": "🎮 ¡Juega a LexiClash conmigo! Te reto a un duelo de palabras.",
+      "copied": "¡Enlace copiado!",
+      "friendsJoined": "amigos se unieron",
+      "noReferralsYet": "Aún no hay referidos"
+    },
     "tierUp": {
       "title": "¡Subiste de Rango!",
       "message": "¡Has alcanzado {tier}!"
