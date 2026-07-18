@@ -1,10 +1,11 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { m } from 'framer-motion';
-import { Play, Crown, Check, X, Trophy } from 'lucide-react';
+import { m, AnimatePresence } from 'framer-motion';
+import { Play, Crown, Check, X, Trophy, Zap, Flame } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useReducedMotion } from 'framer-motion';
 import { MODE_ICONS, MODE_ACTIVE_COLORS, getModeLabel, getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
@@ -88,6 +89,7 @@ export default function StickyReadyBar({
   desktopProminent = false,
 }: StickyReadyBarProps) {
   const { t } = useLanguage();
+  const reducedMotion = useReducedMotion();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   const AUTO_SECONDS = isOnCrazyGamesPlatform ? AUTO_SECONDS_CG : AUTO_SECONDS_DEFAULT;
 
@@ -253,7 +255,29 @@ export default function StickyReadyBar({
                   <span className="truncate">{t('results.defendTitle')}</span>
                 </>
               )}
-              <span className="tabular-nums text-sm opacity-70">{secondsLeft}</span>
+              <span
+                className={cn(
+                  'tabular-nums text-sm',
+                  secondsLeft <= 5 ? 'text-neo-yellow font-black animate-pulse' : 'opacity-70'
+                )}
+              >
+                {secondsLeft <= 5 && !reducedMotion ? (
+                  <AnimatePresence mode="popLayout">
+                    <m.span
+                      key={secondsLeft}
+                      initial={{ scale: 1.5, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      exit={{ scale: 0.5, opacity: 0 }}
+                      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                      className="inline-block"
+                    >
+                      {secondsLeft}
+                    </m.span>
+                  </AnimatePresence>
+                ) : (
+                  secondsLeft
+                )}
+              </span>
             </span>
           </m.button>
           <button
