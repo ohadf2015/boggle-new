@@ -5364,6 +5364,14 @@ const sv = {
     "multiplayerTip": "Hitta unika ord för att poänga! Delade ord ger 0.",
     "wordsPerMin": "Ord/min",
     "topCreators": "Toppkreatörer",
+    "referral": {
+      "inviteFriends": "Bjud in vänner, tjäna belöningar!",
+      "subtitle": "Dela din kod så får ni båda 100 XP + 50 mynt när de spelar.",
+      "shareText": "🎮 Spela LexiClash med mig! Jag utmanar dig på ett ordspel!",
+      "copied": "Länk kopierad!",
+      "friendsJoined": "vänner gick med",
+      "noReferralsYet": "Inga hänvisningar ännu"
+    },
     "tierUp": {
       "title": "Nivå upp!",
       "message": "Du har nått {tier}!"

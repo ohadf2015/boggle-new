@@ -5105,6 +5105,14 @@ const ja = {
     "multiplayerTip": "ユニークな単語を見つけてスコア！他の人とかぶると0点だよ。",
     "wordsPerMin": "語/分",
     "topCreators": "トップクリエイター",
+    "referral": {
+      "inviteFriends": "友達を招待して報酬をゲット！",
+      "subtitle": "コードを共有すると、友達がプレイしたときに二人とも100 XP＋50コインがもらえます。",
+      "shareText": "🎮 LexiClashで一緒に遊ぼう！ワードゲームで勝負だ！",
+      "copied": "リンクをコピーしました！",
+      "friendsJoined": "人の友達が参加",
+      "noReferralsYet": "まだ紹介がありません"
+    },
     "tierUp": {
       "title": "ランクアップ！",
       "message": "{tier}に昇格しました！"
