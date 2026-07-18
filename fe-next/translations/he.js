@@ -5489,6 +5489,7 @@ const he = {
     "totalPoints": "סה״כ נק׳",
     "topPercent": "{percent}% העליונים",
     "noRankYet": "שחק משחקים כדי להיכנס לדירוג!",
+    "comingSoon": "בקרוב! אנחנו מכינים את טבלת המובילים.",
     "viewLeaderboard": "צפייה בטבלת מובילים",
     "friends": "חברים",
     "noFriendsPlayed": "עדיין אף חבר לא שיחק היום!",

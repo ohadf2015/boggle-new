@@ -5432,6 +5432,7 @@ const es = {
     "totalPoints": "total pts",
     "topPercent": "Top {percent}%",
     "noRankYet": "¡Juega partidas para clasificarte!",
+    "comingSoon": "¡Muy pronto! Estamos preparando la tabla de clasificación.",
     "viewLeaderboard": "Ver Clasificación",
     "friends": "Amigos",
     "noFriendsPlayed": "¡Ninguno de tus amigos ha jugado hoy todavía!",

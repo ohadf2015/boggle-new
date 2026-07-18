@@ -5338,6 +5338,7 @@ const sv = {
     "totalPoints": "totalt",
     "topPercent": "Topp {percent}%",
     "noRankYet": "Spela för att bli rankad!",
+    "comingSoon": "Kommer snart! Vi förbereder topplistan.",
     "viewLeaderboard": "Visa topplista",
     "friends": "Vänner",
     "noFriendsPlayed": "Ingen av dina vänner har spelat idag än!",

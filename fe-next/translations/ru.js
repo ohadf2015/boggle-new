@@ -2047,6 +2047,7 @@ const ru = {
     "totalPoints": "всего пт",
     "topPercent": "Топ {percent}%",
     "noRankYet": "Играй в игры, чтобы получить рейтинг!",
+    "comingSoon": "Скоро! Мы настраиваем таблицу лидеров.",
     "viewLeaderboard": "Посмотреть таблицу лидеров",
     "friends": "Друзья",
     "noFriendsPlayed": "Ни один из твоих друзей ещё не играл сегодня!",

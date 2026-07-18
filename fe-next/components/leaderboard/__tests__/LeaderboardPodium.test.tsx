@@ -64,4 +64,17 @@ describe('LeaderboardPodium', () => {
     const { container } = render(<LeaderboardPodium entries={[]} language="en" />);
     expect(container.firstChild).toBeNull();
   });
+
+  it('renders the champion glow as non-interactive so it never blocks clicks', () => {
+    render(<LeaderboardPodium entries={entries} language="en" />);
+    const glow = screen.getByTestId('podium-champion-glow');
+    expect(glow.className).toContain('pointer-events-none');
+  });
+
+  it('links each podium player to their profile page', () => {
+    render(<LeaderboardPodium entries={entries} language="en" />);
+    expect(screen.getByText('Ada').closest('a')).toHaveAttribute('href', '/en/player/a');
+    expect(screen.getByText('Ben').closest('a')).toHaveAttribute('href', '/en/player/b');
+    expect(screen.getByText('Cy').closest('a')).toHaveAttribute('href', '/en/player/c');
+  });
 });

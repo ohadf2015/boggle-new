@@ -5079,6 +5079,7 @@ const ja = {
     "totalPoints": "合計",
     "topPercent": "トップ{percent}%",
     "noRankYet": "ゲームをプレイしてランク入り!",
+    "comingSoon": "近日公開！リーダーボードを準備中です。",
     "viewLeaderboard": "リーダーボードを見る",
     "friends": "フレンド",
     "noFriendsPlayed": "今日はまだフレンドが誰も遊んでいません！",
