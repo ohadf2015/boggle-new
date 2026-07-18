@@ -394,6 +394,38 @@ nightly_parse_test_failures() {
     | sort -u
 }
 
+# nightly_parse_worker_crashed_tests <gate_output_file> → repo-relative TEST FILE paths
+# (fe-next/...) whose vitest WORKER FAILED TO START / was terminated (fork-spawn crash or
+# OOM under machine load) — an INFRA crash that prints NO `FAIL <path>` header.
+#
+# WHY this exists (2026-07-18 false-drop incident): the baseline-aware salvage compares the
+# authored gate's failing tests to a clean-HEAD baseline gate's. A pre-existing-broken test
+# (`AdventureView.timerPerf.test.tsx`) FAILED normally in the authored gate (→ a FAIL line)
+# but its worker CRASHED AT FORK-START in the scoped baseline gate under load:
+#   `[vitest-pool]: Failed to start forks worker for test files …/AdventureView.timerPerf.test.tsx.`
+# That crash emits no FAIL header, so nightly_parse_test_failures saw it as NOT-failing on
+# baseline → the decision computed it as a NEW authored-introduced failure → since the file is
+# non-authored it was neither shipped nor peeled → fallthrough → docs-only DROP of all 11
+# build-clean lane files. A worker that never started proves NOTHING about the test — its
+# baseline verdict is UNKNOWN, not GREEN. The caller unions these into the baseline "failing"
+# set so an inconclusive-on-baseline test can't masquerade as a fresh authored break.
+#
+# vitest can name several files in one crash line ("… for test files A, B."); the token
+# scraper picks every test path in the matched lines. Same infra-crash phrasings + vitest-pool
+# namespace that nightly_gate_has_unattributed_failures already knows (kept in sync).
+# Best-effort: prints nothing if unparseable (caller stays safe — a miss only reverts to the
+# prior conservative behavior, never ships more).
+nightly_parse_worker_crashed_tests() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 0
+  sed -E $'s/\x1b\\[[0-9;]*m//g' "$out" 2>/dev/null \
+    | grep -aE 'Failed to start .*worker for test files|Worker terminated|ERR_WORKER_OUT_OF_MEMORY|Worker forks emitted error|Failed to terminate .*worker|\[vitest-pool(-runner)?\]:' \
+    | grep -aoE '[A-Za-z0-9_./-]+\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)' \
+    | awk '{ if ($0 ~ /\/fe-next\//) sub(/^.*\/fe-next\//,"fe-next/"); else if ($0 !~ /^fe-next\//) $0="fe-next/"$0; print }' \
+    | grep -v '/node_modules/' \
+    | sort -u
+}
+
 # nightly_gate_has_unattributed_failures <gate_output_file> → exit 0 (true) iff the gate
 # output contains a CODE-level failure that nightly_parse_test_failures CANNOT see as a
 # `FAIL <path>` line — so the baseline-aware 'ship' verdict ("every FAIL-line test also fails

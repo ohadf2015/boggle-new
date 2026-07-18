@@ -857,7 +857,15 @@ if [ "$gate_ok" = "0" ] && [ "${iso_rc:-1}" = "1" ]; then
         rm -f "${NIGHTLY_LAST_GATE_OUTPUT:-}" 2>/dev/null || true
         # Pure verdict (unit-tested: nightly_baseline_ship_decision).
         _af_file=$(mktemp); printf '%s\n' "$_authored_fail_tests" > "$_af_file"
+        # Baseline "failing" set = FAIL-line tests UNION worker-crashed tests. A test whose
+        # vitest worker FAILED TO START on baseline (fork-spawn crash / OOM under machine load)
+        # produced no FAIL header, so it is NOT proven green on baseline — its verdict is UNKNOWN.
+        # Unioning it here stops a pre-existing-broken-but-flaky-crashing test from being misread
+        # as a NEW authored failure → the 2026-07-18 false docs-only drop of 11 build-clean files
+        # (baseline crashed on AdventureView.timerPerf → phantom-new → fallthrough → drop-all).
         _bf_file=$(mktemp); nightly_parse_test_failures "$_baseline_out" > "$_bf_file"
+        nightly_parse_worker_crashed_tests "$_baseline_out" >> "$_bf_file"
+        sort -u -o "$_bf_file" "$_bf_file"
         _decision=$(nightly_baseline_ship_decision "$_af_file" "$_bl_rc" "$_bf_file" "$NIGHTLY_AUTHORED_FILE")
         case "$(printf '%s\n' "$_decision" | head -n1)" in
           ship)

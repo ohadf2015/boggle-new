@@ -284,6 +284,52 @@ assert "red baseline w/ no test-fail list → fallthrough" "[ \"\$(nightly_basel
 assert "no authored failing tests → fallthrough" "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BF $_ALLOW)\" = fallthrough ]"
 rm -f "$_AF" "$_BF" "$_ALLOW"
 
+echo "── gate-isolated: nightly_parse_worker_crashed_tests (2026-07-18 false-drop fix) ──"
+_WC=$(mktemp)
+# A vitest worker that FAILED TO START prints NO `FAIL <path>` header — parse the crash line
+# so a baseline worker-crash is treated as INCONCLUSIVE (not green), never a phantom-new failure.
+printf '%s\n' \
+  'stderr | Error: [vitest-pool]: Failed to start forks worker for test files /tmp/nightly-gate.XXXX/fe-next/components/adventure/__tests__/AdventureView.timerPerf.test.tsx.' \
+  '✓ components/other/foo.test.ts (3)' > "$_WC"
+assert "worker-start crash line → parses the crashed test path" \
+  "[ \"\$(nightly_parse_worker_crashed_tests $_WC)\" = 'fe-next/components/adventure/__tests__/AdventureView.timerPerf.test.tsx' ]"
+# Multiple files named in one crash line (vitest batches).
+printf '[vitest-pool]: Failed to start forks worker for test files /w/fe-next/a.test.ts, /w/fe-next/b.test.ts.\n' > "$_WC"
+assert "one crash line naming 2 files → parses BOTH" \
+  "[ \"\$(nightly_parse_worker_crashed_tests $_WC | tr '\n' ' ')\" = 'fe-next/a.test.ts fe-next/b.test.ts ' ]"
+# OOM-terminated worker (memory limit) also counts.
+printf 'Worker terminated due to reaching memory limit: JS heap out of memory /w/fe-next/heavy.test.tsx\n' > "$_WC"
+assert "OOM worker-terminated line → parses the test path" \
+  "[ \"\$(nightly_parse_worker_crashed_tests $_WC)\" = 'fe-next/heavy.test.tsx' ]"
+# No crash → nothing.
+printf '✓ all good\nFAIL components/x/y.test.ts\n' > "$_WC"
+assert "no worker-crash line → empty" "[ -z \"\$(nightly_parse_worker_crashed_tests $_WC)\" ]"
+rm -f "$_WC"
+
+echo "── gate-isolated: baseline-aware SHIP after worker-crash union (2026-07-18 regression) ──"
+# END-TO-END reproduction of the 2026-07-18 false docs-only drop of 11 build-clean files:
+# authored gate FAILS 3 pre-existing-broken adventure tests; baseline gate FAILS 2 by FAIL-line
+# but its worker CRASHED on the 3rd (timerPerf) → no FAIL header. WITHOUT the union the decision
+# saw timerPerf as a NEW authored failure (non-authored → neither ship nor peel → fallthrough →
+# drop-all). WITH the union (as run.sh now does) timerPerf counts as failing-on-baseline → ship.
+_AF=$(mktemp); _BFRAW=$(mktemp); _BOUT=$(mktemp); _ALLOW=$(mktemp)
+printf 'fe-next/components/adventure/__tests__/AdventureView.integration.test.tsx\nfe-next/components/adventure/__tests__/AdventureView.music.test.tsx\nfe-next/components/adventure/__tests__/AdventureView.timerPerf.test.tsx\n' > "$_AF"
+# Simulated baseline gate output: 2 real FAIL lines + a worker-start crash on timerPerf.
+printf '%s\n' \
+  ' FAIL  components/adventure/__tests__/AdventureView.integration.test.tsx > x' \
+  ' FAIL  components/adventure/__tests__/AdventureView.music.test.tsx > y' \
+  'Error: [vitest-pool]: Failed to start forks worker for test files /w/fe-next/components/adventure/__tests__/AdventureView.timerPerf.test.tsx.' > "$_BOUT"
+: > "$_ALLOW"  # none authored (adventure tests are not in the nightly's authored set)
+# OLD path (FAIL lines only) → fallthrough (the bug).
+nightly_parse_test_failures "$_BOUT" > "$_BFRAW"
+assert "WITHOUT crash-union → fallthrough (the 2026-07-18 bug)" \
+  "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BFRAW $_ALLOW)\" = fallthrough ]"
+# NEW path (FAIL lines UNION worker-crashes) → ship (the fix).
+nightly_parse_worker_crashed_tests "$_BOUT" >> "$_BFRAW"; sort -u -o "$_BFRAW" "$_BFRAW"
+assert "WITH crash-union → ship (fix: baseline worker-crash = inconclusive, not new failure)" \
+  "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BFRAW $_ALLOW)\" = ship ]"
+rm -f "$_AF" "$_BFRAW" "$_BOUT" "$_ALLOW"
+
 echo "── gate-isolated: nightly_baseline_test_tokens (targeted baseline filters) ──"
 # The full-suite baseline gate WEDGED on 2026-06-13 (a network integration test hung in
 # the 3278-test suite → rc=3 inconclusive → misread as 'HEAD green' → docs-only DROP of
