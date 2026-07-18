@@ -5020,6 +5020,14 @@ const en = {
     "multiplayerTip": "Unique words score more!",
     "wordsPerMin": "Words/min",
     "topCreators": "Top Creators",
+    "referral": {
+      "inviteFriends": "Invite Friends, Earn Rewards!",
+      "subtitle": "Share your code and both get 100 XP + 50 coins when they play!",
+      "shareText": "🎮 Play LexiClash with me! Challenge me to a word game!",
+      "copied": "Link copied!",
+      "friendsJoined": "friends joined",
+      "noReferralsYet": "No referrals yet"
+    },
     "tierUp": {
       "title": "Tier Up!",
       "message": "You've reached {tier}!"

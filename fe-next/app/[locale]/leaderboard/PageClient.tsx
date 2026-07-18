@@ -423,10 +423,7 @@ export default function LeaderboardPageClient(): React.JSX.Element {
 
           {/* Leaderboard Table — ranks 4+ (top 3 live in the podium above) */}
           {leaderboard.length > 3 && (
-          <m.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.4, ease: 'easeOut' }}
+          <div
             className={cn(
               'rounded-neo-lg overflow-hidden border-3 border-neo-black shadow-hard',
               isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
@@ -445,36 +442,25 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               <div className="col-span-2 text-right">{t('leaderboard.games')}</div>
             </div>
 
-            {/* Table Body with staggered row animation */}
-            <m.div className="divide-y divide-gray-200 dark:divide-slate-700"
-              initial="hidden"
-              animate="visible"
-              variants={{
-                visible: { transition: { staggerChildren: 0.025 } },
-              }}
-            >
+            {/* Table Body */}
+            <div className="divide-y divide-gray-200 dark:divide-slate-700">
               {leaderboard.slice(3).map((entry: LeaderboardEntry, index: number) => {
                 const rank = index + 4;
                 const isCurrentUser = user?.id === entry.player_id;
 
                 return (
-                  <m.div
+                  <div
                     key={entry.player_id}
-                    variants={{
-                      hidden: { opacity: 0, x: -8 },
-                      visible: { opacity: 1, x: 0, transition: { duration: 0.25, ease: 'easeOut' } },
-                    }}
                     className={cn(
-                      'flex flex-col sm:grid sm:grid-cols-10 gap-1 sm:gap-3 px-3 py-3 items-start sm:items-center transition-all duration-200',
+                      'flex flex-col sm:grid sm:grid-cols-10 gap-1 sm:gap-3 px-3 py-3 items-start sm:items-center transition-all duration-150',
                       isCurrentUser
                         ? isDarkMode
                           ? 'bg-cyan-900/20'
                           : 'bg-cyan-50'
                         : isDarkMode
-                          ? 'hover:bg-neo-navy-elevated/30 hover:scale-[1.01]'
-                          : 'hover:bg-gray-50 hover:scale-[1.01]'
+                          ? 'hover:bg-neo-navy-elevated/30'
+                          : 'hover:bg-gray-50'
                     )}
-                    whileHover={isCurrentUser ? undefined : { x: 3, transition: { duration: 0.15 } }}
                   >
                     <div className="hidden sm:block sm:col-span-1 text-center">{getRankIcon(rank)}</div>
                     <div className="flex items-center gap-2 w-full sm:w-auto sm:col-span-5">
@@ -523,11 +509,11 @@ export default function LeaderboardPageClient(): React.JSX.Element {
                     <div className={cn('hidden sm:block sm:col-span-2 text-right text-sm', (isDarkMode ? 'text-neo-cream/70' : 'text-gray-600'))}>
                       {entry.games_played || 0}
                     </div>
-                  </m.div>
+                  </div>
                 );
               })}
-            </m.div>
-          </m.div>
+            </div>
+          </div>
           )}
         </PageStateHandler>
 

@@ -5515,6 +5515,14 @@ const he = {
     "multiplayerTip": "מילים ייחודיות = נקודות! מילים משותפות = אפס 🎯",
     "wordsPerMin": "מילים/דקה",
     "topCreators": "יוצרים מובילים",
+    "referral": {
+      "inviteFriends": "הזמינו חברים, קבלו פרסים!",
+      "subtitle": "שתפו את הקוד שלכם ושניכם מקבלים 100 XP + 50 מטבעות כשהם משחקים!",
+      "shareText": "🎮 שחקו איתי ב-LexiClash! אתגרו אותי למשחק מילים!",
+      "copied": "הקישור הועתק!",
+      "friendsJoined": "חברים הצטרפו",
+      "noReferralsYet": "עדיין אין הפניות"
+    },
     "tierUp": {
       "title": "עלייה בדרגה!",
       "message": "הגעת ל-{tier}!"
