@@ -34,21 +34,22 @@ const RANK_STYLE: Record<1 | 2 | 3, { pedestal: string; medal: string; ring: str
   3: { pedestal: 'bg-neo-orange', medal: 'bg-neo-orange', ring: 'ring-neo-orange', pedH: 'h-10 sm:h-12', score: 'text-neo-orange' },
 };
 
+const CONFETTI_COLORS = ['bg-neo-yellow', 'bg-neo-pink', 'bg-neo-cyan', 'bg-neo-lime', 'bg-neo-orange', 'bg-neo-purple'];
+
 /** Floating confetti particles for the champion */
 const ConfettiParticles = memo(() => {
   const reduce = useReducedMotion();
-  if (reduce) return null;
-
-  const colors = ['bg-neo-yellow', 'bg-neo-pink', 'bg-neo-cyan', 'bg-neo-lime', 'bg-neo-orange', 'bg-neo-purple'];
   const particles = useMemo(() =>
     Array.from({ length: 12 }, (_, i) => ({
       id: i,
-      color: colors[i % colors.length],
+      color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
       x: (i % 6) * 18 - 54,
       delay: i * 0.15,
       rotate: i * 37,
     })),
   []);
+
+  if (reduce) return null;
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden>
