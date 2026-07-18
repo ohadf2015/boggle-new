@@ -5433,6 +5433,14 @@ const es = {
     "topPercent": "Top {percent}%",
     "noRankYet": "¡Juega partidas para clasificarte!",
     "comingSoon": "¡Muy pronto! Estamos preparando la tabla de clasificación.",
+    "referral": {
+      "inviteFriends": "¡Invita a amigos y gana recompensas!",
+      "subtitle": "Comparte tu código y ambos ganáis 100 XP + 50 monedas cuando jueguen.",
+      "shareText": "🎮 ¡Juega a LexiClash conmigo! Te reto a un duelo de palabras.",
+      "copied": "¡Enlace copiado!",
+      "friendsJoined": "amigos se unieron",
+      "noReferralsYet": "Aún no hay invitados"
+    },
     "viewLeaderboard": "Ver Clasificación",
     "friends": "Amigos",
     "noFriendsPlayed": "¡Ninguno de tus amigos ha jugado hoy todavía!",

@@ -5339,6 +5339,14 @@ const sv = {
     "topPercent": "Topp {percent}%",
     "noRankYet": "Spela för att bli rankad!",
     "comingSoon": "Kommer snart! Vi förbereder topplistan.",
+    "referral": {
+      "inviteFriends": "Bjud in vänner och tjäna belöningar!",
+      "subtitle": "Dela din kod så får ni båda 100 XP + 50 mynt när de spelar!",
+      "shareText": "🎮 Spela LexiClash med mig! Jag utmanar dig på ett ordspel!",
+      "copied": "Länk kopierad!",
+      "friendsJoined": "vänner har gått med",
+      "noReferralsYet": "Inga inbjudna än"
+    },
     "viewLeaderboard": "Visa topplista",
     "friends": "Vänner",
     "noFriendsPlayed": "Ingen av dina vänner har spelat idag än!",

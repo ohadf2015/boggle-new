@@ -48,7 +48,7 @@ export default function ReferralShareBanner() {
     try {
       await navigator.clipboard.writeText(data.shareUrl);
       setCopied(true);
-      neoSuccessToast(t('referral.copied') || 'Link copied!');
+      neoSuccessToast(t('leaderboard.referral.copied') || 'Link copied!');
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Fallback
@@ -65,13 +65,13 @@ export default function ReferralShareBanner() {
 
   const handleShare = useCallback(async () => {
     if (!data?.shareUrl) return;
-    const text = `${t('referral.shareText') || '🎮 Play LexiClash with me! Challenge me to a word game!'}\n\n${data.shareUrl}`;
+    const text = `${t('leaderboard.referral.shareText') || '🎮 Play LexiClash with me! Challenge me to a word game!'}\n\n${data.shareUrl}`;
 
     if (navigator.share) {
       await navigator.share({ title: 'LexiClash', text, url: data.shareUrl });
     } else {
       await navigator.clipboard.writeText(text);
-      neoSuccessToast(t('referral.copied') || 'Copied to clipboard!');
+      neoSuccessToast(t('leaderboard.referral.copied') || 'Copied to clipboard!');
     }
   }, [data, t]);
 
@@ -98,10 +98,10 @@ export default function ReferralShareBanner() {
           {/* Content */}
           <div className="flex-1 min-w-0">
             <h3 className="font-bold text-sm sm:text-base text-white">
-              {t('referral.inviteFriends') || 'Invite Friends, Earn Rewards!'}
+              {t('leaderboard.referral.inviteFriends') || 'Invite Friends, Earn Rewards!'}
             </h3>
             <p className="text-xs text-neo-cream/70 mt-0.5">
-              {t('referral.subtitle') || 'Share your code and both get 100 XP + 50 coins when they play!'}
+              {t('leaderboard.referral.subtitle') || 'Share your code and both get 100 XP + 50 coins when they play!'}
             </p>
 
             {/* Referral code display */}
@@ -111,8 +111,8 @@ export default function ReferralShareBanner() {
               </code>
               <span className="text-xs text-neo-cream/50">
                 {data.referralCount > 0
-                  ? `${data.referralCount} ${t('referral.friendsJoined') || 'friends joined'}`
-                  : t('referral.noReferralsYet') || 'No referrals yet'}
+                  ? `${data.referralCount} ${t('leaderboard.referral.friendsJoined') || 'friends joined'}`
+                  : t('leaderboard.referral.noReferralsYet') || 'No referrals yet'}
               </span>
             </div>
           </div>
