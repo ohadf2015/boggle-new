@@ -25,6 +25,7 @@ import { safeToLocaleString } from '@/utils/bcp47Locale';
 import Link from 'next/link';
 import Avatar from '@/components/Avatar';
 import { InlineBannerAd } from '@/components/ads';
+import ReferralShareBanner from '@/components/referral/ReferralShareBanner';
 const NearRankIndicator = dynamic(() => import('@/components/leaderboard/NearRankIndicator'), { ssr: false });
 import LeaderboardPodium from '@/components/leaderboard/LeaderboardPodium';
 import { TierBadge, TierProgressBar } from '@/components/ui/TierBadge';
@@ -416,6 +417,9 @@ export default function LeaderboardPageClient(): React.JSX.Element {
               />
             </div>
           )}
+
+          {/* Referral Share Banner — invite friends for rewards */}
+          {profile && <div className="mb-6"><ReferralShareBanner /></div>}
 
           {/* Leaderboard Table — ranks 4+ (top 3 live in the podium above) */}
           {leaderboard.length > 3 && (
