@@ -102,6 +102,18 @@ const FriendsList: React.FC<FriendsListProps> = ({
   const [authModalMode, setAuthModalMode] = useState<'signin' | 'signup'>('signup');
   const setIsInGame = useHideNavigation();
 
+  // Drive the global bottom-nav hiding off the open chat thread, with a cleanup
+  // that ALWAYS restores the nav on unmount. Previously nav-hiding was toggled
+  // imperatively (setIsInGame(true) on open, false only in the in-thread close
+  // handler). Leaving the chat by the device/browser back gesture unmounts this
+  // component without firing onClose, so `isInGame` — stored in the layout-level
+  // NavigationContext — stayed true and the bottom tab bar vanished on every
+  // subsequent page. One declarative source of truth = no leak (Class 2/4).
+  useEffect(() => {
+    setIsInGame(!!selectedThread);
+    return () => setIsInGame(false);
+  }, [selectedThread, setIsInGame]);
+
   const socketContext = useSocketOptional();
   const giftSocket = socketContext?.socket ?? null;
   const isGiftSocketConnected = socketContext?.isConnected ?? false;
@@ -237,9 +249,8 @@ const FriendsList: React.FC<FriendsListProps> = ({
 
   const handleThreadClick = useCallback((thread: MessageThreadType) => {
     setSelectedThread(thread);
-    setIsInGame(true);
     loadMessages(thread.friendUserId);
-  }, [loadMessages, setIsInGame]);
+  }, [loadMessages]);
 
   // Open a message thread for a friend (creates temporary thread if none exists)
   const handleOpenMessageForFriend = useCallback((friend: Friend) => {
@@ -266,12 +277,11 @@ const FriendsList: React.FC<FriendsListProps> = ({
         isOnline: friend.isOnline,
       };
       setSelectedThread(tempThread);
-      setIsInGame(true);
       loadMessages(friend.odUserId);
     }
     // Switch to messages tab
     setActiveTab('messages');
-  }, [threads, handleThreadClick, loadMessages, setIsInGame]);
+  }, [threads, handleThreadClick, loadMessages]);
 
   // Auto-open thread when deep-link includes ?friendUserId=X (from push / toast / share)
   useEffect(() => {
@@ -840,7 +850,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
         isLoading={false}
         isOpen={!!selectedThread}
         typingUsername={typingUsername ?? undefined}
-        onClose={() => { setSelectedThread(null); setIsInGame(false); }}
+        onClose={() => { setSelectedThread(null); }}
         onSendMessage={handleSendMessage}
         onTyping={selectedThread ? (isTyping: boolean) => setTyping(selectedThread.friendUserId, isTyping) : undefined}
         onDeleteMessage={deleteMessage}
@@ -856,7 +866,7 @@ const FriendsList: React.FC<FriendsListProps> = ({
         }}
         onChallenge={selectedThread ? () => {
           const friend = friends.find(f => f.odUserId === selectedThread.friendUserId);
-          if (friend) { setChallengeFriend(friend); setSelectedThread(null); setIsInGame(false); }
+          if (friend) { setChallengeFriend(friend); setSelectedThread(null); }
         } : undefined}
         onMarkAsRead={handleMarkAsRead}
         currentUserId={profile?.id || ''}
