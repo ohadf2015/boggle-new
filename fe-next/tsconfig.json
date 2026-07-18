@@ -57,6 +57,7 @@
   ],
   "exclude": [
     "node_modules",
+    "standalone",
     "__mocks__",
     "e2e",
     "playwright.config.ts",

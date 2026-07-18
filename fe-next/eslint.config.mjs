@@ -24,6 +24,8 @@ const eslintConfig = defineConfig([
     "backend/coverage/**",
     // Production build output
     "dist/**",
+    // Isolated standalone portal build — own package.json/tsconfig/eslint toolchain.
+    "standalone/**",
   ]),
   {
     rules: {

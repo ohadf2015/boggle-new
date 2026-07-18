@@ -1,0 +1,5 @@
+node_modules
+dist
+# Dictionary is copied from ../public/dicts at build time (predev/prebuild) — not committed here.
+public/en.dict.gz
+*.tsbuildinfo
