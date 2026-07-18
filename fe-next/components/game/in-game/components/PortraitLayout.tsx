@@ -264,6 +264,18 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
   const [floatingScore, setFloatingScore] = useState<number | null>(null);
   const [isFireRoundScore, setIsFireRoundScore] = useState(false);
 
+  // Mythic combo screen shake — triggers a brief shake on the game container
+  // when combo reaches 7+ (mythic tier). The effect fires on each combo level
+  // increase while in the mythic range, not just the first time.
+  const prevComboRef = useRef(comboLevel);
+  const [comboShakeKey, setComboShakeKey] = useState(0);
+  useEffect(() => {
+    if (comboLevel >= 7 && comboLevel > prevComboRef.current && !reduceMotion) {
+      setComboShakeKey(k => k + 1);
+    }
+    prevComboRef.current = comboLevel;
+  }, [comboLevel, reduceMotion]);
+
   // Trigger floating score animation when word is accepted
   useEffect(() => {
     if (currentFeedback?.type === 'accepted' && currentFeedback.score) {
@@ -376,6 +388,8 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
         // In the MP shell the canvas is just the board column — don't run the
         // internal lg: 3-column split (the shell supplies the side rails).
         !inDesktopShell && 'lg:flex-row lg:items-stretch lg:justify-center',
+        // Screen shake on mythic combo (7+)
+        comboShakeKey > 0 && 'animate-combo-shake',
       )}>
         {/* Mobile Header */}
         <GameHeader
