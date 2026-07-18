@@ -122,7 +122,7 @@ function shade(hex: number, f: number): number {
 
 /** Material-specific bevel/lighting tweaks. Returns highlight factor and a small
  *  specular sheen colour for premium reads. */
-function materialFeel(material: TileMaterial): { highlightMul: number; sheen?: number; sheenAlpha?: number; contactShadowAlpha: number } {
+function materialFeel(material: TileMaterial): { highlightMul: number; sheen?: number; sheenAlpha: number; contactShadowAlpha: number } {
   switch (material) {
     case 'glass':
       return { highlightMul: 1.55, sheen: 0xffffff, sheenAlpha: 0.22, contactShadowAlpha: 0.28 };

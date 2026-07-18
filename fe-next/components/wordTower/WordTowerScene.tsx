@@ -393,7 +393,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
           dropIn(tile, y, 0, () => {
             if (!enableComplex) return;
             impactRing(tilt, centerX, y + half, half, l.color, fx.ringScale * 0.6);
-            if (fx.dustPuff > 0) engine.particles.burst(TOWER_DUST, centerX, y + half, capParticles(fx.dustPuff, particleBudget.max));
+            if ((fx.dustPuff ?? 0) > 0) engine.particles.burst(TOWER_DUST, centerX, y + half, capParticles(fx.dustPuff ?? 0, particleBudget.max));
             engine.particles.burst(COMBO_FLASH, centerX, y + half, capParticles(Math.round(fx.particles * 0.6), particleBudget.max));
           });
         }
@@ -456,7 +456,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
           impactRing(tilt, pivotX, pivotY, half, land.ringColor, land.ringScale);
           impactRing(tilt, pivotX, pivotY, half, land.ringColor, land.ringScale * 0.55);
           engine.particles.burst(COMBO_FLASH, pivotX, pivotY, capParticles(land.particles + heft, budget));
-          if (land.dustPuff > 0) engine.particles.burst(TOWER_DUST, pivotX, pivotY + half, capParticles(land.dustPuff, budget));
+          if ((land.dustPuff ?? 0) > 0) engine.particles.burst(TOWER_DUST, pivotX, pivotY + half, capParticles(land.dustPuff ?? 0, budget));
           if (land.debris > 0) engine.particles.burst(RUBBLE_BURST, pivotX, pivotY + half, capParticles(land.debris, budget));
           if (land.shakePx > 0) {
             engine.shake.shake({ intensity: land.shakePx, duration: 0.24, decay: 'exponential' });

@@ -37,6 +37,8 @@ export interface LandFeedback {
   ringColor: number;
   /** Extra debris / shard particles for sloppy/miss drops. */
   debris: number;
+  /** Ground dust-puff particle count on landing. Optional; unset = none. */
+  dustPuff?: number;
   /** One-off wobble impulse intensity (0..1), render-only. */
   wobbleImpulse: number;
   /** Celebration tier label used by the crane UI. */
