@@ -43,6 +43,11 @@ export const SWAY_PERIOD_FRANTIC_MS = 2800;
  *  WYSIWYG holds: the reticle + landing shadow read this same offset. */
 export const SWAY_OFFSET_AT_MAX = 0.20;
 
+/** Duration of a one-off landing wobble impulse (sloppy/miss drops). */
+export const WOBBLE_IMPULSE_MS = 520;
+/** Peak impulse angle (deg) at full intensity. */
+export const WOBBLE_IMPULSE_MAX_DEG = 1.4;
+
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 const clamp01 = (n: number) => clamp(n, 0, 1);
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
@@ -156,6 +161,23 @@ export function swayJitterDeg(elapsedMs: number, instability: number): number {
   const a = Math.sin((2 * Math.PI * elapsedMs) / JITTER_PERIOD_A_MS);
   const b = Math.sin((2 * Math.PI * elapsedMs) / JITTER_PERIOD_B_MS);
   return amp * 0.5 * (a + b);
+}
+
+/**
+ * A one-off damped angular impulse for sloppy/miss landings — the tower visibly
+ * shudders at the joint but settles quickly. Render-only; never feeds scoring.
+ *
+ * @param tMs - milliseconds since the impulse started.
+ * @param intensity - 0..1 impulse strength.
+ * @returns signed angle offset in degrees.
+ */
+export function wobbleImpulseDeg(tMs: number, intensity: number): number {
+  const i = clamp01(intensity);
+  if (i === 0 || tMs <= 0 || tMs >= WOBBLE_IMPULSE_MS) return 0;
+  const k = tMs / WOBBLE_IMPULSE_MS;
+  const decay = Math.exp(-5 * k);
+  const wobble = Math.sin((2 * Math.PI * tMs) / WOBBLE_IMPULSE_MS);
+  return WOBBLE_IMPULSE_MAX_DEG * i * decay * wobble;
 }
 
 /**

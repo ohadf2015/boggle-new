@@ -116,6 +116,8 @@ export interface ShakeConfig {
   decay?: 'linear' | 'exponential';
   /** Shake frequency (oscillations per second) */
   frequency?: number;
+  /** Optional directional bias in pixels (e.g. {x: -1}) pulled toward during decay. */
+  bias?: Vector2;
 }
 
 // ─── Tile Renderer ────────────────────────────────────────────────────

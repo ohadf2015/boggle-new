@@ -6,6 +6,7 @@ describe('letterPlacementFx (escalating placement juice)', () => {
     const fx = letterPlacementFx(0);
     expect(fx.particles).toBeGreaterThanOrEqual(7);
     expect(fx.ringScale).toBe(1);
+    expect(fx.dustPuff).toBeGreaterThanOrEqual(4);
   });
 
   it('escalates with depth — each deeper letter is punchier', () => {
@@ -13,6 +14,7 @@ describe('letterPlacementFx (escalating placement juice)', () => {
     const b = letterPlacementFx(4);
     expect(b.particles).toBeGreaterThan(a.particles);
     expect(b.ringScale).toBeGreaterThan(a.ringScale);
+    expect(b.dustPuff).toBeGreaterThan(a.dustPuff);
   });
 
   it('is monotonic non-decreasing across depth', () => {
@@ -21,6 +23,7 @@ describe('letterPlacementFx (escalating placement juice)', () => {
       const cur = letterPlacementFx(d);
       expect(cur.particles).toBeGreaterThanOrEqual(prev.particles);
       expect(cur.ringScale).toBeGreaterThanOrEqual(prev.ringScale);
+      expect(cur.dustPuff).toBeGreaterThanOrEqual(prev.dustPuff);
       prev = cur;
     }
   });
@@ -29,10 +32,18 @@ describe('letterPlacementFx (escalating placement juice)', () => {
     const fx = letterPlacementFx(50);
     expect(fx.particles).toBeLessThanOrEqual(22);
     expect(fx.ringScale).toBeLessThanOrEqual(1.7);
+    expect(fx.dustPuff).toBeLessThanOrEqual(14);
+    expect(fx.debris).toBeLessThanOrEqual(4);
   });
 
   it('treats negative depth as the baseline (defensive)', () => {
     expect(letterPlacementFx(-3)).toEqual(letterPlacementFx(0));
+  });
+
+  it('adds debris only for deeper letters', () => {
+    expect(letterPlacementFx(0).debris).toBe(0);
+    expect(letterPlacementFx(2).debris).toBe(0);
+    expect(letterPlacementFx(3).debris).toBeGreaterThan(0);
   });
 });
 

@@ -41,6 +41,19 @@ export interface BiomeTheme {
    *  Event interval in ms — ponytail: heuristic values 6s–15s chosen per biome feel. */
   eventTypes?: BiomeEvent[];
   eventIntervalMs?: number;
+  /** Dynamic sun/moon disc colours for this biome. */
+  celestial: {
+    /** Core disc colour. */
+    core: string;
+    /** Outer glow colour. */
+    glow: string;
+    /** Tint applied to the tower by directional light. */
+    lightTint: string;
+  };
+  /** Ambient air-current / dust tint colour. */
+  airTint: string;
+  /** Silhouette colour for distant landmark layers. */
+  landmarkColor: string;
 }
 
 /**
@@ -64,6 +77,9 @@ export const BIOME_THEME: Record<WordTowerBiomeId, BiomeTheme> = {
     nativePropIds: ['cityBird', 'birds', 'helicopter', 'plane', 'drone', 'blimp'],
     eventTypes: ['planeFlyby', 'helicopterPass', 'starTwinkle'],
     eventIntervalMs: 8000,
+    celestial: { core: '#fff7d6', glow: '#ffd700', lightTint: 'rgba(255,230,150,0.18)' },
+    airTint: '#9ccdf2',
+    landmarkColor: '#4a6fa5',
   },
   sky: {
     bg: 'linear-gradient(180deg,#16407e 0%,#2f78c4 48%,#73bdf0 100%)',
@@ -75,6 +91,9 @@ export const BIOME_THEME: Record<WordTowerBiomeId, BiomeTheme> = {
     nativePropIds: ['skyManta', 'kite', 'balloon', 'paraglider', 'birds', 'blimp'],
     eventTypes: ['planeFlyby', 'helicopterPass', 'starTwinkle', 'auroraFlare'],
     eventIntervalMs: 9000,
+    celestial: { core: '#ffffff', glow: '#e0f7ff', lightTint: 'rgba(180,230,255,0.14)' },
+    airTint: '#73bdf0',
+    landmarkColor: '#2f5f9e',
   },
   stratosphere: {
     bg: 'linear-gradient(180deg,#211848 0%,#5b3a9e 42%,#b85a93 74%,#f2a65a 100%)',
@@ -86,6 +105,9 @@ export const BIOME_THEME: Record<WordTowerBiomeId, BiomeTheme> = {
     nativePropIds: ['stratSerpent', 'plane', 'rocket', 'weather balloon'],
     eventTypes: ['planeFlyby', 'auroraFlare', 'meteorShower', 'starTwinkle'],
     eventIntervalMs: 10000,
+    celestial: { core: '#ffe0bd', glow: '#ff9ec4', lightTint: 'rgba(255,180,160,0.16)' },
+    airTint: '#ff9ec4',
+    landmarkColor: '#3a2870',
   },
   orbit: {
     bg: 'linear-gradient(180deg,#04060f 0%,#0b1230 58%,#16204a 100%)',
@@ -97,6 +119,9 @@ export const BIOME_THEME: Record<WordTowerBiomeId, BiomeTheme> = {
     nativePropIds: ['orbitJelly', 'satellite', 'rocket', 'astronaut'],
     eventTypes: ['shootingStar', 'satelliteGlint', 'starTwinkle', 'cometStreak'],
     eventIntervalMs: 11000,
+    celestial: { core: '#d4f1ff', glow: '#6fe6ff', lightTint: 'rgba(130,220,255,0.16)' },
+    airTint: '#6fe6ff',
+    landmarkColor: '#0b1a3a',
   },
   nebula: {
     bg: 'linear-gradient(180deg,#180322 0%,#5a1063 50%,#b81e8c 84%,#ff4fa3 100%)',
@@ -108,6 +133,9 @@ export const BIOME_THEME: Record<WordTowerBiomeId, BiomeTheme> = {
     nativePropIds: ['nebulaJelly', 'comet', 'alien', 'portal'],
     eventTypes: ['shootingStar', 'cometStreak', 'auroraFlare', 'starTwinkle'],
     eventIntervalMs: 12000,
+    celestial: { core: '#ffb3e6', glow: '#ff4fa3', lightTint: 'rgba(255,120,190,0.18)' },
+    airTint: '#ff79c6',
+    landmarkColor: '#2e0a42',
   },
   galaxy: {
     bg: 'linear-gradient(180deg,#04030a 0%,#2a0a4e 45%,#7a1fae 80%,#ffd23f 100%)',
@@ -119,5 +147,8 @@ export const BIOME_THEME: Record<WordTowerBiomeId, BiomeTheme> = {
     nativePropIds: ['galaxyWhale', 'planetRing', 'spaceship', 'comet'],
     eventTypes: ['shootingStar', 'meteorShower', 'cometStreak', 'starTwinkle'],
     eventIntervalMs: 15000,
+    celestial: { core: '#fff1a8', glow: '#ffd23f', lightTint: 'rgba(255,220,120,0.18)' },
+    airTint: '#ffd23f',
+    landmarkColor: '#1a0a38',
   },
 };

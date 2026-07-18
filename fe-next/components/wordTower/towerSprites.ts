@@ -46,6 +46,18 @@ export function getFontStackForLocale(locale: string): string {
 
 const FONT = DEFAULT_FONT;
 
+/** Material feel mapped from surface decoration kind. */
+export type TileMaterial = 'concrete' | 'glass' | 'metal' | 'sciFi' | 'crystal' | 'energy';
+
+const SURFACE_MATERIAL: Record<BlockSurface, TileMaterial> = {
+  windows: 'concrete',
+  glass: 'glass',
+  panels: 'metal',
+  greebles: 'sciFi',
+  facets: 'crystal',
+  energy: 'energy',
+};
+
 /** A column tile: square face + hard shadow + (optional) glyph. Extra fields
  *  track the live colour/pending state and the cancellation token. */
 export type TileSprite = Container & {
@@ -63,6 +75,8 @@ export type TileSprite = Container & {
   /** Deterministic per-position visual jitter (set at build) so the stack reads
    *  as a hand-built tower, not stamped blocks. Persists across recolours. */
   variation?: TileVariation;
+  /** The surface decoration kind this tile was built with — drives material feel. */
+  surface?: BlockSurface;
 };
 
 const easeOutCubic = (k: number) => 1 - Math.pow(1 - k, 3);
@@ -106,6 +120,25 @@ function shade(hex: number, f: number): number {
   return (mix(r) << 16) | (mix(g) << 8) | mix(b);
 }
 
+/** Material-specific bevel/lighting tweaks. Returns highlight factor and a small
+ *  specular sheen colour for premium reads. */
+function materialFeel(material: TileMaterial): { highlightMul: number; sheen?: number; sheenAlpha?: number; contactShadowAlpha: number } {
+  switch (material) {
+    case 'glass':
+      return { highlightMul: 1.55, sheen: 0xffffff, sheenAlpha: 0.22, contactShadowAlpha: 0.28 };
+    case 'metal':
+      return { highlightMul: 1.42, sheen: 0xffffff, sheenAlpha: 0.14, contactShadowAlpha: 0.34 };
+    case 'sciFi':
+      return { highlightMul: 1.38, sheen: undefined, sheenAlpha: 0, contactShadowAlpha: 0.38 };
+    case 'crystal':
+      return { highlightMul: 1.6, sheen: 0xffffff, sheenAlpha: 0.18, contactShadowAlpha: 0.32 };
+    case 'energy':
+      return { highlightMul: 1.35, sheen: undefined, sheenAlpha: 0, contactShadowAlpha: 0.42 };
+    default:
+      return { highlightMul: 1.34, sheen: undefined, sheenAlpha: 0, contactShadowAlpha: 0.36 };
+  }
+}
+
 /**
  * (Re)draw a tile as a PIXEL-ART building block: a square face (no rounded
  * corners), a flat stepped bevel — light top+left, dark bottom+right, snapped to
@@ -139,13 +172,16 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
   const off = Math.max(3, Math.round(s * 0.09));
   tile.shadow.clear().rect(-half + off, -half + off, s, s).fill({ color: 0x000000, alpha: pending ? 0.2 : 0.5 });
 
+  const material = tile.surface ? SURFACE_MATERIAL[tile.surface] : 'concrete';
+  const feel = materialFeel(material);
+
   const g = tile.face;
   g.clear();
   // Square face — a flat pixel block.
   g.rect(-half, -half, s, s).fill({ color: faceColor, alpha: a });
   // Flat stepped bevel (light reads from the top-left): lit top + left bands,
   // shaded bottom + right bands — no gradients, hard pixel edges.
-  const top = shade(faceColor, 1.34 * (v?.highlight ?? 1));
+  const top = shade(faceColor, feel.highlightMul * (v?.highlight ?? 1));
   const left = shade(faceColor, 1.18);
   const bottom = shade(faceColor, 0.56);
   const right = shade(faceColor, 0.74);
@@ -157,6 +193,19 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
   // the crisp stair-stepped look of a beveled sprite block.
   g.rect(-half + px, -half + px, px, px).fill({ color: shade(top, 1.12), alpha: a * 0.85 });
   g.rect(half - px * 2, half - px * 2, px, px).fill({ color: shade(bottom, 0.88), alpha: a * 0.85 });
+
+  // Contact shadow / ambient occlusion band at the bottom edge — sells the
+  // weight of the stack by darkening where this tile rests on the one below.
+  const contactH = Math.max(1, Math.round(px * 0.45));
+  g.rect(-half + px, half - contactH - px * 0.5, s - px * 2, contactH)
+    .fill({ color: 0x000000, alpha: pending ? 0.12 : feel.contactShadowAlpha * a });
+
+  // Optional material sheen stripe (glass/metal/crystal) for a premium highlight.
+  if (feel.sheen && feel.sheenAlpha > 0) {
+    const sheenH = Math.max(1, Math.round(px * 0.7));
+    g.rect(-half + px * 2, -half + px * 2, s - px * 4, sheenH)
+      .fill({ color: feel.sheen, alpha: feel.sheenAlpha * a });
+  }
 
   // Hard black pixel outline.
   g.rect(-half, -half, s, s).stroke({ color: 0x000000, width: Math.max(3, s * 0.07), alignment: 1, alpha: pending ? 0.85 : 1 });
@@ -179,10 +228,10 @@ export function paintTile(tile: TileSprite, color: number, pending: boolean, sha
  * each altitude milestone has its own STRUCTURE: a lit window grid in the city, a
  * glass curtain wall in the sky, riveted hull panels in the stratosphere, sci-fi
  * greebles in orbit, crystalline facets in the nebula, and a star-field energy
- * skin in the deep-space galaxy ("spacy" up high). Tile coords are centred
- * (−half..half), matching the face. Neo-brutalist: hard pixels, NO blur, drawn in
- * near-black / near-white / one neon accent with low alpha so it reads on any
- * graded fill (and any ghost). */
+ * skin in the deep-space galaxy ("spacy" up high). Tile coords are centred (−half..half);
+ * the greeble juts slightly OUTSIDE the face (no clipping on a Pixi child).
+ * Neo-brutalist: hard pixels, NO blur, drawn in near-black / near-white / one neon
+ * accent with low alpha so it reads on any graded fill (and any ghost). */
 /** Per-biome neon accent for surface decoration + greebles. 1:1 with the
  *  {@link BlockSurface} decoration kind (which is 1:1 with the biome), so a
  *  city window-grid glows lime, an orbit hull glows ice-cyan, a nebula facet
@@ -336,6 +385,7 @@ export function makeTile(char: string | null, size: number, color: number, pendi
   tile.color = color;
   tile.pending = pending;
   tile.anim = 0;
+  tile.surface = surface;
   if (pos != null) tile.variation = tileVariation(pos);
   tile.shadow = new Graphics();
   tile.face = new Graphics();
@@ -539,6 +589,30 @@ export function impactRing(parent: Container, x: number, y: number, baseRadius: 
     else { try { ring.destroy(); } catch { /* */ } }
   };
   requestAnimationFrame(tick);
+}
+
+/** Draw a soft ground shadow + reflection under the tower base. */
+export function drawGroundShadow(
+  parent: Container,
+  x: number,
+  y: number,
+  size: number,
+  floorCount: number,
+  color: number,
+): void {
+  const shadow = new Graphics();
+  shadow.zIndex = -1;
+  const w = size * (1.2 + Math.min(floorCount, 20) * 0.04);
+  const h = size * 0.35;
+  // Outer soft shadow ellipse.
+  shadow.ellipse(0, 0, w, h).fill({ color: 0x000000, alpha: 0.22 });
+  // Inner darker core.
+  shadow.ellipse(0, 0, w * 0.65, h * 0.55).fill({ color: 0x000000, alpha: 0.18 });
+  // Subtle reflected colour wash (vertical fade handled by layered ellipses).
+  shadow.ellipse(0, 0, w * 0.35, h * 0.3).fill({ color, alpha: 0.08 });
+  shadow.x = x;
+  shadow.y = y;
+  parent.addChild(shadow);
 }
 
 /** Brief horizontal shake of a container (rejected word). Fire-and-forget. */

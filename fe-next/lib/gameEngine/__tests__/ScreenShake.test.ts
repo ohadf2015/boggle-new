@@ -63,6 +63,20 @@ describe('ScreenShake', () => {
     expect(shake.offset).toEqual({ x: 0, y: 0 });
   });
 
+  it('should pull the offset toward a directional bias', () => {
+    shake.shake({ intensity: 0, duration: 0.5, bias: { x: -8, y: 0 } });
+    shake.update(0.05);
+    // With no noise intensity, the offset should be the bias scaled by decay.
+    expect(shake.offset.x).toBeLessThan(0);
+    expect(shake.offset.x).toBeGreaterThanOrEqual(-8);
+  });
+
+  it('should decay directional bias to zero by the end', () => {
+    shake.shake({ intensity: 0, duration: 0.2, bias: { x: 10, y: -5 } });
+    shake.update(0.3);
+    expect(shake.offset).toEqual({ x: 0, y: 0 });
+  });
+
   describe('presets', () => {
     it('light() should create a short shake', () => {
       shake.light();

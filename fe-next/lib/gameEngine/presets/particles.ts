@@ -659,3 +659,90 @@ export const BLAST_COMET_TRAIL: ParticleConfig = {
   blendMode: 'add',
   shape: 'rect',
 };
+
+// ═══════════════════════════════════════════════════════════════════════
+// Word Tower ambience / collapse presets
+// ═══════════════════════════════════════════════════════════════════════
+
+// ─── Tower Embers ────────────────────────────────────────────────────
+// Warm-to-cool sparks that float upward, denser at lower altitudes.
+
+export const TOWER_EMBERS: ParticleConfig = {
+  maxParticles: 40,
+  frequency: 0.04,
+  emitterLifetime: 0,
+  particlesPerWave: 1,
+  lifetime: { min: 1.0, max: 2.4 },
+  speed: { min: 10, max: 45 },
+  gravity: { x: 0, y: -25 },
+  scale: { start: 0.7, end: 0.1 },
+  alpha: { start: 0.8, end: 0 },
+  rotationSpeed: { min: -60, max: 60 },
+  colors: ['ffaa00', 'ff6600', '88ccff', 'ffffff'],
+  spawnShape: 'rect',
+  spawnConfig: { width: 120, height: 20 },
+  blendMode: 'add',
+  shape: 'star',
+};
+
+// ─── Tower Dust ──────────────────────────────────────────────────────
+// Fine motes drifting down and sideways, kicked up by the tower base.
+
+export const TOWER_DUST: ParticleConfig = {
+  maxParticles: 30,
+  frequency: 0.03,
+  emitterLifetime: 0,
+  particlesPerWave: 1,
+  lifetime: { min: 1.2, max: 2.8 },
+  speed: { min: 5, max: 25 },
+  gravity: { x: -8, y: -4 },
+  scale: { start: 0.5, end: 1.0 },
+  alpha: { start: 0.35, end: 0 },
+  rotationSpeed: { min: -20, max: 20 },
+  colors: ['ddeeff', 'aaccff', 'ffffff'],
+  spawnShape: 'rect',
+  spawnConfig: { width: 160, height: 30 },
+  blendMode: 'screen',
+  shape: 'circle',
+};
+
+// ─── Air Streaks ─────────────────────────────────────────────────────
+// Faint horizontal speed lines in the upper atmosphere / space bands.
+
+export const AIR_STREAKS: ParticleConfig = {
+  maxParticles: 24,
+  frequency: 0.04,
+  emitterLifetime: 0,
+  particlesPerWave: 1,
+  lifetime: { min: 0.8, max: 1.6 },
+  speed: { min: 60, max: 180 },
+  gravity: { x: 0, y: 0 },
+  scale: { start: 1.4, end: 0.4 },
+  alpha: { start: 0.25, end: 0 },
+  rotationSpeed: { min: 0, max: 0 },
+  colors: ['ffffff', 'aaddff', 'ffccff'],
+  spawnShape: 'rect',
+  spawnConfig: { width: 40, height: 8 },
+  blendMode: 'add',
+  shape: 'rect',
+};
+
+// ─── Rubble Burst ────────────────────────────────────────────────────
+// Heavy tumbling chunks for tower collapse / miss impact.
+
+export const RUBBLE_BURST: ParticleConfig = {
+  maxParticles: 40,
+  frequency: 0.001,
+  emitterLifetime: 0.12,
+  particlesPerWave: 40,
+  lifetime: { min: 0.5, max: 1.3 },
+  speed: { min: 120, max: 420 },
+  gravity: { x: 0, y: 500 },
+  scale: { start: 1.6, end: 0.3 },
+  alpha: { start: 1, end: 0.4 },
+  rotationSpeed: { min: -360, max: 360 },
+  colors: ['5a5a5a', '8a8a8a', 'bbbbbb', 'ffaa00'],
+  spawnShape: 'burst',
+  spawnConfig: { directions: 20 },
+  shape: 'rect',
+};

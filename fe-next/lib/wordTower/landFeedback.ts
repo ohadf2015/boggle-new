@@ -31,6 +31,16 @@ export interface LandFeedback {
   glow: boolean;
   /** Full-screen flash intensity for the quality colour wash. */
   flashIntensity: number;
+  /** Full-screen flash colour (hex number). */
+  flashColor: number;
+  /** Impact ring colour (hex number). */
+  ringColor: number;
+  /** Extra debris / shard particles for sloppy/miss drops. */
+  debris: number;
+  /** One-off wobble impulse intensity (0..1), render-only. */
+  wobbleImpulse: number;
+  /** Celebration tier label used by the crane UI. */
+  celebrateTier: 'none' | 'pop' | 'big';
 }
 
 const STATIC: LandFeedback = {
@@ -43,6 +53,11 @@ const STATIC: LandFeedback = {
   sparkles: 0,
   glow: false,
   flashIntensity: 0,
+  flashColor: 0x000000,
+  ringColor: 0x00ffff,
+  debris: 0,
+  wobbleImpulse: 0,
+  celebrateTier: 'none',
 };
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
@@ -80,6 +95,11 @@ export function landFeedback(
         sparkles: 22,
         glow: true,
         flashIntensity: 0.5,
+        flashColor: 0xbfff00,
+        ringColor: 0xbfff00,
+        debris: 0,
+        wobbleImpulse: 0,
+        celebrateTier: 'big',
       };
     case 'good':
       return {
@@ -92,6 +112,11 @@ export function landFeedback(
         sparkles: 10,
         glow: false,
         flashIntensity: 0.28,
+        flashColor: 0x22d3ee,
+        ringColor: 0x22d3ee,
+        debris: 0,
+        wobbleImpulse: 0,
+        celebrateTier: 'pop',
       };
     case 'sloppy':
       return {
@@ -104,11 +129,16 @@ export function landFeedback(
         sparkles: 0,
         glow: false,
         flashIntensity: 0.2,
+        flashColor: 0xffe135,
+        ringColor: 0xffa500,
+        debris: clamp(4 + Math.floor(depth * 0.3), 4, 10),
+        wobbleImpulse: 0.55,
+        celebrateTier: 'none',
       };
     default:
       return {
         impactIntensity: 1,
-        punchIntensity: 0,
+        punchIntensity: -0.6,
         shakePx: clamp(11 + depth * 0.45, 11, 16),
         particles: clamp(10 + depth * 0.5, 10, 20),
         ringScale: 1.2,
@@ -116,6 +146,11 @@ export function landFeedback(
         sparkles: 0,
         glow: false,
         flashIntensity: 0.32,
+        flashColor: 0xff3366,
+        ringColor: 0xff2200,
+        debris: clamp(8 + Math.floor(depth * 0.5), 8, 16),
+        wobbleImpulse: 0.85,
+        celebrateTier: 'none',
       };
   }
 }

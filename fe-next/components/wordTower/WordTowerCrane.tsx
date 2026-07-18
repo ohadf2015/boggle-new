@@ -39,6 +39,7 @@ import { landingOffset, driftFracAt, smoothVelocity } from '@/lib/wordTower/drop
 import { fallDurationMs } from '@/lib/wordTower/fallProfile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
 /** Imperative handle so a parent CTA (e.g. the bottom HUD) can trigger the
  *  drop — keeps the player's finger pinned to one button rather than chasing
@@ -92,6 +93,15 @@ const BAND_SHADOW: Record<PlacementQuality, string> = {
   good: 'rgba(0,255,255,0.4)',
   sloppy: 'rgba(255,225,53,0.4)',
   miss: 'rgba(255,51,102,0.4)',
+};
+
+/** Soft jib glow colour keyed to the live placement band — a luminous trail
+ *  that helps the player time the drop without repainting the carried block. */
+const BAND_GLOW: Record<PlacementQuality, string> = {
+  perfect: 'rgba(191,255,0,0.9)',
+  good: 'rgba(0,255,255,0.8)',
+  sloppy: 'rgba(255,225,53,0.75)',
+  miss: 'rgba(255,51,102,0.7)',
 };
 
 /** How far the trolley carriage slides along the jib (px from centre). */
@@ -299,6 +309,8 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   useImperativeHandle(ref, () => ({ drop }), [drop]);
 
   const { language } = useLanguage();
+  const perf = useDevicePerformance();
+  const enableGlowTrail = perf.enableGlowEffects && !reducedMotion;
   const trolleyX = pos * TROLLEY_RANGE_PX;
   // The band the CURRENT sweep position would score AGAINST THE SWAYING TOP —
   // drives the live beam tint + landing shadow so the drop is a readable skill
@@ -522,6 +534,23 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
             />
           )}
         </div>
+
+        {/* Glow trail along the jib — follows the trolley with a quality-tinted
+            luminous streak. Disabled on reduced-motion or low-end devices so the
+            effect never becomes a performance burden. */}
+        {enableGlowTrail && aiming && (
+          <div
+            className="pointer-events-none absolute inset-x-0 z-0 will-change-transform"
+            style={{
+              top: `${CRANE_TROLLEY_TOP_PX - 10}px`,
+              height: '22px',
+              background: `radial-gradient(circle at calc(50% + ${trolleyX}px), ${BAND_GLOW[liveBand]} 0%, transparent 70%)`,
+              opacity: liveBand === 'perfect' ? 0.85 : liveBand === 'good' ? 0.55 : liveBand === 'sloppy' ? 0.35 : 0.2,
+              transition: 'opacity 100ms linear',
+            }}
+            aria-hidden
+          />
+        )}
 
         {/* Drop-target guide — the bullseye the beam should land on. It SWINGS
             with the unstable tower-top (same offset that scores the drop), so the
