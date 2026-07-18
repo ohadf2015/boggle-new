@@ -57,18 +57,40 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-function useWheelLayout(): WheelLayout {
-  const [width, setWidth] = useState(376);
+/**
+ * Vertical space (px) the caption cluster below the stage needs (drag hint +
+ * "Selected" row + sub-caption + gaps). Reserved so the stage sizes off the
+ * space it can actually own, never pushing the captions off-screen.
+ */
+const CAPTION_RESERVE = 132;
+
+/**
+ * Size the wheel to the box it actually lives in — both width AND height — so
+ * it fills a tall phone or a wide TV instead of capping at a small 376 disc.
+ * Observes the wheel root's parent cell; falls back to the viewport pre-mount.
+ */
+function useWheelLayout(hostRef: React.RefObject<HTMLElement | null>): WheelLayout {
+  const [avail, setAvail] = useState(376);
   useEffect(() => {
+    const host = hostRef.current?.parentElement ?? hostRef.current;
     const measure = () => {
-      const w = typeof window !== 'undefined' ? window.innerWidth : 376;
-      setWidth(Math.max(280, w - 40));
+      const rect = host?.getBoundingClientRect();
+      const w = rect?.width || (typeof window !== 'undefined' ? window.innerWidth : 376);
+      const h =
+        rect?.height || (typeof window !== 'undefined' ? window.innerHeight : 640);
+      // Leave gutters on width and room for the caption cluster on height.
+      setAvail(Math.max(280, Math.min(w - 24, h - CAPTION_RESERVE)));
     };
     measure();
+    if (host && typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(measure);
+      ro.observe(host);
+      return () => ro.disconnect();
+    }
     window.addEventListener('resize', measure);
     return () => window.removeEventListener('resize', measure);
-  }, []);
-  return useMemo(() => scaleWheelLayout(width), [width]);
+  }, [hostRef]);
+  return useMemo(() => scaleWheelLayout(avail), [avail]);
 }
 
 export function QuickPlayWheel({
@@ -79,7 +101,8 @@ export function QuickPlayWheel({
 }: QuickPlayWheelProps) {
   const { t } = useLanguage();
   const { playSound } = useSoundEffects();
-  const layout = useWheelLayout();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const layout = useWheelLayout(rootRef);
   const reduceMotion = usePrefersReducedMotion();
   const knobRef = useRef<HTMLButtonElement>(null);
   const dragOrigin = useRef<{ x: number; y: number } | null>(null);
@@ -197,7 +220,8 @@ export function QuickPlayWheel({
 
   return (
     <div
-      className="flex flex-col items-center gap-5 bg-neo-navy sm:gap-6"
+      ref={rootRef}
+      className="flex h-full w-full flex-col items-center justify-center gap-5 bg-neo-navy sm:gap-6"
       data-testid="quick-play-wheel"
       data-wheel-scale={layout.scale.toFixed(3)}
       data-loading={isLoading ? 'true' : 'false'}

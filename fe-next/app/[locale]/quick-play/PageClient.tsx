@@ -16,17 +16,21 @@ function LoadingFallback() {
 }
 
 function QuickPlayGate() {
-  const { canSeeInWorkModes } = useAuth();
+  const { canSeeInWorkModes, loading } = useAuth();
   const { language } = useLanguageSafe();
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const isDev = process.env.NODE_ENV === 'development';
+  // Wait for auth to finish resolving before deciding: on a hard-load straight
+  // to /quick-play the profile (hence canSeeInWorkModes) lands a beat after
+  // first paint, and redirecting on that transient `false` bounced even admins
+  // back home. Only redirect once we KNOW the user can't see in-work modes.
   useEffect(() => {
-    if (!canSeeInWorkModes && !isDev) {
+    if (!loading && !canSeeInWorkModes && !isDev) {
       router.replace(`/${language}`);
     }
-  }, [canSeeInWorkModes, isDev, language, router]);
+  }, [loading, canSeeInWorkModes, isDev, language, router]);
 
   if (!canSeeInWorkModes && !isDev) {
     return <LoadingFallback />;

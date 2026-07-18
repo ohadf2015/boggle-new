@@ -1,13 +1,23 @@
 'use client';
 
-import React from 'react';
 import { m } from 'framer-motion';
+import Avatar from '@/components/Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+
+interface RivalAvatar {
+  userId: string;
+  customAvatar?: CustomAvatarConfig | null;
+}
 
 interface RivalCompareCardProps {
   rivalName: string;
   rivalEmoji: string;
   rivalScore: number;
   myScore: number;
+  /** Real avatar for the rival — falls back to `rivalEmoji` when omitted. */
+  rivalAvatar?: RivalAvatar;
+  /** Real avatar for the current player — falls back to a 👤 glyph when omitted. */
+  myAvatar?: RivalAvatar;
   t: (key: string) => string;
 }
 
@@ -20,23 +30,21 @@ export default function RivalCompareCard({
   rivalEmoji,
   rivalScore,
   myScore,
+  rivalAvatar,
+  myAvatar,
   t,
 }: RivalCompareCardProps) {
   // Determine outcome
-  let outcome: 'win' | 'lose' | 'tie';
   let outcomeMessage: string;
   let outcomeClass: string;
 
   if (myScore > rivalScore) {
-    outcome = 'win';
     outcomeMessage = t('daily.rival.youWin').replace('{name}', rivalName);
     outcomeClass = 'text-neo-lime';
   } else if (myScore < rivalScore) {
-    outcome = 'lose';
     outcomeMessage = t('daily.rival.youLose').replace('{name}', rivalName);
     outcomeClass = 'text-neo-pink';
   } else {
-    outcome = 'tie';
     outcomeMessage = t('daily.rival.tie');
     outcomeClass = 'text-neo-cyan';
   }
@@ -56,14 +64,22 @@ export default function RivalCompareCard({
       <div className="grid grid-cols-2 gap-3 mb-4">
         {/* Rival column */}
         <div className="flex flex-col items-center gap-2 p-3 bg-neo-navy-light rounded-lg border-2 border-neo-black/20">
-          <div className="text-3xl">{rivalEmoji}</div>
-          <div className="text-xs font-medium text-neo-white/60">{rivalName}</div>
+          {rivalAvatar ? (
+            <Avatar userId={rivalAvatar.userId} customAvatar={rivalAvatar.customAvatar ?? undefined} size="lg" disableEffects />
+          ) : (
+            <div className="text-3xl leading-none">{rivalEmoji}</div>
+          )}
+          <div className="max-w-full truncate text-xs font-medium text-neo-white/60">{rivalName}</div>
           <div className="text-sm font-bold text-neo-white">{rivalScore}</div>
         </div>
 
         {/* Receiver column */}
         <div className="flex flex-col items-center gap-2 p-3 bg-neo-navy-light rounded-lg border-2 border-neo-black/20">
-          <div className="text-3xl">👤</div>
+          {myAvatar ? (
+            <Avatar userId={myAvatar.userId} customAvatar={myAvatar.customAvatar ?? undefined} size="lg" disableEffects />
+          ) : (
+            <div className="text-3xl leading-none">👤</div>
+          )}
           <div className="text-xs font-medium text-neo-white/60">{t('daily.rival.you')}</div>
           <div className="text-sm font-bold text-neo-white">{myScore}</div>
         </div>

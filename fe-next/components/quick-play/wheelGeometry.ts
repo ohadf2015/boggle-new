@@ -41,16 +41,26 @@ export type WheelLayout = {
 
 export type WheelSelection = QuickMode | 'random';
 
+/** Reference stage size the tokens are authored at. */
+export const WHEEL_DESIGN_CONTAINER = WHEEL_DESIGN.ringRadius * 2 + WHEEL_DESIGN.pad; // 376
 /**
- * Scale the wheel stage to fit `availableWidthPx` while keeping nodes tappable
- * and fully inside the container. Narrow phones (~360) get a scaled stage;
- * wider viewports cap at the design size (no upscale beyond reference).
+ * Ceiling the wheel is allowed to grow to. Above the 376 reference the wheel
+ * upscales (nodes/knob/ring all grow) so it genuinely fills a large phone,
+ * tablet or TV viewport instead of floating as a small disc in a sea of navy.
  */
-export function scaleWheelLayout(availableWidthPx: number): WheelLayout {
-  const designContainer = WHEEL_DESIGN.ringRadius * 2 + WHEEL_DESIGN.pad; // 376
+export const WHEEL_MAX_CONTAINER = 620;
+
+/**
+ * Scale the wheel stage to the available box (`min(width, height)` fed by the
+ * caller) while keeping nodes tappable and fully inside the container. Narrow
+ * phones scale down toward the 280 floor; large viewports upscale up to
+ * WHEEL_MAX_CONTAINER so the wheel is the screen, not a widget on it.
+ */
+export function scaleWheelLayout(availablePx: number): WheelLayout {
+  const designContainer = WHEEL_DESIGN_CONTAINER;
   // Floor: still fit four orbiting nodes with min hit targets on ~300px content.
   const minContainer = 280;
-  const container = Math.min(designContainer, Math.max(minContainer, availableWidthPx));
+  const container = Math.min(WHEEL_MAX_CONTAINER, Math.max(minContainer, availablePx));
   const scale = container / designContainer;
   const nodeSize = Math.max(WHEEL_DESIGN.minHit, WHEEL_DESIGN.nodeSize * scale);
   const knobSize = Math.max(WHEEL_DESIGN.minHit + 8, WHEEL_DESIGN.knobSize * scale);

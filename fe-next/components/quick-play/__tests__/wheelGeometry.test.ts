@@ -6,6 +6,8 @@ import {
   nodesInBounds,
   nodeOffset,
   WHEEL_DESIGN,
+  WHEEL_DESIGN_CONTAINER,
+  WHEEL_MAX_CONTAINER,
 } from '../wheelGeometry';
 import { QUICK_MODES } from '../types';
 
@@ -31,11 +33,19 @@ describe('NODE_ANGLES', () => {
 });
 
 describe('scaleWheelLayout (responsive)', () => {
-  it('caps at design size on wide viewports', () => {
+  it('upscales beyond the 376 reference to fill roomy viewports', () => {
     const layout = scaleWheelLayout(480);
-    const design = WHEEL_DESIGN.ringRadius * 2 + WHEEL_DESIGN.pad;
-    expect(layout.containerSize).toBe(design);
-    expect(layout.scale).toBe(1);
+    expect(layout.containerSize).toBe(480);
+    expect(layout.scale).toBeGreaterThan(1);
+    // nodes/knob grow with the stage so it reads as full, not a small disc
+    expect(layout.nodeSize).toBeGreaterThan(WHEEL_DESIGN.nodeSize);
+    expect(layout.knobSize).toBeGreaterThan(WHEEL_DESIGN.knobSize);
+  });
+
+  it('caps at WHEEL_MAX_CONTAINER on very large viewports', () => {
+    const layout = scaleWheelLayout(1200);
+    expect(layout.containerSize).toBe(WHEEL_MAX_CONTAINER);
+    expect(layout.scale).toBeCloseTo(WHEEL_MAX_CONTAINER / WHEEL_DESIGN_CONTAINER, 5);
   });
 
   it('scales down for narrow phone content (~320px usable)', () => {
@@ -46,8 +56,8 @@ describe('scaleWheelLayout (responsive)', () => {
     expect(layout.knobSize).toBeGreaterThanOrEqual(WHEEL_DESIGN.minHit);
   });
 
-  it('keeps all four mode nodes fully in-bounds on 360px and 280px', () => {
-    for (const w of [360, 320, 280]) {
+  it('keeps all four mode nodes fully in-bounds across sizes incl. upscaled', () => {
+    for (const w of [620, 480, 360, 320, 280]) {
       const layout = scaleWheelLayout(w);
       expect(nodesInBounds(layout)).toBe(true);
       for (const mode of QUICK_MODES) {

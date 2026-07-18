@@ -209,6 +209,9 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
             theirValue: challenge.challengerScorePct,
             myValue: r.scorePct,
             type: 'challenge',
+            // Deterministic avatar from the challenge id so the rival reads as a
+            // real player, not a bare target emoji.
+            avatarUserId: challenge.id,
           });
           if (r.scorePct > challenge.challengerScorePct) {
             posthog.capture('quick_play_rival_beaten', { mode: r.mode, rivalType: 'challenge' });
@@ -229,6 +232,9 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
                   theirValue: theirs,
                   myValue: mine,
                   type: 'weekly',
+                  // Real player → seed a real avatar off their id.
+                  avatarUserId: rd.rival.id ? String(rd.rival.id) : undefined,
+                  avatarConfig: rd.rival.custom_avatar ?? null,
                 });
                 if (mine > theirs) {
                   posthog.capture('quick_play_rival_beaten', { mode: r.mode, rivalType: 'weekly' });
@@ -351,7 +357,7 @@ export function QuickPlayHub({ challengeId }: QuickPlayHubProps) {
         </div>
       )}
 
-      <div className="relative z-[1] flex min-h-0 flex-1 items-center justify-center overflow-x-hidden px-1 py-4 sm:py-6">
+      <div className="relative z-[1] flex min-h-0 flex-1 items-center justify-center overflow-x-hidden px-2 py-2 sm:py-3">
         {/* Wheel stays mounted during loading so the lightning strike is visible
             before gameplay mounts — never jump straight into the board. */}
         <QuickPlayWheel

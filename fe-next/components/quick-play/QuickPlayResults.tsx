@@ -8,13 +8,16 @@
  */
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { haptics } from '@/utils/haptics/HapticsManager';
+import Avatar from '@/components/Avatar';
 import RivalCompareCard from '@/components/daily/RivalCompareCard';
 import { celebrationTier } from './celebrationTier';
 import { quickRank } from './quickRank';
 import { NODE_COLORS } from './modeColors';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import type { QuickRoundResult, QuickSubmitOutcome } from './types';
 
 export interface QuickRival {
@@ -25,6 +28,9 @@ export interface QuickRival {
   /** Your number on the SAME axis */
   myValue: number;
   type: 'challenge' | 'weekly';
+  /** Seed for a real (custom or deterministic) avatar instead of a bare emoji */
+  avatarUserId?: string;
+  avatarConfig?: CustomAvatarConfig | null;
 }
 
 interface LeaderboardEntry {
@@ -32,6 +38,7 @@ interface LeaderboardEntry {
   name: string;
   bestScorePct: number;
   rank: number;
+  customAvatar?: CustomAvatarConfig | null;
 }
 
 interface QuickPlayResultsProps {
@@ -47,6 +54,7 @@ const GAUGE_C = 2 * Math.PI * GAUGE_R;
 
 export function QuickPlayResults({ result, outcome, rival, onNextRound, onChallenge }: QuickPlayResultsProps) {
   const { t, language } = useLanguage();
+  const { user, profile } = useAuth();
   const [board, setBoard] = useState<LeaderboardEntry[]>([]);
   const [showFullBoard, setShowFullBoard] = useState(false);
   const celebrated = useRef(false);
@@ -113,7 +121,7 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
   const modeColor = NODE_COLORS[result.mode];
 
   return (
-    <div className="flex min-h-full flex-col gap-2.5 bg-neo-navy px-4 py-3 animate-[fadeInUp_0.2s_ease-out_0s_both]" data-testid="quick-play-results">
+    <div className="flex h-full flex-col gap-2.5 overflow-y-auto overscroll-contain bg-neo-navy px-4 py-3 pb-[max(1rem,env(safe-area-inset-bottom))] animate-[fadeInUp_0.2s_ease-out_0s_both]" data-testid="quick-play-results">
       <div className="flex items-center justify-center gap-2">
         <span className={`rounded-xl border-neo-thick border-black px-3 py-1 font-neo-display text-xs font-bold tracking-widest text-black shadow-hard ${modeColor.bg}`}>
           {t(`quickPlay.solo.mode.${result.mode}`)}
@@ -197,6 +205,12 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
           rivalEmoji={rival.emoji}
           rivalScore={rival.theirValue}
           myScore={rival.myValue}
+          rivalAvatar={
+            rival.avatarUserId
+              ? { userId: rival.avatarUserId, customAvatar: rival.avatarConfig ?? null }
+              : undefined
+          }
+          myAvatar={user?.id ? { userId: user.id, customAvatar: profile?.avatar_config ?? null } : undefined}
           t={t}
         />
       )}
@@ -251,13 +265,28 @@ export function QuickPlayResults({ result, outcome, rival, onNextRound, onChalle
               {t('quickPlay.solo.seeLeaderboard')}
             </button>
           ) : (
-            board.map((e) => (
-              <div key={e.userId} className="flex items-center gap-3 border-b-2 border-black/40 px-4 py-2 text-sm text-neo-cream">
-                <span className="w-6 font-neo-display font-bold text-neo-white/60">{e.rank}</span>
-                <span className="flex-1">{e.name}</span>
-                <span className="font-neo-display font-semibold">{e.bestScorePct}%</span>
-              </div>
-            ))
+            board.map((e) => {
+              const isMe = e.userId === user?.id;
+              return (
+                <div
+                  key={e.userId}
+                  className={`flex items-center gap-3 border-b-2 border-black/40 px-4 py-2 text-sm last:border-b-0 ${
+                    isMe ? 'bg-neo-cozy/15 text-neo-cream' : 'text-neo-cream'
+                  }`}
+                >
+                  <span className="w-5 text-center font-neo-display font-bold text-neo-white/55">{e.rank}</span>
+                  <Avatar
+                    userId={e.userId}
+                    customAvatar={e.customAvatar ?? undefined}
+                    size="sm"
+                    disableEffects
+                    tierMarker={e.rank <= 3}
+                  />
+                  <span className="flex-1 truncate">{e.name}</span>
+                  <span className="font-neo-display font-semibold">{e.bestScorePct}%</span>
+                </div>
+              );
+            })
           )}
         </div>
       )}
