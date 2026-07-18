@@ -215,6 +215,9 @@ export function QuickPlayWheel({
   );
 
   const active: WheelSelection = strikeMode ?? hovered ?? selection;
+  // Drives the arcade rim glow + ambient halo — the whole wheel re-themes to
+  // the mode under the knob. Cozy gold on Random.
+  const activeHex = active !== 'random' ? NODE_COLORS[active].hex : '#FFD666';
   const size = layout.containerSize;
   const iconPx = Math.round(layout.iconSize);
 
@@ -232,27 +235,45 @@ export function QuickPlayWheel({
         data-testid="quick-wheel-stage"
         style={{ width: size, height: size }}
       >
+        {/* Mode-tinted ambient glow — halos the whole disc in the active color. */}
         <div
           aria-hidden
           data-testid="quick-wheel-ambient"
-          className={`pointer-events-none absolute inset-[8%] rounded-full bg-[radial-gradient(circle_at_center,rgba(255,214,102,0.18)_0%,transparent_62%)] ${
+          className={`pointer-events-none absolute inset-[4%] rounded-full transition-[background] duration-500 ${
             !reduceMotion && !strikeMode ? 'animate-pulse' : ''
           }`}
+          style={{ background: `radial-gradient(circle at 50% 42%, ${activeHex}33 0%, transparent 62%)` }}
         />
+        {/* Arcade bezel — layered dark rim with real depth (drop + inset). */}
         <div
           aria-hidden
-          className="absolute inset-[12%] rounded-full border-[3px] border-neo-cozy/40 shadow-[0_0_24px_rgba(255,214,102,0.15)]"
+          className="absolute inset-0 rounded-full border-4 border-black"
+          style={{
+            background: 'conic-gradient(from 0deg,#2a2a44,#15152a,#2a2a44,#15152a,#2a2a44)',
+            boxShadow: '0 9px 0 rgba(0,0,0,0.5), inset 0 0 0 6px #0c0c1a, inset 0 8px 20px rgba(0,0,0,0.7)',
+          }}
+        />
+        {/* Neon glow rim in the active mode color. */}
+        <div
+          aria-hidden
+          className="absolute inset-[13%] rounded-full border-[3px] transition-[border-color,box-shadow] duration-500"
+          style={{ borderColor: `${activeHex}8c`, boxShadow: `0 0 26px ${activeHex}66, inset 0 0 22px rgba(0,0,0,0.6)` }}
         />
         <div
           aria-hidden
           data-testid="quick-wheel-orbit"
-          className={`absolute inset-[14%] rounded-full border-[3px] border-dashed border-neo-white/25 ${
+          className={`absolute inset-[15%] rounded-full border-[3px] border-dashed border-neo-white/20 ${
             !reduceMotion && !strikeMode ? 'wt-wheel-orbit' : ''
           }`}
         />
+        {/* Inner well — recessed center the knob sits in. */}
         <div
           aria-hidden
-          className="absolute inset-[28%] rounded-full border-2 border-black/40 bg-neo-navy-elevated/80 shadow-hard-sm"
+          className="absolute inset-[29%] rounded-full border-2 border-black/50"
+          style={{
+            background: 'radial-gradient(circle at 50% 35%, #242440, #0e0e1e 75%)',
+            boxShadow: 'inset 0 6px 16px rgba(0,0,0,0.8)',
+          }}
         />
 
         {strikeMode && (
@@ -306,13 +327,19 @@ export function QuickPlayWheel({
             >
               <span
                 className={`flex h-full w-full flex-col items-center justify-center gap-0.5 overflow-hidden rounded-2xl border-neo-thick border-black font-neo-display font-bold text-black ${
-                  isActive || isStrike
-                    ? `shadow-hard-lg ring-4 ${NODE_COLORS[mode].ring}`
-                    : 'shadow-hard'
+                  isActive || isStrike ? `ring-4 ${NODE_COLORS[mode].ring}` : ''
                 } ${NODE_COLORS[mode].bg} ${isStrike ? 'brightness-110' : ''} ${
                   locked && !isStrike ? 'opacity-45' : ''
                 }`}
                 data-testid={`quick-wheel-node-face-${mode}`}
+                style={{
+                  // Chunky beveled arcade keycap: top highlight + bottom shade
+                  // (inset) + a solid drop that lifts on the active node.
+                  boxShadow:
+                    isActive || isStrike
+                      ? `0 6px 0 rgba(0,0,0,0.8), inset 0 3px 0 rgba(255,255,255,0.5), inset 0 -4px 0 rgba(0,0,0,0.22), 0 0 26px ${NODE_COLORS[mode].hex}66`
+                      : '0 5px 0 rgba(0,0,0,0.7), inset 0 3px 0 rgba(255,255,255,0.4), inset 0 -4px 0 rgba(0,0,0,0.22)',
+                }}
               >
                 <span
                   className="relative flex items-center justify-center rounded-xl border-2 border-black/20 bg-white/25"
@@ -364,16 +391,21 @@ export function QuickPlayWheel({
           style={{ width: layout.knobSize, height: layout.knobSize }}
         >
           <span
-            className={`flex h-full w-full flex-col items-center justify-center gap-0.5 rounded-full border-4 border-black bg-neo-navy-elevated text-neo-cream shadow-hard-lg ring-[3px] ring-inset ${
+            className={`relative flex h-full w-full flex-col items-center justify-center gap-0.5 rounded-full border-4 border-black text-neo-cream ring-[3px] ring-inset ${
               strikeMode ? 'ring-neo-yellow' : 'ring-neo-cozy'
             } ${entered && !reduceMotion && !strikeMode ? 'animate-neo-pop' : ''} ${
               strikeMode && !reduceMotion ? 'quick-knob-pulse' : ''
             }`}
             style={{
+              // Tactile joystick knob: domed radial fill + raised bevel.
+              background: 'radial-gradient(circle at 50% 34%, #33335a, #1a1a30 70%)',
+              boxShadow: '0 6px 0 rgba(0,0,0,0.8), inset 0 3px 0 rgba(255,255,255,0.22)',
               animationDelay: reduceMotion || strikeMode ? undefined : '360ms',
               animationFillMode: 'both',
             }}
           >
+            {/* Grip ring — reads as a physical, draggable knob. */}
+            <span aria-hidden className="pointer-events-none absolute inset-[14%] rounded-full border-2 border-dashed border-white/15" />
             {isLoading ? (
               <Zap
                 className={`text-neo-yellow ${!reduceMotion ? 'animate-pulse' : ''}`}
