@@ -31,6 +31,7 @@ interface QuickProfileSetupProps {
  */
 const QuickProfileSetup: React.FC<QuickProfileSetupProps> = ({
   onComplete,
+  onPlayNow,
   hasPendingInvite,
   inviteContext,
   onSkipInvite,

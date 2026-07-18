@@ -18,7 +18,7 @@ interface LanguageSelectProps {
  * LanguageSelect — First step in the FTUE onboarding flow.
  * Brand-forward welcome with animated logo, language cards, and a strong CTA.
  */
-const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect }) => {
+const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect, onPlayNow }) => {
   const { language, setLanguage, t } = useLanguage();
   const [selected, setSelected] = useState<Language>(language);
 
