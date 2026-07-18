@@ -1,11 +1,10 @@
 'use client';
 
 import { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { m, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Play, Crown, Check, X, Trophy, Zap, Flame } from 'lucide-react';
 import Avatar from '@/components/Avatar';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useReducedMotion } from 'framer-motion';
 import { MODE_ICONS, MODE_ACTIVE_COLORS, getModeLabel, getModeDescription, type GameModeOption } from '@/components/GameModeSelector';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
