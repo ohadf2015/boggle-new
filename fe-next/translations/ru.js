@@ -2535,6 +2535,7 @@ const ru = {
       "best": "Макс {m} м",
       "possible": "{n} слов",
       "clue": "Подсказка",
+            "cluesLeft": "осталось {n}",
       "collapse": "Свернуть",
       "expand": "Развернуть",
       "rivalPassed": "Обогнал {name}!",

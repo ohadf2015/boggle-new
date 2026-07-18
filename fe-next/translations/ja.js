@@ -502,6 +502,7 @@ const ja = {
       "best": "ベスト {m} m",
       "possible": "{n} 単語",
       "clue": "ヒント",
+            "cluesLeft": "残り {n}",
       "collapse": "閉じる",
       "expand": "開く",
       "rivalPassed": "{name} を抜いた！",

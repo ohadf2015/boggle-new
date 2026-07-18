@@ -177,16 +177,16 @@ export function WordTowerHud(props: WordTowerHudProps) {
       {/* Screen-reader live announcements */}
       <div aria-live="polite" className="sr-only">{liveText}</div>
 
-      {/* Hot Streak badges — ephemeral run perks earned at height milestones. */}
+      {/* Hot Streak badges — ephemeral run perks earned at height milestones.
+          Kept small and quiet so they read as ambient status, not extra HUD noise. */}
       {runPerks && runPerks.length > 0 && (
-        <div className="pointer-events-none mb-1 flex items-end justify-center gap-2 px-4">
+        <div className="pointer-events-none mb-1 flex items-end justify-center gap-1.5 px-4">
           {runPerks.map((pk, i) => (
             <div
               key={`${pk.id}-${i}`}
               role="status"
               aria-label={t('wordTower.runPerk.hotStreak.a11y', { n: pk.dropsRemaining })}
-              className="flex items-center gap-1 rounded-full border-2 border-black bg-neo-orange px-2.5 py-0.5 font-neo-body text-xs font-black text-black shadow-hard-sm"
-              style={{ boxShadow: '0 0 10px rgba(255,107,53,0.65), 2px 2px 0 #000' }}
+              className="flex items-center gap-1 rounded-full border border-black bg-neo-orange px-2 py-0.5 font-neo-body text-[10px] font-black text-black shadow-hard-sm"
             >
               <span aria-hidden>🔥</span>
               <span>+{Math.round((pk.heightMult - 1) * 100)}%</span>

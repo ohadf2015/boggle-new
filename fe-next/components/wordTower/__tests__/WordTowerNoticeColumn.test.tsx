@@ -43,21 +43,39 @@ describe('WordTowerNoticeColumn', () => {
         verdict={{ value: { v: { tone: 'lime', labelKey: 'wordTower.verdict.perfect', gainText: '+4m', toppled: false }, key: 1 }, exiting: false }}
         zone={{ value: 'SKY', exiting: false }}
         reward={{ coins: 32, tier: 'common', source: 'zone', key: 2 }}
-        sabEarned={1}
       />,
     );
-    // All four beats share one flex-column container — the anti-pile-up contract.
+    // All three beats share one flex-column container — the anti-pile-up contract.
     const column = container.querySelector('[data-testid="wt-notice-column"]') as HTMLElement;
     expect(column.className).toContain('flex-col');
     const beats = column.querySelectorAll(':scope > [role="status"]');
-    expect(beats.length).toBe(4);
+    expect(beats.length).toBe(3);
     // Verdict leads the stack.
     expect(beats[0].textContent).toContain('wordTower.verdict.perfect');
     expect(beats[0].textContent).toContain('+4m');
-    // Zone banner, coin reveal and wrecking-ball earn follow inside the SAME column.
+    // Zone banner and coin reveal follow inside the SAME column.
     expect(column.textContent).toContain('SKY');
     expect(column.textContent).toContain('+32');
-    expect(column.textContent).toContain('wordTower.sabotage.earned');
+  });
+
+  it('caps simultaneous beats at MAX 3, dropping lower-priority ones', () => {
+    const { container } = render(
+      <WordTowerNoticeColumn
+        {...baseProps}
+        verdict={{ value: { v: { tone: 'lime', labelKey: 'wordTower.verdict.perfect', gainText: '+4m', toppled: false }, key: 1 }, exiting: false }}
+        zone={{ value: 'SKY', exiting: false }}
+        reward={{ coins: 32, tier: 'common', source: 'zone', key: 2 }}
+        sabEarned={1}
+      />,
+    );
+    const column = container.querySelector('[data-testid="wt-notice-column"]') as HTMLElement;
+    const beats = column.querySelectorAll(':scope > [role="status"]');
+    expect(beats.length).toBe(3);
+    // Verdict, zone and reward win; the lower-priority sabotage earn is hidden.
+    expect(column.textContent).toContain('wordTower.verdict.perfect');
+    expect(column.textContent).toContain('SKY');
+    expect(column.textContent).toContain('+32');
+    expect(column.textContent).not.toContain('wordTower.sabotage.earned');
   });
 
   it('applies the dedicated notice band from shared chrome framing', () => {

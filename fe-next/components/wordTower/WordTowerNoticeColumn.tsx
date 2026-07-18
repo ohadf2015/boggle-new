@@ -1,5 +1,6 @@
 'use client';
 
+import { Fragment, type ReactNode } from 'react';
 import { ChevronsUp } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { TowerNotice } from './TowerNotice';
@@ -27,6 +28,32 @@ const TOWER_TIER_KEY: Record<'highRise' | 'tall' | 'skyscraper', string> = {
   highRise: 'wordTower.celebration.highRise',
   tall: 'wordTower.celebration.tall',
   skyscraper: 'wordTower.celebration.skyscraper',
+};
+
+/** Hard ceiling on simultaneous notices so they never pile into an overwhelming
+ *  stack (founder screenshot 2026-07-02). */
+const MAX_NOTICES = 3;
+
+/** Priority order: the most screen-dominant / time-sensitive beats win when
+ *  many fire at once. Verdict and alarms always lead; scenic flybys trail. */
+const NOTICE_PRIORITY: Record<string, number> = {
+  verdict: 10,
+  hazard: 20,
+  clutch: 30,
+  critical: 35,
+  newBest: 40,
+  zone: 50,
+  reward: 55,
+  surprise: 60,
+  combo: 70,
+  milestone: 80,
+  landmark: 90,
+  skinUnlock: 100,
+  ach: 110,
+  wreckReport: 120,
+  sabEarned: 130,
+  sabAdEarned: 140,
+  tease: 150,
 };
 
 export interface WordTowerNoticeColumnProps {
@@ -78,23 +105,22 @@ export function WordTowerNoticeColumn({
   const { language } = useLanguage();
   const fxClass = (exiting: boolean, enter: string) => (reducedMotion ? '' : exiting ? 'wt-toast-out' : enter);
 
-  return (
-    <div
-      data-testid="wt-notice-column"
-      className="pointer-events-none absolute inset-x-0 z-30 flex flex-col items-center gap-1.5 overflow-hidden px-3"
-      style={{
-        top: noticeTopPx ?? '8.75rem',
-        maxHeight: noticeMaxHeightPx ?? undefined,
-      }}
-    >
-      {/* Unmistakable DROP VERDICT — the single big beat that answers "did I
-          nail it?". Band-coloured headline (PERFECT/NICE/SLOPPY/MISSED) + the
-          metres actually gained. Leads the column so it can't be missed AND
-          can't collide with the celebration stack below it. */}
-      {verdict.value && (() => { const v = verdict.value; return (
+  /** Build every visible beat as a keyed node + priority, then render only the
+   *  top MAX_NOTICES so the stack never overwhelms the play area. */
+  const notices: { key: string; priority: number; node: ReactNode }[] = [];
+
+  // Unmistakable DROP VERDICT — the single big beat that answers "did I
+  // nail it?". Band-coloured headline (PERFECT/NICE/SLOPPY/MISSED) + the
+  // metres actually gained. Leads the column so it can't be missed AND
+  // can't collide with the celebration stack below it.
+  if (verdict.value) {
+    const v = verdict.value;
+    notices.push({
+      key: `verdict-${v.key}`,
+      priority: NOTICE_PRIORITY.verdict,
+      node: (
         <div
-          key={v.key}
-          className={`pointer-events-none flex flex-col items-center gap-1.5 ${fxClass(verdict.exiting, '')}`}
+          className={`pointer-events-none flex flex-col items-center gap-1.5 ${fxClass(verdict.exiting, 'animate-neo-pop')}`}
           aria-live="assertive"
           role="status"
         >
@@ -117,77 +143,156 @@ export function WordTowerNoticeColumn({
             </div>
           )}
         </div>
-      ); })()}
+      ),
+    });
+  }
 
-      {/* Hazard "tower ruined" — bold + red so the loss is unmissable. */}
-      {hazard.value && (
-        <TowerNotice tone="red" title={hazard.value} exiting={hazard.exiting} reducedMotion={reducedMotion} assertive shake titleClassName="normal-case" />
-      )}
+  // Hazard "tower ruined" — bold + red so the loss is unmissable.
+  if (hazard.value) {
+    notices.push({
+      key: `hazard-${hazard.value}`,
+      priority: NOTICE_PRIORITY.hazard,
+      node: (
+        <TowerNotice
+          key={`hazard-${hazard.value}`}
+          tone="red"
+          title={hazard.value}
+          exiting={hazard.exiting}
+          reducedMotion={reducedMotion}
+          assertive
+          shake
+          titleClassName="normal-case"
+        />
+      ),
+    });
+  }
 
-      {/* CLUTCH SAVE — the do-or-die payoff. Lime = triumph. */}
-      {clutch.value && (
-        <TowerNotice tone="lime" title={clutch.value} exiting={clutch.exiting} reducedMotion={reducedMotion} assertive titleClassName="text-lg" />
-      )}
+  // CLUTCH SAVE — the do-or-die payoff. Lime = triumph.
+  if (clutch.value) {
+    notices.push({
+      key: `clutch-${clutch.value}`,
+      priority: NOTICE_PRIORITY.clutch,
+      node: (
+        <TowerNotice
+          key={`clutch-${clutch.value}`}
+          tone="lime"
+          title={clutch.value}
+          exiting={clutch.exiting}
+          reducedMotion={reducedMotion}
+          assertive
+          titleClassName="text-lg"
+        />
+      ),
+    });
+  }
 
-      {/* CRITICAL-lean warning — persistent while the tower is one shaky drop
-          from falling; pulses (not pops) so it reads as a live alarm. */}
-      {critical && (
+  // CRITICAL-lean warning — persistent while the tower is one shaky drop
+  // from falling; pulses (not pops) so it reads as a live alarm.
+  if (critical) {
+    notices.push({
+      key: 'critical',
+      priority: NOTICE_PRIORITY.critical,
+      node: (
         <div
+          key="critical"
           className={`flex items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-orange px-3 py-1.5 font-neo-display text-sm font-black uppercase tracking-wide text-black shadow-hard ${reducedMotion ? '' : 'animate-pulse'}`}
           aria-live="assertive"
+          role="status"
         >
           ⚠ {t('wordTower.clutch.critical')}
         </div>
-      )}
+      ),
+    });
+  }
 
-      {/* New daily best — the self-comparison routine beat. Gold = record. */}
-      {newBest.value && (
-        <TowerNotice tone="yellow" title={<>🏆 {newBest.value}</>} exiting={newBest.exiting} reducedMotion={reducedMotion} />
-      )}
-
-      {/* NEW ZONE banner — the headline of entering a new biome. */}
-      {zone.value && (
-        <TowerNotice tone="cyan" kicker={t('wordTower.zone.entered')} title={zone.value} exiting={zone.exiting} reducedMotion={reducedMotion} />
-      )}
-
-      {/* Next-zone tease — quiet anticipation chip in the approach window. */}
-      {tease && (
-        <div
-          className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
-          aria-live="polite"
-        >
-          <ChevronsUp className="h-3 w-3" />
-          {t('wordTower.zone.next', { zone: t(`wordTower.biome.${tease.nextBiomeId}`), m: Math.ceil(tease.metersToNext) })}
-        </div>
-      )}
-
-      {/* "You actually got coins" reveal — the granted amount + rarity, right
-          under the zone/achievement banner that usually pays it. */}
-      <WordTowerRewardReveal reward={reward} t={t} language={language} reducedMotion={reducedMotion} />
-
-      {/* Wrecking-ball EARN toasts — surfaced here (not beside the rail chip)
-          so the "new zone → coins + wrecking ball" combo stacks as one beat. */}
-      {sabEarned != null && (
+  // New daily best — the self-comparison routine beat. Gold = record.
+  if (newBest.value) {
+    notices.push({
+      key: `newBest-${newBest.value}`,
+      priority: NOTICE_PRIORITY.newBest,
+      node: (
         <TowerNotice
+          key={`newBest-${newBest.value}`}
+          tone="yellow"
+          title={<>🏆 {newBest.value}</>}
+          exiting={newBest.exiting}
+          reducedMotion={reducedMotion}
+        />
+      ),
+    });
+  }
+
+  // NEW ZONE banner — the headline of entering a new biome.
+  if (zone.value) {
+    notices.push({
+      key: `zone-${zone.value}`,
+      priority: NOTICE_PRIORITY.zone,
+      node: (
+        <TowerNotice
+          key={`zone-${zone.value}`}
+          tone="cyan"
+          kicker={t('wordTower.zone.entered')}
+          title={zone.value}
+          exiting={zone.exiting}
+          reducedMotion={reducedMotion}
+        />
+      ),
+    });
+  }
+
+  // "You actually got coins" reveal — the granted amount + rarity, right
+  // under the zone/achievement banner that usually pays it.
+  if (reward) {
+    notices.push({
+      key: `reward-${reward.key}`,
+      priority: NOTICE_PRIORITY.reward,
+      node: <WordTowerRewardReveal key={`reward-${reward.key}`} reward={reward} t={t} language={language} reducedMotion={reducedMotion} />,
+    });
+  }
+
+  // Wrecking-ball EARN toasts — surfaced here (not beside the rail chip)
+  // so the "new zone → coins + wrecking ball" combo stacks as one beat.
+  if (sabEarned != null) {
+    notices.push({
+      key: `sab-${sabEarned}`,
+      priority: NOTICE_PRIORITY.sabEarned,
+      node: (
+        <TowerNotice
+          key={`sab-${sabEarned}`}
           tone="yellow"
           title={<><span aria-hidden>🎯</span> {t('wordTower.sabotage.earned')}</>}
           detail={t('wordTower.sabotage.earnedHint', { n: sabEarned })}
           reducedMotion={reducedMotion}
           titleClassName="normal-case text-sm tracking-normal"
         />
-      )}
-      {sabAdEarned && (
+      ),
+    });
+  }
+  if (sabAdEarned) {
+    notices.push({
+      key: 'sab-ad',
+      priority: NOTICE_PRIORITY.sabAdEarned,
+      node: (
         <TowerNotice
+          key="sab-ad"
           tone="cyan"
           title={t('wordTower.sabotage.adEarned')}
           reducedMotion={reducedMotion}
           titleClassName="normal-case text-sm tracking-normal"
         />
-      )}
+      ),
+    });
+  }
 
-      {/* NEW SKIN UNLOCKED — variable-reward beat at a skin's height milestone. */}
-      {skinUnlock.value && (() => { const unlocked = skinUnlock.value; return (
+  // NEW SKIN UNLOCKED — variable-reward beat at a skin's height milestone.
+  if (skinUnlock.value) {
+    const unlocked = skinUnlock.value;
+    notices.push({
+      key: `skin-${unlocked.id}`,
+      priority: NOTICE_PRIORITY.skinUnlock,
+      node: (
         <TowerNotice
+          key={`skin-${unlocked.id}`}
           tone="yellow"
           kicker={t('wordTower.skin.unlockedToast')}
           title={
@@ -202,41 +307,52 @@ export function WordTowerNoticeColumn({
           exiting={skinUnlock.exiting}
           reducedMotion={reducedMotion}
         />
-      ); })()}
+      ),
+    });
+  }
 
-      {/* Surprise pop — the variable-reward beat. Gold = lucky hit. */}
-      {surprise.value && (() => {
-        const surpriseFx = surprise.value;
-        const meta = TOWER_SURPRISE_META[surpriseFx.s.event];
-        return (
-          <TowerNotice
-            key={surpriseFx.key}
-            tone="yellow"
-            title={meta ? <><span aria-hidden>{meta.emoji}</span> {t(`wordTower.surprise.${meta.key}`)}</> : null}
-            detail={
-              surpriseFx.s.event === 'updraft'
-                // Updraft pays out on the NEXT word — surface the PROMISE
-                // explicitly so the reward isn't hollow.
-                ? <span className="tabular-nums">{t('wordTower.surprise.nextWord')} ×{UPDRAFT_MULT}</span>
-                : (surpriseFx.s.bonusMeters > 0 || surpriseFx.s.bonusScrambles > 0)
-                  ? (
-                    <span dir="ltr" className="tabular-nums">
-                      {surpriseFx.s.bonusMeters > 0 && `+${Math.round(surpriseFx.s.bonusMeters)}m`}
-                      {surpriseFx.s.bonusMeters > 0 && surpriseFx.s.bonusScrambles > 0 && ' · '}
-                      {surpriseFx.s.bonusScrambles > 0 && `+${surpriseFx.s.bonusScrambles}🔀`}
-                    </span>
-                  )
-                  : undefined
-            }
-            exiting={surprise.exiting}
-            reducedMotion={reducedMotion}
-            titleClassName="text-xl"
-          />
-        );
-      })()}
+  // Surprise pop — the variable-reward beat. Gold = lucky hit.
+  if (surprise.value) {
+    const surpriseFx = surprise.value;
+    const meta = TOWER_SURPRISE_META[surpriseFx.s.event];
+    notices.push({
+      key: `surprise-${surpriseFx.key}`,
+      priority: NOTICE_PRIORITY.surprise,
+      node: (
+        <TowerNotice
+          key={surpriseFx.key}
+          tone="yellow"
+          title={meta ? <><span aria-hidden>{meta.emoji}</span> {t(`wordTower.surprise.${meta.key}`)}</> : null}
+          detail={
+            surpriseFx.s.event === 'updraft'
+              // Updraft pays out on the NEXT word — surface the PROMISE
+              // explicitly so the reward isn't hollow.
+              ? <span className="tabular-nums">{t('wordTower.surprise.nextWord')} ×{UPDRAFT_MULT}</span>
+              : (surpriseFx.s.bonusMeters > 0 || surpriseFx.s.bonusScrambles > 0)
+                ? (
+                  <span dir="ltr" className="tabular-nums">
+                    {surpriseFx.s.bonusMeters > 0 && `+${Math.round(surpriseFx.s.bonusMeters)}m`}
+                    {surpriseFx.s.bonusMeters > 0 && surpriseFx.s.bonusScrambles > 0 && ' · '}
+                    {surpriseFx.s.bonusScrambles > 0 && `+${surpriseFx.s.bonusScrambles}🔀`}
+                  </span>
+                )
+                : undefined
+          }
+          exiting={surprise.exiting}
+          reducedMotion={reducedMotion}
+          titleClassName="text-xl"
+        />
+      ),
+    });
+  }
 
-      {/* Combo-milestone fanfare — flame-orange "×5 ON FIRE!". */}
-      {combo.value && (() => { const comboFx = combo.value; return (
+  // Combo-milestone fanfare — flame-orange "×5 ON FIRE!".
+  if (combo.value) {
+    const comboFx = combo.value;
+    notices.push({
+      key: `combo-${comboFx.key}`,
+      priority: NOTICE_PRIORITY.combo,
+      node: (
         <TowerNotice
           key={comboFx.key}
           tone="orange"
@@ -245,21 +361,55 @@ export function WordTowerNoticeColumn({
           reducedMotion={reducedMotion}
           titleClassName="text-lg"
         />
-      ); })()}
+      ),
+    });
+  }
 
-      {/* Witty milestone toast. */}
-      {milestone.value && (
-        <TowerNotice tone="purple" title={milestone.value} exiting={milestone.exiting} reducedMotion={reducedMotion} titleClassName="normal-case text-sm tracking-normal" />
-      )}
-
-      {/* Calm landmark flyby — cosy cream so it reads scenic, not celebratory. */}
-      {landmark.value && (
-        <TowerNotice tone="cream" title={landmark.value} exiting={landmark.exiting} reducedMotion={reducedMotion} titleClassName="normal-case text-sm tracking-normal" />
-      )}
-
-      {/* Achievement unlock. */}
-      {ach.value && (() => { const achToast = ach.value; return (
+  // Witty milestone toast.
+  if (milestone.value) {
+    notices.push({
+      key: `milestone-${milestone.value}`,
+      priority: NOTICE_PRIORITY.milestone,
+      node: (
         <TowerNotice
+          key={`milestone-${milestone.value}`}
+          tone="purple"
+          title={milestone.value}
+          exiting={milestone.exiting}
+          reducedMotion={reducedMotion}
+          titleClassName="normal-case text-sm tracking-normal"
+        />
+      ),
+    });
+  }
+
+  // Calm landmark flyby — cosy cream so it reads scenic, not celebratory.
+  if (landmark.value) {
+    notices.push({
+      key: `landmark-${landmark.value}`,
+      priority: NOTICE_PRIORITY.landmark,
+      node: (
+        <TowerNotice
+          key={`landmark-${landmark.value}`}
+          tone="cream"
+          title={landmark.value}
+          exiting={landmark.exiting}
+          reducedMotion={reducedMotion}
+          titleClassName="normal-case text-sm tracking-normal"
+        />
+      ),
+    });
+  }
+
+  // Achievement unlock.
+  if (ach.value) {
+    const achToast = ach.value;
+    notices.push({
+      key: `ach-${achToast.id}`,
+      priority: NOTICE_PRIORITY.ach,
+      node: (
+        <TowerNotice
+          key={achToast.id}
           tone="yellow"
           kicker={t('wordTower.ach.unlocked')}
           title={<>{achToast.icon} {t(achToast.nameKey)}</>}
@@ -267,12 +417,19 @@ export function WordTowerNoticeColumn({
           reducedMotion={reducedMotion}
           titleClassName="normal-case text-sm tracking-normal"
         />
-      ); })()}
+      ),
+    });
+  }
 
-      {/* Wreck Report — a rival raided you while away; the hit has already been
-          folded in + you were handed a compensation scramble. */}
-      {wreckReport && (
+  // Wreck Report — a rival raided you while away; the hit has already been
+  // folded in + you were handed a compensation scramble.
+  if (wreckReport) {
+    notices.push({
+      key: `wreck-${wreckReport.names.join('-')}-${wreckReport.floors}`,
+      priority: NOTICE_PRIORITY.wreckReport,
+      node: (
         <TowerNotice
+          key={`wreck-${wreckReport.names.join('-')}-${wreckReport.floors}`}
           tone="pink"
           title={<><span aria-hidden>🧨</span> {t('wordTower.wreck.reportTitle')}</>}
           detail={t('wordTower.wreck.reportBody', {
@@ -282,7 +439,45 @@ export function WordTowerNoticeColumn({
           reducedMotion={reducedMotion}
           titleClassName="normal-case"
         />
-      )}
+      ),
+    });
+  }
+
+  // Next-zone tease — quiet anticipation chip in the approach window.
+  if (tease) {
+    notices.push({
+      key: `tease-${tease.nextBiomeId}`,
+      priority: NOTICE_PRIORITY.tease,
+      node: (
+        <div
+          key={`tease-${tease.nextBiomeId}`}
+          className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy/75 px-2 py-1 font-neo-body text-[11px] font-bold text-neo-cyan backdrop-blur-sm"
+          aria-live="polite"
+          role="status"
+        >
+          <ChevronsUp className="h-3 w-3" />
+          {t('wordTower.zone.next', { zone: t(`wordTower.biome.${tease.nextBiomeId}`), m: Math.ceil(tease.metersToNext) })}
+        </div>
+      ),
+    });
+  }
+
+  // Stable sort by priority so the most important beats render first.
+  notices.sort((a, b) => a.priority - b.priority);
+  const visible = notices.slice(0, MAX_NOTICES);
+
+  return (
+    <div
+      data-testid="wt-notice-column"
+      className="pointer-events-none absolute inset-x-0 z-30 flex flex-col items-center gap-1.5 overflow-hidden px-3"
+      style={{
+        top: noticeTopPx ?? '8.75rem',
+        maxHeight: noticeMaxHeightPx ?? undefined,
+      }}
+    >
+      {visible.map(({ key, node }) => (
+        <Fragment key={key}>{node}</Fragment>
+      ))}
     </div>
   );
 }

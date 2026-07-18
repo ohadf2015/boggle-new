@@ -760,6 +760,7 @@ const sv = {
       "best": "Bästa {m} m",
       "possible": "{n} ord",
       "clue": "Ledtråd",
+            "cluesLeft": "{n} kvar",
       "collapse": "Fäll ihop",
       "expand": "Expandera",
       "rivalPassed": "Förbi {name}!",

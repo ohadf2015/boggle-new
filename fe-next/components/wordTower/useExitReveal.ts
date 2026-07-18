@@ -25,6 +25,10 @@ export function useExitReveal<T>(source: T | null | undefined, exitMs = 420): { 
   valueRef.current = value;
 
   useEffect(() => {
+    // Guard against the setTimeout and the rAF watchdog both firing, or a stale
+    // watchdog tick running after the value has already been cleared. Ensures
+    // the finish cleanup runs exactly once per exit.
+    let finished = false;
     if (timer.current) { clearTimeout(timer.current); timer.current = null; }
     let raf = 0;
 
@@ -37,6 +41,7 @@ export function useExitReveal<T>(source: T | null | undefined, exitMs = 420): { 
       // via setTimeout(0). A busy webview frame can starve that 0ms timer, leaving
       // the toast stuck — the founder's "notifications stay stuck" report. Clearing
       // in the effect body removes the timer dependency entirely.
+      finished = true;
       setValue(null);
       setExiting(false);
     } else if (valueRef.current != null) {
@@ -44,6 +49,8 @@ export function useExitReveal<T>(source: T | null | undefined, exitMs = 420): { 
       // value on screen until the animation finishes, then unmount it.
       setExiting(true);
       const finish = () => {
+        if (finished) return;
+        finished = true;
         if (raf) cancelAnimationFrame(raf);
         setValue(null);
         setExiting(false);
@@ -52,12 +59,14 @@ export function useExitReveal<T>(source: T | null | undefined, exitMs = 420): { 
       timer.current = setTimeout(finish, exitMs);
       // rAF watchdog (same rationale as useAutoDismiss): guarantees the exit
       // completes + unmounts even if the main thread starves setTimeout, so a
-      // toast can never linger half-faded on a busy frame.
+      // toast can never linger half-faded on a busy frame. The `finished` guard
+      // prevents it from double-firing if the setTimeout already won.
       if (exitMs > 0 && typeof requestAnimationFrame !== 'undefined') {
         const start = (typeof performance !== 'undefined' ? performance.now() : Date.now());
+        const now = () => (typeof performance !== 'undefined' ? performance.now() : Date.now());
         const tick = () => {
-          const now = (typeof performance !== 'undefined' ? performance.now() : Date.now());
-          if (now - start >= exitMs) {
+          if (finished) return;
+          if (now() - start >= exitMs) {
             if (timer.current) { clearTimeout(timer.current); }
             finish();
             return;
@@ -69,6 +78,7 @@ export function useExitReveal<T>(source: T | null | undefined, exitMs = 420): { 
     }
 
     return () => {
+      finished = true;
       if (timer.current) { clearTimeout(timer.current); timer.current = null; }
       if (raf) cancelAnimationFrame(raf);
     };

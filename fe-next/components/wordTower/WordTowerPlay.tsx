@@ -17,6 +17,7 @@ import { useWordTower } from '@/lib/wordTower/useWordTower';
 import {
   biomeForHeight,
   floorMeters,
+  restoreWordTowerState,
   serializeWordTowerState,
   type WordTowerPlayerState,
 } from '@/lib/wordTower/wordTowerManager';
@@ -42,7 +43,7 @@ import {
   type DailyMutator,
 } from '@/lib/wordTower/dailyMutators';
 import { comboMilestone, type ComboMilestone } from '@/lib/wordTower/comboMilestone';
-import { utcDateKey } from '@/lib/wordTower/dailySeed';
+import { dailyTowerGameCode, DAILY_PLAYER_ID, utcDateKey } from '@/lib/wordTower/dailySeed';
 import { WordTowerMutatorBanner } from './WordTowerMutatorBanner';
 import { WordTowerNoticeColumn } from './WordTowerNoticeColumn';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -107,6 +108,34 @@ const REWARD_MS = 1500;
 /** Wreck Report (async raid landed on you) holds longest — it's a one-per-session
  *  story beat the defender should actually read. */
 const WRECK_REPORT_MS = 3500;
+
+/** Local session fallback key. Daily runs are isolated per UTC day so yesterday's
+ *  state is never restored as today's climb. */
+function sessionStorageKey(daily: boolean) {
+  return daily ? `wt-session-daily-${utcDateKey()}` : 'wt-session-endless';
+}
+
+interface SavedSession {
+  savedAt: number;
+  state: ReturnType<typeof serializeWordTowerState>;
+}
+
+function saveSessionToLocalStorage(g: WordTowerPlayerState, daily: boolean) {
+  try {
+    const payload: SavedSession = { savedAt: Date.now(), state: serializeWordTowerState(g) };
+    localStorage.setItem(sessionStorageKey(daily), JSON.stringify(payload));
+  } catch { /* best-effort; private mode can throw */ }
+}
+
+function loadSessionFromLocalStorage(daily: boolean): SavedSession | null {
+  try {
+    const raw = localStorage.getItem(sessionStorageKey(daily));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as SavedSession;
+    if (!parsed?.state) return null;
+    return parsed;
+  } catch { return null; }
+}
 
 /* (Verdict tone classes + tier-kicker keys moved into WordTowerNoticeColumn.) */
 
@@ -789,13 +818,22 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     state: serializeWordTowerState(g),
   }), []);
 
-  const save = useCallback((beacon = false) => {
-    // Daily runs are perk-eligible and bounded — they must NEVER touch the shared
-    // endless best-height board, or a boosted climb would inflate it. Hard gate.
-    if (daily) return;
+  const save = useCallback((beacon = false, opts: { force?: boolean } = {}) => {
     const g = gameRef.current;
-    if (g.floors.length === lastSavedFloors.current) return;
+    // Always flush the session locally — it's cheap and protects guests, daily
+    // runs, and authenticated players when the network drops or the API rejects.
+    saveSessionToLocalStorage(g, daily);
+
+    // Daily runs are perk-eligible and bounded — they must NEVER touch the shared
+    // endless best-height board, or a boosted climb would inflate it. Local session
+    // persistence above is the ONLY save they need.
+    if (daily) return;
+
+    // Server upserts are deduped by floor count to avoid redundant writes; forced
+    // saves (interval, unload, biome crossing) bypass the dedupe.
+    if (!opts.force && g.floors.length === lastSavedFloors.current) return;
     lastSavedFloors.current = g.floors.length;
+
     const body = JSON.stringify(buildPayload(g));
     if (beacon && typeof navigator !== 'undefined' && navigator.sendBeacon) {
       navigator.sendBeacon('/api/word-tower/progress', new Blob([body], { type: 'application/json' }));
@@ -806,14 +844,63 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       headers: { 'content-type': 'application/json' },
       body,
       keepalive: true,
-    }).catch(() => { /* best-effort */ });
+    })
+      .then((r) => {
+        // 401 (unauthenticated) or any server error → local session is the fallback.
+        if (!r.ok) saveSessionToLocalStorage(g, daily);
+      })
+      .catch(() => {
+        // Network failure → local session already holds the latest state.
+        saveSessionToLocalStorage(g, daily);
+      });
   }, [buildPayload, daily]);
 
-  // Save cadence: every 10 floors + on biome crossing (rare, high-signal).
+  // Restore a previous session from localStorage on load. This is especially
+  // important for guests and daily runs, where the server has no progress row.
+  const sessionRestoredRef = useRef(false);
+  useEffect(() => {
+    if (sessionRestoredRef.current) return;
+    if (typeof window === 'undefined') return;
+    if (!dictionary) return; // wait for the dictionary so the restored tray is solvable
+    const saved = loadSessionFromLocalStorage(daily);
+    if (!saved) return;
+    sessionRestoredRef.current = true;
+    const restored = restoreWordTowerState(
+      {
+        gameCode: daily ? dailyTowerGameCode() : 'solo',
+        playerId: daily ? DAILY_PLAYER_ID : 'solo',
+        language,
+        dict: dictionary,
+      },
+      saved.state,
+    );
+    // Only restore if there's actual progress and it is at least as far as the
+    // server-provided initial game (prevents a stale local blob from rolling back
+    // an authenticated player whose server progress is ahead).
+    if (restored.floors.length === 0 && restored.heightM === 0) return;
+    if (restored.floors.length < initialGame.floors.length || restored.heightM < initialGame.heightM) return;
+    tower.restore(restored);
+  }, [daily, dictionary, initialGame, language, tower.restore]);
+
+  // Save cadence: every 5 floors + on biome crossing (rare, high-signal).
   const floorsCount = game.floors.length;
   useEffect(() => {
-    if (floorsCount > 0 && floorsCount % 10 === 0) save();
+    if (floorsCount > 0 && floorsCount % 5 === 0) save();
   }, [floorsCount, save]);
+
+  // Periodically flush to localStorage (and server for endless) so even a crash
+  // or killed app loses at most 2 minutes of progress.
+  useEffect(() => {
+    const id = setInterval(() => save(false, { force: true }), 120_000);
+    return () => clearInterval(id);
+  }, [save]);
+
+  // Flush on page close / reload so the latest state is always persisted.
+  useEffect(() => {
+    const onBeforeUnload = () => save(true, { force: true });
+    window.addEventListener('beforeunload', onBeforeUnload);
+    return () => window.removeEventListener('beforeunload', onBeforeUnload);
+  }, [save]);
 
   // Daily engagement → grow the streak. Fires once the first floor lands (a real
   // attempt, not a mount), and is idempotent downstream so repeats are harmless.
@@ -838,7 +925,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     }
   }, [daily, newBestShown, personalBestM, game.heightM, onNewDailyBest]); // eslint-disable-line react-hooks/exhaustive-deps
   useAutoDismiss(newBestText, () => setNewBestText(null), TOAST_MS);
-  useEffect(() => { if (game.heightM > 0) save(); }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (game.heightM > 0) save(false, { force: true }); }, [biomeId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Cool EXIT for every compliment/message: after its ~2s hold the source
   //    nulls, and useExitReveal keeps the LAST value on screen with `exiting`
@@ -865,12 +952,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
 
   // Always flush when the tab is hidden / page unloads.
   useEffect(() => {
-    const onHide = () => { if (document.visibilityState === 'hidden') save(true); };
-    const onPageHide = () => save(true);
+    const onHide = () => { if (document.visibilityState === 'hidden') save(true, { force: true }); };
+    const onPageHide = () => save(true, { force: true });
     window.addEventListener('visibilitychange', onHide);
     window.addEventListener('pagehide', onPageHide);
     return () => {
-      save(true);
+      save(true, { force: true });
       window.removeEventListener('visibilitychange', onHide);
       window.removeEventListener('pagehide', onPageHide);
     };
@@ -1167,7 +1254,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         <div className="flex items-center justify-between gap-2">
           <Link
             href={`/${language}`}
-            onClick={() => save(true)}
+            onClick={() => save(true, { force: true })}
             aria-label={t('common.backToHome')}
             className="pointer-events-auto flex h-10 shrink-0 items-center gap-1 rounded-neo border-neo-thick border-black bg-neo-navy/80 px-3 font-neo-body text-sm font-bold text-neo-white shadow-hard backdrop-blur-sm"
           >

@@ -502,6 +502,7 @@ const he = {
       "best": "שיא {m} מ'",
       "possible": "{n} מילים",
       "clue": "רמז",
+            "cluesLeft": "נותרו {n}",
       "collapse": "כיווץ",
       "expand": "הרחבה",
       "rivalPassed": "עברת את {name}!",

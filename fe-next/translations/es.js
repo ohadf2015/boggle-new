@@ -496,6 +496,7 @@ const es = {
       "best": "Mejor {m} m",
       "possible": "{n} palabras",
       "clue": "Pista",
+            "cluesLeft": "{n} restantes",
       "collapse": "Contraer",
       "expand": "Expandir",
       "rivalPassed": "¡Superaste a {name}!",

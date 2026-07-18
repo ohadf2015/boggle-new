@@ -1,5 +1,0 @@
-fix(word-tower): remove pulsing border, disable sway, simplify StatHud
-
-- Remove WordTowerFlowFrame (pulsing inset border — redundant)
-- Disable tower sway animation (instability=0) — was causing flickering
-- Simplify StatHud to altitude + combo only (no expandable detail section)
