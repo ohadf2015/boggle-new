@@ -17,11 +17,11 @@ const huntProps: Record<string, unknown>[] = [];
 const wheelProps: Record<string, unknown>[] = [];
 const blastProps: Record<string, unknown>[] = [];
 
-vi.mock('@/components/singleplayer/SinglePlayerGame', () => ({
+vi.mock('../QuickClassicBoard', () => ({
   __esModule: true,
   default: (props: Record<string, unknown>) => {
     classicProps.push(props);
-    return <div data-testid="mock-classic" data-hide-coach={String(props.hideModeCoach)} />;
+    return <div data-testid="mock-classic" />;
   },
 }));
 
@@ -74,7 +74,7 @@ describe('QuickModeAdapter — ModeCoach suppress for quick play', () => {
     blastProps.length = 0;
   });
 
-  it('classic passes hideModeCoach so ModeCoach cannot block the round', async () => {
+  it('classic renders the MP board (InGameScreen has no ModeCoach to block the round)', async () => {
     render(
       <QuickModeAdapter
         config={config('classic')}
@@ -83,7 +83,7 @@ describe('QuickModeAdapter — ModeCoach suppress for quick play', () => {
       />
     );
     await screen.findByTestId('mock-classic');
-    expect(classicProps[0]?.hideModeCoach).toBe(true);
+    expect(classicProps).toHaveLength(1);
   });
 
   it('word-hunt passes hideModeCoach (practice alone still shows PracticeCoachTip)', async () => {

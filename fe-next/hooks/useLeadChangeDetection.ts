@@ -4,10 +4,7 @@ export interface LeadChangeEvent {
   type: 'took-lead' | 'lost-lead' | 'other-took-lead';
   newLeader: string;
   previousLeader?: string;
-  /** Optional points margin over the runner-up, shown as a "(+N)" chip in
-   *  LeadChangeBanner when present. The detection hook does not currently
-   *  populate it; the banner guards every use with `!= null`, so it stays a
-   *  no-op until a producer sets it. Declared here so the banner type-checks. */
+  /** Points the new leader is ahead by — shown as "(+N)" in LeadChangeBanner. Optional; undefined hides it. */
   scoreGap?: number;
 }
 

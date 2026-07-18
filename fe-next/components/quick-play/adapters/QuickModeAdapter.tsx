@@ -15,10 +15,10 @@ import { useRef, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import type { QuickRoundConfig, QuickRoundResult } from '../types';
 import { BlastQuickRound } from './BlastQuickRound';
-import { fromWordWheel, fromSurvival, fromSinglePlayer } from './normalizeResult';
+import { fromWordWheel, fromSurvival } from './normalizeResult';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 
-const SinglePlayerGame = dynamic(() => import('@/components/singleplayer/SinglePlayerGame'), { ssr: false });
+const QuickClassicBoard = dynamic(() => import('./QuickClassicBoard'), { ssr: false });
 const DailyWordHuntSurvival = dynamic(() => import('@/components/daily/DailyWordHuntSurvival'), { ssr: false });
 const WordWheelGame = dynamic(() => import('@/components/daily/WordWheelGame'), { ssr: false });
 
@@ -123,29 +123,9 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
     default:
       return (
         <div className={STAGE_FILL} data-testid="quick-stage-classic">
-          {/* PortraitGameLayout needs flex-1 h-full ancestors to size the board CQ. */}
-          <div className="relative flex h-full min-h-0 w-full flex-1 flex-col px-2 sm:px-3">
-            <SinglePlayerGame
-              settings={{
-                mode: 'challenge',
-                difficulty: 'MEDIUM',
-                language: config.language as never,
-                grid: config.grid as never,
-                timerSeconds: config.durationSec,
-                bots: [], // quick play is bot-free by design
-                minWordLength: 3,
-              }}
-              // Don't surface "beat the perfect score" challenge tracker —
-              // arcade rounds are about your score this round, not a HS race.
-              targetHighScore={null}
-              hideModeCoach
-              onGameEnd={(r: { playerScore: number; playerWords: string[] }) =>
-                finish(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config))
-              }
-              onQuit={onQuit}
-              quitStaysOnPage
-            />
-          </div>
+          {/* Classic now renders the MULTIPLAYER board (InGameScreen) run solo —
+              the board players see in a live room, not the legacy SP layout. */}
+          <QuickClassicBoard config={config} onDone={finish} onQuit={onQuit} />
         </div>
       );
   }

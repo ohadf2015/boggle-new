@@ -20,7 +20,7 @@ vi.mock('@/components/daily/DailyWordHuntSurvival', () => ({
   __esModule: true,
   default: () => <div data-testid="mock-hunt">hunt</div>,
 }));
-vi.mock('@/components/singleplayer/SinglePlayerGame', () => ({
+vi.mock('../QuickClassicBoard', () => ({
   __esModule: true,
   default: () => <div data-testid="mock-classic">classic</div>,
 }));
@@ -88,11 +88,9 @@ describe('QuickModeAdapter — playable stage for all modes', () => {
     const stage = await screen.findByTestId('quick-stage-classic');
     assertBaseStage(stage);
     expect(stage.className).toMatch(/overflow-hidden/);
-    // Inner wrap gives PortraitGameLayout a real h-full flex ancestor
-    const wrap = stage.firstElementChild as HTMLElement;
-    expect(wrap.className).toMatch(/h-full/);
-    expect(wrap.className).toMatch(/flex-1/);
-    expect(wrap.className).toMatch(/w-full/);
+    // Classic renders the MP board (QuickClassicBoard) which owns its own
+    // h-full flex-1 wrapper internally; the stage just locks the fill column.
+    await screen.findByTestId('mock-classic');
   });
 
   it('blast stage is a locked fill column with full-height wrap', async () => {
