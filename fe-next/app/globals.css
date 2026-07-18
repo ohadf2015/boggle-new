@@ -5113,3 +5113,19 @@ html[data-cosy='true'] .animate-neo-press {
   .hero-dance-kpop     { animation: hero-dance-kpop 0.8s ease-in-out infinite; }
   .hero-dance-triumph  { animation: hero-dance-triumph 1.3s ease-in-out infinite; }
 }
+
+/* ── Combo Screen Shake (mythic 7+) ── */
+@keyframes combo-shake {
+  0%, 100% { transform: translateX(0); }
+  10% { transform: translateX(-4px) rotate(-0.5deg); }
+  20% { transform: translateX(3px) rotate(0.3deg); }
+  30% { transform: translateX(-3px) rotate(-0.4deg); }
+  40% { transform: translateX(2px) rotate(0.2deg); }
+  50% { transform: translateX(-2px); }
+  60% { transform: translateX(1px); }
+  70% { transform: translateX(-1px); }
+  80% { transform: translateX(0); }
+}
+.animate-combo-shake {
+  animation: combo-shake 0.5s ease-out;
+}
