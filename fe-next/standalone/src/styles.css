@@ -24,11 +24,16 @@ body {
 
 .app {
   height: 100%;
-  max-width: 560px;
+  width: 100%;
+  max-width: 640px;
   margin: 0 auto;
   padding: max(16px, env(safe-area-inset-top)) 16px 16px;
   display: flex;
   flex-direction: column;
+  /* Portals (Poki/CrazyGames) require the game to fill the screen. The navy
+     background is full-bleed via body; content is a centred column that scales
+     with the viewport so nothing letterboxes with dead bars. */
+  justify-content: center;
 }
 
 /* ---------- screens ---------- */
@@ -85,7 +90,9 @@ body {
   position: relative;
   display: grid;
   gap: 10px;
-  width: min(92vw, 440px);
+  /* Scale to the smaller viewport dimension so the square board is as large as
+     fits in any aspect (mobile portrait, desktop, iframe) without overflowing. */
+  width: min(92vw, 68vh, 560px);
   aspect-ratio: 1;
   padding: 10px;
   background: var(--navy-light);
