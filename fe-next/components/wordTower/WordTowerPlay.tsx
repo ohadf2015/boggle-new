@@ -54,7 +54,6 @@ import { newlyUnlockedSkin, type TowerSkin } from '@/lib/wordTower/skins';
 import { useTowerSkin } from './useTowerSkin';
 import { WordTowerSkinPicker } from './WordTowerSkinPicker';
 import { WordTowerActionMenu } from './WordTowerActionMenu';
-import { WordTowerFlowFrame } from './WordTowerFlowFrame';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
 import { buildDropVerdict, formatHeightGain, type DropVerdict } from '@/lib/wordTower/dropVerdict';
@@ -472,12 +471,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // How shaky the tower is (0..1) — drives the continuous SWING and, via the
   // crane's matching offset, makes placing on an unstable tower genuinely harder.
   // Damped by height: a tall tower's top travels far at a given angle, so without
-  // this a 30-floor tower whips side-to-side ("goes crazy"). The SAME damped value
   // is fed to BOTH the crane target and the Pixi tower angle, so WYSIWYG holds.
-  const instability =
-    swayInstability(crane.consecutiveSloppy, crane.leanDeg) *
-    swayHeightDampen(game.floors.length) *
-    steadyHandsDampen(crane.perfectStreak); // a perfect run steadies the crane (skill → calm)
+    // DISABLED: tower sway was causing visual flickering and felt redundant.
+    const instability = 0;
 
   // The crane carries the block in the FINAL committed material colour of the
   // current build line, so it never "switches weird colours" on landing. Convert
@@ -1084,10 +1080,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
       {/* (Coin-reward reveal now renders inside the notice column, directly
           under the zone banner it usually accompanies.) */}
 
-      {/* "In the zone" frame — a hard-edged electric border that lights the play
-          area on a hot perfect-drop streak, gold at "ON FIRE". Pure feel. */}
-      <WordTowerFlowFrame perfectStreak={crane.perfectStreak} reducedMotion={reducedMotion} />
-
       {/* (Steady-hands FLOW chip + skin picker now live in the left utility rail
           and the top-bar actions row respectively.) */}
 
@@ -1218,11 +1210,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         <div className="mx-auto mt-12 flex w-fit items-center gap-1.5">
           <WordTowerStatHud
             heightM={game.heightM}
-            biomeId={biomeId}
-            floorsCount={game.floors.length}
-            personalBestM={personalBest}
             combo={game.combo}
-            tier={architectTier}
             t={t}
           />
         </div>
