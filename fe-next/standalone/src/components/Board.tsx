@@ -5,6 +5,8 @@ import type { LetterGrid } from '../core/board';
 interface Props {
   board: LetterGrid;
   onSubmit: (word: string) => void;
+  /** Fired on the player's first trace of the round (for portal gameplayStart). */
+  onTraceStart?: () => void;
   /** pulse key: when it changes with a type, the board flashes accept/reject. */
   flash: { id: number; type: 'accept' | 'reject' } | null;
 }
@@ -15,7 +17,7 @@ interface Props {
  * not emit pointerenter on siblings once capture starts). Draws an SVG connector
  * between selected tile centres.
  */
-export function Board({ board, onSubmit, flash }: Props) {
+export function Board({ board, onSubmit, onTraceStart, flash }: Props) {
   const rows = board.length;
   const cols = board[0].length;
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -53,7 +55,8 @@ export function Board({ board, onSubmit, flash }: Props) {
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     setTracing(true);
     setPath([cell]);
-  }, [cellFromPoint]);
+    onTraceStart?.();
+  }, [cellFromPoint, onTraceStart]);
 
   const onPointerMove = useCallback((e: React.PointerEvent) => {
     if (!tracing) return;
