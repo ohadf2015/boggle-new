@@ -11,6 +11,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const captureMock = vi.fn();
 const trackGameStartMock = vi.fn();
+const trackGameEndMock = vi.fn();
 
 vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: {
@@ -21,6 +22,7 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({
 
 vi.mock('@/utils/growthTracking', () => ({
   trackGameStart: (...args: unknown[]) => trackGameStartMock(...args),
+  trackGameEnd: (...args: unknown[]) => trackGameEndMock(...args),
 }));
 
 import {
@@ -33,6 +35,7 @@ describe('drill telemetry', () => {
   beforeEach(() => {
     captureMock.mockClear();
     trackGameStartMock.mockClear();
+    trackGameEndMock.mockClear();
   });
 
   afterEach(() => {
@@ -91,6 +94,25 @@ describe('drill telemetry', () => {
       words_found: 18,
       duration_seconds: 45,
     });
+  });
+
+  it('trackDrillComplete fires game_completed via trackGameEnd so brain-drill appears in per-mode completion funnel', () => {
+    trackDrillComplete({
+      drillType: 'combo-master',
+      level: 2,
+      score: 150,
+      wordsFound: 10,
+      durationSeconds: 30,
+    });
+
+    expect(trackGameEndMock).toHaveBeenCalledWith(
+      'brain-drill',
+      150,
+      10,
+      true,
+      30,
+      { drillType: 'combo-master', level: 2 }
+    );
   });
 
   it('never throws if posthog.capture itself throws', () => {

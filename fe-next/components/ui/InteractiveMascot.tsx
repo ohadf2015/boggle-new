@@ -635,7 +635,10 @@ export const InteractiveMascot = memo(function InteractiveMascot({
         >
           {/* Image with crossfade on variant change */}
           {/* Fast transition (200ms) for smoother, less noticeable changes */}
-          <AnimatePresence mode="wait">
+          {/* initial={false}: skip opacity:0 on first mount so the mascot paints at full
+              opacity in the SSR HTML. Without this, Framer serialises `initial={{ opacity:0 }}`
+              into the HTML → browser ignores the element for LCP until hydration completes. */}
+          <AnimatePresence mode="wait" initial={false}>
             <m.div
               key={currentVariant}
               initial={{ opacity: 0, scale: 0.98 }}

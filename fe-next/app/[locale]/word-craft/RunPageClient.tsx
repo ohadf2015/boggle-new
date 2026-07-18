@@ -1,12 +1,16 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import { useWordCraftRun } from '@/lib/word-craft/run/useWordCraftRun';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { wordFeedbackTier } from '@/lib/word-craft/run/feedbackTiers';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import { WordCraftBoardSection } from '@/components/word-craft/WordCraftBoardSection';
@@ -20,8 +24,12 @@ import { RunResultScene } from '@/components/word-craft/run/RunResultScene';
 export function RunPageClient() {
   const { t, language } = useLanguage();
   const locale = (language ?? 'en') as SupportedLocale;
+  const params = useParams();
+  const paramLocale = (params?.locale as string | undefined) ?? locale;
   useHideNavigation();
 
+  // Random seed per run — prevents every run from being the same board.
+  const [seed] = useState(() => Math.floor(Math.random() * 1_000_000));
   const [dict, setDict] = useState<Set<string> | null>(null);
   useEffect(() => {
     let cancelled = false;
@@ -34,7 +42,7 @@ export function RunPageClient() {
   }, [locale]);
 
   const boardSize: 7 | 9 = typeof window !== 'undefined' && window.innerWidth >= 768 ? 9 : 7;
-  const run = useWordCraftRun({ seed: 1, dict, locale, boardSize });
+  const run = useWordCraftRun({ seed, dict, locale, boardSize });
   const { state } = run;
 
   // Per-word commit ceremony — fills the "submit → nothing happens" dead zone.
@@ -95,6 +103,15 @@ export function RunPageClient() {
   if (state.phase === 'intro') {
     return (
       <section className="flex flex-col items-center gap-4 p-6 text-center">
+        <div className="self-start">
+          <Link
+            href={`/${paramLocale}/word-craft`}
+            className="inline-flex items-center gap-1 rounded-neo border-neo border-neo-white/20 bg-neo-navy-light px-3 py-1.5 font-neo-body text-sm text-neo-white shadow-hard hover:bg-neo-navy transition-colors"
+          >
+            <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
+            {t('common.back')}
+          </Link>
+        </div>
         <h1 className="text-3xl font-neo-display text-neo-lime">{t('wordcraft.run.intro.title')}</h1>
         <p className="max-w-md font-neo-body text-neo-white">{t('wordcraft.run.intro.howTo')}</p>
         <button
@@ -146,6 +163,15 @@ export function RunPageClient() {
   // state.phase === 'playing'
   return (
     <div className="relative flex flex-col gap-3 p-3" translate="no">
+      <div className="flex items-center">
+        <Link
+          href={`/${paramLocale}/word-craft`}
+          className="inline-flex items-center gap-1 rounded-neo border-neo border-neo-white/20 bg-neo-navy-light px-3 py-1.5 font-neo-body text-sm text-neo-white shadow-hard hover:bg-neo-navy transition-colors"
+        >
+          <DirectionalIcon icon={ArrowLeft} className="w-4 h-4" />
+          {t('common.back')}
+        </Link>
+      </div>
       <RunWordPop pop={wordPop} t={t} />
       <RunHUD
         round={state.round.round}

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { EducationHeader } from '@/components/education/EducationHeader';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,6 +14,10 @@ export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    trackGrowthEvent('iap_viewed', { product: 'teacher_pro' });
+  }, []);
 
   const handleUpgrade = async () => {
     setIsLoading(true);

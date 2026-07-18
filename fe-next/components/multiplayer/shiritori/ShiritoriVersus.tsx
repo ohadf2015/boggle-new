@@ -73,7 +73,7 @@ export function ShiritoriVersus({ socket, username, onQuit }: ShiritoriVersusPro
   if (!init) {
     return (
       <div className="flex min-h-[100dvh] items-center justify-center bg-neo-navy" dir={dir}>
-        <p className="animate-pulse font-neo-display text-xl text-neo-cyan">{t('shiritori.waitTurn')}</p>
+        <p className="animate-pulse font-neo-display text-xl text-neo-cyan">{t('common.starting')}</p>
       </div>
     );
   }

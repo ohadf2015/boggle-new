@@ -13,7 +13,7 @@
 
 import posthog from '@/lib/analytics/lazyPosthog';
 import logger from '@/utils/logger';
-import { trackGameStart } from '@/utils/growthTracking';
+import { trackGameStart, trackGameEnd } from '@/utils/growthTracking';
 import type { DrillType } from '@/shared/types/cognitive';
 
 type Capture = (event: string, props?: Record<string, unknown>) => void;
@@ -39,7 +39,7 @@ export function trackDrillStart(args: DrillStartArgs): void {
     level: args.level,
   });
   // Mirror game_started so brain-drill appears in the per-mode funnel alongside
-  // all other modes (game_completed already fires via emitBrainDrillGameEnd).
+  // all other modes (game_completed mirrors via trackGameEnd in trackDrillComplete).
   trackGameStart('brain-drill', { drillType: args.drillType, level: args.level });
 }
 
@@ -68,5 +68,11 @@ export function trackDrillComplete(args: DrillSessionArgs): void {
     score: args.score,
     words_found: args.wordsFound,
     duration_seconds: args.durationSeconds,
+  });
+  // Mirror game_completed so brain-drill appears in the per-mode completion funnel
+  // alongside classic/survival/word-wheel etc. Symmetric with trackDrillStart→trackGameStart.
+  trackGameEnd('brain-drill', args.score, args.wordsFound, true, args.durationSeconds, {
+    drillType: args.drillType,
+    level: args.level,
   });
 }

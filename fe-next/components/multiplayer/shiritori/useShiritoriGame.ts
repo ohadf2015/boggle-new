@@ -86,7 +86,17 @@ export function useShiritoriGame(
     };
     const onGameOver = (raw: unknown) => {
       const d = raw as GameOverPayload;
-      setState((s) => ({ ...s, finished: true, winner: d.winner }));
+      setState((s) => ({
+        ...s,
+        finished: true,
+        winner: d.winner,
+        // Mark the final loser eliminated — shiritoriGameOver skips the
+        // shiritoriPlayerEliminated event for the last player, so the turn-rail
+        // would show them as still active without this.
+        players: d.loser
+          ? s.players.map((p) => (p.username === d.loser ? { ...p, eliminated: true } : p))
+          : s.players,
+      }));
     };
 
     socket.on('shiritoriWordAccepted', onAccepted);
