@@ -12,6 +12,12 @@ vi.mock('@/contexts/NavigationContext', () => ({
   useHideNavigation: () => vi.fn(),
 }));
 
+// Classic is admin-beta: the MP board (QuickClassicBoard) only renders for
+// admins, so exercise that branch here.
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ isAdmin: true }),
+}));
+
 const classicProps: Record<string, unknown>[] = [];
 const huntProps: Record<string, unknown>[] = [];
 const wheelProps: Record<string, unknown>[] = [];

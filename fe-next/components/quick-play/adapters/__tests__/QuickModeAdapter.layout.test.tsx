@@ -12,6 +12,11 @@ vi.mock('@/contexts/NavigationContext', () => ({
   useHideNavigation: () => vi.fn(),
 }));
 
+// Classic is admin-beta: the MP board (QuickClassicBoard) only renders for admins.
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: () => ({ isAdmin: true }),
+}));
+
 vi.mock('@/components/daily/WordWheelGame', () => ({
   __esModule: true,
   default: () => <div data-testid="mock-word-wheel">wheel</div>,

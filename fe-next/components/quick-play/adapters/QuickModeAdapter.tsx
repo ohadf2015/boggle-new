@@ -15,10 +15,15 @@ import { useRef, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import type { QuickRoundConfig, QuickRoundResult } from '../types';
 import { BlastQuickRound } from './BlastQuickRound';
-import { fromWordWheel, fromSurvival } from './normalizeResult';
+import { fromWordWheel, fromSurvival, fromSinglePlayer } from './normalizeResult';
 import { useHideNavigation } from '@/contexts/NavigationContext';
+import { useAuth } from '@/contexts/AuthContext';
 
+// Classic board is mid-beta: admins get the multiplayer board (InGameScreen)
+// run solo; everyone else keeps the previous single-player board until it's
+// proven out. See the `isAdmin` branch in the classic case.
 const QuickClassicBoard = dynamic(() => import('./QuickClassicBoard'), { ssr: false });
+const SinglePlayerGame = dynamic(() => import('@/components/singleplayer/SinglePlayerGame'), { ssr: false });
 const DailyWordHuntSurvival = dynamic(() => import('@/components/daily/DailyWordHuntSurvival'), { ssr: false });
 const WordWheelGame = dynamic(() => import('@/components/daily/WordWheelGame'), { ssr: false });
 
@@ -53,6 +58,7 @@ interface QuickModeAdapterProps {
 }
 
 export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterProps) {
+  const { isAdmin } = useAuth();
   const doneRef = useRef(false);
   const wordSet = useRef<Set<string> | null>(null);
   // Lock body height + hide bottom nav for the whole arcade round (classic /
@@ -123,9 +129,34 @@ export function QuickModeAdapter({ config, onDone, onQuit }: QuickModeAdapterPro
     default:
       return (
         <div className={STAGE_FILL} data-testid="quick-stage-classic">
-          {/* Classic now renders the MULTIPLAYER board (InGameScreen) run solo —
-              the board players see in a live room, not the legacy SP layout. */}
-          <QuickClassicBoard config={config} onDone={finish} onQuit={onQuit} />
+          {isAdmin ? (
+            /* BETA (admin-only): the MULTIPLAYER board (InGameScreen) run solo —
+               the board players see in a live room, not the legacy SP layout. */
+            <QuickClassicBoard config={config} onDone={finish} onQuit={onQuit} />
+          ) : (
+            /* Everyone else keeps the previous single-player board until the MP
+               board is proven out. PortraitGameLayout needs flex-1 h-full. */
+            <div className="relative flex h-full min-h-0 w-full flex-1 flex-col px-2 sm:px-3">
+              <SinglePlayerGame
+                settings={{
+                  mode: 'challenge',
+                  difficulty: 'MEDIUM',
+                  language: config.language as never,
+                  grid: config.grid as never,
+                  timerSeconds: config.durationSec,
+                  bots: [], // quick play is bot-free by design
+                  minWordLength: 3,
+                }}
+                targetHighScore={null}
+                hideModeCoach
+                onGameEnd={(r: { playerScore: number; playerWords: string[] }) =>
+                  finish(fromSinglePlayer({ score: r.playerScore, wordsFound: r.playerWords }, config))
+                }
+                onQuit={onQuit}
+                quitStaysOnPage
+              />
+            </div>
+          )}
         </div>
       );
   }
