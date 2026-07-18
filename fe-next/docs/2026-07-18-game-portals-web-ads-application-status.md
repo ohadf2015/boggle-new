@@ -69,10 +69,18 @@ Contact used on all forms: **Ohad Fisher / ohadf2015@gmail.com / phone as provid
 - **Game registered:** "LexiClash" (dashboard id 74276) → **`GD_GAME_ID = ce3e476106d643b59b962c5a787d067d`** (from Upload tab).
 - Azerion login: use **"Log in with Google"** (ohadf2015@gmail.com, already linked). A backstop password was set
   during activation — reset via "Forgot password" if needed (kept out of the repo).
-- **READY TO GO LIVE** — flip these env vars (client-side, set in **Vercel** build env):
-  `NEXT_PUBLIC_GD_ADS_ENABLED=true`, `NEXT_PUBLIC_GD_GAME_ID=ce3e476106d643b59b962c5a787d067d`
-- Note: GD's ZIP upload + 2-week catalog review is only for GD to *distribute* our game to other publishers.
-  For our own-domain rewarded ads (SDK + referrer payout, `lib/ads/gameDistributionAds.ts`) the game ID above is enough.
+- **DO NOT flip the env vars yet** — end-to-end testing (2026-07-18) proved GD won't serve until the game leaves Draft:
+  1. **CSP blocked the SDK** — `lexiclash.live` `script-src` lacked `gamedistribution.com` → `main.min.js` failed (`SCRIPT_ERROR`).
+     **FIXED** in `next.config.mjs` (added `html5.api.gamedistribution.com` + `*.gamedistribution.com` to `script-src`,
+     `connect-src`, `frame-src` in both CSP branches). Config verified to parse. This is a prerequisite for ANY own-domain ad SDK.
+  2. With CSP allowed, the SDK loads + inits with our game ID — but GD returns
+     `blocked.html?...&unregistered=true` because the game is **Draft** (Status: Draft, SDK: No). GD domain-locks
+     and serves nothing until the game is **uploaded + SDK-implemented + published** (~2-week review) — the same
+     self-contained-HTML5-ZIP constraint as Poki. Our Supabase/Socket.IO app isn't a ZIP.
+  - **Conclusion:** flipping `NEXT_PUBLIC_GD_ADS_ENABLED=true` now would ship a broken "watch ad" button (SDK →
+    blocked.html → reject → no reward). Keep GD env OFF until a standalone build is uploaded and published.
+- **`GD_GAME_ID = ce3e476106d643b59b962c5a787d067d`** is correct and reserved; env-flip cheat sheet still applies
+  once the game is publishable.
 - Code already wired: `lib/ads/gameDistributionAds.ts` (own-domain payout via referrer).
 
 ## 5. Others — deferred (justified)
