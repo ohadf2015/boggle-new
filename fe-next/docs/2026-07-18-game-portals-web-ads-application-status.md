@@ -11,6 +11,34 @@ Contact used on all forms: **Ohad Fisher / ohadf2015@gmail.com / phone as provid
 
 ---
 
+## Competitive scan — 2026-07-19 (no competitor moves; portal submission is the opening)
+Checked for new competitive moves in the word-game space: CrazyGames word category (no new top
+games or feature changes), Poki word category (page 404), GameDistribution (404), NYT Wordle
+(no changes), Wikipedia Wordle / Words With Friends (no recent updates). **No meaningful moves.**
+
+The finding that matters is a *distribution opening*: no major competitor has launched a
+real-time multiplayer word game on these portals, and LexiClash's standalone portal build
+(portal-SDK adapter + brand cover art + portal-ready zip, per git log) is now complete. First-mover
+window. **Risk:** a simple Boggle clone lands on CrazyGames/Poki and captures the casual audience
+before our submission is accepted.
+
+**No code action available here** — actual submission is a manual portal-dashboard upload, and every
+portal is still gated (see §1–§2, §4). This section records the scan; the checklist below is the work.
+
+### Submission-readiness checklist (per portal, real gates — not "submit today")
+- [ ] **CrazyGames** — relaunch artifact = `npm run package:crazygames`. Blocker (a) *cover art* is
+      **CLEARED** (real landscape/portrait/square cover art shipped, commit `2a01377c4`; replaces the
+      plain icon-512 that caused 0.2% CTR). Remaining gate: (b) instant-fun first session (no login
+      wall → straight to solo Quick Play) → pass QA tool (Preview→validate) → **Submit update** →
+      content-team re-review. Closest to submittable of the three.
+- [ ] **Poki** — `npm run package:poki`. Gated on Poki *studio* approval (early-access request
+      submitted, §1). Do NOT build/submit speculatively — wait for approval, then upload the standalone zip.
+- [ ] **GameDistribution** — `VITE_GD_GAME_ID=ce3e476106d643b59b962c5a787d067d npm run package:gd`.
+      Game is Draft; upload the zip on the Upload tab → publish → ~2-week review. Keep
+      `NEXT_PUBLIC_GD_ADS_ENABLED` OFF until published (§4).
+
+---
+
 ## 1. Poki — ✅ APPLIED (developer early-access request submitted)
 - URL: https://developers.poki.com/share
 - Result: **"Thank you 🤟 We received your request!"**
@@ -34,9 +62,10 @@ Contact used on all forms: **Ohad Fisher / ohadf2015@gmail.com / phone as provid
   *"You didn't pass QA... content team reviews only after you pass the QA tool and submit."*
 - **Do NOT blind-resubmit** — same unimproved build → same performance rejection, wasting the attempt.
 - **The two real levers (product work, scoped follow-up):**
-  1. **Thumbnail** — submission used `/public/icon-512.png` (plain app icon). 0.2% CTR is a thumbnail problem.
-     Commission real game-art cover art (kawaii mascot + letter grid + neo-brutalist style). Upload on the game's **Art** tab.
-     Reusable across Poki, app stores, and social. Only helps CrazyGames on relaunch.
+  1. **Thumbnail** — ✅ **DONE** (2026-07-19 update; commit `2a01377c4`). Real brand cover art
+     (kawaii mascot + letter grid + neo-brutalist style, landscape/portrait/square) now ships in the
+     standalone build; replaces the plain `/public/icon-512.png` that drove the 0.2% CTR. Upload on the
+     game's **Art** tab at relaunch. Reusable across Poki, app stores, and social.
   2. **First-session retention** — the CG landing must be instantly fun: no login wall, fast load, jump straight
      into solo Quick Play. Bottom-20% retention/playtime killed the launch.
   - Then: pass QA tool (Preview → validate) → Submit update → content-team re-review.
