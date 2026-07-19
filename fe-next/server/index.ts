@@ -35,6 +35,7 @@ import {
   registerShutdownHandlers,
   registerProcessErrorHandlers
 } from './lifecycle';
+import { withBootTimeout } from './bootTimeout';
 
 // Route modules
 import adminRoutes from '../backend/routes/admin';
@@ -225,7 +226,14 @@ async function start(): Promise<void> {
 
   // Initialize server components BEFORE listening — ensures Redis, dictionaries,
   // and Socket.IO adapter are ready before Railway routes traffic to this container.
-  await initializeServer(io);
+  // Guarded by an aggregate watchdog: if any single step hangs (e.g. a wedged
+  // dictionary load or worker-pool init that has no finer timeout of its own),
+  // we still bind the port in degraded mode rather than never listening — which
+  // would fail Railway's healthcheck forever and put the container in a
+  // kill→restart→hang crash-loop. Default 25s sits under Railway's 30s
+  // healthcheckTimeout so the port binds inside the healthcheck window.
+  const INIT_TIMEOUT_MS = parseInt(process.env.SERVER_INIT_TIMEOUT_MS || '25000', 10);
+  await withBootTimeout('Server initialization', initializeServer(io), INIT_TIMEOUT_MS);
 
   // Set up event loop monitoring
   setupEventLoopMonitoring();
