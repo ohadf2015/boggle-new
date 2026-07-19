@@ -79,6 +79,6 @@ describe('LeadChangeBanner', () => {
     const banner = screen.getByTestId('lead-change-banner');
     expect(banner.className).toContain('border-3');
     expect(banner.className).toContain('border-neo-black');
-    expect(banner.className).toContain('shadow-hard-sm');
+    expect(banner.className).toContain('shadow-hard');
   });
 });
