@@ -36,6 +36,8 @@ import {
   registerProcessErrorHandlers
 } from './lifecycle';
 import { withBootTimeout } from './bootTimeout';
+import { sendOpsAlert } from '../backend/modules/notificationService';
+import { startMemoryWatchdog } from '../backend/modules/memoryWatchdog';
 
 // Route modules
 import adminRoutes from '../backend/routes/admin';
@@ -233,7 +235,12 @@ async function start(): Promise<void> {
   // kill→restart→hang crash-loop. Default 25s sits under Railway's 30s
   // healthcheckTimeout so the port binds inside the healthcheck window.
   const INIT_TIMEOUT_MS = parseInt(process.env.SERVER_INIT_TIMEOUT_MS || '25000', 10);
-  await withBootTimeout('Server initialization', initializeServer(io), INIT_TIMEOUT_MS);
+  const bootedDegraded = await withBootTimeout('Server initialization', initializeServer(io), INIT_TIMEOUT_MS);
+  if (bootedDegraded) {
+    void sendOpsAlert(
+      `🟠 lexiclash boggle-new: booted in DEGRADED mode — server init exceeded ${INIT_TIMEOUT_MS}ms. Port bound so the liveness probe answers, but Redis/dictionary/adapter may be partial.`,
+    );
+  }
 
   // Set up event loop monitoring
   setupEventLoopMonitoring();
@@ -249,6 +256,11 @@ async function start(): Promise<void> {
       resolve();
     });
   });
+
+  // Warn to Telegram before an OOM-kill (2026-07-19: silent SIGKILL at the
+  // ~2560MB cgroup limit after a slow leak → 53min outage). Early warning buys
+  // time to act while there's still headroom.
+  startMemoryWatchdog();
 }
 
 // Start the server

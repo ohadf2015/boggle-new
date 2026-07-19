@@ -268,6 +268,46 @@ async function sendTelegramNotification(message: string): Promise<void> {
 }
 
 /**
+ * Ops/infra alerts (memory pressure, degraded boot, crashes) → Telegram.
+ *
+ * Deliberately separate from game-event notifications:
+ *  - NOT gated by NOTIFICATIONS_ENABLED (that flag mutes game-event spam; infra
+ *    alerts must fire whenever a chat is configured).
+ *  - Plain text (no MarkdownV2) so RSS numbers / dots / parens don't need escaping.
+ *  - Storm guard: at most one alert per OPS_ALERT_MIN_INTERVAL_MS so an
+ *    uncaught-exception loop can't flood the chat (matched to the watchdog's
+ *    30s tick so a warn→critical escalation is never dropped).
+ */
+const OPS_ALERT_MIN_INTERVAL_MS = 15_000;
+let lastOpsAlertAt = 0;
+
+export async function sendOpsAlert(text: string): Promise<void> {
+  if (!text || !isTelegramConfigured()) return;
+  const now = Date.now();
+  if (now - lastOpsAlertAt < OPS_ALERT_MIN_INTERVAL_MS) return; // storm guard
+  lastOpsAlertAt = now;
+  try {
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text, disable_web_page_preview: true }),
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!response.ok) {
+      logger.warn('OPS_ALERT', `Telegram ops alert failed: ${response.status}`);
+    }
+  } catch (err) {
+    logger.error('OPS_ALERT', `Telegram ops alert error: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+/** Test-only: reset the storm-guard clock so cases don't bleed into each other. */
+export function __resetOpsAlertThrottle(): void {
+  lastOpsAlertAt = 0;
+}
+
+/**
  * Send notification to all configured channels
  */
 async function sendNotification(eventType: NotificationEventType, data: RoomEventData): Promise<void> {

@@ -16,6 +16,7 @@ import { setupRedisAdapter, cleanupRedisAdapter, type ExtendedSocketServer } fro
 import { shutdownInMemorySingletons } from './shutdownSingletons';
 import { clearCleanupTimers } from './socketSetup';
 import { stopConnectionHealthCheck } from '../backend/handlers/presenceHandler';
+import { sendOpsAlert } from '../backend/modules/notificationService';
 import { stopEmptyRoomCleanup } from '../backend/socketHandlers';
 import * as gameStateManager from '../backend/modules/gameStateManager';
 import { startAllCronJobs, stopAllCronJobs } from '../backend/services/cronScheduler';
@@ -299,6 +300,10 @@ export function registerProcessErrorHandlers(): void {
   // Capture uncaught exceptions
   process.on('uncaughtException', (error: Error) => {
     lifecycleLogger.fatal({ err: error }, 'Uncaught Exception');
+
+    // Fire-and-forget crash alert (best-effort within the 2s pre-exit window
+    // below). Storm-guarded inside sendOpsAlert so a rapid crash loop can't flood.
+    void sendOpsAlert(`🔴 lexiclash boggle-new: UNCAUGHT EXCEPTION — process exiting.\n${error?.message || String(error)}`);
 
     // Capture to Sentry in production
     if (process.env.NODE_ENV === 'production') {
