@@ -10,8 +10,12 @@ vi.mock('framer-motion', () => {
     return React.createElement('div', { ref, 'data-testid': props['data-testid'], ...props }, children);
   });
   MotionDiv.displayName = 'MotionDiv';
+  const MotionSpan = React.forwardRef(function MotionSpan({ children, ...props }: any, ref: any) {
+    return React.createElement('span', { ref, ...props }, children);
+  });
+  MotionSpan.displayName = 'MotionSpan';
   return {
-    m: { div: MotionDiv },
+    m: { div: MotionDiv, span: MotionSpan },
     AnimatePresence: ({ children }: any) => children,
   };
 });

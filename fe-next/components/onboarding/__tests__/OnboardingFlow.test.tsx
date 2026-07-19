@@ -242,10 +242,10 @@ describe('OnboardingFlow', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('navigates to the Daily Challenge after the style step', () => {
+  it('navigates to a practice game after the style step', () => {
     render(<OnboardingFlow {...defaultProps} />);
     finishFlow();
-    expect(mockPush).toHaveBeenCalledWith('/en/daily');
+    expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
   });
 
   it('calls onComplete after the style step', () => {
@@ -309,11 +309,11 @@ describe('OnboardingFlow', () => {
       expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/multiplayer?room='));
     });
 
-    it('redirects to the Daily Challenge after the style step when no pending invite', () => {
+    it('redirects to a practice game after the style step when no pending invite', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
       finishFlow();
-      expect(mockPush).toHaveBeenCalledWith('/en/daily');
+      expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
     });
   });
 
