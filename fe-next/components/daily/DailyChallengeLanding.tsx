@@ -25,10 +25,6 @@ import { FloatingDecorations } from './landing/FloatingDecorations';
 import WeeklyChestCard from './WeeklyChestCard';
 import WeeklyChestModal from './WeeklyChestModal';
 import DailyInsightStack from './DailyInsightStack';
-// Same reusable bottom banner slot the home dashboard/landing screen uses. On
-// native it reserves its own in-flow height and overlays the AdMob banner; on
-// web it renders the dev-only placeholder (null in production).
-import InlineBannerAd from '@/components/ads/InlineBannerAd';
 
 interface DailyChallengeLandingProps {
   onSelectWordHunt: () => void;
@@ -406,15 +402,11 @@ export function DailyChallengeLanding({
           />
         </m.div>
       )}
-
-      {/* Global bottom banner — reused from the home dashboard, embedded at the
-          structural bottom of the hub. The container's `pb-bottom-stack` already
-          reserves the fixed-bottom stack (nav + banner), and this slot adds its
-          own in-flow height, so the ad never covers a quest card, the weekly
-          chest, or the leaderboard rows above it. */}
-      <div className="w-full">
-        <InlineBannerAd variant="content" webZone="menu" />
-      </div>
+      {/* The global bottom banner is the app-wide AnchoredNativeBanner, pinned to
+          the viewport bottom on this hub via the admob-routes allowlist — NOT an
+          in-flow slot (which scrolled with the content). This container's
+          `pb-bottom-stack` reserves the fixed-bottom stack (nav + banner) so the
+          leaderboard rows, weekly chest, and quest cards stay clear of it. */}
     </m.div>
   );
 }

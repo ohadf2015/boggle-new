@@ -26,6 +26,14 @@ const GAME_ROUTES = [
   '/admin',
 ];
 
+// Hub landings that share a prefix with a GAME_ROUTES entry but are themselves
+// PASSIVE menus (not gameplay). The anchored banner is allowed here and sits
+// pinned to the viewport bottom — the same static placement as the home
+// dashboard — instead of an in-flow slot that scrolls with the content. Matched
+// EXACTLY so the gameplay sub-routes (/brain/drills, /daily/word-hunt,
+// /daily/word-wheel, /daily/flow) stay blocked by GAME_ROUTES below.
+const ALLOWED_HUB_ROUTES = ['/brain', '/daily'];
+
 const LOCALE_PREFIX = /^\/(en|he|sv|ja|es|ru)/;
 
 /**
@@ -42,6 +50,10 @@ export function isAllowedAdBannerRoute(
 ): boolean {
   if (!pathname) return false;
   const path = pathname.replace(LOCALE_PREFIX, '') || '/';
+  // Normalise a single trailing slash so '/daily/' matches the hub exactly.
+  const normalized = path.length > 1 ? path.replace(/\/$/, '') : path;
+  // Hub landings win over their GAME_ROUTES prefix — exact match only.
+  if (ALLOWED_HUB_ROUTES.includes(normalized)) return true;
   // Classroom multiplayer is an education (child-directed) surface — never monetize.
   if (path.startsWith('/multiplayer') && search?.get('classroom') === 'true') {
     return false;

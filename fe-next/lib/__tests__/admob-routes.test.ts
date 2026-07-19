@@ -10,8 +10,28 @@ describe('isAllowedAdBannerRoute', () => {
 
   it('blocks gameplay routes', () => {
     expect(isAllowedAdBannerRoute('/singleplayer')).toBe(false);
-    expect(isAllowedAdBannerRoute('/daily')).toBe(false);
-    expect(isAllowedAdBannerRoute('/brain')).toBe(false);
+  });
+
+  it('allows the /brain and /daily HUB screens (passive landings — pinned banner like home)', () => {
+    // The hub landings are passive menus, not gameplay: the anchored banner sits
+    // pinned to the viewport bottom there (matching the home dashboard). Exact
+    // match only — the deeper gameplay paths below must stay blocked.
+    expect(isAllowedAdBannerRoute('/brain')).toBe(true);
+    expect(isAllowedAdBannerRoute('/daily')).toBe(true);
+    expect(isAllowedAdBannerRoute('/he/brain')).toBe(true);
+    expect(isAllowedAdBannerRoute('/he/daily')).toBe(true);
+    // Trailing slash normalises to the hub.
+    expect(isAllowedAdBannerRoute('/brain/')).toBe(true);
+    expect(isAllowedAdBannerRoute('/daily/')).toBe(true);
+  });
+
+  it('still blocks the brain/daily GAMEPLAY sub-routes (banner must not cover play)', () => {
+    expect(isAllowedAdBannerRoute('/brain/drills/word-recall')).toBe(false);
+    expect(isAllowedAdBannerRoute('/daily/word-hunt')).toBe(false);
+    expect(isAllowedAdBannerRoute('/daily/word-wheel')).toBe(false);
+    expect(isAllowedAdBannerRoute('/daily/flow')).toBe(false);
+    expect(isAllowedAdBannerRoute('/he/daily/word-hunt')).toBe(false);
+    expect(isAllowedAdBannerRoute('/es/brain/drills/combo')).toBe(false);
   });
 
   it('allows /multiplayer (lobby is passive; active game/results suppressed via screen-fit-locked, not the route)', () => {
