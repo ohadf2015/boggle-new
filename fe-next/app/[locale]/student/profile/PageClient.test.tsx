@@ -372,9 +372,11 @@ describe('StudentProfilePageClient - Duel Features', () => {
       expect(screen.getByText('student.profile.duelRecord')).toBeInTheDocument();
     });
 
-    // Check empty state message
-    expect(screen.getByText('student.profile.noDuelsYet')).toBeInTheDocument();
-    expect(screen.getByText('student.profile.challengePrompt')).toBeInTheDocument();
+    // Check empty state message — the empty-state copy can paint a tick after the
+    // duel-record heading (async duel-history resolve), so retry rather than
+    // assert synchronously (was a CI flake).
+    expect(await screen.findByText('student.profile.noDuelsYet')).toBeInTheDocument();
+    expect(await screen.findByText('student.profile.challengePrompt')).toBeInTheDocument();
   });
 
   test('shows link to full duel history when duels exist', async () => {
