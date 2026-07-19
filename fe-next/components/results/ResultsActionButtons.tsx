@@ -5,10 +5,12 @@
  * Handles host/player modes, ready states, and single/multiplayer variants.
  */
 
-import React from 'react';
+import { useCallback, useState } from 'react';
 import { m } from 'framer-motion';
 import { Play, DoorOpen, Check, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+import { useExperiment } from '@/hooks/useExperiment';
 
 export interface ResultsActionButtonsProps {
   /** Whether current user is the host */
@@ -65,12 +67,28 @@ export function ResultsActionButtons({
   onExit,
 }: ResultsActionButtonsProps) {
   const { t } = useLanguage();
+  const { variant: reactionVariant } = useExperiment('exp-mp-round-reaction-v1');
+  const [showEmoji, setShowEmoji] = useState(false);
+
+  const handleReady = useCallback(() => {
+    trackGrowthEvent('mp_round_ready_clicked', {});
+    if (reactionVariant === 'emoji-burst') {
+      setShowEmoji(true);
+      setTimeout(() => setShowEmoji(false), 1000);
+    }
+    onMarkReady();
+  }, [onMarkReady, reactionVariant]);
+
+  const handleExit = useCallback(() => {
+    if (isMultiplayer) trackGrowthEvent('mp_results_exit_clicked', {});
+    onExit();
+  }, [onExit, isMultiplayer]);
 
   // Single player mode - just exit button
   if (!isMultiplayer) {
     return (
       <m.button
-        onClick={onExit}
+        onClick={handleExit}
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -105,7 +123,7 @@ export function ResultsActionButtons({
             {t('hostView.startGame')}
           </m.button>
           <m.button
-            onClick={onExit}
+            onClick={handleExit}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
             className="w-full bg-neo-red text-neo-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
@@ -118,7 +136,7 @@ export function ResultsActionButtons({
         /* PLAYER: Ready state (disabled) + Exit button */
         <>
           <m.button
-            onClick={onMarkReady}
+            onClick={handleReady}
             disabled
             initial={{ scale: 1 }}
             animate={{ scale: [1, 1.02, 1] }}
@@ -132,7 +150,7 @@ export function ResultsActionButtons({
             {t('results.waitingForHost')}
           </p>
           <m.button
-            onClick={onExit}
+            onClick={handleExit}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
             className="w-full bg-neo-red text-neo-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"
@@ -146,14 +164,14 @@ export function ResultsActionButtons({
         <>
           <div className="space-y-1">
             <m.button
-              onClick={onMarkReady}
+              onClick={handleReady}
               animate={{ scale: [1, 1.05, 1] }}
               transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
               className="w-full bg-neo-lime text-neo-black font-black text-base py-3 px-4 uppercase border-3 border-neo-black rounded-neo shadow-hard flex items-center justify-center gap-2"
             >
-              <Star className="w-5 h-5" />
+              {showEmoji ? <span className="text-lg">🎯</span> : <Star className="w-5 h-5" />}
               {t('results.imReady')}
             </m.button>
             <p className="text-center text-[10px] text-neo-white">
@@ -161,7 +179,7 @@ export function ResultsActionButtons({
             </p>
           </div>
           <m.button
-            onClick={onExit}
+            onClick={handleExit}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.95 }}
             className="w-full bg-neo-red text-neo-white font-bold text-sm py-2 px-3 uppercase border-2 border-neo-black rounded-neo shadow-hard-sm flex items-center justify-center gap-2"

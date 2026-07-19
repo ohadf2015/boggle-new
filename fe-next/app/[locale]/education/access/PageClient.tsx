@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { gsap } from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { AccessRequestGate } from '@/components/education/AccessRequestGate';
+import { DistrictUpsellStrip } from '@/components/education/DistrictUpsellStrip';
 import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { useGsapReveal } from '@/lib/animation/useGsapReveal';
@@ -200,6 +201,8 @@ export function PageClient() {
             </Link>
           </div>
         </div>
+
+        <DistrictUpsellStrip />
       </section>
     </main>
   );

@@ -1625,3 +1625,25 @@ _Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all fl
   - source: layout chunk — layout-level fetch failure from one user, 32 times in 2 days. May be the same Android device as above. No stack trace.
   - status: deferred — watch if user count grows (currently 1 user = device-specific issue, not systemic)
   - recommended owner: review-by-eod
+
+## 2026-07-19
+- [Supabase] RLS policy tar_insert_any on teacher_access_requests — INSERT WITH CHECK (true)
+  - first/last seen: ongoing advisor flag
+  - link: supabase advisor security:rls_policy_always_true
+  - status: deferred
+  - why: design question — INSERT always-true on a request table may be intentional (any authed user should be able to submit a request). Replacing or deleting an RLS policy is on the DEFER side of the autonomy matrix.
+  - recommended owner: backend (review-by-eod — confirm always-true is intentional or tighten to specific conditions)
+
+- [Sentry] JAVASCRIPT-NEXTJS-1R3 — <unknown> on /:locale/words/:word
+  - last seen: 2026-07-12, 85 occurrences, 0 users impacted
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1R3
+  - status: deferred
+  - why: `target: "head > link"` — browser resource load failure on a `<link>` element (chunk/font), no stacktrace. Network/CDN issue for India traffic, not a code bug. No actionable fix without CDN-level investigation.
+  - recommended owner: review-by-eod (mark resolved if pattern is pure network noise)
+
+- [Sentry] JAVASCRIPT-NEXTJS-1PH — CapacitorGameConnect.then() not implemented on android
+  - last seen: 2026-07-05, 153 occurrences, 7 users
+  - link: https://lexiclash.sentry.io/issues/JAVASCRIPT-NEXTJS-1PH
+  - status: shipped (fix already in nativePGS.ts:85-88 — Capacitor.isPluginAvailable guard)
+  - why: fix was applied 07-05 and error has not recurred. Mark as resolved in Sentry.
+  - recommended owner: self (resolve in Sentry UI)

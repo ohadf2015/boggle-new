@@ -1,6 +1,7 @@
 'use client';
 
-import { useRef, useState, type KeyboardEvent, type CompositionEvent } from 'react';
+import { useEffect, useRef, useState, type KeyboardEvent, type CompositionEvent } from 'react';
+import { SHIRITORI_TURN_MS } from '@/shared/constants/shiritoriConstants';
 
 export interface ShiritoriPlayerView {
   username: string;
@@ -23,6 +24,8 @@ export interface ShiritoriViewProps {
   lastError?: string | null;
   /** Submit a word for this turn. */
   onSubmit: (word: string) => void;
+  /** Unix-ms when the current turn started — drives the countdown bar. */
+  turnStartedAt?: number | null;
   /** i18n. */
   t: (key: string) => string;
 }
@@ -48,11 +51,24 @@ export default function ShiritoriView({
   winner,
   lastError,
   onSubmit,
+  turnStartedAt,
   t,
 }: ShiritoriViewProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const composingRef = useRef(false);
   const [value, setValue] = useState('');
+  const TIMEOUT_SECS = SHIRITORI_TURN_MS / 1000;
+  const [secsLeft, setSecsLeft] = useState<number>(() =>
+    turnStartedAt ? Math.max(0, Math.ceil((SHIRITORI_TURN_MS - (Date.now() - turnStartedAt)) / 1000)) : TIMEOUT_SECS
+  );
+
+  useEffect(() => {
+    if (finished || !turnStartedAt) return;
+    const tick = () => setSecsLeft(Math.max(0, Math.ceil((SHIRITORI_TURN_MS - (Date.now() - turnStartedAt)) / 1000)));
+    tick();
+    const id = setInterval(tick, 200);
+    return () => clearInterval(id);
+  }, [turnStartedAt, finished]);
 
   const isMyTurn = !finished && currentPlayer === me;
 
@@ -108,6 +124,16 @@ export default function ShiritoriView({
             <p className="font-neo-display text-5xl font-bold text-neo-cyan" data-testid="required-head">
               {requiredHead ?? '—'}
             </p>
+          </div>
+        )}
+
+        {/* Turn countdown — depletes over SHIRITORI_TURN_MS, turns orange at ≤5s */}
+        {!finished && turnStartedAt != null && (
+          <div role="timer" className="overflow-hidden rounded-neo border-neo border-black bg-neo-navy-light">
+            <div
+              className={`h-2 transition-all duration-200 ${secsLeft <= 5 ? 'bg-neo-orange' : secsLeft <= 9 ? 'bg-neo-yellow' : 'bg-neo-lime'}`}
+              style={{ width: `${Math.min(100, (secsLeft / TIMEOUT_SECS) * 100)}%` }}
+            />
           </div>
         )}
 

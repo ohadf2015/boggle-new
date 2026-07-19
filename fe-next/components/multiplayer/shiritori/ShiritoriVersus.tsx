@@ -59,6 +59,7 @@ function ShiritoriGame({
         winner={game.winner}
         lastError={game.lastError}
         onSubmit={game.submit}
+        turnStartedAt={game.turnStartedAt}
         t={t}
       />
     </div>

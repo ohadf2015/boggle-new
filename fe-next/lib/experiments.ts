@@ -697,6 +697,22 @@ export const EXPERIMENTS = {
     description:
       'MP lobby join eager-feedback. eager-feedback = on join tap with disconnected socket, immediately sets joining state + shows "Connecting…" toast (vs 5s silent wait). Targets /es/multiplayer rageclicks (6/24h, #1 signal 2026-07-18). Conversion = rageclick rate falls. Guardrail = mp_join_attempted stable.',
   }),
+
+  /**
+   * MP results "I'm Ready" micro-delight. Hypothesis: after clicking ready the
+   * player stares at a disabled button waiting for the host — low-engagement dead
+   * time. A brief emoji burst (🎯 shown for 1s before settling to the ✓ state)
+   * acknowledges the tap with positive feedback and reduces perceived wait.
+   * Conversion = mp_round_ready_clicked → game_feedback avg rating on mp_round.
+   * Guardrail = mp_results_exit_clicked must not rise.
+   * Wire: ResultsActionButtons.tsx — onClick handler for "I'M READY" button.
+   */
+  'exp-mp-round-reaction-v1': defineExperiment({
+    variants: ['control', 'emoji-burst'] as const,
+    default: 'control',
+    description:
+      'MP results ready-button micro-delight. emoji-burst = show 🎯 emoji for 1s after clicking ready (before settling to ✓ disabled state). control = immediate checkmark. Targets mp_round sentiment (avg 1.5/3). Conversion = game_feedback avg on mp_round improves.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

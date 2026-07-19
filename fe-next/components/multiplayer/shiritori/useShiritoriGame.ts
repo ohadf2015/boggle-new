@@ -18,6 +18,8 @@ export interface ShiritoriClientState {
   finished: boolean;
   winner: string | null;
   lastError: string | null;
+  /** Unix-ms when the current turn started; null before the first move. */
+  turnStartedAt: number | null;
 }
 
 // Server broadcast payloads (mirror backend/handlers/shiritoriHandler.ts).
@@ -56,6 +58,7 @@ export function useShiritoriGame(
       finished: initial?.finished ?? false,
       winner: initial?.winner ?? null,
       lastError: null,
+      turnStartedAt: firstPlayer ? Date.now() : null,
     };
   });
 
@@ -70,6 +73,7 @@ export function useShiritoriGame(
         requiredHead: d.requiredHead,
         currentPlayer: d.nextPlayer ?? s.currentPlayer,
         lastError: null,
+        turnStartedAt: Date.now(),
       }));
     };
     const onRejected = (raw: unknown) => {
@@ -82,6 +86,7 @@ export function useShiritoriGame(
         ...s,
         players: s.players.map((p) => (p.username === d.player ? { ...p, eliminated: true } : p)),
         currentPlayer: d.nextPlayer ?? s.currentPlayer,
+        turnStartedAt: Date.now(),
       }));
     };
     const onGameOver = (raw: unknown) => {

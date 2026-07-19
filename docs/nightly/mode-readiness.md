@@ -11,17 +11,19 @@
 
 ## Current (in progress)
 
-### shiritori — readiness: 42% — status: IN PROGRESS
+### shiritori — readiness: 55% — status: IN PROGRESS
 - **Why next:** MP-wired recently; verify chain rules + bot-exclusion + i18n + edge cases.
 - **Reach:** JA MP is LIVE (ja board bypasses admin gate); solo is admin-preview; landing at `/[locale]/shiritori`.
 - **Key files:** `components/multiplayer/shiritori/*`, `lib/shiritori/sp/*`, `app/[locale]/shiritori/{page,solo/page}.tsx`, `backend/{handlers,modules}/shiritori*`, `shared/utils/shiritori.ts`.
-- **Last audited:** 2026-07-18
+- **Last audited:** 2026-07-19
 - **Covered (2026-07-18):** chain engine, backend manager+handler, MP hook+view, solo engine+page, landing page, i18n ×6 locales.
-- **Not yet covered:** turn timer display (blocker), visual QA, tests audit.
+- **Covered (2026-07-19):** turn timer implementation (useShiritoriGame+ShiritoriView+ShiritoriVersus), solo/page.tsx verified clean.
+- **Not yet covered:** tests for countdown (TDD gap), visual QA, dictCheckJa major fix.
 
 **Open issues:**
-- 🔴 BLOCKER: No turn-timer UI — 15s server deadline invisible to client; player gets silently eliminated. `ShiritoriView.tsx` needs a countdown. Owner: review-by-eod.
-- 🟡 MAJOR: `dictCheckJa` network error indistinguishable from invalid word (solo/page.tsx:71). Owner: review-by-eod.
+- ✅ FIXED (2026-07-19): No turn-timer UI — 15s server deadline invisible to client. Added `turnStartedAt: number | null` to `ShiritoriClientState`; resets on `shiritoriWordAccepted` / `shiritoriPlayerEliminated`; `ShiritoriView.tsx` renders a depleting progress bar (lime→yellow→orange at ≤9s/≤5s) via `role="timer"`.
+- 🟡 MAJOR: `dictCheckJa` network error indistinguishable from invalid word (solo/page.tsx) — returns `false` on fetch failure, player sees "not in dictionary" on a network drop. Owner: review-by-eod.
+- 🟡 MAJOR: No tests for countdown logic in `useShiritoriGame.test.ts` or `ShiritoriView.test.tsx` — TDD gap; add before promoting to ≥90%. Owner: next run.
 - ✅ FIXED: final loser never marked `eliminated:true` on game-over (`useShiritoriGame.ts:87`).
 - ✅ FIXED: init loading text semantics (`ShiritoriVersus.tsx:77`).
 
