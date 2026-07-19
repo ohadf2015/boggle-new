@@ -102,6 +102,7 @@ vi.mock('@/contexts/NavigationContext', () => ({
     setActiveTab: vi.fn(),
   }),
   useHideNavigation: () => vi.fn(),
+  useRegisterHeaderAudioControl: vi.fn(),
   NavigationProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
