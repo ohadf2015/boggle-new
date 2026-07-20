@@ -95,7 +95,8 @@ function CrosswordCellBase({
       aria-label={label}
       aria-selected={isActive}
       onClick={() => onSelect(cell.row, cell.col)}
-      className={`relative flex items-center justify-center font-neo-body font-bold uppercase select-none transition-colors duration-75 ${bg} ${text} ${
+      onPointerDown={() => onSelect(cell.row, cell.col)}
+      className={`relative flex min-h-[44px] min-w-[44px] items-center justify-center font-neo-body font-bold uppercase select-none touch-manipulation transition-colors duration-75 ${bg} ${text} ${
         isActive ? 'z-10 ring-2 ring-inset ring-neo-navy' : ''
       } ${enter ? 'cw-cell-enter' : ''}`}
       style={{

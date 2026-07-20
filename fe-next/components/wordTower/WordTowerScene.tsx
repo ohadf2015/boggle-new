@@ -19,7 +19,7 @@ import { toppleCrashFx, CRASH_DARK_COLOR } from '@/lib/wordTower/crashFx';
 import { towerRowLayout, towerPanMin, clampPan } from '@/lib/wordTower/towerLayout';
 import { stepMomentum, clampFlickVelocity, WHEEL_SCALE } from '@/lib/wordTower/scrollMomentum';
 import {
-  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLandScaled, impactRing, bumpScale, tumbleOut, drawGroundShadow,
+  makeTile, paintTile, placeInstant, dropIn, popOut, recolor, swivelWordIn, shakeX, squashLandScaled, impactRing, bumpScale, tumbleOut, drawGroundShadow, drawTowerFoundation,
   type TileSprite,
 } from './towerSprites';
 import { impactDipPx, IMPACT_MS } from '@/lib/wordTower/landingImpact';
@@ -33,6 +33,7 @@ import { WordTowerParallaxProps } from './WordTowerParallaxProps';
 import { WordTowerSighting } from './WordTowerSighting';
 import { WordTowerMascot } from './WordTowerMascot';
 import { WordTowerMinimap } from './WordTowerMinimap';
+import { WordTowerGroundPlane } from './WordTowerGroundPlane';
 import { WordTowerAmbient } from './WordTowerAmbient';
 import type { RivalMarker } from '@/lib/wordTower/rivals';
 import type { PlacementQuality } from '@/lib/wordTower/cranePlacement';
@@ -204,6 +205,8 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   const tiltRef = useRef<Container | null>(null);
   // Ground shadow layer — sits at the screen ground line, under the tower.
   const groundLayerRef = useRef<Container | null>(null);
+  // Foundation block under the base tile — replaced on each layout pass.
+  const foundationRef = useRef<Graphics | null>(null);
   // Directional light overlay — tints the tower column from the sun/moon side.
   const lightOverlayRef = useRef<Graphics | null>(null);
   // Screen-y of the ground line the sway pivots about (deck top), kept fresh by
@@ -274,6 +277,7 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       tiltRef.current = null;
       groundLayerRef.current = null;
       lightOverlayRef.current = null;
+      foundationRef.current = null;
       reg.clear();
       firstRender.current = true;
       prevMaxPos.current = -1;
@@ -511,13 +515,25 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       }
     }
 
-    // Ground shadow under the tower base.
+      // Ground shadow under the tower base.
     if (ground) {
       ground.removeChildren();
       if (C > 0 && enableGlow) {
         const groundLocalY = groundScreenY - c.y;
         drawGroundShadow(ground, centerX, groundLocalY, size, C, palette[biomeForHeight(alts[0] ?? 0)] ?? palette.city);
       }
+    }
+
+    // Foundation block under the base tile so the tower visibly connects to the
+    // ground/cityscape instead of floating. It lives in the tilt container so it
+    // pivots with the tower and scrolls down behind the deck as the climb grows.
+    if (foundationRef.current && !foundationRef.current.destroyed) {
+      foundationRef.current.destroy();
+      foundationRef.current = null;
+    }
+    if (tilt && C > 0) {
+      const foundationColor = palette[biomeForHeight(alts[0] ?? 0)] ?? palette.city;
+      foundationRef.current = drawTowerFoundation(tilt, centerX, localY(0) + half, size, foundationColor);
     }
 
     firstRender.current = false;
@@ -963,9 +979,11 @@ export function WordTowerScene(props: SceneProps) {
           BG_PAN_DEPTH) so stars/clouds/props parallax with the user's scroll. They
           are transparent over the static sky above — no edge can reveal navy. */}
       <div ref={(el) => { pan.current.bgEl = el; }} className="absolute inset-0 will-change-transform">
+        {/* Solid ground plane — lowest parallax layer, anchors the tower base. */}
+        <WordTowerGroundPlane groundInsetPx={props.bottomInsetPx ?? 220} biomeId={viewBiome} />
         {/* Parallax ascent backdrop (stars/clouds/skyline) — driven by the
             *viewed* altitude so panning down reveals that altitude's sky. */}
-        <WordTowerBackdrop biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} />
+        <WordTowerBackdrop biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} groundInsetPx={props.bottomInsetPx ?? 220} />
         {/* Lazy altitude-reference props behind the tower (viewed altitude). */}
         <WordTowerParallaxProps heightM={viewAlt} reducedMotion={props.reducedMotion} />
         {/* Rare drifting sightings (cosmic whale / satellite / shooting star). */}

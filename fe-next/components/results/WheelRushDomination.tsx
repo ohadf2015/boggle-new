@@ -156,14 +156,14 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
           <div className="flex items-center gap-1.5 mb-2">
             <Zap className="w-4 h-4 text-neo-cyan" />
             <h3 className="text-xs font-black uppercase tracking-wider text-neo-white">
-              {t('wheelRush.results.matchRecap') || 'Wheel Rush Recap'}
+              {t('wheelRush.results.matchRecap')}
             </h3>
           </div>
 
           <div className="flex items-end justify-between gap-3 mb-2">
             <div className="min-w-0">
               <div className="text-[10px] font-bold uppercase tracking-wider text-neo-white">
-                {t('wheelRush.results.totalLocks') || 'Words Locked'}
+                {t('wheelRush.results.totalLocks')}
               </div>
               <div className="text-4xl font-black text-neo-cyan tabular-nums leading-none drop-shadow-[0_0_8px_rgba(0,255,255,0.3)]">
                 <ScoreCountUp to={matchRecap.totalLocks} duration={1400} delay={prefersReduced ? 0 : 300} />
@@ -172,7 +172,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
             <div className="shrink-0 flex flex-col items-end gap-1">
               <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-neo-white">
                 <Swords className="w-3 h-3" />
-                {t('wheelRush.results.stealRate') || 'Steal Rate'}
+                {t('wheelRush.results.stealRate')}
               </div>
               <div className="w-20 h-2 rounded-full bg-neo-black/60 border border-neo-white/15 overflow-hidden">
                 <m.div
@@ -195,7 +195,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                 </span>
               </div>
               <span className="text-[9px] uppercase tracking-wider text-neo-white">
-                {t('wheelRush.results.locks') || 'Locks'}
+                {t('wheelRush.results.locks')}
               </span>
             </div>
             <div className="flex flex-col items-center">
@@ -206,7 +206,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                 </span>
               </div>
               <span className="text-[9px] uppercase tracking-wider text-neo-white">
-                {t('wheelRush.results.steals') || 'Steals'}
+                {t('wheelRush.results.steals')}
               </span>
             </div>
           </div>
@@ -217,7 +217,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
       <m.div variants={v} className="flex items-center gap-2 px-1">
         <Sparkles className="w-4 h-4 text-neo-cyan" />
         <h3 className="text-sm font-black uppercase tracking-wider text-neo-white">
-          {t('wheelRush.results.boardDomination') || 'Wheel Domination'}
+          {t('wheelRush.results.boardDomination')}
         </h3>
       </m.div>
 
@@ -244,7 +244,7 @@ export default function WheelRushDomination({ playerStats, currentUsername }: Wh
                     {username}
                   </span>
                   <span className="text-[10px] text-neo-white ml-auto tabular-nums">
-                    {stats.totalScore} {t('wheelRush.results.pts') || 'pts'} · {stats.wordsLocked}🔒 · {stats.wordsStolen}⚔
+                    {stats.totalScore} {t('wheelRush.results.pts')} · {stats.wordsLocked}🔒 · {stats.wordsStolen}⚔
                   </span>
                 </div>
 

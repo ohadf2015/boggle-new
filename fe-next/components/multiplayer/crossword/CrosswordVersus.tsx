@@ -29,14 +29,14 @@ interface CrosswordVersusProps {
   onQuit?: () => void;
 }
 
-function StandingsRail({ standings, me, t }: { standings: CrosswordStanding[]; me: string; t: (k: string) => string }) {
+function StandingsRail({ standings, me, t }: { standings: CrosswordStanding[]; me: string; t: (k: string, fallbackOrParams?: string | Record<string, string | number>) => string }) {
   return (
     <ul className="flex flex-col gap-1.5" aria-label={t('crossword.mp.standings')}>
       {standings.map((s) => (
         <li key={s.username} className={`rounded-neo border-neo border-black px-2.5 py-1.5 shadow-hard ${s.username === me ? 'bg-neo-cyan/20' : 'bg-neo-navy-light'}`}>
           <div className="flex items-center justify-between gap-2">
             <span className={`font-neo-display text-xs font-bold ${s.username === me ? 'text-neo-cyan' : 'text-neo-white'}`}>
-              {s.solved ? '🏁 ' : ''}{s.username}
+              {s.solved ? <span aria-hidden="true">🏁 </span> : ''}{s.username}
             </span>
             <span className="font-neo-body text-[10px] tabular-nums text-neo-cream/60">{s.solved ? t('crossword.mp.done') : `${s.percent}%`}</span>
           </div>
@@ -87,8 +87,8 @@ function CrosswordRace({
       <div className="flex items-center gap-3">
         {onQuit && <ExitRoomButton onClick={onQuit} label={t('common.backToHome')} />}
         <span className="font-neo-display text-sm font-bold text-neo-cyan">{t('crossword.mp.title')}</span>
-        <span className="ml-auto font-neo-body text-xs tabular-nums text-neo-cream/70">
-          {stats.wordsSolved}/{stats.wordsTotal} · {stats.percent}%
+        <span className="ms-auto font-neo-body text-xs tabular-nums text-neo-cream/70">
+          {stats.wordsSolved}{t('crossword.mp.statSeparator', '/')}{stats.wordsTotal} {t('crossword.mp.statPercent', '{{percent}}%', { percent: stats.percent })}
         </span>
       </div>
 
@@ -98,21 +98,21 @@ function CrosswordRace({
           <CrosswordGrid state={game.state} onSelect={game.focusCell} t={t} solved={solved} />
           <ClueBar slot={game.activeSlot} rtl={puzzle.rtl} onPrev={() => game.nextSlot(-1)} onNext={() => game.nextSlot(1)} onToggleDir={game.toggleDir} t={t} />
           <div className="flex items-center justify-center gap-2">
-            <button type="button" onClick={game.checkAll} className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
-              <CheckCheck className="h-4 w-4" /> {t('crossword.check')}
+            <button type="button" onClick={game.checkAll} aria-label={t('crossword.check')} className="flex min-h-[44px] items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
+              <CheckCheck className="h-4 w-4" aria-hidden="true" /> {t('crossword.check')}
             </button>
-            <button type="button" onClick={game.revealCell} className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
-              <Lightbulb className="h-4 w-4" /> {t('crossword.revealLetter')}
+            <button type="button" onClick={game.revealCell} aria-label={t('crossword.revealLetter')} className="flex min-h-[44px] items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
+              <Lightbulb className="h-4 w-4" aria-hidden="true" /> {t('crossword.revealLetter')}
             </button>
-            <button type="button" onClick={game.revealWord} className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
-              <Eye className="h-4 w-4" /> {t('crossword.revealWord')}
+            <button type="button" onClick={game.revealWord} aria-label={t('crossword.revealWord')} className="flex min-h-[44px] items-center gap-1 rounded-neo border-neo border-black bg-neo-navy-light px-3 py-2 font-neo-body text-xs font-bold text-neo-white shadow-hard">
+              <Eye className="h-4 w-4" aria-hidden="true" /> {t('crossword.revealWord')}
             </button>
           </div>
           <div className="shrink-0 lg:hidden">
             <CrosswordKeyboard locale={puzzle.locale} onLetter={game.inputLetter} onBackspace={game.backspace} disabled={solved} backspaceLabel={t('crossword.backspace')} />
           </div>
-          <details className="lg:hidden">
-            <summary className="cursor-pointer font-neo-body text-xs text-neo-cream/60">{t('crossword.allClues')}</summary>
+          <details className="lg:hidden rounded-neo border-neo border-black bg-neo-navy-light shadow-hard">
+            <summary className="cursor-pointer list-none px-3 py-2.5 font-neo-body text-xs font-bold text-neo-white">{t('crossword.allClues')}</summary>
             <CrosswordClueList slots={puzzle.slots} activeSlotId={game.activeSlot?.id ?? null} onSelect={(slot) => game.focusSlot(slot.id)} t={t} capturedSlotIds={mySolvedSlotIds} />
           </details>
         </div>
@@ -129,7 +129,7 @@ function CrosswordRace({
         <div className="pointer-events-none absolute inset-x-0 top-14 z-20 flex justify-center">
           <div className="rounded-neo border-neo-thick border-black bg-neo-yellow px-5 py-2 font-neo-display font-bold text-black shadow-hard" role="status">
             {raceOver
-              ? (standings[0]?.username === username ? t('crossword.mp.youWin') : `${standings[0]?.username ?? ''} ${t('crossword.mp.wins')}`)
+              ? (standings[0]?.username === username ? t('crossword.mp.youWin') : t('crossword.mp.winner', { winner: standings[0]?.username ?? '' }))
               : t('crossword.mp.youFinished')}
           </div>
         </div>

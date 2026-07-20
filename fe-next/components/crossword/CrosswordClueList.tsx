@@ -7,7 +7,7 @@ export interface CrosswordClueListProps {
   slots: Slot[];
   activeSlotId: string | null;
   onSelect: (slot: Slot) => void;
-  t: (key: string) => string;
+  t: (key: string, fallbackOrParams?: string | Record<string, string | number>) => string;
   /** 'responsive' = 1 col then 2 at sm+ (mobile sheet). 'stacked' = always 1 col (desktop rail). */
   columns?: 'responsive' | 'stacked';
   /** Slot IDs this player has correctly solved — renders a capture badge. */
@@ -109,7 +109,7 @@ function Section({
                 </span>
                 <span className="font-neo-body text-sm">{slot.clue}</span>
                 {captured && (
-                  <span className="ml-auto shrink-0 text-neo-cyan text-[10px] font-bold" aria-label="captured">✓</span>
+                  <span className="ms-auto shrink-0 text-neo-cyan text-[10px] font-bold" aria-label={t('crossword.captured', 'Captured')}>✓</span>
                 )}
               </button>
             </li>

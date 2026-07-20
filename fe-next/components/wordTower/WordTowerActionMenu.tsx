@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Plus, X } from 'lucide-react';
+import { MoreHorizontal, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface WordTowerActionMenuProps {
@@ -45,11 +45,11 @@ export function WordTowerActionMenu({ children, reducedMotion = false, t }: Word
           is fully collapsed AND non-interactive so it can't catch stray taps. */}
       <div
         className={cn(
-          'flex items-center gap-1.5 overflow-hidden',
+          'flex items-center gap-1 overflow-hidden',
           reducedMotion ? '' : 'transition-all duration-300 ease-out',
           open
             ? 'max-w-[260px] scale-100 opacity-100'
-            : 'pointer-events-none max-w-0 scale-90 opacity-0',
+            : 'pointer-events-none max-w-0 scale-95 opacity-0',
         )}
       >
         {children}
@@ -60,11 +60,14 @@ export function WordTowerActionMenu({ children, reducedMotion = false, t }: Word
         aria-expanded={open}
         aria-label={t(open ? 'wordTower.hud.menuClose' : 'wordTower.hud.menuOpen')}
         className={cn(
-          'flex h-10 w-10 shrink-0 items-center justify-center rounded-neo border-neo-thick border-black bg-neo-cyan text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed',
-          reducedMotion ? '' : 'transition-transform',
+          'flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-neo-thick border-black bg-neo-navy-light text-neo-white shadow-hard backdrop-blur-sm',
+          'hover:scale-105 hover:bg-neo-navy hover:text-neo-cyan hover:border-neo-cyan/50 hover:shadow-hard-lg',
+          'active:scale-95 active:text-neo-cyan active:border-neo-cyan',
+          'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
+          reducedMotion ? '' : 'transition-all duration-200',
         )}
       >
-        {open ? <X className="h-5 w-5" /> : <Plus className="h-5 w-5" />}
+        {open ? <X className="h-5 w-5" /> : <MoreHorizontal className="h-6 w-6" />}
       </button>
     </div>
   );

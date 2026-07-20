@@ -109,10 +109,10 @@ const REWARD_MS = 1500;
  *  story beat the defender should actually read. */
 const WRECK_REPORT_MS = 3500;
 
-/** Local session fallback key. Daily runs are isolated per UTC day so yesterday's
- *  state is never restored as today's climb. */
+/** Local session fallback key. The tower itself persists across days; only the
+ *  daily seed/wheel changes per UTC day. */
 function sessionStorageKey(daily: boolean) {
-  return daily ? `wt-session-daily-${utcDateKey()}` : 'wt-session-endless';
+  return daily ? 'wt-session-persistent' : 'wt-session-endless';
 }
 
 interface SavedSession {
@@ -128,13 +128,24 @@ function saveSessionToLocalStorage(g: WordTowerPlayerState, daily: boolean) {
 }
 
 function loadSessionFromLocalStorage(daily: boolean): SavedSession | null {
-  try {
-    const raw = localStorage.getItem(sessionStorageKey(daily));
-    if (!raw) return null;
-    const parsed = JSON.parse(raw) as SavedSession;
-    if (!parsed?.state) return null;
-    return parsed;
-  } catch { return null; }
+  const tryKey = (key: string): SavedSession | null => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as SavedSession;
+      if (!parsed?.state) return null;
+      return parsed;
+    } catch { return null; }
+  };
+  let saved = tryKey(sessionStorageKey(daily));
+  // One-time migration from the old date-stamped daily key.
+  if (!saved && daily) {
+    saved = tryKey(`wt-session-daily-${utcDateKey()}`);
+    if (saved) {
+      try { localStorage.setItem(sessionStorageKey(true), JSON.stringify(saved)); } catch { /* */ }
+    }
+  }
+  return saved;
 }
 
 /* (Verdict tone classes + tier-kicker keys moved into WordTowerNoticeColumn.) */
@@ -824,10 +835,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
     // runs, and authenticated players when the network drops or the API rejects.
     saveSessionToLocalStorage(g, daily);
 
-    // Daily runs are perk-eligible and bounded — they must NEVER touch the shared
-    // endless best-height board, or a boosted climb would inflate it. Local session
-    // persistence above is the ONLY save they need.
-    if (daily) return;
+    // Daily runs are perk-eligible and bounded. Save to DB too (daily mode now
+    // persists across sessions), but only the local session is the fallback.
+    if (daily) {
+      saveSessionToLocalStorage(g, daily);
+      // Don't skip the DB save below — daily runs also persist to Supabase.
+    }
 
     // Server upserts are deduped by floor count to avoid redundant writes; forced
     // saves (interval, unload, biome crossing) bypass the dedupe.
@@ -854,9 +867,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         saveSessionToLocalStorage(g, daily);
       });
   }, [buildPayload, daily]);
-
-  // Restore a previous session from localStorage on load. This is especially
-  // important for guests and daily runs, where the server has no progress row.
   const sessionRestoredRef = useRef(false);
   useEffect(() => {
     if (sessionRestoredRef.current) return;
@@ -887,6 +897,12 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   useEffect(() => {
     if (floorsCount > 0 && floorsCount % 5 === 0) save();
   }, [floorsCount, save]);
+
+  // Daily mode: persist after EVERY floor so a reload never loses the latest
+  // progress (the tower is meant to stay persistent throughout the day).
+  useEffect(() => {
+    if (daily && floorsCount > 0) save(false, { force: true });
+  }, [floorsCount, save, daily]);
 
   // Periodically flush to localStorage (and server for endless) so even a crash
   // or killed app loses at most 2 minutes of progress.
@@ -1294,7 +1310,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         {/* Simplified altitude readout — its own centred row below the dropped
             Daily/Endless pill (mt clears it). Collapsed = altitude + combo only;
             tap to expand for biome/floors/best/tier (less data overload). */}
-        <div className="mx-auto mt-12 flex w-fit items-center gap-1.5">
+        <div className="mx-auto mt-3 flex w-fit items-center gap-1.5">
           <WordTowerStatHud
             heightM={game.heightM}
             combo={game.combo}

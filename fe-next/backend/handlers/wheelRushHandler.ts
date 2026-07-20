@@ -41,18 +41,18 @@ function broadcastWheelLeaderboard(io: Server, gameCode: string): void {
 export function handleSubmitWheelWord(io: Server, socket: Socket, data: SubmitWheelWordData): void {
   const gameCode = getGameBySocketId(socket.id);
   const username = getUsernameBySocketId(socket.id);
-  if (!gameCode || !username) { socket.emit('error', { message: 'Not in a game' }); return; }
+  if (!gameCode || !username) { socket.emit('error', { code: 'NOT_IN_GAME' }); return; }
 
   const game = getGame(gameCode);
-  if (!game) { socket.emit('error', { message: 'Game not found' }); return; }
-  if (game.gameState !== 'in-progress') { socket.emit('error', { message: 'Game is not in progress' }); return; }
-  if (game.gameMode !== 'wheel-rush') { socket.emit('error', { message: 'Not a wheel-rush game' }); return; }
+  if (!game) { socket.emit('error', { code: 'GAME_NOT_FOUND' }); return; }
+  if (game.gameState !== 'in-progress') { socket.emit('error', { code: 'GAME_NOT_IN_PROGRESS' }); return; }
+  if (game.gameMode !== 'wheel-rush') { socket.emit('error', { code: 'NOT_WHEEL_RUSH' }); return; }
 
   const state = game.wheelRushState;
-  if (!state) { socket.emit('error', { message: 'Wheel state not initialized' }); return; }
+  if (!state) { socket.emit('error', { code: 'WHEEL_STATE_NOT_INITIALIZED' }); return; }
 
   const rawWord = (data.word || '').toUpperCase().trim();
-  if (!rawWord) { socket.emit('error', { message: 'Word required' }); return; }
+  if (!rawWord) { socket.emit('error', { code: 'WORD_REQUIRED' }); return; }
 
   const lang = (game.language || 'en') as Language;
   // Hebrew sofit collapse — wheel stores only regular forms; normalize once at the boundary
@@ -130,19 +130,19 @@ export function registerWheelRushHandlers(io: Server, socket: Socket): void {
   socket.on('submitWheelWord', (data: unknown) => {
     // Weight 5: ~10 submits per 10s window (endgame sprints can spike to 3-4/sec)
     if (!checkRateLimit(socket.id, 5)) {
-      socket.emit('rateLimited', { message: 'Too many submissions, slow down' });
+      socket.emit('rateLimited', { code: 'RATE_LIMITED' });
       return;
     }
     const validation = validatePayload(SubmitWheelWordSchema, data);
     if (!validation.success || !validation.data) {
-      socket.emit('error', { message: `Invalid word: ${validation.success ? 'missing data' : validation.error}` });
+      socket.emit('error', { code: 'INVALID_WORD' });
       return;
     }
     try {
       handleSubmitWheelWord(io, socket, validation.data);
     } catch (err) {
       logger.error('WHEEL_RUSH', `Error submitWheelWord: ${(err as Error).message}`);
-      socket.emit('error', { message: 'Error processing wheel word' });
+      socket.emit('error', { code: 'WORD_PROCESSING_ERROR' });
     }
   });
 }

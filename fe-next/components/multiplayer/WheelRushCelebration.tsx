@@ -46,8 +46,8 @@ export const WheelRushCelebration: React.FC<Props> = ({ celebration, t, prefersR
           <span className="flex items-center gap-1.5 font-neo-display font-black text-lg sm:text-xl tracking-wide">
             <Sparkles className="w-5 h-5" />
             {celebration.tier === 'all'
-              ? (t('wordWheel.allLettersUsed') || 'ALL LETTERS!')
-              : (t('wordWheel.almostAllLetters') || 'ALMOST ALL!')}
+              ? t('wordWheel.allLettersUsed')
+              : t('wordWheel.almostAllLetters')}
             <Sparkles className="w-5 h-5" />
           </span>
           <span dir="auto" className="font-neo-body font-bold text-sm uppercase tracking-widest opacity-80">

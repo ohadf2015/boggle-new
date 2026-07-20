@@ -73,7 +73,10 @@ const en = {
       "done": "Done!",
       "youFinished": "You finished! 🏁",
       "youWin": "You win the race!",
-      "wins": "wins the race!"
+      "wins": "wins the race!",
+      "winner": "{winner} wins the race!",
+      "statSeparator": "/",
+      "statPercent": "{percent}%"
     },
     "name": "Crossword",
     "tagline": "Fill the grid, one clue at a time",
@@ -106,6 +109,8 @@ const en = {
     "nextPuzzlePrompt": "Next puzzle",
     "freeplayEdition": "Freeplay #{count}",
     "generating": "Setting the grid…",
+    "captured": "Captured",
+    "dismiss": "Close",
     "scramble": {
       "title": "Unscramble!",
       "subtitle": "Solve for a streak bonus!",
@@ -142,6 +147,10 @@ const en = {
     "submit": "Submit",
     "waitTurn": "Waiting for your turn…",
     "wins": "wins!",
+    "empty": "—",
+    "winner": "{winner} wins!",
+    "finished": "Game over",
+    "chainArrow": "→",
     "yourTurn": "Your turn — type a word",
     "youWin": "You win!",
     "error": {
@@ -163,6 +172,7 @@ const en = {
       "submit": "Send",
       "checking": "Checking…",
       "giveUp": "Give up",
+      "confirmNewGame": "Start a new game? Your current chain will be lost.",
       "again": "Play again",
       "won": "You win!",
       "lost": "Round over",
@@ -394,7 +404,7 @@ const en = {
     "crane": { "place": "Place your word", "steer": "Steer & drop", "tapToDrop": "Tap to drop", "perfect": "Perfect!", "good": "Nice!", "sloppy": "Wobbly", "miss": "Whoops!", "stability": "Stability", "steady": "Steady", "onFire": "On Fire", "steadyAria": "Steady hands streak: {n} perfect drops" },
     "upgrade": { "categories": { "crane": "Crane", "stability": "Stability", "boost": "Boost" }, "recommended": "Best pick", "title": "Tower Upgrades", "subtitle": "Permanent boosts — spend your coins", "open": "Upgrades", "balance": "{n} coins", "buy": "Buy", "max": "MAXED", "level": "Lv {n}/{max}", "owned": "Owned", "close": "Done", "broke": "Not enough coins", "steadyCable": { "name": "Steady Cable", "desc": "Slows the crane swing for easier timing" }, "wideFooting": { "name": "Wide Footing", "desc": "Widens the perfect-landing window" }, "windbreak": { "name": "Windbreak", "desc": "Calms the high-altitude wind" }, "masterArchitect": { "name": "Master Architect", "desc": "Bigger coin rewards on every drop" }, "reinforcedCore": { "name": "Reinforced Core", "desc": "Survive one more wobble before a topple" }, "quickRecovery": { "name": "Quick Recovery", "desc": "The tower straightens up faster" }, "tailwind": { "name": "Tailwind", "desc": "Every floor climbs a little higher" }, "salvage": { "name": "Salvage Rig", "desc": "A topple knocks off fewer floors" }, "momentum": { "name": "Momentum", "desc": "Perfect-drop streaks pay even bigger" }, "centerMagnet": { "name": "Gravity Core", "desc": "Bad drops still pull the tower back toward center" } },
     "verdict": { "perfect": "Perfect!", "good": "Nice!", "sloppy": "Sloppy", "miss": "Missed!" },
-    "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name} — −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "New zone or achievement!", "watchAd": "📺 Watch Ad +1", "adEarned": "🎯 Token via Ad!", "smashTitle": "Release the ball!", "smashCta": "SMASH!", "smashReleasing": "Releasing…", "floorsDestroyed": "−{n} FLOORS!", "newHeight": "New height:", "strikeCta": "STRIKE!", "strikeHint": "Tap when the meter hits the green zone", "verdict": { "perfect": "PERFECT HIT!", "solid": "SOLID HIT", "weak": "GLANCING BLOW" }, "done": "DONE" },
+    "sabotage": { "chip": "Wrecking ball", "tokens": "{n}", "pickTarget": "Pick a rival", "noTargets": "No rivals to target yet", "confirm": "Send wrecking ball to {name}?", "send": "Send", "cancel": "Cancel", "sentTo": "💥 Hit {name} — −1m", "incoming": "🚨 Sabotage incoming from {name}!", "recovered": "Tower stands. Climb on.", "earned": "🎯 Wrecking Ball earned!", "earnedHint": "New zone or achievement!", "watchAd": "📺 Watch Ad +1", "adEarned": "🎯 Token via Ad!", "smashTitle": "Release the ball!", "smashCta": "SMASH!", "smashReleasing": "Releasing…", "floorsDestroyed": "−{n} FLOORS!", "newHeight": "New height:", "newHeightValue": "{m}m", "strikeCta": "STRIKE!", "strikeHint": "Tap when the meter hits the green zone", "verdict": { "perfect": "PERFECT HIT!", "solid": "SOLID HIT", "weak": "GLANCING BLOW" }, "done": "DONE" },
     "reward": { "tier": { "common": "Coins", "uncommon": "Nice haul!", "rare": "Rare find!", "epic": "JACKPOT!" } },
     "wreck": { "reportTitle": "Tower raided!", "reportBody": "{name} knocked off {floors} floors while you were away — here's a scramble to fight back.", "defaultName": "A rival" },
     "error": { "too_short": "Too short — 3+ letters", "bad_chain": "Start with the glowing letter", "not_buildable": "Use the tray letters", "duplicate": "Already used that word", "not_in_dictionary": "Not in the dictionary" },
@@ -7965,6 +7975,7 @@ const en = {
         "charge": "Ability charge",
         "weakLabel": "Weak to",
         "weaknessHit": "WEAKNESS!",
+        "bossHit": "BOSS!"
         "weakness": {
           "length": "LONG WORDS",
           "lengthLong": "LONGER WORDS",
@@ -14747,10 +14758,34 @@ const en = {
     "notAWord": "Not a word",
     "continue": "Continue",
     "revealing": "Revealing…",
+    "youWin": "You win!",
+    "youLose": "Clash",
+    "draw": "Pass",
+    "noWord": "—",
+    "botRival": "Rival {n}",
+    "outcome": {
+      "unique": "Unique bid",
+      "clash": "Clash",
+      "none": "No bid"
+    },
+    "outcomeEmoji": {
+      "unique": "✅",
+      "clash": "🤝",
+      "none": "⬜"
+    },
+    "error": {
+      "tooShort": "Word must be at least 3 letters",
+      "needStake": "Set a stake to lock your bid"
+    },
     "shareCard": {
       "title": "Your bluffing story",
       "cta": "Share result",
-      "copied": "Copied!"
+      "copied": "Copied!",
+      "header": "🎯 Sealed Bid — {score}pts",
+      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
+      "url": "lexiclash.com/{locale}/sealed-bid",
+      "roundLabel": "R{n}",
+      "vs": "vs"
     },
     "session": {
       "title": "Bluff Counter",
@@ -14758,7 +14793,11 @@ const en = {
       "uniqueLabel": "Unique",
       "clashLabel": "Clash",
       "passLabel": "Pass",
-      "shareCta": "Share Score"
+      "shareCta": "Share Score",
+      "shareHeader": "🧠 Outsmarted the bot {unique}/{total} rounds — {score} pts",
+      "cashOut": "Cash out",
+      "chips": "chips",
+      "coins": "coins"
     }
   },
   "supporter": {

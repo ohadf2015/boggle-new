@@ -167,7 +167,7 @@ export default function ChipTray({
                   sm:h-14 sm:w-14 sm:text-xs
                 `
                 : `
-                  relative rounded-neo border-neo-thick border-black px-3 py-2.5
+                  relative min-h-[44px] min-w-[44px] rounded-neo border-neo-thick border-black px-3 py-2.5
                   ${config.bgColor} ${config.textColor}
                   font-neo-display text-sm font-bold shadow-hard
                   transition-all active:shadow-hard-pressed

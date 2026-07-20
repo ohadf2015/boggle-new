@@ -39,6 +39,7 @@ const NINE_LETTER_SOURCES: Record<string, string[]> = {
   // English seeds). A wheel is anagram play: phonetic kana only, never kanji.
   ja: ['りゅうがくせい','ゆうびんきょく','ひゃっかじてん','ちゅうしゃじょう','ていりゅうじょ','にゅうがくする','にゅういんする','めんどうくさい'],
   es: ['RESPALDOS','CAMINANDO','ENCONTRAR','FABRICADO','GOBIERNO','HORMIGAS','INDOMABLE'],
+  ru: ['АВТОБУСЫ','БИБЛИОТЕК','ВОСТОРГЕ','ГАЗЕТНЫЙ','ДЕРЕВНЯ','ЖЕЛАНИЕ','ЗАВТРАК','ИЗДАНИЕ','КАБИНЕТ','КАРТИНА','КОМАНДА','МАГАЗИН','НАСТРОЕН','ОБЩЕСТВО','ПАМЯТНИК','ПЕРЕМЕНА','ПИСАТЕЛ','ПЛОЩАДЬ','ПОДАРОК','ПОЕЗДКА','ПОМОЩНИК','ПРАЗДНИК','ПРИКЛЮЧЕН','ПРИРОДА','РАССКАЗ','РЕШЕНИЕ','СВОБОДА','СЛОВАРЬ','СОБАКА','СОБЫТИЕ','СОЛНЦЕ','СПАСИБО','СРАВНЕНИ','СТАДИОН','СТОЛИЦА','СТРАНА','СУЩЕСТВО','ТВОРЧЕСТВ','ТЕХНИКА','ТОВАРИЩ','ТРАДИЦИЯ','УЛЫБКА','УЧЕБНИК','ФАМИЛИЯ','ХОРОШИЙ','ЦВЕТОК','ЧЕЛОВЕК','ШКОЛЬНИК','ЭКЗАМЕН','ЯЗЫК'],
 };
 
 function hashString(s: string): number {
@@ -149,7 +150,7 @@ function isInDictionary(word: string, language: Language): boolean {
   const trie = getCachedTrie(language);
   if (!trie) return false;
   const node = getTrieNode(trie, word.toLowerCase());
-  return !!(node && (node as TrieNode).isWord === true);
+  return !!(node && node.isWord === true);
 }
 
 export type WheelValidationError =

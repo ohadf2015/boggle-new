@@ -103,7 +103,7 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
           {typeof remainingTime === 'number' && (
             <div
               data-testid="wheel-rush-timer"
-              aria-label={t('wordWheel.timeLeft') || 'Time Left'}
+              aria-label={t('wordWheel.timeLeft')}
               className="shrink-0"
             >
               <CircularTimer
@@ -123,7 +123,7 @@ export const WheelRushHeader: React.FC<Props> = ({ leaderboard, username, fogAct
             size="icon"
             variant="destructive"
             onClick={onQuit}
-            aria-label={t('common.quit') || 'Quit'}
+            aria-label={t('common.quit')}
             className="shrink-0"
           >
             <X />

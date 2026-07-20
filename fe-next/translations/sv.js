@@ -164,7 +164,10 @@ const sv = {
       "done": "Klar!",
       "youFinished": "Du blev klar! 🏁",
       "youWin": "Du vinner loppet!",
-      "wins": "vinner loppet!"
+      "wins": "vinner loppet!",
+      "winner": "{winner} vinner loppet!",
+      "statSeparator": "/",
+      "statPercent": "{percent}%"
     },
     "name": "Korsord",
     "tagline": "Fyll i rutnätet, en ledtråd i taget",
@@ -204,6 +207,8 @@ const sv = {
     "nextPuzzlePrompt": "Nästa pussel",
     "freeplayEdition": "Träning #{count}",
     "generating": "Bygger rutnätet…",
+    "captured": "Tagen",
+    "dismiss": "Stäng",
     "scramble": {
       "title": "Avkoda!",
       "subtitle": "Lös för bonuspoäng!",
@@ -426,6 +431,10 @@ const sv = {
     "submit": "Skicka",
     "waitTurn": "Väntar på din tur…",
     "wins": "vinner!",
+    "empty": "—",
+    "winner": "{winner} vinner!",
+    "finished": "Spelet slut",
+    "chainArrow": "→",
     "yourTurn": "Din tur – skriv ett ord",
     "youWin": "Du vinner!",
     "error": {
@@ -458,6 +467,7 @@ const sv = {
       "submit": "Skicka",
       "checking": "Kontrollerar…",
       "giveUp": "Ge upp",
+      "confirmNewGame": "Starta ett nytt spel? Din nuvarande kedja förloras.",
       "again": "Spela igen",
       "won": "Du vinner!",
       "lost": "Rundan är slut",
@@ -976,6 +986,7 @@ const sv = {
       "smashReleasing": "Släpper…",
       "floorsDestroyed": "−{n} VÅNINGAR!",
       "newHeight": "Ny höjd:",
+      "newHeightValue": "{m} m",
       "strikeCta": "SLÅ!",
       "strikeHint": "Tryck när mätaren når det gröna fältet",
       "verdict": {
@@ -3202,6 +3213,7 @@ const sv = {
         "charge": "Förmågeladdning",
         "weakLabel": "Svag mot",
         "weaknessHit": "SVAGHET!",
+        "bossHit": "BOSS!"
         "weakness": {
           "length": "LÅNGA ORD",
           "lengthLong": "LÄNGRE ORD",
@@ -11176,6 +11188,7 @@ const sv = {
         "charge": "Förmågauppladdning",
         "weakLabel": "Svag mot",
         "weaknessHit": "SVAGHET!",
+        "bossHit": "BOSS!"
         "weakness": {
           "length": "LÅNGA ORD",
           "lengthLong": "ÄNNU LÄNGRE ORD",
@@ -15730,9 +15743,41 @@ const sv = {
       "passLabel": "Pass",
       "shareCta": "Dela poäng"
     },
+    "youWin": "Du vinner!",
+    "youLose": "Krock",
+    "draw": "Pass",
+    "noWord": "—",
+    "botRival": "Rival {n}",
+    "outcome": {
+      "unique": "Unikt bud",
+      "clash": "Krock",
+      "none": "Inget bud"
+    },
+    "outcomeEmoji": {
+      "unique": "✅",
+      "clash": "🤝",
+      "none": "⬜"
+    },
+    "error": {
+      "tooShort": "Ordet måste vara minst 3 bokstäver",
+      "needStake": "Sätt en insats för att låsa"
+    },
     "revealing": "Avslöjar…",
     "roundLabel": "Runda {n} av {total}",
-    "chipStack": "Marker: {chips}"
+    "chipStack": "Marker: {chips}",
+    "shareCard": {
+      "header": "🎯 Förseglat bud — {score} poäng",
+      "row": "{round} {emoji} {playerWord} mot {botWord}{points}",
+      "url": "lexiclash.com/sv/sealed-bid",
+      "roundLabel": "R{n}",
+      "vs": "mot"
+    },
+    "session": {
+      "shareHeader": "🧠 Överlistade botten {unique}/{total} rundor — {score} poäng",
+      "cashOut": "Ta ut",
+      "chips": "marker",
+      "coins": "mynt"
+    }
   },
   "supporter": {
     "card": {

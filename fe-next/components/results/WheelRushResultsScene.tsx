@@ -160,7 +160,7 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
       <div className="relative z-10 flex items-center justify-center gap-1.5 pt-3 pb-1">
         <Sparkles className="w-3.5 h-3.5 text-neo-cyan" />
         <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-neo-white">
-          {t('wheelRush.results.sceneTitle') || 'Wheel Settles'}
+          {t('wheelRush.results.sceneTitle')}
         </h3>
         <Sparkles className="w-3.5 h-3.5 text-neo-cyan" />
       </div>
@@ -256,7 +256,7 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
       <div className="relative z-10 grid grid-cols-3 gap-2 px-3 pb-3 pt-1">
         <StatTile
           icon={<Lock className="w-3 h-3" />}
-          label={t('wheelRush.results.totalLocks') || 'Words Locked'}
+          label={t('wheelRush.results.totalLocks')}
           value={recap.totalLocks}
           tone="text-neo-lime"
           countUp
@@ -264,14 +264,14 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
         />
         <StatTile
           icon={<Swords className="w-3 h-3" />}
-          label={t('wheelRush.results.stealRate') || 'Steal Rate'}
+          label={t('wheelRush.results.stealRate')}
           value={`${recap.stealRate}%`}
           tone="text-neo-pink"
           delay={prefersReduced ? 0 : 1200}
         />
         <StatTile
           icon={<Sword className="w-3 h-3" />}
-          label={t('wheelRush.results.steals') || 'Steals'}
+          label={t('wheelRush.results.steals')}
           value={recap.totalSteals}
           tone="text-neo-red"
           countUp
@@ -293,7 +293,7 @@ export default function WheelRushResultsScene({ playerStats, scores, currentUser
               <div className="flex items-center gap-1 mb-0.5">
                 <span className={award.tone}>{award.icon}</span>
                 <span className="text-[9px] font-bold uppercase tracking-wider text-neo-white truncate">
-                  {t(award.titleKey) || award.key}
+                  {t(award.titleKey)}
                 </span>
               </div>
               <div className={`text-base font-black tabular-nums ${award.tone}`}>

@@ -55,7 +55,7 @@ export function CrosswordView({
   onNewPuzzle,
   onDailySolved,
 }: CrosswordViewProps) {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const reduced = useReducedMotion();
   const { playSound } = useSoundEffects();
   const [burst, setBurst] = useState(0);
@@ -150,15 +150,24 @@ export function CrosswordView({
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+      // Ignore typing inside the ClueScramble input (or any other input/textarea)
+      // so the global handler doesn't race with the mini-game.
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
+        return;
+      }
       const key = e.key;
       if (key === 'Backspace') {
         e.preventDefault();
         backspace();
       } else if (key === 'ArrowRight') {
+        e.preventDefault();
         moveInSlot(puzzle.rtl ? -1 : 1);
       } else if (key === 'ArrowLeft') {
+        e.preventDefault();
         moveInSlot(puzzle.rtl ? 1 : -1);
       } else if (key === 'ArrowDown' || key === 'ArrowUp') {
+        e.preventDefault();
         // vertical nav toggles to down if needed, then moves
         if (state.dir !== 'down') toggleDir();
         else moveInSlot(key === 'ArrowDown' ? 1 : -1);
@@ -208,6 +217,7 @@ export function CrosswordView({
     <div
       className="fixed inset-x-0 top-0 z-20 flex h-[100dvh] w-full flex-col overflow-hidden bg-neo-navy texture-halftone px-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.5rem,env(safe-area-inset-bottom))] lg:static lg:z-auto lg:mx-auto lg:block lg:h-auto lg:max-w-5xl lg:overflow-visible lg:bg-transparent lg:pt-9 lg:pb-10"
       translate="no"
+      dir={dir}
     >
       <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-cyan/40" />
 
@@ -256,7 +266,7 @@ export function CrosswordView({
       {/* Board + clues. On phones a single fit-to-viewport column (grid+clues
           scroll in the middle, keyboard pinned); grid left / clue rail right on
           desktop. */}
-      <div className="mt-3 flex min-h-0 flex-1 flex-col lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-6 lg:items-start">
+      <div className="mt-3 flex min-h-0 flex-1 flex-col lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-6 lg:items-start rtl:lg:grid-cols-[21rem_minmax(0,1fr)]">
         <div className="flex min-h-0 flex-1 flex-col gap-2 lg:block lg:gap-3">
           {/* Scrollable middle on mobile so the keyboard can stay pinned. */}
           <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain lg:flex-none lg:gap-3 lg:overflow-visible">
@@ -363,9 +373,19 @@ export function CrosswordView({
             <div className="text-5xl mb-1" aria-hidden>
               🎉
             </div>
-            <h2 className="font-neo-display font-extrabold text-2xl mb-3">
-              {t('crossword.solvedTitle')}
-            </h2>
+            <div className="relative">
+              <h2 className="font-neo-display font-extrabold text-2xl mb-3">
+                {t('crossword.solvedTitle')}
+              </h2>
+              <button
+                type="button"
+                onClick={reset}
+                aria-label={t('crossword.dismiss', 'Close')}
+                className="absolute -top-2 -end-2 rounded-neo border-neo border-black bg-neo-navy-light px-2 py-1 font-neo-body text-xs font-bold text-neo-white shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
+              >
+                ✕
+              </button>
+            </div>
             <div className="grid grid-cols-3 gap-2 mb-4">
               <SolvedStat value={formatTime(elapsedMs)} label={t('crossword.timer')} />
               <SolvedStat value={`${stats.wordsTotal}`} label={t('crossword.wordsLabel')} />

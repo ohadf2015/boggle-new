@@ -26,8 +26,14 @@ export interface ShiritoriViewProps {
   onSubmit: (word: string) => void;
   /** Unix-ms when the current turn started — drives the countdown bar. */
   turnStartedAt?: number | null;
-  /** i18n. */
-  t: (key: string) => string;
+  /** i18n. Matches LanguageContext.t. */
+  t: (
+    key: string,
+    fallbackOrParams?: string | Record<string, string | number>,
+    params?: Record<string, string | number>,
+  ) => string;
+  /** Text direction — defaults to ltr for tests. */
+  dir?: 'ltr' | 'rtl';
 }
 
 /**
@@ -53,10 +59,12 @@ export default function ShiritoriView({
   onSubmit,
   turnStartedAt,
   t,
+  dir = 'ltr',
 }: ShiritoriViewProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const composingRef = useRef(false);
   const [value, setValue] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const TIMEOUT_SECS = SHIRITORI_TURN_MS / 1000;
   const [secsLeft, setSecsLeft] = useState<number>(() =>
     turnStartedAt ? Math.max(0, Math.ceil((SHIRITORI_TURN_MS - (Date.now() - turnStartedAt)) / 1000)) : TIMEOUT_SECS
@@ -75,22 +83,26 @@ export default function ShiritoriView({
   const submit = () => {
     // Read the live DOM value (IME may not have flushed to React state yet).
     const raw = (inputRef.current?.value ?? value).trim();
-    if (!raw || !isMyTurn) return;
+    if (!raw || !isMyTurn || isSubmitting) return;
+    setIsSubmitting(true);
     onSubmit(raw);
     setValue('');
     if (inputRef.current) inputRef.current.value = '';
+    // Re-enable input after a brief window so rapid double-clicks / double-Enter
+    // cannot emit multiple socket events before the server has accepted the word.
+    window.setTimeout(() => setIsSubmitting(false), 600);
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     // keyCode 229 = IME still composing — never submit on that Enter.
-    if (e.key === 'Enter' && !composingRef.current && e.keyCode !== 229) {
+    if (e.key === 'Enter' && !composingRef.current && e.keyCode !== 229 && !isSubmitting) {
       e.preventDefault();
       submit();
     }
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-xl flex-col gap-4 p-4 lg:max-w-3xl lg:grid lg:grid-cols-[1fr_11rem] lg:items-start lg:gap-6">
+    <div className="mx-auto flex w-full max-w-xl flex-col gap-4 p-4 lg:max-w-3xl lg:grid lg:grid-cols-[1fr_11rem] lg:items-start lg:gap-6" dir={dir}>
       {/* Turn rail — stacks on top on mobile, becomes a right sidebar at lg so
           wide desktop viewports don't leave the chain floating in dead space. */}
       <aside className="lg:col-start-2 lg:row-start-1" data-testid="shiritori-turn-rail">
@@ -121,8 +133,8 @@ export default function ShiritoriView({
         {!finished && (
           <div className="text-center">
             <p className="font-neo-body text-sm text-neo-white">{t('shiritori.nextStartsWith')}</p>
-            <p className="font-neo-display text-5xl font-bold text-neo-cyan" data-testid="required-head">
-              {requiredHead ?? '—'}
+            <p className="font-neo-display text-5xl font-bold text-neo-cyan" data-testid="required-head" dir="ltr">
+              {requiredHead ?? t('shiritori.empty', '—')}
             </p>
           </div>
         )}
@@ -138,7 +150,7 @@ export default function ShiritoriView({
         )}
 
         {/* Chain history */}
-        <ol className="flex flex-wrap items-center gap-2" aria-label={t('shiritori.chain')}>
+        <ol className="flex flex-wrap items-center gap-2" aria-label={t('shiritori.chain')} dir="ltr">
           {chain.map((w, i) => (
             <li
               key={`${w}-${i}`}
@@ -151,8 +163,12 @@ export default function ShiritoriView({
 
         {/* Game over */}
         {finished ? (
-          <div className="rounded-neo border-neo-thick border-black bg-neo-yellow p-4 text-center font-neo-display text-xl font-bold text-black shadow-hard" role="status">
-            {winner === me ? t('shiritori.youWin') : `${winner ?? ''} ${t('shiritori.wins')}`}
+          <div className="rounded-neo border-neo-thick border-black bg-neo-yellow p-4 text-center font-neo-display text-xl font-bold text-black shadow-hard" role="status" dir={dir}>
+            {winner === me
+              ? t('shiritori.youWin')
+              : winner
+                ? t('shiritori.winner', { winner, defaultValue: '{{winner}} wins!' })
+                : t('shiritori.finished', 'Game over')}
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -171,12 +187,14 @@ export default function ShiritoriView({
                 onKeyDown={onKeyDown}
                 placeholder={isMyTurn ? t('shiritori.yourTurn') : t('shiritori.waitTurn')}
                 aria-label={t('shiritori.inputLabel')}
+                dir="ltr"
+                lang="ja"
                 className="flex-1 rounded-neo border-neo-thick border-black bg-neo-cream px-4 py-3 font-neo-body text-black shadow-hard disabled:opacity-50"
               />
               <button
                 type="button"
                 onClick={submit}
-                disabled={!isMyTurn || value.trim().length === 0}
+                disabled={!isMyTurn || value.trim().length === 0 || isSubmitting}
                 className="rounded-neo border-neo-thick border-black bg-neo-lime px-5 py-3 font-neo-display font-bold text-black shadow-hard active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed disabled:opacity-50"
               >
                 {t('shiritori.submit')}

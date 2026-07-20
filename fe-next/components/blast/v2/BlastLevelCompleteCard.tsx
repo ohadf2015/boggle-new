@@ -64,25 +64,28 @@ type Props = {
 
 // Pick a single "story" line so the screen doesn't recite the same metrics
 // every time. First match wins — order encodes priority.
-function pickHighlight(opts: {
-  stars?: number;
-  bonusWordsFound?: number;
-  cascadeCount?: number;
-  bestChainDepth?: number;
-  timeSeconds?: number;
-  completionReason?: 'mastered' | 'partial';
-}): { label: string; key: string } {
+function pickHighlight(
+  opts: {
+    stars?: number;
+    bonusWordsFound?: number;
+    cascadeCount?: number;
+    bestChainDepth?: number;
+    timeSeconds?: number;
+    completionReason?: 'mastered' | 'partial';
+  },
+  t: (key: string, fallback?: string) => string,
+): { label: string; key: string } {
   // A partial finish gets its own upbeat badge — never a "perfect run" claim,
   // and never a scolding "you missed words". It's still a cleared board.
-  if (opts.completionReason === 'partial') return { label: 'BOARD CLEARED', key: 'partial' };
-  if (opts.stars === 3) return { label: 'PERFECT RUN', key: 'perfect' };
-  if ((opts.bonusWordsFound ?? 0) >= 2) return { label: 'TREASURE HUNTER', key: 'treasure' };
-  if ((opts.bestChainDepth ?? 0) >= 3) return { label: 'CHAIN MASTER', key: 'chain' };
-  if ((opts.cascadeCount ?? 0) >= 2) return { label: 'CASCADE!', key: 'cascade' };
+  if (opts.completionReason === 'partial') return { label: t('blast.highlight.partial', 'BOARD CLEARED'), key: 'partial' };
+  if (opts.stars === 3) return { label: t('blast.highlight.perfect', 'PERFECT RUN'), key: 'perfect' };
+  if ((opts.bonusWordsFound ?? 0) >= 2) return { label: t('blast.highlight.treasure', 'TREASURE HUNTER'), key: 'treasure' };
+  if ((opts.bestChainDepth ?? 0) >= 3) return { label: t('blast.highlight.chain', 'CHAIN MASTER'), key: 'chain' };
+  if ((opts.cascadeCount ?? 0) >= 2) return { label: t('blast.highlight.cascade', 'CASCADE!'), key: 'cascade' };
   if (typeof opts.timeSeconds === 'number' && opts.timeSeconds > 0 && opts.timeSeconds <= 25) {
-    return { label: 'SPEEDRUN', key: 'speed' };
+    return { label: t('blast.highlight.speed', 'SPEEDRUN'), key: 'speed' };
   }
-  return { label: 'LEVEL CLEAR', key: 'clean' };
+  return { label: t('blast.highlight.clean', 'LEVEL CLEAR'), key: 'clean' };
 }
 
 type IconProps = { className?: string };
@@ -179,7 +182,7 @@ export function BlastLevelCompleteCard({
   const chestReady = (chestProgress ?? 0) >= 1;
   const chestAlmost = !chestReady && (chestProgress ?? 0) >= 0.85;
 
-  const highlight = pickHighlight({ stars, bonusWordsFound, cascadeCount, bestChainDepth, timeSeconds, completionReason });
+  const highlight = pickHighlight({ stars, bonusWordsFound, cascadeCount, bestChainDepth, timeSeconds, completionReason }, t);
   // Celebration intensity scales to the outcome — soft partial / standard win /
   // epic 3-star. Drives confetti volume, per-star bursts, and the finale flash.
   const celebration = resultCelebration({ completionReason, stars });

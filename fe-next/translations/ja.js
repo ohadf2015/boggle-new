@@ -92,7 +92,10 @@ const ja = {
       "done": "完成！",
       "youFinished": "完成しました！🏁",
       "youWin": "レースに勝利！",
-      "wins": "がレースに勝利！"
+      "wins": "がレースに勝利！",
+      "winner": "{winner}がレースに勝利！",
+      "statSeparator": "/",
+      "statPercent": "{percent}%"
     },
     "name": "クロスワード",
     "tagline": "ヒントを頼りにマスを埋めよう",
@@ -132,6 +135,8 @@ const ja = {
     "nextPuzzlePrompt": "次のパズル",
     "freeplayEdition": "練習 #{count}",
     "generating": "盤面を準備中…",
+    "captured": "獲得済み",
+    "dismiss": "閉じる",
     "scramble": {
       "title": "並べ替えて！",
       "subtitle": "解いてボーナス獲得！",
@@ -168,6 +173,10 @@ const ja = {
     "submit": "送信",
     "waitTurn": "順番をお待ちください…",
     "wins": "の勝ち！",
+    "empty": "—",
+    "winner": "{winner}の勝ち！",
+    "finished": "ゲーム終了",
+    "chainArrow": "→",
     "yourTurn": "あなたの番です — 言葉を入力",
     "youWin": "あなたの勝ち！",
     "error": {
@@ -200,6 +209,7 @@ const ja = {
       "submit": "送信",
       "checking": "確認中…",
       "giveUp": "降参",
+      "confirmNewGame": "新しいゲームを始めますか？現在のチェーンは失われます。",
       "again": "もう一度",
       "won": "勝利！",
       "lost": "ラウンド終了",
@@ -718,6 +728,7 @@ const ja = {
       "smashReleasing": "放つ…",
       "floorsDestroyed": "−{n} 階破壊！",
       "newHeight": "新しい高さ:",
+      "newHeightValue": "{m}m",
       "strikeCta": "打て！",
       "strikeHint": "メーターが緑ゾーンに入ったらタップ",
       "verdict": {
@@ -2943,6 +2954,7 @@ const ja = {
         "charge": "アビリティチャージ",
         "weakLabel": "弱点",
         "weaknessHit": "弱点ヒット！",
+        "bossHit": "ボスヒット！"
         "weakness": {
           "length": "長い単語",
           "lengthLong": "より長い単語",
@@ -10969,6 +10981,7 @@ const ja = {
         "charge": "スキルチャージ",
         "weakLabel": "弱点",
         "weaknessHit": "弱点を突いた!",
+        "bossHit": "ボスヒット！"
         "weakness": {
           "length": "長い単語",
           "lengthLong": "もっと長い単語",
@@ -15731,9 +15744,41 @@ const ja = {
       "passLabel": "パス",
       "shareCta": "スコアをシェア"
     },
+    "youWin": "勝利！",
+    "youLose": "衝突",
+    "draw": "パス",
+    "noWord": "—",
+    "botRival": "ライバル{n}",
+    "outcome": {
+      "unique": "ユニーク入札",
+      "clash": "衝突",
+      "none": "入札なし"
+    },
+    "outcomeEmoji": {
+      "unique": "✅",
+      "clash": "🤝",
+      "none": "⬜"
+    },
+    "error": {
+      "tooShort": "単語は3文字以上必要です",
+      "needStake": "賭け金を設定してロック"
+    },
     "revealing": "公開中…",
     "roundLabel": "ラウンド {n}/{total}",
-    "chipStack": "チップ: {chips}"
+    "chipStack": "チップ: {chips}",
+    "shareCard": {
+      "header": "🎯 シールドビッド — {score}pt",
+      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
+      "url": "lexiclash.com/ja/sealed-bid",
+      "roundLabel": "R{n}",
+      "vs": "vs"
+    },
+    "session": {
+      "shareHeader": "🧠 {unique}/{total}ラウンドでボットに勝利 — {score}pt",
+      "cashOut": "キャッシュアウト",
+      "chips": "チップ",
+      "coins": "コイン"
+    }
   },
   "supporter": {
     "card": {

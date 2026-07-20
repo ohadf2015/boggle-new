@@ -12,7 +12,7 @@ import AdventureTailOverlays from './AdventureTailOverlays';
 import { getWorldConfig } from '@/lib/adventure/levelConfig';
 import { MAX_EQUIPPED_RUNES } from '@/lib/adventure/runeCatalog';
 
-type Unknown = Record<string, unknown>;
+type Unknown = unknown;
 
 export interface AdventureGameShellProps {
   bossOrch: Unknown & { isBossActive: boolean; showBossIntro: boolean; gridEffectTrigger: unknown; lockedTiles: unknown };

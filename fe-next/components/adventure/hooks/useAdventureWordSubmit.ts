@@ -287,9 +287,9 @@ export function useAdventureWordSubmit(props: UseAdventureWordSubmitProps): UseA
             }
 
             if (weak.isWeakHit) {
-              bossBonus = 'WEAKNESS!';
+              bossBonus = t('adventure.boss.combat.weaknessHit');
             } else if (mechResult.meetsRequirement) {
-              bossBonus = 'BOSS!';
+              bossBonus = t('adventure.boss.combat.bossHit');
             }
 
             // Armor Plating T4: heal player on every word during boss fight

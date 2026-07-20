@@ -615,6 +615,32 @@ export function drawGroundShadow(
   parent.addChild(shadow);
 }
 
+/** Foundation block beneath the base tile — visually connects the tower to the ground/cityscape. */
+export function drawTowerFoundation(
+  parent: Container,
+  x: number,
+  y: number,
+  size: number,
+  color: number,
+): Graphics {
+  const g = new Graphics();
+  g.zIndex = -2;
+  const w = size * 1.34;
+  const h = size * 0.42;
+  const dark = 0x1a2235;
+  // Main block.
+  g.rect(-w / 2, 0, w, h).fill({ color: dark, alpha: 0.92 });
+  // Top ledge tint — ties it to the current biome material.
+  g.rect(-w / 2, 0, w, Math.max(2, Math.round(size * 0.06))).fill({ color, alpha: 0.55 });
+  // Subtle side bevels.
+  g.rect(-w / 2, 0, Math.max(2, size * 0.06), h).fill({ color: 0xffffff, alpha: 0.08 });
+  g.rect(w / 2 - Math.max(2, size * 0.06), 0, Math.max(2, size * 0.06), h).fill({ color: 0x000000, alpha: 0.2 });
+  g.x = x;
+  g.y = y;
+  parent.addChild(g);
+  return g;
+}
+
 /** Brief horizontal shake of a container (rejected word). Fire-and-forget. */
 export function shakeX(c: Container, mag = 9, dur = 320): void {
   const x0 = c.x;

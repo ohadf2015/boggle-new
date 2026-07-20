@@ -74,7 +74,7 @@ async function dictCheckJa(word: string): Promise<boolean> {
 }
 
 export default function ShiritoriSoloPage() {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const { canSeeInWorkModes } = useAuth();
   const { playSound } = useSoundEffects();
   const { locale } = useParams<{ locale: string }>();
@@ -85,9 +85,11 @@ export default function ShiritoriSoloPage() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [score, setScore] = useState(0);
+  const [scoreBump, setScoreBump] = useState(0);
   const [winFlash, setWinFlash] = useState(0);
   const { isGhostTurn, multiplier, markTurnPlayed, reset: resetGhost } = useShiritoriGhostMultiplier();
   const inputRef = useRef<HTMLInputElement>(null);
+  const composingRef = useRef(false);
   const chainEndRef = useRef<HTMLDivElement>(null);
   const wonFiredRef = useRef(false);
 
@@ -155,20 +157,29 @@ export default function ShiritoriSoloPage() {
     chainEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'end' });
   }, [state.chain.length]);
 
-  const newGame = useCallback((d: Difficulty) => {
+  const doNewGame = useCallback((d: Difficulty) => {
     setDifficulty(d);
     setState(initialSpState(pickSeed(d)));
     setInput('');
     setError(null);
     setScore(0);
+    setScoreBump((b) => b + 1);
     resetGhost();
     wonFiredRef.current = false;
     setSoloAward(null);
   }, [resetGhost]);
 
+  const newGame = useCallback((d: Difficulty) => {
+    if (state.phase === 'playing' && state.chain.length > 1) {
+      const ok = window.confirm(t('shiritori.solo.confirmNewGame', 'Start a new game? Your current chain will be lost.'));
+      if (!ok) return;
+    }
+    doNewGame(d);
+  }, [doNewGame, state.phase, state.chain.length, t]);
+
   const submit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    if (state.phase !== 'playing' || state.turn !== 'player' || pending) return;
+    if (state.phase !== 'playing' || state.turn !== 'player' || pending || composingRef.current) return;
     const word = input.trim();
     if (!word) return;
     setError(null);
@@ -194,16 +205,17 @@ export default function ShiritoriSoloPage() {
       const catBonus = checkCategoryBonus(word, today);
       const pts = word.length * multiplier * catBonus.bonusMultiplier;
       setScore((s) => s + pts);
+      setScoreBump((b) => b + 1);
       const rect = inputRef.current?.getBoundingClientRect();
       if (catBonus.hit && catBonus.category) {
         toast(t('shiritori.solo.category.hit', { category: t(`shiritori.solo.category.${catBonus.category}`) }), {
-          icon: '✨',
+          icon: <span aria-hidden="true">✨</span>,
           style: { background: 'var(--popover)', color: 'var(--popover-foreground)' },
         });
         if (rect) SharedFxApp.spawnBurst('sparkle-gold', rect.left + rect.width / 2, rect.top + rect.height / 2, { count: 20 });
       } else if (isGhostTurn) {
         toast(t('shiritori.solo.ghost.reveal'), {
-          icon: '👻',
+          icon: <span aria-hidden="true">👻</span>,
           style: { background: 'var(--popover)', color: 'var(--popover-foreground)' },
         });
         if (rect) SharedFxApp.spawnBurst('sparkle-gold', rect.left + rect.width / 2, rect.top + rect.height / 2, { count: 12 });
@@ -246,7 +258,7 @@ export default function ShiritoriSoloPage() {
         </h1>
         {score > 0 ? (
           <span
-            key={score}
+            key={scoreBump}
             className="animate-neo-pop inline-flex items-center gap-1 rounded-neo border-2 border-black bg-neo-cyan px-2.5 py-1.5 font-neo-display text-sm font-black text-neo-navy shadow-hard-sm"
           >
             <Trophy className="h-3.5 w-3.5" aria-hidden="true" />
@@ -280,7 +292,7 @@ export default function ShiritoriSoloPage() {
         <p className="text-center font-neo-body text-sm text-neo-white">
           {t('shiritori.solo.headPrompt')}{' '}
           <span dir="ltr" className="inline-block animate-neo-pop rounded-neo border-2 border-black bg-neo-cyan px-2 py-0.5 font-neo-display font-black text-neo-navy" key={head}>
-            {head || '—'}
+            {head || t('shiritori.empty', '—')}
           </span>
         </p>
       )}
@@ -298,6 +310,8 @@ export default function ShiritoriSoloPage() {
             dir="ltr"
             value={input}
             onChange={(e) => { setInput(e.target.value); if (error) setError(null); }}
+            onCompositionStart={() => { composingRef.current = true; }}
+            onCompositionEnd={(e) => { composingRef.current = false; setInput(e.currentTarget.value); }}
             placeholder={t('shiritori.solo.inputPlaceholder')}
             aria-label={t('shiritori.solo.inputPlaceholder')}
             autoComplete="off"
@@ -313,7 +327,7 @@ export default function ShiritoriSoloPage() {
           type="button"
           onClick={() => setState((s) => playerGivesUp(s))}
           disabled={state.turn !== 'player' || pending}
-          className="shrink-0 rounded-neo border-3 border-black bg-neo-navy-light px-3 py-3 font-neo-display text-[10px] font-black uppercase tracking-wide text-neo-white shadow-hard-sm disabled:opacity-50"
+          className="shrink-0 rounded-neo border-3 border-black bg-neo-navy-light px-3 py-3 font-neo-display text-xs font-black uppercase tracking-wide text-neo-white shadow-hard-sm disabled:opacity-50 min-h-[44px] min-w-[44px]"
         >
           {t('shiritori.solo.giveUp')}
         </button>
@@ -336,7 +350,7 @@ export default function ShiritoriSoloPage() {
   return (
     <GameStage accent="lime" header={header} footer={footer}>
       <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-lime/40" />
-      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3">
+      <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-3" dir={dir}>
         <ModeCoach mode="shiritori" />
 
         {ended ? (
@@ -385,7 +399,7 @@ export default function ShiritoriSoloPage() {
                   : 'bg-neo-lime text-neo-navy';
               return (
                 <span key={`${w}-${i}`} className="inline-flex items-center gap-1.5">
-                  {i > 0 && <span className="text-neo-white">→</span>}
+                  {i > 0 && <span className="text-neo-white" aria-hidden="true">{t('shiritori.chainArrow', '→')}</span>}
                   <span
                     className={`inline-flex animate-neo-pop items-center gap-1 rounded-neo border-2 border-black px-2.5 py-1 font-neo-display text-base font-black shadow-hard-sm ${tone}`}
                   >

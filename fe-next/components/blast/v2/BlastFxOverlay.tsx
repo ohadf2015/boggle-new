@@ -1,5 +1,6 @@
 'use client';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { classifyOvation, type OvationTier } from '@/lib/blast/v2/engine';
 import { ParticlePool, PhysicsWorld, PhysicsDebris, ScreenShake, ScoreFlyManager, ScreenFlash } from '@/lib/gameEngine';
 import { TILE_EXPLOSION_VARIANTS, CASCADE_SPARKLE, CONFETTI_BURST, COMBO_FLASH, ELECTRIC_RINGS, GOLD_STARS, BLAST_LETTER_POP, BLAST_COMET_TRAIL } from '@/lib/gameEngine/presets/particles';
@@ -220,6 +221,8 @@ export function BlastFxOverlay({
   const systemsRef = useRef<Systems | null>(null);
   const lastClearKeyRef = useRef<number | undefined>(undefined);
   const lastChainKeyRef = useRef<number | undefined>(undefined);
+  const [fxFailed, setFxFailed] = useState(false);
+  const { t } = useLanguage();
 
   // Initialize Pixi + game systems. `resizeTo: canvas` makes Pixi keep its
   // renderer + app.screen synchronized with the canvas DOM size — without
@@ -244,7 +247,10 @@ export function BlastFxOverlay({
           autoDensity: true,
           resolution: typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1,
         });
-      } catch {
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('Blast FX overlay failed to initialize Pixi', err);
+        setFxFailed(true);
         return;
       }
 
@@ -489,15 +495,22 @@ export function BlastFxOverlay({
   }, [chainEventKey, chainDepth, onChainOvation]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      data-testid="blast-fx"
-      className={`${styles.canvas} absolute inset-0 pointer-events-none`}
-      // z-index 30 keeps bursts above the board (which sits at auto inside
-      // a stacking context created by isolation: isolate). Earlier z=10
-      // sometimes ended up painted under tile transforms during chains;
-      // 30 leaves headroom for HUD/modals while keeping FX legible.
-      style={{ zIndex: 30 }}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        data-testid="blast-fx"
+        className={`${styles.canvas} absolute inset-0 pointer-events-none`}
+        // z-index 30 keeps bursts above the board (which sits at auto inside
+        // a stacking context created by isolation: isolate). Earlier z=10
+        // sometimes ended up painted under tile transforms during chains;
+        // 30 leaves headroom for HUD/modals while keeping FX legible.
+        style={{ zIndex: 30 }}
+      />
+      {fxFailed && (
+        <div aria-live="polite" className="sr-only">
+          {t('blast.fxFailed', 'Effects unavailable')}
+        </div>
+      )}
+    </>
   );
 }

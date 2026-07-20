@@ -617,6 +617,12 @@ export interface WordTowerSaveState {
   surpriseSeed?: number;
   wordsSinceSurprise?: number;
   nextWordHeightMult?: number;
+  // Persist the current wheel so a reload resumes the SAME daily letters instead
+  // of drawing a fresh wheel every entry. Optional: old blobs fall back to a
+  // fresh deterministic wheel.
+  tray?: string[];
+  // Keep the draw counter so the next scramble/scramble-paid uses the right seed.
+  trayDraws?: number;
 }
 
 export function serializeWordTowerState(state: WordTowerPlayerState): WordTowerSaveState {
@@ -637,6 +643,8 @@ export function serializeWordTowerState(state: WordTowerPlayerState): WordTowerS
     surpriseSeed: state.surpriseSeed,
     wordsSinceSurprise: state.wordsSinceSurprise,
     nextWordHeightMult: state.nextWordHeightMult,
+    tray: state.tray,
+    trayDraws: state.trayDraws,
   };
 }
 
@@ -669,6 +677,10 @@ export function restoreWordTowerState(
     surpriseSeed: saved.surpriseSeed ?? base.surpriseSeed,
     wordsSinceSurprise: saved.wordsSinceSurprise ?? 0,
     nextWordHeightMult: saved.nextWordHeightMult ?? 1,
+    // Persist the exact wheel (daily letters) and draw counter across reloads.
+    // Old blobs without tray fall back to the deterministic base wheel.
+    tray: saved.tray && saved.tray.length > 0 ? saved.tray : base.tray,
+    trayDraws: saved.trayDraws ?? base.trayDraws,
   };
 }
 

@@ -38,6 +38,7 @@ interface Copy {
   /** Admin-only solo preview link label. Falls back to en. */
   soloPreview: string;
   faqs: { q: string; a: string }[];
+  faqTitle: string;
 }
 
 // ja is the primary locale (this is a JA-native game); en is the fallback for
@@ -62,6 +63,7 @@ const COPY: Record<string, Copy> = {
     cta: '無料で言葉ゲームをプレイ',
     comingSoon: 'しりとりモードはマルチプレイに登場予定です。',
     soloPreview: 'ソロでお試し（管理者プレビュー）',
+    faqTitle: 'よくある質問',
     faqs: [
       { q: 'しりとりは無料で遊べますか？', a: 'はい。LexiClash はブラウザで無料で遊べます。登録は不要です。' },
       { q: 'オンラインで対戦できますか？', a: 'はい。ともだちや世界中のプレイヤーとリアルタイムで対戦できます。' },
@@ -87,6 +89,7 @@ const COPY: Record<string, Copy> = {
     cta: 'Play word games free',
     comingSoon: 'Shiritori mode is coming soon to multiplayer.',
     soloPreview: 'Try solo (admin preview)',
+    faqTitle: 'FAQ',
     faqs: [
       { q: 'Is Shiritori free to play?', a: 'Yes. LexiClash plays free in your browser, no signup required.' },
       { q: 'Can I play online with others?', a: 'Yes — real-time multiplayer with friends or players worldwide.' },
@@ -202,7 +205,7 @@ export default async function ShiritoriLandingPage({ params }: PageProps) {
         </section>
 
         <section className="mt-8">
-          <h2 className="font-neo-display text-2xl font-bold text-neo-white">FAQ</h2>
+          <h2 className="font-neo-display text-2xl font-bold text-neo-white">{copy.faqTitle}</h2>
           <dl className="mt-4 space-y-4">
             {copy.faqs.map((f, i) => (
               <div key={i} className="rounded-neo border-neo border-black bg-neo-navy-light p-4">

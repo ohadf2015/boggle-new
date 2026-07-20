@@ -12,14 +12,24 @@ interface Props {
   coinsAwarded?: number;
 }
 
-export function buildBluffShareText(history: RoundResult[], totalScore: number): string {
+export function buildBluffShareText(
+  history: RoundResult[],
+  totalScore: number,
+  t?: (key: string, params?: Record<string, string | number>) => string,
+): string {
   const unique = history.filter((r) => r.outcome === 'unique').length;
   const total = history.length;
+  if (t) {
+    return [
+      t('sealedBid.session.shareHeader', { unique, total, score: totalScore }),
+      t('sealedBid.shareCard.url'),
+    ].join('\n');
+  }
   return `🧠 Outsmarted the bot ${unique}/${total} rounds — ${totalScore} pts\nlexiclash.com/en/sealed-bid`;
 }
 
 export function SealedBidSessionSummary({ history, totalScore, chips, coinsAwarded }: Props) {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   const unique = history.filter((r) => r.outcome === 'unique').length;
@@ -28,7 +38,7 @@ export function SealedBidSessionSummary({ history, totalScore, chips, coinsAward
   const total = history.length;
 
   const handleShare = async () => {
-    const text = buildBluffShareText(history, totalScore);
+    const text = buildBluffShareText(history, totalScore, t);
     const canNative = typeof navigator !== 'undefined' && !!navigator.share;
     if (canNative) {
       await navigator.share({ text }).catch(() => {});
@@ -42,7 +52,7 @@ export function SealedBidSessionSummary({ history, totalScore, chips, coinsAward
   const canNative = typeof navigator !== 'undefined' && !!navigator.share;
 
   return (
-    <div className="rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard space-y-3 animate-[fadeInUp_0.3s_ease-out_0.1s_both] motion-reduce:animate-none">
+    <div className="rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard space-y-3 animate-[fadeInUp_0.3s_ease-out_0.1s_both] motion-reduce:animate-none" dir={dir}>
       <p className="font-neo-display font-black text-xs uppercase tracking-widest text-neo-white/70 text-center">
         {t('sealedBid.session.title')}
       </p>
@@ -67,12 +77,12 @@ export function SealedBidSessionSummary({ history, totalScore, chips, coinsAward
 
       <div className="flex justify-center gap-2">
         <div className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 shadow-hard-sm">
-          <span className="text-sm" aria-hidden="true">✅</span>
+          <span className="text-sm" aria-hidden="true">{t('sealedBid.outcomeEmoji.unique', '✅')}</span>
           <span className="font-neo-display font-black text-sm text-neo-lime">{unique}</span>
           <span className="font-neo-body text-[10px] text-neo-white/50">{t('sealedBid.session.uniqueLabel')}</span>
         </div>
         <div className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 shadow-hard-sm">
-          <span className="text-sm" aria-hidden="true">🤝</span>
+          <span className="text-sm" aria-hidden="true">{t('sealedBid.outcomeEmoji.clash', '🤝')}</span>
           <span
             data-testid="bluff-clash-count"
             className="font-neo-display font-black text-sm text-neo-orange"
@@ -82,7 +92,7 @@ export function SealedBidSessionSummary({ history, totalScore, chips, coinsAward
           <span className="font-neo-body text-[10px] text-neo-white/50">{t('sealedBid.session.clashLabel')}</span>
         </div>
         <div className="flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy px-3 py-1.5 shadow-hard-sm">
-          <span className="text-sm" aria-hidden="true">⬜</span>
+          <span className="text-sm" aria-hidden="true">{t('sealedBid.outcomeEmoji.none', '⬜')}</span>
           <span
             data-testid="bluff-pass-count"
             className="font-neo-display font-black text-sm text-neo-white/40"

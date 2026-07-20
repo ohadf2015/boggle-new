@@ -9,6 +9,8 @@ import { selectWheelRadius } from '@/lib/wordWheel/wheelGeometry';
 import { isValidWordWheelWord, type WordWheelPuzzle } from '@/utils/dailyChallenge/wordWheelGeneration';
 import { scoreWord } from '@/utils/dailyChallenge/wordWheelScoring';
 import { classifyLetterCoverage } from '@/lib/wheelRush/letterCoverage';
+import { wheelWordDir } from '@/lib/wheelRush/wordDirection';
+import type { Language } from '@/types';
 import { WheelRushCelebration, type WheelCelebration } from '@/components/multiplayer/WheelRushCelebration';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -102,6 +104,9 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   // reduced-motion preference; we gate the breathing/pulse loops on it
   // (WCAG 2.3.3) but leave functional feedback animations (tap, success) intact.
   const prefersReducedMotion = useReducedMotion() ?? false;
+  // Builder direction follows the letters on screen, not the UI locale, so a
+  // Hebrew wheel reads RTL even for an English-UI player. See wheelWordDir.
+  const wordDir = useMemo(() => wheelWordDir(puzzle.allLetters, language as Language), [puzzle.allLetters, language]);
   const {
     playTileSelectSound, playWordAcceptedSound, playWordRejectedSound,
     playComboSound, playLegendaryWordSound, playEpicVictorySound,
@@ -936,7 +941,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           : { type: 'spring', stiffness: 300, damping: 20 }
         }
       >
-        <div className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
+        <div dir={wordDir} className="flex items-center justify-center gap-1 sm:gap-2 flex-wrap max-w-full">
           <AnimatePresence mode="popLayout">
             {builtLetters.length === 0 ? (
               <m.span
@@ -1175,6 +1180,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
           combo={combo}
           pointerPosRef={pointerPosRef}
           isDraggingRef={draggingRef}
+          reducedMotion={prefersReducedMotion}
         />
         {/* Outer glow ring — breathing loop disabled under reduced-motion */}
         <m.div

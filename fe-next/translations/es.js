@@ -92,7 +92,10 @@ const es = {
       "done": "¡Listo!",
       "youFinished": "¡Terminaste! 🏁",
       "youWin": "¡Ganas la carrera!",
-      "wins": "¡gana la carrera!"
+      "wins": "¡gana la carrera!",
+      "winner": "¡{winner} gana la carrera!",
+      "statSeparator": "/",
+      "statPercent": "{percent}%"
     },
     "name": "Crucigrama",
     "tagline": "Rellena la cuadrícula, pista a pista",
@@ -132,6 +135,8 @@ const es = {
     "nextPuzzlePrompt": "Siguiente acertijo",
     "freeplayEdition": "Práctica #{count}",
     "generating": "Preparando la cuadrícula…",
+    "captured": "Capturada",
+    "dismiss": "Cerrar",
     "scramble": {
       "title": "¡Descifra!",
       "subtitle": "¡Resuelve para un bonus de racha!",
@@ -168,6 +173,10 @@ const es = {
     "submit": "Enviar",
     "waitTurn": "Esperando tu turno…",
     "wins": "¡gana!",
+    "empty": "—",
+    "winner": "¡{winner} gana!",
+    "finished": "Fin del juego",
+    "chainArrow": "→",
     "yourTurn": "Tu turno: escribe una palabra",
     "youWin": "¡Ganaste!",
     "error": {
@@ -191,6 +200,7 @@ const es = {
       "submit": "Enviar",
       "checking": "Comprobando…",
       "giveUp": "Rendirse",
+      "confirmNewGame": "¿Empezar un juego nuevo? Perderás tu cadena actual.",
       "again": "Jugar otra vez",
       "won": "¡Ganaste!",
       "lost": "Ronda terminada",
@@ -715,6 +725,7 @@ const es = {
       "smashReleasing": "Soltando…",
       "floorsDestroyed": "¡−{n} PISOS!",
       "newHeight": "Nueva altura:",
+      "newHeightValue": "{m} m",
       "strikeCta": "¡GOLPEA!",
       "strikeHint": "Toca cuando el medidor llegue a la zona verde",
       "verdict": {
@@ -5033,6 +5044,7 @@ const es = {
         "charge": "Carga de habilidad",
         "weakLabel": "Débil a",
         "weaknessHit": "¡DEBILIDAD!",
+        "bossHit": "¡JEFE!"
         "weakness": {
           "length": "PALABRAS LARGAS",
           "lengthLong": "PALABRAS MÁS LARGAS",
@@ -10971,6 +10983,7 @@ const es = {
         "charge": "Carga de habilidad",
         "weakLabel": "Débil a",
         "weaknessHit": "¡PUNTO DÉBIL!",
+        "bossHit": "¡JEFE!"
         "weakness": {
           "length": "PALABRAS LARGAS",
           "lengthLong": "PALABRAS MÁS LARGAS",
@@ -15816,7 +15829,32 @@ const es = {
       "chips": "fichas",
       "coins": "monedas"
     },
-    "revealing": "Revelando…"
+    "noWord": "—",
+    "outcome": {
+      "unique": "Puja única",
+      "clash": "Choque",
+      "none": "Sin puja"
+    },
+    "outcomeEmoji": {
+      "unique": "✅",
+      "clash": "🤝",
+      "none": "⬜"
+    },
+    "error": {
+      "tooShort": "La palabra debe tener al menos 3 letras",
+      "needStake": "Apuesta fichas para bloquear"
+    },
+    "revealing": "Revelando…",
+    "shareCard": {
+      "header": "🎯 Puja sellada — {score} pts",
+      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
+      "url": "lexiclash.com/es/sealed-bid",
+      "roundLabel": "R{n}",
+      "vs": "vs"
+    },
+    "session": {
+      "shareHeader": "🧠 Superé al bot en {unique}/{total} rondas — {score} pts"
+    }
   },
   "supporter": {
     "card": {
