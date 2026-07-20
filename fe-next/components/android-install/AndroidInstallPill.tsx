@@ -37,15 +37,38 @@ export default function AndroidInstallPill() {
   const openPromo = useAndroidInstallStore((s) => s.openPromo);
   const hidePill = useAndroidInstallStore((s) => s.hidePill);
 
+  // ── Capacitor-native guard: wait for the bridge to be ready before showing
+  //     the pill. The bridge may not be initialised on first render, so we
+  //     poll briefly to avoid flashing the pill on native users. ───────────
+  const [capacitorReady, setCapacitorReady] = useState(false);
+  useEffect(() => {
+    if (isCapacitorNative()) {
+      setCapacitorReady(true);
+      return;
+    }
+    const poll = setInterval(() => {
+      if (isCapacitorNative()) {
+        setCapacitorReady(true);
+        clearInterval(poll);
+      }
+    }, 200);
+    const timeout = setTimeout(() => {
+      clearInterval(poll);
+      setCapacitorReady(true); // treat as "not native" after timeout
+    }, 2000);
+    return () => { clearInterval(poll); clearTimeout(timeout); };
+  }, []);
+
   const eligible = useMemo(
     () =>
       typeof navigator !== 'undefined' &&
+      capacitorReady &&
       isAndroidInstallEntryEligible({
         ua: navigator.userAgent,
         isCapacitorNative: isCapacitorNative(),
         isStandalone: isStandaloneDisplay(),
       }),
-    []
+    [capacitorReady]
   );
 
   // Session opt-out: once closed, stay gone until a new session.
