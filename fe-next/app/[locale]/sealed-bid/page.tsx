@@ -45,16 +45,15 @@ async function dictCheck(word: string, lang: string): Promise<boolean> {
 interface RoundRecord {
   deal: SbRackDeal;
   settlement: Settlement;
+  playerWord: string | null;
 }
 
 export default function SealedBidPage() {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const { playSound } = useSoundEffects();
   const { addCoins } = useCoinActions();
   const params = useParams<{ locale: string }>();
   const locale = params?.locale ?? 'en';
-  const isHe = locale === 'he';
-  const dir = isHe ? 'rtl' : 'ltr';
   const reducedMotion = useReducedMotion();
 
   const [deals, setDeals] = useState<SbRackDeal[]>([]);
@@ -65,6 +64,7 @@ export default function SealedBidPage() {
   const [settlement, setSettlement] = useState<Settlement | null>(null);
   const [phase, setPhase] = useState<'bidding' | 'revealed' | 'done'>('bidding');
   const [pending, setPending] = useState(false);
+  const [validationError, setValidationError] = useState<string | null>(null);
   const [history, setHistory] = useState<RoundRecord[]>([]);
   const [coinsAwarded, setCoinsAwarded] = useState(0);
   const [winFlash, setWinFlash] = useState(0);
@@ -90,7 +90,14 @@ export default function SealedBidPage() {
   const currentDeal = deals[roundIndex];
 
   const lockBid = useCallback(async () => {
-    if (phase !== 'bidding' || pending || !currentDeal || !chosenWord || chosenWord.length < 3 || stake <= 0) {
+    if (phase !== 'bidding' || pending || !currentDeal) return;
+    setValidationError(null);
+    if (!chosenWord || chosenWord.length < 3) {
+      setValidationError(t('sealedBid.error.tooShort', 'Word must be at least 3 letters'));
+      return;
+    }
+    if (stake <= 0) {
+      setValidationError(t('sealedBid.error.needStake', 'Set a stake to lock your bid'));
       return;
     }
     setPending(true);
@@ -109,6 +116,7 @@ export default function SealedBidPage() {
     setWallet(newWallet);
     setSettlement(sett);
     setPhase('revealed');
+    setValidationError(null);
 
     if (sett.outcome === 'unique') {
       playSound('wordAccepted');
@@ -118,7 +126,7 @@ export default function SealedBidPage() {
     } else {
       playSound('wordRejected');
     }
-  }, [phase, pending, currentDeal, chosenWord, stake, wallet, language, playSound]);
+  }, [phase, pending, currentDeal, chosenWord, stake, wallet, language, playSound, t, validationError]);
 
   const pass = useCallback(() => {
     if (phase !== 'bidding' || pending || !currentDeal) return;
@@ -136,7 +144,7 @@ export default function SealedBidPage() {
 
   const nextRound = useCallback(() => {
     if (phase !== 'revealed' || !settlement || !currentDeal) return;
-    setHistory((h) => [...h, { deal: currentDeal, settlement }]);
+    setHistory((h) => [...h, { deal: currentDeal, settlement, playerWord: chosenWord || null }]);
     setChosenWord('');
     setStake(0);
     setSettlement(null);
@@ -181,7 +189,8 @@ export default function SealedBidPage() {
 
   const handleWordChange = useCallback((w: string) => {
     setChosenWord(w);
-  }, []);
+    if (validationError) setValidationError(null);
+  }, [validationError]);
 
   const handleStakeChange = useCallback(
     (s: number) => {
@@ -198,7 +207,7 @@ export default function SealedBidPage() {
     >
       <Link
         href={`/${locale}`}
-        aria-label={t('common.back') || 'Back'}
+        aria-label={t('common.back')}
         className="inline-flex min-h-10 min-w-10 items-center justify-center gap-1 rounded-neo border-2 border-black bg-neo-navy-light px-2.5 py-1.5 text-neo-white shadow-hard-sm"
       >
         <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
@@ -208,8 +217,7 @@ export default function SealedBidPage() {
         data-testid="sb-round"
         className="rounded-neo border-2 border-black bg-neo-navy-light px-3 py-1.5 font-neo-display text-xs font-black uppercase tracking-wide text-neo-white shadow-hard-sm"
       >
-        {t('sealedBid.roundLabel', { n: roundIndex + 1, total: 5 }) ||
-          `${t('sealedBid.round')} ${roundIndex + 1}/5`}
+        {t('sealedBid.roundLabel', { n: roundIndex + 1, total: 5 })}
       </span>
 
       <span
@@ -226,8 +234,7 @@ export default function SealedBidPage() {
           className="h-5 w-5 shrink-0"
           draggable={false}
         />
-        {t('sealedBid.chipStack', { chips: wallet.chips }) ||
-          `${wallet.chips} ${t('sealedBid.chips')}`}
+        {t('sealedBid.chipStack', { chips: wallet.chips })}
       </span>
     </div>
   );
@@ -236,7 +243,14 @@ export default function SealedBidPage() {
     <GameStage accent="cyan" header={header} className="bg-neo-navy">
       <ModeCoach mode="sealedBid" />
       <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-cyan/40" />
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col min-h-0">
+      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col min-h-0" dir={dir}>
+        <div aria-live="polite" className="sr-only">
+          {phase === 'revealed' && settlement
+            ? t(`sealedBid.outcome.${settlement.outcome}`)
+            : phase === 'done'
+              ? t('sealedBid.gameOver')
+              : ''}
+        </div>
         {phase === 'done' ? (
           <div className="flex flex-1 flex-col gap-4 py-2">
             <div className="animate-neo-pop rounded-neo border-3 border-black bg-neo-yellow p-5 text-center shadow-hard-lg">
@@ -257,7 +271,7 @@ export default function SealedBidPage() {
                   outcome: h.settlement.outcome,
                   basePoints: Math.abs(h.settlement.delta),
                   points: h.settlement.delta,
-                  playerWord: null,
+                  playerWord: h.playerWord,
                   botWord: h.deal.botPicks[0] ?? '',
                 }))}
                 totalScore={history.reduce((s, h) => s + h.settlement.delta, 0)}
@@ -277,13 +291,14 @@ export default function SealedBidPage() {
           <Showdown
             playerWord={chosenWord || null}
             bots={currentDeal.botPicks.map((word, i) => ({
-              name: t('sealedBid.botRival', { n: i + 1 }) || `Bot ${i + 1}`,
+              name: t('sealedBid.botRival', { n: i + 1 }),
               word,
             }))}
             settlement={settlement}
             reducedMotion={reducedMotion}
             onDone={nextRound}
             payoutTargetRef={payoutTargetRef}
+            dir={dir}
           />
         ) : (
           currentDeal && (
@@ -307,6 +322,11 @@ export default function SealedBidPage() {
               dir={dir}
             />
           )
+        )}
+        {validationError && (
+          <p className="mt-2 text-center font-neo-body text-sm text-neo-red" role="alert">
+            {validationError}
+          </p>
         )}
       </div>
     </GameStage>

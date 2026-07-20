@@ -14,6 +14,7 @@ export interface ShowdownProps {
   reducedMotion?: boolean;
   onDone: () => void;
   payoutTargetRef?: React.RefObject<HTMLElement | null>;
+  dir?: 'ltr' | 'rtl';
 }
 
 export default function Showdown({
@@ -23,11 +24,11 @@ export default function Showdown({
   reducedMotion = false,
   onDone,
   payoutTargetRef,
+  dir = 'ltr',
 }: ShowdownProps): ReactNode {
   const { t } = useLanguage();
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [bannerVisible, setBannerVisible] = useState(reducedMotion);
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const outcome = settlement.outcome; // unique | clash | none
   const bannerText =
@@ -106,16 +107,6 @@ export default function Showdown({
     triggerFX();
   }, [bannerVisible, settlement.outcome, reducedMotion, playerWord, payoutTargetRef]);
 
-  useEffect(() => {
-    if (!bannerVisible) return;
-    timeoutRef.current = setTimeout(() => {
-      onDone();
-    }, 2500);
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
-  }, [bannerVisible, onDone]);
-
   const bannerTone =
     outcome === 'unique'
       ? 'border-neo-yellow bg-neo-yellow text-neo-navy'
@@ -127,6 +118,7 @@ export default function Showdown({
     <div
       data-testid="showdown"
       className="flex w-full max-w-lg flex-1 flex-col items-center justify-center gap-4 px-1 py-2"
+      dir={dir}
     >
       {/* Suspense pulse while bot cards flip */}
       {!bannerVisible && !reducedMotion && (
@@ -134,7 +126,7 @@ export default function Showdown({
           data-testid="showdown-suspense"
           className="animate-pulse text-center font-neo-display text-sm font-black uppercase tracking-widest text-neo-cream/60"
         >
-          {t('sealedBid.revealing') || 'Revealing…'}
+          {t('sealedBid.revealing')}
         </div>
       )}
 
@@ -168,7 +160,7 @@ export default function Showdown({
         data-testid="showdown-player-word"
         className="rounded-neo border-2 border-black bg-neo-cyan px-4 py-2 font-neo-display text-lg font-black uppercase tracking-wider text-neo-navy shadow-hard-sm"
       >
-        {playerWord || '—'}
+        {playerWord || t('sealedBid.noWord', '—')}
       </div>
 
       {/* Rival cards */}

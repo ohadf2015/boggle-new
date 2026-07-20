@@ -73,7 +73,10 @@ const en = {
       "done": "Done!",
       "youFinished": "You finished! 🏁",
       "youWin": "You win the race!",
-      "wins": "wins the race!"
+      "wins": "wins the race!",
+      "winner": "{winner} wins the race!",
+      "statSeparator": "/",
+      "statPercent": "{percent}%"
     },
     "name": "Crossword",
     "tagline": "Fill the grid, one clue at a time",
@@ -106,6 +109,8 @@ const en = {
     "nextPuzzlePrompt": "Next puzzle",
     "freeplayEdition": "Freeplay #{count}",
     "generating": "Setting the grid…",
+    "captured": "Captured",
+    "dismiss": "Close",
     "scramble": {
       "title": "Unscramble!",
       "subtitle": "Solve for a streak bonus!",
@@ -142,6 +147,10 @@ const en = {
     "submit": "Submit",
     "waitTurn": "Waiting for your turn…",
     "wins": "wins!",
+    "empty": "—",
+    "winner": "{winner} wins!",
+    "finished": "Game over",
+    "chainArrow": "→",
     "yourTurn": "Your turn — type a word",
     "youWin": "You win!",
     "error": {
@@ -163,6 +172,7 @@ const en = {
       "submit": "Send",
       "checking": "Checking…",
       "giveUp": "Give up",
+      "confirmNewGame": "Start a new game? Your current chain will be lost.",
       "again": "Play again",
       "won": "You win!",
       "lost": "Round over",
@@ -14747,10 +14757,34 @@ const en = {
     "notAWord": "Not a word",
     "continue": "Continue",
     "revealing": "Revealing…",
+    "youWin": "You win!",
+    "youLose": "Clash",
+    "draw": "Pass",
+    "noWord": "—",
+    "botRival": "Rival {n}",
+    "outcome": {
+      "unique": "Unique bid",
+      "clash": "Clash",
+      "none": "No bid"
+    },
+    "outcomeEmoji": {
+      "unique": "✅",
+      "clash": "🤝",
+      "none": "⬜"
+    },
+    "error": {
+      "tooShort": "Word must be at least 3 letters",
+      "needStake": "Set a stake to lock your bid"
+    },
     "shareCard": {
       "title": "Your bluffing story",
       "cta": "Share result",
-      "copied": "Copied!"
+      "copied": "Copied!",
+      "header": "🎯 Sealed Bid — {score}pts",
+      "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
+      "url": "lexiclash.com/{locale}/sealed-bid",
+      "roundLabel": "R{n}",
+      "vs": "vs"
     },
     "session": {
       "title": "Bluff Counter",
@@ -14758,7 +14792,11 @@ const en = {
       "uniqueLabel": "Unique",
       "clashLabel": "Clash",
       "passLabel": "Pass",
-      "shareCta": "Share Score"
+      "shareCta": "Share Score",
+      "shareHeader": "🧠 Outsmarted the bot {unique}/{total} rounds — {score} pts",
+      "cashOut": "Cash out",
+      "chips": "chips",
+      "coins": "coins"
     }
   },
   "supporter": {

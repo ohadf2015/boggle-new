@@ -3509,7 +3509,10 @@ const ru = {
       "done": "Готово!",
       "youFinished": "Ты закончил! 🏁",
       "youWin": "Ты выиграешь гонку!",
-      "wins": "выигрывает гонку!"
+      "wins": "выигрывает гонку!",
+      "winner": "{winner} выигрывает гонку!",
+      "statSeparator": "/",
+      "statPercent": "{percent}%"
     },
     "name": "Кроссворд",
     "tagline": "Заполни сетку, одну подсказку за раз",
@@ -3549,6 +3552,8 @@ const ru = {
     "nextPuzzlePrompt": "Следующая головоломка",
     "freeplayEdition": "Свободная игра #{count}",
     "generating": "Установка сетки…",
+    "captured": "Захвачено",
+    "dismiss": "Закрыть",
     "scramble": {
       "title": "Расшифруй!",
       "subtitle": "Решите для бонуса серии!",
@@ -9646,6 +9651,21 @@ const ru = {
     "resultUnique": "Уникально! Двойные очки",
     "resultShared": "Столкновение — половина очков",
     "resultNone": "Нет ставки — 0 очков",
+    "noWord": "—",
+    "outcome": {
+      "unique": "Уникальная ставка",
+      "clash": "Совпадение",
+      "none": "Нет ставки"
+    },
+    "outcomeEmoji": {
+      "unique": "✅",
+      "clash": "🤝",
+      "none": "⬜"
+    },
+    "error": {
+      "tooShort": "Слово должно быть не короче 3 букв",
+      "needStake": "Установите ставку, чтобы зафиксировать"
+    },
     "pointsEarned": "+{pts} очки",
     "nextRound": "Следующий раунд →",
     "finalScore": "Финальный результат",
@@ -13284,6 +13304,10 @@ const ru = {
     "submit": "Отправить",
     "waitTurn": "Жду твой ход…",
     "wins": "побеждает!",
+    "empty": "—",
+    "winner": "Победа {winner}!",
+    "finished": "Игра окончена",
+    "chainArrow": "→",
     "yourTurn": "Твой ход — введи слово",
     "youWin": "Ты победил!",
     "error": {
@@ -13307,6 +13331,7 @@ const ru = {
       "submit": "Отправить",
       "checking": "Проверяю…",
       "giveUp": "Сдаться",
+      "confirmNewGame": "Начать новую игру? Текущая цепочка будет потеряна.",
       "again": "Играть снова",
       "won": "Ты победил!",
       "lost": "Раунд закончен",

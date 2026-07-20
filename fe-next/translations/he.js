@@ -92,7 +92,10 @@ const he = {
       "done": "סיים!",
       "youFinished": "סיימת! 🏁",
       "youWin": "ניצחת במירוץ!",
-      "wins": "ניצח במירוץ!"
+      "wins": "ניצח במירוץ!",
+      "winner": "{winner} ניצח במירוץ!",
+      "statSeparator": "/",
+      "statPercent": "{percent}%"
     },
     "name": "תשבץ",
     "tagline": "מלאו את הלוח, רמז אחר רמז",
@@ -132,6 +135,8 @@ const he = {
     "nextPuzzlePrompt": "תשבץ הבא",
     "freeplayEdition": "תרגול #{count}",
     "generating": "מכינים את התשבץ…",
+    "captured": "נכבש",
+    "dismiss": "סגור",
     "scramble": {
       "title": "פתור את הסידור!",
       "subtitle": "פתור לבונוס רצף!",
@@ -168,6 +173,10 @@ const he = {
     "submit": "שליחה",
     "waitTurn": "ממתינים לתורכם…",
     "wins": "ניצח!",
+    "empty": "—",
+    "winner": "{winner} ניצח!",
+    "finished": "המשחק נגמר",
+    "chainArrow": "→",
     "yourTurn": "תורכם — הקלידו מילה",
     "youWin": "ניצחתם!",
     "error": {
@@ -200,6 +209,7 @@ const he = {
       "submit": "שליחה",
       "checking": "בודק…",
       "giveUp": "אני נכנע",
+      "confirmNewGame": "להתחיל משחק חדש? השרשרת הנוכחית תאבד.",
       "again": "עוד פעם",
       "won": "ניצחתם!",
       "lost": "הסיבוב נגמר",
@@ -15667,9 +15677,41 @@ const he = {
       "passLabel": "פאס",
       "shareCta": "שתף תוצאה"
     },
+    "youWin": "ניצחת!",
+    "youLose": "התנגשות",
+    "draw": "פספסת",
+    "noWord": "—",
+    "botRival": "יריב {n}",
+    "outcome": {
+      "unique": "הימור ייחודי",
+      "clash": "התנגשות",
+      "none": "ללא הימור"
+    },
+    "outcomeEmoji": {
+      "unique": "✅",
+      "clash": "🤝",
+      "none": "⬜"
+    },
+    "error": {
+      "tooShort": "המילה חייבת להכיל לפחות 3 אותיות",
+      "needStake": "קבעו הימור כדי לנעול"
+    },
     "revealing": "חושף…",
     "roundLabel": "סבב {n} מתוך {total}",
-    "chipStack": "אסימונים: {chips}"
+    "chipStack": "אסימונים: {chips}",
+    "shareCard": {
+      "header": "🎯 הימור סגור — {score} נקודות",
+      "row": "{round} {emoji} {playerWord} נגד {botWord}{points}",
+      "url": "lexiclash.com/he/sealed-bid",
+      "roundLabel": "ס{n}",
+      "vs": "נגד"
+    },
+    "session": {
+      "shareHeader": "🧠 התחכמתי בבוט ב-{unique} מתוך {total} סיבובים — {score} נקודות",
+      "cashOut": "משיכה",
+      "chips": "שבבים",
+      "coins": "מטבעות"
+    }
   },
   "supporter": {
     "card": {

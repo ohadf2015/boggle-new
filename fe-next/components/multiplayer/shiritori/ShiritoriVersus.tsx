@@ -61,6 +61,7 @@ function ShiritoriGame({
         onSubmit={game.submit}
         turnStartedAt={game.turnStartedAt}
         t={t}
+        dir={dir}
       />
     </div>
   );

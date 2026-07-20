@@ -17,13 +17,33 @@ const OUTCOME_STYLE: Record<RoundResult['outcome'], string> = {
   none: 'text-neo-white/40',
 };
 
-export function buildShareText(history: RoundResult[], totalScore: number): string {
+export function buildShareText(
+  history: RoundResult[],
+  totalScore: number,
+  t?: (key: string, params?: Record<string, string | number>) => string,
+): string {
   const rows = history.map((r, i) => {
     const emoji = OUTCOME_EMOJI[r.outcome];
     const you = r.playerWord ?? '—';
     const pts = r.points > 0 ? ` +${r.points}` : '';
+    if (t) {
+      return t('sealedBid.shareCard.row', {
+        round: i + 1,
+        emoji,
+        playerWord: you,
+        botWord: r.botWord,
+        points: pts,
+      });
+    }
     return `R${i + 1} ${emoji} ${you} vs ${r.botWord}${pts}`;
   });
+  if (t) {
+    return [
+      t('sealedBid.shareCard.header', { score: totalScore }),
+      ...rows,
+      t('sealedBid.shareCard.url'),
+    ].join('\n');
+  }
   return ['🎯 Sealed Bid — ' + totalScore + 'pts', ...rows, 'lexiclash.com/en/sealed-bid'].join('\n');
 }
 
@@ -33,11 +53,11 @@ interface Props {
 }
 
 export function SealedBidShareCard({ history, totalScore }: Props) {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   const handleShare = async () => {
-    const text = buildShareText(history, totalScore);
+    const text = buildShareText(history, totalScore, t);
     const canNativeShare = typeof navigator !== 'undefined' && !!navigator.share;
     if (canNativeShare) {
       await navigator.share({ text }).catch(() => {});
@@ -51,7 +71,7 @@ export function SealedBidShareCard({ history, totalScore }: Props) {
   const canNativeShare = typeof navigator !== 'undefined' && !!navigator.share;
 
   return (
-    <div className="rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard space-y-3 animate-[fadeInUp_0.3s_ease-out_both] motion-reduce:animate-none">
+    <div className="rounded-neo border-3 border-black bg-neo-navy-light p-4 shadow-hard space-y-3 animate-[fadeInUp_0.3s_ease-out_both] motion-reduce:animate-none" dir={dir}>
       <p className="font-neo-display font-black text-xs uppercase tracking-widest text-neo-white/70 text-center">
         {t('sealedBid.shareCard.title')}
       </p>
@@ -64,7 +84,7 @@ export function SealedBidShareCard({ history, totalScore }: Props) {
             style={{ animationDelay: `${i * 60}ms` }}
           >
             <span className="font-neo-body text-[11px] text-neo-white/50 w-5 shrink-0 text-center">
-              R{i + 1}
+              {t('sealedBid.shareCard.roundLabel', { n: i + 1, defaultValue: `R${i + 1}` })}
             </span>
             <span className={`text-sm shrink-0 ${OUTCOME_STYLE[r.outcome]}`}>
               {OUTCOME_EMOJI[r.outcome]}
@@ -72,7 +92,7 @@ export function SealedBidShareCard({ history, totalScore }: Props) {
             <span className="font-neo-display font-black text-sm text-neo-lime min-w-[3.5rem]">
               {r.playerWord ?? '—'}
             </span>
-            <span className="font-neo-body text-[10px] text-neo-white/30 shrink-0">vs</span>
+            <span className="font-neo-body text-[10px] text-neo-white/30 shrink-0">{t('sealedBid.shareCard.vs', 'vs')}</span>
             <span className="font-neo-display font-black text-sm text-neo-pink flex-1">
               {r.botWord}
             </span>
