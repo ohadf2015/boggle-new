@@ -337,7 +337,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         setMyWords(prev => prev.some(w => w.word === data.word)
           ? prev
           : [{ word: data.word, kind: 'stolen', score: data.score, stolenFrom: data.stolenFrom, ts: Date.now() }, ...prev]);
-        flash('ok', tt('wordWheel.stealGain', { score: data.score ?? 0 }) || `+${data.score}`);
+        flash('ok', tt('wordWheel.stealGain', { score: data.score ?? 0 }));
       }
       const coverage = classifyLetterCoverage(data.word, pz?.allLetters ?? []);
       if (coverage !== 'none') celebrateRef.current(coverage, data.word);
@@ -353,7 +353,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             ? { ...w, kind: 'stolen-from-me' as const, stolenFrom: data.by }
             : w,
         ));
-        flash('err', tt('wordWheel.yourWordStolen', { word: data.word, by: data.by ?? '' }) || 'Stolen!');
+        flash('err', tt('wordWheel.yourWordStolen', { word: data.word, by: data.by ?? '' }));
         rejSfx();
         haptic([40, 30, 40]);
       }
@@ -475,17 +475,17 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     const word = builtWord.toUpperCase();
 
     if (word.length < MIN_LEN) {
-      flash('err', t('wordWheel.tooShort', { min: MIN_LEN }) || `Too short (min ${MIN_LEN} letters)`);
+      flash('err', t('wordWheel.tooShort', { min: MIN_LEN }));
       playWordRejectedSound();
       return;
     }
     if (!word.includes(puzzle.centerLetter.toUpperCase())) {
-      flash('err', t('wordWheel.missingCenter', { letter: puzzle.centerLetter }) || `Missing center letter (${puzzle.centerLetter})`);
+      flash('err', t('wordWheel.missingCenter', { letter: puzzle.centerLetter }));
       playWordRejectedSound();
       return;
     }
     if (!isValidWordWheelWord(word, puzzle.centerLetter, puzzle.allLetters)) {
-      flash('err', t('wordWheel.invalidLetters') || 'Invalid letters');
+      flash('err', t('wordWheel.invalidLetters'));
       playWordRejectedSound();
       return;
     }
@@ -543,7 +543,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   if (!puzzle) {
     return (
       <div className="flex-1 flex items-center justify-center bg-neo-navy text-neo-white">
-        <div className="animate-pulse font-neo-display">{t('wheel.rush.loading') || 'Loading wheel...'}</div>
+        <div className="animate-pulse font-neo-display">{t('wheel.rush.loading')}</div>
       </div>
     );
   }
@@ -571,10 +571,15 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
       {fogActive && (
         <div className="text-center text-xs sm:text-sm text-neo-cyan font-neo-display font-bold tracking-wide flex items-center justify-center gap-2 shrink-0">
           <span className={cn('inline-block w-1.5 h-1.5 rounded-full bg-neo-cyan', !prefersReduced && 'animate-pulse')} />
-          {t('wheel.rush.fogActive') || 'Fog of War active!'}
+          {t('wheel.rush.fogActive')}
           <FogCountdown endsAt={fogEndsAt} />
         </div>
       )}
+
+      {/* Live region for screen readers — repeats the transient visual feedback. */}
+      <div aria-live="polite" aria-atomic="true" className="sr-only">
+        {feedback ? feedback.msg : ''}
+      </div>
 
       {/* Word builder (shared shake + motion). Fixed height (not min-h) mirrors
           the daily challenge so the row never grows as tiles wrap. */}
@@ -601,7 +606,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             animate={{ opacity: builtLetters.length === 0 ? 1 : 0 }}
             transition={{ duration: 0.18 }}
           >
-            {t('wordWheel.tapLetters') || 'Tap letters to build a word'}
+            {t('wordWheel.tapLetters')}
           </m.span>
           {builtLetters.map((bl, i) => (
             <WordTile
@@ -705,12 +710,13 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             selectedIndices={builtLetters.map(bl => bl.wheelIndex)}
             radius={wheelRadius}
             combo={0}
+            reducedMotion={!!prefersReduced}
           />
           <m.div
             className="absolute inset-0 rounded-full border-2 border-neo-lime/20"
             style={{ boxShadow: '0 0 24px rgba(191,255,0,0.12), inset 0 0 24px rgba(191,255,0,0.06)' }}
-            animate={{ opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            animate={prefersReduced ? { opacity: 0.85 } : { opacity: [0.6, 1, 0.6] }}
+            transition={prefersReduced ? { duration: 0 } : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           />
           <div className="absolute inset-4 sm:inset-5 rounded-full border border-neo-cyan/10" />
           <div className="absolute inset-8 sm:inset-10 rounded-full border border-neo-cream/5" />
@@ -746,7 +752,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
           )}
         </div>
         <p className="text-neo-white text-xs text-center px-2">
-          {t('wordWheel.centerLetterRule') || 'Must include center letter'} &middot; {(t('wordWheel.minLetters') || 'Min {min} letters').replace('{min}', String(MIN_LEN))}
+          {t('wordWheel.centerLetterRule')} &middot; {t('wordWheel.minLetters', { min: MIN_LEN })}
         </p>
 
         {/* Actions (Clear / Submit / Remove-last) — sit directly under the wheel
@@ -762,7 +768,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             'disabled:opacity-30 disabled:cursor-not-allowed',
           )}
           whileTap={prefersReduced ? {} : { scale: 0.9 }}
-          aria-label={t('wordWheel.clear') || 'Clear'}
+          aria-label={t('wordWheel.clear')}
         >
           <RotateCcw className="w-5 h-5" />
         </m.button>
@@ -783,7 +789,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
         >
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5" />
-            {t('wordWheel.submit') || 'Submit'}
+            {t('wordWheel.submit')}
           </div>
         </m.button>
 
@@ -797,7 +803,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
             'disabled:opacity-30 disabled:cursor-not-allowed',
           )}
           whileTap={prefersReduced ? {} : { scale: 0.9 }}
-          aria-label={t('wordWheel.removeLetter') || 'Remove letter'}
+          aria-label={t('wordWheel.removeLetter')}
         >
           <Delete className="w-5 h-5" />
         </m.button>

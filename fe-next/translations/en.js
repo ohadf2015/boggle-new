@@ -7975,6 +7975,7 @@ const en = {
         "charge": "Ability charge",
         "weakLabel": "Weak to",
         "weaknessHit": "WEAKNESS!",
+        "bossHit": "BOSS!"
         "weakness": {
           "length": "LONG WORDS",
           "lengthLong": "LONGER WORDS",

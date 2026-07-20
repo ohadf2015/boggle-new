@@ -2954,6 +2954,7 @@ const ja = {
         "charge": "アビリティチャージ",
         "weakLabel": "弱点",
         "weaknessHit": "弱点ヒット！",
+        "bossHit": "ボスヒット！"
         "weakness": {
           "length": "長い単語",
           "lengthLong": "より長い単語",
@@ -10980,6 +10981,7 @@ const ja = {
         "charge": "スキルチャージ",
         "weakLabel": "弱点",
         "weaknessHit": "弱点を突いた!",
+        "bossHit": "ボスヒット！"
         "weakness": {
           "length": "長い単語",
           "lengthLong": "もっと長い単語",

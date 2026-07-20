@@ -367,21 +367,42 @@ export function useMultiplayerSocket(
       const hasNoMeaningfulContent =
         !data ||
         (typeof data === 'object' && Object.keys(data).length === 0) ||
-        (isErrorLike && !errorMessage);
+        (isErrorLike && !errorMessage && !errorCode);
 
       if (hasNoMeaningfulContent) {
         logger.debug('[SOCKET.IO] Received empty error object (internal Socket.IO event)');
         return;
       }
 
-      const errorToCapture = new Error(errorMessage || errorCode || 'Unknown socket error');
+      // Prefer server-provided messages, but fall back to localized messages for
+      // typed error codes so handlers don't surface raw English codes to players.
+      const ERROR_CODE_KEY: Record<string, string> = {
+        NOT_IN_GAME: 'errors.notInGame',
+        GAME_NOT_FOUND: 'errors.gameNotFound',
+        GAME_NOT_IN_PROGRESS: 'errors.gameNotInProgress',
+        NOT_WHEEL_RUSH: 'errors.somethingWentWrong',
+        WHEEL_STATE_NOT_INITIALIZED: 'errors.internal',
+        WORD_REQUIRED: 'errors.invalidWord',
+        INVALID_WORD: 'errors.invalidWord',
+        WORD_PROCESSING_ERROR: 'errors.submissionFailed',
+      };
+      const resolvedMessage =
+        errorMessage ||
+        (errorCode && ERROR_CODE_KEY[errorCode]
+          ? optionsRef.current.t(ERROR_CODE_KEY[errorCode])
+          : null);
+      if (!errorMessage && resolvedMessage && data && typeof data === 'object') {
+        data = { ...data, message: resolvedMessage };
+      }
+
+      const errorToCapture = new Error(resolvedMessage || errorCode || 'Unknown socket error');
       const expected = isExpectedError(errorToCapture);
 
       // Only send unexpected errors to Sentry; expected ones just log locally
       if (expected) {
-        logger.log('[SOCKET.IO] Expected error:', errorMessage || errorCode);
+        logger.log('[SOCKET.IO] Expected error:', resolvedMessage || errorCode);
       } else {
-        logger.warn('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
+        logger.warn('[SOCKET.IO] ❌ Error received:', resolvedMessage || errorCode || 'Unknown error');
         captureSocketError(errorToCapture, {
           event: 'error',
           gameCode: optionsRef.current.gameCode || undefined,

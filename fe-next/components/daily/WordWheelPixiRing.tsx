@@ -24,10 +24,14 @@ interface WordWheelPixiRingProps {
    * ring's connection-line/drag-trail math (which used to hardcode 60° = 360/6)
    * draws at the wrong angle and visually detaches from the actual tiles. */
   outerCount?: number;
+  /** When true, disable ambient orbital motion and center pulse for users who
+   * prefer reduced motion. Functional feedback (connection lines) still draws. */
+  reducedMotion?: boolean;
 }
 
 export default function WordWheelPixiRing({
   selectedIndices, radius, combo, pointerPosRef, isDraggingRef, outerCount = 6,
+  reducedMotion = false,
 }: WordWheelPixiRingProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const stateRef = useRef({ selectedIndices, radius, combo, pointerPosRef, isDraggingRef, outerCount });
@@ -40,6 +44,7 @@ export default function WordWheelPixiRing({
     let destroyed = false;
     let removeRectListeners: (() => void) | null = null;
     let rafId: number | null = null;
+    let visibilityPaused = false;
     const app = new Application();
 
     const setup = async () => {
@@ -95,23 +100,33 @@ export default function WordWheelPixiRing({
       let lastTime = performance.now();
 
       const frame = (time: number) => {
-        // Schedule the next frame FIRST so an early return (hidden tab, etc.)
-        // never stalls the loop permanently.
-        if (!destroyed) rafId = requestAnimationFrame(frame);
+        // If the tab is hidden, pause the loop entirely rather than scheduling
+        // continuous no-op frames. We resume on visibilitychange.
+        if (typeof document !== 'undefined' && document.hidden) {
+          if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+            rafId = null;
+          }
+          visibilityPaused = true;
+          lastTime = time;
+          return;
+        }
+
+        // Schedule the next frame so long as we're still mounted.
+        if (!destroyed && rafId === null) rafId = requestAnimationFrame(frame);
 
         // Guard: cleanup calls cancelAnimationFrame on unmount (below), but a
         // frame already dispatched by the browser before that call still runs
         // once more. Bail before touching any Graphics — this is belt, the
         // cancelAnimationFrame is suspenders (Sentry 1CW/1PV, /daily/word-wheel).
         if (destroyed || orbitGfx.destroyed || lineGfx.destroyed || glowGfx.destroyed) return;
-        // Skip all draw work for an invisible canvas (backgrounded tab / hidden
-        // PWA). Freezing `angle` here too avoids a large delta jump on resume.
-        if (typeof document !== 'undefined' && document.hidden) { lastTime = time; return; }
         try {
         const dt = (time - lastTime) / 1000;
         lastTime = time;
         const { selectedIndices: sel, radius: r, combo: c, pointerPosRef: ppRef, isDraggingRef: dragRef, outerCount: oc } = stateRef.current;
-        angle += dt * 0.5;
+        // Ambient motion is decorative: disable it when reduced motion is
+        // preferred. Connection lines and drag trails still update below.
+        if (!reducedMotion) angle += dt * 0.5;
 
         // ── Orbital ring 1: lime dots ──
         orbitGfx.clear();
@@ -180,7 +195,8 @@ export default function WordWheelPixiRing({
         // ── Center energy pulse ──
         glowGfx.clear();
         const boost = Math.min(c * 0.06, 0.3);
-        const pulse = 1 + 0.12 * Math.sin(angle * 2.5);
+        // Freeze the pulse amplitude when reduced motion is preferred.
+        const pulse = reducedMotion ? 1 : 1 + 0.12 * Math.sin(angle * 2.5);
         const gr = 32 * pulse;
         glowGfx.circle(cx, cy, gr);
         glowGfx.fill({ color: 0xbfff00, alpha: 0.03 + boost * 0.08 });
@@ -198,9 +214,19 @@ export default function WordWheelPixiRing({
 
     setup();
 
+    const handleVisibility = () => {
+      if (typeof document === 'undefined') return;
+      if (!document.hidden && visibilityPaused && rafId === null && !destroyed) {
+        visibilityPaused = false;
+        rafId = requestAnimationFrame(frame);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+
     return () => {
       destroyed = true;
       removeRectListeners?.();
+      document.removeEventListener('visibilitychange', handleVisibility);
       // Cancel our own pending rAF frame directly, rather than relying solely
       // on the destroyed-flag check inside it to win a race.
       if (rafId !== null) cancelAnimationFrame(rafId);
@@ -208,7 +234,7 @@ export default function WordWheelPixiRing({
       try { app.destroy(true, { children: true }); } catch { /* */ }
       while (el.firstChild) el.removeChild(el.firstChild);
     };
-  }, []);
+  }, [reducedMotion]);
 
   return (
     <div

@@ -91,7 +91,7 @@ const AdventureGame = memo<AdventureGameProps>(
         ),
       };
     }, [init.adjustedLevelConfig, init.upgradeEffects]);
-    const { t, language } = useLanguage();
+    const { t, language, dir } = useLanguage();
     const {
       playWordAcceptedSound, playComboSound, setGameActive, playCountdownBeep,
       playLevelUpSound, playBossEntranceSound, playBossHitSound, playBossPhaseChangeSound,
@@ -561,15 +561,15 @@ const AdventureGame = memo<AdventureGameProps>(
     return (
       <>
       <AdventureGameShell
-        bossOrch={bossOrch as never}
-        wordSubmit={wordSubmit as never}
-        gridInteraction={gridInteraction as never}
-        modeState={modeState as never}
-        init={init as never}
-        gameState={gameState as never}
-        effects={effects as never}
-        levelConfig={levelConfig as never}
-        chapterQuests={chapterQuests as never}
+        bossOrch={bossOrch }
+        wordSubmit={wordSubmit }
+        gridInteraction={gridInteraction }
+        modeState={modeState }
+        init={init }
+        gameState={gameState }
+        effects={effects }
+        levelConfig={levelConfig }
+        chapterQuests={chapterQuests }
         overlayProps={overlayProps}
         timerStore={timerStore}
         isBossLevel={isBossLevel}
@@ -584,7 +584,7 @@ const AdventureGame = memo<AdventureGameProps>(
         maxHP={maxHP}
         movesRemaining={movesRemaining}
         themedWordsFound={themedWordsFound}
-        upgradeState={upgradeState as never}
+        upgradeState={upgradeState }
         upgradeTriggered={upgradeTriggered}
         lastWordWasThemed={lastWordWasThemed}
         showRetryAssist={showRetryAssist}
@@ -633,7 +633,7 @@ const AdventureGame = memo<AdventureGameProps>(
         starsSoFar={starsSoFar}
         onFinish={completeLevel}
         t={t}
-        isRTL={language === 'he'}
+        isRTL={dir === 'rtl'}
       />
       </>
     );

@@ -3213,6 +3213,7 @@ const sv = {
         "charge": "Förmågeladdning",
         "weakLabel": "Svag mot",
         "weaknessHit": "SVAGHET!",
+        "bossHit": "BOSS!"
         "weakness": {
           "length": "LÅNGA ORD",
           "lengthLong": "LÄNGRE ORD",
@@ -11187,6 +11188,7 @@ const sv = {
         "charge": "Förmågauppladdning",
         "weakLabel": "Svag mot",
         "weaknessHit": "SVAGHET!",
+        "bossHit": "BOSS!"
         "weakness": {
           "length": "LÅNGA ORD",
           "lengthLong": "ÄNNU LÄNGRE ORD",

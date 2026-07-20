@@ -52,6 +52,12 @@ const wordWheelMeta: Record<string, { title: string; description: string; ogTitl
     ogTitle: 'Rueda de Palabras Diaria — Puzzle de Hoy | LexiClash',
     ogDesc: 'Nueva rueda de palabras cada dia. Encuentra palabras, persigue el record mundial!',
   },
+  ru: {
+    title: 'Ежедневное колесо слов — Бесплатная головоломка | LexiClash',
+    description: 'Играйте в Daily Word Wheel — находите слова из колеса букв. Новая головоломка каждый день в полночь по UTC. Одинаковое поле для всех игроков мира. Соревнуйтесь за мировой рекорд!',
+    ogTitle: 'Ежедневное колесо слов — Головоломка дня | LexiClash',
+    ogDesc: 'Новая головоломка с колесом слов каждый день. Находите слова и побивайте рекорды!',
+  },
 };
 
 const wordWheelSeoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
@@ -96,6 +102,24 @@ const wordWheelSeoContent: Record<string, { title: string; description: string; 
     description: 'Nueva rueda de palabras cada dia. Encuentra palabras usando las letras de la rueda.',
     features: ['Nuevo puzzle cada dia', 'Mismas letras para todos', 'Todas las palabras deben incluir la letra central'],
     faq: [],
+  },
+  ru: {
+    title: 'Ежедневное колесо слов',
+    description: 'Каждый день новая головоломка. Находите слова из букв на колесе — каждое слово должно содержать центральную букву. Соревнуйтесь на глобальной таблице лидеров.',
+    features: [
+      'Новая головоломка каждый день в полночь по UTC',
+      'Одинаковые буквы для всех игроков мира — честная конкуренция',
+      'Каждое слово должно содержать центральную букву',
+      'Длинные слова приносят больше очков',
+      'Глобальная таблица лидеров и ежедневный мировой рекорд',
+      'Отслеживайте свою ежедневную серию',
+      'Делитесь результатами с друзьями',
+    ],
+    faq: [
+      { question: 'Что такое ежедневное колесо слов?', answer: 'Ежедневное колесо слов — это бесплатная ежедневная головоломка, в которой нужно находить слова из букв, расположенных на колесе. Каждое слово должно содержать центральную букву. Новая головоломка появляется каждый день в полночь по UTC.' },
+      { question: 'Как играть в колесо слов?', answer: 'Составляйте слова из букв на колесе. Каждое слово должно содержать центральную букву. Длинные слова дают больше очков. Найдите как можно больше слов до окончания времени.' },
+      { question: 'Когда обновляется колесо слов?', answer: 'Новая головоломка генерируется каждый день в полночь по UTC. Ваш прогресс сбрасывается, а новая таблица лидеров начинается заново.' },
+    ],
   },
 };
 

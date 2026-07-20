@@ -15380,6 +15380,7 @@ const ru = {
         "charge": "Заряд способности",
         "weakLabel": "Слаб к",
         "weaknessHit": "СЛАБОСТЬ!",
+        "bossHit": "БОСС!"
         "weakness": {
           "length": "ДЛИННЫЕ СЛОВА",
           "lengthLong": "СЛОВА ПОДЛИННЕЕ",
