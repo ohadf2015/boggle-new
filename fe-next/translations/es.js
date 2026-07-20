@@ -5044,7 +5044,7 @@ const es = {
         "charge": "Carga de habilidad",
         "weakLabel": "Débil a",
         "weaknessHit": "¡DEBILIDAD!",
-        "bossHit": "¡JEFE!"
+        "bossHit": "¡JEFE!",
         "weakness": {
           "length": "PALABRAS LARGAS",
           "lengthLong": "PALABRAS MÁS LARGAS",
@@ -10983,7 +10983,7 @@ const es = {
         "charge": "Carga de habilidad",
         "weakLabel": "Débil a",
         "weaknessHit": "¡PUNTO DÉBIL!",
-        "bossHit": "¡JEFE!"
+        "bossHit": "¡JEFE!",
         "weakness": {
           "length": "PALABRAS LARGAS",
           "lengthLong": "PALABRAS MÁS LARGAS",

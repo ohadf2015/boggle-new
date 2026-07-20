@@ -51,8 +51,6 @@ vi.mock('@/hooks/useAppLifecycle', () => ({ useAppLifecycle: () => {} }));
 vi.mock('@/hooks/useSafeArea', () => ({ useSafeArea: () => ({ bottom: 0 }) }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/he' }));
 
-const flush = () => new Promise((r) => setTimeout(r, 0));
-
 describe('Banner suppress/restore — integration', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -87,18 +85,18 @@ describe('Banner suppress/restore — integration', () => {
     showBannerSpy.mockClear();
     resumeBannerSpy.mockClear();
 
-    // Drawer opens → suppress → native hide.
+    // Drawer opens → suppress → native hide. Poll: the MutationObserver that
+    // detects the class and the controller's serialized queue both resolve
+    // asynchronously, and a single flush can race them under CI load.
     document.documentElement.classList.add('mobile-drawer-open');
-    await flush();
-    await bannerController.whenIdle();
-    expect(hideBannerSpy).toHaveBeenCalled();
+    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled());
 
     // Drawer closes → release → banner returns, visibility restored FIRST.
     document.documentElement.classList.remove('mobile-drawer-open');
-    await flush();
-    await bannerController.whenIdle();
-    expect(resumeBannerSpy).toHaveBeenCalled(); // un-hide the GONE AdView
-    expect(showBannerSpy).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(resumeBannerSpy).toHaveBeenCalled(); // un-hide the GONE AdView
+      expect(showBannerSpy).toHaveBeenCalled();
+    });
   });
 
   it('hides while a modal is open (html.modal-open) and restores when it closes', async () => {
@@ -120,15 +118,13 @@ describe('Banner suppress/restore — integration', () => {
 
     // A dialog opens (the shared DialogContent ref-counts this class) → suppress.
     document.documentElement.classList.add('modal-open');
-    await flush();
-    await bannerController.whenIdle();
-    expect(hideBannerSpy).toHaveBeenCalled();
+    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled());
 
     // Dialog closes → banner returns (visibility restored first, then re-show).
     document.documentElement.classList.remove('modal-open');
-    await flush();
-    await bannerController.whenIdle();
-    expect(resumeBannerSpy).toHaveBeenCalled();
-    expect(showBannerSpy).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(resumeBannerSpy).toHaveBeenCalled();
+      expect(showBannerSpy).toHaveBeenCalled();
+    });
   });
 });

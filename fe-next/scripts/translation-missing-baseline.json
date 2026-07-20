@@ -31,6 +31,7 @@
     "seo.quickPlay.description",
     "seo.quickPlay.ogTitle",
     "seo.quickPlay.ogDescription",
+    "results.rivalBestWord",
     "vs.feature",
     "vs.gamesPerDay",
     "vs.multiplayer",
@@ -56,7 +57,19 @@
     "vs.wordFormation",
     "vs.fiveLanguages",
     "vs.charitableDonation",
-    "vs.bestFor"
+    "vs.bestFor",
+    "sealedBid.shareCard.title",
+    "sealedBid.shareCard.cta",
+    "sealedBid.shareCard.copied",
+    "sealedBid.session.title",
+    "sealedBid.session.outsmarted",
+    "sealedBid.session.uniqueLabel",
+    "sealedBid.session.clashLabel",
+    "sealedBid.session.passLabel",
+    "sealedBid.session.shareCta",
+    "sealedBid.session.cashOut",
+    "sealedBid.session.chips",
+    "sealedBid.session.coins"
   ],
   "he": [
     "sealedBidLegacy.chipStack",
@@ -88,7 +101,17 @@
     "seo.quickPlay.title",
     "seo.quickPlay.description",
     "seo.quickPlay.ogTitle",
-    "seo.quickPlay.ogDescription"
+    "seo.quickPlay.ogDescription",
+    "results.rivalBestWord",
+    "sealedBid.shareCard.title",
+    "sealedBid.shareCard.cta",
+    "sealedBid.shareCard.copied",
+    "sealedBid.session.title",
+    "sealedBid.session.outsmarted",
+    "sealedBid.session.uniqueLabel",
+    "sealedBid.session.clashLabel",
+    "sealedBid.session.passLabel",
+    "sealedBid.session.shareCta"
   ],
   "ja": [
     "sealedBidLegacy.chipStack",
@@ -121,6 +144,7 @@
     "seo.quickPlay.description",
     "seo.quickPlay.ogTitle",
     "seo.quickPlay.ogDescription",
+    "results.rivalBestWord",
     "vs.feature",
     "vs.gamesPerDay",
     "vs.multiplayer",
@@ -146,13 +170,29 @@
     "vs.wordFormation",
     "vs.fiveLanguages",
     "vs.charitableDonation",
-    "vs.bestFor"
+    "vs.bestFor",
+    "sealedBid.shareCard.title",
+    "sealedBid.shareCard.cta",
+    "sealedBid.shareCard.copied",
+    "sealedBid.session.title",
+    "sealedBid.session.outsmarted",
+    "sealedBid.session.uniqueLabel",
+    "sealedBid.session.clashLabel",
+    "sealedBid.session.passLabel",
+    "sealedBid.session.shareCta"
   ],
   "ru": [
     "seo.refund.title",
     "seo.refund.description",
     "seo.refund.ogTitle",
-    "seo.refund.ogDescription"
+    "seo.refund.ogDescription",
+    "results.rivalBestWord",
+    "sealedBid.shareCard.header",
+    "sealedBid.shareCard.row",
+    "sealedBid.shareCard.url",
+    "sealedBid.shareCard.roundLabel",
+    "sealedBid.shareCard.vs",
+    "sealedBid.session.shareHeader"
   ],
   "sv": [
     "sealedBidLegacy.chipStack",
@@ -185,6 +225,7 @@
     "seo.quickPlay.description",
     "seo.quickPlay.ogTitle",
     "seo.quickPlay.ogDescription",
+    "results.rivalBestWord",
     "vs.feature",
     "vs.gamesPerDay",
     "vs.multiplayer",
@@ -210,6 +251,15 @@
     "vs.wordFormation",
     "vs.fiveLanguages",
     "vs.charitableDonation",
-    "vs.bestFor"
+    "vs.bestFor",
+    "sealedBid.shareCard.title",
+    "sealedBid.shareCard.cta",
+    "sealedBid.shareCard.copied",
+    "sealedBid.session.title",
+    "sealedBid.session.outsmarted",
+    "sealedBid.session.uniqueLabel",
+    "sealedBid.session.clashLabel",
+    "sealedBid.session.passLabel",
+    "sealedBid.session.shareCta"
   ]
 }

@@ -45,6 +45,10 @@ export default function WordWheelPixiRing({
     let removeRectListeners: (() => void) | null = null;
     let rafId: number | null = null;
     let visibilityPaused = false;
+    // A ref to the per-frame closure so the visibilitychange handler (outer
+    // scope) can re-schedule the loop; the closure itself is created inside
+    // setup() once Pixi is ready.
+    let frameRef: ((time: number) => void) | null = null;
     const app = new Application();
 
     const setup = async () => {
@@ -209,6 +213,7 @@ export default function WordWheelPixiRing({
         } catch { /* post-destroy null-context race — skip this frame (Sentry 1PV) */ }
       };
 
+      frameRef = frame;
       rafId = requestAnimationFrame(frame);
     };
 
@@ -216,9 +221,10 @@ export default function WordWheelPixiRing({
 
     const handleVisibility = () => {
       if (typeof document === 'undefined') return;
-      if (!document.hidden && visibilityPaused && rafId === null && !destroyed) {
+      const resumeFrame = frameRef;
+      if (!document.hidden && visibilityPaused && rafId === null && !destroyed && resumeFrame) {
         visibilityPaused = false;
-        rafId = requestAnimationFrame(frame);
+        rafId = requestAnimationFrame(resumeFrame);
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);

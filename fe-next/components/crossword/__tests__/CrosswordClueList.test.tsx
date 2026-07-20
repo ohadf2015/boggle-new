@@ -106,8 +106,8 @@ describe('CrosswordClueList', () => {
       );
       const capturedBtn = screen.getByText(`clue-${captured.id}`).closest('button')!;
       const uncapturedBtn = screen.getByText(`clue-${uncaptured.id}`).closest('button')!;
-      expect(capturedBtn.querySelector('[aria-label="captured"]')).toBeTruthy();
-      expect(uncapturedBtn.querySelector('[aria-label="captured"]')).toBeNull();
+      expect(capturedBtn.querySelector('[aria-label="crossword.captured"]')).toBeTruthy();
+      expect(uncapturedBtn.querySelector('[aria-label="crossword.captured"]')).toBeNull();
     });
   });
 });

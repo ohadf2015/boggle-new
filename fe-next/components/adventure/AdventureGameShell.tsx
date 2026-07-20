@@ -16,8 +16,8 @@ type Unknown = unknown;
 
 export interface AdventureGameShellProps {
   bossOrch: Unknown & { isBossActive: boolean; showBossIntro: boolean; gridEffectTrigger: unknown; lockedTiles: unknown };
-  wordSubmit: Unknown & { mechanicHitCount: unknown; handleWordSubmit: (...a: unknown[]) => unknown; validationFeedback: { error: unknown; isValid: boolean; wasSubmitted: boolean }; lastAccepted: unknown; wordFeedback: unknown; mechanicBonus: unknown; dismissMechanicBonus: () => void };
-  gridInteraction: { handleTileSelect: (...a: unknown[]) => unknown; handleDragStart: (...a: unknown[]) => unknown; handleDragEnter: (...a: unknown[]) => unknown; handleDragEnd: (...a: unknown[]) => unknown; handlePauseToggle: () => void };
+  wordSubmit: Unknown & { mechanicHitCount: unknown; handleWordSubmit: (...a: never[]) => unknown; validationFeedback: { error: unknown; isValid: boolean; wasSubmitted: boolean }; lastAccepted: unknown; wordFeedback: unknown; mechanicBonus: unknown; dismissMechanicBonus: () => void };
+  gridInteraction: { handleTileSelect: (...a: never[]) => unknown; handleDragStart: (...a: never[]) => unknown; handleDragEnter: (...a: never[]) => unknown; handleDragEnd: (...a: never[]) => unknown; handlePauseToggle: () => void };
   modeState: { archetype: string; modeDisplayKey?: string; showMoveCounter?: boolean; showLifeBar?: boolean; showTargetWordUI?: boolean; centerLetterRequired?: boolean; centerLetter: string | null };
   init: { gold: number; xpProgress: { progressPercent: number }; hintData: { level: unknown }; upgradeEffects: { timeFreezeSeconds?: number; canDetonateWords?: boolean }; adjustedLevelConfig: { timerSeconds?: number } };
   gameState: { score: number; comboCount: number; wordsFound: string[] };

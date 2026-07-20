@@ -2996,7 +2996,7 @@ const he = {
         "charge": "טעינת יכולת",
         "weakLabel": "פגיע ל",
         "weaknessHit": "חולשה!",
-        "bossHit": "בוס!"
+        "bossHit": "בוס!",
         "weakness": {
           "length": "מילים ארוכות",
           "lengthLong": "מילים ארוכות מאוד",
@@ -10776,7 +10776,7 @@ const he = {
         "charge": "טעינת היכולת",
         "weakLabel": "חלש ל",
         "weaknessHit": "חולשה!",
-        "bossHit": "בוס!"
+        "bossHit": "בוס!",
         "weakness": {
           "length": "מילים ארוכות",
           "lengthLong": "מילים ארוכות יותר",

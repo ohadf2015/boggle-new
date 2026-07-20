@@ -48,6 +48,7 @@ export function CrosswordClueList({
         activeSlotId={activeSlotId}
         onSelect={onSelect}
         capturedSlotIds={capturedSlotIds}
+        t={t}
       />
       <Section
         dir="down"
@@ -56,6 +57,7 @@ export function CrosswordClueList({
         activeSlotId={activeSlotId}
         onSelect={onSelect}
         capturedSlotIds={capturedSlotIds}
+        t={t}
       />
     </div>
   );
@@ -68,6 +70,7 @@ function Section({
   activeSlotId,
   onSelect,
   capturedSlotIds,
+  t,
 }: {
   dir: 'across' | 'down';
   heading: string;
@@ -75,6 +78,7 @@ function Section({
   activeSlotId: string | null;
   onSelect: (slot: Slot) => void;
   capturedSlotIds?: string[];
+  t: (key: string, fallbackOrParams?: string | Record<string, string | number>) => string;
 }) {
   return (
     <div

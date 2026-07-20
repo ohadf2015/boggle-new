@@ -20,7 +20,7 @@
  * the permanent menu row remains as the durable way back across reloads.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Zap, WifiOff, Bell } from 'lucide-react';
@@ -63,34 +63,8 @@ export default function AndroidAppInstallPromo() {
   const closePromo = useAndroidInstallStore((s) => s.closePromo);
   const showPill = useAndroidInstallStore((s) => s.showPill);
 
-  // ── Capacitor-native guard: wait for the bridge to be ready before showing
-  //     the promo. The bridge may not be initialised on first render, so we
-  //     poll briefly to avoid flashing the promo on native users. ───────────
-  const [capacitorReady, setCapacitorReady] = useState(false);
-  useEffect(() => {
-    // If already detected, great.
-    if (isCapacitorNative()) {
-      setCapacitorReady(true);
-      return;
-    }
-    // Poll for up to 2 s in case the bridge is still loading.
-    const poll = setInterval(() => {
-      if (isCapacitorNative()) {
-        setCapacitorReady(true);
-        clearInterval(poll);
-      }
-    }, 200);
-    const timeout = setTimeout(() => {
-      clearInterval(poll);
-      setCapacitorReady(true); // treat as "not native" after timeout
-    }, 2000);
-    return () => { clearInterval(poll); clearTimeout(timeout); };
-  }, []);
-
   // ── Unsolicited auto-popup gating ──────────────────────────────────────
   useEffect(() => {
-    // Don't start the auto-popup logic until we know whether we're native.
-    if (!capacitorReady) return;
     const storedDismiss = localStorage.getItem(DISMISS_KEY);
     const baseInput = {
       ua: navigator.userAgent,
@@ -128,7 +102,7 @@ export default function AndroidAppInstallPromo() {
       cancelled = true;
       if (timer) clearTimeout(timer);
     };
-  }, [pathname, openPromo, capacitorReady]);
+  }, [pathname, openPromo]);
 
   const persistDismissal = () => {
     localStorage.setItem(DISMISS_KEY, String(Date.now() + DISMISS_DAYS * 86_400_000));

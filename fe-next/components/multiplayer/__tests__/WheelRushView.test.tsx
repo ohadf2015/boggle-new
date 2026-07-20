@@ -290,7 +290,9 @@ describe('WheelRushView', () => {
     act(() => {
       socket.fire('wheelWordResult', { word: 'XYZW', accepted: false, error: 'not-a-word' });
     });
-    expect(screen.getByText(/wordWheel\.notInDictionary/)).toBeTruthy();
+    // The message renders twice by design: the visible feedback pill and the
+    // sr-only aria-live region that mirrors it for screen readers.
+    expect(screen.getAllByText(/wordWheel\.notInDictionary/).length).toBeGreaterThan(0);
     expect(screen.queryByText(/^not-a-word$/)).toBeNull();
   });
 

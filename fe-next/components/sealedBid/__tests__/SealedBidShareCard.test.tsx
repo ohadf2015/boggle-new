@@ -4,12 +4,31 @@ import React from 'react';
 import { SealedBidShareCard, buildShareText } from '../SealedBidShareCard';
 import type { RoundResult } from '@/lib/sealedBid/sp/sbEngine';
 
-vi.mock('@/contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    t: (k: string) => k,
-    locale: 'en',
-  }),
-}));
+// Interpolate the share-card templates that carry params (round label, share
+// rows, header) so assertions can see the real "R1"/"STAR" content, exactly as
+// production does; param-less keys (cta, copied, title) stay key-echoed so the
+// key-based assertions keep working.
+vi.mock('@/contexts/LanguageContext', () => {
+  const TEMPLATES: Record<string, string> = {
+    'sealedBid.shareCard.roundLabel': 'R{n}',
+    'sealedBid.shareCard.row': '{round} {emoji} {playerWord} vs {botWord}{points}',
+    'sealedBid.shareCard.header': '🎯 Sealed Bid — {score}pts',
+  };
+  return {
+    useLanguage: () => ({
+      t: (k: string, params?: Record<string, string | number> | string) => {
+        const tmpl = TEMPLATES[k];
+        if (tmpl && params && typeof params === 'object') {
+          return tmpl.replace(/\{(\w+)\}/g, (m, key) =>
+            params[key] !== undefined ? String(params[key]) : m,
+          );
+        }
+        return k;
+      },
+      locale: 'en',
+    }),
+  };
+});
 
 const HISTORY: RoundResult[] = [
   { outcome: 'unique', basePoints: 7, points: 14, playerWord: 'STAR', botWord: 'RATS' },
