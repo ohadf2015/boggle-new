@@ -29,7 +29,7 @@ export function LeadChangeBanner({ event }: LeadChangeBannerProps) {
             'pointer-events-none',
             'flex items-center gap-1.5',
             'px-3 py-1.5',
-            'border-3 border-neo-black shadow-hard rounded-neo',
+            'border-3 border-neo-black shadow-hard-sm rounded-neo',
             'text-xs sm:text-sm font-neo-display font-bold',
             event.type === 'took-lead'
               ? 'bg-neo-lime text-neo-black'
