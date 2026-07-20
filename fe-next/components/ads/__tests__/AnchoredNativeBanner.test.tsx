@@ -195,8 +195,24 @@ describe('AnchoredNativeBanner', () => {
     expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
   });
 
-  it('clears the anchor on /daily', async () => {
+  it('requests the anchor on the /daily hub (passive landing — pinned banner like home)', async () => {
     mockPathname.current = '/daily';
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
+    expect(clearRequest).not.toHaveBeenCalled();
+  });
+
+  it('requests the anchor on the /brain hub (passive landing — pinned banner like home)', async () => {
+    mockPathname.current = '/en/brain';
+    render(<AnchoredNativeBanner />);
+    await Promise.resolve();
+    expect(setRequest).toHaveBeenCalledWith(...anchorReq(0));
+    expect(clearRequest).not.toHaveBeenCalled();
+  });
+
+  it('clears the anchor on /brain/drills gameplay (banner must not cover play)', async () => {
+    mockPathname.current = '/brain/drills/word-recall';
     render(<AnchoredNativeBanner />);
     await Promise.resolve();
     expect(setRequest).not.toHaveBeenCalled();

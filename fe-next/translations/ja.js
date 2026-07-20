@@ -3368,6 +3368,7 @@ const ja = {
     "place": "位",
     "words": "単語",
     "bestWord": "ベストワード",
+    "rivalBestWord": "ライバルのベスト",
     "bestCombo": "ベストコンボ",
     "playersReady": "{count}/{total} 準備完了",
     "missedWords": "見逃した単語",
