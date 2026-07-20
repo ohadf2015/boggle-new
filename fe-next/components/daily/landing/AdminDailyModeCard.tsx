@@ -26,17 +26,27 @@ const ICON: Partial<Record<DailyModeDef['id'], typeof Building2>> = {
   'word-tower': Building2,
 };
 
+/** Per-mode mascot preview — same full-bleed treatment the public QuestCards use,
+ *  so a beta mode reads as a real quest (game 3), not a compact afterthought. */
+const PREVIEW: Partial<Record<DailyModeDef['id'], string>> = {
+  'word-tower': '/daily/word-tower-mascot.jpg',
+};
+
 /**
- * AdminDailyModeCard — surfaces an admin-gated daily mode in the hub.
+ * AdminDailyModeCard — surfaces an admin/beta-gated daily mode in the hub.
  *
  * Registry-driven so future modes appear for admins with zero hub edits. Uses a
  * plain hard-nav `<a>` (not the SPA router) because Word Tower's daily run reads
  * its mode from the `?daily=1` query at mount — a client nav wouldn't re-read it.
- * A small "ADMIN" flask badge makes the gate obvious during the rollout.
+ * A small "BETA" flask badge makes the gate obvious during the rollout. When the
+ * mode has a mascot preview it renders full-bleed (QuestCard parity); otherwise a
+ * compact icon-circle row (fallback for future modes without art).
  */
 export function AdminDailyModeCard({ mode, locale, t, played = false, delay = 0.3 }: AdminDailyModeCardProps) {
   const accent = ACCENT[mode.accent];
   const Icon = ICON[mode.id] ?? Building2;
+  const previewUrl = PREVIEW[mode.id];
+
   return (
     <m.a
       href={dailyModeHref(mode, locale)}
@@ -49,37 +59,54 @@ export function AdminDailyModeCard({ mode, locale, t, played = false, delay = 0.
         'shadow-hard overflow-hidden cursor-pointer p-4',
         'flex items-center gap-4',
         'focus-visible:outline-hidden focus-visible:ring-4 transition-all duration-200 group',
-        accent.tint,
+        previewUrl ? 'min-h-[130px] bg-neo-navy/95' : accent.tint,
         accent.ring,
       )}
+      style={previewUrl ? { backgroundImage: `url(${previewUrl})`, backgroundSize: 'cover', backgroundPosition: 'center center' } : undefined}
     >
+      {/* Legibility gradient over the mascot art (matches QuestCard). */}
+      {previewUrl && (
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/98 via-slate-900/70 to-slate-900/30 pointer-events-none" />
+      )}
       <div className={cn('absolute inset-e-0 top-0 bottom-0 w-1.5 rounded-e-lg', accent.bar)} />
-      <div
-        className={cn(
-          'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
-          'flex items-center justify-center shadow-hard-xs',
-          accent.bar,
-        )}
-      >
-        {played
-          ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
-          : <Icon className="w-6 h-6 text-neo-black" strokeWidth={2.5} />}
-      </div>
-      <div className="flex-1 min-w-0">
+
+      {/* Icon circle only when there's no mascot art to carry the visual. */}
+      {!previewUrl && (
+        <div
+          className={cn(
+            'w-12 h-12 rounded-full border-2 border-neo-black shrink-0',
+            'flex items-center justify-center shadow-hard-xs',
+            accent.bar,
+          )}
+        >
+          {played
+            ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
+            : <Icon className="w-6 h-6 text-neo-black" strokeWidth={2.5} />}
+        </div>
+      )}
+
+      <div className="relative z-10 flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
-          <h2 className="text-xl font-neo-display font-black text-neo-white leading-none truncate">
+          <h2 className="text-xl font-neo-display font-black text-neo-white leading-none truncate drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
             {t(mode.titleKey)}
           </h2>
+          {played && (
+            <span className="flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-black uppercase rounded border border-neo-cyan/50 bg-neo-cyan/20 text-neo-cyan shrink-0">
+              <Check className="w-2.5 h-2.5" strokeWidth={3} />
+              {t('daily.cleared')}
+            </span>
+          )}
           <span className="flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-black uppercase rounded border border-neo-purple/50 bg-neo-purple/20 text-neo-purple shrink-0">
             <FlaskConical className="w-2.5 h-2.5" />
             {t('daily.adminBeta')}
           </span>
         </div>
-        <p className="mt-1 text-xs font-neo-body text-neo-cream/70 line-clamp-2">{t(mode.descKey)}</p>
+        <p className="mt-1 text-xs font-neo-body text-neo-cream/80 line-clamp-2 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">{t(mode.descKey)}</p>
       </div>
+
       <div
         className={cn(
-          'shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
+          'relative z-10 shrink-0 py-2.5 px-5 text-xs font-black uppercase rounded-lg text-center',
           'text-neo-black border-2 border-neo-black shadow-hard-sm',
           'group-active:translate-y-0.5 group-active:shadow-none transition-all group-hover:scale-105',
           accent.cta,
