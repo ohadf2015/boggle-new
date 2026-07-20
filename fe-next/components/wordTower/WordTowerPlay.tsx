@@ -49,7 +49,6 @@ import { WordTowerNoticeColumn } from './WordTowerNoticeColumn';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { LazyMotion, domAnimation } from 'framer-motion';
 import { CoinCounterAnimated } from '@/components/animations/CoinCounterAnimated';
-import { swayInstability, swayHeightDampen, steadyHandsDampen } from '@/lib/wordTower/towerSway';
 import { blockMaterial } from '@/lib/wordTower/blockGrade';
 import { newlyUnlockedSkin, type TowerSkin } from '@/lib/wordTower/skins';
 import { useTowerSkin } from './useTowerSkin';
@@ -71,7 +70,6 @@ import { newlyUnlocked, type Achievement } from '@/lib/wordTower/achievements';
 import { WordTowerScene } from './WordTowerScene';
 import { WordTowerHud } from './WordTowerHud';
 import { WordTowerStatHud } from './WordTowerStatHud';
-import { getTowerArchitectTier } from '@/lib/wordTower/architectTier';
 import { WordTowerNextRivalChip } from './WordTowerNextRivalChip';
 import { addCoins, getCoins, spendCoins } from '@/utils/coinManager';
 import { DomCoinBurst } from '@/components/animations/DomCoinBurst';
@@ -207,7 +205,6 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   // and refresh after any grant/spend. Powers the scramble button's buy state.
   const [coinBalance, setCoinBalance] = useState(() => getCoins());
   const biomeId = useMemo(() => biomeForHeight(game.heightM), [game.heightM]);
-  const architectTier = useMemo(() => getTowerArchitectTier(game.floors), [game.floors]);
   const personalBest = Math.max(personalBestM, game.heightM);
   // Near-miss anticipation: a quiet "Next: Aurora · 18m" chip in the last stretch
   // before a new zone (the zone-entry banner pays it off).
@@ -1085,9 +1082,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         </>
       )}
 
-      {/* ── Left utility rail ── persistent state chips (wrecking ball + watch-ad,
-          steady-hands streak, active mutator, owned perks) stack in ONE flex
-          column on the start side, below the top chrome. One layout owner means
+      {/* ── Left utility rail ── persistent state chips (steady-hands streak,
+          owned perks) stack in ONE flex column on the start side, below the top
+          chrome. One layout owner means
           they can never overlap each other — or the centred banners — at
           hand-tuned absolute offsets again (the 390px pile-up, 2026-07-02). */}
       <div className="pointer-events-none absolute start-2 top-36 z-20 flex max-w-[45%] flex-col items-start gap-1" dir={dir}>
@@ -1152,16 +1149,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           </div>
         )}
 
-        {/* Persistent mutator chip — keeps the day's active twist visible all run. */}
-        {mutator && (
-          <span
-            className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-lime px-1.5 py-0.5 font-neo-body text-[10px] font-black text-black shadow-hard-sm"
-            title={t(mutator.descKey, mutator.id === 'goldenLetter' ? { letter: mutator.goldenLetter ?? '' } : undefined)}
-          >
-            <span aria-hidden>{mutator.icon}</span>
-            {t(mutator.nameKey)}
-          </span>
-        )}
+        {/* (The day's twist is announced once on entry by WordTowerMutatorBanner —
+            no persistent chip here: it read as an opaque label and cluttered the
+            rail. Its gameplay effect is unchanged.) */}
 
         {/* Owned perks — small badge column (daily run) so the player sees their build. */}
         {daily && perks.owned.map((id) => {
@@ -1260,12 +1250,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
         <WordTowerUpgradePanel onClose={() => setShowUpgrades(false)} t={t} language={language} dir={dir} />
       )}
 
-      {/* Top chrome — actions now share the mute-FAB row (#4). Row 1 sits at the
-          top band (aligned with the fixed mute FAB): [back] · [upgrades · skin ·
-          leaderboard · coins], reserving the FAB's width via me-12. The
-          Daily/Endless pill dropped to top-14 (WordTowerGame) so this band is
-          free. Row 2 centres the simplified, expandable altitude readout below
-          the pill. */}
+      {/* Top chrome — one tight two-row header (no more floating pills between).
+          Row 1 shares the fixed mute-FAB band: [back] · [coins · menu], reserving
+          the FAB's width via me-12. Row 2 centres the compact altitude readout
+          directly beneath, so the header reads as a single aligned block. */}
       <div className="pointer-events-none absolute inset-x-0 top-0 z-10 px-3 pt-[max(0.5rem,env(safe-area-inset-top))]">
         <div className="flex items-center justify-between gap-2">
           <Link
@@ -1307,10 +1295,9 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
             </WordTowerActionMenu>
           </div>
         </div>
-        {/* Simplified altitude readout — its own centred row below the dropped
-            Daily/Endless pill (mt clears it). Collapsed = altitude + combo only;
-            tap to expand for biome/floors/best/tier (less data overload). */}
-        <div className="mx-auto mt-3 flex w-fit items-center gap-1.5">
+        {/* Compact altitude + combo readout — centred directly under row 1 (tight
+            gap: no pill sits between them anymore). */}
+        <div className="mx-auto mt-2 flex w-fit items-center gap-1.5">
           <WordTowerStatHud
             heightM={game.heightM}
             combo={game.combo}

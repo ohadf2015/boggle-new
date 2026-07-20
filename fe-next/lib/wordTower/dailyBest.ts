@@ -12,6 +12,16 @@ export function dailyBestKey(dateKey: string): string {
   return `wt-daily-best-${dateKey}`;
 }
 
+/**
+ * Whether the player has climbed today's daily tower — true once a best height
+ * is recorded (>0). Drives the daily-challenge progress counter so Word Tower
+ * reads as a completed quest like Word Hunt / Word Wheel. Takes the raw stored
+ * string so it's pure (caller reads localStorage).
+ */
+export function isDailyTowerPlayed(storedBest: string | null): boolean {
+  return (Number(storedBest) || 0) > 0;
+}
+
 /** Monotonic merge of a stored best with the current height (whole metres). */
 export function mergeDailyBest(storedBest: number, heightM: number): number {
   return Math.max(storedBest, Math.floor(heightM));

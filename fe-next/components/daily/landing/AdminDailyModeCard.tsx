@@ -1,7 +1,7 @@
 'use client';
 
 import { m } from 'framer-motion';
-import { Building2, FlaskConical } from 'lucide-react';
+import { Building2, FlaskConical, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { dailyModeHref, type DailyModeDef } from '@/lib/dailyModes';
 
@@ -9,14 +9,16 @@ interface AdminDailyModeCardProps {
   mode: DailyModeDef;
   locale: string;
   t: (key: string, params?: Record<string, string | number>) => string;
+  /** Already climbed today — shows a cleared check (replays still allowed). */
+  played?: boolean;
   delay?: number;
 }
 
 /** Accent → card chrome classes (matches the neo-brutalist quest cards). */
-const ACCENT: Record<DailyModeDef['accent'], { bar: string; ring: string; cta: string }> = {
-  orange: { bar: 'bg-neo-orange', ring: 'focus-visible:ring-neo-orange', cta: 'bg-neo-orange' },
-  yellow: { bar: 'bg-neo-yellow', ring: 'focus-visible:ring-neo-yellow', cta: 'bg-neo-yellow' },
-  cyan: { bar: 'bg-neo-cyan', ring: 'focus-visible:ring-neo-cyan', cta: 'bg-neo-cyan' },
+const ACCENT: Record<DailyModeDef['accent'], { bar: string; ring: string; cta: string; tint: string }> = {
+  orange: { bar: 'bg-neo-orange', ring: 'focus-visible:ring-neo-orange', cta: 'bg-neo-orange', tint: 'bg-neo-orange/[0.06] hover:bg-neo-orange/[0.1]' },
+  yellow: { bar: 'bg-neo-yellow', ring: 'focus-visible:ring-neo-yellow', cta: 'bg-neo-yellow', tint: 'bg-neo-yellow/[0.06] hover:bg-neo-yellow/[0.1]' },
+  cyan: { bar: 'bg-neo-cyan', ring: 'focus-visible:ring-neo-cyan', cta: 'bg-neo-cyan', tint: 'bg-neo-cyan/[0.06] hover:bg-neo-cyan/[0.1]' },
 };
 
 /** Per-mode glyph (registry stays presentation-light). */
@@ -32,7 +34,7 @@ const ICON: Partial<Record<DailyModeDef['id'], typeof Building2>> = {
  * its mode from the `?daily=1` query at mount — a client nav wouldn't re-read it.
  * A small "ADMIN" flask badge makes the gate obvious during the rollout.
  */
-export function AdminDailyModeCard({ mode, locale, t, delay = 0.3 }: AdminDailyModeCardProps) {
+export function AdminDailyModeCard({ mode, locale, t, played = false, delay = 0.3 }: AdminDailyModeCardProps) {
   const accent = ACCENT[mode.accent];
   const Icon = ICON[mode.id] ?? Building2;
   return (
@@ -43,10 +45,11 @@ export function AdminDailyModeCard({ mode, locale, t, delay = 0.3 }: AdminDailyM
       transition={{ delay, type: 'spring', stiffness: 300, damping: 25 }}
       data-testid={`daily-admin-card-${mode.id}`}
       className={cn(
-        'relative w-full rounded-xl border-3 border-neo-black border-dashed',
+        'relative w-full rounded-xl border-3 border-neo-black',
         'shadow-hard overflow-hidden cursor-pointer p-4',
-        'flex items-center gap-4 bg-neo-navy-light/60 hover:bg-neo-navy-light',
+        'flex items-center gap-4',
         'focus-visible:outline-hidden focus-visible:ring-4 transition-all duration-200 group',
+        accent.tint,
         accent.ring,
       )}
     >
@@ -58,7 +61,9 @@ export function AdminDailyModeCard({ mode, locale, t, delay = 0.3 }: AdminDailyM
           accent.bar,
         )}
       >
-        <Icon className="w-6 h-6 text-neo-black" strokeWidth={2.5} />
+        {played
+          ? <Check className="w-6 h-6 text-neo-black" strokeWidth={3} />
+          : <Icon className="w-6 h-6 text-neo-black" strokeWidth={2.5} />}
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">

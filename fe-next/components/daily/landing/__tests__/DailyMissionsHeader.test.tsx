@@ -54,6 +54,16 @@ describe('DailyMissionsHeader', () => {
     expect(progressBar).toHaveAttribute('aria-valuenow', '100');
   });
 
+  test('expands to a /3 bar for beta users (total=3)', () => {
+    renderWithProviders(<DailyMissionsHeader completedCount={2} total={3} />);
+
+    const progressBar = screen.getByTestId('xp-progress-bar');
+    // 2 of 3 done → 67%, valuemax reflects the 3-quest gauntlet
+    expect(progressBar).toHaveAttribute('aria-valuenow', '67');
+    expect(progressBar).toHaveAttribute('aria-valuemax', '3');
+    expect(screen.getByText(/2\/3/)).toBeInTheDocument();
+  });
+
   test('renders countdown timer', () => {
     renderWithProviders(<DailyMissionsHeader completedCount={0} />);
 

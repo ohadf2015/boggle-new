@@ -9,13 +9,17 @@ import { cn } from '@/lib/utils';
 
 interface DailyMissionsHeaderProps {
   completedCount: number;
+  /** Number of quests in today's gauntlet. Defaults to 2 (the public set);
+   *  beta users who also see Word Tower pass 3 so the bar never shows a
+   *  half-state (3 cards but a /2 counter). */
+  total?: number;
 }
 
 /**
  * Header section with calendar date card, segmented progress bar,
  * and countdown timer. Neo-brutalist styling with glow on completion.
  */
-export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps) {
+export function DailyMissionsHeader({ completedCount, total = 2 }: DailyMissionsHeaderProps) {
   const { t } = useLanguage();
   const [countdown, setCountdown] = useState(getSecondsUntilNextDaily());
   // Defer date to client to avoid SSR/CSR hydration mismatch (React #418)
@@ -36,7 +40,8 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
     return () => clearInterval(interval);
   }, []);
 
-  const allDone = completedCount >= 2;
+  const allDone = completedCount >= total;
+  const segments = Array.from({ length: total }, (_, i) => i);
   const { monthAbbr, dayNum } = dateLabel;
 
   return (
@@ -78,13 +83,13 @@ export function DailyMissionsHeader({ completedCount }: DailyMissionsHeaderProps
             'text-[10px] font-black shrink-0 ms-2',
             allDone ? 'text-neo-lime' : 'text-neo-white'
           )}>
-            {completedCount}/2
+            {completedCount}/{total}
           </span>
         </div>
 
-        {/* Segmented progress: 2 blocks */}
-        <div className="flex gap-1.5" role="progressbar" aria-valuenow={Math.round((completedCount / 2) * 100)} aria-valuemin={0} aria-valuemax={2} data-testid="xp-progress-bar">
-          {[0, 1].map((i) => (
+        {/* Segmented progress: one block per quest */}
+        <div className="flex gap-1.5" role="progressbar" aria-valuenow={Math.round((completedCount / total) * 100)} aria-valuemin={0} aria-valuemax={total} data-testid="xp-progress-bar">
+          {segments.map((i) => (
             <m.div
               key={`segment-${i}`}
               className={cn(

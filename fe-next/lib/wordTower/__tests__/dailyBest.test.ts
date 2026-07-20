@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { dailyBestKey, mergeDailyBest, beatsDailyBest } from '../dailyBest';
+import { dailyBestKey, mergeDailyBest, beatsDailyBest, isDailyTowerPlayed } from '../dailyBest';
 
 describe('dailyBestKey — per-day localStorage slot', () => {
   it('namespaces today\'s best by the UTC day', () => {
@@ -40,5 +40,19 @@ describe('beatsDailyBest — when to fire the "new best" beat', () => {
   it('a first-ever run (best 0) celebrates the first metre', () => {
     expect(beatsDailyBest(0, 1)).toBe(true);
     expect(beatsDailyBest(0, 0)).toBe(false);
+  });
+});
+
+describe('isDailyTowerPlayed — daily-challenge progress signal', () => {
+  it('is true once a best height is recorded', () => {
+    expect(isDailyTowerPlayed('12')).toBe(true);
+    expect(isDailyTowerPlayed('1')).toBe(true);
+  });
+
+  it('is false with no record, zero, or junk', () => {
+    expect(isDailyTowerPlayed(null)).toBe(false);
+    expect(isDailyTowerPlayed('0')).toBe(false);
+    expect(isDailyTowerPlayed('')).toBe(false);
+    expect(isDailyTowerPlayed('abc')).toBe(false);
   });
 });

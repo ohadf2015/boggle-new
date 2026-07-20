@@ -14,6 +14,8 @@ import type { Language } from '@/types';
 import type { PendingChest } from '@/hooks/useWeeklyChest';
 
 import { adminOnlyDailyModes } from '@/lib/dailyModes';
+import { dailyBestKey, isDailyTowerPlayed } from '@/lib/wordTower/dailyBest';
+import { utcDateKey } from '@/lib/wordTower/dailySeed';
 import { ScoreGauntletBanner } from './ScoreGauntletBanner';
 import { QrWelcomeBanner } from './QrWelcomeBanner';
 import { DailyMissionsHeader } from './landing/DailyMissionsHeader';
@@ -73,10 +75,28 @@ export function DailyChallengeLanding({
   // Defer Date.now()-derived value to client to avoid hydration mismatch (React #418)
   const [todayIso, setTodayIso] = useState<string>('');
   const [claimedChest, setClaimedChest] = useState<PendingChest | null>(null);
+  // Word Tower "played today" — client-only localStorage read (SSR-safe), kept
+  // fresh when the player returns from the game (visibility/back nav).
+  const [wordTowerPlayed, setWordTowerPlayed] = useState(false);
 
   useEffect(() => {
     setGuestFingerprint(getGuestFingerprint());
     setTodayIso(new Date().toISOString().split('T')[0]);
+  }, []);
+
+  useEffect(() => {
+    const check = () => {
+      try {
+        setWordTowerPlayed(isDailyTowerPlayed(localStorage.getItem(dailyBestKey(utcDateKey()))));
+      } catch { /* storage disabled — treat as not played */ }
+    };
+    check();
+    document.addEventListener('visibilitychange', check);
+    window.addEventListener('popstate', check);
+    return () => {
+      document.removeEventListener('visibilitychange', check);
+      window.removeEventListener('popstate', check);
+    };
   }, []);
 
   // Derive Word Hunt status from hook (server-aware for cross-device play)
@@ -133,10 +153,18 @@ export function DailyChallengeLanding({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  // Word Tower is a beta-gated 3rd quest: only expand the bar to /3 and count it
+  // when the player actually sees the card. Ceiling: assumes the sole beta daily
+  // mode is Word Tower — revisit if another admin mode ships without a played
+  // signal (it would inflate `total` without ever completing).
+  const showsWordTower = adminModes.some((mode) => mode.id === 'word-tower');
+  const totalQuests = 2 + (showsWordTower ? 1 : 0);
+
   // Completion count for progress bar
   const completedCount =
     (wordHuntStatus === 'won' ? 1 : 0) +
-    (wordWheelStatus === 'played' ? 1 : 0);
+    (wordWheelStatus === 'played' ? 1 : 0) +
+    (showsWordTower && wordTowerPlayed ? 1 : 0);
 
   const wordHuntPlayed = wordHuntStatus === 'won' || wordHuntStatus === 'lost';
   const wordWheelPlayed = wordWheelStatus === 'played';
@@ -156,7 +184,7 @@ export function DailyChallengeLanding({
       <QrWelcomeBanner show={cameFromQrScan} t={t} />
 
       {/* Missions Header: XP bar + countdown */}
-      <DailyMissionsHeader completedCount={completedCount} />
+      <DailyMissionsHeader completedCount={completedCount} total={totalQuests} />
 
       {/* Score Gauntlet Banner: shown when arriving via a challenge share link */}
       <ScoreGauntletBanner
@@ -254,14 +282,16 @@ export function DailyChallengeLanding({
         />
       )}
 
-      {/* ── Dotted connector line ── */}
+      {/* ── Dotted connector line (Word Hunt → Word Wheel) ── keyed to THIS pair,
+          not the aggregate count (which now includes beta Word Tower and would
+          otherwise light this node when Hunt+Tower are done but Wheel isn't). */}
       <div className="flex flex-col items-center gap-0 py-1">
         <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
         <div className={cn(
           'w-5 h-5 rounded-full border-2 border-neo-black flex items-center justify-center',
-          completedCount >= 2 ? 'bg-neo-lime' : 'bg-neo-navy-light'
+          wordHuntStatus === 'won' && wordWheelPlayed ? 'bg-neo-lime' : 'bg-neo-navy-light'
         )}>
-          {completedCount >= 2 && <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />}
+          {wordHuntStatus === 'won' && wordWheelPlayed && <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />}
         </div>
         <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
       </div>
@@ -339,19 +369,36 @@ export function DailyChallengeLanding({
         />
       )}
 
-      {/* Admin-only daily modes (rollout staging). Hidden entirely for non-admins. */}
+      {/* Beta daily modes (Word Tower today) — chained into the quest path as the
+          next node so they read as game 3, not a detached "admin" afterthought.
+          Hidden entirely for non-beta/non-admins (adminModes empty). */}
       {adminModes.length > 0 && (
-        <div className="w-full flex flex-col gap-2" data-testid="daily-admin-modes">
-          {adminModes.map((mode, i) => (
-            <AdminDailyModeCard
-              key={mode.id}
-              mode={mode}
-              locale={currentLanguage}
-              t={t}
-              delay={0.3 + i * 0.05}
-            />
-          ))}
-        </div>
+        <>
+          {/* ── Dotted connector line (Word Wheel → beta quest) ── */}
+          <div className="flex flex-col items-center gap-0 py-1">
+            <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
+            <div className={cn(
+              'w-5 h-5 rounded-full border-2 border-neo-black flex items-center justify-center',
+              wordTowerPlayed ? 'bg-neo-cyan' : 'bg-neo-navy-light'
+            )}>
+              {wordTowerPlayed && <Check className="w-3 h-3 text-neo-black" strokeWidth={3} />}
+            </div>
+            <div className="w-0.5 h-3 border-s-2 border-dashed border-neo-cream/20" />
+          </div>
+
+          <div className="w-full flex flex-col gap-2" data-testid="daily-admin-modes">
+            {adminModes.map((mode, i) => (
+              <AdminDailyModeCard
+                key={mode.id}
+                mode={mode}
+                locale={currentLanguage}
+                t={t}
+                played={mode.id === 'word-tower' ? wordTowerPlayed : false}
+                delay={0.3 + i * 0.05}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {/* Insights: surface "you improved" / "personal best" inline once any mode complete */}
