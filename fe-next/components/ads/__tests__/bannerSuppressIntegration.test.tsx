@@ -80,7 +80,7 @@ describe('Banner suppress/restore — integration', () => {
     );
 
     // Initial show fires (anchor registers its request).
-    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled());
+    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
     hideBannerSpy.mockClear();
     showBannerSpy.mockClear();
     resumeBannerSpy.mockClear();
@@ -89,14 +89,14 @@ describe('Banner suppress/restore — integration', () => {
     // detects the class and the controller's serialized queue both resolve
     // asynchronously, and a single flush can race them under CI load.
     document.documentElement.classList.add('mobile-drawer-open');
-    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled());
+    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
 
     // Drawer closes → release → banner returns, visibility restored FIRST.
     document.documentElement.classList.remove('mobile-drawer-open');
     await waitFor(() => {
       expect(resumeBannerSpy).toHaveBeenCalled(); // un-hide the GONE AdView
       expect(showBannerSpy).toHaveBeenCalled();
-    });
+    }, { timeout: 5000 });
   });
 
   it('hides while a modal is open (html.modal-open) and restores when it closes', async () => {
@@ -111,20 +111,20 @@ describe('Banner suppress/restore — integration', () => {
       </>,
     );
 
-    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled());
+    await waitFor(() => expect(showBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
     hideBannerSpy.mockClear();
     showBannerSpy.mockClear();
     resumeBannerSpy.mockClear();
 
     // A dialog opens (the shared DialogContent ref-counts this class) → suppress.
     document.documentElement.classList.add('modal-open');
-    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled());
+    await waitFor(() => expect(hideBannerSpy).toHaveBeenCalled(), { timeout: 5000 });
 
     // Dialog closes → banner returns (visibility restored first, then re-show).
     document.documentElement.classList.remove('modal-open');
     await waitFor(() => {
       expect(resumeBannerSpy).toHaveBeenCalled();
       expect(showBannerSpy).toHaveBeenCalled();
-    });
+    }, { timeout: 5000 });
   });
 });
