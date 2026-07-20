@@ -718,6 +718,7 @@ const ja = {
       "smashReleasing": "放つ…",
       "floorsDestroyed": "−{n} 階破壊！",
       "newHeight": "新しい高さ:",
+      "newHeightValue": "{m}m",
       "strikeCta": "打て！",
       "strikeHint": "メーターが緑ゾーンに入ったらタップ",
       "verdict": {

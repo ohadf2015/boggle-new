@@ -976,6 +976,7 @@ const sv = {
       "smashReleasing": "Släpper…",
       "floorsDestroyed": "−{n} VÅNINGAR!",
       "newHeight": "Ny höjd:",
+      "newHeightValue": "{m} m",
       "strikeCta": "SLÅ!",
       "strikeHint": "Tryck när mätaren når det gröna fältet",
       "verdict": {

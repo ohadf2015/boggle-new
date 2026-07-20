@@ -129,7 +129,8 @@ export function towerRowLayout({ pinCount, H, bottomInsetPx, maxVisibleRows = DE
   // never shows more than `mvr` committed rows: the active build zone is a tight
   // cluster hanging under the crane and the rest of the screen reads clean. We
   // never let that floor sink into the control deck (clamp for short screens).
-  const groundFloor = H - bottomInsetPx - half - Math.round(size * 0.12);
+  // Base tile sits flush on top of the control deck / ground line — no floating gap.
+  const groundFloor = H - bottomInsetPx - half;
   const baseCenter = Math.min(topCenter + (mvr - 1) * rowH, groundFloor);
   // Overflow once the pinned top would rise above the build line; pan down to keep it there.
   // Round to whole pixels — H*0.28 isn't binary-exact, so the raw expression can

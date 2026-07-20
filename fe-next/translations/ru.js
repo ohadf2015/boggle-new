@@ -2754,6 +2754,7 @@ const ru = {
       "smashReleasing": "Отпускаю…",
       "floorsDestroyed": "−{n} ЭТАЖЕЙ!",
       "newHeight": "Новая высота:",
+      "newHeightValue": "{m} м",
       "strikeCta": "УДАР!",
       "strikeHint": "Нажми, когда шкала войдёт в зелёную зону",
       "verdict": {

@@ -7,20 +7,54 @@ import { loadWordCraftDictionary } from '@/lib/word-craft/dictionary';
 import type { SupportedLocale } from '@/lib/word-craft/tileBag';
 import {
   restoreWordTowerState,
+  type WordTowerSaveState,
   type WordTowerPlayerState,
 } from '@/lib/wordTower/wordTowerManager';
 import { dailyTowerGameCode, DAILY_PLAYER_ID, utcDateKey } from '@/lib/wordTower/dailySeed';
 import { dailyBestKey, mergeDailyBest } from '@/lib/wordTower/dailyBest';
 import { useDailyStreak } from '@/lib/wordTower/useDailyStreak';
+import { getWithAuth } from '@/utils/authFetch';
 import { WordTowerPlay } from './WordTowerPlay';
 import { WordTowerLeaderboard } from './WordTowerLeaderboard';
-import { Flame, CalendarDays } from 'lucide-react';
 
 const SUPPORTED: SupportedLocale[] = ['en', 'he', 'sv', 'es', 'ja'];
 
 interface LoadedProgress {
   initialGame: WordTowerPlayerState;
   personalBestM: number;
+}
+
+interface SavedSession {
+  savedAt: number;
+  state: WordTowerSaveState;
+}
+
+function sessionStorageKey(daily: boolean) {
+  // The tower itself persists across days; only the daily seed/wheel changes per
+  // UTC day (handled by dailyTowerGameCode).
+  return daily ? 'wt-session-persistent' : 'wt-session-endless';
+}
+
+function loadSessionFromLocalStorage(daily: boolean): SavedSession | null {
+  const tryKey = (key: string): SavedSession | null => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as SavedSession;
+      if (!parsed?.state) return null;
+      return parsed;
+    } catch { return null; }
+  };
+  let saved = tryKey(sessionStorageKey(daily));
+  // One-time migration: if a date-stamped daily save exists, adopt it into the
+  // persistent key so the tower keeps its height across the UTC rollover.
+  if (!saved && daily) {
+    saved = tryKey(`wt-session-daily-${utcDateKey()}`);
+    if (saved) {
+      try { localStorage.setItem(sessionStorageKey(true), JSON.stringify(saved)); } catch { /* */ }
+    }
+  }
+  return saved;
 }
 
 export function WordTowerGame() {
@@ -35,7 +69,7 @@ export function WordTowerGame() {
   // tower of the daily challenge — we shouldn't maintain both modes." Kept as a
   // const so the many `daily`-gated branches below/downstream still read clearly.
   const daily = true;
-  const { streak, recordPlay } = useDailyStreak();
+  const { recordPlay } = useDailyStreak();
 
   const dictRef = useRef<Set<string> | null>(null);
   const [dictReady, setDictReady] = useState(false);
@@ -58,10 +92,13 @@ export function WordTowerGame() {
     return () => { cancelled = true; };
   }, [locale]);
 
-  // Initialise the run: a fresh, deterministic, shared-seed DAILY tower — every
-  // player gets the same letters for the day (see `lib/wordTower/dailySeed.ts`),
-  // with a per-day best + streak. No server fetch / no cross-session resume (the
-  // retired endless save is gated off downstream); today's best is read locally.
+  // Initialise the run: a deterministic, shared-seed DAILY tower. Each player
+  // gets the same letters for the day, but a reload resumes THIS player's saved
+  // progress (floors + the exact wheel) so the tower never resets to zero mid-day.
+  // The tower session now persists across days; only the daily seed/wheel is
+  // date-stamped, so each day's challenge is still shared worldwide.
+  // Also tries to load from Supabase (authenticated users) so the tower is
+  // truly persistent across sessions and devices.
   useEffect(() => {
     // Wait for the dictionary so the opening wheel is chosen for word coverage
     // (#5) — pickBestWheel needs the word list. `ready` already gates render on
@@ -73,8 +110,31 @@ export function WordTowerGame() {
     const opts = { gameCode: dailyTowerGameCode(), playerId: DAILY_PLAYER_ID, language, avoidWeakAnchor: true, dict };
     let best = 0;
     try { best = Number(localStorage.getItem(`wt-daily-best-${utcDateKey()}`)) || 0; } catch { /* */ }
-    setProgress({ initialGame: restoreWordTowerState(opts, null), personalBestM: best });
-  }, [language, dictReady]);
+
+    // Resume the in-progress daily tower (if any) so the player lands exactly
+    // where they left off, including the same wheel letters.
+    const saved = loadSessionFromLocalStorage(daily);
+    const initialGame = saved?.state
+      ? restoreWordTowerState(opts, saved.state)
+      : restoreWordTowerState(opts, null);
+    setProgress({ initialGame, personalBestM: best });
+
+    // Also try to load from the DB (authenticated users) — the server progress
+    // may be ahead of the local session (e.g. played on another device).
+    // If the DB has a more advanced state, it will be used by the restore
+    // logic in WordTowerPlay (sessionRestoredRef checks initialGame floors).
+    getWithAuth('/api/word-tower/progress').then((res) => {
+      if (!res.ok) return;
+      res.json().then((data) => {
+        if (!data?.progress?.current_state) return;
+        const serverState = data.progress.current_state as WordTowerSaveState;
+        const serverGame = restoreWordTowerState(opts, serverState);
+        if (serverGame.floors.length > initialGame.floors.length || serverGame.heightM > initialGame.heightM) {
+          setProgress({ initialGame: serverGame, personalBestM: Math.max(best, data.progress.best_height_m ?? 0) });
+        }
+      }).catch(() => { /* ignore — local session is the fallback */ });
+    }).catch(() => { /* ignore — local session is the fallback */ });
+  }, [language, dictReady, daily]);
 
   const isInDictionary = useCallback(
     (canonWord: string) => dictRef.current?.has(canonWord) ?? false,
@@ -120,7 +180,10 @@ export function WordTowerGame() {
 
   if (!ready) {
     return (
-      <div className="flex min-h-[100dvh] items-center justify-center bg-neo-navy">
+      <div className="flex min-h-[100dvh] flex-col items-center justify-center gap-3 bg-neo-navy">
+        <span className="rounded-full border border-neo-white/30 bg-neo-navy-light px-3 py-1 font-neo-body text-xs font-bold text-neo-white/80">
+          {t('wordTower.daily.badge', { date: utcDateKey() })}
+        </span>
         <p className="animate-pulse font-neo-display text-xl text-neo-cyan">{t('wordTower.loading')}</p>
       </div>
     );
@@ -142,23 +205,6 @@ export function WordTowerGame() {
         perkSeed={dailyTowerGameCode()}
         onNewDailyBest={persistDailyBest}
       />
-
-      {/* Daily badge + streak — the tower is the daily challenge, so this is
-          always shown (non-action). Centred pill below the top chrome. */}
-      <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3.5rem)] z-50 flex justify-center px-2" dir={dir}>
-        <div className="pointer-events-none flex items-center gap-1.5">
-          <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-2 py-1 font-neo-display text-[11px] font-black uppercase tracking-wide text-black shadow-hard-sm">
-            <CalendarDays className="h-3 w-3" />
-            {t('wordTower.daily.badge', { date: utcDateKey() })}
-          </span>
-          {streak > 0 && (
-            <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-orange px-2 py-1 font-neo-display text-[11px] font-black text-black shadow-hard-sm">
-              <Flame className="h-3 w-3" />
-              {t('wordTower.daily.streak', { n: streak })}
-            </span>
-          )}
-        </div>
-      </div>
 
       {showLeaderboard && <WordTowerLeaderboard onClose={closeLeaderboard} t={t} dir={dir} />}
 

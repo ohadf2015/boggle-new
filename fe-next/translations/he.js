@@ -718,6 +718,7 @@ const he = {
       "smashReleasing": "משחרר…",
       "floorsDestroyed": "−{n} קומות!",
       "newHeight": "גובה חדש:",
+      "newHeightValue": "{m} מ'",
       "strikeCta": "חבטה!",
       "strikeHint": "הקישו כשהמד נכנס לאזור הירוק",
       "verdict": {

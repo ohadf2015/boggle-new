@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Crosshair, Check } from 'lucide-react';
 import gsap from 'gsap';
 import { Container, Graphics } from 'pixi.js';
 import { cn } from '@/lib/utils';
@@ -258,7 +259,7 @@ export function WordTowerSmashScene({
                 {t('wordTower.sabotage.newHeight')}
               </span>
               <span className="font-neo-display text-lg font-black text-neo-cyan">
-                {Math.round(newHeightM)}m
+                {t('wordTower.sabotage.newHeightValue', { m: Math.round(newHeightM) })}
               </span>
             </div>
           </div>
@@ -269,17 +270,28 @@ export function WordTowerSmashScene({
           onClick={phase === 'aim' ? handleStrike : phase === 'result' ? finish : undefined}
           disabled={phase === 'impact'}
           className={cn(
-            'w-full rounded-neo border-neo-thick border-black px-4 py-3 font-neo-display text-base font-black uppercase shadow-hard transition-transform active:translate-y-px',
-            phase === 'aim' && 'bg-neo-pink text-neo-white hover:scale-105',
-            phase === 'impact' && 'bg-neo-navy-light text-neo-white/40',
-            phase === 'result' && 'bg-neo-lime text-neo-black hover:scale-105',
+            'group relative flex w-full min-h-[52px] items-center justify-center gap-2 overflow-hidden rounded-full border-neo-thick border-black px-6 py-3.5 font-neo-display text-base font-black uppercase tracking-wider shadow-hard transition-all',
+            'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
+            phase === 'aim' &&
+              'bg-gradient-to-b from-neo-pink via-neo-pink to-neo-pink/85 text-neo-white hover:shadow-hard-lg hover:brightness-110 active:scale-[0.98] active:shadow-hard-pressed',
+            phase === 'impact' && 'cursor-wait bg-neo-navy-light text-neo-white/40',
+            phase === 'result' &&
+              'bg-gradient-to-b from-neo-lime via-neo-lime to-neo-lime/85 text-neo-black hover:shadow-hard-lg hover:brightness-110 active:scale-[0.98] active:shadow-hard-pressed',
           )}
         >
-          {phase === 'aim'
-            ? t('wordTower.sabotage.strikeCta')
-            : phase === 'impact'
-              ? '…'
-              : t('wordTower.sabotage.done')}
+          {/* Premium sheen sweep on hover. */}
+          {phase !== 'impact' && (
+            <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 group-hover:translate-x-full" aria-hidden />
+          )}
+          {phase === 'aim' && <Crosshair className="h-5 w-5" aria-hidden />}
+          {phase === 'result' && <Check className="h-5 w-5" aria-hidden />}
+          <span>
+            {phase === 'aim'
+              ? t('wordTower.sabotage.strikeCta')
+              : phase === 'impact'
+                ? t('wordTower.sabotage.smashReleasing')
+                : t('wordTower.sabotage.done')}
+          </span>
         </button>
 
         {phase === 'aim' && (
@@ -374,17 +386,54 @@ function SmashStage({ phase, powerRef, floors, blockCount, material, onImpactDon
     crane.rect(Math.round(W * 0.13) - 4, pivot.y - 4, pivot.x - Math.round(W * 0.13) + 8, 8).fill(C.navy).stroke({ width: 3, color: C.black });
     root.addChild(crane);
 
-    // Chain (redrawn each frame) + ball.
+    // Chain (redrawn each frame) + heavy metal wrecking ball.
     const chain = new Graphics();
     root.addChild(chain);
     const chainLen = Math.round(H * 0.3);
     const ball = new Container();
     const ballG = new Graphics();
-    const ballR = Math.round(W * 0.075);
-    ballG.circle(0, 0, ballR).fill(C.pink).stroke({ width: 3, color: C.black });
-    ballG.circle(-ballR * 0.3, -ballR * 0.3, ballR * 0.25).fill(C.white); // highlight
+    const ballR = Math.round(W * 0.085);
+    // Layered metallic sphere: cast-iron base + warm mid-tone + cool highlight +
+    // bottom shadow rim so it reads as solid iron, not a flat toy ball.
+    ballG.circle(0, 0, ballR).fill({ color: 0x3a3a44 });
+    ballG.circle(0, 0, ballR * 0.95).fill({ color: 0x555560 });
+    ballG.circle(0, 0, ballR * 0.78).fill({ color: 0x6e6e7a });
+    // Broad top-left specular sheen — steel glint that tracks the swing.
+    ballG.ellipse(-ballR * 0.34, -ballR * 0.36, ballR * 0.32, ballR * 0.22).fill({ color: 0xd8d8e0, alpha: 0.45 });
+    // Tighter hot spot inside the sheen.
+    ballG.ellipse(-ballR * 0.3, -ballR * 0.32, ballR * 0.12, ballR * 0.08).fill({ color: 0xffffff, alpha: 0.55 });
+    // Bottom-right contact shadow rim.
+    ballG.ellipse(ballR * 0.32, ballR * 0.34, ballR * 0.26, ballR * 0.18).fill({ color: 0x1a1a22, alpha: 0.7 });
+    ballG.circle(0, 0, ballR).stroke({ width: 2.5, color: 0x111116 });
     ball.addChild(ballG);
+    // Shackle ring on top — the chain bolts through it.
+    const shackle = new Graphics();
+    shackle.circle(0, -ballR, ballR * 0.24).stroke({ width: 4, color: 0x111116 });
+    shackle.circle(0, -ballR, ballR * 0.24).stroke({ width: 2, color: 0x6e6e7a });
+    shackle.circle(0, -ballR, ballR * 0.1).fill({ color: 0x4a4a55 });
+    ball.addChild(shackle);
     root.addChild(ball);
+
+    /** Draw a linked chain between pivot and ball so it looks like real rigging. */
+    const drawChain = (g: Graphics, x1: number, y1: number, x2: number, y2: number) => {
+      g.clear();
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const len = Math.hypot(dx, dy) || 1;
+      const linkCount = Math.max(8, Math.round(len / 11));
+      for (let i = 0; i <= linkCount; i++) {
+        const t = i / linkCount;
+        const x = x1 + dx * t;
+        const y = y1 + dy * t;
+        const alt = i % 2 === 0;
+        const lw = alt ? 3.2 : 2.6;
+        const lh = alt ? 5.5 : 4.4;
+        g.ellipse(x, y, lw, lh).stroke({ width: 2, color: 0x111116 });
+        g.ellipse(x, y, lw - 0.8, lh - 0.8).stroke({ width: 1.2, color: 0x6e6e7a });
+        // Small inner gap so the links read as rings, not pills.
+        g.ellipse(x, y, lw * 0.35, lh * 0.35).fill({ color: 0x22222b });
+      }
+    };
 
     // Power meter (bottom): track, green sweet-spot band, live fill.
     const meter = { x: Math.round(W * 0.12), y: H - 30, w: Math.round(W * 0.76), h: 16 };
@@ -404,18 +453,22 @@ function SmashStage({ phase, powerRef, floors, blockCount, material, onImpactDon
       const r = refs.current;
       if (!r || phaseRef.current !== 'aim') return;
       r.elapsed += ticker.deltaMS / 1000;
-      const p = powerAt(r.elapsed, 0.72); // ~0.72 cycles/sec sweep
+      const p = powerAt(r.elapsed, 0.6); // ~0.6 cycles/sec — slower, more deliberate
       powerRef.current = p;
 
-      // Ball winds further back (away from building) as power rises.
-      const angleDeg = 10 - p * 78; // +10° (loaded) → −68° (wound)
+      // Ball winds further back (away from building) as power rises, plus a slow
+      // heavy pendulum swing so the wrecking ball feels weighty and alive.
+      const swayDeg = Math.sin(r.elapsed * 1.3) * 12;
+      const bobPx = Math.sin(r.elapsed * 2.1) * 2;
+      const angleDeg = 10 - p * 78 + swayDeg; // +10° (loaded) → −68° (wound)
       const a = (angleDeg * Math.PI) / 180;
-      r.ball.x = r.pivot.x + Math.sin(a) * r.chainLen;
-      r.ball.y = r.pivot.y + Math.cos(a) * r.chainLen;
+      const len = r.chainLen + bobPx;
+      r.ball.x = r.pivot.x + Math.sin(a) * len;
+      r.ball.y = r.pivot.y + Math.cos(a) * len;
+      r.ball.rotation = -a * 0.45; // natural twist with the arc
 
       if (!r.chain.destroyed) {
-        r.chain.clear();
-        r.chain.moveTo(r.pivot.x, r.pivot.y).lineTo(r.ball.x, r.ball.y).stroke({ width: 3, color: C.black });
+        drawChain(r.chain, r.pivot.x, r.pivot.y, r.ball.x, r.ball.y);
       }
 
       const inSweet = p >= SMASH_SWEET_SPOT;

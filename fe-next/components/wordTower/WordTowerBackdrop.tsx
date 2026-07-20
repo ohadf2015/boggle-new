@@ -43,10 +43,14 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
   biomeId,
   heightM = 0,
   reducedMotion = false,
+  groundInsetPx,
 }: {
   biomeId: WordTowerBiomeId;
   heightM?: number;
   reducedMotion?: boolean;
+  /** Distance from viewport bottom to the control-deck top (px). Ground layers
+   *  anchor to this line so the tower base never floats above the cityscape. */
+  groundInsetPx?: number;
 }) {
   const b = biomeBackdrop(biomeId);
   const theme = BIOME_THEME[biomeId];
@@ -64,6 +68,7 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
   // the player climbs, so the world recedes/fills the frame ("the ground falls
   // away") — vertigo with ZERO impact on the Pixi tower's camera/landing math.
   const dolly = reducedMotion ? 1 : dollyScaleFor(heightM);
+  const groundBase = groundInsetPx ?? (typeof window !== 'undefined' ? Math.round(window.innerHeight * 0.2) : 140);
 
   // Dynamic sun/moon disc: arcs from low/right toward high/left as you climb,
   // tinting the whole scene. Colour cools with altitude.
@@ -119,10 +124,10 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
       </div>
 
       {/* Far city skyline — light, atmospheric (recedes into the haze). Slow
-          parallax. Raised to peek above the control deck at low altitude. */}
+          parallax. Anchored to the control-deck top so it reads as the horizon. */}
       <svg
-        className="absolute inset-x-0 bottom-[20%] h-[20%] w-full"
-        style={{ opacity: b.skyline * 0.7, transition: FLOW, transform: `translateY(${slide(0.85, 1400)}px)` }}
+        className="absolute inset-x-0 bottom-0 w-full"
+        style={{ height: groundBase + 120, opacity: b.skyline * 0.7, transition: FLOW, transform: `translateY(${slide(0.85, 1400)}px)` }}
         viewBox="0 0 100 26"
         preserveAspectRatio="none"
       >
@@ -131,8 +136,8 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
 
       {/* Distant mountain / landmark silhouettes — a second far depth layer. */}
       <svg
-        className="absolute inset-x-0 bottom-[18%] h-[22%] w-full"
-        style={{ opacity: b.skyline * 0.55, transition: FLOW, transform: `translateY(${slide(0.55, 900)}px)` }}
+        className="absolute inset-x-0 bottom-0 w-full"
+        style={{ height: groundBase + 96, opacity: b.skyline * 0.55, transition: FLOW, transform: `translateY(${slide(0.55, 900)}px)` }}
         viewBox="0 0 100 26"
         preserveAspectRatio="none"
       >
@@ -211,8 +216,8 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
 
       {/* Near city skyline — darker silhouette in front. Faster parallax. */}
       <svg
-        className="absolute inset-x-0 bottom-[17%] h-[26%] w-full"
-        style={{ opacity: b.skyline, transition: FLOW, transform: `translateY(${slide(1.35, 1700)}px)` }}
+        className="absolute inset-x-0 bottom-0 w-full"
+        style={{ height: groundBase + 72, opacity: b.skyline, transition: FLOW, transform: `translateY(${slide(1.35, 1700)}px)` }}
         viewBox="0 0 100 26"
         preserveAspectRatio="none"
       >
@@ -221,8 +226,9 @@ export const WordTowerBackdrop = memo(function WordTowerBackdrop({
 
       {/* Ground / horizon fog — city haze thins into space mist. */}
       <div
-        className="absolute inset-x-0 bottom-0 h-[38%]"
+        className="absolute inset-x-0 bottom-0"
         style={{
+          height: groundBase + 48,
           opacity: theme.groundFog,
           background: 'linear-gradient(180deg, transparent 0%, rgba(214,238,255,0.35) 45%, rgba(20,32,46,0.45) 100%)',
           transition: FLOW,

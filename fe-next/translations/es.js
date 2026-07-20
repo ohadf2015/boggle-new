@@ -715,6 +715,7 @@ const es = {
       "smashReleasing": "Soltando…",
       "floorsDestroyed": "¡−{n} PISOS!",
       "newHeight": "Nueva altura:",
+      "newHeightValue": "{m} m",
       "strikeCta": "¡GOLPEA!",
       "strikeHint": "Toca cuando el medidor llegue a la zona verde",
       "verdict": {
