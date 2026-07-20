@@ -188,7 +188,6 @@ export default function ShiritoriView({
                 placeholder={isMyTurn ? t('shiritori.yourTurn') : t('shiritori.waitTurn')}
                 aria-label={t('shiritori.inputLabel')}
                 dir="ltr"
-                lang="ja"
                 className="flex-1 rounded-neo border-neo-thick border-black bg-neo-cream px-4 py-3 font-neo-body text-black shadow-hard disabled:opacity-50"
               />
               <button

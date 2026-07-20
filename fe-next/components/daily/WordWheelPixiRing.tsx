@@ -45,6 +45,9 @@ export default function WordWheelPixiRing({
     let removeRectListeners: (() => void) | null = null;
     let rafId: number | null = null;
     let visibilityPaused = false;
+    // Hoisted so the visibilitychange handler (outer scope) can re-schedule the
+    // loop; the frame closure itself is created inside setup() once Pixi is ready.
+    let frame: ((time: number) => void) | null = null;
     const app = new Application();
 
     const setup = async () => {
@@ -99,7 +102,7 @@ export default function WordWheelPixiRing({
       const cy = h / 2;
       let lastTime = performance.now();
 
-      const frame = (time: number) => {
+      frame = function frameLoop(time: number) {
         // If the tab is hidden, pause the loop entirely rather than scheduling
         // continuous no-op frames. We resume on visibilitychange.
         if (typeof document !== 'undefined' && document.hidden) {
@@ -113,7 +116,7 @@ export default function WordWheelPixiRing({
         }
 
         // Schedule the next frame so long as we're still mounted.
-        if (!destroyed && rafId === null) rafId = requestAnimationFrame(frame);
+        if (!destroyed && rafId === null) rafId = requestAnimationFrame(frameLoop);
 
         // Guard: cleanup calls cancelAnimationFrame on unmount (below), but a
         // frame already dispatched by the browser before that call still runs
@@ -209,16 +212,18 @@ export default function WordWheelPixiRing({
         } catch { /* post-destroy null-context race — skip this frame (Sentry 1PV) */ }
       };
 
-      rafId = requestAnimationFrame(frame);
+      const startFrame = frame;
+      if (startFrame) rafId = requestAnimationFrame(startFrame);
     };
 
     setup();
 
     const handleVisibility = () => {
       if (typeof document === 'undefined') return;
-      if (!document.hidden && visibilityPaused && rafId === null && !destroyed) {
+      const resumeFrame = frame;
+      if (!document.hidden && visibilityPaused && rafId === null && !destroyed && resumeFrame) {
         visibilityPaused = false;
-        rafId = requestAnimationFrame(frame);
+        rafId = requestAnimationFrame(resumeFrame);
       }
     };
     document.addEventListener('visibilitychange', handleVisibility);

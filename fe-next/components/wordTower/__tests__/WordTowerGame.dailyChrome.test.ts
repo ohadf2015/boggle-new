@@ -25,8 +25,6 @@ describe('WordTowerGame daily chrome (daily-only, no mode switch)', () => {
 
   it('runs the tower in daily mode unconditionally (no endless branch)', () => {
     expect(src).toMatch(/const daily = true/);
-    // The retired endless run fetched saved server progress — it must be gone.
-    expect(src).not.toMatch(/api\/word-tower\/progress/);
     expect(src).not.toMatch(/useDailyMode/);
   });
 

@@ -13,7 +13,7 @@
  * an installed PWA, so it never clutters the menu for users who can't act on it.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Smartphone } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
@@ -25,37 +25,15 @@ export default function GetAppMenuRow({ onNavigate }: { onNavigate?: () => void 
   const { t } = useLanguage();
   const openPromo = useAndroidInstallStore((s) => s.openPromo);
 
-  // ── Capacitor-native guard: wait for the bridge to be ready before showing
-  //     the menu row. The bridge may not be initialised on first render. ───
-  const [capacitorReady, setCapacitorReady] = useState(false);
-  useEffect(() => {
-    if (isCapacitorNative()) {
-      setCapacitorReady(true);
-      return;
-    }
-    const poll = setInterval(() => {
-      if (isCapacitorNative()) {
-        setCapacitorReady(true);
-        clearInterval(poll);
-      }
-    }, 200);
-    const timeout = setTimeout(() => {
-      clearInterval(poll);
-      setCapacitorReady(true);
-    }, 2000);
-    return () => { clearInterval(poll); clearTimeout(timeout); };
-  }, []);
-
   const eligible = useMemo(
     () =>
       typeof navigator !== 'undefined' &&
-      capacitorReady &&
       isAndroidInstallEntryEligible({
         ua: navigator.userAgent,
         isCapacitorNative: isCapacitorNative(),
         isStandalone: isStandaloneDisplay(),
       }),
-    [capacitorReady]
+    []
   );
 
   if (!eligible) return null;

@@ -122,7 +122,7 @@ describe('wheelRushHandler', () => {
     (getGame as unknown as Mock).mockReturnValue({ ...gameBase, gameMode: 'classic' });
     const sock = mkSocket();
     handleSubmitWheelWord(mkIo(), sock, { word: 'CANE' });
-    expect(sock.emit).toHaveBeenCalledWith('error', { message: 'Not a wheel-rush game' });
+    expect(sock.emit).toHaveBeenCalledWith('error', { code: 'NOT_WHEEL_RUSH' });
     expect(validateWheelSubmission).not.toHaveBeenCalled();
   });
 

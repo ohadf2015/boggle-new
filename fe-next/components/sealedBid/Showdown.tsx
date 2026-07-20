@@ -29,6 +29,7 @@ export default function Showdown({
   const { t } = useLanguage();
   const cardRefs = useRef<Array<HTMLDivElement | null>>([]);
   const [bannerVisible, setBannerVisible] = useState(reducedMotion);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const outcome = settlement.outcome; // unique | clash | none
   const bannerText =
@@ -106,6 +107,19 @@ export default function Showdown({
 
     triggerFX();
   }, [bannerVisible, settlement.outcome, reducedMotion, playerWord, payoutTargetRef]);
+
+  // Auto-advance the showdown after the reveal settles, so the round progresses
+  // on its own; the Continue button remains as an explicit skip. onDone must be
+  // idempotent — Continue-click and this timer can both reach it.
+  useEffect(() => {
+    if (!bannerVisible) return;
+    timeoutRef.current = setTimeout(() => {
+      onDone();
+    }, 2500);
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, [bannerVisible, onDone]);
 
   const bannerTone =
     outcome === 'unique'

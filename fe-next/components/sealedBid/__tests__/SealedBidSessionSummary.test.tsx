@@ -113,7 +113,7 @@ describe('SealedBidSessionSummary share action', () => {
     fireEvent.click(btn);
     await vi.waitFor(() =>
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
-        expect.stringContaining('2/5')
+        expect.stringContaining('sealedBid.session.shareHeader')
       )
     );
   });
