@@ -3614,6 +3614,7 @@ const sv = {
     "place": "Plats",
     "words": "Ord",
     "bestWord": "Bästa Ord",
+    "rivalBestWord": "Rivalens Bästa",
     "bestCombo": "Bästa Combo",
     "playersReady": "{count}/{total} Redo",
     "missedWords": "Ord du missade",

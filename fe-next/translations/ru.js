@@ -3994,6 +3994,7 @@ const ru = {
     "place": "Место",
     "words": "Слова",
     "bestWord": "Лучшее слово",
+    "rivalBestWord": "Лучшее слово соперника",
     "bestCombo": "Лучшее комбо",
     "playersReady": "{count}/{total} готовы",
     "missedWords": "Пропущено",

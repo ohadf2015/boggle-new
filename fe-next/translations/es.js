@@ -3136,6 +3136,7 @@ const es = {
     "place": "Lugar",
     "words": "Palabras",
     "bestWord": "Mejor Palabra",
+    "rivalBestWord": "Mejor del Rival",
     "bestCombo": "Mejor Combo",
     "playersReady": "{count}/{total} Listos",
     "missedWords": "Palabras que Perdiste",
