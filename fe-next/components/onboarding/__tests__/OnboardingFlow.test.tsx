@@ -245,7 +245,7 @@ describe('OnboardingFlow', () => {
   it('navigates to the Daily Challenge after the style step', () => {
     render(<OnboardingFlow {...defaultProps} />);
     finishFlow();
-    expect(mockPush).toHaveBeenCalledWith('/en/daily');
+    expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
   });
 
   it('calls onComplete after the style step', () => {
@@ -313,7 +313,7 @@ describe('OnboardingFlow', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
       finishFlow();
-      expect(mockPush).toHaveBeenCalledWith('/en/daily');
+      expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
     });
   });
 
