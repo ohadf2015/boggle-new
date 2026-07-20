@@ -425,6 +425,8 @@ const en = {
       "marble": { "name": "Marble", "blurb": "Pale stone, veined and cool." },
       "gold": { "name": "Gold Rush", "blurb": "Brushed gold, earned the hard way." },
       "onyx": { "name": "Onyx", "blurb": "Graphite to black glass." },
+      "cobalt": { "name": "Cobalt", "blurb": "Blue steel, forged deep." },
+      "crimson": { "name": "Crimson", "blurb": "Garnet steel, tempered red." },
       "aurora": { "name": "Aurora", "blurb": "Alloy that catches the nebula." }
     }
   },

@@ -1072,6 +1072,14 @@ const sv = {
         "name": "Onyx",
         "blurb": "Grafit till svart glas."
       },
+      "cobalt": {
+        "name": "Kobolt",
+        "blurb": "Blått stål, smitt på djupet."
+      },
+      "crimson": {
+        "name": "Karmosin",
+        "blurb": "Granatstål, härdat rött."
+      },
       "aurora": {
         "name": "Aurora",
         "blurb": "Legering som fångar nebulosan."

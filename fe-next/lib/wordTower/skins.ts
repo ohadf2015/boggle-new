@@ -12,7 +12,7 @@
  */
 import { ZONE_MATERIAL, type ZoneMaterialPalette } from './blockGrade';
 
-export type TowerSkinId = 'classic' | 'copper' | 'marble' | 'gold' | 'onyx' | 'aurora';
+export type TowerSkinId = 'classic' | 'copper' | 'marble' | 'gold' | 'cobalt' | 'onyx' | 'crimson' | 'aurora';
 
 export interface TowerSkin {
   id: TowerSkinId;
@@ -89,6 +89,21 @@ export const TOWER_SKINS: TowerSkin[] = [
     swatch: 0xf2c14e,
   },
   {
+    id: 'cobalt',
+    nameKey: 'wordTower.skin.cobalt.name',
+    blurbKey: 'wordTower.skin.cobalt.blurb',
+    unlockAtM: 800,
+    palette: {
+      city: 0x4a7fb5, // bright cobalt steel
+      sky: 0x3d6a9e, // deep cobalt
+      stratosphere: 0x33587f, // steel blue
+      orbit: 0x284763, // dark navy steel
+      nebula: 0x1e3348, // deep blue-black
+      galaxy: 0x12202e, // near-black cobalt
+    },
+    swatch: 0x4a7fb5,
+  },
+  {
     id: 'onyx',
     nameKey: 'wordTower.skin.onyx.name',
     blurbKey: 'wordTower.skin.onyx.blurb',
@@ -102,6 +117,21 @@ export const TOWER_SKINS: TowerSkin[] = [
       galaxy: 0x101116, // onyx
     },
     swatch: 0x4a4e57,
+  },
+  {
+    id: 'crimson',
+    nameKey: 'wordTower.skin.crimson.name',
+    blurbKey: 'wordTower.skin.crimson.blurb',
+    unlockAtM: 1500,
+    palette: {
+      city: 0xb5434a, // garnet red
+      sky: 0x9c383f, // deep ruby
+      stratosphere: 0x7d2e34, // dark carmine
+      orbit: 0x5e2429, // oxblood
+      nebula: 0x431a1e, // dried-blood maroon
+      galaxy: 0x241012, // near-black ruby
+    },
+    swatch: 0xb5434a,
   },
   {
     id: 'aurora',

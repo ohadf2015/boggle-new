@@ -816,6 +816,14 @@ const es = {
         "name": "Ónix",
         "blurb": "Grafito a vidrio negro."
       },
+      "cobalt": {
+        "name": "Cobalto",
+        "blurb": "Acero azul, forjado a fondo."
+      },
+      "crimson": {
+        "name": "Carmesí",
+        "blurb": "Acero granate, templado en rojo."
+      },
       "aurora": {
         "name": "Aurora",
         "blurb": "Aleación que captura la nebulosa."
