@@ -187,6 +187,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   const { variant: feedbackPosition } = useExperiment('exp-mp-round-feedback-top-v1');
   const { variant: gapNudgeVariant } = useExperiment('exp-mp-score-gap-nudge-v1');
   const { variant: progressHeaderVariant } = useExperiment('exp-mp-round-progress-header-v1');
+  const { variant: rivalBestWordVariant } = useExperiment('exp-mp-results-rival-best-word-v1');
 
   useEffect(() => {
     // Canonical funnel event — same shape as word-wheel / word-hunt / blast so
@@ -288,8 +289,25 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         color: 'text-neo-lime',
       });
     }
+    // exp-mp-results-rival-best-word-v1: show rival's highest-scoring word in 2p games.
+    if (showRivals && rivalBestWordVariant === 'show-rival-word' && allPlayerWords && username) {
+      const rivalUsername = sortedScores.find(p => p.username !== username)?.username;
+      const rivalWords = rivalUsername ? (allPlayerWords[rivalUsername] as WordObject[] | undefined) : undefined;
+      if (rivalWords && rivalWords.length > 0) {
+        const rivalBest = rivalWords.reduce((best, w) => ((w.score || 0) > (best.score || 0) ? w : best), rivalWords[0]);
+        const rivalBestDisplay = language === 'he' ? applyHebrewFinalLetters(rivalBest.word) : rivalBest.word;
+        if (rivalBestDisplay) {
+          stats.push({
+            label: t('results.rivalBestWord') || "Rival's Best",
+            value: rivalBestDisplay.toUpperCase(),
+            icon: <Sparkles className="w-3 h-3" />,
+            color: 'text-neo-pink',
+          });
+        }
+      }
+    }
     return stats;
-  }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language, showRivals, isAuthenticated, coinReward]);
+  }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language, showRivals, isAuthenticated, coinReward, rivalBestWordVariant, allPlayerWords, username, sortedScores]);
 
   // Share params for the share button
   const shareParams = useMemo(() => {

@@ -1647,3 +1647,29 @@ _Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all fl
   - status: shipped (fix already in nativePGS.ts:85-88 — Capacitor.isPluginAvailable guard)
   - why: fix was applied 07-05 and error has not recurred. Mark as resolved in Sentry.
   - recommended owner: self (resolve in Sentry UI)
+
+## 2026-07-20
+- [Sentry] JAVASCRIPT-NEXTJS-1PH — CapacitorGameConnect.then() not implemented on android
+  - last 24h, reach=7, score=0.438
+  - link: https://lexiclash.sentry.io/issues/132085085/
+  - status: deferred — nativePGS.ts fix (isPluginAvailable guard, line 85) looks correct; all callsites route through it. SUSPECT: awardPlayGames.ts calls unlockAchievement(...).then() — this calls our wrapper which should be safe, but needs Sentry trace to confirm no remaining path. Check if issue's lastSeen is post-07-05 commit.
+  - why: cannot confirm remaining callsite without Sentry trace (MCP unavailable)
+  - recommended owner: review-by-eod (get Sentry trace → confirm fix complete or find remaining path)
+
+- [Supabase] Impact check — idx_word_pacts_player2_id (shipped 2026-07-16)
+  - target: supabase:advisor:performance:unindexed_foreign_key
+  - status: deferred — Supabase MCP unavailable; query hint: SELECT * FROM pg_indexes WHERE indexname = 'idx_word_pacts_player2_id'
+  - why: MCP not connected this run
+  - recommended owner: self (next connected night — append verdict to impact-ledger.ndjson)
+
+- [Sentry] JAVASCRIPT-NEXTJS-1PV — TypeError: Cannot read properties of null (reading 'clear')
+  - last 24h, reach=6, score=0.102
+  - link: https://lexiclash.sentry.io/issues/132119253/
+  - status: deferred — could not localize without stack trace; candidates: useDictionaryCache memoryCache.clear(), MusicContext pendingStops.clear(), backend cleanupTimers.clear(). All look safe from static analysis — needs actual trace.
+  - why: MCP unavailable; static analysis inconclusive
+  - recommended owner: review-by-eod (get trace from Sentry UI)
+
+- [Supabase] upsert_push_token SECURITY DEFINER callable by authenticated role
+  - link: supabase:advisor:security:authenticated_security_definer_function_executable
+  - status: acknowledged-intentional — only callsite is app/api/player/push-token/route.ts (server-side, authed). Migration 20260628010000 explicitly grants authenticated, revokes public. By design.
+  - recommended owner: none (no action needed)

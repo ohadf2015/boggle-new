@@ -145,7 +145,7 @@ export function WordTowerGame() {
 
       {/* Daily badge + streak — the tower is the daily challenge, so this is
           always shown (non-action). Centred pill below the top chrome. */}
-      <div className="pointer-events-none fixed inset-x-0 top-14 z-50 flex justify-center px-2" dir={dir}>
+      <div className="pointer-events-none fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3.5rem)] z-50 flex justify-center px-2" dir={dir}>
         <div className="pointer-events-none flex items-center gap-1.5">
           <span className="flex items-center gap-1 rounded-neo border-neo border-black bg-neo-yellow px-2 py-1 font-neo-display text-[11px] font-black uppercase tracking-wide text-black shadow-hard-sm">
             <CalendarDays className="h-3 w-3" />

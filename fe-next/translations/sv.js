@@ -12273,7 +12273,10 @@ const sv = {
       "refundPolicy": "Återbetalningspolicy",
       "renewsOn": "Nästa förnyelse",
       "canceledAt": "Avslut väntar vid slutet av innevarande period",
-      "manageSubscription": "Hantera prenumeration"
+      "manageSubscription": "Hantera prenumeration",
+      "districtTitle": "Skola eller kommun?",
+      "districtSubtitle": "Hanterar du flera lärare eller klassrum? Vi erbjuder flexibel prissättning för skolor och kommuner.",
+      "districtCta": "Kontakta oss för skolpriser"
     },
     "teacher": {
       "activeGames": "Aktiva spel",

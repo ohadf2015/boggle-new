@@ -1,67 +1,31 @@
 {
-  "date": "2026-07-19",
-  "note": "7-day window: 4 routes above n≥50 floor. CLS CRITICAL across all routes (0.673–0.979). Homepage LCP 5127ms (slight improvement vs 5301ms 07-18 baseline; AnimatePresence fix landed). /en/multiplayer CLS 0.979 — worst reading ever, up from 0.716 on /es/multiplayer last baseline. Root cause investigation: spacer height mismatch hypothesis + NativeLanguageBanner conditional-render CLS. Supabase MCP absent (23rd consecutive night). All 6 migrations still pending.",
+  "date": "2026-07-20",
+  "note": "7-day window (n≥50 floor). CLS CRITICAL across all routes — /en/multiplayer 0.979 root cause identified (AutoHideHeader spacer dropped on reconnect) and fixed. Homepage CLS 0.903 still open. Supabase MCP absent (24th night). FK index migration still pending.",
   "backend": {
-    "advisor_warnings_count": 3,
-    "note": "Supabase MCP absent (23rd consecutive night). Migrations still pending apply: 20260628, 20260701, 20260706, 20260707, 20260715, 20260716. Advisor warnings: unindexed FK web_vitals_player_id_fkey, unused index idx_word_pacts_player2_id, auth DB connection strategy not percentage-based.",
+    "advisor_warnings_count": 2,
+    "note": "Supabase MCP absent. Advisor: unindexed FK web_vitals_player_id_fkey (migration pending 20260716), auth DB connection strategy. FK index verdict: neutral (migration never applied).",
     "top_queries": [],
-    "migrations_applied_this_run": [],
     "migrations_pending_apply": [
-      { "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql", "carry_count": 22 },
-      { "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql", "carry_count": 17 },
-      { "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql", "carry_count": 12 },
-      { "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql", "carry_count": 11 },
-      { "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql", "carry_count": 4 },
-      { "file": "fe-next/supabase/migrations/20260716020000_web_vitals_player_id_fk_index.sql", "carry_count": 3 }
+      { "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql", "carry_count": 23 },
+      { "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql", "carry_count": 18 },
+      { "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql", "carry_count": 13 },
+      { "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql", "carry_count": 12 },
+      { "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql", "carry_count": 5 },
+      { "file": "fe-next/supabase/migrations/20260716020000_web_vitals_player_id_fk_index.sql", "carry_count": 4 }
     ]
   },
   "frontend": {
-    "note": "7-day window, all routes n≥50. CLS CRITICAL on all 4 routes. LCP POOR on 3/4 routes. INP POOR on all 4 routes. /en/multiplayer CLS 0.979 is a new high-water mark — worse than 07-18 /es/multiplayer 0.716. Investigation: NativeLanguageBanner null→rendered CLS + AutoHideHeader spacer height drift are top hypotheses.",
+    "note": "7-day window (n≥50 floor). CLS CRITICAL all routes. Fix shipped for /en/multiplayer (AutoHideHeader spacer). Check in 3d. Homepage LCP 5127ms — AnimatePresence fix (07-18) not yet reflecting in 7d avg.",
     "by_route": [
-      {
-        "route": "/",
-        "p75_lcp_ms": 5127,
-        "p75_inp_ms": 346,
-        "p75_cls": 0.889,
-        "n_7d": 74,
-        "lcp_status": "POOR (>4000ms)",
-        "inp_status": "POOR (>200ms)",
-        "cls_status": "CRITICAL (>0.25) — NEW, not in 07-18 baseline"
-      },
-      {
-        "route": "/en",
-        "p75_lcp_ms": 3448,
-        "p75_inp_ms": 312,
-        "p75_cls": 0.892,
-        "n_7d": 63,
-        "lcp_status": "POOR (>2500ms)",
-        "inp_status": "POOR (>200ms)",
-        "cls_status": "CRITICAL — NEW"
-      },
-      {
-        "route": "/es/multiplayer",
-        "p75_lcp_ms": 3210,
-        "p75_inp_ms": 424,
-        "p75_cls": 0.673,
-        "n_7d": 139,
-        "lcp_status": "POOR (>2500ms)",
-        "inp_status": "POOR (>200ms)",
-        "cls_status": "CRITICAL — slight improvement vs 0.716 (07-18)"
-      },
-      {
-        "route": "/en/multiplayer",
-        "p75_lcp_ms": 1796,
-        "p75_inp_ms": 274,
-        "p75_cls": 0.979,
-        "n_7d": 113,
-        "lcp_status": "NEEDS_IMPROVEMENT (1500–2500ms)",
-        "inp_status": "POOR (>200ms)",
-        "cls_status": "CRITICAL — worst measured, needs DevTools visual QA"
-      }
+      { "route": "/en/multiplayer", "p75_lcp_ms": 1701, "p75_inp_ms": 268, "p75_cls": 0.979, "n_7d": 111, "cls_fix_shipped": true },
+      { "route": "/", "p75_lcp_ms": 5127, "p75_inp_ms": 242, "p75_cls": 0.903, "n_7d": 72 },
+      { "route": "/en", "p75_lcp_ms": 3002, "p75_inp_ms": 320, "p75_cls": 0.892, "n_7d": 58 },
+      { "route": "/es/multiplayer", "p75_lcp_ms": 3755, "p75_inp_ms": 476, "p75_cls": 0.673, "n_7d": 152 },
+      { "route": "/es/juego-de-palabras-multijugador", "p75_lcp_ms": 2933, "p75_inp_ms": 120, "p75_cls": 0.0, "n_7d": 51, "note": "CLS-free SEO landing — confirms CLS source is in dynamic MP/home components, not layout banners" }
     ]
   },
   "bundle": {
-    "note": "Production build not available this run (.next/ not built). Dev chunks only, not comparable.",
+    "note": "No .next build available this run.",
     "total_kb": null,
     "top_chunks": []
   }

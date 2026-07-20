@@ -12066,7 +12066,10 @@ const ja = {
       "refundPolicy": "返金ポリシー",
       "renewsOn": "次回の更新",
       "canceledAt": "現在の期間終了時に解約予定",
-      "manageSubscription": "サブスクリプションを管理"
+      "manageSubscription": "サブスクリプションを管理",
+      "districtTitle": "学校または学区ですか？",
+      "districtSubtitle": "複数の教師や教室を管理していますか？学校や学区向けに柔軟な料金プランをご用意しています。",
+      "districtCta": "学校向け料金についてお問い合わせ"
     },
     "teacher": {
       "activeGames": "進行中のゲーム",

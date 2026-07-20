@@ -11922,7 +11922,10 @@ const he = {
       "refundPolicy": "מדיניות החזרים",
       "renewsOn": "החידוש הבא",
       "canceledAt": "ביטול ממתין בסוף התקופה הנוכחית",
-      "manageSubscription": "ניהול מנוי"
+      "manageSubscription": "ניהול מנוי",
+      "districtTitle": "בית ספר או רשות?",
+      "districtSubtitle": "מנהלים כמה מורים או כיתות? אנחנו מציעים תמחור גמיש לבתי ספר ורשויות חינוך.",
+      "districtCta": "צרו קשר לתמחור לבתי ספר"
     },
     "teacher": {
       "activeGames": "משחקים פעילים",

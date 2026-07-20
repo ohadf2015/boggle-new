@@ -713,6 +713,23 @@ export const EXPERIMENTS = {
     description:
       'MP results ready-button micro-delight. emoji-burst = show 🎯 emoji for 1s after clicking ready (before settling to ✓ disabled state). control = immediate checkmark. Targets mp_round sentiment (avg 1.5/3). Conversion = game_feedback avg on mp_round improves.',
   }),
+
+  /**
+   * Show rival's highest-scoring word in the 2-player round results stat strip.
+   * Hypothesis: knowing the word the opponent scored most on ("Rival's best: QUARTZ")
+   * makes the score gap feel earned and gives players a concrete takeaway, improving
+   * mp_round sentiment from its current 1.43/3 avg.
+   * Conversion: game_feedback avg rating on mp_round (surface='mp_round') rises.
+   * Guardrail: mp_results_exit_clicked must not rise (players shouldn't bail faster).
+   * PostHog flag key = 'exp-mp-results-rival-best-word-v1', 50/50 rollout.
+   * Wire: ResultsMainContent.tsx — highlightStats, 2-player only (showRivals=true).
+   */
+  'exp-mp-results-rival-best-word-v1': defineExperiment({
+    variants: ['control', 'show-rival-word'] as const,
+    default: 'control',
+    description:
+      'MP 2p results: show-rival-word = add rival\'s highest-scoring word as a stat chip ("Rival\'s best: WORD"). control = no change. Targets mp_round avg 1.43/3. Only shown when allPlayerWords data is present for the opponent.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

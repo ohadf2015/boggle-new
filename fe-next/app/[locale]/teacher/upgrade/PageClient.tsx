@@ -275,6 +275,25 @@ export default function UpgradePricingPageClient() {
           </div>
         </div>
 
+        {/* District / school bulk pricing CTA */}
+        <div className="border-3 border-black rounded-neo p-7 sm:p-8 shadow-hard bg-neo-lime mb-12 flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+          <div className="flex-1 text-center sm:text-start">
+            <h2 className="text-xl font-neo-display font-black text-neo-black mb-1">
+              {t('teacher.subscription.districtTitle')}
+            </h2>
+            <p className="text-sm font-bold text-neo-black/80 leading-snug">
+              {t('teacher.subscription.districtSubtitle')}
+            </p>
+          </div>
+          <a
+            href="mailto:lexiclash.game@gmail.com?subject=School%20%2F%20District%20Pricing"
+            onClick={() => trackGrowthEvent('iap_viewed', { product: 'district_inquiry' })}
+            className="flex-shrink-0 bg-neo-black text-neo-white font-black text-sm border-2 border-black rounded-neo px-5 py-3 shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none whitespace-nowrap"
+          >
+            {t('teacher.subscription.districtCta')}
+          </a>
+        </div>
+
         {/* Legal Links */}
         <div className="text-center border-t border-neo-cream/20 pt-8">
           <p className="text-neo-white/70 font-bold text-sm mb-4">

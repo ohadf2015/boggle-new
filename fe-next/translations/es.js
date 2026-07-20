@@ -12068,7 +12068,10 @@ const es = {
       "refundPolicy": "Política de reembolsos",
       "renewsOn": "Próxima renovación",
       "canceledAt": "Cancelación pendiente al final del periodo actual",
-      "manageSubscription": "Gestionar suscripción"
+      "manageSubscription": "Gestionar suscripción",
+      "districtTitle": "¿Escuela o distrito?",
+      "districtSubtitle": "¿Gestionas varios profesores o clases? Ofrecemos precios flexibles para escuelas y distritos.",
+      "districtCta": "Contáctanos para precios escolares"
     },
     "accessRequired": "Acceso de Profesor Requerido",
     "accessDenied": "Necesitas permisos de profesor para esta página.",

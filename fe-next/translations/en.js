@@ -2901,6 +2901,7 @@ const en = {
     "place": "Place",
     "words": "Words",
     "bestWord": "Best Word",
+    "rivalBestWord": "Rival's Best",
     "bestCombo": "Best Combo",
     "playersReady": "{count}/{total} Ready",
     "missedWords": "Missed",
@@ -11107,7 +11108,10 @@ const en = {
       "refundPolicy": "Refund Policy",
       "renewsOn": "Next renewal",
       "canceledAt": "Cancellation pending at end of current period",
-      "manageSubscription": "Manage Subscription"
+      "manageSubscription": "Manage Subscription",
+      "districtTitle": "School or district?",
+      "districtSubtitle": "Managing multiple teachers or classrooms? We offer flexible pricing for schools and districts.",
+      "districtCta": "Get in touch for school pricing"
     }
   },
   "education": {
