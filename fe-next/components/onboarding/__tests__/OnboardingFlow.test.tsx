@@ -242,10 +242,12 @@ describe('OnboardingFlow', () => {
     expect(mockPush).not.toHaveBeenCalled();
   });
 
-  it('navigates to the Daily Challenge after the style step', () => {
+  it('navigates to the practice game after the style step', () => {
+    // FTUE completers are routed straight into a practice game (commit 977186dd),
+    // not the Daily Challenge, so the first thing they do is play.
     render(<OnboardingFlow {...defaultProps} />);
     finishFlow();
-    expect(mockPush).toHaveBeenCalledWith('/en/daily');
+    expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
   });
 
   it('calls onComplete after the style step', () => {
@@ -309,11 +311,11 @@ describe('OnboardingFlow', () => {
       expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/multiplayer?room='));
     });
 
-    it('redirects to the Daily Challenge after the style step when no pending invite', () => {
+    it('redirects to the practice game after the style step when no pending invite', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
       finishFlow();
-      expect(mockPush).toHaveBeenCalledWith('/en/daily');
+      expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
     });
   });
 
