@@ -221,6 +221,15 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
     };
 }
 
+// WORKAROUND for Next.js 16 memory leak (vercel/next.js#90433): with
+// `output: 'standalone'`, server-side fetches that go through Next's Data Cache
+// leave tee'd ReadableStream branches uncancelled, retained forever by the
+// internal `cacheController` (~7.7MB per render, verified via heap-snapshot diff
+// 2026-07-20 → OOM). Forcing fetches to no-store bypasses the Data Cache tee.
+// Cascades to all [locale] routes. Landing data is still amortized by the
+// in-process TTL cache (lib/cache/ttlCache). REMOVE once #90433 is fixed upstream.
+export const fetchCache = 'force-no-store';
+
 export const viewport = {
     width: 'device-width',
     initialScale: 1,
