@@ -3406,6 +3406,7 @@ const he = {
     "place": "מקום",
     "words": "מילים",
     "bestWord": "המילה הטובה ביותר",
+    "rivalBestWord": "המילה של היריב",
     "bestCombo": "קומבו הכי טוב",
     "playersReady": "{count}/{total} מוכנים",
     "missedWords": "מילים שפספסת",
