@@ -37,6 +37,7 @@ import {
   initialTowerSurpriseSeed,
   type TowerSurpriseState,
   type ActiveTowerSurprise,
+  type TowerSurpriseEvent,
 } from './towerSurprise';
 
 // --- deterministic RNG (imported from @/lib/rng/seededRandom) ---
@@ -282,6 +283,12 @@ export interface WordTowerFloor {
   meters: number;
   /** Crane Stack drop quality applied to this floor's height (default 1). */
   placementMultiplier?: number;
+  /** If a variable-reward surprise fired on the word that placed this floor, the
+   *  event id — lets the renderer draw a special "surprise block" (gold, crystal,
+   *  meteor…) so a cool moment leaves a permanent, visible mark on the tower.
+   *  Deterministic (seeded upstream) + serialized, so a resumed/replayed run
+   *  redraws the same special floors. Purely cosmetic — never affects height. */
+  surprise?: TowerSurpriseEvent;
 }
 export interface WordTowerPlayerState {
   gameCode: string;
@@ -474,7 +481,7 @@ export function applyTowerWord(
 
   const next: WordTowerPlayerState = {
     ...state,
-    floors: [...state.floors, { word: w, len, meters, placementMultiplier }],
+    floors: [...state.floors, { word: w, len, meters, placementMultiplier, surprise: surprise.next.activeSurprise?.event }],
     heightM,
     combo,
     // No chain: the anchor stays empty; the wheel carries over unchanged.

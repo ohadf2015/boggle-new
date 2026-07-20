@@ -14,6 +14,15 @@ describe('buildTowerColumn', () => {
     expect(cells.every((c) => c.kind === 'letter' && c.color === c0 && !c.shared)).toBe(true);
   });
 
+  it('tags a surprise floor onto its emitted letter cells (for the surprise-block render)', () => {
+    const cells = buildTowerColumn([{ word: 'CAT' }, { word: 'TOP', surprise: 'golden_floor' }]);
+    // 'T' connector merges into floor 0's tail; floor 1 emits only 'O','P'.
+    const tagged = cells.filter((c) => c.kind === 'letter' && c.surprise === 'golden_floor');
+    expect(tagged.map((c) => (c.kind === 'letter' ? c.char : '#'))).toEqual(['O', 'P']);
+    // Ordinary floor 0 letters carry no surprise tag.
+    expect(cells.slice(0, 3).every((c) => c.kind === 'letter' && c.surprise === undefined)).toBe(true);
+  });
+
   it('Hebrew word is unicode-safe (one cell per letter, logical order bottom→top)', () => {
     const cells = buildTowerColumn([{ word: 'שלום' }]);
     expect(cells).toHaveLength(4);

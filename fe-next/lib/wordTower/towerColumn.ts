@@ -11,10 +11,14 @@
  * consumes {@link buildTowerColumn} + {@link wordColor} + {@link blendColors}.
  */
 
+import type { TowerSurpriseEvent } from './towerSurprise';
+
 /** One row of the tower. `letter` cells carry a glyph; `brick` cells are the
- *  spoiler-free versus rows (rival words are hidden, only height is shown). */
+ *  spoiler-free versus rows (rival words are hidden, only height is shown).
+ *  `surprise` marks a cell whose floor was placed on a variable-reward pop, so
+ *  the renderer can draw it as a distinct "surprise block" (cosmetic only). */
 export type ColumnCell =
-  | { kind: 'letter'; char: string; color: number; shared: boolean }
+  | { kind: 'letter'; char: string; color: number; shared: boolean; surprise?: TowerSurpriseEvent }
   | { kind: 'brick'; color: number };
 
 // Vibrant neo-brutalist saturation/lightness — bright enough for dark glyphs,
@@ -106,7 +110,9 @@ export function textColorOn(hex: number): number {
  * single brick cell. Array index === stable global row index (the tower is
  * append-only), which the scene uses as its sprite-registry key.
  */
-export function buildTowerColumn(floors: ReadonlyArray<{ word: string }>): ColumnCell[] {
+export function buildTowerColumn(
+  floors: ReadonlyArray<{ word: string; surprise?: TowerSurpriseEvent }>,
+): ColumnCell[] {
   const cells: ColumnCell[] = [];
   floors.forEach((floor, i) => {
     const color = wordColor(i);
@@ -132,7 +138,7 @@ export function buildTowerColumn(floors: ReadonlyArray<{ word: string }>): Colum
       start = conn;
     }
     for (let j = start; j < chars.length; j++) {
-      cells.push({ kind: 'letter', char: chars[j], color, shared: false });
+      cells.push({ kind: 'letter', char: chars[j], color, shared: false, surprise: floor.surprise });
     }
   });
   return cells;

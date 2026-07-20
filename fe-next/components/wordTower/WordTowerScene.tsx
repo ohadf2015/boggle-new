@@ -9,6 +9,7 @@ import { biomeForHeight, type WordTowerFloor, type ApplyResult } from '@/lib/wor
 import type { WordTowerBiomeId } from '@/shared/constants/wordTowerConstants';
 import { buildTowerColumn, cellAltitudes, wordColor } from '@/lib/wordTower/towerColumn';
 import { gradeBlockColor, blockSurface, ZONE_MATERIAL, type BlockSurface, type ZoneMaterialPalette } from '@/lib/wordTower/blockGrade';
+import { surpriseBlockColor } from '@/lib/wordTower/surpriseBlockStyle';
 import { viewAltitudeFor } from '@/lib/wordTower/viewAltitude';
 import { biomeBlendAt } from '@/lib/wordTower/biomeBlend';
 import { letterPlacementFx } from '@/lib/wordTower/placementFx';
@@ -327,11 +328,15 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
 
     const live: LiveCell[] = committed.map((cell, i) => {
       const zone = biomeForHeight(alts[i] ?? 0);
+      // A surprise floor keeps its bold signature colour UNgraded, so a cool
+      // moment stands out as a bright landmark against the biome-graded tower.
+      const surprise = cell.kind === 'letter' ? cell.surprise : undefined;
+      const sigColor = surpriseBlockColor(surprise);
       return {
         key: `s${i}`,
         pos: i,
         char: cell.kind === 'letter' ? cell.char : null,
-        color: gradeBlockColor(cell.color, zone, palette),
+        color: sigColor ?? gradeBlockColor(cell.color, zone, palette),
         surface: blockSurface(zone),
         pending: false,
         shared: cell.kind === 'letter' ? cell.shared : false,
