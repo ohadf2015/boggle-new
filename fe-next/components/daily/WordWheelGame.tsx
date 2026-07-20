@@ -123,6 +123,10 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
   const [isValidating, setIsValidating] = useState(false);
   const [outerLetters, setOuterLetters] = useState(puzzle.outerLetters);
   const [lastWordScore, setLastWordScore] = useState<number | null>(null);
+  // Monotonic id for the flying "+score" element's key. Using Date.now() here
+  // recomputed the key on every render, remounting the element (and restarting
+  // its 1.2s fly animation) whenever anything else re-rendered mid-flight.
+  const [scoreFlyId, setScoreFlyId] = useState(0);
   const [combo, setCombo] = useState(0);
   const comboTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [wordBuilderShake, setWordBuilderShake] = useState(false);
@@ -621,6 +625,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         onWordFound?.(word, nextWordsFound);
         setScore(prev => prev + points);
         setLastWordScore(points);
+        setScoreFlyId(id => id + 1);
         setTimeout(() => setLastWordScore(null), 1200);
         showFeedback(`+${points}`, 'success');
         setBuiltLetters([]);
@@ -1022,7 +1027,7 @@ const WordWheelGame: React.FC<WordWheelGameProps> = ({
         <AnimatePresence>
           {lastWordScore !== null && (
             <m.div
-              key={`score-${Date.now()}`}
+              key={`score-${scoreFlyId}`}
               className="absolute top-0 left-1/2 -translate-x-1/2 font-neo-display font-black text-neo-lime text-3xl pointer-events-none z-20"
               initial={{ opacity: 1, y: 0, scale: 0.5 }}
               animate={{ opacity: 0, y: -60, scale: 1.5 }}

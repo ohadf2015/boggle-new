@@ -147,6 +147,7 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   const pointsToPass = nextRival ? nextRival.score - myScore : 0;
 
   const fbTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shakeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoResetTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Drag-release submits clear instantly on rejection; tap submits wait 1.5s.
   const lastSubmitWasDragRef = useRef(false);
@@ -231,7 +232,11 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
     if (type === 'err') {
       setWordBuilderShake(true);
       haptic([30, 50, 30]);
-      setTimeout(() => setWordBuilderShake(false), 400);
+      if (shakeTimer.current) clearTimeout(shakeTimer.current);
+      shakeTimer.current = setTimeout(() => {
+        shakeTimer.current = null;
+        setWordBuilderShake(false);
+      }, 400);
       // Auto-clear the rejected built word so the next attempt isn't blocked.
       // Drag-release errors clear instantly; tap errors get a 1.5s read window.
       if (autoResetTimerRef.current) clearTimeout(autoResetTimerRef.current);
@@ -276,6 +281,8 @@ export const WheelRushView: React.FC<Props> = ({ socket, username, leaderboard, 
   useEffect(() => { celebrateRef.current = triggerCelebration; }, [triggerCelebration]);
   useEffect(() => () => {
     if (celebrationTimerRef.current) { clearTimeout(celebrationTimerRef.current); celebrationTimerRef.current = null; }
+    if (fbTimer.current) { clearTimeout(fbTimer.current); fbTimer.current = null; }
+    if (shakeTimer.current) { clearTimeout(shakeTimer.current); shakeTimer.current = null; }
   }, []);
 
   // Socket wiring
