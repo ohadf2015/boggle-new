@@ -172,7 +172,7 @@ export default function SealedBidPage() {
       setRoundIndex((i) => i + 1);
       setPhase('bidding');
     }
-  }, [phase, settlement, currentDeal, wallet, roundIndex, language, playSound, addCoins]);
+  }, [phase, settlement, currentDeal, wallet, roundIndex, language, playSound, addCoins, chosenWord]);
 
   const newGame = useCallback(() => {
     const seed = `${language}-${Date.now()}`;
