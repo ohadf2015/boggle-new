@@ -140,4 +140,18 @@ describe('WordTowerHud deck', () => {
       expect(screen.getByTestId('wt-control-deck').className).toContain('--admob-banner-height');
     });
   });
+
+  describe('responsive wheel sizing', () => {
+    // On short/landscape viewports the fixed 230px wheel + deck chrome + banner
+    // ate the whole bottom of the screen. The wheel must scale DOWN with viewport
+    // height (aspect-square → a narrower cap also shortens it) so it never crowds
+    // the upper HUD or the lower ad band. Uses the project's height variants.
+    it('caps the wheel smaller as the viewport gets shorter', () => {
+      render(<WordTowerHud {...baseProps()} />);
+      const wheel = screen.getByRole('group');
+      expect(wheel.className).toContain('max-w-[230px]');       // full size, tall screens
+      expect(wheel.className).toContain('medium-short:max-w-'); // shrinks ≤850px tall
+      expect(wheel.className).toContain('short:max-w-');        // shrinks further ≤600px tall
+    });
+  });
 });
