@@ -84,6 +84,15 @@ const sv = {
     "dismiss": "Okej",
     "sampleWord": "SOL"
   },
+  "directionsTutorial": {
+    "badge": "Snabbtips",
+    "title": "Dra åt valfritt håll",
+    "subtitle": "Bokstäver kopplas ihop om de nuddar — även diagonalt.",
+    "tryPrompt": "Din tur — dra det diagonala ordet",
+    "donePrompt": "Snyggt! Diagonaler räknas också 🎉",
+    "cta": "Nu kör vi",
+    "ctaWait": "{{seconds}} s"
+  },
   "modeCoach": {
     "skip": "Hoppa över",
     "next": "Nästa",
