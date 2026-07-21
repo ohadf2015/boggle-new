@@ -703,6 +703,11 @@ if [ "$gate_ok" = "0" ]; then
       ;;
     2)
       log "isolated gate setup unavailable — falling back to in-place whole-tree gate"
+      # The in-place gate runs the same bare-binary npm scripts (lint/test/build:fast)
+      # against the main tree, so it hits the same broken-.bin "command not found" the
+      # isolated gate just self-healed in its worktree. Heal the main tree too, or this
+      # fallback fails on tooling, not code (2026-07-21).
+      _gate_ensure_bin fe-next
       for attempt in 1 2; do
         [ "$gate_ok" = "1" ] && break
         log "gate attempt $attempt: fe-next lint + test + build:fast (in-place fallback)"

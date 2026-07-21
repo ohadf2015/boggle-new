@@ -28,7 +28,9 @@ setup() {
     mkdir -p fe-next/app fe-next/node_modules/.bin
     printf 'export const v = "COMMITTED";\n' > fe-next/app/lane.ts
     printf 'export const w = "COMMITTED";\n' > fe-next/app/founder.ts
-    printf '#!/bin/sh\necho fake\n' > fe-next/node_modules/.bin/eslint
+    # A healthy node_modules/.bin has the dev tools the gate invokes; stub all four
+    # so _gate_ensure_bin sees them present and skips its npm-rebuild self-heal.
+    for b in eslint vitest tsc next; do printf '#!/bin/sh\necho fake\n' > "fe-next/node_modules/.bin/$b"; done
     git add -A; git commit -qm init )
 }
 teardown() { ( cd "$PROJECT_DIR" && git worktree prune 2>/dev/null ); rm -rf "$PROJECT_DIR"; }
@@ -597,6 +599,45 @@ export NIGHTLY_GATE_CMD='! grep -q "broken = (" app/lane.ts'   # committed HEAD 
 run_baseline_gate 0; rc=$?
 assert "baseline gate FAILS when HEAD itself is broken (red-master signal)" "[ $rc -eq 1 ]"
 unset NIGHTLY_GATE_CMD; teardown
+
+echo "── gate-isolated: toolchain error (missing tool binary) is SETUP-failed, not code-failed ──"
+# 2026-07-21 false-drop: node_modules/.bin lost its eslint/vitest symlinks (concurrent
+# npm installs), the CoW clone inherited the breakage, `npm run lint` died with
+# "sh: eslint: command not found" (rc 127), the gate flattened it to rc=1, drop-and-re-gate
+# found no offender and DROPPED 14 build-clean files. A missing-tool failure is an
+# ENVIRONMENT failure (rc=2 → in-place fallback), never a content failure (rc=1 → drop).
+
+# (a) Pure classifier — the discriminator, locked without a worktree.
+TC_OUT=$(mktemp)
+printf 'sh: eslint: command not found\n' > "$TC_OUT"
+assert "classifier: 'command not found' → toolchain error (true)" "nightly_gate_output_is_toolchain_error \"$TC_OUT\""
+printf 'sh: 1: vitest: not found\n' > "$TC_OUT"
+assert "classifier: dash '<tool>: not found' → toolchain error (true)" "nightly_gate_output_is_toolchain_error \"$TC_OUT\""
+printf 'app/foo.tsx(12,3): error TS2304: Cannot find name x.\n' > "$TC_OUT"
+assert "classifier: a real tsc error is NOT a toolchain error (false)" "! nightly_gate_output_is_toolchain_error \"$TC_OUT\""
+: > "$TC_OUT"
+assert "classifier: empty output is NOT a toolchain error (false)" "! nightly_gate_output_is_toolchain_error \"$TC_OUT\""
+rm -f "$TC_OUT"
+
+# (b) End-to-end via the seam: a gate that fails with "command not found" → rc=2, code untouched.
+setup
+printf 'export const v = "LANE_VERSION";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='echo "sh: eslint: command not found"; exit 127'
+run_isolated_gate "$AUTH"; rc=$?
+assert "gate FAILING with 'command not found' returns rc=2 (setup), NOT rc=1 (drop)" "[ $rc -eq 2 ]"
+assert "main tree lane file untouched on toolchain-error gate" \
+  "grep -q LANE_VERSION \"\$PROJECT_DIR/fe-next/app/lane.ts\""
+unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
+
+# (c) Regression guard: a REAL content failure (no command-not-found) still returns rc=1.
+setup
+printf 'export const v = "LANE_BROKEN";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='echo "app/lane.ts(1,1): error TS1005"; exit 1'
+run_isolated_gate "$AUTH"; rc=$?
+assert "a real content failure (no missing-tool signature) still returns rc=1 (peel intact)" "[ $rc -eq 1 ]"
+unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
 
 echo
 echo "gate-isolated: $PASS passed, $FAIL failed"

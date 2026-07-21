@@ -25,6 +25,55 @@ NIGHTLY_GATE_ENV_FILES=(
   "fe-next/.env.production.local"
 )
 
+# nightly_gate_output_is_toolchain_error <gate_output_file> → exit 0 (true) iff the
+# gate failed because a TOOL BINARY was missing (rc 127 "command not found"), NOT
+# because the lane code is broken.
+#
+# WHY (2026-07-21 false-drop): this workstation's fe-next/node_modules/.bin dev-tool
+# symlinks (eslint, vitest, next, tsc) go MISSING intermittently — parallel sessions
+# running concurrent `npm install`s corrupt them (only 60 of the bin entries survived;
+# eslint/vitest/next/tsc were all gone). The isolated gate CoW-clones node_modules
+# faithfully, so `npm run lint` / `npm run test:changed` — which invoke the BARE
+# binaries (`eslint`, `vitest`) via .bin — die with `sh: eslint: command not found`
+# (rc 127). tsc alone survived because the gate already runs it as `npx --no-install
+# tsc` (.bin-independent). rc 127 was flattened to rc=1 (line ~302: "any nonzero that
+# isn't 124/137 → rc=1") → drop-and-re-gate found no parseable offender → DROPPED all
+# 14 build-clean authored files and shipped docs-only. A missing-tool failure is an
+# ENVIRONMENT failure (rc=2, caller falls back to the in-place gate — never a code
+# drop), the same class as the 124/137 timeout/OOM inconclusive already special-cased.
+# Best-effort: false on empty/missing output. Only ever consulted on a FAILED gate,
+# where "command not found" is overwhelmingly a missing tool, not lane-code output.
+nightly_gate_output_is_toolchain_error() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 1
+  # `sh: eslint: command not found` (bash/zsh) and `sh: 1: eslint: not found` (dash/ash)
+  # are the two shell "binary missing" spellings npm's script runner emits.
+  LC_ALL=C grep -qaE 'command not found|[^[:alnum:]_]not found$' "$out" 2>/dev/null
+}
+
+# _gate_ensure_bin <worktree_fe_next_dir> → self-heal node_modules/.bin before gating.
+# The CoW-cloned node_modules inherits the main repo's (recurringly) broken .bin, so
+# the bare-binary npm scripts (lint, test:changed, build:fast) would fail with
+# "command not found". `npm rebuild` re-links every installed package's bin without
+# touching the lockfile or fetching from the network (verified: restores eslint/
+# vitest/tsc/next in one pass). Only runs when a tool is actually missing, so healthy
+# clones pay nothing. Bounded by gtimeout if present so a contended rebuild can't wedge
+# the gate. Failure is non-fatal — the toolchain-error classifier below is the net.
+_gate_ensure_bin() {
+  local fe="$1" b need=0
+  [ -d "$fe/node_modules" ] || return 0
+  for b in eslint vitest tsc next; do
+    [ -e "$fe/node_modules/.bin/$b" ] || { need=1; break; }
+  done
+  [ "$need" = "1" ] || return 0
+  log "isolated-gate: node_modules/.bin missing dev-tool symlink(s) — self-healing with 'npm rebuild' (recurring broken-.bin condition; would otherwise fail the gate with 'command not found' and false-drop clean code)"
+  if command -v gtimeout >/dev/null 2>&1; then
+    ( cd "$fe" && gtimeout 300 npm rebuild >/dev/null 2>>"$RUN_LOG" )
+  else
+    ( cd "$fe" && npm rebuild >/dev/null 2>>"$RUN_LOG" )
+  fi || log "isolated-gate: 'npm rebuild' self-heal failed — toolchain-error classifier will treat any resulting 'command not found' as a SETUP failure, not a code failure"
+}
+
 # _gate_npm_chain <skip_lint> → the bash -c body that runs the gate inside fe-next.
 # skip_lint=1 OMITS `npm run lint`. Used by the baseline-poison salvage: when every
 # gate-failing file is NON-authored (a pre-existing lint error on the untouched
@@ -227,6 +276,8 @@ run_isolated_gate() {
     cp -Rc "$PROJECT_DIR/fe-next/node_modules" "$wt/fe-next/node_modules" 2>>"$RUN_LOG" \
       || cp -R "$PROJECT_DIR/fe-next/node_modules" "$wt/fe-next/node_modules" 2>>"$RUN_LOG" \
       || { log "isolated-gate: node_modules clone failed — falling back to in-place gate"; _isolated_gate_cleanup "$wt"; return 2; }
+    # Regenerate .bin symlinks the clone may have inherited broken (see _gate_ensure_bin).
+    _gate_ensure_bin "$wt/fe-next"
   fi
   # Build-time env (gitignored → absent from the checkout).
   local envf
@@ -299,7 +350,18 @@ run_isolated_gate() {
     log "isolated-gate: did NOT complete (rc=${rc:-0}: wedged ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle, or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop) — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
     rc=3
   elif [ "${rc:-0}" != "0" ]; then
-    rc=1
+    # A MISSING TOOL BINARY (rc 127 "command not found") is an ENVIRONMENT failure, not
+    # broken lane code. Left as rc=1 it flows to drop-and-re-gate which, finding no
+    # parseable offender, drops ALL authored code (the 2026-07-21 false-drop of 14 clean
+    # files). Reclassify to rc=2 → caller falls back to the in-place gate; code is never
+    # dropped. _gate_ensure_bin above should prevent this; this is the belt to its
+    # suspenders (e.g. if npm rebuild itself failed under contention).
+    if nightly_gate_output_is_toolchain_error "$NIGHTLY_LAST_GATE_OUTPUT"; then
+      log "isolated-gate: FAILED on a missing tool binary ('command not found'), NOT lane code — node_modules/.bin unprovisioned even after self-heal. Classifying as SETUP failure (rc=2 → in-place fallback), never a code failure that would drop clean authored code."
+      rc=2
+    else
+      rc=1
+    fi
   fi
   cat "$NIGHTLY_LAST_GATE_OUTPUT" >> "$RUN_LOG" 2>/dev/null || true
 
