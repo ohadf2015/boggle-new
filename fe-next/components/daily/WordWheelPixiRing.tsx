@@ -116,8 +116,16 @@ export default function WordWheelPixiRing({
           return;
         }
 
-        // Schedule the next frame so long as we're still mounted.
-        if (!destroyed && rafId === null) rafId = requestAnimationFrame(frame);
+        // Schedule the next frame FIRST so an early return never stalls the loop.
+        // Must be unconditional: during a running loop rafId always holds the
+        // CURRENT frame's id (never null — it's only nulled by the hidden-tab
+        // branch above, which returns early), so an `rafId === null` guard here
+        // reschedules zero times and the loop dies after one frame — freezing the
+        // orbital particles and killing connection-line redraws (regression from
+        // 8c43e20ab). Rescheduling every visible frame keeps exactly one frame in
+        // flight; the hidden-tab pause + handleVisibility(rafId===null) resume path
+        // remains the only place a new loop is (re)started, so no double-schedule.
+        if (!destroyed) rafId = requestAnimationFrame(frame);
 
         // Guard: cleanup calls cancelAnimationFrame on unmount (below), but a
         // frame already dispatched by the browser before that call still runs
