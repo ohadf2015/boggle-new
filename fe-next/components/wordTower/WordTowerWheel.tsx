@@ -140,7 +140,14 @@ export function WordTowerWheel({
 
   return (
     <div
-      className="relative mx-auto aspect-square w-full max-w-[230px] touch-none select-none"
+      // Centering: `mx-auto` keeps the wheel horizontally centred inside its
+      // (symmetric) grid column in both LTR and RTL.
+      // Responsive height: the wheel is aspect-square, so a smaller max-WIDTH also
+      // makes it SHORTER. Step the cap down on shorter viewports so the wheel +
+      // deck chrome + ad-banner band never crowd the upper HUD or get clipped at
+      // the bottom on small/landscape phones. Percentage-based letter positions
+      // and tile sizes scale with the box, so it just gets proportionally smaller.
+      className="relative mx-auto aspect-square w-full max-w-[230px] medium-short:max-w-[200px] short:max-w-[172px] touch-none select-none"
       onPointerDown={onDown}
       onPointerMove={placing ? undefined : handlePointerMove}
       onPointerUp={placing ? undefined : handlePointerUp}

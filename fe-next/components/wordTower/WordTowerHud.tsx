@@ -201,18 +201,26 @@ export function WordTowerHud(props: WordTowerHudProps) {
           While placing, the deck tints lime to read as ARMED. */}
       <div
         ref={deckRef}
+        data-testid="wt-control-deck"
         className={cn(
           'pointer-events-auto relative space-y-1 rounded-t-neo border-t-neo-thick border-black px-4 pt-0.5 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-200',
           isPlacing
             ? 'bg-gradient-to-b from-neo-lime/15 via-neo-navy/95 to-neo-navy/95'
             : 'bg-neo-navy/95',
-          // Keep the bottom controls clear of the screen edge / home-indicator so
-          // they're comfortable to tap (open), and float the grab handle well
-          // above the edge when collapsed so re-opening the drawer never grazes
-          // the system back-gesture zone and exits the game.
+          // Bottom clearance, layered so the wheel is never clipped or awkward:
+          //   1. env(safe-area-inset-bottom) — the home-indicator / gesture zone.
+          //   2. var(--admob-banner-height,0px) — the native AdMob banner band.
+          //      Native banners COMPOSITE ABOVE the WebView, so DOM padding alone
+          //      can't clear them; reserving this band lifts the whole deck (and
+          //      thus the wheel's bottom letters + glow ring) above the banner.
+          //      The var self-zeros on web / when no banner shows, so this is a
+          //      no-op there. (deckRef.offsetHeight grows with it → the tower
+          //      grounds above the banner too, keeping the scene consistent.)
+          //   3. a comfortable tap gap so controls never hug the very edge (and,
+          //      collapsed, the grab handle floats clear of the back-gesture zone).
           deckOpen
-            ? 'pb-[calc(env(safe-area-inset-bottom)+1.65rem)]'
-            : 'pb-[calc(env(safe-area-inset-bottom)+1.6rem)]',
+            ? 'pb-[calc(env(safe-area-inset-bottom)+var(--admob-banner-height,0px)+1.65rem)]'
+            : 'pb-[calc(env(safe-area-inset-bottom)+var(--admob-banner-height,0px)+1.6rem)]',
         )}
       >
         {/* Drawer grip — collapse the deck to free the screen for the tower. */}
@@ -298,35 +306,49 @@ export function WordTowerHud(props: WordTowerHudProps) {
           </div>
         )}
 
-        {/* Builder row — the WHEEL flanked by its two tools. Flanking (instead of
-            a cramped button row beneath the wheel) gives the bigger wheel its
-            room AND pushes Change-letters / Delete to opposite edges so they're
-            never mis-tapped (founder ask 2026-06-26: bigger wheel, move + space
-            the buttons). The BUILD / DROP CTA still lives in the wheel's centre
-            hub. Tools are disabled while a word is in flight. RTL: the flex row
-            mirrors automatically, so scramble/delete swap sides cleanly. */}
-        <div className="mx-auto flex max-w-md items-center justify-center gap-3">
-          {isStuck && (
-            <button
-              type="button"
-              onClick={onScramble}
-              disabled={!canScramble || isPlacing}
-              className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-purple px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
-              aria-label={t('wordTower.hud.scramble')}
-            >
-              <Shuffle className="h-5 w-5" />
-              {hasBonusScramble ? (
-                // Free bonus scramble in the bank — show how many remain.
-                <span className="tabular-nums">{scramblesLeft}</span>
-              ) : (
-                // Out of bonuses → the coin price to buy a fresh wheel.
-                <span className="flex items-center gap-0.5 tabular-nums">
-                  <Coins className="h-3 w-3" aria-hidden />{scrambleCost}
-                </span>
-              )}
-            </button>
-          )}
-          <div className={cn('flex-1 transition-[filter] duration-300', lastError && errorKey > 0 && 'animate-neo-shake')}>
+        {/* Builder row — the WHEEL centered, flanked by SYMMETRIC tool slots.
+            Each side reserves an equal fixed-width column that is ALWAYS in flow
+            (even when its tool is hidden), so the wheel sits in the grid's centre
+            column and stays screen-centered regardless of which flanking tools
+            are visible OR the writing direction. The previous `flex` layout put
+            the wheel in a `flex-1` region flanked by only the single always-on
+            trailing tool — that one-sided offset pulled the wheel off-centre, and
+            under RTL it flipped to the visual right edge (the reported bug). A
+            grid with equal side tracks makes centring direction-agnostic: `mx-auto`
+            on the wheel alone can't, because the flanks eat unequal space. The
+            BUILD / DROP CTA still lives in the wheel's centre hub; tools are
+            disabled while a word is in flight. */}
+        <div
+          data-testid="wt-builder-row"
+          className="mx-auto grid max-w-md grid-cols-[3.5rem_1fr_3.5rem] items-center gap-3"
+        >
+          {/* Start slot — scramble (only when stuck); the column is reserved
+              either way so its presence/absence never shifts the wheel. */}
+          <div data-testid="wt-tool-slot-start" className="flex justify-center">
+            {isStuck && (
+              <button
+                type="button"
+                onClick={onScramble}
+                disabled={!canScramble || isPlacing}
+                className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-purple px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+                aria-label={t('wordTower.hud.scramble')}
+              >
+                <Shuffle className="h-5 w-5" />
+                {hasBonusScramble ? (
+                  // Free bonus scramble in the bank — show how many remain.
+                  <span className="tabular-nums">{scramblesLeft}</span>
+                ) : (
+                  // Out of bonuses → the coin price to buy a fresh wheel.
+                  <span className="flex items-center gap-0.5 tabular-nums">
+                    <Coins className="h-3 w-3" aria-hidden />{scrambleCost}
+                  </span>
+                )}
+              </button>
+            )}
+          </div>
+          {/* Wheel — the grid's centre column keeps it strictly screen-centered
+              in both LTR and RTL, whatever tools flank it. */}
+          <div className={cn('w-full transition-[filter] duration-300', lastError && errorKey > 0 && 'animate-neo-shake')}>
             <WordTowerWheel
               tray={tray}
               selected={selected}
@@ -346,31 +368,34 @@ export function WordTowerHud(props: WordTowerHudProps) {
               onDrop={() => onCraneDrop?.()}
             />
           </div>
-          {/* While a word is armed on the crane this button flips to KEEP
-              BUILDING — bail back to the wheel with the spell path intact so the
+          {/* End slot — while a word is armed on the crane this flips to KEEP
+              BUILDING (bail back to the wheel with the spell path intact so the
               player can add/remove letters instead of being forced to drop the
-              word the auto-hand-off grabbed (founder ask 2026-07-17). */}
-          {isPlacing ? (
-            <button
-              type="button"
-              onClick={onCancelPlacement}
-              className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-cyan px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
-              aria-label={t('wordTower.hud.keepBuilding')}
-              title={t('wordTower.hud.keepBuilding')}
-            >
-              <Pencil className="h-5 w-5" />
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={onBackspace}
-              disabled={selected.length === 0}
-              className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
-              aria-label={t('wordTower.hud.backspace')}
-            >
-              <Delete className="h-5 w-5" />
-            </button>
-          )}
+              word the auto-hand-off grabbed, founder ask 2026-07-17); otherwise
+              it's the backspace tool. */}
+          <div data-testid="wt-tool-slot-end" className="flex justify-center">
+            {isPlacing ? (
+              <button
+                type="button"
+                onClick={onCancelPlacement}
+                className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-cyan px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-black shadow-hard active:translate-y-0.5 active:shadow-hard-pressed"
+                aria-label={t('wordTower.hud.keepBuilding')}
+                title={t('wordTower.hud.keepBuilding')}
+              >
+                <Pencil className="h-5 w-5" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={onBackspace}
+                disabled={selected.length === 0}
+                className="flex shrink-0 flex-col items-center gap-0.5 rounded-neo border-neo-thick border-black bg-neo-navy-light px-2.5 py-2 font-neo-display text-[10px] font-bold uppercase tracking-wide text-neo-white shadow-hard disabled:opacity-40 active:translate-y-0.5 active:shadow-hard-pressed"
+                aria-label={t('wordTower.hud.backspace')}
+              >
+                <Delete className="h-5 w-5" />
+              </button>
+            )}
+          </div>
         </div>
         </div>
         )}
