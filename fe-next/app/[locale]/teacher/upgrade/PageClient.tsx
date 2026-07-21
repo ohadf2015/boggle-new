@@ -285,13 +285,13 @@ export default function UpgradePricingPageClient() {
               {t('teacher.subscription.districtSubtitle')}
             </p>
           </div>
-          <a
-            href="mailto:lexiclash.game@gmail.com?subject=School%20%2F%20District%20Pricing"
+          <Link
+            href={`/${language}/education/for-schools`}
             onClick={() => trackGrowthEvent('iap_viewed', { product: 'district_inquiry' })}
             className="flex-shrink-0 bg-neo-black text-neo-white font-black text-sm border-2 border-black rounded-neo px-5 py-3 shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none whitespace-nowrap"
           >
             {t('teacher.subscription.districtCta')}
-          </a>
+          </Link>
         </div>
 
         {/* Legal Links */}

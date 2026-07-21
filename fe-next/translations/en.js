@@ -183,7 +183,8 @@ const en = {
         "not-hiragana": "Hiragana only (e.g. ねこ).",
         "wrong-head": "Wrong head kana — chain from the highlighted kana.",
         "duplicate": "That word was already played.",
-        "not-in-dict": "Not in the Japanese dictionary."
+        "not-in-dict": "Not in the Japanese dictionary.",
+        "network": "Network error — please try again."
       },
       "endReason": {
         "player-no-move": "You gave up — the bot wins.",
@@ -11500,7 +11501,13 @@ const en = {
         "course_desc": "Live + async vocabulary games with teacher analytics, ad-free for students."
       },
       "welcomeBack": "Welcome back",
-      "openDashboard": "Open Teacher Dashboard"
+      "openDashboard": "Open Teacher Dashboard",
+      "furtherReading": {
+        "title": "Explore More",
+        "guides": "Strategy Guides",
+        "glossary": "Word Glossary",
+        "wordSolver": "Word Solver Tool"
+      }
     },
     "leaderboard": {
       "allTime": "All Time",
@@ -14764,6 +14771,7 @@ const en = {
     "vsRivals": "vs {a} & {b}",
     "roundLabel": "Round {n} of {total}",
     "chipStack": "Chips: {chips}",
+    "speedBonus": "Speed ×{n}",
     "gameOver": "Game over",
     "playAgain": "Play again",
     "notAWord": "Not a word",

@@ -66,4 +66,36 @@ describe('useShiritoriGame', () => {
     act(() => view.result.current.submit('ねこ'));
     expect(emit).toHaveBeenCalledWith('submitShiritoriWord', { word: 'ねこ' });
   });
+
+  describe('turnStartedAt', () => {
+    it('is non-null on init when firstPlayer is set', () => {
+      const { view } = setup();
+      expect(view.result.current.turnStartedAt).not.toBeNull();
+    });
+
+    it('resets (becomes a fresh timestamp) after shiritoriWordAccepted', () => {
+      const { view, fire } = setup();
+      const before = view.result.current.turnStartedAt;
+      fire('shiritoriWordAccepted', { word: 'しりとり', by: 'me', requiredHead: 'り', nextPlayer: 'bob' });
+      const after = view.result.current.turnStartedAt;
+      expect(after).not.toBeNull();
+      // Should be >= prior value (new Date.now() call)
+      expect(after!).toBeGreaterThanOrEqual(before!);
+    });
+
+    it('resets after shiritoriPlayerEliminated', () => {
+      const { view, fire } = setup();
+      fire('shiritoriPlayerEliminated', { player: 'bob', reason: 'timeout', nextPlayer: 'me' });
+      expect(view.result.current.turnStartedAt).not.toBeNull();
+    });
+
+    it('is NOT reset on shiritoriGameOver (game finished, no active turn)', () => {
+      const { view, fire } = setup();
+      // After game over, turnStartedAt is intentionally not reset — finished=true
+      // makes the countdown bar disappear via the `!finished` guard in ShiritoriView.
+      fire('shiritoriGameOver', { winner: 'me', reason: 'ends-in-n', loser: 'bob' });
+      expect(view.result.current.finished).toBe(true);
+      // turnStartedAt remains whatever it was — the !finished guard hides the bar
+    });
+  });
 });

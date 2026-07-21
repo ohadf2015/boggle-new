@@ -294,11 +294,19 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
 
       <ScrollIndicator />
 
-      {mounted && !isMobilePortrait && !isNativeApp && (
-        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[104px] sm:min-h-[122px]">
-          <InlineBannerAd webZone="menu" className="my-4" />
-          {/* B2 — CrazyGames home banner */}
-          <CrazyGamesBanner size="728x90" className="my-4" />
+      {/* Space reserved in SSR so ads load into a pre-committed slot — eliminates the
+          104px layout shift that fires when mounted flips true post-hydration. CSS
+          hidden/sm:block replaces the JS isMobilePortrait check to avoid the double-shift
+          (appear then disappear) on mobile devices. */}
+      {!isNativeApp && (
+        <div className="hidden sm:block w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[104px] sm:min-h-[122px]">
+          {mounted && !isMobilePortrait && (
+            <>
+              <InlineBannerAd webZone="menu" className="my-4" />
+              {/* B2 — CrazyGames home banner */}
+              <CrazyGamesBanner size="728x90" className="my-4" />
+            </>
+          )}
         </div>
       )}
 

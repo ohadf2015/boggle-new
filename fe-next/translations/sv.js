@@ -491,7 +491,8 @@ const sv = {
         "not-hiragana": "Endast hiragana (t.ex. ねこ).",
         "wrong-head": "Fel inledande kana — börja med den markerade kana.",
         "duplicate": "Det ordet har redan spelats.",
-        "not-in-dict": "Inte i den japanska ordboken."
+        "not-in-dict": "Inte i den japanska ordboken.",
+        "network": "Nätverksfel — försök igen."
       },
       "endReason": {
         "player-no-move": "Du gav upp — boten vinner.",
@@ -13105,7 +13106,13 @@ const sv = {
         "course_desc": "Live och asynkrona ordspel med läraranalys — helt utan annonser för eleverna."
       },
       "welcomeBack": "Välkommen tillbaka!",
-      "openDashboard": "Öppna lärarpanelen"
+      "openDashboard": "Öppna lärarpanelen",
+      "furtherReading": {
+        "title": "Utforska mer",
+        "guides": "Strategiguider",
+        "glossary": "Ordlista",
+        "wordSolver": "Ordlösarverktyg"
+      }
     },
     "leaderboard": {
       "allTime": "All tid",
@@ -15783,6 +15790,7 @@ const sv = {
     "revealing": "Avslöjar…",
     "roundLabel": "Runda {n} av {total}",
     "chipStack": "Marker: {chips}",
+    "speedBonus": "Hastighet ×{n}",
     "shareCard": {
       "header": "🎯 Förseglat bud — {score} poäng",
       "row": "{round} {emoji} {playerWord} mot {botWord}{points}",

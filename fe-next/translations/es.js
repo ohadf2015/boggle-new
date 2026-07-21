@@ -215,7 +215,8 @@ const es = {
         "not-hiragana": "Solo hiragana (p. ej. ねこ).",
         "wrong-head": "Letra inicial incorrecta — empieza por la kana resaltada.",
         "duplicate": "Esa palabra ya se jugó.",
-        "not-in-dict": "No está en el diccionario japonés."
+        "not-in-dict": "No está en el diccionario japonés.",
+        "network": "Error de red — por favor inténtalo de nuevo."
       },
       "endReason": {
         "player-no-move": "Te rendiste — gana el bot.",
@@ -12891,7 +12892,13 @@ const es = {
         "course_desc": "Juegos síncronos y asincronos con analytics de maestro, sin anuncios."
       },
       "welcomeBack": "¡Bienvenido!",
-      "openDashboard": "Abrir panel de maestro"
+      "openDashboard": "Abrir panel de maestro",
+      "furtherReading": {
+        "title": "Explorar más",
+        "guides": "Guías de estrategia",
+        "glossary": "Glosario de palabras",
+        "wordSolver": "Herramienta de palabras"
+      }
     },
     "leaderboard": {
       "allTime": "Histórico",
@@ -15801,6 +15808,7 @@ const es = {
     "badge": "Puja sellada",
     "roundLabel": "Ronda {n} de {total}",
     "chipStack": "Fichas: {chips}",
+    "speedBonus": "Velocidad ×{n}",
     "lockIn": "Cerrar puja",
     "youWin": "¡Ganaste!",
     "youLose": "Choque",

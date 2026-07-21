@@ -224,7 +224,8 @@ const he = {
         "not-hiragana": "רק יראגנה (לדוגמה ねこ).",
         "wrong-head": "אות פתיחה שגויה — התחילו מהאות המודגשת.",
         "duplicate": "המילה כבר שוחקה.",
-        "not-in-dict": "לא נמצא במילון היפני."
+        "not-in-dict": "לא נמצא במילון היפני.",
+        "network": "שגיאת רשת — אנא נסה שוב."
       },
       "endReason": {
         "player-no-move": "ויתרתם — הבוט מנצח.",
@@ -12745,7 +12746,13 @@ const he = {
         "course_desc": "משחקי אוצר מילים חיים ואסינכרוניים עם ניתוח מורה, ללא מודעות לתלמידים."
       },
       "welcomeBack": "ברוך שובך",
-      "openDashboard": "פתח לוח מורה"
+      "openDashboard": "פתח לוח מורה",
+      "furtherReading": {
+        "title": "עוד באתר",
+        "guides": "מדריכי אסטרטגיה",
+        "glossary": "מילון מילים",
+        "wordSolver": "כלי פתרון מילים"
+      }
     },
     "leaderboard": {
       "allTime": "כל הזמנים",
@@ -15719,6 +15726,7 @@ const he = {
     "revealing": "חושף…",
     "roundLabel": "סבב {n} מתוך {total}",
     "chipStack": "אסימונים: {chips}",
+    "speedBonus": "מהירות ×{n}",
     "shareCard": {
       "header": "🎯 הימור סגור — {score} נקודות",
       "row": "{round} {emoji} {playerWord} נגד {botWord}{points}",

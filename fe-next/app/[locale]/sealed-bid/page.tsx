@@ -6,6 +6,7 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Trophy } from 'lucide-react';
@@ -69,6 +70,8 @@ export default function SealedBidPage() {
   const [coinsAwarded, setCoinsAwarded] = useState(0);
   const [winFlash, setWinFlash] = useState(0);
 
+  const bidMultiplierRef = useRef(3.0);
+  const [bidMultiplier, setBidMultiplier] = useState(3.0);
   const payoutTargetRef = useRef<HTMLElement>(null);
   const didInitRef = useRef(false);
 
@@ -87,6 +90,21 @@ export default function SealedBidPage() {
     setPhase('bidding');
   }, [language]);
 
+  // Speed-bonus multiplier: 3.0× → 1.0× over 15 s; resets each bidding phase
+  useEffect(() => {
+    if (phase !== 'bidding') return;
+    bidMultiplierRef.current = 3.0;
+    setBidMultiplier(3.0);
+    const start = Date.now();
+    const id = setInterval(() => {
+      const progress = Math.min(1, (Date.now() - start) / 15000);
+      const next = Math.max(1.0, 3.0 - 2.0 * progress);
+      bidMultiplierRef.current = next;
+      setBidMultiplier(next);
+    }, 100);
+    return () => clearInterval(id);
+  }, [phase, roundIndex]);
+
   const currentDeal = deals[roundIndex];
 
   const lockBid = useCallback(async () => {
@@ -100,6 +118,7 @@ export default function SealedBidPage() {
       setValidationError(t('sealedBid.error.needStake', 'Set a stake to lock your bid'));
       return;
     }
+    const speedMult = bidMultiplierRef.current;
     setPending(true);
     const dictOk = await dictCheck(chosenWord, language);
     setPending(false);
@@ -112,13 +131,19 @@ export default function SealedBidPage() {
       stake,
     });
 
-    const newWallet = applyDelta(wallet, sett.delta);
+    // Apply speed bonus: unique bids submitted quickly earn a larger delta
+    const finalSett =
+      sett.outcome === 'unique' && speedMult > 1.01
+        ? { ...sett, delta: Math.round(sett.delta * speedMult) }
+        : sett;
+
+    const newWallet = applyDelta(wallet, finalSett.delta);
     setWallet(newWallet);
-    setSettlement(sett);
+    setSettlement(finalSett);
     setPhase('revealed');
     setValidationError(null);
 
-    if (sett.outcome === 'unique') {
+    if (finalSett.outcome === 'unique') {
       playSound('wordAccepted');
       SharedFxApp.spawnBurst('sparkle-gold', window.innerWidth / 2, window.innerHeight / 3, {
         count: 16,
@@ -302,6 +327,17 @@ export default function SealedBidPage() {
           />
         ) : (
           currentDeal && (
+            <>
+              <div className="mb-2 flex justify-center">
+                <span className={cn(
+                  'rounded-full border-2 border-black px-3 py-1 font-neo-display text-sm font-black tabular-nums shadow-hard-sm',
+                  bidMultiplier > 2.0 ? 'bg-neo-lime text-neo-navy' :
+                  bidMultiplier > 1.5 ? 'bg-neo-yellow text-neo-navy' :
+                  'bg-neo-orange text-neo-white'
+                )}>
+                  {t('sealedBid.speedBonus', { n: bidMultiplier.toFixed(1) })}
+                </span>
+              </div>
             <SealedBidTable
               letters={currentDeal.displayLetters}
               word={chosenWord}
@@ -321,6 +357,7 @@ export default function SealedBidPage() {
               reducedMotion={reducedMotion}
               dir={dir}
             />
+            </>
           )
         )}
         {validationError && (

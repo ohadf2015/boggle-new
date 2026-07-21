@@ -224,7 +224,8 @@ const ja = {
         "not-hiragana": "ひらがなのみ（例：ねこ）。",
         "wrong-head": "最初の文字が違います — 表示された文字から始めてください。",
         "duplicate": "その単語はもう使われました。",
-        "not-in-dict": "日本語辞書にありません。"
+        "not-in-dict": "日本語辞書にありません。",
+        "network": "ネットワークエラー — もう一度お試しください。"
       },
       "endReason": {
         "player-no-move": "降参しました — ボットの勝ち。",
@@ -12889,7 +12890,13 @@ const ja = {
         "course_desc": "リアルタイム対戦ゲーム × 自習ドリル。先生は詳細分析付き。生徒は広告ゼロ。"
       },
       "welcomeBack": "おかえりなさい、先生！",
-      "openDashboard": "ダッシュボードを開く"
+      "openDashboard": "ダッシュボードを開く",
+      "furtherReading": {
+        "title": "もっと見る",
+        "guides": "攻略ガイド",
+        "glossary": "単語集",
+        "wordSolver": "単語ソルバー"
+      }
     },
     "leaderboard": {
       "allTime": "全期間",
@@ -15784,6 +15791,7 @@ const ja = {
     "revealing": "公開中…",
     "roundLabel": "ラウンド {n}/{total}",
     "chipStack": "チップ: {chips}",
+    "speedBonus": "スピード ×{n}",
     "shareCard": {
       "header": "🎯 シールドビッド — {score}pt",
       "row": "{round} {emoji} {playerWord} vs {botWord}{points}",

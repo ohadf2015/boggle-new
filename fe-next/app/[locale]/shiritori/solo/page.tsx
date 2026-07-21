@@ -56,21 +56,24 @@ function pickSeed(d: Difficulty): string {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
+class DictNetworkError extends Error {}
+
 async function dictCheckJa(word: string): Promise<boolean> {
+  let res: Response;
   try {
     // POST-only route reading { word, language } from the body — a GET 405s and
     // silently rejected every player word.
-    const res = await fetch('/api/dictionary/check', {
+    res = await fetch('/api/dictionary/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ word, language: 'ja' }),
     });
-    if (!res.ok) return false;
-    const data: { isValid?: boolean } = await res.json();
-    return !!data.isValid;
   } catch {
-    return false;
+    throw new DictNetworkError('fetch failed');
   }
+  if (!res.ok) throw new DictNetworkError(`HTTP ${res.status}`);
+  const data: { isValid?: boolean } = await res.json();
+  return !!data.isValid;
 }
 
 export default function ShiritoriSoloPage() {
@@ -184,7 +187,14 @@ export default function ShiritoriSoloPage() {
     if (!word) return;
     setError(null);
     setPending(true);
-    const ok = await dictCheckJa(word);
+    let ok: boolean;
+    try {
+      ok = await dictCheckJa(word);
+    } catch {
+      setPending(false);
+      setError(t('shiritori.solo.err.network'));
+      return;
+    }
     const r = commitPlayerWord(state, word, ok);
     setPending(false);
     if (r.kind === 'err') {
@@ -225,7 +235,7 @@ export default function ShiritoriSoloPage() {
       markTurnPlayed();
       playSound('wordAccepted');
     }
-  }, [input, state, pending, playSound, t, isGhostTurn, multiplier, markTurnPlayed]);
+  }, [input, state, pending, playSound, t, isGhostTurn, multiplier, markTurnPlayed, today]);
 
   // Admin gate — hooks above this run on every render so order stays stable.
   // Dev bypass lets the game be reached locally (incl. /he RTL playtest).

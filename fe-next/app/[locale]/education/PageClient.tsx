@@ -257,6 +257,17 @@ export function PageClient() {
           </section>
 
           <EducationFAQ />
+
+          <section className="mt-8 border-t border-neo-white/20 pt-8">
+            <h2 className="text-xl font-neo-display font-bold text-neo-white mb-4">
+              {t('education.landing.furtherReading.title')}
+            </h2>
+            <ul className="flex flex-col gap-2 text-neo-cyan">
+              <li><Link href={`/${language}/guides`} className="hover:underline">{t('education.landing.furtherReading.guides')}</Link></li>
+              <li><Link href={`/${language}/glossary`} className="hover:underline">{t('education.landing.furtherReading.glossary')}</Link></li>
+              <li><Link href={`/${language}/tools/word-solver`} className="hover:underline">{t('education.landing.furtherReading.wordSolver')}</Link></li>
+            </ul>
+          </section>
         </>
       )}
 

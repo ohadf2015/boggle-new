@@ -68,4 +68,46 @@ describe('ShiritoriView', () => {
     expect(sidebar).toBeTruthy();
     expect(sidebar.querySelector('[aria-label="shiritori.players"]')).toBeTruthy();
   });
+
+  describe('countdown timer bar', () => {
+    it('renders role="timer" when turnStartedAt is provided', () => {
+      render(<ShiritoriView {...baseProps({ turnStartedAt: Date.now() - 1000 })} />);
+      expect(screen.getByRole('timer')).toBeTruthy();
+    });
+
+    it('does NOT render role="timer" when turnStartedAt is absent', () => {
+      render(<ShiritoriView {...baseProps({ turnStartedAt: null })} />);
+      expect(screen.queryByRole('timer')).toBeNull();
+    });
+
+    it('bar is full (100%) at the start of a turn', () => {
+      // turnStartedAt = now → ~15s remaining → bar should be near 100%
+      render(<ShiritoriView {...baseProps({ turnStartedAt: Date.now() })} />);
+      const bar = screen.getByRole('timer').querySelector('div');
+      // width style should be close to 100%
+      const width = parseFloat(bar?.style?.width ?? '0');
+      expect(width).toBeGreaterThan(90);
+    });
+
+    it('bar has orange class when ≤5s remain', () => {
+      // turnStartedAt 11s ago → ~4s left → orange
+      const TURN_MS = 15_000;
+      render(<ShiritoriView {...baseProps({ turnStartedAt: Date.now() - (TURN_MS - 4000) })} />);
+      const bar = screen.getByRole('timer').querySelector('div');
+      expect(bar?.className).toContain('bg-neo-orange');
+    });
+
+    it('bar has yellow class when ≤9s remain', () => {
+      // turnStartedAt 8s ago → ~7s left → yellow
+      const TURN_MS = 15_000;
+      render(<ShiritoriView {...baseProps({ turnStartedAt: Date.now() - (TURN_MS - 7000) })} />);
+      const bar = screen.getByRole('timer').querySelector('div');
+      expect(bar?.className).toContain('bg-neo-yellow');
+    });
+
+    it('timer bar is absent when game is finished', () => {
+      render(<ShiritoriView {...baseProps({ finished: true, winner: 'me', turnStartedAt: Date.now() })} />);
+      expect(screen.queryByRole('timer')).toBeNull();
+    });
+  });
 });

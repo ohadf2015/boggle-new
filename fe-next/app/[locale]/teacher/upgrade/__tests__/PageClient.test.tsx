@@ -1,6 +1,6 @@
 import { vi, describe, it, expect, beforeEach } from 'vitest';
 import React from 'react';
-import { render } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 vi.mock('@/utils/growthTracking', () => ({
@@ -39,5 +39,11 @@ describe('UpgradePricingPageClient', () => {
   it('tracks iap_viewed with product teacher_pro on mount', () => {
     render(<UpgradePricingPageClient />);
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', { product: 'teacher_pro' });
+  });
+
+  it('district CTA links to for-schools lead form, not mailto', () => {
+    render(<UpgradePricingPageClient />);
+    const cta = screen.getByRole('link', { name: /teacher\.subscription\.districtCta/i });
+    expect(cta).toHaveAttribute('href', '/en/education/for-schools');
   });
 });
