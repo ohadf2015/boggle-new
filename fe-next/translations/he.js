@@ -14058,6 +14058,9 @@ const he = {
       "pop": "פופ"
     },
     "previewMode": "תצוגה מקדימה",
+    "new": "חדש",
+    "balance": "יתרה",
+    "goldNeeded": "נדרשים {price} זהב",
     "tryOn": "מדגם",
     "owned": "בבעלותך",
     "setProgress": "{owned}/{total} בסט",

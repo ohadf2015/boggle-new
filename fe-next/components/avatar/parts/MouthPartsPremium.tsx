@@ -5,6 +5,7 @@
 
 import { STROKE_INNER } from './avatarDesignConstants';
 import { useAvatarUid } from '../AvatarUidContext';
+import { LipShine } from './sharedShading';
 
 const S = STROKE_INNER;
 
@@ -14,19 +15,24 @@ function OpenLaugh() {
     <g>
       <defs>
         <radialGradient id={`${u}laughInner`} cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stopColor="#7A1F2B" />
+          <stop offset="0%" stopColor="#9A2A3A" />
           <stop offset="100%" stopColor="#4A0000" />
         </radialGradient>
+        <linearGradient id={`${u}laughTeeth`} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#fff" />
+          <stop offset="100%" stopColor="#F0F0E8" />
+        </linearGradient>
       </defs>
       <path d="M35 58 Q50 72 65 58 Q50 68 35 58Z" fill={`url(#${u}laughInner)`} stroke="#000" strokeWidth={S} strokeLinecap="round" />
       {/* Teeth */}
-      <path d="M38 59 Q50 63 62 59" fill="#fff" stroke="#000" strokeWidth={1} />
+      <path d="M38 59 Q50 63 62 59" fill={`url(#${u}laughTeeth)`} stroke="#000" strokeWidth={1} />
       <line x1="43" y1="59" x2="43" y2="63" stroke="#000" strokeWidth={0.6} />
       <line x1="50" y1="60" x2="50" y2="64" stroke="#000" strokeWidth={0.6} />
       <line x1="57" y1="59" x2="57" y2="63" stroke="#000" strokeWidth={0.6} />
       {/* Tongue */}
-      <ellipse cx="50" cy="67" rx="5" ry="3" fill="#FF6B6B" opacity="0.8" />
+      <ellipse cx="50" cy="67" rx="5" ry="3" fill="#FF6B6B" opacity="0.85" />
       <path d="M48 66 Q50 69 52 66" fill="none" stroke="#CC4444" strokeWidth={0.6} />
+      <LipShine cx={50} cy={58} w={24} />
       {/* Cheek creases */}
       <path d="M33 58 Q30 56 30 59" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.25" />
       <path d="M67 58 Q70 56 70 59" fill="none" stroke="#000" strokeWidth={0.8} opacity="0.25" />

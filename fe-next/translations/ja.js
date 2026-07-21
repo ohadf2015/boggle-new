@@ -14070,6 +14070,9 @@ const ja = {
       "pop": "ポップ"
     },
     "previewMode": "プレビュー",
+    "new": "NEW",
+    "balance": "残高",
+    "goldNeeded": "{price}ゴールドが必要です",
     "tryOn": "試着",
     "owned": "所持",
     "setProgress": "セット {owned}/{total}",

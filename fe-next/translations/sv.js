@@ -14337,6 +14337,9 @@ const sv = {
       "pop": "Pop"
     },
     "previewMode": "Förhandsgranska",
+    "new": "NY",
+    "balance": "Saldo",
+    "goldNeeded": "{price} guld behövs",
     "tryOn": "Prova",
     "owned": "Ägd",
     "setProgress": "{owned}/{total} i set",

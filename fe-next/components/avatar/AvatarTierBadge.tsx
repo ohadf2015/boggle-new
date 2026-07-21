@@ -1,8 +1,9 @@
 'use client';
 
 import { memo } from 'react';
-import { type CustomAvatarConfig, isEpicPart, isLegendaryPart, isPremiumPart } from '@/shared/types/customAvatar';
+import { isEpicPart, isLegendaryPart, isPremiumPart } from '@/shared/types/customAvatar';
 import type { VisualTier } from './AvatarTierEffects';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface AvatarTierBadgeProps {
   category: string;
@@ -18,42 +19,40 @@ function getPartVisualTier(category: string, partId: string): VisualTier {
   return 'common';
 }
 
-const TIER_STYLES: Record<VisualTier, { bg: string; border: string; text: string; dot: string; label: string }> = {
+const TIER_STYLES: Record<VisualTier, { bg: string; border: string; text: string; dot: string }> = {
   common: {
     bg: 'bg-[#8B5A2B]/15',
     border: 'border-[#8B5A2B]/40',
     text: 'text-[#C49A6C]',
     dot: 'bg-[#C49A6C]',
-    label: 'COMMON',
   },
   rare: {
     bg: 'bg-[#A0AEC0]/15',
     border: 'border-[#A0AEC0]/50',
     text: 'text-[#E2E8F0]',
     dot: 'bg-[#E2E8F0]',
-    label: 'RARE',
   },
   epic: {
     bg: 'bg-[#FFD700]/15',
     border: 'border-[#FFD700]/50',
     text: 'text-[#FFE066]',
     dot: 'bg-[#FFE066]',
-    label: 'EPIC',
   },
   legendary: {
     bg: 'bg-gradient-to-br from-[#FFD700]/20 via-[#FF1493]/20 to-[#00FFFF]/20',
     border: 'border-[#FFD700]/60',
     text: 'text-[#FFD700]',
     dot: 'bg-[#FFD700]',
-    label: 'LEGENDARY',
   },
 };
 
 /**
  * Small rarity badge for a single part — used in builder grids and shop lists.
  * Shows nothing for Common parts so free rows stay clean.
+ * Labels always go through t() (avatarBuilder.tiers.*) — never hardcoded EN.
  */
 const AvatarTierBadge = memo<AvatarTierBadgeProps>(({ category, partId, size = 'sm', className = '' }) => {
+  const { t } = useLanguage();
   const tier = getPartVisualTier(category, partId);
   if (tier === 'common') return null;
 
@@ -68,7 +67,7 @@ const AvatarTierBadge = memo<AvatarTierBadgeProps>(({ category, partId, size = '
       data-tier={tier}
     >
       <span className={`w-1 h-1 rounded-full ${styles.dot} ${tier === 'legendary' ? 'animate-pulse' : ''}`} />
-      {styles.label}
+      {t(`avatarBuilder.tiers.${tier}`)}
     </span>
   );
 });
@@ -76,4 +75,5 @@ const AvatarTierBadge = memo<AvatarTierBadgeProps>(({ category, partId, size = '
 AvatarTierBadge.displayName = 'AvatarTierBadge';
 
 export { getPartVisualTier };
+export type { AvatarTierBadgeProps };
 export default AvatarTierBadge;

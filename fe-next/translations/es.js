@@ -14148,6 +14148,9 @@ const es = {
       "pop": "Pop"
     },
     "previewMode": "Vista previa",
+    "new": "NUEVO",
+    "balance": "Saldo",
+    "goldNeeded": "Se necesitan {price} de oro",
     "tryOn": "Probar",
     "owned": "En propiedad",
     "setProgress": "{owned}/{total} del set",

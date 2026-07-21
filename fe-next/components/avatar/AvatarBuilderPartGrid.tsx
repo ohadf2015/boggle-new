@@ -16,7 +16,7 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { getSetsForPart, getSetProgress } from '@/lib/avatar/avatarSets';
-import AvatarTierBadge from './AvatarTierBadge';
+import AvatarTierBadge, { getPartVisualTier } from './AvatarTierBadge';
 import '@/styles/avatar-tier-animations.css';
 
 export interface PartPreviewGridProps<T extends string> {
@@ -41,6 +41,8 @@ interface PurchaseConfirmState {
   isLegendary: boolean;
 }
 
+type PartFilter = 'all' | 'vip';
+
 export default function PartPreviewGrid<T extends string>({
   label,
   partType,
@@ -51,20 +53,25 @@ export default function PartPreviewGrid<T extends string>({
   config,
   noneLabel,
   premium,
-  t: _t,
+  t: tProp,
   onCoinSpend,
 }: PartPreviewGridProps<T>) {
   const cat = premiumCategory ?? partType;
-  const { language } = useLanguage();
+  const { language, t: tCtx } = useLanguage();
+  const t = tProp ?? tCtx;
   const [confirmPurchase, setConfirmPurchase] = useState<PurchaseConfirmState | null>(null);
   const [tryOnOption, setTryOnOption] = useState<string | null>(null);
+  const [partFilter, setPartFilter] = useState<PartFilter>('all');
 
   const handleClick = (option: T) => {
     const isPrem = isPremiumPart(cat, option);
     if (isPrem && premium && !premium.isPartUnlocked(cat, option)) {
       const price = getPartPrice(cat, option);
       if (premium.coins < price) {
-        toast(`${price} gold needed`, { icon: '🔒', duration: 2000 });
+        toast(t('avatarBuilder.goldNeeded').replace('{price}', String(price)), {
+          icon: '🔒',
+          duration: 2000,
+        });
         return;
       }
       // Show confirmation modal instead of buying directly
@@ -101,9 +108,14 @@ export default function PartPreviewGrid<T extends string>({
 
   // When no premium context exists (e.g. onboarding), hide premium parts entirely
   // so guests can only pick free parts. When premium exists, show all and gate with locks.
-  const visibleOptions = premium
+  const baseVisible = premium
     ? options
     : options.filter(o => o === 'none' || !isPremiumPart(cat, o));
+
+  // VIP filter: only premium parts (keep 'none' so players can clear selection).
+  const visibleOptions = premium && partFilter === 'vip'
+    ? baseVisible.filter(o => o === 'none' || isPremiumPart(cat, o))
+    : baseVisible;
 
   // Sort: 'none' first, then NEW drops (discovery), then other premium, then free.
   const sortedOptions = [...visibleOptions].sort((a, b) => {
@@ -132,9 +144,47 @@ export default function PartPreviewGrid<T extends string>({
     return { set, prog };
   })();
 
+  const showFilter = Boolean(premium);
+
   return (
     <div>
-      <p className="text-neo-white text-xs font-bold uppercase mb-2">{label}</p>
+      <div className="flex items-center justify-between gap-2 mb-2">
+        <p className="text-neo-white text-xs font-bold uppercase">{label}</p>
+        {showFilter && (
+          <div
+            className="flex gap-1"
+            role="tablist"
+            aria-label={t('avatar.premium.vipBadge')}
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={partFilter === 'all'}
+              onClick={() => setPartFilter('all')}
+              className={`px-2 py-0.5 rounded-neo text-[10px] font-black uppercase tracking-wide border transition-colors ${
+                partFilter === 'all'
+                  ? 'bg-neo-lime/20 border-neo-lime text-neo-lime'
+                  : 'bg-neo-navy-light border-neo-white/15 text-neo-white/70 hover:border-neo-white/40'
+              }`}
+            >
+              {t('avatar.premium.filterAll')}
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={partFilter === 'vip'}
+              onClick={() => setPartFilter('vip')}
+              className={`px-2 py-0.5 rounded-neo text-[10px] font-black uppercase tracking-wide border transition-colors ${
+                partFilter === 'vip'
+                  ? 'bg-neo-yellow/20 border-neo-yellow text-neo-yellow'
+                  : 'bg-neo-navy-light border-neo-white/15 text-neo-white/70 hover:border-neo-white/40'
+              }`}
+            >
+              {t('avatar.premium.filterVip')}
+            </button>
+          </div>
+        )}
+      </div>
       <div
         className="grid grid-cols-3 @[24rem]:grid-cols-4 @[36rem]:grid-cols-5 gap-2"
       >
@@ -145,13 +195,26 @@ export default function PartPreviewGrid<T extends string>({
           const isLocked = isPremium && premium && !premium.isPartUnlocked(cat, option);
           const price = isPremium ? getPartPrice(cat, option) : 0;
           const isNew = isNewPart(cat, option);
+          const visualTier = getPartVisualTier(cat, option);
+          const displayName = option === 'none' ? (noneLabel ?? option) : option;
+          const hoverTitle = isPremium
+            ? `${displayName} · ${t(`avatarBuilder.tiers.${visualTier}`)}`
+            : displayName;
 
           return (
             <button
               key={option}
+              type="button"
               onClick={() => handleClick(option)}
+              title={hoverTitle}
+              aria-label={hoverTitle}
+              data-tier={isPremium ? visualTier : 'common'}
               style={{ animationDelay: `${sortedOptions.indexOf(option) * 0.03}s` }}
-              className={`relative flex flex-col items-center p-1.5 rounded-neo border-2 transition-colors animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both hover:scale-[1.06] active:scale-[0.88] transition-transform ${
+              className={`relative flex flex-col items-center p-1.5 rounded-neo border-2 transition-colors animate-in fade-in-0 zoom-in-95 duration-300 fill-mode-both hover:scale-[1.06] active:scale-[0.88] transition-transform overflow-hidden ${
+                isPremium ? 'avatar-part-cell-premium' : ''
+              } ${
+                isLegendary ? 'avatar-part-cell-legendary' : isEpic ? 'avatar-part-cell-epic' : isPremium ? 'avatar-part-cell-rare' : ''
+              } ${
                 selected === option
                   ? 'bg-neo-lime/15 border-neo-lime shadow-hard-sm ring-1 ring-neo-lime/30'
                   : isLocked && isLegendary
@@ -163,10 +226,17 @@ export default function PartPreviewGrid<T extends string>({
                         : 'bg-neo-navy-light border-neo-white/15 hover:border-neo-white/40 hover:bg-neo-navy-light/80'
               }`}
             >
+              {/* Subtle shimmer band on premium cells */}
+              {isPremium && (
+                <span aria-hidden className="avatar-part-shimmer" />
+              )}
+
               {/* NEW ribbon — top-start corner (opposite the tier badge) */}
               {isNew && selected !== option && (
                 <div className="absolute top-0.5 inset-s-0.5 z-10">
-                  <span className="text-[7px] font-black text-neo-navy bg-neo-lime px-1 rounded-sm shadow-xs tracking-wide">NEW</span>
+                  <span className="text-[7px] font-black text-neo-navy bg-neo-lime px-1 rounded-sm shadow-xs tracking-wide">
+                    {t('avatarBuilder.new')}
+                  </span>
                 </div>
               )}
 
@@ -177,7 +247,7 @@ export default function PartPreviewGrid<T extends string>({
 
               {/* Part preview — locked parts shown at FULL color: show the goods so
                   players want to buy. The lock + price badge below conveys gating. */}
-              <div className="w-12 h-12 flex items-center justify-center">
+              <div className="w-12 h-12 flex items-center justify-center relative z-[1]">
                 {option === 'none' ? (
                   <span className="text-neo-white text-xs font-bold">{noneLabel ?? '—'}</span>
                 ) : (
@@ -187,7 +257,7 @@ export default function PartPreviewGrid<T extends string>({
 
               {/* Price badge — below preview, in flow (not overlapping) */}
               {isLocked && (
-                <div className={`flex items-center gap-0.5 mt-0.5 px-1.5 py-0.5 rounded-full ${
+                <div className={`relative z-[1] flex items-center gap-0.5 mt-0.5 px-1.5 py-0.5 rounded-full ${
                   isLegendary ? 'bg-amber-900/70' : isEpic ? 'bg-purple-900/60' : 'bg-neo-navy/80'
                 }`}>
                   <Lock className={`w-2.5 h-2.5 ${isLegendary ? 'text-amber-300' : isEpic ? 'text-purple-300' : 'text-neo-yellow'}`} />
@@ -202,10 +272,10 @@ export default function PartPreviewGrid<T extends string>({
 
               {/* Part name — always visible, never overlapped */}
               {!isLocked && (
-                <span className={`text-[10px] font-bold capitalize truncate w-full text-center mt-0.5 ${
+                <span className={`relative z-[1] text-[10px] font-bold capitalize truncate w-full text-center mt-0.5 ${
                   selected === option ? 'text-neo-lime' : 'text-neo-white'
                 }`}>
-                  {option === 'none' ? (noneLabel ?? option) : option}
+                  {displayName}
                 </span>
               )}
             </button>
@@ -232,9 +302,10 @@ export default function PartPreviewGrid<T extends string>({
             >
               {/* Close button */}
               <button
+                type="button"
                 onClick={() => setConfirmPurchase(null)}
                 className="absolute top-2 inset-e-2 text-neo-white hover:text-neo-white p-1"
-                aria-label="Close"
+                aria-label={t('common.close')}
               >
                 <X size={18} />
               </button>
@@ -275,7 +346,7 @@ export default function PartPreviewGrid<T extends string>({
                 <p className={`text-center text-xs font-black uppercase tracking-wider mb-3 ${
                   confirmPurchase.isLegendary ? 'text-amber-400' : 'text-purple-400'
                 }`}>
-                  {confirmPurchase.isLegendary ? 'LEGENDARY' : 'EPIC'}
+                  {t(confirmPurchase.isLegendary ? 'avatarBuilder.tiers.legendary' : 'avatarBuilder.tiers.epic')}
                 </p>
               )}
 
@@ -322,29 +393,39 @@ export default function PartPreviewGrid<T extends string>({
               {/* Current balance */}
               {premium && (
                 <p className="text-center text-xs text-neo-white mb-4">
-                  Balance: <span className="text-neo-yellow font-bold tabular-nums">{safeToLocaleString(premium.coins, language)}</span> → <span className="text-neo-white font-bold tabular-nums">{safeToLocaleString(premium.coins - confirmPurchase.price, language)}</span>
+                  {t('avatarBuilder.balance')}:{' '}
+                  <span className="text-neo-yellow font-bold tabular-nums">
+                    {safeToLocaleString(premium.coins, language)}
+                  </span>
+                  {' → '}
+                  <span className="text-neo-white font-bold tabular-nums">
+                    {safeToLocaleString(premium.coins - confirmPurchase.price, language)}
+                  </span>
                 </p>
               )}
 
               {/* Try-on toggle */}
               <div className="flex justify-center mb-4">
                 <button
+                  type="button"
                   onClick={tryOnOption ? handleCancelTryOn : handleTryOn}
                   className="text-xs font-bold text-neo-white/80 hover:text-neo-white underline decoration-dotted underline-offset-2"
                 >
-                  {tryOnOption ? (_t?.('avatarBuilder.cancel') || 'Cancel try-on') : (_t?.('avatarBuilder.tryOn') || 'Try on')}
+                  {tryOnOption ? t('avatarBuilder.cancel') : t('avatarBuilder.tryOn')}
                 </button>
               </div>
 
               {/* Action buttons */}
               <div className="flex gap-2">
                 <button
+                  type="button"
                   onClick={() => { setConfirmPurchase(null); handleCancelTryOn(); }}
                   className="flex-1 px-4 py-2.5 text-neo-white font-bold rounded-neo border-2 border-neo-white/15 hover:border-neo-white/30 transition-colors"
                 >
-                  {_t?.('avatarBuilder.cancel') || 'Cancel'}
+                  {t('avatarBuilder.cancel')}
                 </button>
                 <button
+                  type="button"
                   onClick={handleConfirmPurchase}
                   disabled={premium?.isPurchasing}
                   className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 font-bold rounded-neo border-2 border-black shadow-hard-sm transition-colors disabled:opacity-50 hover:scale-[1.03] active:scale-95 ${
@@ -356,7 +437,7 @@ export default function PartPreviewGrid<T extends string>({
                   }`}
                 >
                   <Coins className="w-4 h-4" />
-                  {_t?.('avatar.premium.unlock') || 'Unlock'}
+                  {t('avatar.premium.unlock')}
                 </button>
               </div>
             </div>

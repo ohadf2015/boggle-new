@@ -12779,6 +12779,9 @@ const en = {
       "pop": "Pop"
     },
     "previewMode": "Preview",
+    "new": "NEW",
+    "balance": "Balance",
+    "goldNeeded": "{price} gold needed",
     "tryOn": "Try on",
     "owned": "Owned",
     "setProgress": "{owned}/{total} set",

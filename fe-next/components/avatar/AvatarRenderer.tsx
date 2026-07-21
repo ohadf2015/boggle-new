@@ -19,6 +19,16 @@ import OverlayBadge from './parts/OverlayBadge';
 import { applyMood, getMoodAnimationClass, type AvatarMood } from '@/lib/avatar/avatarMood';
 import type { AvatarOverlay } from '@/lib/avatar/avatarOverlay';
 import '@/styles/avatar-mood-animations.css';
+import {
+  BACK_LAYER_STYLES,
+  BACK_ACCESSORY_STYLES,
+  SKIP_BLUSH_BASES,
+  SKIP_NOSE_BASES,
+  CIRCULAR_BASES,
+  ELLIPTICAL_BASES,
+  SKIP_BLINK_EYES,
+  SKIP_FEMALE_LASHES_EYES,
+} from './avatarLayerRules';
 
 /** Game-mode color frame around avatar — matches brand palette */
 export type AvatarMode = 'multiplayer' | 'singleplayer' | 'brain' | 'practice';
@@ -70,23 +80,6 @@ interface AvatarRendererProps {
  *   chin shadow -> nose -> blush -> eyebrows -> eyes -> blink -> lashes -> mouth ->
  *   facial hair -> hair(front) -> accessory
  */
-/** Styles that render their main body behind the head */
-const BACK_LAYER_STYLES = new Set(['long', 'longFlow', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'twinTails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'lob', 'shag', 'curlyBangs', 'sideSwept', 'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow', 'princessBraid', 'sideBraidBow', 'ponytail', 'cottonCandy', 'vaporwave', 'bobCut']);
-
-/** Accessories that render behind the face (ears, wings, etc.) */
-const BACK_ACCESSORY_STYLES = new Set(['monkeyEars', 'angelWings', 'demonWings', 'butterflyWings', 'wings']);
-
-/** Non-human bases that skip cheek blush & face depth effects */
-const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'catFace', 'robotHead', 'alienHead', 'ghostFace']);
-
-/** Bases with their own nose anatomy — skip NosePart overlay */
-const SKIP_NOSE_BASES = new Set(['skull', 'dragonHead', 'robotHead', 'alienHead']);
-
-/** Bases that use the standard circle shape (get circular depth effects) */
-const CIRCULAR_BASES = new Set(['round', 'blob']);
-
-/** Bases that use elliptical shape */
-const ELLIPTICAL_BASES = new Set(['oval', 'oblong', 'pear', 'rectangular']);
 
 /** Get a blush color that works with the skin tone — warm pink for light skin, deeper rose for dark */
 function getBlushColor(skinColor: string): string {
@@ -96,21 +89,6 @@ function getBlushColor(skinColor: string): string {
   const lightness = (r + g + b) / (255 * 3);
   return lightness > 0.6 ? '#FF6B6B' : '#E84080';
 }
-
-/** Eyes that are closed/non-standard and shouldn't get blink animation */
-const SKIP_BLINK_EYES = new Set([
-  'none', 'sleepy', 'happy', 'dizzy', 'cool', 'wink',
-  'galaxy', 'flame', 'robot', 'void', 'infinity', 'laser',
-  'hypno', 'alien', 'crying', 'money', 'hearts', 'star',
-  'closed', 'squint',
-  'pixelEyes', 'glitchEyes', 'kawaii', 'thirdEye', 'rainbowEyes', 'targetEyes',
-]);
-
-/** Eye styles where hardcoded lash positions don't align — skip generic female lashes */
-const SKIP_FEMALE_LASHES_EYES = new Set([
-  'none', 'lashes', 'monocleEye', 'crossEyed', 'wingedLiner', 'smokyEye',
-  'pixelEyes', 'glitchEyes', 'thirdEye',
-]);
 
 const AvatarRenderer = memo<AvatarRendererProps>(({ config, size = 64, className = '', disableEffects, forceTier, circular, mode, mood, overlay, tierMarker }) => {
   const uid = useId();

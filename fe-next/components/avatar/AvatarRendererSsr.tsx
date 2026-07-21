@@ -11,18 +11,20 @@ import { EYEBROW_PARTS } from './parts/EyebrowParts';
 import { FACIAL_HAIR_PARTS } from './parts/FacialHairParts';
 import { NOSE_PARTS } from './parts/NoseParts';
 import { BODY_PARTS } from './parts/BodyParts';
+import {
+  BACK_LAYER_STYLES,
+  BACK_ACCESSORY_STYLES,
+  SKIP_BLUSH_BASES,
+  SKIP_NOSE_BASES,
+  CIRCULAR_BASES,
+  ELLIPTICAL_BASES,
+  SKIP_FEMALE_LASHES_EYES,
+} from './avatarLayerRules';
 
 // Server-renderable clone of AvatarRenderer — no 'use client', no useId().
 // Use only from API routes / react-dom/server renderToStaticMarkup contexts.
 // Client UI must continue to use AvatarRenderer (supports tier effects + blink).
-
-const BACK_LAYER_STYLES = new Set(['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'lob', 'shag', 'curlyBangs', 'sideSwept', 'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow', 'princessBraid', 'sideBraidBow', 'ponytail', 'cottonCandy', 'vaporwave']);
-const BACK_ACCESSORY_STYLES = new Set(['monkeyEars', 'angelWings', 'demonWings', 'butterflyWings']);
-const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'catFace', 'robotHead', 'alienHead', 'ghostFace']);
-const SKIP_NOSE_BASES = new Set(['skull', 'dragonHead', 'robotHead', 'alienHead']);
-const SKIP_FEMALE_LASHES_EYES = new Set(['none', 'lashes', 'monocleEye', 'crossEyed', 'wingedLiner', 'smokyEye', 'pixelEyes', 'glitchEyes', 'thirdEye']);
-const CIRCULAR_BASES = new Set(['round', 'blob']);
-const ELLIPTICAL_BASES = new Set(['oval', 'oblong', 'pear', 'rectangular']);
+// Layer membership lives in avatarLayerRules so client + SSR never drift.
 
 function getBlushColor(skinColor: string): string {
   const r = parseInt(skinColor.slice(1, 3), 16);

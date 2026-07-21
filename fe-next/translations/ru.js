@@ -12118,6 +12118,9 @@ const ru = {
       "pop": "Поп"
     },
     "previewMode": "Предпросмотр",
+    "new": "NEW",
+    "balance": "Баланс",
+    "goldNeeded": "Нужно {price} золота",
     "tryOn": "Примерить",
     "owned": "Куплено",
     "setProgress": "{owned}/{total} набора",

@@ -251,6 +251,73 @@
   animation: avatar-ring-rotate 4s linear infinite;
 }
 
+/* ── Builder grid cells — premium shimmer ──
+   Subtle sweep so premium parts read as premium even in a dense picker.
+   Epic/legendary get a stronger tinted band. */
+
+.avatar-part-cell-premium {
+  position: relative;
+}
+
+.avatar-part-shimmer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.avatar-part-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  width: 45%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 45%,
+    rgba(255, 255, 255, 0.18) 50%,
+    rgba(255, 255, 255, 0.08) 55%,
+    transparent 100%
+  );
+  animation: avatar-shimmer 3.2s ease-in-out infinite;
+  animation-delay: 0.4s;
+}
+
+.avatar-part-cell-epic .avatar-part-shimmer::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(168, 85, 247, 0.12) 45%,
+    rgba(255, 215, 0, 0.22) 50%,
+    rgba(168, 85, 247, 0.12) 55%,
+    transparent 100%
+  );
+  animation-duration: 2.8s;
+}
+
+.avatar-part-cell-legendary .avatar-part-shimmer::after {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 215, 0, 0.18) 40%,
+    rgba(255, 255, 255, 0.28) 50%,
+    rgba(255, 20, 147, 0.18) 60%,
+    transparent 100%
+  );
+  animation-duration: 2.4s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-part-shimmer::after {
+    animation: none !important;
+    opacity: 0.35;
+    transform: rotate(25deg);
+  }
+}
+
 /* ── Buy-moment foil ──
    Hard-edged holographic sweep for the purchase-confirmation preview. NOT a soft
    glow (which reads as slop) — a crisp diagonal foil band, brand palette, that
