@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { m, useReducedMotion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 
 /**
  * The interactive centrepiece of the directions tutorial. A real 3×3 board the
@@ -70,7 +71,7 @@ export interface DirectionsBoardDemoProps {
 }
 
 export function DirectionsBoardDemo({ onTraced }: DirectionsBoardDemoProps) {
-  const reduced = useReducedMotion() ?? false;
+  const reduced = usePrefersReducedMotion();
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingRef = useRef(false);
   const tracedRef = useRef(false);

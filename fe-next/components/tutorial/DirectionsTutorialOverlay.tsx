@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDirectionsTutorial } from '@/hooks/useDirectionsTutorial';
 import { DirectionsBoardDemo } from './DirectionsBoardDemo';
@@ -29,7 +30,7 @@ export interface DirectionsTutorialOverlayProps {
  */
 export function DirectionsTutorialOverlay({ enabled = true, onShown }: DirectionsTutorialOverlayProps) {
   const { t, language } = useLanguage();
-  const reduced = useReducedMotion() ?? false;
+  const reduced = usePrefersReducedMotion();
   const { visible, secondsLeft, canDismiss, dismiss } = useDirectionsTutorial({ enabled, onShown });
   const [mounted, setMounted] = useState(false);
   const [traced, setTraced] = useState(false);
