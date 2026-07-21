@@ -14146,6 +14146,27 @@ const es = {
       "toxic": "Tóxico",
       "royal": "Real",
       "pop": "Pop"
+    },
+    "previewMode": "Vista previa",
+    "tryOn": "Probar",
+    "owned": "En propiedad",
+    "setProgress": "{owned}/{total} del set",
+    "completeSet": "¡Set completo!",
+    "completionistAura": "Aura de completionista",
+    "sets": {
+      "cosmic": "Cósmico",
+      "dragon": "Dragón",
+      "cyber": "Ciber",
+      "royal": "Real",
+      "mythic": "Mítico",
+      "neon": "Neón",
+      "ocean": "Océano"
+    },
+    "tiers": {
+      "common": "Común",
+      "rare": "Raro",
+      "epic": "Épico",
+      "legendary": "Legendario"
     }
   },
   "features": {

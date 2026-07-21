@@ -22,25 +22,43 @@ export const AVATAR_SETS: readonly AvatarSet[] = [
     id: 'cosmic',
     name: 'Cosmic',
     color: '#A855F7',
-    parts: ['eyes:galaxy', 'hair:galaxy', 'accessory:astronaut', 'mouth:neonSmile'],
+    parts: ['eyes:galaxy', 'hair:galaxy', 'accessory:astronaut', 'mouth:neonSmile', 'base:moonBase'],
   },
   {
     id: 'dragon',
     name: 'Dragon',
     color: '#FF6B00',
-    parts: ['base:dragonHead', 'eyes:flame', 'hair:flame', 'mouth:dragon'],
+    parts: ['base:dragonHead', 'eyes:flame', 'hair:flame', 'mouth:dragon', 'eyes:laserEye'],
   },
   {
     id: 'cyber',
     name: 'Cyber',
     color: '#00FFFF',
-    parts: ['accessory:cyberpunkVisor', 'eyes:robot', 'mouth:robotMouth', 'hair:neon'],
+    parts: ['accessory:cyberpunkVisor', 'eyes:robot', 'mouth:robotMouth', 'hair:neon', 'eyes:cyberEye'],
   },
   {
     id: 'royal',
     name: 'Royal',
     color: '#FFD700',
-    parts: ['accessory:crystalCrown', 'eyes:money', 'mouth:grillz'],
+    parts: ['accessory:crystalCrown', 'eyes:money', 'mouth:grillz', 'accessory:tiara'],
+  },
+  {
+    id: 'mythic',
+    name: 'Mythic',
+    color: '#8B5CF6',
+    parts: ['eyes:moonEye', 'eyes:gemEye', 'accessory:flamingHalo', 'accessory:wings', 'hair:longFlow'],
+  },
+  {
+    id: 'neon',
+    name: 'Neon',
+    color: '#FF1493',
+    parts: ['eyes:cyberEye', 'hair:neon', 'accessory:cyberpunkVisor', 'mouth:robotMouth', 'accessory:headphones'],
+  },
+  {
+    id: 'ocean',
+    name: 'Ocean',
+    color: '#00FFFF',
+    parts: ['eyes:sleepyEye', 'hair:bobCut', 'accessory:earrings', 'accessory:tiara', 'eyes:gemEye'],
   },
 ] as const;
 

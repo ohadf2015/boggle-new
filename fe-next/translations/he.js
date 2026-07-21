@@ -14056,6 +14056,27 @@ const he = {
       "toxic": "רעיל",
       "royal": "מלכותי",
       "pop": "פופ"
+    },
+    "previewMode": "תצוגה מקדימה",
+    "tryOn": "מדגם",
+    "owned": "בבעלותך",
+    "setProgress": "{owned}/{total} בסט",
+    "completeSet": "הסט הושלם!",
+    "completionistAura": "הילה של משלים סטים",
+    "sets": {
+      "cosmic": "קוסמי",
+      "dragon": "דרקון",
+      "cyber": "סייבר",
+      "royal": "מלכותי",
+      "mythic": "מיתולוגי",
+      "neon": "ניאון",
+      "ocean": "אוקיינוס"
+    },
+    "tiers": {
+      "common": "רגיל",
+      "rare": "נדיר",
+      "epic": "אפי",
+      "legendary": "אגדי"
     }
   },
   "encouragement": {

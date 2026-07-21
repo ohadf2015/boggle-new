@@ -16,6 +16,7 @@ import toast from 'react-hot-toast';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { getSetsForPart, getSetProgress } from '@/lib/avatar/avatarSets';
+import AvatarTierBadge from './AvatarTierBadge';
 import '@/styles/avatar-tier-animations.css';
 
 export interface PartPreviewGridProps<T extends string> {
@@ -56,6 +57,7 @@ export default function PartPreviewGrid<T extends string>({
   const cat = premiumCategory ?? partType;
   const { language } = useLanguage();
   const [confirmPurchase, setConfirmPurchase] = useState<PurchaseConfirmState | null>(null);
+  const [tryOnOption, setTryOnOption] = useState<string | null>(null);
 
   const handleClick = (option: T) => {
     const isPrem = isPremiumPart(cat, option);
@@ -85,6 +87,16 @@ export default function PartPreviewGrid<T extends string>({
       onSelect(confirmPurchase.option as T);
     }
     setConfirmPurchase(null);
+    setTryOnOption(null);
+  };
+
+  const handleTryOn = () => {
+    if (!confirmPurchase) return;
+    setTryOnOption(`${cat}:${confirmPurchase.option}`);
+  };
+
+  const handleCancelTryOn = () => {
+    setTryOnOption(null);
   };
 
   // When no premium context exists (e.g. onboarding), hide premium parts entirely
@@ -159,15 +171,9 @@ export default function PartPreviewGrid<T extends string>({
               )}
 
               {/* Tier badge — top corner */}
-              {isLocked && (isLegendary || isEpic) && (
-                <div className="absolute top-0.5 inset-e-0.5 z-10">
-                  {isLegendary ? (
-                    <span className="text-[7px] font-black text-amber-300 bg-linear-to-r from-amber-900/80 to-amber-800/80 px-1 rounded shadow-xs tracking-wide">LEGENDARY</span>
-                  ) : (
-                    <span className="text-[8px] font-black text-purple-400 bg-purple-900/60 px-1 rounded">EPIC</span>
-                  )}
-                </div>
-              )}
+              <div className="absolute top-0.5 inset-e-0.5 z-10">
+                <AvatarTierBadge category={cat} partId={option} size="sm" />
+              </div>
 
               {/* Part preview — locked parts shown at FULL color: show the goods so
                   players want to buy. The lock + price badge below conveys gating. */}
@@ -240,8 +246,11 @@ export default function PartPreviewGrid<T extends string>({
                 }`}>
                   <PartPreview
                     partType={partType}
-                    partName={confirmPurchase.option}
-                    config={config}
+                    partName={tryOnOption ? confirmPurchase.option : selected}
+                    config={{
+                      ...config,
+                      [partType === 'nose' ? 'noseStyle' : partType === 'facialHair' ? 'facialHair' : partType]: tryOnOption ? confirmPurchase.option : selected,
+                    } as CustomAvatarConfig}
                     size={128}
                   />
                   {/* Holographic foil at the decision moment — makes the part feel collectible */}
@@ -317,10 +326,20 @@ export default function PartPreviewGrid<T extends string>({
                 </p>
               )}
 
+              {/* Try-on toggle */}
+              <div className="flex justify-center mb-4">
+                <button
+                  onClick={tryOnOption ? handleCancelTryOn : handleTryOn}
+                  className="text-xs font-bold text-neo-white/80 hover:text-neo-white underline decoration-dotted underline-offset-2"
+                >
+                  {tryOnOption ? (_t?.('avatarBuilder.cancel') || 'Cancel try-on') : (_t?.('avatarBuilder.tryOn') || 'Try on')}
+                </button>
+              </div>
+
               {/* Action buttons */}
               <div className="flex gap-2">
                 <button
-                  onClick={() => setConfirmPurchase(null)}
+                  onClick={() => { setConfirmPurchase(null); handleCancelTryOn(); }}
                   className="flex-1 px-4 py-2.5 text-neo-white font-bold rounded-neo border-2 border-neo-white/15 hover:border-neo-white/30 transition-colors"
                 >
                   {_t?.('avatarBuilder.cancel') || 'Cancel'}

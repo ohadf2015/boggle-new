@@ -5,6 +5,7 @@
 
 import { STROKE_INNER } from './avatarDesignConstants';
 import { useAvatarUid } from '../AvatarUidContext';
+import { MOUTH_PARTS_PREMIUM } from './MouthPartsPremium';
 
 const S = STROKE_INNER;
 
@@ -704,6 +705,7 @@ export const MOUTH_PARTS = {
   robotMouth: RobotMouth,
   grillz: Grillz,
   neonSmile: NeonSmile,
+  ...MOUTH_PARTS_PREMIUM,
 } as const;
 
 export type MouthPart = keyof typeof MOUTH_PARTS;

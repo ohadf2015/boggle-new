@@ -88,11 +88,11 @@ describe('AvatarBuilderPartGrid — premium/locked UI', () => {
   it('shows a set-completion pip row when buying a part that belongs to a set', () => {
     const { container } = renderAccessories(['none', 'crystalCrown']);
     fireEvent.click(screen.getByText('12000'));
-    // crystalCrown is in the "Royal" set (3 parts); buying it = 1/3 owned.
+    // crystalCrown is in the "Royal" set (4 parts); buying it = 1/4 owned.
     const row = container.querySelector('[data-testid="set-progress"]');
     expect(row).toBeTruthy();
     expect(row?.textContent).toContain('Royal');
-    expect(row?.textContent).toContain('1/3');
+    expect(row?.textContent).toContain('1/4');
   });
 
   it('sorts NEW parts ahead of older premium and free parts (after none)', () => {
@@ -101,8 +101,8 @@ describe('AvatarBuilderPartGrid — premium/locked UI', () => {
     const items = Array.from(grid?.children ?? []) as HTMLElement[];
     const order = items.map((el) => {
       const t = el.textContent || '';
-      if (t.includes('NEW') || t.includes('12000')) return 'crystalCrown'; // NEW legendary
-      if (/\b800\b/.test(t)) return 'crown'; // older premium (price 800)
+      if (t.includes('NEW') || t.includes('LEGENDARY') || t.includes('12000')) return 'crystalCrown'; // NEW legendary
+      if (t.includes('RARE') || /\b800\b/.test(t)) return 'crown'; // older premium (price 800)
       if (/glasses/i.test(t)) return 'glasses'; // free
       return 'none';
     });

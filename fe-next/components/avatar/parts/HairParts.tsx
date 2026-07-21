@@ -9,6 +9,7 @@ import { HAIR_PARTS_MODERN } from './HairPartsModern';
 import { HAIR_PARTS_TRENDY } from './HairPartsTrendy';
 import { HAIR_PARTS_FEMININE } from './HairPartsFeminine';
 import { HAIR_FRONT_MAP } from './HairPartsFront';
+import { HAIR_PARTS_PREMIUM, HAIR_FRONT_PARTS_PREMIUM } from './HairPartsPremium';
 
 export const HAIR_PARTS = {
   none: None,
@@ -74,8 +75,13 @@ export const HAIR_PARTS = {
   lowPigtailsBow: HAIR_PARTS_FEMININE.lowPigtailsBow,
   princessBraid: HAIR_PARTS_FEMININE.princessBraid,
   sideBraidBow: HAIR_PARTS_FEMININE.sideBraidBow,
+  /* Premium overhaul hair */
+  ...HAIR_PARTS_PREMIUM,
 } as const;
 
 export type HairPart = keyof typeof HAIR_PARTS;
 
-export const HAIR_FRONT_PARTS: Partial<Record<HairPart, FC<HairPartProps>>> = HAIR_FRONT_MAP;
+export const HAIR_FRONT_PARTS: Partial<Record<HairPart, FC<HairPartProps>>> = {
+  ...HAIR_FRONT_MAP,
+  ...HAIR_FRONT_PARTS_PREMIUM,
+};

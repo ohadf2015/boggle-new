@@ -71,10 +71,10 @@ interface AvatarRendererProps {
  *   facial hair -> hair(front) -> accessory
  */
 /** Styles that render their main body behind the head */
-const BACK_LAYER_STYLES = new Set(['long', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'lob', 'shag', 'curlyBangs', 'sideSwept', 'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow', 'princessBraid', 'sideBraidBow', 'ponytail', 'cottonCandy', 'vaporwave']);
+const BACK_LAYER_STYLES = new Set(['long', 'longFlow', 'afro', 'wavy', 'dreads', 'pigtails', 'sideshave', 'braids', 'bun', 'bangs', 'twintails', 'twinTails', 'mullet', 'flame', 'galaxy', 'neon', 'curly', 'straight', 'spaceBuns', 'cornrows', 'wolfCut', 'curtainBangs', 'halfUp', 'himecut', 'lob', 'shag', 'curlyBangs', 'sideSwept', 'heartBuns', 'sideBow', 'milkmaidBraids', 'butterflyClips', 'lowPigtailsBow', 'princessBraid', 'sideBraidBow', 'ponytail', 'cottonCandy', 'vaporwave', 'bobCut']);
 
 /** Accessories that render behind the face (ears, wings, etc.) */
-const BACK_ACCESSORY_STYLES = new Set(['monkeyEars', 'angelWings', 'demonWings', 'butterflyWings']);
+const BACK_ACCESSORY_STYLES = new Set(['monkeyEars', 'angelWings', 'demonWings', 'butterflyWings', 'wings']);
 
 /** Non-human bases that skip cheek blush & face depth effects */
 const SKIP_BLUSH_BASES = new Set(['skull', 'dragonHead', 'catFace', 'robotHead', 'alienHead', 'ghostFace']);
