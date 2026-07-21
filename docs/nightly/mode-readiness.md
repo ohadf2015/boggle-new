@@ -6,27 +6,29 @@
 > lane reads it at start and rewrites it at end.
 >
 > `readiness` = production-readiness score 0–100, judged HARSHLY across: bugs, UI/visual polish,
-> playability, edge cases, clarity-of-use, i18n (×5), a11y, perf. A mode is **not** ≥90% on vibes —
+> playability, edge cases, clarity of use, i18n (×5), a11y, perf. A mode is **not** ≥90% on vibes —
 > every point above the prior night must be backed by a shipped fix or a verified-clean audit area.
 
 ## Current (in progress)
 
-### shiritori — readiness: 55% — status: IN PROGRESS
+### shiritori — readiness: 70% — status: IN PROGRESS
 - **Why next:** MP-wired recently; verify chain rules + bot-exclusion + i18n + edge cases.
 - **Reach:** JA MP is LIVE (ja board bypasses admin gate); solo is admin-preview; landing at `/[locale]/shiritori`.
 - **Key files:** `components/multiplayer/shiritori/*`, `lib/shiritori/sp/*`, `app/[locale]/shiritori/{page,solo/page}.tsx`, `backend/{handlers,modules}/shiritori*`, `shared/utils/shiritori.ts`.
-- **Last audited:** 2026-07-20
+- **Last audited:** 2026-07-21
 - **Covered (2026-07-18):** chain engine, backend manager+handler, MP hook+view, solo engine+page, landing page, i18n ×6 locales.
 - **Covered (2026-07-19):** turn timer implementation (useShiritoriGame+ShiritoriView+ShiritoriVersus), solo/page.tsx verified clean.
 - **Covered (2026-07-20):** dictCheckJa bug confirmed — `catch {}` returns `false` on network drop AND HTTP error, both treated as "not in dict" by `commitPlayerWord`. Countdown timer rendered correctly in ShiritoriView.tsx (role="timer", color thresholds at ≤9s/≤5s, hidden when finished). `useShiritoriGame.ts:76,89` resets `turnStartedAt` on accepted + eliminated ✅. `turnStartedAt` null on gameOver ✅.
-- **Not yet covered:** countdown TDD tests (still gap), visual QA.
+- **Covered (2026-07-21):** dictCheckJa network/HTTP error path fixed — now throws `DictNetworkError` instead of returning `false`; `submit()` catches it and shows `shiritori.solo.err.network` toast before calling `commitPlayerWord`. `shiritori.solo.err.network` key added to all 6 locales (en/he/sv/ja/es/ru). TDD countdown tests added: `useShiritoriGame.test.ts` (4 turnStartedAt tests) + `ShiritoriView.test.tsx` (5 timer bar tests covering render/absent/full/orange/yellow/finished states).
+- **Not yet covered:** visual QA (screenshot capture).
 
 **Open issues:**
-- ✅ FIXED (2026-07-19): No turn-timer UI — 15s server deadline invisible to client. Added `turnStartedAt: number | null` to `ShiritoriClientState`; resets on `shiritoriWordAccepted` / `shiritoriPlayerEliminated`; `ShiritoriView.tsx` renders a depleting progress bar (lime→yellow→orange at ≤9s/≤5s) via `role="timer"`.
-- 🟡 MAJOR: `dictCheckJa` network error indistinguishable from invalid word — `solo/page.tsx:71 catch {}` returns `false`; `solo/page.tsx:68 !res.ok` returns `false` too. Both hit `commitPlayerWord(state, word, false)` → reason `not-in-dict` shown. Fix: throw on network/HTTP error, catch before `commitPlayerWord`, show `shiritori.solo.err.network` key (add to all 6 translation files). Owner: **next run — top priority**.
-- 🟡 MAJOR: No tests for countdown logic in `useShiritoriGame.test.ts` or `ShiritoriView.test.tsx` — TDD gap. Tests needed: (a) `turnStartedAt` non-null after `shiritoriWordAccepted`, (b) timer bar renders when `turnStartedAt` provided, (c) bar absent when null/finished, (d) bar color at ≤5s (orange) / ≤9s (yellow). Owner: **next run**.
-- ✅ FIXED: final loser never marked `eliminated:true` on game-over (`useShiritoriGame.ts:87`).
-- ✅ FIXED: init loading text semantics (`ShiritoriVersus.tsx:77`).
+- ✅ FIXED (2026-07-19): No turn-timer UI — 15s server deadline invisible to client.
+- ✅ FIXED (2026-07-21): `dictCheckJa` network error indistinguishable from invalid word — `DictNetworkError` thrown, caught in `submit()`, shows `shiritori.solo.err.network` key. Added to all 6 translation files.
+- ✅ FIXED (2026-07-21): No TDD tests for countdown logic — 9 tests added across `useShiritoriGame.test.ts` + `ShiritoriView.test.tsx` covering turnStartedAt lifecycle and timer bar render/color states.
+- ✅ FIXED: final loser never marked `eliminated:true` on game-over.
+- ✅ FIXED: init loading text semantics.
+- 🟡 MINOR: Visual QA not yet captured — code audit covers all areas but no screenshot evidence. Owner: **next run**.
 
 ## Queue (audit order — closest-to-release first)
 

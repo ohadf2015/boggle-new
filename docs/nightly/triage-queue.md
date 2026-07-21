@@ -1673,3 +1673,67 @@ _Source: posthog flag list queried 2026-07-11 via posthog-query.sh flags; all fl
   - link: supabase:advisor:security:authenticated_security_definer_function_executable
   - status: acknowledged-intentional — only callsite is app/api/player/push-token/route.ts (server-side, authed). Migration 20260628010000 explicitly grants authenticated, revokes public. By design.
   - recommended owner: none (no action needed)
+
+## 2026-07-21
+
+- [Supabase] Impact check RESOLVED — idx_word_pacts_player2_id (shipped 2026-07-16)
+  - Queried live DB: index EXISTS in pg_indexes → verdict: improved
+  - Appended verdict to impact-ledger.ndjson
+  - status: shipped (resolved)
+  - recommended owner: none
+
+- [Sentry] JAVASCRIPT-NEXTJS-1PH — CapacitorGameConnect.then() not implemented on android
+  - last seen: 2026-07-05 (pre-dates nativePGS.ts:85 guard fix)
+  - Confirmed: stale brief data. Issue has NOT recurred since fix. Resolving in Sentry.
+  - status: shipped (resolved in Sentry)
+  - recommended owner: none
+
+- [Supabase] teacher_access_requests — tar_insert_any INSERT policy allows public role (anon + authenticated)
+  - Detail: `WITH CHECK (true)` on INSERT for `public` role → unauthenticated users can submit teacher access requests
+  - Fix: DROP tar_insert_any, CREATE new policy scoped to `authenticated` with `WITH CHECK (auth.uid() = user_id)`
+  - status: deferred — policy replacement, not addition (autonomy matrix says defer)
+  - why: failure mode = "teachers can't submit requests", needs QA; also requires checking user_id column constraints
+  - recommended owner: review-by-eod (backend)
+
+- [PostHog] TypeError: Load failed — 68 occurrences, 18 users, last seen 2026-07-20
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f34a3-12d0-7820-a7d2-4b2d22556c1e
+  - Source: chunk 32162 (minified). "Load failed" = Safari/iOS network fetch failure (no stack trace available)
+  - status: deferred — no actionable stack trace; likely transient network/iOS fetch error
+  - why: cannot root-cause without stack trace or URL context
+  - recommended owner: review-by-eod (check if word-wheel WASM fetch needs error boundary)
+
+- [PostHog] React error #418 — hydration mismatch, 14 occurrences, 9 users, ongoing since 2026-06-30
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f185d-dc16-7bf0-8ff4-7390159a8048
+  - args: HTML (full element mismatch between SSR and client render)
+  - status: deferred — chunk 4bd1b696 (minified), no page URL context
+  - why: needs non-minified stack or URL to identify the offending component; suspect: typeof window guard or conditional on client-only state in render
+  - recommended owner: review-by-eod (reproduce in dev with non-minified build)
+
+- [Supabase] upsert_push_token SECURITY DEFINER callable by authenticated role
+  - status: acknowledged-intentional (confirmed: function body uses auth.uid(), requires authentication, search_path already hardened, migration 20260628010000 explicitly scopes to authenticated only)
+  - recommended owner: none
+
+## 2026-07-21 — Lane 03
+
+### exp-mp-room-join-loading-v1 — ZOMBIE FLAG
+- PostHog: active, True
+- Call sites in code: 0 (confirmed via grep on fe-next, excluding experiments.ts/tests)
+- Action: human should deactivate in PostHog — serves a variant that changes nothing
+
+### Unwired experiments (in PostHog but 0 non-test callsites outside experiments.ts)
+These flags are NOT in experiments.ts and are known zombies — separate from the above:
+- exp-mp-room-join-loading-v1 (confirmed zombie, 0 sites)
+
+### mode_card_rapid_reclick impact verdict
+- Shipped 2026-07-16, measured 0 events in last 7d (baseline: 0, direction: up)
+- Verdict: neutral — event fires on edge case (same cube clicked twice <1.5s) which may be rare in real play. Not regressed; low signal volume. Watch for 14d.
+
+### mp_round sentiment alarm
+- avg 1.5/3 (4 bad, 1 ok, 1 great) — worst surface this week
+- 3 active experiments already targeting it: exp-mp-round-reaction-v1, exp-mp-results-rival-best-word-v1, exp-mp-round-progress-header-v1
+- New experiment `exp-mp-results-score-context-v1` proposed (see lane report) — NOT wired tonight (time budget exhausted). Wire next run.
+
+### /en/multiplayer rage clicks (score 0.823, reach=5)
+- Top signal from brief. Root cause not yet isolated.
+- Recommend: check if rage clicks are on the "Join" button while socket is connecting (same root as /es/multiplayer exp-mp-lobby-connect-feedback-v1 which already targets ES).
+- exp-mp-lobby-connect-feedback-v1 currently only wired for ES locale — may need to expand to EN.

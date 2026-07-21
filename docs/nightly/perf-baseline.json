@@ -1,27 +1,26 @@
 {
-  "date": "2026-07-20",
-  "note": "7-day window (n≥50 floor). CLS CRITICAL across all routes — /en/multiplayer 0.979 root cause identified (AutoHideHeader spacer dropped on reconnect) and fixed. Homepage CLS 0.903 still open. Supabase MCP absent (24th night). FK index migration still pending.",
+  "date": "2026-07-21",
+  "note": "7-day window (n≥50 floor). Homepage LCP improved 5301→4836ms. CLS still high across all routes. Ad-banner spacer CLS fix shipped for homepage. Supabase MCP absent.",
   "backend": {
     "advisor_warnings_count": 2,
-    "note": "Supabase MCP absent. Advisor: unindexed FK web_vitals_player_id_fkey (migration pending 20260716), auth DB connection strategy. FK index verdict: neutral (migration never applied).",
+    "note": "Supabase MCP absent this run. Advisor: unindexed FK web_vitals_player_id_fk_index (migration pending 20260716), auth DB connection strategy. 6 migrations still pending apply.",
     "top_queries": [],
     "migrations_pending_apply": [
-      { "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql", "carry_count": 23 },
-      { "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql", "carry_count": 18 },
-      { "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql", "carry_count": 13 },
-      { "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql", "carry_count": 12 },
-      { "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql", "carry_count": 5 },
-      { "file": "fe-next/supabase/migrations/20260716020000_web_vitals_player_id_fk_index.sql", "carry_count": 4 }
+      { "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql", "carry_count": 24 },
+      { "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql", "carry_count": 19 },
+      { "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql", "carry_count": 14 },
+      { "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql", "carry_count": 13 },
+      { "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql", "carry_count": 6 },
+      { "file": "fe-next/supabase/migrations/20260716020000_web_vitals_player_id_fk_index.sql", "carry_count": 5 }
     ]
   },
   "frontend": {
-    "note": "7-day window (n≥50 floor). CLS CRITICAL all routes. Fix shipped for /en/multiplayer (AutoHideHeader spacer). Check in 3d. Homepage LCP 5127ms — AnimatePresence fix (07-18) not yet reflecting in 7d avg.",
+    "note": "7-day window (n≥50 floor). Homepage LCP improved 5301→4836ms (+AnimatePresence fix 07-18 confirmed). CLS still high all routes — /en/multiplayer 07-20 fix diluted by 6d pre-fix data. Ad-banner spacer fix shipped tonight.",
     "by_route": [
-      { "route": "/en/multiplayer", "p75_lcp_ms": 1701, "p75_inp_ms": 268, "p75_cls": 0.979, "n_7d": 111, "cls_fix_shipped": true },
-      { "route": "/", "p75_lcp_ms": 5127, "p75_inp_ms": 242, "p75_cls": 0.903, "n_7d": 72 },
-      { "route": "/en", "p75_lcp_ms": 3002, "p75_inp_ms": 320, "p75_cls": 0.892, "n_7d": 58 },
-      { "route": "/es/multiplayer", "p75_lcp_ms": 3755, "p75_inp_ms": 476, "p75_cls": 0.673, "n_7d": 152 },
-      { "route": "/es/juego-de-palabras-multijugador", "p75_lcp_ms": 2933, "p75_inp_ms": 120, "p75_cls": 0.0, "n_7d": 51, "note": "CLS-free SEO landing — confirms CLS source is in dynamic MP/home components, not layout banners" }
+      { "route": "/en/multiplayer", "p75_lcp_ms": 1908, "p75_cls": 0.979, "n_7d": 126, "note": "7d avg still includes 6d pre-fix data from 07-20 AutoHideHeader fix" },
+      { "route": "/", "p75_lcp_ms": 4836, "p75_cls": 0.921, "n_7d": 84, "note": "LCP improved vs 5301. CLS fix shipped tonight (ad-banner always-render spacer)." },
+      { "route": "/en", "p75_lcp_ms": 3448, "p75_cls": 0.892, "n_7d": 65 },
+      { "route": "/es/multiplayer", "p75_lcp_ms": 3824, "p75_cls": 0.674, "n_7d": 141, "note": "REGRESSED vs 0.369 baseline (07-14 verdict)" }
     ]
   },
   "bundle": {
