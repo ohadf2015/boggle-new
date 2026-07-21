@@ -12349,6 +12349,15 @@ const en = {
     "dismiss": "Maybe Later",
     "imageAlt": "Word Hunt multiplayer duel"
   },
+  "directionsTutorial": {
+    "badge": "Quick tip",
+    "title": "Go in ANY direction",
+    "subtitle": "Letters connect if they touch — even diagonally.",
+    "tryPrompt": "Your turn — trace the diagonal word",
+    "donePrompt": "Nice! Diagonals count too 🎉",
+    "cta": "Let's play",
+    "ctaWait": "{{seconds}}s"
+  },
   "modeCoach": {
     "skip": "Skip",
     "next": "Next",

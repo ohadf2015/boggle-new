@@ -22,6 +22,7 @@ import { ScorePopupFly } from '@/components/animations/ScorePopupFly';
 import PracticeContinuePrompt from './PracticeContinuePrompt';
 import PracticeCoachTip from '@/components/practice/PracticeCoachTip';
 import { ModeCoach } from '@/components/tutorial/ModeCoach';
+import { DirectionsTutorialOverlay } from '@/components/tutorial/DirectionsTutorialOverlay';
 import { fireVictoryConfetti } from '@/utils/confettiUtils';
 import { evaluateSelectionAchievements } from '@/lib/achievements/hiddenAchievementBus';
 
@@ -381,6 +382,13 @@ function SinglePlayerGame({
       <ModeCoach mode="classic" />
     ) : null;
 
+  // First-time-only, blocking "you can trace in ANY direction" tutorial. Shows
+  // once per device across all grid modes (portal + global gate), freezes the
+  // clock while up. Suppressed in Quick Play (hideModeCoach), same as ModeCoach.
+  const directionsTutorialElement = !hideModeCoach ? (
+    <DirectionsTutorialOverlay />
+  ) : null;
+
   // Landscape layout
   if (core.isLandscape) {
     return (
@@ -390,6 +398,7 @@ function SinglePlayerGame({
         {practicePromptElement}
         {practiceCoachElement}
         {modeCoachElement}
+        {directionsTutorialElement}
         <LandscapeGameLayout
           {...commonProps}
           progressBarExpanded={core.progressBarExpanded}
@@ -410,6 +419,7 @@ function SinglePlayerGame({
         {practicePromptElement}
         {practiceCoachElement}
         {modeCoachElement}
+        {directionsTutorialElement}
         <DesktopGameLayout
           {...commonProps}
           targetHighScore={core.targetHighScore}
@@ -429,6 +439,7 @@ function SinglePlayerGame({
       {scorePopupElement}
       {practicePromptElement}
       {modeCoachElement}
+      {directionsTutorialElement}
       <PortraitGameLayout
         {...commonProps}
         targetHighScore={core.targetHighScore}

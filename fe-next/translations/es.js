@@ -13500,6 +13500,15 @@ const es = {
       "earning": "Añadiendo tiempo..."
     }
   },
+  "directionsTutorial": {
+    "badge": "Consejo",
+    "title": "Ve en CUALQUIER dirección",
+    "subtitle": "Las letras se conectan si se tocan, incluso en diagonal.",
+    "tryPrompt": "Te toca: traza la palabra en diagonal",
+    "donePrompt": "¡Bien! Las diagonales también cuentan 🎉",
+    "cta": "A jugar",
+    "ctaWait": "{{seconds}} s"
+  },
   "modeCoach": {
     "skip": "Saltar",
     "next": "Siguiente",

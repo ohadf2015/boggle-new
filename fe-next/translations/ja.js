@@ -15646,6 +15646,15 @@ const ja = {
     "notDownloaded": "ダウンロードされていません",
     "errorGeneric": "ダウンロードに失敗しました。もう一度お試しください。"
   },
+  "directionsTutorial": {
+    "badge": "ヒント",
+    "title": "どの向きでもOK",
+    "subtitle": "となり合う文字はつなげられます。ななめもOK。",
+    "tryPrompt": "やってみよう — ななめの単語をなぞって",
+    "donePrompt": "いいね！ななめもアリ 🎉",
+    "cta": "プレイ開始",
+    "ctaWait": "{{seconds}}秒"
+  },
   "modeCoach": {
     "skip": "スキップ",
     "next": "次へ",
