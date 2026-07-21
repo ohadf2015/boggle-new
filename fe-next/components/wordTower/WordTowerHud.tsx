@@ -201,18 +201,26 @@ export function WordTowerHud(props: WordTowerHudProps) {
           While placing, the deck tints lime to read as ARMED. */}
       <div
         ref={deckRef}
+        data-testid="wt-control-deck"
         className={cn(
           'pointer-events-auto relative space-y-1 rounded-t-neo border-t-neo-thick border-black px-4 pt-0.5 shadow-[0_-3px_0_rgba(0,0,0,0.5)] backdrop-blur-md transition-colors duration-200',
           isPlacing
             ? 'bg-gradient-to-b from-neo-lime/15 via-neo-navy/95 to-neo-navy/95'
             : 'bg-neo-navy/95',
-          // Keep the bottom controls clear of the screen edge / home-indicator so
-          // they're comfortable to tap (open), and float the grab handle well
-          // above the edge when collapsed so re-opening the drawer never grazes
-          // the system back-gesture zone and exits the game.
+          // Bottom clearance, layered so the wheel is never clipped or awkward:
+          //   1. env(safe-area-inset-bottom) — the home-indicator / gesture zone.
+          //   2. var(--admob-banner-height,0px) — the native AdMob banner band.
+          //      Native banners COMPOSITE ABOVE the WebView, so DOM padding alone
+          //      can't clear them; reserving this band lifts the whole deck (and
+          //      thus the wheel's bottom letters + glow ring) above the banner.
+          //      The var self-zeros on web / when no banner shows, so this is a
+          //      no-op there. (deckRef.offsetHeight grows with it → the tower
+          //      grounds above the banner too, keeping the scene consistent.)
+          //   3. a comfortable tap gap so controls never hug the very edge (and,
+          //      collapsed, the grab handle floats clear of the back-gesture zone).
           deckOpen
-            ? 'pb-[calc(env(safe-area-inset-bottom)+1.65rem)]'
-            : 'pb-[calc(env(safe-area-inset-bottom)+1.6rem)]',
+            ? 'pb-[calc(env(safe-area-inset-bottom)+var(--admob-banner-height,0px)+1.65rem)]'
+            : 'pb-[calc(env(safe-area-inset-bottom)+var(--admob-banner-height,0px)+1.6rem)]',
         )}
       >
         {/* Drawer grip — collapse the deck to free the screen for the tower. */}

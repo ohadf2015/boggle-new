@@ -115,4 +115,29 @@ describe('WordTowerHud deck', () => {
       expect(start.contains(scramble)).toBe(true);
     });
   });
+
+  describe('bottom-banner clearance', () => {
+    // Regression: the bottom letter nodes + glow ring of the wheel were clipped
+    // by a native AdMob banner. Native banners COMPOSITE ABOVE the WebView, so
+    // DOM safe-area padding alone can't clear them — the deck must reserve the
+    // `--admob-banner-height` band so its whole contents (the wheel included)
+    // sit above the banner. The var self-zeros on web / when no banner shows, so
+    // this is a no-op there.
+    it('reserves the ad-banner band in the control deck bottom padding', () => {
+      render(<WordTowerHud {...baseProps()} />);
+      const deck = screen.getByTestId('wt-control-deck');
+      expect(deck.className).toContain('--admob-banner-height');
+      // Still keeps the home-indicator safe area + comfortable tap gap.
+      expect(deck.className).toContain('env(safe-area-inset-bottom)');
+    });
+
+    it('keeps the banner reservation whether the deck is expanded or collapsed', () => {
+      const { rerender } = render(<WordTowerHud {...baseProps()} />);
+      expect(screen.getByTestId('wt-control-deck').className).toContain('--admob-banner-height');
+      // Collapse the drawer and re-assert (the padding differs per state).
+      fireEvent.click(screen.getByLabelText('wordTower.hud.collapse'));
+      rerender(<WordTowerHud {...baseProps()} />);
+      expect(screen.getByTestId('wt-control-deck').className).toContain('--admob-banner-height');
+    });
+  });
 });
