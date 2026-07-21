@@ -21,7 +21,7 @@ describe('avatarSets', () => {
     const cosmic = AVATAR_SETS.find(s => s.id === 'cosmic')!;
     const p = getSetProgress(cosmic, ['eyes:galaxy', 'hair:galaxy']);
     expect(p.owned).toBe(2);
-    expect(p.total).toBe(4);
+    expect(p.total).toBe(5);
     expect(p.complete).toBe(false);
     expect(p.missing).toContain('accessory:astronaut');
   });

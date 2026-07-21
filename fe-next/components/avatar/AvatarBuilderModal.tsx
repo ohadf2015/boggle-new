@@ -3,14 +3,14 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { createPortal } from 'react-dom';
-import { X, Shuffle, Undo2, Download, Coins, History } from 'lucide-react';
+import { X, Shuffle, Undo2, Download, Coins, History, Eye, EyeOff } from 'lucide-react';
 import { AVATAR_CATEGORY_ICONS } from './AvatarCategoryIcons';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { safeToLocaleString } from '@/utils/bcp47Locale';
 import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { Reveal } from '@/components/ui/Reveal';
 import AvatarRenderer from './AvatarRenderer';
-import { getAvatarTier, type Tier } from './AvatarTierEffects';
+import AvatarTierEffects, { getAvatarTier, getAvatarVisualTier, type Tier } from './AvatarTierEffects';
 import AvatarEquipBurst from './AvatarEquipBurst';
 import GlowUpButton from './GlowUpButton';
 import { LobbyAvatarRewardButton } from './LobbyAvatarRewardButton';
@@ -26,6 +26,7 @@ import {
   DEFAULT_FEMALE_HAIR,
   DEFAULT_MALE_HAIR,
 } from '@/shared/types/customAvatar';
+import { AVATAR_SETS, getSetProgress } from '@/lib/avatar/avatarSets';
 
 type Category = 'base' | 'hair' | 'eyes' | 'mouth' | 'facialHair' | 'accessories' | 'background';
 
@@ -85,6 +86,7 @@ export default function AvatarBuilderModal({
   const historyRef = useRef<CustomAvatarConfig[]>([]);
   // Equip "snap" burst — fires over the preview when an equip changes the tier.
   const [equipBurst, setEquipBurst] = useState<EquipBurst | null>(null);
+  const [previewMode, setPreviewMode] = useState(false);
   const lastTierRef = useRef<Tier>('free');
 
   useEffect(() => {
@@ -214,6 +216,19 @@ export default function AvatarBuilderModal({
             {t('avatarBuilder.title')}
           </h2>
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setPreviewMode(v => !v)}
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-neo border-2 text-xs font-black transition-colors ${
+                previewMode
+                  ? 'bg-neo-lime/20 border-neo-lime text-neo-lime'
+                  : 'bg-neo-navy-light border-neo-white/20 text-neo-white hover:border-neo-white/40'
+              }`}
+              title={t('avatarBuilder.previewMode')}
+            >
+              {previewMode ? <Eye size={14} /> : <EyeOff size={14} />}
+              <span className="hidden @[28rem]:inline">{t('avatarBuilder.previewMode')}</span>
+            </button>
             {premium && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-neo bg-neo-navy-light border-2 border-neo-yellow/30">
                 <Coins size={14} className="text-neo-yellow" />
@@ -236,9 +251,27 @@ export default function AvatarBuilderModal({
               transition={JELLY_SPRING}
               className="border-3 border-black shadow-hard rounded-neo-lg overflow-hidden cursor-pointer w-[88px] h-[88px] @[24rem]:w-[112px] @[24rem]:h-[112px] @[32rem]:w-[140px] @[32rem]:h-[140px] desktop-tall:@[32rem]:w-[160px] desktop-tall:@[32rem]:h-[160px]"
             >
-              <AvatarRenderer config={config} size={160} className="w-full h-full" />
+              {previewMode ? (
+                <AvatarTierEffects config={config} className="w-full h-full">
+                  <AvatarRenderer config={config} size={160} className="w-full h-full" />
+                </AvatarTierEffects>
+              ) : (
+                <AvatarRenderer config={config} size={160} className="w-full h-full" />
+              )}
             </AdaptiveMotion.div>
             <AvatarEquipBurst burst={equipBurst} fireKey={previewKey} />
+            {previewMode && (
+              <div className="absolute -bottom-6 inset-x-0 text-center">
+                <span className={`text-[10px] font-black uppercase tracking-wider ${
+                  getAvatarVisualTier(config) === 'legendary' ? 'text-amber-300'
+                  : getAvatarVisualTier(config) === 'epic' ? 'text-neo-yellow'
+                  : getAvatarVisualTier(config) === 'rare' ? 'text-neo-white'
+                  : 'text-neo-white/60'
+                }`}>
+                  {t(`avatarBuilder.tiers.${getAvatarVisualTier(config)}`)}
+                </span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -253,6 +286,50 @@ export default function AvatarBuilderModal({
         <div className="flex justify-center px-3 pb-1 shrink-0 empty:hidden" data-testid="avatar-builder-reward-slot">
           <LobbyAvatarRewardButton />
         </div>
+
+        {/* Set completion progress */}
+        {premium && (
+          <div className="px-3 sm:px-4 pb-2 shrink-0">
+            <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
+              {AVATAR_SETS.map(set => {
+                const ownedKeys = set.parts.filter(k => {
+                  const [c, i] = k.split(':');
+                  return premium.isPartUnlocked(c, i);
+                });
+                const prog = getSetProgress(set, ownedKeys);
+                return (
+                  <div
+                    key={set.id}
+                    className="shrink-0 flex items-center gap-1.5 px-2 py-1.5 rounded-neo bg-neo-navy-light border border-neo-white/10"
+                    title={t(`avatarBuilder.sets.${set.id}`)}
+                  >
+                    <span className="text-[10px] font-black uppercase" style={{ color: set.color }}>
+                      {t(`avatarBuilder.sets.${set.id}`)}
+                    </span>
+                    <span className="flex gap-0.5">
+                      {Array.from({ length: prog.total }, (_, i) => (
+                        <span
+                          key={i}
+                          className="w-1.5 h-1.5 rotate-45 border rounded-[1px]"
+                          style={{
+                            borderColor: set.color,
+                            background: i < prog.owned ? set.color : 'transparent',
+                          }}
+                        />
+                      ))}
+                    </span>
+                    <span className="text-[9px] font-black tabular-nums text-neo-white/70">
+                      {prog.owned}/{prog.total}
+                    </span>
+                    {prog.complete && (
+                      <span className="text-[9px]" aria-label={t('avatarBuilder.completeSet')}>★</span>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Category Tabs — scroll-snap row, icon-only on narrow, icon+label when room */}
         <div className="relative shrink-0">

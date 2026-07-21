@@ -14335,6 +14335,27 @@ const sv = {
       "toxic": "Giftig",
       "royal": "Kunglig",
       "pop": "Pop"
+    },
+    "previewMode": "Förhandsgranska",
+    "tryOn": "Prova",
+    "owned": "Ägd",
+    "setProgress": "{owned}/{total} i set",
+    "completeSet": "Set komplett!",
+    "completionistAura": "Completionist-aura",
+    "sets": {
+      "cosmic": "Kosmisk",
+      "dragon": "Drake",
+      "cyber": "Cyber",
+      "royal": "Kunglig",
+      "mythic": "Mytisk",
+      "neon": "Neon",
+      "ocean": "Hav"
+    },
+    "tiers": {
+      "common": "Vanlig",
+      "rare": "Sällsynt",
+      "epic": "Episk",
+      "legendary": "Legendarisk"
     }
   },
   "encouragement": {

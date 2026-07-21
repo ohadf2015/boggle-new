@@ -12116,6 +12116,27 @@ const ru = {
       "toxic": "Токсичный",
       "royal": "Королевский",
       "pop": "Поп"
+    },
+    "previewMode": "Предпросмотр",
+    "tryOn": "Примерить",
+    "owned": "Куплено",
+    "setProgress": "{owned}/{total} набора",
+    "completeSet": "Набор собран!",
+    "completionistAura": "Аура коллекционера",
+    "sets": {
+      "cosmic": "Космос",
+      "dragon": "Дракон",
+      "cyber": "Кибер",
+      "royal": "Королевский",
+      "mythic": "Мифический",
+      "neon": "Неон",
+      "ocean": "Океан"
+    },
+    "tiers": {
+      "common": "Обычный",
+      "rare": "Редкий",
+      "epic": "Эпический",
+      "legendary": "Легендарный"
     }
   },
   "help": {

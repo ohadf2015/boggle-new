@@ -14068,6 +14068,27 @@ const ja = {
       "toxic": "トキシック",
       "royal": "ロイヤル",
       "pop": "ポップ"
+    },
+    "previewMode": "プレビュー",
+    "tryOn": "試着",
+    "owned": "所持",
+    "setProgress": "セット {owned}/{total}",
+    "completeSet": "セット完了！",
+    "completionistAura": "コンプリートオーラ",
+    "sets": {
+      "cosmic": "コスミック",
+      "dragon": "ドラゴン",
+      "cyber": "サイバー",
+      "royal": "ロイヤル",
+      "mythic": "ミシック",
+      "neon": "ネオン",
+      "ocean": "オーシャン"
+    },
+    "tiers": {
+      "common": "コモン",
+      "rare": "レア",
+      "epic": "エピック",
+      "legendary": "レジェンダリー"
     }
   },
   "encouragement": {

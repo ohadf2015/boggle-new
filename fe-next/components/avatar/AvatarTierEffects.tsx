@@ -5,6 +5,18 @@ import { type CustomAvatarConfig, isEpicPart, isLegendaryPart, isPremiumPart } f
 import '@/styles/avatar-tier-animations.css';
 
 type Tier = 'free' | 'vip' | 'epic' | 'legendary';
+export type VisualTier = 'common' | 'rare' | 'epic' | 'legendary';
+
+/** Map the internal economy tier to the player-facing visual tier. */
+export function getAvatarVisualTier(config: CustomAvatarConfig): VisualTier {
+  const tier = getAvatarTier(config);
+  switch (tier) {
+    case 'legendary': return 'legendary';
+    case 'epic': return 'epic';
+    case 'vip': return 'rare';
+    default: return 'common';
+  }
+}
 
 /** Determine the highest tier across all equipped parts */
 function getAvatarTier(config: CustomAvatarConfig): Tier {
@@ -32,8 +44,8 @@ function getAvatarTier(config: CustomAvatarConfig): Tier {
 }
 
 const TIER_CLASS: Record<Tier, string> = {
-  free: '',
-  vip: 'avatar-tier-vip',
+  free: 'avatar-tier-common',
+  vip: 'avatar-tier-rare',
   epic: 'avatar-tier-epic',
   legendary: 'avatar-tier-legendary',
 };
@@ -108,5 +120,5 @@ const AvatarTierEffects = memo<AvatarTierEffectsProps>(({
 AvatarTierEffects.displayName = 'AvatarTierEffects';
 
 export { getAvatarTier };
-export type { Tier };
+export type { Tier, VisualTier };
 export default AvatarTierEffects;

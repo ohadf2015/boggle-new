@@ -17,6 +17,7 @@
 
 import { STROKE_OUTER } from './avatarDesignConstants';
 import { useAvatarUid } from '../AvatarUidContext';
+import { BASE_PARTS_PREMIUM } from './BasePartsPremium';
 
 const S = STROKE_OUTER;
 
@@ -543,6 +544,7 @@ export const BASE_PARTS = {
   robotHead: RobotHead,
   alienHead: AlienHead,
   ghostFace: GhostFace,
+  ...BASE_PARTS_PREMIUM,
 } as const;
 
 export type BasePart = keyof typeof BASE_PARTS;

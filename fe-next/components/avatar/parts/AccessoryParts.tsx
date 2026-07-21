@@ -5,6 +5,7 @@
 
 import { STROKE_INNER, STROKE_OUTER } from './avatarDesignConstants';
 import { useAvatarUid } from '../AvatarUidContext';
+import { ACCESSORY_PARTS_PREMIUM } from './AccessoryPartsPremium';
 
 /** Most accessories use inner stroke; head accessories (hats, crowns) use outer */
 const S = STROKE_INNER;
@@ -1278,6 +1279,7 @@ export const ACCESSORY_PARTS = {
   flamingHalo: FlamingHalo,
   iceCrown: IceCrown,
   crystalCrown: CrystalCrown,
+  ...ACCESSORY_PARTS_PREMIUM,
 } as const;
 
 export type AccessoryPart = keyof typeof ACCESSORY_PARTS;
