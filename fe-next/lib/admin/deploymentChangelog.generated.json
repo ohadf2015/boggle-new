@@ -1,145 +1,26 @@
 {
-  "generatedAt": "2026-07-14T21:52:08.777Z",
+  "generatedAt": "2026-07-21T18:19:27.133Z",
   "commits": [
     {
-      "sha": "c3973c715b54020b3d73e3894fe29d6e731736c6",
-      "shortSha": "c3973c7",
-      "subject": "fix(nightly): stop vitest fork oversubscription wedging the gate, drain migration backlog",
-      "author": "Ohad Fisher",
-      "date": "2026-07-14T10:18:25+03:00"
+      "sha": "c309b47adac88455b63b3e9245d6b8c7f12dd4ca",
+      "shortSha": "c309b47",
+      "subject": "feat(avatar): wire premium parts quality, VIP filter, and shared layer rules",
+      "author": "Hermes (agent)",
+      "date": "2026-07-21T17:38:15+00:00"
     },
     {
-      "sha": "acc4ac1339f729c9f944f887b59f814cc0f1f13a",
-      "shortSha": "acc4ac1",
-      "subject": "fix(blast): catch AudioContext.resume() rejection in legacy sounds hook",
-      "author": "Ohad Fisher",
-      "date": "2026-07-14T10:04:29+03:00"
+      "sha": "f9a7fa6fcc0bfe6ae870da7b2d8e153cc413cab0",
+      "shortSha": "f9a7fa6",
+      "subject": "Kimi: LexiClash avatar overhaul — premium parts, tier system, better animations, new sets",
+      "author": "Hermes (agent)",
+      "date": "2026-07-21T15:56:16+00:00"
     },
     {
-      "sha": "2270e1de80739abb2c902a74cfb8ef2975566d5e",
-      "shortSha": "2270e1d",
-      "subject": "fix(nightly): restore 07-14 lane code dropped by a false-negative gate",
+      "sha": "96581c251d9d52673ba64bf1cdb0dbc7c9c04d27",
+      "shortSha": "96581c2",
+      "subject": "chore(nightly): mark 20260721-010001 salvage restored — lane code shipped",
       "author": "Ohad Fisher",
-      "date": "2026-07-14T09:50:37+03:00"
-    },
-    {
-      "sha": "a3eae6c18de42f2c28964cb40e6eaaa3dbf40404",
-      "shortSha": "a3eae6c",
-      "subject": "chore(nightly): autonomous improvement loop 2026-07-14",
-      "author": "Ohad Fisher",
-      "date": "2026-07-14T08:28:16+03:00"
-    },
-    {
-      "sha": "82b3bc6dd9e28f11b004459ceb34f8359c76d827",
-      "shortSha": "82b3bc6",
-      "subject": "perf(mascot): serve celebration videos from CDN bucket",
-      "author": "Ohad Fisher",
-      "date": "2026-07-14T01:59:30+03:00"
-    },
-    {
-      "sha": "e07e9b25316ff1095f617bb4d2c04144dc5648fa",
-      "shortSha": "e07e9b2",
-      "subject": "fix(word-tower): harden stuck toasts, crane truss, wrecking-ball fx, live wreck notify",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T21:35:53+03:00"
-    },
-    {
-      "sha": "6fb8daf479aec7cc3057743220b0a612795c0438",
-      "shortSha": "6fb8daf",
-      "subject": "fix(nightly): restore code salvaged from 07-12 and 07-13 gate drops",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T11:16:30+03:00"
-    },
-    {
-      "sha": "771e18bffa1e6c75f6a3183e1e64cd16b75e1cb3",
-      "shortSha": "771e18b",
-      "subject": "chore(nightly): autonomous improvement loop 2026-07-13",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T04:22:42+03:00"
-    },
-    {
-      "sha": "8e2be7aa3c498ed2c57d738e35a3a46e048a30da",
-      "shortSha": "8e2be7a",
-      "subject": "chore: remove 9 orphaned promo design-iteration drafts (17.9MB)",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T03:11:05+03:00"
-    },
-    {
-      "sha": "437c2b0c9bc787046df8974b5f90cdf624a6b7e0",
-      "shortSha": "437c2b0",
-      "subject": "perf: convert invite-hero to webp (497KB -> 52KB)",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T02:56:20+03:00"
-    },
-    {
-      "sha": "bbed3c5c887d6904d1afbe2e9d7ce0eb543c6de4",
-      "shortSha": "bbed3c5",
-      "subject": "fix: wire ru into serverTranslate, floor DailyWordHunt tab-switch height",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T02:46:26+03:00"
-    },
-    {
-      "sha": "628f0ab00c518464a451eff5dd0bf973ba5a52c0",
-      "shortSha": "628f0ab",
-      "subject": "perf: memoize BlastComboFlash, verify multiplayer re-render path",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T02:33:11+03:00"
-    },
-    {
-      "sha": "6092736ffcbf8340a396f735819a1039a909e565",
-      "shortSha": "6092736",
-      "subject": "perf: memoize BlastScoreMilestone, remove dead author JPEG duplicates",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T02:04:18+03:00"
-    },
-    {
-      "sha": "0cf099b395eb196b0363146ea1798ec72b431da8",
-      "shortSha": "0cf099b",
-      "subject": "perf: reserve ad-section height + memoize WordTowerBackdrop, drop stale binaries",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T01:50:23+03:00"
-    },
-    {
-      "sha": "c21664fe98ce4134da795b7376d62bfff64f7c58",
-      "shortSha": "c21664f",
-      "subject": "fix(nightly): extend the contention-aware timeout fix to lanes + MCP boot",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T01:47:02+03:00"
-    },
-    {
-      "sha": "20d410bc9bd2b5fc90e748ca8db82931a20743ba",
-      "shortSha": "20d410b",
-      "subject": "fix(nightly): stop false-positive gate wedges from CPU contention, close 2 lane defer gaps",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T01:34:42+03:00"
-    },
-    {
-      "sha": "aaed808a420c8aeeab7435c556f16fba0ef99239",
-      "shortSha": "aaed808",
-      "subject": "feat(ads): grandfather pre-cutoff users as adults + re-prompting age gate",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T01:07:32+03:00"
-    },
-    {
-      "sha": "40f7a976a192532f213289458c9938bc121d59b3",
-      "shortSha": "40f7a97",
-      "subject": "feat(connections): per-player shuffle, 2 free daily hints, pyramid rebuild + 6-locale pool overhaul",
-      "author": "Ohad Fisher",
-      "date": "2026-07-13T00:37:24+03:00"
-    },
-    {
-      "sha": "4531ff6d7045b9120e14125299cea378f489a66d",
-      "shortSha": "4531ff6",
-      "subject": "fix(security): drop all events from migrating sockets during tab takeover",
-      "author": "Ohad Fisher",
-      "date": "2026-07-12T23:22:27+03:00"
-    },
-    {
-      "sha": "327f69e203bf4d31be5a8b6321af909a6ab449c8",
-      "shortSha": "327f69e",
-      "subject": "fix: resolve Wikipedia batch-upsert outage + Sentry noise (1R3, 1KG)",
-      "author": "Ohad Fisher",
-      "date": "2026-07-12T18:00:57+03:00"
+      "date": "2026-07-21T10:18:33+03:00"
     }
   ]
 }

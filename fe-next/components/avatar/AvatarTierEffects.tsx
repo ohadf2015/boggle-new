@@ -4,7 +4,7 @@ import { memo } from 'react';
 import { type CustomAvatarConfig, isEpicPart, isLegendaryPart, isPremiumPart } from '@/shared/types/customAvatar';
 import '@/styles/avatar-tier-animations.css';
 
-type Tier = 'free' | 'vip' | 'epic' | 'legendary';
+export type Tier = 'free' | 'vip' | 'epic' | 'legendary';
 export type VisualTier = 'common' | 'rare' | 'epic' | 'legendary';
 
 /** Map the internal economy tier to the player-facing visual tier. */
@@ -120,5 +120,4 @@ const AvatarTierEffects = memo<AvatarTierEffectsProps>(({
 AvatarTierEffects.displayName = 'AvatarTierEffects';
 
 export { getAvatarTier };
-export type { Tier, VisualTier };
 export default AvatarTierEffects;
