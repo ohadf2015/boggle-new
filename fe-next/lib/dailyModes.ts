@@ -10,10 +10,12 @@
  * here with `adminOnly: true`, surfaces only to admins via {@link adminOnlyDailyModes},
  * and graduates to public by flipping the flag — no hub rewrite.
  *
- * Word Tower is the first mode driven by this: its daily run already gives every
- * player the same letters for the day (see `lib/wordTower/dailySeed.ts`) and keeps
- * a per-day best + streak. Cross-day tower carryover ("continue building each day")
- * is future work; this registry + the admin card are the seam it will plug into.
+ * Word Tower is the first mode driven by this: its daily run gives every player the
+ * same letters for the day (see `lib/wordTower/dailySeed.ts`) and keeps a per-day best
+ * + streak. Cross-day tower carryover ("continue building each day") is now LIVE — the
+ * physical tower (floors/height/records) persists across UTC days while the wheel +
+ * per-session mechanics refresh to each day's shared seed (see the HYBRID branch in
+ * `restoreWordTowerState`, keyed on the save blob's `gameCode`).
  */
 
 export type DailyModeId = 'word-hunt' | 'word-wheel' | 'word-tower';

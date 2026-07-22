@@ -630,6 +630,11 @@ export interface WordTowerSaveState {
   tray?: string[];
   // Keep the draw counter so the next scramble/scramble-paid uses the right seed.
   trayDraws?: number;
+  // The daily seed this blob was built under (e.g. "daily-2026-05-01"). Lets restore
+  // detect a UTC-DAY boundary: HYBRID persistence carries the tower across days but
+  // serves a FRESH shared daily wheel each day. Optional: legacy blobs lack it and
+  // resume as same-day (safe — no spurious wheel rotation).
+  gameCode?: string;
 }
 
 export function serializeWordTowerState(state: WordTowerPlayerState): WordTowerSaveState {
@@ -652,6 +657,7 @@ export function serializeWordTowerState(state: WordTowerPlayerState): WordTowerS
     nextWordHeightMult: state.nextWordHeightMult,
     tray: state.tray,
     trayDraws: state.trayDraws,
+    gameCode: state.gameCode,
   };
 }
 
@@ -661,33 +667,42 @@ export function restoreWordTowerState(
 ): WordTowerPlayerState {
   const base = initWordTowerState(opts);
   if (!saved || saved.version !== WORD_TOWER_SAVE_VERSION) return base;
+  // HYBRID daily persistence: the physical tower (floors/height/records) carries across
+  // days, but each UTC day serves a FRESH shared daily seed (wheel, letters, surprise
+  // rolls). If the blob is from a PRIOR day (gameCode differs), keep the tower but draw
+  // TODAY's wheel and reset the per-session mechanics — otherwise a next-day reload
+  // resumes yesterday's letters and the daily challenge never rotates (2026-05 bug). A
+  // same-day resume, or a legacy blob without a gameCode, restores EXACTLY as before.
+  const newDay = !!saved.gameCode && saved.gameCode !== opts.gameCode;
   return {
     ...base,
     heightM: Math.max(0, saved.heightM ?? 0),
-    combo: Math.max(0, saved.combo ?? 0),
+    // A new day starts a fresh combo streak; a same-day resume keeps it.
+    combo: newDay ? 0 : Math.max(0, saved.combo ?? 0),
     // Chain retired: always empty, even when resuming a pre-wheel save whose blob
     // still carries a stale anchor letter (it must never prefix the built word).
     anchorLetter: '',
-    scramblesLeft: Math.max(0, saved.scramblesLeft ?? base.scramblesLeft),
-    bombCharge: Math.max(0, saved.bombCharge ?? 0),
+    // New day → today's fresh daily scramble allowance; same day → resume the count.
+    scramblesLeft: newDay ? base.scramblesLeft : Math.max(0, saved.scramblesLeft ?? base.scramblesLeft),
+    bombCharge: newDay ? 0 : Math.max(0, saved.bombCharge ?? 0),
     floors: Array.isArray(saved.floors) ? saved.floors : [],
     usedWords: new Set(saved.usedWords ?? []),
     longestWord: saved.longestWord ?? '',
     longestCombo: Math.max(0, saved.longestCombo ?? 0),
     // Old (v1) blobs lack these: default the high-water to the saved height (so a
-    // resumed run still can't farm below it) and an empty fired-hazard set.
+    // resumed run still can't farm below it) and an empty fired-hazard set. These
+    // carry across days too — they belong to the persistent tower, not the session.
     heightHighWaterM: Math.max(0, saved.heightHighWaterM ?? saved.heightM ?? 0),
     firedHazards: new Set(saved.firedHazards ?? []),
-    // Surprise layer: carry the advanced seed + cooldown counter + banked updraft
-    // so the next word rolls identically to a no-reload run. Old blobs (no fields)
-    // fall back to base — a fresh seed from gameCode, counter 0, no charge.
-    surpriseSeed: saved.surpriseSeed ?? base.surpriseSeed,
-    wordsSinceSurprise: saved.wordsSinceSurprise ?? 0,
-    nextWordHeightMult: saved.nextWordHeightMult ?? 1,
-    // Persist the exact wheel (daily letters) and draw counter across reloads.
-    // Old blobs without tray fall back to the deterministic base wheel.
-    tray: saved.tray && saved.tray.length > 0 ? saved.tray : base.tray,
-    trayDraws: saved.trayDraws ?? base.trayDraws,
+    // Surprise layer: a new day rolls TODAY's fresh seed (base); a same-day resume
+    // carries the advanced seed + cooldown counter so the next word rolls identically.
+    surpriseSeed: newDay ? base.surpriseSeed : (saved.surpriseSeed ?? base.surpriseSeed),
+    wordsSinceSurprise: newDay ? 0 : (saved.wordsSinceSurprise ?? 0),
+    nextWordHeightMult: newDay ? 1 : (saved.nextWordHeightMult ?? 1),
+    // The wheel IS the daily seed: a new day draws TODAY's letters (base); a same-day
+    // resume restores the exact saved wheel. Old blobs without a tray fall back to base.
+    tray: newDay ? base.tray : (saved.tray && saved.tray.length > 0 ? saved.tray : base.tray),
+    trayDraws: newDay ? base.trayDraws : (saved.trayDraws ?? base.trayDraws),
   };
 }
 

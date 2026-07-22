@@ -304,6 +304,67 @@ describe('wordTowerManager — serialize/restore', () => {
   });
 });
 
+describe('wordTowerManager — cross-day HYBRID persistence (carry tower, fresh daily wheel)', () => {
+  const day1 = { gameCode: 'daily-2026-05-01', playerId: 'p1', language: 'en' as const };
+  const day2 = { gameCode: 'daily-2026-05-02', playerId: 'p1', language: 'en' as const };
+
+  const savedTowerFromDay1 = () => {
+    const base = initWordTowerState(day1);
+    return serializeWordTowerState({
+      ...base,
+      heightM: 300,
+      combo: 6,
+      bombCharge: 5,
+      floors: [{ word: 'CAT', len: 3, meters: 2 }, { word: 'DOG', len: 3, meters: 2 }],
+      usedWords: new Set(['CAT', 'DOG']),
+      longestCombo: 9,
+      heightHighWaterM: 300,
+    });
+  };
+
+  it('stamps the daily gameCode into the save blob', () => {
+    expect(savedTowerFromDay1().gameCode).toBe('daily-2026-05-01');
+  });
+
+  it('carries the tower (floors, height, records, usedWords) into a new UTC day', () => {
+    const r = restoreWordTowerState(day2, savedTowerFromDay1());
+    expect(r.heightM).toBe(300); // height carries across days
+    expect(r.floors).toHaveLength(2); // physical tower persists
+    expect(r.usedWords.has('CAT')).toBe(true); // can't rebuild a word already in the tower
+    expect(r.longestCombo).toBe(9); // records persist
+    expect(r.heightHighWaterM).toBe(300); // anti-farm high-water persists
+  });
+
+  it("draws TODAY's fresh daily wheel + resets per-session mechanics on a new day", () => {
+    const saved = savedTowerFromDay1();
+    const r = restoreWordTowerState(day2, saved);
+    const freshDay2 = initWordTowerState(day2);
+    expect(r.tray).toEqual(freshDay2.tray); // today's letters…
+    expect(r.tray).not.toEqual(saved.tray); // …NOT yesterday's (the bug this fixes)
+    expect(r.combo).toBe(0); // fresh streak
+    expect(r.bombCharge).toBe(0); // reset
+    expect(r.surpriseSeed).toBe(freshDay2.surpriseSeed); // today's surprise rolls
+  });
+
+  it('same-day resume restores the exact saved wheel + combo (no mid-day rotation)', () => {
+    const base = initWordTowerState(day1);
+    const saved = serializeWordTowerState({ ...base, combo: 4, bombCharge: 2 });
+    const r = restoreWordTowerState(day1, saved); // same gameCode
+    expect(r.tray).toEqual(saved.tray); // exact wheel resumes
+    expect(r.combo).toBe(4); // streak resumes
+    expect(r.bombCharge).toBe(2);
+  });
+
+  it('legacy blobs without a gameCode resume as same-day (no false rotation, height still carries)', () => {
+    const base = initWordTowerState(day1);
+    const blob = serializeWordTowerState({ ...base, heightM: 50, combo: 3 });
+    delete (blob as { gameCode?: string }).gameCode; // simulate a pre-gameCode blob
+    const r = restoreWordTowerState(day2, blob);
+    expect(r.heightM).toBe(50); // height still carries
+    expect(r.combo).toBe(3); // treated as same-day — safe default, no spurious reset
+  });
+});
+
 describe('rerollStart (free fresh wheel)', () => {
   const base = () => initWordTowerState({ gameCode: 'g1', playerId: 'p1', language: 'en' });
 
