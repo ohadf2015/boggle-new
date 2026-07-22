@@ -51,6 +51,28 @@ nightly_gate_output_is_toolchain_error() {
   LC_ALL=C grep -qaE 'command not found|[^[:alnum:]_]not found$' "$out" 2>/dev/null
 }
 
+# nightly_gate_output_is_native_crash <gate_output_file> → exit 0 (true) iff the gate
+# output shows a NATIVE process crash of the toolchain — the shell's job-control crash
+# report for a child killed by a signal: "Abort trap: 6" (SIGABRT), "Bus error: 10"
+# (SIGBUS), or "Segmentation fault: 11" (SIGSEGV). These come from a V8 / SWC / esbuild /
+# jemalloc native abort (usually under memory pressure), NEVER from normal eslint / tsc /
+# vitest output — those report errors as text and exit cleanly with rc=1.
+#
+# WHY (2026-07-09 + 2026-07-14 false-drops): `npm run build:fast` Abort-trapped (exit 134)
+# under machine load. The gate only special-cased 124/137, so 134 flattened to rc=1 →
+# drop-and-re-gate found no parseable offender → DROPPED a whole night of build-clean code
+# to docs-only. A native crash means the gate did NOT complete → the verdict is UNKNOWN,
+# not a content failure — the same INCONCLUSIVE class as the 124/137 timeout/OOM already
+# handled. npm can also remap the crashed child's 134/138/139 to its OWN rc=1, so this
+# string net catches the crash even when the exit code was flattened (belt to the rc check's
+# suspenders, mirroring the toolchain-error string net). Only ever consulted on a FAILED gate.
+# Best-effort: false on empty/missing output.
+nightly_gate_output_is_native_crash() {
+  local out="$1"
+  [ -n "$out" ] && [ -s "$out" ] || return 1
+  LC_ALL=C grep -qaE 'Abort trap: 6|Bus error: 10|Segmentation fault: 11' "$out" 2>/dev/null
+}
+
 # _gate_ensure_bin <worktree_fe_next_dir> → self-heal node_modules/.bin before gating.
 # The CoW-cloned node_modules inherits the main repo's (recurringly) broken .bin, so
 # the bare-binary npm scripts (lint, test:changed, build:fast) would fail with
@@ -340,14 +362,24 @@ run_isolated_gate() {
     run_with_idle_timeout "$_gidle" "$_gmax" "$NIGHTLY_LAST_GATE_OUTPUT" -- \
       bash -c "$_body" _ "$wt" || rc=$?
   fi
-  if [ "${rc:-0}" = "124" ] || [ "${rc:-0}" = "137" ]; then
+  if [ "${rc:-0}" = "124" ] || [ "${rc:-0}" = "137" ] || [ "${rc:-0}" = "134" ]; then
     # 124 = gtimeout's SIGTERM fired. 137 = SIGKILL — either the --kill-after grace
     # SIGKILLed a child (next build / vitest spawn that ignored/outlived SIGTERM) OR an
-    # OOM-kill (tsc/vitest have OOM'd before). Both mean the gate did NOT complete → the
-    # verdict is UNKNOWN, not a content failure. The old code only special-cased 124, so
-    # a 137 wedge silently fell through to rc=1 → docs-only drop-all (the catastrophe in
-    # a different exit code). "timeout-or-OOM" keeps a recurring OOM visible vs a slow night.
-    log "isolated-gate: did NOT complete (rc=${rc:-0}: wedged ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle, or hit the ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop) — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    # OOM-kill (tsc/vitest have OOM'd before). 134 = SIGABRT ("Abort trap: 6") — a NATIVE
+    # crash of the build toolchain (V8/SWC/esbuild/jemalloc abort under memory pressure),
+    # seen on 2026-07-09 + 07-14. All mean the gate did NOT complete → the verdict is
+    # UNKNOWN, not a content failure. The old code only special-cased 124, so a 137 wedge
+    # or a 134 crash silently fell through to rc=1 → docs-only drop-all (the catastrophe in
+    # a different exit code). "timeout/OOM/native-crash" keeps a recurring crash visible.
+    log "isolated-gate: did NOT complete (rc=${rc:-0}: wedged ${NIGHTLY_GATE_IDLE_SECS:-2700}s idle / ${NIGHTLY_GATE_TIMEOUT:-5400}s backstop, or a native toolchain crash) — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
+    rc=3
+  elif [ "${rc:-0}" != "0" ] && nightly_gate_output_is_native_crash "$NIGHTLY_LAST_GATE_OUTPUT"; then
+    # npm can remap a crashed child's 134/138/139 to its OWN rc=1, hiding the SIGABRT.
+    # The shell's "Abort trap: 6" / "Bus error" / "Segmentation fault" crash line still
+    # survives in the output → treat it as the same INCONCLUSIVE native-crash class, never
+    # a code failure. The rc=3 path re-verifies build-only, so a misfire can only cost a
+    # re-verify, never ship broken code. (2026-07-09 + 07-14 build:fast Abort-trap drops.)
+    log "isolated-gate: output shows a native toolchain crash (Abort trap / bus error / segfault) though the exit code was ${rc:-0} — INCONCLUSIVE (rc=3; caller re-verifies build-only, does NOT drop code)"
     rc=3
   elif [ "${rc:-0}" != "0" ]; then
     # A MISSING TOOL BINARY (rc 127 "command not found") is an ENVIRONMENT failure, not

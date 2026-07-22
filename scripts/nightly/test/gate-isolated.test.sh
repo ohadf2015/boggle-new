@@ -639,6 +639,59 @@ run_isolated_gate "$AUTH"; rc=$?
 assert "a real content failure (no missing-tool signature) still returns rc=1 (peel intact)" "[ $rc -eq 1 ]"
 unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
 
+echo "── gate-isolated: a native toolchain CRASH (Abort trap: 6 / SIGABRT) is INCONCLUSIVE, not code-failed ──"
+# 2026-07-09 + 07-14 false-drops: `npm run build:fast` died with "Abort trap: 6" (SIGABRT,
+# exit 134) under memory pressure — a NATIVE crash of the build toolchain (V8/SWC/esbuild),
+# NOT lane code. The gate only special-cased 124/137, so 134 flattened to rc=1 → drop-and-
+# re-gate found no offender → DROPPED a whole night to docs-only. A native crash means the
+# gate did NOT complete → INCONCLUSIVE (rc=3; caller re-verifies build-only, never drops).
+
+# (a) Pure classifier — the discriminator, locked without a worktree.
+NC_OUT=$(mktemp)
+printf '_: line 1: 86632 Abort trap: 6           NEXT_BUILD_DIR=.next-nightly npm run build:fast\n' > "$NC_OUT"
+assert "classifier: 'Abort trap: 6' → native crash (true)" "nightly_gate_output_is_native_crash \"$NC_OUT\""
+printf 'zsh: Bus error: 10  node build\n' > "$NC_OUT"
+assert "classifier: 'Bus error: 10' → native crash (true)" "nightly_gate_output_is_native_crash \"$NC_OUT\""
+printf 'sh: line 1: 42 Segmentation fault: 11  tsc\n' > "$NC_OUT"
+assert "classifier: 'Segmentation fault: 11' → native crash (true)" "nightly_gate_output_is_native_crash \"$NC_OUT\""
+printf 'app/foo.tsx(12,3): error TS2304: Cannot find name x.\n' > "$NC_OUT"
+assert "classifier: a real tsc error is NOT a native crash (false)" "! nightly_gate_output_is_native_crash \"$NC_OUT\""
+printf 'sh: eslint: command not found\n' > "$NC_OUT"
+assert "classifier: a missing-tool line is NOT a native crash (false)" "! nightly_gate_output_is_native_crash \"$NC_OUT\""
+: > "$NC_OUT"
+assert "classifier: empty output is NOT a native crash (false)" "! nightly_gate_output_is_native_crash \"$NC_OUT\""
+rm -f "$NC_OUT"
+
+# (b) End-to-end via the seam: a gate that exits 134 (SIGABRT) → rc=3, code untouched.
+setup
+printf 'export const v = "LANE_VERSION";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='echo building; exit 134'
+run_isolated_gate "$AUTH"; rc=$?
+assert "gate exiting 134 (SIGABRT) returns rc=3 (inconclusive), NOT rc=1 (drop)" "[ $rc -eq 3 ]"
+assert "main tree lane file untouched on native-crash gate" \
+  "grep -q LANE_VERSION \"\$PROJECT_DIR/fe-next/app/lane.ts\""
+unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
+
+# (c) End-to-end: npm remapped the crashed child's 134 to its own rc=1, but the output
+# still carries the shell's "Abort trap: 6" crash line → string net catches it → rc=3.
+setup
+printf 'export const v = "LANE_VERSION";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='echo "_: line 1: 999 Abort trap: 6  npm run build:fast"; exit 1'
+run_isolated_gate "$AUTH"; rc=$?
+assert "gate exiting 1 but printing 'Abort trap: 6' returns rc=3 (crash string net)" "[ $rc -eq 3 ]"
+unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
+
+# (d) Regression guard: a REAL content failure (exit 1, no crash signature) still returns rc=1.
+setup
+printf 'export const v = "LANE_BROKEN";\n' > "$PROJECT_DIR/fe-next/app/lane.ts"
+AUTH=$(mktemp); echo "fe-next/app/lane.ts" > "$AUTH"
+export NIGHTLY_GATE_CMD='echo "app/lane.ts(1,1): error TS1005"; exit 1'
+run_isolated_gate "$AUTH"; rc=$?
+assert "a real content failure (no crash signature) still returns rc=1 (peel intact)" "[ $rc -eq 1 ]"
+unset NIGHTLY_GATE_CMD; rm -f "$AUTH"; teardown
+
 echo
 echo "gate-isolated: $PASS passed, $FAIL failed"
 [ "$FAIL" -eq 0 ]
