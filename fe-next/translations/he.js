@@ -15718,6 +15718,7 @@ const he = {
     "gameOver": "המשחק נגמר",
     "playAgain": "שחק שוב",
     "notAWord": "לא מילה",
+    "tapHint": "הקישו על אותיות כדי לבנות מילה",
     "continue": "המשך",
     "shareCard": {
       "title": "הסיפור שלך",

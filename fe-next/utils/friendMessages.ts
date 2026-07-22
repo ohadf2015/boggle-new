@@ -233,6 +233,15 @@ export async function getUnreadCount(friendId?: string, userId?: string): Promis
 }
 
 /**
+ * Detect Supabase JWT expiration errors so callers can refresh and retry.
+ */
+function isJwtExpiredError(message?: string): boolean {
+  if (!message) return false;
+  const lower = message.toLowerCase();
+  return lower.includes('jwt expired') || lower.includes('token expired') || lower.includes('invalid jwt');
+}
+
+/**
  * Get all message threads with friends
  */
 export async function getThreads(userId?: string): Promise<MessageThread[]> {
@@ -247,7 +256,21 @@ export async function getThreads(userId?: string): Promise<MessageThread[]> {
     // One round-trip: last message + profile + unread count per thread.
     // Replaces the old per-friend N+1 (last-msg + profile + unread queries in a loop).
     // See migration 20260628000000_friend_threads_rpc.sql.
-    const { data: rows, error } = await supabase.rpc('get_friend_threads', { p_user_id: uid });
+    let { data: rows, error } = await supabase.rpc('get_friend_threads', { p_user_id: uid });
+
+    // If the access token expired, refresh the session and retry once instead
+    // of surfacing a JWT error to Sentry every polling cycle.
+    if (error && isJwtExpiredError(error.message)) {
+      logger.debug('FRIEND_MESSAGES', 'JWT expired while getting threads; attempting refresh');
+      const { error: refreshError } = await supabase.auth.refreshSession();
+      if (!refreshError) {
+        const retry = await supabase.rpc('get_friend_threads', { p_user_id: uid });
+        rows = retry.data;
+        error = retry.error;
+      } else {
+        logger.debug('FRIEND_MESSAGES', `Token refresh failed: ${refreshError.message}`);
+      }
+    }
 
     if (error || !rows) {
       if (error) {

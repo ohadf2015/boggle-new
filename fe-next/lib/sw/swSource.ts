@@ -64,21 +64,25 @@ function isCacheable(response) {
   );
 }
 
-function safeCachePut(cache, request, response) {
-  return cache.put(request, response).catch((err) => {
+async function safeCachePut(cache, request, response) {
+  try {
+    return await cache.put(request, response);
+  } catch (err) {
     const msg = err && err.message ? err.message : String(err);
+    // These are known, non-actionable cache failures — swallow them silently.
     if (
       msg.includes('Partial response') ||
       msg.includes('status code 206') ||
       msg.includes('convert value to') ||
-      msg.includes('QuotaExceeded')
+      msg.includes('QuotaExceeded') ||
+      msg.includes('Unexpected internal error')
     ) {
       return;
     }
     self.clients.matchAll().then((clients) => {
       clients.forEach((c) => c.postMessage({ type: 'sw:cache-error', message: msg, url: request.url }));
     });
-  });
+  }
 }
 
 const PRECACHE_ASSETS = ['/favicon.ico', '/icon-192.png', '/icon-512.png'];
