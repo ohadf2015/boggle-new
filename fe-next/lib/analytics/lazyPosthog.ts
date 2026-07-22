@@ -34,10 +34,35 @@ let loadPromise: Promise<PostHog | null> | null = null;
 const callQueue: QueuedCall[] = [];
 const flagCallbacks: Array<(...a: AnyArgs) => void> = [];
 
-// Bound so a never-initialized posthog (no key / SSR) can't leak memory if a
-// hot path keeps firing events. Oldest dropped first; analytics is best-effort.
+/** Bound so a never-initialized posthog (no key / SSR) can't leak memory if a
+ * hot path keeps firing events. Oldest dropped first; analytics is best-effort.
+ */
 const MAX_QUEUE = 200;
 
+/**
+ * Client-side rate limiter that prevents hitting PostHog's built-in rate limit
+ * (~30 events/s). Uses a sliding 1-second window — if more than 10 events are
+ * sent in that window, subsequent events are silently dropped. This avoids the
+ * `[PostHog.js] This capture call is ignored due to client rate limiting.`
+ * spam that happens when many capture calls are fired in rapid succession
+ * (e.g. education/access page).
+ */
+const RATE_LIMIT = 10; // max events per second
+const WINDOW_MS = 1_000;
+const rateLimitTimestamps: number[] = [];
+
+function isRateLimited(): boolean {
+  const now = performance.now();
+  // Remove timestamps outside the window
+  while (rateLimitTimestamps.length > 0 && rateLimitTimestamps[0] < now - WINDOW_MS) {
+    rateLimitTimestamps.shift();
+  }
+  if (rateLimitTimestamps.length >= RATE_LIMIT) {
+    return true;
+  }
+  rateLimitTimestamps.push(now);
+  return false;
+}
 function enqueue(path: string[], args: AnyArgs): void {
   if (callQueue.length >= MAX_QUEUE) callQueue.shift();
   callQueue.push({ path, args });
@@ -56,6 +81,10 @@ function applyPath(target: unknown, path: string[], args: AnyArgs): void {
 /** Fire-and-forget proxy method: forward when loaded, buffer otherwise. */
 function ff(path: string[]) {
   return (...args: AnyArgs): void => {
+    // Rate-limit capture calls to avoid PostHog's client-side rate limiter
+    if (path[0] === 'capture' && isRateLimited()) {
+      return;
+    }
     if (real) applyPath(real, path, args);
     else enqueue(path, args);
   };
