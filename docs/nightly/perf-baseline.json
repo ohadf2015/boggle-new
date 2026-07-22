@@ -1,26 +1,27 @@
 {
-  "date": "2026-07-21",
-  "note": "7-day window (n≥50 floor). Homepage LCP improved 5301→4836ms. CLS still high across all routes. Ad-banner spacer CLS fix shipped for homepage. Supabase MCP absent.",
+  "date": "2026-07-22",
+  "note": "7-day window (n≥50 floor). CLS still catastrophic across all routes despite 07-20 AutoHideHeader fix (0.979→0.967 on /en/multiplayer post-fix). Root cause unresolved — AutoHideHeader spacer accounts for ~0.07 not 0.97. Homepage LCP 4716ms. Supabase MCP not probed this run.",
   "backend": {
     "advisor_warnings_count": 2,
-    "note": "Supabase MCP absent this run. Advisor: unindexed FK web_vitals_player_id_fk_index (migration pending 20260716), auth DB connection strategy. 6 migrations still pending apply.",
+    "note": "Supabase MCP not probed. Advisor: unindexed FK web_vitals_player_id_fk_index (migration pending 20260716), auth DB connection strategy. 6 migrations still pending apply.",
     "top_queries": [],
     "migrations_pending_apply": [
-      { "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql", "carry_count": 24 },
-      { "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql", "carry_count": 19 },
-      { "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql", "carry_count": 14 },
-      { "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql", "carry_count": 13 },
-      { "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql", "carry_count": 6 },
-      { "file": "fe-next/supabase/migrations/20260716020000_web_vitals_player_id_fk_index.sql", "carry_count": 5 }
+      { "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql", "carry_count": 25 },
+      { "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql", "carry_count": 20 },
+      { "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql", "carry_count": 15 },
+      { "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql", "carry_count": 14 },
+      { "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql", "carry_count": 7 },
+      { "file": "fe-next/supabase/migrations/20260716020000_web_vitals_player_id_fk_index.sql", "carry_count": 6 }
     ]
   },
   "frontend": {
-    "note": "7-day window (n≥50 floor). Homepage LCP improved 5301→4836ms (+AnimatePresence fix 07-18 confirmed). CLS still high all routes — /en/multiplayer 07-20 fix diluted by 6d pre-fix data. Ad-banner spacer fix shipped tonight.",
+    "note": "7-day window (n≥50 floor). CLS regression persists: 07-20 AutoHideHeader fix barely moved /en/multiplayer CLS (0.979→0.967). Impact verdict: NEUTRAL. Root cause investigation: NativeLanguageBanner (layout:677) contributes ~0.07 on appearance; remainder unexplained — likely AnimatePresence opacity:0 SSR serialization or skeleton→room swap without height reservation. Visual QA needed.",
     "by_route": [
-      { "route": "/en/multiplayer", "p75_lcp_ms": 1908, "p75_cls": 0.979, "n_7d": 126, "note": "7d avg still includes 6d pre-fix data from 07-20 AutoHideHeader fix" },
-      { "route": "/", "p75_lcp_ms": 4836, "p75_cls": 0.921, "n_7d": 84, "note": "LCP improved vs 5301. CLS fix shipped tonight (ad-banner always-render spacer)." },
-      { "route": "/en", "p75_lcp_ms": 3448, "p75_cls": 0.892, "n_7d": 65 },
-      { "route": "/es/multiplayer", "p75_lcp_ms": 3824, "p75_cls": 0.674, "n_7d": 141, "note": "REGRESSED vs 0.369 baseline (07-14 verdict)" }
+      { "route": "/en/multiplayer", "p75_lcp_ms": 1539, "p75_cls": 0.975, "p75_inp_ms": 208, "n_7d": 140, "note": "CLS post-fix (since 07-20): 0.967, n=62. Barely improved. Root cause unresolved." },
+      { "route": "/", "p75_lcp_ms": 4716, "p75_cls": 0.917, "p75_inp_ms": 228, "n_7d": 99, "note": "LCP unchanged vs 4836 baseline. CLS still high." },
+      { "route": "/es/multiplayer", "p75_lcp_ms": 3755, "p75_cls": 0.671, "p75_inp_ms": 488, "n_7d": 133 },
+      { "route": "/en", "p75_lcp_ms": 3063, "p75_cls": 0.953, "p75_inp_ms": 304, "n_7d": 67 },
+      { "route": "/es/juego-de-palabras-multijugador", "p75_lcp_ms": 3111, "p75_cls": 0.345, "p75_inp_ms": 154, "n_7d": 53 }
     ]
   },
   "bundle": {

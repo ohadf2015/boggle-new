@@ -11,16 +11,17 @@
 
 ## Current (in progress)
 
-### shiritori — readiness: 70% — status: IN PROGRESS
+### shiritori — readiness: 78% — status: IN PROGRESS
 - **Why next:** MP-wired recently; verify chain rules + bot-exclusion + i18n + edge cases.
 - **Reach:** JA MP is LIVE (ja board bypasses admin gate); solo is admin-preview; landing at `/[locale]/shiritori`.
 - **Key files:** `components/multiplayer/shiritori/*`, `lib/shiritori/sp/*`, `app/[locale]/shiritori/{page,solo/page}.tsx`, `backend/{handlers,modules}/shiritori*`, `shared/utils/shiritori.ts`.
-- **Last audited:** 2026-07-21
+- **Last audited:** 2026-07-22
 - **Covered (2026-07-18):** chain engine, backend manager+handler, MP hook+view, solo engine+page, landing page, i18n ×6 locales.
 - **Covered (2026-07-19):** turn timer implementation (useShiritoriGame+ShiritoriView+ShiritoriVersus), solo/page.tsx verified clean.
 - **Covered (2026-07-20):** dictCheckJa bug confirmed — `catch {}` returns `false` on network drop AND HTTP error, both treated as "not in dict" by `commitPlayerWord`. Countdown timer rendered correctly in ShiritoriView.tsx (role="timer", color thresholds at ≤9s/≤5s, hidden when finished). `useShiritoriGame.ts:76,89` resets `turnStartedAt` on accepted + eliminated ✅. `turnStartedAt` null on gameOver ✅.
 - **Covered (2026-07-21):** dictCheckJa network/HTTP error path fixed — now throws `DictNetworkError` instead of returning `false`; `submit()` catches it and shows `shiritori.solo.err.network` toast before calling `commitPlayerWord`. `shiritori.solo.err.network` key added to all 6 locales (en/he/sv/ja/es/ru). TDD countdown tests added: `useShiritoriGame.test.ts` (4 turnStartedAt tests) + `ShiritoriView.test.tsx` (5 timer bar tests covering render/absent/full/orange/yellow/finished states).
-- **Not yet covered:** visual QA (screenshot capture).
+- **Covered (2026-07-22):** a11y deeper pass (RTL icon fixed), perf pass (no issues), score arithmetic (integer-only, no float), edge cases (confirmNewGame translations ×6, backend idempotency), backend handler (rate-limit/finalization/state-transition clean), all remaining code areas verified.
+- **Not yet covered:** visual QA (screenshot capture — solo is admin-gated; next run start dev server or capture landing+MP view).
 
 **Open issues:**
 - ✅ FIXED (2026-07-19): No turn-timer UI — 15s server deadline invisible to client.
@@ -28,7 +29,8 @@
 - ✅ FIXED (2026-07-21): No TDD tests for countdown logic — 9 tests added across `useShiritoriGame.test.ts` + `ShiritoriView.test.tsx` covering turnStartedAt lifecycle and timer bar render/color states.
 - ✅ FIXED: final loser never marked `eliminated:true` on game-over.
 - ✅ FIXED: init loading text semantics.
-- 🟡 MINOR: Visual QA not yet captured — code audit covers all areas but no screenshot evidence. Owner: **next run**.
+- ✅ FIXED (2026-07-22): RTL back-arrow `ArrowLeft` bare icon → `DirectionalIcon` in `app/[locale]/shiritori/solo/page.tsx:263`.
+- 🟡 MINOR: Visual QA not yet captured — solo admin-gated; capture landing+MP view next run for final push to ≥90%. Owner: **next run**.
 
 ## Queue (audit order — closest-to-release first)
 

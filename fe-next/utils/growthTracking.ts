@@ -62,6 +62,7 @@ export type GrowthEvent =
   | 'daily_puzzle_opened'
   | 'daily_puzzle_completed'
   | 'daily_word_hunt_complete'
+  | 'wordhunt_invalid_submitted'
   | 'daily_rival_landed' // Rival challenge link landed (beat-me loop invitation)
   // Adventure
   | 'adventure_level_start'

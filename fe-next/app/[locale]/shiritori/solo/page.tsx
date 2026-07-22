@@ -15,6 +15,7 @@ import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Bot, Send, User, Trophy, Skull } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
@@ -260,7 +261,7 @@ export default function ShiritoriSoloPage() {
           href={`/${locale}/shiritori`}
           className="inline-flex items-center gap-1.5 rounded-neo border-2 border-black bg-neo-navy-light px-2.5 py-1.5 font-neo-body text-xs text-neo-white shadow-hard-sm"
         >
-          <ArrowLeft className="h-4 w-4" />
+          <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
           {t('shiritori.solo.back')}
         </Link>
         <h1 className="truncate font-neo-display text-base font-black uppercase tracking-wide text-neo-white">

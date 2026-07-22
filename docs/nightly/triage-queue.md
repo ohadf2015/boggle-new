@@ -1737,3 +1737,45 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - Top signal from brief. Root cause not yet isolated.
 - Recommend: check if rage clicks are on the "Join" button while socket is connecting (same root as /es/multiplayer exp-mp-lobby-connect-feedback-v1 which already targets ES).
 - exp-mp-lobby-connect-feedback-v1 currently only wired for ES locale — may need to expand to EN.
+
+## 2026-07-22
+- [Sentry] CapacitorGameConnect.then() is not implemented on android (JAVASCRIPT-NEXTJS-1PH)
+  - first_seen: 2026-07 (prior), last_seen: 2026-07-21, count: 7/24h, reach: 7 users
+  - link: https://lexiclash.sentry.io/issues/132085085/
+  - status: deferred — nativePGS.ts already has isPluginAvailable guard (line 85-88) but error persists.
+    Possible: guard passes on builds where native module is registered but throws on every call.
+    Fix: add a try/catch around the initializePlayGames dynamic import AND call a cheap no-throw
+    probe method inside initializePlayGames() to verify actual method availability, not just registration.
+  - why: needs device build verification; can't test headless; blast radius = Android PGS login
+  - recommended owner: review-by-eod
+
+- [PostHog] React error #418 hydration mismatch (019f4747, 019f70e5, 019f185d)
+  - first_seen: 2026-07-09, last_seen: 2026-07-21, count: 27+7+2=36 occ, reach: 7+4+2 users
+  - pages: homepage (37 occ), /en/multiplayer (12 occ), /he/daily (3 occ)
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f4747-c11b-7430-8ac2-882649b49cbd
+  - status: deferred — no sourcemaps; chunk 4bd1b696 minified. Explore agent suspects LandingView.tsx
+    isNativeApp/InlineBannerAd conditional render without mounted gate. Also AutoHideHeader spacer
+    (MP CLS fix 07-20) may have introduced new mismatch on /en/multiplayer.
+  - why: no sourcemaps = can't pinpoint exact line; multiple candidate components; homepage = high blast
+  - recommended owner: review-by-eod (read LandingView.tsx line 89-98 first)
+
+- [PostHog] TypeError: Load failed / Failed to fetch (019f34a3)
+  - first_seen: 2026-07-08, last_seen: 2026-07-21, count: 7/24h, reach: 3 users
+  - source: chunk d320e741.d9b34f086410ae4c.js line 1 col 15229
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f34a3-12d0-7820-a7d2-4b2d22556c1e
+  - status: deferred — fetch failure, no sourcemaps; same user (a07bbd2c) hit it twice in 1 min.
+    Likely a dictionary/WASM fetch timeout or offline network event. Not a code bug per se.
+  - why: needs network context; possibly transient offline event
+  - recommended owner: self (low priority, likely transient)
+
+- [Supabase] Impact check REVOKE migration 07-19 (authenticated_security_definer_function_executable)
+  - status: deferred — Supabase MCP dry all night (0/1 nights connected this week)
+  - why: MCP unavailable; needs get_advisors type=security query
+  - recommended owner: self (HUMAN: mint never-expire SUPABASE_ACCESS_TOKEN)
+
+## 2026-07-22 flag hygiene
+
+| Flag | Age | Status | Action |
+|---|---|---|---|
+| `exp-mp-room-join-loading-v1` | 17d | 0 call sites in codebase (zombie) | **HUMAN: deactivate in PostHog** |
+| `exp-wordhunt-hint-v1` | 32d | Wired in WordHuntResultsContent only (results page) | Running — rage clicks on game page (separate surface); keep |

@@ -2,6 +2,8 @@
 
 import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
+import { useExperiment } from '@/hooks/useExperiment';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { DiscoveredWordsList } from './DiscoveredWordsList';
 import { m, AnimatePresence } from 'framer-motion';
 import type { WordHuntEffect } from './WordHuntEffectsCanvas';
@@ -194,6 +196,10 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     },
   });
 
+  const { variant: clueShakeVariant, trackExposure: trackClueShakeExposure } =
+    useExperiment('exp-wordhunt-clue-shake-v1');
+  const [shakingClues, setShakingClues] = useState(false);
+
   const feedbackKeyRef = useRef(0);
   const prevFeedbackRef = useRef(state.feedbackType);
   if (state.feedbackType && state.feedbackType !== prevFeedbackRef.current) {
@@ -279,12 +285,19 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
           pushEffect({ type: 'targetFound', x: cx, y: cy });
         }
       } else if (
-        !skipAnimations &&
-        (state.feedbackType === 'invalid-word' ||
-          state.feedbackType === 'not-in-dictionary' ||
-          state.feedbackType === 'not-on-board')
+        state.feedbackType === 'invalid-word' ||
+        state.feedbackType === 'not-in-dictionary' ||
+        state.feedbackType === 'not-on-board'
       ) {
-        pushEffect({ type: 'invalid', x: canvasSize.width / 2, y: canvasSize.height / 2 });
+        if (!skipAnimations) {
+          pushEffect({ type: 'invalid', x: canvasSize.width / 2, y: canvasSize.height / 2 });
+        }
+        trackGrowthEvent('wordhunt_invalid_submitted', { feedbackType: state.feedbackType });
+        trackClueShakeExposure();
+        if (clueShakeVariant === 'clue-shake') {
+          setShakingClues(true);
+          setTimeout(() => setShakingClues(false), 500);
+        }
       }
     }
     prevFeedbackForEffects.current = state.feedbackType;
@@ -297,6 +310,8 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
     pushEffect,
     canvasSize.width,
     canvasSize.height,
+    clueShakeVariant,
+    trackClueShakeExposure,
   ]);
 
   // Life delta watcher — gain / drop / lowLife
@@ -556,7 +571,7 @@ const DailyWordHuntSurvival: React.FC<DailyWordHuntSurvivalProps> = ({
       />
 
       {/* Target word clue boxes + inline feedback */}
-      <div className="shrink-0">
+      <div className={cn('shrink-0', shakingClues && 'animate-neo-shake')}>
         <SurvivalClueBoxes
           ref={actions.clueContainerRef}
           currentHint={state.currentHint}

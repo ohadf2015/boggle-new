@@ -168,11 +168,26 @@ export default async function GuidesIndexPage({ params }: PageProps) {
     })),
   };
 
+  const itemListSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    '@id': `${SITE_URL}/${locale}/guides#list`,
+    name: guidesData.title,
+    itemListOrder: 'https://schema.org/ItemListOrderAscending',
+    numberOfItems: 3,
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Classic Mode Strategy Guide', url: `${SITE_URL}/${locale}/guides/classic-strategy` },
+      { '@type': 'ListItem', position: 2, name: 'Blast Mode Mastery Guide', url: `${SITE_URL}/${locale}/guides/blast-strategy` },
+      { '@type': 'ListItem', position: 3, name: 'Word Hunt Strategy Guide', url: `${SITE_URL}/${locale}/guides/word-hunt-strategy` },
+    ],
+  };
+
   // Safe: all content sourced from static module-level constants, not user input
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       <script type="application/ld+json">{encodeJsonLd(faqSchema)}</script>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
       <GuidesIndexPageClient />
     </>
   );

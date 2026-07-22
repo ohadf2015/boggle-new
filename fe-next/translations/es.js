@@ -12452,6 +12452,10 @@ const es = {
       "text": "¿Gestionas múltiples aulas o una escuela entera?",
       "cta": "Obtener apoyo escolar y de distrito →"
     },
+    "upgradePro": {
+      "cta": "Mejorar a Pro",
+      "body": "Desbloquea clases y alumnos ilimitados"
+    },
     "assignment": {
       "createTitle": "Crear Tarea",
       "create": "Crear Tarea",
@@ -15300,9 +15304,9 @@ const es = {
       },
       "dice": {
         "title": "Tu tirada de bono",
-        "subtitle": "Las palabras con esta familia de letras puntúan ×3",
+        "subtitle": "Mayor riesgo, mayor recompensa — tu elección",
         "skip": "Jugar sin bono",
-        "active": "{{family}} ×3",
+        "active": "{{family}} ×{{multiplier}}",
         "families": {
           "vowels": "Explosión vocal",
           "common": "Toque común",

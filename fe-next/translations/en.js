@@ -10685,6 +10685,10 @@ const en = {
       "text": "Managing multiple classrooms or a whole school?",
       "cta": "Get school & district support →"
     },
+    "upgradePro": {
+      "cta": "Upgrade to Pro",
+      "body": "Unlock unlimited classes & students"
+    },
     "dashboard": {
       "title": "Teacher Dashboard",
       "subtitle": "Manage your classrooms, lessons, and student progress",
@@ -13877,9 +13881,9 @@ const en = {
       },
       "dice": {
         "title": "Your Bonus Roll",
-        "subtitle": "Words with this letter family score ×3",
+        "subtitle": "Higher risk, bigger reward — your choice",
         "skip": "Play without bonus",
-        "active": "{{family}} ×3",
+        "active": "{{family}} ×{{multiplier}}",
         "families": {
           "vowels": "Vowel Surge",
           "common": "Common Touch",

@@ -730,6 +730,31 @@ export const EXPERIMENTS = {
     description:
       'MP 2p results: show-rival-word = add rival\'s highest-scoring word as a stat chip ("Rival\'s best: WORD"). control = no change. Targets mp_round avg 1.43/3. Only shown when allPlayerWords data is present for the opponent.',
   }),
+
+  /**
+   * Word Hunt clue-box shake on invalid word submission.
+   * Signal: 6 rage-click users on /he/daily/word-hunt (24h) — null-element
+   * pattern (8/9 clicks with no el_text/el) = players expecting Wordle-style
+   * tile-tap input; submission rejected silently (pill too subtle, canvas
+   * effect off-screen), so they mash the grid area in frustration.
+   * Hypothesis: a shake animation on the clue tile row makes rejection
+   * explicit + visceral (same UX as Wordle/NYT Connections), reducing rage
+   * clicks by confirming "we got your guess, it was wrong."
+   *
+   * control = current (feedback pill + canvas particle only).
+   * clue-shake = animate-neo-shake on clue box container on invalid-word /
+   *   not-in-dictionary / not-on-board feedback.
+   *
+   * PostHog flag key = 'exp-wordhunt-clue-shake-v1', 50/50 rollout.
+   * Wire: DailyWordHuntSurvival.tsx — shakingClues state + shake class on shrink-0 wrapper.
+   * Metric: $rageclick on word-hunt daily URLs (target: down from 6 to <2 in 7d).
+   */
+  'exp-wordhunt-clue-shake-v1': defineExperiment({
+    variants: ['control', 'clue-shake'] as const,
+    default: 'control',
+    description:
+      'Word Hunt invalid-word rejection feedback. clue-shake = animate-neo-shake on clue box row when word rejected (not-in-dictionary/invalid-word/not-on-board). control = current pill+canvas only. Targets /he/daily/word-hunt rage clicks (6 users 24h, null-element pattern = Wordle-tap expectation mismatch). Metric: $rageclick on word-hunt URLs.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

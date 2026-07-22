@@ -12329,6 +12329,10 @@ const sv = {
       "text": "Hanterar du flera klassrum eller en hel skola?",
       "cta": "Få skol- och distriktsstöd →"
     },
+    "upgradePro": {
+      "cta": "Uppgradera till Pro",
+      "body": "Lås upp obegränsade klasser och elever"
+    },
     "dashboard": {
       "title": "Lärarpanel",
       "subtitle": "Hantera dina klassrum, lektioner och elevernas framsteg",
@@ -15416,9 +15420,9 @@ const sv = {
       },
       "dice": {
         "title": "Din bonusrullning",
-        "subtitle": "Ord med denna bokstavsfamilj ger ×3",
+        "subtitle": "Högre risk, större belöning — ditt val",
         "skip": "Spela utan bonus",
-        "active": "{{family}} ×3",
+        "active": "{{family}} ×{{multiplier}}",
         "families": {
           "vowels": "Vokalvåg",
           "common": "Vanlig touch",

@@ -12113,6 +12113,10 @@ const ja = {
       "text": "複数のクラスや学校全体を管理していますか？",
       "cta": "学校・地区向けサポートを受ける →"
     },
+    "upgradePro": {
+      "cta": "Proにアップグレード",
+      "body": "クラスと生徒数の上限を解除"
+    },
     "dashboard": {
       "title": "教師ダッシュボード",
       "subtitle": "クラス、レッスン、生徒の進捗を管理する",
@@ -15150,9 +15154,9 @@ const ja = {
       },
       "dice": {
         "title": "ボーナスロール",
-        "subtitle": "この文字グループを含む単語は×3スコア",
+        "subtitle": "高リスク・高リターン — あなたの選択",
         "skip": "ボーナスなしでプレイ",
-        "active": "{{family}} ×3",
+        "active": "{{family}} ×{{multiplier}}",
         "families": {
           "vowels": "母音サージ",
           "common": "コモンタッチ",

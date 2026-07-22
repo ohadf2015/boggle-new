@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
@@ -11,6 +12,7 @@ import { TrialUrgencyBanner } from '@/components/education/TrialUrgencyBanner';
 import { useTeacherAccess } from '@/lib/education/useTeacherAccess';
 import { Shield, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 
 function TeacherDashboardInner() {
   const router = useRouter();
@@ -80,6 +82,20 @@ function TeacherDashboardInner() {
         </div>
       )}
       <DistrictUpsellBanner t={t} language={language} />
+      {!isAdmin && (
+        <div className="bg-neo-navy border-b border-black/20 px-4 py-2">
+          <div className="mx-auto max-w-5xl flex items-center justify-between">
+            <span className="text-neo-white/60 text-sm font-neo-body">{t('teacher.upgradePro.body')}</span>
+            <Link
+              href={`/${language}/teacher/upgrade`}
+              className="ms-4 font-neo-display font-black text-sm text-neo-lime underline underline-offset-2 whitespace-nowrap hover:opacity-80 transition-opacity"
+              onClick={() => trackGrowthEvent('iap_viewed', { product: 'teacher_pro', source: 'dashboard_banner' })}
+            >
+              {t('teacher.upgradePro.cta')}
+            </Link>
+          </div>
+        </div>
+      )}
       <TeacherDashboard />
     </>
   );

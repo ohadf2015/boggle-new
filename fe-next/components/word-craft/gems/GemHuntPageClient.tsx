@@ -31,9 +31,9 @@ import { useMusic } from '@/contexts/MusicContext';
 import type { SoundEffectKey } from '@/lib/audio/soundEffectsConfig';
 
 const LETTER_FAMILIES = [
-  { id: 'vowels', letters: new Set(['A', 'E', 'I', 'O', 'U']), multiplier: 3 },
-  { id: 'common', letters: new Set(['R', 'S', 'T', 'L', 'N']), multiplier: 3 },
-  { id: 'rare',   letters: new Set(['J', 'K', 'Q', 'X', 'Z']), multiplier: 3 },
+  { id: 'vowels', letters: new Set(['A', 'E', 'I', 'O', 'U']), multiplier: 2 },
+  { id: 'common', letters: new Set(['R', 'S', 'T', 'L', 'N']), multiplier: 2 },
+  { id: 'rare',   letters: new Set(['J', 'K', 'Q', 'X', 'Z']), multiplier: 5 },
   { id: 'power',  letters: new Set(['B', 'C', 'D', 'F', 'G']), multiplier: 3 },
 ];
 type DiceFamily = { id: string; letters: Set<string>; multiplier: number };
@@ -293,7 +293,7 @@ export default function GemHuntPageClient() {
           tilesRemaining={tilesRemaining}
           turnIndex={state.turnIndex}
           diceBonusLabel={sessionDice && sessionDice !== 'none'
-            ? t('wordcraft.gems.dice.active', { family: t(`wordcraft.gems.dice.families.${sessionDice.id}`) })
+            ? t('wordcraft.gems.dice.active', { family: t(`wordcraft.gems.dice.families.${sessionDice.id}`), multiplier: sessionDice.multiplier })
             : null}
           labels={{
             crownsWon: t('wordcraft.gems.hud.crownsWon'),
@@ -415,7 +415,10 @@ export default function GemHuntPageClient() {
                 <span className="font-neo-display text-[10px] font-black uppercase tracking-wider text-neo-white">
                   {t(`wordcraft.gems.dice.families.${fam.id}`)}
                 </span>
-                <span className="rounded-neo border border-black bg-neo-purple px-1.5 py-0.5 font-neo-display text-xs font-black text-neo-white shadow-hard-sm">
+                <span className={cn(
+                  'rounded-neo border border-black px-1.5 py-0.5 font-neo-display text-xs font-black text-neo-white shadow-hard-sm',
+                  fam.multiplier >= 5 ? 'bg-neo-pink' : fam.multiplier >= 3 ? 'bg-neo-purple' : 'bg-neo-cyan text-neo-navy',
+                )}>
                   ×{fam.multiplier}
                 </span>
               </button>
