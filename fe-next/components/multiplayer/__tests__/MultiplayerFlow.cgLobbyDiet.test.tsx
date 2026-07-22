@@ -43,6 +43,21 @@ vi.mock('@/contexts/LanguageContext', () => ({
     dir: 'ltr',
     language: 'en',
   }),
+  useLanguageSafe: () => ({
+    t: (key: string, params?: Record<string, unknown>) =>
+      params ? `${key}|${JSON.stringify(params)}` : key,
+    dir: 'ltr',
+    language: 'en',
+    setLanguage: () => {},
+    currentFlag: '🇺🇸',
+  }),
+}));
+
+vi.mock('@/components/NativeLanguageBanner', () => ({
+  NativeLanguageBanner: () => null,
+}));
+vi.mock('@/components/FirstGameLanguageNotice', () => ({
+  FirstGameLanguageNotice: () => null,
 }));
 
 vi.mock('@/contexts/AuthContext', () => ({

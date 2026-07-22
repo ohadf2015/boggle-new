@@ -1,6 +1,6 @@
 'use client';
 
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../ui/button';
@@ -63,6 +63,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { OpponentWordFeedConnected } from '@/components/multiplayer/OpponentWordFeedConnected';
 import { useGameMode, useGameStore } from '@/hooks/gameState/store';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useGameTimer } from '@/hooks/useGameTimer';
+import { DirectionsTutorialOverlay } from '@/components/tutorial/DirectionsTutorialOverlay';
 
 // ==================== Types ====================
 
@@ -179,6 +181,15 @@ export interface MultiplayerInGameViewProps {
   totalTime?: number;
 }
 
+function WithTutorial({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <DirectionsTutorialOverlay />
+      {children}
+    </>
+  );
+}
+
 // ==================== Component ====================
 
 /**
@@ -255,6 +266,40 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // InGameScreen directly so this component doesn't re-render on irrelevant
   // word-hunt/blast store updates.
   const gameMode = useGameMode();
+
+  // Server-authoritative timer: the prop carries the latest `timeUpdate`, but we
+  // mirror it through useGameTimer so the display ticks smoothly between 1 Hz
+  // server broadcasts and snaps back into sync after reconnect / background tab.
+  const { remainingTime: syncedRemainingTime, setTime: setSyncedTime } = useGameTimer({
+    initialTime: totalTime ?? remainingTime ?? 180,
+    isPaused: !gameActive || remainingTime == null,
+    autoStart: false,
+    onTimeUp: () => {
+      // The server owns game end; this local callback is only for display safety.
+    },
+  });
+
+  // Sync whenever the parent re-renders with a fresh server reading.
+  useEffect(() => {
+    if (remainingTime != null) {
+      setSyncedTime(remainingTime);
+    }
+  }, [remainingTime, setSyncedTime]);
+
+  // Also listen directly to socket time updates so we stay in sync even if the
+  // parent batches or delays prop updates (reconnect resends, tab wake).
+  useEffect(() => {
+    if (!socket) return;
+    const handleTimeUpdate = (data: { remainingTime?: number }) => {
+      if (data.remainingTime !== undefined) {
+        setSyncedTime(data.remainingTime);
+      }
+    };
+    socket.on('timeUpdate', handleTimeUpdate);
+    return () => {
+      socket.off('timeUpdate', handleTimeUpdate);
+    };
+  }, [socket, setSyncedTime]);
 
   // Desktop shell routing (standard mode only)
   const shellEnabled = useDesktopShellEnabled();
@@ -347,29 +392,32 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // Mobile-only fallback: desktop path is handled by WheelRushDesktopAdapter below.
   if (gameMode === 'wheel-rush' && !shellEnabled) {
     return (
-      <WheelRushView
-        socket={socket}
-        username={username}
-        leaderboard={leaderboard}
-        onQuit={handleQuit}
-        t={t}
-        remainingTime={remainingTime}
-        totalTime={totalTime ?? undefined}
-        gameLanguage={gameLanguage}
-      />
+      <WithTutorial>
+        <WheelRushView
+          socket={socket}
+          username={username}
+          leaderboard={leaderboard}
+          onQuit={handleQuit}
+          t={t}
+          remainingTime={syncedRemainingTime}
+          totalTime={totalTime ?? undefined}
+          gameLanguage={gameLanguage}
+        />
+      </WithTutorial>
     );
   }
 
   // No grid placeholder (player-only edge case)
   if (!effectiveGrid) {
     return (
-      <div
-        className="flex-1 flex flex-col min-h-0 bg-neo-navy p-4 items-center justify-center"
-        role="status"
-        aria-busy="true"
-        aria-label={t('common.loading')}
-      >
-        <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4">
+      <WithTutorial>
+        <div
+          className="flex-1 flex flex-col min-h-0 bg-neo-navy p-4 items-center justify-center"
+          role="status"
+          aria-busy="true"
+          aria-label={t('common.loading')}
+        >
+          <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4">
           {Array.from({ length: 16 }).map((_, i) => (
             <div
               key={`tile-${i}`}
@@ -379,6 +427,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           ))}
         </div>
       </div>
+      </WithTutorial>
     );
   }
 
@@ -401,7 +450,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       socket,
       // Game state
       letterGrid: effectiveGrid,
-      remainingTime,
+      remainingTime: syncedRemainingTime,
       timerValue: timerValue ?? 2,
       gameActive,
       showStartAnimation,
@@ -440,16 +489,18 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     };
 
     return (
-      <StandardDesktopAdapter
-        roomId={gameCode}
-        leaderboard={rosterPlayers}
-        foundWords={ladderWords}
-        remainingTime={remainingTime ?? 0}
-        totalTime={totalTime ?? 180}
-        meId={username}
-        socket={socket}
-        canvas={<InGameScreen {...inGameScreenProps} />}
-      />
+      <WithTutorial>
+        <StandardDesktopAdapter
+          roomId={gameCode}
+          leaderboard={rosterPlayers}
+          foundWords={ladderWords}
+          remainingTime={syncedRemainingTime ?? 0}
+          totalTime={totalTime ?? 180}
+          meId={username}
+          socket={socket}
+          canvas={<InGameScreen {...inGameScreenProps} />}
+        />
+      </WithTutorial>
     );
   }
 
@@ -465,23 +516,25 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       leaderboard,
       onQuit: handleQuit,
       t,
-      remainingTime,
+      remainingTime: syncedRemainingTime,
       onFogProgressChange: setFogProgress,
       gameLanguage,
     };
 
     return (
-      <WheelRushDesktopAdapter
-        roomId={gameCode}
-        leaderboard={rosterPlayers}
-        foundWords={ladderWords}
-        remainingTime={remainingTime ?? 0}
-        totalTime={totalTime ?? 60}
-        fogProgress={fogProgress}
-        meId={username}
-        socket={socket}
-        canvas={<WheelRushView {...wheelRushProps} isDesktopCanvas />}
-      />
+      <WithTutorial>
+        <WheelRushDesktopAdapter
+          roomId={gameCode}
+          leaderboard={rosterPlayers}
+          foundWords={ladderWords}
+          remainingTime={syncedRemainingTime ?? 0}
+          totalTime={totalTime ?? 60}
+          fogProgress={fogProgress}
+          meId={username}
+          socket={socket}
+          canvas={<WheelRushView {...wheelRushProps} isDesktopCanvas />}
+        />
+      </WithTutorial>
     );
   }
 
@@ -505,17 +558,19 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     };
 
     return (
-      <WordHuntDesktopAdapter
-        roomId={gameCode}
-        leaderboard={rosterPlayers}
-        foundWords={ladderWords}
-        remainingTime={remainingTime ?? 0}
-        totalTime={totalTime ?? 180}
-        targetCategory=""
-        meId={username}
-        socket={socket}
-        canvas={<WordHuntGame {...wordHuntGameProps} />}
-      />
+      <WithTutorial>
+        <WordHuntDesktopAdapter
+          roomId={gameCode}
+          leaderboard={rosterPlayers}
+          foundWords={ladderWords}
+          remainingTime={syncedRemainingTime ?? 0}
+          totalTime={totalTime ?? 180}
+          targetCategory=""
+          meId={username}
+          socket={socket}
+          canvas={<WordHuntGame {...wordHuntGameProps} />}
+        />
+      </WithTutorial>
     );
   }
 
@@ -525,7 +580,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
       <BlastGame
         config={blastBridge.config}
         mode="multiplayer"
-        remainingTime={remainingTime}
+        remainingTime={syncedRemainingTime}
         totalTime={totalTime}
         leaderboard={leaderboard}
         username={username}
@@ -541,28 +596,35 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     if (shellEnabled) {
       // rosterPlayers + ladderWords memoized at top of component.
       return (
-        <BlastDesktopAdapter
-          roomId={gameCode}
-          leaderboard={rosterPlayers}
-          foundWords={ladderWords}
-          remainingTime={remainingTime ?? 0}
-          totalTime={totalTime ?? 60}
+        <WithTutorial>
+          <BlastDesktopAdapter
+            roomId={gameCode}
+            leaderboard={rosterPlayers}
+            foundWords={ladderWords}
+            remainingTime={syncedRemainingTime ?? 0}
+            totalTime={totalTime ?? 60}
           meId={username}
           socket={socket}
           comboCount={comboLevel}
           comboMultiplier={getComboMultiplier(comboLevel)}
           canvas={blastCanvas}
         />
+        </WithTutorial>
       );
     }
-    return blastCanvas;
+    return (
+      <WithTutorial>
+        {blastCanvas}
+      </WithTutorial>
+    );
   }
 
   // Word Hunt mode
   if (gameMode === 'word-hunt') {
     return (
-      <WordHuntGame
-        grid={effectiveGrid}
+      <WithTutorial>
+        <WordHuntGame
+          grid={effectiveGrid}
         gameLanguage={gameLanguage}
         leaderboard={leaderboard}
         username={username}
@@ -572,22 +634,24 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         onWordHuntGuess={handleWordHuntGuess}
         gameActive={gameActive}
         minWordLength={minWordLength}
-        socket={socket}
-        foundWords={foundWords}
-      />
+          socket={socket}
+          foundWords={foundWords}
+        />
+      </WithTutorial>
     );
   }
 
   // Classic mode — InGameScreen. Subtle seasonal ambience on the wrapper bg.
   return (
-    <div
-      className={cn(
-        'flex-1 flex flex-col min-h-0 overflow-hidden transition-colors duration-300',
-        'bg-neo-navy p-0 md:p-4',
-        getCurrentSeasonDynamic().gridSkinClass,
-      )}
-      translate="no"
-    >
+    <WithTutorial>
+      <div
+        className={cn(
+          'flex-1 flex flex-col min-h-0 overflow-hidden transition-colors duration-300',
+          'bg-neo-navy p-0 md:p-4',
+          getCurrentSeasonDynamic().gridSkinClass,
+        )}
+        translate="no"
+      >
       <div className="relative flex-1 flex flex-col min-h-0">
         <OpponentWordFeedConnected socket={socket} currentPlayerName={username} t={t} />
         <InGameScreen
@@ -602,7 +666,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           socket={socket}
           // Game state
           letterGrid={effectiveGrid}
-          remainingTime={remainingTime}
+          remainingTime={syncedRemainingTime}
           timerValue={timerValue ?? 2}
           gameActive={gameActive}
           showStartAnimation={showStartAnimation}
@@ -703,6 +767,7 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         </AlertDialog>
       )}
     </div>
+    </WithTutorial>
   );
 });
 

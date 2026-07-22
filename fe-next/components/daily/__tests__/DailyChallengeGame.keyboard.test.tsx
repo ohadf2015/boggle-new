@@ -31,6 +31,10 @@ vi.mock('framer-motion', () => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
       return <kbd {...domProps}>{children}</kbd>;
     },
+    polyline: ({ ...props }: Record<string, unknown>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <polyline {...domProps} />;
+    },
   };
   return {
     motion,

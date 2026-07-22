@@ -61,7 +61,17 @@ vi.mock('@/hooks/useMatchmaking', () => ({
   }),
 }));
 vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => ({ isAdmin: false, profile: null }) }));
-vi.mock('@/contexts/LanguageContext', () => ({ useLanguage: () => ({ t: (k: string) => k }) }));
+vi.mock('@/contexts/LanguageContext', () => ({
+  useLanguage: () => ({ t: (k: string) => k }),
+  useLanguageSafe: () => ({ t: (k: string) => k, language: 'en', setLanguage: () => {}, dir: 'ltr', currentFlag: '🇺🇸' }),
+}));
+
+vi.mock('@/components/NativeLanguageBanner', () => ({
+  NativeLanguageBanner: () => null,
+}));
+vi.mock('@/components/FirstGameLanguageNotice', () => ({
+  FirstGameLanguageNotice: () => null,
+}));
 
 const baseRoom: ActiveRoom = {
   gameCode: 'ROOM01',

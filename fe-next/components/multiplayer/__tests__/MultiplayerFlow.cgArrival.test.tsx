@@ -75,6 +75,14 @@ vi.mock('@/contexts/AuthContext', () => ({
 }));
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k }),
+  useLanguageSafe: () => ({ t: (k: string) => k, language: 'en', setLanguage: () => {}, dir: 'ltr', currentFlag: '🇺🇸' }),
+}));
+
+vi.mock('@/components/NativeLanguageBanner', () => ({
+  NativeLanguageBanner: () => null,
+}));
+vi.mock('@/components/FirstGameLanguageNotice', () => ({
+  FirstGameLanguageNotice: () => null,
 }));
 
 const baseRoom: ActiveRoom = {

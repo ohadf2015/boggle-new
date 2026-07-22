@@ -22,6 +22,8 @@ import { selectQuickPlayRoom } from '@/lib/multiplayer/selectQuickPlayRoom';
 import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { useExperiment } from '@/hooks/useExperiment';
 import { QuickPlaySeekingOverlay } from '@/components/multiplayer/QuickPlaySeekingOverlay';
+import { NativeLanguageBanner } from '@/components/NativeLanguageBanner';
+import { FirstGameLanguageNotice } from '@/components/FirstGameLanguageNotice';
 
 type FlowState = 'room-list' | 'join-modal' | 'create-modal';
 
@@ -457,6 +459,8 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   // Always show RoomListView as base, with modals as overlays
   return (
     <>
+      <NativeLanguageBanner />
+      <FirstGameLanguageNotice />
       {showCgHero && (
         <CgLobbyHero
           variant={heroVariant.variant}
