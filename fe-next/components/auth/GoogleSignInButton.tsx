@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 import Script from 'next/script';
-import { isNative } from '@/utils/platform';
-import { supabase } from '@/lib/supabase';
+import { isNative, isEdgeBrowser } from '@/utils/platform';
+import { supabase, signInWithGoogle } from '@/lib/supabase';
 import { ensureGoogleIdInitialized, type GoogleIdServices } from '@/lib/auth/googleOneTap';
 import { cn } from '@/lib/utils';
+import { GoogleIcon } from '@/components/auth/shared/icons/BrandIcons';
 
 const GSI_SRC = 'https://accounts.google.com/gsi/client';
 const GSI_MAX_WIDTH = 400; // GIS hard cap
@@ -19,6 +20,10 @@ interface GoogleSignInButtonProps {
 /**
  * Google's official "Sign in with Google" button (web), wrapped in a
  * neo-brutalist frame to match the app's other auth buttons.
+ *
+ * On Microsoft Edge, Google's GSI (in-page iframe) button is broken because
+ * Edge blocks third-party cookies by default. Edge users get a fallback
+ * button that triggers Supabase's redirect-based OAuth flow instead.
  *
  * The GSI button is an iframe and can't be CSS-styled, and it MUST stay visible
  * (GSI anti-clickjacking ignores clicks on hidden/obscured buttons — a custom
@@ -70,6 +75,28 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
   useEffect(() => {
     if (enabled) void renderButton();
   }, [enabled, renderButton]);
+
+  // Edge browser: GSI iframe + third-party cookie blocking breaks the flow.
+  // Render a fallback button that triggers Supabase's redirect-based OAuth.
+  if (isEdgeBrowser()) {
+    return (
+      <div className={cn('flex justify-center', className)}>
+        <button
+          type="button"
+          data-testid="google-signin-edge-fallback"
+          onClick={() => { void signInWithGoogle(); }}
+          className={cn(
+            'w-full flex items-center justify-center gap-2 py-3 rounded-xl',
+            'border-3 border-neo-black bg-white text-neo-black font-black text-sm',
+            'shadow-hard transition-all hover:shadow-hard-sm active:translate-y-0.5',
+          )}
+        >
+          <GoogleIcon className="w-5 h-5" />
+          <span>Continue with Google</span>
+        </button>
+      </div>
+    );
+  }
 
   if (!enabled) return null;
 

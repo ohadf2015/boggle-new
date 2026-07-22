@@ -75,6 +75,20 @@ export function isMobile(): boolean {
 }
 
 /**
+ * Check if running in Microsoft Edge browser.
+ * Edge blocks third-party cookies by default, which breaks Google's GSI
+ * (in-page iframe-based) sign-in button. Redirect-based OAuth must be used
+ * instead.
+ * @returns true if Edge, false otherwise
+ */
+export function isEdgeBrowser(): boolean {
+  if (typeof navigator === 'undefined') return false;
+  // Edge identifies as "Edg" in the user agent string.
+  // Chromium-based Edge uses "Edg/" (not "Edge/" which is legacy EdgeHTML).
+  return /Edg\//i.test(navigator.userAgent);
+}
+
+/**
  * Get current platform identifier
  * @returns 'ios' | 'android' | 'web'
  */
