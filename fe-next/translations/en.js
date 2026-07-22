@@ -14803,6 +14803,7 @@ const en = {
     "gameOver": "Game over",
     "playAgain": "Play again",
     "notAWord": "Not a word",
+    "tapHint": "Tap letters to build your word",
     "continue": "Continue",
     "revealing": "Revealing…",
     "youWin": "You win!",

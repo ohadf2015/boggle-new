@@ -341,8 +341,35 @@ export function createPubSubClients(): { pubClient: RedisClient; subClient: Redi
   }
 
   try {
-    const pubClient = _redisClient.duplicate();
-    const subClient = _redisClient.duplicate();
+    // Duplicate the main client but explicitly add a retry strategy so the
+    // Socket.IO pub/sub connections survive transient Redis drops. Without
+    // this, .publish() throws "Connection is closed" after the first drop.
+    const pubClient = _redisClient.duplicate({ retryStrategy: getRetryStrategy });
+    const subClient = _redisClient.duplicate({ retryStrategy: getRetryStrategy });
+
+    pubClient.on('connect', () => {
+      logger.debug('REDIS', 'Pub client connected');
+    });
+
+    pubClient.on('reconnecting', (delay: number) => {
+      logger.debug('REDIS', `Pub client reconnecting in ${delay}ms`);
+    });
+
+    pubClient.on('end', () => {
+      logger.debug('REDIS', 'Pub client connection ended');
+    });
+
+    subClient.on('connect', () => {
+      logger.debug('REDIS', 'Sub client connected');
+    });
+
+    subClient.on('reconnecting', (delay: number) => {
+      logger.debug('REDIS', `Sub client reconnecting in ${delay}ms`);
+    });
+
+    subClient.on('end', () => {
+      logger.debug('REDIS', 'Sub client connection ended');
+    });
 
     // Use debug for pub/sub errors since they cascade from the main
     // connection error (already reported via _errorReported flag)
