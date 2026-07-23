@@ -16,11 +16,11 @@ const DATE_PUBLISHED = '2025-12-01';
 const DATE_MODIFIED = '2026-05-19';
 
 const metaTitles: Record<string, string> = {
-  en: 'I Tested 6 Boggle Alternatives in 2026 — Here\'s What Actually Works',
-  he: 'ניסיתי כל חלופת בוגל ב-2026 — הנה מה שבאמת שווה לשחק',
-  sv: 'Jag testade alla Boggle-alternativ 2026 — Här är vad som faktiskt är värt att spela',
-  ja: 'Boggle代替ゲームを全部試した（2026年）— 本当に遊ぶ価値があるのはこれだ',
-  es: 'Probé todas las alternativas a Boggle (2026) — Esto es lo que vale la pena jugar',
+  en: '6 Best Boggle Alternatives 2026 — Honest Reviews, Free & No Download',
+  he: '6 חלופות בוגל 2026 — ביקורות כנות: מי שווה ומי לא',
+  sv: '6 Boggle-alternativ 2026 — Ärliga recensioner, gratis & ingen nedladdning',
+  ja: '2026年版Boggle代替ゲーム6選 — 本音レビュー・無料・DL不要',
+  es: '6 Mejores Alternativas a Boggle (2026) — Reseñas Honestas, Gratis',
 };
 
 const metaDescriptions: Record<string, string> = {
