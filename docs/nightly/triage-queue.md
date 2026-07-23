@@ -1779,3 +1779,29 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 |---|---|---|---|
 | `exp-mp-room-join-loading-v1` | 17d | 0 call sites in codebase (zombie) | **HUMAN: deactivate in PostHog** |
 | `exp-wordhunt-hint-v1` | 32d | Wired in WordHuntResultsContent only (results page) | Running — rage clicks on game page (separate surface); keep |
+
+## 2026-07-23
+
+- [PostHog] Minified React error #418 (hydration mismatch) — homepage
+  - first_seen: 2026-07-09, last_seen: 2026-07-22, count: 31, reach: 7 users
+  - url: https://eu.posthog.com/project/151059/error_tracking/019f4747-c11b-7430-8ac2-882649b49cbd
+  - surfaces: `https://www.lexiclash.live/` and `/he`, Chrome 150 / Android Mobile
+  - status: deferred — minified chunk (4bd1b696), no sourcemaps, can't pinpoint component without dev build
+  - why: needs dev-mode repro on Android Chrome to identify which component has server/client mismatch
+  - recommended owner: review-by-eod — check homepage components using typeof window / navigator / Date.now in render
+
+- [Sentry] Redis "Connection is closed." burst — JAVASCRIPT-NEXTJS-1WM cluster (711 events)
+  - first_seen: 2026-07-22T02:06Z, last_seen: 2026-07-22T03:44Z, burst duration ~98min, 0 users
+  - root cause: Redis dropped → @socket.io/redis-adapter calls pubClient.publish() without .catch()
+  - status: shipped (see redisAdapter.ts:attachAdapter wraps pubClient.publish)
+  - recommended owner: review-by-eod (verify no next Redis restart triggers new burst)
+
+- [PostHog] TypeError: Load failed — chunk fetch (019f34a3)
+  - first_seen: 2026-07-08, last_seen: 2026-07-22, count: 7/24h, reach: 3 users
+  - status: deferred — likely stale chunk after deploy (user on old tab) or network blip; no sourcemaps
+  - why: transient, no consistent reproduction path; chunk hash in URL suggests post-deploy cache issue
+  - recommended owner: self (low priority, check if chunk exists in current build)
+
+- [Feedback/manual] Ron requests coin grant: "games played locally by mistake, coins not credited"
+  - status: deferred — coin economy changes are human-queue-only per autonomy matrix
+  - recommended owner: human — one-time manual coin grant for user Ron via Supabase admin

@@ -1,27 +1,27 @@
 {
-  "date": "2026-07-22",
-  "note": "7-day window (n≥50 floor). CLS still catastrophic across all routes despite 07-20 AutoHideHeader fix (0.979→0.967 on /en/multiplayer post-fix). Root cause unresolved — AutoHideHeader spacer accounts for ~0.07 not 0.97. Homepage LCP 4716ms. Supabase MCP not probed this run.",
+  "date": "2026-07-23",
+  "note": "7-day window (n≥50 floor). CLS still catastrophic across all routes — 07-20 AutoHideHeader spacer fix moved /en/multiplayer CLS 0.979→0.961 (NEUTRAL, <2% improvement). Root cause unresolved: AutoHideHeader is correctly implemented (always renders spacer div or Header). True cause likely socket-state transitions (connecting→lobby→in-game DOM swap) or NativeLanguageBanner conditional mount. Needs visual QA with CLS element attribution. EventBanner animation uses CSS transform (y: -20) which does NOT cause CLS. Supabase MCP not available this run.",
   "backend": {
     "advisor_warnings_count": 2,
-    "note": "Supabase MCP not probed. Advisor: unindexed FK web_vitals_player_id_fk_index (migration pending 20260716), auth DB connection strategy. 6 migrations still pending apply.",
+    "note": "Supabase MCP not available this run. Pending migrations still not applied: 6 carry items. advisor: unindexed FK web_vitals_player_id_fk_index (carry 7 days), auth DB connection strategy (percentage-based).",
     "top_queries": [],
     "migrations_pending_apply": [
-      { "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql", "carry_count": 25 },
-      { "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql", "carry_count": 20 },
-      { "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql", "carry_count": 15 },
-      { "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql", "carry_count": 14 },
-      { "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql", "carry_count": 7 },
-      { "file": "fe-next/supabase/migrations/20260716020000_web_vitals_player_id_fk_index.sql", "carry_count": 6 }
+      { "file": "fe-next/supabase/migrations/20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql", "carry_count": 26 },
+      { "file": "fe-next/supabase/migrations/20260701020000_drop_unused_index_word_wheel_catchup.sql", "carry_count": 21 },
+      { "file": "fe-next/supabase/migrations/20260706020000_quick_play_challenges_index_cleanup.sql", "carry_count": 16 },
+      { "file": "fe-next/supabase/migrations/20260707020000_rls_initplan_fix_quick_play.sql", "carry_count": 15 },
+      { "file": "fe-next/supabase/migrations/20260715020000_word_pacts_player2_id_fk_index.sql", "carry_count": 8 },
+      { "file": "fe-next/supabase/migrations/20260716020000_web_vitals_player_id_fk_index.sql", "carry_count": 7 }
     ]
   },
   "frontend": {
-    "note": "7-day window (n≥50 floor). CLS regression persists: 07-20 AutoHideHeader fix barely moved /en/multiplayer CLS (0.979→0.967). Impact verdict: NEUTRAL. Root cause investigation: NativeLanguageBanner (layout:677) contributes ~0.07 on appearance; remainder unexplained — likely AnimatePresence opacity:0 SSR serialization or skeleton→room swap without height reservation. Visual QA needed.",
+    "note": "7-day window (n≥50 floor). CLS root cause investigation this run: (1) EventBanner already ssr:false + uses CSS transform for animation (not CLS-causing); (2) AutoHideHeader correctly implemented post-07-20 fix; (3) NativeLanguageBanner uses y:-32 transform (not CLS), but conditional mount (0→height) is CLS-causing for users with browser-locale mismatch; (4) socket state transitions on /en/multiplayer are prime suspect for 0.96 CLS — needs visual QA with CLS element attribution (PerformanceObserver or Chrome DevTools Layout Shifts panel).",
     "by_route": [
-      { "route": "/en/multiplayer", "p75_lcp_ms": 1539, "p75_cls": 0.975, "p75_inp_ms": 208, "n_7d": 140, "note": "CLS post-fix (since 07-20): 0.967, n=62. Barely improved. Root cause unresolved." },
-      { "route": "/", "p75_lcp_ms": 4716, "p75_cls": 0.917, "p75_inp_ms": 228, "n_7d": 99, "note": "LCP unchanged vs 4836 baseline. CLS still high." },
-      { "route": "/es/multiplayer", "p75_lcp_ms": 3755, "p75_cls": 0.671, "p75_inp_ms": 488, "n_7d": 133 },
-      { "route": "/en", "p75_lcp_ms": 3063, "p75_cls": 0.953, "p75_inp_ms": 304, "n_7d": 67 },
-      { "route": "/es/juego-de-palabras-multijugador", "p75_lcp_ms": 3111, "p75_cls": 0.345, "p75_inp_ms": 154, "n_7d": 53 }
+      { "route": "/en/multiplayer", "p75_lcp_ms": 1547, "p75_cls": 0.961, "p75_inp_ms": 210, "n_7d": 143, "note": "CLS barely improved from 0.975 baseline. Root cause: socket state transitions suspected. Needs visual QA." },
+      { "route": "/", "p75_lcp_ms": 4870, "p75_cls": 0.903, "p75_inp_ms": 196, "n_7d": 69, "note": "LCP +3.3% vs 4716 baseline (within noise). INP improved 228→196ms." },
+      { "route": "/es/multiplayer", "p75_lcp_ms": 3785, "p75_cls": 0.565, "p75_inp_ms": 424, "n_7d": 138, "note": "INP improved 488→424ms. CLS improved 0.671→0.565." },
+      { "route": "/en", "p75_lcp_ms": 3142, "p75_cls": 0.972, "p75_inp_ms": 300, "n_7d": 64, "note": "LCP +2.5% vs 3063 baseline (within noise). CLS slightly worse." },
+      { "route": "/es/juego-de-palabras-multijugador", "p75_lcp_ms": 3050, "p75_cls": 0.263, "p75_inp_ms": 172, "n_7d": 65, "note": "CLS improved 0.345→0.263. Best CLS route." }
     ]
   },
   "bundle": {
