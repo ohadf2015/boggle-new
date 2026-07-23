@@ -509,6 +509,9 @@ const sv = {
       "ghost": {
         "reveal": "👻 Spökturen — ×2!",
         "score": "Poäng:"
+      },
+      "tempo": {
+        "bonus": "⚡ Snabbkedja — +50%!"
       }
     }
   },
@@ -706,7 +709,8 @@ const sv = {
     "ok": "Bra",
     "great": "Älskade den!",
     "thanks": "Tack för din feedback!",
-    "dismiss": "Stäng"
+    "dismiss": "Stäng",
+    "issueProbe": {"prompt": "Vad fick det att kännas så?", "botsStrong": "Bottar för starka", "technical": "Tekniskt problem"}
   },
   "wordTower": {
     "mutator": {

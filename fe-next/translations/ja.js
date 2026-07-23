@@ -242,6 +242,9 @@ const ja = {
       "ghost": {
         "reveal": "👻 ゴーストターン — ×2!",
         "score": "スコア:"
+      },
+      "tempo": {
+        "bonus": "⚡ 速攻チェーン — +50%！"
       }
     }
   },
@@ -439,7 +442,8 @@ const ja = {
     "ok": "良かった",
     "great": "最高！",
     "thanks": "フィードバックありがとう！",
-    "dismiss": "閉じる"
+    "dismiss": "閉じる",
+    "issueProbe": {"prompt": "なぜそう感じましたか？", "botsStrong": "ボットが強すぎる", "technical": "技術的な問題"}
   },
   "wordTower": {
     "mutator": {

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import { getClassroomContent } from './content';
+import { TeacherAccessCTA } from '@/components/education/TeacherAccessCTA';
 
 export const revalidate = 86400;
 
@@ -180,6 +181,7 @@ export default async function Page({ params }: PageProps) {
             </Link>
           </div>
         </section>
+        <TeacherAccessCTA />
       </div>
     </main>
   );

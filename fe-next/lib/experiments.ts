@@ -755,6 +755,29 @@ export const EXPERIMENTS = {
     description:
       'Word Hunt invalid-word rejection feedback. clue-shake = animate-neo-shake on clue box row when word rejected (not-in-dictionary/invalid-word/not-on-board). control = current pill+canvas only. Targets /he/daily/word-hunt rage clicks (6 users 24h, null-element pattern = Wordle-tap expectation mismatch). Metric: $rageclick on word-hunt URLs.',
   }),
+
+  /**
+   * MP round issue-probe follow-up. mp_round sentiment = 1/3 (avg) as of 2026-07-23;
+   * bug report: special tiles not working with bots (he locale). Without a "why did
+   * you rate this?" signal, the 1/3 score is unactionable — could be gameplay
+   * difficulty, bugs, or confusion.
+   *
+   * control = current behavior: rating → close immediately.
+   * issue-probe = after bad/ok rating on mp_round surface, show a 2-chip follow-up
+   *   ("Bots too strong" | "Technical issue") before closing. Selection fires
+   *   mp_round_issue_selected. Allows triage of bug vs gameplay signal without
+   *   a full UX overhaul.
+   *
+   * Primary metric: mp_round_issue_selected(issue=technical) count > 0 (validates bug)
+   * Guardrail: growth:game_feedback response rate must not fall >10%.
+   * PostHog flag key = 'exp-mp-round-issue-probe-v1', 50/50 rollout.
+   */
+  'exp-mp-round-issue-probe-v1': defineExperiment({
+    variants: ['control', 'issue-probe'] as const,
+    default: 'control',
+    description:
+      'MP round sentiment follow-up probe. issue-probe = after bad/ok rating on mp_round, show 2 triage chips (bots-too-strong / technical-issue) before dismissing. Fires mp_round_issue_selected. Targets unactionable 1/3 avg mp_round score (2026-07-23). Primary metric: mp_round_issue_selected count. Guardrail: game_feedback response rate stable.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

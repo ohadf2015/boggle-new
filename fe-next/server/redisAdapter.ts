@@ -29,6 +29,22 @@ const adapterListeners = new Set<() => void>();
  * Attach the Redis adapter to the Socket.IO server and store the clients.
  */
 function attachAdapter(io: ExtendedSocketServer, pubClient: RedisClient, subClient: RedisClient): void {
+  // @socket.io/redis-adapter calls pubClient.publish() without catching rejections.
+  // When Redis drops, ioredis rejects commands with "Connection is closed." causing
+  // unhandled promise rejections that flood Sentry (711 events per restart episode).
+  // Catch + suppress the known transient message; all other errors are re-thrown.
+  const originalPublish = pubClient.publish.bind(pubClient);
+  pubClient.publish = (async (...args: Parameters<typeof originalPublish>) => {
+    try {
+      return await originalPublish(...args);
+    } catch (err) {
+      if ((err as Error).message === 'Connection is closed.') {
+        return 0;
+      }
+      throw err;
+    }
+  }) as typeof pubClient.publish;
+
   io.adapter(createAdapter(pubClient, subClient));
   io.pubClient = pubClient;
   io.subClient = subClient;

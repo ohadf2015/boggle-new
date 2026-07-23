@@ -242,6 +242,9 @@ const he = {
       "ghost": {
         "reveal": "👻 תור רוח — ×2!",
         "score": "ניקוד:"
+      },
+      "tempo": {
+        "bonus": "⚡ שרשרת מהירה — +50%!"
       }
     }
   },
@@ -439,7 +442,8 @@ const he = {
     "ok": "טוב",
     "great": "אהבתי!",
     "thanks": "תודה על המשוב!",
-    "dismiss": "סגירה"
+    "dismiss": "סגירה",
+    "issueProbe": {"prompt": "מה גרם לתחושה הזו?", "botsStrong": "הבוטים חזקים מדי", "technical": "בעיה טכנית"}
   },
   "wordTower": {
     "mutator": {

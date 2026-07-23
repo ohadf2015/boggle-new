@@ -263,7 +263,11 @@ export type GrowthEvent =
   //   Fires on every join/start button tap in the MP lobby.
   //   Props: { locale: string, socketReady: boolean, action: 'create' | 'join' }.
   //   High socketReady=false rate = socket latency root cause for rage-clicks.
-  | 'mp_lobby_join_attempted';
+  | 'mp_lobby_join_attempted'
+  // exp-mp-round-issue-probe-v1 triage chip selection.
+  //   Fires when player picks a follow-up chip after bad/ok mp_round rating.
+  //   Props: { issue: 'bots_too_strong' | 'technical_issue', language: string }.
+  | 'mp_round_issue_selected';
 
 /** Onboarding funnel step identifiers (FTUE state machine). */
 export type OnboardingStep =

@@ -242,6 +242,9 @@ const es = {
       "ghost": {
         "reveal": "👻 Turno fantasma — ×2!",
         "score": "Puntos:"
+      },
+      "tempo": {
+        "bonus": "⚡ ¡Cadena rápida — +50%!"
       }
     }
   },
@@ -438,7 +441,8 @@ const es = {
     "ok": "Bien",
     "great": "¡Me encantó!",
     "thanks": "¡Gracias por tu opinión!",
-    "dismiss": "Cerrar"
+    "dismiss": "Cerrar",
+    "issueProbe": {"prompt": "¿Qué lo hizo sentir así?", "botsStrong": "Bots muy fuertes", "technical": "Problema técnico"}
   },
   "wordTower": {
     "mutator": {
