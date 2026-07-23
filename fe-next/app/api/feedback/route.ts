@@ -65,7 +65,7 @@ interface FeedbackFields {
 /** Build the founder-facing Telegram message (MarkdownV2, all dynamic parts escaped). */
 function buildTelegramMessage(f: FeedbackFields): string {
   const esc = escapeTelegramMarkdownV2;
-  const userDisplay = f.username ? `${esc(f.username)} (${esc(f.userId || '')})` : (f.userId ? esc(f.userId) : '_anonymous_');
+  const userDisplay = f.username ? `${esc(f.username)}\\(${esc(f.userId || '')}\\)` : (f.userId ? esc(f.userId) : '_anonymous_');
   const lines = [
     '🐞 *New Bug Report / Feedback*',
     '',
@@ -96,7 +96,7 @@ async function sendEmail(f: FeedbackFields): Promise<boolean> {
         from: fromEmail,
         to: FEEDBACK_EMAIL,
         ...(f.email ? { replyTo: f.email } : {}),
-        subject: `[LexiClash Bug] ${f.message.slice(0, 60)}`,
+        subject: `[LexiClash Bug] ${f.message.replace(/\n/g, ' ').replace(/\r/g, '').slice(0, 60)}`,
         text: `Bug report:\n\n${f.message}\n\nPage: ${f.page}\nUser: ${userDisplay}\nEmail: ${f.email || 'n/a'}\nLocale: ${f.locale}\nViewport: ${f.viewport}\nApp: ${f.appVersion}\nBrowser: ${f.userAgent}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: ${c.navy || '#1a1a2e'}; padding: 24px; border-radius: 12px;">
