@@ -178,6 +178,36 @@ _gate_npm_chain() {
   printf '%s' "${chain}npm run build:schemas && npx --no-install tsc --noEmit && { rm -rf .next-nightly 2>/dev/null; NEXT_BUILD_DIR=.next-nightly NIGHTLY_SKIP_NEXT_TS=1 npm run build:fast; } && ${test_cmd}"
 }
 
+# nightly_map_test_to_authored_source <newline-separated test paths> <authored_allowlist_file>
+# → the authored SOURCE files that the given failing TEST files cover, intersected with the
+# authored allowlist. A vitest FAIL names `foo/bar.test.tsx`, but the change that broke it is
+# almost always its SOURCE sibling `foo/bar.tsx` (or, for a `__tests__/` layout, the parent-dir
+# source `foo/Bar.tsx`). When the test file itself is NOT authored, peeling it is a no-op — the
+# broken source survives and the re-gate stays red → docs-only drop-all (2026-07-23:
+# `app/[locale]/scrabble-alternative-online/page.test.tsx` failed on the nightly's authored
+# `page.tsx`, but only `page.tsx` was in the allowlist, so the failing test mapped to nothing and
+# all 11 build-clean files were dropped). Pure string derivation (no filesystem): strip the
+# `.test|.spec` + ext, emit each source-extension candidate for both the sibling and the
+# de-`__tests__/` parent path, then keep only candidates present in the allowlist.
+nightly_map_test_to_authored_source() {
+  local tests="$1" allow="$2"
+  [ -n "$tests" ] && [ -n "$allow" ] && [ -s "$allow" ] || return 0
+  {
+    printf '%s\n' "$tests" | while IFS= read -r t; do
+      [ -n "$t" ] || continue
+      local base ext
+      base=$(printf '%s' "$t" | sed -E 's/\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)$//')
+      [ "$base" = "$t" ] && continue   # not a test-file token; skip
+      for ext in tsx ts jsx js; do
+        printf '%s.%s\n' "$base" "$ext"                                    # sibling: foo/bar.test.tsx → foo/bar.tsx
+        case "$base" in
+          */__tests__/*) printf '%s.%s\n' "$(printf '%s' "$base" | sed -E 's#/__tests__/#/#')" "$ext" ;;  # foo/__tests__/Bar → foo/Bar
+        esac
+      done
+    done
+  } | grep -xF -f "$allow" 2>/dev/null | sort -u
+}
+
 # nightly_baseline_ship_decision <authored_fail_file> <baseline_rc> <baseline_fail_file> <authored_allowlist_file>
 # Pure decision for the baseline-aware salvage when the gate failed but no authored
 # file was pinned as a lint/tsc offender. The three list files hold repo-relative
@@ -191,24 +221,43 @@ _gate_npm_chain() {
 #                   caller uses the existing lint-skip / docs-only salvage (no regression).
 nightly_baseline_ship_decision() {
   local af="$1" brc="$2" bf="$3" allow="$4"
-  # Baseline gate PASSED → clean HEAD is green → the failure is the lanes' own.
-  [ "$brc" = "0" ] && { printf 'fallthrough\n'; return 0; }
   local authored_n baseline_n
   authored_n=$(grep -c . "$af" 2>/dev/null); authored_n=${authored_n:-0}
   baseline_n=$(grep -c . "$bf" 2>/dev/null); baseline_n=${baseline_n:-0}
-  # No authored failing tests, or no comparable test-failure baseline (baseline failed
-  # at lint/build, not test) → can't conclude "pre-existing" → conservative fallthrough.
+  # No authored failing tests → nothing to attribute → conservative fallthrough.
   [ "$authored_n" -gt 0 ] || { printf 'fallthrough\n'; return 0; }
-  [ "$baseline_n" -gt 0 ] || { printf 'fallthrough\n'; return 0; }
-  # NEW failing tests introduced by the authored set = authored − baseline.
+  # Which authored failing tests are NEW (introduced by the lane, not red on clean HEAD)?
+  #   • baseline gate PASSED (brc=0) → clean HEAD is green on ALL of them → the LANE introduced
+  #     every failure. This used to `fallthrough` (→ caller's docs-only drop-all) because a
+  #     lane-caused TEST failure was un-peelable without a test→source map — exactly the
+  #     2026-07-23 scrabble class, where the failing test PASSES on master and the lane's
+  #     source change broke it. With nightly_map_test_to_authored_source we CAN now peel the
+  #     lane's source, so a green baseline must route to peel, NOT fallthrough.
+  #   • baseline gate FAILED (brc≠0) but named NO failing tests (failed at lint/build, or the
+  #     scoped run was undecidable) → we can't tell which authored fails are pre-existing →
+  #     conservative fallthrough (unchanged — never ship on an undecidable baseline).
+  #   • baseline gate FAILED with a test-fail list → NEW = authored − baseline (unchanged).
   local newf new_n
-  newf=$(grep -vxF -f "$bf" "$af" 2>/dev/null || true)
+  if [ "$brc" = "0" ]; then
+    newf=$(grep . "$af" 2>/dev/null || true)                 # clean HEAD green → all authored fails are lane-new
+  else
+    [ "$baseline_n" -gt 0 ] || { printf 'fallthrough\n'; return 0; }
+    newf=$(grep -vxF -f "$bf" "$af" 2>/dev/null || true)     # authored − baseline
+  fi
   new_n=$(printf '%s' "$newf" | grep -c . 2>/dev/null); new_n=${new_n:-0}
+  # brc≠0 with every authored fail also red on baseline → not the lane's fault → ship.
   if [ "$new_n" -eq 0 ]; then printf 'ship\n'; return 0; fi
-  # Some new failures — peel the ones WE authored (never touch non-authored paths).
-  local newauth
+  # Some new failures — peel the ones WE authored. The peel set is the UNION of (a) NEW failing
+  # tests we authored directly and (b) the authored SOURCE files those tests cover (a failing
+  # test is usually broken by its non-authored source sibling — see the 2026-07-23 incident in
+  # nightly_map_test_to_authored_source). Both are allowlist-intersected, so a stray never peels
+  # a file the nightly didn't write. If nothing maps (the lane authored neither the test nor its
+  # source — e.g. a shared-util change surfacing in a non-authored test) → conservative fallthrough.
+  local newauth mapped peel_set
   newauth=$(printf '%s\n' "$newf" | grep -xF -f "$allow" 2>/dev/null || true)
-  if [ -n "$newauth" ]; then printf 'peel\n%s\n' "$newauth"; return 0; fi
+  mapped=$(nightly_map_test_to_authored_source "$newf" "$allow")
+  peel_set=$(printf '%s\n%s\n' "$newauth" "$mapped" | grep . | sort -u)
+  if [ -n "$peel_set" ]; then printf 'peel\n%s\n' "$peel_set"; return 0; fi
   printf 'fallthrough\n'; return 0
 }
 
@@ -445,7 +494,7 @@ nightly_parse_gate_failures() {
       | sed -E 's#^.*/(fe-next/)#\1#' \
       | grep -v '/node_modules/'
     # tsc: `components/foo.tsx(12,3): error TS....` (relative to fe-next cwd).
-    grep -oE '^[A-Za-z0-9_][A-Za-z0-9_./-]*\.(tsx|ts|jsx|js|mjs|cjs)\([0-9]+,[0-9]+\): error' "$out" \
+    grep -oE '^[A-Za-z0-9_][][A-Za-z0-9_./-]*\.(tsx|ts|jsx|js|mjs|cjs)\([0-9]+,[0-9]+\): error' "$out" \
       | sed -E 's/\([0-9]+,[0-9]+\): error.*$//' \
       | sed -E 's#^#fe-next/#' \
       | grep -v '/node_modules/'
@@ -480,8 +529,14 @@ nightly_parse_gate_failures() {
 nightly_parse_test_failures() {
   local out="$1"
   [ -n "$out" ] && [ -s "$out" ] || return 0
+  # The `[][A-Za-z0-9_./-]` class includes a literal `]` (first, per POSIX) and `[` so
+  # a Next.js dynamic-route segment (`app/[locale]/foo/page.test.tsx`) parses — WITHOUT
+  # the brackets the class stops at `app/`, the FAIL header yields no token, and every
+  # failing `app/[locale]/**` test reads as "no parseable offenders" → docs-only drop-all
+  # (the 2026-07-23 scrabble-alternative-online/page.test.tsx incident). The next-build
+  # branch of nightly_parse_gate_failures already anchors brackets this way; kept in sync.
   sed -E $'s/\x1b\\[[0-9;]*m//g' "$out" 2>/dev/null \
-    | grep -oE 'FAIL +[A-Za-z0-9_./-]+\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)' \
+    | grep -oE 'FAIL +[][A-Za-z0-9_./-]+\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)' \
     | sed -E 's/^FAIL +//' \
     | awk '{ if ($0 ~ /\/fe-next\//) sub(/^.*\/fe-next\//,"fe-next/"); else if ($0 !~ /^fe-next\//) $0="fe-next/"$0; print }' \
     | grep -v '/node_modules/' \
@@ -514,7 +569,7 @@ nightly_parse_worker_crashed_tests() {
   [ -n "$out" ] && [ -s "$out" ] || return 0
   sed -E $'s/\x1b\\[[0-9;]*m//g' "$out" 2>/dev/null \
     | grep -aE 'Failed to start .*worker for test files|Worker terminated|ERR_WORKER_OUT_OF_MEMORY|Worker forks emitted error|Failed to terminate .*worker|\[vitest-pool(-runner)?\]:' \
-    | grep -aoE '[A-Za-z0-9_./-]+\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)' \
+    | grep -aoE '[][A-Za-z0-9_./-]+\.(test|spec)\.(tsx|ts|jsx|js|mjs|cjs)' \
     | awk '{ if ($0 ~ /\/fe-next\//) sub(/^.*\/fe-next\//,"fe-next/"); else if ($0 !~ /^fe-next\//) $0="fe-next/"$0; print }' \
     | grep -v '/node_modules/' \
     | sort -u

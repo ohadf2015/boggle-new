@@ -263,9 +263,11 @@ assert "typecheck tier rc=empty → docs-only (safe default)" "[ \"\$(nightly_ga
 
 echo "── gate-isolated: nightly_baseline_ship_decision (baseline-aware verdict) ──"
 _AF=$(mktemp); _BF=$(mktemp); _ALLOW=$(mktemp)
-# Baseline gate PASSED (rc=0) → clean HEAD is green → lanes at fault → fallthrough.
+# Baseline gate PASSED (rc=0) → clean HEAD green → lane introduced the failure. With an EMPTY
+# allowlist neither the test nor any source maps → nothing to peel → fallthrough (conservative).
+# (The peel-on-green-baseline path is exercised by the 2026-07-23 case below with a real allowlist.)
 printf 'fe-next/a.test.ts\n' > "$_AF"; : > "$_BF"; : > "$_ALLOW"
-assert "brc=0 (HEAD green) → fallthrough" "[ \"\$(nightly_baseline_ship_decision $_AF 0 $_BF $_ALLOW)\" = fallthrough ]"
+assert "brc=0 (HEAD green), empty allowlist → fallthrough (nothing to peel)" "[ \"\$(nightly_baseline_ship_decision $_AF 0 $_BF $_ALLOW)\" = fallthrough ]"
 # Authored fails a.test; baseline also fails a.test (+b) → authored ⊆ baseline → ship.
 printf 'fe-next/a.test.ts\n' > "$_AF"; printf 'fe-next/a.test.ts\nfe-next/b.test.ts\n' > "$_BF"; printf 'fe-next/x.tsx\n' > "$_ALLOW"
 assert "authored failing ⊆ baseline failing → ship" "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BF $_ALLOW)\" = ship ]"
@@ -284,6 +286,55 @@ assert "red baseline w/ no test-fail list → fallthrough" "[ \"\$(nightly_basel
 # No authored failing tests → nothing to compare → fallthrough.
 : > "$_AF"; printf 'fe-next/a.test.ts\n' > "$_BF"; : > "$_ALLOW"
 assert "no authored failing tests → fallthrough" "[ \"\$(nightly_baseline_ship_decision $_AF 1 $_BF $_ALLOW)\" = fallthrough ]"
+rm -f "$_AF" "$_BF" "$_ALLOW"
+
+echo "── gate-isolated: [locale] dynamic-route brackets parse (2026-07-23 docs-only drop-all) ──"
+# The FAIL header for a Next.js dynamic route carries literal [ ] — the parser char class
+# MUST include them or the token is unparseable → "no parseable offenders" → docs-only drop-all.
+_BR=$(mktemp)
+printf ' FAIL  app/[locale]/scrabble-alternative-online/page.test.tsx > meta > title\n' > "$_BR"
+assert "parse_test_failures: [locale] test path parses (not empty)" \
+  "[ \"\$(nightly_parse_test_failures $_BR)\" = 'fe-next/app/[locale]/scrabble-alternative-online/page.test.tsx' ]"
+printf 'app/[locale]/foo/page.tsx(12,3): error TS2322: x\n' > "$_BR"
+assert "parse_gate_failures: [locale] tsc error path parses" \
+  "[ \"\$(nightly_parse_gate_failures $_BR)\" = 'fe-next/app/[locale]/foo/page.tsx' ]"
+printf '[vitest-pool]: Failed to start forks worker for test files app/[locale]/bar/x.test.tsx.\n' > "$_BR"
+assert "parse_worker_crashed_tests: [locale] crash path parses" \
+  "[ \"\$(nightly_parse_worker_crashed_tests $_BR)\" = 'fe-next/app/[locale]/bar/x.test.tsx' ]"
+rm -f "$_BR"
+
+echo "── gate-isolated: nightly_map_test_to_authored_source (failing test → authored source) ──"
+_ALLOW=$(mktemp)
+printf 'fe-next/app/[locale]/scrabble-alternative-online/page.tsx\nfe-next/server/redisAdapter.ts\n' > "$_ALLOW"
+assert "sibling [locale] test → authored page.tsx source" \
+  "[ \"\$(nightly_map_test_to_authored_source 'fe-next/app/[locale]/scrabble-alternative-online/page.test.tsx' $_ALLOW)\" = 'fe-next/app/[locale]/scrabble-alternative-online/page.tsx' ]"
+printf 'fe-next/components/foo/Bar.tsx\n' > "$_ALLOW"
+assert "__tests__/ layout test → parent-dir authored source" \
+  "[ \"\$(nightly_map_test_to_authored_source 'fe-next/components/foo/__tests__/Bar.test.tsx' $_ALLOW)\" = 'fe-next/components/foo/Bar.tsx' ]"
+printf 'fe-next/other/unrelated.tsx\n' > "$_ALLOW"
+assert "test whose source is NOT authored → empty (never peel a stray)" \
+  "[ -z \"\$(nightly_map_test_to_authored_source 'fe-next/app/x/page.test.tsx' $_ALLOW)\" ]"
+rm -f "$_ALLOW"
+
+echo "── gate-isolated: 2026-07-23 incident — lane broke a committed test that's GREEN on master → peel source ──"
+# EXACT shape of the drop-all night: the lane authored page.tsx (source), whose committed sibling
+# test page.test.tsx now fails. The SCOPED baseline gate runs ONLY that test on clean HEAD, where
+# it PASSES (master still has the keyword title) → baseline rc=0, EMPTY baseline-fail list. This is
+# the real value (brc=0), NOT the brc=1 an unrelated pre-existing failure would give. Old behavior:
+# `brc=0 → fallthrough` at the top → caller's docs-only drop-all of all 11 files. Fixed: brc=0 means
+# the lane introduced every failure → map to the authored source and peel just it, ship the rest.
+_AF=$(mktemp); _BF=$(mktemp); _ALLOW=$(mktemp)
+printf 'fe-next/app/[locale]/scrabble-alternative-online/page.test.tsx\n' > "$_AF"
+: > "$_BF"   # scoped baseline on clean HEAD is GREEN — our test passes on master
+printf 'fe-next/app/[locale]/scrabble-alternative-online/page.tsx\nfe-next/server/redisAdapter.ts\n' > "$_ALLOW"
+_DOUT=$(nightly_baseline_ship_decision "$_AF" 0 "$_BF" "$_ALLOW")   # brc=0 = the REAL 07-23 value
+assert "07-23 (brc=0, HEAD green on the test): NEW [locale] test → peel verdict (was fallthrough/drop-all)" "[[ \"$_DOUT\" == peel* ]]"
+assert "07-23: peel names the AUTHORED SOURCE page.tsx, not the test file" \
+  "[[ \"\$(printf '%s' \"$_DOUT\" | tail -n +2)\" == 'fe-next/app/[locale]/scrabble-alternative-online/page.tsx' ]]"
+assert "07-23: peel does NOT include the unrelated authored redisAdapter (only the offender's source)" \
+  "[[ \"$_DOUT\" != *redisAdapter* ]]"
+# Guard the reachability regression directly: brc=0 with a mappable authored source MUST NOT fallthrough.
+assert "07-23 reachability: brc=0 no longer short-circuits to fallthrough when a source maps" "[[ \"$_DOUT\" != fallthrough ]]"
 rm -f "$_AF" "$_BF" "$_ALLOW"
 
 echo "── gate-isolated: nightly_parse_worker_crashed_tests (2026-07-18 false-drop fix) ──"
