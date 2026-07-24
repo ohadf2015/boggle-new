@@ -1805,3 +1805,26 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - [Feedback/manual] Ron requests coin grant: "games played locally by mistake, coins not credited"
   - status: deferred — coin economy changes are human-queue-only per autonomy matrix
   - recommended owner: human — one-time manual coin grant for user Ron via Supabase admin
+
+## 2026-07-24
+- [Supabase/Advisor] upsert_push_token SECURITY DEFINER callable by authenticated role
+  - first seen: 2026-07-24, count: n/a, userCount: n/a
+  - link: https://supabase.com/dashboard (advisor: authenticated_security_definer_function_executable)
+  - status: deferred
+  - why: authenticated callers ARE intentional — API route uses user-scoped client. REVOKE authenticated would break push-token registration. Autonomy matrix only autonomously ships REVOKE for anon/public, not authenticated. Question is whether direct REST bypass (/rest/v1/rpc/upsert_push_token) is acceptable vs API route validation.
+  - recommended owner: backend — review-by-eod; consider switching to service-role call in the API route + REVOKE from authenticated
+
+- [Feedback/bug] MP special tiles (ice/explosion) not triggering with bots
+  - first seen: 2026-07-22, count: 1 report
+  - link: Supabase feedback_reports (reporter: Ron)
+  - status: deferred — tile type names not found in quick grep; needs server-side socket handler investigation
+  - why: ambiguous root cause — "ice/explosion" tile names don't match any symbol in fe-next/; may be Blast mode specific or server-side only
+  - recommended owner: backend/game
+
+- [Feedback/feature-request] Double scores for "priority users" (beta access)
+  - status: deferred — feature request not a bug, coin/score economy = human-queue-only
+  - recommended owner: founder design call
+
+- [Feedback/manual] Avatar reset for user "ilik bilik"
+  - status: deferred — requires admin DB operation
+  - recommended owner: human admin
