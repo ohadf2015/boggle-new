@@ -301,6 +301,119 @@ nightly_gate_typecheck_route() {
   esac
 }
 
+# _nightly_bisect_gate <list_file> <mode: quick|full> → 0 pass / 1 fail / other inconclusive
+# Default oracle for nightly_bisect_offenders. quick = the fast conclusive typecheck
+# tier (build:schemas + tsc --noEmit + test:changed, ~1min, wedge-resistant); full =
+# the complete gate (lint + tsc + build:fast + test) — the same authority required to
+# ship. run_isolated_gate is worktree-based + NON-mutating, so every trial is
+# independent and the founder tree is never touched. Overridable via
+# NIGHTLY_BISECT_GATE_FN for unit tests.
+_nightly_bisect_gate() {
+  if [ "${2:-quick}" = "full" ]; then
+    run_isolated_gate "$1"            # lint + tsc + build:fast + test:changed
+  else
+    run_isolated_gate "$1" 0 0 0 1    # build:schemas + tsc --noEmit + test:changed
+  fi
+}
+
+# nightly_bisect_offenders <all_code_list_file> <out_offenders_file>
+# SUBSET-PEEL BISECT BACKSTOP (2026-07-24) — the deferred "class-killer".
+#
+# Last resort BEFORE the destructive docs-only drop-all: instead of throwing away
+# EVERY authored code file because the gate is red, delta-debug to the MINIMAL
+# offending subset so the innocent majority still ships. It decides purely on gate
+# PASS/FAIL — it NEVER parses gate output — so it is immune to the recurring
+# "parser one format behind" false-drop class (2026-07-02/18/21/23…). On 2026-07-23
+# a human did exactly this by hand (1 real offender + 9 innocents restored); this is
+# that salvage, automated.
+#
+# Atomic grouping: fe-next/translations/*.js bisect as ONE unit — a split (ship
+# en.js, drop he.js) ships orphan i18n keys the BUILD can't catch (surfaces as a
+# ratchet/runtime break the NEXT preflight). Independent files (dict candidates,
+# migrations, unrelated components) bisect individually; a stray test/source split
+# is caught by the final full-gate re-verify.
+#
+# Returns 0 and writes the offending files to <out_offenders_file> IFF it isolated a
+# PROPER, non-empty offender subset whose complement (the kept set) PASSES the FULL
+# gate. Returns 1 (out file empty) on: ≤1 code file, no isolable offender, an empty
+# kept set, a kept set that fails the full gate (cheap oracle too weak), a wedge, or
+# budget/wall-time exhaustion → caller falls back to the conservative docs-only
+# drop-all (never a regression, never ships un-full-gated code).
+#
+# Cost is bounded: NIGHTLY_BISECT_MAX_GATES gate calls (default 2*units+3) and
+# NIGHTLY_BISECT_BUDGET_SECS wall-time (default 3600s). Seam: NIGHTLY_BISECT_GATE_FN.
+nightly_bisect_offenders() {
+  local all="$1" out="$2"
+  : > "$out"
+  local n; n=$(grep -c . "$all" 2>/dev/null); n=${n:-0}
+  [ "$n" -gt 1 ] || return 1   # 0/1 code file → docs-only is already minimal
+
+  local gate_fn="${NIGHTLY_BISECT_GATE_FN:-_nightly_bisect_gate}"
+  local budget_secs="${NIGHTLY_BISECT_BUDGET_SECS:-3600}"
+  local start=$SECONDS calls=0
+
+  # --- Build UNITS: translations collapse to ONE unit; everything else stands alone.
+  local units_dir; units_dir=$(mktemp -d -t bisect-units.XXXXXX)
+  local -a units=()
+  local trans_unit="" f u
+  while IFS= read -r f; do
+    [ -z "$f" ] && continue
+    if printf '%s' "$f" | grep -q '/translations/.*\.js$'; then
+      [ -z "$trans_unit" ] && { trans_unit="$units_dir/translations"; : > "$trans_unit"; units+=("$trans_unit"); }
+      echo "$f" >> "$trans_unit"
+    else
+      u="$units_dir/u${#units[@]}"; echo "$f" > "$u"; units+=("$u")
+    fi
+  done < "$all"
+
+  local budget="${NIGHTLY_BISECT_MAX_GATES:-$(( 2 * ${#units[@]} + 3 ))}"
+  local kept; kept=$(mktemp)     # accumulating verified-green kept files
+  local -a offender_units=()
+  local trial rc
+
+  _bisect_cleanup() { rm -f "$kept"; rm -rf "$units_dir"; }
+  _bisect_over_budget() { [ "$calls" -ge "$budget" ] || [ "$(( SECONDS - start ))" -ge "$budget_secs" ]; }
+
+  # --- Incremental accept: grow a kept set, flag units that break it. Order-independent
+  # for the common case (one real offender + independent innocents).
+  for u in "${units[@]}"; do
+    _bisect_over_budget && { _bisect_cleanup; return 1; }
+    trial=$(mktemp); cat "$kept" "$u" > "$trial"
+    "$gate_fn" "$trial" quick; rc=$?; calls=$(( calls + 1 ))
+    if [ "$rc" = "0" ]; then cp "$trial" "$kept"
+    elif [ "$rc" = "1" ]; then offender_units+=("$u")
+    else rm -f "$trial"; _bisect_cleanup; return 1; fi   # wedge/setup → bail
+    rm -f "$trial"
+  done
+
+  # --- Second chance: a unit may have failed only because a dependency wasn't kept yet
+  # (import ordering). Retry each flagged unit against the FINAL kept set.
+  local -a still_bad=()
+  for u in "${offender_units[@]}"; do
+    if _bisect_over_budget; then still_bad+=("$u"); continue; fi
+    trial=$(mktemp); cat "$kept" "$u" > "$trial"
+    "$gate_fn" "$trial" quick; rc=$?; calls=$(( calls + 1 ))
+    if [ "$rc" = "0" ]; then cp "$trial" "$kept"; else still_bad+=("$u"); fi
+    rm -f "$trial"
+  done
+  offender_units=("${still_bad[@]}")
+
+  # --- Decide: need a non-empty kept set AND a non-empty offender set (a proper split).
+  local kept_n=0 off_n=${#offender_units[@]}
+  kept_n=$(grep -c . "$kept" 2>/dev/null); kept_n=${kept_n:-0}
+  if [ "$kept_n" -eq 0 ] || [ "$off_n" -eq 0 ]; then _bisect_cleanup; return 1; fi
+
+  # --- Authoritative FULL gate on the reconstructed kept set (the cheap oracle is
+  # weaker than the ship gate — never ship code the full gate rejects).
+  "$gate_fn" "$kept" full; rc=$?; calls=$(( calls + 1 ))
+  if [ "$rc" != "0" ]; then _bisect_cleanup; return 1; fi
+
+  local ou; for ou in "${offender_units[@]}"; do cat "$ou" >> "$out"; done
+  sort -u "$out" -o "$out"
+  _bisect_cleanup
+  return 0
+}
+
 # run_isolated_gate <authored_list_file> [skip_lint=0] [baseline=0]
 # baseline=1 gates a CLEAN HEAD checkout with NO authored files applied (the
 # authored list is ignored / may be empty) — used by run_baseline_gate to learn

@@ -1100,6 +1100,43 @@ if [ "$gate_ok" = "0" ]; then
   _AUTH_SRC="${NIGHTLY_AUTHORED_ORIGINAL:-$NIGHTLY_AUTHORED_FILE}"
   [ -s "$_AUTH_SRC" ] || _AUTH_SRC="$NIGHTLY_AUTHORED_FILE"
   AUTHORED_CODE=$(mktemp); grep -vE '^docs/' "$_AUTH_SRC" > "$AUTHORED_CODE" || true
+
+  # === SUBSET-PEEL BISECT BACKSTOP (2026-07-24) — the deferred class-killer =====
+  # Before the destructive docs-only drop-all, delta-debug the authored CODE down to
+  # the MINIMAL offending subset so the innocent majority still ships. Decides on gate
+  # PASS/FAIL only — never parses gate output — so it is immune to the recurring
+  # "parser one format behind" false-drop class (2026-07-02/18/21/23; 60% of the last
+  # 20 nightlies shipped ZERO code this way). On 2026-07-23 a human did exactly this by
+  # hand (1 offender + 9 innocents restored + re-gated green). Returns 0 IFF it isolated
+  # a proper offender subset whose complement PASSED the FULL gate; else falls through
+  # to the conservative docs-only salvage below (no regression).
+  _BISECT_OFF=$(mktemp)
+  if nightly_bisect_offenders "$AUTHORED_CODE" "$_BISECT_OFF"; then
+    _off_n=$(grep -c . "$_BISECT_OFF" 2>/dev/null); _off_n=${_off_n:-0}
+    printf '%s\n' "$(cat "$_BISECT_OFF")" | while IFS= read -r f; do [ -n "$f" ] && log "  bisect-drop: $f"; done
+    # Back up + requeue ONLY the offenders (recoverable, next-night triage signal), then
+    # revert ONLY them — the kept code is never mutated (bisect is worktree-based) so it
+    # stays applied for the commit. Backup name matches restore-salvaged-code.sh <tag>.
+    _sp_backup="$LOG_DIR/salvaged-code-${DATE_TAG}"
+    backup_dropped_authored "$_BISECT_OFF" "$_sp_backup"
+    restore_queue_append "$PROJECT_DIR/docs/nightly/restore-queue.ndjson" "$DATE_TAG" \
+      "$_BISECT_OFF" "$_sp_backup" "subset-peel bisect: gate offender(s) isolated; kept set shipped full-gate-green"
+    revert_authored "$RUN_SNAPSHOT" "$_BISECT_OFF"
+    # Commit set = everything EXCEPT the offenders (kept code + all authored docs).
+    _kept_list=$(mktemp)
+    grep -vxF -f "$_BISECT_OFF" "$NIGHTLY_AUTHORED_FILE" > "$_kept_list" 2>/dev/null || cp "$NIGHTLY_AUTHORED_FILE" "$_kept_list"
+    echo "docs/nightly/restore-queue.ndjson" >> "$_kept_list"
+    sort -u "$_kept_list" -o "$_kept_list"; mv "$_kept_list" "$NIGHTLY_AUTHORED_FILE"
+    _kept_n=$(grep -vE '^docs/' "$NIGHTLY_AUTHORED_FILE" | grep -c . 2>/dev/null); _kept_n=${_kept_n:-0}
+    gate_ok=1
+    _restore_cmd="scripts/nightly/restore-salvaged-code.sh ${DATE_TAG}"
+    log "subset-peel bisect: isolated ${_off_n} offending code file(s); the kept ${_kept_n} code file(s) PASSED the full gate — dropped ONLY the offenders, shipping the rest + docs (recover offenders: ${_restore_cmd})"
+    echo -e "\n**Outcome (subset-peel bisect):** gate went red; delta-debug isolated ${_off_n} offending code file(s) and shipped the remaining ${_kept_n} code file(s) + docs after a full-gate re-verify of the kept set. Offenders backed up + requeued for next-night triage — recover: \`${_restore_cmd}\`." >> "$REPORT"
+    tg_alert "nightly $TODAY: gate red → SUBSET-PEEL bisect shipped ${_kept_n} code file(s) + docs, dropped only ${_off_n} offender(s) (kept set full-gate verified). Offenders recoverable: \`${_restore_cmd}\`. Founder WIP untouched."
+    rm -f "$AUTHORED_CODE" "$_BISECT_OFF"
+  else
+  rm -f "$_BISECT_OFF"
+  # ---- docs-only salvage (bisect could not isolate a shippable subset) --------
   # Same recoverable-backup as the drop step: the docs-only salvage reverts ALL
   # authored CODE, so preserve it before discarding (recover by hand if needed).
   _salvage_backup="$LOG_DIR/salvaged-code-${DATE_TAG}"
@@ -1150,6 +1187,7 @@ if [ "$gate_ok" = "0" ]; then
   echo -e "\n**Outcome:** GATE FAILED on lane code — DOCS-ONLY salvage shipped (reports/ideas/learnings kept, lane CODE dropped, founder WIP untouched).\n\n**Lane code is NOT lost** — backed up to \`$_salvage_backup\`. Restore with \`$_restore_cmd\`, then review + re-gate (it failed the gate at least once) before shipping." >> "$REPORT"
   tg_alert "nightly $TODAY: code gate failed — shipped DOCS-ONLY (reports/ideas/learnings). Lane CODE dropped but NOT lost — recover: \`$_restore_cmd\` then review+re-gate. Founder WIP untouched. Log: \`$RUN_LOG\`."
   # fall through to commit; the allowlist now lists only the nightly's docs
+  fi   # end subset-peel-bisect else (docs-only salvage branch)
 fi
 
 # --- commit + push (skipped entirely when NO_CHANGE_MODE=1) ---------------
