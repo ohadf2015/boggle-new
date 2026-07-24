@@ -634,6 +634,7 @@ export const PortraitLayout = memo<PortraitLayoutProps>(function PortraitLayout(
                 meteorTiles={eventTiles?.meteor}
                 rushTiles={rushTiles}
                 effectsProfile={gameMode === 'classic' ? 'lean' : 'full'}
+                submitFeedback={currentFeedback}
               />
               {/* Blast tile type badges */}
               {gameMode === 'blast' && blastTileOverlay && blastTileOverlay.length > 0 && (

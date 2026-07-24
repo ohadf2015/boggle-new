@@ -4,6 +4,7 @@ import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { m, AnimatePresence } from 'framer-motion';
 import dynamic from 'next/dynamic';
 import GameFeedback from '@/components/feedback/GameFeedback';
+import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
 import { TrendingUp, ArrowLeft, RotateCcw } from 'lucide-react';
 import CollapsibleSection from '@/components/ui/CollapsibleSection';
 import PlayerArchetypeBadge from '@/components/results/PlayerArchetypeBadge';
@@ -232,12 +233,16 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
 
   useEffect(() => {
     if (shouldShowConfetti) {
-      const colors = (mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3)
+      const isRankCelebration = mode === 'solo-bots' && playerRank >= 1 && playerRank <= 3;
+      const colors = isRankCelebration
         ? RANK_CONFETTI_COLORS[playerRank]
         : ['#ffd700', '#ff6b6b', '#4ecdc4', '#45b7d1', '#a855f7'];
-      fireConfetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors });
+      // Bigger celebration for new high score / first place
+      const particleCount = results.isNewHighScore ? 180 : isRankCelebration ? 140 : 100;
+      const spread = results.isNewHighScore ? 100 : 70;
+      fireConfetti({ particleCount, spread, origin: { y: 0.6 }, colors });
     }
-  }, [shouldShowConfetti, mode, playerRank]);
+  }, [shouldShowConfetti, mode, playerRank, results.isNewHighScore]);
 
   const gameLanguage = results.language || language;
 
@@ -414,7 +419,9 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
   );
 
   return (
-    <div className="min-h-dvh bg-neo-navy text-white">
+    <div className="relative min-h-dvh bg-neo-navy text-white">
+      {/* Victory flash on new high score */}
+      {results.isNewHighScore && <ScreenFlashOverlay trigger={1} colorClass="bg-neo-lime" />}
       <div className={isDesktop ? 'max-w-5xl mx-auto px-6 xl:px-8 pb-8 pt-4' : 'px-2 pb-28 pt-2'}>
         {isDesktop ? (
           <>
@@ -453,18 +460,27 @@ const SinglePlayerResults: React.FC<SinglePlayerResultsProps> = ({
               </m.div>
             ) : null}
             {/* R7 — Rewarded gold top-up */}
-            <SinglePlayerGoldTopUp t={t} />
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.42 }}>
+              <SinglePlayerGoldTopUp t={t} />
+            </m.div>
             {!showShareImmediate && <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>{shareBlock}</m.div>}
             <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>{achievementsBlock}</m.div>
-            {globalRank && <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />}
+            {globalRank && (
+              <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.43 }}>
+                <GlobalRankBadge rank={globalRank} label={t('leaderboard.globalRank')} />
+              </m.div>
+            )}
             {signupBlock && (
               <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45 }}>
                 {signupBlock}
               </m.div>
             )}
             {/* Inline banner ad (web iframe; native shows no inline banner) */}
-            <CrazyGamesBanner size="320x50" />
-            {ctaBlock}{analysisBlock}
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.48 }}>
+              <CrazyGamesBanner size="320x50" />
+            </m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.52 }}>{ctaBlock}</m.div>
+            <m.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.58 }}>{analysisBlock}</m.div>
           </div>
         )}
         {/* End-of-game sentiment (game_feedback, surface=singleplayer). Shared
