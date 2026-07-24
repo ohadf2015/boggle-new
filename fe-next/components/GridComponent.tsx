@@ -25,6 +25,8 @@ import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useEarthquakeAnimation } from '../hooks/useEarthquakeAnimation';
 import GridCell, { type HighlightedCell } from './grid/GridCell';
+import GridSubmitBurst, { type SubmitBurstType } from './grid/GridSubmitBurst';
+import type { WordFeedback } from './game/WordFormingArea';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 
 export type { HighlightedCell } from './grid/GridCell';
@@ -74,6 +76,8 @@ interface GridComponentProps {
    * visually but cost main-thread raster + GPU composite. Combo SCORING is unaffected.
    */
   effectsProfile?: GridEffectsProfile;
+  /** Latest word-submit feedback. Triggers a localized tile burst on the last selected cell. */
+  submitFeedback?: WordFeedback | null;
 }
 
 // Stable, module-level "no combo" colors. Passed to NON-selected cells so a
@@ -114,6 +118,7 @@ const GridComponent = memo<GridComponentProps>(({
   isAdjacent,
   autoSubmitIdleMs,
   effectsProfile = 'full',
+  submitFeedback,
 }) => {
   const { t } = useLanguage();
   const [reduceMotion, setReduceMotion] = useState(false);
@@ -441,6 +446,32 @@ const GridComponent = memo<GridComponentProps>(({
   // Now fires 16 t() calls per round (when boardSeed changes).
   const cellAriaLabels = useGridAriaLabels(grid, boardSeed);
 
+  // Track the last selected cell so a submit burst can paint at the word's
+  // final tile even after selection clears before async feedback lands.
+  const lastSelectedCellRef = useRef<{ row: number; col: number } | null>(null);
+  useEffect(() => {
+    if (selectedCells.length > 0) {
+      const last = selectedCells[selectedCells.length - 1];
+      if (last) lastSelectedCellRef.current = { row: last.row, col: last.col };
+    }
+  }, [selectedCells]);
+
+  const [submitBurst, setSubmitBurst] = useState<{ key: number; row: number; col: number; type: SubmitBurstType } | null>(null);
+  const prevFeedbackIdRef = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (!submitFeedback) return;
+    if (submitFeedback.id === prevFeedbackIdRef.current) return;
+    prevFeedbackIdRef.current = submitFeedback.id;
+    const last = lastSelectedCellRef.current;
+    if (!last) return;
+    setSubmitBurst({
+      key: submitFeedback.timestamp,
+      row: last.row,
+      col: last.col,
+      type: submitFeedback.type,
+    });
+  }, [submitFeedback]);
+
   return (
     <LazyMotion features={domAnimation} strict>
     <div className="relative w-full h-full flex items-center justify-center">
@@ -628,6 +659,17 @@ const GridComponent = memo<GridComponentProps>(({
                 />
               );
             })
+          )}
+
+          {/* Localized submit burst overlay — paints on the last tile of a submitted word. */}
+          {submitBurst && (
+            <GridSubmitBurst
+              key={submitBurst.key}
+              row={submitBurst.row}
+              col={submitBurst.col}
+              type={submitBurst.type}
+              onDone={() => setSubmitBurst(null)}
+            />
           )}
         </div>
 

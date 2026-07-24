@@ -90,8 +90,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // Coin reward animation state
   const [comboCoinReward, setComboCoinReward] = useState<number | null>(null);
 
+  // Refs for anchoring the floating score popup to real HUD elements
+  const scoreBadgeRef = useRef<HTMLDivElement>(null);
+  const wordAreaRef = useRef<HTMLDivElement>(null);
+
   // Score popup hook - stable IDs via ref, stable clearPopup via useCallback
-  const { scorePopup, triggerPopup, clearPopup } = useScorePopup();
+  const { scorePopup, triggerPopup, clearPopup } = useScorePopup({ originRef: wordAreaRef });
 
   // Refs for game end handler
   const gameOverCalledRef = useRef(false);
@@ -401,7 +405,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       </div>
 
       {/* Stats row - Combo | Timer | Score - matches multiplayer InGameScreen */}
-      <div className={cn(
+      <div ref={wordAreaRef} className={cn(
         "flex items-center justify-center gap-3 md:gap-4 mb-2",
         false &&"flex-col h-full me-4 mb-0"
       )} role="status" aria-label="Game status">
@@ -433,6 +437,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
 
         {/* Score (right position) - vibrant yellow/lime gradient like multiplayer */}
         <m.div
+          ref={scoreBadgeRef}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className="relative border-3 border-neo-black rounded-neo shadow-hard-lg px-3 md:px-4 py-1.5 min-w-[80px] md:min-w-[100px]"
@@ -516,6 +521,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
               ? keyboardInput.highlightedCells
               : undefined
           }
+          submitFeedback={wordSubmission.currentFeedback}
         />
       </div>
 
@@ -556,7 +562,8 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       {/* Score popup fly animation - shows +N when a word is accepted */}
       <ScorePopupFly
         popup={scorePopup}
-        flyToTarget={false}
+        flyToTarget
+        targetRef={scoreBadgeRef}
         showWord
         onComplete={clearPopup}
       />

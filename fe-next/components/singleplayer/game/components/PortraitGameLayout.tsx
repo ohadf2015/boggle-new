@@ -96,6 +96,9 @@ export interface PortraitGameLayoutProps {
   totalBoardWords: number | null;
   // Ref for auto-scroll
   gameStatsRef: React.RefObject<HTMLDivElement | null>;
+  // Refs for anchoring floating score popup
+  scoreBadgeRef?: React.RefObject<HTMLDivElement | null>;
+  wordAreaRef?: React.RefObject<HTMLDivElement | null>;
   // Translation
   t: (key: string) => string | undefined;
 }
@@ -152,8 +155,15 @@ export function PortraitGameLayout({
   setShowQuitConfirm,
   onExtendTime,
   gameStatsRef,
+  scoreBadgeRef: _scoreBadgeRef,
+  wordAreaRef: _wordAreaRef,
   t,
 }: PortraitGameLayoutProps): React.ReactElement {
+  // Use forwarded refs if provided, otherwise local refs
+  const localScoreBadgeRef = React.useRef<HTMLDivElement>(null);
+  const localWordAreaRef = React.useRef<HTMLDivElement>(null);
+  const scoreBadgeRef = _scoreBadgeRef ?? localScoreBadgeRef;
+  const wordAreaRef = _wordAreaRef ?? localWordAreaRef;
   const validWords = React.useMemo(() => foundWords.filter(fw => fw.isValid === true), [foundWords]);
   const validWordCount = validWords.length;
   // exp-game-abandon-confirm-v1: stats-shown variant surfaces score+words in the quit dialog (dark until flag on).
@@ -327,6 +337,7 @@ export function PortraitGameLayout({
         <div className="flex-1 flex justify-end">
           {!isPracticeMode ? (
             <AdaptiveMotion.div
+              ref={scoreBadgeRef}
               initial={{ scale: 0, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="relative border-3 border-neo-black rounded-lg shadow-hard px-2 py-1 min-w-[80px] transform rotate-1"
@@ -354,7 +365,7 @@ export function PortraitGameLayout({
       </div>
 
       {/* Timer + Word Forming Area — same row so they're vertically aligned and share spacing */}
-      <div className="flex items-center justify-center gap-3 shrink-0 relative z-30 px-4 mb-1 mx-auto w-full overflow-visible max-w-[440px]">
+      <div ref={wordAreaRef} className="flex items-center justify-center gap-3 shrink-0 relative z-30 px-4 mb-1 mx-auto w-full overflow-visible max-w-[440px]">
         {!isPracticeMode && (
           <AdaptiveMotion.div
             initial={{ scale: 0, opacity: 0 }}
@@ -442,6 +453,7 @@ export function PortraitGameLayout({
             highlightedPath={gridHighlightedPath}
             language={language}
             isTypingMode={keyboardInput.isTypingMode}
+            submitFeedback={currentFeedback}
           />
           {showWordGoalBadge && (
             <div className="absolute bottom-1 end-1 z-20 bg-neo-navy border-2 border-neo-cyan text-neo-cyan text-xs font-bold px-2 py-1 rounded-md shadow-hard-sm select-none pointer-events-none">

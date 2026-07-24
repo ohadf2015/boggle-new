@@ -111,6 +111,10 @@ function SinglePlayerGame({
   const [scorePopup, setScorePopup] = React.useState<{ id: number; value: number; x: number; y: number; word?: string; bonus?: string } | null>(null);
   const prevScoreRef = useRef(0);
 
+  // Refs for anchoring the floating score popup to real HUD elements (portrait/mobile)
+  const scoreBadgeRef = useRef<HTMLDivElement>(null);
+  const wordAreaRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const achievements = core.liveAchievements;
     // Only trigger for NEW achievements (not on initial render)
@@ -132,11 +136,17 @@ function SinglePlayerGame({
       const lastWord = core.foundWords[core.foundWords.length - 1];
       const wordLen = lastWord?.word?.length ?? 0;
       const bonus = wordLen >= 8 ? 'LEGENDARY!' : wordLen >= 7 ? 'INCREDIBLE!' : wordLen >= 6 ? 'AMAZING!' : undefined;
+
+      // Anchor popup origin to the word-forming area when available (portrait/mobile)
+      const originRect = wordAreaRef.current?.getBoundingClientRect();
+      const originX = originRect ? originRect.left + originRect.width / 2 : (typeof window !== 'undefined' ? window.innerWidth / 2 : 200);
+      const originY = originRect ? originRect.top + originRect.height / 2 : (typeof window !== 'undefined' ? window.innerHeight / 2 : 300);
+
       setScorePopup({
         id: Date.now(),
         value: delta,
-        x: typeof window !== 'undefined' ? window.innerWidth / 2 : 200,
-        y: typeof window !== 'undefined' ? window.innerHeight / 2 : 300,
+        x: originX,
+        y: originY,
         word: lastWord?.word,
         bonus,
       });
@@ -353,6 +363,7 @@ function SinglePlayerGame({
     <ScorePopupFly
       popup={scorePopup}
       flyToTarget
+      targetRef={scoreBadgeRef}
       showWord
       size={scorePopup?.bonus ? 'lg' : 'md'}
       onComplete={() => setScorePopup(null)}
@@ -447,6 +458,8 @@ function SinglePlayerGame({
         progressBarExpanded={core.progressBarExpanded}
         onToggleProgressBar={core.handleToggleProgressBar}
         gameStatsRef={core.gameStatsRef}
+        scoreBadgeRef={scoreBadgeRef}
+        wordAreaRef={wordAreaRef}
       />
     </div>
   );

@@ -194,7 +194,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     setIsNavigating(true);
     markOnboardingSkipped();
     emitSkipped(step);
-    router.push(`/${language}/practice/classic?play=1`);
+    router.push(`/${language}/practice/classic?play=1&firstGame=1`);
     onComplete();
   }, [isNavigating, language, router, onComplete, emitSkipped, step]);
 
@@ -275,7 +275,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     } else {
       // 🎯 Route FTUE completers straight into a practice game — eliminates
       // the 2-tap dead zone between onboarding and first play.
-      router.push(`/${language}/practice/classic?play=1`);
+      router.push(`/${language}/practice/classic?play=1&firstGame=1`);
     }
     emitCompleted({ via: 'style' });
     onComplete();

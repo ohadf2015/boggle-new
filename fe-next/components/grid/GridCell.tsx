@@ -187,6 +187,7 @@ const GridCell = memo<GridCellProps>(({
     className={cn(
       "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",
       "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan",
+      interactive && !ghost && "grid-cell-touch-pop",
       isSelected
         ? comboColors.isRainbow
           ? `${comboColors.textColor || 'text-neo-black'} border-2 border-neo-black/60 z-10`

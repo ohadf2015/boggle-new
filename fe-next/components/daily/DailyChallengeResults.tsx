@@ -32,6 +32,7 @@ import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
 import { useInterstitialAd } from '@/hooks/useInterstitialAd';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useDailyResultSubmission } from './results/useDailyResultSubmission';
+import { StreakFlame } from './StreakFlame';
 import {
   shareImageWithNativeShare,
   type ShareImageResult,
@@ -283,7 +284,15 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           inlineStats
           stats={[
             { label: t('common.words'), value: result.wordCount },
-            { label: t('daily.streak'), value: streak?.currentStreak ?? 0, icon: <Flame className="w-4 h-4 text-amber-400" /> },
+            {
+              label: t('daily.streak'),
+              value: streak?.currentStreak ?? 0,
+              icon: (
+                <StreakFlame active={!!streak && streak.currentStreak > 0} milestone={!!streakMilestone && !!streak && streak.currentStreak > 0}>
+                  <Flame className="w-4 h-4 text-amber-400" />
+                </StreakFlame>
+              ),
+            },
             { label: t('results.time'), value: `${Math.floor((result.timeSeconds ?? 0) / 60)}:${((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}` },
           ]}
         />
