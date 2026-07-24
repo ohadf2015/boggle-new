@@ -102,7 +102,7 @@ export function WordTowerMinimap({ heightM, viewM, personalBestM, rivals, onScro
           <div
             data-marker="view"
             className="absolute inset-x-[-3px] h-0.5 bg-white/80"
-            style={{ bottom: `${viewFrac * 100}%` }}
+            style={{ bottom: `${viewFrac * 100}%`, transition: 'bottom 80ms linear' }}
             aria-hidden
           />
         )}

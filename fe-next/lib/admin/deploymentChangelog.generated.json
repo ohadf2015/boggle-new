@@ -1,26 +1,12 @@
 {
-  "generatedAt": "2026-07-21T18:19:27.133Z",
+  "generatedAt": "2026-07-24T12:10:19.245Z",
   "commits": [
     {
-      "sha": "c309b47adac88455b63b3e9245d6b8c7f12dd4ca",
-      "shortSha": "c309b47",
-      "subject": "feat(avatar): wire premium parts quality, VIP filter, and shared layer rules",
-      "author": "Hermes (agent)",
-      "date": "2026-07-21T17:38:15+00:00"
-    },
-    {
-      "sha": "f9a7fa6fcc0bfe6ae870da7b2d8e153cc413cab0",
-      "shortSha": "f9a7fa6",
-      "subject": "Kimi: LexiClash avatar overhaul — premium parts, tier system, better animations, new sets",
-      "author": "Hermes (agent)",
-      "date": "2026-07-21T15:56:16+00:00"
-    },
-    {
-      "sha": "96581c251d9d52673ba64bf1cdb0dbc7c9c04d27",
-      "shortSha": "96581c2",
-      "subject": "chore(nightly): mark 20260721-010001 salvage restored — lane code shipped",
+      "sha": "a46b52ff1360baa0c63eec74b58cd3008e52d262",
+      "shortSha": "a46b52f",
+      "subject": "feat: game juice pass — StreakFlame, score popups, celebration screens, submit burst, staggered animations",
       "author": "Ohad Fisher",
-      "date": "2026-07-21T10:18:33+03:00"
+      "date": "2026-07-24T09:58:10+00:00"
     }
   ]
 }

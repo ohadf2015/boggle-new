@@ -5388,3 +5388,36 @@ html[data-cosy='true'] .animate-neo-press {
     opacity: 0;
   }
 }
+
+/* ── Crossword animations ───────────────────────────────────── */
+@keyframes cw-pop {
+  0% { transform: scale(0.8); }
+  100% { transform: scale(1); }
+}
+@utility cw-pop {
+  animation: cw-pop 200ms ease-out;
+}
+
+@keyframes cw-solved-glow {
+  0%, 100% { box-shadow: inset 0 0 0 0 rgba(0, 255, 255, 0); }
+  50% { box-shadow: inset 0 0 8px 2px rgba(0, 255, 255, 0.6); }
+}
+@utility cw-solved-glow {
+  animation: cw-solved-glow 1s ease-out;
+}
+
+@keyframes cw-capture-flash {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: rgba(0, 255, 255, 0.15); }
+}
+@utility cw-capture-flash {
+  animation: cw-capture-flash 0.8s ease-out;
+}
+
+@keyframes cw-mobile-clue-slide {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@utility cw-mobile-clue-slide {
+  animation: cw-mobile-clue-slide 0.3s ease-out;
+}

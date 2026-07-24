@@ -34,7 +34,7 @@ interface Template {
 }
 
 // 5×5, 180° rotational symmetry, every run ≥ 3, every white cell checked in both directions
-// (verified by the gate). These are the only 5×5 block patterns that keep all runs ≥ 3.
+// (verified by the gate). Only 3 symmetric 5×5 block patterns keep all runs ≥ 3.
 const EN_TEMPLATES: Template[] = [
   { label: '5x5-diag', size: 5, blocks: [[0, 0], [4, 4]] },
   { label: '5x5-antidiag', size: 5, blocks: [[0, 4], [4, 0]] },
@@ -116,7 +116,7 @@ async function main() {
 
   const raws: RawPuzzle[] = [];
   const sigs = new Set<string>();
-  const PER_TEMPLATE = 20;
+  const PER_TEMPLATE = 30;
 
   for (const tpl of EN_TEMPLATES) {
     let made = 0;

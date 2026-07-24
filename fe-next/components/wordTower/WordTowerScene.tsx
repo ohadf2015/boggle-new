@@ -138,15 +138,10 @@ const MAX_PENDING_PREVIEW = 2;
 /** How far the user must scroll down (px) before the back-to-top button shows. */
 const BACK_TO_TOP_REVEAL_PX = 90;
 
-/** Quantise the *viewed* altitude before it drives React state during a pan.
- *  The pan runs a rAF every frame; feeding a fresh float into `setPanAltitude`
- *  (and `onViewAltChange`) each frame re-rendered the WHOLE scene + sibling rails
- *  ~60×/s, which janked + flickered the scroll (founder 2026-07-17: "scrolling
- *  flashes and feels stuck"). Snapping to a few-metre grid collapses that to a
- *  handful of renders per drag; the backdrop's own CSS transitions ease across
- *  the steps so the parallax still reads as smooth. */
-const VIEW_ALT_QUANTUM_M = 4;
-const quantizeAlt = (m: number) => Math.round(m / VIEW_ALT_QUANTUM_M) * VIEW_ALT_QUANTUM_M;
+/** The pan runs a rAF every frame; feeding a fresh float into `setPanAltitude`
+ *  (and `onViewAltChange`) each frame. The sibling rails (landmark + rival)
+ *  use `useDeferredValue` or their own throttling to handle 60fps updates.
+ *  The backdrop's own CSS transitions smooth the parallax between frames. */
 
 /** Ambient particle emit interval (ms). */
 const AMBIENT_EMBER_INTERVAL_MS = 180;
@@ -210,6 +205,9 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   const foundationRef = useRef<Graphics | null>(null);
   // Directional light overlay — tints the tower column from the sun/moon side.
   const lightOverlayRef = useRef<Graphics | null>(null);
+  // Landing zone indicator — glowing ring on the tower top showing where the
+  // crane beam will land. Drawn in the rAF tick when a word is pending.
+  const landingZoneRef = useRef<Graphics | null>(null);
   // Screen-y of the ground line the sway pivots about (deck top), kept fresh by
   // the diff effect so the rAF can pivot correctly even mid-pan.
   const groundYRef = useRef(0);
@@ -263,10 +261,16 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
     light.blendMode = 'screen';
     engine.camera.addChild(light);
 
+    const landingZone = new Graphics();
+    landingZone.zIndex = 50;
+    landingZone.visible = false;
+    engine.camera.addChild(landingZone);
+
     containerRef.current = c;
     tiltRef.current = tilt;
     groundLayerRef.current = ground;
     lightOverlayRef.current = light;
+    landingZoneRef.current = landingZone;
     ps.container = c;
     const reg = registry.current;
     return () => {
@@ -274,10 +278,12 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
       try { c.destroy({ children: true }); } catch { /* */ }
       try { ground.destroy({ children: true }); } catch { /* */ }
       try { light.destroy(); } catch { /* */ }
+      try { landingZone.destroy(); } catch { /* */ }
       containerRef.current = null;
       tiltRef.current = null;
       groundLayerRef.current = null;
       lightOverlayRef.current = null;
+      landingZoneRef.current = null;
       foundationRef.current = null;
       reg.clear();
       firstRender.current = true;
@@ -592,6 +598,10 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
   windMultRef.current = BIOME_THEME[biomeId].windMult * useTowerUpgradeStore.getState().effects().windMult;
   const biomeIdRef = useRef(biomeId);
   biomeIdRef.current = biomeId;
+  const pendingWordRef = useRef(pendingWord);
+  pendingWordRef.current = pendingWord;
+  const bottomInsetRef = useRef(bottomInsetPx);
+  bottomInsetRef.current = bottomInsetPx;
   const starsRef = useRef(BIOME_THEME[biomeId].stars);
   starsRef.current = BIOME_THEME[biomeId].stars;
 
@@ -662,6 +672,48 @@ function TowerCanvasLayer({ floors, biomeId, pendingWord, resultKey, lastResult,
           } catch { /* context nulled post-destroy race */ }
         } else if (light && !light.destroyed) {
           try { light.clear(); } catch { /* */ }
+        }
+
+        // Landing zone indicator — glowing ring on the tower top showing where the
+        // crane will drop the beam. Visible while a word is pending (pendingWord
+        // non-empty in the scene props). The ring pulses with a slow sine wave.
+        const lz = landingZoneRef.current;
+        const hasPending = pendingWordRef.current.length > 0;
+        if (lz && !lz.destroyed) {
+          if (hasPending) {
+            const W = engine.width;
+            const H = engine.height;
+            const { topCenter, half } = towerRowLayout({ pinCount: 0, H, bottomInsetPx: bottomInsetRef.current });
+            // Ring position — on the tower top at the build line, adjusted for pan
+            const lx = centerXRef.current;
+            const ly = topCenter + half;
+            // Pulse: slow sine wave 0.3..1.0 alpha
+            const pulse = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(now * 0.0025));
+            const ringRadius = 16;
+            const biomeClr = BIOME_THEME[biomeIdRef.current].block;
+            try {
+              lz.clear();
+              lz.visible = true;
+              // Outer glow ring
+              lz.circle(lx, ly, ringRadius + 4)
+                .fill({ color: biomeClr, alpha: 0.15 * pulse });
+              // Main ring
+              lz.circle(lx, ly, ringRadius)
+                .fill({ color: biomeClr, alpha: 0.35 * pulse });
+              // Inner bright dot
+              lz.circle(lx, ly, 2)
+                .fill({ color: 0xffffff, alpha: 0.6 * pulse });
+              // Crosshair lines
+              const crossLen = 10;
+              lz.poly([lx - crossLen, ly, lx + crossLen, ly])
+                .fill({ color: biomeClr, alpha: 0.5 * pulse });
+              lz.poly([lx, ly - crossLen, lx, ly + crossLen])
+                .fill({ color: biomeClr, alpha: 0.5 * pulse });
+            } catch { /* context nulled post-destroy race */ }
+          } else {
+            lz.visible = false;
+            try { lz.clear(); } catch { /* */ }
+          }
         }
       }
       // Upper-shaft wind: a tiny travelling x-sway on settled crown tiles so a
@@ -896,14 +948,10 @@ export function WordTowerScene(props: SceneProps) {
     if (rafRef.current == null) {
       rafRef.current = requestAnimationFrame(() => {
         rafRef.current = null;
-        const alt = quantizeAlt(viewAltitudeFor(heightM, pan.current.y, pan.current.panMin));
-        // Only touch React state when the view crossed a whole grid step — this is
-        // what keeps a fast drag from re-rendering the scene + rails every frame.
-        if (alt !== lastViewAltRef.current) {
-          lastViewAltRef.current = alt;
-          setPanAltitude(alt);
-          onViewAltChange?.(alt); // landmark + rival rails follow the scroll down
-        }
+        const alt = viewAltitudeFor(heightM, pan.current.y, pan.current.panMin);
+        lastViewAltRef.current = alt;
+        setPanAltitude(alt);
+        onViewAltChange?.(alt); // landmark + rival rails follow the scroll down
         setPannedDown(pan.current.y < -BACK_TO_TOP_REVEAL_PX); // no-op re-render if unchanged
       });
     }
@@ -983,7 +1031,7 @@ export function WordTowerScene(props: SceneProps) {
       {/* Parallax elements grouped in one wrapper the pan translates (at
           BG_PAN_DEPTH) so stars/clouds/props parallax with the user's scroll. They
           are transparent over the static sky above — no edge can reveal navy. */}
-      <div ref={(el) => { pan.current.bgEl = el; }} className="absolute inset-0 will-change-transform">
+      <div ref={(el) => { pan.current.bgEl = el; }} className="absolute inset-0 will-change-transform" style={{ transition: 'transform 60ms linear' }}>
         {/* Solid ground plane — lowest parallax layer, anchors the tower base. */}
         <WordTowerGroundPlane groundInsetPx={props.bottomInsetPx ?? 220} biomeId={viewBiome} />
         {/* Parallax ascent backdrop (stars/clouds/skyline) — driven by the

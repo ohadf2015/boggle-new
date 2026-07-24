@@ -24,7 +24,7 @@ import {
   saveProgress,
 } from '@/lib/crossword/progress';
 import { emitCrosswordGameEnd } from '@/lib/crossword/telemetry';
-import { crosswordStats } from '@/lib/crossword/stats';
+import { crosswordStats, solvedSlotIds } from '@/lib/crossword/stats';
 import type { CrosswordPuzzle, Direction } from '@/lib/crossword/types';
 
 export interface UseCrosswordGame {
@@ -42,6 +42,8 @@ export interface UseCrosswordGame {
   nextSlot: (delta?: 1 | -1) => void;
   focusSlot: (slotId: string) => void;
   reset: () => void;
+  /** The ID of the slot that was just solved (or null). Cleared automatically. */
+  justSolvedSlot: string | null;
 }
 
 function now(): number {
@@ -50,17 +52,20 @@ function now(): number {
 
 export function useCrosswordGame(
   puzzle: CrosswordPuzzle,
-  opts: { onSolved?: () => void; onWordSolved?: () => void } = {},
+  opts: { onSolved?: () => void; onWordSolved?: (slotId: string) => void } = {},
 ): UseCrosswordGame {
   const [state, setState] = useState<GameState>(() => {
     const saved = loadProgress(puzzle.id);
     return initGame(puzzle, saved?.entries ?? {}, saved?.revealedCells ?? []);
   });
 
+  // Track which slot was just solved (for brief celebration animation)
+  const [justSolvedSlot, setJustSolvedSlot] = useState<string | null>(null);
+
   // Per-word feedback: fire whenever the count of fully-correct words climbs
   // (but not on the final solve — that's `onSolved`). Seeded from the resumed
   // state so a resume doesn't replay a ding for words already done.
-  const wordsSolvedRef = useRef<number>(crosswordStats(state).wordsSolved);
+  const solvedSlotsRef = useRef<Set<string>>(new Set(solvedSlotIds(state)));
 
   // Stable refs for caller callbacks so effects don't re-run on inline object identity changes.
   const onSolvedRef = useRef(opts.onSolved);
@@ -73,7 +78,6 @@ export function useCrosswordGame(
   const [elapsedMs, setElapsedMs] = useState<number>(baseElapsedRef.current);
   const solvedFiredRef = useRef(false);
 
-  // Keep latest elapsed + state in refs so the unmount flush reads current values.
   const elapsedRef = useRef<number>(elapsedMs);
   elapsedRef.current = elapsedMs;
   const stateRef = useRef<GameState>(state);
@@ -88,8 +92,7 @@ export function useCrosswordGame(
     return () => clearInterval(id);
   }, [state.status]);
 
-  // Persist on meaningful change only (NOT every 250ms timer tick — that would hammer
-  // localStorage ~4×/sec). Time is captured from the ref here and on unmount.
+  // Persist on meaningful change only (NOT every 250ms timer tick).
   useEffect(() => {
     saveProgress({
       ...emptyProgress(puzzle.id, Date.now()),
@@ -111,26 +114,28 @@ export function useCrosswordGame(
         elapsedMs: elapsedRef.current,
       });
     };
-     
+     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [puzzle.id]);
 
   // Fire onWordSolved each time a new word becomes fully correct (excluding the
-  // final solve, which fires onSolved). Refs avoid spurious re-runs when the
-  // caller passes an inline opts object that changes identity every render.
+  // final solve, which fires onSolved). Passes the slot ID for celebration effects.
   useEffect(() => {
-    const solved = crosswordStats(state).wordsSolved;
-    if (solved > wordsSolvedRef.current && state.status !== 'solved') {
-      onWordSolvedRef.current?.();
+    const currentSolved = new Set(solvedSlotIds(state));
+    for (const id of currentSolved) {
+      if (!solvedSlotsRef.current.has(id) && state.status !== 'solved') {
+        setJustSolvedSlot(id);
+        onWordSolvedRef.current?.(id);
+        // Clear the celebration marker after a brief delay
+        setTimeout(() => setJustSolvedSlot((prev) => (prev === id ? null : prev)), 1500);
+      }
     }
-    wordsSolvedRef.current = solved;
+    solvedSlotsRef.current = currentSolved;
   }, [state]);
 
   // Fire onSolved once.
   useEffect(() => {
     if (state.status === 'solved' && !solvedFiredRef.current) {
       solvedFiredRef.current = true;
-      // Record completion to analytics_events so solved puzzles appear in the
-      // admin game log (read from elapsedRef so the duration is current).
       emitCrosswordGameEnd(puzzle, elapsedRef.current);
       onSolvedRef.current?.();
     }
@@ -147,7 +152,6 @@ export function useCrosswordGame(
   const revealWord = useCallback(() => setState(revealWordFn), []);
   const checkAll = useCallback(() => setState(checkAllFn), []);
 
-  // Jump focus to the next/previous slot (by number, wrapping, across then down).
   const nextSlot = useCallback((delta: 1 | -1 = 1) => {
     setState((s) => {
       const order = [...s.puzzle.slots].sort(
@@ -164,8 +168,6 @@ export function useCrosswordGame(
     });
   }, []);
 
-  // Jump focus to a specific slot by id (clue-list click). Forces the slot's direction so an
-  // across clue selects across even if a down slot also passes through the start cell.
   const focusSlot = useCallback((slotId: string) => {
     setState((s) => {
       const target = s.puzzle.slots.find((x) => x.id === slotId);
@@ -183,6 +185,8 @@ export function useCrosswordGame(
     startRef.current = now();
     setElapsedMs(0);
     solvedFiredRef.current = false;
+    setJustSolvedSlot(null);
+    solvedSlotsRef.current = new Set();
     setState(initGame(puzzle));
   }, [puzzle]);
 
@@ -203,5 +207,6 @@ export function useCrosswordGame(
     nextSlot,
     focusSlot,
     reset,
+    justSolvedSlot,
   };
 }

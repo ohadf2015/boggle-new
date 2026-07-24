@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import { displayLetter } from '@/lib/crossword/answer';
 import type { Cell, PuzzleLocale } from '@/lib/crossword/types';
 
@@ -20,6 +20,7 @@ export interface CrosswordCellProps {
   label: string;
   enter?: boolean;
   enterDelay?: number;
+  solvedGlow?: boolean;
 }
 
 function CrosswordCellBase({
@@ -38,10 +39,24 @@ function CrosswordCellBase({
   label,
   enter = false,
   enterDelay = 0,
+  solvedGlow = false,
 }: CrosswordCellProps) {
-  // Column mirroring is the entire RTL story: logical col 0 renders on the right.
   const gridColumn = rtl ? size - cell.col : cell.col + 1;
   const gridRow = cell.row + 1;
+  const prevLetter = useRef(letter);
+  const [pop, setPop] = useState(false);
+
+  // Pop animation when letter changes (not on initial render)
+  useEffect(() => {
+    if (letter && letter !== prevLetter.current) {
+      setPop(true);
+      const t = setTimeout(() => setPop(false), 250);
+      prevLetter.current = letter;
+      return () => clearTimeout(t);
+    }
+    prevLetter.current = letter;
+    return;
+  }, [letter]);
 
   if (cell.block) {
     return (
@@ -55,11 +70,6 @@ function CrosswordCellBase({
 
   const shown = letter ? displayLetter(letter, { isWordEnd }, locale) : '';
 
-  // Newspaper look: cream paper cells, the 1px black grid gap IS the gridline. The active
-  // cell is a sky-blue square and the active word a pale-yellow band — the standard
-  // printed/digital crossword highlight pair. No scale pop (it lifts cells off the grid
-  // plane and breaks the flat-paper illusion); the current cell instead gets a dark inset
-  // ring, exactly like a pencil box around the square you're filling.
   const bg =
     check === 'wrong'
       ? isActive
@@ -98,7 +108,7 @@ function CrosswordCellBase({
       onPointerDown={() => onSelect(cell.row, cell.col)}
       className={`relative flex min-h-[44px] min-w-[44px] items-center justify-center font-neo-body font-bold uppercase select-none touch-manipulation transition-colors duration-75 ${bg} ${text} ${
         isActive ? 'z-10 ring-2 ring-inset ring-neo-navy' : ''
-      } ${enter ? 'cw-cell-enter' : ''}`}
+      } ${enter ? 'cw-cell-enter' : ''} ${pop ? 'cw-pop' : ''} ${solvedGlow ? 'cw-solved-glow' : ''}`}
       style={{
         gridColumn,
         gridRow,

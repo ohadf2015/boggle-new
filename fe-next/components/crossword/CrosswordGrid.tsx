@@ -10,17 +10,16 @@ export interface CrosswordGridProps {
   onSelect: (row: number, col: number) => void;
   t: (key: string, params?: Record<string, string | number>) => string;
   solved?: boolean;
+  /** Slot IDs that just got solved — brief glow on their cells. */
+  wordSolvedSlots?: string[];
 }
 
-export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordGridProps) {
+export function CrosswordGrid({ state, onSelect, t, solved = false, wordSolvedSlots = [] }: CrosswordGridProps) {
   const { puzzle, active, checks, revealed, warmths } = state;
   const size = puzzle.size;
   const reduced = useReducedMotion();
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Difficulty reads at a glance from the grid's hard drop-shadow colour — same family as the
-  // masthead difficulty chip (easy lime · medium cyan · hard pink). Black border stays (neo rule);
-  // the colour lives in the shadow. Colored hard-shadows carry their own RTL flip variants.
   const diffShadow =
     ({ easy: 'shadow-hard-lime', medium: 'shadow-hard-cyan', hard: 'shadow-hard-pink' } as const)[
       puzzle.difficulty
@@ -31,7 +30,6 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
     () => new Set((slot?.cells ?? []).map((c) => `${c.row},${c.col}`)),
     [slot],
   );
-  // Cells that are the last letter of any word (for Hebrew sofit rendering).
   const wordEndCells = useMemo(() => {
     const s = new Set<string>();
     for (const sl of puzzle.slots) {
@@ -41,18 +39,23 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
     return s;
   }, [puzzle.slots]);
 
-  // Entrance is CSS (see .cw-cell-enter): a staggered pop driven by per-cell animation-delay.
-  // CSS is used deliberately over GSAP here — a CSS animation always resolves to its final
-  // (visible) state and survives React re-renders, so cells can never get stuck hidden.
-  // Center of the grid, for a center-out stagger.
+  // Build set of cells in recently solved slots (for glow animation)
+  const solvedCells = useMemo(() => {
+    const s = new Set<string>();
+    if (wordSolvedSlots.length === 0) return s;
+    for (const slotId of wordSolvedSlots) {
+      const sl = puzzle.slots.find((x) => x.id === slotId);
+      if (sl) for (const c of sl.cells) s.add(`${c.row},${c.col}`);
+    }
+    return s;
+  }, [wordSolvedSlots, puzzle.slots]);
+
   const mid = (size - 1) / 2;
   const enterDelay = (row: number, col: number): number => {
     const dist = Math.abs(row - mid) + Math.abs(col - mid);
     return Math.min(dist, 6) * 0.045;
   };
 
-  // GSAP solved cascade: a celebratory ripple across the solved board. Safe — by the time the
-  // puzzle is solved every cell is already visible, so there is no stuck-hidden risk.
   useEffect(() => {
     if (!solved || reduced || !gridRef.current) return;
     let ctx: { revert: () => void } | null = null;
@@ -109,6 +112,7 @@ export function CrosswordGrid({ state, onSelect, t, solved = false }: CrosswordG
             label={t('crossword.cellLabel', { row: cell.row + 1, col: cell.col + 1 })}
             enter={!reduced}
             enterDelay={enterDelay(cell.row, cell.col)}
+            solvedGlow={solvedCells.has(key) && !reduced}
           />
         );
       })}

@@ -1,8 +1,8 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { TOPPLE_AFTER_SLOPPY, type PlacementOutcome } from '@/lib/wordTower/cranePlacement';
-/** Minimal spark burst props — shared by releaseFx and landFeedback. */
+import { TOPPLE_AFTER_SLOPPY, PERFECT_MAX, GOOD_MAX, SLOPPY_MAX, type PlacementOutcome, type PlacementQuality } from '@/lib/wordTower/cranePlacement';
+
 interface SparkBurstFx {
   sparkles: number;
   glow: boolean;
@@ -23,7 +23,6 @@ export function CraneStabilityMeter({
   consecutiveSloppy: number;
   t: (key: string) => string;
 }) {
-  // Dots — 0, 1, 2, 3 (3 = next miss topples a floor).
   const dots = Array.from({ length: TOPPLE_AFTER_SLOPPY + 1 }, (_, i) => i < consecutiveSloppy);
   return (
     <div
@@ -52,8 +51,77 @@ export function CraneStabilityMeter({
   );
 }
 
-/** Sparkle burst scattered around the landed girder when the drop scored well.
- *  Pure CSS; count + reach scale with how clean it was. */
+/** Alignment bar — sweeps left-right showing the current placement quality.
+ *  A glowing reticle sweeps across a track; the track is colour-coded by
+ *  quality band (perfect/good/sloppy/miss). Tap to drop when the indicator
+ *  is in the green (perfect) zone. Same on every drop so the player can
+ *  learn the timing. */
+export function CraneAlignmentBar({
+  pos,
+  sway,
+  liveBand,
+  perfectBandBonus = 0,
+  onSweetSpot,
+  reducedMotion,
+  t,
+}: {
+  pos: number;
+  sway: number;
+  liveBand: PlacementQuality;
+  perfectBandBonus?: number;
+  onSweetSpot: boolean;
+  reducedMotion?: boolean;
+  t: (key: string) => string;
+}) {
+  // Normalised trolley position [-1, 1]
+  const bandPos = ((pos - sway) + 1) / 2; // 0..1
+  const pct = `${Math.round(bandPos * 100)}%`;
+
+  // Quality band colour for the bar fill
+  const bandColor =
+    liveBand === 'perfect' ? 'bg-neo-lime' :
+    liveBand === 'good' ? 'bg-neo-cyan' :
+    liveBand === 'sloppy' ? 'bg-neo-yellow' :
+    'bg-neo-red';
+
+  return (
+    <div
+      className="flex flex-col items-center gap-1"
+      role="group"
+      aria-label={t('wordTower.crane.alignment')}
+    >
+      {/* Track background — shows the quality zones */}
+      <div className="relative h-2 w-48 overflow-hidden rounded-neo border border-black bg-neo-navy">
+        {/* Perfect zone (center) */}
+        <span className="absolute inset-y-0 rounded bg-neo-lime/25" style={{ left: `${(1 - PERFECT_MAX - perfectBandBonus) * 50}%`, right: `${(1 - PERFECT_MAX - perfectBandBonus) * 50}%` }} />
+        {/* Good zone (inner) */}
+        <span className="absolute inset-y-0 bg-neo-cyan/15" style={{ left: '12%', right: '12%' }} />
+        {/* Sloppy zone (outer) */}
+        <span className="absolute inset-y-0 bg-neo-yellow/10" style={{ left: '5%', right: '5%' }} />
+        {/* Moving indicator */}
+        <span
+          className={cn(
+            'absolute top-1/2 h-3 w-1 -translate-y-1/2 rounded-sm shadow-hard',
+            bandColor,
+            onSweetSpot && !reducedMotion && 'crane-target-hot',
+          )}
+          style={{
+            left: pct,
+            transition: reducedMotion ? 'none' : 'left 40ms linear',
+            boxShadow: onSweetSpot ? '0 0 8px 2px rgba(191,255,0,0.8)' : '2px 2px 0 rgba(0,0,0,0.85)',
+          }}
+          aria-hidden
+        />
+      </div>
+      {/* Quality label */}
+      <span className="font-neo-display text-[9px] font-bold uppercase tracking-wider text-neo-white/70">
+        {t(`wordTower.crane.${liveBand}`)}
+      </span>
+    </div>
+  );
+}
+
+/** Sparkle burst scattered around the landed girder when the drop scored well. */
 export function CraneSparkBurst({ release }: { release: SparkBurstFx }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-10" aria-hidden>
@@ -65,11 +133,9 @@ export function CraneSparkBurst({ release }: { release: SparkBurstFx }) {
             key={i}
             className="crane-spark absolute left-1/2 top-1/2 h-1.5 w-1.5 rounded-full bg-neo-lime"
             style={{
-              // @ts-expect-error custom props consumed by the keyframe
               '--sx': `${Math.cos(ang) * dist}px`,
               '--sy': `${Math.sin(ang) * dist}px`,
-              animationDelay: `${(i % 4) * 20}ms`,
-            }}
+            } as React.CSSProperties}
           />
         );
       })}
@@ -77,8 +143,7 @@ export function CraneSparkBurst({ release }: { release: SparkBurstFx }) {
   );
 }
 
-/** The crane's own footer (verdict pill / TAP-TO-DROP button) — only rendered
- *  when the parent does NOT drive the drop via the imperative ref. */
+/** The crane's own footer (verdict pill / TAP-TO-DROP button). */
 export function CraneFooter({
   result,
   falling,

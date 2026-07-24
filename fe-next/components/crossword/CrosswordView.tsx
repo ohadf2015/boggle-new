@@ -1,13 +1,14 @@
 'use client';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { CheckCheck, Eye, RotateCcw, Lightbulb, Timer, ChevronDown } from 'lucide-react';
+import { Settings, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useCrosswordGame } from '@/hooks/useCrosswordGame';
-import { crosswordStats } from '@/lib/crossword/stats';
+import { crosswordStats, solvedSlotIds } from '@/lib/crossword/stats';
+import { checkAll as checkAllFn } from '@/lib/crossword/gameState';
 import type { CrosswordPuzzle, Difficulty, Slot } from '@/lib/crossword/types';
 import { ClueScramble } from './ClueScramble';
 import { CrosswordGrid } from './CrosswordGrid';
@@ -16,8 +17,9 @@ import { CrosswordMasthead } from './CrosswordMasthead';
 import { ClueBar } from './ClueBar';
 import { CrosswordClueList } from './CrosswordClueList';
 import { CrosswordFx } from './CrosswordFx';
+import { CrosswordToolbar } from './CrosswordToolbar';
+import { CrosswordSolvedCard } from './CrosswordSolvedCard';
 import { ScreenFlashOverlay } from '@/components/game/ScreenFlashOverlay';
-import { SoloRewardCard } from '@/components/solo/SoloRewardCard';
 import {
   awardSoloDaily,
   getSoloDateISO,
@@ -25,6 +27,7 @@ import {
   pickDailyModifier,
 } from '@/lib/solo/soloDaily';
 import { crosswordScore } from '@/lib/solo/soloReward';
+import { computeKeyboardState } from '@/lib/crossword/keyboardState';
 
 function formatTime(ms: number): string {
   const total = Math.floor(ms / 1000);
@@ -35,15 +38,10 @@ function formatTime(ms: number): string {
 
 export interface CrosswordViewProps {
   puzzle: CrosswordPuzzle;
-  /** Masthead edition line — a formatted date for the daily, "Freeplay #N" otherwise. */
   edition?: string;
-  /** Current daily streak (shown in the masthead + bumped on a daily solve). */
   streak?: number;
-  /** True when this puzzle is today's daily — only daily solves advance the streak. */
   isDaily?: boolean;
-  /** Start a fresh generated puzzle (endless). Optional difficulty target. */
   onNewPuzzle?: (difficulty?: Difficulty) => void;
-  /** Fired once when the daily is solved, so the host can persist the streak. */
   onDailySolved?: () => void;
 }
 
@@ -60,6 +58,7 @@ export function CrosswordView({
   const { playSound } = useSoundEffects();
   const [burst, setBurst] = useState(0);
   const [winFlash, setWinFlash] = useState(0);
+  const [wordSolvedSlots, setWordSolvedSlots] = useState<string[]>([]);
   const game = useCrosswordGame(puzzle, {
     onSolved: () => {
       setBurst((n) => n + 1);
@@ -67,18 +66,19 @@ export function CrosswordView({
       playSound('victoryFanfare');
       if (isDaily) onDailySolved?.();
     },
-    // A light confirmation each time a word is filled in correctly — the
-    // newspaper-solve "tick" of progress before the final fanfare.
-    onWordSolved: () => playSound('wordAccepted'),
+    onWordSolved: (slotId: string) => {
+      playSound('wordAccepted');
+      setWordSolvedSlots((prev) => [...prev, slotId]);
+      setTimeout(() => setWordSolvedSlots((prev) => prev.filter((id) => id !== slotId)), 1500);
+    },
   });
 
-  // Full-screen game: hide global header / bottom-nav / footer so the board
-  // owns the viewport (and surfaces the in-game mute FAB).
   const setIsInGame = useHideNavigation();
   useEffect(() => {
     setIsInGame(true);
     return () => setIsInGame(false);
   }, [setIsInGame]);
+
   const {
     state,
     activeSlot,
@@ -94,6 +94,7 @@ export function CrosswordView({
     nextSlot,
     focusSlot,
     reset,
+    justSolvedSlot,
   } = game;
 
   const solved = state.status === 'solved';
@@ -101,7 +102,54 @@ export function CrosswordView({
   const stats = useMemo(() => crosswordStats(state), [state]);
   const hintsUsed = state.revealed.length;
 
-  // Clue Scramble: show a 10s mini-overlay on first clue selection per slot.
+  // Timer visibility toggle (stored in localStorage)
+  const [showTimer, setShowTimer] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return localStorage.getItem('cw:showTimer') !== 'false';
+  });
+  const toggleTimer = useCallback(() => {
+    setShowTimer((v) => {
+      const nv = !v;
+      localStorage.setItem('cw:showTimer', String(nv));
+      return nv;
+    });
+  }, []);
+
+  // Auto-check mode (stored in localStorage)
+  const [autoCheck, setAutoCheck] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return localStorage.getItem('cw:autoCheck') === 'true';
+  });
+
+  const toggleAutoCheck = useCallback(() => {
+    setAutoCheck((v) => {
+      const nv = !v;
+      localStorage.setItem('cw:autoCheck', String(nv));
+      return nv;
+    });
+  }, []);
+
+  // Auto-check after each input that fills the last blank
+  const handleInput = useCallback((letter: string) => {
+    inputLetter(letter);
+    // Will check in effect after state updates
+  }, [inputLetter]);
+
+  // Auto-check: when a slot becomes fully filled, run checkAll
+  useEffect(() => {
+    if (!autoCheck || solved) return;
+    const solvedIds = solvedSlotIds(game.state);
+    // Check if any slot just became fully filled (has all entries but isn't solved)
+    for (const slot of game.state.puzzle.slots) {
+      const filled = slot.cells.every((c) => game.state.entries[`${c.row},${c.col}`]);
+      if (filled && !solvedIds.includes(slot.id)) {
+        checkAll();
+        break;
+      }
+    }
+  }, [game.state.entries, autoCheck, solved, checkAll, game.state.puzzle.slots, game.state]);
+
+  // Clue Scramble
   const [pendingSlot, setPendingSlot] = useState<Slot | null>(null);
   const [clueStreak, setClueStreak] = useState(0);
   const scrambleAttempted = useRef(new Set<string>());
@@ -127,7 +175,7 @@ export function CrosswordView({
     [pendingSlot, focusSlot],
   );
 
-  // Solo Daily layer: shared per-day modifier + once-per-day coin award on solve.
+  // Solo Daily
   const today = useMemo(() => getSoloDateISO(), []);
   const dailyModifier = useMemo(() => pickDailyModifier('crossword', today), [today]);
   const [soloAward, setSoloAward] = useState<{ awarded: number; bonus: number; claimed: boolean } | null>(null);
@@ -146,29 +194,18 @@ export function CrosswordView({
     );
   }, [solved, elapsedMs, hintsUsed, stats.wordsTotal, today, puzzle.locale]);
 
-  // Hardware keyboard support.
+  // Hardware keyboard
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
-      // Ignore typing inside the ClueScramble input (or any other input/textarea)
-      // so the global handler doesn't race with the mini-game.
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) {
-        return;
-      }
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) return;
       const key = e.key;
-      if (key === 'Backspace') {
+      if (key === 'Backspace') { e.preventDefault(); backspace(); }
+      else if (key === 'ArrowRight') { e.preventDefault(); moveInSlot(puzzle.rtl ? -1 : 1); }
+      else if (key === 'ArrowLeft') { e.preventDefault(); moveInSlot(puzzle.rtl ? 1 : -1); }
+      else if (key === 'ArrowDown' || key === 'ArrowUp') {
         e.preventDefault();
-        backspace();
-      } else if (key === 'ArrowRight') {
-        e.preventDefault();
-        moveInSlot(puzzle.rtl ? -1 : 1);
-      } else if (key === 'ArrowLeft') {
-        e.preventDefault();
-        moveInSlot(puzzle.rtl ? 1 : -1);
-      } else if (key === 'ArrowDown' || key === 'ArrowUp') {
-        e.preventDefault();
-        // vertical nav toggles to down if needed, then moves
         if (state.dir !== 'down') toggleDir();
         else moveInSlot(key === 'ArrowDown' ? 1 : -1);
       } else if (key === ' ' || key === 'Tab') {
@@ -183,7 +220,7 @@ export function CrosswordView({
     return () => window.removeEventListener('keydown', onKey);
   }, [backspace, moveInSlot, inputLetter, toggleDir, nextSlot, state.dir, puzzle.rtl]);
 
-  // GSAP entrance for the solved card.
+  // Solved card entrance
   useEffect(() => {
     if (!solved || reduced || !overlayRef.current) return;
     let ctx: { revert: () => void } | null = null;
@@ -203,15 +240,50 @@ export function CrosswordView({
 
   const handleReveal = useCallback(() => revealCell(), [revealCell]);
 
-  // "Next" on the solve card: start a fresh generated puzzle if the host wired endless mode,
-  // otherwise replay the same grid.
   const handleNext = useCallback(() => {
     if (onNewPuzzle) onNewPuzzle();
-    else {
-      setSoloAward(null);
-      reset();
-    }
+    else { setSoloAward(null); reset(); }
   }, [onNewPuzzle, reset]);
+
+  // Share handler
+  const handleShare = useCallback(() => {
+    const gridLines = puzzle.cells.filter((c) => !c.block).reduce((acc, c) => {
+      const key = `${c.row},${c.col}`;
+      return acc + (state.entries[key] === c.solution ? '◇' : '▹');
+    }, '');
+    const text = `${t('crossword.mastheadTitle')} — ${edition ?? t('crossword.title')}\n${formatTime(elapsedMs)} | ${stats.wordsSolved}/${stats.wordsTotal} ${t('crossword.wordsLabel')}\n${gridLines}`;
+    navigator.clipboard?.writeText(text).catch(() => {});
+    // Also try Web Share API
+    if (navigator.share) {
+      navigator.share({ text }).catch(() => {});
+    }
+  }, [puzzle, state.entries, edition, t, elapsedMs, stats.wordsSolved, stats.wordsTotal]);
+
+  // Compute keyboard state from game state
+  const { usedLetters, correctLetters, wrongLetters } = useMemo(() => {
+    const kbs = computeKeyboardState(state);
+    return {
+      usedLetters: kbs.used,
+      correctLetters: kbs.correct,
+      wrongLetters: kbs.wrong,
+    };
+  }, [state]);
+
+  // Mobile clue list state
+  const [showAllClues, setShowAllClues] = useState(false);
+
+  // Mini clue list: show active slot + next across + next down + just solved
+  const miniClues = useMemo(() => {
+    const result: Slot[] = [];
+    if (activeSlot && !result.find((s) => s.id === activeSlot.id)) result.push(activeSlot);
+    // Find next across and down clues
+    for (const slot of puzzle.slots) {
+      if (result.length >= 3) break;
+      if (slot.id === activeSlot?.id) continue;
+      result.push(slot);
+    }
+    return result;
+  }, [activeSlot, puzzle.slots]);
 
   return (
     <div
@@ -221,7 +293,6 @@ export function CrosswordView({
     >
       <ScreenFlashOverlay trigger={winFlash} colorClass="bg-neo-cyan/40" />
 
-      {/* Newspaper masthead — the identity ("real crossword") signal. */}
       <CrosswordMasthead
         title={t('crossword.mastheadTitle')}
         edition={edition ?? t('crossword.title')}
@@ -231,8 +302,7 @@ export function CrosswordView({
         streakLabel={t('crossword.streakLabel', { count: streak })}
       />
 
-      {/* Slim stat bar: words solved + timer + the live fill bar (fills with CORRECT letters,
-          so it only completes at a true solve). */}
+      {/* Stat bar: progress + timer + settings */}
       <div className="shrink-0 mt-2 flex items-center gap-3 bg-neo-navy-light border-neo border-black rounded-neo shadow-hard px-3 py-1.5">
         <span
           className="font-neo-display font-bold text-sm text-neo-cyan tabular-nums shrink-0"
@@ -254,27 +324,32 @@ export function CrosswordView({
             style={{ width: `${stats.percent}%` }}
           />
         </div>
-        <div
-          className="flex items-center gap-1.5 font-neo-display font-bold text-sm text-neo-white tabular-nums shrink-0"
-          aria-label={t('crossword.timer')}
+        {showTimer && (
+          <div
+            className="flex items-center gap-1.5 font-neo-display font-bold text-sm text-neo-white tabular-nums shrink-0"
+            aria-label={t('crossword.timer')}
+          >
+            <span className="text-neo-cyan text-[10px]">◈</span>
+            {formatTime(elapsedMs)}
+          </div>
+        )}
+        <button
+          type="button"
+          onClick={toggleTimer}
+          className="shrink-0 text-neo-white/50 hover:text-neo-white transition-colors"
+          aria-label={t('crossword.timerToggle')}
         >
-          <Timer size={15} className="text-neo-cyan" />
-          {formatTime(elapsedMs)}
-        </div>
+          <Settings size={15} />
+        </button>
       </div>
 
-      {/* Board + clues. On phones a single fit-to-viewport column (grid+clues
-          scroll in the middle, keyboard pinned); grid left / clue rail right on
-          desktop. */}
+      {/* Board + clues */}
       <div className="mt-3 flex min-h-0 flex-1 flex-col lg:mt-5 lg:grid lg:grid-cols-[minmax(0,1fr)_21rem] lg:gap-6 lg:items-start rtl:lg:grid-cols-[21rem_minmax(0,1fr)]">
         <div className="flex min-h-0 flex-1 flex-col gap-2 lg:block lg:gap-3">
-          {/* Scrollable middle on mobile so the keyboard can stay pinned. */}
           <div className="flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-contain lg:flex-none lg:gap-3 lg:overflow-visible">
-            <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} />
+            <CrosswordGrid state={state} onSelect={focusCell} t={t} solved={solved} wordSolvedSlots={wordSolvedSlots} />
 
-            {/* Desktop keeps the clue under the grid. On mobile it's pinned just
-                above the keyboard instead (below), so it never scrolls out of
-                view while you're filling letters. */}
+            {/* Desktop clue bar */}
             <div className="hidden lg:block">
               <ClueBar
                 slot={activeSlot}
@@ -286,33 +361,75 @@ export function CrosswordView({
               />
             </div>
 
-            {/* Toolbar */}
-            <div className="flex items-center justify-center gap-2 flex-wrap">
-              <ToolButton onClick={checkAll} icon={<CheckCheck size={16} />} label={t('crossword.check')} />
-              <ToolButton onClick={handleReveal} icon={<Lightbulb size={16} />} label={t('crossword.revealLetter')} />
-              <ToolButton onClick={revealWord} icon={<Eye size={16} />} label={t('crossword.revealWord')} />
-              <ToolButton onClick={reset} icon={<RotateCcw size={16} />} label={t('crossword.restart')} />
-            </div>
+            {/* Toolbar with hierarchy */}
+            <CrosswordToolbar
+              onCheck={checkAll}
+              onRevealLetter={handleReveal}
+              onRevealWord={revealWord}
+              onReset={reset}
+              autoCheck={autoCheck}
+              onToggleAutoCheck={toggleAutoCheck}
+              t={t}
+            />
 
-            {/* Mobile: full clue list tucked into a disclosure so it doesn't crowd the board. */}
-            <details className="lg:hidden group bg-neo-navy-light border-neo border-black rounded-neo shadow-hard">
-              <summary className="flex items-center justify-between gap-2 cursor-pointer list-none px-3 py-2.5 font-neo-display font-bold text-sm text-neo-white">
-                {t('crossword.allClues')}
-                <ChevronDown size={18} className="transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="px-2.5 pb-2.5">
-                <CrosswordClueList
-                  slots={puzzle.slots}
-                  activeSlotId={activeSlot?.id ?? null}
-                  onSelect={handleClueSelect}
-                  t={t}
-                />
-              </div>
-            </details>
+            {/* Mobile: mini clue list + show all */}
+            <div className="lg:hidden">
+              {!showAllClues ? (
+                <div className="bg-neo-navy-light border-neo border-black rounded-neo shadow-hard">
+                  <div className="flex flex-col">
+                    {miniClues.slice(0, 3).map((slot) => (
+                      <button
+                        key={slot.id}
+                        type="button"
+                        onClick={() => focusSlot(slot.id)}
+                        className={`flex items-center gap-2 px-3 py-2 text-start border-b border-black/10 last:border-b-0 ${
+                          slot.id === activeSlot?.id ? 'bg-neo-cyan/15' : ''
+                        } ${wordSolvedSlots.includes(slot.id) ? 'cw-capture-flash' : ''}`}
+                      >
+                        <span className="shrink-0 font-neo-display font-bold text-xs text-neo-cyan w-5 text-end">
+                          {slot.number}
+                        </span>
+                        <span className="font-neo-body text-xs text-neo-white/90 truncate">{slot.clue || t('crossword.noClue')}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowAllClues(true)}
+                    className="w-full flex items-center justify-center gap-1 px-3 py-2 font-neo-body text-xs text-neo-cyan hover:bg-neo-navy transition-colors"
+                  >
+                    {t('crossword.allClues')}
+                    <ChevronDown size={14} />
+                  </button>
+                </div>
+              ) : (
+                <div className="fixed inset-0 z-40 bg-neo-navy/90 flex flex-col cw-mobile-clue-slide">
+                  <div className="flex items-center justify-between px-4 py-3 border-b border-black/10">
+                    <h2 className="font-neo-display font-bold text-neo-white text-sm">{t('crossword.allClues')}</h2>
+                    <button
+                      type="button"
+                      onClick={() => setShowAllClues(false)}
+                      className="font-neo-body text-xs text-neo-cyan px-3 py-1 border-neo border-black rounded-neo"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-4 py-3">
+                    <CrosswordClueList
+                      slots={puzzle.slots}
+                      activeSlotId={activeSlot?.id ?? null}
+                      onSelect={(slot) => { focusSlot(slot.id); setShowAllClues(false); }}
+                      t={t}
+                      capturedSlotIds={solvedSlotIds(state)}
+                      wordSolvedSlots={wordSolvedSlots}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Mobile: the active clue pinned directly above the keyboard, so it
-              stays in view the whole time you're typing (newspaper habit). */}
+          {/* Mobile clue bar */}
           <div className="shrink-0 lg:hidden">
             <ClueBar
               slot={activeSlot}
@@ -324,20 +441,22 @@ export function CrosswordView({
             />
           </div>
 
-          {/* On-screen keyboard — touch only; pinned to the bottom on mobile so
-              the page never scrolls. Desktop uses the physical keyboard. */}
+          {/* On-screen keyboard */}
           <div className="shrink-0 pt-1 lg:hidden">
             <CrosswordKeyboard
               locale={puzzle.locale}
-              onLetter={inputLetter}
+              onLetter={handleInput}
               onBackspace={backspace}
               disabled={solved}
               backspaceLabel={t('crossword.backspace')}
+              usedLetters={usedLetters}
+              correctLetters={correctLetters}
+              wrongLetters={wrongLetters}
             />
           </div>
         </div>
 
-        {/* Desktop: the Across/Down clue rail, the strongest "this is a real crossword" signal. */}
+        {/* Desktop clue rail */}
         <aside className="hidden lg:block lg:sticky lg:top-6 lg:max-h-[calc(100dvh-3rem)] lg:overflow-y-auto pe-0.5">
           <CrosswordClueList
             slots={puzzle.slots}
@@ -345,143 +464,44 @@ export function CrosswordView({
             onSelect={handleClueSelect}
             t={t}
             columns="stacked"
+            capturedSlotIds={solvedSlotIds(state)}
+            wordSolvedSlots={wordSolvedSlots}
           />
         </aside>
       </div>
 
-      {/* Clue Scramble overlay — shown once per slot, before focusing it */}
+      {/* Clue Scramble */}
       {pendingSlot && (
         <ClueScramble answer={pendingSlot.answer} onResult={handleScrambleResult} />
       )}
 
-      {/* Streak badge — fades in after first scramble solve */}
+      {/* Streak badge — no emoji */}
       {clueStreak > 0 && (
         <div
           aria-label={t('crossword.scramble.streakAria', { count: clueStreak })}
           className="fixed top-4 end-4 z-[60] flex items-center gap-1 bg-neo-navy border-neo border-black rounded-neo shadow-hard px-2.5 py-1 font-neo-display font-bold text-neo-lime text-sm pointer-events-none"
         >
-          🔥 {clueStreak}
+          <span aria-hidden>◆</span> {clueStreak}
         </div>
       )}
 
       {solved && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-neo-navy/75 p-6">
-          <div
-            ref={overlayRef}
-            className="bg-neo-cyan text-neo-navy border-neo-thick border-black rounded-neo shadow-hard-lg px-8 py-7 text-center max-w-sm w-full"
-          >
-            <div className="text-5xl mb-1" aria-hidden>
-              🎉
-            </div>
-            <div className="relative">
-              <h2 className="font-neo-display font-extrabold text-2xl mb-3">
-                {t('crossword.solvedTitle')}
-              </h2>
-              <button
-                type="button"
-                onClick={reset}
-                aria-label={t('crossword.dismiss', 'Close')}
-                className="absolute -top-2 -end-2 rounded-neo border-neo border-black bg-neo-navy-light px-2 py-1 font-neo-body text-xs font-bold text-neo-white shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="grid grid-cols-3 gap-2 mb-4">
-              <SolvedStat value={formatTime(elapsedMs)} label={t('crossword.timer')} />
-              <SolvedStat value={`${stats.wordsTotal}`} label={t('crossword.wordsLabel')} />
-              <SolvedStat value={`${hintsUsed}`} label={t('crossword.hintsLabel')} />
-            </div>
-            {soloAward && (
-              <SoloRewardCard
-                t={t}
-                language={language}
-                awarded={soloAward.awarded}
-                bonus={soloAward.bonus}
-                modifier={dailyModifier}
-                claimed={soloAward.claimed}
-                onPlayAgain={handleNext}
-              />
+              <CrosswordSolvedCard
+                        elapsedMs={elapsedMs}
+                        wordsTotal={stats.wordsTotal}
+                        hintsUsed={hintsUsed}
+                        soloAward={soloAward}
+                        dailyModifier={dailyModifier}
+                        onShare={handleShare}
+                        onNewPuzzle={onNewPuzzle ?? (() => {})}
+                        onPlayAgain={handleNext}
+                        onReset={reset}
+                        onDismiss={reset}
+                        t={t}
+                      />
             )}
-            {onNewPuzzle ? (
-              // Endless: pick the next puzzle by difficulty (or replay the same grid).
-              <div className={soloAward ? 'mt-3' : ''}>
-                <p className="font-neo-body font-semibold text-[0.65rem] uppercase tracking-[0.12em] text-neo-navy/70 mb-2">
-                  {t('crossword.nextPuzzlePrompt')}
-                </p>
-                <div className="flex items-center justify-center gap-2">
-                  {(['easy', 'medium', 'hard'] as const).map((d) => (
-                    <button
-                      key={d}
-                      type="button"
-                      onClick={() => onNewPuzzle(d)}
-                      className={`font-neo-display font-bold text-sm border-neo border-black rounded-neo shadow-hard px-4 py-2 active:translate-y-[1px] active:shadow-hard-pressed ${
-                        d === 'easy'
-                          ? 'bg-neo-lime text-neo-navy'
-                          : d === 'hard'
-                            ? 'bg-neo-pink text-neo-white'
-                            : 'bg-neo-navy text-neo-white'
-                      }`}
-                    >
-                      {t(`crossword.difficulty.${d}`)}
-                    </button>
-                  ))}
-                </div>
-                {!soloAward && (
-                  <button
-                    type="button"
-                    onClick={reset}
-                    className="mt-3 font-neo-body font-semibold text-xs text-neo-navy/70 underline underline-offset-2"
-                  >
-                    {t('crossword.playAgain')}
-                  </button>
-                )}
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={reset}
-                className="font-neo-display font-bold bg-neo-navy text-neo-white border-neo border-black rounded-neo shadow-hard px-6 py-2.5 active:translate-y-[1px] active:shadow-hard-pressed"
-              >
-                {t('crossword.playAgain')}
-              </button>
-            )}
-          </div>
-        </div>
-      )}
 
       <CrosswordFx burstKey={burst} />
     </div>
-  );
-}
-
-function SolvedStat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="bg-neo-navy text-neo-cream border-neo border-black rounded-neo px-1 py-2">
-      <div className="font-neo-display font-extrabold text-xl tabular-nums leading-none">{value}</div>
-      <div className="font-neo-body font-semibold text-[0.6rem] uppercase tracking-wide mt-1 opacity-75">
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function ToolButton({
-  onClick,
-  icon,
-  label,
-}: {
-  onClick: () => void;
-  icon: React.ReactNode;
-  label: string;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex items-center gap-1.5 font-neo-body font-semibold text-sm bg-neo-navy-light text-neo-white border-neo border-black rounded-neo shadow-hard px-3 py-2 active:translate-y-[1px] active:shadow-hard-pressed"
-    >
-      {icon}
-      {label}
-    </button>
   );
 }
