@@ -196,11 +196,17 @@ describe('posthogEngagement — platform detection (CrazyGames metric)', () => {
     vi.clearAllMocks();
     delete (window as unknown as { __crazyGamesEnvironment?: string }).__crazyGamesEnvironment;
     delete (window as unknown as { Capacitor?: unknown }).Capacitor;
+    delete (window as unknown as { PokiSDK?: unknown }).PokiSDK;
   });
 
   it('returns "crazygames" when window.__crazyGamesEnvironment === "crazygames"', () => {
     (window as unknown as { __crazyGamesEnvironment: string }).__crazyGamesEnvironment = 'crazygames';
     expect(detectPlatform()).toBe('crazygames');
+  });
+
+  it('returns "poki" when window.PokiSDK is present', () => {
+    (window as unknown as { PokiSDK: object }).PokiSDK = { init: () => Promise.resolve() };
+    expect(detectPlatform()).toBe('poki');
   });
 
   it('returns "android" when Capacitor native bridge present', () => {

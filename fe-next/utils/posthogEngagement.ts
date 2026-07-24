@@ -320,18 +320,30 @@ export function createDeadTimeDetector(opts: { thresholdMs: number; mode: string
 
 // ---------- Platform detection ----------
 
-export type EngagementPlatform = 'crazygames' | 'android' | 'ios' | 'web';
+export type EngagementPlatform = 'crazygames' | 'poki' | 'android' | 'ios' | 'web';
 
 /**
  * Detects the runtime platform for slicing PostHog cohorts. CrazyGames uses
  * `window.__crazyGamesEnvironment` set by the SDK provider on first paint.
- * Capacitor sets `window.Capacitor` on native shells. Everything else = web.
+ * Poki injects `window.PokiSDK` (portal build via VITE_PORTAL=poki, or the
+ * SDK script tag); the document.referrer check catches a plain iframe embed
+ * on poki.com before the SDK finishes loading. Capacitor sets
+ * `window.Capacitor` on native shells. Everything else = web.
  */
 export function detectPlatform(): EngagementPlatform {
   if (typeof window === 'undefined') return 'web';
   try {
     if ((window as { __crazyGamesEnvironment?: string }).__crazyGamesEnvironment === 'crazygames') {
       return 'crazygames';
+    }
+  } catch { /* noop */ }
+  try {
+    if ((window as { PokiSDK?: unknown }).PokiSDK) {
+      return 'poki';
+    }
+    const refHost = document.referrer ? new URL(document.referrer).hostname : '';
+    if (/(^|\.)poki\.com$/i.test(refHost)) {
+      return 'poki';
     }
   } catch { /* noop */ }
   try {
