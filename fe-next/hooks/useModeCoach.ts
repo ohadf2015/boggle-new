@@ -56,24 +56,18 @@ export function useModeCoach(
   const stepRef = useRef(0);
   stepRef.current = stepIndex;
 
-  // First-visit detection runs in an effect so SSR and first client render
-  // agree (nothing rendered) — no hydration mismatch.
+  // Coach removed per user request — "more confusing than helping".
+  // Players jump straight into gameplay with no FTUE steps.
   useEffect(() => {
     const storage = browserStorage();
     if (!content || !storage) return;
     if (hasSeenCoach(mode, COACH_VERSION, storage)) return;
 
-    const timer = window.setTimeout(() => {
-      setStepIndex(0);
-      setVisible(true);
-      dismissedRef.current = false;
-      markCoachSeen(mode, COACH_VERSION, storage); // mark-on-show: abandon-safe
-      posthog.capture('mode_coach_shown', { mode });
-      onShown?.();
-    }, settleMs);
-    return () => window.clearTimeout(timer);
-    // onShown intentionally excluded — callers pass inline fns; mode is the key.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Mark as seen immediately so reload never re-pops, but never show.
+    markCoachSeen(mode, COACH_VERSION, storage);
+    dismissedRef.current = true;
+    // onShown fires so cross-device DB backfill still works.
+    onShown?.();
   }, [mode, content, settleMs]);
 
   const close = useCallback(
