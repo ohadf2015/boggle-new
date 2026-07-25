@@ -15,6 +15,7 @@ import {
   getJsonFromLocalStorage,
   saveJsonToLocalStorage,
 } from '@/utils/storageHelpers';
+import { incrementGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import posthog from '@/lib/analytics/lazyPosthog';
 import {
   setPostHogUserProps,
@@ -276,6 +277,7 @@ export type OnboardingStep =
   | 'tutorial'
   | 'profile'
   | 'style'
+  | 'quickStart'
   | 'mode_select';
 
 export interface GrowthEventData {
@@ -1044,6 +1046,7 @@ export const trackGameEnd = (
   // Lifetime person properties — enable cohort slicing in PostHog
   // (e.g. "players with ≥10 games" × "first_mode_played = adventure").
   if (completed) {
+    incrementGamesCompletedCount();
     incrementPostHogUserProp('total_games_played', 1);
     if (wordCount > 0) incrementPostHogUserProp('total_words_found', wordCount);
     setPostHogUserProps({

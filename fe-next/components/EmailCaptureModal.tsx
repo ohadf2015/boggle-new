@@ -6,6 +6,7 @@ import { Mail, Trophy, Calendar } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useConsentDecided } from '@/hooks/useConsentDecided';
+import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { socialEvents } from './SocialMediaPixels';
 import {
   Dialog,
@@ -91,8 +92,7 @@ export function EmailCaptureModal() {
       if (showCount >= 3) return false;
 
       // Require at least 5 games before showing (avoid "intrusive popup" penalty)
-      const gamesCompleted = parseInt(localStorage.getItem('games_completed_count') || '0');
-      if (gamesCompleted < 5) return false;
+      if (readGamesCompletedCount() < 5) return false;
 
       // Require at least 7 days since first visit
       const firstVisit = localStorage.getItem('first_visit_timestamp');

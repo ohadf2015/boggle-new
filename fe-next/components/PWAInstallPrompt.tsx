@@ -7,10 +7,18 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { gameEvents } from '@/components/GoogleAnalytics';
 import { isAndroidBrowser } from '@/utils/androidApp';
+import { isNative } from '@/utils/platform';
+import { readGamesCompletedCount } from '@/utils/gamesCompletedCount';
 import { isIOSSafari, shouldShowIOSInstallHint } from '@/utils/iosInstall';
 
 const PWA_DISMISS_KEY = 'pwa_install_dismissed_until';
 const PWA_DISMISS_MS = 7 * 24 * 60 * 60 * 1000;
+
+// `games_completed_count` is written by trackGameEnd() in utils/growthTracking —
+// the single funnel every mode's completion routes through. Do NOT add a local
+// window-event listener to maintain it; the one that used to live here listened
+// for an event nobody dispatched, so this counter sat at 0 and both banners
+// below were unreachable.
 
 /** iOS-only: home-screen-installed check (Safari's non-standard flag + display-mode). */
 function isIOSStandalone(): boolean {
@@ -55,7 +63,8 @@ export function PWAInstallPrompt() {
         shouldShowIOSInstallHint({
           ua: navigator.userAgent,
           isStandalone: isIOSStandalone(),
-          gamesCompleted: parseInt(localStorage.getItem('games_completed_count') || '0', 10),
+          isNativeApp: isNative(),
+          gamesCompleted: readGamesCompletedCount(),
           dismissedUntil: iosDismiss ? parseInt(iosDismiss, 10) : null,
           now: Date.now(),
         })
@@ -84,9 +93,7 @@ export function PWAInstallPrompt() {
 
       // Show prompt after 2nd game completion
       // Check localStorage for game completion count
-      const gamesCompleted = parseInt(localStorage.getItem('games_completed_count') || '0');
-
-      if (gamesCompleted >= 2) {
+      if (readGamesCompletedCount() >= 2) {
         setShowPrompt(true);
       }
     };
@@ -223,25 +230,6 @@ export function PWAInstallPrompt() {
       </m.div>
     </AnimatePresence>
   );
-}
-
-/**
- * Helper hook to track game completions for PWA prompt trigger
- */
-export function useTrackGameCompletion() {
-  useEffect(() => {
-    const incrementGameCount = () => {
-      const currentCount = parseInt(localStorage.getItem('games_completed_count') || '0');
-      localStorage.setItem('games_completed_count', (currentCount + 1).toString());
-    };
-
-    // Listen for game completion event
-    window.addEventListener('game_completed', incrementGameCount);
-
-    return () => {
-      window.removeEventListener('game_completed', incrementGameCount);
-    };
-  }, []);
 }
 
 export default PWAInstallPrompt;

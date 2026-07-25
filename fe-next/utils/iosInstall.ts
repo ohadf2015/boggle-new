@@ -25,6 +25,16 @@ export interface IOSInstallHintInput {
   ua: string;
   /** already installed to the home screen (navigator.standalone / standalone display) */
   isStandalone: boolean;
+  /**
+   * running inside the Capacitor native shell (`Capacitor.isNativePlatform()`).
+   *
+   * Required, not optional-defaulting-to-false: a WKWebView reports a clean
+   * iPhone-Safari UA with `navigator.standalone === undefined`, so UA and
+   * standalone both say "installable web page" and the hint would pitch
+   * Add-to-Home-Screen to someone already inside the native app. Making the
+   * caller answer is what stops that from silently regressing.
+   */
+  isNativeApp: boolean;
   /** games completed so far — only pitch install to engaged users */
   gamesCompleted: number;
   /** ms timestamp until which the user dismissed the hint, or null */
@@ -42,6 +52,7 @@ export const IOS_HINT_MIN_GAMES = 2;
  */
 export function shouldShowIOSInstallHint(input: IOSInstallHintInput): boolean {
   if (!isIOSSafari(input.ua)) return false;
+  if (input.isNativeApp) return false;
   if (input.isStandalone) return false;
   if (input.gamesCompleted < IOS_HINT_MIN_GAMES) return false;
   if (input.dismissedUntil != null && input.now < input.dismissedUntil) return false;

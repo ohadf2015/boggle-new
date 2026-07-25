@@ -24,6 +24,7 @@ describe('shouldShowIOSInstallHint', () => {
   const base: IOSInstallHintInput = {
     ua: IPHONE_SAFARI,
     isStandalone: false,
+    isNativeApp: false,
     gamesCompleted: 2,
     dismissedUntil: null,
     now: 1_000_000,
@@ -40,6 +41,13 @@ describe('shouldShowIOSInstallHint', () => {
 
   it('hides once installed to the home screen', () => {
     expect(shouldShowIOSInstallHint({ ...base, isStandalone: true })).toBe(false);
+  });
+
+  // A Capacitor WKWebView reports an iPhone-Safari UA with no CriOS/FxiOS marker,
+  // and `navigator.standalone` is undefined there — so UA + standalone alone would
+  // tell a user already inside the native iOS app to "Add to Home Screen".
+  it('hides inside the native iOS app even though the UA reads as iPhone Safari', () => {
+    expect(shouldShowIOSInstallHint({ ...base, isNativeApp: true })).toBe(false);
   });
 
   it('hides before the engagement threshold', () => {
