@@ -53,6 +53,8 @@ export interface DesktopGameLayoutProps {
   tutorialPath: Array<{ row: number; col: number }> | null;
   /** The word being shown in the tutorial */
   tutorialWord?: string;
+  /** Show the first-play hand coach on the board (BoardHandCoach). */
+  showHandCoach?: boolean;
   // Reveal highlight
   highlightedPath: Array<{ row: number; col: number }>;
   lastWordFoundTimeRef: React.RefObject<number>;
@@ -117,6 +119,7 @@ export function DesktopGameLayout({
   keyboardInput,
   tutorialPath,
   tutorialWord: _tutorialWord,
+  showHandCoach = false,
   highlightedPath,
   lastWordFoundTimeRef,
   fireRoundActive,
@@ -338,6 +341,7 @@ export function DesktopGameLayout({
                 fireRoundActive={fireRoundActive}
                 earthquakeShaking={earthquakeState === 'shaking'}
                 highlightedPath={gridHighlightedPath}
+                showHandCoach={showHandCoach}
                 language={language}
                 isTypingMode={keyboardInput.isTypingMode}
               />

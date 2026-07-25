@@ -36,6 +36,12 @@ vi.mock('@/components/onboarding/LanguageSelect', () => ({
 vi.mock('@/components/onboarding/ScoreRevealV2', () => ({
   default: () => <div data-testid="score-reveal" />,
 }));
+vi.mock('@/components/onboarding/QuickStartStep', () => ({
+  default: () => <div data-testid="quick-start-step" />,
+}));
+vi.mock('@/components/HowToPlay', () => ({
+  default: () => null,
+}));
 vi.mock('@/components/onboarding/OnboardingProgress', () => ({
   default: ({ currentStep, totalSteps }: any) => (
     <div data-testid="onboarding-progress" data-current={currentStep} data-total={totalSteps} />
@@ -58,12 +64,12 @@ describe('OnboardingFlow — invite mode', () => {
     expect(progress.getAttribute('data-total')).toBe('3');
   });
 
-  it('uses 4-step path when no invite at mount (regression guard)', () => {
-    // Non-admin (default): language → returningUser → tutorial → profile.
-    // The admin-only Calm Mode vibe step is not injected.
+  it('shows the single quick-start screen with no progress dots when there is no invite', () => {
+    // The base flow is one screen now, so there is no sequence to indicate —
+    // the progress dots are suppressed rather than rendering a lone dot.
     wrap(<OnboardingFlow onComplete={() => {}} />);
-    const progress = screen.getByTestId('onboarding-progress');
-    expect(progress.getAttribute('data-total')).toBe('4');
+    expect(screen.getByTestId('quick-start-step')).toBeInTheDocument();
+    expect(screen.queryByTestId('onboarding-progress')).not.toBeInTheDocument();
   });
 
   it('renders LanguageSelect first in invite mode', () => {

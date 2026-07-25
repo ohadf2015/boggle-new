@@ -16,15 +16,17 @@ export type FlowStep =
   | 'tutorial'
   | 'profile'
   | 'style'
+  | 'quickStart'
   | 'inviteTutorial';
 
-// Base flow — short FTUE: pick a language, choose name+avatar (both pre-filled),
-// then pick a music/theme style. No tutorial game (users want to play, not sit
-// through a lesson). The 'calmMode' vibe-choice step is ADMIN-ONLY during soft
-// launch — OnboardingFlow injects it after 'returningUser' for admins (see
-// displaySteps). Invite flow stays minimal (no style step) to get friends into
-// the room fast.
-export const STEPS: FlowStep[] = ['language', 'returningUser', 'profile', 'style'];
+// Base flow — ONE screen. Language, name+avatar and the play button all live on
+// 'quickStart', because the old language → profile → style sequence was three
+// full-screen gates in front of a word game and new players stalled on them.
+// The 'returningUser' re-engagement prompt is shown only to guests with 1+ games
+// and the 'calmMode' vibe choice is ADMIN-ONLY during soft launch; OnboardingFlow
+// prepends/injects both (see displaySteps), so neither is in the base list.
+// Invite flow is unchanged — friends still go language → profile → room.
+export const STEPS: FlowStep[] = ['quickStart'];
 export const INVITE_STEPS: FlowStep[] = ['language', 'profile', 'inviteTutorial'];
 
 interface InviteContext {

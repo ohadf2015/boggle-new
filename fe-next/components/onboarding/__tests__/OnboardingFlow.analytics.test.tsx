@@ -111,6 +111,18 @@ vi.mock('../StyleSelectStep', () => ({
   ),
 }));
 
+vi.mock('../QuickStartStep', () => ({
+  __esModule: true,
+  default: ({ onPlay }: any) => (
+    <button data-testid="quick-start-btn" onClick={() => onPlay('Player1', {}, false)}>play</button>
+  ),
+}));
+
+vi.mock('@/components/HowToPlay', () => ({
+  __esModule: true,
+  default: () => null,
+}));
+
 vi.mock('../CalmModeChoice', () => ({
   __esModule: true,
   default: ({ onChoose }: any) => (
@@ -141,61 +153,55 @@ describe('OnboardingFlow analytics', () => {
   });
 
   const goNew = () => fireEvent.click(screen.getByTestId('new-btn'));
-  // Admin picks a vibe (calm/energetic) before the profile step.
+  // Admin picks a vibe (calm/energetic) before the one screen.
   const chooseVibe = () => fireEvent.click(screen.getByTestId('vibe-energetic'));
-  const advanceToProfile = () => {
-    fireEvent.click(screen.getByTestId('lang-btn'));
+  const advanceToQuickStart = () => {
     goNew();
     chooseVibe();
   };
+  const play = () => fireEvent.click(screen.getByTestId('quick-start-btn'));
 
   it('fires onboarding_started once on mount', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
     expect(trackOnboardingStart).toHaveBeenCalledTimes(1);
   });
 
-  it('fires step=language on language select', () => {
+  it('fires step=calmMode when an admin picks a vibe', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    fireEvent.click(screen.getByTestId('lang-btn'));
-    goNew();
-    expect(trackOnboardingStep).toHaveBeenCalledWith('language');
+    advanceToQuickStart();
+    expect(trackOnboardingStep).toHaveBeenCalledWith('calmMode', { cosy: false });
   });
 
-  it('fires step=profile with hasPendingInvite=false', () => {
+  it('fires step=quickStart on play, carrying whether the name was edited', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    advanceToProfile();
-    fireEvent.click(screen.getByTestId('profile-btn'));
-    expect(trackOnboardingStep).toHaveBeenCalledWith('profile', {
-      hasPendingInvite: false,
-      nameEdited: false,
-    });
+    advanceToQuickStart();
+    play();
+    expect(trackOnboardingStep).toHaveBeenCalledWith('quickStart', { nameEdited: false });
   });
 
-  it('fires step=style on style step completion', () => {
+  it('fires step=quickStart exactly once, even on a double tap', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    advanceToProfile();
-    fireEvent.click(screen.getByTestId('profile-btn'));
-    fireEvent.click(screen.getByTestId('style-btn'));
-    expect(trackOnboardingStep).toHaveBeenCalledWith('style');
+    advanceToQuickStart();
+    play();
+    play();
+
+    const calls = (trackOnboardingStep as unknown as ReturnType<typeof vi.fn>).mock.calls
+      .filter((c) => c[0] === 'quickStart');
+    expect(calls).toHaveLength(1);
   });
 
-  it('fires step=style exactly once (on completion, not on entry)', () => {
+  // The base funnel no longer has separate language / profile / style stages —
+  // they are all one screen now. Emitting them would corrupt the live funnel.
+  it('never emits the retired language, profile, style or tutorial steps', () => {
     render(<OnboardingFlow onComplete={vi.fn()} />);
-    advanceToProfile();
-    fireEvent.click(screen.getByTestId('profile-btn'));
-    fireEvent.click(screen.getByTestId('style-btn'));
+    advanceToQuickStart();
+    play();
 
-    const styleCalls = (trackOnboardingStep as unknown as ReturnType<typeof vi.fn>).mock.calls
-      .filter((c) => c[0] === 'style');
-    expect(styleCalls).toHaveLength(1);
-  });
-
-  it('never emits a tutorial step (tutorial removed from the short flow)', () => {
-    render(<OnboardingFlow onComplete={vi.fn()} />);
-    advanceToProfile();
-    fireEvent.click(screen.getByTestId('profile-btn'));
-    fireEvent.click(screen.getByTestId('style-btn'));
-    expect(trackOnboardingStep).not.toHaveBeenCalledWith('tutorial');
-    expect(trackOnboardingStep).not.toHaveBeenCalledWith('tutorial', expect.anything());
+    const emitted = (trackOnboardingStep as unknown as ReturnType<typeof vi.fn>).mock.calls
+      .map((c) => c[0]);
+    expect(emitted).not.toContain('language');
+    expect(emitted).not.toContain('profile');
+    expect(emitted).not.toContain('style');
+    expect(emitted).not.toContain('tutorial');
   });
 });

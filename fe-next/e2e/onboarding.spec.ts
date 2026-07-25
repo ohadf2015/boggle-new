@@ -1,39 +1,43 @@
 import { test, expect } from '@playwright/test';
 import { OnboardingPage } from './pages/OnboardingPage';
-import {
-  goto,
-  clearOnboardingState,
-  waitForHydration,
-  randomUsername,
-} from './helpers/test-utils';
-import {
-  applyStorageFixture,
-  ONBOARDED_USER,
-  GUEST_WITH_PROFILE,
-} from './helpers/storage-fixtures';
+import { goto, clearOnboardingState, waitForHydration } from './helpers/test-utils';
+import { applyStorageFixture, ONBOARDED_USER } from './helpers/storage-fixtures';
+
+/**
+ * FTUE end-to-end.
+ *
+ * The flow is one screen. The specs below deliberately assert the ABSENCE of
+ * gates as much as their presence — the previous FTUE stalled new players on a
+ * language step that needed two taps on the same flag, a profile form whose CTA
+ * looked disabled, and a 14-option style grid, all before any gameplay.
+ *
+ * (The former version of this file tested `components/OnboardingModal.tsx` — a
+ * welcome-demo → profile → quick-tips modal with no live caller — so it was
+ * already asserting against a flow that does not ship.)
+ */
 
 // ---------------------------------------------------------------------------
-// 1. Fresh User First Visit
+// 1. Fresh user first visit
 // ---------------------------------------------------------------------------
 test.describe('Fresh User First Visit', () => {
-  test('onboarding modal appears on first visit', async ({ page }) => {
+  test('the FTUE appears on first visit', async ({ page }) => {
     const onboarding = new OnboardingPage(page);
     await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
-    await expect(onboarding.modal).toBeVisible();
+    await onboarding.waitForFlow();
+    await expect(onboarding.flow).toBeVisible();
   });
 
-  test('modal does NOT appear if onboarding already completed', async ({ page }) => {
+  test('does NOT appear if onboarding already completed', async ({ page }) => {
     await goto(page, '/');
     await applyStorageFixture(page, ONBOARDED_USER);
     await page.reload();
     await waitForHydration(page);
 
     const onboarding = new OnboardingPage(page);
-    await expect(onboarding.modal).not.toBeVisible();
+    await expect(onboarding.flow).not.toBeVisible();
   });
 
-  test('modal does NOT appear if onboarding was skipped', async ({ page }) => {
+  test('does NOT appear if onboarding was skipped', async ({ page }) => {
     await goto(page, '/');
     await page.evaluate(() => {
       localStorage.setItem('lexiclash_onboarding_completed', 'skipped');
@@ -42,340 +46,134 @@ test.describe('Fresh User First Visit', () => {
     await waitForHydration(page);
 
     const onboarding = new OnboardingPage(page);
-    await expect(onboarding.modal).not.toBeVisible();
+    await expect(onboarding.flow).not.toBeVisible();
   });
 });
 
 // ---------------------------------------------------------------------------
-// 2. Step Navigation
+// 2. One screen, no gates
 // ---------------------------------------------------------------------------
-test.describe('Step Navigation', () => {
-  test('can navigate forward through steps', async ({ page }) => {
+test.describe('Single-screen FTUE', () => {
+  test('a player who reads nothing can reach a game in one tap', async ({ page }) => {
     const onboarding = new OnboardingPage(page);
     await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
+    await onboarding.waitForFlow();
 
-    // Step 1 -> Step 2
-    await onboarding.completeWelcomeStep('play');
-    // Expect profile step or next step to be visible
-    const profileVisible = await onboarding.profileStep.isVisible().catch(() => false);
-    if (profileVisible) {
-      await expect(onboarding.nameInput).toBeVisible();
-    }
+    await onboarding.play();
+
+    await onboarding.expectRedirectToGame();
   });
 
-  test('can navigate backward with back button', async ({ page }) => {
+  test('the name arrives pre-filled, so identity is optional', async ({ page }) => {
     const onboarding = new OnboardingPage(page);
     await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
+    await onboarding.waitForFlow();
 
-    // Advance past step 1
-    await onboarding.completeWelcomeStep('play');
-    await waitForHydration(page);
-
-    // Try going back
-    const backVisible = await onboarding.backButton.isVisible().catch(() => false);
-    if (backVisible) {
-      await onboarding.backButton.click();
-      // Should see step 1 elements again
-      await expect(onboarding.letsPlayButton).toBeVisible();
-    }
+    await expect(onboarding.nameInput).toBeVisible();
+    expect((await onboarding.nameInput.inputValue()).trim().length).toBeGreaterThan(0);
   });
 
-  test('progress indicator is present in the modal', async ({ page }) => {
+  test('play stays enabled even with the name cleared', async ({ page }) => {
     const onboarding = new OnboardingPage(page);
     await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
+    await onboarding.waitForFlow();
 
-    await expect(onboarding.progressIndicator).toBeVisible();
+    await onboarding.nameInput.fill('');
+    await expect(onboarding.playButton).toBeEnabled();
+
+    await onboarding.play();
+    await onboarding.expectRedirectToGame();
   });
-});
 
-// ---------------------------------------------------------------------------
-// 3. Welcome Demo Step
-// ---------------------------------------------------------------------------
-test.describe('Welcome Demo Step', () => {
-  test('mini grid is visible on step 1', async ({ page }) => {
+  test('a chosen name is what gets saved', async ({ page }) => {
     const onboarding = new OnboardingPage(page);
     await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
+    await onboarding.waitForFlow();
 
-    await expect(onboarding.miniGrid).toBeVisible();
-  });
+    await onboarding.nameInput.fill('E2EPlayer');
+    await onboarding.play();
+    await onboarding.expectRedirectToGame();
 
-  test('"Let\'s Play" button advances to next step', async ({ page }) => {
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
-
-    await onboarding.letsPlayButton.click();
-    // After clicking, the lets-play button should no longer be visible (moved to next step)
-    await expect(onboarding.letsPlayButton).not.toBeVisible();
-  });
-
-  test('"Skip" button marks onboarding as skipped', async ({ page }) => {
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
-
-    await onboarding.skipButton.click();
-    await waitForHydration(page);
-
-    const completedValue = await page.evaluate(() =>
-      localStorage.getItem('lexiclash_onboarding_completed')
-    );
-    expect(completedValue).toBe('skipped');
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 4. Profile Setup Step
-// ---------------------------------------------------------------------------
-test.describe('Profile Setup Step', () => {
-  async function goToProfileStep(page: import('@playwright/test').Page) {
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
-    await onboarding.completeWelcomeStep('play');
-    return onboarding;
-  }
-
-  test('name input is visible on profile step', async ({ page }) => {
-    const onboarding = await goToProfileStep(page);
-    const profileVisible = await onboarding.profileStep.isVisible().catch(() => false);
-    if (profileVisible) {
-      await expect(onboarding.nameInput).toBeVisible();
-    }
-  });
-
-  test('next button is disabled when name is empty', async ({ page }) => {
-    const onboarding = await goToProfileStep(page);
-    const profileVisible = await onboarding.profileStep.isVisible().catch(() => false);
-    if (profileVisible) {
-      await onboarding.nameInput.fill('');
-      await expect(onboarding.nextButton).toBeDisabled();
-    }
-  });
-
-  test('next button is disabled when name is too short (< 2 chars)', async ({ page }) => {
-    const onboarding = await goToProfileStep(page);
-    const profileVisible = await onboarding.profileStep.isVisible().catch(() => false);
-    if (profileVisible) {
-      await onboarding.nameInput.fill('A');
-      await expect(onboarding.nextButton).toBeDisabled();
-    }
-  });
-
-  test('name input rejects input longer than 20 characters', async ({ page }) => {
-    const onboarding = await goToProfileStep(page);
-    const profileVisible = await onboarding.profileStep.isVisible().catch(() => false);
-    if (profileVisible) {
-      const longName = 'A'.repeat(25);
-      await onboarding.nameInput.fill(longName);
-      const value = await onboarding.nameInput.inputValue();
-      expect(value.length).toBeLessThanOrEqual(20);
-    }
-  });
-
-  test('next button is enabled with a valid name (2-20 chars)', async ({ page }) => {
-    const onboarding = await goToProfileStep(page);
-    const profileVisible = await onboarding.profileStep.isVisible().catch(() => false);
-    if (profileVisible) {
-      await onboarding.nameInput.fill('ValidName');
-      await expect(onboarding.nextButton).toBeEnabled();
-    }
-  });
-
-  test('avatar selector button is visible', async ({ page }) => {
-    const onboarding = await goToProfileStep(page);
-    const profileVisible = await onboarding.profileStep.isVisible().catch(() => false);
-    if (profileVisible) {
-      await expect(onboarding.avatarSelectorButton).toBeVisible();
-    }
-  });
-
-  test('profile step is skipped when user already has a profile', async ({ page }) => {
-    await goto(page, '/');
-    await applyStorageFixture(page, {
-      ...GUEST_WITH_PROFILE,
-      lexiclash_onboarding_completed: 'false',
-    });
-    await page.reload();
-    await waitForHydration(page);
-
-    const onboarding = new OnboardingPage(page);
-    await onboarding.waitForModal();
-    await onboarding.completeWelcomeStep('play');
-
-    // Profile step should be skipped — should land on tips or start training
-    const profileVisible = await onboarding.profileStep.isVisible().catch(() => false);
-    expect(profileVisible).toBe(false);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 5. Quick Tips Step
-// ---------------------------------------------------------------------------
-test.describe('Quick Tips Step', () => {
-  test('start training button is visible on tips step', async ({ page }) => {
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
-
-    // Advance through step 1
-    await onboarding.completeWelcomeStep('play');
-
-    // Advance through step 2 if visible
-    const profileVisible = await onboarding.nameInput.isVisible().catch(() => false);
-    if (profileVisible) {
-      await onboarding.completeProfileStep(randomUsername());
-    }
-
-    // Now on tips step
-    await expect(onboarding.startTrainingButton).toBeVisible({ timeout: 5_000 });
-  });
-
-  test('clicking start training redirects to singleplayer', async ({ page }) => {
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
-
-    await onboarding.completeWelcomeStep('play');
-
-    const profileVisible = await onboarding.nameInput.isVisible().catch(() => false);
-    if (profileVisible) {
-      await onboarding.completeProfileStep(randomUsername());
-    }
-
-    await onboarding.startTrainingButton.click({ timeout: 5_000 });
-    await onboarding.expectRedirectToTraining();
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 6. Complete Flow
-// ---------------------------------------------------------------------------
-test.describe('Complete Flow', () => {
-  test('full onboarding redirects to /singleplayer?autoStart=practice', async ({ page }) => {
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser();
-    await onboarding.completeAllSteps('E2EPlayer');
-    await page.waitForURL(/singleplayer.*autoStart=practice/, { timeout: 10_000 });
-  });
-
-  test('localStorage is updated after completing onboarding', async ({ page }) => {
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser();
-    await onboarding.completeAllSteps('E2EPlayer');
-    await onboarding.expectRedirectToTraining();
-
-    const completedValue = await page.evaluate(() =>
-      localStorage.getItem('lexiclash_onboarding_completed')
-    );
-    expect(completedValue).toBe('true');
-  });
-
-  test('onboarding data is saved to localStorage on completion', async ({ page }) => {
-    const name = randomUsername('SaveTest');
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser();
-    await onboarding.completeAllSteps(name);
-    await onboarding.expectRedirectToTraining();
-
-    const dataRaw = await page.evaluate(() =>
+    const stored = await page.evaluate(() =>
       localStorage.getItem('lexiclash_onboarding_data')
     );
-    expect(dataRaw).toBeTruthy();
-    const data = JSON.parse(dataRaw!);
-    expect(data).toHaveProperty('completedAt');
+    expect(stored).toContain('E2EPlayer');
   });
 
-  test('skipping also saves state to localStorage', async ({ page }) => {
+  test('language switches on a single tap and does not advance the flow', async ({ page }) => {
     const onboarding = new OnboardingPage(page);
     await onboarding.visitAsFreshUser();
-    await onboarding.waitForModal();
-    await onboarding.completeWelcomeStep('skip');
-    await waitForHydration(page);
+    await onboarding.waitForFlow();
 
-    const completedValue = await page.evaluate(() =>
+    await onboarding.language('sv').click();
+
+    // Still on the same screen — one tap changes language, nothing else.
+    await expect(onboarding.playButton).toBeVisible();
+    await expect(onboarding.language('sv')).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('the tutorial is opt-in and returns the player to play', async ({ page }) => {
+    const onboarding = new OnboardingPage(page);
+    await onboarding.visitAsFreshUser();
+    await onboarding.waitForFlow();
+
+    await expect(onboarding.howToPlayLink).toBeVisible();
+    await onboarding.howToPlayLink.click();
+
+    // Opening it must not end onboarding or navigate anywhere.
+    await expect(page).toHaveURL(/\/en\/?$/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 3. Completion state
+// ---------------------------------------------------------------------------
+test.describe('Completion', () => {
+  test('marks onboarding complete in localStorage', async ({ page }) => {
+    const onboarding = new OnboardingPage(page);
+    await onboarding.visitAsFreshUser();
+    await onboarding.waitForFlow();
+
+    await onboarding.play();
+    await onboarding.expectRedirectToGame();
+
+    const completed = await page.evaluate(() =>
       localStorage.getItem('lexiclash_onboarding_completed')
     );
-    expect(['skipped', 'true']).toContain(completedValue);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 7. Locale Support
-// ---------------------------------------------------------------------------
-test.describe('Locale Support', () => {
-  test('onboarding works in English (LTR)', async ({ page }) => {
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser('en');
-    await onboarding.waitForModal();
-
-    const dir = await page.locator('html').getAttribute('dir');
-    // English should be LTR (dir is either 'ltr' or absent)
-    expect(dir).not.toBe('rtl');
-    await expect(onboarding.letsPlayButton).toBeVisible();
+    expect(completed).toBe('true');
   });
 
-  test('onboarding works in Hebrew (RTL) with correct dir attribute', async ({ page }) => {
-    const onboarding = new OnboardingPage(page);
-    await onboarding.visitAsFreshUser('he');
-    await onboarding.waitForModal();
-
-    const dir = await page.locator('html').getAttribute('dir');
-    expect(dir).toBe('rtl');
-    await expect(onboarding.letsPlayButton).toBeVisible();
-  });
-
-  test('UI text changes between English and Hebrew', async ({ page }) => {
-    // Get English text
-    const onboardingEn = new OnboardingPage(page);
-    await onboardingEn.visitAsFreshUser('en');
-    await onboardingEn.waitForModal();
-    const enText = await onboardingEn.modal.textContent();
-
-    // Get Hebrew text
-    const onboardingHe = new OnboardingPage(page);
-    await onboardingHe.visitAsFreshUser('he');
-    await onboardingHe.waitForModal();
-    const heText = await onboardingHe.modal.textContent();
-
-    expect(enText).not.toBe(heText);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// 8. Returning User
-// ---------------------------------------------------------------------------
-test.describe('Returning User', () => {
-  test('previously completed user does not see onboarding modal', async ({ page }) => {
+  test('clearing onboarding state brings the FTUE back', async ({ page }) => {
     await goto(page, '/');
     await applyStorageFixture(page, ONBOARDED_USER);
     await page.reload();
     await waitForHydration(page);
 
     const onboarding = new OnboardingPage(page);
-    await expect(onboarding.modal).not.toBeVisible();
-  });
+    await expect(onboarding.flow).not.toBeVisible();
 
-  test('clearing onboarding state makes modal reappear', async ({ page }) => {
-    // Start as onboarded user
-    await goto(page, '/');
-    await applyStorageFixture(page, ONBOARDED_USER);
-    await page.reload();
-    await waitForHydration(page);
-
-    const onboarding = new OnboardingPage(page);
-    await expect(onboarding.modal).not.toBeVisible();
-
-    // Clear state and reload
     await clearOnboardingState(page);
     await page.reload();
-    await waitForHydration(page);
+    await onboarding.waitForFlow();
+    await expect(onboarding.flow).toBeVisible();
+  });
+});
 
-    await onboarding.waitForModal();
-    await expect(onboarding.modal).toBeVisible();
+// ---------------------------------------------------------------------------
+// 4. Locale support
+// ---------------------------------------------------------------------------
+test.describe('Locale Support', () => {
+  test('works in English (LTR)', async ({ page }) => {
+    const onboarding = new OnboardingPage(page);
+    await onboarding.visitAsFreshUser('en');
+    await onboarding.waitForFlow();
+    await expect(onboarding.flow).toHaveAttribute('dir', 'ltr');
+  });
+
+  test('works in Hebrew (RTL) with the correct dir attribute', async ({ page }) => {
+    const onboarding = new OnboardingPage(page);
+    await onboarding.visitAsFreshUser('he');
+    await onboarding.waitForFlow();
+    await expect(onboarding.flow).toHaveAttribute('dir', 'rtl');
   });
 });

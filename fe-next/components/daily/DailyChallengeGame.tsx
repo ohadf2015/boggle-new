@@ -18,8 +18,6 @@ import { useMusic } from '@/contexts/MusicContext';
 import { useComboSystem } from '@/hooks/useComboSystem';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useGameTimer } from '@/hooks/useGameTimer';
-import { useDirectionsTutorialPause } from '@/hooks/useDirectionsTutorialPause';
-import { DirectionsTutorialOverlay } from '@/components/tutorial/DirectionsTutorialOverlay';
 import { useWordSubmission } from '@/hooks/useWordSubmission';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
 import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
@@ -163,16 +161,12 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
   // Contextual guidance - manages all guidance tooltips
   const contextualGuidance = useContextualGuidance();
 
-  // Freeze the clock while the first-time "any direction" tutorial covers the
-  // board so a brand-new player's first puzzle doesn't tick down as they read it.
-  const isDirectionsTutorialActive = useDirectionsTutorialPause();
 
   // Game timer - handles countdown with callbacks
   // Uses stableOnTimeUp to prevent timer restart on re-renders
   const timer = useGameTimer({
     initialTime: duration,
     isPaused: isGameOver,
-    isExternallyPaused: isDirectionsTutorialActive,
     onTimeUp: stableOnTimeUp,
   });
 
@@ -380,9 +374,9 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
       )}
       translate="no"
     >
-      {/* First-time-only "trace in ANY direction" tutorial (once per device,
-          global gate, freezes the clock while up). */}
-      <DirectionsTutorialOverlay />
+      {/* The "trace in ANY direction" lesson is taught on the board itself now
+          (BoardHandCoach, via showHandCoach below) instead of a modal that froze
+          the clock and disabled its own continue button for ten seconds. */}
 
       {/* Top bar with quit button - matches multiplayer layout */}
       <div className={cn(
@@ -509,6 +503,7 @@ const DailyChallengeGame: React.FC<DailyChallengeGameProps> = ({
         <GridComponent
           grid={grid}
           interactive={!isGameOver}
+          showHandCoach
           onWordSubmit={handleWordSubmit}
           onPathSubmit={handlePathSubmit}
           onWordChange={handleWordChange}

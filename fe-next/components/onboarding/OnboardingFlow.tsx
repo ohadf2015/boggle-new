@@ -5,7 +5,7 @@ import { m, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { markOnboardingComplete, markOnboardingSkipped, consumePendingRoomInvite, hasPendingRoomInvite } from '@/utils/onboardingStorage';
+import { markOnboardingComplete, markOnboardingSkipped, consumePendingRoomInvite, hasPendingRoomInvite, getPendingRoomInvite } from '@/utils/onboardingStorage';
 import { setStoredCustomAvatar } from '@/utils/profileStorage';
 import {
   trackOnboardingStart,
@@ -21,6 +21,8 @@ import { getGuestStats } from '@/utils/guestManager';
 import LanguageSelect from './LanguageSelect';
 import CalmModeChoice from './CalmModeChoice';
 import StyleSelectStep from './StyleSelectStep';
+import QuickStartStep from './QuickStartStep';
+import HowToPlay from '@/components/HowToPlay';
 import { useAccessibility } from '@/contexts/AccessibilityContext';
 import QuickProfileSetup from './QuickProfileSetup';
 import OnboardingProgress from './OnboardingProgress';
@@ -38,9 +40,19 @@ interface OnboardingFlowProps {
 
 /**
  * OnboardingFlow - Orchestrates the short FTUE.
- * State machine: language -> returningUser -> [calmMode (admin)] -> profile -> style -> home.
- * No tutorial game — new players want to play, not sit through a lesson.
- * Full-screen with floating geometric background and progress dots.
+ *
+ * Base state machine: [returningUser (guests with 1+ games)] -> [calmMode (admin)]
+ * -> quickStart -> game. Brand-new players see exactly ONE screen.
+ *
+ * The old language -> profile -> style sequence is gone from this path: three
+ * full-screen gates stood in front of a word game, and the language step needed
+ * two taps on the same flag (select, then confirm) to advance — the single
+ * biggest source of "how do I continue?". Language, name and avatar now sit on
+ * `quickStart` alongside an always-enabled PLAY button, and the tutorial is a
+ * link there rather than a step.
+ *
+ * The invite flow (language -> profile -> inviteTutorial) and the CrazyGames
+ * flow are deliberately unchanged.
  */
 const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { language, dir, t } = useLanguage();
@@ -48,8 +60,16 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   const { updateSetting } = useAccessibility();
   const router = useRouter();
 
-  const [step, setStep] = useState<FlowStep>('language');
+  // Resolved once, synchronously, so nothing renders an optimistic step that a
+  // later read flips (Class 1 in .claude/rules/60-recurring-pitfalls.md).
+  // Invite mode keeps its original entry point; everyone else lands on the one
+  // screen unless they're a returning guest worth re-engaging.
+  const [step, setStep] = useState<FlowStep>(() => {
+    if (getPendingRoomInvite()) return 'language';
+    return (getGuestStats().games || 0) > 0 ? 'returningUser' : 'quickStart';
+  });
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showHowToPlay, setShowHowToPlay] = useState(false);
   const { isOnCrazyGamesPlatform } = useCrazyGames();
   // CG portal substep: tutorial first, then welcome with mode CTAs.
   const [cgTutorialDone, setCgTutorialDone] = useState(false);
@@ -141,7 +161,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
   // Calm Mode is admin-only during soft launch. handleNewUser only fires in the
   // non-invite flow, so the admin flag alone decides whether the vibe step shows.
   const handleNewUser = useCallback(() => {
-    setStep(isAdmin ? 'calmMode' : 'profile');
+    setStep(isAdmin ? 'calmMode' : 'quickStart');
   }, [isAdmin]);
 
   // Calm vs energetic vibe choice — applies cosy mode immediately so the rest of
@@ -150,7 +170,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     (cosy: boolean) => {
       updateSetting('cosyMode', cosy);
       recordStep('calmMode', { cosy });
-      setStep('profile');
+      setStep('quickStart');
     },
     [updateSetting, recordStep]
   );
@@ -281,6 +301,43 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     onComplete();
   }, [isNavigating, playerName, recordStep, language, router, onComplete, emitCompleted]);
 
+  /**
+   * The one and only exit from the base flow: PLAY.
+   *
+   * Payload is deliberately identical to handleStyleComplete's — same
+   * markOnboardingComplete shape, same consumePendingRoomInvite() call, same
+   * destination — because two paths that reach "onboarding done" with different
+   * payloads is Class 3 in .claude/rules/60-recurring-pitfalls.md, and the
+   * invite branch is what silently goes missing.
+   */
+  const handleQuickStartPlay = useCallback(
+    (name: string, avatar: CustomAvatarConfig, nameEdited: boolean) => {
+      if (isNavigating) return;
+      setIsNavigating(true);
+      setPlayerName(name);
+      setPlayerAvatar(avatar);
+      setStoredCustomAvatar(avatar);
+      playerNameEditedRef.current = nameEdited;
+      recordStep('quickStart', { nameEdited });
+      markOnboardingComplete({
+        avatarId: 'custom',
+        displayName: name || 'Player',
+        selectedMode: 'home',
+        nameEdited,
+      });
+
+      const pendingRoom = consumePendingRoomInvite();
+      router.push(
+        pendingRoom
+          ? `/${language}/multiplayer?room=${pendingRoom}`
+          : `/${language}/practice/classic?play=1`,
+      );
+      emitCompleted({ via: 'quick_start' });
+      onComplete();
+    },
+    [isNavigating, recordStep, language, router, onComplete, emitCompleted],
+  );
+
   // Step 0: Language selected — proceed to returningUser prompt OR straight to profile.
   // POLICY: Brand-new users (0 games) skip ReturningUserStep — they go straight to play.
   // Returning users (1+ games) see ReturningUserStep to re-engage with account options.
@@ -337,6 +394,14 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
             onHaveAccount={handleHaveAccount}
             onNew={handleNewUser}
             onSkip={handleSkipOnboarding}
+          />
+        );
+      case 'quickStart':
+        return (
+          <QuickStartStep
+            onPlay={handleQuickStartPlay}
+            onHowToPlay={() => setShowHowToPlay(true)}
+            onHaveAccount={isOnCrazyGamesPlatform ? undefined : handleHaveAccount}
           />
         );
       case 'language':
@@ -464,10 +529,13 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
         />
       </div>
 
-      {/* Progress indicator */}
-      <div className="absolute top-6 z-10">
-        <OnboardingProgress currentStep={stepIndex} totalSteps={displaySteps.length} />
-      </div>
+      {/* Progress indicator — a single dot communicates nothing but clutter, so
+          it only appears when there is actually a sequence to track. */}
+      {displaySteps.length > 1 && (
+        <div className="absolute top-6 z-10">
+          <OnboardingProgress currentStep={stepIndex} totalSteps={displaySteps.length} />
+        </div>
+      )}
 
       {/* Step content */}
       <AnimatePresence mode="wait">
@@ -509,6 +577,10 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           </m.div>
         )}
       </AnimatePresence>
+
+      {/* Opt-in tutorial. Overlays the flow instead of replacing a step, so
+          reading it costs the player nothing and closing it returns them to PLAY. */}
+      {showHowToPlay && <HowToPlay onClose={() => setShowHowToPlay(false)} />}
 
       {!isOnCrazyGamesPlatform && (
         <AuthModal

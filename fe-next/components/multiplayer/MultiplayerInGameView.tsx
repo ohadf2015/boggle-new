@@ -64,7 +64,6 @@ import { OpponentWordFeedConnected } from '@/components/multiplayer/OpponentWord
 import { useGameMode, useGameStore } from '@/hooks/gameState/store';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useGameTimer } from '@/hooks/useGameTimer';
-import { DirectionsTutorialOverlay } from '@/components/tutorial/DirectionsTutorialOverlay';
 
 // ==================== Types ====================
 
@@ -181,13 +180,17 @@ export interface MultiplayerInGameViewProps {
   totalTime?: number;
 }
 
+/**
+ * Teaching in multiplayer now happens on the board itself (BoardHandCoach),
+ * not through a blocking overlay.
+ *
+ * The old DirectionsTutorialOverlay disabled its own continue button for ten
+ * seconds and froze the LOCAL clock — but a multiplayer round is timed by the
+ * server, so a first-time player was locked out of a competitive round while it
+ * kept counting down against them.
+ */
 function WithTutorial({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      <DirectionsTutorialOverlay />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
 
 // ==================== Component ====================

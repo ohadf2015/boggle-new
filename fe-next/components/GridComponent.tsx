@@ -19,6 +19,7 @@ import EarthquakeEffects from './grid/EarthquakeEffects';
 import { getSelectionEscalation, resolveGridEffects, type GridEffectsProfile } from './grid/selectionEscalation';
 import DragReleaseHint from './grid/DragReleaseHint';
 import GridConnectorOverlay from './grid/GridConnectorOverlay';
+import BoardHandCoach from './tutorial/BoardHandCoach';
 import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -78,6 +79,13 @@ interface GridComponentProps {
   effectsProfile?: GridEffectsProfile;
   /** Latest word-submit feedback. Triggers a localized tile burst on the last selected cell. */
   submitFeedback?: WordFeedback | null;
+  /**
+   * Show the first-play hand coach over this board: an animated hand tracing a
+   * path (the solved `highlightedPath` when one is supplied, otherwise a fixed
+   * gesture containing a diagonal). Non-blocking, shown once per device, and it
+   * yields the moment the player touches a tile.
+   */
+  showHandCoach?: boolean;
 }
 
 // Stable, module-level "no combo" colors. Passed to NON-selected cells so a
@@ -119,11 +127,22 @@ const GridComponent = memo<GridComponentProps>(({
   autoSubmitIdleMs,
   effectsProfile = 'full',
   submitFeedback,
+  showHandCoach = false,
 }) => {
   const { t } = useLanguage();
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
   const gridRef = useRef<HTMLDivElement>(null);
+  // Mirror the grid node into state as well as the ref. Overlays that must
+  // appear BEFORE any interaction (the hand coach) can't use `gridRef.current`:
+  // it is null on first render and populating a ref schedules no re-render, so
+  // the coach would silently never show. GridConnectorOverlay gets away with the
+  // ref only because dragging re-renders it anyway.
+  const [gridNode, setGridNode] = useState<HTMLDivElement | null>(null);
+  const attachGridRef = useCallback((el: HTMLDivElement | null) => {
+    gridRef.current = el;
+    setGridNode(el);
+  }, []);
 
   const [dragSubmitCount, setDragSubmitCount] = useState(0);
   const prevSelectedLengthRef = useRef(0);
@@ -546,7 +565,7 @@ const GridComponent = memo<GridComponentProps>(({
         }}
       >
         <div
-          ref={gridRef}
+          ref={attachGridRef}
           dir="ltr"
           data-tutorial="grid"
           {...(equippedTileSkin && { 'data-tile-skin': equippedTileSkin.replace('tile-', '') })}
@@ -697,7 +716,18 @@ const GridComponent = memo<GridComponentProps>(({
           dust={earthquakeDust}
         />
 
-        <GridConnectorOverlay selectedCells={selectedCells} gridEl={gridRef.current} comboLevel={visualEffectiveCombo} />
+        <GridConnectorOverlay selectedCells={selectedCells} gridEl={gridNode} comboLevel={visualEffectiveCombo} />
+
+        {/* First-play teaching, in place. Shares gridRef with the connector
+            overlay so the hand lands on the same real tile centres. */}
+        {showHandCoach && (
+          <BoardHandCoach
+            gridEl={gridNode}
+            rows={grid.length}
+            cols={grid[0]?.length ?? 0}
+            path={highlightedPath.length >= 2 ? highlightedPath : null}
+          />
+        )}
 
         {interactive && (
           <>

@@ -2921,6 +2921,11 @@ const ja = {
       "calmDesc": "やさしい表示、時間プレッシャーなし、控えめなお祝い。",
       "changeLater": "設定でいつでも変更できます。"
     },
+    "quickStart": {
+      "play": "プレイ",
+      "howToPlay": "遊び方",
+      "haveAccount": "アカウントを持っている"
+    },
     "style": {
       "title": "スタイルを選ぼう",
       "subtitle": "音楽と色の雰囲気を選んでください。設定でいつでも変更できます。",
@@ -15684,6 +15689,9 @@ const ja = {
     "downloaded": "{size} MB · {count} 語",
     "notDownloaded": "ダウンロードされていません",
     "errorGeneric": "ダウンロードに失敗しました。もう一度お試しください。"
+  },
+  "boardCoach": {
+    "dragToConnect": "指でなぞって文字をつなげよう（どの向きでもOK）"
   },
   "directionsTutorial": {
     "badge": "ヒント",

@@ -84,6 +84,9 @@ const sv = {
     "dismiss": "Okej",
     "sampleWord": "SOL"
   },
+  "boardCoach": {
+    "dragToConnect": "Dra för att koppla ihop bokstäver – åt vilket håll som helst"
+  },
   "directionsTutorial": {
     "badge": "Snabbtips",
     "title": "Dra åt valfritt håll",
@@ -3187,6 +3190,11 @@ const sv = {
       "calm": "Lugn",
       "calmDesc": "Mjukare bilder, ingen tidspress, lugnare firande.",
       "changeLater": "Du kan byta när som helst i inställningarna."
+    },
+    "quickStart": {
+      "play": "SPELA",
+      "howToPlay": "Så spelar du",
+      "haveAccount": "Jag har ett konto"
     },
     "style": {
       "title": "Välj din stil",

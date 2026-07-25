@@ -2518,6 +2518,11 @@ const en = {
       "calmDesc": "Gentler visuals, no time pressure, softer celebrations.",
       "changeLater": "You can switch anytime in Settings."
     },
+    "quickStart": {
+      "play": "PLAY",
+      "howToPlay": "How to play",
+      "haveAccount": "I have an account"
+    },
     "style": {
       "title": "Pick your style",
       "subtitle": "Choose a vibe for your music and colors. You can change it anytime in Settings.",
@@ -12362,6 +12367,9 @@ const en = {
     "cta": "Play Word Hunt",
     "dismiss": "Maybe Later",
     "imageAlt": "Word Hunt multiplayer duel"
+  },
+  "boardCoach": {
+    "dragToConnect": "Drag to connect letters — any direction"
   },
   "directionsTutorial": {
     "badge": "Quick tip",

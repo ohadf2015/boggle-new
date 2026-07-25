@@ -273,6 +273,7 @@ export default function PracticeClassicSandbox() {
           <GridComponent
             grid={board}
             interactive
+            showHandCoach
             onWordSubmit={handleWordSubmit}
             onSelectionChange={onSelectionChange}
             hideComboIndicator

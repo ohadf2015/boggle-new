@@ -5011,6 +5011,11 @@ const es = {
       "calmDesc": "Efectos más suaves, sin presión de tiempo, celebraciones tranquilas.",
       "changeLater": "Puedes cambiarlo cuando quieras en Ajustes."
     },
+    "quickStart": {
+      "play": "JUGAR",
+      "howToPlay": "Cómo se juega",
+      "haveAccount": "Ya tengo cuenta"
+    },
     "style": {
       "title": "Elige tu estilo",
       "subtitle": "Elige un ambiente para tu música y tus colores. Puedes cambiarlo cuando quieras en Ajustes.",
@@ -13514,6 +13519,9 @@ const es = {
       "cta": "Añadir +{seconds}s",
       "earning": "Añadiendo tiempo..."
     }
+  },
+  "boardCoach": {
+    "dragToConnect": "Arrastra para unir letras, en cualquier dirección"
   },
   "directionsTutorial": {
     "badge": "Consejo",

@@ -114,11 +114,33 @@ vi.mock('../QuickProfileSetup', () => {
 });
 
 // The new final step — picking a music/theme style. Confirming finishes onboarding.
+// Still reachable in the invite flow only; the base flow no longer includes it.
 vi.mock('../StyleSelectStep', () => ({
   __esModule: true,
   default: ({ onComplete }: any) => (
     <div data-testid="style-select-step">
       <button onClick={onComplete}>Finish Style</button>
+    </div>
+  ),
+}));
+
+// The whole base FTUE, collapsed onto one screen.
+vi.mock('../QuickStartStep', () => ({
+  __esModule: true,
+  default: ({ onPlay, onHowToPlay, onHaveAccount }: any) => (
+    <div data-testid="quick-start-step">
+      <button onClick={() => onPlay('Player1', {}, false)}>Play</button>
+      <button onClick={onHowToPlay}>How To Play</button>
+      {onHaveAccount && <button onClick={onHaveAccount}>Have Account</button>}
+    </div>
+  ),
+}));
+
+vi.mock('@/components/HowToPlay', () => ({
+  __esModule: true,
+  default: ({ onClose }: any) => (
+    <div data-testid="how-to-play">
+      <button onClick={onClose}>Close How To Play</button>
     </div>
   ),
 }));
@@ -160,67 +182,54 @@ describe('OnboardingFlow', () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null, isAdmin: true });
     mockHasPendingRoom.mockReturnValue(false);
     mockConsumePendingRoom.mockReturnValue(null);
+    // Explicit reset: clearAllMocks() clears calls but NOT implementations, and
+    // the entry step is now decided by reading this at mount — a leaked value
+    // from a previous test would silently start the flow on the invite path.
+    mockGetPendingRoom.mockReturnValue(null);
     mockUseInviteOnboardingMode.mockReturnValue({
       isInviteMode: false,
       inviteAtMount: null,
-      activeSteps: ['language', 'returningUser', 'profile', 'style'],
+      activeSteps: ['quickStart'],
       handleInviteTeaserComplete: vi.fn(),
     });
   });
 
-  const pickLanguage = () => fireEvent.click(screen.getByText('Select Language'));
   const goNewUser = () => fireEvent.click(screen.getByText("I'm New Here"));
   const chooseEnergetic = () => fireEvent.click(screen.getByText('Energetic'));
-  // Admin path to the profile step: language → new-here → calm/energetic vibe.
+  // Admin path to the one screen: new-here → calm/energetic vibe → quick start.
   // (Non-admins skip the vibe step.)
-  const advanceToProfile = () => {
-    pickLanguage();
+  const advanceToQuickStart = () => {
     goNewUser();
     chooseEnergetic();
   };
-  // Full path to navigation: profile → style → finish.
   const finishFlow = () => {
-    advanceToProfile();
-    fireEvent.click(screen.getByText('Set Profile'));
-    fireEvent.click(screen.getByText('Finish Style'));
+    advanceToQuickStart();
+    fireEvent.click(screen.getByText('Play'));
   };
 
-  it('starts with the language select step', () => {
+  // A returning guest (1+ games — see the getGuestStats mock) still gets the
+  // account re-engagement prompt. Brand-new players skip it entirely.
+  it('starts a returning guest on the account re-engagement step', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    expect(screen.getByTestId('language-select')).toBeInTheDocument();
-  });
-
-  it('transitions to returning user after language select', () => {
-    render(<OnboardingFlow {...defaultProps} />);
-    pickLanguage();
     expect(screen.getByTestId('returning-user-step')).toBeInTheDocument();
   });
 
   it('shows the calm/energetic vibe choice when an admin chooses new here', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    pickLanguage();
     goNewUser();
     expect(screen.getByTestId('calm-mode-choice')).toBeInTheDocument();
   });
 
-  it('skips the vibe choice for non-admins (soft launch gate) — goes straight to profile', () => {
+  it('skips the vibe choice for non-admins (soft launch gate) — goes straight to quick start', () => {
     mockUseAuth.mockReturnValue({ isAuthenticated: false, user: null, isAdmin: false });
     render(<OnboardingFlow {...defaultProps} />);
-    pickLanguage();
     goNewUser();
     expect(screen.queryByTestId('calm-mode-choice')).not.toBeInTheDocument();
-    expect(screen.getByTestId('quick-profile-setup')).toBeInTheDocument();
-  });
-
-  it('advances to profile setup after the vibe choice', () => {
-    render(<OnboardingFlow {...defaultProps} />);
-    advanceToProfile();
-    expect(screen.getByTestId('quick-profile-setup')).toBeInTheDocument();
+    expect(screen.getByTestId('quick-start-step')).toBeInTheDocument();
   });
 
   it('enables cosy mode when the player picks Calm', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    pickLanguage();
     goNewUser();
     fireEvent.click(screen.getByText('Calm'));
     expect(mockUpdateSetting).toHaveBeenCalledWith('cosyMode', true);
@@ -228,29 +237,29 @@ describe('OnboardingFlow', () => {
 
   it('leaves cosy mode off when the player picks Energetic', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    pickLanguage();
     goNewUser();
     chooseEnergetic();
     expect(mockUpdateSetting).toHaveBeenCalledWith('cosyMode', false);
   });
 
-  it('advances to the style step after profile setup (no tutorial game)', () => {
+  // The point of the collapse: no language step, no separate profile step and
+  // no style step stand between the player and the game.
+  it('never shows the old language, profile or style steps in the base flow', () => {
     render(<OnboardingFlow {...defaultProps} />);
-    advanceToProfile();
-    fireEvent.click(screen.getByText('Set Profile'));
-    expect(screen.getByTestId('style-select-step')).toBeInTheDocument();
-    expect(mockPush).not.toHaveBeenCalled();
+    advanceToQuickStart();
+    expect(screen.getByTestId('quick-start-step')).toBeInTheDocument();
+    expect(screen.queryByTestId('language-select')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('quick-profile-setup')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('style-select-step')).not.toBeInTheDocument();
   });
 
-  it('navigates to the practice game after the style step', () => {
-    // FTUE completers are routed straight into a practice game (commit 977186dd),
-    // not the Daily Challenge, so the first thing they do is play.
+  it('navigates straight into a practice game from the play button', () => {
     render(<OnboardingFlow {...defaultProps} />);
     finishFlow();
     expect(mockPush).toHaveBeenCalledWith('/en/practice/classic?play=1');
   });
 
-  it('calls onComplete after the style step', () => {
+  it('calls onComplete after play', () => {
     render(<OnboardingFlow {...defaultProps} />);
     finishFlow();
     expect(defaultProps.onComplete).toHaveBeenCalled();
@@ -262,6 +271,37 @@ describe('OnboardingFlow', () => {
     expect(mockMarkComplete).toHaveBeenCalled();
   });
 
+  it('records the name the player actually started with', () => {
+    render(<OnboardingFlow {...defaultProps} />);
+    finishFlow();
+    expect(mockMarkComplete).toHaveBeenCalledWith(
+      expect.objectContaining({ displayName: 'Player1' })
+    );
+  });
+
+  // The tutorial is offered, never imposed: opening it must not end onboarding
+  // or navigate anywhere.
+  it('opens the tutorial on demand without leaving the flow', () => {
+    render(<OnboardingFlow {...defaultProps} />);
+    advanceToQuickStart();
+    expect(screen.queryByTestId('how-to-play')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('How To Play'));
+
+    expect(screen.getByTestId('how-to-play')).toBeInTheDocument();
+    expect(mockPush).not.toHaveBeenCalled();
+    expect(defaultProps.onComplete).not.toHaveBeenCalled();
+  });
+
+  it('closes the tutorial and returns to the quick start screen', () => {
+    render(<OnboardingFlow {...defaultProps} />);
+    advanceToQuickStart();
+    fireEvent.click(screen.getByText('How To Play'));
+    fireEvent.click(screen.getByText('Close How To Play'));
+    expect(screen.queryByTestId('how-to-play')).not.toBeInTheDocument();
+    expect(screen.getByTestId('quick-start-step')).toBeInTheDocument();
+  });
+
   it('renders full-screen with no visible header/footer', () => {
     render(<OnboardingFlow {...defaultProps} />);
     const flow = screen.getByTestId('onboarding-flow');
@@ -270,25 +310,23 @@ describe('OnboardingFlow', () => {
   });
 
   describe('navigation loading state', () => {
-    it('shows a loading overlay after the style step triggers navigation', () => {
+    it('shows a loading overlay once play triggers navigation', () => {
       render(<OnboardingFlow {...defaultProps} />);
       finishFlow();
       expect(screen.getByTestId('onboarding-loading')).toBeInTheDocument();
     });
 
-    it('does not show a loading overlay before the style step is finished', () => {
+    it('does not show a loading overlay before the player presses play', () => {
       render(<OnboardingFlow {...defaultProps} />);
-      advanceToProfile();
-      fireEvent.click(screen.getByText('Set Profile'));
+      advanceToQuickStart();
       expect(screen.queryByTestId('onboarding-loading')).not.toBeInTheDocument();
     });
 
-    it('ignores duplicate style submissions while navigating', () => {
+    it('ignores duplicate play taps while navigating', () => {
       render(<OnboardingFlow {...defaultProps} />);
-      advanceToProfile();
-      fireEvent.click(screen.getByText('Set Profile'));
-      fireEvent.click(screen.getByText('Finish Style'));
-      fireEvent.click(screen.getByText('Finish Style'));
+      advanceToQuickStart();
+      fireEvent.click(screen.getByText('Play'));
+      fireEvent.click(screen.getByText('Play'));
       expect(mockPush).toHaveBeenCalledTimes(1);
     });
   });
@@ -311,7 +349,7 @@ describe('OnboardingFlow', () => {
       expect(mockPush).not.toHaveBeenCalledWith(expect.stringContaining('/multiplayer?room='));
     });
 
-    it('redirects to the practice game after the style step when no pending invite', () => {
+    it('redirects to the practice game on play when no pending invite', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
       finishFlow();
@@ -323,7 +361,6 @@ describe('OnboardingFlow', () => {
     it('lands a brand-new player on the home page (not multiplayer) when they skip with no pending invite', () => {
       mockConsumePendingRoom.mockReturnValue(null);
       render(<OnboardingFlow {...defaultProps} />);
-      pickLanguage();
       fireEvent.click(screen.getByText('Skip'));
       expect(mockPush).toHaveBeenCalledWith('/en');
       expect(mockPush).not.toHaveBeenCalledWith('/en/multiplayer');
@@ -332,7 +369,6 @@ describe('OnboardingFlow', () => {
     it('still honors a pending room invite on skip (joins multiplayer room)', () => {
       mockConsumePendingRoom.mockReturnValue('ABC123');
       render(<OnboardingFlow {...defaultProps} />);
-      pickLanguage();
       fireEvent.click(screen.getByText('Skip'));
       expect(mockPush).toHaveBeenCalledWith('/en/multiplayer?room=ABC123');
     });

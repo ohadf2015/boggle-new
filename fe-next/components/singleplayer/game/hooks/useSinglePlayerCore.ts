@@ -16,7 +16,6 @@ import { useDesktopLayout } from '@/hooks/useDesktopLayout';
 import { useNavigationGuard } from '@/hooks/useNavigationGuard';
 import { useGiftModalPause } from '@/hooks/useGiftModalPause';
 import { useRewardAdPause } from '@/hooks/useRewardAdPause';
-import { useDirectionsTutorialPause } from '@/hooks/useDirectionsTutorialPause';
 import { generateRandomTable } from '@/utils/utils';
 import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
@@ -99,7 +98,6 @@ export function useSinglePlayerCore({
   const isRewardAdActive = useRewardAdPause();
   // Freeze the clock while the first-time "any direction" tutorial covers the
   // board, so a brand-new player's first round doesn't tick down as they read it.
-  const isDirectionsTutorialActive = useDirectionsTutorialPause();
 
   // Core game state
   const [grid, setGrid] = useState<LetterGrid | null>(null);
@@ -210,7 +208,7 @@ export function useSinglePlayerCore({
   const timer = useGameTimer({
     initialTime: settings.timerSeconds,
     isPaused: isPaused || settings.mode === 'practice',
-    isExternallyPaused: isEarthquakePaused || isGiftModalOpen || isRewardAdActive || isDirectionsTutorialActive,
+    isExternallyPaused: isEarthquakePaused || isGiftModalOpen || isRewardAdActive,
     autoStart: settings.mode !== 'practice',
     onTimeUp: () => { if (!gameOverCalledRef.current) setIsGameOver(true); },
   });
