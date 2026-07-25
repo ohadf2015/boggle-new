@@ -164,12 +164,21 @@ export function startMemoryWatchdog(
     if (samples % 10 === 0) {
       const hs = v8.getHeapStatistics();
       const mb = (n: number) => Math.round(n / 1024 / 1024);
+      // Per-space breakdown: large_object_space growth = big strings/arrays
+      // (dictionaries, grids); old_space growth = retained object graphs.
+      const spaces = v8
+        .getHeapSpaceStatistics()
+        .map((s) => `${s.space_name.replace(/_space$/, '')}=${mb(s.space_used_size)}`)
+        .join(' ');
+      // Handle count catches interval/timer leaks (each leaked setInterval is a handle).
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const handles = (process as any)._getActiveHandles?.()?.length ?? -1;
       logger.info(
         'MEMWATCH',
         `diag rss=${mb(mu.rss)}MB heapUsed=${mb(mu.heapUsed)}/${mb(mu.heapTotal)}MB ` +
           `external=${mb(mu.external)}MB arrayBuffers=${mb(mu.arrayBuffers ?? 0)}MB ` +
-          `heapLimit=${mb(hs.heap_size_limit)}MB malloced=${mb(hs.malloced_memory)}MB ` +
-          `uptime=${Math.round(process.uptime() / 60)}m`,
+          `heapLimit=${mb(hs.heap_size_limit)}MB handles=${handles} ` +
+          `spaces[${spaces}] uptime=${Math.round(process.uptime() / 60)}m`,
       );
     }
   }, intervalMs);
