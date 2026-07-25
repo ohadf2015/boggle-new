@@ -1,13 +1,16 @@
 /**
- * Regression: deleteGame() must release per-game bot state.
+ * Regression: deleteGame() must release per-game module state.
  *
- * `gameBots` (botManager) and `botIdCounters` (botCreation) are module-level
- * Maps keyed by gameCode. Eight handler sites paired `cleanupGameBots()` with
- * teardown by hand, but the two *automatic* sweeps that actually run on a
- * long-lived server — cleanupEmptyRooms() and cleanupStaleGames() — called
- * deleteGame() without it. Every abandoned room therefore retained its Bot
- * objects (each holding a word list) forever. Class-3 asymmetric path, see
- * .claude/rules/60-recurring-pitfalls.md.
+ * Several module-level Maps are keyed by gameCode. Handler sites paired their
+ * cleanup with teardown by hand, but the two *automatic* sweeps that actually
+ * run on a long-lived server — cleanupEmptyRooms() and cleanupStaleGames() —
+ * reach deleteGame() directly, so abandoned rooms retained their entries
+ * forever. Class-3 asymmetric path, see .claude/rules/60-recurring-pitfalls.md.
+ *
+ * Bots are released via the gameCleanupEmitter subscription in botManager
+ * (744ce46bf); these cases lock that behaviour against regression.
+ * gameAIValidationCount had no subscriber at all — cleanupGameTracking() was
+ * exported and called from nowhere — so the third case is the one that was red.
  *
  * These tests drive the SWEEP path specifically: a test through a handler
  * would have passed before the fix and proven nothing.

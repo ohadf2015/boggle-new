@@ -62,8 +62,6 @@ import type { HostGameBase, TransferHostResult } from './hostManager';
 
 import { clearEngagementTimeouts } from '../services/gameLifecycle/gameResults';
 import timerManager from '../utils/timerManager';
-import { cleanupGameBots } from './botManager';
-import { cleanupGameTracking } from './communityWordHybridValidation';
 import { clearOpponentWordFeed } from '../utils/opponentWordFeedBatcher';
 import { clearPlayerFoundWords } from '../utils/playerFoundWordBatcher';
 import { MAX_PLAYERS_PER_ROOM } from '../utils/consts';
@@ -237,13 +235,6 @@ function deleteGame(gameCode: string): void {
 
   userManager.cleanupUserMappings(asBase<GameBase>(game), gameCode);
   scoreManager.clearLeaderboardThrottle(gameCode);
-  // Bots + their id counter are module-level Maps keyed by gameCode. Handler
-  // teardown paths call cleanupGameBots() by hand, but the periodic sweeps
-  // (cleanupEmptyRooms / cleanupStaleGames) reach deleteGame() directly — so
-  // every abandoned room used to retain its Bot objects forever. Cleaning here
-  // covers ALL delete paths; the hand-written calls stay harmless (idempotent).
-  cleanupGameBots(gameCode);
-  cleanupGameTracking(gameCode);
   clearOpponentWordFeed(gameCode);
   clearPlayerFoundWords(gameCode);
   // Notify all per-game state holders (rushTiles, roundEvents, earthquake,

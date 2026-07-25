@@ -6,6 +6,7 @@
 import { normalizeWord } from '../dictionary';
 import type { Language } from '@/shared/types';
 import logger from '../utils/logger';
+import { gameCleanupEmitter } from '../events/gameCleanup';
 // Lazy import to break circular dependency with communityWordManager
 let _isWordCommunityValid: ((word: string, lang: string) => boolean) | null = null;
 function getIsWordCommunityValid(): (word: string, lang: string) => boolean {
@@ -79,6 +80,13 @@ export function resetGameAIValidationCount(gameCode: string): void {
 export function cleanupGameTracking(gameCode: string): void {
   gameAIValidationCount.delete(gameCode);
 }
+
+// cleanupGameTracking existed but was called from nowhere, so gameAIValidationCount
+// retained one entry per game forever. deleteGame emits gameEnd on every deletion
+// path, so subscribing here releases it regardless of how the game ended.
+gameCleanupEmitter.onGameEnd(({ gameCode }) => {
+  cleanupGameTracking(gameCode);
+});
 
 /**
  * Record that an AI validation was used for a game
