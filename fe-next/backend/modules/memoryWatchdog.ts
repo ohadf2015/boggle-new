@@ -19,6 +19,7 @@
  * too chatty/quiet.
  */
 import fs from 'fs';
+import v8 from 'v8';
 import logger from '../utils/logger';
 import { sendOpsAlert } from './notificationService';
 
@@ -143,15 +144,33 @@ export function startMemoryWatchdog(
   const limitBytes = opts.limitBytes ?? getContainerMemoryLimitBytes();
   const send = opts.send ?? sendOpsAlert;
   let state: MemWatchState = { band: 'ok', lastAlertAt: 0 };
+  let samples = 0;
 
   logger.info('MEMWATCH', `Memory watchdog started: limit ${Math.round(limitBytes / 1024 / 1024)}MB, every ${intervalMs}ms`);
 
   timer = setInterval(() => {
-    const rss = process.memoryUsage().rss;
-    const decision = evaluateMemoryAlert(state, rss, limitBytes, Date.now());
+    const mu = process.memoryUsage();
+    const decision = evaluateMemoryAlert(state, mu.rss, limitBytes, Date.now());
     state = decision.next;
     if (decision.alert && decision.level) {
-      void send(formatAlert(decision.level, rss, limitBytes));
+      void send(formatAlert(decision.level, mu.rss, limitBytes));
+    }
+
+    // Leak forensics: full memory breakdown every ~5 min (10 × 30s samples).
+    // rss vs heapUsed vs external/arrayBuffers tells us whether growth lives in
+    // the V8 heap (object retention) or outside it (buffers/native/TLS/zlib) —
+    // the two classes need completely different fixes.
+    samples += 1;
+    if (samples % 10 === 0) {
+      const hs = v8.getHeapStatistics();
+      const mb = (n: number) => Math.round(n / 1024 / 1024);
+      logger.info(
+        'MEMWATCH',
+        `diag rss=${mb(mu.rss)}MB heapUsed=${mb(mu.heapUsed)}/${mb(mu.heapTotal)}MB ` +
+          `external=${mb(mu.external)}MB arrayBuffers=${mb(mu.arrayBuffers ?? 0)}MB ` +
+          `heapLimit=${mb(hs.heap_size_limit)}MB malloced=${mb(hs.malloced_memory)}MB ` +
+          `uptime=${Math.round(process.uptime() / 60)}m`,
+      );
     }
   }, intervalMs);
   if (timer.unref) timer.unref(); // never keep the process alive for the watchdog
