@@ -70,6 +70,18 @@ export function startGameTimer(
 
   // Create interval for time updates
   const timerId = setInterval(() => {
+    // Phantom-tick guard: if the game was deleted (cleanup path, host-left,
+    // abandonment sweep) while this interval was still registered, the tick
+    // would otherwise keep firing against a dead game until the original
+    // endTimestamp — broadcasting to an empty room and eventually calling
+    // endGame on a non-existent game. Kill ourselves immediately; deleteGame
+    // also clears this timer, this is the belt-and-braces half.
+    if (!getGame(gameCode)) {
+      clearGameTimer(gameCode);
+      logger.warn('TIMER', `${gameCode}: tick fired for deleted game — interval self-cleared`);
+      return;
+    }
+
     // Calculate remaining time based on actual elapsed time (prevents drift)
     const now = Date.now();
     const remainingMs = Math.max(0, endTimestamp - now);

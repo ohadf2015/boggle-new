@@ -212,6 +212,12 @@ function deleteGame(gameCode: string): void {
   const game = games[gameCode];
   if (!game) return;
 
+  // Kill the per-second game tick interval FIRST. Without this, a game
+  // deleted mid-round (cleanup sweep, host-left, abandonment) leaves its
+  // interval registered until the original endTimestamp — each tick retains
+  // the closure (io, game ref) and ends by calling endGame() on a dead game.
+  // Leaked per-second intervals are a prime suspect in the OOM sawtooth.
+  timerManager.clearTimer(`game:${gameCode}`);
   timerManager.clearTimer(`hostReconnect:${gameCode}`);
   if (game.validationTimeout) clearTimeout(game.validationTimeout);
   clearPersistTimer(gameCode);
