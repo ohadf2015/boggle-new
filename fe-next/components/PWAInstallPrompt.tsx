@@ -91,18 +91,21 @@ export function PWAInstallPrompt() {
       }
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Also listen for app installed event
-    window.addEventListener('appinstalled', () => {
+    // Named, not inline — an inline arrow can't be removed on cleanup, so it
+    // accumulated one window listener per mount.
+    const handleAppInstalled = () => {
       setShowPrompt(false);
       setDeferredPrompt(null);
       // Track PWA installation in GA4
       gameEvents.pwaInstalled();
-    });
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, []);
 
