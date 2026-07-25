@@ -102,6 +102,38 @@ Tests: `components/animations/__tests__/SharedFxMount.test.tsx` — 11 passing (
 Verification: lint 0, `tsc --noEmit` clean on touched files, 186/186 tests green
 across `components/animations`, `lib/pixiFx`, `lib/perf`, and the device hooks.
 
+### 3.3 12 root-mounted components each shipped their own chunk — `app/essential-providers.tsx`
+
+Twelve components render **unconditionally** at app root, and each was a separate
+`dynamic()` call, so each produced its own chunk fetched on every route:
+`AnchoredNativeBanner`, `BannerCoordinatorMount`, `WebAnchorAdObserver`,
+`SignupPromptHost`, `PlayerStyleOnboardingWrapper`, `AgeGatePromptWrapper`,
+`UnlockNotifierMount`, `GlobalCoinEarnFx`, `SharedFxMount`, `NativeSelectionGuard`,
+`EasterEggListener`, `HiddenAchievementListener`.
+
+Splitting buys no deferral when a component always mounts — it only multiplies
+request count and module-registry work, and the registry already costs 1113 ms at
+6× throttle (§2). They now share `webpackChunkName: "app-root-mounts"`. This changes
+nothing about *what* loads, only how many round trips it takes.
+
+**Measured from the build manifest** (`.next-perf/react-loadable-manifest.json`):
+`app-root-mounts.<hash>.js` is emitted and all 12 modules resolve to it, so Next's
+`dynamic()` transform does honour the magic comment.
+
+Be honest about the size of the win: it is **12 own-chunks → 1**, plus 7 shared
+dependency chunks that those modules pulled in already and that grouping does not
+touch. Distinct chunk files across all 12 modules is now 8. Useful, not dramatic.
+
+`Season*` are deliberately **excluded** — they are gated behind `HomeOnlySeasonGate`,
+and sharing the chunk name would force their bytes onto every route. Do not add a
+conditionally-rendered component to this group.
+
+Verification: lint 0, `app/__tests__/essential-providers-crazygames.test.tsx` 4/4,
+production build green (BUILD_ID written).
+
+This is the first, smallest slice of §5.1. The remaining 119 `next/dynamic` call
+sites are untouched.
+
 ---
 
 ## 4. Hypotheses that were tested and rejected

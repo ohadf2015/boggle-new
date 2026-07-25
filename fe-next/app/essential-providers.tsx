@@ -49,13 +49,25 @@ import { HomeOnlySeasonGate } from '@/components/seasons/HomeOnlySeasonGate';
 // visible UI at first paint, so ssr:false is flash-free. Visible cosy surfaces
 // (CosyAmbientBackdrop, QuietCelebrationLayer) are intentionally NOT deferred —
 // ssr:false on those would flash (see .claude/rules Class-5 mobile-web flash).
-const AnchoredNativeBanner = dynamic(() => import('@/components/ads/AnchoredNativeBanner'), { ssr: false });
-const BannerCoordinatorMount = dynamic(() => import('@/components/ads/BannerCoordinatorMount'), { ssr: false });
-const WebAnchorAdObserver = dynamic(() => import('@/components/ads/WebAnchorAdObserver'), { ssr: false });
-const SignupPromptHost = dynamic(() => import('@/components/auth/SignupPromptHost').then(m => m.SignupPromptHost), { ssr: false });
-const PlayerStyleOnboardingWrapper = dynamic(() => import('./components/PlayerStyleOnboardingWrapper'), { ssr: false });
-const AgeGatePromptWrapper = dynamic(() => import('./components/AgeGatePromptWrapper'), { ssr: false });
-const UnlockNotifierMount = dynamic(() => import('@/components/cosmetics/UnlockNotifierMount').then(m => m.UnlockNotifierMount), { ssr: false });
+//
+// They all share the `app-root-mounts` webpackChunkName ON PURPOSE. Each of these
+// renders UNCONDITIONALLY at app root, so every one of their chunks was fetched on
+// every route anyway — 12 separate requests, 12 module registrations, for code that
+// always loads. Splitting buys no deferral there, it only multiplies request count,
+// and a 6x-throttled load measured 113 script requests with 1113ms spent purely in
+// webpack's module registry (see docs/2026-07-25-low-end-device-performance-audit.md).
+// Grouping changes nothing about WHAT loads — only how many round trips it takes.
+//
+// Do NOT add a conditionally-rendered component to this group: sharing the name
+// would force its bytes onto every route. Season* below stay separate for exactly
+// that reason (they are gated behind HomeOnlySeasonGate).
+const AnchoredNativeBanner = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/ads/AnchoredNativeBanner'), { ssr: false });
+const BannerCoordinatorMount = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/ads/BannerCoordinatorMount'), { ssr: false });
+const WebAnchorAdObserver = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/ads/WebAnchorAdObserver'), { ssr: false });
+const SignupPromptHost = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/auth/SignupPromptHost').then(m => m.SignupPromptHost), { ssr: false });
+const PlayerStyleOnboardingWrapper = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ './components/PlayerStyleOnboardingWrapper'), { ssr: false });
+const AgeGatePromptWrapper = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ './components/AgeGatePromptWrapper'), { ssr: false });
+const UnlockNotifierMount = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/cosmetics/UnlockNotifierMount').then(m => m.UnlockNotifierMount), { ssr: false });
 import { initUtmCapture } from '@/utils/utmCapture';
 import { initConsoleOverride, initCapacitorLogFilter } from '@/utils/consoleOverride';
 import { initSessionTracking } from '@/utils/sessionTracking';
@@ -69,11 +81,11 @@ import { PostHogProvider } from '@/components/providers/PostHogProvider';
 import QuietCelebrationLayer from '@/components/cosy/QuietCelebrationLayer';
 import CosyAmbientBackdrop from '@/components/cosy/CosyAmbientBackdrop';
 
-const GlobalCoinEarnFx = dynamic(() => import('@/components/animations/GlobalCoinEarnFx'), { ssr: false });
-const SharedFxMount = dynamic(() => import('@/components/animations/SharedFxMount'), { ssr: false });
-const NativeSelectionGuard = dynamic(() => import('@/components/native/NativeSelectionGuard'), { ssr: false });
-const EasterEggListener = dynamic(() => import('@/components/EasterEggListener'), { ssr: false });
-const HiddenAchievementListener = dynamic(() => import('@/components/achievements/HiddenAchievementListener'), { ssr: false });
+const GlobalCoinEarnFx = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/animations/GlobalCoinEarnFx'), { ssr: false });
+const SharedFxMount = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/animations/SharedFxMount'), { ssr: false });
+const NativeSelectionGuard = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/native/NativeSelectionGuard'), { ssr: false });
+const EasterEggListener = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/EasterEggListener'), { ssr: false });
+const HiddenAchievementListener = dynamic(() => import(/* webpackChunkName: "app-root-mounts" */ '@/components/achievements/HiddenAchievementListener'), { ssr: false });
 
 
 import type { TranslationData } from '@/translations/loadTranslation';
