@@ -33,6 +33,8 @@ import MpBragCard from '@/components/results/MpBragCard';
 import { deriveBragCardData, deriveBragShareText } from '@/lib/results/bragCard';
 import { getBragShareUrl, trackShareCompleted } from '@/utils/share';
 import GameFeedback from '@/components/feedback/GameFeedback';
+import InlineSignupCard from '@/components/auth/InlineSignupCard';
+import { useIsGuest } from '@/hooks/useIsGuest';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { useExperiment } from '@/hooks/useExperiment';
 
@@ -168,6 +170,10 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
   const [showDetails, setShowDetails] = useState(false);
+
+  // Resolution-aware: `isAuthenticated` alone would flash the guest layout at a
+  // logged-in player on first paint (rules/60 Class 1).
+  const isGuest = useIsGuest(isAuthenticated);
 
   // Derived data
   const winnerScore = sortedScores[0]?.score ?? 0;
@@ -390,8 +396,9 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           </div>
         )}
 
-      {/* exp-mp-round-feedback-top-v1: top-prompt shows feedback above the fold */}
-      {feedbackPosition === 'top-prompt' && (
+      {/* exp-mp-round-feedback-top-v1: top-prompt shows feedback above the fold.
+          Guests skip it — their one ask on this screen is the signup CTA. */}
+      {feedbackPosition === 'top-prompt' && !isGuest && (
         <GameFeedback
           surface="mp_round"
           eligible={
@@ -490,6 +497,11 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         <HighlightsBar stats={highlightStats} />
       )}
 
+      {/* ── 3b. GUESTS STOP HERE — no XP, level, rank tier or history exists for
+          them, so the recap below is empty or meaningless. One signup CTA takes
+          the place of the whole secondary stack. */}
+      {isGuest && <InlineSignupCard isAuthenticated={isAuthenticated} />}
+
       {/* ── 4. WHAT YOU EARNED — XP / level / streak. ImprovementPanel renders
           nothing for guests w/ no progress. Coins no longer get their own
           near-empty full-width card here — they fold into the HighlightsBar
@@ -553,7 +565,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           (multiplayer + room + not the series finale); the shared throttle in
           useGameFeedback keeps it to ~once every few days. top-prompt variant
           renders above the fold instead (see top of return). */}
-      {feedbackPosition !== 'top-prompt' && (
+      {feedbackPosition !== 'top-prompt' && !isGuest && (
         <GameFeedback
           surface="mp_round"
           eligible={
@@ -585,7 +597,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       )}
 
       {/* 6. DETAILS (collapsed by default — hidden on mobile where details are already inline) */}
-      {currentPlayerData && !hideDetailsToggle && (
+      {currentPlayerData && !hideDetailsToggle && !isGuest && (
         <div>
           <button
             type="button"

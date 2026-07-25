@@ -9,9 +9,8 @@ import { render, screen } from '@testing-library/react';
 vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({ t: (k: string) => k, locale: 'en' }),
 }));
-vi.mock('@/contexts/AuthContext', () => ({
-  useAuth: () => ({ user: null, profile: null, isAuthenticated: false }),
-}));
+const auth = vi.hoisted(() => ({ current: { user: null, profile: null, isAuthenticated: false, loading: false } }));
+vi.mock('@/contexts/AuthContext', () => ({ useAuth: () => auth.current }));
 vi.mock('framer-motion', () => ({
   m: { div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div> },
   m: { div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div> },
@@ -34,6 +33,7 @@ vi.mock('../results', () => ({
 vi.mock('../TabbedDailyLeaderboard', () => ({ default: function MockLeaderboard() { return <div data-testid="leaderboard" />; } }));
 vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({ default: function MockInlineSignup() { return <div data-testid="inline-signup" />; } }));
 vi.mock('../WatchAdButton', () => ({ default: function MockWatchAdButton() { return <div data-testid="watch-ad" />; } }));
+vi.mock('@/components/ads/WatchAdForRevealButton', () => ({ default: function MockWatchAdForReveal() { return <div data-testid="watch-ad-reveal" />; } }));
 
 import { WordHuntResultsContent, type WordHuntResultsContentProps } from '../WordHuntResultsContent';
 
@@ -89,7 +89,9 @@ const baseProps: WordHuntResultsContentProps = {
     revealCost: 25,
     handleRevealTargetWord: vi.fn(),
   },
-  isAuthenticated: false,
+  // Full recap is the registered-player screen; guests get the simplified
+  // branch asserted in the "guest simplification" describe below.
+  isAuthenticated: true,
   inlineSignupDismissed: false,
   onInlineSignupDismiss: vi.fn(),
   leaderboardKey: 0,
@@ -127,6 +129,52 @@ describe('WordHuntResultsContent', () => {
   it('renders inline signup for guests when not dismissed', () => {
     render(<WordHuntResultsContent {...baseProps} isAuthenticated={false} inlineSignupDismissed={false} />);
     expect(screen.getByTestId('inline-signup')).toBeInTheDocument();
+  });
+
+  describe('guest simplification', () => {
+    const guestProps = { ...baseProps, isAuthenticated: false, inlineSignupDismissed: false };
+
+    it('keeps only score, leaderboard and the signup CTA', () => {
+      render(<WordHuntResultsContent {...guestProps} />);
+      expect(screen.getByTestId('result-display')).toBeInTheDocument();
+      expect(screen.getByTestId('leaderboard')).toBeInTheDocument();
+      expect(screen.getByTestId('inline-signup')).toBeInTheDocument();
+    });
+
+    it('drops the account-only recap sections', () => {
+      render(<WordHuntResultsContent {...guestProps} />);
+      expect(screen.queryByTestId('more-options')).toBeNull();
+      expect(screen.queryByTestId('past-performance-compare')).toBeNull();
+      expect(screen.queryByTestId('performance-section')).toBeNull();
+      expect(screen.queryByTestId('facts')).toBeNull();
+      expect(screen.queryByTestId('share-section')).toBeNull();
+    });
+
+    it('still shows the answer path on a failed puzzle', () => {
+      render(
+        <WordHuntResultsContent
+          {...guestProps}
+          result={{ ...guestProps.result, solved: false }}
+        />,
+      );
+      expect(screen.getByTestId('coin-unlock')).toBeInTheDocument();
+    });
+
+    it('does not flash the simplified screen while auth is still resolving', () => {
+      auth.current = { ...auth.current, loading: true };
+      try {
+        // A logged-in player's first paint has isAuthenticated=false.
+        render(<WordHuntResultsContent {...guestProps} />);
+        expect(screen.getByTestId('more-options')).toBeInTheDocument();
+      } finally {
+        auth.current = { ...auth.current, loading: false };
+      }
+    });
+
+    it('falls back to the full recap once the guest dismisses the CTA', () => {
+      render(<WordHuntResultsContent {...guestProps} inlineSignupDismissed />);
+      expect(screen.getByTestId('more-options')).toBeInTheDocument();
+    });
   });
 
   describe('back-to-daily CTA (both challenges complete)', () => {

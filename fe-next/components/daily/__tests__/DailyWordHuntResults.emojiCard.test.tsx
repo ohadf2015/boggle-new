@@ -33,7 +33,7 @@ vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     user: null,
     profile: null,
-    isAuthenticated: false,
+    isAuthenticated: true,
   }),
 }));
 

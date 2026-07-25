@@ -14,6 +14,7 @@ import { m } from 'framer-motion';
 import { Eye, CircleDot, ArrowRight, CheckCircle2, Home, BookOpen } from 'lucide-react';
 import Link from 'next/link';
 import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
+import { useIsGuest } from '@/hooks/useIsGuest';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyInsightStack from './DailyInsightStack';
 import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
@@ -138,6 +139,10 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   // challenger sent — efficiencyScore — so the verdict is honest.
   const rival = useDailyRivalCompare(puzzleNumber);
 
+  // Resolution-aware: gating on the `isAuthenticated` prop alone would flash the
+  // simplified screen at a logged-in player on first paint (rules/60 Class 1).
+  const isGuest = useIsGuest(isAuthenticated);
+
   // Word Wheel completion gate: localStorage-first (no first-paint flash) then
   // server-of-record cross-device check — so a player who finished the wheel on
   // another device sees "Back to Daily Hub", not a nag to replay it.
@@ -168,8 +173,11 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   const { variant: crossPromoOrder, trackExposure: trackCrossPromoExposure } =
     useExperiment('wordhunt-crosspromo-position');
   useEffect(() => {
+    // Guests never see either cross-promo placement (simplified screen), so
+    // counting them as exposed would dilute the experiment with a no-op arm.
+    if (isGuest) return;
     trackCrossPromoExposure();
-  }, [trackCrossPromoExposure]);
+  }, [trackCrossPromoExposure, isGuest]);
 
   // A/B: hide the dead "Tap a player to see their path" hint that causes rage clicks.
   const { variant: hintVariant, trackExposure: trackHintExposure } =
@@ -269,9 +277,78 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     </m.div>
   );
 
-  return (
-  <div className="space-y-4">
-    {/* Hero Result Display */}
+  /* The three blocks a guest keeps. Hoisted so the guest branch below reuses
+     them verbatim instead of a second copy that can drift.
+
+     failStateNode = reveal target word + watch ad. Guests keep it — the answer
+     is what they came back for. */
+  const failStateNode = !result.solved ? (
+      <div className="space-y-3">
+        {/* Reveal target word */}
+        {coinActions.targetWordRevealed ? (
+          <div className="py-3 px-4 bg-neo-navy-light/50 rounded-neo border-2 border-slate-700/50 text-center space-y-2">
+            <div className="text-xs text-slate-400">{t('wordHunt.results.theTargetWordWas')}</div>
+            <div className="text-2xl font-black text-neo-lime tracking-wider">
+              {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
+            </div>
+            {result.meaning && (
+              <div className="mt-2 flex items-start gap-2.5 rounded-neo border-neo-thick border-black bg-neo-cyan/15 px-3 py-2.5 shadow-hard text-start">
+                <BookOpen className="w-4 h-4 text-neo-cyan shrink-0 mt-0.5" aria-hidden="true" />
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[10px] font-black uppercase tracking-wider text-neo-cyan">
+                    {t('wordHunt.results.meaning')}
+                  </span>
+                  <span className="text-sm font-bold text-neo-cream leading-snug">
+                    {result.meaning}
+                  </span>
+                  {/* CC BY-SA attribution: meanings are dictionary-sourced from Wiktionary (all langs) */}
+                  <span className="text-[10px] text-slate-400 mt-0.5">
+                    {t('wordHunt.results.meaningSource')}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="max-w-btn space-y-2">
+            <CoinUnlockCard
+              icon={<Eye className="w-5 h-5 text-white" />}
+              title={t('wordHunt.results.revealTargetWord')}
+              subtitle={t('wordHunt.results.seeTheAnswer')}
+              cost={coinActions.revealCost}
+              currentCoins={coinActions.currentCoins}
+              gradientFrom="from-neo-pink"
+              gradientTo="to-neo-pink"
+              onClick={coinActions.handleRevealTargetWord}
+              onSpendStart={(pos) => onSpendStart(pos, coinActions.revealCost)}
+              t={t}
+            />
+            {/* Paywall-softener: free reveal via rewarded ad when coin-poor */}
+            {!coinActions.canAffordReveal && (
+              <WatchAdForRevealButton
+                onReveal={coinActions.handleRevealTargetWordViaAd}
+                revealed={coinActions.targetWordRevealed}
+                placement="reveal_target_word"
+              />
+            )}
+          </div>
+        )}
+
+        {/* Watch Ad for Coins */}
+        {!coinActions.canAffordRetry && (
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <div className="flex-1 h-px bg-neo-navy-elevated" />
+              <span>{t('wordHunt.ad.needMoreCoins')}</span>
+              <div className="flex-1 h-px bg-neo-navy-elevated" />
+            </div>
+            <WatchAdButton onCoinsEarned={() => {}} t={t} language={language} surface="word_hunt_results" />
+          </div>
+        )}
+      </div>
+  ) : null;
+
+  const heroNode = (
     <ResultDisplay
       solved={result.solved}
       attemptsUsed={result.attemptsUsed}
@@ -286,6 +363,54 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       meaning={result.meaning}
       t={t}
     />
+  );
+
+  const leaderboardNode = (
+    <>
+      {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
+      <div onClick={() => trackGrowthEvent('wordhunt_leaderboard_tap', { language, solved: result.solved })}>
+        <TabbedDailyLeaderboard
+          key={leaderboardKey}
+          puzzleDate={puzzleDate}
+          language={language}
+          currentPlayerId={isAuthenticated && profile ? profile.id : null}
+          currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+          maxVisible={3}
+          compact
+          t={t}
+          defaultTab="today"
+          scope="word-hunt"
+          myHuntWordsDiscovered={result.wordsDiscovered?.map(w => w.word)}
+        />
+      </div>
+    </>
+  );
+
+  const signupNode = !isAuthenticated && !inlineSignupDismissed ? (
+    <DailyChallengeInlineSignup
+      pendingResult={{ result, puzzleNumber, puzzleDate, language }}
+      onDismiss={onInlineSignupDismiss}
+    />
+  ) : null;
+
+  /* An unregistered player has no streak, no coin balance, no past plays and no
+     stats row — the full recap is mostly empty cards plus promos. Show the
+     score, the answer, where they placed, and the one thing we want from them.
+     Dismissing the CTA falls through to the full recap (no dead end). */
+  if (isGuest && !inlineSignupDismissed) {
+    return (
+      <div className="space-y-4">
+        {heroNode}
+        {failStateNode}
+        {leaderboardNode}
+        {signupNode}
+      </div>
+    );
+  }
+
+  return (
+  <div className="space-y-4">
+    {heroNode}
 
     {/* Vs your own past plays — placement/score is above, this is the
         "how do I compare to how I usually do" the player cares about next.
@@ -378,22 +503,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     {/* Leaderboard — who else played, and how you stack up. Sits with
         rank/placement/vs-past so the "what matters" cluster (score,
         placement, vs others, vs your past) is together before promo/CTA noise. */}
-    {(result.wordsDiscovered?.length ?? 0) > 0 && hintVariant !== 'hide-hint' && <p className="text-xs text-neo-white text-center font-medium -mb-1">{t('wordHunt.results.tapPlayerHint', 'Tap a player to see their path')}</p>}
-    <div onClick={() => trackGrowthEvent('wordhunt_leaderboard_tap', { language, solved: result.solved })}>
-    <TabbedDailyLeaderboard
-      key={leaderboardKey}
-      puzzleDate={puzzleDate}
-      language={language}
-      currentPlayerId={isAuthenticated && profile ? profile.id : null}
-      currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-      maxVisible={3}
-      compact
-      t={t}
-      defaultTab="today"
-      scope="word-hunt"
-      myHuntWordsDiscovered={result.wordsDiscovered?.map(w => w.word)}
-    />
-    </div>
+    {leaderboardNode}
 
     {/* SECONDARY CROSS-PROMO (variant): Word Wheel CTA below leaderboard. */}
     {crossPromoOrder === 'leaderboard-first' && wheelCtaNode}
@@ -445,72 +555,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     {/* Catch up dailies missed in the last 3 days — nudge after finishing one. */}
     <CatchUpSuggestion excludeDate={puzzleDate} />
 
-    {/* FAIL state: Reveal target word + watch ad */}
-    {!result.solved && (
-      <div className="space-y-3">
-        {/* Reveal target word */}
-        {coinActions.targetWordRevealed ? (
-          <div className="py-3 px-4 bg-neo-navy-light/50 rounded-neo border-2 border-slate-700/50 text-center space-y-2">
-            <div className="text-xs text-slate-400">{t('wordHunt.results.theTargetWordWas')}</div>
-            <div className="text-2xl font-black text-neo-lime tracking-wider">
-              {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
-            </div>
-            {result.meaning && (
-              <div className="mt-2 flex items-start gap-2.5 rounded-neo border-neo-thick border-black bg-neo-cyan/15 px-3 py-2.5 shadow-hard text-start">
-                <BookOpen className="w-4 h-4 text-neo-cyan shrink-0 mt-0.5" aria-hidden="true" />
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-[10px] font-black uppercase tracking-wider text-neo-cyan">
-                    {t('wordHunt.results.meaning')}
-                  </span>
-                  <span className="text-sm font-bold text-neo-cream leading-snug">
-                    {result.meaning}
-                  </span>
-                  {/* CC BY-SA attribution: meanings are dictionary-sourced from Wiktionary (all langs) */}
-                  <span className="text-[10px] text-slate-400 mt-0.5">
-                    {t('wordHunt.results.meaningSource')}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="max-w-btn space-y-2">
-            <CoinUnlockCard
-              icon={<Eye className="w-5 h-5 text-white" />}
-              title={t('wordHunt.results.revealTargetWord')}
-              subtitle={t('wordHunt.results.seeTheAnswer')}
-              cost={coinActions.revealCost}
-              currentCoins={coinActions.currentCoins}
-              gradientFrom="from-neo-pink"
-              gradientTo="to-neo-pink"
-              onClick={coinActions.handleRevealTargetWord}
-              onSpendStart={(pos) => onSpendStart(pos, coinActions.revealCost)}
-              t={t}
-            />
-            {/* Paywall-softener: free reveal via rewarded ad when coin-poor */}
-            {!coinActions.canAffordReveal && (
-              <WatchAdForRevealButton
-                onReveal={coinActions.handleRevealTargetWordViaAd}
-                revealed={coinActions.targetWordRevealed}
-                placement="reveal_target_word"
-              />
-            )}
-          </div>
-        )}
-
-        {/* Watch Ad for Coins */}
-        {!coinActions.canAffordRetry && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-xs text-slate-500">
-              <div className="flex-1 h-px bg-neo-navy-elevated" />
-              <span>{t('wordHunt.ad.needMoreCoins')}</span>
-              <div className="flex-1 h-px bg-neo-navy-elevated" />
-            </div>
-            <WatchAdButton onCoinsEarned={() => {}} t={t} language={language} surface="word_hunt_results" />
-          </div>
-        )}
-      </div>
-    )}
+    {failStateNode}
 
     {/* Share/Retry Section */}
     <m.div
@@ -539,13 +584,9 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       />
     </m.div>
 
-    {/* Inline signup for guests */}
-    {!isAuthenticated && !inlineSignupDismissed && (
-      <DailyChallengeInlineSignup
-        pendingResult={{ result, puzzleNumber, puzzleDate, language }}
-        onDismiss={onInlineSignupDismiss}
-      />
-    )}
+    {/* Inline signup for guests (only reachable here while auth is still
+        resolving — a resolved guest gets the simplified branch above). */}
+    {signupNode}
 
     {/* Daily complete badge — shown once both games done */}
     {wordWheelPlayed && (

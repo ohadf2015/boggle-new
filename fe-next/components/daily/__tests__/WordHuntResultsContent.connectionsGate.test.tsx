@@ -87,7 +87,7 @@ const baseProps: WordHuntResultsContentProps = {
     retryCost: 50, currentCoins: 100, targetWordRevealed: false, revealCost: 25,
     handleRevealTargetWord: vi.fn(), handleRevealTargetWordViaAd: vi.fn(),
   },
-  isAuthenticated: false,
+  isAuthenticated: true,
   inlineSignupDismissed: true,
   onInlineSignupDismiss: vi.fn(),
   leaderboardKey: 0,

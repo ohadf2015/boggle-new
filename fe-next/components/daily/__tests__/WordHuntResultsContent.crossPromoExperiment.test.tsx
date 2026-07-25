@@ -132,7 +132,7 @@ const baseProps: WordHuntResultsContentProps = {
     handleRevealTargetWord: vi.fn(),
     handleRevealTargetWordViaAd: vi.fn(),
   },
-  isAuthenticated: false,
+  isAuthenticated: true,
   inlineSignupDismissed: false,
   onInlineSignupDismiss: vi.fn(),
   leaderboardKey: 0,

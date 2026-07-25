@@ -26,6 +26,7 @@ import { useResultsSideEffects } from '@/hooks/useResultsSideEffects';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useIsDesktop } from '@/hooks/useMediaQuery';
 import { useMultiplayerSignupNudge } from '@/hooks/useMultiplayerSignupNudge';
+import { useIsGuest } from '@/hooks/useIsGuest';
 import { ResultsParallaxBackdrop, ResultsSectionReveal, ResultsScrollProgressRail, ResultsHeroTilt } from '@/components/results/ResultsScrollEffects';
 import { FloatingReaction } from '@/components/game/QuickReactions';
 import { useQuickReactions } from '@/hooks/useQuickReactions';
@@ -123,6 +124,8 @@ function DesktopResultsLayout({
 }: DesktopResultsLayoutProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+  // Resolution-aware guest check — see hooks/useIsGuest (rules/60 Class 1).
+  const isGuest = useIsGuest(mainContentProps.isAuthenticated);
 
   useEffect(() => {
     const el = scrollRef.current;
@@ -223,29 +226,36 @@ function DesktopResultsLayout({
                 this layout's two-column grid. No secondary card needed. */}
             {/* Add-friend affordance now lives inline on each player tile (Podium + ConsolationRows). */}
             {/* D1 retention CTA — outcome-aware Daily Challenge invite. Renders on CG too
-                (PostGameEngagement self-hides on CG; this one stays). */}
-            <ResultsSectionReveal index={4}>
-              <DailyChallengeInvite
-                isWinner={isCurrentUserWinner}
-                placement={currentPlayerRank}
-                totalPlayers={sortedScores.length}
-                marginToNext={marginToNext}
-              />
-            </ResultsSectionReveal>
+                (PostGameEngagement self-hides on CG; this one stays).
+                Guests skip it: their one CTA is the signup card in the recap,
+                and a second "play this instead" competes with it. */}
+            {!isGuest && (
+              <ResultsSectionReveal index={4}>
+                <DailyChallengeInvite
+                  isWinner={isCurrentUserWinner}
+                  placement={currentPlayerRank}
+                  totalPlayers={sortedScores.length}
+                  marginToNext={marginToNext}
+                />
+              </ResultsSectionReveal>
+            )}
             <ResultsSectionReveal index={6}>
               <PostGameEngagement />
             </ResultsSectionReveal>
-            {postGameWordReview && (
+            {postGameWordReview && !isGuest && (
               <ResultsSectionReveal index={8}>
                 {postGameWordReview}
               </ResultsSectionReveal>
             )}
           </div>
 
-          {/* RIGHT: Other players expanded + achievements */}
-          <ResultsSectionReveal index={3} className="space-y-4">
-            <ResultsDetailsContent {...detailsContentProps} />
-          </ResultsSectionReveal>
+          {/* RIGHT: Other players expanded + achievements (registered players only —
+              a guest's screen stops at their own result + standings). */}
+          {!isGuest && (
+            <ResultsSectionReveal index={3} className="space-y-4">
+              <ResultsDetailsContent {...detailsContentProps} />
+            </ResultsSectionReveal>
+          )}
         </div>
 
         {/* Post-game banner ad — CrazyGamesBanner covers the web iframe surface;
@@ -287,6 +297,8 @@ function DesktopResultsLayout({
 const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onReturnToRoom, onExitToLobby, username, socket, achievements, duplicateRuleDisabled, isHost = false, roomLanguage = 'en', gridSize = 4, gameDuration = 180, seriesStandings, seriesRoundNumber, seriesTotalGames, seriesLeader, onResetSeries, wordHuntSummary }) => {
   const { t, language } = useLanguage();
   const { isAuthenticated, user } = useAuth();
+  // Resolution-aware guest check — see hooks/useIsGuest (rules/60 Class 1).
+  const isGuest = useIsGuest(isAuthenticated);
   const setIsInGame = useHideNavigation();
 
   // Hide global bottom nav on mobile while viewing results
@@ -1165,15 +1177,18 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 </div>
               </ResultsSectionReveal>
             ) : null}
-            {/* D1 retention CTA — Daily Challenge invite */}
-            <ResultsSectionReveal index={2}>
-              <DailyChallengeInvite
-                isWinner={isCurrentUserWinner}
-                placement={currentPlayerRank}
-                totalPlayers={sortedScores.length}
-                marginToNext={marginToNext}
-              />
-            </ResultsSectionReveal>
+            {/* D1 retention CTA — Daily Challenge invite. Guests skip it; the
+                signup card in the recap is their single CTA. */}
+            {!isGuest && (
+              <ResultsSectionReveal index={2}>
+                <DailyChallengeInvite
+                  isWinner={isCurrentUserWinner}
+                  placement={currentPlayerRank}
+                  totalPlayers={sortedScores.length}
+                  marginToNext={marginToNext}
+                />
+              </ResultsSectionReveal>
+            )}
             {/* Post-game banner ad — CrazyGamesBanner covers the web iframe surface;
                 ResultsBannerSlot serves AdMob inside the native app (where
                 /multiplayer is in GAME_ROUTES so AnchoredNativeBanner stays hidden). */}
@@ -1181,11 +1196,15 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               <CrazyGamesBanner size="320x50" />
             </ResultsSectionReveal>
             <ResultsBannerSlot placement="multiplayer-round-complete" />
-            {/* Other players' details (inline, no tab switch needed) */}
-            <ResultsSectionReveal index={4}>
-              {renderDetailsTab()}
-            </ResultsSectionReveal>
-            {postGameWordReviewNode && (
+            {/* Other players' details (inline, no tab switch needed) —
+                registered players only; a guest's screen stops at their own
+                result + standings. */}
+            {!isGuest && (
+              <ResultsSectionReveal index={4}>
+                {renderDetailsTab()}
+              </ResultsSectionReveal>
+            )}
+            {postGameWordReviewNode && !isGuest && (
               <ResultsSectionReveal index={5}>
                 {postGameWordReviewNode}
               </ResultsSectionReveal>

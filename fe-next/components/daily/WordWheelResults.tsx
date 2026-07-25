@@ -16,6 +16,7 @@ import { usePracticeFlag } from '@/hooks/usePracticeFlag';
 import PracticeChainCta from '@/components/practice/PracticeChainCta';
 import DailyInsightStack from './DailyInsightStack';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+import { useIsGuest } from '@/hooks/useIsGuest';
 import WordWheelSignupCta from './WordWheelSignupCta';
 import WordWheelReplayCta from './WordWheelReplayCta';
 import CatchUpSuggestion from './CatchUpSuggestion';
@@ -152,6 +153,10 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
   // surfacing the position they can see right beneath the CTA.
   const [currentRank, setCurrentRank] = useState<number | null>(null);
   const [totalPlayers, setTotalPlayers] = useState(0);
+
+  // Resolution-aware: gating on the `isAuthenticated` prop alone would flash the
+  // stripped layout at a logged-in player on first paint (rules/60 Class 1).
+  const isGuest = useIsGuest(isAuthenticated);
 
   // Funnel anchor: fire once on mount so PostHog can measure results-page drop-off
   useEffect(() => {
@@ -384,15 +389,17 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         <span className="text-neo-white/80 text-xs">{t('wordWheel.results.wordsFound')}</span>
       </m.div>
 
-      {/* Daily Insight Cards — personalized analytics on challenge performance */}
-      <m.div
+      {/* Daily Insight Cards — personalized analytics on challenge performance.
+          Guests have no play history to analyse, and their screen is trimmed to
+          score + leaderboard + signup CTA. */}
+      {!isGuest && <m.div
         className="w-full z-10"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.45, type: 'spring', stiffness: 300, damping: 26 }}
       >
         <DailyInsightStack mode="word_wheel" date={puzzleDate} />
-      </m.div>
+      </m.div>}
 
       {/* Returning-player anti-bounce: terminal 'already-played' view gets a
           practice-wheel CTA so an engaged returner has an instant next game
@@ -416,7 +423,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
       )}
 
       {/* Catch-up suggestion: nudge the player to replay other missed dailies */}
-      {!isPractice && (
+      {!isPractice && !isGuest && (
         <m.div
           className="w-full z-10"
           initial={{ opacity: 0, y: 12 }}
@@ -534,7 +541,7 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 
       {/* Multiplayer cross-promo — only once today's daily pair is complete, so it
           never competes with the "finish today's challenge" daily↔daily CTA. */}
-      {!isPractice && hasPlayedWordHunt && (
+      {!isPractice && hasPlayedWordHunt && !isGuest && (
         <m.div
           className="w-full z-10"
           initial={{ opacity: 0, y: 12 }}
@@ -545,8 +552,9 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </m.div>
       )}
 
-      {/* Words found list */}
-      {result.wordsFound.length > 0 && (
+      {/* Words found list — the score + words-found pill above already carry the
+          verdict for a guest; the full chip list is recap. */}
+      {result.wordsFound.length > 0 && !isGuest && (
         <m.div
           className="w-full z-10"
           initial={{ opacity: 0 }}
