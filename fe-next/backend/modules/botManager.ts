@@ -33,6 +33,7 @@ import {
 import { getRecentGames } from '../services/playerGameHistory';
 import { calculatePlayerLevel, selectBotDifficulty } from '../services/adaptiveDifficulty';
 import logger from '../utils/logger';
+import { gameCleanupEmitter } from '../events/gameCleanup';
 
 // Re-export types
 export type { Bot, WordSubmissionData };
@@ -230,6 +231,16 @@ export function cleanupGameBots(gameCode: string): void {
   resetBotIdCounter(gameCode);
   logger.info('BOT', `Cleaned up bots for game ${gameCode}`);
 }
+
+// Games can be deleted WITHOUT a normal endGame (abandonment sweep, empty-room
+// cleanup, host-left pre-start) — deleteGame emits gameEnd on every deletion
+// path, so subscribing here guarantees the bot map entry (and the bots' live
+// scheduling timeouts, which retain their closures) are always released.
+// Handler paths that already call cleanupGameBots explicitly stay correct:
+// cleanup is idempotent.
+gameCleanupEmitter.onGameEnd(({ gameCode }) => {
+  if (gameBots.has(gameCode)) cleanupGameBots(gameCode);
+});
 
 // ==========================================
 // Bot State Management

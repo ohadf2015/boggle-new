@@ -45,7 +45,15 @@ class TimerManager {
   setTimeout(key: string, callback: () => void, delay: number): string {
     this.clearTimer(key); // Clear existing timer if any
 
-    const id = setTimeout(callback, delay);
+    // Self-delete on fire: without this, every naturally-fired timeout leaves
+    // its entry (Timeout handle + callback closure) in the map forever unless
+    // some later code path happens to clearTimer/clearTimersWithPrefix the
+    // key — the dominant old_space growth driver (thousands of rush-tile /
+    // round-event / reconnect / cooldown entries retained per hour).
+    const id = setTimeout(() => {
+      this.timers.delete(key);
+      callback();
+    }, delay);
     this.timers.set(key, {
       type: 'timeout',
       id,

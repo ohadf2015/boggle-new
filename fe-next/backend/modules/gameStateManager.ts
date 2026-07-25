@@ -49,6 +49,7 @@ import * as readyStateManager from './readyStateManager';
 import * as gameQueryManager from './gameQueryManager';
 import * as hostManager from './hostManager';
 import * as metrics from '../utils/metrics';
+import { gameCleanupEmitter } from '../events/gameCleanup';
 
 import type { GameBase, AddUserOptions, AuthContext } from './userManager';
 import type { ScoreGameBase, AddWordOptions, LeaderboardPlayer } from './scoreManager';
@@ -236,6 +237,12 @@ function deleteGame(gameCode: string): void {
   scoreManager.clearLeaderboardThrottle(gameCode);
   clearOpponentWordFeed(gameCode);
   clearPlayerFoundWords(gameCode);
+  // Notify all per-game state holders (rushTiles, roundEvents, earthquake,
+  // hint, wordHunt, bots) so games deleted WITHOUT a normal endGame —
+  // abandonment sweep, empty-room cleanup, host-left pre-start — don't leak
+  // their map entries and pending timers. Idempotent: a game that already
+  // ended normally just re-runs no-op deletes.
+  gameCleanupEmitter.emitGameEnd(gameCode);
   metrics.deleteRoom(gameCode);
   deleteGameFromRedis(gameCode);
   delete games[gameCode];
