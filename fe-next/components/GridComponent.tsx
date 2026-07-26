@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, memo, useMemo, useCallback } from 'react';
 import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';
 import { cn } from '../lib/utils';
 import type { LetterGrid, Language } from '@/types';
@@ -139,16 +139,15 @@ const GridComponent = memo<GridComponentProps>(({
   // the coach would silently never show. GridConnectorOverlay gets away with the
   // ref only because dragging re-renders it anyway.
   const [gridNode, setGridNode] = useState<HTMLDivElement | null>(null);
-  const attachGridRef = useCallback((el: HTMLDivElement | null) => {
-    gridRef.current = el;
-    // Only update state on mount (el !== null). Calling setState with null during
-    // React's deletion-effects phase (safelyDetachRef) enqueues a sync re-render
-    // that re-enters commitDeletionEffectsOnFiber → "Maximum update depth exceeded".
-    // The functional updater bails out (no re-render) when the same node is already
-    // stored, preventing the symmetric loop on mount (commitAttachRef path).
-    if (el !== null) {
-      setGridNode(prev => (prev === el ? prev : el));
-    }
+  // Sync the ref into state via useLayoutEffect instead of a callback ref.
+  // Calling setState inside a callback ref fires during React's commit phase
+  // (safelyAttachRef / commitAttachRef), where any setState enqueues a
+  // synchronous re-render that re-fires the ref → "Maximum update depth".
+  // useLayoutEffect runs after all refs are attached and setState there is
+  // explicitly supported — React flushes it synchronously before paint but
+  // does not loop because the effect deps don't change on subsequent renders.
+  useLayoutEffect(() => {
+    setGridNode(gridRef.current);
   }, []);
 
   const [dragSubmitCount, setDragSubmitCount] = useState(0);
@@ -572,7 +571,7 @@ const GridComponent = memo<GridComponentProps>(({
         }}
       >
         <div
-          ref={attachGridRef}
+          ref={gridRef}
           dir="ltr"
           data-tutorial="grid"
           {...(equippedTileSkin && { 'data-tile-skin': equippedTileSkin.replace('tile-', '') })}
