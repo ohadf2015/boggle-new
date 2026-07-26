@@ -141,11 +141,11 @@ const GridComponent = memo<GridComponentProps>(({
   const [gridNode, setGridNode] = useState<HTMLDivElement | null>(null);
   const attachGridRef = useCallback((el: HTMLDivElement | null) => {
     gridRef.current = el;
-    // Skip the null call on unmount: calling setState during React's deletion
-    // phase (safelyDetachRef → commitDeletionEffectsOnFiber) triggers a
-    // "Maximum update depth exceeded" loop. Overlays only need the node while
-    // the grid is mounted, so ignoring null is safe.
-    if (el !== null) setGridNode(el);
+    // Use a functional update so React bails out (no re-render) when el is the
+    // same node that's already stored. Without the identity check, calling
+    // setGridNode(el) during React's layout-effect commit phase schedules
+    // another sync render which re-fires the callback → "Maximum update depth".
+    setGridNode(prev => (prev === el ? prev : el));
   }, []);
 
   const [dragSubmitCount, setDragSubmitCount] = useState(0);
