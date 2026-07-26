@@ -25,10 +25,10 @@ describe('useModeCoach analytics', () => {
     return view;
   }
 
-  it('emits mode_coach_shown once when the coach first appears', () => {
+  it('emits nothing on a first visit — coach is disabled', () => {
     show();
-    expect(capture).toHaveBeenCalledWith('mode_coach_shown', { mode: 'classic' });
-    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_shown')).toHaveLength(1);
+    // Coach was removed: visible never becomes true, so no events fire.
+    expect(capture).not.toHaveBeenCalled();
   });
 
   it('emits nothing on a repeat visit (already seen)', () => {
@@ -40,41 +40,29 @@ describe('useModeCoach analytics', () => {
     expect(capture).not.toHaveBeenCalled();
   });
 
-  it('emits mode_coach_dismissed with the given reason on dismiss', () => {
+  it('dismiss does not emit — coach is disabled, dismiss is a no-op', () => {
     const { result } = show();
     act(() => result.current.dismiss('skip'));
-    expect(capture).toHaveBeenCalledWith('mode_coach_dismissed', {
-      mode: 'classic',
-      reason: 'skip',
-      step: 0,
-    });
+    expect(capture).not.toHaveBeenCalled();
   });
 
-  it('defaults the dismiss reason to skip', () => {
+  it('dismiss with no argument does not emit', () => {
     const { result } = show();
     act(() => result.current.dismiss());
-    expect(capture).toHaveBeenCalledWith('mode_coach_dismissed', {
-      mode: 'classic',
-      reason: 'skip',
-      step: 0,
-    });
+    expect(capture).not.toHaveBeenCalled();
   });
 
-  it('emits reason=completed when advancing past the last step', () => {
+  it('advance past the last step does not emit — coach is disabled', () => {
     const { result } = show(); // classic = 2 steps
-    act(() => result.current.advance()); // 0 -> 1 (last step), no dismiss yet
-    act(() => result.current.advance()); // past last -> completed
-    expect(capture).toHaveBeenCalledWith('mode_coach_dismissed', {
-      mode: 'classic',
-      reason: 'completed',
-      step: 1,
-    });
+    act(() => result.current.advance()); // 0 -> 1
+    act(() => result.current.advance()); // past last, close() is guarded
+    expect(capture).not.toHaveBeenCalled();
   });
 
-  it('emits mode_coach_dismissed at most once per show cycle', () => {
+  it('multiple dismiss calls never emit (idempotent no-op)', () => {
     const { result } = show();
     act(() => result.current.dismiss('escape'));
     act(() => result.current.dismiss('skip'));
-    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_dismissed')).toHaveLength(1);
+    expect(capture).not.toHaveBeenCalled();
   });
 });

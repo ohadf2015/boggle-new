@@ -12,13 +12,14 @@ describe('useModeCoach', () => {
     vi.useRealTimers();
   });
 
-  it('stays hidden until the settle delay, then shows on first visit', () => {
+  it('stays hidden permanently — coach is disabled', () => {
     const { result } = renderHook(() => useModeCoach('classic', { settleMs: 500 }));
     expect(result.current.visible).toBe(false);
     act(() => {
       vi.advanceTimersByTime(500);
     });
-    expect(result.current.visible).toBe(true);
+    // Coach was removed. visible is always false, even on a first visit.
+    expect(result.current.visible).toBe(false);
     expect(result.current.stepIndex).toBe(0);
   });
 
@@ -56,13 +57,13 @@ describe('useModeCoach', () => {
     expect(result.current.visible).toBe(false);
   });
 
-  it('dismiss hides it immediately', () => {
+  it('dismiss is a safe no-op — coach is disabled, visible stays false', () => {
     const { result } = renderHook(() => useModeCoach('blast', { settleMs: 10 }));
     act(() => {
       vi.advanceTimersByTime(10);
     });
-    expect(result.current.visible).toBe(true);
-    act(() => result.current.dismiss());
+    expect(result.current.visible).toBe(false);
+    expect(() => act(() => result.current.dismiss())).not.toThrow();
     expect(result.current.visible).toBe(false);
   });
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, act, fireEvent } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ModeCoach } from './ModeCoach';
 import { coachStorageKey } from '@/lib/tutorial/modeCoachStore';
@@ -35,14 +35,15 @@ describe('ModeCoach', () => {
     vi.useRealTimers();
   });
 
-  it('shows the mode title + first caption on a first visit', () => {
+  it('never shows on a first visit — coach is disabled', () => {
     render(<ModeCoach mode="classic" />);
     expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
     act(() => {
       vi.advanceTimersByTime(700);
     });
-    expect(screen.getByText('modeCoach.classic.title')).toBeInTheDocument();
-    expect(screen.getByText('modeCoach.classic.step1')).toBeInTheDocument();
+    // Coach was removed: visible is always false.
+    expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
+    expect(screen.queryByText('modeCoach.classic.step1')).toBeNull();
   });
 
   it('renders nothing at all when already seen (show-once)', () => {
@@ -54,53 +55,32 @@ describe('ModeCoach', () => {
     expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
   });
 
-  it('does NOT dismiss when the user taps inside the card (so Next/Skip work)', () => {
-    render(<ModeCoach mode="classic" graceMs={300} />);
-    act(() => {
-      vi.advanceTimersByTime(700 + 300); // visible + grace armed
-    });
-    const next = screen.getByText('modeCoach.next');
-    // Real tap = a pointerdown that bubbles to the capture-phase window listener.
-    act(() => {
-      next.dispatchEvent(new Event('pointerdown', { bubbles: true }));
-    });
-    // Still open — a tap on the card must not auto-dismiss it.
-    expect(screen.getByText('modeCoach.classic.title')).toBeInTheDocument();
-  });
-
-  it('DOES dismiss when the user taps the board behind it (after grace)', () => {
-    render(<ModeCoach mode="classic" graceMs={300} />);
-    act(() => {
-      vi.advanceTimersByTime(700); // settle → visible (arm timer now scheduled)
-    });
-    act(() => {
-      vi.advanceTimersByTime(400); // grace elapsed → listener armed
-    });
-    expect(screen.getByText('modeCoach.classic.title')).toBeInTheDocument();
-    act(() => {
-      document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
-    });
-    expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
-  });
-
-  it('reaches the last step + scoreTip via Next (multi-step not collapsed)', () => {
+  it('renders nothing for any mode — coach is disabled', () => {
     render(<ModeCoach mode="classic" graceMs={300} />);
     act(() => {
       vi.advanceTimersByTime(700 + 300);
     });
-    // classic = 2 steps; advancing should reveal step2 + the score tip, not close.
-    fireEvent.click(screen.getByText('modeCoach.next'));
-    expect(screen.getByText('modeCoach.classic.step2')).toBeInTheDocument();
-    expect(screen.getByText('modeCoach.classic.scoreTip')).toBeInTheDocument();
+    expect(screen.queryByText('modeCoach.next')).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('wordHunt reaches a 3rd step teaching the free-bonus-word mechanic', () => {
+  it('renders nothing for wordHunt mode too', () => {
     render(<ModeCoach mode="wordHunt" graceMs={300} />);
     act(() => {
       vi.advanceTimersByTime(700 + 300);
     });
-    fireEvent.click(screen.getByText('modeCoach.next')); // step1 -> step2
-    fireEvent.click(screen.getByText('modeCoach.next')); // step2 -> step3
-    expect(screen.getByText('modeCoach.wordHunt.step3')).toBeInTheDocument();
+    expect(screen.queryByText('modeCoach.wordHunt.step1')).toBeNull();
+  });
+
+  it('outer touch listener does not throw when coach is hidden', () => {
+    render(<ModeCoach mode="classic" graceMs={300} />);
+    act(() => {
+      vi.advanceTimersByTime(700 + 400);
+    });
+    expect(() => {
+      act(() => {
+        document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+      });
+    }).not.toThrow();
   });
 });
