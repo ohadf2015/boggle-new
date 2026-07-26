@@ -4,7 +4,7 @@
  * Sealed Bid — Versus mount. Same casino table language as solo
  * (wood rail + felt), MP mechanics unchanged.
  */
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Delete } from 'lucide-react';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -48,6 +48,15 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
     if (game.phase === 'bidding' && picks.length) setPicks([]);
   }
 
+  const [secsLeft, setSecsLeft] = useState<number | null>(null);
+  useEffect(() => {
+    if (!game.roundDeadline || game.phase !== 'bidding') { setSecsLeft(null); return; }
+    const tick = () => setSecsLeft(Math.max(0, Math.ceil((game.roundDeadline! - Date.now()) / 1000)));
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, [game.roundDeadline, game.phase]);
+
   const sortedScores = useMemo(
     () => Object.entries(game.scores).sort((a, b) => b[1] - a[1]),
     [game.scores]
@@ -87,6 +96,17 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
             <span className="rounded-neo border-2 border-black bg-neo-navy-light px-3 py-1.5 font-neo-display text-xs font-black uppercase tracking-wide text-neo-white shadow-hard-sm">
               {t('sealedBidMp.round', { n: game.index + 1, total: game.totalRounds })}
             </span>
+            {secsLeft !== null && (
+              <span
+                role="timer"
+                aria-live="polite"
+                className={`rounded-neo border-2 border-black px-3 py-1.5 font-neo-display text-xs font-black uppercase tracking-wide shadow-hard-sm ${
+                  secsLeft <= 5 ? 'bg-neo-red text-white' : 'bg-neo-orange text-black'
+                }`}
+              >
+                {t('sealedBidMp.autoResolve', { secs: secsLeft })}
+              </span>
+            )}
             <ul
               className="flex flex-wrap justify-end gap-1.5 lg:flex-col lg:items-stretch lg:justify-start"
               aria-label={t('sealedBidMp.scores')}

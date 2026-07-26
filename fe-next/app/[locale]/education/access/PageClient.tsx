@@ -202,7 +202,7 @@ export function PageClient() {
           </div>
         </div>
 
-        <DistrictUpsellStrip />
+        <DistrictUpsellStrip hideTeacherCta />
       </section>
     </main>
   );

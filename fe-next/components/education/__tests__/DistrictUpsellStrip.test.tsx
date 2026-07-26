@@ -68,4 +68,22 @@ describe('DistrictUpsellStrip', () => {
     fireEvent.click(link);
     expect(mockTrackGrowthEvent).toHaveBeenCalledWith('landing_cta_clicked', { cta: 'teacher_individual' });
   });
+
+  describe('hideTeacherCta prop', () => {
+    it('hides teacher CTA when hideTeacherCta=true', () => {
+      render(<DistrictUpsellStrip hideTeacherCta />);
+      expect(screen.queryByText('education.landing.teacherLeadCta.title')).not.toBeInTheDocument();
+    });
+
+    it('still shows district CTA when hideTeacherCta=true', () => {
+      render(<DistrictUpsellStrip hideTeacherCta />);
+      expect(screen.getByText('education.landing.districtCta.title')).toBeInTheDocument();
+    });
+
+    it('does not fire teacher impression when hideTeacherCta=true', () => {
+      render(<DistrictUpsellStrip hideTeacherCta />);
+      expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith('education_upsell_impression', { cta: 'teacher_individual' });
+      expect(mockTrackGrowthEvent).toHaveBeenCalledWith('education_upsell_impression', { cta: 'district_upsell' });
+    });
+  });
 });

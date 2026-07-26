@@ -334,7 +334,8 @@ const es = {
     "lockProgress": "{{locked}}/{{total}} fijadas",
     "clear": "Limpiar",
     "pass": "Pasar",
-    "lock": "Fijar apuesta"
+    "lock": "Fijar apuesta",
+    "autoResolve": "Se resuelve en {{secs}}s"
   },
   "sealedBidLegacy": {
     "badge": "Puja secreta",
@@ -8240,6 +8241,7 @@ const es = {
       },
       "points": "pts",
       "wpm": "PPM",
+      "missedWords": "Palabras que perdiste",
       "letters": "letras",
       "target": "Meta",
       "timer": "Tiempo",

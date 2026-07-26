@@ -12,16 +12,18 @@ interface LightningRoundCompletePhaseProps {
   forgivingScore: ForgivingScoreResult;
   wordsFoundCount: number;
   wordsPerMinute: number;
+  topMissedWords?: { word: string; pts: number }[];
   onPlayAgain: () => void;
   onExit?: () => void;
 }
 
 /** Extracted to keep LightningRound under the 500-line cap (audit P2). */
 export default function LightningRoundCompletePhase({
-  level,
+  level: _level,
   forgivingScore,
   wordsFoundCount,
   wordsPerMinute,
+  topMissedWords,
   onPlayAgain,
   onExit,
 }: LightningRoundCompletePhaseProps) {
@@ -63,6 +65,42 @@ export default function LightningRoundCompletePhase({
           <p className="text-xs text-neo-white">{t('brain.drills.wpm')}</p>
         </AdaptiveMotion.div>
       </div>
+
+      {topMissedWords && topMissedWords.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-xs uppercase tracking-widest text-neo-white/50 text-center">
+            {t('brain.drills.missedWords')}
+          </p>
+          <div className="space-y-2">
+            {topMissedWords.map((item, wordIdx) => {
+              const wordDelay = 1.2 + wordIdx * 1.5;
+              return (
+                <div key={item.word} className="flex items-center justify-center gap-1">
+                  {item.word.split('').map((letter, letterIdx) => (
+                    <AdaptiveMotion.span
+                      key={letterIdx}
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: wordDelay + letterIdx * 0.08 }}
+                      className="w-8 h-8 flex items-center justify-center rounded-sm border-2 border-neo-purple/50 bg-neo-navy text-lg font-black text-neo-purple"
+                    >
+                      {letter}
+                    </AdaptiveMotion.span>
+                  ))}
+                  <AdaptiveMotion.span
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: wordDelay + item.word.length * 0.08 + 0.15 }}
+                    className="ml-1 px-1.5 py-0.5 rounded-sm border border-neo-yellow bg-neo-yellow/10 text-neo-yellow text-xs font-bold tabular-nums"
+                  >
+                    +{item.pts}
+                  </AdaptiveMotion.span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       <DrillCompleteActions
         currentDrillId="lightning-round"

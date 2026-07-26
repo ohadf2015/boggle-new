@@ -11,20 +11,19 @@
 
 ## Current (in progress)
 
-### sealed-bid — readiness: 45% (PROVISIONAL) — status: IN PROGRESS
+### sealed-bid — readiness: 60% — status: IN PROGRESS
 - **Why next:** MP bidding mode; verify ≥2-player clash scoring.
 - **Key files:** components/multiplayer/sealedBid/*, backend/handlers/sealedBidHandler.ts, backend/modules/sealedBidManager.ts, app/[locale]/sealed-bid/*.
-- **Last audited:** 2026-07-24
+- **Last audited:** 2026-07-26
 - **Covered (2026-07-24):** backend wiring (gameStartHandler, index.ts), sealedBidManager pure state machine, sealedBidHandler (bid validation, deadline timers, finalize), useSealedBidGame hook, SealedBidVersus MP UI, solo page.tsx, sbMpEngine resolver, i18n ×6 locales (both sealedBid + sealedBidMp namespaces), a11y review, perf review, gate/visibility, tests (5 files, 572 lines), host+player view wiring, lock-gate, rackPool.
+- **Covered (2026-07-26):** countdown timer render (roundDeadline→secsLeft hook wired + UI badge in standings sidebar), sealedBidMp.autoResolve i18n ×6 locales, neo-orange/red urgency color scheme.
 
-**Open issues (2026-07-24):**
-- **MAJOR** `ru` missing `sealedBid.speedBonus` — raw key shown to Russian users during bidding. `page.tsx:338`. **FIXED this run.**
-- **MAJOR** `ru` missing `sealedBid.shareCard.{header,row,vs,shareHeader,url}` — share text broken for Russian. `SealedBidShareCard.tsx`. **FIXED this run.**
-- **MINOR** `sv`+`ja` missing `sealedBid.tapHint` — graceful fallback to `yourWord`, but hint wrong. `SealedBidTable.tsx`. **FIXED this run.**
-- **MAJOR** No countdown timer in `SealedBidVersus` MP view — `roundDeadline` tracked in hook state but never displayed. Players have no idea when auto-resolve fires. `SealedBidVersus.tsx`. **owner: review-by-eod / next night**
-- **MINOR** `topScorer` in `sealedBidHandler.ts:157` resolves ties by JS object insertion order — winner is indeterminate on equal scores. Should alphabetical-tiebreak.
-- **MINOR** `SealedBidVersus.tsx:44-49` — picks reset during render body (state update in render). Extra re-render; should be `useEffect`. Low risk.
-- **MINOR** Solo page `ArrowLeft` without `DirectionalIcon`. `page.tsx:235`. **FIXED this run.**
+**Open issues:**
+- ~~**MAJOR** No countdown timer in `SealedBidVersus` MP view~~ — **FIXED 2026-07-26**: `secsLeft` state + `useEffect` interval wired from `game.roundDeadline`; badge renders orange→red (≤5s) in standings sidebar with `role="timer"` a11y. `SealedBidVersus.tsx`.
+- **MINOR** `topScorer` in `sealedBidHandler.ts:157` resolves ties by JS object insertion order — winner is indeterminate on equal scores. Should alphabetical-tiebreak. **owner: next night**
+- **MINOR** `SealedBidVersus.tsx:44-49` — picks reset during render body (state update in render). Extra re-render; should be `useEffect`. Low risk. **owner: next night**
+- **OPEN** Visual QA not captured — need to verify timer badge renders correctly and RTL (Hebrew) doesn't break layout.
+- **OPEN** Integration test: no test covers the `roundDeadline` countdown path in `SealedBidVersus`. TDD test needed. **owner: next night**
 
 ## Queue (audit order — closest-to-release first)
 

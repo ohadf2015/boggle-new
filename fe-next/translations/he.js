@@ -334,7 +334,8 @@ const he = {
     "lockProgress": "{{locked}}/{{total}} ננעלו",
     "clear": "נקה",
     "pass": "ויתור",
-    "lock": "נעל הצעה"
+    "lock": "נעל הצעה",
+    "autoResolve": "פתרון אוטומטי בעוד {{secs}} שנ׳"
   },
   "sealedBidLegacy": {
     "badge": "הצעה חתומה",
@@ -8156,6 +8157,7 @@ const he = {
       },
       "points": "נק'",
       "wpm": "מ/ד",
+      "missedWords": "מילים שהחמצת",
       "letters": "אותיות",
       "target": "יעד",
       "timer": "טיימר",

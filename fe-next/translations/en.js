@@ -258,7 +258,8 @@ const en = {
     "lockProgress": "{{locked}}/{{total}} locked",
     "clear": "Clear",
     "pass": "Pass",
-    "lock": "Lock bid"
+    "lock": "Lock bid",
+    "autoResolve": "Auto-resolves in {{secs}}s"
   },
   "sealedBidLegacy": {
     "badge": "Sealed Bid",
@@ -7587,6 +7588,7 @@ const en = {
       },
       "points": "pts",
       "wpm": "WPM",
+      "missedWords": "Words you missed",
       "letters": "letters",
       "target": "Target",
       "timer": "Timer",
