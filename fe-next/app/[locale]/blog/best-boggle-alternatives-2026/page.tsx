@@ -24,7 +24,7 @@ const metaTitles: Record<string, string> = {
 };
 
 const metaDescriptions: Record<string, string> = {
-  en: 'I tested 6 Boggle alternatives in 2026 — Wordle, Words With Friends, Wordscapes, LexiClash. Which are pay-to-win duds? Which are genuinely great? Honest reviews, free, no download.',
+  en: '6 Boggle alternatives tested in 2026 — Wordle, Words With Friends, Wordscapes, LexiClash. Which are pay-to-win? Honest reviews, free, no download.',
   he: 'ביקורות כנות (ומעט מטורפות) של 6 חלופות בוגל. מי זבל של pay-to-win ומי באמת שווה? וורדל, מילים עם חברים, LexiClash ועוד — חינם וללא הורדה.',
   sv: 'Ärliga (och lite galna) recensioner av 6 Boggle-alternativ. Vilka är pay-to-win-skräp? Vilka är genuint bra? Wordle, Words With Friends, LexiClash jämförda — gratis, ingen nedladdning.',
   ja: '6つのBoggle代替ゲームを本音レビュー。課金ゲーはどれ？本当に面白いのは？Wordle、Words With Friends、LexiClashを比較 — 無料・ダウンロード不要。',
