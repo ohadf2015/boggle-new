@@ -1,10 +1,17 @@
 {
-  "generatedAt": "2026-07-26T08:43:46.961Z",
+  "generatedAt": "2026-07-26T15:43:43.057Z",
   "commits": [
     {
-      "sha": "623dc460b705514254ae1b7ca81140d38b889bd1",
-      "shortSha": "623dc46",
-      "subject": "perf(server): reclaim idle language memory, slim request logs, land dropped nightly code",
+      "sha": "1293c07ef1795c9f6548a386eee1af069d401378",
+      "shortSha": "1293c07",
+      "subject": "feat(daily): pin the results primary CTA to the bottom of the scrollport",
+      "author": "Ohad Fisher",
+      "date": "2026-07-26T12:06:34+03:00"
+    },
+    {
+      "sha": "50f051479b4f11b4d23e6034bfce44decb026cd5",
+      "shortSha": "50f0514",
+      "subject": "perf(server): reclaim idle solver memory, slim request logs, land dropped nightly code",
       "author": "Ohad Fisher",
       "date": "2026-07-26T11:43:24+03:00"
     },
@@ -133,13 +140,6 @@
       "subject": "chore(nightly): autonomous improvement loop 2026-07-24",
       "author": "Ohad Fisher",
       "date": "2026-07-24T07:32:03+03:00"
-    },
-    {
-      "sha": "f0d49e00e004967835de63dd7bf5d1362191e147",
-      "shortSha": "f0d49e0",
-      "subject": "fix: escape literal parens in Telegram feedback msg; sanitize Resend subject for newlines",
-      "author": "Ohad Fisher",
-      "date": "2026-07-23T17:20:50Z"
     }
   ]
 }

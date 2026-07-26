@@ -35,6 +35,7 @@ import StreakMilestoneCelebration from './StreakMilestoneCelebration';
 import StreakSavedCelebration from './StreakSavedCelebration';
 import CustomPuzzleCreator from '@/components/custom-puzzle/CustomPuzzleCreator';
 import { useAuth } from '@/contexts/AuthContext';
+import { useHideNavigation } from '@/contexts/NavigationContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { WinCinematic } from './WinCinematic';
@@ -80,6 +81,18 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
 
   const { showInterstitial } = useInterstitialAd();
   const { submitLeaderboardScore } = useCrazyGames();
+
+  // This screen ships its own Results/Stats MobileTabBar (below) sized against
+  // --mobile-bottom-safe. GlobalBottomNav only hides while DailyWordHuntSurvival
+  // reports active gameplay, so once the game ends it re-mounts UNDER/behind
+  // that custom bar — two fixed bottom bars stacked, and the sticky CTA's lift
+  // (calibrated for one bar) ends up looking gapped against whichever renders
+  // on top. Keep it hidden for as long as this results screen is shown too.
+  const setIsInGame = useHideNavigation();
+  useEffect(() => {
+    setIsInGame(true);
+    return () => setIsInGame(false);
+  }, [setIsInGame]);
 
   // Ads + leaderboard on mount
   useEffect(() => {
@@ -409,16 +422,21 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
             throttleKey={String(puzzleNumber)}
           />
         </div>
-      </div>
 
-      {/* Inline banner ad — CrazyGamesBanner covers web iframe; ResultsBannerSlot covers native AdMob. */}
-      <div className="hidden md:flex justify-center py-2">
-        <CrazyGamesBanner size="728x90" />
+        {/* Inline banner ad — CrazyGamesBanner covers web iframe; ResultsBannerSlot
+            covers native AdMob. Lives INSIDE the scrollport (not as a flex sibling
+            after it): the sticky CTA's `bottom` offset is calibrated against this
+            box's own edge, so if the banners sat outside it as separate flex items,
+            the scrollport would stop short of them and the CTA would stick ~120px
+            above the real page bottom — a big dead gap above the mobile tab bar. */}
+        <div className="hidden md:flex justify-center py-2">
+          <CrazyGamesBanner size="728x90" />
+        </div>
+        <div className="flex justify-center py-2 md:hidden">
+          <CrazyGamesBanner size="320x50" />
+        </div>
+        <ResultsBannerSlot placement="word-hunt-complete" className="px-4" />
       </div>
-      <div className="flex justify-center py-2 md:hidden">
-        <CrazyGamesBanner size="320x50" />
-      </div>
-      <ResultsBannerSlot placement="word-hunt-complete" className="px-4" />
 
       {/* Mobile Tab Bar — lifted above the native AdMob banner (a SurfaceView
           composited above the WebView, pinned to the viewport bottom) so the
