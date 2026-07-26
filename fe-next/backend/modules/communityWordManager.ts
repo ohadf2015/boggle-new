@@ -48,11 +48,14 @@ const communityValidWords: Record<LanguageCode, Set<string>> = {
 const wordsPendingVotes: Record<LanguageCode, Map<string, PendingWordData>> = {
   en: new Map(), he: new Map(), sv: new Map(), ja: new Map(), es: new Map()
 };
-setPendingVotesRef(wordsPendingVotes);
 
 let loaded = false;
 
 export async function loadCommunityWords(): Promise<void> {
+  // Set the reference here rather than at module-level to avoid a circular
+  // TDZ: communityWordManager imports communityWordHybridValidation, so calling
+  // setPendingVotesRef before that module's body has run causes a ReferenceError.
+  setPendingVotesRef(wordsPendingVotes);
   if (loaded) return;
   const client = getSupabase() as SupabaseClient | null;
   if (!client) { loaded = true; return; }
