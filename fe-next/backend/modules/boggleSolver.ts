@@ -511,6 +511,36 @@ export function clearSolverCaches(): void {
 }
 
 /**
+ * Evict solver caches whose TTL has expired.
+ *
+ * getCachedTrie() only re-checks TRIE_CACHE_TTL when that language is asked
+ * for again, so a locale played once holds its trie (~36 MB for English —
+ * 607k plain-object nodes) until the process dies. Call this on a timer so
+ * idle locales actually give their memory back; they rebuild in ~100 ms.
+ */
+export function pruneSolverCaches(): { tries: number; grids: number } {
+  const now = Date.now();
+  const gridsBefore = gridCache.size;
+  let tries = 0;
+
+  for (const [language, entry] of trieCache.entries()) {
+    if (now - entry.timestamp >= TRIE_CACHE_TTL) {
+      trieCache.delete(language);
+      tries++;
+    }
+  }
+
+  cleanupGridCache();
+  const grids = gridsBefore - gridCache.size;
+
+  if (tries > 0 || grids > 0) {
+    logger.info('SOLVER', `Pruned solver caches: ${tries} tries, ${grids} grids`);
+  }
+
+  return { tries, grids };
+}
+
+/**
  * Get cache statistics for monitoring
  */
 export function getSolverCacheStats(): SolverCacheStats {

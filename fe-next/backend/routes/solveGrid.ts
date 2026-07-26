@@ -50,6 +50,7 @@ const RATE_LIMIT = {
   maxRequests: 30,
   windowMs: 60000,
 };
+const RATE_LIMIT_SWEEP_THRESHOLD = 5000;
 
 /**
  * Simple rate limiter middleware
@@ -57,6 +58,16 @@ const RATE_LIMIT = {
 function rateLimit(req: Request, res: Response, next: NextFunction): void {
   const ip = req.ip || (req.headers['x-forwarded-for'] as string) || 'unknown';
   const now = Date.now();
+
+  // Expired entries are otherwise only overwritten when that same IP returns,
+  // so one-shot IPs accumulate forever. Sweep when the map gets large rather
+  // than on a timer — the work is bounded and costs nothing at normal size.
+  // ponytail: size-triggered sweep; swap for an LRU only if 5k proves too big.
+  if (rateLimitStore.size > RATE_LIMIT_SWEEP_THRESHOLD) {
+    for (const [key, entry] of rateLimitStore.entries()) {
+      if (now > entry.resetTime) rateLimitStore.delete(key);
+    }
+  }
 
   const data = rateLimitStore.get(ip);
   if (!data || now > data.resetTime) {

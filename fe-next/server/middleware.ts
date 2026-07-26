@@ -10,7 +10,7 @@ import express, { Application, Request, Response, NextFunction, RequestHandler }
 import helmet from 'helmet';
 import pinoHttp from 'pino-http';
 import { geolocationMiddleware } from '../backend/utils/geolocation';
-import { httpLogger } from './logger';
+import { httpLogger, httpLogSerializers } from './logger';
 // crazyGamesScriptInjector removed — now rendered via CrazyGamesScriptServer React component
 
 const dev: boolean = process.env.NODE_ENV !== 'production';
@@ -347,7 +347,11 @@ export function configureMiddleware(app: Application, { corsOrigin, isDev }: Mid
   });
 
   // Structured HTTP logging (skip health checks)
-  app.use(pinoHttp({ logger: httpLogger, autoLogging: { ignore: (req) => req.url === '/health' || req.url === '/health/live' } }));
+  app.use(pinoHttp({
+    logger: httpLogger,
+    autoLogging: { ignore: (req) => req.url === '/health' || req.url === '/health/live' },
+    serializers: httpLogSerializers,
+  }));
 
   // WWW redirect (must be first - before other middleware)
   app.use(wwwRedirect());

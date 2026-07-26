@@ -9,7 +9,6 @@ import { useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import logger from '@/utils/logger';
-import { useExperiment } from '@/hooks/useExperiment';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
@@ -127,7 +126,6 @@ export function useMultiplayerJoin({
   // button click, or auto-join racing a manual tap — can both pass the disabled
   // check and double-emit. A ref flips synchronously, closing that window.
   const inFlightRef = useRef(false);
-  const { variant: connectFeedbackVariant } = useExperiment('exp-mp-lobby-connect-feedback-v1');
 
   return useCallback(
     async (
@@ -153,11 +151,6 @@ export function useMultiplayerJoin({
       if (socket && !socket.connected) {
         logger.log('[JOIN] Socket exists but not connected, waiting...');
         trackGrowthEvent('mp_lobby_join_attempted', { socketReady: false });
-        // eager-feedback: show joining state + toast immediately (vs 5s silent wait)
-        if (connectFeedbackVariant === 'eager-feedback') {
-          setIsJoining(true);
-          toast(t('common.connecting'), { duration: 4500, icon: '📡', id: MP_TOAST_IDS.notConnected });
-        }
         const connected = await new Promise<boolean>((resolve) => {
           const timeout = setTimeout(() => resolve(false), 5000);
           const onConnect = (): void => { clearTimeout(timeout); resolve(true); };
@@ -166,7 +159,6 @@ export function useMultiplayerJoin({
         });
         if (!connected) {
           releaseInFlight();
-          if (connectFeedbackVariant === 'eager-feedback') setIsJoining(false);
           setError(t('errors.notConnected'));
           toast.error(t('common.notConnected'), { duration: 3000, icon: '⚠️', id: MP_TOAST_IDS.notConnected });
           return;
@@ -339,7 +331,6 @@ export function useMultiplayerJoin({
       socket, gameCode, username, roomName, language, t,
       isSupabaseEnabled, user, profile, loading, authLoadingStartTime,
       guestAvatar, hostUsername, setGuestAvatar, setUsername, setError, setIsJoining,
-      connectFeedbackVariant,
     ]
   );
 }

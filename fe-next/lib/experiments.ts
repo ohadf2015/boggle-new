@@ -675,28 +675,10 @@ export const EXPERIMENTS = {
       'Homepage mode-card click feedback. click-feedback = immediate press animation (scale+brightness) on card click. Targets homepage rage-clicks (27 in 7d, 20 null-el_text). Conversion = rageclick rate falls on /en + /. Guardrail = game_started stable.',
   }),
 
-  /**
-   * MP lobby join eager-feedback. ES multiplayer is the #1 rage-click surface
-   * (6 rageclicks/24h, 2026-07-18 PostHog). When users tap "Join" while the
-   * socket is still connecting, the current flow silently waits up to 5s
-   * before showing feedback — the button looks frozen. This causes rage-clicks.
-   *
-   * control = current behavior (5s silent wait → error toast on timeout).
-   * eager-feedback = immediately on join attempt with disconnected socket:
-   *   setIsJoining(true) to show button loading state + brief "Connecting…"
-   *   toast so users know we're trying. Join completes normally if socket
-   *   connects within 5s; existing error toast fires if it doesn't.
-   *
-   * Conversion: rageclick rate falls on /es/multiplayer (PostHog rageclicks).
-   * Guardrail: mp_join_attempted must not fall.
-   * PostHog flag key = 'exp-mp-lobby-connect-feedback-v1', 50/50 rollout.
-   */
-  'exp-mp-lobby-connect-feedback-v1': defineExperiment({
-    variants: ['control', 'eager-feedback'] as const,
-    default: 'control',
-    description:
-      'MP lobby join eager-feedback. eager-feedback = on join tap with disconnected socket, immediately sets joining state + shows "Connecting…" toast (vs 5s silent wait). Targets /es/multiplayer rageclicks (6/24h, #1 signal 2026-07-18). Conversion = rageclick rate falls. Guardrail = mp_join_attempted stable.',
-  }),
+  /* CONCLUDED 2026-07-26 — `exp-mp-lobby-connect-feedback-v1` REVERTED to
+     control. The eager-feedback arm (setIsJoining + "Connecting…" toast during
+     the 5s socket wait) did not reduce /es/multiplayer rage-clicks. Its only
+     consumer (useMultiplayerJoin) is back on the plain silent-wait path. */
 
   /**
    * MP results "I'm Ready" micro-delight. Hypothesis: after clicking ready the

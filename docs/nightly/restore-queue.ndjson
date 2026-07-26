@@ -30,3 +30,5 @@
 {"resolve":"20260724-010002"}
 {"tag":"20260726-010916","date":"2026-07-26","files":["fe-next/app/[locale]/multiplayer/useMultiplayerJoin.ts"],"backup":"/Users/ohadfisher/logs/lexi-nightly/dropped-20260726-010916","reason":"drop-and-re-gate round 1 (gate-failing)"}
 {"tag":"20260726-010916","date":"2026-07-26","files":["fe-next/components/results/GameFeedbackCard.tsx"],"backup":"/Users/ohadfisher/logs/lexi-nightly/dropped-20260726-010916","reason":"drop-and-re-gate round 2 (gate-failing)"}
+{"note":"20260726-010916","restored":2,"rejected":[],"reason":"useMultiplayerJoin.ts restored verbatim from the drop backup — it is the consumer-side half of the exp-mp-lobby-connect-feedback-v1 revert, and master had the definition without it. GameFeedbackCard.tsx NOT restored verbatim: the nightly version deferred onClose behind a 1400ms timer for EVERY arm, which broke 3 committed tests; reimplemented so only the issue-probe arm on mp_round changes behaviour. exp-mp-round-issue-probe-v1 had shipped its flag + gameFeedback.issueProbe.* in all 6 locales with zero consumers. Shipped in 623dc460b."}
+{"resolve":"20260726-010916"}

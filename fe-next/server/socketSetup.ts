@@ -12,6 +12,7 @@ import { broadcastActiveRooms } from '../backend/utils/socketHelpers';
 import { purgeStaleSocketEntries, getSocketMapSizes } from '../backend/modules/userManager';
 import { registerDuelHandlers } from '../backend/handlers/duel';
 import { checkConnectionRateLimit } from '../backend/middleware/rateLimiterRedis';
+import { pruneSolverCaches } from '../backend/modules/boggleSolver';
 
 import type { Server as HttpServer } from 'http';
 
@@ -271,6 +272,29 @@ export function setupCleanupTimers(io: Server): void {
     }
   }, 5 * 60 * 1000);
   cleanupTimers.add(socketPurgeTimer);
+
+  // Reclaim idle solver memory every 10 minutes.
+  // Tries are built lazily per locale and were never swept — the TTL inside
+  // getCachedTrie() is only honoured on the next access for that SAME
+  // language, so a locale played once held its trie (~36 MB for English,
+  // 607k nodes) for the life of the process. Container sits at ~790 MB heap /
+  // 1.1 GB RSS with zero active games, so this is worth reclaiming.
+  //
+  // Deliberately does NOT call unloadIdleDictionaries(): that empties the word
+  // Set, and getCachedTrie() returns null for an empty Set. Callers are not
+  // uniformly null-safe (getTrieNode dereferences straight away, and
+  // botWheelRush already documents bots flatlining on a null trie). Pruning
+  // the trie alone is safe — it rebuilds from the still-loaded Set in ~91 ms.
+  const memoryReclaimTimer = setInterval(() => {
+    const { tries, grids } = pruneSolverCaches();
+    if (tries > 0 || grids > 0) {
+      socketLogger.info(
+        { tries, grids, heapUsedMB: Math.round(process.memoryUsage().heapUsed / 1048576) },
+        'Reclaimed idle solver memory'
+      );
+    }
+  }, 10 * 60 * 1000);
+  cleanupTimers.add(memoryReclaimTimer);
 
   // Cleanup empty rooms every 30 seconds
   const emptyRoomsTimer = setInterval(() => {

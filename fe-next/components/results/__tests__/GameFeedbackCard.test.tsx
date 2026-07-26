@@ -21,10 +21,21 @@ vi.mock('@/hooks/useGameFeedback', () => ({
   useGameFeedback: (args: unknown) => mockUseGameFeedback(args),
 }));
 
+const mockUseExperiment = vi.fn();
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: (key: string) => mockUseExperiment(key),
+}));
+
+const mockTrackGrowthEvent = vi.fn();
+vi.mock('@/utils/growthTracking', () => ({
+  trackGrowthEvent: (...args: unknown[]) => mockTrackGrowthEvent(...args),
+}));
+
 import GameFeedbackCard from '../GameFeedbackCard';
 
 beforeEach(() => {
   vi.clearAllMocks();
+  mockUseExperiment.mockReturnValue({ variant: 'control' });
   mockUseLanguage.mockReturnValue({
     t: (key: string) => {
       const map: Record<string, string> = {
@@ -34,6 +45,9 @@ beforeEach(() => {
         'gameFeedback.great': 'Loved it!',
         'gameFeedback.thanks': 'Thanks for the feedback!',
         'gameFeedback.dismiss': 'Dismiss',
+        'gameFeedback.issueProbe.prompt': 'What made it feel that way?',
+        'gameFeedback.issueProbe.botsStrong': 'Bots too strong',
+        'gameFeedback.issueProbe.technical': 'Technical issue',
       };
       return map[key] || key;
     },
@@ -255,5 +269,80 @@ describe('GameFeedbackCard', () => {
         eligible: false,
       })
     );
+  });
+});
+
+/**
+ * exp-mp-round-issue-probe-v1 — follow-up "what went wrong?" step after a
+ * bad/ok rating on the MP round surface only. The control arm MUST keep the
+ * close-immediately behaviour asserted above.
+ */
+describe('GameFeedbackCard — issue probe experiment', () => {
+  const renderProbe = (onClose = vi.fn(), surface: 'mp_round' | 'singleplayer' = 'mp_round') => {
+    mockUseGameFeedback.mockReturnValue({
+      shouldShow: true,
+      recordRating: vi.fn(),
+      dismiss: vi.fn(),
+    });
+    render(
+      <GameFeedbackCard
+        isOpen={true}
+        onClose={onClose}
+        surface={surface}
+        eligible={true}
+        gameMode="classic"
+      />
+    );
+    return onClose;
+  };
+
+  it('shows the probe after a bad rating when in the issue-probe arm on mp_round', () => {
+    mockUseExperiment.mockReturnValue({ variant: 'issue-probe' });
+    const onClose = renderProbe();
+
+    fireEvent.click(screen.getAllByRole('button')[0]);
+
+    expect(screen.getByText('What made it feel that way?')).toBeInTheDocument();
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
+  it('closes immediately on a great rating even in the issue-probe arm', () => {
+    mockUseExperiment.mockReturnValue({ variant: 'issue-probe' });
+    const onClose = renderProbe();
+
+    fireEvent.click(screen.getAllByRole('button')[2]);
+
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('does not show the probe on non-mp surfaces', () => {
+    mockUseExperiment.mockReturnValue({ variant: 'issue-probe' });
+    const onClose = renderProbe(vi.fn(), 'singleplayer');
+
+    fireEvent.click(screen.getAllByRole('button')[0]);
+
+    expect(screen.queryByText('What made it feel that way?')).not.toBeInTheDocument();
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('tracks the selected issue and closes', () => {
+    mockUseExperiment.mockReturnValue({ variant: 'issue-probe' });
+    const onClose = renderProbe();
+
+    fireEvent.click(screen.getAllByRole('button')[0]);
+    fireEvent.click(screen.getByText('Bots too strong'));
+
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('mp_round_issue_selected', {
+      issue: 'bots_too_strong',
+      gameMode: 'classic',
+    });
+    expect(onClose).toHaveBeenCalled();
+  });
+
+  it('reads the experiment under its registered flag key', () => {
+    mockUseExperiment.mockReturnValue({ variant: 'control' });
+    renderProbe();
+
+    expect(mockUseExperiment).toHaveBeenCalledWith('exp-mp-round-issue-probe-v1');
   });
 });

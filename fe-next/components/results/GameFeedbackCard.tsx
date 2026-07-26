@@ -1,10 +1,12 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { m } from 'framer-motion';
 import { Smile, Frown, Heart } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useGameFeedback, type FeedbackRating, type FeedbackSurface } from '@/hooks/useGameFeedback';
+import { useExperiment } from '@/hooks/useExperiment';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
 interface GameFeedbackCardProps {
@@ -45,10 +47,25 @@ const GameFeedbackCard: React.FC<GameFeedbackCardProps> = ({
     throttleKey,
   });
 
+  const { variant: issueProbeVariant } = useExperiment('exp-mp-round-issue-probe-v1');
+  const [showingProbe, setShowingProbe] = useState(false);
+
   if (!isOpen || !shouldShow) return null;
+
+  // exp-mp-round-issue-probe-v1: MP-only follow-up asking WHY a round felt bad.
+  const probeArm = issueProbeVariant === 'issue-probe' && surface === 'mp_round';
 
   const handleRating = (rating: FeedbackRating) => {
     recordRating(rating);
+    if (probeArm && (rating === 'bad' || rating === 'ok')) {
+      setShowingProbe(true);
+      return;
+    }
+    onClose();
+  };
+
+  const handleProbeSelect = (issue: 'bots_too_strong' | 'technical_issue') => {
+    trackGrowthEvent('mp_round_issue_selected', { issue, gameMode });
     onClose();
   };
 
@@ -74,6 +91,32 @@ const GameFeedbackCard: React.FC<GameFeedbackCardProps> = ({
         onClick={(e) => e.stopPropagation()}
         className="relative z-50 w-full max-w-sm mx-4 p-6 rounded-2xl bg-neo-navy border-4 border-black shadow-hard-lg pointer-events-auto"
       >
+        {showingProbe ? (
+          <>
+            <h3 className="text-xl font-neo-display font-black text-neo-white text-center mb-6">
+              {t('gameFeedback.issueProbe.prompt')}
+            </h3>
+            <div className="grid gap-3">
+              {(
+                [
+                  ['bots_too_strong', 'gameFeedback.issueProbe.botsStrong'],
+                  ['technical_issue', 'gameFeedback.issueProbe.technical'],
+                ] as const
+              ).map(([issue, key]) => (
+                <m.button
+                  key={issue}
+                  type="button"
+                  onClick={() => handleProbeSelect(issue)}
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full p-3 rounded-lg border-3 border-black font-bold bg-neo-cyan text-neo-navy hover:bg-neo-cyan/80 shadow-hard-sm"
+                >
+                  {t(key)}
+                </m.button>
+              ))}
+            </div>
+          </>
+        ) : (
+          <>
         {/* Header */}
         <div className="text-center mb-6">
           <h3 className="text-2xl font-neo-display font-black text-neo-white mb-2">
@@ -137,6 +180,8 @@ const GameFeedbackCard: React.FC<GameFeedbackCardProps> = ({
         >
           {t('gameFeedback.dismiss')}
         </button>
+          </>
+        )}
       </m.div>
     </m.div>
   );

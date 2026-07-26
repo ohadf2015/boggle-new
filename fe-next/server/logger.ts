@@ -12,6 +12,23 @@ export const logger = pino({
   ...(isProduction ? {} : { transport: { target: 'pino-pretty', options: { colorize: true } } }),
 });
 
+/**
+ * Slim pino-http serializers.
+ *
+ * pino-http's defaults dump the entire `headers` object (cookies, auth,
+ * user-agent, sentry baggage) on EVERY request — measured at ~3.7 KB per line
+ * in production. That is allocation + stdout churn per request, and it puts
+ * session cookies in the log stream. Keep tracing fields only.
+ */
+export const httpLogSerializers = {
+  req: (req: { id?: unknown; method?: string; url?: string }) => ({
+    id: req.id,
+    method: req.method,
+    url: req.url,
+  }),
+  res: (res: { statusCode?: number }) => ({ statusCode: res.statusCode }),
+};
+
 // Child loggers for different modules
 export const socketLogger = logger.child({ module: 'socket' });
 export const lifecycleLogger = logger.child({ module: 'lifecycle' });
