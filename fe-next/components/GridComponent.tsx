@@ -141,11 +141,14 @@ const GridComponent = memo<GridComponentProps>(({
   const [gridNode, setGridNode] = useState<HTMLDivElement | null>(null);
   const attachGridRef = useCallback((el: HTMLDivElement | null) => {
     gridRef.current = el;
-    // Use a functional update so React bails out (no re-render) when el is the
-    // same node that's already stored. Without the identity check, calling
-    // setGridNode(el) during React's layout-effect commit phase schedules
-    // another sync render which re-fires the callback → "Maximum update depth".
-    setGridNode(prev => (prev === el ? prev : el));
+    // Only update state on mount (el !== null). Calling setState with null during
+    // React's deletion-effects phase (safelyDetachRef) enqueues a sync re-render
+    // that re-enters commitDeletionEffectsOnFiber → "Maximum update depth exceeded".
+    // The functional updater bails out (no re-render) when the same node is already
+    // stored, preventing the symmetric loop on mount (commitAttachRef path).
+    if (el !== null) {
+      setGridNode(prev => (prev === el ? prev : el));
+    }
   }, []);
 
   const [dragSubmitCount, setDragSubmitCount] = useState(0);
