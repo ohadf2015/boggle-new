@@ -11,7 +11,17 @@
  * const { isLowEnd, targetFPS, enableComplexAnimations } = useDevicePerformance();
  */
 
-import { useMemo, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useSyncExternalStore } from 'react';
+import {
+  startFrameWatch,
+  getRuntimeDowngrade,
+  getRuntimeDowngradeServer,
+  subscribeRuntimeTier,
+} from '@/lib/perf/runtimeTier';
+
+/** Wait for hydration + first route work to finish before judging frame health.
+ *  Measuring during load reads load jank as a slow device. */
+const FRAME_WATCH_SETTLE_MS = 3000;
 
 // Navigator extensions for device detection (don't extend Navigator to avoid type conflicts)
 interface NavigatorWithMemory {
@@ -194,6 +204,20 @@ export function useDevicePerformance(): DevicePerformanceConfig {
     () => false // Server snapshot
   );
 
+  // Static hints misclassify budget Android (8 weak cores + 8GB reads as high-end)
+  // and can never flag an iPhone (Safari hides deviceMemory). Watch real frames and
+  // let observed slowness override an over-optimistic static verdict.
+  const runtimeDowngrade = useSyncExternalStore(
+    subscribeRuntimeTier,
+    getRuntimeDowngrade,
+    getRuntimeDowngradeServer
+  );
+
+  useEffect(() => {
+    const id = setTimeout(startFrameWatch, FRAME_WATCH_SETTLE_MS);
+    return () => clearTimeout(id);
+  }, []);
+
   // Compute device capabilities (stable - only runs once on client)
   const capabilities = useMemo(() => detectDeviceCapabilities(), []);
 
@@ -212,12 +236,27 @@ export function useDevicePerformance(): DevicePerformanceConfig {
       };
     }
 
+    // Frames say this device is struggling, whatever the static hints claimed.
+    if (runtimeDowngrade) {
+      return {
+        ...capabilities,
+        isLowEnd: true,
+        targetFPS: 30 as const,
+        throttleMs: 33,
+        enableComplexAnimations: false,
+        enableGlowEffects: false,
+        reduceParticles: true,
+        maxParticles: 4,
+        prefersReducedMotion: false,
+      };
+    }
+
     return {
       ...capabilities,
       prefersReducedMotion: false,
       isMobile: capabilities.isMobile,
     };
-  }, [capabilities, prefersReducedMotion]);
+  }, [capabilities, prefersReducedMotion, runtimeDowngrade]);
 }
 
 /**
