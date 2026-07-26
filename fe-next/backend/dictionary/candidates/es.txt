@@ -921,7 +921,6 @@ oreja
 pie
 invierno
 verano
-otoño
 primavera
 salon
 dormitorio
@@ -1123,3 +1122,5 @@ chicos
 chicas
 pequeños
 pequeñas
+triste
+banana

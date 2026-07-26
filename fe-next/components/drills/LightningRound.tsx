@@ -424,6 +424,11 @@ export default function LightningRound({
               forgivingScore={forgiving}
               wordsFoundCount={wordsFound.length}
               wordsPerMinute={getResults().wordsPerMinute}
+              topMissedWords={availableWords
+                .filter(w => !wordsFound.includes(w.word.toUpperCase()))
+                .map(w => ({ word: w.word.toUpperCase(), pts: calculateWordScore(w.word) }))
+                .sort((a, b) => b.pts - a.pts)
+                .slice(0, 3)}
               onPlayAgain={() => {
                 setPhase('ready');
                 setWordsFound([]);

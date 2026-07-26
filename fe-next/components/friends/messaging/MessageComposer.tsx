@@ -145,14 +145,9 @@ export const MessageComposer: React.FC<MessageComposerProps> = ({
     }
   }, [text, disabled, maxLength, onSend, emitTyping]);
 
-  /**
-   * Handle Enter key (Shift+Enter for newline)
-   */
+  // ponytail: Enter inserts newline; send button is the only send trigger (user request 2026-07-24)
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Skip only when the keydown is an IME composition commit (keyCode 229).
-    // `isComposing` is unreliable on Android GBoard with Hebrew/RTL — it stays
-    // true until a space/punctuation commits the word, blocking Enter-to-send.
-    if (e.key === 'Enter' && !e.shiftKey && e.nativeEvent.keyCode !== 229) {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       handleSend();
     }

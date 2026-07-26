@@ -9637,7 +9637,8 @@ const ru = {
     "lockProgress": "{{locked}}/{{total}} заблокировано",
     "clear": "Очистить",
     "pass": "Пропустить",
-    "lock": "Заблокировать ставку"
+    "lock": "Заблокировать ставку",
+    "autoResolve": "Авторазрешение через {{secs}}с"
   },
   "sealedBid": {
     "allIn": "Всё на кон",
@@ -10124,6 +10125,7 @@ const ru = {
       },
       "points": "баллов",
       "wpm": "СПМ",
+      "missedWords": "Пропущенные слова",
       "letters": "букв",
       "target": "Цель",
       "timer": "Таймер",
@@ -13647,7 +13649,12 @@ const ru = {
     "ok": "Хорошо",
     "great": "Обожаю!",
     "thanks": "Спасибо за отзыв!",
-    "dismiss": "Закрыть"
+    "dismiss": "Закрыть",
+    "issueProbe": {
+      "prompt": "Что пошло не так?",
+      "botsStrong": "Боты слишком сильные",
+      "technical": "Техническая проблема"
+    }
   },
   "mpCrossPromo": {
     "heading": "Играй с другими онлайн",

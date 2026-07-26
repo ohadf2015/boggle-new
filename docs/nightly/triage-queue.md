@@ -1828,3 +1828,31 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - [Feedback/manual] Avatar reset for user "ilik bilik"
   - status: deferred — requires admin DB operation
   - recommended owner: human admin
+
+## 2026-07-26
+- [PostHog] TypeError: Load failed (score 0.375)
+  - last seen: 2026-07-26, count: 3, userCount: 3
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f34a3-12d0-7820-a7d2-4b2d22556c1e
+  - status: deferred
+  - why: need stack trace investigation — likely WASM/fetch failure on word-wheel, needs targeted fix
+  - recommended owner: review-by-eod
+- [PostHog] React error #418 hydration (score 0.237/0.088)
+  - last seen: 2026-07-26, count: 2-3
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f4747-c11b-7430-8ac2-882649b49cbd
+  - status: deferred
+  - why: hydration mismatch — needs SSR/client render tree inspection, ambiguous root cause
+  - recommended owner: review-by-eod
+- [Sentry] Error: Connection is closed (JAVASCRIPT-NEXTJS-1WM)
+  - link: https://lexiclash.sentry.io/issues/135762417/
+  - status: deferred
+  - why: DB connection drop — likely Supabase MCP down (PAT expired), human mint needed
+  - recommended owner: human (never-expire PAT)
+- [Feedback] Ron: special tiles (ice/explosion) don't work in MP with bots
+  - first seen: 2026-07-22, route: /he
+  - status: deferred
+  - why: server-side bot logic in server/multiplayer/ needs investigation of tile-type handling
+  - recommended owner: backend
+- [Feedback] Ron: coins earned locally didn't sync (one-time 10k coin grant requested)
+  - status: deferred
+  - why: coin economy — human-queue only per standing rules
+  - recommended owner: human

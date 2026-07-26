@@ -334,7 +334,8 @@ const ja = {
     "lockProgress": "{{locked}}/{{total}} 人が確定",
     "clear": "クリア",
     "pass": "パス",
-    "lock": "入札を確定"
+    "lock": "入札を確定",
+    "autoResolve": "{{secs}}秒後に自動解決"
   },
   "sealedBidLegacy": {
     "badge": "シールドビッド",
@@ -8281,6 +8282,7 @@ const ja = {
       },
       "points": "pt",
       "wpm": "分速",
+      "missedWords": "見逃した単語",
       "letters": "文字",
       "target": "目標",
       "timer": "タイマー",

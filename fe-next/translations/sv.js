@@ -604,7 +604,8 @@ const sv = {
     "lockProgress": "{{locked}}/{{total}} låsta",
     "clear": "Rensa",
     "pass": "Passa",
-    "lock": "Lås budet"
+    "lock": "Lås budet",
+    "autoResolve": "Löses automatiskt om {{secs}}s"
   },
   "sealedBidLegacy": {
     "badge": "Förseglat bud",
@@ -8502,6 +8503,7 @@ const sv = {
       },
       "points": "p",
       "wpm": "OPM",
+      "missedWords": "Ord du missade",
       "letters": "bokstäver",
       "target": "Mål",
       "timer": "Timer",
