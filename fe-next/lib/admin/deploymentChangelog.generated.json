@@ -1,26 +1,145 @@
 {
-  "generatedAt": "2026-07-21T18:19:27.133Z",
+  "generatedAt": "2026-07-26T08:43:46.961Z",
   "commits": [
     {
-      "sha": "c309b47adac88455b63b3e9245d6b8c7f12dd4ca",
-      "shortSha": "c309b47",
-      "subject": "feat(avatar): wire premium parts quality, VIP filter, and shared layer rules",
-      "author": "Hermes (agent)",
-      "date": "2026-07-21T17:38:15+00:00"
-    },
-    {
-      "sha": "f9a7fa6fcc0bfe6ae870da7b2d8e153cc413cab0",
-      "shortSha": "f9a7fa6",
-      "subject": "Kimi: LexiClash avatar overhaul — premium parts, tier system, better animations, new sets",
-      "author": "Hermes (agent)",
-      "date": "2026-07-21T15:56:16+00:00"
-    },
-    {
-      "sha": "96581c251d9d52673ba64bf1cdb0dbc7c9c04d27",
-      "shortSha": "96581c2",
-      "subject": "chore(nightly): mark 20260721-010001 salvage restored — lane code shipped",
+      "sha": "623dc460b705514254ae1b7ca81140d38b889bd1",
+      "shortSha": "623dc46",
+      "subject": "perf(server): reclaim idle language memory, slim request logs, land dropped nightly code",
       "author": "Ohad Fisher",
-      "date": "2026-07-21T10:18:33+03:00"
+      "date": "2026-07-26T11:43:24+03:00"
+    },
+    {
+      "sha": "543bbe6e691020b4f71783684d3543c9e7429c0f",
+      "shortSha": "543bbe6",
+      "subject": "perf(low-end): self-correcting device tier, skip WebGL FX on low-end, group root chunks",
+      "author": "Ohad Fisher",
+      "date": "2026-07-26T11:10:51+03:00"
+    },
+    {
+      "sha": "608b69773479e4b61a7e4791b1fa1ae7c3d38882",
+      "shortSha": "608b697",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-26",
+      "author": "Ohad Fisher",
+      "date": "2026-07-26T08:13:24+03:00"
+    },
+    {
+      "sha": "7e565ff0415dbf3708993ffcaf43ed35b713f3e2",
+      "shortSha": "7e565ff",
+      "subject": "feat(ftue): collapse onboarding to one screen, teach on the real board",
+      "author": "Ohad Fisher",
+      "date": "2026-07-26T01:44:59+03:00"
+    },
+    {
+      "sha": "4a72d3e9c023efaca27927ef65e97a456ce4d93d",
+      "shortSha": "4a72d3e",
+      "subject": "fix(pwa): revive install gates — games_completed_count had 3 readers, 0 writers",
+      "author": "Ohad Fisher",
+      "date": "2026-07-26T01:10:17+03:00"
+    },
+    {
+      "sha": "bafe016e9673a6f04d86e07e65a05113eb6ff913",
+      "shortSha": "bafe016",
+      "subject": "perf(low-end): group the 12 always-mounted root components into one chunk",
+      "author": "Ohad Fisher",
+      "date": "2026-07-25T21:55:51+03:00"
+    },
+    {
+      "sha": "5f6ffe0821b1cc37c078161f88c0d4308340f52e",
+      "shortSha": "5f6ffe0",
+      "subject": "perf(low-end): self-correcting device tier + skip WebGL FX layer on low-end devices",
+      "author": "Ohad Fisher",
+      "date": "2026-07-25T21:47:32+03:00"
+    },
+    {
+      "sha": "568a3f195c84af8776100ac4dcc7404c18feeedf",
+      "shortSha": "568a3f1",
+      "subject": "fix(mem): subscribe gameAIValidationCount cleanup; drop bot call dup'd by 744ce46bf",
+      "author": "Ohad Fisher",
+      "date": "2026-07-25T21:37:22+03:00"
+    },
+    {
+      "sha": "050399c2fd78cd0d19fdfdbf5ce70433a43900a5",
+      "shortSha": "050399c",
+      "subject": "feat(results): simplify result screens for unregistered players",
+      "author": "Ohad Fisher",
+      "date": "2026-07-25T21:27:36+03:00"
+    },
+    {
+      "sha": "bebb07e12cef7add91843a5ac622abb9a848141f",
+      "shortSha": "bebb07e",
+      "subject": "fix(server): release orphaned bot state in deleteGame; remove PWA listener leak",
+      "author": "Ohad Fisher",
+      "date": "2026-07-25T21:24:50+03:00"
+    },
+    {
+      "sha": "87653de4b648a8b5c457eaa9f68f38f8aa929fa2",
+      "shortSha": "87653de",
+      "subject": "lexiclash: remove blocking tutorial flow, keep non-blocking overlays",
+      "author": "Hermes (agent)",
+      "date": "2026-07-25T18:27:26Z"
+    },
+    {
+      "sha": "744ce46bfaff24aad62e168079de5ffd614d6e38",
+      "shortSha": "744ce46",
+      "subject": "fix(mem): plug old_space leak — self-delete fired timeouts, cleanup on deleteGame",
+      "author": "Ohad Fisher",
+      "date": "2026-07-25T07:56:15Z"
+    },
+    {
+      "sha": "0933dd151e6d4ff95bc44334a6f844f512248a09",
+      "shortSha": "0933dd1",
+      "subject": "fix(oom): kill game tick interval on deleteGame + phantom-tick self-clear",
+      "author": "Ohad Fisher",
+      "date": "2026-07-25T07:51:21Z"
+    },
+    {
+      "sha": "d72dd07bc6e7ead0be4cff42320773f16015f6d1",
+      "shortSha": "d72dd07",
+      "subject": "chore: memwatch diag v2 — per-space heap breakdown + active handle count",
+      "author": "Ohad Fisher",
+      "date": "2026-07-25T06:12:55Z"
+    },
+    {
+      "sha": "2fd1a531547755df9f2b9f219439edaca7f71cf7",
+      "shortSha": "2fd1a53",
+      "subject": "chore: memory watchdog diag — log rss/heap/external breakdown every 5min",
+      "author": "Ohad Fisher",
+      "date": "2026-07-25T05:51:25Z"
+    },
+    {
+      "sha": "a46b52ff1360baa0c63eec74b58cd3008e52d262",
+      "shortSha": "a46b52f",
+      "subject": "feat: game juice pass — StreakFlame, score popups, celebration screens, submit burst, staggered animations",
+      "author": "Ohad Fisher",
+      "date": "2026-07-24T09:58:10Z"
+    },
+    {
+      "sha": "e0bb2d923143c70f5974aa654bd1419d51ba7cbc",
+      "shortSha": "e0bb2d9",
+      "subject": "feat: add poki platform detection to posthogEngagement (type + detectPlatform with SDK and referrer checks)",
+      "author": "Hermes (agent)",
+      "date": "2026-07-24T08:54:52Z"
+    },
+    {
+      "sha": "9696756fddd10fd5d1ba4810aad130a35d5f04c8",
+      "shortSha": "9696756",
+      "subject": "fix(nightly): subset-peel bisect backstop — ship innocent code instead of drop-all on unattributable gate red",
+      "author": "Ohad Fisher",
+      "date": "2026-07-24T10:09:29+03:00"
+    },
+    {
+      "sha": "7ab6ffda93d124c94d4f0180a44e589ea0b0f3cc",
+      "shortSha": "7ab6ffd",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-24",
+      "author": "Ohad Fisher",
+      "date": "2026-07-24T07:32:03+03:00"
+    },
+    {
+      "sha": "f0d49e00e004967835de63dd7bf5d1362191e147",
+      "shortSha": "f0d49e0",
+      "subject": "fix: escape literal parens in Telegram feedback msg; sanitize Resend subject for newlines",
+      "author": "Ohad Fisher",
+      "date": "2026-07-23T17:20:50Z"
     }
   ]
 }

@@ -1,29 +1,39 @@
 /**
- * Cross-promo position experiment wiring on WordHuntResultsContent.
+ * The primary next-step CTA on the Word Hunt results screen is pinned to the
+ * bottom of the scrollport, so "finish today's challenge" / "back to the daily
+ * hub" stays reachable without scrolling past the whole recap.
  *
- * Variant 'wheel-first' (default): Wheel CTA renders before leaderboard.
- * Variant 'leaderboard-first': Wheel CTA renders after leaderboard.
+ * `position: sticky` (not `fixed`) is deliberate — every CTA sits inside a
+ * Framer `m.div` transform ancestor, which turns `fixed` into `absolute`
+ * (see the portal comment in components/views/ResultsPage.tsx). Sticky is
+ * unaffected by transformed ancestors, and it also survives this component
+ * being mounted twice (mobile `md:hidden` + desktop `hidden md:block` columns
+ * in DailyWordHuntResults) without producing two floating bars.
  *
- * Both variants must call trackExposure() when the component mounts so
- * we get unbiased exposure stats matched against cross_promo_click conversions.
+ * A guest never gets a sticky CTA: their screen is score + leaderboard + one
+ * signup CTA (see guest-simplified result screens), and a second pinned CTA
+ * would compete with it.
  */
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const mockVariant = vi.fn<() => string>(() => 'wheel-first');
-const mockTrackExposure = vi.fn();
-const mockTrackHintExposure = vi.fn();
+const mockWheelPlayed = vi.fn<() => boolean>(() => false);
+const mockIsGuest = vi.fn<() => boolean>(() => false);
 
-vi.mock('@/hooks/useExperiment', () => ({
-  useExperiment: (key: string) => ({
-    variant: mockVariant(),
-    trackExposure: key === 'wordhunt-crosspromo-position' ? mockTrackExposure : mockTrackHintExposure,
-    _key: key,
-  }),
+vi.mock('@/hooks/useDailyModePlayed', () => ({
+  useDailyModePlayed: () => mockWheelPlayed(),
 }));
 
-// hasPlayedWordWheelToday returns false → wheel CTA always renders
+vi.mock('@/hooks/useIsGuest', () => ({
+  useIsGuest: () => mockIsGuest(),
+  default: () => mockIsGuest(),
+}));
+
+vi.mock('@/hooks/useExperiment', () => ({
+  useExperiment: () => ({ variant: 'control', trackExposure: vi.fn() }),
+}));
+
 vi.mock('@/utils/dailyChallenge/storage', () => ({
   hasPlayedWordWheelToday: () => false,
   hasPlayedWordHuntToday: () => false,
@@ -31,8 +41,9 @@ vi.mock('@/utils/dailyChallenge/storage', () => ({
 }));
 
 vi.mock('framer-motion', () => ({
-  m: { div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div> },
-  m: { div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div> },
+  m: new Proxy({}, {
+    get: () => ({ children, ...props }: React.ComponentProps<'div'>) => <div {...props}>{children}</div>,
+  }),
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
@@ -55,9 +66,7 @@ vi.mock('../results', () => ({
 }));
 
 vi.mock('../TabbedDailyLeaderboard', () => ({
-  default: function MockLeaderboard() {
-    return <div data-testid="leaderboard">leaderboard</div>;
-  },
+  default: function MockLeaderboard() { return <div data-testid="leaderboard" />; },
 }));
 
 vi.mock('@/components/auth/DailyChallengeInlineSignup', () => ({
@@ -145,47 +154,34 @@ const baseProps: WordHuntResultsContentProps = {
     typeof fallback === 'string' ? fallback : k,
 };
 
-function getOrderedTestIds(container: HTMLElement, ids: string[]): string[] {
-  const all = Array.from(container.querySelectorAll('[data-testid]'));
-  const set = new Set(ids);
-  return all.map(el => el.getAttribute('data-testid')!).filter(id => set.has(id));
-}
-
-describe('WordHuntResultsContent — cross-promo position experiment', () => {
+describe('WordHuntResultsContent — sticky primary CTA', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockVariant.mockReturnValue('wheel-first');
+    mockWheelPlayed.mockReturnValue(false);
+    mockIsGuest.mockReturnValue(false);
   });
 
-  it('wheel-first: wheel CTA renders before leaderboard', () => {
-    mockVariant.mockReturnValue('wheel-first');
-    const { container } = render(<WordHuntResultsContent {...baseProps} />);
-    const order = getOrderedTestIds(container, ['wordhunt-wheel-cta', 'leaderboard']);
-    expect(order).toEqual(['wordhunt-wheel-cta', 'leaderboard']);
-  });
-
-  it('leaderboard-first: wheel CTA renders after leaderboard', () => {
-    mockVariant.mockReturnValue('leaderboard-first');
-    const { container } = render(<WordHuntResultsContent {...baseProps} />);
-    const order = getOrderedTestIds(container, ['wordhunt-wheel-cta', 'leaderboard']);
-    expect(order).toEqual(['leaderboard', 'wordhunt-wheel-cta']);
-  });
-
-  it('fires trackExposure once on mount', () => {
+  it('pins the "finish today\'s challenge" CTA when the wheel is unplayed', () => {
     render(<WordHuntResultsContent {...baseProps} />);
-    expect(mockTrackExposure).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('wordhunt-wheel-cta').className).toContain('sticky');
   });
 
-  it('does not duplicate exposure when component re-renders with same props', () => {
-    const { rerender } = render(<WordHuntResultsContent {...baseProps} />);
-    rerender(<WordHuntResultsContent {...baseProps} />);
-    rerender(<WordHuntResultsContent {...baseProps} />);
-    expect(mockTrackExposure).toHaveBeenCalledTimes(1);
+  it('pins the back-to-daily-hub CTA once the wheel is done', () => {
+    mockWheelPlayed.mockReturnValue(true);
+    render(<WordHuntResultsContent {...baseProps} />);
+    expect(screen.getByTestId('wordhunt-back-to-daily-cta').className).toContain('sticky');
   });
 
-  it('renders only one wheel CTA regardless of variant', () => {
-    mockVariant.mockReturnValue('leaderboard-first');
+  it('renders exactly one primary CTA per state', () => {
     render(<WordHuntResultsContent {...baseProps} />);
     expect(screen.getAllByTestId('wordhunt-wheel-cta')).toHaveLength(1);
+    expect(screen.queryByTestId('wordhunt-back-to-daily-cta')).toBeNull();
+  });
+
+  it('gives a guest no sticky CTA — the signup card is their only one', () => {
+    mockIsGuest.mockReturnValue(true);
+    render(<WordHuntResultsContent {...baseProps} isAuthenticated={false} />);
+    expect(screen.queryByTestId('wordhunt-wheel-cta')).toBeNull();
+    expect(screen.queryByTestId('wordhunt-back-to-daily-cta')).toBeNull();
   });
 });

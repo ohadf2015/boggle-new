@@ -20,6 +20,7 @@ import { useIsGuest } from '@/hooks/useIsGuest';
 import WordWheelSignupCta from './WordWheelSignupCta';
 import WordWheelReplayCta from './WordWheelReplayCta';
 import CatchUpSuggestion from './CatchUpSuggestion';
+import { STICKY_CTA_WORD_WHEEL } from './stickyCta';
 import MpModeCrossPromo from './MpModeCrossPromo';
 import { wasSignupModalDismissedRecently } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
@@ -226,7 +227,12 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 
   return (
     <m.div
-      className="relative flex flex-col items-center gap-3 w-full max-w-md mx-auto px-4 py-5 overflow-hidden"
+      /* No `overflow-hidden` here: an overflow-hidden ancestor becomes the
+         scrollport for `position: sticky` and, since this box never scrolls,
+         would silently pin the CTA to nothing. The confetti layer below does
+         its own clipping (`absolute inset-0 overflow-hidden`), so nothing
+         escapes. */
+      className="relative flex flex-col items-center gap-3 w-full max-w-md mx-auto px-4 py-5"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
@@ -462,9 +468,10 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
 
       {/* PRIMARY CROSS-PROMO: Word Hunt CTA — promoted above leaderboard so users
           finish today's daily-pair (mirrors Word Hunt results page treatment). */}
-      {!isPractice && !hasPlayedWordHunt && (
+      {!isPractice && !hasPlayedWordHunt && !isGuest && (
         <m.div
-          className="w-full z-10"
+          data-testid="wordwheel-hunt-cta"
+          className={`w-full ${STICKY_CTA_WORD_WHEEL}`}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}
@@ -508,10 +515,14 @@ const WordWheelResults: React.FC<WordWheelResultsProps> = ({
         </m.div>
       )}
 
-      {/* Back to Daily Hub — both challenges complete */}
-      {!isPractice && hasPlayedWordHunt && (
+      {/* Back to Daily Hub — both challenges complete. Registered players only:
+          now that this pins to the bottom of the scrollport, showing it to a
+          guest would ride a second CTA over their signup card for the whole
+          scroll. The top-left Back link keeps them out of a dead end. */}
+      {!isPractice && hasPlayedWordHunt && !isGuest && (
         <m.div
-          className="w-full z-10"
+          data-testid="wordwheel-back-to-daily-cta"
+          className={`w-full ${STICKY_CTA_WORD_WHEEL}`}
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, type: 'spring', stiffness: 300, damping: 26 }}

@@ -1,18 +1,18 @@
 {
   "summary": {
-    "totalKeysInCode": 5970,
+    "totalKeysInCode": 5997,
     "keyCountByLanguage": {
-      "en": 11811,
-      "es": 12118,
-      "he": 12020,
-      "ja": 12074,
-      "ru": 11850,
-      "sv": 12070
+      "en": 11861,
+      "es": 12167,
+      "he": 12070,
+      "ja": 12123,
+      "ru": 11891,
+      "sv": 12119
     },
-    "missingFromEnglish": 15,
+    "missingFromEnglish": 14,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 23,
+      "templateLiterals": 24,
       "fallbackUsages": 1,
       "variableKeys": 22
     }
@@ -59,6 +59,13 @@
         "file": "components/adventure/ui/GameInfoStrip.tsx",
         "line": 87,
         "context": "{t(`adventure.mechanic.${mechanic}`)}",
+        "type": "template_literal"
+      },
+      {
+        "pattern": "avatarBuilder.tiers.${tier}",
+        "file": "components/avatar/AvatarTierBadge.tsx",
+        "line": 70,
+        "context": "{t(`avatarBuilder.tiers.${tier}`)}",
         "type": "template_literal"
       },
       {
@@ -506,15 +513,6 @@
       ]
     },
     {
-      "key": "sealedBid.tapHint",
-      "usages": [
-        {
-          "file": "components/sealedBid/SealedBidTable.tsx",
-          "line": 83
-        }
-      ]
-    },
-    {
       "key": "sealedBid.yourWord",
       "usages": [
         {
@@ -694,6 +692,7 @@
       "vs.fiveLanguages",
       "vs.charitableDonation",
       "vs.bestFor",
+      "sealedBid.tapHint",
       "sealedBid.shareCard.title",
       "sealedBid.shareCard.cta",
       "sealedBid.shareCard.copied",
@@ -705,10 +704,18 @@
       "sealedBid.session.shareCta"
     ],
     "ru": [
+      "shiritori.solo.tempo.bonus",
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
       "seo.refund.ogDescription",
+      "teacher.upgradePro.cta",
+      "teacher.upgradePro.body",
+      "education.landing.furtherReading.title",
+      "education.landing.furtherReading.guides",
+      "education.landing.furtherReading.glossary",
+      "education.landing.furtherReading.wordSolver",
+      "sealedBid.speedBonus",
       "sealedBid.shareCard.header",
       "sealedBid.shareCard.row",
       "sealedBid.shareCard.url",
@@ -773,6 +780,7 @@
       "vs.fiveLanguages",
       "vs.charitableDonation",
       "vs.bestFor",
+      "sealedBid.tapHint",
       "sealedBid.shareCard.title",
       "sealedBid.shareCard.cta",
       "sealedBid.shareCard.copied",
@@ -1158,7 +1166,6 @@
       "sealedBid.title",
       "sealedBid.badge",
       "sealedBid.lockIn",
-      "sealedBid.tapHint",
       "sealedBid.yourWord",
       "sealedBid.needWord",
       "sealedBid.needStake"
@@ -1774,7 +1781,6 @@
       "sealedBid.totalScore",
       "sealedBid.timerLabel",
       "sealedBid.sealPhase",
-      "sealedBid.tapHint",
       "sealedBid.backspace",
       "sealedBid.revealPhase",
       "sealedBid.lockIn",

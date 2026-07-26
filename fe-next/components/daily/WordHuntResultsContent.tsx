@@ -19,6 +19,7 @@ import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyInsightStack from './DailyInsightStack';
 import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
 import CatchUpSuggestion from './CatchUpSuggestion';
+import { STICKY_CTA_WORD_HUNT } from './stickyCta';
 import { SuggestWordCard } from './SuggestWordCard';
 import MpModeCrossPromo from './MpModeCrossPromo';
 import WatchAdButton from './WatchAdButton';
@@ -169,15 +170,10 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
     };
   }, []);
 
-  // A/B: cross-promo wheel-CTA placement vs leaderboard order.
-  const { variant: crossPromoOrder, trackExposure: trackCrossPromoExposure } =
-    useExperiment('wordhunt-crosspromo-position');
-  useEffect(() => {
-    // Guests never see either cross-promo placement (simplified screen), so
-    // counting them as exposed would dilute the experiment with a no-op arm.
-    if (isGuest) return;
-    trackCrossPromoExposure();
-  }, [trackCrossPromoExposure, isGuest]);
+  // NOTE: the `wordhunt-crosspromo-position` A/B (wheel CTA above vs below the
+  // leaderboard) is concluded — the primary CTA is now pinned to the bottom of
+  // the scrollport in both cases, so the two arms would render identically and
+  // collect null data. Removed rather than left tracking exposure for nothing.
 
   // A/B: hide the dead "Tap a player to see their path" hint that causes rage clicks.
   const { variant: hintVariant, trackExposure: trackHintExposure } =
@@ -201,6 +197,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   const wheelCtaNode = !wordWheelPlayed && (
     <m.div
       data-testid="wordhunt-wheel-cta"
+      className={STICKY_CTA_WORD_HUNT}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.22, type: 'spring', stiffness: 300, damping: 26 }}
@@ -214,8 +211,7 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
           onClick={() => trackGrowthEvent('cross_promo_click', {
             target: 'word_wheel',
             source: 'word_hunt_results',
-            placement: crossPromoOrder === 'wheel-first' ? 'primary' : 'secondary',
-            experiment_variant: crossPromoOrder,
+            placement: 'sticky',
             solved: result.solved,
             language,
           })}
@@ -250,6 +246,8 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
   // the player to "complete the other challenge".
   const backToDailyCtaNode = wordWheelPlayed && (
     <m.div
+      data-testid="wordhunt-back-to-daily-cta"
+      className={STICKY_CTA_WORD_HUNT}
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.22, type: 'spring', stiffness: 300, damping: 26 }}
@@ -494,19 +492,18 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
       </m.div>
     )}
 
-    {/* Primary next-step: back-to-daily (wheel already done) or a
-        variant-controlled wheel cross-promo, right above the leaderboard so
-        the player sees a clear next step alongside "who else played". */}
+    {/* Primary next-step: back-to-daily (wheel already done) or the wheel
+        cross-promo. Sticky-pinned to the bottom of the scrollport, so it stays
+        on screen through the leaderboard and the rest of the recap. It sits
+        here in DOM order so it lands right above "who else played" once the
+        player scrolls to the end and it unpins. */}
     {backToDailyCtaNode}
-    {!wordWheelPlayed && crossPromoOrder === 'wheel-first' && wheelCtaNode}
+    {wheelCtaNode}
 
     {/* Leaderboard — who else played, and how you stack up. Sits with
         rank/placement/vs-past so the "what matters" cluster (score,
         placement, vs others, vs your past) is together before promo/CTA noise. */}
     {leaderboardNode}
-
-    {/* SECONDARY CROSS-PROMO (variant): Word Wheel CTA below leaderboard. */}
-    {crossPromoOrder === 'leaderboard-first' && wheelCtaNode}
 
     {/* Actionable "score more next time" insight — guess-efficiency aware.
         attemptsToFind = guesses used; a fast solve gets a positive nudge, a blind

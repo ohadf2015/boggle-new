@@ -71,18 +71,10 @@ export const EXPERIMENTS = {
       'Daily challenge landing hero treatment. control = current, mascot-front = mascot leads above CTA, score-tease = preview today\'s top score teaser.',
   }),
 
-  /**
-   * Word-Hunt results cross-promo placement. Wheel-CTA was promoted
-   * above leaderboard 2026-04-29 based on click ratio (4:1). Formalize
-   * as proper experiment to validate uplift with stats engine instead
-   * of raw funnel comparison.
-   */
-  'wordhunt-crosspromo-position': defineExperiment({
-    variants: ['wheel-first', 'leaderboard-first'] as const,
-    default: 'wheel-first',
-    description:
-      'Word-Hunt results page: cross-promo wheel CTA above leaderboard (wheel-first) vs the historical layout (leaderboard-first). Conversion = cross_promo_click.',
-  }),
+  /* CONCLUDED 2026-07-25 — `wordhunt-crosspromo-position` (wheel CTA above vs
+     below the leaderboard) is gone: the primary CTA is now sticky-pinned to
+     the bottom of the results scrollport, so both arms rendered identically.
+     `cross_promo_click` no longer carries `experiment_variant`. */
 
   /**
    * Boost picker grid order. Hypothesis: top-of-grid placement biases
@@ -675,10 +667,11 @@ export const EXPERIMENTS = {
       'Homepage mode-card click feedback. click-feedback = immediate press animation (scale+brightness) on card click. Targets homepage rage-clicks (27 in 7d, 20 null-el_text). Conversion = rageclick rate falls on /en + /. Guardrail = game_started stable.',
   }),
 
-  /* CONCLUDED 2026-07-26 — `exp-mp-lobby-connect-feedback-v1` REVERTED to
-     control. The eager-feedback arm (setIsJoining + "Connecting…" toast during
-     the 5s socket wait) did not reduce /es/multiplayer rage-clicks. Its only
-     consumer (useMultiplayerJoin) is back on the plain silent-wait path. */
+  /* CONCLUDED 2026-07-26 — `exp-mp-lobby-connect-feedback-v1` REVERTED.
+     eager-feedback arm (setIsJoining+toast during 5s socket wait) caused
+     rage clicks to increase 6→22 over 7d. Disabling the join button while
+     connecting made users rage-tap other UI elements. Control (silent wait,
+     button stays enabled) was measurably better. */
 
   /**
    * MP results "I'm Ready" micro-delight. Hypothesis: after clicking ready the

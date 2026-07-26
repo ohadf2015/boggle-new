@@ -694,11 +694,17 @@ const WordWheelChallenge: React.FC = () => {
           </m.div>
         )}
 
-        {/* Completed / Already Played */}
+        {/* Completed / Already Played.
+            The wrapper owns its scrollport (mirroring the ready/playing phases
+            above): the stage root is `overflow-hidden`, so without this the
+            recap had nowhere to scroll and the sticky primary CTA would have
+            had no scrollport to pin to. `justify-start`, not `justify-center`
+            — a centred flex column whose content overflows clips at BOTH ends
+            and can't be scrolled back to the top. */}
         {(phase === 'completed' || phase === 'already-played') && gameResult && (
           <m.div
             key="results"
-            className="flex-1 flex flex-col items-center justify-center"
+            className="flex-1 min-h-0 flex flex-col items-center justify-start overflow-y-auto overscroll-contain pb-bottom-stack"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
