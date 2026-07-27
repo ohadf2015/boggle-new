@@ -2,6 +2,57 @@
 
 Date: 2026-07-27 · Site: https://www.lexiclash.live · Publisher: `ca-pub-1896836706464880`
 
+## UPDATE 2026-07-27 (evening): "Low value content" root cause found & fixed
+
+Google's rejection reason (confirmed by owner): **Low value content**.
+Deeper reviewer-simulation audit (Playwright-rendered visible text, not raw SSR)
+found the real causes:
+
+1. **28 app-shell pages hid all publisher copy in `sr-only` blocks** — tools,
+   daily, community, multiplayer, leaderboard, how-to-play, education, brain
+   drills, rules, word-of-the-day, etc. Rendered visible text: `/en/tools` ≈347
+   words, `/en/daily` ≈366, `/en/community` ≈451 — nearly all of it nav/UI.
+   Human reviewers saw a game UI with zero readable content; hidden keyword
+   text is also a negative spam signal. (Homepage was remediated the same way
+   on 2026-06-04; the other 28 pages were missed.)
+2. **Legal trust pages 404 at canonical URLs** — `/en/privacy`, `/en/terms`
+   returned 404 (content only existed under `/en/legal/*`). Reviewers probe
+   these canonical paths.
+3. **Thin localized templates** — sv/ja/es homepages carry 2 FAQs vs 6 for
+   en/he/ru; `/ja` homepage renders ≈188 words.
+
+### Fixes shipped (same day)
+
+- `components/seo/GamePageSeoContent.tsx` — now renders a **visible**
+  neo-brutalist reference card (title, description, feature grid, native
+  `<details>` FAQ, zero client JS, RTL-safe) by default; `srOnly` kept as an
+  explicit escape hatch. This one flip gives ~25 app-shell pages 300–500 words
+  of visible localized content.
+- `app/[locale]/free-multiplayer-word-game/Showcase3DClient.tsx` — passes
+  `srOnly` (block sits above a pinned 3D hero; page has its own visible FAQ).
+- `app/[locale]/leaderboard/page.tsx` — removed a duplicate
+  `GamePageSeoContent` (layout already renders it).
+- `next.config.mjs` — 301s: `/[locale]/privacy`, `/privacy-policy`, `/terms`,
+  `/terms-of-service`, `/cookies` → `/[locale]/legal/*`.
+- Regression test `components/seo/__tests__/GamePageSeoContent.test.tsx`
+  asserts visible-by-default rendering.
+
+### Resubmission talking points
+
+- Every game page now shows real, readable publisher content (rules, features,
+  FAQs) — not just an app shell.
+- Legal/trust pages resolve at canonical `/privacy` / `/terms` paths.
+- Blog: 28 EN posts, median ~1,733 words, original editorial content.
+
+### Remaining (non-blocking, next iteration)
+
+- sv/ja/es homepages: expand FAQs natively (needs a translator, NOT
+  auto-translate) to reach en/he/ru depth.
+- If rejected again: request the specific sampled URLs via AdSense support and
+  re-audit those exact pages.
+
+---
+
 ## Verdict: READY TO RESUBMIT
 
 All technical and content prerequisites verified live. The only remaining step is

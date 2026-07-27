@@ -162,6 +162,34 @@ const nextConfig = {
         destination: '/en',
         permanent: true,
       },
+      // Legal page aliases: AdSense reviewers and ad verifiers routinely probe
+      // /privacy, /terms, /cookies at the locale root. These used to 404 —
+      // redirect them to the canonical /legal/* pages.
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/privacy',
+        destination: '/:locale/legal/privacy',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/privacy-policy',
+        destination: '/:locale/legal/privacy',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/terms',
+        destination: '/:locale/legal/terms',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/terms-of-service',
+        destination: '/:locale/legal/terms',
+        permanent: true,
+      },
+      {
+        source: '/:locale(en|he|sv|ja|es|ru)/cookies',
+        destination: '/:locale/legal/cookies',
+        permanent: true,
+      },
       // Author route rename: the-word-nerd → ohad-fisher
       {
         source: '/:locale(en|he|sv|ja|es|ru)/about/the-word-nerd',

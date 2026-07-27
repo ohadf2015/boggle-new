@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { buildLeaderboardFaqJsonLd, encodeJsonLd } from '@/lib/seo/leaderboardJsonLd';
 import LeaderboardPageClient from './PageClientNoSsr';
 
@@ -153,12 +152,8 @@ export default async function LeaderboardPage({ params }: { params: Promise<{ lo
   return (
     <>
       <LeaderboardPageClient />
-      <GamePageSeoContent
-        title={content.title}
-        description={content.description}
-        features={content.features}
-        faq={content.faq}
-      />
+      {/* GamePageSeoContent is rendered by leaderboard/layout.tsx — rendering it
+          here too would duplicate the (now visible) content block on the page. */}
       <script type="application/ld+json">{encodeJsonLd(breadcrumbJsonLd)}</script>
       {faqJsonLd && (
         <script type="application/ld+json">{encodeJsonLd(faqJsonLd)}</script>

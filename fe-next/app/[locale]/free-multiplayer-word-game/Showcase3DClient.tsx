@@ -255,9 +255,13 @@ export default function Showcase3DClient({ locale }: Showcase3DClientProps) {
 
   return (
     <main ref={main} className="bg-neo-navy text-neo-white">
-      {/* crawlable, localized SEO/GEO content (visually hidden, in SSR HTML) */}
+      {/* crawlable, localized SEO/GEO content (visually hidden, in SSR HTML) —
+          kept srOnly here because this block sits ABOVE the pinned 3D hero and a
+          visible card would break the showcase layout; the page has its own
+          visible FaqAccordion + chapter copy further down. */}
       <GamePageSeoContent
         asH1
+        srOnly
         title={`${t('showcase3d.heroBadge', 'A world of words')} — LexiClash`}
         description={`${t('showcase3d.modesSub', 'Real rounds, real boards.')} ${t('showcase3d.bottomTitle', 'Your move. Make it loud.')} ${t('showcase3d.cap0Body', '')} ${t('showcase3d.cap1Body', '')}`}
         features={[
