@@ -3,7 +3,6 @@
 import { useCallback, useRef } from 'react';
 import Script from 'next/script';
 import { useAuth } from '@/contexts/AuthContext';
-import { useLanguage } from '@/contexts/LanguageContext';
 import { isNative } from '@/utils/platform';
 import { supabase } from '@/lib/supabase';
 import {
@@ -27,7 +26,6 @@ const GSI_SRC = 'https://accounts.google.com/gsi/client';
  */
 export default function GoogleOneTapInitializer() {
   const { isAuthenticated } = useAuth();
-  const { language } = useLanguage();
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
   const promptedRef = useRef(false);
 
@@ -44,9 +42,9 @@ export default function GoogleOneTapInitializer() {
     if (!google?.accounts?.id) return;
     promptedRef.current = true;
 
-    await ensureGoogleIdInitialized(google, clientId, language);
+    await ensureGoogleIdInitialized(google, clientId);
     google.accounts.id.prompt();
-  }, [clientId, language]);
+  }, [clientId]);
 
   if (!enabled) return null;
 

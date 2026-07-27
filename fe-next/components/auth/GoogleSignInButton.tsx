@@ -50,7 +50,7 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
     const google = (window as unknown as { google?: GoogleIdServices }).google;
     if (!google?.accounts?.id) return;
 
-    await ensureGoogleIdInitialized(google, clientId, language);
+    await ensureGoogleIdInitialized(google, clientId);
     renderedRef.current = true;
     // 'outline' = white button (white bg, dark text). The colored "G" can't be
     // recolored — Google's branding rules forbid a monochrome logo, so a black G
@@ -68,6 +68,10 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
       shape: 'rectangular',
       text: 'continue_with',
       logo_alignment: 'center',
+      // Follow the SITE language, not the browser locale — otherwise a visitor
+      // on /he with a Dutch browser gets "Doorgaan met Google". `locale` is a
+      // renderButton option (it is NOT part of the initialize config).
+      locale: language,
       ...(width != null ? { width: Math.min(width, GSI_MAX_WIDTH) } : {}),
     });
   }, [clientId, width, language]);

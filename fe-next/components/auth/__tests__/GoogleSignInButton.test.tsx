@@ -88,6 +88,15 @@ describe('GoogleSignInButton', () => {
     expect(opts.logo_alignment).toBe('center');
   });
 
+  it('passes the site language as renderButton locale so the button matches the page, not the browser', async () => {
+    const renderButton = stubGoogleId();
+    render(<GoogleSignInButton />);
+    await waitFor(() => expect(renderButton).toHaveBeenCalled());
+    const opts = renderButton.mock.calls[0][1] as Record<string, unknown>;
+    // Default context language is 'en' (no LanguageProvider in this test).
+    expect(opts.locale).toBe('en');
+  });
+
   it('still honors an explicit width prop when a caller forces one', async () => {
     const renderButton = stubGoogleId();
     render(<GoogleSignInButton width={260} />);
