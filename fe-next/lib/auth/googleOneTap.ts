@@ -142,6 +142,11 @@ let idInitialized = false;
 export async function ensureGoogleIdInitialized(
   google: GoogleIdServices | null | undefined,
   clientId: string,
+  /** Site language ('en' | 'he' | 'sv' | 'ja' | 'es' | 'ru'). GSI otherwise
+   *  falls back to the BROWSER locale, so a visitor on /he with a Dutch
+   *  browser sees "Doorgaan met Google" on a Hebrew page. Passing the site
+   *  locale keeps the button + One Tap prompt in the page's language. */
+  locale?: string,
 ): Promise<void> {
   if (idInitialized) return;
   if (!google?.accounts?.id) return;
@@ -160,6 +165,7 @@ export async function ensureGoogleIdInitialized(
     use_fedcm_for_prompt: true,
     auto_select: false,
     cancel_on_tap_outside: true,
+    ...(locale ? { locale } : {}),
   });
   idInitialized = true;
 }

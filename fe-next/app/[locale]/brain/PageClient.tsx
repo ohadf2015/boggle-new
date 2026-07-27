@@ -122,11 +122,16 @@ export default function BrainTrainingPageClient() {
   // State for first game celebration - persisted to localStorage for show-once behavior
   const FIRST_GAME_CELEBRATION_KEY = 'lexiclash_brain_first_game_celebration_shown';
   const [showCelebration, setShowCelebration] = useState(false);
-  const [hasShownCelebration, setHasShownCelebration] = useState(() => {
-    // Initialize from localStorage to persist across sessions
-    if (typeof window === 'undefined') return false;
-    return localStorage.getItem(FIRST_GAME_CELEBRATION_KEY) === 'true';
-  });
+  // SSR-safe: always false on server/first client render; the persisted flag is
+  // read in an effect below. Reading localStorage in the useState initializer
+  // makes the first client render differ from the server HTML for returning
+  // users → hydration mismatch (React #418).
+  const [hasShownCelebration, setHasShownCelebration] = useState(false);
+
+  useEffect(() => {
+    setHasShownCelebration(localStorage.getItem(FIRST_GAME_CELEBRATION_KEY) === 'true');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // State for auth modal
   const [showAuthModal, setShowAuthModal] = useState(false);

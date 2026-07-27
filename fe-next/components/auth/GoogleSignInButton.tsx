@@ -5,6 +5,7 @@ import Script from 'next/script';
 import { isNative, isEdgeBrowser } from '@/utils/platform';
 import { supabase, signInWithGoogle } from '@/lib/supabase';
 import { ensureGoogleIdInitialized, type GoogleIdServices } from '@/lib/auth/googleOneTap';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { GoogleIcon } from '@/components/auth/shared/icons/BrandIcons';
 
@@ -37,6 +38,7 @@ interface GoogleSignInButtonProps {
  */
 export default function GoogleSignInButton({ className, width }: GoogleSignInButtonProps) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID;
+  const { language } = useLanguage();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const renderedRef = useRef(false);
@@ -48,7 +50,7 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
     const google = (window as unknown as { google?: GoogleIdServices }).google;
     if (!google?.accounts?.id) return;
 
-    await ensureGoogleIdInitialized(google, clientId);
+    await ensureGoogleIdInitialized(google, clientId, language);
     renderedRef.current = true;
     // 'outline' = white button (white bg, dark text). The colored "G" can't be
     // recolored — Google's branding rules forbid a monochrome logo, so a black G
@@ -68,7 +70,7 @@ export default function GoogleSignInButton({ className, width }: GoogleSignInBut
       logo_alignment: 'center',
       ...(width != null ? { width: Math.min(width, GSI_MAX_WIDTH) } : {}),
     });
-  }, [clientId, width]);
+  }, [clientId, width, language]);
 
   // GIS may already be loaded (the global One Tap initializer pulls it in) — render
   // immediately rather than waiting for a fresh onReady.

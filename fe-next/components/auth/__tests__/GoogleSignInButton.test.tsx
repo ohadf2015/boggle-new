@@ -4,6 +4,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 const mockIsNative = vi.fn(() => false);
 vi.mock('@/utils/platform', () => ({
   isNative: () => mockIsNative(),
+  isEdgeBrowser: () => false,
 }));
 
 vi.mock('@/lib/supabase', () => ({

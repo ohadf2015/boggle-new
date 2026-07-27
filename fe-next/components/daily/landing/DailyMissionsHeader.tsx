@@ -21,7 +21,11 @@ interface DailyMissionsHeaderProps {
  */
 export function DailyMissionsHeader({ completedCount, total = 2 }: DailyMissionsHeaderProps) {
   const { t } = useLanguage();
-  const [countdown, setCountdown] = useState(getSecondsUntilNextDaily());
+  // Defer the countdown to the client (null on SSR): a live clock value
+  // computed in render differs between server render time and client hydration
+  // time → hydration mismatch (React #418). The date label below is deferred
+  // for the same reason.
+  const [countdown, setCountdown] = useState<number | null>(null);
   // Defer date to client to avoid SSR/CSR hydration mismatch (React #418)
   const [dateLabel, setDateLabel] = useState<{ monthAbbr: string; dayNum: number | null }>({
     monthAbbr: '',
@@ -34,6 +38,7 @@ export function DailyMissionsHeader({ completedCount, total = 2 }: DailyMissions
       monthAbbr: now.toLocaleString('en', { month: 'short' }).toUpperCase(),
       dayNum: now.getDate(),
     });
+    setCountdown(getSecondsUntilNextDaily());
     const interval = setInterval(() => {
       setCountdown(getSecondsUntilNextDaily());
     }, 1000);
@@ -125,7 +130,7 @@ export function DailyMissionsHeader({ completedCount, total = 2 }: DailyMissions
           className="text-sm font-black text-white font-mono tracking-wider"
           data-testid="countdown-timer"
         >
-          {formatTimeHHMMSS(countdown)}
+          {countdown === null ? '--:--:--' : formatTimeHHMMSS(countdown)}
         </p>
       </div>
     </m.div>

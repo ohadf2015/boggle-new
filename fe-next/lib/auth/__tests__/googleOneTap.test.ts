@@ -127,6 +127,20 @@ describe('ensureGoogleIdInitialized', () => {
     await ensureGoogleIdInitialized(google, 'cid-123');
     expect(google.accounts.id.initialize).toHaveBeenCalledTimes(1);
   });
+
+  it('passes the site locale to GIS so the button matches the page language', async () => {
+    const google = makeGoogle();
+    await ensureGoogleIdInitialized(google, 'cid-123', 'he');
+    const cfg = google.accounts.id.initialize.mock.calls[0][0];
+    expect(cfg.locale).toBe('he');
+  });
+
+  it('omits locale when not provided (falls back to browser locale)', async () => {
+    const google = makeGoogle();
+    await ensureGoogleIdInitialized(google, 'cid-123');
+    const cfg = google.accounts.id.initialize.mock.calls[0][0];
+    expect('locale' in cfg).toBe(false);
+  });
 });
 
 describe('shouldEnableGoogleOneTap', () => {
