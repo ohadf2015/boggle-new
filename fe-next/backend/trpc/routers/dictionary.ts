@@ -4,7 +4,7 @@ import { TRPCError } from '@trpc/server';
 import logger from '../../utils/logger';
 import { getCachedWordValidation, setCachedWordValidation } from '../../cache/wordCache';
 
-const { isDictionaryWord, dictionary } = require('../../dictionary');
+const { isDictionaryWord, dictionary, ensureLanguageLoaded } = require('../../dictionary');
 const { isWordCommunityValid, isWordValidForScoring } = require('../../modules/communityWordManager');
 
 const languageEnum = z.enum(['en', 'he', 'sv', 'ja', 'es']);
@@ -34,6 +34,10 @@ export const dictionaryRouter = router({
         if (cached !== null) {
           return { isValid: cached, source: cached ? 'dictionary' : 'unknown' };
         }
+
+        // Non-English dictionaries lazy-load on demand; this endpoint has no game-start
+        // to trigger that, so trigger it here.
+        await ensureLanguageLoaded(input.language);
 
         // Check dictionary
         const isInDictionary = isDictionaryWord(normalizedWord, input.language);
@@ -78,6 +82,7 @@ export const dictionaryRouter = router({
       }
 
       // Check word exists in dictionary first
+      await ensureLanguageLoaded(input.language);
       const isValid = isDictionaryWord(normalizedWord, input.language);
       if (!isValid) {
         throw new TRPCError({ code: 'NOT_FOUND', message: 'Word not found in dictionary' });

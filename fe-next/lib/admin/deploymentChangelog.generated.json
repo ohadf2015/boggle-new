@@ -1,6 +1,20 @@
 {
-  "generatedAt": "2026-07-26T15:43:43.057Z",
+  "generatedAt": "2026-07-27T10:38:15.865Z",
   "commits": [
+    {
+      "sha": "30193e9cf8fa9655e090a50681572e3452a9c42a",
+      "shortSha": "30193e9",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-27",
+      "author": "Ohad Fisher",
+      "date": "2026-07-27T05:49:46+03:00"
+    },
+    {
+      "sha": "dc376bba0a020c5be4dd27e62069cfd02d515363",
+      "shortSha": "dc376bb",
+      "subject": "fix(daily): close sticky-CTA gap and cap Word Wheel to one viewport",
+      "author": "Ohad Fisher",
+      "date": "2026-07-26T18:50:53+03:00"
+    },
     {
       "sha": "1293c07ef1795c9f6548a386eee1af069d401378",
       "shortSha": "1293c07",
@@ -126,20 +140,6 @@
       "subject": "feat: add poki platform detection to posthogEngagement (type + detectPlatform with SDK and referrer checks)",
       "author": "Hermes (agent)",
       "date": "2026-07-24T08:54:52Z"
-    },
-    {
-      "sha": "9696756fddd10fd5d1ba4810aad130a35d5f04c8",
-      "shortSha": "9696756",
-      "subject": "fix(nightly): subset-peel bisect backstop — ship innocent code instead of drop-all on unattributable gate red",
-      "author": "Ohad Fisher",
-      "date": "2026-07-24T10:09:29+03:00"
-    },
-    {
-      "sha": "7ab6ffda93d124c94d4f0180a44e589ea0b0f3cc",
-      "shortSha": "7ab6ffd",
-      "subject": "chore(nightly): autonomous improvement loop 2026-07-24",
-      "author": "Ohad Fisher",
-      "date": "2026-07-24T07:32:03+03:00"
     }
   ]
 }

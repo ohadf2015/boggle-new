@@ -99,14 +99,17 @@ export async function initializeServer(io: Server): Promise<void> {
     lifecycleLogger.error({ err: error }, 'Failed to restore tournaments');
   }
 
-  // Load ALL dictionaries on startup to prevent race conditions and delays during gameplay
-  // Memory cost is ~10-15MB for all 5 languages, but eliminates latency issues
+  // Load English only at boot; every other language lazy-loads via ensureLanguageLoaded()
+  // on first game start (already wired in gameStartHandler/gameLifecycleHandler/gameTimer/
+  // quickPlayRound/wordHuntRoutes/bot*). Measured Set+trie cost: Russian 262MB, Japanese
+  // 77MB, Hebrew 55MB — eager-loading all 6 was the dominant idle-memory driver, not a
+  // ~10-15MB rounding error as the old comment claimed.
   try {
-    lifecycleLogger.info('Loading all dictionaries (en, he, sv, ja, es)');
-    await dictionary.load();
-    lifecycleLogger.info('All dictionaries loaded successfully');
+    lifecycleLogger.info('Loading English dictionary at boot (other languages lazy-load on demand)');
+    await dictionary.loadEnglishOnly();
+    lifecycleLogger.info('English dictionary loaded successfully');
   } catch (error) {
-    lifecycleLogger.error({ err: error }, 'Failed to load dictionaries');
+    lifecycleLogger.error({ err: error }, 'Failed to load English dictionary');
   }
 
   // Warm up worker pool

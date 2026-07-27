@@ -26,7 +26,7 @@ import logger from '../utils/logger.js';
 import { validatePayload, addBotSchema, removeBotSchema } from '../utils/socketValidation.js';
 import { isInProgress } from '../utils/gameStateMachine.js';
 
-import { MAX_PLAYERS_PER_ROOM } from '@/shared/constants/gameConstants';
+import { MAX_PLAYERS_PER_ROOM, MAX_BOTS_PER_ROOM } from '@/shared/constants/gameConstants';
 
 // Types for payloads
 interface AddBotPayload {
@@ -113,6 +113,12 @@ function registerBotHandlers(io: Server, socket: Socket): void {
     const currentBotCount: number = botManager.getGameBots(gameCode).length;
     if (currentPlayerCount + currentBotCount >= MAX_PLAYERS_PER_ROOM) {
       emitError(socket, ErrorCodes.GAME_FULL);
+      return;
+    }
+
+    // Check bot limit
+    if (currentBotCount >= MAX_BOTS_PER_ROOM) {
+      emitError(socket, ErrorCodes.GAME_FULL, { message: `Maximum ${MAX_BOTS_PER_ROOM} bots per room` });
       return;
     }
 

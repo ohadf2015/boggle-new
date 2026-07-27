@@ -9,6 +9,7 @@ import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
 import { cn } from '../../../lib/utils';
 import { ConfirmationDialog } from '../../../components/ui/ConfirmationDialog';
 import type { Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
+import { MAX_BOTS_PER_ROOM } from '@/shared/constants/gameConstants';
 
 interface PlayerData {
   username: string;
@@ -137,6 +138,8 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
   }, [username]);
 
   const isFull = players.length >= maxPlayers;
+  const botCount = players.filter((p) => typeof p === 'object' && p.isBot).length;
+  const botCapReached = botCount >= MAX_BOTS_PER_ROOM;
 
   const handleAddBot = useCallback((difficulty: 'easy' | 'medium' | 'hard') => {
     socket?.emit('addBot', { difficulty, gameCode });
@@ -372,7 +375,7 @@ export const PlayerRoster = memo(function PlayerRoster({ players, username, game
         </AnimatePresence>
 
         {/* Add bot button — sized to match avatar tile so the row stays compact and aligned */}
-        {!isFull && (
+        {!isFull && !botCapReached && (
           <div className="shrink-0 flex flex-col items-center gap-1.5">
             <m.button
               whileHover={{ scale: 1.04 }}

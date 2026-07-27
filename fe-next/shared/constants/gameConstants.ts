@@ -114,6 +114,7 @@ export const MAX_DISCOVERY_WORD_LENGTH = 8;
 // ==================== Room Settings ====================
 
 export const MAX_PLAYERS_PER_ROOM = 50;
+export const MAX_BOTS_PER_ROOM = 3;
 export const MAX_ROOM_NAME_LENGTH = 50;
 export const ROOM_CODE_LENGTH = 4;
 
