@@ -100,13 +100,13 @@ describe('buildShareText', () => {
 
   it('ends with a lexiclash URL', () => {
     const text = buildShareText(HISTORY, 35);
-    expect(text).toMatch(/lexiclash\.com/);
+    expect(text).toMatch(/lexiclash\.live/);
   });
 
   it('handles empty history gracefully', () => {
     const text = buildShareText([], 0);
     expect(text).toMatch(/0/);
-    expect(text).toMatch(/lexiclash\.com/);
+    expect(text).toMatch(/lexiclash\.live/);
   });
 });
 

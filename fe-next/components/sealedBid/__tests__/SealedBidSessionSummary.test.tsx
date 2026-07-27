@@ -39,7 +39,7 @@ describe('buildBluffShareText', () => {
 
   it('includes lexiclash URL', () => {
     const text = buildBluffShareText(HISTORY, 35);
-    expect(text).toMatch(/lexiclash\.com/);
+    expect(text).toMatch(/lexiclash\.live/);
   });
 
   it('handles all-unique history', () => {
@@ -54,7 +54,7 @@ describe('buildBluffShareText', () => {
   it('handles empty history gracefully', () => {
     const text = buildBluffShareText([], 0);
     expect(text).toContain('0/0');
-    expect(text).toMatch(/lexiclash\.com/);
+    expect(text).toMatch(/lexiclash\.live/);
   });
 });
 
