@@ -35,26 +35,20 @@ export function useDailyChallengeStatus(language: Language): UseDailyChallengeSt
   const { user } = useAuth();
   const playerId = user?.id ?? null;
 
-  // Initialize with localStorage data for immediate display
-  const [status, setStatus] = useState<DailyChallengeStatus>(() => {
-    // SSR safety check
-    if (typeof window === 'undefined') {
-      return {
-        hasPlayed: false,
-        hasSolved: null,
-        currentStreak: 0,
-        longestStreak: 0,
-        puzzleNumber: 0,
-        puzzleDate: '',
-        loading: true,
-        fromServer: false,
-      };
-    }
-    return {
-      ...getQuickDailyStatus(language),
-      loading: !!playerId, // Only loading if we'll fetch from server
-    };
-  });
+  // Initialize with SSR-safe defaults. This MUST match the server render exactly:
+  // reading localStorage or playerId here would diverge from SSR output and cause
+  // React hydration error #418 (server renders the loading badge, client doesn't).
+  // The useEffect below immediately overlays real localStorage/server data.
+  const [status, setStatus] = useState<DailyChallengeStatus>(() => ({
+    hasPlayed: false,
+    hasSolved: null,
+    currentStreak: 0,
+    longestStreak: 0,
+    puzzleNumber: 0,
+    puzzleDate: '',
+    loading: true,
+    fromServer: false,
+  }));
 
   // Track if component is mounted to prevent state updates after unmount
   const isMounted = useRef(true);

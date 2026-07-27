@@ -11,7 +11,7 @@
  * const { isLowEnd, targetFPS, enableComplexAnimations } = useDevicePerformance();
  */
 
-import { useEffect, useMemo, useSyncExternalStore } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import {
   startFrameWatch,
   getRuntimeDowngrade,
@@ -91,20 +91,30 @@ function detectIsMobile(): boolean {
 }
 
 // Detect low-end device characteristics
+//
+// HYDRATION SAFETY: this must never run during SSR or the first client render.
+// Node 21+ exposes a global `navigator` (with the SERVER's hardwareConcurrency),
+// so a `typeof navigator === 'undefined'` guard is not enough: a small container
+// (e.g. 2 vCPU) would render the low-end UI on the server while a capable client
+// renders the full UI → React hydration error #418. The hook below always uses
+// SSR_CAPABLE_FALLBACK for SSR + first client render, then adopts real device
+// capabilities in an effect.
+const SSR_CAPABLE_FALLBACK: Omit<DevicePerformanceConfig, 'prefersReducedMotion'> = {
+  isLowEnd: false,
+  targetFPS: 60,
+  throttleMs: 16,
+  enableComplexAnimations: true,
+  enableGlowEffects: true,
+  reduceParticles: false,
+  maxParticles: 20,
+  isSlowConnection: false,
+  isMobile: false,
+};
+
 function detectDeviceCapabilities(): Omit<DevicePerformanceConfig, 'prefersReducedMotion'> {
-  if (typeof navigator === 'undefined') {
+  if (typeof window === 'undefined') {
     // SSR fallback - assume capable device
-    return {
-      isLowEnd: false,
-      targetFPS: 60,
-      throttleMs: 16,
-      enableComplexAnimations: true,
-      enableGlowEffects: true,
-      reduceParticles: false,
-      maxParticles: 20,
-      isSlowConnection: false,
-      isMobile: false,
-    };
+    return SSR_CAPABLE_FALLBACK;
   }
 
   const isMobile = detectIsMobile();
@@ -218,8 +228,17 @@ export function useDevicePerformance(): DevicePerformanceConfig {
     return () => clearTimeout(id);
   }, []);
 
-  // Compute device capabilities (stable - only runs once on client)
-  const capabilities = useMemo(() => detectDeviceCapabilities(), []);
+  // Compute device capabilities. MUST start from SSR_CAPABLE_FALLBACK on both the
+  // server and the first client render (hydration!) — the real detection touches
+  // navigator/window, which can differ between the server's container and the
+  // user's device. Adopt the real values post-hydration in an effect.
+  const [capabilities, setCapabilities] = useState(
+    () => SSR_CAPABLE_FALLBACK
+  );
+
+  useEffect(() => {
+    setCapabilities(detectDeviceCapabilities());
+  }, []);
 
   // Combine capabilities with reduced motion preference
   return useMemo(() => {
