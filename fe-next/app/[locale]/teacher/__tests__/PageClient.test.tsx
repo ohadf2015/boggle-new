@@ -24,9 +24,11 @@ vi.mock('lucide-react', () => ({ Shield: () => null, ArrowLeft: () => null }));
 vi.mock('@/components/ui/button', () => ({ Button: ({ children, onClick }: { children: React.ReactNode; onClick?: () => void }) => <button onClick={onClick}>{children}</button> }));
 
 import * as AuthContext from '@/contexts/AuthContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import TeacherPage from '../PageClient';
 
 const mockUseAuth = AuthContext.useAuth as ReturnType<typeof vi.fn>;
+const mockTrackGrowthEvent = vi.mocked(trackGrowthEvent);
 
 const teacherProfile = { user_role: 'teacher' as const, is_admin: false };
 const adminProfile  = { user_role: 'admin' as const,   is_admin: true  };
@@ -45,5 +47,24 @@ describe('TeacherPage upgrade CTA', () => {
     mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: adminProfile, isAdmin: true, loading: false });
     render(<TeacherPage />);
     expect(screen.queryByRole('link', { name: /teacher\.upgradePro\.cta/i })).toBeNull();
+  });
+
+  it('fires iap_viewed impression on mount for non-admin teacher', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: teacherProfile, isAdmin: false, loading: false });
+    render(<TeacherPage />);
+    expect(mockTrackGrowthEvent).toHaveBeenCalledWith('iap_viewed', {
+      product: 'teacher_pro',
+      source: 'dashboard_banner',
+      event_type: 'impression',
+    });
+  });
+
+  it('does not fire iap_viewed impression for admin', () => {
+    mockUseAuth.mockReturnValue({ user: { id: 'u1' }, profile: adminProfile, isAdmin: true, loading: false });
+    render(<TeacherPage />);
+    expect(mockTrackGrowthEvent).not.toHaveBeenCalledWith(
+      'iap_viewed',
+      expect.objectContaining({ product: 'teacher_pro', event_type: 'impression' }),
+    );
   });
 });

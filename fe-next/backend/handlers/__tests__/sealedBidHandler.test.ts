@@ -138,4 +138,23 @@ describe('sealedBidHandler', () => {
     handleSubmitSealedBid(mkIo(), sock, { word: 'TRAIN' });
     expect(sock.emit).toHaveBeenCalledWith('sealedBidRejected', { error: 'already-locked' });
   });
+
+  it('breaks ties alphabetically — lower username wins regardless of insertion order', () => {
+    // Players added p2-first so Object.entries yields p2 before p1 — the bug returns p2.
+    const game = mkGame({
+      users: { p2: { username: 'p2', socketId: 's2' }, p1: { username: 'p1', socketId: 's1' } },
+      sealedBidState: initSealedBidState(['p2', 'p1'], ['TRAINED'], 1000, 30000),
+    });
+    (getGame as unknown as Mock).mockReturnValue(game);
+    // Both clash on TRAIN → both score 0 → tied
+    (getUsernameBySocketId as unknown as Mock).mockReturnValue('p2');
+    handleSubmitSealedBid(mkIo(), mkSocket('s2'), { word: 'TRAIN' });
+    (getUsernameBySocketId as unknown as Mock).mockReturnValue('p1');
+    handleSubmitSealedBid(mkIo(), mkSocket('s1'), { word: 'TRAIN' });
+    // Fire reveal delay then advance-to-done
+    vi.runAllTimers();
+    const gameOverCall = (broadcastToRoom as unknown as Mock).mock.calls.find((c) => c[2] === 'sealedBidGameOver');
+    expect(gameOverCall).toBeTruthy();
+    expect(gameOverCall![3].winner).toBe('p1');
+  });
 });

@@ -1,19 +1,33 @@
 {
-  "date": "2026-07-26",
-  "note": "7-day window (n≥50 floor). 24h window returned 0 results above floor — low overnight traffic. CLS still catastrophic on / (0.934, 7d p75 n=50) and /en/multiplayer (0.962 from 07-24 baseline). CookieConsent modal hypothesis ruled out — it is a fixed-position overlay and cannot cause CLS. Real CLS root cause still needs DevTools Layout Shifts panel attribution (no headless visual QA available). 6 pending migrations applied this run — first Supabase MCP availability in 6+ nights.",
+  "date": "2026-07-27",
+  "note": "7-day window (n≥50 floor). 24h window returned 0 results above floor — low overnight traffic. CLS still catastrophic on /en/multiplayer (0.963). Supabase MCP unavailable this run — migration written to file but not applied. /en/multiplayer LCP regression: 1648ms→2425ms (+47%) — needs investigation (recent perf(server) and perf(low-end) commits are candidates).",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Supabase MCP AVAILABLE this run. Applied all 6 stalled migrations (8–27 days pending): 2 RLS initplan fixes (quest_achievement_feed, quick_play_challenges/results), 2 unused index drops (idx_word_wheel_attempts_catchup, quick_play_challenges_challenger_idx), 3 new FK indexes (word_clubs.owner_id, word_club_members.user_id, word_pacts.player2_id), 1 analytics index (web_vitals.player_id). auth DB connection percentage strategy advisor warning still unresolved — human config change required in Supabase dashboard.",
-    "top_queries": [],
-    "migrations_pending_apply": []
+    "note": "Auth RLS initplan fix for subscriptions table written to migration 20260727020000_fix_subscriptions_rls_initplan.sql — drops bare auth.uid() + adds role scoping (to authenticated / to service_role) to resolve both initplan AND multiple-permissive-policies advisor warnings. NOT applied (Supabase MCP unavailable). Auth DB connection percentage strategy advisor warning still unresolved — human config change required in Supabase dashboard.",
+    "migrations_pending_apply": [
+      "20260727020000_fix_subscriptions_rls_initplan.sql"
+    ],
+    "top_queries": []
   },
   "frontend": {
-    "note": "7-day window (n≥50 floor). 24h window = 0 routes above floor. CLS root cause uninvestigated — needs DevTools Layout Shifts panel attribution. CookieConsent (nextDynamic) ruled out as CLS source: it is a fixed-position overlay, not in normal document flow. LCP on /es routes still very high (11176ms per intel brief) but below n=50 floor on 24h window — ineligible for regression verdict.",
+    "note": "7-day window (n≥50 floor). 24h window = 0 routes above floor. /en/multiplayer LCP regression 1648ms→2425ms vs 07-26 baseline — needs investigation. CLS root cause uninvestigated — needs DevTools Layout Shifts panel attribution.",
     "by_route": [
-      { "route": "/", "p75_lcp_ms": null, "p75_cls": 0.934, "p75_inp_ms": null, "n_7d": 50, "vs_baseline": "CLS +0.011 from 0.921 (07-21 ad-banner fix baseline) — neutral, within noise, no improvement from spacer fix" },
-      { "route": "/en/multiplayer", "p75_lcp_ms": 1648, "p75_cls": 0.962, "p75_inp_ms": 190, "n_7d": 127, "vs_baseline": "carried from 07-24 — CLS flat (AutoHideHeader fix had no measurable effect)" },
-      { "route": "/es/multiplayer", "p75_lcp_ms": 3755, "p75_cls": 0.608, "p75_inp_ms": 424, "n_7d": 144, "vs_baseline": "carried from 07-24" },
-      { "route": "/es/juego-de-palabras-multijugador", "p75_lcp_ms": 3236, "p75_cls": 0.263, "p75_inp_ms": 172, "n_7d": 58, "vs_baseline": "carried from 07-24" }
+      {
+        "route": "/en/multiplayer",
+        "p75_lcp_ms": 2425,
+        "p75_cls": 0.963,
+        "p75_inp_ms": 192,
+        "n_7d": 101,
+        "vs_baseline": "LCP REGRESSION: 1648ms→2425ms (+47%) vs 07-26. INP flat (190→192ms). CLS flat (0.962→0.963). Suspects: perf(server) reclaim-idle-solver + perf(low-end) chunk grouping commits from 07-26."
+      },
+      {
+        "route": "/es/multiplayer",
+        "p75_lcp_ms": 3348,
+        "p75_cls": 0.343,
+        "p75_inp_ms": 368,
+        "n_7d": 52,
+        "vs_baseline": "LCP improved 3755ms→3348ms (-11%). INP improved 424ms→368ms. CLS improved 0.608→0.343. n=52 barely above floor — treat as low-confidence."
+      }
     ]
   },
   "bundle": {

@@ -158,7 +158,9 @@ function topScorer(scores: Record<string, number>): string | null {
   let best: string | null = null;
   let bestScore = -1;
   for (const [u, s] of Object.entries(scores)) {
-    if (s > bestScore) { bestScore = s; best = u; }
+    if (s > bestScore || (s === bestScore && best !== null && u < best)) {
+      bestScore = s; best = u;
+    }
   }
   return best;
 }

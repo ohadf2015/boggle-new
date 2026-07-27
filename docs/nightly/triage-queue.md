@@ -1856,3 +1856,28 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: coin economy — human-queue only per standing rules
   - recommended owner: human
+
+## 2026-07-27
+- [PostHog] React hydration error #418 — 43 occurrences, 7 users, Android Chrome on root URL
+  - first seen: 2026-07-17, last seen: 2026-07-26 21:00 UTC
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f4747-c11b-7430-8ac2-882649b49cbd
+  - status: deferred
+  - why: Minified chunk, no source maps in PostHog. Sentry has no matching issue. Error msg: `Minified React error #418` (hydration mismatch). $current_url = `https://www.lexiclash.live/` on Android Tablet Chrome 150. Root route is a server-side redirect — actual mismatch likely on locale page after redirect. Needs dev-mode or source-map repro.
+  - recommended owner: review-by-eod
+- [PostHog] TypeError: Load failed — 55 occurrences, 16 users
+  - first seen: 2026-07-08, last seen: 2026-07-26 15:13 UTC
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f34a3-12d0-7820-a7d2-4b2d22556c1e
+  - status: deferred
+  - why: Network-level chunk load failure from `/_next/static/chunks/32162-ea1f61377f721834.js`. ChunkErrorRecovery covers stale-deploy chunk errors via version check + hard reload. This "Load failed" is a raw network/resource failure — unclear if covered. isChunkLoadError may not match plain "Load failed" message. Needs verification that recovery fires on mobile network failure.
+  - recommended owner: review-by-eod
+- [Feedback] Special tiles (ice/explosion) don't work in MP with bots
+  - reported: 2026-07-22, he locale
+  - status: deferred — server-side mechanic, needs investigation of `server/multiplayer/` tile logic
+  - why: Open watch from prior nights (mp_round sentiment avg 1.4/3). Requires tracing special tile triggers through the bot game loop. Beyond single-lane scope.
+  - recommended owner: backend
+- [Feedback] Ron: coin deficit from local games not credited
+  - status: deferred — coin economy write, HARD LINE per autonomy matrix
+  - recommended owner: human (coin economy is human-queue-only)
+- [Sentry] JAVASCRIPT-NEXTJS-1WM Connection is closed — impact VERIFIED improved
+  - measured 0 new occurrences since fix 2026-07-23 (last seen 2026-07-22)
+  - status: shipped (verdict logged to impact-ledger.ndjson)

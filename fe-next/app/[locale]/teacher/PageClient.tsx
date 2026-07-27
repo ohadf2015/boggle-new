@@ -27,6 +27,12 @@ function TeacherDashboardInner() {
     profile?.is_admin === true;
   const isProfileLoading = !authLoading && user && !profile;
 
+  useEffect(() => {
+    if (!isAdmin && isTeacher && !authLoading && !isProfileLoading) {
+      trackGrowthEvent('iap_viewed', { product: 'teacher_pro', source: 'dashboard_banner', event_type: 'impression' });
+    }
+  }, [isAdmin, isTeacher, authLoading, isProfileLoading]);
+
   // Redirect if not authenticated or not teacher
   useEffect(() => {
     if (!authLoading && !isProfileLoading && (!user || !isTeacher)) {

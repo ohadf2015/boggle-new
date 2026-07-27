@@ -80,4 +80,17 @@ describe('SealedBidVersus', () => {
     expect(sidebar).toBeTruthy();
     expect(sidebar).toHaveTextContent('sealedBidMp.round');
   });
+
+  it('shows countdown timer badge when roundDeadline is in the future', async () => {
+    mockState = { ...base, roundDeadline: Date.now() + 15_000 };
+    render(<SealedBidVersus socket={null} username="me" />);
+    expect(await screen.findByRole('timer')).toBeInTheDocument();
+  });
+
+  it('applies urgency styling when ≤5 seconds remain', async () => {
+    mockState = { ...base, roundDeadline: Date.now() + 3_000 };
+    render(<SealedBidVersus socket={null} username="me" />);
+    const badge = await screen.findByRole('timer');
+    expect(badge.className).toContain('bg-neo-red');
+  });
 });
