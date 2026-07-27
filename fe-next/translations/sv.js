@@ -15796,6 +15796,7 @@ const sv = {
     "gameOver": "Spelet slut",
     "playAgain": "Spela igen",
     "notAWord": "Inte ett ord",
+    "tapHint": "Tryck på bokstäver för att bygga ditt ord",
     "continue": "Fortsätt",
     "shareCard": {
       "title": "Din bluffhistoria",
