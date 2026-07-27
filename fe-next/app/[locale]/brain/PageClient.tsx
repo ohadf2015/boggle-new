@@ -130,7 +130,6 @@ export default function BrainTrainingPageClient() {
 
   useEffect(() => {
     setHasShownCelebration(localStorage.getItem(FIRST_GAME_CELEBRATION_KEY) === 'true');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // State for auth modal
