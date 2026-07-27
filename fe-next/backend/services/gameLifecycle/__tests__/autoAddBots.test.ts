@@ -115,6 +115,28 @@ describe('autoAddBotsForSoloPlayer', () => {
     expect(result.botsAdded).toBe(0);
   });
 
+  it('does NOT add bots when the in-memory bot registry was lost but bot users persist (regression: bots re-added every round)', async () => {
+    // After a server restart (or any cleanup that wipes botManager's
+    // in-memory gameBots map), getGameBots returns [] while the persisted
+    // game state still carries the bot users with isBot: true. The guard
+    // must consult game.users too, or 2-3 more bots pile in every round.
+    botManager.getGameBots.mockReturnValue([]);
+
+    const game = {
+      users: {
+        'Alice': { socketId: 'sock1', isHost: true, isBot: false, authUserId: 'user-123' },
+        'LexiBot-easy': { socketId: 'bot-1', isHost: false, isBot: true },
+        'LexiBot-medium': { socketId: 'bot-2', isHost: false, isBot: true },
+      },
+      language: 'en',
+    };
+
+    const result = await autoAddBotsForSoloPlayer('GAME1', game as any);
+
+    expect(result.botsAdded).toBe(0);
+    expect(addUserToGame).not.toHaveBeenCalled();
+  });
+
   it('uses adaptive difficulty when host has authUserId', async () => {
     const game = {
       users: {

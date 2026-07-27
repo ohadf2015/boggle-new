@@ -45,8 +45,13 @@ export async function autoAddBotsForSoloPlayer(
     ([, u]) => !u.isBot && !u.disconnected
   ).length;
 
-  // Count existing bots
-  const existingBots = botManager.getGameBots(gameCode).length;
+  // Count existing bots. The in-memory registry (botManager) is the primary
+  // source, but it is wiped on server restart while the persisted game state
+  // keeps the bot users — trusting it alone re-added 2-3 bots every round.
+  // game.users isBot flags survive restarts, so take the max of both.
+  const botsInRegistry = botManager.getGameBots(gameCode).length;
+  const botsInUsers = users.filter(([, u]) => u.isBot).length;
+  const existingBots = Math.max(botsInRegistry, botsInUsers);
 
   // Only auto-add if solo human with no bots
   if (humanCount !== 1 || existingBots > 0) {
