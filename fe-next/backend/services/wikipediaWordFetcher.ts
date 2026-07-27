@@ -10,7 +10,7 @@ import type { Language } from '@/shared/types/game';
 import logger from '../utils/logger';
 
 // Wikipedia API User-Agent (required by Wikimedia guidelines)
-const WIKIPEDIA_USER_AGENT = 'LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)';
+const WIKIPEDIA_USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
 
 // Rate limiting: 50ms between requests (Wikimedia allows ~200 req/s for identified clients)
 const RATE_LIMIT_DELAY_MS = 50;

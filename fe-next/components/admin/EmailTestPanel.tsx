@@ -163,7 +163,7 @@ export function EmailTestPanel({ authToken, userEmail, userName }: EmailTestPane
 
   const baseUrl = typeof window !== 'undefined'
     ? window.location.origin
-    : process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
+    : process.env.NEXT_PUBLIC_APP_URL || 'https://www.lexiclash.live';
 
   const previewUrl =
     emailType === 'welcome' || emailType === 'reengagement' || emailType === 'android-beta-launch' || emailType === 'android-release-launch'

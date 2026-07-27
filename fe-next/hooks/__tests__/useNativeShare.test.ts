@@ -110,7 +110,7 @@ describe('useNativeShare', () => {
       const shareData = {
         title: 'Join my game!',
         text: "Let's play LexiClash together!",
-        url: 'https://lexiclash.com?room=ABC123',
+        url: 'https://www.lexiclash.live?room=ABC123',
       };
 
       await act(async () => {

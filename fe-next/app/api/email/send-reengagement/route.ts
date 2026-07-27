@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.lexiclash.live';
 
     logger.log('[Reengagement Cron] Starting...');
     const recipients = await getReengagementRecipients();

@@ -48,7 +48,7 @@ vi.mock('qrcode.react', () => ({
 describe('GameCodeDisplay', () => {
   const defaultProps = {
     gameCode: 'ABC123',
-    joinUrl: 'https://lexiclash.com/join/ABC123',
+    joinUrl: 'https://www.lexiclash.live/join/ABC123',
   };
 
   beforeEach(() => {
@@ -120,7 +120,7 @@ describe('GameCodeDisplay', () => {
       fireEvent.click(qrButton);
 
       const qrCode = screen.getByTestId('qr-code');
-      expect(qrCode).toHaveAttribute('data-value', 'https://lexiclash.com/join/ABC123');
+      expect(qrCode).toHaveAttribute('data-value', 'https://www.lexiclash.live/join/ABC123');
     });
   });
 
@@ -157,7 +157,7 @@ describe('GameCodeDisplay', () => {
       const copyLinkButton = screen.getByRole('button', { name: /copy link/i });
       fireEvent.click(copyLinkButton);
 
-      expect(mockWriteText).toHaveBeenCalledWith('https://lexiclash.com/join/ABC123');
+      expect(mockWriteText).toHaveBeenCalledWith('https://www.lexiclash.live/join/ABC123');
     });
   });
 });

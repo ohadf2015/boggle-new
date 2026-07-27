@@ -7048,7 +7048,7 @@ const ru = {
     "morePlatforms": "Больше платформ",
     "lessOptions": "Меньше опций",
     "hideShareOptions": "Скрыть опции поделиться",
-    "joinInstructions": "Перейди на lexiclash.com и введи код",
+    "joinInstructions": "Перейди на lexiclash.live и введи код",
     "showQrCode": "Показать QR Код",
     "qrCode": "QR Код",
     "hideQrCode": "Скрыть QR Код",

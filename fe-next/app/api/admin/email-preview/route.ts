@@ -6,7 +6,7 @@ import { NextResponse } from 'next/server';
  * This endpoint is used by the admin dashboard to preview emails
  */
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.lexiclash.live';
 
   // Calculate puzzle number (days since launch)
   const launchDate = new Date('2025-12-30');

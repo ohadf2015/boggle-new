@@ -1871,7 +1871,7 @@ const ja = {
     "morePlatforms": "他のプラットフォーム",
     "lessOptions": "オプションを減らす",
     "hideShareOptions": "共有オプションを隠す",
-    "joinInstructions": "lexiclash.comにアクセスしてコードを入力",
+    "joinInstructions": "lexiclash.liveにアクセスしてコードを入力",
     "showQrCode": "QRコードを表示",
     "hideQrCode": "QRコードを非表示",
     "qrCode": "QRコード",
@@ -15837,7 +15837,7 @@ const ja = {
     "shareCard": {
       "header": "🎯 シールドビッド — {score}pt",
       "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
-      "url": "lexiclash.com/ja/sealed-bid",
+      "url": "lexiclash.live/ja/sealed-bid",
       "roundLabel": "R{n}",
       "vs": "vs"
     },

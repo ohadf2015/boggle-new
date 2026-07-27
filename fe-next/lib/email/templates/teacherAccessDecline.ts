@@ -14,8 +14,8 @@ export function teacherAccessDecline({ full_name, locale, reason }: Args) {
 <p>Thanks for applying for teacher access. After review, we're not able to approve your request at this time.</p>
 ${reasonLine}
 <p>You're welcome to try the regular game with friends — it's free:</p>
-<p><a href="https://lexiclash.com/${locale}/multiplayer">Play LexiClash</a></p>
-<p>If you'd like to reapply with more details, you can do so anytime at <a href="https://lexiclash.com/${locale}/education/access">/education/access</a>.</p>
+<p><a href="https://www.lexiclash.live/${locale}/multiplayer">Play LexiClash</a></p>
+<p>If you'd like to reapply with more details, you can do so anytime at <a href="https://www.lexiclash.live/${locale}/education/access">/education/access</a>.</p>
 <p>— LexiClash Team</p>`,
   };
 }

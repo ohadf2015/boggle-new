@@ -16,7 +16,7 @@ import ky, { HTTPError } from 'ky';
 import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
 
-const USER_AGENT = 'LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)';
+const USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
 const RATE_LIMIT_MS = 300;
 const CACHE_TTL = 86400 * 7;
 const REDIS_PREFIX = 'jisho:';

@@ -55,7 +55,7 @@ vi.mock('@/utils/logger', () => ({
 vi.mock('@/utils/crossTabAuthSync', () => ({ broadcastSignedOut: vi.fn() }));
 vi.mock('@/utils/platform', () => ({ isNative: () => false }));
 
-const mockLocation = { pathname: '/en/multiplayer', search: '', origin: 'https://lexiclash.com' };
+const mockLocation = { pathname: '/en/multiplayer', search: '', origin: 'https://www.lexiclash.live' };
 Object.defineProperty(window, 'location', { value: mockLocation, writable: true });
 
 import { signInWithMagicLink, signInWithEmail, signUpWithEmail, signInWithGoogle, signInWithDiscord } from '../supabase';
@@ -68,7 +68,7 @@ describe('signInWithMagicLink', () => {
     const result = await signInWithMagicLink('user@example.com');
     expect(mockAuth.signInWithOtp).toHaveBeenCalledWith({
       email: 'user@example.com',
-      options: { emailRedirectTo: 'https://lexiclash.com/en/auth/callback?next=%2Fen%2Fmultiplayer' },
+      options: { emailRedirectTo: 'https://www.lexiclash.live/en/auth/callback?next=%2Fen%2Fmultiplayer' },
     });
     expect(result.error).toBeNull();
   });
@@ -78,7 +78,7 @@ describe('signInWithMagicLink', () => {
     mockAuth.signInWithOtp.mockResolvedValue({ data: {}, error: null });
     await signInWithMagicLink('user@example.com');
     expect(mockAuth.signInWithOtp).toHaveBeenCalledWith(
-      expect.objectContaining({ options: { emailRedirectTo: 'https://lexiclash.com/he/auth/callback?next=%2Fhe%2Fgame' } })
+      expect.objectContaining({ options: { emailRedirectTo: 'https://www.lexiclash.live/he/auth/callback?next=%2Fhe%2Fgame' } })
     );
   });
 
@@ -87,7 +87,7 @@ describe('signInWithMagicLink', () => {
     mockAuth.signInWithOtp.mockResolvedValue({ data: {}, error: null });
     await signInWithMagicLink('user@example.com');
     expect(mockAuth.signInWithOtp).toHaveBeenCalledWith(
-      expect.objectContaining({ options: { emailRedirectTo: 'https://lexiclash.com/en/auth/callback' } })
+      expect.objectContaining({ options: { emailRedirectTo: 'https://www.lexiclash.live/en/auth/callback' } })
     );
   });
 
@@ -97,7 +97,7 @@ describe('signInWithMagicLink', () => {
     mockAuth.signInWithOtp.mockResolvedValue({ data: {}, error: null });
     await signInWithMagicLink('user@example.com');
     expect(mockAuth.signInWithOtp).toHaveBeenCalledWith(
-      expect.objectContaining({ options: { emailRedirectTo: 'https://lexiclash.com/en/auth/callback?next=%2Fen%2Fgame%3Fmode%3Dranked' } })
+      expect.objectContaining({ options: { emailRedirectTo: 'https://www.lexiclash.live/en/auth/callback?next=%2Fen%2Fgame%3Fmode%3Dranked' } })
     );
   });
 
@@ -133,7 +133,7 @@ describe('signUpWithEmail', () => {
     await signUpWithEmail('new@example.com', 'password123');
     expect(mockAuth.signUp).toHaveBeenCalledWith({
       email: 'new@example.com', password: 'password123',
-      options: { emailRedirectTo: 'https://lexiclash.com/en/auth/callback?next=%2Fen%2Fmultiplayer' },
+      options: { emailRedirectTo: 'https://www.lexiclash.live/en/auth/callback?next=%2Fen%2Fmultiplayer' },
     });
   });
 });
@@ -145,7 +145,7 @@ describe('signInWithGoogle', () => {
     mockAuth.signInWithOAuth.mockResolvedValue({ data: {}, error: null });
     await signInWithGoogle();
     expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
-      provider: 'google', options: { redirectTo: 'https://lexiclash.com/en/auth/callback?next=%2Fen%2Fmultiplayer' },
+      provider: 'google', options: { redirectTo: 'https://www.lexiclash.live/en/auth/callback?next=%2Fen%2Fmultiplayer' },
     });
   });
 });
@@ -157,7 +157,7 @@ describe('signInWithDiscord', () => {
     mockAuth.signInWithOAuth.mockResolvedValue({ data: {}, error: null });
     await signInWithDiscord();
     expect(mockAuth.signInWithOAuth).toHaveBeenCalledWith({
-      provider: 'discord', options: { redirectTo: 'https://lexiclash.com/sv/auth/callback?next=%2Fsv%2Fgame' },
+      provider: 'discord', options: { redirectTo: 'https://www.lexiclash.live/sv/auth/callback?next=%2Fsv%2Fgame' },
     });
   });
 });

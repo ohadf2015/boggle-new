@@ -1469,7 +1469,7 @@ const en = {
     "morePlatforms": "More platforms",
     "lessOptions": "Less options",
     "hideShareOptions": "Hide share options",
-    "joinInstructions": "Go to lexiclash.com and enter code",
+    "joinInstructions": "Go to lexiclash.live and enter code",
     "showQrCode": "Show QR Code",
     "qrCode": "QR Code",
     "hideQrCode": "Hide QR Code",
@@ -14844,7 +14844,7 @@ const en = {
       "copied": "Copied!",
       "header": "🎯 Sealed Bid — {score}pts",
       "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
-      "url": "lexiclash.com/{locale}/sealed-bid",
+      "url": "lexiclash.live/{locale}/sealed-bid",
       "roundLabel": "R{n}",
       "vs": "vs"
     },

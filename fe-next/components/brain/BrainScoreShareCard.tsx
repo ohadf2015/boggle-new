@@ -103,7 +103,7 @@ ${t('brain.share.tier')}: ${t(`brain.tiers.${tier}`)}
 ${t('brain.share.gamesPlayed')}: ${gamesAnalyzed}
 
 ${t('brain.share.trainYourBrain')} 🎮
-lexiclash.com`;
+lexiclash.live`;
   }, [score, tier, domains, gamesAnalyzed, t, tierConfig.emoji]);
 
   // Copy to clipboard
@@ -128,7 +128,7 @@ lexiclash.com`;
       await navigator.share({
         title: t('brain.share.title'),
         text: generateShareText(),
-        url: 'https://lexiclash.com',
+        url: 'https://www.lexiclash.live',
       });
     } catch (err) {
       // AbortError means user cancelled the share dialog - this is normal behavior

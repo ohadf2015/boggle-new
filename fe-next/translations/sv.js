@@ -2141,7 +2141,7 @@ const sv = {
     "morePlatforms": "Fler plattformar",
     "lessOptions": "Färre alternativ",
     "hideShareOptions": "Dölj delningsalternativ",
-    "joinInstructions": "Gå till lexiclash.com och ange kod",
+    "joinInstructions": "Gå till lexiclash.live och ange kod",
     "showQrCode": "Visa QR-kod",
     "qrCode": "Visa QR-kod",
     "hideQrCode": "Dölj QR-kod",
@@ -15836,7 +15836,7 @@ const sv = {
     "shareCard": {
       "header": "🎯 Förseglat bud — {score} poäng",
       "row": "{round} {emoji} {playerWord} mot {botWord}{points}",
-      "url": "lexiclash.com/sv/sealed-bid",
+      "url": "lexiclash.live/sv/sealed-bid",
       "roundLabel": "R{n}",
       "vs": "mot"
     },

@@ -74,7 +74,7 @@ export async function GET(req: NextRequest) {
       referralRewardXp: profile.referral_reward_xp ?? 0,
       totalCoins: profile.total_coins ?? 0,
       recentReferrals: recentReferrals ?? [],
-      shareUrl: `https://lexiclash.com?ref=${referralCode}`,
+      shareUrl: `${process.env.NEXT_PUBLIC_APP_URL || 'https://www.lexiclash.live'}?ref=${referralCode}`,
     });
   } catch (err) {
     console.error('Referral GET error:', err);

@@ -78,7 +78,7 @@ async function testHttpsConnectivity(): Promise<void> {
     const startTime = Date.now();
     const response = await ky.get('https://api.wikimedia.org/feed/v1/wikipedia/en/featured/2026/01/19', {
       headers: {
-        'User-Agent': 'LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)',
+        'User-Agent': 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)',
         'Accept': 'application/json'
       },
       timeout: 10000,

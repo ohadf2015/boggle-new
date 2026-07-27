@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // Get the base URL for links in emails
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.com';
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.lexiclash.live';
 
     // Get current UTC hour for timezone filtering
     const currentHourUTC = new Date().getUTCHours();

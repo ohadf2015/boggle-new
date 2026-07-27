@@ -44,7 +44,7 @@ export function buildShareText(
       t('sealedBid.shareCard.url'),
     ].join('\n');
   }
-  return ['🎯 Sealed Bid — ' + totalScore + 'pts', ...rows, 'lexiclash.com/en/sealed-bid'].join('\n');
+  return ['🎯 Sealed Bid — ' + totalScore + 'pts', ...rows, 'lexiclash.live/en/sealed-bid'].join('\n');
 }
 
 interface Props {

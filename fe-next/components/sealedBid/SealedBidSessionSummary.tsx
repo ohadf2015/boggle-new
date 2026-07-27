@@ -25,7 +25,7 @@ export function buildBluffShareText(
       t('sealedBid.shareCard.url'),
     ].join('\n');
   }
-  return `🧠 Outsmarted the bot ${unique}/${total} rounds — ${totalScore} pts\nlexiclash.com/en/sealed-bid`;
+  return `🧠 Outsmarted the bot ${unique}/${total} rounds — ${totalScore} pts\nlexiclash.live/en/sealed-bid`;
 }
 
 export function SealedBidSessionSummary({ history, totalScore, chips, coinsAwarded }: Props) {

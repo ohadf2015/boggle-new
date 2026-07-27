@@ -41,7 +41,7 @@ echo ""
 # Test 3: HTTPS Request with curl
 echo "[Test 3/5] HTTPS Request with curl..."
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
-    -H "User-Agent: LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)" \
+    -H "User-Agent: LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)" \
     --max-time 10 \
     "https://api.wikimedia.org/feed/v1/wikipedia/en/featured/2026/01/19" 2>&1)
 
@@ -50,7 +50,7 @@ if [ "$HTTP_CODE" = "200" ]; then
 
     # Get response time
     RESPONSE_TIME=$(curl -s -o /dev/null -w "%{time_total}" \
-        -H "User-Agent: LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)" \
+        -H "User-Agent: LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)" \
         --max-time 10 \
         "https://api.wikimedia.org/feed/v1/wikipedia/en/featured/2026/01/19")
     echo "  Response time: ${RESPONSE_TIME}s"
@@ -78,7 +78,7 @@ echo ""
 # Test 5: Full API Response
 echo "[Test 5/5] Full API Response Test..."
 RESPONSE=$(curl -s \
-    -H "User-Agent: LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)" \
+    -H "User-Agent: LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)" \
     -H "Accept: application/json" \
     --max-time 10 \
     "https://api.wikimedia.org/feed/v1/wikipedia/en/featured/2026/01/19")

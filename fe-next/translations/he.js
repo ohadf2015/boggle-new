@@ -1871,7 +1871,7 @@ const he = {
     "morePlatforms": "עוד פלטפורמות",
     "lessOptions": "פחות אפשרויות",
     "hideShareOptions": "הסתר אפשרויות שיתוף",
-    "joinInstructions": "כנסו ל-lexiclash.com והזינו את הקוד",
+    "joinInstructions": "כנסו ל-lexiclash.live והזינו את הקוד",
     "showQrCode": "הצג קוד QR",
     "qrCode": "הצג קוד QR",
     "hideQrCode": "הסתר קוד QR",
@@ -15773,7 +15773,7 @@ const he = {
     "shareCard": {
       "header": "🎯 הימור סגור — {score} נקודות",
       "row": "{round} {emoji} {playerWord} נגד {botWord}{points}",
-      "url": "lexiclash.com/he/sealed-bid",
+      "url": "lexiclash.live/he/sealed-bid",
       "roundLabel": "ס{n}",
       "vs": "נגד"
     },

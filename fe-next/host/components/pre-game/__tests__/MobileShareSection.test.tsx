@@ -46,7 +46,7 @@ vi.mock('../../../../components/icons/SocialIcons', () => ({
 
 // Mock share utils
 vi.mock('../../../../utils/share', () => ({
-  getJoinUrl: vi.fn((gameCode: string, _source?: string) => `https://lexiclash.com?room=${gameCode}&utm_source=mobile-lobby&utm_medium=share`),
+  getJoinUrl: vi.fn((gameCode: string, _source?: string) => `https://www.lexiclash.live?room=${gameCode}&utm_source=mobile-lobby&utm_medium=share`),
   copyJoinUrl: vi.fn().mockResolvedValue(true),
   shareViaWhatsApp: vi.fn(),
 }));

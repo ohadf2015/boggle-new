@@ -9,7 +9,7 @@ import { getRedisClient } from '../redisClient';
 import logger from '../utils/logger';
 
 // User-Agent for requests (be a good citizen)
-const MILOG_USER_AGENT = 'LexiClash/1.0 (https://lexiclash.com; contact@lexiclash.com)';
+const MILOG_USER_AGENT = 'LexiClash/1.0 (https://www.lexiclash.live; contact@lexiclash.live)';
 
 // Rate limiting: 1 request per second (be respectful to the service)
 export const MILOG_RATE_LIMIT_MS = 1000;

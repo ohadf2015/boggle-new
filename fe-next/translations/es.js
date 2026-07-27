@@ -1848,7 +1848,7 @@ const es = {
     "hideShareOptions": "Ocultar opciones",
     "copy": "Copiar",
     "copied": "¡Copiado!",
-    "joinInstructions": "Ve a lexiclash.com e ingresa el código",
+    "joinInstructions": "Ve a lexiclash.live e ingresa el código",
     "showQrCode": "Mostrar código QR",
     "hideQrCode": "Ocultar código QR",
     "scanQrCode": "Escanea para unirte al instante",
@@ -15916,7 +15916,7 @@ const es = {
     "shareCard": {
       "header": "🎯 Puja sellada — {score} pts",
       "row": "{round} {emoji} {playerWord} vs {botWord}{points}",
-      "url": "lexiclash.com/es/sealed-bid",
+      "url": "lexiclash.live/es/sealed-bid",
       "roundLabel": "R{n}",
       "vs": "vs"
     },
