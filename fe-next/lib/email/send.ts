@@ -30,7 +30,7 @@ export async function sendEmail({ to, subject, html, from, replyTo }: SendEmailA
     return { ok: false, error: 'no api key' };
   }
   try {
-    const senderEmail = from || process.env.RESEND_FROM_EMAIL || 'LexiClash <noreply@lexiclash.com>';
+    const senderEmail = from || process.env.RESEND_FROM_EMAIL || 'LexiClash <noreply@lexiclash.live>';
     const result = await resend.emails.send({
       from: senderEmail,
       to: Array.isArray(to) ? to : [to],
