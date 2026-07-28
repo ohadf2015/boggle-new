@@ -8529,6 +8529,8 @@ const ru = {
     "overtake": {
       "passedYou": "опередил вас!"
     },
+    "opponentFoundWord": "{{name}} нашёл слово",
+    "opponentFoundLongWord": "{{name}} нашёл слово из {{length}} букв!",
     "rival": {
       "ahead": "впереди",
       "behind": "позади",

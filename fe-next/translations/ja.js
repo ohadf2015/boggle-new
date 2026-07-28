@@ -7674,6 +7674,8 @@ const ja = {
     "overtake": {
       "passedYou": "に抜かれた！"
     },
+    "opponentFoundWord": "{{name}}が単語を発見",
+    "opponentFoundLongWord": "{{name}}が{{length}}文字の単語を発見！",
     "rival": {
       "ahead": "先行",
       "behind": "後方",

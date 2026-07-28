@@ -2353,6 +2353,8 @@ const he = {
     "overtake": {
       "passedYou": "עקף אותך!"
     },
+    "opponentFoundWord": "{{name}} מצא מילה",
+    "opponentFoundLongWord": "{{name}} מצא מילה של {{length}} אותיות!",
     "rival": {
       "ahead": "לפניך",
       "behind": "מאחוריך",

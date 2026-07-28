@@ -8040,6 +8040,8 @@ const sv = {
     "overtake": {
       "passedYou": "gick om dig!"
     },
+    "opponentFoundWord": "{{name}} hittade ett ord",
+    "opponentFoundLongWord": "{{name}} hittade ett ord med {{length}} bokstäver!",
     "rival": {
       "ahead": "före",
       "behind": "efter",

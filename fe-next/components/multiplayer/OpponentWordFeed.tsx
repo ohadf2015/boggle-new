@@ -37,12 +37,12 @@ export function OpponentWordFeed({ feedItems, t }: OpponentWordFeedProps) {
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               transition={{ duration: 0.25 }}
-              className={`rounded-neo border-neo border-black bg-neo-navy-light/80 px-3 py-1.5 ${
+              className={`flex items-center whitespace-nowrap overflow-hidden rounded-neo border-neo border-black bg-neo-navy-light/80 px-3 py-1.5 ${
                 item.isLongWord ? 'animate-neo-shake text-neo-lime font-bold text-sm' : 'text-neo-white text-xs'
               }`}
             >
-              <span>{t(translationKey, { name: item.playerName, length: item.wordLength })}</span>
-              <span className="ms-1.5 text-neo-lime font-bold">+{item.score}</span>
+              <span className="min-w-0 truncate">{t(translationKey, { name: item.playerName, length: item.wordLength })}</span>
+              <span className="ms-1.5 shrink-0 text-neo-lime font-bold">+{item.score}</span>
             </AdaptiveMotion.div>
           );
         })}

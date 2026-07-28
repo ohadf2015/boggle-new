@@ -7088,6 +7088,8 @@ const en = {
     "overtake": {
       "passedYou": "passed you!"
     },
+    "opponentFoundWord": "{{name}} found a word",
+    "opponentFoundLongWord": "{{name}} found a {{length}}-letter word!",
     "rival": {
       "ahead": "ahead",
       "behind": "behind",

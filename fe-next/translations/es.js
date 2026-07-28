@@ -7791,6 +7791,8 @@ const es = {
     "overtake": {
       "passedYou": "te adelantó!"
     },
+    "opponentFoundWord": "{{name}} encontró una palabra",
+    "opponentFoundLongWord": "¡{{name}} encontró una palabra de {{length}} letras!",
     "rival": {
       "ahead": "adelante",
       "behind": "detrás",
