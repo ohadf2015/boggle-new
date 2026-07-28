@@ -2,7 +2,6 @@ import React, { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { DailyLoadingFallback } from '@/components/daily/DailyLoadingFallback';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
 const LOCALES: Locale[] = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
@@ -226,13 +225,6 @@ export default async function WordWheelPage({ params }: PageParams): Promise<Rea
       <Suspense fallback={<LoadingFallback />}>
         <WordWheelChallenge />
       </Suspense>
-      <GamePageSeoContent
-        collapsible
-        title={content.title}
-        description={content.description}
-        features={content.features}
-        faq={content.faq}
-      />
     </>
   );
 }

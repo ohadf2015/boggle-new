@@ -1,7 +1,6 @@
 import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { dailySeoContent } from './dailySeo.data';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
@@ -321,14 +320,6 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
         }}
       />
       {children}
-      <GamePageSeoContent
-        asH1
-        collapsible
-        title={seoContent[locale as keyof typeof seoContent]?.title || seoContent.en.title}
-        description={seoContent[locale as keyof typeof seoContent]?.description || seoContent.en.description}
-        features={seoContent[locale as keyof typeof seoContent]?.features || seoContent.en.features}
-        faq={seoContent[locale as keyof typeof seoContent]?.faq || seoContent.en.faq}
-      />
     </>
   );
 }

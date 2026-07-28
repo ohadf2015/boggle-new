@@ -524,13 +524,12 @@ const WordWheelChallenge: React.FC = () => {
     <div
       ref={containerRef}
       data-testid="word-wheel-stage"
-      // h-dvh/max-h-dvh pins the stage to exactly one viewport: the page also
-      // renders GamePageSeoContent as a sibling BELOW this component (unlike
-      // Word Hunt's page, which has no such sibling), so without an explicit
-      // cap this flex-1 chain has nothing bounded to fill and grows to fit
-      // ALL content (game + SEO), pushing <body> itself past viewport height —
-      // the results recap's overflow-y-auto never engages because it's never
-      // actually shorter than its content.
+      // h-dvh/max-h-dvh pins the stage to exactly one viewport. (The SEO card
+      // that used to sit as a sibling below this component was removed on
+      // 2026-07-28 — this game shell is noIndex, so the copy earned nothing
+      // and only clutters the board; SEO now lives only on the /daily hub.)
+      // Keep the cap regardless: it bounds the flex-1 chain so the results
+      // recap's overflow-y-auto engages instead of growing <body> past height.
       className="relative flex-1 flex flex-col bg-neo-navy min-h-0 h-dvh max-h-dvh w-full max-w-[100vw] overflow-hidden"
       // Layered, always-on ambient backdrop (see STAGE_AMBIENT_BG): a
       // depth-to-abyss vignette plus soft brand-colored glows. Replaces the
