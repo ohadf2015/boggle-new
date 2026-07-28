@@ -204,7 +204,10 @@ export default function FeedbackWidget() {
         aria-label={t('feedbackWidget.bubbleLabel', 'Feedback')}
         aria-expanded={open}
         className={[
-          'fixed z-[70] end-4',
+          // z-[105]: above the app's full-screen z-[100] screen layer (landing
+          // onboarding paints over the widget otherwise), still below cookie
+          // consent (z-[110]) and claim modals (z-[120]).
+          'fixed z-[105] end-4',
           'bottom-[calc(var(--bottom-nav-height,0px)+1rem)]',
           'flex items-center gap-2 rounded-full border-2 border-neo-cream/20',
           'bg-neo-black/70 backdrop-blur-sm px-3 py-2 text-neo-white shadow-lg',
@@ -231,7 +234,8 @@ export default function FeedbackWidget() {
         aria-modal="false"
         aria-label={t('feedbackWidget.title', 'Send feedback')}
         className={[
-          'fixed z-[85] end-4',
+          // z-[105]: see bubble above — must clear the app's z-[100] screens.
+          'fixed z-[105] end-4',
           'bottom-[calc(var(--bottom-nav-height,0px)+1rem)]',
           'w-[calc(100vw-2rem)] max-w-sm',
           'rounded-2xl border-2 border-neo-cream/15 bg-neo-black/90 backdrop-blur-md',
