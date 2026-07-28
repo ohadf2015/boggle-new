@@ -81,6 +81,21 @@ describe('SealedBidVersus', () => {
     expect(sidebar).toHaveTextContent('sealedBidMp.round');
   });
 
+  it('positions exit button at logical start-3 (RTL-safe, not left-3) when onQuit provided', () => {
+    render(<SealedBidVersus socket={null} username="me" onQuit={() => {}} />);
+    const container = screen.getByTestId('sb-exit-container');
+    expect(container.className).toContain('start-3');
+    expect(container.className).not.toContain('left-3');
+  });
+
+  it('uses DirectionalIcon (mirror) for backspace so it flips in RTL', () => {
+    render(<SealedBidVersus socket={null} username="me" />);
+    const backspaceBtn = screen.getByLabelText('sealedBidMp.clear');
+    const svg = backspaceBtn.querySelector('svg');
+    expect(svg).not.toBeNull();
+    expect(svg!.className.baseVal ?? svg!.getAttribute('class')).toContain('rtl:scale-x-[-1]');
+  });
+
   it('shows countdown timer badge when roundDeadline is in the future', async () => {
     mockState = { ...base, roundDeadline: Date.now() + 15_000 };
     render(<SealedBidVersus socket={null} username="me" />);
@@ -92,5 +107,30 @@ describe('SealedBidVersus', () => {
     render(<SealedBidVersus socket={null} username="me" />);
     const badge = await screen.findByRole('timer');
     expect(badge.className).toContain('bg-neo-red');
+  });
+
+  it('shows ♟ Elo rating badge for each player derived from their score', () => {
+    mockState = { ...base, scores: { me: 24, bob: 12 } };
+    render(<SealedBidVersus socket={null} username="me" />);
+    const rail = screen.getByTestId('sb-standings-rail');
+    // me = 1200 + 24 = 1224, bob = 1200 + 12 = 1212 (toLocaleString adds comma)
+    expect(rail.textContent).toContain('1,224');
+    expect(rail.textContent).toContain('1,212');
+  });
+
+  it('shows positive delta chip after a revealed round', () => {
+    mockState = {
+      ...base, phase: 'revealed',
+      results: [
+        { username: 'me', word: 'RETAIN', outcome: 'unique', basePoints: 6, points: 12 },
+        { username: 'bob', word: '', outcome: 'none', basePoints: 0, points: 0 },
+      ],
+      scores: { me: 12, bob: 0 },
+    };
+    render(<SealedBidVersus socket={null} username="me" />);
+    const rail = screen.getByTestId('sb-standings-rail');
+    expect(rail.textContent).toContain('+12');
+    // zero-point pass shows no delta
+    expect(rail.textContent).not.toContain('+0');
   });
 });

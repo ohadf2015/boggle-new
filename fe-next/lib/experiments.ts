@@ -753,6 +753,26 @@ export const EXPERIMENTS = {
     description:
       'MP round sentiment follow-up probe. issue-probe = after bad/ok rating on mp_round, show 2 triage chips (bots-too-strong / technical-issue) before dismissing. Fires mp_round_issue_selected. Targets unactionable 1/3 avg mp_round score (2026-07-23). Primary metric: mp_round_issue_selected count. Guardrail: game_feedback response rate stable.',
   }),
+
+  /**
+   * Addresses rage-click signal on /es/multiplayer (7 users, score 0.875, 2026-07-28).
+   * Root cause: gap between Quick Play button click and isJoining propagating from
+   * parent (async socket confirm) — button stays enabled, users re-click.
+   *
+   * control = current: button disables only when parent isJoining flips true.
+   * eager-disable = local pending state set immediately on click → button disables
+   *   synchronously, shows spinner. Fires mp_quickplay_eager_shown on exposure.
+   *
+   * Primary metric: rage_click count on /[locale]/multiplayer falls.
+   * Proxy: mp_quickplay_initiated fires once per lobby visit (no re-clicks).
+   * PostHog flag key = 'exp-mp-quickplay-eager-disable-v1', 50/50 rollout.
+   */
+  'exp-mp-quickplay-eager-disable-v1': defineExperiment({
+    variants: ['control', 'eager-disable'] as const,
+    default: 'control',
+    description:
+      'MP lobby Quick Play button eager-disable. eager-disable = button disables and shows spinner immediately on click (local state), before async isJoining propagates from parent. Reduces rage clicks from the click→response gap. Primary metric: rage click rate on /multiplayer. 2026-07-28.',
+  }),
 } as const;
 
 export type ExperimentKey = keyof typeof EXPERIMENTS;

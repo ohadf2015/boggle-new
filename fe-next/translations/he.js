@@ -335,7 +335,8 @@ const he = {
     "clear": "נקה",
     "pass": "ויתור",
     "lock": "נעל הצעה",
-    "autoResolve": "פתרון אוטומטי בעוד {{secs}} שנ׳"
+    "autoResolve": "פתרון אוטומטי בעוד {{secs}} שנ׳",
+    "eloRating": "דירוג"
   },
   "sealedBidLegacy": {
     "badge": "הצעה חתומה",

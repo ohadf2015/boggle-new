@@ -605,7 +605,8 @@ const sv = {
     "clear": "Rensa",
     "pass": "Passa",
     "lock": "Lås budet",
-    "autoResolve": "Löses automatiskt om {{secs}}s"
+    "autoResolve": "Löses automatiskt om {{secs}}s",
+    "eloRating": "Rankning"
   },
   "sealedBidLegacy": {
     "badge": "Förseglat bud",

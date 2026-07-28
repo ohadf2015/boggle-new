@@ -208,6 +208,7 @@ export type GrowthEvent =
   //   mp_quickplay_joined — lobby join confirmed (onJoined callback fired).
   //     Props: { asHost: boolean, language: string }.
   | 'mp_quickplay_initiated'
+  | 'mp_quickplay_eager_shown'
   | 'mp_quickplay_socket_wait'
   | 'mp_quickplay_seeking'
   | 'mp_quickplay_joined'

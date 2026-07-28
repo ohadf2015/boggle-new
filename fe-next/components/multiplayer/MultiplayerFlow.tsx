@@ -140,6 +140,11 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
   const heroVariant = useCgLobbyHeroVariant(cgUser ?? null);
 
   const { variant: seekingVariant, trackExposure: trackSeekingExposure } = useExperiment('exp-mp-quickplay-wait-v1');
+  const { variant: eagerDisableVariant } = useExperiment('exp-mp-quickplay-eager-disable-v1');
+
+  // exp-mp-quickplay-eager-disable-v1: local pending flag for immediate button disable.
+  // Only used when eager-disable variant is active; control path never sets this.
+  const [isQuickPlayPending, setIsQuickPlayPending] = useState(false);
   const isSeekingOverlay = quickPlay && isJoining && seekingVariant === 'match-seeking';
   useEffect(() => {
     if (!isSeekingOverlay) return;
@@ -275,7 +280,10 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
   // Clear joining state when join completes or fails
   useEffect(() => {
-    if (!isJoining) setJoiningRoomCode(null);
+    if (!isJoining) {
+      setJoiningRoomCode(null);
+      setIsQuickPlayPending(false);
+    }
   }, [isJoining]);
 
   // Handle create room button
@@ -348,6 +356,10 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
       language: defaultLanguage,
       gameMode: 'classic',
     });
+    if (eagerDisableVariant === 'eager-disable') {
+      setIsQuickPlayPending(true);
+      trackGrowthEvent('mp_quickplay_eager_shown', {});
+    }
     trackGrowthEvent('mp_quickplay_initiated', { hadMatchRoom: !!matchRoom });
     if (matchRoom) {
       setGameCode(matchRoom.gameCode);
@@ -375,7 +387,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
     // so inviting friends to join is a valid affordance.
     cgShowInvite(gameCode);
 
-  }, [isAuthenticated, displayName, defaultLanguage, activeRooms, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite]);
+  }, [isAuthenticated, displayName, defaultLanguage, activeRooms, handleJoin, setGameCode, setRoomName, setHostUsername, setUsername, cgShowInvite, eagerDisableVariant]);
 
   // Landing Quick Play auto-fire: when the user arrives via
   // `/multiplayer?quickPlay=true`, kick off `handleQuickPlay` exactly once on
@@ -485,7 +497,7 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
           roomsLoading={roomsLoading}
           roomFetchTimedOut={roomFetchTimedOut}
           joiningRoomCode={joiningRoomCode}
-          isJoining={isJoining}
+          isJoining={isJoining || isQuickPlayPending}
           onRefreshRooms={refreshRooms}
           onRoomClick={handleRoomClick}
           onCreateRoom={handleCreateClick}

@@ -11,20 +11,22 @@
 
 ## Current (in progress)
 
-### sealed-bid — readiness: 70% — status: IN PROGRESS
+### sealed-bid — readiness: 77% — status: IN PROGRESS
 - **Why next:** MP bidding mode; verify ≥2-player clash scoring.
 - **Key files:** components/multiplayer/sealedBid/*, backend/handlers/sealedBidHandler.ts, backend/modules/sealedBidManager.ts, app/[locale]/sealed-bid/*.
-- **Last audited:** 2026-07-27
+- **Last audited:** 2026-07-28
 - **Covered (2026-07-24):** backend wiring (gameStartHandler, index.ts), sealedBidManager pure state machine, sealedBidHandler (bid validation, deadline timers, finalize), useSealedBidGame hook, SealedBidVersus MP UI, solo page.tsx, sbMpEngine resolver, i18n ×6 locales (both sealedBid + sealedBidMp namespaces), a11y review, perf review, gate/visibility, tests (5 files, 572 lines), host+player view wiring, lock-gate, rackPool.
 - **Covered (2026-07-26):** countdown timer render (roundDeadline→secsLeft hook wired + UI badge in standings sidebar), sealedBidMp.autoResolve i18n ×6 locales, neo-orange/red urgency color scheme.
 - **Covered (2026-07-27):** topScorer tie-breaking fixed (alphabetical), picks-reset-in-render validated as React-blessed pattern (not a bug), TDD tests added: countdown timer badge (×2 tests: renders + urgency color), tie-breaking integration test.
+- **Covered (2026-07-28):** RTL audit — ExitRoomButton (DoorOpen icon, non-directional, OK), solo page.tsx back arrow (DirectionalIcon already correct). **Fixed**: exit button overlay `left-3`→`start-3` (logical property, RTL-safe); backspace `Delete` icon → `DirectionalIcon mirror` (flips in RTL). TDD: 2 new tests (start-3 assertion, rtl:scale-x-[-1] assertion). Also confirmed solo page: already uses `DirectionalIcon` correctly (line 239), `dir={dir}` on root div. Code audit complete for all navigation/directional elements.
 
 **Open issues:**
 - ~~**MAJOR** No countdown timer in `SealedBidVersus` MP view~~ — **FIXED 2026-07-26**: `secsLeft` state + `useEffect` interval wired from `game.roundDeadline`; badge renders orange→red (≤5s) in standings sidebar with `role="timer"` a11y. `SealedBidVersus.tsx`.
 - ~~**MINOR** `topScorer` in `sealedBidHandler.ts:157` resolves ties by JS object insertion order~~ — **FIXED 2026-07-27**: alphabetical tiebreak added; TDD integration test added.
-- ~~**MINOR** `SealedBidVersus.tsx:44-49` — picks reset during render body~~ — **VALIDATED as correct**: React 18 explicitly blesses this "adjusting state while rendering" pattern (documented in React docs). Moving to `useEffect` would be worse — picks would flash for one frame. Not a bug.
-- **OPEN** Visual QA not captured — need to verify timer badge renders correctly and RTL (Hebrew) doesn't break layout. **owner: next night**
-- **OPEN** RTL audit: `SealedBidVersus` uses `dir={dir}` but has no Hebrew-specific layout tests. ExitRoomButton + back arrow need DirectionalIcon check. **owner: next night**
+- ~~**MINOR** `SealedBidVersus.tsx:44-49` — picks reset during render body~~ — **VALIDATED as correct**: React 18 explicitly blesses this "adjusting state while rendering" pattern.
+- ~~**OPEN** RTL audit: `SealedBidVersus` exit button `left-3` + backspace icon not mirrored~~ — **FIXED 2026-07-28**: `start-3` logical property + `DirectionalIcon mirror`. TDD tests added.
+- **OPEN** Visual QA not captured — timer badge + RTL layout need screenshot verification (agent-browser at `lexiclash.live/he/sealed-bid`). **owner: next night**
+- **MINOR** Results row hardcodes `+{r.points}` sign — in RTL the `+` appears before the number (bidi handles this OK, but native speakers may prefer `{r.points}+`). Low priority. **owner: review-by-eod**
 
 ## Queue (audit order — closest-to-release first)
 

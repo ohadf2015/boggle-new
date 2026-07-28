@@ -1881,3 +1881,17 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
 - [Sentry] JAVASCRIPT-NEXTJS-1WM Connection is closed — impact VERIFIED improved
   - measured 0 new occurrences since fix 2026-07-23 (last seen 2026-07-22)
   - status: shipped (verdict logged to impact-ledger.ndjson)
+
+## 2026-07-28
+- [PostHog] React error #418 (two instances, scores 0.412 and 0.308)
+  - issues: 019f4747-c11b-7430-8ac2-882649b49cbd (reach=5) and 019f185d-dc16-7bf0-8ff4-7390159a8048 (reach=4)
+  - description: Minified React error #418 — hydration mismatch (server HTML ≠ client render)
+  - status: deferred — prior fix (c085187e4) addressed /daily and /brain. New occurrences may be on different routes. Root-cause requires Layout-Shifts / hydration trace in browser devtools.
+  - why: needs browser devtools hydration investigation; not diagnosable from stack trace alone
+  - recommended owner: review-by-eod
+- [Sentry] Error: Connection is closed. (JAVASCRIPT-NEXTJS-1WM)
+  - link: https://lexiclash.sentry.io/issues/135762417/
+  - last seen: recent; reach=0 (low user impact)
+  - status: deferred — impact confirmed improved in last run (verdict: improved, 0 new occurrences). Monitor.
+  - why: low reach (0 users), likely transient DB connection drop; monitor for recurrence
+  - recommended owner: self

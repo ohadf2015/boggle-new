@@ -335,7 +335,8 @@ const ja = {
     "clear": "クリア",
     "pass": "パス",
     "lock": "入札を確定",
-    "autoResolve": "{{secs}}秒後に自動解決"
+    "autoResolve": "{{secs}}秒後に自動解決",
+    "eloRating": "レーティング"
   },
   "sealedBidLegacy": {
     "badge": "シールドビッド",

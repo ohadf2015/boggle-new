@@ -259,7 +259,8 @@ const en = {
     "clear": "Clear",
     "pass": "Pass",
     "lock": "Lock bid",
-    "autoResolve": "Auto-resolves in {{secs}}s"
+    "autoResolve": "Auto-resolves in {{secs}}s",
+    "eloRating": "Rating"
   },
   "sealedBidLegacy": {
     "badge": "Sealed Bid",

@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Delete } from 'lucide-react';
 import type { Socket } from 'socket.io-client';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import ExitRoomButton from '@/components/ExitRoomButton';
 import SealedBidFeltShell from '@/components/sealedBid/SealedBidFeltShell';
 import { SEALED_BID_ASSETS } from '@/components/sealedBid/sealedBidAssets';
@@ -79,7 +80,7 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
       dir={dir}
     >
       {onQuit && (
-        <div className="absolute left-3 top-3 z-20">
+        <div data-testid="sb-exit-container" className="absolute start-3 top-3 z-20">
           <ExitRoomButton onClick={onQuit} label={t('common.backToHome')} />
         </div>
       )}
@@ -111,18 +112,44 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
               className="flex flex-wrap justify-end gap-1.5 lg:flex-col lg:items-stretch lg:justify-start"
               aria-label={t('sealedBidMp.scores')}
             >
-              {sortedScores.map(([u, s]) => (
-                <li
-                  key={u}
-                  className={`rounded-full border-2 border-black px-2.5 py-1 font-neo-display text-xs font-bold shadow-hard-sm lg:rounded-neo lg:flex lg:items-center lg:justify-between ${
-                    u === username
-                      ? 'bg-neo-pink text-black'
-                      : 'bg-neo-navy-light text-neo-white'
-                  }`}
-                >
-                  {u} <span className="tabular-nums">{s}</span>
-                </li>
-              ))}
+              {sortedScores.map(([u, s]) => {
+                const roundDelta =
+                  game.phase === 'revealed' && game.results
+                    ? (game.results.find((r) => r.username === u)?.points ?? 0)
+                    : 0;
+                return (
+                  <li
+                    key={u}
+                    className={`flex items-center justify-between rounded-full border-2 border-black px-2.5 py-1 font-neo-display text-xs font-bold shadow-hard-sm lg:rounded-neo ${
+                      u === username
+                        ? 'bg-neo-pink text-black'
+                        : 'bg-neo-navy-light text-neo-white'
+                    }`}
+                  >
+                    <span className="flex min-w-0 items-center gap-1">
+                      <span className="truncate font-bold">{u}</span>
+                      <span
+                        aria-label={t('sealedBidMp.eloRating')}
+                        className={`shrink-0 text-[10px] font-black tabular-nums ${
+                          u === username ? 'opacity-50' : 'opacity-60'
+                        }`}
+                      >
+                        ♟{(1200 + s).toLocaleString()}
+                      </span>
+                      {roundDelta > 0 && (
+                        <span
+                          className={`shrink-0 text-[10px] font-black ${
+                            u === username ? 'text-black/50' : 'text-neo-lime'
+                          }`}
+                        >
+                          +{roundDelta}
+                        </span>
+                      )}
+                    </span>
+                    <span className="shrink-0 tabular-nums">{s}</span>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </aside>
@@ -241,7 +268,7 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
                       aria-label={t('sealedBidMp.clear')}
                       className="min-h-12 rounded-neo border-3 border-black bg-neo-navy-light px-3 py-3 text-neo-white shadow-hard disabled:opacity-40"
                     >
-                      <Delete className="h-5 w-5" />
+                      <DirectionalIcon icon={Delete} className="h-5 w-5" mirror />
                     </button>
                     <button
                       type="button"

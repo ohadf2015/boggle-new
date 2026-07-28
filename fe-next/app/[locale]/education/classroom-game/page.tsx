@@ -57,10 +57,13 @@ export default async function ClassroomGamePage({ params }: { params: Promise<{ 
         features={content.steps.map((s) => `${s.name}: ${s.text}`)}
       />
       <section className="mx-auto max-w-3xl px-4 pb-12 text-center">
-        <div className="rounded-neo border-neo border-neo-purple/50 bg-neo-navy-light px-6 py-5 shadow-hard">
-          <p className="text-sm text-neo-white/85">{FOR_SCHOOLS_FOOTER[locale] ?? FOR_SCHOOLS_FOOTER.en}</p>
-          <Link href={`/${locale}/education/for-schools`}
-            className="mt-3 inline-block rounded-neo border-neo border-neo-purple bg-neo-purple/20 px-5 py-2 font-bold text-neo-white shadow-hard-sm transition-all hover:bg-neo-purple/30 hover:shadow-hard">
+        <div className="rounded-neo border-neo-thick bg-neo-navy-light px-6 py-6 shadow-hard-lg">
+          <p className="text-base text-neo-white/90">{FOR_SCHOOLS_FOOTER[locale] ?? FOR_SCHOOLS_FOOTER.en}</p>
+          <Link
+            href={`/${locale}/education/for-schools`}
+            data-ph-capture-attribute-cta="classroom_for_schools"
+            className="mt-4 inline-block rounded-neo border-neo-thick bg-neo-lime px-6 py-3 font-neo-display font-black uppercase tracking-wide text-neo-navy shadow-hard transition-all hover:-translate-y-0.5 hover:shadow-hard-lg"
+          >
             {FOR_SCHOOLS_CTA[locale] ?? FOR_SCHOOLS_CTA.en}
           </Link>
         </div>

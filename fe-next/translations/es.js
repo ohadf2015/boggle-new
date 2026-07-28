@@ -335,7 +335,8 @@ const es = {
     "clear": "Limpiar",
     "pass": "Pasar",
     "lock": "Fijar apuesta",
-    "autoResolve": "Se resuelve en {{secs}}s"
+    "autoResolve": "Se resuelve en {{secs}}s",
+    "eloRating": "Puntuación"
   },
   "sealedBidLegacy": {
     "badge": "Puja secreta",

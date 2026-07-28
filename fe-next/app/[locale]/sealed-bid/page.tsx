@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { ArrowLeft, Trophy } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useHideNavigation } from '@/contexts/NavigationContext';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
@@ -151,7 +152,7 @@ export default function SealedBidPage() {
     } else {
       playSound('wordRejected');
     }
-  }, [phase, pending, currentDeal, chosenWord, stake, wallet, language, playSound, t, validationError]);
+  }, [phase, pending, currentDeal, chosenWord, stake, wallet, language, playSound, t]);
 
   const pass = useCallback(() => {
     if (phase !== 'bidding' || pending || !currentDeal) return;
@@ -235,7 +236,7 @@ export default function SealedBidPage() {
         aria-label={t('common.back')}
         className="inline-flex min-h-10 min-w-10 items-center justify-center gap-1 rounded-neo border-2 border-black bg-neo-navy-light px-2.5 py-1.5 text-neo-white shadow-hard-sm"
       >
-        <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+        <DirectionalIcon icon={ArrowLeft} className="h-4 w-4" />
       </Link>
 
       <span
