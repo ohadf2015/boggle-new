@@ -160,12 +160,11 @@ export default function FeedbackWidget() {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       setStatus('done');
-      posthog.capture('feedback_submitted', {
-        changeType: CATEGORY_TO_CHANGE_TYPE[category],
-        hasScreenshot: Boolean(screenshot.dataUrl),
-        hasEmail: Boolean(email.trim()),
-        locale: language,
-      });
+      // NOTE: no client-side 'feedback_submitted' capture here — the
+      // feedback-devtools ingest API emits it server-side so it reaches
+      // PostHog even for users who declined analytics consent
+      // (opt_out_capturing_by_default drops all client captures).
+      // A client capture here would double-count consenting users.
     } catch (err) {
       logger.warn('[FeedbackWidget] Submit failed', err);
       setStatus('error');
