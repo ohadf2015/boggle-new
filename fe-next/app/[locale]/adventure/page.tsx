@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import AdventurePageClient from './PageClient';
@@ -233,13 +232,6 @@ export default async function AdventurePage({ params }: { params: Promise<{ loca
         ]}
       />
       <AdventurePageClient />
-      <GamePageSeoContent
-        asH1
-        title={content.title}
-        description={content.description}
-        features={content.features}
-        faq={content.faq}
-      />
     </>
   );
 }

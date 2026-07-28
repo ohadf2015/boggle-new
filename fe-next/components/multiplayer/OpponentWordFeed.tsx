@@ -42,7 +42,7 @@ export function OpponentWordFeed({ feedItems, t }: OpponentWordFeedProps) {
               }`}
             >
               <span className="min-w-0 truncate">{t(translationKey, { name: item.playerName, length: item.wordLength })}</span>
-              <span className="ms-1.5 shrink-0 text-neo-lime font-bold">+{item.score}</span>
+              <span className="ms-1.5 shrink-0 text-neo-lime font-bold" dir="ltr">+{item.score}</span>
             </AdaptiveMotion.div>
           );
         })}

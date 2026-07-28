@@ -3,8 +3,6 @@ import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { PageLoader } from '@/components/ui/PageLoader';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
-import { dailySeoContent } from './dailySeo.data';
 
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
@@ -293,29 +291,12 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
  * Wrapped in Suspense boundary to properly handle useSearchParams
  * which can cause "Rendered fewer hooks than expected" errors without it.
  */
-export default async function DailyChallengePage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<React.JSX.Element> {
-  const { locale } = await params;
-  const seo = dailySeoContent[locale as keyof typeof dailySeoContent] || dailySeoContent.en;
+export default async function DailyChallengePage(): Promise<React.JSX.Element> {
   return (
     <>
       <Suspense fallback={<LoadingFallback />}>
         <DailyRedirect />
       </Suspense>
-      {/* SEO/publisher copy lives ONLY on this indexable hub — the game shells
-          (/daily/word-hunt, /daily/word-wheel) are noIndex, so a card there
-          earns no crawl value and just clutters the board + doubles the h1. */}
-      <GamePageSeoContent
-        asH1
-        collapsible
-        title={seo.title}
-        description={seo.description}
-        features={seo.features}
-        faq={seo.faq}
-      />
     </>
   );
 }

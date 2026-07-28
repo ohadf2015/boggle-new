@@ -1,29 +1,5 @@
 // Es translations
 const es = {
-  "feedbackWidget": {
-    "bubbleLabel": "Comentarios",
-    "title": "Enviar comentarios",
-    "close": "Cerrar",
-    "category": "¿De qué se trata?",
-    "categories": {
-      "bug": "Reportar un error",
-      "idea": "Sugerir una idea",
-      "ux": "Algo es confuso",
-      "other": "Otra cosa"
-    },
-    "messageLabel": "Cuéntanos qué piensas",
-    "messagePlaceholder": "¿Qué pasó? ¿Qué esperabas?",
-    "emailLabel": "Email (opcional — solo si quieres respuesta)",
-    "screenshot": "Adjuntar captura",
-    "screenshotCapturing": "Capturando…",
-    "screenshotRemove": "Quitar captura",
-    "screenshotFailed": "Captura no disponible",
-    "submit": "Enviar comentarios",
-    "sending": "Enviando…",
-    "thanksTitle": "¡Gracias! 🙏",
-    "thanksBody": "Tus comentarios llegaron al equipo.",
-    "errorBody": "No se pudo enviar. Inténtalo de nuevo."
-  },
   "pricing": {
     "title": "Elige tu plan",
     "subtitle": "Funciones de aula para profes y colegios",

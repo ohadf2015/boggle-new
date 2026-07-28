@@ -2,8 +2,7 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Script from 'next/script';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import { buildEducationDuelsJsonLd, getEducationSubpageContent } from '@/lib/seo/educationSubpageJsonLd';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { buildEducationDuelsJsonLd } from '@/lib/seo/educationSubpageJsonLd';
 import PageClient from './PageClient';
 
 export const dynamic = 'force-dynamic';
@@ -16,7 +15,6 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 export default async function DuelsPage({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   const { howTo, resource, breadcrumb } = buildEducationDuelsJsonLd(locale);
-  const content = getEducationSubpageContent('duels', locale);
 
   return (
     <>
@@ -32,11 +30,6 @@ export default async function DuelsPage({ params }: { params: Promise<{ locale: 
       >
         <PageClient />
       </Suspense>
-      <GamePageSeoContent
-        title={content.name}
-        description={content.description}
-        features={content.steps.map((s) => `${s.name}: ${s.text}`)}
-      />
     </>
   );
 }

@@ -1,29 +1,5 @@
 // RU translations
 const ru = {
-  "feedbackWidget": {
-    "bubbleLabel": "Отзыв",
-    "title": "Отправить отзыв",
-    "close": "Закрыть",
-    "category": "О чём речь?",
-    "categories": {
-      "bug": "Сообщить об ошибке",
-      "idea": "Предложить идею",
-      "ux": "Что-то непонятно",
-      "other": "Другое"
-    },
-    "messageLabel": "Расскажите, что случилось",
-    "messagePlaceholder": "Что произошло? Что вы ожидали?",
-    "emailLabel": "Email (необязательно — только если нужен ответ)",
-    "screenshot": "Прикрепить скриншот",
-    "screenshotCapturing": "Съёмка…",
-    "screenshotRemove": "Убрать скриншот",
-    "screenshotFailed": "Скриншот недоступен",
-    "submit": "Отправить отзыв",
-    "sending": "Отправка…",
-    "thanksTitle": "Спасибо! 🙏",
-    "thanksBody": "Ваш отзыв дошёл до команды.",
-    "errorBody": "Не удалось отправить. Попробуйте ещё раз."
-  },
   "pricing": {
     "title": "Выберите тариф",
     "subtitle": "Инструменты для класса — учителям и школам",

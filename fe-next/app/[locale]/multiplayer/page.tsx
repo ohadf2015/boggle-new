@@ -1,7 +1,6 @@
 import ReactDOM from 'react-dom';
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import MultiplayerPageClient from './PageClient';
@@ -216,13 +215,6 @@ export default async function MultiplayerPage({ params }: { params: Promise<{ lo
         ]}
       />
       <MultiplayerPageClient />
-      <GamePageSeoContent
-        collapsible
-        title={content.title}
-        description={content.description}
-        features={content.features}
-        faq={content.faq}
-      />
     </>
   );
 }

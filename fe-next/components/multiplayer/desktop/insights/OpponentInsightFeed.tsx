@@ -68,7 +68,7 @@ export function OpponentInsightFeed({ opponentWords, mode, maxItems = 3 }: Oppon
               <span className="font-mono truncate">⚡ {display}</span>
               <span className="flex items-center gap-1 shrink-0">
                 <span className="opacity-70 truncate max-w-[80px]">{w.byUsername}</span>
-                <span className="tabular-nums font-bold">+{w.score}</span>
+                <span className="tabular-nums font-bold" dir="ltr">+{w.score}</span>
               </span>
             </li>
           );

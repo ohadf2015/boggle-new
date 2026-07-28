@@ -196,24 +196,6 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
     inLanguage: ['en', 'he', 'sv', 'ja', 'es', 'ru'],
   };
 
-  // FAQPage schema — uses the same locale FAQ already rendered (sr-only) by
-  // GamePageSeoContent, so AI search engines (ChatGPT, Perplexity) and Google
-  // rich-results can surface answers directly from /daily without rewrites.
-  const localeFaq = seoContent[locale as keyof typeof seoContent]?.faq || seoContent.en.faq;
-  const faqPageSchema = localeFaq.length > 0 ? {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    '@id': `https://www.lexiclash.live${localePath}/daily#faq`,
-    mainEntity: localeFaq.map((qa) => ({
-      '@type': 'Question',
-      name: qa.question,
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: qa.answer,
-      },
-    })),
-  } : null;
-
   // HowTo schema — structures the "play the daily challenge" flow as four
   // discrete steps. Targets Google's HowTo rich result + AI quotability for
   // queries like "how to play LexiClash daily challenge".
@@ -315,7 +297,6 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
             softwareAppSchema,
             wordHuntEventSchema,
             howToSchema,
-            ...(faqPageSchema ? [faqPageSchema] : []),
           ]),
         }}
       />

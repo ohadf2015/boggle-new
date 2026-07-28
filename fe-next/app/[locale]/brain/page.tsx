@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
-import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
 import BrainTrainingPageClient from './PageClient';
@@ -136,7 +135,6 @@ export default async function BrainTrainingPage({ params }: { params: Promise<{ 
         ]}
       />
       <BrainTrainingPageClient />
-      <GamePageSeoContent title={content.title} description={content.description} features={content.features} faq={content.faq} />
     </>
   );
 }
