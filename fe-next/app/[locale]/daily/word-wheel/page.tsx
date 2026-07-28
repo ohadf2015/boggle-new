@@ -227,6 +227,7 @@ export default async function WordWheelPage({ params }: PageParams): Promise<Rea
         <WordWheelChallenge />
       </Suspense>
       <GamePageSeoContent
+        collapsible
         title={content.title}
         description={content.description}
         features={content.features}

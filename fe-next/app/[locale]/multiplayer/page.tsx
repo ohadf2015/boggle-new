@@ -217,6 +217,7 @@ export default async function MultiplayerPage({ params }: { params: Promise<{ lo
       />
       <MultiplayerPageClient />
       <GamePageSeoContent
+        collapsible
         title={content.title}
         description={content.description}
         features={content.features}
