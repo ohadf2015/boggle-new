@@ -1,5 +1,29 @@
 // HE translations
 const he = {
+  "feedbackWidget": {
+    "bubbleLabel": "משוב",
+    "title": "יש משוב? דברו איתנו",
+    "close": "סגירה",
+    "category": "על מה המשוב?",
+    "categories": {
+      "bug": "דיווח על תקלה",
+      "idea": "הצעה לשיפור",
+      "ux": "משהו מבלבל",
+      "other": "משהו אחר"
+    },
+    "messageLabel": "ספרו לנו מה קרה",
+    "messagePlaceholder": "מה קרה? ומה ציפיתם שיקרה?",
+    "emailLabel": "אימייל (לא חובה — רק אם תרצו שנחזור אליכם)",
+    "screenshot": "צרפו צילום מסך",
+    "screenshotCapturing": "מצלם…",
+    "screenshotRemove": "הסירו צילום מסך",
+    "screenshotFailed": "צילום מסך לא זמין",
+    "submit": "שליחת משוב",
+    "sending": "שולח…",
+    "thanksTitle": "תודה! 🙏",
+    "thanksBody": "המשוב הגיע אלינו ויעזור לנו להשתפר.",
+    "errorBody": "לא הצלחנו לשלוח כרגע. נסו שוב בעוד רגע."
+  },
   "pricing": {
     "title": "בחרו את התוכנית שלכם",
     "subtitle": "כלים לכיתה למורים ולבתי ספר",

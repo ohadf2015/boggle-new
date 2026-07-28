@@ -74,6 +74,13 @@ const SocialMediaPixels = nextDynamic(() => import('@/components/SocialMediaPixe
   loading: () => null,
 });
 
+// Feedback widget — non-critical, self-defers to browser idle internally and
+// lazy-loads its own chunk; screenshot capture (html2canvas) is imported only
+// on explicit user opt-in inside the component.
+const FeedbackWidget = nextDynamic(() => import('@/components/feedback/FeedbackWidget'), {
+  loading: () => null,
+});
+
 
 // Synchronously primes CSS vars from localStorage before paint to prevent CLS
 // from AdMob SizeChanged async event and GlobalBottomNav ResizeObserver.
@@ -699,6 +706,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <EmailCaptureModal />
                     <NewYearCountdown />
                     <CookieConsent />
+                    {/* User feedback bubble → /api/feedback → feedback-devtools ingest */}
+                    <FeedbackWidget />
                     {/* Google One Tap (web) — in-page ID-token sign-in so Google's
                         consent shows our domain, not <ref>.supabase.co. No redirect. */}
                     <GoogleOneTapInitializer />

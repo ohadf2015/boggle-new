@@ -1,5 +1,29 @@
 // Ja translations
 const ja = {
+  "feedbackWidget": {
+    "bubbleLabel": "フィードバック",
+    "title": "フィードバックを送る",
+    "close": "閉じる",
+    "category": "何についてですか？",
+    "categories": {
+      "bug": "バグを報告",
+      "idea": "改善提案",
+      "ux": "わかりにくい点",
+      "other": "その他"
+    },
+    "messageLabel": "ご意見をお聞かせください",
+    "messagePlaceholder": "何が起きましたか？何を期待していましたか？",
+    "emailLabel": "メールアドレス（任意 — 返信が必要な場合のみ）",
+    "screenshot": "スクリーンショットを添付",
+    "screenshotCapturing": "撮影中…",
+    "screenshotRemove": "スクリーンショットを削除",
+    "screenshotFailed": "スクリーンショットを利用できません",
+    "submit": "送信",
+    "sending": "送信中…",
+    "thanksTitle": "ありがとうございます！🙏",
+    "thanksBody": "フィードバックがチームに届きました。",
+    "errorBody": "送信できませんでした。もう一度お試しください。"
+  },
   "pricing": {
     "title": "プランを選ぶ",
     "subtitle": "先生と学校向けの授業機能",

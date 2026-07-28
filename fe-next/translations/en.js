@@ -14870,6 +14870,30 @@ const en = {
       "thanks": "You're on the list! We'll let you know when supporter plans launch."
     }
   },
+  "feedbackWidget": {
+    "bubbleLabel": "Feedback",
+    "title": "Send feedback",
+    "close": "Close",
+    "category": "What's this about?",
+    "categories": {
+      "bug": "Report a bug",
+      "idea": "Suggest an idea",
+      "ux": "Something is confusing",
+      "other": "Something else"
+    },
+    "messageLabel": "Tell us what's on your mind",
+    "messagePlaceholder": "What happened? What did you expect?",
+    "emailLabel": "Email (optional — only if you want a reply)",
+    "screenshot": "Attach screenshot",
+    "screenshotCapturing": "Capturing…",
+    "screenshotRemove": "Remove screenshot",
+    "screenshotFailed": "Screenshot unavailable",
+    "submit": "Send feedback",
+    "sending": "Sending…",
+    "thanksTitle": "Thanks! 🙏",
+    "thanksBody": "Your feedback landed with the team.",
+    "errorBody": "Couldn't send right now. Please try again."
+  },
   "pricing": {
     "title": "Choose Your Plan",
     "subtitle": "Unlock classroom features for teachers and schools",

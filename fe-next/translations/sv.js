@@ -1,5 +1,29 @@
 // Sv translations
 const sv = {
+  "feedbackWidget": {
+    "bubbleLabel": "Feedback",
+    "title": "Skicka feedback",
+    "close": "Stäng",
+    "category": "Vad handlar det om?",
+    "categories": {
+      "bug": "Rapportera en bugg",
+      "idea": "Föreslå en idé",
+      "ux": "Något är förvirrande",
+      "other": "Något annat"
+    },
+    "messageLabel": "Berätta vad du tänker",
+    "messagePlaceholder": "Vad hände? Vad förväntade du dig?",
+    "emailLabel": "E-post (valfritt — bara om du vill ha svar)",
+    "screenshot": "Bifoga skärmdump",
+    "screenshotCapturing": "Tar skärmdump…",
+    "screenshotRemove": "Ta bort skärmdump",
+    "screenshotFailed": "Skärmdump ej tillgänglig",
+    "submit": "Skicka feedback",
+    "sending": "Skickar…",
+    "thanksTitle": "Tack! 🙏",
+    "thanksBody": "Din feedback har nått teamet.",
+    "errorBody": "Kunde inte skicka just nu. Försök igen."
+  },
   "pricing": {
     "title": "Välj din plan",
     "subtitle": "Klassrumsfunktioner för lärare och skolor",
