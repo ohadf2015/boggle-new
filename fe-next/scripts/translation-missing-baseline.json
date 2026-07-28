@@ -112,6 +112,7 @@
     "sealedBid.session.shareCta"
   ],
   "ja": [
+    "sealedBid.tapHint",
     "sealedBidLegacy.chipStack",
     "sealedBidLegacy.gameOver",
     "sealedBidLegacy.busted",
@@ -179,6 +180,10 @@
     "sealedBid.session.shareCta"
   ],
   "ru": [
+    "shiritori.solo.tempo.bonus",
+    "sealedBidMp.eloRating",
+    "teacher.upgradePro.cta",
+    "teacher.upgradePro.body",
     "seo.refund.title",
     "seo.refund.description",
     "seo.refund.ogTitle",
@@ -196,6 +201,7 @@
     "sealedBid.session.shareHeader"
   ],
   "sv": [
+    "sealedBid.tapHint",
     "sealedBidLegacy.chipStack",
     "sealedBidLegacy.gameOver",
     "sealedBidLegacy.busted",
