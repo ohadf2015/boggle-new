@@ -14,12 +14,16 @@ export default function UpgradePricingPageClient() {
   const { t, language } = useLanguage();
   const isRTL = language === 'he';
   const [isLoading, setIsLoading] = useState(false);
+  // Store is in test mode / pending KYC — keep the CTA inert until checkout is truly live.
+  // The API enforces this too (503); this just avoids showing a button that can't work.
+  const checkoutEnabled = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED === 'true';
 
   useEffect(() => {
     trackGrowthEvent('iap_viewed', { product: 'teacher_pro' });
   }, []);
 
   const handleUpgrade = async () => {
+    if (!checkoutEnabled) return;
     setIsLoading(true);
     try {
       const response = await fetch('/api/subscription/checkout', {
@@ -213,7 +217,7 @@ export default function UpgradePricingPageClient() {
 
             <Button
               onClick={handleUpgrade}
-              disabled={isLoading}
+              disabled={isLoading || !checkoutEnabled}
               className="w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
             >
               {isLoading

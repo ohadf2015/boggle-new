@@ -14,6 +14,13 @@ import logger from '@/utils/logger';
  */
 export async function POST(request: NextRequest) {
   try {
+    // Checkout gate: the Lemon Squeezy store is still in test mode / pending KYC activation, so a
+    // real user must not be able to reach a checkout that can't take their money. Enabled only when
+    // NEXT_PUBLIC_CHECKOUT_ENABLED is exactly 'true' (set it once the store is Live + live keys are in).
+    if (process.env.NEXT_PUBLIC_CHECKOUT_ENABLED !== 'true') {
+      return NextResponse.json({ error: 'Checkout is not available yet' }, { status: 503 });
+    }
+
     const user = await getAuthedUser(request);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
