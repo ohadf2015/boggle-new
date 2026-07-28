@@ -44,39 +44,4 @@ describe('GamePageSeoContent', () => {
     const { container: c2 } = render(<GamePageSeoContent {...props} asH1 />);
     expect(c2.querySelector('h1')).not.toBeNull();
   });
-
-  // 2026-07-28 player-feedback fix: on game screens (/daily, /multiplayer,
-  // /singleplayer) the marketing card sat in players' faces when they came to
-  // PLAY. `collapsible` keeps every word in the DOM for AdSense reviewers and
-  // crawlers (native <details>, no hidden-text signal) but renders the card
-  // collapsed so the game is the first thing players see.
-  it('renders a collapsed <details> with all content in the DOM when collapsible', () => {
-    const { container } = render(<GamePageSeoContent {...props} collapsible />);
-    const details = container.querySelector('details');
-    expect(details).not.toBeNull();
-    // Collapsed by default — no `open` attribute.
-    expect(details!.hasAttribute('open')).toBe(false);
-    // Title acts as the visible accordion label.
-    const summary = container.querySelector('summary');
-    expect(summary).not.toBeNull();
-    expect(summary!.textContent).toContain('Free Word Game');
-    // Full copy still in the DOM (AdSense reviewers + crawlers see it).
-    expect(container.textContent).toContain('real-time multiplayer word game');
-    expect(container.textContent).toContain('Daily challenge');
-    expect(container.textContent).toContain('completely free');
-    // Nothing visually hidden.
-    expect(container.querySelector('.sr-only')).toBeNull();
-  });
-
-  it('preserves the heading level inside the summary when collapsible', () => {
-    const { container } = render(<GamePageSeoContent {...props} asH1 collapsible />);
-    const summary = container.querySelector('summary');
-    expect(summary!.querySelector('h1')).not.toBeNull();
-  });
-
-  it('does not render <details> when collapsible is not set', () => {
-    const { container } = render(<GamePageSeoContent {...props} />);
-    // Only the FAQ items use <details> — the outer card must not be one.
-    expect(container.querySelector('section > details')).toBeNull();
-  });
 });

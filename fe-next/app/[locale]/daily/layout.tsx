@@ -323,7 +323,6 @@ export default async function DailyLayout({ children, params }: DailyLayoutProps
       {children}
       <GamePageSeoContent
         asH1
-        collapsible
         title={seoContent[locale as keyof typeof seoContent]?.title || seoContent.en.title}
         description={seoContent[locale as keyof typeof seoContent]?.description || seoContent.en.description}
         features={seoContent[locale as keyof typeof seoContent]?.features || seoContent.en.features}
