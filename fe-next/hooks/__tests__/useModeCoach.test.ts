@@ -17,21 +17,15 @@ describe('useModeCoach analytics', () => {
     vi.useRealTimers();
   });
 
-  function show(mode: 'classic' = 'classic') {
-    const view = renderHook(() => useModeCoach(mode));
+  it('emits nothing on mount — coach removed, replaced by contextual overlay', () => {
+    renderHook(() => useModeCoach('classic'));
     act(() => {
       vi.advanceTimersByTime(700);
     });
-    return view;
-  }
-
-  it('emits mode_coach_shown once when the coach first appears', () => {
-    show();
-    expect(capture).toHaveBeenCalledWith('mode_coach_shown', { mode: 'classic' });
-    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_shown')).toHaveLength(1);
+    expect(capture).not.toHaveBeenCalledWith('mode_coach_shown', expect.anything());
   });
 
-  it('emits nothing on a repeat visit (already seen)', () => {
+  it('emits nothing on a repeat visit (always no-op)', () => {
     window.localStorage.setItem('lc_coach_classic', '1');
     renderHook(() => useModeCoach('classic'));
     act(() => {
@@ -40,41 +34,21 @@ describe('useModeCoach analytics', () => {
     expect(capture).not.toHaveBeenCalled();
   });
 
-  it('emits mode_coach_dismissed with the given reason on dismiss', () => {
-    const { result } = show();
+  it('dismiss is a safe no-op (never visible)', () => {
+    const { result } = renderHook(() => useModeCoach('classic'));
     act(() => result.current.dismiss('skip'));
-    expect(capture).toHaveBeenCalledWith('mode_coach_dismissed', {
-      mode: 'classic',
-      reason: 'skip',
-      step: 0,
-    });
+    expect(result.current.visible).toBe(false);
   });
 
-  it('defaults the dismiss reason to skip', () => {
-    const { result } = show();
-    act(() => result.current.dismiss());
-    expect(capture).toHaveBeenCalledWith('mode_coach_dismissed', {
-      mode: 'classic',
-      reason: 'skip',
-      step: 0,
-    });
+  it('advance does not crash (safe to call on removed coach)', () => {
+    const { result } = renderHook(() => useModeCoach('classic'));
+    act(() => result.current.advance());
+    // Coach is never visible regardless of step — no crash is the assertion
+    expect(result.current.visible).toBe(false);
   });
 
-  it('emits reason=completed when advancing past the last step', () => {
-    const { result } = show(); // classic = 2 steps
-    act(() => result.current.advance()); // 0 -> 1 (last step), no dismiss yet
-    act(() => result.current.advance()); // past last -> completed
-    expect(capture).toHaveBeenCalledWith('mode_coach_dismissed', {
-      mode: 'classic',
-      reason: 'completed',
-      step: 1,
-    });
-  });
-
-  it('emits mode_coach_dismissed at most once per show cycle', () => {
-    const { result } = show();
-    act(() => result.current.dismiss('escape'));
-    act(() => result.current.dismiss('skip'));
-    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_dismissed')).toHaveLength(1);
+  it('marks seen in storage on mount to prevent re-shows', () => {
+    renderHook(() => useModeCoach('classic'));
+    expect(window.localStorage.getItem('lc_coach_classic')).toBe('1');
   });
 });
