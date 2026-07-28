@@ -4,11 +4,12 @@
  * Uses DFS from each non-empty cell to build word paths, checking
  * against the dictionary. Stops immediately on first valid word found.
  *
- * Performance: For a 6x6 grid, worst case is <10ms due to:
- * - Early termination on first match
- * - maxLength cap (8 chars) limits search depth
- * - Cleared cells (empty strings) are skipped
- * - Visited set prevents cell reuse
+ * Performance: Early termination on first match, maxLength cap (8 chars),
+ * cleared cells skipped, visited set prevents cell reuse.
+ * HARD BOUND: when NO word exists the DFS must explore the entire path space
+ * (billions of paths on 6x6) — the original "<10ms worst case" claim only held
+ * when a word is found early. A shared exploration budget aborts the search
+ * and conservatively reports "words remain" (never a false dead-end).
  */
 
 const DIRECTIONS: [number, number][] = [
@@ -17,9 +18,17 @@ const DIRECTIONS: [number, number][] = [
   [1, -1],  [1, 0],  [1, 1],
 ];
 
+/** Max DFS nodes explored before giving up (≈10-50ms). Shared across all
+ * start cells of one hasValidWords call. */
+const DEAD_END_SEARCH_BUDGET = 500_000;
+
+interface SearchBudget { remaining: number }
+
 /**
  * DFS search building word strings from adjacent cells.
  * Returns true immediately when any valid unfound word is discovered.
+ * Also returns true when the exploration budget is exhausted — callers treat
+ * "unknown" as "not a dead-end" (safe direction: never ends a live game).
  */
 function dfs(
   grid: string[][],
@@ -31,7 +40,11 @@ function dfs(
   foundWords: Set<string>,
   minLength: number,
   maxLength: number,
+  budget: SearchBudget,
 ): boolean {
+  if (budget.remaining <= 0) return true; // budget exhausted → conservative
+  budget.remaining -= 1;
+
   const cell = grid[row]?.[col];
   if (!cell) return false; // Out of bounds or cleared
 
@@ -52,7 +65,7 @@ function dfs(
     const nr = row + dr;
     const nc = col + dc;
     if (nr >= 0 && nr < grid.length && nc >= 0 && nc < grid[0].length) {
-      if (dfs(grid, nr, nc, word, visited, checkWord, foundWords, minLength, maxLength)) {
+      if (dfs(grid, nr, nc, word, visited, checkWord, foundWords, minLength, maxLength, budget)) {
         visited.delete(key);
         return true;
       }
@@ -169,11 +182,12 @@ export function hasValidWords(
 
   const rows = grid.length;
   const cols = grid[0].length;
+  const budget: SearchBudget = { remaining: DEAD_END_SEARCH_BUDGET };
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (!grid[r][c]) continue; // Skip cleared cells
-      if (dfs(grid, r, c, '', new Set(), checkWord, foundWords, minLength, maxLength)) {
+      if (dfs(grid, r, c, '', new Set(), checkWord, foundWords, minLength, maxLength, budget)) {
         return true;
       }
     }

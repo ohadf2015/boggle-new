@@ -88,6 +88,11 @@ export default function PracticeWordHuntSandbox() {
   const [confettiKey, setConfettiKey] = useState(0);
   const [popupDismissed, setPopupDismissed] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  // Guard every post-await setState: validator.check() resolves after the
+  // component may have unmounted (test teardown, navigation) — dispatching
+  // into a dead tree throws "window is not defined" as an unhandled error.
+  const mountedRef = useRef(true);
+  useEffect(() => () => { mountedRef.current = false; }, []);
   const [currentSelectionLength, setCurrentSelectionLength] = useState(0);
   const [showDiscoveryTip, setShowDiscoveryTip] = useState(() => {
     if (typeof window === 'undefined') return false;
@@ -256,6 +261,7 @@ export default function PracticeWordHuntSandbox() {
         // Wrong target attempt: still validate vs board for "bonus discovery"
         // path — keep parity with real game's same-length-and-on-board flow.
         const result = await validator.check(displayWord);
+        if (!mountedRef.current) return;
         if (result.isValid && !discoveries.some((d) => d.word === displayWord)) {
           setDiscoveries((d) => [
             ...d,
@@ -278,6 +284,7 @@ export default function PracticeWordHuntSandbox() {
 
     // Discovery word (shorter than target): validate + reveal clues.
     const result = await validator.check(displayWord);
+    if (!mountedRef.current) return;
     if (!result.isValid) {
       const tile = document.querySelector('[data-row][data-col]');
       if (tile) juice.triggerInvalid(tile);

@@ -72,16 +72,34 @@ export default function DeepLinkHandler() {
       return (globalThis as unknown as CapGlobal).Capacitor?.Plugins?.Browser ?? null;
     }
 
+    // Re-wrap a Capacitor plugin proxy in a plain object. The web proxy traps
+    // EVERY property read — including `.then`, which the promise machinery
+    // reads on any value returned from an async function — so returning the
+    // raw proxy across an async boundary rejects with `"App.then()" is not
+    // implemented on web` as an UNHANDLED rejection.
+    const unwrapPluginProxy = (plugin: CapAppPlugin): CapAppPlugin => ({
+      addListener: (event, handler) => plugin.addListener(event, handler),
+      getLaunchUrl: plugin.getLaunchUrl ? () => plugin.getLaunchUrl!() : undefined,
+    });
+
     async function getAppPlugin(): Promise<CapAppPlugin | null> {
       const legacy = getSyncAppPlugin();
-      if (legacy) return legacy;
-      try { return (await import('@capacitor/app')).App as unknown as CapAppPlugin; } catch { return null; }
+      if (legacy) return unwrapPluginProxy(legacy);
+      try {
+        const mod = await import('@capacitor/app');
+        return mod.App ? unwrapPluginProxy(mod.App as unknown as CapAppPlugin) : null;
+      } catch { return null; }
     }
 
     async function getBrowserPlugin() {
       const legacy = getSyncBrowserPlugin();
-      if (legacy) return legacy;
-      try { return (await import('@capacitor/browser')).Browser; } catch { return null; }
+      // Same `.then` trap as the App proxy — never return the raw object
+      // across this async boundary.
+      if (legacy) return { close: () => legacy.close() };
+      try {
+        const mod = await import('@capacitor/browser');
+        return mod.Browser ? { close: () => mod.Browser.close() } : null;
+      } catch { return null; }
     }
 
     const handleAppUrlOpen = async (event: { url: string }) => {

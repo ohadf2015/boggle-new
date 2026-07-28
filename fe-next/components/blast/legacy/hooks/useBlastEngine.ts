@@ -14,7 +14,7 @@ import type { SpecialCombo } from '../utils/blastCombos';
 import { hasValidWords } from '../utils/blastDeadEndDetector';
 import { buildDeadEndGrid } from '../utils/blastDeadEndGrid';
 import { calculateEarnedStars } from '../utils/blastStarCalculator';
-import { blastBoardsEqual } from '../utils/blastBoardEquality';
+import { blastBoardsEqual, blastTileStatesEqual } from '../utils/blastBoardEquality';
 import { calculateLeftoverMoveBonus, applyRevive } from '../utils/blastMoveUtils';
 import { createDDAState, updateDDA, getDDASpawnModifier, isDDABoostActive } from '../utils/blastDDA';
 import { createSeededRandom, generateBlastLetter } from '../utils/blastLetterGenerator';
@@ -183,11 +183,25 @@ export function useBlastEngine(
 
   // Sync server overlay in multiplayer
   const initialTileStatesFromOptions = options?.initialTileStates;
+  // Track the last overlay whose CONTENT we observed. Callers that rebuild the
+  // array every render (inline `initialTileStates: buildTiles()`) produce a new
+  // reference per render — applying that unconditionally re-rendered forever
+  // (setTileStates → new options array → effect → setTileStates → …), and it
+  // also clobbered boards adopted via applyServerBoard. Apply only on a real
+  // content change; fresh-but-equal arrays just update the observed reference.
+  const lastOverlayRef = useRef(initialTileStatesFromOptions);
   useEffect(() => {
-    if (initialTileStatesFromOptions && initialTileStatesFromOptions.length > 0) {
-      setTileStates(initialTileStatesFromOptions);
-      tileStatesRef.current = initialTileStatesFromOptions;
+    const next = initialTileStatesFromOptions;
+    if (!next || next.length === 0) return;
+    const last = lastOverlayRef.current;
+    if (next === last) return;
+    if (last && blastTileStatesEqual(next, last)) {
+      lastOverlayRef.current = next;
+      return;
     }
+    lastOverlayRef.current = next;
+    setTileStates(next);
+    tileStatesRef.current = next;
   }, [initialTileStatesFromOptions]);
 
   const tileStatesRef = useRef(tileStates);

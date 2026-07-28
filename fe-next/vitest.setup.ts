@@ -11,9 +11,17 @@
 
 import { vi, beforeAll, afterAll, afterEach, beforeEach } from 'vitest';
 import '@testing-library/jest-dom';
+import { configure as configureRTL } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { server as mswServer } from './test/msw/server';
+
+// waitFor/waitForElementToBeRemoved default to a 1000ms window — fine on a
+// developer laptop, flaky on the shared CI box where a contended worker can
+// stall an async validator → React state chain past 1s even though the test
+// is waiting on the correct condition. Raise the window globally; the wait
+// conditions themselves stay the synchronization source of truth.
+configureRTL({ asyncUtilTimeout: 10000 });
 
 // ==========================================
 // Global TanStack Query Provider for Tests
@@ -186,6 +194,22 @@ if (!(global as any).performance) {
 beforeAll(() => mswServer.listen({ onUnhandledRequest: 'bypass' }));
 afterEach(() => mswServer.resetHandlers());
 afterAll(() => mswServer.close());
+
+// Capacitor's real plugin registry leaks across test files in the same worker
+// via globalThis (importing real @capacitor/core in ANY file registers web
+// proxies whose unimplemented methods reject with "not implemented on web" —
+// order-dependent unhandled rejections that flip the suite exit code even
+// when every test passes). Reset to a safe web stub between files.
+const resetCapacitorGlobal = () => {
+  (globalThis as Record<string, unknown>).Capacitor = {
+    isNativePlatform: () => false,
+    getPlatform: () => 'web',
+    isPluginAvailable: () => false,
+    Plugins: {},
+  };
+};
+resetCapacitorGlobal();
+afterEach(() => resetCapacitorGlobal());
 
 // ==========================================
 // Mock Next.js Router

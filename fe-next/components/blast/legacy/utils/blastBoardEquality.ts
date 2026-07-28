@@ -65,3 +65,29 @@ export function blastBoardsEqual(
 
   return true;
 }
+
+/**
+ * Content equality for two tileStates matrices (same fields as blastBoardsEqual,
+ * minus the letter grid). Used by effects that must distinguish "fresh array,
+ * same content" from a real server overlay update — treating them as equal is
+ * what prevents setState loops when a caller rebuilds the array every render.
+ */
+export function blastTileStatesEqual(
+  tilesA: BlastTileState[][],
+  tilesB: BlastTileState[][],
+): boolean {
+  if (tilesA.length !== tilesB.length) return false;
+  for (let r = 0; r < tilesA.length; r++) {
+    const rowA = tilesA[r];
+    const rowB = tilesB[r];
+    if (rowA.length !== rowB.length) return false;
+    for (let c = 0; c < rowA.length; c++) {
+      const ta = rowA[c];
+      const tb = rowB[c];
+      for (const field of COMPARED_FIELDS) {
+        if (ta[field] !== tb[field]) return false;
+      }
+    }
+  }
+  return true;
+}

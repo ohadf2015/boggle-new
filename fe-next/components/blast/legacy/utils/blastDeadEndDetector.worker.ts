@@ -31,7 +31,14 @@ function dfs(
   foundWords: Set<string>,
   minLength: number,
   maxLength: number,
+  budget: { remaining: number },
 ): boolean {
+  // Budget exhausted → conservative "words remain" (never a false dead-end).
+  // Without a bound, a grid with NO remaining words forces full path-space
+  // enumeration (billions of paths on 6x6) and hangs the worker.
+  if (budget.remaining <= 0) return true;
+  budget.remaining -= 1;
+
   const cell = grid[row]?.[col];
   if (!cell) return false;
 
@@ -51,7 +58,7 @@ function dfs(
     const nr = row + dr;
     const nc = col + dc;
     if (nr >= 0 && nr < grid.length && nc >= 0 && nc < grid[0].length) {
-      if (dfs(grid, nr, nc, word, visited, dictionary, foundWords, minLength, maxLength)) {
+      if (dfs(grid, nr, nc, word, visited, dictionary, foundWords, minLength, maxLength, budget)) {
         visited.delete(key);
         return true;
       }
@@ -122,11 +129,12 @@ function hasValidWordsImpl(
   if (!grid.length || !grid[0]?.length) return false;
   const rows = grid.length;
   const cols = grid[0].length;
+  const budget = { remaining: 500_000 };
 
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
       if (!grid[r][c]) continue;
-      if (dfs(grid, r, c, '', new Set(), dictionary, foundWords, minLength, maxLength)) {
+      if (dfs(grid, r, c, '', new Set(), dictionary, foundWords, minLength, maxLength, budget)) {
         return true;
       }
     }

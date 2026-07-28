@@ -147,11 +147,11 @@ export default defineConfig({
     // letting the pool spawn one fork per CPU (48) and blow the box's
     // pids.max=1000 cgroup (EAGAIN spawn / uv_thread_create aborts).
     maxWorkers: 4,
-    poolOptions: {
-      forks: {
-        execArgv: ['--max-old-space-size=5120'],
-      },
-    },
+    // Vitest 4 moved execArgv to TOP LEVEL — poolOptions.forks.execArgv is
+    // silently dropped, leaving workers at Node's default ~4GB heap; one
+    // heavy file then OOMs mid-suite ("Reached heap limit Allocation failed")
+    // and the worker crash flips the exit code despite all tests passing.
+    execArgv: ['--max-old-space-size=6144'],
     useAtomics: true,
     teardownTimeout: 30000,
     hookTimeout: 30000,

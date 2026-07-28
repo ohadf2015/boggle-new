@@ -24,6 +24,19 @@ vi.mock('pixi.js', () => ({
     init = vi.fn().mockResolvedValue(undefined);
     destroy = vi.fn();
   },
+  // PracticeWheelSandbox's ring layer imports Graphics lazily; without the
+  // export the dynamic import rejects AFTER the test passes, surfacing as an
+  // unhandled rejection that flips the whole run's exit code.
+  Graphics: class {
+    x = 0;
+    y = 0;
+    alpha = 1;
+    scale = { set: vi.fn() };
+    circle = vi.fn().mockReturnThis();
+    fill = vi.fn().mockReturnThis();
+    clear = vi.fn().mockReturnThis();
+    destroy = vi.fn();
+  },
 }));
 vi.mock('@/lib/practice/usePracticeValidator', () => ({
   usePracticeValidator: () => ({ check: vi.fn().mockResolvedValue({ isValid: false }) }),

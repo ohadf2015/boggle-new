@@ -6,6 +6,13 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 const pkg = createRequire(import.meta.url)('./package.json');
 
+// Bound native threadpools (tokio/rayon inside SWC/Turbopack): every build
+// worker otherwise spawns one thread per CPU — workers × 48 threads blows
+// the pids-capped CI container ("OS can't spawn worker thread", SIGABRT
+// during static generation). Same EAGAIN class as the vitest fork cap.
+process.env.TOKIO_WORKER_THREADS ||= '4';
+process.env.RAYON_NUM_THREADS ||= '4';
+
 const withNextIntl = createNextIntlPlugin();
 
 const __filename = fileURLToPath(import.meta.url);
@@ -110,6 +117,11 @@ const nextConfig = {
   reactCompiler: true,
 
   experimental: {
+    // Page-data/static-gen workers default to CPU count (47 on the CI box) —
+    // the spawn burst trips EAGAIN on pids-capped containers, killing the
+    // build at "Collecting page data". Same root cause as the vitest fork
+    // cap and the Terser parallel=2 below.
+    cpus: 8,
     optimizePackageImports: [
       'lucide-react',
       'framer-motion',

@@ -15,7 +15,7 @@
  * - Neo-brutalist modal style
  */
 
-import { useState, useCallback, useRef, useId } from 'react';
+import { useState, useCallback, useRef, useId, useEffect } from 'react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useDuelSocket, type OpponentInfo } from '@/hooks/useDuelSocket';
@@ -59,6 +59,13 @@ export default function DuelChallengeModal({
   const [selectedLessonId, setSelectedLessonId] = useState<string>('');
   const [duelType, setDuelType] = useState<'async' | 'realtime'>('async');
   const [isCreating, setIsCreating] = useState(false);
+  // Track the post-send close timer so an unmount (test teardown, navigation)
+  // can't fire setState/onClose on a dead component — leaked timers here were
+  // crashing suites with "window is not defined" after jsdom teardown.
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => {
+    if (closeTimerRef.current !== null) clearTimeout(closeTimerRef.current);
+  }, []);
 
   // Handle send challenge
   const handleSendChallenge = useCallback(() => {
@@ -69,7 +76,8 @@ export default function DuelChallengeModal({
     createChallenge(opponent.userId, selectedLessonId, classroomId, duelType);
 
     // Brief delay to show "Challenge sent!" state before closing
-    setTimeout(() => {
+    closeTimerRef.current = setTimeout(() => {
+      closeTimerRef.current = null;
       setIsCreating(false);
       onClose();
     }, 100);
