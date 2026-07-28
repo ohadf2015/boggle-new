@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 5997,
+    "totalKeysInCode": 5998,
     "keyCountByLanguage": {
-      "en": 11861,
-      "es": 12167,
-      "he": 12070,
-      "ja": 12123,
-      "ru": 11891,
-      "sv": 12119
+      "en": 11862,
+      "es": 12168,
+      "he": 12071,
+      "ja": 12125,
+      "ru": 11895,
+      "sv": 12121
     },
     "missingFromEnglish": 14,
     "problematicFlatKeys": 0,
@@ -692,7 +692,6 @@
       "vs.fiveLanguages",
       "vs.charitableDonation",
       "vs.bestFor",
-      "sealedBid.tapHint",
       "sealedBid.shareCard.title",
       "sealedBid.shareCard.cta",
       "sealedBid.shareCard.copied",
@@ -704,13 +703,10 @@
       "sealedBid.session.shareCta"
     ],
     "ru": [
-      "shiritori.solo.tempo.bonus",
       "seo.refund.title",
       "seo.refund.description",
       "seo.refund.ogTitle",
       "seo.refund.ogDescription",
-      "teacher.upgradePro.cta",
-      "teacher.upgradePro.body",
       "education.landing.furtherReading.title",
       "education.landing.furtherReading.guides",
       "education.landing.furtherReading.glossary",
@@ -780,7 +776,6 @@
       "vs.fiveLanguages",
       "vs.charitableDonation",
       "vs.bestFor",
-      "sealedBid.tapHint",
       "sealedBid.shareCard.title",
       "sealedBid.shareCard.cta",
       "sealedBid.shareCard.copied",

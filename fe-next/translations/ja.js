@@ -15798,6 +15798,7 @@ const ja = {
     "gameOver": "ゲーム終了",
     "playAgain": "もう一度",
     "notAWord": "単語ではありません",
+    "tapHint": "文字をタップして単語を作ろう",
     "continue": "続ける",
     "shareCard": {
       "title": "あなたのブラフ記録",
