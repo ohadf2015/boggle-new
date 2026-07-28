@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const pageUrl = `${BASE_URL}/sv/swedish-multiplayer-word-game`;
 
   return {
-    title: 'Alfapet & Scrabble Online Svenska Gratis — Spela Nu | LexiClash',
+    title: 'Alfapet & Scrabble Online Svenska Gratis | LexiClash',
     description: 'Alfapet spel online på svenska — gratis, utan registrering. Spela Scrabble eller Alfapet med 2–50 spelare i realtid. Ingen app, ingen väntan. Starta nu →',
     keywords: 'alfapet spel online, ordspel online, multiplayer ordspel, ordspel svenska, wordfeud alternativ, boggle online svenska, scrabble online gratis, ordspel med vänner, ordspel i realtid, ordhjul, ordhjul online, daglig ordhjul',
     openGraph: {
