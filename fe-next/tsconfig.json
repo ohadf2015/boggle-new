@@ -64,7 +64,7 @@
     "**/*.test.ts",
     "**/*.test.tsx",
     "**/__tests__/**",
-    "vitest.setup.ts",
-    "vitest.config.ts"
+    "**/vitest.setup.ts",
+    "**/vitest.config.ts"
   ]
 }
