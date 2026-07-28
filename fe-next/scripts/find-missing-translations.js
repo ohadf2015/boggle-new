@@ -22,7 +22,7 @@ try {
 // Configuration
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const EXTENSIONS_TO_SCAN = ['.ts', '.tsx', '.js', '.jsx'];
-const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts', '.venv', 'venv', '.venv-rembg', '__pycache__', '__tests__', '__mocks__', 'e2e', 'playwright', 'coverage', '.turbo', 'out'];
+const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts', '.venv', 'venv', '.venv-rembg', '__pycache__', '__tests__', '__mocks__', 'e2e', 'playwright', 'coverage', '.turbo', 'out', 'vendor'];
 const FILE_PATTERNS_TO_EXCLUDE = [/\.test\.[tj]sx?$/, /\.spec\.[tj]sx?$/, /\.stories\.[tj]sx?$/];
 
 // Track dynamic/risky translation patterns that might fail at runtime
@@ -212,6 +212,158 @@ function extractTFunctionCallsWithTypeScript(filePath, content) {
 
   const calls = [];
 
+  // ========================================
+  // Dynamic-key resolution (2026-07-28)
+  // ========================================
+  // Motivation: the "names cover letters" bug (t_bc55700c). Keys selected via a
+  // runtime variable — `const translationKey = cond ? 'a.b' : 'a.c'; t(translationKey)`
+  // — were invisible to the scanner and the keys were missing in all 6 locales.
+  // We resolve the common static shapes so they become ordinary checked keys:
+  //   1. const x = 'a.b' | cond ? 'a.b' : 'a.c' | ['a','b'] as const
+  //   2. type T = 'a' | 'b'  +  function f(k: T) { t(`ns.${k}`) }
+  //   3. (['a','b'] as const).map(k => t(`ns.${k}`)) / arr.map(...) / for..of
+  // Anything we cannot resolve is recorded in dynamicPatterns (previously the
+  // AST path silently dropped these — the regex fallback never ran for files
+  // where the AST produced calls).
+
+  const constStringSets = new Map(); // const name -> Set<string> | null (null = ambiguous)
+  const unionTypeAliases = new Map(); // type alias -> Set<string>
+  const scopeStack = []; // stack of Map<name, Set<string>> for params/loop vars
+
+  function pushScope() { scopeStack.push(new Map()); }
+  function popScope() { scopeStack.pop(); }
+  function bindLocal(name, set) { if (scopeStack.length) scopeStack[scopeStack.length - 1].set(name, set); }
+  function lookupIdentifier(name) {
+    for (let i = scopeStack.length - 1; i >= 0; i--) {
+      const s = scopeStack[i].get(name);
+      if (s) return s;
+    }
+    const s = constStringSets.get(name);
+    return s || null;
+  }
+
+  function unwrapExpr(expr) {
+    let e = expr;
+    // Unwrap ('a' as const), ('a' satisfies T), ('a'), 'a'!, <const>'a'
+    while (
+      ts.isParenthesizedExpression(e) ||
+      ts.isAsExpression(e) ||
+      ts.isSatisfiesExpression(e) ||
+      ts.isNonNullExpression(e) ||
+      ts.isTypeAssertionExpression(e)
+    ) e = e.expression;
+    return e;
+  }
+
+  function resolveStaticStrings(expr, depth = 0) {
+    if (!expr || depth > 6) return null;
+    const e = unwrapExpr(expr);
+    if (ts.isStringLiteral(e) || ts.isNoSubstitutionTemplateLiteral(e)) return new Set([e.text]);
+    if (ts.isConditionalExpression(e)) {
+      const a = resolveStaticStrings(e.whenTrue, depth + 1);
+      const b = resolveStaticStrings(e.whenFalse, depth + 1);
+      if (a && b) return new Set([...a, ...b]);
+      return null;
+    }
+    if (ts.isArrayLiteralExpression(e)) {
+      const out = new Set();
+      for (const el of e.elements) {
+        const s = resolveStaticStrings(el, depth + 1);
+        if (!s || s.size !== 1) return null;
+        out.add([...s][0]);
+      }
+      return out.size ? out : null;
+    }
+    if (ts.isIdentifier(e)) return lookupIdentifier(e.text);
+    return null;
+  }
+
+  function resolveTypeNode(tn) {
+    if (!tn) return null;
+    if (ts.isTypeReferenceNode(tn) && ts.isIdentifier(tn.typeName)) {
+      return unionTypeAliases.get(tn.typeName.text) || null;
+    }
+    if (ts.isUnionTypeNode(tn)) {
+      const out = new Set();
+      for (const t of tn.types) {
+        if (ts.isLiteralTypeNode(t) && ts.isStringLiteral(t.literal)) out.add(t.literal.text);
+        else return null;
+      }
+      return out.size ? out : null;
+    }
+    if (ts.isLiteralTypeNode(tn) && ts.isStringLiteral(tn.literal)) return new Set([tn.literal.text]);
+    return null;
+  }
+
+  // Pre-pass 1: union string type aliases (type T = 'a' | 'b')
+  (function collectAliases(node) {
+    if (ts.isTypeAliasDeclaration(node) && ts.isIdentifier(node.name)) {
+      const members = new Set();
+      let ok = true;
+      (function walkType(tn) {
+        if (ts.isUnionTypeNode(tn)) { tn.types.forEach(walkType); return; }
+        if (ts.isLiteralTypeNode(tn) && ts.isStringLiteral(tn.literal)) { members.add(tn.literal.text); return; }
+        ok = false;
+      })(node.type);
+      if (ok && members.size) unionTypeAliases.set(node.name.text, members);
+    }
+    ts.forEachChild(node, collectAliases);
+  })(sourceFile);
+
+  // Pre-pass 2: const bindings resolvable to a set of strings. A name bound
+  // twice with different values (e.g. same local name in two functions) is
+  // poisoned to null = ambiguous = treated as unresolvable, never guessed.
+  (function collectConsts(node) {
+    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
+      const list = node.parent;
+      const isConst = list && ts.isVariableDeclarationList(list) && (list.flags & ts.NodeFlags.Const);
+      if (isConst) {
+        const name = node.name.text;
+        const s = resolveStaticStrings(node.initializer);
+        if (s) {
+          const prev = constStringSets.get(name);
+          if (prev === undefined) {
+            constStringSets.set(name, s);
+          } else if (prev === null || prev.size !== s.size || [...prev].some(v => !s.has(v))) {
+            constStringSets.set(name, null); // conflicting redeclaration — ambiguous
+          }
+        }
+      }
+    }
+    ts.forEachChild(node, collectConsts);
+  })(sourceFile);
+
+  const MAX_TEMPLATE_COMBOS = 200;
+  function resolveTemplateKeys(templateExpr) {
+    const literals = [templateExpr.head.text];
+    const exprSets = [];
+    for (const span of templateExpr.templateSpans) {
+      const s = resolveStaticStrings(span.expression);
+      if (!s) return null;
+      exprSets.push([...s]);
+      literals.push(span.literal.text);
+    }
+    const comboCount = exprSets.reduce((acc, arr) => acc * arr.length, 1);
+    if (comboCount > MAX_TEMPLATE_COMBOS) return null;
+    let results = [literals[0]];
+    exprSets.forEach((arr, i) => {
+      const next = [];
+      for (const prefix of results) for (const v of arr) next.push(prefix + v + literals[i + 1]);
+      results = next;
+    });
+    return results;
+  }
+
+  function pushDynamic(entry, node) {
+    const pos = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+    dynamicPatterns.push({
+      ...entry,
+      file: path.relative(PROJECT_ROOT, filePath),
+      line: pos.line + 1,
+      context: (content.split('\n')[pos.line] || '').trim().substring(0, 100),
+    });
+  }
+
   function pushKey(key, node, context) {
     if (!key) return;
     if (key.includes('://') || key.startsWith('.') || key.endsWith('.')) return;
@@ -267,6 +419,19 @@ function extractTFunctionCallsWithTypeScript(filePath, content) {
         pushKey(firstArg.text, node);
       } else if (ts.isTemplateExpression(firstArg)) {
         tryExtractKeyFromTemplateExpression(firstArg, node);
+        const resolved = resolveTemplateKeys(firstArg);
+        if (resolved) {
+          for (const k of resolved) pushKey(k, node, `resolved-template`);
+        } else {
+          pushDynamic({ pattern: firstArg.getText(sourceFile).substring(0, 120), type: 'template_literal' }, node);
+        }
+      } else if (ts.isIdentifier(firstArg)) {
+        const s = lookupIdentifier(firstArg.text);
+        if (s) {
+          for (const k of s) pushKey(k, node, `resolved-variable:${firstArg.text}`);
+        } else {
+          pushDynamic({ pattern: `t(${firstArg.text})`, variable: firstArg.text, type: 'variable_key' }, node);
+        }
       }
     }
 
@@ -279,6 +444,57 @@ function extractTFunctionCallsWithTypeScript(filePath, content) {
           // alphanumeric + dots + underscores + hyphens (no spaces, no non-ASCII)
           if (init.text.includes('.') && /^[a-zA-Z0-9._-]+$/.test(init.text)) pushKey(init.text, node);
         }
+      }
+    }
+
+    // Function-likes: bind params annotated with a string-union type
+    // (function f(section: 'a' | 'b') / (k: MyUnion) => ...) so t(`ns.${param}`)
+    // and t(param) inside the body resolve against the union members.
+    if (
+      ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node) ||
+      ts.isArrowFunction(node) || ts.isMethodDeclaration(node)
+    ) {
+      pushScope();
+      for (const p of node.parameters || []) {
+        if (ts.isIdentifier(p.name)) {
+          const s = resolveTypeNode(p.type);
+          if (s) bindLocal(p.name.text, s);
+        }
+      }
+      ts.forEachChild(node, visit);
+      popScope();
+      return;
+    }
+
+    // resolvableArray.map(cb) / .forEach(cb): bind the callback's first param
+    // to the array's string members (covers `(['a','b'] as const).map(k => t(`ns.${k}`))`).
+    if (
+      ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression) &&
+      (node.expression.name.text === 'map' || node.expression.name.text === 'forEach') &&
+      node.arguments.length &&
+      (ts.isArrowFunction(node.arguments[0]) || ts.isFunctionExpression(node.arguments[0]))
+    ) {
+      const arrSet = resolveStaticStrings(node.expression.expression);
+      const cb = node.arguments[0];
+      if (arrSet && cb.parameters.length && ts.isIdentifier(cb.parameters[0].name)) {
+        pushScope();
+        bindLocal(cb.parameters[0].name.text, arrSet);
+        ts.forEachChild(node, visit);
+        popScope();
+        return;
+      }
+    }
+
+    // for (const x of resolvableArray) — bind the loop variable.
+    if (ts.isForOfStatement(node) && ts.isVariableDeclarationList(node.initializer)) {
+      const decl = node.initializer.declarations[0];
+      const arrSet = decl && ts.isIdentifier(decl.name) ? resolveStaticStrings(node.expression) : null;
+      if (arrSet) {
+        pushScope();
+        bindLocal(decl.name.text, arrSet);
+        ts.forEachChild(node, visit);
+        popScope();
+        return;
       }
     }
 
@@ -461,7 +677,7 @@ function extractAllTFunctionCalls() {
 // PART 3: Compare and generate report
 // ============================================
 
-function generateReport(keysByLanguage, tCalls, problematicByLanguage = {}, runtimeRisks = []) {
+function generateReport(keysByLanguage, tCalls, problematicByLanguage = {}, runtimeRisks = [], jsonReportPath = null) {
   console.log('\n========================================');
   console.log('TRANSLATION KEY ANALYSIS REPORT');
   console.log('========================================\n');
@@ -792,10 +1008,10 @@ function generateReport(keysByLanguage, tCalls, problematicByLanguage = {}, runt
     )
   };
 
-  // Write JSON report
-  const jsonReportPath = path.join(PROJECT_ROOT, 'scripts/translation-report.json');
-  fs.writeFileSync(jsonReportPath, JSON.stringify(jsonReport, null, 2));
-  console.log(`\nJSON report written to: ${jsonReportPath}`);
+  // Write JSON report (path injectable so tests don't clobber the real artifact)
+  const reportPath = jsonReportPath || path.join(PROJECT_ROOT, 'scripts/translation-report.json');
+  fs.writeFileSync(reportPath, JSON.stringify(jsonReport, null, 2));
+  console.log(`\nJSON report written to: ${reportPath}`);
 
   return jsonReport;
 }
@@ -885,6 +1101,17 @@ function main() {
   return 0;
 }
 
-// Run the script
-const exitCode = main();
-process.exit(exitCode);
+// Run the script only when invoked directly (imported by tests otherwise)
+if (require.main === module) {
+  const exitCode = main();
+  process.exit(exitCode);
+}
+
+module.exports = {
+  extractTFunctionCalls,
+  extractAllTFunctionCalls,
+  getTranslationKeysFromFile,
+  generateReport,
+  dynamicPatterns,
+  main,
+};

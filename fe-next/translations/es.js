@@ -7675,6 +7675,9 @@ const es = {
     "typeMessage": "Escribe un mensaje...",
     "sendMessage": "Enviar",
     "challenges": {
+      "resultWin": "¡Ganaste {mine}–{theirs}! 🏆",
+      "resultLoss": "Perdiste {mine}–{theirs}.",
+      "resultTie": "¡Empate, {mine}–{theirs}!",
       "send": "Enviar Desafío",
       "pending": "Desafío Pendiente",
       "customMessage": "Añade un mensaje (opcional)",
@@ -12582,6 +12585,7 @@ const es = {
       "coinReward": "+{{amount}} monedas"
     },
     "achievements": {
+      "categories": {"consistency":"Constancia","exploration":"Exploración","progress":"Progreso","skill":"Habilidad"},
       "ariaDismissError": "Descartar error",
       "ariaOverallProgress": "Progreso general",
       "completion": "{{percent}}% completado",

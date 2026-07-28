@@ -7161,6 +7161,9 @@ const en = {
     "typeMessage": "Say something...",
     "sendMessage": "Send",
     "challenges": {
+      "resultWin": "You won {mine}–{theirs}! 🏆",
+      "resultLoss": "You lost {mine}–{theirs}.",
+      "resultTie": "It's a tie, {mine}–{theirs}!",
       "send": "Send Challenge",
       "pending": "Challenge Pending",
       "customMessage": "Add a message (optional)",
@@ -11166,6 +11169,7 @@ const en = {
       "coinReward": "+{{amount}} coins"
     },
     "achievements": {
+      "categories": {"consistency":"Consistency","exploration":"Exploration","progress":"Progress","skill":"Skill"},
       "ariaDismissError": "Dismiss error",
       "ariaOverallProgress": "Overall progress",
       "completion": "{{percent}}% complete",
@@ -14324,6 +14328,11 @@ const en = {
       "ok": "OK"
     },
     "teacherAccess": {
+      "count": {"pending":"Pending","approved":"Approved","declined":"Declined","total":"Total"},
+      "approveSuccess": "Request approved successfully",
+      "approveError": "Failed to approve request",
+      "declineSuccess": "Request declined successfully",
+      "declineError": "Failed to decline request",
       "admin_note": "Admin Note",
       "resend": "Resend approval email",
       "resend_hint": "Re-sends the welcome email (with the note above) to the applicant. Does not change their access.",

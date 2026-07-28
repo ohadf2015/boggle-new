@@ -1285,6 +1285,7 @@ const ru = {
       "coinReward": "+{{amount}} монет"
     },
     "achievements": {
+      "categories": {"consistency":"Стабильность","exploration":"Исследование","progress":"Прогресс","skill":"Мастерство"},
       "ariaDismissError": "Отклонить ошибку",
       "ariaOverallProgress": "Общий прогресс",
       "completion": "{{percent}}% пройдено",
@@ -5426,6 +5427,11 @@ const ru = {
       "ok": "ОК"
     },
     "teacherAccess": {
+      "count": {"pending":"В ожидании","approved":"Одобрено","declined":"Отклонено","total":"Всего"},
+      "approveSuccess": "Запрос успешно одобрен",
+      "approveError": "Ошибка при одобрении запроса",
+      "declineSuccess": "Запрос успешно отклонен",
+      "declineError": "Ошибка при отклонении запроса",
       "admin_note": "Примечание администратора",
       "resend": "Переслать письмо одобрения",
       "resend_hint": "Повторно отправить приветственное письмо (с примечанием выше) соискателю. Не меняет доступ.",
@@ -6799,6 +6805,9 @@ const ru = {
     "typeMessage": "Скажи что-нибудь...",
     "sendMessage": "Отправить",
     "challenges": {
+      "resultWin": "Победа {mine}–{theirs}! 🏆",
+      "resultLoss": "Поражение {mine}–{theirs}.",
+      "resultTie": "Ничья, {mine}–{theirs}!",
       "send": "Отправить Вызов",
       "pending": "Вызов В Ожидании",
       "customMessage": "Добавить сообщение (опционально)",

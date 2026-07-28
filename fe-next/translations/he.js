@@ -7621,6 +7621,9 @@ const he = {
     "blockedUsers": "משתמשים חסומים",
     "unblock": "בטל חסימה",
     "challenges": {
+      "resultWin": "ניצחת {mine}–{theirs}! 🏆",
+      "resultLoss": "הפסדת {mine}–{theirs}.",
+      "resultTie": "תיקו, {mine}–{theirs}!",
       "send": "שלח אתגר",
       "pending": "אתגר ממתין",
       "customMessage": "הוסף הודעה (אופציונלי)",
@@ -12436,6 +12439,7 @@ const he = {
       "coinReward": "+{{amount}} מטבעות"
     },
     "achievements": {
+      "categories": {"consistency":"עקביות","exploration":"חקר","progress":"התקדמות","skill":"כישורים"},
       "ariaDismissError": "סגור הודעת שגיאה",
       "ariaOverallProgress": "התקדמות כללית",
       "completion": "{{percent}}% הושלמו",

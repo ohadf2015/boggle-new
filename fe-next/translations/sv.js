@@ -7924,6 +7924,9 @@ const sv = {
     "blockedUsers": "Blockerade användare",
     "unblock": "Avblockera",
     "challenges": {
+      "resultWin": "Du vann {mine}–{theirs}! 🏆",
+      "resultLoss": "Du förlorade {mine}–{theirs}.",
+      "resultTie": "Oavgjort, {mine}–{theirs}!",
       "accept": "Acceptera",
       "accepted": "Utmaning accepterad!",
       "acceptFailed": "Kunde inte acceptera utmaning",
@@ -12799,6 +12802,7 @@ const sv = {
       "coinReward": "+{{amount}} mynt"
     },
     "achievements": {
+      "categories": {"consistency":"Uthållighet","exploration":"Utforskande","progress":"Framsteg","skill":"Färdighet"},
       "ariaDismissError": "Avfärda fel",
       "ariaOverallProgress": "Övergripande framsteg",
       "completion": "{{percent}}% klart",

@@ -7747,6 +7747,9 @@ const ja = {
     "typeMessage": "メッセージを入力...",
     "sendMessage": "送信",
     "challenges": {
+      "resultWin": "{mine}–{theirs} で勝利！🏆",
+      "resultLoss": "{mine}–{theirs} で敗北…",
+      "resultTie": "{mine}–{theirs} で引き分け！",
       "send": "チャレンジを送信",
       "pending": "チャレンジ保留中",
       "customMessage": "メッセージを追加（任意）",
@@ -12580,6 +12583,7 @@ const ja = {
       "coinReward": "+{{amount}} コイン"
     },
     "achievements": {
+      "categories": {"consistency":"継続力","exploration":"探索","progress":"進捗","skill":"スキル"},
       "ariaDismissError": "エラーを消す",
       "ariaOverallProgress": "全体的な進捗",
       "completion": "{{percent}}%達成",

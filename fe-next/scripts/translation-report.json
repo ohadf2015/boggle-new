@@ -1,24 +1,304 @@
 {
   "summary": {
-    "totalKeysInCode": 5998,
+    "totalKeysInCode": 6154,
     "keyCountByLanguage": {
-      "en": 11862,
-      "es": 12168,
-      "he": 12071,
-      "ja": 12125,
-      "ru": 11895,
-      "sv": 12121
+      "en": 11899,
+      "es": 12197,
+      "he": 12100,
+      "ja": 12154,
+      "ru": 11932,
+      "sv": 12150
     },
     "missingFromEnglish": 14,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
-      "templateLiterals": 24,
+      "templateLiterals": 324,
       "fallbackUsages": 1,
-      "variableKeys": 22
+      "variableKeys": 121
     }
   },
   "runtimeRisks": {
     "templateLiterals": [
+      {
+        "pattern": "`adventure.worlds.${currentWorldConfig.name}`",
+        "type": "template_literal",
+        "file": "app/[locale]/adventure/boss-rush/BossRushPageClient.tsx",
+        "line": 273,
+        "context": "{currentWorldConfig && t(`adventure.worlds.${currentWorldConfig.name}`)}"
+      },
+      {
+        "pattern": "`showcase3d.rail${i}`",
+        "type": "template_literal",
+        "file": "app/[locale]/free-multiplayer-word-game/Showcase3DClient.tsx",
+        "line": 343,
+        "context": "aria-label={t(`showcase3d.rail${i}`, label)}"
+      },
+      {
+        "pattern": "`showcase3d.rail${i}`",
+        "type": "template_literal",
+        "file": "app/[locale]/free-multiplayer-word-game/Showcase3DClient.tsx",
+        "line": 347,
+        "context": "{t(`showcase3d.rail${i}`, label)}"
+      },
+      {
+        "pattern": "`showcase3d.rail${i}`",
+        "type": "template_literal",
+        "file": "app/[locale]/free-multiplayer-word-game/Showcase3DClient.tsx",
+        "line": 364,
+        "context": "{t(`showcase3d.rail${i}`, RAIL[i])}"
+      },
+      {
+        "pattern": "`showcase3d.faqQ${i}`",
+        "type": "template_literal",
+        "file": "app/[locale]/free-multiplayer-word-game/Showcase3DClient.tsx",
+        "line": 443,
+        "context": ".map((i) => ({ q: t(`showcase3d.faqQ${i}`, ''), a: t(`showcase3d.faqA${i}`, '') }))"
+      },
+      {
+        "pattern": "`showcase3d.faqA${i}`",
+        "type": "template_literal",
+        "file": "app/[locale]/free-multiplayer-word-game/Showcase3DClient.tsx",
+        "line": 443,
+        "context": ".map((i) => ({ q: t(`showcase3d.faqQ${i}`, ''), a: t(`showcase3d.faqA${i}`, '') }))"
+      },
+      {
+        "pattern": "`asyncChallenge.mode.${challenge.gameMode}`",
+        "type": "template_literal",
+        "file": "app/[locale]/friend-challenge/[id]/FriendChallengeLandingClient.tsx",
+        "line": 153,
+        "context": "{t(`asyncChallenge.mode.${challenge.gameMode}`, challenge.gameMode)} · {challenge.durationSeconds}s"
+      },
+      {
+        "pattern": "`achievements.${key}.name`",
+        "type": "template_literal",
+        "file": "app/[locale]/player/[id]/PageClient.tsx",
+        "line": 321,
+        "context": "{t(`achievements.${key}.name`, key.replace(/_/g, ' '))}"
+      },
+      {
+        "pattern": "`gameModes.${mode}.name`",
+        "type": "template_literal",
+        "file": "app/[locale]/practice/PageClient.tsx",
+        "line": 254,
+        "context": "{t(`gameModes.${mode}.name`)}"
+      },
+      {
+        "pattern": "`gameModes.${mode}.description`",
+        "type": "template_literal",
+        "file": "app/[locale]/practice/PageClient.tsx",
+        "line": 257,
+        "context": "{t(`gameModes.${mode}.description`)}"
+      },
+      {
+        "pattern": "`gameModes.${mode}.name`",
+        "type": "template_literal",
+        "file": "app/[locale]/practice/PageClient.tsx",
+        "line": 308,
+        "context": "aria-label={`${t(`gameModes.${mode}.name`)} — ${t('practiceHub.completedBadge')}`}"
+      },
+      {
+        "pattern": "`sealedBid.outcome.${settlement.outcome}`",
+        "type": "template_literal",
+        "file": "app/[locale]/sealed-bid/page.tsx",
+        "line": 275,
+        "context": "? t(`sealedBid.outcome.${settlement.outcome}`)"
+      },
+      {
+        "pattern": "`shiritori.solo.err.${r.reason}`",
+        "type": "template_literal",
+        "file": "app/[locale]/shiritori/solo/page.tsx",
+        "line": 202,
+        "context": "setError(t(`shiritori.solo.err.${r.reason}`));"
+      },
+      {
+        "pattern": "`shiritori.solo.category.${catBonus.category}`",
+        "type": "template_literal",
+        "file": "app/[locale]/shiritori/solo/page.tsx",
+        "line": 222,
+        "context": "toast(t('shiritori.solo.category.hit', { category: t(`shiritori.solo.category.${catBonus.category}`)"
+      },
+      {
+        "pattern": "`shiritori.solo.endReason.${state.endReason}`",
+        "type": "template_literal",
+        "file": "app/[locale]/shiritori/solo/page.tsx",
+        "line": 375,
+        "context": "{t(`shiritori.solo.endReason.${state.endReason}`)}"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/AchievementBadge.tsx",
+        "line": 50,
+        "context": "name: t(`achievements.${achievement.key}.name`) || achievement.key,"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.description`",
+        "type": "template_literal",
+        "file": "components/AchievementBadge.tsx",
+        "line": 51,
+        "context": "description: t(`achievements.${achievement.key}.description`)"
+      },
+      {
+        "pattern": "`collectibles.rarity.${rarity}`",
+        "type": "template_literal",
+        "file": "components/CollectionGrid.tsx",
+        "line": 117,
+        "context": "const rarityLabel = t(`collectibles.rarity.${rarity}`) || rarity;"
+      },
+      {
+        "pattern": "`collectibles.rarity.${rarity}`",
+        "type": "template_literal",
+        "file": "components/CollectionGrid.tsx",
+        "line": 132,
+        "context": "{t(`collectibles.rarity.${rarity}`) || rarity}"
+      },
+      {
+        "pattern": "`rank.tier.${navTier}`",
+        "type": "template_literal",
+        "file": "components/GlobalBottomNav.tsx",
+        "line": 483,
+        "context": "aria-label={t(`rank.tier.${navTier}`)}"
+      },
+      {
+        "pattern": "`howToPlay.tips.tip${num}`",
+        "type": "template_literal",
+        "file": "components/HowToPlay.tsx",
+        "line": 337,
+        "context": "{t(`howToPlay.tips.tip${num}`)}"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/achievements/AchievementDock.tsx",
+        "line": 47,
+        "context": "name: t(`achievements.${achievement.key}.name`) || achievement.key,"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.description`",
+        "type": "template_literal",
+        "file": "components/achievements/AchievementDock.tsx",
+        "line": 48,
+        "context": "description: t(`achievements.${achievement.key}.description`)"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/achievements/AchievementPopup.tsx",
+        "line": 51,
+        "context": "? t(`achievements.${achievement.key}.name`) || achievement.key"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/achievements/AchievementPopup.tsx",
+        "line": 89,
+        "context": "name: t(`achievements.${achievement.key}.name`) || achievement.key,"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.description`",
+        "type": "template_literal",
+        "file": "components/achievements/AchievementPopup.tsx",
+        "line": 90,
+        "context": "description: t(`achievements.${achievement.key}.description`)"
+      },
+      {
+        "pattern": "`achievements.${currentAchievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/achievements/AchievementQueue.tsx",
+        "line": 130,
+        "context": "achievementName: t(`achievements.${currentAchievement.key}.name`) || currentAchievement.key,"
+      },
+      {
+        "pattern": "`achievements.${currentAchievement.key}.description`",
+        "type": "template_literal",
+        "file": "components/achievements/AchievementQueue.tsx",
+        "line": 131,
+        "context": "description: t(`achievements.${currentAchievement.key}.description`),"
+      },
+      {
+        "pattern": "`achievements.cinematic.${cinematicTier.toLowerCase()}`",
+        "type": "template_literal",
+        "file": "components/achievements/AchievementQueue.tsx",
+        "line": 136,
+        "context": "tierLabel: t(`achievements.cinematic.${cinematicTier.toLowerCase()}`),"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/achievements/AchievementQueue.tsx",
+        "line": 199,
+        "context": "const name = t(`achievements.${achievement.key}.name`) || achievement.key;"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/achievements/UnifiedAchievementModal.tsx",
+        "line": 94,
+        "context": "name: t(`achievements.${achievement.key}.name`) || achievement.key,"
+      },
+      {
+        "pattern": "`achievements.${achievement.key}.description`",
+        "type": "template_literal",
+        "file": "components/achievements/UnifiedAchievementModal.tsx",
+        "line": 95,
+        "context": "description: t(`achievements.${achievement.key}.description`),"
+      },
+      {
+        "pattern": "`education.achievements.${unlock.achievementKey}.name`",
+        "type": "template_literal",
+        "file": "components/achievements/UnifiedAchievementModal.tsx",
+        "line": 114,
+        "context": "name: t(`education.achievements.${unlock.achievementKey}.name`) || unlock.achievementKey,"
+      },
+      {
+        "pattern": "`education.achievements.${unlock.achievementKey}.description`",
+        "type": "template_literal",
+        "file": "components/achievements/UnifiedAchievementModal.tsx",
+        "line": 115,
+        "context": "description: t(`education.achievements.${unlock.achievementKey}.description`),"
+      },
+      {
+        "pattern": "`curator.levels.${key}.title`",
+        "type": "template_literal",
+        "file": "components/admin/AccessLevelsInfo.tsx",
+        "line": 57,
+        "context": "<h4 className=\"font-neo-display text-neo-white\">{t(`curator.levels.${key}.title`)}</h4>"
+      },
+      {
+        "pattern": "`curator.levels.${key}.scope`",
+        "type": "template_literal",
+        "file": "components/admin/AccessLevelsInfo.tsx",
+        "line": 60,
+        "context": "{t(`curator.levels.${key}.scope`)}"
+      },
+      {
+        "pattern": "`curator.levels.${key}.desc`",
+        "type": "template_literal",
+        "file": "components/admin/AccessLevelsInfo.tsx",
+        "line": 63,
+        "context": "{t(`curator.levels.${key}.desc`)}"
+      },
+      {
+        "pattern": "`curator.tier.${cap.tier}.desc`",
+        "type": "template_literal",
+        "file": "components/admin/AccessLevelsInfo.tsx",
+        "line": 79,
+        "context": "{t(`curator.tier.${cap.tier}.desc`)}"
+      },
+      {
+        "pattern": "`curator.tier.${clamped}.label`",
+        "type": "template_literal",
+        "file": "components/admin/CuratorTierBadge.tsx",
+        "line": 34,
+        "context": "const label = t(`curator.tier.${clamped}.label`);"
+      },
+      {
+        "pattern": "`curator.tier.${clamped}.desc`",
+        "type": "template_literal",
+        "file": "components/admin/CuratorTierBadge.tsx",
+        "line": 39,
+        "context": "title={t(`curator.tier.${clamped}.desc`)}"
+      },
       {
         "pattern": "curator.tier.${clamped}.label",
         "file": "components/admin/CuratorTierBadge.tsx",
@@ -32,6 +312,160 @@
         "line": 39,
         "context": "title={t(`curator.tier.${clamped}.desc`)}",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`admin.live.roomStatus.${key}`",
+        "type": "template_literal",
+        "file": "components/admin/LiveMonitor.tsx",
+        "line": 108,
+        "context": "return t(`admin.live.roomStatus.${key}`, key);"
+      },
+      {
+        "pattern": "`admin.schoolLeads.count.${k}`",
+        "type": "template_literal",
+        "file": "components/admin/SchoolLeadsQueue.tsx",
+        "line": 84,
+        "context": "<div className=\"text-xs uppercase text-slate-400\">{t(`admin.schoolLeads.count.${k}`)}</div>"
+      },
+      {
+        "pattern": "`admin.blocklist.duration.${d.key}`",
+        "type": "template_literal",
+        "file": "components/admin/blocklist/BlockListManager.tsx",
+        "line": 162,
+        "context": "<SelectItem key={d.key} value={d.key}>{t(`admin.blocklist.duration.${d.key}`)}</SelectItem>"
+      },
+      {
+        "pattern": "`admin.insights.dow.${DOW_KEYS[peakDow]}`",
+        "type": "template_literal",
+        "file": "components/admin/overview/InsightsPanel.tsx",
+        "line": 138,
+        "context": "🔥 <span className=\"font-bold text-neo-lime\">{t(`admin.insights.dow.${DOW_KEYS[peakDow]}`) || DOW_KE"
+      },
+      {
+        "pattern": "`admin.insights.dow.${DOW_KEYS[b.dow]}`",
+        "type": "template_literal",
+        "file": "components/admin/overview/InsightsPanel.tsx",
+        "line": 150,
+        "context": "<span className=\"text-slate-400 text-[10px] font-bold\">{(t(`admin.insights.dow.${DOW_KEYS[b.dow]}`) "
+      },
+      {
+        "pattern": "`admin.todayGames.source.${acq.kind}`",
+        "type": "template_literal",
+        "file": "components/admin/today-games/components/GameDetailPanel.tsx",
+        "line": 87,
+        "context": "{t(`admin.todayGames.source.${acq.kind}`, acq.kind)}"
+      },
+      {
+        "pattern": "`admin.todayGames.source.${acq.kind}`",
+        "type": "template_literal",
+        "file": "components/admin/today-games/components/GameGroupDetailPanel.tsx",
+        "line": 125,
+        "context": "{t(`admin.todayGames.source.${acq.kind}`, acq.kind)}"
+      },
+      {
+        "pattern": "`admin.todayGames.source.${acquisitionTag.kind}`",
+        "type": "template_literal",
+        "file": "components/admin/today-games/components/GameRow.tsx",
+        "line": 99,
+        "context": "const sourceLabel = t("
+      },
+      {
+        "pattern": "`admin.todayGames.range.${range}`",
+        "type": "template_literal",
+        "file": "components/admin/today-games/components/GamesFilters.tsx",
+        "line": 60,
+        "context": "{t(`admin.todayGames.range.${range}`, DATE_RANGE_FALLBACK[range])}"
+      },
+      {
+        "pattern": "`admin.todayGames.${b.labelKey}`",
+        "type": "template_literal",
+        "file": "components/admin/today-games/components/StatsBar.tsx",
+        "line": 51,
+        "context": "label={t(`admin.todayGames.${b.labelKey}`, b.label)}"
+      },
+      {
+        "pattern": "`adventure.tiles.aria.${tile.type}`",
+        "type": "template_literal",
+        "file": "components/adventure/AdventureGrid.tsx",
+        "line": 361,
+        "context": "const typeLabel = t(`adventure.tiles.aria.${tile.type}`);"
+      },
+      {
+        "pattern": "`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`",
+        "type": "template_literal",
+        "file": "components/adventure/AdventureHub.tsx",
+        "line": 121,
+        "context": "alt={t(`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`)}"
+      },
+      {
+        "pattern": "`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`",
+        "type": "template_literal",
+        "file": "components/adventure/AdventureHub.tsx",
+        "line": 155,
+        "context": "{t(`adventure.worlds.${worldConfig?.name ?? 'alphabetMeadows'}`)}"
+      },
+      {
+        "pattern": "`adventure.worlds.${nextWorldConfig.name}`",
+        "type": "template_literal",
+        "file": "components/adventure/AdventureHub.tsx",
+        "line": 271,
+        "context": "{t(`adventure.worlds.${nextWorldConfig.name}`)} — {t('adventure.level')} {nextLevel.level}"
+      },
+      {
+        "pattern": "`adventure.worlds.${selectedWorldConfig.name}`",
+        "type": "template_literal",
+        "file": "components/adventure/AdventureView.tsx",
+        "line": 446,
+        "context": "worldName={selectedWorldConfig ? t(`adventure.worlds.${selectedWorldConfig.name}`) : undefined}"
+      },
+      {
+        "pattern": "`adventure.collection.category.${key}`",
+        "type": "template_literal",
+        "file": "components/adventure/CollectionPanel.tsx",
+        "line": 142,
+        "context": "{t(`adventure.collection.category.${key}`)}"
+      },
+      {
+        "pattern": "`adventure.collection.rarity.${item.rarity}`",
+        "type": "template_literal",
+        "file": "components/adventure/CollectionPanel.tsx",
+        "line": 209,
+        "context": "{t(`adventure.collection.rarity.${item.rarity}`)}"
+      },
+      {
+        "pattern": "`adventure.defeatExplainer.tip.${worstObjective.type}`",
+        "type": "template_literal",
+        "file": "components/adventure/LevelCompleteContent.tsx",
+        "line": 257,
+        "context": "💡 {t(`adventure.defeatExplainer.tip.${worstObjective.type}`)}"
+      },
+      {
+        "pattern": "`adventure.worlds.mechanicHint${worldNumber}`",
+        "type": "template_literal",
+        "file": "components/adventure/LevelEntryOverlay.tsx",
+        "line": 277,
+        "context": "{t(`adventure.worlds.mechanicHint${worldNumber}`)}"
+      },
+      {
+        "pattern": "`adventure.worlds.${world.name}`",
+        "type": "template_literal",
+        "file": "components/adventure/LevelGridHeader.tsx",
+        "line": 32,
+        "context": "const worldName = t(`adventure.worlds.${world.name}`) || world.name;"
+      },
+      {
+        "pattern": "`adventure.mechanic.${mechanic}`",
+        "type": "template_literal",
+        "file": "components/adventure/MechanicIndicator.tsx",
+        "line": 42,
+        "context": "{t(`adventure.mechanic.${mechanic}`)}"
+      },
+      {
+        "pattern": "`adventure.mechanics.${mechanic}`",
+        "type": "template_literal",
+        "file": "components/adventure/MechanicIndicator.tsx",
+        "line": 45,
+        "context": "{t(`adventure.mechanics.${mechanic}`)}"
       },
       {
         "pattern": "adventure.mechanic.${mechanic}",
@@ -48,11 +482,95 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`adventure.objectives.${obj.type}`",
+        "type": "template_literal",
+        "file": "components/adventure/RetryAssistModal.tsx",
+        "line": 215,
+        "context": "const label = t(`adventure.objectives.${obj.type}`);"
+      },
+      {
+        "pattern": "`adventure.runes.rarity.${def.rarity}`",
+        "type": "template_literal",
+        "file": "components/adventure/RunePanel.tsx",
+        "line": 206,
+        "context": "{t(`adventure.runes.rarity.${def.rarity}`)}"
+      },
+      {
+        "pattern": "`adventure.skills.paths.${path}`",
+        "type": "template_literal",
+        "file": "components/adventure/SkillTree/SkillPath.tsx",
+        "line": 116,
+        "context": "{t(`adventure.skills.paths.${path}`) || path}"
+      },
+      {
         "pattern": "adventure.skills.paths.${path}",
         "file": "components/adventure/SkillTree/SkillPath.tsx",
         "line": 116,
         "context": "{t(`adventure.skills.paths.${path}`) || path}",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`adventure.worlds.${world.name}`",
+        "type": "template_literal",
+        "file": "components/adventure/WorldMap.tsx",
+        "line": 100,
+        "context": "const worldName = t(`adventure.worlds.${world.name}`) || world.name;"
+      },
+      {
+        "pattern": "`adventure.worlds.${nextWorldConfig.name}`",
+        "type": "template_literal",
+        "file": "components/adventure/WorldMap.tsx",
+        "line": 650,
+        "context": "{t(`adventure.worlds.${nextWorldConfig.name}`)} — {t('adventure.level')} {nextLevel.level}"
+      },
+      {
+        "pattern": "`adventure.bosses.twist.${twistType}.name`",
+        "type": "template_literal",
+        "file": "components/adventure/boss/BossMechanicTutorial.tsx",
+        "line": 89,
+        "context": "{t(`adventure.bosses.twist.${twistType}.name`)}"
+      },
+      {
+        "pattern": "`adventure.bosses.twist.${twistType}.desc`",
+        "type": "template_literal",
+        "file": "components/adventure/boss/BossMechanicTutorial.tsx",
+        "line": 96,
+        "context": "{t(`adventure.bosses.twist.${twistType}.desc`)}"
+      },
+      {
+        "pattern": "`adventure.bosses.twist.${twistType}.tip`",
+        "type": "template_literal",
+        "file": "components/adventure/boss/BossMechanicTutorial.tsx",
+        "line": 102,
+        "context": "💡 {t(`adventure.bosses.twist.${twistType}.tip`)}"
+      },
+      {
+        "pattern": "`adventure.worlds.${currentWorldConfig.name}`",
+        "type": "template_literal",
+        "file": "components/adventure/hooks/useAdventureGameCallbacks.ts",
+        "line": 112,
+        "context": "previousWorldName: t(`adventure.worlds.${currentWorldConfig.name}`),"
+      },
+      {
+        "pattern": "`adventure.worlds.${nextWorldConfig.name}`",
+        "type": "template_literal",
+        "file": "components/adventure/hooks/useAdventureGameCallbacks.ts",
+        "line": 114,
+        "context": "newWorldName: t(`adventure.worlds.${nextWorldConfig.name}`),"
+      },
+      {
+        "pattern": "`${mechanicKey}Desc`",
+        "type": "template_literal",
+        "file": "components/adventure/themed/ModifierBadge.tsx",
+        "line": 86,
+        "context": "{t(`${mechanicKey}Desc`, '')}"
+      },
+      {
+        "pattern": "`adventure.mechanic.${mechanic}`",
+        "type": "template_literal",
+        "file": "components/adventure/ui/GameInfoStrip.tsx",
+        "line": 87,
+        "context": "{t(`adventure.mechanic.${mechanic}`)}"
       },
       {
         "pattern": "adventure.mechanic.${mechanic}",
@@ -62,11 +580,116 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`auth.inlineSignup.${randomMessage}`",
+        "type": "template_literal",
+        "file": "components/auth/DailyChallengeInlineSignup.tsx",
+        "line": 325,
+        "context": "{t(`auth.inlineSignup.${randomMessage}`) || t('auth.inlineSignup.funnyMessages.dontLeaveHanging')}"
+      },
+      {
+        "pattern": "`auth.dailyChallenge.benefits.${benefit.key}`",
+        "type": "template_literal",
+        "file": "components/auth/DailyChallengeInlineSignup.tsx",
+        "line": 362,
+        "context": "{t(`auth.dailyChallenge.benefits.${benefit.key}`) || benefit.key}"
+      },
+      {
+        "pattern": "`avatarBuilder.bodyStyles.${style}`",
+        "type": "template_literal",
+        "file": "components/avatar/AvatarBuilderCategoryOptions.tsx",
+        "line": 345,
+        "context": "{t(`avatarBuilder.bodyStyles.${style}`) || style}"
+      },
+      {
+        "pattern": "`avatarBuilder.${gender}`",
+        "type": "template_literal",
+        "file": "components/avatar/AvatarBuilderColorControls.tsx",
+        "line": 104,
+        "context": "<span>{t(`avatarBuilder.${gender}`)}</span>"
+      },
+      {
+        "pattern": "`avatarBuilder.tiers.${getAvatarVisualTier(config)}`",
+        "type": "template_literal",
+        "file": "components/avatar/AvatarBuilderModal.tsx",
+        "line": 271,
+        "context": "{t(`avatarBuilder.tiers.${getAvatarVisualTier(config)}`)}"
+      },
+      {
+        "pattern": "`avatarBuilder.sets.${set.id}`",
+        "type": "template_literal",
+        "file": "components/avatar/AvatarBuilderModal.tsx",
+        "line": 304,
+        "context": "title={t(`avatarBuilder.sets.${set.id}`)}"
+      },
+      {
+        "pattern": "`avatarBuilder.sets.${set.id}`",
+        "type": "template_literal",
+        "file": "components/avatar/AvatarBuilderModal.tsx",
+        "line": 307,
+        "context": "{t(`avatarBuilder.sets.${set.id}`)}"
+      },
+      {
+        "pattern": "`avatarBuilder.tiers.${visualTier}`",
+        "type": "template_literal",
+        "file": "components/avatar/AvatarBuilderPartGrid.tsx",
+        "line": 201,
+        "context": "? `${displayName} · ${t(`avatarBuilder.tiers.${visualTier}`)}`"
+      },
+      {
+        "pattern": "`avatarBuilder.tiers.${tier}`",
+        "type": "template_literal",
+        "file": "components/avatar/AvatarTierBadge.tsx",
+        "line": 70,
+        "context": "{t(`avatarBuilder.tiers.${tier}`)}"
+      },
+      {
         "pattern": "avatarBuilder.tiers.${tier}",
         "file": "components/avatar/AvatarTierBadge.tsx",
         "line": 70,
         "context": "{t(`avatarBuilder.tiers.${tier}`)}",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`blast.results.brag.${tier.key}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastBragCard.tsx",
+        "line": 171,
+        "context": "{t(`blast.results.brag.${tier.key}`)}"
+      },
+      {
+        "pattern": "`blast.pregameBuff.${initialBuff}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastGame.tsx",
+        "line": 703,
+        "context": "const label = t(`blast.pregameBuff.${initialBuff}`) || initialBuff;"
+      },
+      {
+        "pattern": "`blast.pregameBuff.${initialBuff}Desc`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastGame.tsx",
+        "line": 704,
+        "context": "const desc = t(`blast.pregameBuff.${initialBuff}Desc`) || '';"
+      },
+      {
+        "pattern": "`blast.objective.color${colorTag.charAt(0).toUpperCase()}${colorTag.slice(1)}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastHintToast.tsx",
+        "line": 22,
+        "context": "? (t(`blast.objective.color${colorTag.charAt(0).toUpperCase()}${colorTag.slice(1)}`) || colorTag)"
+      },
+      {
+        "pattern": "`blast.tileGuide.${tileType}.name`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastHintToast.tsx",
+        "line": 26,
+        "context": "const tileLabel = tileType ? (t(`blast.tileGuide.${tileType}.name`) || tileType) : '';"
+      },
+      {
+        "pattern": "`blast.hint.toast.${target.i18nKey}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastHintToast.tsx",
+        "line": 28,
+        "context": "const template = t(`blast.hint.toast.${target.i18nKey}`) || defaultTemplate(target.i18nKey);"
       },
       {
         "pattern": "blast.objective.color${colorTag.charAt(0).toUpperCase()}${colorTag.slice(1)}",
@@ -90,11 +713,907 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`blast.modifier.${modifier.id}.name`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastModifierBadge.tsx",
+        "line": 57,
+        "context": "const name = t(`blast.modifier.${modifier.id}.name`) || modifier.id;"
+      },
+      {
+        "pattern": "`blast.modifier.${modifier.id}.desc`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastModifierBadge.tsx",
+        "line": 74,
+        "context": "const desc = t(`blast.modifier.${modifier.id}.desc`) || '';"
+      },
+      {
+        "pattern": "`blast.pregameBuff.${selected}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastPregameBuffModal.tsx",
+        "line": 37,
+        "context": "const selectedLabel = selected ? t(`blast.pregameBuff.${selected}`) : '';"
+      },
+      {
+        "pattern": "`blast.pregameBuff.${selected}Desc`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastPregameBuffModal.tsx",
+        "line": 38,
+        "context": "const selectedDesc = selected ? t(`blast.pregameBuff.${selected}Desc`) : t('blast.pregameBuff.ctaDef"
+      },
+      {
+        "pattern": "`blast.pregameBuff.${id}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastPregameBuffModal.tsx",
+        "line": 76,
+        "context": "<span>{t(`blast.pregameBuff.${id}`)}</span>"
+      },
+      {
+        "pattern": "`blast.mascot.${mascotKey}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastResultsSummary.tsx",
+        "line": 132,
+        "context": "alt={t(`blast.mascot.${mascotKey}`)}"
+      },
+      {
+        "pattern": "`blast.stars${results.stars}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastResultsSummary.tsx",
+        "line": 153,
+        "context": "<StarRating stars={results.stars} label={t(`blast.stars${results.stars}`)} />"
+      },
+      {
+        "pattern": "`blast.milestone.${tier.key}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastScoreMilestone.tsx",
+        "line": 113,
+        "context": "const label = t?.(`blast.milestone.${tier.key}`) || `${tier.key}!`;"
+      },
+      {
+        "pattern": "`blast.tileGuide.${type}.name`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastTileGuide.tsx",
+        "line": 65,
+        "context": "{t(`blast.tileGuide.${type}.name`)}"
+      },
+      {
+        "pattern": "`blast.tileGuide.${type}.desc`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastTileGuide.tsx",
+        "line": 68,
+        "context": "{t(`blast.tileGuide.${type}.desc`)}"
+      },
+      {
+        "pattern": "`blast.store.${def.id}.name`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastUpgradePanel.tsx",
+        "line": 114,
+        "context": "{t(`blast.store.${def.id}.name`)}"
+      },
+      {
+        "pattern": "`blast.store.${def.id}.desc`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastUpgradePanel.tsx",
+        "line": 119,
+        "context": "{t(`blast.store.${def.id}.desc`)}"
+      },
+      {
+        "pattern": "`blast.store.${def.id}.name`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastUpgradePanel.tsx",
+        "line": 128,
+        "context": "aria-label={`${t(`blast.store.${def.id}.name`)} — ${"
+      },
+      {
+        "pattern": "`blast.pregameBuff.${pregameBuff}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastView.tsx",
+        "line": 393,
+        "context": "<span>{t(`blast.pregameBuff.${pregameBuff}`)}</span>"
+      },
+      {
+        "pattern": "`blast.pregameBuff.${pregameBuff}Desc`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastView.tsx",
+        "line": 394,
+        "context": "<span className=\"text-[10px] opacity-70\">· {t(`blast.pregameBuff.${pregameBuff}Desc`)}</span>"
+      },
+      {
+        "pattern": "`blast.archetypes.${archetype}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastWaveIntro.tsx",
+        "line": 76,
+        "context": "const label = t(`blast.archetypes.${archetype}`) || '';"
+      },
+      {
+        "pattern": "`blast.mascot.${mascotKey}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/BlastWaveIntro.tsx",
+        "line": 77,
+        "context": "const mascotAlt = t(`blast.mascot.${mascotKey}`) || '';"
+      },
+      {
+        "pattern": "`blast.combo.${detectedCombos[0].type}`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
+        "line": 249,
+        "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU"
+      },
+      {
         "pattern": "blast.combo.${detectedCombos[0].type}",
         "file": "components/blast/legacy/hooks/useBlastWordHandler.ts",
         "line": 249,
         "context": "effects.setComboTypeName(t(`blast.combo.${detectedCombos[0].type}`) || `${detectedCombos[0].type.toU",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`blast.tileGuide.${objective.tileType}.name`",
+        "type": "template_literal",
+        "file": "components/blast/legacy/utils/blastObjectiveUtils.ts",
+        "line": 76,
+        "context": "? (t(`blast.tileGuide.${objective.tileType}.name`) || objective.tileType)"
+      },
+      {
+        "pattern": "`blast.chest.tier.${tier}`",
+        "type": "template_literal",
+        "file": "components/blast/v2/BlastChestBadge.tsx",
+        "line": 145,
+        "context": "{t(`blast.chest.tier.${tier}`, tier.toUpperCase())}"
+      },
+      {
+        "pattern": "`blast.themes.${theme}`",
+        "type": "template_literal",
+        "file": "components/blast/v2/BlastHud.tsx",
+        "line": 165,
+        "context": "<span className=\"truncate\">{t(`blast.themes.${theme}`, theme)}</span>"
+      },
+      {
+        "pattern": "`blast.themes.${level.theme}`",
+        "type": "template_literal",
+        "file": "components/blast/v2/BlastLevelIntroCard.tsx",
+        "line": 64,
+        "context": "<span>{t(`blast.themes.${level.theme}`, level.theme)}</span>"
+      },
+      {
+        "pattern": "`${modifierKey}.title`",
+        "type": "template_literal",
+        "file": "components/blast/v2/BlastLevelIntroCard.tsx",
+        "line": 89,
+        "context": "<span>{t(`${modifierKey}.title`, level.modifier)}</span>"
+      },
+      {
+        "pattern": "`${modifierKey}.sub`",
+        "type": "template_literal",
+        "file": "components/blast/v2/BlastLevelIntroCard.tsx",
+        "line": 91,
+        "context": "<span className=\"font-bold\">{t(`${modifierKey}.sub`, '')}</span>"
+      },
+      {
+        "pattern": "`blast.surprise.${meta.key}.title`",
+        "type": "template_literal",
+        "file": "components/blast/v2/BlastSurpriseBanner.tsx",
+        "line": 62,
+        "context": "{t(`blast.surprise.${meta.key}.title`, shown.event)}"
+      },
+      {
+        "pattern": "`${BOOST_CONFIGS[boostType].i18nKey}.title`",
+        "type": "template_literal",
+        "file": "components/boosts/BoostPicker.tsx",
+        "line": 142,
+        "context": "aria-label={t(`${BOOST_CONFIGS[boostType].i18nKey}.title`)}"
+      },
+      {
+        "pattern": "`${BOOST_CONFIGS[boostType].i18nKey}.title`",
+        "type": "template_literal",
+        "file": "components/boosts/BoostPicker.tsx",
+        "line": 153,
+        "context": "{t(`${BOOST_CONFIGS[boostType].i18nKey}.title`)}"
+      },
+      {
+        "pattern": "`${BOOST_CONFIGS[boostType].i18nKey}.description`",
+        "type": "template_literal",
+        "file": "components/boosts/BoostPicker.tsx",
+        "line": 156,
+        "context": "{t(`${BOOST_CONFIGS[boostType].i18nKey}.description`)}"
+      },
+      {
+        "pattern": "`brain.tiers.${tier}`",
+        "type": "template_literal",
+        "file": "components/brain/BrainScoreHero.tsx",
+        "line": 187,
+        "context": "{t(`brain.tiers.${tier}`)}"
+      },
+      {
+        "pattern": "`brain.tiers.${nextTier}`",
+        "type": "template_literal",
+        "file": "components/brain/BrainScoreHero.tsx",
+        "line": 197,
+        "context": "{t(`brain.tiers.${nextTier}`)}"
+      },
+      {
+        "pattern": "`brain.tiers.${tier}`",
+        "type": "template_literal",
+        "file": "components/brain/BrainScoreShareCard.tsx",
+        "line": 102,
+        "context": "${t('brain.share.tier')}: ${t(`brain.tiers.${tier}`)}"
+      },
+      {
+        "pattern": "`brain.tiers.${tier}`",
+        "type": "template_literal",
+        "file": "components/brain/BrainScoreShareCard.tsx",
+        "line": 201,
+        "context": "{t(`brain.tiers.${tier}`)}"
+      },
+      {
+        "pattern": "`brain.domains.${domainKey}`",
+        "type": "template_literal",
+        "file": "components/brain/CognitiveDomainGrid.tsx",
+        "line": 182,
+        "context": "{t(`brain.domains.${domainKey}`)}"
+      },
+      {
+        "pattern": "`brain.domains.${domainKey}`",
+        "type": "template_literal",
+        "file": "components/brain/CognitiveDomainGrid.tsx",
+        "line": 229,
+        "context": "<p className=\"font-bold\">{t(`brain.domains.${domainKey}`)}</p>"
+      },
+      {
+        "pattern": "`brain.domains.${domainKey}Desc`",
+        "type": "template_literal",
+        "file": "components/brain/CognitiveDomainGrid.tsx",
+        "line": 231,
+        "context": "<p className=\"text-xs leading-relaxed\">{t(`brain.domains.${domainKey}Desc`)}</p>"
+      },
+      {
+        "pattern": "`brain.progress.${domainData.trend}`",
+        "type": "template_literal",
+        "file": "components/brain/CognitiveDomainGrid.tsx",
+        "line": 242,
+        "context": "{t(`brain.progress.${domainData.trend}`)}"
+      },
+      {
+        "pattern": "`brain.drills.${drillId}.name`",
+        "type": "template_literal",
+        "file": "components/brain/DrillBriefing.tsx",
+        "line": 63,
+        "context": "{t(`brain.drills.${drillId}.name`)}"
+      },
+      {
+        "pattern": "`brain.drills.badge.${badge}.title`",
+        "type": "template_literal",
+        "file": "components/brain/DrillEarningsBreakdown.tsx",
+        "line": 95,
+        "context": "{t(`brain.drills.badge.${badge}.title`)}"
+      },
+      {
+        "pattern": "`brain.drills.badge.${badge}.name`",
+        "type": "template_literal",
+        "file": "components/brain/DrillEarningsBreakdown.tsx",
+        "line": 105,
+        "context": "{t(`brain.drills.badge.${badge}.name`)}"
+      },
+      {
+        "pattern": "`brain.domains.${targetDomain}`",
+        "type": "template_literal",
+        "file": "components/brain/DrillProgressionOverlay.tsx",
+        "line": 289,
+        "context": "{t(`brain.domains.${targetDomain}`)}"
+      },
+      {
+        "pattern": "`brain.tiers.${tier}`",
+        "type": "template_literal",
+        "file": "components/brain/DrillProgressionOverlay.tsx",
+        "line": 411,
+        "context": "{t(`brain.tiers.${tier}`)}"
+      },
+      {
+        "pattern": "`brain.drills.${drill.drillType}.name`",
+        "type": "template_literal",
+        "file": "components/brain/DrillUnlockProgress.tsx",
+        "line": 110,
+        "context": "{t(`brain.drills.${drill.drillType}.name`)} {t('brain.unlock.nowAvailable')}"
+      },
+      {
+        "pattern": "`brain.drills.${drill.drillType}.name`",
+        "type": "template_literal",
+        "file": "components/brain/DrillUnlockProgress.tsx",
+        "line": 159,
+        "context": "{t(`brain.drills.${drill.drillType}.name`)}"
+      },
+      {
+        "pattern": "`brain.tiers.${tier}`",
+        "type": "template_literal",
+        "file": "components/brain/FirstGameCelebration.tsx",
+        "line": 207,
+        "context": "{t(`brain.tiers.${tier}`)}"
+      },
+      {
+        "pattern": "`brain.domains.${key}`",
+        "type": "template_literal",
+        "file": "components/brain/FirstGameCelebration.tsx",
+        "line": 229,
+        "context": "{t(`brain.domains.${key}`)}"
+      },
+      {
+        "pattern": "`brain.domains.${recommendedDomain}`",
+        "type": "template_literal",
+        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
+        "line": 142,
+        "context": "return t('brain.recommendation.declining', { domain: t(`brain.domains.${recommendedDomain}`) });"
+      },
+      {
+        "pattern": "`brain.domains.${recommendedDomain}`",
+        "type": "template_literal",
+        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
+        "line": 145,
+        "context": "return t('brain.recommendation.low', { domain: t(`brain.domains.${recommendedDomain}`) });"
+      },
+      {
+        "pattern": "`brain.domains.${recommendedDomain}`",
+        "type": "template_literal",
+        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
+        "line": 147,
+        "context": "return t('brain.recommendation.improve', { domain: t(`brain.domains.${recommendedDomain}`) });"
+      },
+      {
+        "pattern": "`brain.drills.${recommendedDrill}.name`",
+        "type": "template_literal",
+        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
+        "line": 207,
+        "context": "{t(`brain.drills.${recommendedDrill}.name`)}"
+      },
+      {
+        "pattern": "`brain.domains.${recommendedDomain}`",
+        "type": "template_literal",
+        "file": "components/brain/PersonalizedDrillRecommendation.tsx",
+        "line": 213,
+        "context": "{t(`brain.domains.${recommendedDomain}`)} • {domainData.score}/100"
+      },
+      {
+        "pattern": "`brain.drills.${drill.id}.name`",
+        "type": "template_literal",
+        "file": "components/brain/QuickDrillsSection.tsx",
+        "line": 151,
+        "context": "{t(`brain.drills.${drill.id}.name`)}"
+      },
+      {
+        "pattern": "`brain.domains.${drill.domain}`",
+        "type": "template_literal",
+        "file": "components/brain/QuickDrillsSection.tsx",
+        "line": 158,
+        "context": "{t(`brain.domains.${drill.domain}`)}"
+      },
+      {
+        "pattern": "`brain.tips.${activeTip.id}`",
+        "type": "template_literal",
+        "file": "components/brain/ScientificTipsCarousel.tsx",
+        "line": 212,
+        "context": "{t(`brain.tips.${activeTip.id}`)}"
+      },
+      {
+        "pattern": "`brain.tips.${activeTip.sourceKey}`",
+        "type": "template_literal",
+        "file": "components/brain/ScientificTipsCarousel.tsx",
+        "line": 240,
+        "context": "{t(`brain.tips.${activeTip.sourceKey}`)}"
+      },
+      {
+        "pattern": "`brain.tiers.${highestTier}`",
+        "type": "template_literal",
+        "file": "components/brain/WelcomeBackCard.tsx",
+        "line": 111,
+        "context": "return t('brain.welcomeBack.reachTier', { tier: t(`brain.tiers.${highestTier}`) });"
+      },
+      {
+        "pattern": "`connections.daily.shareCallout.${gridCallout(outcomes)}`",
+        "type": "template_literal",
+        "file": "components/connections/ConnectionsDailyChallenge.tsx",
+        "line": 214,
+        "context": "callout: t(`connections.daily.shareCallout.${gridCallout(outcomes)}`),"
+      },
+      {
+        "pattern": "`connections.daily.medal.${medal}`",
+        "type": "template_literal",
+        "file": "components/connections/ConnectionsDailyChallenge.tsx",
+        "line": 245,
+        "context": "{t(`connections.daily.medal.${medal}`)}"
+      },
+      {
+        "pattern": "`connections.difficulty.${puzzle.difficulty}`",
+        "type": "template_literal",
+        "file": "components/connections/PuzzleCard.tsx",
+        "line": 174,
+        "context": "{t(`connections.difficulty.${puzzle.difficulty}`)}"
+      },
+      {
+        "pattern": "`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]))}`",
+        "type": "template_literal",
+        "file": "components/connections/pyramid/PyramidChallenge.tsx",
+        "line": 202,
+        "context": "callout: t(`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]"
+      },
+      {
+        "pattern": "`cosmetics.rarity.${item.rarity}`",
+        "type": "template_literal",
+        "file": "components/cosmetics/CosmeticCollection.tsx",
+        "line": 88,
+        "context": "{t(`cosmetics.rarity.${item.rarity}`)}"
+      },
+      {
+        "pattern": "`cosmetics.rarity.${cosmetic.rarity}`",
+        "type": "template_literal",
+        "file": "components/cosmetics/CosmeticPreview.tsx",
+        "line": 51,
+        "context": "{t(`cosmetics.rarity.${cosmetic.rarity}`)}"
+      },
+      {
+        "pattern": "`cosmetics.rarity.${cosmetic.rarity}`",
+        "type": "template_literal",
+        "file": "components/cosmetics/CosmeticUnlockToast.tsx",
+        "line": 54,
+        "context": "const rarityLabel = t(`cosmetics.rarity.${cosmetic.rarity}`);"
+      },
+      {
+        "pattern": "`rank.tier.${tier.id}`",
+        "type": "template_literal",
+        "file": "components/cosmetics/RankProgressBanner.tsx",
+        "line": 48,
+        "context": "{t(`rank.tier.${tier.id}`)}"
+      },
+      {
+        "pattern": "`rank.tier.${nextTier.id}`",
+        "type": "template_literal",
+        "file": "components/cosmetics/RankProgressBanner.tsx",
+        "line": 70,
+        "context": "tier: t(`rank.tier.${nextTier.id}`),"
+      },
+      {
+        "pattern": "`rank.tier.${tier.id}`",
+        "type": "template_literal",
+        "file": "components/cosmetics/TierRoadmap.tsx",
+        "line": 49,
+        "context": "{t(`rank.tier.${tier.id}`)}"
+      },
+      {
+        "pattern": "`crossword.dir.${slot.dir}`",
+        "type": "template_literal",
+        "file": "components/crossword/ClueBar.tsx",
+        "line": 20,
+        "context": "const dirLabel = slot ? t(`crossword.dir.${slot.dir}`) : '';"
+      },
+      {
+        "pattern": "`crossword.difficulty.${puzzle.difficulty}`",
+        "type": "template_literal",
+        "file": "components/crossword/CrosswordView.tsx",
+        "line": 229,
+        "context": "difficultyLabel={t(`crossword.difficulty.${puzzle.difficulty}`)}"
+      },
+      {
+        "pattern": "`curator.admin.inbox.kind.${p.kind}`",
+        "type": "template_literal",
+        "file": "components/curator/CuratorProposalsInbox.tsx",
+        "line": 100,
+        "context": "{t(`curator.admin.inbox.kind.${p.kind}`)}"
+      },
+      {
+        "pattern": "`daily.badges.${justEarnedBadge.label}`",
+        "type": "template_literal",
+        "file": "components/daily/DailyRewardPreview.tsx",
+        "line": 45,
+        "context": "badge: t(`daily.badges.${justEarnedBadge.label}`),"
+      },
+      {
+        "pattern": "`daily.badges.${nextMilestone.label}`",
+        "type": "template_literal",
+        "file": "components/daily/DailyRewardPreview.tsx",
+        "line": 96,
+        "context": "badge: t(`daily.badges.${nextMilestone.label}`),"
+      },
+      {
+        "pattern": "`daily.createChallengeFeature.benefits.${benefit.key}`",
+        "type": "template_literal",
+        "file": "components/daily/UnauthenticatedCreateChallengeSection.tsx",
+        "line": 109,
+        "context": "{t(`daily.createChallengeFeature.benefits.${benefit.key}`)}"
+      },
+      {
+        "pattern": "`daily.weeklyChest.tier${tier.charAt(0).toUpperCase() + tier.slice(1)}`",
+        "type": "template_literal",
+        "file": "components/daily/WeeklyChestCard.tsx",
+        "line": 120,
+        "context": "const tierLabel = t("
+      },
+      {
+        "pattern": "`daily.weeklyChest.tier${projectedTier.charAt(0).toUpperCase() + projectedTier.slice(1)}`",
+        "type": "template_literal",
+        "file": "components/daily/WeeklyChestInfoModal.tsx",
+        "line": 34,
+        "context": "const tierLabel = t("
+      },
+      {
+        "pattern": "`daily.weeklyChest.tier${tier.charAt(0).toUpperCase() + tier.slice(1)}`",
+        "type": "template_literal",
+        "file": "components/daily/WeeklyChestInfoModal.tsx",
+        "line": 85,
+        "context": "alt={t(`daily.weeklyChest.tier${tier.charAt(0).toUpperCase() + tier.slice(1)}`)}"
+      },
+      {
+        "pattern": "`daily.weeklyChest.tier${tier.charAt(0).toUpperCase() + tier.slice(1)}`",
+        "type": "template_literal",
+        "file": "components/daily/WeeklyChestInfoModal.tsx",
+        "line": 98,
+        "context": "{t(`daily.weeklyChest.tier${tier.charAt(0).toUpperCase() + tier.slice(1)}`)}"
+      },
+      {
+        "pattern": "`daily.weeklyChest.tier${tierKey}`",
+        "type": "template_literal",
+        "file": "components/daily/WeeklyChestModal.tsx",
+        "line": 66,
+        "context": "const tierLabel = t(`daily.weeklyChest.tier${tierKey}`)"
+      },
+      {
+        "pattern": "`wordHunt.survival.score.tier.${tierInfo.tier}`",
+        "type": "template_literal",
+        "file": "components/daily/survival/AccumulatedScoreDisplay.tsx",
+        "line": 93,
+        "context": "const tierLabel = t(`wordHunt.survival.score.tier.${tierInfo.tier}`);"
+      },
+      {
+        "pattern": "`wordHunt.survival.score.tier.${tierInfo.nextTier}`",
+        "type": "template_literal",
+        "file": "components/daily/survival/AccumulatedScoreDisplay.tsx",
+        "line": 100,
+        "context": "const nextLabel = t(`wordHunt.survival.score.tier.${tierInfo.nextTier}`);"
+      },
+      {
+        "pattern": "`brain.drills.${nextDrill}.name`",
+        "type": "template_literal",
+        "file": "components/drills/DrillCompleteActions.tsx",
+        "line": 40,
+        "context": "const nextDrillName = nextDrill ? t(`brain.drills.${nextDrill}.name`) : '';"
+      },
+      {
+        "pattern": "`brain.drills.rarity.${rarity}`",
+        "type": "template_literal",
+        "file": "components/drills/RareGems.tsx",
+        "line": 198,
+        "context": "setFeedback({ message: `+${points} ${t('brain.drills.points')} (${t(`brain.drills.rarity.${rarity}`)"
+      },
+      {
+        "pattern": "`brain.drills.rarity.${rarity}`",
+        "type": "template_literal",
+        "file": "components/drills/RareGems.tsx",
+        "line": 318,
+        "context": "{t(`brain.drills.rarity.${rarity}`)} (+{GEM_POINTS[rarity as keyof typeof GEM_POINTS]})"
+      },
+      {
+        "pattern": "`education.access.role_${value}`",
+        "type": "template_literal",
+        "file": "components/education/AccessRequestForm.tsx",
+        "line": 190,
+        "context": "<span className=\"text-sm\">{t(`education.access.role_${value}`)}</span>"
+      },
+      {
+        "pattern": "`education.achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/education/AchievementProgressCard.tsx",
+        "line": 116,
+        "context": "aria-label={`${t(`education.achievements.${achievement.key}.name`)} achievement`}"
+      },
+      {
+        "pattern": "`education.achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/education/AchievementProgressCard.tsx",
+        "line": 137,
+        "context": ": `${t(`education.achievements.${achievement.key}.name`)} icon`"
+      },
+      {
+        "pattern": "`education.achievements.${achievement.key}.name`",
+        "type": "template_literal",
+        "file": "components/education/AchievementProgressCard.tsx",
+        "line": 153,
+        "context": ": t(`education.achievements.${achievement.key}.name`)}"
+      },
+      {
+        "pattern": "`education.achievements.tiers.${achievement.currentTier}`",
+        "type": "template_literal",
+        "file": "components/education/AchievementProgressCard.tsx",
+        "line": 157,
+        "context": "{t(`education.achievements.tiers.${achievement.currentTier}`)}"
+      },
+      {
+        "pattern": "`education.achievements.${achievement.key}.hint`",
+        "type": "template_literal",
+        "file": "components/education/AchievementProgressCard.tsx",
+        "line": 230,
+        "context": "? t(`education.achievements.${achievement.key}.hint`)"
+      },
+      {
+        "pattern": "`education.achievements.${achievement.key}.hint`",
+        "type": "template_literal",
+        "file": "components/education/AchievementProgressCard.tsx",
+        "line": 231,
+        "context": ": t(`education.achievements.${achievement.key}.hint`)}"
+      },
+      {
+        "pattern": "`education.achievements.tiers.${tier}`",
+        "type": "template_literal",
+        "file": "components/education/AchievementUnlockModal.tsx",
+        "line": 101,
+        "context": "const tierName = t(`education.achievements.tiers.${tier}`);"
+      },
+      {
+        "pattern": "`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`",
+        "type": "template_literal",
+        "file": "components/education/ClassroomModeBanner.tsx",
+        "line": 189,
+        "context": "value={t(`teacher.classroom.gameModes.${MODE_TRANSLATION_KEY[gameMode]}`)}"
+      },
+      {
+        "pattern": "`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`",
+        "type": "template_literal",
+        "file": "components/education/ClassroomSetupStep.tsx",
+        "line": 234,
+        "context": "const label = t(`teacher.classroom.gameModes.${MODE_KEY_MAP[key]}`);"
+      },
+      {
+        "pattern": "`education.landing.mock.${p.nameKey}`",
+        "type": "template_literal",
+        "file": "components/education/EducationModeMock.tsx",
+        "line": 121,
+        "context": "{t(`education.landing.mock.${p.nameKey}`)}"
+      },
+      {
+        "pattern": "`education.landing.moat.${p.key}.tag`",
+        "type": "template_literal",
+        "file": "components/education/MoatTrifectaSection.tsx",
+        "line": 51,
+        "context": "{t(`education.landing.moat.${p.key}.tag`)}"
+      },
+      {
+        "pattern": "`education.landing.moat.${p.key}.title`",
+        "type": "template_literal",
+        "file": "components/education/MoatTrifectaSection.tsx",
+        "line": 54,
+        "context": "{t(`education.landing.moat.${p.key}.title`)}"
+      },
+      {
+        "pattern": "`education.landing.moat.${p.key}.body`",
+        "type": "template_literal",
+        "file": "components/education/MoatTrifectaSection.tsx",
+        "line": 57,
+        "context": "{t(`education.landing.moat.${p.key}.body`)}"
+      },
+      {
+        "pattern": "`education.forSchools.form.role_${r}`",
+        "type": "template_literal",
+        "file": "components/education/SchoolLeadForm.tsx",
+        "line": 129,
+        "context": "{SCHOOL_LEAD_ROLES.map((r) => <SelectItem key={r} value={r}>{t(`education.forSchools.form.role_${r}`"
+      },
+      {
+        "pattern": "`education.forSchools.form.count_${b}`",
+        "type": "template_literal",
+        "file": "components/education/SchoolLeadForm.tsx",
+        "line": 138,
+        "context": "{STUDENT_COUNT_BUCKETS.map((b) => <SelectItem key={b} value={b}>{t(`education.forSchools.form.count_"
+      },
+      {
+        "pattern": "`education.forSchools.form.interest_${key}`",
+        "type": "template_literal",
+        "file": "components/education/SchoolLeadForm.tsx",
+        "line": 154,
+        "context": "<span>{t(`education.forSchools.form.interest_${key}`)}</span>"
+      },
+      {
+        "pattern": "`education.landing.modes.${m.key}.tag`",
+        "type": "template_literal",
+        "file": "components/education/SixModeTour.tsx",
+        "line": 68,
+        "context": "{t(`education.landing.modes.${m.key}.tag`)}"
+      },
+      {
+        "pattern": "`education.landing.modes.${m.key}.title`",
+        "type": "template_literal",
+        "file": "components/education/SixModeTour.tsx",
+        "line": 71,
+        "context": "{t(`education.landing.modes.${m.key}.title`)}"
+      },
+      {
+        "pattern": "`education.landing.modes.${m.key}.body`",
+        "type": "template_literal",
+        "file": "components/education/SixModeTour.tsx",
+        "line": 74,
+        "context": "{t(`education.landing.modes.${m.key}.body`)}"
+      },
+      {
+        "pattern": "`education.landing.modes.${m.key}.teaches`",
+        "type": "template_literal",
+        "file": "components/education/SixModeTour.tsx",
+        "line": 77,
+        "context": "{t('education.landing.modes.teaches')}: {t(`education.landing.modes.${m.key}.teaches`)}"
+      },
+      {
+        "pattern": "`challenges.${challenge.challenge_tier}`",
+        "type": "template_literal",
+        "file": "components/education/challenges/DailyChallengeCard.tsx",
+        "line": 42,
+        "context": "{t(`challenges.${challenge.challenge_tier}`)}"
+      },
+      {
+        "pattern": "`xp.prestigeModal.${key}`",
+        "type": "template_literal",
+        "file": "components/engagement/PrestigeModal.tsx",
+        "line": 56,
+        "context": "const pm = (key: string) => t(`xp.prestigeModal.${key}`);"
+      },
+      {
+        "pattern": "`weeklyQuest.${quest.difficulty}`",
+        "type": "template_literal",
+        "file": "components/engagement/QuestSelector.tsx",
+        "line": 79,
+        "context": "{t(`weeklyQuest.${quest.difficulty}`)}"
+      },
+      {
+        "pattern": "`quests.avatarPartCategory.${quest.avatarPartReward.category}`",
+        "type": "template_literal",
+        "file": "components/engagement/QuestSelector.tsx",
+        "line": 92,
+        "context": "{t(`quests.avatarPartCategory.${quest.avatarPartReward.category}`)}"
+      },
+      {
+        "pattern": "`referral.milestone_${milestone.milestone}`",
+        "type": "template_literal",
+        "file": "components/engagement/ReferralMilestonePopup.tsx",
+        "line": 134,
+        "context": "{t(`referral.milestone_${milestone.milestone}`)}"
+      },
+      {
+        "pattern": "`weeklyQuest.${quest.difficulty}`",
+        "type": "template_literal",
+        "file": "components/engagement/WeeklyQuestCard.tsx",
+        "line": 54,
+        "context": "{t(`weeklyQuest.${quest.difficulty}`)}"
+      },
+      {
+        "pattern": "`friends.challenges.modes.${id}`",
+        "type": "template_literal",
+        "file": "components/friends/ChallengeInviteDialog.tsx",
+        "line": 214,
+        "context": "<span>{t(`friends.challenges.modes.${id}`)}</span>"
+      },
+      {
+        "pattern": "`socialGift.type.${data.giftType}`",
+        "type": "template_literal",
+        "file": "components/friends/FriendsList.tsx",
+        "line": 125,
+        "context": "toast.success(t('socialGift.received', { sender: data.senderName, type: t(`socialGift.type.${data.gi"
+      },
+      {
+        "pattern": "`gameModes.${mode}.name`",
+        "type": "template_literal",
+        "file": "components/game/ModeIntroCard.tsx",
+        "line": 54,
+        "context": "const name = t(`gameModes.${mode}.name`);"
+      },
+      {
+        "pattern": "`gameModes.${mode}.description`",
+        "type": "template_literal",
+        "file": "components/game/ModeIntroCard.tsx",
+        "line": 55,
+        "context": "const description = t(`gameModes.${mode}.description`);"
+      },
+      {
+        "pattern": "`gameModes.${mode}.intro.greet`",
+        "type": "template_literal",
+        "file": "components/game/ModeIntroCard.tsx",
+        "line": 56,
+        "context": "const greet = t(`gameModes.${mode}.intro.greet`);"
+      },
+      {
+        "pattern": "`collectibles.rarity.${gift.badge.rarity}`",
+        "type": "template_literal",
+        "file": "components/gift/AdminGiftModal.tsx",
+        "line": 470,
+        "context": "{t(`collectibles.rarity.${gift.badge.rarity}`) || gift.badge.rarity} {t('gift.badge')}"
+      },
+      {
+        "pattern": "`asyncChallenge.mode.${challenge.gameMode}`",
+        "type": "template_literal",
+        "file": "components/growth/AsyncChallengeCard.tsx",
+        "line": 57,
+        "context": "{t(`asyncChallenge.mode.${challenge.gameMode}`)}"
+      },
+      {
+        "pattern": "`ugc.difficulty.${board.difficulty.toLowerCase()}`",
+        "type": "template_literal",
+        "file": "components/landing/LandingCommunityShowcase.tsx",
+        "line": 181,
+        "context": "{t(`ugc.difficulty.${board.difficulty.toLowerCase()}`)}"
+      },
+      {
+        "pattern": "`landing.home.tier.${tier.toLowerCase()}`",
+        "type": "template_literal",
+        "file": "components/landing/home/HomeRankCard.tsx",
+        "line": 49,
+        "context": "const tierLabel = t(`landing.home.tier.${tier.toLowerCase()}`);"
+      },
+      {
+        "pattern": "`landing.home.titles.${titleKey}`",
+        "type": "template_literal",
+        "file": "components/landing/home/HomeTopBar.tsx",
+        "line": 100,
+        "context": "const title = titleKey ? t(`landing.home.titles.${titleKey}`, humanizeTitleKey(titleKey)) : null;"
+      },
+      {
+        "pattern": "`league.${tier}`",
+        "type": "template_literal",
+        "file": "components/leagues/LeagueHomeSection.tsx",
+        "line": 71,
+        "context": "const tierName = t(`league.${tier}`) || tier;"
+      },
+      {
+        "pattern": "`league.${tier}`",
+        "type": "template_literal",
+        "file": "components/leagues/LeaguePositionBadge.tsx",
+        "line": 86,
+        "context": "const tierName = t(`league.${tier}`) || tier;"
+      },
+      {
+        "pattern": "`league.${tier}`",
+        "type": "template_literal",
+        "file": "components/leagues/LeagueResults.tsx",
+        "line": 60,
+        "context": "#{position} in {t(`league.${tier}`)}"
+      },
+      {
+        "pattern": "`multiplayerFlow.roomList.gameModes.${round.gameMode === 'word-hunt' ? 'wordHunt' : round.gameMode === 'wheel-rush' ? 'w",
+        "type": "template_literal",
+        "file": "components/multiplayer/MpModeBreakdown.tsx",
+        "line": 100,
+        "context": "{t("
+      },
+      {
+        "pattern": "`season.twist.${currentSeason.twist.key}.blurb`",
+        "type": "template_literal",
+        "file": "components/multiplayer/SeasonBanner.tsx",
+        "line": 130,
+        "context": "title={t(`season.twist.${currentSeason.twist.key}.blurb`) !== `season.twist.${currentSeason.twist.ke"
+      },
+      {
+        "pattern": "`season.twist.${currentSeason.twist.key}.blurb`",
+        "type": "template_literal",
+        "file": "components/multiplayer/SeasonBanner.tsx",
+        "line": 131,
+        "context": "? t(`season.twist.${currentSeason.twist.key}.blurb`)"
+      },
+      {
+        "pattern": "`season.twist.${currentSeason.twist.key}.title`",
+        "type": "template_literal",
+        "file": "components/multiplayer/SeasonBanner.tsx",
+        "line": 137,
+        "context": "{t(`season.twist.${currentSeason.twist.key}.title`) !== `season.twist.${currentSeason.twist.key}.tit"
+      },
+      {
+        "pattern": "`season.twist.${currentSeason.twist.key}.title`",
+        "type": "template_literal",
+        "file": "components/multiplayer/SeasonBanner.tsx",
+        "line": 138,
+        "context": "? t(`season.twist.${currentSeason.twist.key}.title`)"
+      },
+      {
+        "pattern": "`mp.insights.rarity.${rarity}`",
+        "type": "template_literal",
+        "file": "components/multiplayer/desktop/insights/RarityHeatChip.tsx",
+        "line": 34,
+        "context": "aria-label={t(`mp.insights.rarity.${rarity}`)}"
+      },
+      {
+        "pattern": "`mp.insights.rarity.${rarity}`",
+        "type": "template_literal",
+        "file": "components/multiplayer/desktop/insights/RarityHeatChip.tsx",
+        "line": 37,
+        "context": "<span>{t(`mp.insights.rarity.${rarity}`)}</span>"
       },
       {
         "pattern": "mp.insights.rarity.${rarity}",
@@ -111,11 +1630,242 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`sealedBidMp.outcome.${r.outcome}`",
+        "type": "template_literal",
+        "file": "components/multiplayer/sealedBid/SealedBidVersus.tsx",
+        "line": 237,
+        "context": "{r.word ?? '—'} · {t(`sealedBidMp.outcome.${r.outcome}`)} · +"
+      },
+      {
+        "pattern": "`shiritori.error.${lastError}`",
+        "type": "template_literal",
+        "file": "components/multiplayer/shiritori/ShiritoriView.tsx",
+        "line": 204,
+        "context": "{t(`shiritori.error.${lastError}`)}"
+      },
+      {
+        "pattern": "`offline.queue.status.${status}`",
+        "type": "template_literal",
+        "file": "components/offline/PendingSyncBadge.tsx",
+        "line": 97,
+        "context": "{t(`offline.queue.status.${status}`)}"
+      },
+      {
+        "pattern": "`onboarding.ftue.v2.titles.${tier.key}`",
+        "type": "template_literal",
+        "file": "components/onboarding/ScoreRevealV2.tsx",
+        "line": 97,
+        "context": "{t(`onboarding.ftue.v2.titles.${tier.key}`)}"
+      },
+      {
+        "pattern": "`onboarding.ftue.v2.mascotReactions.${tier.key}`",
+        "type": "template_literal",
+        "file": "components/onboarding/ScoreRevealV2.tsx",
+        "line": 132,
+        "context": "{t(`onboarding.ftue.v2.mascotReactions.${tier.key}`)}"
+      },
+      {
+        "pattern": "`practice.${mode}.${key}`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeBailoutCta.tsx",
+        "line": 56,
+        "context": "<span>{t(`practice.${mode}.${key}`)}</span>"
+      },
+      {
         "pattern": "practice.${mode}.${key}",
         "file": "components/practice/PracticeBailoutCta.tsx",
         "line": 56,
         "context": "<span>{t(`practice.${mode}.${key}`)}</span>",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`practice.continueTo.${next}`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeChainCta.tsx",
+        "line": 50,
+        "context": "const label = next ? t(`practice.continueTo.${next}`) : t('practice.allDone');"
+      },
+      {
+        "pattern": "`practice.complete.${mode}`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeCompleteBanner.tsx",
+        "line": 38,
+        "context": "{t(`practice.complete.${mode}`)}"
+      },
+      {
+        "pattern": "`practice.mistakeCoach.${kind}.title`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeMistakeCoach.tsx",
+        "line": 132,
+        "context": "{t(`practice.mistakeCoach.${kind}.title`)}"
+      },
+      {
+        "pattern": "`practice.mistakeCoach.${kind}.body`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeMistakeCoach.tsx",
+        "line": 135,
+        "context": "{t(`practice.mistakeCoach.${kind}.body`)}"
+      },
+      {
+        "pattern": "`gameModes.${mode}.name`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeModeNav.tsx",
+        "line": 59,
+        "context": "const label = t(`gameModes.${mode}.name`);"
+      },
+      {
+        "pattern": "`education.practice.mastery.${mastery}`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeModeSelector.tsx",
+        "line": 206,
+        "context": "{t(`education.practice.mastery.${mastery}`) || mastery}"
+      },
+      {
+        "pattern": "`gameModes.${mode}.name`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeTutorialSheet.tsx",
+        "line": 162,
+        "context": "{t(`gameModes.${mode}.name`)}"
+      },
+      {
+        "pattern": "`gameModes.${mode}.intro.greet`",
+        "type": "template_literal",
+        "file": "components/practice/PracticeTutorialSheet.tsx",
+        "line": 165,
+        "context": "{t(`gameModes.${mode}.intro.greet`)}"
+      },
+      {
+        "pattern": "`achievementTiers.${tier.toLowerCase()}`",
+        "type": "template_literal",
+        "file": "components/profile/ProfileAchievements.tsx",
+        "line": 64,
+        "context": ": t(`achievementTiers.${tier.toLowerCase()}`);"
+      },
+      {
+        "pattern": "`achievements.${key}.name`",
+        "type": "template_literal",
+        "file": "components/profile/ProfileAchievements.tsx",
+        "line": 71,
+        "context": "name: t(`achievements.${key}.name`) || key,"
+      },
+      {
+        "pattern": "`achievements.${key}.description`",
+        "type": "template_literal",
+        "file": "components/profile/ProfileAchievements.tsx",
+        "line": 72,
+        "context": "description: t(`achievements.${key}.description`),"
+      },
+      {
+        "pattern": "`achievements.${key}.name`",
+        "type": "template_literal",
+        "file": "components/profile/ProfileAchievementsPublic.tsx",
+        "line": 52,
+        "context": "name: t(`achievements.${key}.name`) || key,"
+      },
+      {
+        "pattern": "`achievements.${key}.description`",
+        "type": "template_literal",
+        "file": "components/profile/ProfileAchievementsPublic.tsx",
+        "line": 53,
+        "context": "description: t(`achievements.${key}.description`),"
+      },
+      {
+        "pattern": "`quests.avatarPartCategory.${reward.category}`",
+        "type": "template_literal",
+        "file": "components/quests/QuestHub.tsx",
+        "line": 111,
+        "context": "{t(`quests.avatarPartCategory.${reward.category}`)}"
+      },
+      {
+        "pattern": "`weeklyQuest.${activeQuest.difficulty}`",
+        "type": "template_literal",
+        "file": "components/quests/QuestHub.tsx",
+        "line": 221,
+        "context": "{t(`weeklyQuest.${activeQuest.difficulty}`)}"
+      },
+      {
+        "pattern": "`weeklyQuest.${quest.difficulty}`",
+        "type": "template_literal",
+        "file": "components/quests/QuestHub.tsx",
+        "line": 315,
+        "context": "{t(`weeklyQuest.${quest.difficulty}`)}"
+      },
+      {
+        "pattern": "`quickPlay.solo.mode.${config?.mode ?? 'classic'}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayHub.tsx",
+        "line": 76,
+        "context": "else if (phase === 'playing') announce(t(`quickPlay.solo.mode.${config?.mode ?? 'classic'}`));"
+      },
+      {
+        "pattern": "`quickPlay.solo.rank.${quickRank(totalPoints).key}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayHub.tsx",
+        "line": 324,
+        "context": "{t(`quickPlay.solo.rank.${quickRank(totalPoints).key}`)}"
+      },
+      {
+        "pattern": "`quickPlay.solo.mode.${result.mode}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayResults.tsx",
+        "line": 127,
+        "context": "{t(`quickPlay.solo.mode.${result.mode}`)}"
+      },
+      {
+        "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayResults.tsx",
+        "line": 141,
+        "context": "{t('quickPlay.solo.rankUp', { rank: t(`quickPlay.solo.rank.${rankNow.key}`) })}"
+      },
+      {
+        "pattern": "`quickPlay.solo.rank.${rankNow.key}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayResults.tsx",
+        "line": 232,
+        "context": "{t(`quickPlay.solo.rank.${rankNow.key}`)}"
+      },
+      {
+        "pattern": "`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayResults.tsx",
+        "line": 239,
+        "context": "rank: t(`quickPlay.solo.rank.${quickRank(rankNow.nextAt).key}`),"
+      },
+      {
+        "pattern": "`quickPlay.solo.mode.${mode}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayWheel.tsx",
+        "line": 312,
+        "context": "aria-label={t(`quickPlay.solo.mode.${mode}`)}"
+      },
+      {
+        "pattern": "`quickPlay.solo.mode.${mode}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayWheel.tsx",
+        "line": 363,
+        "context": "{t(`quickPlay.solo.mode.${mode}`)}"
+      },
+      {
+        "pattern": "`quickPlay.solo.mode.${strikeMode}`",
+        "type": "template_literal",
+        "file": "components/quick-play/QuickPlayWheel.tsx",
+        "line": 459,
+        "context": "<span className={NODE_COLORS[strikeMode].text}>{t(`quickPlay.solo.mode.${strikeMode}`)}</span>"
+      },
+      {
+        "pattern": "`ranked.${nextTier.id}`",
+        "type": "template_literal",
+        "file": "components/ranked/RankedTierBadge.tsx",
+        "line": 73,
+        "context": "{t('ranked.nextTier')}: {t(`ranked.${nextTier.id}`)}"
+      },
+      {
+        "pattern": "`results.crowns.${crown.id}`",
+        "type": "template_literal",
+        "file": "components/results/ConsolationRows.tsx",
+        "line": 127,
+        "context": "{t(`results.crowns.${crown.id}`) || crown.name}"
       },
       {
         "pattern": "results.crowns.${crown.id}",
@@ -125,11 +1875,165 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`rank.tier.${tier}`",
+        "type": "template_literal",
+        "file": "components/seasons/RankTierChip.tsx",
+        "line": 59,
+        "context": "{t(`rank.tier.${tier}`)}"
+      },
+      {
         "pattern": "rank.tier.${tier}",
         "file": "components/seasons/RankTierChip.tsx",
         "line": 59,
         "context": "{t(`rank.tier.${tier}`)}",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`seasonBadges.rarity.${badge.rarity}`",
+        "type": "template_literal",
+        "file": "components/seasons/SeasonBadgeCard.tsx",
+        "line": 43,
+        "context": "const rarityLabel = t(`seasonBadges.rarity.${badge.rarity}`);"
+      },
+      {
+        "pattern": "`catalystTeaser.${c.id}.name`",
+        "type": "template_literal",
+        "file": "components/singleplayer/results/CatalystTeaser.tsx",
+        "line": 77,
+        "context": "{t(`catalystTeaser.${c.id}.name`)}"
+      },
+      {
+        "pattern": "`catalystTeaser.${c.id}.desc`",
+        "type": "template_literal",
+        "file": "components/singleplayer/results/CatalystTeaser.tsx",
+        "line": 80,
+        "context": "{t(`catalystTeaser.${c.id}.desc`)}"
+      },
+      {
+        "pattern": "`teacher.dashboard.tab.${tab.id}`",
+        "type": "template_literal",
+        "file": "components/teacher/TeacherDashboard.tsx",
+        "line": 156,
+        "context": "{t(`teacher.dashboard.tab.${tab.id}`)}"
+      },
+      {
+        "pattern": "`education.analytics.${level.key}`",
+        "type": "template_literal",
+        "file": "components/teacher/analytics/VocabularyHeatmap.tsx",
+        "line": 110,
+        "context": "{t(`education.analytics.${level.key}`)}"
+      },
+      {
+        "pattern": "`teacher.curriculum.grades.${list.grade_level}`",
+        "type": "template_literal",
+        "file": "components/teacher/curriculum/CurriculumWordListBrowser.tsx",
+        "line": 272,
+        "context": "{getGradeGroup(list.grade_level)} - {t(`teacher.curriculum.grades.${list.grade_level}`)}"
+      },
+      {
+        "pattern": "`teacher.curriculum.subjects.${list.subject}`",
+        "type": "template_literal",
+        "file": "components/teacher/curriculum/CurriculumWordListBrowser.tsx",
+        "line": 275,
+        "context": "{t(`teacher.curriculum.subjects.${list.subject}`)}"
+      },
+      {
+        "pattern": "`training.analysis.skills.${skill}`",
+        "type": "template_literal",
+        "file": "components/training/TrainingAnalysisModal.tsx",
+        "line": 307,
+        "context": "{t(`training.analysis.skills.${skill}`) || config.label}"
+      },
+      {
+        "pattern": "`training.analysis.tip.${skill}`",
+        "type": "template_literal",
+        "file": "components/training/TrainingAnalysisModal.tsx",
+        "line": 401,
+        "context": "• {t(`training.analysis.tip.${skill}`) || SKILL_CONFIGS[skill]?.description}"
+      },
+      {
+        "pattern": "`ugc.board.${generatedBoard.difficulty.toLowerCase()}`",
+        "type": "template_literal",
+        "file": "components/ugc/BoardCreatorWizard.tsx",
+        "line": 128,
+        "context": "{t(`ugc.board.${generatedBoard.difficulty.toLowerCase()}`)}"
+      },
+      {
+        "pattern": "`ugc.board.${generatedBoard.difficulty.toLowerCase()}`",
+        "type": "template_literal",
+        "file": "components/ugc/BoardCreatorWizard.tsx",
+        "line": 241,
+        "context": "{t(`ugc.board.${generatedBoard.difficulty.toLowerCase()}`)}"
+      },
+      {
+        "pattern": "`wordcraft.encouragement.${encIdx}`",
+        "type": "template_literal",
+        "file": "components/word-craft/WordCraftGameScreen.tsx",
+        "line": 614,
+        "context": "const encouragement = t(`wordcraft.encouragement.${encIdx}`);"
+      },
+      {
+        "pattern": "`wordcraft.modifier.${modifier}`",
+        "type": "template_literal",
+        "file": "components/word-craft/WordCraftModifierChip.tsx",
+        "line": 58,
+        "context": "const label = t(`wordcraft.modifier.${modifier}`, p.label);"
+      },
+      {
+        "pattern": "`wordcraft.modifier.desc.${modifier}`",
+        "type": "template_literal",
+        "file": "components/word-craft/WordCraftModifierChip.tsx",
+        "line": 59,
+        "context": "const note = t(`wordcraft.modifier.desc.${modifier}`, p.note);"
+      },
+      {
+        "pattern": "`wordcraft.difficulty.${d}`",
+        "type": "template_literal",
+        "file": "components/word-craft/WordCraftSetup.tsx",
+        "line": 98,
+        "context": "label={t(`wordcraft.difficulty.${d}`)}"
+      },
+      {
+        "pattern": "`wordcraft.modifier.desc.${m}`",
+        "type": "template_literal",
+        "file": "components/word-craft/WordCraftSetup.tsx",
+        "line": 118,
+        "context": "const desc = isSurprise ? undefined : t(`wordcraft.modifier.desc.${m}`);"
+      },
+      {
+        "pattern": "`wordcraft.gems.dice.families.${sessionDice.id}`",
+        "type": "template_literal",
+        "file": "components/word-craft/gems/GemHuntPageClient.tsx",
+        "line": 296,
+        "context": "? t('wordcraft.gems.dice.active', { family: t(`wordcraft.gems.dice.families.${sessionDice.id}`), mul"
+      },
+      {
+        "pattern": "`wordcraft.gems.dice.families.${fam.id}`",
+        "type": "template_literal",
+        "file": "components/word-craft/gems/GemHuntPageClient.tsx",
+        "line": 416,
+        "context": "{t(`wordcraft.gems.dice.families.${fam.id}`)}"
+      },
+      {
+        "pattern": "`wordcraft.run.rarity.${card.rarity}`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/PowerCardView.tsx",
+        "line": 32,
+        "context": "{t(`wordcraft.run.rarity.${card.rarity}`)}"
+      },
+      {
+        "pattern": "`wordcraft.run.card.${card.id}.name`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/PowerCardView.tsx",
+        "line": 35,
+        "context": "{t(`wordcraft.run.card.${card.id}.name`)}"
+      },
+      {
+        "pattern": "`wordcraft.run.card.${card.id}.desc`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/PowerCardView.tsx",
+        "line": 38,
+        "context": "{t(`wordcraft.run.card.${card.id}.desc`)}"
       },
       {
         "pattern": "wordcraft.run.rarity.${card.rarity}",
@@ -153,6 +2057,27 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`wordcraft.run.card.${c.id}.name`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/RunHUD.tsx",
+        "line": 38,
+        "context": "{t(`wordcraft.run.card.${c.id}.name`)}"
+      },
+      {
+        "pattern": "`wordcraft.run.card.${c.id}.name`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/RunResultScene.tsx",
+        "line": 33,
+        "context": "{t(`wordcraft.run.card.${c.id}.name`)}"
+      },
+      {
+        "pattern": "`wordcraft.run.feedback.${pop.tier}`",
+        "type": "template_literal",
+        "file": "components/word-craft/run/RunWordPop.tsx",
+        "line": 55,
+        "context": "<span className=\"text-sm\">{t(`wordcraft.run.feedback.${pop.tier}`)}</span>"
+      },
+      {
         "pattern": "wordcraft.run.feedback.${pop.tier}",
         "file": "components/word-craft/run/RunWordPop.tsx",
         "line": 55,
@@ -160,11 +2085,144 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`wordTower.crane.${result.quality}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerCraneBits.tsx",
+        "line": 106,
+        "context": "{t(`wordTower.crane.${result.quality}`)}"
+      },
+      {
+        "pattern": "`wordTower.howTo.steps.${i}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerGame.tsx",
+        "line": 227,
+        "context": "{t(`wordTower.howTo.steps.${i}`)}"
+      },
+      {
+        "pattern": "`wordTower.error.${lastError}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerHud.tsx",
+        "line": 256,
+        "context": "{t(`wordTower.error.${lastError}`)}"
+      },
+      {
+        "pattern": "`wordTower.biome.${r.highestBiome}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerLeaderboard.tsx",
+        "line": 88,
+        "context": "<span className=\"text-xs opacity-70\">{t(`wordTower.biome.${r.highestBiome}`)}</span>"
+      },
+      {
+        "pattern": "`wordTower.surprise.${meta.key}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerNoticeColumn.tsx",
+        "line": 325,
+        "context": "title={meta ? <><span aria-hidden>{meta.emoji}</span> {t(`wordTower.surprise.${meta.key}`)}</> : nul"
+      },
+      {
+        "pattern": "`wordTower.biome.${tease.nextBiomeId}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerNoticeColumn.tsx",
+        "line": 459,
+        "context": "{t('wordTower.zone.next', { zone: t(`wordTower.biome.${tease.nextBiomeId}`), m: Math.ceil(tease.mete"
+      },
+      {
+        "pattern": "`wordTower.biome.${biomeId}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerPlay.tsx",
+        "line": 366,
+        "context": "setZoneText(t(`wordTower.biome.${biomeId}`));"
+      },
+      {
+        "pattern": "`wordTower.hazard.${hz.kind}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerPlay.tsx",
+        "line": 764,
+        "context": "setHazardText(t('wordTower.hazard.lost', { kind: t(`wordTower.hazard.${hz.kind}`), n: hz.removed }))"
+      },
+      {
+        "pattern": "`wordTower.reward.tier.${meta.key}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerRewardReveal.tsx",
+        "line": 57,
+        "context": "{t(`wordTower.reward.tier.${meta.key}`)}"
+      },
+      {
         "pattern": "wordTower.reward.tier.${meta.key}",
         "file": "components/wordTower/WordTowerRewardReveal.tsx",
         "line": 57,
         "context": "{t(`wordTower.reward.tier.${meta.key}`)}",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`wordTower.sabotage.verdict.${verdict}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerSmashScene.tsx",
+        "line": 255,
+        "context": "{t(`wordTower.sabotage.verdict.${verdict}`)}"
+      },
+      {
+        "pattern": "`wordTower.upgrade.categories.${cat.id}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerUpgradePanel.tsx",
+        "line": 96,
+        "context": "<section key={cat.id} aria-label={t(`wordTower.upgrade.categories.${cat.id}`)}>"
+      },
+      {
+        "pattern": "`wordTower.upgrade.categories.${cat.id}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerUpgradePanel.tsx",
+        "line": 104,
+        "context": "{t(`wordTower.upgrade.categories.${cat.id}`)}"
+      },
+      {
+        "pattern": "`wordTower.upgrade.${id}.name`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerUpgradePanel.tsx",
+        "line": 128,
+        "context": "{t(`wordTower.upgrade.${id}.name`)}"
+      },
+      {
+        "pattern": "`wordTower.upgrade.${id}.desc`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerUpgradePanel.tsx",
+        "line": 137,
+        "context": "<p className=\"mt-0.5 text-xs text-neo-cream/75\">{t(`wordTower.upgrade.${id}.desc`)}</p>"
+      },
+      {
+        "pattern": "`wordTower.upgrade.${id}.name`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerUpgradePanel.tsx",
+        "line": 151,
+        "context": "aria-label={`${t(`wordTower.upgrade.${id}.name`)} — ${"
+      },
+      {
+        "pattern": "`wordTower.error.${tower.state.lastError}`",
+        "type": "template_literal",
+        "file": "components/wordTower/WordTowerVersus.tsx",
+        "line": 172,
+        "context": "<p key={`err-${tower.state.errorKey}`} className=\"text-center font-neo-body text-sm font-bold text-n"
+      },
+      {
+        "pattern": "`boosts.${type}.title`",
+        "type": "template_literal",
+        "file": "hooks/useBoostAckListener.ts",
+        "line": 45,
+        "context": "const title = t(`boosts.${type}.title`);"
+      },
+      {
+        "pattern": "`singlePlayer.features.unlocked.${feature}`",
+        "type": "template_literal",
+        "file": "hooks/useFeatureUnlockNotifications.ts",
+        "line": 69,
+        "context": "`${t(`singlePlayer.features.unlocked.${feature}`)} ${t(`singlePlayer.features.unlocked.${feature}Des"
+      },
+      {
+        "pattern": "`singlePlayer.features.unlocked.${feature}Desc`",
+        "type": "template_literal",
+        "file": "hooks/useFeatureUnlockNotifications.ts",
+        "line": 69,
+        "context": "`${t(`singlePlayer.features.unlocked.${feature}`)} ${t(`singlePlayer.features.unlocked.${feature}Des"
       },
       {
         "pattern": "singlePlayer.features.unlocked.${feature}",
@@ -181,11 +2239,53 @@
         "type": "template_literal"
       },
       {
+        "pattern": "`joinView.${\n                ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<La",
+        "type": "template_literal",
+        "file": "host/components/HostPreGameView.tsx",
+        "line": 601,
+        "context": "{t(`joinView.${"
+      },
+      {
+        "pattern": "`tvResults.${labelKey}`",
+        "type": "template_literal",
+        "file": "host/components/tv-results/TvResultsWinnersPodium.tsx",
+        "line": 266,
+        "context": "{t(`tvResults.${labelKey}`)}"
+      },
+      {
         "pattern": "tvBroadcast.mode.${mode}",
         "file": "lib/tvBroadcast/modeLabel.ts",
         "line": 5,
         "context": "* their slug instead of calling t(`tvBroadcast.mode.${mode}`) with a key that",
         "type": "template_literal"
+      },
+      {
+        "pattern": "`leaderboard.gameModes.${subKey}`",
+        "type": "template_literal",
+        "file": "lib/xp/modeLabels.ts",
+        "line": 33,
+        "context": "if (subKey) return t(`leaderboard.gameModes.${subKey}`);"
+      },
+      {
+        "pattern": "`wordHunt.shareMessage.${keys[randomIdx]}`",
+        "type": "template_literal",
+        "file": "utils/dailyChallenge/shareUtils.ts",
+        "line": 157,
+        "context": "? t(`wordHunt.shareMessage.${keys[randomIdx]}`)"
+      },
+      {
+        "pattern": "`wordHunt.shareMessage.${keys[randomIdx]}`",
+        "type": "template_literal",
+        "file": "utils/dailyChallenge/shareUtils.ts",
+        "line": 163,
+        "context": "? t(`wordHunt.shareMessage.${keys[randomIdx]}`)"
+      },
+      {
+        "pattern": "`wordHunt.shareMessage.${ctaKeys[ctaRandomIdx]}`",
+        "type": "template_literal",
+        "file": "utils/dailyChallenge/shareUtils.ts",
+        "line": 178,
+        "context": "? t(`wordHunt.shareMessage.${ctaKeys[ctaRandomIdx]}`)"
       }
     ],
     "fallbackUsages": [
@@ -201,12 +2301,300 @@
     ],
     "variableKeys": [
       {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "app/[locale]/community/PageClient.tsx",
+        "line": 148,
+        "context": "<span className=\"hidden sm:inline\">{t(labelKey)}</span>"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "app/[locale]/community/PageClient.tsx",
+        "line": 319,
+        "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(locale)",
+        "variable": "locale",
+        "type": "variable_key",
+        "file": "app/[locale]/leaderboard/error.tsx",
+        "line": 54,
+        "context": "{t(locale, 'errors.failedToLoadLeaderboard')}"
+      },
+      {
+        "pattern": "t(locale)",
+        "variable": "locale",
+        "type": "variable_key",
+        "file": "app/[locale]/leaderboard/error.tsx",
+        "line": 57,
+        "context": "{error.message || t(locale, 'errors.unableToLoadData')}"
+      },
+      {
+        "pattern": "t(locale)",
+        "variable": "locale",
+        "type": "variable_key",
+        "file": "app/[locale]/leaderboard/error.tsx",
+        "line": 64,
+        "context": "🔄 {t(locale, 'errors.tryAgainButton')}"
+      },
+      {
+        "pattern": "t(locale)",
+        "variable": "locale",
+        "type": "variable_key",
+        "file": "app/[locale]/profile/error.tsx",
+        "line": 54,
+        "context": "{t(locale, 'errors.failedToLoadProfile')}"
+      },
+      {
+        "pattern": "t(locale)",
+        "variable": "locale",
+        "type": "variable_key",
+        "file": "app/[locale]/profile/error.tsx",
+        "line": 57,
+        "context": "{error.message || t(locale, 'errors.unableToLoadData')}"
+      },
+      {
+        "pattern": "t(locale)",
+        "variable": "locale",
+        "type": "variable_key",
+        "file": "app/[locale]/profile/error.tsx",
+        "line": 64,
+        "context": "🔄 {t(locale, 'errors.tryAgainButton')}"
+      },
+      {
+        "pattern": "t(q)",
+        "variable": "q",
+        "type": "variable_key",
+        "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+        "line": 273,
+        "context": "<h3 className=\"text-lg font-bold text-neo-cyan mb-2\">{t(q)}</h3>"
+      },
+      {
+        "pattern": "t(a)",
+        "variable": "a",
+        "type": "variable_key",
+        "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
+        "line": 275,
+        "context": "{t(a)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/admin/InvalidWordsManager.tsx",
+        "line": 312,
+        "context": "return key ? (t(key) || REASON_FALLBACKS[reason] || reason) : reason;"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/admin/overview/MpModeBreakdown.tsx",
+        "line": 88,
+        "context": "{t(labelKey) || stat.mode}"
+      },
+      {
+        "pattern": "t(translationKey)",
+        "variable": "translationKey",
+        "type": "variable_key",
+        "file": "components/adventure/AdventureObjectives.tsx",
+        "line": 148,
+        "context": "const label = t(translationKey, { target: objective.target });"
+      },
+      {
+        "pattern": "t(themeDisplayKey)",
+        "variable": "themeDisplayKey",
+        "type": "variable_key",
+        "file": "components/adventure/AdventureThemeBanner.tsx",
+        "line": 40,
+        "context": "{t(themeDisplayKey)}"
+      },
+      {
+        "pattern": "t(gameModeDisplayKey)",
+        "variable": "gameModeDisplayKey",
+        "type": "variable_key",
+        "file": "components/adventure/AdventureThemeBanner.tsx",
+        "line": 45,
+        "context": "{t(gameModeDisplayKey)}"
+      },
+      {
+        "pattern": "t(currentTaunt)",
+        "variable": "currentTaunt",
+        "type": "variable_key",
+        "file": "components/adventure/BossDialogue.tsx",
+        "line": 62,
+        "context": "const translatedTaunt = t(currentTaunt) || currentTaunt;"
+      },
+      {
         "pattern": "t(currentTaunt)",
         "variable": "currentTaunt",
         "file": "components/adventure/BossDialogue.tsx",
         "line": 62,
         "context": "const translatedTaunt = t(currentTaunt) || currentTaunt;",
         "type": "variable_key"
+      },
+      {
+        "pattern": "t(bossName)",
+        "variable": "bossName",
+        "type": "variable_key",
+        "file": "components/adventure/BossHPBar.tsx",
+        "line": 63,
+        "context": "aria-label={`${t(bossName)} health: ${hpPercentage}%`}"
+      },
+      {
+        "pattern": "t(bossName)",
+        "variable": "bossName",
+        "type": "variable_key",
+        "file": "components/adventure/BossHPBar.tsx",
+        "line": 69,
+        "context": "{t(bossName)}"
+      },
+      {
+        "pattern": "t(translationKey)",
+        "variable": "translationKey",
+        "type": "variable_key",
+        "file": "components/adventure/HintMessage.tsx",
+        "line": 50,
+        "context": "{t(translationKey, params)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/adventure/LevelPreviewCard.tsx",
+        "line": 253,
+        "context": "{t(key)}"
+      },
+      {
+        "pattern": "t(messageKey)",
+        "variable": "messageKey",
+        "type": "variable_key",
+        "file": "components/adventure/LexiReaction.tsx",
+        "line": 152,
+        "context": "const message = t(messageKey);"
+      },
+      {
+        "pattern": "t(defaultKey)",
+        "variable": "defaultKey",
+        "type": "variable_key",
+        "file": "components/adventure/LexiReaction.tsx",
+        "line": 159,
+        "context": "const defaultMessage = t(defaultKey);"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/adventure/NextLevelPreview.tsx",
+        "line": 62,
+        "context": "<span>{t(key)}</span>"
+      },
+      {
+        "pattern": "t(dialogueKey)",
+        "variable": "dialogueKey",
+        "type": "variable_key",
+        "file": "components/adventure/StoryBeatCard.tsx",
+        "line": 26,
+        "context": "const fullText = t(dialogueKey);"
+      },
+      {
+        "pattern": "t(mechanicName)",
+        "variable": "mechanicName",
+        "type": "variable_key",
+        "file": "components/adventure/boss/BossMechanicWidget.tsx",
+        "line": 72,
+        "context": "{t(mechanicName) || mechanicName}"
+      },
+      {
+        "pattern": "t(currentTaunt)",
+        "variable": "currentTaunt",
+        "type": "variable_key",
+        "file": "components/adventure/boss/BossOverlay.tsx",
+        "line": 565,
+        "context": "dialogue={t(currentTaunt)}"
+      },
+      {
+        "pattern": "t(hintKey)",
+        "variable": "hintKey",
+        "type": "variable_key",
+        "file": "components/adventure/boss/ParryPrompt.tsx",
+        "line": 65,
+        "context": "{t(hintKey)}"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/adventure/boss/SegmentedHPBar.tsx",
+        "line": 144,
+        "context": "aria-label={t(labelKey)}"
+      },
+      {
+        "pattern": "t(bossName)",
+        "variable": "bossName",
+        "type": "variable_key",
+        "file": "components/adventure/boss/SegmentedHPBar.tsx",
+        "line": 331,
+        "context": "{t(bossName) || bossName}"
+      },
+      {
+        "pattern": "t(bossName)",
+        "variable": "bossName",
+        "type": "variable_key",
+        "file": "components/adventure/boss/SegmentedHPBar.tsx",
+        "line": 363,
+        "context": "aria-label={t('adventure.hpBar.healthLabel', { bossName: t(bossName) || bossName, percentage: hpPerc"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/adventure/boss/WeaknessBadge.tsx",
+        "line": 29,
+        "context": "aria-label={`${t('adventure.boss.combat.weakLabel')}: ${t(labelKey)}`}"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/adventure/boss/WeaknessBadge.tsx",
+        "line": 33,
+        "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(label)",
+        "variable": "label",
+        "type": "variable_key",
+        "file": "components/adventure/power-ups/PowerUpButton.tsx",
+        "line": 69,
+        "context": "const ariaLabel = `${t(label)} - ${"
+      },
+      {
+        "pattern": "t(label)",
+        "variable": "label",
+        "type": "variable_key",
+        "file": "components/adventure/power-ups/PowerUpButton.tsx",
+        "line": 113,
+        "context": "label={t(label)}"
+      },
+      {
+        "pattern": "t(mechanicKey)",
+        "variable": "mechanicKey",
+        "type": "variable_key",
+        "file": "components/adventure/themed/ModifierBadge.tsx",
+        "line": 80,
+        "context": "{t(mechanicKey) || mechanic}"
+      },
+      {
+        "pattern": "t(mechanicKey)",
+        "variable": "mechanicKey",
+        "type": "variable_key",
+        "file": "components/adventure/themed/ModifierBadge.tsx",
+        "line": 97,
+        "context": "{t(mechanicKey) || mechanic}"
       },
       {
         "pattern": "t(mechanicKey)",
@@ -225,12 +2613,108 @@
         "type": "variable_key"
       },
       {
+        "pattern": "t(modeDisplayKey)",
+        "variable": "modeDisplayKey",
+        "type": "variable_key",
+        "file": "components/adventure/ui/GameHeader.tsx",
+        "line": 151,
+        "context": "{t(modeDisplayKey)}"
+      },
+      {
+        "pattern": "t(subtitleKey)",
+        "variable": "subtitleKey",
+        "type": "variable_key",
+        "file": "components/auth/FirstWinSignupModal.tsx",
+        "line": 164,
+        "context": "{t(subtitleKey)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/auth/MultiplayerSignupSheet.tsx",
+        "line": 183,
+        "context": "{t(key)}"
+      },
+      {
+        "pattern": "t(titleKey)",
+        "variable": "titleKey",
+        "type": "variable_key",
+        "file": "components/auth/shared/BenefitsList.tsx",
+        "line": 45,
+        "context": "{t(titleKey)}"
+      },
+      {
         "pattern": "t(titleKey)",
         "variable": "titleKey",
         "file": "components/auth/shared/BenefitsList.tsx",
         "line": 45,
         "context": "{t(titleKey)}",
         "type": "variable_key"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/blast/legacy/BlastGame.tsx",
+        "line": 361,
+        "context": "const tSafe = useCallback((key: string) => t(key) || key, [t]);"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/blast/legacy/BlastGame.tsx",
+        "line": 436,
+        "context": "const tAdapter = useCallback((key: string) => t(key) || undefined, [t]);"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/blast/legacy/BlastMPLeaderboard.tsx",
+        "line": 75,
+        "context": "const label = (key: string, fallback: string) => t?.(key) || fallback;"
+      },
+      {
+        "pattern": "t(tileNameKey)",
+        "variable": "tileNameKey",
+        "type": "variable_key",
+        "file": "components/blast/legacy/BlastWaveIntro.tsx",
+        "line": 134,
+        "context": "const tileName = t(tileNameKey) || tile;"
+      },
+      {
+        "pattern": "t(tileDescKey)",
+        "variable": "tileDescKey",
+        "type": "variable_key",
+        "file": "components/blast/legacy/BlastWaveIntro.tsx",
+        "line": 135,
+        "context": "const tileDesc = t(tileDescKey) || '';"
+      },
+      {
+        "pattern": "t(colorKey)",
+        "variable": "colorKey",
+        "type": "variable_key",
+        "file": "components/blast/legacy/utils/blastObjectiveUtils.ts",
+        "line": 69,
+        "context": "const colorLabel: string = colorKey ? (t(colorKey) || objective.colorTag || '') : '';"
+      },
+      {
+        "pattern": "t(quipKey)",
+        "variable": "quipKey",
+        "type": "variable_key",
+        "file": "components/blast/v2/BlastWordCelebration.tsx",
+        "line": 229,
+        "context": "quip.textContent = t(quipKey, tier === 'mega' ? 'MEGA COMBO!' : 'NICE CHAIN!');"
+      },
+      {
+        "pattern": "t(affirmKey)",
+        "variable": "affirmKey",
+        "type": "variable_key",
+        "file": "components/cosy/QuietCelebrationLayer.tsx",
+        "line": 85,
+        "context": "<span className=\"font-neo-display text-lg\">{t(affirmKey)}</span>"
       },
       {
         "pattern": "t(affirmKey)",
@@ -241,6 +2725,86 @@
         "type": "variable_key"
       },
       {
+        "pattern": "t(descKey)",
+        "variable": "descKey",
+        "type": "variable_key",
+        "file": "components/daily/WeeklyChestInfoModal.tsx",
+        "line": 100,
+        "context": "<p className=\"text-xs text-neo-white font-bold leading-snug\">{t(descKey)}</p>"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/daily/survival/quitDialogConfig.ts",
+        "line": 54,
+        "context": "const value = t(key, fallback);"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/education/ClassroomSetupStep.tsx",
+        "line": 180,
+        "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/education/ClassroomSetupStep.tsx",
+        "line": 215,
+        "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/education/achievements/AchievementGrid.tsx",
+        "line": 78,
+        "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(nameKey)",
+        "variable": "nameKey",
+        "type": "variable_key",
+        "file": "components/education/achievements/AchievementGrid.tsx",
+        "line": 103,
+        "context": "const displayName = isSecret && !isUnlocked ? '???' : t(nameKey);"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/game/ComboMilestoneAnnouncement.tsx",
+        "line": 34,
+        "context": "setMilestone(t(key));"
+      },
+      {
+        "pattern": "t(messageKey)",
+        "variable": "messageKey",
+        "type": "variable_key",
+        "file": "components/game/in-game/hooks/useSocketFeedback.ts",
+        "line": 109,
+        "context": "message: t(messageKey) || 'Invalid word',"
+      },
+      {
+        "pattern": "t(errorKey)",
+        "variable": "errorKey",
+        "type": "variable_key",
+        "file": "components/game/in-game/hooks/useWordSubmission.ts",
+        "line": 127,
+        "context": "msg = t(errorKey) || errorKey;"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/grid/InputModeIndicator.tsx",
+        "line": 42,
+        "context": "{t(labelKey)}"
+      },
+      {
         "pattern": "t(labelKey)",
         "variable": "labelKey",
         "file": "components/grid/InputModeIndicator.tsx",
@@ -249,20 +2813,196 @@
         "type": "variable_key"
       },
       {
-        "pattern": "t(headerKey)",
-        "variable": "headerKey",
-        "file": "components/multiplayer/desktop/insights/GoalBanner.tsx",
-        "line": 28,
-        "context": "<ThemedPanel mode={mode} variant=\"rail\" header={t(headerKey)} testId=\"goal-banner\">",
-        "type": "variable_key"
+        "pattern": "t(messageKey)",
+        "variable": "messageKey",
+        "type": "variable_key",
+        "file": "components/growth/ReengagementBanner.tsx",
+        "line": 104,
+        "context": "{t(messageKey)}"
       },
       {
-        "pattern": "t(message)",
-        "variable": "message",
-        "file": "components/practice/PracticeHelperBubble.tsx",
+        "pattern": "t(twistTitleKey)",
+        "variable": "twistTitleKey",
+        "type": "variable_key",
+        "file": "components/landing/LandingSeasonHero.tsx",
+        "line": 28,
+        "context": "const twistTitleLocalized = twist ? t(twistTitleKey) : '';"
+      },
+      {
+        "pattern": "t(tierKey)",
+        "variable": "tierKey",
+        "type": "variable_key",
+        "file": "components/leagues/LeagueCard.tsx",
+        "line": 52,
+        "context": "{t(tierKey)}"
+      },
+      {
+        "pattern": "t(nameError)",
+        "variable": "nameError",
+        "type": "variable_key",
+        "file": "components/multiplayer/CreateRoomModal.tsx",
+        "line": 231,
+        "context": "{t(nameError)}"
+      },
+      {
+        "pattern": "t(nameError)",
+        "variable": "nameError",
+        "type": "variable_key",
+        "file": "components/multiplayer/JoinRoomModal.tsx",
+        "line": 177,
+        "context": "{t(nameError)}"
+      },
+      {
+        "pattern": "t(nameError)",
+        "variable": "nameError",
+        "type": "variable_key",
+        "file": "components/multiplayer/PlayerProfileCard.tsx",
+        "line": 135,
+        "context": "{t(nameError)}"
+      },
+      {
+        "pattern": "t(taglineKey)",
+        "variable": "taglineKey",
+        "type": "variable_key",
+        "file": "components/multiplayer/SeasonBanner.tsx",
+        "line": 29,
+        "context": "const taglineRaw = t(taglineKey);"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/native/OfflineFallback.tsx",
+        "line": 109,
+        "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(confirmLabelKey)",
+        "variable": "confirmLabelKey",
+        "type": "variable_key",
+        "file": "components/playerStyle/StylePicker.tsx",
+        "line": 221,
+        "context": "{t(confirmLabelKey)}"
+      },
+      {
+        "pattern": "t(tipKey)",
+        "variable": "tipKey",
+        "type": "variable_key",
+        "file": "components/practice/PracticeInstructions.tsx",
+        "line": 182,
+        "context": "<span>{t(tipKey)}</span>"
+      },
+      {
+        "pattern": "t(tipKey)",
+        "variable": "tipKey",
+        "type": "variable_key",
+        "file": "components/practice/PracticeTutorialSheet.tsx",
+        "line": 213,
+        "context": "{t(tipKey)}"
+      },
+      {
+        "pattern": "t(nameKey)",
+        "variable": "nameKey",
+        "type": "variable_key",
+        "file": "components/quests/QuestCard.tsx",
         "line": 57,
-        "context": "{t(message)}",
-        "type": "variable_key"
+        "context": "aria-label={`${t(nameKey)}${completed ? ` - ${t('quests.done')}` : ''}`}"
+      },
+      {
+        "pattern": "t(nameKey)",
+        "variable": "nameKey",
+        "type": "variable_key",
+        "file": "components/quests/QuestCard.tsx",
+        "line": 108,
+        "context": "{t(nameKey)}"
+      },
+      {
+        "pattern": "t(descKey)",
+        "variable": "descKey",
+        "type": "variable_key",
+        "file": "components/quests/QuestCard.tsx",
+        "line": 116,
+        "context": "{t(descKey)}"
+      },
+      {
+        "pattern": "t(tierNameKey)",
+        "variable": "tierNameKey",
+        "type": "variable_key",
+        "file": "components/ranked/RankedTierBadge.tsx",
+        "line": 27,
+        "context": "<span style={{ color: tier.color }}>{t(tierNameKey)}</span>"
+      },
+      {
+        "pattern": "t(tierNameKey)",
+        "variable": "tierNameKey",
+        "type": "variable_key",
+        "file": "components/ranked/RankedTierBadge.tsx",
+        "line": 41,
+        "context": "{t(tierNameKey)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/results/GameFeedbackCard.tsx",
+        "line": 113,
+        "context": "{t(key)}"
+      },
+      {
+        "pattern": "t(translationKey)",
+        "variable": "translationKey",
+        "type": "variable_key",
+        "file": "components/results/PlayerArchetypeBadge.tsx",
+        "line": 235,
+        "context": "const translated = t(translationKey);"
+      },
+      {
+        "pattern": "t(translationKey)",
+        "variable": "translationKey",
+        "type": "variable_key",
+        "file": "components/results/PlayerArchetypeBadge.tsx",
+        "line": 250,
+        "context": "const translated = t(translationKey);"
+      },
+      {
+        "pattern": "t(translationKey)",
+        "variable": "translationKey",
+        "type": "variable_key",
+        "file": "components/results/PlayerArchetypeBadge.tsx",
+        "line": 256,
+        "context": "const translated = t(translationKey);"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/results/ResultsHeroSection.tsx",
+        "line": 109,
+        "context": "return formatRankOrdinal(rank, (key, params) => t(key, params) ?? key);"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/results/ResultsMainContent.tsx",
+        "line": 539,
+        "context": "return t(key, params);"
+      },
+      {
+        "pattern": "t(hintKey)",
+        "variable": "hintKey",
+        "type": "variable_key",
+        "file": "components/sealedBid/SealedBidTable.tsx",
+        "line": 141,
+        "context": "{t(hintKey)}"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/seasons/SeasonLeaderboardTabs.tsx",
+        "line": 65,
+        "context": "{t(labelKey)}"
       },
       {
         "pattern": "t(labelKey)",
@@ -271,6 +3011,214 @@
         "line": 65,
         "context": "{t(labelKey)}",
         "type": "variable_key"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/singleplayer/game/components/DesktopGameLayout.tsx",
+        "line": 160,
+        "context": "const tSafe = React.useCallback((key: string) => t(key) || key, [t]);"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/singleplayer/game/components/LandscapeGameLayout.tsx",
+        "line": 160,
+        "context": "const tSafe = React.useCallback((key: string) => t(key) || key, [t]);"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/singleplayer/game/components/PortraitGameLayout.tsx",
+        "line": 181,
+        "context": "const tSafe = React.useCallback((key: string) => t(key) || key, [t]);"
+      },
+      {
+        "pattern": "t(errorKey)",
+        "variable": "errorKey",
+        "type": "variable_key",
+        "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
+        "line": 296,
+        "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
+      },
+      {
+        "pattern": "t(errorKey)",
+        "variable": "errorKey",
+        "type": "variable_key",
+        "file": "components/singleplayer/game/hooks/useSinglePlayerCore.ts",
+        "line": 296,
+        "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
+      },
+      {
+        "pattern": "t(errorKey)",
+        "variable": "errorKey",
+        "type": "variable_key",
+        "file": "components/singleplayer/game/hooks/useWordSubmission.ts",
+        "line": 192,
+        "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
+      },
+      {
+        "pattern": "t(errorKey)",
+        "variable": "errorKey",
+        "type": "variable_key",
+        "file": "components/singleplayer/game/hooks/useWordSubmission.ts",
+        "line": 192,
+        "context": "const msg = (params ? t(errorKey, params) : t(errorKey)) || errorKey;"
+      },
+      {
+        "pattern": "t(encouragementKey)",
+        "variable": "encouragementKey",
+        "type": "variable_key",
+        "file": "components/singleplayer/results/PracticeResults.tsx",
+        "line": 309,
+        "context": "{t(encouragementKey)}"
+      },
+      {
+        "pattern": "t(encouragementKey)",
+        "variable": "encouragementKey",
+        "type": "variable_key",
+        "file": "components/singleplayer/results/PracticeResults.tsx",
+        "line": 313,
+        "context": "text={t(encouragementKey)}"
+      },
+      {
+        "pattern": "t(subtitleKey)",
+        "variable": "subtitleKey",
+        "type": "variable_key",
+        "file": "components/singleplayer/results/PracticeResults.tsx",
+        "line": 365,
+        "context": "{t(subtitleKey)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "components/singleplayer/results/components/YourWordsSection.tsx",
+        "line": 37,
+        "context": "const result = t(key);"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "components/ugc/CreatorProfileStats.tsx",
+        "line": 75,
+        "context": "{t(labelKey)}"
+      },
+      {
+        "pattern": "t(titleKey)",
+        "variable": "titleKey",
+        "type": "variable_key",
+        "file": "components/ugc/UGCFeaturedStrip.tsx",
+        "line": 88,
+        "context": "{t(titleKey)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "hooks/useValidation.ts",
+        "line": 41,
+        "context": "toast.error(t(key) || key);"
+      },
+      {
+        "pattern": "t(errorKey)",
+        "variable": "errorKey",
+        "type": "variable_key",
+        "file": "hooks/useWordSubmission.ts",
+        "line": 339,
+        "context": "const msg = params ? t(errorKey, params) : t(errorKey);"
+      },
+      {
+        "pattern": "t(errorKey)",
+        "variable": "errorKey",
+        "type": "variable_key",
+        "file": "hooks/useWordSubmission.ts",
+        "line": 339,
+        "context": "const msg = params ? t(errorKey, params) : t(errorKey);"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "host/components/pre-game/AdvancedSettingsModal.tsx",
+        "line": 187,
+        "context": "aria-label={t(labelKey)}"
+      },
+      {
+        "pattern": "t(labelKey)",
+        "variable": "labelKey",
+        "type": "variable_key",
+        "file": "host/components/pre-game/AdvancedSettingsModal.tsx",
+        "line": 196,
+        "context": "<span>{t(labelKey)}</span>"
+      },
+      {
+        "pattern": "t(nameKey)",
+        "variable": "nameKey",
+        "type": "variable_key",
+        "file": "host/components/pre-game/BattleModeCard.tsx",
+        "line": 187,
+        "context": "{t(nameKey)}"
+      },
+      {
+        "pattern": "t(presetDescKey)",
+        "variable": "presetDescKey",
+        "type": "variable_key",
+        "file": "host/components/pre-game/PresetInfoDrawer.tsx",
+        "line": 73,
+        "context": "<p className=\"text-sm text-neo-black/70\">{t(presetDescKey)}</p>"
+      },
+      {
+        "pattern": "t(nameKey)",
+        "variable": "nameKey",
+        "type": "variable_key",
+        "file": "host/components/pre-game/desktop/SettingsPanel.tsx",
+        "line": 117,
+        "context": "{t(nameKey)}"
+      },
+      {
+        "pattern": "t(descKey)",
+        "variable": "descKey",
+        "type": "variable_key",
+        "file": "host/components/pre-game/desktop/SettingsPanel.tsx",
+        "line": 120,
+        "context": "{t(descKey)}"
+      },
+      {
+        "pattern": "t(modeBadgeKey)",
+        "variable": "modeBadgeKey",
+        "type": "variable_key",
+        "file": "host/components/tv-broadcast/TvActivityPanel.tsx",
+        "line": 392,
+        "context": "{t(modeBadgeKey)}"
+      },
+      {
+        "pattern": "t(quip)",
+        "variable": "quip",
+        "type": "variable_key",
+        "file": "host/components/tv-results/TvResultsPlayerSpotlight.tsx",
+        "line": 152,
+        "context": "{t(quip)}"
+      },
+      {
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "lib/adventure/objectiveProgress.ts",
+        "line": 36,
+        "context": "return t(key, { target: objective.target });"
+      },
+      {
+        "pattern": "t(defaultKey)",
+        "variable": "defaultKey",
+        "type": "variable_key",
+        "file": "lib/multiplayer/resolveHostLeftMessage.ts",
+        "line": 31,
+        "context": "if (defaultKey) return t(defaultKey);"
       },
       {
         "pattern": "t(default)",
@@ -297,84 +3245,28 @@
         "type": "variable_key"
       },
       {
-        "pattern": "t(this)",
-        "variable": "this",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 11,
-        "context": "*/Symbol.metadata??=Symbol(\"metadata\"),d.litPropertyMetadata??=new WeakMap;let y=class extends HTMLE",
-        "type": "variable_key"
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "lib/tvBroadcast/modeLabel.ts",
+        "line": 22,
+        "context": "if (key) return t(key);"
       },
       {
-        "pattern": "t(this)",
-        "variable": "this",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 48,
-        "context": "const pt=\"183\",At=1,gt=3,mt=0,ft=1,bt=2,vt=100,yt=101,xt=102,_t=200,Et=201,St=202,Ct=203,wt=204,Mt=2",
-        "type": "variable_key"
+        "pattern": "t(modeKey)",
+        "variable": "modeKey",
+        "type": "variable_key",
+        "file": "shared/utils/shareResultGenerator.ts",
+        "line": 36,
+        "context": "let header = t(modeKey);"
       },
       {
-        "pattern": "t(this)",
-        "variable": "this",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 48,
-        "context": "const pt=\"183\",At=1,gt=3,mt=0,ft=1,bt=2,vt=100,yt=101,xt=102,_t=200,Et=201,St=202,Ct=203,wt=204,Mt=2",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(e)",
-        "variable": "e",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 48,
-        "context": "const pt=\"183\",At=1,gt=3,mt=0,ft=1,bt=2,vt=100,yt=101,xt=102,_t=200,Et=201,St=202,Ct=203,wt=204,Mt=2",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(s)",
-        "variable": "s",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 552,
-        "context": "</div>`;var tp=function(){var t=new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,3,2,0,0,5,3,1,0,",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(e)",
-        "variable": "e",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 552,
-        "context": "</div>`;var tp=function(){var t=new Uint8Array([0,97,115,109,1,0,0,0,1,4,1,96,0,0,3,3,2,0,0,5,3,1,0,",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(e)",
-        "variable": "e",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 1008,
-        "context": "*/const f_=new vn,b_=new vn,v_=new vn,y_=new class{constructor(t,e,i=0,n=1/0){this.ray=new Us(t,e),t",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(n)",
-        "variable": "n",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 1008,
-        "context": "*/const f_=new vn,b_=new vn,v_=new vn,y_=new class{constructor(t,e,i=0,n=1/0){this.ray=new Us(t,e),t",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(n)",
-        "variable": "n",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 1008,
-        "context": "*/const f_=new vn,b_=new vn,v_=new vn,y_=new class{constructor(t,e,i=0,n=1/0){this.ray=new Us(t,e),t",
-        "type": "variable_key"
-      },
-      {
-        "pattern": "t(e)",
-        "variable": "e",
-        "file": "public/vendor/model-viewer.min.js",
-        "line": 1036,
-        "context": "*/var C_,w_,M_,I_,T_,B_,R_,D_,L_,P_,F_,U_,N_,O_,k_,Q_=function(t,e,i,n){for(var r,s=arguments.length",
-        "type": "variable_key"
+        "pattern": "t(key)",
+        "variable": "key",
+        "type": "variable_key",
+        "file": "utils/socketErrorMessage.ts",
+        "line": 25,
+        "context": "const translated = t(key);"
       }
     ]
   },
@@ -915,14 +3807,6 @@
       "wordHunt.score.mpResults.boardCleared",
       "admin.welcome",
       "admin.nav.players",
-      "admin.teacherAccess.count.pending",
-      "admin.teacherAccess.count.approved",
-      "admin.teacherAccess.count.declined",
-      "admin.teacherAccess.count.total",
-      "admin.teacherAccess.approveSuccess",
-      "admin.teacherAccess.declineSuccess",
-      "admin.teacherAccess.approveError",
-      "admin.teacherAccess.declineError",
       "admin.sidebar.guests",
       "admin.sidebar.wordCraft",
       "admin.invalidWords.word",
@@ -1218,14 +4102,6 @@
       "wordHunt.score.mpResults.boardCleared",
       "admin.welcome",
       "admin.nav.players",
-      "admin.teacherAccess.count.pending",
-      "admin.teacherAccess.count.approved",
-      "admin.teacherAccess.count.declined",
-      "admin.teacherAccess.count.total",
-      "admin.teacherAccess.approveSuccess",
-      "admin.teacherAccess.declineSuccess",
-      "admin.teacherAccess.approveError",
-      "admin.teacherAccess.declineError",
       "admin.sidebar.guests",
       "admin.sidebar.wordCraft",
       "admin.moderation.investigate",
@@ -1532,14 +4408,6 @@
       "wordHunt.score.mpResults.boardCleared",
       "admin.welcome",
       "admin.nav.players",
-      "admin.teacherAccess.count.pending",
-      "admin.teacherAccess.count.approved",
-      "admin.teacherAccess.count.declined",
-      "admin.teacherAccess.count.total",
-      "admin.teacherAccess.approveSuccess",
-      "admin.teacherAccess.declineSuccess",
-      "admin.teacherAccess.approveError",
-      "admin.teacherAccess.declineError",
       "admin.sidebar.guests",
       "admin.sidebar.wordCraft",
       "admin.invalidWords.word",
@@ -1910,14 +4778,6 @@
       "wordHunt.score.mpResults.boardCleared",
       "admin.welcome",
       "admin.nav.players",
-      "admin.teacherAccess.count.pending",
-      "admin.teacherAccess.count.approved",
-      "admin.teacherAccess.count.declined",
-      "admin.teacherAccess.count.total",
-      "admin.teacherAccess.approveSuccess",
-      "admin.teacherAccess.declineSuccess",
-      "admin.teacherAccess.approveError",
-      "admin.teacherAccess.declineError",
       "admin.sidebar.guests",
       "admin.sidebar.wordCraft",
       "admin.invalidWords.word",
