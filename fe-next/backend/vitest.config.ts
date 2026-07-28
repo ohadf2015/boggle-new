@@ -221,12 +221,10 @@ export default defineConfig({
     // one fork per CPU — 48 on the nightly box against a pids.max=1000
     // cgroup. Cap workers like the frontend config does.
     maxWorkers: 4,
-    poolOptions: {
-      forks: {
-        execArgv: ['--max-old-space-size=4096'],
-      },
-    },
-    useAtomics: true,
+    // NOTE: vitest 4 removed `poolOptions` — per-fork execArgv is no longer
+    // configurable here. If the nightly box needs --max-old-space-size for
+    // fork workers, set NODE_OPTIONS='--max-old-space-size=4096' in the
+    // nightly runner script instead.
     fileParallelism: true,
     clearMocks: true,
     restoreMocks: false,
