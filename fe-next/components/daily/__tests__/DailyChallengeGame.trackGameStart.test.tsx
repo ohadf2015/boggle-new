@@ -16,10 +16,23 @@ vi.mock('@/utils/growthTracking', () => ({
 }));
 
 vi.mock('framer-motion', () => {
+  // Cache one component per motion tag. Returning a fresh arrow component on
+  // every Proxy access gives React a new component type each render, which
+  // forces an unmount/remount of the whole subtree — ref callbacks fire with
+  // null then the node again, and state-mirroring refs (GridComponent's
+  // setGridNode) loop into "Maximum update depth exceeded".
+  const cache = new Map<string | symbol, React.ComponentType<React.PropsWithChildren<Record<string, unknown>>>>();
   const motion = new Proxy({}, {
-    get: () => ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
-      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...rest } = props as Record<string, unknown>;
-      return <div {...rest}>{children}</div>;
+    get: (_target, tag) => {
+      let Component = cache.get(tag);
+      if (!Component) {
+        Component = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+          const { initial, animate, exit, whileHover, whileTap, transition, variants, ...rest } = props as Record<string, unknown>;
+          return <div {...rest}>{children}</div>;
+        };
+        cache.set(tag, Component);
+      }
+      return Component;
     },
   });
   return {

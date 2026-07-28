@@ -216,6 +216,17 @@ export default defineConfig({
     ],
     testTimeout: 30000,
     pool: 'forks',
+    // Root cause of the chronic backend flakiness (uv_thread_create aborts,
+    // pino thread-stream EAGAIN, whole-file crashes): pool defaults to
+    // one fork per CPU — 48 on the nightly box against a pids.max=1000
+    // cgroup. Cap workers like the frontend config does.
+    maxWorkers: 4,
+    poolOptions: {
+      forks: {
+        execArgv: ['--max-old-space-size=4096'],
+      },
+    },
+    useAtomics: true,
     fileParallelism: true,
     clearMocks: true,
     restoreMocks: false,

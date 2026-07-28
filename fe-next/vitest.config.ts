@@ -143,8 +143,10 @@ export default defineConfig({
     // spawning, wedging every 2026-07-13/07-14 gate tier. 4×5120=20GB leaves
     // headroom. Raise again only if a real single-file OOM reappears (shard-6
     // history: heap size wasn't the cause there — a teardown crash was).
-    maxForks: 4,
-    minForks: 2,
+    // NOTE: Vitest 4 removed maxForks/minForks — these were silently ignored,
+    // letting the pool spawn one fork per CPU (48) and blow the box's
+    // pids.max=1000 cgroup (EAGAIN spawn / uv_thread_create aborts).
+    maxWorkers: 4,
     poolOptions: {
       forks: {
         execArgv: ['--max-old-space-size=5120'],

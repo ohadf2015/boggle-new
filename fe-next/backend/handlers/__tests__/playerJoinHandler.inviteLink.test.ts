@@ -128,7 +128,6 @@ vi.mock('../../modules/communityWordManager', () => ({
 }));
 
 vi.mock('../../modules/communityWordHybridValidation', () => ({
-  setPendingVotesRef: vi.fn(),
   shouldUseAIValidation: vi.fn(),
   SELF_HEALING_CONFIG: {},
 }));

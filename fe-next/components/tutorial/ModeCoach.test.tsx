@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, act, fireEvent } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { ModeCoach } from './ModeCoach';
 import { coachStorageKey } from '@/lib/tutorial/modeCoachStore';
@@ -26,6 +26,10 @@ vi.mock('framer-motion', () => {
   };
 });
 
+// Contract since commit 87653de ("remove blocking tutorial flow"): the coach
+// is disabled — ModeCoach renders nothing in every state. It still marks the
+// mode as seen and fires onShown once so a future re-enable won't re-pop for
+// existing players and cross-device DB backfill keeps working.
 describe('ModeCoach', () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -35,17 +39,17 @@ describe('ModeCoach', () => {
     vi.useRealTimers();
   });
 
-  it('shows the mode title + first caption on a first visit', () => {
+  it('renders nothing on a first visit — even after the settle delay', () => {
     render(<ModeCoach mode="classic" />);
     expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
     act(() => {
       vi.advanceTimersByTime(700);
     });
-    expect(screen.getByText('modeCoach.classic.title')).toBeInTheDocument();
-    expect(screen.getByText('modeCoach.classic.step1')).toBeInTheDocument();
+    expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
+    expect(screen.queryByText('modeCoach.classic.step1')).toBeNull();
   });
 
-  it('renders nothing at all when already seen (show-once)', () => {
+  it('renders nothing when already seen (show-once)', () => {
     window.localStorage.setItem(coachStorageKey('classic'), '1');
     render(<ModeCoach mode="classic" />);
     act(() => {
@@ -54,53 +58,25 @@ describe('ModeCoach', () => {
     expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
   });
 
-  it('does NOT dismiss when the user taps inside the card (so Next/Skip work)', () => {
-    render(<ModeCoach mode="classic" graceMs={300} />);
+  it('marks the mode as seen and fires onShown once on first visit', () => {
+    const onShown = vi.fn();
+    render(<ModeCoach mode="wordHunt" onShown={onShown} />);
     act(() => {
-      vi.advanceTimersByTime(700 + 300); // visible + grace armed
+      vi.advanceTimersByTime(700);
     });
-    const next = screen.getByText('modeCoach.next');
-    // Real tap = a pointerdown that bubbles to the capture-phase window listener.
-    act(() => {
-      next.dispatchEvent(new Event('pointerdown', { bubbles: true }));
-    });
-    // Still open — a tap on the card must not auto-dismiss it.
-    expect(screen.getByText('modeCoach.classic.title')).toBeInTheDocument();
+    expect(window.localStorage.getItem(coachStorageKey('wordHunt'))).toBe('1');
+    expect(onShown).toHaveBeenCalledTimes(1);
+    expect(screen.queryByText('modeCoach.wordHunt.title')).toBeNull();
   });
 
-  it('DOES dismiss when the user taps the board behind it (after grace)', () => {
+  it('board taps after the grace period change nothing (still hidden)', () => {
     render(<ModeCoach mode="classic" graceMs={300} />);
     act(() => {
-      vi.advanceTimersByTime(700); // settle → visible (arm timer now scheduled)
+      vi.advanceTimersByTime(700 + 300);
     });
-    act(() => {
-      vi.advanceTimersByTime(400); // grace elapsed → listener armed
-    });
-    expect(screen.getByText('modeCoach.classic.title')).toBeInTheDocument();
     act(() => {
       document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }));
     });
     expect(screen.queryByText('modeCoach.classic.title')).toBeNull();
-  });
-
-  it('reaches the last step + scoreTip via Next (multi-step not collapsed)', () => {
-    render(<ModeCoach mode="classic" graceMs={300} />);
-    act(() => {
-      vi.advanceTimersByTime(700 + 300);
-    });
-    // classic = 2 steps; advancing should reveal step2 + the score tip, not close.
-    fireEvent.click(screen.getByText('modeCoach.next'));
-    expect(screen.getByText('modeCoach.classic.step2')).toBeInTheDocument();
-    expect(screen.getByText('modeCoach.classic.scoreTip')).toBeInTheDocument();
-  });
-
-  it('wordHunt reaches a 3rd step teaching the free-bonus-word mechanic', () => {
-    render(<ModeCoach mode="wordHunt" graceMs={300} />);
-    act(() => {
-      vi.advanceTimersByTime(700 + 300);
-    });
-    fireEvent.click(screen.getByText('modeCoach.next')); // step1 -> step2
-    fireEvent.click(screen.getByText('modeCoach.next')); // step2 -> step3
-    expect(screen.getByText('modeCoach.wordHunt.step3')).toBeInTheDocument();
   });
 });

@@ -56,14 +56,16 @@ type LanguageCode = 'en' | 'he' | 'sv' | 'ja' | 'es';
 // Track AI validation usage per game
 const gameAIValidationCount = new Map<string, number>();
 
-// Reference to pending votes cache (set by communityWordManager)
-let wordsPendingVotesRef: Record<LanguageCode, Map<string, { netScore: number }>> | null = null;
-
-/**
- * Set reference to the pending votes cache from communityWordManager
- */
-export function setPendingVotesRef(ref: Record<LanguageCode, Map<string, { netScore: number }>>): void {
-  wordsPendingVotesRef = ref;
+// Reference to pending votes cache, resolved lazily from communityWordManager.
+// A module-scope `setPendingVotesRef(...)` call from communityWordManager raced
+// the circular import (manager ↔ hybridValidation) and hit this binding in its
+// TDZ under some shard orders — "Cannot access before initialization".
+let _wordsPendingVotes: Record<LanguageCode, Map<string, { netScore: number }>> | null = null;
+function getWordsPendingVotes(): Record<LanguageCode, Map<string, { netScore: number }>> {
+  if (!_wordsPendingVotes) {
+    _wordsPendingVotes = require('./communityWordManager').wordsPendingVotes;
+  }
+  return _wordsPendingVotes!;
 }
 
 /**
@@ -146,8 +148,9 @@ export function shouldUseAIValidation(
     };
   }
 
-  if (wordsPendingVotesRef) {
-    const pendingCache = wordsPendingVotesRef[lang];
+  const wordsPendingVotes = getWordsPendingVotes();
+  if (wordsPendingVotes) {
+    const pendingCache = wordsPendingVotes[lang];
     if (pendingCache) {
       const cached = pendingCache.get(normalized);
       if (cached) {

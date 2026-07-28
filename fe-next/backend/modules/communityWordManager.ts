@@ -33,7 +33,6 @@ export {
   getRemainingAIValidations, filterWordsForAIValidation,
   resetGameAIValidationCount, cleanupGameTracking,
 } from './communityWordHybridValidation';
-import { setPendingVotesRef } from './communityWordHybridValidation';
 
 export const AI_VOTE_POINTS = 4;
 // Bumped 6 → 8 on 2026-05-01 for collusion defense; matches DB trigger
@@ -45,10 +44,9 @@ export const VALID_THRESHOLD = 0;
 const communityValidWords: Record<LanguageCode, Set<string>> = {
   en: new Set(), he: new Set(), sv: new Set(), ja: new Set(), es: new Set()
 };
-const wordsPendingVotes: Record<LanguageCode, Map<string, PendingWordData>> = {
+export const wordsPendingVotes: Record<LanguageCode, Map<string, PendingWordData>> = {
   en: new Map(), he: new Map(), sv: new Map(), ja: new Map(), es: new Map()
 };
-setPendingVotesRef(wordsPendingVotes);
 
 let loaded = false;
 

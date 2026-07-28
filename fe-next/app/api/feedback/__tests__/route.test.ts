@@ -53,9 +53,12 @@ vi.mock('@/lib/telegram', () => ({
 }));
 
 // Resend email
-const mockEmailSend = vi.fn();
+const mockEmailSend = vi.hoisted(() => vi.fn());
 vi.mock('resend', () => ({
-  Resend: vi.fn(() => ({ emails: { send: mockEmailSend } })),
+  // Must be a real constructor: route.ts does `new Resend(...)` at module scope.
+  Resend: class {
+    emails = { send: mockEmailSend };
+  },
 }));
 
 // Rate limiter — allow by default

@@ -7,6 +7,9 @@ vi.mock('@/lib/analytics/lazyPosthog', () => ({
   default: { capture: (...args: unknown[]) => capture(...args) },
 }));
 
+// Contract since commit 87653de: the coach is disabled and never shows, so it
+// must be analytics-silent — no mode_coach_shown and no mode_coach_dismissed,
+// no matter how the user (or a stray caller) pokes dismiss/advance.
 describe('useModeCoach analytics', () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -17,7 +20,7 @@ describe('useModeCoach analytics', () => {
     vi.useRealTimers();
   });
 
-  function show(mode: 'classic' = 'classic') {
+  function mount(mode: 'classic' = 'classic') {
     const view = renderHook(() => useModeCoach(mode));
     act(() => {
       vi.advanceTimersByTime(700);
@@ -25,10 +28,9 @@ describe('useModeCoach analytics', () => {
     return view;
   }
 
-  it('emits mode_coach_shown once when the coach first appears', () => {
-    show();
-    expect(capture).toHaveBeenCalledWith('mode_coach_shown', { mode: 'classic' });
-    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_shown')).toHaveLength(1);
+  it('emits no mode_coach_shown on a first visit (coach never appears)', () => {
+    mount();
+    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_shown')).toHaveLength(0);
   });
 
   it('emits nothing on a repeat visit (already seen)', () => {
@@ -40,41 +42,19 @@ describe('useModeCoach analytics', () => {
     expect(capture).not.toHaveBeenCalled();
   });
 
-  it('emits mode_coach_dismissed with the given reason on dismiss', () => {
-    const { result } = show();
+  it('emits no mode_coach_dismissed on dismiss', () => {
+    const { result } = mount();
     act(() => result.current.dismiss('skip'));
-    expect(capture).toHaveBeenCalledWith('mode_coach_dismissed', {
-      mode: 'classic',
-      reason: 'skip',
-      step: 0,
-    });
-  });
-
-  it('defaults the dismiss reason to skip', () => {
-    const { result } = show();
-    act(() => result.current.dismiss());
-    expect(capture).toHaveBeenCalledWith('mode_coach_dismissed', {
-      mode: 'classic',
-      reason: 'skip',
-      step: 0,
-    });
-  });
-
-  it('emits reason=completed when advancing past the last step', () => {
-    const { result } = show(); // classic = 2 steps
-    act(() => result.current.advance()); // 0 -> 1 (last step), no dismiss yet
-    act(() => result.current.advance()); // past last -> completed
-    expect(capture).toHaveBeenCalledWith('mode_coach_dismissed', {
-      mode: 'classic',
-      reason: 'completed',
-      step: 1,
-    });
-  });
-
-  it('emits mode_coach_dismissed at most once per show cycle', () => {
-    const { result } = show();
     act(() => result.current.dismiss('escape'));
-    act(() => result.current.dismiss('skip'));
-    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_dismissed')).toHaveLength(1);
+    act(() => result.current.dismiss());
+    expect(capture.mock.calls.filter((c) => c[0] === 'mode_coach_dismissed')).toHaveLength(0);
+  });
+
+  it('emits nothing when advancing past the last step', () => {
+    const { result } = mount(); // classic = 2 steps
+    act(() => result.current.advance());
+    act(() => result.current.advance());
+    act(() => result.current.advance());
+    expect(capture).not.toHaveBeenCalled();
   });
 });

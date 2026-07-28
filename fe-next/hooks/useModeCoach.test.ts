@@ -3,6 +3,10 @@ import { renderHook, act } from '@testing-library/react';
 import { useModeCoach } from './useModeCoach';
 import { coachStorageKey } from '@/lib/tutorial/modeCoachStore';
 
+// Contract since commit 87653de ("remove blocking tutorial flow"): the FTUE
+// coach is disabled — it NEVER becomes visible. On the first visit it only
+// marks the mode as seen (so a re-enabled coach won't re-pop) and fires the
+// onShown callback once so cross-device DB backfill keeps working.
 describe('useModeCoach', () => {
   beforeEach(() => {
     window.localStorage.clear();
@@ -12,17 +16,17 @@ describe('useModeCoach', () => {
     vi.useRealTimers();
   });
 
-  it('stays hidden until the settle delay, then shows on first visit', () => {
+  it('stays hidden on first visit — before AND after the settle delay', () => {
     const { result } = renderHook(() => useModeCoach('classic', { settleMs: 500 }));
     expect(result.current.visible).toBe(false);
     act(() => {
       vi.advanceTimersByTime(500);
     });
-    expect(result.current.visible).toBe(true);
+    expect(result.current.visible).toBe(false);
     expect(result.current.stepIndex).toBe(0);
   });
 
-  it('persists "seen" the moment it shows (abandon-safe) and fires onShown once', () => {
+  it('marks the mode as seen on mount and fires onShown once (DB backfill)', () => {
     const onShown = vi.fn();
     renderHook(() => useModeCoach('classic', { settleMs: 100, onShown }));
     act(() => {
@@ -32,36 +36,25 @@ describe('useModeCoach', () => {
     expect(onShown).toHaveBeenCalledTimes(1);
   });
 
-  it('never shows again once seen', () => {
+  it('does not fire onShown again on a repeat visit (already seen)', () => {
     window.localStorage.setItem(coachStorageKey('classic'), '1');
-    const { result } = renderHook(() => useModeCoach('classic', { settleMs: 50 }));
+    const onShown = vi.fn();
+    const { result } = renderHook(() => useModeCoach('classic', { settleMs: 50, onShown }));
     act(() => {
       vi.advanceTimersByTime(200);
     });
     expect(result.current.visible).toBe(false);
+    expect(onShown).not.toHaveBeenCalled();
   });
 
-  it('advances through steps then closes on the last advance', () => {
-    const { result } = renderHook(() => useModeCoach('classic', { settleMs: 10 }));
-    act(() => {
-      vi.advanceTimersByTime(10);
-    });
-    // classic has 2 steps
-    expect(result.current.stepIndex).toBe(0);
-    expect(result.current.isLastStep).toBe(false);
-    act(() => result.current.advance());
-    expect(result.current.stepIndex).toBe(1);
-    expect(result.current.isLastStep).toBe(true);
-    act(() => result.current.advance());
-    expect(result.current.visible).toBe(false);
-  });
-
-  it('dismiss hides it immediately', () => {
+  it('dismiss and advance never make it visible', () => {
     const { result } = renderHook(() => useModeCoach('blast', { settleMs: 10 }));
     act(() => {
       vi.advanceTimersByTime(10);
     });
-    expect(result.current.visible).toBe(true);
+    expect(result.current.visible).toBe(false);
+    act(() => result.current.advance());
+    expect(result.current.visible).toBe(false);
     act(() => result.current.dismiss());
     expect(result.current.visible).toBe(false);
   });
