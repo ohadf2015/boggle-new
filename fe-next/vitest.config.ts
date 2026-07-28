@@ -147,9 +147,10 @@ export default defineConfig({
     // letting the pool spawn one fork per CPU (48) and blow the box's
     // pids.max=1000 cgroup (EAGAIN spawn / uv_thread_create aborts).
     maxWorkers: 4,
-    // NOTE: vitest 4 removed `poolOptions`/`useAtomics` — per-fork execArgv is
-    // no longer configurable here. Use NODE_OPTIONS='--max-old-space-size=5120'
-    // in the nightly runner if fork heap needs a bump.
+    // Vitest 4 moved per-worker node args from poolOptions.forks.execArgv to a
+    // top-level test.execArgv (the old key was silently ignored). Caps each
+    // fork's heap so the pool can't OOM under chronic nightly-box load.
+    execArgv: ['--max-old-space-size=5120'],
     teardownTimeout: 30000,
     hookTimeout: 30000,
     fileParallelism: true,
