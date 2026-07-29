@@ -23,8 +23,10 @@ export interface GemHuntWinSceneProps {
 
 function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, labels }: GemHuntWinSceneProps) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const scoreRef = useRef<HTMLSpanElement>(null);
   useEffect(() => {
     if (!cardRef.current) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const ctx = gsap.context(() => {
       gsap.fromTo('[data-win-card]', { y: 30, opacity: 0, scale: 0.85 }, { y: 0, opacity: 1, scale: 1, duration: 0.45, ease: 'back.out(1.6)' });
       gsap.fromTo(
@@ -32,9 +34,21 @@ function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, labels
         { y: -50, opacity: 0, rotation: 180 },
         { y: 0, opacity: 1, rotation: 0, duration: 0.55, ease: 'back.out(2)', stagger: 0.08, delay: 0.25 },
       );
+      if (!reduceMotion && scoreRef.current) {
+        const counter = { val: 0 };
+        gsap.to(counter, {
+          val: totalScore,
+          duration: 0.8,
+          delay: 0.3,
+          ease: 'power2.out',
+          onUpdate: () => {
+            if (scoreRef.current) scoreRef.current.textContent = String(Math.round(counter.val));
+          },
+        });
+      }
     }, cardRef);
     return () => ctx.revert();
-  }, []);
+  }, [totalScore]);
 
   const isWin = outcome === 'won';
   return (
@@ -64,7 +78,7 @@ function GemHuntWinSceneImpl({ totalScore, turnIndex, outcome, onRestart, labels
           ))}
         </div>
         <div className="mb-4 flex items-center justify-around font-neo-display text-xs uppercase tracking-wider text-neo-white">
-          <span>{labels.score} <span className="ms-1 text-neo-lime text-lg tabular-nums">{totalScore}</span></span>
+          <span>{labels.score} <span ref={scoreRef} className="ms-1 text-neo-lime text-lg tabular-nums">{totalScore}</span></span>
           <span>{labels.turns} <span className="ms-1 text-neo-cyan text-lg tabular-nums">{turnIndex}</span></span>
         </div>
         <button

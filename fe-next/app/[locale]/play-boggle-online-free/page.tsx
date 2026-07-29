@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return {
     title: 'Play Boggle Online Free — No Download, No Signup | LexiClash',
-    description: 'Play boggle online free — unlimited games, no download, no signup. Solo or real-time multiplayer with 2-20+ friends. 4x4, 5x5, 6x6 grids, daily challenges, boss battles. Free boggle game online 2026.',
+    description: 'Play boggle online free — no download, no signup. Solo or multiplayer with 2–50 players. 4×4 to 6×6 grids, daily challenges. Start now →',
     keywords: 'play boggle online free no download, boggle online free no download, play boggle online free, free boggle online no download, free online boggle no download, boggle game free no download, play boggle word shake free no download, play boggle online free with other players, boggle alternatives 2026, games like boggle online free, word game no download, boggle word shake free, word games online free, word making games, word hunt game online, free word game no download, word puzzle game free',
     openGraph: {
       title: 'Play Boggle Online Free - No Download Needed | LexiClash',
@@ -388,6 +388,23 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
               Start a Room →
             </Link>
           </div>
+        </section>
+
+        {/* CLASSROOM */}
+        <section className="mt-20 max-w-3xl">
+          <h2 className="mb-3 font-neo-display text-3xl font-black uppercase leading-tight sm:text-4xl">
+            Boggle online for the <span className="text-neo-cyan">classroom</span>.
+          </h2>
+          <p className="text-sm leading-relaxed text-neo-white sm:text-base">
+            Teachers use LexiClash as a free classroom Boggle game — no accounts, no downloads, no setup. Spin up a
+            room in seconds, share the link or QR code, and 20+ students compete live on the same word grid. Great
+            for vocabulary practice, spelling drills, and ESL classes. Want a version built for schools, with
+            classroom-ready tools?{' '}
+            <Link href={`/${locale}/education/for-schools`} className="text-neo-cyan underline">
+              Check out LexiClash for Schools
+            </Link>
+            .
+          </p>
         </section>
 
         {/* WHY LEXICLASH */}

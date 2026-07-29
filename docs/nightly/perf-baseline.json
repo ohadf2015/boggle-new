@@ -1,50 +1,56 @@
 {
-  "date": "2026-07-28",
-  "note": "7-day window (n≥50 floor). 24h window returned 0 results above floor — low overnight traffic. LCP improved significantly vs 07-27 baseline on both routes (+29% /en/multiplayer, +22% /es/multiplayer). CLS on /en/multiplayer still catastrophic (0.949) — structural cause: full DOM swap on socket connecting→lobby transition, not fixable with a small edit. Supabase MCP unavailable for the second night running — migration 20260727020000_fix_subscriptions_rls_initplan.sql still pending apply.",
+  "date": "2026-07-29",
+  "note": "7-day window (n≥50 floor). 24h window returned 0 results above floor — low overnight traffic. /en/multiplayer LCP rose 1726ms→3228ms but n dropped 86→52 (barely above floor) — likely window drift, not confirmed regression. /es/multiplayer flat. CLS still critical. Supabase MCP unavailable AND CLI requires Docker (not running) — migration pending apply for 3rd consecutive night. HUMAN: apply migration or mint never-expire PAT. Practice classic sandbox LCP (6940ms stale data) investigated — root cause: eagerly imports all 3 sandboxes; lazy-load optimization deferred (needs bundle size >200KB gzip confirmation).",
   "backend": {
     "advisor_warnings_count": 3,
-    "note": "Auth RLS initplan fix for subscriptions table written to migration 20260727020000_fix_subscriptions_rls_initplan.sql — drops bare auth.uid() + adds role scoping (to authenticated / to service_role) to resolve both initplan AND multiple-permissive-policies advisor warnings. NOT applied (Supabase MCP unavailable 2nd consecutive night). Auth DB connection percentage strategy advisor warning still unresolved — human config change required in Supabase dashboard.",
+    "note": "Auth RLS initplan + multiple-permissive-policies fix for subscriptions table written to migration 20260727020000_fix_subscriptions_rls_initplan.sql — wraps bare auth.uid() in (select auth.uid()), scopes policies to authenticated/service_role. NOT applied — Supabase MCP unavailable AND Docker not running (3rd consecutive night). HUMAN ACTION REQUIRED.",
     "migrations_pending_apply": [
       "20260727020000_fix_subscriptions_rls_initplan.sql"
     ],
     "top_queries": []
   },
   "frontend": {
-    "note": "7-day window (n≥50 floor). 24h window = 0 routes above floor. Both routes improved LCP vs 07-27. CLS root cause on /en/multiplayer = socket-state DOM swap (connecting→lobby), not NativeLanguageBanner (50px shift would produce CLS ~0.07, not 0.949). CLS fix requires skeleton/placeholder for lobby state that matches lobby layout — multi-hour refactor, not a lane fix.",
+    "note": "7-day window (n≥50 floor). 24h window = 0 routes above floor. /en/multiplayer LCP apparent regression (1726→3228ms) but n=52 barely above floor — window drift likely. Multiplayer page well-optimized (hero has priority, game views lazy-loaded). LCP driven by socket connect latency. Practice classic: all 3 sandbox components imported eagerly at app/[locale]/practice/[mode]/PageClient.tsx:7-9 — only 1 used per visit; lazy-load candidate pending bundle size verification.",
     "by_route": [
       {
         "route": "/en/multiplayer",
-        "p75_lcp_ms": 1726,
-        "p75_cls": 0.949,
-        "p75_inp_ms": 184,
-        "n_7d": 86,
-        "vs_baseline": "LCP IMPROVED: 2425ms→1726ms (-29%) vs 07-27. INP flat (192→184ms). CLS flat (0.963→0.949). LCP improvement likely from perf(server) + perf(low-end) commits on 07-26/07-27."
+        "p75_lcp_ms": 3228,
+        "p75_cls": 0.926,
+        "p75_inp_ms": 192,
+        "n_7d": 52,
+        "vs_baseline": "LCP APPARENT REGRESSION: 1726ms→3228ms (+87%) BUT n dropped 86→52. Barely above floor. Window drift likely. CLS slightly improved (0.949→0.926), still critical. INP flat (184→192ms, noise)."
       },
       {
         "route": "/es/multiplayer",
-        "p75_lcp_ms": 2605,
-        "p75_cls": 0.396,
-        "p75_inp_ms": 382,
-        "n_7d": 67,
-        "vs_baseline": "LCP IMPROVED: 3348ms→2605ms (-22%) vs 07-27. INP flat (368→382ms, noise). CLS slight regression (0.343→0.396, noise — n=67 barely above floor). Low-confidence route."
+        "p75_lcp_ms": 2652,
+        "p75_cls": 0.399,
+        "p75_inp_ms": 454,
+        "n_7d": 69,
+        "vs_baseline": "LCP flat: 2605ms→2652ms (+1.8%, noise). INP flat. CLS flat. Low-confidence route."
       }
     ]
   },
   "bundle": {
-    "note": "No .next build available this run — Railway build, not local. Cannot check chunk sizes.",
+    "note": "No local .next build available — Railway build only. Cannot measure chunk sizes.",
     "total_kb": null,
     "top_chunks": []
   },
   "cls_investigation": {
-    "multiplayer_cls_0949": {
+    "multiplayer_cls_0926": {
       "confirmed_not_cause": [
-        "AutoHideHeader spacer (07-20 fix applied, CLS 0.979→0.961)",
-        "NativeLanguageBanner (50px shift = CLS ~0.07, not 0.949 — mathematically ruled out)",
-        "FirstGameLanguageNotice (same reasoning as above)"
+        "AutoHideHeader spacer (07-20 fix applied)",
+        "NativeLanguageBanner (50px shift = CLS ~0.07, not 0.926 — mathematically ruled out)",
+        "FirstGameLanguageNotice (same reasoning)"
       ],
       "root_cause_identified": "Socket state DOM swap: MultiplayerFlow initially renders connecting/seeking state (minimal DOM), then replaces full viewport with RoomListView on socket connect. Full-viewport DOM replacement = impact_fraction ~1.0, distance_fraction ~0.95 → CLS ~0.95.",
-      "fix_required": "Render RoomListView skeleton at same dimensions as the real lobby before socket connects — so the DOM swap is invisible to the layout shift algorithm. Estimated 4-6h refactor (need to audit full MultiplayerFlow render tree). Defer to Lane 11 (mode QA) or a dedicated refactor lane.",
+      "fix_required": "Render RoomListView skeleton at same dimensions as real lobby before socket connects. Estimated 4-6h refactor. Defer to Lane 11 or dedicated refactor lane.",
       "action": "Logged in perf-watch.md for human review"
     }
+  },
+  "practice_classic_investigation": {
+    "lcp_candidate": "Eager import of all 3 sandbox components at PageClient.tsx:7-9 (Classic/WordHunt/WheelRush). Only 1 used per mode visit.",
+    "fix_candidate": "dynamic() import for unused 2 sandboxes. Needs bundle size >200KB gzip confirmation before shipping (hard rule).",
+    "null_render_note": "PageClient.tsx:127 null render only fires on tutorial step — ?play=1 users (initialStep=play) are unaffected.",
+    "action": "Deferred — needs local build to verify chunk sizes"
   }
 }

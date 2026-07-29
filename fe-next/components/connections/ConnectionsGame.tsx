@@ -21,6 +21,7 @@ import {
   revealHint as revealHintLogic,
   markRated,
   xpForPuzzle,
+  isCompletedTerminalStatus,
 } from '@/lib/connections/gameLogic';
 import { getCurrentLevel, setCurrentLevel } from '@/lib/connections/levelStore';
 import { getCurrentLives, setCurrentLives, MAX_LIVES } from '@/lib/connections/livesStore';
@@ -138,7 +139,7 @@ export default function ConnectionsGame() {
     endFiredRef.current = true;
     const totalScore = sessionScore + (state.score ?? 0);
     const durationSec = Math.floor((Date.now() - gameStartTimeRef.current) / 1000);
-    trackGameEnd('connections', totalScore, level, status === 'correct', durationSec, {
+    trackGameEnd('connections', totalScore, level, isCompletedTerminalStatus(status), durationSec, {
       isWinner: status === 'correct',
       terminalStatus: status,
       level,
