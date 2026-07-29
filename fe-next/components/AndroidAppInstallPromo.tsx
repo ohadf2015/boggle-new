@@ -84,23 +84,48 @@ export default function AndroidAppInstallPromo() {
 
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let cleanupListeners: (() => void) | undefined;
 
     void hasLexiClashInstalled().then((installed) => {
       if (cancelled) return;
       if (!shouldShowAndroidInstallPromo({ ...baseInput, isInstalled: installed, now: Date.now() })) {
         return;
       }
-      timer = setTimeout(() => {
-        if (cancelled) return;
-        sessionStorage.setItem(SESSION_FLAG, '1');
-        openPromo('auto_popup');
-        trackInstallPromoShown('auto_popup');
-      }, SHOW_DELAY_MS);
+      const arm = () => {
+        if (cancelled || timer) return;
+        timer = setTimeout(() => {
+          if (cancelled) return;
+          sessionStorage.setItem(SESSION_FLAG, '1');
+          openPromo('auto_popup');
+          trackInstallPromoShown('auto_popup');
+        }, SHOW_DELAY_MS);
+      };
+      // LCP guard: only start the countdown after the visitor's first tap or
+      // keypress. Chrome stops considering LCP candidates at the first user
+      // input, so a dialog that can only open post-interaction can never
+      // become the LCP element — before this, the auto-popup fired at 12s and
+      // its hero image was recorded as a ~12-22s LCP in both lab (PSI/Lighthouse
+      // never interact) and field data for passive Android visitors. Passive
+      // visitors (lab audits, bounce traffic) simply never see the popup.
+      const hasInteracted =
+        typeof navigator !== 'undefined' &&
+        Boolean(navigator.userActivation?.hasBeenActive);
+      if (hasInteracted) {
+        arm();
+      } else {
+        window.addEventListener('pointerdown', arm, { once: true });
+        window.addEventListener('keydown', arm, { once: true });
+      }
+      cleanupListeners = () => {
+        window.removeEventListener('pointerdown', arm);
+        window.removeEventListener('keydown', arm);
+      };
     });
 
     return () => {
       cancelled = true;
       if (timer) clearTimeout(timer);
+      cleanupListeners?.();
     };
   }, [pathname, openPromo]);
 
@@ -144,6 +169,10 @@ export default function AndroidAppInstallPromo() {
             fill
             sizes="(max-width: 640px) 100vw, 28rem"
             className="object-cover"
+            // Eager: the dialog only opens post-interaction (see the LCP guard
+            // above), so lazy's near-viewport deferral just adds a visible
+            // pop-in inside an already-open modal.
+            loading="eager"
           />
         </div>
 
