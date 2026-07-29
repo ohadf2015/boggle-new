@@ -2,8 +2,10 @@
  * PageClient — first-time visitors drop straight into OnboardingFlow.
  *
  * New users get the short FTUE (language → name/avatar → style) immediately on
- * first visit, NOT the marketing LandingView (reverses the 2026-05-08
- * landing-first experiment). Returning users still see LandingView.
+ * first visit, rendered as an opaque full-screen overlay ON TOP of the marketing
+ * LandingView (reverses the 2026-05-08 landing-first experiment; overlay-not-
+ * replace since 2026-07-29 — unmounting LandingView was the CLS 1.0 regression).
+ * Returning users still see LandingView alone.
  */
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
@@ -42,10 +44,12 @@ describe('HomePageClient — auto-onboarding for new users', () => {
     });
   });
 
-  it('renders OnboardingFlow (not LandingView) for new users on first visit', () => {
+  it('renders OnboardingFlow as an overlay ON TOP of LandingView for new users on first visit', () => {
     render(<HomePageClient />);
     expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
-    expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
+    // LandingView STAYS mounted underneath the opaque FTUE overlay — unmounting
+    // it post-hydration reflowed the SEO section and was the CLS 1.0 source.
+    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
   });
 
   it('renders LandingView for returning users (onboarding completed)', () => {

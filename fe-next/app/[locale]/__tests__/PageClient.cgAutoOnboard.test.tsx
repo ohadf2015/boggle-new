@@ -45,18 +45,19 @@ describe('HomePageClient — CG auto-onboarding', () => {
     });
   });
 
-  it('skips LandingView and mounts OnboardingFlow on first paint when CG iframe detected', () => {
+  it('overlays OnboardingFlow on LandingView on first paint when CG iframe detected', () => {
     mockCgDetected = true;
     render(<HomePageClient />);
     expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
-    expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
+    // LandingView stays mounted beneath the opaque FTUE overlay (CLS fix).
+    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
   });
 
   it('mounts OnboardingFlow for non-CG new users too (first-visit auto-onboard)', () => {
     mockCgDetected = false;
     render(<HomePageClient />);
     expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
-    expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
+    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
   });
 
   it('does NOT auto-mount FTUE for CG users who already completed onboarding', () => {

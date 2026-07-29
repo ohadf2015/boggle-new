@@ -25,11 +25,14 @@ export default function Loading() {
   // eslint-disable-next-line react-hooks/purity
   const styleKey = DANCERS[Math.floor(Math.random() * DANCERS.length)];
   return (
-    // ponytail: fixed inset-0 (not flex-1/h-full) — viewport-pinned so it's
-    // always full-screen. `h-full` (height:100%) collapsed to content height on
-    // mobile Chromium when the flex parent had no definite height → short loader
-    // → CLS. Mirrors the OnboardingFlow fallback in PageClient.tsx.
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-neo-navy">
+    // In-flow viewport-tall loader (min-h-[100svh]): `h-full` collapsed to
+    // content height on mobile Chromium (short loader → CLS), and the later
+    // `fixed inset-0` version took the loader OUT of flow entirely — leaving an
+    // empty page where the footer sat visible under the header, so the content
+    // swap shoved it on-screen (the CLS 1.0 footer shift). In-flow + viewport
+    // height keeps the footer below the fold during load, so the swap happens
+    // off-screen and counts ~zero CLS.
+    <div className="flex min-h-[100svh] flex-col items-center justify-center gap-6 bg-neo-navy">
       <LoadingDancer
         styleKey={styleKey}
         className="w-28 h-28 sm:w-36 sm:h-36 lg:w-44 lg:h-44"
