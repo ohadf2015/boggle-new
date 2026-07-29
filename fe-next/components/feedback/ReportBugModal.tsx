@@ -55,33 +55,142 @@ function collectDeviceMetadata(): DeviceMetadata {
 }
 
 /**
- * Screenshot capture — html2canvas is dynamic-imported ONLY on explicit opt-in
- * so it never lands in the initial bundle. Dialogs + the FAB are hidden during
- * capture via the `feedback-capturing` html class (see globals.css) so the
- * shot shows the page state the player is reporting about, not the modal.
+ * Screenshot capture — two strategies, ordered by jank:
+ *
+ * 1. NATIVE (getDisplayMedia): OS-level capture. No DOM re-render, zero main-
+ *    thread cost, and it actually captures WebGL/canvas game content (which
+ *    html2canvas renders blank or tainted). Requires one user pick in the
+ *    browser's tab picker. Unsupported on iOS Safari → falls through.
+ * 2. DOM (html2canvas): re-renders the page to a canvas ON the main thread.
+ *    On the in-game screen (PIXI canvas, particles, AdMob iframes, animated
+ *    HUD) a naive full-body capture can block for seconds or hang entirely.
+ *    Guardrails: dynamic-import only on opt-in, per-attempt hard timeout,
+ *    two tiers (full → heavy-elements-excluded), downscaled output.
+ *
+ * Dialogs + the FAB are hidden during capture via the `feedback-capturing`
+ * html class (see globals.css) so the shot shows the page state the player
+ * is reporting about, not the modal.
  */
-async function captureScreenshot(): Promise<string | null> {
+const CAPTURE_TIMEOUT_MS = 8_000;
+const CAPTURE_MAX_WIDTH = 1280;
+
+function withTimeout<T>(work: Promise<T>, ms: number): Promise<T | null> {
+  return Promise.race([
+    work,
+    new Promise<null>((resolve) => {
+      setTimeout(() => resolve(null), ms);
+    }),
+  ]);
+}
+
+/** Downscale to CAPTURE_MAX_WIDTH and encode as JPEG; null on tainted canvas. */
+function canvasToJpeg(source: HTMLCanvasElement, quality: number): string | null {
   try {
-    document.documentElement.classList.add('feedback-capturing');
-    const { default: html2canvas } = await import('html2canvas');
-    const attempts: Array<{ scale: number; quality: number }> = [
-      { scale: 0.5, quality: 0.6 },
-      { scale: 0.35, quality: 0.5 },
+    let canvas = source;
+    if (source.width > CAPTURE_MAX_WIDTH) {
+      const scaled = document.createElement('canvas');
+      scaled.width = CAPTURE_MAX_WIDTH;
+      scaled.height = Math.round((source.height * CAPTURE_MAX_WIDTH) / source.width);
+      scaled.getContext('2d')?.drawImage(source, 0, 0, scaled.width, scaled.height);
+      canvas = scaled;
+    }
+    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+    return dataUrl.length <= MAX_SCREENSHOT_DATAURL_CHARS ? dataUrl : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Native screen capture. Returns null when unsupported or the user cancels. */
+class CaptureCancelled extends Error {}
+
+async function captureNative(): Promise<string | null> {
+  if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getDisplayMedia) {
+    return null;
+  }
+  let stream: MediaStream | null = null;
+  try {
+    stream = await navigator.mediaDevices.getDisplayMedia({
+      video: { frameRate: 1 },
+      audio: false,
+      // Chrome hints: default the picker to the current tab.
+      ...({ preferCurrentTab: true, selfBrowserSurface: 'include' } as Record<string, unknown>),
+    } as DisplayMediaStreamOptions);
+    const video = document.createElement('video');
+    video.muted = true;
+    video.srcObject = stream;
+    await video.play();
+    if (!video.videoWidth) {
+      await withTimeout(
+        new Promise<void>((resolve) => {
+          video.addEventListener('loadeddata', () => resolve(), { once: true });
+        }),
+        2_000,
+      );
+    }
+    if (!video.videoWidth || !video.videoHeight) return null;
+    const frame = document.createElement('canvas');
+    frame.width = video.videoWidth;
+    frame.height = video.videoHeight;
+    frame.getContext('2d')?.drawImage(video, 0, 0);
+    return canvasToJpeg(frame, 0.7);
+  } catch (err) {
+    // User dismissed the tab picker → honour it, don't fall back to DOM capture.
+    if ((err as DOMException)?.name === 'NotAllowedError') {
+      throw new CaptureCancelled();
+    }
+    return null;
+  } finally {
+    stream?.getTracks().forEach((track) => track.stop());
+  }
+}
+
+/** html2canvas capture with hard timeout; `skipHeavy` excludes canvas/video. */
+async function captureDom(scale: number, skipHeavy: boolean): Promise<string | null> {
+  const { default: html2canvas } = await import('html2canvas');
+  const work = html2canvas(document.body, {
+    scale,
+    useCORS: true,
+    logging: false,
+    ignoreElements: (el: Element) => {
+      if (el.getAttribute('data-feedback-fab') === 'true') return true;
+      const tag = el.tagName;
+      // Cross-origin iframes (AdMob) are always dead weight in a bug shot.
+      if (tag === 'IFRAME') return true;
+      // Tier 2: canvas/video are the main freeze sources (and WebGL captures
+      // blank anyway without preserveDrawingBuffer).
+      return skipHeavy && (tag === 'CANVAS' || tag === 'VIDEO');
+    },
+  });
+  const canvas = await withTimeout(work, CAPTURE_TIMEOUT_MS);
+  if (!canvas) return null;
+  return canvasToJpeg(canvas, skipHeavy ? 0.5 : 0.6);
+}
+
+async function captureScreenshot(): Promise<string | null> {
+  document.documentElement.classList.add('feedback-capturing');
+  try {
+    // Let the overlay-hide paint before any capture path reads the screen.
+    await new Promise((resolve) => {
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve(undefined)));
+    });
+    const native = await captureNative();
+    if (native) return native;
+    const tiers: Array<[number, boolean]> = [
+      [0.4, false],
+      [0.3, true],
     ];
-    for (const { scale, quality } of attempts) {
-      const canvas = await html2canvas(document.body, {
-        scale,
-        useCORS: true,
-        logging: false,
-        ignoreElements: (el: Element) => el.getAttribute('data-feedback-fab') === 'true',
-      });
-      const dataUrl = canvas.toDataURL('image/jpeg', quality);
-      if (dataUrl.length <= MAX_SCREENSHOT_DATAURL_CHARS) {
-        return dataUrl;
+    for (const [scale, skipHeavy] of tiers) {
+      try {
+        const dataUrl = await captureDom(scale, skipHeavy);
+        if (dataUrl) return dataUrl;
+      } catch (err) {
+        logger.warn('[ReportBugModal] DOM capture tier failed', { scale, skipHeavy, err });
       }
     }
     return null;
   } catch (err) {
+    if (err instanceof CaptureCancelled) return null;
     logger.warn('[ReportBugModal] Screenshot capture failed', err);
     return null;
   } finally {
@@ -134,7 +243,9 @@ export function ReportBugModal({ isOpen, onClose }: ReportBugModalProps) {
   const handleAttachScreenshot = useCallback(async () => {
     setCapturing(true);
     setScreenshotFailed(false);
-    const dataUrl = await captureScreenshot();
+    // Outer safety net: even if every inner guard fails, the UI unsticks.
+    const dataUrl = await withTimeout(captureScreenshot(), 30_000);
+    document.documentElement.classList.remove('feedback-capturing');
     setCapturing(false);
     if (dataUrl) {
       setScreenshot(dataUrl);
