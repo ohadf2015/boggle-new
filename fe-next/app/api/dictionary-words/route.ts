@@ -6,10 +6,14 @@
  * Performance optimizations:
  * - Uses streaming response for large dictionaries
  * - Sets aggressive cache headers (24h browser cache, 7d CDN cache)
- * - Gzip compression handled by Next.js automatically
+ * - Gzip applied IN-ROUTE (cached per language): the Express compression
+ *   middleware does not pick this response up, and Next standalone runs with
+ *   compress:false, so without this the 2.8MB English list crosses the wire
+ *   raw on every first visit.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { gzipSync } from 'zlib';
 import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
 import * as fsp from 'fs/promises';
@@ -17,6 +21,15 @@ import * as path from 'path';
 
 // Cache dictionaries at module level — populated lazily per language
 const dictionaries: Record<string, string[] | null> = {
+  en: null,
+  es: null,
+  he: null,
+  sv: null,
+  ja: null,
+};
+
+// Pre-gzipped payloads cached per language (dictionary content is static per deploy)
+const gzippedPayloads: Record<string, { gzip: Buffer; raw: string } | null> = {
   en: null,
   es: null,
   he: null,
@@ -155,19 +168,34 @@ export async function GET(request: NextRequest) {
   try {
     const words = await loadDictionary(language);
 
-    // Return as newline-delimited text (more compact than JSON)
-    const response = new NextResponse(words.join('\n'), {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        // Aggressive caching - dictionary rarely changes
-        'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400',
-        // ETag for conditional requests
-        'ETag': `"${language}-${words.length}"`,
-      },
-    });
+    // Build (and cache) the newline-delimited payload + its gzip form once
+    if (!gzippedPayloads[language]) {
+      const raw = words.join('\n');
+      gzippedPayloads[language] = { gzip: gzipSync(raw, { level: 6 }), raw };
+    }
+    const payload = gzippedPayloads[language]!;
 
-    return response;
+    const cacheHeaders: Record<string, string> = {
+      'Content-Type': 'text/plain; charset=utf-8',
+      // Aggressive caching - dictionary rarely changes
+      'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400',
+      // ETag for conditional requests
+      'ETag': `"${language}-${words.length}"`,
+      'Vary': 'Accept-Encoding',
+    };
+
+    const acceptsGzip = (request.headers.get('accept-encoding') || '').includes('gzip');
+    if (acceptsGzip) {
+      return new NextResponse(new Uint8Array(payload.gzip), {
+        status: 200,
+        headers: { ...cacheHeaders, 'Content-Encoding': 'gzip' },
+      });
+    }
+
+    return new NextResponse(payload.raw, {
+      status: 200,
+      headers: cacheHeaders,
+    });
   } catch (error) {
     console.error('[dictionary-words] Error loading dictionary:', error);
     return NextResponse.json(

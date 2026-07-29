@@ -3542,6 +3542,26 @@ html {
   padding-bottom: calc(var(--footer-height) + env(safe-area-inset-bottom, 0px));
 }
 
+/* Page content with bottom nav awareness.
+   LAYOUT-CRITICAL: lives in globals.css (initial CSS bundle), NOT the
+   post-mount animations.css — when it was deferred there, the padding snapped
+   in after FCP and shoved the footer down (~64px), the single largest CLS
+   contributor on mobile (CLS ≈ 1.0 on the landing page).
+   Top-spacing for the fixed <Header /> is handled by a sibling spacer the
+   Header component renders itself — this class intentionally only handles the
+   bottom. */
+.page-content-safe {
+  padding-bottom: var(--mobile-bottom-safe);
+}
+
+/* When the global bottom nav is present, `body.screen-fit` already reserves the
+   bottom clearance via --bottom-stack-height (nav + admob banner). Adding
+   --mobile-bottom-safe here too DOUBLE-reserves it. Zero it on these pages so
+   the reservation lives in exactly one place (body.screen-fit). */
+html.has-global-bottom-nav .page-content-safe {
+  padding-bottom: 0;
+}
+
 /* Combined safe area for both header and footer */
 .content-safe-full {
   padding-top: calc(var(--header-height-mobile) + 8px);
