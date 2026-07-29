@@ -7,7 +7,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Copy, Check, Send, ImageDown, Mail, MessageSquare, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
+import { Copy, Check, Send, ImageDown, Mail, MessageSquare, ExternalLink, ChevronDown, ChevronUp, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { XTwitterIcon, WhatsAppIcon, LinkedInIcon, FacebookIcon } from './icons';
 import { Loader } from '@/components/ui/Loader';
@@ -25,7 +25,9 @@ interface SharePanelProps {
   onEmail: () => void;
   onSMS: () => void;
   onDownloadImage?: () => void;
+  onDownloadStreakCard?: () => void;
   isGeneratingImage?: boolean;
+  isGeneratingStreakCard?: boolean;
   ogImageUrl?: string;
   t: (key: string) => string;
 }
@@ -43,7 +45,9 @@ export const SharePanel: React.FC<SharePanelProps> = ({
   onEmail,
   onSMS,
   onDownloadImage,
+  onDownloadStreakCard,
   isGeneratingImage,
+  isGeneratingStreakCard,
   ogImageUrl,
   t,
 }) => {
@@ -211,6 +215,29 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                     <>
                       <ImageDown className="me-2 w-5 h-5" />
                       {t('daily.downloadImage')}
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+
+            {/* Download Streak Card Button */}
+            {onDownloadStreakCard && (
+              <div className="mt-2">
+                <Button
+                  onClick={onDownloadStreakCard}
+                  disabled={isGeneratingStreakCard}
+                  className="w-full py-3 bg-neo-orange text-white border-3 border-neo-black rounded-neo disabled:opacity-50 hover:brightness-110"
+                >
+                  {isGeneratingStreakCard ? (
+                    <>
+                      <Loader size="sm" className="me-2" />
+                      {t('wordHunt.results.generating')}
+                    </>
+                  ) : (
+                    <>
+                      <Flame className="me-2 w-5 h-5" />
+                      {t('daily.shareStreakCard') || '🔥 Share Streak Card'}
                     </>
                   )}
                 </Button>

@@ -20,7 +20,7 @@ import type { GameStats } from '@/shared/weeklyQuestTemplates';
 import { getSocketById, safeEmit } from '../../utils/socketHelpers';
 import { incrementWordApproval } from '../../redis/wordApproval';
 import { processGameEndEngagement, processAchievementEngagement } from '../../handlers/engagementHandler';
-import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant } from '../../modules/supabase/rankedMmr';
+import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type MmdDelta } from '../../modules/supabase/rankedMmr';
 import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
 import logger from '../../utils/logger';
 import type { PlayerResult, UserData } from './types';
@@ -116,12 +116,19 @@ export function clearEngagementTimeouts(gameCode: string): void {
 
 /**
  * Record game results to Supabase and emit XP/engagement events
+ *
+ * @param io - Socket.IO server
+ * @param gameCode - Game code
+ * @param scoresArray - Final player scores with results
+ * @param game - Game state
+ * @param precomputedMmrMap - Optional pre-computed MMR deltas (if already calculated upstream)
  */
 export async function recordGameResultsToSupabase(
   io: Server,
   gameCode: string,
   scoresArray: PlayerResult[],
-  game: GameState
+  game: GameState,
+  precomputedMmrMap?: Map<string, MmdDelta> | null
 ): Promise<void> {
   try {
     // Filter out bot players — they have no auth identity and shouldn't be persisted
@@ -226,34 +233,39 @@ export async function recordGameResultsToSupabase(
       );
     }
     if (gameInfo.isRanked && scoresArray.length >= 2 && durationOk && scoreOk) {
-      try {
-        const sortedForRanked = [...boostedScores].sort((a, b) => b.totalScore - a.totalScore);
-        const playerIds = sortedForRanked
-          .map(p => (game.users?.[p.username] as UserData | undefined)?.authUserId)
-          .filter((id): id is string => !!id);
-        const baselines = await fetchRankedBaselines(playerIds);
-        const rankedParticipants: RankedParticipant[] = sortedForRanked.map((p, i) => {
-          const userData = game.users?.[p.username] as UserData | undefined;
-          const playerId = userData?.authUserId || '';
-          const baseline = baselines.get(playerId);
-          return {
-            playerId,
-            placement: i + 1,
-            score: p.totalScore,
-            currentMmr: baseline?.currentMmr ?? DEFAULT_RATING,
-            peakMmr: baseline?.peakMmr ?? DEFAULT_RATING,
-            rd: baseline?.rd ?? DEFAULT_RD,
-            gamesPlayed: baseline?.gamesPlayed ?? 0,
-            priorWins: baseline?.priorWins ?? 0,
-          };
-        }).filter(p => p.playerId);
+      // Use pre-computed MMR if available (upstream already calculated it)
+      if (!precomputedMmrMap) {
+        try {
+          const sortedForRanked = [...boostedScores].sort((a, b) => b.totalScore - a.totalScore);
+          const playerIds = sortedForRanked
+            .map(p => (game.users?.[p.username] as UserData | undefined)?.authUserId)
+            .filter((id): id is string => !!id);
+          const baselines = await fetchRankedBaselines(playerIds);
+          const rankedParticipants: RankedParticipant[] = sortedForRanked.map((p, i) => {
+            const userData = game.users?.[p.username] as UserData | undefined;
+            const playerId = userData?.authUserId || '';
+            const baseline = baselines.get(playerId);
+            return {
+              playerId,
+              placement: i + 1,
+              score: p.totalScore,
+              currentMmr: baseline?.currentMmr ?? DEFAULT_RATING,
+              peakMmr: baseline?.peakMmr ?? DEFAULT_RATING,
+              rd: baseline?.rd ?? DEFAULT_RD,
+              gamesPlayed: baseline?.gamesPlayed ?? 0,
+              priorWins: baseline?.priorWins ?? 0,
+            };
+          }).filter(p => p.playerId);
 
-        if (rankedParticipants.length >= 2) {
-          await updateRankedMmr(rankedParticipants);
-          logger.info('RANKED', `Updated MMR for ${rankedParticipants.length} players in game ${gameCode}`);
+          if (rankedParticipants.length >= 2) {
+            await updateRankedMmr(rankedParticipants);
+            logger.info('RANKED', `Updated MMR for ${rankedParticipants.length} players in game ${gameCode}`);
+          }
+        } catch (rankedErr) {
+          logger.error('RANKED', `Failed to update MMR for game ${gameCode}: ${(rankedErr as Error).message}`);
         }
-      } catch (rankedErr) {
-        logger.error('RANKED', `Failed to update MMR for game ${gameCode}: ${(rankedErr as Error).message}`);
+      } else {
+        logger.info('RANKED', `Using pre-computed MMR map for game ${gameCode} (${precomputedMmrMap.size} players)`);
       }
     }
 

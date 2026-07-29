@@ -15,7 +15,7 @@ const PUBLIC_PROFILE_COLUMNS = [
   'id', 'username', 'display_name', 'avatar_config',
   'country_code', 'current_level', 'total_xp', 'total_games', 'total_score',
   'total_words', 'casual_wins', 'ranked_wins', 'longest_word', 'longest_word_length',
-  'achievement_counts', 'created_at',
+  'achievement_counts', 'created_at', 'ranked_mmr', 'peak_mmr',
 ].join(', ');
 
 interface ProfileRow {
@@ -124,6 +124,8 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
       achievementCounts: profile.achievement_counts || {},
       memberSince,
       percentile,
+      rankedMmr: (profile as any).ranked_mmr ?? 1000,
+      peakMmr: (profile as any).peak_mmr ?? 1000,
       xpByMode,
     };
 

@@ -11,6 +11,7 @@ import type { Avatar as AvatarData } from '@/shared/types/game';
 import { fireFirstWinConfetti } from '@/utils/confettiUtils';
 import { fireEquippedVictoryEffect } from '@/utils/victoryEffects';
 import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
+import MmrChangeBadge from '@/components/results/MmrChangeBadge';
 
 // ============================================================
 // TYPES
@@ -272,6 +273,12 @@ const ResultsHeroSection = memo<ResultsHeroSectionProps>(
               >
                 {username}
               </p>
+              {/* Ranked MMR change badge */}
+              {!isEliminated && (
+                <div className="flex justify-center mt-0.5">
+                  <MmrChangeBadge username={username} />
+                </div>
+              )}
             </m.div>
           </m.div>
 

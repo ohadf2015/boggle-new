@@ -186,3 +186,6 @@ export type { WordWheelPuzzle } from './dailyChallenge/wordWheelGeneration';
 
 // Word Wheel scoring
 export { scoreWord as scoreWordWheelWord } from './dailyChallenge/wordWheelScoring';
+
+// Streak share card
+export type { StreakShareCardOptions, ShareImageResult } from './dailyChallenge/streakShareCard';

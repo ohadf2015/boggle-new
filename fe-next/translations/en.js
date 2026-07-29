@@ -6205,6 +6205,7 @@ const en = {
     "shareImageHint": "Share your achievement with friends!",
     "download": "Save Image",
     "downloadImage": "Save Image",
+    "shareStreakCard": "🔥 Share Streak Card",
     "playingAs": "Playing as",
     "keepPlaying": "Come back tomorrow for a new puzzle!",
     "guestPlayer": "Guest",

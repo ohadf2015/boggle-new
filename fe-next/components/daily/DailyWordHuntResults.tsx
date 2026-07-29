@@ -470,6 +470,8 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         onSMS={shareHandlers.handleSMS}
         onDownloadImage={shareHandlers.handleDownloadShareImage}
         isGeneratingImage={shareHandlers.isGeneratingImage}
+        onDownloadStreakCard={shareHandlers.handleStreakShareCard}
+        isGeneratingStreakCard={shareHandlers.isGeneratingStreakCard}
         ogImageUrl={shareHandlers.ogImageUrl}
         t={t}
       />

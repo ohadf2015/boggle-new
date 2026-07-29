@@ -240,6 +240,38 @@ export function useShareHandlers({
     }
   }, [isGeneratingImage, stats, puzzleNumber, language, result.solved, result.attemptsUsed, isAuthenticated, profile, guestPlayer]);
 
+  /** Generate and download a streak-focused share card (Wordle-style). */
+  const [isGeneratingStreakCard, setIsGeneratingStreakCard] = useState(false);
+  const handleStreakShareCard = useCallback(async () => {
+    if (isGeneratingStreakCard) return;
+    setIsGeneratingStreakCard(true);
+    try {
+      const { generateStreakShareCard, downloadStreakCard } = await import('@/utils/dailyChallenge/streakShareCard');
+      const wordsFound = result.wordsDiscovered?.length ?? result.attempts?.filter((a) => a.feedback?.every((f) => f.feedback === 'green')).length ?? 0;
+      const totalWords = result.attempts?.length ?? 0;
+      const rankPct = stats?.yourStats?.rank != null && (stats?.totalPlayers ?? 0) > 0
+        ? Math.round((1 - stats.yourStats.rank / stats.totalPlayers) * 100)
+        : null;
+      const card = await generateStreakShareCard({
+        streakDays: result.streakDays || 0,
+        puzzleNumber,
+        language,
+        solved: result.solved,
+        wordsFound: wordsFound || 0,
+        totalWords: totalWords || result.attemptsUsed || 10,
+        rankPercent: rankPct,
+        displayName: isAuthenticated && profile
+          ? profile.display_name || profile.username
+          : guestPlayer?.displayName,
+      });
+      downloadStreakCard(card.dataUrl, result.streakDays || 0);
+    } catch (err) {
+      console.error('Failed to generate streak share card:', err);
+    } finally {
+      setIsGeneratingStreakCard(false);
+    }
+  }, [isGeneratingStreakCard, result, stats, puzzleNumber, language, isAuthenticated, profile, guestPlayer]);
+
   return {
     copied,
     showSharePanel,
@@ -259,6 +291,8 @@ export function useShareHandlers({
     handleSMS,
     handleNativeShare,
     handleDownloadShareImage,
+    isGeneratingStreakCard,
+    handleStreakShareCard,
     challengeUrl,
     handleChallengeShare,
   };
