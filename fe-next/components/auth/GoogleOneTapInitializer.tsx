@@ -51,9 +51,17 @@ export default function GoogleOneTapInitializer() {
   return (
     <Script
       src={GSI_SRC}
-      strategy="afterInteractive"
+      // lazyOnload: the gsi client + its iframe + Google Sans font (~200KB,
+      // plus main-thread init) were competing with LCP on the landing page.
+      // One Tap appearing a few seconds later is an acceptable tradeoff.
+      strategy="lazyOnload"
       onReady={() => {
-        void initOneTap();
+        // Defer the actual prompt into an idle window so Google's iframe/font
+        // injection never lands inside the critical rendering path.
+        const ric: (cb: () => void) => void = window.requestIdleCallback
+          ? (cb) => window.requestIdleCallback(cb, { timeout: 4000 })
+          : (cb) => { setTimeout(cb, 2000); };
+        ric(() => { void initOneTap(); });
       }}
     />
   );

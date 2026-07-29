@@ -58,7 +58,8 @@ describe('HomePageClient ?next= round-trip', () => {
   it('auto-opens FTUE when ?next= is present and onboarding is not completed', () => {
     render(<HomePageClient />);
     expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
-    expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
+    // LandingView stays mounted beneath the opaque FTUE overlay (CLS fix).
+    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
   });
 
   it('navigates to the decoded next path when FTUE completes', () => {

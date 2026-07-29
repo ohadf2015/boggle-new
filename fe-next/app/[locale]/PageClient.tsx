@@ -236,14 +236,22 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     );
   }
 
-  if (showFTUE && routeAllowsOnboarding) {
-    return <OnboardingFlow onComplete={handleFTUEComplete} />;
-  }
-
+  // FTUE renders ON TOP of LandingView (opaque fixed inset-0 z-[100] overlay),
+  // NOT instead of it. Previously `showFTUE` replaced LandingView entirely:
+  // the SSR'd hero unmounted post-hydration, the SEO section reflowed to the
+  // top of the viewport, and Chrome logged the swap as a ~0.98 layout shift —
+  // THE landing-page CLS regression (field p75 CLS 0.98). Keeping LandingView
+  // mounted is pixel-identical for the user (the overlay is opaque) and leaves
+  // layout untouched underneath.
   return (
-    <LandingView
-      initialData={initialData}
-      onStartOnboarding={mounted && isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
-    />
+    <>
+      <LandingView
+        initialData={initialData}
+        onStartOnboarding={mounted && isNewUser && routeAllowsOnboarding ? handleStartOnboarding : undefined}
+      />
+      {showFTUE && routeAllowsOnboarding && (
+        <OnboardingFlow onComplete={handleFTUEComplete} />
+      )}
+    </>
   );
 }

@@ -65,7 +65,8 @@ describe('HomePageClient new-user room invite', () => {
   it('auto-opens FTUE for a new user who arrives via a room invite link', () => {
     render(<HomePageClient />);
     expect(screen.getByTestId('onboarding-flow')).toBeInTheDocument();
-    expect(screen.queryByTestId('landing-view')).not.toBeInTheDocument();
+    // LandingView stays mounted beneath the opaque FTUE overlay (CLS fix).
+    expect(screen.getByTestId('landing-view')).toBeInTheDocument();
   });
 
   it('persists the pending invite so OnboardingFlow can consume it', () => {

@@ -179,6 +179,11 @@ function cacheHeaders(): RequestHandler {
     
     if (path.startsWith('/_next/static/') || STATIC_ASSET_RE.test(path)) {
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    } else if (path === '/api/dictionary-words') {
+      // Next.js route handler sets its own long-lived Cache-Control + ETag and
+      // serves a 2.8MB payload — stamping no-store here defeats both and forces
+      // a full re-download on every visit.
+      return next();
     } else if (path.startsWith('/_next/') || EXPRESS_API_ROUTES.some((route) => path.startsWith(route))) {
       res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
       res.setHeader('Pragma', 'no-cache');

@@ -33,9 +33,10 @@ describe('HomePageClient route allowlist guard', () => {
 
   it('mounts OnboardingFlow on locale homepage for a new user', () => {
     mockPathname.mockReturnValue('/en');
-    const { getByTestId, queryByTestId } = render(<HomePageClient />);
+    const { getByTestId } = render(<HomePageClient />);
     expect(getByTestId('onboarding-flow')).toBeTruthy();
-    expect(queryByTestId('landing-view')).toBeNull();
+    // LandingView stays mounted beneath the FTUE overlay (CLS fix 2026-07-29).
+    expect(getByTestId('landing-view')).toBeTruthy();
   });
 
   it('hides onStartOnboarding CTA on blog route', () => {
