@@ -6,7 +6,7 @@ import { headers, cookies } from 'next/headers';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: '404 - Page Not Found | LexiClash',
+  title: { absolute: '404 - Page Not Found | LexiClash' },
   robots: { index: false, follow: false },
 };
 

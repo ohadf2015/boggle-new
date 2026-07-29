@@ -8,7 +8,7 @@ import NotFoundClient from './NotFoundClient';
 // (mascot + stale-chunk recovery) lives in NotFoundClient.
 // docs/2026-06-17-adsense-thin-page-noindex-spec.md
 export const metadata: Metadata = {
-  title: '404 - Page Not Found | LexiClash',
+  title: { absolute: '404 - Page Not Found | LexiClash' },
   robots: { index: false, follow: false },
 };
 
