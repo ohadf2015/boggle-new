@@ -129,12 +129,18 @@ USER nextjs
 EXPOSE 3001
 ENV PORT=3001
 ENV HOSTNAME="0.0.0.0"
-# Heap cap raised 1024 -> 2048: the Next.js SSR + Express + Socket.IO working set
-# sits ~700-900MB and the old 1GB cap caused recurring V8 heap-OOM crashes
-# (FATAL "Ineffective mark-compacts near heap limit") ~every 100min of uptime,
-# surfacing as 502s across every route. Container has multi-GB RAM (RSS peaks
-# ~1.65GB without cgroup kill), so 2GB heap + off-heap stays well within limits.
-ENV NODE_OPTIONS="--max-old-space-size=2048"
+# Heap cap = 1536MB on the 2384MiB (2.5GB) Railway container. History: 1024 was
+# too tight (V8 fatal "Ineffective mark-compacts" ~every 100min); it was bumped to
+# 2048, but 2048 is 86% of the container — V8 defers major GC until near its cap,
+# so old_space rides to ~1.9GB and RSS to ~2.0GB (83% of cgroup), tripping the
+# memory watchdog and sitting one burst from a kernel SIGKILL (measured 2026-07-29:
+# heapUsed floor ~700MB after GC, so no true leak — the cap just let it balloon).
+# 1536 + ~280MB non-heap RSS ≈ 1836MB = 77% of container, under the 80% WARN, while
+# leaving ~800MB of live-set headroom for loaded games (old crashing 1024 had ~250MB).
+# The memoryWatchdog boot guard alerts if cap ever exceeds 80% of container again.
+# If loaded (many-game) heapUsed post-GC nears ~1.2GB, the fix is a BIGGER CONTAINER,
+# never a bigger cap (a cap >80% of RAM recreates this).
+ENV NODE_OPTIONS="--max-old-space-size=1536"
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
   CMD curl -f http://localhost:3001/health/live || exit 1

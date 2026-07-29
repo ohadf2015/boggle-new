@@ -12,8 +12,11 @@ vi.mock('../modules/notificationService', () => ({ sendOpsAlert: vi.fn() }));
 import {
   evaluateMemoryAlert,
   getContainerMemoryLimitBytes,
+  evaluateHeapCapVsContainer,
   type MemWatchState,
 } from '../modules/memoryWatchdog';
+
+const MB = 1024 * 1024;
 
 const LIMIT = 1000; // bytes → pct = rss / 1000, keeps the math obvious
 const ok = (): MemWatchState => ({ band: 'ok', lastAlertAt: 0 });
@@ -98,5 +101,27 @@ describe('getContainerMemoryLimitBytes', () => {
     // sane positive byte count well under the 1TiB unlimited sentinel.
     expect(bytes).toBeGreaterThan(0);
     expect(bytes).toBeLessThan(1024 ** 4);
+  });
+});
+
+describe('evaluateHeapCapVsContainer', () => {
+  it('flags UNSAFE when the heap cap exceeds 80% of the container (the 2026-07-29 misconfig)', () => {
+    // --max-old-space-size=2048 on a 2384MiB container = 86% → RSS rides to ~98% → cgroup SIGKILL risk.
+    const r = evaluateHeapCapVsContainer(2048 * MB, 2384 * MB);
+    expect(r.safe).toBe(false);
+    expect(r.heapPct).toBeCloseTo(0.86, 2);
+    expect(r.message).toMatch(/heap cap/i);
+  });
+
+  it('is SAFE at the right-sized cap', () => {
+    // 1536 / 2384 = 64%, leaving room for ~280MB non-heap RSS under the 80% watchdog WARN.
+    const r = evaluateHeapCapVsContainer(1536 * MB, 2384 * MB);
+    expect(r.safe).toBe(true);
+    expect(r.heapPct).toBeCloseTo(0.64, 2);
+  });
+
+  it('treats an unknown (0) container limit as safe — never false-alarm at boot', () => {
+    const r = evaluateHeapCapVsContainer(2048 * MB, 0);
+    expect(r.safe).toBe(true);
   });
 });

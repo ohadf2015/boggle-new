@@ -112,7 +112,39 @@ export function getContainerMemoryLimitBytes(): number {
   if (cg) return cg;
   const envMb = parseInt(process.env.MEMORY_LIMIT_MB || '', 10);
   if (Number.isFinite(envMb) && envMb > 0) return envMb * 1024 * 1024;
-  return 2560 * 1024 * 1024;
+  return 2384 * 1024 * 1024; // observed Railway cgroup limit (2026-07-29)
+}
+
+/**
+ * The V8 heap cap (--max-old-space-size) must leave room for non-heap RSS
+ * (external buffers, code, stacks, malloc) under the container limit — else V8
+ * defers major GC until near its cap, RSS rides to the cgroup limit, and the
+ * kernel SIGKILLs the process before V8 ever OOMs. Trip if the cap alone claims
+ * >80% of container RAM (~280MB non-heap overhead would already push RSS past it).
+ *
+ * On 2026-07-29 `--max-old-space-size=2048` on a 2384MiB container (86%) did
+ * exactly this. This guard makes a future cap/container edit fail LOUDLY at boot
+ * (Class 4 — silent misconfig) instead of silently recreating the OOM.
+ */
+export const HEAP_CAP_SAFE_FRACTION = 0.8;
+
+export function evaluateHeapCapVsContainer(
+  heapLimitBytes: number,
+  containerLimitBytes: number,
+): { safe: boolean; heapPct: number; message: string } {
+  if (containerLimitBytes <= 0) {
+    return { safe: true, heapPct: 0, message: '' };
+  }
+  const heapPct = heapLimitBytes / containerLimitBytes;
+  const safe = heapPct <= HEAP_CAP_SAFE_FRACTION;
+  const mb = (n: number) => Math.round(n / 1024 / 1024);
+  const message = safe
+    ? ''
+    : `⚠️ lexiclash boggle-new: V8 heap cap too large for container — ` +
+      `--max-old-space-size=${mb(heapLimitBytes)}MB is ${Math.round(heapPct * 100)}% of the ${mb(containerLimitBytes)}MB container ` +
+      `(safe ≤ ${Math.round(HEAP_CAP_SAFE_FRACTION * 100)}%). RSS will ride to the cgroup limit and risk a SIGKILL. ` +
+      `Lower NODE_OPTIONS --max-old-space-size or use a bigger container.`;
+  return { safe, heapPct, message };
 }
 
 function formatAlert(level: 'warn' | 'critical' | 'recovered', rssBytes: number, limitBytes: number): string {
@@ -147,6 +179,13 @@ export function startMemoryWatchdog(
   let samples = 0;
 
   logger.info('MEMWATCH', `Memory watchdog started: limit ${Math.round(limitBytes / 1024 / 1024)}MB, every ${intervalMs}ms`);
+
+  // Boot-time sanity: is the V8 heap cap sized to leave RSS headroom under the container?
+  const capCheck = evaluateHeapCapVsContainer(v8.getHeapStatistics().heap_size_limit, limitBytes);
+  if (!capCheck.safe) {
+    logger.warn('MEMWATCH', capCheck.message);
+    void send(capCheck.message);
+  }
 
   timer = setInterval(() => {
     const mu = process.memoryUsage();

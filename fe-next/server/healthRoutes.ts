@@ -3,8 +3,10 @@
  * Endpoints for monitoring, health checks, and metrics
  */
 
+import v8 from 'v8';
 import type { Application, Request, Response } from 'express';
 import type { Server } from 'socket.io';
+import { computeScalingPressure } from './scalingPressure';
 import { isRedisAvailable, getRedisMetrics, getRedisClient } from '../backend/redisClient';
 import { circuitBreaker } from '../backend/redis/circuitBreaker';
 import { checkPoolHealth } from '../backend/db/supabasePool';
@@ -124,19 +126,22 @@ export function configureHealthRoutes(app: Application, io: Server): void {
     const metrics = getMetrics();
     const supabaseMetrics = getConnectionMetrics();
 
-    // Compute pressure signals for autoscaler
-    const connectionUtilization = socketConnections / maxConnections;
-    const heapUtilization = memUsage.heapUsed / memUsage.heapTotal;
+    // Compute pressure signals for autoscaler. heapUtilization is measured against
+    // the V8 heap *limit* (--max-old-space-size), NOT heapTotal — see scalingPressure.ts.
+    const heapLimitBytes = v8.getHeapStatistics().heap_size_limit;
     const eventLoopLagMs = metrics.eventLoopLagMs;
     const supabaseQueueDepth = supabaseMetrics.queueLength;
 
     // readyForMore: true when this replica has headroom across all dimensions.
     // Autoscalers can scale up when ALL replicas report readyForMore=false.
-    const readyForMore =
-      connectionUtilization < 0.75 &&
-      heapUtilization < 0.85 &&
-      eventLoopLagMs < 100 &&
-      supabaseQueueDepth < 8;
+    const { connectionUtilization, heapUtilization, readyForMore } = computeScalingPressure({
+      socketConnections,
+      maxConnections,
+      heapUsedBytes: memUsage.heapUsed,
+      heapLimitBytes,
+      eventLoopLagMs,
+      supabaseQueueDepth,
+    });
 
     res.json({
       status: 'ok',
@@ -177,6 +182,9 @@ export function configureHealthRoutes(app: Application, io: Server): void {
       memory: {
         heapUsedMB: Math.round(memUsage.heapUsed / 1024 / 1024),
         heapTotalMB: Math.round(memUsage.heapTotal / 1024 / 1024),
+        // heapLimitMB is the real OOM ceiling (--max-old-space-size). Compare
+        // heapUsedMB against THIS, not heapTotalMB, to judge OOM proximity.
+        heapLimitMB: Math.round(heapLimitBytes / 1024 / 1024),
         rssMB: Math.round(memUsage.rss / 1024 / 1024),
         externalMB: Math.round(memUsage.external / 1024 / 1024),
       },
