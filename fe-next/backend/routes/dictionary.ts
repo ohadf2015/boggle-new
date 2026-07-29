@@ -10,10 +10,8 @@ import logger from '../utils/logger';
 import { createEndpointLimiter } from '../utils/apiRateLimiter';
 
 // Import the same dictionary used by multiplayer
- 
-const { isDictionaryWord, dictionary } = require('../dictionary');
- 
-const { isWordCommunityValid, isWordValidForScoring } = require('../modules/communityWordManager');
+import { isDictionaryWord, dictionary, ensureLanguageLoaded } from '../dictionary';
+import { isWordCommunityValid, isWordValidForScoring } from '../modules/communityWordManager';
 
 const router: Router = express.Router();
 
@@ -62,9 +60,22 @@ router.post('/check', dictionaryRateLimiter, async (req: DictionaryCheckRequest,
   }
 
   try {
-    // Check if dictionary is loaded
-    const dict = dictionary as Dictionary;
-    if (!dict.loaded) {
+    // Dictionaries are lazy-loaded per language (English-only at boot) and idle
+    // languages can be UNLOADED by the memory manager. Without this await, any
+    // non-English check (e.g. Hebrew daily challenge) hit an empty dictionary
+    // and every word fell through to source:'unknown'. Ensure the requested
+    // language is actually loaded before validating.
+    const SUPPORTED = ['en', 'he', 'sv', 'ja', 'es', 'ru'];
+    const lang = (SUPPORTED.includes(language) ? language : 'en') as import('@/shared/types').Language;
+    if (SUPPORTED.includes(language)) {
+      await ensureLanguageLoaded(lang);
+    }
+
+    // Check the REQUESTED language is loaded — the global `loaded` flag only
+    // means English finished; lazy-loaded languages never set it.
+    const dict = dictionary as Dictionary & { loadedLanguages?: Set<string> };
+    const langLoaded = dict.loadedLanguages ? dict.loadedLanguages.has(lang) : dict.loaded;
+    if (!langLoaded) {
       logger.warn('DICTIONARY', `Dictionary not loaded yet, returning unknown for: ${normalizedWord}`);
       res.json({ isValid: false, source: 'not_loaded' } as DictionaryCheckResponse);
       return;
@@ -77,7 +88,7 @@ router.post('/check', dictionaryRateLimiter, async (req: DictionaryCheckRequest,
     // const shouldAutoValidate = isInDictionary || isCommunityValidated || hasPositiveScore;
 
     // Check 1: Local dictionary (same as multiplayer)
-    const isInDictionary = isDictionaryWord(normalizedWord, language);
+    const isInDictionary = isDictionaryWord(normalizedWord, lang);
 
     if (isInDictionary === true) {
       res.json({ isValid: true, source: 'dictionary' } as DictionaryCheckResponse);
