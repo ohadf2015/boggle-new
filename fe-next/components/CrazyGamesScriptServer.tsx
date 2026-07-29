@@ -1,13 +1,18 @@
 /**
  * CrazyGames SDK Script — Server Component
  *
- * Renders the CrazyGames SDK <script> tags inside the React tree so that
- * hydration sees them. Previously injected via Express middleware
+ * Renders the CrazyGames SDK <script> tags using next/script with lazyOnload
+ * strategy so they do not block initial page rendering. The bootstrap code
+ * polls for the SDK with retries, so load ordering is independently handled.
+ *
+ * This component was previously injected via Express middleware
  * (crazyGamesInjector.ts), which caused hydration mismatches because React
- * didn't know about the extra DOM nodes.
+ * didn't know about the extra DOM nodes. Moved into the React tree.
  *
  * SECURITY: All content is static string literals — no user input.
  */
+
+import Script from 'next/script';
 
 // Opt-in load. The CrazyGames SDK only does anything inside a crazygames.com
 // iframe; on our own domains (lexiclash.live) it self-disables yet still costs a
@@ -31,10 +36,13 @@ export default function CrazyGamesScriptServer() {
 
   return (
     <>
-      {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-      <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js" />
-      <script
+      <Script
+        src="https://sdk.crazygames.com/crazygames-sdk-v3.js"
+        strategy="lazyOnload"
+      />
+      <Script
         id="crazygames-bootstrap"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{ __html: BOOTSTRAP_CODE }}
       />
     </>

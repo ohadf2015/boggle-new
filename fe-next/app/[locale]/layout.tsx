@@ -11,6 +11,7 @@ import InGameAudioButton from '@/components/InGameAudioButton';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import AdSenseLoader from '@/components/ads/AdSenseLoader';
+import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PagePresenceReporter from '@/components/PagePresenceReporter';
@@ -582,7 +583,33 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* PostHog EU analytics — preconnect for faster first event */}
                 <link rel="preconnect" href="https://eu.i.posthog.com" />
                 <link rel="dns-prefetch" href="https://eu.i.posthog.com" />
+                {/* AdSense / Google Ads — preconnect for ad script and ad serving origins */}
+                <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
+                <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
+                <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
+                <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
+                {/* CrazyGames SDK — preconnect for game-distribution builds */}
+                <link rel="preconnect" href="https://sdk.crazygames.com" />
+                <link rel="dns-prefetch" href="https://sdk.crazygames.com" />
                 {/* GIF preload removed — 571KB blocks critical resources (Lighthouse: LCP 24s → should drop significantly) */}
+                {/* Locale-conditional font preloads — Hebrew/Cyrillic fonts have
+                    preload: false in fonts.ts to avoid wasted bytes on Latin pages.
+                    Preload them here when the locale actually needs them.
+                    Next.js auto-generates size-adjust for the fallback,
+                    so font-swap CLS is already mitigated. */}
+                {validLocale === 'he' && (
+                  <>
+                    <link rel="preload" href="/fonts/fredoka-hebrew.woff2" as="font" type="font/woff2" crossOrigin="anonymous" fetchPriority="high" />
+                    <link rel="preload" href="/fonts/rubik-hebrew.woff2" as="font" type="font/woff2" crossOrigin="anonymous" fetchPriority="high" />
+                    <link rel="preload" href="/fonts/heebo-hebrew.woff2" as="font" type="font/woff2" crossOrigin="anonymous" fetchPriority="high" />
+                  </>
+                )}
+                {validLocale === 'ru' && (
+                  <>
+                    <link rel="preload" href="/fonts/comfortaa-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="anonymous" fetchPriority="high" />
+                    <link rel="preload" href="/fonts/rubik-cyrillic.woff2" as="font" type="font/woff2" crossOrigin="anonymous" fetchPriority="high" />
+                  </>
+                )}
                 {/* Favicon and icons - use relative paths for development, absolute for production */}
                 {/* PNG icons FIRST - Google requires multiples of 48px and prefers PNG over SVG/ICO */}
                 <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
@@ -605,8 +632,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
-                {/* CrazyGames SDK must load in <head> with beforeInteractive
-                    so it's detected by their QA tool before hydration */}
+                {/* CrazyGames SDK — loaded with lazyOnload strategy (non-blocking).
+                    Render position in <head> is vestigial (next/script injects at
+                    the document body regardless of tree position). */}
                 <CrazyGamesScriptServer />
                 {/* CLS guard: prime --admob-banner-height and --bottom-nav-height
                     from localStorage BEFORE first paint.
@@ -639,6 +667,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 {/* Direct AdSense (web Auto-Ads) — replaces PurpleAds. Dark until
                     NEXT_PUBLIC_ADSENSE_ENABLED=true; consent/tier/web gated internally. */}
                 <AdSenseLoader />
+                {/* Web anchor-ad height observer — measures AdSense anchor ad band
+                    and publishes --web-anchor-ad-height for CLS prevention. */}
+                <WebAnchorAdObserver />
                 <SocialMediaPixels />
                 <WebVitalsReporter />
                 {/* Report current page so admin live monitor sees users not in a game */}
