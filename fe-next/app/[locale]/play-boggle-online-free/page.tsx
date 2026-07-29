@@ -390,6 +390,23 @@ export default async function PlayBoggleOnlineFreePage({ params }: PageProps) {
           </div>
         </section>
 
+        {/* CLASSROOM */}
+        <section className="mt-20 max-w-3xl">
+          <h2 className="mb-3 font-neo-display text-3xl font-black uppercase leading-tight sm:text-4xl">
+            Boggle online for the <span className="text-neo-cyan">classroom</span>.
+          </h2>
+          <p className="text-sm leading-relaxed text-neo-white sm:text-base">
+            Teachers use LexiClash as a free classroom Boggle game — no accounts, no downloads, no setup. Spin up a
+            room in seconds, share the link or QR code, and 20+ students compete live on the same word grid. Great
+            for vocabulary practice, spelling drills, and ESL classes. Want a version built for schools, with
+            classroom-ready tools?{' '}
+            <Link href={`/${locale}/education/for-schools`} className="text-neo-cyan underline">
+              Check out LexiClash for Schools
+            </Link>
+            .
+          </p>
+        </section>
+
         {/* WHY LEXICLASH */}
         <section className="mt-20">
           <h2 className="mb-8 font-neo-display text-3xl font-black uppercase sm:text-4xl">

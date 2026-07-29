@@ -1,5 +1,5 @@
 import { normalizeHebrewWord } from '../../shared/utils/wordNormalization';
-import type { ConnectionPuzzle, GameState, GuessResult } from './types';
+import type { ConnectionPuzzle, GameState, GuessResult, GameStatus } from './types';
 
 export const INITIAL_LIVES = 3;
 export const POINTS_EASY = 100;
@@ -13,6 +13,15 @@ const POINTS_BY_DIFFICULTY: Record<ConnectionPuzzle['difficulty'], number> = {
   medium: POINTS_MEDIUM,
   hard: POINTS_HARD,
 };
+
+/**
+ * A give-up is a real abandon (player quit mid-puzzle). Running out of lives
+ * or solving correctly are both natural game endings — count as completed so
+ * the completion funnel isn't undercounted; `isWinner` carries win/loss.
+ */
+export function isCompletedTerminalStatus(status: GameStatus): boolean {
+  return status === 'correct' || status === 'outOfLives';
+}
 
 export function xpForPuzzle(difficulty: ConnectionPuzzle['difficulty'], streak: number): number {
   const base = POINTS_BY_DIFFICULTY[difficulty];

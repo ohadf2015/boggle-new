@@ -9,6 +9,7 @@ import {
   revive,
   revealHint,
   xpForPuzzle,
+  isCompletedTerminalStatus,
   INITIAL_LIVES,
   POINTS_EASY,
   POINTS_MEDIUM,
@@ -298,5 +299,24 @@ describe('xpForPuzzle', () => {
   it('applies streak bonus at threshold', () => {
     expect(xpForPuzzle('easy', STREAK_BONUS_THRESHOLD)).toBe(15);
     expect(xpForPuzzle('hard', STREAK_BONUS_THRESHOLD)).toBe(53);
+  });
+});
+
+describe('isCompletedTerminalStatus', () => {
+  it('treats a correct finish as completed', () => {
+    expect(isCompletedTerminalStatus('correct')).toBe(true);
+  });
+
+  it('treats running out of lives as completed (natural game-over, not an abandon)', () => {
+    expect(isCompletedTerminalStatus('outOfLives')).toBe(true);
+  });
+
+  it('treats a voluntary give-up as NOT completed (abandoned)', () => {
+    expect(isCompletedTerminalStatus('gaveUp')).toBe(false);
+  });
+
+  it('treats non-terminal states as not completed', () => {
+    expect(isCompletedTerminalStatus('playing')).toBe(false);
+    expect(isCompletedTerminalStatus('wrong')).toBe(false);
   });
 });
