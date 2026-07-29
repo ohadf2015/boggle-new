@@ -283,6 +283,25 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
   };
 }
 
+const HE_DAILY_FAQS = [
+  {
+    q: 'מהי המילה היומית?',
+    a: 'המילה היומית היא פאזל מילים יומי בעברית — ניחשו מילה בת 5 אותיות ב-10 ניסיונות. אותו לוח לכולם, חינם, ללא הרשמה.',
+  },
+  {
+    q: 'האם המילה היומית חינמית?',
+    a: 'כן, המילה היומית חינמית לחלוטין ואינה דורשת הרשמה. פתחו את lexiclash.live בכל דפדפן ושחקו מיד.',
+  },
+  {
+    q: 'כמה ניסיונות יש לנחש את מילת היום?',
+    a: 'יש לכם 10 ניסיונות לנחש את מילת היום. אחרי כל ניסיון תקבלו רמזים: אות נכונה במקום נכון (ירוק), אות נכונה במקום לא נכון (צהוב) ואות שאינה במילה (אפור).',
+  },
+  {
+    q: 'מה ההבדל בין המילה היומית ומילת היום?',
+    a: 'שניהם שמות לאותו פאזל — ניחוש המילה היומית בלקסיקלאש. ניחשו את מילת היום ב-10 ניסיונות, אותו לוח לכל השחקנים בעולם.',
+  },
+];
+
 /**
  * Daily Challenge page route
  * Same puzzle for everyone worldwide each day
@@ -291,9 +310,27 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
  * Wrapped in Suspense boundary to properly handle useSearchParams
  * which can cause "Rendered fewer hooks than expected" errors without it.
  */
-export default async function DailyChallengePage(): Promise<React.JSX.Element> {
+export default async function DailyChallengePage({ params }: { params: Promise<{ locale: string }> }): Promise<React.JSX.Element> {
+  const { locale } = await params;
+
+  const heFaqSchema = locale === 'he' ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: HE_DAILY_FAQS.map((faq) => ({
+      '@type': 'Question',
+      name: faq.q,
+      acceptedAnswer: { '@type': 'Answer', text: faq.a },
+    })),
+  } : null;
+
   return (
     <>
+      {heFaqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(heFaqSchema) }}
+        />
+      )}
       <Suspense fallback={<LoadingFallback />}>
         <DailyRedirect />
       </Suspense>

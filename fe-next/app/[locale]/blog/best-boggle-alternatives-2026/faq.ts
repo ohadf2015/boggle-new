@@ -9,6 +9,10 @@ export interface FaqItem {
 export const faqByLocale: Record<string, FaqItem[]> = {
   en: [
     {
+      question: 'What are the best games like Boggle online?',
+      answer: 'The best word games like Boggle online in 2026 are: LexiClash (free real-time multiplayer on a shared letter grid — closest to physical Boggle), Wordle (free daily one-puzzle, no multiplayer), and Word Blitz (mobile, fast-paced). LexiClash is the only one with true Boggle-style simultaneous play where everyone sees the same grid at the same time.',
+    },
+    {
       question: 'Is there a free online game like Boggle?',
       answer: 'Yes — LexiClash is a free online word game with real-time multiplayer on a letter grid, similar to Boggle. No download, no pay-to-win power-ups. Play instantly at lexiclash.live.',
     },
