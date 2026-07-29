@@ -87,6 +87,17 @@ describe('sitemap', () => {
     }
   });
 
+  // Teacher Pro pricing is the site's only revenue surface — it must be
+  // crawlable from the sitemap. Fully SSR'd with Product+Offer JSON-LD
+  // (added 2026-07-29 after finding it missing entirely).
+  it('lists /teacher/upgrade for every supported locale', () => {
+    for (const locale of ['he', 'en', 'sv', 'ja', 'es', 'ru']) {
+      const entry = routes.find((r) => r.url === `${BASE_URL}/${locale}/teacher/upgrade`);
+      expect(entry, `missing /teacher/upgrade for ${locale}`).toBeDefined();
+      expect(entry?.alternates?.languages).toBeDefined();
+    }
+  });
+
   // Adventure is BETA-gated (PageClient redirects non-beta users away) —
   // public visitors and the AdSense reviewer hit a wall. Out of the sitemap
   // and noindexed until GA. Restore both when the BETA badge drops.

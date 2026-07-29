@@ -169,6 +169,12 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForAllLocales(routes, '/education/duels', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
   addForAllLocales(routes, '/education/classroom-game', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.65 });
 
+  // ─── Teacher Pro pricing (the paywall's front door) ───
+  // Fully SSR'd (price, features, FAQ in raw HTML) and carries Product+Offer
+  // and FAQPage JSON-LD. Previously absent from the sitemap — the only revenue
+  // surface had no crawl path (added 2026-07-29).
+  addForAllLocales(routes, '/teacher/upgrade', { lastModified: LAST_DEPLOYED, changeFrequency: 'monthly', priority: 0.7 });
+
   // ─── Education SEO landings (English-only target; non-EN noindexed via robots in metadata) ───
   // Each targets a high-volume teacher/ESL keyword cluster; non-EN locales hreflang back to /education.
   const educationLandings = [
