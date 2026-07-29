@@ -150,4 +150,34 @@ describe('ReportBugModal', () => {
     await waitFor(() => expect(screen.getByText('bugReport.success')).toBeInTheDocument());
     expect(screen.queryByText('bugReport.rewardEarned')).toBeNull();
   });
+
+  it('switches feedback type and posts it with the report', async () => {
+    const user = userEvent.setup();
+    render(<ReportBugModal isOpen onClose={vi.fn()} />);
+    await user.click(screen.getByRole('radio', { name: /Feature idea/i }));
+    await user.type(screen.getByRole('textbox'), 'Please add a practice mode with no timer');
+    await user.click(screen.getByRole('button', { name: /bugReport\.submit/i }));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('/api/feedback', expect.any(Object)));
+    const init = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0][1];
+    const body = JSON.parse(init.body);
+    expect(body.type).toBe('feature');
+  });
+
+  it('defaults to bug type and attaches device metadata', async () => {
+    const user = userEvent.setup();
+    render(<ReportBugModal isOpen onClose={vi.fn()} />);
+    await user.type(screen.getByRole('textbox'), 'Something is broken on this page');
+    await user.click(screen.getByRole('button', { name: /bugReport\.submit/i }));
+
+    await waitFor(() => expect(fetch).toHaveBeenCalledWith('/api/feedback', expect.any(Object)));
+    const init = (fetch as unknown as ReturnType<typeof vi.fn>).mock.calls[0][1];
+    const body = JSON.parse(init.body);
+    expect(body.type).toBe('bug');
+    expect(typeof body.url).toBe('string');
+    expect(typeof body.screen).toBe('string');
+    expect(typeof body.platform).toBe('string');
+    expect(typeof body.touch).toBe('number');
+    expect(body.screenshotDataUrl).toBeUndefined();
+  });
 });

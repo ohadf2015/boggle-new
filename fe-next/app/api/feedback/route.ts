@@ -5,7 +5,7 @@ import logger from '@/utils/logger';
 import { captureApiError } from '@/utils/sentry';
 import { checkApiRateLimit, rateLimitResponse, addRateLimitHeaders } from '@/lib/apiRateLimit';
 import { withTimeout, EMAIL_COLORS } from '@/lib/email';
-import { sendTelegramMessage, escapeTelegramMarkdownV2, isTelegramConfigured } from '@/lib/telegram';
+import { sendTelegramMessage, sendTelegramPhoto, escapeTelegramMarkdownV2, isTelegramConfigured } from '@/lib/telegram';
 import { awardCoinsServer } from '@/backend/services/economy/awardCoins';
 
 /**
@@ -50,35 +50,55 @@ function getSupabaseAdmin() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
+type FeedbackType = 'bug' | 'feature' | 'general';
+
+const TYPE_META: Record<FeedbackType, { emoji: string; label: string }> = {
+  bug: { emoji: '🐞', label: 'Bug Report' },
+  feature: { emoji: '💡', label: 'Feature Request' },
+  general: { emoji: '💬', label: 'General Feedback' },
+};
+
 interface FeedbackFields {
   message: string;
+  type: FeedbackType;
   page: string;
+  url: string;
   userAgent: string;
   userId: string | null;
   username: string | null;
   email: string | null;
   locale: string;
   viewport: string;
+  screen: string;
+  touch: number | null;
+  platform: string;
+  connection: string;
   appVersion: string;
+  screenshotDataUrl: string | null;
 }
 
 /** Build the founder-facing Telegram message (MarkdownV2, all dynamic parts escaped). */
 function buildTelegramMessage(f: FeedbackFields): string {
   const esc = escapeTelegramMarkdownV2;
+  const meta = TYPE_META[f.type];
   const userDisplay = f.username ? `${esc(f.username)}\\(${esc(f.userId || '')}\\)` : (f.userId ? esc(f.userId) : '_anonymous_');
   const lines = [
-    '🐞 *New Bug Report / Feedback*',
+    `${meta.emoji} *New ${esc(meta.label)}*`,
     '',
     esc(f.message),
     '',
-    `*Page:* ${esc(f.page) || '_unknown_'}`,
+    `*Page:* ${esc(f.url || f.page) || '_unknown_'}`,
     `*User:* ${userDisplay}`,
     `*Locale:* ${esc(f.locale) || '_?_'}`,
     `*Browser:* ${esc(f.userAgent.slice(0, 180)) || '_?_'}`,
   ];
   if (f.viewport) lines.push(`*Viewport:* ${esc(f.viewport)}`);
+  if (f.screen) lines.push(`*Screen:* ${esc(f.screen)}`);
+  if (f.connection) lines.push(`*Network:* ${esc(f.connection)}`);
+  if (f.touch !== null) lines.push(`*Touch points:* ${f.touch}`);
   if (f.appVersion) lines.push(`*App:* ${esc(f.appVersion)}`);
   if (f.email) lines.push(`*Reply to:* ${esc(f.email)}`);
+  if (f.screenshotDataUrl) lines.push('_Screenshot attached above_');
   return lines.join('\n');
 }
 
@@ -90,27 +110,33 @@ async function sendEmail(f: FeedbackFields): Promise<boolean> {
   }
   const c = EMAIL_COLORS as Record<string, string>;
   const userDisplay = f.username ? `${f.username} (${f.userId})` : (f.userId || 'anonymous');
+  const meta = TYPE_META[f.type];
+  const screenshotBase64 = f.screenshotDataUrl?.split(',')[1] ?? null;
   try {
     const result = await withTimeout(
       resend.emails.send({
         from: fromEmail,
         to: FEEDBACK_EMAIL,
         ...(f.email ? { replyTo: f.email } : {}),
-        subject: `[LexiClash Bug] ${f.message.replace(/\n/g, ' ').replace(/\r/g, '').slice(0, 60)}`,
-        text: `Bug report:\n\n${f.message}\n\nPage: ${f.page}\nUser: ${userDisplay}\nEmail: ${f.email || 'n/a'}\nLocale: ${f.locale}\nViewport: ${f.viewport}\nApp: ${f.appVersion}\nBrowser: ${f.userAgent}`,
+        subject: `[LexiClash ${f.type === 'bug' ? 'Bug' : f.type === 'feature' ? 'Feature' : 'Feedback'}] ${f.message.replace(/\n/g, ' ').replace(/\r/g, '').slice(0, 60)}`,
+        text: `${meta.label}:\n\n${f.message}\n\nPage: ${f.url || f.page}\nUser: ${userDisplay}\nEmail: ${f.email || 'n/a'}\nLocale: ${f.locale}\nViewport: ${f.viewport}\nScreen: ${f.screen}\nPlatform: ${f.platform}\nNetwork: ${f.connection}\nApp: ${f.appVersion}\nBrowser: ${f.userAgent}${screenshotBase64 ? '\nScreenshot: attached' : ''}`,
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: ${c.navy || '#1a1a2e'}; padding: 24px; border-radius: 12px;">
-            <h2 style="color: ${c.lime || '#BFFF00'};">🐞 New Bug Report</h2>
+            <h2 style="color: ${c.lime || '#BFFF00'};">${meta.emoji} New ${escapeHtml(meta.label)}</h2>
             <p style="white-space: pre-wrap; color: ${c.white || '#fff'}; line-height: 1.6;">${escapeHtml(f.message)}</p>
             <hr style="border-color: ${c.grayDark || '#333'};" />
             <p style="color: ${c.gray || '#aaa'}; font-size: 13px;">
-              Page: ${escapeHtml(f.page)}<br/>
+              Page: ${escapeHtml(f.url || f.page)}<br/>
               User: ${escapeHtml(userDisplay)}<br/>
               Reply: ${f.email ? escapeHtml(f.email) : 'n/a'}<br/>
-              Locale: ${escapeHtml(f.locale)} · Viewport: ${escapeHtml(f.viewport)} · App: ${escapeHtml(f.appVersion)}<br/>
+              Locale: ${escapeHtml(f.locale)} · Viewport: ${escapeHtml(f.viewport)} · Screen: ${escapeHtml(f.screen)} · Network: ${escapeHtml(f.connection)} · App: ${escapeHtml(f.appVersion)}<br/>
               Browser: ${escapeHtml(f.userAgent)}
+              ${screenshotBase64 ? '<br/><em>Screenshot attached to this email.</em>' : ''}
             </p>
           </div>`,
+        ...(screenshotBase64
+          ? { attachments: [{ filename: 'feedback-screenshot.jpg', content: screenshotBase64 }] }
+          : {}),
       }),
       10_000,
       'Resend API timed out after 10 seconds'
@@ -150,16 +176,27 @@ export async function POST(request: NextRequest) {
 
     const rawEmail = str(body.email, 255).toLowerCase();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const rawType = str(body.type, 16);
+    const screenshot = typeof body.screenshotDataUrl === 'string' && body.screenshotDataUrl.startsWith('data:image/')
+      ? body.screenshotDataUrl.slice(0, 1_200_000)
+      : null;
     const fields: FeedbackFields = {
       message,
+      type: rawType === 'feature' || rawType === 'general' ? rawType : 'bug',
       page: str(body.page, 300),
+      url: str(body.url, 500),
       userAgent: str(body.userAgent, 500),
       userId: typeof body.userId === 'string' && body.userId.trim() ? body.userId.trim().slice(0, 64) : null,
       username: null,
       email: rawEmail && emailRegex.test(rawEmail) ? rawEmail : null,
       locale: str(body.locale, 8),
       viewport: str(body.viewport, 24),
+      screen: str(body.screen, 32),
+      touch: typeof body.touch === 'number' && body.touch >= 0 && body.touch <= 100 ? Math.round(body.touch) : null,
+      platform: str(body.platform, 64),
+      connection: str(body.connection, 16),
       appVersion: str(body.appVersion, 32),
+      screenshotDataUrl: screenshot,
     };
 
     // Look up username server-side (do not trust client)
@@ -186,7 +223,7 @@ export async function POST(request: NextRequest) {
         shouldReward = (count ?? 0) === 0;
       }
 
-      const { error } = await supabase.from('feedback_reports').insert({
+      const baseRow = {
         message: fields.message,
         page: fields.page || null,
         user_agent: fields.userAgent || null,
@@ -200,7 +237,27 @@ export async function POST(request: NextRequest) {
         status: 'new',
         reward_granted: shouldReward,
         created_at: new Date().toISOString(),
-      });
+      };
+      // Newer schema has `type` + `metadata` jsonb; older doesn't. Try the rich
+      // row first, fall back to the base row on any schema mismatch — never
+      // lose a report because a migration hasn't run yet.
+      const richRow = {
+        ...baseRow,
+        type: fields.type,
+        metadata: {
+          url: fields.url || null,
+          screen: fields.screen || null,
+          touch: fields.touch,
+          platform: fields.platform || null,
+          connection: fields.connection || null,
+          hasScreenshot: !!fields.screenshotDataUrl,
+        },
+      };
+      let { error } = await supabase.from('feedback_reports').insert(richRow);
+      if (error) {
+        logger.warn('[Feedback] Rich insert failed, retrying base row:', error.message);
+        ({ error } = await supabase.from('feedback_reports').insert(baseRow));
+      }
       if (error) {
         logger.error('[Feedback] DB insert error:', error);
         captureApiError(new Error(error.message), '/api/feedback', { method: 'POST', statusCode: 500 });
@@ -224,8 +281,22 @@ export async function POST(request: NextRequest) {
     }
 
     // 2. Telegram + 3. Email — run in parallel, don't let one block the other.
+    // With a screenshot: photo first (short caption), then the full text report
+    // so no metadata is lost to Telegram's 1024-char caption limit.
+    const sendTelegramReport = async (): Promise<boolean> => {
+      if (!isTelegramConfigured()) return false;
+      const fullText = buildTelegramMessage(fields);
+      if (fields.screenshotDataUrl) {
+        const esc = escapeTelegramMarkdownV2;
+        const meta = TYPE_META[fields.type];
+        const caption = `${meta.emoji} *${esc(meta.label)}*\n${esc(fields.message.slice(0, 700))}`;
+        await sendTelegramPhoto(fields.screenshotDataUrl, caption);
+        return sendTelegramMessage(fullText);
+      }
+      return sendTelegramMessage(fullText);
+    };
     const [tgSent, emailSent] = await Promise.all([
-      isTelegramConfigured() ? sendTelegramMessage(buildTelegramMessage(fields)) : Promise.resolve(false),
+      sendTelegramReport(),
       sendEmail(fields),
     ]);
 

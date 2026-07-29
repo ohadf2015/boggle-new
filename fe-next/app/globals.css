@@ -5388,3 +5388,10 @@ html[data-cosy='true'] .animate-neo-press {
     opacity: 0;
   }
 }
+
+/* Feedback screenshot capture: hide dialogs + overlay while html2canvas runs
+   so the shot shows the page state being reported, not the feedback modal. */
+html.feedback-capturing [role="dialog"],
+html.feedback-capturing [data-dialog-overlay] {
+  visibility: hidden !important;
+}

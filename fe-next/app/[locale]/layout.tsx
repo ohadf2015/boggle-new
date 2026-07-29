@@ -46,6 +46,13 @@ const PushNotificationPrompt = nextDynamic(
 // Lazy-load cookie consent banner — only needed on first visit
 const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
 
+// Feedback FAB — smart launcher that auto-positions above bottom nav / ads /
+// any fixed bottom bar, draggable, hides during keyboard + dialogs. Defers to
+// browser idle internally; the modal chunk loads on first open.
+const FeedbackFab = nextDynamic(() => import('@/components/feedback/FeedbackFab'), {
+  loading: () => null,
+});
+
 // Non-critical components — deferred to keep landing-page JS small.
 // All are post-hydration effects that don't block first paint or LCP.
 const PWAInstallPrompt = nextDynamic(() => import('@/components/PWAInstallPrompt'), {
@@ -698,6 +705,8 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <EmailCaptureModal />
                     <NewYearCountdown />
                     <CookieConsent />
+                    {/* Floating feedback launcher → ReportBugModal → /api/feedback (Supabase + Telegram + email) */}
+                    <FeedbackFab />
                     {/* Google One Tap (web) — in-page ID-token sign-in so Google's
                         consent shows our domain, not <ref>.supabase.co. No redirect. */}
                     <GoogleOneTapInitializer />

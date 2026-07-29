@@ -75,3 +75,60 @@ export async function sendTelegramMessage(
     return false;
   }
 }
+
+/**
+ * Send a photo (base64 data URL, e.g. a feedback screenshot) with an optional
+ * MarkdownV2 caption. Caption is hard-capped at 1000 chars (Telegram limit is
+ * 1024). Never throws — returns false on any failure so the caller can fall
+ * back to a text-only report.
+ */
+export async function sendTelegramPhoto(
+  dataUrl: string,
+  caption: string,
+  options: SendOptions = {}
+): Promise<boolean> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = options.chatId ?? process.env.TELEGRAM_CHAT_ID;
+
+  if (!dataUrl || !token || !chatId) return false;
+
+  const match = /^data:image\/(png|jpe?g|webp);base64,(.+)$/i.exec(dataUrl);
+  if (!match) {
+    logger.warn('[Telegram] sendPhoto: unsupported data URL format');
+    return false;
+  }
+
+  try {
+    const ext = match[1].toLowerCase().replace('jpeg', 'jpg');
+    const buffer = Buffer.from(match[2], 'base64');
+    if (buffer.byteLength > 9_500_000) {
+      logger.warn('[Telegram] sendPhoto: image too large, skipping');
+      return false;
+    }
+
+    const form = new FormData();
+    form.append('chat_id', chatId);
+    form.append('photo', new Blob([new Uint8Array(buffer)]), `feedback.${ext}`);
+    if (caption) {
+      form.append('caption', caption.slice(0, 1000));
+      form.append('parse_mode', 'MarkdownV2');
+    }
+
+    const response = await fetch(`${TELEGRAM_API}/bot${token}/sendPhoto`, {
+      method: 'POST',
+      body: form,
+      signal: AbortSignal.timeout(15000),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.text().catch(() => '');
+      logger.warn(`[Telegram] sendPhoto failed: ${response.status} - ${errorBody}`);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    logger.error(`[Telegram] sendPhoto error: ${message}`);
+    return false;
+  }
+}
