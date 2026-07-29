@@ -1,9 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Download, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { gameEvents } from '@/components/GoogleAnalytics';
+import { isAndroidBrowser } from '@/utils/androidApp';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -21,10 +24,16 @@ interface BeforeInstallPromptEvent extends Event {
  */
 export function PWAInstallPrompt() {
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
 
   useEffect(() => {
+    // On Android the native app promo (AndroidAppInstallPromo) owns the install
+    // pitch — yield so the user never gets two install prompts. Desktop Chrome,
+    // where there is no native app, still gets the PWA banner.
+    if (isAndroidBrowser(navigator.userAgent)) return;
+
     // Check if user has dismissed prompt recently
     const dismissedUntil = localStorage.getItem('pwa_install_dismissed_until');
     if (dismissedUntil && Date.now() < parseInt(dismissedUntil)) {
@@ -57,6 +66,8 @@ export function PWAInstallPrompt() {
     window.addEventListener('appinstalled', () => {
       setShowPrompt(false);
       setDeferredPrompt(null);
+      // Track PWA installation in GA4
+      gameEvents.pwaInstalled();
     });
 
     return () => {
@@ -74,10 +85,8 @@ export function PWAInstallPrompt() {
     // Wait for user response
     const { outcome } = await deferredPrompt.userChoice;
 
-    if (outcome === 'accepted') {
-      console.log('User accepted PWA install');
-    } else {
-      console.log('User dismissed PWA install');
+    if (outcome !== 'accepted') {
+      // User dismissed - no action needed
     }
 
     // Clear the prompt
@@ -94,11 +103,12 @@ export function PWAInstallPrompt() {
     localStorage.setItem('pwa_install_dismissed_until', dismissedUntil.toString());
   };
 
+  if (isOnCrazyGamesPlatform) return null;
   if (!showPrompt || !deferredPrompt) return null;
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
@@ -121,10 +131,10 @@ export function PWAInstallPrompt() {
             </div>
             <div className="flex-1">
               <h3 className="font-black text-neo-white text-lg mb-1">
-                {t('pwa.installTitle') || 'Install LexiClash'}
+                {t('pwa.installTitle')}
               </h3>
               <p className="text-neo-white text-sm opacity-90">
-                {t('pwa.installDescription') || 'Install our app for faster access, offline play, and a better experience!'}
+                {t('pwa.installDescription')}
               </p>
             </div>
           </div>
@@ -134,17 +144,17 @@ export function PWAInstallPrompt() {
               onClick={handleInstallClick}
               className="flex-1 px-4 py-2.5 bg-neo-lime text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
             >
-              {t('pwa.installButton') || 'Install Now'}
+              {t('pwa.installButton')}
             </button>
             <button
               onClick={handleDismiss}
               className="px-4 py-2.5 bg-neo-white text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard transition-all duration-100 uppercase text-sm"
             >
-              {t('common.later') || 'Later'}
+              {t('common.later')}
             </button>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 }

@@ -8,11 +8,55 @@
  */
 
 import confettiLib, { type CreateTypes, type Options, type Shape } from 'canvas-confetti';
+import {
+  applyCelebrationIntensity,
+  isCelebrationSuppressed,
+  type CelebrationIntensity,
+} from '@/lib/cosy/celebrationScale';
+import { emitQuietFeedback } from '@/lib/cosy/quietFeedback';
 
 // Singleton canvas for confetti
 let confettiCanvas: HTMLCanvasElement | null = null;
+
+/**
+ * Global celebration intensity, synced from Cosy / Calm Mode by the
+ * AccessibilityProvider via `setCelebrationIntensity`. Applied at the single
+ * `fireConfetti` chokepoint so EVERY caller (presets + non-React modules)
+ * scales down under cosy without each having to thread the preference. Defaults
+ * to 'full' → behaviour-neutral until cosy flips it.
+ */
+let celebrationIntensity: CelebrationIntensity = 'full';
+
+/** Set the global celebration intensity (called by AccessibilityProvider). */
+export function setCelebrationIntensity(intensity: CelebrationIntensity): void {
+  celebrationIntensity = intensity;
+}
 let myConfetti: CreateTypes | null = null;
 let resizeHandler: (() => void) | null = null;
+let autoCleanupTimer: ReturnType<typeof setTimeout> | null = null;
+
+/** Auto-cleanup delay: destroy canvas 3s after last confetti fire to free memory */
+const AUTO_CLEANUP_DELAY_MS = 3000;
+
+// ==================== Z-Index Constants ====================
+
+/**
+ * Centralized z-index constants for layered particle effects
+ *
+ * These values establish a clear visual hierarchy:
+ * - BACKGROUND_PARTICLES (1000): Subtle background layer
+ * - MIDGROUND_PARTICLES (2000): Main celebration layer
+ * - FOREGROUND_PARTICLES (3000): Foreground accents
+ * - CELEBRATION_OVERLAY (9000): UI overlays (modals, toasts)
+ * - CINEMATIC_PLAYER (9999): Full-screen cinematics (highest)
+ */
+export const Z_INDEX = {
+  BACKGROUND_PARTICLES: 1000,
+  MIDGROUND_PARTICLES: 2000,
+  FOREGROUND_PARTICLES: 3000,
+  CELEBRATION_OVERLAY: 9000,
+  CINEMATIC_PLAYER: 9999,
+} as const;
 
 // ==================== Neo-Brutalist Confetti Configuration ====================
 
@@ -83,12 +127,17 @@ function getConfettiCanvas(): HTMLCanvasElement | null {
       useWorker: false,
     });
 
-    // Handle window resize to update canvas dimensions (with cleanup capability)
+    // Handle window resize to update canvas dimensions (throttled to prevent jank)
+    let resizeRaf: number | null = null;
     resizeHandler = () => {
-      if (confettiCanvas) {
-        confettiCanvas.width = window.innerWidth;
-        confettiCanvas.height = window.innerHeight;
-      }
+      if (resizeRaf !== null) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = null;
+        if (confettiCanvas) {
+          confettiCanvas.width = window.innerWidth;
+          confettiCanvas.height = window.innerHeight;
+        }
+      });
     };
     window.addEventListener('resize', resizeHandler);
   }
@@ -101,6 +150,33 @@ function getConfettiCanvas(): HTMLCanvasElement | null {
  * Applies Neo-Brutalist defaults (flat squares, bold colors) unless overridden
  */
 export function fireConfetti(options: Options = {}): Promise<null> | null {
+  // Skip confetti entirely on low-end devices to prevent frame drops
+  if (typeof document !== 'undefined' && document.documentElement.classList.contains('low-end-device')) {
+    return null;
+  }
+
+  // B4 (WCAG 2.3.3): respect the OS-level reduced-motion preference at the
+  // single chokepoint so every caller (level-up, victory, daily challenge,
+  // duel, etc.) is covered without each having to remember the gate.
+  if (typeof window !== 'undefined' && typeof window.matchMedia === 'function') {
+    try {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return null;
+      }
+    } catch {
+      // matchMedia stubs in test environments may throw — treat as "not set"
+    }
+  }
+
+  // Cosy / Calm Mode (calm tier): particle effects are OFF for the elder /
+  // effect-averse persona. Instead of a smaller explosion we emit ONE quiet
+  // dignified beat (a soft checkmark) via the QuietCelebrationLayer — the
+  // feedback loop stays alive, just calm. Return before touching the canvas.
+  if (isCelebrationSuppressed(celebrationIntensity)) {
+    emitQuietFeedback();
+    return null;
+  }
+
   // Ensure canvas exists
   getConfettiCanvas();
 
@@ -109,12 +185,27 @@ export function fireConfetti(options: Options = {}): Promise<null> | null {
     return null;
   }
 
+  // Schedule auto-cleanup: destroy canvas after no confetti fires for 3s.
+  // Prevents the global singleton from leaking memory in long sessions.
+  if (autoCleanupTimer) clearTimeout(autoCleanupTimer);
+  autoCleanupTimer = setTimeout(() => {
+    autoCleanupTimer = null;
+    cleanupConfetti();
+  }, AUTO_CLEANUP_DELAY_MS);
+
   try {
-    return myConfetti({
-      zIndex: 10000,
-      ...NEO_BRUTALIST_DEFAULTS,
-      ...options,
-    });
+    // Cosy / Calm Mode scales every burst down (fewer particles, tighter
+    // spread) — never off; the OS reduced-motion gate above already handles
+    // "no animation at all".
+    const merged = applyCelebrationIntensity(
+      {
+        zIndex: 10000,
+        ...NEO_BRUTALIST_DEFAULTS,
+        ...options,
+      },
+      celebrationIntensity,
+    );
+    return myConfetti(merged);
   } catch (error) {
     console.error('[Confetti] Error firing confetti:', error);
     return null;
@@ -135,6 +226,10 @@ export function resetConfetti(): void {
  * Removes resize listener and canvas to prevent memory leaks
  */
 export function cleanupConfetti(): void {
+  if (autoCleanupTimer) {
+    clearTimeout(autoCleanupTimer);
+    autoCleanupTimer = null;
+  }
   if (resizeHandler) {
     window.removeEventListener('resize', resizeHandler);
     resizeHandler = null;
@@ -287,6 +382,28 @@ export function fireVictoryConfetti(): void {
 }
 
 /**
+ * Fire a light, short burst for onboarding FTUE beats.
+ * Tuned to be quick (no follow-up delay) so it doesn't slow step transitions.
+ *
+ * @param origin - Where the burst originates (default: center, slightly above middle)
+ * @param colors - Custom palette (defaults to the 5 neo-brutalist accents)
+ */
+export function fireOnboardingBurst(
+  origin: { x?: number; y?: number } = { x: 0.5, y: 0.55 },
+  colors: string[] = NEO_BRUTALIST_COLORS
+): void {
+  fireConfetti({
+    particleCount: 22,
+    spread: 75,
+    startVelocity: 42,
+    origin,
+    colors,
+    scalar: 1.15,
+    ticks: 120,
+  });
+}
+
+/**
  * Fire streak milestone confetti - moderate multi-burst
  */
 export function fireStreakConfetti(): void {
@@ -317,7 +434,7 @@ export function fireStreakConfetti(): void {
  * Neo-brutalist style with chunky particles and bold colors
  * @returns Cancel function to stop the animation (call on unmount)
  */
-export function fireFirstWinConfetti(durationMs: number = 2500): () => void {
+export function fireFirstWinConfetti(durationMs: number = 1500): () => void {
   const colors = NEO_BRUTALIST_COLORS;
   const end = Date.now() + durationMs;
   let rafId: number | null = null;
@@ -328,47 +445,48 @@ export function fireFirstWinConfetti(durationMs: number = 2500): () => void {
     if (cancelled) return;
     frameCount++;
 
-    // Only fire every 3rd frame to reduce particle count
-    if (frameCount % 3 === 0) {
+    // Side bursts every 6th frame — was every 3rd. Cuts particle drizzle in half
+    // without losing the cascading-from-the-corners shape.
+    if (frameCount % 6 === 0) {
       // Left side burst
       fireConfetti({
-        particleCount: 2, // Reduced from 5
+        particleCount: 1,
         angle: 60,
         spread: 50,
         origin: { x: 0, y: 0.6 },
         colors,
         startVelocity: 55,
         gravity: 1.0,
-        ticks: 180,
-        scalar: 1.3,
+        ticks: 160,
+        scalar: 1.2,
       });
 
       // Right side burst
       fireConfetti({
-        particleCount: 2, // Reduced from 5
+        particleCount: 1,
         angle: 120,
         spread: 50,
         origin: { x: 1, y: 0.6 },
         colors,
         startVelocity: 55,
         gravity: 1.0,
-        ticks: 180,
-        scalar: 1.3,
+        ticks: 160,
+        scalar: 1.2,
       });
     }
 
-    // Center burst occasionally
-    if (Math.random() > 0.85) {
+    // Center burst rare-ish punctuation only — was Math.random()>0.85.
+    if (Math.random() > 0.95) {
       fireConfetti({
-        particleCount: 6, // Reduced from 12
+        particleCount: 3,
         angle: 90,
         spread: 100,
         origin: { x: 0.5, y: 0.5 },
         colors,
         startVelocity: 40,
         gravity: 0.8,
-        ticks: 140,
-        scalar: 1.5,
+        ticks: 120,
+        scalar: 1.4,
       });
     }
 
@@ -385,6 +503,156 @@ export function fireFirstWinConfetti(durationMs: number = 2500): () => void {
     if (rafId !== null) {
       cancelAnimationFrame(rafId);
     }
+  };
+}
+
+/**
+ * Fire layered celebration with background, midground, and foreground particles
+ *
+ * Creates depth perception through:
+ * - Budget split: 20% background, 60% midground, 20% foreground
+ * - Timing delays: 0ms, 100ms, 200ms
+ * - Z-index layering: 1000, 2000, 3000
+ * - Variable origins and spreads for depth
+ *
+ * @param duration - Duration of celebration in ms (unused, for API compatibility)
+ * @param budget - Particle budget object from useParticleBudget hook
+ *
+ * @example
+ * ```tsx
+ * const budget = useParticleBudget();
+ * fireLayeredCelebration(2000, budget);
+ * ```
+ */
+export function fireLayeredCelebration(duration: number, budget: { combo: number }): void {
+  // Use 80% of combo budget for safety margin
+  const totalBudget = Math.floor(budget.combo * 0.8);
+
+  // Budget split: 20% background, 60% midground, 20% foreground
+  const backgroundCount = Math.floor(totalBudget * 0.2);
+  const midgroundCount = Math.floor(totalBudget * 0.6);
+  const foregroundCount = Math.floor(totalBudget * 0.2);
+
+  // Layer 1: Background (immediate, subtle, distant)
+  fireConfetti({
+    particleCount: backgroundCount,
+    spread: 80,
+    origin: { y: 0.7 },
+    zIndex: Z_INDEX.BACKGROUND_PARTICLES,
+    scalar: 1.0,
+    startVelocity: 35,
+    flat: true,
+    shapes: NEO_BRUTALIST_SHAPES,
+    colors: NEO_BRUTALIST_COLORS,
+  });
+
+  // Layer 2: Midground (100ms delay, main celebration, largest)
+  setTimeout(() => {
+    fireConfetti({
+      particleCount: midgroundCount,
+      spread: 100,
+      origin: { y: 0.6 },
+      zIndex: Z_INDEX.MIDGROUND_PARTICLES,
+      scalar: 1.3,
+      startVelocity: 50,
+      flat: true,
+      shapes: NEO_BRUTALIST_SHAPES,
+      colors: NEO_BRUTALIST_COLORS,
+    });
+  }, 100);
+
+  // Layer 3: Foreground (200ms delay, close accents, pop)
+  setTimeout(() => {
+    fireConfetti({
+      particleCount: foregroundCount,
+      spread: 60,
+      origin: { y: 0.5 },
+      zIndex: Z_INDEX.FOREGROUND_PARTICLES,
+      scalar: 1.5,
+      startVelocity: 60,
+      flat: true,
+      shapes: NEO_BRUTALIST_SHAPES,
+      colors: NEO_BRUTALIST_COLORS,
+    });
+  }, 200);
+}
+
+/**
+ * Fire firework burst celebration - dramatic upward explosion effect
+ * Creates multiple bursts at different positions for stadium-like celebration
+ *
+ * @param count - Number of firework bursts (default: 3)
+ * @param duration - Total duration in ms (default: 2000)
+ * @returns Cancel function to stop the animation
+ */
+export function fireFireworks(count: number = 3, durationMs: number = 2000): () => void {
+  const colors = NEO_BRUTALIST_COLORS;
+  let cancelled = false;
+  const timeouts: NodeJS.Timeout[] = [];
+
+  // Fire multiple bursts at staggered intervals
+  for (let i = 0; i < count; i++) {
+    const delay = (i * durationMs) / count;
+    const timeout = setTimeout(() => {
+      if (cancelled) return;
+
+      // Random horizontal position
+      const xPos = 0.2 + Math.random() * 0.6;
+
+      // Initial upward trail
+      fireConfetti({
+        particleCount: 8,
+        angle: 90,
+        spread: 15,
+        origin: { x: xPos, y: 1 },
+        colors: [colors[i % colors.length] || '#FFE135'],
+        startVelocity: 80,
+        gravity: 1.5,
+        ticks: 100,
+        scalar: 0.8,
+      });
+
+      // Delayed burst at peak
+      const burstTimeout = setTimeout(() => {
+        if (cancelled) return;
+
+        // Main burst
+        fireConfetti({
+          particleCount: 40,
+          spread: 360,
+          origin: { x: xPos, y: 0.3 },
+          colors,
+          startVelocity: 30,
+          gravity: 0.8,
+          ticks: 150,
+          scalar: 1.2,
+          flat: true,
+          shapes: NEO_BRUTALIST_SHAPES,
+        });
+
+        // Sparkle follow-up
+        fireConfetti({
+          particleCount: 20,
+          spread: 180,
+          origin: { x: xPos, y: 0.35 },
+          colors,
+          startVelocity: 20,
+          gravity: 0.6,
+          ticks: 100,
+          scalar: 0.8,
+        });
+      }, 400);
+
+      timeouts.push(burstTimeout);
+    }, delay);
+
+    timeouts.push(timeout);
+  }
+
+  // Return cleanup function
+  return () => {
+    cancelled = true;
+    timeouts.forEach(t => clearTimeout(t));
   };
 }
 

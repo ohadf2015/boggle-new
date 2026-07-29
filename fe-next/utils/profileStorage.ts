@@ -13,11 +13,13 @@
  */
 
 import { getFromStorage, saveToStorage, removeFromStorage } from '@/utils/storageHelpers';
+import { type CustomAvatarConfig, isValidCustomAvatar, getRandomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Storage key constants - single source of truth
 export const PROFILE_STORAGE_KEYS = {
   USERNAME: 'boggle_username',
   AVATAR_ID: 'boggle_avatar_id',
+  CUSTOM_AVATAR: 'boggle_custom_avatar',
 } as const;
 
 /**
@@ -26,6 +28,7 @@ export const PROFILE_STORAGE_KEYS = {
 export interface GuestProfileData {
   username: string | null;
   avatarId: string | null;
+  customAvatar: CustomAvatarConfig | null;
 }
 
 // ============================================================================
@@ -81,6 +84,38 @@ export function clearStoredAvatarId(): void {
   removeFromStorage(PROFILE_STORAGE_KEYS.AVATAR_ID);
 }
 
+export function getStoredCustomAvatar(): CustomAvatarConfig | null {
+  const raw = getFromStorage(PROFILE_STORAGE_KEYS.CUSTOM_AVATAR);
+  if (!raw) return null;
+  try {
+    const parsed = JSON.parse(raw);
+    if (isValidCustomAvatar(parsed)) return parsed;
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Get stored custom avatar, or auto-generate and persist a random one.
+ * Use this for guest flows where a custom avatar should always exist.
+ */
+export function getOrCreateStoredCustomAvatar(): CustomAvatarConfig {
+  const existing = getStoredCustomAvatar();
+  if (existing) return existing;
+  const random = getRandomAvatarConfig();
+  setStoredCustomAvatar(random);
+  return random;
+}
+
+export function setStoredCustomAvatar(config: CustomAvatarConfig): void {
+  saveToStorage(PROFILE_STORAGE_KEYS.CUSTOM_AVATAR, JSON.stringify(config));
+}
+
+export function clearStoredCustomAvatar(): void {
+  removeFromStorage(PROFILE_STORAGE_KEYS.CUSTOM_AVATAR);
+}
+
 // ============================================================================
 // Combined profile operations
 // ============================================================================
@@ -92,6 +127,7 @@ export function getStoredProfile(): GuestProfileData {
   return {
     username: getStoredUsername(),
     avatarId: getStoredAvatarId(),
+    customAvatar: getStoredCustomAvatar(),
   };
 }
 
@@ -106,6 +142,9 @@ export function saveStoredProfile(profile: Partial<GuestProfileData>): void {
   if (profile.avatarId) {
     setStoredAvatarId(profile.avatarId);
   }
+  if (profile.customAvatar) {
+    setStoredCustomAvatar(profile.customAvatar);
+  }
 }
 
 /**
@@ -114,6 +153,7 @@ export function saveStoredProfile(profile: Partial<GuestProfileData>): void {
 export function clearStoredProfile(): void {
   clearStoredUsername();
   clearStoredAvatarId();
+  clearStoredCustomAvatar();
 }
 
 /**

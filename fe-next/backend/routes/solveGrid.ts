@@ -96,8 +96,10 @@ async function filterBlacklistedWords(words: BotWords, language: string): Promis
       .eq('language', language);
 
     if (error) {
-      logger.error('SOLVE-GRID', `Blacklist query error: ${error.message}`);
-      return words; // Return unfiltered on error
+      // Truncate error message — Supabase 502s return full HTML pages as error.message
+      const errMsg = error.message.startsWith('<!') ? 'Supabase 502 Bad Gateway' : error.message.slice(0, 200);
+      logger.debug('SOLVE-GRID', `Blacklist query error (returning unfiltered): ${errMsg}`);
+      return words; // Return unfiltered on error — graceful degradation
     }
 
     const blacklistedSet = new Set(
@@ -111,7 +113,7 @@ async function filterBlacklistedWords(words: BotWords, language: string): Promis
     };
   } catch (err) {
     const error = err as Error;
-    logger.error('SOLVE-GRID', `Blacklist filter error: ${error.message}`);
+    logger.debug('SOLVE-GRID', `Blacklist filter error (returning unfiltered): ${error.message}`);
     return words; // Graceful degradation
   }
 }
@@ -171,10 +173,12 @@ router.post('/', rateLimit, async (req: SolveGridRequest, res: Response): Promis
     const msg = error instanceof Error ? error.message : 'Unknown error';
     logger.error('SOLVE-GRID', `Error: ${msg}`);
 
-    res.status(500).json({
-      success: false,
-      error: 'Failed to solve grid',
-    } as SolveGridResponse);
+    if (!res.headersSent) {
+      res.status(500).json({
+        success: false,
+        error: 'Failed to solve grid',
+      } as SolveGridResponse);
+    }
   }
 });
 

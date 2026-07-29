@@ -7,7 +7,6 @@
 
 import React from 'react';
 import { Trophy, X } from 'lucide-react';
-import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import type { Language } from '@/types';
 
 export interface ScoreBadgeProps {
@@ -22,9 +21,9 @@ export interface ScoreBadgeProps {
 export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
   solved,
   attemptsUsed,
-  targetWord,
+  targetWord: _targetWord,
   streakDays,
-  language,
+  language: _language,
   onClick,
 }) => (
   <div
@@ -32,23 +31,18 @@ export const ScoreBadge: React.FC<ScoreBadgeProps> = ({
     onClick={onClick}
   >
     {solved ? (
-      <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500 rounded-neo border-2 border-neo-black">
-        <Trophy className="w-4 h-4 text-white" />
-        <span className="font-black text-white text-sm">{attemptsUsed}/10</span>
+      <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-lime rounded-neo border-2 border-neo-black shadow-hard-sm">
+        <Trophy className="w-4 h-4 text-neo-black" />
+        <span className="font-black text-neo-black text-sm">{attemptsUsed}/10</span>
       </div>
     ) : (
-      <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-700 dark:bg-gray-600 rounded-neo border-2 border-neo-black">
-        <X className="w-4 h-4 text-white" />
-        <span className="font-black text-white text-sm">X/10</span>
+      <div className="flex items-center gap-1.5 px-2 py-1 bg-neo-gray rounded-neo border-2 border-neo-black shadow-hard-sm">
+        <X className="w-4 h-4 text-neo-white" />
+        <span className="font-black text-neo-white text-sm">X/10</span>
       </div>
     )}
-    {solved && targetWord && (
-      <span className="font-black text-neo-lime text-sm">
-        {language === 'he' ? applyHebrewFinalLetters(targetWord) : targetWord.toUpperCase()}
-      </span>
-    )}
     {streakDays > 0 && (
-      <span className="text-xs bg-orange-500 text-white px-1.5 py-0.5 rounded font-bold">
+      <span className="text-xs bg-neo-orange text-neo-black px-1.5 py-0.5 rounded-neo border border-neo-black font-bold">
         🔥{streakDays}
       </span>
     )}

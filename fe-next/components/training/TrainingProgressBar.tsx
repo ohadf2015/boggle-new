@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, MoveUpRight, RotateCw, Target, Trophy, Sparkles, ChevronDown } from 'lucide-react';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -99,32 +99,32 @@ const SkillCheckpoint = memo<{
   const Icon = skill.icon;
 
   return (
-    <motion.div
+    <m.div
       initial={isJustUnlocked ? { scale: 0.8, opacity: 0 } : false}
       animate={isJustUnlocked ? { scale: [0.8, 1.2, 1], opacity: 1 } : { scale: 1, opacity: 1 }}
-      transition={isJustUnlocked ? { duration: 0.5, ease: 'easeOut' } : undefined}
+      transition={isJustUnlocked ? { type: 'spring', stiffness: 400, damping: 22 } : undefined}
       className={cn(
         'flex items-center gap-2 p-2 rounded-lg border-2 transition-all duration-300',
         isCompleted
           ? 'border-neo-lime bg-neo-lime/10 dark:bg-neo-lime/20'
           : isDarkMode
-            ? 'border-slate-600 bg-slate-700/50'
+            ? 'border-slate-600 bg-neo-navy-elevated/50'
             : 'border-gray-200 bg-gray-50'
       )}
     >
       {/* Icon */}
       <div className={cn(
-        'flex-shrink-0 p-1.5 rounded-md',
+        'shrink-0 p-1.5 rounded-md',
         isCompleted ? 'bg-neo-lime/20' : skill.bgColor
       )}>
         {isCompleted ? (
-          <motion.div
+          <m.div
             initial={isJustUnlocked ? { rotate: -180, scale: 0 } : false}
             animate={isJustUnlocked ? { rotate: 0, scale: 1 } : undefined}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 22 }}
           >
             <Check className="w-4 h-4 text-neo-lime" />
-          </motion.div>
+          </m.div>
         ) : (
           <Icon className={cn('w-4 h-4', skill.color)} />
         )}
@@ -142,15 +142,15 @@ const SkillCheckpoint = memo<{
 
       {/* Checkmark indicator */}
       {isCompleted && (
-        <motion.div
+        <m.div
           initial={isJustUnlocked ? { scale: 0 } : false}
           animate={isJustUnlocked ? { scale: [0, 1.3, 1] } : undefined}
           transition={{ delay: 0.3 }}
         >
           <Check className="w-4 h-4 text-neo-lime" />
-        </motion.div>
+        </m.div>
       )}
-    </motion.div>
+    </m.div>
   );
 });
 
@@ -196,10 +196,10 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
 
   // Get status message
   const statusMessage = useMemo(() => {
-    if (isComplete) return t('training.progress.complete') || "You're Ready!";
-    if (progressPercent >= 80) return t('training.progress.almostThere') || 'Almost there!';
-    if (progressPercent >= 40) return t('training.progress.keepGoing') || 'Keep going!';
-    return t('training.progress.getStarted') || 'Let\'s get started!';
+    if (isComplete) return t('training.progress.complete');
+    if (progressPercent >= 80) return t('training.progress.almostThere');
+    if (progressPercent >= 40) return t('training.progress.keepGoing');
+    return t('training.progress.getStarted');
   }, [progressPercent, isComplete, t]);
 
   // Clear justUnlocked after animation
@@ -217,7 +217,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
   // min-h-[44px] ensures touch target meets accessibility requirements
   if (compact && !expanded) {
     return (
-      <motion.button
+      <m.button
         onClick={onToggleExpand}
         whileTap={{ scale: 0.98 }}
         className={cn(
@@ -225,20 +225,20 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
           isComplete
             ? 'bg-neo-lime border-neo-lime text-neo-black'
             : isDarkMode
-              ? 'bg-slate-700 border-slate-500 text-white'
+              ? 'bg-neo-navy-elevated border-slate-500 text-white'
               : 'bg-white border-neo-black text-neo-black'
         )}
       >
         {isComplete ? (
           <>
             <Trophy className="w-5 h-5" />
-            <span className="text-base font-bold">{t('training.progress.ready') || 'Ready!'}</span>
+            <span className="text-base font-bold">{t('training.progress.ready')}</span>
           </>
         ) : (
           <>
             <span className="text-base font-bold min-w-[32px]">{completedCount}/{totalSkills}</span>
             <div className="flex-1 h-3 rounded-full bg-gray-200 dark:bg-slate-600 overflow-hidden">
-              <motion.div
+              <m.div
                 className={cn(
                   'h-full rounded-full',
                   progressVariant === 'success' ? 'bg-neo-lime' :
@@ -256,16 +256,16 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
                 'text-xs font-medium whitespace-nowrap',
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
               )}>
-                {t('training.progress.tapForDetails') || 'Tap for details'}
+                {t('training.progress.tapForDetails')}
               </span>
               <ChevronDown className={cn(
-                'w-4 h-4 flex-shrink-0',
+                'w-4 h-4 shrink-0',
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
               )} />
             </div>
           </>
         )}
-      </motion.button>
+      </m.button>
     );
   }
 
@@ -286,14 +286,15 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
   } : {};
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: -10 }}
       animate={{ opacity: 1, y: 0 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       {...containerProps}
       className={cn(
         'rounded-xl border-2 overflow-hidden shadow-hard-sm',
         isDarkMode
-          ? 'bg-slate-800/90 border-slate-600'
+          ? 'bg-neo-navy-light/90 border-slate-600'
           : 'bg-white/95 border-neo-black',
         compact ? 'p-3' : 'p-4',
         compact && onToggleExpand && 'cursor-pointer'
@@ -306,7 +307,7 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
             'font-bold text-sm uppercase tracking-wide',
             isDarkMode ? 'text-gray-300' : 'text-neo-black'
           )}>
-            {t('training.progress.title') || 'Training Progress'}
+            {t('training.progress.title')}
           </h3>
           {compact && onToggleExpand && (
             <button
@@ -316,10 +317,10 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
               }}
               className={cn(
                 'text-xs px-3 py-2 min-h-[36px] rounded border',
-                isDarkMode ? 'border-slate-500 text-gray-400 hover:bg-slate-700' : 'border-gray-300 text-gray-500 hover:bg-gray-100'
+                isDarkMode ? 'border-slate-500 text-gray-400 hover:bg-neo-navy-elevated' : 'border-gray-300 text-gray-500 hover:bg-gray-100'
               )}
             >
-              {t('common.collapse') || 'Collapse'}
+              {t('common.collapse')}
             </button>
           )}
         </div>
@@ -374,27 +375,27 @@ const TrainingProgressBar: React.FC<TrainingProgressBarProps> = ({
       {/* Celebration when complete */}
       <AnimatePresence>
         {isComplete && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             className="mt-3 pt-3 border-t-2 border-neo-lime/30"
           >
             <div className="flex items-center justify-center gap-2 text-neo-lime">
-              <motion.div
+              <m.div
                 animate={{ rotate: [0, 15, -15, 0] }}
                 transition={{ duration: 0.5, repeat: 3 }}
               >
                 <Trophy className="w-5 h-5" />
-              </motion.div>
+              </m.div>
               <span className="font-bold text-sm">
-                {t('training.progress.readyForMultiplayer') || "You're ready for multiplayer!"}
+                {t('training.progress.readyForMultiplayer')}
               </span>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 };
 

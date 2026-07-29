@@ -1,30 +1,17 @@
 /**
- * Tests for CreateRoomModal component UI styling and behavior
- *
- * Tests the UI improvements including:
- * - RTL text alignment
- * - Neo-brutalist profile section styling
- * - Avatar button shadow consistency
- * - Input styling consistency
+ * Tests for CreateRoomModal component
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CreateRoomModal from '../CreateRoomModal';
 import type { Language } from '@/shared/types/game';
+import { DEFAULT_AVATAR_CONFIG, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import * as profileStorage from '@/utils/profileStorage';
 
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
-    button: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <button {...props}>{children}</button>,
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
-
-// Mock Dialog components from Radix UI
-jest.mock('@/components/ui/dialog', () => ({
-  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean; onOpenChange?: (open: boolean) => void }) =>
+vi.mock('@/components/ui/dialog', () => ({
+  Dialog: ({ children, open }: { children: React.ReactNode; open?: boolean }) =>
     open ? <div data-testid="dialog">{children}</div> : null,
   DialogContent: ({ children, className }: { children: React.ReactNode; className?: string; noDescription?: boolean }) =>
     <div className={className} data-testid="dialog-content">{children}</div>,
@@ -32,26 +19,25 @@ jest.mock('@/components/ui/dialog', () => ({
     <div className={className} data-testid="dialog-header">{children}</div>,
   DialogTitle: ({ children, className }: { children: React.ReactNode; className?: string }) =>
     <h2 className={className} data-testid="dialog-title">{children}</h2>,
-  DialogBody: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <div className={className} data-testid="dialog-body">{children}</div>,
-  DialogFooter: ({ children, className }: { children: React.ReactNode; className?: string }) =>
-    <div className={className} data-testid="dialog-footer">{children}</div>,
 }));
 
-// Mock dependencies
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         'multiplayerFlow.createModal.title': 'Create Room',
-        'multiplayerFlow.createModal.changeAvatar': 'Change avatar',
+        'multiplayerFlow.createModal.yourName': 'Your Name',
         'multiplayerFlow.createModal.namePlaceholder': 'Your name',
-        'multiplayerFlow.createModal.authenticatedHint': 'Signed in',
         'multiplayerFlow.createModal.roomNameLabel': 'Room Name',
         'multiplayerFlow.createModal.optional': 'optional',
-        'multiplayerFlow.createModal.roomNameHint': 'Leave empty for auto-generated name',
         'multiplayerFlow.createModal.creating': 'Creating...',
         'multiplayerFlow.createModal.createButton': 'Create Room',
+        'joinView.selectLanguage': 'Language',
+        'joinView.english': 'English',
+        'joinView.hebrew': 'Hebrew',
+        'joinView.swedish': 'Swedish',
+        'joinView.japanese': 'Japanese',
+        'joinView.spanish': 'Spanish',
       };
       return translations[key] || key;
     },
@@ -60,285 +46,200 @@ jest.mock('@/contexts/LanguageContext', () => ({
   }),
 }));
 
-jest.mock('@/utils/profileStorage', () => ({
-  getStoredUsername: jest.fn().mockReturnValue('TestPlayer'),
-  getStoredAvatarId: jest.fn().mockReturnValue('avatar-1'),
-  setStoredUsername: jest.fn(),
-  setStoredAvatarId: jest.fn(),
+vi.mock('@/utils/profileStorage', () => ({
+  getStoredUsername: vi.fn().mockReturnValue('TestUser'),
+  getStoredCustomAvatar: vi.fn().mockReturnValue(null),
+  getOrCreateStoredCustomAvatar: vi.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', eyebrows: 'none', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4', shirtColor: '#4A90D9' }),
+  setStoredUsername: vi.fn(),
+  setStoredCustomAvatar: vi.fn(),
 }));
 
-jest.mock('@/utils/avatarConfig', () => {
-  const mockAvatar = { id: 'avatar-1', name: 'Test Avatar', path: '/avatars/test.png' };
-  return {
-    AVATARS: [mockAvatar],
-    getAvatarPath: jest.fn(() => '/avatars/test.png'),
-    getRandomAvatar: () => mockAvatar,
-  };
-});
-
-jest.mock('@/utils/consts', () => ({
-  sanitizeRoomName: jest.fn((name: string) => name),
+vi.mock('@/utils/consts', () => ({
+  sanitizeRoomName: vi.fn((name: string) => name),
+  NAME_VALID_PATTERN: /^[\p{L}\p{N}\s._-]+$/u,
+  USERNAME_MIN_LENGTH: 2,
+  USERNAME_MAX_LENGTH: 20,
+  ROOM_NAME_MIN_LENGTH: 2,
+  ROOM_NAME_MAX_LENGTH: 30,
+  GAME_CODE_MIN_LENGTH: 4,
+  GAME_CODE_MAX_LENGTH: 6,
+  WORD_MIN_LENGTH: 3,
+  WORD_MAX_LENGTH: 16,
+  PASSWORD_MIN_LENGTH: 6,
+  PASSWORD_MAX_LENGTH: 128,
+  EMAIL_VALID_PATTERN: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+  EMAIL_MAX_LENGTH: 254,
+  EMAIL_LOCAL_MAX_LENGTH: 64,
+  PASSWORD_STRENGTH_PATTERN: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
 }));
 
-jest.mock('@/lib/utils', () => ({
-  cn: (...classes: (string | undefined)[]) => classes.filter(Boolean).join(' '),
+vi.mock('@/utils/validation', () => ({
+  validateUsername: (username: string) => {
+    if (!username || username.trim().length < 2) {
+      return { isValid: false, error: 'validation.usernameRequired' };
+    }
+    return { isValid: true, error: null };
+  },
 }));
 
-jest.mock('@/components/EmojiAvatarPicker', () => {
-  const MockEmojiAvatarPicker = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) =>
-    isOpen ? (
-      <div data-testid="emoji-avatar-picker">
-        <button onClick={onClose}>Close Picker</button>
-      </div>
-    ) : null;
-  return {
-    __esModule: true,
-    default: MockEmojiAvatarPicker,
-    PROFILE_AVATAR_ID: 'profile-avatar',
-  };
-});
-
-jest.mock('@/components/Avatar', () => ({
-  __esModule: true,
-  default: () => <div data-testid="avatar-component" />,
+vi.mock('@/lib/utils', () => ({
+  cn: (...classes: (string | undefined | false)[]) => classes.filter(Boolean).join(' '),
 }));
 
-// Mock UI components
-jest.mock('@/components/ui/button', () => ({
-  Button: ({ children, onClick, disabled, className, variant, size }: React.PropsWithChildren<{
-    onClick?: () => void;
-    disabled?: boolean;
-    className?: string;
-    variant?: string;
-    size?: string;
-  }>) => (
-    <button onClick={onClick} disabled={disabled} className={className}>
-      {children}
-    </button>
-  ),
-}));
-
-jest.mock('@/components/ui/input', () => {
-  const MockInput = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
-    (props, ref) => <input ref={ref} {...props} />
-  );
-  MockInput.displayName = 'MockInput';
-  return { Input: MockInput };
-});
-
-jest.mock('@/components/ui/label', () => ({
-  Label: ({ children, className }: React.PropsWithChildren<{ className?: string }>) =>
-    <label className={className}>{children}</label>,
-}));
-
-jest.mock('@/components/multiplayer/AvatarSelector', () => ({
-  AvatarSelector: ({ selectedAvatarId, onAvatarChange }: {
-    selectedAvatarId: string;
-    onAvatarChange: (id: string) => void;
-    profilePictureUrl?: string | null;
+vi.mock('@/components/multiplayer/AvatarSelector', () => ({
+  AvatarSelector: ({ onAvatarChange }: {
+    selectedAvatar?: CustomAvatarConfig | null;
+    onAvatarChange: (config: CustomAvatarConfig) => void;
+    compact?: boolean;
+    onBuilderOpenChange?: (open: boolean) => void;
   }) => (
     <div data-testid="avatar-selector">
-      <button onClick={() => onAvatarChange('new-avatar')}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img alt="Test Avatar" src="/avatars/test.png" />
+      <button onClick={() => onAvatarChange({ ...DEFAULT_AVATAR_CONFIG, eyes: 'star' })}>
+        Change Avatar
       </button>
     </div>
   ),
 }));
 
-jest.mock('@/components/join/LanguageSelector', () => ({
-  LanguageSelector: ({ selectedLanguage, onLanguageChange }: { selectedLanguage: string; onLanguageChange: (lang: string) => void }) => (
-    <select
-      data-testid="language-selector"
-      value={selectedLanguage}
-      onChange={(e) => onLanguageChange(e.target.value)}
-    >
-      <option value="en">English</option>
-      <option value="he">Hebrew</option>
-    </select>
-  ),
-}));
+vi.mock('@/components/motion/AdaptiveMotion', () => {
+  // Cache components to prevent unmount/remount on re-render
+  const cache: Record<string, React.FC<Record<string, unknown>>> = {};
+
+  const createMotionComponent = (tag: string) => {
+    if (!cache[tag]) {
+      const Comp = React.forwardRef<HTMLElement, Record<string, unknown>>(
+        (props, ref) => {
+          const { initial, animate, exit, transition, variants, whileHover, whileTap, whileFocus, whileDrag, layout, layoutId, ...htmlProps } = props;
+          return React.createElement(tag, { ...htmlProps, ref });
+        }
+      );
+      Comp.displayName = `Motion.${tag}`;
+      cache[tag] = Comp as unknown as React.FC<Record<string, unknown>>;
+    }
+    return cache[tag];
+  };
+
+  return {
+    AdaptiveMotion: new Proxy({}, {
+      get: (_target, prop: string) => createMotionComponent(prop),
+    }),
+    AdaptiveAnimatePresence: ({ children }: { children: React.ReactNode; mode?: string }) => <>{children}</>,
+  };
+});
 
 describe('CreateRoomModal', () => {
   const defaultProps = {
     isOpen: true,
-    onClose: jest.fn(),
+    onClose: vi.fn(),
     isCreating: false,
-    onCreate: jest.fn(),
+    onCreate: vi.fn(),
     defaultLanguage: 'en' as Language,
     isAuthenticated: false,
     displayName: null,
-    profilePictureUrl: null,
-    profileAvatarId: undefined,
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
-  describe('Profile Section UI', () => {
-    it('should render profile section with proper neo-brutalist styling', () => {
-      render(<CreateRoomModal {...defaultProps} />);
-
-      // Profile section should render with the avatar name from random avatar
-      const profileSection = screen.getByText('Test Avatar').closest('div');
-      expect(profileSection).toBeInTheDocument();
-    });
-
-    it('should render AvatarSelector component', () => {
-      render(<CreateRoomModal {...defaultProps} />);
-
-      // Since AvatarSelector is mocked, we just verify it renders
-      expect(screen.getByTestId('avatar-selector')).toBeInTheDocument();
-      expect(screen.getByAltText('Test Avatar')).toBeInTheDocument();
-    });
-
-    it('should display username with proper text alignment for RTL', () => {
-      render(<CreateRoomModal {...defaultProps} />);
-
-      // Find the name button container - uses avatar name from getRandomAvatar
-      const nameButton = screen.getByText('Test Avatar').closest('button');
-      expect(nameButton).toBeInTheDocument();
-
-      // Should use text-start (RTL-safe) instead of text-left
-      // The class should contain 'text-start' for RTL compatibility
-      expect(nameButton?.className).toContain('text-start');
-    });
-
-    it('should show pencil icon for guest users on name', () => {
-      render(<CreateRoomModal {...defaultProps} />);
-
-      const nameButton = screen.getByText('Test Avatar').closest('button');
-      // Pencil icon should be present (the SVG from lucide-react)
-      const pencilIcon = nameButton?.querySelector('svg');
-      expect(pencilIcon).toBeInTheDocument();
-    });
-
-    it('should not show pencil icon for authenticated users', () => {
-      render(
-        <CreateRoomModal
-          {...defaultProps}
-          isAuthenticated={true}
-          displayName="AuthUser"
-        />
-      );
-
-      // Authenticated users see a disabled input, not an editable button
-      const nameInput = screen.getByDisplayValue('AuthUser');
-      expect(nameInput).toBeDisabled();
-
-      // Should NOT have a pencil icon
-      const nameContainer = nameInput.closest('div');
-      const pencilIcon = nameContainer?.querySelector('svg');
-      expect(pencilIcon).toBeNull();
-    });
+  it('should render AvatarSelector', () => {
+    render(<CreateRoomModal {...defaultProps} />);
+    expect(screen.getByTestId('avatar-selector')).toBeInTheDocument();
   });
 
-  describe('Room Name Input', () => {
-    it('should render room name input with consistent styling', () => {
-      render(<CreateRoomModal {...defaultProps} />);
-
-      const roomNameInput = screen.getByPlaceholderText(/room/i);
-      expect(roomNameInput).toBeInTheDocument();
-
-      // Input should be rendered - checking basic functionality
-      expect(roomNameInput.tagName).toBe('INPUT');
-    });
-
-    it('should show optional label for room name', () => {
-      render(<CreateRoomModal {...defaultProps} />);
-
-      expect(screen.getByText('(optional)')).toBeInTheDocument();
-    });
+  it('should render always-visible name input for guests', () => {
+    render(<CreateRoomModal {...defaultProps} />);
+    const nameInput = screen.getByDisplayValue('TestUser');
+    expect(nameInput.tagName).toBe('INPUT');
   });
 
-  describe('Avatar Selection', () => {
-    it('should allow selecting avatars directly from grid', () => {
-      render(<CreateRoomModal {...defaultProps} />);
-
-      const avatarButtons = screen.getAllByRole('button').filter(btn =>
-        btn.querySelector('img[alt="Test Avatar"]')
-      );
-
-      expect(avatarButtons.length).toBeGreaterThan(0);
-    });
+  it('should show authenticated user name in input (pre-filled with displayName)', () => {
+    render(<CreateRoomModal {...defaultProps} isAuthenticated={true} displayName="AuthUser" />);
+    expect(screen.getByDisplayValue('AuthUser')).toBeInTheDocument();
   });
 
-  describe('Name Editing', () => {
-    it('should allow guest users to edit name', async () => {
-      const user = userEvent.setup();
-      render(<CreateRoomModal {...defaultProps} />);
+  it('should show validation error on submit with empty name', async () => {
+    const user = userEvent.setup();
+    const mockOnCreate = vi.fn();
+    (profileStorage.getStoredUsername as ReturnType<typeof vi.fn>).mockReturnValueOnce('');
+    render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
 
-      const nameButton = screen.getByText('Test Avatar').closest('button');
-      expect(nameButton).not.toBeDisabled();
+    const createButton = screen.getByRole('button', { name: /create room/i });
+    await user.click(createButton);
 
-      await user.click(nameButton!);
-
-      // Should show input field after clicking
-      const input = screen.getByDisplayValue('Test Avatar');
-      expect(input).toBeInTheDocument();
-      expect(input.tagName).toBe('INPUT');
-    });
-
-    it('should not allow authenticated users to edit name', () => {
-      render(
-        <CreateRoomModal
-          {...defaultProps}
-          isAuthenticated={true}
-          displayName="AuthUser"
-        />
-      );
-
-      // Authenticated users see their name in a disabled input (not editable)
-      const nameInput = screen.getByDisplayValue('AuthUser');
-      expect(nameInput).toBeInTheDocument();
-      expect(nameInput).toBeDisabled();
-
-      // Should NOT have a pencil icon (which indicates editability)
-      const nameContainer = nameInput.closest('div');
-      const pencilIcon = nameContainer?.querySelector('svg');
-      expect(pencilIcon).toBeNull();
-    });
+    expect(mockOnCreate).not.toHaveBeenCalled();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
   });
 
-  describe('Create Button', () => {
-    it('should call onCreate with correct config', async () => {
-      const user = userEvent.setup();
-      const mockOnCreate = jest.fn();
-      render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
+  it('should render room name input with optional label', () => {
+    render(<CreateRoomModal {...defaultProps} />);
+    expect(screen.getByText('optional')).toBeInTheDocument();
+  });
 
-      const createButton = screen.getByRole('button', { name: /create room/i });
-      await user.click(createButton);
+  it('should call onCreate with correct config', async () => {
+    const user = userEvent.setup();
+    const mockOnCreate = vi.fn();
 
+    render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
+
+    // Wait for useEffect to populate username from storage
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('TestUser')).toBeInTheDocument();
+    });
+
+    const createButton = screen.getByRole('button', { name: /create room/i });
+    await user.click(createButton);
+
+    expect(mockOnCreate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        hostUsername: 'TestUser',
+        language: 'en',
+      })
+    );
+  });
+
+  it('should show creating state', () => {
+    render(<CreateRoomModal {...defaultProps} isCreating={true} />);
+    expect(screen.getByRole('button', { name: /creating/i })).toBeDisabled();
+  });
+
+  it('should render language flag pills with default selected', () => {
+    render(<CreateRoomModal {...defaultProps} defaultLanguage="he" />);
+    // Hebrew flag pill should exist
+    const hebrewButton = screen.getByText('Hebrew');
+    expect(hebrewButton).toBeInTheDocument();
+    // All 5 language pills should render
+    expect(screen.getByText('English')).toBeInTheDocument();
+    expect(screen.getByText('Swedish')).toBeInTheDocument();
+  });
+
+  it('should switch language when clicking a flag pill', async () => {
+    const user = userEvent.setup();
+    const mockOnCreate = vi.fn();
+    render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
+
+    // Wait for useEffect to populate state
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('TestUser')).toBeInTheDocument();
+    });
+
+    // Click Hebrew language pill
+    await user.click(screen.getByText('Hebrew'));
+
+    // Submit and verify language changed
+    const createButton = screen.getByRole('button', { name: /create room/i });
+    await user.click(createButton);
+
+    await waitFor(() => {
       expect(mockOnCreate).toHaveBeenCalledWith(
-        expect.objectContaining({
-          hostUsername: 'Test Avatar',
-          avatarId: 'avatar-1',
-          language: 'en',
-        })
+        expect.objectContaining({ language: 'he' })
       );
-    });
-
-    it('should show creating state when isCreating is true', () => {
-      render(<CreateRoomModal {...defaultProps} isCreating={true} />);
-
-      expect(screen.getByRole('button', { name: /creating/i })).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /creating/i })).toBeDisabled();
     });
   });
 
-  describe('Language Selector', () => {
-    it('should render language selector', () => {
-      render(<CreateRoomModal {...defaultProps} />);
-
-      expect(screen.getByTestId('language-selector')).toBeInTheDocument();
-    });
-
-    it('should use default language', () => {
-      render(<CreateRoomModal {...defaultProps} defaultLanguage="he" />);
-
-      const selector = screen.getByTestId('language-selector') as HTMLSelectElement;
-      expect(selector.value).toBe('he');
-    });
+  it('should render character counter for name input', () => {
+    render(<CreateRoomModal {...defaultProps} />);
+    // TestUser is 8 chars
+    expect(screen.getByText('8/20')).toBeInTheDocument();
   });
 });

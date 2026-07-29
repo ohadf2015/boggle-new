@@ -1,60 +1,46 @@
 # LexiClash - Project Overview
 
-**See [fe-next/claude.md](fe-next/claude.md) for detailed coding standards, design system, and technical architecture.**
+> **Be extremely concise. Sacrifice grammar for brevity.**
+
+> **Primary codebase is `fe-next/`** - See [fe-next/CLAUDE.md](fe-next/CLAUDE.md) for all standards.
 
 ## Quick Start
-
-- **Main Directory**: `fe-next/` - Next.js frontend application
-- **Development**: `npm run dev` (in fe-next/)
-- **Testing**: `npm run test` (runs all tests)
-- **Build**: `npm run build`
-
-## Project Structure
-
-```
-boggle-new/
-├── fe-next/              # Next.js frontend application
-│   ├── app/              # Next.js App Router pages
-│   ├── components/       # React components
-│   ├── backend/          # Express server & WebSocket handlers
-│   ├── hooks/            # Custom React hooks
-│   ├── contexts/         # React Context providers
-│   ├── translations/     # i18n (Hebrew, English, Swedish, Japanese)
-│   ├── claude.md         # MAIN REFERENCE - Read this for all standards
-│   └── package.json
-├── docs/                 # Project documentation
-├── .claude/              # Claude Code configuration
-└── README files          # Essential documentation only
+```bash
+cd fe-next && npm install && npm run dev
 ```
 
-## Key Resources
-
-- **Code Standards & Design System**: [fe-next/claude.md](fe-next/claude.md)
-- **Tech Stack**:
-  - Frontend: Next.js 16, React, TypeScript, Tailwind CSS
-  - Backend: Express, Socket.IO, Node.js
-  - Database: Supabase + Redis
-  - Testing: Jest, Playwright
+## Tech Stack
+Next.js 16 | TypeScript | Tailwind | Express | Socket.IO | Supabase | Redis | Vitest+Jest/Playwright
 
 ## Critical Guidelines
+- All UI text: `t('key')` - NO hardcoded strings
+- 5 languages: Hebrew (RTL), English, Swedish, Japanese, Spanish
+- TDD mandatory: Test first, then implement
+- Max 500 lines per file
+- Run `npm run lint && npm run test && npm run build` after changes
 
-1. **All UI text must use translation keys** - No hardcoded strings
-2. **Support 4 languages**: Hebrew (RTL), English, Swedish, Japanese
-3. **Neo-Brutalist design** - Dark, bold, high-contrast style
-4. **Tests are mandatory** - Every feature needs tests
-5. **Type safety** - No `any` types allowed
-6. **Keep files modular** - Max 500 lines per file
+## Environment
+- Redis: `brew install redis && redis-server`
+- Copy `.env.example` → `.env.local`, add Supabase keys
 
-## Before Making Changes
+## Project Structure
+```
+boggle-new/
+├── fe-next/           # Main codebase (Next.js + Express backend)
+│   └── CLAUDE.md      # DETAILED STANDARDS - Read this
+├── docs/              # Documentation & archives
+└── .claude/rules/     # Coding standards (TDD, Git, Security)
+```
 
-1. Read [fe-next/claude.md](fe-next/claude.md) - it contains all technical decisions
-2. Verify tests pass: `npm run test`
-3. Verify build passes: `npm run build`
-4. Run linter: `npm run lint`
+## Common Gotchas
+- **RTL**: Test Hebrew with `?locale=he`, shadows auto-flip
+- **Translations**: Use `t('key')`, never hardcode text
+- **WebSocket**: Rate limit 50 msg/10s, auto-reconnect enabled
 
-## Important Notes
-
-- This project is a multi-language word game with real-time multiplayer features
-- Architecture prioritizes maintainability and clarity over cleverness
-- All code follows SOLID principles and DRY methodology
-- Documentation is crucial - keep it updated
+## Design Context
+- **Users**: Mixed casual + competitive, ages 15-40, phones + TV/party screens, 5 languages (Hebrew RTL)
+- **Brand**: Quirky, electric, loud — party energy + competitive edge + surprising charm
+- **Aesthetic**: Neo-Brutalist refined — dark navy, hard pixel shadows, solid borders, electric color-coded modes (lime/pink/cyan/purple), Fredoka + Rubik fonts, kawaii mascot
+- **Principles**: Energy with intention · Phone AND TV · Personality everywhere · Competitive clarity · Coherent chaos
+- **Anti-references**: Generic mobile game UI, soft gradients, glassmorphism, corporate aesthetics
+- **Full context**: See [.impeccable.md](.impeccable.md)

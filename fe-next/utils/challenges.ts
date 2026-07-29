@@ -142,6 +142,28 @@ export function parseGridSeed(seed: string): LetterGrid | null {
 /**
  * Get the challenge URL for sharing
  */
+/**
+ * Build OG image URL for a challenge (used for rich social media previews)
+ */
+export function getChallengeOgUrl(opts: {
+  player: string;
+  score: number;
+  words?: number;
+  combo?: number;
+  lang?: string;
+}): string {
+  if (typeof window === 'undefined') return '';
+  const origin = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+  const params = new URLSearchParams({
+    player: opts.player,
+    score: String(opts.score),
+  });
+  if (opts.words) params.set('words', String(opts.words));
+  if (opts.combo && opts.combo >= 3) params.set('combo', String(opts.combo));
+  if (opts.lang) params.set('lang', opts.lang);
+  return `${origin}/api/og/challenge?${params}`;
+}
+
 export function getChallengeUrl(challengeCode: string, utmSource?: string): string {
   if (typeof window === 'undefined') return '';
   const publicUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useState, useCallback, useMemo, memo } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { useReducedMotion } from '@/utils/accessibility';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
@@ -27,7 +27,7 @@ interface FloatingCoinAnimationProps {
  * FloatingCoinAnimation - Animated coins flying from source to top-right corner
  * Used for combo milestone rewards to show coins being earned
  */
-const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
+const FloatingCoinAnimation = memo<FloatingCoinAnimationProps>(({
   coinAmount,
   startPosition,
   onAnimationComplete,
@@ -39,15 +39,26 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
   const [displayAmount, setDisplayAmount] = useState<number | null>(null);
   const [particles, setParticles] = useState<CoinParticle[]>([]);
 
-  // Pre-compute target position to avoid calc() in animation (causes jank)
+  // Find coin counter element and compute target position for fly-to animation
   const targetPosition = useMemo(() => {
     if (typeof window === 'undefined') return { x: 0, y: 0 };
     const startX = typeof startPosition?.x === 'number' ? startPosition.x : window.innerWidth / 2;
     const startY = typeof startPosition?.y === 'number' ? startPosition.y : window.innerHeight * 0.35;
+
+    // Try to find the coin counter badge via data attribute
+    const coinTarget = document.querySelector('[data-coin-target]');
+    if (coinTarget) {
+      const rect = coinTarget.getBoundingClientRect();
+      return {
+        x: rect.left + rect.width / 2 - startX,
+        y: rect.top + rect.height / 2 - startY,
+      };
+    }
+
+    // Fallback: top-left area where coin badge typically is
     return {
-      // Target: top-right corner (coin display area)
-      x: window.innerWidth - 80 - startX,
-      y: 40 - startY,
+      x: 60 - startX,
+      y: 100 - startY,
     };
   }, [startPosition]);
 
@@ -65,6 +76,23 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
     }));
   }, []);
 
+  // Pulse the coin counter badge when coins land
+  const pulseCoinTarget = useCallback(() => {
+    const coinTarget = document.querySelector('[data-coin-target]');
+    if (coinTarget instanceof HTMLElement) {
+      coinTarget.style.transition = 'transform 0.15s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+      coinTarget.style.transform = 'scale(1.2) rotate(-1deg)';
+      coinTarget.style.boxShadow = '0 0 12px rgba(251, 191, 36, 0.6), 4px 4px 0px black';
+      setTimeout(() => {
+        coinTarget.style.transform = '';
+        coinTarget.style.boxShadow = '';
+        setTimeout(() => {
+          coinTarget.style.transition = '';
+        }, 150);
+      }, 300);
+    }
+  }, []);
+
   // Trigger animation when coinAmount changes to a positive value
   useEffect(() => {
     if (coinAmount !== null && coinAmount > 0) {
@@ -72,16 +100,22 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
       setParticles(generateParticles(coinAmount));
       setShowAnimation(true);
 
+      // Pulse the coin counter when coins land (timed with particle arrival)
+      const pulseTimer = setTimeout(pulseCoinTarget, 900);
+
       // Auto-dismiss after animation completes
       const timer = setTimeout(() => {
         setShowAnimation(false);
         onAnimationComplete?.();
       }, 1500);
 
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(pulseTimer);
+      };
     }
     return undefined;
-  }, [coinAmount, generateParticles, onAnimationComplete]);
+  }, [coinAmount, generateParticles, onAnimationComplete, pulseCoinTarget]);
 
   if (!showAnimation || displayAmount === null || displayAmount <= 0) {
     return null;
@@ -90,7 +124,7 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
   // For reduced motion or low-end devices, show a simple fade animation
   if (prefersReducedMotion || skipComplexAnimation) {
     return (
-      <motion.div
+      <m.div
         className={`fixed z-[100] pointer-events-none ${className || ''}`}
         style={{
           left: startPosition?.x ?? '50%',
@@ -102,11 +136,11 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
         exit={{ opacity: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-bold shadow-lg">
+        <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-linear-to-r from-yellow-400 to-orange-400 text-white font-bold shadow-lg">
           <span>💰</span>
           <span>+{displayAmount}</span>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
@@ -116,7 +150,7 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
         className={`fixed inset-0 z-[100] pointer-events-none overflow-hidden ${className || ''}`}
       >
         {/* Central coin burst with amount */}
-        <motion.div
+        <m.div
           className="absolute flex items-center gap-1.5"
           style={{
             left: startPosition?.x ?? '50%',
@@ -134,8 +168,8 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
             ease: 'easeOut',
           }}
         >
-          <motion.div
-            className="px-4 py-2 rounded-full bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 text-white font-black text-xl shadow-xl border-2 border-yellow-200"
+          <m.div
+            className="px-4 py-2 rounded-full bg-linear-to-r from-yellow-400 via-amber-400 to-orange-400 text-white font-black text-xl shadow-xl border-2 border-yellow-200"
             style={{
               filter: 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))',
             }}
@@ -151,20 +185,20 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
             }}
           >
             <span className="flex items-center gap-2">
-              <motion.span
+              <m.span
                 animate={{ rotate: [0, 15, -15, 0] }}
                 transition={{ duration: 0.5 }}
               >
                 💰
-              </motion.span>
+              </m.span>
               <span>+{displayAmount}</span>
             </span>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
 
         {/* Flying coin particles - using pre-computed positions to avoid calc() jank */}
         {particles.map((particle) => (
-          <motion.div
+          <m.div
             key={`coin-${particle.id}`}
             className="absolute w-6 h-6 text-2xl will-change-transform"
             style={{
@@ -200,12 +234,12 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
             }}
           >
             🪙
-          </motion.div>
+          </m.div>
         ))}
 
         {/* Sparkle effects */}
         {[...Array(6)].map((_, i) => (
-          <motion.div
+          <m.div
             key={`sparkle-${i}`}
             className="absolute w-2 h-2 rounded-full bg-yellow-300"
             style={{
@@ -230,6 +264,8 @@ const FloatingCoinAnimation: React.FC<FloatingCoinAnimationProps> = ({
       </div>
     </AnimatePresence>
   );
-};
+});
+
+FloatingCoinAnimation.displayName = 'FloatingCoinAnimation';
 
 export default FloatingCoinAnimation;

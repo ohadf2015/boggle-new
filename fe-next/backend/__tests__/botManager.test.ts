@@ -4,26 +4,27 @@
  */
 
 // Mock dependencies
-jest.mock('../modules/supabaseServer', () => ({
-  getPopularPlayerWords: jest.fn().mockResolvedValue({ data: [] }),
-  getSupabase: jest.fn().mockReturnValue(null),
+vi.mock('../modules/supabaseServer', () => ({
+  getPopularPlayerWords: vi.fn().mockResolvedValue({ data: [] }),
+  getSupabase: vi.fn().mockReturnValue(null),
 }));
 
-jest.mock('../modules/boggleSolver', () => ({
-  findWordsForBots: jest.fn().mockReturnValue({
+vi.mock('../modules/boggleSolver', () => ({
+  findWordsForBots: vi.fn().mockReturnValue({
     easy: ['cat', 'dog', 'rat', 'bat'],
     medium: ['hello', 'world', 'games', 'words'],
     hard: ['testing', 'playing', 'working'],
   }),
 }));
 
-jest.mock('../utils/logger', () => ({
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../utils/logger', () => ({ default: {
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   addBot,
   removeBot,
@@ -308,7 +309,7 @@ describe('Bot Manager', () => {
       expect(result.name).toBeDefined();
       expect(result.name.length).toBeGreaterThan(0);
       expect(result.avatar).toBeDefined();
-      expect(result.avatar.avatarImage).toBeDefined();
+      expect(result.avatar.customAvatar).toBeDefined();
     });
 
     test('generateRandomPlayerName avoids existing names', () => {
@@ -331,7 +332,7 @@ describe('Bot Manager', () => {
       const avatar = getRandomGenericAvatar();
 
       expect(avatar).toBeDefined();
-      expect(avatar.avatarImage).toBeDefined();
+      expect(avatar.customAvatar).toBeDefined();
       expect(avatar.emoji).toBeDefined();
       expect(avatar.color).toBeDefined();
     });
@@ -347,7 +348,7 @@ describe('Bot Behavior', () => {
         id: 'bot-test',
         gameCode: 'TEST',
         username: 'TestBot',
-        avatar: { avatarImage: 'test', emoji: '🤖', color: '#000' },
+        avatar: { avatarImage: 'test', emoji: '⚙️', color: '#000' },
         difficulty: 'medium',
         personality: 'steady',
         isBot: true,
@@ -452,7 +453,7 @@ describe('Bot Behavior', () => {
         id: 'bot-test',
         gameCode: 'TEST',
         username: 'TestBot',
-        avatar: { avatarImage: 'test', emoji: '🤖', color: '#000' },
+        avatar: { avatarImage: 'test', emoji: '⚙️', color: '#000' },
         difficulty: 'medium',
         personality: 'steady',
         isBot: true,
@@ -475,47 +476,47 @@ describe('Bot Behavior', () => {
       };
     }
 
-    test('submitBotWord increments word index', () => {
+    test('submitBotWord increments word index', async () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
-      submitBotWord(bot, callback);
+      await submitBotWord(bot, callback);
 
       expect(bot.currentWordIndex).toBe(1);
     });
 
-    test('submitBotWord adds word to wordsFound', () => {
+    test('submitBotWord adds word to wordsFound', async () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
-      submitBotWord(bot, callback);
+      await submitBotWord(bot, callback);
 
       expect(bot.wordsFound).toContain('hello');
     });
 
-    test('submitBotWord updates score', () => {
+    test('submitBotWord updates score', async () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
-      submitBotWord(bot, callback);
+      await submitBotWord(bot, callback);
 
       expect(bot.score).toBeGreaterThan(0);
     });
 
-    test('submitBotWord increments combo level', () => {
+    test('submitBotWord increments combo level', async () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
-      submitBotWord(bot, callback);
+      await submitBotWord(bot, callback);
 
       expect(bot.comboLevel).toBe(1);
     });
 
-    test('submitBotWord calls callback with correct data', () => {
+    test('submitBotWord calls callback with correct data', async () => {
       const bot = createMockBot();
-      const callback = jest.fn();
+      const callback = vi.fn();
 
-      submitBotWord(bot, callback);
+      await submitBotWord(bot, callback);
 
       expect(callback).toHaveBeenCalledWith({
         botId: 'bot-test',
@@ -526,33 +527,70 @@ describe('Bot Behavior', () => {
       });
     });
 
-    test('submitBotWord does nothing when inactive', () => {
+    test('submitBotWord does nothing when inactive', async () => {
       const bot = createMockBot({ isActive: false });
-      const callback = jest.fn();
+      const callback = vi.fn();
 
-      submitBotWord(bot, callback);
+      await submitBotWord(bot, callback);
 
       expect(callback).not.toHaveBeenCalled();
       expect(bot.currentWordIndex).toBe(0);
     });
 
-    test('submitBotWord does nothing when all words submitted', () => {
+    test('submitBotWord does nothing when all words submitted', async () => {
       const bot = createMockBot({ currentWordIndex: 3 });
-      const callback = jest.fn();
+      const callback = vi.fn();
 
-      submitBotWord(bot, callback);
+      await submitBotWord(bot, callback);
 
       expect(callback).not.toHaveBeenCalled();
     });
 
-    test('submitBotWord skips duplicate words', () => {
+    test('submitBotWord skips duplicate words', async () => {
       const bot = createMockBot({ wordsFound: ['hello'] });
-      const callback = jest.fn();
+      const callback = vi.fn();
 
-      submitBotWord(bot, callback);
+      await submitBotWord(bot, callback);
 
       expect(callback).not.toHaveBeenCalled();
       expect(bot.currentWordIndex).toBe(1);
+    });
+
+    test('submitBotWord does not inflate score when callback returns false', async () => {
+      const bot = createMockBot();
+      const rejectingCallback = vi.fn().mockReturnValue(false);
+
+      await submitBotWord(bot, rejectingCallback);
+
+      expect(rejectingCallback).toHaveBeenCalled();
+      expect(bot.score).toBe(0);
+      expect(bot.comboLevel).toBe(0);
+      expect(bot.wordsFound).not.toContain('hello');
+      expect(bot.currentWordIndex).toBe(1);
+    });
+
+    test('submitBotWord does not inflate score when async callback resolves false', async () => {
+      const bot = createMockBot();
+      const rejectingCallback = vi.fn().mockResolvedValue(false);
+
+      await submitBotWord(bot, rejectingCallback);
+
+      expect(bot.score).toBe(0);
+      expect(bot.comboLevel).toBe(0);
+      expect(bot.wordsFound).not.toContain('hello');
+    });
+
+    test('submitBotWord credits numeric callback return as bot score (H1)', async () => {
+      const bot = createMockBot();
+      // botGame callback returns totalScore = base + blast/wordHunt bonuses.
+      // bot.score must accumulate that total so shouldBotScore cap is honoured.
+      const numericCallback = vi.fn().mockResolvedValue(42);
+
+      await submitBotWord(bot, numericCallback);
+
+      expect(bot.score).toBe(42);
+      expect(bot.comboLevel).toBe(1);
+      expect(bot.wordsFound).toContain('hello');
     });
   });
 
@@ -694,9 +732,10 @@ describe('Bot Configuration', () => {
     expect(BOT_CONFIG.NAMES).toHaveProperty('he');
     expect(BOT_CONFIG.NAMES).toHaveProperty('sv');
     expect(BOT_CONFIG.NAMES).toHaveProperty('ja');
+    expect(BOT_CONFIG.NAMES).toHaveProperty('es');
 
     // Each language should have names for all difficulties
-    ['en', 'he', 'sv', 'ja'].forEach(lang => {
+    ['en', 'he', 'sv', 'ja', 'es'].forEach(lang => {
       expect(BOT_CONFIG.NAMES[lang]).toHaveProperty('easy');
       expect(BOT_CONFIG.NAMES[lang]).toHaveProperty('medium');
       expect(BOT_CONFIG.NAMES[lang]).toHaveProperty('hard');

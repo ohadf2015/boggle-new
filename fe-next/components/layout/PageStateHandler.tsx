@@ -3,7 +3,7 @@
 import React from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { NeoLoader } from '@/components/ui/NeoLoader';
+import { PageLoader } from '@/components/ui/PageLoader';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -78,10 +78,9 @@ export function PageStateHandler({
 
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <NeoLoader
-          variant="letters"
+        <PageLoader
           size="md"
-          text={loadingText || t('common.loading') || 'Loading...'}
+          text={loadingText || t('common.loading')}
         />
       </div>
     );
@@ -107,7 +106,7 @@ export function PageStateHandler({
             isDarkMode ? 'text-white' : 'text-gray-900'
           )}
         >
-          {t('common.error') || 'Something went wrong'}
+          {t('common.error')}
         </p>
         <p
           className={cn(
@@ -128,7 +127,7 @@ export function PageStateHandler({
             )}
           >
             <RefreshCw className="w-4 h-4" />
-            {t('common.retry') || 'Try Again'}
+            {t('common.retry')}
           </Button>
         )}
       </div>
@@ -144,9 +143,9 @@ export function PageStateHandler({
     return (
       <EmptyState
         type="no-results"
-        title={emptyText || t('common.noData') || 'No data available'}
+        title={emptyText || t('common.noData')}
         showMascot
-        mascotVariant="encouraging"
+        mascotVariant="happy"
       />
     );
   }

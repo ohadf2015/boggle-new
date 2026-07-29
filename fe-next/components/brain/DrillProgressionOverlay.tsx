@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, X, Star, Coins, Trophy, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { CognitiveDomain, BrainTier } from '@/shared/types/cognitive';
+import type { DrillImprovement } from '@/shared/utils/drillImprovement';
 
 interface DrillProgressionOverlayProps {
   /** Whether the overlay is visible */
@@ -25,6 +26,36 @@ interface DrillProgressionOverlayProps {
   overallScore: number;
   /** Current tier */
   tier: BrainTier;
+  /** XP awarded for this drill (from server) */
+  xpAwarded?: number;
+  /** Gold awarded for this drill */
+  goldAwarded?: number;
+  /** Level promotion info if drill bumped player to a new level */
+  levelUp?: { newLevel: number; previousLevel: number };
+  /** "You got better" signals — surfaces the single most flattering true one. */
+  improvement?: DrillImprovement;
+}
+
+/**
+ * Picks the single most flattering TRUE improvement signal to celebrate.
+ * Priority: personal best > above your average > better than last time >
+ * first attempt. Returns null when there's nothing genuine to show.
+ */
+function pickImprovementBadge(improvement: DrillImprovement | undefined) {
+  if (!improvement) return null;
+  if (improvement.isPersonalBest) {
+    return { key: 'brain.drills.newPersonalBest', Icon: Trophy, bg: 'bg-neo-yellow' } as const;
+  }
+  if (improvement.totalPlays > 0 && improvement.averageScore > 0 && improvement.currentScore > improvement.averageScore) {
+    return { key: 'brain.drills.aboveAverage', Icon: TrendingUp, bg: 'bg-neo-green' } as const;
+  }
+  if (improvement.improvedVsLast) {
+    return { key: 'brain.drills.betterThanLast', Icon: TrendingUp, bg: 'bg-neo-green' } as const;
+  }
+  if (improvement.totalPlays === 0) {
+    return { key: 'brain.drills.firstAttempt', Icon: Sparkles, bg: 'bg-neo-cyan' } as const;
+  }
+  return null;
 }
 
 const DOMAIN_CONFIG: Record<CognitiveDomain, {
@@ -67,20 +98,32 @@ const DOMAIN_CONFIG: Record<CognitiveDomain, {
 
 /**
  * Animated counter component for score display
+ * Animates from startValue to endValue for satisfying progression feedback
  */
-function AnimatedScore({ value, duration = 1500 }: { value: number; duration?: number }) {
-  const [displayValue, setDisplayValue] = useState(0);
+function AnimatedScore({
+  value,
+  startValue = 0,
+  duration = 1500
+}: {
+  value: number;
+  startValue?: number;
+  duration?: number;
+}) {
+  const [displayValue, setDisplayValue] = useState(startValue);
 
   useEffect(() => {
     let startTime: number;
     let animationFrame: number;
+    const from = startValue;
+    const to = value;
+    const delta = to - from;
 
     const animate = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
       // Easing function for smooth animation
       const easeOut = 1 - Math.pow(1 - progress, 3);
-      setDisplayValue(Math.round(easeOut * value));
+      setDisplayValue(Math.round(from + (delta * easeOut)));
 
       if (progress < 1) {
         animationFrame = requestAnimationFrame(animate);
@@ -92,7 +135,7 @@ function AnimatedScore({ value, duration = 1500 }: { value: number; duration?: n
     return () => {
       if (animationFrame) cancelAnimationFrame(animationFrame);
     };
-  }, [value, duration]);
+  }, [value, startValue, duration]);
 
   return <span>{displayValue}</span>;
 }
@@ -112,10 +155,16 @@ export default function DrillProgressionOverlay({
   scoreDelta,
   overallScore,
   tier,
+  xpAwarded,
+  goldAwarded,
+  levelUp,
+  improvement,
 }: DrillProgressionOverlayProps) {
   const { theme } = useTheme();
   const { t } = useLanguage();
   const isDarkMode = theme === 'dark';
+  const improvementBadge = pickImprovementBadge(improvement);
+  const ImprovementIcon = improvementBadge?.Icon;
   const [showScore, setShowScore] = useState(false);
   const [showDelta, setShowDelta] = useState(false);
   const [showOverall, setShowOverall] = useState(false);
@@ -155,7 +204,7 @@ export default function DrillProgressionOverlay({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -164,7 +213,7 @@ export default function DrillProgressionOverlay({
           style={{ backdropFilter: 'blur(8px)' }}
         >
           {/* Backdrop */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.8 }}
             exit={{ opacity: 0 }}
@@ -176,41 +225,60 @@ export default function DrillProgressionOverlay({
           />
 
           {/* Content Card */}
-          <motion.div
+          <m.div
             initial={{ scale: 0.8, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: -20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 300 }}
             className={cn(
               'relative w-full max-w-sm rounded-neo border-4 border-neo-black shadow-hard-lg p-6',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
+              isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
             )}
           >
             {/* Close button */}
             <button
               onClick={onClose}
+              aria-label={t('common.close')}
               className={cn(
                 'absolute top-3 right-3 p-1.5 rounded-neo border-2 border-neo-black',
                 'transition-all hover:scale-105',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-100 text-neo-black'
+                isDarkMode ? 'bg-neo-navy-elevated text-neo-white' : 'bg-gray-100 text-neo-black'
               )}
             >
               <X className="w-4 h-4" />
             </button>
 
+            {/* Level-up celebration banner — shows above header when drill promoted player to new level */}
+            {levelUp && levelUp.newLevel > levelUp.previousLevel && (
+              <m.div
+                initial={{ opacity: 0, y: -12, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', damping: 14, stiffness: 220, delay: 0.4 }}
+                className="mb-4 flex items-center justify-center gap-2 rounded-neo border-3 border-neo-black bg-neo-yellow px-3 py-2 shadow-hard-sm"
+                role="status"
+                aria-label={`Level up to ${levelUp.newLevel}`}
+              >
+                <Star className="h-4 w-4 text-neo-black" fill="currentColor" />
+                <span className="font-neo-display text-xs font-black uppercase tracking-widest text-neo-black">
+                  {t('brain.drills.levelUp', { level: levelUp.newLevel })}
+                </span>
+                <Star className="h-4 w-4 text-neo-black" fill="currentColor" />
+              </m.div>
+            )}
+
             {/* Header */}
             <div className="text-center mb-6">
-              <motion.p
+              <m.p
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
                   'text-sm font-bold uppercase tracking-wide mb-2',
-                  isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                  isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
                 )}
               >
                 {t('brain.drills.brainTraining')}
-              </motion.p>
-              <motion.h2
+              </m.p>
+              <m.h2
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.1 }}
@@ -220,17 +288,17 @@ export default function DrillProgressionOverlay({
                 )}
               >
                 {t(`brain.domains.${targetDomain}`)}
-              </motion.h2>
+              </m.h2>
             </div>
 
             {/* Domain Icon with Animation */}
-            <motion.div
+            <m.div
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', damping: 12, stiffness: 200, delay: 0.2 }}
               className="flex justify-center mb-6"
             >
-              <motion.div
+              <m.div
                 animate={{
                   scale: [1, 1.1, 1],
                   rotate: [0, 5, -5, 0],
@@ -246,13 +314,13 @@ export default function DrillProgressionOverlay({
                 )}
               >
                 <Icon className="w-10 h-10 text-neo-black" />
-              </motion.div>
-            </motion.div>
+              </m.div>
+            </m.div>
 
             {/* Score Display */}
             <AnimatePresence>
               {showScore && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center mb-4"
@@ -262,11 +330,11 @@ export default function DrillProgressionOverlay({
                       'text-5xl font-black',
                       isDarkMode ? 'text-neo-white' : 'text-neo-black'
                     )}>
-                      <AnimatedScore value={newDomainScore} />
+                      <AnimatedScore value={newDomainScore} startValue={previousDomainScore} />
                     </span>
                     <span className={cn(
                       'text-xl font-bold',
-                      isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                      isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
                     )}>
                       /100
                     </span>
@@ -275,48 +343,68 @@ export default function DrillProgressionOverlay({
                   {/* Progress Bar */}
                   <div className={cn(
                     'h-3 mt-3 rounded-full border-2 border-neo-black overflow-hidden',
-                    isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+                    isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200'
                   )}>
-                    <motion.div
+                    <m.div
                       className={cn('h-full', domainConfig.bgColor)}
                       initial={{ width: `${previousDomainScore}%` }}
                       animate={{ width: `${newDomainScore}%` }}
-                      transition={{ duration: 1, ease: 'easeOut' }}
+                      transition={{ type: 'spring', stiffness: 80, damping: 15 }}
                     />
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 
-            {/* Delta Display */}
+            {/* Improvement badge — the single most flattering true "you got better" signal */}
             <AnimatePresence>
-              {showDelta && scoreDelta !== 0 && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.5 }}
-                  animate={{ opacity: 1, scale: 1 }}
+              {showDelta && improvementBadge && ImprovementIcon && (
+                <m.div
+                  initial={{ opacity: 0, scale: 0.5, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ type: 'spring', damping: 15 }}
+                  className="flex justify-center mb-4"
+                  data-testid="drill-improvement-badge"
+                >
+                  <div className={cn(
+                    'inline-flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black',
+                    improvementBadge.bg
+                  )}>
+                    <ImprovementIcon className="w-5 h-5 text-neo-black" />
+                    <span className="text-sm font-black uppercase tracking-wide text-neo-black">
+                      {t(improvementBadge.key)}
+                    </span>
+                  </div>
+                </m.div>
+              )}
+            </AnimatePresence>
+
+            {/* Delta Display - Only show positive gains with upward arrow */}
+            <AnimatePresence>
+              {showDelta && scoreDelta > 0 && (
+                <m.div
+                  initial={{ opacity: 0, scale: 0.5, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ type: 'spring', damping: 15 }}
                   className="flex justify-center mb-4"
                 >
                   <div className={cn(
                     'inline-flex items-center gap-2 px-4 py-2 rounded-neo border-3 border-neo-black',
-                    scoreDelta > 0 ? 'bg-neo-green' : 'bg-red-400'
+                    'bg-neo-green'
                   )}>
-                    <TrendingUp className={cn(
-                      'w-5 h-5 text-neo-black',
-                      scoreDelta < 0 && 'rotate-180'
-                    )} />
+                    <TrendingUp className="w-5 h-5 text-neo-black" />
                     <span className="text-lg font-black text-neo-black">
-                      {scoreDelta > 0 ? '+' : ''}{scoreDelta}
+                      +{scoreDelta}
                     </span>
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 
             {/* Overall Score */}
             <AnimatePresence>
               {showOverall && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className={cn(
@@ -326,7 +414,7 @@ export default function DrillProgressionOverlay({
                 >
                   <p className={cn(
                     'text-xs font-bold uppercase tracking-wide mb-1',
-                    isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                    isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
                   )}>
                     {t('brain.overallScore')}
                   </p>
@@ -339,17 +427,48 @@ export default function DrillProgressionOverlay({
                     </span>
                     <span className={cn(
                       'px-2 py-0.5 rounded-neo border-2 border-neo-black text-xs font-bold uppercase',
-                      isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-100 text-neo-black'
+                      isDarkMode ? 'bg-neo-navy-elevated text-neo-white' : 'bg-gray-100 text-neo-black'
                     )}>
                       {t(`brain.tiers.${tier}`)}
                     </span>
                   </div>
-                </motion.div>
+                </m.div>
+              )}
+            </AnimatePresence>
+
+            {/* XP + Gold rewards */}
+            <AnimatePresence>
+              {showOverall && (xpAwarded !== undefined || goldAwarded !== undefined) && (
+                <m.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 }}
+                  className="flex justify-center gap-3 mt-3"
+                >
+                  {(xpAwarded ?? 0) > 0 && (
+                    <div className={cn(
+                      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black',
+                      'bg-neo-cyan text-neo-black font-bold text-sm'
+                    )}>
+                      <Star className="w-4 h-4" />
+                      {t('brain.drills.xpEarned', { xp: xpAwarded ?? 0 })}
+                    </div>
+                  )}
+                  {(goldAwarded ?? 0) > 0 && (
+                    <div className={cn(
+                      'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-neo-black',
+                      'bg-neo-yellow text-neo-black font-bold text-sm'
+                    )}>
+                      <Coins className="w-4 h-4" />
+                      {t('brain.drills.goldEarned', { gold: goldAwarded ?? 0 })}
+                    </div>
+                  )}
+                </m.div>
               )}
             </AnimatePresence>
 
             {/* Tap to close hint */}
-            <motion.p
+            <m.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.5 }}
               transition={{ delay: 2 }}
@@ -359,9 +478,9 @@ export default function DrillProgressionOverlay({
               )}
             >
               {t('common.tapToClose')}
-            </motion.p>
-          </motion.div>
-        </motion.div>
+            </m.p>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

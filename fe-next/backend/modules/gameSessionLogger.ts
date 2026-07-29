@@ -3,13 +3,34 @@
  * Handles logging game sessions to database for analytics and history tracking
  */
 
-import type { SupabaseClient } from '@supabase/supabase-js';
-import { captureBackgroundError } from '@/utils/sentry';
+import { type SupabaseClient, createClient } from '@supabase/supabase-js';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
+
+/**
+ * Backend-safe error capture that doesn't require @sentry/nextjs
+ * Logs errors to console in development and captures via Sentry in production
+ * when running within Next.js context (not standalone backend)
+ */
+function captureBackgroundErrorSafe(
+  error: Error,
+  context: { operation: string; service?: string; userId?: string }
+): void {
+  // Always log to our logger for backend visibility
+  logger.error('GAME_SESSION_LOGGER', `[${context.operation}] ${error.message}`, {
+    service: context.service,
+    userId: context.userId,
+    stack: error.stack,
+  });
+}
 
 // Create Supabase client (lazy loaded)
 let supabase: SupabaseClient | null = null;
+
+/** Test-only: reset the cached client */
+export function _resetSupabaseForTesting(): void {
+  supabase = null;
+}
 
 function getSupabaseClient(): SupabaseClient | null {
   if (supabase) return supabase;
@@ -22,7 +43,6 @@ function getSupabaseClient(): SupabaseClient | null {
     return null;
   }
 
-  const { createClient } = require('@supabase/supabase-js');
   supabase = createClient(supabaseUrl, supabaseServiceKey);
   return supabase;
 }
@@ -40,7 +60,7 @@ export interface GameSessionData {
   guestSessionId?: string | null;
 
   // Game details
-  mode: 'singleplayer' | 'multiplayer' | 'daily_challenge';
+  mode: 'singleplayer' | 'multiplayer' | 'daily_challenge' | 'word_hunt';
   language: string;
   difficulty?: string | null;
 
@@ -113,13 +133,17 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
   const client = getSupabaseClient();
   if (!client) return null;
 
-  try {
-    // Validate that either userId or guestSessionId is set
-    if (!sessionData.userId && !sessionData.guestSessionId) {
-      logger.error('GAME_SESSION_LOGGER', 'Either userId or guestSessionId must be provided');
-      return null;
-    }
+  // DB check_player_id constraint requires exactly one identifier (XOR)
+  if (!sessionData.userId && !sessionData.guestSessionId) {
+    logger.debug('GAME_SESSION_LOGGER', 'Skipping game session log: no player identifier');
+    return null;
+  }
+  // When both are set, prefer authenticated userId (XOR enforcement)
+  if (sessionData.userId && sessionData.guestSessionId) {
+    sessionData = { ...sessionData, guestSessionId: null };
+  }
 
+  try {
     const { data, error } = await client
       .from('game_sessions')
       .insert({
@@ -157,7 +181,7 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
 
     if (error) {
       logger.error('GAME_SESSION_LOGGER', `Failed to log game session: ${error.message}`);
-      captureBackgroundError(new Error(error.message), {
+      captureBackgroundErrorSafe(new Error(error.message), {
         operation: 'log_game_session',
         service: 'gameSessionLogger',
         userId: sessionData.userId || undefined,
@@ -165,11 +189,12 @@ export async function logGameSession(sessionData: GameSessionData): Promise<stri
       return null;
     }
 
-    logger.info('GAME_SESSION_LOGGER', `Logged ${sessionData.mode} session for ${sessionData.userId ? 'user' : 'guest'}`);
+    const actorKind = sessionData.userId ? 'user' : sessionData.guestSessionId ? 'guest' : 'anonymous';
+    logger.info('GAME_SESSION_LOGGER', `Logged ${sessionData.mode} session for ${actorKind}`);
     return data.id;
   } catch (err) {
     logger.error('GAME_SESSION_LOGGER', `Exception logging game session: ${err}`);
-    captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+    captureBackgroundErrorSafe(err instanceof Error ? err : new Error(String(err)), {
       operation: 'log_game_session_exception',
       service: 'gameSessionLogger',
       userId: sessionData.userId || undefined,
@@ -212,7 +237,7 @@ export async function updateGameSession(
 
     if (error) {
       logger.error('GAME_SESSION_LOGGER', `Failed to update game session: ${error.message}`);
-      captureBackgroundError(new Error(error.message), {
+      captureBackgroundErrorSafe(new Error(error.message), {
         operation: 'update_game_session',
         service: 'gameSessionLogger',
       });
@@ -223,7 +248,7 @@ export async function updateGameSession(
     return true;
   } catch (err) {
     logger.error('GAME_SESSION_LOGGER', `Exception updating game session: ${err}`);
-    captureBackgroundError(err instanceof Error ? err : new Error(String(err)), {
+    captureBackgroundErrorSafe(err instanceof Error ? err : new Error(String(err)), {
       operation: 'update_game_session_exception',
       service: 'gameSessionLogger',
     });
@@ -272,9 +297,7 @@ export async function getGameSessions(filters: GameSessionFilters = {}): Promise
       query = query.eq('completed', filters.completed);
     }
 
-    if (filters.limit) {
-      query = query.limit(filters.limit);
-    }
+    query = query.limit(filters.limit || 500);
 
     if (filters.offset) {
       query = query.range(filters.offset, filters.offset + (filters.limit || 50) - 1);

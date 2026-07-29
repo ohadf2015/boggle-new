@@ -18,7 +18,7 @@ interface UseCoinActionsProps {
   efficiencyScore: number;
   streakDays: number;
   userId?: string;
-  onRetry: () => void;
+  onRetry: () => void | Promise<void>;
 }
 
 export function useCoinActions({
@@ -79,6 +79,11 @@ export function useCoinActions({
     }
   }, [puzzleDate, language, spendCoins, costs]);
 
+  // Reveal without spending — used by the rewarded-ad paywall-softener flow
+  const handleRevealTargetWordViaAd = useCallback(() => {
+    setTargetWordRevealed(true);
+  }, []);
+
   // Handle retry challenge (costs coins)
   const handleRetryChallenge = useCallback(async () => {
     const cost = costs.DAILY_RETRY;
@@ -90,7 +95,7 @@ export function useCoinActions({
     });
 
     if (success) {
-      onRetry();
+      await onRetry();
     }
   }, [puzzleDate, language, puzzleNumber, onRetry, spendCoins, costs]);
 
@@ -103,6 +108,7 @@ export function useCoinActions({
     revealCost: costs.REVEAL_TARGET_WORD,
     retryCost: costs.DAILY_RETRY,
     handleRevealTargetWord,
+    handleRevealTargetWordViaAd,
     handleRetryChallenge,
   };
 }

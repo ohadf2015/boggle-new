@@ -7,9 +7,7 @@
  * Build: npm run build:schemas
  */
 
-// Re-export all schemas from shared source of truth
 export {
-  // Base schemas
   LanguageSchema,
   AvatarSchema,
   GameCodeSchema,
@@ -19,8 +17,10 @@ export {
   DifficultySchema,
   BotDifficultySchema,
   PresenceStatusSchema,
+  RoomNameSchema,
+  PlayerIdSchema,
+  GuestTokenHashSchema,
 
-  // Event schemas
   CreateGameSchema,
   JoinGameSchema,
   LeaveRoomSchema,
@@ -44,15 +44,15 @@ export {
   ReconnectSchema,
   UpdateGameSettingsSchema,
   BroadcastShufflingGridSchema,
+  GenerateScoreCardSchema,
+  ApplyWordPackSchema,
 
-  // Schema map and utilities
   ClientEventSchemas,
   validatePayload,
   validateSocketEvent,
   safeValidateSocketEvent,
   getEventSchema,
 
-  // Types
   type ClientEventName,
   type Language,
   type Avatar,
@@ -74,141 +74,13 @@ export {
   type TransferHostData,
   type CreateTournamentData,
   type ReconnectData,
+  type ApplyWordPackData,
 } from '../../shared/schemas/socketSchemas';
 
-import { z } from 'zod';
-import {
-  ClientEventSchemas,
-  validatePayload as baseValidatePayload,
-} from '../../shared/schemas/socketSchemas';
-
-// Import error handler for backend-specific integration
-// Using dynamic import to avoid circular dependency
-let errorHandler: any = null;
-let logger: any = null;
-
-function getErrorHandler() {
-  if (!errorHandler) {
-    errorHandler = require('./errorHandler');
-  }
-  return errorHandler;
-}
-
-function getLogger() {
-  if (!logger) {
-    logger = require('./logger');
-  }
-  return logger;
-}
-
-// ==================== Backend-Specific Validation Helpers ====================
-
-/**
- * Validate and emit error if validation fails (integrated with error handler)
- * @param schema - Zod schema to validate against
- * @param data - Data to validate
- * @param socket - Socket for error emission
- * @param eventName - Event name for logging
- * @returns Validation result
- */
-export function validateWithError<T extends z.ZodSchema>(
-  schema: T,
-  data: unknown,
-  socket: any,
-  eventName: string = 'unknown'
-): { success: true; data: z.infer<T> } | { success: false } {
-  const result = baseValidatePayload(schema, data);
-
-  if (!result.success) {
-    // Type narrowing: result is { success: false; error: string }
-    const errorResult = result as { success: false; error: string };
-    getLogger().debug('VALIDATION', `Validation failed for ${eventName}`, {
-      error: errorResult.error,
-    });
-
-    const { emitError, ErrorCodes } = getErrorHandler();
-    emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, {
-      message: `Invalid ${eventName} payload: ${errorResult.error}`,
-    });
-
-    return { success: false };
-  }
-
-  return { success: true, data: result.data };
-}
-
-/**
- * Create a validated event handler wrapper with error handling
- * @param schema - Zod schema for validation
- * @param handler - Event handler function (receives validated data)
- * @param socket - Socket for error emission
- * @param eventName - Event name for logging
- * @returns Wrapped handler with validation
- */
-export function withValidation<T extends z.ZodSchema>(
-  schema: T,
-  handler: (data: z.infer<T>) => void | Promise<void>,
-  socket: any,
-  eventName: string = 'unknown'
-): (data: unknown) => Promise<void> {
-  return async (data: unknown) => {
-    const result = validateWithError(schema, data, socket, eventName);
-    if (!result.success) {
-      return;
-    }
-    return handler(result.data);
-  };
-}
-
-/**
- * Create a validation middleware for socket events
- * @param eventName - Name of the socket event
- * @returns Middleware function
- */
-export function createValidationMiddleware(eventName: string) {
-  const schema = (ClientEventSchemas as Record<string, z.ZodSchema>)[eventName];
-  if (!schema) {
-    getLogger().warn('VALIDATION', `No schema found for event: ${eventName}`);
-    return (socket: any, data: unknown, handler: (data: unknown) => void) => handler(data);
-  }
-
-  return (socket: any, data: unknown, handler: (data: unknown) => void) => {
-    const result = validateWithError(schema, data, socket, eventName);
-    if (result.success) {
-      return handler(result.data);
-    }
-  };
-}
-
-/**
- * Check if an event has a registered schema
- * @param eventName - Name of the socket event
- * @returns True if schema exists
- */
-export function hasSchema(eventName: string): boolean {
-  return eventName in ClientEventSchemas;
-}
-
-/**
- * Create a validation error (AppError)
- * @param message - Error message
- * @param fields - Field-level errors
- * @returns AppError instance
- */
-export function createValidationError(message: string, fields?: Record<string, string>) {
-  const { AppError, ErrorCodes } = getErrorHandler();
-  return new AppError(ErrorCodes.VALIDATION_FAILED, {
-    message,
-    details: fields,
-  });
-}
-
-// ==================== Legacy Compatibility Aliases ====================
-// These match the old CommonJS export names for backwards compatibility
+import { ClientEventSchemas } from '../../shared/schemas/socketSchemas';
 
 export const eventSchemas = ClientEventSchemas;
 
-// Lowercase aliases for backwards compatibility with existing code
 export {
   LanguageSchema as languageSchema,
   AvatarSchema as avatarSchema,
@@ -219,6 +91,9 @@ export {
   DifficultySchema as difficultySchema,
   BotDifficultySchema as botDifficultySchema,
   PresenceStatusSchema as presenceStatusSchema,
+  RoomNameSchema as roomNameSchema,
+  PlayerIdSchema as playerIdSchema,
+  GuestTokenHashSchema as guestTokenHashSchema,
   CreateGameSchema as createGameSchema,
   JoinGameSchema as joinGameSchema,
   LeaveRoomSchema as leaveRoomSchema,
@@ -242,4 +117,5 @@ export {
   ReconnectSchema as reconnectSchema,
   UpdateGameSettingsSchema as updateGameSettingsSchema,
   BroadcastShufflingGridSchema as broadcastShufflingGridSchema,
+  GenerateScoreCardSchema as generateScoreCardSchema,
 } from '../../shared/schemas/socketSchemas';

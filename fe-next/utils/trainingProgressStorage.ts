@@ -8,6 +8,12 @@
  * 4. Track long-term improvement across sessions
  */
 
+import {
+  getJsonFromLocalStorage,
+  saveJsonToLocalStorage,
+  removeFromLocalStorage,
+} from '@/utils/storageHelpers';
+
 const STORAGE_KEY = 'lexiclash_training_progress';
 
 /**
@@ -48,14 +54,6 @@ export interface TrainingProgress {
 
   // Track when they first passed (for analytics)
   firstPassedDate: string | null;
-
-  // Did they skip the gateway modal? (respects choice but tracks for analytics)
-  hasSkippedGateway: boolean;
-  gatewaySkippedAt: string | null;
-
-  // Has the gateway modal been shown to this user? (shows only once)
-  hasSeenGateway: boolean;
-  gatewaySeenAt: string | null;
 }
 
 const DEFAULT_SKILLS: TrainingSkills = {
@@ -77,80 +75,29 @@ const DEFAULT_PROGRESS: TrainingProgress = {
   lastTrainingDate: null,
   hasPassedTraining: false,
   firstPassedDate: null,
-  hasSkippedGateway: false,
-  gatewaySkippedAt: null,
-  hasSeenGateway: false,
-  gatewaySeenAt: null,
 };
 
 /**
  * Get training progress from localStorage
  */
 export function getTrainingProgress(): TrainingProgress {
-  if (typeof window === 'undefined') {
-    return { ...DEFAULT_PROGRESS, skills: { ...DEFAULT_SKILLS } };
-  }
-
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      return { ...DEFAULT_PROGRESS, skills: { ...DEFAULT_SKILLS } };
-    }
-    const parsed = JSON.parse(stored);
-    // Merge with defaults to handle schema evolution
-    return {
-      ...DEFAULT_PROGRESS,
-      ...parsed,
-      skills: {
-        ...DEFAULT_SKILLS,
-        ...parsed.skills,
-      },
-    };
-  } catch {
-    return { ...DEFAULT_PROGRESS, skills: { ...DEFAULT_SKILLS } };
-  }
+  const stored = getJsonFromLocalStorage<Partial<TrainingProgress>>(STORAGE_KEY, {});
+  // Merge with defaults to handle schema evolution
+  return {
+    ...DEFAULT_PROGRESS,
+    ...stored,
+    skills: {
+      ...DEFAULT_SKILLS,
+      ...(stored.skills || {}),
+    },
+  };
 }
 
 /**
  * Save training progress to localStorage
  */
 function saveTrainingProgress(progress: TrainingProgress): void {
-  if (typeof window === 'undefined') return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(progress));
-}
-
-/**
- * Check if the training gateway should be shown
- * Shows if: not passed training AND not skipped gateway AND not already seen
- * This ensures the modal only shows ONCE per user
- */
-export function shouldShowTrainingGateway(): boolean {
-  const progress = getTrainingProgress();
-  return !progress.hasPassedTraining && !progress.hasSkippedGateway && !progress.hasSeenGateway;
-}
-
-/**
- * Mark the gateway as seen (called when modal is displayed)
- * This ensures the modal only shows once, regardless of how user closes it
- */
-export function markGatewaySeen(): void {
-  const progress = getTrainingProgress();
-  if (!progress.hasSeenGateway) {
-    progress.hasSeenGateway = true;
-    progress.gatewaySeenAt = new Date().toISOString();
-    saveTrainingProgress(progress);
-  }
-}
-
-/**
- * Mark the gateway as skipped (user chose to proceed anyway)
- * We still respect their choice but track it
- */
-export function markGatewaySkipped(): void {
-  const progress = getTrainingProgress();
-  progress.hasSkippedGateway = true;
-  progress.gatewaySkippedAt = new Date().toISOString();
-  saveTrainingProgress(progress);
+  saveJsonToLocalStorage(STORAGE_KEY, progress);
 }
 
 /**
@@ -383,8 +330,7 @@ export function getSkillSummary(): {
  * Reset training progress (for testing or "restart tutorial")
  */
 export function resetTrainingProgress(): void {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEY);
+  removeFromLocalStorage(STORAGE_KEY);
 }
 
 /**
@@ -418,16 +364,11 @@ const DEFAULT_DAILY_PROGRESS: DailyChallengeProgress = {
  * Get the number of daily challenges the player has completed
  */
 export function getDailyChallengesCompleted(): number {
-  if (typeof window === 'undefined') return 0;
-
-  try {
-    const stored = localStorage.getItem(DAILY_CHALLENGE_STORAGE_KEY);
-    if (!stored) return 0;
-    const parsed = JSON.parse(stored) as DailyChallengeProgress;
-    return parsed.challengesCompleted || 0;
-  } catch {
-    return 0;
-  }
+  const progress = getJsonFromLocalStorage<DailyChallengeProgress>(
+    DAILY_CHALLENGE_STORAGE_KEY,
+    DEFAULT_DAILY_PROGRESS
+  );
+  return progress.challengesCompleted || 0;
 }
 
 /**
@@ -442,19 +383,17 @@ export function isNewDailyPlayer(threshold: number = 3): boolean {
  * Called after a player finishes a daily challenge (win or lose)
  */
 export function incrementDailyChallengesCompleted(): void {
-  if (typeof window === 'undefined') return;
+  const stored = getJsonFromLocalStorage<Partial<DailyChallengeProgress>>(
+    DAILY_CHALLENGE_STORAGE_KEY,
+    {}
+  );
+  const progress: DailyChallengeProgress = {
+    ...DEFAULT_DAILY_PROGRESS,
+    ...stored,
+  };
 
-  try {
-    const stored = localStorage.getItem(DAILY_CHALLENGE_STORAGE_KEY);
-    const progress: DailyChallengeProgress = stored
-      ? { ...DEFAULT_DAILY_PROGRESS, ...JSON.parse(stored) }
-      : { ...DEFAULT_DAILY_PROGRESS };
+  progress.challengesCompleted++;
+  progress.lastCompletedDate = new Date().toISOString();
 
-    progress.challengesCompleted++;
-    progress.lastCompletedDate = new Date().toISOString();
-
-    localStorage.setItem(DAILY_CHALLENGE_STORAGE_KEY, JSON.stringify(progress));
-  } catch {
-    // Silently fail if localStorage is unavailable
-  }
+  saveJsonToLocalStorage(DAILY_CHALLENGE_STORAGE_KEY, progress);
 }

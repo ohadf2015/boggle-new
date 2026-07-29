@@ -1,36 +1,38 @@
 {
   "mcpServers": {
-    "supabase": {
-      "type": "http",
-      "url": "https://mcp.supabase.com/mcp?project_ref=hdtmpkicuxvtmvrmtybx"
-    },
-    "sentry": {
-      "type": "http",
-      "url": "https://mcp.sentry.dev/mcp"
+    "animate-ai": {
+      "command": "node",
+      "args": [
+        "/Users/ohadfisher/git/animate_ai/skill/animate-ai-skill/dist/server.js"
+      ]
     },
     "memory": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "github:whenmoon-afk/claude-memory-mcp"]
+      "args": [
+        "-y",
+        "github:whenmoon-afk/claude-memory-mcp"
+      ]
     },
     "github": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/"
     },
-    "playwright": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "@playwright/mcp@latest"]
-    },
     "sequential-thinking": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
     },
     "google-analytics": {
       "type": "stdio",
       "command": "pipx",
-      "args": ["run", "analytics-mcp"],
+      "args": [
+        "run",
+        "analytics-mcp"
+      ],
       "env": {
         "GOOGLE_APPLICATION_CREDENTIALS": "${GOOGLE_APPLICATION_CREDENTIALS}",
         "GOOGLE_PROJECT_ID": "${GOOGLE_PROJECT_ID}"

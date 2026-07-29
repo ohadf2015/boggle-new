@@ -1,0 +1,184 @@
+/* Board wrapper — sets up container query context for tile sizing and
+   draws a faint frame around the playing field. The wrapping flex parent
+   uses `containerType: size` so both width (cqi) and height (cqb) drive
+   tile sizing — boards stay big regardless of how few rows are filled. */
+.board {
+  container-type: size;
+  border-radius: 18px;
+  isolation: isolate;
+}
+
+/* Tile size adapts to BOTH column count AND row count by taking the smaller
+   of width-fit and height-fit. Without the height constraint, a 6-col board
+   with only 2 rows of tiles produced a 3:1 ratio that pinned tiles to ~30px
+   on phones with most of the play area wasted. min(cqi, cqb) lets the board
+   fill its allotted box and pump tile size up to ~88px on tall phones.
+   Falls back to 18cqi for callers that forget to pass column/row counts. */
+.board {
+  --blast-tile-gap: 8px;
+  --blast-tile-cap: 88px;
+  --blast-tile-min: 32px;
+  --blast-cols: 6;
+  --blast-rows: 6;
+  --blast-tile-size: clamp(
+    var(--blast-tile-min),
+    min(
+      calc((100cqi - (var(--blast-cols) - 1) * var(--blast-tile-gap) - 32px) / var(--blast-cols)),
+      calc((100cqb - (var(--blast-rows) - 1) * var(--blast-tile-gap) - 32px) / var(--blast-rows))
+    ),
+    var(--blast-tile-cap)
+  );
+}
+
+/* Empty slot frame behind each tile column. Same size & gap as tiles so
+   landed tiles align perfectly with their well. Soft inset shadow only —
+   no border — so empty columns disappear into the background instead of
+   reading as dashed letters behind the play area. */
+.cellWell {
+  width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.018);
+  box-shadow:
+    inset 0 2px 0 rgba(0, 0, 0, 0.18),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+}
+
+/* Column wrapper for live tiles — must hold a fixed width matching the well
+   beneath, otherwise an emptied column collapses to 0px and `justify-center`
+   shifts the remaining columns horizontally mid-fall. That sideways shift
+   is what made tiles read as "falling down AND to the side" during gravity. */
+.tileColumn {
+  width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  flex: 0 0 var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+}
+
+.tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: var(--blast-tile-size, clamp(48px, 18cqi, 88px));
+  aspect-ratio: 1 / 1;
+  /* Neo-brutalist hard border: 3px solid, near-black */
+  border: 3px solid #0b1530;
+  border-radius: 10px;
+  /* Hard offset drop shadow (no blur) — neo-brutalist style */
+  box-shadow: 4px 4px 0 0 #0b1530;
+  /* Bevel/depth via inner highlights: top light + bottom shadow */
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+    4px 4px 0 0 #0b1530;
+  font-weight: 800;
+  font-size: calc(var(--blast-tile-size, 64px) * 0.45);
+  /* Warm off-white tile face in rest state */
+  background: #f4e9d8;
+  color: #0b1530;
+  user-select: none;
+  touch-action: none;
+  cursor: pointer;
+  /* Smooth state transitions for depth effect */
+  transition: all 120ms ease-out;
+}
+
+/* Selected state: electric accent color face + white letter */
+.tile[data-state="selected"] {
+  /* Deeper shadow in pressed state */
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.12),
+    6px 6px 0 0 #0b1530;
+  /* Accent color — modeColor prop tints it, pink default for Blast */
+  background: var(--tile-mode-color, #ec4899);
+  color: #ffffff;
+  /* Subtle lift animation on selection */
+  filter: brightness(1.1);
+}
+
+/* Just-cleared state: drop shadow effect as tile explodes out */
+.tile[data-state="just-cleared"] {
+  box-shadow: none;
+}
+
+/* Frozen tile styling: lighter blue tint with reduced opacity */
+.tile[data-state-frozen] {
+  background: #bae6fd;
+  opacity: 0.6;
+}
+
+/* Double bonus rainbow pulse animation */
+.tile[data-double-bonus] {
+  animation: rainbow-pulse 1.6s linear infinite;
+}
+
+@keyframes rainbow-pulse {
+  0%, 100% {
+    border-color: #ec4899;
+  }
+  33% {
+    border-color: #06b6d4;
+  }
+  66% {
+    border-color: #84cc16;
+  }
+}
+
+.letter {
+  line-height: 1;
+  /* Bold display font for Fredoka */
+  font-family: inherit;
+}
+
+.coin,
+.gem {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid #0b1530;
+}
+
+.coin {
+  background: #fbbf24;
+}
+
+.gem {
+  background: #a855f7;
+  animation: gem-pulse 2s ease-in-out infinite;
+}
+
+@keyframes gem-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+}
+
+.revealGlow {
+  position: absolute;
+  inset: -2px;
+  border-radius: 12px;
+  pointer-events: none;
+  box-shadow: 0 0 0 3px #06b6d4, 0 0 16px 4px #06b6d4;
+  animation: revealPulse 0.9s ease-in-out 2;
+}
+
+@keyframes revealPulse {
+  0%, 100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .revealGlow {
+    animation: none;
+    opacity: 0.6;
+  }
+}

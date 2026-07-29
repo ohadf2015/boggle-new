@@ -5,7 +5,6 @@
 
 import type { Server, Socket } from 'socket.io';
 import type {
-  Game,
   Avatar,
   WordDetail,
   ScoreCardData,
@@ -16,16 +15,16 @@ import type {
   GenerateScoreCardRequest,
   AchievementPayload
 } from '@/shared/types';
+import type { GameState } from '../modules/gameState/types.js';
 
-const { getGame, getGameBySocketId, getUsernameBySocketId } = require('../modules/gameStateManager');
-const { safeEmit } = require('../utils/socketHelpers');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const { inc } = require('../utils/metrics');
-const { isSocketMigrating } = require('./shared');
-const { validatePayload, generateScoreCardSchema } = require('../utils/socketValidation');
-const { ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
-const logger = require('../utils/logger');
+import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager.js';
+import { safeEmit } from '../utils/socketHelpers.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import { inc } from '../utils/metrics.js';
+import { isSocketMigrating } from './shared';
+import { validatePayload, generateScoreCardSchema } from '../utils/socketValidation.js';
+import { ACHIEVEMENT_ICONS } from '../modules/achievementManager.js';
+import logger from '../utils/logger.js';
 
 // Rate limit weight for score card generation (medium-heavy operation)
 const SCORECARD_WEIGHT = parseInt(process.env.RATE_WEIGHT_SCORECARD || '5');
@@ -174,15 +173,15 @@ function getTopWords(wordDetails: WordDetail[]): ScoreCardWord[] {
  * @param username - Player username
  * @returns Score card data
  */
-function generateScoreCardData(game: Game, username: string): ScoreCardData {
+function generateScoreCardData(game: GameState, username: string): ScoreCardData {
   // Get player data
   const user = game.users[username];
   if (!user) {
     throw new Error('Player not found in game');
   }
 
-  // Get word details for this player
-  const wordDetails: WordDetail[] = game.playerWordDetails?.[username] || [];
+  // Get word details for this player (cast from unknown[] as stored in GameState)
+  const wordDetails = (game.playerWordDetails?.[username] || []) as WordDetail[];
   const totalWordsFound = game.playerWords?.[username]?.length || 0;
   const score = game.playerScores?.[username] || 0;
 
@@ -199,30 +198,30 @@ function generateScoreCardData(game: Game, username: string): ScoreCardData {
   // Get top words
   const topWords = getTopWords(wordDetails);
 
-  // Get achievements
-  const achievementKeys: string[] = game.playerAchievements?.[username] || [];
-  const achievements: AchievementPayload[] = achievementKeys.map(key => ({
-    key,
-    icon: ACHIEVEMENT_ICONS[key] || '🏅'
+  // Get achievements (extract id from PlayerAchievement objects)
+  const playerAchievements = game.playerAchievements?.[username] || [];
+  const achievements: AchievementPayload[] = playerAchievements.map(a => ({
+    key: a.id,
+    icon: ACHIEVEMENT_ICONS[a.id] || '🏅'
   }));
 
   // Build metadata
   const metadata: ScoreCardMetadata = {
     gameCode: game.gameCode,
     language: game.language || 'en',
-    timestamp: (game as Game & { gameEndedAt?: number }).gameEndedAt || Date.now(),
+    timestamp: (game as GameState & { gameEndedAt?: number }).gameEndedAt || Date.now(),
     gameDuration: game.gameDuration || game.timerSeconds || 180,
     isRanked: game.isRanked || false,
     difficulty: game.difficulty,
-    minWordLength: game.minWordLength || 3
+    minWordLength: game.minWordLength || 2
   };
 
   // Get titles (may be stored in game state after calculation)
-  const titles: string[] = (game as Game & { playerTitles?: Record<string, string[]> }).playerTitles?.[username] || [];
+  const titles: string[] = (game as GameState & { playerTitles?: Record<string, string[]> }).playerTitles?.[username] || [];
 
   return {
     username,
-    avatar: user.avatar,
+    avatar: user.avatar ?? {},
     score,
     rank,
     stats,
@@ -268,11 +267,11 @@ function registerScorecardHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const { gameCode: providedGameCode, username: providedUsername } = validation.data as GenerateScoreCardRequest;
+    const { gameCode: providedGameCode } = validation.data as GenerateScoreCardRequest;
 
-    // Get game code and username from context if not provided
+    // Always use server-side identity to prevent spoofing
     const gameCode = providedGameCode || getGameBySocketId(socket.id);
-    const username = providedUsername || getUsernameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
 
     // Validate game code and username
     if (!gameCode) {
@@ -343,15 +342,6 @@ function registerScorecardHandlers(io: Server, socket: Socket): void {
     }
   });
 }
-
-module.exports = {
-  registerScorecardHandlers,
-  // Export for testing
-  calculateRank,
-  calculateStats,
-  getTopWords,
-  generateScoreCardData
-};
 
 export {
   registerScorecardHandlers,

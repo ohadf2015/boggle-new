@@ -1,4 +1,5 @@
 # Dependencies
+**/node_modules/
 node_modules/
 fe-next/node_modules/
 package-lock.json
@@ -7,6 +8,7 @@ fe-next/package-lock.json
 # Build outputs
 build/
 dist/
+**/.next/
 fe-next/.next/
 fe-next/out/
 fe-next/build/
@@ -15,21 +17,58 @@ fe-next/build/
 .cache/
 .npm/
 .eslintcache
-fe-next/.next/cache/
+
+# Backup files
+*.bak
 
 # Test files
 coverage/
 __tests__/
+**/__tests__/
 *.test.js
 *.test.ts
+*.test.tsx
 *.spec.js
 *.spec.ts
+**/*.test.js
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.js
+**/*.spec.ts
+fe-next/jest.config.*
+fe-next/jest.setup.*
 
 # Development files
 .git/
 .github/
 .vscode/
 .idea/
+.husky/
+.worktrees/
+.planning/
+.claude/
+# AI agent tooling (contain dangling skill symlinks that abort `railway up` indexing)
+.gemini/
+.trae/
+.opencode/
+.agent/
+.agents/
+.cursor/
+
+# Native mobile projects — NOT part of the web/server build. android/ also holds
+# huge gradle build outputs (app/build, .gradle, *.aab) that blow the upload past
+# Railway/Cloudflare's payload limit (413). Built separately via release-android.sh.
+android/
+ios/
+fe-next/android/
+fe-next/ios/
+fe-next/raw/
+fe-next/tmp/
+fe-next/resources/
+*.aab
+*.apk
+lighthouse-report*.json
+fe-next/lighthouse-report*.json
 
 # Documentation
 *.md
@@ -38,6 +77,7 @@ BUILD.md
 DEPLOYMENT.md
 RAILWAY.md
 README.md
+CLAUDE.md
 
 # Environment and config
 .env*
@@ -53,14 +93,23 @@ logs/
 
 # Docker (not needed for Railway)
 Dockerfile
+Dockerfile.bun
 docker-compose.yml
 .dockerignore
 
+# Dev scripts not needed in production
+scripts/docker-*
+fe-next/lighthouserc.*.cjs
+fe-next/e2e/
+fe-next/playwright.config.*
+
 # Misc
-.husky/
-.git/
 *.swp
 *.swo
 *~
 .tmp/
 temp/
+.superdesign/
+fe-next/remotion-root/
+fe-next/app/sw.js/
+fe-next/supabase/

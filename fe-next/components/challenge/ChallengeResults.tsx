@@ -1,15 +1,21 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Trophy, Target, RotateCw, Home, Share2, Crown, TrendingUp, TrendingDown, Copy, Check } from 'lucide-react';
+import { m } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import { RotateCw, Home, Share2, TrendingUp, TrendingDown, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/utils/ThemeContext';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { cn } from '@/lib/utils';
 import { getChallengeUrl, generateChallengeShareMessage, type ScoreChallenge } from '@/utils/challenges';
+import ResultsWinnerBanner from '@/components/results/ResultsWinnerBanner';
 import type { SinglePlayerResultsData } from '@/components/singleplayer/SinglePlayerView';
+
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 
 interface ChallengeResultsProps {
   results: SinglePlayerResultsData;
@@ -30,18 +36,39 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
   onPlayAgain,
   onBackToHome,
 }) => {
-  const { language } = useLanguage();
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { language, t } = useLanguage();
   const [copied, setCopied] = useState(false);
+  const { showInterstitial } = useInterstitialAd();
+  const { submitLeaderboardScore } = useCrazyGames();
+
+  // Ads + leaderboard on mount
+  useEffect(() => {
+    showInterstitial('challenge-complete');
+    if (results.playerScore > 0) {
+      submitLeaderboardScore(results.playerScore);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const beatCreator = attemptResult?.beatCreator ?? results.playerScore > challenge.creatorScore;
   const scoreDiff = attemptResult?.scoreDifference ?? (results.playerScore - challenge.creatorScore);
 
+  const [displayDiff, setDisplayDiff] = useState(0);
+  useEffect(() => {
+    const absDiff = Math.abs(scoreDiff);
+    const duration = 1200;
+    const start = Date.now();
+    const tick = () => {
+      const elapsed = Date.now() - start;
+      const progress = Math.min(elapsed / duration, 1);
+      setDisplayDiff(Math.round(absDiff * Math.sqrt(progress)));
+      if (progress < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [scoreDiff]);
+
   // Celebration effect
   useEffect(() => {
     if (beatCreator) {
-      // Winner confetti
       const duration = 3000;
       const end = Date.now() + duration;
 
@@ -97,278 +124,130 @@ const ChallengeResults: React.FC<ChallengeResultsProps> = ({
         // User cancelled or error
       }
     } else {
-      // Fallback to copy
       handleCopyLink();
     }
   }, [challenge, language, handleCopyLink]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
-      <motion.div
+    <div className="flex-1 min-h-screen flex items-center justify-center bg-neo-navy p-4 overflow-y-auto scrollable-area">
+      <m.div
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
-        className="max-w-md w-full space-y-6"
+        className="max-w-md lg:max-w-3xl xl:max-w-4xl w-full space-y-4 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start"
       >
-        {/* Result Card - Click to fire confetti */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.1 }}
-          onClick={() => beatCreator && fireConfetti({ particleCount: 80, spread: 70, origin: { y: 0.6 } })}
-          className={cn(
-            'p-6 rounded-neo border-4 border-neo-black shadow-hard-xl overflow-hidden relative cursor-pointer transition-transform hover:scale-[1.01] active:scale-[0.99]',
-            beatCreator
-              ? 'bg-gradient-to-br from-green-400 to-emerald-500'
-              : isDark
-              ? 'bg-gray-500'
-              : 'bg-gradient-to-br from-gray-100 to-gray-200'
-          )}
-        >
-          {/* Background pattern */}
-          <div className="absolute inset-0 opacity-10 pointer-events-none">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 10px, currentColor 10px, currentColor 11px)`,
-            }} />
-          </div>
-
-          {/* Result Header */}
-          <div className="relative text-center mb-6">
-            <motion.div
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
-              transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-              className={cn(
-                'inline-flex items-center justify-center w-20 h-20 rounded-full border-4 mb-4',
-                beatCreator
-                  ? 'bg-yellow-400 border-yellow-600'
-                  : isDark
-                  ? 'bg-slate-600 border-slate-500'
-                  : 'bg-gray-300 border-gray-400'
-              )}
-            >
-              {beatCreator ? (
-                <Trophy className="w-10 h-10 text-yellow-900" />
-              ) : (
-                <Target className="w-10 h-10 text-gray-600 dark:text-gray-300" />
-              )}
-            </motion.div>
-
-            <motion.h1
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
-              className={cn(
-                'text-3xl font-black uppercase tracking-wide',
-                beatCreator ? 'text-white' : isDark ? 'text-white' : 'text-gray-800'
-              )}
-            >
-              {beatCreator
-                ? (language === 'he' ? 'ניצחת!' : 'You Won!')
-                : (language === 'he' ? 'כמעט!' : 'So Close!')}
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className={cn(
-                'text-sm mt-1',
-                beatCreator ? 'text-white/80' : isDark ? 'text-gray-300' : 'text-gray-600'
-              )}
-            >
-              {beatCreator
-                ? (language === 'he' ? `ניצחת את ${challenge.creatorUsername}!` : `You beat ${challenge.creatorUsername}!`)
-                : (language === 'he' ? 'נסה שוב!' : 'Try again!')}
-            </motion.p>
-          </div>
+        {/* Hero + Score Comparison */}
+        <div>
+          <ResultsWinnerBanner
+            winner={{ username: t('common.you'), score: results.playerScore }}
+            isCurrentUserWinner={beatCreator}
+            variant={beatCreator ? 'ranking' : 'completion'}
+            rank={beatCreator ? 1 : 2}
+            totalPlayers={2}
+            customMessage={beatCreator ? t('challengeResults.youWon') : t('challengeResults.soClose')}
+            customAnnouncement={beatCreator
+              ? t('challengeResults.youBeat', { name: challenge.creatorUsername })
+              : t('challengeResults.tryAgainMsg')}
+          />
 
           {/* Score Comparison */}
-          <div className="relative grid grid-cols-3 gap-4 mb-6">
-            {/* Your Score */}
-            <div className={cn(
-              'text-center p-4 rounded-neo border-2',
-              beatCreator ? 'bg-white/20 border-white/30' : isDark ? 'bg-black/20 border-white/10' : 'bg-white/50 border-gray-300'
-            )}>
-              <p className={cn(
-                'text-xs font-bold uppercase mb-1',
-                beatCreator ? 'text-white/70' : isDark ? 'text-gray-400' : 'text-gray-500'
-              )}>
-                {language === 'he' ? 'אתה' : 'You'}
-              </p>
-              <p className={cn(
-                'text-3xl font-black',
-                beatCreator ? 'text-white' : isDark ? 'text-cyan-400' : 'text-cyan-600'
-              )}>
-                {results.playerScore}
-              </p>
+          <div className="grid grid-cols-3 gap-3 mt-4">
+            <div className="text-center p-4 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
+              <p className="text-[10px] font-black uppercase text-neo-white mb-1">{t('challengeResults.you')}</p>
+              <p className="text-3xl font-black text-neo-cyan">{results.playerScore}</p>
             </div>
-
-            {/* VS */}
             <div className="flex items-center justify-center">
-              <div className={cn(
-                'px-3 py-1 rounded-full text-xs font-black uppercase',
-                beatCreator ? 'bg-white/30 text-white' : isDark ? 'bg-white/10 text-gray-300' : 'bg-gray-200 text-gray-600'
-              )}>
-                VS
-              </div>
+              <span className="bg-neo-yellow text-neo-black border-2 border-neo-black rounded-neo font-black px-3 py-1 shadow-hard-sm text-xs uppercase">VS</span>
             </div>
-
-            {/* Creator Score */}
-            <div className={cn(
-              'text-center p-4 rounded-neo border-2',
-              beatCreator ? 'bg-white/20 border-white/30' : isDark ? 'bg-black/20 border-white/10' : 'bg-white/50 border-gray-300'
-            )}>
-              <p className={cn(
-                'text-xs font-bold uppercase mb-1',
-                beatCreator ? 'text-white/70' : isDark ? 'text-gray-400' : 'text-gray-500'
-              )}>
-                {challenge.creatorUsername}
-              </p>
-              <p className={cn(
-                'text-3xl font-black',
-                beatCreator ? 'text-white/80' : isDark ? 'text-yellow-400' : 'text-yellow-600'
-              )}>
-                {challenge.creatorScore}
-              </p>
+            <div className="text-center p-4 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
+              <p className="text-[10px] font-black uppercase text-neo-white mb-1">{challenge.creatorUsername}</p>
+              <p className="text-3xl font-black text-neo-yellow">{challenge.creatorScore}</p>
             </div>
           </div>
 
           {/* Score Difference */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.6 }}
             className={cn(
-              'flex items-center justify-center gap-2 p-3 rounded-neo border-2 mb-6',
-              beatCreator
-                ? 'bg-white/30 border-white/40'
-                : scoreDiff < 0
-                ? isDark ? 'bg-red-500/20 border-red-500/30' : 'bg-red-100 border-red-300'
-                : isDark ? 'bg-gray-700 border-gray-600' : 'bg-gray-100 border-gray-300'
+              'flex items-center justify-center gap-2 p-3 border-3 border-neo-black rounded-neo shadow-hard mt-3',
+              beatCreator ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-white'
             )}
           >
             {beatCreator ? (
-              <TrendingUp className="w-5 h-5 text-white" />
+              <TrendingUp className="w-5 h-5" />
             ) : (
-              <TrendingDown className={cn('w-5 h-5', isDark ? 'text-red-400' : 'text-red-500')} />
+              <TrendingDown className="w-5 h-5" />
             )}
-            <span className={cn(
-              'text-lg font-black',
-              beatCreator ? 'text-white' : isDark ? 'text-red-400' : 'text-red-600'
-            )}>
-              {scoreDiff > 0 ? '+' : ''}{scoreDiff} {language === 'he' ? 'נקודות' : 'pts'}
+            <span className="text-lg font-black">
+              {scoreDiff > 0 ? '+' : '-'}{displayDiff} {t('challengeResults.pts')}
             </span>
-          </motion.div>
+          </m.div>
 
           {/* Stats Row */}
-          <div className={cn(
-            'grid grid-cols-2 gap-3',
-            beatCreator ? 'text-white' : ''
-          )}>
-            <div className={cn(
-              'text-center p-3 rounded-neo border-2',
-              beatCreator ? 'bg-white/20 border-white/30' : isDark ? 'bg-black/20 border-white/10' : 'bg-white/50 border-gray-300'
-            )}>
-              <p className={cn(
-                'text-2xl font-black',
-                beatCreator ? 'text-white' : isDark ? 'text-white' : 'text-gray-800'
-              )}>
-                {results.playerWords.length}
-              </p>
-              <p className={cn(
-                'text-xs',
-                beatCreator ? 'text-white/70' : isDark ? 'text-gray-400' : 'text-gray-500'
-              )}>
-                {language === 'he' ? 'מילים' : 'words'}
-              </p>
+          <div className="grid grid-cols-2 gap-3 mt-3">
+            <div className="text-center p-3 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
+              <p className="text-2xl font-black text-white">{results.playerWords.length}</p>
+              <p className="text-[10px] font-black uppercase text-neo-white">{t('challengeResults.words')}</p>
             </div>
-            <div className={cn(
-              'text-center p-3 rounded-neo border-2',
-              beatCreator ? 'bg-white/20 border-white/30' : isDark ? 'bg-black/20 border-white/10' : 'bg-white/50 border-gray-300'
-            )}>
-              <p className={cn(
-                'text-2xl font-black',
-                beatCreator ? 'text-white' : isDark ? 'text-white' : 'text-gray-800'
-              )}>
-                {Math.max(...results.playerWords.map(w => w.length), 0)}
-              </p>
-              <p className={cn(
-                'text-xs',
-                beatCreator ? 'text-white/70' : isDark ? 'text-gray-400' : 'text-gray-500'
-              )}>
-                {language === 'he' ? 'מילה ארוכה' : 'longest'}
-              </p>
+            <div className="text-center p-3 bg-neo-navy border-3 border-neo-black rounded-neo shadow-hard">
+              <p className="text-2xl font-black text-white">{Math.max(...results.playerWords.map(w => w.length), 0)}</p>
+              <p className="text-[10px] font-black uppercase text-neo-white">{t('challengeResults.longest')}</p>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Action Buttons */}
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7 }}
-          className="space-y-3"
+          className="space-y-3 lg:self-center"
         >
-          {/* Try Again */}
           <Button
             onClick={onPlayAgain}
-            className={cn(
-              'w-full flex items-center justify-center gap-2 p-4',
-              'font-black text-lg uppercase rounded-neo',
-              'border-4 border-neo-black shadow-hard-lg',
-              'hover:shadow-hard-xl hover:-translate-y-1 transition-all',
-              'bg-neo-lime text-neo-black'
-            )}
+            className="w-full flex items-center justify-center gap-2 p-4 font-black text-lg uppercase rounded-neo border-4 border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 transition-all bg-neo-lime text-neo-black"
           >
             <RotateCw className="w-5 h-5" />
-            {language === 'he' ? 'נסה שוב' : 'Try Again'}
+            {t('common.playAgain')}
           </Button>
 
-          {/* Share Challenge */}
           <div className="grid grid-cols-2 gap-3">
             <Button
               onClick={handleShare}
-              className={cn(
-                'flex items-center justify-center gap-2 p-3',
-                'font-bold uppercase rounded-neo',
-                'border-2 border-neo-black shadow-hard-sm',
-                'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
-                'bg-neo-cyan text-neo-black'
-              )}
+              className="flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all bg-neo-cyan text-neo-black"
             >
               <Share2 className="w-4 h-4" />
-              {language === 'he' ? 'שתף' : 'Share'}
+              {t('common.share')}
             </Button>
             <Button
               onClick={handleCopyLink}
-              className={cn(
-                'flex items-center justify-center gap-2 p-3',
-                'font-bold uppercase rounded-neo',
-                'border-2 border-neo-black shadow-hard-sm',
-                'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
-                copied ? 'bg-neo-lime text-neo-black' : 'bg-neo-lime text-neo-black'
-              )}
+              className="flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo border-2 border-neo-black shadow-hard-sm hover:shadow-hard hover:-translate-y-0.5 transition-all bg-neo-yellow text-neo-black"
             >
               {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-              {copied ? (language === 'he' ? 'הועתק!' : 'Copied!') : (language === 'he' ? 'העתק' : 'Copy')}
+              {copied ? t('common.copied') : t('common.copy')}
             </Button>
           </div>
 
-          {/* Back to Home */}
           <Button
             onClick={onBackToHome}
             variant="ghost"
-            className={cn(
-              'w-full flex items-center justify-center gap-2 p-3',
-              'font-bold uppercase rounded-neo',
-              isDark ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-black/5'
-            )}
+            className="w-full flex items-center justify-center gap-2 p-3 font-bold uppercase rounded-neo text-neo-white hover:text-white hover:bg-neo-white/10"
           >
             <Home className="w-4 h-4" />
-            {language === 'he' ? 'חזרה לדף הבית' : 'Back to Home'}
+            {t('common.backToHome')}
           </Button>
-        </motion.div>
-      </motion.div>
+
+          {/* Banner Ads — CrazyGamesBanner covers web iframe; ResultsBannerSlot covers native AdMob. */}
+          <div className="hidden md:block">
+            <CrazyGamesBanner size="728x90" />
+          </div>
+          <div className="md:hidden">
+            <CrazyGamesBanner size="320x50" />
+          </div>
+          <ResultsBannerSlot placement="challenge-complete" className="my-3" />
+        </m.div>
+      </m.div>
     </div>
   );
 };

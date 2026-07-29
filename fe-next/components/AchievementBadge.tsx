@@ -1,5 +1,5 @@
 import React, { useState, memo, useMemo, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Badge } from './ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 import { calculateTier, getTierProgress, TIER_COLORS, TIER_ICONS, TierName, TierColors } from '../utils/achievementTiers';
@@ -39,6 +39,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
   const [open, setOpen] = useState(false);
   const { t } = useLanguage();
   const isTouchDevice = useRef(false);
+  const justOpened = useRef(false);
 
   // Localize achievement using user's UI language preference
   // Achievement can have either { key, icon } (unlocalized) or { name, description, icon } (legacy localized)
@@ -47,7 +48,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
       return {
         icon: achievement.icon,
         name: t(`achievements.${achievement.key}.name`) || achievement.key,
-        description: t(`achievements.${achievement.key}.description`) || ''
+        description: t(`achievements.${achievement.key}.description`)
       };
     }
     // Legacy format: already has name and description
@@ -65,7 +66,12 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
-    setOpen(!open);
+    const next = !open;
+    setOpen(next);
+    if (next) {
+      justOpened.current = true;
+      setTimeout(() => { justOpened.current = false; }, 200);
+    }
   };
 
   const handleOpenChange = (newOpen: boolean) => {
@@ -87,10 +93,10 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
   const getTierName = (tierKey: TierName | null): string => {
     if (!tierKey) return '';
     const tierNames: Record<TierName, string> = {
-      BRONZE: t('achievementTiers.bronze') || 'Bronze',
-      SILVER: t('achievementTiers.silver') || 'Silver',
-      GOLD: t('achievementTiers.gold') || 'Gold',
-      PLATINUM: t('achievementTiers.platinum') || 'Platinum',
+      BRONZE: t('achievementTiers.bronze'),
+      SILVER: t('achievementTiers.silver'),
+      GOLD: t('achievementTiers.gold'),
+      PLATINUM: t('achievementTiers.platinum'),
     };
     return tierNames[tierKey] || tierKey;
   };
@@ -99,7 +105,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
     <TooltipProvider delayDuration={0}>
       <Tooltip open={open} onOpenChange={handleOpenChange}>
         <TooltipTrigger asChild onClick={handleClick} onTouchStart={handleTouchStart}>
-          <motion.button
+          <m.button
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: index * 0.05, type: 'spring', stiffness: 300 }}
@@ -114,7 +120,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                         border-3 rounded-md
                         shadow-hard-sm
                         hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard
-                        active:translate-x-[1px] active:translate-y-[1px] active:shadow-none
+                        active:translate-x-px active:translate-y-px active:shadow-none
                         transition-all duration-100 cursor-pointer touch-manipulation"
               style={{
                 backgroundColor: locked ? '#808080' : (tierColors?.bg || 'var(--neo-cyan)'),
@@ -125,14 +131,14 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                 filter: locked ? 'grayscale(100%)' : undefined,
               }}
             >
-              <span className="mr-1">{localizedAchievement.icon}</span>
+              <span className="me-1">{localizedAchievement.icon}</span>
               {localizedAchievement.name}
             </Badge>
             {/* Lock icon for locked achievements */}
             {locked && (
               <span
-                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-600 bg-gray-700 shadow-sm"
-                title={t('profile.locked') || 'Locked'}
+                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-gray-600 bg-neo-navy-elevated shadow-xs"
+                title={t('profile.locked')}
               >
                 🔒
               </span>
@@ -140,20 +146,23 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
             {/* Tier indicator badge (only for earned achievements) */}
             {showTier && tier && !locked && (
               <span
-                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-neo-black shadow-sm"
+                className="absolute -top-1 -right-1 text-xs w-5 h-5 flex items-center justify-center rounded-full border-2 border-neo-black shadow-xs"
                 style={{ backgroundColor: tierColors?.bg }}
                 title={getTierName(tier)}
               >
                 {tierIcon}
               </span>
             )}
-          </motion.button>
+          </m.button>
         </TooltipTrigger>
         <TooltipContent
           side="top"
           sideOffset={8}
           className="z-50 bg-neo-purple text-white border-3 border-neo-black shadow-hard rounded-md p-3 max-w-xs"
-          onPointerDownOutside={() => setOpen(false)}
+          onPointerDownOutside={(e) => {
+            if (justOpened.current) { e.preventDefault(); return; }
+            setOpen(false);
+          }}
         >
           <div>
             {/* Show lock indicator for locked achievements */}
@@ -161,7 +170,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
               <div className="flex items-center gap-1 mb-1">
                 <span className="text-sm">🔒</span>
                 <span className="text-[11px] sm:text-xs uppercase font-bold text-neo-cyan tracking-wide">
-                  {t('profile.locked') || 'Locked'}
+                  {t('profile.locked')}
                 </span>
               </div>
             )}
@@ -175,15 +184,15 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
                   <span className="text-neo-lime font-bold">
                     {tierIcon} {getTierName(tier)}
                   </span>
-                  <span className="text-neo-white/70">
-                    ({t('achievementTiers.earned') || 'Earned'} {count}x)
+                  <span className="text-neo-white">
+                    ({t('achievementTiers.earned')} {count}x)
                   </span>
                 </div>
 
                 {/* Progress to next tier */}
                 {!tierProgress.isMaxTier && tierProgress.nextTier && (
                   <div className="mt-1">
-                    <div className="flex justify-between text-[11px] sm:text-xs text-neo-white/75 mb-0.5">
+                    <div className="flex justify-between text-[11px] sm:text-xs text-neo-white mb-0.5">
                       <span>{tierProgress.currentCount}/{tierProgress.nextThreshold}</span>
                       <span>{TIER_ICONS[tierProgress.nextTier]} {getTierName(tierProgress.nextTier)}</span>
                     </div>
@@ -198,7 +207,7 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
 
                 {tierProgress.isMaxTier && (
                   <p className="text-[11px] sm:text-xs text-neo-lime mt-1 font-bold">
-                    {t('achievementTiers.maxTier') || 'Max Tier Reached!'}
+                    {t('achievementTiers.maxTier')}
                   </p>
                 )}
               </div>
@@ -206,8 +215,8 @@ export const AchievementBadge = memo<AchievementBadgeProps>(({ achievement, inde
 
             {/* Hint for locked achievements */}
             {locked && (
-              <p className="text-[11px] sm:text-xs text-neo-white/60 mt-2 italic">
-                {t('profile.earnThisAchievement') || 'Play games to unlock this achievement!'}
+              <p className="text-[11px] sm:text-xs text-neo-white mt-2 italic">
+                {t('profile.earnThisAchievement')}
               </p>
             )}
           </div>

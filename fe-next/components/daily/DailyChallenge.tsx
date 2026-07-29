@@ -1,401 +1,199 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { getCurrentSeasonDynamic } from '@/lib/seasons';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useInterval } from '@/hooks/useSafeTimeout';
+import { m, AnimatePresence } from 'framer-motion';
+import { isNative } from '@/utils/platform';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
+
 import AutoHideHeader from '@/components/AutoHideHeader';
 import DailyWordHuntSurvival, { type SurvivalGameResult } from './DailyWordHuntSurvival';
 import DailyWordHuntResults from './DailyWordHuntResults';
 import DailyReadyScreen, { type ChallengeData } from './DailyReadyScreen';
 import { DailyChallengeTutorial } from './DailyChallengeTutorial';
-import { TrainingGatewayModal } from '@/components/training';
-import { shouldShowTrainingGateway, markGatewaySkipped, markGatewaySeen } from '@/utils/trainingProgressStorage';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import { useMusic } from '@/contexts/MusicContext';
+
+import { formatTimeHHMMSS } from '@/shared/utils/timeFormatting';
+import { useWinStreak } from '@/hooks/useWinStreak';
+import { PageLoader } from '@/components/ui/PageLoader';
 import {
   generateDailyPuzzle,
   getDailyChallengeDate,
   getPuzzleNumber,
   getSecondsUntilNextDaily,
-  formatCountdown,
   hasPlayedWordHuntToday,
   getTodaysWordHuntResult,
   saveWordHuntResult,
-  getDailyStreak,
-  parseChallengeParam,
-  clearWordHuntResultForRetry,
   getGuestFingerprint,
   mapServerResultToStoredResult,
-  GAME_LANGUAGE_KEY,
   getWordHuntTutorialKey,
   getWordHuntResultKey,
+  markWordHuntForfeitToday,
+  hasWordHuntForfeitToday,
+  clearWordHuntForfeitToday,
   type WordHuntResult,
   type StoredWordHuntResult,
 } from '@/utils/dailyChallenge';
-import { neoSuccessToast, neoErrorToast } from '@/components/NeoToast';
-import { useSearchParams } from 'next/navigation';
+import { neoErrorToast } from '@/components/NeoToast';
+import { trackDailyPuzzle, trackFeatureFirstUse, trackGrowthEvent } from '@/utils/growthTracking';
 import {
-  hasPlayedAnyGame,
-} from '@/utils/playerProgressStorage';
+  buildDailyWordHuntCompletePayload,
+  type WordHuntRescueMethod,
+} from './analytics/wordHuntCompletePayload';
+import { shouldAutoShowTutorial } from './tutorial/shouldAutoShowTutorial';
+import { markWordHuntTutorialSeen } from './tutorial/markWordHuntTutorialSeen';
+import { useDailyChallengeUrlParams } from './useDailyChallengeUrlParams';
+import { isCatchUpDate, shouldGateCatchUpBehindAd } from '@/utils/dailyChallenge/catchUp';
+import { isUsableDailyPuzzle } from '@/utils/dailyChallenge/puzzlePayload';
+import { useRetryChallenge } from './useRetryChallenge';
+import { usePracticeFlag } from '@/hooks/usePracticeFlag';
+import PracticeBadge from '@/components/practice/PracticeBadge';
+import { useNetworkState } from '@/hooks/useNetworkState';
+import { useOfflineModeFlag } from '@/hooks/useOfflineModeFlag';
+import { getOfflineStore } from '@/lib/offline';
+import { getCachedDailyPuzzle } from '@/lib/offline/prefetchDaily';
+import DailyOfflineFallback from '@/components/offline/DailyOfflineFallback';
 import type { LetterGrid, Language } from '@/types';
 
-// Retry token validation response type
-interface RetryTokenValidation {
-  valid: boolean;
-  reason?: string;
-  puzzleDate?: string;
-  language?: string;
-  todayDate?: string;
-}
+export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played' | 'offline-miss';
 
-export type DailyChallengePhase = 'loading' | 'ready' | 'playing' | 'completed' | 'already-played';
-
-/**
- * DailyChallenge - Main container for the daily puzzle
- * Same puzzle for everyone worldwide each day
- */
 const DailyChallenge: React.FC = () => {
   const { t, language } = useLanguage();
   const { isAuthenticated, profile } = useAuth();
+  const { unlockAudio } = useMusic();
+  const { recordWin: recordStreak } = useWinStreak();
+  const isPractice = usePracticeFlag();
+  const offlineFlag = useOfflineModeFlag();
+  const { online } = useNetworkState();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
-  // Game language state - separate from UI language
-  // This controls only the puzzle/dictionary language, not the UI
-  // User can switch languages via the dropdown during the session
-  // Initialize with URL locale to avoid hydration mismatch (localStorage is read in useEffect)
+  // Catch-up: `?date=YYYY-MM-DD` launches a past daily within the last-3-days
+  // window. Validated against today so only a genuine catch-up date is honored
+  // (anything else falls through to today's puzzle).
+  const dateParam = searchParams.get('date');
+  const catchupDate = dateParam && isCatchUpDate(getDailyChallengeDate(), dateParam) ? dateParam : null;
+  const isCatchup = !!catchupDate;
+
+  // Game language state
   const urlLocale = language as Language;
   const defaultLanguage = urlLocale && ['en', 'he', 'sv', 'ja', 'es'].includes(urlLocale)
     ? urlLocale
     : 'en';
   const [gameLanguage, setGameLanguage] = useState<Language>(defaultLanguage);
-  const [isLanguageInitialized, setIsLanguageInitialized] = useState(false);
 
-  // Load saved game language from localStorage after mount (avoids hydration mismatch)
-  useEffect(() => {
-    const saved = localStorage.getItem(GAME_LANGUAGE_KEY);
-    if (saved && ['en', 'he', 'sv', 'ja', 'es'].includes(saved)) {
-      setGameLanguage(saved as Language);
-    }
-    setIsLanguageInitialized(true);
-  }, []);
-
-  // Persist game language to localStorage (only after initial load to avoid overwriting saved value)
-  useEffect(() => {
-    if (isLanguageInitialized) {
-      localStorage.setItem(GAME_LANGUAGE_KEY, gameLanguage);
-    }
-  }, [gameLanguage, isLanguageInitialized]);
-
-  // Get current language flag
   const getCurrentFlag = (lang: Language) => {
-    const flags: Record<string, string> = {
-      en: '🇺🇸',
-      he: '🇮🇱',
-      sv: '🇸🇪',
-      ja: '🇯🇵',
-      es: '🇪🇸',
-    };
+    const flags: Record<string, string> = { en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸' };
     return flags[lang] || '🌐';
   };
 
-  // Challenge state (from URL parameter)
+  // Challenge state
   const [challengeData, setChallengeData] = useState<ChallengeData | null>(null);
-
-  // Phase management
   const [phase, setPhase] = useState<DailyChallengePhase>('loading');
-
-  // Tutorial state
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialCompleted, setTutorialCompleted] = useState(false);
 
-  // Daily challenge state
+  useEffect(() => {
+    if (shouldAutoShowTutorial({ phase, tutorialCompleted, showTutorial })) {
+      setShowTutorial(true);
+    }
+  }, [phase, tutorialCompleted, showTutorial]);
   const [puzzleDate, setPuzzleDate] = useState<string>('');
   const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
   const [grid, setGrid] = useState<LetterGrid | null>(null);
   const [targetWord, setTargetWord] = useState<string>('');
   const [countdown, setCountdown] = useState<string>('');
-
-  // Results
   const [storedResult, setStoredResult] = useState<StoredWordHuntResult | null>(null);
-  const [gameResult, setGameResult] = useState<SurvivalGameResult | null>(null);
-
-  // State to track if we just reset
+  const [, setGameResult] = useState<SurvivalGameResult | null>(null);
+  // True when the player bailed mid-game today (no saved result). Re-entry is
+  // ad-gated on native; on web it degrades to a free replay.
+  const [forfeitedToday, setForfeitedToday] = useState(false);
   const [wasReset, setWasReset] = useState(false);
-
-  // Ref to track if we just completed a retry reset - survives re-renders
-  // Used to skip "already played" checks immediately after a paid retry
-  const justResetRef = useRef(false);
-
-  // Guest fingerprint for leaderboard
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
 
-  // Training gateway modal for new players
-  const [showTrainingGateway, setShowTrainingGateway] = useState(false);
-  // Track if gateway was already shown this session to prevent re-showing
-  const [gatewayShownThisSession, setGatewayShownThisSession] = useState(false);
+  // Retry challenge hook
+  const { handleRetryChallenge, justResetRef, extraTries } = useRetryChallenge({
+    gameLanguage,
+    isAuthenticated,
+    profile: isAuthenticated && profile ? { id: profile.id } : null,
+    t,
+    setStoredResult: () => setStoredResult(null),
+    setGameResult: () => setGameResult(null),
+    setWasReset,
+    setPhase,
+  });
+
+  // URL parameter handling
+  useDailyChallengeUrlParams({
+    gameLanguage,
+    isAuthenticated,
+    profile: isAuthenticated && profile ? { id: profile.id } : null,
+    t,
+    setChallengeData,
+    setWasReset,
+  });
 
   // Fetch guest fingerprint on mount
   useEffect(() => {
     getGuestFingerprint().then(setGuestFingerprint);
   }, []);
 
-  // Check if we should show training gateway for new players
+  // Set initial countdown value immediately on mount
   useEffect(() => {
-    // Only show when page loads in ready phase (not during game or results)
-    if (phase !== 'ready') return;
-
-    // Don't show again if already shown this session
-    if (gatewayShownThisSession) return;
-
-    // Check if player should see training gateway
-    const shouldShow = shouldShowTrainingGateway();
-
-    // Show modal if new player and hasn't passed/skipped
-    if (shouldShow) {
-      // Small delay to let the page load first
-      const timer = setTimeout(() => {
-        setShowTrainingGateway(true);
-        setGatewayShownThisSession(true); // Mark as shown this session
-        markGatewaySeen(); // Mark as seen in localStorage so it only shows once per user
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-    return;
-  }, [phase, gatewayShownThisSession]);
-
-  // Handle skipping training gateway
-  const handleSkipTrainingGateway = useCallback(() => {
-    markGatewaySkipped();
-    setShowTrainingGateway(false);
+    const seconds = getSecondsUntilNextDaily();
+    setCountdown(formatTimeHHMMSS(seconds));
   }, []);
 
-  // Pull-to-refresh - disabled during gameplay
-  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
-    onRefresh: async () => {
-      window.location.reload();
-    },
-    threshold: 60,
-    enabled: phase !== 'playing', // Disable during gameplay
-  });
 
-  // Parse challenge parameter and handle admin reset from URL
-  useEffect(() => {
-    const challengeParam = searchParams.get('challenge');
-    if (challengeParam) {
-      const parsed = parseChallengeParam(challengeParam);
-      if (parsed) {
-        setChallengeData(parsed);
-      }
-    }
-
-    // Handle admin reset: ?reset=true clears both localStorage AND server-side attempt
-    const resetParam = searchParams.get('reset');
-    if (resetParam === 'true' && typeof window !== 'undefined') {
-      let isMounted = true;
-
-      const performReset = async () => {
-        try {
-          // Get today's date for the API call
-          const today = new Date().toISOString().split('T')[0];
-
-          // Build reset request body with player credentials
-          const resetBody: { puzzleDate: string; language: string; playerId?: string; guestFingerprint?: string } = {
-            puzzleDate: today,
-            language: gameLanguage,
-          };
-
-          if (isAuthenticated && profile) {
-            resetBody.playerId = profile.id;
-          } else {
-            const fp = await getGuestFingerprint();
-            if (fp) {
-              resetBody.guestFingerprint = fp;
-            }
-          }
-
-          // Delete server-side attempt record
-          let serverReset = false;
-          if (resetBody.playerId || resetBody.guestFingerprint) {
-            try {
-              const resetResponse = await fetch('/api/daily/reset-attempt', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(resetBody),
-              });
-              const resetResult = await resetResponse.json();
-              serverReset = resetResult.success && (resetResult.deleted > 0);
-            } catch (serverError) {
-              console.warn('Failed to reset server attempt:', serverError);
-            }
-          }
-
-          if (!isMounted) return;
-
-          // Clear the localStorage for this game language
-          const localCleared = clearWordHuntResultForRetry(gameLanguage);
-
-          if (localCleared || serverReset) {
-            setWasReset(true);
-            // Show success toast
-            neoSuccessToast(t('daily.attemptReset'), { icon: '🔄', duration: 4000 });
-          }
-        } catch (error) {
-          console.error('Reset error:', error);
-        }
-
-        // Clean up URL by removing the reset parameter (always, even on error)
-        if (isMounted && typeof window !== 'undefined') {
-          const url = new URL(window.location.href);
-          url.searchParams.delete('reset');
-          window.history.replaceState({}, '', url.toString());
-        }
-      };
-
-      performReset();
-
-      return () => {
-        isMounted = false;
-      };
-    }
-
-    // Handle retry token: ?retryToken={token} validates and clears localStorage
-    const retryToken = searchParams.get('retryToken');
-    if (retryToken && typeof window !== 'undefined') {
-      let isMounted = true;
-
-      // Validate the token via API
-      const validateRetryToken = async () => {
-        try {
-          const response = await fetch(`/api/daily/validate-retry-token?token=${encodeURIComponent(retryToken)}`);
-          const data: RetryTokenValidation = await response.json();
-
-          // Check if component is still mounted before updating state
-          if (!isMounted) return;
-
-          if (data.valid) {
-            // Token is valid - reset both localStorage and server-side attempts
-            // IMPORTANT: Must await server reset before allowing puzzle to initialize
-            // to prevent race condition where server check finds existing attempt
-
-            // Record token usage and reset server-side attempts first
-            const resetBody: { token: string; playerId?: string; guestFingerprint?: string } = { token: retryToken };
-            if (isAuthenticated && profile) {
-              resetBody.playerId = profile.id;
-            } else {
-              const fp = await getGuestFingerprint();
-              if (fp) {
-                resetBody.guestFingerprint = fp;
-              }
-            }
-
-            try {
-              const resetResponse = await fetch('/api/daily/validate-retry-token', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(resetBody),
-              });
-              const resetResult = await resetResponse.json();
-
-              if (!isMounted) return;
-
-              // Now clear localStorage after server reset succeeded
-              const cleared = clearWordHuntResultForRetry(gameLanguage);
-
-              // Set wasReset to trigger puzzle re-initialization
-              setWasReset(true);
-
-              if (resetResult.attemptsReset > 0 || cleared) {
-                neoSuccessToast(t('daily.retryLinkUsed'), { icon: '🔓', duration: 4000 });
-              } else {
-                // No previous attempt to clear, but still allow playing
-                neoSuccessToast(t('daily.retryLinkReady'), { icon: '🎯', duration: 3000 });
-              }
-            } catch (resetError) {
-              console.warn('Failed to reset server attempt:', resetError);
-              // Still try to proceed with localStorage clear
-              if (!isMounted) return;
-              clearWordHuntResultForRetry(gameLanguage);
-              setWasReset(true);
-              neoSuccessToast(t('daily.retryLinkReady'), { icon: '🎯', duration: 3000 });
-            }
-          } else {
-            // Token is invalid - show appropriate error message
-            if (data.reason === 'expired') {
-              neoErrorToast(t('daily.retryLinkExpired'), { icon: '⏰', duration: 5000 });
-            } else if (data.reason === 'wrong_date') {
-              neoErrorToast(t('daily.retryLinkWrongDate'), { icon: '📅', duration: 5000 });
-            } else {
-              neoErrorToast(t('daily.retryLinkInvalid'), { icon: '❌', duration: 5000 });
-            }
-          }
-        } catch (error) {
-          console.error('Failed to validate retry token:', error);
-          if (isMounted) {
-            neoErrorToast(t('daily.retryLinkError'), { icon: '⚠️', duration: 5000 });
-          }
-        }
-
-        // Clean up URL by removing the retryToken parameter (only if mounted)
-        if (isMounted && typeof window !== 'undefined') {
-          const url = new URL(window.location.href);
-          url.searchParams.delete('retryToken');
-          window.history.replaceState({}, '', url.toString());
-        }
-      };
-
-      validateRetryToken();
-
-      return () => {
-        isMounted = false;
-      };
-    }
-    return undefined;
-  }, [searchParams, gameLanguage, t, isAuthenticated, profile]);
 
   // Track previous values for smarter re-initialization
-  const prevGameLanguageRef = React.useRef<Language | null>(null);
-  const prevWasResetRef = React.useRef<boolean>(false);
+  const prevGameLanguageRef = useRef<Language | null>(null);
+  const prevWasResetRef = useRef<boolean>(false);
+  const gameStartedAtRef = useRef<number>(0);
+  // One rewarded ad unlocks one catch-up date; reset when the date changes so
+  // each missed day is its own watch (and today's daily is never gated).
+  const catchupAdUnlockedRef = useRef<boolean>(false);
+  useEffect(() => {
+    catchupAdUnlockedRef.current = false;
+  }, [catchupDate]);
 
   // Initialize Word Hunt daily challenge
   useEffect(() => {
     let isMounted = true;
 
-    // Determine if we need a full reload (new puzzle) vs just a re-check (auth changed)
     const languageChanged = prevGameLanguageRef.current !== null && prevGameLanguageRef.current !== gameLanguage;
     const wasJustReset = wasReset && !prevWasResetRef.current;
     const needsFullReload = languageChanged || wasJustReset || prevGameLanguageRef.current === null;
 
-    // Update refs for next comparison
     prevGameLanguageRef.current = gameLanguage;
     prevWasResetRef.current = wasReset;
 
-    // Only set loading phase when we need a full puzzle reload
-    // Skip setting loading when just auth state changes (prevents infinite loading)
-    if (needsFullReload) {
-      setPhase('loading');
-    }
+    if (needsFullReload) setPhase('loading');
 
     const initializePuzzle = async () => {
-      const date = getDailyChallengeDate();
+      const date = catchupDate || getDailyChallengeDate();
       const number = getPuzzleNumber(date);
-
       if (!isMounted) return;
-
       setPuzzleDate(date);
       setPuzzleNumber(number);
 
-      // Check if tutorial has been completed
       const tutorialKey = getWordHuntTutorialKey(gameLanguage);
       const hasCompletedTutorial = typeof window !== 'undefined' && localStorage.getItem(tutorialKey) === 'true';
       setTutorialCompleted(hasCompletedTutorial);
 
-      // Skip "already played" checks if we just reset (paid retry)
-      // The server reset may not have propagated yet, so we trust the reset action
-      if (!wasJustReset) {
-        // Quick check: If localStorage says already played, show results immediately
-        // (Server check below will catch cases where localStorage was cleared)
-        const localResult = getTodaysWordHuntResult(gameLanguage);
+      // Mid-game forfeit today (no saved result) → gate re-entry behind a
+      // rewarded ad on native. Skipped for practice + post-retry replays.
+      setForfeitedToday(!isPractice && !wasJustReset && hasWordHuntForfeitToday(gameLanguage));
+
+      // Practice mode: bypass already-played gates so the player can replay safely.
+      // Catch-up skips the today-only local cache (it's keyed to today) but still
+      // runs the server check below, which gates by the catch-up `date`.
+      if (!wasJustReset && !isPractice) {
+        const localResult = isCatchup ? null : getTodaysWordHuntResult(gameLanguage);
         if (localResult) {
           if (!isMounted) return;
           setStoredResult(localResult);
@@ -403,41 +201,27 @@ const DailyChallenge: React.FC = () => {
           return;
         }
 
-        // Server-side check: Verify with Supabase if player has already played
-        // This catches cases where localStorage was cleared but player already submitted
         try {
           const fp = await getGuestFingerprint();
           const checkParams = new URLSearchParams();
-          if (isAuthenticated && profile) {
-            checkParams.set('playerId', profile.id);
-          } else if (fp) {
-            checkParams.set('guestFingerprint', fp);
-          }
+          if (isAuthenticated && profile) checkParams.set('playerId', profile.id);
+          else if (fp) checkParams.set('guestFingerprint', fp);
 
           if (checkParams.toString()) {
             const checkResponse = await fetch(
               `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
             );
-
             if (!isMounted) return;
-
             if (checkResponse.ok) {
               const checkData = await checkResponse.json();
               if (checkData.hasPlayed && checkData.result) {
-                // Player already played - reconstruct stored result from server data
                 const serverResult = mapServerResultToStoredResult(
-                  checkData.result,
-                  date,
-                  number,
-                  gameLanguage
+                  checkData.result, date, number, gameLanguage, checkData.streak?.currentStreak || 0
                 );
-
-                // Sync localStorage with server data
                 if (typeof window !== 'undefined') {
                   const storageKey = getWordHuntResultKey(gameLanguage, date);
                   localStorage.setItem(storageKey, JSON.stringify(serverResult));
                 }
-
                 setStoredResult(serverResult);
                 setPhase('already-played');
                 return;
@@ -445,78 +229,142 @@ const DailyChallenge: React.FC = () => {
             }
           }
         } catch (checkError) {
-          // Log but don't block - if server check fails, fall back to local-only check
           console.warn('Failed to check server for existing attempt:', checkError);
         }
       }
 
-      // Player has not played yet - fetch the puzzle
-      // Try to fetch puzzle from API (includes AI-selected word if available)
+      if (offlineFlag && !online) {
+        const store = await getOfflineStore();
+        const cached = await getCachedDailyPuzzle<{ grid: LetterGrid; targetWord: string }>(
+          store, date, gameLanguage, 'wordhunt',
+        );
+        if (cached && isMounted) {
+          setGrid(cached.grid);
+          setTargetWord(cached.targetWord);
+          setPhase('ready');
+          return;
+        }
+        if (isMounted) setPhase('offline-miss');
+        return;
+      }
+
       try {
         const response = await fetch(`/api/daily-challenge/puzzle/${date}/${gameLanguage}`);
         if (!isMounted) return;
-
-        if (response.ok) {
-          const puzzleData = await response.json();
-          if (!isMounted) return;
+        const puzzleData = response.ok ? await response.json().catch(() => null) : null;
+        if (!isMounted) return;
+        if (isUsableDailyPuzzle(puzzleData)) {
           setGrid(puzzleData.grid);
           setTargetWord(puzzleData.targetWord);
         } else {
-          // Fall back to local generation
+          // ok-but-empty body, non-ok status, or unparseable JSON → generate locally
           const puzzle = generateDailyPuzzle(date, gameLanguage);
           if (!isMounted) return;
           setGrid(puzzle.grid);
           setTargetWord(puzzle.targetWord);
         }
       } catch {
-        // Fall back to local generation on network error
         if (!isMounted) return;
         const puzzle = generateDailyPuzzle(date, gameLanguage);
         setGrid(puzzle.grid);
         setTargetWord(puzzle.targetWord);
       }
 
-      // Go to ready screen - tutorial is available via "How to Play" button
       if (!isMounted) return;
       setPhase('ready');
     };
 
     initializePuzzle();
+    return () => { isMounted = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameLanguage, wasReset, isAuthenticated, profile?.id, catchupDate]);
 
-    return () => {
-      isMounted = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Intentionally using profile?.id instead of profile to prevent infinite re-init when profile object reference changes
-  }, [gameLanguage, wasReset, isAuthenticated, profile?.id]); // Re-initialize when game language changes, admin reset, or auth state changes
-
-  // Update countdown timer
+  // Safety net: the only render branch for `playing` requires both grid AND
+  // targetWord; entering `playing` without them renders nothing (blank screen).
+  // If that ever happens (empty payload that slipped through, offline cache miss,
+  // an ad-callback start before data settled), self-heal by generating locally
+  // so the player always gets a real puzzle instead of a blank screen.
   useEffect(() => {
-    const updateCountdown = () => {
-      const seconds = getSecondsUntilNextDaily();
-      setCountdown(formatCountdown(seconds));
-    };
+    if (phase === 'playing' && (!grid || !targetWord)) {
+      const puzzle = generateDailyPuzzle(puzzleDate || getDailyChallengeDate(), gameLanguage);
+      setGrid(puzzle.grid);
+      setTargetWord(puzzle.targetWord);
+    }
+  }, [phase, grid, targetWord, puzzleDate, gameLanguage]);
 
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
+  // Countdown timer
+  useInterval(() => {
+    const seconds = getSecondsUntilNextDaily();
+    setCountdown(formatTimeHHMMSS(seconds));
+  }, 1000);
 
-    return () => clearInterval(interval);
-  }, []);
+  // Common "enter the game" tail: unlock audio + analytics + flip to playing.
+  // Shared by the normal start path, the forfeit replay, and the catch-up unlock
+  // (unlockAudio is idempotent, so calling it again from here is harmless).
+  const startPlaying = useCallback(() => {
+    unlockAudio();
+    trackDailyPuzzle('opened', 'word_hunt');
+    trackFeatureFirstUse('daily_word_hunt');
+    gameStartedAtRef.current = Date.now();
+    setPhase('playing');
+  }, [unlockAudio]);
 
-  // Handle game start - with safety check to prevent replay
+  // Minimal "go to playing" used after a forfeit replay is granted (skips the
+  // already-played check — a forfeit never saves a result, so it always passes).
+  const beginPlaying = useCallback(() => {
+    clearWordHuntForfeitToday(gameLanguage);
+    setForfeitedToday(false);
+    startPlaying();
+  }, [gameLanguage, startPlaying]);
+
+  // Rewarded ad that unlocks a replay after a mid-game forfeit (native only;
+  // reward arrives via onRewardEarned, not a return value).
+  const { showAd, isAdAvailable, isPlaceholderCooldown } = useRewardedAd({
+    rewardKind: 'feature',
+    surface: 'retry',
+    onRewardEarned: () => beginPlaying(),
+  });
+
+  // Rewarded ad that unlocks playing a past day's daily (catch-up). Native only;
+  // web degrades to a free play. Reward → mark this date unlocked + start.
+  const {
+    showAd: showCatchUpAd,
+    isAdAvailable: isCatchUpAdAvailable,
+    isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
+  } = useRewardedAd({
+    rewardKind: 'feature',
+    surface: 'catchup',
+    onRewardEarned: () => {
+      catchupAdUnlockedRef.current = true;
+      startPlaying();
+    },
+  });
+
+  // Handle game start with safety checks
   const handleStartGame = useCallback(async () => {
-    // Safety check: verify user hasn't already played today
-    // This prevents replay if phase state somehow becomes 'ready' when it shouldn't
+    // Forfeit ad-gate: bailed mid-game today → watch a rewarded ad to replay on
+    // native. On web / when no ad is available, degrade to a free replay.
+    if (forfeitedToday) {
+      if (isNative() && isAdAvailable && !isPlaceholderCooldown) {
+        showAd();
+        return;
+      }
+      clearWordHuntForfeitToday(gameLanguage);
+      setForfeitedToday(false);
+    }
 
-    // Skip all checks if we just completed a paid retry reset
-    // This prevents race condition where server check finds old record before deletion propagates
+    unlockAudio();
+
     if (justResetRef.current) {
-      justResetRef.current = false; // Clear the flag
+      justResetRef.current = false;
+      gameStartedAtRef.current = Date.now();
       setPhase('playing');
       return;
     }
 
-    // First check localStorage (quick)
-    if (hasPlayedWordHuntToday(gameLanguage)) {
+    // Practice mode: bypass already-played gates so the player can replay safely.
+    // Catch-up uses its own date (below), so the today-only cache gate is skipped.
+    if (!isPractice && !isCatchup && hasPlayedWordHuntToday(gameLanguage)) {
       const result = getTodaysWordHuntResult(gameLanguage);
       if (result) {
         setStoredResult(result);
@@ -525,81 +373,110 @@ const DailyChallenge: React.FC = () => {
       }
     }
 
-    // Additional server-side check to prevent replay after localStorage clear
-    try {
-      const date = getDailyChallengeDate();
-      const fp = await getGuestFingerprint();
-      const checkParams = new URLSearchParams();
-      if (isAuthenticated && profile) {
-        checkParams.set('playerId', profile.id);
-      } else if (fp) {
-        checkParams.set('guestFingerprint', fp);
-      }
+    if (!isPractice) {
+      try {
+        const date = catchupDate || getDailyChallengeDate();
+        const fp = await getGuestFingerprint();
+        const checkParams = new URLSearchParams();
+        if (isAuthenticated && profile) checkParams.set('playerId', profile.id);
+        else if (fp) checkParams.set('guestFingerprint', fp);
 
-      if (checkParams.toString()) {
-        const checkResponse = await fetch(
-          `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
-        );
-
-        if (checkResponse.ok) {
-          const checkData = await checkResponse.json();
-          if (checkData.hasPlayed) {
-            // Player already played - redirect to results
-            neoErrorToast(t('daily.alreadyPlayed') || 'You have already played today!', { icon: '🔒', duration: 3000 });
-
-            if (checkData.result) {
-              const number = getPuzzleNumber(date);
-              const serverResult = mapServerResultToStoredResult(
-                checkData.result,
-                date,
-                number,
-                gameLanguage
-              );
-              setStoredResult(serverResult);
+        if (checkParams.toString()) {
+          const checkResponse = await fetch(
+            `/api/daily-challenge/word-hunt/check-played/${date}/${gameLanguage}?${checkParams.toString()}`
+          );
+          if (checkResponse.ok) {
+            const checkData = await checkResponse.json();
+            if (checkData.hasPlayed) {
+              neoErrorToast(t('daily.alreadyPlayed'), { icon: '🔒', duration: 3000 });
+              if (checkData.result) {
+                const number = getPuzzleNumber(date);
+                const serverResult = mapServerResultToStoredResult(
+                  checkData.result, date, number, gameLanguage, checkData.streak?.currentStreak || 0
+                );
+                setStoredResult(serverResult);
+              }
+              setPhase('already-played');
+              return;
             }
-
-            setPhase('already-played');
-            return;
           }
         }
+      } catch (error) {
+        console.warn('Failed to check server before game start:', error);
       }
-    } catch (error) {
-      // If server check fails, allow playing (server will reject duplicate submissions anyway)
-      console.warn('Failed to check server before game start:', error);
     }
 
-    setPhase('playing');
-  }, [gameLanguage, isAuthenticated, profile, t]);
+    // Catch-up ad gate (last gate): playing a past day's daily costs a rewarded
+    // ad on native. Placed AFTER the already-played check so we never burn an ad
+    // only to hit an "already played" wall on a deep-linked completed day.
+    // Web / no ad / placeholder cooldown → gate is false → free play.
+    if (
+      shouldGateCatchUpBehindAd({
+        isCatchup,
+        alreadyUnlocked: catchupAdUnlockedRef.current,
+        isNative: isNative(),
+        isAdAvailable: isCatchUpAdAvailable,
+        isPlaceholderCooldown: isCatchUpPlaceholderCooldown,
+      })
+    ) {
+      showCatchUpAd();
+      return;
+    }
 
-  // Handle Word Hunt game completion
-  const handleGameComplete = useCallback((result: SurvivalGameResult) => {
-    // Create the Word Hunt result object (streak will be updated by saveWordHuntResult)
+    startPlaying();
+  }, [gameLanguage, isAuthenticated, profile, t, unlockAudio, justResetRef, isPractice, isCatchup, catchupDate, forfeitedToday, isAdAvailable, isPlaceholderCooldown, showAd, isCatchUpAdAvailable, isCatchUpPlaceholderCooldown, showCatchUpAd, startPlaying]);
+
+  // Handle game completion
+  const handleGameComplete = useCallback((result: SurvivalGameResult, rescueMethod?: WordHuntRescueMethod) => {
+    // Practice mode: skip all persistence (no streak, no leaderboard, no analytics).
+    // Show transient results only and let player replay freely.
+    if (isPractice) {
+      setGameResult(result);
+      setPhase('completed');
+      return;
+    }
     const wordHuntResult: WordHuntResult = {
       puzzleNumber,
       puzzleDate,
       language: gameLanguage,
+      isCatchup,
       solved: result.solved,
       attemptsUsed: result.attemptsUsed,
       targetWord: result.targetWord,
       attempts: result.attempts,
-      // Include survival mode fields
       wordsDiscovered: result.wordsDiscovered,
       lifeRemaining: result.lifeRemaining,
       clueTokensEarned: result.clueTokensEarned,
       clueTokensSpent: result.clueTokensSpent,
       hintsUnlocked: result.hintsUnlocked,
       efficiencyScore: result.efficiencyScore,
-      streakDays: 0, // Placeholder - will be updated after save
+      extraTries,
+      streakDays: 0,
       completedAt: new Date().toISOString(),
     };
 
-    // Save result to localStorage and update streak (only for authenticated users)
     const updatedStreak = saveWordHuntResult(wordHuntResult, isAuthenticated);
-
-    // Update the result with the actual streak
     wordHuntResult.streakDays = updatedStreak.currentStreak;
 
-    // Store result for display
+    // Record to universal play streak (tracks consecutive days across all game modes)
+    recordStreak();
+
+    trackDailyPuzzle('completed', 'word_hunt', {
+      solved: result.solved,
+      attempts: result.attemptsUsed,
+    });
+
+    trackGrowthEvent('daily_word_hunt_complete', {
+      ...buildDailyWordHuntCompletePayload({
+        result,
+        puzzleNumber,
+        language: gameLanguage,
+        startedAt: gameStartedAtRef.current,
+        completedAt: Date.now(),
+        rescueMethod: rescueMethod ?? null,
+      }),
+    });
+
     setGameResult(result);
     setStoredResult({
       date: puzzleDate,
@@ -607,137 +484,79 @@ const DailyChallenge: React.FC = () => {
       result: wordHuntResult,
       completedAt: new Date().toISOString(),
     });
-
     setPhase('completed');
-  }, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated]);
 
-  // Handle tutorial completion
-  const handleTutorialComplete = useCallback(() => {
-    const tutorialKey = getWordHuntTutorialKey(gameLanguage);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(tutorialKey, 'true');
+    // Update weekly quest progress for daily challenge completion
+    if (isAuthenticated && result.solved) {
+      fetch('/api/stats/record-game', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          score: result.efficiencyScore ?? 0,
+          wordCount: result.wordsDiscovered?.length ?? 0,
+          longWordsFound: result.wordsDiscovered?.filter(w => (w.word?.length ?? 0) >= 6).length ?? 0,
+          mode: 'daily-challenge',
+          isDailyChallenge: true,
+        }),
+      })
+        .then(r => r.json())
+        .then(data => {
+          if (data.questUpdate?.completed) {
+            import('@/components/quests/QuestCompletionToast').then(({ showQuestCompletionToast }) => {
+              showQuestCompletionToast({
+                questName: t(data.questUpdate.description),
+                xpReward: data.questUpdate.xpReward,
+                dedupKey: `weekly:${data.questUpdate.questType ?? data.questUpdate.description}`,
+                t,
+              });
+            });
+          }
+        })
+        .catch(() => { /* non-critical */ });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- t is stable from LanguageContext
+}, [puzzleNumber, puzzleDate, gameLanguage, isAuthenticated, recordStreak, isPractice, isCatchup]);
+
+  const handleTutorialComplete = useCallback(() => {
+    markWordHuntTutorialSeen(gameLanguage);
     setTutorialCompleted(true);
     setShowTutorial(false);
   }, [gameLanguage]);
 
-  // Handle tutorial skip
+  // Skip persists the seen flag too — otherwise the auto-show effect re-fires
+  // immediately (X button bug) and the tutorial re-appears next session.
   const handleTutorialSkip = useCallback(() => {
+    markWordHuntTutorialSeen(gameLanguage);
+    setTutorialCompleted(true);
     setShowTutorial(false);
-  }, []);
+  }, [gameLanguage]);
+  const handleShowTutorial = useCallback(() => setShowTutorial(true), []);
+  // Client-side nav (no hard reload) — a hard nav while the game-active
+  // beforeunload guard is armed can blank a Capacitor WebView (black screen).
+  const handleBack = useCallback(() => { router.push(`/${language}/daily`); }, [router, language]);
 
-  // Handle showing tutorial manually
-  const handleShowTutorial = useCallback(() => {
-    setShowTutorial(true);
-  }, []);
+  // Mid-game exit: record a forfeit (no result saved) so re-entry is ad-gated,
+  // then leave. Practice runs are exempt.
+  const handleQuitMidGame = useCallback(() => {
+    if (!isPractice) markWordHuntForfeitToday(gameLanguage);
+    router.push(`/${language}/daily`);
+  }, [isPractice, gameLanguage, router, language]);
 
-  // Handle going back
-  const handleBack = useCallback(() => {
-    window.location.href = `/${language}`;
-  }, [language]);
+  // Subtle seasonal ambience washes the whole daily screen — atmosphere only,
+  // behind all content (relative wrapper), no readability impact.
+  const seasonSkin = useMemo(() => getCurrentSeasonDynamic().gridSkinClass, []);
 
-  // Handle retry challenge (paid with coins)
-  const handleRetryChallenge = useCallback(async () => {
-    try {
-      const today = getDailyChallengeDate();
-
-      // Build reset request body with player credentials
-      const resetBody: { puzzleDate: string; language: string; playerId?: string; guestFingerprint?: string } = {
-        puzzleDate: today,
-        language: gameLanguage,
-      };
-
-      if (isAuthenticated && profile) {
-        resetBody.playerId = profile.id;
-      } else {
-        const fp = await getGuestFingerprint();
-        if (fp) {
-          resetBody.guestFingerprint = fp;
-        }
-      }
-
-      // Delete server-side attempt record
-      if (resetBody.playerId || resetBody.guestFingerprint) {
-        try {
-          const resetResponse = await fetch('/api/daily/reset-attempt', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(resetBody),
-          });
-          const resetResult = await resetResponse.json();
-          if (!resetResult.success) {
-            console.warn('Server reset returned failure:', resetResult);
-          }
-        } catch (serverError) {
-          console.warn('Failed to reset server attempt:', serverError);
-          // Continue anyway - local reset is more important
-        }
-      }
-
-      // Clear the stored result for today
-      const cleared = clearWordHuntResultForRetry(gameLanguage);
-      if (!cleared) {
-        console.error('Failed to clear Word Hunt result for retry');
-        neoErrorToast(t('daily.retryFailed') || 'Failed to reset. Please try again.', { icon: '❌', duration: 4000 });
-        return;
-      }
-
-      // Mark that we just reset - this prevents the "already played" check
-      // from blocking the user when they click Play after a paid retry
-      justResetRef.current = true;
-
-      // Reset state for fresh start
-      setStoredResult(null);
-      setGameResult(null);
-
-      // IMPORTANT: Set wasReset to trigger puzzle re-initialization
-      // This ensures the init effect skips "already played" server checks
-      setWasReset(true);
-
-      setPhase('ready');
-
-      // Show success feedback
-      neoSuccessToast(t('daily.attemptReset') || 'Challenge reset! Good luck!', { icon: '🔄', duration: 3000 });
-    } catch (error) {
-      console.error('Retry challenge error:', error);
-      neoErrorToast(t('daily.retryFailed') || 'Failed to reset. Please try again.', { icon: '❌', duration: 4000 });
-    }
-  }, [gameLanguage, isAuthenticated, profile, t]);
-
-  // Render based on phase
   return (
     <div
-      className="flex flex-col h-full bg-gray-100 dark:bg-neo-navy relative page-content-safe"
-      {...pullToRefreshHandlers}
+      className={`flex-1 flex flex-col min-h-0 h-dvh max-h-dvh bg-gray-100 dark:bg-neo-navy relative overflow-x-clip overflow-hidden ${seasonSkin}`}
     >
-      {/* Pull-to-refresh indicator - only show when not playing */}
-      {phase !== 'playing' && (
-        <PullToRefreshIndicator
-          pullDistance={pullState.pullDistance}
-          isRefreshing={pullState.isRefreshing}
-          threshold={60}
-        />
-      )}
-
       <AutoHideHeader />
 
       <AnimatePresence mode="wait">
         {phase === 'loading' && (
-          <motion.div
-            key="loading"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="flex-1 flex items-center justify-center"
-          >
-            <div className="text-center">
-              <div className="relative w-12 h-12 mx-auto mb-3">
-                <div className="absolute inset-0 border-4 border-neo-lime/30 rounded-full" />
-                <div className="absolute inset-0 border-4 border-transparent border-t-neo-lime rounded-full animate-spin" />
-              </div>
-              <p className="text-gray-600 dark:text-gray-300 text-sm">{t('daily.loading')}</p>
-            </div>
-          </motion.div>
+          <m.div key="loading" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex items-center justify-center">
+            <PageLoader size="lg" text={t('daily.loading')} />
+          </m.div>
         )}
 
         {phase === 'ready' && (
@@ -760,15 +579,32 @@ const DailyChallenge: React.FC = () => {
           />
         )}
 
+        {phase === 'playing' && isPractice && (
+          <div className="absolute top-3 right-3 z-30 pointer-events-none">
+            <PracticeBadge />
+          </div>
+        )}
+
         {phase === 'playing' && grid && targetWord && (
           <DailyWordHuntSurvival
+            key="playing"
             grid={grid}
             puzzleNumber={puzzleNumber}
             language={gameLanguage}
             targetWord={targetWord}
             onComplete={handleGameComplete}
-            onQuit={handleBack}
+            onQuit={handleQuitMidGame}
+            puzzleDate={puzzleDate}
+            currentPlayerId={isAuthenticated && profile ? profile.id : null}
+            currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
+            practice={isPractice}
           />
+        )}
+
+        {phase === 'offline-miss' && (
+          <m.div key="offline-miss" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col">
+            <DailyOfflineFallback onRetry={() => setPhase('loading')} />
+          </m.div>
         )}
 
         {(phase === 'completed' || phase === 'already-played') && storedResult && puzzleDate && (
@@ -786,21 +622,10 @@ const DailyChallenge: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Tutorial Modal */}
       {showTutorial && (
-        <DailyChallengeTutorial
-          onComplete={handleTutorialComplete}
-          onSkip={handleTutorialSkip}
-        />
+        <DailyChallengeTutorial onComplete={handleTutorialComplete} onSkip={handleTutorialSkip} />
       )}
 
-      {/* Training Gateway Modal for New Players */}
-      <TrainingGatewayModal
-        isOpen={showTrainingGateway}
-        onClose={() => setShowTrainingGateway(false)}
-        onSkip={handleSkipTrainingGateway}
-        returnTo="daily"
-      />
     </div>
   );
 };

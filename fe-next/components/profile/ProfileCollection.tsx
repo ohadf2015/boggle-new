@@ -1,11 +1,13 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Gift } from 'lucide-react';
 import { CollectionGrid } from '@/components/CollectionGrid';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/EnhancedLoading';
+import { EnhancedEmptyState } from '@/components/ui/EnhancedEmptyState';
 import type { PlayerCollectible } from '@/contexts/auth/authTypes';
 
 interface ProfileCollectionProps {
@@ -24,50 +26,47 @@ export function ProfileCollection({
   const { t } = useLanguage();
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      className={cn(
-        'rounded-2xl p-4 mb-4',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
-      )}
+      className="rounded-neo-xl p-6 mb-4 bg-neo-navy-light border border-white/[0.08]"
     >
-      <div className="flex items-center justify-between mb-3">
-        <h2 className={cn(
-          'text-base font-bold flex items-center gap-2',
-          isDarkMode ? 'text-white' : 'text-gray-900'
-        )}>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-black font-neo-display uppercase flex items-center gap-2 text-white">
           <Gift className="text-neo-pink" />
-          {t('collectibles.title') || 'My Collection'}
+          {t('collectibles.title')}
         </h2>
         {collectibles.length > 0 && (
-          <span className={cn(
-            'text-xs px-2 py-1 rounded-full',
-            isDarkMode ? 'bg-slate-700 text-gray-300' : 'bg-gray-100 text-gray-600'
-          )}>
-            {collectibles.length} {t('collectibles.items') || 'items'}
+          <span className="text-xs font-black uppercase px-3 py-1.5 rounded-full bg-neo-pink/10 text-neo-pink">
+            {collectibles.length} {t('collectibles.items')}
           </span>
         )}
       </div>
 
       {isLoading ? (
-        <div className="flex justify-center py-6">
-          <div className="w-6 h-6 border-3 border-neo-pink border-t-transparent rounded-full animate-spin" />
+        <div className="grid grid-cols-4 gap-3 py-4">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <Skeleton key={`skeleton-${i}`} variant="circular" width={64} height={64} />
+          ))}
         </div>
+      ) : collectibles.length === 0 ? (
+        <EnhancedEmptyState
+          title={t('collectibles.emptyCollection')}
+          description={t('collectibles.earnByPlaying')}
+          icon="sparkles"
+          compact
+        />
       ) : (
         <CollectionGrid collectibles={collectibles} />
       )}
 
-      <div className={cn(
-        'mt-3 pt-3 border-t text-center',
-        isDarkMode ? 'border-slate-700' : 'border-gray-200'
-      )}>
-        <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
-          {t('collectibles.shopComingSoon') || 'Shop coming soon! Collect special avatars, badges, and titles.'}
+      <div className="mt-4 pt-3 border-t border-slate-700 text-center">
+        <p className="text-xs text-gray-500">
+          {t('collectibles.shopComingSoon')}
         </p>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

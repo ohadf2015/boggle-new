@@ -1,8 +1,8 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Hash, Ruler, Zap, Flame, Target, Trophy } from 'lucide-react';
+import { m, AnimatePresence } from 'framer-motion';
+import { Hash, Ruler, Zap, Flame, Target, Trophy, type LucideIcon } from 'lucide-react';
 import Avatar from '../../../components/Avatar';
 import { cn } from '../../../lib/utils';
 import type { Avatar as AvatarType } from '@/shared/types/game';
@@ -30,7 +30,7 @@ interface PlayerData {
 
 interface GameStat {
   id: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   label: string;
   value: string | number;
   subValue?: string;
@@ -185,7 +185,7 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
           username: hero.player.username,
           avatar: hero.player.avatar,
         },
-        color: 'bg-gradient-to-r from-neo-orange to-neo-red',
+        color: 'bg-linear-to-r from-neo-orange to-neo-red',
       });
     }
 
@@ -195,14 +195,14 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="grid grid-cols-2 md:grid-cols-3 gap-4"
         >
           {stats.map((stat, index) => (
-            <motion.div
+            <m.div
               key={stat.id}
               initial={{ y: 30, opacity: 0, rotateX: -20 }}
               animate={{ y: 0, opacity: 1, rotateX: 0 }}
@@ -243,8 +243,9 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
               {stat.player && (
                 <div className="flex items-center gap-2 mt-2 pt-2 border-t-2 border-neo-black/20">
                   <Avatar
-                    profilePictureUrl={stat.player.avatar?.profilePictureUrl ?? undefined}
+
                     avatarImage={stat.player.avatar?.avatarImage}
+                    customAvatar={stat.player.avatar?.customAvatar}
                     size="sm"
                     className="border-2 border-neo-black"
                   />
@@ -253,9 +254,9 @@ const TvResultsStatsGrid = memo<TvResultsStatsGridProps>(({
                   </span>
                 </div>
               )}
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

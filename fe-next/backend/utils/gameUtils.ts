@@ -17,6 +17,10 @@ import {
 // Import word normalization for board verification
 import { normalizeWord } from '@/shared/utils/wordNormalization';
 
+// Japanese hiragana board pool — single source of truth shared with the frontend
+// grid, /api/dictionary-words, serverDicts validation, and the ja.dict.gz build.
+import { japaneseHiraganaFrequency, JAPANESE_HIRAGANA_POOL } from '@/shared/constants/japaneseLetters';
+
 // ==========================================
 // Type Definitions
 // ==========================================
@@ -81,6 +85,10 @@ export const kanjiCompounds: string[] = [
   "長男", "新人", "古本", "明日", "強力", "生物", "男女",
   "父母", "兄弟", "友人", "王国", "天地", "山川", "海空"
 ];
+
+// Re-exported from the shared single source of truth (see import above) so existing
+// importers of `gameUtils` keep working while frontend/API/build all share one pool.
+export { japaneseHiraganaFrequency };
 
 // Valid Hebrew letters set for filtering
 const validHebrewLettersSet = new Set<string>([
@@ -225,7 +233,7 @@ const MAX_BOARD_GENERATION_ATTEMPTS = 5;
 export function generateRandomTable(
   rows: number | null = null,
   cols: number | null = null,
-  language: Language = 'he',
+  language: Language = 'en',
   wordsToEmbed: string[] = []
 ): LetterGrid {
   // Use default difficulty if no rows/cols specified
@@ -243,8 +251,12 @@ export function generateRandomTable(
     letters = spanishLetterPool;
   } else if (language === 'ja') {
     return generateJapaneseTable(rows, cols);
-  } else {
+  } else if (language === 'he') {
     letters = hebrewLetters;
+  } else {
+    // Unknown/undefined language must NOT silently become Hebrew — that leaked a
+    // Hebrew board onto English players. Hebrew now requires an explicit 'he'.
+    letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   }
 
   // If we have words to embed, use enhanced generation
@@ -535,109 +547,23 @@ function tryPlaceWordSnake(
 }
 
 /**
- * Generate a Japanese board with embedded Kanji compounds
+ * Generate a Japanese board as a frequency-weighted HIRAGANA grid.
+ *
+ * Mirrors the random-fill model used for en/sv/es (a Boggle board is random; the
+ * dictionary supplies findability). Replaces the previous kanji grid, which could
+ * only surface ~3 pre-planted compounds per board — not a word game. Validation
+ * against the hiragana dictionary makes traced kana words discoverable.
  */
 export function generateJapaneseTable(rows: number, cols: number): LetterGrid {
-  const grid: (string | null)[][] = Array(rows).fill(null).map(() => Array(cols).fill(null));
-  const totalCells = rows * cols;
-  const targetCompounds = Math.floor(totalCells / 5);
-
-  const shuffledCompounds = [...kanjiCompounds].sort(() => Math.random() - 0.5);
-  const twoCharCompounds = shuffledCompounds.filter(w => w.length === 2);
-  const threeCharCompounds = shuffledCompounds.filter(w => w.length === 3);
-
-  let embeddedCount = 0;
-  const usedCells = new Set<string>();
-
-  for (const compound of threeCharCompounds) {
-    if (embeddedCount >= Math.floor(targetCompounds * 0.2)) break;
-    if (tryEmbedCompound(grid, compound, rows, cols, usedCells)) {
-      embeddedCount++;
-    }
-  }
-
-  for (const compound of twoCharCompounds) {
-    if (embeddedCount >= targetCompounds) break;
-    if (tryEmbedCompound(grid, compound, rows, cols, usedCells)) {
-      embeddedCount++;
-    }
-  }
-
+  const grid: LetterGrid = [];
   for (let i = 0; i < rows; i++) {
+    const row: string[] = [];
     for (let j = 0; j < cols; j++) {
-      if (grid[i][j] === null) {
-        grid[i][j] = japaneseLetters[Math.floor(Math.random() * japaneseLetters.length)];
-      }
+      row.push(JAPANESE_HIRAGANA_POOL[Math.floor(Math.random() * JAPANESE_HIRAGANA_POOL.length)]);
     }
+    grid.push(row);
   }
-
-  return grid as LetterGrid;
-}
-
-/**
- * Try to embed a compound word into the grid
- */
-function tryEmbedCompound(
-  grid: (string | null)[][],
-  compound: string,
-  rows: number,
-  cols: number,
-  usedCells: Set<string>
-): boolean {
-  const wordLen = compound.length;
-  const directions: Direction[] = [
-    { dr: 0, dc: 1 },
-    { dr: 0, dc: -1 },
-    { dr: 1, dc: 0 },
-    { dr: -1, dc: 0 },
-    { dr: 1, dc: 1 },
-    { dr: 1, dc: -1 },
-    { dr: -1, dc: -1 },
-    { dr: -1, dc: 1 },
-  ];
-
-  const shuffledDirs = [...directions].sort(() => Math.random() - 0.5);
-
-  const attempts = 50;
-  for (let attempt = 0; attempt < attempts; attempt++) {
-    const startRow = Math.floor(Math.random() * rows);
-    const startCol = Math.floor(Math.random() * cols);
-
-    for (const dir of shuffledDirs) {
-      const endRow = startRow + (wordLen - 1) * dir.dr;
-      const endCol = startCol + (wordLen - 1) * dir.dc;
-
-      if (endRow < 0 || endRow >= rows || endCol < 0 || endCol >= cols) {
-        continue;
-      }
-
-      let canPlace = true;
-      const cellsToUse: Cell[] = [];
-
-      for (let i = 0; i < wordLen; i++) {
-        const r = startRow + i * dir.dr;
-        const c = startCol + i * dir.dc;
-        const cellKey = `${r},${c}`;
-
-        if (grid[r][c] !== null && grid[r][c] !== compound[i]) {
-          canPlace = false;
-          break;
-        }
-
-        cellsToUse.push({ r, c, char: compound[i], key: cellKey });
-      }
-
-      if (canPlace) {
-        for (const cell of cellsToUse) {
-          grid[cell.r][cell.c] = cell.char;
-          usedCells.add(cell.key);
-        }
-        return true;
-      }
-    }
-  }
-
-  return false;
+  return grid;
 }
 
 // ==========================================

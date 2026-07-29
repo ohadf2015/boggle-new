@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target, ArrowLeft, AlertCircle, Crown, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import SinglePlayerGame from '@/components/singleplayer/SinglePlayerGame';
@@ -13,6 +13,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useTheme } from '@/utils/ThemeContext';
 import { getGuestSessionId } from '@/utils/guestManager';
 import { cn } from '@/lib/utils';
+import { PageLoader } from '@/components/ui/PageLoader';
 import type { SinglePlayerGameState, SinglePlayerResultsData, BotOpponent } from '@/components/singleplayer/SinglePlayerView';
 import type { LetterGrid, Language, DifficultyLevel } from '@/shared/types/game';
 
@@ -27,7 +28,7 @@ interface ChallengeViewProps {
  * Players compete on the exact same board as the challenge creator
  */
 const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const { user, profile, isAuthenticated } = useAuth();
   const { theme } = useTheme();
   const router = useRouter();
@@ -44,14 +45,14 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
     async function loadChallenge() {
       const data = await getChallenge(challengeCode);
       if (!data) {
-        setError('Challenge not found or has expired');
+        setError(t('challengeView.notFoundOrExpired'));
         setPhase('error');
         return;
       }
 
       // Check if expired
       if (new Date(data.expiresAt) < new Date()) {
-        setError('This challenge has expired');
+        setError(t('challengeView.expired'));
         setPhase('error');
         return;
       }
@@ -61,7 +62,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
     }
 
     loadChallenge();
-  }, [challengeCode]);
+  }, [challengeCode, t]);
 
   // Parse grid from seed
   const grid = useMemo((): LetterGrid | null => {
@@ -125,8 +126,8 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
 
   // Handle quit
   const handleQuit = useCallback(() => {
-    router.push('/');
-  }, [router]);
+    router.push(`/${language}`);
+  }, [router, language]);
 
   // Handle play again
   const handlePlayAgain = useCallback(() => {
@@ -138,14 +139,8 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   // Render loading state
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-        <div className="text-center">
-          <div className="relative w-12 h-12 mx-auto mb-3">
-            <div className="absolute inset-0 border-4 border-cyan-500/30 rounded-full" />
-            <div className="absolute inset-0 border-4 border-transparent border-t-cyan-500 rounded-full animate-spin" />
-          </div>
-          <p className="text-gray-600 dark:text-gray-300 text-sm">Loading challenge...</p>
-        </div>
+      <div className="flex-1 flex items-center justify-center bg-neo-navy">
+        <PageLoader size="lg" text={t('challengeView.loading')} />
       </div>
     );
   }
@@ -153,13 +148,13 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
   // Render error state
   if (phase === 'error') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
-        <motion.div
+      <div className="flex-1 flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           className={cn(
             'max-w-md w-full p-6 rounded-neo border-4 border-neo-black shadow-hard-lg text-center',
-            isDark ? 'bg-slate-800' : 'bg-white'
+            isDark ? 'bg-neo-navy-light' : 'bg-white'
           )}
         >
           <AlertCircle className="w-16 h-16 mx-auto mb-4 text-red-500" />
@@ -167,18 +162,18 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             'text-xl font-black uppercase mb-2',
             isDark ? 'text-white' : 'text-gray-900'
           )}>
-            {language === 'he' ? 'אופס!' : 'Oops!'}
+            {t('challengeView.oops')}
           </h2>
           <p className={cn('mb-6', isDark ? 'text-gray-300' : 'text-gray-600')}>
             {error}
           </p>
           <Button
-            onClick={() => router.push('/')}
+            onClick={() => router.push(`/${language}`)}
             className="w-full bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo shadow-hard-md hover:shadow-hard-lg hover:-translate-y-1 transition-all font-bold"
           >
-            {language === 'he' ? 'חזרה לדף הבית' : 'Back to Home'}
+            {t('challengeView.backToHome')}
           </Button>
-        </motion.div>
+        </m.div>
       </div>
     );
   }
@@ -190,8 +185,8 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
       : 0;
 
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
-        <motion.div
+      <div className="flex-1 flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy p-4">
+        <m.div
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           className="max-w-md w-full space-y-6"
@@ -205,11 +200,11 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             )}
           >
             <ArrowLeft size={16} className="rtl:rotate-180" />
-            {language === 'he' ? 'חזרה' : 'Back'}
+            {t('challengeView.back')}
           </button>
 
           {/* Challenge Card */}
-          <motion.div
+          <m.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.1 }}
@@ -220,22 +215,22 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
           >
             {/* Header */}
             <div className="text-center mb-6">
-              <motion.div
+              <m.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: 'spring' }}
                 className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neo-lime border-3 border-neo-black shadow-hard-md mb-3"
               >
                 <Target className="w-8 h-8 text-neo-black" />
-              </motion.div>
+              </m.div>
               <h1 className={cn(
                 'text-2xl font-black uppercase tracking-wide',
                 isDark ? 'text-white' : 'text-gray-900'
               )}>
-                {language === 'he' ? 'אתגר!' : 'Challenge!'}
+                {t('challengeView.title')}
               </h1>
               <p className={cn('text-sm mt-1', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                {language === 'he' ? 'תנצחו את הניקוד הזה?' : 'Can you beat this score?'}
+                {t('challengeView.beatScore')}
               </p>
             </div>
 
@@ -258,7 +253,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                   {challenge.creatorUsername}
                 </p>
                 <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'יצר את האתגר' : 'created this challenge'}
+                  {t('challengeView.createdChallenge')}
                 </p>
               </div>
             </div>
@@ -266,13 +261,13 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             {/* Score to Beat */}
             <div className={cn(
               'text-center p-6 rounded-neo border-3 mb-4',
-              'bg-gradient-to-br from-neo-lime/20 to-orange-500/20 border-neo-lime'
+              'bg-linear-to-br from-neo-lime/20 to-orange-500/20 border-neo-lime'
             )}>
               <p className={cn(
                 'text-sm font-bold uppercase tracking-wide mb-2',
                 isDark ? 'text-yellow-300' : 'text-yellow-700'
               )}>
-                {language === 'he' ? 'ניקוד לניצחון' : 'Score to Beat'}
+                {t('challengeView.scoreToBeat')}
               </p>
               <div className="flex items-center justify-center gap-2">
                 <Crown className="w-8 h-8 text-yellow-500" />
@@ -287,12 +282,12 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                 'text-sm mt-2',
                 isDark ? 'text-gray-300' : 'text-gray-600'
               )}>
-                {challenge.creatorWordCount} {language === 'he' ? 'מילים' : 'words'}
+                {challenge.creatorWordCount} {t('challengeView.words')}
                 {challenge.creatorLongestWord && (
                   <>
                     <span className="mx-2">|</span>
                     <span>
-                      {language === 'he' ? 'הכי ארוכה: ' : 'Longest: '}
+                      {t('challengeView.longest')}
                       <strong>{challenge.creatorLongestWord}</strong>
                     </span>
                   </>
@@ -310,7 +305,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                   {challenge.totalAttempts}
                 </p>
                 <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'ניסיונות' : 'Attempts'}
+                  {t('challengeView.attempts')}
                 </p>
               </div>
               <div className={cn(
@@ -321,7 +316,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                   {challenge.totalBeaten}
                 </p>
                 <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'ניצחונות' : 'Beaten'}
+                  {t('challengeView.beaten')}
                 </p>
               </div>
               <div className={cn(
@@ -332,7 +327,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
                   {winRate}%
                 </p>
                 <p className={cn('text-xs', isDark ? 'text-gray-400' : 'text-gray-500')}>
-                  {language === 'he' ? 'אחוז הצלחה' : 'Win Rate'}
+                  {t('challengeView.winRate')}
                 </p>
               </div>
             </div>
@@ -350,7 +345,7 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
             </div>
 
             {/* Start Button */}
-            <motion.button
+            <m.button
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleStartGame}
@@ -363,10 +358,10 @@ const ChallengeView: React.FC<ChallengeViewProps> = ({ challengeCode }) => {
               )}
             >
               <Zap className="w-6 h-6" />
-              {language === 'he' ? 'התחל אתגר!' : 'Start Challenge!'}
-            </motion.button>
-          </motion.div>
-        </motion.div>
+              {t('challengeView.startChallenge')}
+            </m.button>
+          </m.div>
+        </m.div>
       </div>
     );
   }

@@ -3,14 +3,11 @@
  * Tests for board word validation logic
  */
 
-const {
-  validateWordOnBoard,
+import { validateWordOnBoard,
   getWordPath,
   makePositionsMap,
   normalizeHebrewLetter,
-  normalizeHebrewWord
-} = require('../modules/wordValidator');
-
+  normalizeHebrewWord } from '../modules/wordValidator';
 describe('Word Validator', () => {
 
   // Sample 3x3 board for testing
@@ -31,54 +28,54 @@ describe('Word Validator', () => {
   describe('validateWordOnBoard', () => {
 
     test('finds simple horizontal word', () => {
-      expect(validateWordOnBoard('cat', testBoard)).toBe(true);
+      expect(validateWordOnBoard('cat', testBoard, null, 'en')).toBe(true);
     });
 
     test('finds simple vertical word', () => {
-      expect(validateWordOnBoard('cdr', testBoard)).toBe(true);
+      expect(validateWordOnBoard('cdr', testBoard, null, 'en')).toBe(true);
     });
 
     test('finds diagonal word', () => {
-      expect(validateWordOnBoard('cot', testBoard)).toBe(true);
+      expect(validateWordOnBoard('cot', testBoard, null, 'en')).toBe(true);
     });
 
     test('finds word that wraps around', () => {
-      expect(validateWordOnBoard('dog', testBoard)).toBe(true);
+      expect(validateWordOnBoard('dog', testBoard, null, 'en')).toBe(true);
     });
 
     test('rejects word not on board', () => {
-      expect(validateWordOnBoard('xyz', testBoard)).toBe(false);
+      expect(validateWordOnBoard('xyz', testBoard, null, 'en')).toBe(false);
     });
 
     test('rejects word that reuses same cell', () => {
       // "TAAT" would need to reuse 'A' at position (0,1)
-      expect(validateWordOnBoard('tat', testBoard)).toBe(false);
+      expect(validateWordOnBoard('tat', testBoard, null, 'en')).toBe(false);
     });
 
     test('case insensitive matching', () => {
-      expect(validateWordOnBoard('CAT', testBoard)).toBe(true);
-      expect(validateWordOnBoard('Cat', testBoard)).toBe(true);
+      expect(validateWordOnBoard('CAT', testBoard, null, 'en')).toBe(true);
+      expect(validateWordOnBoard('Cat', testBoard, null, 'en')).toBe(true);
     });
 
     test('handles empty word', () => {
-      expect(validateWordOnBoard('', testBoard)).toBe(false);
+      expect(validateWordOnBoard('', testBoard, null, 'en')).toBe(false);
     });
 
     test('handles null/undefined board', () => {
-      expect(validateWordOnBoard('cat', null)).toBe(false);
-      expect(validateWordOnBoard('cat', undefined)).toBe(false);
+      expect(validateWordOnBoard('cat', null, null, 'en')).toBe(false);
+      expect(validateWordOnBoard('cat', undefined, null, 'en')).toBe(false);
     });
 
     test('handles empty board', () => {
-      expect(validateWordOnBoard('cat', [])).toBe(false);
+      expect(validateWordOnBoard('cat', [], null, 'en')).toBe(false);
     });
 
     test('finds longer word on larger board', () => {
-      expect(validateWordOnBoard('hello', largerBoard)).toBe(true);
+      expect(validateWordOnBoard('hello', largerBoard, null, 'en')).toBe(true);
     });
 
     test('finds word using all directions', () => {
-      expect(validateWordOnBoard('rise', largerBoard)).toBe(true);
+      expect(validateWordOnBoard('rise', largerBoard, null, 'en')).toBe(true);
     });
 
   });
@@ -86,7 +83,7 @@ describe('Word Validator', () => {
   describe('getWordPath', () => {
 
     test('returns correct path for horizontal word', () => {
-      const path = getWordPath('cat', testBoard);
+      const path = getWordPath('cat', testBoard, null, 'en');
       expect(path).not.toBeNull();
       expect(path.length).toBe(3);
       expect(path[0]).toEqual({ row: 0, col: 0 }); // C
@@ -95,12 +92,12 @@ describe('Word Validator', () => {
     });
 
     test('returns null for word not on board', () => {
-      const path = getWordPath('xyz', testBoard);
+      const path = getWordPath('xyz', testBoard, null, 'en');
       expect(path).toBeNull();
     });
 
     test('path uses each cell only once', () => {
-      const path = getWordPath('dog', testBoard);
+      const path = getWordPath('dog', testBoard, null, 'en');
       expect(path).not.toBeNull();
 
       // Check all cells are unique
@@ -114,7 +111,7 @@ describe('Word Validator', () => {
   describe('makePositionsMap', () => {
 
     test('creates map of letter positions', () => {
-      const positions = makePositionsMap(testBoard);
+      const positions = makePositionsMap(testBoard, 'en');
 
       expect(positions.get('c')).toEqual([[0, 0]]);
       expect(positions.get('a')).toEqual([[0, 1], [2, 1]]); // Two 'A's
@@ -122,12 +119,12 @@ describe('Word Validator', () => {
     });
 
     test('handles empty board', () => {
-      const positions = makePositionsMap([]);
+      const positions = makePositionsMap([], 'en');
       expect(positions.size).toBe(0);
     });
 
     test('lowercases all letters', () => {
-      const positions = makePositionsMap([['A', 'B'], ['C', 'D']]);
+      const positions = makePositionsMap([['A', 'B'], ['C', 'D']], 'en');
       expect(positions.has('a')).toBe(true);
       expect(positions.has('A')).toBe(false);
     });

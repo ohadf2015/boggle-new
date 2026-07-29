@@ -1,6 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { cookies } from 'next/headers'
-import type { SupabaseClient } from '@supabase/supabase-js'
+import type { SupabaseClient, User } from '@supabase/supabase-js'
 
 export async function createClient(): Promise<SupabaseClient> {
   const cookieStore = await cookies()
@@ -26,6 +26,27 @@ export async function createClient(): Promise<SupabaseClient> {
     },
     auth: {
       flowType: 'pkce'
-    }
+    },
+    global: {
+      fetch: (url, options = {}) => {
+        return fetch(url, {
+          ...options,
+          signal: options.signal ?? AbortSignal.timeout(10000),
+        })
+      },
+    },
   })
+}
+
+/**
+ * Get authenticated user by verifying the JWT with Supabase Auth.
+ * This makes a network round-trip (~50-200ms) but guarantees the
+ * user object is authentic and not tampered with via cookies.
+ */
+export async function getSessionUser(supabase: SupabaseClient): Promise<{ user: User | null; error: Error | null }> {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  if (error || !user) {
+    return { user: null, error: error ?? new Error('No authenticated user') };
+  }
+  return { user, error: null };
 }

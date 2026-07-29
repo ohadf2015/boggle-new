@@ -2,7 +2,7 @@
 
 import React, { memo, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, MoveUpRight, RotateCw, Target, Trophy, Sparkles } from 'lucide-react';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -113,26 +113,26 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
   return createPortal(
     <AnimatePresence>
       {skillId && (
-        <motion.div
+        <m.div
           key={`skill-unlock-${skillId}`}
           initial={{ opacity: 0, y: -50, scale: 0.8 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -30, scale: 0.9 }}
           transition={{ type: 'spring', damping: 15, stiffness: 300 }}
-          className="fixed top-4 left-1/2 -translate-x-1/2 z-[200] pointer-events-none"
+          className="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
         >
-          <motion.div
+          <m.div
             className={cn(
               'flex items-center gap-3 px-4 py-3 rounded-xl border-2 shadow-hard-md',
               isDarkMode
-                ? 'bg-slate-800 border-neo-lime text-white'
+                ? 'bg-neo-navy-light border-neo-lime text-white'
                 : 'bg-white border-neo-lime text-neo-black'
             )}
             animate={{ scale: [1, 1.02, 1] }}
             transition={{ duration: 0.3, delay: 0.2 }}
           >
             {/* Icon with color background */}
-            <motion.div
+            <m.div
               className={cn(
                 'flex items-center justify-center w-8 h-8 rounded-lg',
                 config.bgColor
@@ -142,12 +142,12 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
               transition={{ type: 'spring', damping: 10, delay: 0.1 }}
             >
               <Check className="w-5 h-5 text-white" />
-            </motion.div>
+            </m.div>
 
             {/* Text */}
             <div className="flex flex-col">
               <span className="text-xs uppercase tracking-wide text-neo-lime font-bold">
-                {t('training.unlock.title') || 'Skill Unlocked!'}
+                {t('training.unlock.title')}
               </span>
               <span className={cn(
                 "font-bold text-sm",
@@ -158,14 +158,14 @@ const SkillUnlockToast: React.FC<SkillUnlockToastProps> = ({
             </div>
 
             {/* Progress indicator */}
-            <motion.div
+            <m.div
               className="absolute bottom-0 left-0 h-1 bg-neo-lime rounded-b-lg"
               initial={{ width: '100%' }}
               animate={{ width: '0%' }}
               transition={{ duration: duration / 1000, ease: 'linear' }}
             />
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body

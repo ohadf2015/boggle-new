@@ -1,347 +1,114 @@
-'use client';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
+import ContactPageClient from './PageClient';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Send, Mail, MessageSquare, User, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import AutoHideHeader from '@/components/AutoHideHeader';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { useTheme } from '@/utils/ThemeContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { cn } from '@/lib/utils';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
-import { InstagramIcon } from '@/components/icons/SocialIcons';
+export const revalidate = 86400;
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
-type FormStatus = 'idle' | 'submitting' | 'success' | 'error';
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'contact', path: '/contact', locale });
+}
 
-export default function ContactPage(): React.ReactNode {
-  const { theme } = useTheme();
-  const { t, language } = useLanguage();
-  const router = useRouter();
-  const isLandscape = useMobileLandscape();
-  const isDarkMode = theme === 'dark';
+const contactSeoContent: Record<string, {
+  title: string;
+  description: string;
+  features: string[];
+  faq: { question: string; answer: string }[];
+}> = {
+  en: {
+    title: 'Contact LexiClash — Support, Feedback & Partnership',
+    description:
+      'Reach the LexiClash team for support, feedback, bug reports, partnership inquiries, press requests, or general questions. LexiClash is built and maintained by a small independent studio, which means every message reaches a real person on the team — not a queue of outsourced agents reading from a script. We read every email, prioritize bug reports affecting active gameplay, and respond personally to feature suggestions that match our roadmap. Whether you found a dictionary edge case, want to translate LexiClash into a new language, run a school program looking for vocabulary tools, or you just hit something weird and want to flag it — we want to hear from you.',
+    features: [
+      'Direct line to the development team — no outsourced support agents, no canned replies',
+      'Bug reports get priority routing — include device, browser, and reproduction steps for fastest fix',
+      'Feature suggestions reviewed weekly — popular requests make it onto the public roadmap',
+      'Partnership inquiries welcome — game portals, education platforms, language-learning apps, content creators',
+      'Press and media contact for interviews, reviews, screenshots, and brand assets',
+      'School and classroom inquiries — we offer free educator accounts and bulk word-list customization',
+      'Available in English, Hebrew, Swedish, Japanese, and Spanish — write in any language we support',
+      'Privacy and data deletion requests handled within 30 days per GDPR and CCPA requirements',
+    ],
+    faq: [
+      {
+        question: 'How long does it take to get a response from LexiClash support?',
+        answer:
+          'We aim to respond to every message within 48 hours during weekdays. Bug reports affecting active gameplay get priority routing and usually receive a response within 12 hours. Complex partnership or technical questions may take 3-5 business days while we coordinate internally. If you have not heard back after 5 business days, the message likely got caught in our spam filter — please resend with a different subject line.',
+      },
+      {
+        question: 'Can I suggest new features or game modes?',
+        answer:
+          'Absolutely — player suggestions drive a large portion of the LexiClash roadmap. The Adventure, Blast, and Word Hunt modes all started as player requests. Use the contact form to describe the feature, why you want it, and what existing game (if any) does it well. We review every suggestion in our weekly planning meeting and respond personally to ones we are considering.',
+      },
+      {
+        question: 'I found a bug — what is the fastest way to get it fixed?',
+        answer:
+          'Email us with: (1) what you were doing when it happened, (2) what device, browser, and operating system you are on, (3) any error message or screenshot, and (4) whether you can reproduce it consistently. Bug reports with reproduction steps usually ship a fix within one release cycle (3-7 days). Critical gameplay bugs are patched within hours.',
+      },
+      {
+        question: 'Do you accept translation contributions or community localizations?',
+        answer:
+          'Yes — LexiClash currently supports English, Hebrew, Swedish, Japanese, and Spanish, all maintained in collaboration with native speakers. If you are fluent in a language not yet supported and want to help bring LexiClash to your community, email us with your background and the language you want to add. We share the translation files, review a sample, and credit contributors in the About page.',
+      },
+      {
+        question: 'Can teachers, schools, or libraries use LexiClash for classroom programs?',
+        answer:
+          'Yes. LexiClash is used in classrooms for vocabulary expansion, ESL practice, and friendly competitive learning. We offer free educator accounts with custom word lists, no ads, and a quiet leaderboard for student groups. Contact us with your school or program name and we will set you up — there is no paid tier required.',
+      },
+      {
+        question: 'How do I delete my LexiClash account and all associated data?',
+        answer:
+          'You can delete your account directly from the Account Settings page (Settings → Account → Delete Account). All personal data is erased within 30 days as required by GDPR and CCPA. If you cannot access the in-app option for any reason, email us at lexiclash.game@gmail.com from the email tied to the account and we will process the deletion manually.',
+      },
+      {
+        question: 'Is there a Discord, subreddit, or community forum for LexiClash?',
+        answer:
+          'We have an active Discord community where players share strategy, request features, report bugs, and run informal tournaments. Join via the link in the footer. For longer-form discussion, the r/LexiClash subreddit is a slower but more searchable place to find past threads and answers.',
+      },
+    ],
+  },
+  he: {
+    title: 'צור קשר עם LexiClash',
+    description: 'פנו לצוות LexiClash עם משוב, דיווחי באגים, שאלות או בקשות שיתוף פעולה.',
+    features: ['שלחו משוב על מצבי משחק ותכונות', 'דווחו על באגים או בעיות טכניות', 'פניות שיתוף פעולה מוזמנות'],
+    faq: [{ question: 'כמה זמן לוקח לקבל תשובה?', answer: 'אנחנו שואפים להשיב תוך 48 שעות. דיווחי באגים ובעיות דחופות מקבלים עדיפות.' }],
+  },
+  sv: {
+    title: 'Kontakta LexiClash — Hör av Dig',
+    description: 'Kontakta LexiClash-teamet med feedback, buggrapporter eller frågor.',
+    features: ['Skicka feedback om spellägen och funktioner', 'Rapportera buggar', 'Samarbetsförfrågningar välkomnas'],
+    faq: [{ question: 'Hur lång tid tar det att få svar?', answer: 'Vi siktar på att svara inom 48 timmar. Buggrapporter prioriteras.' }],
+  },
+  ja: {
+    title: 'LexiClashに連絡 — お問い合わせ',
+    description: 'フィードバック、バグ報告、パートナーシップのお問い合わせなど、LexiClashチームにご連絡ください。',
+    features: ['ゲームモードや機能についてのフィードバック送信', 'バグや技術的問題の報告', 'パートナーシップのお問い合わせ歓迎'],
+    faq: [{ question: '返信にどのくらいかかりますか？', answer: '48時間以内の返信を目指しています。バグ報告と緊急の問題は優先されます。' }],
+  },
+  es: {
+    title: 'Contacta LexiClash — Ponte en Contacto',
+    description: 'Contacta al equipo de LexiClash para comentarios, reportes de errores, consultas de asociación o preguntas.',
+    features: ['Envía comentarios sobre modos de juego y características', 'Reporta errores o problemas técnicos', 'Consultas de asociación bienvenidas'],
+    faq: [
+      { question: '¿Cuánto tarda la respuesta?', answer: 'Intentamos responder en 48 horas. Los reportes de errores y problemas urgentes tienen prioridad.' },
+      { question: '¿Puedo sugerir nuevas funciones?', answer: 'Por supuesto — nos encanta escuchar ideas de los jugadores. Usa el formulario de contacto para describir tu sugerencia.' },
+    ],
+  },
+};
 
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
-  });
-  const [status, setStatus] = useState<FormStatus>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setStatus('submitting');
-    setErrorMessage('');
-
-    try {
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to send message');
-      }
-
-      setStatus('success');
-      setFormData({ name: '', email: '', message: '' });
-    } catch (error) {
-      setStatus('error');
-      setErrorMessage(error instanceof Error ? error.message : 'Something went wrong');
-    }
-  };
-
-  const isValid = formData.name.trim() && formData.email.trim() && formData.message.trim();
-
+export default async function ContactPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const content = contactSeoContent[locale] ?? contactSeoContent.en;
   return (
-    <div className={cn(
-      isLandscape ? 'h-screen overflow-y-auto' : 'min-h-screen',
-      isDarkMode
-        ? 'bg-neo-navy'
-        : 'bg-gradient-to-br from-neo-cream via-white to-neo-cream'
-    )}>
-      <AutoHideHeader />
-
-      <div className={cn(
-        "max-w-2xl mx-auto px-4 pb-24 lg:pb-6",
-        isLandscape ? "py-2" : "py-6"
-      )}>
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-4 mb-6"
-        >
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => router.push(`/${language}`)}
-            className={cn(
-              'rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800 text-white hover:bg-slate-700 hover:text-white' : 'bg-white text-neo-black hover:bg-neo-cream'
-            )}
-          >
-            <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
-            {t('common.back') || 'Back'}
-          </Button>
-          <h1 className={cn(
-            'text-2xl font-black uppercase',
-            isDarkMode ? 'text-white' : 'text-neo-black'
-          )}>
-            {t('contact.title') || 'Contact Us'}
-          </h1>
-        </motion.div>
-
-        {/* Social Links */}
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8"
-        >
-          <h2 className={cn(
-            'text-sm font-black uppercase mb-3 flex items-center gap-2',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            <MessageSquare className="w-4 h-4" />
-            {t('contact.connectWithUs') || 'Connect With Us'}
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {/* Instagram */}
-            <a
-              href="https://www.instagram.com/lexi.clash"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={cn(
-                'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
-                isDarkMode
-                  ? 'bg-slate-800 hover:bg-slate-700'
-                  : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
-              )}
-            >
-              <div className={cn(
-                'w-12 h-12 rounded-lg flex items-center justify-center border-2 border-neo-black',
-                'bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400'
-              )}>
-                <InstagramIcon className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <p className={cn('font-bold', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  Instagram
-                </p>
-                <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                  @lexi.clash
-                </p>
-              </div>
-            </a>
-
-            {/* Email */}
-            <a
-              href="mailto:lexiclash.game@gmail.com"
-              className={cn(
-                'flex items-center gap-3 p-4 rounded-neo border-3 border-neo-black transition-all hover:scale-[1.02]',
-                isDarkMode
-                  ? 'bg-slate-800 hover:bg-slate-700'
-                  : 'bg-white hover:bg-neo-cream shadow-hard hover:shadow-hard-lg'
-              )}
-            >
-              <div className={cn(
-                'w-12 h-12 rounded-lg flex items-center justify-center border-2 border-neo-black bg-neo-cyan'
-              )}>
-                <Mail className="w-6 h-6 text-neo-black" />
-              </div>
-              <div>
-                <p className={cn('font-bold', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                  {t('contact.emailLabel') || 'Email'}
-                </p>
-                <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                  lexiclash.game@gmail.com
-                </p>
-              </div>
-            </a>
-          </div>
-        </motion.section>
-
-        {/* Contact Form */}
-        <motion.section
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          <h2 className={cn(
-            'text-sm font-black uppercase mb-3 flex items-center gap-2',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            <Send className="w-4 h-4" />
-            {t('contact.sendMessage') || 'Send a Message'}
-          </h2>
-
-          {status === 'success' ? (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className={cn(
-                'p-6 rounded-neo border-3 border-neo-black text-center',
-                isDarkMode ? 'bg-slate-800' : 'bg-white shadow-hard'
-              )}
-            >
-              <CheckCircle className="w-12 h-12 mx-auto mb-3 text-neo-lime" />
-              <h3 className={cn('text-lg font-bold mb-2', isDarkMode ? 'text-white' : 'text-neo-black')}>
-                {t('contact.successTitle') || 'Message Sent!'}
-              </h3>
-              <p className={cn('text-sm', isDarkMode ? 'text-gray-400' : 'text-gray-600')}>
-                {t('contact.successMessage') || "Thanks for reaching out! We'll get back to you soon."}
-              </p>
-              <Button
-                onClick={() => setStatus('idle')}
-                className="mt-4 rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black font-bold shadow-hard hover:shadow-hard-lg"
-              >
-                {t('contact.sendAnother') || 'Send Another Message'}
-              </Button>
-            </motion.div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name Field */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="name"
-                  className={cn('text-sm font-bold flex items-center gap-2', isDarkMode ? 'text-white' : 'text-neo-black')}
-                >
-                  <User className="w-4 h-4" />
-                  {t('contact.nameLabel') || 'Name'}
-                  <span className="text-neo-red">*</span>
-                </label>
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder={t('contact.namePlaceholder') || 'Your name'}
-                  required
-                  disabled={status === 'submitting'}
-                />
-              </div>
-
-              {/* Email Field */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="email"
-                  className={cn('text-sm font-bold flex items-center gap-2', isDarkMode ? 'text-white' : 'text-neo-black')}
-                >
-                  <Mail className="w-4 h-4" />
-                  {t('contact.emailLabel') || 'Email'}
-                  <span className="text-neo-red">*</span>
-                </label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder={t('contact.emailPlaceholder') || 'your@email.com'}
-                  required
-                  disabled={status === 'submitting'}
-                />
-              </div>
-
-              {/* Message Field */}
-              <div className="space-y-1.5">
-                <label
-                  htmlFor="message"
-                  className={cn('text-sm font-bold flex items-center gap-2', isDarkMode ? 'text-white' : 'text-neo-black')}
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  {t('contact.messageLabel') || 'Message'}
-                  <span className="text-neo-red">*</span>
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  placeholder={t('contact.messagePlaceholder') || 'Tell us what you think...'}
-                  required
-                  disabled={status === 'submitting'}
-                  rows={5}
-                  className={cn(
-                    'flex w-full px-4 py-3 text-sm font-medium resize-none',
-                    'rounded-neo border-3 border-neo-black dark:border-slate-500',
-                    'bg-neo-cream dark:bg-slate-700 text-slate-900 dark:text-white',
-                    'shadow-[inset_2px_2px_0px_rgba(0,0,0,0.1)]',
-                    'placeholder:text-slate-500 dark:placeholder:text-slate-400 placeholder:font-normal',
-                    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy',
-                    'focus:shadow-[inset_3px_3px_0px_rgba(0,0,0,0.15)]',
-                    'disabled:cursor-not-allowed disabled:opacity-50',
-                    'transition-shadow duration-100'
-                  )}
-                />
-              </div>
-
-              {/* Error Message */}
-              {status === 'error' && (
-                <motion.div
-                  initial={{ opacity: 0, y: -5 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 p-3 rounded-neo border-2 border-neo-red bg-neo-red/10 text-neo-red"
-                >
-                  <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                  <p className="text-sm font-medium">{errorMessage || t('contact.errorMessage') || 'Failed to send message. Please try again.'}</p>
-                </motion.div>
-              )}
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                disabled={!isValid || status === 'submitting'}
-                className={cn(
-                  'w-full rounded-neo border-3 border-neo-black font-bold text-lg py-6',
-                  'bg-neo-lime text-neo-black shadow-hard',
-                  'hover:bg-neo-orange hover:shadow-hard-lg',
-                  'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-hard',
-                  'transition-all duration-150'
-                )}
-              >
-                {status === 'submitting' ? (
-                  <>
-                    <Loader2 className="w-5 h-5 me-2 animate-spin" />
-                    {t('contact.sending') || 'Sending...'}
-                  </>
-                ) : (
-                  <>
-                    <Send className="w-5 h-5 me-2" />
-                    {t('contact.submit') || 'Send Message'}
-                  </>
-                )}
-              </Button>
-            </form>
-          )}
-        </motion.section>
-
-        {/* Footer Note */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className={cn(
-            'mt-8 pt-4 border-t text-center',
-            isDarkMode ? 'border-slate-700' : 'border-gray-200'
-          )}
-        >
-          <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-400')}>
-            {t('contact.responseTime') || 'Estimated response time: 1-2 business days'}
-          </p>
-        </motion.div>
-      </div>
-    </div>
+    <>
+      <ContactPageClient />
+      <GamePageSeoContent
+        title={content.title}
+        description={content.description}
+        features={content.features}
+        faq={content.faq}
+      />
+    </>
   );
 }

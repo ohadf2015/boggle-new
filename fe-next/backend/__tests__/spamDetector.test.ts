@@ -3,6 +3,7 @@
  * Tests for progressive penalty system for invalid word submissions
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import {
   SpamDetector,
   PenaltyTier,
@@ -11,12 +12,12 @@ import {
 } from '../modules/spamDetector';
 
 // Mock logger
-jest.mock('../utils/logger', () => ({
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-}));
+vi.mock('../utils/logger', () => ({ default: {
+  debug: vi.fn(),
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+} }));
 
 describe('SpamDetector', () => {
 
@@ -535,8 +536,8 @@ describe('SpamDetector', () => {
 
   describe('Singleton Instance', () => {
 
-    test('singleton is properly exported and functional', () => {
-      const { spamDetector } = require('../modules/spamDetector');
+    test('singleton is properly exported and functional', async () => {
+      const { spamDetector } = await import('../modules/spamDetector');
 
       expect(spamDetector).toBeDefined();
       expect(typeof spamDetector.recordInvalidWord).toBe('function');
@@ -545,8 +546,8 @@ describe('SpamDetector', () => {
       expect(typeof spamDetector.getStats).toBe('function');
     });
 
-    test('singleton respects environment variable defaults', () => {
-      const { spamDetector } = require('../modules/spamDetector');
+    test('singleton respects environment variable defaults', async () => {
+      const { spamDetector } = await import('../modules/spamDetector');
       const stats = spamDetector.getStats();
 
       // Should have default config values

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -165,10 +165,10 @@ export function XpBarAnimated({
       <div className="flex items-center gap-3">
         {/* Level badge */}
         {showLevel && (
-          <motion.div
+          <m.div
             className={cn(
               'flex items-center justify-center rounded-neo border-3 border-neo-black shadow-hard',
-              'bg-gradient-to-br from-neo-lime to-amber-500 font-black text-neo-black',
+              'bg-linear-to-br from-neo-lime to-amber-500 font-black text-neo-black',
               sizeConfig[size].levelBadge
             )}
             animate={
@@ -187,7 +187,7 @@ export function XpBarAnimated({
             }}
           >
             {level}
-          </motion.div>
+          </m.div>
         )}
 
         {/* XP Bar container */}
@@ -199,9 +199,9 @@ export function XpBarAnimated({
             )}
           >
             {/* Fill bar */}
-            <motion.div
+            <m.div
               className={cn(
-                'absolute inset-y-0 left-0 rounded-r-sm bg-gradient-to-r',
+                'absolute inset-y-0 left-0 rounded-r-sm bg-linear-to-r',
                 colors.bar
               )}
               initial={{ width: `${(previousXp ?? currentXp) / maxXp * 100}%` }}
@@ -230,8 +230,8 @@ export function XpBarAnimated({
               {!isLowEnd && percentage > 10 && (
                 <div className="absolute inset-0 overflow-hidden">
                   {[...Array(3)].map((_, i) => (
-                    <motion.div
-                      key={i}
+                    <m.div
+                      key={`bubble-${i}`}
                       className="absolute w-1 h-1 rounded-full bg-white/40"
                       style={{
                         left: `${20 + i * 30}%`,
@@ -251,7 +251,7 @@ export function XpBarAnimated({
                   ))}
                 </div>
               )}
-            </motion.div>
+            </m.div>
 
             {/* Milestone markers */}
             {milestones.map((milestone) => (
@@ -266,7 +266,7 @@ export function XpBarAnimated({
           {/* XP text */}
           {showXpText && (
             <div className={cn('flex justify-between mt-1', sizeConfig[size].text)}>
-              <span className="text-neo-white/60 font-medium">
+              <span className="text-neo-white font-medium">
                 {displayXp.toLocaleString()} / {maxXp.toLocaleString()} XP
               </span>
               <span className={cn('font-bold', colors.text)}>
@@ -280,7 +280,7 @@ export function XpBarAnimated({
       {/* +XP indicator */}
       <AnimatePresence>
         {showXpGain && xpGained && xpGained > 0 && (
-          <motion.div
+          <m.div
             className="absolute -top-2 right-0 pointer-events-none"
             initial={{ opacity: 0, y: 0, scale: 0.8 }}
             animate={{ opacity: 1, y: -20, scale: 1 }}
@@ -297,14 +297,14 @@ export function XpBarAnimated({
             >
               +{xpGained} XP
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       {/* Level up flash */}
       <AnimatePresence>
         {isLevelingUp && enableGlowEffects && (
-          <motion.div
+          <m.div
             className="absolute inset-0 rounded-neo pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.5, 0] }}

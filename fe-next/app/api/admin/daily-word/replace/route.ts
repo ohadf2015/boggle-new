@@ -1,7 +1,23 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
-import { regenerateDailyPuzzle } from '@/utils/dailyChallenge';
+import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { getSupabaseAdmin } from '@/lib/admin/server';
+import { regenerateDailyPuzzle } from '@/utils/dailyChallenge/gridGeneration.server';
+import { invalidateDailyPuzzleCache } from '@/backend/redis/dailyPuzzle';
+import { MAX_TARGET_WORD_LENGTH } from '@/utils/dailyChallenge/constants';
+import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
+
+// Minimum word length by language (must match wikipediaWordProcessor.ts)
+const MIN_WORD_LENGTH: Record<Language, number> = {
+  en: 4,
+  he: 4,
+  sv: 4,
+  ja: 2, // Japanese kanji compounds are typically 2-4 characters
+  es: 4,
+  fr: 4,
+  de: 4,
+};
 
 /**
  * POST /api/admin/daily-word/replace
@@ -9,26 +25,17 @@ import type { Language } from '@/types';
  * When the word is replaced, the stored grid is cleared and regenerated
  * Only accessible to admin users
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Check if user is authenticated and is admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
-    // Check if user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
     // Parse request body
@@ -42,20 +49,25 @@ export async function POST(request: Request) {
       );
     }
 
-    // Validate word format (3-10 letters, uppercase)
-    const formattedWord = newWord.toUpperCase().trim();
-    if (formattedWord.length < 3 || formattedWord.length > 10) {
+    // Validate language first (needed for min length check)
+    const validLanguages = ['en', 'he', 'sv', 'ja', 'es'] as const;
+    if (!validLanguages.includes(language)) {
       return NextResponse.json(
-        { error: 'Word must be between 3 and 10 letters' },
+        { error: 'Invalid language code' },
         { status: 400 }
       );
     }
 
-    // Validate language
-    const validLanguages = ['en', 'he', 'sv', 'ja', 'es'];
-    if (!validLanguages.includes(language)) {
+    // Validate word format using language-specific minimum
+    const formattedWord = newWord.toUpperCase().trim();
+    const minLength = MIN_WORD_LENGTH[language as Language] || 4;
+    // Cap admin overrides to the gameplay target length limit.
+    // Japanese kanji compounds are shorter (2-4); others follow MAX_TARGET_WORD_LENGTH.
+    const maxLength = language === 'ja' ? 4 : MAX_TARGET_WORD_LENGTH;
+
+    if (formattedWord.length < minLength || formattedWord.length > maxLength) {
       return NextResponse.json(
-        { error: 'Invalid language code' },
+        { error: `Word must be between ${minLength} and ${maxLength} letters for ${language}` },
         { status: 400 }
       );
     }
@@ -77,7 +89,7 @@ export async function POST(request: Request) {
         .from('daily_target_words')
         .update({
           override_word: formattedWord,
-          override_by: user.id,
+          override_by: authResult.user!.id,
           override_at: new Date().toISOString(),
           grid: null, // Clear stored grid - will be regenerated on next request
           grid_generated_at: null,
@@ -86,6 +98,12 @@ export async function POST(request: Request) {
         .eq('id', existing.id);
 
       if (updateError) {
+        logger.error('Update word error:', updateError);
+        captureApiError(new Error(updateError.message), '/api/admin/daily-word/replace', {
+          method: 'POST',
+          statusCode: 500,
+          body: { puzzleDate, language }
+        });
         return NextResponse.json(
           { error: `Failed to update word: ${updateError.message}` },
           { status: 500 }
@@ -111,12 +129,18 @@ export async function POST(request: Request) {
           ai_selected: false,
           ai_reason: 'Admin manual selection',
           override_word: formattedWord,
-          override_by: user.id,
+          override_by: authResult.user!.id,
           override_at: new Date().toISOString(),
           // grid will be generated on first player request
         });
 
       if (insertError) {
+        logger.error('Insert word error:', insertError);
+        captureApiError(new Error(insertError.message), '/api/admin/daily-word/replace', {
+          method: 'POST',
+          statusCode: 500,
+          body: { puzzleDate, language }
+        });
         return NextResponse.json(
           { error: `Failed to create word entry: ${insertError.message}` },
           { status: 500 }
@@ -129,6 +153,12 @@ export async function POST(request: Request) {
         newWord: formattedWord,
       };
     }
+
+    // Invalidate Redis cache so players get the new word immediately
+    // This must happen BEFORE board regeneration so any concurrent requests
+    // fetch the new word from the database
+    const cacheInvalidated = await invalidateDailyPuzzleCache(puzzleDate, language);
+    logger.log(`[Admin] Cache invalidation for ${puzzleDate}/${language}: ${cacheInvalidated ? 'success' : 'skipped/failed'}`);
 
     // Regenerate board immediately if requested (default: true)
     let boardRegenerateResult = null;
@@ -143,10 +173,16 @@ export async function POST(request: Request) {
           }
         };
       } catch (regenerateError) {
-        console.error('Board regeneration error:', regenerateError);
+        const errorMessage = regenerateError instanceof Error ? regenerateError.message : 'Unknown error';
+        logger.error('Board regeneration error:', regenerateError);
+        captureApiError(
+          regenerateError instanceof Error ? regenerateError : new Error('Unknown error'),
+          '/api/admin/daily-word/replace',
+          { method: 'POST', statusCode: 500 }
+        );
         boardRegenerateResult = {
           success: false,
-          error: regenerateError instanceof Error ? regenerateError.message : 'Unknown error'
+          error: errorMessage
         };
       }
     }
@@ -171,13 +207,20 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       word: wordUpdateResult,
+      cacheInvalidated,
       boardRegenerate: boardRegenerateResult,
       reset: resetResult,
     });
   } catch (error) {
-    console.error('Replace word error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    logger.error('Replace word error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/replace',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

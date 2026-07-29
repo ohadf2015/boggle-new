@@ -1,14 +1,25 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
-import { Button as ButtonComponent } from '../ui/button';
+import React, { useState, useEffect } from 'react';
+import { m } from 'framer-motion';
+import { Mail, Wand2, AlertCircle } from 'lucide-react';
+import { Loader } from '@/components/ui/Loader';
+import { Button } from '../ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+} from '@/components/ui/dialog';
 
-const Button = ButtonComponent as any;
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord } from '../../lib/supabase';
+import { signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import { isNative } from '../../utils/platform';
+import { validateEmail } from '../../utils/validation';
+import { cn } from '../../lib/utils';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 // Brand icon SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -33,31 +44,93 @@ interface WordHuntLoginModalProps {
 
 const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform, showAuthPrompt } = useCrazyGames();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState<string | null>(null);
+  const [showOtpFlow, setShowOtpFlow] = useState(isNative);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+
+  useEffect(() => {
+    if (!showOtpFlow && isNative()) setShowOtpFlow(true);
+  }, [showOtpFlow]);
+
+  const { signIn: oauthSignIn } = useOAuthSignIn({
+    onError: (msg) => setError(msg),
+    onSuccess: () => onClose(),
+  });
+
+  // On CrazyGames, use their native auth instead of our modal
+  useEffect(() => {
+    if (isOpen && isOnCrazyGamesPlatform) {
+      showAuthPrompt();
+      onClose();
+    }
+  }, [isOpen, isOnCrazyGamesPlatform, showAuthPrompt, onClose]);
 
   const handleSignIn = async (provider: 'google' | 'discord') => {
-    setIsLoading(provider);
     setError(null);
+    await oauthSignIn(provider);
+  };
+
+  // CrazyGames: route through native auth, never render our modal UI
+  if (isOnCrazyGamesPlatform) return null;
+
+  const handleEmailChange = (value: string) => {
+    setEmail(value);
+    if (value) {
+      const result = validateEmail(value);
+      setEmailError(result.isValid ? null : (result.error ? t(result.error) : null));
+    } else {
+      setEmailError(null);
+    }
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
+      return;
+    }
+
+    setIsLoading('magiclink');
+    setError(null);
+    setEmailError(null);
 
     try {
-      let result;
-      switch (provider) {
-        case 'google':
-          result = await signInWithGoogle();
-          break;
-        case 'discord':
-          result = await signInWithDiscord();
-          break;
-        default:
-          throw new Error('Unknown provider');
+      if (showOtpFlow && otpSent) {
+        // Verify OTP code
+        const result = await verifyOtpCode(email, otpCode);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          onClose();
+        }
+      } else if (showOtpFlow) {
+        // Send OTP code
+        const result = await sendOtpCode(email);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          setOtpSent(true);
+          setSuccess(t('auth.otp.codeSent'));
+        }
+      } else {
+        // Web: magic link
+        const result = await signInWithMagicLink(email);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          setSuccess(t('auth.magicLink.checkEmail'));
+        }
       }
-
-      if (result.error) {
-        setError(result.error.message);
-        setIsLoading(null);
-      }
-      // OAuth will redirect, so no need to close modal
+      setIsLoading(null);
     } catch (err) {
       setError((err as Error).message || 'An error occurred');
       setIsLoading(null);
@@ -68,7 +141,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         noDescription
-        className="max-w-sm bg-slate-800 border-orange-500/30"
+        className="max-w-sm bg-neo-navy-light border-orange-500/30"
       >
         <DialogHeader className="bg-transparent border-b-0 p-0">
           <DialogTitle className="sr-only">
@@ -78,7 +151,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
 
         <DialogBody className="p-6 pt-0">
           {/* Content */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
@@ -91,57 +164,151 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
             <p className="text-sm text-gray-300">
               {t('auth.wordHunt.loginSubtitle')}
             </p>
-          </motion.div>
+          </m.div>
 
-          {/* Sign In Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="space-y-3 mb-4"
-          >
-            <Button
-              onClick={() => handleSignIn('google')}
-              disabled={isLoading !== null}
-              className="w-full h-12 bg-white text-gray-800 hover:bg-gray-50 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
-              asChild={false}
+          {/* Success Message */}
+          {success ? (
+            <m.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-4 p-4 rounded-lg bg-emerald-900/30 border border-emerald-500/50 text-center"
             >
-              {isLoading === 'google' ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                <GoogleIcon className="w-5 h-5" />
-              )}
-              <span>{t('auth.signInWith', { provider: 'Google' })}</span>
-            </Button>
+              <p className="text-sm font-bold text-emerald-300">{success}</p>
+            </m.div>
+          ) : (
+            <>
+              {/* Sign In Buttons */}
+              <m.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="space-y-3 mb-4"
+              >
+                <Button
+                  onClick={() => handleSignIn('google')}
+                  disabled={isLoading !== null}
+                  className="w-full h-12 bg-white text-gray-800 hover:bg-gray-50 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+                  asChild={false}
+                >
+                  {isLoading === 'google' ? (
+                    <Loader size="sm" />
+                  ) : (
+                    <GoogleIcon className="w-5 h-5" />
+                  )}
+                  <span>{t('auth.signInWith', { provider: 'Google' })}</span>
+                </Button>
 
-            <Button
-              onClick={() => handleSignIn('discord')}
-              disabled={isLoading !== null}
-              className="w-full h-12 bg-brand-discord text-white hover:bg-brand-discord-hover font-medium rounded-xl transition-all flex items-center justify-center gap-2"
-              asChild={false}
-            >
-              {isLoading === 'discord' ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Button
+                  onClick={() => handleSignIn('discord')}
+                  disabled={isLoading !== null}
+                  className="w-full h-12 bg-brand-discord text-white hover:bg-brand-discord-hover font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+                  asChild={false}
+                >
+                  {isLoading === 'discord' ? (
+                    <Loader size="sm" />
+                  ) : (
+                    <DiscordIcon className="w-5 h-5" />
+                  )}
+                  <span>{t('auth.signInWith', { provider: 'Discord' })}</span>
+                </Button>
+              </m.div>
+
+              {/* Email Form (OTP on native, magic link on web) */}
+              {!showEmailForm ? (
+                <button
+                  onClick={() => setShowEmailForm(true)}
+                  className="w-full mb-4 text-sm text-gray-400 hover:text-gray-200 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  <span>{t('auth.inlineSignup.orContinueWith')}</span>
+                </button>
               ) : (
-                <DiscordIcon className="w-5 h-5" />
+                <m.form
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  onSubmit={handleEmailSubmit}
+                  className="mb-4 space-y-3"
+                >
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className="flex-1 h-px bg-gray-600" />
+                    <span>{t('auth.magicLink.divider')}</span>
+                    <div className="flex-1 h-px bg-gray-600" />
+                  </div>
+
+                  <div>
+                    <input
+                      type="email"
+                      autoComplete="email"
+                      value={email}
+                      onChange={(e) => handleEmailChange(e.target.value)}
+                      placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                      className={cn(
+                        "w-full px-4 py-3 rounded-xl border-2 bg-neo-navy-elevated text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan",
+                        emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
+                      )}
+                      disabled={isLoading !== null || otpSent}
+                    />
+                    {emailError && (
+                      <p className="mt-1 text-xs text-red-400">{emailError}</p>
+                    )}
+                  </div>
+
+                  {/* OTP code input (native only, after code sent) */}
+                  {showOtpFlow && otpSent && (
+                    <div>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        autoComplete="one-time-code"
+                        maxLength={6}
+                        value={otpCode}
+                        onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                        placeholder={t('auth.otp.enterCode')}
+                        className="w-full px-4 py-3 rounded-xl border-2 bg-neo-navy-elevated text-white placeholder-gray-400 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan border-slate-600 focus:border-neo-cyan text-center text-2xl tracking-[0.5em] font-mono"
+                        disabled={isLoading !== null}
+                      />
+                    </div>
+                  )}
+
+                  <Button
+                    type="submit"
+                    disabled={isLoading !== null || !email || !!emailError || (otpSent && otpCode.length < 6)}
+                    className="w-full h-12 bg-cyan-500 text-white hover:bg-cyan-600 font-medium rounded-xl transition-all flex items-center justify-center gap-2"
+                    asChild={false}
+                  >
+                    {isLoading === 'magiclink' ? (
+                      <Loader size="sm" />
+                    ) : (
+                      <>
+                        <Wand2 className="w-4 h-4" />
+                        <span>
+                          {otpSent
+                            ? t('auth.otp.verify')
+                            : showOtpFlow
+                              ? t('auth.otp.sendCode')
+                              : t('auth.magicLink.sendLink')}
+                        </span>
+                      </>
+                    )}
+                  </Button>
+                </m.form>
               )}
-              <span>{t('auth.signInWith', { provider: 'Discord' })}</span>
-            </Button>
-          </motion.div>
+            </>
+          )}
 
           {/* Error Message */}
           {error && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="mb-4 p-3 rounded-lg bg-red-900/30 border border-red-500/50 text-red-300 text-sm"
             >
-              {error}
-            </motion.div>
+              <AlertCircle className="w-4 h-4 shrink-0 inline-block me-1" />{error}
+            </m.div>
           )}
 
           {/* Skip Option */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
@@ -153,7 +320,7 @@ const WordHuntLoginModal: React.FC<WordHuntLoginModalProps> = ({ isOpen, onClose
             >
               {t('auth.wordHunt.skipCta')}
             </button>
-          </motion.div>
+          </m.div>
         </DialogBody>
       </DialogContent>
     </Dialog>

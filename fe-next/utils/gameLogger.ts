@@ -123,7 +123,7 @@ export async function logGameStart(params: GameStartParams): Promise<string | nu
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      console.warn('Failed to log game start:', response.status, errorData?.error || 'Unknown error');
+      console.debug('[Analytics] Failed to log game start:', response.status, errorData?.error || 'Unknown error');
       return null;
     }
 
@@ -180,7 +180,7 @@ export async function logGameEnd(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      console.warn('Failed to log game end:', response.status, errorData?.error || 'Unknown error');
+      console.debug('[Analytics] Failed to log game end:', response.status, errorData?.error || 'Unknown error');
       return false;
     }
 
@@ -222,7 +222,7 @@ export async function updateGameSession(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
-      console.warn('Failed to update game session:', response.status, errorData?.error || 'Unknown error');
+      console.debug('[Analytics] Failed to update game session:', response.status, errorData?.error || 'Unknown error');
       return false;
     }
 

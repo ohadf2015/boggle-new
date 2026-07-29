@@ -16,6 +16,7 @@ import { DIFFICULTIES } from '@/utils/consts';
 import logger from '@/utils/logger';
 import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { Player } from '@/hooks/useGameState';
+import { useGameMode } from '@/hooks/gameState';
 
 interface UseHostEffectsOptions {
   socket: Socket | null;
@@ -60,6 +61,7 @@ interface UseHostEffectsOptions {
 }
 
 export function useHostEffects(options: UseHostEffectsOptions): void {
+  const gameMode = useGameMode();
   const {
     socket,
     gameStarted,
@@ -111,8 +113,8 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
       !hasTriggeredUrgentMusicRef.current
     ) {
       // Calculate total time from timerValue (minutes to seconds)
-      // timerValue defaults to 3 minutes
-      const totalTimeSeconds = (options.timerValue || 3) * 60;
+      // timerValue defaults to 2 minutes
+      const totalTimeSeconds = (options.timerValue || 2) * 60;
       // Trigger when 33% of time has elapsed (67% remaining)
       const triggerThreshold = totalTimeSeconds * 0.67;
 
@@ -158,7 +160,7 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
 
   // Countdown beep
   useEffect(() => {
-    if (gameStarted && remainingTime !== null && remainingTime <= 3 && remainingTime > 0) {
+    if (gameStarted && remainingTime !== null && remainingTime <= 10 && remainingTime > 0) {
       playCountdownBeep(remainingTime);
     }
   }, [remainingTime, gameStarted, playCountdownBeep]);
@@ -199,8 +201,9 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
     }
 
     const currentLang = roomLanguage || language;
-    const rows = DIFFICULTIES[difficulty].rows;
-    const cols = DIFFICULTIES[difficulty].cols;
+    const isBlast = gameMode === 'blast';
+    const rows = isBlast ? 6 : DIFFICULTIES[difficulty].rows;
+    const cols = isBlast ? 6 : DIFFICULTIES[difficulty].cols;
 
     const interval = setInterval(() => {
       const randomGrid = generateRandomTable(rows, cols, currentLang as Language);
@@ -222,6 +225,7 @@ export function useHostEffects(options: UseHostEffectsOptions): void {
     roomLanguage,
     language,
     socket,
+    gameMode,
     setShufflingGrid,
     setHighlightedCells,
   ]);

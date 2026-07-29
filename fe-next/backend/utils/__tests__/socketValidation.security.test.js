@@ -3,15 +3,11 @@
  * Tests input validation against common attack vectors
  */
 
-const {
-  usernameSchema,
+import { usernameSchema,
   roomNameSchema,
   playerIdSchema,
   guestTokenHashSchema,
-  avatarSchema,
-  ALLOWED_IMAGE_DOMAINS
-} = require('../socketValidation');
-
+  avatarSchema } from '../socketValidation';
 describe('Security - Input Validation', () => {
 
   describe('Username Validation', () => {
@@ -100,88 +96,7 @@ describe('Security - Input Validation', () => {
     });
   });
 
-  describe('Avatar Schema - Profile Picture URL Validation (SSRF Prevention)', () => {
-    it('should accept HTTPS URLs from whitelisted domains', () => {
-      const validUrls = [
-        'https://i.imgur.com/abc123.jpg',
-        'https://cdn.discordapp.com/avatars/123.png',
-        'https://lh3.googleusercontent.com/photo.jpg',
-        'https://avatars.githubusercontent.com/u/123'
-      ];
-
-      // Add Supabase URL if environment is configured
-      if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL);
-        validUrls.push(`https://${url.hostname}/storage/v1/object/public/profile_pictures/user123/profile.jpg`);
-      }
-
-      validUrls.forEach(url => {
-        const result = avatarSchema.safeParse({
-          emoji: '😀',
-          color: '#FF5733',
-          profilePictureUrl: url
-        });
-        expect(result.success).toBe(true);
-      });
-    });
-
-    // SECURITY: HTTP URLs are now rejected (HTTPS required)
-    it('should reject HTTP URLs (require HTTPS only)', () => {
-      const result = avatarSchema.safeParse({
-        emoji: '😀',
-        color: '#FF5733',
-        profilePictureUrl: 'http://i.imgur.com/abc123.jpg'
-      });
-      expect(result.success).toBe(false);
-    });
-
-    // SECURITY: javascript: URLs are now rejected (XSS prevention)
-    it('should reject javascript: URLs (XSS prevention)', () => {
-      const result = avatarSchema.safeParse({
-        emoji: '😀',
-        color: '#FF5733',
-        profilePictureUrl: 'javascript:alert(1)'
-      });
-      expect(result.success).toBe(false);
-    });
-
-    // SECURITY: data: URLs are now rejected (SSRF protection)
-    it('should reject data: URLs (SSRF protection)', () => {
-      const result = avatarSchema.safeParse({
-        emoji: '😀',
-        color: '#FF5733',
-        profilePictureUrl: 'data:text/html,<script>alert(1)</script>'
-      });
-      expect(result.success).toBe(false);
-    });
-
-    // SECURITY: file: URLs are now rejected (local file access prevention)
-    it('should reject file: URLs (local file access prevention)', () => {
-      const result = avatarSchema.safeParse({
-        emoji: '😀',
-        color: '#FF5733',
-        profilePictureUrl: 'file:///etc/passwd'
-      });
-      expect(result.success).toBe(false);
-    });
-
-    // SECURITY: Non-whitelisted domains are now rejected
-    it('should reject URLs from non-whitelisted domains', () => {
-      const urls = [
-        'https://evil.com/image.jpg',
-        'https://attacker.net/photo.png'
-      ];
-
-      urls.forEach(url => {
-        const result = avatarSchema.safeParse({
-          emoji: '😀',
-          color: '#FF5733',
-          profilePictureUrl: url
-        });
-        expect(result.success).toBe(false);
-      });
-    });
-
+  describe('Avatar Schema Validation', () => {
     it('should reject emoji bombs (excessive emojis)', () => {
       const emojiBomb = '😀'.repeat(10);
       const result = avatarSchema.safeParse({
@@ -296,37 +211,3 @@ describe('Security - Input Validation', () => {
   });
 });
 
-describe('Security - ALLOWED_IMAGE_DOMAINS Configuration', () => {
-  it('should include common trusted image CDN domains', () => {
-    const expectedDomains = [
-      'i.imgur.com',
-      'cdn.discordapp.com',
-      'lh3.googleusercontent.com',
-      'avatars.githubusercontent.com'
-    ];
-
-    expectedDomains.forEach(domain => {
-      expect(ALLOWED_IMAGE_DOMAINS).toContain(domain);
-    });
-  });
-
-  it('should not include wildcard or overly permissive domains', () => {
-    expect(ALLOWED_IMAGE_DOMAINS).not.toContain('*');
-    expect(ALLOWED_IMAGE_DOMAINS).not.toContain('*.com');
-  });
-
-  it('should NOT include broad "supabase.co" domain for security', () => {
-    // SECURITY: We should never allow all *.supabase.co domains
-    // Only specific project domains should be whitelisted
-    expect(ALLOWED_IMAGE_DOMAINS).not.toContain('supabase.co');
-  });
-
-  it('should include specific Supabase project domain from environment if configured', () => {
-    // If NEXT_PUBLIC_SUPABASE_URL is set, the specific project domain should be included
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
-      const url = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL);
-      expect(ALLOWED_IMAGE_DOMAINS).toContain(url.hostname);
-    }
-    // If not set, test passes (domain won't be in list, which is fine)
-  });
-});

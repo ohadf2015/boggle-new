@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>LexiClash</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; height: 100%; background: #1a1a2e; color: #fffef0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+      main { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
+      .card { max-width: 28rem; background: #16213e; border: 3px solid #000; border-radius: 12px; box-shadow: 4px 4px 0 #000; padding: 2rem 1.5rem; }
+      [dir="rtl"] .card { box-shadow: -4px 4px 0 #000; }
+      h1 { font-size: 1.75rem; margin: 0 0 0.75rem; letter-spacing: 0.02em; color: #bfff00; }
+      p { font-size: 1rem; line-height: 1.55; margin: 0 0 1.25rem; color: #fffef0cc; }
+      button { background: #bfff00; color: #000; border: 3px solid #000; border-radius: 8px; padding: 0.85rem 1.5rem; font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; box-shadow: 3px 3px 0 #000; }
+      [dir="rtl"] button { box-shadow: -3px 3px 0 #000; }
+      button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 #000; }
+      small { display: block; margin-top: 1.5rem; color: #fffef080; font-size: 0.8rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="card">
+        <h1 id="title">Can't reach LexiClash</h1>
+        <p id="desc">Looks like the connection dropped. Check Wi-Fi or mobile data, then try again.</p>
+        <button id="retry" type="button" onclick="location.href='https://www.lexiclash.live'">Retry</button>
+        <small id="hint">If this keeps happening, reopen the app or reinstall.</small>
+      </div>
+    </main>
+    <script>
+      (function () {
+        var strings = {
+          en: { title: "Can't reach LexiClash", desc: "Looks like the connection dropped. Check Wi-Fi or mobile data, then try again.", retry: "Retry", hint: "If this keeps happening, reopen the app or reinstall." },
+          he: { title: "לא מצליחים להתחבר ל-LexiClash", desc: "נראה שהחיבור נפל. בדקו Wi-Fi או נתונים סלולריים ונסו שוב.", retry: "נסו שוב", hint: "אם זה ממשיך, פתחו מחדש את האפליקציה או התקינו מחדש." },
+          sv: { title: "Kan inte nå LexiClash", desc: "Anslutningen verkar ha brutits. Kontrollera Wi-Fi eller mobildata och försök igen.", retry: "Försök igen", hint: "Om det upprepas, öppna appen igen eller installera om." },
+          ja: { title: "LexiClashに接続できません", desc: "接続が切れたようです。Wi-Fiまたはモバイルデータを確認して、もう一度お試しください。", retry: "再試行", hint: "繰り返し発生する場合は、アプリを再起動するか再インストールしてください。" },
+          es: { title: "No se puede conectar con LexiClash", desc: "Parece que se perdió la conexión. Verifica el Wi-Fi o los datos móviles e inténtalo de nuevo.", retry: "Reintentar", hint: "Si sigue ocurriendo, reabre la aplicación o reinstálala." }
+        };
+        var lang = (navigator.language || "en").slice(0, 2).toLowerCase();
+        var s = strings[lang] || strings.en;
+        document.documentElement.lang = lang in strings ? lang : "en";
+        if (lang === "he") document.documentElement.dir = "rtl";
+        document.getElementById("title").textContent = s.title;
+        document.getElementById("desc").textContent = s.desc;
+        document.getElementById("retry").textContent = s.retry;
+        document.getElementById("hint").textContent = s.hint;
+        document.title = "LexiClash — " + s.title;
+
+        // Auto-recover: the moment connectivity returns, reload straight into
+        // the app instead of making the user tap Retry. Guarded so we only fire
+        // once. (The app itself handles offline play once it has loaded; this
+        // screen only appears when the WebView couldn't reach the host at all.)
+        var HOME = "https://www.lexiclash.live";
+        var recovered = false;
+        function recover() {
+          if (recovered) return;
+          recovered = true;
+          location.href = HOME;
+        }
+        window.addEventListener("online", recover);
+
+        // Cold-start offline bootstrap: Capacitor's errorPath can fire before
+        // the registered service worker gets a chance to serve the cached app
+        // shell. If we're offline and a SW is registered for the host origin,
+        // re-navigate to the host ONCE — the SW's navigation fallback then
+        // serves a cached locale shell so offline-capable modes still open.
+        // sessionStorage guards against an error.html -> host -> error.html loop
+        // when the SW genuinely can't serve (then we just show this screen).
+        (function attemptOfflineBootstrap() {
+          try {
+            if (navigator.onLine !== false) return;            // only when offline
+            if (sessionStorage.getItem("lc_offline_boot") === "1") return; // already tried
+            sessionStorage.setItem("lc_offline_boot", "1");
+            recovered = true;                                   // suppress other handlers
+            location.href = HOME;                               // SW (if controlling) serves cache
+          } catch (e) { /* sessionStorage blocked — fall through to manual UI */ }
+        })();
+        // Belt-and-suspenders: poll, since the 'online' event is unreliable in
+        // some WebViews. Cheap HEAD probe; navigate on first success.
+        var pollTimer = setInterval(function () {
+          if (recovered) { clearInterval(pollTimer); return; }
+          if (navigator.onLine === false) return;
+          fetch(HOME + "/api/ping", { method: "HEAD", cache: "no-store" })
+            .then(function (r) { if (r && (r.ok || r.status === 204)) { clearInterval(pollTimer); recover(); } })
+            .catch(function () {});
+        }, 4000);
+      })();
+    </script>
+  </body>
+</html>

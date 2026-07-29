@@ -1,50 +1,40 @@
 'use client';
 
-import React, { useEffect, useCallback, memo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useCallback, memo, useState } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { Bot } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
+import PlayerProfileTooltip from '../ui/PlayerProfileTooltip';
 import type { Player } from './types';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { fireConfetti, RANK_COLORS } from '@/utils/confettiUtils';
-import { RANK_CONFIG, getRankConfig } from '@/utils/rankingStyles';
+import { RANK_CONFIG } from '@/utils/rankingStyles';
+import useReducedMotion from '@/hooks/useReducedMotion';
+import { ScoreCountUp } from '@/components/results/shared';
 
-// Fire confetti burst for a specific rank with custom origin
+// Fire confetti burst for a specific rank with custom origin.
+// Tuned down 2026-05-15: prior 80-particle x 4-volley burst per rank was overwhelming on MP results.
 const fireConfettiForRank = (rank: number, intensity: number = 1): void => {
-  const count = Math.floor(80 * intensity);
+  const count = Math.floor(30 * intensity);
   const colors = RANK_COLORS[rank] || RANK_COLORS[1];
 
   // Different origin positions for each rank (left, center, right)
   const originX = rank === 1 ? 0.5 : rank === 2 ? 0.25 : 0.75;
 
   fireConfetti({
-    particleCount: Math.floor(count * 0.25),
-    spread: 26,
-    startVelocity: 45,
+    particleCount: Math.floor(count * 0.5),
+    spread: 45,
+    startVelocity: 40,
     origin: { x: originX, y: 0.6 },
     colors,
   });
   fireConfetti({
-    particleCount: Math.floor(count * 0.2),
-    spread: 50,
-    origin: { x: originX, y: 0.6 },
-    colors,
-  });
-  fireConfetti({
-    particleCount: Math.floor(count * 0.35),
+    particleCount: Math.floor(count * 0.5),
     spread: 80,
     decay: 0.91,
-    scalar: 0.8,
-    origin: { x: originX, y: 0.6 },
-    colors,
-  });
-  fireConfetti({
-    particleCount: Math.floor(count * 0.2),
-    spread: 100,
-    startVelocity: 25,
-    decay: 0.92,
-    scalar: 1.1,
+    scalar: 0.85,
     origin: { x: originX, y: 0.6 },
     colors,
   });
@@ -60,11 +50,15 @@ export interface LeaderboardParticipant {
   isCurrentPlayer?: boolean;
   isBot?: boolean;
   avatar?: {
-    emoji?: string;
-    color?: string;
-    profilePictureUrl?: string | null;
-    avatarImage?: string;
+    customAvatar?: CustomAvatarConfig | null;
   };
+}
+
+export interface EmojiReaction {
+  id: string;
+  emoji: string;
+  username: string;
+  timestamp: number;
 }
 
 interface Top3LeaderboardProps {
@@ -79,6 +73,8 @@ interface Top3LeaderboardProps {
   showConfetti?: boolean;
   /** Compact mode - reduced padding and no header (default: false) */
   compact?: boolean;
+  /** Emoji reactions for speech bubbles above podium cards */
+  emojiReactions?: EmojiReaction[];
 }
 
 // Using shared RANK_CONFIG from @/utils/rankingStyles
@@ -92,6 +88,27 @@ interface Top3LeaderboardProps {
  * - Multiplayer mode: Pass `players` prop
  * - Single player mode: Pass `participants` prop (with bots)
  */
+/** Speech bubble that appears above a podium card */
+function PodiumEmojiBubble({ emoji, onDone }: { emoji: string; onDone: () => void }) {
+  useEffect(() => {
+    const timer = setTimeout(onDone, 2500);
+    return () => clearTimeout(timer);
+  }, [onDone]);
+
+  return (
+    <m.div
+      initial={{ scale: 0, y: 10, opacity: 0 }}
+      animate={{ scale: 1, y: -8, opacity: 1 }}
+      exit={{ scale: 0, opacity: 0 }}
+      transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+      className="absolute -top-8 inset-s-1/2 -translate-x-1/2 rtl:translate-x-1/2 z-30 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-lg pointer-events-none"
+    >
+      {emoji}
+      <div className="absolute -bottom-1.5 inset-s-1/2 -translate-x-1/2 rtl:translate-x-1/2 w-3 h-3 bg-neo-cream border-b-3 border-e-3 border-neo-black rotate-45" />
+    </m.div>
+  );
+}
+
 const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   players,
   participants,
@@ -99,8 +116,11 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   headerText,
   showConfetti = true,
   compact = false,
+  emojiReactions = [],
 }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const reducedMotion = useReducedMotion();
+  const rtlFlip = dir === 'rtl' ? -1 : 1;
 
   // Normalize to unified participant format
   const normalizedParticipants: LeaderboardParticipant[] = React.useMemo(() => {
@@ -122,42 +142,46 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
   // Get top 3 participants
   const top3 = normalizedParticipants.slice(0, 3);
 
-  // Fire staggered confetti bursts for top 3 on mount
+  // Fire a single confetti burst for the winner on mount.
+  // Tuned 2026-05-15: previously fired 3 staggered bursts (all top-3); too overwhelming.
   useEffect(() => {
-    if (!showConfetti || top3.length === 0) return;
+    if (!showConfetti || top3.length === 0 || reducedMotion) return;
 
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    top3.forEach((_, index) => {
-      const rank = index + 1;
-      const delay = 600 + index * 300;
-      const intensity = 1 - index * 0.2;
-      const timer = setTimeout(() => fireConfettiForRank(rank, intensity), delay);
-      timers.push(timer);
-    });
-
-    return () => timers.forEach(timer => clearTimeout(timer));
+    const timer = setTimeout(() => fireConfettiForRank(1, 1), 600);
+    return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showConfetti, top3.length]); // Intentionally using length, not full array - only re-fire when count changes
 
-  const handleCardClick = useCallback((rank: number) => {
-    fireConfettiForRank(rank, 0.7);
-  }, []);
+  const handleCardClick = useCallback((rank: number, isCurrentPlayer: boolean) => {
+    if (!reducedMotion) fireConfettiForRank(rank, isCurrentPlayer ? 1.2 : 0.7);
+  }, [reducedMotion]);
+
+  // Emoji speech bubble state
+  const [dismissedBubbles, setDismissedBubbles] = useState<Set<string>>(new Set());
+  const activeBubbles = emojiReactions.filter(r => !dismissedBubbles.has(r.id));
 
   if (top3.length === 0) return null;
 
   // Podium order: 2nd (left), 1st (center), 3rd (right)
   // Podium heights (relative): 1st = tallest, 2nd = medium, 3rd = shortest
   const podiumConfig = {
-    1: { order: 1, height: compact ? 'h-24' : 'h-28', mt: 'mt-0', podiumHeight: compact ? 'h-10' : 'h-12' },
-    2: { order: 0, height: compact ? 'h-20' : 'h-24', mt: compact ? 'mt-4' : 'mt-4', podiumHeight: compact ? 'h-6' : 'h-8' },
-    3: { order: 2, height: compact ? 'h-16' : 'h-20', mt: compact ? 'mt-8' : 'mt-8', podiumHeight: compact ? 'h-4' : 'h-5' },
+    1: { order: 1, mt: 'mt-0', podiumHeight: compact ? 'h-16' : 'h-20' },
+    2: { order: 0, mt: compact ? 'mt-6' : 'mt-8', podiumHeight: compact ? 'h-10' : 'h-12' },
+    3: { order: 2, mt: compact ? 'mt-10' : 'mt-12', podiumHeight: compact ? 'h-7' : 'h-8' },
+  };
+
+  // Card background styling per rank
+  const cardStyles = {
+    1: 'bg-linear-to-b from-amber-300 via-amber-400 to-amber-500',
+    2: 'bg-linear-to-b from-slate-300 to-slate-400',
+    3: 'bg-linear-to-b from-orange-300 via-orange-400 to-orange-500',
   };
 
   // Reorder for podium display: [2nd, 1st, 3rd]
   const podiumOrder = [top3[1], top3[0], top3[2]].filter(Boolean);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: compact ? 0.1 : 0.3 }}
@@ -166,14 +190,14 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
       {/* Header - hidden in compact mode */}
       {!compact && (
         <div className="flex items-center justify-center gap-2 mb-2">
-          <span className="text-xs font-black uppercase tracking-wide text-slate-500 dark:text-slate-400">
-            {headerText || t('results.topPlayers') || 'Top Players'}
+          <span className="text-xs font-black uppercase tracking-wide text-neo-white">
+            {headerText || t('results.topPlayers')}
           </span>
         </div>
       )}
 
       {/* Podium Layout: 2nd - 1st - 3rd */}
-      <div className="flex items-end justify-center gap-1.5">
+      <div className="flex items-end justify-center gap-2 sm:gap-3">
         {podiumOrder.map((participant, displayIndex) => {
           if (!participant) return null;
           // Determine actual rank from original position
@@ -185,93 +209,165 @@ const Top3Leaderboard = memo<Top3LeaderboardProps>(({
           const Icon = config.icon;
 
           return (
-            <motion.div
+            <m.div
               key={participant.name}
-              initial={{ opacity: 0, y: 20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              transition={{ delay: compact ? 0.05 * displayIndex : 0.1 + displayIndex * 0.1, type: 'spring', stiffness: 200 }}
+              initial={{
+                opacity: 0,
+                y: rank === 1 ? -40 : 30,
+                x: rank === 2 ? -30 * rtlFlip : rank === 3 ? 30 * rtlFlip : 0,
+                scale: 0.8,
+              }}
+              animate={{
+                opacity: 1, y: 0, x: 0, scale: 1,
+              }}
+              transition={{ delay: compact ? 0.05 * displayIndex : 0.15 + displayIndex * 0.12, type: 'spring', stiffness: 220, damping: 18 }}
               style={{ order: podium.order }}
-              className={cn('flex flex-col items-center', podium.mt)}
+              className={cn('flex flex-col items-center', podium.mt, rank === 1 && 'z-10')}
             >
+              {/* Emoji speech bubbles above podium card */}
+              <div className="relative">
+                <AnimatePresence>
+                  {activeBubbles
+                    .filter(r => r.username === participant.name)
+                    .slice(0, 3) // max 3 stacked
+                    .map((r, bubbleIdx) => (
+                      <div key={r.id} style={{ position: 'relative', marginBottom: bubbleIdx > 0 ? -4 : 0 }}>
+                        <PodiumEmojiBubble
+                          emoji={r.emoji}
+                          onDone={() => setDismissedBubbles(prev => new Set(prev).add(r.id))}
+                        />
+                      </div>
+                    ))}
+                </AnimatePresence>
+              </div>
+
+              {/* Crown/Medal icon above card for winner */}
+              <m.div
+                initial={{ scale: 0, y: 10 }}
+                animate={{ scale: 1, y: 0 }}
+                transition={{ delay: compact ? 0.1 : 0.4 + displayIndex * 0.1, type: 'spring', stiffness: 300, damping: 15 }}
+                className="mb--1 relative z-10"
+              >
+                <Icon className={cn(
+                  rank === 1 ? 'w-8 h-8 text-amber-400 drop-shadow-[0_2px_4px_rgba(251,191,36,0.5)]' :
+                  rank === 2 ? 'w-6 h-6 text-slate-300 drop-shadow-[0_2px_4px_rgba(148,163,184,0.5)]' :
+                  'w-6 h-6 text-orange-400 drop-shadow-[0_2px_4px_rgba(251,146,60,0.5)]',
+                  compact && 'scale-75'
+                )} />
+              </m.div>
+
               {/* Player Card */}
-              <motion.div
-                whileHover={{ scale: 1.05 }}
+              <m.div
+                whileHover={{ scale: 1.05, y: -4 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => handleCardClick(rank)}
+                onClick={() => handleCardClick(rank, isCurrentPlayer)}
                 className={cn(
-                  'relative rounded-neo border-2 border-neo-black shadow-hard-sm overflow-hidden cursor-pointer',
-                  'bg-white dark:bg-slate-800',
-                  compact ? 'w-20 p-1.5' : 'w-24 p-2',
-                  isCurrentPlayer && 'ring-2 ring-neo-cyan'
+                  'relative rounded-neo border-3 border-neo-black shadow-hard overflow-hidden cursor-pointer',
+                  cardStyles[rank as 1 | 2 | 3],
+                  compact ? 'w-24 p-2' : rank === 1 ? 'w-36 p-3' : 'w-28 p-2.5',
+                  isCurrentPlayer && 'ring-2 ring-neo-cyan ring-offset-2 ring-offset-neo-navy',
                 )}
               >
-                {/* Avatar with rank badge overlay */}
-                <div className="flex justify-center relative mb-1">
+                {/* Subtle halftone texture */}
+                <div className="absolute inset-0 pointer-events-none opacity-[0.06] bg-[radial-gradient(circle,black_1px,transparent_1px)] bg-size-[8px_8px]" />
+
+                {/* Winner glow pulse */}
+                {rank === 1 && !reducedMotion && (
+                  <m.div
+                    className="absolute inset-0 rounded-neo pointer-events-none"
+                    animate={{
+                      boxShadow: [
+                        'inset 0 0 0 0 rgba(191,255,0,0)',
+                        'inset 0 0 20px rgba(191,255,0,0.3)',
+                        'inset 0 0 0 0 rgba(191,255,0,0)',
+                      ],
+                    }}
+                    transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                )}
+
+                {/* Avatar */}
+                <div className="flex justify-center relative mb-1.5">
                   {participant.isBot ? (
                     <div className={cn(
-                      'rounded-full bg-slate-200 dark:bg-slate-700 border-2 border-neo-black flex items-center justify-center',
-                      compact ? 'w-8 h-8' : 'w-10 h-10'
+                      'rounded-full bg-white/80 border-3 border-neo-black flex items-center justify-center shadow-hard-sm',
+                      compact ? 'w-10 h-10' : rank === 1 ? 'w-14 h-14' : 'w-12 h-12'
                     )}>
-                      <Bot className={cn('text-slate-500 dark:text-slate-400', compact ? 'text-sm' : 'text-lg')} />
+                      <Bot className={cn('text-slate-500', compact ? 'w-5 h-5' : 'w-6 h-6')} />
                     </div>
                   ) : (
-                    <Avatar
-                      profilePictureUrl={participant.avatar?.profilePictureUrl ?? undefined}
-                      avatarImage={participant.avatar?.avatarImage}
-                      size="sm"
-                      className={cn('border-2 border-neo-black', compact ? 'w-8 h-8' : 'w-10 h-10')}
-                    />
+                    <div className={cn(
+                      'rounded-full border-3 border-neo-black shadow-hard-sm bg-white/90 p-0.5',
+                      compact ? '' : rank === 1 ? 'p-1' : ''
+                    )}>
+                      <Avatar
+                        customAvatar={participant.avatar?.customAvatar}
+                        userId={participant.name}
+                        size={compact ? 'md' : rank === 1 ? 'xl' : 'lg'}
+                        className={cn(compact ? 'w-9 h-9' : rank === 1 ? 'w-12 h-12' : 'w-10 h-10')}
+                      />
+                    </div>
                   )}
-                  {/* Rank badge overlay */}
-                  <div className={cn(
-                    'absolute -top-1 -end-1 rounded-full flex items-center justify-center border border-neo-black',
-                    compact ? 'w-5 h-5' : 'w-6 h-6',
-                    config.bg
-                  )}>
-                    <Icon className={cn(compact ? 'w-3 h-3' : 'w-3.5 h-3.5', config.text)} />
-                  </div>
                 </div>
 
                 {/* Name */}
-                <p className={cn(
-                  'font-bold text-center truncate text-neo-black dark:text-white',
-                  compact ? 'text-[10px]' : 'text-xs'
-                )}>
-                  {participant.name}
-                  {isCurrentPlayer && <span className="text-neo-cyan"> ★</span>}
-                </p>
+                <PlayerProfileTooltip
+                  player={{
+                    username: participant.name,
+                    customAvatar: participant.avatar?.customAvatar,
+                    score: participant.score,
+                  }}
+                  isCurrentUser={isCurrentPlayer}
+                  side="bottom"
+                >
+                  <p className={cn(
+                    'font-black text-center truncate text-neo-black',
+                    compact ? 'text-[10px]' : rank === 1 ? 'text-sm' : 'text-xs',
+                    !isCurrentPlayer && 'cursor-pointer'
+                  )}>
+                    {participant.name}
+                    {isCurrentPlayer && <span className="text-neo-cyan"> ★</span>}
+                  </p>
+                </PlayerProfileTooltip>
 
-                {/* Score */}
+                {/* Score - prominent display with count-up */}
                 <div className={cn(
-                  'text-center rounded-neo border border-neo-black mt-1',
-                  compact ? 'py-0.5' : 'py-1',
-                  config.bg
+                  'text-center rounded-neo border-2 border-neo-black mt-1.5 bg-white/90 shadow-hard-sm',
+                  compact ? 'py-0.5 px-1' : 'py-1 px-2',
                 )}>
-                  <span className={cn('font-black', compact ? 'text-xs' : 'text-sm', config.text)}>
-                    {participant.score}
+                  <span className={cn('font-black text-neo-black tabular-nums', compact ? 'text-sm' : rank === 1 ? 'text-xl' : 'text-lg')}>
+                    <ScoreCountUp to={participant.score} duration={1400} delay={reducedMotion ? 0 : 400 + displayIndex * 150} />
                   </span>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Podium Base */}
               <div className={cn(
-                'w-full rounded-t-neo border-2 border-neo-black border-b-0 flex items-center justify-center',
-                compact ? 'w-20' : 'w-24',
+                'w-full border-x-3 border-t-3 border-neo-black flex items-start justify-center pt-2',
+                compact ? 'w-24 rounded-t-lg' : rank === 1 ? 'w-36 rounded-t-lg' : 'w-28 rounded-t-lg',
                 podium.podiumHeight,
-                config.bg
+                rank === 1 ? 'bg-linear-to-b from-amber-400 to-amber-500' :
+                rank === 2 ? 'bg-linear-to-b from-slate-300 to-slate-400' :
+                'bg-linear-to-b from-orange-400 to-orange-500',
               )}>
-                <span className={cn('font-black', compact ? 'text-lg' : 'text-xl', config.text)}>
-                  {rank === 1 ? '🥇' : rank === 2 ? '🥈' : '🥉'}
+                <span className={cn(
+                  'font-black',
+                  compact ? 'text-lg' : 'text-2xl',
+                  rank === 1 ? 'text-amber-800' :
+                  rank === 2 ? 'text-slate-600' :
+                  'text-orange-800',
+                )}>
+                  {rank}
                 </span>
               </div>
-            </motion.div>
+            </m.div>
           );
         })}
       </div>
 
       {/* Podium Floor */}
-      <div className="w-full h-2 bg-slate-700 dark:bg-slate-600 border-2 border-neo-black rounded-b-neo -mt-[2px]" />
-    </motion.div>
+      <div className="w-full h-2 bg-neo-black rounded-b-neo -mt-[2px]" />
+    </m.div>
   );
 });
 

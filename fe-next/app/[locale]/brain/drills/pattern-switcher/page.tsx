@@ -1,154 +1,112 @@
-'use client';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import PatternSwitcherPageClient from './PageClient';
 
-import React, { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useNavigation } from '@/contexts/NavigationContext';
-import PatternSwitcher from '@/components/drills/PatternSwitcher';
-import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay';
-import { useDrillGrid } from '@/hooks/useDrillGrid';
-import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
+export const dynamic = 'force-dynamic';
 
-/**
- * Pattern Switcher Drill Page
- *
- * Cognitive Flexibility training drill where players must find
- * words matching specific length requirements that change.
- */
-export default function PatternSwitcherPage() {
-  const router = useRouter();
-  const { theme } = useTheme();
-  const { t, language } = useLanguage();
-  const { setIsInGame } = useNavigation();
-  const isDarkMode = theme === 'dark';
-  const { saveDrillResult } = useSaveDrillResult();
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'brainPatternSwitcher', path: '/brain/drills/pattern-switcher', locale });
+}
 
-  // State for progression overlay
-  const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
-  const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
-
-  // Generate drill grid
-  const { grid, availableWords, isLoading } = useDrillGrid(5, language);
-
-  // Hide bottom nav during drill
-  React.useEffect(() => {
-    setIsInGame(true);
-    return () => setIsInGame(false);
-  }, [setIsInGame]);
-
-  const handleComplete = useCallback(async (result: {
-    score: number;
-    patternsCompleted: number;
-    wordsFound: number;
-    timeSpent: number;
-    level: number;
-  }) => {
-    const saveResult = await saveDrillResult({
-      drillType: 'pattern-switcher',
-      level: result.level,
-      score: result.score,
-      durationSeconds: result.timeSpent,
-      wordsFound: result.wordsFound,
-      extraData: {
-        patternsCompleted: result.patternsCompleted,
+const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
+  en: {
+    title: 'Pattern Switcher — Cognitive Flexibility Word Drill',
+    description: 'Challenge your brain to switch between different word-finding rules each round. Pattern Switcher trains cognitive flexibility — the mental ability to adapt quickly when the rules change — a key executive function linked to learning and problem-solving.',
+    features: [
+      'New word-finding rule every round (length, letter, position)',
+      'Switch cost measured and displayed after each round',
+      'Builds executive control and mental agility',
+      'Tracks rule-switching accuracy over time',
+    ],
+    faq: [
+      {
+        question: 'What is cognitive flexibility?',
+        answer: 'Cognitive flexibility is the ability to shift your thinking between concepts or adapt to new rules quickly. It is an executive function strongly associated with creativity and academic performance.',
       },
-    });
+      {
+        question: 'Why alternate word-finding rules instead of sticking to one?',
+        answer: 'Switching rules forces your brain to suppress the previous strategy and activate a new one. This "task-switching" exercise is one of the most effective ways to strengthen prefrontal cortex function.',
+      },
+      {
+        question: 'How often should I train cognitive flexibility?',
+        answer: 'Short daily sessions of 5–10 minutes are more effective than longer infrequent sessions. Pattern Switcher rounds are designed to fit into a daily warm-up routine.',
+      },
+    ],
+  },
+  he: {
+    title: 'מחליף דפוסים — תרגיל מילים לגמישות קוגניטיבית',
+    description: 'אתגר את מוחך לעבור בין כללי חיפוש מילים שונים בכל סיבוב. מחליף דפוסים מאמן גמישות קוגניטיבית — היכולת המנטלית להסתגל במהירות כשהכללים משתנים — תפקוד ניהולי מרכזי הקשור ללמידה ופתרון בעיות.',
+    features: [
+      'כלל חיפוש מילים חדש בכל סיבוב',
+      'עלות המיתוג נמדדת ומוצגת לאחר כל סיבוב',
+      'בונה שליטה ניהולית וזריזות מנטלית',
+      'עוקב אחר דיוק מיתוג כללים לאורך זמן',
+    ],
+    faq: [
+      {
+        question: 'מהי גמישות קוגניטיבית?',
+        answer: 'גמישות קוגניטיבית היא היכולת לעבור בין מושגים או להסתגל לכללים חדשים במהירות. זהו תפקוד ניהולי הקשור קשר הדוק ליצירתיות וביצועים אקדמיים.',
+      },
+    ],
+  },
+  sv: {
+    title: 'Mönsterväxlaren — Ordövning i kognitiv flexibilitet',
+    description: 'Träna hjärnan att växla mellan olika ordsökregler varje runda. Mönsterväxlaren stärker kognitiv flexibilitet — en nyckelkompetens kopplad till inlärning och problemlösning.',
+    features: [
+      'Ny ordsökregel varje runda',
+      'Växlingskostnaden mäts och visas',
+      'Stärker exekutiv kontroll och mental smidighet',
+      'Spårar din regelväxlingsprecision',
+    ],
+    faq: [],
+  },
+  ja: {
+    title: 'パターンスイッチャー — 認知柔軟性ワードドリル',
+    description: 'ラウンドごとに異なる単語探しルールに切り替えながら、脳の適応力を鍛えましょう。認知柔軟性は学習や問題解決に深く関わる重要な実行機能です。',
+    features: [
+      'ラウンドごとに新しい単語探しルール',
+      '切り替えコストを測定・表示',
+      '実行制御と精神的な敏捷性を強化',
+      'ルール切り替え精度を経時追跡',
+    ],
+    faq: [
+      {
+        question: '認知柔軟性とは何ですか？',
+        answer: '概念間の思考を切り替えたり、新しいルールに素早く適応する能力です。創造性や学業成績と強く関連する実行機能です。',
+      },
+    ],
+  },
+  es: {
+    title: 'Cambiador de Patrones — Ejercicio de Flexibilidad Cognitiva',
+    description: 'Desafía tu cerebro a cambiar entre diferentes reglas de búsqueda de palabras cada ronda. El Cambiador de Patrones entrena la flexibilidad cognitiva — la capacidad mental de adaptarse rápidamente cuando las reglas cambian — una función ejecutiva clave vinculada al aprendizaje.',
+    features: [
+      'Nueva regla de búsqueda de palabras cada ronda',
+      'El costo de cambio se mide y muestra tras cada ronda',
+      'Desarrolla el control ejecutivo y la agilidad mental',
+      'Rastrea la precisión de cambio de reglas con el tiempo',
+    ],
+    faq: [
+      {
+        question: '¿Qué es la flexibilidad cognitiva?',
+        answer: 'La flexibilidad cognitiva es la capacidad de cambiar el pensamiento entre conceptos o adaptarse a nuevas reglas rápidamente. Es una función ejecutiva fuertemente asociada con la creatividad y el rendimiento académico.',
+      },
+      {
+        question: '¿Por qué alternar reglas en lugar de usar siempre la misma?',
+        answer: 'Cambiar de regla obliga al cerebro a suprimir la estrategia anterior y activar una nueva. Este ejercicio de cambio de tarea es una de las formas más efectivas de fortalecer la función prefrontal.',
+      },
+    ],
+  },
+};
 
-    // Show progression overlay if we got brainScore data back
-    if (saveResult.success && saveResult.brainScore) {
-      setBrainScoreUpdate(saveResult.brainScore);
-      setShowProgressionOverlay(true);
-    }
-  }, [saveDrillResult]);
-
-  const handleExit = useCallback(() => {
-    router.push(`/${language}/brain`);
-  }, [router, language]);
-
-  const handleBack = useCallback(() => {
-    router.push(`/${language}/brain`);
-  }, [router, language]);
-
-  if (isLoading || grid.length === 0) {
-    return (
-      <div className={cn(
-        'min-h-screen flex items-center justify-center',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className={cn(
-            'w-12 h-12 border-4 border-t-transparent rounded-full',
-            isDarkMode ? 'border-neo-cyan' : 'border-neo-cyan'
-          )}
-        />
-      </div>
-    );
-  }
-
+export default async function PatternSwitcherPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const content = seoContent[locale] || seoContent.en;
   return (
-    <div className={cn(
-      'min-h-screen flex flex-col',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-    )}>
-      {/* Header */}
-      <header className={cn(
-        'flex items-center justify-between px-4 py-3',
-        'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <button
-          onClick={handleBack}
-          className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-neo',
-            'border-3 border-neo-black shadow-hard-sm',
-            'transition-all hover:translate-y-[-2px] hover:shadow-hard',
-            isDarkMode ? 'bg-neo-navy text-neo-white' : 'bg-neo-cream text-neo-black'
-          )}
-        >
-          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-          <span className="font-bold text-sm hidden sm:inline">{t('common.back')}</span>
-        </button>
-
-        <h1 className={cn(
-          'text-lg font-black uppercase tracking-wide',
-          isDarkMode ? 'text-neo-white' : 'text-neo-black'
-        )}>
-          {t('brain.drills.pattern-switcher.name')}
-        </h1>
-
-        <div className="w-10" /> {/* Spacer */}
-      </header>
-
-      {/* Drill Content */}
-      <div className="flex-1">
-        <PatternSwitcher
-          grid={grid}
-          availableWords={availableWords}
-          level={1}
-          language={language}
-          onComplete={handleComplete}
-          onExit={handleExit}
-        />
-      </div>
-
-      {/* Brain Score Progression Overlay */}
-      {brainScoreUpdate && (
-        <DrillProgressionOverlay
-          isOpen={showProgressionOverlay}
-          onClose={() => setShowProgressionOverlay(false)}
-          targetDomain={brainScoreUpdate.targetDomain}
-          newDomainScore={brainScoreUpdate.domainScores[brainScoreUpdate.targetDomain]}
-          scoreDelta={brainScoreUpdate.scoreDelta}
-          overallScore={brainScoreUpdate.overallScore}
-          tier={brainScoreUpdate.tier}
-        />
-      )}
-    </div>
+    <>
+      <PatternSwitcherPageClient />
+      <GamePageSeoContent title={content.title} description={content.description} features={content.features} faq={content.faq} />
+    </>
   );
 }

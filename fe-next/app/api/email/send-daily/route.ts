@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import {
   isEmailServiceConfigured,
   getEligibleRecipients,
@@ -25,13 +26,13 @@ export async function POST(request: NextRequest) {
   const expectedSecret = process.env.CRON_SECRET;
 
   if (expectedSecret && cronSecret !== expectedSecret && cronSecret !== `Bearer ${expectedSecret}`) {
-    console.warn('[Email Cron] Unauthorized request attempted');
+    logger.warn('[Email Cron] Unauthorized request attempted');
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   // Check if email service is configured
   if (!isEmailServiceConfigured()) {
-    console.warn('[Email Cron] Email service not configured');
+    logger.warn('[Email Cron] Email service not configured');
     return NextResponse.json(
       { error: 'Email service not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL.' },
       { status: 503 }
@@ -45,12 +46,12 @@ export async function POST(request: NextRequest) {
     // Get current UTC hour for timezone filtering
     const currentHourUTC = new Date().getUTCHours();
 
-    console.log(`[Email Cron] Starting daily email send at UTC hour ${currentHourUTC}`);
+    logger.log(`[Email Cron] Starting daily email send at UTC hour ${currentHourUTC}`);
 
     // Get eligible recipients (users whose local time is ~8 AM)
     const recipients = await getEligibleRecipients(currentHourUTC);
 
-    console.log(`[Email Cron] Found ${recipients.length} eligible recipients`);
+    logger.log(`[Email Cron] Found ${recipients.length} eligible recipients`);
 
     if (recipients.length === 0) {
       return NextResponse.json({
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    console.log(`[Email Cron] Completed: ${sent} sent, ${failed} failed`);
+    logger.log(`[Email Cron] Completed: ${sent} sent, ${failed} failed`);
 
     return NextResponse.json({
       success: true,
@@ -93,7 +94,8 @@ export async function POST(request: NextRequest) {
       errors: errors.length > 0 ? errors : undefined,
     });
   } catch (error) {
-    console.error('[Email Cron] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('[Email Cron] Error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/email/send-daily',

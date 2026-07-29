@@ -5,15 +5,18 @@
 
 import type { Server, Socket } from 'socket.io';
 import type { Game, ChatMessagePayload } from '@/shared/types';
-
-const { getGame, getGameBySocketId, getUsernameBySocketId } = require('../modules/gameStateManager');
-const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
-const { cleanProfanity } = require('../utils/profanityFilter');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const { inc } = require('../utils/metrics');
-const { isSocketMigrating } = require('./shared');
-const { validatePayload, chatMessageSchema } = require('../utils/socketValidation');
+import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
+import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
+import { cleanProfanity } from '../utils/profanityFilter';
+import { sanitizeHtml } from '../utils/sanitize';
+import { emitError, ErrorCodes } from '../utils/errorHandler';
+import { checkRateLimit } from '../utils/rateLimiter';
+import { checkSocketRateLimit } from '../middleware/rateLimiterRedis';
+import { inc } from '../utils/metrics';
+import logger from '../utils/logger';
+import { isSocketMigrating } from './shared';
+import { validatePayload, chatMessageSchema } from '../utils/socketValidation';
+import { ensureSocialCapability } from '../utils/socialPolicyServer';
 
 // Rate limit weight for chat
 const CHAT_WEIGHT = parseInt(process.env.RATE_WEIGHT_CHAT || '1');
@@ -29,18 +32,6 @@ interface ChatHistoryRequest {
 }
 
 /**
- * Sanitize HTML to prevent XSS attacks
- */
-function sanitizeHtml(str: string): string {
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-/**
  * Register chat-related socket event handlers
  * @param io - Socket.IO server instance
  * @param socket - Socket.IO socket instance
@@ -48,7 +39,7 @@ function sanitizeHtml(str: string): string {
 function registerChatHandlers(io: Server, socket: Socket): void {
 
   // Handle chat messages
-  socket.on('chatMessage', (data: ChatMessageData) => {
+  socket.on('chatMessage', async (data: ChatMessageData) => {
     if (isSocketMigrating(socket)) return;
 
     if (!checkRateLimit(socket.id, CHAT_WEIGHT)) {
@@ -57,10 +48,25 @@ function registerChatHandlers(io: Server, socket: Socket): void {
       return;
     }
 
+    // Per-action rate limit for chat messages (3/s)
+    const rl = await checkSocketRateLimit(socket.id, 'chatMessage');
+    if (!rl.allowed) {
+      logger.warn('RATE_LIMIT', 'Rate limited', { socketId: socket.id, action: 'chatMessage' });
+      socket.emit('rate-limited', { action: 'chatMessage', retryAfterMs: rl.retryAfterMs });
+      return;
+    }
+
     // Validate payload
     const validation = validatePayload(chatMessageSchema, data);
     if (!validation.success) {
-      emitError(socket, `Invalid request: ${validation.error}`);
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
+      return;
+    }
+
+    // Families Policy: block freeform chat with strangers for child / unknown-age
+    // users. Enforced server-side — the client also hides the UI, but never trust it.
+    if (!(await ensureSocialCapability(socket, 'publicRoomChat'))) {
+      emitError(socket, ErrorCodes.SOCIAL_RESTRICTED);
       return;
     }
 
@@ -69,13 +75,13 @@ function registerChatHandlers(io: Server, socket: Socket): void {
     const username = getUsernameBySocketId(socket.id);
 
     if (!gameCode || !message || !username) {
-      emitError(socket, ErrorMessages.INVALID_MESSAGE);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
@@ -101,11 +107,13 @@ function registerChatHandlers(io: Server, socket: Socket): void {
       game.chatHistory = game.chatHistory.slice(-100);
     }
 
+    // Use non-volatile broadcast — chat messages must not be silently dropped (R-1)
     broadcastToRoom(io, getGameRoom(gameCode), 'chatMessage', chatMessageData);
   });
 
   // Handle chat history request (for late joiners and page refresh)
   socket.on('requestChatHistory', (data: ChatHistoryRequest) => {
+    if (!checkRateLimit(socket.id)) return;
     if (isSocketMigrating(socket)) return;
 
     const gameCode = data?.gameCode || getGameBySocketId(socket.id);
@@ -123,7 +131,5 @@ function registerChatHandlers(io: Server, socket: Socket): void {
     socket.emit('chatHistory', { messages: game.chatHistory });
   });
 }
-
-module.exports = { registerChatHandlers };
 
 export { registerChatHandlers };

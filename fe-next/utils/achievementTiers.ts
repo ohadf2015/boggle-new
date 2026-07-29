@@ -18,6 +18,14 @@ export const HALL_OF_FAME_ACHIEVEMENTS = new Set([
   'PRECISION_MASTER',   // 45+ words with 100% accuracy
   'ANAGRAM_ARTIST',     // 2 consecutive anagram words (luck + skill)
 
+  // Rare "word feat" achievements (clever + very hard)
+  'CONSONANT_CULT',     // 4+ letter word with no vowels
+  'VOWEL_HOARDER',      // one word with every vowel A,E,I,O,U
+  'ROGUE_Q',            // a Q with no U
+  'LEVIATHAN',          // a 12+ letter word
+  'NO_REPEATS',         // 8+ letter isogram
+  'FLAWLESS_VICTORY',   // won with zero invalid submissions
+
   // Top-tier lifetime achievements (require significant dedication)
   'LEGEND',             // 100 wins total
   'CENTURION',          // 100 games played
@@ -182,6 +190,79 @@ export function getTierProgress(count: number): TierProgress {
     progress,
     isMaxTier: false,
   };
+}
+
+/**
+ * Visual intensifiers for the achievement toast keyed by tier rarity.
+ * Drives sparkle count, pulse radius, shine repetitions, confetti volume,
+ * and the colored hard-shadow Tailwind class — so rarer tiers feel rarer.
+ *
+ * `shadowClass` always returns a known token from tailwind.config.js.
+ * Falls back to `shadow-hard-yellow` for unknown / null tiers (the
+ * neo-brutalist-fixes test depends on this default).
+ */
+export interface TierToastStyle {
+  shadowClass: 'shadow-hard-yellow' | 'shadow-hard-cyan' | 'shadow-hard-purple';
+  sparkleCount: number;
+  pulseRadius: number;
+  shineRepeat: number;
+  confettiCount: number;
+  confettiSpread: number;
+  showRarityBadge: boolean;
+}
+
+const TIER_TOAST_STYLE: Record<TierName, TierToastStyle> = {
+  BRONZE: {
+    shadowClass: 'shadow-hard-yellow',
+    sparkleCount: 3,
+    pulseRadius: 7,
+    shineRepeat: 1,
+    confettiCount: 28,
+    confettiSpread: 55,
+    showRarityBadge: false,
+  },
+  SILVER: {
+    shadowClass: 'shadow-hard-cyan',
+    sparkleCount: 4,
+    pulseRadius: 8,
+    shineRepeat: 1,
+    confettiCount: 36,
+    confettiSpread: 65,
+    showRarityBadge: false,
+  },
+  GOLD: {
+    shadowClass: 'shadow-hard-yellow',
+    sparkleCount: 5,
+    pulseRadius: 10,
+    shineRepeat: 2,
+    confettiCount: 48,
+    confettiSpread: 80,
+    showRarityBadge: true,
+  },
+  PLATINUM: {
+    shadowClass: 'shadow-hard-purple',
+    sparkleCount: 6,
+    pulseRadius: 13,
+    shineRepeat: 2,
+    confettiCount: 64,
+    confettiSpread: 95,
+    showRarityBadge: true,
+  },
+};
+
+const DEFAULT_TIER_TOAST_STYLE: TierToastStyle = {
+  shadowClass: 'shadow-hard-yellow',
+  sparkleCount: 3,
+  pulseRadius: 7,
+  shineRepeat: 1,
+  confettiCount: 28,
+  confettiSpread: 55,
+  showRarityBadge: false,
+};
+
+export function getTierToastStyle(tier: TierName | null | undefined): TierToastStyle {
+  if (!tier) return DEFAULT_TIER_TOAST_STYLE;
+  return TIER_TOAST_STYLE[tier] ?? DEFAULT_TIER_TOAST_STYLE;
 }
 
 /**

@@ -15,13 +15,16 @@ interface UseTvSoundsResult {
   setVolume: (volume: number) => void;
 }
 
-// Sound file paths (using existing sounds)
+// Sound file paths - using higher-quality sounds where available
 const SOUND_PATHS: Record<NotificationTier | 'combo_break', string> = {
-  subtle: '/sounds/word-accepted.wav',
-  medium: '/sounds/achievment.mp3',
-  mega: '/sounds/fire-round-start.wav',
-  combo_break: '/sounds/earthquake-rumble.wav',
+  subtle: '/sounds/combo.wav',
+  medium: '/sounds/combo-milestone.mp3',
+  mega: '/sounds/achievement.mp3',
+  combo_break: '/sounds/combo-break.mp3',
 };
+
+// Minimum gap between any sound plays (ms)
+const MIN_SOUND_GAP_MS = 2000;
 
 /**
  * useTvSounds - Handles sound effects for TV broadcast notifications
@@ -34,10 +37,11 @@ export function useTvSounds({
   const audioRefs = useRef<Record<string, HTMLAudioElement | null>>({});
   const mutedRef = useRef(false);
   const volumeRef = useRef(initialVolume);
+  const lastSoundTimeRef = useRef(0);
 
   // Get global mute settings
   const { sfxMuted, sfxVolume } = useSoundEffects();
-  const { isMuted: musicMuted, audioUnlocked } = useMusic();
+  const { audioUnlocked } = useMusic();
 
   // Pre-load audio files
   useEffect(() => {
@@ -68,37 +72,41 @@ export function useTvSounds({
     };
   }, [enabled]);
 
-  // Play sound by tier - respects global mute settings
+  // Play sound by tier - respects global mute settings and minimum gap
   const playSound = useCallback((tier: NotificationTier) => {
-    // Check both local and global mute settings
-    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted || musicMuted) return;
+    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted) return;
+
+    const now = Date.now();
+    if (now - lastSoundTimeRef.current < MIN_SOUND_GAP_MS) return;
 
     const audio = audioRefs.current[tier];
     if (audio) {
-      // Reset and play - use global SFX volume
+      lastSoundTimeRef.current = now;
       audio.currentTime = 0;
       audio.volume = sfxVolume * volumeRef.current;
       audio.play().catch(error => {
-        // Silently fail if autoplay is blocked
         console.debug('TV sound play failed:', error);
       });
     }
-  }, [enabled, audioUnlocked, sfxMuted, musicMuted, sfxVolume]);
+  }, [enabled, audioUnlocked, sfxMuted, sfxVolume]);
 
-  // Play combo break sound - respects global mute settings
+  // Play combo break sound - respects global mute settings and minimum gap
   const playComboBreak = useCallback(() => {
-    // Check both local and global mute settings
-    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted || musicMuted) return;
+    if (!enabled || mutedRef.current || !audioUnlocked || sfxMuted) return;
+
+    const now = Date.now();
+    if (now - lastSoundTimeRef.current < MIN_SOUND_GAP_MS) return;
 
     const audio = audioRefs.current['combo_break'];
     if (audio) {
+      lastSoundTimeRef.current = now;
       audio.currentTime = 0;
       audio.volume = sfxVolume * volumeRef.current;
       audio.play().catch(error => {
         console.debug('Combo break sound play failed:', error);
       });
     }
-  }, [enabled, audioUnlocked, sfxMuted, musicMuted, sfxVolume]);
+  }, [enabled, audioUnlocked, sfxMuted, sfxVolume]);
 
   // Set muted state
   const setMuted = useCallback((muted: boolean) => {

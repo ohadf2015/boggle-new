@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Sparkles, PartyPopper } from 'lucide-react';
-import { Dialog, DialogContent, DialogBody } from '../ui/dialog';
+import { Dialog, DialogContent, DialogBody, DialogTitle } from '../ui/dialog';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useNewYearDetection, formatTimeRemaining } from '../../hooks/useNewYearDetection';
 import { triggerHaptic } from '../../utils/hapticFeedback';
@@ -25,7 +25,20 @@ interface NewYearCountdownProps {
  *
  * All times calculated in player's local timezone.
  */
-export default function NewYearCountdown({ enabled = true }: NewYearCountdownProps) {
+function isWithinNewYearWindow(): boolean {
+  const now = new Date();
+  const month = now.getMonth();
+  const day = now.getDate();
+  return (month === 11 && day >= 29) || (month === 0 && day <= 2);
+}
+
+export default function NewYearCountdown(props: NewYearCountdownProps) {
+  const { enabled = true } = props;
+  if (!enabled || !isWithinNewYearWindow()) return null;
+  return <NewYearCountdownInner {...props} />;
+}
+
+function NewYearCountdownInner({ enabled = true }: NewYearCountdownProps) {
   const { t } = useLanguage();
   const newYearState = useNewYearDetection({ enabled });
 
@@ -106,8 +119,8 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
       {/* Pre-notification toast */}
       <AnimatePresence>
         {showPreNotification && (
-          <motion.div
-            className="fixed top-4 right-4 z-[9998] max-w-xs"
+          <m.div
+            className="fixed top-4 right-4 z-9998 max-w-xs"
             initial={{ opacity: 0, x: 100, rotate: 3 }}
             animate={{ opacity: 1, x: 0, rotate: 0 }}
             exit={{ opacity: 0, x: 100, rotate: -3 }}
@@ -115,10 +128,10 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
           >
             <div className="bg-neo-pink text-neo-white border-3 border-neo-black rounded-neo-lg shadow-hard-lg p-4">
               <div className="flex items-center gap-3">
-                <Sparkles className="w-6 h-6 flex-shrink-0" />
+                <Sparkles className="w-6 h-6 shrink-0" />
                 <div>
                   <p className="font-black text-sm uppercase">
-                    {t('newYear.comingSoon') || 'Something special coming soon...'}
+                    {t('newYear.comingSoon')}
                   </p>
                   <p className="text-xs font-medium opacity-90">
                     {formatTimeRemaining(newYearState.secondsUntilMidnight)}
@@ -126,15 +139,18 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                 </div>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       {/* Countdown Modal */}
       <Dialog open={showCountdown} onOpenChange={(open) => { if (!open) setShowCountdown(false); }}>
         <DialogContent noDescription className="max-w-md">
+          <DialogTitle className="sr-only">
+            {t('newYear.countdownTitle')}
+          </DialogTitle>
           <DialogBody className="text-center py-8">
-            <motion.div
+            <m.div
               className="flex flex-col items-center gap-6"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -143,15 +159,15 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
 
               <div>
                 <h2 className="text-2xl font-black uppercase mb-2 text-neo-black">
-                  {t('newYear.countdownTitle') || 'New Year Countdown'}
+                  {t('newYear.countdownTitle')}
                 </h2>
                 <p className="text-sm font-medium text-neo-black/70">
-                  {t('newYear.countdownSubtitle') || 'Get ready to celebrate!'}
+                  {t('newYear.countdownSubtitle')}
                 </p>
               </div>
 
               {/* Countdown number */}
-              <motion.div
+              <m.div
                 key={newYearState.secondsUntilMidnight}
                 className="relative"
                 initial={{ scale: 0, rotate: -10 }}
@@ -166,12 +182,12 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                 >
                   {newYearState.secondsUntilMidnight}
                 </div>
-              </motion.div>
+              </m.div>
 
               <p className="text-lg font-bold text-neo-black uppercase">
-                {t('newYear.almostThere') || 'Almost there!'}
+                {t('newYear.almostThere')}
               </p>
-            </motion.div>
+            </m.div>
           </DialogBody>
         </DialogContent>
       </Dialog>
@@ -179,8 +195,11 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
       {/* Celebration Modal with Fireworks */}
       <Dialog open={showCelebration} onOpenChange={setShowCelebration}>
         <DialogContent noDescription className="max-w-2xl overflow-hidden">
+          <DialogTitle className="sr-only">
+            {t('newYear.happyNewYear')}
+          </DialogTitle>
           <DialogBody className="text-center py-12 relative">
-            <motion.div
+            <m.div
               className="flex flex-col items-center gap-8"
               initial={{ scale: 0.5, opacity: 0, rotate: -10 }}
               animate={{ scale: 1, opacity: 1, rotate: 0 }}
@@ -190,7 +209,7 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
 
               {/* Happy New Year text */}
               <div className="relative">
-                <motion.h1
+                <m.h1
                   className="text-6xl sm:text-7xl md:text-8xl font-black uppercase tracking-tight"
                   style={{
                     background: 'linear-gradient(135deg, var(--neo-lime) 0%, var(--neo-red) 25%, var(--neo-pink) 50%, var(--neo-pink) 75%, var(--neo-cyan) 100%)',
@@ -209,33 +228,33 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                     ease: 'easeInOut',
                   }}
                 >
-                  {t('newYear.happyNewYear') || 'Happy New Year!'}
-                </motion.h1>
+                  {t('newYear.happyNewYear')}
+                </m.h1>
 
                 {/* Year badge */}
-                <motion.div
+                <m.div
                   className="mt-6 inline-block bg-neo-cyan text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg px-8 py-3"
                   initial={{ scale: 0, rotate: -15 }}
                   animate={{ scale: 1, rotate: 0 }}
                   transition={{ delay: 0.3, type: 'spring', damping: 12 }}
                 >
                   <span className="text-5xl font-black">{newYearState.celebrationYear}</span>
-                </motion.div>
+                </m.div>
               </div>
 
-              <motion.p
+              <m.p
                 className="text-xl font-bold text-neo-black uppercase max-w-md"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}
               >
-                {t('newYear.celebrationMessage') || 'Wishing you an amazing year ahead filled with words, wins, and wonder!'}
-              </motion.p>
+                {t('newYear.celebrationMessage')}
+              </m.p>
 
               {/* Confetti emoji decorations */}
               <div className="flex gap-4 text-4xl">
                 {['🎉', '✨', '🎊', '🥳', '🎆'].map((emoji, i) => (
-                  <motion.span
+                  <m.span
                     key={emoji}
                     initial={{ opacity: 0, y: 20, rotate: 0 }}
                     animate={{
@@ -251,10 +270,10 @@ export default function NewYearCountdown({ enabled = true }: NewYearCountdownPro
                     }}
                   >
                     {emoji}
-                  </motion.span>
+                  </m.span>
                 ))}
               </div>
-            </motion.div>
+            </m.div>
           </DialogBody>
         </DialogContent>
       </Dialog>

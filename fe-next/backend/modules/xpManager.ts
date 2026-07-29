@@ -7,11 +7,29 @@
 export const XP_CONFIG = {
   // Base XP rewards
   GAME_COMPLETION: 50,    // Base XP for completing a game
-  SCORE_MULTIPLIER: 0.5,  // XP per point scored
+  SCORE_MULTIPLIER: 0.15, // XP per point scored (reduced from 0.5 to prevent inflation)
   WIN_BONUS: 50,          // Bonus XP for winning (1st place in multiplayer)
   ACHIEVEMENT_XP: 100,    // XP per achievement earned in-game
 
-  // Level curve: XP needed = 100 * level^1.5
+  // Per-game XP caps
+  SINGLEPLAYER_CAP: 300,  // Max XP from a single singleplayer game
+  MULTIPLAYER_CAP: 400,   // Max XP from a single multiplayer game
+  ACHIEVEMENT_CAP: 200,   // Max achievement XP per game (2 achievements worth)
+
+  // Daily XP cap thresholds (applied server-side in increment_player_xp)
+  DAILY_FULL_RATE: 1500,     // First 1500 XP/day at 100%
+  DAILY_HALF_RATE: 3000,     // 1500-3000 XP/day at 50%
+  // Above 3000 XP/day: 25% rate
+
+  // Level-based diminishing returns
+  DIMINISHING_RETURNS: {
+    25: 1.0,   // Levels 1-25: 100%
+    50: 0.85,  // Levels 26-50: 85%
+    75: 0.70,  // Levels 51-75: 70%
+    100: 0.55, // Levels 76-100: 55%
+  } as Record<number, number>,
+
+  // Level curve: XP needed = 100 * level^exponent
   LEVEL_EXPONENT: 1.5,
   LEVEL_BASE: 100,
 
@@ -114,7 +132,7 @@ export interface NextMilestone {
 }
 
 /**
- * Calculate XP earned from a game
+ * Calculate XP earned from a game (with per-game caps)
  */
 export function calculateGameXp(gameStats: GameStats): XpResult {
   const { score = 0, isWinner = false, achievementCount = 0, playerCount = 1 } = gameStats;
@@ -123,7 +141,7 @@ export function calculateGameXp(gameStats: GameStats): XpResult {
     gameCompletion: XP_CONFIG.GAME_COMPLETION,
     scoreXp: Math.round(score * XP_CONFIG.SCORE_MULTIPLIER),
     winBonus: 0,
-    achievementXp: achievementCount * XP_CONFIG.ACHIEVEMENT_XP,
+    achievementXp: Math.min(achievementCount * XP_CONFIG.ACHIEVEMENT_XP, XP_CONFIG.ACHIEVEMENT_CAP),
   };
 
   // Only award win bonus for multiplayer games
@@ -131,12 +149,89 @@ export function calculateGameXp(gameStats: GameStats): XpResult {
     breakdown.winBonus = XP_CONFIG.WIN_BONUS;
   }
 
-  const totalXp = breakdown.gameCompletion + breakdown.scoreXp + breakdown.winBonus + breakdown.achievementXp;
+  const rawTotal = breakdown.gameCompletion + breakdown.scoreXp + breakdown.winBonus + breakdown.achievementXp;
+
+  // Apply per-game cap based on mode
+  const isMultiplayer = playerCount > 1;
+  const cap = isMultiplayer ? XP_CONFIG.MULTIPLAYER_CAP : XP_CONFIG.SINGLEPLAYER_CAP;
+  const totalXp = Math.min(rawTotal, cap);
 
   return {
     totalXp,
     breakdown,
   };
+}
+
+/**
+ * Whether a multiplayer game had a real opponent to play against.
+ *
+ * Multiplayer XP is only granted when at least one OTHER real (non-bot) player
+ * was in the game — a lobby filled out with bots (a lone human) grants no XP.
+ * `realPlayerCount` is the number of non-bot participants (bots already filtered
+ * out upstream in gameResults.ts). This does NOT govern single-player play,
+ * which awards XP through a separate path.
+ */
+export function hasRealOpponent(realPlayerCount: number | null | undefined): boolean {
+  return (realPlayerCount ?? 0) >= 2;
+}
+
+/**
+ * Get diminishing returns factor based on player level.
+ * Higher-level players earn progressively less XP per game,
+ * making progression harder over time.
+ */
+export function getDiminishingReturnsFactor(level: number): number {
+  if (level <= 25) return 1.0;
+  if (level <= 50) return 0.85;
+  if (level <= 75) return 0.70;
+  return 0.55;
+}
+
+/**
+ * Calculate effective XP after applying daily cap with tiered decay.
+ * - First 1500 XP/day: 100% rate
+ * - 1500-3000 XP/day: 50% rate
+ * - 3000+ XP/day: 25% rate
+ *
+ * @param xpToAdd - Raw XP being awarded
+ * @param dailyXpSoFar - XP already earned today
+ * @returns Effective XP after daily cap
+ */
+export function getDailyXpCap(xpToAdd: number, dailyXpSoFar: number): number {
+  if (xpToAdd <= 0) return 0;
+
+  const FULL = XP_CONFIG.DAILY_FULL_RATE;   // 1500
+  const HALF = XP_CONFIG.DAILY_HALF_RATE;   // 3000
+
+  let remaining = xpToAdd;
+  let effective = 0;
+  let cursor = dailyXpSoFar;
+
+  // Zone 1: Full rate (0 - FULL)
+  if (cursor < FULL && remaining > 0) {
+    const spaceInZone = FULL - cursor;
+    const inZone = Math.min(remaining, spaceInZone);
+    effective += inZone; // 100%
+    remaining -= inZone;
+    cursor += inZone;
+  }
+
+  // Zone 2: Half rate (FULL - HALF)
+  if (cursor < HALF && remaining > 0) {
+    const spaceInZone = HALF - cursor;
+    const inZone = Math.min(remaining, spaceInZone);
+    effective += Math.round(inZone * 0.5);
+    remaining -= inZone;
+    cursor += inZone;
+  }
+
+  // Zone 3: Quarter rate (HALF+)
+  if (remaining > 0) {
+    effective += Math.round(remaining * 0.25);
+  }
+
+  // Always award at least 1 XP for a positive input
+  return Math.max(1, effective);
 }
 
 /**
@@ -332,10 +427,19 @@ export function canPrestige(currentLevel: number, currentPrestige: number): bool
 }
 
 /**
- * Get the XP multiplier for a prestige level
+ * Get the XP multiplier for a prestige level.
+ * Accumulates bonuses from all ranks up to and including the given level.
+ * E.g. prestige 3 = 1.0 + (1.05-1.0) + (1.10-1.0) + (1.15-1.0) = 1.30
  */
 export function getPrestigeMultiplier(prestigeLevel: number): number {
-  return PRESTIGE_CONFIG.MULTIPLIERS[prestigeLevel] || 1.00;
+  if (prestigeLevel <= 0) return 1.0;
+  const maxLevel = Math.min(prestigeLevel, PRESTIGE_CONFIG.MAX_PRESTIGE);
+  let accumulated = 1.0;
+  for (let rank = 1; rank <= maxLevel; rank++) {
+    const rankMultiplier = PRESTIGE_CONFIG.MULTIPLIERS[rank] ?? 1.0;
+    accumulated += rankMultiplier - 1.0;
+  }
+  return Math.round(accumulated * 100) / 100;
 }
 
 /**
@@ -441,7 +545,7 @@ function formatTitleName(title: string): string {
 /**
  * Convert number to Roman numeral (for prestige display)
  */
-function toRoman(num: number): string {
+export function toRoman(num: number): string {
   const romanNumerals: [number, string][] = [
     [5, 'V'],
     [4, 'IV'],
@@ -458,25 +562,3 @@ function toRoman(num: number): string {
   return result;
 }
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  calculateGameXp,
-  getXpForLevel,
-  getLevelFromXp,
-  getXpProgress,
-  getTitleForLevel,
-  getUnlockedTitles,
-  checkLevelUp,
-  getLevelTier,
-  getNextMilestone,
-  // Prestige exports
-  canPrestige,
-  getPrestigeMultiplier,
-  getPrestigeDisplay,
-  getNextPrestigeRewards,
-  getPrestigeInfo,
-  applyPrestigeMultiplier,
-  XP_CONFIG,
-  LEVEL_TITLES,
-  PRESTIGE_CONFIG,
-};

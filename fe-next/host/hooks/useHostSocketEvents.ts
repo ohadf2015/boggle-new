@@ -35,7 +35,7 @@ interface UseHostSocketEventsProps {
   username: string;
   queueAchievement: (achievement: AchievementPayload) => void;
   playComboSound: (level: number) => void;
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any }) => void;
 
   // State setters
   setPlayersReady: React.Dispatch<React.SetStateAction<Player[]>>;
@@ -179,6 +179,7 @@ const useHostSocketEvents = ({
     intentionalExitRef,
     onShowResults,
     onGameStart,
+    setPlayersReady,
   });
 
   // Word submission events (for host playing)
@@ -198,10 +199,12 @@ const useHostSocketEvents = ({
   });
 
   // Player management events
+  // Pass hostUsername to filter self-notifications when host is also playing
   useHostPlayerEvents({
     socket,
     t,
     hostPlaying,
+    hostUsername: hostPlaying ? username : undefined,
     queueAchievement,
     setPlayersReady,
     setPlayerWordCounts,

@@ -3,14 +3,14 @@ import '@testing-library/jest-dom';
 import { UnauthenticatedCreateChallengeSection } from '../UnauthenticatedCreateChallengeSection';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   },
 }));
 
 // Mock InteractiveMascot
-jest.mock('../../ui/InteractiveMascot', () => ({
+vi.mock('../../ui/InteractiveMascot', () => ({
   InteractiveMascot: ({ variant, tooltip }: any) => (
     <div data-testid="mascot" data-variant={variant} title={tooltip}>
       Mascot
@@ -19,7 +19,7 @@ jest.mock('../../ui/InteractiveMascot', () => ({
 }));
 
 // Mock Button component
-jest.mock('../../ui/button', () => ({
+vi.mock('../../ui/button', () => ({
   Button: ({ children, onClick, className }: any) => (
     <button onClick={onClick} className={className} data-testid="cta-button">
       {children}
@@ -42,7 +42,7 @@ describe('UnauthenticatedCreateChallengeSection', () => {
     return translations[key] || key;
   };
 
-  const mockOnAuthRequired = jest.fn();
+  const mockOnAuthRequired = vi.fn();
 
   const defaultProps = {
     language: 'en' as const,

@@ -4,16 +4,20 @@
  * Calculates word scores and game results with combo bonuses.
  * Pure functions with no side effects - fully testable.
  *
- * Scoring Formula:
- *   baseScore = wordLength - 1 (each letter beyond first = 1 point)
+ * Scoring Formula (exponential base scores):
+ *   baseScore = lookup by word length: 2→5, 3→10, 4→20, 5→50, 6→100, 7→200, 8+→500
  *   comboBonus = floor(comboLevel * wordLengthFactor)
- *   totalScore = baseScore + comboBonus
+ *   totalScore = (baseScore + comboBonus) * fireRoundMultiplier * rarityMultiplier
  *
- * Combo Multipliers (legacy, kept for compatibility):
- *   0-2: x1.0, 3-4: x1.25, 5-6: x1.5, 7-8: x1.75, 9-10: x2.0, 11+: x2.25
+ * @see shared/utils/scoring.ts — single source of truth
  */
 
 import type { Avatar } from '@/shared/types/game';
+import {
+  calculateWordScore as canonicalCalculateWordScore,
+  getComboBonus as canonicalGetComboBonus,
+  getComboMultiplier as canonicalGetComboMultiplier,
+} from '@/shared/utils/scoring';
 
 // ==========================================
 // Type Definitions
@@ -74,83 +78,13 @@ export interface AIValidationResult {
 }
 
 // ==========================================
-// Combo Calculations
+// Scoring — re-exported from canonical source
 // ==========================================
 
-/**
- * Get combo multiplier based on combo level
- * Higher combo levels give better multipliers
- *
- * @param comboLevel - Current combo level (0+)
- * @returns Multiplier (1.0 - 2.25)
- */
-export function getComboMultiplier(comboLevel: number): number {
-  if (comboLevel <= 2) return 1.0;
-  if (comboLevel <= 4) return 1.25;
-  if (comboLevel <= 6) return 1.5;
-  if (comboLevel <= 8) return 1.75;
-  if (comboLevel <= 10) return 2.0;
-  return 2.25; // Max multiplier at combo 11+
-}
-
-/**
- * Get flat combo bonus based on combo level and word length
- * Combo bonus scales with word length to reward longer words in combos
- *
- * Word length factors:
- *   3 letters: 0.2 (minimal bonus)
- *   4 letters: 0.5 (modest bonus)
- *   5 letters: 1.0 (full base bonus)
- *   6 letters: 1.5 (1.5x bonus)
- *   7+ letters: 2.0 (perfectionist reward)
- *
- * @param comboLevel - Current combo level (0+)
- * @param wordLength - Length of the word (default: 4)
- * @returns Bonus points (integer)
- */
-export function getComboBonus(comboLevel: number, wordLength: number = 4): number {
-  if (comboLevel <= 0) return 0;
-
-  // Word length factor - longer words get better combo bonuses
-  let wordLengthFactor: number;
-  if (wordLength <= 3) {
-    wordLengthFactor = 0.2;  // Very short words - minimal combo bonus
-  } else if (wordLength === 4) {
-    wordLengthFactor = 0.5;  // Short words - modest combo bonus
-  } else if (wordLength === 5) {
-    wordLengthFactor = 1.0;  // Medium words - full base bonus
-  } else if (wordLength === 6) {
-    wordLengthFactor = 1.5;  // Good words - 1.5x bonus
-  } else {
-    wordLengthFactor = 2.0;  // Long words (7+) - 2x bonus
-  }
-
-  // Base bonus caps at 10 points
-  const baseBonus = Math.min(comboLevel, 10);
-
-  return Math.floor(baseBonus * wordLengthFactor);
-}
-
-// ==========================================
-// Score Calculations
-// ==========================================
-
-/**
- * Calculate score for a single word
- * Base score: 1 point per letter beyond the first
- * Plus combo bonus based on combo level and word length
- *
- * @param word - The word to score
- * @param comboLevel - Current combo level (default: 0)
- * @returns Total score for the word
- */
-export function calculateWordScore(word: string, comboLevel: number = 0): number {
-  const length = word.length;
-  if (length <= 1) return 0; // Single letters not allowed
-  const baseScore = length - 1; // Each letter beyond first = 1 point
-  const bonus = getComboBonus(comboLevel, length);
-  return baseScore + bonus;
-}
+/** @see shared/utils/scoring.ts — single source of truth for all scoring */
+export const getComboMultiplier = canonicalGetComboMultiplier;
+export const getComboBonus = canonicalGetComboBonus;
+export const calculateWordScore = canonicalCalculateWordScore;
 
 /**
  * Calculate final game scores for all players
@@ -208,9 +142,11 @@ export function calculateGameScores(
 
       if (validated) {
         if (existingDetails && typeof existingDetails.score === 'number') {
+          // Use pre-calculated score (includes combo bonus from submit time)
           score = existingDetails.score;
         } else {
-          score = calculateWordScore(word, 0);
+          // Fallback: base score + any recorded combo bonus
+          score = calculateWordScore(word, 0) + (existingDetails?.comboBonus ?? 0);
         }
         totalScore += score;
       }

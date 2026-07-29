@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -45,7 +45,7 @@ export function KeyboardDesktopBadge({
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5, duration: 0.3 }}
@@ -63,7 +63,6 @@ export function KeyboardDesktopBadge({
           'rounded-neo border-2 border-neo-black',
           'bg-neo-cyan/90 text-neo-black',
           'shadow-hard-sm',
-          'backdrop-blur-sm'
         )}
       >
         <Keyboard className="w-4 h-4" />
@@ -76,7 +75,7 @@ export function KeyboardDesktopBadge({
           </span>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

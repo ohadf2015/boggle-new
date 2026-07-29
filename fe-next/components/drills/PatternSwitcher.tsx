@@ -1,17 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { Shuffle, Trophy, RotateCcw, Target } from 'lucide-react';
+import { useState, useCallback, useRef } from 'react';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
 import WordFormingArea, { type WordFeedback } from '@/components/game/WordFormingArea';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
+import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
+import PatternSwitcherCompletePhase from './PatternSwitcherCompletePhase';
+import DrillBriefing from '@/components/brain/DrillBriefing';
 import type { LetterGrid, Language } from '@/types';
+import { calculateWordScore } from '@/shared/utils/scoring';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -35,6 +37,7 @@ interface PatternSwitcherProps {
     level: number;
   }) => void;
   onExit?: () => void;
+  onPlayAgain?: () => void;
 }
 
 type GamePhase = 'ready' | 'playing' | 'feedback' | 'complete';
@@ -52,16 +55,18 @@ export default function PatternSwitcher({
   language = 'en',
   onComplete,
   onExit,
+  onPlayAgain,
 }: PatternSwitcherProps) {
-  const { theme } = useTheme();
-  const { t } = useLanguage();
-  const { playErrorSound } = useSoundEffects();
-  const isDarkMode = theme === 'dark';
+  const { t, dir } = useLanguage();
+  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
   const [phase, setPhase] = useState<GamePhase>('ready');
-  const [requiredLength, setRequiredLength] = useState(3);
+  const [requiredLength, setRequiredLength] = useState(() => {
+    const lengths = [...new Set(availableWords.map(w => w.word.length))].sort();
+    return lengths[0] ?? 3;
+  });
   const [pattern, setPattern] = useState<number[]>([]);
   const [patternIndex, setPatternIndex] = useState(0);
   const [lives, setLives] = useState(levelConfig.lives);
@@ -81,25 +86,43 @@ export default function PatternSwitcher({
     minWordLength: 2,
   });
 
-  // Generate available lengths from words (capped at 5 letters max for fair gameplay)
-  const MAX_WORD_LENGTH = 5;
-  const availableLengths = [...new Set(availableWords.map(w => w.word.length))]
-    .filter(len => len <= MAX_WORD_LENGTH)
-    .sort();
+  // Generate available lengths from words that actually exist on the board
+  const availableLengths = [...new Set(availableWords.map(w => w.word.length))].sort();
 
-  // Generate random pattern
+  // Generate random pattern — only request lengths that have unfound words on the board
   const generatePattern = useCallback(() => {
     const lengths: number[] = [];
+    // Count only words NOT yet found across all patterns (fixes C3: impossible states)
+    const wordCountByLength: Record<number, number> = {};
+    for (const w of availableWords) {
+      const len = w.word.length;
+      if (!wordsFoundSetRef.current.has(w.word.toLowerCase())) {
+        wordCountByLength[len] = (wordCountByLength[len] || 0) + 1;
+      }
+    }
+
+    const remainingByLength = { ...wordCountByLength };
+
     for (let i = 0; i < levelConfig.patternLength; i++) {
-      const randomLength = availableLengths[Math.floor(Math.random() * availableLengths.length)];
+      // Filter to lengths that still have available words
+      const validLengths = availableLengths.filter(len => (remainingByLength[len] || 0) > 0);
+      if (validLengths.length === 0) break; // No more valid lengths possible
+      const randomLength = validLengths[Math.floor(Math.random() * validLengths.length)];
       lengths.push(randomLength);
+      remainingByLength[randomLength] -= 1;
     }
     return lengths;
-  }, [levelConfig.patternLength, availableLengths]);
+  }, [levelConfig.patternLength, availableLengths, availableWords]);
 
-  // Start game
+  // Start game — regenerate board if too few words for a valid pattern
   const startGame = useCallback(() => {
+    wordsFoundSetRef.current.clear();
     const newPattern = generatePattern();
+    if (newPattern.length === 0) {
+      // Board has too few words — request regeneration
+      onPlayAgain?.();
+      return;
+    }
     setPattern(newPattern);
     setPatternIndex(0);
     setRequiredLength(newPattern[0]);
@@ -108,10 +131,10 @@ export default function PatternSwitcher({
     setScore(0);
     setPatternsCompleted(0);
     setCurrentFeedback(null);
-    wordsFoundSetRef.current.clear();
     startTimeRef.current = Date.now();
+    playDrillStartSound();
     setPhase('playing');
-  }, [generatePattern, levelConfig.lives]);
+  }, [generatePattern, levelConfig.lives, onPlayAgain, playDrillStartSound]);
 
   // Handle word submission with integrated validation feedback
   const handleWordSubmit = useCallback((word: string) => {
@@ -127,7 +150,7 @@ export default function PatternSwitcher({
         id: `duplicate-${now}`,
         type: 'duplicate',
         word: upperWord,
-        message: t('playerView.wordAlreadyFound') || 'Already found!',
+        message: t('playerView.wordAlreadyFound'),
         timestamp: now,
       });
       playErrorSound?.();
@@ -141,7 +164,7 @@ export default function PatternSwitcher({
         id: `reject-${now}`,
         type: 'rejected',
         word: upperWord,
-        message: t('playerView.wordNotInList') || 'Word not available',
+        message: t('playerView.wordNotInList'),
         timestamp: now,
       });
       playErrorSound?.();
@@ -153,7 +176,7 @@ export default function PatternSwitcher({
       // Correct length! Show positive feedback
       wordsFoundSetRef.current.add(normalizedWord);
       setWordsFound(prev => [...prev, upperWord]);
-      const wordScore = word.length * 15;
+      const wordScore = calculateWordScore(word);
       setScore(prev => prev + wordScore);
 
       // Show positive feedback using WordFormingArea component
@@ -175,8 +198,13 @@ export default function PatternSwitcher({
           setPatternsCompleted(prev => prev + 1);
           setScore(prev => prev + 100); // Bonus
 
-          // Generate new pattern
+          // Generate new pattern — if board exhausted, end with bonus
           const newPattern = generatePattern();
+          if (newPattern.length === 0) {
+            setScore(prev => prev + 200);
+            setPhase('complete');
+            return;
+          }
           setPattern(newPattern);
           setPatternIndex(0);
           setRequiredLength(newPattern[0]);
@@ -226,26 +254,23 @@ export default function PatternSwitcher({
     };
   }, [score, patternsCompleted, wordsFound.length, level]);
 
-  useEffect(() => {
-    if (phase === 'complete') {
-      onComplete(getResults());
-    }
-  }, [phase, getResults, onComplete]);
+  // Handle completion (idempotent — see useDrillCompleteOnce)
+  useDrillCompleteOnce(phase, getResults, onComplete, playDrillCompleteSound);
 
   return (
-    <div className={cn(
+    <div dir={dir} className={cn(
       'flex flex-col h-full',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+      'bg-neo-navy'
     )}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
           {/* Required length */}
-          <div className={cn(
+          <div role="status" className={cn(
             'px-4 py-2 rounded-neo border-3 border-neo-black font-black text-xl',
             'bg-neo-cyan text-neo-black'
           )}>
@@ -256,7 +281,7 @@ export default function PatternSwitcher({
           <div className="flex items-center gap-1">
             {Array.from({ length: levelConfig.lives }).map((_, i) => (
               <div
-                key={i}
+                key={`life-${i}`}
                 className={cn(
                   'w-3 h-3 rounded-full border border-neo-black',
                   i < lives ? 'bg-neo-red' : 'bg-gray-300'
@@ -266,7 +291,7 @@ export default function PatternSwitcher({
           </div>
         </div>
 
-        <div className={cn(
+        <div aria-live="polite" className={cn(
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
           'bg-neo-cyan text-neo-black'
         )}>
@@ -278,16 +303,16 @@ export default function PatternSwitcher({
       {phase !== 'ready' && phase !== 'complete' && (
         <div className={cn(
           'flex items-center justify-center gap-2 py-2 border-b-2 border-neo-black',
-          isDarkMode ? 'bg-slate-800/50' : 'bg-white/50'
+          'bg-neo-navy-light'
         )}>
           {pattern.map((len, i) => (
             <div
-              key={i}
+              key={`step-${i}-${len}`}
               className={cn(
                 'w-8 h-8 rounded-lg border-2 border-neo-black flex items-center justify-center font-bold text-sm',
                 i < patternIndex ? 'bg-neo-green text-neo-black' :
                 i === patternIndex ? 'bg-neo-cyan text-neo-black' :
-                isDarkMode ? 'bg-slate-700 text-neo-white/50' : 'bg-gray-200 text-neo-black/50'
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
               {len}
@@ -297,45 +322,18 @@ export default function PatternSwitcher({
       )}
 
       {/* Game Area */}
-      <div className="flex-1 flex flex-col items-center justify-center p-4">
+      <div className="flex-1 min-h-0 overflow-x-hidden overflow-y-auto flex flex-col items-center justify-start p-4">
         {phase === 'ready' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <Shuffle className="w-20 h-20 mx-auto text-neo-cyan" />
-            <h2 className={cn(
-              'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {t('brain.drills.pattern-switcher.name')}
-            </h2>
-            <p className={cn(
-              'text-sm max-w-xs',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-            )}>
-              {t('brain.drills.pattern-switcher.description')}
-            </p>
-            <div className={cn(
-              'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}>
-              <p>{t('brain.drills.level')}: {level}</p>
-              <p>{t('brain.drills.patternLength')}: {levelConfig.patternLength}</p>
-            </div>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={startGame}
-              className="px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold text-lg uppercase bg-neo-cyan text-neo-black"
-            >
-              {t('brain.drills.start')}
-            </motion.button>
-          </motion.div>
+          <DrillBriefing
+            drillId="pattern-switcher"
+            level={level}
+            goalText={`${t('brain.drills.patternLength')}: ${levelConfig.patternLength} · ${levelConfig.lives} ❤`}
+            onStart={() => { playDrillStartSound(); startGame(); }}
+          />
         )}
 
         {(phase === 'playing' || phase === 'feedback') && (
-          <div className="w-full max-w-md space-y-4 relative">
+          <div className="w-full max-w-md lg:max-w-lg space-y-4 relative">
             {/* Word feedback area - shows validation results */}
             <div className="flex justify-center">
               <WordFormingArea
@@ -374,139 +372,33 @@ export default function PatternSwitcher({
             )}
 
             {/* Finish Game Button */}
-            <motion.button
+            <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={finishGame}
+              aria-label={t('brain.drills.finishGame')}
               className={cn(
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
-                'transition-all hover:translate-y-[-1px]',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                'transition-all hover:-translate-y-px',
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
-              {t('brain.drills.finishGame') || 'Finish Game'}
-            </motion.button>
+              {t('brain.drills.finishGame')}
+            </AdaptiveMotion.button>
           </div>
         )}
 
         {phase === 'complete' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', damping: 12, delay: 0.2 }}
-            >
-              <Trophy className={cn(
-                'w-20 h-20 mx-auto',
-                patternsCompleted > 0 ? 'text-neo-lime' : 'text-gray-400'
-              )} />
-            </motion.div>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className={cn(
-                'text-2xl font-black',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
-              )}
-            >
-              {lives > 0 ? t('brain.drills.complete') : t('brain.drills.gameOver')}
-            </motion.h2>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className={cn(
-                'p-4 rounded-neo border-3 border-neo-black space-y-3',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
-              )}
-            >
-              {/* Animated Score */}
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.7, type: 'spring' }}
-                className="text-3xl font-black text-neo-cyan"
-              >
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  {score}
-                </motion.span> {t('brain.drills.points')}
-              </motion.div>
-              
-              {/* Animated Stats Grid */}
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-                  )}
-                >
-                  <Shuffle className="w-6 h-6 mx-auto text-neo-cyan mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
-                    {patternsCompleted}
-                  </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                    {t('brain.drills.patterns')}
-                  </p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-                  )}
-                >
-                  <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
-                    {wordsFound.length}
-                  </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                    {t('brain.drills.wordsFound')}
-                  </p>
-                </motion.div>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="flex gap-3 justify-center"
-            >
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setPhase('ready')}
-                className={cn(
-                  'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
-                )}
-              >
-                <RotateCcw className="w-5 h-5" />
-                {t('brain.drills.playAgain')}
-              </motion.button>
-              {onExit && (
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onExit}
-                  className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-cyan text-neo-black"
-                >
-                  {t('brain.drills.exit')}
-                </motion.button>
-              )}
-            </motion.div>
-          </motion.div>
+          <PatternSwitcherCompletePhase
+            score={score}
+            patternsCompleted={patternsCompleted}
+            wordsFoundCount={wordsFound.length}
+            lives={lives}
+            level={level}
+            maxLives={levelConfig.lives}
+            onPlayAgain={() => { setPhase('ready'); onPlayAgain?.(); }}
+            onExit={onExit}
+          />
         )}
       </div>
     </div>

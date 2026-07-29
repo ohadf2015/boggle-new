@@ -11,24 +11,29 @@
  * - lifecycle.ts - Startup initialization and graceful shutdown
  */
 
+// IMPORTANT: Must be first import - sets up globalThis.AsyncLocalStorage for Next.js 16+
+import './preload';
+
 import 'dotenv/config';
-import express, { Application, Request, Response } from 'express';
+import { httpLogger } from './logger';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import * as http from 'http';
 import next from 'next';
-import * as url from 'url';
-
-import type { Server as SocketIOServer } from 'socket.io';
+import { parse as parseUrl } from 'url';
 
 // Server modules
 import { configureMiddleware } from './middleware';
 import { createSocketServer, setupConnectionMonitoring, setupCleanupTimers } from './socketSetup';
 import { configureHealthRoutes } from './healthRoutes';
 import { handleLocaleRedirect } from './localeRedirect';
+import { errorHandler, notFoundHandler } from './errorMiddleware';
+import { httpRateLimitMiddleware } from '../backend/middleware/rateLimiterRedis';
 import {
   initializeServer,
   setupEventLoopMonitoring,
   createShutdownHandler,
-  registerShutdownHandlers
+  registerShutdownHandlers,
+  registerProcessErrorHandlers
 } from './lifecycle';
 
 // Route modules
@@ -39,8 +44,16 @@ import geolocationRoutes from '../backend/routes/geolocation';
 import dictionaryRoutes from '../backend/routes/dictionary';
 import solveGridRoutes from '../backend/routes/solveGrid';
 import singlePlayerRoutes from '../backend/routes/singlePlayer';
+import singlePlayerLeaderboardRoutes from '../backend/routes/singlePlayerLeaderboard';
+import presenceRoutes from '../backend/routes/presence';
 import dailyChallengeRoutes from '../backend/routes/dailyChallenge';
 import aiHintsRoutes from '../backend/routes/aiHints';
+// adminGift and adminNotification now mounted inside admin/index.ts for RBAC + rate limiting
+import ugcPacksRoutes from '../backend/routes/ugcPacks';
+import ugcBoardsRoutes from '../backend/routes/ugcBoards';
+import playerProfileRoutes from '../backend/routes/playerProfile';
+import { createExpressMiddleware } from '@trpc/server/adapters/express';
+import { appRouter } from '../backend/trpc/root';
 
 // Configuration
 const dev: boolean = process.env.NODE_ENV !== 'production';
@@ -71,6 +84,14 @@ async function start(): Promise<void> {
   const io = createSocketServer(httpServer, CORS_ORIGIN);
   app.set('io', io);
 
+  // Liveness probe — must be ahead of helmet/compression/CORS so a future
+  // middleware regression can never make Railway probes flaky. Stays trivial
+  // (sync JSON, no deps); /health/ready in healthRoutes.ts owns the full
+  // dependency check.
+  app.get('/health/live', (_req: Request, res: Response): void => {
+    res.json({ status: 'alive', timestamp: new Date().toISOString() });
+  });
+
   // Configure middleware
   configureMiddleware(app, { corsOrigin: CORS_ORIGIN, isDev: dev });
 
@@ -81,6 +102,9 @@ async function start(): Promise<void> {
   // Health and metrics routes
   configureHealthRoutes(app, io);
 
+  // Rate limiting for API routes
+  app.use('/api', httpRateLimitMiddleware());
+
   // API routes
   app.use('/api/leaderboard', leaderboardRoutes);
   app.use('/api/geolocation', geolocationRoutes);
@@ -89,13 +113,92 @@ async function start(): Promise<void> {
   app.use('/api/dictionary', dictionaryRoutes);
   app.use('/api/solve-grid', solveGridRoutes);
   app.use('/api/single-player', singlePlayerRoutes);
+  app.use('/api/single-player', singlePlayerLeaderboardRoutes);
+  app.use('/api/presence', presenceRoutes);
   app.use('/api/daily-challenge', dailyChallengeRoutes);
+  app.use('/api/ugc/packs', ugcPacksRoutes);
+  app.use('/api/ugc/boards', ugcBoardsRoutes);
+  app.use('/api/player-profile', playerProfileRoutes);
   app.use('/api', aiHintsRoutes);
 
-  // Next.js request handler (catch-all)
-  app.use(async (req: Request, res: Response): Promise<void> => {
+  // tRPC API — type-safe endpoints (alongside existing Express routes)
+  app.use('/api/trpc', createExpressMiddleware({
+    router: appRouter,
+    createContext: ({ req, res }) => ({ req, res }),
+  }));
+
+  // SEO file bypass - handle directly via Express to avoid Next.js catch-all interference
+  app.get('/sitemap.xml', async (req, res, next) => {
     try {
-      const parsedUrl = url.parse(req.url, true);
+      const sitemapModule = await import('../app/sitemap');
+      const routes = sitemapModule.default();
+      
+      let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+      xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n';
+      
+      for (const route of routes) {
+        xml += '  <url>\n';
+        xml += `    <loc>${route.url}</loc>\n`;
+        if (route.lastModified) xml += `    <lastmod>${route.lastModified}</lastmod>\n`;
+        if (route.changeFrequency) xml += `    <changefreq>${route.changeFrequency}</changefreq>\n`;
+        if (route.priority) xml += `    <priority>${route.priority}</priority>\n`;
+        if (route.alternates?.languages) {
+          for (const [lang, url] of Object.entries(route.alternates.languages)) {
+            xml += `    <xhtml:link rel="alternate" hreflang="${lang}" href="${url}" />\n`;
+          }
+        }
+        xml += '  </url>\n';
+      }
+      xml += '</urlset>';
+      
+      res.setHeader('Content-Type', 'application/xml');
+      res.send(xml);
+    } catch (err) {
+      httpLogger.error({ err }, 'Failed to generate sitemap.xml');
+      next(err);
+    }
+  });
+
+  app.get('/robots.txt', async (req, res, next) => {
+    try {
+      const robotsModule = await import('../app/robots');
+      const config = robotsModule.default();
+      
+      let txt = '';
+      if (config.rules) {
+        const rules = Array.isArray(config.rules) ? config.rules : [config.rules];
+        for (const rule of rules) {
+          const uas = Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent];
+          for (const ua of uas) txt += `User-agent: ${ua}\n`;
+          
+          if (rule.allow) {
+            const allows = Array.isArray(rule.allow) ? rule.allow : [rule.allow];
+            for (const allow of allows) txt += `Allow: ${allow}\n`;
+          }
+          if (rule.disallow) {
+            const disallows = Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow];
+            for (const disallow of disallows) txt += `Disallow: ${disallow}\n`;
+          }
+          txt += '\n';
+        }
+      }
+      if (config.sitemap) {
+        const sitemaps = Array.isArray(config.sitemap) ? config.sitemap : [config.sitemap];
+        for (const s of sitemaps) txt += `Sitemap: ${s}\n`;
+      }
+      
+      res.setHeader('Content-Type', 'text/plain');
+      res.send(txt);
+    } catch (err) {
+      httpLogger.error({ err }, 'Failed to generate robots.txt');
+      next(err);
+    }
+  });
+
+  // Next.js request handler (catch-all)
+  app.use(async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const parsedUrl = parseUrl(req.url, true);
       const { pathname } = parsedUrl;
 
       // Handle root path locale redirect
@@ -106,15 +209,22 @@ async function start(): Promise<void> {
 
       await handle(req, res, parsedUrl);
     } catch (err) {
-      console.error('Error occurred handling', req.url, err);
-      if (!res.headersSent) {
-        res.statusCode = 500;
-        res.end('internal server error');
-      }
+      // Pass to error handler instead of handling inline
+      next(err);
     }
   });
 
-  // Initialize server components
+  // 404 handler (must be after all routes)
+  app.use(notFoundHandler);
+
+  // Global error handler (must be last)
+  app.use(errorHandler);
+
+  // Register process-level error handlers (must be early)
+  registerProcessErrorHandlers();
+
+  // Initialize server components BEFORE listening — ensures Redis, dictionaries,
+  // and Socket.IO adapter are ready before Railway routes traffic to this container.
   await initializeServer(io);
 
   // Set up event loop monitoring
@@ -124,16 +234,17 @@ async function start(): Promise<void> {
   const shutdownHandler = createShutdownHandler(httpServer, io);
   registerShutdownHandlers(shutdownHandler);
 
-  // Start listening
-  httpServer.listen(PORT, HOST, () => {
-    console.log(`> Server ready on http://${HOST}:${PORT}`);
-    console.log(`> Socket.IO server ready`);
-    console.log(`> Environment: ${dev ? 'development' : 'production'}`);
+  // Start listening AFTER initialization is complete
+  await new Promise<void>((resolve) => {
+    httpServer.listen(PORT, HOST, () => {
+      httpLogger.info({ host: HOST, port: PORT, env: dev ? 'development' : 'production' }, 'Server ready');
+      resolve();
+    });
   });
 }
 
 // Start the server
 start().catch((err: Error) => {
-  console.error('Failed to start server:', err);
+  httpLogger.fatal({ err }, 'Failed to start server');
   process.exit(1);
 });

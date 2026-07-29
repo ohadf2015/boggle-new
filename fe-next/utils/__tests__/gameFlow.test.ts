@@ -5,6 +5,7 @@
  */
 
 import { validateWordLocally, isWordOnBoard } from '../clientWordValidator';
+import { calculateWordScore } from '@/shared/utils/scoring';
 
 describe('Game Flow - Word Submission to Results', () => {
   const testGrid = [
@@ -50,10 +51,11 @@ describe('Game Flow - Word Submission to Results', () => {
       const words = ['cat', 'dog', 'bat'];
       
       words.forEach(word => {
-        totalScore += Math.max(word.length - 1, 0);
+        totalScore += calculateWordScore(word);
       });
-      
-      expect(totalScore).toBe(6);
+
+      // cat=10, dog=10, bat=10 = 30
+      expect(totalScore).toBe(30);
     });
   });
 

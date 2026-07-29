@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, memo, useRef } from 'react';
-import { Button } from '../components/ui/button';
+import React, { useEffect, useState, useCallback, memo, useRef, useMemo } from 'react';
 import GoRipplesAnimation from '../components/GoRipplesAnimation';
 import '../style/animation.scss';
 import { useSocket } from '../utils/SocketContext';
@@ -13,18 +12,30 @@ import { DIFFICULTIES } from '../utils/consts';
 import { usePresence } from '../hooks/usePresence';
 import { useEarthquakeFireRound } from '../hooks/useEarthquakeFireRound';
 import type { Language, PlayerResult } from '@/types';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { setStoredUsername, setStoredCustomAvatar } from '@/utils/profileStorage';
+import { useGameMode } from '@/hooks/gameState/store';
+import logger from '@/utils/logger';
+import {
+  sendCountdownComplete,
+  stashStartGameMessageId,
+  consumeStashedMessageId,
+  wasStartGameHandled,
+  markStartGameHandled,
+} from '@/shared/utils/gameEventUtils';
 
 // Extracted components
 import HostPreGameView from './components/HostPreGameView';
 import HostInGameView from './components/HostInGameView';
 import TvBroadcastView from './components/TvBroadcastView';
-import ValidationModal from '../components/results/ValidationModal';
+import TvLobbyView from './components/tv-broadcast/TvLobbyView';
 import { TvResultsView } from './components/tv-results';
 import {
   QRCodeDialog,
   FinalScoresModal,
   ExitConfirmDialog,
   CancelTournamentDialog,
+  SoloStartConfirmDialog,
 } from './components/HostDialogs';
 
 // Custom hooks
@@ -36,11 +47,38 @@ import {
   type Player,
 } from './hooks';
 import { useNavigationGuard } from '../hooks/useNavigationGuard';
-import { useHideNavigation } from '../contexts/NavigationContext';
+import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
+import { useGameStartTelemetry } from '@/hooks/useGameStartTelemetry';
+import { useGameEndTelemetry } from '@/hooks/useGameEndTelemetry';
+import { useTimerZeroWatchdog } from '../hooks/useTimerZeroWatchdog';
+import { useTimerStallWatchdog } from '../hooks/useTimerStallWatchdog';
+import { addGameBreadcrumb } from '../utils/sentry';
 
 // ==========================================
 // Props
 // ==========================================
+
+interface GameStartData {
+  letterGrid: string[][];
+  timerSeconds: number;
+  language: Language;
+  minWordLength?: number;
+  messageId?: string;
+}
+
+interface LessonData {
+  lessonId: string;
+  lessonName: string;
+  vocabularyWords: string[];
+  language: Language;
+  templateSettings?: {
+    timerSeconds: number;
+    difficulty: string;
+    minWordLength: number;
+    allowLateJoin: boolean;
+  } | null;
+}
 
 interface HostViewProps {
   gameCode: string;
@@ -48,6 +86,22 @@ interface HostViewProps {
   initialPlayers?: Player[];
   username: string;
   onShowResults: (data: unknown) => void;
+  /** Pending game start data from page-level socket handler (for host returning from results) */
+  pendingGameStart?: GameStartData | null;
+  /** Callback when pending game start has been consumed */
+  onGameStartConsumed?: () => void;
+  /** Lesson data for vocabulary-based games started from teacher dashboard */
+  lessonData?: LessonData | null;
+  /** Callback when host changes their display name */
+  onUsernameChange?: (newName: string) => void;
+  /** Quick Play: auto-start solo game immediately after room join */
+  autoStart?: boolean;
+  /** Private rooms (Quick Play / classroom) hide invite + share affordances. */
+  isPrivate?: boolean;
+  /** Quick Play: auto-fill bots + start the moment the lobby mounts. */
+  isQuickPlay?: boolean;
+  /** SPA reset to lobby (no reload) — see useHostGameActions.onExitToLobby. */
+  onExitToLobby?: () => void;
 }
 
 // ==========================================
@@ -60,16 +114,45 @@ const HostView: React.FC<HostViewProps> = memo(({
   initialPlayers = [],
   username,
   onShowResults,
+  pendingGameStart,
+  onGameStartConsumed,
+  lessonData,
+  onUsernameChange,
+  autoStart = false,
+  isPrivate = false,
+  isQuickPlay = false,
+  onExitToLobby,
 }) => {
-  const { t, language, dir } = useLanguage();
+  const { t, language } = useLanguage();
   const { socket } = useSocket();
   const { fadeToTrack, stopMusic, TRACKS } = useMusic();
   const { playComboSound, playCountdownBeep } = useSoundEffects();
   const { queueAchievement } = useAchievementQueue();
-  const setIsInGame = useHideNavigation();
-
   // Enable presence tracking
   usePresence({ enabled: !!gameCode });
+  const currentGameMode = useGameMode();
+
+  // Host name change handler
+  const handleHostNameChange = useCallback((newName: string) => {
+    setStoredUsername(newName);
+    socket?.emit('updateGuestName', { newName });
+  }, [socket]);
+
+  // Listen for server confirmation of name change
+  useEffect(() => {
+    if (!socket) return;
+    const handleNameUpdated = (data: { newName: string }) => {
+      if (data?.newName) onUsernameChange?.(data.newName);
+    };
+    socket.on('guestNameUpdated', handleNameUpdated);
+    return () => { socket.off('guestNameUpdated', handleNameUpdated); };
+  }, [socket, onUsernameChange]);
+
+  // Host avatar change handler — emits socket event so other players see the update
+  const handleHostAvatarChange = useCallback((config: CustomAvatarConfig) => {
+    setStoredCustomAvatar(config);
+    socket?.emit('updateAvatar', { customAvatar: config });
+  }, [socket]);
 
   // Consolidated state management
   const state = useHostViewState({
@@ -77,6 +160,10 @@ const HostView: React.FC<HostViewProps> = memo(({
     roomLanguage: roomLanguageProp,
     defaultLanguage: language as Language,
   });
+
+  // Mode-specific state from Zustand store (for TV broadcast).
+  // wordHunt overlay state subscribed inside TvBroadcastView so this view
+  // doesn't re-render on word-hunt ticks when host isn't broadcasting.
 
   // Earthquake/Fire Round state (managed via socket events)
   const [earthquakeState, setEarthquakeState] = useState<'idle' | 'warning' | 'shaking' | 'fire-round'>('idle');
@@ -165,6 +252,42 @@ const HostView: React.FC<HostViewProps> = memo(({
     initialPlayers,
   });
 
+  // Defense-in-depth: if timeUpdate(0) or endGame are missed on the host (e.g.
+  // brief network blip), this watchdog forces waitingForResults and pulls the
+  // server's cached scoring payload 2s after the timer visually reaches 0.
+  // The root fix (setRemainingTime before guard in useHostGameEvents) handles the
+  // primary case; this catches the residual scenario where the event is lost entirely.
+  useTimerZeroWatchdog({
+    remainingTime: state.runtime.remainingTime,
+    gameActive: state.runtime.gameStarted || (!!state.runtime.tableData && !!state.runtime.remainingTime && state.runtime.remainingTime > 0),
+    waitingForResults: state.runtime.waitingForResults,
+    onTrigger: () => {
+      if (state.tournament.finalScores) return;
+      logger.log('[HOST] Timer-zero watchdog: forcing waiting state + requesting results');
+      state.setWaitingForResults(true);
+      socket?.emit('requestResults');
+    },
+  });
+
+  // Stall watchdog — see PlayerView for rationale. Host display can desync the
+  // same way (server clock unstarted, gameSessionId drift); recovery emits
+  // `requestGameState` to force a fresh `startGame` with current remainingTime.
+  useTimerStallWatchdog({
+    remainingTime: state.runtime.remainingTime,
+    gameActive: state.runtime.gameStarted || (!!state.runtime.tableData && !!state.runtime.remainingTime && state.runtime.remainingTime > 0),
+    waitingForResults: state.runtime.waitingForResults,
+    onStall: () => {
+      if (state.tournament.finalScores) return;
+      logger.log('[HOST] Timer-stall watchdog: remainingTime frozen — requesting fresh game state');
+      addGameBreadcrumb('mp_timer_stall', {
+        role: 'host',
+        gameCode,
+        remainingTime: state.runtime.remainingTime,
+      });
+      socket?.emit('requestGameState');
+    },
+  });
+
   // Game actions
   const actions = useHostGameActions({
     socket,
@@ -197,24 +320,63 @@ const HostView: React.FC<HostViewProps> = memo(({
     setShowExitConfirm: state.setShowExitConfirm,
     setShowCancelTournamentDialog: state.setShowCancelTournamentDialog,
     setShowQR: state.setShowQR,
+    setShowSoloConfirm: state.setShowSoloConfirm,
     intentionalExitRef: state.refs.intentionalExitRef,
     tournamentTimeoutRef: state.refs.tournamentTimeoutRef,
+    onExitToLobby,
   });
 
+  // Quick Play: auto-start solo game once room is joined and socket ready.
+  // Ref-guarded so StrictMode double-mount or rerun only fires once per attempt.
+  // If emit silently fails (e.g. transient socket glitch), ref clears after 3.5s
+  // so a rerender retries. Success clears retry via gameStarted early-return.
+  const autoStartFiredRef = useRef(false);
+  useEffect(() => {
+    if (!autoStart) return;
+    if (state.runtime.gameStarted) return;
+    if (autoStartFiredRef.current) return;
+    if (!socket?.connected || !gameCode) return;
+    logger.debug('[QUICK_PLAY autostart] firing', {
+      gameCode,
+      connected: socket?.connected,
+      gameStarted: state.runtime.gameStarted,
+    });
+    autoStartFiredRef.current = true;
+    actions.confirmSoloStart();
+    const retryTimer = setTimeout(() => {
+      autoStartFiredRef.current = false;
+    }, 3500);
+    return () => clearTimeout(retryTimer);
+  }, [autoStart, socket, gameCode, state.runtime.gameStarted, actions]);
+
+  // Destructure stable setters for useEffect dependencies
+  const { setWordsForBoard } = state;
+  const roomLanguage = state.roomLanguage;
+  const difficulty = state.settings.difficulty;
+
   // Request words for board embedding
+  // If lesson data is available, use vocabulary words from the lesson instead of random server words
   useEffect(() => {
     if (!socket) return;
-    if (state.roomLanguage === 'ja') return;
+    if (roomLanguage === 'ja') return;
 
-    const difficultyConfig = DIFFICULTIES[state.settings.difficulty];
+    // If we have lesson vocabulary, use those words instead of requesting random ones
+    if (lessonData?.vocabularyWords && lessonData.vocabularyWords.length > 0) {
+      // Use lesson vocabulary for board embedding
+      setWordsForBoard(lessonData.vocabularyWords.map(w => w.toUpperCase()));
+      return;
+    }
+
+    // Otherwise request random themed words from server
+    const difficultyConfig = DIFFICULTIES[difficulty];
     socket.emit('getWordsForBoard', {
-      language: state.roomLanguage,
+      language: roomLanguage,
       boardSize: {
         rows: difficultyConfig.rows,
         cols: difficultyConfig.cols,
       },
     });
-  }, [socket, state.settings.difficulty, state.roomLanguage]);
+  }, [socket, difficulty, roomLanguage, lessonData, setWordsForBoard]);
 
   // Listen for players ready updates
   useEffect(() => {
@@ -231,22 +393,124 @@ const HostView: React.FC<HostViewProps> = memo(({
 
     socket.on('playersReadyUpdate', handlePlayersReadyUpdate);
     socket.on('resetGame', handleResetGame);
-    socket.on('startGame', handleResetGame);
+    // Note: startGame ready-state reset is handled inside useHostGameEvents.handleStartGame
+    // to avoid a duplicate listener that fires on reconnect and clears state mid-game.
 
     return () => {
       socket.off('playersReadyUpdate', handlePlayersReadyUpdate);
       socket.off('resetGame', handleResetGame);
-      socket.off('startGame', handleResetGame);
     };
   }, [socket]);
+
+  // Server-owned lobby auto-start: when every guest is ready, the server runs a
+  // short synced countdown and then tells the host to fire the normal start —
+  // so a host who never clicks "Start" no longer strands a ready lobby.
+  const lobbyAutoStart = useLobbyAutoStart({ socket, onFire: actions.startGame });
+
+  // Handle pending game start (when host returns from results page)
+  // The startGame event was captured at page level while HostView was unmounted
+  // We need to initialize the game state with that data
+  useEffect(() => {
+    if (!pendingGameStart) return;
+
+    // Skip if useHostGameEvents.handleStartGame already drove the start for
+    // this messageId — both handlers run for a normal start, and double
+    // setShowStartAnimation(true) makes GoRipples unmount/remount and play
+    // the countdown twice.
+    if (wasStartGameHandled('HOST', pendingGameStart.messageId)) {
+      onGameStartConsumed?.();
+      return;
+    }
+
+    // Initialize game state from pending data
+    if (pendingGameStart.letterGrid) {
+      state.setTableData(pendingGameStart.letterGrid);
+    }
+    if (pendingGameStart.timerSeconds !== undefined) {
+      state.setRemainingTime(pendingGameStart.timerSeconds);
+    }
+
+    // Stash so the GoRipplesAnimation can emit `countdownComplete` once it
+    // finishes — server gates the round timer on that signal.
+    if (pendingGameStart.messageId) {
+      stashStartGameMessageId('HOST', pendingGameStart.messageId);
+      markStartGameHandled('HOST', pendingGameStart.messageId);
+    }
+
+    // Reset states for new game and trigger animation
+    state.setWaitingForResults(false);
+    state.setShowStartAnimation(true);
+    state.setPlayerWordCounts({});
+    state.setPlayerScores({});
+    state.setHostFoundWords([]);
+    state.setHostAchievements([]);
+    state.setFinalScores(null);
+
+    // Trigger music change for game start
+    fadeToTrack(TRACKS.IN_GAME, 800, 800);
+
+    // Mark pending game start as consumed
+    onGameStartConsumed?.();
+  }, [pendingGameStart, onGameStartConsumed, state, fadeToTrack, TRACKS.IN_GAME]);
 
   // Destructure for cleaner JSX
   const { runtime, settings, players, tournament, animation, ui, hostPlaying: hostPlayingState, combo } = state;
 
+  // CrazyGames SDK lifecycle (gameplayStart/Stop, happyTime) — required for full launch.
+  // Hosts in MP rooms (whether playing or broadcasting) must emit lifecycle events for
+  // CrazyGames QA detection. roundKey resets between tournament rounds.
+  useCrazyGamesLifecycle({
+    isGameActive: runtime.gameStarted && !runtime.waitingForResults,
+    isGameOver: runtime.waitingForResults,
+    score: players.playerScores[username] ?? 0,
+    maxCombo: combo.level ?? 0,
+    roundKey: tournament.tournamentData?.currentRound ?? 0,
+  });
+
+  // Bot count for the admin game log's human-vs-bot composition (forward capture).
+  const botPlayerCount = useMemo(() => {
+    const rows = (tournament.finalScores?.players ?? []) as unknown as PlayerResult[];
+    return rows.filter(p => p.isBot).length;
+  }, [tournament.finalScores]);
+
+  // PostHog funnel parity: emit `growth:game_started` once when the host's
+  // game becomes active. Without this, MP `game_completed` events have no
+  // matching `game_started`, blinding started→finished funnels.
+  useGameStartTelemetry({
+    mode: currentGameMode ?? 'multiplayer',
+    isGameActive: runtime.gameStarted && !runtime.waitingForResults,
+    extras: {
+      gameCode, role: 'host', isMultiplayer: true,
+      engineMode: 'multiplayer', gameMode: currentGameMode ?? 'classic',
+      playerCount: tournament.finalScores?.players?.length ?? 0,
+      botCount: botPlayerCount,
+    },
+  });
+
+  // Paired MP end emit (game_completed) so the nightly job sees MP outcomes per mode.
+  const hostResultRow = useMemo(() => {
+    const rows = (tournament.finalScores?.players ?? []) as unknown as PlayerResult[];
+    return rows.find(p => p.isHost) ?? null;
+  }, [tournament.finalScores]);
+  useGameEndTelemetry({
+    mode: currentGameMode ?? 'multiplayer',
+    resultsShown: !!tournament.finalScores,
+    score: hostResultRow?.score ?? 0,
+    wordCount: hostResultRow?.wordsFoundCount ?? 0,
+    extras: {
+      gameCode, role: 'host', isMultiplayer: true,
+      engineMode: 'multiplayer', gameMode: currentGameMode ?? 'classic',
+      playerCount: tournament.finalScores?.players?.length ?? 0,
+      botCount: botPlayerCount,
+    },
+  });
+
   // Navigation guard - prevent accidental navigation during active game
-  // Only enable when the host is actively playing (not spectating)
+  // Enable for ALL hosts when game is running, whether playing or spectating
+  // Hosts in spectator/broadcast mode still need confirmation before leaving
   useNavigationGuard({
-    enabled: runtime.gameStarted && settings.hostPlaying,
+    enabled: runtime.gameStarted,
+    leaving: actions.leaving,
     message: t('playerView.exitWarning'),
     onNavigationAttempt: () => {
       // Show the exit confirmation dialog
@@ -255,9 +519,43 @@ const HostView: React.FC<HostViewProps> = memo(({
     },
   });
 
+  // Handle logo click exit request
+  // Use refs to access latest values without re-registering the event listener
+  const runtimeRef = useRef(runtime);
+  const actionsRef = useRef(actions);
+  const stateRef = useRef(state);
+
+  useEffect(() => {
+    runtimeRef.current = runtime;
+    actionsRef.current = actions;
+    stateRef.current = state;
+  });
+
+  useEffect(() => {
+    const handleRoomExitRequest = (event: CustomEvent) => {
+      const { gameCode: requestedCode, username: requestedUsername } = event.detail;
+
+      // Verify the request is for this game session
+      if (requestedCode === gameCode && requestedUsername === username) {
+        // If game hasn't started (waiting state), auto-exit without confirmation
+        if (!runtimeRef.current.gameStarted) {
+          actionsRef.current.confirmExitRoom();
+        } else {
+          // Game is active - show confirmation modal
+          stateRef.current.setShowExitConfirm(true);
+        }
+      }
+    };
+
+    window.addEventListener('requestRoomExit', handleRoomExitRequest as EventListener);
+    return () => {
+      window.removeEventListener('requestRoomExit', handleRoomExitRequest as EventListener);
+    };
+  }, [gameCode, username]);
+
   // Earthquake/Fire Round feature for multiplayer (only for triggering, state managed via socket events)
   useEarthquakeFireRound({
-    enabled: runtime.gameStarted && !runtime.waitingForResults,
+    enabled: runtime.gameStarted && !runtime.waitingForResults && (!currentGameMode || currentGameMode === 'classic'),
     gameDurationSeconds: state.settings.timerValue * 60,
     currentTimeSeconds: runtime.remainingTime || 0,
     language: state.roomLanguage,
@@ -283,43 +581,23 @@ const HostView: React.FC<HostViewProps> = memo(({
     },
   });
 
-  // Build leaderboard for waiting view
-  const leaderboard = state.players.playersReady
-    .map((player) => {
-      const name = typeof player === 'string' ? player : player.username;
-      return {
-        username: name,
-        score: state.players.playerScores[name] || 0,
-        wordCount: state.players.playerWordCounts[name] || 0,
-        avatar: typeof player === 'object' ? player.avatar : undefined,
-        isHost: typeof player === 'object' ? (player as any).isHost : false,
-      };
-    })
-    .filter(p => {
-      // Filter out Host if they have 0 words (Broadcast Mode)
-      // We check if the username matches the current host specific username or the isHost flag
-      if ((p.username === username || p.isHost) && p.wordCount === 0) {
-        return false;
-      }
-      return true;
-    })
-    .sort((a, b) => b.score - a.score);
-
   // Detect when we have active game data (covers countdown and transition to active game)
   const hasActiveGameData = runtime.tableData && runtime.remainingTime !== null && runtime.remainingTime > 0;
 
-  // Hide bottom navigation during gameplay
-  useEffect(() => {
-    const isGameActive = runtime.showStartAnimation || ((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults);
-    setIsInGame(!!isGameActive);
-    return () => setIsInGame(false);
-  }, [runtime.showStartAnimation, runtime.gameStarted, hasActiveGameData, runtime.waitingForResults, setIsInGame]);
+  // Navigation hiding is managed by PageClient based on isActive/showResults
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex flex-col items-center p-2 sm:p-4 md:p-6 lg:p-8 overflow-auto transition-colors duration-300">
+    <div className="flex-1 flex flex-col min-h-0 overflow-hidden bg-neo-navy">
       {/* GO Animation */}
       {runtime.showStartAnimation && (
-        <GoRipplesAnimation onComplete={() => state.setShowStartAnimation(false)} />
+        <GoRipplesAnimation
+          onComplete={() => {
+            state.setShowStartAnimation(false);
+            const id = consumeStashedMessageId('HOST');
+            if (socket) sendCountdownComplete(socket, id, 'HOST');
+          }}
+          t={t}
+        />
       )}
 
       {/* Dialogs */}
@@ -342,6 +620,14 @@ const HostView: React.FC<HostViewProps> = memo(({
           onShowQR={() => state.setShowQR(true)}
           onClose={() => state.setFinalScores(null)}
           t={t}
+          socket={socket}
+          gameCode={gameCode}
+          language={state.roomLanguage}
+          isTeacher={!!lessonData}
+          allWords={((tournament.finalScores?.players ?? []) as unknown as PlayerResult[]).flatMap((p) =>
+            (p.allWords ?? []).map(w => ({ word: w.word, score: w.score ?? 0, foundBy: [p.username] }))
+          )}
+          gameMode={currentGameMode}
         />
       )}
 
@@ -359,6 +645,7 @@ const HostView: React.FC<HostViewProps> = memo(({
         onNextRound={actions.handleNextRound}
         socket={socket}
         playersReady={playersReadyData}
+        wordHuntSummary={tournament.finalScores?.wordHuntSummary}
       />
 
       <QRCodeDialog
@@ -382,16 +669,18 @@ const HostView: React.FC<HostViewProps> = memo(({
         t={t}
       />
 
-
-      {/* Validation Modal - Shows during AI word validation */}
-      <ValidationModal
-        isOpen={runtime.waitingForResults}
+      <SoloStartConfirmDialog
+        open={ui.showSoloConfirm}
+        onOpenChange={state.setShowSoloConfirm}
+        onConfirm={actions.confirmSoloStart}
         t={t}
-        foundWords={hostPlayingState.hostFoundWords}
+        gameCode={gameCode}
       />
 
-      {/* Pre-Game View */}
-      {!runtime.gameStarted && !runtime.waitingForResults && !runtime.showStartAnimation && !hasActiveGameData && (
+
+
+      {/* Pre-Game View — phone lobby (host playing) */}
+      {!runtime.gameStarted && !runtime.waitingForResults && !runtime.showStartAnimation && !hasActiveGameData && settings.hostPlaying && (
         <HostPreGameView
           gameCode={gameCode}
           roomLanguage={state.roomLanguage}
@@ -414,20 +703,47 @@ const HostView: React.FC<HostViewProps> = memo(({
           hostPlaying={settings.hostPlaying}
           setHostPlaying={state.setHostPlaying}
           playersReady={players.playersReady as any}
+          readyUsernames={playersReadyData?.readyUsernames ?? []}
+          readyTotal={playersReadyData?.totalPlayers ?? 0}
+          autoStartSecondsLeft={lobbyAutoStart.secondsLeft}
+          onCancelAutoStart={lobbyAutoStart.cancel}
           playerWordCounts={players.playerWordCounts}
           shufflingGrid={animation.shufflingGrid}
           highlightedCells={animation.highlightedCells}
           tableData={runtime.tableData}
           onStartGame={actions.startGame}
+          onAutoStartWithBots={actions.confirmSoloStart}
           onExitRoom={actions.handleExitRoom}
           onCancelTournament={actions.handleCancelTournamentDialog}
           onRegenerateBoard={actions.regenerateBoard}
           tournamentCreating={tournament.tournamentCreating}
+          lessonData={lessonData}
+          onNameChange={handleHostNameChange}
+          onAvatarChange={handleHostAvatarChange}
+          isPrivate={isPrivate}
+          isQuickPlay={isQuickPlay}
+        />
+      )}
+
+      {/* Pre-Game View — TV lobby (host NOT playing / spectator mode) */}
+      {!runtime.gameStarted && !runtime.waitingForResults && !runtime.showStartAnimation && !hasActiveGameData && !settings.hostPlaying && (
+        <TvLobbyView
+          gameCode={gameCode}
+          roomLanguage={state.roomLanguage}
+          username={username}
+          t={t}
+          playersReady={players.playersReady as any}
+          timerValue={settings.timerValue}
+          difficulty={settings.difficulty}
+          onStartGame={actions.startGame}
+          onExitRoom={actions.handleExitRoom}
+          tournamentCreating={tournament.tournamentCreating}
+          setHostPlaying={state.setHostPlaying}
         />
       )}
 
       {/* In-Game View - Host Playing */}
-      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && settings.hostPlaying) && (
+      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && settings.hostPlaying && runtime.tableData) && (
         <HostInGameView
           gameCode={gameCode}
           username={username}
@@ -452,11 +768,12 @@ const HostView: React.FC<HostViewProps> = memo(({
           fireRoundActive={fireRoundActive}
           fireRoundRemaining={fireRoundRemaining}
           boardTheme={state.boardTheme}
+          totalTime={settings.timerValue * 60}
         />
       )}
 
       {/* TV Broadcast View - Host NOT Playing (Spectator Mode) */}
-      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && !settings.hostPlaying) && (
+      {((runtime.gameStarted || hasActiveGameData) && !runtime.waitingForResults && !settings.hostPlaying && runtime.tableData) && (
         <TvBroadcastView
           gameCode={gameCode}
           username={username}

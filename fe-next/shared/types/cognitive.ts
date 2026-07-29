@@ -102,7 +102,7 @@ export interface GameCognitiveInput {
   // Game results
   wordsFound: number;
   gameDurationSeconds: number;
-  gridSize: number;            // 25, 49, or 81
+  gridSize: number;            // 25, 36, or 49
 
   // Word details
   wordLengths: number[];       // Length of each found word
@@ -262,15 +262,15 @@ export const TIER_CONFIGS: TierConfig[] = [
 /** Thresholds for processing speed calculation by grid size */
 export const WPM_THRESHOLDS: Record<number, number> = {
   25: 12,   // 5x5 grid - expect ~12 WPM for 100 score
+  36: 14,   // 6x6 grid - expect ~14 WPM for 100 score
   49: 15,   // 7x7 grid - expect ~15 WPM for 100 score
-  81: 18,   // 9x9 grid - expect ~18 WPM for 100 score
 };
 
 /** Grid normalizers for working memory calculation */
 export const GRID_NORMALIZERS: Record<number, number> = {
   25: 1.0,
+  36: 1.15,
   49: 1.3,
-  81: 1.6,
 };
 
 /** Domain weights for overall score calculation */

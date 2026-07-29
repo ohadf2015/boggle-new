@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -168,7 +168,7 @@ export function CoinTrajectory({
       case 'neo':
         return (
           <div
-            className="rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-2 border-amber-700 shadow-hard"
+            className="rounded-full bg-linear-to-br from-amber-300 via-yellow-400 to-amber-500 border-2 border-amber-700 shadow-hard"
             style={{ width: size, height: size }}
           >
             <div className="w-full h-full flex items-center justify-center text-amber-800 font-black text-xs">
@@ -179,7 +179,7 @@ export function CoinTrajectory({
       case 'icon':
         return (
           <div
-            className="rounded-full bg-gradient-to-br from-yellow-400 to-amber-500"
+            className="rounded-full bg-linear-to-br from-yellow-400 to-amber-500"
             style={{ width: size, height: size }}
           />
         );
@@ -192,7 +192,7 @@ export function CoinTrajectory({
   return (
     <div
       className={cn(
-        'fixed inset-0 pointer-events-none z-[200] overflow-hidden',
+        'fixed inset-0 pointer-events-none z-60 overflow-hidden',
         className
       )}
     >
@@ -201,7 +201,7 @@ export function CoinTrajectory({
           const { controlX, controlY } = getTrajectory(particle);
 
           return (
-            <motion.div
+            <m.div
               key={particle.id}
               className="absolute will-change-transform"
               style={{
@@ -241,7 +241,7 @@ export function CoinTrajectory({
             >
               {/* Trail effect */}
               {showTrail && enableGlowEffects && !isLowEnd && (
-                <motion.div
+                <m.div
                   className="absolute inset-0 rounded-full"
                   style={{
                     background: 'radial-gradient(circle, rgba(255,225,53,0.4) 0%, transparent 70%)',
@@ -258,14 +258,14 @@ export function CoinTrajectory({
                 />
               )}
               {renderCoin(particle.size)}
-            </motion.div>
+            </m.div>
           );
         })}
       </AnimatePresence>
 
       {/* Impact effect at target */}
       {arrivedCount > 0 && enableGlowEffects && !isLowEnd && (
-        <motion.div
+        <m.div
           className="absolute pointer-events-none"
           style={{
             left: targetPos.x,
@@ -283,7 +283,7 @@ export function CoinTrajectory({
               background: 'radial-gradient(circle, rgba(255,225,53,0.6) 0%, transparent 70%)',
             }}
           />
-        </motion.div>
+        </m.div>
       )}
     </div>
   );

@@ -5,13 +5,13 @@ import { useRandomMascotActivity } from '@/hooks/useRandomMascotActivity';
 import type { ActivityVariant } from '../InteractiveMascot';
 
 // Mock the hook
-jest.mock('@/hooks/useRandomMascotActivity');
+vi.mock('@/hooks/useRandomMascotActivity');
 const mockUseRandomMascotActivity = useRandomMascotActivity as jest.MockedFunction<
   typeof useRandomMascotActivity
 >;
 
 // Mock InteractiveMascot since we only want to test IdleMascot logic
-jest.mock('../InteractiveMascot', () => ({
+vi.mock('../InteractiveMascot', () => ({
   __esModule: true,
   default: ({ variant, onClick }: any) => (
     <div data-testid="interactive-mascot" data-variant={variant} onClick={onClick}>
@@ -21,7 +21,7 @@ jest.mock('../InteractiveMascot', () => ({
 }));
 
 // Mock device performance hook
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     prefersReducedMotion: false,
     enableComplexAnimations: true,
@@ -29,29 +29,44 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
 }));
 
 describe('IdleMascot', () => {
-  const mockTriggerActivity = jest.fn();
-  const mockResetToBase = jest.fn();
+  const mockTriggerActivity = vi.fn();
+  const mockResetToBase = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockUseRandomMascotActivity.mockReturnValue({
       currentVariant: 'happy',
+      currentBaseVariant: 'happy',
       isDoingActivity: false,
       triggerActivity: mockTriggerActivity,
       resetToBase: mockResetToBase,
     });
   });
 
-  it('should render with base variant', () => {
+  it('should render with base variant and default timing', () => {
     render(<IdleMascot baseVariant="happy" />);
 
     const mascot = screen.getByTestId('interactive-mascot');
     expect(mascot).toBeInTheDocument();
     expect(mascot).toHaveAttribute('data-variant', 'happy');
+
+    // Verify default timing values are passed (8-15s initial delay, 45-90s interval)
+    // These are longer intervals to reduce image change frequency
+    expect(mockUseRandomMascotActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        initialDelayMin: 8000,
+        initialDelayMax: 15000,
+        minInterval: 45000,
+        maxInterval: 90000,
+        cycleBaseVariants: true,
+      })
+    );
   });
 
   it('should pass props to useRandomMascotActivity hook', () => {
-    const activities: ActivityVariant[] = ['eating_pizza', 'gaming'];
+    const activities: ActivityVariant[] = ['eating_pizza', 'skateboarding'];
+    const initialDelayMin = 1000;
+    const initialDelayMax = 3000;
     const minInterval = 15000;
     const maxInterval = 45000;
     const activityDuration = 5000;
@@ -60,25 +75,33 @@ describe('IdleMascot', () => {
       <IdleMascot
         baseVariant="thinking"
         activities={activities}
+        initialDelayMin={initialDelayMin}
+        initialDelayMax={initialDelayMax}
         minInterval={minInterval}
         maxInterval={maxInterval}
         activityDuration={activityDuration}
       />
     );
 
-    expect(mockUseRandomMascotActivity).toHaveBeenCalledWith({
-      baseVariant: 'thinking',
-      activities,
-      minInterval,
-      maxInterval,
-      activityDuration,
-      enabled: true,
-    });
+    expect(mockUseRandomMascotActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        baseVariant: 'thinking',
+        activities,
+        initialDelayMin,
+        initialDelayMax,
+        minInterval,
+        maxInterval,
+        activityDuration,
+        enabled: true,
+        cycleBaseVariants: true,
+      })
+    );
   });
 
   it('should display current variant from hook', () => {
     mockUseRandomMascotActivity.mockReturnValue({
       currentVariant: 'eating_pizza',
+      currentBaseVariant: 'happy',
       isDoingActivity: true,
       triggerActivity: mockTriggerActivity,
       resetToBase: mockResetToBase,
@@ -102,7 +125,7 @@ describe('IdleMascot', () => {
 
   it('should call custom onClick handler along with trigger', async () => {
     const user = userEvent.setup();
-    const mockOnClick = jest.fn();
+    const mockOnClick = vi.fn();
 
     render(<IdleMascot baseVariant="happy" enableClick onClick={mockOnClick} />);
 

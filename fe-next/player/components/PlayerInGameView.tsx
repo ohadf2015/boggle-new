@@ -1,17 +1,49 @@
 'use client';
 
-import React, { useMemo, memo, useCallback } from 'react';
+import React, { memo, useCallback, useEffect } from 'react';
 import type { Socket } from 'socket.io-client';
 import { Button } from '../../components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
-import ExitRoomButton from '../../components/ExitRoomButton';
-import HintButton from '../../components/HintButton';
 import TournamentStandings from '../../components/TournamentStandings';
+import dynamic from 'next/dynamic';
 import InGameScreen from '../../components/game/InGameScreen';
+import { useBlastMultiplayerBridge } from '@/components/blast/legacy/hooks/useBlastMultiplayerBridge';
+import { GameLoadingFallback } from '@/components/ui/GameLoadingFallback';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+
+const BlastGame = dynamic(
+  () => import('@/components/blast/legacy/BlastGame').then(m => ({ default: m.BlastGame })),
+  { ssr: false, loading: () => <GameLoadingFallback /> },
+);
+const WordHuntGame = dynamic(
+  () => import('@/components/wordhunt/WordHuntGame').then(m => ({ default: m.WordHuntGame })),
+  { ssr: false, loading: () => <GameLoadingFallback /> },
+);
+const WheelRushView = dynamic(
+  () => import('@/components/multiplayer/WheelRushView').then(m => ({ default: m.WheelRushView })),
+  { ssr: false, loading: () => <GameLoadingFallback /> },
+);
+const WordTowerVersus = dynamic(
+  () => import('@/components/wordTower/WordTowerVersus').then(m => ({ default: m.WordTowerVersus })),
+  { ssr: false, loading: () => <GameLoadingFallback /> },
+);
 import type { LetterGrid, Language, Avatar as AvatarType, TournamentStanding } from '@/shared/types/game';
 import type { BoardTheme } from '@/shared/types/socket';
+import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
+import {
+  useGameMode,
+  useGameModeConfirmed,
+  useGameStore,
+  useBlastBoardClearedByLocal,
+} from '@/hooks/gameState/store';
+import { usePendingWords } from '@/lib/multiplayer/usePendingWords';
+import { useReconnectFlow } from '@/lib/multiplayer/useReconnectFlow';
+import { PendingWordChip } from '@/components/multiplayer/PendingWordChip';
+import { ReconnectingOverlay } from '@/components/multiplayer/ReconnectingOverlay';
+import { MPGameAbortedModal } from '@/components/multiplayer/MPGameAbortedModal';
+import { useRouter, useParams } from 'next/navigation';
 
 // ==================== Hint Types ====================
 
@@ -73,6 +105,14 @@ interface PlayerInGameViewProps {
   minWordLength: number;
   comboLevel: number;
   comboLevelRef: React.MutableRefObject<number>;
+  /**
+   * Timestamp of the last accepted word — drives the combo-window countdown
+   * inside `ComboDisplayConnected`. The 10 Hz RAF state used to live in
+   * `PlayerView` and cascade through every memo boundary down here on every
+   * tick; passing the trigger value instead of the derived state keeps the
+   * shell stable during drag.
+   */
+  lastWordTime: number | null;
 
   // Player data
   foundWords: FoundWord[];
@@ -93,7 +133,6 @@ interface PlayerInGameViewProps {
   onExitRoom: () => void;
   onConfirmExit: () => void;
   onWordSubmit: (word: string) => void;
-  setWord: (word: string) => void;
   onResetCombo?: () => void;
 
   // Hints (single-player mode)
@@ -106,6 +145,12 @@ interface PlayerInGameViewProps {
 
   // Board theme
   boardTheme?: BoardTheme | null;
+
+  // Tutorial callback
+  onShowTutorial?: () => void;
+
+  // Blast multiplayer: total game duration for CircularTimer progress ring
+  totalTime?: number;
 }
 
 // ==================== Component ====================
@@ -132,6 +177,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   minWordLength,
   comboLevel,
   comboLevelRef,
+  lastWordTime,
 
   // Player data
   foundWords,
@@ -164,14 +210,117 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
 
   // Board theme
   boardTheme,
-}): React.ReactElement => {
+
+  // Tutorial callback
+  onShowTutorial,
+
+  // Blast multiplayer
+  totalTime,
+}): React.ReactElement | null => {
   // Get player's game history for trail display logic
   const { profile } = useAuth();
+
+  // Sound effects for MP Blast board cleared celebration
+  const { playEpicVictorySound } = useSoundEffects();
+
+  // Game mode state from Zustand
+  const gameMode = useGameMode();
+  const gameModeConfirmed = useGameModeConfirmed();
+  const gameDuration = useGameStore((s) => s.gameDuration);
+  const setBlastBoardClearedByLocal = useGameStore((s) => s.setBlastBoardClearedByLocal);
+
+  // Mode-overlay state subscribed inside InGameScreen — keeps this view
+  // from re-rendering on irrelevant store updates when gameMode isn't classic.
+
+  // Blast multiplayer bridge — converts Zustand state to BlastGame props
+  const blastBridge = useBlastMultiplayerBridge({
+    letterGrid: letterGrid || shufflingGrid,
+    gridSize: (letterGrid || shufflingGrid)?.[0]?.length ?? 4,
+  });
+
+  const { pendingWords, enqueuePending, confirmPending, rejectPending, dismissPending, clearAll } = usePendingWords();
+
+  const router = useRouter();
+  const params = useParams();
+  const { isReconnecting, reconnectAttempt, maxReconnectAttempts, isServerUpdating, showAbortModal, triggerAbort } =
+    useReconnectFlow({ gameCode, username, gameActive });
+
+  const handleContinueSolo = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('mp_solo_handoff', JSON.stringify({ grid: letterGrid, gameCode }));
+    }
+    const locale = (params?.locale as string) || 'en';
+    router.push(`/${locale}/singleplayer?mpHandoff=1`);
+  }, [router, params, letterGrid, gameCode]);
+
+  // Listen for per-word server feedback to drive pending-word chip transitions
+  useEffect(() => {
+    if (!socket) return;
+    const handlePlayerFound = (data: { username: string; word: string }) => {
+      if (data.username === username) confirmPending(data.word);
+    };
+    const handleWordRejected = (data: { word: string }) => rejectPending(data.word);
+    socket.on('playerFoundWord', handlePlayerFound);
+    socket.on('wordRejected', handleWordRejected);
+    socket.on('wordAlreadyFound', handleWordRejected);
+    socket.on('wordNotOnBoard', handleWordRejected);
+    socket.on('endGame', clearAll);
+    return () => {
+      socket.off('playerFoundWord', handlePlayerFound);
+      socket.off('wordRejected', handleWordRejected);
+      socket.off('wordAlreadyFound', handleWordRejected);
+      socket.off('wordNotOnBoard', handleWordRejected);
+      socket.off('endGame', clearAll);
+    };
+  }, [socket, username, confirmPending, rejectPending, clearAll]);
+
+  // Blast multiplayer: emit word + comboType to server via socket
+  const handleBlastWordWithCombo = useCallback((word: string, comboType: string | null) => {
+    if (!socket) return;
+    enqueuePending(word);
+    socket.emit('submitWord', { word, comboType });
+  }, [socket, enqueuePending]);
+
+  // Word hunt guess handler — emits to server
+  const handleWordHuntGuess = useCallback((guess: string) => {
+    if (!socket) return;
+    socket.emit('submitTargetWord', { guess });
+  }, [socket]);
+
+  // Blast multiplayer: local player cleared the shared board
+  const handleMPBoardCleared = useCallback(() => {
+    setBlastBoardClearedByLocal(true);
+    playEpicVictorySound();
+  }, [setBlastBoardClearedByLocal, playEpicVictorySound]);
 
   // Memoized handler for closing tournament standings
   const handleCloseTournamentStandings = useCallback(() => {
     setShowTournamentStandings(false);
   }, [setShowTournamentStandings]);
+
+  // Wait for server to confirm mode before rendering — prevents one-frame classic flash
+  // caused by the host handler setting tableData (React state) and gameMode (Zustand)
+  // in separate calls, producing two render cycles.
+  if (!gameModeConfirmed) return null;
+
+  // Wheel-rush has no letter grid — render dedicated view before grid guard
+  if (gameMode === 'wheel-rush') {
+    return (
+      <WheelRushView
+        socket={socket}
+        username={username}
+        leaderboard={leaderboard}
+        onQuit={onExitRoom}
+        t={t}
+        remainingTime={remainingTime}
+      />
+    );
+  }
+
+  // Word Tower versus — per-player towers, no shared grid
+  if (gameMode === 'word-tower') {
+    return <WordTowerVersus socket={socket} username={username} onQuit={onExitRoom} />;
+  }
 
   // Use letterGrid or shufflingGrid
   const effectiveGrid = letterGrid || shufflingGrid;
@@ -179,11 +328,11 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   // Show placeholder if no grid
   if (!effectiveGrid) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-4 flex items-center justify-center">
+      <div className="flex-1 flex flex-col min-h-0 bg-neo-cream dark:bg-neo-navy p-4 items-center justify-center">
         <div className="w-full max-w-2xl aspect-square grid grid-cols-4 gap-3 p-4">
           {Array.from({ length: 16 }).map((_, i) => (
             <div
-              key={i}
+              key={`placeholder-${i}`}
               className="aspect-square rounded-xl bg-slate-700/50 text-white animate-pulse"
               style={{ animationDelay: `${i * 50}ms` }}
             />
@@ -194,88 +343,119 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
   }
 
   return (
-    <div className="h-screen overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 p-0 md:p-4 flex flex-col transition-colors duration-300">
+    <div className={cn(
+      'flex-1 flex flex-col min-h-0 overflow-x-clip overflow-y-auto transition-colors duration-300',
+      gameMode === 'blast' ? 'bg-neo-navy p-0' : 'bg-neo-cream dark:bg-neo-navy p-0 md:p-4'
+    )}>
 
-      {/* Top Bar - Desktop only */}
-      <div className="hidden lg:flex w-full max-w-7xl mx-auto items-center justify-between mb-1 pt-24">
-        <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-[60]" />
 
-        {/* Hint Button - Single Player Mode Only */}
-        {hints && hints.isSinglePlayer && (
-          <HintButton
-            hint={hints.hint}
-            hintType={hints.hintType}
-            hintsRemaining={hints.hintsRemaining}
-            wordLength={hints.wordLength}
-            firstLetter={hints.firstLetter}
-            isLoading={hints.isLoading}
-            error={hints.error}
-            isAvailable={hints.isAvailable}
-            isSinglePlayer={hints.isSinglePlayer}
-            gameActive={gameActive}
-            onRequestHint={hints.requestHint}
-            onClearHint={hints.clearHint}
-            t={t}
+      {/* Main Game Content — Blast/WordHunt use dedicated components, others use InGameScreen */}
+      {gameMode === 'blast' ? (
+          <BlastGame
+            config={blastBridge.config}
+            mode="multiplayer"
+            remainingTime={remainingTime}
+            totalTime={totalTime}
+            leaderboard={leaderboard}
+            username={username}
+            onGameEnd={() => {/* Server controls game end in multiplayer */}}
+            onMPDeadEnd={() => socket?.emit('blastDeadEnd')}
+            onMPBoardCleared={handleMPBoardCleared}
+            onQuit={onExitRoom}
+            onWordWithComboType={handleBlastWordWithCombo}
+            initialTileStates={blastBridge.initialTileStates}
+            blastSeed={blastBridge.blastSeed}
+            serverGrid={blastBridge.serverGrid}
           />
-        )}
-      </div>
+      ) : gameMode === 'word-hunt' ? (
+          <WordHuntGame
+            grid={effectiveGrid}
+            gameLanguage={gameLanguage}
+            leaderboard={leaderboard}
+            username={username}
+            score={leaderboard.find(p => p.username === username)?.score ?? 0}
+            onQuit={onExitRoom}
+            onWordSubmit={onWordSubmit}
+            onWordHuntGuess={handleWordHuntGuess}
+            gameActive={gameActive}
+            minWordLength={minWordLength}
+            socket={socket}
+            foundWords={foundWords}
+          />
+      ) : (
+        <InGameScreen
+          // Core identity
+          username={username}
+          gameCode={gameCode}
+          isHost={false}
+          isPlaying={true}
+          gameplayFocusMode={true}
+          t={t}
+          dir={dir}
+          socket={socket}
 
-      {/* Main Game Content */}
-      <InGameScreen
-        // Core identity
-        username={username}
-        gameCode={gameCode}
-        isHost={false}
-        isPlaying={true}
-        gameplayFocusMode={true}
-        t={t}
-        dir={dir}
-        socket={socket}
+          // Game state
+          letterGrid={effectiveGrid}
+          remainingTime={remainingTime}
+          timerValue={gameDuration ? gameDuration / 60 : 2}
+          gameActive={gameActive}
+          showStartAnimation={showStartAnimation}
+          gameLanguage={gameLanguage}
+          minWordLength={minWordLength}
+          comboLevel={comboLevel}
+          comboLevelRef={comboLevelRef}
+          lastWordTime={lastWordTime}
 
-        // Game state
-        letterGrid={effectiveGrid}
-        remainingTime={remainingTime}
-        timerValue={3} // Default 3 minutes, will be overridden by server
-        gameActive={gameActive}
-        showStartAnimation={showStartAnimation}
-        gameLanguage={gameLanguage}
-        minWordLength={minWordLength}
-        comboLevel={comboLevel}
-        comboLevelRef={comboLevelRef}
+          // Player data
+          foundWords={foundWords}
+          leaderboard={leaderboard}
+          totalBoardWords={totalBoardWords}
 
-        // Player data
-        foundWords={foundWords}
-        leaderboard={leaderboard}
-        totalBoardWords={totalBoardWords}
+          // Callbacks
+          onExitRoom={onExitRoom}
+          onWordSubmit={onWordSubmit}
+          onResetCombo={onResetCombo}
 
-        // Callbacks
-        onExitRoom={onExitRoom}
-        onWordSubmit={onWordSubmit}
-        onResetCombo={onResetCombo}
+          // Tournament
+          tournamentData={tournamentData}
 
-        // Tournament
-        tournamentData={tournamentData}
+          // Hints
+          hints={hints}
 
-        // Hints
-        hints={hints}
+          // Earthquake/Fire Round
+          earthquakeState={earthquakeState}
+          fireRoundActive={fireRoundActive}
+          fireRoundRemaining={fireRoundRemaining}
 
-        // Earthquake/Fire Round
-        earthquakeState={earthquakeState}
-        fireRoundActive={fireRoundActive}
-        fireRoundRemaining={fireRoundRemaining}
+          // Board theme
+          boardTheme={boardTheme}
 
-        // Board theme
-        boardTheme={boardTheme}
+          // Game mode overlays
+          gameMode={gameMode ?? undefined}
+          onWordHuntGuess={handleWordHuntGuess}
 
-        // Player experience (for keyboard trail inactivity threshold)
-        totalGamesPlayed={profile?.total_games}
-      />
+          // Player experience (for keyboard trail inactivity threshold)
+          totalGamesPlayed={profile?.total_games}
+
+          // Tutorial callback
+          onShowTutorial={onShowTutorial}
+        />
+      )}
+
+      {/* Pending word chips — optimistic submit feedback */}
+      {pendingWords.size > 0 && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-40 flex flex-wrap gap-1 justify-center pointer-events-none">
+          {Array.from(pendingWords.entries()).map(([word, status]) => (
+            <PendingWordChip key={word} word={word} status={status} onDismiss={dismissPending} />
+          ))}
+        </div>
+      )}
 
       {/* Tournament Standings Modal */}
       <Dialog open={showTournamentStandings} onOpenChange={setShowTournamentStandings}>
-        <DialogContent noDescription className="max-w-4xl max-h-[90vh] overflow-y-auto bg-white text-neo-black dark:bg-slate-800 dark:text-white border-purple-500/30">
+        <DialogContent noDescription className="max-w-4xl max-h-[90vh] overflow-y-auto overscroll-contain scrollable-area bg-white text-neo-black dark:bg-slate-800 dark:text-white border-purple-500/30">
           <DialogHeader>
-            <DialogTitle className="text-center text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 dark:from-purple-400 dark:to-pink-400">
+            <DialogTitle className="text-center text-2xl font-black text-neo-pink dark:text-neo-pink">
               {tournamentData?.status === 'completed' ? t('hostView.tournamentComplete') : t('hostView.tournamentStandings')}
             </DialogTitle>
           </DialogHeader>
@@ -290,13 +470,20 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
           <DialogFooter className="sm:justify-center">
             <Button
               onClick={handleCloseTournamentStandings}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400 hover:shadow-[0_0_15px_rgba(168,85,247,0.5)]"
+              className="w-full bg-neo-pink text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
             >
               {t('common.close')}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {isReconnecting && gameActive && (
+        <ReconnectingOverlay attempt={reconnectAttempt} maxAttempts={maxReconnectAttempts} onGiveUp={triggerAbort} isServerUpdating={isServerUpdating} />
+      )}
+      {showAbortModal && (
+        <MPGameAbortedModal wordCount={foundWords.length} boardSeed={gameCode} onContinueSolo={handleContinueSolo} onReturnToLobby={onExitRoom} />
+      )}
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
@@ -315,7 +502,7 @@ const PlayerInGameView = memo<PlayerInGameViewProps>(({
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={onConfirmExit}
-              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white"
+              className="bg-neo-red text-neo-cream font-bold border-3 border-neo-black shadow-hard hover:shadow-hard-lg active:shadow-hard-pressed"
             >
               {t('common.confirm')}
             </AlertDialogAction>

@@ -9,16 +9,19 @@
  * - Cancel tournament
  */
 
-import React, { useCallback, MutableRefObject } from 'react';
+import React, { useCallback, useRef, useState, type RefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast, neoErrorToast, neoInfoToast } from '@/components/NeoToast';
+import { neoSuccessToast, neoErrorToast, neoInfoToast, TOAST_ICONS } from '@/components/NeoToast';
 import { clearSessionPreservingUsername } from '@/utils/session';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES } from '@/utils/consts';
 import logger from '@/utils/logger';
+import { BOOST_TOKEN_STORAGE_KEY } from '@/hooks/useBoostClaim';
 import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { TournamentData } from './useHostViewState';
 import type { BoardTheme } from '@/shared/types/socket';
+import { useGameMode, useHostSelectedGameMode } from '@/hooks/gameState';
+import { WHEEL_RUSH_DURATION_SEC } from '@/shared/constants/wheelRushConstants';
 
 interface UseHostGameActionsOptions {
   socket: Socket | null;
@@ -57,14 +60,25 @@ interface UseHostGameActionsOptions {
   setShowExitConfirm: React.Dispatch<React.SetStateAction<boolean>>;
   setShowCancelTournamentDialog: React.Dispatch<React.SetStateAction<boolean>>;
   setShowQR: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSoloConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Refs
-  intentionalExitRef: MutableRefObject<boolean>;
-  tournamentTimeoutRef: MutableRefObject<NodeJS.Timeout | null>;
+  intentionalExitRef: RefObject<boolean>;
+  tournamentTimeoutRef: RefObject<NodeJS.Timeout | null>;
+
+  /**
+   * Reset MP state IN PLACE and return to the lobby without a page reload —
+   * PageClient's proven `handleExitToLobby`. When provided, confirmExitRoom
+   * delegates to it instead of `window.location.reload()`, which blanks the
+   * Capacitor WebView (the "exit MP → black screen" report). Optional so the
+   * hook keeps the legacy reload fallback when unwired.
+   */
+  onExitToLobby?: () => void;
 }
 
 export interface UseHostGameActionsReturn {
   startGame: () => void;
+  confirmSoloStart: () => void;
   stopGame: () => void;
   handleExitRoom: () => void;
   confirmExitRoom: () => void;
@@ -75,9 +89,15 @@ export interface UseHostGameActionsReturn {
   handleCancelTournamentDialog: () => void;
   handleHostWordSubmit: (word: string) => void;
   regenerateBoard: () => void;
+  /** True once the host confirms exit; fed to useNavigationGuard to skip the go(-1) teardown race. */
+  leaving: boolean;
 }
 
 export function useHostGameActions(options: UseHostGameActionsOptions): UseHostGameActionsReturn {
+  const gameMode = useGameMode();
+  // Send the host's persistent intent (can be 'random'), not the resolved gameMode
+  // — otherwise a "random" pick locks to the rolled result on subsequent rounds.
+  const hostSelectedGameMode = useHostSelectedGameMode();
   const {
     socket,
     gameCode,
@@ -96,7 +116,6 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     tournamentData,
     setTableData,
     setRemainingTime,
-    setShowStartAnimation,
     setPlayerWordCounts,
     setPlayerScores,
     setHostFoundWords,
@@ -109,24 +128,32 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setShowExitConfirm,
     setShowCancelTournamentDialog,
     setShowQR,
+    setShowSoloConfirm,
     intentionalExitRef,
     tournamentTimeoutRef,
+    onExitToLobby,
   } = options;
 
-  const startGame = useCallback(() => {
-    // Validate players are ready
-    if (playersCount === 0) {
-      logger.warn('[HOST] Cannot start game: no players');
-      neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: '⚠️', duration: 3000 });
+  const startGameLockRef = useRef(false);
+
+  /** Core game-start logic shared by startGame and confirmSoloStart */
+  const executeStartGame = useCallback(() => {
+    // Debounce: prevent double-click from emitting startGame twice
+    if (startGameLockRef.current) {
+      logger.warn('[HOST] Start game already in progress, ignoring duplicate');
       return;
     }
 
-    // Validate socket connection
+    // Validate socket connection BEFORE taking the lock so a transient
+    // disconnect doesn't jam retries for the 3s debounce window.
     if (!socket || !socket.connected) {
-      logger.error('[HOST] Cannot start game: socket not connected');
-      neoErrorToast(t('hostView.connectionLost') || 'Connection lost. Please refresh.', { icon: '🔌', duration: 4000 });
+      logger.warn('[HOST] Cannot start game: socket not connected');
+      neoErrorToast(t('hostView.connectionLost') || 'Connection lost. Please refresh.', { icon: TOAST_ICONS.plug, duration: 4000 });
       return;
     }
+
+    startGameLockRef.current = true;
+    setTimeout(() => { startGameLockRef.current = false; }, 3000);
 
     // Tournament creation
     if (gameType === 'tournament' && !tournamentData) {
@@ -143,7 +170,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
         if (!tournamentData) {
           setTournamentCreating(false);
           neoErrorToast(t('hostView.tournamentCreateFailed'), {
-            icon: '❌',
+            icon: TOAST_ICONS.xCircle,
             duration: 5000,
           });
         }
@@ -157,24 +184,50 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       return;
     }
 
-    // Regular game
-    const difficultyConfig = DIFFICULTIES[difficulty];
+    // Regular game — blast mode always uses 6x6 grid
+    const difficultyConfig = DIFFICULTIES[difficulty] ?? DIFFICULTIES.MEDIUM;
+    const rows = gameMode === 'blast' ? 6 : difficultyConfig.rows;
+    const cols = gameMode === 'blast' ? 6 : difficultyConfig.cols;
     const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
-    const newTable = generateRandomTable(
-      difficultyConfig.rows,
-      difficultyConfig.cols,
-      roomLanguage,
-      embedWords
-    );
+    const newTable = generateRandomTable(rows, cols, roomLanguage, embedWords);
+
+    if (!newTable || !Array.isArray(newTable) || newTable.length === 0) {
+      logger.error('[HOST] Failed to generate letter grid', { difficulty, gameMode, rows, cols });
+      return;
+    }
 
     setTableData(newTable);
-    const seconds = timerValue * 60;
+    // Wheel-rush is design-locked to its 1-minute default (WHEEL_RUSH_DURATION_SEC).
+    const seconds = (hostSelectedGameMode === 'wheel-rush')
+      ? WHEEL_RUSH_DURATION_SEC
+      : timerValue * 60;
     setRemainingTime(seconds);
-    setShowStartAnimation(true);
+    // NOTE: Do NOT trigger the start animation optimistically here. The host's
+    // 3-2-1-GO countdown is driven by the server `startGame` broadcast (see
+    // useHostGameEvents.handleStartGame) — the exact same trigger players use.
+    // Starting it on click put the host a full network round-trip ahead of the
+    // players, so the game appeared to start at different times. Letting the
+    // broadcast drive both keeps host and players in sync.
     setPlayerWordCounts({});
     setPlayerScores({});
     setHostFoundWords([]);
     setHostAchievements([]);
+
+    // Read cached boost token BEFORE emit so the server registers the boost
+    // atomically with state transition. The prior separate `boost:apply` emit
+    // raced submitWord — first words could land before the boost was stashed.
+    let boostToken: string | undefined;
+    const rawBoost = typeof sessionStorage !== 'undefined'
+      ? sessionStorage.getItem(BOOST_TOKEN_STORAGE_KEY(gameCode))
+      : null;
+    if (rawBoost) {
+      try {
+        const parsed = JSON.parse(rawBoost) as { token?: string };
+        if (parsed?.token) boostToken = parsed.token;
+      } catch {
+        // Ignore parsing errors — startGame proceeds without a boost.
+      }
+    }
 
     logger.info('[HOST] Starting game with', playersCount, 'players');
     socket.emit('startGame', {
@@ -185,10 +238,13 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
       minWordLength: minWordLength,
       difficulty: difficulty,
       boardTheme: boardTheme,
+      gameMode: hostSelectedGameMode || 'random',
+      tvMode: !hostPlaying,
+      ...(boostToken ? { boostToken } : {}),
     });
 
     neoSuccessToast(t('common.gameStarted'), {
-      icon: '🎮',
+      icon: TOAST_ICONS.gamepad,
       duration: 3000,
     });
   }, [
@@ -207,21 +263,57 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     tournamentRounds,
     setTableData,
     setRemainingTime,
-    setShowStartAnimation,
     setPlayerWordCounts,
     setPlayerScores,
     setHostFoundWords,
     setHostAchievements,
     setTournamentCreating,
     tournamentTimeoutRef,
+    gameMode,
+    hostSelectedGameMode,
+    gameCode,
   ]);
+
+  /** Public startGame — shows solo confirmation if host is alone */
+  const startGame = useCallback(() => {
+    // playersCount includes the host, so subtract 1 when host is playing
+    const otherPlayers = hostPlaying ? playersCount - 1 : playersCount;
+
+    // No players at all (host not playing and nobody joined)
+    if (otherPlayers <= 0 && !hostPlaying) {
+      logger.warn('[HOST] Cannot start game: no players');
+      neoErrorToast(t('hostView.noPlayers') || 'No players in lobby', { icon: TOAST_ICONS.alertTriangle, duration: 3000 });
+      return;
+    }
+
+    // Solo host with no other players — ask for confirmation
+    if (otherPlayers <= 0 && hostPlaying) {
+      setShowSoloConfirm(true);
+      return;
+    }
+
+    executeStartGame();
+  }, [playersCount, hostPlaying, t, executeStartGame, setShowSoloConfirm]);
+
+  /** Called when user confirms they want to play solo with bots */
+  const confirmSoloStart = useCallback(() => {
+    setShowSoloConfirm(false);
+    executeStartGame();
+  }, [executeStartGame, setShowSoloConfirm]);
 
   const stopGame = useCallback(() => {
     socket?.emit('endGame', { gameCode });
     setRemainingTime(null);
     setGameStarted(false);
-    neoInfoToast(t('hostView.gameStopped'), { icon: '⏹️' });
+    // Host pressed X — do not auto-advance to the next game on the results page.
+    // StickyReadyBar reads this flag on mount to keep its 35s countdown cancelled.
+    try { sessionStorage.setItem('mp-auto-advance-cancelled', '1'); } catch {}
+    neoInfoToast(t('hostView.gameStopped'), { icon: TOAST_ICONS.stopCircle });
   }, [socket, gameCode, t, setRemainingTime, setGameStarted]);
+
+  // True once the host confirms exit — passed to useNavigationGuard so its
+  // teardown skips the go(-1) that races the reload and blanks the WebView.
+  const [leaving, setLeaving] = useState(false);
 
   const handleExitRoom = useCallback(() => {
     setShowExitConfirm(true);
@@ -229,13 +321,40 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
   const confirmExitRoom = useCallback(() => {
     intentionalExitRef.current = true;
+
+    // Signal the navigation guard we're leaving (batched with setGameStarted(false)
+    // → one commit where the guard's render-time leavingRef is true at teardown, so
+    // it skips the go(-1) that races the reload and blanks the native WebView).
+    setLeaving(true);
+
+    // Disable navigation guard BEFORE navigation to prevent native browser prompt
+    setGameStarted(false);
+
+    // Preferred path: reset MP state IN PLACE via PageClient's proven
+    // handleExitToLobby (emits the same graceful leaveRoom, clears session,
+    // strips the ?room= param — NO reload, NO socket.disconnect). The legacy
+    // hard reload below blanks the Capacitor WebView.
+    if (onExitToLobby) {
+      onExitToLobby();
+      return;
+    }
+
+    // Legacy fallback (callback not wired): hard reload.
     clearSessionPreservingUsername(username);
-    socket?.emit('closeRoom', { gameCode });
+    // Persist the intentional-exit flag in sessionStorage so the post-reload
+    // boot path skips auto-rejoin. The ref alone is gone after reload.
+    try { sessionStorage.setItem('boggle_intentional_exit', '1'); } catch { /* blocked */ }
+    // Room-centric exit: the host LEAVES (like any player) rather than nuking the
+    // room. The server's leaveRoom MIGRATES host to an eligible successor (or
+    // closes only if no one remains) — the same graceful path a host disconnect
+    // already takes. closeRoom unconditionally deleted the room, kicking everyone
+    // even mid-game. ("Stop Game" / endGame is the separate end-for-all action.)
+    socket?.emit('leaveRoom', { gameCode, username });
     setTimeout(() => {
       socket?.disconnect();
       window.location.reload();
     }, 100);
-  }, [socket, gameCode, username, intentionalExitRef]);
+  }, [socket, gameCode, username, intentionalExitRef, setGameStarted, onExitToLobby]);
 
   const handleCancelTournament = useCallback(() => {
     if (!socket || !tournamentData) return;
@@ -244,13 +363,21 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     setTournamentData(null);
     setGameType('regular');
     neoErrorToast(t('hostView.tournamentCancelled') || 'Tournament cancelled', {
-      icon: '❌',
+      icon: TOAST_ICONS.xCircle,
       duration: 3000,
     });
   }, [socket, tournamentData, t, setShowCancelTournamentDialog, setTournamentData, setGameType]);
 
   const handleStartNewGame = useCallback(() => {
-    socket?.emit('resetGame', {}, (response: { success: boolean; error?: string; gameState?: string }) => {
+    // Reuse the same lock as startGame to prevent duplicate emissions
+    if (startGameLockRef.current) {
+      logger.warn('[HOST] handleStartNewGame already in progress, ignoring duplicate');
+      return;
+    }
+    startGameLockRef.current = true;
+    setTimeout(() => { startGameLockRef.current = false; }, 3000);
+
+    socket?.emit('resetGame', { gameCode }, (response: { success: boolean; error?: string; gameState?: string }) => {
       if (response?.success) {
         setFinalScores(null);
         setGameType('regular');
@@ -258,19 +385,25 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
 
         // Immediately start a new game - skip the waiting room
         // This includes all current players and any waiting room players
-        const difficultyConfig = DIFFICULTIES[difficulty];
+        const difficultyConfig = DIFFICULTIES[difficulty] ?? DIFFICULTIES.MEDIUM;
+        const rows = gameMode === 'blast' ? 6 : difficultyConfig.rows;
+        const cols = gameMode === 'blast' ? 6 : difficultyConfig.cols;
         const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
-        const newTable = generateRandomTable(
-          difficultyConfig.rows,
-          difficultyConfig.cols,
-          roomLanguage,
-          embedWords
-        );
+        const newTable = generateRandomTable(rows, cols, roomLanguage, embedWords);
+
+        if (!newTable || !Array.isArray(newTable) || newTable.length === 0) {
+          logger.error('[HOST] Failed to generate letter grid on restart', { difficulty, gameMode });
+          return;
+        }
 
         setTableData(newTable);
-        const seconds = timerValue * 60;
+        const seconds = (hostSelectedGameMode === 'wheel-rush')
+          ? WHEEL_RUSH_DURATION_SEC
+          : timerValue * 60;
         setRemainingTime(seconds);
-        setShowStartAnimation(true);
+        // Animation is driven by the server `startGame` broadcast (same as
+        // players) — see the sync note in executeStartGame. Don't start it
+        // optimistically or the host runs ahead of the players.
         setPlayerWordCounts({});
         setPlayerScores({});
         setHostFoundWords([]);
@@ -284,24 +417,26 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
           minWordLength: minWordLength,
           difficulty: difficulty,
           boardTheme: boardTheme,
+          gameMode: hostSelectedGameMode || 'random',
+          tvMode: !hostPlaying,
         });
 
         neoSuccessToast(t('common.gameStarted'), {
-          icon: '🎮',
+          icon: TOAST_ICONS.gamepad,
           duration: 3000,
         });
       } else {
         neoErrorToast(t('hostView.resetFailed') || 'Failed to reset game', {
-          icon: '❌',
+          icon: TOAST_ICONS.xCircle,
           duration: 3000,
         });
-        logger.error('[HOST] Game reset failed:', response?.error);
+        logger.debug('[HOST] Game reset failed:', response?.error);
       }
     });
   }, [
     socket, t, setFinalScores, setGameType, difficulty, timerValue, roomLanguage,
-    wordsForBoard, hostPlaying, minWordLength, boardTheme,
-    setTableData, setRemainingTime, setShowStartAnimation,
+    wordsForBoard, hostPlaying, minWordLength, boardTheme, gameMode, hostSelectedGameMode, gameCode,
+    setTableData, setRemainingTime,
     setPlayerWordCounts, setPlayerScores, setHostFoundWords, setHostAchievements
   ]);
 
@@ -327,35 +462,30 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
   const regenerateBoard = useCallback(() => {
     if (!socket) return;
 
-    // Request new words from server
+    // Request new words from server — blast mode always uses 6x6
     const difficultyConfig = DIFFICULTIES[difficulty];
+    const rows = gameMode === 'blast' ? 6 : difficultyConfig.rows;
+    const cols = gameMode === 'blast' ? 6 : difficultyConfig.cols;
     socket.emit('getWordsForBoard', {
       language: roomLanguage,
-      boardSize: {
-        rows: difficultyConfig.rows,
-        cols: difficultyConfig.cols,
-      },
+      boardSize: { rows, cols },
     });
 
     // The new words will be received via socket event and stored in wordsForBoard
     // Generate a new board immediately with current words (will be updated when new words arrive)
     const embedWords = roomLanguage !== 'ja' ? wordsForBoard : [];
-    const newTable = generateRandomTable(
-      difficultyConfig.rows,
-      difficultyConfig.cols,
-      roomLanguage,
-      embedWords
-    );
+    const newTable = generateRandomTable(rows, cols, roomLanguage, embedWords);
 
     setTableData(newTable);
 
     neoInfoToast(t('hostView.boardRegenerated') || 'Board regenerated!', {
       duration: 2000,
     });
-  }, [socket, difficulty, roomLanguage, wordsForBoard, t, setTableData]);
+  }, [socket, difficulty, roomLanguage, wordsForBoard, t, setTableData, gameMode]);
 
   return {
     startGame,
+    confirmSoloStart,
     stopGame,
     handleExitRoom,
     confirmExitRoom,
@@ -366,6 +496,7 @@ export function useHostGameActions(options: UseHostGameActionsOptions): UseHostG
     handleCancelTournamentDialog,
     handleHostWordSubmit,
     regenerateBoard,
+    leaving,
   };
 }
 

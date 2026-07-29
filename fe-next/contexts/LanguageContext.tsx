@@ -2,20 +2,40 @@
 
 import { createContext, useState, useContext, useEffect, useRef, useCallback, useMemo, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { translations } from '../translations';
 import { locales, defaultLocale } from '../lib/i18n';
+import { matchLanguageList } from '../lib/localeResolution';
+import { loadTranslation, getCachedTranslation, seedTranslationCache, type TranslationData } from '../translations/loadTranslation';
 import logger from '@/utils/logger';
+import { hasSupabaseSession } from '@/utils/onboardingStorage';
 import type { Language } from '@/types';
 
 interface LanguageContextValue {
   language: Language;
-  setLanguage: (newLang: Language) => void;
-  t: (path: string, params?: Record<string, string | number>) => string;
+  setLanguage: (newLang: Language, options?: { skipNavigation?: boolean }) => void;
+  /**
+   * Translate a key with optional fallback and interpolation params.
+   * @param path - The translation key path (e.g., 'errors.networkError')
+   * @param fallbackOrParams - Either a fallback string or interpolation params object
+   * @param paramsWhenFallback - Interpolation params when first arg is a fallback string
+   *
+   * Usage examples:
+   * - Basic: translateFn('common.save')
+   * - With params: translateFn('common.loading', { count: 5 })
+   * - With fallback: translateFn('common.error', 'Something went wrong')
+   */
+  t: (path: string, fallbackOrParams?: string | Record<string, string | number>, paramsWhenFallback?: Record<string, string | number>) => string;
   dir: 'rtl' | 'ltr';
   currentFlag: string;
 }
 
 const LanguageContext = createContext<LanguageContextValue | null>(null);
+
+// Fallback flags used only until the active language's translation bundle
+// (which carries its own `flag`) finishes loading. Keyed by language so a
+// non-Hebrew user never briefly sees the Israeli flag as the default.
+const FLAG_BY_LANGUAGE: Record<string, string> = {
+    en: '🇺🇸', he: '🇮🇱', sv: '🇸🇪', ja: '🇯🇵', es: '🇪🇸',
+};
 
 const parseLocaleFromPath = (pathname: string): Language | null => {
     if (!pathname) return null;
@@ -24,32 +44,23 @@ const parseLocaleFromPath = (pathname: string): Language | null => {
     return locales.includes(locale as Language) ? (locale as Language) : null;
 };
 
-// Map browser language codes to supported locales
+// Map browser language codes to supported locales. Uses the shared resolver so
+// close-but-unshipped languages map to a native bundle (e.g. a pt-BR browser
+// resolves to our Spanish bundle, not the English default).
 const getBrowserLanguage = (): Language | null => {
     if (typeof window === 'undefined' || !navigator) return null;
-
-    // Get browser languages (e.g., ['en-US', 'en', 'he'])
     const browserLanguages = navigator.languages || [navigator.language];
-
-    for (const lang of browserLanguages) {
-        // Get the primary language code (e.g., 'en' from 'en-US')
-        const primaryLang = lang.split('-')[0]?.toLowerCase();
-
-        // Check if we support this language
-        if (primaryLang && locales.includes(primaryLang as Language)) {
-            return primaryLang as Language;
-        }
-    }
-
-    return null;
+    return matchLanguageList(browserLanguages) as Language | null;
 };
 
 interface LanguageProviderProps {
   children: ReactNode;
   initialLanguage?: Language;
+  /** Pre-loaded translation data for the initial language (avoids async load on mount) */
+  initialTranslations?: TranslationData;
 }
 
-export const LanguageProvider = ({ children, initialLanguage }: LanguageProviderProps) => {
+export const LanguageProvider = ({ children, initialLanguage, initialTranslations }: LanguageProviderProps) => {
     const router = useRouter();
     const pathname = usePathname();
 
@@ -83,31 +94,89 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
     const mountedRef = useRef(false);
     const languageRef = useRef(language);
 
+    // Seed the cache with initial translations if provided (avoids async load for first language)
+    if (initialTranslations && initialLanguage) {
+        seedTranslationCache(initialLanguage, initialTranslations);
+    }
+
+    // Dynamic translation state — only the active language is loaded
+    const [currentTranslations, setCurrentTranslations] = useState<TranslationData | undefined>(
+        () => initialTranslations || getCachedTranslation(getServerSafeLanguage())
+    );
+
+    // Ref to avoid re-creating t() on every translation load (prevents app-wide render storm).
+    // The t() function reads from this ref instead of closing over state, so its identity
+    // stays stable even when translations load asynchronously.
+    const translationsRef = useRef(currentTranslations);
+    translationsRef.current = currentTranslations;
+
+    // Bump counter once when translations finish loading to update dir/flag in context.
+    // This triggers exactly ONE re-render per language switch, not per-state-update.
+    const [translationsReady, setTranslationsReady] = useState(() => !!currentTranslations);
+
+    // Load translations when language changes or on first mount when no initialTranslations
+    useEffect(() => {
+        const cached = getCachedTranslation(language);
+        if (cached) {
+            if (cached !== currentTranslations) {
+                setCurrentTranslations(cached);
+                setTranslationsReady(true);
+            }
+            return;
+        }
+        setTranslationsReady(false);
+        // Async load for language switch (or first mount without initialTranslations)
+        loadTranslation(language).then((data) => {
+            setCurrentTranslations(data);
+            setTranslationsReady(true);
+        }).catch((err) => {
+            logger.warn(`Failed to load translations for ${language}:`, err);
+        });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [language]);
+
     // Keep ref in sync
     useEffect(() => {
         languageRef.current = language;
     }, [language]);
 
-    // After mount, sync localStorage with URL locale
-    // URL is the source of truth - don't override explicit URL locale with stored preferences
+    // After mount, reconcile URL locale with user's explicit saved preference.
+    // Android WebView cold-starts at `/` → server falls back to Accept-Language
+    // (device locale) when cookie is absent/pruned, overwriting user's choice.
+    // Fix: if user explicitly selected a language (flag set), that wins over URL.
     useEffect(() => {
         mountedRef.current = true;
 
-        // Get the locale from the URL path
-        const urlLocale = pathname ? parseLocaleFromPath(pathname) : null;
+        // The server already resolved the locale (redirect → /[locale] → initialLanguage).
+        // Treat that as authoritative even if usePathname() is momentarily empty on the
+        // first client render. Without this, a falsy pathname dropped us into the
+        // browser-language branch below and flipped Hebrew-browser users to /he on a
+        // correct /en URL — the "everyone gets Hebrew" regression.
+        const urlLocale =
+            (initialLanguage && locales.includes(initialLanguage) ? initialLanguage : null)
+            ?? (pathname ? parseLocaleFromPath(pathname) : null);
+        const savedLanguage = localStorage.getItem('boggle_language');
+        const explicit = localStorage.getItem('boggle_language_explicit') === '1';
+        const currentLang = languageRef.current;
 
-        // If URL has an explicit locale, that's the source of truth
-        // Don't change language state - the URL dictates the language
         if (urlLocale) {
+            // User's explicit pick overrides URL locale guessed by server.
+            if (
+                explicit &&
+                savedLanguage &&
+                locales.includes(savedLanguage as Language) &&
+                savedLanguage !== urlLocale
+            ) {
+                const segments = pathname.split('/');
+                segments[1] = savedLanguage;
+                const newPath = segments.join('/') || `/${savedLanguage}`;
+                setLanguageState(savedLanguage as Language);
+                router.replace(newPath);
+            }
             return;
         }
 
-        // Only if there's NO locale in URL (shouldn't happen with middleware, but fallback)
-        // do we check stored preferences
-        const currentLang = languageRef.current;
-
-        // Check localStorage for user's explicit preference
-        const savedLanguage = localStorage.getItem('boggle_language');
+        // No URL locale — use saved preference or browser fallback
         if (savedLanguage && locales.includes(savedLanguage as Language)) {
             if (savedLanguage !== currentLang) {
                 setLanguageState(savedLanguage as Language);
@@ -115,20 +184,12 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
             return;
         }
 
-        // Check for location-detected locale from middleware
-        const detectedLocale = getCookieLocale('boggle_detected_locale');
-        if (detectedLocale && detectedLocale !== currentLang) {
-            setLanguageState(detectedLocale);
-            return;
-        }
-
-        // Use browser language as fallback
         const browserLang = getBrowserLanguage();
         if (browserLang && browserLang !== currentLang) {
             setLanguageState(browserLang);
         }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only run on mount - pathname is read once for initialization
+    }, []); // Only run on mount
 
     // Sync language when pathname or initialLanguage changes (after mount)
     useEffect(() => {
@@ -148,13 +209,73 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
         }
     }, [language]);
 
-    const setLanguage = useCallback((newLang: Language) => {
+    // Auto-sync current language to profiles.language for server-side push
+    // localization. `explicit: false` tells the API "fill if NULL, don't
+    // clobber" — otherwise visiting /en/anything would silently overwrite
+    // a Hebrew speaker's stored preference and route every push in English.
+    // Deliberate switcher clicks go through setLanguage() with explicit:true.
+    // 401 (anonymous) leaves the dedup gate UNSET so a later post-login mount retries.
+    useEffect(() => {
+        if (typeof window === 'undefined' || typeof fetch === 'undefined') return;
+        const key = `boggle_language_synced:${language}`;
+        let alreadySynced = false;
+        try {
+            alreadySynced = sessionStorage.getItem(key) === '1';
+        } catch {
+            // sessionStorage unavailable (private mode etc.) — fall through and POST
+        }
+        if (alreadySynced) return;
+        if (!hasSupabaseSession()) return;
+        fetch('/api/user/language', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ language, explicit: false }),
+        })
+            .then((res) => {
+                if (res.ok) {
+                    try { sessionStorage.setItem(key, '1'); } catch { /* ignore */ }
+                }
+            })
+            .catch(() => { /* non-blocking */ });
+    }, [language]);
+
+    const setLanguage = useCallback((newLang: Language, options?: { skipNavigation?: boolean }) => {
         if (newLang !== languageRef.current) {
             setLanguageState(newLang);
+
+            // Mark as explicit user choice — mount effect uses this to override
+            // server-guessed URL locale (Accept-Language) on Android WebView cold start.
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('boggle_language_explicit', '1');
+            }
 
             // Also update cookie immediately for server-side consistency
             if (typeof document !== 'undefined') {
                 document.cookie = `boggle_language=${newLang}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+                document.cookie = `boggle_language_explicit=1; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
+            }
+
+            // Fire-and-forget: persist to profiles.language so per-recipient push
+            // notifications can be localized server-side. `explicit:true` lets the
+            // API overwrite any prior auto-synced value — switcher click is the
+            // user's deliberate intent and must win over URL/cookie heuristics.
+            if (typeof fetch !== 'undefined' && hasSupabaseSession()) {
+                // Reset session dedup so the auto-sync effect won't bail on the next
+                // mount, and so subsequent re-mounts re-confirm the explicit choice.
+                try { sessionStorage.removeItem(`boggle_language_synced:${newLang}`); } catch { /* ignore */ }
+                fetch('/api/user/language', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ language: newLang, explicit: true }),
+                }).catch(() => { /* non-blocking */ });
+            }
+
+            // Caller can opt out of the immediate router.push — used by the FTUE
+            // language step, where router.push remounts [locale]/PageClient and
+            // resets the FTUE back to 'language' (infinite loop). Cookie + state
+            // are already updated above so subsequent navigations use new locale.
+            if (options?.skipNavigation) {
+                return;
             }
 
             // Navigate to new locale preserving FULL path (everything after locale)
@@ -175,18 +296,34 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
     }, [pathname, router]);
 
     // Memoize t function to prevent unnecessary re-renders of consumers
-    const t = useCallback((path: string, params: Record<string, string | number> = {}): string => {
+    // Supports: translateFn(path), translateFn(path, params), translateFn(path, fallback), translateFn(path, fallback, params)
+    const t = useCallback((
+        path: string,
+        fallbackOrParams?: string | Record<string, string | number>,
+        paramsWhenFallback?: Record<string, string | number>
+    ): string => {
+        // Determine fallback and params based on argument types
+        const fallback = typeof fallbackOrParams === 'string' ? fallbackOrParams : undefined;
+        const params: Record<string, string | number> = typeof fallbackOrParams === 'object' && fallbackOrParams !== null
+            ? fallbackOrParams
+            : (paramsWhenFallback || {});
+
         const keys = path.split('.');
-        // Use type assertion since Language type may include values not in translations
-        let current: unknown = (translations as Record<string, unknown>)[language] || translations['he']; // Fallback to Hebrew if language is invalid
+        // Read from ref to avoid depending on currentTranslations state
+        let current: unknown = translationsRef.current;
 
         if (!current) {
-            logger.warn(`Translation missing for language: ${language}`);
-            return path;
+            // Translations not loaded yet — return fallback or key
+            return fallback || path;
         }
 
         for (const key of keys) {
             if (typeof current !== 'object' || current === null || !(key in current)) {
+                // Use fallback if provided, otherwise return the path
+                if (fallback) {
+                    return fallback;
+                }
+                // DO NOT demote to debug. User mandate 2026-05-01: missing keys are real bugs and must page Sentry.
                 logger.warn(`Translation missing for key: ${path} in language: ${language}`);
                 return path;
             }
@@ -210,17 +347,20 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
             return result;
         }
 
-        return typeof current === 'string' ? current : path;
+        return typeof current === 'string' ? current : (fallback || path);
     }, [language]);
 
-    // Memoize context value to prevent unnecessary re-renders of all consumers
+    // Memoize context value — depends on translationsReady (boolean) not currentTranslations (object).
+    // This means consumers re-render at most once per language switch (false→true), not on every
+    // intermediate state update of the large translations object.
     const value = useMemo<LanguageContextValue>(() => ({
         language,
         setLanguage,
         t,
-        dir: ((translations as Record<string, { direction?: 'rtl' | 'ltr' }>)[language])?.direction || 'rtl',
-        currentFlag: ((translations as Record<string, { flag?: string }>)[language])?.flag || '🇮🇱'
-    }), [language, setLanguage, t]);
+        dir: (translationsRef.current?.direction as 'rtl' | 'ltr') || (language === 'he' ? 'rtl' : 'ltr'),
+        currentFlag: (translationsRef.current?.flag as string) || FLAG_BY_LANGUAGE[language] || '🇺🇸'
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }), [language, setLanguage, t, translationsReady]);
 
     return (
         <LanguageContext.Provider value={value}>
@@ -232,7 +372,99 @@ export const LanguageProvider = ({ children, initialLanguage }: LanguageProvider
 export const useLanguage = (): LanguageContextValue => {
     const context = useContext(LanguageContext);
     if (!context) {
-        throw new Error('useLanguage must be used within a LanguageProvider');
+        // In development, throw to catch missing provider early
+        if (process.env.NODE_ENV === 'development') {
+            throw new Error('useLanguage must be used within a LanguageProvider');
+        }
+        // In production, gracefully fall back instead of crashing the page
+        // Fixes JAVASCRIPT-NEXTJS-FQ: React 19 edge case where context is
+        // briefly unavailable during dynamic import + Suspense on low-end devices
+        return LANGUAGE_FALLBACK;
+    }
+    return context;
+};
+
+/**
+ * Default translation function for use outside of LanguageContext
+ * Falls back to English translations with basic key lookup
+ */
+const createFallbackT = (_lang: Language = 'en') => (
+    path: string,
+    fallbackOrParams?: string | Record<string, string | number>,
+    _paramsWhenFallback?: Record<string, string | number>
+): string => {
+    // Fallback t() — translations may not be loaded yet, return key or fallback
+    const fallback = typeof fallbackOrParams === 'string' ? fallbackOrParams : undefined;
+
+    // Try to use cached translations if available
+    const cached = getCachedTranslation(_lang);
+    if (!cached) return fallback || path;
+
+    const params: Record<string, string | number> = typeof fallbackOrParams === 'object' && fallbackOrParams !== null
+        ? fallbackOrParams
+        : (_paramsWhenFallback || {});
+
+    try {
+        const keys = path.split('.');
+        let current: unknown = cached;
+
+        for (const key of keys) {
+            if (typeof current !== 'object' || current === null || !(key in current)) {
+                return fallback || path;
+            }
+            current = (current as Record<string, unknown>)[key];
+        }
+
+        if (typeof current === 'string' && Object.keys(params).length > 0) {
+            let result = current.replace(/\$\{(\w+)\}/g, (match, key) => {
+                return params[key] !== undefined ? String(params[key]) : match;
+            });
+            result = result.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+                return params[key] !== undefined ? String(params[key]) : match;
+            });
+            result = result.replace(/\{(\w+)\}/g, (match, key) => {
+                return params[key] !== undefined ? String(params[key]) : match;
+            });
+            return result;
+        }
+
+        return typeof current === 'string' ? current : (fallback || path);
+    } catch {
+        return fallback || path;
+    }
+};
+
+/**
+ * Fallback values used when LanguageProvider is not available
+ * Useful for error boundaries and components that may render before provider mounts
+ */
+export const LANGUAGE_FALLBACK: LanguageContextValue = {
+    language: 'en',
+    setLanguage: () => {
+        logger.warn('setLanguage called outside of LanguageProvider');
+    },
+    t: createFallbackT('en'),
+    dir: 'ltr',
+    currentFlag: '🇺🇸'
+};
+
+/**
+ * Safe version of useLanguage that returns fallback values instead of throwing
+ * when used outside of LanguageProvider. Useful for:
+ * - Dynamically imported components that may load before provider mounts
+ * - Components used in ErrorBoundary fallback UI
+ * - Server-side rendering edge cases
+ *
+ * @returns LanguageContextValue - either from context or fallback defaults
+ */
+export const useLanguageSafe = (): LanguageContextValue => {
+    const context = useContext(LanguageContext);
+    if (!context) {
+        // Log warning in development only to help identify missing providers
+        if (process.env.NODE_ENV === 'development') {
+            logger.warn('useLanguageSafe: LanguageProvider not found, using fallback values');
+        }
+        return LANGUAGE_FALLBACK;
     }
     return context;
 };

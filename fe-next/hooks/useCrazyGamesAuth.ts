@@ -5,7 +5,7 @@ import { useCrazyGames } from '@/components/CrazyGamesSDK';
 
 export interface CrazyGamesUser {
   username: string;
-  profilePictureUrl: string;
+  profilePictureUrl?: string;
 }
 
 interface UseCrazyGamesAuthReturn {
@@ -23,6 +23,10 @@ interface UseCrazyGamesAuthReturn {
   login: () => Promise<CrazyGamesUser | null>;
   /** Check if CrazyGames accounts are available */
   isAccountAvailable: boolean;
+  /** Get signed JWT for server-side user verification (1hr TTL) */
+  getUserToken: () => Promise<string | null>;
+  /** Show account linking prompt (link CrazyGames account to in-game account) */
+  showAccountLink: () => Promise<void>;
 }
 
 /**
@@ -52,6 +56,10 @@ export function useCrazyGamesAuth(): UseCrazyGamesAuthReturn {
     getUser,
     showAuthPrompt,
     isUserAccountAvailable,
+    getUserToken,
+    showAccountLinkPrompt,
+    addAuthListener,
+    removeAuthListener,
   } = useCrazyGames();
 
   const [user, setUser] = useState<CrazyGamesUser | null>(null);
@@ -70,26 +78,49 @@ export function useCrazyGamesAuth(): UseCrazyGamesAuthReturn {
       return;
     }
 
+    let mounted = true;
+
     const checkUser = async () => {
       try {
         // Check if accounts are available
         const accountAvailable = await isUserAccountAvailable();
+        if (!mounted) return;
         setIsAccountAvailable(accountAvailable);
 
         // Get current user if logged in
         const currentUser = await getUser();
+        if (!mounted) return;
         if (currentUser) {
           setUser(currentUser);
         }
       } catch (error) {
         console.error('Error checking CrazyGames user:', error);
       } finally {
-        setHasCheckedUser(true);
+        if (mounted) setHasCheckedUser(true);
       }
     };
 
     checkUser();
+    return () => { mounted = false; };
   }, [isAvailable, isLoading, getUser, isUserAccountAvailable]);
+
+  // Listen for mid-session login (user logs into CrazyGames while playing)
+  useEffect(() => {
+    if (!isAvailable) return;
+
+    const handleAuthChange = (cgUser: { username: string; profilePictureUrl: string }) => {
+      setUser(cgUser);
+    };
+
+    addAuthListener(handleAuthChange);
+    return () => removeAuthListener(handleAuthChange);
+  }, [isAvailable, addAuthListener, removeAuthListener]);
+
+  // Account linking prompt
+  const showAccountLink = useCallback(async (): Promise<void> => {
+    if (!isAvailable) return;
+    await showAccountLinkPrompt();
+  }, [isAvailable, showAccountLinkPrompt]);
 
   // Login function - shows CrazyGames auth prompt
   const login = useCallback(async (): Promise<CrazyGamesUser | null> => {
@@ -119,6 +150,8 @@ export function useCrazyGamesAuth(): UseCrazyGamesAuthReturn {
     isLoggingIn,
     login,
     isAccountAvailable,
+    getUserToken,
+    showAccountLink,
   };
 }
 

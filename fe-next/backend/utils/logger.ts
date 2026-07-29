@@ -1,492 +1,130 @@
 /**
  * Structured Logger for Backend
- * Provides consistent logging with correlation IDs, structured output,
- * and configurable log levels.
+ * Thin wrapper around Pino that preserves the existing call-site API:
+ *   logger.info('CATEGORY', 'message', optionalData)
+ *   logger.forGame('ABC').info(...)
+ *   logger.forSocket('xyz').info(...)
  *
- * Features:
- * - Log levels (ERROR, WARN, INFO, DEBUG)
- * - Correlation IDs for request tracing
- * - Async context propagation via AsyncLocalStorage
- * - Structured JSON output (for log aggregators)
- * - Colored console output (development)
- * - Error serialization with stack traces
- * - Request/Response logging middleware
- * - Sampling support for high-volume debug logs
+ * Replaces the 550-line hand-rolled logger with ~80 lines of Pino.
  */
 
-import crypto from 'crypto';
-import { AsyncLocalStorage } from 'async_hooks';
-import type { Request, Response, NextFunction } from 'express';
-import type { Socket } from 'socket.io';
+import pino from 'pino';
+import * as Sentry from '@sentry/nextjs';
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+const pinoInstance = pino({
+  level: process.env.LOG_LEVEL?.toLowerCase() || (isProduction ? 'info' : 'debug'),
+  ...(isProduction
+    ? {}
+    : { transport: { target: 'pino-pretty', options: { colorize: true } } }),
+});
 
 // ==========================================
-// Type Definitions
-// ==========================================
-
-interface LogContext {
-  correlationId?: string;
-  gameCode?: string;
-  socketId?: string;
-  method?: string;
-  path?: string;
-  ip?: string;
-  eventName?: string;
-}
-
-interface LogEntry {
-  timestamp: string;
-  level: string;
-  service: string;
-  instance: string;
-  category: string;
-  message: string;
-  correlationId?: string;
-  gameCode?: string;
-  socketId?: string;
-  data?: unknown;
-}
-
-interface SerializedError {
-  name: string;
-  message: string;
-  stack?: string;
-  code?: string | number;
-}
-
-interface TimerResult {
-  end: (data?: Record<string, unknown>) => void;
-}
-
-// ==========================================
-// Constants
-// ==========================================
-
-const LOG_LEVELS: Record<string, number> = {
-  ERROR: 0,
-  WARN: 1,
-  INFO: 2,
-  DEBUG: 3
-};
-
-const LEVEL_NAMES: string[] = ['ERROR', 'WARN', 'INFO', 'DEBUG'];
-
-// Async context storage for correlation IDs
-const asyncContext = new AsyncLocalStorage<LogContext>();
-
-// ==========================================
-// Logger Class
+// Logger class — preserves existing API
 // ==========================================
 
 class Logger {
-  level: number;
-  enableTimestamp: boolean;
-  enableColors: boolean;
-  jsonMode: boolean;
-  serviceName: string;
-  instanceId: string;
-  correlationId?: string;
-  gameCode?: string;
-  socketId?: string;
+  private pino: pino.Logger;
 
-  constructor() {
-    this.level = process.env.LOG_LEVEL
-      ? LOG_LEVELS[process.env.LOG_LEVEL.toUpperCase()] ?? LOG_LEVELS.INFO
-      : LOG_LEVELS.INFO;
-    this.enableTimestamp = process.env.LOG_TIMESTAMP !== 'false';
-    this.enableColors = process.env.LOG_COLORS !== 'false' && (process.stdout.isTTY ?? false);
-    this.jsonMode = process.env.LOG_FORMAT === 'json';
-    this.serviceName = process.env.SERVICE_NAME || 'boggle-server';
-    this.instanceId = process.env.RAILWAY_REPLICA_ID || process.env.HOSTNAME || 'local';
+  constructor(p?: pino.Logger) {
+    this.pino = p || pinoInstance;
   }
 
-  /**
-   * Generate a correlation ID for request tracing
-   */
-  static generateCorrelationId(): string {
-    return `${Date.now().toString(36)}-${crypto.randomBytes(4).toString('hex')}`;
-  }
-
-  /**
-   * Create a child logger with a specific correlation ID
-   */
-  withCorrelationId(correlationId: string): Logger {
-    const childLogger = Object.create(this) as Logger;
-    childLogger.correlationId = correlationId;
-    return childLogger;
-  }
-
-  /**
-   * Create a child logger for a specific game
-   */
+  /** Create child logger bound to a game code */
   forGame(gameCode: string): Logger {
-    const childLogger = Object.create(this) as Logger;
-    childLogger.gameCode = gameCode;
-    return childLogger;
+    return new Logger(this.pino.child({ gameCode }));
   }
 
-  /**
-   * Create a child logger for a specific socket
-   */
+  /** Create child logger bound to a socket ID */
   forSocket(socketId: string): Logger {
-    const childLogger = Object.create(this) as Logger;
-    childLogger.socketId = socketId;
-    return childLogger;
+    return new Logger(this.pino.child({ socketId: socketId?.substring(0, 8) }));
   }
 
-  getTimestamp(): string {
-    return new Date().toISOString();
+  /** Create child logger with a correlation ID */
+  withCorrelationId(correlationId: string): Logger {
+    return new Logger(this.pino.child({ correlationId }));
   }
 
-  /**
-   * Serialize data for logging
-   */
-  serializeData(data: unknown): unknown {
-    if (data === undefined || data === null) return undefined;
-
-    // Handle Error objects specially
-    if (data instanceof Error) {
-      return {
-        name: data.name,
-        message: data.message,
-        stack: data.stack?.split('\n').slice(0, 5).join('\n'),
-        code: (data as NodeJS.ErrnoException).code,
-      } as SerializedError;
-    }
-
-    // Handle objects that might contain Error instances
-    if (typeof data === 'object') {
-      try {
-        // Create a sanitized copy
-        return JSON.parse(JSON.stringify(data, (_key: string, value: unknown) => {
-          if (value instanceof Error) {
-            return { name: value.name, message: value.message };
-          }
-          // Truncate very long strings
-          if (typeof value === 'string' && value.length > 1000) {
-            return value.substring(0, 1000) + '...[truncated]';
-          }
-          return value;
-        }));
-      } catch (e) {
-        return { error: 'Serialization failed', reason: (e as Error).message };
-      }
-    }
-
-    return data;
-  }
-
-  /**
-   * Get merged context from instance properties and async storage
-   */
-  getMergedContext(): LogContext {
-    const asyncStore = asyncContext.getStore() || {};
-    return {
-      correlationId: this.correlationId || asyncStore.correlationId,
-      gameCode: this.gameCode || asyncStore.gameCode,
-      socketId: this.socketId || asyncStore.socketId,
-      method: asyncStore.method,
-      path: asyncStore.path,
-    };
-  }
-
-  /**
-   * Format message for JSON output (structured logging)
-   */
-  formatJson(level: number, category: string, message: string, data?: unknown): string {
-    const context = this.getMergedContext();
-
-    const logEntry: LogEntry = {
-      timestamp: this.getTimestamp(),
-      level: LEVEL_NAMES[level],
-      service: this.serviceName,
-      instance: this.instanceId,
-      category,
-      message,
-    };
-
-    // Add context if available (from instance or async storage)
-    if (context.correlationId) logEntry.correlationId = context.correlationId;
-    if (context.gameCode) logEntry.gameCode = context.gameCode;
-    if (context.socketId) logEntry.socketId = context.socketId;
-
-    // Add additional data
-    if (data !== undefined) {
-      logEntry.data = this.serializeData(data);
-    }
-
-    return JSON.stringify(logEntry);
-  }
-
-  /**
-   * Format message for console output (human-readable)
-   */
-  formatConsole(level: number, category: string, message: string, data?: unknown): string {
-    const timestamp = this.enableTimestamp ? `[${this.getTimestamp()}] ` : '';
-    const categoryStr = category ? `[${category}] ` : '';
-    const context = this.getMergedContext();
-
-    // Build context string
-    const contextParts: string[] = [];
-    if (context.gameCode) contextParts.push(`game=${context.gameCode}`);
-    if (context.socketId) contextParts.push(`socket=${context.socketId.substring(0, 8)}`);
-    if (context.correlationId) contextParts.push(`cid=${context.correlationId.substring(0, 12)}`);
-    const contextStr = contextParts.length > 0 ? `(${contextParts.join(' ')}) ` : '';
-
-    // Serialize data
-    let dataStr = '';
-    if (data !== undefined) {
-      const serialized = this.serializeData(data);
-      if (serialized !== undefined) {
-        dataStr = ` ${JSON.stringify(serialized)}`;
-      }
-    }
-
-    const fullMessage = `${timestamp}${categoryStr}${contextStr}${message}${dataStr}`;
-
-    if (this.enableColors) {
-      const colors: Record<number, string> = {
-        0: '\x1b[31m',   // ERROR: Red
-        1: '\x1b[33m',   // WARN: Yellow
-        2: '\x1b[36m',   // INFO: Cyan
-        3: '\x1b[90m',   // DEBUG: Gray
-      };
-      const reset = '\x1b[0m';
-      const color = colors[level] || reset;
-      return `${color}${fullMessage}${reset}`;
-    }
-
-    return fullMessage;
-  }
-
-  /**
-   * Core logging method
-   */
-  log(level: number, category: string, message: string, data?: unknown): void {
-    if (this.level < level) return;
-
-    const formatted = this.jsonMode
-      ? this.formatJson(level, category, message, data)
-      : this.formatConsole(level, category, message, data);
-
-    switch (level) {
-      case LOG_LEVELS.ERROR:
-        console.error(formatted);
-        break;
-      case LOG_LEVELS.WARN:
-        console.warn(formatted);
-        break;
-      default:
-        console.log(formatted);
-    }
-  }
-
-  // Convenience methods
+  // Core logging methods — (category, message, data?)
   error(category: string, message: string, data?: unknown): void {
-    this.log(LOG_LEVELS.ERROR, category, message, data);
+    this.pino.error({ category, ...(data != null ? { data } : {}) }, message);
+    if (isProduction) this.captureToSentry('error', category, message, data);
   }
 
   warn(category: string, message: string, data?: unknown): void {
-    this.log(LOG_LEVELS.WARN, category, message, data);
+    this.pino.warn({ category, ...(data != null ? { data } : {}) }, message);
+    if (isProduction) this.captureToSentry('warning', category, message, data);
   }
 
   info(category: string, message: string, data?: unknown): void {
-    this.log(LOG_LEVELS.INFO, category, message, data);
+    this.pino.info({ category, ...(data != null ? { data } : {}) }, message);
   }
 
   debug(category: string, message: string, data?: unknown): void {
-    this.log(LOG_LEVELS.DEBUG, category, message, data);
+    this.pino.debug({ category, ...(data != null ? { data } : {}) }, message);
   }
 
-  /**
-   * Log a socket event (convenience method)
-   */
+  /** Log a socket event */
   socketEvent(eventName: string, socketId: string, data?: Record<string, unknown>): void {
-    this.info('SOCKET', `Event: ${eventName}`, { socketId: socketId?.substring(0, 8), ...data });
+    this.pino.info({ category: 'SOCKET', eventName, socketId: socketId?.substring(0, 8), ...data }, `Event: ${eventName}`);
   }
 
-  /**
-   * Log game action (convenience method)
-   */
+  /** Log a game action */
   gameAction(gameCode: string, action: string, data?: Record<string, unknown>): void {
-    this.info('GAME', `${action} in game ${gameCode}`, data);
+    this.pino.info({ category: 'GAME', gameCode, ...data }, `${action} in game ${gameCode}`);
   }
 
-  /**
-   * Log performance timing
-   */
+  /** Log performance timing */
   timing(category: string, operation: string, durationMs: number, data?: Record<string, unknown>): void {
-    this.info(category, `${operation} completed`, { durationMs, ...data });
+    this.pino.info({ category, durationMs, ...data }, `${operation} completed`);
   }
 
-  /**
-   * Create a timer for measuring operation duration
-   */
-  startTimer(category: string, operation: string): TimerResult {
+  /** Start a timer that logs duration on .end() */
+  startTimer(category: string, operation: string): { end: (data?: Record<string, unknown>) => void } {
     const start = process.hrtime.bigint();
     return {
       end: (data?: Record<string, unknown>) => {
-        const end = process.hrtime.bigint();
-        const durationMs = Number(end - start) / 1000000;
+        const durationMs = Number(process.hrtime.bigint() - start) / 1_000_000;
         this.timing(category, operation, Math.round(durationMs * 100) / 100, data);
-      }
+      },
     };
+  }
+
+  private captureToSentry(level: 'error' | 'warning', category: string, message: string, data?: unknown): void {
+    Sentry.withScope((scope) => {
+      scope.setLevel(level);
+      scope.setTag('log.category', category);
+      // Attach structured context so Sentry links to the right code
+      scope.setContext('logger', {
+        category,
+        message,
+        ...(data != null && !(data instanceof Error) ? { data: typeof data === 'object' ? JSON.stringify(data).slice(0, 2048) : String(data) } : {}),
+      });
+      if (data instanceof Error) {
+        // Preserve the category/message as fingerprint context so errors
+        // with the same category+message group together in Sentry
+        scope.setFingerprint([category, data.message || message]);
+        scope.setTransactionName(`${category}: ${message}`);
+        Sentry.captureException(data);
+      } else {
+        Sentry.captureMessage(`[${category}] ${message}`, level);
+      }
+    });
   }
 }
 
-// ==========================================
-// Async Context Functions
-// ==========================================
-
-/**
- * Run a function with a specific context (correlation ID, etc.)
- * All log calls within this context will automatically include the context
- */
-function runWithContext<T>(context: LogContext, fn: () => T): T {
-  return asyncContext.run(context, fn);
-}
-
-/**
- * Get the current async context
- */
-function getContext(): LogContext | undefined {
-  return asyncContext.getStore();
-}
-
-/**
- * Set a value in the current context (if exists)
- */
-function setContextValue<K extends keyof LogContext>(key: K, value: LogContext[K]): void {
-  const store = asyncContext.getStore();
-  if (store) {
-    store[key] = value;
-  }
-}
-
-// ==========================================
-// Express Middleware
-// ==========================================
-
-interface RequestWithCorrelation extends Request {
-  correlationId?: string;
-}
-
-/**
- * Express middleware to set up logging context
- * Adds correlation ID and request info to all logs within the request
- */
-function requestLoggerMiddleware(): (req: Request, res: Response, next: NextFunction) => void {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const correlationId = (req.headers['x-correlation-id'] as string) || Logger.generateCorrelationId();
-    const context: LogContext = {
-      correlationId,
-      method: req.method,
-      path: req.path,
-      ip: req.ip || (req.headers['x-forwarded-for'] as string) || 'unknown'
-    };
-
-    // Add correlation ID to response headers
-    res.setHeader('X-Correlation-ID', correlationId);
-
-    // Store on request object for other middleware
-    (req as RequestWithCorrelation).correlationId = correlationId;
-
-    // Run the rest of the request handling within the async context
-    runWithContext(context, () => {
-      // Log request start
-      logger.info('HTTP', `${req.method} ${req.path}`, {
-        query: Object.keys(req.query).length > 0 ? req.query : undefined,
-        userAgent: (req.headers['user-agent'] as string)?.substring(0, 100)
-      });
-
-      // Track response time
-      const startTime = process.hrtime.bigint();
-
-      // Log response when finished
-      res.on('finish', () => {
-        const endTime = process.hrtime.bigint();
-        const durationMs = Number(endTime - startTime) / 1000000;
-
-        const logLevel: 'error' | 'warn' | 'info' = res.statusCode >= 500 ? 'error' :
-                        res.statusCode >= 400 ? 'warn' : 'info';
-
-        logger[logLevel]('HTTP', `${req.method} ${req.path} ${res.statusCode}`, {
-          status: res.statusCode,
-          durationMs: Math.round(durationMs * 100) / 100
-        });
-      });
-
-      next();
-    });
-  };
-}
-
-/**
- * Socket.IO middleware to set up logging context for socket events
- */
-function wrapSocketEventHandler<T extends unknown[], R>(
-  socket: Socket,
-  eventName: string,
-  handler: (...args: T) => Promise<R>
-): (...args: T) => Promise<R> {
-  return async (...args: T): Promise<R> => {
-    const correlationId = Logger.generateCorrelationId();
-    const context: LogContext = {
-      correlationId,
-      socketId: socket.id,
-      eventName,
-      ip: socket.handshake?.headers?.['x-forwarded-for'] as string || socket.handshake?.address
-    };
-
-    return runWithContext(context, async () => {
-      logger.debug('SOCKET', `Event received: ${eventName}`, { socketId: socket.id.substring(0, 8) });
-      const startTime = process.hrtime.bigint();
-
-      try {
-        const result = await handler(...args);
-        const endTime = process.hrtime.bigint();
-        const durationMs = Number(endTime - startTime) / 1000000;
-
-        logger.debug('SOCKET', `Event handled: ${eventName}`, {
-          durationMs: Math.round(durationMs * 100) / 100
-        });
-
-        return result;
-      } catch (error) {
-        logger.error('SOCKET', `Error in ${eventName} handler`, {
-          error: (error as Error).message,
-          stack: (error as Error).stack?.split('\n').slice(0, 3).join('\n')
-        });
-        throw error;
-      }
-    });
-  };
-}
-
-// Create singleton logger instance
+// Singleton
 const logger = new Logger();
 
-// Export everything
 export default logger;
-export {
-  Logger,
-  LOG_LEVELS,
-  runWithContext,
-  getContext,
-  setContextValue,
-  requestLoggerMiddleware,
-  wrapSocketEventHandler,
-  asyncContext,
-};
-export type { LogContext, LogEntry, TimerResult };
+export { Logger };
 
 // CommonJS compatibility for mixed codebase
-module.exports = logger;
-module.exports.default = logger;
-module.exports.Logger = Logger;
-module.exports.LOG_LEVELS = LOG_LEVELS;
-module.exports.runWithContext = runWithContext;
-module.exports.getContext = getContext;
-module.exports.setContextValue = setContextValue;
-module.exports.requestLoggerMiddleware = requestLoggerMiddleware;
-module.exports.wrapSocketEventHandler = wrapSocketEventHandler;
-module.exports.asyncContext = asyncContext;
+try {
+  module.exports = logger;
+  module.exports.default = logger;
+  module.exports.Logger = Logger;
+} catch {
+  // ESM environment (e.g., Vitest) — skip CJS exports
+}

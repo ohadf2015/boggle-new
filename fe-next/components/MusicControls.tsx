@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect, memo, useCallback, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Volume2, VolumeX, Volume1, Music, Smartphone } from 'lucide-react';
 import { useMusic } from '../contexts/MusicContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Button } from './ui/button';
-import { isHapticsEnabled, setHapticsEnabled } from '../utils/haptics';
+import { useHapticsConfig } from '../contexts/HapticsContext';
+import { resolveMasterMuteClick } from '@/lib/audio/masterMuteToggle';
 
 /**
  * MusicControls - Neo-Brutalist styled volume controls with separate music and SFX sliders
@@ -18,9 +19,9 @@ const MusicControls: React.FC = memo(() => {
   const { volume, setVolume, isMuted, toggleMute, isPlaying, audioUnlocked, unlockAudio } = useMusic();
   const { sfxVolume, setSfxVolume, sfxMuted, toggleSfxMute } = useSoundEffects();
   const { t, language } = useLanguage();
+  const { enabled: hapticsEnabled, setEnabled: setHapticsEnabled } = useHapticsConfig();
   const [showSlider, setShowSlider] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
-  const [hapticsEnabled, setHapticsEnabledState] = useState(true);
   const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, right: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
   const isRTL = language === 'he';
@@ -28,8 +29,6 @@ const MusicControls: React.FC = memo(() => {
   // Prevent hydration mismatch by only rendering dynamic icon after mount
   useEffect(() => {
     setHasMounted(true);
-    // Load haptics preference after mount
-    setHapticsEnabledState(isHapticsEnabled());
   }, []);
 
   // Calculate dropdown position when showing
@@ -47,16 +46,15 @@ const MusicControls: React.FC = memo(() => {
   // Toggle haptics and persist
   const handleToggleHaptics = useCallback(() => {
     const newValue = !hapticsEnabled;
-    setHapticsEnabledState(newValue);
     setHapticsEnabled(newValue);
     // Give tactile feedback when enabling
     if (newValue && 'vibrate' in navigator) {
       navigator.vibrate(15);
     }
-  }, [hapticsEnabled]);
+  }, [hapticsEnabled, setHapticsEnabled]);
 
   // Responsive icon class for consistent sizing with button
-  const iconClass = "w-4 h-4 sm:w-5 sm:h-5 lg:w-5 lg:h-5 xl:w-6 xl:h-6 2xl:w-6 2xl:h-6";
+  const iconClass = "w-[18px] h-[18px]";
 
   // Memoized volume icon
   const volumeIcon = useMemo(() => {
@@ -71,42 +69,49 @@ const MusicControls: React.FC = memo(() => {
     return <Volume2 className={iconClass} strokeWidth={2.5} aria-hidden="true" />;
   }, [hasMounted, isMuted, volume, sfxMuted, sfxVolume]);
 
+  // Volume sliders are pure volume controls. Mute is a separate axis the user
+  // toggles via the master button — sliding the volume up while muted should
+  // not unilaterally unmute. (Doing so caused mute to "come back" after every
+  // tweak, since other surfaces also trigger volume changes.)
   const handleMusicVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    if (isMuted && newVolume > 0) {
-      toggleMute();
-    }
-  }, [setVolume, isMuted, toggleMute]);
+    setVolume(parseFloat(e.target.value));
+  }, [setVolume]);
 
   const handleSfxVolumeChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const newVolume = parseFloat(e.target.value);
-    setSfxVolume(newVolume);
-    if (sfxMuted && newVolume > 0) {
-      toggleSfxMute();
-    }
-  }, [setSfxVolume, sfxMuted, toggleSfxMute]);
+    setSfxVolume(parseFloat(e.target.value));
+  }, [setSfxVolume]);
 
+  // Master mute: locked tab → unlock + move toward audible (never swallow the
+  // click, never mute on the enable tap); unlocked → silence-wins coherent
+  // toggle. See resolveMasterMuteClick for the full decision table.
   const handleClick = useCallback(() => {
-    if (!audioUnlocked) {
-      unlockAudio();
-    } else {
-      // Toggle both music and SFX mute together for unified mute experience
-      toggleMute();
-      toggleSfxMute();
-    }
-  }, [audioUnlocked, unlockAudio, toggleMute, toggleSfxMute]);
+    const action = resolveMasterMuteClick({ audioUnlocked, isMuted, sfxMuted });
+    if (action.unlock) unlockAudio();
+    if (action.toggleMusic) toggleMute();
+    if (action.toggleSfx) toggleSfxMute();
+  }, [audioUnlocked, unlockAudio, isMuted, sfxMuted, toggleMute, toggleSfxMute]);
 
   const handleMouseEnter = useCallback(() => setShowSlider(true), []);
   const handleMouseLeave = useCallback(() => setShowSlider(false), []);
+  const handleFocus = useCallback(() => setShowSlider(true), []);
+  const handleBlur = useCallback((e: React.FocusEvent) => {
+    // Only close if focus leaves the entire dropdown/button group
+    const relatedTarget = e.relatedTarget as HTMLElement | null;
+    const currentTarget = e.currentTarget as HTMLElement;
+    if (!currentTarget.contains(relatedTarget)) {
+      setShowSlider(false);
+    }
+  }, []);
 
   return (
     <div
       className="relative"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       role="group"
-      aria-label={t('music.controls') || 'Music controls'}
+      aria-label={t('music.controls')}
     >
       {/* Neo-Brutalist Volume Button */}
       <Button
@@ -114,19 +119,19 @@ const MusicControls: React.FC = memo(() => {
         variant="outline"
         size="icon"
         onClick={handleClick}
-        className={`relative w-9 h-9 sm:w-11 sm:h-11 lg:w-12 lg:h-12 xl:w-12 xl:h-12 2xl:w-14 2xl:h-14 border-2 sm:border-3 lg:border-3 2xl:border-3 rounded-neo lg:rounded-neo shadow-hard-sm sm:shadow-hard lg:shadow-hard 2xl:shadow-hard-lg flex-shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream text-neo-black'}`}
-        aria-label={hasMounted ? (isMuted ? (t('music.unmute') || 'Unmute') : (t('music.mute') || 'Mute')) : (t('music.mute') || 'Mute')}
+        className={`relative flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] border-3 border-neo-black dark:border-slate-500 rounded-neo shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard active:translate-x-px active:translate-y-px active:shadow-none transition-all duration-100 shrink-0 ${hasMounted && (isMuted || volume === 0) && (sfxMuted || sfxVolume === 0) ? 'bg-slate-200 text-slate-400 dark:bg-slate-600 dark:text-slate-400' : 'bg-neo-cream dark:bg-neo-navy-elevated text-neo-black dark:text-white'}`}
+        aria-label={hasMounted ? (isMuted ? (t('music.unmute')) : (t('music.mute'))) : (t('music.mute'))}
         aria-pressed={hasMounted ? !isMuted : true}
-        title={hasMounted ? (isMuted ? (t('music.soundOff') || 'Sound Off - Click to unmute') : (t('music.soundOn') || 'Sound On')) : (t('music.sound') || 'Sound')}
+        title={hasMounted ? (isMuted ? (t('music.soundOff')) : (t('music.soundOn'))) : (t('music.sound'))}
       >
         {volumeIcon}
 
         {/* Playing indicator - Neo-Brutalist style */}
         {isPlaying && !isMuted && audioUnlocked && (
-          <motion.div
+          <m.div
             className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-neo-lime text-neo-black border-2 border-neo-black"
             animate={{ scale: [1, 1.2, 1] }}
-            transition={{ repeat: Infinity, duration: 1.5 }}
+            transition={{ type: 'tween', repeat: Infinity, duration: 1.5 }}
           />
         )}
       </Button>
@@ -135,7 +140,7 @@ const MusicControls: React.FC = memo(() => {
       {hasMounted && createPortal(
         <AnimatePresence>
           {showSlider && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -10, scale: 0.95, rotate: -2 }}
               animate={{ opacity: 1, y: 0, scale: 1, rotate: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -147,7 +152,7 @@ const MusicControls: React.FC = memo(() => {
                 border-3 border-neo-black
                 rounded-neo
                 shadow-hard-lg
-                z-[9999]
+                z-50
               "
               style={{
                 top: dropdownPosition.top,
@@ -183,7 +188,7 @@ const MusicControls: React.FC = memo(() => {
                       onChange={handleMusicVolumeChange}
                       dir="ltr"
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      aria-label={t('music.musicVolumeSlider') || 'Music volume slider'}
+                      aria-label={t('music.musicVolumeSlider')}
                       aria-valuemin={0}
                       aria-valuemax={100}
                       aria-valuenow={Math.round(volume * 100)}
@@ -214,7 +219,7 @@ const MusicControls: React.FC = memo(() => {
                       onChange={handleSfxVolumeChange}
                       dir="ltr"
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                      aria-label={t('music.sfxVolumeSlider') || 'Sound effects volume slider'}
+                      aria-label={t('music.sfxVolumeSlider')}
                       aria-valuemin={0}
                       aria-valuemax={100}
                       aria-valuenow={Math.round(sfxVolume * 100)}
@@ -228,7 +233,7 @@ const MusicControls: React.FC = memo(() => {
                     <div className="flex items-center">
                       <Smartphone size={14} strokeWidth={2.5} className="text-neo-black" aria-hidden="true" />
                       <span className="text-xs font-black uppercase tracking-wide text-neo-black/70">
-                        {t('music.haptics') || 'Haptics'}
+                        {t('music.haptics')}
                       </span>
                     </div>
                     <button
@@ -237,7 +242,7 @@ const MusicControls: React.FC = memo(() => {
                       style={{ width: '44px', height: '22px' }}
                       role="switch"
                       aria-checked={hapticsEnabled}
-                      aria-label={t('music.toggleHaptics') || 'Toggle haptic feedback'}
+                      aria-label={t('music.toggleHaptics')}
                     >
                       {/* Track - thin pill shape, neo-brutalist */}
                       <div
@@ -248,8 +253,8 @@ const MusicControls: React.FC = memo(() => {
                         style={{ height: '10px', top: '6px' }}
                       />
                       {/* Knob - circular, neo-brutalist with shadow */}
-                      <motion.div
-                        className="absolute rounded-full bg-neo-cream border-2 border-neo-black shadow-[2px_2px_0_0_#000]"
+                      <m.div
+                        className="absolute rounded-full bg-neo-cream border-2 border-neo-black shadow-hard-sm"
                         style={{ width: '16px', height: '16px', top: '3px' }}
                         animate={{ left: hapticsEnabled ? '26px' : '2px' }}
                         transition={{ type: 'spring', stiffness: 500, damping: 30 }}
@@ -259,12 +264,12 @@ const MusicControls: React.FC = memo(() => {
                 )}
 
                 {!audioUnlocked && (
-                  <span className="text-xs font-bold text-neo-orange">
+                  <span className="text-xs font-bold text-neo-white">
                     {t('music.clickToEnable')}
                   </span>
                 )}
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>,
         document.body

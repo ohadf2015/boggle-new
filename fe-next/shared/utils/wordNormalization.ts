@@ -15,9 +15,11 @@ import type { Language } from '@/shared/types/game';
 // ============================================================
 
 /**
- * Hebrew final letter mappings - convert final forms to regular forms
+ * Hebrew final-letter mappings — sofit form to regular form.
+ * Use when storing letters in any data structure that should be position-agnostic
+ * (boards, tile pools, dictionaries, validation sets).
  */
-const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
+export const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
   'ץ': 'צ',
   'ך': 'כ',
   'ם': 'מ',
@@ -26,15 +28,26 @@ const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
 };
 
 /**
- * Hebrew regular to final letter mappings
+ * Hebrew regular-to-sofit mapping. Apply ONLY at the display/render boundary —
+ * never on board state, never on stored words, never on dictionary keys.
  */
-const HEBREW_REGULAR_TO_FINAL: Record<string, string> = {
+export const HEBREW_REGULAR_TO_FINAL: Record<string, string> = {
   'צ': 'ץ',
   'כ': 'ך',
   'מ': 'ם',
   'נ': 'ן',
   'פ': 'ף'
 };
+
+/**
+ * Canonical Hebrew base alphabet (22 letters, regular forms only).
+ * This is the ONLY letter set that should ever appear on a playable board grid
+ * or tile pool. Sofit letters are display-only.
+ */
+export const HEBREW_BASE_LETTERS: readonly string[] = [
+  'א','ב','ג','ד','ה','ו','ז','ח','ט','י',
+  'כ','ל','מ','נ','ס','ע','פ','צ','ק','ר','ש','ת',
+];
 
 /**
  * Valid Hebrew letters (aleph to tav, including final forms)
@@ -113,6 +126,7 @@ export function normalizeSpanishLetter(letter: string): string {
  * Normalize an entire Spanish word - remove accents from vowels
  */
 export function normalizeSpanishWord(word: string): string {
+  if (typeof word !== 'string') return '';
   return word.split('').map(normalizeSpanishLetter).join('');
 }
 
@@ -140,6 +154,10 @@ export function normalizeLetter(letter: string, language: Language): string {
  * This is the primary function to use for cross-language normalization
  */
 export function normalizeWord(word: string, language: Language): string {
+  // Guard against null/undefined board cells reaching here during rAF ticks.
+  // Without this, es threw "null.split" (Sentry 1ME) and en/sv threw
+  // "null.toLowerCase is not a function" (Sentry 1MA). One guard covers all branches.
+  if (typeof word !== 'string') return '';
   switch (language) {
     case 'he':
       return normalizeHebrewWord(word);
@@ -152,6 +170,57 @@ export function normalizeWord(word: string, language: Language): string {
     default:
       return word.toLowerCase();
   }
+}
+
+// ============================================================
+// WORD SANITIZATION (Removes invisible Unicode characters)
+// ============================================================
+
+/**
+ * Regex pattern for invisible Unicode characters that should be removed
+ * Includes:
+ * - Zero-width characters (ZWSP, ZWNJ, ZWJ, WJ)
+ * - Directional formatting marks (LRM, RLM, LRE, RLE, PDF, etc.)
+ * - Soft hyphen
+ * - Non-breaking spaces (converted to regular spaces then trimmed)
+ * - Hebrew vowel points (niqqud) and cantillation marks
+ */
+const INVISIBLE_UNICODE_PATTERN = /[\u200B-\u200F\u2028-\u202F\u2060-\u206F\uFEFF\u00AD\u00A0\u0591-\u05C7]/g;
+
+/**
+ * Sanitize a word by removing invisible Unicode characters
+ * This fixes issues where words from database or user input contain hidden characters
+ * that cause length mismatches in feedback generation
+ *
+ * @param word - The word to sanitize
+ * @param language - Optional language for additional filtering
+ * @returns Sanitized word with only visible characters
+ *
+ * @example
+ * // Remove RTL mark from Hebrew word
+ * sanitizeWord('שמים\u200F') // Returns: 'שמים'
+ *
+ * // Remove niqqud (vowel points) from Hebrew
+ * sanitizeWord('שָׁמַיִם') // Returns: 'שמים'
+ *
+ * // Trim whitespace
+ * sanitizeWord('  hello  ') // Returns: 'hello'
+ */
+export function sanitizeWord(word: string, language?: Language): string {
+  if (typeof word !== 'string') return '';
+
+  // Step 1: Remove invisible Unicode characters
+  let sanitized = word.replace(INVISIBLE_UNICODE_PATTERN, '');
+
+  // Step 2: Trim whitespace
+  sanitized = sanitized.trim();
+
+  // Step 3: If language specified, filter to valid characters only
+  if (language === 'he') {
+    sanitized = filterHebrewWord(sanitized);
+  }
+
+  return sanitized;
 }
 
 // ============================================================

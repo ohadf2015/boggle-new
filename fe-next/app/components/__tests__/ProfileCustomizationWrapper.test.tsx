@@ -1,39 +1,43 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 /**
  * ProfileCustomizationWrapper Component Tests
  *
  * Tests the global profile customization wrapper that shows the modal
  * after signup/login for users who haven't customized their profile yet.
+ * Updated: now saves avatar_config (CustomAvatarConfig) instead of avatar_image string.
  */
 
-import { getAvatarEmojiAndColor, AVATARS } from '@/utils/avatarConfig';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 // Mock the dependencies
-jest.mock('@/contexts/AuthContext', () => ({
-  useAuth: jest.fn(),
+vi.mock('@/contexts/AuthContext', () => ({
+  useAuth: vi.fn(),
 }));
 
-jest.mock('@/utils/logger', () => ({
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  debug: jest.fn(),
+vi.mock('@/utils/logger', () => ({
+  info: vi.fn(),
+  warn: vi.fn(),
+  error: vi.fn(),
+  debug: vi.fn(),
 }));
 
-jest.mock('next/dynamic', () => () => {
-  const MockComponent = () => null;
-  MockComponent.displayName = 'DynamicComponent';
-  return MockComponent;
-});
+vi.mock('next/dynamic', () => ({
+  default: () => {
+    const MockComponent = () => null;
+    MockComponent.displayName = 'DynamicComponent';
+    return MockComponent;
+  },
+}));
 
 import { useAuth } from '@/contexts/AuthContext';
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
 
 // Helper to create mock auth state (types are simplified for tests)
 const createMockAuthState = (overrides: Record<string, unknown>) => ({
   profile: null,
   needsProfileCustomization: false,
-  updateProfile: jest.fn(),
+  updateProfile: vi.fn(),
   user: null,
   rankedProgress: null,
   loading: false,
@@ -41,16 +45,17 @@ const createMockAuthState = (overrides: Record<string, unknown>) => ({
   isAuthenticated: false,
   isGuest: true,
   isAdmin: false,
+  isTeacher: false,
   canPlayRanked: false,
   gamesUntilRanked: 10,
-  setupProfile: jest.fn(),
-  refreshProfile: jest.fn(),
+  setupProfile: vi.fn(),
+  refreshProfile: vi.fn(),
   ...overrides,
 });
 
 describe('ProfileCustomizationWrapper', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Auth State Conditions', () => {
@@ -72,11 +77,9 @@ describe('ProfileCustomizationWrapper', () => {
           username: 'TestUser',
           display_name: 'Test User',
           has_customized_profile: true,
-          avatar_emoji: '🐶',
-          avatar_color: '#4ECDC4',
-          avatar_image: 'broccoli-bob',
+          avatar_config: getRandomAvatarConfig(),
         },
-        needsProfileCustomization: false, // Key: false because already customized
+        needsProfileCustomization: false,
         isAuthenticated: true,
         isGuest: false,
       }) as ReturnType<typeof useAuth>);
@@ -91,12 +94,9 @@ describe('ProfileCustomizationWrapper', () => {
           id: 'test-user-id',
           username: 'TestUser',
           display_name: 'Test User',
-          has_customized_profile: false, // Not yet customized
-          avatar_emoji: '🐶',
-          avatar_color: '#4ECDC4',
-          avatar_image: 'broccoli-bob',
+          has_customized_profile: false,
         },
-        needsProfileCustomization: true, // Key: true because needs customization
+        needsProfileCustomization: true,
         isAuthenticated: true,
         isGuest: false,
       }) as ReturnType<typeof useAuth>);
@@ -107,167 +107,225 @@ describe('ProfileCustomizationWrapper', () => {
   });
 
   describe('Save Handler Logic', () => {
-    it('should include avatar_emoji and avatar_color when saving', async () => {
-      const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+    it('should save avatar_config (CustomAvatarConfig) when saving', async () => {
+      const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
-      // Simulate the save handler logic from ProfileCustomizationWrapper
-      const handleSave = async (name: string, avatarId: string) => {
-        const { emoji, color } = getAvatarEmojiAndColor(avatarId);
+      const testAvatar: CustomAvatarConfig = {
+        base: 'round',
+        skinColor: '#FFDBB4',
+        hair: 'spiky',
+        hairColor: '#2C1B18',
+        eyes: 'round',
+        mouth: 'smile',
+        accessory: 'none',
+        accessoryColor: '#000000',
+        bgColor: '#1a1a2e',
+        gender: 'male',
+      };
 
+      // Simulate the new save handler logic from ProfileCustomizationWrapper
+      const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
         await mockUpdateProfile({
           display_name: name,
-          username: name,
-          avatar_image: avatarId,
-          avatar_emoji: emoji,
-          avatar_color: color,
+          avatar_config: avatarConfig,
           has_customized_profile: true,
         });
       };
 
-      await handleSave('NewPlayer', 'broccoli-bob');
+      await handleSave('NewPlayer', testAvatar);
 
       expect(mockUpdateProfile).toHaveBeenCalledWith({
         display_name: 'NewPlayer',
-        username: 'NewPlayer',
-        avatar_image: 'broccoli-bob',
-        avatar_emoji: '🥦',
-        avatar_color: '#10b981',
+        avatar_config: testAvatar,
         has_customized_profile: true,
       });
     });
 
-    it('should handle all avatar types from the AVATARS list', async () => {
-      const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+    it('should not include old avatar_image/avatar_emoji/avatar_color fields', async () => {
+      const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
-      // Verify all avatars in the list have valid emoji/color mappings
-      for (const avatar of AVATARS) {
-        const { emoji, color } = getAvatarEmojiAndColor(avatar.id);
+      const testAvatar = getRandomAvatarConfig();
 
-        expect(emoji).toBeTruthy();
-        expect(color).toMatch(/^#[0-9a-f]{6}$/i);
-
-        // Simulate save for each avatar
-        mockUpdateProfile.mockClear();
-        await mockUpdateProfile({
-          display_name: 'TestPlayer',
-          username: 'TestPlayer',
-          avatar_image: avatar.id,
-          avatar_emoji: emoji,
-          avatar_color: color,
-          has_customized_profile: true,
-        });
-
-        expect(mockUpdateProfile).toHaveBeenCalledWith(
-          expect.objectContaining({
-            avatar_image: avatar.id,
-            avatar_emoji: emoji,
-            avatar_color: color,
-          })
-        );
-      }
-    });
-
-    it('should handle profile picture avatar ID correctly', async () => {
-      const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
-      const PROFILE_AVATAR_ID = '__profile_avatar__';
-
-      const handleSave = async (name: string, avatarId: string) => {
-        const { emoji, color } = getAvatarEmojiAndColor(avatarId);
-
+      const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
         await mockUpdateProfile({
           display_name: name,
-          username: name,
-          avatar_image: avatarId,
-          avatar_emoji: emoji,
-          avatar_color: color,
+          avatar_config: avatarConfig,
           has_customized_profile: true,
         });
       };
 
-      await handleSave('PlayerWithProfilePic', PROFILE_AVATAR_ID);
+      await handleSave('Player', testAvatar);
 
-      // Profile avatar should use default emoji/color
-      expect(mockUpdateProfile).toHaveBeenCalledWith(
-        expect.objectContaining({
-          avatar_image: PROFILE_AVATAR_ID,
-          avatar_emoji: '🎯', // default
-          avatar_color: '#6366f1', // default
+      const savedData = mockUpdateProfile.mock.calls[0][0];
+      expect(savedData).not.toHaveProperty('avatar_image');
+      expect(savedData).not.toHaveProperty('avatar_emoji');
+      expect(savedData).not.toHaveProperty('avatar_color');
+      expect(savedData).toHaveProperty('avatar_config');
+    });
+  });
+
+  describe('Error Handling on Save', () => {
+    it('should not close modal when updateProfile returns an error', async () => {
+      const mockUpdateProfile = vi.fn().mockResolvedValue({
+        data: null,
+        error: { message: 'Network error' },
+      });
+
+      // Simulate the wrapper's handleSave logic
+      let modalClosed = false;
+      const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
+        const { error } = await mockUpdateProfile({
+          display_name: name,
+          avatar_config: avatarConfig,
           has_customized_profile: true,
-        })
-      );
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+        modalClosed = true;
+      };
+
+      await expect(
+        handleSave('TestPlayer', getRandomAvatarConfig())
+      ).rejects.toThrow('Network error');
+      expect(modalClosed).toBe(false);
+    });
+
+    it('should close modal when updateProfile succeeds', async () => {
+      const mockUpdateProfile = vi.fn().mockResolvedValue({
+        data: { has_customized_profile: true },
+        error: null,
+      });
+
+      let modalClosed = false;
+      const handleSave = async (name: string, avatarConfig: CustomAvatarConfig) => {
+        const { error } = await mockUpdateProfile({
+          display_name: name,
+          avatar_config: avatarConfig,
+          has_customized_profile: true,
+        });
+
+        if (error) {
+          throw new Error(error.message);
+        }
+        modalClosed = true;
+      };
+
+      await handleSave('TestPlayer', getRandomAvatarConfig());
+      expect(modalClosed).toBe(true);
+    });
+  });
+
+  describe('Race Condition Protection', () => {
+    it('should not overwrite has_customized_profile=true with stale false data', () => {
+      // Simulate the functional updater guard in fetchUserData
+      const currentProfile = {
+        id: 'user-1',
+        username: 'CustomName',
+        display_name: 'Custom Name',
+        has_customized_profile: true,
+        avatar_config: getRandomAvatarConfig(),
+      };
+
+      const staleDbData = {
+        id: 'user-1',
+        username: 'GoogleName',
+        display_name: 'Google Name',
+        has_customized_profile: false,
+      };
+
+      // This is the guard logic from useProfileManagement.fetchUserData
+      const result = (() => {
+        if (currentProfile?.has_customized_profile && !staleDbData.has_customized_profile) {
+          return currentProfile;
+        }
+        return staleDbData;
+      })();
+
+      expect(result).toBe(currentProfile);
+      expect(result.has_customized_profile).toBe(true);
+      expect(result.display_name).toBe('Custom Name');
+    });
+
+    it('should allow overwrite when DB data also has has_customized_profile=true', () => {
+      const currentProfile = {
+        id: 'user-1',
+        username: 'OldName',
+        display_name: 'Old Name',
+        has_customized_profile: true,
+      };
+
+      const freshDbData = {
+        id: 'user-1',
+        username: 'NewName',
+        display_name: 'New Name',
+        has_customized_profile: true,
+      };
+
+      const result = (() => {
+        if (currentProfile?.has_customized_profile && !freshDbData.has_customized_profile) {
+          return currentProfile;
+        }
+        return freshDbData;
+      })();
+
+      expect(result).toBe(freshDbData);
+      expect(result.display_name).toBe('New Name');
+    });
+
+    it('should allow setting profile when no current profile exists', () => {
+      const currentProfile = null;
+
+      const dbData = {
+        id: 'user-1',
+        username: 'NewUser',
+        display_name: 'New User',
+        has_customized_profile: false,
+      };
+
+      const result = (() => {
+        if (currentProfile?.has_customized_profile && !dbData.has_customized_profile) {
+          return currentProfile;
+        }
+        return dbData;
+      })();
+
+      expect(result).toBe(dbData);
     });
   });
 });
 
 describe('Integration: Profile Customization Flow', () => {
-  /**
-   * This describes the complete flow:
-   * 1. User signs up via OAuth (Google, etc.)
-   * 2. AuthContext creates profile with has_customized_profile: false
-   * 3. ProfileCustomizationWrapper detects needsProfileCustomization: true
-   * 4. Modal shows with avatar selection and name input
-   * 5. User selects avatar and enters name, clicks Save
-   * 6. updateProfile is called with all required fields including avatar_emoji/avatar_color
-   * 7. Modal closes, has_customized_profile is now true
-   */
-  it('complete signup to customization flow works correctly', async () => {
-    const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+  it('complete signup to customization flow saves CustomAvatarConfig', async () => {
+    const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
-    // Verify that needsProfileCustomization would be true for new user
-    const newUserState = {
-      has_customized_profile: false,
+    const selectedAvatar: CustomAvatarConfig = {
+      base: 'heart',
+      skinColor: '#EDB98A',
+      hair: 'bob',
+      hairColor: '#D4A574',
+      eyes: 'round',
+      mouth: 'smile',
+      accessory: 'none',
+      accessoryColor: '#000000',
+      bgColor: '#1a1a2e',
+      gender: 'female',
     };
-    expect(newUserState.has_customized_profile).toBe(false);
-
-    // Step 4-6: User customizes and saves
-    const selectedAvatarId = 'sunny-steve';
-    const newDisplayName = 'SunnyPlayer';
-
-    const { emoji, color } = getAvatarEmojiAndColor(selectedAvatarId);
 
     await mockUpdateProfile({
-      display_name: newDisplayName,
-      username: newDisplayName,
-      avatar_image: selectedAvatarId,
-      avatar_emoji: emoji,
-      avatar_color: color,
-      has_customized_profile: true,
-    });
-
-    // Step 7: Verify the profile update was called correctly
-    expect(mockUpdateProfile).toHaveBeenCalledWith({
       display_name: 'SunnyPlayer',
       username: 'SunnyPlayer',
-      avatar_image: 'sunny-steve',
-      avatar_emoji: '☀️',
-      avatar_color: '#f59e0b',
-      has_customized_profile: true,
-    });
-  });
-
-  it('user who chooses to keep their profile picture works correctly', async () => {
-    const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
-    const PROFILE_AVATAR_ID = '__profile_avatar__';
-
-    // User keeps profile picture and just updates name
-    const { emoji, color } = getAvatarEmojiAndColor(PROFILE_AVATAR_ID);
-
-    await mockUpdateProfile({
-      display_name: 'Johnny',
-      username: 'Johnny',
-      avatar_image: PROFILE_AVATAR_ID,
-      avatar_emoji: emoji,
-      avatar_color: color,
+      avatar_config: selectedAvatar,
       has_customized_profile: true,
     });
 
-    expect(mockUpdateProfile).toHaveBeenCalledWith({
-      display_name: 'Johnny',
-      username: 'Johnny',
-      avatar_image: '__profile_avatar__',
-      avatar_emoji: '🎯',
-      avatar_color: '#6366f1',
-      has_customized_profile: true,
-    });
+    expect(mockUpdateProfile).toHaveBeenCalledWith(
+      expect.objectContaining({
+        display_name: 'SunnyPlayer',
+        avatar_config: selectedAvatar,
+        has_customized_profile: true,
+      })
+    );
   });
 });

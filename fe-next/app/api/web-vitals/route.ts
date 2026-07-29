@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createClient, getSessionUser } from '@/utils/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,11 +15,7 @@ interface WebVitalPayload {
   navigation_type: string | null;
   session_id: string;
   user_agent: string;
-  metadata: {
-    id: string;
-    navigationType: string;
-    delta: number;
-  };
+  metadata: Record<string, unknown>;
 }
 
 export async function POST(request: NextRequest) {
@@ -27,7 +23,8 @@ export async function POST(request: NextRequest) {
     const data: WebVitalPayload = await request.json();
 
     // Validate required fields
-    if (!data.metric_name || !data.metric_value || !data.metric_rating) {
+    // Note: metric_value can be 0 (valid for CLS), so use typeof check
+    if (!data.metric_name || typeof data.metric_value !== 'number' || !data.metric_rating) {
       return NextResponse.json(
         { error: 'Missing required fields' },
         { status: 400 }
@@ -46,8 +43,8 @@ export async function POST(request: NextRequest) {
     // Get Supabase client
     const supabase = await createClient();
 
-    // Get current user if authenticated (optional)
-    const { data: { user } } = await supabase.auth.getUser();
+    // Get current user from session JWT (no network call — proxy already refreshed)
+    const { user } = await getSessionUser(supabase);
 
     // Extract country code from headers if available
     const countryCode = request.headers.get('cf-ipcountry') ||
@@ -74,7 +71,8 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Error saving web vital:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('Error saving web vital:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to save metric' },
         { status: 500 }
@@ -83,7 +81,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
-    console.error('Error processing web vital:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error processing web vital:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

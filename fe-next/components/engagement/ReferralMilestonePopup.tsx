@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Users, Gift, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/utils/ThemeContext';
@@ -83,16 +83,16 @@ export function ReferralMilestonePopup({
       {isOpen && (
         <>
           {/* Backdrop */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs"
             onClick={handleClose}
           />
 
           {/* Popup */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.8, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.8, y: 20 }}
@@ -108,7 +108,7 @@ export function ReferralMilestonePopup({
               onClick={handleClose}
               className={`absolute right-3 top-3 z-10 p-1.5 rounded-full transition-colors ${
                 isDarkMode
-                  ? 'hover:bg-white/10 text-neo-cream/70'
+                  ? 'hover:bg-white/10 text-neo-white'
                   : 'hover:bg-black/10 text-neo-black/70'
               }`}
               aria-label={t('common.close')}
@@ -117,54 +117,54 @@ export function ReferralMilestonePopup({
             </button>
 
             {/* Header with gradient */}
-            <div className={`bg-gradient-to-br ${colors.bg} p-6 pb-8 text-center text-white`}>
-              <motion.div
+            <div className={`bg-linear-to-br ${colors.bg} p-6 pb-8 text-center text-white`}>
+              <m.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-sm mb-3"
+                className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-white/20 backdrop-blur-xs mb-3"
               >
                 <Users className="w-10 h-10" />
-              </motion.div>
+              </m.div>
 
-              <motion.h2
+              <m.h2
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
                 className="text-xl font-bold"
               >
                 {t('referral.milestoneTitle')}
-              </motion.h2>
+              </m.h2>
             </div>
 
             {/* Content */}
             <div className="p-6 text-center">
               {/* Friend name and milestone */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.4 }}
                 className="mb-4"
               >
-                <p className={`text-lg ${isDarkMode ? 'text-neo-cream' : 'text-neo-black'}`}>
+                <p className={`text-lg ${isDarkMode ? 'text-neo-white' : 'text-neo-black'}`}>
                   <span className="font-bold">{milestone.referredUsername}</span>
                   {' '}
                   {t(`referral.milestone_${milestone.milestone}`)}
                 </p>
-              </motion.div>
+              </m.div>
 
               {/* Game count badge */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
-                className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br ${colors.bg} text-white text-2xl font-bold shadow-lg mb-4`}
+                className={`inline-flex items-center justify-center w-16 h-16 rounded-full bg-linear-to-br ${colors.bg} text-white text-2xl font-bold shadow-lg mb-4`}
               >
                 {gameCount}
-              </motion.div>
+              </m.div>
 
               {/* Reward */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.6 }}
@@ -173,20 +173,20 @@ export function ReferralMilestonePopup({
                 <Gift className="w-5 h-5" />
                 <span>+{milestone.rewardXp} XP</span>
                 <Sparkles className="w-5 h-5" />
-              </motion.div>
+              </m.div>
 
               {/* Message */}
-              <motion.p
+              <m.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
-                className={`text-sm ${isDarkMode ? 'text-neo-cream/70' : 'text-neo-black/70'}`}
+                className={`text-sm ${isDarkMode ? 'text-neo-white' : 'text-neo-black/70'}`}
               >
                 {t('referral.milestoneMessage')}
-              </motion.p>
+              </m.p>
 
               {/* Close button */}
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.8 }}
@@ -194,13 +194,13 @@ export function ReferralMilestonePopup({
               >
                 <Button
                   onClick={handleClose}
-                  className={`w-full bg-gradient-to-r ${colors.bg} text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity`}
+                  className={`w-full bg-linear-to-r ${colors.bg} text-white font-bold py-3 rounded-xl hover:opacity-90 transition-opacity`}
                 >
                   {t('common.awesome')}
                 </Button>
-              </motion.div>
+              </m.div>
             </div>
-          </motion.div>
+          </m.div>
         </>
       )}
     </AnimatePresence>

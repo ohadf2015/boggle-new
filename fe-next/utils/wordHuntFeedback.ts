@@ -5,6 +5,10 @@
  * Compares submitted words against the target word and returns position-based feedback.
  */
 
+import type { Language } from '@/types';
+import { normalizeHebrewLetter, sanitizeWord } from '@/shared/utils/wordNormalization';
+import { findWordPath } from '@/utils/wordPathFinder';
+
 export type FeedbackType = 'green' | 'yellow' | 'gray';
 
 export interface LetterFeedback {
@@ -42,39 +46,61 @@ export interface LetterFeedback {
  */
 export function getLetterFeedback(
   submittedWord: string,
-  targetWord: string
+  targetWord: string,
+  language?: Language
 ): LetterFeedback[] {
-  const submitted = submittedWord.toUpperCase();
-  const target = targetWord.toUpperCase();
+  // Sanitize words to remove invisible Unicode characters (RTL marks, niqqud, etc.)
+  // This fixes length mismatches that cause "?" padding in feedback tiles
+  const sanitizedSubmitted = sanitizeWord(submittedWord, language);
+  const sanitizedTarget = sanitizeWord(targetWord, language);
+
+  const submitted = sanitizedSubmitted.toUpperCase();
+  const target = sanitizedTarget.toUpperCase();
 
   const feedback: LetterFeedback[] = [];
+
+  // For Hebrew, normalize final letters to regular forms for comparison
+  // This ensures ם matches מ, ך matches כ, etc.
+  const normalizeForComparison = (letter: string): string => {
+    if (language === 'he') {
+      return normalizeHebrewLetter(letter);
+    }
+    return letter;
+  };
+
   const targetLetters = target.split('');
   const submittedLetters = submitted.split('');
+
+  // Create normalized versions for comparison
+  const targetNormalized = targetLetters.map(normalizeForComparison);
+  const submittedNormalized = submittedLetters.map(normalizeForComparison);
 
   // Track which letters in target have been "used" for feedback
   const targetUsed: boolean[] = new Array(targetLetters.length).fill(false);
   const submittedProcessed: FeedbackType[] = new Array(submittedLetters.length).fill('gray');
 
   // First pass: Mark all exact position matches as GREEN
-  for (let i = 0; i < submittedLetters.length; i++) {
-    if (i < targetLetters.length && submittedLetters[i] === targetLetters[i]) {
+  // Use normalized letters for comparison to handle Hebrew final letters
+  for (let i = 0; i < submittedNormalized.length; i++) {
+    if (i < targetNormalized.length && submittedNormalized[i] === targetNormalized[i]) {
       submittedProcessed[i] = 'green';
       targetUsed[i] = true;
     }
   }
 
   // Second pass: Mark yellows for letters that exist elsewhere
-  for (let i = 0; i < submittedLetters.length; i++) {
+  for (let i = 0; i < submittedNormalized.length; i++) {
     // Skip if already marked green
     if (submittedProcessed[i] === 'green') {
       continue;
     }
 
-    const letter = submittedLetters[i];
+    const normalizedLetter = submittedNormalized[i];
 
     // Find if this letter exists in target (at a position that hasn't been used)
-    const targetIndex = targetLetters.findIndex(
-      (targetLetter, idx) => targetLetter === letter && !targetUsed[idx]
+    // Use normalized comparison for Hebrew final letter support
+    const targetIndex = targetNormalized.findIndex(
+      (targetLetter, idx) => targetLetter === normalizedLetter && !targetUsed[idx]
     );
 
     if (targetIndex !== -1) {
@@ -167,14 +193,34 @@ export function getLetterKnowledge(
 
 /**
  * Validate that a word can be formed on the Boggle board
- * This is a placeholder - the actual validation should use the board's path-finding logic
+ * Uses DFS path-finding to verify the word can be traced through adjacent cells
  *
  * @param word - Word to validate
- * @param grid - The letter grid
- * @returns true if word can be formed on board
+ * @param grid - The letter grid (2D array of letters)
+ * @param language - Language for normalization (defaults to 'en')
+ * @returns true if word can be formed on board using adjacent cells
+ *
+ * @example
+ * ```typescript
+ * const grid = [
+ *   ['C', 'A', 'T'],
+ *   ['D', 'O', 'G'],
+ *   ['X', 'Y', 'Z']
+ * ];
+ * canFormWordOnBoard('CAT', grid); // true - C→A→T are adjacent
+ * canFormWordOnBoard('COG', grid); // false - C and O are not adjacent
+ * ```
  */
-export function canFormWordOnBoard(word: string, grid: string[][]): boolean {
-  // TODO: Integrate with existing board path-finding logic from GridComponent
-  // For now, return true - actual validation will be done by the game component
-  return true;
+export function canFormWordOnBoard(
+  word: string,
+  grid: string[][],
+  language: Language = 'en'
+): boolean {
+  // Handle edge cases
+  if (!word || word.length === 0) return false;
+  if (!grid || grid.length === 0 || !grid[0] || grid[0].length === 0) return false;
+
+  // Use the existing path-finding algorithm
+  const path = findWordPath(word, grid, language);
+  return path !== null;
 }

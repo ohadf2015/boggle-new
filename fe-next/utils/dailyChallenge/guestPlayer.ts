@@ -7,6 +7,12 @@
 import type { GuestDailyPlayer } from './types';
 import { GUEST_DAILY_PLAYER_KEY, GUEST_FINGERPRINT_KEY } from './constants';
 import { hashString } from './prng';
+import {
+  getJsonFromLocalStorage,
+  saveJsonToLocalStorage,
+  getFromLocalStorage,
+  saveToLocalStorage,
+} from '@/utils/storageHelpers';
 
 /**
  * Get or generate guest daily player info
@@ -18,13 +24,9 @@ export async function getGuestDailyPlayer(): Promise<GuestDailyPlayer> {
   }
 
   // Check if we already have stored guest player info
-  const stored = localStorage.getItem(GUEST_DAILY_PLAYER_KEY);
+  const stored = getJsonFromLocalStorage<GuestDailyPlayer | null>(GUEST_DAILY_PLAYER_KEY, null);
   if (stored) {
-    try {
-      return JSON.parse(stored);
-    } catch {
-      // Continue to generate new
-    }
+    return stored;
   }
 
   // Generate new guest player info
@@ -40,7 +42,7 @@ export async function getGuestDailyPlayer(): Promise<GuestDailyPlayer> {
         avatarEmoji: data.avatar.emoji,
         avatarColor: data.avatar.color,
       };
-      localStorage.setItem(GUEST_DAILY_PLAYER_KEY, JSON.stringify(guestPlayer));
+      saveJsonToLocalStorage(GUEST_DAILY_PLAYER_KEY, guestPlayer);
       return guestPlayer;
     }
   } catch {
@@ -49,11 +51,11 @@ export async function getGuestDailyPlayer(): Promise<GuestDailyPlayer> {
 
   // Fallback
   const fallback: GuestDailyPlayer = {
-    displayName: 'Player ' + Math.floor(Math.random() * 1000),
+    displayName: ['WordNinja', 'LetterWizard', 'VowelViking', 'SyllableStar', 'GrammarGhost', 'SpellingBee', 'AlphabetAce', 'LexiconLion'][Math.floor(Math.random() * 8)],
     avatarEmoji: '🎯',
     avatarColor: '#6366f1',
   };
-  localStorage.setItem(GUEST_DAILY_PLAYER_KEY, JSON.stringify(fallback));
+  saveJsonToLocalStorage(GUEST_DAILY_PLAYER_KEY, fallback);
   return fallback;
 }
 
@@ -66,27 +68,21 @@ export function updateGuestDailyPlayer(updates: Partial<GuestDailyPlayer>): Gues
     return null;
   }
 
-  const stored = localStorage.getItem(GUEST_DAILY_PLAYER_KEY);
-  let current: GuestDailyPlayer = {
-    displayName: 'Guest',
-    avatarEmoji: '🎯',
-    avatarColor: '#6366f1',
-  };
-
-  if (stored) {
-    try {
-      current = JSON.parse(stored);
-    } catch {
-      // Use default
+  const current = getJsonFromLocalStorage<GuestDailyPlayer>(
+    GUEST_DAILY_PLAYER_KEY,
+    {
+      displayName: 'Guest',
+      avatarEmoji: '🎯',
+      avatarColor: '#6366f1',
     }
-  }
+  );
 
   const updated: GuestDailyPlayer = {
     ...current,
     ...updates,
   };
 
-  localStorage.setItem(GUEST_DAILY_PLAYER_KEY, JSON.stringify(updated));
+  saveJsonToLocalStorage(GUEST_DAILY_PLAYER_KEY, updated);
   return updated;
 }
 
@@ -100,7 +96,7 @@ export async function getGuestFingerprint(): Promise<string> {
 
   try {
     // First, check if we already have a stored fingerprint (for consistency across sessions)
-    const storedFingerprint = localStorage.getItem(GUEST_FINGERPRINT_KEY);
+    const storedFingerprint = getFromLocalStorage(GUEST_FINGERPRINT_KEY);
     if (storedFingerprint && storedFingerprint.length > 0) {
       return storedFingerprint;
     }
@@ -127,14 +123,14 @@ export async function getGuestFingerprint(): Promise<string> {
     }
 
     // Store for consistency
-    localStorage.setItem(GUEST_FINGERPRINT_KEY, fingerprint);
+    saveToLocalStorage(GUEST_FINGERPRINT_KEY, fingerprint);
 
     return fingerprint;
   } catch {
     // Fallback to UUID if anything fails
     const fallbackId = generateGuestUUID();
     try {
-      localStorage.setItem(GUEST_FINGERPRINT_KEY, fallbackId);
+      saveToLocalStorage(GUEST_FINGERPRINT_KEY, fallbackId);
     } catch {
       // localStorage might be disabled - that's ok, just return the UUID
     }

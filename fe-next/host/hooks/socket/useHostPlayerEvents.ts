@@ -4,28 +4,39 @@
  */
 import { useEffect, useMemo } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoInfoToast } from '../../../components/NeoToast';
+import { neoInfoToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { processAchievements } from '@/shared/utils/achievementUtils';
 import { createXpGainedHandler, createLevelUpHandler } from '@/shared/utils/xpUtils';
 import { createConnectionHandlers } from '@/shared/utils/connectionUtils';
 import { createPlayerPresenceHandler } from '@/shared/utils/presenceUtils';
+import { throttleLatest } from '../../../utils/throttle';
 import logger from '@/utils/logger';
 import type { XpGainedPayload, LevelUpPayload, AchievementPayload } from '@/shared/types/socket';
-import type { LeaderboardEntry } from '@/shared/types/game';
+import type { GameUser } from '@/shared/types/game';
 import type { Player } from '@/hooks/useGameState';
+
+interface LeaderboardWirePlayer {
+  username: string;
+  score: number;
+  wordCount?: number;
+}
+
+/** Coalesce the opponent-score leaderboard flood to ~6.7 updates/sec. */
+const LEADERBOARD_THROTTLE_MS = 150;
 
 interface UseHostPlayerEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
   hostPlaying: boolean;
+  hostUsername?: string;
   queueAchievement: (achievement: AchievementPayload) => void;
 
   // State setters
   setPlayersReady: React.Dispatch<React.SetStateAction<Player[]>>;
   setPlayerWordCounts: React.Dispatch<React.SetStateAction<Record<string, number>>>;
   setPlayerScores: React.Dispatch<React.SetStateAction<Record<string, number>>>;
-  setPlayerAchievements: React.Dispatch<React.SetStateAction<Record<string, any[]>>>;
-  setHostAchievements: React.Dispatch<React.SetStateAction<any[]>>;
+  setPlayerAchievements: React.Dispatch<React.SetStateAction<Record<string, unknown[]>>>;
+  setHostAchievements: React.Dispatch<React.SetStateAction<unknown[]>>;
 
   // XP state setters
   setXpGainedData: React.Dispatch<React.SetStateAction<XpGainedPayload | null>>;
@@ -39,6 +50,7 @@ export function useHostPlayerEvents({
   socket,
   t,
   hostPlaying,
+  hostUsername,
   queueAchievement,
   setPlayersReady,
   setPlayerWordCounts,
@@ -49,9 +61,10 @@ export function useHostPlayerEvents({
   setLevelUpData,
 }: UseHostPlayerEventsProps): void {
   // Create memoized handlers using shared utilities
+  // Pass hostUsername to filter out self-notifications when host is also playing
   const connectionHandlers = useMemo(
-    () => createConnectionHandlers(t, 'HOST'),
-    [t]
+    () => createConnectionHandlers(t, 'HOST', hostUsername),
+    [t, hostUsername]
   );
   const {
     handlePlayerDisconnected,
@@ -76,11 +89,27 @@ export function useHostPlayerEvents({
   useEffect(() => {
     if (!socket) return;
 
-    const handleUpdateUsers = (data: any) => {
-      const newUsers = data.users || [];
+    // Coalesce the opponent-score leaderboard flood (one event per word in a
+    // busy room) to ~6.7/s with the freshest payload, so a host who is also
+    // playing doesn't lose word-drag frame budget to per-event re-renders.
+    const throttledApplyLeaderboard = throttleLatest((leaderboard: LeaderboardWirePlayer[]) => {
+      const newScores: Record<string, number> = {};
+      const newWordCounts: Record<string, number> = {};
+      leaderboard.forEach((entry) => {
+        newScores[entry.username] = entry.score;
+        if (entry.wordCount !== undefined) {
+          newWordCounts[entry.username] = entry.wordCount;
+        }
+      });
+      setPlayerScores(newScores);
+      setPlayerWordCounts(prev => ({ ...prev, ...newWordCounts }));
+    }, LEADERBOARD_THROTTLE_MS);
+
+    const handleUpdateUsers = (data: { users: Array<GameUser | string> }) => {
+      const newUsers = (data.users || []) as Player[];
       setPlayersReady(newUsers);
 
-      const currentUsernames = new Set(newUsers.map((u: string | Player) =>
+      const currentUsernames = new Set((data.users || []).map((u) =>
         typeof u === 'string' ? u : u.username
       ));
 
@@ -106,7 +135,7 @@ export function useHostPlayerEvents({
       });
 
       setPlayerAchievements(prev => {
-        const filtered: Record<string, any[]> = {};
+        const filtered: Record<string, unknown[]> = {};
         Object.keys(prev).forEach(uname => {
           if (currentUsernames.has(uname)) {
             filtered[uname] = prev[uname] ?? [];
@@ -116,14 +145,14 @@ export function useHostPlayerEvents({
       });
     };
 
-    const handlePlayerJoinedLate = (data: any) => {
+    const handlePlayerJoinedLate = (data: { username: string }) => {
       neoInfoToast(`${data.username} ${t('hostView.playerJoinedLate')}`, {
-        icon: '🚀',
+        icon: TOAST_ICONS.rocket,
         duration: 4000,
       });
     };
 
-    const handlePlayerFoundWord = (data: any) => {
+    const handlePlayerFoundWord = (data: { username: string; word: string; wordCount: number; score: number; comboLevel: number }) => {
       setPlayerWordCounts(prev => ({
         ...prev,
         [data.username]: data.wordCount
@@ -136,33 +165,26 @@ export function useHostPlayerEvents({
       }
     };
 
-    const handleUpdateLeaderboard = (data: { leaderboard: LeaderboardEntry[] }) => {
+    const handleUpdateLeaderboard = (data: { leaderboard: LeaderboardWirePlayer[] }) => {
       if (!data.leaderboard || !Array.isArray(data.leaderboard)) return;
-
-      const newScores: Record<string, number> = {};
-      const newWordCounts: Record<string, number> = {};
-
-      data.leaderboard.forEach((entry: LeaderboardEntry) => {
-        newScores[entry.username] = entry.score;
-        if ((entry as any).wordCount !== undefined) {
-          newWordCounts[entry.username] = (entry as any).wordCount;
-        }
-      });
-
-      setPlayerScores(newScores);
-      setPlayerWordCounts(prev => ({ ...prev, ...newWordCounts }));
+      if (typeof window !== 'undefined' && window.location.search.includes('lbdebug')) {
+        console.info('[lbdebug][host] updateLeaderboard received:', data.leaderboard.map(e => `${e.username}=${e.score}`).join(', '));
+      }
+      throttledApplyLeaderboard(data.leaderboard);
     };
 
-    const handleAchievementUnlocked = (data: any) => {
+    const handleAchievementUnlocked = (data: { username?: string; achievement?: AchievementPayload }) => {
       if (!hostPlaying && data.username && data.achievement) {
+        const username = data.username;
+        const achievement = data.achievement;
         setPlayerAchievements(prev => ({
           ...prev,
-          [data.username]: [...(prev[data.username] || []), data.achievement]
+          [username]: [...(prev[username] || []), achievement]
         }));
       }
     };
 
-    const handleLiveAchievementUnlocked = (data: any) => {
+    const handleLiveAchievementUnlocked = (data: { achievements: AchievementPayload[] }) => {
       const validAchievements = processAchievements(data, queueAchievement, 'HOST');
       if (hostPlaying && validAchievements.length > 0) {
         setHostAchievements(prev => [...prev, ...validAchievements]);
@@ -171,6 +193,10 @@ export function useHostPlayerEvents({
 
     // Register listeners
     socket.on('updateUsers', handleUpdateUsers);
+    // Guest rename re-keys the roster server-side and broadcasts `playerListUpdate`
+    // (same `{ users }` shape). Without this listener the roster kept stale names —
+    // breaking anything keyed by display name (e.g. lobby emote face-swaps).
+    socket.on('playerListUpdate', handleUpdateUsers);
     socket.on('playerPresenceUpdate', handlePlayerPresenceUpdate);
     socket.on('playerJoinedLate', handlePlayerJoinedLate);
     socket.on('playerFoundWord', handlePlayerFoundWord);
@@ -186,7 +212,9 @@ export function useHostPlayerEvents({
     socket.on('levelUp', handleLevelUp);
 
     return () => {
+      throttledApplyLeaderboard.cancel();
       socket.off('updateUsers', handleUpdateUsers);
+      socket.off('playerListUpdate', handleUpdateUsers);
       socket.off('playerPresenceUpdate', handlePlayerPresenceUpdate);
       socket.off('playerJoinedLate', handlePlayerJoinedLate);
       socket.off('playerFoundWord', handlePlayerFoundWord);

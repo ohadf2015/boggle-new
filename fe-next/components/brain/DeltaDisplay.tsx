@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -42,7 +42,7 @@ export default function DeltaDisplay({ delta, className }: DeltaDisplayProps) {
     : 'text-gray-400';
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'inline-flex items-center gap-1 px-2 py-0.5 rounded-neo border-2 border-neo-black',
         colorClass,
@@ -56,6 +56,6 @@ export default function DeltaDisplay({ delta, className }: DeltaDisplayProps) {
       <span className="text-[10px] font-black uppercase">
         {isPositive && '+'}{delta}
       </span>
-    </motion.div>
+    </m.div>
   );
 }

@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Keyboard, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,8 +17,8 @@ interface KeyboardQuickTipProps {
  * KeyboardQuickTip - First-time keyboard hint
  *
  * Shows immediately on first gameplay to inform users about keyboard support.
+ * Minimal top banner design with quick auto-dismiss.
  * Once dismissed, never shows again (persisted in localStorage).
- * Neo-Brutalist design matching KeyboardHintTooltip.
  */
 export function KeyboardQuickTip({
   isVisible,
@@ -29,79 +28,56 @@ export function KeyboardQuickTip({
   return (
     <AnimatePresence>
       {isVisible && (
-        <motion.div
-          initial={{ opacity: 0, y: 20, scale: 0.9 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 20, scale: 0.9 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.5 }}
+        <m.div
+          initial={{ opacity: 0, y: -40 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -40 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 30, delay: 0.5 }}
           className={cn(
-            'fixed bottom-20 right-4 z-50',
-            'max-w-[260px]',
-            'bg-neo-pink text-white',
-            'border-4 border-neo-black',
-            'rounded-neo-lg shadow-hard-xl',
-            'p-4'
+            'fixed top-4 left-1/2 -translate-x-1/2 z-50',
+            'max-w-[90%] sm:max-w-md',
+            'bg-neo-pink/95 backdrop-blur-xs text-white',
+            'border-3 border-neo-black',
+            'rounded-neo shadow-hard-lg',
+            'px-3 py-2'
           )}
           role="tooltip"
           aria-live="polite"
         >
-          {/* Close button */}
-          <button
-            onClick={onDismiss}
-            className={cn(
-              'absolute top-2 right-2',
-              'w-8 h-8 min-w-[32px] min-h-[32px]',
-              'flex items-center justify-center',
-              'bg-white/20 hover:bg-white/30',
-              'rounded-neo border-2 border-white/30',
-              'transition-colors'
-            )}
-            aria-label="Dismiss tip"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          {/* Compact single-line content */}
+          <div className="flex items-center gap-2">
+            {/* Icon with glow pulse */}
+            <m.div
+              className="shrink-0 w-7 h-7 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center relative"
+              animate={{ scale: [1, 1.08, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            >
+              <Keyboard className="w-4 h-4" />
+              {/* Glow effect */}
+              <m.div
+                className="absolute inset-0 w-7 h-7 bg-neo-lime rounded-neo blur-xs -z-10"
+                animate={{ opacity: [0.4, 0.8, 0.4] }}
+                transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+              />
+            </m.div>
 
-          {/* Content */}
-          <div className="flex items-start gap-3 pr-6">
-            {/* Icon */}
-            <div className="flex-shrink-0 w-9 h-9 bg-neo-lime text-neo-black rounded-neo border-2 border-neo-black flex items-center justify-center">
-              <Keyboard className="w-5 h-5" />
-            </div>
-
-            {/* Text */}
+            {/* Text - single line, compact */}
             <div className="flex-1 min-w-0">
-              <div className="font-black text-sm uppercase mb-1">
-                {t('keyboardQuickTip.title')}
-              </div>
-              <p className="text-sm leading-snug mb-2">
+              <p className="text-xs font-bold leading-tight">
                 {t('keyboardQuickTip.message')}
               </p>
-              <p className="text-xs text-white/70">
-                {t('keyboardQuickTip.pressQuestion')}
-              </p>
             </div>
+
+            {/* Close button - inline */}
+            <button
+              onClick={onDismiss}
+              className="shrink-0 w-6 h-6 flex items-center justify-center bg-white/20 hover:bg-white/30 rounded-full border-2 border-white/30 transition-colors"
+              aria-label="Dismiss tip"
+            >
+              <X className="w-3 h-3" />
+            </button>
           </div>
-
-          {/* Got it button */}
-          <button
-            onClick={onDismiss}
-            className={cn(
-              'w-full mt-3 px-4 py-2',
-              'bg-neo-lime text-neo-black',
-              'border-3 border-neo-black rounded-neo',
-              'font-bold text-sm uppercase',
-              'shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg',
-              'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
-              'transition-all'
-            )}
-          >
-            {t('keyboardQuickTip.gotIt')}
-          </button>
-
-          {/* Pointer arrow */}
-          <div className="absolute bottom-[-12px] right-8 w-0 h-0 border-l-[12px] border-l-transparent border-r-[12px] border-r-transparent border-t-[12px] border-t-neo-black" />
-          <div className="absolute bottom-[-8px] right-[34px] w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-t-[10px] border-t-neo-pink" />
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

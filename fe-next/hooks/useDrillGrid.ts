@@ -394,6 +394,19 @@ function tryPlaceWordFromPosition(
   return path;
 }
 
+/** Check that a grid has enough word diversity for pattern-based drills */
+function hasSufficientWordDiversity(words: WordWithPath[], maxLength: number = 5): boolean {
+  const countByLength: Record<number, number> = {};
+  for (const w of words) {
+    const len = w.word.length;
+    if (len <= maxLength) {
+      countByLength[len] = (countByLength[len] || 0) + 1;
+    }
+  }
+  // Need at least 2 different lengths with 3+ words each
+  return Object.values(countByLength).filter(c => c >= 3).length >= 2;
+}
+
 interface UseDrillGridReturn {
   grid: LetterGrid;
   availableWords: WordWithPath[];
@@ -413,13 +426,21 @@ export function useDrillGrid(gridSize: number = 5, language: Language = 'en'): U
 
   const regenerate = useCallback(async () => {
     setIsLoading(true);
+    const MAX_RETRIES = 3;
     try {
-      const { grid: newGrid, words } = await generateDrillGrid(gridSize, language);
+      let newGrid: LetterGrid = [];
+      let words: WordWithPath[] = [];
+      let attempts = 0;
+      do {
+        const result = await generateDrillGrid(gridSize, language);
+        newGrid = result.grid;
+        words = result.words;
+        attempts++;
+      } while (!hasSufficientWordDiversity(words) && attempts < MAX_RETRIES);
       setGrid(newGrid);
       setAvailableWords(words);
     } catch (error) {
       console.error('Error generating drill grid:', error);
-      // Fallback to empty grid on error
       setGrid(Array(gridSize).fill(null).map(() => Array(gridSize).fill('')));
       setAvailableWords([]);
     } finally {

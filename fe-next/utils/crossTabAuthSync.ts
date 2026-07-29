@@ -280,7 +280,7 @@ export function tryAcquireCodeLock(code: string): boolean {
     // Lock was removed (shouldn't happen), try again
     return false;
   } catch (err) {
-    logger.warn('CrossTabAuthSync: Failed to acquire code lock:', err);
+    logger.debug('CrossTabAuthSync: Failed to acquire code lock:', err);
     // On error, proceed (better UX than blocking)
     return true;
   }
@@ -323,7 +323,7 @@ export function releaseCodeLock(): void {
       }
     }
   } catch (err) {
-    logger.warn('CrossTabAuthSync: Failed to release code lock:', err);
+    logger.debug('CrossTabAuthSync: Failed to release code lock:', err);
     // Try to remove anyway
     try {
       localStorage.removeItem(AUTH_CODE_LOCK_KEY);

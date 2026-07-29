@@ -7,11 +7,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { captureApiError } from '@/utils/sentry';
+import type { GameSessionUpdateData } from '@/backend/modules/gameSessionLogger';
 
-// Import backend services (dynamic to avoid server/client issues)
-let logGameSession: any;
-let updateGameSession: any;
-let getOrCreateGuestSession: any;
+type GameSessionLoggerModule = typeof import('@/backend/modules/gameSessionLogger');
+type GuestTrackerModule = typeof import('@/backend/modules/guestTracker');
+
+let logGameSession: GameSessionLoggerModule['logGameSession'] | undefined;
+let updateGameSession: GameSessionLoggerModule['updateGameSession'] | undefined;
+let getOrCreateGuestSession: GuestTrackerModule['getOrCreateGuestSession'] | undefined;
 
 async function getLoggers() {
   if (!logGameSession || !updateGameSession) {
@@ -19,7 +22,7 @@ async function getLoggers() {
     logGameSession = loggerModule.logGameSession;
     updateGameSession = loggerModule.updateGameSession;
   }
-  return { logGameSession, updateGameSession };
+  return { logGameSession: logGameSession!, updateGameSession: updateGameSession! };
 }
 
 async function getGuestTracker() {
@@ -27,7 +30,7 @@ async function getGuestTracker() {
     const guestModule = await import('@/backend/modules/guestTracker');
     getOrCreateGuestSession = guestModule.getOrCreateGuestSession;
   }
-  return { getOrCreateGuestSession };
+  return { getOrCreateGuestSession: getOrCreateGuestSession! };
 }
 
 // Rate limit: 60 requests per minute per IP (generous for gameplay)
@@ -88,12 +91,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      if (!userId && !guestSessionId) {
-        return NextResponse.json(
-          { error: 'Either userId or guestSessionId must be provided' },
-          { status: 400 }
-        );
-      }
+      // Fully anonymous sessions (no userId AND no guestSessionId) are now allowed —
+      // they persist with both ids NULL so admin dashboard sees every game.
 
       // Validate mode
       if (!['singleplayer', 'multiplayer', 'daily_challenge'].includes(mode)) {
@@ -178,7 +177,7 @@ export async function POST(request: NextRequest) {
 
       const { updateGameSession: updateFn } = await getLoggers();
 
-      const updates: any = {};
+      const updates: GameSessionUpdateData = {};
       if (score !== undefined) updates.score = score;
       if (wordsFound !== undefined) updates.wordsFound = wordsFound;
       if (durationSeconds !== undefined) updates.durationSeconds = durationSeconds;

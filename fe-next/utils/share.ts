@@ -1,28 +1,68 @@
 import toast from 'react-hot-toast';
+import posthog from 'posthog-js';
 import logger from '@/utils/logger';
+import { trackReferralInviteSent } from '@/utils/viralTracking';
+import { trackGrowthEvent } from '@/utils/growthTracking';
+
+export type ShareMethod =
+  | 'whatsapp'
+  | 'facebook'
+  | 'telegram'
+  | 'twitter'
+  | 'discord'
+  | 'email'
+  | 'sms'
+  | 'clipboard'
+  | 'web_share_api'
+  | 'fallback_clipboard';
+
+/**
+ * Unified share-completion event. Fires alongside surface-specific events
+ * (share_whatsapp_clicked etc.) so the "Share Action (Any Method)" PostHog
+ * goal can match without knowing every channel name. Caller passes the
+ * concrete `method` so we can break down conversion by channel.
+ */
+export function trackShareCompleted(
+  method: ShareMethod,
+  extras?: Record<string, string | number | boolean>,
+): void {
+  trackGrowthEvent('share_completed', { method, ...(extras ?? {}) });
+}
 
 /**
  * Translation function type
  */
-type TranslationFunction = (key: string) => string;
+type TranslationFunction = (
+  key: string,
+  params?: Record<string, string | number>,
+) => string;
 
 /**
  * Get the join URL for a game room
  * @param gameCode - The game code
  * @param utmSource - Optional UTM source to track where link came from
+ * @param hostName - Optional host display name (truncated to 24 chars). When set,
+ *   appended as `host=<encoded>` so the recipient's onboarding can name them.
  * @returns The full URL to join the game
  */
-export const getJoinUrl = (gameCode: string, utmSource?: string): string => {
+export const getJoinUrl = (gameCode: string, utmSource?: string, hostName?: string): string => {
   if (typeof window === 'undefined') return '';
   if (!gameCode) return '';
-  const publicUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+  const origin = window.location.origin;
+  // Extract current locale from the URL path (e.g. /en/..., /he/...)
+  const localeMatch = window.location.pathname.match(/^\/([a-z]{2})(\/|$)/);
+  const locale = localeMatch?.[1] || 'en';
   const params = new URLSearchParams();
   params.set('room', gameCode);
   if (utmSource) {
     params.set('utm_source', utmSource);
-    params.set('utm_medium', 'share');
+    params.set('utm_medium', 'referral');
+    params.set('utm_campaign', 'player_invite');
   }
-  return `${publicUrl}?${params.toString()}`;
+  if (hostName && hostName.trim()) {
+    params.set('host', hostName.trim().slice(0, 24));
+  }
+  return `${origin}/${locale}?${params.toString()}`;
 };
 
 /**
@@ -42,14 +82,64 @@ export const copyJoinUrl = async (gameCode: string, t: TranslationFunction | nul
       duration: 2000,
       icon: '✅',
     });
+    trackReferralInviteSent();
+    trackShareCompleted('clipboard', { utm_source: utmSource });
     return true;
-  } catch (error) {
-    logger.error('Failed to copy URL:', error);
-    const errorMessage = t ? t('share.copyError') : 'Error copying link';
-    toast.error(errorMessage, {
-      duration: 2000,
-    });
-    return false;
+  } catch (clipboardError) {
+    // Fallback 1: execCommand for older browsers
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = url;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+
+      if (success) {
+        const successMessage = t ? t('share.linkCopied') : 'Link copied! 📋';
+        toast.success(successMessage, {
+          duration: 2000,
+          icon: '✅',
+        });
+        trackReferralInviteSent();
+        trackShareCompleted('fallback_clipboard', { utm_source: utmSource });
+        return true;
+      }
+      throw new Error('execCommand copy returned false');
+    } catch {
+      // Fallback 2: Web Share API (works on most mobile browsers)
+      if (typeof navigator.share === 'function') {
+        try {
+          await navigator.share({ url });
+          trackShareCompleted('web_share_api', { utm_source: utmSource });
+          return true;
+        } catch (shareError) {
+          // User cancelled or share failed — only log if not user-cancelled
+          if (shareError instanceof DOMException && shareError.name === 'AbortError') {
+            return false;
+          }
+          logger.warn('Share API also failed:', shareError);
+        }
+      }
+
+      // All methods failed — show URL in toast for manual copying
+      const isNotAllowed = clipboardError instanceof DOMException && clipboardError.name === 'NotAllowedError';
+      if (isNotAllowed) {
+        logger.warn('Clipboard copy failed (NotAllowedError, all fallbacks exhausted)');
+      } else {
+        logger.warn('Failed to copy URL:', clipboardError);
+      }
+      const manualCopyMsg = t ? t('share.manualCopy') : 'Copy this link:';
+      toast(`${manualCopyMsg}\n${url}`, {
+        duration: 8000,
+        icon: '📋',
+      });
+      return false;
+    }
   }
 };
 
@@ -68,6 +158,8 @@ export const shareViaWhatsApp = (gameCode: string, roomName: string = '', t: Tra
 
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
+  trackReferralInviteSent();
+  trackShareCompleted('whatsapp');
 };
 
 /**
@@ -80,6 +172,7 @@ export const shareViaFacebook = (url: string): void => {
   // Note: Facebook doesn't support pre-filled text in sharer, only URL
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
   window.open(facebookUrl, '_blank', 'width=600,height=400');
+  trackShareCompleted('facebook');
 };
 
 /**
@@ -94,6 +187,7 @@ export const shareViaTelegram = (message: string, url?: string): void => {
     ? `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(message)}`
     : `https://t.me/share/url?text=${encodeURIComponent(message)}`;
   window.open(telegramUrl, '_blank', 'width=600,height=400');
+  trackShareCompleted('telegram');
 };
 
 /**
@@ -107,6 +201,7 @@ export const shareViaTwitter = (message: string, url?: string): void => {
   const text = url ? `${message}\n${url}` : message;
   const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
   window.open(twitterUrl, '_blank', 'width=550,height=420');
+  trackShareCompleted('twitter');
 };
 
 /**
@@ -129,6 +224,7 @@ export const shareViaDiscord = async (message: string, url: string, t: Translati
       duration: 3000,
       icon: '🎮',
     });
+    trackShareCompleted('discord');
     return true;
   } catch (error) {
     logger.error('Failed to copy for Discord:', error);
@@ -150,6 +246,7 @@ export const shareViaEmail = (subject: string, body: string, url: string): void 
   const fullBody = `${body}\n\n${url}`;
   const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(fullBody)}`;
   window.location.href = mailtoUrl;
+  trackShareCompleted('email');
 };
 
 /**
@@ -165,6 +262,7 @@ export const shareViaSms = (message: string, url: string): void => {
   // iOS uses &body=, Android uses ?body= - use ? for broader compatibility
   const smsUrl = `sms:?body=${encodeURIComponent(fullMessage)}`;
   window.location.href = smsUrl;
+  trackShareCompleted('sms');
 };
 
 /**
@@ -188,20 +286,40 @@ export const canShareViaSms = (): boolean => {
  * @returns Success status
  */
 export const copyGameCode = async (gameCode: string, t: TranslationFunction | null = null): Promise<boolean> => {
+  const showSuccess = () => {
+    const successMessage = t ? t('share.codeCopied') : 'הקוד הועתק ללוח! 🎯';
+    toast.success(successMessage, { duration: 2000, icon: '✅' });
+  };
+
   try {
     await navigator.clipboard.writeText(gameCode);
-    const successMessage = t ? t('share.codeCopied') : 'הקוד הועתק ללוח! 🎯';
-    toast.success(successMessage, {
-      duration: 2000,
-      icon: '✅',
-    });
+    showSuccess();
     return true;
-  } catch (error) {
-    logger.error('Failed to copy game code:', error);
-    const errorMessage = t ? t('share.codeCopyError') : 'שגיאה בהעתקת הקוד';
-    toast.error(errorMessage, {
-      duration: 2000,
-    });
+  } catch {
+    // Fallback: execCommand for older browsers / permission-denied
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = gameCode;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      if (success) {
+        showSuccess();
+        return true;
+      }
+    } catch {
+      // execCommand also failed
+    }
+
+    // All methods failed — show code in toast for manual copy
+    logger.warn('Failed to copy game code, showing manual fallback');
+    const manualMsg = t ? t('share.manualCopy') : 'Copy this code:';
+    toast(`${manualMsg} ${gameCode}`, { duration: 6000, icon: '📋' });
     return false;
   }
 };
@@ -336,6 +454,8 @@ export const shareResultsViaWhatsApp = (
   const message = generatePersonalizedShareMessage(gameCode, result, language);
   const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
   window.open(whatsappUrl, '_blank');
+  trackReferralInviteSent();
+  trackShareCompleted('whatsapp', { surface: 'results' });
 };
 
 /**
@@ -398,6 +518,13 @@ const trackVariantEvent = (variantId: string, event: 'shown' | 'clicked' | 'conv
     localStorage.setItem(PERFORMANCE_STORAGE_KEY, JSON.stringify(performance));
   } catch {
     // Storage full or unavailable
+  }
+
+  // Send to PostHog so A/B test data can be analyzed at scale
+  try {
+    posthog.capture('share_variant_event', { variantId, event });
+  } catch {
+    // PostHog not initialized
   }
 };
 
@@ -528,4 +655,83 @@ export const getShareMessageVariants = (
 ): string[] => {
   const variants = generateVariants(gameCode, result, language, utmSource);
   return variants.map(v => v.message);
+};
+
+// ─── UGC Share Functions ─────────────────────────────────────────
+
+/**
+ * Get the URL for a community board
+ */
+export const getBoardUrl = (boardCode: string, locale: string = 'en'): string => {
+  if (typeof window === 'undefined') return '';
+  const baseUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+  return `${baseUrl}/${locale}/community/${boardCode}?utm_source=share&utm_medium=board`;
+};
+
+/**
+ * Share a community board via various channels
+ */
+export const shareBoard = (
+  boardCode: string,
+  title: string,
+  creatorName: string,
+  locale: string,
+  t: TranslationFunction
+): void => {
+  const url = getBoardUrl(boardCode, locale);
+  const message = `${t('ugc.board.shareMessage')}\n${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`;
+
+  if (navigator.share) {
+    navigator.share({ title, text: message, url })
+      .then(() => trackShareCompleted('web_share_api', { surface: 'board' }))
+      .catch(() => {
+        // Fallback to clipboard
+        navigator.clipboard.writeText(message)
+          .then(() => trackShareCompleted('clipboard', { surface: 'board' }))
+          .catch(() => {});
+      });
+  } else {
+    navigator.clipboard.writeText(message).then(() => {
+      toast.success(t('share.linkCopied') || 'Link copied!', { duration: 2000, icon: '✅' });
+      trackShareCompleted('clipboard', { surface: 'board' });
+    }).catch(() => {});
+  }
+};
+
+/**
+ * Get the URL for a word pack
+ */
+export const getWordPackUrl = (packId: string, locale: string = 'en'): string => {
+  if (typeof window === 'undefined') return '';
+  const baseUrl = process.env.REACT_APP_PUBLIC_URL || window.location.origin;
+  return `${baseUrl}/${locale}/community?tab=packs&pack=${packId}&utm_source=share&utm_medium=pack`;
+};
+
+/**
+ * Share a word pack
+ */
+export const shareWordPack = (
+  packId: string,
+  name: string,
+  creatorName: string,
+  locale: string,
+  t: TranslationFunction
+): void => {
+  const url = getWordPackUrl(packId, locale);
+  const message = `${t('ugc.pack.shareMessage')}\n"${name}" ${t('ugc.board.createdBy', { name: creatorName })}\n\n${url}`;
+
+  if (navigator.share) {
+    navigator.share({ title: name, text: message, url })
+      .then(() => trackShareCompleted('web_share_api', { surface: 'word_pack' }))
+      .catch(() => {
+        navigator.clipboard.writeText(message)
+          .then(() => trackShareCompleted('clipboard', { surface: 'word_pack' }))
+          .catch(() => {});
+      });
+  } else {
+    navigator.clipboard.writeText(message).then(() => {
+      toast.success(t('share.linkCopied') || 'Link copied!', { duration: 2000, icon: '✅' });
+      trackShareCompleted('clipboard', { surface: 'word_pack' });
+    }).catch(() => {});
+  }
 };

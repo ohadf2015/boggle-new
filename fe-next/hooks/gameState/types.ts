@@ -171,7 +171,6 @@ export interface GameStateActions {
   // Combo actions
   incrementCombo: () => void;
   resetCombo: () => void;
-  useComboShield: () => boolean;
   updateLastWordTime: () => void;
 
   // Tournament actions

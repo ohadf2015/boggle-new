@@ -1,0 +1,100 @@
+{
+  "date": "2026-06-09",
+  "note": "Fourteenth snapshot. Backend: dropped redundant 'Admins can view invalid word submissions' SELECT policy on invalid_word_submissions (duplicate of is_admin_user() in 'curators read...' policy — eliminated double per-row profiles scan). Frontend: removed force-dynamic from /daily/word-hunt and /daily/word-wheel, replaced with revalidate=3600 (ISR). Expected LCP drop from ~4500ms to <1000ms on cold path. word_pacts FK index skipped (1-row table, Seq Scan optimal). user_reports indexes skipped (brand-new today, not stale-unused).",
+  "backend": {
+    "advisor_warnings_count": 4,
+    "advisor_warnings": [
+      {
+        "type": "multiple_permissive_policies",
+        "table": "invalid_word_submissions",
+        "status": "FIXED — migration 20260609_drop_redundant_invalid_word_submissions_admin_policy applied. Redundant admin SELECT policy dropped; is_admin_user() in remaining curator policy covers admins identically."
+      },
+      {
+        "type": "multiple_permissive_policies",
+        "table": "connections_puzzles",
+        "status": "DEFERRED — needs policy audit; similar pattern but not in today's brief scope"
+      },
+      {
+        "type": "unindexed_foreign_keys",
+        "table": "word_pacts",
+        "fkey": "word_pacts_player2_id_fkey",
+        "status": "SKIPPED — table has 1 row (EXPLAIN ANALYZE: Seq Scan on 1 buffer, 0.7ms). Index would be wasteful. Re-evaluate when table grows."
+      },
+      {
+        "type": "unused_index",
+        "table": "user_reports",
+        "indexes": ["idx_user_reports_pending", "idx_user_reports_target"],
+        "status": "SKIPPED — table + indexes created 2026-06-09 (today). Advisor flags new indexes before stats accumulate. Not genuinely unused."
+      }
+    ],
+    "top_queries": [
+      {
+        "label": "realtime.list_changes WAL parser (slot1)",
+        "total_ms": 3328219.9,
+        "mean_ms": 4.3,
+        "calls": 775439,
+        "verdict": "INFRASTRUCTURE — Supabase Realtime internal, cannot optimize"
+      },
+      {
+        "label": "realtime.list_changes WAL parser (slot2)",
+        "total_ms": 1332308.6,
+        "mean_ms": 4.4,
+        "calls": 304235,
+        "verdict": "INFRASTRUCTURE"
+      },
+      {
+        "label": "sync_coins RPC",
+        "total_ms": 136907.5,
+        "mean_ms": 7.3,
+        "calls": 18761,
+        "verdict": "OK — 7ms mean acceptable for transactional coin sync"
+      },
+      {
+        "label": "profiles last_seen_at UPDATE",
+        "total_ms": 72579.9,
+        "mean_ms": 1.6,
+        "calls": 45119,
+        "verdict": "OK"
+      },
+      {
+        "label": "pg_timezone_names SELECT",
+        "total_ms": 70483.1,
+        "mean_ms": 330.9,
+        "calls": 213,
+        "verdict": "WATCH — 330ms mean on catalog scan; Supabase Dashboard internal, not app code. Monitor for growth."
+      }
+    ]
+  },
+  "frontend": {
+    "by_route": [
+      {
+        "route": "/es/multiplayer",
+        "p75_lcp_ms": 4028,
+        "p75_inp_ms": 244,
+        "p75_cls": 0.045,
+        "n": 12,
+        "severity": "POOR",
+        "root_cause": "skeleton-vs-hydrated height mismatch in PageClient.tsx; INP 244ms above 200ms threshold",
+        "status": "DEFERRED — low n (12 events), needs skeleton height fix in PageClient.tsx"
+      },
+      {
+        "route": "/en/daily/word-wheel",
+        "p75_lcp_ms_baseline": 4516,
+        "severity": "POOR (pre-fix)",
+        "root_cause": "force-dynamic prevented ISR caching; every request paid full SSR cold path",
+        "status": "FIXED — revalidate=3600 (ISR), expected LCP ~500ms on cached path"
+      },
+      {
+        "route": "/he/daily/word-hunt",
+        "p75_lcp_ms_baseline": 4350,
+        "severity": "POOR (pre-fix)",
+        "root_cause": "force-dynamic (same as word-wheel)",
+        "status": "FIXED — revalidate=3600 (ISR)"
+      }
+    ]
+  },
+  "bundle": {
+    "total_kb": null,
+    "note": "No .next build in working tree — bundle comparison skipped. Gate runs full build authoritatively."
+  }
+}

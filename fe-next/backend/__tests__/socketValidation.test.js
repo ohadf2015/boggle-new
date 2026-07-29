@@ -3,8 +3,8 @@
  * Tests for Zod schema validation
  */
 
-const {
-  validatePayload,
+import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import { validatePayload,
   validateWithError,
   getEventSchema,
   hasSchema,
@@ -15,9 +15,7 @@ const {
   languageSchema,
   gameCodeSchema,
   usernameSchema,
-  eventSchemas
-} = require('../utils/socketValidation');
-
+  eventSchemas } from '../utils/socketValidation';
 describe('Base Schemas', () => {
   describe('languageSchema', () => {
     it('should accept valid languages', () => {
@@ -239,7 +237,7 @@ describe('validateWithError', () => {
   beforeEach(() => {
     mockSocket = {
       id: 'socket-123',
-      emit: jest.fn()
+      emit: vi.fn()
     };
   });
 

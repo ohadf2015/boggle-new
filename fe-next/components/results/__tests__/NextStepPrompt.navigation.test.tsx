@@ -4,33 +4,33 @@ import userEvent from '@testing-library/user-event';
 import NextStepPrompt from '../NextStepPrompt';
 
 // Track navigation
-const mockRouterPush = jest.fn();
+const mockRouterPush = vi.fn();
 
 // Mock next/navigation (for useRouter)
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockRouterPush,
   }),
 }));
 
 // Mock session utility
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         'nextStep.challengeBots': 'Challenge the Bots!',
         'nextStep.challengeBotsDesc': 'Test your skills against AI opponents',
-        'nextStep.dailyChallenge': 'Daily Challenge',
-        'nextStep.dailyChallengeDesc': 'Same puzzle as everyone worldwide',
+        'nextStep.tryDailyChallenge': 'Try Daily Challenge',
+        'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
-        'nextStep.brainTraining': 'Train Your Brain',
-        'nextStep.brainTrainingDesc': 'Track your cognitive growth',
+        'nextStep.goMultiplayerFromDaily': 'Why Stop at One?',
+        'nextStep.goMultiplayerFromDailyDesc': 'Unlimited games, real opponents — no waiting until tomorrow',
         'nextStep.backToLobby': 'Back to Lobby',
         'nextStep.letsGo': "Let's Go!",
       };
@@ -42,8 +42,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} onClick={onClick} {...props}>{children}</div>
     ),
@@ -54,10 +54,10 @@ jest.mock('framer-motion', () => ({
 }));
 
 describe('NextStepPrompt Navigation', () => {
-  const mockOnBackToLobby = jest.fn();
+  const mockOnBackToLobby = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockRouterPush.mockClear();
   });
 
@@ -92,10 +92,31 @@ describe('NextStepPrompt Navigation', () => {
       );
 
       // Click specifically on the title text inside the button
-      const titleElement = screen.getByText('Daily Challenge');
+      const titleElement = screen.getByText('Try Daily Challenge');
       await user.click(titleElement);
 
       expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
+    });
+
+    it('should call onAction instead of navigating when provided', async () => {
+      const user = userEvent.setup();
+      const mockOnAction = vi.fn();
+
+      render(
+        <NextStepPrompt
+          currentMode="solo-bots"
+          onBackToLobby={mockOnBackToLobby}
+          onAction={mockOnAction}
+          variant="mobile"
+        />
+      );
+
+      const titleElement = screen.getByText('Try Daily Challenge');
+      await user.click(titleElement);
+
+      // Should call onAction, not navigate
+      expect(mockOnAction).toHaveBeenCalledTimes(1);
+      expect(mockRouterPush).not.toHaveBeenCalled();
     });
   });
 
@@ -111,7 +132,7 @@ describe('NextStepPrompt Navigation', () => {
         />
       );
 
-      const buttonElement = screen.getByText('Go Multiplayer!');
+      const buttonElement = screen.getByText('Why Stop at One?');
       await user.click(buttonElement);
 
       expect(mockRouterPush).toHaveBeenCalledWith('/en/multiplayer');
@@ -134,7 +155,7 @@ describe('NextStepPrompt Navigation', () => {
       const buttonElement = screen.getByRole('button', { name: /let's go/i });
       await user.click(buttonElement);
 
-      expect(mockRouterPush).toHaveBeenCalledWith('/en/brain');
+      expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
     });
 
     it('should navigate when clicking on text inside the desktop CTA button', async () => {
@@ -159,9 +180,9 @@ describe('NextStepPrompt Navigation', () => {
   describe('All modes navigate correctly', () => {
     const testCases = [
       { mode: 'practice' as const, expectedHref: '/en/singleplayer?preset=bots', titleText: 'Challenge the Bots!' },
-      { mode: 'solo-bots' as const, expectedHref: '/en/daily', titleText: 'Daily Challenge' },
-      { mode: 'daily' as const, expectedHref: '/en/multiplayer', titleText: 'Go Multiplayer!' },
-      { mode: 'multiplayer-bots' as const, expectedHref: '/en/brain', titleText: 'Train Your Brain' },
+      { mode: 'solo-bots' as const, expectedHref: '/en/daily', titleText: 'Try Daily Challenge' },
+      { mode: 'daily' as const, expectedHref: '/en/multiplayer', titleText: 'Why Stop at One?' },
+      { mode: 'multiplayer-bots' as const, expectedHref: '/en/daily', titleText: 'Try Daily Challenge' },
     ];
 
     testCases.forEach(({ mode, expectedHref, titleText }) => {

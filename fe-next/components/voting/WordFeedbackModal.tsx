@@ -1,11 +1,18 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ThumbsUp, ThumbsDown, X, Book, CheckCircle, HelpCircle } from 'lucide-react';
+import { useState, useEffect, useCallback, memo, useRef } from 'react';
+import { m } from 'framer-motion';
+import { ThumbsUp, ThumbsDown, Book, CheckCircle, HelpCircle } from 'lucide-react';
 import Avatar from '../Avatar';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '../../utils/utils';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogBody,
+} from '@/components/ui/dialog';
 
 /**
  * Avatar data interface
@@ -13,7 +20,7 @@ import { applyHebrewFinalLetters } from '../../utils/utils';
 interface AvatarData {
   emoji?: string;
   color?: string;
-  profilePictureUrl?: string;
+
 }
 
 /**
@@ -60,17 +67,13 @@ interface WordFeedbackModalProps {
  * Makes voting fun with humorous commentary
  */
 const getWittySentences = (t: (key: string, params?: Record<string, string>) => string, word: string, player: string) => {
-  // Apply Hebrew final letter normalization for display
   const displayWord = applyHebrewFinalLetters(word);
   return [
-    t('wordFeedback.witty1', { player, word: displayWord }) || `${player} claims "${displayWord}" is totally a word...`,
-    t('wordFeedback.witty2', { player, word: displayWord }) || 'Real word or creative genius? You decide!',
-    t('wordFeedback.witty3', { player, word: displayWord }) || `${player} found "${displayWord}" in their brain dictionary`,
-    t('wordFeedback.witty4', { player, word: displayWord }) || `Webster called, they want to know about "${displayWord}"`,
-    t('wordFeedback.witty5', { player, word: displayWord }) || 'Sounds legit... or does it?',
-    t('wordFeedback.witty6', { player, word: displayWord }) || `Is "${displayWord}" a stroke of genius or madness?`,
-    t('wordFeedback.witty7', { player, word: displayWord }) || `${player} swears this is a real word!`,
-    t('wordFeedback.witty8', { player, word: displayWord }) || `The dictionary committee awaits your verdict on "${displayWord}"`,
+    t('wordFeedback.witty1', { player, word: displayWord }) || `Real word or bluff?`,
+    t('wordFeedback.witty2', { player, word: displayWord }),
+    t('wordFeedback.witty5', { player, word: displayWord }),
+    t('wordFeedback.witty6', { player, word: displayWord }) || `Genius or madness?`,
+    t('wordFeedback.witty7', { player, word: displayWord }) || `Legit or legend?`,
   ];
 };
 
@@ -96,7 +99,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
   const [hasVoted, setHasVoted] = useState(false);
   const [encouragementSentence, setEncouragementSentence] = useState('');
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [votedWords, setVotedWords] = useState<Set<string>>(new Set());
+  const [_votedWords, setVotedWords] = useState<Set<string>>(new Set());
   const prevWordRef = useRef<string | null>(null);
 
   // Get current word from queue or fall back to single word prop
@@ -114,7 +117,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
         const randomIndex = Math.floor(Math.random() * validSentences.length);
         setEncouragementSentence(validSentences[randomIndex] ?? '');
       } else {
-        setEncouragementSentence(`${currentWord.submittedBy} claims "${currentWord.word}" is totally a word...`);
+        setEncouragementSentence(`Real word or bluff?`);
       }
       setRemainingTime(timeoutSeconds);
       setHasVoted(false);
@@ -192,15 +195,6 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
     moveToNextWord();
   }, [hasVoted, moveToNextWord]);
 
-  // Handle timeout - move to next word instead of closing
-  const handleTimeout = useCallback(() => {
-    if (hasMoreWords) {
-      moveToNextWord();
-    } else {
-      onTimeout();
-    }
-  }, [hasMoreWords, moveToNextWord, onTimeout]);
-
   // Timer bar width percentage
   const timerProgress = (remainingTime / timeoutSeconds) * 100;
 
@@ -210,8 +204,6 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
     if (remainingTime <= 6) return 'bg-neo-pink';
     return 'bg-neo-cyan';
   };
-
-  if (!isOpen) return null;
 
   // Get vote info for current word
   // Words need 6 points to be prominently valid (added to dictionary)
@@ -223,25 +215,13 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
   const isValidForScoring = wordVoteInfo?.isValidForScoring || false;
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onSkip()}>
+      <DialogContent
+        noDescription
+        className="bg-neo-cream border-4 border-neo-black max-w-md overflow-hidden"
         dir={dir}
       >
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-neo-black/60 text-white"
-          onClick={onSkip}
-        />
-
-        {/* Modal */}
-        <motion.div
+        <m.div
           key={currentWord.word}
           initial={{ opacity: 0, scale: 0.8, y: 50, rotate: -5 }}
           animate={{ opacity: 1, scale: 1, y: 0, rotate: -1 }}
@@ -251,83 +231,51 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
             stiffness: 300,
             damping: 20
           }}
-          className="
-            relative w-full max-w-md
-            bg-neo-cream
-            border-4 border-neo-black
-            rounded-neo-lg
-            shadow-hard-xl
-            overflow-hidden
-          "
         >
-          {/* Header - Dictionary Building Focus */}
-          <div className="
-            bg-neo-pink text-white
-            border-b-4 border-neo-black
-            px-4 py-3
-            flex items-center justify-between
-          ">
-            <h2 className="text-xl font-black uppercase tracking-tight text-neo-cream flex items-center gap-2">
-              <Book className="w-5 h-5 text-neo-lime" />
-              {t('wordFeedback.dictionaryTitle') || 'Build Our Dictionary'}
-            </h2>
-            <div className="flex items-center gap-2">
-              {/* Word counter for multi-word queue */}
-              {totalWords > 1 && (
-                <span className="text-neo-cream/80 text-sm font-bold">
-                  {currentWordIndex + 1}/{totalWords}
-                </span>
-              )}
-              <button
-                onClick={onSkip}
-                className="
-                  text-neo-cream hover:text-neo-lime
-                  transition-colors p-1
-                "
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-          </div>
+          <DialogHeader
+            variant="pink"
+            className="flex-row items-center justify-between"
+          >
+            <DialogTitle className="text-xl font-black uppercase tracking-tight text-white flex items-center gap-2">
+              <Book className="w-5 h-5 text-neo-yellow" />
+              {t('wordFeedback.dictionaryTitle')}
+            </DialogTitle>
+            {/* Word counter for multi-word queue */}
+            {totalWords > 1 && (
+              <span className="text-neo-white text-sm font-bold">
+                {currentWordIndex + 1}/{totalWords}
+              </span>
+            )}
+          </DialogHeader>
 
-          {/* Content */}
-          <div className="p-6 space-y-4">
+          <DialogBody className="space-y-4">
             {/* Encouragement - Dictionary focused */}
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center text-neo-pink font-bold text-sm"
             >
               {encouragementSentence}
-            </motion.p>
-
-            {/* Question */}
-            <p className="text-center text-neo-black font-bold text-lg">
-              {t('wordFeedback.question') || 'Is this a real word?'}
-            </p>
-
-            {/* Submitter Info - Shows who found this word */}
+            </m.p>
+            {/* Submitter Info */}
             {currentWord.submittedBy && (
-              <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-center gap-2 text-neo-black/70"
+              <m.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex flex-col items-center gap-1"
               >
-                {currentWord.submitterAvatar && (
-                  <Avatar
-                    profilePictureUrl={currentWord.submitterAvatar.profilePictureUrl}
-                    size="sm"
-                  />
-                )}
-                <span className="text-sm font-semibold">
-                  {t('wordFeedback.submittedBy') || 'Submitted by'}: <span className="font-bold text-neo-pink">{currentWord.submittedBy}</span>
+                <Avatar
+                  userId={currentWord.submittedBy}
+                  size="xl"
+                />
+                <span className="text-xs text-neo-white font-semibold">
+                  {currentWord.submittedBy}
                 </span>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Word Card - Cleaner, focused on the word */}
-            <motion.div
+            <m.div
               key={currentWord.word}
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
@@ -349,27 +297,27 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               {/* Vote Progress Bar - Simplified */}
               {wordVoteInfo && (
                 <div className="mt-4 space-y-1">
-                  <div className="h-2 bg-neo-black/20 text-white rounded-full overflow-hidden">
-                    <motion.div
+                  <div className="h-2 bg-neo-black/20 rounded-full overflow-hidden">
+                    <m.div
                       className={`h-full ${isValidForScoring ? 'bg-neo-cyan' : 'bg-neo-lime'}`}
                       initial={{ width: 0 }}
                       animate={{ width: `${progressPercent}%` }}
                       transition={{ duration: 0.5 }}
                     />
                   </div>
-                  <p className="text-xs font-semibold text-neo-black/70 flex items-center justify-center gap-1">
+                  <p className="text-xs font-semibold text-neo-gray flex items-center justify-center gap-1">
                     <CheckCircle className={`w-3 h-3 ${isValidForScoring ? 'text-neo-cyan' : 'text-neo-lime'}`} />
                     {votesNeeded > 0
-                      ? `${votesNeeded} ${t('wordFeedback.votesNeededShort') || 'more votes'}`
-                      : (t('wordFeedback.almostApproved') || 'Almost there!')}
+                      ? `${votesNeeded} ${t('wordFeedback.votesNeededShort')}`
+                      : (t('wordFeedback.almostApproved'))}
                   </p>
                 </div>
               )}
-            </motion.div>
+            </m.div>
 
             {/* Voting Buttons */}
             {!hasVoted ? (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
@@ -380,7 +328,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   onClick={() => handleVote('dislike')}
                   className="
                     flex-1 max-w-28
-                    bg-neo-red text-neo-cream
+                    bg-neo-red text-neo-white
                     border-3 border-neo-black
                     rounded-neo-lg
                     shadow-hard
@@ -393,7 +341,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   "
                 >
                   <ThumbsDown className="w-5 h-5" />
-                  <span>{t('wordFeedback.notAWord') || 'Not a word'}</span>
+                  <span>{t('wordFeedback.notAWord')}</span>
                 </button>
 
                 {/* I Don't Know */}
@@ -401,7 +349,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   onClick={handleDontKnow}
                   className="
                     flex-1 max-w-28
-                    bg-neo-gray text-neo-cream
+                    bg-neo-gray text-neo-white
                     border-3 border-neo-black
                     rounded-neo-lg
                     shadow-hard
@@ -414,7 +362,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   "
                 >
                   <HelpCircle className="w-5 h-5" />
-                  <span>{t('wordFeedback.dontKnow') || "Don't know"}</span>
+                  <span>{t('wordFeedback.dontKnow')}</span>
                 </button>
 
                 {/* Thumbs Up */}
@@ -435,11 +383,11 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                   "
                 >
                   <ThumbsUp className="w-5 h-5" />
-                  <span>{t('wordFeedback.realWord') || 'Real word!'}</span>
+                  <span>{t('wordFeedback.realWord')}</span>
                 </button>
-              </motion.div>
+              </m.div>
             ) : (
-              <motion.div
+              <m.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 className="text-center py-4"
@@ -447,11 +395,11 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 <span className="text-2xl font-black text-neo-pink flex items-center justify-center gap-2">
                   <CheckCircle className="w-6 h-6 text-neo-lime" />
                   {hasMoreWords
-                    ? (t('wordFeedback.nextWord') || 'Next word...')
-                    : (t('wordFeedback.thankYou') || 'Thanks for helping!')
+                    ? (t('wordFeedback.nextWord'))
+                    : (t('wordFeedback.thankYou'))
                   }
                 </span>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Timer Bar */}
@@ -463,7 +411,7 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
                 rounded-neo
                 overflow-hidden
               ">
-                <motion.div
+                <m.div
                   className={`h-full ${getTimerColor()} transition-colors duration-300`}
                   initial={{ width: '100%' }}
                   animate={{ width: `${timerProgress}%` }}
@@ -472,19 +420,19 @@ const WordFeedbackModal = memo<WordFeedbackModalProps>(({
               </div>
 
               {/* Footer */}
-              <div className="flex justify-between items-center text-xs text-neo-black/75">
+              <div className="flex justify-between items-center text-xs text-neo-gray">
                 <span>
-                  {t('wordFeedback.skipHint') || 'Press ESC to skip'}
+                  {t('wordFeedback.skipHint')}
                 </span>
                 <span className="font-mono font-bold">
                   {remainingTime}s
                 </span>
               </div>
             </div>
-          </div>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+          </DialogBody>
+        </m.div>
+      </DialogContent>
+    </Dialog>
   );
 });
 

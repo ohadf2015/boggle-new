@@ -1,0 +1,236 @@
+/**
+ * ResultDisplay Component Tests
+ *
+ * Tests for the Speedometer Gauge hero section in WordHunt daily challenge results.
+ * Verifies scoring, eye toggle behavior, win/fail states.
+ */
+
+import React from 'react';
+import { render, screen, fireEvent } from '@testing-library/react';
+import { ResultDisplay } from '../ResultDisplay';
+import { getScoreBreakdown } from '@/utils/aiHintGenerator';
+
+// Mock framer-motion to render immediately
+vi.mock('framer-motion', () => ({
+  m: {
+    div: ({ children, ...props }: any) => {
+      const { initial, animate, transition, whileTap, exit, variants, whileHover, ...rest } = props;
+      return <div {...rest}>{children}</div>;
+    },
+    span: ({ children, ...props }: any) => {
+      const { initial, animate, transition, whileTap, exit, variants, whileHover, ...rest } = props;
+      return <span {...rest}>{children}</span>;
+    },
+  },
+}));
+
+vi.mock('@/hooks/useCountUp', () => ({
+  useCountUp: ({ target }: { target: number }) => target,
+}));
+
+vi.mock('@/utils/confettiUtils', () => ({
+  fireConfetti: vi.fn(),
+}));
+
+vi.mock('@/shared/utils/wordNormalization', () => ({
+  applyHebrewFinalLetters: (w: string) => w,
+}));
+
+// Mock ScoreGaugeRing to avoid SVG rendering complexity
+vi.mock('../ScoreGaugeRing', () => ({
+  ScoreGaugeRing: (props: any) => (
+    <div data-testid="score-gauge-ring" data-score={props.score} data-max={props.maxScore}>
+      {props.showScore !== false && <span data-testid="gauge-score">{props.score}</span>}
+    </div>
+  ),
+}));
+
+describe('ResultDisplay Score Calculation', () => {
+  describe('getScoreBreakdown', () => {
+    it('should return 0 for unsolved puzzles', () => {
+      const breakdown = getScoreBreakdown(100, 1, 20, false);
+      expect(breakdown.total).toBe(0);
+      expect(breakdown.speed).toBe(0);
+      expect(breakdown.accuracy).toBe(0);
+      expect(breakdown.exploration).toBe(0);
+    });
+
+    it('should calculate all components for solved puzzles', () => {
+      // Perfect game: 100 life, 1 guess, 20 words
+      const breakdown = getScoreBreakdown(100, 1, 20, true);
+      expect(breakdown.speed).toBe(400);       // 100 * 4 = 400
+      expect(breakdown.accuracy).toBe(400);    // 400 - (1-1) * 40 = 400
+      expect(breakdown.exploration).toBe(200); // 20 * 10 = 200
+      expect(breakdown.total).toBe(1000);
+    });
+
+    it('should calculate correct accuracy score for multiple guesses', () => {
+      // 7 guesses: 400 - (7-1) * 40 = 400 - 240 = 160
+      const breakdown = getScoreBreakdown(50, 7, 10, true);
+      expect(breakdown.accuracy).toBe(160);
+    });
+
+    it('should NOT return accuracy score alone when other params are missing', () => {
+      const breakdown = getScoreBreakdown(0, 7, 0, true);
+      expect(breakdown.speed).toBe(0);
+      expect(breakdown.exploration).toBe(0);
+      expect(breakdown.accuracy).toBe(160);
+      expect(breakdown.total).toBe(160);
+    });
+
+    it('should calculate total as sum of all components', () => {
+      const breakdown = getScoreBreakdown(50, 3, 15, true);
+      expect(breakdown.speed).toBe(200);
+      expect(breakdown.accuracy).toBe(320);
+      expect(breakdown.exploration).toBe(150);
+      expect(breakdown.total).toBe(670);
+    });
+  });
+});
+
+describe('ResultDisplay Props Requirements', () => {
+  it('should require lifeRemaining for accurate speed score', () => {
+    const withLife = getScoreBreakdown(50, 3, 10, true);
+    const withoutLife = getScoreBreakdown(0, 3, 10, true);
+
+    expect(withLife.speed).toBe(200);
+    expect(withoutLife.speed).toBe(0);
+    expect(withLife.total).toBeGreaterThan(withoutLife.total);
+  });
+
+  it('should require wordsDiscovered for accurate exploration score', () => {
+    const withWords = getScoreBreakdown(50, 3, 10, true);
+    const withoutWords = getScoreBreakdown(50, 3, 0, true);
+
+    expect(withWords.exploration).toBe(100);
+    expect(withoutWords.exploration).toBe(0);
+    expect(withWords.total).toBeGreaterThan(withoutWords.total);
+  });
+});
+
+const mockT = (key: string) => key;
+
+describe('ResultDisplay Component', () => {
+  const solvedProps = {
+    solved: true,
+    attemptsUsed: 3,
+    targetWord: 'HELLO',
+    streakDays: 5,
+    language: 'en' as const,
+    puzzleNumber: 42,
+    countdown: '12:34:56',
+    lifeRemaining: 60,
+    wordsDiscovered: 8,
+    t: mockT,
+  };
+
+  describe('Win state', () => {
+    it('renders the gauge ring-3 for solved puzzle', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByTestId('score-gauge-ring')).toBeInTheDocument();
+    });
+
+    it('shows target word by default', () => {
+      render(<ResultDisplay {...solvedProps} targetWord="CAT" />);
+      // Word is visible by default
+      expect(screen.getByTestId('letter-C')).toBeInTheDocument();
+      expect(screen.getByTestId('letter-A')).toBeInTheDocument();
+      expect(screen.getByTestId('letter-T')).toBeInTheDocument();
+    });
+
+    it('hides target word letters when eye toggle is clicked', () => {
+      render(<ResultDisplay {...solvedProps} targetWord="CAT" />);
+      const toggle = screen.getByTestId('word-visibility-toggle');
+      fireEvent.click(toggle);
+      // Word is now hidden
+      expect(screen.queryByTestId('letter-C')).not.toBeInTheDocument();
+      const questionMarks = screen.getAllByText('?');
+      expect(questionMarks.length).toBe(3);
+    });
+
+    it('renders puzzle number in header', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByText('daily.puzzleNumber')).toBeInTheDocument();
+    });
+
+    it('renders streak badge when streak > 0', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByText('5')).toBeInTheDocument();
+    });
+
+    it('does not render streak badge when streak is 0', () => {
+      render(<ResultDisplay {...solvedProps} streakDays={0} />);
+      expect(screen.queryByText('0')).not.toBeInTheDocument();
+    });
+
+    it('renders countdown', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByText('12:34:56')).toBeInTheDocument();
+    });
+
+    it('renders score breakdown chips', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      // getScoreBreakdown(60, 3, 8, true) yields speed=240, accuracy=320, exploration=80
+      expect(screen.getByText(/\+240/)).toBeInTheDocument();
+      expect(screen.getByText(/\+320/)).toBeInTheDocument();
+      expect(screen.getByText(/\+80/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Eye toggle', () => {
+    it('renders the word visibility toggle button', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      expect(screen.getByTestId('word-visibility-toggle')).toBeInTheDocument();
+    });
+
+    it('shows letters by default', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      // Letters should be visible by default
+      expect(screen.getByTestId('letter-H')).toBeInTheDocument();
+    });
+
+    it('hides letters when toggle is clicked', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      const toggle = screen.getByTestId('word-visibility-toggle');
+      fireEvent.click(toggle); // hide
+      expect(screen.queryByTestId('letter-H')).not.toBeInTheDocument();
+      // Should show ? placeholders (5 for HELLO)
+      const questionMarks = screen.getAllByText('?');
+      expect(questionMarks.length).toBe(5);
+    });
+
+    it('shows letters again when toggle is clicked twice', () => {
+      render(<ResultDisplay {...solvedProps} />);
+      const toggle = screen.getByTestId('word-visibility-toggle');
+      fireEvent.click(toggle); // hide
+      fireEvent.click(toggle); // show again
+      expect(screen.getByTestId('letter-H')).toBeInTheDocument();
+    });
+  });
+
+  describe('Fail state', () => {
+    const failProps = { ...solvedProps, solved: false };
+
+    it('renders fail state without gauge score', () => {
+      render(<ResultDisplay {...failProps} />);
+      // Gauge is rendered but with showScore=false
+      expect(screen.getByTestId('score-gauge-ring')).toBeInTheDocument();
+    });
+
+    it('shows attempts used', () => {
+      render(<ResultDisplay {...failProps} />);
+      const text = screen.getByText('3');
+      expect(text).toBeInTheDocument();
+    });
+
+    it('shows countdown in fail state', () => {
+      render(<ResultDisplay {...failProps} />);
+      expect(screen.getByText('12:34:56')).toBeInTheDocument();
+    });
+
+    it('does not show eye toggle in fail state', () => {
+      render(<ResultDisplay {...failProps} />);
+      expect(screen.queryByTestId('word-visibility-toggle')).not.toBeInTheDocument();
+    });
+  });
+});

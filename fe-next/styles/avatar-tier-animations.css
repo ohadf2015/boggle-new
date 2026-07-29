@@ -1,0 +1,239 @@
+/* ============================================
+   Avatar Tier Animation System
+   Progressively richer effects per rarity tier:
+   - VIP:       subtle float + shimmer sweep
+   - Epic:      pulsing glow + sparkle particles
+   - Legendary: holographic hue-rotate + breathing glow + particles
+   ============================================ */
+
+/* ── All Avatars — Idle Breathing ── */
+
+@keyframes avatar-idle-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.012); }
+}
+
+/* Subtle idle breathing for ALL avatars — makes them feel alive */
+.avatar-idle-breathe {
+  animation: avatar-idle-breathe 4s ease-in-out infinite;
+}
+
+/* ── VIP Tier ── */
+
+@keyframes avatar-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+
+@keyframes avatar-shimmer {
+  0% { transform: translateX(-100%) rotate(25deg); }
+  100% { transform: translateX(200%) rotate(25deg); }
+}
+
+.avatar-tier-vip {
+  animation: avatar-float 3s ease-in-out infinite;
+}
+
+.avatar-tier-vip .avatar-shimmer-overlay {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.avatar-tier-vip .avatar-shimmer-overlay::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.12) 45%,
+    rgba(255, 255, 255, 0.25) 50%,
+    rgba(255, 255, 255, 0.12) 55%,
+    transparent 100%
+  );
+  animation: avatar-shimmer 3.5s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* ── Epic Tier ── */
+
+@keyframes avatar-glow-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px var(--tier-color)); }
+  50% { filter: drop-shadow(0 0 12px var(--tier-color)) drop-shadow(0 0 4px var(--tier-color)); }
+}
+
+@keyframes avatar-sparkle {
+  0% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1) rotate(180deg); }
+  100% { opacity: 0; transform: scale(0.3) rotate(360deg); }
+}
+
+.avatar-tier-epic {
+  --tier-color: rgba(168, 85, 247, 0.6);
+  animation: avatar-float 2.5s ease-in-out infinite, avatar-glow-pulse 2s ease-in-out infinite;
+}
+
+.avatar-tier-epic .avatar-shimmer-overlay::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(168, 85, 247, 0.15) 45%,
+    rgba(168, 85, 247, 0.3) 50%,
+    rgba(168, 85, 247, 0.15) 55%,
+    transparent 100%
+  );
+  animation: avatar-shimmer 3s ease-in-out infinite;
+}
+
+.avatar-tier-epic .avatar-sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #E040FB, #7C4DFF);
+  pointer-events: none;
+  animation: avatar-sparkle 2s ease-in-out infinite;
+}
+
+.avatar-tier-epic .avatar-sparkle:nth-child(1) { top: 5%; left: 10%; animation-delay: 0s; }
+.avatar-tier-epic .avatar-sparkle:nth-child(2) { top: 15%; right: 8%; animation-delay: 0.4s; }
+.avatar-tier-epic .avatar-sparkle:nth-child(3) { bottom: 20%; left: 15%; animation-delay: 0.8s; }
+.avatar-tier-epic .avatar-sparkle:nth-child(4) { bottom: 10%; right: 12%; animation-delay: 1.2s; }
+.avatar-tier-epic .avatar-sparkle:nth-child(5) { top: 40%; left: 5%; animation-delay: 1.6s; }
+.avatar-tier-epic .avatar-sparkle:nth-child(6) { top: 50%; right: 5%; animation-delay: 0.6s; }
+
+/* ── Legendary Tier ── */
+
+/* Halo glow cycles through warm gold/amber/rose without recoloring the avatar itself.
+   Uses drop-shadow color shift only — no hue-rotate, so skin/hair/eyes stay true. */
+@keyframes avatar-holo {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.7)) brightness(1); }
+  33% { filter: drop-shadow(0 0 14px rgba(255, 140, 0, 0.7)) brightness(1.03); }
+  66% { filter: drop-shadow(0 0 10px rgba(255, 105, 180, 0.6)) brightness(1.02); }
+}
+
+@keyframes avatar-breathe {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.02) translateY(-2px); }
+}
+
+@keyframes avatar-legendary-sparkle {
+  0% { opacity: 0; transform: scale(0) translateY(0); }
+  30% { opacity: 1; transform: scale(1) translateY(-4px); }
+  70% { opacity: 0.8; transform: scale(0.8) translateY(-10px); }
+  100% { opacity: 0; transform: scale(0) translateY(-16px); }
+}
+
+@keyframes avatar-ring-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.avatar-tier-legendary {
+  --tier-color: rgba(255, 170, 0, 0.7);
+  animation: avatar-breathe 3s ease-in-out infinite, avatar-holo 6s ease-in-out infinite;
+}
+
+.avatar-tier-legendary .avatar-shimmer-overlay::after {
+  content: '';
+  position: absolute;
+  inset: -50%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 215, 0, 0.2) 40%,
+    rgba(255, 255, 255, 0.35) 50%,
+    rgba(255, 215, 0, 0.2) 60%,
+    transparent 100%
+  );
+  animation: avatar-shimmer 2.5s ease-in-out infinite;
+}
+
+.avatar-tier-legendary .avatar-sparkle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #FFD700, #FF8C00);
+  pointer-events: none;
+  animation: avatar-legendary-sparkle 2.2s ease-out infinite;
+}
+
+.avatar-tier-legendary .avatar-sparkle:nth-child(1) { top: 10%; left: 8%; animation-delay: 0s; }
+.avatar-tier-legendary .avatar-sparkle:nth-child(2) { top: 5%; right: 12%; animation-delay: 0.3s; }
+.avatar-tier-legendary .avatar-sparkle:nth-child(3) { bottom: 25%; left: 5%; animation-delay: 0.6s; }
+.avatar-tier-legendary .avatar-sparkle:nth-child(4) { bottom: 15%; right: 8%; animation-delay: 0.9s; }
+.avatar-tier-legendary .avatar-sparkle:nth-child(5) { top: 30%; left: 3%; animation-delay: 1.2s; }
+.avatar-tier-legendary .avatar-sparkle:nth-child(6) { top: 35%; right: 3%; animation-delay: 1.5s; }
+.avatar-tier-legendary .avatar-sparkle:nth-child(7) { top: 60%; left: 10%; animation-delay: 1.8s; }
+.avatar-tier-legendary .avatar-sparkle:nth-child(8) { top: 55%; right: 10%; animation-delay: 0.4s; }
+
+/* Rotating ring border for legendary */
+.avatar-tier-legendary .avatar-ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  pointer-events: none;
+  background: conic-gradient(
+    from 0deg,
+    #FFD700,
+    #FF6D00,
+    #FF1493,
+    #8B5CF6,
+    #00FFFF,
+    #BFFF00,
+    #FFD700
+  );
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  -webkit-mask-composite: xor;
+  padding: 2px;
+  animation: avatar-ring-rotate 4s linear infinite;
+}
+
+/* ── Reduced Motion ── */
+
+@media (prefers-reduced-motion: reduce) {
+  .avatar-idle-breathe,
+  .avatar-tier-vip,
+  .avatar-tier-epic,
+  .avatar-tier-legendary {
+    animation: none !important;
+  }
+
+  .avatar-tier-vip .avatar-shimmer-overlay::after,
+  .avatar-tier-epic .avatar-shimmer-overlay::after,
+  .avatar-tier-legendary .avatar-shimmer-overlay::after {
+    animation: none !important;
+  }
+
+  .avatar-tier-epic .avatar-sparkle,
+  .avatar-tier-legendary .avatar-sparkle {
+    display: none;
+  }
+
+  .avatar-tier-legendary .avatar-ring {
+    animation: none !important;
+  }
+
+  /* Keep a subtle static glow for reduced-motion users so they know it's premium */
+  .avatar-tier-epic {
+    filter: drop-shadow(0 0 6px var(--tier-color));
+  }
+
+  .avatar-tier-legendary {
+    filter: drop-shadow(0 0 8px var(--tier-color));
+  }
+}

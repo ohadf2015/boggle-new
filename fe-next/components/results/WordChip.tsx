@@ -2,7 +2,7 @@
 
 import React, { useState, memo, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -84,7 +84,6 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const isDuplicate = wordObj.isDuplicate;
   const isValid = wordObj.validated;
   const isAiVerified = wordObj.isAiVerified;
-  const isPending = wordObj.isPendingValidation;
   const invalidReason = wordObj.invalidReason;
   const aiReason = wordObj.aiReason;
   const displayWord = applyHebrewFinalLetters(wordObj.word);
@@ -100,7 +99,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
     : rawReason;
 
   // Check if this word should have a touchable tooltip
-  const hasInvalidReason = !isValid && !isDuplicate && !isPending && displayReason;
+  const hasInvalidReason = !isValid && !isDuplicate && displayReason;
 
   const handleTouchStart = () => {
     isTouchDevice.current = true;
@@ -129,7 +128,6 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   // Get color based on score - Neo-Brutalist solid colors
   const getBackgroundColor = (): string => {
     if (isDuplicate) return 'var(--neo-pink)';
-    if (isPending) return 'var(--neo-cyan)';
     if (!isValid) return '#DC2626'; // Darker red for 4.6:1 contrast with cream text
     return getPointColor(wordObj.score);
   };
@@ -137,7 +135,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   // Get text color based on background - ensure WCAG AA contrast (4.5:1)
   // Colors: 1=gray (dark), 2-3=cyan, 4=orange, 5-6=purple, 7-8=pink
   const getTextColor = (): string => {
-    if (isDuplicate || !isValid || isPending) return 'var(--neo-cream)';
+    if (isDuplicate || !isValid) return 'var(--neo-cream)';
     // 1-point words have dark gray background (#2d2d44), need light text
     if (wordObj.score === 1) return 'var(--neo-cream)';
     // Other point colors need dark text for proper contrast:
@@ -151,15 +149,15 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
   const validationTooltipContent = (
     <AnimatePresence>
       {isOpen && isMounted && tooltipPosition && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
           transition={{ duration: 0.15 }}
           className={cn(
-            'fixed z-[9999] -translate-x-1/2',
+            'fixed z-30 -translate-x-1/2',
             'w-56 sm:w-64 px-3 py-2.5 rounded-neo border-3 border-neo-black',
-            'bg-neo-red text-neo-cream shadow-hard-lg',
+            'bg-neo-red text-neo-white shadow-hard-lg',
             tooltipPosition.showAbove && '-translate-y-full'
           )}
           style={{
@@ -184,8 +182,8 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <div className="flex items-center gap-2 mb-1.5 relative z-10">
              {isAiVerified && (
                 <p className="font-black text-xs uppercase flex items-center gap-1.5 text-neo-lime">
-                  <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-cream">AI</span>
-                  {t('results.aiRejected') || 'Rejected by AI'}
+                  <span className="px-1.5 py-0.5 bg-neo-pink rounded border border-neo-black text-neo-white">AI</span>
+                  {t('results.aiRejected')}
                 </p>
               )}
           </div>
@@ -194,7 +192,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <p className="text-sm font-bold relative z-10">
             {displayReason}
           </p>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
@@ -211,10 +209,9 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       <span
         className={cn(
           // Increased padding for 48px minimum touch target to account for borders (WCAG 2.1 AA)
-          "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+          "inline-flex items-center gap-1.5 px-4 py-3 min-h-[48px] text-sm font-black uppercase border-2 border-neo-black rounded-neo shadow-hard-sm transition-all hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
           isDuplicate && "line-through opacity-80",
-          !isDuplicate && !isValid && !isPending && "opacity-70",
-          isPending && "animate-pulse",
+          !isDuplicate && !isValid && "opacity-70",
           hasInvalidReason && "cursor-pointer active:scale-95"
         )}
         style={{
@@ -224,6 +221,12 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
         role={hasInvalidReason ? "button" : undefined}
         aria-label={hasInvalidReason ? `${displayWord}: ${displayReason}` : undefined}
         tabIndex={hasInvalidReason ? 0 : undefined}
+        onKeyDown={hasInvalidReason ? (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsOpen(!isOpen);
+          }
+        } : undefined}
       >
         {label}
         {/* Show info icon for invalid words with reason - indicates it's tappable */}
@@ -243,44 +246,19 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-xs px-1.5 py-0.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded border border-neo-black font-black cursor-help">
+                <span className="text-xs px-1.5 py-0.5 bg-linear-to-r from-orange-500 to-red-500 text-white rounded border border-neo-black font-black cursor-help">
                   🔥+{wordObj.fireRoundBonus}
                 </span>
               </TooltipTrigger>
               <TooltipContent
                 side="top"
-                className="bg-neo-red text-neo-cream border-2 border-neo-black shadow-hard rounded-neo p-2"
+                className="bg-neo-red text-neo-white border-2 border-neo-black shadow-hard rounded-neo p-2"
               >
                 <p className="text-xs font-bold text-neo-black">
-                  {t('results.fireRoundBonus') || 'Fire Round Bonus!'}
+                  {t('results.fireRoundBonus')}
                   <span className="block text-neo-red mt-1 font-black">
-                    2x {t('results.points') || 'points'} (+{wordObj.fireRoundBonus})
+                    2x {t('results.points')} (+{wordObj.fireRoundBonus})
                   </span>
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        )}
-        {/* Show pending validation indicator */}
-        {isPending && !isDuplicate && (
-          <TooltipProvider delayDuration={0}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="text-xs px-1.5 py-0.5 bg-neo-lime text-neo-black rounded border border-neo-black font-black cursor-help">
-                  ?
-                </span>
-              </TooltipTrigger>
-              <TooltipContent
-                side="top"
-                className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
-              >
-                <p className="text-xs font-bold text-neo-cream">
-                  {t('results.pendingValidation') || 'Pending community validation'}
-                  {wordObj.potentialScore && (
-                    <span className="block text-neo-lime mt-1">
-                      {t('results.potentialScore', { score: String(wordObj.potentialScore) }) || `+${wordObj.potentialScore} pts if approved`}
-                    </span>
-                  )}
                 </p>
               </TooltipContent>
             </Tooltip>
@@ -291,7 +269,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
           <TooltipProvider delayDuration={0}>
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="text-xs px-1.5 py-0.5 bg-neo-pink text-neo-cream rounded border border-neo-black font-black cursor-help">
+                <span className="text-xs px-1.5 py-0.5 bg-neo-pink text-neo-white rounded border border-neo-black font-black cursor-help">
                   AI
                 </span>
               </TooltipTrigger>
@@ -299,7 +277,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
                 side="top"
                 className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2 max-w-[250px]"
               >
-                <p className="text-xs font-bold text-neo-cream">{t('results.aiVerified') || 'Verified by AI'}</p>
+                <p className="text-xs font-bold text-neo-white">{t('results.aiVerified')}</p>
                 {aiReason && (
                   <p className="text-xs text-neo-lime mt-1">{aiReason}</p>
                 )}
@@ -313,7 +291,7 @@ const WordChip = memo<WordChipProps>(({ wordObj, playerCount }) => {
       {isOpen && isMounted && createPortal(validationTooltipContent, document.body)}
 
       {isDuplicate && playerCount > 1 && (
-        <span className="absolute -top-2 end-[-8px] bg-neo-black text-neo-cream text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">
+        <span className="absolute -top-2 inset-e-[-8px] bg-neo-black text-neo-white text-[10px] px-1.5 py-0.5 min-w-[18px] h-[18px] flex items-center justify-center font-black border-2 border-neo-black rounded-neo">
           {playerCount}
         </span>
       )}

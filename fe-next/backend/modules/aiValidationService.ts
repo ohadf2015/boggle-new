@@ -7,7 +7,7 @@
  */
 
  
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
  
 const { gameAIService } = require('./gameAIService');
  
@@ -61,7 +61,7 @@ export async function isAIServiceAvailable(): Promise<boolean> {
     return isConfigured;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.warn('AI_SERVICE', `AI service not available: ${errorMessage}`);
+    logger.info('AI_SERVICE', `AI service not available: ${errorMessage}`);
     return false;
   }
 }
@@ -76,7 +76,7 @@ export async function validateWordWithAI(word: string, language: string = 'en'):
   try {
     const service = getAIService();
     if (!service) {
-      logger.warn('AI_SERVICE', `AI service not available - cannot validate "${word}"`);
+      logger.info('AI_SERVICE', `AI service not available - cannot validate "${word}"`);
       return { isValid: false, isAiVerified: false, reason: 'AI service not available' };
     }
 
@@ -104,7 +104,7 @@ export async function validateWordWithAI(word: string, language: string = 'en'):
         logger.debug('AI_SERVICE', `AI vote recorded for "${word}": ${AI_VOTE_POINTS} points, netScore: ${aiVoteResult.netScore}`);
       } catch (voteError) {
         const errorMessage = voteError instanceof Error ? voteError.message : String(voteError);
-        logger.warn('AI_SERVICE', `Failed to record AI vote for "${word}": ${errorMessage}`);
+        logger.debug('AI_SERVICE', `Failed to record AI vote for "${word}": ${errorMessage}`);
       }
     }
 
@@ -117,7 +117,7 @@ export async function validateWordWithAI(word: string, language: string = 'en'):
   } catch (error) {
     const duration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('AI_SERVICE', `AI validation failed for "${word}" after ${duration}ms: ${errorMessage}`);
+    logger.info('AI_SERVICE', `AI validation failed for "${word}" after ${duration}ms: ${errorMessage}`);
     return { isValid: false, isAiVerified: false, reason: 'Validation error' };
   }
 }
@@ -136,7 +136,7 @@ export async function validateWordsWithAI(words: string[], language: string = 'e
   try {
     const service = getAIService();
     if (!service) {
-      logger.warn('AI_SERVICE', `AI service not available - cannot batch validate ${words.length} words`);
+      logger.info('AI_SERVICE', `AI service not available - cannot batch validate ${words.length} words`);
       words.forEach(word => {
         results.set(word, { isValid: false, isAiVerified: false, reason: 'AI service not available' });
       });
@@ -178,7 +178,7 @@ export async function validateWordsWithAI(words: string[], language: string = 'e
               reason: reason || 'Valid word',
               confidence: confidence || 85
             }).catch((err: Error) => {
-              logger.warn('AI_SERVICE', `Failed to record AI vote for "${word}": ${err.message}`);
+              logger.debug('AI_SERVICE', `Failed to record AI vote for "${word}": ${err.message}`);
             })
           );
         } else {
@@ -194,7 +194,7 @@ export async function validateWordsWithAI(words: string[], language: string = 'e
             reason: reason || 'Invalid word',
             confidence: confidence || 85
           }).catch((err: Error) => {
-            logger.warn('AI_SERVICE', `Failed to record AI vote for "${word}": ${err.message}`);
+            logger.debug('AI_SERVICE', `Failed to record AI vote for "${word}": ${err.message}`);
           })
         );
       }
@@ -219,7 +219,7 @@ export async function validateWordsWithAI(words: string[], language: string = 'e
   } catch (error) {
     const duration = Date.now() - startTime;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error('AI_SERVICE', `Batch AI validation failed after ${duration}ms: ${errorMessage}`);
+    logger.info('AI_SERVICE', `Batch AI validation failed after ${duration}ms: ${errorMessage}`);
     words.forEach(word => {
       results.set(word, { isValid: false, isAiVerified: false, reason: 'Validation error' });
     });

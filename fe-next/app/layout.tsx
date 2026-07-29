@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { LazyMotionRoot } from './LazyMotionRoot';
 
 // Check if this is a preview/staging environment (explicitly set or PR preview)
 // Only block indexing when NEXT_PUBLIC_IS_PREVIEW is explicitly true or when it's a PR preview
@@ -9,23 +10,37 @@ const isPreviewEnvironment = process.env.NEXT_PUBLIC_IS_PREVIEW === 'true' ||
 
 export const metadata: Metadata = {
     metadataBase: new URL('https://www.lexiclash.live'),
+    // Canonical at the bare root — resolves the duplicate-content ambiguity
+    // between `/`, `/?room=…`, and `/?utm_*=…`. Locale pages set their own
+    // canonical in `[locale]/layout.tsx`.
+    alternates: {
+        canonical: 'https://www.lexiclash.live/',
+        languages: {
+            'x-default': 'https://www.lexiclash.live/en',
+            en: 'https://www.lexiclash.live/en',
+            he: 'https://www.lexiclash.live/he',
+            sv: 'https://www.lexiclash.live/sv',
+            ja: 'https://www.lexiclash.live/ja',
+            es: 'https://www.lexiclash.live/es',
+        },
+    },
     title: {
-        default: 'LexiClash - Real-Time Multiplayer Word Strategy Game',
+        default: 'Free Boggle Online — No Download | LexiClash Multiplayer Word Game',
         template: '%s | LexiClash',
     },
-    description: 'Compete in real-time word battles against friends. LexiClash is a fast-paced multiplayer strategy game. Play for free now.',
+    description: 'LexiClash — the free multiplayer word game. Play boggle online with friends, no download needed. Real-time word battles for 2-20+ players. Daily word wheel, adventure mode, brain training. Like Words With Friends but everyone plays at once. 5 languages.',
     // Open Graph meta tags for social sharing (WhatsApp, Facebook, Discord, etc.)
     // These are essential for link previews when sharing root URLs like lexiclash.live?room=1234
     openGraph: {
         type: 'website',
         locale: 'en_US',
         url: 'https://www.lexiclash.live',
-        title: 'LexiClash - Real-Time Multiplayer Word Strategy Game',
-        description: 'Compete in real-time word battles against friends. LexiClash is a fast-paced multiplayer strategy game. Play for free now.',
+        title: 'Free Boggle Online — No Download | LexiClash Multiplayer Word Game',
+        description: 'Play boggle online free — no download, no signup. Real-time multiplayer word battles with friends. Like Words With Friends but everyone plays at once. Daily challenges, 5 languages.',
         siteName: 'LexiClash',
         images: [
             {
-                url: 'https://www.lexiclash.live/og-image-en.jpg',
+                url: 'https://www.lexiclash.live/og-image-en.webp',
                 width: 1200,
                 height: 630,
                 alt: 'LexiClash - Real-Time Multiplayer Word Strategy Game',
@@ -35,9 +50,9 @@ export const metadata: Metadata = {
     // Twitter Card meta tags
     twitter: {
         card: 'summary_large_image',
-        title: 'LexiClash - Real-Time Multiplayer Word Strategy Game',
-        description: 'Compete in real-time word battles against friends. LexiClash is a fast-paced multiplayer strategy game. Play for free now.',
-        images: ['https://www.lexiclash.live/og-image-en.jpg'],
+        title: 'LexiClash – Free Online Word Game | Play With Friends',
+        description: 'Play boggle free online with friends — no download. Real-time multiplayer word battles, daily challenges, 5 languages.',
+        images: ['https://www.lexiclash.live/og-image-en.webp'],
     },
     // Block indexing for preview/staging environments
     robots: isPreviewEnvironment ? {
@@ -67,8 +82,8 @@ export const metadata: Metadata = {
     icons: {
         // Primary icon for Google (48px PNG - Google's preferred format)
         icon: '/icon-48.png',
-        // Shortcut icon (favicon.ico with 16x16, 32x32, 48x48)
-        shortcut: '/favicon.ico',
+        // Shortcut icon — Bing/Edge require .ico format explicitly
+        shortcut: { url: '/favicon.ico', type: 'image/x-icon' },
         // Apple touch icon for iOS
         apple: '/apple-touch-icon.png',
         // Additional sizes for other contexts
@@ -78,8 +93,13 @@ export const metadata: Metadata = {
         ],
     },
     other: {
-        'google-adsense-account': 'ca-pub-1896836706464880',
+        'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
+        'rating': 'General',
+        'msapplication-TileColor': '#1a1a2e',
+        'msapplication-TileImage': '/icon-144.png',
+        'msapplication-config': '/browserconfig.xml',
     },
+    category: 'games',
 };
 
 interface RootLayoutProps {
@@ -87,5 +107,5 @@ interface RootLayoutProps {
 }
 
 export default function RootLayout({ children }: RootLayoutProps): ReactNode {
-    return children;
+    return <LazyMotionRoot>{children}</LazyMotionRoot>;
 }

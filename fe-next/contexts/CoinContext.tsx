@@ -12,7 +12,7 @@
  * - Duplicate award prevention via session tracking
  */
 
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useRef, useMemo, ReactNode } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   getCoins,
@@ -26,7 +26,68 @@ import {
   COIN_REWARDS,
 } from '@/utils/coinManager';
 import { syncCoinsToDatabase, spendCoinsFromDatabase, getProfile } from '@/lib/supabase';
+import { emitCoinEarned } from '@/utils/coinEarnedFx';
 import toast from 'react-hot-toast';
+import * as Sentry from '@sentry/nextjs';
+
+// Coin effect toasts — neo-brutalist styled visual feedback for earn/spend
+function coinEarnToast(amount: number, reason?: string) {
+  toast.custom(
+    (t) => (
+      <div
+        className={`${t.visible ? 'animate-neo-pop' : 'opacity-0 scale-75'} transition-all duration-300 max-w-xs w-full`}
+      >
+        <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-neo-navy shadow-hard-lg">
+          {/* Shimmer overlay */}
+          <div className="absolute inset-0 bg-linear-to-r from-transparent via-neo-lime/10 to-transparent animate-shimmer pointer-events-none" />
+          <div className="relative flex items-center gap-3 px-4 py-3">
+            {/* Coin icon with glow */}
+            <div className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-linear-to-br from-yellow-400 to-amber-500 border-2 border-neo-black shadow-[0_0_12px_rgba(251,191,36,0.5)]">
+              <span className="text-lg" role="img" aria-label="coin">🪙</span>
+            </div>
+            {/* Amount + reason */}
+            <div className="flex-1 min-w-0">
+              <p className="font-neo-display text-lg font-black text-neo-lime leading-tight">
+                +{amount} <span className="text-neo-lime/70 text-sm">gold</span>
+              </p>
+              {reason && (
+                <p className="font-neo-body text-xs text-neo-white/60 truncate">{reason}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    { duration: 3000, position: 'top-center' },
+  );
+}
+
+function coinSpendToast(amount: number, reason?: string) {
+  toast.custom(
+    (t) => (
+      <div
+        className={`${t.visible ? 'animate-neo-pop' : 'opacity-0 scale-75'} transition-all duration-300 max-w-xs w-full`}
+      >
+        <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-neo-navy shadow-hard-lg">
+          <div className="relative flex items-center gap-3 px-4 py-3">
+            <div className="shrink-0 w-10 h-10 flex items-center justify-center rounded-full bg-linear-to-br from-pink-400 to-pink-600 border-2 border-neo-black">
+              <span className="text-lg" role="img" aria-label="coin">🪙</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-neo-display text-lg font-black text-neo-pink leading-tight">
+                -{amount} <span className="text-neo-pink/70 text-sm">gold</span>
+              </p>
+              {reason && (
+                <p className="font-neo-body text-xs text-neo-white/60 truncate">{reason}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    { duration: 2500, position: 'top-center' },
+  );
+}
 
 // Types
 export interface CoinRewardBreakdown {
@@ -35,6 +96,8 @@ export interface CoinRewardBreakdown {
   streak?: number;
   scoreBonus?: number;
   placement?: number;
+  /** Bonus from streak tier (e.g. +5% at 3-day, +25% at 30-day) */
+  streakBonus?: number;
 }
 
 export interface CoinRewardResult {
@@ -72,6 +135,7 @@ interface CoinContextValue {
     rank?: number;
     totalPlayers?: number;
     gameCode?: string;
+    currentStreak?: number;
   }) => Promise<CoinRewardResult | null>;
 
   awardComboMilestone: (params: {
@@ -88,6 +152,21 @@ interface CoinContextValue {
 }
 
 const CoinContext = createContext<CoinContextValue | null>(null);
+
+/** Actions-only context — consumers that never read `coins` or `isLoading` won't re-render on balance changes. */
+interface CoinActionsValue {
+  addCoins: CoinContextValue['addCoins'];
+  spendCoins: CoinContextValue['spendCoins'];
+  refreshCoins: CoinContextValue['refreshCoins'];
+  canAfford: CoinContextValue['canAfford'];
+  awardDailyCompletion: CoinContextValue['awardDailyCompletion'];
+  awardGameCompletion: CoinContextValue['awardGameCompletion'];
+  awardComboMilestone: CoinContextValue['awardComboMilestone'];
+  awardWatchedAd: CoinContextValue['awardWatchedAd'];
+  costs: typeof COIN_COSTS;
+  rewards: typeof COIN_REWARDS;
+}
+const CoinActionsContext = createContext<CoinActionsValue | null>(null);
 
 // Helper to check if award already given
 function isAlreadyAwarded(key: string): boolean {
@@ -131,6 +210,10 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     ? (profile?.total_coins ?? 0)
     : localCoins;
 
+  // Ref keeps latest coins so canAfford identity stays stable
+  const coinsRef = useRef(coins);
+  coinsRef.current = coins;
+
   /**
    * Refresh coin balance from source of truth
    */
@@ -147,11 +230,11 @@ export function CoinProvider({ children }: { children: ReactNode }) {
   }, [isAuthenticated, user, refreshProfile]);
 
   /**
-   * Check if user can afford an amount
+   * Check if user can afford an amount (ref-based for stable identity)
    */
   const canAfford = useCallback((amount: number) => {
-    return coins >= amount;
-  }, [coins]);
+    return coinsRef.current >= amount;
+  }, []);
 
   /**
    * Core: Add coins to balance
@@ -163,21 +246,33 @@ export function CoinProvider({ children }: { children: ReactNode }) {
   ): Promise<number> => {
     if (amount <= 0) return coins;
 
+    // Fire global coin-earned event so GlobalCoinEarnFx can play sound + fly coins
+    const fireCoinEarnedFx = () => emitCoinEarned(amount);
+
     if (isAuthenticated && user) {
       const result = await syncCoinsToDatabase(user.id, amount, reason, metadata);
 
       if (result.success) {
         await refreshProfile();
         const { data: freshProfile } = await getProfile(user.id);
+        coinEarnToast(amount, reason);
+        fireCoinEarnedFx();
         return freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
       } else {
-        console.error('[CoinContext] Failed to add coins:', result.error);
+        // Rate-limits are expected under burst play — don't surface as Sentry errors.
+        if (result.error === 'TOO_MANY_REQUESTS') {
+          console.debug('[CoinContext] Coin sync rate-limited; balance will reconcile on next sync');
+        } else {
+          console.error('[CoinContext] Failed to add coins:', result.error);
+        }
         toast.error('Failed to update coin balance');
         return coins;
       }
     } else {
       const newTotal = addLocalCoins(amount, reason, metadata);
       setLocalCoins(newTotal);
+      coinEarnToast(amount, reason);
+      fireCoinEarnedFx();
       return newTotal;
     }
   }, [isAuthenticated, user, coins, refreshProfile]);
@@ -197,6 +292,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
 
       if (result.success) {
         await refreshProfile();
+        coinSpendToast(amount, reason);
         return true;
       } else {
         console.error('[CoinContext] Failed to spend coins:', result.error);
@@ -207,6 +303,7 @@ export function CoinProvider({ children }: { children: ReactNode }) {
       const success = spendLocalCoins(amount, reason, metadata);
       if (success) {
         setLocalCoins(getCoins());
+        coinSpendToast(amount, reason);
       }
       return success;
     }
@@ -301,12 +398,13 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     rank?: number;
     totalPlayers?: number;
     gameCode?: string;
+    currentStreak?: number;
   }): Promise<CoinRewardResult | null> => {
-    const { sessionId, mode, score, rank, totalPlayers, gameCode } = params;
+    const { sessionId, mode, score, rank, totalPlayers, gameCode, currentStreak } = params;
     const awardKey = `lexiclash_game_coin_award_${sessionId}`;
 
     // Calculate reward first (needed for both auth and guest modes)
-    const reward = calculateGameReward(score, mode, rank, totalPlayers);
+    const reward = calculateGameReward(score, mode, rank, totalPlayers, currentStreak);
 
     // Don't show anything if reward is 0
     if (reward.total <= 0) {
@@ -399,29 +497,44 @@ export function CoinProvider({ children }: { children: ReactNode }) {
   }, [addCoins]);
 
   /**
-   * Award coins for watching a rewarded ad
+   * Award coins for watching a rewarded ad.
+   *
+   * Bypasses the generic addCoins() wrapper so we get a typed success/failure
+   * signal — addCoins() swallows errors (returns current balance on failure)
+   * which makes it impossible to detect server-side daily-cap rejections.
+   * Uses syncCoinsToDatabase directly for auth users (routes to award_ad_coins
+   * RPC with server-enforced 10-watch/day limit) and addLocalCoins for guests.
    */
   const awardWatchedAd = useCallback(async (platform: string): Promise<CoinRewardResult | null> => {
     const amount = COIN_REWARDS.WATCH_AD;
+    const metadata = { platform, timestamp: new Date().toISOString() };
 
-    try {
-      const newBalance = await addCoins(amount, 'Watched Ad', {
-        platform,
-        timestamp: new Date().toISOString(),
-      });
-
-      return {
-        awarded: amount,
-        breakdown: { base: amount },
-        newBalance,
-      };
-    } catch (error) {
-      console.error('[CoinContext] Failed to award ad coins:', error);
-      return null;
+    if (isAuthenticated && user) {
+      const result = await syncCoinsToDatabase(user.id, amount, 'Watched Ad', metadata);
+      if (!result.success) {
+        console.error('[CoinContext] Failed to award ad coins:', result.error);
+        toast.error(result.error === 'Daily ad limit reached'
+          ? 'Daily ad limit reached'
+          : 'Failed to grant ad reward');
+        return null;
+      }
+      await refreshProfile();
+      const { data: freshProfile } = await getProfile(user.id);
+      const newBalance = freshProfile?.total_coins ?? result.newBalance ?? (coins + amount);
+      coinEarnToast(amount, 'Watched Ad');
+      emitCoinEarned(amount);
+      return { awarded: amount, breakdown: { base: amount }, newBalance };
+    } else {
+      const newBalance = addLocalCoins(amount, 'Watched Ad', metadata);
+      setLocalCoins(newBalance);
+      coinEarnToast(amount, 'Watched Ad');
+      emitCoinEarned(amount);
+      return { awarded: amount, breakdown: { base: amount }, newBalance };
     }
-  }, [addCoins]);
+  }, [isAuthenticated, user, coins, refreshProfile, setLocalCoins]);
 
-  const value: CoinContextValue = {
+  // Memoize context value to prevent unnecessary re-renders in consumers
+  const value = useMemo<CoinContextValue>(() => ({
     coins,
     isLoading,
     canAfford,
@@ -434,11 +547,38 @@ export function CoinProvider({ children }: { children: ReactNode }) {
     awardWatchedAd,
     costs: COIN_COSTS,
     rewards: COIN_REWARDS,
-  };
+  }), [
+    coins,
+    isLoading,
+    canAfford,
+    addCoins,
+    spendCoins,
+    refreshCoins,
+    awardDailyCompletion,
+    awardGameCompletion,
+    awardComboMilestone,
+    awardWatchedAd,
+  ]);
+
+  // Actions-only value — stable across balance changes (no coins/isLoading deps)
+  const actionsValue = useMemo<CoinActionsValue>(() => ({
+    addCoins,
+    spendCoins,
+    refreshCoins,
+    canAfford,
+    awardDailyCompletion,
+    awardGameCompletion,
+    awardComboMilestone,
+    awardWatchedAd,
+    costs: COIN_COSTS,
+    rewards: COIN_REWARDS,
+  }), [addCoins, spendCoins, refreshCoins, canAfford, awardDailyCompletion, awardGameCompletion, awardComboMilestone, awardWatchedAd]);
 
   return (
     <CoinContext.Provider value={value}>
-      {children}
+      <CoinActionsContext.Provider value={actionsValue}>
+        {children}
+      </CoinActionsContext.Provider>
     </CoinContext.Provider>
   );
 }
@@ -450,7 +590,46 @@ export function CoinProvider({ children }: { children: ReactNode }) {
 export function useCoinContext(): CoinContextValue {
   const context = useContext(CoinContext);
   if (!context) {
-    throw new Error('useCoinContext must be used within a CoinProvider');
+    Sentry.captureMessage('useCoinContext used outside CoinProvider — returning defaults', 'warning');
+    return {
+      coins: 0,
+      isLoading: false,
+      canAfford: () => false,
+      addCoins: async () => 0,
+      spendCoins: async () => false,
+      refreshCoins: async () => 0,
+      awardDailyCompletion: async () => null,
+      awardGameCompletion: async () => null,
+      awardComboMilestone: async () => 0,
+      awardWatchedAd: async () => null,
+      costs: COIN_COSTS,
+      rewards: COIN_REWARDS,
+    };
+  }
+  return context;
+}
+
+/**
+ * Hook to access coin actions without re-rendering on balance changes.
+ * Use this in components that only call actions (spend, award, etc.)
+ * but don't display the coin balance.
+ */
+export function useCoinActions(): CoinActionsValue {
+  const context = useContext(CoinActionsContext);
+  if (!context) {
+    Sentry.captureMessage('useCoinActions used outside CoinProvider — returning defaults', 'warning');
+    return {
+      addCoins: async () => 0,
+      spendCoins: async () => false,
+      refreshCoins: async () => 0,
+      canAfford: () => false,
+      awardDailyCompletion: async () => null,
+      awardGameCompletion: async () => null,
+      awardComboMilestone: async () => 0,
+      awardWatchedAd: async () => null,
+      costs: COIN_COSTS,
+      rewards: COIN_REWARDS,
+    };
   }
   return context;
 }

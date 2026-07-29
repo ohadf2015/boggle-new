@@ -39,6 +39,8 @@ Sentry.init({
     "TimeoutError",
     "ECONNRESET",
     "ETIMEDOUT",
+    // Bots hitting routes with invalid locale params — not a bug
+    /Incorrect locale information provided/i,
   ],
 
   initialScope: {

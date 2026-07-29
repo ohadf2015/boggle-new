@@ -1,0 +1,570 @@
+{
+  "language": "en",
+  "lastUpdated": "2026-01-20",
+  "words": [
+    {
+      "word": "METEOR",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/METEOR",
+      "score": 89
+    },
+    {
+      "word": "PLANET",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/PLANET",
+      "score": 89
+    },
+    {
+      "word": "KEPLER",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/KEPLER",
+      "score": 89
+    },
+    {
+      "word": "PULSAR",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/PULSAR",
+      "score": 88
+    },
+    {
+      "word": "ECLIPSE",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/ECLIPSE",
+      "score": 88
+    },
+    {
+      "word": "MERCURY",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/MERCURY",
+      "score": 88
+    },
+    {
+      "word": "REGULUS",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/REGULUS",
+      "score": 88
+    },
+    {
+      "word": "GIANT",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/GIANT",
+      "score": 88
+    },
+    {
+      "word": "CLUSTER",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/CLUSTER",
+      "score": 88
+    },
+    {
+      "word": "JUPITER",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/JUPITER",
+      "score": 87
+    },
+    {
+      "word": "PROCYON",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/PROCYON",
+      "score": 87
+    },
+    {
+      "word": "COSMIC",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/COSMIC",
+      "score": 87
+    },
+    {
+      "word": "ORBIT",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/ORBIT",
+      "score": 86
+    },
+    {
+      "word": "CAPELLA",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/CAPELLA",
+      "score": 86
+    },
+    {
+      "word": "POLLUX",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/POLLUX",
+      "score": 86
+    },
+    {
+      "word": "CANOPUS",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/CANOPUS",
+      "score": 86
+    },
+    {
+      "word": "SPIRAL",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/SPIRAL",
+      "score": 86
+    },
+    {
+      "word": "AURORA",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/AURORA",
+      "score": 85
+    },
+    {
+      "word": "STELLAR",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/STELLAR",
+      "score": 85
+    },
+    {
+      "word": "VENUS",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/VENUS",
+      "score": 85
+    },
+    {
+      "word": "SATURN",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/SATURN",
+      "score": 85
+    },
+    {
+      "word": "POLARIS",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/POLARIS",
+      "score": 85
+    },
+    {
+      "word": "NOVA",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/NOVA",
+      "score": 85
+    },
+    {
+      "word": "VOID",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/VOID",
+      "score": 85
+    },
+    {
+      "word": "NEBULA",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/NEBULA",
+      "score": 84
+    },
+    {
+      "word": "LUNAR",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/LUNAR",
+      "score": 84
+    },
+    {
+      "word": "NEPTUNE",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/NEPTUNE",
+      "score": 84
+    },
+    {
+      "word": "VEGA",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/VEGA",
+      "score": 84
+    },
+    {
+      "word": "DENEB",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/DENEB",
+      "score": 84
+    },
+    {
+      "word": "HUBBLE",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/HUBBLE",
+      "score": 84
+    },
+    {
+      "word": "SOLAR",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/SOLAR",
+      "score": 83
+    },
+    {
+      "word": "URANUS",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/URANUS",
+      "score": 83
+    },
+    {
+      "word": "CASTOR",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/CASTOR",
+      "score": 83
+    },
+    {
+      "word": "HALLEY",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/HALLEY",
+      "score": 83
+    },
+    {
+      "word": "ZENITH",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/ZENITH",
+      "score": 82
+    },
+    {
+      "word": "ASTEROID",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/ASTEROID",
+      "score": 82
+    },
+    {
+      "word": "COSMOS",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/COSMOS",
+      "score": 82
+    },
+    {
+      "word": "ARCTURUS",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/ARCTURUS",
+      "score": 82
+    },
+    {
+      "word": "TYCHO",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/TYCHO",
+      "score": 82
+    },
+    {
+      "word": "BUTTE",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/BUTTE",
+      "score": 82
+    },
+    {
+      "word": "BASIN",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/BASIN",
+      "score": 82
+    },
+    {
+      "word": "RAVINE",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/RAVINE",
+      "score": 82
+    },
+    {
+      "word": "RIGEL",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/RIGEL",
+      "score": 81
+    },
+    {
+      "word": "SPICA",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/SPICA",
+      "score": 81
+    },
+    {
+      "word": "DWARF",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/DWARF",
+      "score": 81
+    },
+    {
+      "word": "LAGOON",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/LAGOON",
+      "score": 81
+    },
+    {
+      "word": "SHOAL",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/SHOAL",
+      "score": 81
+    },
+    {
+      "word": "SOUND",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/SOUND",
+      "score": 81
+    },
+    {
+      "word": "POINT",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/POINT",
+      "score": 81
+    },
+    {
+      "word": "DESERT",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/DESERT",
+      "score": 81
+    },
+    {
+      "word": "OASIS",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/OASIS",
+      "score": 81
+    },
+    {
+      "word": "ARROYO",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/ARROYO",
+      "score": 81
+    },
+    {
+      "word": "GORGE",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/GORGE",
+      "score": 81
+    },
+    {
+      "word": "GALAXY",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/GALAXY",
+      "score": 80
+    },
+    {
+      "word": "COMET",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/COMET",
+      "score": 80
+    },
+    {
+      "word": "QUASAR",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/QUASAR",
+      "score": 80
+    },
+    {
+      "word": "MARS",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/MARS",
+      "score": 80
+    },
+    {
+      "word": "PLUTO",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/PLUTO",
+      "score": 80
+    },
+    {
+      "word": "SIRIUS",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/SIRIUS",
+      "score": 80
+    },
+    {
+      "word": "ANTARES",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/ANTARES",
+      "score": 80
+    },
+    {
+      "word": "ALTAIR",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/ALTAIR",
+      "score": 80
+    },
+    {
+      "word": "BRAHE",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/BRAHE",
+      "score": 80
+    },
+    {
+      "word": "GULF",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/GULF",
+      "score": 80
+    },
+    {
+      "word": "STEPPE",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/STEPPE",
+      "score": 80
+    },
+    {
+      "word": "DUNE",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/DUNE",
+      "score": 80
+    },
+    {
+      "word": "PEAK",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/PEAK",
+      "score": 80
+    },
+    {
+      "word": "FAULT",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/FAULT",
+      "score": 79
+    },
+    {
+      "word": "ATOLL",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/ATOLL",
+      "score": 78
+    },
+    {
+      "word": "ISTHMUS",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/ISTHMUS",
+      "score": 78
+    },
+    {
+      "word": "CLIFF",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/CLIFF",
+      "score": 78
+    },
+    {
+      "word": "FJORD",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/FJORD",
+      "score": 77
+    },
+    {
+      "word": "DELTA",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/DELTA",
+      "score": 77
+    },
+    {
+      "word": "REEF",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/REEF",
+      "score": 77
+    },
+    {
+      "word": "CAPE",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/CAPE",
+      "score": 77
+    },
+    {
+      "word": "SAVANNA",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/SAVANNA",
+      "score": 77
+    },
+    {
+      "word": "TAIGA",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/TAIGA",
+      "score": 77
+    },
+    {
+      "word": "CHASM",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/CHASM",
+      "score": 77
+    },
+    {
+      "word": "SUMMIT",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/SUMMIT",
+      "score": 77
+    },
+    {
+      "word": "VALLEY",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/VALLEY",
+      "score": 76
+    },
+    {
+      "word": "PLATEAU",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/PLATEAU",
+      "score": 76
+    },
+    {
+      "word": "ESTUARY",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/ESTUARY",
+      "score": 76
+    },
+    {
+      "word": "STRAIT",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/STRAIT",
+      "score": 76
+    },
+    {
+      "word": "CHANNEL",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/CHANNEL",
+      "score": 76
+    },
+    {
+      "word": "TUNDRA",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/TUNDRA",
+      "score": 76
+    },
+    {
+      "word": "CREST",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/CREST",
+      "score": 76
+    },
+    {
+      "word": "SLOPE",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/SLOPE",
+      "score": 76
+    },
+    {
+      "word": "BLUFF",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/BLUFF",
+      "score": 75
+    },
+    {
+      "word": "HARBOR",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/HARBOR",
+      "score": 74
+    },
+    {
+      "word": "PRAIRIE",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/PRAIRIE",
+      "score": 74
+    },
+    {
+      "word": "RIDGE",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/RIDGE",
+      "score": 74
+    },
+    {
+      "word": "CANYON",
+      "source": "mostread_title",
+      "url": "https://en.wikipedia.org/wiki/CANYON",
+      "score": 73
+    },
+    {
+      "word": "MESA",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/MESA",
+      "score": 73
+    },
+    {
+      "word": "INLET",
+      "source": "tfa_title",
+      "url": "https://en.wikipedia.org/wiki/INLET",
+      "score": 73
+    },
+    {
+      "word": "ABYSS",
+      "source": "onthisday_title",
+      "url": "https://en.wikipedia.org/wiki/ABYSS",
+      "score": 73
+    }
+  ]
+}

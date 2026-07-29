@@ -13,9 +13,14 @@
  */
 
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
+import toast from 'react-hot-toast';
 import { couldBeOnBoard, normalizeWord } from '@/utils/clientWordValidator';
+import { detectInputLanguage } from '@/utils/languageDetection';
+import { useLanguageSafe } from '@/contexts/LanguageContext';
+import { useIsDesktop } from '@/hooks/useMediaQuery';
 import type { LetterGrid } from '@/types';
 import type { HighlightedCell } from '@/components/GridComponent';
+import type { Language } from '@/shared/types/game';
 
 // ==================== Types ====================
 
@@ -24,14 +29,18 @@ export interface UseKeyboardWordInputOptions {
   grid: LetterGrid;
   /** Language for normalization */
   language: string;
+  /** Board language (for desktop keyboard mismatch notifications) */
+  gameLanguage?: Language | null;
   /** Whether keyboard input is enabled */
   enabled: boolean;
   /** Callback when word is submitted */
-  onWordSubmit?: (word: string) => void;
+  onWordSubmit?: (word: string, meta?: { inputMethod: 'kb' | 'drag' }) => void;
   /** Callback when typed word changes (for external display) */
   onTypedWordChange?: (word: string) => void;
   /** Minimum word length for submission */
   minWordLength?: number;
+  /** Disable path highlighting (e.g. Word Hunt — showing the path reveals the answer) */
+  disablePathHighlighting?: boolean;
 }
 
 export interface UseKeyboardWordInputReturn {
@@ -174,9 +183,6 @@ function getPartialHighlight(
   const usedPositions = new Set<string>();
 
   // Try to build a partial path matching as many letters as possible
-  const rows = grid.length;
-  const cols = grid[0]?.length || 0;
-
   for (let i = 0; i < normalizedWord.length; i++) {
     const letter = normalizedWord[i];
     const positions = findLetterPositions(grid, letter, language);
@@ -224,20 +230,23 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   const {
     grid,
     language,
+    gameLanguage,
     enabled,
     onWordSubmit,
     onTypedWordChange,
     minWordLength = 2,
+    disablePathHighlighting = false,
   } = options;
 
   const [typedWord, setTypedWord] = useState('');
   const [isTypingMode, setIsTypingMode] = useState(false);
   const typedWordRef = useRef('');
+  const languageMismatchNotifiedRef = useRef(false);
+  const isDesktop = useIsDesktop();
+  const { t } = useLanguageSafe();
 
-  // Keep ref in sync with state
-  useEffect(() => {
-    typedWordRef.current = typedWord;
-  }, [typedWord]);
+  // Keep ref in sync with state (inline, no effect needed)
+  typedWordRef.current = typedWord;
 
   // Notify parent of typed word changes
   useEffect(() => {
@@ -251,10 +260,12 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   }, [typedWord, grid, language]);
 
   // Calculate highlighted cells based on typed word
+  // Disabled in Word Hunt mode — showing the path would reveal the answer
   const highlightedCells = useMemo(() => {
+    if (disablePathHighlighting) return [];
     if (!typedWord || typedWord.length === 0) return [];
     return getPartialHighlight(grid, typedWord, language);
-  }, [typedWord, grid, language]);
+  }, [typedWord, grid, language, disablePathHighlighting]);
 
   // Clear typed word
   const clearTypedWord = useCallback(() => {
@@ -266,7 +277,7 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
   const submitTypedWord = useCallback(() => {
     const word = typedWordRef.current;
     if (word.length >= minWordLength && isValidOnGrid) {
-      onWordSubmit?.(word);
+      onWordSubmit?.(word, { inputMethod: 'kb' });
       setTypedWord('');
       setIsTypingMode(false);
     }
@@ -330,6 +341,27 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
       // Check if it's a single printable character (letter)
       if (key.length === 1 && /[\p{L}]/u.test(key)) {
         e.preventDefault();
+
+        // Desktop only: Check for language mismatch and show notification once per session
+        if (isDesktop && gameLanguage && !languageMismatchNotifiedRef.current) {
+          const inputLanguage = detectInputLanguage(key);
+
+          // If input language detected and doesn't match board language
+          if (inputLanguage && inputLanguage !== gameLanguage) {
+            const langKeyMap: Record<string, string> = { he: 'joinView.hebrew', en: 'joinView.english', sv: 'joinView.swedish', ja: 'joinView.japanese', es: 'joinView.spanish' };
+            const langName = t(langKeyMap[gameLanguage] || gameLanguage) || gameLanguage;
+            toast.error(
+              t('keyboardLanguageMismatch', { language: langName }),
+              {
+                duration: 5000,
+                position: 'top-center',
+                icon: '⌨️',
+              }
+            );
+            languageMismatchNotifiedRef.current = true;
+          }
+        }
+
         setTypedWord(prev => prev + key.toUpperCase());
         setIsTypingMode(true);
       }
@@ -342,10 +374,11 @@ export function useKeyboardWordInput(options: UseKeyboardWordInputOptions): UseK
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [enabled, minWordLength, submitTypedWord, clearTypedWord]); // typedWord accessed via ref pattern inside handler
 
-  // Clear typed word when grid changes (new game)
+  // Clear typed word when grid changes (new game) and reset notification flag
   useEffect(() => {
     setTypedWord('');
     setIsTypingMode(false);
+    languageMismatchNotifiedRef.current = false;
   }, [grid]);
 
   return {

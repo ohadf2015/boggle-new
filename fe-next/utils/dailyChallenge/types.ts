@@ -55,6 +55,10 @@ export interface WordHuntResult {
   puzzleDate: string;
   language: Language;
 
+  /** True when this was a catch-up play of a past daily (last-3-days window).
+   *  Persisted so a queued/offline submission keeps the flag. */
+  isCatchup?: boolean;
+
   // Game outcome
   solved: boolean;                // Did player find the target word?
   attemptsUsed: number;          // 1-10 attempts
@@ -80,9 +84,39 @@ export interface WordHuntResult {
   hintsUnlocked?: number;
   efficiencyScore?: number;
 
+  // Retry tracking
+  extraTries?: number;          // Number of coin-paid retries (penalty: -150 each)
+
   // Metadata
   streakDays: number;
   completedAt: string;
+}
+
+/**
+ * Result for Word Wheel daily challenge
+ */
+export interface WordWheelResult {
+  puzzleNumber: number;
+  puzzleDate: string;
+  language: Language;
+  centerLetter: string;
+  wordsFound: string[];
+  totalPossible: number;
+  score: number;
+  timeSeconds: number;
+  streakDays: number;
+  completedAt: string;
+}
+
+/**
+ * Stored Word Wheel result interface
+ */
+export interface StoredWordWheelResult {
+  date: string;
+  puzzleNumber: number;
+  result: WordWheelResult;
+  completedAt: string;
+  submittedToServer?: boolean;
 }
 
 // Legacy interface for backward compatibility

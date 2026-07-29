@@ -1,154 +1,111 @@
-'use client';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import RareGemsPageClient from './PageClient';
 
-import React, { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useNavigation } from '@/contexts/NavigationContext';
-import RareGems from '@/components/drills/RareGems';
-import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay';
-import { useDrillGrid } from '@/hooks/useDrillGrid';
-import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
+export const dynamic = 'force-dynamic';
 
-/**
- * Rare Gems Drill Page
- *
- * Vocabulary training drill where players discover
- * uncommon and rare words for bonus points.
- */
-export default function RareGemsPage() {
-  const router = useRouter();
-  const { theme } = useTheme();
-  const { t, language } = useLanguage();
-  const { setIsInGame } = useNavigation();
-  const isDarkMode = theme === 'dark';
-  const { saveDrillResult } = useSaveDrillResult();
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'brainRareGems', path: '/brain/drills/rare-gems', locale });
+}
 
-  // State for progression overlay
-  const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
-  const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
-
-  // Generate drill grid
-  const { grid, availableWords, isLoading } = useDrillGrid(5, language);
-
-  // Hide bottom nav during drill
-  React.useEffect(() => {
-    setIsInGame(true);
-    return () => setIsInGame(false);
-  }, [setIsInGame]);
-
-  const handleComplete = useCallback(async (result: {
-    score: number;
-    rareWordsFound: number;
-    totalWordsFound: number;
-    timeSpent: number;
-    level: number;
-  }) => {
-    const saveResult = await saveDrillResult({
-      drillType: 'rare-gems',
-      level: result.level,
-      score: result.score,
-      durationSeconds: result.timeSpent,
-      wordsFound: result.totalWordsFound,
-      extraData: {
-        rareWordsFound: result.rareWordsFound,
+const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
+  en: {
+    title: 'Rare Gems — Vocabulary Depth Word Drill',
+    description: 'Hunt for uncommon and rare vocabulary words hidden in the grid to earn massive bonus points. Rare Gems rewards players who push beyond everyday language — building an exceptional vocabulary one rare find at a time.',
+    features: [
+      'Words rated by rarity — the rarer the word, the higher the gem tier',
+      'Bonus multiplier for consecutive rare word finds',
+      'Hints system reveals one letter at a time for stubborn gems',
+      'Vocabulary log saves every rare word you discover',
+    ],
+    faq: [
+      {
+        question: 'How are words classified as rare?',
+        answer: 'Rarity is calculated from word frequency data across large text corpora. Words that appear less often in everyday writing earn a higher gem rating — from uncommon (silver) to extremely rare (diamond).',
       },
-    });
+      {
+        question: 'Will I actually learn rare words by playing?',
+        answer: 'Yes. Each discovered gem displays a definition and example sentence. The vocabulary log lets you review past finds, and spaced repetition surfaces old gems again in future sessions.',
+      },
+      {
+        question: 'What if I can only find common words?',
+        answer: 'Common words still count toward your score. The drill rewards persistence — the board is always solvable, but rare gems require creative scanning of letter paths.',
+      },
+    ],
+  },
+  he: {
+    title: 'אבני חן נדירות — תרגיל מילים לעומק אוצר המילים',
+    description: 'צוד מילים נדירות וייחודיות החבויות בלוח כדי להרוויח נקודות בונוס עצומות. אבני חן נדירות מתגמלת שחקנים שמתקדמים מעבר לשפה היומיומית — ובונה אוצר מילים יוצא דופן, גילוי אחר גילוי.',
+    features: [
+      'מילים מדורגות לפי נדירות — ככל שהמילה נדירה יותר, כך דרגת האבן גבוהה יותר',
+      'מכפיל בונוס עבור מציאות מילים נדירות רצופות',
+      'מערכת רמזים חושפת אות אחת בכל פעם',
+      'יומן אוצר מילים שומר כל מילה נדירה שגילית',
+    ],
+    faq: [
+      {
+        question: 'האם אוכל ממש ללמוד מילים נדירות על ידי משחק?',
+        answer: 'כן. כל אבן חן שגולתה מציגה הגדרה ומשפט דוגמה. יומן אוצר המילים מאפשר לסקור גילויים עבר, וחזרה מרווחת מציגה מחדש אבני חן ישנות בסשנים עתידיים.',
+      },
+    ],
+  },
+  sv: {
+    title: 'Sällsynta Pärlor — Ordövning i ordförrådsdjup',
+    description: 'Jaga ovanliga och sällsynta vokabulärord gömda i nätet för att tjäna enorma bonuspoäng. Sällsynta Pärlor belönar spelare som sträcker sig bortom vardagsspråket.',
+    features: [
+      'Ord betygsätts efter sällsynthet',
+      'Bonusmultiplikator för på varandra följande sällsynta ord',
+      'Ledtrådssystem avslöjar en bokstav i taget',
+      'Vokabulärlogg sparar varje sällsynt ord du hittar',
+    ],
+    faq: [],
+  },
+  ja: {
+    title: 'レアジェム — 語彙力強化ワードドリル',
+    description: 'グリッドに隠された珍しい語彙を見つけて大量のボーナスポイントを獲得しましょう。レアジェムは日常言語を超えた語彙力を持つプレイヤーを報います。',
+    features: [
+      '単語の希少性に応じてジェムティアが決まる',
+      '連続レア単語発見でボーナス倍率アップ',
+      '語彙ログで発見した珍しい単語を保存',
+    ],
+    faq: [
+      {
+        question: '単語はどのようにレアと分類されますか？',
+        answer: '大規模テキストコーパスの単語頻度データから希少性を計算します。日常的な文章に少ししか登場しない単語ほど高いジェムランクを獲得します。',
+      },
+    ],
+  },
+  es: {
+    title: 'Gemas Raras — Ejercicio de Profundidad de Vocabulario',
+    description: 'Caza palabras de vocabulario poco comunes y raras escondidas en la cuadrícula para ganar enormes puntos de bonificación. Gemas Raras recompensa a los jugadores que van más allá del lenguaje cotidiano — construyendo un vocabulario excepcional un hallazgo raro a la vez.',
+    features: [
+      'Palabras clasificadas por rareza — cuanto más rara, mayor el nivel de gema',
+      'Multiplicador de bonificación por hallazgos consecutivos de palabras raras',
+      'Sistema de pistas que revela una letra a la vez',
+      'Registro de vocabulario que guarda cada palabra rara descubierta',
+    ],
+    faq: [
+      {
+        question: '¿Cómo se clasifican las palabras como raras?',
+        answer: 'La rareza se calcula a partir de datos de frecuencia de palabras en grandes corpus de texto. Las palabras que aparecen menos en la escritura cotidiana obtienen una calificación de gema más alta.',
+      },
+      {
+        question: '¿Aprenderé realmente palabras raras jugando?',
+        answer: 'Sí. Cada gema descubierta muestra una definición y una oración de ejemplo. El registro de vocabulario te permite revisar hallazgos pasados, y la repetición espaciada vuelve a mostrar gemas antiguas en sesiones futuras.',
+      },
+    ],
+  },
+};
 
-    // Show progression overlay if we got brainScore data back
-    if (saveResult.success && saveResult.brainScore) {
-      setBrainScoreUpdate(saveResult.brainScore);
-      setShowProgressionOverlay(true);
-    }
-  }, [saveDrillResult]);
-
-  const handleExit = useCallback(() => {
-    router.push(`/${language}/brain`);
-  }, [router, language]);
-
-  const handleBack = useCallback(() => {
-    router.push(`/${language}/brain`);
-  }, [router, language]);
-
-  if (isLoading || grid.length === 0) {
-    return (
-      <div className={cn(
-        'min-h-screen flex items-center justify-center',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className={cn(
-            'w-12 h-12 border-4 border-t-transparent rounded-full',
-            isDarkMode ? 'border-neo-green' : 'border-neo-green'
-          )}
-        />
-      </div>
-    );
-  }
-
+export default async function RareGemsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const content = seoContent[locale] || seoContent.en;
   return (
-    <div className={cn(
-      'min-h-screen flex flex-col',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-    )}>
-      {/* Header */}
-      <header className={cn(
-        'flex items-center justify-between px-4 py-3',
-        'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <button
-          onClick={handleBack}
-          className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-neo',
-            'border-3 border-neo-black shadow-hard-sm',
-            'transition-all hover:translate-y-[-2px] hover:shadow-hard',
-            isDarkMode ? 'bg-neo-navy text-neo-white' : 'bg-neo-cream text-neo-black'
-          )}
-        >
-          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-          <span className="font-bold text-sm hidden sm:inline">{t('common.back')}</span>
-        </button>
-
-        <h1 className={cn(
-          'text-lg font-black uppercase tracking-wide',
-          isDarkMode ? 'text-neo-white' : 'text-neo-black'
-        )}>
-          {t('brain.drills.rare-gems.name')}
-        </h1>
-
-        <div className="w-10" /> {/* Spacer */}
-      </header>
-
-      {/* Drill Content */}
-      <div className="flex-1">
-        <RareGems
-          grid={grid}
-          availableWords={availableWords}
-          level={1}
-          language={language}
-          onComplete={handleComplete}
-          onExit={handleExit}
-        />
-      </div>
-
-      {/* Brain Score Progression Overlay */}
-      {brainScoreUpdate && (
-        <DrillProgressionOverlay
-          isOpen={showProgressionOverlay}
-          onClose={() => setShowProgressionOverlay(false)}
-          targetDomain={brainScoreUpdate.targetDomain}
-          newDomainScore={brainScoreUpdate.domainScores[brainScoreUpdate.targetDomain]}
-          scoreDelta={brainScoreUpdate.scoreDelta}
-          overallScore={brainScoreUpdate.overallScore}
-          tier={brainScoreUpdate.tier}
-        />
-      )}
-    </div>
+    <>
+      <RareGemsPageClient />
+      <GamePageSeoContent title={content.title} description={content.description} features={content.features} faq={content.faq} />
+    </>
   );
 }

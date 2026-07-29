@@ -10,6 +10,12 @@ interface UseCrazyGamesInviteOptions {
   onInstantMultiplayer?: () => void;
   /** Auto-show invite button when room is created */
   autoShowInviteButton?: boolean;
+  /** Maximum players for this room */
+  maxPlayers?: number;
+  /** Current player count */
+  currentPlayers?: number;
+  /** Game state (waiting, playing, ended) */
+  gameState?: 'waiting' | 'playing' | 'ended';
 }
 
 interface UseCrazyGamesInviteReturn {
@@ -64,6 +70,9 @@ export function useCrazyGamesInvite(options: UseCrazyGamesInviteOptions = {}): U
     onInviteJoin,
     onInstantMultiplayer,
     autoShowInviteButton = true,
+    maxPlayers,
+    currentPlayers,
+    gameState,
   } = options;
 
   const {
@@ -74,6 +83,8 @@ export function useCrazyGamesInvite(options: UseCrazyGamesInviteOptions = {}): U
     inviteLink,
     showInviteButton: sdkShowInvite,
     hideInviteButton: sdkHideInvite,
+    addJoinRoomListener,
+    removeJoinRoomListener,
   } = useCrazyGames();
 
   const [inviteRoomId, setInviteRoomId] = useState<string | null>(null);
@@ -93,6 +104,15 @@ export function useCrazyGamesInvite(options: UseCrazyGamesInviteOptions = {}): U
         setIsReady(true);
         return;
       }
+
+      // Skip invite auto-join if the player just intentionally exited a room
+      try {
+        if (sessionStorage.getItem('boggle_intentional_exit')) {
+          sessionStorage.removeItem('boggle_intentional_exit');
+          setIsReady(true);
+          return;
+        }
+      } catch { /* storage blocked */ }
 
       // Check for roomId in invite params
       const roomId = getInviteParam('roomId');
@@ -138,6 +158,39 @@ export function useCrazyGamesInvite(options: UseCrazyGamesInviteOptions = {}): U
     sdkHideInvite();
     setIsInviteButtonVisible(false);
   }, [isAvailable, sdkHideInvite]);
+
+  // Auto-hide invite button based on room state
+  useEffect(() => {
+    if (!isInviteButtonVisible) return;
+
+    // Hide if room is full
+    if (maxPlayers !== undefined && currentPlayers !== undefined && currentPlayers >= maxPlayers) {
+      hideInviteButton();
+      return;
+    }
+
+    // Hide if game is no longer waiting
+    if (gameState !== undefined && gameState !== 'waiting') {
+      hideInviteButton();
+    }
+  }, [maxPlayers, currentPlayers, gameState, isInviteButtonVisible, hideInviteButton]);
+
+  // Listen for mid-session joins (someone clicks invite link while game is running)
+  useEffect(() => {
+    if (!isAvailable) return;
+
+    const handleJoinRoom = (params: Record<string, string>) => {
+      const roomId = params.roomId;
+      if (roomId) {
+        setInviteRoomId(roomId);
+        setIsInviteJoin(true);
+        onInviteJoin?.(roomId);
+      }
+    };
+
+    addJoinRoomListener(handleJoinRoom);
+    return () => removeJoinRoomListener(handleJoinRoom);
+  }, [isAvailable, addJoinRoomListener, removeJoinRoomListener, onInviteJoin]);
 
   // Cleanup on unmount
   useEffect(() => {

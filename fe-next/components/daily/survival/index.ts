@@ -24,6 +24,8 @@ export type {
   TargetAttempt,
   SurvivalGameResult,
   AccumulatedClue,
+  ScoreEvent,
+  AutoClueNotificationData,
 } from './types';
 
 // Constants
@@ -64,5 +66,23 @@ export type { SurvivalClueBoxesProps } from './SurvivalClueBoxes';
 export { SurvivalGridSection } from './SurvivalGridSection';
 export type { SurvivalGridSectionProps } from './SurvivalGridSection';
 
-export { SurvivalLandscapeLayout } from './SurvivalLandscapeLayout';
-export type { SurvivalLandscapeLayoutProps } from './SurvivalLandscapeLayout';
+export { AccumulatedScoreDisplay } from './AccumulatedScoreDisplay';
+export type { AccumulatedScoreDisplayProps } from './AccumulatedScoreDisplay';
+
+export { AutoClueNotification } from './AutoClueNotification';
+export type { AutoClueNotificationProps } from './AutoClueNotification';
+
+export { useLiveScoreTracker } from './useLiveScoreTracker';
+export type { LiveScoreState, LiveScoreActions, UseLiveScoreTrackerProps } from './useLiveScoreTracker';
+
+export { SurvivalDesktopLayout } from './SurvivalDesktopLayout';
+export type { SurvivalDesktopLayoutProps } from './SurvivalDesktopLayout';
+
+export { SurvivalLiveRanks } from './SurvivalLiveRanks';
+export type { SurvivalLiveRanksProps } from './SurvivalLiveRanks';
+
+export { SurvivalLootPanel } from './SurvivalLootPanel';
+export type { SurvivalLootPanelProps } from './SurvivalLootPanel';
+
+export { SurvivalMobileInfoBar } from './SurvivalMobileInfoBar';
+export type { SurvivalMobileInfoBarProps } from './SurvivalMobileInfoBar';

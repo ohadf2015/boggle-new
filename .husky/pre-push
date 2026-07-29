@@ -1,72 +1,121 @@
 #!/bin/sh
 
-echo "🔍 Running pre-push checks..."
+echo "🔍 Running pre-push checks (parallel)..."
 echo ""
+
+# vitest 4.x's rolldown bundle imports `styleText` from `node:util`, which is
+# unavailable on Node ≤20. If a Node ≥22 is installed under nvm, prefer it so
+# the hook isn't crippled by a stale system `node` higher up on PATH.
+for nv in v22 v23 v24; do
+  for d in "$HOME/.nvm/versions/node"/$nv*/bin; do
+    [ -x "$d/node" ] && PATH="$d:$PATH" && break 2
+  done
+done
+export PATH
 
 cd fe-next
 
-# Step 1: Lint (only changed files)
-echo "📝 Step 1/3: Running lint on changed files..."
+# Collect changed files once (fast: no subshell per-file)
+CHANGED=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null | grep -E '\.(ts|tsx|js|jsx)$' || true)
+LINT_FILES=$(echo "$CHANGED" | sed 's|^fe-next/||' | while IFS= read -r f; do [ -n "$f" ] && [ -f "$f" ] && printf '%s ' "$f"; done)
+BACKEND_FILES=$(echo "$CHANGED" | grep -E '^fe-next/backend/' | sed 's|^fe-next/||' || true)
+FRONTEND_FILES=$(echo "$CHANGED" | grep -E '^fe-next/' | grep -v '^fe-next/backend/' | sed 's|^fe-next/||' || true)
 
-# Get list of changed files vs origin/master (excluding deleted files)
-LINT_FILES=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null | grep -E '\.(ts|tsx|js|jsx)$' | sed 's|^fe-next/||' || true)
+# Type-relevant changes: any .ts/.tsx/.js/.jsx/.mjs/.cjs, or a tsconfig/package.json.
+# A push that touches NONE of these (e.g. a docs-only nightly commit) cannot
+# introduce a type error, so the whole-project `tsc --noEmit` below is skipped.
+# Running it unconditionally was the 2026-05-29 strand: a docs-only nightly push
+# was blocked by an UNRELATED pre-existing type error (a stale .next validator
+# pointing at a founder-WIP page that never existed) → push failed → commit
+# stranded in refs/nightly-pending/. Code pushes still run the full type-check.
+TYPE_RELEVANT=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null \
+  | grep -E '\.(ts|tsx|js|jsx|mjs|cjs)$|(^|/)tsconfig[^/]*\.json$|(^|/)package\.json$' || true)
 
-if [ -z "$LINT_FILES" ]; then
-  echo "ℹ️  No relevant file changes detected, skipping lint"
-else
-  if ! npx eslint $LINT_FILES --fix --max-warnings=0 2>/dev/null; then
-    echo ""
-    echo "❌ Lint failed. Please fix the issues above before pushing."
+TMPDIR=$(mktemp -d)
+trap 'rm -rf "$TMPDIR"' EXIT
+
+# --- Run all 3 checks in parallel ---
+
+# Lint
+(
+  if [ -z "$LINT_FILES" ]; then
+    echo "ℹ️  Lint: no files to check"
+  elif ./node_modules/.bin/eslint $LINT_FILES --fix --max-warnings=0 2>/dev/null; then
+    echo "✅ Lint passed"
+  else
+    echo "❌ Lint failed"
     exit 1
   fi
-fi
-echo "✅ Lint passed"
-echo ""
+) > "$TMPDIR/lint.log" 2>&1 &
+PID_LINT=$!
 
-# Step 2: Type check
-echo "🔧 Step 2/3: Running type check..."
-if ! npx tsc --noEmit; then
+# Type check
+(
+  if [ -z "$TYPE_RELEVANT" ]; then
+    echo "ℹ️  Type check: no type-relevant files changed — skipped"
+  elif ./node_modules/.bin/tsc --noEmit; then
+    echo "✅ Type check passed"
+  else
+    echo "❌ Type check failed"
+    exit 1
+  fi
+) > "$TMPDIR/tsc.log" 2>&1 &
+PID_TSC=$!
+
+# Tests (backend + frontend in parallel within this job)
+#
+# --no-file-parallelism is required: vitest 4.x's experimental cache dir
+# (`node_modules/.experimental-vitest-cache`) races between worker threads,
+# producing 1000+ phantom ENOENT failures on large fan-outs (e.g. when a
+# hub component is touched and --changed pulls 1000+ test files). Serial
+# execution eliminates the race; cache is wiped before each run so the
+# next worker pool starts clean.
+(
+  FAIL=0
+
+  rm -rf node_modules/.experimental-vitest-cache 2>/dev/null
+
+  # NODE_OPTIONS bumps heap to 8GB — required when --changed fans out to
+  # 1000+ test files (hub-component edits) and serial execution accumulates
+  # memory across files, otherwise vitest gets OOM-killed mid-run.
+  export NODE_OPTIONS="${NODE_OPTIONS:-} --max-old-space-size=8192"
+
+  if [ -n "$BACKEND_FILES" ]; then
+    ./node_modules/.bin/vitest run --config=backend/vitest.config.ts --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism 2>&1 || FAIL=1
+  fi
+
+  if [ -n "$FRONTEND_FILES" ]; then
+    ./node_modules/.bin/vitest run --reporter=verbose --changed origin/master --passWithNoTests --no-file-parallelism 2>&1 || FAIL=1
+  fi
+
+  if [ -z "$BACKEND_FILES" ] && [ -z "$FRONTEND_FILES" ]; then
+    echo "ℹ️  Tests: no files to check"
+  elif [ "$FAIL" -eq 0 ]; then
+    echo "✅ Tests passed"
+  else
+    echo "❌ Tests failed"
+    exit 1
+  fi
+) > "$TMPDIR/test.log" 2>&1 &
+PID_TEST=$!
+
+# --- Wait and collect results ---
+FAILED=0
+
+wait $PID_LINT  || FAILED=1
+cat "$TMPDIR/lint.log"
+
+wait $PID_TSC   || FAILED=1
+cat "$TMPDIR/tsc.log"
+
+wait $PID_TEST  || FAILED=1
+cat "$TMPDIR/test.log"
+
+if [ "$FAILED" -ne 0 ]; then
   echo ""
-  echo "❌ Type check failed. Please fix the type errors above before pushing."
+  echo "❌ Pre-push checks failed. Fix the issues above before pushing."
   exit 1
 fi
-echo "✅ Type check passed"
+
 echo ""
-
-# Step 3: Tests (only for changed files)
-echo "🧪 Step 3/3: Running tests for changed files..."
-
-# Get list of changed files vs origin/master (excluding deleted files)
-CHANGED_FILES=$(git -C .. diff --name-only --diff-filter=d origin/master...HEAD 2>/dev/null | grep -E '\.(ts|tsx|js|jsx)$' || true)
-
-if [ -z "$CHANGED_FILES" ]; then
-  echo "ℹ️  No relevant file changes detected, skipping tests"
-else
-  # Separate backend and frontend files
-  BACKEND_FILES=$(echo "$CHANGED_FILES" | grep -E '^fe-next/backend/' | sed 's|^fe-next/||' || true)
-  FRONTEND_FILES=$(echo "$CHANGED_FILES" | grep -E '^fe-next/' | grep -v '^fe-next/backend/' | sed 's|^fe-next/||' || true)
-
-  # Run backend tests if backend files changed
-  if [ -n "$BACKEND_FILES" ]; then
-    echo "  📦 Running backend tests for changed files..."
-    if ! npx jest --config=backend/jest.config.js --findRelatedTests $BACKEND_FILES --passWithNoTests; then
-      echo ""
-      echo "❌ Backend tests failed. Please fix the failing tests above before pushing."
-      exit 1
-    fi
-  fi
-
-  # Run frontend tests if frontend files changed
-  if [ -n "$FRONTEND_FILES" ]; then
-    echo "  🎨 Running frontend tests for changed files..."
-    if ! npx jest --config=jest.config.js --findRelatedTests $FRONTEND_FILES --passWithNoTests; then
-      echo ""
-      echo "❌ Frontend tests failed. Please fix the failing tests above before pushing."
-      exit 1
-    fi
-  fi
-fi
-echo "✅ Tests passed"
-echo ""
-
-echo "🎉 All pre-push checks passed! Proceeding with push..."
+echo "🎉 All pre-push checks passed!"

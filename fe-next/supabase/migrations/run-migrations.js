@@ -33,22 +33,21 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
 const MIGRATIONS_TABLE = '_migrations';
 
 async function ensureMigrationsTable() {
-  const { error } = await supabase.rpc('exec_sql', {
-    sql: `
-      CREATE TABLE IF NOT EXISTS ${MIGRATIONS_TABLE} (
-        id SERIAL PRIMARY KEY,
-        name TEXT UNIQUE NOT NULL,
-        executed_at TIMESTAMPTZ DEFAULT NOW()
-      );
-    `
-  }).catch(() => {
-    // If RPC doesn't exist, try raw SQL via REST
-    return { error: null };
-  });
-
-  // Fallback: create via direct query if RPC fails
-  if (error) {
-    console.log('Note: Using alternative migration tracking method');
+  try {
+    const { error } = await supabase.rpc('exec_sql', {
+      sql: `
+        CREATE TABLE IF NOT EXISTS ${MIGRATIONS_TABLE} (
+          id SERIAL PRIMARY KEY,
+          name TEXT UNIQUE NOT NULL,
+          executed_at TIMESTAMPTZ DEFAULT NOW()
+        );
+      `
+    });
+    if (error) {
+      console.log('Note: Using alternative migration tracking method');
+    }
+  } catch {
+    console.log('Note: exec_sql RPC not available, skipping table creation');
   }
 }
 

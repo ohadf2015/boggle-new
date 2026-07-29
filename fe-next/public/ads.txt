@@ -1,1 +1,4 @@
+# LexiClash authorized digital sellers.
+# PurpleAds (managed reseller layer) removed 2026-06-08 — direct Google AdSense only.
+# Re-add a partner's block here only if you onboard a new managed/exchange seller.
 google.com, pub-1896836706464880, DIRECT, f08c47fec0942fa0

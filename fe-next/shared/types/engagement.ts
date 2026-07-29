@@ -225,6 +225,12 @@ export interface EngagementStatus {
   calendar: CalendarStatus;
   comeback: ComebackStatus;
   gamesToday: number;
+  /** Player XP/level/gold from profiles table */
+  xp?: number;
+  level?: number;
+  xpToNextLevel?: number;
+  xpForCurrentLevel?: number;
+  gold?: number;
 }
 
 // ==================== Game Stats for Engagement ====================

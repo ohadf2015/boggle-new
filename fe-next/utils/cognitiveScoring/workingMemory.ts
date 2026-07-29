@@ -20,7 +20,7 @@ interface WorkingMemoryInput {
  *
  * Formula:
  * - avgLength = sum(wordLengths) / count
- * - gridBonus = sqrt(gridSize) / 5 (normalizer: 1.0 for 5x5, up to 1.8 for 9x9)
+ * - gridBonus = sqrt(gridSize) / 5 (normalizer: 1.0 for 5x5, up to 1.3 for 7x7)
  * - Score = avgLength * gridBonus * 12, capped at 100
  *
  * The multiplier (12) is tuned so that:

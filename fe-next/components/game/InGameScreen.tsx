@@ -1,145 +1,57 @@
 'use client';
 
-import React, { ReactNode, useRef, useEffect, useCallback, useMemo, memo, useState, useTransition, useDeferredValue } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { Trophy, Crown } from 'lucide-react';
-import type { Socket } from 'socket.io-client';
-import { Badge } from '../ui/badge';
-import { Card, CardContent } from '../ui/card';
-import ExitRoomButton from '../ExitRoomButton';
-import Avatar from '../Avatar';
-import PresenceIndicator from '../PresenceIndicator';
-import GridComponent from '../GridComponent';
-import CircularTimer from '../CircularTimer';
-import RoomChat from '../RoomChat';
-import { EarthquakeWarning, FireRoundIndicator } from '../earthquake';
-import HintButton from '../HintButton';
-import WordFormingArea, { type WordFeedback } from './WordFormingArea';
-import ComboDisplay from './ComboDisplay';
-import { applyHebrewFinalLetters } from '../../utils/utils';
-import { wordErrorToast } from '../NeoToast';
+import { useRef, useEffect, useCallback, useMemo, memo, useState } from 'react';
+import {
+  useBlastTileOverlay,
+  useWordHuntTargetLength,
+  useWordHuntMyLife,
+  useWordHuntTargetAttempts,
+  useWordHuntTargetFound,
+  useWordHuntPlayerLives,
+  useWordHuntEliminatedPlayers,
+} from '@/hooks/gameState/store';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { useAnnouncer } from '../GameAnnouncer';
-import { validateWordLocally, couldBeOnBoard } from '../../utils/clientWordValidator';
-import { hapticForWordScore, hapticError } from '../../utils/haptics';
-import { getRankStyle, getRankIconString } from '../../utils/rankingStyles';
-import type { LetterGrid, Language } from '@/shared/types/game';
-import type {
-  FoundWord,
-  ExtendedLeaderboardPlayer as LeaderboardPlayer,
-  TournamentData,
-} from '@/shared/types/view';
-import type { BoardTheme } from '@/shared/types/socket';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
 import { useAutoScrollOnGameStart } from '@/hooks/useAutoScrollOnGameStart';
-import { WordsRemaining } from '@/player/components/in-game/WordsRemaining';
-import { getPerformanceConfig } from '../grid/performanceUtils';
-import ContextualTooltip from './ContextualTooltip';
-import DirectionGuidanceTooltip from './DirectionGuidanceTooltip';
-import {
-  useContextualGuidance,
-  useComboGuidanceTrigger,
-  useEarthquakeGuidanceTrigger,
-  useFireRoundGuidanceTrigger,
-} from '@/hooks/useContextualGuidance';
-import { useDirectionPatternGuidance } from '@/hooks/useDirectionPatternGuidance';
+import { useSelectionStore, resetSelection, useFrozenWhileSelecting } from '@/hooks/useSelectionStore';
 import { useTapToDragGuidance } from '@/hooks/useTapToDragGuidance';
+import { useMPStuckCoach } from '@/hooks/useMPStuckCoach';
+import { MPStuckCoachCard } from '@/components/game/ftue/MPStuckCoachCard';
 import { useKeyboardWordInput } from '@/hooks/useKeyboardWordInput';
 import { useCrazyGamesLifecycle } from '@/hooks/useCrazyGamesLifecycle';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useKeyboardHelpState } from '@/hooks/useKeyboardHelpState';
-import KeyboardHintTooltip from './KeyboardHintTooltip';
-import TapToDragTooltip from './TapToDragTooltip';
-import { KeyboardShortcutsOverlay, KeyboardModeIndicator, KeyboardQuickTip } from '../keyboard';
-import CompactLeaderboard, { type CompactPlayer } from './CompactLeaderboard';
-import { shouldShowKeyboardTrails } from './keyboardTrailsUtils';
+import { useLeadChangeDetection } from '@/hooks/useLeadChangeDetection';
+import type { WordFeedback } from './WordFormingArea';
+import type { FoundWord } from '@/shared/types/view';
+import { detectSpecialCombos } from '@/components/blast/legacy/utils/blastCombos';
+import type { BlastTileState } from '@/components/blast/legacy/types';
+import type { SelectedCell } from '@/components/grid';
 
-// ==================== Types ====================
+// Extracted hooks
+import {
+  useWordSubmission,
+  useEarthquakeEffects,
+  useSocketFeedback,
+} from './in-game/hooks';
 
-interface HintsState {
-  hint: string | null;
-  hintType: 'definition' | 'firstLetter' | 'length' | 'category' | null;
-  hintsRemaining: number;
-  wordLength?: number;
-  firstLetter?: string;
-  isLoading: boolean;
-  error: string | null;
-  isAvailable: boolean;
-  isSinglePlayer: boolean;
-  requestHint: () => void;
-  clearHint: () => void;
-}
+// Extracted sub-components
+import { PortraitLayout } from './in-game/components';
+import type { RoundEventState } from './in-game/components/RoundEventOverlay';
+import type { SpecialWordEvent } from './in-game/components/SpecialWordToast';
 
-// ==================== Constants ====================
+// Types
+import type { InGameScreenProps, EarthquakeState } from './in-game/types';
 
-/** Re-render interval for keyboard trails visibility check */
-const TRAILS_CHECK_INTERVAL_MS = 5000; // Check every 5 seconds
-
-interface InGameScreenProps {
-  // Core identity
-  username: string;
-  gameCode: string;
-  isHost?: boolean;
-  isPlaying?: boolean; // For host: whether they're actively playing or spectating
-  t: (path: string, params?: Record<string, string | number>) => string;
-  dir?: 'rtl' | 'ltr';
-  socket: Socket | null;
-
-  // Game state
-  letterGrid: LetterGrid;
-  remainingTime: number | null;
-  timerValue?: number; // Timer duration in minutes
-  gameActive?: boolean;
-  showStartAnimation?: boolean;
-  gameLanguage?: Language | null;
-  minWordLength?: number;
-  comboLevel?: number;
-  comboLevelRef?: React.MutableRefObject<number>;
-
-  // Player data
-  foundWords?: FoundWord[] | string[];
-  leaderboard?: LeaderboardPlayer[];
-  totalBoardWords?: number | null;
-
-  // Callbacks
-  onExitRoom?: () => void;
-  onWordSubmit?: (word: string) => void;
-  onResetCombo?: () => void;
-
-  // Tournament (optional)
-  tournamentData?: TournamentData | null;
-
-  // Hints (single-player mode)
-  hints?: HintsState;
-
-  // Earthquake/Fire Round
-  earthquakeState?: 'idle' | 'warning' | 'shaking' | 'fire-round';
-  fireRoundActive?: boolean;
-  fireRoundRemaining?: number;
-
-  // Focus mode - hides leaderboard and chat during gameplay
-  gameplayFocusMode?: boolean;
-
-  // Achievement dock (rendered outside this component)
-  children?: ReactNode;
-
-  // Board theme (date-themed words indicator)
-  boardTheme?: BoardTheme | null;
-
-  // Player experience - used to determine inactivity threshold for keyboard trails
-  // New players (0-1 games) see trails sooner (10s) as tutorial help
-  // Experienced players (2+ games) see trails later (30s) when truly stuck
-  totalGamesPlayed?: number;
-}
-
-// ==================== Component ====================
+// Re-export types for backward compatibility
+export type { HintsState, InGameScreenProps } from './in-game/types';
 
 /**
  * InGameScreen - Unified in-game screen component for both Host and Player views
  * Shows active game state with grid, timer, found words, and leaderboard
  * Ensures consistent UI between host and player during gameplay
  */
-const InGameScreen = memo<InGameScreenProps>(({
+const InGameScreen = memo<InGameScreenProps>(function InGameScreen({
   // Core identity
   username,
   gameCode,
@@ -152,13 +64,14 @@ const InGameScreen = memo<InGameScreenProps>(({
   // Game state
   letterGrid,
   remainingTime,
-  timerValue = 3,
+  timerValue = 1.5,
   gameActive = true,
   showStartAnimation = false,
   gameLanguage = 'en',
   minWordLength = 2,
   comboLevel = 0,
   comboLevelRef,
+  lastWordTime = null,
 
   // Player data
   foundWords = [],
@@ -177,7 +90,7 @@ const InGameScreen = memo<InGameScreenProps>(({
   hints,
 
   // Earthquake/Fire Round
-  earthquakeState = 'idle',
+  earthquakeState = 'idle' as EarthquakeState,
   fireRoundActive = false,
   fireRoundRemaining = 0,
 
@@ -187,31 +100,54 @@ const InGameScreen = memo<InGameScreenProps>(({
   // Achievement dock
   children,
 
-  // Board theme
-  boardTheme,
-
   // Player experience
   totalGamesPlayed,
-}) => {
+
+  // Tutorial callback
+  onShowTutorial,
+
+  // Game mode overlays
+  gameMode,
+  onWordHuntGuess,
+
+  // Desktop shell integration
+  inDesktopShell = false,
+}) {
+  // Mode-overlay state read directly from store — keeps parents from
+  // re-rendering on irrelevant store updates (was previously prop-passed
+  // by MultiplayerInGameView + PlayerInGameView, churning them on every
+  // word-hunt/blast tick even when their gameMode isn't classic).
+  const blastTileOverlay = useBlastTileOverlay();
+  const wordHuntTargetLength = useWordHuntTargetLength();
+  const wordHuntAttempts = useWordHuntTargetAttempts();
+  const wordHuntFound = useWordHuntTargetFound();
+  const wordHuntLife = useWordHuntMyLife();
+  const wordHuntPlayerLives = useWordHuntPlayerLives();
+  const wordHuntEliminatedPlayers = useWordHuntEliminatedPlayers();
+  // Sound effects
   const {
     playWordAcceptedSound,
+    playWordRejectedSound,
+    playWordLengthSound,
     playEarthquakeRumble,
     playEarthquakeShake,
     playFireRoundStart,
     startFireCrackleLoop,
     stopFireCrackleLoop,
-    setGameActive,
+    playComboMilestoneSound,
+    playComboBreakSound,
+    playRoundStartSound,
+    playTimesUpSound,
+    playTimerHeartbeatSound,
+    setGameActive: setSoundGameActive,
   } = useSoundEffects();
-  const { announceWordResult, announceTimer } = useAnnouncer();
-  const isLandscape = useMobileLandscape();
 
-  // Enable sound effects when in-game, disable when leaving
+  const { announceWordResult, announceTimer } = useAnnouncer();
+  // Enable sound effects when in-game
   useEffect(() => {
-    setGameActive(true);
-    return () => {
-      setGameActive(false);
-    };
-  }, [setGameActive]);
+    setSoundGameActive(true);
+    return () => setSoundGameActive(false);
+  }, [setSoundGameActive]);
 
   // Announce timer at key intervals for screen reader users
   useEffect(() => {
@@ -220,1131 +156,491 @@ const InGameScreen = memo<InGameScreenProps>(({
     }
   }, [remainingTime, gameActive, announceTimer]);
 
-  // CrazyGames SDK lifecycle events (gameplayStart/Stop, happyTime)
-  // In multiplayer, game ends when remainingTime hits 0
+  // Play round start sound when game becomes active
+  const hasFiredRoundStartRef = useRef(false);
+  useEffect(() => {
+    if (gameActive && !showStartAnimation && !hasFiredRoundStartRef.current) {
+      hasFiredRoundStartRef.current = true;
+      playRoundStartSound();
+    }
+    if (!gameActive) {
+      hasFiredRoundStartRef.current = false;
+    }
+  }, [gameActive, showStartAnimation, playRoundStartSound]);
+
+  // Play times-up sound when timer hits zero
+  const hasFiredTimesUpRef = useRef(false);
+  useEffect(() => {
+    if (remainingTime === 0 && gameActive === false && !hasFiredTimesUpRef.current) {
+      hasFiredTimesUpRef.current = true;
+      playTimesUpSound();
+    }
+    if (gameActive) {
+      hasFiredTimesUpRef.current = false;
+    }
+  }, [remainingTime, gameActive, playTimesUpSound]);
+
+  // CrazyGames SDK lifecycle — clear stale banners when game starts
+  const { clearAllBanners } = useCrazyGames();
+  const hasClearedBannersRef = useRef(false);
+  useEffect(() => {
+    if (gameActive && !hasClearedBannersRef.current) {
+      hasClearedBannersRef.current = true;
+      clearAllBanners();
+    }
+    if (!gameActive) hasClearedBannersRef.current = false;
+  }, [gameActive, clearAllBanners]);
+
   const isGameOver = remainingTime === 0;
   useCrazyGamesLifecycle({
     isGameActive: gameActive && !isGameOver,
     isGameOver,
     maxCombo: comboLevel,
+    wordsFound: foundWords.length,
   });
 
-  // Mobile tab state for words/leaderboard toggle
-  const [mobileActiveTab, setMobileActiveTab] = useState<'words' | 'leaderboard'>('words');
-
-  // Use transition for non-urgent UI updates (leaderboard, word list)
-  const [isPending, startTransition] = useTransition();
-
-  // Defer expensive leaderboard calculations for smoother UI
-  const deferredLeaderboard = useDeferredValue(leaderboard);
-
-  // Defer found words updates for better performance during rapid word submissions
-  const deferredFoundWords = useDeferredValue(foundWords);
-
-  // Word forming state (for external WordFormingArea)
-  const [formedWord, setFormedWord] = useState('');
-  const [letterCount, setLetterCount] = useState(0);
-
-  // Feedback state (for WordFormingArea)
+  // State — formedWord/letterCount live in useSelectionStore (subscribed by
+  // WordFormingAreaConnected only). Keeping them out of InGameScreen state
+  // prevents this whole tree from re-rendering on every cell entered during a drag.
   const [currentFeedback, setCurrentFeedback] = useState<WordFeedback | null>(null);
+  const [lastWordFoundTime, setLastWordFoundTime] = useState<number>(() => (gameActive ? Date.now() : 0));
 
-  // Track when the last word was found - used for inactivity-based keyboard trail visibility
-  // Trails are shown only when player hasn't found a word for a while (30+ seconds)
-  const [lastWordFoundTime, setLastWordFoundTime] = useState<number>(0);
+  // Freeze leaderboard/found-words while the player is mid-drag. Socket bursts
+  // (opponents scoring 4-6/sec in active MP rooms) used to cascade through
+  // PortraitLayout → CompactLeaderboard / GameLeaderboard during selection,
+  // stealing frame budget from the grid drag rendering ("UI stuck when
+  // selecting words"). The frozen value reveals the latest state the instant
+  // the player releases — leaderboard catches up immediately.
+  const deferredLeaderboard = useFrozenWhileSelecting(leaderboard);
+  const deferredFoundWords = useFrozenWhileSelecting(foundWords);
 
-  // Force re-render periodically to check trail visibility based on time elapsed
-  const [, setTrailsCheckTick] = useState(0);
-  useEffect(() => {
-    if (!gameActive || !isPlaying) return;
-    const interval = setInterval(() => {
-      setTrailsCheckTick(tick => tick + 1);
-    }, TRAILS_CHECK_INTERVAL_MS);
-    return () => clearInterval(interval);
-  }, [gameActive, isPlaying]);
-
-  // Reset lastWordFoundTime to current time when game starts
-  // This ensures keyboard trails don't show immediately - they'll only
-  // appear after the inactivity threshold (10s new players, 30s experienced)
-  useEffect(() => {
-    if (gameActive && showStartAnimation) {
-      setLastWordFoundTime(Date.now());
-    }
-  }, [gameActive, showStartAnimation]);
-
-  // Viewport height detection for very short landscape screens
-  const [viewportHeight, setViewportHeight] = useState(0);
-
-  // Ref for auto-scroll target (timer/stats section in portrait mode)
+  // Refs
   const gameStatsRef = useRef<HTMLDivElement>(null);
-
-  // Auto-scroll to game area on game start in portrait mode
-  useAutoScrollOnGameStart(gameStatsRef, {
-    gameActive,
-    isLandscape,
-    showStartAnimation,
-  });
-
-  // Contextual guidance for first-time players
-  const guidance = useContextualGuidance();
-
-  // Auto-trigger guidance based on game events
-  useComboGuidanceTrigger(comboLevel, guidance.triggerComboGuidance);
-  useEarthquakeGuidanceTrigger(earthquakeState, guidance.triggerEarthquakeGuidance);
-  useFireRoundGuidanceTrigger(fireRoundActive, guidance.triggerFireRoundGuidance);
-
-  // Direction pattern guidance - shows when player only uses straight-line directions
-  const directionGuidance = useDirectionPatternGuidance();
-
-  // Tap-to-drag guidance - shows when player taps single letter without dragging
-  const tapDragGuidance = useTapToDragGuidance();
-
-  // Track viewport height for responsive landscape adjustments
-  useEffect(() => {
-    const updateHeight = () => setViewportHeight(window.innerHeight);
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
-    window.addEventListener('orientationchange', updateHeight);
-    return () => {
-      window.removeEventListener('resize', updateHeight);
-      window.removeEventListener('orientationchange', updateHeight);
-    };
-  }, []);
-
-  // Track previous earthquake state to detect transitions
-  const prevEarthquakeStateRef = useRef<typeof earthquakeState>('idle');
-  const prevFireRoundActiveRef = useRef(false);
-
-  // Track current fireRoundActive value via ref for use in callbacks
-  // This ensures the socket emit uses the latest value without waiting for re-render
-  const fireRoundActiveRef = useRef(fireRoundActive);
-  useEffect(() => {
-    fireRoundActiveRef.current = fireRoundActive;
-  }, [fireRoundActive]);
-
-  // Earthquake/Fire Round sound effects for multiplayer (triggered by state changes from socket)
-  useEffect(() => {
-    const prevState = prevEarthquakeStateRef.current;
-    const prevFireActive = prevFireRoundActiveRef.current;
-
-    // Trigger sounds based on state transitions
-    if (earthquakeState === 'warning' && prevState !== 'warning') {
-      playEarthquakeRumble();
-      // Haptic feedback for warning
-      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate([150, 100, 150, 100, 200]);
-      }
-    } else if (earthquakeState === 'shaking' && prevState !== 'shaking') {
-      playEarthquakeShake();
-      // Haptic feedback for shake
-      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate([300, 150, 300, 150, 400, 150, 300]);
-      }
-    }
-
-    // Fire round start
-    if (fireRoundActive && !prevFireActive) {
-      playFireRoundStart();
-      startFireCrackleLoop();
-      // Haptic feedback for fire round
-      if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-        navigator.vibrate(200);
-      }
-    }
-
-    // Fire round end
-    if (!fireRoundActive && prevFireActive) {
-      stopFireCrackleLoop();
-    }
-
-    // Update refs for next comparison
-    prevEarthquakeStateRef.current = earthquakeState;
-    prevFireRoundActiveRef.current = fireRoundActive;
-  }, [earthquakeState, fireRoundActive, playEarthquakeRumble, playEarthquakeShake, playFireRoundStart, startFireCrackleLoop, stopFireCrackleLoop]);
-
-  // Track if grid animation has already played
   const hasAnimatedRef = useRef(false);
-  useEffect(() => {
-    hasAnimatedRef.current = true;
-  }, []);
 
-  // Listen for word feedback socket events to update WordFormingArea
-  useEffect(() => {
-    if (!socket || !isPlaying) return;
-
-    const handleWordAccepted = (data: { word: string; score: number; comboLevel?: number; fireRoundActive?: boolean; fireRoundBonus?: number }) => {
-      // Track when the last word was found for inactivity-based trail visibility
-      setLastWordFoundTime(Date.now());
-      setCurrentFeedback({
-        id: `accepted-${Date.now()}`,
-        type: 'accepted',
-        word: data.word,
-        score: data.score,
-        fireRoundActive: data.fireRoundActive,
-        fireRoundBonus: data.fireRoundBonus,
-        timestamp: Date.now(),
-      });
-    };
-
-    const handleWordAlreadyFound = (data: { word: string }) => {
-      setCurrentFeedback({
-        id: `duplicate-${Date.now()}`,
-        type: 'duplicate',
-        word: data.word,
-        message: t('playerView.alreadyFound') || 'Already found',
-        timestamp: Date.now(),
-      });
-    };
-
-    const handleWordNeedsValidation = (data: { word: string; message?: string }) => {
-      setCurrentFeedback({
-        id: `pending-${Date.now()}`,
-        type: 'pending',
-        word: data.word,
-        message: data.message || t('playerView.pendingValidation') || 'Pending validation',
-        timestamp: Date.now(),
-      });
-    };
-
-    const handleWordRejected = (data: { word: string; reason?: string }) => {
-      setCurrentFeedback({
-        id: `rejected-${Date.now()}`,
-        type: 'rejected',
-        word: data.word,
-        message: data.reason || t('playerView.invalidWord') || 'Invalid word',
-        timestamp: Date.now(),
-      });
-    };
-
-    const handleWordNotOnBoard = (data: { word: string }) => {
-      setCurrentFeedback({
-        id: `rejected-${Date.now()}`,
-        type: 'rejected',
-        word: data.word,
-        message: t('playerView.wordNotOnBoard') || 'Not on board',
-        timestamp: Date.now(),
-      });
-    };
-
-    const handleWordTooShort = (data: { word: string; minLength?: number }) => {
-      setCurrentFeedback({
-        id: `rejected-${Date.now()}`,
-        type: 'rejected',
-        word: data.word,
-        message: t('playerView.wordTooShort') || 'Too short',
-        timestamp: Date.now(),
-      });
-    };
-
-    socket.on('wordAccepted', handleWordAccepted);
-    socket.on('wordAlreadyFound', handleWordAlreadyFound);
-    socket.on('wordNeedsValidation', handleWordNeedsValidation);
-    socket.on('wordRejected', handleWordRejected);
-    socket.on('wordNotOnBoard', handleWordNotOnBoard);
-    socket.on('wordTooShort', handleWordTooShort);
-
-    return () => {
-      socket.off('wordAccepted', handleWordAccepted);
-      socket.off('wordAlreadyFound', handleWordAlreadyFound);
-      socket.off('wordNeedsValidation', handleWordNeedsValidation);
-      socket.off('wordRejected', handleWordRejected);
-      socket.off('wordNotOnBoard', handleWordNotOnBoard);
-      socket.off('wordTooShort', handleWordTooShort);
-    };
-  }, [socket, isPlaying, t]);
-
-  // Create a ref for combo if not provided
+  // Create internal combo level ref if not provided
   const internalComboLevelRef = useRef(comboLevel);
   useEffect(() => {
     internalComboLevelRef.current = comboLevel;
   }, [comboLevel]);
   const effectiveComboLevelRef = comboLevelRef || internalComboLevelRef;
 
-  // Normalize found words to FoundWord format (using deferred value for smoother updates)
-  const normalizedFoundWords: FoundWord[] = useMemo(() => {
-    return deferredFoundWords.map(w =>
-      typeof w === 'string' ? { word: w, isValid: true } : w
-    );
-  }, [deferredFoundWords]);
+  // Mark animation as complete
+  useEffect(() => {
+    hasAnimatedRef.current = true;
+  }, []);
 
-  // Calculate player's score and rank from leaderboard
+  // Clear stale feedback and formed word when grid changes (new round)
+  useEffect(() => {
+    setCurrentFeedback(null);
+    resetSelection();
+  }, [letterGrid]);
+
+  // Reset lastWordFoundTime when game starts
+  useEffect(() => {
+    if (gameActive) {
+      setLastWordFoundTime(Date.now());
+    }
+  }, [gameActive]);
+
+  // Auto-scroll to game area on game start
+  useAutoScrollOnGameStart(gameStatsRef, {
+    gameActive,
+    isLandscape: false,
+    showStartAnimation,
+  });
+
+  // Tap-to-drag guidance
+  const tapDragGuidance = useTapToDragGuidance();
+
+  // Desktop detection via pointer capability (no UA sniffing)
+  const isDesktop = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(pointer: fine)').matches;
+  }, []);
+
+  // Single FTUE arbiter for confused classic-MP players (idle / tap-only /
+  // fruitless-fiddle). One coordinator → never stacks popups, never nags veterans.
+  const stuckCoach = useMPStuckCoach({
+    active: gameActive && isPlaying && !showStartAnimation,
+    isClassic: gameMode === 'classic',
+    totalGamesPlayed: totalGamesPlayed ?? 0,
+    isDesktop,
+  });
+
+  // Earthquake/fire round effects
+  useEarthquakeEffects({
+    earthquakeState,
+    fireRoundActive,
+    playEarthquakeRumble,
+    playEarthquakeShake,
+    playFireRoundStart,
+    startFireCrackleLoop,
+    stopFireCrackleLoop,
+  });
+
+  // Normalize found words to FoundWord format
+  const normalizedFoundWords: FoundWord[] = useMemo(
+    () => deferredFoundWords.map((w) => (typeof w === 'string' ? { word: w, isValid: true } : w)),
+    [deferredFoundWords]
+  );
+
+  // Calculate player's score and rank (deferred to avoid double-render on leaderboard updates)
   const playerData = useMemo(() => {
-    const playerEntry = leaderboard.find(p => p.username === username);
-    const playerRank = leaderboard.findIndex(p => p.username === username) + 1;
+    const playerEntry = deferredLeaderboard.find((p) => p.username === username);
+    const playerRank = deferredLeaderboard.findIndex((p) => p.username === username) + 1;
     return {
       score: playerEntry?.score ?? 0,
       rank: playerRank > 0 ? playerRank : null,
     };
-  }, [leaderboard, username]);
+  }, [deferredLeaderboard, username]);
 
-  // Word submission handler with validation
-  const handleGridWordSubmit = useCallback((formedWord: string): void => {
-    if (!isPlaying) return;
+  // Lead change detection — use deferred leaderboard so socket burst updates
+  // don't churn this hook + downstream sound effects during active drag.
+  const leadChangeEvent = useLeadChangeDetection(deferredLeaderboard, username);
 
-    const currentLang = gameLanguage || 'en';
+  // Play sound on lead change
+  useEffect(() => {
+    if (!leadChangeEvent) return;
+    if (leadChangeEvent.type === 'took-lead') {
+      playComboMilestoneSound(5);
+    } else {
+      playComboBreakSound(1);
+    }
+  }, [leadChangeEvent, playComboMilestoneSound, playComboBreakSound]);
 
-    // Client-side validation
-    const validation = validateWordLocally(formedWord, currentLang, minWordLength, normalizedFoundWords);
+  // Golden letter positions from backend startGame payload
+  const [goldenLetters, setGoldenLetters] = useState<Array<{ row: number; col: number }>>([]);
 
-    if (!validation.isValid) {
-      let msg: string;
-      const isDuplicate = validation.errorKey === 'playerView.wordAlreadyFound';
+  // Round event state
+  const [roundEvent, setRoundEvent] = useState<RoundEventState | null>(null);
+  const roundEventTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-      if (validation.errorKey === 'playerView.wordTooShortMin') {
-        msg = t('playerView.wordTooShortMin')
-          ? t('playerView.wordTooShortMin').replace('${min}', String(validation.errorParams?.min || minWordLength))
-          : `Word too short! (min ${validation.errorParams?.min || minWordLength} letters)`;
-      } else if (validation.errorKey === 'playerView.wordTooShort') {
-        msg = t('playerView.wordTooShort') || 'Word too short';
-      } else if (isDuplicate) {
-        msg = t('playerView.alreadyFound') || 'Already found';
-      } else {
-        const errorKey = validation.errorKey ?? 'Invalid word';
-        msg = t(errorKey) || errorKey;
+  // Round event tile effects — frozen (blizzard), charged (lightning), meteor (crater)
+  const [eventTiles, setEventTiles] = useState<{
+    frozen: Set<string>;
+    charged: Set<string>;
+    meteor: Set<string>;
+  }>({ frozen: new Set(), charged: new Set(), meteor: new Set() });
+
+  // Special word toast state
+  const [specialWordEvent, setSpecialWordEvent] = useState<SpecialWordEvent | null>(null);
+  const specialWordTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Timer state for heartbeat sound and screen border glow
+  const [timerUrgencyState, setTimerUrgencyState] = useState<'normal' | 'low' | 'veryLow' | 'critical'>('normal');
+  const heartbeatIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Heartbeat sound at ≤10s
+  useEffect(() => {
+    if (timerUrgencyState === 'veryLow' || timerUrgencyState === 'critical') {
+      if (!heartbeatIntervalRef.current) {
+        heartbeatIntervalRef.current = setInterval(() => {
+          playTimerHeartbeatSound();
+        }, timerUrgencyState === 'critical' ? 600 : 1000);
       }
-      // Show feedback in WordFormingArea - use 'duplicate' type for already found words
-      setCurrentFeedback({
-        id: isDuplicate ? `duplicate-${Date.now()}` : `reject-${Date.now()}`,
-        type: isDuplicate ? 'duplicate' : 'rejected',
-        word: formedWord,
-        message: msg,
-        timestamp: Date.now(),
+    } else {
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
+    }
+    return () => {
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+        heartbeatIntervalRef.current = null;
+      }
+    };
+  }, [timerUrgencyState, playTimerHeartbeatSound]);
+
+  // Socket listeners for new round events, special words, and golden letters
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleGoldenLetters = (data: { goldenLetters?: Array<{ row: number; col: number }>; reconnect?: boolean }) => {
+      // Only update when the payload explicitly carries goldenLetters. Reconnect /
+      // late-join startGame emits omit the field, which previously clobbered the
+      // existing golden tiles (stars vanished mid-game after a re-render).
+      if (data.goldenLetters !== undefined) {
+        setGoldenLetters(data.goldenLetters);
+      }
+    };
+
+    const handleRoundEventWarning = (data: { eventType: string }) => {
+      const type = data.eventType as RoundEventState['type'];
+      setRoundEvent({ type, phase: 'warning' });
+    };
+
+    const handleRoundEventStart = (data: { eventType: string; duration: number; data?: Record<string, unknown> }) => {
+      const type = data.eventType as RoundEventState['type'];
+      setRoundEvent({ type, phase: 'active', duration: data.duration });
+
+      // Extract affected tiles from event data
+      const eventData = data.data ?? {};
+      if (type === 'blizzard' && eventData.blizzard) {
+        const bd = eventData.blizzard as { frozenTiles?: Array<{ row: number; col: number }> };
+        if (bd.frozenTiles) {
+          setEventTiles(prev => ({ ...prev, frozen: new Set(bd.frozenTiles!.map(t => `${t.row}-${t.col}`)) }));
+        }
+      } else if (type === 'lightning' && eventData.lightning) {
+        const ld = eventData.lightning as { chargedTiles?: Array<{ row: number; col: number }> };
+        if (ld.chargedTiles) {
+          setEventTiles(prev => ({ ...prev, charged: new Set(ld.chargedTiles!.map(t => `${t.row}-${t.col}`)) }));
+        }
+      } else if (type === 'meteor' && eventData.meteor) {
+        const md = eventData.meteor as { affectedTiles?: Array<{ row: number; col: number }> };
+        if (md.affectedTiles) {
+          setEventTiles(prev => ({ ...prev, meteor: new Set(md.affectedTiles!.map(t => `${t.row}-${t.col}`)) }));
+        }
+      }
+
+      if (roundEventTimerRef.current) clearTimeout(roundEventTimerRef.current);
+      roundEventTimerRef.current = setTimeout(() => {
+        setRoundEvent(null);
+      }, data.duration * 1000);
+    };
+
+    const handleRoundEventEnd = () => {
+      if (roundEventTimerRef.current) clearTimeout(roundEventTimerRef.current);
+      setRoundEvent(null);
+      setEventTiles({ frozen: new Set(), charged: new Set(), meteor: new Set() });
+    };
+
+    const handleSpecialWordFound = (data: { word: string; bonus?: number; username?: string }) => {
+      setSpecialWordEvent({
+        word: data.word,
+        bonus: data.bonus ?? 10,
+        finderUsername: data.username ?? '',
       });
-      // Haptic feedback for error
-      hapticError();
-      // Announce rejection for screen readers
-      announceWordResult(formedWord, false, undefined, msg);
-      // Reset combo if duplicate word
-      if (isDuplicate && onResetCombo) {
-        onResetCombo();
-      }
+      if (specialWordTimerRef.current) clearTimeout(specialWordTimerRef.current);
+      specialWordTimerRef.current = setTimeout(() => {
+        setSpecialWordEvent(null);
+      }, 3000);
+    };
+
+    socket.on('startGame', handleGoldenLetters);
+    socket.on('roundEventWarning', handleRoundEventWarning);
+    socket.on('roundEventStart', handleRoundEventStart);
+    socket.on('roundEventEnd', handleRoundEventEnd);
+    socket.on('specialWordFound', handleSpecialWordFound);
+
+    return () => {
+      socket.off('startGame', handleGoldenLetters);
+      socket.off('roundEventWarning', handleRoundEventWarning);
+      socket.off('roundEventStart', handleRoundEventStart);
+      socket.off('roundEventEnd', handleRoundEventEnd);
+      socket.off('specialWordFound', handleSpecialWordFound);
+      if (roundEventTimerRef.current) clearTimeout(roundEventTimerRef.current);
+      if (specialWordTimerRef.current) clearTimeout(specialWordTimerRef.current);
+    };
+  }, [socket]);
+
+  // Golden letters are now driven entirely by the server's startGame payload
+  // (which always includes the field, even as []). Don't pre-emptively clear
+  // when gameActive flickers — a transient false would wipe the tiles and the
+  // next round's payload re-broadcast is the only place that could restore
+  // them, which doesn't happen mid-round.
+
+  // Ref to hold detected combo type from path (blast multiplayer)
+  const comboTypeRef = useRef<string | null>(null);
+
+  // Detect combo type from selected cells path in blast multiplayer
+  const handlePathSubmit = useCallback((cells: SelectedCell[]) => {
+    if (gameMode !== 'blast' || !blastTileOverlay || blastTileOverlay.length === 0) {
+      comboTypeRef.current = null;
       return;
     }
-
-    // Check if word can be on board
-    if (!couldBeOnBoard(formedWord, letterGrid, currentLang)) {
-      const notOnBoardMsg = t('playerView.wordNotOnBoard');
-      // Show feedback in WordFormingArea
-      setCurrentFeedback({
-        id: `reject-${Date.now()}`,
-        type: 'rejected',
-        word: formedWord,
-        message: notOnBoardMsg,
-        timestamp: Date.now(),
-      });
-      hapticError();
-      announceWordResult(formedWord, false, undefined, notOnBoardMsg);
-      return;
+    // Build a minimal tileStates lookup from blastTileOverlay
+    // detectSpecialCombos accesses tileStates[row][col].type and .isCleared
+    const maxRow = Math.max(...blastTileOverlay.map(t => t.row), 0) + 1;
+    const maxCol = Math.max(...blastTileOverlay.map(t => t.col), 0) + 1;
+    const tileStates: BlastTileState[][] = Array.from({ length: maxRow }, () =>
+      Array.from({ length: maxCol }, () => ({ type: 'standard' as const, isCleared: false } as unknown as BlastTileState))
+    );
+    for (const tile of blastTileOverlay) {
+      tileStates[tile.row][tile.col] = { type: tile.type, isCleared: false } as unknown as BlastTileState;
     }
+    const path = cells.map(c => ({ row: c.row, col: c.col }));
+    const combos = detectSpecialCombos(path, tileStates);
+    comboTypeRef.current = combos.length > 0 ? combos[0].type : null;
+  }, [gameMode, blastTileOverlay]);
 
-    // Play sound and haptic feedback immediately (optimistic)
-    playWordAcceptedSound();
-    hapticForWordScore(formedWord.length);
-
-    // Submit to server
-    if (!socket || !gameActive) return;
-    socket.emit('submitWord', {
-      word: formedWord.toLowerCase(),
-      comboLevel: Math.min(effectiveComboLevelRef.current, 10),
-      fireRoundActive: fireRoundActiveRef.current,
-    });
-
-    // Add to local found words
-    onWordSubmit?.(formedWord);
-  }, [
+  // Word submission hook
+  const { handleGridWordSubmit, fireRoundActiveRef } = useWordSubmission({
     isPlaying,
+    gameActive,
     gameLanguage,
     minWordLength,
     normalizedFoundWords,
     letterGrid,
-    gameActive,
     socket,
+    comboLevelRef: effectiveComboLevelRef,
+    t,
+    playWordRejectedSound,
+    announceWordResult,
     onWordSubmit,
     onResetCombo,
-    t,
-    playWordAcceptedSound,
-    announceWordResult,
-    effectiveComboLevelRef,
-  ]);
+    setCurrentFeedback,
+    setLastWordFoundTime,
+    comboTypeRef,
+  });
 
-  // Keyboard word input - allows typing words directly instead of swiping
+  // Count every submit attempt so the coach can distinguish "spelling junk"
+  // (validity confusion) from "never submits" (gesture confusion).
+  const handleTrackedWordSubmit = useCallback(
+    (word: string, meta?: { inputMethod: 'kb' | 'drag' }) => {
+      stuckCoach.markSubmit();
+      handleGridWordSubmit(word, meta);
+    },
+    [stuckCoach, handleGridWordSubmit]
+  );
+
+  // A single tap that released on one tile = "clicking randomly" — feed the coach
+  // alongside the legacy tap-to-drag detector.
+  const handleSingleTap = useCallback(
+    (cell: { row: number; col: number; letter: string }) => {
+      stuckCoach.markTap();
+      tapDragGuidance.handleSingleTapDetected(cell);
+    },
+    [stuckCoach, tapDragGuidance]
+  );
+
+  // Update fireRoundActiveRef when fireRoundActive changes
+  useEffect(() => {
+    fireRoundActiveRef.current = fireRoundActive;
+  }, [fireRoundActive, fireRoundActiveRef]);
+
+  // Socket feedback hook — owns server-truth audio (accept on server's wordAccepted,
+  // reject + haptic error on rejection events). Prevents MP audio-lie.
+  useSocketFeedback({
+    socket,
+    isPlaying,
+    t,
+    setCurrentFeedback,
+    setLastWordFoundTime,
+    playWordAcceptedSound,
+    playWordRejectedSound,
+    playWordLengthSound,
+    onWordAccepted: stuckCoach.markAccepted,
+  });
+
+  // Keyboard word input
   const keyboardInput = useKeyboardWordInput({
     grid: letterGrid,
     language: gameLanguage || 'en',
+    gameLanguage: gameLanguage,
     enabled: isPlaying && gameActive && !showStartAnimation,
-    onWordSubmit: handleGridWordSubmit,
+    onWordSubmit: handleTrackedWordSubmit,
     minWordLength,
   });
 
-  // Desktop detection for keyboard help features
-  const isDesktop = useMemo(() => {
-    if (typeof window === 'undefined') return false;
-    return !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  }, []);
-
-  // Keyboard help state - manages help overlay and quick tip visibility
+  // Keyboard help state
   const keyboardHelp = useKeyboardHelpState({
     enabled: isDesktop && isPlaying,
     enableQuickTip: isDesktop,
   });
 
-  // Memoize leaderboard items with centralized ranking utilities (using deferred value)
-  const memoizedLeaderboard = useMemo(() => deferredLeaderboard.map((player, index) => ({
-    ...player,
-    rankStyle: getRankStyle(index),
-    isMe: player.username === username,
-    rankDisplay: getRankIconString(index)
-  })), [deferredLeaderboard, username]);
-
-  // Handle word forming changes from GridComponent
+  // Word change handler — pushes selection into useSelectionStore so only
+  // WordFormingAreaConnected re-renders. InGameScreen + PortraitLayout no longer
+  // re-render per cell entered during a drag.
+  const dragCountedRef = useRef(false);
   const handleWordChange = useCallback((word: string, count: number) => {
-    setFormedWord(word);
-    setLetterCount(count);
-  }, []);
+    // Detect a real drag (path of 2+ tiles) once per gesture → feeds the coach's
+    // "builds words but never submits" signal. Reset when the path clears.
+    if (count === 0) {
+      dragCountedRef.current = false;
+    } else if (count >= 2 && !dragCountedRef.current) {
+      dragCountedRef.current = true;
+      stuckCoach.markDragStart();
+    }
+    useSelectionStore.getState().setSelection(word, count);
+  }, [stuckCoach]);
 
-  // Check for very short landscape screens to prevent panel overlap
-  const isVeryShortLandscape = isLandscape && viewportHeight > 0 && viewportHeight < 400;
-  const isExtremelyShortLandscape = isLandscape && viewportHeight > 0 && viewportHeight < 350;
+  // Shared props for layout components
+  const sharedLayoutProps = {
+    username,
+    isPlaying,
+    t,
+    dir,
+    letterGrid,
+    remainingTime,
+    timerValue,
+    gameActive,
+    showStartAnimation,
+    gameLanguage: gameLanguage || 'en',
+    comboLevel,
+    lastWordTime,
+    fireRoundActive,
+    hasAnimated: hasAnimatedRef.current,
+    earthquakeState,
+    playerScore: playerData.score,
+    playerRank: playerData.rank,
+    currentFeedback,
+    isTypingMode: keyboardInput.isTypingMode,
+    typedWord: keyboardInput.typedWord,
+    highlightedCells: keyboardInput.highlightedCells,
+    lastWordFoundTime,
+    totalGamesPlayed,
+    onExitRoom,
+    onShowTutorial,
+    onWordSubmit: handleTrackedWordSubmit,
+    onPathSubmit: handlePathSubmit,
+    onWordChange: handleWordChange,
+    onSingleTapDetected: handleSingleTap,
+    hints,
+    fireRoundRemaining,
+    showDragTutorial: tapDragGuidance.showDragTutorial,
+    onDismissDragTutorial: tapDragGuidance.dismissDragTutorial,
+    isDesktop,
+    showQuickTip: keyboardHelp.showQuickTip,
+    onDismissQuickTip: keyboardHelp.dismissQuickTip,
+    isHelpOpen: keyboardHelp.isHelpOpen,
+    onCloseHelp: keyboardHelp.closeHelp,
+    minWordLength,
+    leadChangeEvent,
+    gameMode,
+    blastTileOverlay,
+    wordHuntTargetLength,
+    wordHuntAttempts,
+    wordHuntFound,
+    wordHuntLife,
+    wordHuntPlayerLives,
+    wordHuntEliminatedPlayers,
+    onWordHuntGuess,
+    goldenLetters,
+    roundEvent,
+    eventTiles,
+    specialWordEvent,
+    timerUrgencyState,
+    onTimerState: setTimerUrgencyState,
+  } as const;
 
-  // ==================== Landscape Layout ====================
-  // In landscape mobile mode, use a maximized grid layout with stats on sides
-  if (isLandscape) {
-    return (
-      <>
-        {/* Earthquake Warning Overlay */}
-        <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
-
-        {/* Fire Round Indicator */}
-        <FireRoundIndicator
-          isActive={fireRoundActive}
-          remainingSeconds={fireRoundRemaining}
-        />
-
-        {/* Contextual Guidance Tooltips - First-time player education */}
-        <ContextualTooltip
-          type="combo"
-          isVisible={guidance.showComboTip}
-          onDismiss={guidance.dismissComboTip}
-          t={t}
-        />
-        <ContextualTooltip
-          type="earthquake"
-          isVisible={guidance.showEarthquakeTip}
-          onDismiss={guidance.dismissEarthquakeTip}
-          t={t}
-        />
-        <ContextualTooltip
-          type="fireRound"
-          isVisible={guidance.showFireRoundTip}
-          onDismiss={guidance.dismissFireRoundTip}
-          t={t}
-        />
-        <DirectionGuidanceTooltip
-          isVisible={directionGuidance.showDirectionGuidance}
-          onDismiss={directionGuidance.dismissDirectionGuidance}
-          t={t}
-          dir={dir}
-        />
-        <TapToDragTooltip
-          isVisible={tapDragGuidance.showDragTutorial}
-          onDismiss={tapDragGuidance.dismissDragTutorial}
-          t={t}
-          dir={dir}
-        />
-
-        {/* Keyboard Input Hint - Desktop only (legacy fallback) */}
-        {isPlaying && !keyboardHelp.showQuickTip && (
-          <KeyboardHintTooltip
-            delaySeconds={10}
-            desktopOnly={true}
-            t={t}
-          />
-        )}
-
-        {/* Keyboard Quick Tip - Desktop only (immediate hint) */}
-        {isPlaying && isDesktop && (
-          <KeyboardQuickTip
-            isVisible={keyboardHelp.showQuickTip}
-            onDismiss={keyboardHelp.dismissQuickTip}
-            t={t}
-          />
-        )}
-
-        {/* Keyboard Mode Indicator - Desktop only */}
-        {isPlaying && isDesktop && (
-          <KeyboardModeIndicator
-            isNavigationMode={false}
-            isTypingMode={keyboardInput.isTypingMode}
-            t={t}
-            position="top-right"
-          />
-        )}
-
-        {/* Keyboard Shortcuts Overlay - Desktop only */}
-        {isDesktop && (
-          <KeyboardShortcutsOverlay
-            isOpen={keyboardHelp.isHelpOpen}
-            onClose={keyboardHelp.closeHelp}
-            t={t}
-          />
-        )}
-
-        {/* Full-screen landscape container with grid centered - uses full viewport, no scroll */}
-        <div className="relative flex items-center justify-center w-full h-screen max-h-[100dvh] overflow-hidden bg-slate-900 text-white landscape-full-height">
-
-          {/* Left Side Panel - Timer, Rank, Words Count */}
-          {/* Using clamp to prevent panel overlap on very narrow/short screens */}
-          <div className={cn(
-            "absolute top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
-            isExtremelyShortLandscape ? "left-1" : "left-2"
-          )}
-            style={{
-              left: 'clamp(4px, 1.5vw, 12px)',
-              maxWidth: 'clamp(70px, 14vw, 110px)'
-            }}
-          >
-            <div className="landscape-panel flex flex-col items-center gap-2">
-              {/* Timer - Large and prominent */}
-              {remainingTime !== null && (
-                <CircularTimer
-                  remainingTime={remainingTime}
-                  totalTime={timerValue * 60}
-                  size={isExtremelyShortLandscape ? "md" : "lg"}
-                />
-              )}
-
-              {/* Rank Badge (if in multiplayer) */}
-              {isPlaying && playerData.rank && playerData.rank > 0 && leaderboard.length > 1 && (
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="flex flex-col items-center"
-                >
-                  <div className="landscape-stat-secondary text-white">
-                    #{playerData.rank}
-                  </div>
-                  <div className="landscape-stat-label text-white">
-                    {t('common.rank') || 'RANK'}
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Words Found Count */}
-              {isPlaying && (
-                <div className="flex flex-col items-center">
-                  <div className="landscape-stat-secondary text-white">
-                    {normalizedFoundWords.length}
-                  </div>
-                  <div className="landscape-stat-label text-white">
-                    {t('common.words') || 'WORDS'}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Right Side Panel - Score & Combo */}
-          {/* Using clamp to prevent panel overlap on very narrow/short screens */}
-          {isPlaying && (
-            <div className={cn(
-              "absolute top-1/2 -translate-y-1/2 z-40 landscape-side-panel",
-              isExtremelyShortLandscape ? "right-1" : "right-2"
-            )}
-              style={{
-                right: 'clamp(4px, 1.5vw, 12px)',
-                maxWidth: 'clamp(70px, 14vw, 110px)'
-              }}
-            >
-              <div className="landscape-panel flex flex-col items-center gap-2">
-                {/* Score - Primary stat, large and animated */}
-                <div className="flex flex-col items-center">
-                  <motion.div
-                    key={playerData.score}
-                    initial={{ scale: 1.3 }}
-                    animate={{ scale: 1 }}
-                    className="landscape-stat-primary text-neo-black"
-                  >
-                    {playerData.score}
-                  </motion.div>
-                  <div className="landscape-stat-label text-neo-black">
-                    {t('common.score') || 'SCORE'}
-                  </div>
-                </div>
-
-                {/* Combo Display - High contrast for light panel background */}
-                <ComboDisplay comboLevel={comboLevel} highContrast compact />
-              </div>
-            </div>
-          )}
-
-
-          {/* Bottom action bar - safe from side panel overlap */}
-          <div
-            className="absolute bottom-2 left-0 right-0 z-30 flex justify-between items-center"
-            style={{
-              paddingInline: 'clamp(100px, 18vw, 150px)',
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)'
-            }}
-          >
-            {/* Exit button - positioned safely inside side panels */}
-            {onExitRoom && (
-              <ExitRoomButton
-                onClick={onExitRoom}
-                label={t('playerView.exit')}
-                className="w-12 h-12"
-              />
-            )}
-
-            {/* Spacer for when no exit button */}
-            {!onExitRoom && <div />}
-
-            {/* Hint Button - Single Player Mode Only */}
-            {hints && hints.isSinglePlayer && (
-              <HintButton
-                hint={hints.hint}
-                hintType={hints.hintType}
-                hintsRemaining={hints.hintsRemaining}
-                wordLength={hints.wordLength}
-                firstLetter={hints.firstLetter}
-                isLoading={hints.isLoading}
-                error={hints.error}
-                isAvailable={hints.isAvailable}
-                isSinglePlayer={hints.isSinglePlayer}
-                gameActive={gameActive}
-                onRequestHint={hints.requestHint}
-                onClearHint={hints.clearHint}
-                t={t}
-              />
-            )}
-          </div>
-
-          {/* Center: Word Forming Area + Grid - with responsive padding for side panels */}
-          <div className={cn(
-            "flex flex-col items-center justify-center w-full h-full landscape-grid-container",
-            "gap-1.5 py-1"
-          )}
-            style={{
-              paddingInline: 'clamp(120px, 18vw, 180px)'
-            }}>
-            {/* Word Forming Area with integrated feedback - flex-shrink-0 prevents squishing, z-50 keeps it visible */}
-            {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
-            {isPlaying && (
-              <WordFormingArea
-                word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
-                letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
-                feedback={currentFeedback}
-                compact
-                className="mb-1 flex-shrink-0 z-50"
-              />
-            )}
-            <div className="flex-1 flex items-center justify-center game-board-frame-landscape" style={{ aspectRatio: '1/1' }}>
-              <GridComponent
-                key={isPlaying ? 'playing-grid-landscape' : 'spectating-grid-landscape'}
-                grid={letterGrid}
-                interactive={isPlaying && !showStartAnimation}
-                animateOnMount={!hasAnimatedRef.current}
-                onWordSubmit={handleGridWordSubmit}
-                onPathSubmit={directionGuidance.trackWordPath}
-                onWordChange={handleWordChange}
-                comboLevel={comboLevel}
-                hideComboIndicator={true}
-                hideWordPreview={true}
-                largeText
-                fireRoundActive={fireRoundActive}
-                earthquakeShaking={earthquakeState === 'shaking'}
-                highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTime, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
-                onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
-                language={gameLanguage || 'en'}
-              />
-            </div>
-          </div>
-
-          {/* Compact Leaderboard - Top center in landscape multiplayer */}
-          {isPlaying && leaderboard.length > 1 && (
-            <div className="absolute top-2 left-1/2 -translate-x-1/2 z-30 w-auto max-w-[280px]">
-              <CompactLeaderboard
-                players={leaderboard.map((p, index) => ({
-                  username: p.username,
-                  score: p.score,
-                  rank: index + 1,
-                  isCurrentUser: p.username === username,
-                  profilePictureUrl: p.avatar?.profilePictureUrl,
-                  avatarImage: p.avatar?.avatarImage,
-                  avatarEmoji: p.avatar?.emoji,
-                  avatarColor: p.avatar?.color,
-                }))}
-                currentUsername={username}
-                t={t}
-                className="text-xs"
-              />
-            </div>
-          )}
-
-        </div>
-
-        {/* Achievement dock */}
-        {children}
-      </>
-    );
-  }
-
-  // ==================== Portrait/Desktop Layout ====================
+  // Portrait/Desktop Layout
   return (
     <>
-      {/* Earthquake Warning Overlay */}
-      <EarthquakeWarning isVisible={earthquakeState === 'warning'} />
-
-      {/* Fire Round Indicator */}
-      <FireRoundIndicator
-        isActive={fireRoundActive}
-        remainingSeconds={fireRoundRemaining}
-      />
-
-      {/* Contextual Guidance Tooltips - First-time player education */}
-      <ContextualTooltip
-        type="combo"
-        isVisible={guidance.showComboTip}
-        onDismiss={guidance.dismissComboTip}
-        t={t}
-      />
-      <ContextualTooltip
-        type="earthquake"
-        isVisible={guidance.showEarthquakeTip}
-        onDismiss={guidance.dismissEarthquakeTip}
-        t={t}
-      />
-      <ContextualTooltip
-        type="fireRound"
-        isVisible={guidance.showFireRoundTip}
-        onDismiss={guidance.dismissFireRoundTip}
-        t={t}
-      />
-      <DirectionGuidanceTooltip
-        isVisible={directionGuidance.showDirectionGuidance}
-        onDismiss={directionGuidance.dismissDirectionGuidance}
-        t={t}
-        dir={dir}
-      />
-      <TapToDragTooltip
-        isVisible={tapDragGuidance.showDragTutorial}
-        onDismiss={tapDragGuidance.dismissDragTutorial}
-        t={t}
-        dir={dir}
-      />
-
-      {/* Keyboard Input Hint - Desktop only (legacy fallback) */}
-      {isPlaying && !keyboardHelp.showQuickTip && (
-        <KeyboardHintTooltip
-          delaySeconds={10}
-          desktopOnly={true}
-          t={t}
-        />
-      )}
-
-      {/* Keyboard Quick Tip - Desktop only (immediate hint) */}
-      {isPlaying && isDesktop && (
-        <KeyboardQuickTip
-          isVisible={keyboardHelp.showQuickTip}
-          onDismiss={keyboardHelp.dismissQuickTip}
-          t={t}
-        />
-      )}
-
-      {/* Keyboard Mode Indicator - Desktop only */}
-      {isPlaying && isDesktop && (
-        <KeyboardModeIndicator
-          isNavigationMode={false}
-          isTypingMode={keyboardInput.isTypingMode}
-          t={t}
-          position="top-right"
-        />
-      )}
-
-      {/* Keyboard Shortcuts Overlay - Desktop only */}
-      {isDesktop && (
-        <KeyboardShortcutsOverlay
-          isOpen={keyboardHelp.isHelpOpen}
-          onClose={keyboardHelp.closeHelp}
-          t={t}
-        />
-      )}
-
-      <div className="flex flex-col lg:flex-row gap-0 md:gap-2 lg:gap-3 flex-1 w-full max-w-[1920px] mx-auto overflow-hidden transition-all duration-500 ease-in-out h-full max-h-[100dvh]">
-
-        {/* Top Bar - Only on mobile, integrated into parent on desktop */}
-        <div className="lg:hidden w-full flex items-center justify-between px-1 flex-shrink-0">
-          {onExitRoom && (
-            <ExitRoomButton onClick={onExitRoom} label={t('playerView.exit')} className="relative z-50" />
-          )}
-
-          {/* Hint Button - Single Player Mode Only */}
-          {hints && hints.isSinglePlayer && (
-            <HintButton
-              hint={hints.hint}
-              hintType={hints.hintType}
-              hintsRemaining={hints.hintsRemaining}
-              wordLength={hints.wordLength}
-              firstLetter={hints.firstLetter}
-              isLoading={hints.isLoading}
-              error={hints.error}
-              isAvailable={hints.isAvailable}
-              isSinglePlayer={hints.isSinglePlayer}
-              gameActive={gameActive}
-              onRequestHint={hints.requestHint}
-              onClearHint={hints.clearHint}
-              t={t}
-            />
-          )}
+      <PortraitLayout
+        {...sharedLayoutProps}
+        gameCode={gameCode}
+        isHost={isHost}
+        gameplayFocusMode={gameplayFocusMode}
+        deferredLeaderboard={deferredLeaderboard}
+        foundWords={normalizedFoundWords}
+        tournamentData={tournamentData}
+        totalBoardWords={totalBoardWords}
+        gameStatsRef={gameStatsRef}
+        inDesktopShell={inDesktopShell}
+      >
+        {children}
+      </PortraitLayout>
+      {/* Stuck-player coach: fixed bottom-center, above the grid. Mobile + desktop. */}
+      {stuckCoach.visible && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-[60] flex justify-center px-3">
+          <MPStuckCoachCard
+            stage={stuckCoach.stage}
+            onDismiss={() => stuckCoach.dismiss('manual')}
+          />
         </div>
-
-
-        {/* Left Column: Found Words (Desktop only, only when playing, hidden in focus mode) */}
-        {isPlaying && !gameplayFocusMode && (
-          <div className="hidden lg:flex lg:flex-col lg:w-64 xl:w-72 2xl:w-80 gap-2 min-h-0 flex-shrink-0">
-            <div
-              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col min-h-0 max-h-[75vh] lg:max-h-[80vh] overflow-hidden"
-              style={{ transform: 'rotate(1deg)' }}
-            >
-              {/* Header */}
-              <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-cyan text-neo-black">
-                <h3 className="text-neo-black text-base uppercase tracking-widest font-black">
-                  {t('playerView.wordsFound')}
-                </h3>
-              </div>
-              {/* Content */}
-              <div className="flex-1 overflow-y-auto p-3 min-h-0 custom-scrollbar">
-                <div className="space-y-2">
-                  <AnimatePresence>
-                    {normalizedFoundWords.map((foundWordObj, index) => {
-                      const wordText = foundWordObj.word;
-                      const isInvalid = foundWordObj.isValid === false;
-                      const isLatest = index === normalizedFoundWords.length - 1;
-                      return (
-                        <motion.div
-                          key={`${wordText}-${foundWordObj.timestamp || index}`}
-                          initial={{ x: -30, opacity: 0 }}
-                          animate={{ x: 0, opacity: 1 }}
-                          exit={{ x: -30, opacity: 0 }}
-                          className={`p-2 text-center font-black uppercase border-3 border-neo-black rounded-neo transition-all
-                          ${isInvalid
-                              ? 'bg-neo-red text-neo-cream shadow-hard-sm line-through opacity-70'
-                              : isLatest
-                                ? 'bg-neo-lime text-neo-black shadow-hard'
-                                : 'bg-neo-cream text-neo-black shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard'}`}
-                        >
-                          {applyHebrewFinalLetters(wordText).toUpperCase()}
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
-                  {normalizedFoundWords.length === 0 && (
-                    <p className="text-center text-neo-black py-6 text-sm font-bold">
-                      {t('playerView.noWordsYet') || 'No words found yet'}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Center Column: Timer, Score, Grid */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 overflow-hidden max-h-full">
-          {/* Stats row - Timer centered, Combo + Score absolutely positioned on right */}
-          {remainingTime !== null && (
-            <div ref={gameStatsRef} className="relative flex items-center justify-center flex-shrink-0 mb-2 md:mb-3" role="status" aria-label="Game status">
-              {/* Timer (center - always visible and prominent, position fixed) */}
-              <motion.div
-                data-tutorial="timer"
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                className="relative z-20 flex-shrink-0"
-              >
-                <div className="hidden lg:block">
-                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="lg" />
-                </div>
-                <div className="lg:hidden">
-                  <CircularTimer remainingTime={remainingTime} totalTime={timerValue * 60} size="xs" />
-                </div>
-              </motion.div>
-
-              {/* Combo + Score - absolutely positioned on right to not shift timer */}
-              {/* z-30 ensures combo renders ABOVE timer (z-20), pointer-events-none prevents blocking timer */}
-              {isPlaying && (
-                <div className="absolute right-2 rtl:right-auto rtl:left-2 md:right-4 md:rtl:left-4 top-1/2 -translate-y-1/2 flex flex-col items-end rtl:items-start gap-1 md:gap-2 z-30 pointer-events-none">
-                  {/* Combo container - fixed height to prevent layout shift when combo appears/disappears */}
-                  <div className="h-[28px] md:h-[32px] flex items-center justify-end rtl:justify-start">
-                    <ComboDisplay comboLevel={comboLevel} compact />
-                  </div>
-
-                  {/* Score - vibrant yellow/lime gradient */}
-                  {/* pointer-events-auto restores interactivity since parent has pointer-events-none */}
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="relative border-2 md:border-3 border-neo-black rounded-neo shadow-hard md:shadow-hard-lg px-1.5 md:px-4 py-0.5 md:py-1.5 min-w-[50px] md:min-w-[90px] pointer-events-auto"
-                    style={{
-                      background: 'linear-gradient(135deg, #FFE135 0%, #BFFF00 100%)',
-                    }}
-                  >
-                    <div className="text-center">
-                      <motion.div
-                        key={playerData.score}
-                        initial={{ scale: 1.3 }}
-                        animate={{ scale: 1 }}
-                        className="text-lg md:text-2xl lg:text-3xl font-black text-neo-black leading-tight"
-                        style={{ textShadow: '1px 1px 0px rgba(255,255,255,0.5)' }}
-                      >
-                        {playerData.score}
-                      </motion.div>
-                      <div className="text-[9px] md:text-xs lg:text-sm font-bold uppercase tracking-wider text-neo-black">
-                        {t('common.score') || 'Score'}
-                      </div>
-                    </div>
-                    {/* Rank badge */}
-                    {playerData.rank && playerData.rank > 0 && (
-                      <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-5 h-5 md:w-6 md:h-6 bg-neo-pink text-neo-cream border-2 border-neo-black rounded-full flex items-center justify-center text-[10px] md:text-xs font-black shadow-hard-sm">
-                        #{playerData.rank}
-                      </div>
-                    )}
-                  </motion.div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Word Forming Area with feedback - centered below timer */}
-          {/* Shows typed word when in keyboard mode, otherwise shows swiped word */}
-          {isPlaying && (
-            <div className="flex items-center justify-center flex-shrink-0 mb-0">
-              <WordFormingArea
-                word={keyboardInput.isTypingMode ? keyboardInput.typedWord : formedWord}
-                letterCount={keyboardInput.isTypingMode ? keyboardInput.typedWord.length : letterCount}
-                feedback={currentFeedback}
-                compact
-              />
-            </div>
-          )}
-
-          {/* Tournament Progress Banner */}
-          {tournamentData && (
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              className="max-w-7xl mx-auto mb-1"
-            >
-              <Card className="bg-gradient-to-r from-purple-600/90 to-pink-600/90 dark:from-purple-700/90 dark:to-pink-700/90 backdrop-blur-md border border-purple-400/50 shadow-[0_0_20px_rgba(168,85,247,0.3)]">
-                <CardContent className="py-1 px-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <Trophy className="w-5 h-5 text-yellow-300 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />
-                      <div>
-                        <div className="text-white font-bold text-xs md:text-sm">
-                          {tournamentData.name || t('hostView.tournament')}
-                        </div>
-                        <div className="text-purple-100 text-[10px] md:text-xs">
-                          {t('hostView.tournamentRound')} {tournamentData.currentRound || 1} / {tournamentData.totalRounds || 3}
-                        </div>
-                      </div>
-                    </div>
-                    <Badge className="bg-white/20 text-neo-black border-white/30 text-[10px] md:text-xs">
-                      {t('hostView.tournamentProgress')}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-
-          {/* Grid - Direct connection to timer row */}
-          {/* Removed extra padding to prevent scroll - safe area handled by parent */}
-          <div className="flex-1 flex items-start justify-center min-h-0 overflow-hidden">
-            <GridComponent
-              key={isPlaying ? 'playing-grid' : 'spectating-grid'}
-              grid={letterGrid}
-              interactive={isPlaying && !showStartAnimation}
-              animateOnMount={!hasAnimatedRef.current}
-              onWordSubmit={handleGridWordSubmit}
-              onPathSubmit={directionGuidance.trackWordPath}
-              onWordChange={handleWordChange}
-              comboLevel={comboLevel}
-              hideComboIndicator={true}
-              hideWordPreview={true}
-              fireRoundActive={fireRoundActive}
-              earthquakeShaking={earthquakeState === 'shaking'}
-              highlightedPath={shouldShowKeyboardTrails(keyboardInput.isTypingMode, lastWordFoundTime, totalGamesPlayed) ? keyboardInput.highlightedCells : []}
-              onSingleTapDetected={tapDragGuidance.handleSingleTapDetected}
-              language={gameLanguage || 'en'}
-            />
-          </div>
-
-
-          {/* Words Remaining - 5+ letter words only (single-player only) */}
-          {hints?.isSinglePlayer && isPlaying && totalBoardWords !== null && totalBoardWords !== undefined && totalBoardWords > 0 && (
-            <div className="flex justify-center flex-shrink-0">
-              <WordsRemaining
-                totalWords={totalBoardWords}
-                foundWordsCount={normalizedFoundWords.filter(fw => fw.isValid !== false && fw.word.length >= 5).length}
-                t={t}
-                minLength={5}
-              />
-            </div>
-          )}
-
-          {/* Mobile: Split-view with compact leaderboard + words (eliminates tab switching) */}
-          {/* Now visible on all mobile/tablet screens, hidden on desktop where sidebar is used */}
-          {isPlaying && !gameplayFocusMode && leaderboard && leaderboard.length > 0 && (
-            <div className="block lg:hidden mt-0.5 md:mt-1 space-y-0.5 max-w-md mx-auto lg:max-w-lg md:space-y-1 flex-shrink-0 overflow-hidden max-h-[120px]">
-              {/* Compact Leaderboard - Always visible */}
-              <CompactLeaderboard
-                players={leaderboard.map(p => ({
-                  username: p.username,
-                  score: p.score,
-                  rank: 0, // Will be calculated in component
-                  profilePictureUrl: p.avatar?.profilePictureUrl,
-                  avatarEmoji: p.avatar?.emoji,
-                  avatarColor: p.avatar?.color,
-                }))}
-                currentUsername={username}
-                t={t}
-              />
-
-              {/* Found Words - Compact view, no scroll */}
-              <div className="bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard p-1.5 md:p-2">
-                <div className="flex items-center justify-between mb-1 px-0.5">
-                  <span className="text-[10px] md:text-xs font-black uppercase text-neo-black">
-                    {t('hostView.words') || 'Your Words'}
-                  </span>
-                  <span className="text-xs font-bold text-neo-black/90">
-                    {normalizedFoundWords.length}
-                  </span>
-                </div>
-                <div className="max-h-[50px] overflow-hidden">
-                  {normalizedFoundWords.length === 0 ? (
-                    <p className="text-center text-neo-black/90 py-2 text-sm font-bold">
-                      {t('playerView.noWordsYet') || 'No words found yet'}
-                    </p>
-                  ) : (
-                    <div className="flex flex-wrap gap-1">
-                      {normalizedFoundWords.slice().reverse().map((wordObj, index) => (
-                        <motion.span
-                          key={`${wordObj.word}-${index}`}
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{ scale: 1, opacity: 1 }}
-                          transition={{ type: 'spring', stiffness: 500, damping: 30 }}
-                          className={`inline-block px-2 py-1 text-xs font-bold uppercase rounded-neo border-2 border-neo-black ${wordObj.isValid === false
-                            ? 'bg-neo-red text-neo-cream line-through opacity-70'
-                            : index === 0
-                              ? 'bg-neo-lime text-neo-black'
-                              : 'bg-white text-neo-black'
-                            }`}
-                        >
-                          {applyHebrewFinalLetters(wordObj.word)}
-                        </motion.span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Achievement dock */}
-          {children}
-        </div>
-
-        {/* Right Column: Live Leaderboard (hidden in focus mode) */}
-        {!gameplayFocusMode && (
-          <div className="lg:w-64 xl:w-72 2xl:w-80 flex flex-col gap-2 flex-shrink-0">
-            <div
-              className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-lg flex flex-col overflow-hidden max-h-[45vh] lg:max-h-none lg:flex-grow"
-              style={{ transform: 'rotate(-1deg)' }}
-            >
-              {/* Header */}
-              <div className="py-3 px-4 border-b-4 border-neo-black bg-neo-pink text-white">
-                <h3 className="flex items-center gap-2 text-neo-cream text-base uppercase tracking-widest font-black">
-                  <Trophy className="w-4 h-4 text-neo-lime" style={{ filter: 'drop-shadow(2px 2px 0px rgb(var(--neo-black)))' }} />
-                  {t('playerView.leaderboard')}
-                </h3>
-              </div>
-              {/* Content */}
-              <div className="overflow-y-auto flex-1 p-3 custom-scrollbar">
-                <div className="space-y-2">
-                  {memoizedLeaderboard.map((player, index) => (
-                    <motion.div
-                      key={player.username}
-                      initial={{ x: 50, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      transition={{ delay: index * 0.05 }}
-                      layout
-                      className={`flex items-center gap-3 p-2 rounded-neo border-3 shadow-hard-sm transition-all
-                    hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard
-                    ${player.rankStyle} ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}
-                    >
-                      {/* Rank badge */}
-                      <div className="w-10 h-10 rounded-neo flex items-center justify-center font-black text-lg bg-neo-black text-neo-cream border-2 border-neo-black">
-                        {player.rankDisplay}
-                      </div>
-                      {/* Avatar */}
-                      <Avatar
-                        profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
-                        avatarImage={player.avatar?.avatarImage}
-                        size="xl"
-                      />
-                      {/* Player info */}
-                      <div className="flex-1 min-w-0">
-                        <div className={`font-black truncate text-sm flex items-center gap-1 text-neo-black ${dir === 'rtl' ? 'flex-row-reverse' : ''}`}>
-                          {player.isHost && <Crown className="w-4 h-4 text-neo-lime flex-shrink-0" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />}
-                          <span className="truncate" title={player.username}>{player.username}</span>
-                          {player.isMe && (
-                            <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold flex-shrink-0">
-                              {t('playerView.me') || 'YOU'}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-xs font-bold text-neo-black/90">
-                          {player.wordCount || 0} {t('hostView.words') || 'words'}
-                        </div>
-                      </div>
-                      {/* Presence and Score */}
-                      <div className="flex items-center gap-2">
-                        {/* Presence indicator (only show for others when host) */}
-                        {isHost && !player.isMe && player.presenceStatus && (
-                          <PresenceIndicator
-                            status={player.presenceStatus}
-                            isWindowFocused={player.isWindowFocused}
-                            size="lg"
-                          />
-                        )}
-                        <div className="text-right">
-                          <div className="text-lg font-black text-neo-black leading-none">
-                            {player.score}
-                          </div>
-                          <div className="text-xs font-bold text-neo-black/90 uppercase">pts</div>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                  {leaderboard.length === 0 && (
-                    <p className="text-center text-neo-black/90 py-6 text-sm font-bold">
-                      {t('hostView.waitingForPlayers') || 'Waiting for players...'}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Chat Component - Desktop only */}
-            <div className="hidden lg:block">
-              <RoomChat
-                username={isHost ? "Host" : username}
-                isHost={isHost}
-                gameCode={gameCode}
-                className="max-h-[200px]"
-              />
-            </div>
-          </div>
-        )}
-      </div>
+      )}
     </>
   );
 });

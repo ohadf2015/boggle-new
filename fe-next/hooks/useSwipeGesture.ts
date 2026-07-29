@@ -1,124 +1,238 @@
-import { useCallback, useRef } from 'react';
-
-export interface SwipeGestureOptions {
-  onSwipeLeft?: () => void;
-  onSwipeRight?: () => void;
-  onSwipeUp?: () => void;
-  onSwipeDown?: () => void;
-  threshold?: number;
-  isRtl?: boolean;
-  enableHaptic?: boolean;
-  hapticIntensity?: number;
-}
-
-export interface SwipeGestureHandlers {
-  onTouchStart: (e: React.TouchEvent) => void;
-  onTouchEnd: (e: React.TouchEvent) => void;
-}
-
 /**
- * useSwipeGesture - Reusable hook for swipe gesture detection
+ * useSwipeGesture Hook
  *
- * Features:
- * - Detects horizontal and vertical swipes
- * - RTL language support (reverses horizontal directions)
- * - Configurable threshold
- * - Optional haptic feedback
- * - Works with any component that supports touch events
+ * Swipe gesture detection hook using Framer Motion for flashcard interactions.
+ * Provides motion values for drag animations, threshold-based swipe detection,
+ * and keyboard shortcuts for accessibility.
  *
  * @example
- * const swipeHandlers = useSwipeGesture({
- *   onSwipeLeft: handleNext,
- *   onSwipeRight: handlePrev,
+ * ```tsx
+ * const { x, rotate, opacity, handleDragEnd, handleKeyDown } = useSwipeGesture({
+ *   onSwipe: (direction) => {
+ *     if (direction === 'right') handleGotIt();
+ *     else handleDontKnow();
+ *   },
+ *   threshold: 150,
+ * });
+ * ```
+ *
+ * ## Migration from v1 API (Phase 21)
+ *
+ * The API was simplified from separate callbacks to a unified callback:
+ *
+ * ```tsx
+ * // OLD API (deprecated)
+ * useSwipeGesture({
+ *   onSwipeLeft: () => handleNext(),
+ *   onSwipeRight: () => handleBack(),
  *   isRtl: dir === 'rtl',
  *   enableHaptic: true,
  * });
  *
- * <div {...swipeHandlers}>Content</div>
+ * // NEW API (current)
+ * useSwipeGesture({
+ *   onSwipe: (direction) => {
+ *     if (direction === 'left') handleNext();
+ *     else if (direction === 'right') handleBack();
+ *   },
+ *   threshold: 150,
+ * });
+ * ```
+ *
+ * **Breaking changes:**
+ * - `onSwipeLeft`/`onSwipeRight` replaced with `onSwipe(direction)`
+ * - `isRtl` removed (handle RTL in your callback if needed)
+ * - `enableHaptic` removed (trigger haptics in your callback if needed)
  */
-export function useSwipeGesture(options: SwipeGestureOptions): SwipeGestureHandlers {
-  const {
-    onSwipeLeft,
-    onSwipeRight,
-    onSwipeUp,
-    onSwipeDown,
-    threshold = 50,
-    isRtl = false,
-    enableHaptic = true,
-    hapticIntensity = 10,
-  } = options;
 
-  const touchStartRef = useRef<{ x: number; y: number } | null>(null);
+import { useMotionValue, useTransform, MotionValue } from 'framer-motion';
+import { useState, useEffect, useCallback, useRef } from 'react';
 
-  const triggerHaptic = useCallback(() => {
-    if (enableHaptic && window.navigator?.vibrate) {
-      window.navigator.vibrate(hapticIntensity);
+export type SwipeDirection = 'left' | 'right';
+
+export interface SwipeConfig {
+  /** Callback triggered when swipe threshold is exceeded or keyboard shortcut pressed */
+  onSwipe: (direction: SwipeDirection) => void;
+  /** Minimum horizontal distance (in px) to trigger swipe. Default: 150 */
+  threshold?: number;
+  /** Disable all swipe detection */
+  disabled?: boolean;
+}
+
+interface DragEndInfo {
+  offset: { x: number; y: number };
+  velocity: { x: number; y: number };
+}
+
+export interface UseSwipeGestureReturn {
+  /** Motion value for horizontal position */
+  x: MotionValue<number>;
+  /** Motion value for card rotation (-50deg to +50deg) */
+  rotate: MotionValue<number>;
+  /** Motion value for card opacity (fades at edges) */
+  opacity: MotionValue<number>;
+  /** Handler for drag end event from Framer Motion */
+  handleDragEnd: (event: any, info: DragEndInfo) => void;
+  /** Handler for keyboard shortcuts (ArrowLeft/ArrowRight) */
+  handleKeyDown: (event: React.KeyboardEvent) => void;
+  /** Current swipe direction based on x position */
+  swipeDirection: SwipeDirection | null;
+  /** Progress toward threshold (0-1) */
+  swipeProgress: number;
+  /** Native touch start handler for mobile (works on any element) */
+  onTouchStart: (event: React.TouchEvent) => void;
+  /** Native touch end handler for mobile (works on any element) */
+  onTouchEnd: (event: React.TouchEvent) => void;
+}
+
+/**
+ * Hook for swipe gesture detection with Framer Motion
+ *
+ * Features:
+ * - Drag-based swipe detection with configurable threshold
+ * - Motion values for smooth animations (x, rotate, opacity)
+ * - Keyboard shortcuts (ArrowLeft/ArrowRight) for accessibility
+ * - Snap-back animation when swipe is insufficient
+ * - Disabled state support
+ *
+ * @param config - Configuration object with onSwipe callback and optional threshold
+ * @returns Motion values, handlers, and derived state
+ */
+export function useSwipeGesture({
+  onSwipe,
+  threshold = 150,
+  disabled = false,
+}: SwipeConfig): UseSwipeGestureReturn {
+  // Motion value for horizontal drag position
+  const x = useMotionValue(0);
+
+  // Ref to track touch start position and time for native touch events
+  const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
+
+  // Transform x position to rotation (-50deg at -300px, +50deg at +300px)
+  const rotate = useTransform(x, [-300, 300], [-50, 50]);
+
+  // Transform x position to opacity (fade out at edges)
+  const opacity = useTransform(
+    x,
+    [-threshold * 2, -threshold, 0, threshold, threshold * 2],
+    [0.5, 1, 1, 1, 0.5]
+  );
+
+  /**
+   * Handle drag end event
+   * Detects if swipe threshold was crossed, triggers callback or snaps back
+   */
+  const handleDragEnd = (event: any, info: DragEndInfo) => {
+    const swipeDistance = info.offset.x;
+    const absDistance = Math.abs(swipeDistance);
+
+    // Check if swipe threshold was met
+    if (!disabled && absDistance >= threshold) {
+      const direction: SwipeDirection = swipeDistance > 0 ? 'right' : 'left';
+      onSwipe(direction);
+    } else {
+      // Snap back to center
+      x.set(0);
     }
-  }, [enableHaptic, hapticIntensity]);
+  };
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    const touch = e.touches[0];
-    if (!touch) return;
-    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
-  }, []);
+  /**
+   * Handle keyboard shortcuts for accessibility
+   * ArrowRight = swipe right, ArrowLeft = swipe left
+   */
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (disabled) return;
 
-  const handleTouchEnd = useCallback(
+    if (event.key === 'ArrowRight') {
+      onSwipe('right');
+    } else if (event.key === 'ArrowLeft') {
+      onSwipe('left');
+    }
+  };
+
+  /**
+   * Derived swipe direction based on current x position
+   * Uses state to react to motion value changes
+   */
+  const [swipeDirection, setSwipeDirection] = useState<SwipeDirection | null>(null);
+  const [swipeProgress, setSwipeProgress] = useState<number>(0);
+
+  // Subscribe to x motion value changes
+  useEffect(() => {
+    const unsubscribe = x.on('change', (currentX) => {
+      // Update direction
+      if (currentX > 0) {
+        setSwipeDirection('right');
+      } else if (currentX < 0) {
+        setSwipeDirection('left');
+      } else {
+        setSwipeDirection(null);
+      }
+
+      // Update progress
+      const absX = Math.abs(currentX);
+      const progress = absX / threshold;
+      setSwipeProgress(Math.min(progress, 1.0));
+    });
+
+    return unsubscribe;
+  }, [x, threshold]);
+
+  /**
+   * Native touch start handler for mobile
+   * Records the initial touch position and time for swipe detection
+   */
+  const onTouchStart = useCallback(
     (e: React.TouchEvent) => {
-      if (!touchStartRef.current) return;
+      if (disabled) return;
+      touchStartRef.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+        time: Date.now(),
+      };
+    },
+    [disabled]
+  );
 
-      const touch = e.changedTouches[0];
-      if (!touch) return;
+  /**
+   * Native touch end handler for mobile
+   * Detects swipe based on distance, direction, and timing
+   */
+  const onTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      if (disabled || !touchStartRef.current) return;
 
-      const deltaX = touch.clientX - touchStartRef.current.x;
-      const deltaY = touch.clientY - touchStartRef.current.y;
+      const deltaX = e.changedTouches[0].clientX - touchStartRef.current.x;
+      const deltaY = e.changedTouches[0].clientY - touchStartRef.current.y;
+      const deltaTime = Date.now() - touchStartRef.current.time;
 
-      const absDeltaX = Math.abs(deltaX);
-      const absDeltaY = Math.abs(deltaY);
-
-      // Determine if this is a horizontal or vertical swipe
-      if (absDeltaX > absDeltaY && absDeltaX > threshold) {
-        // Horizontal swipe
-        const isSwipeLeft = deltaX < 0;
-
-        if (isRtl) {
-          // RTL: reverse horizontal directions
-          if (isSwipeLeft && onSwipeRight) {
-            triggerHaptic();
-            onSwipeRight();
-          } else if (!isSwipeLeft && onSwipeLeft) {
-            triggerHaptic();
-            onSwipeLeft();
-          }
-        } else {
-          // LTR: normal directions
-          if (isSwipeLeft && onSwipeLeft) {
-            triggerHaptic();
-            onSwipeLeft();
-          } else if (!isSwipeLeft && onSwipeRight) {
-            triggerHaptic();
-            onSwipeRight();
-          }
-        }
-      } else if (absDeltaY > absDeltaX && absDeltaY > threshold) {
-        // Vertical swipe
-        const isSwipeUp = deltaY < 0;
-
-        if (isSwipeUp && onSwipeUp) {
-          triggerHaptic();
-          onSwipeUp();
-        } else if (!isSwipeUp && onSwipeDown) {
-          triggerHaptic();
-          onSwipeDown();
-        }
+      // Only trigger swipe if:
+      // 1. Horizontal movement > vertical (prevent scroll conflicts)
+      // 2. Distance exceeds threshold
+      // 3. Gesture was quick enough (< 300ms) to be intentional
+      if (
+        Math.abs(deltaX) > Math.abs(deltaY) &&
+        Math.abs(deltaX) >= threshold &&
+        deltaTime < 300
+      ) {
+        onSwipe(deltaX > 0 ? 'right' : 'left');
       }
 
       touchStartRef.current = null;
     },
-    [onSwipeLeft, onSwipeRight, onSwipeUp, onSwipeDown, threshold, isRtl, triggerHaptic]
+    [disabled, threshold, onSwipe]
   );
 
   return {
-    onTouchStart: handleTouchStart,
-    onTouchEnd: handleTouchEnd,
+    x,
+    rotate,
+    opacity,
+    handleDragEnd,
+    handleKeyDown,
+    swipeDirection,
+    swipeProgress,
+    onTouchStart,
+    onTouchEnd,
   };
 }

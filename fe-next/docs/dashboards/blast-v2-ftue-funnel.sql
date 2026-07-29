@@ -1,0 +1,18 @@
+-- FTUE Funnel: Level 1 Start → Level 1 Complete → Level 5 → Level 10
+-- Setup: In PostHog, create Funnel insight with steps:
+--  1. blast_level_started WHERE level = 1
+--  2. blast_level_completed WHERE level = 1
+--  3. blast_level_started WHERE level = 5
+--  4. blast_level_started WHERE level = 10
+--
+-- Measure: % conversion per step
+-- Target: >85% L1→L1C, >50% L1C→L5, >25% L5→L10 (3-month)
+--
+-- Interpretation:
+-- - Step 1-2: New player retention after FTUE intro
+-- - Step 2-3: Player progression willingness (moved beyond first level)
+-- - Step 3-4: Deep engagement (willing to go to 10x levels)
+--
+-- Alerts:
+-- - If L1→L1C < 70%, FTUE may be confusing or too hard
+-- - If L1C→L5 < 30%, content difficulty ramp may be too steep

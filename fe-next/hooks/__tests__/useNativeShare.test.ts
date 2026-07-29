@@ -3,6 +3,7 @@
  * Comprehensive test coverage for native Web Share API functionality
  */
 
+import { vi } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useNativeShare } from '../useNativeShare';
 
@@ -40,7 +41,7 @@ describe('useNativeShare', () => {
     it('should return true when navigator.share is available', () => {
       global.navigator = {
         ...originalNavigator,
-        share: jest.fn().mockResolvedValue(undefined),
+        share: vi.fn().mockResolvedValue(undefined),
       } as any;
 
       const { result } = renderHook(() => useNativeShare());
@@ -74,7 +75,7 @@ describe('useNativeShare', () => {
 
   describe('Share Success', () => {
     it('should return true when share is successful', async () => {
-      const mockShare = jest.fn().mockResolvedValue(undefined);
+      const mockShare = vi.fn().mockResolvedValue(undefined);
       global.navigator = {
         ...originalNavigator,
         share: mockShare,
@@ -98,7 +99,7 @@ describe('useNativeShare', () => {
     });
 
     it('should call navigator.share with correct data', async () => {
-      const mockShare = jest.fn().mockResolvedValue(undefined);
+      const mockShare = vi.fn().mockResolvedValue(undefined);
       global.navigator = {
         ...originalNavigator,
         share: mockShare,
@@ -128,7 +129,7 @@ describe('useNativeShare', () => {
     it('should return false when user cancels share (AbortError)', async () => {
       const abortError = new Error('User cancelled');
       abortError.name = 'AbortError';
-      const mockShare = jest.fn().mockRejectedValue(abortError);
+      const mockShare = vi.fn().mockRejectedValue(abortError);
 
       global.navigator = {
         ...originalNavigator,
@@ -153,10 +154,10 @@ describe('useNativeShare', () => {
     });
 
     it('should not log error for AbortError (user cancelled)', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation();
       const abortError = new Error('User cancelled');
       abortError.name = 'AbortError';
-      const mockShare = jest.fn().mockRejectedValue(abortError);
+      const mockShare = vi.fn().mockRejectedValue(abortError);
 
       global.navigator = {
         ...originalNavigator,
@@ -180,10 +181,10 @@ describe('useNativeShare', () => {
 
   describe('Error Handling', () => {
     it('should handle NotAllowedError (permission denied)', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation();
       const permissionError = new Error('Permission denied');
       permissionError.name = 'NotAllowedError';
-      const mockShare = jest.fn().mockRejectedValue(permissionError);
+      const mockShare = vi.fn().mockRejectedValue(permissionError);
 
       global.navigator = {
         ...originalNavigator,
@@ -207,9 +208,9 @@ describe('useNativeShare', () => {
     });
 
     it('should handle TypeError (invalid data)', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation();
       const typeError = new TypeError('Invalid share data');
-      const mockShare = jest.fn().mockRejectedValue(typeError);
+      const mockShare = vi.fn().mockRejectedValue(typeError);
 
       global.navigator = {
         ...originalNavigator,
@@ -233,9 +234,9 @@ describe('useNativeShare', () => {
     });
 
     it('should handle generic errors', async () => {
-      const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
+      const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation();
       const genericError = new Error('Something went wrong');
-      const mockShare = jest.fn().mockRejectedValue(genericError);
+      const mockShare = vi.fn().mockRejectedValue(genericError);
 
       global.navigator = {
         ...originalNavigator,
@@ -281,7 +282,7 @@ describe('useNativeShare', () => {
     });
 
     it('should call nativeShare when share is available', async () => {
-      const mockShare = jest.fn().mockResolvedValue(undefined);
+      const mockShare = vi.fn().mockResolvedValue(undefined);
       global.navigator = {
         ...originalNavigator,
         share: mockShare,
@@ -307,7 +308,7 @@ describe('useNativeShare', () => {
     it('should return share result from nativeShare', async () => {
       const abortError = new Error('User cancelled');
       abortError.name = 'AbortError';
-      const mockShare = jest.fn().mockRejectedValue(abortError);
+      const mockShare = vi.fn().mockRejectedValue(abortError);
 
       global.navigator = {
         ...originalNavigator,
@@ -331,7 +332,7 @@ describe('useNativeShare', () => {
 
   describe('Callback Stability', () => {
     it('should have stable callback references', () => {
-      const mockShare = jest.fn().mockResolvedValue(undefined);
+      const mockShare = vi.fn().mockResolvedValue(undefined);
       global.navigator = {
         ...originalNavigator,
         share: mockShare,
@@ -350,7 +351,7 @@ describe('useNativeShare', () => {
 
     it('should update callbacks when canNativeShare changes', () => {
       // Start with share available
-      const mockShare = jest.fn().mockResolvedValue(undefined);
+      const mockShare = vi.fn().mockResolvedValue(undefined);
       global.navigator = {
         ...originalNavigator,
         share: mockShare,
@@ -379,7 +380,7 @@ describe('useNativeShare', () => {
 
   describe('Return Value Interface', () => {
     it('should return all expected properties', () => {
-      const mockShare = jest.fn().mockResolvedValue(undefined);
+      const mockShare = vi.fn().mockResolvedValue(undefined);
       global.navigator = {
         ...originalNavigator,
         share: mockShare,

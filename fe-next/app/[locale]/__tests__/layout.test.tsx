@@ -1,0 +1,147 @@
+import { vi, type Mock, } from 'vitest';
+import { render } from '@testing-library/react';
+
+// Mock next/dynamic
+vi.mock('next/dynamic', () => ({
+    __esModule: true,
+    default: () => {
+        const Component = () => null;
+        Component.displayName = 'DynamicComponent';
+        return Component;
+    },
+}));
+
+// Mock next/script - render as script tag for testing
+vi.mock('next/script', () => ({
+    __esModule: true,
+    default: ({ src, strategy, crossOrigin, ...props }: any) => (
+        // eslint-disable-next-line @next/next/no-sync-scripts
+        <script src={src} data-strategy={strategy} crossOrigin={crossOrigin} {...props} />
+    ),
+}));
+
+// Mock all child components
+vi.mock('@/components/Footer', () => ({
+    __esModule: true,
+    default: () => null,
+}));
+
+vi.mock('@/components/GoogleAnalytics', () => ({
+    __esModule: true,
+    default: () => null,
+}));
+
+vi.mock('@/components/CrazyGamesScriptServer', () => ({
+    __esModule: true,
+    default: () => null,
+}));
+
+vi.mock('@/components/SocialMediaPixels', () => ({
+    __esModule: true,
+    default: () => null,
+}));
+
+vi.mock('@/components/WebVitalsReporter', () => ({
+    __esModule: true,
+    default: () => null,
+}));
+
+vi.mock('@/components/PWAInstallPrompt', () => ({
+    __esModule: true,
+    default: () => null,
+}));
+
+vi.mock('@/components/ServiceWorkerRegistration', () => ({
+    __esModule: true,
+    default: () => null,
+}));
+
+vi.mock('@/components/celebration/NewYearCountdown', () => ({
+    __esModule: true,
+    default: () => null,
+}));
+
+// Mock the providers with minimal context
+const mockLanguageContext = {
+    t: (key: string) => key,
+    language: 'en' as const,
+    setLanguage: vi.fn(),
+    dir: 'ltr' as const,
+    currentFlag: '🇺🇸',
+};
+
+const mockNavigationContext = {
+    shouldHideNav: false,
+};
+
+vi.mock('@/contexts/LanguageContext', () => ({
+    LanguageContext: {
+        Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    },
+    useLanguage: () => mockLanguageContext,
+}));
+
+vi.mock('@/contexts/NavigationContext', () => ({
+    NavigationContext: {
+        Provider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+    },
+    useNavigation: () => mockNavigationContext,
+}));
+
+vi.mock('../../providers', () => ({
+    Providers: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
+vi.mock('../../fonts', () => ({
+    fredoka: { variable: 'fredoka-var' },
+    rubik: { variable: 'rubik-var' },
+    fredokaLatin: { variable: 'fredoka-latin-var' },
+    fredokaHebrew: { variable: 'fredoka-hebrew-var' },
+    rubikLatin: { variable: 'rubik-latin-var' },
+    rubikHebrew: { variable: 'rubik-hebrew-var' },
+}));
+
+describe('LocaleLayout Hydration', () => {
+    it('should render without hydration mismatch', { timeout: 30000 }, async () => {
+        const LocaleLayout = (await import('../layout')).default;
+
+        // Spy on console.error to catch React hydration warnings
+        const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        const params = Promise.resolve({ locale: 'en' });
+        const { container } = render(
+            await LocaleLayout({
+                children: <div data-testid="test-content">Test Content</div>,
+                params,
+            })
+        );
+
+        // The layout renders as an html element, which testing-library handles
+        // by mounting it in the test container. Just verify it renders something.
+        expect(container).toBeTruthy();
+        expect(container.innerHTML).toBeTruthy();
+
+        // Check for skip link text which should always be present
+        expect(container.textContent).toContain('Skip to main content');
+
+        // AdSense script must NOT load on localhost/dev/native WebView.
+        // GoogleAdSense.tsx gates itself on hostname + NODE_ENV + Capacitor, so
+        // under vitest (jsdom, localhost, NODE_ENV=test) no <script> should emit.
+        const scripts = document.querySelectorAll('script');
+        const adsenseScript = Array.from(scripts).find(s =>
+            s.getAttribute('src')?.includes('adsbygoogle.js')
+        );
+        expect(adsenseScript).toBeUndefined();
+
+        // Check for hydration errors
+        const hydrationErrors = consoleError.mock.calls.filter(call =>
+            call[0]?.toString().includes('Hydration') ||
+            call[0]?.toString().includes('did not match')
+        );
+
+        expect(hydrationErrors.length).toBe(0);
+
+        consoleError.mockRestore();
+    });
+
+});

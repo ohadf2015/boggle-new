@@ -73,8 +73,10 @@ export async function GET(request: NextRequest) {
     const puzzleNumber = searchParams.get('puzzleNumber') || '';
     const locale = searchParams.get('locale') || 'en';
 
-    // Construct avatar image URL - prioritize direct URL, then local avatar
-    const origin = new URL(request.url).origin;
+    // Construct avatar image URL - prioritize direct URL, then local avatar.
+    // Use a fixed public origin — request.url resolves to container origin (localhost:$PORT)
+    // behind Railway's proxy, and forwarded headers are user-controllable (SSRF risk).
+    const origin = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
     const avatarImageUrl = avatarUrl || (avatarImage ? `${origin}/avatars/${avatarImage}` : null);
 
     const challenge = CHALLENGE[locale] || CHALLENGE.en;
@@ -253,7 +255,8 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('Error generating Word Hunt OG image:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error generating Word Hunt OG image:', errorMessage);
     return new Response('Failed to generate image', { status: 500 });
   }
 }

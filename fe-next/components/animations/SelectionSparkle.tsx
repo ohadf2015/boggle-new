@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useState, useCallback, memo, useRef, useReducer } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -68,25 +68,45 @@ const COLOR_SCHEMES = {
  * />
  * ```
  */
+// Default size range - defined outside component to prevent reference changes
+const DEFAULT_SIZE_RANGE: [number, number] = [3, 6];
+
 export const SelectionSparkle = memo(function SelectionSparkle({
   position,
   triggerKey,
   colorScheme = 'default',
   particleCount = 8,
   spreadRadius = 40,
-  sizeRange = [3, 6],
+  sizeRange = DEFAULT_SIZE_RANGE,
   duration = 400,
   useSquareParticles = true,
   className,
 }: SelectionSparkleProps) {
   const { isLowEnd, prefersReducedMotion, maxParticles, enableComplexAnimations } =
     useDevicePerformance();
-  const [particles, setParticles] = useState<SparkleParticle[]>([]);
-  const [isActive, setIsActive] = useState(false);
+  // Batch particles + isActive — they always change together on trigger start/end
+  type SparkleState = { particles: SparkleParticle[]; isActive: boolean };
+  type SparkleAction = { type: 'start'; particles: SparkleParticle[] } | { type: 'end' };
+  const [sparkleState, dispatchSparkle] = useReducer(
+    (state: SparkleState, action: SparkleAction): SparkleState => {
+      switch (action.type) {
+        case 'start': return { particles: action.particles, isActive: true };
+        case 'end': return { particles: [], isActive: false };
+        default: return state;
+      }
+    },
+    { particles: [], isActive: false }
+  );
+  const { particles, isActive } = sparkleState;
+
+  // Use ref for position to avoid dependency array issues
+  // Position changes should NOT trigger the effect - only triggerKey should
+  const positionRef = useRef(position);
+  positionRef.current = position;
 
   const colors = COLOR_SCHEMES[colorScheme];
 
-  // Generate particles
+  // Generate particles - use stable reference by reading from ref
   const generateParticles = useCallback(
     (pos: { x: number; y: number }): SparkleParticle[] => {
       const count = Math.min(particleCount, isLowEnd ? 4 : maxParticles);
@@ -104,21 +124,23 @@ export const SelectionSparkle = memo(function SelectionSparkle({
     [particleCount, isLowEnd, maxParticles, sizeRange, spreadRadius, colors]
   );
 
-  // Trigger effect when key changes
+  // Trigger effect ONLY when triggerKey changes
+  // Position is read from ref to avoid stale closure while keeping effect stable
   useEffect(() => {
-    if (position && enableComplexAnimations) {
-      setParticles(generateParticles(position));
-      setIsActive(true);
+    const currentPosition = positionRef.current;
+    if (currentPosition && enableComplexAnimations) {
+      // dispatch batches particles + isActive in one update
+      dispatchSparkle({ type: 'start', particles: generateParticles(currentPosition) });
 
       const timer = setTimeout(() => {
-        setIsActive(false);
-        setParticles([]);
+        dispatchSparkle({ type: 'end' });
       }, duration + 100);
 
       return () => clearTimeout(timer);
     }
     return undefined;
-  }, [triggerKey, position, generateParticles, duration, enableComplexAnimations]);
+    // NOTE: position is intentionally excluded - triggerKey is the trigger mechanism
+  }, [triggerKey, generateParticles, duration, enableComplexAnimations]);
 
   // Skip for reduced motion or disabled animations
   if (prefersReducedMotion || !enableComplexAnimations || !isActive) {
@@ -134,7 +156,7 @@ export const SelectionSparkle = memo(function SelectionSparkle({
           const endY = Math.sin(radians) * particle.distance;
 
           return (
-            <motion.div
+            <m.div
               key={particle.id}
               className="absolute"
               style={{
@@ -184,14 +206,14 @@ export const SelectionSparkle = memo(function SelectionSparkle({
                   }}
                 />
               )}
-            </motion.div>
+            </m.div>
           );
         })}
       </AnimatePresence>
 
       {/* Central flash */}
       {position && !isLowEnd && (
-        <motion.div
+        <m.div
           key={`flash-${triggerKey}`}
           className="absolute rounded-full"
           style={{

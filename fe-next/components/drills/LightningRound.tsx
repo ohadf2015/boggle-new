@@ -1,17 +1,21 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Clock, Trophy, RotateCcw, Target } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { Clock, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
+import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
+import LightningRoundCompletePhase from './LightningRoundCompletePhase';
+import DrillBriefing from '@/components/brain/DrillBriefing';
 import type { LetterGrid, Language } from '@/types';
+import { calculateWordScore } from '@/shared/utils/scoring';
+import { calculateForgivingDrillScore } from '@/shared/utils/drillScoring';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -35,6 +39,7 @@ interface LightningRoundProps {
     wordsPerMinute: number;
   }) => void;
   onExit?: () => void;
+  onPlayAgain?: () => void;
 }
 
 type GamePhase = 'ready' | 'playing' | 'complete';
@@ -52,11 +57,10 @@ export default function LightningRound({
   language = 'en',
   onComplete,
   onExit,
+  onPlayAgain,
 }: LightningRoundProps) {
-  const { theme } = useTheme();
-  const { t } = useLanguage();
-  const { playErrorSound } = useSoundEffects();
-  const isDarkMode = theme === 'dark';
+  const { t, dir } = useLanguage();
+  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -69,11 +73,16 @@ export default function LightningRound({
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Available word set for quick lookup
-  const availableWordSet = useMemo(
-    () => new Set(availableWords.map(w => w.word.toUpperCase())),
-    [availableWords]
-  );
+  const { validateWord } = useDrillWordSubmit({
+    grid,
+    language,
+    availableWords,
+    wordsFound,
+    phase,
+    playingPhase: 'playing',
+    playErrorSound,
+    t,
+  });
 
   // Keyboard support for desktop users
   const keyboard = useDrillKeyboardSupport({
@@ -86,6 +95,7 @@ export default function LightningRound({
 
   // Start game
   const startGame = useCallback(() => {
+    playDrillStartSound();
     setPhase('playing');
     setTimeRemaining(levelConfig.timeLimit);
     setWordsFound([]);
@@ -102,7 +112,7 @@ export default function LightningRound({
         return prev - 1;
       });
     }, 1000);
-  }, [levelConfig.timeLimit]);
+  }, [levelConfig.timeLimit, playDrillStartSound]);
 
   // Finish game early (saves progress)
   const finishGame = useCallback(() => {
@@ -112,37 +122,18 @@ export default function LightningRound({
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
-    if (phase !== 'playing') return;
-
-    const upperWord = word.toUpperCase();
-
-    // Check if word can be formed on the board
-    if (!isWordOnBoard(upperWord, grid, language)) {
-      setFeedback({ message: t('brain.drills.errors.notOnBoard') || 'Word not on board', type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    // Check if already found
-    if (wordsFound.includes(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.alreadyFound') || 'Already found', type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    // Check if word is in available words list
-    if (!availableWordSet.has(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.invalidWord') || 'Invalid word', type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
+    const { valid, upperWord, error } = validateWord(word);
+    if (!valid) {
+      if (error && error !== 'notPlaying') {
+        setFeedback({ message: error, type: 'error' });
+        setTimeout(() => setFeedback(null), 2000);
+      }
       return;
     }
 
     // Valid word!
     setWordsFound(prev => [...prev, upperWord]);
-    const wordScore = word.length * 10;
+    const wordScore = calculateWordScore(word);
     setScore(prev => prev + wordScore);
     setLastWordScore(wordScore);
 
@@ -151,7 +142,7 @@ export default function LightningRound({
       setLastWordScore(null);
       setFeedback(null);
     }, 1000);
-  }, [phase, availableWordSet, wordsFound, grid, language, t, playErrorSound]);
+  }, [validateWord, t]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -171,12 +162,8 @@ export default function LightningRound({
     };
   }, [score, wordsFound.length, level, levelConfig.timeLimit]);
 
-  // Handle completion
-  useEffect(() => {
-    if (phase === 'complete') {
-      onComplete(getResults());
-    }
-  }, [phase, getResults, onComplete]);
+  // Handle completion (idempotent — see useDrillCompleteOnce)
+  useDrillCompleteOnce(phase, getResults, onComplete, playDrillCompleteSound);
 
   // Cleanup timer
   useEffect(() => {
@@ -189,28 +176,28 @@ export default function LightningRound({
   const getTimeColor = () => {
     if (timeRemaining <= 5) return 'text-neo-red';
     if (timeRemaining <= 10) return 'text-neo-orange';
-    return isDarkMode ? 'text-neo-lime' : 'text-neo-purple';
+    return 'text-neo-lime';
   };
 
   return (
-    <div className={cn(
+    <div dir={dir} className={cn(
       'flex flex-col h-full',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+      'bg-neo-navy'
     )}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
           {/* Timer */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            'bg-neo-navy-elevated'
           )}>
             <Clock className={cn('w-4 h-4', getTimeColor())} />
-            <span className={cn('font-black text-lg tabular-nums', getTimeColor())}>
+            <span role="status" className={cn('font-black text-lg tabular-nums', getTimeColor())}>
               {timeRemaining}s
             </span>
           </div>
@@ -218,7 +205,7 @@ export default function LightningRound({
           {/* Words found */}
           <div className={cn(
             'px-2 py-1 rounded border-2 border-neo-black text-xs font-bold',
-            isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-neo-cream text-neo-black'
+            'bg-neo-navy-elevated text-neo-white'
           )}>
             {wordsFound.length} {t('brain.drills.wordsFound')}
           </div>
@@ -226,84 +213,49 @@ export default function LightningRound({
 
         {/* Score */}
         <div className="relative">
-          <div className={cn(
+          <div aria-live="polite" className={cn(
             'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-            isDarkMode ? 'bg-neo-lime text-neo-black' : 'bg-neo-lime text-neo-black'
+            'bg-neo-lime text-neo-black'
           )}>
             {score} {t('brain.drills.points')}
           </div>
 
           {/* Score popup */}
-          <AnimatePresence>
+          <AdaptiveAnimatePresence>
             {lastWordScore && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: -20 }}
                 exit={{ opacity: 0 }}
                 className="absolute -top-2 right-0 text-neo-green font-bold text-sm"
               >
                 +{lastWordScore}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
-          </AnimatePresence>
+          </AdaptiveAnimatePresence>
         </div>
       </div>
 
       {/* Game Area */}
-      <div className="flex-1 flex flex-col items-center justify-center p-4">
+      <div className="flex-1 min-h-0 overflow-x-hidden overflow-y-auto flex flex-col items-center justify-start p-4">
         {/* Ready Phase */}
         {phase === 'ready' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <Zap className={cn(
-              'w-20 h-20 mx-auto',
-              isDarkMode ? 'text-neo-lime' : 'text-neo-lime'
-            )} />
-            <h2 className={cn(
-              'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {t('brain.drills.lightning-round.name')}
-            </h2>
-            <p className={cn(
-              'text-sm max-w-xs',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-            )}>
-              {t('brain.drills.lightning-round.description')}
-            </p>
-            <div className={cn(
-              'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}>
-              <p>{t('brain.drills.level')}: {level}</p>
-              <p>{t('brain.drills.timeLimit')}: {levelConfig.timeLimit}s</p>
-            </div>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={startGame}
-              className={cn(
-                'px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard',
-                'font-bold text-lg uppercase',
-                'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
-                'bg-neo-lime text-neo-black'
-              )}
-            >
-              {t('brain.drills.start')}
-            </motion.button>
-          </motion.div>
+          <DrillBriefing
+            drillId="lightning-round"
+            level={level}
+            goalText={`${t('brain.drills.timeLimit')}: ${levelConfig.timeLimit}s · ${t('brain.drills.target')}: ${levelConfig.targetWords} ${t('brain.drills.wordsFound')}`}
+            onStart={() => { playDrillStartSound(); startGame(); }}
+          />
         )}
 
         {/* Playing Phase */}
         {phase === 'playing' && (
-          <div className="w-full max-w-md space-y-4">
+          <div className="w-full max-w-md lg:max-w-lg space-y-4">
             <div className="flex items-center justify-center gap-2">
               <Zap className="w-5 h-5 text-neo-lime animate-pulse" />
               <span className={cn(
                 'font-bold uppercase',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}>
                 {t('brain.drills.lightning-round.name')}
               </span>
@@ -320,7 +272,7 @@ export default function LightningRound({
 
             {/* Keyboard typed word display */}
             {keyboard.isTypingMode && keyboard.typedWord && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
@@ -331,47 +283,60 @@ export default function LightningRound({
                 )}
               >
                 {keyboard.typedWord}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
 
-            {/* Feedback message */}
-            <AnimatePresence>
-              {feedback && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className={cn(
-                    'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
-                    feedback.type === 'error'
-                      ? 'bg-neo-red text-neo-white'
-                      : 'bg-neo-green text-neo-black'
-                  )}
-                >
-                  {feedback.message}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Recent words */}
-            {wordsFound.length > 0 && (
-              <div className={cn(
-                'flex flex-wrap gap-2 justify-center p-3 rounded-neo border-2 border-neo-black max-h-28 overflow-y-auto',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
-              )}>
-                {wordsFound.slice(-10).map((word, i) => (
-                  <span
-                    key={i}
+            {/* Feedback message — fixed-height slot so toggling doesn't shift the grid */}
+            <div className="min-h-[2.75rem] flex items-center justify-center">
+              <AdaptiveAnimatePresence>
+                {feedback && (
+                  <AdaptiveMotion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    role="status"
+                    aria-live={feedback.type === 'error' ? 'assertive' : 'polite'}
+                    aria-atomic="true"
                     className={cn(
-                      'px-3 py-1 rounded-neo text-sm font-bold',
+                      'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
+                      feedback.type === 'error'
+                        ? 'bg-neo-red text-neo-white'
+                        : 'bg-neo-green text-neo-black'
+                    )}
+                  >
+                    {feedback.message}
+                  </AdaptiveMotion.div>
+                )}
+              </AdaptiveAnimatePresence>
+            </div>
+
+            {/* Recent words — always-rendered, fixed height: it scrolls instead of
+                growing, so the centered grid never re-positions on submit (CLS fix). */}
+            <div
+              data-testid="drill-found-words"
+              className={cn(
+                'flex flex-wrap gap-2 justify-center content-start p-3 rounded-neo border-2 border-neo-black h-28 overflow-y-auto',
+                'bg-neo-navy-light'
+              )}
+            >
+              {wordsFound.length === 0 ? (
+                <span className="self-center text-xs text-neo-white">
+                  {t('brain.drills.foundWordsHint')}
+                </span>
+              ) : (
+                wordsFound.slice(-10).map((word, i) => (
+                  <span
+                    key={`${word}-${i}`}
+                    className={cn(
+                      'px-3 py-1 rounded-neo text-sm font-bold h-fit',
                       'bg-neo-green/20 text-neo-green border border-neo-green/30'
                     )}
                   >
                     {word}
                   </span>
-                ))}
-              </div>
-            )}
+                ))
+              )}
+            </div>
 
             {/* Keyboard UI - Desktop only */}
             {keyboard.isDesktop && (
@@ -391,143 +356,48 @@ export default function LightningRound({
             )}
 
             {/* Finish Game Button */}
-            <motion.button
+            <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={finishGame}
+              aria-label={t('brain.drills.finishGame')}
               className={cn(
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
-                'transition-all hover:translate-y-[-1px]',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                'transition-all hover:-translate-y-px',
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
-              {t('brain.drills.finishGame') || 'Finish Game'}
-            </motion.button>
+              {t('brain.drills.finishGame')}
+            </AdaptiveMotion.button>
           </div>
         )}
 
         {/* Complete Phase */}
-        {phase === 'complete' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', damping: 12, delay: 0.2 }}
-            >
-              <Trophy className="w-20 h-20 mx-auto text-neo-lime" />
-            </motion.div>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className={cn(
-                'text-2xl font-black',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
-              )}
-            >
-              {t('brain.drills.complete')}
-            </motion.h2>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className={cn(
-                'p-4 rounded-neo border-3 border-neo-black space-y-3',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
-              )}
-            >
-              {/* Animated Score */}
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.7, type: 'spring' }}
-                className="text-3xl font-black text-neo-lime"
-              >
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  {score}
-                </motion.span> {t('brain.drills.points')}
-              </motion.div>
-              
-              {/* Animated Stats Grid */}
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-                  )}
-                >
-                  <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
-                    {wordsFound.length}
-                  </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                    {t('brain.drills.wordsFound')}
-                  </p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-                  )}
-                >
-                  <Zap className="w-6 h-6 mx-auto text-neo-lime mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-cyan' : 'text-neo-purple')}>
-                    {getResults().wordsPerMinute}
-                  </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                    {t('brain.drills.wpm')}
-                  </p>
-                </motion.div>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="flex gap-3 justify-center"
-            >
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  setPhase('ready');
-                  setWordsFound([]);
-                  setScore(0);
-                }}
-                className={cn(
-                  'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
-                  'font-bold uppercase',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
-                )}
-              >
-                <RotateCcw className="w-5 h-5" />
-                {t('brain.drills.playAgain')}
-              </motion.button>
-              {onExit && (
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onExit}
-                  className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-lime text-neo-black"
-                >
-                  {t('brain.drills.exit')}
-                </motion.button>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
+        {phase === 'complete' && (() => {
+          const forgiving = calculateForgivingDrillScore({
+            level,
+            rawScore: score,
+            wordsFound: wordsFound.length,
+            target: levelConfig.targetWords,
+            setbacks: 0,
+            maxSetbacks: 1,
+          });
+          return (
+            <LightningRoundCompletePhase
+              level={level}
+              forgivingScore={forgiving}
+              wordsFoundCount={wordsFound.length}
+              wordsPerMinute={getResults().wordsPerMinute}
+              onPlayAgain={() => {
+                setPhase('ready');
+                setWordsFound([]);
+                setScore(0);
+                onPlayAgain?.();
+              }}
+              onExit={onExit}
+            />
+          );
+        })()}
       </div>
     </div>
   );

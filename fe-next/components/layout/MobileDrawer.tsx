@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Drawer } from 'vaul';
 import { X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Button } from '../ui/button';
@@ -14,11 +14,20 @@ interface MobileDrawerProps {
   /** Height variant: 'auto' fits content, 'half' is 50vh, 'full' is nearly full screen */
   height?: 'auto' | 'half' | 'full';
   className?: string;
+  /** Accessible label for the close button (should be translated) */
+  closeLabel?: string;
 }
+
+const snapPointsMap = {
+  auto: undefined,
+  half: [0.5],
+  full: [0.95],
+};
 
 /**
  * Mobile-friendly slide-up drawer for secondary content.
  * Uses Neo-Brutalist styling with hard shadows and thick borders.
+ * Powered by vaul — supports native swipe-to-dismiss gesture.
  */
 export function MobileDrawer({
   isOpen,
@@ -27,6 +36,7 @@ export function MobileDrawer({
   children,
   height = 'half',
   className,
+  closeLabel,
 }: MobileDrawerProps) {
   const heightClasses = {
     auto: 'max-h-[85vh]',
@@ -34,57 +44,52 @@ export function MobileDrawer({
     full: 'h-[calc(100vh-48px)]',
   };
 
+  const snapPoints = snapPointsMap[height];
+
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 z-[55] bg-neo-black/50"
-          />
+    <Drawer.Root
+      open={isOpen}
+      onOpenChange={(open) => { if (!open) onClose(); }}
+      snapPoints={snapPoints}
+    >
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 z-55 bg-neo-black/50" />
+        <Drawer.Content
+          className={cn(
+            'mobile-drawer',
+            heightClasses[height],
+            'overflow-hidden flex flex-col z-[60] fixed inset-x-0 bottom-0 bg-neo-cream rounded-t-2xl border-t-4 border-x-4 border-neo-black outline-hidden',
+            className,
+          )}
+        >
+          {/* Drag handle */}
+          <div className="mx-auto mt-2 mb-1 h-1.5 w-12 rounded-full bg-neo-black/20" />
 
-          {/* Drawer */}
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className={cn(
-              'mobile-drawer',
-              heightClasses[height],
-              'overflow-hidden flex flex-col z-[60]',
-              className
-            )}
-          >
-            {/* Header */}
-            {title && (
-              <div className="flex items-center justify-between px-4 py-3 border-b-4 border-neo-black bg-neo-lime text-neo-black">
-                <h3 className="font-bold uppercase tracking-wide text-neo-black">
-                  {title}
-                </h3>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={onClose}
-                  className="h-8 w-8 border-2"
-                >
-                  <X />
-                </Button>
-              </div>
-            )}
-
-            {/* Content */}
-            <div className="flex-1 overflow-auto p-4">
-              {children}
+          {/* Header */}
+          {title && (
+            <div className="flex items-center justify-between px-4 py-3 border-b-4 border-neo-black bg-neo-lime text-neo-black">
+              <Drawer.Title className="font-bold uppercase tracking-wide text-neo-black">
+                {title}
+              </Drawer.Title>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onClose}
+                aria-label={closeLabel || 'Close'}
+                className="h-8 w-8 border-2 border-neo-black text-neo-black hover:bg-neo-black/10"
+              >
+                <X className="text-neo-black" />
+              </Button>
             </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
+          )}
+
+          {/* Content */}
+          <div className="flex-1 overflow-auto p-4">
+            {children}
+          </div>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   );
 }
 

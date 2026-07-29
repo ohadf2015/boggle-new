@@ -138,10 +138,9 @@ export function usePullToRefresh(options: PullToRefreshOptions) {
 
     // Only pull down when at top of scroll and pulling down
     if (deltaY > 10 && currentScrollTop <= 1) {
-      // Prevent default scroll behavior while pulling
-      if (e.cancelable) {
-        e.preventDefault();
-      }
+      // Note: we rely on CSS overscroll-behavior-y:contain on the scroll
+      // container (.screen-fit) instead of e.preventDefault() so that
+      // touch listeners stay passive and don't block compositor scrolling.
 
       // Apply resistance to make it feel natural
       const pullDistance = Math.min(

@@ -5,6 +5,12 @@
  * Used to show combo, earthquake, and fire round explanations only once.
  */
 
+import {
+  getJsonFromLocalStorage,
+  saveJsonToLocalStorage,
+  removeFromLocalStorage,
+} from '@/utils/storageHelpers';
+
 const STORAGE_KEY = 'lexiclash_contextual_guidance';
 
 export interface GuidanceState {
@@ -19,6 +25,10 @@ export interface GuidanceState {
   dragTutorialShown: boolean;
   /** Whether the user has completed the first-play tutorial by making a word with combined directions */
   firstPlayTutorialCompleted: boolean;
+  /** Whether the user has seen the multiplayer "How to Play" tutorial modal */
+  multiplayerTutorialShown: boolean;
+  /** Whether the in-game MP stuck-player coach has been shown (one-shot across sessions) */
+  stuckCoachShown: boolean;
 }
 
 const DEFAULT_STATE: GuidanceState = {
@@ -30,36 +40,25 @@ const DEFAULT_STATE: GuidanceState = {
   effectsPreferenceShown: false,
   dragTutorialShown: false,
   firstPlayTutorialCompleted: false,
+  multiplayerTutorialShown: false,
+  stuckCoachShown: false,
 };
 
 /**
  * Get the current guidance state from localStorage
  */
 export function getGuidanceState(): GuidanceState {
-  if (typeof window === 'undefined') {
-    return DEFAULT_STATE;
-  }
-
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) {
-      return DEFAULT_STATE;
-    }
-    return { ...DEFAULT_STATE, ...JSON.parse(stored) };
-  } catch {
-    return DEFAULT_STATE;
-  }
+  const stored = getJsonFromLocalStorage<Partial<GuidanceState>>(STORAGE_KEY, {});
+  return { ...DEFAULT_STATE, ...stored };
 }
 
 /**
  * Mark a specific guidance type as shown
  */
 export function markGuidanceShown(key: keyof GuidanceState): void {
-  if (typeof window === 'undefined') return;
-
   const state = getGuidanceState();
   state[key] = true;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  saveJsonToLocalStorage(STORAGE_KEY, state);
 }
 
 /**
@@ -73,8 +72,7 @@ export function shouldShowGuidance(key: keyof GuidanceState): boolean {
  * Reset all guidance state (useful for testing or "show tutorial again")
  */
 export function resetGuidance(): void {
-  if (typeof window === 'undefined') return;
-  localStorage.removeItem(STORAGE_KEY);
+  removeFromLocalStorage(STORAGE_KEY);
 }
 
 /**

@@ -1,0 +1,30 @@
+{
+  "count": 24,
+  "batches": [
+    "input-01.json",
+    "input-02.json",
+    "input-03.json",
+    "input-04.json",
+    "input-05.json",
+    "input-06.json",
+    "input-07.json",
+    "input-08.json",
+    "input-09.json",
+    "input-10.json",
+    "input-11.json",
+    "input-12.json",
+    "input-13.json",
+    "input-14.json",
+    "input-15.json",
+    "input-16.json",
+    "input-17.json",
+    "input-18.json",
+    "input-19.json",
+    "input-20.json",
+    "input-21.json",
+    "input-22.json",
+    "input-23.json",
+    "input-24.json"
+  ],
+  "words": 2398
+}

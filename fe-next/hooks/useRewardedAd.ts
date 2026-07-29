@@ -1,12 +1,99 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { Howler } from 'howler';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
-import { useIMAVideoAds } from '@/components/ads/IMAVideoAdsProvider';
-import { useGoogleAds } from '@/components/ads/GoogleAdsProvider';
+import { useAdMob } from '@/hooks/useAdMob';
+import { useH5GamesAds } from '@/hooks/useH5GamesAds';
+import { useGameDistributionAds } from '@/hooks/useGameDistributionAds';
+import { getGdGameId } from '@/lib/ads/gameDistributionAds';
+import { useAyetVideoAds } from '@/hooks/useAyetVideoAds';
+import { getAyetPlacementId } from '@/lib/ads/ayetVideoAds';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { emitRewardAdActive } from '@/hooks/useRewardAdPause';
+import { trackRewardedAdOffered, trackRewardedAdWatched, trackRewardedAdDeclined } from '@/utils/growthTracking';
+import type { RewardedSurface } from '@/lib/admob-config';
 
 export type AdStatus = 'idle' | 'loading' | 'showing' | 'completed' | 'error';
+
+const PLACEHOLDER_TIMESTAMPS_KEY = 'lexiclash_placeholder_ad_timestamps';
+const MAX_PLACEHOLDER_PER_HOUR = 3;
+const ONE_HOUR = 60 * 60 * 1000;
+
+// Hook-level stuck-state backstop. Each ad provider is trusted to fire a
+// terminal callback (reward / error / dismiss). If a provider's SDK hangs and
+// fires NOTHING, `status` would stick at 'showing' forever and the in-flight
+// guard would permanently disable the watch-ad button — the "reward ads timer
+// stuck" bug. This is a LONG backstop, deliberately set ABOVE AdMob's own
+// worst-case legit path (≈12s prepare + 90s show-safety ≈ 102s) so it only
+// catches genuine infinite-hangs and NEVER preempts a late-but-real reward.
+// Covers every path uniformly — including CrazyGames / H5, which have no
+// timeout of their own, and a hung AdMob `whenReady()` the native layer misses.
+const REWARD_STUCK_WATCHDOG_MS = 120000;
+
+// Daily ad view tracking
+const DAILY_AD_VIEWS_KEY = 'lexiclash_daily_ad_views';
+const MAX_DAILY_AD_VIEWS = 10;
+
+function getTodayKey(): string {
+  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+}
+
+function getDailyViewCount(): number {
+  if (typeof window === 'undefined') return 0;
+  try {
+    const stored = localStorage.getItem(DAILY_AD_VIEWS_KEY);
+    if (!stored) return 0;
+    const data = JSON.parse(stored);
+    if (data.date !== getTodayKey()) return 0;
+    return data.count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
+function recordDailyView(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const today = getTodayKey();
+    const stored = localStorage.getItem(DAILY_AD_VIEWS_KEY);
+    let count = 0;
+    if (stored) {
+      const data = JSON.parse(stored);
+      if (data.date === today) count = data.count ?? 0;
+    }
+    localStorage.setItem(DAILY_AD_VIEWS_KEY, JSON.stringify({ date: today, count: count + 1 }));
+  } catch { /* silent */ }
+}
+
+function isDailyLimitReached(): boolean {
+  return getDailyViewCount() >= MAX_DAILY_AD_VIEWS;
+}
+
+function isPlaceholderCapped(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const stored = localStorage.getItem(PLACEHOLDER_TIMESTAMPS_KEY);
+    if (!stored) return false;
+    const timestamps: number[] = JSON.parse(stored);
+    const cutoff = Date.now() - ONE_HOUR;
+    return timestamps.filter(t => t > cutoff).length >= MAX_PLACEHOLDER_PER_HOUR;
+  } catch {
+    return false;
+  }
+}
+
+function recordPlaceholderView(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const stored = localStorage.getItem(PLACEHOLDER_TIMESTAMPS_KEY);
+    const timestamps: number[] = stored ? JSON.parse(stored) : [];
+    const cutoff = Date.now() - ONE_HOUR;
+    const updated = [...timestamps.filter(t => t > cutoff), Date.now()];
+    localStorage.setItem(PLACEHOLDER_TIMESTAMPS_KEY, JSON.stringify(updated));
+  } catch { /* silent */ }
+}
 
 interface UseRewardedAdOptions {
   /** Callback when ad is successfully completed and coins are awarded */
@@ -15,6 +102,25 @@ interface UseRewardedAdOptions {
   onAdError?: (error: string) => void;
   /** Callback when ad starts playing */
   onAdStarted?: () => void;
+  /**
+   * What the ad is rewarding.
+   * - 'coins' (default): hook auto-grants WATCH_AD coins via awardWatchedAd.
+   * - 'feature': hook does NOT grant coins — the caller's onRewardEarned is
+   *   the sole reward (e.g. retry, extra life, streak freeze, avatar part).
+   *   Prevents the double-reward bug where feature unlocks also paid coins.
+   */
+  rewardKind?: 'coins' | 'feature';
+  /**
+   * Which gameplay surface this ad serves. Routes to a per-surface AdMob unit
+   * so the waterfall can be optimized per placement. Defaults to 'generic'.
+   */
+  surface?: RewardedSurface;
+  /**
+   * Free-form analytics tag for the offered→watched funnel. Mirrors the value
+   * passed to `trackRewardedAdOffered` so PostHog can join offer and outcome
+   * by surface. Defaults to the routing `surface` when omitted.
+   */
+  analyticsSurface?: string;
 }
 
 interface UseRewardedAdReturn {
@@ -22,22 +128,45 @@ interface UseRewardedAdReturn {
   status: AdStatus;
   /** Whether a rewarded ad is available to show */
   isAdAvailable: boolean;
+  /** Whether placeholder cooldown is active (3/hour limit) */
+  isPlaceholderCooldown: boolean;
   /** Show a rewarded ad and earn coins on completion */
   showAd: () => void;
+  /** Pre-load the next ad so showAd resolves instantly. No-op on web/CG. */
+  prepareAd: () => void;
   /** Error message if ad failed */
   error: string | null;
   /** Amount of coins that will be rewarded */
   rewardAmount: number;
+  /** Whether the user can show another ad today */
+  canShowAd: boolean;
+  /** Number of ad views today */
+  viewsToday: number;
+  /** Maximum daily ad views allowed */
+  maxViews: number;
+  /** Whether the daily limit has been reached */
+  isDailyLimitReached: boolean;
+  /** Whether the hook is in placeholder mode (no real ad provider wired) */
+  isPlaceholder: boolean;
 }
 
 /**
  * Hook to show rewarded video ads and earn coins.
  *
+ * Provider reality (PostHog 90d, audited 2026-05-21): AdMob (native) is the
+ * ONLY provider that delivers — 27 successful watches, 0 from any web path.
+ * Web rewarded ads have a 0% fill rate (H5 Games Ads needs AdSense approval
+ * we don't have; CrazyGames only works inside its own iframe). So on
+ * production web the hook intentionally lands on `placeholder`, which makes
+ * `canShowAd` false and hides the watch-ad CTAs — better than promising a
+ * reward we can't grant.
+ *
  * Priority order:
- * 1. CrazyGames SDK - when running on CrazyGames platform
- * 2. Google IMA SDK - rewarded video ads (requires Ad Manager)
- * 3. Google AdSense - display ad fallback (requires AdSense)
- * 4. Simulation fallback - for development/testing
+ * 1. CrazyGames SDK - only inside a CrazyGames-distributed build (opt-in env)
+ * 1.5. AdMob - native Capacitor apps (the only path with real fill)
+ * 1.75. H5 Games Ads - production web, gated off pending AdSense approval
+ * 2. Simulation fallback - for development/testing
+ * 3. Placeholder - no ads available; refuses rewards + hides CTA in prod
  *
  * @example
  * ```tsx
@@ -51,26 +180,93 @@ interface UseRewardedAdReturn {
  * ```
  */
 export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAdReturn {
-  const { onRewardEarned, onAdError, onAdStarted } = options;
+  const { onRewardEarned, onAdError, onAdStarted, rewardKind = 'coins', surface = 'generic', analyticsSurface } = options;
+  const telemetrySurface = analyticsSurface ?? surface;
   const [status, setStatus] = useState<AdStatus>('idle');
   const [error, setError] = useState<string | null>(null);
+  const [placeholderCooldownFlag, setPlaceholderCooldownFlag] = useState(() => isPlaceholderCapped());
+  const [dailyViewCount, setDailyViewCount] = useState(() => getDailyViewCount());
+
+  // Timers held in refs so a single showAd session can clear its own watchdog
+  // and so unmount can sweep any pending timer (hygiene — no setState on a
+  // dead component). watchdogRef = the stuck-state backstop; idleResetRef =
+  // the short completed/error → idle reset.
+  const watchdogRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // True only while THIS instance's ad is live. The game-clock pause is a
+  // global, non-refcounted boolean, so an unconditional unmount emit(false)
+  // from one rewarded consumer would clear a DIFFERENT consumer's active pause
+  // (resuming the timer behind its ad). Gate the unmount backstop on our own
+  // ad so we only release a pause we ourselves set.
+  const adActiveRef = useRef(false);
+  useEffect(() => () => {
+    if (watchdogRef.current) clearTimeout(watchdogRef.current);
+    if (idleResetRef.current) clearTimeout(idleResetRef.current);
+    // Unmounted mid-ad (e.g. navigation) with no terminal callback fired —
+    // release our own pause so a listening game clock isn't frozen forever.
+    if (adActiveRef.current) emitRewardAdActive(false);
+  }, []);
 
   // Use unified CoinContext for all coin operations
   const { awardWatchedAd, rewards } = useCoinContext();
 
   // Ad platform hooks
   const crazyGames = useCrazyGames();
-  const imaVideoAds = useIMAVideoAds();
-  const googleAds = useGoogleAds();
+  const adMob = useAdMob();
+  const h5Ads = useH5GamesAds();
+  const gdAds = useGameDistributionAds();
+  const ayetAds = useAyetVideoAds();
 
   // Determine which ad platform to use (priority order)
   const shouldUseCrazyGames = crazyGames.isAvailable && crazyGames.isOnCrazyGamesPlatform;
-  const shouldUseIMAVideoAds = !shouldUseCrazyGames && imaVideoAds.isAvailable;
-  const shouldUseGoogleAds = !shouldUseCrazyGames && !shouldUseIMAVideoAds && googleAds.isAvailable;
-  const shouldUseSimulation = !shouldUseCrazyGames && !shouldUseIMAVideoAds && !shouldUseGoogleAds;
+  const shouldUseAdMob = !shouldUseCrazyGames && Capacitor.isNativePlatform();
+  // Production web (not CG, not native) → Google H5 Games Ads via `adBreak()`.
+  // Triple-gated: explicit `NEXT_PUBLIC_H5_ADS_ENABLED=true` env (off until
+  // AdSense domain approval lands, since H5 Games Ads serves no fill without
+  // it), production runtime OR `?h5ads_test=1`, and browser env. Keeping all
+  // three lets us ship the code dormant and flip the env when approval lands.
+  const isProd = process.env.NODE_ENV === 'production';
+  const isDev = process.env.NODE_ENV === 'development';
+  const h5EnvEnabled = process.env.NEXT_PUBLIC_H5_ADS_ENABLED === 'true';
+  const hasH5TestFlag = typeof window !== 'undefined' && (
+    (window as unknown as { __h5AdsTest?: boolean }).__h5AdsTest === true ||
+    (typeof location !== 'undefined' && /[?&]h5ads_test=1/.test(location.search))
+  );
+  // Production web → GameDistribution rewarded (the AdSense-rejection fallback;
+  // see docs/2026-06-04-web-ad-provider-after-adsense-rejection.md). Unlike H5
+  // it fills on our OWN domain without AdSense approval, so this is the live web
+  // path once the env + game id are provisioned. Triple-gated like H5 — explicit
+  // `NEXT_PUBLIC_GD_ADS_ENABLED=true` + a configured game id, prod runtime OR
+  // `?gdads_test=1`, browser env — so it ships dormant and flips by env. Sits
+  // ABOVE the (0-fill) H5 path in priority.
+  // Production web → ayeT-Studios rewarded video (the PRIMARY post-AdSense web
+  // path: no traffic minimum, own-domain payout; see
+  // docs/2026-06-04-web-ad-provider-after-adsense-rejection.md). Triple-gated
+  // like the others — explicit `NEXT_PUBLIC_AYET_ADS_ENABLED=true` + a configured
+  // placement id, prod runtime OR `?ayet_test=1`, browser env — so it ships
+  // dormant and flips by env. Sits ABOVE GameDistribution and the dead H5 path.
+  const ayetEnvEnabled = process.env.NEXT_PUBLIC_AYET_ADS_ENABLED === 'true' && getAyetPlacementId() !== '';
+  const hasAyetTestFlag = typeof window !== 'undefined' && (
+    (window as unknown as { __ayetAdsTest?: boolean }).__ayetAdsTest === true ||
+    (typeof location !== 'undefined' && /[?&]ayet_test=1/.test(location.search))
+  );
+  const shouldUseAyet = !shouldUseCrazyGames && !shouldUseAdMob && ayetAds.isAvailable && ayetEnvEnabled && (isProd || hasAyetTestFlag);
+  const gdEnvEnabled = process.env.NEXT_PUBLIC_GD_ADS_ENABLED === 'true' && getGdGameId() !== '';
+  const hasGdTestFlag = typeof window !== 'undefined' && (
+    (window as unknown as { __gdAdsTest?: boolean }).__gdAdsTest === true ||
+    (typeof location !== 'undefined' && /[?&]gdads_test=1/.test(location.search))
+  );
+  const shouldUseGd = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && gdAds.isAvailable && gdEnvEnabled && (isProd || hasGdTestFlag);
+  const shouldUseH5 = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && h5Ads.isAvailable && h5EnvEnabled && (isProd || hasH5TestFlag);
+  // Simulation only in development — never award free gold in production
+  const shouldUseSimulation = isDev && !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseH5;
+  // Placeholder: no ad platform available — still grant coins, log for admin
+  const isPlaceholder = !shouldUseCrazyGames && !shouldUseAdMob && !shouldUseAyet && !shouldUseGd && !shouldUseH5
+    && !shouldUseSimulation;
 
-  // Ad is available if any platform is ready
-  const isAdAvailable = shouldUseCrazyGames || shouldUseIMAVideoAds || shouldUseGoogleAds || shouldUseSimulation;
+  // Always available — placeholder grants coins when no real ads exist
+  const isAdAvailable = true;
+  const isPlaceholderCooldown = isPlaceholder && placeholderCooldownFlag;
 
   const rewardAmount = rewards.WATCH_AD;
 
@@ -79,87 +275,223 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       return; // Don't allow multiple simultaneous ads
     }
 
+    // Determine platform early for declined-event tagging
+    const platformForDecline = shouldUseCrazyGames ? 'crazygames'
+      : shouldUseAdMob ? 'admob'
+      : shouldUseAyet ? 'ayet'
+      : shouldUseGd ? 'gamedistribution'
+      : shouldUseH5 ? 'h5-games'
+      : shouldUseSimulation ? 'simulation'
+      : 'no-ad-placeholder';
+
+    // Enforce daily limit across all platforms
+    if (isDailyLimitReached()) {
+      trackRewardedAdDeclined('daily_limit_reached', platformForDecline, telemetrySurface);
+      onAdError?.('Daily ad limit reached');
+      return;
+    }
+
+    // No-ads web build (no CrazyGames, no AdMob, not dev): refuse to grant
+    // ANY reward — feature unlocks (hint/freeze/retry/extra-life) and coin
+    // grants alike. Until real ads ship on a platform, boosts must stay
+    // locked. canShowAd already returns false here so well-behaved callsites
+    // hide the button; this block stops rogue callers from bypassing it.
+    if (isPlaceholder && !isDev) {
+      trackRewardedAdDeclined('no_ad_provider', platformForDecline, telemetrySurface);
+      onAdError?.('No ad provider available');
+      return;
+    }
+
+    // Enforce placeholder cooldown (development only — production blocked above)
+    if (isPlaceholder && isPlaceholderCapped()) {
+      setPlaceholderCooldownFlag(true);
+      trackRewardedAdDeclined('placeholder_cooldown', platformForDecline, telemetrySurface);
+      onAdError?.('Cooldown active — try again later');
+      return;
+    }
+
+    // Sweep any pending completed→idle / error→idle reset from a PRIOR session
+    // before starting a new one — otherwise that stale timer fires mid-session
+    // and flips the live status back to 'idle' (re-enabling the button under a
+    // running ad).
+    if (idleResetRef.current) { clearTimeout(idleResetRef.current); idleResetRef.current = null; }
+
     setStatus('loading');
     setError(null);
 
+    // Freeze any listening game clock for the whole ad lifecycle. Emitting here
+    // — after the early returns, before any provider shows — means EVERY
+    // rewarded surface pauses a live timer (not just the one component that
+    // used to wire this by hand), and the early-return paths above never set
+    // it true, so they can't strand the clock frozen. Paired with the two
+    // terminal emits below (reward + error) and the unmount safety above.
+    adActiveRef.current = true;
+    emitRewardAdActive(true);
+
     // Determine platform for logging
-    const platform = shouldUseCrazyGames
-      ? 'crazygames'
-      : shouldUseIMAVideoAds
-        ? 'ima-sdk'
-        : shouldUseGoogleAds
-          ? 'adsense'
-          : 'simulation';
+    const platform = shouldUseCrazyGames ? 'crazygames'
+      : shouldUseAdMob ? 'admob'
+      : shouldUseAyet ? 'ayet'
+      : shouldUseGd ? 'gamedistribution'
+      : shouldUseH5 ? 'h5-games'
+      : shouldUseSimulation ? 'simulation'
+      : 'no-ad-placeholder';
 
-    // Award coins helper - uses unified CoinContext for auth/guest sync
-    const awardCoinsAndNotify = async () => {
-      const result = await awardWatchedAd(platform);
-      setStatus('completed');
-      await onRewardEarned?.(result?.awarded ?? rewardAmount);
+    trackRewardedAdOffered(telemetrySurface ?? 'unknown', { platform });
 
-      // Reset to idle after a short delay
-      setTimeout(() => setStatus('idle'), 1500);
+    // Single idempotent settle guard for this showAd session. The FIRST
+    // terminal outcome — reward, error, or the stuck-state watchdog — wins;
+    // every later callback (a late real reward, a duplicate provider event, a
+    // watchdog that outlived a normal ad) is ignored. Generalizes the
+    // CrazyGames `settleCg` pattern to ALL paths so the watchdog can never
+    // double-fire with a real callback.
+    let sessionSettled = false;
+    const clearWatchdog = () => {
+      if (watchdogRef.current) { clearTimeout(watchdogRef.current); watchdogRef.current = null; }
     };
 
-    // Handle ad error
-    const handleAdError = (errorMsg: string) => {
+    // Error transition, split from the settle guard so the in-flight
+    // coin-grant-failure path (already inside a settled session) can reuse it
+    // without tripping the guard a second time.
+    const applyError = (errorMsg: string) => {
+      adActiveRef.current = false;
+      emitRewardAdActive(false); // resume the game clock on any failure path
       setStatus('error');
       setError(errorMsg);
+      trackRewardedAdDeclined(errorMsg, platform, telemetrySurface);
       onAdError?.(errorMsg);
-
       // Reset to idle after showing error
-      setTimeout(() => {
+      idleResetRef.current = setTimeout(() => {
         setStatus('idle');
         setError(null);
       }, 3000);
     };
 
+    // Award coins helper - uses unified CoinContext for auth/guest sync.
+    // For rewardKind='feature' we skip awardWatchedAd so feature unlocks
+    // (retry, extra life, streak freeze, etc.) don't silently also pay coins.
+    const awardCoinsAndNotify = async () => {
+      if (sessionSettled) return;
+      sessionSettled = true;
+      clearWatchdog();
+      adActiveRef.current = false;
+      emitRewardAdActive(false); // ad done — resume the game clock before granting
+      if (isPlaceholder) {
+        recordPlaceholderView();
+        setPlaceholderCooldownFlag(isPlaceholderCapped());
+      }
+      recordDailyView();
+      setDailyViewCount(getDailyViewCount());
+      let awarded = 0;
+      if (rewardKind === 'coins') {
+        const result = await awardWatchedAd(platform);
+        if (!result) {
+          // DB write failed — don't report false success to analytics or caller
+          applyError('Failed to grant coins — please try again');
+          return;
+        }
+        awarded = result.awarded;
+      }
+      trackRewardedAdWatched(platform, awarded, telemetrySurface);
+      setStatus('completed');
+      await onRewardEarned?.(awarded);
+
+      // Reset to idle after a short delay
+      idleResetRef.current = setTimeout(() => setStatus('idle'), 1500);
+    };
+
+    // Handle ad error
+    const handleAdError = (errorMsg: string) => {
+      if (sessionSettled) return;
+      sessionSettled = true;
+      clearWatchdog();
+      applyError(errorMsg);
+    };
+
+    // Arm the stuck-state backstop for the whole loading→showing→reward window.
+    // If NO provider callback fires within the long window (hung SDK), force
+    // the state machine back to idle so the watch-ad button re-enables.
+    // Synchronous paths (immediate placeholder grant) settle first and clear
+    // this instantly; real ads settle well within REWARD_STUCK_WATCHDOG_MS.
+    clearWatchdog();
+    watchdogRef.current = setTimeout(() => {
+      if (sessionSettled) return;
+      sessionSettled = true;
+      watchdogRef.current = null;
+      applyError('Ad timed out — please try again');
+    }, REWARD_STUCK_WATCHDOG_MS);
+
     if (shouldUseCrazyGames) {
       // Priority 1: CrazyGames SDK for rewarded ads
+      // Full-launch QA requires gameplayStop + audio mute around ads.
+      crazyGames.gameplayStop();
+      let settled = false;
+      const settleCg = (cb: () => void) => {
+        if (settled) return;
+        settled = true;
+        try { Howler.mute(false); } catch { /* Howler not initialized */ }
+        crazyGames.gameplayStart();
+        cb();
+      };
       crazyGames.showRewardedAd({
         adStarted: () => {
+          try { Howler.mute(true); } catch { /* Howler not initialized */ }
           setStatus('showing');
           onAdStarted?.();
         },
-        adFinished: () => {
-          awardCoinsAndNotify();
-        },
-        adError: (errorMsg: string) => {
-          handleAdError(errorMsg || 'Ad failed to load');
-        },
+        adFinished: () => settleCg(() => { awardCoinsAndNotify(); }),
+        adError: (errorMsg: string) => settleCg(() => { handleAdError(errorMsg || 'Ad failed to load'); }),
       });
-    } else if (shouldUseIMAVideoAds) {
-      // Priority 2: Google IMA SDK for rewarded video ads
-      imaVideoAds.showRewardedAd({
-        onAdStarted: () => {
-          setStatus('showing');
-          onAdStarted?.();
-        },
-        onAdComplete: () => {
-          awardCoinsAndNotify();
-        },
-        onAdError: (errorMsg: string) => {
-          handleAdError(errorMsg || 'Ad failed to load');
-        },
-      });
-    } else if (shouldUseGoogleAds) {
-      // Priority 3: Google AdSense display ads (fallback)
-      googleAds.showRewardedAd({
-        onAdStarted: () => {
-          setStatus('showing');
-          onAdStarted?.();
-        },
-        onAdComplete: () => {
-          awardCoinsAndNotify();
-        },
-        onAdError: (errorMsg: string) => {
-          handleAdError(errorMsg || 'Ad failed to load');
-        },
-      });
-    } else {
-      // Priority 4: Simulation fallback for development/testing
-      // This allows testing the flow without real ads
-      console.log('[RewardedAd] Using simulation mode - no real ads configured');
+    } else if (shouldUseAdMob) {
+      // Priority 1.5: AdMob SDK for native Capacitor apps
+      setStatus('showing');
+      onAdStarted?.();
+      adMob.showRewarded(
+        () => { awardCoinsAndNotify(); },
+        (errMsg) => { handleAdError(errMsg || 'Ad dismissed without reward'); },
+        { surface },
+      );
+    } else if (shouldUseAyet) {
+      // Priority 1.6: ayeT-Studios rewarded video — primary production-web path
+      // (no traffic min, own-domain). Client reward via callbackRewarded; the
+      // server-side daily cap in /api/coins is the replay backstop (with the
+      // S2S conversion callback as the secure server credit, wired separately).
+      // Mute Howler around the fullscreen video, restore on both terminal paths.
+      setStatus('showing');
+      onAdStarted?.();
+      try { Howler.mute(true); } catch { /* Howler not initialized */ }
+      const unmuteAyet = () => { try { Howler.mute(false); } catch { /* Howler not initialized */ } };
+      ayetAds.showRewarded(
+        () => { unmuteAyet(); awardCoinsAndNotify(); },
+        (reason) => { unmuteAyet(); handleAdError(reason || 'Ad dismissed without reward'); },
+        { name: surface },
+      );
+    } else if (shouldUseGd) {
+      // Priority 1.7: GameDistribution for production web — own-domain rewarded
+      // fill (no SSV; replay protection is the server-side daily cap in
+      // /api/coins). GD requires game audio muted during the video ad, so mute
+      // Howler around it and restore on both terminal paths.
+      setStatus('showing');
+      onAdStarted?.();
+      try { Howler.mute(true); } catch { /* Howler not initialized */ }
+      const unmuteGd = () => { try { Howler.mute(false); } catch { /* Howler not initialized */ } };
+      gdAds.showRewarded(
+        () => { unmuteGd(); awardCoinsAndNotify(); },
+        (reason) => { unmuteGd(); handleAdError(reason || 'Ad dismissed without reward'); },
+        { name: surface },
+      );
+    } else if (shouldUseH5) {
+      // Priority 1.75: H5 Games Ads for production web (no SSV — relies on
+      // server-side daily cap in /api/coins for replay protection).
+      setStatus('showing');
+      onAdStarted?.();
+      h5Ads.showRewarded(
+        () => { awardCoinsAndNotify(); },
+        (reason) => { handleAdError(reason || 'Ad dismissed without reward'); },
+        { name: surface },
+      );
+    } else if (shouldUseSimulation) {
+      // Priority 2: Simulation fallback for development/testing
       setStatus('showing');
       onAdStarted?.();
 
@@ -167,15 +499,37 @@ export function useRewardedAd(options: UseRewardedAdOptions = {}): UseRewardedAd
       setTimeout(() => {
         awardCoinsAndNotify();
       }, 3000);
+    } else {
+      // Priority 3: No ad platform — grant coins immediately
+      setStatus('showing');
+      onAdStarted?.();
+      awardCoinsAndNotify();
     }
-  }, [status, shouldUseCrazyGames, shouldUseIMAVideoAds, shouldUseGoogleAds, crazyGames, imaVideoAds, googleAds, rewardAmount, onRewardEarned, onAdError, onAdStarted, awardWatchedAd]);
+  }, [status, isDev, isPlaceholder, shouldUseCrazyGames, shouldUseAdMob, shouldUseAyet, shouldUseGd, shouldUseH5, shouldUseSimulation, crazyGames, adMob, ayetAds, gdAds, h5Ads, onRewardEarned, onAdError, onAdStarted, awardWatchedAd, rewardKind, surface, telemetrySurface]);
+
+  // Pre-load AdMob rewarded slot when caller signals likely intent (button
+  // mount). CrazyGames SDK auto-prepares; simulation/placeholder paths
+  // resolve instantly. Reduces tap-to-ad latency on the hot native path —
+  // PostHog 30d showed only 3 users ever completed a watch (96 offers /
+  // 13 users / 20 watches), and tap-latency anecdotally drives drop-off.
+  const prepareAd = useCallback(() => {
+    if (!shouldUseAdMob) return;
+    void adMob.prepareRewarded({ surface });
+  }, [shouldUseAdMob, adMob, surface]);
 
   return {
     status,
     isAdAvailable,
+    isPlaceholderCooldown,
     showAd,
+    prepareAd,
     error,
     rewardAmount,
+    canShowAd: !isDailyLimitReached() && !(isPlaceholder && !isDev),
+    viewsToday: dailyViewCount,
+    maxViews: MAX_DAILY_AD_VIEWS,
+    isDailyLimitReached: isDailyLimitReached(),
+    isPlaceholder,
   };
 }
 

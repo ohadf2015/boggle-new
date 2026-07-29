@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createAdminClient } from '@/utils/supabase/admin';
 import { captureApiError } from '@/utils/sentry';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 // Calendar rewards configuration (mirrored from engagementManager)
 interface CalendarReward {
@@ -59,7 +56,7 @@ async function getUserIdFromRequest(request: NextRequest): Promise<string | null
 
   if (!token) return null;
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
+  const supabase = createAdminClient()!;
   const { data: { user }, error } = await supabase.auth.getUser(token);
 
   if (error || !user) return null;
@@ -77,7 +74,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createAdminClient()!;
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
@@ -122,7 +119,8 @@ export async function GET(request: NextRequest) {
       rewards: CALENDAR_REWARDS.slice(0, Math.min(31, getDaysInMonth(currentMonth, currentYear))),
     });
   } catch (error) {
-    console.error('[API] Calendar GET error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[API] Calendar GET error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/engagement/calendar',
@@ -146,7 +144,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const supabase = createAdminClient()!;
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
@@ -203,13 +201,17 @@ export async function POST(request: NextRequest) {
     let appliedReward: unknown = reward;
 
     switch (reward.type) {
-      case 'xp':
-        await supabase.rpc('increment_player_xp', {
+      case 'xp': {
+        const { error: xpRewardError } = await supabase.rpc('increment_player_xp', {
           p_player_id: userId,
           p_xp_amount: reward.amount,
         });
+        if (xpRewardError) {
+          console.error('Error granting calendar XP reward:', xpRewardError);
+        }
         appliedReward = { type: 'xp', amount: reward.amount };
         break;
+      }
 
       case 'hints':
         // Get current hints count and increment
@@ -257,7 +259,8 @@ export async function POST(request: NextRequest) {
       nextReward: CALENDAR_REWARDS[currentDay] || null,
     });
   } catch (error) {
-    console.error('[API] Calendar POST error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[API] Calendar POST error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/engagement/calendar',

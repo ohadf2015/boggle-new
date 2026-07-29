@@ -1,51 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, memo, useRef, useMemo } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Hand } from 'lucide-react';
+import { getDemoConfig } from '../onboarding/demoConfigs';
 
 const AUTO_DISMISS_MS = 8000; // 8 seconds
-
-// Demo grid letters for swipe demonstration
-// LTR: reads left-to-right, RTL: reads right-to-left
-const DEMO_GRID_LTR = [
-  ['S', 'W', 'I'],
-  ['O', 'R', 'P'],
-  ['N', 'D', 'E'],
-];
-
-const DEMO_GRID_RTL = [
-  ['I', 'W', 'S'],
-  ['P', 'R', 'O'],
-  ['E', 'D', 'N'],
-];
-
-// Simple horizontal swipe path: S -> W -> I -> P -> E
-// LTR: swipes left-to-right (col 0 -> 2)
-const DEMO_PATH_LTR: [number, number][] = [
-  [0, 0], // S
-  [0, 1], // W
-  [0, 2], // I
-  [1, 2], // P
-  [2, 2], // E
-];
-
-// RTL: swipes right-to-left (col 2 -> 0)
-const DEMO_PATH_RTL: [number, number][] = [
-  [0, 2], // S
-  [0, 1], // W
-  [0, 0], // I
-  [1, 0], // P
-  [2, 0], // E
-];
-
-const DEMO_WORD = 'SWIPE';
 
 interface SwipeTipTooltipProps {
   isVisible: boolean;
   onDismiss: () => void;
   t: (key: string) => string;
   dir?: 'ltr' | 'rtl';
+  /** Locale for example word/grid. Defaults to 'en'. */
+  language?: string;
 }
 
 /**
@@ -55,24 +23,53 @@ interface SwipeTipTooltipProps {
  * Features a mini animated grid that traces a swipe path with finger indicator.
  */
 const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
-  ({ isVisible, onDismiss, t, dir = 'ltr' }) => {
+  ({ isVisible, onDismiss, t, dir = 'ltr', language = 'en' }) => {
     const [selectedCells, setSelectedCells] = useState<[number, number][]>([]);
     const [isAnimating, setIsAnimating] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [fingerPosition, setFingerPosition] = useState<{ x: number; y: number } | null>(null);
     const [isPopping, setIsPopping] = useState(false);
+    const timerIdsRef = useRef<Set<ReturnType<typeof setTimeout>>>(new Set());
+
+    // Locale-aware example: 3x3 grid with vetted demo word per language.
+    // Reuses the shared demoConfigs vocabulary. RTL grid is the LTR letters
+    // mirrored column-wise so the same path coords visually swipe RTL.
+    const isRTL = dir === 'rtl';
+    const baseDemo = useMemo(() => getDemoConfig(language), [language]);
+    const DEMO_GRID = useMemo(
+      () => (isRTL ? baseDemo.letters.map(row => [...row].reverse()) : baseDemo.letters),
+      [baseDemo, isRTL],
+    );
+    const DEMO_PATH = useMemo<[number, number][]>(
+      () => baseDemo.path.map(p => [p.row, isRTL ? (DEMO_GRID[0].length - 1 - p.col) : p.col] as [number, number]),
+      [baseDemo, isRTL, DEMO_GRID],
+    );
+    const DEMO_WORD = baseDemo.word;
+
+    const scheduleTimer = useCallback((cb: () => void, delay: number) => {
+      const id = setTimeout(() => {
+        timerIdsRef.current.delete(id);
+        cb();
+      }, delay);
+      timerIdsRef.current.add(id);
+      return id;
+    }, []);
+
+    // Clear all pending timeouts on unmount
+    useEffect(() => {
+      const timerIds = timerIdsRef.current;
+      return () => {
+        timerIds.forEach(id => clearTimeout(id));
+        timerIds.clear();
+      };
+    }, []);
 
     // Handle dismiss with pop animation
     const handleDismiss = useCallback(() => {
       setIsPopping(true);
       // Let animation play before actual dismiss
-      setTimeout(onDismiss, 300);
-    }, [onDismiss]);
-
-    // Select grid and path based on direction
-    const isRTL = dir === 'rtl';
-    const DEMO_GRID = isRTL ? DEMO_GRID_RTL : DEMO_GRID_LTR;
-    const DEMO_PATH = isRTL ? DEMO_PATH_RTL : DEMO_PATH_LTR;
+      scheduleTimer(onDismiss, 300);
+    }, [onDismiss, scheduleTimer]);
 
     const cellSize = 36;
     const gap = 3;
@@ -89,7 +86,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
 
       // Animate each cell selection with delay and finger movement
       DEMO_PATH.forEach((cell, index) => {
-        setTimeout(() => {
+        scheduleTimer(() => {
           setSelectedCells((prev) => [...prev, cell]);
           // Position finger at current cell
           setFingerPosition({
@@ -100,13 +97,13 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
       });
 
       // Show success after path completes
-      setTimeout(
+      scheduleTimer(
         () => {
           setShowSuccess(true);
           setFingerPosition(null); // Hide finger on success
 
           // Reset and replay after showing success
-          setTimeout(() => {
+          scheduleTimer(() => {
             setSelectedCells([]);
             setShowSuccess(false);
             setIsAnimating(false);
@@ -114,7 +111,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
         },
         DEMO_PATH.length * 350 + 300
       );
-    }, [isAnimating, DEMO_PATH]);
+    }, [isAnimating, DEMO_PATH, scheduleTimer]);
 
     // Auto-start animation when visible
     useEffect(() => {
@@ -162,7 +159,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
     return (
       <AnimatePresence>
         {isVisible && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={isPopping
               ? { opacity: 0, scale: 1.15, y: -20 }
@@ -173,8 +170,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
               ? { duration: 0.25, ease: [0.36, 1.2, 0.5, 1] }
               : { type: 'spring', stiffness: 300, damping: 25 }
             }
-            className="fixed bottom-24 left-1/2 z-50 pointer-events-auto safe-area-bottom"
-            style={{ transform: 'translateX(-50%)' }}
+            className="fixed bottom-[calc(6rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-50 pointer-events-auto safe-area-bottom"
           >
             <div
               className="
@@ -199,18 +195,18 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                   flex items-center justify-center
                   hover:scale-110 transition-transform
                 "
-                aria-label={t('common.close') || 'Close'}
+                aria-label={t('common.close')}
               >
                 <X className="w-3 h-3" />
               </button>
 
               {/* Header */}
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-neo-cyan to-neo-lime rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+                <div className="w-8 h-8 bg-linear-to-br from-neo-cyan to-neo-lime rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
                   <Hand className="w-4 h-4 text-neo-black" />
                 </div>
                 <h4 className="font-black text-neo-black text-sm uppercase tracking-wide">
-                  {t('guidance.swipeTip.title') || 'Swipe to Form Words!'}
+                  {t('guidance.swipeTip.title')}
                 </h4>
               </div>
 
@@ -234,7 +230,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                         const isSelected = isCellSelected(rowIndex, colIndex);
 
                         return (
-                          <motion.div
+                          <m.div
                             key={`${rowIndex}-${colIndex}`}
                             className={`
                               flex items-center justify-center relative
@@ -256,14 +252,14 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                             }}
                           >
                             {letter}
-                          </motion.div>
+                          </m.div>
                         );
                       })
                     )}
 
                     {/* Finger indicator */}
                     {fingerPosition && (
-                      <motion.div
+                      <m.div
                         className="absolute z-20 pointer-events-none"
                         style={{
                           left: fingerPosition.x + 8 - 12,
@@ -278,7 +274,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                             <path d="M12.5 2.5a2.5 2.5 0 00-2.5 2.5v8.5a.5.5 0 01-1 0V8a2 2 0 10-4 0v9a7 7 0 0014 0v-6a2 2 0 00-4 0v2.5a.5.5 0 01-1 0V5a2.5 2.5 0 00-2.5-2.5z"/>
                           </svg>
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </div>
 
@@ -304,8 +300,8 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                           const y2 = getCenter(cell[0]);
 
                           return (
-                            <motion.line
-                              key={i}
+                            <m.line
+                              key={`${x1}-${y1}-${x2}-${y2}`}
                               x1={x1}
                               y1={y1}
                               x2={x2}
@@ -325,7 +321,7 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                 </div>
 
                 {/* Word display */}
-                <motion.div
+                <m.div
                   className={`
                     px-3 py-1 rounded-lg border-2 border-neo-black
                     font-black text-sm tracking-wider
@@ -339,37 +335,37 @@ const SwipeTipTooltip = memo<SwipeTipTooltipProps>(
                         .join('')
                     : DEMO_WORD}
                   {showSuccess && ' ✓'}
-                </motion.div>
+                </m.div>
               </div>
 
               {/* Tap to dismiss - more prominent with pulse animation */}
-              <motion.div
+              <m.div
                 className="flex items-center justify-center gap-1.5 mt-3 py-1.5 px-3 mx-auto w-fit
                   bg-neo-black/5 rounded-full border border-neo-black/20"
                 animate={{ scale: [1, 1.02, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <span className="text-[11px] font-semibold text-neo-black/70 uppercase tracking-wide">
-                  {t('common.tapToDismiss') || 'Tap anywhere to dismiss'}
+                  {t('common.tapToDismiss')}
                 </span>
-                <motion.span
+                <m.span
                   className="text-neo-cyan"
                   animate={{ y: [0, -2, 0] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
                   <X className="w-3 h-3" />
-                </motion.span>
-              </motion.div>
+                </m.span>
+              </m.div>
 
               {/* Progress bar */}
-              <motion.div
+              <m.div
                 className="absolute bottom-0 left-0 h-1 bg-neo-cyan/40 rounded-b-lg"
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}
               />
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     );

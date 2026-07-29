@@ -26,8 +26,10 @@ export async function GET(request: NextRequest) {
     const wordCount = parseInt(searchParams.get('wordCount') || '0');
     const puzzleNumber = parseInt(searchParams.get('puzzleNumber') || '0');
 
-    // Construct avatar image URL if provided
-    const origin = new URL(request.url).origin;
+    // Construct avatar image URL if provided.
+    // Use a fixed public origin — request.url resolves to container origin (localhost:$PORT)
+    // behind Railway's proxy, and forwarded headers are user-controllable (SSRF risk).
+    const origin = process.env.NEXT_PUBLIC_APP_URL || 'https://lexiclash.live';
     const avatarImageUrl = avatarImage ? `${origin}/avatars/${avatarImage}` : null;
 
     // Get rank display (medal for top 3, number otherwise)
@@ -270,7 +272,8 @@ export async function GET(request: NextRequest) {
       }
     );
   } catch (error) {
-    console.error('Error generating OG image:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error generating OG image:', errorMessage);
     return new Response('Failed to generate image', { status: 500 });
   }
 }

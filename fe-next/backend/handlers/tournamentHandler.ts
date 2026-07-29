@@ -6,24 +6,32 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, GameUser, LetterGrid, Language, TournamentStanding, GridPosition, Avatar } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
   getGameUsers,
   updateGame,
   setTournamentIdForGame
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const { broadcastToRoom, getGameRoom, safeEmit } = require('../utils/socketHelpers');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const { makePositionsMap } = require('../modules/wordValidator');
-const { generateRandomTable } = require('../utils/gameUtils');
-const gameStartCoordinator = require('../utils/gameStartCoordinator');
-const tournamentManager = require('../modules/tournamentManager');
-const logger = require('../utils/logger');
-const { startGameTimer } = require('./shared');
+import { broadcastToRoom, getGameRoom, safeEmit } from '../utils/socketHelpers.js';
+import { emitError, ErrorCodes } from '../utils/errorHandler.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import { makePositionsMap } from '../modules/wordValidator.js';
+import { generateRandomTable } from '../utils/gameUtils.js';
+import { generateRichBoard } from '../utils/boardSelection.js';
+import { DIFFICULTIES, DEFAULT_DIFFICULTY } from '../utils/consts.js';
+import gameStartCoordinator from '../utils/gameStartCoordinator.js';
+import {
+  createTournament as createTournamentFn,
+  getTournamentStandings,
+  getTournament,
+  startTournamentRound,
+  deleteTournament
+} from '../modules/tournamentManager.js';
+import logger from '../utils/logger.js';
+import { startGameTimer } from './shared';
 
 // Types for payloads
 interface CreateTournamentPayload {
@@ -63,32 +71,34 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     // Verify sender is host
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, 'Only the host can create a tournament');
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only the host can create a tournament' });
       return;
     }
 
-    // Get players with their avatars
-    const users: GameUser[] = getGameUsers(gameCode);
-    const players: TournamentPlayer[] = users.map(u => ({
-      socketId: u.socketId,
-      username: u.username,
-      avatar: u.avatar
-    }));
+    // Get host info
+    const hostPlayerId = game.hostPlayerId || socket.id;
+    const hostUsername = game.hostUsername || 'Host';
+
+    // Create tournament settings
+    const settings = {
+      name: name || 'Tournament',
+      totalRounds: totalRounds || 3
+    };
 
     // Create tournament
-    const tournament: Tournament = tournamentManager.createTournament(name || 'Tournament', totalRounds || 3, players);
+    const tournament = createTournamentFn(hostPlayerId, hostUsername, settings);
     setTournamentIdForGame(gameCode, tournament.id);
 
     // Broadcast tournament created
@@ -100,7 +110,7 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
         currentRound: 0,
         status: 'created'
       },
-      standings: tournamentManager.getTournamentStandings(tournament.id) as TournamentStanding[]
+      standings: getTournamentStandings(tournament.id) || []
     });
 
     logger.info('TOURNAMENT', `Tournament "${tournament.name}" created for game ${gameCode}`);
@@ -116,39 +126,46 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     // Verify sender is host
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, 'Only the host can start a tournament round');
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only the host can start a tournament round' });
       return;
     }
 
     const tournamentId = game.tournamentId;
     if (!tournamentId) {
-      emitError(socket, 'No tournament active');
+      emitError(socket, ErrorCodes.TOURNAMENT_INVALID_STATE, { message: 'No tournament active' });
       return;
     }
 
-    const tournament: Tournament = tournamentManager.getTournament(tournamentId);
+    const tournament = getTournament(tournamentId);
     if (!tournament) {
-      emitError(socket, 'Tournament not found');
+      emitError(socket, ErrorCodes.TOURNAMENT_NOT_FOUND);
       return;
     }
 
     // Start new round
-    tournamentManager.startTournamentRound(tournamentId);
+    startTournamentRound(tournamentId, gameCode);
 
     // Generate new board for the round
-    const letterGrid: LetterGrid = generateRandomTable(game.language || 'en');
+    const tDim = DIFFICULTIES[DEFAULT_DIFFICULTY];
+    const tLang = game.language || 'en';
+    const letterGrid: LetterGrid = generateRichBoard(
+      () => generateRandomTable(tDim.rows, tDim.cols, tLang),
+      tLang,
+      tDim.rows,
+      tDim.cols
+    ) as LetterGrid;
     const timerSeconds = game.timerSeconds || 180;
 
     // Update game state
@@ -162,14 +179,14 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     });
 
     // Precompute positions
-    const positions: Map<string, GridPosition[]> = makePositionsMap(letterGrid);
+    const positions = makePositionsMap(letterGrid);
     const current = getGame(gameCode);
     if (current) {
       current.letterPositions = positions;
     }
 
     // Initialize player data for new round
-    const users: GameUser[] = getGameUsers(gameCode);
+    const users = getGameUsers(gameCode);
     const playerUsernames = users.map(u => u.username);
     const gameForInit = getGame(gameCode);
     if (gameForInit) {
@@ -179,17 +196,18 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       if (!gameForInit.playerWords) gameForInit.playerWords = {};
 
       playerUsernames.forEach((username: string) => {
-        gameForInit.playerWordDetails[username] = [];
+        gameForInit.playerWordDetails![username] = [];
         gameForInit.playerWords[username] = [];
         gameForInit.playerScores[username] = 0;
-        gameForInit.playerAchievements[username] = [];
+        gameForInit.playerAchievements![username] = [];
       });
       gameForInit.firstWordFound = false;
       gameForInit.startTime = Date.now();
     }
 
     // Initialize game start coordination
-    const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
+    const humanUsernames = users.filter(u => !u.isBot).map(u => u.username);
+    const messageId = gameStartCoordinator.initializeSequence(gameCode, humanUsernames, timerSeconds);
 
     // Broadcast round start
     broadcastToRoom(io, getGameRoom(gameCode), 'tournamentRoundStarting', {
@@ -199,7 +217,7 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
         totalRounds: tournament.totalRounds,
         currentRound: tournament.currentRound
       },
-      standings: tournamentManager.getTournamentStandings(tournamentId) as TournamentStanding[]
+      standings: getTournamentStandings(tournamentId) || []
     });
 
     // Broadcast game start
@@ -209,7 +227,7 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       language: game.language,
       minWordLength: game.minWordLength || 2,
       messageId,
-      boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null // Preserve theme from first round if any
+      boardTheme: (game as unknown as { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null // Preserve theme from first round if any
     });
 
     // Set acknowledgment timeout
@@ -222,6 +240,8 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
 
   // Handle get tournament standings
   socket.on('getTournamentStandings', () => {
+    // Light weight: read-only but allocates standings + tournament objects each call
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
@@ -235,8 +255,8 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
       return;
     }
 
-    const standings: TournamentStanding[] = tournamentManager.getTournamentStandings(game.tournamentId);
-    const tournament: Tournament | null = tournamentManager.getTournament(game.tournamentId);
+    const standings = getTournamentStandings(game.tournamentId) || [];
+    const tournament = getTournament(game.tournamentId) ?? null;
 
     socket.emit('tournamentStandings', {
       tournament: tournament ? {
@@ -260,30 +280,30 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     const gameCode = getGameBySocketId(socket.id);
 
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     // Verify sender is host
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, 'Only the host can cancel a tournament');
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only the host can cancel a tournament' });
       return;
     }
 
     const tournamentId = game.tournamentId;
     if (!tournamentId) {
-      emitError(socket, 'No tournament active');
+      emitError(socket, ErrorCodes.TOURNAMENT_INVALID_STATE, { message: 'No tournament active' });
       return;
     }
 
     // Cancel tournament
-    tournamentManager.cancelTournament(tournamentId);
+    deleteTournament(tournamentId);
     setTournamentIdForGame(gameCode, null);
 
     // Broadcast cancellation
@@ -294,7 +314,5 @@ function registerTournamentHandlers(io: Server, socket: Socket): void {
     logger.info('TOURNAMENT', `Tournament ${tournamentId} cancelled for game ${gameCode}`);
   });
 }
-
-module.exports = { registerTournamentHandlers };
 
 export { registerTournamentHandlers };

@@ -6,15 +6,20 @@
  */
 import { useEffect, useMemo, MutableRefObject } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast, neoInfoToast, wordErrorToast } from '../../../components/NeoToast';
+import { neoInfoToast, wordErrorToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { clearSessionPreservingUsername } from '../../../utils/session';
+import { throttleLatest } from '../../../utils/throttle';
+import { socketErrorMessage } from '../../../utils/socketErrorMessage';
+import { resolveHostLeftMessage } from '../../../lib/multiplayer/resolveHostLeftMessage';
 import { processAchievements } from '@/shared/utils/achievementUtils';
 import { createXpGainedHandler, createLevelUpHandler } from '@/shared/utils/xpUtils';
 import { createConnectionHandlers } from '@/shared/utils/connectionUtils';
 import { createPlayerPresenceHandler } from '@/shared/utils/presenceUtils';
-import { useGameStateContext } from '@/contexts/GameStateContext';
+import { useGameActions } from '@/hooks/gameState';
 import logger from '@/utils/logger';
 import type { AchievementPayload } from '@/shared/types/socket';
+import type { LeaderboardEntry, LetterGrid } from '@/shared/types/game';
+import type { Player } from '@/hooks/gameState/types';
 
 interface UsePlayerSessionEventsProps {
   socket: Socket | null;
@@ -23,6 +28,31 @@ interface UsePlayerSessionEventsProps {
   queueAchievement: (achievement: AchievementPayload) => void;
   intentionalExitRef: MutableRefObject<boolean>;
 }
+
+interface UpdateUsersPayload { users?: Player[] }
+interface ShufflingGridPayload {
+  grid?: LetterGrid;
+  highlightedCells?: Array<{ row: number; col: number }>;
+}
+interface LeaderboardUpdatePayload { leaderboard: LeaderboardEntry[] }
+
+/** Coalesce the opponent-score leaderboard flood to ~6.7 updates/sec. */
+const LEADERBOARD_THROTTLE_MS = 150;
+interface LiveAchievementPayload { achievements?: unknown[] }
+interface HostMessagePayload {
+  message?: string;
+  i18nKey?: string;
+  i18nParams?: Record<string, string | number>;
+  gracePeriodMs?: number;
+}
+interface HostTransferredPayload {
+  message?: string;
+  newHost?: string;
+  previousHost?: string;
+  i18nKey?: string;
+  i18nParams?: Record<string, string | number>;
+}
+interface SocketErrorEventPayload { code?: string; message?: string }
 
 /**
  * Hook for managing player session-related socket events
@@ -34,7 +64,7 @@ export function usePlayerSessionEvents({
   queueAchievement,
   intentionalExitRef,
 }: UsePlayerSessionEventsProps): void {
-  // Get state setters from context (no more prop drilling!)
+  // Get state setters from Zustand store (actions never trigger re-renders)
   const {
     setPlayers: setPlayersReady,
     setShufflingGrid,
@@ -43,11 +73,12 @@ export function usePlayerSessionEvents({
     setLeaderboard,
     setXpGainedData,
     setLevelUpData,
-  } = useGameStateContext();
+  } = useGameActions();
   // Create memoized handlers using shared utilities
+  // Pass username to filter out self-notifications (e.g., player doesn't see "you reconnected" toast)
   const connectionHandlers = useMemo(
-    () => createConnectionHandlers(t, 'PLAYER'),
-    [t]
+    () => createConnectionHandlers(t, 'PLAYER', username),
+    [t, username]
   );
   const {
     handlePlayerDisconnected,
@@ -72,11 +103,23 @@ export function usePlayerSessionEvents({
   useEffect(() => {
     if (!socket) return;
 
-    const handleUpdateUsers = (data: any) => {
+    // Leaderboard updates stream in on every opponent's word in a busy room
+    // (up to ~150/s in a 50-player game). Each raw setLeaderboard re-executes
+    // PlayerView → InGameScreen, stealing frame budget from the player's own
+    // word-drag RAF. Coalesce to ~6.7/s with the freshest payload: the leading
+    // edge keeps the player's own score instant, the display is already frozen
+    // mid-drag by useFrozenWhileSelecting, and 6.7/s is faster than anyone can
+    // read a scoreboard. cancel() on cleanup avoids a post-unmount setState.
+    const throttledSetLeaderboard = throttleLatest(
+      (lb: LeaderboardEntry[]) => setLeaderboard(lb),
+      LEADERBOARD_THROTTLE_MS,
+    );
+
+    const handleUpdateUsers = (data: UpdateUsersPayload) => {
       setPlayersReady(data.users || []);
     };
 
-    const handleShufflingGridUpdate = (data: any) => {
+    const handleShufflingGridUpdate = (data: ShufflingGridPayload) => {
       if (data.grid) {
         setShufflingGrid(data.grid);
       }
@@ -85,44 +128,44 @@ export function usePlayerSessionEvents({
       }
     };
 
-    const handleUpdateLeaderboard = (data: any) => {
-      setLeaderboard(data.leaderboard);
+    const handleUpdateLeaderboard = (data: LeaderboardUpdatePayload) => {
+      if (typeof window !== 'undefined' && window.location.search.includes('lbdebug')) {
+        console.info('[lbdebug][player] updateLeaderboard received:', (data.leaderboard || []).map(e => `${e.username}=${e.score}`).join(', '));
+      }
+      throttledSetLeaderboard(data.leaderboard);
     };
 
-    const handleLiveAchievementUnlocked = (data: any) => {
+    const handleLiveAchievementUnlocked = (data: LiveAchievementPayload) => {
       const validAchievements = processAchievements(data, queueAchievement, 'PLAYER');
       if (validAchievements.length > 0) {
         setAchievements(prev => [...prev, ...validAchievements]);
       }
     };
 
-    const handleHostDisconnected = (data: any) => {
+    const handleHostDisconnected = (data: HostMessagePayload) => {
       logger.log('[PLAYER] Host disconnected, waiting for reconnection');
-      neoInfoToast(data.message || t('playerView.hostDisconnected') || 'Host disconnected. Waiting for reconnection...', {
-        icon: '⏳',
-        duration: 5000
-      });
+      neoInfoToast(
+        resolveHostLeftMessage(data, t, 'playerView.hostDisconnected'),
+        { icon: TOAST_ICONS.hourglass, duration: 5000 }
+      );
     };
 
-    const handleHostTransferred = (data: any) => {
+    const handleHostTransferred = (data: HostTransferredPayload) => {
       logger.log('[PLAYER] Host transferred to:', data.newHost);
-      neoSuccessToast(data.message || `${data.newHost} ${t('playerView.isNowHost') || 'is now the host'}`, {
-        icon: '👑',
-        duration: 4000
-      });
+      // Silent — the host crown moves on the player roster, no toast needed.
     };
 
-    const handleSessionTakenOver = (data: any) => {
+    const handleSessionTakenOver = (data: HostMessagePayload) => {
       logger.log('[PLAYER] Session taken over by another tab');
       intentionalExitRef.current = true;
       clearSessionPreservingUsername(username);
       neoInfoToast(data.message || t('playerView.sessionMovedToAnotherTab') || 'Session moved to another tab', {
-        icon: '📱',
+        icon: TOAST_ICONS.smartphone,
         duration: 3000
       });
     };
 
-    const handleSessionMigrated = (data: any) => {
+    const handleSessionMigrated = (data: HostMessagePayload) => {
       logger.log('[PLAYER] Session migrated to different room');
       intentionalExitRef.current = true;
       clearSessionPreservingUsername(username);
@@ -131,8 +174,8 @@ export function usePlayerSessionEvents({
       });
     };
 
-    const handleError = (data: any) => {
-      const message = data?.message || t('playerView.errorOccurred') || 'An error occurred';
+    const handleError = (data: SocketErrorEventPayload) => {
+      const message = socketErrorMessage(data, t);
       wordErrorToast(message, { duration: 3000 });
     };
 
@@ -142,6 +185,10 @@ export function usePlayerSessionEvents({
 
     // Register listeners
     socket.on('updateUsers', handleUpdateUsers);
+    // Guest rename re-keys the roster server-side and broadcasts `playerListUpdate`
+    // (same `{ users }` shape). Without this listener the roster kept stale names —
+    // breaking anything keyed by display name (e.g. lobby emote face-swaps).
+    socket.on('playerListUpdate', handleUpdateUsers);
     socket.on('playerPresenceUpdate', handlePlayerPresenceUpdate);
     socket.on('shufflingGridUpdate', handleShufflingGridUpdate);
     socket.on('updateLeaderboard', handleUpdateLeaderboard);
@@ -160,7 +207,9 @@ export function usePlayerSessionEvents({
     socket.on('rateLimited', handleRateLimited);
 
     return () => {
+      throttledSetLeaderboard.cancel();
       socket.off('updateUsers', handleUpdateUsers);
+      socket.off('playerListUpdate', handleUpdateUsers);
       socket.off('playerPresenceUpdate', handlePlayerPresenceUpdate);
       socket.off('shufflingGridUpdate', handleShufflingGridUpdate);
       socket.off('updateLeaderboard', handleUpdateLeaderboard);

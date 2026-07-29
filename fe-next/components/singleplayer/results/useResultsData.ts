@@ -6,11 +6,29 @@
  */
 
 import { useMemo } from 'react';
-import { calculatePlayerInsights, WordData } from '@/utils/gameInsights';
+import { calculatePlayerInsights, type PlayerInsights, type WordData } from '@/utils/gameInsights';
 import { categorizeWords, calculateWordStats } from '@/components/results/utils';
 import { calculateAllPlayerArchetypes, getMissedWords, type PlayerArchetype } from '@/utils/playerArchetypes';
+import { calculateWordScore } from '@/shared/utils/scoring';
 import type { WordObject } from '@/components/results/types';
 import type { SinglePlayerResultsData, PlayerWordData } from '../SinglePlayerView';
+
+// Re-export types for consumers
+export type { PlayerInsights };
+
+/** Type alias for word grouping by point values */
+export type WordsByPoints = Record<number, WordObject[]>;
+
+/** Type alias for invalid word display */
+export type InvalidWord = WordObject;
+
+/** Missed word that player could have found */
+export interface MissedWord {
+  word: string;
+  score: number;
+  foundBy: string[];
+  path?: { row: number; col: number }[];
+}
 
 export interface BotWordDetail {
   name: string;
@@ -49,10 +67,7 @@ function playerWordDataToWordObject(word: PlayerWordData): WordObject {
 }
 
 export interface ParticipantAvatar {
-  emoji?: string;
-  color?: string;
-  profilePictureUrl?: string | null;
-  avatarImage?: string;
+  customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
 }
 
 export interface Participant {
@@ -87,6 +102,22 @@ export function useResultsData(
 
   const playerRank = allParticipants.findIndex(p => p.isPlayer) + 1;
   const isWinner = playerRank === 1;
+
+  // Debug logging for win streak diagnosis
+  if (process.env.NODE_ENV === 'development') {
+    console.log('[ResultsData] Player rank calculation', {
+      playerScore: results.playerScore,
+      botScores: results.botScores.map(b => ({ name: b.name, score: b.score })),
+      allParticipantsSorted: allParticipants.map((p, i) => ({
+        rank: i + 1,
+        name: p.name,
+        score: p.score,
+        isPlayer: p.isPlayer,
+      })),
+      playerRank,
+      isWinner,
+    });
+  }
 
   // Convert PlayerWordData to WordObject format for shared utilities
   const wordObjects = useMemo((): WordObject[] => {
@@ -198,7 +229,7 @@ export function useResultsData(
         .map(word => ({
           word,
           validated: true,
-          score: Math.max(word.length - 1, 1), // Estimate score from word length
+          score: calculateWordScore(word),
         })),
     }));
 
@@ -218,13 +249,14 @@ export function useResultsData(
     if (results.botScores.length === 0) return [];
 
     const playerUsername = t('common.you') || 'You';
-    const playerWords = results.playerWordData?.filter(w => w.isValid) || [];
+    const playerWords = results.playerWordData || [];
 
-    // Build allPlayersWords map
+    // Build allPlayersWords map — include ALL player words (even invalid)
+    // so words the player attempted don't show as "missed"
     const allPlayersWords: Record<string, Array<{ word: string; validated: boolean; score: number }>> = {
       [playerUsername]: playerWords.map(w => ({
         word: w.word,
-        validated: true,
+        validated: w.isValid,
         score: w.score,
       })),
     };
@@ -236,7 +268,7 @@ export function useResultsData(
         .map(word => ({
           word,
           validated: true,
-          score: Math.max(word.length - 1, 1), // Estimate score from word length
+          score: calculateWordScore(word),
         }));
     });
 

@@ -101,7 +101,7 @@ describe('ShareButton', () => {
 
   describe('click handling', () => {
     it('calls onClick when clicked', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(<ShareButton onClick={handleClick}>Copy Link</ShareButton>);
 
       fireEvent.click(screen.getByRole('button'));
@@ -142,7 +142,7 @@ describe('ShareButton', () => {
     });
 
     it('can be activated with keyboard', () => {
-      const handleClick = jest.fn();
+      const handleClick = vi.fn();
       render(<ShareButton onClick={handleClick}>Copy Link</ShareButton>);
       const button = screen.getByRole('button');
 

@@ -20,8 +20,23 @@ const TvGrid = memo<TvGridProps>(({
   earthquakeShaking = false,
 }) => {
   return (
-    <div className="tv-grid-container w-full h-full flex items-center justify-center p-2 md:p-4">
-      <div className="w-full h-full max-w-[min(100%,800px)] max-h-[min(100%,800px)] aspect-square">
+    <div
+      className="tv-grid-container w-full h-full flex items-center justify-center p-2 sm:p-3 md:p-6"
+      style={{ containerType: 'size' }}
+      role="img"
+      aria-label="Game letter grid"
+    >
+      {/* Square grid that fits within available space - uses min of container width/height */}
+      {/* On mobile, use more of the available space with tighter padding */}
+      <div
+        className="aspect-square max-w-full max-h-full"
+        style={{
+          // Size based on the smaller dimension to ensure square fits
+          // Use 95% to leave some breathing room on mobile
+          width: 'min(95cqi, 95cqb)',
+          height: 'min(95cqi, 95cqb)',
+        }}
+      >
         <GridComponent
           grid={grid}
           interactive={false}

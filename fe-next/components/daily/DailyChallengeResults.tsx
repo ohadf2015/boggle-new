@@ -1,47 +1,41 @@
 'use client';
 
-import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Share2, Trophy, Flame, Target, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ImageDown, ChevronDown, ChevronUp } from 'lucide-react';
-import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-
-// X/Twitter icon (no lucide equivalent)
-const XTwitterIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
-    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-  </svg>
-);
-
-// WhatsApp icon (official brand icon)
-const WhatsAppIcon = ({ className }: { className?: string }) => (
-  <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-  </svg>
-);
+import React, { useState, useCallback, useEffect, useRef } from 'react';
+import GameFeedback from '@/components/feedback/GameFeedback';
+import { m, AnimatePresence } from 'framer-motion';
+import WatchAdButton from './WatchAdButton';
+import DoubleGoldAdButton from '@/components/ads/DoubleGoldAdButton';
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
+import CrazyGamesBanner from '@/components/CrazyGamesBanner';
+import { Share2, Flame, BookOpen, ArrowLeft, Copy, Check, Image as ImageIcon, ChevronDown, ChevronUp } from 'lucide-react';
+import { useDailyConfetti } from './results/useDailyConfetti';
+import { Loader } from '@/components/ui/Loader';
+import { SharePanelModal, XTwitterIcon, WhatsAppIcon } from './results/SharePanelModal';
+import { ImagePreviewModal } from './results/ImagePreviewModal';
 import { Button } from '@/components/ui/button';
 import NextStepPrompt from '@/components/results/NextStepPrompt';
-import { hasPlayedToday } from '@/utils/dailyChallenge/storage';
-import { LANGUAGE_OPTIONS } from './results/constants';
-import type { Language } from '@/types';
-import { fireConfetti } from '@/utils/confettiUtils';
+import { ResultsHero } from '@/components/results/shared';
+import { displayScore } from '@/utils/scoreDisplay';
 import {
   generateShareableResult,
-  getGuestFingerprint,
-  getGuestDailyPlayer,
   type DailyChallengeResult,
   type DailyStreak,
-  type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
 import DailyLeaderboard from './DailyLeaderboard';
+import { DailyRewardClaim } from './DailyRewardClaim';
+import { getRewardCoins } from '@/lib/dailyRewards';
 import { useAuth } from '@/contexts/AuthContext';
+import { GameEmojiShareCard } from '@/components/shared/GameEmojiShareCard';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useDailyResultSubmission } from './results/useDailyResultSubmission';
 import {
   shareImageWithNativeShare,
   type ShareImageResult,
 } from '@/utils/shareImageGenerator';
-import {
-  generateDailyShareImage,
-  downloadDailyShareImage,
-} from '@/utils/dailyShareImage';
+// dailyShareImage (620 LOC + canvas rendering) is dynamically imported inside the
+// image handlers so it stays out of the results-screen chunk — it only runs on share/download tap.
+import { maybeRequestReview, trackPositiveMoment } from '@/lib/reviews/requestReview';
 
 interface DailyChallengeResultsProps {
   result: DailyChallengeResult;
@@ -52,7 +46,6 @@ interface DailyChallengeResultsProps {
   countdown: string;
   isNewCompletion: boolean;
   onBack: () => void;
-  onGameLanguageChange?: (lang: Language) => void;
   t: (key: string) => string;
 }
 
@@ -68,222 +61,47 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   countdown,
   isNewCompletion,
   onBack,
-  onGameLanguageChange,
   t,
 }) => {
   const [copied, setCopied] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
-  const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
-  const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
-  const [leaderboardKey, setLeaderboardKey] = useState(0);
+  const { guestFingerprint, guestPlayer, leaderboardKey } = useDailyResultSubmission(result, longestWord, isNewCompletion);
   const [shareImage, setShareImage] = useState<ShareImageResult | null>(null);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [showImagePreview, setShowImagePreview] = useState(false);
-  const [currentUserRank, setCurrentUserRank] = useState<number | null>(null);
-  const [totalPlayers, setTotalPlayers] = useState(0);
-  const [showSharePreview, setShowSharePreview] = useState(false);
   const [showWords, setShowWords] = useState(false);
   const { profile, isAuthenticated } = useAuth();
+  const { showInterstitial } = useInterstitialAd();
+  const { submitLeaderboardScore } = useCrazyGames();
 
-  // Get languages that haven't been played today
-  const availableLanguages = useMemo(() =>
-    LANGUAGE_OPTIONS.filter(
-      (option) => option.code !== result.language && !hasPlayedToday(option.code as Language)
-    ),
-    [result.language]
-  );
-
-  // Performance optimization for low-end devices
-  const { isLowEnd, enableComplexAnimations } = useDevicePerformance();
-  const skipConfetti = useMemo(() => isLowEnd || !enableComplexAnimations, [isLowEnd, enableComplexAnimations]);
-
-  // Fire confetti burst for a specific rank (top 3 celebration) - skip on low-end devices
-  const fireRankConfettiLocal = useCallback((rank: number): void => {
-    if (skipConfetti) return;
-
-    // Confetti colors for each rank (matching Top3Leaderboard)
-    const RANK_CONFETTI_COLORS: Record<number, string[]> = {
-      1: ['#ffd700', '#ffed4a', '#f59e0b', '#fbbf24'], // Gold
-      2: ['#c0c0c0', '#94a3b8', '#e2e8f0', '#cbd5e1'], // Silver
-      3: ['#cd7f32', '#ea580c', '#f97316', '#fb923c'], // Bronze/Orange
-    };
-
-    const count = Math.floor(60 * (1.2 - rank * 0.15)); // Reduced: 1st = 60, 2nd = 51, 3rd = 42
-    const colors = RANK_CONFETTI_COLORS[rank] || RANK_CONFETTI_COLORS[1];
-
-    const defaults = {
-      origin: { y: 0.6 },
-      colors,
-    };
-
-    fireConfetti({
-      ...defaults,
-      particleCount: Math.floor(count * 0.35),
-      spread: 26,
-      startVelocity: 55,
-    });
-    fireConfetti({
-      ...defaults,
-      particleCount: Math.floor(count * 0.25),
-      spread: 60,
-    });
-    fireConfetti({
-      ...defaults,
-      particleCount: Math.floor(count * 0.4),
-      spread: 100,
-      decay: 0.91,
-      scalar: 0.9,
-    });
-  }, [skipConfetti]);
-
-  // Handle rank change from leaderboard and fire top 3 confetti
-  const handleCurrentUserRankChange = useCallback((rank: number | null) => {
-    setCurrentUserRank(rank);
-    // Fire rank-specific confetti for top 3 on new completion
-    if (isNewCompletion && rank !== null && rank <= 3) {
-      // Delay to let initial confetti finish
-      setTimeout(() => fireRankConfettiLocal(rank), 2500);
-    }
-  }, [isNewCompletion, fireRankConfettiLocal]);
-
-  // Get guest fingerprint and player info on mount
+  const hasMarkedQuestRef = useRef(false);
+  const hasRequestedReviewRef = useRef(false);
   useEffect(() => {
-    getGuestFingerprint().then(setGuestFingerprint);
-    // Get guest player info for display in leaderboard
-    if (!isAuthenticated) {
-      getGuestDailyPlayer().then(setGuestPlayer);
+    showInterstitial('daily-complete');
+    if (result.score > 0) {
+      submitLeaderboardScore(result.score);
     }
-  }, [isAuthenticated]);
-
-  // Submit result to backend when completing a new challenge
-  useEffect(() => {
-    // For authenticated users, wait for profile. For guests, proceed without waiting for guestPlayer
-    // We can use fallback values if guestPlayer hasn't loaded yet
-    const canSubmit = isNewCompletion && result && guestFingerprint && (isAuthenticated ? !!profile : true);
-
-    if (canSubmit) {
-      const submitResult = async () => {
-        try {
-          // Get player display info with fallbacks for guests
-          const displayName = isAuthenticated && profile
-            ? profile.display_name || profile.username
-            : guestPlayer?.displayName || 'Guest Player';
-          const avatarEmoji = isAuthenticated && profile
-            ? profile.avatar_emoji
-            : guestPlayer?.avatarEmoji || '🎯';
-          const avatarColor = isAuthenticated && profile
-            ? profile.avatar_color
-            : guestPlayer?.avatarColor || '#6366f1';
-          const avatarImage = isAuthenticated && profile
-            ? profile.avatar_image
-            : undefined;
-          const profilePictureUrl = isAuthenticated && profile
-            ? profile.profile_picture_url
-            : undefined;
-
-          // Fetch country code from geolocation API (works for all languages)
-          let countryCode: string | null = null;
-          try {
-            const geoResponse = await fetch('/api/geolocation');
-            if (geoResponse.ok) {
-              const geoData = await geoResponse.json();
-              countryCode = geoData.countryCode || null;
-            }
-          } catch (geoError) {
-            console.warn('Failed to fetch country code:', geoError);
-            // Continue without country code - it's optional
-          }
-
-          const response = await fetch('/api/daily-challenge/submit', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              puzzleDate: result.puzzleDate,
-              puzzleNumber: result.puzzleNumber,
-              language: result.language,
-              playerId: isAuthenticated && profile ? profile.id : null,
-              guestFingerprint: !isAuthenticated ? guestFingerprint : null,
-              displayName,
-              avatarEmoji,
-              avatarColor,
-              avatarImage,
-              profilePictureUrl,
-              countryCode,
-              score: Math.round(result.score),
-              wordCount: result.wordCount,
-              wordsByLength: result.wordsByLength,
-              timeSeconds: result.timeSeconds,
-              longestWord,
-            }),
-          });
-          if (!response.ok) {
-            const errorText = await response.text();
-            console.error('Failed to submit daily result:', errorText);
-            console.error('Submission details:', {
-              puzzleDate: result.puzzleDate,
-              language: result.language,
-              isAuthenticated,
-              hasProfile: !!profile,
-              hasGuestFingerprint: !!guestFingerprint,
-              displayName,
-            });
-            return; // Don't refresh leaderboard if submission failed
-          }
-
-          const responseData = await response.json();
-          console.log('Daily challenge submitted successfully:', responseData);
-
-          // Refresh the leaderboard after successful submission
-          setLeaderboardKey(prev => prev + 1);
-        } catch (err) {
-          console.error('Failed to submit daily result:', err);
-        }
-      };
-      submitResult();
+    if (!hasMarkedQuestRef.current) {
+      // Daily Challenge is no longer tracked in the daily quest system
+      // The quest now focuses on Blast, Classic MP, and Word Hunt MP
+      hasMarkedQuestRef.current = true;
     }
-  }, [isNewCompletion, result, guestFingerprint, longestWord, isAuthenticated, profile, guestPlayer]);
-
-  // Fire confetti on new completion - skip on low-end devices
-  useEffect(() => {
-    if (skipConfetti || !isNewCompletion || result.score <= 0) return;
-
-    const duration = 1500; // Reduced from 2000 for better performance
-    const end = Date.now() + duration;
-
-    const frame = () => {
-      fireConfetti({
-        particleCount: 2, // Reduced from 3
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: ['#FFE135', '#FF6B35', '#00D9FF'],
-      });
-      fireConfetti({
-        particleCount: 2, // Reduced from 3
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: ['#FFE135', '#FF6B35', '#00D9FF'],
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-    frame();
-
-    // Extra burst for streak milestones (reduced particle count)
-    if (streakMilestone) {
-      setTimeout(() => {
-        fireConfetti({
-          particleCount: 60, // Reduced from 100
-          spread: 100,
-          origin: { y: 0.6 },
-          colors: ['#FF6B35', '#FFE135', '#FF1493'],
-        });
-      }, 500);
+    // Track positive moment + maybe request review — only on a real result (score > 0),
+    // so abandoned/zero attempts don't count toward the review-prompt engagement gate.
+    if (result.score > 0 && !hasRequestedReviewRef.current) {
+      trackPositiveMoment();
+      maybeRequestReview('dailyStreak');
+      hasRequestedReviewRef.current = true;
     }
-  }, [isNewCompletion, result.score, streakMilestone, skipConfetti]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const {
+    currentUserRank,
+    totalPlayers,
+    handleCurrentUserRankChange,
+    setTotalPlayers,
+    fireRankConfettiLocal,
+  } = useDailyConfetti(isNewCompletion, result.score, streakMilestone);
 
   // Generate shareable text with translations
   const shareText = generateShareableResult(result, undefined, t);
@@ -295,6 +113,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'NotAllowedError') return;
       console.error('Failed to copy:', err);
     }
   }, [shareText]);
@@ -333,13 +152,14 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
 
     setIsGeneratingImage(true);
     try {
+      const { generateDailyShareImage } = await import('@/utils/dailyShareImage');
       const imageResult = await generateDailyShareImage({
         gameType: 'puzzle',
         rank: currentUserRank,
         totalPlayers,
         puzzleNumber: result.puzzleNumber,
         language: result.language,
-        score: Math.round(result.score),
+        score: displayScore(Math.round(result.score)),
         wordCount: result.wordCount,
         displayName: isAuthenticated && profile
           ? profile.display_name || profile.username
@@ -379,22 +199,23 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
   }, [shareImage, shareText, handleGenerateImage, t]);
 
   // Download share image
-  const handleDownloadImage = useCallback(() => {
+  const handleDownloadImage = useCallback(async () => {
     if (shareImage) {
+      const { downloadDailyShareImage } = await import('@/utils/dailyShareImage');
       downloadDailyShareImage(shareImage, 'puzzle', result.puzzleNumber);
     }
   }, [shareImage, result.puzzleNumber]);
 
   return (
-    <motion.div
+    <m.div
       key="results"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start p-4 pb-24 md:pb-4 overflow-y-auto"
+      className="flex-1 min-h-0 flex flex-col items-center justify-start p-4 page-content-safe overflow-y-auto overscroll-contain scrollable-area"
     >
       {/* Back button */}
-      <motion.div className="absolute top-24 sm:top-28 start-4">
+      <m.div className="absolute top-24 sm:top-28 inset-s-4">
         <Button
           variant="ghost"
           size="sm"
@@ -404,100 +225,55 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           <ArrowLeft className="w-4 h-4 me-2 rtl:rotate-180" />
           {t('daily.home')}
         </Button>
-      </motion.div>
+      </m.div>
 
       {/* Main content - Cleaner design */}
-      <div className="max-w-md w-full text-center space-y-5 py-6">
+      {/* On desktop: 2-column grid with score/share left, leaderboard right */}
+      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl py-6">
+      <div className="lg:grid lg:grid-cols-2 lg:gap-8 lg:items-start">
 
-        {/* Completion badge - Simplified */}
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          transition={{ type: 'spring', delay: 0.1 }}
-        >
-          {isNewCompletion ? (
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-neo-cyan/20 rounded-full border border-neo-cyan/40">
-              <Trophy className="w-4 h-4 text-neo-cyan" />
-              <span className="font-bold text-neo-cyan text-sm uppercase tracking-wide">
-                {t('daily.completed')}
-              </span>
-            </div>
-          ) : (
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-slate-700/50 rounded-full border border-slate-600">
-              <Target className="w-4 h-4 text-slate-400" />
-              <span className="font-bold text-slate-400 text-sm uppercase tracking-wide">
-                {t('daily.alreadyPlayed')}
-              </span>
-            </div>
-          )}
-        </motion.div>
+      {/* LEFT COLUMN on desktop: score, stats, share, words (all existing stacked content) */}
+      <div className="text-center space-y-5">
 
-        {/* Score - Clear focal point */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          onClick={() => result.score > 0 && fireRankConfettiLocal(currentUserRank && currentUserRank <= 3 ? currentUserRank : 1)}
-          className="cursor-pointer transition-transform hover:scale-[1.02] active:scale-[0.98] py-2"
-        >
-          <div className="text-xs text-slate-500 uppercase font-bold tracking-wider">
-            {t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
-          </div>
-          <div className="text-7xl md:text-8xl font-black text-neo-lime drop-shadow-[0_0_20px_rgba(255,225,53,0.3)] my-1">
-            {Math.round(result.score)}
-          </div>
-          <div className="text-slate-400 text-sm font-medium">
-            {t('common.points')}
-          </div>
-        </motion.div>
+        {/* Hero Zone — unified score + stats */}
+        <ResultsHero
+          outcomeLabel={isNewCompletion ? t('daily.completed') : t('daily.alreadyPlayed')}
+          score={displayScore(Math.round(result.score))}
+          subtitle={t('daily.puzzleNumber').replace('{number}', String(result.puzzleNumber))}
+          pointsLabel={t('common.points')}
+          variant={isNewCompletion ? 'win' : 'neutral'}
+          badge={streakMilestone && isNewCompletion ? {
+            text: `${t('daily.streakDays').replace('{count}', String(streakMilestone))}`,
+            variant: 'milestone',
+          } : undefined}
+          onScoreClick={() => result.score > 0 && fireRankConfettiLocal(currentUserRank && currentUserRank <= 3 ? currentUserRank : 1)}
+          inlineStats
+          stats={[
+            { label: t('common.words'), value: result.wordCount },
+            { label: t('daily.streak'), value: streak?.currentStreak ?? 0, icon: <Flame className="w-4 h-4 text-amber-400" /> },
+            { label: t('results.time'), value: `${Math.floor((result.timeSeconds ?? 0) / 60)}:${((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}` },
+          ]}
+        />
 
-        {/* Streak milestone - Simplified */}
-        {streakMilestone && isNewCompletion && (
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', delay: 0.3 }}
-            className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full border border-amber-500/40"
-          >
-            <Flame className="w-5 h-5 text-amber-400" />
-            <span className="font-black text-amber-400">
-              {t('daily.streakDays').replace('{count}', String(streakMilestone))}
-            </span>
-          </motion.div>
+        {/* Daily Reward Claim */}
+        {isNewCompletion && streak && (
+          <>
+            <DailyRewardClaim
+              coinsEarned={getRewardCoins(streak.currentStreak)}
+              currentStreakDay={streak.currentStreak}
+              t={t}
+            />
+            {/* Endowment anchoring: double the daily reward they just saw */}
+            <DoubleGoldAdButton
+              earnedAmount={getRewardCoins(streak.currentStreak)}
+              surface="daily_results_double"
+            />
+            <WatchAdButton onCoinsEarned={() => {}} t={t} surface="daily_challenge_results" />
+          </>
         )}
 
-        {/* Stats - Unified row design */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="bg-slate-800/50 rounded-xl border border-slate-700/50 p-3"
-        >
-          <div className="flex items-center justify-around">
-            <div className="text-center px-3">
-              <div className="text-2xl font-black text-white">{result.wordCount}</div>
-              <div className="text-xs text-slate-400 font-medium">{t('common.words')}</div>
-            </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-3">
-              <div className="flex items-center justify-center gap-1">
-                <Flame className="w-4 h-4 text-amber-400" />
-                <span className="text-2xl font-black text-white">{streak?.currentStreak ?? 0}</span>
-              </div>
-              <div className="text-xs text-slate-400 font-medium">{t('daily.streak')}</div>
-            </div>
-            <div className="w-px h-8 bg-slate-700" />
-            <div className="text-center px-3">
-              <div className="text-2xl font-black text-white">
-                {Math.floor((result.timeSeconds ?? 0) / 60)}:{((result.timeSeconds ?? 0) % 60).toString().padStart(2, '0')}
-              </div>
-              <div className="text-xs text-slate-400 font-medium">{t('results.time')}</div>
-            </div>
-          </div>
-        </motion.div>
-
         {/* Share Section - Streamlined */}
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
@@ -506,19 +282,19 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           {/* Primary CTA */}
           <Button
             onClick={handleNativeShare}
-            className="w-full py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-3 border-neo-black rounded-xl shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
+            className="w-full max-w-btn py-4 text-base font-black uppercase bg-neo-cyan text-neo-black border-3 border-neo-black rounded-xl shadow-hard hover:shadow-hard-lg hover:-translate-y-1 transition-all duration-150"
           >
-            <Share2 className="mr-2 w-5 h-5" />
+            <Share2 className="me-2 w-5 h-5" />
             {t('daily.shareScore')}
           </Button>
 
-          {/* Secondary share options - Cleaner row */}
+          {/* Secondary share options — neo-brutalist row */}
           <div className="flex items-center justify-center gap-2">
             <Button
               onClick={handleWhatsApp}
               aria-label="Share on WhatsApp"
               size="sm"
-              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all"
+              className="flex-1 py-3 bg-brand-whatsapp hover:bg-brand-whatsapp-hover text-white border-2 border-neo-black rounded-neo shadow-hard-sm transition-all"
             >
               <WhatsAppIcon className="w-4 h-4" />
             </Button>
@@ -527,7 +303,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               onClick={handleTwitter}
               aria-label="Share on X"
               size="sm"
-              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all"
+              className="flex-1 py-3 bg-neo-navy text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all"
             >
               <XTwitterIcon className="w-4 h-4" />
             </Button>
@@ -535,12 +311,12 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             <Button
               onClick={handleGenerateImage}
               disabled={isGeneratingImage}
-              aria-label={t('daily.shareImage') || 'Share as Image'}
+              aria-label={t('daily.shareImage')}
               size="sm"
-              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all disabled:opacity-50"
+              className="flex-1 py-3 bg-neo-navy text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all disabled:opacity-50"
             >
               {isGeneratingImage ? (
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                <Loader size="sm" />
               ) : (
                 <ImageIcon className="w-4 h-4" />
               )}
@@ -550,7 +326,7 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
               onClick={handleCopy}
               aria-label={copied ? t('common.copied') : t('daily.copyToClipboard')}
               size="sm"
-              className="flex-1 py-3 bg-slate-700 hover:bg-slate-600 text-white border-2 border-slate-600 rounded-lg transition-all"
+              className="flex-1 py-3 bg-neo-navy text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all"
             >
               {copied ? (
                 <Check className="w-4 h-4 text-neo-cyan" />
@@ -561,97 +337,112 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
           </div>
 
           {copied && (
-            <motion.p
+            <m.p
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-sm text-neo-cyan font-medium"
             >
               {t('daily.copiedToClipboard')}
-            </motion.p>
+            </m.p>
           )}
 
-          {/* Collapsible share preview */}
-          <button
-            onClick={() => setShowSharePreview(!showSharePreview)}
-            className="flex items-center justify-center gap-1 text-xs text-slate-500 hover:text-slate-400 transition-colors mx-auto"
-          >
-            {showSharePreview ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
-            {showSharePreview ? t('common.hidePreview') || 'Hide preview' : t('common.showPreview') || 'Show preview'}
-          </button>
+        </m.div>
 
-          <AnimatePresence>
-            {showSharePreview && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
-              >
-                <div className="bg-slate-900 rounded-lg border border-slate-700 p-3 text-left">
-                  <pre className="text-white text-xs font-mono whitespace-pre-wrap leading-relaxed">
-                    {shareText}
-                  </pre>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
+        {/* Emoji Share Card */}
+        <m.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.52 }}
+        >
+          <GameEmojiShareCard
+            data={{
+              mode: 'classic',
+              puzzleNumber: result.puzzleNumber,
+              score: Math.round(result.score),
+              words,
+            }}
+            t={t}
+            language={result.language}
+          />
+        </m.div>
 
-        {/* Next Step - Suggest Multiplayer */}
-        <motion.div
+        {/* Next Step - Suggest Multiplayer (unlimited games!) */}
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.55 }}
-          className="pt-4"
         >
           <NextStepPrompt
             currentMode="daily"
             onBackToLobby={onBack}
             variant="mobile"
           />
-        </motion.div>
-
-        {/* Try Another Language */}
-        {availableLanguages.length > 0 && onGameLanguageChange && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.55 }}
-            className="pt-4 border-t border-slate-700/50"
-          >
-            <p className="text-xs text-slate-500 font-medium uppercase tracking-wide mb-2">
-              {t('wordHunt.results.tryAnotherLanguage') || 'Try another language'}
-            </p>
-            <div className="flex flex-wrap justify-center gap-2">
-              {availableLanguages.map((option) => (
-                <Button
-                  key={option.code}
-                  onClick={() => onGameLanguageChange(option.code as Language)}
-                  size="sm"
-                  className="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-lg transition-all flex items-center gap-1.5"
-                >
-                  <span className="text-base">{option.flag}</span>
-                  <span className="font-medium text-xs">{option.name}</span>
-                </Button>
-              ))}
-            </div>
-          </motion.div>
-        )}
+        </m.div>
 
         {/* Next puzzle countdown */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
           className="py-3"
         >
-          <p className="text-xs text-slate-500">
+          <p className="text-xs text-neo-white font-bold uppercase tracking-wider">
             {t('daily.nextPuzzleIn')} <span className="font-bold text-neo-cyan">{countdown}</span>
           </p>
-        </motion.div>
+        </m.div>
 
+        {/* Words found - Collapsible (left column on desktop) */}
+        {words.length > 0 && (
+          <m.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <button
+              onClick={() => setShowWords(!showWords)}
+              className="flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-slate-300 transition-colors mx-auto py-2"
+            >
+              <BookOpen className="w-4 h-4" />
+              <span className="font-medium">{t('common.wordsFound')} ({words.length})</span>
+              {showWords ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            </button>
+
+            <AnimatePresence>
+              {showWords && (
+                <m.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="flex flex-wrap gap-1 justify-center pt-2">
+                    {words.map((word, i) => (
+                      <span
+                        key={`word-${i}-${word}`}
+                        className={`px-2 py-1 text-xs font-medium rounded-md ${
+                          word === longestWord
+                            ? 'bg-neo-yellow text-neo-black border-2 border-neo-black shadow-hard-sm font-black'
+                            : 'bg-neo-navy text-neo-white border border-neo-black/30 rounded-neo'
+                        }`}
+                      >
+                        {word}
+                      </span>
+                    ))}
+                  </div>
+                </m.div>
+              )}
+            </AnimatePresence>
+          </m.div>
+        )}
+      </div>{/* end left column */}
+
+      {/* Native-banner slot (mobile column on stack; web shows nothing — CrazyGamesBanner covers web) */}
+      <ResultsBannerSlot placement="daily-complete" className="lg:hidden my-3" />
+
+      {/* RIGHT COLUMN on desktop: leaderboard (on mobile rendered below via normal flow) */}
+      <div>
         {/* Today's Players Leaderboard */}
-        <motion.div
+        <m.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.7 }}
@@ -668,195 +459,59 @@ const DailyChallengeResults: React.FC<DailyChallengeResultsProps> = ({
             t={t}
             gameType="puzzle"
           />
-        </motion.div>
+        </m.div>
+      </div>{/* end right column */}
 
-        {/* Words found - Collapsible */}
-        {words.length > 0 && (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            <button
-              onClick={() => setShowWords(!showWords)}
-              className="flex items-center justify-center gap-2 text-sm text-slate-400 hover:text-slate-300 transition-colors mx-auto py-2"
-            >
-              <BookOpen className="w-4 h-4" />
-              <span className="font-medium">{t('common.wordsFound')} ({words.length})</span>
-              {showWords ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
+      </div>{/* end lg:grid */}
 
-            <AnimatePresence>
-              {showWords && (
-                <motion.div
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  className="overflow-hidden"
-                >
-                  <div className="flex flex-wrap gap-1 justify-center pt-2">
-                    {words.map((word, i) => (
-                      <span
-                        key={i}
-                        className={`px-2 py-1 text-xs font-medium rounded-md ${
-                          word === longestWord
-                            ? 'bg-neo-lime/20 text-neo-lime border border-neo-lime/30'
-                            : 'bg-slate-800 text-slate-300 border border-slate-700'
-                        }`}
-                      >
-                        {word}
-                      </span>
-                    ))}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
-        )}
+      {/* CrazyGames banner — 728x90 desktop, 320x50 mobile */}
+      <div className="hidden md:flex justify-center py-2">
+        <CrazyGamesBanner size="728x90" />
       </div>
+      <div className="flex justify-center py-2 md:hidden">
+        <CrazyGamesBanner size="320x50" />
+      </div>
+      {/* End-of-game sentiment (game_feedback, surface=daily) — only on a fresh
+          completion; the shared throttle keeps it rare across all surfaces. */}
+      <div className="mt-2 mb-4 max-w-md mx-auto">
+        <GameFeedback
+          surface="daily"
+          eligible={isNewCompletion}
+          gameMode="daily"
+          throttleKey={String(result.puzzleNumber)}
+        />
+      </div>
+      </div>{/* end outer width wrapper */}
 
       {/* Share panel for browsers without native share */}
       <AnimatePresence>
         {showSharePanel && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => setShowSharePanel(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-white dark:bg-neo-navy rounded-neo border-4 border-neo-black p-6 max-w-sm w-full"
-              onClick={e => e.stopPropagation()}
-            >
-              <h3 className="text-xl font-black mb-4">{t('daily.shareScore')}</h3>
-
-              <div className="space-y-3">
-                <Button
-                  onClick={handleWhatsApp}
-                  className="w-full py-3 bg-brand-whatsapp text-white border-3 border-neo-black rounded-neo"
-                >
-                  <WhatsAppIcon className="mr-2 w-5 h-5" />
-                  WhatsApp
-                </Button>
-
-                <Button
-                  onClick={handleTwitter}
-                  className="w-full py-3 bg-black text-white border-3 border-gray-700 rounded-neo"
-                >
-                  <XTwitterIcon className="mr-2 w-5 h-5" />
-                  X / Twitter
-                </Button>
-
-                <Button
-                  onClick={handleCopy}
-                  className="w-full py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white border-3 border-neo-black rounded-neo"
-                >
-                  {copied ? (
-                    <>
-                      <Check className="mr-2 w-5 h-5 text-neo-lime" />
-                      {t('common.copied')}
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="mr-2 w-5 h-5" />
-                      {t('daily.copyToClipboard')}
-                    </>
-                  )}
-                </Button>
-              </div>
-
-              <Button
-                onClick={() => setShowSharePanel(false)}
-                variant="ghost"
-                className="w-full mt-4"
-              >
-                {t('daily.close')}
-              </Button>
-            </motion.div>
-          </motion.div>
+          <SharePanelModal
+            onClose={() => setShowSharePanel(false)}
+            onWhatsApp={handleWhatsApp}
+            onTwitter={handleTwitter}
+            onCopy={handleCopy}
+            copied={copied}
+            t={t}
+          />
         )}
       </AnimatePresence>
 
       {/* Image preview modal */}
       <AnimatePresence>
         {showImagePreview && shareImage && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/85 backdrop-blur-sm flex items-center justify-center z-50 p-4"
-            onClick={() => setShowImagePreview(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.95, opacity: 0, y: 10 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="bg-slate-900 rounded-xl border-2 border-slate-700 p-5 max-w-lg w-full shadow-2xl"
-              onClick={e => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="text-center mb-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-neo-cyan/10 rounded-full border border-neo-cyan/30 mb-2">
-                  <ImageIcon className="w-4 h-4 text-neo-cyan" />
-                  <span className="text-xs font-bold text-neo-cyan uppercase tracking-wide">
-                    {t('daily.shareImage') || 'Share Image'}
-                  </span>
-                </div>
-                <p className="text-slate-400 text-sm">
-                  {t('daily.shareImageHint') || 'Share your achievement with friends!'}
-                </p>
-              </div>
-
-              {/* Image preview - using <img> intentionally for data URL which Next.js Image doesn't optimize */}
-              <div className="relative rounded-lg overflow-hidden border border-slate-600 mb-4 bg-slate-800">
-                <div className="absolute inset-0 bg-gradient-to-br from-neo-cyan/5 via-transparent to-neo-pink/5 pointer-events-none" />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={shareImage.dataUrl}
-                  alt={`LexiClash Daily Challenge #${result.puzzleNumber} - Score: ${Math.round(result.score)}`}
-                  className="w-full h-auto relative"
-                  style={{ maxHeight: '50vh', objectFit: 'contain' }}
-                />
-              </div>
-
-              {/* Action buttons */}
-              <div className="space-y-2">
-                {/* Primary CTA - Share */}
-                <Button
-                  onClick={handleShareImage}
-                  className="w-full py-3.5 bg-neo-cyan text-neo-black border-2 border-neo-black rounded-lg shadow-hard font-bold text-sm hover:shadow-hard-lg hover:-translate-y-0.5 transition-all"
-                >
-                  <Share2 className="mr-2 w-4 h-4" />
-                  {t('daily.shareScore')}
-                </Button>
-
-                {/* Secondary - Download */}
-                <Button
-                  onClick={handleDownloadImage}
-                  className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white border border-slate-600 rounded-lg font-medium text-sm transition-all"
-                >
-                  <ImageDown className="mr-2 w-4 h-4" />
-                  {t('daily.download') || 'Save Image'}
-                </Button>
-              </div>
-
-              {/* Close button */}
-              <button
-                onClick={() => setShowImagePreview(false)}
-                className="w-full mt-3 py-2 text-sm text-slate-500 hover:text-slate-300 transition-colors"
-              >
-                {t('daily.close')}
-              </button>
-            </motion.div>
-          </motion.div>
+          <ImagePreviewModal
+            shareImage={shareImage}
+            puzzleNumber={result.puzzleNumber}
+            score={result.score}
+            onClose={() => setShowImagePreview(false)}
+            onShare={handleShareImage}
+            onDownload={handleDownloadImage}
+            t={t}
+          />
         )}
       </AnimatePresence>
-    </motion.div>
+    </m.div>
   );
 };
 

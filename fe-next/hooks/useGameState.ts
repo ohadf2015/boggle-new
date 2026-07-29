@@ -8,8 +8,7 @@
  * - gameState/useGameState.ts: Hook implementation
  */
 
-// Re-export everything for backward compatibility
-export { useGameState } from './gameState';
+// Re-export types for backward compatibility
 export type {
   Player,
   ComboState,

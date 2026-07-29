@@ -41,6 +41,11 @@ interface UseEarthquakeAnimationProps {
 
 const PARTICLE_COLORS = ['#FFE135', '#FF6B35', '#FF3366', '#00FFFF', '#BFFF00'];
 
+// Stable zero-offset reference. Returning a fresh `{x:0,y:0,...}` literal from
+// getShakeOffset each render would defeat GridCell.memo (new ref per cell every
+// render). Sharing one frozen object keeps prop identity stable across renders.
+const ZERO_SHAKE_OFFSET: ShakeOffset = Object.freeze({ x: 0, y: 0, rotate: 0, scale: 1, delay: 0 });
+
 /**
  * OPTIMIZED Earthquake Animation Hook
  *
@@ -152,7 +157,7 @@ export function useEarthquakeAnimation({
       setEarthquakePhase('rumble');
       playEarthquakeRumble();
 
-      // Phase 2: Main quake (after 300ms) - dust covers the board
+      // Phase 2: Main quake (after 150ms) - dust covers the board
       const quakeTimeout = setTimeout(() => {
         setEarthquakePhase('quake');
         playEarthquakeShake();
@@ -162,26 +167,26 @@ export function useEarthquakeAnimation({
           setEarthquakeParticles(generateParticles());
           setEarthquakeDust(generateDustClouds());
           setShowCracks(true);
-          setDustPhase('cover'); // Comic dust covers the board
+          setDustPhase('cover');
         }
-      }, 300);
+      }, 150);
 
-      // Phase 3: Settle (after 1100ms) - comic reveal effect
+      // Phase 3: Settle (after 550ms) - comic reveal effect
       const settleTimeout = setTimeout(() => {
         setEarthquakePhase('settle');
         setEarthquakeParticles([]);
         setEarthquakeDust([]);
         if (useEnhancedMode) {
-          setDustPhase('reveal'); // Comic book reveal with action lines
+          setDustPhase('reveal');
         }
-      }, 1100);
+      }, 550);
 
-      // Phase 4: Back to idle (after 1700ms)
+      // Phase 4: Back to idle (after 850ms) - reduced from 1700ms
       const idleTimeout = setTimeout(() => {
         setEarthquakePhase('idle');
         setShowCracks(false);
         setDustPhase('idle');
-      }, 1700);
+      }, 850);
 
       prevEarthquakeShakingRef.current = earthquakeShaking;
 
@@ -213,8 +218,8 @@ export function useEarthquakeAnimation({
   // Get shake offset for a specific cell
   const getShakeOffset = useCallback((cellKey: string): ShakeOffset => {
     return earthquakeShaking
-      ? shakeOffsetsRef.current.get(cellKey) || { x: 0, y: 0, rotate: 0, scale: 1, delay: 0 }
-      : { x: 0, y: 0, rotate: 0, scale: 1, delay: 0 };
+      ? shakeOffsetsRef.current.get(cellKey) || ZERO_SHAKE_OFFSET
+      : ZERO_SHAKE_OFFSET;
   }, [earthquakeShaking]);
 
   // Memoized animation config for each phase

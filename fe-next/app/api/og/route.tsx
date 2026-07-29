@@ -40,6 +40,23 @@ const SCORE_TIERS = [
   { min: 0, color: COLORS.cyan, label: 'NICE', emoji: '✓' },
 ];
 
+const MODE_LABELS: Record<string, string> = {
+  singleplayer: 'Solo',
+  multiplayer: 'Multiplayer',
+  blast: 'Blast',
+  adventure: 'Adventure',
+  daily: 'Daily Challenge',
+  'word-hunt': 'Word Hunt',
+};
+
+const CTA: Record<string, string> = {
+  en: 'Can you beat this score?',
+  he: 'תצליחו לנצח?',
+  sv: 'Kan du slå detta?',
+  ja: 'このスコアに勝てる？',
+  es: '¿Puedes superar esto?',
+};
+
 function getScoreTier(score: number) {
   return SCORE_TIERS.find(tier => score >= tier.min) || SCORE_TIERS[SCORE_TIERS.length - 1];
 }
@@ -52,6 +69,8 @@ export async function GET(request: NextRequest) {
   const room = searchParams.get('room');
   const achievement = searchParams.get('achievement');
   const streak = searchParams.get('streak');
+  const words = searchParams.get('words');
+  const mode = searchParams.get('mode');
   const locale = searchParams.get('locale') || 'en';
 
   // Determine card type
@@ -185,6 +204,64 @@ export async function GET(request: NextRequest) {
                   </span>
                 </div>
 
+                {/* Stats row: mode + words */}
+                {(mode || words) && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: '12px',
+                      marginTop: '12px',
+                      flexWrap: 'wrap',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    {mode && MODE_LABELS[mode] && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          backgroundColor: COLORS.cyan,
+                          border: `3px solid ${COLORS.black}`,
+                          borderRadius: '8px',
+                          padding: '6px 16px',
+                          boxShadow: `3px 3px 0px ${COLORS.black}`,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: '18px',
+                            fontWeight: 700,
+                            color: COLORS.black,
+                          }}
+                        >
+                          {MODE_LABELS[mode]}
+                        </span>
+                      </div>
+                    )}
+                    {words && (
+                      <div
+                        style={{
+                          display: 'flex',
+                          backgroundColor: COLORS.pink,
+                          border: `3px solid ${COLORS.black}`,
+                          borderRadius: '8px',
+                          padding: '6px 16px',
+                          boxShadow: `3px 3px 0px ${COLORS.black}`,
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: '18px',
+                            fontWeight: 700,
+                            color: COLORS.black,
+                          }}
+                        >
+                          {words} words
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Call to action */}
                 <div
                   style={{
@@ -205,7 +282,7 @@ export async function GET(request: NextRequest) {
                       textTransform: 'uppercase',
                     }}
                   >
-                    Can you beat this score?
+                    {CTA[locale] || CTA.en}
                   </span>
                 </div>
               </>
@@ -402,7 +479,7 @@ export async function GET(request: NextRequest) {
                 >
                   {['🎮 Multiplayer', '⚡ Real-time', '🌍 5 Languages'].map((feature, i) => (
                     <div
-                      key={i}
+                      key={feature}
                       style={{
                         display: 'flex',
                         backgroundColor: [COLORS.yellow, COLORS.cyan, COLORS.pink][i],

@@ -1,27 +1,81 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import nextDynamic from 'next/dynamic';
-import { translations } from '@/translations';
-import { Providers } from '../providers';
-import Footer from '@/components/Footer';
+import { layoutTranslations as translations } from '@/translations/layout';
+import { ConditionalProviders } from '../conditional-providers';
+import { loadTranslation } from '@/translations/loadTranslation';
+import AutoHideFooter from '@/components/AutoHideFooter';
+import GlobalBottomNav from '@/components/GlobalBottomNav';
+import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
-import { CrazyGamesScript } from '@/components/CrazyGamesSDK';
-import SocialMediaPixels from '@/components/SocialMediaPixels';
+import AdSenseLoader from '@/components/ads/AdSenseLoader';
+import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
-import PWAInstallPrompt from '@/components/PWAInstallPrompt';
+import PagePresenceReporter from '@/components/PagePresenceReporter';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
-import NewYearCountdown from '@/components/celebration/NewYearCountdown';
-import { fredoka, rubik } from '../fonts';
+import AnimationsLoader from '@/components/AnimationsLoader';
+import DictionaryPrewarmer from '@/components/DictionaryPrewarmer';
+import NativeOAuthInitializer from '@/components/NativeOAuthInitializer';
+import NativePGSInitializer from '@/components/NativePGSInitializer';
+import { ToastContainer } from '@/components/ui/EnhancedToast';
+import { OfflineBanner } from '@/components/offline/OfflineBanner';
+import { NativeLanguageBanner } from '@/components/NativeLanguageBanner';
+import { FirstGameLanguageNotice } from '@/components/FirstGameLanguageNotice';
+import { OfflineSyncBridge } from '@/components/offline/OfflineSyncBridge';
+import { getLocalizedSchemaStrings } from '@/utils/seoLocalizedSchema';
+import type { Language } from '@/shared/types/game';
+
+import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew } from '../fonts';
 
 // Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
 const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureModal'), {
   loading: () => null,
 });
 
-// Force dynamic rendering - prevent static generation
-export const dynamic = 'force-dynamic';
-export const dynamicParams = true;
-export const runtime = 'nodejs';
+// Lazy-load push notification prompt — shown after engagement threshold
+const PushNotificationPrompt = nextDynamic(
+  () => import('@/components/notifications/PushNotificationPrompt'),
+  { loading: () => null }
+);
+
+// Lazy-load cookie consent banner — only needed on first visit
+const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
+
+// Non-critical components — deferred to keep landing-page JS small.
+// All are post-hydration effects that don't block first paint or LCP.
+const PWAInstallPrompt = nextDynamic(() => import('@/components/PWAInstallPrompt'), {
+  loading: () => null,
+});
+const AndroidAppRedirect = nextDynamic(() => import('@/components/AndroidAppRedirect'), {
+  loading: () => null,
+});
+const AndroidAppInstallPromo = nextDynamic(() => import('@/components/AndroidAppInstallPromo'), {
+  loading: () => null,
+});
+const VersionChecker = nextDynamic(() => import('@/components/VersionChecker'), {
+  loading: () => null,
+});
+const NewYearCountdown = nextDynamic(() => import('@/components/celebration/NewYearCountdown'), {
+  loading: () => null,
+});
+const ChurnSignalTracker = nextDynamic(
+  () => import('@/components/engagement/ChurnSignalTracker').then(m => ({ default: m.ChurnSignalTracker })),
+  { loading: () => null }
+);
+const SocialMediaPixels = nextDynamic(() => import('@/components/SocialMediaPixels'), {
+  loading: () => null,
+});
+
+
+// Synchronously primes CSS vars from localStorage before paint to prevent CLS
+// from AdMob SizeChanged async event and GlobalBottomNav ResizeObserver.
+// Static literal — no user input. Sanity cap at 200px: nav max ≈ 64 + 48px
+// safe-area = 112; banner max (ADAPTIVE on Android 15) ≈ 75 + safe-area ≈ 110.
+// Anything past 200 is a stale value from a pathological prior session (Android
+// 15+ safe-area plugin double-counted system bars and we cached the result) —
+// dropping it forces the runtime to re-measure cleanly, otherwise it haunts
+// this session via PRIME before useSafeArea / AnchoredNativeBanner can recover.
+const PRIME_CLS_VARS_SCRIPT = `(function(){try{var d=document.documentElement;var b=parseFloat(localStorage.getItem('lc_admob_h'));var n=parseFloat(localStorage.getItem('lc_bottom_nav_h'));if(!isNaN(b)&&b>=0&&b<=200)d.style.setProperty('--admob-banner-height',b+'px');else if(!isNaN(b))try{localStorage.removeItem('lc_admob_h')}catch(e){}if(!isNaN(n)&&n>=0&&n<=200)d.style.setProperty('--bottom-nav-height',n+'px');else if(!isNaN(n))try{localStorage.removeItem('lc_bottom_nav_h')}catch(e){}}catch(e){}})();`;
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -30,55 +84,29 @@ interface LocaleLayoutProps {
     params: Promise<{ locale: string }>;
 }
 
-// Helper function to get locale-specific URL path
-// Always returns explicit locale path for SEO consistency
+const SUPPORTED_LOCALES = new Set(['en', 'he', 'sv', 'ja', 'es']);
+
 function getLocalePath(locale: string): string {
-    switch (locale) {
-        case 'en':
-            return '/en';
-        case 'sv':
-            return '/sv';
-        case 'ja':
-            return '/ja';
-        case 'he':
-            return '/he';
-        case 'es':
-            return '/es';
-        default:
-            return '/en'; // Default to English for SEO
-    }
+    return SUPPORTED_LOCALES.has(locale) ? `/${locale}` : '/en';
 }
 
-// Helper function to get language code for structured data
 function getLanguageCode(locale: string): string {
-    switch (locale) {
-        case 'en':
-            return 'en';
-        case 'sv':
-            return 'sv';
-        case 'ja':
-            return 'ja';
-        case 'es':
-            return 'es';
-        case 'he':
-        default:
-            return 'he';
-    }
+    return SUPPORTED_LOCALES.has(locale) ? locale : 'en';
 }
 
 export async function generateMetadata({ params }: LocaleLayoutProps): Promise<Metadata> {
     const { locale } = await params;
-    const validLocale = (locale as Locale) || 'he';
-    const seo = translations[validLocale]?.seo || translations.he.seo;
+    const validLocale = (SUPPORTED_LOCALES.has(locale) ? locale : 'en') as Locale;
+    const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);
 
-    // Use locale-specific OG image
+    // Use locale-specific OG image (WebP format for faster loading)
     const ogImageMap: Record<string, string> = {
-        he: 'https://www.lexiclash.live/og-image-he.jpg',
-        en: 'https://www.lexiclash.live/og-image-en.jpg',
-        sv: 'https://www.lexiclash.live/og-image-sv.jpg',
-        ja: 'https://www.lexiclash.live/og-image-ja.jpg',
-        es: 'https://www.lexiclash.live/og-image-es.jpg',
+        he: 'https://www.lexiclash.live/og-image-he.webp',
+        en: 'https://www.lexiclash.live/og-image-en.webp',
+        sv: 'https://www.lexiclash.live/og-image-sv.webp',
+        ja: 'https://www.lexiclash.live/og-image-ja.webp',
+        es: 'https://www.lexiclash.live/og-image-es.webp',
     };
     const ogImageAltMap: Record<string, string> = {
         he: 'לקסי קלאש - משחק מילים מרובה משתתפים',
@@ -129,7 +157,7 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
                 { url: 'https://www.lexiclash.live/favicon.svg', type: 'image/svg+xml' },
             ],
             shortcut: [
-                { url: 'https://www.lexiclash.live/icon-48.png', sizes: '48x48', type: 'image/png' },
+                { url: 'https://www.lexiclash.live/favicon.ico', type: 'image/x-icon' },
             ],
             apple: [
                 { url: 'https://www.lexiclash.live/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
@@ -145,24 +173,66 @@ export async function generateMetadata({ params }: LocaleLayoutProps): Promise<M
                 sv: 'https://www.lexiclash.live/sv',
                 ja: 'https://www.lexiclash.live/ja',
                 es: 'https://www.lexiclash.live/es',
+                'en-IL': 'https://www.lexiclash.live/en',
+                'he-IL': 'https://www.lexiclash.live/he',
+                'en-US': 'https://www.lexiclash.live/en',
+                'es-US': 'https://www.lexiclash.live/es',
+                'en-GB': 'https://www.lexiclash.live/en',
+                'en-SE': 'https://www.lexiclash.live/en',
+                'sv-SE': 'https://www.lexiclash.live/sv',
+                'en-JP': 'https://www.lexiclash.live/en',
+                'ja-JP': 'https://www.lexiclash.live/ja',
+                'en-ES': 'https://www.lexiclash.live/en',
+                'es-ES': 'https://www.lexiclash.live/es',
+                'en-MX': 'https://www.lexiclash.live/en',
+                'es-MX': 'https://www.lexiclash.live/es',
+                'en-AU': 'https://www.lexiclash.live/en',
+                'es-AR': 'https://www.lexiclash.live/es',
+                'es-CO': 'https://www.lexiclash.live/es',
             },
         },
         other: {
             'google-site-verification': '4Blim0yOh_Hl4uX9TFnRX71lagbldOOxg7PwrcEbhrc',
+            // Geo-targeting: signal to search engines this site is based in Israel
+            'geo.region': 'IL',
+            'geo.placename': 'Israel',
+            // Content-Language hints for search engines (supplements html lang attr)
+            'content-language': validLocale === 'he' ? 'he-IL' : validLocale,
         },
     };
 }
 
-// Removed generateStaticParams to prevent static generation
-// The app uses dynamic rendering with WebSocket connections
+export const viewport = {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+    themeColor: '#1a1a2e',
+};
 
 export default async function LocaleLayout({ children, params }: LocaleLayoutProps): Promise<ReactNode> {
     const { locale } = await params;
-    const validLocale = (locale as Locale) || 'he';
-    const dir = translations[validLocale]?.direction || 'rtl';
-    const seo = translations[validLocale]?.seo || translations.he.seo;
+    const validLocale = (SUPPORTED_LOCALES.has(locale) ? locale : 'en') as Locale;
+    const dir = translations[validLocale]?.direction || 'ltr';
+    const seo = translations[validLocale]?.seo || translations.en.seo;
     const localePath = getLocalePath(validLocale);
     const languageCode = getLanguageCode(validLocale);
+    const schemaStrings = getLocalizedSchemaStrings(validLocale);
+
+    // Locale-aware font preloading: Hebrew pages get all 4 font variables,
+    // non-Hebrew pages skip Hebrew font preloads (~60-80KB saved)
+    const fontClasses = validLocale === 'he'
+      ? `${fredokaLatin.variable || ''} ${fredokaHebrew.variable || ''} ${rubikLatin.variable || ''} ${rubikHebrew.variable || ''} ${heeboHebrew.variable || ''}`
+      : `${fredokaLatin.variable || ''} ${rubikLatin.variable || ''}`;
+
+    // Load only the active language's full translations server-side (~250KB instead of 1.26MB)
+    // This is passed to ConditionalProviders → EssentialProviders → LanguageProvider
+    // so the client only downloads the language it needs
+    const initialTranslations = await loadTranslation(validLocale).catch(() => undefined);
+
+    // IMPORTANT: The theme script below modifies the DOM before React hydration
+    // To prevent hydration mismatches, we need to ensure the server-rendered className
+    // is compatible with what the client will expect after the script runs
+    // The script now preserves existing classes and only adds the theme class
 
     // Structured data for Google (JSON-LD)
     const structuredData = [
@@ -174,8 +244,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             name: 'LexiClash',
             alternateName: ['LexiClash Multiplayer Word Game', 'LexiClash Word Battle', 'לקסיקלאש', 'לקסי קלאש', 'משחק מילים מרובה משתתפים', 'קרב מילים אונליין', 'משחק כמו בוגל', 'משחק כמו סקראבל', 'וורדל מרובה משתתפים'],
             applicationCategory: 'GameApplication',
-            applicationSubCategory: 'Multiplayer Word Game',
+            applicationSubCategory: 'Online Multiplayer Word Game',
             typicalAgeRange: '6-99',
+            contentRating: 'Everyone',
+            isFamilyFriendly: true,
             audience: {
                 '@type': 'PeopleAudience',
                 suggestedMinAge: 6,
@@ -188,22 +260,17 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 priceCurrency: 'USD',
                 availability: 'https://schema.org/InStock',
             },
-            aggregateRating: {
-                '@type': 'AggregateRating',
-                ratingValue: '4.8',
-                ratingCount: '500',
-                bestRating: '5',
-                worstRating: '1',
-            },
+            // aggregateRating removed — hardcoded ratings risk a Google manual action.
+            // TODO: Wire to real user ratings from Supabase when available.
             description: seo.description,
             url: `https://www.lexiclash.live${localePath}`,
             image: {
                 '@type': 'ImageObject',
-                url: 'https://www.lexiclash.live/og-image-en.jpg',
+                url: 'https://www.lexiclash.live/og-image-en.webp',
                 width: 1200,
                 height: 630,
             },
-            screenshot: 'https://www.lexiclash.live/og-image-en.jpg',
+            screenshot: 'https://www.lexiclash.live/og-image-en.webp',
             inLanguage: [languageCode, 'he', 'en', 'sv', 'ja', 'es'],
             availableLanguage: [
                 { '@type': 'Language', name: 'English', alternateName: 'en' },
@@ -213,7 +280,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 { '@type': 'Language', name: 'Spanish', alternateName: 'es' },
             ],
             featureList: [
-                'Real-time multiplayer gameplay',
+                'Online multiplayer word game with real-time gameplay',
                 'Fast-paced competitive word battles',
                 'Multiple language support (Hebrew, English, Swedish, Japanese, Spanish)',
                 'Live leaderboard and rankings',
@@ -252,12 +319,19 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 'iOS',
                 'Android',
             ],
+            // Signal to Google that this app serves Israel (primary market) + global
+            areaServed: [
+                { '@type': 'Country', name: 'Israel' },
+                { '@type': 'Country', name: 'United States' },
+                { '@type': 'Country', name: 'Sweden' },
+                { '@type': 'Country', name: 'Japan' },
+            ],
             author: {
                 '@type': 'Organization',
                 name: 'LexiClash',
                 url: 'https://www.lexiclash.live',
             },
-            keywords: 'multiplayer word game, real-time word battle, competitive word game, party game, word puzzle, wordle multiplayer, scrabble online, boggle online, ruzzle alternative, משחק מילים מרובה משתתפים, משחק מילים בעברית, קרב מילים אונליין, משחק מילים לחברים, וורדל בעברית, סקראבל אונליין, בוגל אונליין, תפזורת אונליין',
+            keywords: 'online multiplayer word game, multiplayer word game, real-time word battle, competitive word game, party game, word puzzle, wordle multiplayer, scrabble online, boggle online, ruzzle alternative, משחק מילים מרובה משתתפים, משחק מילים בעברית, קרב מילים אונליין, משחק מילים לחברים, וורדל בעברית, סקראבל אונליין, בוגל אונליין, תפזורת אונליין',
         },
         // Organization schema with social proof
         {
@@ -265,16 +339,21 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             '@type': 'Organization',
             '@id': 'https://www.lexiclash.live/#organization',
             name: 'LexiClash',
+            alternateName: ['לקסיקלאש', 'לקסי קלאש', 'Lexi Clash'],
             url: 'https://www.lexiclash.live',
             logo: {
                 '@type': 'ImageObject',
-                url: 'https://www.lexiclash.live/og-image-en.jpg',
+                url: 'https://www.lexiclash.live/og-image-en.webp',
                 width: 1200,
                 height: 630,
             },
             // Social media and platform presence for SEO authority
             sameAs: [
                 'https://www.lexiclash.live',
+                'https://www.instagram.com/lexi.clash',
+                'https://play.google.com/store/apps/details?id=live.lexiclash.app',
+                'https://www.crazygames.com/game/lexiclash',
+                // TODO: Add TikTok and X/Twitter URLs here once accounts are created
             ],
             contactPoint: {
                 '@type': 'ContactPoint',
@@ -298,6 +377,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             '@id': 'https://www.lexiclash.live/#website',
             url: 'https://www.lexiclash.live',
             name: 'LexiClash',
+            alternateName: ['לקסיקלאש', 'לקסי קלאש', 'Lexi Clash', 'LexiClash Word Game'],
             description: seo.description,
             publisher: {
                 '@id': 'https://www.lexiclash.live/#organization',
@@ -320,205 +400,57 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             },
             primaryImageOfPage: {
                 '@type': 'ImageObject',
-                url: 'https://www.lexiclash.live/og-image-en.jpg',
+                url: 'https://www.lexiclash.live/og-image-en.webp',
             },
             mainContentOfPage: {
                 '@type': 'WebPageElement',
                 cssSelector: 'main',
             },
+            speakable: {
+                '@type': 'SpeakableSpecification',
+                cssSelector: ['[data-speakable="true"]', 'h1', 'h2', 'main p:first-of-type'],
+            },
         },
-        // FAQ schema - common questions users ask AI assistants and search engines
+        // SiteNavigationElement schema — ordered by user value for sitelinks signal
+        // (Google picks ~6-8 sitelinks; lead with highest-CTR/most-distinctive pages)
         {
             '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            '@id': 'https://www.lexiclash.live/#faq',
-            mainEntity: [
-                {
-                    '@type': 'Question',
-                    name: 'What is a good multiplayer word game for parties?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash is a fast-paced multiplayer word game perfect for parties. Players compete in real-time to find words on a shared letter grid. It works on any device with no download required - just share a room code or QR code with friends and start playing instantly. Great for 2-20+ players!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What is a free online game like Boggle I can play with friends?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash is a free online word game similar to Boggle that you can play with friends in real-time. Like Boggle and Scrabble, players find words from letters - but in LexiClash everyone competes simultaneously! It features competitive multiplayer gameplay, live leaderboards, and supports multiple languages including English, Hebrew, Swedish, Japanese, and Spanish. No account required - just create a room and share the link!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'Is there a multiplayer version of Wordle I can play with friends?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'Yes! While Wordle is single-player, LexiClash offers real-time multiplayer word game fun. Like Wordle, it challenges your vocabulary - but you compete live against friends! Create a room, share the code, and race to find more words than your opponents. It also has a Daily Challenge mode similar to Wordle where everyone plays the same puzzle.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What is a good Scrabble alternative to play online?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash is a great Scrabble alternative for online play! Unlike turn-based Scrabble, LexiClash is real-time - all players race simultaneously to find words on the same grid. It\'s faster, more exciting, and supports 2-20+ players. Perfect for parties or quick games with friends. Free to play, no download needed!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What are good team building games for remote teams?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash is an excellent team building game for remote teams. It\'s a real-time multiplayer word game that works in any browser - no downloads needed. Teams can compete against each other, and the fast-paced gameplay keeps everyone engaged. Perfect for virtual team events and icebreakers.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What is a fun word game for family game night?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash is perfect for family game night! It\'s a multiplayer word game where everyone races to find words on a letter grid. Suitable for ages 6 and up, it\'s free to play, works on phones and computers, and the whole family can join with a simple room code. Great for building vocabulary while having fun!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'Is there a free alternative to Kahoot for word games?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'Yes! LexiClash is a free multiplayer word game similar to Kahoot\'s competitive style. Players join rooms and compete in real-time word battles. It\'s great for classrooms, parties, and casual play. No subscription needed - completely free with support for Hebrew, English, Swedish, Japanese, and Spanish.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What is a good browser game that doesn\'t require download?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash is a great browser-based multiplayer word game that requires no download. Just visit lexiclash.live, create or join a room, and start playing instantly. It works on desktop, tablet, and mobile browsers. Perfect for quick gaming sessions with friends!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What multiplayer games can I play on my phone with friends?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash is a multiplayer word game you can play on your phone with friends. It\'s browser-based so there\'s nothing to install. Create a room, share the code or QR code with friends, and compete in real-time word battles. Supports unlimited players and works across all devices!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What is a good game like Alias to play online?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash offers a similar competitive word game experience to Alias but playable online. It\'s a fast-paced multiplayer game where you find words against the clock while competing with friends. Free to play, no download required, and available in multiple languages.',
-                    },
-                },
-                // Additional FAQ questions for better search coverage
-                {
-                    '@type': 'Question',
-                    name: 'How do you play LexiClash?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'In LexiClash, players compete to find words on a letter grid. Swipe or click adjacent letters to form words - the longer the word, the more points you earn. Build combos by finding words quickly for bonus multipliers. Games typically last 3 minutes. Create a room, share the code with friends, and compete in real-time!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'Is LexiClash free to play?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'Yes, LexiClash is completely free to play! No subscription, no in-app purchases required. Just visit lexiclash.live, create a room, and start playing. The game works in any browser on desktop, tablet, or mobile devices.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What languages does LexiClash support?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash supports 5 languages: English, Hebrew, Swedish, Japanese, and Spanish. Each language has its own dictionary for word validation. You can switch languages from the game settings. The interface is also available in all supported languages.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'How many players can play LexiClash at once?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash supports 2 to 20+ players in a single room! Perfect for small groups or large parties. All players see the same letter grid and compete in real-time. The live leaderboard shows everyone\'s score as the game progresses.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'Can I play LexiClash offline?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash is primarily an online multiplayer game requiring internet connection. However, the Progressive Web App (PWA) features allow the game to load even with spotty connection once cached. For offline word practice, try the single-player mode which has reduced connectivity requirements.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'How do I join a friend\'s LexiClash game?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'To join a friend\'s game: 1) Get the room code or QR code from your friend, 2) Go to lexiclash.live, 3) Click "Join Room", 4) Enter the room code or scan the QR code. You\'ll join instantly and can start competing when the host starts the game!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'Are there achievements in LexiClash?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'Yes! LexiClash has 35+ achievements across categories like speed, combos, word length, and milestones. Unlock badges for finding long words, building high combos, or reaching career milestones. Track your progress on the profile page and compete on the leaderboard!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'What devices can play LexiClash?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'LexiClash works on any device with a modern web browser! Play on desktop computers, laptops, tablets, and smartphones. No app download needed - just visit lexiclash.live. The game is optimized for touch screens and supports both portrait and landscape orientations on mobile.',
-                    },
-                },
-                // Hebrew-specific FAQ questions for Israeli SEO
-                {
-                    '@type': 'Question',
-                    name: 'מה המשחק מילים הכי טוב בעברית לשחק עם חברים?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'לקסיקלאש הוא משחק מילים מרובה משתתפים בעברית, דומה לבוגל וסקראבל! צרו חדר, שלחו לינק לחברים והתחרו בזמן אמת. עם יותר מ-10,000 מילים בעברית, ללא צורך בהרשמה או הורדה. מושלם לערבי משפחה, מסיבות וגיבוש. פותח בישראל.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'האם יש משחק כמו וורדל בעברית שאפשר לשחק עם חברים?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'כן! לקסיקלאש הוא כמו וורדל אבל מרובה משתתפים ובעברית! במקום לשחק לבד, מתחרים בזמן אמת נגד חברים. יש גם מצב אתגר יומי כמו וורדל - אותו פאזל לכולם כל יום. בנוסף, יש מצב משחק חופשי עם חברים.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'איפה אפשר לשחק סקראבל או בוגל אונליין בעברית?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'לקסיקלאש הוא אלטרנטיבה מעולה לסקראבל ובוגל אונליין בעברית! בניגוד לסקראבל שמשחקים בתורות, בלקסיקלאש כולם מתחרים בו-זמנית על אותו לוח. מהיר יותר, מותח יותר, ותומך ב-2 עד 20+ שחקנים. חינם וללא הורדה!',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'איך משחקים משחק מילים מרובה משתתפים אונליין?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'בלקסיקלאש: 1) צרו חדר חדש 2) שלחו לינק או קוד QR לחברים 3) כולם מצטרפים ורואים את אותו לוח אותיות 4) התחרו בזמן אמת למצוא מילים - מי שימצא יותר ינצח! עובד בכל דפדפן ללא התקנה.',
-                    },
-                },
-                {
-                    '@type': 'Question',
-                    name: 'האם יש משחק מילים בחינם בעברית לנייד?',
-                    acceptedAnswer: {
-                        '@type': 'Answer',
-                        text: 'כן! לקסיקלאש הוא משחק מילים חינמי לחלוטין שעובד מצוין בנייד. אין צורך להוריד אפליקציה - פשוט היכנסו ל-lexiclash.live מהדפדפן. דומה לבוגל, סקראבל ותפזורת אבל מרובה משתתפים. תומך ב-2 עד 20+ שחקנים, עם מילון עברית מקיף.',
-                    },
-                },
+            '@type': 'SiteNavigationElement',
+            '@id': 'https://www.lexiclash.live/#site-navigation',
+            name: 'Main Navigation',
+            hasPart: [
+                { '@type': 'SiteNavigationElement', name: 'Multiplayer Word Battle', url: `https://www.lexiclash.live${localePath}/multiplayer` },
+                { '@type': 'SiteNavigationElement', name: 'Daily Word Wheel', url: `https://www.lexiclash.live${localePath}/daily/word-wheel` },
+                { '@type': 'SiteNavigationElement', name: 'Daily Word Hunt', url: `https://www.lexiclash.live${localePath}/daily` },
+                { '@type': 'SiteNavigationElement', name: 'Word of the Day', url: `https://www.lexiclash.live${localePath}/word-of-the-day` },
+                { '@type': 'SiteNavigationElement', name: 'Adventure Mode', url: `https://www.lexiclash.live${localePath}/adventure` },
+                { '@type': 'SiteNavigationElement', name: 'Leaderboard', url: `https://www.lexiclash.live${localePath}/leaderboard` },
+                { '@type': 'SiteNavigationElement', name: 'Play Classic Solo', url: `https://www.lexiclash.live${localePath}/singleplayer` },
+                { '@type': 'SiteNavigationElement', name: 'Word Solver', url: `https://www.lexiclash.live${localePath}/tools/word-solver` },
+                { '@type': 'SiteNavigationElement', name: 'How to Play', url: `https://www.lexiclash.live${localePath}/how-to-play` },
+                { '@type': 'SiteNavigationElement', name: 'Blog', url: `https://www.lexiclash.live${localePath}/blog` },
+                { '@type': 'SiteNavigationElement', name: 'FAQ', url: `https://www.lexiclash.live${localePath}/faq` },
+                { '@type': 'SiteNavigationElement', name: 'About', url: `https://www.lexiclash.live${localePath}/about` },
+            ],
+        },
+        // Game modes ItemList — exposes the 8 distinct game modes as sub-entities
+        // for richer brand SERP / sitelinks consideration (rising "lexiclash" brand query +320% w/w).
+        {
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            '@id': 'https://www.lexiclash.live/#game-modes',
+            name: 'LexiClash Game Modes',
+            description: '8 distinct word game modes — multiplayer, daily, solo, adventure, blast, word hunt, word wheel, brain training.',
+            numberOfItems: 8,
+            itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Multiplayer Word Battle', url: `https://www.lexiclash.live${localePath}/multiplayer`, description: 'Real-time grid battles with 2-20 friends, free, no download.' },
+                { '@type': 'ListItem', position: 2, name: 'Daily Word Wheel', url: `https://www.lexiclash.live${localePath}/daily/word-wheel`, description: 'Spin the daily letter wheel, find every word, beat the timer.' },
+                { '@type': 'ListItem', position: 3, name: 'Daily Word Hunt', url: `https://www.lexiclash.live${localePath}/daily`, description: 'Wordle-style 10-attempt survival mode with global leaderboard.' },
+                { '@type': 'ListItem', position: 4, name: 'Adventure Mode', url: `https://www.lexiclash.live${localePath}/adventure`, description: 'Roguelike word-game adventure with bosses and loot.' },
+                { '@type': 'ListItem', position: 5, name: 'Blast', url: `https://www.lexiclash.live${localePath}/singleplayer`, description: 'Cascading combos and tile-clearing word puzzles.' },
+                { '@type': 'ListItem', position: 6, name: 'Single Player vs AI', url: `https://www.lexiclash.live${localePath}/singleplayer`, description: 'Solo practice against AI bots with adjustable difficulty.' },
+                { '@type': 'ListItem', position: 7, name: 'Brain Training Drills', url: `https://www.lexiclash.live${localePath}/brain-training`, description: 'Quick vocab and pattern drills, daily progression.' },
+                { '@type': 'ListItem', position: 8, name: 'Word of the Day', url: `https://www.lexiclash.live${localePath}/word-of-the-day`, description: 'Daily featured word with definition, etymology and example use.' },
             ],
         },
         // BreadcrumbList schema for better SERP navigation
@@ -540,57 +472,27 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
             '@context': 'https://schema.org',
             '@type': 'HowTo',
             '@id': 'https://www.lexiclash.live/#howto',
-            name: languageCode === 'he' ? 'איך לשחק ב-LexiClash' : 'How to Play LexiClash',
-            description: languageCode === 'he'
-                ? 'למדו כיצד לשחק במשחק המילים המרובה משתתפים LexiClash'
-                : 'Learn how to play the multiplayer word game LexiClash',
+            name: schemaStrings.howToName,
+            description: schemaStrings.howToDescription,
             totalTime: 'PT3M',
-            step: [
-                {
-                    '@type': 'HowToStep',
-                    name: languageCode === 'he' ? 'צרו או הצטרפו לחדר' : 'Create or Join a Room',
-                    text: languageCode === 'he'
-                        ? 'צרו חדר משחק חדש או הצטרפו לחדר קיים באמצעות קוד חדר או סריקת QR'
-                        : 'Create a new game room or join an existing one using a room code or QR scan',
-                    position: 1,
-                },
-                {
-                    '@type': 'HowToStep',
-                    name: languageCode === 'he' ? 'מצאו מילים בלוח' : 'Find Words on the Grid',
-                    text: languageCode === 'he'
-                        ? 'החליקו או לחצו על אותיות סמוכות כדי ליצור מילים - ככל שהמילה ארוכה יותר, יותר נקודות!'
-                        : 'Swipe or click adjacent letters to form words - longer words score more points!',
-                    position: 2,
-                },
-                {
-                    '@type': 'HowToStep',
-                    name: languageCode === 'he' ? 'בנו קומבו' : 'Build Combos',
-                    text: languageCode === 'he'
-                        ? 'מצאו מילים במהירות רצופה לבניית קומבו ולהכפלת הניקוד שלכם'
-                        : 'Find words in quick succession to build combos and multiply your score',
-                    position: 3,
-                },
-                {
-                    '@type': 'HowToStep',
-                    name: languageCode === 'he' ? 'נצחו את היריבים!' : 'Beat Your Opponents!',
-                    text: languageCode === 'he'
-                        ? 'השחקן עם הכי הרבה נקודות בסוף הזמן מנצח. מילים שנמצאו על ידי כולם לא נותנות נקודות!'
-                        : 'The player with the most points when time runs out wins. Words found by everyone score nothing!',
-                    position: 4,
-                },
-            ],
+            inLanguage: languageCode,
+            step: schemaStrings.steps.map((s, i) => ({
+                '@type': 'HowToStep',
+                name: s.name,
+                text: s.text,
+                position: i + 1,
+            })),
         },
         // Event schema for Daily Challenge - improves discoverability for recurring events
         {
             '@context': 'https://schema.org',
             '@type': 'Event',
             '@id': 'https://www.lexiclash.live/#daily-challenge',
-            name: languageCode === 'he' ? 'אתגר יומי של LexiClash' : 'LexiClash Daily Challenge',
-            description: languageCode === 'he'
-                ? 'פאזל מילים יומי - אותו לוח לכולם ברחבי העולם! שתפו את התוצאות שלכם כמו וורדל'
-                : 'Daily word puzzle - same board for everyone worldwide! Share your results like Wordle',
-            startDate: new Date().toISOString().split('T')[0],
-            endDate: new Date().toISOString().split('T')[0],
+            name: schemaStrings.dailyEventName,
+            description: schemaStrings.dailyEventDescription,
+            inLanguage: languageCode,
+            startDate: '2024-01-01',
+            endDate: '2099-12-31',
             eventStatus: 'https://schema.org/EventScheduled',
             eventAttendanceMode: 'https://schema.org/OnlineEventAttendanceMode',
             location: {
@@ -614,87 +516,138 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 byDay: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
             },
         },
+        // FAQPage JSON-LD lives on the homepage only (lib/seo/homepageFaqJsonLd.ts)
+        // to avoid Google "Duplicate field 'FAQPage'" on landing pages with own FAQ.
     ];
 
     return (
-        <html lang={validLocale} dir={dir} className={`${fredoka.variable} ${rubik.variable}`}>
+        <html lang={validLocale} dir={dir} className={`dark ${fontClasses}`} suppressHydrationWarning>
             <head>
                 <meta charSet="utf-8" />
-                {/* Blocking script to set theme before React hydrates - prevents flash */}
-                <script
-                    dangerouslySetInnerHTML={{
-                        __html: `
-                            (function() {
-                                try {
-                                    const savedTheme = localStorage.getItem('boggle_theme');
-                                    const theme = (savedTheme === 'light' || savedTheme === 'dark') ? savedTheme : 'dark';
-                                    document.documentElement.classList.add(theme);
-                                } catch (e) {
-                                    document.documentElement.classList.add('dark');
-                                }
-                            })();
-                        `,
-                    }}
-                />
                 {/* Preconnect hints for faster resource loading on slow connections */}
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
+                <link rel="preconnect" href="https://www.lexiclash.live" />
                 <link rel="preconnect" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
                 <link rel="dns-prefetch" href="https://hdtmpkicuxvtmvrmtybx.supabase.co" />
-                {/* Favicon and icons with absolute URLs for better Google crawlability */}
+                {/* PostHog EU analytics — preconnect for faster first event */}
+                <link rel="preconnect" href="https://eu.i.posthog.com" />
+                <link rel="dns-prefetch" href="https://eu.i.posthog.com" />
+                {/* GIF preload removed — 571KB blocks critical resources (Lighthouse: LCP 24s → should drop significantly) */}
+                {/* Favicon and icons - use relative paths for development, absolute for production */}
                 {/* PNG icons FIRST - Google requires multiples of 48px and prefers PNG over SVG/ICO */}
-                <link rel="icon" type="image/png" sizes="48x48" href="https://www.lexiclash.live/icon-48.png" />
-                <link rel="icon" type="image/png" sizes="96x96" href="https://www.lexiclash.live/icon-96.png" />
-                <link rel="icon" type="image/png" sizes="144x144" href="https://www.lexiclash.live/icon-144.png" />
-                <link rel="icon" type="image/png" sizes="192x192" href="https://www.lexiclash.live/icon-192.png" />
-                <link rel="icon" type="image/png" sizes="512x512" href="https://www.lexiclash.live/icon-512.png" />
+                <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
+                <link rel="icon" type="image/png" sizes="96x96" href="/icon-96.png" />
+                <link rel="icon" type="image/png" sizes="144x144" href="/icon-144.png" />
+                <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+                <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
                 {/* SVG favicon for modern browsers (after PNG for Google compatibility) */}
-                <link rel="icon" href="https://www.lexiclash.live/favicon.svg" type="image/svg+xml" />
+                <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
                 {/* Apple touch icons for iOS devices */}
-                <link rel="apple-touch-icon" sizes="180x180" href="https://www.lexiclash.live/apple-touch-icon.png" />
-                <link rel="apple-touch-icon" sizes="152x152" href="https://www.lexiclash.live/icon-144.png" />
-                <link rel="apple-touch-icon" sizes="144x144" href="https://www.lexiclash.live/icon-144.png" />
-                <meta name="viewport" content="width=device-width, initial-scale=1" />
-                <meta name="theme-color" content="#667eea" />
+                <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+                <link rel="apple-touch-icon" sizes="152x152" href="/icon-144.png" />
+                <link rel="apple-touch-icon" sizes="144x144" href="/icon-144.png" />
                 <script
                     type="application/ld+json"
                     dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
                 />
-                <link rel="manifest" href="/manifest.json" />
+                <link rel="manifest" href="/manifest.webmanifest" />
                 <meta name="mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-capable" content="yes" />
                 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
                 <meta name="apple-mobile-web-app-title" content="LexiClash" />
-                {/* Google AdSense - placed in head to avoid data-nscript warning */}
+                {/* CrazyGames SDK must load in <head> with beforeInteractive
+                    so it's detected by their QA tool before hydration */}
+                <CrazyGamesScriptServer />
+                {/* CLS guard: prime --admob-banner-height and --bottom-nav-height from
+                    localStorage cache BEFORE first paint. Static string literal, no user input. */}
                 <script
-                    async
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1896836706464880"
-                    crossOrigin="anonymous"
+                    dangerouslySetInnerHTML={{
+                        __html: PRIME_CLS_VARS_SCRIPT,
+                    }}
                 />
             </head>
             <body className="antialiased screen-fit" suppressHydrationWarning>
+                {/* Dark-only theme — static string literal, no user input, safe from XSS */}
+                <script
+                    dangerouslySetInnerHTML={{
+                        __html: `document.documentElement.classList.add('dark')`,
+                    }}
+                />
                 {/* Skip to main content link for keyboard/screen reader users */}
                 <a
                     href="#main-content"
-                    className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-3 focus:min-h-[44px] focus:min-w-[44px] focus:bg-neo-lime focus:text-neo-black focus:font-bold focus:border-3 focus:border-neo-black focus:rounded-neo focus:shadow-hard focus:outline-none focus:flex focus:items-center focus:justify-center"
+                    className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-70 focus:px-4 focus:py-3 focus:min-h-[48px] focus:min-w-[48px] focus:bg-neo-lime focus:text-neo-black focus:font-bold focus:border-3 focus:border-neo-black focus:rounded-neo focus:shadow-hard focus:outline-hidden focus:flex focus:items-center focus:justify-center focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2"
+                    aria-label={translations[validLocale]?.accessibility?.skipToMain || 'Skip to main content'}
                 >
-                    {validLocale === 'he' ? 'דלג לתוכן הראשי' : validLocale === 'sv' ? 'Hoppa till huvudinnehåll' : validLocale === 'ja' ? 'メインコンテンツへスキップ' : validLocale === 'es' ? 'Saltar al contenido principal' : 'Skip to main content'}
+                    {translations[validLocale]?.accessibility?.skipToMain || 'Skip to main content'}
                 </a>
+                {/* Google Consent Mode v2 — MUST load before GA */}
+                <GoogleConsentMode />
+                {/* Load external scripts with optimized strategies to prevent blocking */}
                 <GoogleAnalytics />
-                <CrazyGamesScript />
+                {/* Direct AdSense (web Auto-Ads) — replaces PurpleAds. Dark until
+                    NEXT_PUBLIC_ADSENSE_ENABLED=true; consent/tier/web gated internally. */}
+                <AdSenseLoader />
                 <SocialMediaPixels />
                 <WebVitalsReporter />
+                {/* Report current page so admin live monitor sees users not in a game */}
+                <PagePresenceReporter />
                 <ServiceWorkerRegistration />
-                <Providers lang={validLocale}>
-                    <div className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
-                        <main id="main-content" className="screen-fit-content relative z-10" tabIndex={-1}>
-                            {children}
+                {/* Defer loading animations.css (60KB) after page mount */}
+                <AnimationsLoader />
+                {/* Warm client dict Set on idle so first word submit skips ~100-300ms fetch */}
+                <DictionaryPrewarmer lang={validLocale as Language} />
+                {/* DeepLinkHandler moved to NativeAppProvider (client component) to avoid Capacitor/Turbopack issues */}
+                {/* Initialize native OAuth (Google/Apple Sign-In) on mobile */}
+                <NativeOAuthInitializer />
+                {/* Warm the Android-only Play Games Services bridge on mobile */}
+                <NativePGSInitializer />
+                {/* Server-rendered legal navigation — guarantees crawlers find
+                    privacy/terms/about links even without JS execution */}
+                <nav aria-label="Site Navigation" className="sr-only">
+                    <ul>
+                        <li><a href={`/${validLocale}/how-to-play`}>{translations[validLocale]?.nav?.howToPlay || 'How to Play'}</a></li>
+                        <li><a href={`/${validLocale}/blog`}>{translations[validLocale]?.nav?.blog || 'Blog'}</a></li>
+                        <li><a href={`/${validLocale}/faq`}>{translations[validLocale]?.nav?.faq || 'FAQ'}</a></li>
+                        <li><a href={`/${validLocale}/about`}>{translations[validLocale]?.nav?.aboutLexiClash || 'About LexiClash'}</a></li>
+                        <li><a href={`/${validLocale}/contact`}>{translations[validLocale]?.nav?.contactUs || 'Contact Us'}</a></li>
+                        <li><a href={`/${validLocale}/legal/privacy`}>{translations[validLocale]?.nav?.privacyPolicy || 'Privacy Policy'}</a></li>
+                        <li><a href={`/${validLocale}/legal/terms`}>{translations[validLocale]?.nav?.termsOfService || 'Terms of Service'}</a></li>
+                        <li><a href={`/${validLocale}/legal/disclaimer`}>{translations[validLocale]?.nav?.disclaimer || 'Disclaimer'}</a></li>
+                    </ul>
+                </nav>
+                <ConditionalProviders lang={validLocale} initialTranslations={initialTranslations}>
+                    {/* VersionChecker needs to be inside providers to access LanguageContext */}
+                    <VersionChecker />
+                    <NativeLanguageBanner />
+                    <FirstGameLanguageNotice />
+                    <OfflineBanner />
+                    <OfflineSyncBridge />
+                    <div className="flex-1 flex flex-col min-h-0 relative overflow-x-clip">
+                        <main
+                            id="main-content"
+                            className="main-content-safe flex-1 min-h-0 flex flex-col"
+                            tabIndex={-1}
+                        >
+                            <div className="flex-1 flex flex-col min-h-0">
+                                {children}
+                            </div>
                         </main>
-                        <Footer className="hidden sm:block relative z-10" />
+                        <AutoHideFooter className="relative z-0 shrink-0" />
+                        {/* Global bottom navigation - mobile only, hidden during gameplay */}
+                        <GlobalBottomNav />
                     </div>
+                    <AndroidAppRedirect />
+                    <AndroidAppInstallPromo />
                     <PWAInstallPrompt />
+                    <PushNotificationPrompt />
                     <EmailCaptureModal />
                     <NewYearCountdown />
-                </Providers>
+                    <CookieConsent />
+                    <ChurnSignalTracker />
+                    {/* Toast notifications container */}
+                    <ToastContainer position="bottom-right" />
+                </ConditionalProviders>
             </body>
         </html>
     );

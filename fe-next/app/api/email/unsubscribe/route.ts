@@ -91,7 +91,8 @@ export async function POST(request: NextRequest) {
       message: 'Successfully unsubscribed from daily challenge emails',
     });
   } catch (error) {
-    console.error('[Unsubscribe] Error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Unsubscribe] Error:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to process unsubscribe request' },
       { status: 500 }

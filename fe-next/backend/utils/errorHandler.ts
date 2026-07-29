@@ -12,6 +12,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import type { Socket, Server } from 'socket.io';
+import * as Sentry from '@sentry/nextjs';
 import logger from './logger';
 
 // ==========================================
@@ -77,6 +78,7 @@ export const ErrorCodes = {
   PLAYER_NOT_HOST: 'PLAYER_NOT_HOST',
   PLAYER_ALREADY_IN_GAME: 'PLAYER_ALREADY_IN_GAME',
   PLAYER_KICKED: 'PLAYER_KICKED',
+  PLAYER_BLOCKED: 'PLAYER_BLOCKED',
   PLAYER_USERNAME_TAKEN: 'PLAYER_USERNAME_TAKEN',
   PLAYER_INVALID_USERNAME: 'PLAYER_INVALID_USERNAME',
 
@@ -101,6 +103,8 @@ export const ErrorCodes = {
   AUTH_INVALID_TOKEN: 'AUTH_INVALID_TOKEN',
   AUTH_EXPIRED: 'AUTH_EXPIRED',
   AUTH_FORBIDDEN: 'AUTH_FORBIDDEN',
+  // Families Policy: social surface blocked for child/unknown-age user
+  SOCIAL_RESTRICTED: 'SOCIAL_RESTRICTED',
 
   // Tournament errors (7xxx)
   TOURNAMENT_NOT_FOUND: 'TOURNAMENT_NOT_FOUND',
@@ -112,6 +116,7 @@ export const ErrorCodes = {
   SERVICE_UNAVAILABLE: 'SERVICE_UNAVAILABLE',
   DATABASE_ERROR: 'DATABASE_ERROR',
   REDIS_ERROR: 'REDIS_ERROR',
+  WORD_PROCESSING_ERROR: 'WORD_PROCESSING_ERROR',
 } as const;
 
 export type ErrorCode = typeof ErrorCodes[keyof typeof ErrorCodes];
@@ -183,6 +188,11 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
   },
   [ErrorCodes.PLAYER_KICKED]: {
     message: 'You have been removed from the game',
+    severity: ErrorSeverity.LOW,
+    httpStatus: 403
+  },
+  [ErrorCodes.PLAYER_BLOCKED]: {
+    message: 'You have been blocked from playing',
     severity: ErrorSeverity.LOW,
     httpStatus: 403
   },
@@ -270,6 +280,11 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
     severity: ErrorSeverity.LOW,
     httpStatus: 403
   },
+  [ErrorCodes.SOCIAL_RESTRICTED]: {
+    message: 'This social feature is not available for your account',
+    severity: ErrorSeverity.LOW,
+    httpStatus: 403
+  },
 
   [ErrorCodes.TOURNAMENT_NOT_FOUND]: {
     message: 'Tournament not found',
@@ -305,6 +320,11 @@ export const ErrorRegistry: Record<string, ErrorRegistryEntry> = {
   [ErrorCodes.REDIS_ERROR]: {
     message: 'Cache operation failed',
     severity: ErrorSeverity.HIGH,
+    httpStatus: 500
+  },
+  [ErrorCodes.WORD_PROCESSING_ERROR]: {
+    message: 'An error occurred while processing your word',
+    severity: ErrorSeverity.MEDIUM,
     httpStatus: 500
   },
 };
@@ -421,7 +441,8 @@ export function emitError(socket: Socket, codeOrMessage: string, options: EmitEr
       code: options.code || ErrorCodes.INTERNAL_ERROR,
       message: codeOrMessage
     };
-    logger.debug('SOCKET_ERROR', `[LEGACY] ${codeOrMessage}`, { socketId: socket.id });
+    // Warn (not debug) so prod logs surface remaining untyped emit sites — guides migration to typed ErrorCodes.
+    logger.warn('SOCKET_ERROR', `[LEGACY] ${codeOrMessage}`, { socketId: socket.id });
   }
 
   socket.emit('error', errorPayload);
@@ -439,6 +460,29 @@ export function emitAppError(socket: Socket, error: Error | AppError): void {
       error.message,
       error.toLogObject()
     );
+
+    // Capture high/critical severity errors to Sentry in production
+    if (
+      process.env.NODE_ENV === 'production' &&
+      (error.severity === ErrorSeverity.HIGH || error.severity === ErrorSeverity.CRITICAL)
+    ) {
+      Sentry.withScope((scope) => {
+        scope.setTag('error.type', 'socket_app_error');
+        scope.setTag('app.error_code', error.code);
+        scope.setTag('app.error_severity', error.severity);
+        scope.setContext('app_error', {
+          code: error.code,
+          severity: error.severity,
+          httpStatus: error.httpStatus,
+          details: error.details,
+          correlationId: error.correlationId,
+        });
+        scope.setContext('socket', {
+          socketId: socket.id,
+        });
+        Sentry.captureException(error);
+      });
+    }
   } else {
     // Wrap unknown errors
     const appError = new AppError(ErrorCodes.INTERNAL_ERROR, {
@@ -446,6 +490,17 @@ export function emitAppError(socket: Socket, error: Error | AppError): void {
     });
     socket.emit('error', appError.toClientError());
     logger.error('SOCKET_ERROR', 'Unhandled error', { error: error.message, stack: error.stack });
+
+    // Capture unknown errors to Sentry in production
+    if (process.env.NODE_ENV === 'production') {
+      Sentry.withScope((scope) => {
+        scope.setTag('error.type', 'socket_unhandled_error');
+        scope.setContext('socket', {
+          socketId: socket.id,
+        });
+        Sentry.captureException(error);
+      });
+    }
   }
 }
 
@@ -477,6 +532,20 @@ export function wrapSocketHandler(handler: SocketHandler, eventName: string): (i
         stack: (error as Error).stack
       });
 
+      // Capture error to Sentry in production
+      if (process.env.NODE_ENV === 'production') {
+        Sentry.withScope((scope) => {
+          scope.setTag('error.type', 'socket_handler_error');
+          scope.setTag('socket.event', eventName);
+          scope.setContext('socket_handler', {
+            event: eventName,
+            socketId: socket.id,
+            correlationId,
+          });
+          Sentry.captureException(error as Error);
+        });
+      }
+
       if (error instanceof AppError) {
         error.correlationId = correlationId;
         emitAppError(socket, error);
@@ -507,6 +576,22 @@ export function wrapRouteHandler(handler: RouteHandler): (req: Request, res: Res
         error: (error as Error).message,
         stack: (error as Error).stack
       });
+
+      // Capture error to Sentry in production
+      if (process.env.NODE_ENV === 'production') {
+        Sentry.withScope((scope) => {
+          scope.setTag('error.type', 'route_error');
+          scope.setTag('http.method', req.method);
+          scope.setTag('http.path', req.path);
+          scope.setContext('http_request', {
+            method: req.method,
+            path: req.path,
+            correlationId,
+            url: req.url,
+          });
+          Sentry.captureException(error as Error);
+        });
+      }
 
       if (error instanceof AppError) {
         error.correlationId = correlationId;
@@ -540,24 +625,3 @@ export function isAppError(error: unknown): error is AppError {
   return error instanceof AppError;
 }
 
-// ==========================================
-// Legacy Support (ErrorMessages)
-// ==========================================
-
-/**
- * Legacy error messages for backwards compatibility
- * @deprecated Use ErrorCodes + createError() instead. Will be removed in v2.0.
- */
-export const ErrorMessages = {
-  INVALID_GAME_CODE: ErrorRegistry[ErrorCodes.GAME_INVALID_CODE].message,
-  GAME_NOT_FOUND: ErrorRegistry[ErrorCodes.GAME_NOT_FOUND].message,
-  NOT_IN_GAME: ErrorRegistry[ErrorCodes.PLAYER_NOT_IN_GAME].message,
-  USERNAME_REQUIRED: 'Game code and username are required',
-  ROOM_FULL: (max: number): string => `Room is full (maximum ${max} players)`,
-  ONLY_HOST_CAN_START: ErrorRegistry[ErrorCodes.PLAYER_NOT_HOST].message,
-  ONLY_HOST_CAN_END: ErrorRegistry[ErrorCodes.PLAYER_NOT_HOST].message,
-  RATE_LIMIT_EXCEEDED: ErrorRegistry[ErrorCodes.RATE_LIMIT_EXCEEDED].message,
-  INVALID_WORD_SUBMISSION: 'Invalid word submission - missing required fields',
-  INVALID_MESSAGE: 'Invalid message',
-  GAME_NOT_IN_PROGRESS: ErrorRegistry[ErrorCodes.GAME_NOT_IN_PROGRESS].message
-};

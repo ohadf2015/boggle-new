@@ -28,6 +28,8 @@ export interface UseDrillKeyboardSupportOptions {
   grid: LetterGrid;
   /** Language for normalization */
   language: Language | string;
+  /** Board language (for desktop keyboard mismatch notifications) */
+  gameLanguage?: Language | string | null;
   /** Whether keyboard input is enabled (typically phase === 'playing') */
   enabled: boolean;
   /** Callback when word is submitted via keyboard */
@@ -78,6 +80,7 @@ export function useDrillKeyboardSupport(
   const {
     grid,
     language,
+    gameLanguage,
     enabled,
     onWordSubmit,
     minWordLength = 2,
@@ -93,6 +96,7 @@ export function useDrillKeyboardSupport(
   const keyboardInput = useKeyboardWordInput({
     grid,
     language: language as string,
+    gameLanguage: gameLanguage as Language | null | undefined,
     enabled: enabled && isDesktop, // Only enable on desktop
     onWordSubmit,
     minWordLength,

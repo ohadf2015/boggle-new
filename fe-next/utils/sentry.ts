@@ -148,11 +148,39 @@ const EXPECTED_ERROR_PATTERNS = [
   /play\(\) failed/i,
   /autoplay/i,
   /user denied permission/i,
+  /Playback was unable to start/i,
+  /Failed to start the audio device/i,
+  /audio device/i,
+  /InvalidStateError/i,
+
+  // Audio loading/decoding issues (expected on some devices)
+  /HTML5 Audio pool exhausted/i,
+  /pool exhausted/i,
+  /Decoding audio data failed/i,
+  /audio.*decoding/i,
+  /Failed to load.*audio/i,
+  /Failed to play.*audio/i,
+  /onloaderror/i,
+  /onplayerror/i,
 
   // Rate limiting (handled gracefully by UI)
   /rate limit/i,
   /too many requests/i,
   /429/,
+
+  // Multiplayer race conditions (mutex guards working as designed)
+  /Game is already starting/i,
+  /Invalid start game request/i,
+  /duplicate startGame/i,
+  /Cannot add bots during a game/i,
+
+  // Supabase auth token lock contention (expected under concurrent requests)
+  /Lock .* was released because another request stole it/i,
+  /Lock broken by another request with the 'steal' option/i,
+  /Lock was stolen by another request/i,
+
+  // Auth loading timeout (safety guard, not a bug)
+  /Auth loading timeout/i,
 
   // Network timeouts for non-critical operations
   /AbortError/i,
@@ -164,12 +192,30 @@ const EXPECTED_ERROR_PATTERNS = [
   /username taken/i,
   /room not found/i,
   /game not found/i,
+  /game code already/i,
+  /already in use/i,
   /already referred/i,
   /cannot refer yourself/i,
+  /not in progress/i,
+  /not in a game/i,
+  /not a word-hunt game/i,
+  /already in progress/i,
+  /target word already found/i,
+  /you have been eliminated/i,
+  /you have been kicked/i,
 
   // Socket reconnection (normal lifecycle)
   /transport close/i,
   /ping timeout/i,
+  /websocket error/i,
+  /connect_error/i,
+  /polling error/i,
+  /socket not connected/i,
+  /Cannot join/i,
+  /cannot emit/i,
+
+  // Transient server errors (player should retry)
+  /An error occurred while processing your word/i,
 ];
 
 /**

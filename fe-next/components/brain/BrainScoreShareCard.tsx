@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import {
   Brain,
   Share2,
@@ -115,6 +115,7 @@ lexiclash.com`;
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'NotAllowedError') return;
       console.error('Failed to copy:', err);
     }
   }, [generateShareText]);
@@ -131,7 +132,10 @@ lexiclash.com`;
         url: 'https://lexiclash.com',
       });
     } catch (err) {
-      // User cancelled or error
+      // AbortError means user cancelled the share dialog - this is normal behavior
+      if (err instanceof DOMException && err.name === 'AbortError') {
+        return;
+      }
       console.error('Share failed:', err);
     } finally {
       setIsSharing(false);
@@ -151,14 +155,14 @@ lexiclash.com`;
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70"
         onClick={onClose}
       >
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, y: 20 }}
           animate={{ scale: 1, y: 0 }}
           exit={{ scale: 0.9, y: 20 }}
@@ -170,7 +174,7 @@ lexiclash.com`;
             ref={cardRef}
             className={cn(
               'rounded-neo border-4 border-neo-black shadow-hard-lg overflow-hidden',
-              'bg-gradient-to-br',
+              'bg-linear-to-br',
               tierConfig.bgGradient
             )}
           >
@@ -189,7 +193,7 @@ lexiclash.com`;
               )}
 
               {/* Main Score */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0.5 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', delay: 0.1 }}
@@ -197,10 +201,10 @@ lexiclash.com`;
               >
                 <div className="text-7xl font-black drop-shadow-lg">{score}</div>
                 <div className="text-xl font-bold opacity-80">/100</div>
-              </motion.div>
+              </m.div>
 
               {/* Tier Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-xs">
                 <span className="text-2xl">{tierConfig.emoji}</span>
                 <span className="font-black uppercase tracking-wide">
                   {t(`brain.tiers.${tier}`)}
@@ -209,7 +213,7 @@ lexiclash.com`;
             </div>
 
             {/* Domain Scores Grid */}
-            <div className="bg-white/10 backdrop-blur-sm p-4">
+            <div className="bg-white/10 backdrop-blur-xs p-4">
               <div className="grid grid-cols-5 gap-2">
                 {Object.entries(domains).map(([key, data]) => {
                   const Icon = DOMAIN_ICONS[key as keyof typeof DOMAIN_ICONS];
@@ -237,7 +241,7 @@ lexiclash.com`;
                 <Brain className="w-5 h-5 text-white" />
                 <span className="text-white font-bold text-sm">LexiClash</span>
               </div>
-              <span className="text-white/70 text-xs">
+              <span className="text-white text-xs">
                 {gamesAnalyzed} {t('brain.share.games')}
               </span>
             </div>
@@ -246,7 +250,7 @@ lexiclash.com`;
           {/* Share Actions */}
           <div className={cn(
             'mt-4 p-4 rounded-neo border-3 border-neo-black shadow-hard',
-            isDarkMode ? 'bg-slate-800' : 'bg-white'
+            isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
           )}>
             <div className="flex items-center justify-between mb-3">
               <h3 className={cn(
@@ -257,9 +261,10 @@ lexiclash.com`;
               </h3>
               <button
                 onClick={onClose}
+                aria-label={t('common.close')}
                 className={cn(
                   'p-1.5 rounded-neo border-2 border-neo-black',
-                  isDarkMode ? 'bg-slate-700' : 'bg-gray-100'
+                  isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-100'
                 )}
               >
                 <X className="w-4 h-4" />
@@ -273,7 +278,7 @@ lexiclash.com`;
                 className={cn(
                   'flex flex-col items-center gap-1.5 p-3 rounded-neo border-2 border-neo-black',
                   'transition-all hover:translate-y-[-2px] hover:shadow-hard-sm',
-                  copied ? 'bg-neo-green' : isDarkMode ? 'bg-slate-700' : 'bg-gray-100'
+                  copied ? 'bg-neo-green' : isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-100'
                 )}
               >
                 {copied ? (
@@ -321,8 +326,8 @@ lexiclash.com`;
               )}
             </div>
           </div>
-        </motion.div>
-      </motion.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>
   );
 }

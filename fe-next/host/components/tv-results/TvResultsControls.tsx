@@ -1,10 +1,12 @@
 'use client';
 
-import React, { memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { memo, useEffect, useState } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { Play, SkipForward, QrCode, Users } from 'lucide-react';
 import { Button } from '../../../components/ui/button';
 import { cn } from '../../../lib/utils';
+
+const MIN_WAIT_MS = 15_000;
 
 interface TvResultsControlsProps {
   visible: boolean;
@@ -40,21 +42,43 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
   const allReady = playersReadyCount === totalPlayers && totalPlayers > 0;
   const showNextRound = isTournament && !isLastRound;
 
+  // Minimum 15s gate from when controls become visible — prevents
+  // accidentally skipping past the score reveal even if everyone is ready.
+  const [secondsLeft, setSecondsLeft] = useState(Math.ceil(MIN_WAIT_MS / 1000));
+  useEffect(() => {
+    if (!visible) {
+      setSecondsLeft(Math.ceil(MIN_WAIT_MS / 1000));
+      return;
+    }
+    const startedAt = Date.now();
+    const tick = () => {
+      const left = Math.max(0, Math.ceil((MIN_WAIT_MS - (Date.now() - startedAt)) / 1000));
+      setSecondsLeft(left);
+      if (left === 0 && interval) clearInterval(interval);
+    };
+    const interval: ReturnType<typeof setInterval> | null = setInterval(tick, 250);
+    tick();
+    return () => { if (interval) clearInterval(interval); };
+  }, [visible]);
+  const gateLocked = secondsLeft > 0;
+  // Unlock when EITHER all players ready OR 15s elapsed.
+  const continueDisabled = gateLocked && !(totalPlayers > 0 && allReady);
+
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 50, opacity: 0 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-          className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900 via-slate-900/95 to-transparent pt-8 pb-6 px-6"
+          className="fixed bottom-0 left-0 right-0 z-[70] bg-linear-to-t from-slate-900 via-slate-900/95 to-transparent pt-8 pb-6 px-6"
         >
           <div className="max-w-5xl mx-auto flex items-center justify-between gap-4">
             {/* Skip Button (only during animation) */}
             <div className="flex-1">
               {isAnimating && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                 >
@@ -63,10 +87,10 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                     variant="outline"
                     className="bg-transparent border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
                   >
-                    <SkipForward className="w-5 h-5 mr-2" />
+                    <SkipForward className="w-5 h-5 me-2" />
                     {t('tvResults.skip')}
                   </Button>
-                </motion.div>
+                </m.div>
               )}
             </div>
 
@@ -74,7 +98,7 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
             <div className="flex items-center gap-4">
               {/* Players Ready Indicator */}
               {totalPlayers > 0 && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   className={cn(
@@ -87,63 +111,50 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                     {playersReadyCount}/{totalPlayers}
                   </span>
                   <span className="font-bold text-neo-black/70 text-sm">
-                    {t('tvResults.playersReady') || 'Ready'}
+                    {t('tvResults.playersReady')}
                   </span>
                   {allReady && (
-                    <motion.span
+                    <m.span
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       className="text-lg"
                     >
                       🎉
-                    </motion.span>
+                    </m.span>
                   )}
-                </motion.div>
+                </m.div>
               )}
 
               {/* Start New Game / Next Round Button */}
-              <motion.div
+              <m.div
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.1 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
               >
-                {showNextRound ? (
-                  <Button
-                    onClick={onNextRound}
-                    className={cn(
-                      'h-14 px-8 text-lg font-black uppercase',
-                      'bg-neo-lime text-neo-black border-4 border-neo-black',
-                      'shadow-hard-lg hover:shadow-hard-xl',
-                      'hover:translate-x-[-3px] hover:translate-y-[-3px]',
-                      'active:shadow-hard active:translate-x-[1px] active:translate-y-[1px]',
-                      'transition-all'
-                    )}
-                  >
-                    <Play className="w-6 h-6 mr-2" />
-                    {t('tvResults.nextRound') || 'Next Round'}
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={onStartNewGame}
-                    className={cn(
-                      'h-14 px-8 text-lg font-black uppercase',
-                      'bg-neo-lime text-neo-black border-4 border-neo-black',
-                      'shadow-hard-lg hover:shadow-hard-xl',
-                      'hover:translate-x-[-3px] hover:translate-y-[-3px]',
-                      'active:shadow-hard active:translate-x-[1px] active:translate-y-[1px]',
-                      'transition-all'
-                    )}
-                  >
-                    <Play className="w-6 h-6 mr-2" />
-                    {t('tvResults.startNewGame') || 'Start New Game'}
-                  </Button>
-                )}
-              </motion.div>
+                <Button
+                  onClick={showNextRound ? onNextRound : onStartNewGame}
+                  disabled={continueDisabled}
+                  className={cn(
+                    'h-14 px-8 text-lg font-black uppercase',
+                    'bg-neo-lime text-neo-black border-4 border-neo-black',
+                    'shadow-hard-lg hover:shadow-hard-xl',
+                    'hover:translate-x-[-3px] hover:translate-y-[-3px]',
+                    'active:shadow-hard active:translate-x-px active:translate-y-px',
+                    'transition-all',
+                    continueDisabled && 'opacity-60 cursor-not-allowed hover:translate-x-0 hover:translate-y-0 hover:shadow-hard-lg'
+                  )}
+                >
+                  <Play className="w-6 h-6 me-2" />
+                  {gateLocked
+                    ? `${showNextRound ? t('tvResults.nextRound') : t('tvResults.startNewGame')} (${secondsLeft}s)`
+                    : (showNextRound ? t('tvResults.nextRound') : t('tvResults.startNewGame'))}
+                </Button>
+              </m.div>
             </div>
 
             {/* QR Code Button */}
             <div className="flex-1 flex justify-end">
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
               >
@@ -152,13 +163,13 @@ const TvResultsControls = memo<TvResultsControlsProps>(({
                   variant="outline"
                   className="bg-transparent border-2 border-neo-cream/50 text-neo-cream hover:bg-neo-cream/10"
                 >
-                  <QrCode className="w-5 h-5 mr-2" />
+                  <QrCode className="w-5 h-5 me-2" />
                   {t('tvResults.qrCode')}
                 </Button>
-              </motion.div>
+              </m.div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

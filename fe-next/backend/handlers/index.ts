@@ -5,30 +5,36 @@
 
 import type { Server, Socket } from 'socket.io';
 
-const { registerGameHandlers } = require('./gameHandler');
-const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
-const { registerWordHandlers } = require('./wordHandler');
-const { registerChatHandlers } = require('./chatHandler');
-const { registerBotHandlers } = require('./botHandler');
-const { registerTournamentHandlers } = require('./tournamentHandler');
-const { registerPresenceHandlers, startConnectionHealthCheck } = require('./presenceHandler');
-const { registerHostHandlers } = require('./hostHandler');
-const { registerConnectionHandlers } = require('./connectionHandler');
-const { registerHintHandlers } = require('./hintHandler');
-const {
-  registerEngagementHandlers,
-  processGameEndEngagement,
-  processLongWordEngagement,
-  processAchievementEngagement,
-} = require('./engagementHandler');
-const { registerEarthquakeHandlers, clearGameEarthquakeState } = require('./earthquakeHandler');
-const { registerScorecardHandlers } = require('./scorecardHandler');
-const {
-  startGameTimer,
-  endGame,
-  calculateAndBroadcastFinalScores,
-  isSocketMigrating
-} = require('./shared');
+import { registerGameHandlers, MAX_PLAYERS_PER_ROOM } from './gameHandler.js';
+import { registerWordHandlers } from './wordHandler.js';
+import { registerChatHandlers } from './chatHandler.js';
+import { registerBotHandlers } from './botHandler.js';
+import { registerTournamentHandlers } from './tournamentHandler.js';
+import { registerPresenceHandlers, startConnectionHealthCheck } from './presenceHandler.js';
+import { registerFriendsHandlers } from './friendsHandler.js';
+import { registerFriendMessagingHandlers } from './friendMessagingHandler.js';
+import { registerFriendChallengeHandlers } from './friendChallengeHandler.js';
+import { registerHostHandlers } from './hostHandler.js';
+import { registerConnectionHandlers } from './connectionHandler.js';
+import { registerHintHandlers } from './hintHandler.js';
+import { registerEngagementHandlers } from './engagementHandler.js';
+import { registerEarthquakeHandlers } from './earthquakeHandler.js';
+import { registerScorecardHandlers } from './scorecardHandler.js';
+import { registerVocabularyHandlers } from './vocabularyHandler.js';
+import { registerClassroomGameHandlers } from './classroomGameHandler.js';
+import { registerAvatarHandlers } from './avatarHandler.js';
+import { registerWordHuntHandlers } from './wordHuntHandler.js';
+import { registerWheelRushHandlers } from './wheelRushHandler.js';
+import { registerShiritoriHandlers } from './shiritoriHandler.js';
+import { registerWordTowerHandlers } from './wordTowerHandler.js';
+import { registerWordPackHandler } from './wordPackHandler.js';
+import { registerKickHandler } from './kickHandler.js';
+import { registerReactionHandlers } from './reactionHandler.js';
+import { registerLobbyEmoteHandlers } from './lobbyEmoteHandler.js';
+import { registerGiftHandlers } from './giftHandler.js';
+import { registerPartyHandlers } from './partyHandler.js';
+import { registerBoostHandlers } from './boostHandler.js';
+import { getGame } from '../modules/gameStateManager.js';
 
 /**
  * Register all socket event handlers for a connection
@@ -42,71 +48,35 @@ function registerAllHandlers(io: Server, socket: Socket): void {
   registerBotHandlers(io, socket);
   registerTournamentHandlers(io, socket);
   registerPresenceHandlers(io, socket);
+  registerFriendsHandlers(io, socket);
+  registerFriendMessagingHandlers(io, socket);
+  registerFriendChallengeHandlers(io, socket);
   registerHostHandlers(io, socket);
   registerConnectionHandlers(io, socket);
   registerHintHandlers(io, socket);
   registerEngagementHandlers(io, socket);
   registerEarthquakeHandlers(io, socket);
   registerScorecardHandlers(io, socket);
+  registerVocabularyHandlers(socket, (code: string) => {
+    return getGame(code);
+  });
+  registerClassroomGameHandlers(io, socket);
+  registerAvatarHandlers(io, socket);
+  registerWordHuntHandlers(io, socket);
+  registerWheelRushHandlers(io, socket);
+  registerShiritoriHandlers(io, socket);
+  registerWordTowerHandlers(io, socket);
+  registerWordPackHandler(io, socket);
+  registerKickHandler(io, socket);
+  registerReactionHandlers(io, socket);
+  registerLobbyEmoteHandlers(io, socket);
+  registerGiftHandlers(io, socket);
+  registerPartyHandlers(io, socket);
+  registerBoostHandlers(io, socket);
 }
-
-module.exports = {
-  // Main registration function
-  registerAllHandlers,
-
-  // Individual handler registrations (for selective use)
-  registerGameHandlers,
-  registerWordHandlers,
-  registerChatHandlers,
-  registerBotHandlers,
-  registerTournamentHandlers,
-  registerPresenceHandlers,
-  registerHostHandlers,
-  registerConnectionHandlers,
-  registerHintHandlers,
-  registerEngagementHandlers,
-  registerEarthquakeHandlers,
-  registerScorecardHandlers,
-
-  // Engagement utilities (for use in other handlers)
-  processGameEndEngagement,
-  processLongWordEngagement,
-  processAchievementEngagement,
-
-  // Shared utilities
-  startGameTimer,
-  endGame,
-  calculateAndBroadcastFinalScores,
-  isSocketMigrating,
-  startConnectionHealthCheck,
-  clearGameEarthquakeState,
-
-  // Configuration
-  MAX_PLAYERS_PER_ROOM
-};
 
 export {
   registerAllHandlers,
-  registerGameHandlers,
-  registerWordHandlers,
-  registerChatHandlers,
-  registerBotHandlers,
-  registerTournamentHandlers,
-  registerPresenceHandlers,
-  registerHostHandlers,
-  registerConnectionHandlers,
-  registerHintHandlers,
-  registerEngagementHandlers,
-  registerEarthquakeHandlers,
-  registerScorecardHandlers,
-  processGameEndEngagement,
-  processLongWordEngagement,
-  processAchievementEngagement,
-  startGameTimer,
-  endGame,
-  calculateAndBroadcastFinalScores,
-  isSocketMigrating,
   startConnectionHealthCheck,
-  clearGameEarthquakeState,
   MAX_PLAYERS_PER_ROOM
 };

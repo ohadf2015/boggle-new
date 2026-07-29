@@ -5,7 +5,7 @@
 
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
 
 // Create Supabase client (lazy loaded)
 let supabase: SupabaseClient | null = null;
@@ -16,14 +16,40 @@ function getSupabaseClient(): SupabaseClient | null {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    logger.warn('GUEST_TRACKER', 'Supabase not configured. Guest sessions will not be tracked.');
+  if (!supabaseUrl || !supabaseServiceKey || supabaseServiceKey === 'placeholder') {
+    logger.warn('GUEST_TRACKER', 'Supabase not configured (missing or placeholder service key). Guest sessions will not be tracked.');
     return null;
   }
 
   const { createClient } = require('@supabase/supabase-js');
   supabase = createClient(supabaseUrl, supabaseServiceKey);
   return supabase;
+}
+
+const DB_TIMEOUT_MS = 5000;
+
+/**
+ * Run a Supabase query with both an AbortSignal-driven cancel and a JS-level timeout.
+ *
+ * The JS race rejects the awaited promise on schedule, but does not cancel the
+ * underlying fetch — without `.abortSignal()`, the socket stays open until the
+ * Supabase edge closes it. Wiring AbortSignal.timeout into postgrest-js asks the
+ * client to abort the in-flight fetch when our budget elapses; whether it actually
+ * frees the pool slot depends on the postgrest-js version honouring the signal.
+ * The +50ms on the JS timer ensures the AbortSignal fires first when both are armed.
+ */
+function runQuery<T>(
+  buildQuery: (signal: AbortSignal) => PromiseLike<T>,
+  label: string,
+  ms: number = DB_TIMEOUT_MS
+): Promise<T> {
+  const signal = AbortSignal.timeout(ms);
+  return Promise.race([
+    Promise.resolve(buildQuery(signal)),
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms + 50)
+    ),
+  ]);
 }
 
 export interface GuestSessionData {
@@ -62,41 +88,54 @@ export async function getOrCreateGuestSession(
 
   try {
     // Try to get existing session
-    const { data: existingSession, error: fetchError } = await client
-      .from('guest_sessions')
-      .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
-      .eq('session_id', sessionData.sessionId)
-      .single();
+    const { data: existingSession, error: fetchError } = await runQuery(
+      (signal) => client
+        .from('guest_sessions')
+        .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
+        .eq('session_id', sessionData.sessionId)
+        .abortSignal(signal)
+        .single(),
+      'getOrCreate:fetch'
+    );
 
     if (existingSession && !fetchError) {
-      // Update last visit time
-      await client
-        .from('guest_sessions')
-        .update({ last_visit_at: new Date().toISOString() })
-        .eq('session_id', sessionData.sessionId);
+      // Update last visit time — fire and forget, don't block response.
+      // 5s AbortSignal so the connection releases even if Supabase stalls.
+      const bgSignal = AbortSignal.timeout(DB_TIMEOUT_MS);
+      Promise.resolve(
+        client
+          .from('guest_sessions')
+          .update({ last_visit_at: new Date().toISOString() })
+          .eq('session_id', sessionData.sessionId)
+          .abortSignal(bgSignal)
+      ).catch((err: unknown) => logger.error('GUEST_TRACKER', `Failed to update last visit: ${err}`));
 
       logger.info('GUEST_TRACKER', `Updated last visit for session ${sessionData.sessionId}`);
       return existingSession;
     }
 
     // Create new session
-    const { data: newSession, error: insertError } = await client
-      .from('guest_sessions')
-      .insert({
-        session_id: sessionData.sessionId,
-        device_type: sessionData.deviceType || null,
-        browser: sessionData.browser || null,
-        language: sessionData.language || null,
-        utm_source: sessionData.utmSource || null,
-        utm_medium: sessionData.utmMedium || null,
-        utm_campaign: sessionData.utmCampaign || null,
-        referrer: sessionData.referrer || null,
-        country: sessionData.country || null,
-        first_visit_at: new Date().toISOString(),
-        last_visit_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+    const { data: newSession, error: insertError } = await runQuery(
+      (signal) => client
+        .from('guest_sessions')
+        .insert({
+          session_id: sessionData.sessionId,
+          device_type: sessionData.deviceType || null,
+          browser: sessionData.browser || null,
+          language: sessionData.language || null,
+          utm_source: sessionData.utmSource || null,
+          utm_medium: sessionData.utmMedium || null,
+          utm_campaign: sessionData.utmCampaign || null,
+          referrer: sessionData.referrer || null,
+          country: sessionData.country || null,
+          first_visit_at: new Date().toISOString(),
+          last_visit_at: new Date().toISOString(),
+        })
+        .select()
+        .abortSignal(signal)
+        .single(),
+      'getOrCreate:insert'
+    );
 
     if (insertError) {
       logger.error('GUEST_TRACKER', `Failed to create guest session: ${insertError.message}`);
@@ -136,10 +175,14 @@ export async function updateGuestSession(
       updateData.last_visit_at = updates.lastVisitAt.toISOString();
     }
 
-    const { error } = await client
-      .from('guest_sessions')
-      .update(updateData)
-      .eq('session_id', sessionId);
+    const { error } = await runQuery(
+      (signal) => client
+        .from('guest_sessions')
+        .update(updateData)
+        .eq('session_id', sessionId)
+        .abortSignal(signal),
+      'updateGuestSession'
+    );
 
     if (error) {
       logger.error('GUEST_TRACKER', `Failed to update guest session: ${error.message}`);
@@ -165,13 +208,17 @@ export async function linkGuestSessionToUser(
   if (!client) return false;
 
   try {
-    const { error } = await client
-      .from('guest_sessions')
-      .update({
-        user_id: userId,
-        linked_at: new Date().toISOString(),
-      })
-      .eq('session_id', sessionId);
+    const { error } = await runQuery(
+      (signal) => client
+        .from('guest_sessions')
+        .update({
+          user_id: userId,
+          linked_at: new Date().toISOString(),
+        })
+        .eq('session_id', sessionId)
+        .abortSignal(signal),
+      'linkGuestSessionToUser'
+    );
 
     if (error) {
       logger.error('GUEST_TRACKER', `Failed to link guest session to user: ${error.message}`);
@@ -194,11 +241,15 @@ export async function getGuestSession(sessionId: string): Promise<any | null> {
   if (!client) return null;
 
   try {
-    const { data, error } = await client
-      .from('guest_sessions')
-      .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
-      .eq('session_id', sessionId)
-      .single();
+    const { data, error } = await runQuery(
+      (signal) => client
+        .from('guest_sessions')
+        .select('id, session_id, first_visit_at, last_visit_at, device_type, browser, language, utm_source, utm_medium, utm_campaign, referrer, country, user_id, linked_at, created_at')
+        .eq('session_id', sessionId)
+        .abortSignal(signal)
+        .single(),
+      'getGuestSession'
+    );
 
     if (error) {
       logger.error('GUEST_TRACKER', `Failed to get guest session: ${error.message}`);
@@ -296,53 +347,61 @@ export async function getGuestSessionAnalytics(): Promise<{
   if (!client) return defaultAnalytics;
 
   try {
-    // Get all sessions - only fields needed for analytics
-    const { data: sessions, error } = await client
-      .from('guest_sessions')
-      .select('user_id, utm_source, country, device_type');
+    // Run all aggregations in parallel using DB-side grouping (no full table scan)
+    const [totalsResult, sourcesResult, countriesResult, devicesResult] = await Promise.all([
+      // Totals + conversion in one lightweight count query
+      (client.rpc('get_guest_session_totals').single() as unknown) as Promise<{ data: { total: number; linked: number } | null; error: unknown }>,
+      // Top sources — fallback to manual aggregation if RPC not available
+      client
+        .from('guest_sessions')
+        .select('utm_source')
+        .not('utm_source', 'is', null)
+        .limit(5000),
+      client
+        .from('guest_sessions')
+        .select('country')
+        .not('country', 'is', null)
+        .limit(5000),
+      client
+        .from('guest_sessions')
+        .select('device_type')
+        .limit(5000),
+    ]);
 
-    if (error || !sessions) {
-      logger.error('GUEST_TRACKER', `Failed to get sessions for analytics: ${error?.message}`);
-      return defaultAnalytics;
+    // Totals — use RPC if available, otherwise fall back to count queries
+    let totalSessions = 0;
+    let linkedSessions = 0;
+    if (totalsResult.data && !totalsResult.error) {
+      totalSessions = totalsResult.data.total;
+      linkedSessions = totalsResult.data.linked;
+    } else {
+      // Fallback: lightweight HEAD counts instead of loading all rows
+      const [totalRes, linkedRes] = await Promise.all([
+        client.from('guest_sessions').select('id', { count: 'exact', head: true }),
+        client.from('guest_sessions').select('id', { count: 'exact', head: true }).not('user_id', 'is', null),
+      ]);
+      totalSessions = totalRes.count ?? 0;
+      linkedSessions = linkedRes.count ?? 0;
     }
 
-    const totalSessions = sessions.length;
-    const linkedSessions = sessions.filter((s) => s.user_id).length;
     const conversionRate = totalSessions > 0 ? (linkedSessions / totalSessions) * 100 : 0;
 
-    // Top UTM sources
-    const sourceCounts: Record<string, number> = {};
-    sessions.forEach((s) => {
-      const source = s.utm_source || 'direct';
-      sourceCounts[source] = (sourceCounts[source] || 0) + 1;
-    });
-    const topSources = Object.entries(sourceCounts)
-      .map(([source, count]) => ({ source, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-
-    // Top countries
-    const countryCounts: Record<string, number> = {};
-    sessions.forEach((s) => {
-      if (s.country) {
-        countryCounts[s.country] = (countryCounts[s.country] || 0) + 1;
+    // Aggregate top-N from fetched rows (capped at 5000 — safe memory)
+    const countTop = <T extends Record<string, unknown>>(rows: T[] | null, key: keyof T, fallback: string): Array<{ [k: string]: string | number }> => {
+      const counts: Record<string, number> = {};
+      for (const row of rows || []) {
+        const val = (row[key] as string) || fallback;
+        counts[val] = (counts[val] || 0) + 1;
       }
-    });
-    const topCountries = Object.entries(countryCounts)
-      .map(([country, count]) => ({ country, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+      return Object.entries(counts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5)
+        .map(([name, count]) => ({ name, count }));
+    };
 
-    // Top devices
-    const deviceCounts: Record<string, number> = {};
-    sessions.forEach((s) => {
-      const device = s.device_type || 'unknown';
-      deviceCounts[device] = (deviceCounts[device] || 0) + 1;
-    });
-    const topDevices = Object.entries(deviceCounts)
-      .map(([device, count]) => ({ device, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
+    const topSources = countTop(sourcesResult.data, 'utm_source', 'direct').map(r => ({ source: r.name as string, count: r.count as number }));
+    const topCountries = countTop(countriesResult.data, 'country', 'unknown').map(r => ({ country: r.name as string, count: r.count as number }));
+    const topDevices = countTop(devicesResult.data, 'device_type', 'unknown').map(r => ({ device: r.name as string, count: r.count as number }));
 
     return {
       totalSessions,

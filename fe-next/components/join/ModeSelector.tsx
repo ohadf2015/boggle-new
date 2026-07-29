@@ -36,7 +36,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
         >
           <div className="flex items-center gap-1.5">
             <DoorOpen className="text-base" />
-            <span className="font-bold text-sm">{t('joinView.joinRoom') || 'Join Room'}</span>
+            <span className="font-bold text-sm">{t('joinView.joinRoom')}</span>
           </div>
         </ToggleGroupItem>
         <ToggleGroupItem
@@ -45,7 +45,7 @@ export const ModeSelector: React.FC<ModeSelectorProps> = ({
         >
           <div className="flex items-center gap-1.5">
             <Crown className="text-base" />
-            <span className="font-bold text-sm">{t('joinView.createRoom') || 'Create Room'}</span>
+            <span className="font-bold text-sm">{t('joinView.createRoom')}</span>
           </div>
         </ToggleGroupItem>
       </ToggleGroup>

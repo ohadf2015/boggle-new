@@ -1,147 +1,149 @@
 'use client';
 
-import { useState, useEffect, memo } from 'react';
-import Image from 'next/image';
-import { User } from 'lucide-react';
-import { getAvatarPath, getRandomAvatar, AVATARS } from '@/utils/avatarConfig';
+import { useMemo, memo } from 'react';
+import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import AvatarRenderer, { type AvatarMode } from '@/components/avatar/AvatarRenderer';
+import type { AvatarMood } from '@/lib/avatar/avatarMood';
+import type { AvatarOverlay } from '@/lib/avatar/avatarOverlay';
+import { cn } from '@/lib/utils';
+import { NeoSkeletonAvatar } from '@/components/ui/skeleton';
 
-// Special constant for "use profile avatar" selection - indicates profile picture should be used
+/** @deprecated No longer used — profile pictures removed in favor of custom avatars */
 export const PROFILE_AVATAR_ID = '__profile_avatar__';
 
-/**
- * Avatar size type
- */
 type AvatarSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
-/**
- * Size configuration
- */
 interface SizeConfig {
   container: string;
-  icon: string;
   px: number;
 }
 
-/**
- * Avatar Props
- */
 interface AvatarProps {
+  /** @deprecated Profile pictures removed — this prop is ignored */
   profilePictureUrl?: string | null;
-  avatarImage?: string; // Avatar image ID (e.g., 'broccoli-bob') or PROFILE_AVATAR_ID
+  /** @deprecated Use customAvatar instead */
+  avatarImage?: string;
+  customAvatar?: CustomAvatarConfig | null;
+  /** Unique identifier for deterministic fallback avatar generation (e.g. user ID, username) */
+  userId?: string;
   size?: AvatarSize;
+  /** Pixel size override — fills container at exact px (bypasses SIZE_CONFIG). Used when caller already controls outer tile dimensions. */
+  pixelSize?: number;
   className?: string;
+  /** Show loading skeleton instead of avatar */
+  isLoading?: boolean;
+  /** Game-mode color frame: pink/cyan/purple/lime ring around avatar */
+  mode?: AvatarMode;
+  /** Equipped profile-frame cosmetic id (e.g. 'frame-gold'). 'frame-none'/null = no frame. */
+  frame?: string | null;
+  /**
+   * Skip the per-tier CSS animation wrapper (idle breathing, glow-pulse drop-shadow,
+   * sparkles, holographic filter loop, conic-gradient ring). Use in in-match
+   * leaderboards/rosters where many avatars are visible at once — the continuous
+   * `filter: drop-shadow` keyframes are paint-bound and stack into significant jank.
+   */
+  disableEffects?: boolean;
+  /**
+   * Transient reaction (correct/wrong/streak/win/…). Temporarily swaps the
+   * eyes/eyebrows/mouth + plays a short animation. Undefined renders normally.
+   * Drive with the `useAvatarMood` hook from game events.
+   */
+  mood?: AvatarMood;
+  /** Loud reaction badge (alert/flame) for TV-legible high-signal moments. */
+  overlay?: AvatarOverlay | null;
 }
 
-/**
- * Size configuration map
- */
+/** Map a profile-frame cosmetic id to its avatar wrapper class. Returns null for no frame. */
+function frameWrapperClass(frame: string | null | undefined): string | null {
+  if (!frame || frame === 'frame-none') return null;
+  return `avatar-${frame}`;
+}
+
 const SIZE_CONFIG: Record<AvatarSize, SizeConfig> = {
-  sm: { container: 'w-6 h-6', icon: 'w-4 h-4', px: 24 },
-  md: { container: 'w-8 h-8', icon: 'w-5 h-5', px: 32 },
-  lg: { container: 'w-12 h-12', icon: 'w-8 h-8', px: 48 },
-  xl: { container: 'w-20 h-20', icon: 'w-12 h-12', px: 80 },
-  '2xl': { container: 'w-28 h-28', icon: 'w-16 h-16', px: 112 }
+  sm: { container: 'w-6 h-6', px: 24 },
+  md: { container: 'w-8 h-8', px: 32 },
+  lg: { container: 'w-12 h-12', px: 48 },
+  xl: { container: 'w-20 h-20', px: 80 },
+  '2xl': { container: 'w-28 h-28', px: 112 }
 };
 
 /**
- * Unified Avatar Component - Displays profile pictures or character avatar images
- * No emoji fallback - only supports custom character avatars or profile pictures
- * Memoized to prevent unnecessary re-renders in lists
+ * Unified Avatar Component
+ * Fallback chain: customAvatar (SVG) > deterministic random custom avatar.
  */
-const Avatar = memo<AvatarProps>(({
-  profilePictureUrl,
-  avatarImage,
-  size = 'md',
-  className = ''
-}) => {
-  const [imageError, setImageError] = useState(false);
-  const [avatarError, setAvatarError] = useState(false);
-  const config = SIZE_CONFIG[size] || SIZE_CONFIG.md;
+const Avatar = memo<AvatarProps>((props) => {
+  const {
+    customAvatar,
+    userId,
+    size = 'md',
+    pixelSize,
+    className = '',
+    isLoading,
+    mode,
+    frame,
+    disableEffects,
+    mood,
+    overlay,
+  } = props;
+  // Back-compat: legacy callers still pass `avatarImage`. Read via prop access
+  // so this component does not surface its own deprecation diagnostic.
+  const legacySeed = (props as { avatarImage?: string }).avatarImage;
+  const frameClass = frameWrapperClass(frame);
+  const frameAttr = frameClass ? { 'data-frame': frame as string } : {};
+  const baseConfig = SIZE_CONFIG[size] || SIZE_CONFIG.md;
+  const config: SizeConfig = pixelSize != null
+    ? { container: '', px: pixelSize }
+    : baseConfig;
+  const containerSizeClass = pixelSize != null ? '' : config.container;
+  const containerStyle = pixelSize != null
+    ? { width: pixelSize, height: pixelSize }
+    : undefined;
 
-  // Reset error states when URLs change
-  useEffect(() => {
-    setImageError(false);
-    setAvatarError(false);
-  }, [profilePictureUrl, avatarImage]);
+  // Pre-compute fallback avatar (must be before conditionals to satisfy hook rules)
+  const fallbackSeed = userId || legacySeed || 'default-avatar';
+  const fallbackConfig = useMemo(
+    () => getSeededAvatarConfig(hashString(fallbackSeed)),
+    [fallbackSeed]
+  );
 
-  // 1. Show profile picture if available and using PROFILE_AVATAR_ID or explicitly provided
-  const shouldShowProfilePicture = profilePictureUrl &&
-    (avatarImage === PROFILE_AVATAR_ID || !avatarImage) &&
-    !imageError;
+  // Show skeleton only when explicitly loading or when no identity is available.
+  // The fallback config is deterministic from userId, so server and client
+  // renders match without a hydration gate.
+  const hasIdentity = !!(customAvatar || userId || legacySeed);
+  const shouldLoad = isLoading === true || (isLoading === undefined && !hasIdentity);
 
-  if (shouldShowProfilePicture) {
+  // 0. Loading state
+  if (shouldLoad) {
+    return (
+      <NeoSkeletonAvatar size={config.px} className={className} />
+    );
+  }
+
+  // 1. Custom SVG avatar (highest priority)
+  if (customAvatar) {
     return (
       <div
-        className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
+        className={cn('relative rounded-full overflow-hidden shrink-0', containerSizeClass, className, frameClass)}
+        style={containerStyle}
+        data-testid="header-avatar"
+        data-avatar-type="custom"
+        {...frameAttr}
       >
-        <Image
-          src={profilePictureUrl}
-          alt="Profile"
-          fill
-          sizes={`(max-width: 768px) ${config.px}px, ${config.px}px`}
-          className="object-cover"
-          onError={() => setImageError(true)}
-          referrerPolicy="no-referrer"
-          loading="lazy"
-          priority={false}
-        />
+        <AvatarRenderer config={customAvatar} size={config.px} circular className="w-full h-full" mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} />
       </div>
     );
   }
 
-  // 2. Show character avatar image if provided and valid
-  if (avatarImage && avatarImage !== PROFILE_AVATAR_ID && !avatarError) {
-    // Check if it's a valid avatar ID
-    const isValidAvatar = AVATARS.some(a => a.id === avatarImage);
-    const avatarPath = avatarImage.includes('/') ? avatarImage : getAvatarPath(avatarImage);
-
-    // If avatar ID is invalid, use a random one
-    const finalPath = isValidAvatar ? avatarPath : getAvatarPath(getRandomAvatar());
-
-    return (
-      <div
-        className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
-      >
-        <Image
-          src={finalPath}
-          alt="Avatar"
-          fill
-          sizes={`(max-width: 768px) ${config.px}px, ${config.px}px`}
-          className="object-cover"
-          onError={() => setAvatarError(true)}
-          loading="lazy"
-          priority={false}
-        />
-      </div>
-    );
-  }
-
-  // 3. Fallback: Show default avatar (first in the list)
-  // This handles cases where avatarImage is PROFILE_AVATAR_ID but no profile picture exists
-  const fallbackAvatar = AVATARS[0];
-
+  // 2. Fallback: deterministic random custom avatar
   return (
     <div
-      className={`relative rounded-full overflow-hidden flex-shrink-0 ${config.container} ${className}`}
+      className={cn('relative rounded-full overflow-hidden shrink-0', containerSizeClass, className, frameClass)}
+      style={containerStyle}
+      data-testid="header-avatar"
+      data-avatar-type="generated"
+      {...frameAttr}
     >
-      <Image
-        src={getAvatarPath(fallbackAvatar)}
-        alt="Avatar"
-        fill
-        sizes={`(max-width: 768px) ${config.px}px, ${config.px}px`}
-        className="object-cover"
-        onError={() => {
-          // If even fallback fails, show a generic user icon
-          setAvatarError(true);
-        }}
-        loading="lazy"
-        priority={false}
-      />
-      {avatarError && (
-        <div className="absolute inset-0 bg-neo-navy/80 flex items-center justify-center" data-testid="avatar-fallback-icon">
-          <User className={`${config.icon} text-neo-cyan`} />
-        </div>
-      )}
+      <AvatarRenderer config={fallbackConfig} size={config.px} circular mode={mode} disableEffects={disableEffects} mood={mood} overlay={overlay} />
     </div>
   );
 });

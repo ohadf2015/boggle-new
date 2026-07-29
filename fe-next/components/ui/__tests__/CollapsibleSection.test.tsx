@@ -3,8 +3,8 @@ import '@testing-library/jest-dom';
 import CollapsibleSection from '../CollapsibleSection';
 
 // Mock framer-motion to avoid matchMedia issues
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: 'div',
     span: 'span',
   },
@@ -12,14 +12,14 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock the useIsDesktop hook
-const mockUseIsDesktop = jest.fn();
-jest.mock('../../../hooks/useMediaQuery', () => ({
+const mockUseIsDesktop = vi.fn();
+vi.mock('../../../hooks/useMediaQuery', () => ({
   useIsDesktop: () => mockUseIsDesktop(),
 }));
 
 describe('CollapsibleSection', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should be collapsed by default on desktop when defaultExpanded is not specified', () => {

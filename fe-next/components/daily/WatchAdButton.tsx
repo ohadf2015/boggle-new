@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Coins, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import { Play, Coins, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader } from '@/components/ui/Loader';
 import { Button } from '@/components/ui/button';
-import { useRewardedAd, AdStatus } from '@/hooks/useRewardedAd';
+import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { useCoinContext } from '@/contexts/CoinContext';
+import { trackRewardedAdOffered } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 
 interface WatchAdButtonProps {
@@ -17,6 +19,8 @@ interface WatchAdButtonProps {
   className?: string;
   /** Whether to show as a compact button or full card */
   variant?: 'button' | 'card';
+  /** Placement tag for PostHog funnel (e.g. 'daily_watch', 'word_hunt_results'). */
+  surface: string;
 }
 
 /**
@@ -34,14 +38,22 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   t,
   className,
   variant = 'button',
+  surface,
 }) => {
+  useEffect(() => {
+    trackRewardedAdOffered(surface);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const [showSuccess, setShowSuccess] = useState(false);
   const [earnedAmount, setEarnedAmount] = useState(0);
 
-  const { coins: currentCoins, refreshCoins } = useCoinContext();
+  const { refreshCoins } = useCoinContext();
 
   // Update effect to refresh coins when ad succeeds
-  const { showAd, isAdAvailable, status, error, rewardAmount } = useRewardedAd({
+  const { showAd, isAdAvailable, isPlaceholderCooldown, status, error, rewardAmount } = useRewardedAd({
+    surface: 'generic',
+    analyticsSurface: surface,
     onRewardEarned: async (earned) => {
       setEarnedAmount(earned);
       setShowSuccess(true);
@@ -62,14 +74,14 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
 
   const isLoading = status === 'loading';
   const isShowing = status === 'showing';
-  const isDisabled = !isAdAvailable || isLoading || isShowing;
+  const isDisabled = !isAdAvailable || isLoading || isShowing || isPlaceholderCooldown;
 
   // Get status-specific content
   const getStatusContent = () => {
     if (showSuccess) {
       return {
         icon: <CheckCircle className="w-5 h-5 text-neo-lime" />,
-        text: `+${earnedAmount} ${t('wordHunt.ad.coinsEarned') || 'coins earned!'}`,
+        text: `+${earnedAmount} ${t('wordHunt.ad.coinsEarned')}`,
         subtext: null,
       };
     }
@@ -77,27 +89,27 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
     switch (status) {
       case 'loading':
         return {
-          icon: <Loader2 className="w-5 h-5 animate-spin" />,
-          text: t('wordHunt.ad.loading') || 'Loading ad...',
+          icon: <Loader size="sm" />,
+          text: t('wordHunt.ad.loading'),
           subtext: null,
         };
       case 'showing':
         return {
           icon: <Play className="w-5 h-5 animate-pulse" />,
-          text: t('wordHunt.ad.watching') || 'Watching ad...',
-          subtext: t('wordHunt.ad.almostDone') || 'Almost done!',
+          text: t('wordHunt.ad.watching'),
+          subtext: t('wordHunt.ad.almostDone'),
         };
       case 'error':
         return {
           icon: <AlertCircle className="w-5 h-5 text-red-400" />,
-          text: t('wordHunt.ad.error') || 'Ad failed',
-          subtext: error || t('wordHunt.ad.tryAgain') || 'Try again later',
+          text: t('wordHunt.ad.error'),
+          subtext: error || t('wordHunt.ad.tryAgain'),
         };
       default:
         return {
           icon: <Play className="w-5 h-5" />,
-          text: t('wordHunt.ad.watchAd') || 'Watch Ad',
-          subtext: `+${rewardAmount} ${t('common.coins') || 'coins'}`,
+          text: t('wordHunt.ad.watchAd'),
+          subtext: `+${rewardAmount} ${t('common.coins')}`,
         };
     }
   };
@@ -107,13 +119,13 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
   if (variant === 'card') {
     // Full card variant for settings/dedicated section
     return (
-      <motion.div
+      <m.div
         whileHover={!isDisabled ? { scale: 1.02, y: -2 } : {}}
         whileTap={!isDisabled ? { scale: 0.98 } : {}}
         className={cn(
           "relative overflow-hidden rounded-neo-lg border-3 border-neo-black shadow-hard transition-all cursor-pointer",
           showSuccess
-            ? "bg-gradient-to-br from-neo-lime to-emerald-500"
+            ? "bg-linear-to-br from-neo-lime to-emerald-500"
             : isDisabled
               ? "bg-gray-500 cursor-not-allowed"
               : "bg-neo-purple hover:shadow-hard-lg",
@@ -122,7 +134,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
         onClick={!isDisabled ? showAd : undefined}
       >
         {/* Reward badge */}
-        <div className="absolute top-2 end-2 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
+        <div className="absolute top-2 inset-e-2 flex items-center gap-1 px-2.5 py-1 bg-neo-lime rounded-full border-2 border-neo-black shadow-hard-sm text-neo-black">
           <Coins className="w-4 h-4" />
           <span className="font-black text-sm">+{rewardAmount}</span>
         </div>
@@ -131,7 +143,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
         <div className="p-4">
           <div className="flex items-center gap-3">
             <div className={cn(
-              "flex-shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-2 border-neo-black",
+              "shrink-0 w-12 h-12 rounded-neo flex items-center justify-center border-2 border-neo-black",
               showSuccess ? "bg-white/30" : "bg-white/20"
             )}>
               {content.icon}
@@ -141,21 +153,21 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
                 {content.text}
               </div>
               {content.subtext && (
-                <div className="text-xs mt-0.5 text-white/80">
+                <div className="text-xs mt-0.5 text-white">
                   {content.subtext}
                 </div>
               )}
             </div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   // Compact button variant (default)
   return (
     <AnimatePresence mode="wait">
-      <motion.div
+      <m.div
         key={showSuccess ? 'success' : status}
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -172,7 +184,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
               ? "bg-neo-lime text-neo-black"
               : isDisabled
                 ? "bg-slate-500 text-slate-300 cursor-not-allowed opacity-70"
-                : "bg-gradient-to-r from-purple-500 to-indigo-600 text-white hover:shadow-hard-lg hover:-translate-y-0.5"
+                : "bg-linear-to-r from-purple-500 to-indigo-600 text-white hover:shadow-hard-lg hover:-translate-y-0.5"
           )}
         >
           <span className="flex items-center justify-center gap-2">
@@ -186,7 +198,7 @@ const WatchAdButton: React.FC<WatchAdButtonProps> = ({
             )}
           </span>
         </Button>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 };

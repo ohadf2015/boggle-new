@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { Pencil, Users } from 'lucide-react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Users, Swords, Eye } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -14,29 +14,30 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { AvatarSelector } from '@/components/multiplayer/AvatarSelector';
-import { PROFILE_AVATAR_ID } from '@/components/EmojiAvatarPicker';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import {
   getStoredUsername,
-  getStoredAvatarId,
+  getOrCreateStoredCustomAvatar,
   setStoredUsername,
-  setStoredAvatarId,
+  setStoredCustomAvatar,
 } from '@/utils/profileStorage';
-import { getRandomAvatar } from '@/utils/avatarConfig';
+import { validateUsername } from '@/utils/validation';
 import { cn } from '@/lib/utils';
 import type { ActiveRoom } from '@/shared/types/game';
+import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface JoinRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
   room: ActiveRoom | null;
   isJoining: boolean;
-  onJoin: (username: string, avatarId: string) => void;
+  onJoin: (username: string) => void;
+  onSpectate?: (username: string) => void;
   isAuthenticated: boolean;
   displayName: string | null;
-  profilePictureUrl?: string | null;
-  profileAvatarId?: string;
+  profileAvatar?: CustomAvatarConfig | null;
 }
 
 const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
@@ -45,147 +46,183 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
   room,
   isJoining,
   onJoin,
+  onSpectate,
   isAuthenticated,
   displayName,
-  profilePictureUrl,
-  profileAvatarId,
+  profileAvatar,
 }) => {
-  const { t } = useLanguage();
+  const { t, dir } = useLanguage();
+  const { updateProfile: updateAuthProfile } = useAuth();
 
   const [username, setUsername] = useState<string>('');
-  const [avatarId, setAvatarId] = useState<string>('');
-  const [isEditingName, setIsEditingName] = useState(false);
+  const [customAvatar, setCustomAvatar] = useState<CustomAvatarConfig | null>(null);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+  const [hasTouchedName, setHasTouchedName] = useState(false);
+  const nameInputRef = useRef<HTMLInputElement>(null);
 
-  // Initialize state when modal opens - only runs when modal opens, not on state changes
+  // Initialize state when modal opens
   useEffect(() => {
     if (!isOpen) return;
 
+    setHasAttemptedSubmit(false);
+    setHasTouchedName(false);
+
     if (isAuthenticated && displayName) {
       setUsername(displayName);
-      setAvatarId(profileAvatarId || PROFILE_AVATAR_ID);
+      setCustomAvatar(profileAvatar ?? getRandomAvatarConfig());
     } else {
       const storedUsername = getStoredUsername();
-      const storedAvatarId = getStoredAvatarId();
-
-      if (storedUsername) {
-        setUsername(storedUsername);
-      } else {
-        const randomAvatar = getRandomAvatar();
-        setUsername(randomAvatar.name);
-        setAvatarId(randomAvatar.id);
-      }
-
-      if (storedAvatarId) {
-        setAvatarId(storedAvatarId);
-      } else {
-        const randomAvatar = getRandomAvatar();
-        setAvatarId(randomAvatar.id);
-      }
+      setUsername(storedUsername || '');
+      setCustomAvatar(getOrCreateStoredCustomAvatar());
     }
-  }, [isOpen, isAuthenticated, displayName, profileAvatarId]);
+  }, [isOpen, isAuthenticated, displayName, profileAvatar]);
 
   const handleJoin = useCallback(() => {
-    if (!username.trim() || !avatarId) return;
+    setHasAttemptedSubmit(true);
 
-    // Always store avatar selection (even for authenticated users) so it's available when joining
+    const validation = validateUsername(username);
+    if (!validation.isValid || !customAvatar) {
+      if (!validation.isValid) {
+        nameInputRef.current?.focus();
+      }
+      return;
+    }
+
     if (!isAuthenticated) {
       setStoredUsername(username.trim());
     }
-    setStoredAvatarId(avatarId);
+    setStoredCustomAvatar(customAvatar);
+    if (isAuthenticated) {
+      const profileUpdates: Record<string, unknown> = { avatar_config: customAvatar };
+      if (username.trim() !== displayName) {
+        profileUpdates.display_name = username.trim();
+      }
+      updateAuthProfile(profileUpdates).catch(() => {});
+    }
 
-    onJoin(username.trim(), avatarId);
-  }, [username, avatarId, isAuthenticated, onJoin]);
+    onJoin(username.trim());
+  }, [username, customAvatar, isAuthenticated, onJoin, updateAuthProfile, displayName]);
 
   if (!room) return null;
 
-  const isValid = username.trim().length >= 2 && avatarId;
+  const usernameValidation = validateUsername(username);
+  const showError = (hasAttemptedSubmit || hasTouchedName) && !usernameValidation.isValid;
+  const nameError = showError ? usernameValidation.error : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent noDescription className="max-w-sm sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{t('multiplayerFlow.joinModal.title') || 'Join Room'}</DialogTitle>
+      <DialogContent noDescription dir={dir} className="max-w-sm sm:max-w-md max-h-[85dvh] overflow-y-auto">
+        <DialogHeader variant="pink">
+          <DialogTitle>{t('multiplayerFlow.joinModal.title')}</DialogTitle>
         </DialogHeader>
 
-        <DialogBody className="space-y-6">
-          {/* Room Info Card */}
-          <div className="flex items-center gap-4 p-4 bg-neo-navy/40 rounded-neo border-2 border-neo-black shadow-hard-sm">
-            <span className="text-3xl flex-shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
-            <div className="flex-1 min-w-0">
-              <p className="font-bold text-neo-white truncate text-lg">
-                {room.roomName || room.gameCode}
-              </p>
-              <p className="text-sm text-neo-cyan flex items-center gap-1.5 font-medium">
-                <Users className="w-4 h-4" />
-                {room.playerCount || 0} {t('joinView.players') || 'players'}
-              </p>
+        <DialogBody className="space-y-4">
+          {/* Room Info Card — lobby ticket style */}
+          <div className="relative rounded-neo border-3 border-neo-black shadow-hard-sm bg-neo-navy-light overflow-hidden">
+            {/* Dashed separator line for "ticket" feel */}
+            <div className="absolute inset-x-0 bottom-0 border-b-2 border-dashed border-neo-white/10" />
+            <div className="flex items-center gap-3 p-3">
+              <span className="text-3xl shrink-0">{LANGUAGE_FLAGS[room.language] || '🎮'}</span>
+              <div className="flex-1 min-w-0">
+                <p className="font-black text-neo-white truncate text-lg tracking-tight" title={room.roomName || room.gameCode}>
+                  {room.roomName || room.gameCode}
+                </p>
+                <p className={cn(
+                  'text-sm flex items-center gap-1.5 font-bold',
+                  room.maxPlayers && room.playerCount >= room.maxPlayers ? 'text-neo-red' : 'text-neo-cyan'
+                )}>
+                  <Users className="w-4 h-4" />
+                  {room.playerCount || 0}{room.maxPlayers ? `/${room.maxPlayers}` : ''} {t('joinView.players')}
+                  {room.maxPlayers && room.playerCount >= room.maxPlayers && (
+                    <span className="text-[10px] font-black uppercase tracking-wider bg-neo-red/20 text-neo-red px-1.5 py-0.5 rounded-sm border border-neo-red/30">
+                      {t('multiplayerFlow.joinModal.roomFull')}
+                    </span>
+                  )}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Avatar Selector */}
-          <AvatarSelector
-            selectedAvatarId={avatarId}
-            onAvatarChange={setAvatarId}
-            profilePictureUrl={profilePictureUrl}
-          />
-
-          {/* Username Input */}
-          <div className="space-y-2">
-            <Label className="text-xs font-bold uppercase text-neo-cyan">
-              {t('multiplayerFlow.joinModal.yourName') || 'Your Name'}
-            </Label>
-            {isAuthenticated ? (
+          {/* Avatar + Name — compact inline layout */}
+          <div className="flex items-center gap-3">
+            <AvatarSelector
+              selectedAvatar={customAvatar}
+              onAvatarChange={setCustomAvatar}
+              compact
+            />
+            <div className="flex-1 space-y-1">
+              <Label htmlFor="join-username" className="text-xs font-black uppercase tracking-wider text-neo-pink">
+                {t('multiplayerFlow.joinModal.yourName')}
+              </Label>
               <Input
-                value={username}
-                disabled
-                className="font-bold bg-neo-navy/40 border-neo-black text-neo-white cursor-not-allowed opacity-90"
-              />
-            ) : isEditingName ? (
-              <Input
+                ref={nameInputRef}
+                id="join-username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                onBlur={() => setIsEditingName(false)}
-                onKeyDown={(e) => e.key === 'Enter' && setIsEditingName(false)}
+                onBlur={() => setHasTouchedName(true)}
+                onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
                 maxLength={20}
                 autoFocus
-                className="font-bold bg-neo-navy/40 border-neo-black text-neo-white placeholder:text-neo-white/50"
-                placeholder={t('multiplayerFlow.joinModal.namePlaceholder') || 'Your name'}
-              />
-            ) : (
-              <button
-                type="button"
-                onClick={() => setIsEditingName(true)}
+                aria-required="true"
+                aria-invalid={!!nameError}
+                aria-describedby={nameError ? 'join-username-error' : undefined}
                 className={cn(
-                  'w-full flex items-center justify-between px-4 py-3',
-                  'bg-neo-navy/40 hover:bg-neo-navy/60',
-                  'rounded-neo border-2 border-neo-black',
-                  'shadow-hard-sm hover:shadow-hard',
-                  'hover:translate-x-[-1px] hover:translate-y-[-1px]',
-                  'active:translate-x-[1px] active:translate-y-[1px] active:shadow-none',
-                  'transition-all duration-200'
+                  'font-bold bg-neo-navy-light border-2 border-neo-black text-neo-white placeholder:text-neo-white focus-visible:ring-neo-pink',
+                  nameError && 'border-red-500 animate-neo-shake'
                 )}
-              >
-                <span className="font-bold text-neo-white truncate">
-                  {username || t('multiplayerFlow.joinModal.namePlaceholder') || 'Your name'}
-                </span>
-                <Pencil className="w-4 h-4 text-neo-cyan flex-shrink-0" />
-              </button>
-            )}
+                placeholder={t('multiplayerFlow.joinModal.namePlaceholder')}
+              />
+              {nameError && (
+                <p id="join-username-error" className="text-xs font-bold text-red-400" role="alert">
+                  {t(nameError)}
+                </p>
+              )}
+            </div>
           </div>
         </DialogBody>
 
-        <DialogFooter>
-          <Button
-            variant="default"
-            size="lg"
-            onClick={handleJoin}
-            disabled={!isValid || isJoining}
-            className="w-full bg-neo-cyan hover:bg-neo-cyan/90 text-neo-black font-bold uppercase"
-          >
-            {isJoining
-              ? t('multiplayerFlow.joinModal.joining') || 'Joining...'
-              : t('multiplayerFlow.joinModal.joinButton') || 'Join Game'}
-          </Button>
+        <DialogFooter className="sticky bottom-0 bg-inherit z-10 flex flex-col gap-2" style={{ paddingBottom: 'calc(max(0.75rem, env(safe-area-inset-bottom, 0.75rem)) + var(--admob-banner-height, 0px))' }}>
+          {room.maxPlayers && room.playerCount >= room.maxPlayers ? (
+            <>
+              <p className="text-xs text-center text-neo-white font-bold">
+                {t('multiplayerFlow.joinModal.roomFullSpectate')}
+              </p>
+              <Button
+                variant="default"
+                size="lg"
+                // Re-check capacity at click time — if a player left while the
+                // modal was open the room may no longer be full, in which case
+                // we should join as a player instead of silently spectating
+                // (audit UX-H1).
+                onClick={() => {
+                  const stillFull = room.maxPlayers && room.playerCount >= room.maxPlayers;
+                  if (stillFull) {
+                    onSpectate?.(username.trim()) || handleJoin();
+                  } else {
+                    handleJoin();
+                  }
+                }}
+                disabled={isJoining}
+                className="w-full bg-neo-purple hover:bg-neo-purple/90 text-neo-white font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
+              >
+                <Eye className="w-5 h-5" />
+                {t('multiplayerFlow.joinModal.spectateButton')}
+              </Button>
+            </>
+          ) : (
+            <Button
+              variant="default"
+              size="lg"
+              onClick={handleJoin}
+              disabled={isJoining}
+              className="w-full bg-neo-pink hover:bg-neo-pink-light text-neo-black font-black uppercase tracking-wide border-3 border-neo-black shadow-hard hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all duration-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none disabled:translate-x-0 disabled:translate-y-0 gap-2"
+            >
+              <Swords className="w-5 h-5" />
+              {isJoining
+                ? t('multiplayerFlow.joinModal.joining')
+                : t('multiplayerFlow.joinModal.joinButton')}
+            </Button>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -1,55 +1,43 @@
 /**
  * useWordSubmission - Unified word submission and validation hook
  *
- * Consolidates word validation logic from:
- * - SinglePlayerGame.tsx (~220 lines)
- * - DailyChallengeGame.tsx (~185 lines)
- * - InGameScreen.tsx (~70 lines for multiplayer)
+ * Used by DailyChallengeGame, SoloPracticeBoard, and any future modes.
  *
  * Features:
  * - Local validation (length, duplicates, board presence)
- * - Dictionary API validation
+ * - Client-side dictionary cache for instant validation (IndexedDB + memory)
+ * - Pre-validation cache (words validated while user types)
+ * - Fallback to dictionary API when cache misses
  * - Optional spam detection
- * - Combo integration
- * - Score calculation
+ * - Optimistic combo increment (combo increments at submit, rolls back on reject)
+ * - Score calculation via canonical scoring engine
  * - Feedback state management
  */
 
 import { useState, useRef, useCallback, useMemo } from 'react';
-import { validateWordLocally, isWordOnBoard } from '@/utils/clientWordValidator';
+import { validateWordLocally, isWordOnBoard, buildPositionsMap } from '@/utils/clientWordValidator';
+import { getComboBonus, calculateWordScore } from '@/shared/utils/scoring';
+import { useDictionaryCache } from '@/hooks/useDictionaryCache';
+import { usePrevalidation } from '@/hooks/usePrevalidation';
+import { trackWordFound, trackInvalidWord } from '@/utils/posthogEngagement';
 import type { Language, LetterGrid } from '@/shared/types/game';
 
-// ==================== Scoring Utilities ====================
+type InvalidWordReason = 'not_in_dictionary' | 'too_short' | 'already_found' | 'invalid_path' | 'other';
 
-/**
- * Get combo bonus based on combo level and word length - matches backend scoring engine
- */
-function getComboBonus(comboLevel: number, wordLength: number): number {
-  if (comboLevel <= 0) return 0;
-
-  // Word length factor - longer words get better combo bonuses
-  let wordLengthFactor: number;
-  if (wordLength <= 3) {
-    wordLengthFactor = 0.2;  // Very short words - minimal combo bonus
-  } else if (wordLength === 4) {
-    wordLengthFactor = 0.5;  // Short words - modest combo bonus
-  } else if (wordLength === 5) {
-    wordLengthFactor = 1.0;  // Medium words - full base bonus
-  } else if (wordLength === 6) {
-    wordLengthFactor = 1.5;  // Good words - 1.5x bonus
-  } else {
-    wordLengthFactor = 2.0;  // Long words (7+) - 2x bonus
-  }
-
-  const baseBonus = Math.min(comboLevel, 10);
-  return Math.floor(baseBonus * wordLengthFactor);
+/** Maps the hook's i18n errorKey to the PostHog reason taxonomy. */
+function errorKeyToReason(errorKey: string | undefined): InvalidWordReason {
+  if (!errorKey) return 'other';
+  if (errorKey.includes('tooShort') || errorKey.includes('minLength')) return 'too_short';
+  if (errorKey.includes('alreadyFound')) return 'already_found';
+  if (errorKey.includes('notOnBoard') || errorKey.includes('invalidPath')) return 'invalid_path';
+  return 'other';
 }
 
 // ==================== Types ====================
 
 export interface WordFeedback {
   id: string;
-  type: 'accepted' | 'rejected' | 'pending' | 'duplicate';
+  type: 'accepted' | 'rejected' | 'duplicate';
   word: string;
   score?: number;
   message?: string;
@@ -77,18 +65,18 @@ export interface UseWordSubmissionOptions {
   minWordLength?: number;
   /** Enable spam detection (default: false) */
   enableSpamDetection?: boolean;
+  /** Game mode string for analytics (e.g. 'sp', 'daily', 'mp'). Omit to skip tracking. */
+  mode?: string;
   /** Fire round active (for 2x multiplier) */
   fireRoundActive?: boolean;
   /** Current combo level for scoring */
   comboLevel?: number;
   /** Translation function */
-  t?: (key: string) => string;
+  t?: (key: string, params?: Record<string, string | number>) => string;
   /** Called when word is accepted */
   onWordAccepted?: (word: string, score: number, comboBonus: number, fireRoundBonus: number) => void;
   /** Called when word is rejected */
   onWordRejected?: (word: string, reason: string) => void;
-  /** Called when word needs AI validation */
-  onWordPending?: (word: string) => void;
   /** Called when combo should reset */
   onComboReset?: () => void;
   /** Called when combo should increment */
@@ -111,7 +99,9 @@ export interface WordSubmissionReturn {
   /** Get valid word count */
   validWordCount: number;
   /** Calculate word score */
-  calculateScore: (wordLength: number, comboLevel: number) => number;
+  calculateScore: (word: string, comboLevel: number) => number;
+  /** Prefetch validation for a word being formed (call as user swipes) */
+  prefetchValidation: (word: string) => void;
 }
 
 // ==================== Constants ====================
@@ -129,12 +119,12 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     language,
     minWordLength = 2,
     enableSpamDetection = false,
+    mode,
     fireRoundActive = false,
     comboLevel = 0,
     t = (key: string) => key,
     onWordAccepted,
     onWordRejected,
-    onWordPending,
     onComboReset,
     onComboIncrement,
   } = options;
@@ -146,12 +136,27 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
   // Refs
   const foundWordsSetRef = useRef<Set<string>>(new Set());
   const gameStartTimeRef = useRef<number>(Date.now());
+  const lastWordTimeRef = useRef<number | null>(null);
   const submissionTimestampsRef = useRef<number[]>([]);
   const spamCooldownUntilRef = useRef<number>(0);
   const comboLevelRef = useRef(comboLevel);
+  const positionsMapRef = useRef<Map<string, [number, number][]> | null>(null);
+  const positionsGridRef = useRef<LetterGrid | null>(null);
 
   // Keep combo ref in sync
   comboLevelRef.current = comboLevel;
+
+  // Cache positions map — rebuild only when grid changes
+  if (grid !== positionsGridRef.current) {
+    positionsGridRef.current = grid;
+    positionsMapRef.current = grid ? buildPositionsMap(grid, language) : null;
+  }
+
+  // Client-side dictionary cache — preloads full dictionary for O(1) lookups
+  const { checkWord: checkWordInCache, isLoaded: isDictionaryCacheLoaded } = useDictionaryCache(language);
+
+  // Pre-validation cache — validates words as user swipes, before submit
+  const { prefetch: prefetchValidation, getCached: getPrevalidationCached, clearCache: clearPrevalidationCache } = usePrevalidation(language);
 
   // Calculate valid word count
   const validWordCount = useMemo(() => {
@@ -161,26 +166,19 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
   /**
    * Calculate word score based on length and combo - matches backend scoring engine
    */
-  const calculateScore = useCallback((wordLength: number, currentCombo: number): number => {
-    // Base score: word length - 1 (matches multiplayer scoring)
-    const baseScore = Math.max(wordLength - 1, 1);
-    // Combo bonus based on combo level and word length (matches backend formula)
-    const comboBonus = getComboBonus(currentCombo, wordLength);
-    // Fire round multiplier (2x during fire round, 1x otherwise)
+  const calculateScore = useCallback((word: string, currentCombo: number): number => {
     const multiplier = fireRoundActive ? 2 : 1;
-    return (baseScore + comboBonus) * multiplier;
+    return calculateWordScore(word, currentCombo, multiplier);
   }, [fireRoundActive]);
 
   /**
    * Check spam detection
-   * Returns true if submission should be blocked
    */
   const checkSpam = useCallback((): { blocked: boolean; warning: boolean; message?: string } => {
     if (!enableSpamDetection) return { blocked: false, warning: false };
 
     const now = Date.now();
 
-    // Check if on cooldown
     if (spamCooldownUntilRef.current > now) {
       const remaining = Math.ceil((spamCooldownUntilRef.current - now) / 1000);
       return {
@@ -190,7 +188,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       };
     }
 
-    // Prune old timestamps and add new one
     submissionTimestampsRef.current = submissionTimestampsRef.current.filter(
       ts => now - ts < SPAM_WINDOW_MS
     );
@@ -198,7 +195,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
 
     const submissionCount = submissionTimestampsRef.current.length;
 
-    // Check for spam cooldown
     if (submissionCount >= SPAM_COOLDOWN_THRESHOLD) {
       spamCooldownUntilRef.current = now + SPAM_COOLDOWN_MS;
       return {
@@ -208,7 +204,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       };
     }
 
-    // Warning for approaching limit
     if (submissionCount === SPAM_WARNING_THRESHOLD) {
       return {
         blocked: false,
@@ -219,6 +214,83 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
 
     return { blocked: false, warning: false };
   }, [enableSpamDetection, t]);
+
+  /**
+   * Handle a validated word (valid in dictionary)
+   */
+  const handleValidWord = useCallback((
+    normalizedWord: string,
+    now: number,
+    currentCombo: number,
+  ) => {
+    const fullScore = calculateScore(normalizedWord, currentCombo);
+    const comboBonus = getComboBonus(currentCombo, normalizedWord.length);
+    const fireRoundBonus = fireRoundActive
+      ? calculateWordScore(normalizedWord, currentCombo, 1)
+      : 0;
+
+    setFoundWords(prev => prev.map(fw =>
+      fw.word === normalizedWord && fw.timestamp === now
+        ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus }
+        : fw
+    ));
+
+    setCurrentFeedback({
+      id: `accept-${now}`,
+      type: 'accepted',
+      word: normalizedWord.toUpperCase(),
+      score: fullScore,
+      fireRoundActive,
+      fireRoundBonus,
+      timestamp: now,
+    });
+
+    onWordAccepted?.(normalizedWord, fullScore, comboBonus, fireRoundBonus);
+
+    if (mode) {
+      const prev = lastWordTimeRef.current;
+      const timeSinceLastWordMs = prev != null ? now - prev : undefined;
+      lastWordTimeRef.current = now;
+      trackWordFound({
+        word: normalizedWord,
+        mode,
+        timeSinceLastWordMs,
+        score: fullScore,
+      });
+    }
+  }, [calculateScore, fireRoundActive, onWordAccepted, mode]);
+
+  /**
+   * Handle an invalid word (not in dictionary)
+   */
+  const handleInvalidWord = useCallback((
+    normalizedWord: string,
+    now: number,
+  ) => {
+    setFoundWords(prev => prev.map(fw =>
+      fw.word === normalizedWord && fw.timestamp === now
+        ? { ...fw, isValid: false, score: 0 }
+        : fw
+    ));
+    const msg = t('playerView.invalidWord') || 'Not a valid word';
+    setCurrentFeedback({
+      id: `reject-${now}`,
+      type: 'rejected',
+      word: normalizedWord.toUpperCase(),
+      message: msg,
+      timestamp: now,
+    });
+    onWordRejected?.(normalizedWord, msg);
+    onComboReset?.();
+
+    if (mode) {
+      trackInvalidWord({
+        mode,
+        reason: 'not_in_dictionary',
+        attemptLength: normalizedWord.length,
+      });
+    }
+  }, [t, onWordRejected, onComboReset, mode]);
 
   /**
    * Submit a word for validation
@@ -242,7 +314,6 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     }
 
     if (spamCheck.warning) {
-      // Show warning but don't block
       setCurrentFeedback({
         id: `warning-${now}`,
         type: 'rejected',
@@ -252,19 +323,20 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       });
     }
 
-    // Step 1: Local validation
+    // Step 1: Local validation (uses Set ref for O(1) duplicate check)
     const localValidation = validateWordLocally(
       normalizedWord,
       language,
       minWordLength,
-      foundWords.map(fw => ({ word: fw.word, isValid: fw.isValid }))
+      foundWordsSetRef.current
     );
 
     if (!localValidation.isValid) {
-      let msg = t(localValidation.errorKey ?? 'Invalid word');
-      if (localValidation.errorParams?.min) {
-        msg = msg.replace('${min}', String(localValidation.errorParams.min));
-      }
+      const errorKey = localValidation.errorKey ?? 'Invalid word';
+      const params = localValidation.errorParams?.min
+        ? { min: String(localValidation.errorParams.min) }
+        : undefined;
+      const msg = params ? t(errorKey, params) : t(errorKey);
       setCurrentFeedback({
         id: `reject-${now}`,
         type: 'rejected',
@@ -274,11 +346,18 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       });
       onWordRejected?.(normalizedWord, msg);
       onComboReset?.();
+      if (mode) {
+        trackInvalidWord({
+          mode,
+          reason: errorKeyToReason(localValidation.errorKey),
+          attemptLength: normalizedWord.length,
+        });
+      }
       return;
     }
 
-    // Step 2: Check if word exists on board
-    if (!grid || !isWordOnBoard(normalizedWord, grid, language)) {
+    // Step 2: Check if word exists on board (uses cached positions map)
+    if (!grid || !isWordOnBoard(normalizedWord, grid, language, positionsMapRef.current ?? undefined)) {
       const msg = t('playerView.wordNotOnBoard') || 'Word not on board';
       setCurrentFeedback({
         id: `reject-${now}`,
@@ -289,6 +368,9 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       });
       onWordRejected?.(normalizedWord, msg);
       onComboReset?.();
+      if (mode) {
+        trackInvalidWord({ mode, reason: 'invalid_path', attemptLength: normalizedWord.length });
+      }
       return;
     }
 
@@ -304,14 +386,21 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       });
       onWordRejected?.(normalizedWord, msg);
       onComboReset?.();
+      if (mode) {
+        trackInvalidWord({ mode, reason: 'already_found', attemptLength: normalizedWord.length });
+      }
       return;
     }
 
     // Add to set immediately to prevent double submission
     foundWordsSetRef.current.add(normalizedWord);
 
+    // Optimistically increment combo BEFORE validation.
+    // Ensures rapid submissions each get a unique combo level.
+    // If the word is invalid, combo resets via onComboReset.
+    onComboIncrement?.(true);
     const currentCombo = comboLevelRef.current;
-    const baseScore = calculateScore(normalizedWord.length, 0);
+    const baseScore = calculateScore(normalizedWord, 0);
     const timeSinceStart = (now - gameStartTimeRef.current) / 1000;
 
     // Step 4: Add word with pending state
@@ -320,10 +409,30 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
       score: baseScore,
       timestamp: now,
       timeSinceStart,
-      isValid: null, // Pending validation
+      isValid: null,
     }]);
 
-    // Step 5: Validate with dictionary API
+    // Step 5a: Try client-side dictionary cache (instant, no network)
+    if (isDictionaryCacheLoaded) {
+      if (checkWordInCache(normalizedWord)) {
+        handleValidWord(normalizedWord, now, currentCombo);
+      } else {
+        handleInvalidWord(normalizedWord, now);
+      }
+      return;
+    }
+
+    // Step 5b: Try pre-validation cache (validated while user was swiping)
+    const prevalidated = getPrevalidationCached(normalizedWord);
+    if (prevalidated === true) {
+      handleValidWord(normalizedWord, now, currentCombo);
+      return;
+    } else if (prevalidated === false) {
+      handleInvalidWord(normalizedWord, now);
+      return;
+    }
+
+    // Step 5c: Fallback to dictionary API (network round-trip)
     fetch('/api/dictionary/check', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -331,73 +440,36 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     })
       .then(res => {
         if (!res.ok) {
-          return { isValid: false, source: 'pending' };
+          return { isValid: false, source: 'error' };
         }
         return res.json();
       })
       .then(result => {
         if (result.isValid) {
-          // Word is valid - calculate full score with combo using backend-matching formula
-          const fullScore = calculateScore(normalizedWord.length, currentCombo);
-          const wordLenScore = Math.max(normalizedWord.length - 1, 1);
-          const comboBonus = getComboBonus(currentCombo, normalizedWord.length);
-          const fireRoundBonus = fireRoundActive ? (wordLenScore + comboBonus) : 0;
-
-          setFoundWords(prev => prev.map(fw =>
-            fw.word === normalizedWord && fw.timestamp === now
-              ? { ...fw, isValid: true, score: fullScore, comboBonus, fireRoundBonus }
-              : fw
-          ));
-
-          setCurrentFeedback({
-            id: `accept-${now}`,
-            type: 'accepted',
-            word: normalizedWord.toUpperCase(),
-            score: fullScore,
-            fireRoundActive,
-            fireRoundBonus,
-            timestamp: now,
-          });
-
-          onWordAccepted?.(normalizedWord, fullScore, comboBonus, fireRoundBonus);
-          onComboIncrement?.(true);
+          handleValidWord(normalizedWord, now, currentCombo);
         } else {
-          // Word not in dictionary - stays pending for AI validation
-          setCurrentFeedback({
-            id: `pending-${now}`,
-            type: 'pending',
-            word: normalizedWord.toUpperCase(),
-            timestamp: now,
-          });
-          onWordPending?.(normalizedWord);
-          onComboReset?.(); // Break combo on pending word
+          handleInvalidWord(normalizedWord, now);
         }
       })
       .catch(() => {
-        // On API error, treat as pending
-        setCurrentFeedback({
-          id: `pending-${Date.now()}`,
-          type: 'pending',
-          word: normalizedWord.toUpperCase(),
-          timestamp: Date.now(),
-        });
-        onWordPending?.(normalizedWord);
-        onComboReset?.();
+        handleInvalidWord(normalizedWord, now);
       });
   }, [
     grid,
     language,
     minWordLength,
-    foundWords,
-    fireRoundActive,
     t,
     checkSpam,
     calculateScore,
-    onWordAccepted,
     onWordRejected,
-    onWordPending,
     onComboReset,
     onComboIncrement,
+    isDictionaryCacheLoaded,
+    checkWordInCache,
+    getPrevalidationCached,
+    handleValidWord,
+    handleInvalidWord,
+    mode,
   ]);
 
   /**
@@ -415,9 +487,11 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     setCurrentFeedback(null);
     foundWordsSetRef.current = new Set();
     gameStartTimeRef.current = Date.now();
+    lastWordTimeRef.current = null;
     submissionTimestampsRef.current = [];
     spamCooldownUntilRef.current = 0;
-  }, []);
+    clearPrevalidationCache();
+  }, [clearPrevalidationCache]);
 
   return {
     foundWords,
@@ -428,6 +502,7 @@ export function useWordSubmission(options: UseWordSubmissionOptions): WordSubmis
     reset,
     validWordCount,
     calculateScore,
+    prefetchValidation,
   };
 }
 

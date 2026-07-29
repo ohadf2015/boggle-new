@@ -31,7 +31,7 @@ interface UsePlayerSocketEventsProps {
   queueAchievement: (achievement: AchievementPayload) => void;
   playComboSound: (level: number) => void;
   fireRoundActive?: boolean;
-  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number }) => void;
+  onShowResults?: (data: { scores: any; letterGrid: any; duplicateRuleDisabled?: boolean; playerCount?: number; wordHuntSummary?: any; blastSummary?: any }) => void;
 
   // Local state (not in GameState context)
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;

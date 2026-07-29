@@ -1,11 +1,19 @@
 /**
  * API Rate Limiter for Next.js App Router
  *
- * Simple in-memory rate limiting for API routes.
+ * Distributed rate limiting using Redis with in-memory fallback.
  * Uses sliding window algorithm with IP-based tracking.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import {
+  checkRateLimitRedis,
+  isIpBlockedRedis,
+  blockIpRedis,
+  RATE_LIMIT_KEYS,
+} from '@/backend/redis/rateLimit';
+
+import logger from '@/backend/utils/logger';
 
 // Store for rate limit data
 interface RateLimitData {
@@ -140,7 +148,7 @@ export function checkApiRateLimit(
     if (data.count > config.maxRequests * 2) {
       const blockDuration = config.blockDurationMs || 300000; // 5 minutes default
       blockedIps.set(ip, { expiry: now + blockDuration });
-      console.warn(`[API Rate Limit] Blocked IP ${ip} for ${Math.round(blockDuration / 1000)}s`);
+      logger.warn('RATE_LIMIT', `Blocked IP ${ip} for ${Math.round(blockDuration / 1000)}s`);
     }
 
     return {
@@ -202,4 +210,109 @@ export function getRateLimitStats() {
     trackedClients: clientStore.size,
     blockedIps: blockedIps.size,
   };
+}
+
+// ==========================================
+// Redis-Backed Rate Limiting (Distributed)
+// ==========================================
+
+/**
+ * Check rate limit using Redis (distributed across instances)
+ * Falls back to in-memory if Redis is unavailable
+ *
+ * @param request - NextRequest object
+ * @param endpoint - Endpoint identifier for tracking
+ * @param config - Rate limit configuration
+ * @returns Promise<RateLimitResult>
+ */
+export async function checkApiRateLimitAsync(
+  request: NextRequest,
+  endpoint: string,
+  config: RateLimitConfig
+): Promise<RateLimitResult> {
+  scheduleCleanup();
+
+  const ip = getClientIp(request);
+  const now = Date.now();
+
+  try {
+    // Check if IP is blocked in Redis (distributed)
+    const redisBlocked = await isIpBlockedRedis(ip);
+    if (redisBlocked) {
+      const blockExpiry = now + (config.blockDurationMs || 300000);
+      blockedIps.set(ip, { expiry: blockExpiry }); // Sync to local cache
+      return {
+        success: false,
+        remaining: 0,
+        resetTime: blockExpiry,
+        blocked: true,
+        retryAfter: Math.ceil((config.blockDurationMs || 300000) / 1000),
+      };
+    }
+
+    // Also check local block cache
+    const localBlock = blockedIps.get(ip);
+    if (localBlock && localBlock.expiry > now) {
+      return {
+        success: false,
+        remaining: 0,
+        resetTime: localBlock.expiry,
+        blocked: true,
+        retryAfter: Math.ceil((localBlock.expiry - now) / 1000),
+      };
+    }
+
+    // Check rate limit in Redis (distributed)
+    const redisKey = RATE_LIMIT_KEYS.api(`${ip}:${endpoint}`);
+    const redisResult = await checkRateLimitRedis(redisKey, {
+      maxRequests: config.maxRequests,
+      windowMs: config.windowMs,
+    });
+
+    if (redisResult.limited) {
+      // Block IP if significantly over limit (abuse detection)
+      const localData = clientStore.get(`${ip}:${endpoint}`);
+      const requestCount = localData?.count || 0;
+
+      if (requestCount > config.maxRequests * 2) {
+        const blockDuration = config.blockDurationMs || 300000;
+        blockedIps.set(ip, { expiry: now + blockDuration });
+        await blockIpRedis(ip, blockDuration);
+        logger.warn('RATE_LIMIT', `Blocked IP ${ip} for ${Math.round(blockDuration / 1000)}s`);
+      }
+
+      return {
+        success: false,
+        remaining: 0,
+        resetTime: redisResult.resetTime,
+        blocked: false,
+        retryAfter: Math.ceil((redisResult.resetTime - now) / 1000),
+      };
+    }
+
+    // Also update local cache for abuse detection
+    let data = clientStore.get(`${ip}:${endpoint}`);
+    if (!data || now > data.resetTime) {
+      data = {
+        count: 1,
+        resetTime: now + config.windowMs,
+        lastRequest: now,
+      };
+    } else {
+      data.count++;
+      data.lastRequest = now;
+    }
+    clientStore.set(`${ip}:${endpoint}`, data);
+
+    return {
+      success: true,
+      remaining: redisResult.remaining,
+      resetTime: redisResult.resetTime,
+      blocked: false,
+    };
+  } catch (error) {
+    // Redis error - fall back to in-memory
+    logger.warn('RATE_LIMIT', 'Redis error, using in-memory fallback:', error);
+    return checkApiRateLimit(request, endpoint, config);
+  }
 }

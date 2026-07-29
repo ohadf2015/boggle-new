@@ -1,44 +1,24 @@
-import * as fs from 'fs';
-import * as fsp from 'fs/promises';
-import * as path from 'path';
-import { promisify } from 'util';
 import type { Language } from '@/shared/types';
+import logger from './utils/logger';
+import { getThemedWords, getCurrentTheme } from './data/dateThemedWords';
+import {
+  normalizeHebrewWord,
+  isValidHebrewLetter,
+} from '@/shared/utils/wordNormalization';
+import {
+  createSafeReadFile,
+  loadEnglishDictionary,
+  loadHebrewDictionary,
+  loadSwedishDictionary,
+  loadJapaneseDictionary,
+  loadSpanishDictionary,
+  loadNounList,
+} from './dictionaryLoaders';
 
-const appendFileAsync = promisify(fs.appendFile);
-const logger = require('./utils/logger');
-const { getThemedWords, getCurrentTheme } = require('./data/dateThemedWords');
-
-// Hebrew letter normalization - final letters
-const hebrewFinalLetters: Record<string, string> = {
-  'ך': 'כ',
-  'ם': 'מ',
-  'ן': 'נ',
-  'ף': 'פ',
-  'ץ': 'צ'
-};
-
-// Valid Hebrew letters (aleph to tav, including final forms)
-const validHebrewLetters = new Set<string>([
-  'א', 'ב', 'ג', 'ד', 'ה', 'ו', 'ז', 'ח', 'ט', 'י',
-  'כ', 'ך', 'ל', 'מ', 'ם', 'נ', 'ן', 'ס', 'ע', 'פ',
-  'ף', 'צ', 'ץ', 'ק', 'ר', 'ש', 'ת'
-]);
-
-function normalizeHebrewLetter(letter: string): string {
-  return hebrewFinalLetters[letter] || letter;
-}
-
-function normalizeHebrewWord(word: string): string {
-  return word.split('').map(normalizeHebrewLetter).join('');
-}
-
-// Check if a word contains only valid Hebrew letters (no punctuation like gershayim ״ or geresh ׳)
 function isValidHebrewWordForBoard(word: string): boolean {
-  return word.split('').every(char => validHebrewLetters.has(char));
+  return word.split('').every(char => isValidHebrewLetter(char));
 }
 
-// Spanish accent normalization - accented vowels to base vowels for dictionary lookup
-// Note: Ñ is kept as-is since it exists in the dictionary as a distinct letter
 const spanishAccentMap: Record<string, string> = {
   'á': 'a', 'é': 'e', 'í': 'i', 'ó': 'o', 'ú': 'u', 'ü': 'u'
 };
@@ -71,16 +51,28 @@ interface LanguageConfig {
   approvedFile: string;
 }
 
+interface DictionaryMemoryStats {
+  language: Language;
+  wordCount: number;
+  estimatedBytes: number;
+  lastAccessed: number;
+}
+
 class Dictionary {
+  static _communityValidator: ((word: string, language: Language) => boolean) | null = null;
+
   englishWords: Set<string>;
   hebrewWords: Set<string>;
   swedishWords: Set<string>;
   japaneseWords: Set<string>;
   spanishWords: Set<string>;
   kanjiCompounds: string[];
-  loaded: boolean; // @deprecated - use loadedLanguages instead
-  loadedLanguages: Set<Language>; // Track which languages are loaded
-  loadingPromises: Map<Language, Promise<void>>; // Prevent duplicate loading
+  // Noun-only subsets for board seeding (players see recognizable words)
+  nounLists: Map<Language, Set<string>>;
+  loaded: boolean;
+  loadedLanguages: Set<Language>;
+  loadingPromises: Map<Language, Promise<void>>;
+  lastAccessTime: Map<Language, number>;
 
   constructor() {
     this.englishWords = new Set();
@@ -88,522 +80,205 @@ class Dictionary {
     this.swedishWords = new Set();
     this.japaneseWords = new Set();
     this.spanishWords = new Set();
-    this.kanjiCompounds = []; // Array of valid Kanji compounds for board generation
+    this.kanjiCompounds = [];
+    this.nounLists = new Map();
     this.loaded = false;
     this.loadedLanguages = new Set();
     this.loadingPromises = new Map();
+    this.lastAccessTime = new Map();
   }
 
-  async load(): Promise<void> {
-    if (this.loaded) {
-      return;
+  private getDictionaryForLanguage(lang: Language): Set<string> {
+    const map: Record<string, Set<string>> = {
+      en: this.englishWords, he: this.hebrewWords, sv: this.swedishWords,
+      ja: this.japaneseWords, es: this.spanishWords,
+    };
+    return map[lang] || this.englishWords;
+  }
+
+  getMemoryStats(): DictionaryMemoryStats[] {
+    const avgBytesPerWord = 12;
+    const stats: DictionaryMemoryStats[] = [];
+    const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
+    for (const lang of languages) {
+      if (this.loadedLanguages.has(lang)) {
+        const dict = this.getDictionaryForLanguage(lang);
+        stats.push({
+          language: lang,
+          wordCount: dict.size,
+          estimatedBytes: dict.size * avgBytesPerWord,
+          lastAccessed: this.lastAccessTime.get(lang) || 0
+        });
+      }
+    }
+    return stats;
+  }
+
+  getTotalMemoryUsage(): number {
+    return this.getMemoryStats().reduce((sum, stat) => sum + stat.estimatedBytes, 0);
+  }
+
+  unloadLanguage(language: Language): boolean {
+    if (language === 'en') {
+      logger.warn('DICT', 'Cannot unload English dictionary - it is the default fallback');
+      return false;
+    }
+    if (!this.loadedLanguages.has(language)) return false;
+
+    const beforeSize = this.getTotalMemoryUsage();
+
+    switch (language) {
+      case 'he': this.hebrewWords = new Set(); break;
+      case 'sv': this.swedishWords = new Set(); break;
+      case 'ja': this.japaneseWords = new Set(); this.kanjiCompounds = []; break;
+      case 'es': this.spanishWords = new Set(); break;
     }
 
-    logger.info('DICT', 'Loading dictionaries in parallel...');
+    this.nounLists.delete(language);
+    this.loadedLanguages.delete(language);
+    this.lastAccessTime.delete(language);
+
+    const freedBytes = beforeSize - this.getTotalMemoryUsage();
+    logger.info('DICT', `Unloaded ${language} dictionary, freed ~${Math.round(freedBytes / 1024)}KB`);
+    return true;
+  }
+
+  unloadIdleDictionaries(maxIdleMs: number = 30 * 60 * 1000): Language[] {
+    const now = Date.now();
+    const unloaded: Language[] = [];
+
+    for (const [language, lastAccess] of this.lastAccessTime.entries()) {
+      if (language !== 'en' && now - lastAccess > maxIdleMs) {
+        if (this.unloadLanguage(language)) unloaded.push(language);
+      }
+    }
+
+    if (unloaded.length > 0) {
+      logger.info('DICT', `Unloaded ${unloaded.length} idle dictionaries: ${unloaded.join(', ')}`);
+    }
+    return unloaded;
+  }
+
+  async loadEnglishOnly(): Promise<void> {
+    if (this.loadedLanguages.has('en')) return;
+
+    logger.info('DICT', 'Loading English dictionary only (lazy loading enabled for other languages)...');
     const startTime = Date.now();
 
     try {
-      // Define file paths
-      const hebrewFilePath = path.join(__dirname, 'hebrew_words.txt');
-      const hebrewApprovedFilePath = path.join(__dirname, 'hebrew_words_approved.txt');
-      const englishApprovedFilePath = path.join(__dirname, 'english_words_approved.txt');
-      const swedishWordsPath = path.join(__dirname, '../node_modules/@arvidbt/swedish-words/out/index.js');
-      const swedishApprovedFilePath = path.join(__dirname, 'swedish_words_approved.txt');
-      const kanjiFilePath = path.join(__dirname, 'kanji_compounds.txt');
-      const japaneseApprovedFilePath = path.join(__dirname, 'japanese_words_approved.txt');
-      const spanishApprovedFilePath = path.join(__dirname, 'spanish_words_approved.txt');
+      await this.loadLanguage('en');
+      this.loadedLanguages.add('en');
+      this.lastAccessTime.set('en', Date.now());
+      this.loaded = true;
 
-      // Helper to safely read a file (returns empty string if not exists)
-      const safeReadFile = async (filePath: string): Promise<string> => {
+      // Lazily initialize community word validator (once, not per-call)
+      if (!Dictionary._communityValidator) {
         try {
-          if (fs.existsSync(filePath)) {
-            return await fsp.readFile(filePath, 'utf-8');
-          }
-        } catch (e: unknown) {
-          const error = e as Error;
-          logger.warn('DICT', `Could not read ${filePath}: ${error.message}`);
-        }
-        return '';
-      };
-
-      // Load all files in parallel for 70-80% faster startup
-      const [
-        hebrewContent,
-        hebrewApprovedContent,
-        englishApprovedContent,
-        swedishFileContent,
-        swedishApprovedContent,
-        kanjiContent,
-        japaneseApprovedContent,
-        spanishApprovedContent,
-      ] = await Promise.all([
-        safeReadFile(hebrewFilePath),
-        safeReadFile(hebrewApprovedFilePath),
-        safeReadFile(englishApprovedFilePath),
-        safeReadFile(swedishWordsPath),
-        safeReadFile(swedishApprovedFilePath),
-        safeReadFile(kanjiFilePath),
-        safeReadFile(japaneseApprovedFilePath),
-        safeReadFile(spanishApprovedFilePath),
-      ]);
-
-      // Process English words (synchronous require, but fast)
-      const englishWords: string[] = require('an-array-of-english-words');
-      this.englishWords = new Set(englishWords.map(w => w.toLowerCase()));
-      const englishMainCount = this.englishWords.size;
-      logger.debug('DICT', `Loaded ${englishMainCount} English words from main dictionary`);
-
-      // Process community-approved English words
-      if (englishApprovedContent) {
-        const approvedWords = englishApprovedContent
-          .split('\n')
-          .map(w => w.trim().toLowerCase())
-          .filter(w => w.length > 0);
-
-        let englishApprovedCount = 0;
-        for (const word of approvedWords) {
-          if (!this.englishWords.has(word)) {
-            this.englishWords.add(word);
-            englishApprovedCount++;
-          }
-        }
-        if (englishApprovedCount > 0) {
-          logger.debug('DICT', `Loaded ${englishApprovedCount} community-approved English words`);
-        }
-      }
-      logger.debug('DICT', `Total English words: ${this.englishWords.size}`);
-
-      // Process Hebrew words
-      if (hebrewContent) {
-        const hebrewWords = hebrewContent
-          .split('\n')
-          .map(w => w.trim())
-          .filter(w => w.length > 0)
-          .map(w => normalizeHebrewWord(w));
-
-        this.hebrewWords = new Set(hebrewWords);
-        const mainCount = this.hebrewWords.size;
-        logger.debug('DICT', `Loaded ${mainCount} Hebrew words from main dictionary`);
-      }
-
-      // Process community-approved Hebrew words
-      if (hebrewApprovedContent) {
-        const approvedWords = hebrewApprovedContent
-          .split('\n')
-          .map(w => w.trim())
-          .filter(w => w.length > 0)
-          .map(w => normalizeHebrewWord(w));
-
-        let approvedCount = 0;
-        for (const word of approvedWords) {
-          if (!this.hebrewWords.has(word)) {
-            this.hebrewWords.add(word);
-            approvedCount++;
-          }
-        }
-        if (approvedCount > 0) {
-          logger.debug('DICT', `Loaded ${approvedCount} community-approved Hebrew words`);
-        }
-      }
-      logger.debug('DICT', `Total Hebrew words: ${this.hebrewWords.size}`);
-
-      // Process Swedish words
-      if (swedishFileContent) {
-        try {
-          const arrayMatch = swedishFileContent.match(/var swedish_words = \[([\s\S]*?)\];/);
-
-          if (arrayMatch) {
-            const arrayContent = arrayMatch[1];
-
-            // Helper function to decode JavaScript escape sequences (e.g., \xE5 -> å)
-            const decodeJsEscapes = (str: string): string | null => {
-              // Convert \xNN to \u00NN for JSON compatibility
-              const jsonCompatible = str.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
-              try {
-                return JSON.parse(jsonCompatible);
-              } catch {
-                return null;
-              }
-            };
-
-            // Valid Swedish word pattern - only alphabetic characters (including å, ä, ö)
-            const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
-
-            const words = arrayContent
-              .split(',')
-              .map(line => {
-                const trimmed = line.trim();
-                if (!trimmed.startsWith('"') || !trimmed.endsWith('"')) return null;
-                return decodeJsEscapes(trimmed);
-              })
-              .filter((w): w is string => w !== null && w.length > 1 && validSwedishWordPattern.test(w));
-
-            this.swedishWords = new Set(words.map(w => w.toLowerCase()));
-            const swedishMainCount = this.swedishWords.size;
-            logger.debug('DICT', `Loaded ${swedishMainCount} Swedish words from main dictionary`);
-
-            // Process community-approved Swedish words
-            if (swedishApprovedContent) {
-              const approvedWords = swedishApprovedContent
-                .split('\n')
-                .map(w => w.trim().toLowerCase())
-                .filter(w => w.length > 0);
-
-              let swedishApprovedCount = 0;
-              for (const word of approvedWords) {
-                if (!this.swedishWords.has(word)) {
-                  this.swedishWords.add(word);
-                  swedishApprovedCount++;
-                }
-              }
-              if (swedishApprovedCount > 0) {
-                logger.debug('DICT', `Loaded ${swedishApprovedCount} community-approved Swedish words`);
-              }
-            }
-            logger.debug('DICT', `Total Swedish words: ${this.swedishWords.size}`);
-          } else {
-            logger.warn('DICT', 'Could not parse Swedish dictionary - using fallback validation');
-          }
-        } catch (swedishError: unknown) {
-          const error = swedishError as Error;
-          logger.error('DICT', `Error processing Swedish dictionary: ${error.message}`);
+          const { isWordCommunityValid } = await import('./modules/communityWordManager');
+          Dictionary._communityValidator = isWordCommunityValid;
+        } catch {
+          // Community word manager not available yet
         }
       }
 
-      // Process Japanese Kanji compounds
-      if (kanjiContent) {
-        try {
-          const kanjiCompounds = kanjiContent
-            .split('\n')
-            .map(w => w.trim())
-            .filter(w => w.length > 0);
+      const loadTime = Date.now() - startTime;
+      logger.info('DICT', `English dictionary loaded in ${loadTime}ms (other languages will be lazy-loaded)`);
+    } catch (error) {
+      logger.error('DICT', `Error loading English dictionary: ${error}`);
+    }
+  }
 
-          this.japaneseWords = new Set(kanjiCompounds);
-          this.kanjiCompounds = kanjiCompounds;
-          const japaneseMainCount = this.japaneseWords.size;
-          logger.debug('DICT', `Loaded ${japaneseMainCount} Japanese Kanji compounds from main dictionary`);
+  async load(): Promise<void> {
+    if (this.loaded) return;
 
-          // Process community-approved Japanese words
-          if (japaneseApprovedContent) {
-            const approvedWords = japaneseApprovedContent
-              .split('\n')
-              .map(w => w.trim())
-              .filter(w => w.length > 0);
+    logger.info('DICT', 'Loading all dictionaries in parallel...');
+    const startTime = Date.now();
 
-            let japaneseApprovedCount = 0;
-            for (const word of approvedWords) {
-              if (!this.japaneseWords.has(word)) {
-                this.japaneseWords.add(word);
-                japaneseApprovedCount++;
-              }
-            }
-            if (japaneseApprovedCount > 0) {
-              logger.debug('DICT', `Loaded ${japaneseApprovedCount} community-approved Japanese words`);
-            }
-          }
-          logger.debug('DICT', `Total Japanese words: ${this.japaneseWords.size}`);
-        } catch (japaneseError) {
-          logger.error('DICT', `Error processing Japanese Kanji compounds: ${japaneseError}`);
-        }
-      }
-
-      // Process Spanish words (from npm package, similar to English)
-      const spanishWords: string[] = require('an-array-of-spanish-words');
-      this.spanishWords = new Set(spanishWords.map(w => w.toLowerCase()));
-      const spanishMainCount = this.spanishWords.size;
-      logger.debug('DICT', `Loaded ${spanishMainCount} Spanish words from main dictionary`);
-
-      // Process community-approved Spanish words
-      if (spanishApprovedContent) {
-        const approvedWords = spanishApprovedContent
-          .split('\n')
-          .map(w => w.trim().toLowerCase())
-          .filter(w => w.length > 0);
-
-        let spanishApprovedCount = 0;
-        for (const word of approvedWords) {
-          if (!this.spanishWords.has(word)) {
-            this.spanishWords.add(word);
-            spanishApprovedCount++;
-          }
-        }
-        if (spanishApprovedCount > 0) {
-          logger.debug('DICT', `Loaded ${spanishApprovedCount} community-approved Spanish words`);
-        }
-      }
-      logger.debug('DICT', `Total Spanish words: ${this.spanishWords.size}`);
+    try {
+      const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
+      await Promise.all(languages.map(lang => this.loadLanguage(lang)));
 
       this.loaded = true;
-      // Mark all languages as loaded since load() loads all of them
-      this.loadedLanguages.add('en');
-      this.loadedLanguages.add('he');
-      this.loadedLanguages.add('sv');
-      this.loadedLanguages.add('ja');
-      this.loadedLanguages.add('es');
+      for (const lang of languages) {
+        this.loadedLanguages.add(lang);
+      }
       const loadTime = Date.now() - startTime;
       logger.info('DICT', `All dictionaries loaded in ${loadTime}ms`);
     } catch (error) {
       logger.error('DICT', `Error loading dictionaries: ${error}`);
-      // Continue without dictionaries - fall back to manual validation
     }
   }
 
-  /**
-   * Lazy load a specific language dictionary on demand
-   * Returns immediately if already loaded or loading
-   */
   async ensureLanguageLoaded(language: Language): Promise<void> {
-    // Already loaded
     if (this.loadedLanguages.has(language)) {
+      this.lastAccessTime.set(language, Date.now());
       return;
     }
-
-    // Already loading - return existing promise
     if (this.loadingPromises.has(language)) {
       return this.loadingPromises.get(language);
     }
 
-    // Start loading
     const loadPromise = this.loadLanguage(language);
     this.loadingPromises.set(language, loadPromise);
 
     try {
       await loadPromise;
       this.loadedLanguages.add(language);
+      this.lastAccessTime.set(language, Date.now());
     } finally {
       this.loadingPromises.delete(language);
     }
   }
 
-  /**
-   * Load a specific language dictionary
-   */
   private async loadLanguage(language: Language): Promise<void> {
     const startTime = Date.now();
     logger.info('DICT', `Lazy loading ${language} dictionary...`);
 
     try {
-      const safeReadFile = async (filePath: string): Promise<string> => {
-        try {
-          if (fs.existsSync(filePath)) {
-            return await fsp.readFile(filePath, 'utf-8');
-          }
-        } catch (e: unknown) {
-          const error = e as Error;
-          logger.warn('DICT', `Could not read ${filePath}: ${error.message}`);
-        }
-        return '';
-      };
+      const safeReadFile = createSafeReadFile();
 
       switch (language) {
         case 'en':
-          await this.loadEnglishDictionary(safeReadFile);
+          this.englishWords = await loadEnglishDictionary(safeReadFile);
           break;
         case 'he':
-          await this.loadHebrewDictionary(safeReadFile);
+          this.hebrewWords = await loadHebrewDictionary(safeReadFile);
           break;
         case 'sv':
-          await this.loadSwedishDictionary(safeReadFile);
+          this.swedishWords = await loadSwedishDictionary(safeReadFile);
           break;
-        case 'ja':
-          await this.loadJapaneseDictionary(safeReadFile);
+        case 'ja': {
+          const result = await loadJapaneseDictionary(safeReadFile);
+          this.japaneseWords = result.words;
+          this.kanjiCompounds = result.compounds;
           break;
+        }
         case 'es':
-          await this.loadSpanishDictionary(safeReadFile);
+          this.spanishWords = await loadSpanishDictionary(safeReadFile);
           break;
       }
 
+      // Load noun list for board seeding (non-blocking — empty set is fine as fallback)
+      const nounNormalizer = language === 'he'
+        ? (w: string) => normalizeHebrewWord(w.trim())
+        : (w: string) => w.trim().toLowerCase();
+      const nouns = await loadNounList(safeReadFile, language, nounNormalizer);
+      if (nouns.size > 0) {
+        this.nounLists.set(language, nouns);
+      }
+
       const loadTime = Date.now() - startTime;
-      logger.info('DICT', `${language} dictionary loaded in ${loadTime}ms`);
+      const nounInfo = nouns.size > 0 ? ` (${nouns.size} nouns)` : '';
+      logger.info('DICT', `${language} dictionary loaded in ${loadTime}ms${nounInfo}`);
     } catch (error) {
       logger.error('DICT', `Error loading ${language} dictionary: ${error}`);
     }
   }
 
-  private async loadEnglishDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
-    const englishWords: string[] = require('an-array-of-english-words');
-    this.englishWords = new Set(englishWords.map(w => w.toLowerCase()));
-    logger.debug('DICT', `Loaded ${this.englishWords.size} English words from main dictionary`);
-
-    const englishApprovedFilePath = path.join(__dirname, 'english_words_approved.txt');
-    const approvedContent = await safeReadFile(englishApprovedFilePath);
-
-    if (approvedContent) {
-      const approvedWords = approvedContent.split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
-      let approvedCount = 0;
-      for (const word of approvedWords) {
-        if (!this.englishWords.has(word)) {
-          this.englishWords.add(word);
-          approvedCount++;
-        }
-      }
-      if (approvedCount > 0) {
-        logger.debug('DICT', `Loaded ${approvedCount} community-approved English words`);
-      }
-    }
-    logger.debug('DICT', `Total English words: ${this.englishWords.size}`);
-  }
-
-  private async loadHebrewDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
-    const hebrewFilePath = path.join(__dirname, 'hebrew_words.txt');
-    const hebrewApprovedFilePath = path.join(__dirname, 'hebrew_words_approved.txt');
-
-    const [hebrewContent, hebrewApprovedContent] = await Promise.all([
-      safeReadFile(hebrewFilePath),
-      safeReadFile(hebrewApprovedFilePath),
-    ]);
-
-    if (hebrewContent) {
-      const hebrewWords = hebrewContent.split('\n').map(w => w.trim()).filter(w => w.length > 0).map(w => normalizeHebrewWord(w));
-      this.hebrewWords = new Set(hebrewWords);
-      logger.debug('DICT', `Loaded ${this.hebrewWords.size} Hebrew words from main dictionary`);
-    }
-
-    if (hebrewApprovedContent) {
-      const approvedWords = hebrewApprovedContent.split('\n').map(w => w.trim()).filter(w => w.length > 0).map(w => normalizeHebrewWord(w));
-      let approvedCount = 0;
-      for (const word of approvedWords) {
-        if (!this.hebrewWords.has(word)) {
-          this.hebrewWords.add(word);
-          approvedCount++;
-        }
-      }
-      if (approvedCount > 0) {
-        logger.debug('DICT', `Loaded ${approvedCount} community-approved Hebrew words`);
-      }
-    }
-    logger.debug('DICT', `Total Hebrew words: ${this.hebrewWords.size}`);
-  }
-
-  private async loadSwedishDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
-    const swedishWordsPath = path.join(__dirname, '../node_modules/@arvidbt/swedish-words/out/index.js');
-    const swedishApprovedFilePath = path.join(__dirname, 'swedish_words_approved.txt');
-
-    const [swedishFileContent, swedishApprovedContent] = await Promise.all([
-      safeReadFile(swedishWordsPath),
-      safeReadFile(swedishApprovedFilePath),
-    ]);
-
-    if (swedishFileContent) {
-      try {
-        const arrayMatch = swedishFileContent.match(/var swedish_words = \[([\s\S]*?)\];/);
-        if (arrayMatch) {
-          const arrayContent = arrayMatch[1];
-          const decodeJsEscapes = (str: string): string | null => {
-            const jsonCompatible = str.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
-            try {
-              return JSON.parse(jsonCompatible);
-            } catch {
-              return null;
-            }
-          };
-
-          const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
-          const words = arrayContent
-            .split(',')
-            .map(line => {
-              const trimmed = line.trim();
-              if (!trimmed.startsWith('"') || !trimmed.endsWith('"')) return null;
-              return decodeJsEscapes(trimmed);
-            })
-            .filter((w): w is string => w !== null && w.length > 1 && validSwedishWordPattern.test(w));
-
-          this.swedishWords = new Set(words.map(w => w.toLowerCase()));
-          logger.debug('DICT', `Loaded ${this.swedishWords.size} Swedish words from main dictionary`);
-
-          if (swedishApprovedContent) {
-            const approvedWords = swedishApprovedContent.split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
-            let approvedCount = 0;
-            for (const word of approvedWords) {
-              if (!this.swedishWords.has(word)) {
-                this.swedishWords.add(word);
-                approvedCount++;
-              }
-            }
-            if (approvedCount > 0) {
-              logger.debug('DICT', `Loaded ${approvedCount} community-approved Swedish words`);
-            }
-          }
-          logger.debug('DICT', `Total Swedish words: ${this.swedishWords.size}`);
-        }
-      } catch (error) {
-        logger.error('DICT', `Error processing Swedish dictionary: ${error}`);
-      }
-    }
-  }
-
-  private async loadJapaneseDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
-    const kanjiFilePath = path.join(__dirname, 'kanji_compounds.txt');
-    const japaneseApprovedFilePath = path.join(__dirname, 'japanese_words_approved.txt');
-
-    const [kanjiContent, japaneseApprovedContent] = await Promise.all([
-      safeReadFile(kanjiFilePath),
-      safeReadFile(japaneseApprovedFilePath),
-    ]);
-
-    if (kanjiContent) {
-      try {
-        const kanjiCompounds = kanjiContent.split('\n').map(w => w.trim()).filter(w => w.length > 0);
-        this.japaneseWords = new Set(kanjiCompounds);
-        this.kanjiCompounds = kanjiCompounds;
-        logger.debug('DICT', `Loaded ${this.japaneseWords.size} Japanese Kanji compounds from main dictionary`);
-
-        if (japaneseApprovedContent) {
-          const approvedWords = japaneseApprovedContent.split('\n').map(w => w.trim()).filter(w => w.length > 0);
-          let approvedCount = 0;
-          for (const word of approvedWords) {
-            if (!this.japaneseWords.has(word)) {
-              this.japaneseWords.add(word);
-              approvedCount++;
-            }
-          }
-          if (approvedCount > 0) {
-            logger.debug('DICT', `Loaded ${approvedCount} community-approved Japanese words`);
-          }
-        }
-        logger.debug('DICT', `Total Japanese words: ${this.japaneseWords.size}`);
-      } catch (error) {
-        logger.error('DICT', `Error processing Japanese Kanji compounds: ${error}`);
-      }
-    }
-  }
-
-  private async loadSpanishDictionary(safeReadFile: (path: string) => Promise<string>): Promise<void> {
-    const spanishWords: string[] = require('an-array-of-spanish-words');
-    this.spanishWords = new Set(spanishWords.map(w => w.toLowerCase()));
-    logger.debug('DICT', `Loaded ${this.spanishWords.size} Spanish words from main dictionary`);
-
-    const spanishApprovedFilePath = path.join(__dirname, 'spanish_words_approved.txt');
-    const approvedContent = await safeReadFile(spanishApprovedFilePath);
-
-    if (approvedContent) {
-      const approvedWords = approvedContent.split('\n').map(w => w.trim().toLowerCase()).filter(w => w.length > 0);
-      let approvedCount = 0;
-      for (const word of approvedWords) {
-        if (!this.spanishWords.has(word)) {
-          this.spanishWords.add(word);
-          approvedCount++;
-        }
-      }
-      if (approvedCount > 0) {
-        logger.debug('DICT', `Loaded ${approvedCount} community-approved Spanish words`);
-      }
-    }
-    logger.debug('DICT', `Total Spanish words: ${this.spanishWords.size}`);
-  }
-
   isValidWord(word: string, language: Language): boolean | null {
-    // Check if the specific language dictionary is loaded (new lazy loading approach)
-    if (!this.loadedLanguages.has(language)) {
-      // Language not loaded yet - caller should call ensureLanguageLoaded(language) and retry
-      return null;
-    }
-
-    // Backward compatibility: also check old global loaded flag
-    if (!this.loaded && this.loadedLanguages.size === 0) {
-      // If dictionaries aren't loaded at all, treat all words as unknown (require manual validation)
-      return null;
-    }
+    if (!this.loadedLanguages.has(language)) return null;
+    this.lastAccessTime.set(language, Date.now());
+    if (!this.loaded && this.loadedLanguages.size === 0) return null;
 
     let normalizedWord: string;
     let dictionary: Set<string>;
@@ -613,22 +288,18 @@ class Dictionary {
         normalizedWord = normalizeHebrewWord(word);
         dictionary = this.hebrewWords;
         break;
-
       case 'sv':
         normalizedWord = word.toLowerCase();
         dictionary = this.swedishWords;
         break;
-
       case 'ja':
-        normalizedWord = word; // Japanese doesn't need case normalization
+        normalizedWord = word;
         dictionary = this.japaneseWords;
         break;
-
       case 'es':
         normalizedWord = normalizeSpanishWord(word);
         dictionary = this.spanishWords;
         break;
-
       case 'en':
       default:
         normalizedWord = word.toLowerCase();
@@ -636,164 +307,103 @@ class Dictionary {
         break;
     }
 
-    // Check static dictionary first
-    if (dictionary.has(normalizedWord)) {
-      return true;
-    }
+    if (dictionary.has(normalizedWord)) return true;
 
-    // Check community-validated words (words with 6+ net votes)
-    // Lazy require to avoid circular dependency
     try {
-      const { isWordCommunityValid } = require('./modules/communityWordManager');
-      if (isWordCommunityValid(normalizedWord, language)) {
-        return true;
+      if (Dictionary._communityValidator) {
+        if (Dictionary._communityValidator(normalizedWord, language)) return true;
       }
-    } catch (e) {
-      // Community word manager not available yet (during initial load)
+    } catch {
+      // Community word manager not available yet
     }
 
     return false;
   }
 
-  isValidEnglishWord(word: string): boolean | null {
-    return this.isValidWord(word, 'en');
-  }
+  isValidEnglishWord(word: string): boolean | null { return this.isValidWord(word, 'en'); }
+  isValidHebrewWord(word: string): boolean | null { return this.isValidWord(word, 'he'); }
+  isValidSwedishWord(word: string): boolean | null { return this.isValidWord(word, 'sv'); }
+  isValidJapaneseWord(word: string): boolean | null { return this.isValidWord(word, 'ja'); }
+  isValidSpanishWord(word: string): boolean | null { return this.isValidWord(word, 'es'); }
 
-  isValidHebrewWord(word: string): boolean | null {
-    return this.isValidWord(word, 'he');
-  }
-
-  isValidSwedishWord(word: string): boolean | null {
-    return this.isValidWord(word, 'sv');
-  }
-
-  isValidJapaneseWord(word: string): boolean | null {
-    return this.isValidWord(word, 'ja');
-  }
-
-  isValidSpanishWord(word: string): boolean | null {
-    return this.isValidWord(word, 'es');
-  }
-
-  // Get random Kanji compounds for board generation
   getRandomKanjiCompounds(count: number = 5, minLength: number = 2, maxLength: number = 4): string[] {
-    if (!this.kanjiCompounds || this.kanjiCompounds.length === 0) {
-      return [];
-    }
-
-    // Filter compounds by length
-    const filteredCompounds = this.kanjiCompounds.filter(
-      w => w.length >= minLength && w.length <= maxLength
-    );
-
-    if (filteredCompounds.length === 0) {
-      return [];
-    }
-
-    // Shuffle and pick random compounds
-    const shuffled = [...filteredCompounds].sort(() => Math.random() - 0.5);
+    if (!this.kanjiCompounds || this.kanjiCompounds.length === 0) return [];
+    const filtered = this.kanjiCompounds.filter(w => w.length >= minLength && w.length <= maxLength);
+    if (filtered.length === 0) return [];
+    const shuffled = [...filtered].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, Math.min(count, shuffled.length));
   }
 
-  // Get random long words (4+ letters) for board embedding to enhance game experience
   getRandomLongWords(language: Language, count: number = 5, minLength: number = 4, maxLength: number = 8): string[] {
     let dictionary: Set<string>;
     let normalizer = (w: string): string => w;
-    let validator = (_w: string): boolean => true; // Default: accept all words
+    let validator = (_w: string): boolean => true;
 
     switch (language) {
       case 'he':
         dictionary = this.hebrewWords;
-        // Filter out words with non-Hebrew characters (like gershayim ״ or geresh ׳)
         validator = isValidHebrewWordForBoard;
         break;
       case 'sv':
         dictionary = this.swedishWords;
-        normalizer = (w: string): string => w.toUpperCase(); // Swedish board uses uppercase
+        normalizer = (w: string): string => w.toUpperCase();
         break;
       case 'en':
         dictionary = this.englishWords;
-        normalizer = (w: string): string => w.toUpperCase(); // English board uses uppercase
+        normalizer = (w: string): string => w.toUpperCase();
         break;
       case 'es':
         dictionary = this.spanishWords;
-        normalizer = (w: string): string => w.toUpperCase(); // Spanish board uses uppercase
+        normalizer = (w: string): string => w.toUpperCase();
         break;
       case 'ja':
-        // Japanese uses Kanji compounds, handled separately
         return this.getRandomKanjiCompounds(count, minLength, maxLength);
       default:
         return [];
     }
 
-    if (!dictionary || dictionary.size === 0) {
-      return [];
-    }
+    if (!dictionary || dictionary.size === 0) return [];
 
-    // Filter words by length and validity (for Hebrew, exclude words with punctuation)
-    const filteredWords = Array.from(dictionary).filter(
+    // Prefer nouns for board seeding — players see recognizable words
+    const nounList = this.nounLists.get(language);
+    const sourceWords = nounList && nounList.size > 0 ? nounList : dictionary;
+
+    const filtered = Array.from(sourceWords).filter(
       w => w.length >= minLength && w.length <= maxLength && validator(w)
     );
+    if (filtered.length === 0) return [];
 
-    if (filteredWords.length === 0) {
-      return [];
-    }
-
-    // Shuffle and pick random words
-    const shuffled = [...filteredWords].sort(() => Math.random() - 0.5);
+    const shuffled = [...filtered].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, Math.min(count, shuffled.length)).map(normalizer);
   }
 
-  /**
-   * Get random long words with 50% themed words based on current date
-   * Returns both words and theme information for display
-   * @param language - Language code (en, he, sv, es, ja)
-   * @param count - Total number of words to return
-   * @param minLength - Minimum word length
-   * @param maxLength - Maximum word length (now supports up to 12)
-   * @returns Object with words array and theme info
-   */
   getRandomLongWordsWithTheme(
-    language: Language,
-    count: number = 10,
-    minLength: number = 3,
-    maxLength: number = 12
+    language: Language, count: number = 10, minLength: number = 3, maxLength: number = 12
   ): ThemedWordsResult {
-    // Get current theme and themed words (50% of total)
     const themedCount = Math.ceil(count / 2);
     const regularCount = count - themedCount;
 
     const themedResult = getThemedWords(language, themedCount, minLength, maxLength) as ThemedWordsResult;
     let themedWords = themedResult.words;
 
-    // Normalize themed words based on language
     let normalizer = (w: string): string => w;
     if (language === 'en' || language === 'sv' || language === 'es') {
       normalizer = (w: string): string => w.toUpperCase();
     }
     themedWords = themedWords.map(normalizer);
 
-    // Get regular dictionary words for the other 50%
     const regularWords = this.getRandomLongWords(language, regularCount, minLength, maxLength);
-
-    // Combine and shuffle all words together
     const allWords = [...themedWords, ...regularWords];
     const shuffled = allWords.sort(() => Math.random() - 0.5);
-
-    // Remove any duplicates while preserving order
     const uniqueWords = [...new Set(shuffled)];
 
-    return {
-      words: uniqueWords,
-      theme: themedResult.theme
-    };
+    return { words: uniqueWords, theme: themedResult.theme };
   }
 }
 
-// Create a singleton instance
+// Singleton
 const dictionary = new Dictionary();
 
-// Export wrapper functions for compatibility
 function isDictionaryWord(word: string, language: Language): boolean | null {
   return dictionary.isValidWord(word, language);
 }
@@ -802,77 +412,51 @@ function getAvailableDictionaries(): Language[] {
   return ['en', 'he', 'sv', 'ja', 'es'];
 }
 
-// Normalize word based on language
 function normalizeWord(word: string, language: Language): string {
   switch (language) {
-    case 'he':
-      return normalizeHebrewWord(word);
-    case 'es':
-      return normalizeSpanishWord(word);
-    case 'ja':
-      return word; // Japanese doesn't need normalization
+    case 'he': return normalizeHebrewWord(word);
+    case 'es': return normalizeSpanishWord(word);
+    case 'ja': return word;
     case 'en':
     case 'sv':
-    default:
-      return word.toLowerCase();
+    default: return word.toLowerCase();
   }
 }
 
-// Get the dictionary Set and approved file path for a language
 function getLanguageConfig(language: Language): LanguageConfig {
   const configs: Record<string, LanguageConfig> = {
-    en: {
-      dictionary: dictionary.englishWords,
-      approvedFile: 'english_words_approved.txt'
-    },
-    he: {
-      dictionary: dictionary.hebrewWords,
-      approvedFile: 'hebrew_words_approved.txt'
-    },
-    sv: {
-      dictionary: dictionary.swedishWords,
-      approvedFile: 'swedish_words_approved.txt'
-    },
-    ja: {
-      dictionary: dictionary.japaneseWords,
-      approvedFile: 'japanese_words_approved.txt'
-    },
-    es: {
-      dictionary: dictionary.spanishWords,
-      approvedFile: 'spanish_words_approved.txt'
-    }
+    en: { dictionary: dictionary.englishWords, approvedFile: 'english_words_approved.txt' },
+    he: { dictionary: dictionary.hebrewWords, approvedFile: 'hebrew_words_approved.txt' },
+    sv: { dictionary: dictionary.swedishWords, approvedFile: 'swedish_words_approved.txt' },
+    ja: { dictionary: dictionary.japaneseWords, approvedFile: 'japanese_words_approved.txt' },
+    es: { dictionary: dictionary.spanishWords, approvedFile: 'spanish_words_approved.txt' },
   };
   return configs[language] || configs.en;
 }
 
-// Add a community-approved word to the dictionary (both in-memory and file)
+// Audit C3 (2026-05-01): runtime persistence is DB-only. We previously appended
+// to `*_approved.txt` here, but Railway containers have ephemeral FS — those
+// writes were lost on every redeploy. Real persistence happens via
+// `word_scores.is_potentially_valid=true`, rehydrated by `loadCommunityWords()`
+// at boot. The committed `*_approved.txt` files still seed the baseline at boot.
 async function addApprovedWord(word: string, language: Language): Promise<boolean> {
   const config = getLanguageConfig(language);
   const normalizedWord = normalizeWord(word, language);
-
-  // Check if already in dictionary
-  if (config.dictionary.has(normalizedWord)) {
-    return false; // Already exists
-  }
-
-  // Add to in-memory dictionary
+  if (config.dictionary.has(normalizedWord)) return false;
   config.dictionary.add(normalizedWord);
-
-  // Append to approved words file
-  try {
-    const approvedFilePath = path.join(__dirname, config.approvedFile);
-    await appendFileAsync(approvedFilePath, normalizedWord + '\n', 'utf-8');
-    logger.info('DICT', `Word "${word}" (${language}) promoted to community-approved dictionary`);
-    return true;
-  } catch (error: unknown) {
-    const err = error as Error;
-    logger.error('DICT', `Error appending approved word to file: ${err.message}`);
-    // Word is still in memory, just not persisted
-    return true;
-  }
+  logger.info('DICT', `Word "${word}" (${language}) added to in-memory dictionary; DB is the authoritative store`);
+  return true;
 }
 
-// Named exports for TypeScript compatibility
+async function removeApprovedWord(word: string, language: Language): Promise<boolean> {
+  const config = getLanguageConfig(language);
+  const normalizedWord = normalizeWord(word, language);
+  if (!config.dictionary.has(normalizedWord)) return false;
+  config.dictionary.delete(normalizedWord);
+  logger.info('DICT', `Word "${word}" (${language}) removed from in-memory dictionary; DB is the authoritative store`);
+  return true;
+}
+
 export {
   dictionary,
   isDictionaryWord,
@@ -882,11 +466,30 @@ export {
   normalizeSpanishWord,
   normalizeWord,
   addApprovedWord,
+  removeApprovedWord,
 };
 
-// Additional exported functions
 export const load = (): Promise<void> => dictionary.load();
+export const loadEnglishOnly = (): Promise<void> => dictionary.loadEnglishOnly();
 export const isValidWord = (word: string, language: Language): boolean | null => dictionary.isValidWord(word, language);
+/**
+ * Async word validation with Redis cache layer.
+ * Checks cache first, falls back to in-memory dictionary, then populates cache.
+ * Use this in async paths (socket handlers, API routes) where the cache hit
+ * avoids needing the dictionary loaded in memory for that language.
+ */
+export const isValidWordCached = async (word: string, language: Language): Promise<boolean | null> => {
+  const { getCachedWordValidation, setCachedWordValidation } = await import('./cache/wordCache');
+  const cached = await getCachedWordValidation(language, word);
+  if (cached !== null) return cached;
+
+  const result = dictionary.isValidWord(word, language);
+  if (result !== null) {
+    // fire-and-forget cache population
+    setCachedWordValidation(language, word, result).catch(() => {});
+  }
+  return result;
+};
 export const isValidEnglishWord = (word: string): boolean | null => dictionary.isValidEnglishWord(word);
 export const isValidHebrewWord = (word: string): boolean | null => dictionary.isValidHebrewWord(word);
 export const isValidSwedishWord = (word: string): boolean | null => dictionary.isValidSwedishWord(word);
@@ -896,28 +499,9 @@ export const getRandomKanjiCompounds = (count?: number, minLength?: number, maxL
 export const getRandomLongWords = (language: Language, count?: number, minLength?: number, maxLength?: number): string[] => dictionary.getRandomLongWords(language, count, minLength, maxLength);
 export const getRandomLongWordsWithTheme = (language: Language, count?: number, minLength?: number, maxLength?: number): ThemedWordsResult => dictionary.getRandomLongWordsWithTheme(language, count, minLength, maxLength);
 export const ensureLanguageLoaded = (language: Language): Promise<void> => dictionary.ensureLanguageLoaded(language);
+export const getMemoryStats = (): DictionaryMemoryStats[] => dictionary.getMemoryStats();
+export const getTotalMemoryUsage = (): number => dictionary.getTotalMemoryUsage();
+export const unloadLanguage = (language: Language): boolean => dictionary.unloadLanguage(language);
+export const unloadIdleDictionaries = (maxIdleMs?: number): Language[] => dictionary.unloadIdleDictionaries(maxIdleMs);
 export { getCurrentTheme };
-
-// CommonJS exports for backward compatibility
-module.exports = {
-  dictionary,
-  isDictionaryWord,
-  getAvailableDictionaries,
-  normalizeHebrewWord,
-  normalizeSpanishLetter,
-  normalizeSpanishWord,
-  normalizeWord,
-  addApprovedWord,
-  load,
-  isValidWord,
-  isValidEnglishWord,
-  isValidHebrewWord,
-  isValidSwedishWord,
-  isValidJapaneseWord,
-  isValidSpanishWord,
-  getRandomKanjiCompounds,
-  getRandomLongWords,
-  getRandomLongWordsWithTheme,
-  getCurrentTheme,
-  ensureLanguageLoaded,
-};
+export type { DictionaryMemoryStats };

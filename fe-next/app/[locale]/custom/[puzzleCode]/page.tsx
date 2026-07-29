@@ -1,24 +1,19 @@
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
-import { translations } from '@/translations';
+import { loadTranslation } from '@/translations/loadTranslation';
+import { PageLoader } from '@/components/ui/PageLoader';
 
-type Locale = keyof typeof translations;
+type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
 interface PageParams {
   params: Promise<{ locale: string; puzzleCode: string }>;
 }
 
-// Loading fallback component
+// Loading fallback component - flex-1 fills parent, PageLoader centers within
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-    <div className="text-center">
-      <div className="relative w-12 h-12 mx-auto mb-3">
-        <div className="absolute inset-0 border-4 border-neo-pink/30 rounded-full" />
-        <div className="absolute inset-0 border-4 border-transparent border-t-neo-pink rounded-full animate-spin" />
-      </div>
-      <p className="text-gray-600 dark:text-gray-300 text-sm">Loading Custom Puzzle...</p>
-    </div>
+  <div className="flex-1 flex items-center justify-center bg-neo-navy">
+    <PageLoader size="lg" text="Loading Custom Puzzle..." />
   </div>
 );
 
@@ -35,16 +30,16 @@ export const dynamic = 'force-dynamic';
  */
 export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
   const { locale } = await params;
-  const supportedLocales = Object.keys(translations);
+  const supportedLocales = ['en', 'he', 'sv', 'ja', 'es'];
   const validLocale = (supportedLocales.includes(locale) ? locale : 'en') as Locale;
-  const t = translations[validLocale] as Record<string, unknown>;
+  const t = await loadTranslation(validLocale) as Record<string, unknown>;
 
-   
-  const customPuzzle = (t as any).customPuzzle || {};
+  const customPuzzle = (t.customPuzzle ?? {}) as { title?: string; description?: string };
   const title = customPuzzle.title || 'Custom Puzzle';
   const description = customPuzzle.description || 'Can you solve this custom word puzzle?';
 
   return {
+    robots: { index: false, follow: false },
     title: `${title} - LexiClash`,
     description,
     openGraph: {

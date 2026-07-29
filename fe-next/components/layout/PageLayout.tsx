@@ -91,7 +91,7 @@ export function PageLayout({
         fullHeight ? 'h-full overflow-hidden' : 'min-h-full',
         isDarkMode
           ? 'bg-neo-navy'
-          : 'bg-gradient-to-br from-blue-50 via-white to-purple-50',
+          : 'bg-linear-to-br from-blue-50 via-white to-purple-50',
         className
       )}
       {...(onRefresh ? pullToRefreshHandlers : {})}
@@ -105,15 +105,15 @@ export function PageLayout({
         />
       )}
 
-      {/* Auto-hide header */}
+      {/* Auto-hide header - sticky on mobile, static on desktop */}
       {showHeader && <AutoHideHeader />}
 
-      {/* Page content */}
+      {/* Page content with proper spacing */}
       <div
         className={cn(
           'flex-1 mx-auto w-full',
           fullHeight && 'min-h-0',
-          bottomNavAware && 'page-content-safe',
+          bottomNavAware && 'pb-bottom-stack sm:pb-0',
           maxWidthClasses[maxWidth],
           paddingClasses[padding]
         )}

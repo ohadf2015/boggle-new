@@ -1,8 +1,51 @@
-import { translations } from '@/translations';
+import { loadTranslation, type TranslationData } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
+
+const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
+  en: {
+    title: 'Global Leaderboard - Top Word Game Players Worldwide',
+    description: 'See where you rank among the best word game players worldwide. Compete in LexiClash multiplayer matches and daily challenges to climb the rankings.',
+    features: [
+      'Live-updating global rankings with real-time scores',
+      'All-time leaderboard tracking total scores across all games',
+      'See your rank position and progress over time',
+      'Compare scores with friends and top players worldwide',
+      'Separate creator leaderboard for community content makers',
+    ],
+    faq: [
+      { question: 'How are leaderboard rankings calculated?', answer: 'Rankings are based on total score accumulated across all multiplayer games. Higher word scores, longer words, and bonus achievements contribute to your total.' },
+      { question: 'How often does the leaderboard update?', answer: 'The leaderboard updates in real-time. Your score changes are reflected immediately after each game finishes.' },
+    ],
+  },
+  he: {
+    title: 'טבלת מובילים עולמית - השחקנים הטובים ביותר במשחקי מילים',
+    description: 'ראו איפה אתם מדורגים בין שחקני משחקי המילים הטובים בעולם. התחרו במשחקים ואתגרים יומיים כדי לטפס בדירוגים.',
+    features: ['דירוגים עולמיים מתעדכנים בזמן אמת', 'מעקב אחרי ניקוד כולל לאורך כל המשחקים', 'השוו ניקוד עם חברים ושחקנים מובילים'],
+    faq: [],
+  },
+  ja: {
+    title: 'グローバルリーダーボード - トップワードゲームプレイヤー世界ランキング',
+    description: '世界中のワードゲームプレイヤーの中であなたの順位を確認しましょう。',
+    features: ['リアルタイム更新のグローバルランキング', '全ゲームの累計スコア追跡'],
+    faq: [],
+  },
+  sv: {
+    title: 'Global Topplista - Världens Bästa Ordspelare & Rankningar',
+    description: 'Se var du rankas bland vaerldens baesta ordspelare.',
+    features: ['Realtidsuppdaterade globala rankningar'],
+    faq: [],
+  },
+  es: {
+    title: 'Tabla de Clasificacion Global - Mejores Jugadores de Palabras',
+    description: 'Descubre tu posicion entre los mejores jugadores de juegos de palabras del mundo.',
+    features: ['Rankings globales actualizados en tiempo real'],
+    faq: [],
+  },
+};
 
 interface LayoutParams {
   params: Promise<{ locale: string }>;
@@ -11,8 +54,10 @@ interface LayoutParams {
 export async function generateMetadata({ params }: LayoutParams): Promise<Metadata> {
   const { locale } = await params;
   const validLocale = (locale as Locale) || 'en';
-  const seo = translations[validLocale]?.seo?.leaderboard || translations.en.seo.leaderboard;
-  const baseSeo = translations[validLocale]?.seo || translations.en.seo;
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const enT = await loadTranslation('en') as Record<string, any>;
+  const seo = t?.seo?.leaderboard || enT.seo.leaderboard;
+  const baseSeo = t?.seo || enT.seo;
 
   // Always use explicit locale path for SEO consistency
   const localePath = `/${locale}`;
@@ -51,6 +96,22 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         sv: 'https://www.lexiclash.live/sv/leaderboard',
         ja: 'https://www.lexiclash.live/ja/leaderboard',
         es: 'https://www.lexiclash.live/es/leaderboard',
+        'en-IL': 'https://www.lexiclash.live/en/leaderboard',
+        'he-IL': 'https://www.lexiclash.live/he/leaderboard',
+        'en-US': 'https://www.lexiclash.live/en/leaderboard',
+        'es-US': 'https://www.lexiclash.live/es/leaderboard',
+        'en-GB': 'https://www.lexiclash.live/en/leaderboard',
+        'en-SE': 'https://www.lexiclash.live/en/leaderboard',
+        'sv-SE': 'https://www.lexiclash.live/sv/leaderboard',
+        'en-JP': 'https://www.lexiclash.live/en/leaderboard',
+        'ja-JP': 'https://www.lexiclash.live/ja/leaderboard',
+        'en-ES': 'https://www.lexiclash.live/en/leaderboard',
+        'es-ES': 'https://www.lexiclash.live/es/leaderboard',
+        'en-MX': 'https://www.lexiclash.live/en/leaderboard',
+        'es-MX': 'https://www.lexiclash.live/es/leaderboard',
+        'en-AU': 'https://www.lexiclash.live/en/leaderboard',
+        'es-AR': 'https://www.lexiclash.live/es/leaderboard',
+        'es-CO': 'https://www.lexiclash.live/es/leaderboard',
       },
     },
     robots: {
@@ -154,6 +215,12 @@ export default async function LeaderboardLayout({ children, params }: Leaderboar
         dangerouslySetInnerHTML={{ __html: JSON.stringify([breadcrumbSchema, webPageSchema, itemListSchema, collectionPageSchema]) }}
       />
       {children}
+      <GamePageSeoContent
+        title={seoContent[locale as keyof typeof seoContent]?.title || seoContent.en.title}
+        description={seoContent[locale as keyof typeof seoContent]?.description || seoContent.en.description}
+        features={seoContent[locale as keyof typeof seoContent]?.features || seoContent.en.features}
+        faq={seoContent[locale as keyof typeof seoContent]?.faq || seoContent.en.faq}
+      />
     </>
   );
 }

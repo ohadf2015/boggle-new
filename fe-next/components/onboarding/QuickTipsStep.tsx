@@ -1,26 +1,25 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Pointer, Star, Zap, Play, Sparkles } from 'lucide-react';
+import { m } from 'framer-motion';
+import { Pointer, Star, Zap, Mouse } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useIsDesktop } from '@/hooks/useMediaQuery';
 
 interface QuickTipsStepProps {
   selectedMode: 'single' | 'multi' | 'daily' | null;
   onModeSelect: (mode: 'single' | 'multi' | 'daily') => void;
-  onComplete?: () => void;
 }
 
 /**
- * QuickTipsStep - Simplified final step with quick tips and single Training CTA
- * No overwhelming mode selection - just start training!
+ * QuickTipsStep - Final step with quick tips and mode teasers
  */
 const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
   selectedMode,
   onModeSelect,
-  onComplete,
 }) => {
   const { t } = useLanguage();
+  const isDesktop = useIsDesktop();
 
   // Auto-select training mode when component mounts
   useEffect(() => {
@@ -31,9 +30,9 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
 
   const tips = [
     {
-      icon: Pointer,
-      titleKey: 'onboarding.quickTips.tip1Title',
-      textKey: 'onboarding.quickTips.tip1Text',
+      icon: isDesktop ? Mouse : Pointer,
+      titleKey: isDesktop ? 'onboarding.quickTips.tip1TitleDesktop' : 'onboarding.quickTips.tip1Title',
+      textKey: isDesktop ? 'onboarding.quickTips.tip1TextDesktop' : 'onboarding.quickTips.tip1Text',
     },
     {
       icon: Star,
@@ -50,35 +49,36 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
   return (
     <div className="flex flex-col items-center space-y-4 sm:space-y-5 w-full max-w-lg mx-auto">
       {/* Header */}
-      <motion.div
+      <m.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 26 }}
         className="text-center space-y-1"
       >
-        <h2 className="text-xl sm:text-2xl font-black text-neo-black uppercase">
-          {t('onboarding.quickTips.title') || 'Quick Tips'}
+        <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
+          {t('onboarding.quickTips.title')}
         </h2>
-        <p className="text-xs sm:text-sm text-neo-black/70">
-          {t('onboarding.quickTips.subtitle') || 'A few things to know before you start'}
+        <p className="text-xs sm:text-sm text-neo-white">
+          {t('onboarding.quickTips.subtitle')}
         </p>
-      </motion.div>
+      </m.div>
 
       {/* Quick Tips - unified neutral styling */}
-      <motion.div
+      <m.div
         initial={{ scale: 0.9, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
         className="w-full"
       >
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
           {tips.map((tip, index) => {
             const Icon = tip.icon;
             return (
-              <motion.div
+              <m.div
                 key={tip.titleKey}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.15 + index * 0.1 }}
+                transition={{ delay: 0.15 + index * 0.1, type: 'spring', stiffness: 380, damping: 26 }}
                 className="flex sm:flex-col items-center gap-2 sm:gap-2 p-2.5 sm:p-3 rounded-neo border-2 border-neo-black shadow-hard-sm bg-neo-cream"
               >
                 <div className="w-8 h-8 sm:w-10 sm:h-10 bg-neo-lime text-neo-black border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm shrink-0">
@@ -92,54 +92,33 @@ const QuickTipsStep: React.FC<QuickTipsStepProps> = ({
                     {t(tip.textKey)}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
-      </motion.div>
+      </m.div>
 
-      {/* Single prominent Training Mode CTA */}
-      <motion.div
+      {/* Practice Mode destination card */}
+      <m.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
         className="w-full"
       >
-        <div
-          className="bg-gradient-to-br from-neo-lime to-lime-300 border-3 border-neo-black rounded-neo p-4 sm:p-5 shadow-hard text-center cursor-pointer hover:shadow-hard-lg active:shadow-none active:translate-y-1 transition-all"
-          onClick={onComplete}
-        >
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 text-neo-black" />
-            <h3 className="font-black text-lg sm:text-xl text-neo-black uppercase">
-              {t('onboarding.training.title') || 'Training Mode'}
-            </h3>
+        <div className="flex items-center gap-3 p-3 sm:p-4 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime">
+          <div className="w-10 h-10 bg-neo-black rounded-full flex items-center justify-center shrink-0">
+            <Zap className="w-5 h-5 text-neo-lime" />
           </div>
-          <p className="text-xs sm:text-sm text-neo-black/80 mb-3">
-            {t('onboarding.training.description') || 'Practice at your own pace with no pressure. Perfect for beginners!'}
-          </p>
-          <motion.div
-            className="inline-flex items-center gap-2 bg-neo-black text-neo-lime px-4 py-2 rounded-neo font-black text-sm sm:text-base"
-            animate={{ scale: [1, 1.02, 1] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            <Play className="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" />
-            {t('onboarding.training.ready') || "You're ready to play!"}
-          </motion.div>
+          <div>
+            <div className="font-black text-sm sm:text-base text-neo-black uppercase">
+              {t('onboarding.training.title')}
+            </div>
+            <div className="text-xs text-neo-black/70 leading-snug">
+              {t('onboarding.training.description')}
+            </div>
+          </div>
         </div>
-      </motion.div>
-
-      {/* Encouragement */}
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.6 }}
-        className="bg-neo-lime/30 border-2 border-neo-black/20 rounded-neo px-4 py-2"
-      >
-        <p className="text-center font-bold text-xs text-neo-black dark:text-neo-white">
-          {t('onboarding.training.hint') || 'More game modes will unlock as you play!'}
-        </p>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

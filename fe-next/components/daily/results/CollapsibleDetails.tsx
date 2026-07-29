@@ -6,7 +6,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Coins, Timer, Sparkles } from 'lucide-react';
 import { getSurvivalBonusMessage } from './constants';
 
@@ -33,12 +33,12 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
     <div className="rounded-neo border-2 border-neo-black overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-2.5 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
+        className="w-full flex items-center justify-between p-2.5 bg-slate-100 dark:bg-neo-navy-elevated hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
       >
         <div className="flex items-center gap-2">
           <Sparkles className="w-4 h-4 text-neo-lime" />
           <span className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase">
-            {t('wordHunt.results.details') || 'Details & Rewards'}
+            {t('wordHunt.results.details')}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -53,27 +53,27 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
               )}
             </div>
           )}
-          <motion.div animate={{ rotate: expanded ? 180 : 0 }}>
+          <m.div animate={{ rotate: expanded ? 180 : 0 }}>
             <ChevronDown className="w-4 h-4 text-gray-500" />
-          </motion.div>
+          </m.div>
         </div>
       </button>
 
       <AnimatePresence>
         {expanded && (
-          <motion.div
+          <m.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="p-3 space-y-3 bg-white dark:bg-slate-800 text-neo-black dark:text-neo-white">
+            <div className="p-3 space-y-3 bg-white dark:bg-neo-navy-light text-neo-black dark:text-neo-white">
               {/* Coin rewards */}
               {coinReward && coinReward.awarded > 0 && (
                 <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
                   <div className="flex items-center gap-2">
                     <Coins className="w-5 h-5 text-amber-600" />
-                    <span className="font-bold text-sm text-gray-700 dark:text-gray-200">{t('wordHunt.results.coinsEarned') || 'Coins Earned'}</span>
+                    <span className="font-bold text-sm text-gray-700 dark:text-gray-200">{t('wordHunt.results.coinsEarned')}</span>
                   </div>
                   <div className="text-right">
                     <span className="font-black text-lg text-amber-600 dark:text-amber-400">+{coinReward.awarded}</span>
@@ -113,7 +113,7 @@ export const CollapsibleDetails: React.FC<CollapsibleDetailsProps> = ({
                 </div>
               )}
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

@@ -1,0 +1,18 @@
+# Railway deployment configuration for LexiClash
+# Enables horizontal scaling with sticky sessions for WebSocket affinity
+
+[deploy]
+# Health check endpoint for zero-downtime deployments
+healthcheckPath = "/health/live"
+healthcheckTimeout = 30
+# Graceful shutdown — give in-flight games time to persist to Redis
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
+
+[deploy.scaling]
+# Enable sticky sessions so WebSocket connections stay on the same replica.
+# Without this, Socket.IO polling fallback breaks across replicas and
+# in-memory game state is unreachable from other instances.
+# The Redis adapter handles cross-replica event broadcasting, but game state
+# mutations must hit the replica that owns the game in memory.
+stickySessions = true

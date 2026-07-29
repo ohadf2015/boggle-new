@@ -1,9 +1,11 @@
 'use client';
 
 import React, { useMemo, useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
+import { Mascot } from '@/components/ui/Mascot';
+import { MINDBLOWN_PROGRESS_THRESHOLD } from '@/utils/mascotConfig';
 
 interface AchievementProgress {
   key: string;
@@ -79,7 +81,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'WORDSMITH',
         icon: '🎓',
-        name: t('achievements.WORDSMITH.name') || 'Wordsmith',
+        name: t('achievements.WORDSMITH.name'),
         current: validWordCount,
         target: 50,
         percentage: (validWordCount / 50) * 100,
@@ -90,7 +92,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'LEXICON',
         icon: '🏆',
-        name: t('achievements.LEXICON.name') || 'Lexicon',
+        name: t('achievements.LEXICON.name'),
         current: validWordCount,
         target: 65,
         percentage: (validWordCount / 65) * 100,
@@ -101,7 +103,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'VOCABULARY_TITAN',
         icon: '🗿',
-        name: t('achievements.VOCABULARY_TITAN.name') || 'Vocabulary Titan',
+        name: t('achievements.VOCABULARY_TITAN.name'),
         current: validWordCount,
         target: 60,
         percentage: (validWordCount / 60) * 100,
@@ -114,7 +116,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'COMBO_KING',
         icon: '🔥',
-        name: t('achievements.COMBO_KING.name') || 'Combo King',
+        name: t('achievements.COMBO_KING.name'),
         current: currentCombo,
         target: 25,
         percentage: (currentCombo / 25) * 100,
@@ -125,7 +127,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'COMBO_GOD',
         icon: '👑',
-        name: t('achievements.COMBO_GOD.name') || 'Combo God',
+        name: t('achievements.COMBO_GOD.name'),
         current: currentCombo,
         target: 25,
         percentage: (currentCombo / 25) * 100,
@@ -141,7 +143,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'SPEED_DEMON',
         icon: '⚡',
-        name: t('achievements.SPEED_DEMON.name') || 'Speed Demon',
+        name: t('achievements.SPEED_DEMON.name'),
         current: validWordCount,
         target: speedDemonThreshold,
         percentage: (validWordCount / speedDemonThreshold) * 100,
@@ -154,7 +156,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'WORD_MASTER',
         icon: '📚',
-        name: t('achievements.WORD_MASTER.name') || 'Word Master',
+        name: t('achievements.WORD_MASTER.name'),
         current: Math.max(...wordLengths, 0),
         target: 7,
         percentage: (Math.max(...wordLengths, 0) / 7) * 100,
@@ -167,7 +169,7 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
       progress.push({
         key: 'TREASURE_HUNTER',
         icon: '💎',
-        name: t('achievements.TREASURE_HUNTER.name') || 'Treasure Hunter',
+        name: t('achievements.TREASURE_HUNTER.name'),
         current: Math.max(...wordLengths, 0),
         target: 8,
         percentage: (Math.max(...wordLengths, 0) / 8) * 100,
@@ -185,6 +187,11 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
   const visibleAchievements = useMemo(() => {
     return achievementProgress.filter(p => !dismissedAchievements.has(p.key));
   }, [achievementProgress, dismissedAchievements]);
+
+  // Show mindblown mascot when any visible achievement is near completion
+  const hasNearMilestone = visibleAchievements.some(
+    (a) => a.percentage >= MINDBLOWN_PROGRESS_THRESHOLD
+  );
 
   // Auto-dismiss achievements after 3 seconds
   useEffect(() => {
@@ -225,10 +232,15 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
   }
 
   return (
-    <div className={cn("fixed bottom-20 right-4 z-40 space-y-2", className)}>
+    <div className={cn("fixed bottom-[calc(5rem+var(--admob-banner-height,0px))] ltr:right-4 rtl:left-4 z-40 space-y-2", className)}>
+      {hasNearMilestone && (
+        <div className="flex justify-center my-1">
+          <Mascot variant={hasNearMilestone ? 'mindblown' : 'encouraging'} size="xs" animated clipBorder="none" />
+        </div>
+      )}
       <AnimatePresence>
         {visibleAchievements.map((progress) => (
-          <motion.div
+          <m.div
             key={progress.key}
             initial={{ opacity: 0, x: 50, scale: 0.8 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
@@ -247,8 +259,8 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
 
             {/* Progress Bar */}
             <div className="w-full bg-neo-black/40 rounded-full h-2 overflow-hidden border border-neo-black/60">
-              <motion.div
-                className="h-full bg-gradient-to-r from-neo-cyan to-neo-pink"
+              <m.div
+                className="h-full bg-linear-to-r from-neo-cyan to-neo-pink"
                 initial={{ width: 0 }}
                 animate={{ width: `${Math.min(progress.percentage, 100)}%` }}
                 transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -257,14 +269,14 @@ export const AchievementProgressTracker: React.FC<AchievementProgressTrackerProp
 
             {/* Progress Text */}
             <div className="flex justify-between items-center mt-1">
-              <span className="text-xs font-bold text-neo-cream">
+              <span className="text-xs font-bold text-neo-white">
                 {progress.current}/{progress.target}
               </span>
               <span className="text-xs font-bold text-neo-lime">
                 {Math.round(progress.percentage)}%
               </span>
             </div>
-          </motion.div>
+          </m.div>
         ))}
       </AnimatePresence>
     </div>

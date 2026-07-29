@@ -9,10 +9,8 @@ import {
   type WordHuntResult,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
-import {
-  generateDailyShareImage,
-  downloadDailyShareImage,
-} from '@/utils/dailyShareImage';
+// dailyShareImage (620 LOC + canvas rendering) is dynamically imported inside the
+// share handler so it stays out of the results-screen chunk — it only runs on share-tap.
 import type { Language } from '@/types';
 import type { WordHuntStats } from './types';
 
@@ -25,7 +23,7 @@ interface UseShareHandlersProps {
   avatarEmoji: string;
   stats: WordHuntStats | null;
   isAuthenticated: boolean;
-  profile: { display_name?: string | null; username?: string; avatar_emoji?: string | null; avatar_image?: string | null; profile_picture_url?: string | null } | null;
+  profile: { display_name?: string | null; username?: string; avatar_emoji?: string | null; avatar_image?: string | null } | null;
   guestPlayer: GuestDailyPlayer | null;
   t: (key: string) => string;
 }
@@ -74,11 +72,9 @@ export function useShareHandlers({
     // Add custom avatar image if available (authenticated users)
     if (isAuthenticated && profile?.avatar_image) {
       params.set('avatarImage', profile.avatar_image);
-    } else if (isAuthenticated && profile?.profile_picture_url) {
-      params.set('avatarUrl', profile.profile_picture_url);
     }
     return `${origin}/api/og/word-hunt?${params.toString()}`;
-  }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language, isAuthenticated, profile?.avatar_image, profile?.profile_picture_url]);
+  }, [result.solved, result.attemptsUsed, puzzleNumber, displayName, avatarEmoji, language, isAuthenticated, profile?.avatar_image]);
 
   // Generate shareable text
   const shareText = useMemo(() => {
@@ -107,6 +103,7 @@ export function useShareHandlers({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'NotAllowedError') return;
       console.error('Failed to copy:', err);
     }
   }, [shareTextWithUrl]);
@@ -163,6 +160,10 @@ export function useShareHandlers({
           text: shareTextWithUrl,
         });
       } catch (err) {
+        // AbortError means user cancelled the share dialog - this is normal behavior
+        if (err instanceof DOMException && err.name === 'AbortError') {
+          return;
+        }
         console.error('Share failed:', err);
       }
     } else {
@@ -170,12 +171,50 @@ export function useShareHandlers({
     }
   }, [shareTextWithUrl]);
 
+  // Build challenge URL with gauntlet params so recipients see the challenger's score
+  const challengeUrl = useMemo(() => {
+    const origin = typeof window !== 'undefined'
+      ? window.location.origin
+      : 'https://www.lexiclash.live';
+    const score = result.efficiencyScore ?? 0;
+    const params = new URLSearchParams({
+      whChallenger: displayName,
+      whChallengeScore: String(score),
+      whChallengeEmoji: avatarEmoji,
+      whChallengeDate: puzzleDate,
+    });
+    return `${origin}/${language}/daily?${params.toString()}`;
+  }, [displayName, avatarEmoji, puzzleDate, language, result.efficiencyScore]);
+
+  // Handle challenge (gauntlet) share via native share or panel fallback
+  const handleChallengeShare = useCallback(async () => {
+    const score = result.efficiencyScore ?? 0;
+    const text = t('wordHunt.gauntlet.shareText')
+      .replace('{score}', String(score))
+      .replace('{name}', displayName);
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: t('wordHunt.title'),
+          text,
+          url: challengeUrl,
+        });
+      } catch {
+        // User cancelled or share failed — no-op
+      }
+    } else {
+      setShowSharePanel(true);
+    }
+  }, [challengeUrl, displayName, result.efficiencyScore, t]);
+
   // Handle download personalized share image
   const handleDownloadShareImage = useCallback(async () => {
     if (isGeneratingImage) return;
 
     setIsGeneratingImage(true);
     try {
+      const { generateDailyShareImage, downloadDailyShareImage } = await import('@/utils/dailyShareImage');
       const imageResult = await generateDailyShareImage({
         gameType: 'wordHunt',
         rank: stats?.yourStats?.rank || null,
@@ -219,5 +258,7 @@ export function useShareHandlers({
     handleSMS,
     handleNativeShare,
     handleDownloadShareImage,
+    challengeUrl,
+    handleChallengeShare,
   };
 }

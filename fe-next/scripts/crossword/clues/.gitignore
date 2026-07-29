@@ -1,0 +1,5 @@
+# Regenerable build artifacts (Datamuse cache + enriched pool + batch inputs).
+# The committed product is lib/crossword/data/clueBank.en.json; clue source is batches/output-*.json.
+.cache/
+pool.en.json
+batches/input-*.json

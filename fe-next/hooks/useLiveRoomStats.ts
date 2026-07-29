@@ -5,15 +5,19 @@ import { useSocketOptional } from '@/utils/SocketContext';
 import type { ActiveRoom } from '@/shared/types/game';
 
 interface LiveRoomStats {
+  /** Number of rooms in waiting state (joinable) */
   openRooms: number;
+  /** Total players in waiting rooms */
   totalPlayers: number;
+  /** Total players actively playing across all multiplayer rooms (waiting + in-progress) */
+  activePlayers: number;
   isLoading: boolean;
   refresh: () => void;
 }
 
 /**
  * useLiveRoomStats - Hook to fetch live room statistics for the landing page
- * Returns the number of open rooms and total players across all rooms
+ * Returns the number of open rooms, players in waiting rooms, and total active players
  * Uses useSocketOptional to gracefully handle cases where socket context isn't available
  */
 export function useLiveRoomStats(): LiveRoomStats {
@@ -23,6 +27,7 @@ export function useLiveRoomStats(): LiveRoomStats {
   const [stats, setStats] = useState<Omit<LiveRoomStats, 'refresh'>>({
     openRooms: 0,
     totalPlayers: 0,
+    activePlayers: 0,
     isLoading: true,
   });
 
@@ -38,9 +43,16 @@ export function useLiveRoomStats(): LiveRoomStats {
     const openRooms = rooms.filter(room => room.gameState === 'waiting');
     const totalPlayers = openRooms.reduce((sum, room) => sum + (room.playerCount || 0), 0);
 
+    // Count all players in active rooms (waiting + in-progress)
+    const activeRooms = rooms.filter(room =>
+      room.gameState === 'waiting' || room.gameState === 'in-progress'
+    );
+    const activePlayers = activeRooms.reduce((sum, room) => sum + (room.playerCount || 0), 0);
+
     setStats({
       openRooms: openRooms.length,
       totalPlayers,
+      activePlayers,
       isLoading: false,
     });
   }, []);
@@ -54,9 +66,9 @@ export function useLiveRoomStats(): LiveRoomStats {
     // Request active rooms on mount
     socket.emit('getActiveRooms');
 
-    // Poll every 30 seconds to keep stats fresh
+    // Poll every 30 seconds to keep stats fresh — skip when tab is hidden
     const interval = setInterval(() => {
-      if (socket.connected) {
+      if (socket.connected && typeof document !== 'undefined' && document.visibilityState === 'visible') {
         socket.emit('getActiveRooms');
       }
     }, 30000);
@@ -78,7 +90,13 @@ export function useLiveRoomStats(): LiveRoomStats {
     return undefined;
   }, [isConnected]);
 
-  return { ...stats, refresh };
+  return {
+    openRooms: stats.openRooms,
+    totalPlayers: stats.totalPlayers,
+    activePlayers: stats.activePlayers,
+    isLoading: stats.isLoading,
+    refresh,
+  };
 }
 
 export default useLiveRoomStats;

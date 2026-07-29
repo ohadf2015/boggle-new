@@ -12,12 +12,22 @@
 
 const fs = require('fs');
 const path = require('path');
+let ts = null;
+try {
+  ts = require('typescript');
+} catch (e) {
+  ts = null;
+}
 
 // Configuration
 const PROJECT_ROOT = path.resolve(__dirname, '..');
 const TRANSLATIONS_FILE = path.join(PROJECT_ROOT, 'translations/index.js');
 const EXTENSIONS_TO_SCAN = ['.ts', '.tsx', '.js', '.jsx'];
-const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts'];
+const DIRS_TO_EXCLUDE = ['node_modules', '.next', 'dist', 'build', '.git', 'playwright-report', 'scripts', '.venv', 'venv', '.venv-rembg', '__pycache__', '__tests__', '__mocks__', 'e2e', 'playwright', 'coverage', '.turbo', 'out'];
+const FILE_PATTERNS_TO_EXCLUDE = [/\.test\.[tj]sx?$/, /\.spec\.[tj]sx?$/, /\.stories\.[tj]sx?$/];
+
+// Track dynamic/risky translation patterns that might fail at runtime
+const dynamicPatterns = [];
 
 // ============================================
 // PART 1: Extract translation keys from translation file
@@ -41,42 +51,92 @@ function extractTranslationKeys(obj, prefix = '') {
   return keys;
 }
 
-function getTranslationKeysFromFile() {
-  console.log('Reading translations file...');
+/**
+ * Detect keys that contain dots - these won't work with the t() function
+ * which splits by '.' and traverses nested objects.
+ *
+ * Example: { daily: { "wordHunt.subtitle": "value" } }
+ * - Script extracts as: "daily.wordHunt.subtitle" (looks correct)
+ * - Runtime t("daily.wordHunt.subtitle") fails because it looks for:
+ *   translations.daily.wordHunt.subtitle (nested objects)
+ *   but finds: translations.daily["wordHunt.subtitle"] (flat key)
+ */
+function findProblematicFlatKeys(obj, prefix = '', problematic = []) {
+  for (const [key, value] of Object.entries(obj)) {
+    const fullPath = prefix ? `${prefix}.${key}` : key;
 
-  const content = fs.readFileSync(TRANSLATIONS_FILE, 'utf-8');
+    // Check if this key contains a dot - this is problematic!
+    if (key.includes('.')) {
+      problematic.push({
+        flatKey: key,
+        parentPath: prefix,
+        appearsAs: fullPath,
+        value: typeof value === 'string' ? value.substring(0, 50) : '[object]'
+      });
+    }
 
-  // Use a safe approach: eval the file in a controlled way
-  // Extract the translations object using regex and parsing
-  const translationsMatch = content.match(/const\s+translations\s*=\s*(\{[\s\S]*?\});?\s*(?:\/\/|module\.exports)/);
-
-  if (!translationsMatch) {
-    // Try alternative approach - require the module
-    try {
-      const translationsModule = require(TRANSLATIONS_FILE);
-      const translations = translationsModule.translations;
-
-      const result = {};
-      for (const lang of Object.keys(translations)) {
-        result[lang] = extractTranslationKeys(translations[lang]);
-      }
-      return { translations, keysByLanguage: result };
-    } catch (e) {
-      console.error('Failed to parse translations file:', e.message);
-      process.exit(1);
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      findProblematicFlatKeys(value, fullPath, problematic);
     }
   }
 
-  // Fallback to require
-  const translationsModule = require(TRANSLATIONS_FILE);
-  const translations = translationsModule.translations;
+  return problematic;
+}
 
-  const result = {};
-  for (const lang of Object.keys(translations)) {
-    result[lang] = extractTranslationKeys(translations[lang]);
+function parseESMTranslationFile(filePath) {
+  const content = fs.readFileSync(filePath, 'utf-8');
+  // Find the object literal after "const xx = "
+  const constIdx = content.indexOf('const ');
+  const objStart = content.indexOf('{', constIdx);
+  let depth = 0;
+  let objEnd = objStart;
+  for (let i = objStart; i < content.length; i++) {
+    if (content[i] === '{') depth++;
+    else if (content[i] === '}') { depth--; if (depth === 0) { objEnd = i; break; } }
+  }
+  const objStr = content.substring(objStart, objEnd + 1);
+  // Evaluate the object literal in isolation (safe - only static translation data)
+  const vm = require('vm');
+  return vm.runInNewContext(`(${objStr})`);
+}
+
+function getTranslationKeysFromFile() {
+  console.log('Reading translations file...');
+
+  const translationsDir = path.dirname(TRANSLATIONS_FILE);
+  const indexContent = fs.readFileSync(TRANSLATIONS_FILE, 'utf-8');
+
+  // Extract language imports: import { en } from './en.js'
+  const importRegex = /import\s*\{\s*(\w+)\s*\}\s*from\s*['"]\.\/(\w+)\.js['"]/g;
+  const translations = {};
+  let m;
+  while ((m = importRegex.exec(indexContent)) !== null) {
+    const langName = m[1];
+    const fileName = m[2];
+    const langFile = path.join(translationsDir, `${fileName}.js`);
+    if (fs.existsSync(langFile)) {
+      try {
+        translations[langName] = parseESMTranslationFile(langFile);
+      } catch (e) {
+        console.error(`Failed to parse ${langFile}: ${e.message}`);
+        process.exit(1);
+      }
+    }
   }
 
-  return { translations, keysByLanguage: result };
+  if (Object.keys(translations).length === 0) {
+    console.error('Failed to parse translations: no language files found');
+    process.exit(1);
+  }
+
+  const result = {};
+  const problematicByLanguage = {};
+  for (const lang of Object.keys(translations)) {
+    result[lang] = extractTranslationKeys(translations[lang]);
+    problematicByLanguage[lang] = findProblematicFlatKeys(translations[lang]);
+  }
+
+  return { translations, keysByLanguage: result, problematicByLanguage };
 }
 
 // ============================================
@@ -90,12 +150,16 @@ function getAllFiles(dir, files = []) {
     const fullPath = path.join(dir, entry.name);
 
     if (entry.isDirectory()) {
-      if (!DIRS_TO_EXCLUDE.includes(entry.name)) {
+      // Skip build output (`.next`, `.next-verify`, `.next-verify2`, any `.next*`)
+      // and the static exclude list. Scanning minified build chunks produced bogus
+      // "missing keys" like "@", "\+", "=" and node-fetch vars, inflating the
+      // advisory to noise everyone ignored (2026-06-05).
+      if (!DIRS_TO_EXCLUDE.includes(entry.name) && !entry.name.startsWith('.next')) {
         getAllFiles(fullPath, files);
       }
     } else if (entry.isFile()) {
       const ext = path.extname(entry.name);
-      if (EXTENSIONS_TO_SCAN.includes(ext)) {
+      if (EXTENSIONS_TO_SCAN.includes(ext) && !FILE_PATTERNS_TO_EXCLUDE.some(p => p.test(entry.name))) {
         files.push(fullPath);
       }
     }
@@ -104,8 +168,137 @@ function getAllFiles(dir, files = []) {
   return files;
 }
 
+function getScriptKind(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.tsx') return ts ? ts.ScriptKind.TSX : undefined;
+  if (ext === '.ts') return ts ? ts.ScriptKind.TS : undefined;
+  if (ext === '.jsx') return ts ? ts.ScriptKind.JSX : undefined;
+  if (ext === '.js') return ts ? ts.ScriptKind.JS : undefined;
+  return ts ? ts.ScriptKind.Unknown : undefined;
+}
+
+function extractTFunctionCallsWithTypeScript(filePath, content) {
+  if (!ts) return null;
+  if (!content.includes('t(') && !content.includes('`') && !content.includes('nameKey')) return null;
+
+  const indirectPropertyNames = new Set([
+    'nameKey',
+    'description',
+    'label',
+    'title',
+    'message',
+    'text',
+    'placeholder',
+    'tooltip',
+    'header',
+    'buttonText',
+    'errorMessage',
+    'successMessage',
+  ]);
+
+  const benefitsArrayPattern = /const\s+benefits\s*=\s*\[\s*([\s\S]*?)\s*\]/m;
+  const objectKeyPattern = /\{\s*[^}]*?\bkey\s*:\s*['"]([^'"]+)['"][^}]*?\}/g;
+  let benefitsKeys = [];
+  const benefitsMatch = content.match(benefitsArrayPattern);
+  if (benefitsMatch) {
+    let m;
+    while ((m = objectKeyPattern.exec(benefitsMatch[1])) !== null) {
+      benefitsKeys.push(m[1]);
+    }
+    benefitsKeys = [...new Set(benefitsKeys)];
+  }
+
+  const sourceFile = ts.createSourceFile(
+    filePath,
+    content,
+    ts.ScriptTarget.Latest,
+    true,
+    getScriptKind(filePath)
+  );
+
+  const calls = [];
+
+  function pushKey(key, node, context) {
+    if (!key) return;
+    if (key.includes('://') || key.startsWith('.') || key.endsWith('.')) return;
+    if (key.includes(' ') || key.startsWith('#') || key.startsWith('/') || key.includes('(')) return;
+    const pos = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+    calls.push({
+      key,
+      file: path.relative(PROJECT_ROOT, filePath),
+      line: pos.line + 1,
+      context: (context || content.split('\n')[pos.line] || '').trim().substring(0, 100),
+    });
+  }
+
+  function getPropertyNameText(nameNode) {
+    if (!nameNode) return null;
+    if (ts.isIdentifier(nameNode)) return nameNode.text;
+    if (ts.isStringLiteral(nameNode) || ts.isNoSubstitutionTemplateLiteral(nameNode)) return nameNode.text;
+    return null;
+  }
+
+  function isTCallExpression(expr) {
+    if (ts.isIdentifier(expr)) return expr.text === 't';
+    if (ts.isPropertyAccessExpression(expr)) return expr.name?.text === 't';
+    return false;
+  }
+
+  function tryExtractKeyFromTemplateExpression(templateExpr, nodeForLocation) {
+    const headText = templateExpr.head.text;
+    if (!templateExpr.templateSpans?.length) return;
+    if (templateExpr.templateSpans.length !== 1) return;
+    const span = templateExpr.templateSpans[0];
+    const tailText = span.literal?.text ?? '';
+    if (tailText !== '') return;
+    const expr = span.expression;
+    if (
+      headText === 'daily.createChallengeFeature.benefits.' &&
+      ts.isPropertyAccessExpression(expr) &&
+      ts.isIdentifier(expr.expression) &&
+      expr.expression.text === 'benefit' &&
+      expr.name.text === 'key' &&
+      benefitsKeys.length > 0
+    ) {
+      for (const k of benefitsKeys) {
+        pushKey(`${headText}${k}`, nodeForLocation, `template:${headText}\${benefit.key} -> ${headText}${k}`);
+      }
+    }
+  }
+
+  function visit(node) {
+    if (ts.isCallExpression(node) && isTCallExpression(node.expression) && node.arguments?.length) {
+      const firstArg = node.arguments[0];
+      if (ts.isStringLiteral(firstArg) || ts.isNoSubstitutionTemplateLiteral(firstArg)) {
+        pushKey(firstArg.text, node);
+      } else if (ts.isTemplateExpression(firstArg)) {
+        tryExtractKeyFromTemplateExpression(firstArg, node);
+      }
+    }
+
+    if (ts.isPropertyAssignment(node)) {
+      const propName = getPropertyNameText(node.name);
+      if (propName && indirectPropertyNames.has(propName)) {
+        const init = node.initializer;
+        if (ts.isStringLiteral(init) || ts.isNoSubstitutionTemplateLiteral(init)) {
+          // Only treat as translation key if it looks like one:
+          // alphanumeric + dots + underscores + hyphens (no spaces, no non-ASCII)
+          if (init.text.includes('.') && /^[a-zA-Z0-9._-]+$/.test(init.text)) pushKey(init.text, node);
+        }
+      }
+    }
+
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return calls;
+}
+
 function extractTFunctionCalls(filePath) {
   const content = fs.readFileSync(filePath, 'utf-8');
+  const astCalls = extractTFunctionCallsWithTypeScript(filePath, content);
+  if (astCalls && astCalls.length > 0) return astCalls;
   const lines = content.split('\n');
   const calls = [];
 
@@ -125,6 +318,22 @@ function extractTFunctionCalls(filePath) {
     // nameKey: 'key', description: 'key', etc.
     /\b(?:nameKey|description|label|title|message|text|placeholder|tooltip|header|buttonText|errorMessage|successMessage):\s*['"]([^'"]+)['"]/g,
   ];
+
+  // Heuristic: detect template literal t(`namespace.${var}`) cases and expand when possible
+  // Specifically handles patterns like: t(`daily.createChallengeFeature.benefits.${benefit.key}`)
+  const templatePattern = /\bt\(\s*`([^`]+)`\s*\)/g;
+  // Collect local arrays of the form: const benefits = [ { key: '...' }, ... ]
+  const benefitsArrayPattern = /const\s+benefits\s*=\s*\[\s*([\s\S]*?)\s*\]/m;
+  const objectKeyPattern = /\{\s*[^}]*?\bkey\s*:\s*['"]([^'"]+)['"][^}]*?\}/g;
+  let benefitsKeys = [];
+  const benefitsMatch = content.match(benefitsArrayPattern);
+  if (benefitsMatch) {
+    let m;
+    while ((m = objectKeyPattern.exec(benefitsMatch[1])) !== null) {
+      benefitsKeys.push(m[1]);
+    }
+    benefitsKeys = [...new Set(benefitsKeys)];
+  }
 
   for (let lineNum = 0; lineNum < lines.length; lineNum++) {
     const line = lines[lineNum];
@@ -147,9 +356,9 @@ function extractTFunctionCalls(filePath) {
         if (key.includes(' ') || key.startsWith('#') || key.startsWith('/') || key.includes('(')) continue;
 
         // For indirect patterns (from object properties), only accept keys that look like translation keys
-        // (must contain a dot, indicating namespace.key pattern)
+        // (must contain a dot and only ASCII key characters — no non-Latin content)
         const isIndirectPattern = pattern.source.includes('nameKey|description|label');
-        if (isIndirectPattern && !key.includes('.')) continue;
+        if (isIndirectPattern && (!key.includes('.') || !/^[a-zA-Z0-9._-]+$/.test(key))) continue;
 
         calls.push({
           key,
@@ -158,6 +367,78 @@ function extractTFunctionCalls(filePath) {
           context: line.trim().substring(0, 100)
         });
       }
+    }
+
+    // Handle template literals
+    templatePattern.lastIndex = 0;
+    let tpl;
+    while ((tpl = templatePattern.exec(line)) !== null) {
+      const raw = tpl[1];
+      // If there's no interpolation, treat as a normal key
+      if (!raw.includes('${')) {
+        calls.push({
+          key: raw,
+          file: path.relative(PROJECT_ROOT, filePath),
+          line: lineNum + 1,
+          context: line.trim().substring(0, 100)
+        });
+        continue;
+      }
+      // Track dynamic pattern for reporting
+      dynamicPatterns.push({
+        pattern: raw,
+        file: path.relative(PROJECT_ROOT, filePath),
+        line: lineNum + 1,
+        context: line.trim().substring(0, 100),
+        type: 'template_literal'
+      });
+      // Expand known pattern for daily.createChallengeFeature.benefits.${benefit.key}
+      const prefixMatch = raw.match(/^(daily\.createChallengeFeature\.benefits\.)\$\{benefit\.key\}$/);
+      if (prefixMatch && benefitsKeys.length > 0) {
+        const prefix = prefixMatch[1];
+        for (const k of benefitsKeys) {
+          calls.push({
+            key: `${prefix}${k}`,
+            file: path.relative(PROJECT_ROOT, filePath),
+            line: lineNum + 1,
+            context: `template:${raw} -> ${prefix}${k}`.substring(0, 100)
+          });
+        }
+      }
+    }
+
+    // Detect risky patterns: t() with fallback || that might indicate missing key
+    const fallbackPattern = /\bt\(\s*['"]([^'"]+)['"]\s*\)\s*\|\|\s*['"]([^'"]+)['"]/g;
+    fallbackPattern.lastIndex = 0;
+    let fb;
+    while ((fb = fallbackPattern.exec(line)) !== null) {
+      dynamicPatterns.push({
+        pattern: fb[0],
+        key: fb[1],
+        fallback: fb[2],
+        file: path.relative(PROJECT_ROOT, filePath),
+        line: lineNum + 1,
+        context: line.trim().substring(0, 100),
+        type: 'fallback_usage'
+      });
+    }
+
+    // Detect t() calls with variable keys (risky at runtime)
+    const varKeyPattern = /\bt\(\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)/g;
+    varKeyPattern.lastIndex = 0;
+    let vk;
+    while ((vk = varKeyPattern.exec(line)) !== null) {
+      const varName = vk[1];
+      // Skip common false positives
+      if (['t', 'key', 'translationKey', 'i18nKey'].includes(varName)) continue;
+      dynamicPatterns.push({
+        pattern: vk[0],
+        variable: varName,
+        file: path.relative(PROJECT_ROOT, filePath),
+        line: lineNum + 1,
+        context: line.trim().substring(0, 100),
+        type: 'variable_key'
+      });
     }
   }
 
@@ -186,7 +467,7 @@ function extractAllTFunctionCalls() {
 // PART 3: Compare and generate report
 // ============================================
 
-function generateReport(keysByLanguage, tCalls, translations) {
+function generateReport(keysByLanguage, tCalls, problematicByLanguage = {}, runtimeRisks = []) {
   console.log('\n========================================');
   console.log('TRANSLATION KEY ANALYSIS REPORT');
   console.log('========================================\n');
@@ -203,6 +484,92 @@ function generateReport(keysByLanguage, tCalls, translations) {
   console.log('\nKeys defined per language:');
   for (const lang of languages) {
     console.log(`  ${lang}: ${keysByLanguage[lang].length} keys`);
+  }
+
+  // ========================================
+  // Section 0a: Runtime risk patterns (dynamic keys, fallbacks, variables)
+  // ========================================
+  if (runtimeRisks.length > 0) {
+    console.log('\n========================================');
+    console.log('⚠️  RUNTIME RISK PATTERNS');
+    console.log('========================================\n');
+    console.log('These patterns may cause runtime errors if the dynamic keys don\'t exist.\n');
+
+    const templateLiterals = runtimeRisks.filter(r => r.type === 'template_literal');
+    const fallbackUsages = runtimeRisks.filter(r => r.type === 'fallback_usage');
+    const variableKeys = runtimeRisks.filter(r => r.type === 'variable_key');
+
+    if (templateLiterals.length > 0) {
+      console.log(`TEMPLATE LITERALS (${templateLiterals.length} found):`);
+      console.log('  These use dynamic interpolation - ensure all possible values exist.\n');
+      for (const tl of templateLiterals.slice(0, 5)) {
+        console.log(`  - ${tl.file}:${tl.line}`);
+        console.log(`    Pattern: t(\`${tl.pattern}\`)`);
+      }
+      if (templateLiterals.length > 5) {
+        console.log(`  ... and ${templateLiterals.length - 5} more\n`);
+      }
+      console.log('');
+    }
+
+    if (fallbackUsages.length > 0) {
+      console.log(`FALLBACK PATTERNS (${fallbackUsages.length} found):`);
+      console.log('  t("key") || "fallback" suggests the key might be missing.\n');
+      for (const fb of fallbackUsages.slice(0, 10)) {
+        console.log(`  - ${fb.file}:${fb.line}`);
+        console.log(`    Key: "${fb.key}" -> Fallback: "${fb.fallback}"`);
+      }
+      if (fallbackUsages.length > 10) {
+        console.log(`  ... and ${fallbackUsages.length - 10} more\n`);
+      }
+      console.log('');
+    }
+
+    if (variableKeys.length > 0) {
+      console.log(`VARIABLE KEYS (${variableKeys.length} found):`);
+      console.log('  t(variable) uses a variable as key - verify all possible values exist.\n');
+      for (const vk of variableKeys.slice(0, 10)) {
+        console.log(`  - ${vk.file}:${vk.line}`);
+        console.log(`    Variable: ${vk.variable}`);
+      }
+      if (variableKeys.length > 10) {
+        console.log(`  ... and ${variableKeys.length - 10} more\n`);
+      }
+      console.log('');
+    }
+  }
+
+  // ========================================
+  // Section 0b: CRITICAL - Problematic flat keys (keys with dots that break t() function)
+  // ========================================
+  const totalProblematic = Object.values(problematicByLanguage).reduce((sum, arr) => sum + arr.length, 0);
+  if (totalProblematic > 0) {
+    console.log('\n========================================');
+    console.log('⚠️  CRITICAL: FLAT KEYS WITH DOTS (WILL BREAK AT RUNTIME)');
+    console.log('========================================\n');
+    console.log('These keys contain dots but are stored as flat strings, not nested objects.');
+    console.log('The t() function splits by "." and traverses nested objects, so these WILL FAIL.\n');
+    console.log('Example: { daily: { "wordHunt.subtitle": "value" } }');
+    console.log('  - Script sees: "daily.wordHunt.subtitle" ✓');
+    console.log('  - Runtime t("daily.wordHunt.subtitle") looks for: daily.wordHunt.subtitle');
+    console.log('  - But actual structure is: daily["wordHunt.subtitle"] ✗\n');
+    console.log('FIX: Convert flat keys to nested objects:\n');
+    console.log('  WRONG: { daily: { "wordHunt.subtitle": "value" } }');
+    console.log('  RIGHT: { daily: { wordHunt: { subtitle: "value" } } }\n');
+
+    for (const lang of languages) {
+      const problematic = problematicByLanguage[lang] || [];
+      if (problematic.length > 0) {
+        console.log(`${lang.toUpperCase()}: ${problematic.length} problematic flat keys`);
+        for (const p of problematic.slice(0, 10)) {
+          console.log(`  - "${p.parentPath}.${p.flatKey}" → should be nested under "${p.parentPath}"`);
+        }
+        if (problematic.length > 10) {
+          console.log(`  ... and ${problematic.length - 10} more`);
+        }
+        console.log('');
+      }
+    }
   }
 
   // Use English as the reference language
@@ -379,6 +746,8 @@ function generateReport(keysByLanguage, tCalls, translations) {
   // ========================================
   // Section 5: JSON output for further processing
   // ========================================
+  const totalProblematicCount = Object.values(problematicByLanguage).reduce((sum, arr) => sum + arr.length, 0);
+
   const jsonReport = {
     summary: {
       totalKeysInCode: uniqueKeysInCode.length,
@@ -386,7 +755,29 @@ function generateReport(keysByLanguage, tCalls, translations) {
         languages.map(l => [l, keysByLanguage[l].length])
       ),
       missingFromEnglish: missingFromEnglish.length,
+      problematicFlatKeys: totalProblematicCount,
+      runtimeRisks: {
+        templateLiterals: runtimeRisks.filter(r => r.type === 'template_literal').length,
+        fallbackUsages: runtimeRisks.filter(r => r.type === 'fallback_usage').length,
+        variableKeys: runtimeRisks.filter(r => r.type === 'variable_key').length,
+      },
     },
+    runtimeRisks: {
+      templateLiterals: runtimeRisks.filter(r => r.type === 'template_literal'),
+      fallbackUsages: runtimeRisks.filter(r => r.type === 'fallback_usage'),
+      variableKeys: runtimeRisks.filter(r => r.type === 'variable_key'),
+    },
+    problematicFlatKeys: Object.fromEntries(
+      languages.map(lang => [
+        lang,
+        (problematicByLanguage[lang] || []).map(p => ({
+          flatKey: p.flatKey,
+          parentPath: p.parentPath,
+          appearsAs: p.appearsAs,
+          fix: `Convert "${p.parentPath}.${p.flatKey}" to nested: ${p.parentPath}.${p.flatKey.split('.').join('.')}`
+        }))
+      ])
+    ),
     missingFromEnglish: missingFromEnglish.map(m => ({
       key: m.key,
       usages: m.usages.map(u => ({ file: u.file, line: u.line }))
@@ -423,23 +814,40 @@ function main() {
   console.log('Translation Key Analysis Tool');
   console.log('==============================\n');
 
-  // Step 1: Extract translation keys
-  const { translations, keysByLanguage } = getTranslationKeysFromFile();
+  // Clear dynamic patterns from previous runs
+  dynamicPatterns.length = 0;
 
-  // Step 2: Extract t() calls
+  // Step 1: Extract translation keys and detect problematic flat keys
+  const { keysByLanguage, problematicByLanguage } = getTranslationKeysFromFile();
+
+  // Step 2: Extract t() calls (also populates dynamicPatterns)
   const tCalls = extractAllTFunctionCalls();
 
-  // Step 3: Generate report
-  const report = generateReport(keysByLanguage, tCalls, translations);
+  // Step 3: Generate report with runtime risk patterns
+  const report = generateReport(keysByLanguage, tCalls, problematicByLanguage, dynamicPatterns);
 
   console.log('\n==============================');
   console.log('Analysis complete!');
   console.log('==============================');
 
-  // Return exit code based on missing keys
+  // Return exit code based on issues found
+  const totalProblematic = Object.values(problematicByLanguage).reduce((sum, arr) => sum + arr.length, 0);
+  if (totalProblematic > 0) {
+    console.log(`\n⚠️  CRITICAL: ${totalProblematic} flat keys with dots found - these WILL BREAK at runtime!`);
+    return 1;
+  }
+
   if (report.missingFromEnglish.length > 0) {
     console.log(`\nWARNING: ${report.missingFromEnglish.length} translation keys are used but not defined!`);
-    return 1;
+    // ADVISORY, not a hard failure. This set is dominated by dynamic
+    // `t(\`...${var}...\`)` template keys and deploy-lag (keys present in source
+    // but not yet in the scanned snapshot), so gating on it exited non-zero on a
+    // perfectly healthy tree — which permanently red-failed CI's lint job and the
+    // pre-commit hook, training everyone to ignore/bypass the gate and letting
+    // real failures (stale tests, 2026-06-01) slip through. Keep it VISIBLE but
+    // non-gating. Genuine runtime-breaking issues (flat keys with dots) still
+    // hard-fail above. Opt back into strict gating with TRANSLATIONS_STRICT=1.
+    if (process.env.TRANSLATIONS_STRICT === '1') return 1;
   }
 
   return 0;

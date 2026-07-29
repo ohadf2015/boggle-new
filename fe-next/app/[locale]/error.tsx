@@ -4,20 +4,37 @@ import { useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import { captureError } from '@/utils/sentry';
 import { translations } from '../../translations';
-import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 
 function isChunkLoadError(error: Error): boolean {
   const message = error.message?.toLowerCase() || '';
   const name = error.name?.toLowerCase() || '';
+
+  // Check for explicit chunk load error name
+  if (name === 'chunkloaderror') return true;
+
+  // Check for "module is not defined" - CommonJS/ESM bundling issue
+  // This happens when Turbopack fails to transpile a CommonJS module for browser
+  // Fixes JAVASCRIPT-NEXTJS-9S: ReferenceError: module is not defined
+  if (name === 'referenceerror' && message.includes('module is not defined')) {
+    return true;
+  }
+
+  // Check for specific chunk-related error messages
+  // Note: 'failed to fetch' alone is too broad - only match if it's clearly a chunk/module error
   return (
-    name === 'chunkloaderror' ||
     message.includes('loading chunk') ||
     message.includes('failed to load chunk') ||
     message.includes('loading css chunk') ||
     message.includes('dynamically imported module') ||
     message.includes('_next/static/chunks') ||
     message.includes('module 964893') || // Specific error from report
-    message.includes('failed to fetch')
+    // Only match 'failed to fetch' if it's in context of module/chunk loading
+    (message.includes('failed to fetch') && (
+      message.includes('module') ||
+      message.includes('chunk') ||
+      message.includes('_next/') ||
+      message.includes('dynamically imported')
+    ))
   );
 }
 
@@ -76,15 +93,22 @@ export default function Error({
       sessionStorage.removeItem('chunk_error_refresh');
     }
 
-    console.error('Page error:', error);
+    // Log error with message for better debugging (Error objects serialize to {} in console)
+    console.error('Page error:', error.name, error.message);
     captureError(error, {
       errorBoundary: {
         type: 'page-error',
         digest: error.digest,
         isChunkError: isChunkLoadError(error),
+        // Tag the locale + route so cross-[locale] navigation failures (the
+        // language-switch "black screen" class) are diagnosable. This effect
+        // only runs because the fallback below is dependency-free and always
+        // renders — a heavy fallback that crashed here would also lose telemetry.
+        locale,
+        path: typeof window !== 'undefined' ? window.location.pathname : undefined,
       },
     });
-  }, [error]);
+  }, [error, locale]);
 
   const handleRefresh = () => {
     // For chunk errors, clear caches before reloading
@@ -98,20 +122,22 @@ export default function Error({
   const isChunkError = isChunkLoadError(error);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 py-8">
+    <div className="flex-1 flex items-center justify-center bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 py-8">
       <div className="neo-card max-w-lg w-full p-8 text-center animate-neo-pop rotate-[-1deg] bg-neo-cream border-4 border-neo-black shadow-hard-xl">
-        {/* Interactive Mascot - shows different moods based on error type */}
-        <div className="mb-6">
-          <InteractiveMascot
-            variant={isChunkError ? 'thinking' : 'oops'}
-            size="lg"
-            enableHover
-            enableClick
-            hoverVariant="encouraging"
-            clickVariant={isChunkError ? 'excited' : 'happy'}
-            clickAnimation={isChunkError ? 'spin' : 'shake'}
-            tooltip={isChunkError ? t('errors.refreshPage') : t('common.retry')}
-          />
+        {/*
+          Static, dependency-free icon. This is an error boundary fallback — it
+          renders precisely when chunks are broken (e.g. a stale-deploy
+          ChunkLoadError surfaced by a cross-[locale] language switch). It must
+          NOT pull a heavy/lazy chunk (the old animated mascot dragged in a
+          motion lib, next/image, video and the mascot data module): if that
+          chunk were also stale the fallback would throw, React cannot re-catch a
+          throw inside a boundary's own fallback, the tree unmounts → blank navy
+          "black screen". A plain emoji always renders.
+        */}
+        <div className="mb-6 flex justify-center" aria-hidden="true">
+          <span className="text-7xl leading-none animate-neo-pop select-none">
+            {isChunkError ? '✨' : '😵‍💫'}
+          </span>
         </div>
 
         <h2 className="text-3xl font-black text-neo-black mb-3 uppercase tracking-wide font-neo-display">

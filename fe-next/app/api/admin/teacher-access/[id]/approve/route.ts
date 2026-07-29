@@ -1,0 +1,43 @@
+import { NextResponse } from 'next/server';
+import { createClient } from '@/utils/supabase/server';
+import { sendEmail } from '@/lib/email/send';
+import { teacherAccessConfirmation } from '@/lib/email/templates/teacherAccessConfirmation';
+
+export async function POST(_req: Request, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
+  const sb = await createClient();
+
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) return NextResponse.json({ ok: false }, { status: 401 });
+  const { data: profile } = await sb.from('profiles').select('id, is_admin').eq('id', user.id).single();
+  if (!profile?.is_admin) return NextResponse.json({ ok: false }, { status: 403 });
+
+  const { data: row, error: fetchErr } = await sb.from('teacher_access_requests').select('*').eq('id', id).single();
+  if (fetchErr || !row) return NextResponse.json({ ok: false, error: 'not found' }, { status: 404 });
+
+  const upd = await sb.from('teacher_access_requests').update({
+    status: 'approved',
+    reviewed_at: new Date().toISOString(),
+    reviewed_by: user.id,
+  }).eq('id', id);
+  if (upd.error) return NextResponse.json({ ok: false, error: upd.error.message }, { status: 500 });
+
+  if (row.user_id) {
+    const r = await sb.from('profiles').update({ user_role: 'teacher' }).eq('id', row.user_id);
+    if (r.error) return NextResponse.json({ ok: false, error: r.error.message }, { status: 500 });
+  } else {
+    const r = await sb.from('teacher_access_allowlist').insert({
+      email: row.email,
+      approved_by: user.id,
+      source_request_id: row.id,
+    });
+    if (r.error && !r.error.message.includes('duplicate')) {
+      return NextResponse.json({ ok: false, error: r.error.message }, { status: 500 });
+    }
+  }
+
+  const tpl = teacherAccessConfirmation({ full_name: row.full_name, locale: row.locale });
+  await sendEmail({ to: row.email, subject: tpl.subject, html: tpl.html });
+
+  return NextResponse.json({ ok: true });
+}

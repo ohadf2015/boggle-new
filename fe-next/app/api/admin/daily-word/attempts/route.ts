@@ -1,31 +1,24 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { getSupabaseAdmin } from '@/lib/admin/server';
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * GET /api/admin/daily-word/attempts
  * Get all attempts for a specific daily puzzle (for admin management)
  * Query params: puzzleDate (YYYY-MM-DD), language
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Check if user is authenticated and is admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
-    // Check if user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
     const { searchParams } = new URL(request.url);
@@ -75,7 +68,8 @@ export async function GET(request: Request) {
     const { data: attempts, error, count } = await query.range(offset, offset + limit - 1);
 
     if (error) {
-      console.error('Fetch attempts error:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('Fetch attempts error:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to fetch attempts' },
         { status: 500 }
@@ -91,9 +85,15 @@ export async function GET(request: Request) {
       language,
     });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('Get attempts error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/attempts',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

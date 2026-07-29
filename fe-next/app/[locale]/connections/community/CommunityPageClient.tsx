@@ -1,0 +1,29 @@
+'use client';
+
+import React, { Suspense } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { PageLoader } from '@/components/ui/PageLoader';
+import ConnectionsCommunity from '@/components/connections/ConnectionsCommunity';
+
+interface Props {
+  locale: string;
+}
+
+function LoadingFallback(): React.JSX.Element {
+  const { t } = useLanguage();
+  return (
+    <div className="flex-1 flex items-center justify-center">
+      <PageLoader size="lg" text={t('connections.loading')} />
+    </div>
+  );
+}
+
+export default function CommunityPageClient(_props: Props): React.JSX.Element {
+  return (
+    <div data-testid="connections-community-root" className="flex-1 flex flex-col min-h-0 bg-neo-navy text-neo-white">
+      <Suspense fallback={<LoadingFallback />}>
+        <ConnectionsCommunity />
+      </Suspense>
+    </div>
+  );
+}

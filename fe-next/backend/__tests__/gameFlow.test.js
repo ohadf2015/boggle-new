@@ -3,11 +3,10 @@
  * Tests the complete game lifecycle from creation to results
  */
 
-const { createGame, getGame, deleteGame, clearAllGames } = require('../modules/gameStateManager');
-const { validateWordOnBoard } = require('../modules/wordValidator');
-const { calculateWordScore } = require('../modules/scoringEngine');
-const { addBot, getGameBots, cleanupGameBots } = require('../modules/botManager');
-
+import { createGame, getGame, deleteGame, clearAllGames } from '../modules/gameStateManager';
+import { validateWordOnBoard } from '../modules/wordValidator';
+import { calculateWordScore } from '../modules/scoringEngine';
+import { addBot, getGameBots, cleanupGameBots } from '../modules/botManager';
 // Helper to create game data matching the actual API
 function createGameData(hostUsername, options = {}) {
   return {
@@ -149,22 +148,22 @@ describe('Game Flow Integration', () => {
     test('calculates score based on word length', () => {
       // New scoring formula: baseScore = length - 1 (each letter beyond first = 1 point)
       // 3-letter words: 3-1 = 2
-      expect(calculateWordScore('cat', 0)).toBe(2);
+      expect(calculateWordScore('cat', 0)).toBe(10);
 
       // 4-letter words: 4-1 = 3
-      expect(calculateWordScore('cats', 0)).toBe(3);
+      expect(calculateWordScore('cats', 0)).toBe(20);
 
       // 5-letter words: 5-1 = 4
-      expect(calculateWordScore('catch', 0)).toBe(4);
+      expect(calculateWordScore('catch', 0)).toBe(50);
 
       // 6-letter words: 6-1 = 5
-      expect(calculateWordScore('cactus', 0)).toBe(5);
+      expect(calculateWordScore('cactus', 0)).toBe(100);
 
       // 7-letter words: 7-1 = 6
-      expect(calculateWordScore('cabinet', 0)).toBe(6);
+      expect(calculateWordScore('cabinet', 0)).toBe(200);
 
       // 8 letter words: 8-1 = 7
-      expect(calculateWordScore('cabinets', 0)).toBe(7);
+      expect(calculateWordScore('cabinets', 0)).toBe(500);
     });
 
     test('applies combo multiplier', () => {

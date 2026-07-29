@@ -11,10 +11,10 @@
 
 import type { Server, Socket } from 'socket.io';
 
-const { registerGameLifecycleHandlers } = require('./gameLifecycleHandler');
-const { registerPlayerJoinHandlers } = require('./playerJoinHandler');
-const { registerRoomManagementHandlers } = require('./roomManagementHandler');
-const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
+import { registerGameLifecycleHandlers } from './gameLifecycleHandler.js';
+import { registerPlayerJoinHandlers } from './playerJoinHandler.js';
+import { registerRoomManagementHandlers } from './roomManagementHandler.js';
+import { MAX_PLAYERS_PER_ROOM } from '../utils/consts.js';
 
 /**
  * Register all game-related socket event handlers
@@ -31,7 +31,5 @@ function registerGameHandlers(io: Server, socket: Socket): void {
   // Register room management handlers
   registerRoomManagementHandlers(io, socket);
 }
-
-module.exports = { registerGameHandlers, MAX_PLAYERS_PER_ROOM };
 
 export { registerGameHandlers, MAX_PLAYERS_PER_ROOM };

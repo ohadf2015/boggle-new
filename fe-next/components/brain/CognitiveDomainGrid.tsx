@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Zap, Brain, Target, Shuffle, BookOpen, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -147,7 +147,7 @@ export default function CognitiveDomainGrid({
                 }}
               >
                 <TooltipTrigger asChild>
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
@@ -177,7 +177,7 @@ export default function CognitiveDomainGrid({
                       </div>
                       <p className={cn(
                         'text-[11px] font-bold uppercase tracking-wide line-clamp-1 flex-1',
-                        isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                        isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
                       )}>
                         {t(`brain.domains.${domainKey}`)}
                       </p>
@@ -200,7 +200,7 @@ export default function CognitiveDomainGrid({
                       </span>
                       <span className={cn(
                         'text-[10px] font-bold',
-                        isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                        isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
                       )}>
                         /100
                       </span>
@@ -209,16 +209,16 @@ export default function CognitiveDomainGrid({
                     {/* Mini Progress Bar */}
                     <div className={cn(
                       'h-1 mt-1.5 rounded-full border border-neo-black overflow-hidden',
-                      isDarkMode ? 'bg-slate-700' : 'bg-white'
+                      isDarkMode ? 'bg-neo-navy-elevated' : 'bg-white'
                     )}>
-                      <motion.div
+                      <m.div
                         className={cn('h-full', config.progressBar)}
                         initial={{ width: 0 }}
                         animate={{ width: `${domainData.score}%` }}
                         transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
                       />
                     </div>
-                  </motion.div>
+                  </m.div>
                 </TooltipTrigger>
                 <TooltipContent side="top" className="max-w-[280px]">
                   <div className="space-y-2">

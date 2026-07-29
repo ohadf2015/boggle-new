@@ -1,462 +1,285 @@
 'use client';
 
-import React, { useEffect, useState, lazy, Suspense, memo } from 'react';
-import Link from 'next/link';
+import { useEffect, useState, useCallback } from 'react';
+import { Capacitor } from '@capacitor/core';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import toast from 'react-hot-toast';
-import { motion } from 'framer-motion';
-import { User, Users, Bot, Trophy, LayoutGrid, Crown, GraduationCap, Brain, Sparkles, Star, Zap, Target } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useMusic } from '@/contexts/MusicContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { useMobileLandscape } from '@/hooks/useMobileLandscape';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import { useMobilePortrait } from '@/hooks/useMobilePortrait';
 import { cn } from '@/lib/utils';
 import { useLiveRoomStats } from '@/hooks/useLiveRoomStats';
-import { usePullToRefresh } from '@/hooks/usePullToRefresh';
-import { useMouseParallax } from '@/hooks/useTiltEffect';
-import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
-import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
-import { InteractiveMascotWithEntrance } from '@/components/ui/InteractiveMascot';
-import ModeCard from './ModeCard';
-import TutorialPrompt from './TutorialPrompt';
-import Header from '@/components/Header';
-import { hasCompletedOnboarding, markOnboardingSkipped } from '@/utils/onboardingStorage';
-import AuthModal from '@/components/auth/AuthModal';
-
-/**
- * Interactive Mascot component for the hero section
- * Responds to hover and click with mood changes
- * Uses responsive sizing - smaller on mobile for better proportions
- */
-const HeroMascot = memo(function HeroMascot() {
-  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
-
-  return (
-    <div className="relative mx-auto mb-1">
-      {/* Interactive Mascot - happy by default, excited on hover, celebrating on click */}
-      {/* Responsive: sm (64px) on mobile, md (96px) on tablet, lg (128px) on desktop */}
-      <div className="block sm:hidden">
-        <InteractiveMascotWithEntrance
-          variant="happy"
-          size="sm"
-          enableHover
-          enableClick
-          hoverVariant="excited"
-          clickVariant="celebrating"
-          clickAnimation="bounce"
-          priority
-          delay={0.1}
-        />
-      </div>
-      <div className="hidden sm:block lg:hidden">
-        <InteractiveMascotWithEntrance
-          variant="happy"
-          size="md"
-          enableHover
-          enableClick
-          hoverVariant="excited"
-          clickVariant="celebrating"
-          clickAnimation="bounce"
-          priority
-          delay={0.1}
-        />
-      </div>
-      <div className="hidden lg:block">
-        <InteractiveMascotWithEntrance
-          variant="happy"
-          size="lg"
-          enableHover
-          enableClick
-          hoverVariant="excited"
-          clickVariant="celebrating"
-          clickAnimation="bounce"
-          priority
-          delay={0.1}
-        />
-      </div>
-
-      {/* Sparkle accents around mascot - lime family unified */}
-      {enableComplexAnimations && !prefersReducedMotion && (
-        <>
-          <motion.div
-            className="absolute -top-2 -right-2 text-neo-lime"
-            animate={{ scale: [0, 1, 0], rotate: [0, 180, 360] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 0 }}
-          >
-            <Sparkles className="w-5 h-5" />
-          </motion.div>
-          <motion.div
-            className="absolute top-1/2 -left-4 text-neo-lime-light"
-            animate={{ scale: [0, 1, 0], rotate: [0, -180, -360] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-          >
-            <Star className="w-4 h-4 fill-current" />
-          </motion.div>
-          <motion.div
-            className="absolute -bottom-1 right-1/4 text-neo-lime-muted"
-            animate={{ scale: [0, 1, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}
-          >
-            <Zap className="w-4 h-4 fill-current" />
-          </motion.div>
-        </>
-      )}
-    </div>
-  );
+import { usePlayerStats } from '@/hooks/usePlayerStats';
+import { useDailyChallengeStatus } from '@/hooks/useDailyChallengeStatus';
+import { useTopPlayers } from '@/hooks/useTopPlayers';
+import { useLandingStats } from '@/hooks/useLandingStats';
+import { InlineBannerAd } from '@/components/ads';
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+import { hasCompletedOnboarding, hasSupabaseSession, markOnboardingComplete } from '@/utils/onboardingStorage';
+import { LandingSEOSection, ScrollIndicator } from './LandingSEOSection';
+import { LandingBlogSection } from './LandingBlogSection';
+import { LandingHero } from './LandingHero';
+import { LandingHeroVariant } from './LandingHeroVariant';
+import { LandingCardsSkeleton } from './LandingCardsSkeleton';
+// SSR enabled: receives initialData (gamesToday) at server time → no skeleton flash above the fold.
+const LandingSocialProofBar = dynamic(() => import('./LandingSocialProofBar').then(m => m.LandingSocialProofBar), {
+  loading: () => <div className="h-10 w-full max-w-4xl mx-auto" />,
 });
-
-// Lazy load DailyChallengeBanner - not critical for initial paint
-const DailyChallengeBanner = lazy(() => import('@/components/daily/DailyChallengeBanner'));
-
-// Dynamic import for OnboardingModal (not needed on initial page load)
-const OnboardingModal = dynamic(() => import('@/components/OnboardingModal'), {
+const LandingAvatarTeaser = dynamic(() => import('./LandingAvatarTeaser').then(m => m.LandingAvatarTeaser), {
   ssr: false,
+  loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
 });
+import { LandingChallengeCards } from './LandingChallengeCards';
+import { LandingLeaderboardPreview } from './LandingLeaderboardPreview';
+import { LandingSeasonHero } from './LandingSeasonHero';
+import { LandingBottomCTA } from './LandingBottomCTA';
 
-// Note: ProfileCustomizationModal is now handled globally in ProfileCustomizationWrapper
-// (see app/components/ProfileCustomizationWrapper.tsx)
+// Below-the-fold sections — lazy load to speed up initial render
+// LiveActivityTicker moved out to reduce landing clutter
+// Engagement widgets — only high-value conditional ones on landing
+const LandingYourRank = dynamic(() => import('./LandingYourRank').then(m => m.LandingYourRank), {
+  ssr: false,
+  loading: () => <div className="h-48 w-full rounded-neo bg-neo-navy-light/50 animate-pulse" />,
+});
+// LeaguePositionBadge, WotdTeaser, WordPact, FriendsActivity moved to dedicated pages
+import Header from '@/components/Header';
+import { getPerfVariant } from '@/utils/perfVariant';
+import { useEvents } from '@/hooks/useEvents';
+import { useExperiment } from '@/hooks/useExperiment';
+import type { LandingInitialData } from '@/lib/landing/fetchLandingData';
 
-/**
- * LandingView - Main landing page with game mode selection
- * Two prominent cards: Single Player and Multiplayer
- */
-const LandingView: React.FC = () => {
+const EventBanner = dynamic(() => import('@/components/events/EventBanner'), { ssr: false });
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
+const ShareReferralModal = dynamic(
+  () => import('./ShareReferralModal').then((m) => m.ShareReferralModal),
+  { ssr: false }
+);
+const PlayfulBackground = dynamic(
+  () => import('@/components/ui/PlayfulBackground').then((m) => m.PlayfulBackground),
+  { ssr: false }
+);
+
+interface LandingViewProps {
+  /** Pre-fetched server data — eliminates client-side waterfall fetches */
+  initialData?: LandingInitialData;
+  /** New users: callback to launch OnboardingFlow when they click play */
+  onStartOnboarding?: () => void;
+}
+
+const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboarding }) => {
   const { t, language } = useLanguage();
   const router = useRouter();
   const { playTrack, TRACKS } = useMusic();
-  const { isAuthenticated } = useAuth();
-  const isLandscape = useMobileLandscape();
+  const { isAuthenticated, isAdmin, profile, loading: authLoading } = useAuth();
   const isMobilePortrait = useMobilePortrait();
+  // The in-content InlineBannerAd below is a WEB monetization slot. On native it
+  // would register a banner-coordinator 'slot' (priority > the bottom anchor),
+  // hijacking the single native banner to this mid-page DOM position — so on a
+  // landscape phone the banner floats into the middle of the home page instead
+  // of sticking to the bottom. Gate the whole web-ad block off on native; the
+  // global AnchoredNativeBanner keeps the banner pinned to the bottom there.
+  // Mounted flag (not a bare Capacitor call) keeps SSR/hydration consistent.
+  const [isNativeApp, setIsNativeApp] = useState(false);
+  useEffect(() => { setIsNativeApp(Capacitor.isNativePlatform()); }, []);
+
+  // Auth-flicker gate: if a Supabase token exists in localStorage we KNOW the user
+  // will resolve to authed. Render skeleton until profile lands instead of paint-
+  // ing the guest-default card set and overwriting it on hydration. Guests with
+  // no token sync straight from localStorage and hit the real cards on paint #1.
+  const [hadSession] = useState(() => typeof window !== 'undefined' && hasSupabaseSession());
+  const cardsReady = !hadSession || (!authLoading && !!profile);
+
+  // Below-fold content is already code-split via dynamic() imports,
+  // so no need for a separate hydration gate that causes CLS.
+
   const liveRoomStats = useLiveRoomStats();
-
-  // Mouse-based parallax for hero section
-  const mouseParallax = useMouseParallax(15);
-
-  // Pull-to-refresh for room stats
-  const { pullToRefreshHandlers, pullState } = usePullToRefresh({
-    onRefresh: async () => {
-      liveRoomStats.refresh();
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      toast.success(t('common.refreshed') || 'Refreshed', {
-        duration: 2000,
-      });
-    },
-    threshold: 60,
+  const { allTimeBest: playerAllTimeBest } = usePlayerStats();
+  const dailyChallengeStatus = useDailyChallengeStatus(language as 'en' | 'he' | 'sv' | 'ja' | 'es');
+  const { activeEvents, myEvents, joinEvent: joinEventAction } = useEvents();
+  const { players: topPlayers, loading: topPlayersLoading } = useTopPlayers(5, {
+    initialData: initialData?.topPlayers,
   });
+  const { activePlayers, gamesToday, gameModes, languages: langCount } = useLandingStats({
+    initialGamesToday: initialData?.gamesToday,
+  });
+  const [dismissedEventIds, setDismissedEventIds] = useState<Set<string>>(new Set());
+  const visibleEvent = activeEvents.find((e) => !dismissedEventIds.has(e.id));
+  const handleDismissEvent = useCallback(() => {
+    if (visibleEvent) setDismissedEventIds((prev) => new Set([...prev, visibleEvent.id]));
+  }, [visibleEvent]);
 
-  // Tutorial prompt state (non-intrusive banner for first-time visitors)
-  const [showTutorialPrompt, setShowTutorialPrompt] = useState(false);
+  // Landing hero A/B test — variant adds subtitle + CTA + live count
+  const { variant: heroVariant, trackExposure: trackHeroExposure } =
+    useExperiment('landing-variant-homepage-v1');
+  useEffect(() => {
+    trackHeroExposure();
+  }, [trackHeroExposure]);
 
-  // Onboarding modal state (opened when user clicks to start tutorial)
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  // Auth modal state (opened when user clicks locked feature)
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const { isOnCrazyGamesPlatform, isLoading: cgLoading } = useCrazyGames();
+  // Treat "still resolving" as embedded — prevents the auth modal
+  // signup CTA from flashing on first paint while the CG SDK confirms env.
+  const hideExternalAuth = cgLoading || isOnCrazyGamesPlatform;
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [, setIsAvatarBuilderOpen] = useState(false);
 
-  // Note: Profile customization is now handled globally in ProfileCustomizationWrapper
+  // Mark returning players (cleared localStorage) as onboarded
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (hasCompletedOnboarding()) return;
+    if (isAuthenticated && profile?.total_games && profile.total_games > 0) {
+      markOnboardingComplete({
+        avatarId: profile.avatar_image || 'default',
+        displayName: profile.display_name || profile.username || 'Player',
+        selectedMode: null,
+      });
+    }
+  }, [isAuthenticated, profile]);
 
   // Check for room parameter and redirect to multiplayer page
-  // This handles shared links (WhatsApp, barcode scan, copy link)
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const urlParams = new URLSearchParams(window.location.search);
     const roomCode = urlParams.get('room');
     if (roomCode) {
-      // Redirect to multiplayer page with all query params preserved (room, utm_source, etc.)
       router.replace(`/${language}/multiplayer${window.location.search}`);
     }
   }, [language, router]);
 
-  // Show tutorial prompt for first-time visitors (non-intrusive approach)
+  const [enableHeavyBackground, setEnableHeavyBackground] = useState(false);
+  useEffect(() => { setEnableHeavyBackground(getPerfVariant() === 'control'); }, []);
+
+  // Queue ambient music on mount. If audio is locked, MusicContext queues the
+  // track in pendingUnlockTrackRef and plays it when its own document-level
+  // auto-unlock listener fires on the first gesture. Single code path — no
+  // duplicate playback.
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Only show if not completed and no room redirect in progress
-    const urlParams = new URLSearchParams(window.location.search);
-    const hasRoom = urlParams.get('room');
-
-    // Skip tutorial prompt if user is authenticated or already completed onboarding
-    if (hasRoom || isAuthenticated || hasCompletedOnboarding()) {
-      return;
-    }
-
-    // Show prompt after a brief delay (lets the page settle)
-    const timer = setTimeout(() => {
-      setShowTutorialPrompt(true);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [isAuthenticated]);
-
-  // Handle tutorial prompt actions
-  const handleStartTutorial = () => {
-    setShowTutorialPrompt(false);
-    setShowOnboarding(true);
-  };
-
-  const handleDismissTutorialPrompt = () => {
-    setShowTutorialPrompt(false);
-    markOnboardingSkipped(); // Mark as skipped so prompt won't show again
-  };
-
-  // Re-open tutorial (for the "Tutorial" button)
-  const handleOpenTutorial = () => {
-    setShowOnboarding(true);
-  };
-
-  // Play lobby music on landing page (same as multiplayer lobby)
-  // Note: We always call playTrack even if audio isn't unlocked yet
-  // The MusicContext will queue the request and play when user interacts
-  useEffect(() => {
-    playTrack(TRACKS.LOBBY);
+    playTrack(TRACKS.BOSSA);
   }, [playTrack, TRACKS]);
+
+  const dailyChallengeStats = {
+    hasPlayed: dailyChallengeStatus.hasPlayed,
+    hasSolved: dailyChallengeStatus.hasSolved,
+    currentStreak: dailyChallengeStatus.currentStreak,
+    puzzleNumber: dailyChallengeStatus.puzzleNumber,
+    loading: dailyChallengeStatus.loading,
+  };
+
+  // FTUE is triggered by LandingView via onStartOnboarding prop for new users
+
 
   return (
     <div
       className={cn(
-        'flex flex-col bg-gray-100 dark:bg-neo-navy relative overflow-hidden page-content-safe',
-        isLandscape && 'landscape-full-height',
-        isMobilePortrait && 'h-[100dvh] max-h-[100dvh]',
-        !isLandscape && !isMobilePortrait && 'h-full'
+        'flex flex-col bg-neo-navy relative page-content-safe',
       )}
-      {...pullToRefreshHandlers}
     >
-      {/* Playful background with parallax and floating elements - hidden on mobile portrait for performance */}
-      {!isLandscape && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
+      {enableHeavyBackground && !isMobilePortrait && <PlayfulBackground intensity="high" colorScheme="default" />}
 
-      {/* Pull-to-refresh indicator */}
-      <PullToRefreshIndicator
-        pullDistance={pullState.pullDistance}
-        isRefreshing={pullState.isRefreshing}
-        threshold={60}
-      />
-
-      {/* Onboarding Modal */}
-      <OnboardingModal isOpen={showOnboarding} onClose={() => setShowOnboarding(false)} />
-
-      {/* Auth Modal - for locked features */}
-      <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />
-
-      {/* Note: ProfileCustomizationModal is now rendered globally by ProfileCustomizationWrapper */}
-
-      {/* Header - compact in landscape via CSS */}
+      {!hideExternalAuth && <AuthModal isOpen={showAuthModal} onClose={() => setShowAuthModal(false)} />}
+      <ShareReferralModal isOpen={showShareModal} onClose={() => setShowShareModal(false)} />
       <Header />
 
-      {/* Main content */}
-      <main className={cn(
-        'w-full max-w-7xl mx-auto overflow-x-hidden relative z-20 flex-1 flex flex-col',
-        (isLandscape || isMobilePortrait) && 'justify-center px-2 sm:px-4 py-2',
-        !isLandscape && !isMobilePortrait && 'justify-center px-2 sm:px-3 lg:px-6 xl:px-8 py-2 sm:py-3 lg:py-4'
-      )}>
-        {/* Hero section with mascot - hidden on mobile portrait and landscape */}
-        {!isLandscape && !isMobilePortrait && (
-          <motion.div
-            className="text-center mb-2 sm:mb-3 lg:mb-4 animate-fade-in-fast relative z-10"
-            style={{
-              transform: `translate(${mouseParallax.x * 1.2}px, ${mouseParallax.y * 1.2}px)`,
-            }}
-          >
-            {/* Mascot - smaller on desktop */}
-            <HeroMascot />
+      {visibleEvent && (
+        <div className="w-full max-w-7xl mx-auto px-2 sm:px-3 lg:px-6 xl:px-8 pt-2">
+          <EventBanner
+            event={visibleEvent}
+            onJoin={(id) => joinEventAction(id)}
+            onDismiss={handleDismissEvent}
+            hasJoined={myEvents.some((e) => e.id === visibleEvent.id)}
+          />
+        </div>
+      )}
 
-            <motion.h1
-              className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black uppercase tracking-tight text-neo-black dark:text-neo-white mb-1 sm:mb-1.5 lg:mb-2"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              {t('landing.chooseMode') || 'Choose Your Mode'}
-            </motion.h1>
-            <motion.p
-              className="text-sm sm:text-base lg:text-lg xl:text-xl font-medium text-neo-black/80 dark:text-neo-white/85"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              {t('landing.subtitleSimple') || 'Practice solo or challenge friends'}
-            </motion.p>
-          </motion.div>
-        )}
-
-        {/* Tutorial Prompt - Non-intrusive banner for first-time visitors (hidden in landscape and mobile portrait) */}
-        {!isLandscape && !isMobilePortrait && (
-          <TutorialPrompt
-            isVisible={showTutorialPrompt}
-            onStartTutorial={handleStartTutorial}
-            onDismiss={handleDismissTutorialPrompt}
+      {/* Main content — padding uses CSS breakpoints to avoid JS-driven CLS */}
+      <section className="w-full max-w-7xl mx-auto overflow-x-clip relative z-20 flex flex-col gap-6 sm:gap-8 px-2 py-1.5 sm:px-3 sm:py-5 md:px-4 md:py-6 lg:px-6 lg:py-8 xl:px-8">
+        {/* Hero: Mascot + Title + CTA + Leaderboard (desktop) */}
+        {heroVariant === 'variant' ? (
+          <LandingHeroVariant
+            players={topPlayers}
+            playersLoading={topPlayersLoading}
+            isMobilePortrait={isMobilePortrait}
+            activePlayers={activePlayers}
+          />
+        ) : (
+          <LandingHero
+            players={topPlayers}
+            playersLoading={topPlayersLoading}
+            isMobilePortrait={isMobilePortrait}
           />
         )}
 
-        {/* Daily Challenge Banner - Lazy loaded with skeleton fallback */}
-        <div className={cn(
-          'w-full',
-          (isLandscape || isMobilePortrait) ? 'mb-2' : 'mb-2 sm:mb-3 lg:mb-4 xl:mb-6'
-        )}>
-          <Suspense fallback={
-            <div className="w-full p-2 sm:p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime animate-pulse">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-neo bg-neo-black/20" />
-                <div className="flex-1 space-y-2">
-                  <div className="h-5 w-32 bg-neo-black/20 rounded" />
-                  <div className="h-3 w-20 bg-neo-black/10 rounded" />
-                </div>
-              </div>
-            </div>
-          }>
-            <DailyChallengeBanner
-              compact={isLandscape || isMobilePortrait}
-              mascot={isMobilePortrait ? (
-                <InteractiveMascotWithEntrance
-                  variant="happy"
-                  size="xs"
-                  enableClick
-                  clickVariant="celebrating"
-                  clickAnimation="bounce"
-                />
-              ) : undefined}
-            />
-          </Suspense>
-        </div>
+        {/* Social Proof Bar — compact stats, immediately below hero */}
+        <LandingSocialProofBar
+          activePlayers={activePlayers}
+          gamesToday={gamesToday}
+          gameModes={gameModes}
+          languages={langCount}
+        />
 
-        {/* Mode cards - horizontal in landscape/mobile portrait, centered grid on desktop */}
-        {/* Using CSS animation for instant paint without JS overhead */}
-        {(isLandscape || isMobilePortrait) ? (
-          /* Landscape/Mobile Portrait: Horizontal layout */
-          <div className="w-full animate-fade-in-fast flex gap-2 sm:gap-3 flex-1 min-h-0">
-            {/* Multiplayer Card - Compact */}
-            <Link
-              href={`/${language}/multiplayer`}
-              className={cn(
-                'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
-                'bg-gradient-to-br from-neo-pink to-pink-400',
-                'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
-                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
-                'transition-all min-h-[100px] sm:min-h-[120px]',
-                isMobilePortrait && 'max-h-[30dvh]',
-                isLandscape && 'max-h-[70dvh]',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
-              )}
-              aria-label={`${t('landing.multiplayer') || 'Multiplayer'} - ${t('landing.multiplayerDesc') || 'Compete with friends'}`}
-            >
-              <Users className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-              <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.multiplayer') || 'Multiplayer'}</span>
-              {!isMobilePortrait && (
-                <div className="flex gap-2 text-xs" aria-hidden="true">
-                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><LayoutGrid className="inline w-3 h-3 mr-1" />Rooms</span>
-                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Crown className="inline w-3 h-3 mr-1" />Host</span>
-                </div>
-              )}
-            </Link>
+        {/* Season Hero — prominent themed art + countdown + leaderboard CTA */}
+        <LandingSeasonHero />
 
-            {/* Single Player Card - Compact */}
-            <Link
-              href={`/${language}/singleplayer`}
-              className={cn(
-                'flex-1 flex flex-col items-center justify-center gap-1 sm:gap-2 p-2 sm:p-4',
-                'bg-gradient-to-br from-neo-cyan to-cyan-400',
-                'border-3 sm:border-4 border-neo-black rounded-neo shadow-hard',
-                'hover:shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px]',
-                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-sm',
-                'transition-all min-h-[100px] sm:min-h-[120px]',
-                isMobilePortrait && 'max-h-[30dvh]',
-                isLandscape && 'max-h-[70dvh]',
-                'focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy'
-              )}
-              aria-label={`${t('landing.singlePlayer') || 'Single Player'} - ${t('landing.singlePlayerDesc') || 'Practice at your own pace'}`}
-            >
-              <User className="w-8 h-8 sm:w-10 sm:h-10 text-neo-black" aria-hidden="true" />
-              <span className="text-sm sm:text-lg font-black uppercase text-neo-black text-center">{t('landing.singlePlayer') || 'Single Player'}</span>
-              {!isMobilePortrait && (
-                <div className="flex gap-2 text-xs" aria-hidden="true">
-                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Bot className="inline w-3 h-3 mr-1" />Bots</span>
-                  <span className="bg-neo-black/20 px-2 py-1 rounded-neo font-bold"><Trophy className="inline w-3 h-3 mr-1" />Challenges</span>
-                </div>
-              )}
-            </Link>
-          </div>
+
+        {/* ===== GAME MODES — THE PRIMARY CONTENT ===== */}
+        {cardsReady ? (
+          <LandingChallengeCards
+            language={language}
+            isAdmin={isAdmin}
+            hasBlastAccess={true}
+            activePlayers={liveRoomStats.activePlayers}
+            openRooms={liveRoomStats.openRooms}
+            totalPlayers={liveRoomStats.totalPlayers}
+            playerAllTimeBest={playerAllTimeBest}
+            t={t}
+            dailyChallengeStats={dailyChallengeStats}
+            cardOrder={initialData?.cardOrder}
+          />
         ) : (
-          /* Desktop: Centered grid layout */
-          <div className="w-full animate-fade-in-fast flex flex-col items-center gap-4 sm:gap-5 lg:gap-6">
-            {/* Primary cards - 2 columns, centered */}
-            <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 lg:gap-6">
-              <ModeCard
-                title={t('landing.multiplayer') || 'Multiplayer'}
-                description={t('landing.multiplayerDesc') || 'Compete with friends in real-time!'}
-                href={`/${language}/multiplayer`}
-                icon={<Users className="w-6 h-6" />}
-                variant="pink"
-                liveBadge={{
-                  openRooms: liveRoomStats.openRooms,
-                  totalPlayers: liveRoomStats.totalPlayers,
-                  roomsLabel: t('landing.openRooms') || 'open rooms',
-                  playersLabel: t('landing.playersLive') || 'playing now',
-                }}
-              />
-              <ModeCard
-                title={t('landing.singlePlayer') || 'Single Player'}
-                description={t('landing.singlePlayerDesc') || 'Practice at your own pace or challenge yourself!'}
-                href={`/${language}/singleplayer`}
-                icon={<User className="w-6 h-6" />}
-                variant="cyan"
-              />
-            </div>
-
-            {/* Secondary cards - 2 columns, centered, smaller */}
-            <div className="w-full max-w-3xl grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-              <ModeCard
-                title={t('landing.brainTraining') || 'Brain Training'}
-                description={t('landing.brainTrainingDesc') || 'Track cognitive growth'}
-                href={`/${language}/brain`}
-                icon={<Brain className="w-5 h-5" />}
-                variant="purple"
-                secondary
-              />
-              <ModeCard
-                title={t('landing.brainDrills') || 'Quick Drills'}
-                description={t('landing.brainDrillsDesc') || 'Focused mini-games'}
-                href={`/${language}/brain#drills`}
-                icon={<Target className="w-5 h-5" />}
-                variant="orange"
-                secondary
-                locked={!isAuthenticated}
-                lockedMessage={t('landing.signInToUnlock') || 'Sign in to unlock'}
-                onLockedClick={() => setShowAuthModal(true)}
-              />
-            </div>
-          </div>
+          <LandingCardsSkeleton isAdmin={isAdmin} />
         )}
 
-      </main>
+        {/* Leaderboard — mobile only via CSS (no JS-driven mount/unmount → no CLS) */}
+        <div className="md:hidden w-full max-w-4xl mx-auto">
+          <LandingLeaderboardPreview players={topPlayers} loading={topPlayersLoading} compact />
+        </div>
 
-      {/* Tutorial FAB - Fixed bottom corner button */}
-      {/* Z-index 45 on mobile, higher on desktop to clear any overlapping elements */}
-      {/* Position uses max() to ensure button clears safe area on devices with home indicators */}
-      <button
-        onClick={handleOpenTutorial}
-        className="
-          fixed bottom-[max(env(safe-area-inset-bottom,0px),1rem)] right-4 z-[45] lg:bottom-8 lg:right-8 lg:z-[100]
-          flex items-center justify-center gap-2
-          min-w-[48px] min-h-[48px]
-          px-4 py-3
-          bg-neo-purple text-neo-white
-          font-bold text-sm
-          border-3 border-neo-black
-          rounded-neo shadow-hard-lg
-          hover:scale-105 hover:shadow-hard-xl
-          active:scale-95 active:shadow-hard
-          transition-all duration-150
-          rtl:right-auto rtl:left-4
-          animate-fade-in-up
-        "
-        aria-label={t('landing.tutorial') || 'Tutorial'}
-      >
-        <GraduationCap className="w-5 h-5" />
-        <span className="hidden sm:inline">{t('landing.tutorial') || 'Tutorial'}</span>
-      </button>
+        {/* Below-fold sections — rank + avatar only. Community/Share moved off landing. */}
+        <div className="flex flex-col gap-6 sm:gap-8">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-6 w-full max-w-4xl mx-auto xl:max-w-5xl">
+            <div className="lg:flex-1">
+              <LandingYourRank />
+            </div>
+            <div className="lg:flex-1">
+              <LandingAvatarTeaser onBuilderOpenChange={setIsAvatarBuilderOpen} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <ScrollIndicator />
+
+      {!isMobilePortrait && !isNativeApp && (
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <InlineBannerAd webZone="menu" className="my-4" />
+          {/* B2 — CrazyGames home banner */}
+          <CrazyGamesBanner size="728x90" className="my-4" />
+        </div>
+      )}
+
+      {onStartOnboarding && (
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-8">
+          <LandingBottomCTA onPlayClick={onStartOnboarding} />
+        </div>
+      )}
+
+      <LandingSEOSection />
+
+      <div className="w-full px-4 sm:px-6 lg:px-8 pb-12 sm:pb-16 relative z-20">
+        <LandingBlogSection />
+      </div>
     </div>
   );
 };

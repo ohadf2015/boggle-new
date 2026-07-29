@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Trophy, Flame, X, TrendingUp, Clock } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import { Trophy, Flame, X, TrendingUp, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { BrainTier } from '@/shared/types/cognitive';
+import { SilentVideo } from '@/components/ui/SilentVideo';
 
 interface WelcomeBackCardProps {
   /** Days since last activity */
@@ -123,33 +124,32 @@ export default function WelcomeBackCard({
   return (
     <AnimatePresence>
       {!isDismissed && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -20, scale: 0.95 }}
           className={cn(
             'rounded-neo border-3 border-neo-black shadow-hard overflow-hidden',
             isDarkMode
-              ? 'bg-gradient-to-br from-neo-purple/20 to-neo-cyan/20'
-              : 'bg-gradient-to-br from-purple-100 to-cyan-100'
+              ? 'bg-linear-to-br from-neo-purple/20 to-neo-cyan/20'
+              : 'bg-linear-to-br from-purple-100 to-cyan-100'
           )}
         >
           {/* Decorative top bar */}
-          <div className="h-1.5 bg-gradient-to-r from-neo-purple via-neo-cyan to-neo-lime" />
+          <div className="h-1.5 bg-linear-to-r from-neo-purple via-neo-cyan to-neo-lime" />
 
           <div className="p-4">
             {/* Header with dismiss button */}
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-center gap-2">
-                <motion.div
-                  animate={{ rotate: [0, 10, -10, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
-                  <Sparkles className={cn(
-                    'w-6 h-6',
-                    isDarkMode ? 'text-neo-lime' : 'text-neo-purple'
-                  )} />
-                </motion.div>
+                <SilentVideo
+                  src="/mascot/encouraging.webp"
+                  width={40}
+                  height={40}
+                  className="drop-shadow-[2px_2px_0px_rgba(0,0,0,1)]"
+                  preload="metadata"
+                  aria-hidden="true"
+                />
                 <h3 className={cn(
                   'text-lg font-black uppercase',
                   isDarkMode ? 'text-neo-white' : 'text-neo-black'
@@ -159,10 +159,11 @@ export default function WelcomeBackCard({
               </div>
               <button
                 onClick={handleDismiss}
+                aria-label={t('common.close')}
                 className={cn(
                   'p-1.5 rounded-neo border-2 border-neo-black',
                   'transition-all hover:bg-neo-red/20',
-                  isDarkMode ? 'bg-slate-700' : 'bg-white'
+                  isDarkMode ? 'bg-neo-navy-elevated' : 'bg-white'
                 )}
               >
                 <X className="w-4 h-4" />
@@ -172,7 +173,7 @@ export default function WelcomeBackCard({
             {/* Welcome message */}
             <p className={cn(
               'text-sm mb-4',
-              isDarkMode ? 'text-neo-white/80' : 'text-neo-black/80'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/80'
             )}>
               {getWelcomeMessage()}
             </p>
@@ -182,11 +183,11 @@ export default function WelcomeBackCard({
               {/* Current Score */}
               <div className={cn(
                 'p-2 rounded-neo border-2 border-neo-black text-center',
-                isDarkMode ? 'bg-slate-700/50' : 'bg-white'
+                isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-white'
               )}>
                 <p className={cn(
                   'text-[10px] font-bold uppercase mb-0.5',
-                  isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                  isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
                 )}>
                   {t('brain.welcomeBack.currentScore')}
                 </p>
@@ -208,7 +209,7 @@ export default function WelcomeBackCard({
                     <Trophy className="w-3 h-3 text-neo-lime" />
                     <p className={cn(
                       'text-[10px] font-bold uppercase',
-                      isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                      isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
                     )}>
                       {t('brain.welcomeBack.personalBest')}
                     </p>
@@ -224,7 +225,7 @@ export default function WelcomeBackCard({
               {/* Longest Streak */}
               <div className={cn(
                 'p-2 rounded-neo border-2 border-neo-black text-center',
-                isDarkMode ? 'bg-slate-700/50' : 'bg-white'
+                isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-white'
               )}>
                 <div className="flex items-center justify-center gap-1 mb-0.5">
                   <Flame className={cn(
@@ -233,7 +234,7 @@ export default function WelcomeBackCard({
                   )} />
                   <p className={cn(
                     'text-[10px] font-bold uppercase',
-                    isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                    isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
                   )}>
                     {t('brain.welcomeBack.bestStreak')}
                   </p>
@@ -250,7 +251,7 @@ export default function WelcomeBackCard({
             {/* Motivational message */}
             <div className={cn(
               'flex items-center gap-2 p-3 rounded-neo border-2 border-neo-black',
-              'bg-gradient-to-r from-neo-green/20 to-neo-cyan/20'
+              'bg-linear-to-r from-neo-green/20 to-neo-cyan/20'
             )}>
               <TrendingUp className="w-5 h-5 text-neo-green shrink-0" />
               <p className={cn(
@@ -265,17 +266,17 @@ export default function WelcomeBackCard({
             <div className="flex items-center justify-center gap-1.5 mt-3">
               <Clock className={cn(
                 'w-3 h-3',
-                isDarkMode ? 'text-neo-white/40' : 'text-neo-black/40'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/40'
               )} />
               <p className={cn(
                 'text-[10px]',
-                isDarkMode ? 'text-neo-white/40' : 'text-neo-black/40'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/40'
               )}>
                 {t('brain.welcomeBack.daysAway', { days: daysSinceLastActivity })}
               </p>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -1,10 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Gift, Users, Copy, Check, Share2, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { useTheme } from '@/utils/ThemeContext';
 import { cn } from '@/lib/utils';
+import { Loader } from '@/components/ui/Loader';
 
 // Brand icon SVG components
 const WhatsAppIcon = ({ className }: { className?: string }) => (
@@ -22,6 +23,8 @@ const TelegramIcon = ({ className }: { className?: string }) => (
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { trackShare } from '@/utils/growthTracking';
+import Avatar from '@/components/Avatar';
+import type { CustomAvatarConfig } from '@/shared/types/customAvatar';
 
 interface ReferralData {
   referralCode: string;
@@ -34,6 +37,7 @@ interface ReferralData {
     display_name: string;
     avatar_emoji: string;
     avatar_color: string;
+    avatar_config?: CustomAvatarConfig | null;
     created_at: string;
     referred_games_played: number;
     reward_granted: boolean;
@@ -68,8 +72,10 @@ export function ReferralCard() {
         throw new Error(result.error || 'Unknown error');
       }
     } catch (err) {
-      console.error('Error fetching referral data:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load referral data');
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = err instanceof Error ? err.message : String(err);
+      console.error('Error fetching referral data:', errorMessage);
+      setError(errorMessage || 'Failed to load referral data');
     } finally {
       setLoading(false);
     }
@@ -89,6 +95,7 @@ export function ReferralCard() {
       trackShare('copy');
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
+      if (err instanceof DOMException && err.name === 'NotAllowedError') return;
       console.error('Failed to copy:', err);
     }
   }, [referralData]);
@@ -130,11 +137,11 @@ export function ReferralCard() {
   if (loading) {
     return (
       <div className={cn(
-        'rounded-2xl p-6 mb-4',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        'rounded-3xl p-6 mb-4',
+        'bg-neo-navy-light border border-neo-pink/20 rounded-neo-xl'
       )}>
         <div className="flex items-center justify-center py-6">
-          <div className="w-6 h-6 border-3 border-neo-pink border-t-transparent rounded-full animate-spin" />
+          <Loader size="md" />
         </div>
       </div>
     );
@@ -143,8 +150,8 @@ export function ReferralCard() {
   if (error || !referralData) {
     return (
       <div className={cn(
-        'rounded-2xl p-6 mb-4',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        'rounded-3xl p-6 mb-4',
+        'bg-neo-navy-light border border-neo-pink/20 rounded-neo-xl'
       )}>
         <p className="text-center text-red-500 text-sm">{error || 'Failed to load referral data'}</p>
       </div>
@@ -152,12 +159,12 @@ export function ReferralCard() {
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'rounded-2xl p-4 sm:p-6 mb-4',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        'p-4 sm:p-6 mb-4',
+        'bg-neo-navy-light border border-neo-pink/20 rounded-neo-xl'
       )}
     >
       {/* Header */}
@@ -173,13 +180,13 @@ export function ReferralCard() {
             'font-bold text-base',
             isDarkMode ? 'text-white' : 'text-gray-900'
           )}>
-            {t('profile.referralReward') || 'Invite Friends'}
+            {t('profile.referralReward')}
           </h3>
           <p className={cn(
             'text-xs',
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
-            {t('profile.referralDescription') || 'Earn XP when friends join!'}
+            {t('profile.referralDescription')}
           </p>
         </div>
         {/* Stats Summary */}
@@ -192,7 +199,7 @@ export function ReferralCard() {
               {referralData.referralCount}
             </div>
             <div className={cn('text-[10px]', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
-              {t('profile.referralsCount') || 'Friends'}
+              {t('profile.referralsCount')}
             </div>
           </div>
           <div className="text-center">
@@ -209,7 +216,7 @@ export function ReferralCard() {
       {/* Referral Code + Copy */}
       <div className={cn(
         'rounded-xl p-3 mb-4',
-        isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+        isDarkMode ? 'bg-neo-navy/50' : 'bg-gray-50'
       )}>
         <div className="flex items-center gap-2">
           <div className="flex-1">
@@ -217,9 +224,9 @@ export function ReferralCard() {
               'text-[10px] font-medium uppercase tracking-wide mb-1',
               isDarkMode ? 'text-gray-500' : 'text-gray-500'
             )}>
-              {t('profile.yourReferralCode') || 'Your Code'}
+              {t('profile.yourReferralCode')}
             </div>
-            <code className="text-xl font-black text-neo-pink tracking-wider">
+            <code className="text-xl font-black text-neo-lime bg-neo-lime/10 px-3 py-1 rounded-lg tracking-wider">
               {referralData.referralCode}
             </code>
           </div>
@@ -231,12 +238,12 @@ export function ReferralCard() {
               copied
                 ? 'bg-green-500 hover:bg-green-500 text-white'
                 : isDarkMode
-                  ? 'bg-slate-700 hover:bg-slate-600 text-white'
+                  ? 'bg-neo-navy-elevated hover:bg-slate-600 text-white'
                   : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
             )}
           >
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-            <span className="ms-1.5 text-xs">{copied ? t('common.copied') || 'Copied!' : t('common.copy') || 'Copy'}</span>
+            <span className="ms-1.5 text-xs">{copied ? t('common.copied') : t('common.copy')}</span>
           </Button>
         </div>
       </div>
@@ -254,7 +261,7 @@ export function ReferralCard() {
         <Button
           onClick={() => handleShare('telegram')}
           size="sm"
-          className="flex-1 h-10 bg-[#0088cc] hover:bg-[#0077b5] text-white rounded-xl font-bold"
+          className="flex-1 h-10 bg-brand-telegram hover:bg-brand-telegram-hover text-white rounded-xl font-bold"
         >
           <TelegramIcon className="w-4 h-4 me-1.5" />
           <span className="hidden sm:inline">Telegram</span>
@@ -270,7 +277,7 @@ export function ReferralCard() {
           )}
         >
           <Share2 className="w-4 h-4 me-1.5" />
-          <span className="hidden sm:inline">{t('common.share') || 'Share'}</span>
+          <span className="hidden sm:inline">{t('common.share')}</span>
         </Button>
       </div>
 
@@ -280,17 +287,17 @@ export function ReferralCard() {
         className={cn(
           'w-full flex items-center justify-between p-2 rounded-lg text-xs font-medium transition-colors',
           isDarkMode
-            ? 'text-gray-400 hover:bg-slate-700/50'
+            ? 'text-gray-400 hover:bg-neo-navy-elevated/50'
             : 'text-gray-500 hover:bg-gray-100'
         )}
       >
-        <span>💎 {t('profile.referralRewards') || 'View Rewards'}</span>
+        <span>💎 {t('profile.referralRewards')}</span>
         {showRewards ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
       </button>
 
       <AnimatePresence>
         {showRewards && (
-          <motion.div
+          <m.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -299,7 +306,7 @@ export function ReferralCard() {
           >
             <div className={cn(
               'grid grid-cols-2 gap-2 mt-2 p-3 rounded-lg text-xs',
-              isDarkMode ? 'bg-slate-900/30' : 'bg-gray-50'
+              isDarkMode ? 'bg-neo-navy/30' : 'bg-gray-50'
             )}>
               <div className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
                 🎯 Friend joins: <span className="font-bold text-neo-pink">+100 XP</span>
@@ -314,7 +321,7 @@ export function ReferralCard() {
                 ⭐ 10 games: <span className="font-bold text-neo-pink">+200 XP</span>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
@@ -328,7 +335,7 @@ export function ReferralCard() {
             'text-xs font-medium mb-2',
             isDarkMode ? 'text-gray-400' : 'text-gray-600'
           )}>
-            👥 {t('profile.yourReferrals') || 'Your Referrals'} ({referralData.referrals.length})
+            👥 {t('profile.yourReferrals')} ({referralData.referrals.length})
           </div>
           <div className="flex flex-wrap gap-1.5">
             {referralData.referrals.slice(0, 6).map((referral) => (
@@ -336,16 +343,11 @@ export function ReferralCard() {
                 key={referral.id}
                 className={cn(
                   'flex items-center gap-1.5 px-2 py-1 rounded-lg text-xs',
-                  isDarkMode ? 'bg-slate-700/50' : 'bg-gray-100'
+                  isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-100'
                 )}
                 title={`${referral.display_name || referral.username} - ${referral.referred_games_played} games`}
               >
-                <div
-                  className="w-5 h-5 rounded-full flex items-center justify-center text-[10px]"
-                  style={{ backgroundColor: referral.avatar_color || '#FFE135' }}
-                >
-                  {referral.avatar_emoji || '🎯'}
-                </div>
+                <Avatar customAvatar={referral.avatar_config} userId={referral.id} size="sm" />
                 <span className={cn(
                   'font-medium truncate max-w-[60px]',
                   isDarkMode ? 'text-gray-300' : 'text-gray-700'
@@ -360,7 +362,7 @@ export function ReferralCard() {
             {referralData.referrals.length > 6 && (
               <div className={cn(
                 'px-2 py-1 rounded-lg text-xs font-medium',
-                isDarkMode ? 'bg-slate-700/50 text-gray-400' : 'bg-gray-100 text-gray-500'
+                isDarkMode ? 'bg-neo-navy-elevated/50 text-gray-400' : 'bg-gray-100 text-gray-500'
               )}>
                 +{referralData.referrals.length - 6}
               </div>
@@ -377,11 +379,11 @@ export function ReferralCard() {
         )}>
           <p className={cn('text-xs', isDarkMode ? 'text-gray-500' : 'text-gray-500')}>
             <Users className="w-4 h-4 inline-block me-1 opacity-50" />
-            {t('profile.noReferralsYet') || 'No referrals yet. Share your code!'}
+            {t('profile.noReferralsYet')}
           </p>
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 }
 

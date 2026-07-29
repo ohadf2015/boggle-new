@@ -1,0 +1,275 @@
+{
+  "locale": "he",
+  "levels": [
+    {
+      "id": "he-chain-01",
+      "levelNumber": 1,
+      "theme": "onboarding",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["חתול", "שמש", "ביצה"]
+    },
+    {
+      "id": "he-chain-02",
+      "levelNumber": 2,
+      "theme": "fruits",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["תפוח", "ענב", "אגס"]
+    },
+    {
+      "id": "he-chain-03",
+      "levelNumber": 3,
+      "theme": "animals",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["כלב", "פרה", "סוס"]
+    },
+    {
+      "id": "he-chain-04",
+      "levelNumber": 4,
+      "theme": "food",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["לחמ", "אורז", "עוגה"]
+    },
+    {
+      "id": "he-chain-05",
+      "levelNumber": 5,
+      "theme": "colors",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["אדומ", "כחול", "ירוק"]
+    },
+    {
+      "id": "he-chain-06",
+      "levelNumber": 6,
+      "theme": "ocean",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["דג", "סרטנ", "כריש", "צדפה", "ספינה"]
+    },
+    {
+      "id": "he-chain-07",
+      "levelNumber": 7,
+      "theme": "space",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["ירח", "כוכב", "שמש", "מאדימ", "מטאור"]
+    },
+    {
+      "id": "he-chain-08",
+      "levelNumber": 8,
+      "theme": "animals",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["זאב", "דוב", "נמר", "אריה", "תנינ"]
+    },
+    {
+      "id": "he-chain-09",
+      "levelNumber": 9,
+      "theme": "fruits",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["תפוז", "בננה", "מנגו", "לימונ", "אבטיח"]
+    },
+    {
+      "id": "he-chain-10",
+      "levelNumber": 10,
+      "theme": "weather",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["גשמ", "עננ", "שלג", "סופה", "ברק"]
+    },
+    {
+      "id": "he-chain-11",
+      "levelNumber": 11,
+      "theme": "animals",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["סוסה", "זברה", "פנדה", "קואלה", "נמיה", "צבוע"]
+    },
+    {
+      "id": "he-chain-12",
+      "levelNumber": 12,
+      "theme": "food",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["גבינה", "פסטה", "סלט", "דבש", "פלפל", "מרק"]
+    },
+    {
+      "id": "he-chain-13",
+      "levelNumber": 13,
+      "theme": "nature",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["נהר", "חופ", "מערה", "אגמ", "יער", "שדה"]
+    },
+    {
+      "id": "he-chain-14",
+      "levelNumber": 14,
+      "theme": "space",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["כוכב", "שביט", "מטאור", "רקטה", "מסלול", "נבולה"]
+    },
+    {
+      "id": "he-chain-15",
+      "levelNumber": 15,
+      "theme": "animals",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["קרנפ", "נמר", "פיל", "צבי", "יענ", "חזיר"]
+    },
+    {
+      "id": "he-chain-16",
+      "levelNumber": 16,
+      "theme": "ocean",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["דג", "גל", "צדפ", "שונית", "כריש", "צלילה", "מדוזה"]
+    },
+    {
+      "id": "he-chain-17",
+      "levelNumber": 17,
+      "theme": "nature",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["עצ", "עלה", "סלע", "נהר", "אגמ", "מערה", "גשר"]
+    },
+    {
+      "id": "he-chain-18",
+      "levelNumber": 18,
+      "theme": "weather",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["גשמ", "רוח", "שלג", "עננ", "ברד", "סופה", "ברק"]
+    },
+    {
+      "id": "he-chain-19",
+      "levelNumber": 19,
+      "theme": "fruits",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["תפוז", "ענב", "אגס", "מנגו", "בננה", "אפרסק", "דובדבנ"]
+    },
+    {
+      "id": "he-chain-20",
+      "levelNumber": 20,
+      "theme": "food",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["אורז", "סלט", "פסטה", "עוגה", "לחמ", "גבינה", "פיתה"]
+    },
+    {
+      "id": "he-chain-21",
+      "levelNumber": 21,
+      "theme": "animals",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["דוב", "זאב", "פיל", "נמר", "סוס", "אריה", "קרנפ", "תוכי"]
+    },
+    {
+      "id": "he-chain-22",
+      "levelNumber": 22,
+      "theme": "home",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["דלת", "חדר", "כסא", "מיטה", "שולח", "ארונ", "מטבח", "מנורה"]
+    },
+    {
+      "id": "he-chain-23",
+      "levelNumber": 23,
+      "theme": "school",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["ספר", "עט", "כיתה", "מורה", "תיק", "לוח", "תלמיד", "שיעור"]
+    },
+    {
+      "id": "he-chain-24",
+      "levelNumber": 24,
+      "theme": "space",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["כוכב", "ירח", "שמש", "רקטה", "מאדימ", "שביט", "מסלול", "נבולה"]
+    },
+    {
+      "id": "he-chain-25",
+      "levelNumber": 25,
+      "theme": "transport",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["מכונית", "אופניימ", "רכבת", "מטוס", "סירה", "אוטובוס", "אוניה", "אופנוע"]
+    },
+    {
+      "id": "he-chain-26",
+      "levelNumber": 26,
+      "theme": "fruits",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["תפוח", "ענב", "אגס", "מנגו", "תפוז", "לימונ", "בננה", "אננס", "דובדבנ"]
+    },
+    {
+      "id": "he-chain-27",
+      "levelNumber": 27,
+      "theme": "ocean",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["דג", "גל", "סרטנ", "צדפ", "כריש", "לוויתנ", "תמנונ", "אלמוג", "מדוזה"]
+    },
+    {
+      "id": "he-chain-28",
+      "levelNumber": 28,
+      "theme": "mythology",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["ענק", "פרא", "שד", "ננס", "פיה", "טרול", "דרקונ", "קוסמ", "מכשפה"]
+    },
+    {
+      "id": "he-chain-29",
+      "levelNumber": 29,
+      "theme": "music",
+      "locale": "he",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": ["תופ", "שיר", "להקה", "חליל", "כינור", "גיטרה", "פסנתר", "תזמורת", "מנגינה"]
+    },
+    {
+      "id": "he-chain-30",
+      "levelNumber": 30,
+      "theme": "science",
+      "locale": "he",
+      "columns": 7,
+      "decoyTiles": 0,
+      "chain": ["אטומ", "תא", "עצמ", "מוח", "דמ", "גנ", "אנרגיה", "כבידה", "מולקולה"]
+    }
+  ]
+}

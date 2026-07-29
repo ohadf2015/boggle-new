@@ -1,0 +1,107 @@
+// Homepage FAQPage JSON-LD.
+// Must appear on exactly one URL per locale (the homepage). Emitting this on
+// every route via root layout causes Google "Duplicate field 'FAQPage'" when
+// landing pages (e.g. lexiclash-vs-wordle) emit their own FAQPage.
+
+const SUPPORTED = new Set(['en', 'he', 'sv', 'ja', 'es']);
+
+export function buildHomepageFaqJsonLd(locale: string) {
+  const lang = SUPPORTED.has(locale) ? locale : 'en';
+  const localePath = `/${lang}`;
+
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    '@id': `https://www.lexiclash.live${localePath}#faq`,
+    mainEntity: [
+      {
+        '@type': 'Question',
+        name: lang === 'he' ? 'האם אפשר לשחק בוגל אונליין בחינם?' : 'Can I play boggle online free with no download?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: lang === 'he'
+            ? 'כן! לקסיקלאש מאפשר לשחק בוגל אונליין בחינם ללא הורדה וללא הרשמה. פשוט גלשו ל-lexiclash.live והתחילו לשחק מיד בכל מכשיר.'
+            : 'Yes! LexiClash lets you play boggle online completely free with no download and no signup. Just visit lexiclash.live and start playing instantly on any device.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: lang === 'he' ? 'האם זה כמו Words With Friends?' : 'Is this like Words With Friends but multiplayer?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: lang === 'he'
+            ? 'לקסיקלאש שונה מ-Words With Friends כי כולם משחקים בו-זמנית בזמן אמת במקום בתורות. 2-20+ שחקנים יכולים להתחרות על אותו לוח. מהיר יותר, מרגש יותר ומושלם לקבוצות.'
+            : 'LexiClash is different from Words With Friends because everyone plays simultaneously in real-time instead of taking turns. 2-20+ players can compete on the same grid. Faster, more exciting, and perfect for groups.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: lang === 'he' ? 'האם המשחק חינם?' : 'Is LexiClash free to play?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: lang === 'he'
+            ? 'כן, לקסיקלאש חינם לחלוטין. ללא מנוי, ללא רכישות בתוך האפליקציה. פשוט גלשו ל-lexiclash.live והתחילו לשחק.'
+            : 'Yes, LexiClash is completely free. No subscription, no in-app purchases. Just visit lexiclash.live and start playing.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: lang === 'he' ? 'איך משחקים עם חברים?' : 'How do I play word games with friends online?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: lang === 'he'
+            ? 'צרו חדר, שתפו את הלינק עם חברים דרך וואטסאפ, דיסקורד או כל מסנג\'ר. חברים לוחצים על הלינק ומצטרפים מיד — ללא הרשמה או הורדה. עד 20+ שחקנים בחדר אחד.'
+            : 'Create a room, share the link with friends via WhatsApp, Discord, or any messenger. Friends click the link and join instantly — no signup or download needed. Up to 20+ players per room.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: lang === 'he'
+          ? 'מה זה גלגל המילה היומית?'
+          : lang === 'ja'
+            ? 'デイリーワードホイールとは？'
+            : lang === 'sv'
+              ? 'Vad är Dagligt Ordhjul?'
+              : lang === 'es'
+                ? '¿Qué es la Rueda de Palabras diaria?'
+                : 'What is the Daily Word Wheel?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: lang === 'he'
+            ? 'גלגל המילה היומית הוא פאזל חינמי חדש מדי יום: גלגל של אותיות שממנו יוצרים כמה שיותר מילים, כאשר כל מילה חייבת לכלול את האות המרכזית. כל העולם מקבל את אותו הגלגל בחצות UTC. ללא הורדה, ללא הרשמה — שחקו בדפדפן ושתפו תוצאות כמו Wordle.'
+            : lang === 'ja'
+              ? 'デイリーワードホイールは毎日新しい無料パズル。文字のホイールから単語を作り、すべての単語に中心文字を含める必要があります。全プレイヤーが世界中でUTC午前0時に同じホイールを受け取ります。ダウンロード・登録不要、ブラウザでプレイし、Wordleのように結果を共有できます。'
+              : lang === 'sv'
+                ? 'Dagligt Ordhjul är ett gratis ordpussel som förnyas varje dag: ett hjul med bokstäver där du bildar så många ord som möjligt, och varje ord måste innehålla mittbokstaven. Alla spelare världen över får samma hjul vid midnatt UTC. Ingen nedladdning, ingen registrering — spela i webbläsaren och dela resultat som Wordle.'
+                : lang === 'es'
+                  ? 'La Rueda de Palabras diaria es un puzzle gratuito nuevo cada día: una rueda de letras donde formas la mayor cantidad de palabras posible, y cada palabra debe incluir la letra central. Todos los jugadores del mundo reciben la misma rueda a medianoche UTC. Sin descargas, sin registro — juega en el navegador y comparte resultados como Wordle.'
+                  : 'The Daily Word Wheel is a free daily word puzzle: a wheel of letters where you form as many words as possible, and every word must include the center letter. All players worldwide get the same wheel at midnight UTC. No download, no signup — play in your browser and share results like Wordle.',
+        },
+      },
+      {
+        '@type': 'Question',
+        name: lang === 'he'
+          ? 'מה זה Word Hunt (חיפוש מילים)?'
+          : lang === 'ja'
+            ? 'ワードハントとは？'
+            : lang === 'sv'
+              ? 'Vad är Word Hunt (Ordjakt)?'
+              : lang === 'es'
+                ? '¿Qué es Word Hunt (Caza de Palabras)?'
+                : 'What is Word Hunt?',
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: lang === 'he'
+            ? 'Word Hunt הוא פאזל חיפוש מילים יומי: יש לכם 10 ניסיונות למצוא את המילה המוסתרת בלוח. כל העולם מקבל את אותו הלוח בחצות UTC. שתפו תוצאות אימוג\'י כמו Wordle. שחקו חינם בלקסיקלאש — ללא הורדה, ללא הרשמה.'
+            : lang === 'ja'
+              ? 'ワードハントは毎日のワードサーチパズルです。10回の試行で隠された単語を見つけます。全プレイヤーが世界中でUTC午前0時に同じボードを受け取ります。Wordleのように絵文字で結果を共有できます。LexiClashで無料でプレイ — ダウンロード・登録不要。'
+              : lang === 'sv'
+                ? 'Word Hunt är ett dagligt ordpussel: du har 10 försök att hitta det dolda ordet på brädet. Alla spelare världen över får samma bräde vid midnatt UTC. Dela emoji-resultat som Wordle. Spela gratis på LexiClash — ingen nedladdning, ingen registrering.'
+                : lang === 'es'
+                  ? 'Word Hunt es un puzzle diario de búsqueda de palabras: tienes 10 intentos para encontrar la palabra oculta en el tablero. Todos los jugadores del mundo reciben el mismo tablero a medianoche UTC. Comparte resultados emoji como Wordle. Juega gratis en LexiClash — sin descargas, sin registro.'
+                  : 'Word Hunt is a daily word-search puzzle: you have 10 attempts to find the hidden word on the board. All players worldwide get the same board at midnight UTC. Share emoji results like Wordle. Play free on LexiClash — no download, no signup.',
+        },
+      },
+    ],
+  };
+}

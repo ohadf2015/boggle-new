@@ -34,6 +34,76 @@ export async function fetchGeolocation(): Promise<{
 }
 
 /**
+ * Extract display name from OAuth user metadata.
+ * Handles Google (full_name, name), Discord (global_name, preferred_username, full_name),
+ * and Apple (full_name, name) metadata shapes.
+ */
+export function extractOAuthDisplayName(
+  userMetadata: Record<string, unknown> | undefined
+): string | null {
+  if (!userMetadata) return null;
+
+  // Try standard fields first (Google, Apple)
+  const fullName =
+    (userMetadata.full_name as string) || (userMetadata.name as string);
+  if (fullName) {
+    // Extract first name, capitalize properly
+    const firstName = fullName.split(' ')[0];
+    if (/^[A-Z]+$/.test(firstName)) {
+      return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+    }
+    return firstName;
+  }
+
+  // Discord: custom_claims.global_name or preferred_username
+  const customClaims = userMetadata.custom_claims as Record<string, unknown> | undefined;
+  if (customClaims?.global_name) return customClaims.global_name as string;
+  if (userMetadata.preferred_username) return userMetadata.preferred_username as string;
+
+  // Email prefix as last resort
+  const email = userMetadata.email as string | undefined;
+  if (email) return email.split('@')[0];
+
+  return null;
+}
+
+// Locale-aware fallback names for when the random-name API fails.
+// Witty single-or-two-word names with no dashes/underscores. Mirrors the
+// style of BOT_CONFIG.PLAYER_NAMES so a fallback feels native, not jarring.
+const FALLBACK_NAMES_BY_LANG: Record<string, string[]> = {
+  en: [
+    'Sneaky Pickle', 'Disco Potato', 'Cosmic Banana', 'Fluffy Waffle',
+    'Peppy Penguin', 'Loopy Llama', 'Bouncy Bear', 'Sassy Sloth',
+    'Quirky Quokka', 'Funky Flamingo', 'Wacky Walrus', 'Zesty Avocado',
+  ],
+  he: [
+    'מלפפון חמקמק', 'בננה קוסמית', 'וופל פלאפי', 'פינגווין פפי',
+    'למה לופי', 'דרקון מסוחרר', 'דוב קופצני', 'פלמינגו פאנקי',
+    'עצלן חצוף', 'קואלה משונה', 'רקון רועש', 'שועל פיזי',
+  ],
+  sv: [
+    'Smyg Gurka', 'Kosmisk Banan', 'Pigg Pingvin', 'Loopy Lama',
+    'Yr Drake', 'Studsig Björn', 'Funky Flamingo', 'Fräck Sengångare',
+    'Knasig Koala', 'Vild Tvättbjörn', 'Fräsig Räv', 'Glad Flodhäst',
+  ],
+  ja: [
+    'こっそりピクルス', 'コズミックバナナ', 'ペッピーペンギン', 'ルーピーラマ',
+    'くるくるドラゴン', 'ぴょんぴょんクマ', 'ファンキーフラミンゴ', 'おませなナマケモノ',
+    'へんてこコアラ', 'やんちゃアライグマ', 'シュワシュワキツネ', 'ハッピーカバ',
+  ],
+  es: [
+    'Pepino Astuto', 'Banana Cósmica', 'Pingüino Animado', 'Llama Chiflada',
+    'Dragón Mareado', 'Oso Saltarín', 'Flamenco Funky', 'Perezoso Sassy',
+    'Koala Raro', 'Mapache Ruidoso', 'Zorro Chispeante', 'Hippo Feliz',
+  ],
+};
+
+function pickFallbackName(language: string): string {
+  const pool = FALLBACK_NAMES_BY_LANG[language] ?? FALLBACK_NAMES_BY_LANG.en;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+/**
  * Fetch a random player name with suited avatar
  */
 export async function fetchRandomPlayerName(
@@ -51,8 +121,8 @@ export async function fetchRandomPlayerName(
   } catch (error) {
     logger.warn('Failed to fetch random name, using fallback:', error);
     return {
-      name: 'Player ' + Math.floor(Math.random() * 1000),
-      avatar: { emoji: '😀', color: '#6366f1' },
+      name: pickFallbackName(language),
+      avatar: { emoji: '😀', color: '#8B5CF6' },
     };
   }
 }
@@ -77,7 +147,7 @@ export async function fetchRandomGenericAvatar(): Promise<{
     return data.avatar;
   } catch (error) {
     logger.warn('Failed to fetch random avatar, using fallback:', error);
-    return { emoji: '😊', color: '#6366f1' };
+    return { emoji: '😊', color: '#8B5CF6' };
   }
 }
 

@@ -34,10 +34,16 @@ export const saveSession = (session: Omit<Session, 'timestamp'>): void => {
     timestamp: Date.now(),
   };
 
-  Cookies.set(SESSION_COOKIE_NAME, JSON.stringify(sessionData), {
+  const serialized = JSON.stringify(sessionData);
+
+  Cookies.set(SESSION_COOKIE_NAME, serialized, {
     expires: SESSION_EXPIRY_HOURS / 24, // Convert hours to days
     sameSite: 'strict',
   });
+
+  // Also save to sessionStorage as fallback for iframe contexts (e.g. CrazyGames)
+  // where third-party cookies may be blocked
+  saveToStorage(SESSION_COOKIE_NAME, serialized);
 };
 
 /**
@@ -46,7 +52,15 @@ export const saveSession = (session: Omit<Session, 'timestamp'>): void => {
  */
 export const getSession = (): Session | null => {
   try {
-    const sessionCookie = Cookies.get(SESSION_COOKIE_NAME);
+    // Try cookie first, fall back to sessionStorage (for iframe contexts like CrazyGames)
+    let sessionCookie = Cookies.get(SESSION_COOKIE_NAME);
+    if (!sessionCookie) {
+      try {
+        sessionCookie = sessionStorage.getItem(SESSION_COOKIE_NAME) || undefined;
+      } catch {
+        // sessionStorage blocked
+      }
+    }
     if (!sessionCookie) return null;
 
     const session = JSON.parse(sessionCookie) as Session;
@@ -72,6 +86,12 @@ export const getSession = (): Session | null => {
  */
 export const clearSession = (): void => {
   Cookies.remove(SESSION_COOKIE_NAME);
+  try {
+    sessionStorage.removeItem(SESSION_COOKIE_NAME);
+    localStorage.removeItem(SESSION_COOKIE_NAME);
+  } catch {
+    // Storage blocked
+  }
 };
 
 /**
@@ -92,7 +112,13 @@ export const clearSessionPreservingUsername = (username?: string): void => {
     logger.error('Error preserving username:', error);
   }
 
-  // Clear the session cookie
+  // Clear the session from cookie AND storage (prevents auto-rejoin on reconnect)
   Cookies.remove(SESSION_COOKIE_NAME);
+  try {
+    sessionStorage.removeItem(SESSION_COOKIE_NAME);
+    localStorage.removeItem(SESSION_COOKIE_NAME);
+  } catch {
+    // Storage blocked
+  }
 };
 

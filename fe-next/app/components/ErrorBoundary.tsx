@@ -1,9 +1,12 @@
 'use client';
 
 import { Component, ReactNode, ErrorInfo } from 'react';
+import { m } from 'framer-motion';
 import { translations } from '../../translations';
 import logger from '@/utils/logger';
 import { captureError } from '@/utils/sentry';
+import { EnhancedButton } from '@/components/ui/EnhancedButton';
+import { ErrorState } from '@/components/ui/EnhancedEmptyState';
 
 /**
  * ErrorBoundary Props
@@ -41,6 +44,13 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo): void {
+    // Skip Sentry capture for chunk load errors (stale deployment)
+    // These are already filtered in ignoreErrors but bypass it via captureMessage
+    if (this.isChunkLoadError(error)) {
+      this.setState({ error, errorInfo });
+      return;
+    }
+
     logger.error('ErrorBoundary caught an error:', error, errorInfo);
 
     captureError(error, {
@@ -58,6 +68,19 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
     });
   }
 
+  isChunkLoadError(error: Error | null): boolean {
+    if (!error) return false;
+    const message = error.message?.toLowerCase() || '';
+    const name = error.name?.toLowerCase() || '';
+    if (name === 'chunkloaderror') return true;
+    return (
+      message.includes('loading chunk') ||
+      message.includes('loading css chunk') ||
+      message.includes('failed to load chunk') ||
+      (message.includes('failed to fetch dynamically imported module') && message.includes('_next/'))
+    );
+  }
+
   handleReset = (): void => {
     this.setState({ hasError: false, error: null, errorInfo: null });
     window.location.reload();
@@ -71,50 +94,47 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       const t: TranslationFunction = (path: string): string => {
         try {
           const keys = path.split('.');
-          let current: any = translations[language as keyof typeof translations];
+          let current: unknown = translations[language as keyof typeof translations];
           for (const key of keys) {
-            current = current[key];
+            if (current === null || typeof current !== 'object') return path;
+            current = (current as Record<string, unknown>)[key];
             if (current === undefined) return path;
           }
-          return current;
+          return typeof current === 'string' ? current : path;
         } catch {
           return path;
         }
       };
 
       return (
-        <div className="min-h-screen flex items-center justify-center p-6 bg-neo-navy text-neo-white">
-          <div className="max-w-xl w-full text-center p-6 neo-card bg-neo-cream text-neo-black rotate-[-1deg]">
-            <div className="text-5xl mb-4">😵</div>
-            <h1 className="text-2xl font-black mb-3 uppercase tracking-wide text-neo-red">
-              {t('errors.somethingWentWrong')}
-            </h1>
-            <p className="text-sm mb-4">
-              {t('errors.unexpectedError')}
-            </p>
+        <div className="min-h-screen flex items-center justify-center p-6 bg-neo-navy">
+          <m.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="max-w-md w-full"
+          >
+            <ErrorState
+              title={t('errors.somethingWentWrong')}
+              description={t('errors.unexpectedError')}
+              onRetry={this.handleReset}
+            />
             {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mb-4 text-left bg-neo-navy p-3 rounded-neo border-3 border-neo-black text-xs">
-                <summary className="cursor-pointer mb-2 text-neo-lime font-bold">
+              <details className="mt-4 text-start bg-neo-navy-light p-3 rounded-neo border-2 border-neo-black/30 text-xs">
+                <summary className="cursor-pointer mb-2 text-neo-cyan font-bold">
                   {t('errors.errorDetails')}
                 </summary>
                 <pre className="overflow-x-auto text-neo-red m-0">
                   {this.state.error.toString()}
                 </pre>
                 {this.state.errorInfo && (
-                  <pre className="overflow-x-auto text-neo-cream mt-2 text-[11px]">
+                  <pre className="overflow-x-auto text-neo-white mt-2 text-[11px]">
                     {this.state.errorInfo.componentStack}
                   </pre>
                 )}
               </details>
             )}
-            <button
-              onClick={this.handleReset}
-              className="btn-neo-primary px-6 py-3"
-              aria-label={t('errors.refreshPage')}
-            >
-              {t('errors.refreshPage')}
-            </button>
-          </div>
+          </m.div>
         </div>
       );
     }

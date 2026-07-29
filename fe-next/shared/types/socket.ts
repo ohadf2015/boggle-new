@@ -8,11 +8,16 @@ import type {
   LetterGrid,
   Avatar,
   GameUser,
+  GameMode,
   ActiveRoom,
   LeaderboardEntry,
   TournamentStanding,
-  WordDetail
+  WordDetail,
+  BlastTileOverlay,
+  LetterFeedback,
 } from './game';
+
+import type { BlastTileType } from './blast';
 
 import type {
   SpamWarningPayload,
@@ -35,6 +40,8 @@ export interface ClientToServerEvents {
   join: (data: JoinGamePayload) => void;
   startGame: (data: StartGamePayload) => void;
   startGameAck: (data: { messageId: string }) => void;
+  countdownComplete: (data: { messageId: string }) => void;
+  lobbyAutoStartCancel: () => void;
   endGame: () => void;
   resetGame: () => void;
   closeRoom: () => void;
@@ -44,7 +51,7 @@ export interface ClientToServerEvents {
   broadcastShufflingGrid: (data: { gridState: unknown }) => void;
 
   // Word events
-  submitWord: (data: { word: string; comboLevel?: number }) => void;
+  submitWord: (data: { word: string; comboLevel?: number; comboType?: string | null }) => void;
   submitWordVote: (data: SubmitWordVotePayload) => void;
   submitPeerValidationVote: (data: { word: string; isValid: boolean; gameCode?: string }) => void;
   validateWords: (data: { validatedScores: unknown }) => void;
@@ -90,6 +97,17 @@ export interface ClientToServerEvents {
 
   // Spectator events
   upgradeToPlayer: (data: { gameCode: string }) => void;
+
+  // Kick events
+  kickPlayer: (data: { targetUsername: string }) => void;
+
+  // TV mode events
+  resultsRevealed: () => void;
+
+  // Boost events
+  // Legacy separate-emit path. Prefer bundling `boostToken` into startGame
+  // (atomic registration); this event is kept for back-compat with older clients.
+  'boost:apply': (data: { gameCode?: string; sessionId: string; token: string }) => void;
 }
 
 // ==================== Hint Types ====================
@@ -158,6 +176,9 @@ export interface ServerToClientEvents {
   peerValidationResult: (data: PeerValidationResultPayload) => void;
   validationComplete: (data: { success: boolean }) => void;
 
+  // TV mode events
+  resultsRevealed: (data: Record<string, never>) => void;
+
   // Chat events
   chatMessage: (data: ChatMessagePayload) => void;
 
@@ -181,9 +202,29 @@ export interface ServerToClientEvents {
   playerDisconnected: (data: { username: string; message: string }) => void;
   playerReconnected: (data: { username: string }) => void;
   playerLeft: (data: { username: string; message: string }) => void;
-  hostDisconnected: (data: { message: string; gracePeriodMs: number }) => void;
-  hostLeftRoomClosing: (data: { message: string }) => void;
+  hostDisconnected: (data: {
+    message: string;
+    gracePeriodMs: number;
+    i18nKey?: string;
+    i18nParams?: Record<string, string | number>;
+  }) => void;
+  hostLeftRoomClosing: (data: {
+    message: string;
+    i18nKey?: string;
+    i18nParams?: Record<string, string | number>;
+    reason?: 'explicit_no_successor' | 'grace_expired' | 'host_switched_room';
+  }) => void;
   hostReactivated: (data: { success: boolean }) => void;
+  // Audit T3 (2026-05-10): typed payload + i18n envelope. Server-side
+  // `message` was English-only; clients now prefer `i18nKey`+`i18nParams`
+  // via `resolveHostLeftMessage`, falling back to `message` for back-compat.
+  hostTransferred: (data: {
+    previousHost: string;
+    newHost: string;
+    message?: string;
+    i18nKey?: string;
+    i18nParams?: Record<string, string | number>;
+  }) => void;
 
   // Hint events (single-player mode)
   hintResponse: (data: HintPayload) => void;
@@ -216,9 +257,93 @@ export interface ServerToClientEvents {
   'scorecard:data': (data: GenerateScoreCardResponse) => void;
   'scorecard:error': (data: { message: string; code?: string }) => void;
 
+  // Blast multiplayer events
+  // Note: blastWordAccepted was merged into wordAccepted (see wordHandler.mergedEmits.test.ts)
+  blastComboSync: (data: BlastComboSyncPayload) => void;
+
   // Spectator events
   spectatorUpgraded: (data: SpectatorUpgradedPayload) => void;
   spectatorList: (data: { spectators: GameUser[] }) => void;
+
+  // Kick events
+  kicked: (data: { reason: 'host' | 'inactive' }) => void;
+  playerKicked: (data: { username: string; reason: 'host' | 'inactive' }) => void;
+
+  // Game lifecycle events
+  totalBoardWords: (data: { count: number }) => void;
+  gameStarting: (data: { gameMode: string }) => void;
+  validatedScores: (data: {
+    scores?: unknown[];
+    letterGrid?: unknown;
+    duplicateRuleDisabled?: boolean;
+    playerCount?: number;
+    gameMode?: string;
+    wordHuntSummary?: unknown;
+    blastSummary?: unknown;
+    wheelRushSummary?: unknown;
+    reconnect?: boolean;
+  }) => void;
+  playing: (data: Record<string, never>) => void;
+  finished: (data: Record<string, never>) => void;
+
+  // Lobby / ready-up events
+  playerListUpdate: (data: { users: unknown[] }) => void;
+  playersReadyUpdate: (data: { readyCount: number; totalPlayers: number; readyUsernames: string[] }) => void;
+  allPlayersReady: (data: { readyCount: number; totalPlayers: number }) => void;
+  autoStartCountdown: (data: { remaining: number }) => void;
+  autoStartCancelled: (data: Record<string, never>) => void;
+  // Lobby auto-start: server-owned countdown that begins when every non-host
+  // human marks ready, so a stalled host no longer blocks the game. Distinct
+  // from the bot auto-fill `autoStart*` events above and from the post-start
+  // 3-2-1 countdown.
+  lobbyAutoStartTick: (data: { secondsLeft: number }) => void;
+  lobbyAutoStartCancelled: (data: Record<string, never>) => void;
+  lobbyAutoStartFire: (data: Record<string, never>) => void;
+
+  // Word / room broadcast events
+  playerFoundWord: (data: {
+    username: string;
+    word: string;
+    wordCount: number;
+    score: number;
+    comboLevel: number;
+    comboSync?: { comboType: string; username: string };
+  }) => void;
+  wordSubmit: (data: { word: string; username: string }) => void;
+  roomCreate: (data: { gameCode: string; roomName: string }) => void;
+  avatarUpdated: (data: { username: string; avatarImage?: unknown; customAvatar?: unknown }) => void;
+
+  // Round events (monotonic breakers)
+  roundEventWarning: (data: { eventType: string; gameSessionId?: number; timestamp: number }) => void;
+  roundEventStart: (data: { eventType: string; gameSessionId?: number; duration: number; data?: Record<string, unknown> }) => void;
+  roundEventEnd: (data: { eventType: string; gameSessionId?: number }) => void;
+
+  // Special word found
+  specialWordFound: (data: { word: string; foundBy: string; bonus: number; gameSessionId?: number }) => void;
+
+  // Earthquake / Fire Round events
+  fireRoundStart: (data: { gameSessionId?: string; grid: unknown[][]; duration: number }) => void;
+  fireRoundEnd: (data: { gameSessionId?: string }) => void;
+  earthquakeShake: (data: { gameSessionId?: string }) => void;
+  earthquakeWarning: (data: { gameSessionId?: string; timestamp: number }) => void;
+
+  // Engagement — daily missions & grand slam
+  'engagement:dailyMissions': (data: { missions: unknown[] }) => void;
+  'engagement:grandSlamClaimed': (data: { claimed: boolean; [key: string]: unknown }) => void;
+
+  // Engagement — Word of the Day
+  'engagement:wotd': (data: { word: string; language: string; [key: string]: unknown }) => void;
+  'engagement:wotdRecorded': (data: { success?: boolean; found?: boolean; [key: string]: unknown }) => void;
+  'engagement:wotdStats': (data: { stats?: unknown; [key: string]: unknown }) => void;
+
+  // Party game events
+  'party:gameUpdate': (data: Record<string, unknown>) => void;
+  'party:phaseChange': (data: { phase: string; gameState?: unknown }) => void;
+  'party:playerJoined': (data: { player: unknown }) => void;
+  'party:playerLeft': (data: { socketId: string; username?: string }) => void;
+
+  // Boost ack — server confirms a boost token was registered against the player's game.
+  'boost:applied': (data: { success: boolean; boostType?: string }) => void;
 }
 
 // ==================== Payload Types ====================
@@ -245,7 +370,8 @@ export interface CreateGamePayload {
   authUserId?: string;
   guestTokenHash?: string;
   isRanked?: boolean;
-  profilePictureUrl?: string;
+  isPrivate?: boolean;
+  isClassroom?: boolean;
 }
 
 export interface JoinGamePayload {
@@ -255,7 +381,6 @@ export interface JoinGamePayload {
   avatar?: Avatar;
   authUserId?: string;
   guestTokenHash?: string;
-  profilePictureUrl?: string;
 }
 
 export interface StartGamePayload {
@@ -263,6 +388,9 @@ export interface StartGamePayload {
   timerSeconds: number;
   language?: Language;
   minWordLength?: number;
+  gameMode?: GameMode;
+  /** Optional boost token bundled with startGame (atomic boost registration). */
+  boostToken?: string;
 }
 
 export interface JoinedPayload {
@@ -274,6 +402,9 @@ export interface JoinedPayload {
   language: Language;
   users: GameUser[];
   reconnected?: boolean;
+  /** True when joining a game already in progress (late join). Lets the client
+   *  arm the lost-`startGame` recovery fallback, same as a reconnection. */
+  gameInProgress?: boolean;
 }
 
 export interface JoinedAsSpectatorPayload {
@@ -293,6 +424,11 @@ export interface StartGameBroadcast {
   reconnect?: boolean;
   lateJoin?: boolean;
   skipAck?: boolean;
+  gameMode?: GameMode;
+  goldenLetters?: Array<{ row: number; col: number }>;
+  /** Server's authoritative session id — required for reconnect/lateJoin so
+   *  the client's timeUpdate session-id guard accepts subsequent ticks. */
+  gameSessionId?: number;
 }
 
 export interface WordAcceptedPayload {
@@ -305,11 +441,24 @@ export interface WordAcceptedPayload {
   fireRoundActive?: boolean;
   fireRoundMultiplier?: number;
   fireRoundBonus?: number;
+  goldenBonus?: number;
+  isSpecialWord?: boolean;
+  inputMethod?: 'kb' | 'drag';
+  /** Merged blast data (Fix 2) — present when gameMode is blast */
+  blast?: {
+    tileBonus: number;
+    tilesCleared: string[];
+    movesUsed: number;
+    bonusMove: boolean;
+    comboType?: string | null;
+  };
 }
 
 export interface AchievementPayload {
   key: string;
   icon: string;
+  /** Achievement count for tier calculation (GOLD/PLATINUM cinematics) */
+  count?: number;
 }
 
 export interface GameOverPayload {
@@ -328,7 +477,7 @@ export interface PlayerResultPayload {
 
 export interface SubmitWordVotePayload {
   word: string;
-  voteType: 'valid' | 'invalid';
+  voteType: 'like' | 'dislike';
   gameCode?: string;
   submittedBy?: string;
   isBot?: boolean;
@@ -581,6 +730,39 @@ export interface EngagementStatus {
     completed: number;
     total: number;
   };
+}
+
+// ==================== Blast Multiplayer Types ====================
+
+export interface BlastComboSyncPayload {
+  comboType: string;
+  username: string;
+}
+
+// ==================== Word Hunt Types ====================
+
+export interface WordHuntLifeUpdatePayload {
+  playerLives: Record<string, number>;
+  eliminatedPlayers: string[];
+}
+
+export interface WordHuntTargetResultPayload {
+  guess: string;
+  feedback: LetterFeedback[];
+  correct: boolean;
+  isFirstFinder: boolean;
+  bonus: number;
+  livesRemaining: number;
+}
+
+export interface WordHuntTargetFoundPayload {
+  username: string;
+  targetWord: string;
+  isFirstFinder: boolean;
+}
+
+export interface WordHuntEliminatedPayload {
+  username: string;
 }
 
 // ==================== Spectator Types ====================

@@ -2,27 +2,40 @@
 'use no memo'; // Disable React Compiler memoization due to TanStack Virtual incompatibility
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { CardContent as CardContentComponent } from './ui/card';
-import { Input as InputComponent } from './ui/input';
-import { Button as ButtonComponent } from './ui/button';
-import { Badge as BadgeComponent } from './ui/badge';
-
-// Type casting for JSX components not yet migrated to TS
-const CardContent = CardContentComponent as any;
-const Input = InputComponent as any;
-const Button = ButtonComponent as any;
-const Badge = BadgeComponent as any;
-import { motion } from 'framer-motion';
+import { CardContent } from './ui/card';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import { Badge } from './ui/badge';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useSocket } from '../utils/SocketContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useSoundEffects } from '../contexts/SoundEffectsContext';
 import { Send, MessageSquare, Bell } from 'lucide-react';
+import { haptics } from '@/utils/haptics/HapticsManager';
 import toast from 'react-hot-toast';
 import { useAnnouncer } from './GameAnnouncer';
+import { useCrazyGamesChatDisabled } from '@/hooks/useCrazyGamesSettingsBridge';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useSocialCapabilities } from '@/hooks/useSocialCapabilities';
+import { AgeGateModal } from '@/components/families/AgeGateModal';
+import { SafetyReminderModal } from '@/components/families/SafetyReminderModal';
 
-const MAX_CHAT_HEIGHT = 400; // Max height in pixels
 const ESTIMATED_MESSAGE_HEIGHT = 60; // Estimated height per message
+
+// Module-level dedup: prevents duplicate notifications when multiple RoomChat
+// instances are mounted (lobby, in-game, results). Only the first instance to
+// process a given chatMessage fires sound/toast/vibrate/announce.
+const _notifiedMessages = new Set<string>();
+const DEDUP_TTL_MS = 5_000; // auto-expire entries after 5s
+
+function shouldNotify(data: ChatMessageData): boolean {
+  const key = `${data.username}:${data.timestamp}:${data.message}`;
+  if (_notifiedMessages.has(key)) return false;
+  _notifiedMessages.add(key);
+  setTimeout(() => _notifiedMessages.delete(key), DEDUP_TTL_MS);
+  return true;
+}
 
 interface ChatMessage {
   id: string;
@@ -45,19 +58,28 @@ interface RoomChatProps {
   gameCode: string;
   className?: string;
   onNewMessage?: () => void;
+  /** 'standalone' = speech-bubble with cream bg + tail; 'embedded' = transparent, no rotation/tail */
+  variant?: 'standalone' | 'embedded';
 }
 
-const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, className = '', onNewMessage }) => {
+const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, className = '', onNewMessage, variant = 'standalone' }) => {
   const { t } = useLanguage();
   const { socket } = useSocket();
   const { playMessageSound } = useSoundEffects();
   const { announce } = useAnnouncer();
+  const isChatDisabled = useCrazyGamesChatDisabled();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  // Families Policy: gate freeform stranger chat by the user's social tier.
+  const { caps, needsAgeGate, safetyAcknowledged, acknowledgeSafety } = useSocialCapabilities();
+  const [showAgeGate, setShowAgeGate] = useState(false);
+  const [showSafety, setShowSafety] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
   const [latestAnnouncement, setLatestAnnouncement] = useState('');
   const parentRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const messagesLengthRef = useRef(0);
 
   // Virtual scrolling setup
   const virtualizer = useVirtualizer({
@@ -84,70 +106,73 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     const isOwnMessage = (isHost && data.isHost) || data.username === username;
 
     if (!isOwnMessage) {
-      // Increment unread count
+      // Increment unread count (always — each instance tracks its own)
       setUnreadCount(prev => prev + 1);
 
-      // Notify parent of new message
-      onNewMessage?.();
+      // Dedup: only fire sound/toast/vibrate/announce once across all mounted RoomChat instances
+      if (shouldNotify(data)) {
+        // Notify parent of new message
+        onNewMessage?.();
 
-      // Play notification sound
-      playMessageSound();
+        // Play notification sound
+        playMessageSound();
 
-      // Announce for screen readers
-      const announcementText = `${data.username} says: ${data.message}`;
-      setLatestAnnouncement(announcementText);
-      announce(announcementText);
+        // Announce for screen readers
+        const announcementText = `${data.username} says: ${data.message}`;
+        setLatestAnnouncement(announcementText);
+        announce(announcementText);
 
-      // Show toast notification with click to scroll
-      const newMessageIndex = messages.length; // Index of the new message (will be added after this)
-      toast(
-        <div
-          className="flex items-center gap-3 cursor-pointer"
-          onClick={() => {
-            // Scroll to the message using virtualizer
-            virtualizer.scrollToIndex(newMessageIndex, { align: 'center', behavior: 'smooth' });
-            // Apply highlight effect after scroll
-            setTimeout(() => {
-              const messageElement = document.getElementById(messageId);
-              if (messageElement) {
-                messageElement.classList.add('ring-3', 'ring-neo-cyan', 'ring-offset-2');
-                setTimeout(() => {
-                  messageElement.classList.remove('ring-3', 'ring-neo-cyan', 'ring-offset-2');
-                }, 2000);
-              }
-            }, 300);
-            // Clear unread count
-            setUnreadCount(0);
-            toast.dismiss();
-          }}
-        >
-          <Bell style={{ color: '#FF6B9D', flexShrink: 0, fontSize: '18px' }} />
-          <div style={{ minWidth: 0 }}>
-            <div style={{ fontWeight: 900, color: '#000000', textTransform: 'uppercase', fontSize: '14px' }}>{data.username}</div>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(0,0,0,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
-          </div>
-        </div>,
-        {
-          duration: 4000,
-          position: 'top-right',
-          style: {
-            background: '#FFFEF0',
-            border: '3px solid #000000',
-            boxShadow: '4px 4px 0px #000000',
-            borderRadius: '8px',
-            padding: '12px 16px',
-            cursor: 'pointer',
-            pointerEvents: 'auto',
-          },
+        // Show toast notification with click to scroll
+        const newMessageIndex = messagesLengthRef.current; // Use ref to avoid stale closure
+        toast(
+          <div
+            className="flex items-center gap-3 cursor-pointer"
+            onClick={() => {
+              // Scroll to the message using virtualizer
+              virtualizer.scrollToIndex(newMessageIndex, { align: 'center', behavior: 'smooth' });
+              // Apply highlight effect after scroll
+              setTimeout(() => {
+                const messageElement = document.getElementById(messageId);
+                if (messageElement) {
+                  messageElement.classList.add('ring-3', 'ring-neo-cyan', 'ring-offset-2');
+                  setTimeout(() => {
+                    messageElement.classList.remove('ring-3', 'ring-neo-cyan', 'ring-offset-2');
+                  }, 2000);
+                }
+              }, 300);
+              // Clear unread count
+              setUnreadCount(0);
+              toast.dismiss();
+            }}
+          >
+            <Bell style={{ color: 'var(--neo-pink-light)', flexShrink: 0, fontSize: '18px' }} />
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontWeight: 900, color: 'rgb(var(--neo-black))', textTransform: 'uppercase', fontSize: '14px' }}>{data.username}</div>
+              <div style={{ fontSize: '14px', fontWeight: 700, color: 'rgba(0,0,0,0.8)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{data.message.substring(0, 50)}{data.message.length > 50 ? '...' : ''}</div>
+            </div>
+          </div>,
+          {
+            duration: 4000,
+            position: 'top-right',
+            style: {
+              background: 'var(--neo-cream)',
+              border: '3px solid var(--neo-black)',
+              boxShadow: '4px 4px 0px var(--neo-black)',
+              borderRadius: '8px',
+              padding: '12px 16px',
+              cursor: 'pointer',
+              pointerEvents: 'auto',
+            },
+          }
+        );
+
+        // Short tap on incoming chat — gated by haptics toggle
+        if (haptics.isEnabled() && window.navigator?.vibrate) {
+          window.navigator.vibrate(30);
         }
-      );
-
-      // Vibrate on mobile
-      if (window.navigator && window.navigator.vibrate) {
-        window.navigator.vibrate(200);
       }
     }
-  }, [username, isHost, messages.length, virtualizer, playMessageSound, onNewMessage, announce]);
+  }, [username, isHost, virtualizer, playMessageSound, onNewMessage, announce]);
 
   useEffect(() => {
     if (!socket) return;
@@ -189,8 +214,9 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     };
   }, [socket, gameCode]);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll to bottom when new messages arrive + keep ref in sync
   useEffect(() => {
+    messagesLengthRef.current = messages.length;
     if (messages.length > 0) {
       virtualizer.scrollToIndex(messages.length - 1, { align: 'end', behavior: 'smooth' });
       setUnreadCount(0);
@@ -202,24 +228,43 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     setUnreadCount(0);
   };
 
+  // Read DOM value at send time. Android GBoard with Hebrew/RTL buffers IME
+  // composition and may leave React state empty until commit; the DOM input
+  // already has the typed text, so read from there.
   const sendMessage = () => {
-    if (!inputMessage.trim() || !socket) return;
+    if (!socket) return;
+    const raw = inputRef.current?.value ?? inputMessage;
+    const trimmed = raw.trim();
+    if (!trimmed) return;
+
+    // Families Policy: show the online-safety reminder before the user's first
+    // freeform exchange. Defer the send until they acknowledge.
+    if (!safetyAcknowledged) {
+      setShowSafety(true);
+      return;
+    }
 
     socket.emit('chatMessage', {
-      message: inputMessage.trim(),
+      message: trimmed,
       gameCode,
-      username: isHost ? 'Host' : username,
+      username,
       isHost
     });
 
     setInputMessage('');
     if (inputRef.current) {
+      inputRef.current.value = '';
       inputRef.current.focus();
     }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    // Skip only when keydown is an IME composition commit (keyCode 229).
+    // `isComposing` is unreliable on Android GBoard with Hebrew/RTL — it
+    // stays true past the commit, blocking Enter-to-send. keyCode 229 is the
+    // canonical IME-commit signal across the browsers/keyboards we support.
+    // Same pattern as components/friends/messaging/MessageComposer.tsx.
+    if (e.key === 'Enter' && e.nativeEvent.keyCode !== 229) {
       e.preventDefault();
       sendMessage();
     }
@@ -233,67 +278,104 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
     return `${hours}:${minutes}`;
   };
 
-  return (
-    // NEO-BRUTALIST: Speech bubble container with tail and tilt
-    <div className={`speech-bubble rotate-[1deg] flex flex-col mb-4 ${className}`}>
-      {/* NEO-BRUTALIST Header */}
-      <div className="py-3 px-4 border-b-3 border-neo-black flex-shrink-0">
-        <h3 className="text-neo-black text-base font-black uppercase flex items-center gap-2">
-          <MessageSquare className="text-neo-pink" />
-          {t('chat.title') || 'Room Chat'}
-          {unreadCount > 0 && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="relative"
-            >
-              <Badge variant="destructive" className="animate-pulse">
-                {unreadCount}
-              </Badge>
-            </motion.div>
+  // Hide chat on CrazyGames platform entirely (child safety, platform policy)
+  // Also hide when platform explicitly disables chat via settings
+  if (isChatDisabled || isOnCrazyGamesPlatform) return null;
+
+  // Families Policy: child / unknown-age users cannot use freeform stranger
+  // chat. Unknown age → offer the neutral age screen; known child → explain it
+  // is turned off (adults manage it in parental controls).
+  if (!caps.publicRoomChat) {
+    return (
+      <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>
+        <CardContent className="flex-1 flex flex-col items-center justify-center gap-3 p-6 text-center">
+          <MessageSquare className="text-neo-pink" size={32} aria-hidden />
+          <p className="font-neo-body text-sm text-neo-black">
+            {needsAgeGate
+              ? t('familiesSafety.chatNeedsAge')
+              : t('familiesSafety.chatRestricted')}
+          </p>
+          {needsAgeGate && (
+            <Button variant="cyan" onClick={() => setShowAgeGate(true)}>
+              {t('familiesSafety.chatAddAge')}
+            </Button>
           )}
-        </h3>
+        </CardContent>
+        <AgeGateModal
+          isOpen={showAgeGate}
+          onClose={() => setShowAgeGate(false)}
+          onResolved={() => {
+            setShowAgeGate(false);
+            // Reconnect so the server re-resolves the social tier for this socket.
+            socket?.disconnect();
+            socket?.connect();
+          }}
+        />
       </div>
+    );
+  }
+
+  return (
+    <div className={`${variant === 'standalone' ? 'speech-bubble rotate-[1deg] mb-4' : 'flex flex-col h-full'} flex flex-col ${className}`}>
+      {/* Header — hidden in embedded variant (parent provides its own) */}
+      {variant === 'standalone' && (
+        <div className="py-3 px-4 shrink-0 border-b-3 border-neo-black">
+          <h2 className="text-base font-black uppercase flex items-center gap-2 text-neo-black">
+            <MessageSquare className="text-neo-pink" />
+            {t('chat.title')}
+            {unreadCount > 0 && (
+              <AdaptiveMotion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="relative"
+              >
+                <Badge variant="destructive" className="animate-pulse">
+                  {unreadCount}
+                </Badge>
+              </AdaptiveMotion.div>
+            )}
+          </h2>
+        </div>
+      )}
       <CardContent className="flex-1 flex flex-col p-3 gap-3 min-h-0 overflow-hidden">
         {/* Messages Area with Virtual Scrolling */}
         <div
           ref={parentRef}
-          className="flex-1 overflow-auto pr-2 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600"
-          style={{ maxHeight: MAX_CHAT_HEIGHT }}
+          className={`flex-1 overflow-auto pe-2 min-h-0 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 ${variant === 'embedded' ? '' : 'max-h-[300px] sm:max-h-[400px] md:max-h-[500px]'}`}
         >
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-4 gap-2">
               {/* NEO-BRUTALIST empty state - compact version */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ scale: 0.8, rotate: -5 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 className="relative"
               >
                 {/* Decorative background shapes - smaller */}
-                <div className="absolute -top-1 -right-1 w-10 h-10 bg-neo-pink text-white border-2 border-neo-black rotate-12 -z-10" />
+                <div className="absolute -top-1 -right-1 w-10 h-10 bg-neo-pink text-neo-white border-2 border-neo-black rotate-12 -z-10" />
                 <div className="absolute -bottom-1 -left-1 w-8 h-8 bg-neo-cyan text-neo-black border-2 border-neo-black -rotate-6 -z-10" />
 
                 {/* Main icon container - smaller */}
                 <div className="bg-neo-lime text-neo-black border-2 border-neo-black shadow-hard-sm p-2 rotate-[-2deg]">
                   <MessageSquare className="text-2xl text-neo-black" />
                 </div>
-              </motion.div>
+              </AdaptiveMotion.div>
 
               {/* Text with Neo-Brutalist styling - smaller */}
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
                 className="text-center"
               >
                 <div className="bg-neo-black text-neo-white px-3 py-1 font-black uppercase text-xs tracking-wider rotate-[1deg] shadow-hard-sm border-2 border-neo-black">
-                  {t('chat.noMessages') || 'No messages yet'}
+                  {t('chat.noMessages')}
                 </div>
-                <p className="text-neo-black/75 font-bold text-[10px] mt-2 uppercase tracking-wide">
-                  {t('chat.startChatting') || 'Start chatting!'}
+                <p className={`font-bold text-[10px] mt-2 uppercase tracking-wide ${variant === 'embedded' ? 'text-neo-white' : 'text-neo-black/75'}`}>
+                  {t('chat.startChatting')}
                 </p>
-              </motion.div>
+              </AdaptiveMotion.div>
             </div>
           ) : (
             <div
@@ -320,7 +402,7 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                       transform: `translateY(${virtualItem.start}px)`,
                     }}
                   >
-                    <motion.div
+                    <AdaptiveMotion.div
                       id={msg.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -334,21 +416,25 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
                         >
                           {msg.username}
                         </Badge>
-                        <span className="text-xs text-neo-black/70 font-medium">
+                        <span className={`text-xs font-medium ${variant === 'embedded' ? 'text-neo-white' : 'text-neo-black/70'}`}>
                           {formatTime(msg.timestamp)}
                         </span>
                       </div>
-                      {/* NEO-BRUTALIST message bubble */}
+                      {/* Message bubble */}
                       <div
-                        className={`px-3 py-2 max-w-[80%] break-words border-2 border-neo-black rounded-neo font-medium ${
-                          isOwnMessage
-                            ? 'bg-neo-cyan text-neo-black shadow-hard-sm'
-                            : 'bg-neo-white text-neo-black shadow-hard-sm'
+                        className={`px-3 py-2 max-w-[80%] wrap-break-word border-2 rounded-neo font-medium ${
+                          variant === 'embedded'
+                            ? isOwnMessage
+                              ? 'bg-neo-cyan/20 text-neo-cyan border-neo-cyan/30'
+                              : 'bg-neo-white/10 text-neo-white border-neo-white/20'
+                            : isOwnMessage
+                              ? 'bg-neo-cyan text-neo-black border-neo-black shadow-hard-sm'
+                              : 'bg-neo-white text-neo-black border-neo-black shadow-hard-sm'
                         }`}
                       >
                         {msg.message}
                       </div>
-                    </motion.div>
+                    </AdaptiveMotion.div>
                   </div>
                 );
               })}
@@ -357,24 +443,47 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         </div>
 
         {/* NEO-BRUTALIST Input Area */}
-        <div className="flex gap-2 flex-shrink-0">
+        <div className="flex gap-2 shrink-0">
           <Input
             ref={inputRef}
             value={inputMessage}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputMessage(e.target.value)}
+            // `onInput` is the reliable signal on Android GBoard with Hebrew/RTL
+            // when `onChange` doesn't fire mid-composition. Mirror DOM → state.
+            onInput={(e: React.FormEvent<HTMLInputElement>) => setInputMessage(e.currentTarget.value)}
             onKeyDown={handleKeyDown}
+            // Backstop: sync React state from the DOM on keyup. Android GBoard
+            // with Hebrew/RTL can buffer IME composition so onChange/onInput
+            // don't fire, leaving `inputMessage` empty and the Send button
+            // stuck looking disabled. keyup carries the committed DOM value.
+            onKeyUp={(e: React.KeyboardEvent<HTMLInputElement>) => setInputMessage(e.currentTarget.value)}
             onFocus={handleInputFocus}
-            placeholder={t('chat.placeholder') || 'Type a message...'}
+            onCompositionUpdate={(e: React.CompositionEvent<HTMLInputElement>) => {
+              setInputMessage(e.currentTarget.value);
+            }}
+            onCompositionEnd={(e: React.CompositionEvent<HTMLInputElement>) => {
+              setInputMessage(e.currentTarget.value);
+            }}
+            placeholder={t('chat.placeholder')}
+            aria-label={t('chat.placeholder')}
+            maxLength={200}
             className="flex-1 min-w-0 text-sm"
             dir="auto"
           />
           <Button
             onClick={sendMessage}
-            disabled={!inputMessage.trim()}
+            // `aria-disabled` (not real `disabled`) so taps still commit Android
+            // GBoard IME composition (Hebrew/RTL) — sendMessage reads DOM value
+            // and bails on empty trim. jest-dom's `toBeDisabled()` matches both.
+            aria-disabled={inputMessage.length === 0 || !socket}
             size="icon"
             variant="cyan"
-            className="flex-shrink-0"
-            aria-label={t('chat.send') || 'Send message'}
+            className={`shrink-0 ${
+              inputMessage.length === 0 || !socket
+                ? 'bg-neo-navy-light text-neo-white grayscale opacity-50'
+                : ''
+            }`}
+            aria-label={t('chat.send')}
           >
             <Send aria-hidden="true" />
           </Button>
@@ -386,11 +495,28 @@ const RoomChat: React.FC<RoomChatProps> = ({ username, isHost, gameCode, classNa
         role="log"
         aria-live="polite"
         aria-atomic="false"
-        aria-label={t('chat.newMessages') || 'New chat messages'}
+        aria-label={t('chat.newMessages')}
         className="sr-only"
       >
         {latestAnnouncement}
       </div>
+
+      {/* Families Policy: online-safety reminder before the first message. */}
+      <SafetyReminderModal
+        isOpen={showSafety}
+        onClose={() => setShowSafety(false)}
+        onAcknowledge={() => {
+          acknowledgeSafety();
+          setShowSafety(false);
+          // Deliver the buffered message now that the reminder is acknowledged.
+          const trimmed = (inputRef.current?.value ?? inputMessage).trim();
+          if (trimmed && socket) {
+            socket.emit('chatMessage', { message: trimmed, gameCode, username, isHost });
+            setInputMessage('');
+            if (inputRef.current) inputRef.current.value = '';
+          }
+        }}
+      />
     </div>
   );
 };

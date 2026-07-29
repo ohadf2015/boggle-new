@@ -6,10 +6,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
+import { m, AnimatePresence } from 'framer-motion';
 import { Copy, Check, Send, ImageDown, Mail, MessageSquare, ExternalLink, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { XTwitterIcon, WhatsAppIcon, LinkedInIcon, FacebookIcon } from './icons';
+import { Loader } from '@/components/ui/Loader';
 
 interface SharePanelProps {
   isOpen: boolean;
@@ -52,14 +54,14 @@ export const SharePanel: React.FC<SharePanelProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto overscroll-contain scrollable-area"
           onClick={onClose}
         >
-          <motion.div
+          <m.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
@@ -72,18 +74,20 @@ export const SharePanel: React.FC<SharePanelProps> = ({
             {ogImageUrl && (
               <div className="mb-6">
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">
-                  {t('wordHunt.results.previewImage') || 'Preview Image'}
+                  {t('wordHunt.results.previewImage')}
                 </p>
-                <div className="relative w-full rounded-neo border-3 border-neo-black overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <div className="relative w-full rounded-neo border-3 border-neo-black overflow-hidden bg-gray-100 dark:bg-neo-navy-light">
                   {!imageLoaded && (
-                    <div className="aspect-[1200/630] flex items-center justify-center">
-                      <div className="w-8 h-8 border-4 border-neo-lime/30 border-t-neo-lime rounded-full animate-spin" />
+                    <div className="aspect-1200/630 flex items-center justify-center">
+                      <Loader size="sm" />
                     </div>
                   )}
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={ogImageUrl}
                     alt="Share preview"
+                    width={1200}
+                    height={630}
+                    unoptimized
                     className={`w-full h-auto ${imageLoaded ? 'block' : 'hidden'}`}
                     onLoad={() => setImageLoaded(true)}
                   />
@@ -97,15 +101,15 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 onClick={onWhatsApp}
                 className="py-3 bg-brand-whatsapp text-white border-3 border-neo-black rounded-neo hover:brightness-110"
               >
-                <WhatsAppIcon className="mr-2 w-5 h-5" />
+                <WhatsAppIcon className="me-2 w-5 h-5" />
                 WhatsApp
               </Button>
 
               <Button
                 onClick={onTwitter}
-                className="py-3 bg-black text-white border-3 border-gray-700 rounded-neo hover:bg-gray-900"
+                className="py-3 bg-black text-white border-3 border-gray-700 rounded-neo hover:bg-neo-navy"
               >
-                <XTwitterIcon className="mr-2 w-5 h-5" />
+                <XTwitterIcon className="me-2 w-5 h-5" />
                 X / Twitter
               </Button>
 
@@ -113,15 +117,15 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 onClick={onFacebook}
                 className="py-3 bg-brand-facebook text-white border-3 border-neo-black rounded-neo hover:brightness-110"
               >
-                <FacebookIcon className="mr-2 w-5 h-5" />
+                <FacebookIcon className="me-2 w-5 h-5" />
                 Facebook
               </Button>
 
               <Button
                 onClick={onTelegram}
-                className="py-3 bg-[#0088cc] text-white border-3 border-neo-black rounded-neo hover:brightness-110"
+                className="py-3 bg-brand-telegram text-white border-3 border-neo-black rounded-neo hover:bg-brand-telegram-hover"
               >
-                <Send className="mr-2 w-5 h-5" />
+                <Send className="me-2 w-5 h-5" />
                 Telegram
               </Button>
             </div>
@@ -134,12 +138,12 @@ export const SharePanel: React.FC<SharePanelProps> = ({
               {showMoreOptions ? (
                 <>
                   <ChevronUp className="w-4 h-4" />
-                  {t('wordHunt.results.lessOptions') || 'Less options'}
+                  {t('wordHunt.results.lessOptions')}
                 </>
               ) : (
                 <>
                   <ChevronDown className="w-4 h-4" />
-                  {t('wordHunt.results.moreOptions') || 'More options'}
+                  {t('wordHunt.results.moreOptions')}
                 </>
               )}
             </button>
@@ -147,7 +151,7 @@ export const SharePanel: React.FC<SharePanelProps> = ({
             {/* Secondary Share Options */}
             <AnimatePresence>
               {showMoreOptions && (
-                <motion.div
+                <m.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -158,44 +162,44 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                       onClick={onLinkedIn}
                       className="py-3 bg-brand-linkedin text-white border-3 border-neo-black rounded-neo hover:brightness-110"
                     >
-                      <LinkedInIcon className="mr-2 w-5 h-5" />
+                      <LinkedInIcon className="me-2 w-5 h-5" />
                       LinkedIn
                     </Button>
 
                     <Button
                       onClick={onEmail}
-                      className="py-3 bg-gray-600 text-white border-3 border-neo-black rounded-neo hover:bg-gray-700"
+                      className="py-3 bg-gray-600 text-white border-3 border-neo-black rounded-neo hover:bg-neo-navy-elevated"
                     >
-                      <Mail className="mr-2 w-5 h-5" />
-                      {t('share.email') || 'Email'}
+                      <Mail className="me-2 w-5 h-5" />
+                      {t('share.email')}
                     </Button>
 
                     <Button
                       onClick={onSMS}
                       className="py-3 bg-neo-lime text-neo-black border-3 border-neo-black rounded-neo hover:brightness-110"
                     >
-                      <MessageSquare className="mr-2 w-5 h-5" />
-                      {t('share.sms') || 'SMS'}
+                      <MessageSquare className="me-2 w-5 h-5" />
+                      {t('share.sms')}
                     </Button>
 
                     <Button
                       onClick={onCopy}
-                      className="py-3 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white border-3 border-neo-black rounded-neo"
+                      className="py-3 bg-neo-navy-elevated dark:bg-slate-600 text-white border-3 border-neo-black rounded-neo shadow-hard hover:bg-neo-navy-light dark:hover:bg-slate-500"
                     >
                       {copied ? (
                         <>
-                          <Check className="mr-2 w-5 h-5 text-neo-lime" />
+                          <Check className="me-2 w-5 h-5 text-neo-lime" />
                           {t('common.copied')}
                         </>
                       ) : (
                         <>
-                          <Copy className="mr-2 w-5 h-5" />
-                          {t('daily.copyLink') || 'Copy Link'}
+                          <Copy className="me-2 w-5 h-5" />
+                          {t('daily.copyLink')}
                         </>
                       )}
                     </Button>
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
 
@@ -209,13 +213,13 @@ export const SharePanel: React.FC<SharePanelProps> = ({
                 >
                   {isGeneratingImage ? (
                     <>
-                      <div className="mr-2 w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      {t('wordHunt.results.generating') || 'Generating...'}
+                      <Loader size="sm" className="me-2" />
+                      {t('wordHunt.results.generating')}
                     </>
                   ) : (
                     <>
-                      <ImageDown className="mr-2 w-5 h-5" />
-                      {t('daily.downloadImage') || 'Download Image'}
+                      <ImageDown className="me-2 w-5 h-5" />
+                      {t('daily.downloadImage')}
                     </>
                   )}
                 </Button>
@@ -225,8 +229,8 @@ export const SharePanel: React.FC<SharePanelProps> = ({
             <Button onClick={onClose} variant="ghost" className="w-full mt-4">
               {t('daily.close')}
             </Button>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

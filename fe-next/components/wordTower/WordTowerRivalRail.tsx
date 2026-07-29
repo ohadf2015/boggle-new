@@ -1,0 +1,112 @@
+'use client';
+
+import { useEffect, useRef, useState } from 'react';
+import { visibleRivalMarkers, rivalsPassed, type RivalMarker } from '@/lib/wordTower/rivals';
+import { blockMaterial } from '@/lib/wordTower/blockGrade';
+import { PROP_PX_PER_M } from '@/lib/wordTower/parallaxProps';
+
+/** Build line as a fraction of viewport height — matches towerLayout's topCenter. */
+const BUILD_LINE_FRACTION = 0.28;
+const LINE_FLOW = 'top 900ms cubic-bezier(0.22,1,0.36,1)';
+/** How long the "passed!" cheer stays up before it auto-dismisses. */
+const PASS_TOAST_MS = 2000;
+
+const hex = (n: number) => `#${n.toString(16).padStart(6, '0')}`;
+
+interface Props {
+  rivals: RivalMarker[];
+  /** Viewer's current altitude (m). */
+  viewerHeightM: number;
+  reducedMotion?: boolean;
+  t: (key: string, params?: Record<string, string | number>) => string;
+}
+
+/**
+ * Other players' towers rendered as themed ghost columns on the parallax altitude
+ * scale — tinted with the material of the highest zone THEY reached (concrete →
+ * gunmetal → obsidian) + an avatar chip, so "their building" reads as a real
+ * tower you rise past. Crossing one fires a brief "passed {name}!" celebration.
+ * Inert + reduced-motion safe.
+ */
+export function WordTowerRivalRail({ rivals, viewerHeightM, reducedMotion, t }: Props) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [h, setH] = useState(0);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => setH(el.clientHeight);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  // Detect crossings only — NO dismiss timer here. (A timer in this effect would be
+  // cancelled by the cleanup on every height change, so the toast would never clear.)
+  const prevHeight = useRef(viewerHeightM);
+  const [passed, setPassed] = useState<string | null>(null);
+  useEffect(() => {
+    const crossed = rivalsPassed(prevHeight.current, viewerHeightM, rivals);
+    prevHeight.current = viewerHeightM;
+    if (crossed.length > 0) setPassed(crossed[crossed.length - 1]!.name);
+  }, [viewerHeightM, rivals]);
+
+  // Auto-dismiss lives in its OWN effect keyed on `passed`, so building more words
+  // (which re-runs the crossing effect above) can't cancel the pending dismissal.
+  useEffect(() => {
+    if (passed == null) return;
+    const id = setTimeout(() => setPassed(null), PASS_TOAST_MS);
+    return () => clearTimeout(id);
+  }, [passed]);
+
+  const buildLineY = h * BUILD_LINE_FRACTION;
+  const markers = h > 0 ? visibleRivalMarkers(viewerHeightM, rivals, buildLineY, h, PROP_PX_PER_M) : [];
+
+  return (
+    <div ref={ref} className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      {markers.map((m, i) => {
+        // Alternate edges so multiple rivals don't overlap; a tinted block-striped
+        // column rises to the record line — "their tower reaches this high".
+        const side = i % 2 === 0 ? 'start-1' : 'end-1';
+        const colH = Math.min(h, Math.max(90, h - m.screenY));
+        const mat = hex(blockMaterial(m.highestBiome ?? 'city'));
+        return (
+          <div
+            key={m.id}
+            className={`absolute ${side}`}
+            style={{ top: m.screenY, transition: reducedMotion ? 'none' : LINE_FLOW }}
+          >
+            <span className="absolute -top-6 start-0 flex items-center gap-1 whitespace-nowrap rounded-neo border-neo border-black bg-neo-navy/75 px-1.5 py-0.5 font-neo-body text-[10px] font-bold text-neo-white backdrop-blur-sm">
+              <span
+                className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-black text-[8px] leading-none"
+                style={{ background: m.avatarColor ?? '#2a2a40' }}
+              >
+                {m.avatarEmoji ?? '🧗'}
+              </span>
+              {m.name} · {Math.round(m.heightM)}m
+            </span>
+            {/* Roof cap — the rival tower's crown at their record height. */}
+            <div className="h-1.5 w-5 rounded-t-neo border border-black" style={{ background: mat }} />
+            <div
+              className="w-5 border-x border-black/50"
+              style={{
+                height: colH,
+                opacity: 0.5,
+                backgroundColor: mat,
+                backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.32) 0 1px, transparent 1px 11px), repeating-linear-gradient(0deg, rgba(255,255,255,0.16) 2px 4px, transparent 4px 12px)',
+              }}
+            />
+          </div>
+        );
+      })}
+      {passed && (
+        // Pinned high under the HUD — NOT over the build column (was top-[42%], which
+        // covered the tower letters).
+        <div className="absolute left-1/2 top-[15%] -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-yellow px-3 py-1.5 font-neo-display text-sm font-black text-black shadow-hard">
+          🎉 {t('wordTower.hud.rivalPassed', { name: passed })}
+        </div>
+      )}
+    </div>
+  );
+}

@@ -77,6 +77,54 @@ export interface AuthContext {
 type GamesMap = Record<string, GameBase>;
 
 /**
+ * Get diagnostic sizes of all internal maps.
+ * Useful for health check endpoints and monitoring.
+ */
+export function getSocketMapSizes(): { socketToGame: number; socketToUsername: number; usernameToSocket: number; authUserConnections: number } {
+  return {
+    socketToGame: socketToGame.size,
+    socketToUsername: socketToUsername.size,
+    usernameToSocket: usernameToSocket.size,
+    authUserConnections: authUserConnections.size,
+  };
+}
+
+/**
+ * Purge stale socket entries that reference sockets no longer in the Socket.IO server.
+ * Call periodically (e.g. every 5 min) to prevent unbounded map growth from
+ * orphaned entries where disconnect events were missed.
+ */
+export function purgeStaleSocketEntries(activeSocketIds: Set<string>): number {
+  let purged = 0;
+
+  for (const [socketId] of socketToGame) {
+    if (!activeSocketIds.has(socketId)) {
+      socketToGame.delete(socketId);
+      socketToUsername.delete(socketId);
+      purged++;
+    }
+  }
+
+  // Clean usernameToSocket entries pointing to dead sockets
+  for (const [key, socketId] of usernameToSocket) {
+    if (!activeSocketIds.has(socketId)) {
+      usernameToSocket.delete(key);
+      purged++;
+    }
+  }
+
+  // Clean authUserConnections entries pointing to dead sockets
+  for (const [userId, conn] of authUserConnections) {
+    if (!activeSocketIds.has(conn.socketId)) {
+      authUserConnections.delete(userId);
+      purged++;
+    }
+  }
+
+  return purged;
+}
+
+/**
  * Add a user to a game
  */
 export function addUserToGame(
@@ -257,11 +305,16 @@ export function updateUserSocketId(
   game.users[username].socketId = newSocketId;
 
   // Update auth context if provided (for reconnection with new auth state)
+  // IMPORTANT: Only overwrite if the new value is truthy (not null/undefined)
+  // This preserves the existing auth context when reconnecting without auth data
   if (authContext) {
-    if (authContext.authUserId !== undefined) {
+    // Only update authUserId if the new value is truthy (a real user ID)
+    // This prevents clearing an existing authUserId when reconnecting without auth data
+    if (authContext.authUserId) {
       game.users[username].authUserId = authContext.authUserId;
     }
-    if (authContext.guestTokenHash !== undefined) {
+    // Only update guestTokenHash if the new value is truthy
+    if (authContext.guestTokenHash) {
       game.users[username].guestTokenHash = authContext.guestTokenHash;
     }
   }
@@ -283,6 +336,18 @@ export function updateUserSocketId(
   }
 
   return true;
+}
+
+/**
+ * Update username in socket mappings (for guest name changes)
+ */
+export function updateUsernameMapping(gameCode: string, oldUsername: string, newUsername: string, socketId: string): void {
+  // Remove old mappings
+  usernameToSocket.delete(`${gameCode}:${oldUsername}`);
+
+  // Set new mappings
+  socketToUsername.set(socketId, newUsername);
+  usernameToSocket.set(`${gameCode}:${newUsername}`, socketId);
 }
 
 /**
@@ -395,6 +460,12 @@ export function cleanupUserMappings(game: GameBase | null, gameCode: string): vo
   if (!game) return;
 
   for (const username of Object.keys(game.users)) {
+    const userData = game.users[username];
+    // Clean auth user connections for this game
+    if (userData && userData.authUserId) {
+      authUserConnections.delete(userData.authUserId);
+    }
+
     const key = `${gameCode}:${username}`;
     const socketId = usernameToSocket.get(key);
     if (socketId) {
@@ -404,6 +475,24 @@ export function cleanupUserMappings(game: GameBase | null, gameCode: string): vo
     }
   }
 }
+
+/**
+ * Remove stale auth user connections whose games no longer exist.
+ * Should be called periodically (e.g., every 5 minutes) to prevent unbounded growth.
+ */
+export function cleanupStaleAuthConnections(activeGameCodes: Set<string>): number {
+  let cleaned = 0;
+  for (const [authUserId, conn] of authUserConnections.entries()) {
+    if (!activeGameCodes.has(conn.gameCode)) {
+      authUserConnections.delete(authUserId);
+      cleaned++;
+    }
+  }
+  return cleaned;
+}
+
+// Test-only named exports for internal maps
+export { socketToGame as _socketToGame, socketToUsername as _socketToUsername, usernameToSocket as _usernameToSocket, authUserConnections as _authUserConnections };
 
 // CommonJS exports for backward compatibility
 module.exports = {
@@ -416,6 +505,7 @@ module.exports = {
   getSocketIdByUsername,
   getUserBySocketId,
   updateUserSocketId,
+  updateUsernameMapping,
   getGameUsers,
 
   // Host management
@@ -429,6 +519,9 @@ module.exports = {
   clearSocketMappings,
   clearSocketMappingsForLeave,
   cleanupUserMappings,
+  cleanupStaleAuthConnections,
+  getSocketMapSizes,
+  purgeStaleSocketEntries,
 
   // Expose maps for testing
   _socketToGame: socketToGame,

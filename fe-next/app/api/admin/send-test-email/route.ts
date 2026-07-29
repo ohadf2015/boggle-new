@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { createClient } from '@/utils/supabase/server';
 import { sendTestEmail, isEmailServiceConfigured } from '@/lib/email';
+import { captureApiError } from '@/utils/sentry';
+
+export const maxDuration = 60;
 
 /**
  * POST /api/admin/send-test-email
@@ -15,12 +19,12 @@ import { sendTestEmail, isEmailServiceConfigured } from '@/lib/email';
 export async function POST(request: NextRequest) {
   const startTime = Date.now();
   // Using console.warn because console.log is stripped in production
-  console.warn('[Admin] ====== Send test email request START ======');
+  logger.warn('[Admin] ====== Send test email request START ======');
 
   // Check if email service is configured FIRST (fast check)
-  console.warn('[Admin] Step 1: Checking email config...');
+  logger.warn('[Admin] Step 1: Checking email config...');
   if (!isEmailServiceConfigured()) {
-    console.warn('[Admin] Email service not configured');
+    logger.warn('[Admin] Email service not configured');
     return NextResponse.json({
       error: 'Email service not configured. Set RESEND_API_KEY and RESEND_FROM_EMAIL in your environment variables.',
       details: {
@@ -29,46 +33,46 @@ export async function POST(request: NextRequest) {
       }
     }, { status: 503 });
   }
-  console.warn('[Admin] Step 1 DONE: Email config OK', { elapsed: Date.now() - startTime });
+  logger.warn('[Admin] Step 1 DONE: Email config OK', { elapsed: Date.now() - startTime });
 
   try {
     // Create Supabase client
-    console.warn('[Admin] Step 2: Creating Supabase client...');
+    logger.warn('[Admin] Step 2: Creating Supabase client...');
     const supabase = await createClient();
-    console.warn('[Admin] Step 2 DONE: Supabase client created', { elapsed: Date.now() - startTime });
+    logger.warn('[Admin] Step 2 DONE: Supabase client created', { elapsed: Date.now() - startTime });
 
     // Check if user is authenticated
-    console.warn('[Admin] Step 3: Getting user...');
+    logger.warn('[Admin] Step 3: Getting user...');
     const { data: { user }, error: authError } = await supabase.auth.getUser();
-    console.warn('[Admin] Step 3 DONE: getUser complete', { elapsed: Date.now() - startTime, hasUser: !!user, authError: authError?.message });
+    logger.warn('[Admin] Step 3 DONE: getUser complete', { elapsed: Date.now() - startTime, hasUser: !!user, authError: authError?.message });
 
     if (authError || !user) {
-      console.warn('[Admin] Auth failed:', authError?.message);
+      logger.warn('[Admin] Auth failed:', authError?.message);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Check if user is admin
-    console.warn('[Admin] Step 4: Checking admin status for user', user.id);
+    logger.warn('[Admin] Step 4: Checking admin status for user', user.id);
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
       .select('is_admin, display_name, username')
       .eq('id', user.id)
       .single();
-    console.warn('[Admin] Step 4 DONE: Profile fetched', { elapsed: Date.now() - startTime, isAdmin: profile?.is_admin, profileError: profileError?.message });
+    logger.warn('[Admin] Step 4 DONE: Profile fetched', { elapsed: Date.now() - startTime, isAdmin: profile?.is_admin, profileError: profileError?.message });
 
     if (profileError || !profile?.is_admin) {
-      console.warn('[Admin] Not admin or profile error:', profileError?.message);
+      logger.warn('[Admin] Not admin or profile error:', profileError?.message);
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
     // Parse request body
-    console.warn('[Admin] Step 5: Parsing request body...');
+    logger.warn('[Admin] Step 5: Parsing request body...');
     let body: { email?: string; recipientName?: string } = {};
     try {
       body = await request.json();
-      console.warn('[Admin] Step 5 DONE: Body parsed', { elapsed: Date.now() - startTime, body });
+      logger.warn('[Admin] Step 5 DONE: Body parsed', { elapsed: Date.now() - startTime, body });
     } catch {
-      console.warn('[Admin] Step 5 DONE: Empty body (using defaults)', { elapsed: Date.now() - startTime });
+      logger.warn('[Admin] Step 5 DONE: Empty body (using defaults)', { elapsed: Date.now() - startTime });
     }
 
     // Use provided email or default to admin's email
@@ -82,30 +86,36 @@ export async function POST(request: NextRequest) {
     // Use provided name or default to admin's name
     const recipientName = body.recipientName || profile.display_name || profile.username || 'Test User';
 
-    console.warn('[Admin] Step 6: Sending test email...', { targetEmail, recipientName });
+    logger.warn('[Admin] Step 6: Sending test email...', { targetEmail, recipientName });
 
     // Send the test email
     const result = await sendTestEmail(targetEmail, recipientName);
-    console.warn('[Admin] Step 6 DONE: sendTestEmail returned', { elapsed: Date.now() - startTime, result });
+    logger.warn('[Admin] Step 6 DONE: sendTestEmail returned', { elapsed: Date.now() - startTime, result });
 
     if (!result.success) {
-      console.warn('[Admin] Send failed:', result.error);
+      logger.warn('[Admin] Send failed:', result.error);
       return NextResponse.json({
         error: result.error || 'Failed to send test email',
       }, { status: 500 });
     }
 
-    console.warn('[Admin] ====== SUCCESS - Total time:', Date.now() - startTime, 'ms ======');
+    logger.warn('[Admin] ====== SUCCESS - Total time:', Date.now() - startTime, 'ms ======');
     return NextResponse.json({
       success: true,
       message: `Test email sent to ${targetEmail}`,
       sentTo: targetEmail,
     });
   } catch (error) {
-    console.error('[Admin] ====== ERROR after', Date.now() - startTime, 'ms ======');
-    console.error('[Admin] Error details:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
+    logger.error('[Admin] ====== ERROR after', Date.now() - startTime, 'ms ======');
+    logger.error('[Admin] Error details:', errorMessage);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/send-test-email',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json({
-      error: error instanceof Error ? error.message : 'Internal server error',
+      error: errorMessage,
     }, { status: 500 });
   }
 }

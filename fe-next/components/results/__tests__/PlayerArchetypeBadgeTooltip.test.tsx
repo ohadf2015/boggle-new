@@ -12,26 +12,26 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 const mockLanguageContext = {
   t: (key: string) => key,
   language: 'he',
-  setLanguage: jest.fn(),
+  setLanguage: vi.fn(),
   dir: 'rtl',
 };
 
-jest.mock('../../../contexts/LanguageContext', () => ({
+vi.mock('../../../contexts/LanguageContext', () => ({
   useLanguage: () => mockLanguageContext,
 }));
 
-jest.mock('../../../contexts/SoundEffectsContext', () => ({
+vi.mock('../../../contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playSound: jest.fn(),
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    playErrorSound: jest.fn(),
-    setGameActive: jest.fn(),
+    playSound: vi.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    playErrorSound: vi.fn(),
+    setGameActive: vi.fn(),
   }),
 }));
 
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, ...domProps } = props as Record<string, unknown>;
       return <div {...domProps}>{children}</div>;
@@ -40,7 +40,7 @@ jest.mock('framer-motion', () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ alt, ...props }: { alt: string; [key: string]: unknown }) => {
     return (
@@ -51,8 +51,8 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock createPortal to render inline for testing
-jest.mock('react-dom', () => {
-  const originalModule = jest.requireActual('react-dom');
+vi.mock('react-dom', () => {
+  const originalModule = vi.importActual('react-dom');
   return {
     ...originalModule,
     createPortal: (node: React.ReactNode) => node,
@@ -87,7 +87,7 @@ describe('PlayerArchetypeBadge Tooltip Position', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('positions tooltip arrow pointing at the badge when badge is near right edge in RTL', async () => {
@@ -110,7 +110,7 @@ describe('PlayerArchetypeBadge Tooltip Position', () => {
       toJSON: () => ({}),
     };
 
-    Element.prototype.getBoundingClientRect = jest.fn(() => mockBadgeRect);
+    Element.prototype.getBoundingClientRect = vi.fn(() => mockBadgeRect);
 
     render(<PlayerArchetypeBadge archetype={mockArchetype} animate={false} />);
 
@@ -176,7 +176,7 @@ describe('PlayerArchetypeBadge Tooltip Position', () => {
       toJSON: () => ({}),
     };
 
-    Element.prototype.getBoundingClientRect = jest.fn(() => mockBadgeRect);
+    Element.prototype.getBoundingClientRect = vi.fn(() => mockBadgeRect);
 
     render(<PlayerArchetypeBadge archetype={mockArchetype} animate={false} />);
 

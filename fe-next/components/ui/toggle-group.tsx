@@ -18,21 +18,21 @@ const toggleVariants = cva(
     "shadow-hard-sm",
     // Focus state
     "ring-offset-background",
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
+    "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2",
     // Disabled state
-    "disabled:pointer-events-none disabled:opacity-50",
+    "disabled:pointer-events-none disabled:opacity-70",
     // Transition
     "transition-all duration-100",
     // Active (selected) state - yellow with shadow
     "data-[state=on]:bg-neo-lime data-[state=on]:shadow-hard",
     // Hover effect (non-selected)
-    "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard",
+    "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard",
   ].join(" "),
   {
     variants: {
       variant: {
         default: "",
-        outline: "bg-transparent border-2 text-neo-cream",
+        outline: "bg-transparent border-2 text-neo-white",
       },
       size: {
         default: "h-10 px-4",

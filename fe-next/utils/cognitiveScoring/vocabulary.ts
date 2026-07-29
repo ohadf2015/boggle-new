@@ -17,18 +17,21 @@ interface VocabularyInput {
 /**
  * Calculate Vocabulary score (0-100)
  *
- * Formula:
- * - rareRatio = (rareWords + legendaryWords * 2) / wordsFound
- * - Score = rareRatio * 200, capped at 100
+ * Formula uses absolute rare word count + ratio bonus:
+ * - baseScore = rareWordCount * 15 + legendaryWordCount * 30
+ * - ratioBonus = (rareRatio * 50) if rareRatio > 0.1
+ * - Score = baseScore + ratioBonus, capped at 100
  *
  * Legendary words count double because they're much harder to find.
  *
  * Tuned so that:
- * - 10% rare words = 20 points
- * - 25% rare words = 50 points
- * - 50%+ rare words = 100 points
+ * - 2 rare words (10%) = ~35 points (decent)
+ * - 3 rare words (15%) = ~55 points (good)
+ * - 5 rare words (25%) = ~85 points (excellent)
+ * - 1 legendary word adds significant bonus
  *
- * Most players find mostly common words, so high rare % is impressive.
+ * This formula rewards finding rare words without requiring
+ * unrealistic ratios for decent scores.
  */
 export function calculateVocabulary(input: VocabularyInput): number {
   const { wordsFound, rareWordCount, legendaryWordCount } = input;
@@ -37,14 +40,17 @@ export function calculateVocabulary(input: VocabularyInput): number {
     return 0;
   }
 
-  // Weight legendary words more heavily (they're much rarer)
+  // Base score from absolute rare word count
+  // Each rare word = 15 points, each legendary = 30 points
+  const baseScore = (rareWordCount * 15) + (legendaryWordCount * 30);
+
+  // Bonus for higher rare ratio (rewards efficiency)
   const weightedRareCount = rareWordCount + (legendaryWordCount * 2);
-
-  // Calculate ratio of rare/legendary to total
   const rareRatio = weightedRareCount / wordsFound;
+  const ratioBonus = rareRatio > 0.1 ? rareRatio * 50 : 0;
 
-  // Calculate score with multiplier
-  const rawScore = rareRatio * 200;
+  // Calculate score
+  const rawScore = baseScore + ratioBonus;
 
   // Cap at 100 and round
   return Math.min(100, Math.round(rawScore));

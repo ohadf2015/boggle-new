@@ -1,4 +1,5 @@
 import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "../../lib/utils";
 
@@ -12,10 +13,8 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
     <div
       ref={ref}
       className={cn(
-        // Neo-Brutalist card styling
-        "rounded-neo-lg border-4 border-neo-black bg-neo-cream text-neo-black",
-        // Dark mode - use dark background with 3:1+ contrast border
-        "dark:bg-slate-800 dark:text-neo-white dark:border-slate-400",
+        // Neo-Brutalist card styling (dark-only)
+        "rounded-neo-lg border-4 border-neo-cream/40 bg-neo-navy text-neo-white",
         "shadow-hard-lg h-full",
         // Container query setup for responsive children
         "cq-container",
@@ -49,6 +48,64 @@ const CardDark = React.forwardRef<HTMLDivElement, CardProps>(
   )
 );
 CardDark.displayName = "CardDark";
+
+// CVA-based Card Variants (for flexible card system)
+const cardVariants = cva(
+  // Base styles - shared across all variants
+  "border-neo-black rounded-neo @container/card cq-container h-full",
+  {
+    variants: {
+      variant: {
+        default: "bg-neo-gray text-neo-white shadow-hard-lg border-4",
+        dark: "bg-neo-black text-neo-white shadow-hard-lg border-4",
+        gradient: "border-3 shadow-hard", // For ModeCard-style gradients - background set via gradient prop
+        outline: "bg-transparent border-3 shadow-hard-sm",
+      },
+      tilt: {
+        none: "",
+        left: "rotate-[-2deg]",
+        right: "rotate-[2deg]",
+      },
+      hover: {
+        none: "",
+        lift: "transition-transform hover:-translate-y-1 hover:shadow-hard-xl",
+        tilt3d: "transition-all hover:rotate-0", // For ModeCard 3D effect
+      },
+      padding: {
+        none: "p-0",
+        tight: "*:cq-p-tight",
+        normal: "*:cq-p-responsive",
+        large: "*:cq-p-responsive-lg",
+        generous: "*:cq-p-generous",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      tilt: "none",
+      hover: "none",
+      padding: "normal",
+    },
+  }
+);
+
+// New CardVariant component with full CVA support
+export interface CardVariantProps
+  extends React.HTMLAttributes<HTMLDivElement>,
+    VariantProps<typeof cardVariants> {
+  gradient?: string; // For custom gradient backgrounds (e.g., "bg-linear-to-br from-neo-cyan to-cyan-400")
+}
+
+const CardVariant = React.forwardRef<HTMLDivElement, CardVariantProps>(
+  ({ className, variant, tilt, hover, padding, gradient, style, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn(cardVariants({ variant, tilt, hover, padding }), gradient, className)}
+      style={style}
+      {...props}
+    />
+  )
+);
+CardVariant.displayName = "CardVariant";
 
 const CardHeader = React.forwardRef<
   HTMLDivElement,
@@ -84,7 +141,7 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm lg:text-base xl:text-lg text-neo-black/90 dark:text-neo-white/90", className)}
+    className={cn("text-sm lg:text-base xl:text-lg text-neo-white", className)}
     {...props}
   />
 ));
@@ -110,4 +167,14 @@ const CardFooter = React.forwardRef<
 ));
 CardFooter.displayName = "CardFooter";
 
-export { Card, CardDark, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
+export {
+  Card,
+  CardDark,
+  CardVariant,
+  cardVariants,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardDescription,
+  CardContent,
+};

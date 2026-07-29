@@ -1,43 +1,23 @@
 'use client';
 
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { Bot } from 'lucide-react';
+import {
+  AlertTriangle, Ban, BookOpen, Bot, Check, CheckCircle, Crown, FileText,
+  Flag, Gamepad2, HelpCircle, Hourglass, Info, Lightbulb, Link,
+  Plug, RefreshCw, Rocket, Ruler, Shield, Smartphone, Sparkles,
+  Square, StopCircle, Tag, Target, Timer, Trophy, Users, XCircle,
+} from 'lucide-react';
 import { applyHebrewFinalLetters } from '@/utils/utils';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
+import { Loader } from '@/components/ui/Loader';
 
 /**
  * Neo-Brutalist Toast Component
  * Features: Thick borders, hard shadows, bold uppercase text, vibrant colors
  */
 
-// Custom toast styles for Neo-Brutalist design
-const neoToastStyles = {
-  success: {
-    background: 'var(--neo-lime)',
-    color: 'var(--neo-black)',
-    border: '3px solid var(--neo-black)',
-    boxShadow: '4px 4px 0px var(--neo-black)',
-  },
-  error: {
-    background: 'var(--neo-red)',
-    color: 'var(--neo-white)',
-    border: '3px solid var(--neo-black)',
-    boxShadow: '4px 4px 0px var(--neo-black)',
-  },
-  info: {
-    background: 'var(--neo-cyan)',
-    color: 'var(--neo-black)',
-    border: '3px solid var(--neo-black)',
-    boxShadow: '4px 4px 0px var(--neo-black)',
-  },
-  warning: {
-    background: 'var(--neo-yellow)',
-    color: 'var(--neo-black)',
-    border: '3px solid var(--neo-black)',
-    boxShadow: '4px 4px 0px var(--neo-black)',
-  },
-};
 
 interface WordAcceptedOptions {
   score?: number;
@@ -76,16 +56,52 @@ export type WordRejectionReason =
   | 'timeout'
   | 'unknown';
 
-const REJECTION_MESSAGES: Record<WordRejectionReason, { icon: string; message: string }> = {
-  not_in_dictionary: { icon: '📖', message: 'Not in dictionary' },
-  already_found: { icon: '🔄', message: 'Already found this word' },
-  too_short: { icon: '📏', message: 'Word too short' },
-  invalid_path: { icon: '🚫', message: 'Invalid letter path' },
-  outside_board: { icon: '⬜', message: 'Letters not on board' },
-  not_connected: { icon: '🔗', message: 'Letters not connected' },
-  duplicate: { icon: '👥', message: 'Already submitted' },
-  timeout: { icon: '⏱️', message: 'Validation timeout' },
-  unknown: { icon: '❓', message: 'Word not accepted' },
+const iconClass = 'w-5 h-5';
+
+/**
+ * Shared icon map for toast notifications.
+ * Exported so .ts hook files can reference icons without JSX.
+ */
+export const TOAST_ICONS = {
+  bookOpen: <BookOpen className={iconClass} />,
+  refresh: <RefreshCw className={iconClass} />,
+  ruler: <Ruler className={iconClass} />,
+  ban: <Ban className={iconClass} />,
+  square: <Square className={iconClass} />,
+  link: <Link className={iconClass} />,
+  users: <Users className={iconClass} />,
+  timer: <Timer className={iconClass} />,
+  helpCircle: <HelpCircle className={iconClass} />,
+  hourglass: <Hourglass className={iconClass} />,
+  crown: <Crown className={iconClass} />,
+  smartphone: <Smartphone className={iconClass} />,
+  check: <Check className={iconClass} />,
+  alertTriangle: <AlertTriangle className={iconClass} />,
+  gamepad: <Gamepad2 className={iconClass} />,
+  rocket: <Rocket className={iconClass} />,
+  target: <Target className={iconClass} />,
+  trophy: <Trophy className={iconClass} />,
+  xCircle: <XCircle className={iconClass} />,
+  flag: <Flag className={iconClass} />,
+  plug: <Plug className={iconClass} />,
+  stopCircle: <StopCircle className={iconClass} />,
+  shield: <Shield className={iconClass} />,
+  lightbulb: <Lightbulb className={iconClass} />,
+  tag: <Tag className={iconClass} />,
+  fileText: <FileText className={iconClass} />,
+  sparkles: <Sparkles className={iconClass} />,
+} as const;
+
+const REJECTION_MESSAGES: Record<WordRejectionReason, { icon: React.ReactNode; messageKey: string }> = {
+  not_in_dictionary: { icon: TOAST_ICONS.bookOpen, messageKey: 'toast.rejection.notInDictionary' },
+  already_found: { icon: TOAST_ICONS.refresh, messageKey: 'toast.rejection.alreadyFound' },
+  too_short: { icon: TOAST_ICONS.ruler, messageKey: 'toast.rejection.tooShort' },
+  invalid_path: { icon: TOAST_ICONS.ban, messageKey: 'toast.rejection.invalidPath' },
+  outside_board: { icon: TOAST_ICONS.square, messageKey: 'toast.rejection.outsideBoard' },
+  not_connected: { icon: TOAST_ICONS.link, messageKey: 'toast.rejection.notConnected' },
+  duplicate: { icon: TOAST_ICONS.users, messageKey: 'toast.rejection.duplicate' },
+  timeout: { icon: TOAST_ICONS.timer, messageKey: 'toast.rejection.timeout' },
+  unknown: { icon: TOAST_ICONS.helpCircle, messageKey: 'toast.rejection.unknown' },
 };
 
 interface WordRejectedOptions {
@@ -108,59 +124,62 @@ export const wordAcceptedToast = (word: string, options: WordAcceptedOptions = {
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
+            role="status"
+            aria-live="polite"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
-            <motion.span
-              initial={{ scale: 0, rotate: -180 }}
-              animate={{ scale: 1, rotate: 0 }}
+            <m.span
+              initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 300 }}
-              className="text-2xl"
+              className="text-2xl text-neo-black"
+              aria-hidden="true"
             >
               ✓
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {applyHebrewFinalLetters(word)}
             </span>
             {/* Show score if provided and greater than 0 */}
             {typeof score === 'number' && score > 0 && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
+              <m.span
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
                 className="px-2 py-1 bg-neo-cyan border-2 border-neo-black rounded font-black text-sm text-neo-black"
               >
                 +{score}
-              </motion.span>
+              </m.span>
             )}
             {/* Show fire round 2x multiplier badge */}
             {fireRoundActive && (
-              <motion.span
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
+              <m.span
+                initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 15 }}
-                className="px-2 py-1 bg-gradient-to-r from-neo-red to-neo-pink border-2 border-neo-black rounded font-black text-xs text-neo-cream"
+                className="px-2 py-1 bg-linear-to-r from-neo-red to-neo-pink border-2 border-neo-black rounded font-black text-xs text-neo-white"
               >
                 🔥 ×2
-              </motion.span>
+              </m.span>
             )}
             {/* Show combo bonus if present */}
             {typeof comboBonus === 'number' && comboBonus > 0 && (
-              <motion.span
-                initial={{ scale: 0, rotate: -10 }}
-                animate={{ scale: 1, rotate: 0 }}
+              <m.span
+                initial={{ opacity: 0, scale: 0.95, rotate: -10 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
                 transition={{ delay: 0.25, type: 'spring', stiffness: 400, damping: 15 }}
-                className="px-2 py-1 bg-neo-pink border-2 border-neo-black rounded font-black text-sm text-neo-white"
+                className="px-2 py-1 bg-neo-pink border-2 border-neo-black rounded font-black text-sm text-neo-black"
               >
                 +{comboBonus} {options.comboBonusLabel || 'combo!'}
-              </motion.span>
+              </m.span>
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -177,28 +196,28 @@ export const wordNeedsValidationToast = (word: string, options: WordNeedsValidat
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               animate={{ rotate: [0, 10, -10, 0] }}
               transition={{ duration: 0.5, repeat: 2 }}
-              className="text-2xl"
+              className="text-2xl text-neo-black"
             >
               ⏳
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {applyHebrewFinalLetters(word)}
             </span>
             <span dir="auto" className="text-xs font-bold text-neo-black/70 uppercase">
               {options.pendingLabel || 'Pending'}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -215,40 +234,37 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-pink border-3 border-neo-black shadow-hard"
             style={{ minWidth: '220px', pointerEvents: 'auto' }}
           >
-            <motion.span
+            <m.span
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
               className="text-2xl flex items-center justify-center"
             >
-              <Bot className="text-neo-cream" />
-            </motion.span>
+              <Bot className="text-neo-black" />
+            </m.span>
             <div className="flex flex-col">
-              <span dir="auto" className="font-black uppercase tracking-wide text-neo-cream">
+              <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
                 {applyHebrewFinalLetters(word)}
               </span>
-              <span dir="auto" className="text-xs font-bold text-neo-cream/80 uppercase">
+              <span dir="auto" className="text-xs font-bold text-neo-black/70 uppercase">
                 {options.aiValidatingLabel || 'AI checking...'}
               </span>
             </div>
-            <motion.div
+            <m.div
               animate={{ scale: [1, 1.2, 1] }}
-              transition={{ duration: 0.6, repeat: Infinity }}
-              className="ml-auto"
+              transition={{ type: 'tween', duration: 0.6, repeat: Infinity }}
+              className="ms-auto"
             >
-              <svg className="w-5 h-5 text-neo-cream animate-spin" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-            </motion.div>
-          </motion.div>
+              <Loader size="sm" />
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -261,16 +277,16 @@ export const wordAIValidatingToast = (word: string, options: WordAIValidatingOpt
 };
 
 // Neo-Brutalist Word Rejected Toast (with detailed reason)
-export const wordRejectedToast = (word: string, options: WordRejectedOptions = {}): string => {
+export const wordRejectedToast = (word: string, options: WordRejectedOptions & { t?: (key: string) => string } = {}): string => {
   const { reason = 'unknown', customMessage, duration } = options;
   const rejectionInfo = REJECTION_MESSAGES[reason];
-  const displayMessage = customMessage || rejectionInfo.message;
+  const displayMessage = customMessage || (options.t ? options.t(rejectionInfo.messageKey) : rejectionInfo.messageKey);
 
   return toast.custom(
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9, x: 0 }}
             animate={{
               y: 0,
@@ -285,34 +301,37 @@ export const wordRejectedToast = (word: string, options: WordRejectedOptions = {
               damping: 25,
               x: { duration: 0.4, delay: 0.1 }
             }}
+            role="alert"
+            aria-live="assertive"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ minWidth: '240px', pointerEvents: 'auto' }}
           >
-            <motion.span
-              initial={{ scale: 0, rotate: -90 }}
-              animate={{ scale: 1, rotate: 0 }}
+            <m.span
+              initial={{ opacity: 0, scale: 0.95, rotate: -90 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
-              className="text-2xl"
+              className="text-2xl text-neo-white"
+              aria-hidden="true"
             >
               {rejectionInfo.icon}
-            </motion.span>
+            </m.span>
             <div className="flex flex-col gap-0.5">
               <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
                 {applyHebrewFinalLetters(word)}
               </span>
-              <span dir="auto" className="text-xs font-bold text-neo-white/80 uppercase">
+              <span dir="auto" className="text-xs font-bold text-neo-white uppercase">
                 {displayMessage}
               </span>
             </div>
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+            <m.span
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 15 }}
-              className="text-xl ml-auto"
+              className="text-xl ms-auto text-neo-white"
             >
               ✗
-            </motion.span>
-          </motion.div>
+            </m.span>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -329,7 +348,7 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9, x: 0 }}
             animate={{
               y: 0,
@@ -344,21 +363,24 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
               damping: 25,
               x: { duration: 0.4, delay: 0.1 }
             }}
+            role="alert"
+            aria-live="assertive"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ minWidth: '200px', pointerEvents: 'auto' }}
           >
-            <motion.span
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
+            <m.span
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
-              className="text-2xl"
+              className="text-2xl text-neo-white"
+              aria-hidden="true"
             >
               ✗
-            </motion.span>
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -371,32 +393,34 @@ export const wordErrorToast = (message: string, options: WordErrorOptions = {}):
 
 // Neo-Brutalist Success Toast (generic)
 export const neoSuccessToast = (message: string, options: NeoToastOptions = {}): string => {
+  const icon = options.icon ?? <CheckCircle className="w-6 h-6 text-neo-black" />;
   return toast.custom(
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
+            role="status"
+            aria-live="polite"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-lime border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            {options.icon && (
-              <motion.span
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.1, type: 'spring' }}
-                className="text-2xl"
-              >
-                {options.icon}
-              </motion.span>
-            )}
+            <m.span
+              initial={{ opacity: 0, scale: 0.95, rotate: -180 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              transition={{ delay: 0.1, type: 'spring' }}
+              className="text-2xl text-neo-black"
+              aria-hidden="true"
+            >
+              {icon}
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -410,11 +434,12 @@ export const neoSuccessToast = (message: string, options: NeoToastOptions = {}):
 
 // Neo-Brutalist Error Toast (generic)
 export const neoErrorToast = (message: string, options: NeoToastOptions = {}): string => {
+  const icon = options.icon ?? <XCircle className="w-6 h-6 text-neo-white" />;
   return toast.custom(
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9, x: 0 }}
             animate={{
               y: 0,
@@ -429,23 +454,24 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
               damping: 25,
               x: { duration: 0.3 }
             }}
+            role="alert"
+            aria-live="assertive"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-red border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            {options.icon && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
-                className="text-2xl"
-              >
-                {options.icon}
-              </motion.span>
-            )}
+            <m.span
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
+              className="text-2xl text-neo-white"
+              aria-hidden="true"
+            >
+              {icon}
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-white">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
@@ -458,49 +484,53 @@ export const neoErrorToast = (message: string, options: NeoToastOptions = {}): s
 
 // Neo-Brutalist Info Toast
 export const neoInfoToast = (message: string, options: NeoToastOptions = {}): string => {
+  const icon = options.icon ?? <Info className="w-6 h-6 text-neo-black" />;
   return toast.custom(
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: -10, opacity: 0, scale: 0.95 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={SPRING_PRESETS.snappy}
+            role="status"
+            aria-live="polite"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-cyan border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            {options.icon && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ delay: 0.1, type: 'spring' }}
-                className="text-2xl"
-              >
-                {options.icon}
-              </motion.span>
-            )}
+            <m.span
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.1, type: 'spring' }}
+              className="text-2xl text-neo-black"
+              aria-hidden="true"
+            >
+              {icon}
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
     {
       duration: options.duration || 3000,
       position: 'top-center',
+      id: options.id,
     }
   );
 };
 
 // Neo-Brutalist Warning Toast
 export const neoWarningToast = (message: string, options: NeoToastOptions = {}): string => {
+  const icon = options.icon ?? <AlertTriangle className="w-6 h-6 text-neo-black" />;
   return toast.custom(
     (t) => (
       <AnimatePresence>
         {t.visible && (
-          <motion.div
+          <m.div
             initial={{ y: -20, opacity: 0, scale: 0.9 }}
             animate={{
               y: 0,
@@ -515,29 +545,31 @@ export const neoWarningToast = (message: string, options: NeoToastOptions = {}):
               damping: 25,
               x: { duration: 0.3, delay: 0.1 }
             }}
+            role="status"
+            aria-live="polite"
             className="flex items-center gap-3 px-4 py-3 rounded-lg bg-neo-yellow border-3 border-neo-black shadow-hard"
             style={{ pointerEvents: 'auto' }}
           >
-            {options.icon && (
-              <motion.span
-                initial={{ scale: 0 }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
-                className="text-2xl"
-              >
-                {options.icon}
-              </motion.span>
-            )}
+            <m.span
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: [1, 1.2, 1] }}
+              transition={{ delay: 0.1, type: 'spring', repeat: 1 }}
+              className="text-2xl text-neo-black"
+              aria-hidden="true"
+            >
+              {icon}
+            </m.span>
             <span dir="auto" className="font-black uppercase tracking-wide text-neo-black">
               {message}
             </span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     ),
     {
       duration: options.duration || 4000,
       position: 'top-center',
+      id: options.id,
     }
   );
 };

@@ -1,4 +1,4 @@
-import { translations } from '@/translations';
+import { loadTranslation } from '@/translations/loadTranslation';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
@@ -11,13 +11,20 @@ interface LayoutParams {
 export async function generateMetadata({ params }: LayoutParams): Promise<Metadata> {
   const { locale } = await params;
   const validLocale = (locale as Locale) || 'en';
-  const seo = translations[validLocale]?.seo?.multiplayer || translations.en.seo.multiplayer;
-  const baseSeo = translations[validLocale]?.seo || translations.en.seo;
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  // Only load English fallback if current locale is missing SEO data
+  const seo = t?.seo?.multiplayer ?? (await loadTranslation('en') as Record<string, any>).seo.multiplayer;
+  const baseSeo = t?.seo ?? (await loadTranslation('en') as Record<string, any>).seo;
 
   const localePath = `/${locale}`;
-  const ogImage = locale === 'he'
-    ? 'https://www.lexiclash.live/og-image-he.jpg'
-    : 'https://www.lexiclash.live/og-image-en.jpg';
+  const ogImageMap: Record<string, string> = {
+    he: 'https://www.lexiclash.live/og-image-he.webp',
+    en: 'https://www.lexiclash.live/og-image-en.webp',
+    sv: 'https://www.lexiclash.live/og-image-sv.webp',
+    ja: 'https://www.lexiclash.live/og-image-ja.webp',
+    es: 'https://www.lexiclash.live/og-image-es.webp',
+  };
+  const ogImage = ogImageMap[locale] || ogImageMap.en;
 
   return {
     title: seo.title,
@@ -53,6 +60,22 @@ export async function generateMetadata({ params }: LayoutParams): Promise<Metada
         sv: 'https://www.lexiclash.live/sv/multiplayer',
         ja: 'https://www.lexiclash.live/ja/multiplayer',
         es: 'https://www.lexiclash.live/es/multiplayer',
+        'en-IL': 'https://www.lexiclash.live/en/multiplayer',
+        'he-IL': 'https://www.lexiclash.live/he/multiplayer',
+        'en-US': 'https://www.lexiclash.live/en/multiplayer',
+        'es-US': 'https://www.lexiclash.live/es/multiplayer',
+        'en-GB': 'https://www.lexiclash.live/en/multiplayer',
+        'en-SE': 'https://www.lexiclash.live/en/multiplayer',
+        'sv-SE': 'https://www.lexiclash.live/sv/multiplayer',
+        'en-JP': 'https://www.lexiclash.live/en/multiplayer',
+        'ja-JP': 'https://www.lexiclash.live/ja/multiplayer',
+        'en-ES': 'https://www.lexiclash.live/en/multiplayer',
+        'es-ES': 'https://www.lexiclash.live/es/multiplayer',
+        'en-MX': 'https://www.lexiclash.live/en/multiplayer',
+        'es-MX': 'https://www.lexiclash.live/es/multiplayer',
+        'en-AU': 'https://www.lexiclash.live/en/multiplayer',
+        'es-AR': 'https://www.lexiclash.live/es/multiplayer',
+        'es-CO': 'https://www.lexiclash.live/es/multiplayer',
       },
     },
     robots: {
@@ -97,7 +120,7 @@ export default async function MultiplayerLayout({ children, params }: Multiplaye
     '@id': `https://www.lexiclash.live${localePath}/multiplayer#webpage`,
     url: `https://www.lexiclash.live${localePath}/multiplayer`,
     name: 'Multiplayer - LexiClash',
-    description: 'Join real-time word battles with friends! Host or join multiplayer rooms and compete live.',
+    description: 'Free online multiplayer word game — join real-time word battles with friends! Host or join rooms and compete live.',
     isPartOf: {
       '@id': 'https://www.lexiclash.live/#website',
     },

@@ -1,29 +1,23 @@
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useSearchParams } from 'next/navigation';
-import { ArrowLeft, Globe, ChevronDown, Trophy, Target, Check, UserCircle2 } from 'lucide-react';
+import { ArrowLeft, Trophy, Target, UserCircle2, Sparkles, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
 import DailyIntroCarousel from './DailyIntroCarousel';
 import { CreateChallengeModal } from './CreateChallengeModal';
 import { UnauthenticatedCreateChallengeSection } from './UnauthenticatedCreateChallengeSection';
+import { LanguageDropdown } from './LanguageDropdown';
 import AuthModal from '../auth/AuthModal';
-import { hasPlayedWordHuntToday } from '@/utils/dailyChallenge';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { safeToLocaleDateString } from '@/utils/bcp47Locale';
+import { useMusic } from '@/contexts/MusicContext';
+import { MascotWithEntrance } from '@/components/ui/Mascot';
 import type { Language } from '@/types';
 
-// ==========================================
-// Constants
-// ==========================================
-
-export const LANGUAGE_OPTIONS: { code: Language; flag: string; name: string }[] = [
-  { code: 'en', flag: '🇺🇸', name: 'English' },
-  { code: 'he', flag: '🇮🇱', name: 'עברית' },
-  { code: 'sv', flag: '🇸🇪', name: 'Svenska' },
-  { code: 'ja', flag: '🇯🇵', name: '日本語' },
-  { code: 'es', flag: '🇪🇸', name: 'Español' },
-];
+export { LANGUAGE_OPTIONS } from './LanguageDropdown';
 
 // ==========================================
 // Types
@@ -60,7 +54,7 @@ export interface DailyReadyScreenProps {
 // Component
 // ==========================================
 
-const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
+const DailyReadyScreenInner: React.FC<DailyReadyScreenProps> = ({
   puzzleNumber,
   puzzleDate,
   language,
@@ -78,11 +72,11 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   t,
 }) => {
   const searchParams = useSearchParams();
-  const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showCreateChallenge, setShowCreateChallenge] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [pendingCreateChallenge, setPendingCreateChallenge] = useState(false);
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
 
   // Auto-open leaderboard if showLeaderboard query param is present
   useEffect(() => {
@@ -112,17 +106,22 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
     setShowAuthModal(true);
   };
 
+  // Preload game music tracks while on ready screen
+  // This ensures music starts instantly when game begins (no loading delay)
+  const { preloadMusicTrack, TRACKS } = useMusic();
+  useEffect(() => {
+    // Preload BOSSA_ARCADE (survival mode music) and IN_GAME (standard game music)
+    // These are the most likely tracks needed when the game starts
+    preloadMusicTrack(TRACKS.BOSSA_ARCADE);
+    preloadMusicTrack(TRACKS.IN_GAME);
+  }, [preloadMusicTrack, TRACKS]);
+
   // Check if this is a valid challenge (same puzzle number)
   const isValidChallenge = challengeData && challengeData.puzzleNumber === puzzleNumber;
 
-  // Calculate how many languages have been completed today
-  const completedLanguagesCount = useMemo(() => {
-    return LANGUAGE_OPTIONS.filter(option => hasPlayedWordHuntToday(option.code)).length;
-  }, []);
-
   const formattedDate = useMemo(() => {
     try {
-      return new Date(puzzleDate + 'T00:00:00Z').toLocaleDateString(language, {
+      return safeToLocaleDateString(new Date(puzzleDate + 'T00:00:00Z'), language, {
         weekday: 'long',
         month: 'long',
         day: 'numeric',
@@ -133,15 +132,15 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
   }, [puzzleDate, language]);
 
   return (
-    <motion.div
+    <m.div
       key="ready"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col items-center justify-start pt-28 sm:pt-32 pb-24 lg:pb-4 px-4"
+      className="flex-1 flex flex-col items-center justify-start pt-2 sm:pt-4 px-4 pb-bottom-stack sm:pb-10 min-h-0 overflow-y-auto"
     >
       {/* Top bar with back and language */}
-      <div className="absolute top-20 sm:top-24 left-4 right-4 flex items-center justify-between">
+      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl flex items-center justify-between mb-2">
         {/* Back button */}
         <Button
           variant="ghost"
@@ -153,71 +152,33 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
           {t('daily.home')}
         </Button>
 
-        {/* Language Selector */}
-        <div className="relative">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setShowLangDropdown(!showLangDropdown)}
-            onBlur={() => setTimeout(() => setShowLangDropdown(false), 200)}
-            className="relative flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-sm hover:shadow-hard transition-all min-w-[44px] min-h-[44px]"
-          >
-            <span className="text-lg">{currentFlag}</span>
-            <Globe className="w-4 h-4 text-neo-black" />
-            <ChevronDown className={`w-3 h-3 text-neo-black transition-transform ${showLangDropdown ? 'rotate-180' : ''}`} />
-            {completedLanguagesCount > 0 && (
-              <span className="absolute -top-2 -right-2 w-5 h-5 bg-neo-lime text-neo-black rounded-full border-2 border-neo-black flex items-center justify-center text-xs font-black">
-                {completedLanguagesCount}
-              </span>
-            )}
-          </Button>
-
-          <AnimatePresence>
-            {showLangDropdown && (
-              <motion.div
-                initial={{ opacity: 0, y: -5, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -5, scale: 0.95 }}
-                transition={{ duration: 0.15 }}
-                className="absolute top-full right-0 mt-2 z-[100] bg-neo-cream border-3 border-neo-black rounded-neo shadow-hard-lg overflow-hidden min-w-[140px]"
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                {LANGUAGE_OPTIONS.map((option) => {
-                  const hasPlayed = hasPlayedWordHuntToday(option.code);
-                  return (
-                    <button
-                      key={option.code}
-                      onClick={() => {
-                        onLanguageChange(option.code);
-                        setShowLangDropdown(false);
-                      }}
-                      className={`w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-neo-cyan/30 transition-colors ${
-                        language === option.code ? 'bg-neo-cyan/50 font-bold' : ''
-                      }`}
-                    >
-                      <span className="text-lg">{option.flag}</span>
-                      <span className="text-sm text-neo-black">{option.name}</span>
-                      {hasPlayed && (
-                        <Check className="w-4 h-4 ml-auto text-neo-lime" strokeWidth={3} />
-                      )}
-                    </button>
-                  );
-                })}
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        <LanguageDropdown
+          language={language}
+          currentFlag={currentFlag}
+          onLanguageChange={onLanguageChange}
+        />
       </div>
 
-      {/* Main content - SIMPLIFIED */}
-      <div className="max-w-md w-full text-center space-y-5">
+      {/* Main content - COMPACT on mobile, two-column on desktop */}
+      <div className="w-full max-w-md lg:max-w-5xl xl:max-w-6xl lg:grid lg:grid-cols-[1fr_360px] lg:gap-8 xl:gap-12 lg:items-start">
+      {/* Left column: primary content */}
+      <div className="text-center space-y-3">
+        {/* Explorer mascot — sets adventure tone before the word hunt */}
+        <div className="flex justify-center">
+          <MascotWithEntrance variant="explorer" size="sm" delay={0.1} />
+        </div>
+
         {/* Guest Mode Notice - Show only for anonymous users */}
-        {!isAuthenticated && (
-          <motion.div
+        {!isAuthenticated && !isOnCrazyGamesPlatform && (
+          <m.div
             initial={{ y: -10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.05 }}
-            className="w-full max-w-sm mx-auto bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-400 p-3 text-center"
+            transition={{ delay: 0.05, type: 'spring', stiffness: 300, damping: 26 }}
+            className="w-full max-w-sm mx-auto bg-amber-50 dark:bg-amber-900/20 rounded-neo border-2 border-amber-400 p-3 text-center cursor-pointer hover:border-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+            onClick={() => setShowAuthModal(true)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowAuthModal(true); }}
           >
             <div className="flex items-center justify-center gap-2 text-amber-700 dark:text-amber-300 text-sm font-bold">
               <UserCircle2 className="w-4 h-4" />
@@ -226,15 +187,15 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
               {t('daily.guestModeBenefits')}
             </p>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Challenge Banner (when arriving via challenge link) */}
         {isValidChallenge && (
-          <motion.div
+          <m.div
             initial={{ scale: 0.8, opacity: 0, y: -20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            transition={{ delay: 0.05, type: 'spring' }}
+            transition={{ delay: 0.05, type: 'spring', stiffness: 400, damping: 22 }}
             className="w-full max-w-sm mx-auto bg-indigo-600 rounded-neo border-3 border-neo-black shadow-hard p-4"
           >
             <div className="flex items-center justify-center gap-2 mb-2">
@@ -246,40 +207,40 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
                 <div className="text-3xl font-black text-white">
                   {challengeData.solved ? challengeData.attemptsUsed : 'X'}/10
                 </div>
-                <div className="text-xs text-white/80">{t('wordHunt.results.attempts')}</div>
+                <div className="text-xs text-white">{t('wordHunt.results.attempts')}</div>
               </div>
               {challengeData.wordsDiscovered > 0 && (
                 <div className="text-center">
                   <div className="text-2xl font-black text-white">{challengeData.wordsDiscovered}</div>
-                  <div className="text-xs text-white/80">{t('wordHunt.survival.wordsLabel')}</div>
+                  <div className="text-xs text-white">{t('wordHunt.survival.wordsLabel')}</div>
                 </div>
               )}
             </div>
-            <div className="text-center mt-2 text-white/90 text-sm font-bold">
+            <div className="text-center mt-2 text-white text-sm font-bold">
               {t('wordHunt.results.beatTheirScore')}
             </div>
-          </motion.div>
+          </m.div>
         )}
 
         {/* Hero Section - Puzzle Number (LARGE) */}
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
           className="space-y-2"
         >
           {/* Daily Badge - Simple text, no box */}
-          <motion.div
+          <m.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.05, type: 'spring' }}
+            transition={{ delay: 0.05, type: 'spring', stiffness: 400, damping: 22 }}
             className="inline-flex items-center gap-2"
           >
             <Target className="w-6 h-6 text-amber-500" />
             <span className="text-2xl font-black text-neo-black dark:text-white uppercase tracking-wide">
               {t('daily.badge')}
             </span>
-          </motion.div>
+          </m.div>
 
           {/* Challenge number and date - subtle styling */}
           <div className="flex items-center justify-center gap-2 text-gray-400 dark:text-gray-500">
@@ -287,89 +248,103 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
             <span className="text-gray-300 dark:text-gray-600">•</span>
             <span className="text-sm">{formattedDate}</span>
           </div>
-        </motion.div>
+        </m.div>
+
+        {/* PRIMARY PLAY BUTTON — inline on desktop, sticky on mobile */}
+        {/* Desktop inline button */}
+        <m.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+          className="hidden sm:block w-full max-w-sm mx-auto"
+        >
+          <button
+            onClick={onStart}
+            className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 hover:-translate-y-0.5 hover:shadow-hard-lg active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
+          >
+            <Target className="w-6 h-6" />
+            {t('daily.playButton')}
+          </button>
+        </m.div>
 
         {/* Animated Tutorial Carousel */}
         {targetWordLength > 0 && (
-          <motion.div
+          <m.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
           >
             <DailyIntroCarousel targetWordLength={targetWordLength} />
-          </motion.div>
+          </m.div>
         )}
 
-        {/* START BUTTON - PROMINENT */}
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, type: 'spring' }}
-        >
-          <Button
-            onClick={onStart}
-            className="w-full py-7 text-2xl font-black uppercase bg-emerald-500 text-white border-4 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm transition-all"
-          >
-            {t('daily.playButton')}
-          </Button>
-        </motion.div>
-
-        {/* Create Challenge Section - Different UI for authenticated vs unauthenticated */}
+        {/* Secondary actions row — demoted from primary CTA, sits below carousel */}
         {isAuthenticated ? (
-          <motion.div
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.35, type: 'spring' }}
+          <m.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, type: 'spring', stiffness: 280, damping: 26 }}
+            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-1"
           >
-            <Button
+            <button
               onClick={() => setShowCreateChallenge(true)}
-              variant="outline"
-              className="w-full py-3 text-lg font-bold bg-neo-cream text-neo-black border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-lime/20 hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-sm transition-all flex items-center justify-center gap-2"
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-neo-pink hover:text-neo-pink-light transition-colors"
             >
-              <span className="text-xl">🛠️</span>
+              <Sparkles className="w-4 h-4" />
               {t('daily.createCustomChallenge')}
-            </Button>
-          </motion.div>
+            </button>
+            <button
+              onClick={() => setShowLeaderboard(!showLeaderboard)}
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+            >
+              <Trophy className="w-4 h-4" />
+              {t('daily.todaysPlayers')}
+            </button>
+            <button
+              onClick={onShowTutorial}
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
+            >
+              <HelpCircle className="w-4 h-4" />
+              {t('daily.howToPlay')}
+            </button>
+          </m.div>
         ) : (
-          <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
-        )}
-
-        {/* Secondary Actions - Collapsed */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="flex items-center justify-center gap-4 pt-2"
-        >
-          <button
-            onClick={onShowTutorial}
-            className={`text-sm font-bold transition-colors flex items-center gap-1 ${
-              !tutorialCompleted
-                ? 'text-neo-pink dark:text-neo-pink-light hover:text-neo-pink-dark'
-                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
-            }`}
-          >
-            <span>?</span> {t('daily.howToPlay')}
-            {!tutorialCompleted && (
-              <span className="relative flex h-2 w-2 ml-1">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-neo-pink opacity-75 animate-ping" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-neo-pink" />
-              </span>
+          <>
+            {!isOnCrazyGamesPlatform && (
+              <m.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.35, type: 'spring', stiffness: 300, damping: 26 }}
+              >
+                <UnauthenticatedCreateChallengeSection language={language} t={t} onAuthRequired={handleAuthRequired} />
+              </m.div>
             )}
-          </button>
-          <span className="text-gray-300 dark:text-gray-600">|</span>
-          <button
-            onClick={() => setShowLeaderboard(!showLeaderboard)}
-            className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
-          >
-            <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
-          </button>
-        </motion.div>
+            <m.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, type: 'spring', stiffness: 280, damping: 26 }}
+              className="flex items-center justify-center gap-4 pt-2"
+            >
+              <button
+                onClick={() => setShowLeaderboard(!showLeaderboard)}
+                className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+              >
+                <Trophy className="w-3 h-3" /> {t('daily.todaysPlayers')}
+              </button>
+              <button
+                onClick={onShowTutorial}
+                className="text-sm font-bold text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors flex items-center gap-1"
+              >
+                <HelpCircle className="w-3 h-3" /> {t('daily.howToPlay')}
+              </button>
+            </m.div>
+          </>
+        )}
 
         {/* Collapsible Leaderboard */}
         <AnimatePresence>
           {showLeaderboard && (
-            <motion.div
+            <m.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
@@ -386,19 +361,70 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
                 t={t}
                 defaultTab="today"
               />
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
         {/* Note */}
-        <motion.p
+        <m.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
+          transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
           className="text-xs text-gray-500 dark:text-gray-400"
         >
           {t('daily.samePuzzle')}
-        </motion.p>
+        </m.p>
+
+        {/* (desktop play button moved up to appear right after hero section) */}
+      </div>
+
+      {/* Right column: desktop-only persistent leaderboard sidebar */}
+      <m.div
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.25, type: 'spring', stiffness: 280, damping: 26 }}
+        className="hidden lg:flex lg:flex-col lg:gap-4 lg:sticky lg:top-4"
+      >
+        <div className="rounded-neo border-3 border-neo-black shadow-hard overflow-hidden bg-neo-cream">
+          <div className="flex items-center gap-2 px-4 py-3 bg-neo-black">
+            <Trophy className="w-4 h-4 text-neo-yellow" />
+            <span className="font-black text-sm text-neo-white uppercase tracking-wide">
+              {t('daily.todaysPlayers')}
+            </span>
+          </div>
+          <div className="p-3">
+            <TabbedDailyLeaderboard
+              puzzleDate={puzzleDate}
+              language={language}
+              currentPlayerId={currentPlayerId}
+              currentGuestFingerprint={guestFingerprint}
+              maxVisible={8}
+              compact
+              t={t}
+              defaultTab="today"
+            />
+          </div>
+        </div>
+      </m.div>
+
+      </div>
+
+      {/* Mobile sticky play button — sits above bottom nav, below cookie consent */}
+      <div className="sm:hidden fixed bottom-[var(--bottom-stack-height,0px)] inset-x-0 z-[100] px-4 pb-2 pointer-events-none">
+        <m.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+          className="max-w-sm mx-auto pointer-events-auto"
+        >
+          <button
+            onClick={onStart}
+            className="group w-full py-4 text-lg font-black uppercase rounded-neo border-3 border-neo-black bg-linear-to-r from-emerald-400 to-neo-cyan text-neo-black shadow-hard transition-all duration-200 active:translate-y-0.5 active:shadow-hard-pressed flex items-center justify-center gap-2 animate-breathing"
+          >
+            <Target className="w-6 h-6" />
+            {t('daily.playButton')}
+          </button>
+        </m.div>
       </div>
 
       <CreateChallengeModal
@@ -407,13 +433,21 @@ const DailyReadyScreen: React.FC<DailyReadyScreenProps> = ({
         language={language}
       />
 
-      <AuthModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        initialMode="signup"
-      />
-    </motion.div>
+      {!isOnCrazyGamesPlatform && (
+        <AuthModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          initialMode="signup"
+        />
+      )}
+    </m.div>
   );
 };
+
+const DailyReadyScreen: React.FC<DailyReadyScreenProps> = (props) => (
+  <React.Suspense>
+    <DailyReadyScreenInner {...props} />
+  </React.Suspense>
+);
 
 export default DailyReadyScreen;

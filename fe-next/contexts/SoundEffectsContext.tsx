@@ -1,44 +1,17 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useRef, useCallback, useMemo, useState, ReactNode } from 'react';
-import { Howl } from 'howler';
+import { createContext, useContext, useEffect, useRef, useCallback, useMemo, useState, ReactNode } from 'react';
+import type { Howl } from 'howler';
 import { useMusic } from './MusicContext';
 import logger from '@/utils/logger';
-import { hapticAchievement, hapticForComboLevel, hapticComboBreak, hapticComboSaved } from '@/utils/haptics';
+import { haptics } from '@/utils/haptics/HapticsManager';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
-
-interface SoundEffectOptions {
-  volume?: number;
-  rate?: number;
-  /** If false, sound plays even when game is not active (e.g., for achievements, chat) */
-  requiresGameActive?: boolean;
-}
-
-interface SoundEffectsContextType {
-  sfxVolume: number;
-  sfxMuted: boolean;
-  isGameActive: boolean;
-  setSfxVolume: (volume: number) => void;
-  toggleSfxMute: () => void;
-  setGameActive: (active: boolean) => void;
-  playSound: (soundKey: keyof typeof SOUND_EFFECTS, options?: SoundEffectOptions) => void;
-  playComboSound: (comboLevel: number) => void;
-  playAchievementSound: () => void;
-  playWordAcceptedSound: () => void;
-  playCountdownBeep: (secondsRemaining: number) => void;
-  playMessageSound: () => void;
-  playErrorSound: () => void;
-  // Combo feedback sounds
-  playComboMilestoneSound: (milestoneLevel: number) => void;
-  playComboBreakSound: (lostLevel: number) => void;
-  playComboSavedSound: () => void;
-  // Earthquake/Fire Round sounds
-  playEarthquakeRumble: () => void;
-  playEarthquakeShake: () => void;
-  playFireRoundStart: () => void;
-  startFireCrackleLoop: () => void;
-  stopFireCrackleLoop: () => void;
-}
+import { createLazyHowl, preloadAudioOnDemand, preloadByPriority, AUDIO_LOAD_PRIORITY, ensureHowl } from '@/lib/audio/audioLoader';
+import { getCountdownBeepParams } from '@/utils/countdownBeepParams';
+import { pickVariant, SOUND_VARIATIONS, comboLevelSrc, wordLengthSrc } from '@/lib/audio/soundVariations';
+import { SOUND_EFFECTS, SOUND_PRIORITIES, type SoundEffectOptions, type SoundEffectsContextType } from '@/lib/audio/soundEffectsConfig';
+import { useSoundPlayFunctions } from '@/hooks/useSoundPlayFunctions';
+import { useNativeAppStatePause } from '@/hooks/useNativeAppStatePause';
 
 interface SfxSettings {
   volume: number;
@@ -46,24 +19,6 @@ interface SfxSettings {
 }
 
 const SoundEffectsContext = createContext<SoundEffectsContextType | null>(null);
-
-// Sound effect definitions
-const SOUND_EFFECTS = {
-  achievement: '/sounds/achievment.mp3',
-  combo: '/sounds/combo.wav',
-  wordAccepted: '/sounds/word-accepted.wav',
-  countdownBeep: '/sounds/countdown-beep.wav',
-  message: '/sounds/message.mp3',
-  // Combo feedback sounds (user will provide custom files)
-  comboMilestone: '/sounds/combo-milestone.mp3',
-  comboBreak: '/sounds/combo-break.mp3',
-  comboSaved: '/sounds/combo-saved.mp3',
-  // Earthquake/Fire Round sounds (user will provide custom files)
-  earthquakeRumble: '/sounds/earthquake-rumble.wav',
-  earthquakeShake: '/sounds/earthquake-shake.wav',
-  fireRoundStart: '/sounds/fire-round-start.wav',
-  fireCrackleLoop: '/sounds/fire-crackle-loop.wav',
-} as const;
 
 const SFX_STORAGE_KEY = 'boggle_sfx_settings';
 const DEFAULT_SFX_SETTINGS: SfxSettings = { volume: 0.7, muted: false };
@@ -130,7 +85,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
           error.message.includes('audio device')) {
         // Prevent this error from being reported to Sentry
         event.preventDefault();
-        logger.warn('[SFX] iOS Safari audio device error (silenced):', error.message);
+        logger.log('[SFX] iOS Safari audio device error (silenced):', error.message);
       }
     };
 
@@ -138,52 +93,152 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     return () => window.removeEventListener('unhandledrejection', handleUnhandledRejection);
   }, []);
 
-  // Track tab visibility to block sounds when tab is hidden
+  // Progressive preload on first user interaction
+  useEffect(() => {
+    if (typeof window === 'undefined' || !audioUnlocked) return;
+
+    // Create sound and priority maps for preloadByPriority
+    const soundsMap = new Map<string, Howl>(Object.entries(soundsRef.current));
+    const prioritiesMap = new Map<string, AUDIO_LOAD_PRIORITY>(Object.entries(SOUND_PRIORITIES));
+
+    // Progressive loading strategy:
+    // 1. Load CRITICAL sounds immediately on audio unlock
+    // 2. Load HIGH priority sounds during idle time
+    // 3. LOW priority sounds stay lazy (load only when triggered)
+
+    (async () => {
+      // Load CRITICAL sounds immediately
+      logger.log('[SFX] Preloading CRITICAL sounds on audio unlock');
+      await preloadByPriority(soundsMap, prioritiesMap, AUDIO_LOAD_PRIORITY.CRITICAL);
+
+      // Load HIGH priority sounds during idle time
+      if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(() => {
+          logger.log('[SFX] Preloading HIGH priority sounds during idle time');
+          preloadByPriority(soundsMap, prioritiesMap, AUDIO_LOAD_PRIORITY.HIGH);
+        });
+      } else {
+        // Fallback for browsers without requestIdleCallback
+        setTimeout(() => {
+          logger.log('[SFX] Preloading HIGH priority sounds (setTimeout fallback)');
+          preloadByPriority(soundsMap, prioritiesMap, AUDIO_LOAD_PRIORITY.HIGH);
+        }, 1000);
+      }
+    })();
+  }, [audioUnlocked]);
+
+  // Lifted out of the visibility effect so the native app-state hook can call
+  // it too. All deps are stable refs — closure capture is safe.
+  const setVisible = useCallback((visible: boolean, reason: string) => {
+    const wasVisible = isTabVisibleRef.current;
+    isTabVisibleRef.current = visible;
+    logger.log(`[SFX] ${reason}:`, visible ? 'visible' : 'hidden');
+
+    if (!visible && wasVisible) {
+      const howl = soundsRef.current['fireCrackleLoop'];
+      if (howl && fireCrackleLoopIdRef.current !== null && howl.playing()) {
+        howl.pause();
+        logger.log('[SFX] Paused fire crackle loop (lost focus)');
+      }
+    } else if (visible && !wasVisible) {
+      const howl = soundsRef.current['fireCrackleLoop'];
+      if (howl && fireCrackleLoopIdRef.current !== null && !howl.playing() && !sfxMutedRef.current && isGameActiveRef.current) {
+        howl.play();
+        logger.log('[SFX] Resumed fire crackle loop (regained focus)');
+      }
+    }
+  }, []);
+
+  // Track tab visibility AND window focus to block sounds when not in focus
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const handleVisibilityChange = () => {
-      isTabVisibleRef.current = document.visibilityState === 'visible';
-      logger.log('[SFX] Tab visibility changed:', isTabVisibleRef.current ? 'visible' : 'hidden');
+      setVisible(document.visibilityState === 'visible', 'Tab visibility changed');
+    };
+
+    const handleBlur = () => {
+      if (document.visibilityState === 'visible') {
+        setVisible(false, 'Window blur');
+      }
+    };
+
+    const handleFocus = () => {
+      setVisible(true, 'Window focus');
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, []);
+    window.addEventListener('blur', handleBlur);
+    window.addEventListener('focus', handleFocus);
 
-  // Initialize sound effects
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+      window.removeEventListener('focus', handleFocus);
+    };
+  }, [setVisible]);
+
+  // Native parity: iOS swipe-up / call interrupt doesn't reliably fire
+  // visibilitychange in WKWebView. Capacitor's appStateChange does.
+  const handleNativeBackground = useCallback(
+    () => setVisible(false, 'Native app backgrounded'),
+    [setVisible]
+  );
+  const handleNativeForeground = useCallback(
+    () => setVisible(true, 'Native app foregrounded'),
+    [setVisible]
+  );
+  useNativeAppStatePause({
+    onBackground: handleNativeBackground,
+    onForeground: handleNativeForeground,
+  });
+
+  // Initialize sound effects — wait for howler module to load first
   useEffect(() => {
     if (typeof window === 'undefined') return;
     if (soundsLoadedRef.current) return; // Prevent re-initialization
 
-    // Create Howl instances for each sound effect with deferred loading for slow connections
-    Object.entries(SOUND_EFFECTS).forEach(([key, src]) => {
-      soundsRef.current[key] = new Howl({
-        src: [src],
-        volume: 0.6,
-        preload: false, // Defer loading for slow connections - load on demand
-        html5: false, // Web Audio API for pitch control
-        onload: () => {
-          logger.log(`[SFX] Loaded: ${key}`);
-        },
-        onloaderror: (id, err) => {
-          logger.warn(`[SFX] Failed to load ${key}:`, err);
-        },
-        onplayerror: (id, err) => {
-          // Silently handle iOS Safari audio device errors
-          // These occur when the device can't start audio (e.g., silent mode, bluetooth issues)
-          logger.warn(`[SFX] Failed to play ${key}:`, err);
-        },
+    let cancelled = false;
+
+    ensureHowl().then(() => {
+      if (cancelled || soundsLoadedRef.current) return;
+
+      // Create Howl instances for each sound effect using lazy loading
+      Object.entries(SOUND_EFFECTS).forEach(([key, src]) => {
+        soundsRef.current[key] = createLazyHowl(src, {
+          volume: 0.6,
+          // html5: true and preload: false set by createLazyHowl
+          onload: () => {
+            logger.log(`[SFX] Loaded: ${key}`);
+          },
+          onloaderror: (_id, err) => {
+            logger.log(`[SFX] Failed to load ${key}:`, err);
+          },
+          onplayerror: (_id, err) => {
+            // Silently handle iOS Safari audio device errors
+            logger.log(`[SFX] Failed to play ${key}:`, err);
+          },
+        });
       });
-    });
 
-    soundsLoadedRef.current = true;
+      // Pre-create lazy Howls for all variation files so they're ready when picked
+      Object.values(SOUND_VARIATIONS).forEach(variants => {
+        variants.forEach(src => {
+          const varKey = `_var_${src}`;
+          if (!soundsRef.current[varKey]) {
+            soundsRef.current[varKey] = createLazyHowl(src, { volume: 0.6 });
+          }
+        });
+      });
 
-    // Copy ref value for cleanup to avoid stale ref warnings
-    const sounds = soundsRef.current;
+      soundsLoadedRef.current = true;
+    }).catch(() => {});
 
     return () => {
+      cancelled = true;
       // Cleanup on unmount
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- soundsRef is stable and not a React-rendered node
+      const sounds = soundsRef.current;
       Object.values(sounds).forEach(howl => {
         howl.unload();
       });
@@ -191,7 +246,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   }, []);
 
   // Play a sound effect
-  const playSound = useCallback((soundKey: keyof typeof SOUND_EFFECTS, options: SoundEffectOptions = {}) => {
+  const playSound = useCallback(async (soundKey: keyof typeof SOUND_EFFECTS, options: SoundEffectOptions = {}) => {
     // Check basic conditions
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current) return;
 
@@ -199,16 +254,38 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     const requiresGameActive = options.requiresGameActive !== false;
     if (requiresGameActive && !isGameActiveRef.current) return;
 
-    const howl = soundsRef.current[soundKey];
+    // Check for sound variations — pick a random variant if available
+    const baseSrc = SOUND_EFFECTS[soundKey];
+    const chosenSrc = pickVariant(soundKey, baseSrc);
+    const isVariant = chosenSrc !== baseSrc;
+
+    // Use a variation Howl on-the-fly, or the base Howl
+    let howl: Howl;
+    if (isVariant) {
+      // Lazily create/cache variation Howls using the same ref map
+      const varKey = `_var_${chosenSrc}`;
+      if (!soundsRef.current[varKey]) {
+        soundsRef.current[varKey] = createLazyHowl(chosenSrc, { volume: 0.6 });
+      }
+      howl = soundsRef.current[varKey];
+    } else {
+      howl = soundsRef.current[soundKey];
+    }
+
     if (!howl) {
       logger.warn(`[SFX] Sound not found: ${soundKey}`);
       return;
     }
 
-    // Load on-demand for slow connections - only load when actually needed
+    // Preload on-demand if not loaded - wait for loading to complete
     if (howl.state() === 'unloaded') {
-      logger.log(`[SFX] Loading sound on demand: ${soundKey}`);
-      howl.load();
+      logger.log(`[SFX] Preloading sound on demand: ${isVariant ? chosenSrc : soundKey}`);
+      try {
+        await preloadAudioOnDemand(howl);
+      } catch (err) {
+        logger.log(`[SFX] Failed to load ${soundKey}, skipping playback:`, err);
+        return; // Don't try to play if loading failed
+      }
     }
 
     // Apply volume (uses separate SFX volume)
@@ -227,130 +304,98 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       howl.play();
     } catch (err) {
       // Silently handle play errors (iOS can throw InvalidStateError)
-      logger.warn(`[SFX] Play error for ${soundKey}:`, err);
+      logger.log(`[SFX] Play error for ${soundKey}:`, err);
     }
   }, [audioUnlocked, sfxMuted, sfxVolume]);
 
-  // Play combo sound with dynamic pitch based on combo level
-  // Pitch increases with each combo level (infinite scaling)
-  const playComboSound = useCallback((comboLevel: number) => {
+  // Play combo sound — bespoke audio per combo level (1..25), clamps above 25.
+  // Falls back to the legacy single-file pitch-shift if the level file fails to load.
+  const playComboSound = useCallback(async (comboLevel: number) => {
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current || comboLevel < 1) return;
 
-    // Calculate pitch rate: starts at 1.0, increases by ~0.1 per combo level
-    // Uses logarithmic scaling for smooth progression that doesn't get too extreme
-    // Level 1: 1.0, Level 5: ~1.3, Level 10: ~1.6, Level 20: ~2.0
-    const baseRate = 1.0;
-    const pitchIncrease = Math.log2(comboLevel + 1) * 0.25;
-    const rate = Math.min(baseRate + pitchIncrease, 3.0); // Cap at 3x for sanity
+    const src = comboLevelSrc(comboLevel);
+    const cacheKey = `_combo_${src}`;
+    let howl = soundsRef.current[cacheKey];
+    if (!howl) {
+      howl = createLazyHowl(src, { volume: 0.7 });
+      soundsRef.current[cacheKey] = howl;
+    }
 
-    // Also increase volume slightly with combo level (max 1.0)
-    const volumeBoost = Math.min(0.6 + (comboLevel * 0.03), 1.0);
+    if (howl.state() === 'unloaded') {
+      try {
+        await preloadAudioOnDemand(howl);
+      } catch (err) {
+        // Bespoke level file failed — fall back to pitch-shifted base combo
+        logger.log(`[SFX] combo-level ${comboLevel} failed, using pitch fallback:`, err);
+        const rate = Math.min(1.0 + Math.log2(comboLevel + 1) * 0.2, 1.8);
+        const volumeBoost = Math.min(0.6 + (comboLevel * 0.03), 1.0);
+        playSound('combo', { rate, volume: volumeBoost });
+        haptics.tap();
+        return;
+      }
+    }
 
-    playSound('combo', { rate, volume: volumeBoost });
-    hapticForComboLevel(comboLevel);
-  }, [audioUnlocked, sfxMuted, playSound]);
+    // Slight volume swell with combo level (max 1.0) so escalation reads even with bespoke audio
+    const volumeBoost = Math.min(0.6 + (comboLevel * 0.02), 1.0);
+    howl.volume(volumeBoost * sfxVolume);
+    howl.rate(1.0);
+    try {
+      howl.play();
+    } catch (err) {
+      logger.log(`[SFX] combo-level ${comboLevel} play error:`, err);
+    }
+    haptics.tap();
+  }, [audioUnlocked, sfxMuted, sfxVolume, playSound]);
 
-  // Play achievement unlock sound with haptic feedback
-  // Achievements can trigger on results screen, so don't require game active
-  const playAchievementSound = useCallback(() => {
-    playSound('achievement', { volume: 0.8, requiresGameActive: false });
-    hapticAchievement();
-  }, [playSound]);
-
-  // Play word accepted sound
-  const playWordAcceptedSound = useCallback(() => {
-    playSound('wordAccepted', { volume: 0.4 });
-  }, [playSound]);
-
-  // Play countdown beep with increasing pitch (3, 2, 1 seconds remaining)
-  // secondsRemaining: 3 = lowest pitch, 1 = highest pitch
+  // Play countdown beep with increasing pitch (10→1 seconds remaining)
   const playCountdownBeep = useCallback((secondsRemaining: number) => {
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
-
-    // Pitch increases as we get closer to 0: 3->1.0, 2->1.2, 1->1.4
-    const pitchMap: Record<number, number> = { 3: 1.0, 2: 1.2, 1: 1.4 };
-    const rate = pitchMap[secondsRemaining] || 1.0;
-    const volume = secondsRemaining === 1 ? 0.9 : 0.7; // Loudest on final beep
-
-    playSound('countdownBeep', { rate, volume });
+    const params = getCountdownBeepParams(secondsRemaining);
+    if (!params) return;
+    playSound('countdownBeep', { rate: params.rate, volume: params.volume });
   }, [audioUnlocked, sfxMuted, playSound]);
 
-  // Play chat message notification sound
-  // Chat works throughout the app, so don't require game active
-  const playMessageSound = useCallback(() => {
-    playSound('message', { volume: 0.5, requiresGameActive: false });
-  }, [playSound]);
+  // Play word-length feedback (3..7 use bespoke files, 8+ uses celebration file).
+  // Falls back silently if the bespoke file fails — caller already plays wordAccepted.
+  const playWordLengthSound = useCallback(async (length: number) => {
+    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current || length < 3) return;
 
-  // Play error sound for invalid actions
-  const playErrorSound = useCallback(() => {
-    playSound('comboBreak', { volume: 0.4 });
-  }, [playSound]);
+    const src = wordLengthSrc(length);
+    const cacheKey = `_wlen_${src}`;
+    let howl = soundsRef.current[cacheKey];
+    if (!howl) {
+      howl = createLazyHowl(src, { volume: 0.65 });
+      soundsRef.current[cacheKey] = howl;
+    }
 
-  // ==================== Combo Feedback Sounds ====================
+    if (howl.state() === 'unloaded') {
+      try {
+        await preloadAudioOnDemand(howl);
+      } catch (err) {
+        logger.log(`[SFX] word-length ${length} failed to load:`, err);
+        return;
+      }
+    }
 
-  /**
-   * Play milestone celebration sound for combo 5, 10, 15
-   * Higher milestones get slightly louder and higher pitched
-   */
-  const playComboMilestoneSound = useCallback((milestoneLevel: number) => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
+    howl.volume(0.65 * sfxVolume);
+    howl.rate(1.0);
+    try {
+      howl.play();
+    } catch (err) {
+      logger.log(`[SFX] word-length ${length} play error:`, err);
+    }
+  }, [audioUnlocked, sfxMuted, sfxVolume]);
 
-    // Pitch and volume increase with milestone level
-    const pitchMap: Record<number, number> = { 5: 1.0, 10: 1.1, 15: 1.2 };
-    const volumeMap: Record<number, number> = { 5: 0.7, 10: 0.8, 15: 0.9 };
-
-    const rate = pitchMap[milestoneLevel] || 1.0;
-    const volume = volumeMap[milestoneLevel] || 0.7;
-
-    playSound('comboMilestone', { rate, volume });
-    // Milestone also triggers a celebratory haptic
-    hapticForComboLevel(milestoneLevel);
-  }, [audioUnlocked, sfxMuted, playSound]);
-
-  /**
-   * Play combo break sound when combo is lost
-   * Louder for higher combos that were lost (more impactful loss)
-   */
-  const playComboBreakSound = useCallback((lostLevel: number) => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
-
-    // Volume scales with lost combo level (losing a big combo is more impactful)
-    // But capped to not be too harsh
-    const volume = Math.min(0.3 + (lostLevel * 0.04), 0.6);
-
-    playSound('comboBreak', { volume });
-    hapticComboBreak(lostLevel);
-  }, [audioUnlocked, sfxMuted, playSound]);
-
-  /**
-   * Play combo saved sound when player narrowly avoids losing combo
-   */
-  const playComboSavedSound = useCallback(() => {
-    if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
-
-    playSound('comboSaved', { volume: 0.5 });
-    hapticComboSaved();
-  }, [audioUnlocked, sfxMuted, playSound]);
-
-  // Earthquake/Fire Round sound effects
-
-  // Play earthquake rumble (warning phase - 2 seconds)
-  const playEarthquakeRumble = useCallback(() => {
-    playSound('earthquakeRumble', { volume: 0.7 });
-  }, [playSound]);
-
-  // Play earthquake shake (shake phase - 1 second)
-  const playEarthquakeShake = useCallback(() => {
-    playSound('earthquakeShake', { volume: 0.8 });
-  }, [playSound]);
-
-  // Play fire round start sound
-  const playFireRoundStart = useCallback(() => {
-    playSound('fireRoundStart', { volume: 0.8 });
-  }, [playSound]);
+  // All individual play functions extracted to useSoundPlayFunctions hook
+  const soundFns = useSoundPlayFunctions(playSound, {
+    audioUnlocked,
+    sfxMuted,
+    isTabVisibleRef,
+    isGameActiveRef,
+  });
 
   // Start fire crackle ambient loop (plays for 15 seconds)
-  const startFireCrackleLoop = useCallback(() => {
+  const startFireCrackleLoop = useCallback(async () => {
     if (!audioUnlocked || sfxMuted || !isTabVisibleRef.current || !isGameActiveRef.current) return;
 
     const howl = soundsRef.current['fireCrackleLoop'];
@@ -365,10 +410,15 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       fireCrackleLoopIdRef.current = null;
     }
 
-    // Load on-demand if needed
+    // Preload on-demand if needed
     if (howl.state() === 'unloaded') {
-      logger.log('[SFX] Loading fire crackle loop on demand');
-      howl.load();
+      logger.log('[SFX] Preloading fire crackle loop on demand');
+      try {
+        await preloadAudioOnDemand(howl);
+      } catch (err) {
+        logger.log('[SFX] Failed to load fire crackle loop, skipping:', err);
+        return;
+      }
     }
 
     // Configure as loop
@@ -382,7 +432,7 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
       logger.log('[SFX] Started fire crackle loop');
     } catch (err) {
       // Silently handle play errors (iOS can throw InvalidStateError)
-      logger.warn('[SFX] Fire crackle loop play error:', err);
+      logger.log('[SFX] Fire crackle loop play error:', err);
     }
   }, [audioUnlocked, sfxMuted, sfxVolume]);
 
@@ -403,34 +453,35 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     }, 500);
   }, []);
 
+  // Stop fire crackle loop when muted
+  useEffect(() => {
+    if (sfxMuted && fireCrackleLoopIdRef.current !== null) {
+      const howl = soundsRef.current['fireCrackleLoop'];
+      if (howl) {
+        howl.stop(fireCrackleLoopIdRef.current);
+        howl.loop(false);
+        fireCrackleLoopIdRef.current = null;
+        logger.log('[SFX] Stopped fire crackle loop due to mute');
+      }
+    }
+  }, [sfxMuted]);
+
   // Memoize context value to prevent unnecessary re-renders of all consumers
   const value = useMemo<SoundEffectsContextType>(() => ({
-    // Volume state
     sfxVolume,
     sfxMuted,
     setSfxVolume,
     toggleSfxMute,
-    // Game active state
     isGameActive,
     setGameActive,
-    // Sound playback
     playSound,
     playComboSound,
-    playAchievementSound,
-    playWordAcceptedSound,
     playCountdownBeep,
-    playMessageSound,
-    playErrorSound,
-    // Combo feedback sounds
-    playComboMilestoneSound,
-    playComboBreakSound,
-    playComboSavedSound,
-    // Earthquake/Fire Round sounds
-    playEarthquakeRumble,
-    playEarthquakeShake,
-    playFireRoundStart,
+    playWordLengthSound,
     startFireCrackleLoop,
     stopFireCrackleLoop,
+    // All individual play functions from extracted hook
+    ...soundFns,
   }), [
     sfxVolume,
     sfxMuted,
@@ -440,19 +491,11 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
     setGameActive,
     playSound,
     playComboSound,
-    playAchievementSound,
-    playWordAcceptedSound,
     playCountdownBeep,
-    playMessageSound,
-    playErrorSound,
-    playComboMilestoneSound,
-    playComboBreakSound,
-    playComboSavedSound,
-    playEarthquakeRumble,
-    playEarthquakeShake,
-    playFireRoundStart,
+    playWordLengthSound,
     startFireCrackleLoop,
     stopFireCrackleLoop,
+    soundFns,
   ]);
 
   return (
@@ -462,10 +505,51 @@ export function SoundEffectsProvider({ children }: SoundEffectsProviderProps) {
   );
 }
 
+// No-op stub returned when provider is unavailable (e.g., during SSR edge cases)
+const NOOP = () => {};
+const SOUND_EFFECTS_FALLBACK = {
+  sfxVolume: 0.7, sfxMuted: true, isGameActive: false,
+  setSfxVolume: NOOP, toggleSfxMute: NOOP, setGameActive: NOOP,
+  playSound: NOOP, playComboSound: NOOP, playCountdownBeep: NOOP,
+  playWordLengthSound: NOOP,
+  startFireCrackleLoop: NOOP, stopFireCrackleLoop: NOOP,
+  // All individual play functions
+  playWordAcceptedSound: NOOP, playWordRejectedSound: NOOP,
+  playAchievementSound: NOOP, playMessageSound: NOOP, playErrorSound: NOOP,
+  playComboMilestoneSound: NOOP, playComboBreakSound: NOOP, playComboSavedSound: NOOP,
+  playEarthquakeRumble: NOOP, playEarthquakeShake: NOOP, playFireRoundStart: NOOP,
+  playVictorySound: NOOP, playDefeatSound: NOOP,
+  playLevelUpSound: NOOP, playLevelUpModalSound: NOOP, playPowerUpSound: NOOP,
+  playBossHitSound: NOOP, playBossPhaseChangeSound: NOOP,
+  playBossEntranceSound: NOOP, playBossDefeatSound: NOOP,
+  playBlastBombSound: NOOP, playBlastLightningSound: NOOP, playBlastPrismSound: NOOP, playBlastHighlightStingerSound: NOOP,
+  playMatchFoundSound: NOOP, playStreakMilestoneSound: NOOP, playTierPromotionSound: NOOP,
+  playTileSelectSound: NOOP, playRoundStartSound: NOOP, playTimesUpSound: NOOP,
+  playCoinCollectSound: NOOP, playButtonClickSound: NOOP, playChestOpenSound: NOOP,
+  playQuestCompleteSound: NOOP, playBoardShuffleSound: NOOP, playUpgradePurchaseSound: NOOP,
+  playHintRevealSound: NOOP, playDailyRewardSound: NOOP, playTimerUrgentSound: NOOP,
+  playStreakFireSound: NOOP, playScreenTransitionSound: NOOP, playLongWordBonusSound: NOOP,
+  playBoardClearSound: NOOP, playCoinCascadeSound: NOOP, playCrownVictorySound: NOOP,
+  playGiftReceivedSound: NOOP, playLeadChangeSound: NOOP, playMatchStartSound: NOOP,
+  playMenuOpenSound: NOOP, playMenuCloseSound: NOOP, playOpponentScoredSound: NOOP,
+  playPathConnectSound: NOOP, playPerfectWordSound: NOOP,
+  playPlayerJoinedSound: NOOP, playPlayerLeftSound: NOOP, playRareWordSound: NOOP,
+  playSwipeTransitionSound: NOOP, playTileAppearSound: NOOP,
+  playTimeBonusSound: NOOP, playTimerHeartbeatSound: NOOP, playXpGainSound: NOOP,
+  playMegaCascadeSound: NOOP, playUltraComboSound: NOOP, playBossDefeatLegendarySound: NOOP,
+  playLegendaryWordSound: NOOP, playEpicVictorySound: NOOP, playStreakLegendarySound: NOOP,
+  playDrillStartSound: NOOP, playDrillCompleteSound: NOOP, playWheelSpinSound: NOOP,
+  playFlashChallengeSound: NOOP, playWordRevealSound: NOOP,
+} as SoundEffectsContextType;
+
 export function useSoundEffects(): SoundEffectsContextType {
   const context = useContext(SoundEffectsContext);
   if (!context) {
-    throw new Error('useSoundEffects must be used within a SoundEffectsProvider');
+    // Graceful degradation instead of crashing the page
+    // Use log (not warn) — this is expected in edge cases (e.g. race conditions during mount)
+    // and is already handled by the NOOP stub, so no Sentry alert needed
+    logger.log('useSoundEffects called outside SoundEffectsProvider — returning no-op stub');
+    return SOUND_EFFECTS_FALLBACK;
   }
   return context;
 }

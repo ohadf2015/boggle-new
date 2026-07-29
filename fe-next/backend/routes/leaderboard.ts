@@ -9,13 +9,49 @@
 import express, { Request, Response, Router } from 'express';
  
 const { getSupabase, isSupabaseConfigured } = require('../modules/supabaseServer');
- 
 const { getCachedLeaderboardTop100, cacheLeaderboardTop100, getCachedUserRank, cacheUserRank } = require('../redisClient');
- 
 const { coalesce } = require('../utils/requestCoalescing');
 import logger from '../utils/logger';
 
 const router: Router = express.Router();
+
+/**
+ * Legacy fallback for rank calculation when RPC is not available
+ * Uses two separate queries (kept for backwards compatibility during migration)
+ */
+async function fetchRankLegacy(supabase: any, userId: string): Promise<UserRankResponse> {
+  // First get the user's data
+  const { data: userData, error: userError } = await supabase
+    .from('leaderboard')
+    .select('player_id, username, total_score, games_played')
+    .eq('player_id', userId)
+    .single();
+
+  if (userError || !userData) {
+    const customError: CustomError = { status: 404, message: 'User not found in leaderboard' };
+    throw customError;
+  }
+
+  // Count higher scores in a separate query
+  const { count, error: countError } = await supabase
+    .from('leaderboard')
+    .select('player_id', { count: 'exact', head: true })
+    .gt('total_score', userData.total_score);
+
+  if (countError) {
+    throw new Error(`Rank count error: ${countError.message}`);
+  }
+
+  const rankData: UserRankData = {
+    ...userData,
+    rank_position: (count || 0) + 1
+  };
+
+  // Cache the result
+  await cacheUserRank(userId, rankData);
+
+  return { data: rankData, cached: false };
+}
 
 interface LeaderboardEntry {
   player_id: string;
@@ -24,7 +60,6 @@ interface LeaderboardEntry {
   avatar_emoji: string;
   avatar_color: string;
   avatar_image?: string;
-  profile_picture_url?: string;
   total_score: number;
   games_played: number;
   games_won: number;
@@ -87,7 +122,7 @@ router.get('/', async (_req: Request, res: Response): Promise<void> => {
       const supabase = getSupabase();
       const { data, error } = await supabase
         .from('leaderboard')
-        .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, profile_picture_url, total_score, games_played, games_won, ranked_mmr')
+        .select('player_id, username, display_name, avatar_emoji, avatar_color, avatar_image, total_score, games_played, games_won, ranked_mmr')
         .order('total_score', { ascending: false })
         .limit(100);
 
@@ -122,7 +157,7 @@ router.get('/rank/:userId', async (req: Request, res: Response): Promise<void> =
       return;
     }
 
-    const { userId } = req.params;
+    const userId = req.params.userId as string;
     if (!userId) {
       res.status(400).json({ error: 'User ID required' });
       return;
@@ -143,41 +178,34 @@ router.get('/rank/:userId', async (req: Request, res: Response): Promise<void> =
         return { data: recheck, cached: true, coalesced: true };
       }
 
-      // Fetch from Supabase
+      // Fetch from Supabase using optimized RPC function
+      // This combines user data + rank calculation into a single database query
       const supabase = getSupabase();
+      const { data: rpcData, error: rpcError } = await supabase
+        .rpc('get_user_leaderboard_rank', { target_user_id: userId });
 
-      // OPTIMIZATION: Combined query approach
-      // Strategy: Get all users in descending score order, then find this user's position
-      // This is more efficient than N+1 (two separate queries)
-      // For even better performance, would need a PostgreSQL window function via RPC
+      if (rpcError) {
+        // If RPC doesn't exist yet (migration not run), fall back to legacy approach
+        if (rpcError.message?.includes('function') && rpcError.message?.includes('does not exist')) {
+          logger.warn('API', 'get_user_leaderboard_rank RPC not found, using fallback queries');
+          return await fetchRankLegacy(supabase, userId);
+        }
+        throw new Error(`RPC error: ${rpcError.message}`);
+      }
 
-      // First get the user's data
-      const { data: userData, error: userError } = await supabase
-        .from('leaderboard')
-        .select('player_id, username, total_score, games_played')
-        .eq('player_id', userId)
-        .single();
-
-      if (userError || !userData) {
+      // RPC returns array, take first result
+      const userData = rpcData?.[0];
+      if (!userData) {
         const customError: CustomError = { status: 404, message: 'User not found in leaderboard' };
         throw customError;
       }
 
-      // OPTIMIZATION: Count higher scores in one efficient query
-      // Instead of: SELECT * with count, we only select the ID and use exact count
-      // This reduces data transfer and is more efficient with proper indexes
-      const { count, error: countError } = await supabase
-        .from('leaderboard')
-        .select('player_id', { count: 'exact', head: true })
-        .gt('total_score', userData.total_score);
-
-      if (countError) {
-        throw new Error(`Rank count error: ${countError.message}`);
-      }
-
       const rankData: UserRankData = {
-        ...userData,
-        rank_position: (count || 0) + 1
+        player_id: userData.player_id,
+        username: userData.username,
+        total_score: userData.total_score,
+        games_played: userData.games_played,
+        rank_position: userData.rank_position
       };
 
       // Cache the result

@@ -10,32 +10,28 @@ import { getAvatarEmojiAndColor, AVATARS } from '@/utils/avatarConfig';
 describe('Profile Customization Avatar Config', () => {
   describe('getAvatarEmojiAndColor', () => {
     it('returns correct values for known avatars', () => {
-      // Test a few known avatar IDs
+      // Test a few known avatar IDs - now using hex colors for socket/database compatibility
       const broccoliResult = getAvatarEmojiAndColor('broccoli-bob');
-      expect(broccoliResult).toEqual({ emoji: '🥦', color: '#10b981' });
+      expect(broccoliResult).toEqual({ emoji: '🥦', color: '#52B788' });
 
       const sunnyResult = getAvatarEmojiAndColor('sunny-steve');
-      expect(sunnyResult).toEqual({ emoji: '☀️', color: '#f59e0b' });
+      expect(sunnyResult).toEqual({ emoji: '☀️', color: '#F8B739' });
 
       const octoResult = getAvatarEmojiAndColor('octo-otto');
-      expect(octoResult).toEqual({ emoji: '🐙', color: '#8b5cf6' });
+      expect(octoResult).toEqual({ emoji: '🐙', color: '#BB8FCE' });
     });
 
     it('returns default for unknown avatars', () => {
       const unknownResult = getAvatarEmojiAndColor('unknown-avatar');
-      expect(unknownResult).toEqual({ emoji: '🎯', color: '#6366f1' });
+      expect(unknownResult).toEqual({ emoji: '🎯', color: '#FF6B6B' });
     });
 
-    it('returns default for profile picture avatar ID', () => {
-      const profileResult = getAvatarEmojiAndColor('__profile_avatar__');
-      expect(profileResult).toEqual({ emoji: '🎯', color: '#6366f1' });
-    });
-
-    it('all AVATARS have valid emoji and color mappings', () => {
+    it('all AVATARS have valid emoji and hex color mappings', () => {
       AVATARS.forEach(avatar => {
         const { emoji, color } = getAvatarEmojiAndColor(avatar.id);
         expect(emoji).toBeTruthy();
-        expect(color).toMatch(/^#[0-9a-f]{6}$/i);
+        // Colors are hex for socket schema validation
+        expect(color).toMatch(/^#[0-9A-Fa-f]{6}$/);
       });
     });
   });
@@ -50,7 +46,7 @@ describe('Profile Customization Save Handler Integration', () => {
    * avatar_image, and has_customized_profile, missing avatar_emoji and avatar_color.
    */
   it('save handler should include avatar_emoji and avatar_color', async () => {
-    const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+    const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
     // This is the CORRECT implementation of the save handler
     const handleProfileCustomizationSave = async (name: string, avatarId: string) => {
@@ -58,7 +54,6 @@ describe('Profile Customization Save Handler Integration', () => {
 
       await mockUpdateProfile({
         display_name: name,
-        username: name,
         avatar_image: avatarId,
         avatar_emoji: emoji,
         avatar_color: color,
@@ -71,55 +66,21 @@ describe('Profile Customization Save Handler Integration', () => {
 
     expect(mockUpdateProfile).toHaveBeenCalledWith({
       display_name: 'TestPlayer',
-      username: 'TestPlayer',
       avatar_image: 'broccoli-bob',
       avatar_emoji: '🥦',
-      avatar_color: '#10b981',
+      avatar_color: '#52B788', // Using hex color for socket/database compatibility
       has_customized_profile: true,
     });
   });
 
-  it('save handler should handle profile picture avatar correctly', async () => {
-    const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
-    const PROFILE_AVATAR_ID = '__profile_avatar__';
-
-    // Simulate save with profile picture
-    const handleProfileCustomizationSave = async (name: string, avatarId: string) => {
-      const { emoji, color } = getAvatarEmojiAndColor(avatarId);
-
-      await mockUpdateProfile({
-        display_name: name,
-        username: name,
-        avatar_image: avatarId,
-        avatar_emoji: emoji,
-        avatar_color: color,
-        has_customized_profile: true,
-      });
-    };
-
-    await handleProfileCustomizationSave('TestPlayer', PROFILE_AVATAR_ID);
-
-    // Should still include emoji and color (defaults for profile avatar)
-    expect(mockUpdateProfile).toHaveBeenCalledWith(
-      expect.objectContaining({
-        display_name: 'TestPlayer',
-        avatar_image: PROFILE_AVATAR_ID,
-        avatar_emoji: '🎯',  // default emoji for profile avatar
-        avatar_color: '#6366f1',  // default color for profile avatar
-        has_customized_profile: true,
-      })
-    );
-  });
-
   it('save handler should handle any avatar from AVATARS list', async () => {
-    const mockUpdateProfile = jest.fn().mockResolvedValue({ data: {}, error: null });
+    const mockUpdateProfile = vi.fn().mockResolvedValue({ data: {}, error: null });
 
     const handleProfileCustomizationSave = async (name: string, avatarId: string) => {
       const { emoji, color } = getAvatarEmojiAndColor(avatarId);
 
       await mockUpdateProfile({
         display_name: name,
-        username: name,
         avatar_image: avatarId,
         avatar_emoji: emoji,
         avatar_color: color,
@@ -150,7 +111,6 @@ describe('LandingView handleProfileCustomizationSave bug verification', () => {
    * The BUGGY implementation was:
    *   await updateProfile({
    *     display_name: name,
-   *     username: name,
    *     avatar_image: avatarId,
    *     has_customized_profile: true,
    *   });

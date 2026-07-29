@@ -1,0 +1,3198 @@
+@keyframes final-shine {
+  0% {
+    filter: brightness(1.5) saturate(1.5);
+  }
+
+  100% {
+    filter: brightness(1) saturate(1);
+  }
+}
+
+.slot-machine-text::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+  border-radius: 4px;
+  animation: shimmer 2s infinite;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .slot-machine-text {
+    filter: brightness(1.2);
+  }
+}
+
+/* Animated Title Styles */
+.animated-title {
+  font-size: 48px;
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 20px;
+  perspective: 1000px;
+  position: relative;
+}
+
+.animated-title .text {
+  display: inline-block;
+  transform-origin: 50% 50%;
+  background: linear-gradient(135deg, #a0b5ff 0%, #c89aff 25%, #ffb3fc 50%, #7dd9ff 75%, #a0b5ff 100%);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 8px rgba(160, 181, 255, 0.6);
+  animation: gradientFlow 4s ease infinite, titleBounce 2s ease-in-out infinite, textGlow 3s ease-in-out infinite;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.animated-title .text:hover {
+  transform: scale(1.05);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-title .text {
+    animation: none;
+    transition: none;
+  }
+
+  .animated-title .text:hover {
+    transform: none;
+  }
+}
+
+.animated-title .text::before {
+  content: 'LexiClash';
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  background: linear-gradient(135deg, #a0b5ff 0%, #c89aff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: blur(4px);
+  opacity: 0.5;
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes titleBounce {
+
+  0%,
+  100% {
+    transform: translateY(0) rotateX(0deg);
+  }
+
+  25% {
+    transform: translateY(-10px) rotateX(5deg);
+  }
+
+  50% {
+    transform: translateY(0) rotateX(0deg);
+  }
+
+  75% {
+    transform: translateY(-5px) rotateX(-5deg);
+  }
+}
+
+@keyframes textGlow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgba(160, 181, 255, 0.6));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 12px rgba(200, 154, 255, 0.8)) drop-shadow(0 0 15px rgba(255, 179, 252, 0.6));
+  }
+}
+
+/* ====================================
+   NEO-BRUTALIST COMBO ANIMATIONS
+   (Adapted with higher saturation + black outlines)
+   ==================================== */
+
+/* Combo Flicker Animation - Neo-Brutalist version */
+@keyframes flicker {
+  0% {
+    opacity: 1;
+    filter: brightness(1) saturate(1.5) contrast(1.1);
+  }
+
+  50% {
+    opacity: 0.9;
+    filter: brightness(1.4) saturate(2) contrast(1.2);
+  }
+
+  100% {
+    opacity: 1;
+    filter: brightness(1.2) saturate(1.7) contrast(1.1);
+  }
+}
+
+/* Rainbow Shift Animation - Neo-Brutalist (faster, more saturated) */
+@keyframes rainbow-shift {
+  0% {
+    background-position: 0% 50%;
+    filter: saturate(1.5);
+  }
+
+  50% {
+    filter: saturate(2);
+  }
+
+  100% {
+    background-position: 100% 50%;
+    filter: saturate(1.5);
+  }
+}
+
+/* Rainbow Gradient Cell Animation - Neo-Brutalist */
+@keyframes rainbow-cell {
+  0% {
+    background-position: 0% 50%;
+    filter: brightness(1) saturate(1.8) contrast(1.1);
+  }
+
+  50% {
+    background-position: 100% 50%;
+    filter: brightness(1.3) saturate(2.2) contrast(1.2);
+  }
+
+  100% {
+    background-position: 0% 50%;
+    filter: brightness(1) saturate(1.8) contrast(1.1);
+  }
+}
+
+/* Selection Escalation — breathing glow replaces shake (shake reads as GPU glitch) */
+@keyframes escalation-breathe-1 {
+  0%, 100% {
+    box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.6), 0 0 8px rgba(255, 107, 53, 0.2);
+    transform: scale(var(--esc-scale, 1.05));
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(255, 107, 53, 0.8), 0 0 14px rgba(255, 107, 53, 0.35);
+    transform: scale(calc(var(--esc-scale, 1.05) + 0.012));
+  }
+}
+
+@keyframes escalation-breathe-2 {
+  0%, 100% {
+    box-shadow: 0 0 0 2px rgba(255, 20, 147, 0.6), 0 0 10px rgba(255, 20, 147, 0.25);
+    transform: scale(var(--esc-scale, 1.06));
+  }
+  50% {
+    box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.85), 0 0 18px rgba(255, 20, 147, 0.4);
+    transform: scale(calc(var(--esc-scale, 1.06) + 0.018));
+  }
+}
+
+@keyframes escalation-breathe-3 {
+  0%, 100% {
+    box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.7), 0 0 12px rgba(0, 255, 255, 0.3);
+    transform: scale(var(--esc-scale, 1.08));
+  }
+  33% {
+    box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.8), 0 0 20px rgba(255, 20, 147, 0.4);
+    transform: scale(calc(var(--esc-scale, 1.08) + 0.022));
+  }
+  66% {
+    box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.9), 0 0 22px rgba(0, 255, 255, 0.45);
+    transform: scale(calc(var(--esc-scale, 1.08) + 0.015));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes escalation-breathe-1 {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(255, 107, 53, 0.6); transform: none; }
+  }
+  @keyframes escalation-breathe-2 {
+    0%, 100% { box-shadow: 0 0 0 2px rgba(255, 20, 147, 0.6); transform: none; }
+  }
+  @keyframes escalation-breathe-3 {
+    0%, 100% { box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.7); transform: none; }
+  }
+}
+
+/* Light Strobe Animation - Neo-Brutalist with hard shadow pulse */
+@keyframes strobe-light {
+  0% {
+    filter: brightness(1) saturate(1.5);
+    box-shadow: 4px 4px 0px rgb(var(--neo-black)), 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  100% {
+    filter: brightness(1.5) saturate(1.8);
+    box-shadow: 6px 6px 0px rgb(var(--neo-black)), 0 0 40px rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* Intense Strobe Animation - Neo-Brutalist with outline pulse */
+@keyframes strobe-intense {
+  0% {
+    filter: brightness(1) saturate(1.8);
+    box-shadow: 4px 4px 0px rgb(var(--neo-black)), 0 0 30px rgba(255, 255, 255, 0.7);
+    outline: 3px solid rgb(var(--neo-black));
+    outline-offset: 0px;
+  }
+
+  100% {
+    filter: brightness(1.7) saturate(2.2);
+    box-shadow: 8px 8px 0px rgb(var(--neo-black)), 0 0 60px rgba(255, 255, 255, 1);
+    outline: 5px solid rgb(var(--neo-black));
+    outline-offset: 2px;
+  }
+}
+
+/* NEW: Neo-Brutalist Starburst Effect */
+@keyframes neo-starburst {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.5) rotate(180deg);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(2) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* ====================================
+   ENHANCED COMBO ANIMATIONS (Full Juice)
+   ==================================== */
+
+/* GPU optimization for frequently animated elements */
+.combo-badge,
+.combo-container,
+.score-popup,
+.word-valid,
+.word-invalid,
+[data-animate="true"] {
+  will-change: transform, opacity;
+}
+
+/* Remove will-change after animation completes to free GPU memory */
+.animation-complete {
+  will-change: auto;
+}
+
+/* Performance optimizations for combo animations */
+.combo-indicator-container,
+.combo-sparkle,
+.combo-confetti,
+.combo-glow-ring {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Limit compositing layers at extreme combo levels */
+.combo-indicator-container[data-extreme="true"] .combo-sparkle,
+.combo-indicator-container[data-extreme="true"] .combo-confetti {
+  will-change: auto;
+}
+
+/* Combo badge entrance with spring overshoot */
+@keyframes combo-entrance {
+  0% {
+    transform: scale(0) rotate(-15deg) translateY(20px);
+    opacity: 0;
+  }
+
+  40% {
+    transform: scale(1.4) rotate(8deg) translateY(-10px);
+    opacity: 1;
+  }
+
+  70% {
+    transform: scale(1.15) rotate(-3deg) translateY(5px);
+  }
+
+  100% {
+    transform: scale(1.2) rotate(0deg) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Combo badge satisfying exit */
+@keyframes combo-exit {
+  0% {
+    transform: scale(1.2) translateY(0) rotate(0);
+    opacity: 1;
+  }
+
+  30% {
+    transform: scale(1.5) translateY(-30px) rotate(10deg);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(0) translateY(-100px) rotate(20deg);
+    opacity: 0;
+  }
+}
+
+/* Sparkle particle burst */
+@keyframes sparkle-burst {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+
+  20% {
+    transform: scale(1.5) rotate(90deg);
+    opacity: 1;
+  }
+
+  60% {
+    transform: scale(1) rotate(270deg);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: scale(0) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Glow ring expansion */
+@keyframes glow-ring-expand {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+    box-shadow: 0 0 20px currentColor;
+  }
+
+  40% {
+    opacity: 0.8;
+    box-shadow: 0 0 40px currentColor;
+  }
+
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+    box-shadow: 0 0 60px currentColor;
+  }
+}
+
+/* Screen shake for high combos */
+@keyframes combo-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10% {
+    transform: translateX(-4px) rotate(-0.5deg);
+  }
+
+  20% {
+    transform: translateX(4px) rotate(0.5deg);
+  }
+
+  30% {
+    transform: translateX(-3px) rotate(-0.3deg);
+  }
+
+  40% {
+    transform: translateX(3px) rotate(0.3deg);
+  }
+
+  50% {
+    transform: translateX(-2px);
+  }
+
+  60% {
+    transform: translateX(2px);
+  }
+
+  70% {
+    transform: translateX(-1px);
+  }
+
+  80% {
+    transform: translateX(1px);
+  }
+}
+
+/* Confetti fall animation */
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(100px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+/* Shimmer sweep for rainbow badges */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Pulse glow for high combos */
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+    transform: scale(1);
+  }
+
+  50% {
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.9);
+    transform: scale(1.05);
+  }
+}
+
+/* Inner radial pulse */
+@keyframes inner-glow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+}
+
+/* Emoji bounce */
+@keyframes emoji-bounce {
+
+  0%,
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+
+  25% {
+    transform: scale(1.2) rotate(-10deg);
+  }
+
+  50% {
+    transform: scale(1.1) rotate(10deg);
+  }
+
+  75% {
+    transform: scale(1.15) rotate(-5deg);
+  }
+}
+
+/* NEW: Board wobble animation */
+@keyframes board-wobble {
+
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+
+  50% {
+    transform: rotate(-1.5deg);
+  }
+}
+
+/* NEW: Button press animation */
+@keyframes neo-press {
+  0% {
+    transform: translate(0, 0);
+    box-shadow: var(--shadow-md);
+  }
+
+  100% {
+    transform: translate(2px, 2px);
+    box-shadow: var(--shadow-pressed);
+  }
+}
+
+/* NEW: Pop-in animation for elements */
+@keyframes neo-pop-in {
+  0% {
+    transform: scale(0.8) rotate(-5deg);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.1) rotate(2deg);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* NEW: Slide-in with tilt */
+@keyframes neo-slide-in {
+  0% {
+    transform: translateY(-20px) rotate(-3deg);
+    opacity: 0;
+  }
+
+  60% {
+    transform: translateY(5px) rotate(1deg);
+  }
+
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Glass Shine Animation - sweeping highlight effect */
+@keyframes glass-shine {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* ====================================
+   EARTHQUAKE/FIRE ROUND ANIMATIONS
+   ==================================== */
+
+/* Earthquake shake - gentler screen shake effect */
+@keyframes earthquake-shake {
+
+  0%,
+  100% {
+    transform: translateX(0) translateY(0) rotate(0deg);
+  }
+
+  10% {
+    transform: translateX(-3px) translateY(-1px) rotate(-0.3deg);
+  }
+
+  20% {
+    transform: translateX(3px) translateY(1.5px) rotate(0.3deg);
+  }
+
+  30% {
+    transform: translateX(-2px) translateY(-1px) rotate(-0.2deg);
+  }
+
+  40% {
+    transform: translateX(2px) translateY(1px) rotate(0.2deg);
+  }
+
+  50% {
+    transform: translateX(-1.5px) translateY(-0.5px) rotate(-0.15deg);
+  }
+
+  60% {
+    transform: translateX(1.5px) translateY(0.5px) rotate(0.15deg);
+  }
+
+  70% {
+    transform: translateX(-1px) translateY(-0.5px) rotate(-0.1deg);
+  }
+
+  80% {
+    transform: translateX(1px) translateY(0.5px) rotate(0.1deg);
+  }
+
+  90% {
+    transform: translateX(-0.5px) translateY(0) rotate(-0.05deg);
+  }
+}
+
+/* Fire glow - lightweight pulsing effect for letters during fire round */
+@keyframes fire-glow {
+
+  0%,
+  100% {
+    transform: translateZ(0) scale(1);
+    opacity: 0.9;
+    box-shadow: 0 0 8px rgba(255, 107, 53, 0.6);
+  }
+
+  50% {
+    transform: translateZ(0) scale(1.05);
+    opacity: 1;
+    box-shadow: 0 0 15px rgba(255, 107, 53, 0.9),
+      0 0 25px rgba(255, 51, 102, 0.5);
+  }
+}
+
+/* Rainbow pulse - dance floor effect for fire round (GPU-accelerated) */
+@keyframes rainbow-pulse {
+
+  0%,
+  100% {
+    transform: translateZ(0) scale(1);
+    opacity: 0.92;
+  }
+
+  50% {
+    transform: translateZ(0) scale(1.03);
+    opacity: 0.98;
+  }
+}
+
+/* Warning pulse - for earthquake warning overlay */
+@keyframes warning-pulse {
+
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.95;
+  }
+
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+/* Fire round badge pulse */
+@keyframes fire-badge-pulse {
+
+  0%,
+  100% {
+    transform: scale(1) rotate(-1deg);
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.6),
+      4px 4px 0 rgb(var(--neo-black));
+  }
+
+  50% {
+    transform: scale(1.08) rotate(1deg);
+    box-shadow: 0 0 30px rgba(255, 107, 53, 0.9),
+      0 0 50px rgba(255, 51, 102, 0.5),
+      5px 5px 0 rgb(var(--neo-black));
+  }
+}
+
+/* Flame flicker effect */
+@keyframes flame-flicker {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+
+  25% {
+    opacity: 0.9;
+    transform: translateY(-2px) scaleY(1.05);
+  }
+
+  50% {
+    opacity: 0.95;
+    transform: translateY(-1px) scaleY(0.98);
+  }
+
+  75% {
+    opacity: 0.92;
+    transform: translateY(-3px) scaleY(1.03);
+  }
+}
+
+@keyframes glass-shine-reverse {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Sparkle Flash Animation */
+@keyframes sparkle-flash {
+
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+/* Gradient XY Animation for background glow */
+@keyframes gradient-xy {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* Gradient X Animation for text */
+@keyframes gradient-x {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ====================================
+   MOBILE UX IMPROVEMENTS
+   ==================================== */
+
+/* Safe Area Insets for notched devices */
+:root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
+  /* Capacitor plugin safe area (set by useSafeArea hook) */
+  /* These override env() values when Capacitor plugin provides more accurate data */
+  --cap-safe-area-top: 0px;
+  --cap-safe-area-bottom: 0px;
+  --cap-safe-area-left: 0px;
+  --cap-safe-area-right: 0px;
+
+  /* AdMob anchored banner height — set by AnchoredNativeBanner on SizeChanged */
+  --admob-banner-height: 0px;
+
+  /* Combined safe area - use Capacitor values if set, fall back to env() */
+  --combined-safe-area-top: max(var(--safe-area-top), var(--cap-safe-area-top));
+  --combined-safe-area-bottom: calc(max(var(--safe-area-bottom), var(--cap-safe-area-bottom)) + var(--admob-banner-height));
+  --combined-safe-area-left: max(var(--safe-area-left), var(--cap-safe-area-left));
+  --combined-safe-area-right: max(var(--safe-area-right), var(--cap-safe-area-right));
+
+  /* Safe area without the admob clearance — for elements that already
+     position above the admob banner via `bottom: var(--admob-banner-height)`.
+     Using --combined-safe-area-bottom for their inner padding would
+     double-count the banner. Critical for Android Capacitor where
+     env(safe-area-inset-bottom) reads 0 inside the WebView and the
+     real bottom inset only lives on --cap-safe-area-bottom. */
+  --safe-area-bottom-raw: max(var(--safe-area-bottom), var(--cap-safe-area-bottom));
+}
+
+/* Safe area utility classes */
+.safe-area-top {
+  padding-top: var(--combined-safe-area-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: var(--combined-safe-area-bottom);
+}
+
+/* Same as `.safe-area-bottom` but excludes the admob banner clearance — for
+   fixed elements that already use `bottom: var(--admob-banner-height)`. Uses
+   the Capacitor-aware --safe-area-bottom-raw so Android (where env() is 0
+   inside the WebView) still respects the gesture-nav inset. */
+.safe-area-pb {
+  padding-bottom: var(--safe-area-bottom-raw);
+}
+
+.safe-area-left {
+  padding-left: var(--combined-safe-area-left);
+}
+
+.safe-area-right {
+  padding-right: var(--combined-safe-area-right);
+}
+
+.safe-area-inset {
+  padding-top: var(--combined-safe-area-top);
+  padding-bottom: var(--combined-safe-area-bottom);
+  padding-left: var(--combined-safe-area-left);
+  padding-right: var(--combined-safe-area-right);
+}
+
+/* Fixed bottom elements with combined safe area */
+.fixed-bottom-safe {
+  bottom: max(var(--combined-safe-area-bottom), 16px);
+}
+
+/* Mobile Tab Bar - Fixed bottom navigation */
+.mobile-tab-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  /* Semi-transparent background for subtle content visibility */
+  background-color: rgba(26, 26, 46, 0.85);
+  /* Backdrop blur for glass effect */
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  padding-top: 0.5rem;
+  padding-bottom: max(0.5rem, var(--combined-safe-area-bottom));
+  border-top: 3px solid rgba(0, 0, 0, 0.5);
+  min-height: 56px;
+}
+
+/* Mobile viewport container - fills screen without scrolling */
+.mobile-viewport {
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tab content area - fills remaining space */
+.tab-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* SCREEN-FIT LAYOUT UTILITIES moved to globals.css for critical initial load */
+
+.safe-area-left {
+  padding-left: var(--safe-area-left);
+}
+
+.safe-area-right {
+  padding-right: var(--safe-area-right);
+}
+
+.safe-area-inset {
+  padding-top: var(--safe-area-top);
+  padding-bottom: var(--safe-area-bottom);
+  padding-left: var(--safe-area-left);
+  padding-right: var(--safe-area-right);
+}
+
+/* Fixed bottom elements with safe area */
+.fixed-bottom-safe {
+  bottom: max(var(--safe-area-bottom), 16px);
+}
+
+/* ============================================
+   RESPONSIVE FLEX LAYOUTS - No Scroll Pattern
+   ============================================ */
+
+/* Bottom safe area spacing variable - uses --mobile-bottom-safe from globals.css
+   which includes full bottom nav height (64px) + device safe area */
+:root {
+  --bottom-nav-height: 0px;
+  --bottom-safe-padding: calc(env(safe-area-inset-bottom, 0px) + 16px);
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --bottom-safe-padding: 0px;
+  }
+}
+
+/* Page content with bottom nav awareness
+   Uses --mobile-bottom-safe (nav height 64px + device safe area)
+   to prevent content from being hidden behind the fixed bottom nav.
+   Top-spacing for the fixed <Header /> is handled by a sibling spacer the
+   Header component renders itself — this class intentionally only handles the
+   bottom. Pages without a Header (e.g. loading skeletons with their own inline
+   header) keep working unchanged. */
+.page-content-safe {
+  padding-bottom: var(--mobile-bottom-safe);
+}
+
+/* When the global bottom nav is present, `body.screen-fit` already reserves the
+   bottom clearance via --bottom-stack-height (nav + admob banner). Adding
+   --mobile-bottom-safe here too DOUBLE-reserves it — and because BOTH vars
+   include --admob-banner-height, the empty band exploded by ~2x the instant a
+   banner loaded (the "blank panel that only appears when there's an ad", ~700px
+   on Android). Zero it on these pages so the reservation lives in exactly one
+   place (body.screen-fit). Non-nav pages keep --mobile-bottom-safe above. */
+html.has-global-bottom-nav .page-content-safe {
+  padding-bottom: 0;
+}
+
+/* Flex column to row transition at md breakpoint */
+.flex-col-to-row {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2cqw, 1.5rem);
+}
+
+@media (min-width: 768px) {
+  .flex-col-to-row {
+    flex-direction: row;
+  }
+
+  .flex-col-to-row > * {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* Flex column to row at lg breakpoint */
+.flex-col-to-row-lg {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2cqw, 1.5rem);
+}
+
+@media (min-width: 1024px) {
+  .flex-col-to-row-lg {
+    flex-direction: row;
+  }
+
+  .flex-col-to-row-lg > * {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* Auto-fit grid for cards */
+.grid-auto-fit {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(0.75rem, 2cqw, 1.5rem);
+}
+
+/* Smaller auto-fit grid for compact cards */
+.grid-auto-fit-sm {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: clamp(0.5rem, 1.5cqw, 1rem);
+}
+
+/* Viewport-fit content area (no internal scroll) */
+.viewport-fit {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Scrollable only when needed */
+.scroll-if-needed {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent iOS zoom on input focus (requires 16px min font) */
+input,
+select,
+textarea {
+  font-size: max(16px, 1rem);
+}
+
+/* Game grid cells: enforce minimum touch target size for accessibility */
+/* IMPORTANT: Never set min-width/min-height larger than what the grid track provides,
+   or cells will overflow and overlap. The grid uses minmax(0, 1fr) so cells
+   naturally shrink to fit. Only set a small floor for extreme edge cases. */
+.game-board-frame [role="gridcell"] {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Touch action utilities for game interactions */
+.touch-none {
+  touch-action: none;
+}
+
+.touch-pan-x {
+  touch-action: pan-x;
+}
+
+.touch-pan-y {
+  touch-action: pan-y;
+}
+
+.touch-manipulation {
+  touch-action: manipulation;
+}
+
+/* Game grid - prevent all browser gestures */
+.game-grid,
+[role="grid"] {
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* ====================================
+   CRAZYGAMES IFRAME EMBEDDING STYLES
+   ==================================== */
+
+/* Marker class only — applied to <body> by CrazyGamesScriptServer bootstrap.
+   Cross-origin iframes already isolate styles, so no layout reset is needed.
+   Earlier `all: initial` here wiped body's `display: flex` (from .screen-fit)
+   and reset `display` to `inline`, which detached the fixed header from its
+   spacer and broke the flex-1 chain that fills the viewport. Keep this rule
+   empty; layout-affecting overrides go on `body.crazygames-embed` selectors
+   below so they don't fight `.screen-fit`. */
+.crazygames-embed {
+  /* intentionally empty — see comment above */
+}
+
+/* CrazyGames iframe requirements - prevent mobile selection issues */
+/* When embedded in CrazyGames, prevent text selection and magnification */
+.crazygames-embed body,
+body.crazygames-embed {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: manipulation;
+  /* CG iframe has no notch/status bar — strip the safe-area top padding that
+     `.screen-fit` adds. Belt-and-braces with the spacer hide below. */
+  padding-top: 0 !important;
+}
+
+/* Header.tsx renders an invisible flow spacer (`h-header`) sibling that
+   reserves vertical room for its fixed bar. In the CG iframe `position: fixed`
+   on the bar can be defeated by ancestors, leaving both spacer and bar in the
+   document flow — the spacer then shows up as a navy band above the bar
+   (reported as "empty space above header"). Hiding the spacer here collapses
+   the gap; if `fixed` is working in CG the bar still overlays viewport top
+   anyway, so removing the in-flow placeholder is safe. */
+body.crazygames-embed [aria-hidden="true"].h-header {
+  display: none !important;
+}
+
+
+/* Landscape mode optimization for desktop (CrazyGames requirement #10) */
+@media (min-width: 1024px) and (orientation: landscape) {
+  .crazygames-embed {
+    /* Ensure content fits without scroll */
+    max-height: 100vh;
+    max-height: 100dvh;
+  }
+}
+
+/* CrazyGames desktop optimization - minimum 821x462 viewport */
+/* Targets "tweener" screens: larger than mobile but smaller than full desktop */
+@media (min-width: 821px) and (min-height: 462px) and (max-width: 1023px) {
+  body.crazygames-embed .game-board-frame,
+  .crazygames-embed .game-board-frame {
+    /* Optimized sizing for CrazyGames iframe constraints */
+    width: min(calc(100dvh - 100px), calc(100vw - 420px), 55vmin);
+    height: min(calc(100dvh - 100px), calc(100vw - 420px), 55vmin);
+    max-height: calc(100dvh - 100px);
+    padding: 10px;
+  }
+}
+
+/* CrazyGames small desktop - compact sidebars */
+@media (min-width: 821px) and (min-height: 462px) and (max-width: 1199px) {
+  body.crazygames-embed .desktop-stats-panel,
+  .crazygames-embed .desktop-stats-panel {
+    /* Narrower sidebars for smaller CrazyGames viewports */
+    max-width: 200px;
+    min-width: 180px;
+  }
+
+  body.crazygames-embed .desktop-words-panel,
+  .crazygames-embed .desktop-words-panel {
+    /* Narrower sidebars for smaller CrazyGames viewports */
+    max-width: 220px;
+    min-width: 180px;
+  }
+}
+
+/* CrazyGames very small viewport - ultra compact mode */
+@media (max-height: 550px) and (min-width: 821px) {
+  body.crazygames-embed .game-board-frame,
+  .crazygames-embed .game-board-frame {
+    /* Maximize grid on very short screens */
+    width: min(calc(100dvh - 80px), calc(100vw - 380px), 50vmin);
+    height: min(calc(100dvh - 80px), calc(100vw - 380px), 50vmin);
+    max-height: calc(100dvh - 80px);
+    padding: 8px;
+  }
+}
+
+/* Scrollable areas - allow vertical scroll only */
+.scrollable-area {
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Isolated scroll container for mobile with fixed bottom elements
+ * CRITICAL: When screen-fit-content has overflow:visible, child scroll
+ * containers need explicit height constraints. This class creates an
+ * isolated scroll context that works independently of body scroll.
+ *
+ * Use when:
+ * - Page has fixed bottom tab bar (position: fixed)
+ * - Content needs to scroll independently
+ * - Parent uses screen-fit-content pattern
+ *
+ * The calc accounts for PARENT elements only (not siblings):
+ * - 100dvh: Full viewport (dynamic - adjusts when browser UI changes)
+ * - AutoHideHeader: 60px (global header with logo/menu)
+ * - GlobalBottomNav: 64px (h-16 fixed bar; reserved here so content doesn't sit under it on routes where the nav shows)
+ * - Safe area: env(safe-area-inset-bottom) for notched devices
+ *
+ * IMPORTANT: This class does NOT subtract sibling elements like "Compact Header"
+ * because in a flex layout, the flex container automatically handles sibling
+ * sizing. Only parent-level elements outside the component need to be subtracted.
+ *
+ * NOTE: MobileTabBar (position: fixed) is NOT subtracted because it overlays
+ * content rather than taking document flow space. The content uses
+ * pb-[--mobile-bottom-safe] padding to scroll past the fixed bar.
+ */
+.isolate-scroll {
+  /* Fixed height = viewport - AutoHideHeader(60) - GlobalBottomNav(64) - safe-area */
+  /* Note: Sibling elements (compact headers) are handled by flex layout, not subtracted here */
+  height: calc(100dvh - 60px - 64px - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 60px - 64px - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* On desktop/tablet, revert to flex-based layout (no fixed tab bar) */
+@media (min-width: 768px) {
+  .isolate-scroll {
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+  }
+}
+
+/**
+ * Daily-specific scroll isolation variant
+ *
+ * For /daily pages where GlobalBottomNav is hidden and the component
+ * has its own MobileTabBar. Only subtracts AutoHideHeader (60px), NOT
+ * the main.pb-16 (64px) since daily pages don't have GlobalBottomNav.
+ *
+ * The component handles its own bottom padding via pb-[--mobile-bottom-safe].
+ */
+.isolate-scroll-daily {
+  /* Fixed height = viewport - AutoHideHeader(60) - safe-area */
+  /* NO subtraction for main.pb-16 since daily pages hide GlobalBottomNav */
+  height: calc(100dvh - 60px - env(safe-area-inset-bottom, 0px));
+  max-height: calc(100dvh - 60px - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+
+/* On desktop/tablet, use max-height constraint instead of fixed height.
+ * height: auto lets the element grow with content; max-height caps it
+ * at the viewport minus header so overflow-y: auto can activate. */
+@media (min-width: 768px) {
+  .isolate-scroll-daily {
+    height: auto;
+    max-height: calc(100dvh - 60px);
+    overflow-y: auto;
+  }
+}
+
+/* ====================================
+   ENHANCED FOCUS & ACCESSIBILITY
+   ==================================== */
+
+/* Enhanced focus ring for all interactive elements */
+
+/* Default focus ring */
+*:focus-visible {
+  outline: 3px solid var(--neo-cyan);
+  outline-offset: 2px;
+}
+
+/* Focus ring for dark backgrounds */
+.focus-ring-light:focus-visible {
+  outline-color: var(--neo-yellow);
+}
+
+/* No focus ring for mouse users */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ====================================
+   CONNECTION STATUS INDICATOR
+   ==================================== */
+
+.connection-indicator {
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgb(var(--neo-black));
+  z-index: 9998;
+  transition: background-color 0.3s ease;
+}
+
+.connection-indicator--connected {
+  background-color: var(--neo-cyan);
+}
+
+.connection-indicator--connecting {
+  background-color: var(--neo-yellow);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.connection-indicator--disconnected {
+  background-color: var(--neo-red);
+}
+
+.connection-indicator--reconnecting {
+  background-color: var(--neo-yellow);
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.6;
+    transform: scale(0.9);
+  }
+}
+
+/* ====================================
+   SKELETON LOADING STATES
+   ==================================== */
+
+.skeleton {
+  background: linear-gradient(90deg,
+      var(--neo-navy-light) 25%,
+      var(--neo-gray) 50%,
+      var(--neo-navy-light) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius);
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: 0.5em;
+}
+
+.skeleton-card {
+  height: 80px;
+  border: 3px solid rgb(var(--neo-black));
+  border-radius: var(--radius-lg);
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid rgb(var(--neo-black));
+}
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Respect reduced motion for skeleton */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--neo-navy-light);
+  }
+}
+
+/* ====================================
+   GLOBAL REDUCED MOTION SUPPORT
+   ====================================
+   For users who prefer reduced motion, disable all non-essential animations.
+   This includes CSS animations, transitions, and sets a flag for JavaScript.
+*/
+@media (prefers-reduced-motion: reduce) {
+
+  /* Disable all CSS animations globally */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Disable specific game animations */
+  .combo-entrance,
+  .starburst,
+  .flicker,
+  .rainbow-cell,
+  .strobe-light,
+  .strobe-intense,
+  .glow-ring-expand,
+  .board-wobble,
+  .gradient-x,
+  .gradient-xy {
+    animation: none !important;
+  }
+
+  /* Keep essential visual feedback (no motion, just static states) */
+  .shadow-hard:hover,
+  .shadow-hard:focus {
+    transform: none;
+    box-shadow: var(--shadow-md);
+  }
+
+  /* Disable confetti and particle effects for users who prefer reduced motion */
+  /* The data-confetti attribute is added by our confettiUtils.ts wrapper */
+  canvas[data-confetti="true"] {
+    display: none !important;
+  }
+}
+
+/* ====================================
+   OPTIMISTIC UI FEEDBACK
+   ==================================== */
+
+/* Pending word state */
+.word-pending {
+  opacity: 0.7;
+  position: relative;
+}
+
+.word-pending::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border: 2px solid var(--neo-cyan);
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: pending-spinner 0.8s linear infinite;
+}
+
+/* Use a unique name to avoid conflicting with Tailwind's animate-spin */
+@keyframes pending-spinner {
+  from {
+    transform: translateY(-50%) rotate(0deg);
+  }
+
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
+/* Valid word confirmation */
+.word-valid {
+  animation: word-accept 0.3s ease-out;
+}
+
+@keyframes word-accept {
+  0% {
+    transform: scale(1);
+    background-color: var(--neo-cyan);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
+
+  100% {
+    transform: scale(1);
+    background-color: transparent;
+  }
+}
+
+/* Invalid word rejection */
+.word-invalid {
+  animation: word-reject 0.4s ease-out;
+}
+
+@keyframes word-reject {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  20%,
+  60% {
+    transform: translateX(-5px);
+  }
+
+  40%,
+  80% {
+    transform: translateX(5px);
+  }
+}
+
+/* ====================================
+   FLOATING SCORE ANIMATION
+   ==================================== */
+
+.score-popup {
+  position: absolute;
+  pointer-events: none;
+  font-weight: 900;
+  font-size: 1.5rem;
+  color: var(--neo-yellow);
+  text-shadow:
+    2px 2px 0 rgb(var(--neo-black)),
+    -1px -1px 0 rgb(var(--neo-black)),
+    1px -1px 0 rgb(var(--neo-black)),
+    -1px 1px 0 rgb(var(--neo-black));
+  animation: score-float 0.8s ease-out forwards;
+  z-index: 100;
+}
+
+@keyframes score-float {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.5);
+  }
+
+  50% {
+    transform: translateY(-30px) scale(1.2);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-50px) scale(1);
+  }
+}
+
+/* ====================================
+   KEYBOARD VISIBILITY HELPERS
+   ==================================== */
+
+/* Add padding when virtual keyboard is open */
+.keyboard-open {
+  padding-bottom: var(--keyboard-height, 0px);
+}
+
+/* Ensure form inputs are visible when keyboard opens */
+.keyboard-scroll-target {
+  scroll-margin-bottom: clamp(64px, calc(var(--keyboard-height, 0px) + var(--safe-area-bottom, 16px)), 96px);
+}
+
+/* ====================================
+   RESPONSIVE IMPROVEMENTS
+   ==================================== */
+
+/* Extra small screens (< 360px) */
+@media (max-width: 359px) {
+  .game-board-frame {
+    padding: 2px;
+  }
+
+  .text-responsive-sm {
+    font-size: 0.75rem;
+  }
+}
+
+/* ====================================
+   MOBILE LANDSCAPE OPTIMIZATION
+   ==================================== */
+
+/* Landscape orientation on mobile devices — DEPRECATED: landscape layouts removed, CSS kept for reference.
+   Scoped to max-width: 1199px so it only targets small phones/tablets in landscape;
+   short desktop windows (e.g. CrazyGames 1280×600 iframe) are unaffected. */
+@media (orientation: landscape) and (max-height: 600px) and (max-width: 1199px) {
+
+  /* Prevent horizontal scrolling */
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  * {
+    max-width: 100%;
+  }
+
+  /* Prevent elements from being positioned outside viewport */
+  body {
+    position: relative;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Fix negative positioning issues */
+  main,
+  header,
+  footer {
+    position: relative;
+  }
+
+  /* Ensure no content extends beyond viewport */
+  .overflow-x-hidden {
+    overflow-x: hidden !important;
+  }
+
+  /* Improved spacing for landscape forms */
+  form {
+    gap: 0.75rem;
+  }
+
+  /* Better input sizing in landscape */
+  input[type="text"],
+  input[type="number"],
+  select {
+    font-size: 16px !important;
+    min-height: 48px !important;
+  }
+
+  /* Improved button sizing */
+  button:not(.icon-only) {
+    padding: 0.75rem 1rem;
+  }
+
+  /* Fix small icons inside buttons in landscape mode */
+  button svg,
+  a[role="button"] svg,
+  header button svg,
+  header a svg {
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    min-width: 1.25rem !important;
+    min-height: 1.25rem !important;
+  }
+
+  /* Better card spacing */
+  .card {
+    padding: 1rem;
+    gap: 0.75rem;
+  }
+
+  /* Improved text readability */
+  .text-sm {
+    font-size: 0.875rem;
+  }
+
+  .text-xs {
+    font-size: 0.75rem;
+  }
+
+  /* Landscape wrapper - sizes the grid container to take full available height */
+  .game-board-frame-landscape {
+    height: 100%;
+    max-height: 100%;
+    width: auto;
+  }
+
+  /* Game board frame adjustments for landscape - balanced for side panels */
+  .game-board-frame {
+    /* Reduced from 94dvh to 68dvh to leave space for larger side panels */
+    /* This allows stats to be more readable while keeping grid playable */
+    width: min(75dvh, calc(100vw - 320px));
+    max-width: min(75dvh, calc(100vw - 320px));
+    height: min(75dvh, calc(100vw - 320px));
+    max-height: min(75dvh, calc(100vw - 320px));
+    aspect-ratio: 1 / 1;
+    padding: 6px;
+  }
+
+  /* Grid cells: let CSS grid handle sizing via minmax(0, 1fr).
+     Setting min-width/min-height here caused cells to overflow the grid
+     and overlap each other on tablet-sized screens. */
+
+  /* Stack game UI vertically in landscape */
+  .game-layout-landscape {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  /* ====== Landscape Side Panel Styles ====== */
+
+  /* Landscape side panel sizing */
+  .landscape-side-panel {
+    width: clamp(120px, 18vw, 180px);
+    min-width: 120px;
+    max-width: 180px;
+  }
+
+  /* Large stats typography for landscape panels - responsive sizing */
+  .landscape-stat-primary {
+    font-size: clamp(1.5rem, 4vw, 2.25rem);
+    font-weight: 900;
+    line-height: 1.15;
+  }
+
+  .landscape-stat-secondary {
+    font-size: clamp(1.125rem, 3vw, 1.5rem);
+    font-weight: 700;
+    line-height: 1.25;
+  }
+
+  .landscape-stat-label {
+    font-size: clamp(0.6rem, 1.2vw, 0.75rem);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0.9;
+  }
+
+  /* Neo-brutalist panel background for landscape - improved outdoor visibility */
+  .landscape-panel {
+    background: rgba(255, 254, 240, 0.92);
+    border: 3px solid rgb(0, 0, 0);
+    border-radius: 8px;
+    box-shadow: 4px 4px 0px rgb(0, 0, 0);
+    padding: clamp(10px, 2vw, 16px);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Dark mode panel variant */
+  .dark .landscape-panel {
+    background: rgba(26, 26, 46, 0.92);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 4px 4px 0px rgba(0, 0, 0, 0.5);
+  }
+
+  .dark .landscape-stat-primary,
+  .dark .landscape-stat-secondary,
+  .dark .landscape-stat-label {
+    color: var(--neo-cream) !important;
+  }
+
+  /* Hide non-essential elements in landscape */
+  .hide-landscape {
+    display: none !important;
+  }
+
+  /* Show landscape-only elements */
+  .show-landscape {
+    display: block !important;
+  }
+
+  /* Compact header in landscape */
+  header {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+    margin-bottom: 0 !important;
+  }
+
+  header>div {
+    padding: 0.5rem 0.75rem !important;
+    border-width: 2px !important;
+  }
+
+  header h1 {
+    font-size: 1rem !important;
+  }
+
+  /* Header buttons - consolidated touch targets (48px minimum for WCAG compliance) */
+  header button,
+  header a {
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: 0.5rem !important;
+  }
+
+  /* Timer positioning for landscape */
+  .timer-landscape {
+    position: relative;
+    top: auto;
+    right: auto;
+  }
+
+  /* Word list compact mode */
+  .word-list-landscape {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  /* Leaderboard compact in landscape */
+  .leaderboard-landscape {
+    max-height: 50vh;
+    overflow-y: auto;
+    font-size: 0.875rem;
+  }
+
+  /* Reduce padding in landscape */
+  .p-landscape-compact {
+    padding: 0.5rem;
+  }
+
+  /* Reduce gaps in landscape */
+  .gap-landscape-compact {
+    gap: 0.5rem;
+  }
+
+  /* Text size adjustments */
+  .text-landscape-sm {
+    font-size: clamp(0.9rem, 1.2vw, 1rem);
+  }
+
+  .text-landscape-xs {
+    font-size: clamp(0.75rem, 1.1vw, 0.875rem);
+  }
+
+  /* Better spacing for landscape */
+  .landscape-spacing-compact {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  /* Header auto-hide in landscape */
+  header {
+    transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  }
+
+  header.landscape-hidden {
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Better button spacing in landscape */
+  button,
+  a[role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Compact form elements */
+  input,
+  select,
+  textarea {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  /* Better scrollbar for landscape */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Hide footer in mobile landscape to maximize screen space */
+  footer {
+    display: none !important;
+  }
+}
+
+/* ====== Consolidated Landscape Touch Targets (Mobile/Tablet only) ====== */
+/* Single source of truth for mobile/tablet landscape touch targets */
+/* Max-width 1199px ensures desktop uses its own min-width based styles */
+@media (orientation: landscape) and (max-width: 1199px) {
+  /* Header elements - ensure 48px minimum */
+  header button,
+  header a {
+    min-width: 48px !important;
+    min-height: 48px !important;
+  }
+
+  /* Grid cells: removed min-width/min-height that caused overlap on tablets.
+     CSS grid minmax(0, 1fr) handles proper sizing. */
+}
+
+/* Custom scrollbar styling for game panels */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.2) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Prevent text selection issues in landscape */
+@media (orientation: landscape) {
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Better focus states for landscape */
+  *:focus-visible {
+    outline: 3px solid var(--neo-cyan);
+    outline-offset: 2px;
+  }
+
+  input,
+  select,
+  textarea {
+    min-height: 48px;
+  }
+}
+
+/* Full-height landscape grid (when header is hidden) */
+@media (orientation: landscape) and (max-height: 600px) {
+
+  /* Content container for full height */
+  .landscape-content {
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+  }
+
+  /* Game board frame maximized for full height when no header */
+  .game-board-frame-full {
+    width: min(95vh, calc(100vw - 100px));
+    max-width: min(95vh, calc(100vw - 100px));
+    height: min(95vh, calc(100vw - 100px));
+    max-height: min(95vh, calc(100vw - 100px));
+    aspect-ratio: 1 / 1;
+    padding: 4px;
+  }
+
+  /* In-game container uses full viewport */
+  .landscape-full-height {
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+  }
+
+  /* Grid container maximized */
+  .landscape-grid-container {
+    max-height: 100vh;
+    max-height: 100dvh;
+  }
+}
+
+/* Very short landscape screens (phones in landscape) */
+@media (orientation: landscape) and (max-height: 450px) {
+
+  /* Landscape wrapper for very short screens */
+  .game-board-frame-landscape {
+    height: 100%;
+    max-height: 100%;
+    width: auto;
+  }
+
+  .game-board-frame {
+    /* Reduced from 96dvh to 70dvh for better balance with side panels */
+    /* Still playable on short screens while allowing room for stats */
+    width: min(78dvh, calc(100vw - 260px));
+    max-width: min(78dvh, calc(100vw - 260px));
+    height: min(78dvh, calc(100vw - 260px));
+    max-height: min(78dvh, calc(100vw - 260px));
+    padding: 4px;
+  }
+
+  /* Very short landscape panel adjustments */
+  .landscape-panel {
+    padding: 10px;
+    border-width: 3px;
+    box-shadow: 4px 4px 0px rgb(0, 0, 0);
+  }
+
+  .landscape-stat-primary {
+    font-size: 1.75rem;
+  }
+
+  .landscape-stat-secondary {
+    font-size: 1.25rem;
+  }
+
+  /* Full-height mode - even larger on short screens */
+  .game-board-frame-full {
+    width: min(98dvh, calc(100vw - 100px));
+    max-width: min(98dvh, calc(100vw - 100px));
+    height: min(98dvh, calc(100vw - 100px));
+    max-height: min(98dvh, calc(100vw - 100px));
+    padding: 4px;
+  }
+
+  /* Grid cells: removed min-width/min-height that caused overlap.
+     Keep font-size clamp for readability on very short screens. */
+  .game-board-frame [role="gridcell"] {
+    font-size: clamp(0.75rem, 2vw, 0.875rem);
+  }
+
+  /* Even more compact for very short screens */
+  .ultra-compact-landscape {
+    padding: 0.25rem;
+    gap: 0.25rem;
+  }
+
+  /* Allow wrapping to prevent overlap on ultra-short heights */
+  .game-layout-landscape {
+    flex-wrap: wrap;
+  }
+
+  /* Hide more elements on very short screens */
+  .hide-ultra-landscape {
+    display: none !important;
+  }
+
+  /* Ultra-compact text */
+  .text-ultra-compact {
+    font-size: 0.7rem;
+    line-height: 1.2;
+  }
+
+  /* Smaller buttons but still touchable */
+  button,
+  a[role="button"] {
+    min-height: 40px;
+    min-width: 40px;
+    padding: 0.375rem 0.75rem;
+  }
+
+  /* Fix icons inside buttons on very short landscape screens */
+  button svg,
+  a[role="button"] svg {
+    width: 1.125rem !important;
+    height: 1.125rem !important;
+    min-width: 1.125rem !important;
+    min-height: 1.125rem !important;
+  }
+
+  /* Compact header */
+  header {
+    padding: 0.25rem 0.5rem;
+  }
+
+  /* Hide decorative elements */
+  .decorative-landscape {
+    display: none !important;
+  }
+
+  /* Grid cells: removed min-width/min-height that caused overlap on tablets. */
+}
+
+/* Landscape tablets (larger screens in landscape, but NOT desktop) */
+/* Max-width 1199px ensures this doesn't override desktop min-width styles */
+@media (orientation: landscape) and (min-height: 601px) and (max-height: 900px) and (max-width: 1199px) {
+  .game-board-frame {
+    /* Larger grid for better playability on tablets in landscape */
+    /* FIX: Use single variable to ensure square grid (was using different values for width/height!) */
+    --board-size: min(80vh, calc(100vw - 300px));
+    width: var(--board-size);
+    max-width: var(--board-size);
+    height: var(--board-size);
+    max-height: var(--board-size);
+  }
+}
+
+/* NOTE: Removed separate landscape query for large screens (height > 900px) */
+/* Desktop screens use min-width based queries defined earlier (lines 536-553) */
+/* This avoids landscape media queries overriding desktop-specific styles */
+
+/* Accessibility: Larger text mode */
+html.larger-text {
+  font-size: 125%;
+}
+
+/* Accessibility: High contrast mode (user-enabled) */
+html.high-contrast .border-neo,
+html.high-contrast [class*="border-"] {
+  border-width: 5px !important;
+}
+
+html.high-contrast .shadow-hard,
+html.high-contrast .shadow-hard-sm,
+html.high-contrast .shadow-hard-lg {
+  box-shadow: 8px 8px 0px rgb(var(--neo-black)) !important;
+}
+
+/* Accessibility: Reduce motion mode (user-enabled) */
+html.reduce-motion *,
+html.reduce-motion *::before,
+html.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --neo-black: #000000;
+    --border-neo: 4px;
+    --border-neo-thick: 5px;
+  }
+
+  *:focus-visible {
+    outline-width: 4px;
+  }
+}
+
+/* ====================================
+   LOW-END DEVICE OPTIMIZATIONS
+   Applied automatically via performanceUtils.ts
+   ==================================== */
+.low-end-device {
+  /* Disable will-change hints - let browser decide what to optimize */
+  --disable-will-change: true;
+}
+
+.low-end-device * {
+  will-change: auto !important;
+}
+
+/* Disable particle and confetti animations on low-end devices */
+.low-end-device .combo-sparkle,
+.low-end-device .combo-confetti,
+.low-end-device .combo-particles,
+.low-end-device .particle-yellow,
+.low-end-device .particle-cyan,
+.low-end-device .particle-pink,
+.low-end-device .particle-rainbow {
+  display: none !important;
+}
+
+/* Simplify shadows to reduce paint operations */
+.low-end-device .shadow-hard,
+.low-end-device .shadow-hard-sm,
+.low-end-device .shadow-hard-lg,
+.low-end-device .shadow-hard-xl {
+  box-shadow: 2px 2px 0 rgb(var(--neo-black)) !important;
+}
+
+/* Disable filter effects (blur, glow) which are expensive */
+.low-end-device .combo-glow-rainbow,
+.low-end-device .combo-glow-normal,
+.low-end-device .combo-glow-subtle {
+  filter: none !important;
+}
+
+/* Disable halftone patterns to reduce paint operations */
+.low-end-device .texture-halftone::before,
+.low-end-device .texture-halftone-lg::before,
+.low-end-device .texture-halftone-comic::before {
+  display: none !important;
+}
+
+/* Disable complex animations for combo system */
+.low-end-device .combo-badge,
+.low-end-device .combo-container {
+  animation: none !important;
+}
+
+/* Simplify grid cell rendering - use CSS transitions instead of JS animations */
+.low-end-device .game-board-frame [role="gridcell"] {
+  transition: transform 50ms ease-out, background-color 50ms ease-out !important;
+  animation: none !important;
+}
+
+/* CSS-based selection state for grid cells */
+.low-end-device .game-board-frame [role="gridcell"][aria-selected="true"] {
+  transform: scale(1.02) !important;
+}
+
+/* Force GPU compositing for essential elements only */
+.low-end-device .game-board-frame {
+  transform: translateZ(0);
+  contain: layout paint;
+}
+
+/* Instant active feedback for touch responsiveness */
+.low-end-device .game-board-frame [role="gridcell"]:active {
+  transform: scale(0.98) !important;
+  transition: none !important;
+}
+
+/* Disable heavy blast tile animations (box-shadow + filter keyframes) */
+.low-end-device .blast-tile-ice,
+.low-end-device .blast-tile-lightning,
+.low-end-device .blast-tile-magnet,
+.low-end-device .blast-tile-prism,
+.low-end-device .blast-tile-gem,
+.low-end-device .blast-tile-frozen,
+.low-end-device .blast-tile-objective {
+  animation: none !important;
+  filter: none !important;
+}
+
+/* Disable adventure tile glow/shimmer animations */
+.low-end-device .adventure-tile-gold,
+.low-end-device .adventure-tile-bomb,
+.low-end-device .adventure-tile-time {
+  animation: none !important;
+  filter: none !important;
+}
+
+/* Simplify all inset box-shadows on game tiles */
+.low-end-device [class*="blast-tile-"],
+.low-end-device [class*="adventure-tile-"] {
+  box-shadow: none !important;
+}
+
+/* ==================== Enhanced Touch Interaction Styles ==================== */
+/* Improved touch targets and feedback for onboarding and general gameplay */
+
+/* Larger effective touch area via padding trick - apply to all devices */
+.game-board-frame [role="gridcell"] {
+  /* Use position relative for pseudo-element touch area expansion */
+  position: relative;
+  /* Prevent text selection during swipe */
+  user-select: none;
+  -webkit-user-select: none;
+  /* Ensure touch events are captured */
+  touch-action: none;
+}
+
+/* Expand touch target beyond visible bounds */
+.game-board-frame [role="gridcell"]::before {
+  content: '';
+  position: absolute;
+  /* Expand by 15% beyond cell bounds on all sides */
+  inset: -15%;
+  z-index: -1;
+  /* Invisible but captures touch events */
+  background: transparent;
+}
+
+/* Visual feedback during active touch/swipe on adjacent cells */
+.game-board-frame [role="gridcell"].ring-neo-lime\/70 {
+  /* Adjacent hint cells - pulse subtly to show they're valid targets */
+  animation: adjacentPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes adjacentPulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* RTL support: Ensure swipe gestures work correctly in both directions */
+/* The grid itself uses dir="ltr" but we ensure touch feedback is consistent */
+[dir="rtl"] .game-board-frame {
+  /* Touch coordinates are handled in JS, but visual feedback should be RTL-aware */
+}
+
+/* Mobile-specific: Increase touch target for better swipe accuracy */
+@media (hover: none) and (pointer: coarse) {
+  .game-board-frame [role="gridcell"]::before {
+    /* Even larger touch expansion on touch devices */
+    inset: -20%;
+  }
+
+  /* Smoother transitions during swipe for better perceived responsiveness */
+  .game-board-frame [role="gridcell"] {
+    transition: transform 80ms ease-out, background-color 80ms ease-out;
+    will-change: transform;
+  }
+
+  /* Immediate visual feedback on touch */
+  .game-board-frame [role="gridcell"]:active {
+    transform: scale(0.95);
+    transition: transform 0ms;
+  }
+}
+
+/* ==================== TV Broadcast Mode Grid ==================== */
+/* Override game-board-frame sizing when inside TV broadcast container */
+.tv-grid-container {
+  /* Container that fills available space */
+  container-type: size;
+}
+
+.tv-grid-container .game-board-frame {
+  /* Override the vmin-based sizing with container-relative sizing */
+  width: 100% !important;
+  height: 100% !important;
+  max-width: min(100%, 100cqh) !important;
+  max-height: min(100%, 100cqw) !important;
+  aspect-ratio: 1 / 1 !important;
+  margin: 0 auto;
+}
+
+/* ==================== Desktop Layout Grid Container ==================== */
+/* Override game-board-frame sizing when inside desktop 3-column layout */
+.desktop-grid-container {
+  position: relative;
+  aspect-ratio: 1 / 1;
+}
+
+.desktop-grid-container .game-board-frame {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 auto;
+}
+
+/* ==================== Adventure Grid Container ==================== */
+/* The adventure layout (GameGridArea) wraps the grid in an aspect-square
+   flex container that sizes itself to the available space. The inner
+   GridComponent's .game-board-frame element must fill that wrapper rather
+   than honoring the legacy mobile-landscape width/height rules above —
+   otherwise flex-shrink squashes width-only, leaving height at the CSS
+   value and producing rectangular cells. */
+.adventure-grid-container .game-board-frame {
+  width: 100% !important;
+  height: 100% !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  margin: 0 auto;
+}
+
+/* ====================================
+   CLUE BOX ATTENTION ANIMATIONS
+   For Daily Challenge Target Word Hints
+   ==================================== */
+
+/* Attention-grabbing pulse for clue container when new feedback appears */
+/* Uses single amber/gold color for elegant, non-distracting effect */
+@keyframes clue-attention-pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 200, 50, 0.6);
+  }
+
+  50% {
+    transform: scale(1.015);
+    box-shadow: 0 0 24px 8px rgba(255, 200, 50, 0.35);
+  }
+
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 200, 50, 0);
+  }
+}
+
+/* Glow ring that expands outward from clue container */
+/* Single amber/gold color for consistency */
+@keyframes clue-glow-ring {
+  0% {
+    transform: scale(0.95);
+    opacity: 1;
+    box-shadow: inset 0 0 15px rgba(255, 200, 50, 0.6),
+      0 0 20px rgba(255, 200, 50, 0.4);
+  }
+
+  100% {
+    transform: scale(1.08);
+    opacity: 0;
+    box-shadow: inset 0 0 0 rgba(255, 200, 50, 0),
+      0 0 40px rgba(255, 200, 50, 0);
+  }
+}
+
+/* Bouncy entrance for feedback letters */
+@keyframes clue-letter-bounce {
+  0% {
+    transform: scale(0) rotate(-10deg);
+    opacity: 0;
+  }
+
+  50% {
+    transform: scale(1.3) rotate(5deg);
+    opacity: 1;
+  }
+
+  70% {
+    transform: scale(0.9) rotate(-2deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Shake animation to grab attention */
+@keyframes clue-shake {
+
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-4px);
+  }
+
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Border glow effect for active clue container */
+/* Single amber/gold color with subtle breathing - elegant and not distracting */
+@keyframes clue-border-glow {
+
+  0%,
+  100% {
+    border-color: rgba(255, 200, 50, 0.7);
+    box-shadow: 0 0 8px rgba(255, 200, 50, 0.25),
+      0 0 16px rgba(255, 200, 50, 0.15),
+      4px 4px 0 rgb(var(--neo-black));
+  }
+
+  50% {
+    border-color: rgba(255, 200, 50, 0.95);
+    box-shadow: 0 0 12px rgba(255, 200, 50, 0.35),
+      0 0 24px rgba(255, 200, 50, 0.2),
+      4px 4px 0 rgb(var(--neo-black));
+  }
+}
+
+/* Flash effect for new clue reveal */
+/* Single amber/gold color for consistency */
+@keyframes clue-flash {
+  0% {
+    background-color: rgba(255, 200, 50, 0.6);
+  }
+
+  100% {
+    background-color: transparent;
+  }
+}
+
+/* Utility classes for clue box animations */
+.clue-container-attention {
+  animation: clue-attention-pulse 0.6s ease-out;
+}
+
+.clue-container-glow {
+  animation: clue-border-glow 3s ease-in-out infinite;
+}
+
+.clue-letter-entrance {
+  animation: clue-letter-bounce 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.clue-shake {
+  animation: clue-shake 0.5s ease-in-out;
+}
+
+/* Persistent glow for clue container when showing feedback */
+/* Single amber/gold color for consistent, elegant styling */
+.clue-feedback-active {
+  background: rgba(255, 200, 50, 0.08);
+  border: 3px solid rgba(255, 200, 50, 0.9);
+  box-shadow: 0 0 16px rgba(255, 200, 50, 0.35),
+    0 0 32px rgba(255, 200, 50, 0.15),
+    4px 4px 0 rgb(var(--neo-black));
+}
+
+/* Green glow for clue container when word reveals new clues */
+.clue-container-green-glow {
+  animation: clue-green-pulse 0.8s ease-out;
+}
+
+@keyframes clue-green-pulse {
+  0% {
+    border-color: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.4),
+      0 0 16px rgba(34, 197, 94, 0.2),
+      4px 4px 0 rgb(var(--neo-black));
+  }
+
+  30% {
+    border-color: rgba(34, 197, 94, 1);
+    box-shadow: 0 0 24px rgba(34, 197, 94, 0.8),
+      0 0 48px rgba(34, 197, 94, 0.4),
+      0 0 72px rgba(34, 197, 94, 0.2),
+      4px 4px 0 rgb(var(--neo-black));
+  }
+
+  100% {
+    border-color: rgba(34, 197, 94, 0.3);
+    box-shadow: 0 0 8px rgba(34, 197, 94, 0.2),
+      4px 4px 0 rgb(var(--neo-black));
+  }
+}
+
+/* Low-end device fallback for green glow */
+.low-end-device .clue-container-green-glow {
+  animation: none;
+  border-color: rgba(34, 197, 94, 0.8);
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.4),
+    4px 4px 0 rgb(var(--neo-black));
+}
+
+/* Low-end device fallback - simpler animations */
+.low-end-device .clue-container-attention {
+  animation: none;
+  transform: scale(1.02);
+  transition: transform 0.15s ease-out;
+}
+
+.low-end-device .clue-container-glow {
+  animation: none;
+  border-color: rgba(255, 200, 50, 0.8);
+  box-shadow: 0 0 10px rgba(255, 200, 50, 0.3),
+    4px 4px 0 rgb(var(--neo-black));
+}
+
+.low-end-device .clue-letter-entrance {
+  animation: none;
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ====================================
+   LIFE METER ANIMATIONS
+   For Daily Challenge Health Bar
+   ==================================== */
+
+/* Beating heart animation */
+@keyframes heart-beat {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  15% {
+    transform: scale(1.3);
+  }
+
+  30% {
+    transform: scale(1);
+  }
+
+  45% {
+    transform: scale(1.2);
+  }
+
+  60% {
+    transform: scale(1);
+  }
+}
+
+/* Life gain flash effect on the meter */
+@keyframes life-gain-flash {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.8),
+      inset 0 0 20px rgba(34, 197, 94, 0.5);
+  }
+
+  50% {
+    box-shadow: 0 0 30px 15px rgba(34, 197, 94, 0.6),
+      inset 0 0 30px rgba(34, 197, 94, 0.3);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0),
+      inset 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+/* Life meter pulse when gaining life */
+@keyframes life-meter-pulse {
+  0% {
+    transform: scale(1);
+  }
+
+  30% {
+    transform: scale(1.03);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* Utility classes for life meter */
+.heart-beating {
+  animation: heart-beat 0.6s ease-in-out;
+}
+
+.heart-continuous-beat {
+  animation: heart-beat 1s ease-in-out infinite;
+}
+
+.life-gain-flash {
+  animation: life-gain-flash 0.6s ease-out;
+}
+
+.life-meter-pulse {
+  animation: life-meter-pulse 0.4s ease-out;
+}
+
+/* Low-end device fallback */
+.low-end-device .heart-beating,
+.low-end-device .heart-continuous-beat {
+  animation: none;
+}
+
+.low-end-device .life-gain-flash {
+  animation: none;
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+}
+
+.low-end-device .life-meter-pulse {
+  animation: none;
+}
+
+/* Life bar danger glow — red pulsing shadow at low health */
+.life-bar-danger-glow {
+  animation: life-bar-danger-glow 1.5s ease-in-out infinite;
+}
+
+@keyframes life-bar-danger-glow {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(239, 68, 68, 0.3));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(239, 68, 68, 0.6));
+  }
+}
+
+/* Life bar low pulse — subtle brightness throb on the fill */
+.life-bar-low-pulse {
+  animation: life-bar-low-pulse 1s ease-in-out infinite;
+}
+
+@keyframes life-bar-low-pulse {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.3);
+  }
+}
+
+.low-end-device .life-bar-danger-glow,
+.low-end-device .life-bar-low-pulse {
+  animation: none;
+}
+
+/* ====================================
+   WORD DISCOVERY SPARKLE BURST
+   Radial sparkle dots on valid word find
+   ==================================== */
+
+@keyframes sparkle-burst {
+  0% {
+    transform: scale(0) rotate(0deg);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1.8) rotate(90deg);
+    opacity: 0;
+  }
+}
+
+.sparkle-burst {
+  position: absolute;
+  inset: -12px;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.sparkle-burst::before,
+.sparkle-burst::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, transparent 40%,
+    transparent 40%),
+    conic-gradient(
+      from 0deg,
+      transparent 0deg, rgba(191, 255, 0, 0.6) 5deg, transparent 10deg,
+      transparent 80deg, rgba(0, 255, 255, 0.5) 85deg, transparent 90deg,
+      transparent 170deg, rgba(191, 255, 0, 0.4) 175deg, transparent 180deg,
+      transparent 260deg, rgba(0, 255, 255, 0.3) 265deg, transparent 270deg
+    );
+  mask: radial-gradient(circle, transparent 45%, black 46%, black 52%, transparent 53%);
+  -webkit-mask: radial-gradient(circle, transparent 45%, black 46%, black 52%, transparent 53%);
+  border-radius: 50%;
+  animation: sparkle-burst 0.5s ease-out forwards;
+}
+
+.sparkle-burst::after {
+  animation-delay: 0.06s;
+  transform: rotate(45deg);
+}
+
+.low-end-device .sparkle-burst,
+.low-end-device .sparkle-burst::before,
+.low-end-device .sparkle-burst::after {
+  animation: none;
+  display: none;
+}
+
+/* Score glow pulse on increment */
+@keyframes score-glow {
+  0% { box-shadow: 0 0 0 0 rgba(191, 255, 0, 0.3); }
+  50% { box-shadow: 0 0 12px 4px rgba(191, 255, 0, 0.15); }
+  100% { box-shadow: 0 0 0 0 rgba(191, 255, 0, 0); }
+}
+
+.score-glow-pulse {
+  animation: score-glow 0.4s ease-out;
+}
+
+/* ====================================
+   LOGO "LEXI" EMPHASIS ANIMATION
+   Subtle glow effect to make "Lexi" stand out
+   ==================================== */
+
+@keyframes lexi-glow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.4));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 16px rgba(0, 255, 255, 0.7));
+  }
+}
+
+.animate-lexi-glow {
+  animation: lexi-glow 3s ease-in-out infinite;
+}
+
+/* Reduced motion: disable glow animation */
+@media (prefers-reduced-motion: reduce) {
+  .animate-lexi-glow {
+    animation: none;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.5));
+  }
+}
+
+/* Low-end device fallback */
+.low-end-device .animate-lexi-glow {
+  animation: none;
+  filter: drop-shadow(0 0 6px rgba(0, 255, 255, 0.4));
+}
+
+/* ====================================
+   LOGO LIGHTNING BOLT ANIMATIONS
+   Animated lightning bolts for visual impact
+   ==================================== */
+
+@keyframes lightning-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px currentColor) brightness(1);
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 12px currentColor) brightness(1.2);
+    transform: scale(1.08);
+  }
+}
+
+@keyframes lightning-flash {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px currentColor);
+  }
+  25% {
+    opacity: 0.9;
+    filter: drop-shadow(0 0 10px currentColor) brightness(1.3);
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 15px currentColor) brightness(1.4);
+  }
+  75% {
+    opacity: 0.95;
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+}
+
+.animate-lightning-left {
+  animation: lightning-pulse 2s ease-in-out infinite;
+  animation-delay: 0s;
+}
+
+.animate-lightning-right {
+  animation: lightning-pulse 2s ease-in-out infinite;
+  animation-delay: 1s;
+}
+
+/* ====================================
+   LOGO SPARKLE ANIMATIONS
+   Twinkling sparkles for decorative effect
+   ==================================== */
+
+@keyframes sparkle-twinkle {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(0.8) rotate(0deg);
+  }
+  25% {
+    opacity: 1;
+    transform: scale(1.2) rotate(15deg);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1) rotate(0deg);
+  }
+  75% {
+    opacity: 1;
+    transform: scale(1.1) rotate(-15deg);
+  }
+}
+
+/* ====================================
+   KEYBOARD FOCUS ANIMATION
+   Enhanced focus ring for grid navigation
+   ==================================== */
+
+@keyframes keyboard-focus {
+  0%, 100% {
+    box-shadow: 0 0 0 3px var(--neo-cyan), 0 0 8px var(--neo-cyan);
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--neo-cyan), 0 0 16px var(--neo-cyan);
+  }
+}
+
+.animate-keyboard-focus {
+  animation: keyboard-focus 1s ease-in-out infinite;
+}
+
+/* ====================================
+   HINT BLINK AND FADEOUT ANIMATIONS
+   For revealed word path highlighting
+   ==================================== */
+
+@keyframes hint-blink {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(255, 225, 53, 0.5);
+  }
+  50% {
+    opacity: 0.7;
+    box-shadow: 0 0 20px rgba(255, 225, 53, 0.8);
+  }
+}
+
+@keyframes hint-fadeout {
+  0% {
+    opacity: 1;
+    box-shadow: 0 0 12px rgba(255, 225, 53, 0.5);
+  }
+  100% {
+    opacity: 0.3;
+    box-shadow: 0 0 0 rgba(255, 225, 53, 0);
+  }
+}
+
+.animate-hint-blink {
+  animation: hint-blink 0.5s ease-in-out infinite;
+}
+
+.animate-hint-fadeout {
+  animation: hint-fadeout 1s ease-out forwards;
+}
+
+/* ====================================
+   DYNAMIC ENERGY UI ANIMATIONS
+   Single Player Enhanced Theme
+   ==================================== */
+
+/* Vortex Background Rotation */
+@keyframes vortex-rotate {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}
+
+/* Aurora Wave Effect */
+@keyframes aurora-wave {
+  0% {
+    transform: translateY(-20%) skewY(-5deg);
+  }
+  100% {
+    transform: translateY(20%) skewY(5deg);
+  }
+}
+
+/* Floating Particle Animation */
+@keyframes particle-float {
+  0%, 100% {
+    transform: translate(0px, 0px) rotate(0deg);
+    opacity: 0.15;
+  }
+  50% {
+    transform: translate(15px, -30px) rotate(180deg);
+    opacity: 0.4;
+  }
+}
+
+/* Energy UI Utility Classes */
+.animate-particle-float {
+  animation: particle-float 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Energy Background Layers */
+.energy-vortex-layer {
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  top: -50%;
+  left: -50%;
+  background: radial-gradient(rgba(0, 255, 255, 0.08) 0%, rgba(255, 20, 147, 0.04) 40%, transparent 70%);
+  animation: vortex-rotate 25s linear infinite;
+  pointer-events: none;
+}
+
+.energy-aurora-layer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 0%, rgba(0, 255, 255, 0.05) 50%, transparent 100%);
+  animation: aurora-wave 10s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.energy-scanline-layer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(transparent 50%, rgba(0, 0, 0, 0.08) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  .animate-particle-float,
+  .energy-vortex-layer,
+  .energy-aurora-layer {
+    animation: none !important;
+  }
+}
+
+/* ====================================
+   DAILY CHALLENGE LANDING - QUEST UI
+   ==================================== */
+
+/* Holographic shimmer sweep across cards on hover */
+@keyframes hologram-shimmer {
+  0% {
+    left: -150%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+/* Gentle breathing pulse for unplayed quest cards */
+@keyframes breathing {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Animated dashed path between quest nodes */
+@keyframes quest-path-dash {
+  0% {
+    stroke-dashoffset: 20;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Streak flame pulse animation */
+@keyframes flame-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 4px rgba(255, 107, 53, 0.6));
+  }
+  50% {
+    transform: scale(1.15);
+    filter: drop-shadow(0 0 10px rgba(255, 107, 53, 0.9));
+  }
+}
+
+/* Calendar date flip entrance */
+@keyframes date-flip {
+  0% {
+    transform: rotateX(-90deg);
+    opacity: 0;
+  }
+  60% {
+    transform: rotateX(10deg);
+    opacity: 1;
+  }
+  100% {
+    transform: rotateX(0deg);
+    opacity: 1;
+  }
+}
+
+/* Utility classes for daily quest animations */
+.animate-hologram-shimmer {
+  animation: hologram-shimmer 0.8s ease-in-out;
+}
+
+.animate-breathing {
+  animation: breathing 3s ease-in-out infinite;
+}
+
+.animate-quest-path {
+  stroke-dasharray: 8 6;
+  animation: quest-path-dash 1.5s linear infinite;
+}
+
+.animate-flame-pulse {
+  animation: flame-pulse 1.5s ease-in-out infinite;
+}
+
+.animate-date-flip {
+  animation: date-flip 0.5s ease-out;
+  transform-origin: center top;
+}
+
+/* Low-end device fallback */
+.low-end-device .animate-breathing,
+.low-end-device .animate-hologram-shimmer,
+.low-end-device .animate-flame-pulse,
+.low-end-device .animate-quest-path {
+  animation: none !important;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-breathing,
+  .animate-hologram-shimmer,
+  .animate-flame-pulse,
+  .animate-quest-path,
+  .animate-date-flip {
+    animation: none !important;
+  }
+}
+
+/* ====================================
+   NEAR-MISS SHIMMER PULSE
+   Pulses on tiles adjacent to a submitted word that could have formed a combo.
+   ==================================== */
+
+@keyframes nearMissPulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+
+  20% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  50% {
+    opacity: 0.85;
+    transform: scale(1.0);
+  }
+
+  80% {
+    opacity: 0.5;
+    transform: scale(1.03);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.0);
+  }
+}
+
+/* Reduced motion: use border-only glow instead of scale animation */
+@media (prefers-reduced-motion: reduce) {
+  .near-miss-pulse {
+    animation: nearMissPulseReduced 1.5s ease-out forwards !important;
+  }
+
+  @keyframes nearMissPulseReduced {
+    0% {
+      opacity: 0;
+    }
+
+    20% {
+      opacity: 1;
+    }
+
+    80% {
+      opacity: 0.6;
+    }
+
+    100% {
+      opacity: 0;
+    }
+  }
+}
+
+/* ============================================
+   REDUCED MOTION - Accessibility Fallbacks
+   Comprehensive catch-all for all animations.
+   Individual reduced-motion blocks above handle
+   specific graceful degradations; this block
+   ensures nothing is missed.
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-breathing,
+  .animate-date-flip,
+  .animate-flame-pulse,
+  .animate-hint-blink,
+  .animate-hint-fadeout,
+  .animate-hologram-shimmer,
+  .animate-keyboard-focus,
+  .animate-lexi-glow,
+  .animate-lightning-left,
+  .animate-lightning-right,
+  .animate-particle-float,
+  .animate-quest-path,
+  .slot-machine-text::before,
+  .animated-title .text,
+  .combo-glow-ring,
+  .near-miss-pulse {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .animate-avatar-float {
+    animation: none !important;
+  }
+}
+
+/* Lightweight CSS float for lobby avatars — replaces JS-driven Framer Motion infinite loops */
+@keyframes avatar-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+.animate-avatar-float {
+  animation: avatar-float 3s ease-in-out infinite;
+}
+
+/* Crown bounce — neo-brutalist host crown swing (0.8s cycle, ±10°) */
+@keyframes crown-bounce {
+  0%, 100% { transform: translateX(-50%) rotate(0deg) translateY(0); }
+  25% { transform: translateX(-50%) rotate(10deg) translateY(-2px); }
+  75% { transform: translateX(-50%) rotate(-10deg) translateY(-2px); }
+}
+.animate-crown-bounce {
+  animation: crown-bounce 0.8s ease-in-out infinite;
+}
+
+/* Pulse-code — room code pulsing glow */
+@keyframes pulse-code {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.03); }
+}
+.animate-pulse-code {
+  animation: pulse-code 1.6s ease-in-out infinite;
+}
+
+/* Fade-in-up — staggered entrance for lobby sections */
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}

@@ -7,13 +7,13 @@ import type { MutableRefObject } from 'react';
 // ==================== Constants ====================
 
 /** Base combo chain window in milliseconds */
-export const COMBO_BASE_WINDOW_MS = 3000;
+export const COMBO_BASE_WINDOW_MS = 6000;
 
 /** Bonus time per combo level in milliseconds */
 export const COMBO_LEVEL_BONUS_MS = 1000;
 
 /** Maximum combo window in milliseconds */
-export const COMBO_MAX_WINDOW_MS = 10000;
+export const COMBO_MAX_WINDOW_MS = 12000;
 
 /** Number of valid words required to earn one combo shield */
 export const VALID_WORDS_PER_SHIELD = 10;
@@ -109,16 +109,22 @@ export function processComboOnWordAccepted(
 
   let newComboLevel = 0;
 
-  if (currentLastWordTime && (now - currentLastWordTime) < comboChainWindow) {
+  if (!currentLastWordTime) {
+    // First word of the session - start combo at 1
+    newComboLevel = 1;
+    setters.setComboLevel(newComboLevel);
+    refs.comboLevelRef.current = newComboLevel;
+  } else if ((now - currentLastWordTime) < comboChainWindow) {
     // Within combo window - increment combo
     newComboLevel = currentComboLevel + 1;
     setters.setComboLevel(newComboLevel);
     refs.comboLevelRef.current = newComboLevel;
     playComboSound?.(newComboLevel);
   } else {
-    // Outside window - reset to 0
-    setters.setComboLevel(0);
-    refs.comboLevelRef.current = 0;
+    // Outside window - reset to 1 (this word starts a new chain)
+    newComboLevel = 1;
+    setters.setComboLevel(newComboLevel);
+    refs.comboLevelRef.current = newComboLevel;
   }
 
   // Update last word time

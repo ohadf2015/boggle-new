@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { XpGainedData, LevelUpData } from './types';
@@ -57,69 +57,77 @@ const BonusBadgesRow: React.FC<BonusBadgesRowProps> = memo(({
   }
 
   const sizeClasses = size === 'sm'
-    ? 'px-1.5 py-0.5 text-[10px] border'
-    : 'px-1.5 sm:px-2 py-0.5 text-[10px] sm:text-xs border sm:border-2';
+    ? 'px-2 py-1 text-[10px] border-2'
+    : 'px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs border-3';
 
   return (
     <div className={cn('flex items-center gap-1.5 sm:gap-2 flex-wrap', className)}>
       {/* Combo Bonus */}
       {comboBonus > 0 && (
-        <motion.span
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.15, type: 'spring', stiffness: 300 }}
+        <m.span
+          initial={{ scale: 0, rotate: -15, y: 10 }}
+          animate={{ scale: 1, rotate: 0, y: 0 }}
+          whileHover={{ scale: 1.12, rotate: -3, y: -2 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 400, damping: 10 }}
           className={cn(
-            'bg-neo-red border-neo-black rounded-neo shadow-hard-sm text-neo-black font-black',
+            'bg-neo-red border-neo-black rounded-neo shadow-hard-sm text-neo-black font-black cursor-default',
             sizeClasses
           )}
         >
           ⚡ +{comboBonus}
-        </motion.span>
+        </m.span>
       )}
 
       {/* Fire Round Bonus */}
       {fireRoundBonus > 0 && (
-        <motion.span
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+        <m.span
+          initial={{ scale: 0, rotate: 15, y: 10 }}
+          animate={{ scale: 1, rotate: 0, y: 0 }}
+          whileHover={{ scale: 1.12, rotate: 3, y: -2 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 400, damping: 10 }}
           className={cn(
-            'bg-neo-red border-neo-black rounded-neo shadow-hard-sm text-neo-cream font-black',
+            'bg-neo-red border-neo-black rounded-neo shadow-hard-sm text-neo-white font-black cursor-default',
             sizeClasses
           )}
         >
           🔥 +{fireRoundBonus}
-        </motion.span>
+        </m.span>
       )}
 
       {/* XP Earned */}
       {xpGainedData && (
-        <motion.span
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.25, type: 'spring', stiffness: 300 }}
+        <m.span
+          initial={{ scale: 0, rotate: -15, y: 10 }}
+          animate={{ scale: 1, rotate: 0, y: 0 }}
+          whileHover={{ scale: 1.12, rotate: -3, y: -2 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ delay: 0.25, type: 'spring', stiffness: 400, damping: 10 }}
           className={cn(
-            'bg-neo-pink border-neo-black rounded-neo shadow-hard-sm text-neo-cream font-black',
+            'bg-neo-pink border-neo-black rounded-neo shadow-hard-sm text-neo-white font-black cursor-default',
             sizeClasses
           )}
         >
           ⭐ +{xpGainedData.xpEarned} XP
-        </motion.span>
+        </m.span>
       )}
 
       {/* Level Up */}
       {levelUpData && (
-        <motion.span
-          initial={{ scale: 0, rotate: -10 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.3, type: 'spring', stiffness: 300 }}
+        <m.span
+          initial={{ scale: 0, rotate: 15, y: 10 }}
+          animate={{ scale: [0, 1.25, 0.9, 1.05, 1], rotate: [15, -5, 3, 0], y: [10, -4, 2, 0] }}
+          whileHover={{ scale: 1.15, rotate: -3, y: -3 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 10 }}
           className={cn(
-            'bg-neo-lime border-neo-black rounded-neo shadow-hard-sm text-neo-black font-black',
+            'bg-neo-lime border-neo-black rounded-neo shadow-hard-sm text-neo-black font-black cursor-default',
             sizeClasses
           )}
         >
           🎉 Lvl {levelUpData.oldLevel} {levelArrow} {levelUpData.newLevel}
-        </motion.span>
+        </m.span>
       )}
     </div>
   );

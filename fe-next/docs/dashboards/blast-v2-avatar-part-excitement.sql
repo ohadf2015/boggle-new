@@ -1,0 +1,15 @@
+-- Avatar part drop → profile view within 1h
+-- Setup: In PostHog, create Funnel insight:
+--  Step 1: blast_chest_opened WHERE avatar_part != null
+--  Step 2: avatar_builder_equipped within 1h (session)
+--
+-- Measure: % of avatar part drops that lead to builder visit within 1h
+-- Target: > 40% (avatar economy engagement)
+--
+-- Interpretation:
+-- - High rate: avatar drops are exciting, player immediately customizes
+-- - Low rate: avatar parts may feel cosmetic/low-value OR chest opening ceremony not compelling
+--
+-- Context:
+-- - `avatar_part` field in blast_chest_opened identifies rare vs common cosmetic drops
+-- - Pairing with avatar_builder_equipped shows downstream conversion

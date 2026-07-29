@@ -1,16 +1,320 @@
 /**
- * Enhanced Rate Limiter with IP-based tracking
- * Provides protection against reconnection bypass attacks by tracking both IP and socket ID
+ * Unified Rate Limiter
+ *
+ * Core sliding-window rate limiter that supports:
+ * - Socket.IO connections (IP + socket ID tracking)
+ * - Express HTTP requests (via apiRateLimiter.ts)
+ *
+ * Consolidates common logic: IP extraction, sliding window, blocking, cleanup.
  */
 
 import type { Socket } from 'socket.io';
+import type { Request } from 'express';
 import logger from './logger';
+import {
+  isIpBlockedRedis,
+  blockIpRedis,
+  checkRateLimitRedis,
+  RATE_LIMIT_KEYS,
+} from '../redis/rateLimit';
 
-// ==========================================
-// Type Definitions
-// ==========================================
+// NOTE: Do NOT re-export from apiRateLimiter here — it creates a circular dependency
+// (apiRateLimiter imports RateLimiterCore from this file).
+// Import directly from './apiRateLimiter' instead.
 
-interface RateLimiterOptions {
+export interface RateLimiterCoreOptions {
+  maxRequests: number;
+  windowMs: number;
+  ipMaxRequests?: number;
+  ipWindowMs?: number;
+  blockDurationMs: number;
+  cleanupIntervalMs?: number;
+}
+
+interface RateLimitData {
+  count: number;
+  resetTime: number;
+  lastActivity: number;
+}
+
+interface IpRateData extends RateLimitData {
+  keys: Set<string>;
+}
+
+interface RateLimitResult {
+  limited: boolean;
+  reason?: 'ip_blocked' | 'key_limit' | 'ip_limit';
+  remaining?: number;
+  resetTime?: number;
+}
+
+interface RateLimiterStats {
+  trackedKeys: number;
+  trackedIps: number;
+  blockedIps: number;
+  config: {
+    maxRequests: number;
+    windowMs: number;
+    ipMaxRequests: number;
+    blockDurationMs: number;
+  };
+}
+
+type HeaderValue = string | string[] | undefined;
+
+/**
+ * Extract the rightmost (proxy-appended) IP from a header value.
+ * In a proxy chain like "client, proxy1, proxy2", the rightmost IP
+ * is the one added by the trusted proxy closest to the server.
+ * Using the leftmost (first) IP is insecure — it's client-controlled.
+ */
+function extractLastIp(value: HeaderValue): string | null {
+  if (!value) return null;
+  const str = Array.isArray(value) ? value[0] : value;
+  const ips = str.split(',').map(ip => ip.trim()).filter(Boolean);
+  return ips[ips.length - 1] || null;
+}
+
+/**
+ * Extract client IP from Socket.IO handshake headers.
+ * Prefers socket.handshake.address (TCP-level, set by proxy after trust proxy config),
+ * falls back to proxy headers using rightmost IP to prevent spoofing.
+ */
+export function getIpFromSocket(socket: Socket): string {
+  if (!socket?.handshake) return 'unknown';
+
+  // TCP-level address is most reliable when trust proxy is configured
+  const directAddr = socket.handshake.address;
+
+  const headers = socket.handshake.headers || {};
+
+  // cf-connecting-ip is trustworthy when Cloudflare is the edge proxy
+  const cfIp = extractLastIp(headers['cf-connecting-ip']);
+  if (cfIp) return cfIp;
+
+  const forwardedFor = extractLastIp(headers['x-forwarded-for']);
+  if (forwardedFor) return forwardedFor;
+
+  const realIp = extractLastIp(headers['x-real-ip']);
+  if (realIp) return realIp;
+
+  return directAddr || 'unknown';
+}
+
+/**
+ * Extract client IP from Express request headers.
+ * Uses rightmost IP from X-Forwarded-For to prevent spoofing.
+ */
+export function getIpFromRequest(req: Request): string {
+  const headers = req.headers || {};
+
+  const cfIp = extractLastIp(headers['cf-connecting-ip']);
+  if (cfIp) return cfIp;
+
+  const forwardedFor = extractLastIp(headers['x-forwarded-for']);
+  if (forwardedFor) return forwardedFor;
+
+  const realIp = extractLastIp(headers['x-real-ip']);
+  if (realIp) return realIp;
+
+  return req.ip || req.socket?.remoteAddress || 'unknown';
+}
+
+export class RateLimiterCore {
+  private maxRequests: number;
+  private windowMs: number;
+  private ipMaxRequests: number;
+  private ipWindowMs: number;
+  private blockDurationMs: number;
+
+  private keyData: Map<string, RateLimitData>;
+  private ipData: Map<string, IpRateData>;
+  private blockedIps: Map<string, number>;
+  private cleanupInterval: ReturnType<typeof setInterval> | null;
+
+  constructor(options: RateLimiterCoreOptions) {
+    this.maxRequests = options.maxRequests;
+    this.windowMs = options.windowMs;
+    this.ipMaxRequests = options.ipMaxRequests ?? options.maxRequests * 30;
+    this.ipWindowMs = options.ipWindowMs ?? options.windowMs;
+    this.blockDurationMs = options.blockDurationMs;
+
+    this.keyData = new Map();
+    this.ipData = new Map();
+    this.blockedIps = new Map();
+
+    const cleanupMs = options.cleanupIntervalMs ?? 60000;
+    this.cleanupInterval = setInterval(() => this.cleanup(), cleanupMs);
+    this.cleanupInterval.unref();
+  }
+
+  registerKey(key: string, ip: string): void {
+    const now = Date.now();
+
+    this.keyData.set(key, {
+      count: 0,
+      resetTime: now + this.windowMs,
+      lastActivity: now,
+    });
+
+    if (!this.ipData.has(ip)) {
+      this.ipData.set(ip, {
+        keys: new Set([key]),
+        count: 0,
+        resetTime: now + this.ipWindowMs,
+        lastActivity: now,
+      });
+    } else {
+      const data = this.ipData.get(ip)!;
+      data.keys.add(key);
+      data.lastActivity = now;
+    }
+  }
+
+  unregisterKey(key: string, ip: string): void {
+    this.keyData.delete(key);
+
+    const ipInfo = this.ipData.get(ip);
+    if (ipInfo) {
+      ipInfo.keys.delete(key);
+      if (ipInfo.keys.size === 0) {
+        this.ipData.delete(ip);
+      }
+    }
+  }
+
+  isIpBlocked(ip: string): boolean {
+    const expiry = this.blockedIps.get(ip);
+    if (!expiry) return false;
+
+    if (Date.now() > expiry) {
+      this.blockedIps.delete(ip);
+      return false;
+    }
+    return true;
+  }
+
+  blockIp(ip: string, durationMs: number = this.blockDurationMs): void {
+    this.blockedIps.set(ip, Date.now() + durationMs);
+    logger.warn('RATE_LIMIT', `IP ${ip} blocked for ${Math.round(durationMs / 1000)}s`);
+  }
+
+  checkLimit(key: string, ip: string, weight: number = 1): RateLimitResult {
+    const now = Date.now();
+
+    if (this.isIpBlocked(ip)) {
+      return { limited: true, reason: 'ip_blocked' };
+    }
+
+    let kData = this.keyData.get(key);
+    if (!kData) {
+      this.registerKey(key, ip);
+      kData = this.keyData.get(key)!;
+    }
+
+    if (now > kData.resetTime) {
+      kData.count = 0;
+      kData.resetTime = now + this.windowMs;
+    }
+
+    kData.count += weight;
+    kData.lastActivity = now;
+
+    if (kData.count > this.maxRequests) {
+      logger.warn('RATE_LIMIT', `Key ${key} (IP: ${ip}) exceeded limit (${kData.count}/${this.maxRequests})`);
+      return {
+        limited: true,
+        reason: 'key_limit',
+        remaining: 0,
+        resetTime: kData.resetTime,
+      };
+    }
+
+    const ipInfo = this.ipData.get(ip);
+    if (ipInfo) {
+      if (now > ipInfo.resetTime) {
+        ipInfo.count = 0;
+        ipInfo.resetTime = now + this.ipWindowMs;
+      }
+
+      ipInfo.count += weight;
+      ipInfo.lastActivity = now;
+
+      if (ipInfo.count > this.ipMaxRequests) {
+        logger.warn('RATE_LIMIT', `IP ${ip} exceeded limit (${ipInfo.count}/${this.ipMaxRequests}) - blocking`);
+        this.blockIp(ip);
+        return { limited: true, reason: 'ip_limit' };
+      }
+    }
+
+    return {
+      limited: false,
+      remaining: Math.max(0, this.maxRequests - kData.count),
+      resetTime: kData.resetTime,
+    };
+  }
+
+  getRemaining(key: string): { remaining: number; resetTime: number } {
+    const data = this.keyData.get(key);
+    if (!data) return { remaining: this.maxRequests, resetTime: Date.now() + this.windowMs };
+    return {
+      remaining: Math.max(0, this.maxRequests - data.count),
+      resetTime: data.resetTime,
+    };
+  }
+
+  getStats(): RateLimiterStats {
+    return {
+      trackedKeys: this.keyData.size,
+      trackedIps: this.ipData.size,
+      blockedIps: this.blockedIps.size,
+      config: {
+        maxRequests: this.maxRequests,
+        windowMs: this.windowMs,
+        ipMaxRequests: this.ipMaxRequests,
+        blockDurationMs: this.blockDurationMs,
+      },
+    };
+  }
+
+  private cleanup(): void {
+    const now = Date.now();
+    const staleThreshold = 5 * 60 * 1000;
+
+    for (const [key, data] of this.keyData) {
+      if (now - data.lastActivity > staleThreshold) {
+        this.keyData.delete(key);
+      }
+    }
+
+    for (const [ip, data] of this.ipData) {
+      if (now - data.lastActivity > staleThreshold && data.keys.size === 0) {
+        this.ipData.delete(ip);
+      }
+    }
+
+    for (const [ip, expiry] of this.blockedIps) {
+      if (now > expiry) {
+        this.blockedIps.delete(ip);
+      }
+    }
+  }
+
+  shutdown(): void {
+    if (this.cleanupInterval) {
+      clearInterval(this.cleanupInterval);
+      this.cleanupInterval = null;
+    }
+  }
+
+  clear(): void {
+    this.keyData.clear();
+    this.ipData.clear();
+    this.blockedIps.clear();
+  }
+}
+
+interface SocketRateLimiterOptions {
   maxMessages?: number;
   windowMs?: number;
   ipMaxMessages?: number;
@@ -18,26 +322,7 @@ interface RateLimiterOptions {
   blockDurationMs?: number;
 }
 
-interface SocketRateData {
-  ip: string;
-  messageCount: number;
-  resetTime: number;
-  lastActivity: number;
-}
-
-interface IpRateData {
-  socketIds: Set<string>;
-  messageCount: number;
-  resetTime: number;
-  lastActivity: number;
-}
-
-interface RateLimitResult {
-  limited: boolean;
-  reason?: 'ip_blocked' | 'socket_limit' | 'ip_limit';
-}
-
-interface ClientStats {
+interface SocketClientStats {
   socketId: string;
   ip: string;
   messageCount: number;
@@ -49,7 +334,7 @@ interface ClientStats {
   isIpBlocked: boolean;
 }
 
-interface RateLimiterStats {
+interface SocketRateLimiterStats {
   trackedSockets: number;
   trackedIps: number;
   blockedIps: number;
@@ -61,357 +346,214 @@ interface RateLimiterStats {
   };
 }
 
-// ==========================================
-// Rate Limiter Class
-// ==========================================
-
-/**
- * Sliding window rate limiter with multi-key support
- * Tracks rate limits by IP address, socket ID, and combined keys
- */
 export class RateLimiter {
+  private core: RateLimiterCore;
+  private socketIpMap: Map<string, string>;
+
   maxMessages: number;
   windowMs: number;
   ipMaxMessages: number;
   ipWindowMs: number;
   blockDurationMs: number;
-  socketClients: Map<string, SocketRateData>;
-  ipClients: Map<string, IpRateData>;
+
+  socketClients: Map<string, { ip: string; messageCount: number; resetTime: number; lastActivity: number }>;
+  ipClients: Map<string, { socketIds: Set<string>; messageCount: number; resetTime: number; lastActivity: number }>;
   blockedIps: Map<string, number>;
   cleanupInterval: ReturnType<typeof setInterval> | null;
 
-  constructor(options: RateLimiterOptions = {}) {
-    // Per-socket limit: 150 messages per 10 seconds (15 msg/sec per user)
-    // Typical usage: ~5-10 msg/sec during active gameplay
-    this.maxMessages = options.maxMessages || 150;
-    this.windowMs = options.windowMs || 10000;
+  constructor(options: SocketRateLimiterOptions = {}) {
+    this.maxMessages = options.maxMessages ?? 100;
+    this.windowMs = options.windowMs ?? 10000;
+    this.ipMaxMessages = options.ipMaxMessages ?? 500;
+    this.ipWindowMs = options.ipWindowMs ?? 10000;
+    this.blockDurationMs = options.blockDurationMs ?? 60000;
 
-    // Per-IP limit: 4500 messages per 10 seconds (450 msg/sec shared)
-    // This accommodates ~30 users playing simultaneously from same WiFi/NAT
-    this.ipMaxMessages = options.ipMaxMessages || 4500;
-    this.ipWindowMs = options.ipWindowMs || 10000;
-
-    // Block duration after exceeding limit
-    this.blockDurationMs = options.blockDurationMs || 60000; // 1 minute block
-
-    // Separate tracking for different identifiers
-    this.socketClients = new Map();  // Socket ID -> rate data
-    this.ipClients = new Map();      // IP address -> rate data
-    this.blockedIps = new Map();     // IP address -> block expiry timestamp
-
-    // Cleanup stale entries every minute
-    // Use unref() so the interval doesn't prevent process exit (important for tests)
-    this.cleanupInterval = setInterval(() => this._cleanup(), 60000);
-    this.cleanupInterval.unref();
-  }
-
-  /**
-   * Extract client IP from socket handshake
-   * Handles X-Forwarded-For, X-Real-IP, and direct connection
-   */
-  static getClientIp(socket: Socket): string {
-    if (!socket || !socket.handshake) return 'unknown';
-
-    const headers = socket.handshake.headers || {};
-
-    // Check X-Forwarded-For (may contain multiple IPs)
-    const forwardedFor = headers['x-forwarded-for'];
-    if (forwardedFor) {
-      // Take the first IP (original client)
-      const forwardedForStr = Array.isArray(forwardedFor) ? forwardedFor[0] : forwardedFor;
-      const ips = forwardedForStr.split(',').map((ip: string) => ip.trim());
-      if (ips[0]) return ips[0];
-    }
-
-    // Check X-Real-IP (nginx/reverse proxy)
-    const realIp = headers['x-real-ip'];
-    if (realIp) return Array.isArray(realIp) ? realIp[0] : realIp;
-
-    // Check CF-Connecting-IP (Cloudflare)
-    const cfIp = headers['cf-connecting-ip'];
-    if (cfIp) return Array.isArray(cfIp) ? cfIp[0] : cfIp;
-
-    // Fall back to direct socket address
-    return socket.handshake.address || 'unknown';
-  }
-
-  /**
-   * Initialize rate limiting for a socket with IP tracking
-   */
-  initClient(socketId: string, ip: string = 'unknown'): void {
-    const now = Date.now();
-
-    this.socketClients.set(socketId, {
-      ip,
-      messageCount: 0,
-      resetTime: now + this.windowMs,
-      lastActivity: now
+    this.core = new RateLimiterCore({
+      maxRequests: this.maxMessages,
+      windowMs: this.windowMs,
+      ipMaxRequests: this.ipMaxMessages,
+      ipWindowMs: this.ipWindowMs,
+      blockDurationMs: this.blockDurationMs,
     });
 
-    // Initialize or update IP tracking
-    if (!this.ipClients.has(ip)) {
-      this.ipClients.set(ip, {
-        socketIds: new Set([socketId]),
-        messageCount: 0,
-        resetTime: now + this.ipWindowMs,
-        lastActivity: now
-      });
-    } else {
-      const ipData = this.ipClients.get(ip)!;
-      ipData.socketIds.add(socketId);
-      ipData.lastActivity = now;
-    }
+    this.socketIpMap = new Map();
+
+    this.socketClients = new Map();
+    this.ipClients = new Map();
+    this.blockedIps = new Map();
+    this.cleanupInterval = null;
   }
 
-  /**
-   * Check if IP is currently blocked
-   */
+  static getClientIp(socket: Socket): string {
+    return getIpFromSocket(socket);
+  }
+
+  initClient(socketId: string, ip: string = 'unknown'): void {
+    this.socketIpMap.set(socketId, ip);
+    this.core.registerKey(socketId, ip);
+  }
+
   isIpBlocked(ip: string): boolean {
-    const blockExpiry = this.blockedIps.get(ip);
-    if (!blockExpiry) return false;
-
-    if (Date.now() > blockExpiry) {
-      this.blockedIps.delete(ip);
-      return false;
-    }
-    return true;
+    return this.core.isIpBlocked(ip);
   }
 
-  /**
-   * Block an IP address temporarily
-   */
   blockIp(ip: string, durationMs: number = this.blockDurationMs): void {
-    this.blockedIps.set(ip, Date.now() + durationMs);
-    logger.warn('RATE_LIMIT', `IP ${ip} blocked for ${durationMs}ms`);
+    this.core.blockIp(ip, durationMs);
   }
 
-  /**
-   * Check if a client has exceeded the rate limit
-   */
-  isRateLimited(socketId: string, weight: number = 1): RateLimitResult {
-    const socketData = this.socketClients.get(socketId);
-
-    if (!socketData) {
-      // Client not initialized, allow and initialize with unknown IP
-      this.initClient(socketId, 'unknown');
-      return { limited: false };
+  isRateLimited(socketId: string, weight: number = 1): { limited: boolean; reason?: 'ip_blocked' | 'socket_limit' | 'ip_limit' } {
+    let ip = this.socketIpMap.get(socketId);
+    if (!ip) {
+      ip = 'unknown';
+      this.initClient(socketId, ip);
     }
 
-    const ip = socketData.ip;
-    const now = Date.now();
+    const result = this.core.checkLimit(socketId, ip, weight);
 
-    // Check if IP is blocked
-    if (this.isIpBlocked(ip)) {
-      return { limited: true, reason: 'ip_blocked' };
+    let reason: 'ip_blocked' | 'socket_limit' | 'ip_limit' | undefined;
+    if (result.reason === 'key_limit') {
+      reason = 'socket_limit';
+    } else if (result.reason) {
+      reason = result.reason;
     }
 
-    // Check socket-level rate limit
-    if (now > socketData.resetTime) {
-      socketData.messageCount = 0;
-      socketData.resetTime = now + this.windowMs;
-    }
-
-    socketData.messageCount += weight;
-    socketData.lastActivity = now;
-
-    if (socketData.messageCount > this.maxMessages) {
-      logger.warn('RATE_LIMIT', `Socket ${socketId} (IP: ${ip}) exceeded limit (${socketData.messageCount}/${this.maxMessages})`);
-      return { limited: true, reason: 'socket_limit' };
-    }
-
-    // Check IP-level rate limit
-    const ipData = this.ipClients.get(ip);
-    if (ipData) {
-      if (now > ipData.resetTime) {
-        ipData.messageCount = 0;
-        ipData.resetTime = now + this.ipWindowMs;
-      }
-
-      ipData.messageCount += weight;
-      ipData.lastActivity = now;
-
-      if (ipData.messageCount > this.ipMaxMessages) {
-        logger.warn('RATE_LIMIT', `IP ${ip} exceeded limit (${ipData.messageCount}/${this.ipMaxMessages}) - blocking`);
-        this.blockIp(ip);
-        return { limited: true, reason: 'ip_limit' };
-      }
-    }
-
-    return { limited: false };
+    return { limited: result.limited, reason };
   }
 
-  /**
-   * Remove a client from rate limiting (on disconnect)
-   */
   removeClient(socketId: string): void {
-    const socketData = this.socketClients.get(socketId);
-    if (!socketData) return;
-
-    const ip = socketData.ip;
-    this.socketClients.delete(socketId);
-
-    // Update IP tracking
-    const ipData = this.ipClients.get(ip);
-    if (ipData) {
-      ipData.socketIds.delete(socketId);
-      // Remove IP entry if no more sockets from this IP
-      if (ipData.socketIds.size === 0) {
-        this.ipClients.delete(ip);
-      }
-    }
+    const ip = this.socketIpMap.get(socketId) || 'unknown';
+    this.core.unregisterKey(socketId, ip);
+    this.socketIpMap.delete(socketId);
   }
 
-  /**
-   * Get current stats for a client
-   */
-  getClientStats(socketId: string): ClientStats | null {
-    const socketData = this.socketClients.get(socketId);
-    if (!socketData) return null;
+  getClientStats(socketId: string): SocketClientStats | null {
+    const ip = this.socketIpMap.get(socketId);
+    if (!ip) return null;
 
-    const now = Date.now();
-    const timeRemaining = Math.max(0, socketData.resetTime - now);
-    const ipData = this.ipClients.get(socketData.ip);
+    const { remaining, resetTime } = this.core.getRemaining(socketId);
 
     return {
       socketId,
-      ip: socketData.ip,
-      messageCount: socketData.messageCount,
+      ip,
+      messageCount: this.maxMessages - remaining,
       maxMessages: this.maxMessages,
-      timeRemaining,
-      isLimited: socketData.messageCount >= this.maxMessages,
-      ipMessageCount: ipData?.messageCount || 0,
+      timeRemaining: Math.max(0, resetTime - Date.now()),
+      isLimited: remaining === 0,
+      ipMessageCount: 0,
       ipMaxMessages: this.ipMaxMessages,
-      isIpBlocked: this.isIpBlocked(socketData.ip)
+      isIpBlocked: this.core.isIpBlocked(ip),
     };
   }
 
-  /**
-   * Get aggregate statistics
-   */
-  getStats(): RateLimiterStats {
+  getStats(): SocketRateLimiterStats {
+    const coreStats = this.core.getStats();
     return {
-      trackedSockets: this.socketClients.size,
-      trackedIps: this.ipClients.size,
-      blockedIps: this.blockedIps.size,
+      trackedSockets: coreStats.trackedKeys,
+      trackedIps: coreStats.trackedIps,
+      blockedIps: coreStats.blockedIps,
       config: {
         maxMessages: this.maxMessages,
         windowMs: this.windowMs,
         ipMaxMessages: this.ipMaxMessages,
-        blockDurationMs: this.blockDurationMs
-      }
+        blockDurationMs: this.blockDurationMs,
+      },
     };
   }
 
-  /**
-   * Cleanup stale entries to prevent memory leaks
-   */
-  private _cleanup(): void {
-    const now = Date.now();
-    const staleThreshold = 5 * 60 * 1000; // 5 minutes
-
-    // Cleanup stale socket entries
-    for (const [socketId, data] of this.socketClients) {
-      if (now - data.lastActivity > staleThreshold) {
-        this.removeClient(socketId);
-      }
-    }
-
-    // Cleanup expired IP blocks
-    for (const [ip, expiry] of this.blockedIps) {
-      if (now > expiry) {
-        this.blockedIps.delete(ip);
-      }
-    }
-  }
-
-  /**
-   * Shutdown the rate limiter (clear intervals)
-   */
   shutdown(): void {
-    if (this.cleanupInterval) {
-      clearInterval(this.cleanupInterval);
-      this.cleanupInterval = null;
-    }
+    this.core.shutdown();
   }
 
-  /**
-   * Clear all rate limiting data
-   */
   clear(): void {
-    this.socketClients.clear();
-    this.ipClients.clear();
-    this.blockedIps.clear();
+    this.core.clear();
+    this.socketIpMap.clear();
   }
 
-  // Legacy method for backwards compatibility
   getClientCount(): number {
-    return this.socketClients.size;
+    return this.socketIpMap.size;
   }
 }
 
-// Create singleton instance with configurable options
-// These can be overridden via environment variables
-const maxMessages = parseInt(process.env.RATE_MAX_MESSAGES || '150');
+const maxMessages = parseInt(process.env.RATE_MAX_MESSAGES || '100');
 const windowMs = parseInt(process.env.RATE_WINDOW_MS || '10000');
-const ipMaxMessages = parseInt(process.env.RATE_IP_MAX_MESSAGES || '4500'); // Supports ~30 users on same WiFi
+const ipMaxMessages = parseInt(process.env.RATE_IP_MAX_MESSAGES || '4500');
 const blockDurationMs = parseInt(process.env.RATE_BLOCK_DURATION_MS || '60000');
 
 export const rateLimiterInstance = new RateLimiter({
   maxMessages,
   windowMs,
   ipMaxMessages,
-  blockDurationMs
+  blockDurationMs,
 });
 
-/**
- * Initialize rate limiting for a socket connection
- * Should be called when a socket connects
- */
 export function initRateLimit(socket: Socket): void {
   const ip = RateLimiter.getClientIp(socket);
   rateLimiterInstance.initClient(socket.id, ip);
 }
 
-/**
- * Check if a client is allowed to proceed (not rate limited)
- */
 export function checkRateLimit(socketId: string, weight: number = 1): boolean {
   const result = rateLimiterInstance.isRateLimited(socketId, weight);
   return !result.limited;
 }
 
-interface DetailedRateLimitResult {
-  allowed: boolean;
-  reason?: string;
-}
-
-/**
- * Check rate limit with detailed result
- */
-export function checkRateLimitDetailed(socketId: string, weight: number = 1): DetailedRateLimitResult {
+export function checkRateLimitDetailed(socketId: string, weight: number = 1): { allowed: boolean; reason?: string } {
   const result = rateLimiterInstance.isRateLimited(socketId, weight);
   return { allowed: !result.limited, reason: result.reason };
 }
 
-/**
- * Reset/remove rate limiting for a client (e.g., on disconnect)
- */
 export function resetRateLimit(socketId: string): void {
   rateLimiterInstance.removeClient(socketId);
 }
 
-/**
- * Check if an IP is currently blocked
- */
 export function isIpBlocked(ip: string): boolean {
   return rateLimiterInstance.isIpBlocked(ip);
 }
 
-/**
- * Get rate limiter statistics
- */
-export function getRateLimitStats(): RateLimiterStats {
+export function getRateLimitStats(): SocketRateLimiterStats {
   return rateLimiterInstance.getStats();
+}
+
+export async function isIpBlockedAsync(ip: string): Promise<boolean> {
+  if (rateLimiterInstance.isIpBlocked(ip)) {
+    return true;
+  }
+
+  const redisBlocked = await isIpBlockedRedis(ip);
+  if (redisBlocked) {
+    rateLimiterInstance.blockIp(ip);
+    return true;
+  }
+
+  return false;
+}
+
+export async function blockIpAsync(ip: string, durationMs?: number): Promise<void> {
+  const duration = durationMs ?? rateLimiterInstance.blockDurationMs;
+  rateLimiterInstance.blockIp(ip, duration);
+  await blockIpRedis(ip, duration);
+}
+
+export async function checkRateLimitAsync(
+  key: string,
+  ip: string,
+  options: { maxRequests: number; windowMs: number; weight?: number }
+): Promise<{ allowed: boolean; reason?: string; remaining: number }> {
+  if (await isIpBlockedAsync(ip)) {
+    return { allowed: false, reason: 'ip_blocked', remaining: 0 };
+  }
+
+  const redisKey = RATE_LIMIT_KEYS.socket(key);
+  const result = await checkRateLimitRedis(redisKey, {
+    maxRequests: options.maxRequests,
+    windowMs: options.windowMs,
+    weight: options.weight ?? 1,
+  });
+
+  return {
+    allowed: !result.limited,
+    reason: result.reason,
+    remaining: result.remaining,
+  };
 }
 
 export default rateLimiterInstance;

@@ -9,12 +9,12 @@
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
-
+*.venv-rembg
 # testing
 /coverage
 
-# next.js
-/.next/
+# next.js (covers .next, .next-nightly, .next-verify + any future verify-build dir)
+/.next*/
 /out/
 
 # production
@@ -23,6 +23,9 @@
 # misc
 .DS_Store
 *.pem
+
+# Firebase service account files (contain secrets)
+*-firebase-adminsdk-*.json
 
 # debug
 npm-debug.log*
@@ -42,3 +45,57 @@ next-env.d.ts
 
 # backend compiled schemas
 /backend/dist
+
+# Python virtual environment
+.venv/
+
+# Temporary image processing files
+*.png.tmp
+
+# Asset pipeline temp files
+.asset-temp/
+
+# Asset backup folders (keep locally, don't commit)
+public/images/adventure-png-backup/
+public/collectibles/*-png-backup/
+public/logos-png-backup/
+
+# Capacitor native platforms (generated, don't commit)
+/ios/
+/android/
+# Exceptions: files we hand-edit and must survive fresh clones
+!/android/
+/android/*
+!/android/variables.gradle
+!/android/app/
+/android/app/*
+!/android/app/build.gradle
+!/android/app/src/
+/android/app/src/*
+!/android/app/src/main/
+/android/app/src/main/*
+!/android/app/src/main/AndroidManifest.xml
+!/android/app/src/main/java/
+/android/app/src/main/java/**
+!/android/app/src/main/java/live/
+!/android/app/src/main/java/live/lexiclash/
+!/android/app/src/main/java/live/lexiclash/app/
+!/android/app/src/main/java/live/lexiclash/app/MainActivity.java
+!/android/app/src/main/java/live/lexiclash/app/LexiClashApplication.java
+# Brand assets: splash, app icon, shortcuts, theme — must survive cap sync + fresh clones
+!/android/app/src/main/res/
+
+# Capacitor build artifacts
+.capacitor/
+
+
+# Play Store release automation
+play-console-sa.json
+**/play-console-sa*.json
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/README.md
+public/dicts/
+
+# Lighthouse CI report output (npm run lighthouse:ci)
+.lighthouseci/

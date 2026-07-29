@@ -8,10 +8,10 @@
 import { useCallback, useRef, useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { createClient } from '@/utils/supabase/client';
+import logger from '@/utils/logger';
 import {
   calculateGameCognitiveScores,
   updateBrainScore,
-  getDomainScoresRecord,
   getTierFromScore,
   calculateTierProgress,
 } from '@/utils/cognitiveScoring';
@@ -66,13 +66,13 @@ export function useSaveCognitiveScore() {
   ): Promise<CognitiveScoreResult | null> => {
     // Only save for authenticated users
     if (!userId) {
-      console.log('[useSaveCognitiveScore] Skipping - no authenticated user');
+      logger.log('[useSaveCognitiveScore] Skipping - no authenticated user');
       return null;
     }
 
     // Prevent duplicate saves
     if (hasSavedRef.current) {
-      console.log('[useSaveCognitiveScore] Already saved this session');
+      logger.log('[useSaveCognitiveScore] Already saved this session');
       return null;
     }
 
@@ -122,7 +122,12 @@ export function useSaveCognitiveScore() {
         input.gameSessionId
       );
 
-      console.log('[useSaveCognitiveScore] Calculated scores:', {
+      if (!gameScores) {
+        logger.log('[useSaveCognitiveScore] No scores calculated (insufficient data)');
+        return null;
+      }
+
+      logger.log('[useSaveCognitiveScore] Calculated scores:', {
         processingSpeed: gameScores.processingSpeed,
         workingMemory: gameScores.workingMemory,
         attention: gameScores.attention,
@@ -141,10 +146,10 @@ export function useSaveCognitiveScore() {
           .from('game_sessions')
           .select('id')
           .eq('id', verifiedGameSessionId)
-          .single();
+          .maybeSingle();
 
         if (!sessionExists) {
-          console.log('[useSaveCognitiveScore] Game session not found in database, skipping session link');
+          logger.log('[useSaveCognitiveScore] Game session not found in database, skipping session link');
           verifiedGameSessionId = undefined;
         }
       }
@@ -180,7 +185,7 @@ export function useSaveCognitiveScore() {
       if (insertError) {
         // Handle foreign key constraint error gracefully - retry without session ID
         if (insertError.code === '23503' && verifiedGameSessionId) {
-          console.log('[useSaveCognitiveScore] Session not found, retrying without session link');
+          logger.log('[useSaveCognitiveScore] Session not found, retrying without session link');
           await supabase
             .from('game_cognitive_scores')
             .insert({
@@ -202,7 +207,7 @@ export function useSaveCognitiveScore() {
               game_duration_seconds: gameScores.gameDurationSeconds,
             });
         } else {
-          console.error('[useSaveCognitiveScore] Failed to insert game score:', insertError);
+          logger.error('[useSaveCognitiveScore] Failed to insert game score:', insertError);
         }
         // Continue to update brain score even if game score insert fails
       }
@@ -212,7 +217,7 @@ export function useSaveCognitiveScore() {
         .from('brain_scores')
         .select('*')
         .eq('user_id', userId)
-        .single();
+        .maybeSingle();
 
       let overallScore: number;
       let tier: string;
@@ -253,7 +258,7 @@ export function useSaveCognitiveScore() {
           .eq('user_id', userId);
 
         if (updateError) {
-          console.error('[useSaveCognitiveScore] Failed to update brain score:', updateError);
+          logger.error('[useSaveCognitiveScore] Failed to update brain score:', updateError);
         }
 
         overallScore = updated.overallScore;
@@ -269,7 +274,7 @@ export function useSaveCognitiveScore() {
           .eq('user_id', userId)
           .eq('period_type', 'daily')
           .eq('period_start', today)
-          .single();
+          .maybeSingle();
 
         if (existingHistory) {
           // Update existing entry for today (ensure all scores are integers)
@@ -306,7 +311,6 @@ export function useSaveCognitiveScore() {
 
       } else {
         // Create new brain score (use safe integer values defined earlier)
-        const domainScores = getDomainScoresRecord(gameScores);
         overallScore = Math.round((
           safeProcessingSpeed +
           safeWorkingMemory +
@@ -335,7 +339,7 @@ export function useSaveCognitiveScore() {
           });
 
         if (createError) {
-          console.error('[useSaveCognitiveScore] Failed to create brain score:', createError);
+          logger.error('[useSaveCognitiveScore] Failed to create brain score:', createError);
         }
 
         // Also add to history (fetch-then-update to handle case where drill was done first)
@@ -346,7 +350,7 @@ export function useSaveCognitiveScore() {
           .eq('user_id', userId)
           .eq('period_type', 'daily')
           .eq('period_start', todayDate)
-          .single();
+          .maybeSingle();
 
         if (existingHistoryNew) {
           await supabase
@@ -394,7 +398,7 @@ export function useSaveCognitiveScore() {
         scoreDelta,
       };
     } catch (err) {
-      console.error('[useSaveCognitiveScore] Error:', err);
+      logger.error('[useSaveCognitiveScore] Error:', err);
       setError(err instanceof Error ? err.message : 'Failed to save cognitive score');
       setIsSaving(false);
       return null;

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
 interface Tab {
@@ -16,6 +16,8 @@ interface MobileTabBarProps {
   activeTab: string | null;
   onTabChange: (tabId: string) => void;
   className?: string;
+  /** Optional slot rendered at the trailing edge of the tab bar */
+  endSlot?: React.ReactNode;
 }
 
 /**
@@ -27,6 +29,7 @@ export function MobileTabBar({
   activeTab,
   onTabChange,
   className,
+  endSlot,
 }: MobileTabBarProps) {
   return (
     <nav className={cn('mobile-tab-bar md:hidden', className)}>
@@ -46,19 +49,19 @@ export function MobileTabBar({
               'transition-all duration-100',
               isActive
                 ? 'text-neo-lime scale-110'
-                : 'text-neo-white/70 hover:text-neo-white'
+                : 'text-neo-white hover:text-neo-white'
             )}
           >
             <div className="relative">
               <span className="text-xl">{tab.icon}</span>
               {tab.badge !== undefined && tab.badge > 0 && (
-                <motion.span
+                <m.span
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="absolute -top-1 -right-2 rtl:-right-auto rtl:-left-2 bg-neo-pink text-neo-white text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center border-2 border-neo-black"
                 >
                   {tab.badge > 99 ? '99+' : tab.badge}
-                </motion.span>
+                </m.span>
               )}
             </div>
             <span className="text-xs font-bold uppercase tracking-wide mt-1">
@@ -67,6 +70,11 @@ export function MobileTabBar({
           </button>
         );
       })}
+      {endSlot && (
+        <div className="ms-auto flex items-center pe-2">
+          {endSlot}
+        </div>
+      )}
     </nav>
   );
 }

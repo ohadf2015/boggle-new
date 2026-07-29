@@ -3,6 +3,9 @@
  * Central export for all shared type definitions
  */
 
+// Blast tile types (canonical — import before game to avoid re-export conflicts)
+export * from './blast';
+
 // Game types
 export * from './game';
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback, useRef, useEffect, useMemo } from 'react';
 
 /**
  * GameAnnouncer - Accessibility component for screen reader announcements
@@ -197,7 +197,8 @@ export const GameAnnouncerProvider: React.FC<GameAnnouncerProviderProps> = ({ ch
     announce(messages[phase], phase === 'warning' ? 'assertive' : 'polite');
   }, [announce]);
 
-  const contextValue: AnnouncerContextType = {
+  // Memoize context value to prevent unnecessary re-renders of consumers
+  const contextValue: AnnouncerContextType = useMemo(() => ({
     announce,
     announceWordResult,
     announceCombo,
@@ -212,7 +213,22 @@ export const GameAnnouncerProvider: React.FC<GameAnnouncerProviderProps> = ({ ch
     announceRoundEnd,
     announceFireRound,
     announceEarthquake,
-  };
+  }), [
+    announce,
+    announceWordResult,
+    announceCombo,
+    announceGameState,
+    announceConnection,
+    announceLeaderboard,
+    announcePlayerJoin,
+    announcePlayerLeave,
+    announceTimer,
+    announceScoreUpdate,
+    announceRoundStart,
+    announceRoundEnd,
+    announceFireRound,
+    announceEarthquake,
+  ]);
 
   return (
     <AnnouncerContext.Provider value={contextValue}>

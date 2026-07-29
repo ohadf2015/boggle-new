@@ -3,9 +3,9 @@
  *
  * This test ensures that ALL next step navigation paths work correctly:
  * - Practice → Challenge Bots (singleplayer?preset=bots)
- * - Solo-Bots → Daily Challenge (daily)
+ * - Solo-Bots → Try Daily Challenge (daily)
  * - Daily → Go Multiplayer (multiplayer)
- * - Multiplayer-Bots → Train Your Brain (brain)
+ * - Multiplayer-Bots → Try Daily Challenge (daily)
  *
  * Each navigation MUST clear the session before navigating to prevent
  * players from getting stuck on the results page.
@@ -17,34 +17,34 @@ import userEvent from '@testing-library/user-event';
 import NextStepPrompt from '../NextStepPrompt';
 
 // Track session clearing and navigation
-const mockClearSession = jest.fn();
-const mockRouterPush = jest.fn();
+const mockClearSession = vi.fn();
+const mockRouterPush = vi.fn();
 
 // Mock session utility
-jest.mock('@/utils/session', () => ({
+vi.mock('@/utils/session', () => ({
   clearSessionPreservingUsername: () => mockClearSession(),
 }));
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: mockRouterPush,
   }),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
         'nextStep.challengeBots': 'Challenge the Bots!',
         'nextStep.challengeBotsDesc': 'Test your skills against AI opponents',
-        'nextStep.dailyChallenge': 'Daily Challenge',
-        'nextStep.dailyChallengeDesc': 'Same puzzle as everyone worldwide',
+        'nextStep.tryDailyChallenge': 'Try Daily Challenge',
+        'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
         'nextStep.goMultiplayer': 'Go Multiplayer!',
         'nextStep.goMultiplayerDesc': 'Compete with real players',
-        'nextStep.brainTraining': 'Train Your Brain',
-        'nextStep.brainTrainingDesc': 'Track your cognitive growth',
+        'nextStep.goMultiplayerFromDaily': 'Why Stop at One?',
+        'nextStep.goMultiplayerFromDailyDesc': 'Unlimited games, real opponents — no waiting until tomorrow',
         'nextStep.backToLobby': 'Back to Lobby',
         'nextStep.letsGo': "Let's Go!",
       };
@@ -56,8 +56,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} onClick={onClick} {...props}>{children}</div>
     ),
@@ -68,10 +68,10 @@ jest.mock('framer-motion', () => ({
 }));
 
 describe('NextStepPrompt - All Navigation Modes', () => {
-  const mockOnBackToLobby = jest.fn();
+  const mockOnBackToLobby = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
     mockClearSession.mockClear();
     mockRouterPush.mockClear();
   });
@@ -110,7 +110,7 @@ describe('NextStepPrompt - All Navigation Modes', () => {
     });
   });
 
-  describe('Solo-Bots Mode → Daily Challenge', () => {
+  describe('Solo-Bots Mode → Try Daily Challenge', () => {
     const testVariants = ['desktop', 'mobile', 'landscape'] as const;
 
     testVariants.forEach((variant) => {
@@ -128,7 +128,7 @@ describe('NextStepPrompt - All Navigation Modes', () => {
         // Find and click the navigation button
         const navButton = variant === 'desktop'
           ? screen.getByRole('button', { name: /let's go/i })
-          : screen.getByText('Daily Challenge');
+          : screen.getByText('Try Daily Challenge');
 
         await user.click(navButton);
 
@@ -141,6 +141,28 @@ describe('NextStepPrompt - All Navigation Modes', () => {
         const pushCallOrder = mockRouterPush.mock.invocationCallOrder[0];
         expect(clearCallOrder).toBeLessThan(pushCallOrder);
       });
+    });
+
+    it('should call onAction instead of navigating when callback is provided', async () => {
+      const user = userEvent.setup();
+      const mockOnAction = vi.fn();
+
+      render(
+        <NextStepPrompt
+          currentMode="solo-bots"
+          onBackToLobby={mockOnBackToLobby}
+          onAction={mockOnAction}
+          variant="mobile"
+        />
+      );
+
+      const navButton = screen.getByText('Try Daily Challenge');
+      await user.click(navButton);
+
+      // Should call onAction, not clear session or navigate
+      expect(mockOnAction).toHaveBeenCalledTimes(1);
+      expect(mockClearSession).not.toHaveBeenCalled();
+      expect(mockRouterPush).not.toHaveBeenCalled();
     });
   });
 
@@ -162,7 +184,7 @@ describe('NextStepPrompt - All Navigation Modes', () => {
         // Find and click the navigation button
         const navButton = variant === 'desktop'
           ? screen.getByRole('button', { name: /let's go/i })
-          : screen.getByText('Go Multiplayer!');
+          : screen.getByText('Why Stop at One?');
 
         await user.click(navButton);
 
@@ -178,11 +200,11 @@ describe('NextStepPrompt - All Navigation Modes', () => {
     });
   });
 
-  describe('Multiplayer-Bots Mode → Train Your Brain', () => {
+  describe('Multiplayer-Bots Mode → Try Daily Challenge', () => {
     const testVariants = ['desktop', 'mobile', 'landscape'] as const;
 
     testVariants.forEach((variant) => {
-      it(`should clear session and navigate to /en/brain (${variant})`, async () => {
+      it(`should clear session and navigate to /en/daily (${variant})`, async () => {
         const user = userEvent.setup();
 
         render(
@@ -196,13 +218,13 @@ describe('NextStepPrompt - All Navigation Modes', () => {
         // Find and click the navigation button
         const navButton = variant === 'desktop'
           ? screen.getByRole('button', { name: /let's go/i })
-          : screen.getByText('Train Your Brain');
+          : screen.getByText('Try Daily Challenge');
 
         await user.click(navButton);
 
         // Verify session was cleared BEFORE navigation
         expect(mockClearSession).toHaveBeenCalledTimes(1);
-        expect(mockRouterPush).toHaveBeenCalledWith('/en/brain');
+        expect(mockRouterPush).toHaveBeenCalledWith('/en/daily');
 
         // Verify correct order
         const clearCallOrder = mockClearSession.mock.invocationCallOrder[0];

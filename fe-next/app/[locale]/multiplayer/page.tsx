@@ -1,1416 +1,215 @@
-'use client';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import MultiplayerPageClient from './PageClient';
 
-import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import nextDynamic from 'next/dynamic';
-import toast from 'react-hot-toast';
-import { Socket } from 'socket.io-client';
-import AutoHideHeader from '@/components/AutoHideHeader';
-import ErrorBoundary from '@/app/components/ErrorBoundary';
-import { FeatureErrorBoundary } from '@/components/ErrorBoundaries';
-import { ConnectionDot } from '@/components/ConnectionStatusIndicator';
-import SpectatorBanner from '@/components/SpectatorBanner';
-import { SocketContext, getSharedSocket, releaseSharedSocket, getSharedSocketIfExists, getSocketURL } from '@/utils/SocketContext';
-import { saveSession, getSession, clearSession, clearSessionPreservingUsername } from '@/utils/session';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { TrainingGatewayModal } from '@/components/training';
-import { shouldShowTrainingGateway } from '@/utils/trainingProgressStorage';
-import { useAuth } from '@/contexts/AuthContext';
-import { useMusic } from '@/contexts/MusicContext';
-import { getGuestSessionId, hashToken } from '@/utils/guestManager';
-import { getSession as getSupabaseSession } from '@/lib/supabase';
-import logger from '@/utils/logger';
-import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
-import { getStoredUsername, setStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
-import { captureSocketError, addSocketEventBreadcrumb, addGameBreadcrumb, isExpectedError } from '@/utils/sentry';
-import { sanitizeRoomName } from '@/utils/consts';
-import { NeoLoader } from '@/components/ui/NeoLoader';
-import { PlayfulBackground } from '@/components/ui/PlayfulBackground';
-import type { Language, ActiveRoom } from '@/shared/types/game';
-
-interface ResultsData {
-  scores: Array<{
-    username: string;
-    score: number;
-    words: string[];
-  }>;
-  letterGrid: string[][];
-  /** Whether duplicate word rule is disabled (for rooms with >7 players) */
-  duplicateRuleDisabled?: boolean;
-  /** Number of players in the game */
-  playerCount?: number;
-}
-
-interface GameStartData {
-  letterGrid: string[][];
-  timerSeconds: number;
-  language: Language;
-}
-
-// Dynamic imports for code splitting - only load when needed
-const HostView = nextDynamic(() => import('@/host/HostView'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
-});
-
-const PlayerView = nextDynamic(() => import('@/player/PlayerView'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
-});
-
-const MultiplayerFlow = nextDynamic(() => import('@/components/multiplayer/MultiplayerFlow'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
-});
-
-const ResultsPage = nextDynamic(() => import('@/components/views/ResultsPage'), {
-  loading: () => <ViewLoadingSkeleton />,
-  ssr: false,
-});
-
-// QuickJoinView removed - invitation flow now uses MultiplayerFlow with InvitationQuickJoin
-
-// Loading skeleton component with playful design
-function ViewLoadingSkeleton() {
-  return (
-    <div className="min-h-[60vh] flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy relative overflow-hidden">
-      <PlayfulBackground intensity="medium" colorScheme="game" />
-      <div className="relative z-10">
-        <NeoLoader variant="letters" size="md" text="Loading game..." />
-      </div>
-    </div>
-  );
-}
-
-// Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic';
 
-const SOCKET_CONFIG = {
-  RECONNECTION_ATTEMPTS: 10,
-  RECONNECTION_DELAY: 1000,
-  RECONNECTION_DELAY_MAX: 30000,
-  HOST_KEEP_ALIVE_INTERVAL: 30000,
-  CONNECTION_TIMEOUT: 15000, // Reduced from 20s for faster feedback on slow connections
-  ROOMS_LOADING_TIMEOUT: 3000, // Reduced timeout for active rooms - show UI faster
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'multiplayer', path: '/multiplayer', locale });
+}
+
+const seoContent: Record<string, {
+  title: string;
+  description: string;
+  features: string[];
+  faq: { question: string; answer: string }[];
+}> = {
+  en: {
+    title: 'Multiplayer Word Game — Real-Time Word Battles With Friends',
+    description:
+      'LexiClash Multiplayer is a real-time competitive word game where you race against friends and rivals to find words on a shared grid. Host private rooms for game nights, join public lobbies to test your skills against the world, or challenge the AI bot when nobody is online. Every match is live, timed, and scored — no waiting for turns. Four distinct multiplayer modes mean every match feels different: Classic Boggle-style word racing, Wheel Rush rotating-tile sprints, Word Hunt directed-search puzzles, and Blast Mode tile-clearing combo chains. Match-making works across devices: someone on a phone in Tel Aviv can play head-to-head with a friend on a laptop in Stockholm with sub-100ms latency on the same shared grid. No download. No signup unless you want a persistent profile. Open the link, pick a mode, and you are in.',
+    features: [
+      'Host private rooms with custom settings — invite friends via link or room code',
+      'Public matchmaking lobbies — get matched with opponents of similar skill in seconds',
+      'Real-time scoring with live opponent word feeds — see what they find as they find it',
+      'Adjustable round timers, grid sizes, and scoring rules for casual or competitive play',
+      'Spectator mode — watch top players compete and learn advanced word-finding strategies',
+      'Four multiplayer modes: Classic, Wheel Rush, Word Hunt, Blast — each with distinct scoring and pacing',
+      'Cross-device matchmaking — phones, tablets, laptops, and TV screens all join the same match',
+      'Sub-100ms latency on Socket.IO infrastructure — opponent moves appear before you finish typing yours',
+      'Anti-cheat dictionary validation — every submitted word checked against the same competitive list',
+      'Optional rematch system — replay the same opponents on a fresh grid in one tap',
+    ],
+    faq: [
+      {
+        question: 'How do I start a multiplayer word game with friends?',
+        answer:
+          'Tap "Create Room" on the multiplayer page, customize your settings (timer, grid size, rounds, mode), then share the room link or code with friends. They join instantly — no account required. You can also set a room password for private matches. Rooms stay open for 24 hours so you can come back to the same lobby after a break.',
+      },
+      {
+        question: 'Is LexiClash multiplayer free to play?',
+        answer:
+          'Yes — LexiClash multiplayer is completely free with no download required. Play directly in your browser on any device. There are no paywalls, ads-to-unlock, or premium-only features. Optional rewarded ads exist for cosmetic boosts but never gate competitive play.',
+      },
+      {
+        question: 'How many players can join a multiplayer room?',
+        answer:
+          'Multiplayer rooms support up to 8 players competing simultaneously on the same grid. For larger groups, try Party Mode which supports even more players on a shared TV screen with phones as controllers. Classroom mode supports up to 32 players for educator use.',
+      },
+      {
+        question: 'What makes LexiClash different from Scrabble, Wordle, or Words With Friends?',
+        answer:
+          'Unlike turn-based games like Scrabble or Words With Friends — where you wait minutes or hours between moves — LexiClash is fully real-time. Everyone plays the same board simultaneously under time pressure. Unlike solo puzzles like Wordle, you compete directly against other players with live score feeds and combo chains. The result is the strategic depth of a tile-letter game combined with the intensity of a fighting game.',
+      },
+      {
+        question: 'What are the four multiplayer modes and which is most popular?',
+        answer:
+          'Classic is a Boggle-style 4x4 or 5x5 grid where you race to find words within a 2-minute timer — most popular for new players. Wheel Rush rotates the letter pool every 15 seconds, rewarding fast pattern recognition. Word Hunt gives a target word count to find within a constrained letter set — best for puzzle lovers. Blast Mode clears tiles as you spell, building combo multipliers for longer chains — most popular for competitive players chasing high scores.',
+      },
+      {
+        question: 'How does matchmaking work? Will I always be matched against strong players?',
+        answer:
+          'Public lobbies use ELO-style skill rating to match you against opponents of similar level. New players start in the rookie pool against other newcomers and the AI bot. As you win matches, your rating climbs and you face progressively stronger opponents. Private rooms have no matchmaking — you choose your opponents directly.',
+      },
+      {
+        question: 'Can I play multiplayer when nobody else is online?',
+        answer:
+          'Yes. LexiClash includes an AI bot opponent with three difficulty levels — Easy, Medium, and Hard. The bot plays at human-realistic speeds (not instant-perfect) and is a useful warm-up before facing humans. It is also the default opponent when public lobbies are empty.',
+      },
+      {
+        question: 'Are LexiClash multiplayer matches fair? How do you prevent cheating?',
+        answer:
+          'Every submitted word is validated server-side against the same competitive dictionary used in Scrabble tournaments. Anagram solvers and external dictionaries do not give an edge because all valid words are equally scored — the only differentiator is how fast you find them. We also detect and block coordinated boost-rings via behavioral analysis.',
+      },
+    ],
+  },
+  he: {
+    title: 'משחק מילים מרובה משתתפים — קרבות מילים בזמן אמת עם חברים',
+    description:
+      'LexiClash מרובה משתתפים הוא משחק מילים תחרותי בזמן אמת שבו אתם מתחרים נגד חברים ויריבים למצוא מילים על לוח משותף. ארחו חדרים פרטיים לערבי משחקים, הצטרפו ללובי ציבורי כדי לבדוק את הכישורים שלכם מול העולם, או אתגרו את הבוט כשאף אחד לא מחובר.',
+    features: [
+      'חדרים פרטיים עם הגדרות מותאמות אישית — הזמינו חברים באמצעות קישור או קוד חדר',
+      'לובי ציבורי לשיבוץ — התאמה עם יריבים ברמה דומה תוך שניות',
+      'ניקוד בזמן אמת עם פיד מילים חי של היריב — ראו מה הם מוצאים בזמן שהם מוצאים',
+      'טיימרים, גדלי לוח וכללי ניקוד מתכווננים למשחק קז\'ואלי או תחרותי',
+    ],
+    faq: [
+      {
+        question: 'איך מתחילים משחק מרובה משתתפים עם חברים?',
+        answer:
+          'לחצו על "צור חדר", התאימו את ההגדרות (טיימר, גודל לוח, סבבים), ושתפו את הקישור או הקוד עם חברים. הם מצטרפים מיד — ללא צורך בחשבון.',
+      },
+      {
+        question: 'האם LexiClash מרובה משתתפים חינמי?',
+        answer:
+          'כן — LexiClash מרובה משתתפים חינמי לחלוטין ללא צורך בהורדה. שחקו ישירות בדפדפן בכל מכשיר.',
+      },
+    ],
+  },
+  sv: {
+    title: 'Multiplayer-ordspel — Ordstrider i realtid med vänner',
+    description:
+      'LexiClash Multiplayer är ett tävlingsinriktat ordspel i realtid där du tävlar mot vänner och rivaler om att hitta ord på ett gemensamt rutnät. Skapa privata rum för spelkvällar eller gå med i offentliga lobbyer för att testa dina färdigheter mot hela världen.',
+    features: [
+      'Privata rum med anpassade inställningar — bjud in vänner via länk eller rumskod',
+      'Offentlig matchning — matchas med motståndare på liknande nivå på sekunder',
+      'Poängsättning i realtid med live-feed av motståndarens ord',
+      'Justerbara rundtimer, rutnätsstorlekar och poängregler',
+    ],
+    faq: [
+      {
+        question: 'Hur startar jag ett multiplayer-ordspel med vänner?',
+        answer:
+          'Tryck på "Skapa rum" på multiplayer-sidan, anpassa inställningarna och dela rumslänken eller koden med vänner. De ansluter direkt — inget konto krävs.',
+      },
+      {
+        question: 'Är LexiClash multiplayer gratis?',
+        answer:
+          'Ja — LexiClash multiplayer är helt gratis utan nedladdning. Spela direkt i webbläsaren på valfri enhet.',
+      },
+    ],
+  },
+  ja: {
+    title: 'マルチプレイヤーワードゲーム — 友達とリアルタイム対戦',
+    description:
+      'LexiClashマルチプレイヤーは、友達やライバルと共有グリッド上で単語を見つけ合うリアルタイム対戦型ワードゲームです。プライベートルームを作成してゲームナイトを楽しんだり、パブリックロビーで世界中のプレイヤーと対戦しましょう。',
+    features: [
+      'カスタム設定のプライベートルーム — リンクやルームコードで友達を招待',
+      'パブリックマッチメイキング — 同レベルの相手と数秒でマッチング',
+      'リアルタイムスコアリングとライブ対戦フィード',
+      '調整可能なラウンドタイマー、グリッドサイズ、スコアルール',
+    ],
+    faq: [
+      {
+        question: '友達とマルチプレイヤーワードゲームを始めるには？',
+        answer:
+          'マルチプレイヤーページで「ルーム作成」をタップし、設定をカスタマイズしてリンクやコードを友達に共有します。アカウント不要で即座に参加できます。',
+      },
+      {
+        question: 'LexiClashマルチプレイヤーは無料ですか？',
+        answer:
+          'はい — LexiClashマルチプレイヤーはダウンロード不要で完全無料です。あらゆるデバイスのブラウザで直接プレイできます。',
+      },
+    ],
+  },
+  es: {
+    title: 'Juego de Palabras Multijugador — Batallas de Palabras en Tiempo Real',
+    description:
+      'LexiClash Multijugador es un juego de palabras competitivo en tiempo real donde compites contra amigos y rivales para encontrar palabras en un tablero compartido. Crea salas privadas para noches de juegos, únete a lobbies públicos o desafía al bot de IA.',
+    features: [
+      'Salas privadas con configuración personalizada — invita amigos por enlace o código de sala',
+      'Emparejamiento público — encuentra oponentes de nivel similar en segundos',
+      'Puntuación en tiempo real con feed en vivo de palabras del oponente',
+      'Temporizadores, tamaños de tablero y reglas de puntuación ajustables',
+      'Modo espectador — observa a los mejores jugadores y aprende estrategias avanzadas',
+    ],
+    faq: [
+      {
+        question: '¿Cómo inicio un juego de palabras multijugador con amigos?',
+        answer:
+          'Toca "Crear Sala" en la página multijugador, personaliza la configuración y comparte el enlace o código con amigos. Se unen al instante — sin necesidad de cuenta.',
+      },
+      {
+        question: '¿Es gratis LexiClash multijugador?',
+        answer:
+          'Sí — LexiClash multijugador es completamente gratis sin descarga. Juega directamente en el navegador en cualquier dispositivo.',
+      },
+      {
+        question: '¿Cuántos jugadores pueden unirse a una sala?',
+        answer:
+          'Las salas multijugador admiten hasta 8 jugadores compitiendo simultáneamente en el mismo tablero. Para grupos más grandes, prueba el Modo Fiesta.',
+      },
+    ],
+  },
 };
 
-// Note: Socket singleton is now managed by SocketContext.tsx
-// Use getSharedSocket(), releaseSharedSocket(), and getSharedSocketIfExists()
-
-export default function MultiplayerPage(): React.JSX.Element {
-  const [gameCode, setGameCode] = useState<string>('');
-  const [username, setUsername] = useState<string>('');
-  const [guestAvatar, setGuestAvatar] = useState<{ emoji: string; color: string } | null>(null);
-  const [roomName, setRoomName] = useState<string>('');
-  const [hostUsername, setHostUsername] = useState<string>('');
-  const [isActive, setIsActive] = useState<boolean>(false);
-  const [isHost, setIsHost] = useState<boolean>(false);
-  const [error, setError] = useState<string>('');
-  const [activeRooms, setActiveRooms] = useState<ActiveRoom[]>([]);
-  const [showResults, setShowResults] = useState<boolean>(false);
-  const [resultsData, setResultsData] = useState<ResultsData | null>(null);
-  const [attemptingReconnect, setAttemptingReconnect] = useState<boolean>(false);
-  const [roomLanguage, setRoomLanguage] = useState<Language | null>(null);
-  const [playersInRoom, setPlayersInRoom] = useState<Array<{ username: string; score?: number }>>([]);
-  const [socket, setSocket] = useState<Socket | null>(null);
-  const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [roomsLoading, setRoomsLoading] = useState<boolean>(true); // Track rooms loading state
-  const [pendingGameStart, setPendingGameStart] = useState<GameStartData | null>(null); // Store game start data for players returning from results
-  const [gameStartTime, setGameStartTime] = useState<number | null>(null); // Track when current game started for duration calculation
-  const [isJoining, setIsJoining] = useState<boolean>(false); // Track join/create loading state
-  const [authLoadingStartTime, setAuthLoadingStartTime] = useState<number | null>(null); // Track when auth loading started
-
-  // Late joiner & spectator state
-  const [isSpectator, setIsSpectator] = useState<boolean>(false);
-  const [isLateJoiner, setIsLateJoiner] = useState<boolean>(false);
-
-  // Training gateway state - show prompt before allowing multiplayer for new players
-  const [showTrainingGateway, setShowTrainingGateway] = useState<boolean>(false);
-  const [showLateJoinerWelcome, setShowLateJoinerWelcome] = useState<boolean>(false);
-  const [spectators, setSpectators] = useState<Array<{ username: string; socketId: string; avatar: any }>>([]);
-
-  const socketRef = useRef<Socket | null>(null);
-  const attemptingReconnectRef = useRef<boolean>(attemptingReconnect);
-  const hostKeepAliveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  // Store calculated game duration when results are shown to prevent recalculation
-  // if state is reset before cognitive scoring effect executes
-  const gameDurationRef = useRef<number | null>(null);
-  const wasConnectedRef = useRef<boolean>(false);
-  const showResultsRef = useRef<boolean>(showResults);
-
-  const { t, language } = useLanguage();
-  const { user, isAuthenticated, isSupabaseEnabled, profile, loading, refreshProfile } = useAuth();
-  const { playTrack, fadeToTrack, TRACKS } = useMusic();
-
-  // Track auth loading start time for timeout
-  useEffect(() => {
-    if (loading && !authLoadingStartTime) {
-      setAuthLoadingStartTime(Date.now());
-    } else if (!loading) {
-      setAuthLoadingStartTime(null);
-    }
-  }, [loading, authLoadingStartTime]);
-
-  // Track if we should auto-join (prefilled room + existing username)
-  const [shouldAutoJoin, setShouldAutoJoin] = useState(false);
-  const [prefilledRoomCode, setPrefilledRoomCode] = useState('');
-
-  // Track if username has been manually set by the user or loaded from session/localStorage
-  // This prevents auth loading from overwriting user-entered names
-  const usernameManuallySetRef = useRef<boolean>(false);
-
-  // Music transitions based on game state
-  // Note: We always call playTrack/fadeToTrack even if audio isn't unlocked yet
-  // The MusicContext will queue the request and play when user interacts
-  useEffect(() => {
-    if (showResults) {
-      // Results screen - bossa music is already playing from validation phase
-      // Don't change the music, let it continue
-      return;
-    } else if (!isActive) {
-      // Lobby - play lobby music
-      playTrack(TRACKS.LOBBY);
-    } else if (isActive) {
-      // In room waiting - play before game music
-      // (in_game music is triggered by HostView/PlayerView when game actually starts)
-      playTrack(TRACKS.BEFORE_GAME);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isActive, showResults]);
-
-  // Check if we should show the training gateway for new players
-  // Only show on initial load, not when returning from an active game
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (isActive || showResults) return; // Don't show during/after game
-
-    // Check if player should see training gateway
-    const shouldShow = shouldShowTrainingGateway();
-    if (shouldShow) {
-      // Small delay to let the page render first
-      const timer = setTimeout(() => {
-        setShowTrainingGateway(true);
-      }, 500);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [isActive, showResults]);
-
-  // Initialize state from URL and session
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const initializeState = () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomFromUrl = urlParams.get('room');
-      logger.log('[Init] URL search:', window.location.search, '| roomFromUrl:', roomFromUrl);
-      const savedUsername = getStoredUsername() || '';
-      const savedSession = getSession();
-
-      let joiningNewRoomViaInvitation = false;
-      const hasSession = savedSession && savedSession.gameCode;
-
-      if (roomFromUrl) {
-        logger.log('[Init] Setting prefilledRoomCode to:', roomFromUrl);
-        setGameCode(roomFromUrl);
-        setPrefilledRoomCode(roomFromUrl);
-        if (savedSession?.gameCode && savedSession.gameCode !== roomFromUrl) {
-          clearSession();
-          joiningNewRoomViaInvitation = true;
-        }
-        if (savedUsername && savedUsername.trim()) {
-          setUsername(savedUsername);
-          setShouldAutoJoin(true);
-        }
-      } else if (hasSession) {
-        // Only auto-reconnect if this is a page refresh, not intentional navigation
-        // Check if user arrived via refresh (reload) vs navigation
-        const isPageRefresh = (() => {
-          try {
-            const navEntries = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
-            const firstEntry = navEntries[0];
-            if (firstEntry) {
-              return firstEntry.type === 'reload';
-            }
-            // Fallback for older browsers
-            return performance.navigation?.type === 1;
-          } catch {
-            return false;
-          }
-        })();
-
-        if (isPageRefresh) {
-          setGameCode(savedSession.gameCode);
-          setAttemptingReconnect(true);
-        } else {
-          // User intentionally navigated to main page - clear session and let them start fresh
-          logger.log('[Init] User navigated to main page, clearing session');
-          clearSession();
-        }
-      }
-
-      if (roomFromUrl && savedUsername) {
-        // Already set above, derive avatar from name
-        setGuestAvatar(getAvatarForName(savedUsername));
-        usernameManuallySetRef.current = true; // Mark as set from localStorage
-      } else if (joiningNewRoomViaInvitation) {
-        if (savedUsername) {
-          setUsername(savedUsername);
-          setGuestAvatar(getAvatarForName(savedUsername));
-          usernameManuallySetRef.current = true; // Mark as set from localStorage
-        } else {
-          // Set a fun random default name for guests with matching avatar
-          const { name, avatar } = getRandomDefaultNameWithAvatar(language);
-          setUsername(name);
-          setGuestAvatar(avatar);
-        }
-      } else if (savedSession?.username) {
-        setUsername(savedSession.username);
-        setGuestAvatar(getAvatarForName(savedSession.username));
-        usernameManuallySetRef.current = true; // Mark as set from session
-      } else if (savedUsername) {
-        setUsername(savedUsername);
-        setGuestAvatar(getAvatarForName(savedUsername));
-        usernameManuallySetRef.current = true; // Mark as set from localStorage
-      }
-      // Note: We don't set random guest names here anymore
-      // For guests without saved names, the auth effect or handleJoin will handle it
-      // This prevents authenticated users from briefly seeing random guest names
-
-      // Also set roomName for hosting if not already set
-      if (!joiningNewRoomViaInvitation && savedSession?.roomName) {
-        setRoomName(savedSession.roomName);
-      }
-      // Note: We don't set random room names here anymore for the same reason
-    };
-
-    Promise.resolve().then(initializeState);
-  }, [language]);
-
-  // Set username and roomName from profile display_name for authenticated users
-  // Uses fallback chain from OAuth metadata if profile hasn't loaded yet
-  // For guests without saved names, generate random names only after auth is confirmed
-  const hasSetRandomNameRef = useRef<boolean>(false);
-  useEffect(() => {
-    // Wait for auth to finish loading
-    if (loading) return;
-
-    if (user) {
-      // Authenticated user - use display name from profile/OAuth
-      // BUT only if username wasn't already set from localStorage/session/form
-      const displayName =
-        profile?.display_name ||                    // Best: profile display name
-        user?.user_metadata?.full_name ||           // Good: OAuth full name
-        user?.user_metadata?.name ||                // Okay: OAuth name
-        user?.email?.split('@')[0] ||               // Fallback: email prefix
-        '';
-
-      // Only set if username is empty OR if it hasn't been manually set yet
-      // This prevents overwriting user-typed names when auth loads
-      if (displayName && !usernameManuallySetRef.current && !username.trim()) {
-        setUsername(displayName);
-        usernameManuallySetRef.current = true; // Mark as set from auth
-      }
-    } else if (!hasSetRandomNameRef.current) {
-      // Guest user - check if we need to generate a random name
-      // Use ref to prevent setting random names multiple times
-      const savedUsername = getStoredUsername() || '';
-
-      // IMPORTANT: Check current username state first - user may have typed a name in the form
-      // Only generate random name if BOTH saved and current username are empty
-      if (!savedUsername.trim() && !username.trim()) {
-        // No saved username AND no current username - generate a fun random name
-        const { name, avatar } = getRandomDefaultNameWithAvatar(language);
-        logger.log('[AUTH] Generated random name for guest:', name, 'avatar:', avatar.emoji);
-        setUsername(name);
-        setGuestAvatar(avatar);
-        hasSetRandomNameRef.current = true;
-      } else if (savedUsername.trim() && !username.trim()) {
-        // Have saved username but current state is empty - restore from localStorage
-        logger.log('[AUTH] Using saved username:', savedUsername);
-        setUsername(savedUsername);
-        setGuestAvatar(getAvatarForName(savedUsername));
-      } else if (username.trim()) {
-        // User has already entered a name - don't override it, just set avatar
-        logger.log('[AUTH] Preserving user-entered username:', username);
-        setGuestAvatar(getAvatarForName(username));
-      }
-    }
-  }, [user, profile?.display_name, loading, language, username]);
-
-  // Refresh profile on mount for authenticated users to get latest display_name
-  useEffect(() => {
-    if (isAuthenticated && user?.id && refreshProfile) {
-      refreshProfile();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Run once on mount
-
-  useEffect(() => {
-    attemptingReconnectRef.current = attemptingReconnect;
-  }, [attemptingReconnect]);
-
-  useEffect(() => {
-    showResultsRef.current = showResults;
-  }, [showResults]);
-
-  // Initialize Socket.IO connection using shared singleton
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    // Get or create shared socket instance
-    // IMPORTANT: Always go through full listener setup, even for existing sockets
-    // This fixes the bug where existing sockets from SocketProvider didn't have game event listeners
-    const existingSocket = getSharedSocketIfExists();
-    const isReusingSocket = existingSocket && existingSocket.connected;
-
-    const socketUrl = getSocketURL();
-    logger.log('[SOCKET.IO] MultiplayerPage using shared socket:', socketUrl, isReusingSocket ? '(reusing existing)' : '(creating new)');
-
-    // Get socket - either existing or create new
-    const socketInstance = isReusingSocket ? existingSocket : getSharedSocket();
-    socketRef.current = socketInstance;
-
-    // For existing connected sockets, set state immediately and request active rooms
-    if (isReusingSocket) {
-      Promise.resolve().then(() => {
-        setSocket(socketInstance);
-        setIsConnected(true);
-        socketInstance.emit('getActiveRooms');
-      });
-    }
-
-    // Remove any existing listeners before adding new ones (prevents duplicates on re-mount)
-    const eventNames = [
-      'connect', 'disconnect', 'connect_error', 'reconnect', 'reconnect_failed',
-      'joined', 'updateUsers', 'activeRooms', 'joinedAsSpectator', 'spectatorList',
-      'spectatorUpgraded', 'debugGameStateResponse', 'error', 'startGame', 'resetGame',
-      'hostLeftRoomClosing', 'sessionMigrated', 'warning', 'rateLimited', 'hostTransferred', 'pong'
-    ];
-    eventNames.forEach(event => socketInstance.off(event));
-
-    // Connection events
-    socketInstance.on('connect', () => {
-      logger.log('[SOCKET.IO] Connected:', socketInstance.id);
-      setIsConnected(true);
-      setSocket(socketInstance);
-
-      // Request active rooms on connect
-      socketInstance.emit('getActiveRooms');
-
-      // Handle reconnection to game
-      if (wasConnectedRef.current) {
-        const savedSession = getSession();
-        if (savedSession?.gameCode) {
-          logger.log('[SOCKET.IO] Reconnecting to game:', savedSession.gameCode);
-          toast.success(t('common.reconnecting') || 'Reconnecting to game...', {
-            duration: 2000,
-          });
-
-          // Build auth context inline for reconnection
-          const buildAuthContext = async () => {
-            try {
-              // First check if user is authenticated via Supabase session
-              // (user state may not be set yet during reconnect, so check session directly)
-              const { data: { session } } = await getSupabaseSession();
-              if (session?.user?.id) {
-                return { authUserId: session.user.id, guestTokenHash: null };
-              }
-
-              // Fall back to guest token
-              const guestSessionId = getGuestSessionId();
-              if (guestSessionId) {
-                const hash = await hashToken(guestSessionId);
-                return { authUserId: null, guestTokenHash: hash };
-              }
-              return { authUserId: null, guestTokenHash: null };
-            } catch (error) {
-              logger.error('[AUTH] Failed to build auth context during reconnection:', error);
-              return { authUserId: null, guestTokenHash: null };
-            }
-          };
-
-          buildAuthContext().then((authContext) => {
-            // Check if socket is still connected after async operation
-            if (!socketInstance.connected) {
-              logger.warn('[SOCKET.IO] Socket disconnected during auth context build, skipping reconnection emit');
-              return;
-            }
-            if (savedSession.isHost) {
-              socketInstance.emit('createGame', {
-                gameCode: savedSession.gameCode,
-                roomName: savedSession.roomName,
-                language: savedSession.language || language,
-                hostUsername: savedSession.hostUsername || savedSession.username,
-                ...authContext,
-                avatar: profile ? {
-                  emoji: profile.avatar_emoji,
-                  color: profile.avatar_color,
-                } : getAvatarForName(savedSession.hostUsername || savedSession.username || ''),
-              });
-            } else {
-              socketInstance.emit('join', {
-                gameCode: savedSession.gameCode,
-                username: savedSession.username,
-                ...authContext,
-                avatar: profile ? {
-                  emoji: profile.avatar_emoji,
-                  color: profile.avatar_color,
-                } : getAvatarForName(savedSession.username || ''),
-              });
-            }
-          });
-        }
-      }
-      wasConnectedRef.current = true;
-    });
-
-    socketInstance.on('disconnect', (reason) => {
-      logger.log('[SOCKET.IO] Disconnected:', reason);
-      setIsConnected(false);
-      setIsJoining(false); // Clear joining state on disconnect to prevent stuck button
-
-      if (reason === 'io server disconnect') {
-        socketInstance.connect();
-      }
-    });
-
-    socketInstance.on('connect_error', (error) => {
-      logger.error('[SOCKET.IO] Connection error:', error.message);
-      captureSocketError(error, {
-        event: 'connect_error',
-        gameCode: gameCode || undefined,
-        socketId: socketInstance.id || undefined,
-        username: username || undefined,
-      });
-      setError(t('errors.unstableConnection') || 'Connection error');
-      setIsJoining(false); // Clear joining state on connection error
-    });
-
-    socketInstance.on('reconnect', (attemptNumber) => {
-      logger.log('[SOCKET.IO] Reconnected after', attemptNumber, 'attempts');
-      setIsConnected(true);
-      toast.success(t('common.reconnected') || 'Reconnected!', {
-        duration: 2000,
-        icon: '✓',
-      });
-    });
-
-    socketInstance.on('reconnect_failed', () => {
-      logger.error('[SOCKET.IO] Reconnection failed');
-      captureSocketError(new Error('Reconnection exhausted after max attempts'), {
-        event: 'reconnect_failed',
-        gameCode: gameCode || undefined,
-        socketId: socketInstance.id || undefined,
-        username: username || undefined,
-      });
-      setError(t('errors.connectionLost') || 'Connection lost');
-      setIsJoining(false); // Clear joining state on reconnection failure
-    });
-
-    // Game events
-    socketInstance.on('joined', (data) => {
-      logger.log('[SOCKET.IO] ✅ Joined successfully:', data);
-      addGameBreadcrumb('room_joined', {
-        gameCode: data.gameCode,
-        isHost: data.isHost,
-        username: data.username,
-      });
-      setIsHost(data.isHost);
-      setIsActive(true);
-      setError('');
-      setAttemptingReconnect(false);
-      setShouldAutoJoin(false);
-      setIsJoining(false); // Clear loading state
-      setPrefilledRoomCode(''); // Clear prefilled room code on successful join
-
-      if (data.language) {
-        setRoomLanguage(data.language);
-      }
-
-      const joinedUsername = data.username || username;
-      if (data.isHost) {
-        setUsername(joinedUsername);
-        setStoredUsername(joinedUsername);
-      } else if (username) {
-        setStoredUsername(username);
-      }
-
-      saveSession({
-        gameCode: data.gameCode || gameCode,
-        username: joinedUsername,
-        isHost: data.isHost,
-        roomName: data.isHost ? roomName : '',
-        hostUsername: data.isHost ? joinedUsername : undefined,
-        language: data.language || roomLanguage,
-      });
-    });
-
-    socketInstance.on('updateUsers', (data) => {
-      if (data.users) {
-        setPlayersInRoom(data.users);
-      }
-    });
-
-    socketInstance.on('activeRooms', (data) => {
-      setActiveRooms(data.rooms || []);
-      setRoomsLoading(false);
-    });
-
-    // Spectator & Late Joiner events
-    socketInstance.on('joinedAsSpectator', (data) => {
-      logger.log('[SPECTATOR] Joined as spectator:', data);
-      setIsSpectator(true);
-      setGameCode(data.gameCode);
-      setRoomName(data.roomName);
-      setRoomLanguage(data.language);
-      setIsJoining(false);
-
-      saveSession({
-        gameCode: data.gameCode,
-        username: data.username || username,
-        isHost: false,
-        roomName: data.roomName,
-        language: data.language,
-      });
-
-      toast(t('spectator.youAreSpectating') || 'Watching as spectator', {
-        duration: 4000,
-        icon: '👀',
-      });
-    });
-
-    socketInstance.on('spectatorList', (data) => {
-      logger.log('[SPECTATOR] Spectator list updated:', data.spectators?.length || 0);
-      setSpectators(data.spectators || []);
-    });
-
-    socketInstance.on('spectatorUpgraded', (data) => {
-      if (data.success && data.username === username) {
-        logger.log('[SPECTATOR] Upgraded to player, late join:', data.lateJoin);
-        setIsSpectator(false);
-        setIsActive(true);
-        setPlayersInRoom(data.users || []);
-
-        if (data.lateJoin) {
-          setIsLateJoiner(true);
-          setShowLateJoinerWelcome(true);
-        }
-
-        toast.success(t('spectator.upgraded') || 'You can now play!', {
-          duration: 3000,
-          icon: '🎮',
-        });
-      }
-    });
-
-    // Fallback: if rooms don't load quickly, stop showing loading state for better UX on slow connections
-    const roomsLoadingTimeout = setTimeout(() => {
-      setRoomsLoading(false);
-    }, SOCKET_CONFIG.ROOMS_LOADING_TIMEOUT);
-
-    // Debug handler to check server-side game state
-    socketInstance.on('debugGameStateResponse', (data) => {
-      logger.log('[DEBUG] Server game state:', data);
-    });
-
-    socketInstance.on('error', (data) => {
-      setIsJoining(false); // Clear loading state on any error
-
-      // Handle empty error objects (Socket.IO internal errors) - log as debug, not error
-      // Also handle Error instances that may appear as {} when logged
-      // Note: Error objects from different realms may fail instanceof check, so also check for Error-like objects
-      const isErrorLike = data && typeof data === 'object' && ('stack' in data || 'message' in data);
-
-      // Extract message, handling various error formats
-      const errorMessage = data?.message || (typeof data === 'string' ? data : null);
-      const errorCode = data?.code;
-
-      // Check if we have any meaningful content to log/process
-      const hasNoMeaningfulContent = !data ||
-        (typeof data === 'object' && Object.keys(data).length === 0) ||
-        (isErrorLike && !errorMessage);
-
-      if (hasNoMeaningfulContent) {
-        // Only log in debug mode - these are internal Socket.IO events
-        logger.debug('[SOCKET.IO] Received empty error object (internal Socket.IO event)');
-        return; // Don't process empty errors further
-      }
-
-      // Log meaningful errors with the extracted message
-      logger.error('[SOCKET.IO] ❌ Error received:', errorMessage || errorCode || 'Unknown error');
-
-      // Capture to Sentry only for unexpected errors (not user errors like room not found)
-      const errorToCapture = new Error(errorMessage || errorCode || 'Unknown socket error');
-      if (!isExpectedError(errorToCapture)) {
-        captureSocketError(errorToCapture, {
-          event: 'error',
-          gameCode: gameCode || undefined,
-          socketId: socketInstance.id || undefined,
-          username: username || undefined,
-          isHost,
-        });
-      }
-
-      // If error is about game not in progress, query server for actual state
-      if (data?.code === 'GAME_NOT_IN_PROGRESS' || data?.message?.includes('not in progress')) {
-        logger.error('[SOCKET.IO] Game state mismatch - querying server for actual state');
-        socketInstance.emit('debugGameState');
-      }
-
-      // Handle specific error cases
-      if (data.message?.includes('not found') || data.message?.includes('Game not found') || data.message?.includes('closed')) {
-        if (attemptingReconnectRef.current) {
-          setError(t('errors.sessionExpired'));
-          toast.error(t('errors.sessionExpired'), { duration: 4000, icon: '⚠️' });
-        } else {
-          // Show friendly message for room not found
-          const errorKey = data.message?.includes('closed') ? 'errors.roomClosed' : 'errors.gameCodeNotExist';
-          setError(t(errorKey) || t('errors.gameCodeNotExist'));
-          toast.error(t('errors.roomNoLongerExists') || t('errors.gameCodeNotExist'), { duration: 4000, icon: '❌' });
-        }
-        setGameCode('');
-        setPrefilledRoomCode(''); // Clear prefilled room so user sees main join page
-        setIsActive(false);
-        setAttemptingReconnect(false);
-        setShouldAutoJoin(false);
-        clearSession();
-
-        // Auto-refresh room list after error
-        socketInstance.emit('getActiveRooms');
-
-        // Remove room parameter from URL without page reload
-        if (typeof window !== 'undefined' && window.location.search.includes('room=')) {
-          const url = new URL(window.location.href);
-          url.searchParams.delete('room');
-          window.history.replaceState({}, '', url.pathname + (url.search || ''));
-        }
-      } else if (data.message?.includes('already in use') || data.message?.includes('Game code already')) {
-        setError(t('errors.gameCodeExists'));
-        toast.error(t('errors.gameCodeExists'), { duration: 4000, icon: '❌' });
-        setIsActive(false);
-        setIsHost(false);
-        setAttemptingReconnect(false);
-      } else if (data.message?.includes('username') || data.message?.includes('Username')) {
-        setError(t('errors.usernameTaken'));
-        toast.error(t('errors.usernameTaken'), { duration: 4000, icon: '❌' });
-        setIsActive(false);
-        setAttemptingReconnect(false);
-        setShouldAutoJoin(false);
-        clearSession();
-      } else {
-        const errorMsg = data.message || 'An error occurred';
-        setError(errorMsg);
-        // Show toast for all other errors to ensure user gets visual feedback
-        toast.error(errorMsg, { duration: 4000, icon: '❌' });
-      }
-    });
-
-    // Handle game start at page level to avoid race conditions
-    // Store game start data so PlayerView can consume it when it mounts or updates
-    // This ensures the event is captured even if PlayerView is still loading (dynamic import)
-    // Note: The actual "Game Started" toast is shown by PlayerView/HostView components
-    socketInstance.on('startGame', (data) => {
-      logger.log('[SOCKET.IO] startGame received:', data);
-      addGameBreadcrumb('game_started', {
-        language: data.language,
-        timerSeconds: data.timerSeconds,
-        gridSize: data.letterGrid?.length,
-      });
-
-      // Always store pending game start data for PlayerView to consume
-      setPendingGameStart(data);
-      // Track game start time for duration calculation
-      setGameStartTime(Date.now());
-
-      // If viewing results, transition back to game
-      if (showResultsRef.current) {
-        logger.log('[SOCKET.IO] Closing results to start new game');
-        setShowResults(false);
-        setResultsData(null);
-      }
-      // Toast notification is handled by PlayerView/HostView to avoid duplicates
-    });
-
-    // Handle game reset - keep players in the room for new game
-    // Note: Toast notification is handled by PlayerView/HostView to avoid duplicates
-    socketInstance.on('resetGame', () => {
-      logger.log('[SOCKET.IO] Game reset - staying in room for new game');
-      // Update ref SYNCHRONOUSLY before state change to prevent race condition
-      // where startGame arrives before the ref useEffect updates
-      showResultsRef.current = false;
-      setShowResults(false);
-      setResultsData(null);
-      // Toast notification is handled by PlayerView/HostView to avoid duplicates
-    });
-
-    socketInstance.on('hostLeftRoomClosing', (data) => {
-      toast.error(data.message || t('playerView.roomClosed'), {
-        icon: '🚪',
-        duration: 5000,
-      });
-      // Preserve username in localStorage for smooth fallback to lobby
-      clearSessionPreservingUsername(username);
-      setIsActive(false);
-      setIsHost(false);
-      setGameCode('');
-      setTimeout(() => window.location.reload(), 2000);
-    });
-
-    // Handle session migration (another tab took over)
-    socketInstance.on('sessionMigrated', (data) => {
-      logger.log('[SOCKET.IO] Session migrated:', data);
-      toast(data.message || 'Your session was moved to another tab', {
-        icon: '🔄',
-        duration: 5000,
-      });
-      // Clear local state - session is now in another tab
-      clearSessionPreservingUsername(username);
-      setIsActive(false);
-      setIsHost(false);
-      setGameCode('');
-    });
-
-    // Handle joining as spectator (room is full)
-    socketInstance.on('joinedAsSpectator', (data) => {
-      logger.log('[SOCKET.IO] Joined as spectator:', data);
-      setIsJoining(false); // Clear loading state
-      setPrefilledRoomCode(''); // Clear prefilled room code
-      setAttemptingReconnect(false);
-      setShouldAutoJoin(false);
-
-      toast(t('common.roomFull') || 'Room is full. You joined as a spectator.', {
-        icon: '👀',
-        duration: 5000,
-      });
-
-      // Set spectator state - user can watch but not participate
-      if (data.language) {
-        setRoomLanguage(data.language);
-      }
-      // Note: We don't set isActive=true since spectators can't participate
-      // They're in the socket room but not in the game
-    });
-
-    // Handle server warnings (e.g., Redis failures)
-    socketInstance.on('warning', (data) => {
-      logger.warn('[SOCKET.IO] Warning:', data);
-      if (data.type === 'persistence') {
-        toast.error(data.message || 'Game state could not be saved. Progress may be lost on server restart.', {
-          icon: '⚠️',
-          duration: 6000,
-        });
-      } else {
-        toast.error(data.message || 'A warning occurred', {
-          icon: '⚠️',
-          duration: 4000,
-        });
-      }
-    });
-
-    // Handle rate limiting - user is sending too many requests
-    socketInstance.on('rateLimited', () => {
-      logger.warn('[SOCKET.IO] Rate limited by server');
-      setIsJoining(false); // Clear loading state
-      toast.error(t('errors.rateLimited') || 'Too many requests. Please wait a moment and try again.', {
-        icon: '⏳',
-        duration: 4000,
-      });
-    });
-
-    socketInstance.on('hostTransferred', (data) => {
-      if (data.newHost === username) {
-        setIsHost(true);
-        saveSession({
-          gameCode,
-          username,
-          isHost: true,
-          roomName: roomName || username,
-          language: roomLanguage || 'en',
-        });
-        toast.success(t('hostView.youAreNowHost'), { duration: 5000, icon: '👑' });
-      } else {
-        toast(`${data.newHost} ${t('hostView.newHostAssigned')}`, { duration: 3000, icon: '🔄' });
-      }
-    });
-
-    socketInstance.on('pong', () => {
-      // Heartbeat response - connection is alive
-    });
-
-    // Defer state update to avoid calling setState directly within effect
-    Promise.resolve().then(() => {
-      setSocket(socketInstance);
-    });
-
-    return () => {
-      logger.log('[SOCKET.IO] MultiplayerPage cleaning up');
-      clearTimeout(roomsLoadingTimeout);
-      // Remove this component's listeners but keep socket alive for other components
-      socketInstance.off('connect');
-      socketInstance.off('disconnect');
-      socketInstance.off('connect_error');
-      socketInstance.off('reconnect');
-      socketInstance.off('reconnect_failed');
-      socketInstance.off('joined');
-      socketInstance.off('updateUsers');
-      socketInstance.off('activeRooms');
-      socketInstance.off('joinedAsSpectator');
-      socketInstance.off('spectatorList');
-      socketInstance.off('spectatorUpgraded');
-      socketInstance.off('debugGameStateResponse');
-      socketInstance.off('error');
-      socketInstance.off('startGame');
-      socketInstance.off('resetGame');
-      socketInstance.off('hostLeftRoomClosing');
-      socketInstance.off('sessionMigrated');
-      socketInstance.off('warning');
-      socketInstance.off('rateLimited');
-      socketInstance.off('hostTransferred');
-      socketInstance.off('pong');
-      // Release reference to shared socket only if we created one (not reusing existing)
-      // When reusing, getSharedSocketIfExists() doesn't increment refcount
-      if (!isReusingSocket) {
-        releaseSharedSocket();
-      }
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- gameCode, username, roomName, roomLanguage are used in handlers but shouldn't trigger socket recreation
-  }, [t, language]);
-
-  // Host keep-alive
-  useEffect(() => {
-    if (!isActive || !isHost || !socket || !isConnected) {
-      if (hostKeepAliveIntervalRef.current) {
-        clearInterval(hostKeepAliveIntervalRef.current);
-        hostKeepAliveIntervalRef.current = null;
-      }
-      return;
-    }
-
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible' && socket && isConnected) {
-        socket.emit('hostReactivate', { gameCode });
-      }
-    };
-
-    hostKeepAliveIntervalRef.current = setInterval(() => {
-      if (document.visibilityState === 'visible' && socket && isConnected) {
-        socket.emit('hostKeepAlive', { gameCode });
-      }
-    }, SOCKET_CONFIG.HOST_KEEP_ALIVE_INTERVAL);
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Send initial reactivation
-    socket.emit('hostReactivate', { gameCode });
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      if (hostKeepAliveIntervalRef.current) {
-        clearInterval(hostKeepAliveIntervalRef.current);
-        hostKeepAliveIntervalRef.current = null;
-      }
-    };
-  }, [isActive, isHost, socket, isConnected, gameCode]);
-
-  // Helper to get auth context for socket events
-  const getAuthContext = useCallback(async () => {
-    if (!isSupabaseEnabled) return { authUserId: null, guestTokenHash: null, guestSessionId: null };
-
-    // Use user.id directly - don't require profile for stats recording
-    if (user?.id) {
-      return { authUserId: user.id, guestTokenHash: null, guestSessionId: null };
-    }
-
-    const guestSessionId = getGuestSessionId();
-    if (guestSessionId) {
-      const hash = await hashToken(guestSessionId);
-      return { authUserId: null, guestTokenHash: hash, guestSessionId };
-    }
-
-    return { authUserId: null, guestTokenHash: null, guestSessionId: null };
-  }, [isSupabaseEnabled, user]);
-
-  // Auto-join effect
-  useEffect(() => {
-    if (!shouldAutoJoin || !socket || !isConnected || isActive || attemptingReconnect) {
-      return;
-    }
-
-    if (prefilledRoomCode && username && username.trim()) {
-      // Capture current values to avoid stale closure issues
-      const currentUsername = username;
-      const currentProfile = profile;
-      const currentPrefilledRoomCode = prefilledRoomCode;
-
-      const autoJoinTimeout = setTimeout(async () => {
-        if (socket && socket.connected && !isActive) {
-          const authContext = await getAuthContext();
-          // Check socket is still connected after async operation
-          if (!socket.connected) {
-            logger.warn('[AUTO-JOIN] Socket disconnected during auth context build, skipping auto-join');
-            return;
-          }
-          socket.emit('join', {
-            gameCode: currentPrefilledRoomCode,
-            username: currentUsername,
-            ...authContext,
-            avatar: currentProfile ? {
-              emoji: currentProfile.avatar_emoji,
-              color: currentProfile.avatar_color,
-            } : getAvatarForName(currentUsername),
-            profilePictureUrl: currentProfile?.profile_picture_url,
-          });
-          setShouldAutoJoin(false);
-        }
-      }, 200);
-      return () => clearTimeout(autoJoinTimeout);
-    }
-    return undefined;
-  }, [shouldAutoJoin, prefilledRoomCode, username, isActive, attemptingReconnect, socket, isConnected, getAuthContext, profile]);
-
-  // Session reconnection
-  useEffect(() => {
-    if (!attemptingReconnect || !socket || !isConnected || isActive) {
-      return;
-    }
-
-    const savedSession = getSession();
-    if (!savedSession?.gameCode) {
-      Promise.resolve().then(() => setAttemptingReconnect(false));
-      return;
-    }
-
-    // Check if session is too old (more than 5 minutes of inactivity)
-    const sessionAge = Date.now() - savedSession.timestamp;
-    const maxInactivity = 5 * 60 * 1000; // 5 minutes
-
-    if (sessionAge > maxInactivity) {
-      // Session is too old, don't auto-reconnect - user needs to manually rejoin
-      logger.log('[SESSION] Session too old for auto-reconnect, clearing session');
-      clearSession();
-      Promise.resolve().then(() => setAttemptingReconnect(false));
-      return;
-    }
-
-    const reconnectTimeout = setTimeout(async () => {
-      const authContext = await getAuthContext();
-
-      if (savedSession.isHost) {
-        if (!savedSession.roomName || !savedSession.hostUsername) {
-          clearSession();
-          setAttemptingReconnect(false);
-          return;
-        }
-        socket.emit('createGame', {
-          gameCode: savedSession.gameCode,
-          roomName: savedSession.roomName,
-          hostUsername: savedSession.hostUsername,
-          language: savedSession.language || language,
-          ...authContext,
-          avatar: profile ? {
-            emoji: profile.avatar_emoji,
-            color: profile.avatar_color,
-          } : getAvatarForName(savedSession.hostUsername),
-          profilePictureUrl: profile?.profile_picture_url,
-        });
-      } else {
-        if (!savedSession.username) {
-          clearSession();
-          setAttemptingReconnect(false);
-          return;
-        }
-        socket.emit('join', {
-          gameCode: savedSession.gameCode,
-          username: savedSession.username,
-          ...authContext,
-          avatar: profile ? {
-            emoji: profile.avatar_emoji,
-            color: profile.avatar_color,
-          } : getAvatarForName(savedSession.username),
-          profilePictureUrl: profile?.profile_picture_url,
-        });
-      }
-    }, 500);
-
-    return () => clearTimeout(reconnectTimeout);
-  }, [attemptingReconnect, isActive, socket, isConnected, language, getAuthContext, profile]);
-
-  const handleJoin = useCallback(async (isHostMode: boolean, roomLang?: Language | null, overrideGameCode?: string, overrideRoomName?: string) => {
-    console.log(`🎮 [JOIN] handleJoin called - mode: ${isHostMode ? 'HOST' : 'PLAYER'}, socket connected: ${socket?.connected}`);
-
-    if (!socket || !isConnected) {
-      console.error('❌ [JOIN] Cannot join - socket not connected', { socket: !!socket, isConnected });
-      setError(t('errors.notConnected') || 'Not connected to server');
-      toast.error(t('common.notConnected') || 'Not connected to server', {
-        duration: 3000,
-        icon: '⚠️',
-      });
-      return;
-    }
-
-    // Wait for auth to finish loading before creating/joining game
-    // But allow joining after 5 seconds even if auth is still loading (to prevent permanent block)
-    const AUTH_LOADING_TIMEOUT = 5000;
-    const authLoadingTooLong = authLoadingStartTime && (Date.now() - authLoadingStartTime > AUTH_LOADING_TIMEOUT);
-
-    if (loading && !authLoadingTooLong) {
-      logger.log('[AUTH] Auth still loading, waiting...');
-      toast.error(t('common.loadingProfile') || 'Loading profile, please wait...', {
-        duration: 2000,
-        icon: '⏳',
-      });
-      return;
-    }
-
-    if (authLoadingTooLong) {
-      logger.warn('[AUTH] Auth loading timed out, proceeding without profile');
-    }
-
-    // Compute the correct username at join time to avoid stale state issues
-    // When authenticated, always prefer the profile/OAuth display name over any generated guest name
-    let effectiveUsername = user
-      ? (profile?.display_name ||
-        user?.user_metadata?.full_name ||
-        user?.user_metadata?.name ||
-        user?.email?.split('@')[0] ||
-        username)
-      : username;
-
-    // For guests without a username, generate a fun random name on the spot
-    // This handles cases where handleJoin is called before the auth effect runs
-    let generatedAvatar: { emoji: string; color: string } | null = null;
-    if (!effectiveUsername?.trim() && !user) {
-      const { name, avatar } = getRandomDefaultNameWithAvatar(language);
-      effectiveUsername = name;
-      generatedAvatar = avatar;
-      setGuestAvatar(avatar);
-      logger.log('[JOIN] Generated random name for guest:', name);
-    }
-
-    // Also update state to keep it in sync for future use
-    if (effectiveUsername !== username) {
-      setUsername(effectiveUsername);
-    }
-
-    // Get selected avatar image from localStorage (includes user's selection from modal)
-    const avatarImageId = getStoredAvatarId();
-
-    // Determine avatar to use: prioritize modal selection > profile > guest state > just-generated > derive from name
-    const effectiveAvatar = profile
-      ? { emoji: profile.avatar_emoji, color: profile.avatar_color, avatarImage: avatarImageId || profile.avatar_image }
-      : {
-        ...(generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername)),
-        avatarImage: avatarImageId || undefined
-      };
-
-    setError('');
-    setIsJoining(true); // Show loading state
-
-    // Safety timeout: clear isJoining after 10 seconds if no response
-    const safetyTimeout = setTimeout(() => {
-      setIsJoining(false);
-      console.warn('⏱️ [JOIN] Safety timeout triggered - no response received within 10 seconds');
-      logger.warn('[JOIN] Safety timeout triggered - no response received within 10 seconds');
-      toast.error(t('errors.connectionTimeout') || 'Connection timeout. Please try again.', {
-        duration: 4000,
-        icon: '⚠️',
-      });
-    }, 10000);
-
-    // Clear safety timeout when response is received (via joined/error/rateLimited events)
-    const clearSafetyTimeout = () => clearTimeout(safetyTimeout);
-    socket.once('joined', clearSafetyTimeout);
-    socket.once('error', clearSafetyTimeout);
-    socket.once('joinedAsSpectator', clearSafetyTimeout);
-    socket.once('rateLimited', clearSafetyTimeout);
-
-    // Use overrideGameCode if provided, otherwise use state gameCode
-    const codeToUse = overrideGameCode || gameCode;
-
-    // Build auth context for game result tracking
-    let authUserId = null;
-    let guestTokenHash = null;
-    let guestSessionId: string | null = null;
-
-    if (isSupabaseEnabled) {
-      // For stats recording, we only need the user.id from Supabase auth
-      // Don't require profile to exist - user may have logged in but not completed profile setup
-      if (user?.id) {
-        // Authenticated user (has Supabase auth, regardless of profile status)
-        authUserId = user.id;
-        logger.log('[AUTH] Joining as authenticated user:', { authUserId, username: effectiveUsername, hasProfile: !!profile });
-      } else {
-        // Guest user - get or create guest session
-        guestSessionId = getGuestSessionId();
-        if (guestSessionId) {
-          guestTokenHash = await hashToken(guestSessionId);
-        }
-        logger.log('[AUTH] Joining as guest:', { hasUser: !!user, guestTokenHash: !!guestTokenHash, guestSessionId: !!guestSessionId });
-      }
-    }
-
-    if (isHostMode) {
-      // For hosts, determine username and room name separately
-      // Authenticated users: use their display name as username, custom room name for room
-      // Guest users: use both hostUsername and roomName from state
-      const finalHostUsername = user ? effectiveUsername : (hostUsername || effectiveUsername);
-      // Use overrideRoomName if provided (from direct submission), or fall back to state, or generate default
-      // Use dash instead of apostrophe to avoid validation issues with special characters
-      const finalRoomName = sanitizeRoomName(overrideRoomName || roomName || `${finalHostUsername} Room`);
-
-      // For hosts: prioritize modal selection, then profile, then generated/guest avatar
-      const hostAvatar = profile
-        ? { emoji: profile.avatar_emoji, color: profile.avatar_color, avatarImage: avatarImageId || profile.avatar_image }
-        : {
-          ...(generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername)),
-          avatarImage: avatarImageId || undefined
-        };
-
-      const createGamePayload = {
-        gameCode: codeToUse,
-        roomName: finalRoomName,
-        hostUsername: finalHostUsername,
-        language: roomLang || language,
-        authUserId,
-        guestTokenHash,
-        guestSessionId,
-        avatar: hostAvatar,
-        profilePictureUrl: profile?.profile_picture_url,
-      };
-
-      // Production-safe logging (always visible)
-      console.log('[JOIN] Emitting createGame event:', {
-        gameCode: codeToUse,
-        roomName: finalRoomName,
-        hostUsername: finalHostUsername,
-        language: roomLang || language,
-        hasAuth: !!authUserId,
-        hasGuestToken: !!guestTokenHash,
-        hasAvatar: !!hostAvatar,
-        socketConnected: socket.connected,
-        socketId: socket.id
-      });
-
-      socket.emit('createGame', createGamePayload);
-
-      console.log('[JOIN] createGame event emitted, waiting for response...');
-    } else {
-      const joinPayload = {
-        gameCode: codeToUse,
-        username: effectiveUsername,
-        authUserId,
-        guestTokenHash,
-        guestSessionId,
-        avatar: effectiveAvatar,
-        profilePictureUrl: profile?.profile_picture_url,
-      };
-
-      logger.log('[JOIN] Emitting join event:', {
-        gameCode: codeToUse,
-        username: effectiveUsername,
-        hasAuth: !!authUserId,
-        hasGuestToken: !!guestTokenHash,
-        socketConnected: socket.connected,
-        socketId: socket.id
-      });
-
-      socket.emit('join', joinPayload);
-
-      logger.log('[JOIN] join event emitted, waiting for response...');
-    }
-  }, [socket, isConnected, gameCode, username, roomName, language, t, isSupabaseEnabled, user, profile, loading, authLoadingStartTime, guestAvatar, hostUsername]);
-
-  const refreshRooms = useCallback(() => {
-    if (socket && isConnected) {
-      setRoomsLoading(true);
-      socket.emit('getActiveRooms');
-    }
-  }, [socket, isConnected]);
-
-  const handleUpgradeToPlayer = useCallback(() => {
-    if (!socket || !gameCode) {
-      logger.warn('[SPECTATOR] Cannot upgrade: no socket or gameCode');
-      return;
-    }
-
-    logger.info('[SPECTATOR] Requesting upgrade to player in game:', gameCode);
-    socket.emit('upgradeToPlayer', { gameCode });
-  }, [socket, gameCode]);
-
-  const handleReturnToRoom = useCallback(() => {
-    // Emit ready confirmation to server before hiding results
-    if (socket && gameCode) {
-      socket.emit('confirmReadyForNextGame');
-    }
-    setShowResults(false);
-    setResultsData(null);
-    // Reset game state atomically - these must be reset together to prevent
-    // calculateGameDuration() from returning stale/incorrect values
-    setPendingGameStart(null);
-    setGameStartTime(null);
-    // Reset stored duration for next game
-    gameDurationRef.current = null;
-  }, [socket, gameCode]);
-
-  const handleShowResults = useCallback((data: unknown) => {
-    setResultsData(data as ResultsData);
-    setShowResults(true);
-  }, []);
-
-  // Calculate and store game duration when results are first shown
-  // This ensures the duration remains stable even if gameStartTime/pendingGameStart are reset
-  useEffect(() => {
-    if (showResults && resultsData && gameDurationRef.current === null) {
-      // Calculate duration once when results are first shown
-      if (gameStartTime && pendingGameStart?.timerSeconds) {
-        // Calculate actual elapsed time, but cap at configured timer duration
-        const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-        gameDurationRef.current = Math.min(elapsed, pendingGameStart.timerSeconds);
-      } else {
-        // Fallback to configured duration if we don't have start time
-        gameDurationRef.current = pendingGameStart?.timerSeconds || 180;
-      }
-    }
-  }, [showResults, resultsData, gameStartTime, pendingGameStart]);
-
-  // Memoized game duration - uses ref value if available, otherwise calculates
-  // This ensures stable duration value for cognitive scoring calculations
-  const gameDuration = useMemo(() => {
-    // If we have a stored duration from when results were shown, use it
-    // This prevents recalculation if state is reset before cognitive scoring executes
-    if (gameDurationRef.current !== null) {
-      return gameDurationRef.current;
-    }
-    
-    // Fallback calculation if ref not set yet (shouldn't happen in normal flow)
-    if (!showResults || !resultsData) {
-      return pendingGameStart?.timerSeconds || 180;
-    }
-    
-    if (gameStartTime && pendingGameStart?.timerSeconds) {
-      const elapsed = Math.floor((Date.now() - gameStartTime) / 1000);
-      return Math.min(elapsed, pendingGameStart.timerSeconds);
-    }
-    return pendingGameStart?.timerSeconds || 180;
-  }, [showResults, resultsData, gameStartTime, pendingGameStart]);
-
-  // QuickJoinView handlers removed - invitation flow now handled by MultiplayerFlow
-
-  // Manual reconnect handler
-  const handleManualReconnect = useCallback(() => {
-    if (socket && !socket.connected) {
-      socket.connect();
-    }
-  }, [socket]);
-
-  // Create context value
-  const socketContextValue = {
-    socket,
-    isConnected,
-    connectionError: error,
-    isReconnecting: attemptingReconnect,
-    reconnectAttempt: 0, // Local override doesn't track attempts
-    maxReconnectAttempts: 20,
-    manualReconnect: handleManualReconnect,
-  };
-
-  const renderView = () => {
-    if (showResults) {
-      return (
-        <FeatureErrorBoundary featureName="Results">
-          <ResultsPage
-            finalScores={resultsData?.scores ?? null}
-            gameCode={gameCode}
-            onReturnToRoom={handleReturnToRoom}
-            username={username}
-            socket={socket}
-            duplicateRuleDisabled={resultsData?.duplicateRuleDisabled}
-            playerCount={resultsData?.playerCount}
-            isHost={isHost}
-            roomLanguage={roomLanguage ?? undefined}
-            gridSize={resultsData?.letterGrid && Array.isArray(resultsData.letterGrid) && resultsData.letterGrid.length > 0 ? resultsData.letterGrid.length : 4}
-            gameDuration={gameDuration}
-          />
-        </FeatureErrorBoundary>
-      );
-    }
-
-    if (!isActive) {
-      // MultiplayerFlow handles both normal flow and invitation links
-      // When prefilledRoomCode is set, it shows InvitationQuickJoin or ProfileSetup accordingly
-      return (
-        <FeatureErrorBoundary featureName="Lobby">
-          <MultiplayerFlow
-            handleJoin={handleJoin}
-            refreshRooms={refreshRooms}
-            activeRooms={activeRooms}
-            roomsLoading={roomsLoading}
-            isJoining={isJoining}
-            isAuthenticated={isAuthenticated}
-            displayName={profile?.display_name ?? ''}
-            profileAvatarId={profile?.avatar_image}
-            profilePictureUrl={profile?.profile_picture_url}
-            prefilledRoom={prefilledRoomCode}
-            defaultLanguage={language as Language}
-            setGameCode={setGameCode}
-            setUsername={setUsername}
-            setRoomName={setRoomName}
-            setHostUsername={setHostUsername}
-          />
-        </FeatureErrorBoundary>
-      );
-    }
-
-    if (isHost) {
-      return (
-        <FeatureErrorBoundary featureName="Host Game">
-          <HostView gameCode={gameCode} roomLanguage={roomLanguage ?? undefined} initialPlayers={playersInRoom} username={username} onShowResults={handleShowResults} />
-        </FeatureErrorBoundary>
-      );
-    }
-
-    return (
-      <FeatureErrorBoundary featureName="Player Game">
-        <PlayerView
-          gameCode={gameCode}
-          username={username}
-          onShowResults={handleShowResults}
-          initialPlayers={playersInRoom}
-          pendingGameStart={pendingGameStart}
-          onGameStartConsumed={() => setPendingGameStart(null)}
-          roomLanguage={roomLanguage}
-        />
-      </FeatureErrorBoundary>
-    );
-  };
-
+export default async function MultiplayerPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const content = seoContent[locale] ?? seoContent.en;
+  const origin = 'https://www.lexiclash.live';
   return (
-    <SocketContext.Provider value={socketContextValue}>
-      {/* Connection status indicator */}
-      <ConnectionDot />
-
-      {/* Training gateway modal - prompts new players to try training first */}
-      <TrainingGatewayModal
-        isOpen={showTrainingGateway}
-        onClose={() => setShowTrainingGateway(false)}
-        onSkip={() => setShowTrainingGateway(false)}
-        returnTo="multiplayer"
+    <>
+      {/* Preload the lobby hero mascot from the FIRST server HTML response so the
+          browser fetches it while the (ssr:false) multiplayer JS downloads — the
+          mascot is the LCP element once the lobby mounts. first-timer variant is
+          the cold-visit case; returning users have it cached. React hoists this
+          rel=preload link into <head>. */}
+      <link rel="preload" as="image" href="/mascot/play.webp" type="image/webp" fetchPriority="high" />
+      <VideoGameJsonLd
+        mode="multiplayer"
+        locale={locale}
+        name={content.title}
+        description={content.description}
+        playMode="MultiPlayer"
+        numberOfPlayers={{ minValue: 2, maxValue: 8 }}
       />
-
-      {/* Spectator status banner */}
-      <SpectatorBanner
-        isSpectating={isSpectator}
-        onRequestUpgrade={handleUpgradeToPlayer}
-        t={t}
-        spectatorCount={spectators.length}
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'LexiClash', url: `${origin}/${locale}` },
+          { name: content.title, url: `${origin}/${locale}/multiplayer` },
+        ]}
       />
-
-      <AutoHideHeader />
-      <ErrorBoundary>
-        <div id="main-content" tabIndex={-1}>
-          {renderView()}
-        </div>
-      </ErrorBoundary>
-    </SocketContext.Provider>
+      <MultiplayerPageClient />
+      <GamePageSeoContent
+        title={content.title}
+        description={content.description}
+        features={content.features}
+        faq={content.faq}
+      />
+    </>
   );
 }

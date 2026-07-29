@@ -1,14 +1,19 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Trophy, Clock, ChevronDown, ChevronUp, Sparkles, Share2, Check, Copy } from 'lucide-react';
+import { useSafeInterval } from '@/hooks/useSafeTimeout';
+import { m, AnimatePresence } from 'framer-motion';
+import { Users, Trophy, ChevronDown, ChevronUp, Share2, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getRankDisplay } from '@/utils/rankingStyles';
+import { Loader } from '@/components/ui/Loader';
 import { getPuzzleNumber } from '@/utils/dailyChallenge';
-import { formatDistanceToNow, getCountryFlag } from '@/shared/utils';
+import { shareWithFallback } from '@/utils/shareWithFallback';
+import { getCountryFlag } from '@/shared/utils';
 import Avatar from '@/components/Avatar';
 import type { Language } from '@/types';
+
+import ParticipantRow from './DailyLeaderboardParticipantRow';
+import VirtualizedParticipantList from './VirtualizedParticipantList';
 
 // ==========================================
 // Types
@@ -21,7 +26,7 @@ export interface DailyParticipant {
   avatar_emoji: string;
   avatar_color: string;
   avatar_image?: string | null;
-  profile_picture_url?: string | null;
+  custom_avatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   country_code?: string | null;
   score: number;
   word_count: number;
@@ -45,144 +50,8 @@ interface DailyLeaderboardProps {
   compact?: boolean;
   maxVisible?: number;
   t: (key: string) => string;
-  gameType?: 'puzzle' | 'wordHunt';
+  gameType?: 'puzzle' | 'wordHunt' | 'wordWheel';
 }
-
-// ==========================================
-// Helper Components
-// ==========================================
-
-const ParticipantRow = memo<{
-  participant: DailyParticipant;
-  index: number;
-  isCurrentUser: boolean;
-  compact: boolean;
-  gameType: 'puzzle' | 'wordHunt';
-  t: (key: string) => string;
-}>(({ participant, index, isCurrentUser, compact, gameType, t }) => {
-  const rank = participant.rank_position;
-  const isTopThree = rank <= 3;
-  const countryFlag = getCountryFlag(participant.country_code);
-
-  // Format time since completion
-  const timeAgo = formatDistanceToNow(participant.completed_at, t);
-
-  // Enhanced rank colors for better contrast
-  const getRankColors = () => {
-    if (isCurrentUser) {
-      return 'bg-gradient-to-r from-neo-cyan/40 to-neo-cyan/20 border-neo-cyan shadow-[0_0_12px_rgba(0,255,255,0.3)] ring-2 ring-neo-cyan/60';
-    }
-    if (rank === 1) {
-      return 'bg-gradient-to-r from-amber-100 to-yellow-50 dark:from-amber-900/40 dark:to-yellow-900/20 border-amber-400 dark:border-amber-500';
-    }
-    if (rank === 2) {
-      return 'bg-gradient-to-r from-slate-100 to-gray-50 dark:from-slate-700/60 dark:to-slate-800/40 border-slate-400 dark:border-slate-400';
-    }
-    if (rank === 3) {
-      return 'bg-gradient-to-r from-orange-100 to-amber-50 dark:from-orange-900/40 dark:to-amber-900/20 border-orange-400 dark:border-orange-500';
-    }
-    return 'bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-600 hover:border-slate-300 dark:hover:border-slate-500';
-  };
-
-  // Rank badge colors
-  const getRankBadgeColors = () => {
-    if (rank === 1) return 'bg-gradient-to-br from-amber-400 to-yellow-500 text-amber-900 border-amber-600';
-    if (rank === 2) return 'bg-gradient-to-br from-slate-300 to-gray-400 text-slate-800 border-slate-500';
-    if (rank === 3) return 'bg-gradient-to-br from-orange-400 to-amber-500 text-orange-900 border-orange-600';
-    return 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-500';
-  };
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.3 }}
-      className={`
-        flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3.5 rounded-xl border-2 transition-all duration-200
-        ${getRankColors()}
-        ${compact ? 'py-2' : ''}
-        ${isCurrentUser ? 'scale-[1.02]' : 'hover:scale-[1.01]'}
-      `}
-    >
-      {/* Rank Badge */}
-      <div
-        className={`
-          w-9 h-9 sm:w-11 sm:h-11 rounded-xl flex items-center justify-center font-black text-sm sm:text-base
-          ${getRankBadgeColors()}
-          border-2 shadow-sm
-        `}
-      >
-        {getRankDisplay(rank)}
-      </div>
-
-      {/* Avatar with Country Flag */}
-      <div className="relative">
-        <div className="w-9 h-9 sm:w-11 sm:h-11 border-2 border-neo-black/80 shadow-sm rounded-xl overflow-hidden">
-          <Avatar
-            profilePictureUrl={participant.profile_picture_url ?? undefined}
-            avatarImage={participant.avatar_image ?? undefined}
-            size="md"
-            className="w-full h-full"
-          />
-        </div>
-        {/* Country Flag Badge */}
-        {countryFlag && (
-          <div className="absolute -bottom-1 -right-1 text-sm sm:text-base drop-shadow-sm" title={participant.country_code || undefined}>
-            {countryFlag}
-          </div>
-        )}
-      </div>
-
-      {/* Name & Score */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 flex-wrap">
-          <span className={`font-bold truncate text-sm sm:text-base ${isCurrentUser ? 'text-neo-cyan dark:text-neo-cyan' : 'text-slate-800 dark:text-white'}`}>
-            {participant.display_name || 'Player'}
-          </span>
-          {isCurrentUser && (
-            <span className="text-[10px] sm:text-xs bg-neo-cyan text-neo-black px-2 py-0.5 rounded-full font-black shrink-0 shadow-sm animate-pulse">
-              YOU
-            </span>
-          )}
-          {rank === 1 && (
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 shrink-0 animate-pulse" />
-          )}
-        </div>
-        <div className="text-xs sm:text-sm flex items-center gap-2 mt-0.5">
-          {gameType === 'wordHunt' ? (
-            <>
-              <span className={`font-bold ${participant.solved ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500 dark:text-rose-400'}`}>
-                {participant.solved ? `✓ ${t('wordHunt.leaderboard.solved')}` : `✗ ${t('wordHunt.leaderboard.failed')}`}
-              </span>
-              {participant.solved && (
-                <>
-                  <span className="text-slate-400 dark:text-slate-500">•</span>
-                  <span className="text-slate-600 dark:text-slate-300 font-medium">{participant.attempts_used} {t('wordHunt.leaderboard.attempts')}</span>
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <span className="font-bold text-indigo-600 dark:text-indigo-400">{participant.score} {t('wordHunt.leaderboard.pts')}</span>
-              <span className="text-slate-400 dark:text-slate-500">•</span>
-              <span className="text-slate-600 dark:text-slate-300 font-medium">{participant.word_count} {t('wordHunt.leaderboard.words')}</span>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Time */}
-      {!compact && (
-        <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 bg-slate-100/50 dark:bg-slate-700/50 px-2 py-1 rounded-lg">
-          <Clock className="w-3.5 h-3.5" />
-          <span>{timeAgo}</span>
-        </div>
-      )}
-    </motion.div>
-  );
-});
-
-ParticipantRow.displayName = 'ParticipantRow';
 
 // ==========================================
 // Main Component
@@ -218,7 +87,9 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       // Use the correct API endpoint based on game type
       const basePath = gameType === 'wordHunt'
         ? `/api/daily-challenge/word-hunt/leaderboard`
-        : `/api/daily-challenge/leaderboard`;
+        : gameType === 'wordWheel'
+          ? `/api/daily-challenge/word-wheel/leaderboard`
+          : `/api/daily-challenge/leaderboard`;
       const url = `${basePath}/${puzzleDate}/${language}?limit=50`;
       const response = await fetch(url);
 
@@ -229,7 +100,10 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       }
 
       const data = await response.json();
-      console.log('Leaderboard data:', { url, date: puzzleDate, language, gameType, participants: data.data?.length, total: data.totalParticipants, totalAttempts: data.totalAttempts, guestPlayerCount: data.guestPlayerCount });
+      // BUG-007: Wrap debug logs in dev check
+      if (process.env.NODE_ENV === 'development') {
+        console.log('Leaderboard data:', { url, date: puzzleDate, language, gameType, participants: data.data?.length, total: data.totalParticipants, totalAttempts: data.totalAttempts, guestPlayerCount: data.guestPlayerCount });
+      }
       setParticipants(data.data || []);
       setTotalCount(data.totalParticipants || 0);
       setTotalAttempts(data.totalAttempts || 0);
@@ -240,29 +114,25 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       }
     } catch (err) {
       console.error('Failed to fetch daily leaderboard:', err);
-      setError('Failed to load leaderboard');
+      setError(t('errors.failedToLoadLeaderboard'));
     } finally {
       setLoading(false);
     }
-  }, [puzzleDate, language, onParticipantCountChange, gameType]);
+  }, [puzzleDate, language, onParticipantCountChange, gameType, t]);
 
   // Initial fetch and polling - pause when tab is not visible
+  const pollingInterval = useSafeInterval();
+
   useEffect(() => {
     fetchLeaderboard();
 
-    let interval: NodeJS.Timeout | null = null;
-
     const startPolling = () => {
-      if (interval) clearInterval(interval);
       // Poll every 30 seconds for updates
-      interval = setInterval(fetchLeaderboard, 30000);
+      pollingInterval.start(fetchLeaderboard, 30000);
     };
 
     const stopPolling = () => {
-      if (interval) {
-        clearInterval(interval);
-        interval = null;
-      }
+      pollingInterval.stop();
     };
 
     const handleVisibilityChange = () => {
@@ -285,7 +155,7 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
       stopPolling();
       document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [fetchLeaderboard]);
+  }, [fetchLeaderboard, pollingInterval]);
 
   // Check if current user is in the list
   const isCurrentUser = (participant: DailyParticipant) => {
@@ -341,31 +211,23 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
     const shareUrl = `${origin}/${language}/daily?share=${encodeURIComponent(ogParams.toString())}`;
 
     // Build share text based on game type
+    const gameLabel = gameType === 'wordHunt' ? 'Word Hunt'
+      : gameType === 'wordWheel' ? 'Word Wheel'
+      : 'Daily';
     const shareText = gameType === 'wordHunt'
-      ? `🎯 I ranked #${currentUserData.rank_position} on LexiClash Word Hunt #${puzzleNumber}! ${currentUserData.solved ? `Solved in ${currentUserData.attempts_used}/10` : 'X/10'}\n\n`
-      : `🎯 I ranked #${currentUserData.rank_position} on LexiClash Daily #${puzzleNumber}! ${currentUserData.score ?? 0} pts | ${currentUserData.word_count ?? 0} words\n\n`;
+      ? `🎯 I ranked #${currentUserData.rank_position} on LexiClash ${gameLabel} #${puzzleNumber}! ${currentUserData.solved ? `Solved in ${currentUserData.attempts_used}/10` : 'X/10'}\n\n`
+      : `🎯 I ranked #${currentUserData.rank_position} on LexiClash ${gameLabel} #${puzzleNumber}! ${currentUserData.score ?? 0} pts | ${currentUserData.word_count ?? 0} words\n\n`;
 
-    // Try native share first
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `LexiClash Daily #${puzzleNumber}`,
-          text: shareText,
-          url: shareUrl,
-        });
-        return;
-      } catch (err) {
-        // User cancelled or error - fall through to copy
-      }
-    }
+    const result = await shareWithFallback({
+      title: `LexiClash ${gameLabel} #${puzzleNumber}`,
+      text: shareText,
+      url: shareUrl,
+      clipboardText: shareText + shareUrl,
+    });
 
-    // Fallback to clipboard
-    try {
-      await navigator.clipboard.writeText(shareText + shareUrl);
+    if (result === 'copied') {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
     }
   }, [currentUserData, puzzleDate, language, gameType]);
 
@@ -388,18 +250,18 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
   // Empty state - no successful players on leaderboard
   if (!loading && filteredParticipants.length === 0) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         className={`
-          bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95
+          bg-linear-to-br from-white/95 to-slate-50/95 dark:from-neo-navy/95 dark:to-neo-navy/90
           rounded-2xl border-2 border-slate-200 dark:border-slate-700
           ${compact ? 'p-3' : 'p-4 sm:p-5'}
-          shadow-lg backdrop-blur-sm
+          shadow-lg
         `}
       >
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
+          <div className="p-2 sm:p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
             <Users className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           </div>
           <div>
@@ -408,10 +270,10 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
             </h3>
             {(totalAttempts > 0 || guestPlayerCount > 0) && (
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-medium">
-                {totalAttempts} {totalAttempts === 1 ? t('daily.playerSingular') : t('daily.playersPlural')} {t('daily.tookChallenge') || 'took the challenge'}
+                {totalAttempts} {totalAttempts === 1 ? t('daily.playerSingular') : t('daily.playersPlural')} {t('daily.tookChallenge')}
                 {guestPlayerCount > 0 && (
-                  <span className="text-slate-500 dark:text-slate-500">
-                    {' '}({guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'})
+                  <span className="text-slate-500 dark:text-slate-400">
+                    {' '}({guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') : t('daily.guestsPlural')})
                   </span>
                 )}
               </p>
@@ -422,29 +284,31 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           <div className="text-4xl mb-3">🏆</div>
           <p className="text-slate-700 dark:text-slate-300 font-bold text-sm sm:text-base">
             {totalAttempts > 0
-              ? (t('daily.signUpToAppear') || 'Sign up to appear on the leaderboard!')
+              ? (t('daily.signUpToAppear'))
               : t('daily.beFirstToPlay')}
           </p>
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
+      role="region"
+      aria-label={t('daily.todaysPlayers')}
       className={`
-        bg-gradient-to-br from-white/95 to-slate-50/95 dark:from-slate-800/95 dark:to-slate-900/95
+        bg-linear-to-br from-white/95 to-slate-50/95 dark:from-neo-navy/95 dark:to-neo-navy/90
         rounded-2xl border-2 border-slate-200 dark:border-slate-700
         ${compact ? 'p-3' : 'p-4 sm:p-5'}
-        shadow-lg backdrop-blur-sm
+        shadow-lg
       `}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
+          <div className="p-2 sm:p-2.5 bg-linear-to-br from-indigo-500 to-purple-600 text-white rounded-xl border-2 border-indigo-600 shadow-md">
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6 text-amber-300" />
           </div>
           <div>
@@ -455,12 +319,12 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               {totalCount} {totalCount === 1 ? t('daily.playerSingular') : t('daily.playersPlural')}
               {guestPlayerCount > 0 && (
                 <span className="text-slate-500 dark:text-slate-500">
-                  {' '}• {guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') || 'guest' : t('daily.guestsPlural') || 'guests'}
+                  {' '}• {guestPlayerCount} {guestPlayerCount === 1 ? t('daily.guestSingular') : t('daily.guestsPlural')}
                 </span>
               )}
               {totalAttempts > totalCount + guestPlayerCount && (
                 <span className="text-slate-500 dark:text-slate-500">
-                  {' '}• {totalAttempts} {t('daily.totalAttempts') || 'total attempts'}
+                  {' '}• {totalAttempts} {t('daily.totalAttempts')}
                 </span>
               )}
             </p>
@@ -472,8 +336,8 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           <Button
             onClick={handleShareRank}
             size="sm"
-            className="px-3 py-1 h-8 bg-neo-pink hover:bg-neo-pink/90 text-white border-2 border-neo-black rounded-xl shadow-sm hover:-translate-y-0.5 transition-all"
-            aria-label="Share your rank"
+            className="px-3 py-1 h-8 bg-neo-pink hover:bg-neo-pink/90 text-white border-2 border-neo-black rounded-xl shadow-xs hover:-translate-y-0.5 transition-all"
+            aria-label={t('common.share')}
           >
             {copied ? (
               <Check className="w-3.5 h-3.5" />
@@ -486,10 +350,10 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
 
       {/* Current User Position Card - Shows when user is not in visible list */}
       {currentUserData && currentUserIndex >= maxVisible && !expanded && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-3 p-3 rounded-xl bg-gradient-to-r from-neo-cyan/30 to-neo-cyan/10 border-2 border-neo-cyan shadow-[0_0_15px_rgba(0,255,255,0.2)]"
+          className="mb-3 p-3 rounded-xl bg-linear-to-r from-neo-cyan/30 to-neo-cyan/10 border-2 border-neo-cyan shadow-[0_0_15px_rgba(0,255,255,0.2)]"
         >
           <div className="flex items-center gap-3">
             {/* Your Rank Badge */}
@@ -506,11 +370,12 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                 </span>
               </div>
               <div className="flex items-center gap-2 mt-1">
-                <div className="w-6 h-6 rounded-lg border border-neo-black/50 overflow-hidden">
+                <div className="w-10 h-10 rounded-full border-2 border-neo-cyan overflow-hidden shadow-hard-sm shrink-0">
                   <Avatar
-                    profilePictureUrl={currentUserData.profile_picture_url ?? undefined}
+
                     avatarImage={currentUserData.avatar_image ?? undefined}
-                    size="sm"
+                    customAvatar={currentUserData.custom_avatar ?? undefined}
+                    size="lg"
                     className="w-full h-full"
                   />
                 </div>
@@ -536,13 +401,13 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
               )}
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Loading state */}
       {loading && participants.length === 0 && (
         <div className="flex items-center justify-center py-8">
-          <div className="w-8 h-8 border-3 border-neo-pink border-t-transparent rounded-full animate-spin" />
+          <Loader size="md" />
         </div>
       )}
 
@@ -561,24 +426,36 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
 
       {/* Participants list */}
       {!error && (
-        <div className="space-y-2">
-          <AnimatePresence mode="popLayout">
-            {visibleParticipants.map((participant, index) => (
-              <ParticipantRow
-                key={participant.player_id || participant.guest_fingerprint || index}
-                participant={participant}
-                index={index}
-                isCurrentUser={isCurrentUser(participant)}
-                compact={compact}
-                gameType={gameType}
-                t={t}
-              />
-            ))}
-          </AnimatePresence>
+        <div>
+          {expanded && visibleParticipants.length > 15 ? (
+            <VirtualizedParticipantList
+              participants={visibleParticipants}
+              isCurrentUser={isCurrentUser}
+              compact={compact}
+              gameType={gameType}
+              t={t}
+            />
+          ) : (
+            <div className="space-y-2" role="list" aria-label={t('daily.todaysPlayers')}>
+              <AnimatePresence mode="popLayout">
+                {visibleParticipants.map((participant, index) => (
+                  <ParticipantRow
+                    key={participant.player_id || participant.guest_fingerprint || index}
+                    participant={participant}
+                    index={index}
+                    isCurrentUser={isCurrentUser(participant)}
+                    compact={compact}
+                    gameType={gameType}
+                    t={t}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
 
           {/* Show more/less button */}
           {hasMore && (
-            <motion.button
+            <m.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               onClick={() => setExpanded(!expanded)}
@@ -595,11 +472,11 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
                   {t('daily.showMore')} ({filteredParticipants.length - maxVisible} {t('daily.more')})
                 </>
               )}
-            </motion.button>
+            </m.button>
           )}
         </div>
       )}
-    </motion.div>
+    </m.div>
   );
 };
 

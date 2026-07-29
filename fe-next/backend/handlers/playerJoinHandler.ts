@@ -4,56 +4,57 @@
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, GameUser, Avatar, Language, LeaderboardEntry, TournamentStanding } from '@/shared/types';
+import type { GameUser, Avatar } from '@/shared/types';
 
-const {
+import {
   getGame,
   deleteGame,
   addUserToGame,
   removeUserFromGame,
-  getGameBySocketId,
+  getUsernameBySocketId,
   getSocketIdByUsername,
   getGameUsers,
   getActiveRooms,
-  updateHostSocketId,
-  updateUserSocketId,
-  getLeaderboard,
-  getTournamentIdFromGame,
-  getAuthUserConnection,
   isRoomEmpty,
   addSpectatorToGame,
   getGameSpectators,
   upgradeSpectatorToPlayer,
-  isSpectator,
   clearSocketMappingsForLeave,
   restoreGameFromRedis,
   getNextEligibleHost,
   transferHost
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const {
+import {
   broadcastToRoom,
-  broadcastToRoomExceptSender,
+  broadcastActiveRooms,
   getGameRoom,
   joinRoom,
   leaveRoom,
-  safeEmit,
-  getSocketById,
-  disconnectSocket
-} = require('../utils/socketHelpers');
+  LOBBY_ROOM,
+} from '../utils/socketHelpers.js';
 
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const timerManager = require('../utils/timerManager');
-const { cleanupGameBots } = require('../modules/botManager');
-const tournamentManager = require('../modules/tournamentManager');
-const { generateRandomAvatar } = require('../utils/gameUtils');
-const { ACHIEVEMENT_ICONS } = require('../modules/achievementManager');
-const logger = require('../utils/logger');
-const { validatePayload, joinGameSchema, leaveRoomSchema } = require('../utils/socketValidation');
-const { MAX_PLAYERS_PER_ROOM } = require('../utils/consts');
-const { isInProgress, canJoinFreely, shouldSendGameState } = require('../utils/gameStateMachine');
-const { notifyPlayerJoined } = require('../modules/notificationService');
+import { cancelAutoStartCountdown } from '../modules/lobbyAutoStart.js';
+import { emitError, ErrorCodes } from '../utils/errorHandler.js';
+import { checkRateLimit, getIpFromSocket } from '../utils/rateLimiter.js';
+import { isBlocked } from '../modules/blockListManager.js';
+import timerManager, { clearGameTimer } from '../utils/timerManager.js';
+import { cleanupGameBots } from '../modules/botManager.js';
+import gameStartCoordinator from '../utils/gameStartCoordinator.js';
+import { startGameTimer, resumeGameTimerIfMissing } from '../services/gameLifecycle/gameTimer.js';
+import { generateRandomAvatar } from '../utils/gameUtils.js';
+import logger from '../utils/logger.js';
+import { validatePayload, joinGameSchema } from '../utils/socketValidation.js';
+import { MAX_PLAYERS_PER_ROOM } from '../utils/consts.js';
+import { isInProgress, shouldSendGameState } from '../utils/gameStateMachine.js';
+import { notifyPlayerJoined } from '../modules/notificationService.js';
+import {
+  handleReconnection,
+  handleLateJoin,
+  handleTournamentJoin,
+  handleExistingAuthConnectionJoin
+} from './playerReconnectHandler';
+import { ensurePlayerState } from './playerDataInit';
 
 // Types for payloads
 interface JoinGamePayload {
@@ -64,7 +65,6 @@ interface JoinGamePayload {
   authUserId?: string;
   guestTokenHash?: string;
   guestSessionId?: string;
-  profilePictureUrl?: string;
 }
 
 interface LeaveRoomPayload {
@@ -74,25 +74,6 @@ interface LeaveRoomPayload {
 
 interface UpgradeToPlayerPayload {
   gameCode: string;
-}
-
-interface AuthConnectionResult {
-  handled: boolean;
-  existingUsername?: string;
-  isHost?: boolean;
-}
-
-interface AuthConnection {
-  socketId: string;
-  gameCode: string;
-  username: string;
-  isHost: boolean;
-}
-
-interface Spectator {
-  username: string;
-  socketId: string;
-  avatar?: Avatar;
 }
 
 /**
@@ -112,13 +93,21 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     // Validate payload
     const validation = validatePayload(joinGameSchema, data);
     if (!validation.success) {
-      emitError(socket, `Invalid request: ${validation.error}`);
+      // Typed (LOW severity → debug, not Sentry) — bad username is expected user
+      // input, not a fault. Sentry JAVASCRIPT-NEXTJS-1MB/1MC/1MD.
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
       return;
     }
 
-    let { gameCode, username, playerId, avatar, authUserId, guestTokenHash, guestSessionId, profilePictureUrl } = validation.data as JoinGamePayload;
+    let { gameCode, username, playerId, avatar, authUserId: clientAuthUserId, guestTokenHash, guestSessionId } = validation.data as JoinGamePayload;
 
-    logger.info('SOCKET', `Join request: ${username} to game ${gameCode}`);
+    // Use server-verified user ID if available (from JWT middleware), ignore client-supplied value
+    const authUserId = (socket.data?.verifiedUserId as string | undefined) || undefined;
+    if (clientAuthUserId && authUserId && clientAuthUserId !== authUserId) {
+      logger.warn('SOCKET', `Auth ID mismatch for ${username}: client="${clientAuthUserId}" verified="${authUserId}"`);
+    }
+
+    logger.info('SOCKET', `Join request: ${username} to game ${gameCode}${authUserId ? ` (verified: ${authUserId})` : ' (guest)'}`);
 
     let game = getGame(gameCode);
     if (!game) {
@@ -127,10 +116,23 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         game = restoredGame;
         logger.info('SOCKET', `Restored game ${gameCode} from Redis for join request`);
       } else {
-        emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+        emitError(socket, ErrorCodes.GAME_NOT_FOUND);
         return;
       }
     }
+
+    // A server restart/redeploy wipes the in-memory setInterval game clock
+    // (round countdown + word-hunt life drain) and bot loops while Redis keeps
+    // the game state. Whichever path rehydrated this game (the sync getGame
+    // above, or an async restore upstream), an in-progress game whose timer was
+    // orphaned must have it resumed — otherwise the round is frozen: word-hunt
+    // life stays pinned at its last value, the round never ends, and players
+    // can still submit words (the "stuck at full life for everyone" report).
+    // No-op for normal live reconnects (a timer is already running) and for
+    // waiting/finished games — see resumeGameTimerIfMissing's guards.
+    // Awaited so the dictionary is warm (bot solving + word validation) before
+    // the resumed round runs.
+    await resumeGameTimerIfMissing(io, gameCode);
 
     // Handle multi-tab detection and existing auth connection
     if (authUserId) {
@@ -140,13 +142,51 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
         logger.info('SOCKET', `Using existing username "${authResult.existingUsername}" instead of "${username}" for auth user reconnection`);
         username = authResult.existingUsername;
       }
+    } else if (guestTokenHash) {
+      // Audit HIGH #4 (2026-05-10): guest reconnect path. If a guest host
+      // returns to their game (sessionStorage cleared, new tab, etc.) and
+      // picks a different display name, the username-based reconnect lookup
+      // would miss them — they'd land as a brand-new player without host
+      // status. Match on guestTokenHash instead so they reclaim their slot.
+      for (const [existingName, user] of Object.entries(game.users)) {
+        if (user.guestTokenHash && user.guestTokenHash === guestTokenHash) {
+          if (existingName !== username) {
+            logger.info('SOCKET', `Guest reconnect by tokenHash: "${username}" → existing slot "${existingName}" in game ${gameCode}`);
+            username = existingName;
+          }
+          break;
+        }
+      }
+    }
+
+    // Block kicked players from re-joining
+    if (game.kickedPlayers?.has(username)) {
+      emitError(socket, ErrorCodes.PLAYER_KICKED, { message: 'You have been kicked from this room' });
+      return;
+    }
+
+    // Global moderation blocklist (admin-issued): refuse the verified player
+    // (auth user id), the guest (guest session id), or any client behind a
+    // blocked IP. Checked here — before reconnection/late-join — so a blocked
+    // user cannot reclaim a slot or rejoin under a new name.
+    const blockMatch = await isBlocked({
+      authUserId,
+      guestSessionId,
+      ip: getIpFromSocket(socket),
+    });
+    if (blockMatch) {
+      logger.warn('SOCKET', `Blocked ${blockMatch.blockType} attempted to join ${gameCode} as ${username}`);
+      emitError(socket, ErrorCodes.PLAYER_BLOCKED, {
+        message: blockMatch.reason || 'You have been blocked from playing.',
+      });
+      return;
     }
 
     // Block late joins for ranked games (use state machine helper)
     if (game.isRanked && isInProgress(game.gameState) && !game.allowLateJoin) {
       const existingSocketId = getSocketIdByUsername(gameCode, username);
       if (!existingSocketId) {
-        emitError(socket, 'Cannot join ranked game in progress');
+        emitError(socket, ErrorCodes.GAME_CLOSED, { message: 'Cannot join ranked game in progress' });
         return;
       }
     }
@@ -159,13 +199,14 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       // Add as spectator
       const userAvatar = avatar || generateRandomAvatar();
       addSpectatorToGame(gameCode, username, socket.id, {
-        avatar: { ...userAvatar, profilePictureUrl: profilePictureUrl || null },
+        avatar: userAvatar,
         authUserId: authUserId || null,
         guestTokenHash: guestTokenHash || null,
         guestSessionId: guestSessionId || null
       });
 
       joinRoom(socket, getGameRoom(gameCode));
+      leaveRoom(socket, LOBBY_ROOM); // Stop receiving lobby broadcasts while in-game
       socket.emit('joinedAsSpectator', {
         success: true,
         gameCode,
@@ -192,8 +233,9 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     // Add new user
     const userAvatar = avatar || generateRandomAvatar();
+    logger.info('PLAYER_JOIN', `Adding user ${username} to game ${gameCode} with authUserId=${authUserId || 'NONE'}, guestHash=${guestTokenHash ? 'yes' : 'no'}`);
     addUserToGame(gameCode, username, socket.id, {
-      avatar: { ...userAvatar, profilePictureUrl: profilePictureUrl || null },
+      avatar: userAvatar,
       isHost: false,
       playerId,
       authUserId: authUserId || null,
@@ -202,7 +244,13 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     });
 
     joinRoom(socket, getGameRoom(gameCode));
+    leaveRoom(socket, LOBBY_ROOM); // Stop receiving lobby broadcasts while in-game
 
+    // `gameInProgress` lets the client arm the lost-`startGame` safety-net for
+    // late joiners (it already does this for reconnections). Without it, a
+    // late-join `startGame` that races the client's listener registration is
+    // lost silently → player stuck on a default grid while the real mode runs.
+    const gameInProgress = shouldSendGameState(game.gameState);
     socket.emit('joined', {
       success: true,
       gameCode,
@@ -210,22 +258,33 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       username,
       roomName: game.roomName,
       language: game.language,
-      users: getGameUsers(gameCode)
+      isPrivate: game.isPrivate || false,
+      users: getGameUsers(gameCode),
+      gameInProgress
     });
 
     // If game is in progress, send current state (use state machine helper)
-    if (shouldSendGameState(game.gameState)) {
+    if (gameInProgress) {
       handleLateJoin(socket, game, gameCode, username);
     }
 
     // Handle tournament join
-    handleTournamentJoin(io, socket, gameCode, username, userAvatar, profilePictureUrl);
+    handleTournamentJoin(io, socket, gameCode, username, userAvatar);
 
     // Broadcast updates
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
       users: getGameUsers(gameCode)
     });
-    io.emit('activeRooms', { rooms: getActiveRooms() });
+    broadcastActiveRooms(io, getActiveRooms());
+
+    // A newly-joined player starts un-ready, so the lobby auto-start's
+    // all-ready condition no longer holds — cancel any in-flight countdown.
+    // No-op when nothing is counting.
+    if (game.gameState === 'waiting') {
+      cancelAutoStartCountdown(gameCode, () =>
+        broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartCancelled', {})
+      );
+    }
 
     logger.info('SOCKET', `${username} joined game ${gameCode}`);
 
@@ -242,54 +301,82 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
   });
 
   // Handle leave room
-  socket.on('leaveRoom', ({ gameCode, username }: LeaveRoomPayload) => {
+  // Derive username from server-side mapping to prevent impersonation
+  socket.on('leaveRoom', ({ gameCode, username: payloadUsername }: LeaveRoomPayload) => {
+    // Light RL: each leave does state mutation + broadcast. Spam → repeated
+    // updateUsers fanouts to all lobby clients.
+    if (!checkRateLimit(socket.id)) return;
+    // Prefer socket-mapped username (auth source of truth) but fall back to
+    // the payload when the socket reconnected mid-session and lost its
+    // mapping. Without this fallback an explicit Exit silently no-ops and
+    // the user keeps showing as a "ghost" room member in the lobby.
+    const username = getUsernameBySocketId(socket.id) || payloadUsername;
     if (!gameCode || !username) return;
 
     const game = getGame(gameCode);
     if (!game) return;
+    // Verify the user is actually a member of this game — guards against a
+    // malicious payload trying to evict someone else after a socket reconnect.
+    if (!game.users[username]) return;
 
     // Check if leaving user is the host
     const isLeavingUserHost = game.hostUsername === username;
 
-    // If game is in progress or finished, mark as disconnected instead of removing
-    // This allows the player to rejoin and continue
+    // Explicit `leaveRoom` (the user pressed Exit) — always fully remove,
+    // regardless of game state. Distinct from a transport disconnect, which
+    // hits `connectionHandler` and marks the user as `disconnected: true`
+    // pending a reconnect grace window. If we kept the in-progress slot open
+    // here, the user would silently auto-resume on next visit — surprising.
     if (isInProgress(game.gameState) || game.gameState === 'finished') {
-      if (game.users[username]) {
-        game.users[username].disconnected = true;
-        game.users[username].disconnectedAt = Date.now();
+      // Cancel any pending reconnection timer from a prior network drop.
+      timerManager.clearTimer(`reconnect:${gameCode}:${username}`);
 
-        // Clear socket mappings to prevent stale socket ID issues on rejoin
-        // User data remains in game.users for score preservation
-        clearSocketMappingsForLeave(socket.id, gameCode, username);
-
-        logger.info('SOCKET', `${username} left room ${gameCode} (game in progress - marked as disconnected, can rejoin)`);
-
-        broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
-          username,
-          message: `${username} left the room`
-        });
-
-        // Update spectator list in case slot opened
-        broadcastToRoom(io, getGameRoom(gameCode), 'spectatorList', {
-          spectators: getGameSpectators(gameCode)
-        });
+      // Notify game start coordinator so ack sequence adjusts.
+      const leaveCoordResult = gameStartCoordinator.handlePlayerDisconnect(gameCode, username);
+      if (leaveCoordResult && leaveCoordResult.startTimer) {
+        startGameTimer(io, gameCode, game.gameDuration || game.timerSeconds || 180);
       }
+
+      clearSocketMappingsForLeave(socket.id, gameCode, username);
+      removeUserFromGame(gameCode, username);
+
+      logger.info('SOCKET', `${username} left room ${gameCode} (in-progress — fully removed on explicit exit)`);
+
+      broadcastToRoom(io, getGameRoom(gameCode), 'playerLeft', {
+        username,
+        message: `${username} left the room`
+      });
+
+      broadcastToRoom(io, getGameRoom(gameCode), 'spectatorList', {
+        spectators: getGameSpectators(gameCode)
+      });
     } else {
       // Game not started yet - fully remove user
+      // Audit MED #6 (2026-05-10): also clear any stale reconnect timers from
+      // a prior network flap, mirroring the in-progress branch above. Without
+      // this, a player who flapped + then explicitly leaves leaves a phantom
+      // timer in the manager that never fires (game already cleaned up) but
+      // wastes a slot in the timer map.
+      timerManager.clearTimer(`reconnect:${gameCode}:${username}`);
+      if (isLeavingUserHost) {
+        timerManager.clearTimer(`hostReconnect:${gameCode}`);
+      }
       removeUserFromGame(gameCode, username);
       logger.info('SOCKET', `${username} left room ${gameCode} (waiting state - fully removed)`);
     }
 
     leaveRoom(socket, getGameRoom(gameCode));
+    joinRoom(socket, LOBBY_ROOM); // Rejoin lobby to receive room list updates
     socket.emit('leftRoom', { success: true });
 
     // Check if room is now empty and close it immediately
     if (isRoomEmpty(gameCode)) {
       logger.info('SOCKET', `Room ${gameCode} is empty after ${username} left - closing immediately`);
-      timerManager.clearGameTimer(gameCode);
+      clearGameTimer(gameCode);
       cleanupGameBots(gameCode);
+      gameStartCoordinator.cleanupSequence(gameCode);
       deleteGame(gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
       return;
     }
 
@@ -305,21 +392,27 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
           broadcastToRoom(io, getGameRoom(gameCode), 'hostTransferred', {
             previousHost: username,
             newHost: nextHost,
-            message: `${username} left. ${nextHost} is now the host.`
+            message: `${username} left. ${nextHost} is now the host.`,
+            i18nKey: 'multiplayerFlow.hostTransferredAnnouncement',
+            i18nParams: { previousHost: username, newHost: nextHost }
           });
         }
       } else {
         // No eligible host found - close the room
         logger.info('SOCKET', `No eligible host found for game ${gameCode} after host ${username} left - closing room`);
-        timerManager.clearGameTimer(gameCode);
+        clearGameTimer(gameCode);
         cleanupGameBots(gameCode);
+        gameStartCoordinator.cleanupSequence(gameCode);
 
         broadcastToRoom(io, getGameRoom(gameCode), 'hostLeftRoomClosing', {
-          message: 'Host left and no other players available. Room is closing.'
+          message: 'Host left and no other players available. Room is closing.',
+          i18nKey: 'multiplayerFlow.hostLeftReason.explicitNoSuccessor',
+          i18nParams: { host: username },
+          reason: 'explicit_no_successor'
         });
 
         deleteGame(gameCode);
-        io.emit('activeRooms', { rooms: getActiveRooms() });
+        broadcastActiveRooms(io, getActiveRooms());
         return;
       }
     }
@@ -327,25 +420,26 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
       users: getGameUsers(gameCode)
     });
-    io.emit('activeRooms', { rooms: getActiveRooms() });
+    broadcastActiveRooms(io, getActiveRooms());
   });
 
   // Handle spectator upgrade to player
   socket.on('upgradeToPlayer', ({ gameCode }: UpgradeToPlayerPayload) => {
+    if (!checkRateLimit(socket.id)) return;
     if (!gameCode) return;
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     // Find spectator by socket ID
-    const spectators: Spectator[] = getGameSpectators(gameCode);
+    const spectators = getGameSpectators(gameCode);
     const spectator = spectators.find(s => s.socketId === socket.id);
 
     if (!spectator) {
-      emitError(socket, 'You are not a spectator in this game');
+      emitError(socket, ErrorCodes.AUTH_FORBIDDEN, { message: 'You are not a spectator in this game' });
       return;
     }
 
@@ -353,7 +447,15 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
 
     // Check if room has space
     if (Object.keys(game.users).length >= MAX_PLAYERS_PER_ROOM) {
-      emitError(socket, 'Room is still full. Please wait for a slot to open.');
+      emitError(socket, ErrorCodes.GAME_FULL, { message: 'Room is still full. Please wait for a slot to open.' });
+      return;
+    }
+
+    // Only allow upgrade during waiting or in-progress states
+    // Prevent upgrades during 'finished' or 'validating' which could corrupt results
+    const isLateJoin = isInProgress(game.gameState);
+    if (game.gameState !== 'waiting' && !isLateJoin) {
+      emitError(socket, ErrorCodes.GAME_CLOSED, { message: 'Cannot join while game is ending. Wait for the next round.' });
       return;
     }
 
@@ -361,14 +463,12 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
     const success = upgradeSpectatorToPlayer(gameCode, username);
 
     if (!success) {
-      emitError(socket, 'Failed to join game');
+      emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to join game' });
       return;
     }
 
     logger.info('SOCKET', `Spectator ${username} upgraded to player in game ${gameCode}`);
 
-    // Notify the upgraded player
-    const isLateJoin = isInProgress(game.gameState);
     socket.emit('spectatorUpgraded', {
       success: true,
       username,
@@ -377,8 +477,12 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
       lateJoin: isLateJoin
     });
 
-    // If game is in progress, send current state
+    // If game is in progress, initialize player data and send current state
     if (isLateJoin) {
+      const currentGame = getGame(gameCode);
+      if (currentGame) {
+        ensurePlayerState(currentGame, username);
+      }
       handleLateJoin(socket, game, gameCode, username);
     }
 
@@ -392,230 +496,8 @@ function registerPlayerJoinHandlers(io: Server, socket: Socket): void {
   });
 }
 
-// ==========================================
-// Helper Functions
-// ==========================================
-
-/**
- * Handle existing authenticated connection when joining a game
- * @returns - { handled: boolean, existingUsername?: string, isHost?: boolean }
- */
-async function handleExistingAuthConnectionJoin(io: Server, socket: Socket, authUserId: string, gameCode: string, username: string): Promise<AuthConnectionResult> {
-  const existingConnection: AuthConnection | null = getAuthUserConnection(authUserId);
-  if (!existingConnection) return { handled: false };
-
-  const isSameSocket = existingConnection.socketId === socket.id;
-
-  if (existingConnection.gameCode === gameCode) {
-    if (!isSameSocket) {
-      const oldSocket = getSocketById(io, existingConnection.socketId);
-      if (oldSocket && oldSocket.connected) {
-        oldSocket.data = oldSocket.data || {};
-        oldSocket.data.migrating = true;
-        safeEmit(oldSocket, 'sessionTakenOver', {
-          message: 'Your session was moved to another tab',
-          gameCode
-        });
-        setTimeout(() => {
-          if (oldSocket.connected) disconnectSocket(oldSocket, true);
-        }, 100);
-      }
-    }
-    // Return existing username to prevent creating duplicate user
-    logger.info('SOCKET', `Auth user ${authUserId} reconnecting to same game ${gameCode}, using existing username: ${existingConnection.username}`);
-    return {
-      handled: true,
-      existingUsername: existingConnection.username,
-      isHost: existingConnection.isHost
-    };
-  }
-
-  if (!isSameSocket) {
-    const oldSocket = getSocketById(io, existingConnection.socketId);
-    if (oldSocket && oldSocket.connected) {
-      safeEmit(oldSocket, 'sessionMigrated', {
-        message: 'Your session was moved to another tab'
-      });
-      disconnectSocket(oldSocket, true);
-    }
-  }
-
-  if (existingConnection.isHost) {
-    const oldGame = getGame(existingConnection.gameCode);
-    if (oldGame) {
-      if (oldGame.reconnectionTimeout) {
-        clearTimeout(oldGame.reconnectionTimeout);
-        oldGame.reconnectionTimeout = null;
-      }
-      broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
-        message: 'Host joined a different game. Room is closing.'
-      });
-      timerManager.clearGameTimer(existingConnection.gameCode);
-      deleteGame(existingConnection.gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
-    }
-  } else {
-    removeUserFromGame(existingConnection.gameCode, existingConnection.username);
-
-    // Check if the old room is now empty and close it immediately
-    if (isRoomEmpty(existingConnection.gameCode)) {
-      logger.info('SOCKET', `Room ${existingConnection.gameCode} is empty after ${existingConnection.username} left to join ${gameCode} - closing immediately`);
-      timerManager.clearGameTimer(existingConnection.gameCode);
-      cleanupGameBots(existingConnection.gameCode);
-      deleteGame(existingConnection.gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
-    } else {
-      const oldGame = getGame(existingConnection.gameCode);
-      if (oldGame) {
-        broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'updateUsers', {
-          users: getGameUsers(existingConnection.gameCode)
-        });
-      }
-    }
-  }
-
-  if (isSameSocket) {
-    leaveRoom(socket, getGameRoom(existingConnection.gameCode));
-  }
-
-  return { handled: false };
-}
-
-/**
- * Handle player reconnection to an existing game
- */
-function handleReconnection(io: Server, socket: Socket, game: Game, gameCode: string, username: string, authUserId?: string, guestTokenHash?: string): void {
-  logger.info('SOCKET', `Reconnection detected for ${username}`);
-
-  if (game.users[username]) {
-    game.users[username].disconnected = false;
-    delete game.users[username].disconnectedAt;
-
-    if ((game.users[username] as GameUser & { reconnectionTimeout?: ReturnType<typeof setTimeout> }).reconnectionTimeout) {
-      clearTimeout((game.users[username] as GameUser & { reconnectionTimeout?: ReturnType<typeof setTimeout> }).reconnectionTimeout);
-      delete (game.users[username] as GameUser & { reconnectionTimeout?: ReturnType<typeof setTimeout> }).reconnectionTimeout;
-    }
-
-    broadcastToRoom(io, getGameRoom(gameCode), 'playerReconnected', { username });
-  }
-
-  updateUserSocketId(gameCode, username, socket.id, {
-    authUserId: authUserId || null,
-    guestTokenHash: guestTokenHash || null
-  });
-
-  if (game.hostUsername === username) {
-    updateHostSocketId(gameCode, socket.id);
-    if (game.reconnectionTimeout) {
-      clearTimeout(game.reconnectionTimeout);
-      game.reconnectionTimeout = null;
-    }
-  }
-
-  joinRoom(socket, getGameRoom(gameCode));
-
-  socket.emit('joined', {
-    success: true,
-    gameCode,
-    isHost: game.hostUsername === username,
-    username,
-    roomName: game.roomName,
-    language: game.language,
-    reconnected: true,
-    users: getGameUsers(gameCode)
-  });
-
-  // Send game state on reconnection if game is in progress (use state machine helper)
-  if (isInProgress(game.gameState)) {
-    socket.emit('startGame', {
-      letterGrid: game.letterGrid,
-      timerSeconds: game.remainingTime || game.timerSeconds,
-      language: game.language,
-      minWordLength: game.minWordLength || 2,
-      messageId: 'reconnect-' + Date.now(),
-      reconnect: true,
-      skipAck: true,
-      boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null
-    });
-  }
-
-  broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
-    users: getGameUsers(gameCode)
-  });
-}
-
-/**
- * Handle late join to an in-progress game
- */
-function handleLateJoin(socket: Socket, game: Game, gameCode: string, username: string): void {
-  logger.info('SOCKET', `${username} joining game ${gameCode} in progress`);
-
-  socket.emit('startGame', {
-    letterGrid: game.letterGrid,
-    timerSeconds: game.remainingTime || game.timerSeconds,
-    language: game.language,
-    minWordLength: game.minWordLength || 2,
-    messageId: 'late-join-' + Date.now(),
-    lateJoin: true,
-    skipAck: true,
-    boardTheme: (game as Game & { boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null }).boardTheme || null
-  });
-
-  const leaderboard: LeaderboardEntry[] = getLeaderboard(gameCode);
-  socket.emit('updateLeaderboard', { leaderboard });
-
-  const playerAchievementKeys: string[] = game.playerAchievements?.[username] || [];
-  if (playerAchievementKeys.length > 0) {
-    const achievements = playerAchievementKeys
-      .map(key => ({ key, icon: ACHIEVEMENT_ICONS[key] }))
-      .filter((a: { key: string; icon: string | undefined }) => a.icon);
-    logger.info('ACHIEVEMENT', `Late join: Resending ${achievements.length} achievements to ${username}: ${playerAchievementKeys.join(', ')} (gameState: ${game.gameState})`);
-    socket.emit('liveAchievementUnlocked', { achievements });
-  }
-}
-
-/**
- * Handle tournament join for a player
- */
-function handleTournamentJoin(io: Server, socket: Socket, gameCode: string, username: string, userAvatar: Avatar, profilePictureUrl?: string): void {
-  const tournamentId = getTournamentIdFromGame(gameCode);
-  if (!tournamentId) return;
-
-  try {
-    const tournamentAvatar = { ...userAvatar, profilePictureUrl: profilePictureUrl || null };
-    tournamentManager.addPlayerMidTournament(tournamentId, socket.id, username, tournamentAvatar);
-
-    const tournament = tournamentManager.getTournament(tournamentId);
-    const standings: TournamentStanding[] = tournamentManager.getTournamentStandings(tournamentId);
-
-    socket.emit('tournamentInfo', {
-      tournament: {
-        id: tournament.id,
-        name: tournament.name,
-        totalRounds: tournament.totalRounds,
-        currentRound: tournament.currentRound,
-        status: tournament.status
-      },
-      standings
-    });
-
-    broadcastToRoomExceptSender(socket, getGameRoom(gameCode), 'tournamentPlayerJoined', {
-      username,
-      standings
-    });
-  } catch (err: unknown) {
-    const error = err as Error;
-    logger.warn('TOURNAMENT', `Could not add ${username} to tournament: ${error.message}`);
-  }
-}
-
-module.exports = {
-  registerPlayerJoinHandlers,
-  handleReconnection,
-  handleLateJoin,
-  handleTournamentJoin,
-  handleExistingAuthConnectionJoin
-};
+// Helper functions (handleReconnection, handleLateJoin, handleTournamentJoin, handleExistingAuthConnectionJoin)
+// are in ./playerReconnectHandler.ts
 
 export {
   registerPlayerJoinHandlers,

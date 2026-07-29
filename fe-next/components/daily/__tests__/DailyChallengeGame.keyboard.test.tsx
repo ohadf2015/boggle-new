@@ -5,8 +5,8 @@ import DailyChallengeGame from '../DailyChallengeGame';
 import type { LetterGrid } from '@/types';
 
 // Mock framer-motion to avoid matchMedia issues
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => {
+  const motion = {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
       return <div {...domProps}>{children}</div>;
@@ -27,52 +27,67 @@ jest.mock('framer-motion', () => ({
       const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
       return <span {...domProps}>{children}</span>;
     },
-  },
-  AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
-}));
+    kbd: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+      const { initial, animate, exit, whileHover, whileTap, transition, variants, ...domProps } = props as Record<string, unknown>;
+      return <kbd {...domProps}>{children}</kbd>;
+    },
+  };
+  return {
+    motion,
+    m: motion,
+    LazyMotion: ({ children }: React.PropsWithChildren) => <>{children}</>,
+    domAnimation: {},
+    AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
+  };
+});
 
 // Mock hooks and components
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
+  }),
+  useLanguageSafe: () => ({
+    t: (key: string) => key,
+    language: 'en',
+    setLanguage: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playWordAcceptedSound: jest.fn(),
-    playComboSound: jest.fn(),
-    setGameActive: jest.fn(),
+    playWordAcceptedSound: vi.fn(),
+    playComboSound: vi.fn(),
+    setGameActive: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/MusicContext', () => ({
+vi.mock('@/contexts/MusicContext', () => ({
   useMusic: () => ({
-    stopMusic: jest.fn(),
+    stopMusic: vi.fn(),
   }),
 }));
 
-jest.mock('@/contexts/CoinContext', () => ({
+vi.mock('@/contexts/CoinContext', () => ({
   useCoinContext: () => ({
-    awardComboMilestone: jest.fn().mockResolvedValue(0),
+    awardComboMilestone: vi.fn().mockResolvedValue(0),
   }),
 }));
 
-jest.mock('@/hooks/useMobileLandscape', () => ({
+vi.mock('@/hooks/useMobileLandscape', () => ({
   useMobileLandscape: () => false,
 }));
 
-jest.mock('@/hooks/useGameMusic', () => ({
-  useGameMusic: jest.fn(),
+vi.mock('@/hooks/useGameMusic', () => ({
+  useGameMusic: vi.fn(),
 }));
 
-jest.mock('@/hooks/useCrazyGamesLifecycle', () => ({
-  useCrazyGamesLifecycle: jest.fn(),
+vi.mock('@/hooks/useCrazyGamesLifecycle', () => ({
+  useCrazyGamesLifecycle: vi.fn(),
 }));
 
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -80,12 +95,12 @@ jest.mock('@/hooks/useDevicePerformance', () => ({
   }),
 }));
 
-jest.mock('@/components/game/FloatingCoinAnimation', () => ({
+vi.mock('@/components/game/FloatingCoinAnimation', () => ({
   __esModule: true,
   default: () => null,
 }));
 
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascot: () => null,
 }));
 
@@ -96,18 +111,18 @@ const mockGrid: LetterGrid = [
 ];
 
 describe('DailyChallengeGame - Keyboard Typing', () => {
-  const mockOnComplete = jest.fn();
-  const mockOnQuit = jest.fn();
+  const mockOnComplete = vi.fn();
+  const mockOnQuit = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
-    jest.useFakeTimers();
+    vi.clearAllMocks();
+    vi.useFakeTimers();
 
     // Clear localStorage for KeyboardHintTooltip
     localStorage.clear();
 
     // Restore fetch mock after clearing
-    global.fetch = jest.fn((url: string | URL | Request) => {
+    global.fetch = vi.fn((url: string | URL | Request) => {
       const urlString = typeof url === 'string' ? url : url.toString();
       if (urlString.includes('/api/dictionary/check')) {
         return Promise.resolve({
@@ -123,7 +138,7 @@ describe('DailyChallengeGame - Keyboard Typing', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   it('should render KeyboardHintTooltip when game is active', async () => {
@@ -140,7 +155,7 @@ describe('DailyChallengeGame - Keyboard Typing', () => {
 
     // KeyboardHintTooltip has a 10-second delay before showing
     // Fast-forward time to trigger the tooltip
-    jest.advanceTimersByTime(10000);
+    vi.advanceTimersByTime(10000);
 
     // The tooltip should now be visible
     await waitFor(() => {

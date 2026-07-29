@@ -1,10 +1,11 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Medal, Star } from 'lucide-react';
 import { Card } from './ui/card';
 import { Badge } from './ui/badge';
 import { useLanguage } from '../contexts/LanguageContext';
 import { cn } from '../lib/utils';
+import SessionStatsCard from './results/SessionStatsCard';
 import type { Avatar } from '@/types';
 
 interface TournamentPlayerStanding {
@@ -58,24 +59,24 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
       case 3:
         return 'bg-neo-lime text-neo-black';
       default:
-        return 'bg-neo-pink text-neo-cream';
+        return 'bg-neo-pink text-neo-white';
     }
   };
 
   return (
-    <Card className="bg-white/90 text-neo-black dark:bg-slate-800/90 dark:text-white backdrop-blur-md p-4 sm:p-6 rounded-lg shadow-xl border-2 border-amber-500/50">
+    <Card className="bg-neo-navy text-neo-white p-4 sm:p-6 rounded-neo shadow-hard-lg border-neo-thick border-neo-black">
       <div className="space-y-4">
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="flex items-center justify-center gap-2">
-            <Trophy className="text-amber-500 text-2xl" />
-            <h2 className="text-2xl font-bold text-amber-700 dark:text-amber-300">
+            <Trophy className="text-neo-yellow text-2xl" />
+            <h2 className="text-2xl font-bold text-neo-yellow">
               {isComplete ? t('hostView.tournamentComplete') : t('hostView.tournamentStandings')}
             </h2>
           </div>
 
           {!isComplete && (
-            <p className="text-sm text-amber-600 dark:text-amber-400">
+            <p className="text-sm text-neo-yellow/80">
               {t('hostView.tournamentRound')} {currentRound}/{totalRounds}
             </p>
           )}
@@ -88,7 +89,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
             const isTopThree = placement <= 3;
 
             return (
-              <motion.div
+              <m.div
                 key={player.playerId ?? player.username}
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -144,8 +145,8 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
                             <div className="flex gap-1 mt-0.5">
                               {player.roundScores.map((score, i) => (
                                 <span
-                                  key={i}
-                                  className="text-xs bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded"
+                                  key={`round-${i + 1}`}
+                                  className="text-xs bg-slate-200 dark:bg-neo-navy-elevated px-1.5 py-0.5 rounded"
                                   title={`Round ${i + 1}: ${score}`}
                                 >
                                   {score}
@@ -173,14 +174,21 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
                     </div>
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             );
           })}
         </div>
 
+        {/* Session Stats */}
+        <SessionStatsCard
+          standings={standings}
+          currentRound={currentRound}
+          t={t}
+        />
+
         {/* Winner announcement for completed tournament */}
         {isComplete && standings[0] && (
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: -10 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', duration: 0.5 }}
@@ -196,7 +204,7 @@ const TournamentStandings: React.FC<TournamentStandingsProps> = ({
             <p className="text-lg font-semibold text-neo-black">
               {standings[0].totalScore} {t('hostView.totalScore').toLowerCase()}
             </p>
-          </motion.div>
+          </m.div>
         )}
       </div>
     </Card>

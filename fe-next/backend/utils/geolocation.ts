@@ -11,6 +11,7 @@
 
 import type { Request, Response, NextFunction } from 'express';
 import { getRedisClient } from '../redisClient';
+import logger from './logger';
 
 // ==========================================
 // Type Definitions
@@ -66,6 +67,13 @@ export const GEOLOCATION_CACHE_TTL = 24 * 60 * 60;
 // In-memory fallback cache for when Redis is unavailable
 const memoryCache = new Map<string, MemoryCacheEntry>();
 const MAX_MEMORY_CACHE_SIZE = 1000;
+
+// Circuit breaker: when ip-api.com rate-limits us (HTTP 429), back off for this
+// long before issuing another request. ip-api's free tier resets per-minute, so
+// 60s gives the rate-limit window time to drain instead of cascading into more
+// 429s on every subsequent request.
+const RATE_LIMIT_COOLDOWN_MS = 60_000;
+let rateLimitedUntil = 0;
 
 // ==========================================
 // IP Extraction Functions
@@ -152,7 +160,7 @@ async function getCachedGeodata(ip: string): Promise<GeoData | null> {
         return JSON.parse(cached) as GeoData;
       }
     } catch (error) {
-      console.warn('[GEOLOCATION] Redis cache read error:', (error as Error).message);
+      logger.warn('GEOLOCATION', 'Redis cache read error', { error: (error as Error).message });
     }
   }
 
@@ -175,7 +183,7 @@ async function cacheGeodata(ip: string, data: GeoData): Promise<void> {
     try {
       await redis.setex(`geo:${ip}`, GEOLOCATION_CACHE_TTL, JSON.stringify(data));
     } catch (error) {
-      console.warn('[GEOLOCATION] Redis cache write error:', (error as Error).message);
+      logger.warn('GEOLOCATION', 'Redis cache write error', { error: (error as Error).message });
     }
   }
 
@@ -221,10 +229,19 @@ export async function lookupIP(ip: string): Promise<GeoData> {
 
     // Check if fetch is available (Node.js 18+ has global fetch)
     if (typeof fetch === 'undefined') {
-      console.warn('[GEOLOCATION] fetch is not available - returning null');
+      logger.warn('GEOLOCATION', 'fetch is not available - returning null');
       return {
         status: 'error',
         message: 'fetch not available',
+        countryCode: null
+      };
+    }
+
+    // Circuit breaker: short-circuit while upstream is known rate-limited.
+    if (Date.now() < rateLimitedUntil) {
+      return {
+        status: 'error',
+        message: 'rate-limited (cooldown)',
         countryCode: null
       };
     }
@@ -244,7 +261,17 @@ export async function lookupIP(ip: string): Promise<GeoData> {
     }
 
     if (!response.ok) {
-      console.warn('[GEOLOCATION] API returned HTTP', response.status);
+      // 429 → trip the circuit breaker so we stop hammering ip-api for the
+      // next minute. Any other HTTP error is still debug-level noise since
+      // callers degrade gracefully.
+      if (response.status === 429) {
+        rateLimitedUntil = Date.now() + RATE_LIMIT_COOLDOWN_MS;
+        logger.debug('GEOLOCATION', 'API rate-limited, cooldown engaged', {
+          cooldownMs: RATE_LIMIT_COOLDOWN_MS
+        });
+      } else {
+        logger.debug('GEOLOCATION', 'API returned HTTP error', { status: response.status });
+      }
       return {
         status: 'error',
         message: `HTTP ${response.status}`,
@@ -255,7 +282,7 @@ export async function lookupIP(ip: string): Promise<GeoData> {
     const data = await response.json() as GeoData;
 
     if (data.status === 'fail') {
-      console.warn('[GEOLOCATION] API returned failure:', data.message);
+      logger.debug('GEOLOCATION', 'API returned failure', { message: data.message });
       return {
         status: 'fail',
         message: data.message,
@@ -275,16 +302,16 @@ export async function lookupIP(ip: string): Promise<GeoData> {
 
     // Cache the result (in background, don't await)
     cacheGeodata(ip, result).catch(err => {
-      console.warn('[GEOLOCATION] Cache write failed:', err.message);
+      logger.warn('GEOLOCATION', 'Cache write failed', { error: err.message });
     });
 
     return result;
   } catch (error) {
     // Handle AbortError specially for clearer logging
     if ((error as Error).name === 'AbortError') {
-      console.warn('[GEOLOCATION] Request timed out for', ip);
+      logger.warn('GEOLOCATION', 'Request timed out', { ip });
     } else {
-      console.warn('[GEOLOCATION] Lookup failed for', ip, ':', (error as Error).message);
+      logger.warn('GEOLOCATION', 'Lookup failed', { ip, error: (error as Error).message });
     }
     return {
       status: 'error',
@@ -345,7 +372,7 @@ export async function getCountryFromRequest(req: Request): Promise<CountryResult
     };
   } catch (error) {
     // Log the error but return a safe fallback - never throw
-    console.warn('[GEOLOCATION] getCountryFromRequest error:', (error as Error).message);
+    logger.warn('GEOLOCATION', 'getCountryFromRequest error', { error: (error as Error).message });
     return { countryCode: null, source: 'error', error: (error as Error).message };
   }
 }
@@ -398,7 +425,8 @@ export function geolocationMiddleware(options: GeolocationMiddlewareOptions = {}
 
       next();
     } catch (error) {
-      console.error('[GEOLOCATION] Middleware error:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      logger.error('GEOLOCATION', 'Middleware error', { error: errorMessage });
       next(); // Continue even if geolocation fails
     }
   };

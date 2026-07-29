@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import logger from '@/utils/logger';
 import { createClient } from '@/utils/supabase/server';
 import { captureApiError } from '@/utils/sentry';
 
@@ -81,7 +82,8 @@ export async function GET(request: Request) {
       useCount: tokenData.use_count,
     });
   } catch (error) {
-    console.error('Validate retry token error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Validate retry token error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/daily/validate-retry-token',
@@ -163,7 +165,7 @@ export async function POST(request: Request) {
 
     // If RPC doesn't exist yet, we'll handle it gracefully
     if (updateError) {
-      console.warn('Could not increment use count (RPC may not exist):', updateError.message);
+      logger.warn('Could not increment use count (RPC may not exist):', updateError.message);
       // Continue anyway - the main functionality still works
     }
 
@@ -182,11 +184,11 @@ export async function POST(request: Request) {
         .select('id');
 
       if (deleteError) {
-        console.warn('Could not reset player attempt:', deleteError.message);
+        logger.warn('Could not reset player attempt:', deleteError.message);
       } else {
         attemptsReset = deletedData?.length || 0;
         if (attemptsReset > 0) {
-          console.log(`Reset ${attemptsReset} attempt(s) for player ${playerId} on ${tokenData.puzzle_date}/${tokenData.language}`);
+          logger.log(`Reset ${attemptsReset} attempt(s) for player ${playerId} on ${tokenData.puzzle_date}/${tokenData.language}`);
         }
       }
     } else if (guestFingerprint) {
@@ -200,11 +202,11 @@ export async function POST(request: Request) {
         .select('id');
 
       if (deleteError) {
-        console.warn('Could not reset guest attempt:', deleteError.message);
+        logger.warn('Could not reset guest attempt:', deleteError.message);
       } else {
         attemptsReset = deletedData?.length || 0;
         if (attemptsReset > 0) {
-          console.log(`Reset ${attemptsReset} attempt(s) for guest ${guestFingerprint.substring(0, 8)}... on ${tokenData.puzzle_date}/${tokenData.language}`);
+          logger.log(`Reset ${attemptsReset} attempt(s) for guest ${guestFingerprint.substring(0, 8)}... on ${tokenData.puzzle_date}/${tokenData.language}`);
         }
       }
     }
@@ -216,7 +218,8 @@ export async function POST(request: Request) {
       attemptsReset,
     });
   } catch (error) {
-    console.error('Use retry token error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error('Use retry token error:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/daily/validate-retry-token',

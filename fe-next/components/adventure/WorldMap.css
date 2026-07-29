@@ -1,0 +1,406 @@
+/**
+ * WorldMap CSS Animations
+ *
+ * Performance optimization: CSS keyframe animations run on the compositor thread,
+ * avoiding main thread JavaScript overhead. This is ~60% more efficient than
+ * Framer Motion for static repeating animations like twinkling stars.
+ */
+
+/* Star twinkle animation - uses GPU-accelerated opacity and transform */
+@keyframes star-twinkle {
+  0%, 100% {
+    opacity: var(--star-opacity-min, 0.3);
+    transform: scale(1);
+  }
+  50% {
+    opacity: var(--star-opacity-max, 0.8);
+    transform: scale(var(--star-scale, 1.3));
+  }
+}
+
+/* Optimized star element — no will-change to avoid excessive GPU layer allocation.
+ * CSS animations on opacity+transform are compositor-promoted automatically by browsers. */
+.world-map-star {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: star-twinkle var(--star-duration, 3s) ease-in-out infinite;
+  animation-delay: var(--star-delay, 0s);
+}
+
+/* Small star variant */
+.world-map-star--small {
+  --star-scale: 1.5;
+}
+
+/* Medium star variant */
+.world-map-star--medium {
+  --star-scale: 1.4;
+}
+
+/* Large star variant - with glow */
+.world-map-star--large {
+  --star-scale: 1.3;
+}
+
+/* Nebula clouds — static, no animation. The breathing animation was removed
+   because 4 nebulae × scale transform + opacity = 4 extra composite layers
+   with no perceptible visual benefit at their large size. */
+.world-map-nebula {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Shooting star animation */
+@keyframes shooting-star {
+  0% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(200px, 100px);
+    opacity: 0;
+  }
+}
+
+.world-map-shooting-star {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: shooting-star var(--shooting-duration, 2s) ease-out infinite;
+  animation-delay: var(--shooting-delay, 0s);
+  box-shadow:
+    0 0 6px 2px rgba(255, 255, 255, 0.8),
+    -20px 0 15px 1px rgba(255, 255, 255, 0.4),
+    -40px 0 20px 0px rgba(255, 255, 255, 0.2);
+}
+
+/* Cloud floating animation */
+@keyframes cloud-float {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(var(--cloud-drift, 20px));
+  }
+}
+
+.world-map-cloud {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.35;
+  filter: blur(2px);
+  animation: cloud-float var(--cloud-duration, 15s) ease-in-out infinite;
+}
+
+/* Orbit animation - organic floating path with natural easing
+ * Uses irregular keyframe positions and varied scale/opacity for lifelike movement
+ * The path follows a slightly elliptical orbit with gentle bobbing
+ */
+@keyframes orbit-clockwise {
+  0% {
+    transform: translate(
+      calc(var(--orbit-radius) * 1 - 8px),
+      calc(var(--orbit-radius) * 0.1 - 8px)
+    ) scale(0.85) rotate(-5deg);
+    opacity: 0.4;
+  }
+  18% {
+    transform: translate(
+      calc(var(--orbit-radius) * 0.4 - 8px),
+      calc(var(--orbit-radius) * 0.85 - 8px)
+    ) scale(1.05) rotate(3deg);
+    opacity: 0.6;
+  }
+  35% {
+    transform: translate(
+      calc(var(--orbit-radius) * -0.3 - 8px),
+      calc(var(--orbit-radius) * 0.95 - 8px)
+    ) scale(0.95) rotate(-2deg);
+    opacity: 0.55;
+  }
+  52% {
+    transform: translate(
+      calc(var(--orbit-radius) * -1 - 8px),
+      calc(var(--orbit-radius) * 0.15 - 8px)
+    ) scale(0.9) rotate(4deg);
+    opacity: 0.45;
+  }
+  68% {
+    transform: translate(
+      calc(var(--orbit-radius) * -0.5 - 8px),
+      calc(var(--orbit-radius) * -0.8 - 8px)
+    ) scale(1.1) rotate(-3deg);
+    opacity: 0.65;
+  }
+  85% {
+    transform: translate(
+      calc(var(--orbit-radius) * 0.6 - 8px),
+      calc(var(--orbit-radius) * -0.7 - 8px)
+    ) scale(0.92) rotate(2deg);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate(
+      calc(var(--orbit-radius) * 1 - 8px),
+      calc(var(--orbit-radius) * 0.1 - 8px)
+    ) scale(0.85) rotate(-5deg);
+    opacity: 0.4;
+  }
+}
+
+@keyframes orbit-counter-clockwise {
+  0% {
+    transform: translate(
+      calc(var(--orbit-radius) * 1 - 8px),
+      calc(var(--orbit-radius) * -0.1 - 8px)
+    ) scale(0.88) rotate(4deg);
+    opacity: 0.45;
+  }
+  15% {
+    transform: translate(
+      calc(var(--orbit-radius) * 0.5 - 8px),
+      calc(var(--orbit-radius) * -0.9 - 8px)
+    ) scale(1.08) rotate(-2deg);
+    opacity: 0.62;
+  }
+  33% {
+    transform: translate(
+      calc(var(--orbit-radius) * -0.4 - 8px),
+      calc(var(--orbit-radius) * -0.85 - 8px)
+    ) scale(0.93) rotate(3deg);
+    opacity: 0.52;
+  }
+  50% {
+    transform: translate(
+      calc(var(--orbit-radius) * -1 - 8px),
+      calc(var(--orbit-radius) * -0.1 - 8px)
+    ) scale(0.87) rotate(-4deg);
+    opacity: 0.42;
+  }
+  70% {
+    transform: translate(
+      calc(var(--orbit-radius) * -0.45 - 8px),
+      calc(var(--orbit-radius) * 0.88 - 8px)
+    ) scale(1.05) rotate(2deg);
+    opacity: 0.58;
+  }
+  88% {
+    transform: translate(
+      calc(var(--orbit-radius) * 0.55 - 8px),
+      calc(var(--orbit-radius) * 0.75 - 8px)
+    ) scale(0.95) rotate(-3deg);
+    opacity: 0.48;
+  }
+  100% {
+    transform: translate(
+      calc(var(--orbit-radius) * 1 - 8px),
+      calc(var(--orbit-radius) * -0.1 - 8px)
+    ) scale(0.88) rotate(4deg);
+    opacity: 0.45;
+  }
+}
+
+.world-map-orbit-letter {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  pointer-events: none;
+  font-weight: 900;
+  text-shadow: 0 0 8px currentColor;
+}
+
+.world-map-orbit-letter--clockwise {
+  animation: orbit-clockwise var(--orbit-duration, 8s) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--orbit-delay, 0s);
+}
+
+.world-map-orbit-letter--counter-clockwise {
+  animation: orbit-counter-clockwise var(--orbit-duration, 8s) cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--orbit-delay, 0s);
+}
+
+/* Pulse ring animation for unlocked worlds */
+@keyframes pulse-ring {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0;
+  }
+}
+
+.world-map-pulse-ring {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid #ffe135;
+  pointer-events: none;
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* Crown bob animation */
+@keyframes crown-bob {
+  0%, 100% {
+    transform: translateY(0) translateX(-50%);
+  }
+  50% {
+    transform: translateY(-3px) translateX(-50%);
+  }
+}
+
+.world-map-crown {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  animation: crown-bob 2s ease-in-out infinite;
+}
+
+/* Mascot bob animation */
+@keyframes mascot-bob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.world-map-mascot {
+  animation: mascot-bob 2s ease-in-out infinite;
+}
+
+/* Scroll hint bob */
+@keyframes scroll-hint-bob {
+  0%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  50% {
+    transform: translateX(-50%) translateY(-3px);
+  }
+}
+
+.world-map-scroll-hint {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  animation: scroll-hint-bob 1.5s ease-in-out infinite;
+}
+
+/* Fog of war shimmer for next locked world */
+@keyframes shimmer-sweep {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.world-fog-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  animation: shimmer-sweep 3s ease-in-out infinite;
+}
+
+/* Content-visibility optimization — lets the browser skip layout/paint for off-screen world nodes.
+ * contain-intrinsic-size prevents layout shift when nodes enter the viewport. */
+.world-node-container {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 200px;
+}
+
+/* World node entrance — CSS replaces 20 framer-motion spring instances on mount.
+ * A single CSS animation per node is vastly cheaper than a JS-driven spring. */
+@keyframes world-node-enter {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.world-node-entrance {
+  animation: world-node-enter 0.4s ease-out both;
+  animation-delay: var(--entrance-delay, 0s);
+}
+
+/* World info card entrance */
+@keyframes world-card-enter {
+  from { opacity: 0; transform: translateX(var(--card-x, -20px)); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.world-card-entrance {
+  animation: world-card-enter 0.35s ease-out both;
+  animation-delay: var(--card-delay, 0s);
+}
+
+/* Trail dot — CSS offset-path replaces SMIL animateMotion.
+ * offset-path animations are compositor-promoted; SMIL runs on main thread. */
+@keyframes trail-dot-move {
+  0% { offset-distance: 0%; opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0.6; }
+}
+
+.world-map-trail-dot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  pointer-events: none;
+  offset-path: var(--trail-path);
+  offset-rotate: 0deg;
+  animation: trail-dot-move 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Pure CSS cloud shape — eliminates 3 image loads (75KB total).
+ * Uses box-shadow for the puffy lobes, single DOM element. */
+.world-map-cloud-shape {
+  background: rgba(255, 255, 255, 0.10);
+  border-radius: 50px;
+  box-shadow:
+    -14px -8px 0 8px rgba(255, 255, 255, 0.08),
+    14px -5px 0 10px rgba(255, 255, 255, 0.07),
+    -6px -14px 0 12px rgba(255, 255, 255, 0.06),
+    8px -12px 0 6px rgba(255, 255, 255, 0.05);
+}
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  .world-map-star,
+  .world-map-nebula,
+  .world-map-shooting-star,
+  .world-map-cloud,
+  .world-map-orbit-letter,
+  .world-map-pulse-ring,
+  .world-map-crown,
+  .world-map-mascot,
+  .world-map-scroll-hint,
+  .world-fog-shimmer::after,
+  .world-map-trail-dot,
+  .world-node-entrance,
+  .world-card-entrance {
+    animation: none;
+  }
+  .world-node-entrance,
+  .world-card-entrance {
+    opacity: 1;
+    transform: none;
+  }
+}

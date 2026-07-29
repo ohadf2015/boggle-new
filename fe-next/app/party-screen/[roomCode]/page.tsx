@@ -4,9 +4,9 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { io, Socket } from 'socket.io-client';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Monitor, Users, Clock, Trophy, Wifi, WifiOff, Maximize, Minimize, QrCode } from 'lucide-react';
+import { Monitor, Users, Clock, Trophy, Wifi, WifiOff, Maximize, Minimize, QrCode, Crown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import logger from '@/utils/logger';
 
@@ -20,7 +20,6 @@ interface PartyPlayer {
   avatar?: {
     emoji?: string;
     color?: string;
-    profilePictureUrl?: string | null;
     avatarImage?: string;
   };
   isHost?: boolean;
@@ -171,7 +170,7 @@ export default function PartyScreen() {
   };
 
   return (
-    <div className="h-dvh w-full bg-neo-navy text-neo-cream overflow-hidden flex flex-col">
+    <div className="w-full bg-neo-navy text-neo-white overflow-hidden flex flex-col">
       {/* Halftone texture */}
       <div
         className="fixed inset-0 pointer-events-none opacity-[0.04]"
@@ -187,10 +186,10 @@ export default function PartyScreen() {
           <Monitor className="w-8 h-8 text-neo-lime" />
           <div>
             <h1 className="text-2xl font-black uppercase tracking-tight">
-              {t('partyScreen.title') || 'Party Screen'}
+              {t('partyScreen.title')}
             </h1>
-            <p className="text-sm text-neo-cream/60">
-              {t('partyScreen.room') || 'Room'}: <span className="font-bold text-neo-lime">{roomCode}</span>
+            <p className="text-sm text-neo-white">
+              {t('partyScreen.room')}: <span className="font-bold text-neo-lime">{roomCode}</span>
             </p>
           </div>
         </div>
@@ -205,7 +204,7 @@ export default function PartyScreen() {
           )}>
             {isConnected ? <Wifi className="w-4 h-4" /> : <WifiOff className="w-4 h-4" />}
             <span className="text-sm font-bold uppercase">
-              {isConnected ? 'Live' : 'Connecting...'}
+              {isConnected ? t('partyScreen.live') : t('partyScreen.connecting')}
             </span>
           </div>
 
@@ -227,13 +226,13 @@ export default function PartyScreen() {
           <div className="bg-neo-cream text-neo-black p-6 rounded-neo-lg border-4 border-neo-black shadow-hard-xl text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <QrCode className="w-6 h-6" />
-              <h2 className="text-xl font-black uppercase">{t('partyScreen.scanToJoin') || 'Scan to Join'}</h2>
+              <h2 className="text-xl font-black uppercase">{t('partyScreen.scanToJoin')}</h2>
             </div>
             <div className="bg-white text-black p-4 rounded-neo border-2 border-neo-black inline-block">
               <QRCode value={joinUrl} size={200} level="M" />
             </div>
             <div className="mt-4">
-              <p className="text-sm font-bold text-neo-black/60 uppercase">{t('partyScreen.orEnterCode') || 'Or enter code'}</p>
+              <p className="text-sm font-bold text-neo-black/60 uppercase">{t('partyScreen.orEnterCode')}</p>
               <p className="text-4xl font-black tracking-widest mt-1">{roomCode}</p>
             </div>
           </div>
@@ -243,7 +242,7 @@ export default function PartyScreen() {
             <Users className="w-8 h-8 text-neo-pink" />
             <div>
               <p className="text-3xl font-black">{sortedPlayers.length}</p>
-              <p className="text-sm text-neo-cream/70 uppercase">{t('partyScreen.players') || 'Players'}</p>
+              <p className="text-sm text-neo-white uppercase">{t('partyScreen.players')}</p>
             </div>
           </div>
         </div>
@@ -252,7 +251,7 @@ export default function PartyScreen() {
         <div className="flex-1 flex flex-col items-center justify-center">
           {/* Phase indicator */}
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={gameState.phase}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -261,11 +260,11 @@ export default function PartyScreen() {
             >
               {gameState.phase === 'waiting' && (
                 <div className="space-y-4">
-                  <p className="text-2xl font-bold text-neo-cream/70 uppercase animate-pulse">
-                    {t('partyScreen.waitingForPlayers') || 'Waiting for players...'}
+                  <p className="text-2xl font-bold text-neo-white uppercase animate-pulse">
+                    {t('partyScreen.waitingForPlayers')}
                   </p>
-                  <p className="text-lg text-neo-cream/50">
-                    {t('partyScreen.hostWillStart') || 'The host will start the game when ready'}
+                  <p className="text-lg text-neo-white">
+                    {t('partyScreen.hostWillStart')}
                   </p>
                 </div>
               )}
@@ -296,30 +295,30 @@ export default function PartyScreen() {
                   <div className="text-center">
                     <Trophy className="w-24 h-24 text-neo-lime mx-auto" />
                     <p className="text-4xl font-black text-neo-lime uppercase mt-4">
-                      {t('partyScreen.gameOver') || 'Game Over!'}
+                      {t('partyScreen.gameOver')}
                     </p>
                   </div>
 
                   {/* Recent words feed - shown after game ends */}
                   {gameState.recentWords.length > 0 && (
                     <div className="bg-neo-cream/10 border-2 border-neo-cream/20 rounded-neo p-4 max-w-md mx-auto">
-                      <h3 className="text-sm font-bold text-neo-cream/60 uppercase mb-2">
-                        {t('partyScreen.recentWords') || 'Recent Words'}
+                      <h3 className="text-sm font-bold text-neo-white uppercase mb-2">
+                        {t('partyScreen.recentWords')}
                       </h3>
                       <div className="space-y-2">
                         <AnimatePresence mode="popLayout">
                           {gameState.recentWords.slice(0, 5).map((event) => (
-                            <motion.div
+                            <m.div
                               key={`${event.username}-${event.word}-${event.timestamp}`}
                               initial={{ opacity: 0, x: -20 }}
                               animate={{ opacity: 1, x: 0 }}
                               exit={{ opacity: 0, x: 20 }}
                               className="flex items-center justify-between bg-neo-cream/5 px-3 py-2 rounded-neo"
                             >
-                              <span className="font-bold text-neo-cream">{event.username}</span>
+                              <span className="font-bold text-neo-white">{event.username}</span>
                               <span className="font-black text-neo-lime uppercase">{event.word}</span>
                               <span className="text-neo-green font-bold">+{event.score}</span>
-                            </motion.div>
+                            </m.div>
                           ))}
                         </AnimatePresence>
                       </div>
@@ -327,7 +326,7 @@ export default function PartyScreen() {
                   )}
                 </div>
               )}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
         </div>
 
@@ -335,13 +334,13 @@ export default function PartyScreen() {
         <div className="w-96 bg-neo-cream/5 border-2 border-neo-cream/20 rounded-neo-lg p-4 flex flex-col">
           <div className="flex items-center gap-2 mb-4">
             <Trophy className="w-6 h-6 text-neo-lime" />
-            <h2 className="text-xl font-black uppercase">{t('partyScreen.leaderboard') || 'Leaderboard'}</h2>
+            <h2 className="text-xl font-black uppercase">{t('partyScreen.leaderboard')}</h2>
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-2">
             <AnimatePresence mode="popLayout">
               {sortedPlayers.map((player, index) => (
-                <motion.div
+                <m.div
                   key={player.username}
                   layout
                   initial={{ opacity: 0, x: 20 }}
@@ -367,16 +366,16 @@ export default function PartyScreen() {
                   <div className="flex-1 min-w-0">
                     <p className={cn(
                       'font-bold truncate',
-                      index < 3 ? 'text-neo-black' : 'text-neo-cream'
+                      index < 3 ? 'text-neo-black' : 'text-neo-white'
                     )}>
                       {player.username}
-                      {player.isHost && <span className="ms-1 text-xs">👑</span>}
+                      {player.isHost && <Crown className="ms-1 w-3 h-3 inline-block" />}
                     </p>
                     <p className={cn(
                       'text-xs',
-                      index < 3 ? 'text-neo-black/60' : 'text-neo-cream/60'
+                      index < 3 ? 'text-neo-black/60' : 'text-neo-white'
                     )}>
-                      {player.wordCount} {t('partyScreen.words') || 'words'}
+                      {player.wordCount} {t('partyScreen.words')}
                     </p>
                   </div>
 
@@ -387,14 +386,14 @@ export default function PartyScreen() {
                   )}>
                     {player.score}
                   </div>
-                </motion.div>
+                </m.div>
               ))}
             </AnimatePresence>
 
             {sortedPlayers.length === 0 && (
-              <div className="text-center text-neo-cream/50 py-8">
+              <div className="text-center text-neo-white py-8">
                 <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>{t('partyScreen.noPlayersYet') || 'No players yet'}</p>
+                <p>{t('partyScreen.noPlayersYet')}</p>
               </div>
             )}
           </div>

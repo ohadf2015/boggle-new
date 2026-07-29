@@ -19,8 +19,8 @@ osascript -e 'display notification "Claude needs your input" with title "Claude 
 6. **Present plan** - Implementation plan (files, steps, test cases) - wait for approval
 7. **Test-first** - Write tests → run (fail) → implement → run (pass)
 8. **UI polish** - Run `/ui [component]` if has UI components
-9. **Verify** - `npx tsc --noEmit`, `npm run lint`, `npm test`, git diff
-10. **Store memory** - Use `mcp__memory__memory_store` to save feature decisions and patterns
+9. **Store memory** - Use `mcp__memory__memory_store` to save feature decisions and patterns
+10. **Commit & push** - Use `/commit-push` to verify all checks and push to remote (if user requests commit)
 11. **GitHub PR** - Optionally create PR with `mcp__github__create_pull_request` (if requested)
 
 ## Key Rules

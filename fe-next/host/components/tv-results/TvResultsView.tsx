@@ -1,28 +1,40 @@
 'use client';
 
-import React, { memo, useMemo, useCallback, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { memo, useMemo, useCallback, useEffect, useRef } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import { Maximize, Minimize } from 'lucide-react';
+import { Socket } from 'socket.io-client';
 import TvResultsWinnersPodium from './TvResultsWinnersPodium';
 import TvResultsStatsGrid from './TvResultsStatsGrid';
 import TvResultsAwards from './TvResultsAwards';
+import TvResultsPlayerSpotlight from './TvResultsPlayerSpotlight';
 import TvResultsLeaderboard from './TvResultsLeaderboard';
 import TvResultsControls from './TvResultsControls';
 import TournamentStandings from '../../../components/TournamentStandings';
 import PlayersReadyIndicator from '../../../components/results/PlayersReadyIndicator';
+import { HostWordSelector } from '../../../components/multiplayer/HostWordSelector';
+import BlastMpResults from '../../../components/blast/legacy/BlastMpResults';
+import MpModeBreakdown from '../../../components/multiplayer/MpModeBreakdown';
 import { useTvResultsAnimation, type SoundType } from './useTvResultsAnimation';
+import { useTvFullscreen } from '../../hooks/useTvFullscreen';
+import { useGameMode } from '@/hooks/gameState/store';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import { aggregateRoundsFromResults } from '@/lib/multiplayer/mpRoundAggregation';
 import { cn } from '../../../lib/utils';
+import { DJMascotWithEntrance } from '../../../components/ui/DJMascot';
 import { useSoundEffects } from '../../../contexts/SoundEffectsContext';
 import { useMusic } from '../../../contexts/MusicContext';
 import type { PlayerResult } from '@/types/components';
 import type { TournamentStanding } from '@/shared/types/game';
+import type { Language } from '@/shared/types';
 
 // Sound paths for results
 const RESULTS_SOUNDS: Record<SoundType, string> = {
   whoosh: '/sounds/message.mp3',
   pop: '/sounds/word-accepted.wav',
-  fanfare: '/sounds/achievment.mp3',
+  fanfare: '/sounds/achievement.mp3',
   victory: '/sounds/fire-round-start.wav',
-  ding: '/sounds/achievment.mp3',
+  ding: '/sounds/achievement.mp3',
   ready: '/sounds/word-accepted.wav',
 };
 
@@ -48,8 +60,21 @@ interface TvResultsViewProps {
   onStartNewGame: () => void;
   onNextRound: () => void;
   onShowQR: () => void;
+  /** Optional close handler - reserved for future use */
   onClose?: () => void;
   t: (path: string, params?: Record<string, string | number>) => string;
+  /** Socket.IO client instance for vocabulary selection */
+  socket?: Socket | null;
+  /** Game code for vocabulary selection */
+  gameCode?: string;
+  /** Game language */
+  language?: Language;
+  /** Whether current user is a teacher */
+  isTeacher?: boolean;
+  /** All words found during the game */
+  allWords?: Array<{ word: string; score: number; foundBy?: string[] }>;
+  /** Current game mode (from store) */
+  gameMode?: string;
 }
 
 /**
@@ -66,12 +91,25 @@ const TvResultsView = memo<TvResultsViewProps>(({
   onStartNewGame,
   onNextRound,
   onShowQR,
-  onClose,
+  onClose: _onClose,
   t,
+  socket = null,
+  gameCode = '',
+  language = 'en',
+  isTeacher = false,
+  allWords = [],
+  gameMode: gameModeOverride,
 }) => {
+  const storeGameMode = useGameMode();
+  const gameMode = gameModeOverride || storeGameMode;
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const { sfxMuted, sfxVolume } = useSoundEffects();
   const { isMuted: musicMuted, audioUnlocked } = useMusic();
+
+  // Fullscreen mode support
+  const { isFullscreen, toggleFullscreen, isSupported: isFullscreenSupported } = useTvFullscreen({
+    enabled: true,
+  });
 
   // Filter out host from results (they're not playing in broadcast mode)
   const filteredScores = useMemo(() => {
@@ -116,10 +154,18 @@ const TvResultsView = memo<TvResultsViewProps>(({
     }
   }, [audioUnlocked, sfxMuted, musicMuted, sfxVolume]);
 
+  // Notify players when TV reveal animation is done
+  const revealSentRef = useRef(false);
+  const handlePhaseChange = useCallback((phase: string) => {
+    if (phase === 'controls' && !revealSentRef.current && socket?.connected) {
+      revealSentRef.current = true;
+      socket.emit('resultsRevealed');
+    }
+  }, [socket]);
+
   // Animation orchestration
   const {
     currentPhase,
-    isComplete,
     isAnimating,
     skipToEnd,
     getPhaseVisibility,
@@ -129,6 +175,7 @@ const TvResultsView = memo<TvResultsViewProps>(({
     isTournament: !!tournamentData,
     playerCount: filteredScores.length,
     onSound: playSound,
+    onPhaseChange: handlePhaseChange,
   });
 
   // Cleanup audio on unmount
@@ -175,53 +222,78 @@ const TvResultsView = memo<TvResultsViewProps>(({
   const showTournamentStandings = currentPhase === 'tournament-standings';
 
   return (
-    <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 z-50 overflow-hidden">
+    <div className="fixed inset-0 bg-linear-to-b from-slate-900 via-slate-800 to-slate-900 z-[60] overflow-hidden">
+      {/* Fullscreen Toggle Button */}
+      {isFullscreenSupported && (
+        <m.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleFullscreen}
+          className="absolute top-4 right-4 z-[70] bg-neo-black/80 hover:bg-neo-black text-neo-cream p-3 rounded-neo border-2 border-neo-cream/30 shadow-hard-sm transition-colors"
+          title={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+          aria-label={isFullscreen ? t('tvBroadcast.exitFullscreen') : t('tvBroadcast.enterFullscreen')}
+        >
+          {isFullscreen ? (
+            <Minimize className="w-6 h-6" />
+          ) : (
+            <Maximize className="w-6 h-6" />
+          )}
+        </m.button>
+      )}
+
       {/* Main Content */}
       <div className="relative h-full flex flex-col">
         {/* Header */}
         <AnimatePresence>
           {getPhaseVisibility('header') && (
-            <motion.header
+            <m.header
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
               transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-              className="flex-shrink-0 py-6 px-8 text-center"
+              className="relative shrink-0 py-6 px-8 text-center"
             >
-              <motion.h1
+              {/* DJ Mascot */}
+              <div className="absolute bottom-0 left-4">
+                <DJMascotWithEntrance size="lg" delay={0.5} />
+              </div>
+
+              <m.h1
                 initial={{ scale: 0.8 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 400 }}
                 className={cn(
                   'font-black text-4xl md:text-5xl lg:text-6xl uppercase tracking-wide',
                   'text-transparent bg-clip-text',
-                  'bg-gradient-to-r from-neo-yellow via-neo-orange to-neo-pink'
+                  'bg-linear-to-r from-neo-yellow via-neo-orange to-neo-pink'
                 )}
               >
                 {showTournamentStandings
-                  ? `${t('tvResults.tournamentStandings') || 'Tournament Standings'}`
-                  : t('tvResults.title') || 'THE RESULTS ARE IN!'}
-              </motion.h1>
+                  ? `${t('tvResults.tournamentStandings')}`
+                  : t('tvResults.title')}
+              </m.h1>
 
               {isTournament && !showTournamentStandings && (
-                <motion.p
+                <m.p
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3 }}
+                  transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
                   className="text-neo-cream/70 font-bold mt-2"
                 >
                   Round {tournamentData.currentRound} of {tournamentData.totalRounds}
-                </motion.p>
+                </m.p>
               )}
-            </motion.header>
+            </m.header>
           )}
         </AnimatePresence>
 
         {/* Main Content Area */}
-        <div className="flex-1 overflow-hidden px-6 pb-24">
+        <div className="flex-1 overflow-hidden px-6 pb-32">
           {showTournamentStandings ? (
             // Tournament Standings View
-            <motion.div
+            <m.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               className="h-full flex items-center justify-center"
@@ -236,14 +308,45 @@ const TvResultsView = memo<TvResultsViewProps>(({
                   />
                 )}
               </div>
-            </motion.div>
+            </m.div>
+          ) : gameMode === 'blast' ? (
+            // Blast Results View
+            <div className="h-full overflow-y-auto space-y-6 max-w-4xl mx-auto py-4">
+              {/* Blast Results */}
+              <m.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              >
+                <BlastMpResults
+                  results={filteredScores.map(p => ({
+                    username: p.username,
+                    score: p.score,
+                    wordsFoundCount: p.wordsFoundCount ?? 0,
+                    tilesCleared: 0,
+                    bestCombo: 0,
+                    boardCleared: (p as { boardCleared?: boolean }).boardCleared,
+                  }))}
+                  gameMode="blast"
+                />
+              </m.div>
+
+              {/* MP Mode Breakdown */}
+              <m.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25, delay: 0.1 }}
+              >
+                <MpModeBreakdown rounds={[]} />
+              </m.div>
+            </div>
           ) : (
             // Regular Results View
             <div className="h-full grid grid-cols-1 lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
               {/* Left Column: Podium & Awards */}
               <div className="lg:col-span-2 flex flex-col gap-6">
                 {/* Winners Podium */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <TvResultsWinnersPodium
                     players={podiumPlayers}
                     show3rd={getPhaseVisibility('podium-3rd')}
@@ -263,12 +366,22 @@ const TvResultsView = memo<TvResultsViewProps>(({
                     t={t}
                   />
                 </div>
+
+                {/* Player Spotlight */}
+                <div className="shrink-0">
+                  <TvResultsPlayerSpotlight
+                    players={playerData}
+                    visible={getPhaseVisibility('player-spotlight')}
+                    gameDuration={gameDuration}
+                    t={t}
+                  />
+                </div>
               </div>
 
               {/* Right Column: Stats & Leaderboard */}
               <div className="flex flex-col gap-6">
                 {/* Game Stats */}
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   <TvResultsStatsGrid
                     players={playerData}
                     visible={getPhaseVisibility('stats')}
@@ -313,9 +426,26 @@ const TvResultsView = memo<TvResultsViewProps>(({
           </div>
         )}
 
-        {/* Controls Bar */}
+        {/* Teacher Word Selector - Only for teachers */}
+        {isTeacher && allWords.length > 0 && (
+          <div className="px-8 py-4">
+            <div className="max-w-6xl mx-auto">
+              <HostWordSelector
+                socket={socket}
+                gameCode={gameCode}
+                language={language}
+                isHost={true}
+                gameState="finished"
+                allWords={allWords}
+                t={t}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Controls Bar - visible as soon as header phase starts so host can skip/play again */}
         <TvResultsControls
-          visible={getPhaseVisibility('controls') || isComplete}
+          visible={getPhaseVisibility('header')}
           isAnimating={isAnimating}
           isTournament={isTournament}
           isLastRound={isLastRound}

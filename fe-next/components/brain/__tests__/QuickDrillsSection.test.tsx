@@ -8,8 +8,8 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 
 // Mock framer-motion before imports
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     button: ({ children, className, ...props }: React.HTMLAttributes<HTMLButtonElement>) => (
       <button className={className} {...props}>{children}</button>
     ),
@@ -20,30 +20,30 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock dependencies
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: vi.fn(),
   }),
 }));
 
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/AuthContext', () => ({
+vi.mock('@/contexts/AuthContext', () => ({
   useAuth: () => ({
     profile: { total_games: 10 },
   }),
 }));
 
-jest.mock('@/components/ui/tooltip', () => ({
+vi.mock('@/components/ui/tooltip', () => ({
   TooltipProvider: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   Tooltip: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   TooltipTrigger: ({ children }: { children: React.ReactNode }) => <>{children}</>,
@@ -78,9 +78,10 @@ describe('QuickDrillsSection', () => {
     it('renders icons with responsive sizing for desktop', () => {
       const { container } = render(<QuickDrillsSection />);
 
-      // Icon containers should have responsive sizing (md:w-12 or similar)
-      // Use rounded-md selector to target drill icons specifically (not DrillUnlockProgress which uses rounded-neo)
-      const iconContainers = container.querySelectorAll('.rounded-md.border-neo-black.flex.items-center.justify-center');
+      // Emblem containers should have responsive sizing (md:w-14 or similar).
+      // Target the drill emblem boxes (rounded-md + overflow-hidden image holder),
+      // not DrillUnlockProgress which uses rounded-neo.
+      const iconContainers = container.querySelectorAll('.rounded-md.border-neo-black.overflow-hidden');
       expect(iconContainers.length).toBeGreaterThan(0);
 
       const firstIconContainer = iconContainers[0];
@@ -91,7 +92,7 @@ describe('QuickDrillsSection', () => {
       const { container } = render(<QuickDrillsSection />);
 
       // Title text should scale up on desktop
-      const titleElements = container.querySelectorAll('.font-bold.text-left');
+      const titleElements = container.querySelectorAll('.font-bold.text-start');
       expect(titleElements.length).toBeGreaterThan(0);
 
       const firstTitle = titleElements[0];

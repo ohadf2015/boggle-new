@@ -74,7 +74,7 @@ export const FormField: React.FC<FormFieldProps> = ({
         {label}
         {required && (
           <>
-            <span className="text-neo-red ml-1" aria-hidden="true">*</span>
+            <span className="text-neo-red ms-1" aria-hidden="true">*</span>
             <span className="sr-only"> (required)</span>
           </>
         )}

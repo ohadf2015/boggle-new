@@ -2,6 +2,11 @@ node_modules
 build
 .env
 .DS_Store
+.claude-memory/
+.memdb/
+.trae/
+.worktrees/
+.tmp-fal/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -11,9 +16,11 @@ yarn-error.log*
 # Test artifacts and reports
 test-results/
 playwright-report/
+playwriter-report/
 coverage/
 .nyc_output/
 *.lcov
+**/*.venv-rembg
 
 # Test media (screenshots, videos, traces)
 **/*-test-results/
@@ -31,5 +38,43 @@ coverage/
 **/*.webm
 **/*.mp4
 **/*.mov
+!fe-next/public/**/*.webm
+!fe-next/public/**/*.mp4
 /test-screenshots
 /screenshots
+fe-next/app-debug.apk
+
+# Temporary files
+tmp/
+fe-next/tmp/
+.vercel
+.claude/worktrees/
+.claude/scheduled_tasks.lock
+fe-next/dist/
+.env.local
+dump.rdb
+
+# Release signing keys
+*.keystore
+*.jks
+supabase/.temp/
+
+# Nightly Intelligence Suite — operational data (regenerated nightly; read locally
+# by stale-fallback + Pass-2 attribution). Briefs feed lanes via env, not via git.
+docs/nightly/intel/
+
+# Local tool caches + scratch backups (never commit)
+.claude/council-cache/
+**/.claude/council-cache/
+*.logo-bak
+
+# Scratch image-generation outputs (source of truth lives in docs/play-games-icons/)
+output/
+
+# Python bytecode cache (nightly tools)
+__pycache__/
+*.pyc
+
+# Nightly runtime data (regenerated each run; artifacts/ideas ARE committed by run.sh, these are not)
+docs/nightly/feedback/
+docs/nightly/reports/

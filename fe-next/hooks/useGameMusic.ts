@@ -19,6 +19,11 @@ interface UseGameMusicOptions {
   enabled?: boolean;
   /** Earthquake state for special music during earthquake phases */
   earthquakeState?: EarthquakeState;
+  /**
+   * Cozy / Calm Mode: hold the in-game bed and never escalate to the urgent
+   * "almost out of time" ramp. Reward-neutral — music doesn't gate word-count.
+   */
+  suppressUrgentMusic?: boolean;
 }
 
 /**
@@ -41,6 +46,7 @@ export function useGameMusic({
   isPaused = false,
   enabled = true,
   earthquakeState = 'idle',
+  suppressUrgentMusic = false,
 }: UseGameMusicOptions) {
   const { fadeToTrack, playTrack, TRACKS } = useMusic();
 
@@ -72,11 +78,21 @@ export function useGameMusic({
         break;
 
       case 'playing':
-        // Only fade to in-game music on transition TO playing
-        if (previousPhase !== 'playing') {
-          fadeToTrack(TRACKS.IN_GAME, 800, 800);
-          hasTriggeredUrgentMusicRef.current = false;
-          earthquakeMusicActiveRef.current = false;
+        // Only fade to music on transition TO playing (not when already playing)
+        // Also skip if game is paused (isPaused = true means game over state)
+        if (previousPhase !== 'playing' && !isPaused) {
+          if (earthquakeState === 'idle') {
+            // Normal game: play in-game music
+            fadeToTrack(TRACKS.IN_GAME, 800, 800);
+            hasTriggeredUrgentMusicRef.current = false;
+            earthquakeMusicActiveRef.current = false;
+          } else {
+            // Fire-round/earthquake active (e.g., Word Hunt): play bossa-arcade immediately
+            // This handles initial mount case where we start directly in fire-round
+            fadeToTrack(TRACKS.BOSSA_ARCADE, 800, 800);
+            hasTriggeredUrgentMusicRef.current = false;
+            earthquakeMusicActiveRef.current = true;
+          }
         }
         break;
 
@@ -91,11 +107,13 @@ export function useGameMusic({
         // No music change for waiting state
         break;
     }
-  }, [phase, enabled, fadeToTrack, playTrack, TRACKS]);
+  }, [phase, enabled, earthquakeState, isPaused, fadeToTrack, playTrack, TRACKS]);
 
   // Handle urgent music after 33% of game time has elapsed
   useEffect(() => {
     if (!enabled || phase !== 'playing' || isPaused) return;
+    // Cozy / Calm Mode: never escalate to the urgent panic track.
+    if (suppressUrgentMusic) return;
     if (remainingTime === null || remainingTime === undefined) return;
 
     // Calculate threshold: 33% elapsed = 67% remaining
@@ -121,6 +139,7 @@ export function useGameMusic({
     totalTime,
     isPaused,
     enabled,
+    suppressUrgentMusic,
     fadeToTrack,
     TRACKS,
   ]);

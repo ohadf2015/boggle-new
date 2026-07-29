@@ -40,25 +40,32 @@ export const TryAnotherLanguage: React.FC<TryAnotherLanguageProps> = ({
   };
 
   return (
-    <div className="pt-3 border-t border-gray-200 dark:border-gray-700">
-      <h3 className="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase mb-2 flex items-center gap-1.5">
-        🌍 {t('wordHunt.results.tryAnotherLanguage')}
-      </h3>
-      <div className="flex flex-wrap justify-center gap-2">
+    <div className="mt-6 p-4 bg-linear-to-br from-neo-cyan/10 via-neo-purple/10 to-neo-pink/10 border-3 border-neo-black rounded-neo shadow-hard">
+      <div className="flex items-center gap-3 mb-3">
+        <div className="w-10 h-10 shrink-0 bg-linear-to-br from-neo-cyan to-neo-purple rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+          <span className="text-xl">🌍</span>
+        </div>
+        <div className="flex-1">
+          <h3 className="font-black text-base text-white uppercase tracking-tight">
+            {t('wordHunt.results.tryAnotherLanguage')}
+          </h3>
+          <p className="text-xs text-gray-400 mt-0.5">
+            {t('wordHunt.results.playDifferentLanguage')}
+          </p>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2">
         {availableLanguages.map((option) => (
           <Button
             key={option.code}
             onClick={() => handleLanguageClick(option.code)}
-            className="px-3 py-2 bg-slate-600 text-white border-2 border-neo-black rounded-neo shadow-hard-sm hover:-translate-y-0.5 transition-all flex items-center gap-1.5"
+            className="px-4 py-2.5 bg-linear-to-r from-neo-cyan to-neo-purple hover:from-neo-cyan/90 hover:to-neo-purple/90 text-white font-bold text-sm border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-1 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center gap-2"
           >
-            <span className="text-base">{option.flag}</span>
-            <span className="font-bold text-xs">{option.name}</span>
+            <span className="text-lg">{option.flag}</span>
+            <span className="uppercase tracking-wide">{option.name}</span>
           </Button>
         ))}
       </div>
-      <p className="text-[10px] text-gray-500 dark:text-gray-400 mt-2 text-center">
-        {t('wordHunt.results.playDifferentLanguage')}
-      </p>
     </div>
   );
 };

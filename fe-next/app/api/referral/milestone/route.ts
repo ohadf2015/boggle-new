@@ -75,20 +75,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Referral record not found' }, { status: 404 });
     }
 
-    // Define milestone rewards
-    const MILESTONE_REWARDS: Record<string, { xp: number; description: string; field: string }> = {
+    // Define milestone rewards (XP + coins granted to the referrer)
+    const MILESTONE_REWARDS: Record<
+      string,
+      { xp: number; coins: number; description: string; field: string }
+    > = {
       first_game_played: {
         xp: 50,
+        coins: 5,
         description: 'Your friend played their first game',
         field: 'referred_first_game_played',
       },
       five_games_played: {
         xp: 100,
+        coins: 10,
         description: 'Your friend played 5 games',
         field: 'referred_games_played',
       },
       ten_games_played: {
         xp: 200,
+        coins: 20,
         description: 'Your friend played 10 games',
         field: 'referred_games_played',
       },
@@ -159,12 +165,40 @@ export async function POST(request: NextRequest) {
         statusCode: 500,
       });
       // Try direct update if RPC fails
-      await supabase
+      const { data: fallbackProfile } = await supabase
+        .from('profiles')
+        .select('referral_reward_xp, total_xp')
+        .eq('id', profile.referred_by)
+        .single();
+
+      const { error: fallbackError } = await supabase
         .from('profiles')
         .update({
-          referral_reward_xp: supabase.rpc('increment', { x: reward.xp }),
+          total_xp: (fallbackProfile?.total_xp || 0) + reward.xp,
+          referral_reward_xp: (fallbackProfile?.referral_reward_xp || 0) + reward.xp,
         })
         .eq('id', profile.referred_by);
+
+      if (fallbackError) {
+        console.error('Fallback XP update also failed:', fallbackError);
+      }
+    }
+
+    // Grant reward coins to referrer via atomic sync_coins RPC
+    const { error: coinError } = await supabase.rpc('sync_coins', {
+      p_user_id: profile.referred_by,
+      p_amount: reward.coins,
+      p_reason: `referral_milestone_${milestone}`,
+      p_metadata: { referred_user_id: user.id, milestone },
+    });
+
+    if (coinError) {
+      console.error('Error granting milestone coins:', coinError);
+      captureApiError(new Error(coinError.message), '/api/referral/milestone', {
+        method: 'POST',
+        userId: user.id,
+        statusCode: 500,
+      });
     }
 
     // Record the reward
@@ -174,6 +208,7 @@ export async function POST(request: NextRequest) {
       reward_type: `milestone_${milestone}`,
       reward_description: reward.description,
       xp_amount: reward.xp,
+      coin_amount: reward.coins,
       metadata: {
         referred_user_id: user.id,
         milestone,
@@ -196,11 +231,13 @@ export async function POST(request: NextRequest) {
       data: {
         milestone,
         rewardXp: reward.xp,
+        rewardCoins: reward.coins,
         referrerId: profile.referred_by,
       },
     });
   } catch (error) {
-    console.error('Error in POST /api/referral/milestone:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in POST /api/referral/milestone:', errorMessage);
     captureApiError(
       error instanceof Error ? error : new Error(String(error)),
       '/api/referral/milestone',

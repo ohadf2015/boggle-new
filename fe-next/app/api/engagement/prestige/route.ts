@@ -1,40 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { createClient } from '@/utils/supabase/server';
 import {
   canPrestige,
-  getPrestigeMultiplier,
   getNextPrestigeRewards,
+  toRoman,
   PRESTIGE_CONFIG,
 } from '@/backend/modules/xpManager';
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-async function getUserIdFromRequest(request: NextRequest): Promise<string | null> {
-  const authHeader = request.headers.get('authorization');
-  const token = authHeader?.replace('Bearer ', '') || request.cookies.get('sb-access-token')?.value;
-
-  if (!token) return null;
-
-  const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-
-  if (error || !user) return null;
-  return user.id;
-}
+import { captureApiError } from '@/utils/sentry';
 
 /**
  * GET /api/engagement/prestige
  * Get current prestige status and rewards preview
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
-    const userId = await getUserIdFromRequest(request);
-    if (!userId) {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const userId = user.id;
 
     const { data: profile, error } = await supabase
       .from('profiles')
@@ -63,7 +49,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error('[PRESTIGE API] Error:', error);
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/engagement/prestige', { method: 'GET' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[PRESTIGE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -72,14 +60,26 @@ export async function GET(request: NextRequest) {
  * POST /api/engagement/prestige
  * Apply prestige - resets level to 1, grants rewards
  */
-export async function POST(request: NextRequest) {
+export async function POST(_request: NextRequest) {
+  // Rate limit: 3 requests per minute (prestige is rare)
+  const rateLimitResult = checkApiRateLimit(_request, 'engagement-prestige', {
+    maxRequests: 3,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { success: false, error: 'Too many requests' },
+      { status: 429 }
+    );
+  }
+
   try {
-    const userId = await getUserIdFromRequest(request);
-    if (!userId) {
+    const supabase = await createClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const userId = user.id;
 
     // Get current profile
     const { data: profile, error: profileError } = await supabase
@@ -114,10 +114,30 @@ export async function POST(request: NextRequest) {
 
     // Calculate new prestige values
     const newPrestigeLevel = currentPrestige + 1;
-    const newMultiplier = getPrestigeMultiplier(newPrestigeLevel);
     const rewards = getNextPrestigeRewards(currentPrestige);
 
-    // Build unlocked rewards array
+    // Use atomic RPC to apply prestige (race-condition safe)
+    const { data: rpcResult, error: rpcError } = await supabase
+      .rpc('apply_prestige', {
+        p_player_id: userId,
+        p_expected_prestige: currentPrestige,
+      });
+
+    if (rpcError) {
+      console.error('[PRESTIGE API] RPC error:', rpcError);
+      return NextResponse.json({ error: 'Failed to apply prestige' }, { status: 500 });
+    }
+
+    // Check if optimistic lock succeeded (rows_affected > 0)
+    const result = Array.isArray(rpcResult) ? rpcResult[0] : rpcResult;
+    if (!result || result.rows_affected === 0) {
+      return NextResponse.json(
+        { error: 'Prestige already applied or conditions changed. Please refresh.' },
+        { status: 409 }
+      );
+    }
+
+    // Update prestige_unlocks separately (JSONB append)
     const existingUnlocks = profile.prestige_unlocks || [];
     const newUnlocks = [
       ...existingUnlocks,
@@ -129,26 +149,35 @@ export async function POST(request: NextRequest) {
       })),
     ];
 
-    // Update profile - reset XP to 0, level to 1, increment prestige
-    const { error: updateError } = await supabase
+    const { error: unlockError } = await supabase
       .from('profiles')
-      .update({
-        current_level: 1,
-        total_xp: 0,
-        lifetime_xp: (profile.lifetime_xp || profile.total_xp || 0), // Keep lifetime XP
-        prestige_level: newPrestigeLevel,
-        prestige_multiplier: newMultiplier,
-        prestige_unlocks: newUnlocks,
-        // Set the new prestige title
-        player_title: PRESTIGE_CONFIG.TITLES[newPrestigeLevel] || null,
-        updated_at: new Date().toISOString(),
-      })
+      .update({ prestige_unlocks: newUnlocks })
       .eq('id', userId);
 
-    if (updateError) {
-      console.error('[PRESTIGE API] Update error:', updateError);
-      return NextResponse.json({ error: 'Failed to apply prestige' }, { status: 500 });
+    if (unlockError) {
+      console.error('[PRESTIGE API] Failed to save unlocks, retrying once:', unlockError);
+      // Retry once — prestige was already applied, rewards must be saved
+      const { error: retryError } = await supabase
+        .from('profiles')
+        .update({ prestige_unlocks: newUnlocks })
+        .eq('id', userId);
+
+      if (retryError) {
+        console.error('[PRESTIGE API] Retry failed — prestige applied but rewards lost:', retryError);
+        captureApiError(new Error(`Prestige rewards lost: ${retryError.message}`), '/api/engagement/prestige', { method: 'POST', userId });
+        // Still return success since prestige itself was applied, but flag the issue
+        return NextResponse.json({
+          success: true,
+          newPrestigeLevel,
+          newMultiplier: result.new_multiplier,
+          rewards,
+          rewardsLost: true,
+          message: `Prestige ${toRoman(newPrestigeLevel)} achieved! Some rewards may need to be re-synced.`,
+        });
+      }
     }
+
+    const newMultiplier = result.new_multiplier;
 
     return NextResponse.json({
       success: true,
@@ -158,24 +187,9 @@ export async function POST(request: NextRequest) {
       message: `Congratulations! You are now Prestige ${toRoman(newPrestigeLevel)}!`,
     });
   } catch (error) {
-    console.error('[PRESTIGE API] Error:', error);
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/engagement/prestige', { method: 'POST' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[PRESTIGE API] Error:', errorMessage);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
-
-function toRoman(num: number): string {
-  const romanNumerals: [number, string][] = [
-    [5, 'V'],
-    [4, 'IV'],
-    [1, 'I'],
-  ];
-
-  let result = '';
-  for (const [value, numeral] of romanNumerals) {
-    while (num >= value) {
-      result += numeral;
-      num -= value;
-    }
-  }
-  return result;
 }

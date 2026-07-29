@@ -1,17 +1,20 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Target, Flame, Trophy, RotateCcw, Timer } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { Target, Flame, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
+import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
+import ComboMasterCompletePhase from './ComboMasterCompletePhase';
+import DrillBriefing from '@/components/brain/DrillBriefing';
 import type { LetterGrid, Language } from '@/types';
+import { calculateWordScore } from '@/shared/utils/scoring';
 
 // Level configurations
 const LEVEL_CONFIGS = [
@@ -35,6 +38,7 @@ interface ComboMasterProps {
     level: number;
   }) => void;
   onExit?: () => void;
+  onPlayAgain?: () => void;
 }
 
 type GamePhase = 'ready' | 'playing' | 'complete';
@@ -52,11 +56,10 @@ export default function ComboMaster({
   language = 'en',
   onComplete,
   onExit,
+  onPlayAgain,
 }: ComboMasterProps) {
-  const { theme } = useTheme();
-  const { t } = useLanguage();
-  const { playErrorSound } = useSoundEffects();
-  const isDarkMode = theme === 'dark';
+  const { t, dir } = useLanguage();
+  const { playErrorSound, playDrillStartSound, playDrillCompleteSound } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -70,11 +73,22 @@ export default function ComboMaster({
   const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const comboTimerRef = useRef<NodeJS.Timeout | null>(null);
+  // Refs to avoid stale closures in callbacks
+  const comboRef = useRef(combo);
+  comboRef.current = combo;
+  const comboBreaksRef = useRef(comboBreaks);
+  comboBreaksRef.current = comboBreaks;
 
-  const availableWordSet = useMemo(
-    () => new Set(availableWords.map(w => w.word.toUpperCase())),
-    [availableWords]
-  );
+  const { validateWord } = useDrillWordSubmit({
+    grid,
+    language,
+    availableWords,
+    wordsFound,
+    phase,
+    playingPhase: 'playing',
+    playErrorSound,
+    t,
+  });
   const MAX_COMBO_BREAKS = 3;
 
   // Keyboard support for desktop users
@@ -94,35 +108,44 @@ export default function ComboMaster({
     comboTimerRef.current = setInterval(() => {
       setComboTimer(prev => {
         if (prev <= 1) {
-          // Combo broken!
-          setCombo(0);
-          setComboBreaks(breaks => {
-            const newBreaks = breaks + 1;
-            if (newBreaks >= MAX_COMBO_BREAKS) {
-              if (comboTimerRef.current) clearInterval(comboTimerRef.current);
-              setPhase('complete');
-            }
-            return newBreaks;
-          });
-          return levelConfig.comboTimeout;
+          return 0; // Signal combo break
         }
         return prev - 1;
       });
     }, 1000);
   }, [levelConfig.comboTimeout]);
 
+  // Handle combo break when timer reaches 0
+  useEffect(() => {
+    if (comboTimer === 0 && phase === 'playing') {
+      setCombo(0);
+      comboRef.current = 0;
+      comboBreaksRef.current += 1;
+      const newBreaks = comboBreaksRef.current;
+      setComboBreaks(newBreaks);
+      if (newBreaks >= MAX_COMBO_BREAKS) {
+        if (comboTimerRef.current) clearInterval(comboTimerRef.current);
+        setPhase('complete');
+      } else {
+        setComboTimer(levelConfig.comboTimeout);
+      }
+    }
+  }, [comboTimer, phase, levelConfig.comboTimeout]);
+
   // Start game
   const startGame = useCallback(() => {
+    playDrillStartSound();
     setPhase('playing');
     setCombo(0);
     setMaxCombo(0);
     setWordsFound([]);
     setScore(0);
     setComboBreaks(0);
+    comboBreaksRef.current = 0;
 
     startTimeRef.current = Date.now();
     startComboTimer();
-  }, [startComboTimer]);
+  }, [startComboTimer, playDrillStartSound]);
 
   // Finish game early (saves progress)
   const finishGame = useCallback(() => {
@@ -132,40 +155,21 @@ export default function ComboMaster({
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
-    if (phase !== 'playing') return;
-
-    const upperWord = word.toUpperCase();
-
-    // Check if word can be formed on the board
-    if (!isWordOnBoard(upperWord, grid, language)) {
-      setFeedback({ message: t('brain.drills.errors.notOnBoard') || 'Word not on board', type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
+    const { valid, upperWord, error } = validateWord(word);
+    if (!valid) {
+      if (error && error !== 'notPlaying') {
+        setFeedback({ message: error, type: 'error' });
+        setTimeout(() => setFeedback(null), 2000);
+      }
       return;
     }
 
-    // Check if already found
-    if (wordsFound.includes(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.alreadyFound') || 'Already found', type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    // Check if word is in available words list
-    if (!availableWordSet.has(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.invalidWord') || 'Invalid word', type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    // Valid word!
+    // Valid word! Use comboRef to avoid stale closure
     setWordsFound(prev => [...prev, upperWord]);
-    const newCombo = combo + 1;
+    const newCombo = comboRef.current + 1;
     setCombo(newCombo);
     setMaxCombo(prev => Math.max(prev, newCombo));
-    const baseScore = word.length * 10;
+    const baseScore = calculateWordScore(word, 0);
     const comboMultiplier = 1 + (newCombo * 0.1);
     const wordScore = Math.round(baseScore * comboMultiplier);
 
@@ -179,7 +183,7 @@ export default function ComboMaster({
       if (comboTimerRef.current) clearInterval(comboTimerRef.current);
       setPhase('complete');
     }
-  }, [phase, availableWordSet, wordsFound, combo, startComboTimer, levelConfig.targetCombo, grid, language, t, playErrorSound]);
+  }, [validateWord, startComboTimer, levelConfig.targetCombo, t]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -196,12 +200,8 @@ export default function ComboMaster({
     };
   }, [score, maxCombo, wordsFound.length, level]);
 
-  // Handle completion
-  useEffect(() => {
-    if (phase === 'complete') {
-      onComplete(getResults());
-    }
-  }, [phase, getResults, onComplete]);
+  // Handle completion (idempotent — see useDrillCompleteOnce)
+  useDrillCompleteOnce(phase, getResults, onComplete, playDrillCompleteSound);
 
   // Cleanup
   useEffect(() => {
@@ -214,21 +214,21 @@ export default function ComboMaster({
   const comboBarPercent = (comboTimer / levelConfig.comboTimeout) * 100;
 
   return (
-    <div className={cn(
+    <div dir={dir} className={cn(
       'flex flex-col h-full',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+      'bg-neo-navy'
     )}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
           {/* Combo display */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            combo >= 5 ? 'bg-neo-orange' : isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            combo >= 5 ? 'bg-neo-orange' : 'bg-neo-navy-elevated'
           )}>
             <Flame className={cn(
               'w-4 h-4',
@@ -236,7 +236,7 @@ export default function ComboMaster({
             )} />
             <span className={cn(
               'font-black text-lg',
-              combo >= 5 ? 'text-neo-black' : isDarkMode ? 'text-neo-orange' : 'text-neo-orange'
+              combo >= 5 ? 'text-neo-black' : 'text-neo-orange'
             )}>
               x{combo}
             </span>
@@ -246,7 +246,7 @@ export default function ComboMaster({
           <div className="flex items-center gap-1">
             {Array.from({ length: MAX_COMBO_BREAKS }).map((_, i) => (
               <div
-                key={i}
+                key={`life-${i}`}
                 className={cn(
                   'w-3 h-3 rounded-full border border-neo-black',
                   i < (MAX_COMBO_BREAKS - comboBreaks)
@@ -258,9 +258,9 @@ export default function ComboMaster({
           </div>
         </div>
 
-        <div className={cn(
+        <div aria-live="polite" className={cn(
           'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-          isDarkMode ? 'bg-neo-orange text-neo-black' : 'bg-neo-orange text-neo-black'
+          'bg-neo-orange text-neo-black'
         )}>
           {score} {t('brain.drills.points')}
         </div>
@@ -270,9 +270,9 @@ export default function ComboMaster({
       {phase === 'playing' && (
         <div className={cn(
           'h-2 border-b-2 border-neo-black',
-          isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+          'bg-neo-navy-elevated'
         )}>
-          <motion.div
+          <AdaptiveMotion.div
             className={cn(
               'h-full',
               comboBarPercent > 50 ? 'bg-neo-green' :
@@ -285,64 +285,32 @@ export default function ComboMaster({
       )}
 
       {/* Game Area */}
-      <div className="flex-1 flex flex-col items-center justify-center p-4">
+      <div className="flex-1 min-h-0 overflow-x-hidden overflow-y-auto flex flex-col items-center justify-start p-4">
         {/* Ready Phase */}
         {phase === 'ready' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <Target className="w-20 h-20 mx-auto text-neo-orange" />
-            <h2 className={cn(
-              'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {t('brain.drills.combo-master.name')}
-            </h2>
-            <p className={cn(
-              'text-sm max-w-xs',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-            )}>
-              {t('brain.drills.combo-master.description')}
-            </p>
-            <div className={cn(
-              'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}>
-              <p>{t('brain.drills.level')}: {level}</p>
-              <p>{t('brain.drills.combo-master.targetCombo', { combo: levelConfig.targetCombo })}</p>
-              <p>{t('brain.drills.combo-master.timerPerWord', { time: levelConfig.comboTimeout })}</p>
-            </div>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={startGame}
-              className={cn(
-                'px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard',
-                'font-bold text-lg uppercase',
-                'bg-neo-orange text-neo-black'
-              )}
-            >
-              {t('brain.drills.start')}
-            </motion.button>
-          </motion.div>
+          <DrillBriefing
+            drillId="combo-master"
+            level={level}
+            goalText={`${t('brain.drills.target')}: x${levelConfig.targetCombo} · ${t('brain.drills.timer')}: ${levelConfig.comboTimeout}s ${t('brain.drills.perWord')}`}
+            onStart={() => { playDrillStartSound(); startGame(); }}
+          />
         )}
 
         {/* Playing Phase */}
         {phase === 'playing' && (
-          <div className="w-full max-w-md space-y-4">
+          <div className="w-full max-w-md lg:max-w-lg space-y-4">
             <div className="flex items-center justify-center gap-2">
               <Target className="w-5 h-5 text-neo-orange" />
               <span className={cn(
                 'font-bold',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                'text-neo-white'
               )}>
                 {t('brain.drills.target')}: x{levelConfig.targetCombo}
               </span>
-              <Timer className="w-4 h-4 text-neo-cyan ml-2" />
-              <span className={cn(
+              <Timer className="w-4 h-4 text-neo-cyan ms-2" />
+              <span role="status" className={cn(
                 'font-bold tabular-nums',
-                comboTimer <= 3 ? 'text-neo-red' : isDarkMode ? 'text-neo-cyan' : 'text-neo-purple'
+                comboTimer <= 3 ? 'text-neo-red' : 'text-neo-cyan'
               )}>
                 {comboTimer}s
               </span>
@@ -360,7 +328,7 @@ export default function ComboMaster({
 
             {/* Keyboard typed word display */}
             {keyboard.isTypingMode && keyboard.typedWord && (
-              <motion.div
+              <AdaptiveMotion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 className={cn(
@@ -371,16 +339,19 @@ export default function ComboMaster({
                 )}
               >
                 {keyboard.typedWord}
-              </motion.div>
+              </AdaptiveMotion.div>
             )}
 
             {/* Feedback message */}
-            <AnimatePresence>
+            <AdaptiveAnimatePresence>
               {feedback && (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
+                  role="status"
+                  aria-live={feedback.type === 'error' ? 'assertive' : 'polite'}
+                  aria-atomic="true"
                   className={cn(
                     'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
                     feedback.type === 'error'
@@ -389,9 +360,9 @@ export default function ComboMaster({
                   )}
                 >
                   {feedback.message}
-                </motion.div>
+                </AdaptiveMotion.div>
               )}
-            </AnimatePresence>
+            </AdaptiveAnimatePresence>
 
             {/* Keyboard UI - Desktop only */}
             {keyboard.isDesktop && (
@@ -411,141 +382,34 @@ export default function ComboMaster({
             )}
 
             {/* Finish Game Button */}
-            <motion.button
+            <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={finishGame}
+              aria-label={t('brain.drills.finishGame')}
               className={cn(
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
-                'transition-all hover:translate-y-[-1px]',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                'transition-all hover:-translate-y-px',
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
-              {t('brain.drills.finishGame') || 'Finish Game'}
-            </motion.button>
+              {t('brain.drills.finishGame')}
+            </AdaptiveMotion.button>
           </div>
         )}
 
         {/* Complete Phase */}
         {phase === 'complete' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', damping: 12, delay: 0.2 }}
-            >
-              <Trophy className={cn(
-                'w-20 h-20 mx-auto',
-                maxCombo >= levelConfig.targetCombo ? 'text-neo-lime' : 'text-gray-400'
-              )} />
-            </motion.div>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className={cn(
-                'text-2xl font-black',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
-              )}
-            >
-              {maxCombo >= levelConfig.targetCombo ? t('brain.drills.complete') : t('brain.drills.gameOver')}
-            </motion.h2>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className={cn(
-                'p-4 rounded-neo border-3 border-neo-black space-y-3',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
-              )}
-            >
-              {/* Animated Score */}
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.7, type: 'spring' }}
-                className="text-3xl font-black text-neo-orange"
-              >
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  {score}
-                </motion.span> {t('brain.drills.points')}
-              </motion.div>
-              
-              {/* Animated Stats Grid */}
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-                  )}
-                >
-                  <Flame className="w-6 h-6 mx-auto text-neo-orange mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-cyan' : 'text-neo-purple')}>
-                    x{maxCombo}
-                  </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                    {t('brain.drills.maxCombo')}
-                  </p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-                  )}
-                >
-                  <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
-                    {wordsFound.length}
-                  </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                    {t('brain.drills.wordsFound')}
-                  </p>
-                </motion.div>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="flex gap-3 justify-center"
-            >
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setPhase('ready')}
-                className={cn(
-                  'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard',
-                  'font-bold uppercase',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
-                )}
-              >
-                <RotateCcw className="w-5 h-5" />
-                {t('brain.drills.playAgain')}
-              </motion.button>
-              {onExit && (
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onExit}
-                  className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-orange text-neo-black"
-                >
-                  {t('brain.drills.exit')}
-                </motion.button>
-              )}
-            </motion.div>
-          </motion.div>
+          <ComboMasterCompletePhase
+            score={score}
+            maxCombo={maxCombo}
+            wordsFoundCount={wordsFound.length}
+            targetCombo={levelConfig.targetCombo}
+            comboBreaks={comboBreaks}
+            level={level}
+            onPlayAgain={() => { setPhase('ready'); onPlayAgain?.(); }}
+            onExit={onExit}
+          />
         )}
       </div>
     </div>

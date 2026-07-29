@@ -2,7 +2,8 @@
 
 import React, { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import {
   X,
   Trophy,
@@ -125,14 +126,14 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
 
   return createPortal(
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
         onClick={handleClose}
       >
-        <motion.div
+        <m.div
           initial={{ scale: 0.8, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.8, opacity: 0, y: 20 }}
@@ -147,16 +148,17 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
         >
           {/* Decorative background */}
           {hasPassed && (
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-gradient-to-b from-green-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-linear-to-b from-green-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
           )}
 
           {/* Close button */}
           <button
             onClick={handleClose}
+            aria-label={t('common.close')}
             className={cn(
               'absolute top-4 right-4 rtl:right-auto rtl:left-4 rounded-full p-2 z-10 transition-colors',
               isDarkMode
-                ? 'hover:bg-slate-700 text-gray-400 hover:text-gray-200'
+                ? 'hover:bg-neo-navy-elevated text-gray-400 hover:text-gray-200'
                 : 'hover:bg-gray-100 text-gray-500 hover:text-gray-700'
             )}
           >
@@ -164,14 +166,14 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
           </button>
 
           {/* Header with celebration */}
-          <motion.div
+          <m.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: 'spring', damping: 10, delay: 0.1 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10, delay: 0.1 }}
             className="flex justify-center mb-4"
           >
             {hasPassed ? (
-              <motion.div
+              <m.div
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 0.5, repeat: 3 }}
                 className={cn(
@@ -183,7 +185,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   'drop-shadow-[0_0_20px_rgba(34,197,94,0.5)]',
                   isDarkMode ? 'text-green-400' : 'text-green-600'
                 )} size={48} />
-              </motion.div>
+              </m.div>
             ) : (
               <div className={cn(
                 'p-4 rounded-2xl',
@@ -194,49 +196,49 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 )} size={48} />
               </div>
             )}
-          </motion.div>
+          </m.div>
 
           {/* Title */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, ...SPRING_PRESETS.balanced }}
             className="text-center mb-6"
           >
             <h2 className={cn(
               'text-2xl font-bold mb-2',
               hasPassed
                 ? (isDarkMode
-                  ? 'text-transparent bg-clip-text bg-gradient-to-r from-green-300 to-emerald-400'
-                  : 'text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-emerald-600')
+                  ? 'text-transparent bg-clip-text bg-linear-to-r from-green-300 to-emerald-400'
+                  : 'text-transparent bg-clip-text bg-linear-to-r from-green-500 to-emerald-600')
                 : (isDarkMode
-                  ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-300 to-pink-400'
-                  : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-600')
+                  ? 'text-transparent bg-clip-text bg-linear-to-r from-purple-300 to-pink-400'
+                  : 'text-transparent bg-clip-text bg-linear-to-r from-purple-500 to-pink-600')
             )}>
               {hasPassed
-                ? (t('training.analysis.titleComplete') || 'Training Complete!')
-                : (t('training.analysis.titleProgress') || 'Keep Practicing!')}
+                ? (t('training.analysis.titleComplete'))
+                : (t('training.analysis.titleProgress'))}
             </h2>
             <p className={cn(
               'text-sm',
               isDarkMode ? 'text-gray-300' : 'text-gray-600'
             )}>
               {hasPassed
-                ? (t('training.analysis.subtitleComplete') || 'You\'ve mastered the basics!')
-                : (t('training.analysis.subtitleProgress') || 'A few more skills to unlock')}
+                ? (t('training.analysis.subtitleComplete'))
+                : (t('training.analysis.subtitleProgress'))}
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Progress bar */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.25 }}
+            transition={{ delay: 0.25, type: 'spring', stiffness: 280, damping: 26 }}
             className="mb-6"
           >
             <div className="flex justify-between mb-1">
               <span className={cn('text-sm font-medium', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                {t('training.analysis.progress') || 'Skills Progress'}
+                {t('training.analysis.progress')}
               </span>
               <span className={cn('text-sm font-bold', isDarkMode ? 'text-gray-200' : 'text-gray-800')}>
                 {masteredCount}/{totalSkills}
@@ -244,27 +246,27 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
             </div>
             <div className={cn(
               'h-3 rounded-full overflow-hidden',
-              isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+              isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200'
             )}>
-              <motion.div
+              <m.div
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 0.8, delay: 0.3 }}
                 className={cn(
                   'h-full rounded-full',
                   hasPassed
-                    ? 'bg-gradient-to-r from-green-400 to-emerald-500'
-                    : 'bg-gradient-to-r from-purple-400 to-pink-500'
+                    ? 'bg-linear-to-r from-green-400 to-emerald-500'
+                    : 'bg-linear-to-r from-purple-400 to-pink-500'
                 )}
               />
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Skills grid */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
             className="grid grid-cols-2 gap-3 mb-6"
           >
             {allSkills.map((skill, index) => {
@@ -273,11 +275,11 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
               const Icon = config.icon;
 
               return (
-                <motion.div
+                <m.div
                   key={skill}
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.35 + index * 0.05 }}
+                  transition={{ delay: 0.35 + index * 0.05, type: 'spring', stiffness: 380, damping: 26 }}
                   className={cn(
                     'p-3 rounded-xl border-2 transition-all',
                     isMastered
@@ -285,14 +287,14 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                         ? 'bg-green-900/20 border-green-500/30'
                         : 'bg-green-50 border-green-200')
                       : (isDarkMode
-                        ? 'bg-slate-700/50 border-slate-600'
+                        ? 'bg-neo-navy-elevated/50 border-slate-600'
                         : 'bg-gray-50 border-gray-200')
                   )}
                 >
                   <div className="flex items-center gap-2 mb-1">
                     <Icon
                       className={cn(
-                        'flex-shrink-0',
+                        'shrink-0',
                         isMastered
                           ? (isDarkMode ? 'text-green-400' : 'text-green-600')
                           : (isDarkMode ? 'text-gray-400' : 'text-gray-500')
@@ -317,26 +319,26 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   )}>
                     {t(`training.analysis.skills.${skill}`) || config.label}
                   </p>
-                </motion.div>
+                </m.div>
               );
             })}
-          </motion.div>
+          </m.div>
 
           {/* Stats */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
+            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
             className={cn(
               'p-4 rounded-xl mb-6',
-              isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
+              isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-50'
             )}
           >
             <p className={cn(
               'text-sm font-medium mb-3',
               isDarkMode ? 'text-gray-300' : 'text-gray-600'
             )}>
-              {t('training.analysis.stats') || 'Your Stats'}
+              {t('training.analysis.stats')}
             </p>
             <div className="grid grid-cols-3 gap-4 text-center">
               <div>
@@ -350,7 +352,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   'text-xs',
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 )}>
-                  {t('training.analysis.wordsFound') || 'Words'}
+                  {t('training.analysis.wordsFound')}
                 </p>
               </div>
               <div>
@@ -364,7 +366,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   'text-xs',
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 )}>
-                  {t('training.analysis.longestWord') || 'Longest'}
+                  {t('training.analysis.longestWord')}
                 </p>
               </div>
               <div>
@@ -378,18 +380,18 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   'text-xs',
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 )}>
-                  {t('training.analysis.dirChanges') || 'Dir. Changes'}
+                  {t('training.analysis.dirChanges')}
                 </p>
               </div>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Tips for improvement (if not passed) */}
           {!hasPassed && summary.needsWork.length > 0 && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.45 }}
+              transition={{ delay: 0.45, type: 'spring', stiffness: 280, damping: 26 }}
               className={cn(
                 'p-4 rounded-xl mb-6 border',
                 isDarkMode
@@ -402,7 +404,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 isDarkMode ? 'text-purple-300' : 'text-purple-700'
               )}>
                 <Sparkles className="inline w-4 h-4 me-1" />
-                {t('training.analysis.tips') || 'Tips for next time:'}
+                {t('training.analysis.tips')}
               </p>
               <ul className="space-y-1">
                 {summary.needsWork.slice(0, 2).map((skill) => (
@@ -417,14 +419,14 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   </li>
                 ))}
               </ul>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Action Buttons */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.5, type: 'spring', stiffness: 280, damping: 26 }}
             className="space-y-3"
           >
             {hasPassed ? (
@@ -435,23 +437,23 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                     onClick={() => handleGoToMode('multiplayer')}
                     className={cn(
                       'h-12 font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
-                      'bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600',
+                      'bg-linear-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600',
                       'text-white shadow-lg hover:shadow-xl'
                     )}
                   >
                     <Gamepad2 size={18} />
-                    {t('training.analysis.multiplayer') || 'Multiplayer'}
+                    {t('training.analysis.multiplayer')}
                   </Button>
                   <Button
                     onClick={() => handleGoToMode('daily')}
                     className={cn(
                       'h-12 font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
-                      'bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600',
+                      'bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600',
                       'text-white shadow-lg hover:shadow-xl'
                     )}
                   >
                     <Calendar size={18} />
-                    {t('training.analysis.daily') || 'Daily'}
+                    {t('training.analysis.daily')}
                   </Button>
                 </div>
 
@@ -462,12 +464,12 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   className={cn(
                     'w-full h-10 text-sm font-medium rounded-xl transition-all',
                     isDarkMode
-                      ? 'text-gray-400 hover:text-gray-200 hover:bg-slate-700'
+                      ? 'text-gray-400 hover:text-gray-200 hover:bg-neo-navy-elevated'
                       : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                   )}
                 >
                   <RotateCcw className="me-2" size={16} />
-                  {t('training.analysis.practiceMore') || 'Practice More'}
+                  {t('training.analysis.practiceMore')}
                 </Button>
               </>
             ) : (
@@ -477,12 +479,12 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                   onClick={handleTryAgain}
                   className={cn(
                     'w-full h-12 text-base font-semibold rounded-xl transition-all flex items-center justify-center gap-2',
-                    'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
+                    'bg-linear-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600',
                     'text-white shadow-lg hover:shadow-xl'
                   )}
                 >
                   <RotateCcw size={20} />
-                  {t('training.analysis.tryAgain') || 'Try Again'}
+                  {t('training.analysis.tryAgain')}
                   <ArrowRight size={18} className="rtl:rotate-180" />
                 </Button>
 
@@ -494,7 +496,7 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                     className={cn(
                       'w-full h-10 text-sm font-medium rounded-xl transition-all',
                       isDarkMode
-                        ? 'text-gray-400 hover:text-gray-200 hover:bg-slate-700'
+                        ? 'text-gray-400 hover:text-gray-200 hover:bg-neo-navy-elevated'
                         : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                     )}
                   >
@@ -503,9 +505,9 @@ const TrainingAnalysisModal: React.FC<TrainingAnalysisModalProps> = ({
                 )}
               </>
             )}
-          </motion.div>
-        </motion.div>
-      </motion.div>
+          </m.div>
+        </m.div>
+      </m.div>
     </AnimatePresence>,
     document.body
   );

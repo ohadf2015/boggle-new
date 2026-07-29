@@ -5,6 +5,8 @@
 
 import type { Request, Response } from 'express';
 import type { UrlWithParsedQuery } from 'url';
+import { httpLogger } from './logger';
+import { resolveLocaleFromAcceptLanguage } from '../lib/localeResolution';
 
 /**
  * Extended Request with geo data
@@ -30,7 +32,7 @@ export const COUNTRY_TO_LOCALE: Record<string, string> = {
 };
 
 export const SUPPORTED_LOCALES: string[] = ['he', 'en', 'sv', 'ja', 'es'];
-export const DEFAULT_LOCALE: string = 'he';
+export const DEFAULT_LOCALE: string = 'en';
 
 // Social media crawler user agents
 const SOCIAL_CRAWLERS: string[] = [
@@ -38,6 +40,15 @@ const SOCIAL_CRAWLERS: string[] = [
   'linkedinbot', 'slackbot', 'telegrambot', 'discordbot',
   'pinterest', 'redditbot', 'embedly', 'quora link preview',
   'outbrain', 'vkshare', 'w3c_validator'
+];
+
+// SEO search engine crawler user agents
+const SEO_CRAWLERS: string[] = [
+  'googlebot', 'bingbot', 'yandexbot', 'duckduckbot', 'baiduspider',
+  'sogou', 'exabot', 'ia_archiver', 'applebot', 'petalbot',
+  'semrushbot', 'ahrefsbot', 'mj12bot', 'dotbot', 'rogerbot',
+  'google-inspectiontool', 'google-extended', 'bytespider',
+  'gptbot', 'claudebot', 'anthropic-ai', 'ccbot'
 ];
 
 /**
@@ -51,13 +62,31 @@ export function isSocialCrawler(userAgent: string): boolean {
 }
 
 /**
+ * Detect if request is from an SEO search engine crawler
+ * @param userAgent - User agent string
+ * @returns Whether the request is from an SEO bot
+ */
+export function isSeoCrawler(userAgent: string): boolean {
+  const ua = (userAgent || '').toLowerCase();
+  return SEO_CRAWLERS.some(bot => ua.includes(bot));
+}
+
+/**
+ * Detect if request is from any type of bot (social or SEO)
+ */
+export function isBot(userAgent: string): boolean {
+  return isSocialCrawler(userAgent) || isSeoCrawler(userAgent);
+}
+
+/**
  * Determine locale from request
- * Priority: cookie > IP geolocation > x-country-code header > Accept-Language
+ * Priority: cookie > Accept-Language > default
+ * Location-based detection removed to respect user preferences
  * @param req - Express request object
  * @returns Locale code
  */
 export function determineLocale(req: GeoRequest): string {
-  // Priority 1: Cookie preference
+  // Priority 1: Cookie preference (explicit user selection)
   const cookies = req.headers.cookie;
   const cookieLocale = cookies?.split(';')
     .find(c => c.trim().startsWith('boggle_language='))
@@ -67,27 +96,15 @@ export function determineLocale(req: GeoRequest): string {
     return cookieLocale;
   }
 
-  // Priority 2: IP Geolocation
-  if (req.geoData?.countryCode && COUNTRY_TO_LOCALE[req.geoData.countryCode]) {
-    return COUNTRY_TO_LOCALE[req.geoData.countryCode];
-  }
-
-  // Priority 3: x-country-code header
-  const countryHeader = req.headers['x-country-code'] as string | undefined;
-  if (countryHeader && COUNTRY_TO_LOCALE[countryHeader]) {
-    return COUNTRY_TO_LOCALE[countryHeader];
-  }
-
-  // Priority 4: Accept-Language header
-  const acceptLanguage = req.headers['accept-language'];
-  if (acceptLanguage) {
-    const browserLang = acceptLanguage.split(',')[0].split('-')[0].toLowerCase();
-    if (SUPPORTED_LOCALES.includes(browserLang)) {
-      return browserLang;
-    }
-  }
-
-  return DEFAULT_LOCALE;
+  // Priority 2: Accept-Language header (browser preference). Shared resolver
+  // q-sorts the full list AND maps close-but-unshipped languages to a native
+  // bundle (e.g. pt-BR -> es) before falling back to DEFAULT_LOCALE. Previously
+  // this only inspected the first tag and ignored proximity, so Brazilians got
+  // English instead of our (far more intelligible) Spanish bundle.
+  return resolveLocaleFromAcceptLanguage(
+    req.headers['accept-language'],
+    DEFAULT_LOCALE,
+  );
 }
 
 /**
@@ -102,17 +119,20 @@ export function handleLocaleRedirect(req: GeoRequest, res: Response, parsedUrl: 
   const locale = determineLocale(req);
   const queryString = parsedUrl.search || '';
 
-  // For social crawlers: rewrite internally (don't redirect)
-  if (isSocialCrawler(userAgent)) {
-    console.log(`[Crawler] Social crawler detected -> rewriting to /${locale}${queryString}`);
-    parsedUrl.pathname = `/${locale}`;
-    req.url = `/${locale}${queryString}`;
+  // For any bot (social or SEO): rewrite internally (don't redirect)
+  // Redirects waste crawl budget — serve content directly
+  if (isBot(userAgent)) {
+    // SEO bots always get x-default locale (en) to match sitemap canonical
+    const botLocale = isSeoCrawler(userAgent) ? 'en' : locale;
+    httpLogger.debug({ botLocale, queryString }, 'Bot detected, rewriting');
+    parsedUrl.pathname = `/${botLocale}`;
+    req.url = `/${botLocale}${queryString}`;
     return false; // Continue to Next.js handler
   }
 
-  // For regular users: redirect
-  console.log(`[Redirect] Root path redirect: ${req.url} -> /${locale}${queryString}`);
-  res.writeHead(307, { Location: `/${locale}${queryString}` });
+  // For regular users: 301 permanent redirect (locale structure is permanent)
+  httpLogger.debug({ from: req.url, to: `/${locale}${queryString}` }, 'Root path redirect');
+  res.writeHead(301, { Location: `/${locale}${queryString}` });
   res.end();
   return true; // Request handled
 }

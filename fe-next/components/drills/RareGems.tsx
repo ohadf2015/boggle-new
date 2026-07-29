@@ -1,16 +1,29 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Gem, Star, Trophy, RotateCcw, Clock, Target } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
+import { Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import GridComponent from '@/components/GridComponent';
-import { isWordOnBoard } from '@/utils/utils';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useDrillWordSubmit } from './hooks/useDrillWordSubmit';
+import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
+import DrillBriefing from '@/components/brain/DrillBriefing';
+import RareGemsCompletePhase from './RareGemsCompletePhase';
+import GemPouchMeter from './GemPouchMeter';
+import GemFindPopup from './GemFindPopup';
+import PouchFullBeat from './PouchFullBeat';
+import {
+  classifyGem,
+  gemValue,
+  GEM_POINTS,
+  celebrationFor,
+  computeGemProgress,
+  type CelebrationLevel,
+} from '@/lib/drills/rareGems';
 import type { LetterGrid, Language } from '@/types';
 
 // Level configurations
@@ -22,27 +35,12 @@ const LEVEL_CONFIGS = [
   { level: 5, timeLimit: 45, targetRare: 15, targetScore: 500 },
 ];
 
-// Word rarity based on length (adjusted for fair gameplay - max 5 letters for rare)
-const getWordRarity = (word: string): 'common' | 'uncommon' | 'rare' | 'legendary' => {
-  const len = word.length;
-  if (len >= 6) return 'legendary';  // 6+ letters = legendary
-  if (len >= 5) return 'rare';       // 5 letters = rare
-  if (len >= 4) return 'uncommon';   // 4 letters = uncommon
-  return 'common';                   // 3 letters = common
-};
-
+// Gem-tier → swatch colour (UI only; tier + points live in lib/drills/rareGems).
 const RARITY_COLORS = {
   common: 'bg-gray-400',
   uncommon: 'bg-neo-green',
   rare: 'bg-neo-purple',
   legendary: 'bg-neo-lime',
-};
-
-const RARITY_POINTS = {
-  common: 10,
-  uncommon: 25,
-  rare: 50,
-  legendary: 100,
 };
 
 interface RareGemsProps {
@@ -58,6 +56,7 @@ interface RareGemsProps {
     level: number;
   }) => void;
   onExit?: () => void;
+  onPlayAgain?: () => void;
 }
 
 type GamePhase = 'ready' | 'playing' | 'complete';
@@ -75,11 +74,18 @@ export default function RareGems({
   language = 'en',
   onComplete,
   onExit,
+  onPlayAgain,
 }: RareGemsProps) {
-  const { theme } = useTheme();
-  const { t } = useLanguage();
-  const { playErrorSound } = useSoundEffects();
-  const isDarkMode = theme === 'dark';
+  const { t, dir } = useLanguage();
+  const {
+    playErrorSound,
+    playDrillStartSound,
+    playDrillCompleteSound,
+    playWordAcceptedSound,
+    playRareWordSound,
+    playLegendaryWordSound,
+    playChestOpenSound,
+  } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
 
@@ -87,15 +93,29 @@ export default function RareGems({
   const [timeRemaining, setTimeRemaining] = useState(levelConfig.timeLimit);
   const [wordsFound, setWordsFound] = useState<{ word: string; rarity: string }[]>([]);
   const [score, setScore] = useState(0);
-  const [lastWord, setLastWord] = useState<{ word: string; rarity: string; points: number } | null>(null);
+  const [lastWord, setLastWord] = useState<{ word: string; rarity: string; points: number; celebration: CelebrationLevel } | null>(null);
   const [feedback, setFeedback] = useState<{ message: string; type: 'error' | 'success' } | null>(null);
+  // Brief "Pouch Full!" celebration beat before flipping to the results phase.
+  const [pouchFull, setPouchFull] = useState(false);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const winBeatRef = useRef<NodeJS.Timeout | null>(null);
 
-  const availableWordSet = useMemo(
-    () => new Set(availableWords.map(w => w.word.toUpperCase())),
-    [availableWords]
+  const foundWordStrings = useMemo(
+    () => wordsFound.map(w => w.word),
+    [wordsFound]
   );
+
+  const { validateWord } = useDrillWordSubmit({
+    grid,
+    language,
+    availableWords,
+    wordsFound: foundWordStrings,
+    phase,
+    playingPhase: 'playing',
+    playErrorSound,
+    t,
+  });
 
   // Keyboard support for desktop users
   const keyboard = useDrillKeyboardSupport({
@@ -106,13 +126,14 @@ export default function RareGems({
     minWordLength: 2,
   });
 
-  const rareWordsFound = wordsFound.filter(w =>
-    w.rarity === 'rare' || w.rarity === 'legendary'
-  ).length;
+  const progress = computeGemProgress(wordsFound, levelConfig.targetRare);
+  const rareWordsFound = progress.rareCount;
 
   // Start game
   const startGame = useCallback(() => {
+    playDrillStartSound();
     setPhase('playing');
+    setPouchFull(false);
     setTimeRemaining(levelConfig.timeLimit);
     setWordsFound([]);
     setScore(0);
@@ -128,56 +149,63 @@ export default function RareGems({
         return prev - 1;
       });
     }, 1000);
-  }, [levelConfig.timeLimit]);
+  }, [levelConfig.timeLimit, playDrillStartSound]);
 
   // Handle word submission
   const handleWordSubmit = useCallback((word: string) => {
-    if (phase !== 'playing') return;
-
-    const upperWord = word.toUpperCase();
-
-    // Check if word can be formed on the board
-    if (!isWordOnBoard(upperWord, grid, language)) {
-      setFeedback({ message: t('brain.drills.errors.notOnBoard') || 'Word not on board', type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
+    const { valid, upperWord, error } = validateWord(word);
+    if (!valid) {
+      if (error && error !== 'notPlaying') {
+        setFeedback({ message: error, type: 'error' });
+        setTimeout(() => setFeedback(null), 2000);
+      }
       return;
     }
 
-    const alreadyFound = wordsFound.some(w => w.word === upperWord);
-    if (alreadyFound) {
-      setFeedback({ message: t('brain.drills.errors.alreadyFound') || 'Already found', type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
+    // Valid word — mine a gem! Tier + points come from the pure lib.
+    const rarity = classifyGem(word);
+    const points = gemValue(rarity);
+    const celebration = celebrationFor(rarity);
+
+    // Escalating find ceremony: bigger gem → louder, richer feedback.
+    switch (celebration) {
+      case 'epic': playLegendaryWordSound(); break;
+      case 'big': playRareWordSound(); break;
+      default: playWordAcceptedSound(); break;
     }
 
-    if (!availableWordSet.has(upperWord)) {
-      setFeedback({ message: t('brain.drills.errors.invalidWord') || 'Invalid word', type: 'error' });
-      playErrorSound?.();
-      setTimeout(() => setFeedback(null), 2000);
-      return;
-    }
-
-    // Valid word!
-    const rarity = getWordRarity(word);
-    const points = RARITY_POINTS[rarity];
     setWordsFound(prev => [...prev, { word: upperWord, rarity }]);
     setScore(prev => prev + points);
-    setLastWord({ word: upperWord, rarity, points });
+    setLastWord({ word: upperWord, rarity, points, celebration });
     setFeedback({ message: `+${points} ${t('brain.drills.points')} (${t(`brain.drills.rarity.${rarity}`)})`, type: 'success' });
     setTimeout(() => {
       setLastWord(null);
       setFeedback(null);
     }, 1500);
 
-    if (rareWordsFound + (rarity === 'rare' || rarity === 'legendary' ? 1 : 0) >= levelConfig.targetRare) {
+    const willComplete =
+      rareWordsFound + (rarity === 'rare' || rarity === 'legendary' ? 1 : 0) >=
+      levelConfig.targetRare;
+    if (willComplete) {
       if (timerRef.current) clearInterval(timerRef.current);
       const bonusTime = timeRemaining * 2;
       setScore(prev => prev + bonusTime);
-      setPhase('complete');
+      // Cosy payoff: a short "Pouch Full!" beat before the results phase.
+      setPouchFull(true);
+      playChestOpenSound();
+      winBeatRef.current = setTimeout(() => setPhase('complete'), 900);
     }
-  }, [phase, availableWordSet, wordsFound, rareWordsFound, levelConfig.targetRare, timeRemaining, grid, language, t, playErrorSound]);
+  }, [
+    validateWord,
+    rareWordsFound,
+    levelConfig.targetRare,
+    timeRemaining,
+    t,
+    playWordAcceptedSound,
+    playRareWordSound,
+    playLegendaryWordSound,
+    playChestOpenSound,
+  ]);
 
   // Finish game early (saves progress)
   const finishGame = useCallback(() => {
@@ -200,82 +228,76 @@ export default function RareGems({
     };
   }, [score, rareWordsFound, wordsFound.length, level, levelConfig.timeLimit]);
 
-  useEffect(() => {
-    if (phase === 'complete') {
-      onComplete(getResults());
-    }
-  }, [phase, getResults, onComplete]);
+  // Handle completion (idempotent — see useDrillCompleteOnce)
+  useDrillCompleteOnce(phase, getResults, onComplete, playDrillCompleteSound);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
+      if (winBeatRef.current) clearTimeout(winBeatRef.current);
     };
   }, []);
 
   return (
-    <div className={cn(
-      'flex flex-col h-full',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
+    <div dir={dir} className={cn(
+      'relative flex flex-col h-full',
+      'bg-neo-navy'
     )}>
       {/* Header */}
       <div className={cn(
         'flex items-center justify-between px-4 py-3',
         'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-slate-800' : 'bg-white'
+        'bg-neo-navy-light'
       )}>
         <div className="flex items-center gap-3">
           {/* Timer */}
           <div className={cn(
             'flex items-center gap-1 px-3 py-1 rounded-neo border-2 border-neo-black',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            'bg-neo-navy-elevated'
           )}>
             <Clock className={cn(
               'w-4 h-4',
               timeRemaining <= 10 ? 'text-neo-red' : 'text-neo-green'
             )} />
-            <span className={cn(
+            <span role="status" className={cn(
               'font-black text-lg tabular-nums',
-              timeRemaining <= 10 ? 'text-neo-red' : isDarkMode ? 'text-neo-green' : 'text-neo-green'
+              timeRemaining <= 10 ? 'text-neo-red' : 'text-neo-green'
             )}>
               {timeRemaining}s
             </span>
           </div>
-
-          {/* Rare count */}
-          <div className={cn(
-            'flex items-center gap-1 px-2 py-1 rounded border-2 border-neo-black',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-          )}>
-            <Gem className="w-4 h-4 text-neo-purple" />
-            <span className={cn(
-              'font-bold text-sm',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {rareWordsFound}/{levelConfig.targetRare}
-            </span>
-          </div>
         </div>
 
-        <div className={cn(
-          'px-3 py-1 rounded-neo border-2 border-neo-black font-bold',
-          'bg-neo-green text-neo-black'
-        )}>
+        <div aria-live="polite" className="px-3 py-1 rounded-neo border-2 border-neo-black font-bold bg-neo-cozy text-neo-black">
           {score} {t('brain.drills.points')}
         </div>
       </div>
+
+      {/* Gem Pouch — the felt-progress meter (replaces the old tiny count chip) */}
+      {phase === 'playing' && (
+        <div className="px-4 py-2 border-b-2 border-neo-black bg-neo-navy-light">
+          <GemPouchMeter
+            rareCount={rareWordsFound}
+            target={levelConfig.targetRare}
+            fraction={progress.fraction}
+            totalGems={progress.totalGems}
+            t={t}
+          />
+        </div>
+      )}
 
       {/* Rarity Legend */}
       {phase === 'playing' && (
         <div className={cn(
           'flex items-center justify-center gap-3 py-2 text-xs',
           'border-b-2 border-neo-black',
-          isDarkMode ? 'bg-slate-800/50' : 'bg-white/50'
+          'bg-neo-navy-light'
         )}>
           {Object.entries(RARITY_COLORS).map(([rarity, color]) => (
             <div key={rarity} className="flex items-center gap-1">
               <div className={cn('w-3 h-3 rounded border border-neo-black', color)} />
-              <span className={isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'}>
-                {t(`brain.drills.rarity.${rarity}`)} (+{RARITY_POINTS[rarity as keyof typeof RARITY_POINTS]})
+              <span className={'text-neo-white'}>
+                {t(`brain.drills.rarity.${rarity}`)} (+{GEM_POINTS[rarity as keyof typeof GEM_POINTS]})
               </span>
             </div>
           ))}
@@ -283,52 +305,24 @@ export default function RareGems({
       )}
 
       {/* Game Area */}
-      <div className="flex-1 flex flex-col items-center justify-center p-4">
+      <div className="flex-1 min-h-0 overflow-x-hidden overflow-y-auto flex flex-col items-center justify-start p-4">
         {phase === 'ready' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <BookOpen className="w-20 h-20 mx-auto text-neo-green" />
-            <h2 className={cn(
-              'text-2xl font-black',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {t('brain.drills.rare-gems.name')}
-            </h2>
-            <p className={cn(
-              'text-sm max-w-xs',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-            )}>
-              {t('brain.drills.rare-gems.description')}
-            </p>
-            <div className={cn(
-              'text-xs space-y-1 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}>
-              <p>{t('brain.drills.level')}: {level}</p>
-              <p>{t('brain.drills.timeSpent')}: {levelConfig.timeLimit}s</p>
-              <p>{t('brain.drills.targetRareWords')}: {levelConfig.targetRare}</p>
-            </div>
-            <motion.button
-              whileTap={{ scale: 0.95 }}
-              onClick={startGame}
-              className="px-8 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold text-lg uppercase bg-neo-green text-neo-black"
-            >
-              {t('brain.drills.start')}
-            </motion.button>
-          </motion.div>
+          <DrillBriefing
+            drillId="rare-gems"
+            level={level}
+            goalText={`${t('brain.drills.timeLimit')}: ${levelConfig.timeLimit}s · ${t('brain.drills.targetRareWords')}: ${levelConfig.targetRare}`}
+            onStart={() => { playDrillStartSound(); startGame(); }}
+          />
         )}
 
         {phase === 'playing' && (
-          <div className="w-full max-w-md space-y-4 relative">
+          <div className="w-full max-w-md lg:max-w-lg space-y-4 relative">
             {/* Keyboard typed word display */}
             {keyboard.isTypingMode && keyboard.typedWord && (
               <div className="flex justify-center">
                 <div className={cn(
                   'px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-lg',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
+                  'bg-neo-navy-elevated text-neo-white'
                 )}>
                   {keyboard.typedWord.toUpperCase()}
                 </div>
@@ -344,67 +338,60 @@ export default function RareGems({
               className="w-full"
             />
 
-            {/* Feedback message */}
-            <AnimatePresence>
-              {feedback && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className={cn(
-                    'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
-                    feedback.type === 'error'
-                      ? 'bg-neo-red text-neo-white'
-                      : 'bg-neo-green text-neo-black'
-                  )}
-                >
-                  {feedback.message}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Word popup */}
-            <AnimatePresence>
-              {lastWord && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  className={cn(
-                    'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
-                    'px-4 py-2 rounded-neo border-3 border-neo-black shadow-hard',
-                    RARITY_COLORS[lastWord.rarity as keyof typeof RARITY_COLORS]
-                  )}
-                >
-                  <div className="flex items-center gap-2">
-                    {lastWord.rarity === 'legendary' && <Star className="w-5 h-5 text-neo-black" />}
-                    {lastWord.rarity === 'rare' && <Gem className="w-5 h-5 text-neo-black" />}
-                    <span className="font-black text-neo-black">{lastWord.word}</span>
-                    <span className="font-bold text-neo-black">+{lastWord.points}</span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Found words */}
-            {wordsFound.length > 0 && (
-              <div className={cn(
-                'flex flex-wrap gap-2 justify-center p-3 rounded-neo border-2 border-neo-black max-h-32 overflow-y-auto',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
-              )}>
-                {wordsFound.slice(-15).map((w, i) => (
-                  <span
-                    key={i}
+            {/* Feedback message — fixed-height slot so toggling doesn't shift the grid */}
+            <div className="min-h-[2.75rem] flex items-center justify-center">
+              <AdaptiveAnimatePresence>
+                {feedback && (
+                  <AdaptiveMotion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    role="status"
+                    aria-live={feedback.type === 'error' ? 'assertive' : 'polite'}
+                    aria-atomic="true"
                     className={cn(
-                      'px-3 py-1 rounded-neo border border-neo-black/30 text-sm font-bold text-neo-black',
+                      'text-center px-4 py-2 rounded-neo border-2 border-neo-black font-bold text-sm',
+                      feedback.type === 'error'
+                        ? 'bg-neo-red text-neo-white'
+                        : 'bg-neo-green text-neo-black'
+                    )}
+                  >
+                    {feedback.message}
+                  </AdaptiveMotion.div>
+                )}
+              </AdaptiveAnimatePresence>
+            </div>
+
+            {/* Escalating gem find ceremony — bigger gem pops bigger. */}
+            <GemFindPopup find={lastWord} />
+
+            {/* Found words — always-rendered, fixed height: scrolls instead of
+                growing, so the centered grid never re-positions on submit (CLS fix). */}
+            <div
+              data-testid="drill-found-words"
+              className={cn(
+                'flex flex-wrap gap-2 justify-center content-start p-3 rounded-neo border-2 border-neo-black h-32 overflow-y-auto',
+                'bg-neo-navy-light'
+              )}
+            >
+              {wordsFound.length === 0 ? (
+                <span className="self-center text-xs text-neo-white">
+                  {t('brain.drills.foundWordsHint')}
+                </span>
+              ) : (
+                wordsFound.slice(-15).map((w, i) => (
+                  <span
+                    key={`${w.word}-${i}`}
+                    className={cn(
+                      'px-3 py-1 rounded-neo border border-neo-black/30 text-sm font-bold text-neo-black h-fit',
                       RARITY_COLORS[w.rarity as keyof typeof RARITY_COLORS]
                     )}
                   >
                     {w.word}
                   </span>
-                ))}
-              </div>
-            )}
+                ))
+              )}
+            </div>
 
             {/* Keyboard UI - Desktop only */}
             {keyboard.isDesktop && (
@@ -424,141 +411,37 @@ export default function RareGems({
             )}
 
             {/* Finish Game Button */}
-            <motion.button
+            <AdaptiveMotion.button
               whileTap={{ scale: 0.95 }}
               onClick={finishGame}
+              aria-label={t('brain.drills.finishGame')}
               className={cn(
                 'w-full mt-4 px-4 py-2 rounded-neo border-2 border-neo-black',
                 'font-bold text-sm uppercase',
-                'transition-all hover:translate-y-[-1px]',
-                isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-gray-200 text-neo-black'
+                'transition-all hover:-translate-y-px',
+                'bg-neo-navy-elevated text-neo-white'
               )}
             >
-              {t('brain.drills.finishGame') || 'Finish Game'}
-            </motion.button>
+              {t('brain.drills.finishGame')}
+            </AdaptiveMotion.button>
           </div>
         )}
 
         {phase === 'complete' && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center space-y-6"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: 'spring', damping: 12, delay: 0.2 }}
-            >
-              <Trophy className={cn(
-                'w-20 h-20 mx-auto',
-                rareWordsFound >= levelConfig.targetRare ? 'text-neo-lime' : 'text-gray-400'
-              )} />
-            </motion.div>
-            <motion.h2
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className={cn(
-                'text-2xl font-black',
-                isDarkMode ? 'text-neo-white' : 'text-neo-black'
-              )}
-            >
-              {rareWordsFound >= levelConfig.targetRare ? t('brain.drills.complete') : t('brain.drills.gameOver')}
-            </motion.h2>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className={cn(
-                'p-4 rounded-neo border-3 border-neo-black space-y-3',
-                isDarkMode ? 'bg-slate-800' : 'bg-white'
-              )}
-            >
-              {/* Animated Score */}
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.7, type: 'spring' }}
-                className="text-3xl font-black text-neo-green"
-              >
-                <motion.span
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  {score}
-                </motion.span> {t('brain.drills.points')}
-              </motion.div>
-              
-              {/* Animated Stats Grid */}
-              <div className="grid grid-cols-2 gap-3 mt-4">
-                <motion.div
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.9 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-                  )}
-                >
-                  <Gem className="w-6 h-6 mx-auto text-neo-purple mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
-                    {rareWordsFound}
-                  </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                    {t('brain.drills.rareWords')}
-                  </p>
-                </motion.div>
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 1 }}
-                  className={cn(
-                    'p-3 rounded-neo border-2 border-neo-black',
-                    isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
-                  )}
-                >
-                  <Target className="w-6 h-6 mx-auto text-neo-green mb-1" />
-                  <p className={cn('text-2xl font-black', isDarkMode ? 'text-neo-white' : 'text-neo-black')}>
-                    {wordsFound.length}
-                  </p>
-                  <p className={cn('text-xs', isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70')}>
-                    {t('brain.drills.wordsFound')}
-                  </p>
-                </motion.div>
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              className="flex gap-3 justify-center"
-            >
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setPhase('ready')}
-                className={cn(
-                  'flex items-center gap-2 px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase',
-                  isDarkMode ? 'bg-slate-700 text-neo-white' : 'bg-white text-neo-black'
-                )}
-              >
-                <RotateCcw className="w-5 h-5" />
-                {t('brain.drills.playAgain')}
-              </motion.button>
-              {onExit && (
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={onExit}
-                  className="px-6 py-3 rounded-neo border-3 border-neo-black shadow-hard font-bold uppercase bg-neo-green text-neo-black"
-                >
-                  {t('brain.drills.exit')}
-                </motion.button>
-              )}
-            </motion.div>
-          </motion.div>
+          <RareGemsCompletePhase
+            score={score}
+            rareWordsFound={rareWordsFound}
+            wordsFoundCount={wordsFound.length}
+            targetRare={levelConfig.targetRare}
+            level={level}
+            onPlayAgain={() => { setPhase('ready'); onPlayAgain?.(); }}
+            onExit={onExit}
+          />
         )}
       </div>
+
+      {/* "Pouch Full!" win beat — a short cosy payoff before the results phase. */}
+      <PouchFullBeat visible={pouchFull && phase === 'playing'} t={t} />
     </div>
   );
 }

@@ -1,5 +1,7 @@
-import { NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { getSupabaseAdmin } from '@/lib/admin/server';
+import { captureApiError } from '@/utils/sentry';
 import crypto from 'crypto';
 
 /**
@@ -16,26 +18,17 @@ import crypto from 'crypto';
  * - retryUrl: string (full URL to share with players)
  * - expiresAt: string (ISO timestamp when token expires)
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Check if user is authenticated and is admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
-    // Check if user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
     // Parse request body
@@ -82,7 +75,7 @@ export async function POST(request: Request) {
         token,
         puzzle_date: puzzleDate,
         language,
-        created_by: user.id,
+        created_by: authResult.user!.id,
         expires_at: expiresAt.toISOString(),
         use_count: 0,
       })
@@ -90,7 +83,8 @@ export async function POST(request: Request) {
       .single();
 
     if (insertError) {
-      console.error('Failed to create retry token:', insertError);
+      const errorMessage = insertError.message || 'Unknown error';
+      console.error('Failed to create retry token:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to create retry token' },
         { status: 500 }
@@ -112,9 +106,15 @@ export async function POST(request: Request) {
       expiresAt: tokenData.expires_at,
     });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('Generate retry link error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/generate-retry-link',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }
@@ -124,26 +124,17 @@ export async function POST(request: Request) {
  * GET /api/admin/daily-word/generate-retry-link
  * List all retry tokens (for admin dashboard)
  */
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
-
-    // Check if user is authenticated and is admin
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
-    // Check if user is admin
-    const { data: profile, error: profileError } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (profileError || !profile?.is_admin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
     }
 
     // Parse query params
@@ -168,7 +159,8 @@ export async function GET(request: Request) {
     const { data: tokens, error: queryError } = await query;
 
     if (queryError) {
-      console.error('Failed to fetch retry tokens:', queryError);
+      const errorMessage = queryError.message || 'Unknown error';
+      console.error('Failed to fetch retry tokens:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to fetch retry tokens' },
         { status: 500 }
@@ -180,9 +172,15 @@ export async function GET(request: Request) {
       tokens,
     });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('List retry tokens error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/generate-retry-link',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

@@ -12,10 +12,23 @@ const router: Router = express.Router();
 
 // ==================== Types ====================
 
+interface SessionAvatar {
+  emoji?: string;
+  color?: string;
+  avatarImage?: string;
+  customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig;
+}
+
 interface SessionData {
   timestamp: number;
+  startedAt: number;
   language: string;
   mode: string;
+  username?: string;
+  avatar?: SessionAvatar | null;
+  playerId?: string | null;
+  isAuthenticated?: boolean;
+  score?: number;
 }
 
 interface HeartbeatRequest extends Request {
@@ -23,6 +36,11 @@ interface HeartbeatRequest extends Request {
     sessionId?: string;
     language?: string;
     mode?: string;
+    username?: string;
+    avatar?: SessionAvatar | null;
+    playerId?: string | null;
+    isAuthenticated?: boolean;
+    score?: number;
   };
 }
 
@@ -36,6 +54,18 @@ interface CountResponse {
   byLanguage: Record<string, number>;
   byMode: Record<string, number>;
   timestamp: number;
+}
+
+export interface ActiveSinglePlayerSession {
+  sessionId: string;
+  username: string;
+  avatar: SessionAvatar | null;
+  language: string;
+  mode: string;
+  score: number;
+  isAuthenticated: boolean;
+  playerId: string | null;
+  startedAt: number;
 }
 
 // ==================== In-Memory Session Storage ====================
@@ -105,6 +135,30 @@ function getSinglePlayersByMode(): Record<string, number> {
   return counts;
 }
 
+/**
+ * Get all active single-player sessions with identity data for admin live view.
+ * Anonymous heartbeats (no username) are filtered out so admins only see
+ * actionable rows. Authenticated sessions include playerId for profile links.
+ */
+function getActiveSinglePlayerSessions(): ActiveSinglePlayerSession[] {
+  const sessions: ActiveSinglePlayerSession[] = [];
+  for (const [sessionId, data] of activeSinglePlayers) {
+    if (!data.username) continue;
+    sessions.push({
+      sessionId,
+      username: data.username,
+      avatar: data.avatar ?? null,
+      language: data.language,
+      mode: data.mode,
+      score: data.score ?? 0,
+      isAuthenticated: !!data.isAuthenticated,
+      playerId: data.playerId ?? null,
+      startedAt: data.startedAt ?? data.timestamp,
+    });
+  }
+  return sessions.sort((a, b) => b.startedAt - a.startedAt);
+}
+
 // ==================== Routes ====================
 
 /**
@@ -115,18 +169,37 @@ function getSinglePlayersByMode(): Record<string, number> {
  */
 router.post('/heartbeat', (req: HeartbeatRequest, res: Response): void => {
   try {
-    const { sessionId, language, mode } = req.body;
+    const { sessionId, language, mode, username, avatar, playerId, isAuthenticated, score } = req.body;
 
     if (!sessionId || typeof sessionId !== 'string') {
       res.status(400).json({ error: 'sessionId is required' } as HeartbeatResponse);
       return;
     }
 
-    // Update or create session
+    // Guard against abuse: limit sessionId length and total map size
+    if (sessionId.length > 128) {
+      res.status(400).json({ error: 'sessionId too long' } as HeartbeatResponse);
+      return;
+    }
+    if (activeSinglePlayers.size >= 10000 && !activeSinglePlayers.has(sessionId)) {
+      res.status(429).json({ error: 'Too many active sessions' } as HeartbeatResponse);
+      return;
+    }
+
+    // Preserve startedAt across heartbeats so admins see real session age.
+    const existing = activeSinglePlayers.get(sessionId);
     activeSinglePlayers.set(sessionId, {
       timestamp: Date.now(),
+      startedAt: existing?.startedAt ?? Date.now(),
       language: language || 'en',
-      mode: mode || 'unknown'
+      mode: mode || 'unknown',
+      username: typeof username === 'string' ? username.slice(0, 64) : existing?.username,
+      avatar: avatar ?? existing?.avatar ?? null,
+      playerId: playerId ?? existing?.playerId ?? null,
+      isAuthenticated: typeof isAuthenticated === 'boolean'
+        ? isAuthenticated
+        : existing?.isAuthenticated ?? false,
+      score: typeof score === 'number' ? score : existing?.score ?? 0,
     });
 
     res.json({ success: true } as HeartbeatResponse);
@@ -176,4 +249,9 @@ router.get('/count', (_req: Request, res: Response): void => {
 
 // Export both router and utility functions
 export default router;
-export { getActiveSinglePlayerCount, getSinglePlayersByLanguage, getSinglePlayersByMode };
+export {
+  getActiveSinglePlayerCount,
+  getSinglePlayersByLanguage,
+  getSinglePlayersByMode,
+  getActiveSinglePlayerSessions,
+};

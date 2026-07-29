@@ -17,15 +17,18 @@ interface AttentionInput {
 /**
  * Calculate Attention score (0-100)
  *
- * Formula:
- * - comboRate = maxCombo / wordsFound (what % of words were in a combo)
- * - noHintBonus = 1.1 if no hints, else 1.0
- * - Score = comboRate * 100 * noHintBonus, capped at 100
+ * Formula uses absolute combo achievement + word finding bonus:
+ * - comboScore = maxCombo * 12 (achieving combos shows sustained focus)
+ * - wordBonus = log2(wordsFound) * 5 (finding more words is good, not bad!)
+ * - noHintBonus = +10 if no hints used
+ * - Score = comboScore + wordBonus + noHintBonus, capped at 100
+ *
+ * This formula DOES NOT penalize finding more words.
  *
  * Tuned so that:
- * - 50% combo rate with no hints = 55 points
- * - 80% combo rate with no hints = 88 points
- * - 100% combo rate with no hints = 100 points (perfect)
+ * - 3 combo, 10 words, no hints = ~52 points (decent game)
+ * - 5 combo, 20 words, no hints = ~72 points (good game)
+ * - 8 combo, 30 words, no hints = ~100 points (excellent game)
  */
 export function calculateAttention(input: AttentionInput): number {
   const { wordsFound, maxCombo, hintsUsed } = input;
@@ -34,15 +37,19 @@ export function calculateAttention(input: AttentionInput): number {
     return 0;
   }
 
-  // Calculate combo rate (percentage of words that were part of max combo chain)
-  // This is an approximation - true combo calculation would need full history
-  const comboRate = Math.min(1, maxCombo / wordsFound);
+  // Base score from combo achievement (sustained attention indicator)
+  // maxCombo of 5 = 60 points, maxCombo of 8 = 96 points
+  const comboScore = maxCombo * 12;
+
+  // Bonus for finding words (logarithmic to prevent infinite scaling)
+  // 10 words = ~17, 20 words = ~22, 30 words = ~25
+  const wordBonus = Math.log2(Math.max(1, wordsFound)) * 5;
 
   // Bonus for not using hints (shows self-reliance)
-  const noHintBonus = hintsUsed === 0 ? 1.1 : 1.0;
+  const noHintBonus = hintsUsed === 0 ? 10 : 0;
 
   // Calculate score
-  const rawScore = comboRate * 100 * noHintBonus;
+  const rawScore = comboScore + wordBonus + noHintBonus;
 
   // Cap at 100 and round
   return Math.min(100, Math.round(rawScore));

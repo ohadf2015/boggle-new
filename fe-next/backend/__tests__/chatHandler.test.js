@@ -4,25 +4,52 @@
  */
 
 // Must mock before requiring the module
-jest.mock('../modules/gameStateManager');
-jest.mock('../utils/socketHelpers');
-jest.mock('../utils/profanityFilter');
-jest.mock('../utils/errorHandler');
-jest.mock('../utils/rateLimiter');
-jest.mock('../utils/metrics');
-jest.mock('../handlers/shared');
-jest.mock('../utils/socketValidation');
+vi.mock('../modules/gameStateManager');
+vi.mock('../utils/socketHelpers');
+vi.mock('../utils/profanityFilter');
+vi.mock('../utils/errorHandler');
+vi.mock('../utils/rateLimiter', () => ({ default: { checkRateLimit: vi.fn().mockReturnValue(true), checkRateLimitDetailed: vi.fn().mockReturnValue({ allowed: true }), initRateLimit: vi.fn(), getIpFromSocket: vi.fn().mockReturnValue('127.0.0.1') }, checkRateLimit: vi.fn().mockReturnValue(true), checkRateLimitDetailed: vi.fn().mockReturnValue({ allowed: true }), initRateLimit: vi.fn(), getIpFromSocket: vi.fn().mockReturnValue('127.0.0.1') }));
+vi.mock('../utils/metrics');
+vi.mock('../handlers/shared');
+vi.mock('../utils/socketValidation');
+vi.mock('../utils/sanitize', () => ({
+  sanitizeHtml: vi.fn((text) => text),
+}));
+vi.mock('../middleware/rateLimiterRedis', () => ({
+  checkSocketRateLimit: vi.fn().mockResolvedValue({ allowed: true }),
+}));
+vi.mock('../utils/socialPolicyServer', () => ({
+  ensureSocialCapability: vi.fn().mockResolvedValue(true),
+  getSocialCapabilities: vi.fn().mockResolvedValue({
+    publicRoomChat: true,
+    friendMessaging: true,
+    friendManagement: true,
+    customDisplayName: true,
+    emojiReactions: true,
+  }),
+  resolveSocketSocialContext: vi.fn().mockResolvedValue({
+    tier: 'adult',
+    caps: {
+      publicRoomChat: true,
+      friendMessaging: true,
+      friendManagement: true,
+      customDisplayName: true,
+      emojiReactions: true,
+    },
+  }),
+  clearSocketSocialContextCache: vi.fn(),
+}));
 
-const { registerChatHandlers } = require('../handlers/chatHandler');
-const { getGame, getGameBySocketId, getUsernameBySocketId } = require('../modules/gameStateManager');
-const { broadcastToRoom, getGameRoom } = require('../utils/socketHelpers');
-const { cleanProfanity } = require('../utils/profanityFilter');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const { inc } = require('../utils/metrics');
-const { isSocketMigrating } = require('../handlers/shared');
-const { validatePayload, chatMessageSchema } = require('../utils/socketValidation');
-
+import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import { registerChatHandlers } from '../handlers/chatHandler';
+import { getGame, getGameBySocketId, getUsernameBySocketId } from '../modules/gameStateManager';
+import { broadcastToRoom, getGameRoom } from '../utils/socketHelpers';
+import { cleanProfanity } from '../utils/profanityFilter';
+import { emitError, ErrorCodes } from '../utils/errorHandler';
+import { checkRateLimit } from '../utils/rateLimiter';
+import { inc } from '../utils/metrics';
+import { isSocketMigrating } from '../handlers/shared';
+import { validatePayload, chatMessageSchema } from '../utils/socketValidation';
 describe('Chat Handler', () => {
   let mockIo;
   let mockSocket;
@@ -30,20 +57,20 @@ describe('Chat Handler', () => {
 
   beforeEach(() => {
     // Reset all mocks
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Setup event handler capture
     eventHandlers = {};
     mockSocket = {
       id: 'socket-123',
-      on: jest.fn((event, handler) => {
+      on: vi.fn((event, handler) => {
         eventHandlers[event] = handler;
       }),
-      emit: jest.fn()
+      emit: vi.fn()
     };
     mockIo = {
-      to: jest.fn().mockReturnThis(),
-      emit: jest.fn()
+      to: vi.fn().mockReturnThis(),
+      emit: vi.fn()
     };
 
     // Default mock implementations
@@ -68,11 +95,11 @@ describe('Chat Handler', () => {
       expect(mockSocket.on).toHaveBeenCalledWith('chatMessage', expect.any(Function));
     });
 
-    it('should broadcast chat message to room', () => {
+    it('should broadcast chat message to room', async () => {
       const game = { hostSocketId: 'host-socket', users: {} };
       getGame.mockReturnValue(game);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello world',
         gameCode: 'ABCDEF'
       });
@@ -89,11 +116,11 @@ describe('Chat Handler', () => {
       );
     });
 
-    it('should store message in game chat history', () => {
+    it('should store message in game chat history', async () => {
       const game = { hostSocketId: 'host-socket', users: {} };
       getGame.mockReturnValue(game);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello world',
         gameCode: 'ABCDEF'
       });
@@ -107,11 +134,11 @@ describe('Chat Handler', () => {
       });
     });
 
-    it('should mark host messages correctly', () => {
+    it('should mark host messages correctly', async () => {
       const game = { hostSocketId: 'socket-123', users: {} };
       getGame.mockReturnValue(game);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello from host',
         gameCode: 'ABCDEF'
       });
@@ -127,7 +154,7 @@ describe('Chat Handler', () => {
       );
     });
 
-    it('should limit chat history to 100 messages', () => {
+    it('should limit chat history to 100 messages', async () => {
       const existingHistory = Array(100).fill(null).map((_, i) => ({
         message: `old-${i}`,
         username: 'User',
@@ -141,7 +168,7 @@ describe('Chat Handler', () => {
       };
       getGame.mockReturnValue(game);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'New message',
         gameCode: 'ABCDEF'
       });
@@ -150,16 +177,37 @@ describe('Chat Handler', () => {
       expect(game.chatHistory[99].message).toBe('New message');
     });
 
-    it('should emit error if game not found', () => {
+    it('should emit GAME_NOT_FOUND when game lookup fails', async () => {
       getGame.mockReturnValue(null);
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello',
         gameCode: 'INVALID'
       });
 
-      expect(emitError).toHaveBeenCalled();
+      expect(emitError).toHaveBeenCalledWith(mockSocket, ErrorCodes.GAME_NOT_FOUND);
       expect(broadcastToRoom).not.toHaveBeenCalled();
+    });
+
+    it('should emit VALIDATION_INVALID_PAYLOAD when schema validation fails', async () => {
+      validatePayload.mockReturnValue({ success: false, error: 'bad shape' });
+
+      await eventHandlers.chatMessage({});
+
+      expect(emitError).toHaveBeenCalledWith(
+        mockSocket,
+        ErrorCodes.VALIDATION_INVALID_PAYLOAD,
+        expect.objectContaining({ message: expect.stringContaining('bad shape') })
+      );
+    });
+
+    it('should emit PLAYER_NOT_IN_GAME when game/username unresolved', async () => {
+      getGameBySocketId.mockReturnValue(null);
+      getUsernameBySocketId.mockReturnValue(null);
+
+      await eventHandlers.chatMessage({ message: 'Hello' });
+
+      expect(emitError).toHaveBeenCalledWith(mockSocket, ErrorCodes.PLAYER_NOT_IN_GAME);
     });
 
     it('should check rate limit and block if exceeded', () => {
@@ -254,12 +302,12 @@ describe('Chat Handler', () => {
   });
 
   describe('message timestamps', () => {
-    it('should include timestamp in broadcast', () => {
+    it('should include timestamp in broadcast', async () => {
       const game = { hostSocketId: 'host-socket', users: {} };
       getGame.mockReturnValue(game);
       const beforeTime = Date.now();
 
-      eventHandlers.chatMessage({
+      await eventHandlers.chatMessage({
         message: 'Hello',
         gameCode: 'ABCDEF'
       });

@@ -8,7 +8,6 @@ export {
   default as useHostViewState,
   type UseHostViewStateReturn,
   type TournamentData,
-  type FinalScoresData,
   type XpGainedData,
   type LevelUpData,
   type GameSettings,

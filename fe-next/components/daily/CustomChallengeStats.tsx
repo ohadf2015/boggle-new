@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Users, Target, TrendingUp, Crown, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { PageLoader } from '@/components/ui/PageLoader';
+import Avatar from '@/components/Avatar';
 
 interface CustomChallengeStatsProps {
   puzzleCode: string;
@@ -30,9 +32,11 @@ interface StatsData {
 
 interface LeaderboardEntry {
   rank_position: number;
+  user_id?: string;
   display_name: string;
   avatar_emoji: string;
   avatar_color: string;
+  avatar_config?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   solved: boolean;
   attempts_used: number;
   efficiency_score: number;
@@ -80,14 +84,14 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
 
   const handleShare = () => {
     const url = `${window.location.origin}/${stats?.language || 'en'}/custom/${puzzleCode}`;
-    navigator.clipboard.writeText(url);
+    navigator.clipboard.writeText(url).catch(() => {});
     // Could add toast notification here
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-neo-pink border-t-transparent" />
+        <PageLoader size="md" />
       </div>
     );
   }
@@ -110,7 +114,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-neo-lime to-neo-orange p-6 rounded-xl border-neo-thick border-neo-black shadow-hard-lg">
+      <div className="bg-linear-to-br from-neo-lime to-neo-orange p-6 rounded-xl border-neo-thick border-neo-black shadow-hard-lg">
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-2xl sm:text-3xl font-black uppercase tracking-tight text-neo-black mb-2">
@@ -129,7 +133,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             onClick={handleShare}
             className="bg-neo-white hover:bg-neo-cyan border-neo-thick border-neo-black shadow-hard-sm"
           >
-            <Share2 className="w-4 h-4 mr-2" />
+            <Share2 className="w-4 h-4 me-2" />
             {t('daily.shareButton')}
           </Button>
         </div>
@@ -137,10 +141,10 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
 
       {/* Key Stats Grid */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-4 shadow-hard-sm"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -148,12 +152,12 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             <span className="text-sm font-bold uppercase text-slate-600">{t('daily.totalPlayers')}</span>
           </div>
           <div className="text-3xl font-black text-neo-black">{stats.totalAttempts}</div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-4 shadow-hard-sm"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -161,12 +165,12 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             <span className="text-sm font-bold uppercase text-slate-600">{t('daily.solved')}</span>
           </div>
           <div className="text-3xl font-black text-neo-black">{stats.totalSolved}</div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.3, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-4 shadow-hard-sm"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -174,12 +178,12 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             <span className="text-sm font-bold uppercase text-slate-600">{t('daily.solveRate')}</span>
           </div>
           <div className="text-3xl font-black text-neo-black">{stats.solveRate.toFixed(0)}%</div>
-        </motion.div>
+        </m.div>
 
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.4 }}
+          transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-4 shadow-hard-sm"
         >
           <div className="flex items-center gap-2 mb-2">
@@ -187,7 +191,7 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
             <span className="text-sm font-bold uppercase text-slate-600">{t('daily.beatCreator')}</span>
           </div>
           <div className="text-3xl font-black text-neo-black">{stats.beatCreatorCount}</div>
-        </motion.div>
+        </m.div>
       </div>
 
       {/* Attempt Distribution */}
@@ -207,14 +211,14 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
                       {attempts} {t('daily.attempts')}
                     </span>
                     <div className="flex-1 h-8 bg-slate-100 rounded-lg overflow-hidden border-2 border-neo-black">
-                      <motion.div
+                      <m.div
                         initial={{ width: 0 }}
                         animate={{ width: `${percentage}%` }}
                         transition={{ duration: 0.5, delay: 0.1 * parseInt(attempts) }}
-                        className="h-full bg-gradient-to-r from-neo-cyan to-neo-pink flex items-center justify-end pr-2"
+                        className="h-full bg-linear-to-r from-neo-cyan to-neo-pink flex items-center justify-end pe-2"
                       >
                         <span className="text-xs font-black text-neo-white">{count}</span>
-                      </motion.div>
+                      </m.div>
                     </div>
                   </div>
                 ) : null;
@@ -227,34 +231,29 @@ export const CustomChallengeStats: React.FC<CustomChallengeStatsProps> = ({ puzz
       {leaderboard.length > 0 && (
         <div className="bg-neo-white border-neo-thick border-neo-black rounded-xl p-6 shadow-hard-sm">
           <h3 className="text-xl font-black uppercase mb-4 text-neo-black flex items-center gap-2">
-            <Trophy className="w-6 h-6 text-neo-lime" strokeWidth={2.5} />
+            <Trophy className="w-6 h-6 text-amber-600" strokeWidth={2.5} />
             {t('daily.topPerformers')}
           </h3>
           <div className="space-y-2">
             {leaderboard.map((entry, idx) => (
-              <motion.div
-                key={idx}
+              <m.div
+                key={`lb-${entry.user_id ?? idx}`}
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.05 * idx }}
+                transition={{ delay: 0.05 * idx, type: 'spring', stiffness: 380, damping: 26 }}
                 className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 border-2 border-slate-200"
               >
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-neo-black text-neo-white font-black text-sm">
                   {entry.rank_position}
                 </div>
-                <div
-                  className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-neo-black"
-                  style={{ backgroundColor: entry.avatar_color }}
-                >
-                  <span className="text-xl">{entry.avatar_emoji}</span>
-                </div>
+                <Avatar customAvatar={entry.avatar_config} userId={entry.user_id} size="lg" />
                 <div className="flex-1">
                   <div className="font-bold text-neo-black">{entry.display_name}</div>
                   <div className="text-xs text-slate-600">
-                    {entry.attempts_used} {t('daily.attempts')} • {entry.efficiency_score} {t('daily.points')}
+                    {entry.attempts_used} {t('daily.attempts')} • {Math.round(entry.efficiency_score)} {t('daily.points')}
                   </div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
           </div>
         </div>

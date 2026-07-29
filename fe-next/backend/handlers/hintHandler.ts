@@ -11,16 +11,17 @@
 import type { Server, Socket } from 'socket.io';
 import type { Game, GameUser, Language } from '@/shared/types';
 
-const {
+import {
   getGame,
   getGameBySocketId,
   getUsernameBySocketId,
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const { findWordsForBots, getCachedTrie } = require('../modules/boggleSolver');
-const { safeEmit } = require('../utils/socketHelpers');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const logger = require('../utils/logger');
+import { findWordsForBots, getCachedTrie } from '../modules/boggleSolver.js';
+import { safeEmit } from '../utils/socketHelpers.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import logger from '../utils/logger.js';
+import { gameCleanupEmitter } from '../events/gameCleanup';
 
 // Configuration
 const HINTS_PER_GAME = 3;
@@ -66,6 +67,15 @@ interface GameAIService {
 // Track hints per game: gameCode -> { hintsUsed: number, lastHintTime: number }
 const gameHintState = new Map<string, HintState>();
 
+// Subscribe to cleanup events (breaks circular dependency with shared.ts)
+gameCleanupEmitter.onGameEnd(({ gameCode }) => {
+  gameHintState.delete(gameCode);
+});
+
+gameCleanupEmitter.onGameReset(({ gameCode }) => {
+  gameHintState.delete(gameCode);
+});
+
 /**
  * Check if hints are available for this game/player
  */
@@ -107,7 +117,7 @@ function getUnfoundWords(game: Game, username: string): string[] {
   if (!game.letterGrid) return [];
 
   const language = game.language || 'en';
-  const minLength = game.minWordLength || 3;
+  const minLength = game.minWordLength || 2;
 
   // Get all valid words on board using boggleSolver
   const wordsResult: WordsByDifficulty = findWordsForBots(game.letterGrid, language, { minLength });
@@ -142,11 +152,7 @@ async function generateHintForWord(targetWord: string, language: Language): Prom
   // Try to use AI service if available
   try {
     // Dynamic import to avoid circular dependencies
-    const aiServicePath = require.resolve('../../lib/ai-service');
-    delete require.cache[aiServicePath]; // Clear cache for fresh import
-
-    // Try importing the AI service
-    const { gameAIService } = await import('../../lib/ai-service.js') as { gameAIService: GameAIService };
+    const { gameAIService } = require('../../lib/ai-service') as { gameAIService: GameAIService };
 
     if (await gameAIService.isConfigured()) {
       const hintLevel = length <= 4 ? 1 : length <= 6 ? 2 : 3;
@@ -230,69 +236,69 @@ async function generateHintForWord(targetWord: string, language: Language): Prom
 function registerHintHandlers(io: Server, socket: Socket): void {
 
   socket.on('requestHint', async () => {
-    // Rate limiting
-    if (!checkRateLimit(socket.id)) {
-      socket.emit('rateLimited');
-      return;
-    }
-
-    const gameCode = getGameBySocketId(socket.id);
-    if (!gameCode) {
-      safeEmit(socket, 'hintError', {
-        message: 'Not in a game',
-        code: 'NOT_IN_GAME',
-      });
-      return;
-    }
-
-    const game = getGame(gameCode);
-    if (!game) {
-      safeEmit(socket, 'hintError', {
-        message: 'Game not found',
-        code: 'GAME_NOT_FOUND',
-      });
-      return;
-    }
-
-    const username = getUsernameBySocketId(socket.id);
-    if (!username) {
-      safeEmit(socket, 'hintError', {
-        message: 'Player not found',
-        code: 'PLAYER_NOT_FOUND',
-      });
-      return;
-    }
-
-    // Check if hints are available
-    const hintCheck = canUseHint(gameCode, game);
-    if (!hintCheck.available) {
-      safeEmit(socket, 'hintError', {
-        message: hintCheck.reason,
-        code: 'HINT_UNAVAILABLE',
-      });
-      return;
-    }
-
-    // Get unfound words
-    const unfoundWords = getUnfoundWords(game, username);
-    if (unfoundWords.length === 0) {
-      safeEmit(socket, 'hintError', {
-        message: 'No more words to hint!',
-        code: 'NO_WORDS_LEFT',
-      });
-      return;
-    }
-
-    // Sort by length (prefer longer words = more points)
-    unfoundWords.sort((a, b) => b.length - a.length);
-
-    // Pick from top 10 longest words randomly for variety
-    const topCandidates = unfoundWords.slice(0, Math.min(10, unfoundWords.length));
-    const targetWord = topCandidates[Math.floor(Math.random() * topCandidates.length)];
-
-    logger.info('HINT', `Generating hint for "${targetWord}" (${unfoundWords.length} unfound words)`);
-
     try {
+      // Rate limiting
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        return;
+      }
+
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) {
+        safeEmit(socket, 'hintError', {
+          message: 'Not in a game',
+          code: 'NOT_IN_GAME',
+        });
+        return;
+      }
+
+      const game = getGame(gameCode);
+      if (!game) {
+        safeEmit(socket, 'hintError', {
+          message: 'Game not found',
+          code: 'GAME_NOT_FOUND',
+        });
+        return;
+      }
+
+      const username = getUsernameBySocketId(socket.id);
+      if (!username) {
+        safeEmit(socket, 'hintError', {
+          message: 'Player not found',
+          code: 'PLAYER_NOT_FOUND',
+        });
+        return;
+      }
+
+      // Check if hints are available
+      const hintCheck = canUseHint(gameCode, game as unknown as Parameters<typeof canUseHint>[1]);
+      if (!hintCheck.available) {
+        safeEmit(socket, 'hintError', {
+          message: hintCheck.reason,
+          code: 'HINT_UNAVAILABLE',
+        });
+        return;
+      }
+
+      // Get unfound words
+      const unfoundWords = getUnfoundWords(game as unknown as Game, username);
+      if (unfoundWords.length === 0) {
+        safeEmit(socket, 'hintError', {
+          message: 'No more words to hint!',
+          code: 'NO_WORDS_LEFT',
+        });
+        return;
+      }
+
+      // Sort by length (prefer longer words = more points)
+      unfoundWords.sort((a, b) => b.length - a.length);
+
+      // Pick from top 10 longest words randomly for variety
+      const topCandidates = unfoundWords.slice(0, Math.min(10, unfoundWords.length));
+      const targetWord = topCandidates[Math.floor(Math.random() * topCandidates.length)];
+
+      logger.info('HINT', `Generating hint for "${targetWord}" (${unfoundWords.length} unfound words)`);
+
       // Generate hint
       const hintData = await generateHintForWord(targetWord, game.language || 'en');
 
@@ -317,7 +323,7 @@ function registerHintHandlers(io: Server, socket: Socket): void {
 
     } catch (error: unknown) {
       const err = error as Error;
-      logger.error('HINT', 'Failed to generate hint', err);
+      logger.error('HINT', `requestHint handler failed: ${err.message}`);
       safeEmit(socket, 'hintError', {
         message: 'Failed to generate hint',
         code: 'HINT_ERROR',
@@ -344,14 +350,6 @@ function getGameHintState(gameCode: string): { hintsUsed: number; lastHintTime: 
     maxHints: HINTS_PER_GAME,
   };
 }
-
-module.exports = {
-  registerHintHandlers,
-  clearGameHintState,
-  getGameHintState,
-  canUseHint,
-  HINTS_PER_GAME,
-};
 
 export {
   registerHintHandlers,

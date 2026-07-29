@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 import { Clock, AlertTriangle } from 'lucide-react';
@@ -152,7 +152,7 @@ export function TimerUrgency({
     <div className={cn('relative', className)}>
       {/* Screen edge glow for critical */}
       {urgencyLevel === 'critical' && enableGlowEffects && !isLowEnd && (
-        <motion.div
+        <m.div
           className="fixed inset-0 pointer-events-none z-[60]"
           animate={{
             opacity: [0, 0.15, 0],
@@ -172,7 +172,7 @@ export function TimerUrgency({
       )}
 
       {/* Main timer container */}
-      <motion.div
+      <m.div
         className={cn(
           'relative rounded-neo border-3 border-neo-black overflow-hidden',
           config.bg,
@@ -210,7 +210,7 @@ export function TimerUrgency({
             compact ? 'text-sm' : 'text-xl'
           )}>
             {urgencyLevel === 'critical' ? (
-              <motion.div
+              <m.div
                 animate={{ rotate: [0, -10, 10, 0] }}
                 transition={{ duration: 0.3, repeat: Infinity }}
               >
@@ -220,7 +220,7 @@ export function TimerUrgency({
                     compact ? 'w-3 h-3' : 'w-5 h-5'
                   )}
                 />
-              </motion.div>
+              </m.div>
             ) : (
               <Clock
                 className={cn(
@@ -229,7 +229,7 @@ export function TimerUrgency({
                 )}
               />
             )}
-            <motion.span
+            <m.span
               className="font-black text-neo-black tabular-nums"
               animate={
                 urgencyLevel === 'critical'
@@ -242,7 +242,7 @@ export function TimerUrgency({
               }}
             >
               {formattedTime}
-            </motion.span>
+            </m.span>
           </div>
         )}
 
@@ -254,7 +254,7 @@ export function TimerUrgency({
               compact ? 'h-1 mt-0.5' : 'h-2 mt-2'
             )}
           >
-            <motion.div
+            <m.div
               className="h-full bg-neo-black/60 rounded-full"
               initial={{ width: '100%' }}
               animate={{ width: `${percentage}%` }}
@@ -262,11 +262,11 @@ export function TimerUrgency({
             />
           </div>
         )}
-      </motion.div>
+      </m.div>
 
       {/* Tick marks for milestones */}
       {!compact && urgencyLevel !== 'normal' && !isLowEnd && (
-        <motion.div
+        <m.div
           className="absolute -right-1 -top-1"
           animate={{
             scale: [1, 1.3, 1],
@@ -287,7 +287,7 @@ export function TimerUrgency({
               boxShadow: enableGlowEffects ? `0 0 8px ${config.glow}` : undefined,
             }}
           />
-        </motion.div>
+        </m.div>
       )}
     </div>
   );
@@ -310,8 +310,8 @@ export function TimeBonusPopup({
   if (prefersReducedMotion) return null;
 
   return (
-    <motion.div
-      className="fixed pointer-events-none z-[150]"
+    <m.div
+      className="fixed pointer-events-none z-150"
       style={{ left: position.x, top: position.y }}
       initial={{ opacity: 0, y: 0, x: '-50%', scale: 0.8 }}
       animate={{ opacity: [0, 1, 1, 0], y: -40, scale: 1 }}
@@ -324,7 +324,7 @@ export function TimeBonusPopup({
           +{amount}s
         </span>
       </div>
-    </motion.div>
+    </m.div>
   );
 }
 

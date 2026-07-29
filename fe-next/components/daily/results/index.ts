@@ -21,6 +21,7 @@
  * - StatsSection.tsx   - Statistics with histogram
  * - TryAnotherLanguage.tsx - Language switching component
  * - SharePanel.tsx     - Share modal component
+ * - EmojiShareCard.tsx   - Wordle-style emoji share card for results
  */
 
 // Types
@@ -44,6 +45,10 @@ export { useShareHandlers } from './useShareHandlers';
 export { useResultSubmission } from './useResultSubmission';
 export { useCoinActions } from './useCoinActions';
 export { useConfettiEffects } from './useConfettiEffects';
+export { useSpendAnimation } from './useSpendAnimation';
+export type { SpendAnimationPosition, UseSpendAnimationReturn } from './useSpendAnimation';
+export { useStreakFreezeStatus } from './useStreakFreezeStatus';
+export type { UseStreakFreezeStatusReturn } from './useStreakFreezeStatus';
 
 // Components
 export { ScoreBadge } from './ScoreBadge';
@@ -51,6 +56,9 @@ export type { ScoreBadgeProps } from './ScoreBadge';
 
 export { ResultDisplay } from './ResultDisplay';
 export type { ResultDisplayProps } from './ResultDisplay';
+
+export { ScoreGaugeRing } from './ScoreGaugeRing';
+export type { ScoreGaugeRingProps } from './ScoreGaugeRing';
 
 export { ScoreBreakdownSection } from './ScoreBreakdownSection';
 export type { ScoreBreakdownSectionProps } from './ScoreBreakdownSection';
@@ -73,6 +81,9 @@ export type { AttemptHistoryProps } from './AttemptHistory';
 export { StatsSection } from './StatsSection';
 export type { StatsSectionProps } from './StatsSection';
 
+export { StatsBlurb } from './StatsBlurb';
+export type { StatsBlurbProps } from './StatsBlurb';
+
 export { DesktopStatsCard } from './DesktopStatsCard';
 export type { DesktopStatsCardProps } from './DesktopStatsCard';
 
@@ -85,3 +96,13 @@ export { LeaderboardTeaser } from './LeaderboardTeaser';
 export type { LeaderboardTeaserProps } from './LeaderboardTeaser';
 export { GuestBrainScorePreview } from './GuestBrainScorePreview';
 export type { GuestBrainScorePreviewProps } from './GuestBrainScorePreview';
+export { MoreOptionsAccordion } from './MoreOptionsAccordion';
+export type { MoreOptionsAccordionProps } from './MoreOptionsAccordion';
+
+export { EmojiShareCard } from './EmojiShareCard';
+export type { EmojiShareCardProps } from './EmojiShareCard';
+
+export { default as DailyWordHuntFacts } from './DailyWordHuntFacts';
+
+export { StreakFreezeIndicator } from './StreakFreezeIndicator';
+export type { StreakFreezeIndicatorProps } from './StreakFreezeIndicator';

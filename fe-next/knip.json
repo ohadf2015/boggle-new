@@ -1,0 +1,25 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "server.ts",
+    "server/index.ts",
+    "backend/socketHandlers.ts",
+    "backend/handlers/index.ts",
+    "backend/events/index.ts",
+    "scripts/*.ts",
+    "e2e/**/*.spec.ts",
+    "e2e/pages/*.ts",
+    "e2e/helpers/*.ts",
+    "playwright.config.ts",
+    "vitest.backend.config.ts",
+    "vitest.backend.setup.ts",
+    "remotion-root/index.ts",
+    "remotion-root/Root.tsx"
+  ],
+  "ignore": [
+    "android/**",
+    "public/sw.js",
+    "backend/dist/**",
+    "**/*.generated.ts"
+  ]
+}

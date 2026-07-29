@@ -1,17 +1,15 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
-import { Lock, Unlock, Shuffle, BookOpen, Sparkles } from 'lucide-react';
+import { m } from 'framer-motion';
+import { Lock, Unlock, Shuffle, BookOpen, Sparkles, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { DrillType } from '@/shared/types/cognitive';
 
 interface LockedDrill {
   drillType: DrillType;
   gamesRequired: number;
-  icon: React.ElementType;
+  icon: LucideIcon;
   color: string;
 }
 
@@ -30,7 +28,7 @@ const LOCKED_DRILLS: LockedDrill[] = [
     drillType: 'rare-gems',
     gamesRequired: 10,
     icon: BookOpen,
-    color: 'bg-lime-400',
+    color: 'bg-neo-lime',
   },
 ];
 
@@ -44,9 +42,7 @@ const LOCKED_DRILLS: LockedDrill[] = [
 export default function DrillUnlockProgress({
   gamesPlayed,
 }: DrillUnlockProgressProps) {
-  const { theme } = useTheme();
   const { t } = useLanguage();
-  const isDarkMode = theme === 'dark';
 
   // Find drills that are close to being unlocked (within 3 games) or just unlocked
   const relevantDrills = LOCKED_DRILLS.filter((drill) => {
@@ -70,21 +66,22 @@ export default function DrillUnlockProgress({
       {justUnlocked.map((drill) => {
         const Icon = drill.icon;
         return (
-          <motion.div
+          <m.div
             key={`unlocked-${drill.drillType}`}
             initial={{ opacity: 0, scale: 0.9, y: -10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             className={cn(
               'flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black',
-              'bg-gradient-to-r from-neo-green/20 to-neo-cyan/20'
+              'bg-linear-to-r from-neo-lime/20 to-neo-cyan/20'
             )}
           >
-            <motion.div
+            <m.div
               animate={{
                 scale: [1, 1.2, 1],
                 rotate: [0, 10, -10, 0],
               }}
               transition={{
+                type: 'tween',
                 duration: 1.5,
                 repeat: 3,
               }}
@@ -94,21 +91,21 @@ export default function DrillUnlockProgress({
               )}
             >
               <Unlock className="w-5 h-5 text-neo-black" />
-            </motion.div>
+            </m.div>
 
             <div className="flex-1">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-neo-lime" />
                 <p className={cn(
                   'text-sm font-black uppercase',
-                  isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                  'text-neo-white'
                 )}>
                   {t('brain.unlock.newDrillUnlocked')}
                 </p>
               </div>
               <p className={cn(
                 'text-xs',
-                isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                'text-neo-white'
               )}>
                 {t(`brain.drills.${drill.drillType}.name`)} {t('brain.unlock.nowAvailable')}
               </p>
@@ -116,9 +113,9 @@ export default function DrillUnlockProgress({
 
             <Icon className={cn(
               'w-6 h-6',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              'text-neo-white'
             )} />
-          </motion.div>
+          </m.div>
         );
       })}
 
@@ -129,18 +126,18 @@ export default function DrillUnlockProgress({
         const progress = (gamesPlayed / drill.gamesRequired) * 100;
 
         return (
-          <motion.div
+          <m.div
             key={`progress-${drill.drillType}`}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             className={cn(
               'flex items-center gap-3 p-3 rounded-neo border-2 border-neo-black',
-              isDarkMode ? 'bg-slate-700/50' : 'bg-neo-cream/50'
+              'bg-neo-navy-light/50'
             )}
           >
             <div className={cn(
               'w-10 h-10 rounded-neo border-2 border-neo-black flex items-center justify-center relative',
-              'bg-gray-300'
+              'bg-neo-cream/30'
             )}>
               <Lock className="w-5 h-5 text-neo-black/50" />
               {/* Small badge showing games left */}
@@ -157,13 +154,13 @@ export default function DrillUnlockProgress({
               <div className="flex items-center justify-between mb-1">
                 <p className={cn(
                   'text-xs font-bold',
-                  isDarkMode ? 'text-neo-white' : 'text-neo-black'
+                  'text-neo-white'
                 )}>
                   {t(`brain.drills.${drill.drillType}.name`)}
                 </p>
                 <p className={cn(
                   'text-[10px] font-bold',
-                  isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                  'text-neo-white'
                 )}>
                   {gamesLeft} {gamesLeft === 1 ? t('brain.unlock.gameLeft') : t('brain.unlock.gamesLeft')}
                 </p>
@@ -172,9 +169,9 @@ export default function DrillUnlockProgress({
               {/* Progress bar */}
               <div className={cn(
                 'h-2 rounded-full border border-neo-black overflow-hidden',
-                isDarkMode ? 'bg-slate-600' : 'bg-gray-200'
+                'bg-neo-navy-light'
               )}>
-                <motion.div
+                <m.div
                   className={cn('h-full', drill.color)}
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
@@ -185,9 +182,9 @@ export default function DrillUnlockProgress({
 
             <Icon className={cn(
               'w-5 h-5',
-              isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+              'text-neo-white'
             )} />
-          </motion.div>
+          </m.div>
         );
       })}
     </div>

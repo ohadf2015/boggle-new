@@ -3,6 +3,7 @@
  * Tests for centralized timer management and cleanup
  */
 
+import { vi, type Mock, type MockInstance } from 'vitest';
 import timerManager, { TimerManager, setGameTimer, clearGameTimer } from '../utils/timerManager';
 
 describe('TimerManager', () => {
@@ -22,7 +23,7 @@ describe('TimerManager', () => {
   describe('setInterval', () => {
 
     test('creates an interval timer and returns key', () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
       const key = manager.setInterval('test-interval', callback, 1000);
 
       expect(key).toBe('test-interval');
@@ -30,19 +31,20 @@ describe('TimerManager', () => {
     });
 
     test('callback is called at interval', async () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
       manager.setInterval('interval-test', callback, 50);
 
-      // Wait for 2-3 intervals
-      await new Promise(resolve => setTimeout(resolve, 150));
+      // Wait for enough time to ensure at least 2 calls
+      // Using 300ms for 50ms interval (6x buffer) to handle timer imprecision and CI load
+      await new Promise(resolve => setTimeout(resolve, 300));
 
       expect(callback).toHaveBeenCalled();
       expect(callback.mock.calls.length).toBeGreaterThanOrEqual(2);
     });
 
     test('replaces existing timer with same key', () => {
-      const callback1 = jest.fn();
-      const callback2 = jest.fn();
+      const callback1 = vi.fn();
+      const callback2 = vi.fn();
 
       manager.setInterval('same-key', callback1, 1000);
       manager.setInterval('same-key', callback2, 1000);
@@ -54,7 +56,7 @@ describe('TimerManager', () => {
   describe('setTimeout', () => {
 
     test('creates a timeout timer and returns key', () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
       const key = manager.setTimeout('test-timeout', callback, 1000);
 
       expect(key).toBe('test-timeout');
@@ -62,7 +64,7 @@ describe('TimerManager', () => {
     });
 
     test('callback is called after delay', async () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
       manager.setTimeout('timeout-test', callback, 50);
 
       expect(callback).not.toHaveBeenCalled();
@@ -73,8 +75,8 @@ describe('TimerManager', () => {
     });
 
     test('replaces existing timer with same key', () => {
-      const callback1 = jest.fn();
-      const callback2 = jest.fn();
+      const callback1 = vi.fn();
+      const callback2 = vi.fn();
 
       manager.setTimeout('same-key', callback1, 1000);
       manager.setTimeout('same-key', callback2, 1000);
@@ -86,7 +88,7 @@ describe('TimerManager', () => {
   describe('clearTimer', () => {
 
     test('clears existing interval timer', () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
       manager.setInterval('to-clear', callback, 100);
 
       expect(manager.hasTimer('to-clear')).toBe(true);
@@ -98,7 +100,7 @@ describe('TimerManager', () => {
     });
 
     test('clears existing timeout timer', () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
       manager.setTimeout('to-clear', callback, 100);
 
       const result = manager.clearTimer('to-clear');
@@ -113,7 +115,7 @@ describe('TimerManager', () => {
     });
 
     test('prevents callback from firing after clear', async () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
       manager.setTimeout('prevent-fire', callback, 50);
 
       manager.clearTimer('prevent-fire');
@@ -124,7 +126,7 @@ describe('TimerManager', () => {
     });
 
     test('stops interval from continuing after clear', async () => {
-      const callback = jest.fn();
+      const callback = vi.fn();
       manager.setInterval('stop-interval', callback, 30);
 
       // Let it fire once
@@ -144,10 +146,10 @@ describe('TimerManager', () => {
   describe('clearTimersWithPrefix', () => {
 
     test('clears all timers with matching prefix', () => {
-      manager.setInterval('game:ABC:timer1', jest.fn(), 1000);
-      manager.setInterval('game:ABC:timer2', jest.fn(), 1000);
-      manager.setTimeout('game:ABC:timeout', jest.fn(), 1000);
-      manager.setInterval('game:XYZ:timer1', jest.fn(), 1000);
+      manager.setInterval('game:ABC:timer1', vi.fn(), 1000);
+      manager.setInterval('game:ABC:timer2', vi.fn(), 1000);
+      manager.setTimeout('game:ABC:timeout', vi.fn(), 1000);
+      manager.setInterval('game:XYZ:timer1', vi.fn(), 1000);
 
       const cleared = manager.clearTimersWithPrefix('game:ABC');
 
@@ -159,7 +161,7 @@ describe('TimerManager', () => {
     });
 
     test('returns 0 when no timers match prefix', () => {
-      manager.setInterval('other:timer', jest.fn(), 1000);
+      manager.setInterval('other:timer', vi.fn(), 1000);
 
       const cleared = manager.clearTimersWithPrefix('game:');
 
@@ -175,10 +177,10 @@ describe('TimerManager', () => {
   describe('clearAll', () => {
 
     test('clears all timers', () => {
-      manager.setInterval('timer1', jest.fn(), 1000);
-      manager.setInterval('timer2', jest.fn(), 1000);
-      manager.setTimeout('timeout1', jest.fn(), 1000);
-      manager.setTimeout('timeout2', jest.fn(), 1000);
+      manager.setInterval('timer1', vi.fn(), 1000);
+      manager.setInterval('timer2', vi.fn(), 1000);
+      manager.setTimeout('timeout1', vi.fn(), 1000);
+      manager.setTimeout('timeout2', vi.fn(), 1000);
 
       expect(manager.getTimerCount()).toBe(4);
 
@@ -194,7 +196,7 @@ describe('TimerManager', () => {
     });
 
     test('prevents all callbacks from firing', async () => {
-      const callbacks = [jest.fn(), jest.fn(), jest.fn()];
+      const callbacks = [vi.fn(), vi.fn(), vi.fn()];
 
       manager.setTimeout('t1', callbacks[0], 50);
       manager.setTimeout('t2', callbacks[1], 50);
@@ -213,7 +215,7 @@ describe('TimerManager', () => {
   describe('hasTimer', () => {
 
     test('returns true for existing timer', () => {
-      manager.setInterval('exists', jest.fn(), 1000);
+      manager.setInterval('exists', vi.fn(), 1000);
       expect(manager.hasTimer('exists')).toBe(true);
     });
 
@@ -222,7 +224,7 @@ describe('TimerManager', () => {
     });
 
     test('returns false after timer is cleared', () => {
-      manager.setInterval('was-here', jest.fn(), 1000);
+      manager.setInterval('was-here', vi.fn(), 1000);
       manager.clearTimer('was-here');
       expect(manager.hasTimer('was-here')).toBe(false);
     });
@@ -235,19 +237,19 @@ describe('TimerManager', () => {
     });
 
     test('returns correct count', () => {
-      manager.setInterval('i1', jest.fn(), 1000);
-      manager.setTimeout('t1', jest.fn(), 1000);
+      manager.setInterval('i1', vi.fn(), 1000);
+      manager.setTimeout('t1', vi.fn(), 1000);
 
       expect(manager.getTimerCount()).toBe(2);
 
-      manager.setInterval('i2', jest.fn(), 1000);
+      manager.setInterval('i2', vi.fn(), 1000);
 
       expect(manager.getTimerCount()).toBe(3);
     });
 
     test('decreases after clear', () => {
-      manager.setInterval('i1', jest.fn(), 1000);
-      manager.setInterval('i2', jest.fn(), 1000);
+      manager.setInterval('i1', vi.fn(), 1000);
+      manager.setInterval('i2', vi.fn(), 1000);
 
       expect(manager.getTimerCount()).toBe(2);
 
@@ -260,9 +262,9 @@ describe('TimerManager', () => {
   describe('getTimerKeys', () => {
 
     test('returns all keys without prefix', () => {
-      manager.setInterval('game:A:timer', jest.fn(), 1000);
-      manager.setInterval('game:B:timer', jest.fn(), 1000);
-      manager.setTimeout('other:timer', jest.fn(), 1000);
+      manager.setInterval('game:A:timer', vi.fn(), 1000);
+      manager.setInterval('game:B:timer', vi.fn(), 1000);
+      manager.setTimeout('other:timer', vi.fn(), 1000);
 
       const keys = manager.getTimerKeys();
 
@@ -273,9 +275,9 @@ describe('TimerManager', () => {
     });
 
     test('returns filtered keys with prefix', () => {
-      manager.setInterval('game:A:timer', jest.fn(), 1000);
-      manager.setInterval('game:B:timer', jest.fn(), 1000);
-      manager.setTimeout('other:timer', jest.fn(), 1000);
+      manager.setInterval('game:A:timer', vi.fn(), 1000);
+      manager.setInterval('game:B:timer', vi.fn(), 1000);
+      manager.setTimeout('other:timer', vi.fn(), 1000);
 
       const keys = manager.getTimerKeys('game:');
 
@@ -286,7 +288,7 @@ describe('TimerManager', () => {
     });
 
     test('returns empty array when no matches', () => {
-      manager.setInterval('other:timer', jest.fn(), 1000);
+      manager.setInterval('other:timer', vi.fn(), 1000);
 
       const keys = manager.getTimerKeys('game:');
 
@@ -303,7 +305,7 @@ describe('Game Timer Convenience Functions', () => {
   });
 
   test('setGameTimer registers timer with game prefix', () => {
-    const intervalId = setInterval(jest.fn(), 1000) as unknown as ReturnType<typeof setInterval>;
+    const intervalId = setInterval(vi.fn(), 1000) as unknown as ReturnType<typeof setInterval>;
     setGameTimer('ABC123', intervalId);
 
     expect(timerManager.hasTimer('game:ABC123')).toBe(true);
@@ -313,7 +315,7 @@ describe('Game Timer Convenience Functions', () => {
   });
 
   test('clearGameTimer clears game timer', () => {
-    const intervalId = setInterval(jest.fn(), 1000) as unknown as ReturnType<typeof setInterval>;
+    const intervalId = setInterval(vi.fn(), 1000) as unknown as ReturnType<typeof setInterval>;
     setGameTimer('XYZ789', intervalId);
 
     const result = clearGameTimer('XYZ789');
@@ -344,8 +346,8 @@ describe('Timer Manager - Memory Leak Prevention', () => {
   });
 
   test('replacing timers clears old ones to prevent leaks', async () => {
-    const oldCallback = jest.fn();
-    const newCallback = jest.fn();
+    const oldCallback = vi.fn();
+    const newCallback = vi.fn();
 
     manager.setInterval('leak-test', oldCallback, 30);
 
@@ -369,8 +371,8 @@ describe('Timer Manager - Memory Leak Prevention', () => {
     // Simulate multiple games starting and ending
     for (let i = 0; i < 10; i++) {
       const gameCode = `GAME${i}`;
-      manager.setInterval(`game:${gameCode}:main`, jest.fn(), 1000);
-      manager.setTimeout(`game:${gameCode}:end`, jest.fn(), 60000);
+      manager.setInterval(`game:${gameCode}:main`, vi.fn(), 1000);
+      manager.setTimeout(`game:${gameCode}:end`, vi.fn(), 60000);
     }
 
     expect(manager.getTimerCount()).toBe(20);
@@ -406,7 +408,7 @@ describe('Timer Manager - Concurrent Operations', () => {
 
     // Create many timers rapidly
     for (let i = 0; i < 100; i++) {
-      manager.setTimeout(`rapid:${i}`, jest.fn(), 10000);
+      manager.setTimeout(`rapid:${i}`, vi.fn(), 10000);
     }
 
     expect(manager.getTimerCount()).toBe(100);
@@ -426,10 +428,10 @@ describe('Timer Manager - Concurrent Operations', () => {
   });
 
   test('isolation between different timer keys', async () => {
-    const callbacks: Record<string, jest.Mock> = {
-      'a': jest.fn(),
-      'b': jest.fn(),
-      'c': jest.fn()
+    const callbacks: Record<string, Mock> = {
+      'a': vi.fn(),
+      'b': vi.fn(),
+      'c': vi.fn()
     };
 
     manager.setInterval('timer:a', callbacks.a, 20);

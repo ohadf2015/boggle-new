@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Brain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -43,11 +43,11 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
     
     // Use neo-lime (success/progress) for positive scores
     const bgColor = isPositive
-        ? 'bg-gradient-to-r from-neo-lime to-lime-400'
-        : 'bg-gradient-to-r from-neo-red to-red-400';
+        ? 'bg-linear-to-r from-neo-lime to-lime-400'
+        : 'bg-linear-to-r from-neo-red to-red-400';
     
     const textColor = isPositive ? 'text-neo-black' : 'text-white';
-    const subTextColor = isPositive ? 'text-neo-black/90' : 'text-white/90';
+    const subTextColor = isPositive ? 'text-neo-black/90' : 'text-white';
     const iconColor = isPositive ? 'text-neo-black' : 'text-white';
 
     // Inline variant - small badge for landscape mode
@@ -62,8 +62,8 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
                     <Brain className={cn("w-3 h-3", iconColor)} />
                     <span className={cn("font-black", textColor)}>{sign}{reward.scoreDelta}</span>
                 </div>
-                <div className={cn("text-[8px] font-bold uppercase", subTextColor)}>
-                    {t('brain.points') || 'Brain Pts'}
+                <div className={cn("text-[10px] font-bold uppercase", subTextColor)}>
+                    {t('brain.points')}
                 </div>
             </div>
         );
@@ -81,7 +81,7 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
                     <Brain className={cn("w-5 h-5", iconColor)} />
                     <span className={cn("font-black text-xl", textColor)}>{sign}{reward.scoreDelta}</span>
                     <span className={cn("text-sm font-bold", subTextColor)}>
-                        {t('brain.points') || 'Brain Points'}
+                        {t('brain.points')}
                     </span>
                 </div>
             </div>
@@ -90,10 +90,10 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
 
     // Full variant - large card
     return (
-        <motion.div
+        <m.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ delay: 0.4, type: 'spring' }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 400, damping: 22 }}
             className={cn(
                 'px-4 py-3 rounded-neo border-3 border-neo-black shadow-hard',
                 bgColor,
@@ -104,10 +104,10 @@ const BrainPointsDisplay: React.FC<BrainPointsDisplayProps> = memo(({
                 <Brain className={cn("w-5 h-5", iconColor)} />
                 <span className={cn("font-black text-xl", textColor)}>{sign}{reward.scoreDelta}</span>
                 <span className={cn("text-sm font-bold", subTextColor)}>
-                    {t('brain.points') || 'Brain Points'}
+                    {t('brain.points')}
                 </span>
             </div>
-        </motion.div>
+        </m.div>
     );
 });
 

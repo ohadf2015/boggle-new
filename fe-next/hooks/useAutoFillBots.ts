@@ -70,7 +70,7 @@ export function useAutoFillBots({
     if (!socket || !enabled) return;
 
     const handleAutoFillComplete = (data: { botsAdded: number }) => {
-      console.log(`Auto-fill complete: ${data.botsAdded} bots added`);
+      if (process.env.NODE_ENV === 'development') console.log(`Auto-fill complete: ${data.botsAdded} bots added`);
     };
 
     const handleAutoStartCountdown = (data: { remaining: number }) => {

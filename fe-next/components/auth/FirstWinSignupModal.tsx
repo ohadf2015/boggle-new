@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { Trophy, TrendingUp, Medal, Users } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody } from '../ui/dialog';
 import { fireConfetti } from '@/utils/confettiUtils';
@@ -18,6 +19,8 @@ import {
   type AuthBenefit,
 } from './shared';
 import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useExperiment } from '@/hooks/useExperiment';
 
 interface FirstWinSignupModalProps {
   isOpen: boolean;
@@ -44,12 +47,33 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
 }) => {
   const { theme } = useTheme();
   const { t } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const isDarkMode = theme === 'dark';
 
   const { signIn, loadingProvider, error } = useOAuthSignIn();
 
   const guestStats: GuestStats = getGuestStatsSummary();
   const isMultiGamesVariant = variant === 'multiGames';
+
+  // A/B: subtitle copy variant. Title + OAuth UI stay constant so we
+  // isolate the conversion delta to the persuasion line.
+  const { variant: ctaVariant, trackExposure: trackCtaExposure } =
+    useExperiment('signup-prompt-cta-copy');
+
+  // Map variant → translation key suffix for both firstWin & multiGames
+  // namespaces. Falls back to base `subtitle` for control.
+  const subtitleKey = (() => {
+    const ns = isMultiGamesVariant ? 'auth.multiGames' : 'auth.firstWin';
+    if (ctaVariant === 'urgency') return `${ns}.subtitleUrgency`;
+    if (ctaVariant === 'value-prop') return `${ns}.subtitleValueProp`;
+    return `${ns}.subtitle`;
+  })();
+
+  // Fire exposure only when the modal actually opens (it is mounted
+  // globally via SignupPromptHost — most users never see it).
+  useEffect(() => {
+    if (isOpen) trackCtaExposure();
+  }, [isOpen, trackCtaExposure]);
 
   // Trigger celebratory confetti when modal opens (only for firstWin variant)
   useEffect(() => {
@@ -67,38 +91,41 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
     return undefined;
   }, [isOpen, isMultiGamesVariant]);
 
+  if (isOnCrazyGamesPlatform) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         noDescription
         className={cn(
-          'max-w-md',
+          'max-w-md max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl',
           isDarkMode
-            ? 'bg-neo-navy border-yellow-500/30'
-            : 'bg-gradient-to-b from-white via-white to-gray-50 border-yellow-400/50'
+            ? 'bg-neo-navy border border-yellow-500/30'
+            : 'bg-white border border-yellow-400/50'
         )}
       >
-        <DialogHeader className="bg-transparent border-b-0 p-0">
+        <DialogHeader variant="gradient" customBg="bg-transparent" className="border-b-0 p-0">
           <DialogTitle className="sr-only">
             {isMultiGamesVariant
-              ? t('auth.multiGames.title') || "You're Getting Good!"
+              ? t('auth.multiGames.title')
               : t('auth.firstWin.title')}
           </DialogTitle>
         </DialogHeader>
 
-        <DialogBody className="p-6 pt-0 relative">
+        <DialogBody className="relative p-6 pt-0">
           {/* Decorative background glow */}
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-yellow-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-32 bg-linear-to-b from-yellow-500/20 to-transparent rounded-full blur-3xl pointer-events-none" />
+
 
           {/* Trophy animation */}
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', damping: 10, stiffness: 100, delay: 0.2 }}
             className="flex justify-center mb-4"
           >
             <div className="relative">
-              <motion.div
+              <m.div
                 animate={{
                   scale: [1, 1.1, 1],
                   rotate: [-5, 5, -5],
@@ -106,55 +133,52 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <Trophy
-                  className="text-6xl text-yellow-500 drop-shadow-[0_0_20px_rgba(234,179,8,0.5)]"
+                  className="text-6xl text-yellow-500 drop-shadow-[0_0_20px_rgb(234_179_8/0.5)]"
                   size={64}
                 />
-              </motion.div>
+              </m.div>
               {/* Sparkle effects */}
-              <motion.div
+              <m.div
                 className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 w-4 h-4 bg-yellow-300 rounded-full"
                 animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 0 }}
               />
-              <motion.div
+              <m.div
                 className="absolute -top-1 -left-3 rtl:-left-auto rtl:-right-3 w-3 h-3 bg-yellow-400 rounded-full"
                 animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
               />
-              <motion.div
+              <m.div
                 className="absolute -bottom-1 right-0 rtl:right-auto rtl:left-0 w-2 h-2 bg-orange-400 rounded-full"
                 animate={{ scale: [0, 1, 0], opacity: [0, 1, 0] }}
                 transition={{ duration: 1.5, repeat: Infinity, delay: 1 }}
               />
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Header */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
+            transition={{ delay: 0.3, ...SPRING_PRESETS.balanced }}
             className="text-center mb-6"
           >
             <h2 className="text-2xl font-bold mb-2 text-neo-lime">
               {isMultiGamesVariant
-                ? t('auth.multiGames.title') || "You're Getting Good!"
+                ? t('auth.multiGames.title')
                 : t('auth.firstWin.title')}
             </h2>
             <p className={cn('text-sm', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-              {isMultiGamesVariant
-                ? t('auth.multiGames.subtitle') ||
-                  'Sign up to save your progress and track your achievements!'
-                : t('auth.firstWin.subtitle')}
+              {t(subtitleKey)}
             </p>
-          </motion.div>
+          </m.div>
 
           {/* Benefits list */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className={cn('mb-6 p-4 rounded-xl', isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50')}
+            transition={{ delay: 0.4, ...SPRING_PRESETS.balanced }}
+            className={cn('mb-6 p-4 rounded-xl', isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-50')}
           >
             <p
               className={cn(
@@ -166,32 +190,32 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             </p>
             <ul className="space-y-2">
               {benefits.map((benefit, index) => (
-                <motion.li
+                <m.li
                   key={benefit.translationKey}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.5 + index * 0.1 }}
+                  transition={{ delay: 0.5 + index * 0.1, type: 'spring', stiffness: 380, damping: 26 }}
                   className={cn(
                     'flex items-center gap-3 text-sm',
                     isDarkMode ? 'text-gray-200' : 'text-gray-700'
                   )}
                 >
                   <benefit.icon
-                    className={cn('flex-shrink-0', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}
+                    className={cn('shrink-0', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}
                     size={16}
                   />
                   <span>{t(benefit.translationKey)}</span>
-                </motion.li>
+                </m.li>
               ))}
             </ul>
-          </motion.div>
+          </m.div>
 
           {/* Current stats teaser */}
           {guestStats && guestStats.gamesPlayed > 0 && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.6, ...SPRING_PRESETS.balanced }}
               className={cn(
                 'mb-6 p-3 rounded-lg text-center text-sm',
                 isDarkMode
@@ -205,26 +229,26 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
                   score: guestStats.totalScore,
                 })}
               </span>
-            </motion.div>
+            </m.div>
           )}
 
           {/* OAuth Sign In Buttons */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7 }}
+            transition={{ delay: 0.7, ...SPRING_PRESETS.balanced }}
           >
             <OAuthButtonGroup onSignIn={signIn} loadingProvider={loadingProvider} />
-          </motion.div>
+          </m.div>
 
           {/* Error Message */}
           {error && <AuthErrorMessage message={error} className="mt-4" />}
 
           {/* Continue as Guest */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
+            transition={{ delay: 0.8, type: 'spring', stiffness: 280, damping: 26 }}
             className="mt-6 text-center"
           >
             <button
@@ -236,7 +260,7 @@ const FirstWinSignupModal: React.FC<FirstWinSignupModalProps> = ({
             >
               {t('auth.firstWin.maybeLater')}
             </button>
-          </motion.div>
+          </m.div>
 
           {/* Terms */}
           <AuthTermsFooter className="mt-4" />

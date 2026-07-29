@@ -1,14 +1,17 @@
 'use client';
 
 import React, { useCallback, useMemo, useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, MessageCircle, Trophy, Flame, Check, Loader2, Target, Mail, MessageSquare } from 'lucide-react';
+import { Copy, MessageCircle, Trophy, Flame, Check, Target, Mail, MessageSquare } from 'lucide-react';
+import { Loader } from '@/components/ui/Loader';
 import { Dialog, DialogContent, DialogTitle } from '../ui/dialog';
 import { cn } from '@/lib/utils';
 import { getJoinUrl, copyJoinUrl, shareViaWhatsApp, shareViaTwitter, shareViaDiscord, shareViaEmail, shareViaSms, canShareViaSms, generatePersonalizedShareMessage, type GameResultForShare } from '@/utils/share';
 import { trackShare } from '@/utils/growthTracking';
+import { getStoredUsername } from '@/utils/profileStorage';
 import { useNativeShare } from '@/hooks/useNativeShare';
+import { addCoins } from '@/utils/coinManager';
 import { createChallenge, getChallengeUrl, generateChallengeShareMessage, type ChallengeCreatorData, type ChallengeGameConfig, type ChallengePerformance } from '@/utils/challenges';
 import toast from 'react-hot-toast';
 
@@ -64,7 +67,23 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 }) => {
   const { canNativeShare, nativeShare } = useNativeShare();
   const isPostGame = context === 'post-game';
-  const joinUrl = getJoinUrl(gameCode, isPostGame ? 'share-win' : 'modal-share');
+
+  // Award daily share bonus (20 coins, once per day)
+  const awardShareBonus = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const today = new Date().toISOString().split('T')[0];
+    const lastBonus = localStorage.getItem('lastShareBonusDate');
+    if (lastBonus !== today) {
+      localStorage.setItem('lastShareBonusDate', today);
+      addCoins(20, 'Share Bonus');
+      toast.success(t('share.shareBonusAwarded'), { icon: '🎉', duration: 3000 });
+    }
+  }, [t]);
+  const joinUrl = getJoinUrl(
+    gameCode,
+    isPostGame ? 'share-win' : 'modal-share',
+    getStoredUsername() ?? undefined,
+  );
   const [copied, setCopied] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingChallenge, setIsCreatingChallenge] = useState(false);
@@ -109,14 +128,16 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
     setIsLoading(false);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    awardShareBonus();
     // Haptic feedback on mobile
     if (navigator.vibrate) {
       navigator.vibrate(50);
     }
-  }, [gameCode, t, isPostGame]);
+  }, [gameCode, t, isPostGame, awardShareBonus]);
 
   const handleWhatsApp = useCallback(() => {
     trackShare('whatsapp', gameCode);
+    awardShareBonus();
     if (isPostGame && gameResult) {
       // Use personalized message for post-game
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(shareMessage)}`;
@@ -124,7 +145,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
     } else {
       shareViaWhatsApp(gameCode, roomName, t);
     }
-  }, [gameCode, roomName, t, isPostGame, gameResult, shareMessage]);
+  }, [gameCode, roomName, t, isPostGame, gameResult, shareMessage, awardShareBonus]);
 
   const handleTwitter = useCallback(() => {
     trackShare('twitter', gameCode);
@@ -145,13 +166,13 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
   const handleEmail = useCallback(() => {
     trackShare('email', gameCode);
     const subject = isPostGame
-      ? (language === 'he' ? 'הצלחתי ב-LexiClash!' : 'I crushed it at LexiClash!')
-      : (language === 'he' ? 'בואו לשחק LexiClash!' : 'Join me for LexiClash!');
+      ? t('share.emailSubjectPostGame')
+      : t('share.emailSubjectInvite');
     const body = isPostGame && gameResult
       ? shareMessage
       : `${t('share.inviteTitle')}\n${t('share.inviteMessage')}\n\nRoom Code: ${gameCode}`;
     shareViaEmail(subject, body, joinUrl);
-  }, [shareMessage, joinUrl, isPostGame, gameResult, language, t, gameCode]);
+  }, [shareMessage, joinUrl, isPostGame, gameResult, t, gameCode]);
 
   const handleSms = useCallback(() => {
     trackShare('sms', gameCode);
@@ -168,9 +189,10 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
       url: joinUrl,
     });
     if (success) {
+      awardShareBonus();
       onClose();
     }
-  }, [nativeShare, joinUrl, shareMessage, isPostGame, t, onClose]);
+  }, [nativeShare, joinUrl, shareMessage, isPostGame, t, onClose, awardShareBonus]);
 
   // Handle creating a challenge
   const handleCreateChallenge = useCallback(async () => {
@@ -185,26 +207,26 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
         await navigator.clipboard.writeText(challengeUrl);
         setChallengeCreated(true);
         toast.success(
-          language === 'he' ? 'קישור האתגר הועתק!' : 'Challenge link copied!',
+          t('share.challengeLinkCopied'),
           { icon: '🎯', duration: 3000 }
         );
         setTimeout(() => setChallengeCreated(false), 3000);
       } else {
         toast.error(
-          language === 'he' ? 'שגיאה ביצירת האתגר' : 'Error creating challenge',
+          t('share.errorCreatingChallenge'),
           { duration: 3000 }
         );
       }
     } catch (error) {
       console.error('Error creating challenge:', error);
       toast.error(
-        language === 'he' ? 'שגיאה ביצירת האתגר' : 'Error creating challenge',
+        t('share.errorCreatingChallenge'),
         { duration: 3000 }
       );
     } finally {
       setIsCreatingChallenge(false);
     }
-  }, [challengeData, language]);
+  }, [challengeData, t]);
 
   // Determine header color based on context
   const headerColor = isPostGame ? 'bg-neo-lime' : 'bg-neo-pink';
@@ -212,7 +234,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent noDescription className="sm:max-w-md bg-[#1a1a2e] border-4 border-neo-black rounded-neo shadow-hard-xl p-0 overflow-hidden">
+      <DialogContent noDescription className="sm:max-w-md bg-neo-navy border-4 border-neo-black rounded-neo shadow-hard-xl p-0 overflow-hidden">
         {/* Header - Context-aware */}
         <div className={cn(
           'border-b-4 border-neo-black p-4 flex items-center justify-center gap-2',
@@ -220,7 +242,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
         )}>
           {isPostGame && <Trophy className="w-5 h-5 text-neo-black" />}
           <DialogTitle className={cn('text-lg font-black uppercase', headerTextColor)}>
-            {isPostGame ? t('share.shareVictory') || 'Share Your Victory!' : t('share.modalTitle')}
+            {isPostGame ? t('share.shareVictory') : t('share.modalTitle')}
           </DialogTitle>
         </div>
 
@@ -228,7 +250,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
         <div className="p-4 space-y-4">
           {/* Post-game Stats Display - Enhanced Share Card */}
           {isPostGame && gameResult && (
-            <motion.div
+            <m.div
               initial={{ y: -10, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               className="flex flex-col items-center gap-3"
@@ -242,7 +264,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
 
               {/* Player Archetype Badge */}
               {gameResult.archetype && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1 }}
@@ -252,7 +274,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   <span className="text-sm font-bold text-neo-cyan">
                     {gameResult.archetype.name}
                   </span>
-                </motion.div>
+                </m.div>
               )}
 
               {/* Main Stats Row */}
@@ -262,7 +284,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     {gameResult.score}
                   </div>
                   <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
-                    {language === 'he' ? 'נקודות' : 'pts'}
+                    {t('share.pts')}
                   </div>
                 </div>
                 <div className="w-0.5 h-10 rounded-full bg-white/20" />
@@ -271,7 +293,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     {gameResult.wordCount}
                   </div>
                   <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
-                    {language === 'he' ? 'מילים' : 'words'}
+                    {t('share.words')}
                   </div>
                 </div>
                 {gameResult.maxCombo && gameResult.maxCombo > 1 && (
@@ -282,7 +304,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                         {gameResult.maxCombo}x
                       </div>
                       <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
-                        {language === 'he' ? 'קומבו' : 'combo'}
+                        {t('share.combo')}
                       </div>
                     </div>
                   </>
@@ -295,7 +317,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                         <Flame className="w-5 h-5" /> {gameResult.streakDays}
                       </div>
                       <div className="text-xs font-bold uppercase tracking-wide text-gray-300">
-                        {language === 'he' ? 'רצף' : 'streak'}
+                        {t('share.streak')}
                       </div>
                     </div>
                   </>
@@ -307,23 +329,23 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 <div className="flex items-center justify-center gap-3 flex-wrap">
                   {/* Longest Word */}
                   {gameResult.longestWord && (
-                    <motion.div
+                    <m.div
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.15 }}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-neo border-2 border-purple-500/50 bg-purple-500/20"
                     >
                       <span className="text-purple-300 text-xs font-bold uppercase">
-                        {language === 'he' ? 'הכי ארוכה:' : 'Longest:'}
+                        {t('share.longest')}
                       </span>
                       <span className="text-white font-black text-sm uppercase">
                         {gameResult.longestWord}
                       </span>
-                    </motion.div>
+                    </m.div>
                   )}
                   {/* Achievements */}
                   {gameResult.achievements && gameResult.achievements.length > 0 && (
-                    <motion.div
+                    <m.div
                       initial={{ scale: 0.9, opacity: 0 }}
                       animate={{ scale: 1, opacity: 1 }}
                       transition={{ delay: 0.2 }}
@@ -337,14 +359,14 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                           +{gameResult.achievements.length - 3}
                         </span>
                       )}
-                    </motion.div>
+                    </m.div>
                   )}
                 </div>
               )}
 
               {/* Placement Badge */}
               {gameResult.placement && gameResult.totalPlayers && gameResult.totalPlayers > 1 && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.25 }}
@@ -368,20 +390,20 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   <span className="text-gray-400 text-xs">
                     / {gameResult.totalPlayers}
                   </span>
-                </motion.div>
+                </m.div>
               )}
-            </motion.div>
+            </m.div>
           )}
 
           {/* QR Code - Hidden on mobile, visible on desktop */}
-          <motion.div
+          <m.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.1 }}
             className="hidden sm:flex flex-col items-center"
           >
-            <p className="text-xs font-bold text-white/70 uppercase tracking-wide mb-2">
-              {t('share.scanToJoin') || 'Scan to join'}
+            <p className="text-xs font-bold text-white uppercase tracking-wide mb-2">
+              {t('share.scanToJoin')}
             </p>
             <div
               className="bg-white text-neo-black p-5 rounded-neo border-3 border-neo-black shadow-hard-md"
@@ -395,10 +417,10 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 includeMargin={false}
               />
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Room Code Display */}
-          <motion.div
+          <m.div
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
@@ -412,7 +434,7 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             <button
               onClick={handleCopyLink}
               className={cn(
-                'border-2 border-neo-black rounded-neo p-3 min-w-[44px] min-h-[44px] flex items-center justify-center shadow-hard-sm hover:shadow-hard-md hover:-translate-y-0.5 transition-all focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2',
+                'border-2 border-neo-black rounded-neo p-3 min-w-[44px] min-h-[44px] flex items-center justify-center shadow-hard-sm hover:shadow-hard-md hover:-translate-y-0.5 transition-all focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2',
                 copied ? 'bg-neo-lime' : 'bg-neo-cyan'
               )}
               aria-label={copied ? t('share.linkCopied') : t('share.copyLink')}
@@ -420,17 +442,17 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
             >
               {copied ? <Check className="w-4 h-4 text-neo-black" /> : <Copy className="w-4 h-4 text-neo-black" />}
             </button>
-          </motion.div>
+          </m.div>
 
           {/* Simplified Share Options - Only Copy + WhatsApp */}
-          <motion.div
+          <m.div
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.3 }}
             className="space-y-3"
           >
             {/* Primary: Copy Link - Full Width */}
-            <motion.button
+            <m.button
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.35 }}
@@ -444,22 +466,22 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 'transition-all duration-150',
                 'font-black text-lg uppercase tracking-wide',
                 copied ? 'bg-neo-lime text-neo-black' : 'bg-neo-lime text-neo-black',
-                'focus:outline-none focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2',
+                'focus:outline-hidden focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2',
                 'disabled:opacity-70 disabled:cursor-not-allowed'
               )}
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader size="sm" />
               ) : copied ? (
                 <Check className="w-5 h-5" />
               ) : (
                 <Copy className="w-5 h-5" />
               )}
               <span>{copied ? t('share.linkCopied') : t('share.copyLink')}</span>
-            </motion.button>
+            </m.button>
 
             {/* Secondary: WhatsApp - Full Width */}
-            <motion.button
+            <m.button
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.4 }}
@@ -472,15 +494,15 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 'transition-all duration-150',
                 'font-bold text-sm uppercase tracking-wide',
                 'bg-brand-whatsapp text-black',
-                'focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
+                'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
               )}
             >
               <MessageCircle className="w-5 h-5" />
               <span>{t('share.whatsapp')}</span>
-            </motion.button>
+            </m.button>
 
             {/* More Platforms Toggle */}
-            <motion.button
+            <m.button
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.42 }}
@@ -489,12 +511,12 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               aria-controls="more-platforms"
               className={cn(
                 'w-full flex items-center justify-center gap-1.5 py-2 rounded-neo',
-                'text-white/70 hover:text-white transition-colors',
+                'text-white hover:text-white transition-colors',
                 'font-medium text-xs uppercase tracking-wide',
-                'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+                'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
               )}
             >
-              <span>{showMorePlatforms ? (t('share.lessOptions') || 'Less options') : (t('share.morePlatforms') || 'More platforms')}</span>
+              <span>{showMorePlatforms ? (t('share.lessOptions')) : (t('share.morePlatforms'))}</span>
               <svg
                 className={cn('w-3.5 h-3.5 transition-transform', showMorePlatforms && 'rotate-180')}
                 fill="none"
@@ -503,11 +525,11 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
               >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
-            </motion.button>
+            </m.button>
 
             {/* Additional Share Platforms */}
             {showMorePlatforms && (
-              <motion.div
+              <m.div
                 id="more-platforms"
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
@@ -516,12 +538,12 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 className="grid grid-cols-2 gap-2"
               >
                 {/* Twitter/X */}
-                <motion.button
+                <m.button
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.05 }}
                   onClick={handleTwitter}
-                  aria-label={t('share.twitter') || 'Twitter/X'}
+                  aria-label={t('share.twitter')}
                   className={cn(
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
@@ -529,22 +551,22 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     'transition-all duration-150',
                     'font-bold text-xs uppercase tracking-wide',
                     'bg-black text-white',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
                   )}
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
-                  <span>{t('share.twitter') || 'X'}</span>
-                </motion.button>
+                  <span>{t('share.twitter')}</span>
+                </m.button>
 
                 {/* Discord */}
-                <motion.button
+                <m.button
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.1 }}
                   onClick={handleDiscord}
-                  aria-label={t('share.discord') || 'Discord'}
+                  aria-label={t('share.discord')}
                   className={cn(
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
@@ -552,20 +574,20 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     'transition-all duration-150',
                     'font-bold text-xs uppercase tracking-wide',
                     'bg-brand-discord text-white',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
                   )}
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>{t('share.discord') || 'Discord'}</span>
-                </motion.button>
+                  <span>{t('share.discord')}</span>
+                </m.button>
 
                 {/* Email */}
-                <motion.button
+                <m.button
                   initial={{ scale: 0.9, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ delay: 0.15 }}
                   onClick={handleEmail}
-                  aria-label={t('share.email') || 'Email'}
+                  aria-label={t('share.email')}
                   className={cn(
                     'flex items-center justify-center gap-2 p-3 rounded-neo',
                     'border-2 border-neo-black shadow-hard-sm',
@@ -573,21 +595,21 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                     'transition-all duration-150',
                     'font-bold text-xs uppercase tracking-wide',
                     'bg-neo-pink text-neo-black',
-                    'focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
+                    'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
                   )}
                 >
                   <Mail className="w-4 h-4" />
-                  <span>{t('share.email') || 'Email'}</span>
-                </motion.button>
+                  <span>{t('share.email')}</span>
+                </m.button>
 
                 {/* SMS - Mobile Only */}
                 {isMobile && (
-                  <motion.button
+                  <m.button
                     initial={{ scale: 0.9, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ delay: 0.2 }}
                     onClick={handleSms}
-                    aria-label={t('share.sms') || 'SMS'}
+                    aria-label={t('share.sms')}
                     className={cn(
                       'flex items-center justify-center gap-2 p-3 rounded-neo',
                       'border-2 border-neo-black shadow-hard-sm',
@@ -595,25 +617,25 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                       'transition-all duration-150',
                       'font-bold text-xs uppercase tracking-wide',
                       'bg-neo-lime text-neo-black',
-                      'focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
+                      'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2'
                     )}
                   >
                     <MessageCircle className="w-4 h-4" />
-                    <span>{t('share.sms') || 'SMS'}</span>
-                  </motion.button>
+                    <span>{t('share.sms')}</span>
+                  </m.button>
                 )}
-              </motion.div>
+              </m.div>
             )}
 
             {/* Challenge a Friend (Post-game only, when challenge data is available) */}
             {isPostGame && challengeData && (
-              <motion.button
+              <m.button
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.42 }}
                 onClick={handleCreateChallenge}
                 disabled={isCreatingChallenge}
-                aria-label={language === 'he' ? 'אתגר חבר' : 'Challenge a Friend'}
+                aria-label={t('challenge.challengeFriend')}
                 className={cn(
                   'w-full flex items-center justify-center gap-2 p-3 rounded-neo',
                   'border-2 border-neo-black shadow-hard-sm',
@@ -621,12 +643,12 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                   'transition-all duration-150',
                   'font-bold text-sm uppercase tracking-wide',
                   challengeCreated ? 'bg-neo-lime text-neo-black' : 'bg-neo-cyan text-neo-black',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2',
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2',
                   'disabled:opacity-70 disabled:cursor-not-allowed'
                 )}
               >
                 {isCreatingChallenge ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader size="sm" />
                 ) : challengeCreated ? (
                   <Check className="w-5 h-5" />
                 ) : (
@@ -634,33 +656,33 @@ const UnifiedShareModal: React.FC<UnifiedShareModalProps> = ({
                 )}
                 <span>
                   {challengeCreated
-                    ? (language === 'he' ? 'קישור הועתק!' : 'Link Copied!')
-                    : (language === 'he' ? 'אתגר חבר' : 'Challenge a Friend')}
+                    ? t('share.linkCopied')
+                    : t('challenge.challengeFriend')}
                 </span>
-              </motion.button>
+              </m.button>
             )}
 
             {/* Native Share (Mobile Only) */}
             {canNativeShare && (
-              <motion.button
+              <m.button
                 initial={{ scale: 0.95, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.45 }}
                 onClick={handleNativeShare}
-                aria-label={t('share.more') || 'More Options'}
+                aria-label={t('share.more')}
                 className={cn(
                   'w-full sm:hidden flex items-center justify-center gap-2 p-3 rounded-neo',
                   'border-2 border-white/30 shadow-hard-sm',
                   'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
                   'font-bold text-sm uppercase tracking-wide',
                   'bg-white/10 text-white hover:bg-white/20',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
                 )}
               >
-                <span>{t('share.more') || 'More Options...'}</span>
-              </motion.button>
+                <span>{t('share.more')}</span>
+              </m.button>
             )}
-          </motion.div>
+          </m.div>
         </div>
       </DialogContent>
     </Dialog>

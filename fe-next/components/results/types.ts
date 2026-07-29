@@ -36,7 +36,7 @@ export interface Player {
   score: number;
   allWords?: WordObject[];
   achievements?: GameAchievement[];
-  avatar?: AvatarType & { profilePictureUrl?: string };
+  avatar?: AvatarType;
   title?: Title;
 }
 
@@ -69,6 +69,8 @@ export interface ResultsPlayerCardProps {
   levelUpData?: LevelUpData | null;
   duplicateRuleDisabled?: boolean;
   archetype?: PlayerArchetype | null;
+  /** Compact mode — smaller avatar, tighter spacing, no rotation */
+  compact?: boolean;
 }
 
 export interface WordChipProps {

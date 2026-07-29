@@ -15,12 +15,12 @@ const buttonVariants = cva(
     "shadow-hard",
     "transition-all duration-100",
     // Press effect: translate to close shadow gap
-    "hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard-lg",
+    "hover:-translate-x-px hover:-translate-y-px hover:shadow-hard-lg",
     "active:translate-x-[2px] active:translate-y-[2px] active:shadow-hard-pressed",
     // Focus styling
-    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy",
+    "focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-white dark:focus-visible:ring-offset-neo-navy",
     // Disabled state
-    "disabled:pointer-events-none disabled:opacity-50 disabled:translate-x-0 disabled:translate-y-0",
+    "disabled:pointer-events-none disabled:opacity-70 disabled:translate-x-0 disabled:translate-y-0",
     // SVG icons - responsive sizes
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
     "[&_svg]:w-5 [&_svg]:h-5",
@@ -31,32 +31,32 @@ const buttonVariants = cva(
         // Primary: Electric Yellow - main CTA
         default: "bg-neo-lime text-neo-black hover:bg-neo-lime-hover",
         // Destructive: Red for danger actions
-        destructive: "bg-neo-red text-neo-white hover:brightness-110",
+        destructive: "bg-neo-red text-neo-black hover:brightness-110",
         // Outline: Transparent with border
         outline: [
           "bg-neo-cream text-neo-black",
           "hover:bg-neo-white",
         ].join(" "),
         // Secondary: Pink accent
-        secondary: "bg-neo-pink text-neo-white hover:brightness-110",
+        secondary: "bg-neo-pink text-neo-black hover:brightness-110",
         // Ghost: Minimal, with high-contrast visible border for accessibility (WCAG AA 3:1 for UI components)
         ghost: [
-          "bg-transparent text-neo-white border-3 border-neo-black dark:border-neo-cream shadow-none",
+          "bg-transparent text-neo-black dark:text-neo-white border-3 border-neo-black dark:border-neo-cream shadow-none",
           "hover:bg-neo-navy-light/50 hover:border-neo-cyan hover:shadow-hard-sm",
           "hover:translate-x-0 hover:translate-y-0",
           "active:translate-x-0 active:translate-y-0 active:shadow-none",
         ].join(" "),
         // Link: Text only with always-visible underline for accessibility
         link: [
-          "bg-transparent text-neo-cyan dark:text-neo-cyan border-0 shadow-none",
-          "underline underline-offset-4 decoration-2",
+          "bg-transparent text-neo-black dark:text-neo-cyan border-0 shadow-none",
+          "underline underline-offset-4 decoration-2 decoration-neo-cyan",
           "hover:brightness-110 hover:translate-x-0 hover:translate-y-0 hover:shadow-none",
           "active:translate-x-0 active:translate-y-0",
         ].join(" "),
         // NEW: Success variant (green)
         success: "bg-neo-lime text-neo-black hover:brightness-110",
         // NEW: Accent variant (pink)
-        accent: "bg-neo-pink text-neo-white hover:brightness-110",
+        accent: "bg-neo-pink text-neo-black hover:brightness-110",
         // NEW: Cyan variant
         cyan: "bg-neo-cyan text-neo-black hover:brightness-110",
       },

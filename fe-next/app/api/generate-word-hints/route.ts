@@ -119,10 +119,13 @@ function generateBlanksDisplay(word: string, revealPositions: number[]): string 
 }
 
 function calculateRevealOrder(word: string, language: string): number[] {
+  const lastPosition = word.length - 1;
   const vowelPositions = findVowelPositions(word, language);
-  const vowelsFromEnd = [...vowelPositions].sort((a, b) => b - a);
+  const vowelsFromEnd = [...vowelPositions]
+    .filter(i => i !== lastPosition)
+    .sort((a, b) => b - a);
   const consonantPositions = [...Array(word.length).keys()]
-    .filter(i => !vowelPositions.includes(i))
+    .filter(i => !vowelPositions.includes(i) && i !== lastPosition)
     .sort((a, b) => b - a);
 
   return [...vowelsFromEnd, ...consonantPositions];
@@ -132,10 +135,13 @@ function generateAlgorithmicHints(targetWord: string, language: string): HintLev
   const word = targetWord.toUpperCase();
   const wordLength = word.length;
   const maxReveal = Math.floor(wordLength / 2);
+  const lastPosition = wordLength - 1;
 
   const revealOrder = calculateRevealOrder(word, language);
   const vowelPositions = findVowelPositions(word, language);
-  const vowelsFromEnd = [...vowelPositions].sort((a, b) => b - a);
+  const vowelsExcludingLast = [...vowelPositions]
+    .filter(i => i !== lastPosition)
+    .sort((a, b) => b - a);
 
   const hints: HintLevel[] = [];
 
@@ -146,10 +152,10 @@ function generateAlgorithmicHints(targetWord: string, language: string): HintLev
     unlockCost: HINT_UNLOCK_COSTS.LEVEL_1,
   });
 
-  // Level 2: Reveal last vowel (or last letter if no vowels)
-  const level2Positions = vowelsFromEnd.length > 0
-    ? [vowelsFromEnd[0]]
-    : [wordLength - 1];
+  // Level 2: Reveal a vowel (excluding last letter), or first letter as fallback
+  const level2Positions = vowelsExcludingLast.length > 0
+    ? [vowelsExcludingLast[0]]
+    : wordLength > 1 ? [0] : [];
   hints.push({
     level: 2,
     hint: generateBlanksDisplay(word, level2Positions),

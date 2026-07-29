@@ -1,6 +1,8 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
 import { createClient } from '@/utils/supabase/server';
 import { isValidPuzzleCode, calculateCustomPuzzleScore } from '@/utils/customPuzzle';
+import { captureApiError } from '@/utils/sentry';
 
 interface RouteParams {
   params: Promise<{ puzzleCode: string }>;
@@ -47,7 +49,19 @@ interface SubmitAttemptRequest {
  * POST /api/custom-puzzle/[puzzleCode]/submit
  * Submit an attempt for a custom puzzle
  */
-export async function POST(request: Request, { params }: RouteParams) {
+export async function POST(request: NextRequest, { params }: RouteParams) {
+  // Rate limit: 20 requests per minute
+  const rateLimitResult = checkApiRateLimit(request, 'custom-puzzle-submit', {
+    maxRequests: 20,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { error: 'Too many requests' },
+      { status: 429 }
+    );
+  }
+
   try {
     const { puzzleCode } = await params;
     const body: SubmitAttemptRequest = await request.json();
@@ -67,7 +81,6 @@ export async function POST(request: Request, { params }: RouteParams) {
       clueTokensEarned,
       clueTokensSpent,
       hintsUnlocked,
-      efficiencyScore: providedEfficiencyScore,
     } = body;
 
     if (!isValidPuzzleCode(puzzleCode)) {
@@ -95,18 +108,22 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     const supabase = await createClient();
 
-    // Get authenticated user if available
-    const { data: { user } } = await supabase.auth.getUser();
+    // Fetch user auth and puzzle in parallel
+    const [authResult, puzzleResult] = await Promise.all([
+      supabase.auth.getUser(),
+      supabase
+        .from('custom_puzzles')
+        .select('id, puzzle_code, target_word, creator_id, creator_guest_fingerprint, creator_efficiency_score')
+        .eq('puzzle_code', puzzleCode.toLowerCase())
+        .single(),
+    ]);
+
+    const user = authResult.data?.user;
     const { data: profileData } = user
-      ? await supabase.from('profiles').select('avatar_emoji, avatar_color, avatar_image, profile_picture_url').eq('id', user.id).single()
+      ? await supabase.from('profiles').select('avatar_emoji, avatar_color, avatar_image').eq('id', user.id).single()
       : { data: null };
 
-    // Fetch the puzzle to verify it exists
-    const { data: puzzle, error: puzzleError } = await supabase
-      .from('custom_puzzles')
-      .select('id, puzzle_code, target_word, creator_id, creator_guest_fingerprint, creator_efficiency_score')
-      .eq('puzzle_code', puzzleCode.toLowerCase())
-      .single();
+    const { data: puzzle, error: puzzleError } = puzzleResult;
 
     if (puzzleError || !puzzle) {
       return NextResponse.json(
@@ -123,18 +140,16 @@ export async function POST(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Calculate player's efficiency score
-    const efficiencyScore = providedEfficiencyScore !== undefined
-      ? providedEfficiencyScore
-      : calculateCustomPuzzleScore(
-          solved,
-          attemptsUsed,
-          wordsDiscovered?.length || 0,
-          lifeRemaining || 0
-        );
+    // Always server-recalculate efficiency score (never trust client)
+    const efficiencyScore = calculateCustomPuzzleScore(
+      solved,
+      attemptsUsed,
+      wordsDiscovered?.length || 0,
+      lifeRemaining || 0
+    );
 
     // Insert attempt (uses unique constraint to prevent duplicates)
-    const insertData: any = {
+    const insertData: Record<string, unknown> = {
       puzzle_id: puzzle.id,
       player_id: user?.id || null,
       guest_fingerprint: user ? null : (guestFingerprint || null),
@@ -142,7 +157,6 @@ export async function POST(request: Request, { params }: RouteParams) {
       avatar_emoji: avatarEmoji || profileData?.avatar_emoji || '🎯',
       avatar_color: avatarColor || profileData?.avatar_color || '#6366f1',
       avatar_image: avatarImage || profileData?.avatar_image || undefined,
-      profile_picture_url: profileData?.profile_picture_url || undefined,
       country_code: countryCode || undefined,
       solved,
       attempts_used: attemptsUsed,
@@ -205,7 +219,9 @@ export async function POST(request: Request, { params }: RouteParams) {
       creatorScore: puzzle.creator_efficiency_score,
     });
   } catch (error) {
-    console.error('Submit attempt error:', error);
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/custom-puzzle/submit', { method: 'POST' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Submit attempt error:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

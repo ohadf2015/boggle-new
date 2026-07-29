@@ -1,0 +1,38 @@
+Data Category,Data Type,Collected,Shared,Purpose,Optional/Required,Ephemeral,User Can Delete
+Personal info,Email address,Yes,Yes (LogRocket; Resend),App functionality; Account management,Required,No,Yes
+Personal info,Name (display name / username),Yes,Yes (PostHog; LogRocket),App functionality; Personalization,Required,No,Yes
+Personal info,User IDs,Yes,Yes (PostHog; LogRocket; Sentry; GA4),App functionality; Analytics,Required,No,Yes
+Personal info,Profile picture,Yes,No,App functionality; Personalization,Optional,No,Yes
+Location,Approximate location (IP-based country/city),Yes,Yes (ip-api.com server-side),Analytics; Personalization,Required (auto-collected),No,Yes
+App activity,App interactions (page views; game events),Yes,Yes (PostHog; GA4; Facebook Pixel; TikTok Pixel),Analytics; Advertising,Required,No,Yes
+App activity,In-app search history,No,No,N/A,N/A,N/A,N/A
+App activity,Other user-generated content (game scores; words; achievements),Yes,No,App functionality,Required,No,Yes
+Device or other IDs,Device or other IDs (advertising ID via AdMob),Yes (mobile only),Yes (AdMob/Google),Advertising,Required,No,Yes
+Financial info,Purchase history,No,No,Handled by Google Play,N/A,N/A,N/A
+Photos and videos,Photos (profile picture upload),Yes,No,App functionality,Optional,No,Yes
+Contacts,Contacts,No,No,N/A,N/A,N/A,N/A
+Calendar,Calendar,No,No,N/A,N/A,N/A,N/A
+Web browsing,Web browsing history,No,No,N/A,N/A,N/A,N/A
+Audio,Audio files,No,No,N/A,N/A,N/A,N/A
+Files and docs,Files and docs,No,No,N/A,N/A,N/A,N/A
+Messages,Messages,No,No,N/A,N/A,N/A,N/A
+Health and fitness,Health and fitness,No,No,N/A,N/A,N/A,N/A
+,,,,,,
+SECURITY PRACTICES,Answer,,,,,
+Is data encrypted in transit?,Yes (HTTPS),,,,,
+Can users request data deletion?,Yes,,,,,
+Deletion URL,https://lexiclash.com/en/account/delete,,,,,
+Deletion API endpoint,DELETE /api/account/delete,,,,,
+Does your app follow the Families Policy?,No (not targeting children),,,,,
+,,,,,,
+THIRD-PARTY SERVICES,Data Shared,Consent Required?,,,,,
+PostHog (EU),User ID; display name; role; events,Yes (cookie consent),,,,,
+Google Analytics 4,Game events; page views,Yes (cookie consent),,,,,
+LogRocket,Session recordings; email; user ID; country,Yes (cookie consent),,,,,
+Sentry,User ID; error traces; browser info,No (error monitoring),,,,,
+Facebook Pixel,Page views; conversion events,NO — NOT CONSENT-GATED (fix needed),,,,,
+TikTok Pixel,Page views; conversion events,NO — NOT CONSENT-GATED (fix needed),,,,,
+AdMob,Device advertising IDs,SDK-managed,,,,,
+Firebase,Push notification tokens,No (functional),,,,,
+Resend,Email addresses,No (transactional),,,,,
+ip-api.com,IP address (server-side),No (server-side only),,,,,

@@ -1,0 +1,416 @@
+diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
+index c629139..567088f 100644
+--- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
++++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/banner/BannerExecutor.java
+@@ -33,6 +33,16 @@ public class BannerExecutor extends Executor {
+     private RelativeLayout mAdViewLayout;
+     private AdView mAdView;
+     private ViewGroup mViewGroup;
++    // True once the CURRENT AdView has successfully loaded at least one ad.
++    // AdMob auto-refresh (~30-60s, configured server-side) re-invokes this
++    // AdView's AdListener on every refresh; a refresh no-fill fires
++    // onAdFailedToLoad. Upstream tears the AdView down on ANY failure, which
++    // destroys a perfectly-good displayed banner on the first refresh no-fill
++    // (the "banner disappears after a while" bug). Google's own contract keeps
++    // the last good ad on a refresh failure — this flag lets us honor that:
++    // destroy ONLY when no ad was ever shown (initial no-fill). Reset to false
++    // only in createNewAdView (a fresh AdView + fresh listener).
++    private boolean bannerHasLoaded = false;
+ 
+     public BannerExecutor(
+         Supplier<Context> contextSupplier,
+@@ -44,7 +54,20 @@ public class BannerExecutor extends Executor {
+     }
+ 
+     public void initialize() {
+-        mViewGroup = (ViewGroup) ((ViewGroup) activitySupplier.get().findViewById(android.R.id.content)).getChildAt(0);
++        ensureViewGroup();
++    }
++
++    private void ensureViewGroup() {
++        if (mViewGroup != null) return;
++        try {
++            Activity activity = activitySupplier.get();
++            if (activity == null) return;
++            ViewGroup content = (ViewGroup) activity.findViewById(android.R.id.content);
++            if (content == null) return;
++            ViewGroup child = content.getChildCount() > 0 ? (ViewGroup) content.getChildAt(0) : null;
++            mViewGroup = child != null ? child : content;
++        } catch (Exception ignored) {
++        }
+     }
+ 
+     public void showBanner(final PluginCall call) {
+@@ -64,6 +87,16 @@ public class BannerExecutor extends Executor {
+ 
+         if (mAdView != null) {
+             updateExistingAdView(adOptions);
++            // CRITICAL: resolve the PluginCall on the re-show path. The upstream
++            // plugin returned here WITHOUT resolving, so the JS showBanner()
++            // promise stayed PENDING forever on every re-show (mAdView != null).
++            // The JS-side bannerController serializes show/hide through one
++            // promise chain (await ops.show()); a never-resolving show froze the
++            // chain so every later suppress/hide/reassert queued behind it and
++            // never ran — the app-wide "drawer doesn't hide the banner / banner
++            // never updates on layout change" bug. The banner already renders via
++            // updateExistingAdView; resolve so the chain can proceed.
++            call.resolve();
+             return;
+         }
+ 
+@@ -84,10 +117,29 @@ public class BannerExecutor extends Executor {
+             mAdViewLayout = new RelativeLayout(contextSupplier.get());
+             mAdViewLayout.setHorizontalGravity(Gravity.CENTER_HORIZONTAL);
+             mAdViewLayout.setVerticalGravity(Gravity.BOTTOM);
++            mAdViewLayout.setClipChildren(true);
++            mAdViewLayout.setClipToPadding(true);
++
++            // Banner-height container (NOT WRAP_CONTENT). The ad's hardware surface
++            // composites as its own GPU layer; if the container is left tall (a
++            // momentarily-oversized creative makes WRAP_CONTENT measure ~480dp) that
++            // tall layer punctures the WebView across the middle of the screen and the
++            // splash/app-icon shows through — the "logo/navy container hiding the page"
++            // bug. Pin the container to the ad's declared height (capped 120dp) so it's
++            // a thin strip anchored above the tabs; the page fills everything above it.
++            float __dens = contextSupplier.get().getResources().getDisplayMetrics().density;
++            int __bannerH;
++            {
++                com.google.android.gms.ads.AdSize __sz = mAdView.getAdSize();
++                int __cap = (int) (120 * __dens);
++                __bannerH = (__sz != null && __sz.getHeight() > 0)
++                    ? Math.min((int) (__sz.getHeight() * __dens), __cap)
++                    : __cap;
++            }
+ 
+             final CoordinatorLayout.LayoutParams mAdViewLayoutParams = new CoordinatorLayout.LayoutParams(
+-                CoordinatorLayout.LayoutParams.WRAP_CONTENT,
+-                CoordinatorLayout.LayoutParams.WRAP_CONTENT
++                CoordinatorLayout.LayoutParams.MATCH_PARENT,
++                __bannerH
+             );
+ 
+             // TODO: Make an enum like the AdSizeEnum?
+@@ -107,13 +159,23 @@ public class BannerExecutor extends Executor {
+             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+                 View rootView = activitySupplier.get().getWindow().getDecorView();
+                 rootView.setOnApplyWindowInsetsListener((v, insets) -> {
+-                    int bottomInset = insets.getSystemWindowInsetBottom();
+-                    int topInset = insets.getSystemWindowInsetTop();
++                    // Use TYPE-SPECIFIC insets, NOT the deprecated getSystemWindowInset*()
++                    // which lumps in the IME (keyboard) inset. On Android 15 the IME inset
++                    // is reported as a ~972px stale "hint" even with no keyboard visible, so
++                    // a BOTTOM banner's bottom margin (max(inset, userMargin)) jumps to ~972px
++                    // and the banner is shoved ~a full keyboard-height UP into mid-screen,
++                    // where its native surface occludes the WebView content below it
++                    // (the "blank section / stray logo below the ad"). navigationBars() = 48px.
++                    int bottomInset = insets.getInsets(android.view.WindowInsets.Type.navigationBars()).bottom;
++                    int topInset = insets.getInsets(android.view.WindowInsets.Type.statusBars()).top;
++                    // Honor caller-supplied margin via max(): the caller already accounts for
++                    // the safe area via --bottom-nav-height, so summing would double-count.
++                    int userMarginPx = (int) (adOptions.margin * v.getResources().getDisplayMetrics().density);
+ 
+                     if ("TOP_CENTER".equals(adOptions.position)) {
+-                        mAdViewLayoutParams.setMargins(0, topInset, 0, 0);
++                        mAdViewLayoutParams.setMargins(0, Math.max(topInset, userMarginPx), 0, 0);
+                     } else {
+-                        mAdViewLayoutParams.setMargins(0, 0, 0, bottomInset);
++                        mAdViewLayoutParams.setMargins(0, 0, 0, Math.max(bottomInset, userMarginPx));
+                     }
+ 
+                     mAdViewLayout.setLayoutParams(mAdViewLayoutParams);
+@@ -205,7 +267,7 @@ public class BannerExecutor extends Executor {
+                     .get()
+                     .runOnUiThread(() -> {
+                         if (mAdView != null) {
+-                            mViewGroup.removeView(mAdViewLayout);
++                            if (mViewGroup != null) mViewGroup.removeView(mAdViewLayout);
+                             mAdViewLayout.removeView(mAdView);
+                             mAdView.destroy();
+                             mAdView = null;
+@@ -226,6 +288,18 @@ public class BannerExecutor extends Executor {
+         activitySupplier
+             .get()
+             .runOnUiThread(() -> {
++                if (mAdView == null) {
++                    Log.d(logTag, "Banner: updateExistingAdView skipped, mAdView is null");
++                    return;
++                }
++                // Restore visibility: a prior hideBanner() set the layout GONE +
++                // paused the AdView. The upstream re-show path only reloaded the
++                // ad and never un-hid it, so a suppress→release (side-menu
++                // open→close) cycle left the banner permanently hidden. resume it.
++                if (mAdViewLayout != null) {
++                    mAdViewLayout.setVisibility(View.VISIBLE);
++                }
++                mAdView.resume();
+                 final AdRequest adRequest = RequestHelper.createRequest(adOptions);
+                 mAdView.loadAd(adRequest);
+             });
+@@ -245,12 +319,36 @@ public class BannerExecutor extends Executor {
+                 AdViewIdHelper.assignIdToAdView(mAdView, adOptions, adRequest, logTag, contextSupplier.get());
+                 // Add the AdView to the view hierarchy.
+                 mAdViewLayout.addView(mAdView);
++                // Hard-constrain the banner to its declared ad-size height. An oversized
++                // ad creative (e.g. a 320x480 test creative on a registered test device,
++                // or a misbehaving adaptive size under Android 15/16 edge-to-edge) would
++                // otherwise grow the AdView into a tall, mostly-transparent native surface
++                // that composites OVER and occludes the WebView content beneath it — the
++                // long-reported "blank section / stray logo below the ad". Real banner ads
++                // are already this size, so this is a no-op for them; only a pathological
++                // creative is clamped (and clipped) so it can never cover the page.
++                try {
++                    float dens = contextSupplier.get().getResources().getDisplayMetrics().density;
++                    int maxHpx = (int) (120 * dens); // generous banner ceiling (real banners ~50-90dp)
++                    com.google.android.gms.ads.AdSize sz = mAdView.getAdSize();
++                    int hPx = (sz != null && sz.getHeight() > 0) ? Math.min((int) (sz.getHeight() * dens), maxHpx) : maxHpx;
++                    int wPx = (sz != null && sz.getWidth() > 0)
++                        ? (int) (sz.getWidth() * dens)
++                        : android.widget.RelativeLayout.LayoutParams.WRAP_CONTENT;
++                    mAdView.setLayoutParams(new android.widget.RelativeLayout.LayoutParams(wPx, hPx));
++                    mAdView.setClipChildren(true);
++                    mAdViewLayout.setClipChildren(true);
++                    mAdViewLayout.setClipToPadding(true);
++                } catch (Exception ignored) {}
++                // Fresh AdView + fresh listener: no ad displayed yet.
++                bannerHasLoaded = false;
+                 // Start loading the ad.
+                 mAdView.loadAd(adRequest);
+                 mAdView.setAdListener(
+                     new AdListener() {
+                         @Override
+                         public void onAdLoaded() {
++                            bannerHasLoaded = true;
+                             final BannerAdSizeInfo sizeInfo = new BannerAdSizeInfo(mAdView);
+ 
+                             notifyListeners(BannerAdPluginEvents.SizeChanged.getWebEventName(), sizeInfo);
+@@ -260,8 +358,19 @@ public class BannerExecutor extends Executor {
+ 
+                         @Override
+                         public void onAdFailedToLoad(@NonNull LoadAdError adError) {
++                            // Refresh no-fill on an already-displayed banner: keep the
++                            // last good ad on screen (Google's default contract) and emit
++                            // NOTHING. Emitting FailedToLoad would trip the JS resetVar()
++                            // listener and collapse --admob-banner-height to 0, reflowing
++                            // page content OVER the still-visible ad. Only the INITIAL
++                            // load failure (nothing shown yet) tears down + collapses.
++                            if (bannerHasLoaded) {
++                                super.onAdFailedToLoad(adError);
++                                return;
++                            }
++
+                             if (mAdView != null) {
+-                                mViewGroup.removeView(mAdViewLayout);
++                                if (mViewGroup != null) mViewGroup.removeView(mAdViewLayout);
+                                 mAdViewLayout.removeView(mAdView);
+                                 mAdView.destroy();
+                                 mAdView = null;
+@@ -297,7 +406,12 @@ public class BannerExecutor extends Executor {
+                 );
+ 
+                 // Add AdViewLayout top of the WebView
+-                mViewGroup.addView(mAdViewLayout);
++                ensureViewGroup();
++                if (mViewGroup != null) {
++                    mViewGroup.addView(mAdViewLayout);
++                } else {
++                    Log.e(logTag, "Banner: mViewGroup null after ensureViewGroup, skip addView");
++                }
+             });
+     }
+ }
+diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/FullscreenPluginCallback.kt b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/FullscreenPluginCallback.kt
+index a9e37aa..025af2e 100644
+--- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/FullscreenPluginCallback.kt
++++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/FullscreenPluginCallback.kt
+@@ -15,6 +15,8 @@ class FullscreenPluginCallback(private val loadPluginObject: LoadPluginEventName
+     }
+ 
+     override fun onAdFailedToShowFullScreenContent(adError: AdError) {
++        // No-op unless a rewarded ad paused the WebView (see RewardedWebViewGuard).
++        RewardedWebViewGuard.resume()
+         val adMobError = AdMobPluginError(adError)
+         notifyListenersFunction.accept(
+                 loadPluginObject.FailedToShow, adMobError
+@@ -22,6 +24,9 @@ class FullscreenPluginCallback(private val loadPluginObject: LoadPluginEventName
+     }
+ 
+     override fun onAdDismissedFullScreenContent() {
++        // Ad surface is fully gone — safe to resume the WebView. No-op if nothing
++        // was paused (e.g. an interstitial routed through this shared callback).
++        RewardedWebViewGuard.resume()
+         notifyListenersFunction.accept(loadPluginObject.Dismissed, JSObject())
+     }
+ }
+\ No newline at end of file
+diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/RewardedWebViewGuard.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/RewardedWebViewGuard.java
+new file mode 100644
+index 0000000..3ed2745
+--- /dev/null
++++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/helpers/RewardedWebViewGuard.java
+@@ -0,0 +1,90 @@
++package com.getcapacitor.community.admob.helpers;
++
++import android.app.Activity;
++import android.os.Handler;
++import android.os.Looper;
++import android.webkit.WebView;
++import com.getcapacitor.BridgeActivity;
++
++/**
++ * Pauses the Capacitor WebView while a fullscreen rewarded ad is on screen.
++ *
++ * Why: the native AdMob rewarded ad (its "Reward in X seconds" countdown)
++ * renders on the app's main/UI thread. If the WebView keeps doing work behind
++ * the fullscreen ad — JS timers (setInterval/setTimeout are NOT throttled by
++ * document visibility), layout, compositing — it can starve that thread and the
++ * native countdown freezes. `WebView.onPause()` + `pauseTimers()` stops all of
++ * it for the duration of the ad, then we resume the instant the ad is gone.
++ *
++ * FAIL-SAFE by construction (this is a blind fix shipped without on-device
++ * confirmation, so its worst case must be bounded, never catastrophic):
++ *   - Resume is driven by the ad's own Dismissed / FailedToShow callbacks.
++ *   - A hard backstop force-resumes after MAX_PAUSE_MS regardless, so a missed
++ *     callback can never leave the WebView (and thus the whole game) frozen
++ *     permanently — the worst case is a bounded ≤MAX_PAUSE_MS stall for a user
++ *     whose ad already hung (i.e. no worse than the status quo they hit).
++ *   - Idempotent: double-pause / double-resume are no-ops; resume() called for
++ *     an interstitial (which we never pause) is a no-op because nothing is stored.
++ *   - We deliberately do NOT resume on the Rewarded event: it fires at video-end,
++ *     before the end-card/close is dismissed, so resuming there would re-contend
++ *     the thread while the ad is still fullscreen.
++ */
++public final class RewardedWebViewGuard {
++
++    private RewardedWebViewGuard() {}
++
++    // Hard cap on how long the WebView may stay paused. Must exceed the longest
++    // realistic rewarded ad (video + end-card). 90s is comfortably above that.
++    private static final long MAX_PAUSE_MS = 90_000L;
++
++    private static final Handler MAIN = new Handler(Looper.getMainLooper());
++    private static final Runnable BACKSTOP = RewardedWebViewGuard::resume;
++
++    // The WebView we paused, or null when nothing is paused. Guards idempotency.
++    private static WebView paused;
++
++    /** Pause the Capacitor WebView for the duration of a fullscreen rewarded ad. */
++    public static void pause(Activity activity) {
++        if (paused != null) return; // already paused — keep the original backstop
++        final WebView wv = webViewOf(activity);
++        if (wv == null) return;
++        paused = wv;
++        try {
++            wv.onPause();
++            wv.pauseTimers();
++        } catch (Exception ignored) {
++            paused = null;
++            return;
++        }
++        MAIN.removeCallbacks(BACKSTOP);
++        MAIN.postDelayed(BACKSTOP, MAX_PAUSE_MS);
++    }
++
++    /** Resume a WebView paused by {@link #pause}. Safe no-op if nothing is paused. */
++    public static void resume() {
++        MAIN.removeCallbacks(BACKSTOP);
++        final WebView wv = paused;
++        paused = null;
++        if (wv == null) return;
++        final Runnable doResume = () -> {
++            try {
++                wv.resumeTimers();
++                wv.onResume();
++            } catch (Exception ignored) {}
++        };
++        if (Looper.myLooper() == Looper.getMainLooper()) {
++            doResume.run();
++        } else {
++            MAIN.post(doResume);
++        }
++    }
++
++    private static WebView webViewOf(Activity activity) {
++        if (activity instanceof BridgeActivity) {
++            try {
++                return ((BridgeActivity) activity).getBridge().getWebView();
++            } catch (Exception ignored) {}
++        }
++        return null;
++    }
++}
+diff --git a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/rewarded/AdRewardExecutor.java b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/rewarded/AdRewardExecutor.java
+index f9ead0c..4f4d3f4 100644
+--- a/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/rewarded/AdRewardExecutor.java
++++ b/node_modules/@capacitor-community/admob/android/src/main/java/com/getcapacitor/community/admob/rewarded/AdRewardExecutor.java
+@@ -8,6 +8,7 @@ import com.getcapacitor.PluginCall;
+ import com.getcapacitor.PluginMethod;
+ import com.getcapacitor.community.admob.helpers.AdViewIdHelper;
+ import com.getcapacitor.community.admob.helpers.RequestHelper;
++import com.getcapacitor.community.admob.helpers.RewardedWebViewGuard;
+ import com.getcapacitor.community.admob.models.AdMobPluginError;
+ import com.getcapacitor.community.admob.models.AdOptions;
+ import com.getcapacitor.community.admob.models.Executor;
+@@ -64,6 +65,11 @@ public class AdRewardExecutor extends Executor {
+             activitySupplier
+                 .get()
+                 .runOnUiThread(() -> {
++                    // Free the main/UI thread the native ad's countdown renders
++                    // on by pausing the WebView for the ad's duration. Resumed on
++                    // Dismissed/FailedToShow (FullscreenPluginCallback) or a hard
++                    // backstop. See RewardedWebViewGuard.
++                    RewardedWebViewGuard.pause(activitySupplier.get());
+                     mRewardedAd.show(
+                         activitySupplier.get(),
+                         RewardedAdCallbackAndListeners.INSTANCE.getOnUserEarnedRewardListener(call, notifyListenersFunction)
+diff --git a/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift b/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift
+index 70081af..08efed3 100644
+--- a/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift
++++ b/node_modules/@capacitor-community/admob/ios/Sources/AdMobPlugin/Banner/BannerExecutor.swift
+@@ -7,6 +7,14 @@ class BannerExecutor: NSObject, BannerViewDelegate {
+     var bannerView: BannerView!
+     var adPosition: String = ""
+     var Margin: Int = 0
++    // True once the CURRENT bannerView has successfully loaded at least one ad.
++    // AdMob auto-refresh re-invokes the delegate on every refresh; a refresh
++    // no-fill fires didFailToReceiveAdWithError. Upstream removes the banner on
++    // ANY failure, tearing down a perfectly-good displayed banner on the first
++    // refresh no-fill (the "banner disappears after a while" bug). Keep the last
++    // good ad on a refresh failure (Google's contract); remove ONLY on the
++    // initial no-fill (nothing shown yet).
++    var bannerHasLoaded = false
+ 
+     func showBanner(_ call: CAPPluginCall, _ request: Request, _ adUnitID: String) {
+         if let rootViewController = plugin?.getRootVC() {
+@@ -41,6 +49,8 @@ class BannerExecutor: NSObject, BannerViewDelegate {
+             }
+ 
+             self.bannerView = BannerView(adSize: bannerSize)
++            // Fresh bannerView: no ad displayed yet.
++            self.bannerHasLoaded = false
+             self.addBannerViewToView(self.bannerView, adPosition, adMargin)
+             self.bannerView.translatesAutoresizingMaskIntoConstraints = false
+             self.bannerView.adUnitID = adUnitID
+@@ -119,6 +129,7 @@ class BannerExecutor: NSObject, BannerViewDelegate {
+     /// Tells the delegate an ad request loaded an ad.
+     func bannerViewDidReceiveAd(_ bannerView: BannerView) {
+         NSLog("bannerViewDidReceiveAd")
++        self.bannerHasLoaded = true
+         if let rootViewController = plugin?.getRootVC() {
+             rootViewController.view.addSubview(bannerView)
+             rootViewController.view.addConstraints(
+@@ -150,6 +161,15 @@ class BannerExecutor: NSObject, BannerViewDelegate {
+     func bannerView(_ bannerView: BannerView,
+                     didFailToReceiveAdWithError error: Error) {
+         NSLog("bannerView:didFailToReceiveAdWithError: \(error.localizedDescription)")
++        // Refresh no-fill on an already-displayed banner: keep the last good ad
++        // on screen (Google's default contract) and emit NOTHING. Emitting
++        // FailedToLoad would trip the JS resetVar() listener and collapse
++        // --admob-banner-height to 0, reflowing page content OVER the still-
++        // visible ad. Only the INITIAL load failure (nothing shown yet) removes
++        // the banner + collapses the reserved strip.
++        if self.bannerHasLoaded {
++            return
++        }
+         self.removeBannerViewToView()
+         self.plugin?.notifyListeners(BannerAdPluginEvents.SizeChanged.rawValue, data: [
+             "width": 0,

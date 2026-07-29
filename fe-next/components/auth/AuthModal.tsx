@@ -1,21 +1,31 @@
 'use client';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, type MutableRefObject } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Mail, Eye, EyeOff, Loader2, type LucideIcon } from 'lucide-react';
+import { m, AnimatePresence } from 'framer-motion';
+import { X, Mail, Eye, EyeOff, Wand2, Shield, AlertCircle } from 'lucide-react';
+import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
-import { Button as ButtonComponent } from '../ui/button';
-
-// Type assertion for JSX Button component
-const Button = ButtonComponent as any;
-import { useTheme } from '../../utils/ThemeContext';
+import { Button } from '../ui/button';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail } from '../../lib/supabase';
+import { signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import { trackEvent } from '@/components/GoogleAnalytics';
+import { isNative } from '../../utils/platform';
+
 import { getGuestStatsSummary } from '../../utils/guestManager';
 import { cn } from '../../lib/utils';
 import { validateEmail, validatePassword } from '../../utils/validation';
-import type { Language } from '@/types';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { useFocusTrap } from '@/hooks/useFocusTrap';
+import { useErrorShake } from '@/hooks/useErrorShake';
+
+/** Quick fade+slide entrance for a validation error appearing under a field. */
+const ERROR_ENTER = {
+  initial: { opacity: 0, y: -4 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.15 },
+} as const;
 
 // Brand icon SVG components
 const GoogleIcon = ({ className }: { className?: string }) => (
@@ -49,54 +59,84 @@ interface Provider {
   id: 'google' | 'discord';
   icon: React.FC<{ className?: string }>;
   label: string;
-  color: string;
+  className: string;
 }
 
 type AuthMode = 'signin' | 'signup';
 
 const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats = false, initialMode = 'signin' }) => {
-  const { theme } = useTheme();
   const { t, language } = useLanguage();
-  const isDarkMode = theme === 'dark';
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Modal-level `error` is only set on a failed submit (server rejection / invalid
+  // credentials), never per-keystroke — so shaking on it is the canonical
+  // "login rejected" feedback without firing while the user types.
+  const errorShake = useErrorShake(error);
   const [success, setSuccess] = useState<string | null>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
+  const { isOnCrazyGamesPlatform, showAuthPrompt } = useCrazyGames();
+  useFocusTrap(modalRef, isOpen, onClose);
+
+  // On CrazyGames, skip the modal entirely — trigger native CG auth prompt
+  useEffect(() => {
+    if (isOpen && isOnCrazyGamesPlatform) {
+      showAuthPrompt();
+      onClose();
+    }
+  }, [isOpen, isOnCrazyGamesPlatform, showAuthPrompt, onClose]);
 
   // Email/password form state
   const [authMode, setAuthMode] = useState<AuthMode>(initialMode);
-  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [usePassword, setUsePassword] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [otpStep, setOtpStep] = useState<'enter-email' | 'enter-code'>('enter-email');
+  const [otpCode, setOtpCode] = useState('');
+  const [otpCooldown, setOtpCooldown] = useState(0);
+
+  const otpIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Clear OTP interval on unmount
+  useEffect(() => {
+    return () => {
+      if (otpIntervalRef.current) clearInterval(otpIntervalRef.current);
+    };
+  }, []);
 
   const guestStats: GuestStats | null = showGuestStats ? getGuestStatsSummary() : null;
+
+  // OAuth sign-in with native SDK priority (Google/Apple native → in-app browser → redirect)
+  const handleOAuthError = useCallback((msg: string) => setError(msg), []);
+  const handleOAuthSuccess = useCallback(() => onClose(), [onClose]);
+  const { signIn: oauthSignIn, loadingProvider: oauthLoadingProvider } = useOAuthSignIn({
+    onError: handleOAuthError,
+    onSuccess: handleOAuthSuccess,
+  });
 
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
       setAuthMode(initialMode);
-      setShowEmailForm(false);
+      setUsePassword(false);
       setEmail('');
       setPassword('');
       setEmailError(null);
       setPasswordError(null);
       setError(null);
       setSuccess(null);
+      setOtpStep('enter-email');
+      setOtpCode('');
+      setOtpCooldown(0);
     }
   }, [isOpen, initialMode]);
 
   // Focus trap and keyboard handling
+  // Escape is handled by useFocusTrap — only handle Tab here
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      onClose();
-      return;
-    }
-
-    // Focus trap
     if (e.key === 'Tab' && modalRef.current) {
       const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -112,14 +152,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
         firstElement?.focus();
       }
     }
-  }, [onClose]);
+  }, []);
 
-  // Manage focus on open/close
   useEffect(() => {
     if (isOpen) {
       previousActiveElement.current = document.activeElement as HTMLElement;
       document.addEventListener('keydown', handleKeyDown);
-      // Focus the first focusable element after a short delay for animation
       setTimeout(() => {
         const firstFocusable = modalRef.current?.querySelector<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -137,34 +175,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   }, [isOpen, handleKeyDown]);
 
   const handleSignIn = async (provider: 'google' | 'discord') => {
-    setIsLoading(provider);
     setError(null);
-
-    try {
-      let result;
-      switch (provider) {
-        case 'google':
-          result = await signInWithGoogle();
-          break;
-        case 'discord':
-          result = await signInWithDiscord();
-          break;
-        default:
-          throw new Error('Unknown provider');
-      }
-
-      if (result.error) {
-        setError(result.error.message);
-        setIsLoading(null);
-      }
-      // OAuth will redirect, so no need to close modal
-    } catch (err) {
-      setError((err as Error).message || 'An error occurred');
-      setIsLoading(null);
-    }
+    await oauthSignIn(provider);
   };
 
-  // Email validation handlers
   const handleEmailChange = (value: string) => {
     setEmail(value);
     if (value) {
@@ -188,14 +202,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate email
     const emailValidation = validateEmail(email);
     if (!emailValidation.isValid) {
       setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
       return;
     }
 
-    // Validate password
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       setPasswordError(passwordValidation.error ? t(passwordValidation.error) : 'Invalid password');
@@ -208,140 +220,207 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
     setPasswordError(null);
 
     try {
-      let result;
-      if (authMode === 'signup') {
-        result = await signUpWithEmail(email, password);
-      } else {
-        result = await signInWithEmail(email, password);
-      }
+      const result = authMode === 'signup'
+        ? await signUpWithEmail(email, password)
+        : await signInWithEmail(email, password);
 
       if (result.error) {
-        // Handle specific errors
         if (result.error.message.includes('already registered') || result.error.message.includes('already exists')) {
-          setError(t('auth.inlineSignup.emailInUse') || 'This email is already registered. Try signing in instead.');
+          setError(t('auth.inlineSignup.emailInUse'));
           setAuthMode('signin');
         } else if (result.error.message.includes('Invalid login')) {
-          setError(t('auth.invalidCredentials') || 'Invalid email or password');
+          setError(t('auth.invalidCredentials'));
         } else {
           setError(result.error.message);
         }
         setIsLoading(null);
       } else if (authMode === 'signup') {
-        // Signup successful - show confirmation message
-        setSuccess(t('auth.inlineSignup.checkEmail') || 'Check your email to verify your account!');
+        trackEvent('funnel_sign_up', { method: 'password' });
+        setSuccess(t('auth.inlineSignup.checkEmail'));
         setIsLoading(null);
       }
-      // For signin, the auth context will handle the redirect
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
 
-  const isAnyLoading = isLoading !== null;
+  const handleMagicLinkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  // Using brand colors from tailwind.config.js for consistency and maintainability
-  const providers: Provider[] = [
-    { id: 'google', icon: GoogleIcon, label: 'Google', color: 'bg-brand-google text-white hover:bg-brand-google-hover' },
-    { id: 'discord', icon: DiscordIcon, label: 'Discord', color: 'bg-brand-discord text-white hover:bg-brand-discord-hover' }
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
+      return;
+    }
+
+    setIsLoading('magiclink');
+    setError(null);
+    setEmailError(null);
+
+    try {
+      const result = await signInWithMagicLink(email);
+
+      if (result.error) {
+        setError(result.error.message);
+      } else {
+        trackEvent('funnel_sign_up', { method: 'magic_link' });
+        setSuccess(t('auth.magicLink.checkEmail'));
+      }
+      setIsLoading(null);
+    } catch (err) {
+      setError((err as Error).message || t('common.errorOccurred'));
+      setIsLoading(null);
+    }
+  };
+
+  const handleOtpSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
+      return;
+    }
+
+    setIsLoading('otp');
+    setError(null);
+    setEmailError(null);
+
+    try {
+      const result = await sendOtpCode(email);
+      if (result.error) {
+        setError(result.error.message);
+      } else {
+        setOtpStep('enter-code');
+        // Start 60s cooldown (Supabase rate limit)
+        setOtpCooldown(60);
+        if (otpIntervalRef.current) clearInterval(otpIntervalRef.current);
+        otpIntervalRef.current = setInterval(() => {
+          setOtpCooldown((prev) => {
+            if (prev <= 1) { if (otpIntervalRef.current) { clearInterval(otpIntervalRef.current); otpIntervalRef.current = null; } return 0; }
+            return prev - 1;
+          });
+        }, 1000);
+      }
+      setIsLoading(null);
+    } catch (err) {
+      setError((err as Error).message || t('common.errorOccurred'));
+      setIsLoading(null);
+    }
+  };
+
+  const handleOtpVerify = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (otpCode.length !== 6) return;
+
+    setIsLoading('otp-verify');
+    setError(null);
+
+    try {
+      const result = await verifyOtpCode(email, otpCode);
+      if (result.error) {
+        setError(result.error.message);
+      } else {
+        onClose();
+      }
+      setIsLoading(null);
+    } catch (err) {
+      setError((err as Error).message || t('common.errorOccurred'));
+      setIsLoading(null);
+    }
+  };
+
+  const isAnyLoading = isLoading !== null || oauthLoadingProvider !== null;
+  // Use OTP on native — magic links open Safari and never return to the app.
+  // Re-check on mount in case Capacitor bridge initializes after first render.
+  const [showOtpFlow, setShowOtpFlow] = useState(isNative);
+  useEffect(() => {
+    if (!showOtpFlow && isNative()) setShowOtpFlow(true);
+  }, [showOtpFlow]);
+
+  const allProviders: Provider[] = [
+    {
+      id: 'google',
+      icon: GoogleIcon,
+      label: 'Google',
+      className: 'bg-white text-gray-800 border-3 border-neo-black hover:bg-gray-50 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed',
+    },
+    {
+      id: 'discord',
+      icon: DiscordIcon,
+      label: 'Discord',
+      className: 'bg-brand-discord text-white border-3 border-neo-black hover:bg-brand-discord-hover shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed',
+    },
   ];
+  // On native, only show Google (Discord requires browser OAuth which leaves the app)
+  const providers = isNative() ? allProviders.filter(p => p.id === 'google') : allProviders;
 
   if (!isOpen) return null;
-
-  // Use portal to render modal at document body level to avoid transform/filter stacking context issues
   if (typeof document === 'undefined') return null;
 
   return createPortal(
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
         onClick={onClose}
       >
-        <motion.div
+        <m.div
           ref={modalRef}
           role="dialog"
           aria-modal="true"
           aria-labelledby="auth-modal-title"
-          initial={{ scale: 0.95, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0.95, opacity: 0 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className={cn(
-            'w-full max-w-md max-h-[90vh] overflow-y-auto rounded-2xl p-6 shadow-2xl',
-            isDarkMode ? 'bg-slate-800 border border-slate-700' : 'bg-white'
-          )}
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          transition={{ type: 'spring', damping: 22, stiffness: 280 }}
+          className="w-full max-w-md max-h-[90vh] overflow-y-auto rounded-neo border-3 border-neo-black bg-neo-navy p-6 shadow-hard-lg"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2
-              id="auth-modal-title"
-              className={cn(
-                'text-xl font-bold',
-                isDarkMode ? 'text-white' : 'text-gray-900'
-              )}
-            >
-              {authMode === 'signup' ? (t('auth.signUp') || 'Sign Up') : t('auth.signIn')}
-            </h2>
-            <Button
-              variant="ghost"
-              size="icon"
+          <div className="flex items-center justify-between mb-5">
+            <div>
+              <h2
+                id="auth-modal-title"
+                className="text-2xl font-black text-white font-neo-display"
+              >
+                {authMode === 'signup' ? (t('auth.signUp')) : (t('auth.signIn'))}
+              </h2>
+              <p className="text-sm text-gray-300 mt-0.5">
+                {t('auth.upgradePrompt')}
+              </p>
+            </div>
+            <button
               onClick={onClose}
-              className="rounded-full"
-              aria-label={t('common.close') || 'Close'}
-              asChild={false}
+              className="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-neo border-2 border-slate-600 hover:border-white hover:bg-white/10 transition-all text-gray-300 hover:text-white"
+              aria-label={t('common.close')}
             >
-              <X size={18} />
-            </Button>
+              <X size={16} />
+            </button>
           </div>
 
           {/* Guest Stats Preview */}
           {showGuestStats && guestStats && guestStats.gamesPlayed > 0 && (
-            <div className={cn(
-              'mb-6 p-4 rounded-xl',
-              isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50'
-            )}>
-              <p className={cn(
-                'text-sm font-medium mb-2',
-                isDarkMode ? 'text-gray-300' : 'text-gray-600'
-              )}>
+            <div className="mb-5 p-3 rounded-neo border-2 border-neo-cyan/30 bg-neo-cyan/5">
+              <p className="text-xs font-bold text-neo-cyan mb-2">
                 {t('auth.guestStatsTitle')}
               </p>
-              <div className="flex gap-4 text-sm">
-                <div className={cn(
-                  'flex-1 text-center p-2 rounded-lg',
-                  isDarkMode ? 'bg-slate-600' : 'bg-white'
-                )}>
-                  <div className={cn(
-                    'font-bold text-lg',
-                    isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
-                  )}>
+              <div className="flex gap-3 text-sm">
+                <div className="flex-1 text-center p-2 rounded-lg bg-neo-navy-light/50">
+                  <div className="font-black text-lg text-neo-cyan">
                     {guestStats.gamesPlayed}
                   </div>
-                  <div className={cn(
-                    'text-xs',
-                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                  )}>
+                  <div className="text-[10px] text-gray-300 uppercase tracking-wide">
                     {t('profile.totalGames')}
                   </div>
                 </div>
-                <div className={cn(
-                  'flex-1 text-center p-2 rounded-lg',
-                  isDarkMode ? 'bg-slate-600' : 'bg-white'
-                )}>
-                  <div className={cn(
-                    'font-bold text-lg',
-                    isDarkMode ? 'text-purple-400' : 'text-purple-600'
-                  )}>
+                <div className="flex-1 text-center p-2 rounded-lg bg-neo-navy-light/50">
+                  <div className="font-black text-lg text-neo-pink">
                     {guestStats.totalScore}
                   </div>
-                  <div className={cn(
-                    'text-xs',
-                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                  )}>
+                  <div className="text-[10px] text-gray-300 uppercase tracking-wide">
                     {t('profile.totalScore')}
                   </div>
                 </div>
@@ -350,211 +429,402 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, showGuestStats =
           )}
 
           {/* Success Message */}
-          {success && (
-            <div className={cn(
-              'mb-4 p-4 rounded-xl text-center',
-              isDarkMode ? 'bg-emerald-900/30 border border-emerald-500' : 'bg-emerald-100 border border-emerald-500'
-            )}>
-              <p className={cn(
-                'text-sm font-bold',
-                isDarkMode ? 'text-emerald-300' : 'text-emerald-700'
-              )}>{success}</p>
-            </div>
-          )}
+          <AnimatePresence>
+            {success && (
+              <m.div
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.95, opacity: 0 }}
+                className="mb-4 p-4 rounded-neo border-3 border-emerald-400 bg-emerald-500/10 text-center shadow-hard-sm"
+              >
+                <Mail className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
+                <p className="text-sm font-bold text-emerald-300">{success}</p>
+              </m.div>
+            )}
+          </AnimatePresence>
 
           {!success && (
             <>
               {/* OAuth Buttons */}
-              <div className="space-y-3">
-                {providers.map((provider) => (
+              {isOnCrazyGamesPlatform ? (
+                <div className="space-y-3">
                   <Button
-                    key={provider.id}
-                    onClick={() => handleSignIn(provider.id)}
+                    onClick={() => showAuthPrompt()}
                     disabled={isAnyLoading}
-                    className={cn(
-                      'w-full h-12 text-base font-medium rounded-xl transition-all',
-                      provider.color
-                    )}
+                    className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-lime text-neo-black hover:bg-neo-lime-light shadow-hard transition-all"
                     asChild={false}
                   >
-                    {isLoading === provider.id ? (
-                      <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                    {isLoading === 'crazygames' ? (
+                      <Loader size="sm" />
                     ) : (
-                      <provider.icon className="w-5 h-5" />
+                      <span>{t('auth.loginCrazyGames')}</span>
                     )}
-                    <span className="ml-2">
-                      {t('auth.signInWith', { provider: provider.label })}
-                    </span>
                   </Button>
-                ))}
-              </div>
-
-              {/* Email Form Toggle */}
-              {!showEmailForm ? (
-                <button
-                  onClick={() => setShowEmailForm(true)}
-                  className={cn(
-                    'w-full mt-4 text-sm flex items-center justify-center gap-2 transition-colors',
-                    isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'
-                  )}
-                >
-                  <Mail className="w-4 h-4" />
-                  <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
-                </button>
+                </div>
               ) : (
-                <motion.form
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: 'auto', opacity: 1 }}
-                  onSubmit={handleEmailSubmit}
-                  className="mt-4 space-y-3"
-                >
-                  {/* Divider */}
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <div className={cn('flex-1 h-px', isDarkMode ? 'bg-slate-600' : 'bg-gray-300')} />
-                    <span>{authMode === 'signup' ? 'Create account' : 'Sign in with email'}</span>
-                    <div className={cn('flex-1 h-px', isDarkMode ? 'bg-slate-600' : 'bg-gray-300')} />
-                  </div>
-
-                  {/* Email Input */}
-                  <div>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => handleEmailChange(e.target.value)}
-                      placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
-                      className={cn(
-                        'w-full px-4 py-3 rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all',
-                        isDarkMode ? 'bg-slate-700 text-white placeholder-gray-400' : 'bg-gray-50 text-gray-900 placeholder-gray-400',
-                        emailError ? 'border-red-500' : (isDarkMode ? 'border-slate-600' : 'border-gray-200')
-                      )}
-                      disabled={isAnyLoading}
-                    />
-                    {emailError && (
-                      <p className="mt-1 text-xs text-red-500">{emailError}</p>
-                    )}
-                  </div>
-
-                  {/* Password Input */}
-                  <div>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={password}
-                        onChange={(e) => handlePasswordChange(e.target.value)}
-                        placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
-                        className={cn(
-                          'w-full px-4 py-3 pr-12 rounded-xl border-2 focus:outline-none focus:ring-2 focus:ring-cyan-500 transition-all',
-                          isDarkMode ? 'bg-slate-700 text-white placeholder-gray-400' : 'bg-gray-50 text-gray-900 placeholder-gray-400',
-                          passwordError ? 'border-red-500' : (isDarkMode ? 'border-slate-600' : 'border-gray-200')
-                        )}
+                <div className="space-y-2.5">
+                  {providers.map((provider, idx) => (
+                    <m.div
+                      key={provider.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                    >
+                      <Button
+                        onClick={() => handleSignIn(provider.id)}
                         disabled={isAnyLoading}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
                         className={cn(
-                          'absolute right-3 rtl:right-auto rtl:left-3 top-1/2 -translate-y-1/2 transition-colors',
-                          isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'
+                          'w-full h-12 text-base font-bold rounded-neo transition-all flex items-center justify-center gap-2',
+                          provider.className
                         )}
+                        asChild={false}
                       >
-                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                      </button>
-                    </div>
-                    {passwordError && (
-                      <p className="mt-1 text-xs text-red-500">{passwordError}</p>
-                    )}
+                        {(isLoading === provider.id || oauthLoadingProvider === provider.id) ? (
+                          <Loader size="sm" />
+                        ) : (
+                          <>
+                            <provider.icon className="w-5 h-5" />
+                            <span>{t('auth.signInWith', { provider: provider.label })}</span>
+                          </>
+                        )}
+                      </Button>
+                    </m.div>
+                  ))}
+                </div>
+              )}
+
+              {/* Divider + Email Section — always visible (no toggle) */}
+              {!isOnCrazyGamesPlatform && (
+                <div className="mt-5">
+                  {/* Divider */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="flex-1 h-px bg-slate-600" />
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                      {t('auth.magicLink.divider')}
+                    </span>
+                    <div className="flex-1 h-px bg-slate-600" />
                   </div>
 
-                  {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
-                    className={cn(
-                      'w-full h-12 text-base font-medium rounded-xl transition-all',
-                      'bg-cyan-500 text-white hover:bg-cyan-600'
-                    )}
-                    asChild={false}
-                  >
-                    {isLoading === 'email' ? (
-                      <Loader2 className="w-5 h-5 animate-spin" />
+                  {!usePassword ? (
+                    showOtpFlow ? (
+                      /* OTP Code Form (native — no browser redirect) */
+                      otpStep === 'enter-email' ? (
+                        <form onSubmit={handleOtpSend} className="space-y-3">
+                          <div>
+                            <label htmlFor="otp-email-input" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
+                            <input
+                              id="otp-email-input"
+                              type="email"
+                              autoComplete="email"
+                              value={email}
+                              onChange={(e) => handleEmailChange(e.target.value)}
+                              placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                              aria-invalid={emailError ? true : undefined}
+                              aria-describedby={emailError ? 'otp-email-error' : undefined}
+                              className={cn(
+                                'w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500',
+                                'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                                emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
+                              )}
+                              disabled={isAnyLoading}
+                              spellCheck={false}
+                            />
+                            {emailError && (
+                              <m.p id="otp-email-error" role="alert" className="mt-1 text-xs text-red-400" {...ERROR_ENTER}>{emailError}</m.p>
+                            )}
+                          </div>
+                          <Button
+                            type="submit"
+                            disabled={isAnyLoading || !email || !!emailError}
+                            className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2"
+                            asChild={false}
+                          >
+                            {isLoading === 'otp' ? (
+                              <Loader size="sm" />
+                            ) : (
+                              <>
+                                <Mail className="w-4 h-4" />
+                                <span>{t('auth.otp.sendCode')}</span>
+                              </>
+                            )}
+                          </Button>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                              <Mail className="w-3 h-3" />
+                              {t('auth.otp.noPassword')}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setUsePassword(true)}
+                              className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
+                            >
+                              {t('auth.magicLink.usePassword')}
+                            </button>
+                          </div>
+                        </form>
+                      ) : (
+                        <form onSubmit={handleOtpVerify} className="space-y-3">
+                          <p className="text-sm text-gray-300 mb-2">
+                            {t('auth.otp.codeSentTo')} <span className="font-bold text-white">{email}</span>
+                          </p>
+                          <div>
+                            <label htmlFor="otp-code-input" className="sr-only">{t('auth.otp.codeSentTo')}</label>
+                            <input
+                              id="otp-code-input"
+                              type="text"
+                              inputMode="numeric"
+                              autoComplete="one-time-code"
+                              maxLength={6}
+                              value={otpCode}
+                              onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                              placeholder="000000"
+                              className="w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500 text-center text-2xl tracking-[0.5em] font-mono focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors border-slate-600 focus:border-neo-cyan"
+                              disabled={isAnyLoading}
+                            />
+                          </div>
+                          <Button
+                            type="submit"
+                            disabled={isAnyLoading || otpCode.length !== 6}
+                            className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                            asChild={false}
+                          >
+                            {isLoading === 'otp-verify' ? (
+                              <Loader size="sm" />
+                            ) : (
+                              t('auth.otp.verify')
+                            )}
+                          </Button>
+                          <div className="flex items-center justify-between">
+                            <button
+                              type="button"
+                              onClick={() => { setOtpStep('enter-email'); setOtpCode(''); setError(null); }}
+                              className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
+                            >
+                              {t('auth.otp.changeEmail')}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleOtpSend as unknown as React.MouseEventHandler}
+                              disabled={otpCooldown > 0}
+                              className="text-xs text-gray-400 hover:text-gray-300 transition-colors disabled:opacity-40"
+                            >
+                              {otpCooldown > 0 ? `${t('auth.otp.resend')} (${otpCooldown}s)` : t('auth.otp.resend')}
+                            </button>
+                          </div>
+                        </form>
+                      )
                     ) : (
-                      authMode === 'signup'
-                        ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
-                        : (t('auth.signIn') || 'Sign In')
-                    )}
-                  </Button>
+                    /* Magic Link Form (web — no password needed) */
+                    <form onSubmit={handleMagicLinkSubmit} className="space-y-3">
+                      <div>
+                        <label htmlFor="magic-email-input" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
+                        <input
+                          id="magic-email-input"
+                          type="email"
+                          autoComplete="email"
+                          value={email}
+                          onChange={(e) => handleEmailChange(e.target.value)}
+                          placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                          aria-invalid={emailError ? true : undefined}
+                          aria-describedby={emailError ? 'magic-email-error' : undefined}
+                          className={cn(
+                            'w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500',
+                            'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                            emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
+                          )}
+                          disabled={isAnyLoading}
+                          spellCheck={false}
+                        />
+                        {emailError && (
+                          <m.p id="magic-email-error" role="alert" className="mt-1 text-xs text-red-400" {...ERROR_ENTER}>{emailError}</m.p>
+                        )}
+                      </div>
 
-                  {/* Toggle auth mode */}
-                  <button
-                    type="button"
-                    onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
-                    className={cn(
-                      'w-full text-xs transition-colors',
-                      isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
-                    )}
-                  >
-                    {authMode === 'signup'
-                      ? (t('auth.alreadyHaveAccount') || 'Already have an account? Sign in')
-                      : (t('auth.noAccount') || "Don't have an account? Sign up")}
-                  </button>
-                </motion.form>
+                      <Button
+                        type="submit"
+                        disabled={isAnyLoading || !email || !!emailError}
+                        className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all flex items-center justify-center gap-2"
+                        asChild={false}
+                      >
+                        {isLoading === 'magiclink' ? (
+                          <Loader size="sm" />
+                        ) : (
+                          <>
+                            <Wand2 className="w-4 h-4" />
+                            <span>{t('auth.magicLink.sendLink')}</span>
+                          </>
+                        )}
+                      </Button>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                          <Wand2 className="w-3 h-3" />
+                          {t('auth.magicLink.noPassword')}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setUsePassword(true)}
+                          className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
+                        >
+                          {t('auth.magicLink.usePassword')}
+                        </button>
+                      </div>
+                    </form>
+                    )
+                  ) : (
+                    /* Password Form */
+                    <form onSubmit={handleEmailSubmit} className="space-y-3">
+                      <div>
+                        <label htmlFor="pwd-email-input" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
+                        <input
+                          id="pwd-email-input"
+                          type="email"
+                          autoComplete="email"
+                          value={email}
+                          onChange={(e) => handleEmailChange(e.target.value)}
+                          placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                          aria-invalid={emailError ? true : undefined}
+                          aria-describedby={emailError ? 'pwd-email-error' : undefined}
+                          className={cn(
+                            'w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500',
+                            'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                            emailError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
+                          )}
+                          disabled={isAnyLoading}
+                          spellCheck={false}
+                        />
+                        {emailError && (
+                          <m.p id="pwd-email-error" role="alert" className="mt-1 text-xs text-red-400" {...ERROR_ENTER}>{emailError}</m.p>
+                        )}
+                      </div>
+
+                      <div>
+                        <label htmlFor="pwd-password-input" className="sr-only">{t('auth.inlineSignup.passwordPlaceholder')}</label>
+                        <div className="relative">
+                          <input
+                            id="pwd-password-input"
+                            type={showPassword ? 'text' : 'password'}
+                            autoComplete={authMode === 'signup' ? 'new-password' : 'current-password'}
+                            value={password}
+                            onChange={(e) => handlePasswordChange(e.target.value)}
+                            placeholder={t('auth.inlineSignup.passwordPlaceholder')}
+                            aria-invalid={passwordError ? true : undefined}
+                            aria-describedby={passwordError ? 'pwd-password-error' : undefined}
+                            className={cn(
+                              'w-full px-4 py-3 pe-12 rounded-neo border-2 bg-neo-navy-light text-white placeholder-gray-500',
+                              'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy transition-colors',
+                              passwordError ? 'border-red-500' : 'border-slate-600 focus:border-neo-cyan'
+                            )}
+                            disabled={isAnyLoading}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            aria-label={showPassword ? (t('auth.hidePassword')) : (t('auth.showPassword'))}
+                            className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-gray-300 hover:text-gray-200 transition-colors rounded focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan"
+                          >
+                            {showPassword ? <EyeOff className="w-5 h-5" aria-hidden="true" /> : <Eye className="w-5 h-5" aria-hidden="true" />}
+                          </button>
+                        </div>
+                        {passwordError && (
+                          <m.p id="pwd-password-error" role="alert" className="mt-1 text-xs text-red-400" {...ERROR_ENTER}>{passwordError}</m.p>
+                        )}
+                      </div>
+
+                      <Button
+                        type="submit"
+                        disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
+                        className="w-full h-12 text-base font-bold rounded-neo border-3 border-neo-black bg-neo-cyan text-neo-black hover:bg-neo-cyan/90 shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all"
+                        asChild={false}
+                      >
+                        {isLoading === 'email' ? (
+                          <Loader size="sm" />
+                        ) : (
+                          authMode === 'signup'
+                            ? (t('auth.inlineSignup.signUpButton'))
+                            : (t('auth.signIn'))
+                        )}
+                      </Button>
+
+                      <div className="flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
+                          className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
+                        >
+                          {authMode === 'signup'
+                            ? (t('auth.alreadyHaveAccount'))
+                            : (t('auth.noAccount'))}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUsePassword(false)}
+                          className="text-xs text-gray-400 hover:text-gray-300 transition-colors"
+                        >
+                          {t('auth.magicLink.useMagicLink')}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
               )}
 
               {/* Error Message */}
-              {error && (
-                <div className={cn(
-                  'mt-4 p-3 rounded-lg text-sm',
-                  isDarkMode ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-700'
-                )}>
-                  {error}
-                </div>
-              )}
+              <AnimatePresence>
+                {error && (
+                  <m.div
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="mt-4 p-3 rounded-neo border-2 border-red-500/50 bg-red-500/10 text-sm text-red-300"
+                    role="alert"
+                  >
+                    <m.span className="flex items-center gap-2" animate={errorShake}>
+                      <AlertCircle className="w-4 h-4 shrink-0" />{error}
+                    </m.span>
+                  </m.div>
+                )}
+              </AnimatePresence>
             </>
           )}
 
           {/* Continue as Guest */}
-          <div className="mt-6 text-center">
+          <div className="mt-5 text-center">
             <button
               onClick={onClose}
-              className={cn(
-                'text-sm hover:underline',
-                isDarkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-700'
-              )}
+              className="text-sm text-gray-400 hover:text-gray-300 transition-colors"
             >
               {t('auth.continueAsGuest')}
             </button>
           </div>
 
-          {/* Terms */}
-          <p className={cn(
-            'mt-4 text-xs text-center',
-            isDarkMode ? 'text-gray-400' : 'text-gray-600'
-          )}>
-            {t('auth.termsPrefix')}{' '}
-            <Link
-              href={`/${language}/legal/terms`}
-              className={cn(
-                'underline transition-colors',
-                isDarkMode ? 'hover:text-cyan-400' : 'hover:text-cyan-600'
-              )}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {t('auth.termsLink')}
-            </Link>
-            {' '}{t('auth.andText')}{' '}
-            <Link
-              href={`/${language}/legal/privacy`}
-              className={cn(
-                'underline transition-colors',
-                isDarkMode ? 'hover:text-cyan-400' : 'hover:text-cyan-600'
-              )}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {t('auth.privacyLink')}
-            </Link>
-          </p>
-        </motion.div>
-      </motion.div>
+          {/* Trust Signal + Terms */}
+          <div className="mt-4 flex flex-col items-center gap-2">
+            <div className="flex items-center gap-1.5 text-[10px] text-gray-400">
+              <Shield className="w-3 h-3 text-emerald-500" />
+              <span>{t('auth.trustBadge')}</span>
+            </div>
+            <p className="text-[10px] text-gray-400 text-center">
+              {t('auth.termsPrefix')}{' '}
+              <Link
+                href={`/${language}/legal/terms`}
+                className="underline hover:text-gray-300 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {t('auth.termsLink')}
+              </Link>
+              {' '}{t('auth.andText')}{' '}
+              <Link
+                href={`/${language}/legal/privacy`}
+                className="underline hover:text-gray-300 transition-colors"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {t('auth.privacyLink')}
+              </Link>
+            </p>
+          </div>
+        </m.div>
+      </m.div>
     </AnimatePresence>,
     document.body
   );

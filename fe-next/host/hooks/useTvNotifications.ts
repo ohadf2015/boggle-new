@@ -1,6 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
-import type { TvNotificationData, TvNotificationType, NotificationTier } from '../components/tv-broadcast/TvNotification';
+import {
+  NOTIFICATION_LAYOUTS,
+  NOTIFICATION_MASCOTS,
+  type TvNotificationData,
+  type TvNotificationType,
+  type NotificationTier,
+  type NotificationLayout,
+} from '../components/tv-broadcast/TvNotification';
+import type { MascotVariant } from '../../components/ui/Mascot';
 
 interface PlayerFoundWordPayload {
   username: string;
@@ -44,10 +52,23 @@ interface UseTvNotificationsResult {
 
 // Notification configurations
 const NOTIFICATION_DURATION: Record<NotificationTier, number> = {
-  subtle: 3000,
-  medium: 4000,
-  mega: 5000,
+  subtle: 2500,
+  medium: 3500,
+  mega: 4500,
 };
+
+// Throttling configuration - applies to all tiers
+const THROTTLE_WINDOW_MS = 10000;
+const MAX_SUBTLE_PER_WINDOW = 1;
+const MAX_MEDIUM_PER_WINDOW = 2;
+const MAX_MEGA_PER_WINDOW = 1;
+
+// Photo finish cooldown (ms)
+const PHOTO_FINISH_COOLDOWN_MS = 30000;
+const PHOTO_FINISH_POINT_THRESHOLD = 15;
+
+// Max pending before dropping subtle notifications
+const MAX_PENDING_FOR_SUBTLE = 3;
 
 /**
  * useTvNotifications - Detects game events and creates TV broadcast notifications
@@ -65,6 +86,10 @@ export function useTvNotifications({
   const lastWordPerPlayerRef = useRef<Record<string, { word: string; time: number }>>({});
   const previousCombosRef = useRef<Record<string, number>>({});
   const notificationIdRef = useRef(0);
+  const recentSubtleNotificationsRef = useRef<number[]>([]);
+  const recentMediumNotificationsRef = useRef<number[]>([]);
+  const recentMegaNotificationsRef = useRef<number[]>([]);
+  const lastPhotoFinishTimeRef = useRef(0);
 
   // Generate unique notification ID
   const generateId = useCallback(() => {
@@ -72,7 +97,7 @@ export function useTvNotifications({
     return `tv-notif-${Date.now()}-${notificationIdRef.current}`;
   }, []);
 
-  // Add a notification to the queue
+  // Add a notification to the queue with throttling for all tiers
   const addNotification = useCallback((
     type: TvNotificationType,
     tier: NotificationTier,
@@ -80,21 +105,53 @@ export function useTvNotifications({
     subtext?: string,
     player?: string,
   ) => {
+    const now = Date.now();
+
+    // Throttle all tiers during busy moments
+    if (tier === 'subtle') {
+      const recentSubtle = recentSubtleNotificationsRef.current.filter(
+        time => now - time < THROTTLE_WINDOW_MS
+      );
+      if (recentSubtle.length >= MAX_SUBTLE_PER_WINDOW) return;
+      recentSubtleNotificationsRef.current = [...recentSubtle, now];
+    } else if (tier === 'medium') {
+      const recentMedium = recentMediumNotificationsRef.current.filter(
+        time => now - time < THROTTLE_WINDOW_MS
+      );
+      if (recentMedium.length >= MAX_MEDIUM_PER_WINDOW) return;
+      recentMediumNotificationsRef.current = [...recentMedium, now];
+    } else if (tier === 'mega') {
+      const recentMega = recentMegaNotificationsRef.current.filter(
+        time => now - time < THROTTLE_WINDOW_MS
+      );
+      if (recentMega.length >= MAX_MEGA_PER_WINDOW) return;
+      recentMegaNotificationsRef.current = [...recentMega, now];
+    }
+
+    // Get layout and mascot variant from mappings
+    const layout: NotificationLayout = NOTIFICATION_LAYOUTS[type];
+    const mascotVariant: MascotVariant = NOTIFICATION_MASCOTS[type];
+
     const notification: TvNotificationData = {
       id: generateId(),
       type,
       tier,
+      layout,
+      mascotVariant,
       headline,
       subtext,
       player,
       duration: NOTIFICATION_DURATION[tier],
-      timestamp: Date.now(),
+      timestamp: now,
     };
 
-    // Priority queue: mega notifications can bump lower priority
+    // Priority queue: mega notifications go to the front
+    // Drop subtle notifications when queue is too full
     setNotifications(prev => {
+      if (tier === 'subtle' && prev.length >= MAX_PENDING_FOR_SUBTLE) {
+        return prev; // Drop subtle when queue is busy
+      }
       if (tier === 'mega') {
-        // Mega notifications go to the front
         return [notification, ...prev];
       }
       return [...prev, notification];
@@ -123,6 +180,10 @@ export function useTvNotifications({
       previousRankingsRef.current = {};
       lastWordPerPlayerRef.current = {};
       previousCombosRef.current = {};
+      recentSubtleNotificationsRef.current = [];
+      recentMediumNotificationsRef.current = [];
+      recentMegaNotificationsRef.current = [];
+      lastPhotoFinishTimeRef.current = 0;
       setNotifications([]);
     };
 
@@ -132,6 +193,10 @@ export function useTvNotifications({
       previousRankingsRef.current = {};
       lastWordPerPlayerRef.current = {};
       previousCombosRef.current = {};
+      recentSubtleNotificationsRef.current = [];
+      recentMediumNotificationsRef.current = [];
+      recentMegaNotificationsRef.current = [];
+      lastPhotoFinishTimeRef.current = 0;
     };
 
     socket.on('resetGame', handleResetGame);
@@ -160,18 +225,18 @@ export function useTvNotifications({
       if (word) {
         const wordLength = word.length;
         if (wordLength >= 8) {
-          addNotification('rare_word', 'mega', t('tvBroadcast.notifications.rareWord'), `"${word.toUpperCase()}"`, username);
+          addNotification('rare_word', 'mega', t('tvBroadcast.notifications.rareWord'), t('tvBroadcast.notifications.nLetters', { count: wordLength }), username);
         } else if (wordLength >= 7) {
-          addNotification('epic_word', 'medium', t('tvBroadcast.notifications.epicWord'), `"${word.toUpperCase()}"`, username);
+          addNotification('epic_word', 'medium', t('tvBroadcast.notifications.epicWord'), t('tvBroadcast.notifications.nLetters', { count: wordLength }), username);
         } else if (wordLength >= 5) {
-          addNotification('long_word', 'subtle', t('tvBroadcast.notifications.longWord'), `"${word.toUpperCase()}"`, username);
+          addNotification('long_word', 'subtle', t('tvBroadcast.notifications.longWord'), t('tvBroadcast.notifications.nLetters', { count: wordLength }), username);
         }
 
         // Word snipe detection (same word within 2 seconds)
         const now = Date.now();
         for (const [player, wordData] of Object.entries(lastWordPerPlayerRef.current)) {
           if (player !== username && wordData.word.toLowerCase() === word.toLowerCase() && now - wordData.time < 2000) {
-            addNotification('word_snipe', 'medium', t('tvBroadcast.notifications.wordSnipe'), `${t('tvBroadcast.notifications.bothFound')} "${word.toUpperCase()}"`, `${username} & ${player}`);
+            addNotification('word_snipe', 'medium', t('tvBroadcast.notifications.wordSnipe'), t('tvBroadcast.notifications.sameWordFound', { length: word.length }), `${username} & ${player}`);
           }
         }
         lastWordPerPlayerRef.current[username] = { word, time: now };
@@ -237,11 +302,17 @@ export function useTvNotifications({
         }
       });
 
-      // Photo finish detection (top 2 within 5 points)
+      // Photo finish detection (top 2 within threshold, with cooldown)
       if (leaderboard.length >= 2) {
         const [first, second] = leaderboard;
-        if (first && second && Math.abs(first.score - second.score) <= 5 && first.score > 0) {
-          // Only show if we haven't shown recently (throttle)
+        const now = Date.now();
+        if (
+          first && second &&
+          Math.abs(first.score - second.score) <= PHOTO_FINISH_POINT_THRESHOLD &&
+          first.score > 0 &&
+          now - lastPhotoFinishTimeRef.current >= PHOTO_FINISH_COOLDOWN_MS
+        ) {
+          lastPhotoFinishTimeRef.current = now;
           addNotification('photo_finish', 'mega', t('tvBroadcast.notifications.photoFinish'), `${Math.abs(first.score - second.score)} ${t('tvBroadcast.notifications.ptsApart')}`, `${first.username} vs ${second.username}`);
         }
       }

@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useMemo, useState, memo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Target, Hash, Award, TrendingUp, ChevronDown, Zap, BarChart3, Sparkles } from 'lucide-react';
+import React, { useMemo, useState, memo } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import { Target, Hash, Award, TrendingUp, ChevronDown, Zap, BarChart3, Sparkles, Lightbulb, Star } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
@@ -10,13 +10,13 @@ import PlayerArchetypeBadge from './PlayerArchetypeBadge';
 import PlayerInsights from './PlayerInsights';
 import { AchievementBadge } from '../AchievementBadge';
 import XpBreakdownCard from './XpBreakdownCard';
-import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
 import { filterGameAchievements } from './utils';
 import { useWordCategories } from './useWordCategories';
 import BonusBadgesRow from './BonusBadgesRow';
 import { calculatePlayerInsights } from '@/utils/gameInsights';
 import { applyHebrewFinalLetters } from '@/utils/utils';
-import type { Player, WordObject, XpGainedData, LevelUpData } from './types';
+import { getGuestStats } from '@/utils/guestManager';
+import type { Player, XpGainedData, LevelUpData } from './types';
 import type { PlayerArchetype } from '@/utils/playerArchetypes';
 
 interface ConsolidatedPlayerCardProps {
@@ -24,7 +24,6 @@ interface ConsolidatedPlayerCardProps {
   rank: number;
   totalPlayers: number;
   winnerScore: number;
-  allPlayerWords: Record<string, WordObject[]>;
   xpGainedData: XpGainedData | null;
   levelUpData: LevelUpData | null;
   archetype: PlayerArchetype | null;
@@ -42,7 +41,6 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   rank,
   totalPlayers,
   winnerScore,
-  allPlayerWords,
   xpGainedData,
   levelUpData,
   archetype,
@@ -53,53 +51,41 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
 
   // Expanded states for collapsible sections
   const [showDetails, setShowDetails] = useState(false);
-  const [showWords, setShowWords] = useState(false);
-  const [showXp, setShowXp] = useState(false);
-  const [showAchievements, setShowAchievements] = useState(false);
+  const [showXp, setShowXp] = useState(!!xpGainedData);
+  // Default-expand achievements when player earned some this game
+  const [showAchievements, setShowAchievements] = useState(
+    () => (player.achievements?.length ?? 0) > 0
+  );
 
   const isWinner = rank === 1;
   const pointsFromWinner = winnerScore - player.score;
 
-  const getRankSuffix = (r: number) => {
-    if (r === 1) return 'st';
-    if (r === 2) return 'nd';
-    if (r === 3) return 'rd';
-    return 'th';
-  };
-
   // Rank-specific styling
   const rankColors: Record<number, { bg: string; text: string }> = {
-    1: { bg: 'bg-neo-lime', text: 'text-neo-black' },
-    2: { bg: 'bg-slate-300', text: 'text-slate-800' },
-    3: { bg: 'bg-neo-lime', text: 'text-neo-black' },
+    1: { bg: 'bg-amber-400', text: 'text-neo-black' },
+    2: { bg: 'bg-slate-200', text: 'text-slate-900' },
+    3: { bg: 'bg-amber-500', text: 'text-neo-black' },
   };
   const rankStyle = rankColors[rank] || { bg: 'bg-neo-cream', text: 'text-neo-black' };
-
-  // Calculate how many players found each word - memoized callback
-  const getPlayerCountForWord = useCallback((word: string): number => {
-    if (!allPlayerWords || !word) return 1;
-    let count = 0;
-    Object.values(allPlayerWords).forEach(playerWordList => {
-      if (Array.isArray(playerWordList) && playerWordList.some(w => w?.word?.toLowerCase() === word.toLowerCase())) {
-        count++;
-      }
-    });
-    return count;
-  }, [allPlayerWords]);
 
   // Use shared hook for word categorization
   const {
     validWords,
-    duplicateWords,
-    invalidWords,
-    wordsByPoints,
-    sortedPointGroups,
     totalComboBonus,
     totalFireRoundBonus,
     longestWord,
     accuracy,
     bestWord,
   } = useWordCategories(player.allWords);
+
+  // Personal best detection — compare against stored guest stats
+  const personalBests = useMemo(() => {
+    const stats = getGuestStats();
+    return {
+      isScorePB: player.score > 0 && player.score >= (stats.bestGameScore || 0),
+      isWordCountPB: validWords.length > 0 && validWords.length >= (stats.bestWordCount || 0),
+    };
+  }, [player.score, validWords.length]);
 
   // Summary stats for display (with Hebrew final letters applied)
   const summaryStats = useMemo(() => ({
@@ -126,26 +112,22 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
   }, [player.achievements, validWords]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: -20, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
+      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
       className="w-full max-w-xl mx-auto mb-4"
     >
       <div
         className={cn(
           'relative overflow-hidden rounded-neo-lg border-4 border-neo-black shadow-hard-lg',
-          'bg-neo-navy'
+          'bg-neo-navy',
+          '-rotate-[0.5deg]'
         )}
-        style={{ transform: 'rotate(-0.5deg)' }}
       >
         {/* Halftone texture */}
         <div
-          className="absolute inset-0 pointer-events-none opacity-[0.04]"
-          style={{
-            backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
-            backgroundSize: '8px 8px',
-          }}
+          className="absolute inset-0 pointer-events-none opacity-[0.04] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-size-[8px_8px]"
         />
 
         <div className="relative z-10 p-4 sm:p-5">
@@ -153,7 +135,7 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           <div className="flex items-center gap-2 mb-2 sm:mb-3">
             <Sparkles className="w-5 h-5 text-neo-cyan" />
             <h2 className="text-sm font-black uppercase tracking-wide text-white">
-              {t('results.yourPerformance') || 'Your Performance'}
+              {t('results.yourPerformance')}
             </h2>
           </div>
 
@@ -161,28 +143,28 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
           <div className="flex items-center gap-3 sm:gap-4 mb-2 sm:mb-3">
             {/* Rank Badge - Large and prominent (hidden when shown alongside banner) */}
             {!hideRankAndScore && (
-              <motion.div
+              <m.div
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 3 }}
-                transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.1 }}
                 className={cn(
-                  'flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-neo flex items-center justify-center border-3 sm:border-4 border-neo-black shadow-hard-lg',
+                  'shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-neo flex items-center justify-center border-3 sm:border-4 border-neo-black shadow-hard-lg',
                   rankStyle.bg, rankStyle.text
                 )}
               >
                 <div className="text-center">
                   <span className="text-2xl sm:text-3xl font-black">#{rank}</span>
                 </div>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Avatar */}
             {player.avatar && (
               <Avatar
-                profilePictureUrl={player.avatar.profilePictureUrl}
-                avatarImage={player.avatar.avatarImage}
+                userId={player.username}
+                customAvatar={player.avatar.customAvatar}
                 size="xl"
-                className="flex-shrink-0 border-2 border-neo-black w-12 h-12 sm:w-14 sm:h-14"
+                className="shrink-0 border-2 border-neo-black w-12 h-12 sm:w-14 sm:h-14"
               />
             )}
 
@@ -191,8 +173,8 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <h3 className="text-base sm:text-lg font-black text-white truncate">{player.username}</h3>
               <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
                 {!hideRankAndScore && (
-                  <span className="text-[10px] sm:text-xs text-white/60 font-bold">
-                    {rank}{getRankSuffix(rank)} of {totalPlayers}
+                  <span className="text-[10px] sm:text-xs text-slate-300 font-bold">
+                    {t('results.yourPlace', { place: rank, total: totalPlayers })}
                   </span>
                 )}
                 {archetype && (
@@ -203,46 +185,57 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
 
             {/* Score (hidden when shown alongside banner) */}
             {!hideRankAndScore && (
-              <motion.div
+              <m.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                className="flex-shrink-0 text-right"
+                transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.2 }}
+                className="shrink-0 text-right"
               >
                 <div className="text-2xl sm:text-3xl font-black text-white">{player.score}</div>
-                <div className="text-[9px] sm:text-[10px] font-bold uppercase text-white/60">
-                  {t('results.points') || 'Points'}
+                <div className="text-[9px] sm:text-[10px] font-bold uppercase text-slate-300">
+                  {t('results.points')}
                 </div>
-              </motion.div>
+              </m.div>
             )}
           </div>
 
           {/* Gap to winner */}
           {!isWinner && pointsFromWinner > 0 && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.25 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.25 }}
               className="flex items-center gap-1.5 mb-2 sm:mb-3 px-2 py-1 sm:py-1.5 rounded-neo bg-neo-cyan/20 border border-neo-cyan/40"
             >
               <TrendingUp className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-cyan" />
               <span className="text-[10px] sm:text-xs font-bold text-neo-cyan">
-                {t('results.pointsFromFirst', { points: pointsFromWinner }) || `Just ${pointsFromWinner} pts from 1st!`}
+                {t('results.pointsFromFirst', { points: pointsFromWinner })}
               </span>
-            </motion.div>
+            </m.div>
           )}
 
           {/* Key Stats Grid - Always visible (2 cols mobile, 3 cols larger) */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 mb-2 sm:mb-3">
             {/* Words Found */}
-            <div className="bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center">
+            <div className="bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center relative">
+              {personalBests.isWordCountPB && validWords.length > 0 && (
+                <m.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.6, type: 'spring', stiffness: 400, damping: 15 }}
+                  className="absolute -top-1.5 -inset-e-1.5 w-5 h-5 bg-tier-gold rounded-full border border-neo-black flex items-center justify-center shadow-hard-sm z-10"
+                  title={t('results.personalBest')}
+                >
+                  <Star className="w-3 h-3 text-neo-black" />
+                </m.div>
+              )}
               <div className="flex justify-center mb-0.5 sm:mb-1">
                 <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-neo-lime text-neo-black border border-neo-black flex items-center justify-center">
                   <Hash className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-black" />
                 </div>
               </div>
               <div className="text-lg sm:text-xl font-black text-white">{validWords.length}</div>
-              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-white/60">{t('results.words') || 'Words'}</div>
+              <div className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-300">{t('results.words')}</div>
             </div>
 
             {/* Accuracy */}
@@ -253,21 +246,32 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                 </div>
               </div>
               <div className="text-lg sm:text-xl font-black text-white">{summaryStats?.accuracy || 0}%</div>
-              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-white/60">{t('results.accuracy') || 'Accuracy'}</div>
+              <div className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-300">{t('results.accuracy')}</div>
             </div>
 
             {/* Best Word - Hidden on mobile (available in details), shown on sm+ */}
             <div className="hidden sm:block bg-white/10 rounded-neo border border-white/20 p-1.5 sm:p-2 text-center">
               <div className="flex justify-center mb-0.5 sm:mb-1">
                 <div className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-neo-pink text-white border border-neo-black flex items-center justify-center">
-                  <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-cream" />
+                  <Award className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-neo-white" />
                 </div>
               </div>
               <div className="text-xs sm:text-sm font-black text-white uppercase truncate">
-                {bestWord ? applyHebrewFinalLetters(bestWord.word) : '-'}
+                {bestWord ? (
+                  applyHebrewFinalLetters(bestWord.word).split('').map((char, i) => (
+                    <m.span
+                      key={`char-${i}-${char}`}
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 + i * 0.05, duration: 0.15 }}
+                    >
+                      {char}
+                    </m.span>
+                  ))
+                ) : '-'}
               </div>
-              <div className="text-[8px] sm:text-[9px] font-bold uppercase text-white/60">
-                {bestWord?.score ? `${bestWord.score} ${t('results.points') || 'pts'}` : (t('results.bestWord') || 'Best')}
+              <div className="text-[10px] sm:text-[11px] font-bold uppercase text-slate-300">
+                {bestWord?.score ? `${bestWord.score} ${t('results.points')}` : (t('results.bestWord'))}
               </div>
             </div>
           </div>
@@ -281,85 +285,64 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
             className="mb-2 sm:mb-3"
           />
 
-          {/* Collapsible: Performance Details */}
-          <button
-            onClick={() => setShowDetails(!showDetails)}
-            aria-expanded={showDetails}
-            className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-cyan/50 bg-neo-cyan/10 hover:bg-neo-cyan/20 transition-colors mb-1.5 sm:mb-2"
-          >
-            <span className="flex items-center gap-1.5 sm:gap-2">
-              <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t('results.viewDetails') || 'View Performance Details'}</span>
-              <span className="sm:hidden">{t('results.details') || 'Details'}</span>
-            </span>
-            <motion.div animate={{ rotate: showDetails ? 180 : 0 }} transition={{ duration: 0.2 }}>
-              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
-            </motion.div>
-          </button>
-          <AnimatePresence>
-            {showDetails && playerInsights && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden mb-2"
-              >
-                <div className="bg-white/5 text-neo-black rounded-neo border border-white/10 p-2">
-                  <PlayerInsights insights={playerInsights} />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {/* Personalized learning callout — uses actual game data instead of generic tip */}
+          {totalComboBonus === 0 && totalFireRoundBonus === 0 && bestWord && (
+            <m.div
+              initial={{ opacity: 0, y: 5 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.3 }}
+              className="mb-2 sm:mb-3 p-2 bg-neo-cyan/10 rounded-neo border border-neo-cyan/30"
+            >
+              <div className="text-[10px] sm:text-xs text-neo-cyan font-bold flex items-center gap-1.5 mb-1">
+                <Lightbulb className="w-3.5 h-3.5 shrink-0" />
+                {t('results.scoringTip')}
+              </div>
+              <p className="text-[9px] sm:text-[10px] text-neo-white leading-relaxed">
+                {bestWord.word.length >= 6
+                  ? t('results.personalTipLongWord', { word: applyHebrewFinalLetters(bestWord.word).toUpperCase(), score: bestWord.score })
+                  : t('results.personalTipShortWord', { word: applyHebrewFinalLetters(bestWord.word).toUpperCase(), score: bestWord.score })
+                }
+              </p>
+            </m.div>
+          )}
 
-          {/* Collapsible: Words */}
-          <button
-            onClick={() => setShowWords(!showWords)}
-            aria-expanded={showWords}
-            className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-white/20 bg-white/5 hover:bg-white/10 transition-colors mb-1.5 sm:mb-2"
-          >
-            <span className="flex items-center gap-1.5 sm:gap-2">
-              <Hash className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-              <span className="hidden sm:inline">{t('results.viewAllWords') || 'View All Words'}</span>
-              <span className="sm:hidden">{t('results.words') || 'Words'}</span>
-              <span className="text-white/60">({player.allWords?.length || 0})</span>
-            </span>
-            <motion.div animate={{ rotate: showWords ? 180 : 0 }} transition={{ duration: 0.2 }}>
-              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
-            </motion.div>
-          </button>
-          <AnimatePresence>
-            {showWords && player.allWords && player.allWords.length > 0 && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.25 }}
-                className="overflow-hidden mb-2"
+          {/* Collapsible: Achievements (auto-expanded when earned) */}
+          {gameAchievements.length > 0 && (
+            <>
+              <button
+                onClick={() => setShowAchievements(!showAchievements)}
+                aria-expanded={showAchievements}
+                className="w-full flex items-center justify-between p-2 sm:p-3 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border-2 border-neo-lime/50 bg-neo-lime/10 hover:bg-neo-lime/20 transition-colors mb-2"
               >
-                <div className="bg-white/5 text-neo-black rounded-neo border border-white/10 p-2 space-y-2">
-                  <WordPointsGroup
-                    wordsByPoints={wordsByPoints}
-                    sortedPointGroups={sortedPointGroups}
-                    t={t}
-                    getPlayerCountForWord={getPlayerCountForWord}
-                    mode="chip"
-                  />
-                  <SharedWordsSection
-                    duplicateWords={duplicateWords}
-                    t={t}
-                    getPlayerCountForWord={getPlayerCountForWord}
-                  />
-                  <InvalidWordsSection
-                    invalidWords={invalidWords}
-                    t={t}
-                    getPlayerCountForWord={getPlayerCountForWord}
-                    mode="chip"
-                  />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                <span className="flex items-center gap-1.5 sm:gap-2">
+                  <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">{t('hostView.achievements')}</span>
+                  <span className="sm:hidden">{t('results.badges')}</span>
+                  <span className="text-slate-300">({gameAchievements.length})</span>
+                </span>
+                <m.div animate={{ rotate: showAchievements ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
+                </m.div>
+              </button>
+              <AnimatePresence>
+                {showAchievements && (
+                  <m.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.25 }}
+                    className="overflow-hidden mb-2"
+                  >
+                    <div className="flex flex-wrap gap-2">
+                      {gameAchievements.map((ach, i) => (
+                        <AchievementBadge key={ach.key || ach.name || `ach-${i}`} achievement={ach} index={i} />
+                      ))}
+                    </div>
+                  </m.div>
+                )}
+              </AnimatePresence>
+            </>
+          )}
 
           {/* Collapsible: XP Breakdown (only if authenticated) */}
           {xpGainedData && (
@@ -367,20 +350,20 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
               <button
                 onClick={() => setShowXp(!showXp)}
                 aria-expanded={showXp}
-                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-pink/50 bg-neo-pink/10 hover:bg-neo-pink/20 transition-colors mb-1.5 sm:mb-2"
+                className="w-full flex items-center justify-between p-2 sm:p-3 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border-2 border-neo-purple/50 bg-neo-purple/10 hover:bg-neo-purple/20 transition-colors mb-2"
               >
                 <span className="flex items-center gap-1.5 sm:gap-2">
                   <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">{t('results.viewXpBreakdown') || 'View XP Breakdown'}</span>
-                  <span className="sm:hidden">{t('results.xp') || 'XP'}</span>
+                  <span className="hidden sm:inline">{t('results.viewXpBreakdown')}</span>
+                  <span className="sm:hidden">{t('results.xp')}</span>
                 </span>
-                <motion.div animate={{ rotate: showXp ? 180 : 0 }} transition={{ duration: 0.2 }}>
+                <m.div animate={{ rotate: showXp ? 180 : 0 }} transition={{ duration: 0.2 }}>
                   <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
-                </motion.div>
+                </m.div>
               </button>
               <AnimatePresence>
                 {showXp && (
-                  <motion.div
+                  <m.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
@@ -392,52 +375,45 @@ const ConsolidatedPlayerCard: React.FC<ConsolidatedPlayerCardProps> = memo(({
                       levelUpData={levelUpData}
                       isWinner={isWinner}
                     />
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </>
           )}
 
-          {/* Collapsible: Achievements */}
-          {gameAchievements.length > 0 && (
-            <>
-              <button
-                onClick={() => setShowAchievements(!showAchievements)}
-                aria-expanded={showAchievements}
-                className="w-full flex items-center justify-between p-1.5 sm:p-2 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border sm:border-2 border-neo-lime/50 bg-neo-lime/10 hover:bg-neo-lime/20 transition-colors"
+          {/* Collapsible: Performance Details (analytical — last) */}
+          <button
+            onClick={() => setShowDetails(!showDetails)}
+            aria-expanded={showDetails}
+            className="w-full flex items-center justify-between p-2 sm:p-3 rounded-neo text-xs sm:text-sm font-bold text-white uppercase border-2 border-neo-cyan/50 bg-neo-cyan/10 hover:bg-neo-cyan/20 transition-colors mb-2"
+          >
+            <span className="flex items-center gap-1.5 sm:gap-2">
+              <BarChart3 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">{t('results.viewDetails')}</span>
+              <span className="sm:hidden">{t('results.details')}</span>
+            </span>
+            <m.div animate={{ rotate: showDetails ? 180 : 0 }} transition={{ duration: 0.2 }}>
+              <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
+            </m.div>
+          </button>
+          <AnimatePresence>
+            {showDetails && playerInsights && (
+              <m.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="overflow-hidden mb-2"
               >
-                <span className="flex items-center gap-1.5 sm:gap-2">
-                  <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  <span className="hidden sm:inline">{t('hostView.achievements') || 'Achievements'}</span>
-                  <span className="sm:hidden">{t('results.badges') || 'Badges'}</span>
-                  <span className="text-white/60">({gameAchievements.length})</span>
-                </span>
-                <motion.div animate={{ rotate: showAchievements ? 180 : 0 }} transition={{ duration: 0.2 }}>
-                  <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
-                </motion.div>
-              </button>
-              <AnimatePresence>
-                {showAchievements && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25 }}
-                    className="overflow-hidden mt-2"
-                  >
-                    <div className="flex flex-wrap gap-2">
-                      {gameAchievements.map((ach, i) => (
-                        <AchievementBadge key={i} achievement={ach} index={i} />
-                      ))}
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </>
-          )}
+                <div className="bg-white/5 text-neo-black rounded-neo border border-white/10 p-2">
+                  <PlayerInsights insights={playerInsights} />
+                </div>
+              </m.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

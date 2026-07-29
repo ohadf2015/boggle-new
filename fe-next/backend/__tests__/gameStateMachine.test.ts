@@ -139,8 +139,11 @@ describe('Game State Machine', () => {
       expect(canTransition('finished', 'START')).toBe(false);
     });
 
-    test('cannot transition from finished via END', () => {
-      expect(canTransition('finished', 'END')).toBe(false);
+    test('can transition from finished via END (idempotent)', () => {
+      expect(canTransition('finished', 'END')).toBe(true);
+      const result = transition('finished', 'END');
+      expect(result.success).toBe(true);
+      expect(result.newState).toBe('finished');
     });
   });
 
@@ -178,7 +181,7 @@ describe('Game State Machine', () => {
     });
 
     test('finished state allows VALIDATE, SKIP_VALIDATION, and RESET', () => {
-      expect(getValidEvents('finished')).toEqual(['VALIDATE', 'SKIP_VALIDATION', 'RESET']);
+      expect(getValidEvents('finished')).toEqual(['END', 'VALIDATE', 'SKIP_VALIDATION', 'RESET']);
     });
 
     test('validating state allows VALIDATION_COMPLETE', () => {

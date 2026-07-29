@@ -5,7 +5,14 @@
  * Coins are earned from Daily Challenge completion and spent on word reveals.
  */
 
-import logger from '@/utils/logger';
+import {
+  getJsonFromLocalStorage,
+  saveJsonToLocalStorage,
+  getFromLocalStorage,
+  saveToLocalStorage,
+} from '@/utils/storageHelpers';
+import { getStreakCoinBonusPercent } from '@/lib/streakTierRewards';
+import { incrementGamesPlayed } from '@/utils/pushNotifications';
 
 const COINS_STORAGE_KEY = 'lexiclash_coins';
 const COINS_HISTORY_KEY = 'lexiclash_coins_history';
@@ -14,15 +21,15 @@ const COINS_HISTORY_KEY = 'lexiclash_coins_history';
 export const COIN_EARNING = {
   DAILY_BASE: 25,           // Base coins for completing daily challenge
   EFFICIENCY_MULTIPLIER: 0.5, // Coins per efficiency point
-  STREAK_BONUS: 10,         // Coins per streak day
-  MAX_STREAK_BONUS_DAYS: 7, // Cap streak bonus at 7 days
+  STREAK_BONUS: 10,         // Coins per streak day (uncapped — tiers reward long streaks)
 } as const;
 
 // Coin cost constants
 export const COIN_COSTS = {
   REVEAL_5_PLUS: 60,        // Cost to reveal a 5+ letter word (balances with daily earnings)
   REVEAL_TARGET_WORD: 250,  // Cost to reveal the target word in daily challenge when failed
-  DAILY_RETRY: 500,         // Cost to retry daily challenge (full reset, more expensive than reveal)
+  DAILY_RETRY: 200,         // Cost to retry daily challenge (reduced from 500 — was 4+ sessions of earning)
+  DAILY_RETRY_LEADERBOARD_PENALTY: 100, // Server-applied score deduction when a retry attempt updates the leaderboard
 } as const;
 
 // Coin reward constants for ads and bonuses
@@ -37,10 +44,25 @@ export const COIN_EARNING_OTHER = {
   TOP_3_BONUS: 10,          // Bonus for 2nd-3rd place
   MULTIPLAYER_BASE: 15,     // Base coins for multiplayer participation
   SINGLEPLAYER_BASE: 10,    // Base coins for single player completion
+  MAX_GAME_REWARD: 500,     // Cap per game — prevents high Word Hunt scores from exceeding API limit
 } as const;
+
+// Bonus constants for dedicated achievement pipelines
+export const FIRST_WIN_BONUS = 100;
+export const WOTD_BONUS = 50;
+export const GRAND_SLAM_BONUS = 200;
 
 // Free reveals per game
 export const FREE_REVEALS_PER_GAME = 2;
+
+// Streak milestone bonus rewards (one-time per milestone)
+export const STREAK_MILESTONES = [
+  { days: 7, bonus: 100 },
+  { days: 14, bonus: 200 },
+  { days: 30, bonus: 500 },
+  { days: 60, bonus: 1000 },
+  { days: 100, bonus: 2500 },
+] as const;
 
 // Combo milestone coin rewards
 export const COMBO_COIN_REWARDS = {
@@ -72,74 +94,38 @@ export interface CoinTransaction {
  * Get current coin balance
  */
 export function getCoins(): number {
-  if (typeof window === 'undefined') return 0;
-
-  try {
-    const stored = localStorage.getItem(COINS_STORAGE_KEY);
-    if (!stored) return 0;
-
-    const balance: CoinBalance = JSON.parse(stored);
-    return balance.total || 0;
-  } catch (error) {
-    logger.error('Error reading coins:', error);
-    return 0;
-  }
+  const balance = getJsonFromLocalStorage<CoinBalance | null>(COINS_STORAGE_KEY, null);
+  return balance?.total || 0;
 }
 
 /**
  * Get full coin balance details
  */
 export function getCoinBalance(): CoinBalance {
-  if (typeof window === 'undefined') {
-    return { total: 0, earnedFromDaily: 0, spent: 0, lastUpdated: new Date().toISOString() };
-  }
-
-  try {
-    const stored = localStorage.getItem(COINS_STORAGE_KEY);
-    if (!stored) {
-      return { total: 0, earnedFromDaily: 0, spent: 0, lastUpdated: new Date().toISOString() };
-    }
-
-    return JSON.parse(stored);
-  } catch (error) {
-    logger.error('Error reading coin balance:', error);
-    return { total: 0, earnedFromDaily: 0, spent: 0, lastUpdated: new Date().toISOString() };
-  }
+  const defaultBalance = { total: 0, earnedFromDaily: 0, spent: 0, lastUpdated: new Date().toISOString() };
+  return getJsonFromLocalStorage<CoinBalance>(COINS_STORAGE_KEY, defaultBalance);
 }
 
 /**
  * Save coin balance to storage
  */
 function saveCoinBalance(balance: CoinBalance): void {
-  if (typeof window === 'undefined') return;
-
-  try {
-    localStorage.setItem(COINS_STORAGE_KEY, JSON.stringify(balance));
-  } catch (error) {
-    logger.error('Error saving coin balance:', error);
-  }
+  saveJsonToLocalStorage(COINS_STORAGE_KEY, balance);
 }
 
 /**
  * Add a transaction to history
  */
 function addTransaction(transaction: CoinTransaction): void {
-  if (typeof window === 'undefined') return;
+  const history = getJsonFromLocalStorage<CoinTransaction[]>(COINS_HISTORY_KEY, []);
 
-  try {
-    const stored = localStorage.getItem(COINS_HISTORY_KEY);
-    const history: CoinTransaction[] = stored ? JSON.parse(stored) : [];
-
-    // Keep last 100 transactions
-    history.unshift(transaction);
-    if (history.length > 100) {
-      history.pop();
-    }
-
-    localStorage.setItem(COINS_HISTORY_KEY, JSON.stringify(history));
-  } catch (error) {
-    logger.error('Error saving coin transaction:', error);
+  // Keep last 100 transactions
+  history.unshift(transaction);
+  if (history.length > 100) {
+    history.pop();
   }
+
+  saveJsonToLocalStorage(COINS_HISTORY_KEY, history);
 }
 
 /**
@@ -162,6 +148,9 @@ export function addCoins(amount: number, reason: string, details?: Record<string
     timestamp: new Date().toISOString(),
     details,
   });
+
+  // Increment games-played counter so push prompt eventually shows (N-16)
+  incrementGamesPlayed();
 
   return balance.total;
 }
@@ -209,25 +198,30 @@ export function canAfford(amount: number): boolean {
 export function calculateDailyReward(
   solved: boolean,
   efficiencyScore: number,
-  streakDays: number
-): { total: number; breakdown: { base: number; efficiency: number; streak: number } } {
+  streakDays: number,
+  currentWinStreak?: number
+): { total: number; breakdown: { base: number; efficiency: number; streak: number; streakBonus: number } } {
   if (!solved) {
     // Still give some coins for trying
     const base = Math.floor(COIN_EARNING.DAILY_BASE / 2);
     return {
       total: base,
-      breakdown: { base, efficiency: 0, streak: 0 }
+      breakdown: { base, efficiency: 0, streak: 0, streakBonus: 0 }
     };
   }
 
   const base = COIN_EARNING.DAILY_BASE;
-  const efficiency = Math.floor(efficiencyScore * COIN_EARNING.EFFICIENCY_MULTIPLIER);
-  const cappedStreakDays = Math.min(streakDays, COIN_EARNING.MAX_STREAK_BONUS_DAYS);
-  const streak = cappedStreakDays * COIN_EARNING.STREAK_BONUS;
+  const cappedEfficiency = Math.min(efficiencyScore, 100);
+  const efficiency = Math.floor(cappedEfficiency * COIN_EARNING.EFFICIENCY_MULTIPLIER);
+  const streak = Math.min(streakDays, 100) * COIN_EARNING.STREAK_BONUS;
+
+  // Streak tier coin bonus (applied to subtotal)
+  const subtotal = base + efficiency + streak;
+  const streakBonus = currentWinStreak ? Math.floor(subtotal * getStreakCoinBonusPercent(currentWinStreak) / 100) : 0;
 
   return {
-    total: base + efficiency + streak,
-    breakdown: { base, efficiency, streak }
+    total: subtotal + streakBonus,
+    breakdown: { base, efficiency, streak, streakBonus }
   };
 }
 
@@ -246,7 +240,7 @@ export function awardDailyCoins(
 
   // Check if already awarded for this puzzle
   const awardKey = `lexiclash_daily_coin_award_${puzzleDate}_${language}`;
-  if (localStorage.getItem(awardKey)) {
+  if (getFromLocalStorage(awardKey)) {
     return null; // Already awarded
   }
 
@@ -261,7 +255,7 @@ export function awardDailyCoins(
   });
 
   // Mark as awarded
-  localStorage.setItem(awardKey, new Date().toISOString());
+  saveToLocalStorage(awardKey, new Date().toISOString());
 
   return {
     awarded: reward.total,
@@ -273,15 +267,7 @@ export function awardDailyCoins(
  * Get transaction history
  */
 export function getCoinHistory(): CoinTransaction[] {
-  if (typeof window === 'undefined') return [];
-
-  try {
-    const stored = localStorage.getItem(COINS_HISTORY_KEY);
-    return stored ? JSON.parse(stored) : [];
-  } catch (error) {
-    logger.error('Error reading coin history:', error);
-    return [];
-  }
+  return getJsonFromLocalStorage<CoinTransaction[]>(COINS_HISTORY_KEY, []);
 }
 
 /**
@@ -291,8 +277,9 @@ export function calculateGameReward(
   score: number,
   mode: 'singleplayer' | 'multiplayer',
   rank?: number,
-  totalPlayers?: number
-): { total: number; breakdown: { base: number; scoreBonus: number; placement: number } } {
+  totalPlayers?: number,
+  currentStreak?: number
+): { total: number; breakdown: { base: number; scoreBonus: number; placement: number; streakBonus: number } } {
   // Base coins for completing the game (only if player scored points)
   const base = score > 0
     ? (mode === 'multiplayer'
@@ -313,9 +300,15 @@ export function calculateGameReward(
     }
   }
 
+  // Streak tier coin bonus (applied to subtotal)
+  const subtotal = base + scoreBonus + placement;
+  const streakBonus = currentStreak ? Math.floor(subtotal * getStreakCoinBonusPercent(currentStreak) / 100) : 0;
+
+  const total = Math.min(subtotal + streakBonus, COIN_EARNING_OTHER.MAX_GAME_REWARD);
+
   return {
-    total: base + scoreBonus + placement,
-    breakdown: { base, scoreBonus, placement }
+    total,
+    breakdown: { base, scoreBonus, placement, streakBonus }
   };
 }
 
@@ -328,17 +321,18 @@ export function awardGameCoins(
   mode: 'singleplayer' | 'multiplayer',
   score: number,
   rank?: number,
-  totalPlayers?: number
-): { awarded: number; breakdown: { base: number; scoreBonus: number; placement: number } } | null {
+  totalPlayers?: number,
+  currentStreak?: number
+): { awarded: number; breakdown: { base: number; scoreBonus: number; placement: number; streakBonus: number } } | null {
   if (typeof window === 'undefined') return null;
 
   // Check if already awarded for this session
   const awardKey = `lexiclash_game_coin_award_${sessionId}`;
-  if (localStorage.getItem(awardKey)) {
+  if (getFromLocalStorage(awardKey)) {
     return null; // Already awarded
   }
 
-  const reward = calculateGameReward(score, mode, rank, totalPlayers);
+  const reward = calculateGameReward(score, mode, rank, totalPlayers, currentStreak);
 
   // Don't award if reward is 0
   if (reward.total <= 0) {
@@ -355,7 +349,7 @@ export function awardGameCoins(
   });
 
   // Mark as awarded
-  localStorage.setItem(awardKey, new Date().toISOString());
+  saveToLocalStorage(awardKey, new Date().toISOString());
 
   return {
     awarded: reward.total,
@@ -404,4 +398,14 @@ export function awardComboCoins(comboLevel: number, gameMode: string): number {
   });
 
   return reward;
+}
+
+/**
+ * Apply streak tier coin bonus to a base amount.
+ * Returns the bonus amount (not the total).
+ */
+export function applyStreakCoinBonus(baseAmount: number, currentStreak: number): number {
+  const bonusPercent = getStreakCoinBonusPercent(currentStreak);
+  if (bonusPercent <= 0) return 0;
+  return Math.floor(baseAmount * bonusPercent / 100);
 }

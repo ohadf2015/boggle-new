@@ -46,6 +46,7 @@ export interface LiveLeaderboardEntry {
   avatar?: Avatar;
   isHost?: boolean;
   isBot?: boolean;
+  comboLevel?: number;
 }
 
 /**
@@ -54,6 +55,7 @@ export interface LiveLeaderboardEntry {
 export interface ExtendedLeaderboardPlayer extends LiveLeaderboardEntry {
   presenceStatus?: PresenceStatus;
   isWindowFocused?: boolean;
+  disconnected?: boolean;
 }
 
 // ==================== Tournament Types ====================

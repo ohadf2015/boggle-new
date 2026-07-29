@@ -15,32 +15,48 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import MultiplayerFlow from '../MultiplayerFlow';
 import type { ActiveRoom, Language } from '@/shared/types/game';
+import { hasCompleteStoredProfile, getStoredUsername, getStoredAvatarId } from '@/utils/profileStorage';
 
 // Mock dependencies
-jest.mock('@/utils/profileStorage', () => ({
-  getStoredUsername: jest.fn().mockReturnValue('TestPlayer'),
-  getStoredAvatarId: jest.fn().mockReturnValue('avatar-1'),
-  hasCompleteStoredProfile: jest.fn().mockReturnValue(true),
+vi.mock('@/utils/profileStorage', () => ({
+  getStoredUsername: vi.fn().mockReturnValue('TestPlayer'),
+  getStoredAvatarId: vi.fn().mockReturnValue('avatar-1'),
+  hasCompleteStoredProfile: vi.fn().mockReturnValue(true),
 }));
 
-jest.mock('@/hooks/useCrazyGamesInvite', () => ({
+vi.mock('@/hooks/useCrazyGamesInvite', () => ({
   useCrazyGamesInvite: () => ({
-    isReady: false,
+    isReady: true,
     inviteRoomId: null,
     isInstantMultiplayer: false,
+    showInviteButton: vi.fn(),
+    hideInviteButton: vi.fn(),
+    createInviteLink: vi.fn(),
+    isInviteButtonVisible: false,
+    isInviteJoin: false,
   }),
 }));
 
-jest.mock('@/utils/avatarConfig', () => ({
-  getAvatarEmojiAndColor: jest.fn(() => ({ emoji: '🎮', color: '#FF6B6B' })),
+vi.mock('@/utils/avatarConfig', () => ({
+  getAvatarEmojiAndColor: vi.fn(() => ({ emoji: '🎮', color: '#FF6B6B' })),
 }));
 
-jest.mock('@/components/EmojiAvatarPicker', () => ({
-  PROFILE_AVATAR_ID: 'profile-avatar',
+let mockIsOnCrazyGamesPlatform = false;
+vi.mock('@/components/CrazyGamesSDK', () => ({
+  useCrazyGames: () => ({
+    isOnCrazyGamesPlatform: mockIsOnCrazyGamesPlatform,
+  }),
+}));
+
+vi.mock('@/shared/types/customAvatar', () => ({
+  getRandomAvatarConfig: () => ({
+    gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'spiky', hairColor: '#2C1B18',
+    eyes: 'round', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#1a1a2e',
+  }),
 }));
 
 // Mock child components
-jest.mock('../RoomListView', () => ({
+vi.mock('../RoomListView', () => ({
   __esModule: true,
   default: ({
     activeRooms,
@@ -48,18 +64,21 @@ jest.mock('../RoomListView', () => ({
     onRefreshRooms,
     onRoomClick,
     onCreateRoom,
+    onQuickPlay,
   }: {
     activeRooms: ActiveRoom[];
     roomsLoading: boolean;
     onRefreshRooms: () => void;
     onRoomClick: (room: ActiveRoom) => void;
     onCreateRoom: () => void;
+    onQuickPlay?: () => void;
   }) => (
     <div data-testid="room-list-view">
       <h2>Room List ({activeRooms.length} rooms)</h2>
       {roomsLoading && <span>Loading rooms...</span>}
       <button onClick={onRefreshRooms}>Refresh</button>
       <button onClick={onCreateRoom}>Create Room</button>
+      {onQuickPlay && <button onClick={onQuickPlay}>Quick Play</button>}
       {activeRooms.map((room) => (
         <button
           key={room.gameCode}
@@ -73,7 +92,7 @@ jest.mock('../RoomListView', () => ({
   ),
 }));
 
-jest.mock('../JoinRoomModal', () => ({
+vi.mock('../JoinRoomModal', () => ({
   __esModule: true,
   default: ({
     isOpen,
@@ -98,7 +117,7 @@ jest.mock('../JoinRoomModal', () => ({
     ) : null,
 }));
 
-jest.mock('../CreateRoomModal', () => ({
+vi.mock('../CreateRoomModal', () => ({
   __esModule: true,
   default: ({
     isOpen,
@@ -157,22 +176,22 @@ describe('MultiplayerFlow', () => {
   ];
 
   const defaultProps = {
-    handleJoin: jest.fn(),
-    refreshRooms: jest.fn(),
+    handleJoin: vi.fn(),
+    refreshRooms: vi.fn(),
     activeRooms: mockActiveRooms,
     roomsLoading: false,
     isJoining: false,
     isAuthenticated: false,
     displayName: 'TestPlayer',
     defaultLanguage: 'en' as Language,
-    setGameCode: jest.fn(),
-    setUsername: jest.fn(),
-    setRoomName: jest.fn(),
-    setHostUsername: jest.fn(),
+    setGameCode: vi.fn(),
+    setUsername: vi.fn(),
+    setRoomName: vi.fn(),
+    setHostUsername: vi.fn(),
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Initial Render', () => {
@@ -214,8 +233,23 @@ describe('MultiplayerFlow', () => {
   });
 
   describe('Join Room Flow', () => {
-    it('should open join modal when room is clicked', async () => {
+    it('should fast-join when room is clicked and user has profile', async () => {
       render(<MultiplayerFlow {...defaultProps} />);
+
+      const roomButton = screen.getByTestId('room-ROOM01');
+      await userEvent.click(roomButton);
+
+      // Fast-join: no modal, direct handleJoin call
+      expect(screen.queryByTestId('join-room-modal')).not.toBeInTheDocument();
+      expect(defaultProps.setGameCode).toHaveBeenCalledWith('ROOM01');
+      expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, 'TestPlayer');
+    });
+
+    it('should open join modal when room is clicked and no profile', async () => {
+      
+      (hasCompleteStoredProfile as Mock).mockReturnValue(false);
+
+      render(<MultiplayerFlow {...defaultProps} isAuthenticated={false} displayName="" />);
 
       const roomButton = screen.getByTestId('room-ROOM01');
       await userEvent.click(roomButton);
@@ -225,9 +259,12 @@ describe('MultiplayerFlow', () => {
     });
 
     it('should close join modal when close button clicked', async () => {
-      render(<MultiplayerFlow {...defaultProps} />);
+      
+      (hasCompleteStoredProfile as Mock).mockReturnValue(false);
 
-      // Open modal
+      render(<MultiplayerFlow {...defaultProps} isAuthenticated={false} displayName="" />);
+
+      // Open modal (no profile → shows modal)
       const roomButton = screen.getByTestId('room-ROOM01');
       await userEvent.click(roomButton);
       expect(screen.getByTestId('join-room-modal')).toBeInTheDocument();
@@ -239,34 +276,17 @@ describe('MultiplayerFlow', () => {
       expect(screen.queryByTestId('join-room-modal')).not.toBeInTheDocument();
     });
 
-    it('should call handleJoin when joining a room', async () => {
-      // Ensure mock returns correct value
-      const avatarConfig = require('@/utils/avatarConfig');
-      avatarConfig.getAvatarEmojiAndColor.mockReturnValue({ emoji: '🎮', color: '#FF6B6B' });
+    it('should fast-join for authenticated users without showing modal', async () => {
+      render(<MultiplayerFlow {...defaultProps} isAuthenticated={true} displayName="AuthUser" />);
 
-      render(<MultiplayerFlow {...defaultProps} />);
-
-      // Open modal
       const roomButton = screen.getByTestId('room-ROOM01');
       await userEvent.click(roomButton);
 
-      // Click join
-      const joinButton = screen.getByText('Join');
-      await userEvent.click(joinButton);
-
+      // Direct join — no modal
+      expect(screen.queryByTestId('join-room-modal')).not.toBeInTheDocument();
       expect(defaultProps.setGameCode).toHaveBeenCalledWith('ROOM01');
-      expect(defaultProps.setUsername).toHaveBeenCalledWith('TestPlayer');
-      expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01');
-    });
-
-    it('should show joining state in modal', async () => {
-      render(<MultiplayerFlow {...defaultProps} isJoining={true} />);
-
-      // Open modal
-      const roomButton = screen.getByTestId('room-ROOM01');
-      await userEvent.click(roomButton);
-
-      expect(screen.getByText('Joining...')).toBeInTheDocument();
+      expect(defaultProps.setUsername).toHaveBeenCalledWith('AuthUser');
+      expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, 'AuthUser');
     });
   });
 
@@ -312,8 +332,13 @@ describe('MultiplayerFlow', () => {
         true,
         'en',
         expect.any(String),
-        'Test Room'
+        'Test Room',
+        'HostPlayer'
       );
+      // Default visibility = public: no isPrivate option ever passed
+      const createCalls = (defaultProps.handleJoin as ReturnType<typeof vi.fn>).mock.calls;
+      const opts = createCalls[createCalls.length - 1]?.[5];
+      expect(opts?.isPrivate).toBeUndefined();
     });
 
     it('should generate valid 6-character game code', async () => {
@@ -359,22 +384,22 @@ describe('MultiplayerFlow', () => {
 
   describe('Prefilled Room Code', () => {
     it('should auto-join with prefilled room code when profile exists', async () => {
-      const { hasCompleteStoredProfile, getStoredUsername, getStoredAvatarId } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as jest.Mock).mockReturnValue(true);
-      (getStoredUsername as jest.Mock).mockReturnValue('StoredPlayer');
-      (getStoredAvatarId as jest.Mock).mockReturnValue('stored-avatar');
+      
+      (hasCompleteStoredProfile as Mock).mockReturnValue(true);
+      (getStoredUsername as Mock).mockReturnValue('StoredPlayer');
+      (getStoredAvatarId as Mock).mockReturnValue('stored-avatar');
 
       render(<MultiplayerFlow {...defaultProps} prefilledRoom="INVITE1" />);
 
       await waitFor(() => {
         expect(defaultProps.setGameCode).toHaveBeenCalledWith('INVITE1');
-        expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'INVITE1');
+        expect(defaultProps.handleJoin).toHaveBeenCalledWith(false, null, 'INVITE1', undefined, 'StoredPlayer');
       });
     });
 
     it('should show join modal with prefilled room when no profile', async () => {
-      const { hasCompleteStoredProfile } = require('@/utils/profileStorage');
-      (hasCompleteStoredProfile as jest.Mock).mockReturnValue(false);
+      
+      (hasCompleteStoredProfile as Mock).mockReturnValue(false);
 
       render(
         <MultiplayerFlow
@@ -391,6 +416,143 @@ describe('MultiplayerFlow', () => {
     });
   });
 
+  describe('Classroom Mode', () => {
+    it('should NOT render RoomListView when isClassroomMode is true', () => {
+      render(
+        <MultiplayerFlow
+          {...defaultProps}
+          isClassroomMode={true}
+          host={true}
+          prefilledRoom="RRGWFX"
+          isAuthenticated={true}
+          displayName="Teacher"
+        />
+      );
+
+      // Arena Hub / Quick Start / Open Arenas must not appear in classroom mode —
+      // teacher already has the share code (rendered by ClassroomModeBanner upstream).
+      expect(screen.queryByTestId('room-list-view')).not.toBeInTheDocument();
+    });
+
+    it('should render waiting state when isClassroomMode is true', () => {
+      render(
+        <MultiplayerFlow
+          {...defaultProps}
+          isClassroomMode={true}
+          host={true}
+          prefilledRoom="RRGWFX"
+          isAuthenticated={true}
+          displayName="Teacher"
+        />
+      );
+
+      // useLanguage falls back through translation cache; assert the EN string
+      // for `education.classroomGame.waitingForPlayers`.
+      expect(screen.getByText(/waiting for players/i)).toBeInTheDocument();
+    });
+
+    it('should still auto-create classroom host room via prefilledRoom', async () => {
+      const handleJoin = vi.fn();
+      render(
+        <MultiplayerFlow
+          {...defaultProps}
+          handleJoin={handleJoin}
+          isClassroomMode={true}
+          host={true}
+          prefilledRoom="RRGWFX"
+          isAuthenticated={true}
+          displayName="Teacher"
+        />
+      );
+
+      await waitFor(() => {
+        expect(handleJoin).toHaveBeenCalledWith(
+          true,
+          'en',
+          'RRGWFX',
+          expect.any(String),
+          'Teacher',
+          expect.objectContaining({ isPrivate: true })
+        );
+      });
+    });
+  });
+
+  describe('Quick Play', () => {
+    it('CONSOLIDATES: joins an existing compatible waiting room instead of spawning a new one', async () => {
+      // defaultProps.activeRooms has ROOM01 (en, waiting, casual) — a compatible
+      // room — so Quick Play must JOIN it rather than host a fresh public lobby.
+      // This is the room-management fix: stops the arena filling with 1/50 ghosts.
+      const handleJoin = vi.fn();
+      render(<MultiplayerFlow {...defaultProps} handleJoin={handleJoin} />);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Quick Play' }));
+
+      // Join path: not host mode, targets the existing room's code, no quickPlay flag.
+      expect(handleJoin).toHaveBeenCalledWith(false, null, 'ROOM01', undefined, expect.any(String));
+      const createCalls = handleJoin.mock.calls.filter((call) => call[0] === true);
+      expect(createCalls).toHaveLength(0);
+    });
+
+    it('does NOT hijack a ranked or different-language room', async () => {
+      // ROOM02 is Hebrew + ranked → never a Quick Play target. With it the only
+      // room available, Quick Play must fall back to creating a public room.
+      const handleJoin = vi.fn();
+      render(
+        <MultiplayerFlow
+          {...defaultProps}
+          handleJoin={handleJoin}
+          activeRooms={[mockActiveRooms[1]]}
+        />,
+      );
+
+      await userEvent.click(screen.getByRole('button', { name: 'Quick Play' }));
+
+      expect(handleJoin).toHaveBeenCalledWith(
+        true,
+        'en',
+        expect.stringMatching(/^[A-Z0-9]{6}$/),
+        expect.any(String),
+        expect.any(String),
+        expect.objectContaining({ quickPlay: true }),
+      );
+    });
+
+    it('creates a new public room with the quickPlay flag when no compatible room exists', async () => {
+      const handleJoin = vi.fn();
+      render(<MultiplayerFlow {...defaultProps} handleJoin={handleJoin} activeRooms={[]} />);
+
+      await userEvent.click(screen.getByRole('button', { name: 'Quick Play' }));
+
+      expect(handleJoin).toHaveBeenCalledWith(
+        true, // host mode
+        'en', // defaultLanguage
+        expect.stringMatching(/^[A-Z0-9]{6}$/),
+        expect.any(String), // generated room name
+        expect.any(String), // username (sourced from stored profile)
+        expect.objectContaining({ quickPlay: true }),
+      );
+    });
+
+    it('should auto-fire quick play once when quickPlay prop is true', async () => {
+      const handleJoin = vi.fn();
+      // Empty room list so the create path (quickPlay flag) is exercised, and the
+      // once-guard against StrictMode double-invoke is what we assert.
+      render(
+        <MultiplayerFlow {...defaultProps} handleJoin={handleJoin} activeRooms={[]} quickPlay />,
+      );
+
+      // Wait a microtask so the mount effect runs
+      await new Promise((r) => setTimeout(r, 0));
+
+      // handleJoin must be called exactly once with the quickPlay flag set
+      const quickPlayCalls = handleJoin.mock.calls.filter(
+        (call) => call[5]?.quickPlay === true,
+      );
+      expect(quickPlayCalls).toHaveLength(1);
+    });
+  });
+
   describe('Empty Room List', () => {
     it('should render correctly with no rooms', () => {
       render(<MultiplayerFlow {...defaultProps} activeRooms={[]} />);
@@ -402,8 +564,8 @@ describe('MultiplayerFlow', () => {
 
 describe('MultiplayerFlow - Game Code Generation', () => {
   it('should generate different codes for multiple rooms', async () => {
-    const handleJoin = jest.fn();
-    const setGameCode = jest.fn();
+    const handleJoin = vi.fn();
+    const setGameCode = vi.fn();
     const generatedCodes: string[] = [];
 
     // Capture generated codes
@@ -413,7 +575,7 @@ describe('MultiplayerFlow - Game Code Generation', () => {
 
     const props = {
       handleJoin,
-      refreshRooms: jest.fn(),
+      refreshRooms: vi.fn(),
       activeRooms: [],
       roomsLoading: false,
       isJoining: false,
@@ -421,9 +583,9 @@ describe('MultiplayerFlow - Game Code Generation', () => {
       displayName: 'TestPlayer',
       defaultLanguage: 'en' as Language,
       setGameCode,
-      setUsername: jest.fn(),
-      setRoomName: jest.fn(),
-      setHostUsername: jest.fn(),
+      setUsername: vi.fn(),
+      setRoomName: vi.fn(),
+      setHostUsername: vi.fn(),
     };
 
     const { rerender } = render(<MultiplayerFlow {...props} />);
@@ -445,5 +607,100 @@ describe('MultiplayerFlow - Game Code Generation', () => {
     generatedCodes.forEach(code => {
       expect(code).toMatch(/^[A-Z0-9]{6}$/);
     });
+  });
+
+});
+
+describe('CrazyGames lobby arrival — never auto-join (policy 2026-05-03)', () => {
+  // The CrazyGames "smart auto-join" was removed. Landing on /multiplayer in
+  // a CG iframe must show the lobby and let the user pick — silent redirects
+  // into stranger rooms or quick-play matches were a primary UX complaint.
+  const baseProps = {
+    handleJoin: vi.fn(),
+    refreshRooms: vi.fn(),
+    activeRooms: [
+      {
+        gameCode: 'ROOM01',
+        roomName: 'Test Room 1',
+        playerCount: 2,
+        language: 'en' as Language,
+        gameState: 'waiting' as const,
+        isRanked: false,
+        createdAt: Date.now(),
+      },
+    ],
+    roomsLoading: false,
+    isJoining: false,
+    isAuthenticated: true,
+    displayName: 'CGPlayer',
+    defaultLanguage: 'en' as Language,
+    setGameCode: vi.fn(),
+    setUsername: vi.fn(),
+    setRoomName: vi.fn(),
+    setHostUsername: vi.fn(),
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockIsOnCrazyGamesPlatform = true;
+  });
+
+  afterEach(() => {
+    mockIsOnCrazyGamesPlatform = false;
+  });
+
+  it('does NOT auto-join an open room on CrazyGames — lobby renders for user choice', () => {
+    const handleJoin = vi.fn();
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} />);
+
+    expect(handleJoin).not.toHaveBeenCalled();
+  });
+
+  it('does NOT auto-trigger quick-play when no open rooms on CrazyGames', () => {
+    const handleJoin = vi.fn();
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={[]} />);
+
+    expect(handleJoin).not.toHaveBeenCalled();
+  });
+
+  it('does NOT auto-join when only full rooms exist on CrazyGames', () => {
+    const handleJoin = vi.fn();
+    const fullRooms: ActiveRoom[] = [
+      {
+        gameCode: 'FULL01', roomName: 'Full Room', playerCount: 8, maxPlayers: 8,
+        language: 'en' as Language, gameState: 'waiting', isRanked: false, createdAt: Date.now(),
+      },
+    ];
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={fullRooms} />);
+
+    expect(handleJoin).not.toHaveBeenCalled();
+  });
+
+  it('does NOT auto-join in-progress rooms on CrazyGames', () => {
+    const handleJoin = vi.fn();
+    const rooms: ActiveRoom[] = [
+      {
+        gameCode: 'PLAY01', roomName: 'In Progress', playerCount: 3,
+        language: 'en' as Language, gameState: 'playing', isRanked: false, createdAt: Date.now(),
+      },
+    ];
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={rooms} />);
+
+    expect(handleJoin).not.toHaveBeenCalled();
+  });
+
+  it('should NOT auto-join on non-CrazyGames platforms', () => {
+    mockIsOnCrazyGamesPlatform = false;
+    const handleJoin = vi.fn();
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} activeRooms={[]} />);
+
+    expect(handleJoin).not.toHaveBeenCalled();
+  });
+
+  it('should NOT auto-join when rooms are still loading', () => {
+    const handleJoin = vi.fn();
+    render(<MultiplayerFlow {...baseProps} handleJoin={handleJoin} roomsLoading={true} />);
+
+    expect(handleJoin).not.toHaveBeenCalled();
   });
 });

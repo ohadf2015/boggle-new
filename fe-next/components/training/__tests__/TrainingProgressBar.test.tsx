@@ -3,11 +3,11 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import TrainingProgressBar from '../TrainingProgressBar';
 
 // Mock dependencies
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'light' }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => {
       const translations: Record<string, string> = {
@@ -27,8 +27,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion to avoid animation issues
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
       const { onClick, onKeyDown, role, tabIndex, className } = props as {
         onClick?: () => void;
@@ -73,7 +73,7 @@ describe('TrainingProgressBar', () => {
 
   describe('expand/collapse functionality', () => {
     it('should toggle from collapsed to expanded when clicking compact bar', () => {
-      const onToggleExpand = jest.fn();
+      const onToggleExpand = vi.fn();
       render(
         <TrainingProgressBar
           {...defaultProps}
@@ -91,7 +91,7 @@ describe('TrainingProgressBar', () => {
     });
 
     it('should toggle from expanded to collapsed when clicking expanded container', () => {
-      const onToggleExpand = jest.fn();
+      const onToggleExpand = vi.fn();
       render(
         <TrainingProgressBar
           {...defaultProps}
@@ -109,7 +109,7 @@ describe('TrainingProgressBar', () => {
     });
 
     it('should toggle when clicking Collapse button in expanded state', () => {
-      const onToggleExpand = jest.fn();
+      const onToggleExpand = vi.fn();
       render(
         <TrainingProgressBar
           {...defaultProps}
@@ -127,7 +127,7 @@ describe('TrainingProgressBar', () => {
     });
 
     it('should collapse when pressing Enter on expanded container', () => {
-      const onToggleExpand = jest.fn();
+      const onToggleExpand = vi.fn();
       render(
         <TrainingProgressBar
           {...defaultProps}

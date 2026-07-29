@@ -1,14 +1,12 @@
 'use client';
 
 import React, { useState, useMemo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Trophy, Flame, X, Share2 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useTheme } from '../../utils/ThemeContext';
 import { cn } from '../../lib/utils';
 import UnifiedShareModal from '../modals/UnifiedShareModal';
-import { useNativeShare } from '../../hooks/useNativeShare';
-import { generatePersonalizedShareMessage, getJoinUrl, type GameResultForShare } from '../../utils/share';
+import { type GameResultForShare } from '../../utils/share';
 
 interface Achievement {
   id?: string;
@@ -205,8 +203,6 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   longestWord,
 }) => {
   const { t, language } = useLanguage();
-  const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
 
   // Generate witty message based on score tier
@@ -241,52 +237,29 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
     longestWord,
   }), [score, wordCount, isWinner, achievements, streakDays, maxCombo, archetype, placement, totalPlayers, longestWord]);
 
-  // Native share support
-  const { canNativeShare, nativeShare } = useNativeShare();
-
-  // Generate share URL and message
-  const joinUrl = getJoinUrl(gameCode, 'share-win');
-  const shareMessage = useMemo(() => {
-    return generatePersonalizedShareMessage(gameCode, gameResult, language, 'victory-prompt');
-  }, [gameCode, gameResult, language]);
-
-  // Smart share handler: try native share first, then modal
-  const handleShare = useCallback(async () => {
-    if (canNativeShare) {
-      const success = await nativeShare({
-        title: language === 'he' ? 'ניצחתי ב-LexiClash!' : 'I won at LexiClash!',
-        text: shareMessage,
-        url: joinUrl,
-      });
-      // If native share succeeded, we're done. If cancelled/failed, show modal
-      if (!success) {
-        setIsShareModalOpen(true);
-      }
-    } else {
-      // Desktop: show modal directly
-      setIsShareModalOpen(true);
-    }
-  }, [canNativeShare, nativeShare, shareMessage, joinUrl, language]);
+  // Share handler: always open modal first for better UX
+  // Modal has nice branded UI ready for screenshot/sharing
+  const handleShare = useCallback(() => {
+    setIsShareModalOpen(true);
+  }, []);
 
   // Streak encouragement - motivate users close to milestones
   const streakEncouragement = useMemo(() => {
     if (streakDays === 6) {
-      return language === 'he' ? '🔥 יום אחד לשבוע שלם!' : '🔥 One day from a full week!';
+      return `🔥 ${t('results.streakOneWeek')}`;
     }
     if (streakDays === 13) {
-      return language === 'he' ? '🔥 מחר שבועיים!' : '🔥 Almost two weeks!';
+      return `🔥 ${t('results.streakTwoWeeks')}`;
     }
     if (streakDays === 29) {
-      return language === 'he' ? '🔥 יום אחד לחודש!' : '🔥 One day from a full month!';
+      return `🔥 ${t('results.streakOneMonth')}`;
     }
     if (streakDays >= 7 && streakDays % 7 === 0) {
       const weeks = Math.floor(streakDays / 7);
-      return language === 'he'
-        ? `🎯 ${weeks} שבועות ברצף!`
-        : `🎯 ${weeks} week${weeks > 1 ? 's' : ''} streak!`;
+      return `🎯 ${t('results.streakWeeks', { weeks: String(weeks) })}`;
     }
     return null;
-  }, [streakDays, language]);
+  }, [streakDays, t]);
 
   // Don't show for non-winners with low scores
   if (!isWinner && score < 30) return null;
@@ -295,20 +268,18 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   if (compact) {
     return (
       <>
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           className={cn(
             'flex items-center justify-center gap-3 p-3 rounded-xl border-2',
-            isDarkMode
-              ? 'bg-slate-800/60 border-cyan-400/30'
-              : 'bg-gradient-to-r from-cyan-50 to-blue-50 border-cyan-300'
+            'bg-neo-navy-light/60 border-neo-cyan/30'
           )}
         >
-          <span className={cn('text-sm font-bold', isDarkMode ? 'text-cyan-300' : 'text-cyan-700')}>
-            {language === 'he' ? 'שתפו את הניצחון!' : 'Share your victory!'}
+          <span className={cn('text-sm font-bold', 'text-neo-cyan')}>
+            {t('results.shareVictoryPrompt')}
           </span>
-          <motion.button
+          <m.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleShare}
@@ -317,14 +288,14 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
               'border-2 border-neo-black shadow-hard-sm',
               'hover:shadow-hard-md hover:-translate-y-0.5 transition-all',
               'bg-neo-lime text-neo-black',
-              'focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
+              'focus:outline-hidden focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2'
             )}
-            aria-label={language === 'he' ? 'שתף' : 'Share'}
+            aria-label={t('results.share')}
           >
             <Share2 size={14} />
-            <span>{language === 'he' ? 'שתף' : 'Share'}</span>
-          </motion.button>
-        </motion.div>
+            <span>{t('results.share')}</span>
+          </m.button>
+        </m.div>
 
         <UnifiedShareModal
           isOpen={isShareModalOpen}
@@ -343,7 +314,7 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
   return (
     <>
       <AnimatePresence>
-        <motion.div
+        <m.div
           key="share-win-prompt"
           initial={{ opacity: 0, y: 20, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -352,24 +323,21 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
           className={cn(
           'relative p-4 sm:p-5 rounded-2xl border-3 overflow-hidden',
           isWinner
-            ? isDarkMode
-              ? 'bg-gradient-to-br from-yellow-900/30 via-amber-900/20 to-orange-900/30 border-yellow-400/60 shadow-hard-lg'
-              : 'bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50 border-yellow-400 shadow-hard-lg'
-            : isDarkMode
-            ? 'bg-gradient-to-br from-cyan-900/30 via-blue-900/20 to-indigo-900/30 border-cyan-400/50 shadow-hard-md'
-            : 'bg-gradient-to-br from-cyan-50 via-blue-50 to-indigo-50 border-cyan-400 shadow-hard-md'
+            ? 'bg-linear-to-br from-neo-lime/20 via-neo-navy to-neo-pink/20 border-neo-lime/60 shadow-hard-lg'
+            : 'bg-linear-to-br from-neo-cyan/20 via-neo-navy to-neo-purple/20 border-neo-cyan/50 shadow-hard-md'
         )}
       >
         {/* Background decoration */}
-        <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-white/15 to-transparent rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-linear-to-bl from-white/15 to-transparent rounded-full blur-3xl pointer-events-none" />
 
         {/* Close button */}
         {onClose && (
           <button
             onClick={onClose}
+            aria-label={t('common.close')}
             className={cn(
               'absolute top-2 right-2 p-1.5 rounded-full transition-colors',
-              isDarkMode ? 'hover:bg-white/10 text-gray-300' : 'hover:bg-black/5 text-gray-600'
+              'hover:bg-neo-cream/10 text-neo-white'
             )}
           >
             <X size={14} />
@@ -378,24 +346,24 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
 
         {/* Header with trophy */}
         <div className="flex items-center gap-3 mb-4">
-          <motion.div
+          <m.div
             animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+            transition={{ type: 'tween', duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
           >
-            <Trophy className="text-3xl text-yellow-400 drop-shadow-lg" />
-          </motion.div>
+            <Trophy className="text-3xl text-neo-lime drop-shadow-lg" />
+          </m.div>
           <div>
             <h3 className={cn(
               'text-xl font-black uppercase tracking-wide',
-              isDarkMode ? 'text-white' : 'text-gray-900'
+              'text-neo-white'
             )}>
               {isWinner
-                ? language === 'he' ? 'ניצחון!' : 'VICTORY!'
-                : language === 'he' ? 'משחק טוב!' : 'WELL PLAYED!'}
+                ? t('results.victory')
+                : t('results.wellPlayed')}
             </h3>
             <p className={cn(
-              'text-sm font-medium italic',
-              isDarkMode ? 'text-gray-300' : 'text-gray-600'
+              'text-sm font-bold italic',
+              'text-neo-white'
             )}>
               &ldquo;{wittyMessage}&rdquo;
             </p>
@@ -404,77 +372,42 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
 
         {/* Streak badge */}
         {streakDays > 0 && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             className={cn(
-              'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium mb-4',
+              'inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold mb-4',
               streakDays >= 7
-                ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                ? 'bg-neo-pink/20 text-neo-pink border border-neo-pink/30'
+                : 'bg-neo-lime/20 text-neo-lime border border-neo-lime/30'
             )}
           >
-            <Flame className={streakDays >= 7 ? 'text-orange-500' : 'text-yellow-500'} />
-            {streakDays} {t('growth.dayStreak') || 'day streak'}!
-          </motion.div>
+            <Flame className={streakDays >= 7 ? 'text-neo-pink' : 'text-neo-lime'} />
+            {streakDays} {t('growth.dayStreak')}!
+          </m.div>
         )}
-
-        {/* Stats display */}
-        <div className={cn(
-          'flex items-center justify-center gap-4 mb-4 p-3 rounded-xl border-2',
-          isDarkMode ? 'bg-black/30 border-white/10' : 'bg-white/60 border-gray-200'
-        )}>
-          <div className="text-center px-3">
-            <div className={cn('text-2xl font-black', isDarkMode ? 'text-yellow-400' : 'text-yellow-600')}>
-              {score}
-            </div>
-            <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-              {language === 'he' ? 'נקודות' : 'pts'}
-            </div>
-          </div>
-          <div className={cn('w-0.5 h-10 rounded-full', isDarkMode ? 'bg-white/20' : 'bg-gray-300')} />
-          <div className="text-center px-3">
-            <div className={cn('text-2xl font-black', isDarkMode ? 'text-cyan-400' : 'text-cyan-600')}>
-              {wordCount}
-            </div>
-            <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-              {language === 'he' ? 'מילים' : 'words'}
-            </div>
-          </div>
-          {achievements.length > 0 && (
-            <>
-              <div className={cn('w-0.5 h-10 rounded-full', isDarkMode ? 'bg-white/20' : 'bg-gray-300')} />
-              <div className="text-center px-3">
-                <div className="text-2xl">{achievements.slice(0, 3).map(a => a.icon || '🏆').join('')}</div>
-                <div className={cn('text-xs font-bold uppercase tracking-wide', isDarkMode ? 'text-gray-300' : 'text-gray-600')}>
-                  {achievements.length} {language === 'he' ? 'הישגים' : 'badges'}
-                </div>
-              </div>
-            </>
-          )}
-        </div>
 
         {/* Streak Encouragement - motivate sharing near milestones */}
         {streakEncouragement && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className={cn(
               'text-center py-2 px-4 rounded-neo border-2',
-              'bg-orange-500/20 border-orange-500/40 text-orange-400',
+              'bg-neo-pink/20 border-neo-pink/40 text-neo-pink',
               'font-bold text-sm animate-pulse'
             )}
           >
             {streakEncouragement}
-          </motion.div>
+          </m.div>
         )}
 
         {/* Single Share CTA - tries native share first on mobile */}
-        <motion.button
+        <m.button
           whileHover={{ scale: 1.02, y: -2 }}
           whileTap={{ scale: 0.98 }}
           onClick={handleShare}
-          aria-label={language === 'he' ? 'שתף את הניצחון' : 'Share Your Victory'}
+          aria-label={t('results.shareYourVictory')}
           className={cn(
             'w-full flex items-center justify-center gap-2 px-4 py-4',
             'font-black text-lg uppercase tracking-wide rounded-neo',
@@ -482,21 +415,21 @@ const ShareWinPrompt: React.FC<ShareWinPromptProps> = ({
             'hover:shadow-hard-xl active:shadow-hard-sm',
             'transition-all duration-150',
             'bg-neo-lime text-neo-black',
-            'focus:outline-none focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2'
+            'focus:outline-hidden focus:ring-4 focus:ring-neo-cyan focus:ring-offset-2'
           )}
         >
           <Share2 size={18} />
-          <span>{language === 'he' ? 'שתף את הניצחון!' : 'Share Your Victory!'}</span>
-        </motion.button>
+          <span>{t('results.shareYourVictory')}</span>
+        </m.button>
 
         {/* Viral prompt */}
         <p className={cn(
-          'mt-3 text-center text-sm font-medium',
-          isDarkMode ? 'text-gray-400' : 'text-gray-500'
+          'mt-3 text-center text-sm font-bold',
+          'text-neo-white'
         )}>
-          {language === 'he' ? 'תאתגרו את החברים 😈' : 'Challenge your friends 😈'}
+          {t('results.challengeFriends')}
         </p>
-      </motion.div>
+      </m.div>
       </AnimatePresence>
 
       {/* Unified Share Modal */}

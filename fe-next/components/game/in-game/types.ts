@@ -2,15 +2,17 @@
  * InGameScreen Types
  */
 
-import type { ReactNode } from 'react';
+import type { ReactNode, MutableRefObject } from 'react';
 import type { Socket } from 'socket.io-client';
-import type { LetterGrid, Language } from '@/shared/types/game';
+import type { LetterGrid, Language, GameModeSelection } from '@/shared/types/game';
 import type {
   FoundWord,
   ExtendedLeaderboardPlayer as LeaderboardPlayer,
   TournamentData,
 } from '@/shared/types/view';
 import type { BoardTheme } from '@/shared/types/socket';
+import type { RoundEventState } from '@/components/game/in-game/components/RoundEventOverlay';
+import type { SpecialWordEvent } from '@/components/game/in-game/components/SpecialWordToast';
 
 /**
  * State for hints feature in single-player mode
@@ -37,7 +39,7 @@ export interface InGameScreenProps {
   username: string;
   gameCode: string;
   isHost?: boolean;
-  isPlaying?: boolean; // For host: whether they're actively playing or spectating
+  isPlaying?: boolean;
   t: (path: string, params?: Record<string, string | number>) => string;
   dir?: 'rtl' | 'ltr';
   socket: Socket | null;
@@ -45,13 +47,20 @@ export interface InGameScreenProps {
   // Game state
   letterGrid: LetterGrid;
   remainingTime: number | null;
-  timerValue?: number; // Timer duration in minutes
+  timerValue?: number;
   gameActive?: boolean;
   showStartAnimation?: boolean;
   gameLanguage?: Language | null;
   minWordLength?: number;
   comboLevel?: number;
-  comboLevelRef?: React.MutableRefObject<number>;
+  comboLevelRef?: MutableRefObject<number>;
+  /**
+   * Timestamp of the last accepted word. Threaded through to
+   * `ComboDisplayConnected`, which owns the ~10 Hz combo-window RAF so it
+   * doesn't cascade through 4 memo boundaries during a drag. Null when no
+   * combo has been started.
+   */
+  lastWordTime?: number | null;
 
   // Player data
   foundWords?: FoundWord[] | string[];
@@ -82,7 +91,40 @@ export interface InGameScreenProps {
 
   // Board theme (date-themed words indicator)
   boardTheme?: BoardTheme | null;
+
+  // Game mode (classic/blast/word-hunt) — controls mode-specific overlays
+  gameMode?: GameModeSelection;
+
+  // Word-hunt input handler (state is read internally from store).
+  onWordHuntGuess?: (guess: string) => void;
+
+  // Player experience - used to determine inactivity threshold for keyboard trails
+  totalGamesPlayed?: number;
+
+  // Tutorial callback - opens onboarding tutorial
+  onShowTutorial?: () => void;
+
+  // Round events (blizzard/lightning/meteor)
+  roundEvent?: RoundEventState | null;
+
+  // Special word found by any player
+  specialWordEvent?: SpecialWordEvent | null;
+
+  // Golden letters (bonus tiles highlighted on grid)
+  goldenLetters?: Array<{ row: number; col: number }>;
+
+  // Timer urgency state — drives screen border glow
+  timerUrgencyState?: 'normal' | 'low' | 'veryLow' | 'critical';
+  onTimerState?: (state: 'normal' | 'low' | 'veryLow' | 'critical') => void;
+
+  // Desktop shell integration: when true, desktop shell owns the timer UI (suppress 4× CircularTimer mounts)
+  inDesktopShell?: boolean;
 }
+
+/**
+ * Translation function type
+ */
+export type TranslationFn = (path: string, params?: Record<string, string | number>) => string;
 
 /**
  * State for earthquake effect
@@ -93,3 +135,12 @@ export type EarthquakeState = 'idle' | 'warning' | 'shaking' | 'fire-round';
  * Mobile tab options for bottom navigation
  */
 export type MobileTab = 'words' | 'leaderboard';
+
+/**
+ * Position of a tapped cell on the grid
+ */
+export interface TappedCellPosition {
+  row: number;
+  col: number;
+  letter: string;
+}

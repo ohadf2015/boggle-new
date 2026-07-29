@@ -1,13 +1,14 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import gsap from 'gsap';
+import { useEffect, useRef, useState } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Star, Trophy, Crown, Sparkles } from 'lucide-react';
+import { CelebrationMascotWithEntrance } from '@/components/ui/CelebrationMascot';
+import { SharedFxApp } from '@/lib/pixiFx/SharedFxApp';
 
 interface LevelUpCelebrationProps {
   /** New level reached */
@@ -68,19 +69,25 @@ export function LevelUpCelebration({
   const { isLowEnd, prefersReducedMotion, enableGlowEffects, enableComplexAnimations } =
     useDevicePerformance();
   const containerRef = useRef<HTMLDivElement>(null);
-  const timelineRef = useRef<gsap.core.Timeline | null>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const timelineRef = useRef<{ kill: () => void } | null>(null);
   const [phase, setPhase] = useState<'flash' | 'badge' | 'reveal' | 'rewards' | 'done'>('flash');
 
   // Get icon based on level milestone
   const LevelIcon = level >= 50 ? Crown : level >= 25 ? Trophy : level >= 10 ? Star : Sparkles;
 
-  // GSAP Timeline Animation
+  // GSAP Timeline Animation — dynamically imported to save ~30KB from initial bundle
   useEffect(() => {
     if (!show || !containerRef.current || prefersReducedMotion) return;
 
     const container = containerRef.current;
-    const ctx = gsap.context(() => {
-      timelineRef.current = gsap.timeline({
+    let ctx: { revert: () => void } | null = null;
+
+    import('gsap').then(({ default: gsap }) => {
+      if (!container.isConnected) return; // Component unmounted during load
+
+      ctx = gsap.context(() => {
+      const tl = gsap.timeline({
         onComplete: () => {
           setPhase('done');
           if (autoDismissAfter > 0 && onDismiss) {
@@ -88,8 +95,7 @@ export function LevelUpCelebration({
           }
         },
       });
-
-      const tl = timelineRef.current;
+      timelineRef.current = tl;
 
       // Phase 1: Flash
       tl.to('.level-flash', {
@@ -144,19 +150,25 @@ export function LevelUpCelebration({
           },
           '-=0.1'
         )
-        // Phase 5: Rewards (if any)
-        .from(
-          '.level-rewards',
-          {
-            y: 20,
-            opacity: 0,
-            duration: 0.4,
-            ease: 'power2.out',
-            onComplete: () => setPhase('rewards'),
-          },
-          '-=0.1'
-        )
+        // Phase 5: Rewards (if any) - only animate if element exists
+        if (rewards && (rewards.coins || rewards.unlocks?.length)) {
+          tl.from(
+            '.level-rewards',
+            {
+              y: 20,
+              opacity: 0,
+              duration: 0.4,
+              ease: 'power2.out',
+              onComplete: () => setPhase('rewards'),
+            },
+            '-=0.1'
+          );
+        } else {
+          // No rewards, just set phase
+          tl.call(() => setPhase('rewards'));
+        }
         // Pulse the badge
+        tl
         .to('.level-badge', {
           scale: 1.05,
           duration: 0.3,
@@ -165,12 +177,13 @@ export function LevelUpCelebration({
           ease: 'power1.inOut',
         });
     }, container);
+    }); // end dynamic import
 
     return () => {
-      ctx.revert();
+      ctx?.revert();
       timelineRef.current?.kill();
     };
-  }, [show, prefersReducedMotion, enableComplexAnimations, autoDismissAfter, onDismiss]);
+  }, [show, prefersReducedMotion, enableComplexAnimations, autoDismissAfter, onDismiss, rewards]);
 
   // Auto dismiss
   useEffect(() => {
@@ -179,12 +192,24 @@ export function LevelUpCelebration({
     return () => clearTimeout(timer);
   }, [show, autoDismissAfter, onDismiss]);
 
+  // Pixi particle burst bridge (replaces 8 framer-motion divs)
+  useEffect(() => {
+    if (!show) return;
+    if (prefersReducedMotion || isLowEnd || !enableComplexAnimations) return;
+    const el = badgeRef.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    SharedFxApp.spawnBurst('level-up-burst', x, y);
+  }, [show, prefersReducedMotion, isLowEnd, enableComplexAnimations]);
+
   // Reduced motion variant
   if (prefersReducedMotion && show) {
     return (
       <div
         className={cn(
-          'fixed inset-0 z-[300] flex items-center justify-center bg-neo-black/80',
+          'fixed inset-0 z-60 flex items-center justify-center bg-neo-black/80',
           className
         )}
         onClick={onDismiss}
@@ -194,7 +219,7 @@ export function LevelUpCelebration({
             <span className="text-4xl font-black text-neo-black">{level}</span>
           </div>
           <h2 className="text-2xl font-black text-neo-lime">
-            {t('levelUp.title') || 'Level Up!'}
+            {t('levelUp.title')}
           </h2>
           {rewards?.coins && (
             <p className="text-neo-white mt-2">+{rewards.coins} coins</p>
@@ -207,10 +232,10 @@ export function LevelUpCelebration({
   return (
     <AnimatePresence>
       {show && (
-        <motion.div
+        <m.div
           ref={containerRef}
           className={cn(
-            'fixed inset-0 z-[300] flex items-center justify-center',
+            'fixed inset-0 z-60 flex items-center justify-center',
             className
           )}
           initial={{ opacity: 0 }}
@@ -220,7 +245,7 @@ export function LevelUpCelebration({
           onClick={onDismiss}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-neo-black/85 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-neo-black/85 backdrop-blur-xs" />
 
           {/* Flash overlay */}
           <div
@@ -229,7 +254,7 @@ export function LevelUpCelebration({
 
           {/* Radial glow */}
           {enableGlowEffects && !isLowEnd && (
-            <motion.div
+            <m.div
               className="absolute inset-0 pointer-events-none"
               animate={{
                 background: [
@@ -245,10 +270,10 @@ export function LevelUpCelebration({
           {/* Main content */}
           <div className="relative z-10 text-center px-4">
             {/* Badge container */}
-            <div className="level-badge relative inline-block mb-6">
+            <div ref={badgeRef} className="level-badge relative inline-block mb-6">
               {/* Rotating ring */}
               {!isLowEnd && (
-                <motion.div
+                <m.div
                   className="absolute inset-0 rounded-full border-4 border-dashed border-neo-lime/50"
                   style={{ margin: -8 }}
                   animate={{ rotate: 360 }}
@@ -258,7 +283,7 @@ export function LevelUpCelebration({
 
               {/* Main badge */}
               <div
-                className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-4 border-neo-black shadow-hard flex items-center justify-center"
+                className="w-28 h-28 rounded-full bg-linear-to-br from-amber-300 via-yellow-400 to-amber-500 border-4 border-neo-black shadow-hard flex items-center justify-center"
                 style={{
                   boxShadow: enableGlowEffects
                     ? '6px 6px 0 black, 0 0 40px rgba(255,225,53,0.5)'
@@ -276,48 +301,15 @@ export function LevelUpCelebration({
                 </span>
               </div>
 
-              {/* Particle burst */}
-              {enableComplexAnimations && !isLowEnd && phase !== 'flash' && (
-                <>
-                  {[...Array(8)].map((_, i) => {
-                    const angle = (360 / 8) * i;
-                    const radians = (angle * Math.PI) / 180;
-                    return (
-                      <motion.div
-                        key={i}
-                        className="absolute w-3 h-3 bg-neo-lime border-2 border-neo-black"
-                        style={{
-                          left: '50%',
-                          top: '50%',
-                          marginLeft: -6,
-                          marginTop: -6,
-                        }}
-                        initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
-                        animate={{
-                          x: Math.cos(radians) * 80,
-                          y: Math.sin(radians) * 80,
-                          scale: [0, 1.5, 0],
-                          opacity: [1, 1, 0],
-                          rotate: 180,
-                        }}
-                        transition={{
-                          duration: 0.8,
-                          delay: 0.3 + i * 0.05,
-                          ease: 'easeOut',
-                        }}
-                      />
-                    );
-                  })}
-                </>
-              )}
+              {/* Particle burst — dispatched via SharedFxApp.spawnBurst('level-up-burst') */}
             </div>
 
             {/* Title */}
             <h2 className="level-title text-3xl md:text-4xl font-black text-neo-lime mb-2 drop-shadow-[0_4px_0_black]">
-              {t('levelUp.title') || 'Level Up!'}
+              {t('levelUp.title')}
             </h2>
 
-            <p className="level-title text-neo-white/80 text-lg mb-4">
+            <p className="level-title text-neo-white text-lg mb-4">
               {t('levelUp.reached', { level }) || `You reached level ${level}!`}
             </p>
 
@@ -325,8 +317,8 @@ export function LevelUpCelebration({
             {rewards && (rewards.coins || rewards.unlocks?.length) && (
               <div className="level-rewards space-y-2">
                 {rewards.coins && (
-                  <motion.div
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-neo bg-gradient-to-r from-amber-400 to-yellow-400 border-3 border-neo-black shadow-hard"
+                  <m.div
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-neo bg-linear-to-r from-amber-400 to-yellow-400 border-3 border-neo-black shadow-hard"
                     animate={
                       enableGlowEffects
                         ? {
@@ -342,36 +334,49 @@ export function LevelUpCelebration({
                   >
                     <span className="text-xl">💰</span>
                     <span className="font-black text-neo-black">
-                      +{rewards.coins} {t('common.coins') || 'Coins'}
+                      +{rewards.coins} {t('common.coins')}
                     </span>
-                  </motion.div>
+                  </m.div>
                 )}
 
                 {rewards.unlocks?.map((unlock, i) => (
-                  <motion.div
-                    key={i}
+                  <m.div
+                    key={unlock}
                     className="block text-neo-lime font-bold"
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 + i * 0.1 }}
                   >
                     🔓 {unlock}
-                  </motion.div>
+                  </m.div>
                 ))}
               </div>
             )}
 
             {/* Tap to continue */}
-            <motion.p
-              className="text-neo-white/50 text-sm mt-6"
+            <m.p
+              className="text-neo-white text-sm mt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 2 }}
             >
-              {t('common.tapToContinue') || 'Tap to continue'}
-            </motion.p>
+              {t('common.tapToContinue')}
+            </m.p>
+
+            {/* Celebration Mascot - appears after reveal */}
+            {phase !== 'flash' && phase !== 'badge' && (
+              <div className="absolute bottom-8 right-8 sm:bottom-12 sm:right-12 pointer-events-none">
+                <CelebrationMascotWithEntrance
+                  variant="celebration"
+                  size="md"
+                  delay={0.8}
+                  className="drop-shadow-lg"
+                  clipBorder="none"
+                />
+              </div>
+            )}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

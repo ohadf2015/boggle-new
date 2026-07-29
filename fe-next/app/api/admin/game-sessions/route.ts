@@ -6,15 +6,19 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { captureApiError } from '@/utils/sentry';
+import type { GameSessionFilters } from '@/backend/modules/gameSessionLogger';
 
-// Import backend services
-let getGameSessions: any;
-let getGameSessionStats: any;
-let getGuestSessionAnalytics: any;
+type GameSessionLoggerModule = typeof import('@/backend/modules/gameSessionLogger');
+type GuestTrackerModule = typeof import('@/backend/modules/guestTracker');
+
+let getGameSessions: GameSessionLoggerModule['getGameSessions'] | undefined;
+let getGameSessionStats: GameSessionLoggerModule['getGameSessionStats'] | undefined;
+let getGuestSessionAnalytics: GuestTrackerModule['getGuestSessionAnalytics'] | undefined;
 
 async function getServices() {
-  if (!getGameSessions || !getGameSessionStats) {
+  if (!getGameSessions || !getGameSessionStats || !getGuestSessionAnalytics) {
     const gameModule = await import('@/backend/modules/gameSessionLogger');
     const guestModule = await import('@/backend/modules/guestTracker');
     getGameSessions = gameModule.getGameSessions;
@@ -25,70 +29,14 @@ async function getServices() {
 }
 
 /**
- * Get Supabase admin client
- */
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return null;
-  }
-
-  return createClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-}
-
-/**
- * Check if request has valid admin authorization
- */
-async function isAdminRequest(request: NextRequest): Promise<{ isAdmin: boolean; userId?: string }> {
-  const supabase = getSupabaseAdmin();
-  if (!supabase) {
-    return { isAdmin: false };
-  }
-
-  // Get auth token from Authorization header
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { isAdmin: false };
-  }
-
-  const token = authHeader.substring(7);
-
-  // Verify token
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-  if (error || !user) {
-    return { isAdmin: false };
-  }
-
-  // Check if user is admin
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single();
-
-  if (profileError || !profile?.is_admin) {
-    return { isAdmin: false };
-  }
-
-  return { isAdmin: true, userId: user.id };
-}
-
-/**
  * GET - Fetch game sessions with filters
  */
 export async function GET(request: NextRequest) {
   try {
-    // Check admin authorization
-    const { isAdmin, userId } = await isAdminRequest(request);
-    if (!isAdmin) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    // Verify admin authentication
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
     // Parse query parameters
@@ -109,7 +57,7 @@ export async function GET(request: NextRequest) {
     // Handle different actions
     if (action === 'stats') {
       // Get game session statistics
-      const filters: any = {};
+      const filters: GameSessionFilters = {};
       if (mode) filters.mode = mode;
       if (language) filters.language = language;
       if (startDate) filters.startDate = new Date(startDate);
@@ -137,7 +85,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Default: Fetch sessions
-    const filters: any = {
+    const filters: GameSessionFilters = {
       limit,
       offset,
     };
@@ -162,9 +110,15 @@ export async function GET(request: NextRequest) {
       limit,
     });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Internal server error';
     console.error('[admin/game-sessions] Error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/game-sessions',
+      { method: 'GET', statusCode: 500 }
+    );
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

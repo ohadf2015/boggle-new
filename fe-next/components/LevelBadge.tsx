@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '../lib/utils';
+import { useLanguage } from '../contexts/LanguageContext';
 
 /**
  * Level tier type
@@ -132,15 +133,17 @@ const LevelBadge = memo<LevelBadgeProps>(({
   animate = true,
   className,
 }) => {
+  const { t } = useLanguage();
   const tier = useMemo(() => getTierForLevel(level), [level]);
   const sizeConfig = SIZES[size] || SIZES.md;
+  const levelLabel = t('streakBar.level', { level });
 
   const badge = (
     <div
       className={cn(
         'relative flex items-center justify-center rounded-full',
         'font-black text-white',
-        'bg-gradient-to-br',
+        'bg-linear-to-br',
         tier.gradient,
         sizeConfig.container,
         sizeConfig.border,
@@ -150,7 +153,7 @@ const LevelBadge = memo<LevelBadgeProps>(({
         'hover:scale-110 hover:shadow-hard',
         className
       )}
-      title={`Level ${level}`}
+      title={levelLabel}
     >
       {/* Level number */}
       <span className={cn(sizeConfig.text, 'drop-shadow-[0_1px_1px_rgba(0,0,0,0.5)]')}>
@@ -161,8 +164,8 @@ const LevelBadge = memo<LevelBadgeProps>(({
       {level >= 25 && (
         <div
           className={cn(
-            'absolute inset-0 rounded-full blur-sm opacity-50 -z-10',
-            'bg-gradient-to-br',
+            'absolute inset-0 rounded-full blur-xs opacity-50 -z-10',
+            'bg-linear-to-br',
             tier.gradient
           )}
         />
@@ -172,7 +175,7 @@ const LevelBadge = memo<LevelBadgeProps>(({
 
   if (animate) {
     return (
-      <motion.div
+      <m.div
         initial={{ scale: 0, rotate: -180 }}
         animate={{ scale: 1, rotate: 0 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -181,10 +184,10 @@ const LevelBadge = memo<LevelBadgeProps>(({
         {badge}
         {showLabel && (
           <span className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">
-            Lvl {level}
+            {levelLabel}
           </span>
         )}
-      </motion.div>
+      </m.div>
     );
   }
 
@@ -193,7 +196,7 @@ const LevelBadge = memo<LevelBadgeProps>(({
       {badge}
       {showLabel && (
         <span className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">
-          Lvl {level}
+          {levelLabel}
         </span>
       )}
     </div>

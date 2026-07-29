@@ -24,7 +24,7 @@ LexiClash is a multiplayer word game built with:
 - **Database:** Supabase (PostgreSQL + Auth)
 - **Styling:** Tailwind CSS, Radix UI components
 - **State:** XState for game state machines
-- **Testing:** Jest (unit), Playwright (e2e)
+- **Testing:** Jest (unit), Playwriter (e2e)
 
 ### Project Structure
 ```
@@ -170,24 +170,10 @@ Create and present plan before coding:
 2. Implement minimal code to pass tests
 3. Refactor if needed
 
-### 4.6 Phase: Verify
-Run verification checks:
-```bash
-npx tsc --noEmit          # TypeScript
-npm run lint              # ESLint
-npm run build             # Build check
-npm run test              # Unit tests
-```
-
-For multiplayer changes, also run:
-```bash
-cd fe-next && npx playwright test e2e/multiplayer-game-start.spec.ts --project=chromium --timeout=120000
-```
-
-### 4.7 Mark as Completed
+### 4.6 Mark as Completed
 Update the todo status to `completed`
 
-### 4.8 Document Test Instructions
+### 4.7 Document Test Instructions
 For each feature, document:
 ```
 ## Testing: [Feature Title]
@@ -245,7 +231,14 @@ Use `mcp__notion__notion-update-page` with:
 
 ---
 
-## Phase 6: Report to User
+## Phase 6: Commit & Push (Optional)
+
+If the user requests to commit the changes, use `/commit-push` to:
+- Run all verification checks (translations, linting, type checking, tests, build)
+- Fix any issues found
+- Commit and push to remote
+
+## Phase 7: Report to User
 
 Output a summary in chat:
 
@@ -333,7 +326,7 @@ Recall related features and patterns:
 mcp__memory__memory_recall(query="feature [feature-area] implementation pattern")
 ```
 
-### After Each Feature (Phase 4.8)
+### After Each Feature (Phase 4.7)
 Store feature implementation for future reference:
 ```
 mcp__memory__memory_store(

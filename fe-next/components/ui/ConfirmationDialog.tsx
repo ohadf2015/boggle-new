@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useRef, useCallback } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -12,6 +13,7 @@ import {
 } from './alert-dialog';
 import { cn } from '../../lib/utils';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { trackModalInteraction } from '../../utils/growthTracking';
 
 export type ConfirmationDialogVariant = 'danger' | 'warning' | 'default';
 
@@ -21,9 +23,9 @@ interface ConfirmationDialogProps {
   /** Callback when the open state changes */
   onOpenChange: (open: boolean) => void;
   /** Dialog title */
-  title: string;
+  title: string | undefined;
   /** Dialog description/message */
-  description: string;
+  description: string | undefined;
   /** Text for the confirm button */
   confirmText?: string;
   /** Text for the cancel button */
@@ -34,6 +36,11 @@ interface ConfirmationDialogProps {
   variant?: ConfirmationDialogVariant;
   /** Additional className for the content wrapper */
   className?: string;
+  /** Opt-in analytics id. When set, fires `modal_interaction` growth events
+   *  (`shown` / `dismissed` / `confirmed`) for funnel tracking. */
+  analyticsId?: string;
+  /** Extra context merged into all analytics payloads for this dialog. */
+  analyticsExtras?: Record<string, unknown>;
 }
 
 const variantStyles: Record<ConfirmationDialogVariant, {
@@ -42,15 +49,15 @@ const variantStyles: Record<ConfirmationDialogVariant, {
 }> = {
   danger: {
     content: 'bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm',
-    confirm: 'flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-cream hover:brightness-110',
+    confirm: 'flex-1 bg-neo-red border-2 border-neo-black rounded-neo font-bold text-neo-white hover:brightness-110',
   },
   warning: {
     content: 'bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm',
     confirm: 'flex-1 bg-neo-lime border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-110',
   },
   default: {
-    content: 'bg-white text-neo-black dark:bg-slate-800 dark:text-white border-red-500/30',
-    confirm: 'bg-red-500 hover:bg-red-600',
+    content: 'bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo shadow-hard max-w-sm',
+    confirm: 'flex-1 bg-neo-lime border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-110',
   },
 };
 
@@ -87,15 +94,46 @@ export function ConfirmationDialog({
   onOpenChange,
   title,
   description,
-  confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  confirmText,
+  cancelText,
   onConfirm,
   variant = 'danger',
   className,
+  analyticsId,
+  analyticsExtras,
 }: ConfirmationDialogProps) {
-  const { dir } = useLanguage();
+  const { dir, t } = useLanguage();
   const styles = variantStyles[variant];
   const isRtl = dir === 'rtl';
+
+  const prevOpenRef = useRef(false);
+  const confirmedRef = useRef(false);
+
+  useEffect(() => {
+    if (!analyticsId) {
+      prevOpenRef.current = open;
+      return;
+    }
+    const prev = prevOpenRef.current;
+    if (!prev && open) {
+      confirmedRef.current = false;
+      trackModalInteraction(analyticsId, 'shown', analyticsExtras);
+    } else if (prev && !open) {
+      if (!confirmedRef.current) {
+        trackModalInteraction(analyticsId, 'dismissed', analyticsExtras);
+      }
+      confirmedRef.current = false;
+    }
+    prevOpenRef.current = open;
+  }, [open, analyticsId, analyticsExtras]);
+
+  const handleConfirm = useCallback(() => {
+    if (analyticsId) {
+      confirmedRef.current = true;
+      trackModalInteraction(analyticsId, 'confirmed', analyticsExtras);
+    }
+    onConfirm();
+  }, [analyticsId, analyticsExtras, onConfirm]);
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -109,8 +147,8 @@ export function ConfirmationDialog({
             {title}
           </AlertDialogTitle>
           <AlertDialogDescription className={cn(
-            variant === 'danger' && 'text-neo-black/70 font-medium',
-            variant === 'warning' && 'text-neo-black/70 font-medium',
+            variant === 'danger' && 'text-neo-black font-medium',
+            variant === 'warning' && 'text-neo-black font-medium',
             'text-center'
           )}>
             {description}
@@ -124,13 +162,13 @@ export function ConfirmationDialog({
             (variant === 'danger' || variant === 'warning') &&
             'flex-1 bg-neo-cream border-2 border-neo-black rounded-neo font-bold text-neo-black hover:brightness-95'
           )}>
-            {cancelText}
+            {cancelText || t('common.cancel')}
           </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={handleConfirm}
             className={styles.confirm}
           >
-            {confirmText}
+            {confirmText || t('common.confirm')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

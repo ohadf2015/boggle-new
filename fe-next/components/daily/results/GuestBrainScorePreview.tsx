@@ -8,9 +8,10 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Brain, Lock, TrendingUp, Zap, Target, Lightbulb, BookOpen } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Loader } from '@/components/ui/Loader';
 import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
 
 export interface GuestBrainScorePreviewProps {
@@ -67,7 +68,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={`relative bg-neo-purple dark:from-purple-900/20 dark:to-indigo-900/20 rounded-neo border-2 border-purple-200 dark:border-purple-700 overflow-hidden ${className}`}
@@ -75,7 +76,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
       {/* Blurred preview content */}
       <div className="relative p-5">
         {/* Blur overlay */}
-        <div className="absolute inset-0 backdrop-blur-sm bg-white/30 dark:bg-black/30 z-10 flex flex-col items-center justify-center p-4">
+        <div className="absolute inset-0 bg-neo-cream/30 dark:bg-neo-navy/80 z-10 flex flex-col items-center justify-center p-4">
           <div className="bg-white dark:bg-neo-navy rounded-full p-3 shadow-lg mb-3">
             <Lock className="w-6 h-6 text-purple-600 dark:text-purple-400" />
           </div>
@@ -95,7 +96,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
               className="w-full bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 rounded-neo shadow-hard-sm"
             >
               {isLoading === 'google' ? (
-                <span className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full" />
+                <Loader size="sm" />
               ) : (
                 <GoogleIcon className="w-4 h-4 me-2" />
               )}
@@ -108,7 +109,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
               className="w-full bg-brand-discord hover:bg-brand-discord-hover text-white border-2 border-brand-discord-hover rounded-neo shadow-hard-sm"
             >
               {isLoading === 'discord' ? (
-                <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+                <Loader size="sm" />
               ) : (
                 <DiscordIcon className="w-4 h-4 me-2" />
               )}
@@ -121,7 +122,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
         <div className="pointer-events-none select-none">
           {/* Header */}
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-purple-100 dark:bg-purple-800/30 rounded-lg">
+            <div className="p-2 bg-neo-purple/20 dark:bg-neo-purple/30 rounded-lg">
               <Brain className="w-6 h-6 text-purple-600 dark:text-purple-400" />
             </div>
             <div>
@@ -147,9 +148,9 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
 
           {/* Fake progress bars */}
           <div className="mt-4 space-y-2">
-            {[65, 78, 52, 89, 71].map((value, i) => (
-              <div key={i} className="flex items-center gap-2">
-                <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            {[65, 78, 52, 89, 71].map((value) => (
+              <div key={`progress-bar-${value}`} className="flex items-center gap-2">
+                <div className="flex-1 bg-gray-200 dark:bg-neo-navy-elevated rounded-full h-2">
                   <div
                     className="bg-purple-500 h-2 rounded-full"
                     style={{ width: `${value}%` }}
@@ -161,7 +162,7 @@ export const GuestBrainScorePreview: React.FC<GuestBrainScorePreviewProps> = ({
           </div>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

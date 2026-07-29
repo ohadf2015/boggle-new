@@ -63,7 +63,7 @@ export interface GameAchievement {
 export interface PlayerResult {
   username: string;
   score: number;
-  avatar?: Avatar & { profilePictureUrl?: string };
+  avatar?: Avatar;
   isHost?: boolean;
   allWords?: WordDetail[];
   achievements?: GameAchievement[];
@@ -86,6 +86,13 @@ export interface ResultsPageProps {
   gameCode?: string;
   /** Handler to return to the room/lobby (optional for single player) */
   onReturnToRoom?: () => void;
+  /**
+   * Handler to fully exit the game back to the multiplayer lobby, resetting MP
+   * state IN PLACE (no page reload). Native-safe: a hard nav blanks the
+   * Capacitor static-export WebView. When absent (e.g. single player) the
+   * exit falls back to a client-side router navigation.
+   */
+  onExitToLobby?: () => void;
   /** Current user's username */
   username: string;
   /** Socket.IO connection */
@@ -104,6 +111,22 @@ export interface ResultsPageProps {
   gridSize?: number;
   /** Game duration in seconds for cognitive scoring */
   gameDuration?: number;
+  /** Series standings for accumulated scores across multiple games */
+  seriesStandings?: Array<{ username: string; avatar?: { emoji?: string; color?: string }; totalScore: number; roundScores: number[]; currentRank: number; rankChange: number; roundWins: number }>;
+  /** Current series round number */
+  seriesRoundNumber?: number;
+  /** Total games in the series */
+  seriesTotalGames?: number;
+  /** Username of the current series leader */
+  seriesLeader?: string | null;
+  /** Callback to reset the series tracker (start new series) */
+  onResetSeries?: () => void;
+  /** Word Hunt summary from server (target word, lives, eliminated) */
+  wordHuntSummary?: { targetWord: string; playerLives: Record<string, number>; eliminatedPlayers: string[]; targetFoundBy: string | null; survivalTime?: number; discoveryWords?: number };
+  /** Blast mode summary from server */
+  blastSummary?: { playerMoves?: Record<string, number>; playerStats?: Record<string, import('@/shared/types/game').BlastPlayerStats> };
+  /** Wheel Rush mode summary from server */
+  wheelRushSummary?: { playerStats?: Record<string, import('@/shared/types/game').WheelRushPlayerStats> };
 }
 
 export interface VoteInfo {

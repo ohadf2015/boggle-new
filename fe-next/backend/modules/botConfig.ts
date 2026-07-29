@@ -5,8 +5,6 @@
  * Extracted from botManager.js for better separation of concerns
  */
 
-import type { Language } from '@/shared/types/game';
-
 export type BotDifficulty = 'easy' | 'medium' | 'hard';
 export type BotPersonality = 'aggressive' | 'methodical' | 'streaky' | 'steady';
 
@@ -60,22 +58,22 @@ export const BOT_CONFIG: BotConfigType = {
   // Medium and hard bots are intentionally slower to feel more realistic
   TIMING: {
     easy: {
-      minDelay: 4000,    // Minimum time between words
-      maxDelay: 12000,   // Maximum time between words
-      startDelay: 3000,  // Initial delay before first word
-      typingSpeed: 300,  // Base ms per character "typing"
+      minDelay: 2000,    // Minimum time between words
+      maxDelay: 5500,    // Maximum time between words
+      startDelay: 2000,  // Initial delay before first word
+      typingSpeed: 150,  // Base ms per character "typing"
     },
     medium: {
-      minDelay: 3500,    // Increased from 2500 - more realistic thinking time
-      maxDelay: 10000,   // Increased from 8000 - occasional longer pauses
-      startDelay: 2500,  // Increased from 2000 - takes time to scan the board
-      typingSpeed: 250,  // Increased from 200 - more realistic typing
+      minDelay: 1500,    // Thinks quickly
+      maxDelay: 4000,    // Occasional pauses
+      startDelay: 1500,  // Scans board then starts
+      typingSpeed: 120,  // Faster typing
     },
     hard: {
-      minDelay: 3000,    // Increased from 2500 - still thinks before acting
-      maxDelay: 9000,    // Increased from 7000 - occasional pondering
-      startDelay: 2000,  // Increased from 1500 - scans board first
-      typingSpeed: 200,  // Increased from 150 - more human-like typing
+      minDelay: 800,     // Fast word recognition
+      maxDelay: 2500,    // Brief thinking pauses
+      startDelay: 800,   // Quick scan
+      typingSpeed: 70,   // Expert typing speed
     }
   },
 
@@ -83,25 +81,25 @@ export const BOT_CONFIG: BotConfigType = {
   // Medium and hard bots find fewer words per minute for more realistic gameplay
   WORDS: {
     easy: {
-      maxWordLength: 5,       // Only find shorter words
-      wordsPerMinute: 3,      // Average words found per minute
+      maxWordLength: 6,       // Find short-medium words
+      wordsPerMinute: 7,      // Decent pace
       focusOnShort: true,     // Prefer 3-4 letter words
-      missChance: 0.15,       // 15% chance to "miss" a word (realistic errors)
-      wrongWordChance: 0.12,  // 12% chance to submit a wrong word (like humans do)
+      missChance: 0.10,       // 10% chance to "miss" a word
+      wrongWordChance: 0.08,  // 8% chance to submit a wrong word
     },
     medium: {
-      maxWordLength: 7,
-      wordsPerMinute: 4,      // Reduced from 5 - more realistic pace
+      maxWordLength: 8,
+      wordsPerMinute: 11,     // Competitive pace
       focusOnShort: false,
-      missChance: 0.10,       // Increased from 0.08 - more realistic mistakes
-      wrongWordChance: 0.08,  // 8% wrong word chance
+      missChance: 0.05,       // Fewer mistakes
+      wrongWordChance: 0.04,  // 4% wrong word chance
     },
     hard: {
-      maxWordLength: 8,
-      wordsPerMinute: 4,      // Reduced from 5 - even experts take time
+      maxWordLength: 12,      // Experts find long words
+      wordsPerMinute: 16,     // Fast and aggressive
       focusOnShort: false,
-      missChance: 0.10,       // Increased from 0.08 - more realistic
-      wrongWordChance: 0.05,  // 5% wrong word chance (experts make fewer mistakes)
+      missChance: 0.03,       // Rarely misses
+      wrongWordChance: 0.02,  // Very few mistakes
     }
   },
 
@@ -145,7 +143,7 @@ export const BOT_CONFIG: BotConfigType = {
         { name: 'Mind Master', emoji: '🎭', color: '#a855f7' },
         { name: 'Brain Blitz', emoji: '💥', color: '#38bdf8' },
       ],
-      botSuffix: '🤖',
+      botSuffix: 'Bot',
     },
     he: {
       easy: [
@@ -181,10 +179,10 @@ export const BOT_CONFIG: BotConfigType = {
         { name: 'נינג׳ה', emoji: '🥷', color: '#1f2937' },
         { name: 'סמוראי', emoji: '⚔️', color: '#dc2626' },
         { name: 'אליפון', emoji: '🏆', color: '#facc15' },
-        { name: 'מכונה', emoji: '🤖', color: '#60a5fa' },
+        { name: 'מכונה', emoji: '⚙️', color: '#60a5fa' },
         { name: 'ויקינג', emoji: '🛡️', color: '#78716c' },
       ],
-      botSuffix: '🤖',
+      botSuffix: 'Bot',
     },
     sv: {
       easy: [
@@ -223,7 +221,7 @@ export const BOT_CONFIG: BotConfigType = {
         { name: 'Falkenansen', emoji: '🦅', color: '#64748b' },
         { name: 'Trollkarlansen', emoji: '🧙', color: '#c4b5fd' },
       ],
-      botSuffix: '🤖',
+      botSuffix: 'Bot',
     },
     ja: {
       easy: [
@@ -262,7 +260,46 @@ export const BOT_CONFIG: BotConfigType = {
         { name: 'アマテラス', emoji: '☀️', color: '#fcd34d' },
         { name: 'ツクヨミ', emoji: '🌙', color: '#a78bfa' },
       ],
-      botSuffix: '🤖',
+      botSuffix: 'Bot',
+    },
+    es: {
+      easy: [
+        { name: 'Novato', emoji: '🐣', color: '#fef08a' },
+        { name: 'Brote', emoji: '🌱', color: '#bbf7d0' },
+        { name: 'Aprendiz', emoji: '📚', color: '#93c5fd' },
+        { name: 'Principiante', emoji: '🎒', color: '#fdba74' },
+        { name: 'Gatito Curioso', emoji: '🐱', color: '#f9a8d4' },
+        { name: 'Cachorro', emoji: '🐕', color: '#fcd34d' },
+        { name: 'Pequeñín', emoji: '🧒', color: '#c4b5fd' },
+        { name: 'Pasito', emoji: '👶', color: '#fda4af' },
+        { name: 'Chispita', emoji: '✨', color: '#fef08a' },
+        { name: 'Semilla', emoji: '🌿', color: '#4ade80' },
+      ],
+      medium: [
+        { name: 'Forjador', emoji: '⚒️', color: '#fca5a1' },
+        { name: 'Cazador', emoji: '🏹', color: '#86efac' },
+        { name: 'Acertijo', emoji: '🧩', color: '#67e8f9' },
+        { name: 'Explorador', emoji: '👁️', color: '#a78bfa' },
+        { name: 'Guerrero', emoji: '⚔️', color: '#f87171' },
+        { name: 'Estratega', emoji: '🎯', color: '#38bdf8' },
+        { name: 'Buitre Verbal', emoji: '🦅', color: '#78716c' },
+        { name: 'Lobo Alfa', emoji: '🐺', color: '#94a3b8' },
+        { name: 'Lazo Letras', emoji: '🤠', color: '#fbbf24' },
+        { name: 'Compi Boggle', emoji: '🎮', color: '#a78bfa' },
+      ],
+      hard: [
+        { name: 'Mago Verbal', emoji: '🧙', color: '#c4b5fd' },
+        { name: 'Rey del Léxico', emoji: '👑', color: '#fcd34d' },
+        { name: 'Demonio Léxico', emoji: '😈', color: '#ef4444' },
+        { name: 'Sabio Ortógrafo', emoji: '🦉', color: '#8b5cf6' },
+        { name: 'Leyenda Letras', emoji: '🏆', color: '#facc15' },
+        { name: 'Genio Verbal', emoji: '⚡', color: '#fbbf24' },
+        { name: 'Jefe Boggle', emoji: '💼', color: '#60a5fa' },
+        { name: 'Genio Cuadrícula', emoji: '🧠', color: '#22c55e' },
+        { name: 'Maestro Mental', emoji: '🎭', color: '#a855f7' },
+        { name: 'Tormenta Mental', emoji: '💥', color: '#38bdf8' },
+      ],
+      botSuffix: 'Bot',
     },
   },
 
@@ -309,9 +346,9 @@ export const BOT_CONFIG: BotConfigType = {
       { name: 'בננה קוסמית', emoji: '🍌', color: '#fde047' },
       { name: 'וופל פלאפי', emoji: '🧇', color: '#fbbf24' },
       { name: 'טאקו קריספי', emoji: '🌮', color: '#ef4444' },
-      { name: 'מוצ׳י סקוושי', emoji: '🍡', color: '#f9a8d4' },
+      { name: 'מוצי סקוושי', emoji: '🍡', color: '#f9a8d4' },
       { name: 'בייגלה מפותל', emoji: '🥨', color: '#a78bfa' },
-      { name: 'עוגייה צ׳אנקית', emoji: '🍪', color: '#a16207' },
+      { name: 'עוגייה צאנקית', emoji: '🍪', color: '#a16207' },
       { name: 'דונאט דביק', emoji: '🍩', color: '#f9a8d4' },
       { name: 'אבוקדו זסטי', emoji: '🥑', color: '#86efac' },
       { name: 'נודל לעיס', emoji: '🍜', color: '#fb923c' },
@@ -393,6 +430,37 @@ export const BOT_CONFIG: BotConfigType = {
       { name: 'シュワシュワキツネ', emoji: '🦊', color: '#fb923c' },
       { name: 'ハッピーカバ', emoji: '🦛', color: '#64748b' },
     ],
+    es: [
+      // Adjective + Food (Spanish)
+      { name: 'Pepino Astuto', emoji: '🥒', color: '#22c55e' },
+      { name: 'Patata Disco', emoji: '🥔', color: '#a78bfa' },
+      { name: 'Banana Cósmica', emoji: '🍌', color: '#fde047' },
+      { name: 'Waffle Esponjoso', emoji: '🧇', color: '#fbbf24' },
+      { name: 'Taco Crujiente', emoji: '🌮', color: '#ef4444' },
+      { name: 'Mochi Blandito', emoji: '🍡', color: '#f9a8d4' },
+      { name: 'Pretzel Retorcido', emoji: '🥨', color: '#a78bfa' },
+      { name: 'Galleta Gordita', emoji: '🍪', color: '#a16207' },
+      { name: 'Dona Pegajosa', emoji: '🍩', color: '#f9a8d4' },
+      { name: 'Aguacate Picante', emoji: '🥑', color: '#86efac' },
+      { name: 'Fideo Chicle', emoji: '🍜', color: '#fb923c' },
+      { name: 'Falafel Crujiente', emoji: '🧆', color: '#22c55e' },
+      // Adjective + Animal (Spanish)
+      { name: 'Salmón Bobo', emoji: '🐟', color: '#fb923c' },
+      { name: 'Ganso Risueño', emoji: '🦆', color: '#fef08a' },
+      { name: 'Morsa Loca', emoji: '🦭', color: '#64748b' },
+      { name: 'Pingüino Animado', emoji: '🐧', color: '#1f2937' },
+      { name: 'Llama Chiflada', emoji: '🦙', color: '#fcd34d' },
+      { name: 'Dragón Mareado', emoji: '🐉', color: '#22c55e' },
+      { name: 'Flamenco Funky', emoji: '🦩', color: '#f472b6' },
+      { name: 'Oso Saltarín', emoji: '🐻', color: '#a16207' },
+      { name: 'Cebra Veloz', emoji: '🦓', color: '#1f2937' },
+      { name: 'Perezoso Sassy', emoji: '🦥', color: '#a16207' },
+      { name: 'Koala Raro', emoji: '🐨', color: '#94a3b8' },
+      { name: 'Medusa Alegre', emoji: '🪼', color: '#a78bfa' },
+      { name: 'Mapache Ruidoso', emoji: '🦝', color: '#64748b' },
+      { name: 'Zorro Chispeante', emoji: '🦊', color: '#fb923c' },
+      { name: 'Hippo Feliz', emoji: '🦛', color: '#64748b' },
+    ],
   },
 
   // Generic avatars for OAuth users whose names don't come from the fun name pool
@@ -457,8 +525,15 @@ export const CACHE_CONFIG = {
   BLACKLIST_TTL: 10 * 60 * 1000,           // 10 minutes
 } as const;
 
-// CommonJS exports for backward compatibility
-module.exports = {
-  BOT_CONFIG,
-  CACHE_CONFIG,
-};
+// CommonJS exports for backward compatibility (server-only).
+// Bare `module.exports = ...` leaks into client chunks under Turbopack and throws
+// `ReferenceError: module is not defined` in the browser (Sentry JAVASCRIPT-NEXTJS-13J/13H,
+// chain: OnboardingFlow → QuickProfileSetup → onboardingNameSuggestions → BOT_CONFIG).
+// The typeof guard is a no-op in the browser (branch skipped, `module` never read)
+// while preserving the CJS-replace shape that backend `require('./botConfig')` consumers expect.
+if (typeof module !== 'undefined' && typeof module === 'object') {
+  module.exports = {
+    BOT_CONFIG,
+    CACHE_CONFIG,
+  };
+}

@@ -8,8 +8,8 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // Mock framer-motion before imports
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     button: ({ children, className, onClick, ...props }: React.HTMLAttributes<HTMLButtonElement> & { onClick?: () => void }) => (
       <button className={className} onClick={onClick} {...props}>{children}</button>
     ),
@@ -21,25 +21,27 @@ jest.mock('framer-motion', () => ({
 }));
 
 // Mock dependencies
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'en',
   }),
 }));
 
-jest.mock('@/contexts/SoundEffectsContext', () => ({
+vi.mock('@/contexts/SoundEffectsContext', () => ({
   useSoundEffects: () => ({
-    playErrorSound: jest.fn(),
-    playSuccessSound: jest.fn(),
+    playErrorSound: vi.fn(),
+    playSuccessSound: vi.fn(),
+    playDrillStartSound: vi.fn(),
+    playSound: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useDrillKeyboardSupport', () => ({
+vi.mock('@/hooks/useDrillKeyboardSupport', () => ({
   useDrillKeyboardSupport: () => ({
     isTypingMode: false,
     typedWord: '',
@@ -47,23 +49,23 @@ jest.mock('@/hooks/useDrillKeyboardSupport', () => ({
     isDesktop: false,
     showEnterHint: false,
     showQuickTip: false,
-    dismissQuickTip: jest.fn(),
+    dismissQuickTip: vi.fn(),
     isValidOnGrid: false,
   }),
 }));
 
-jest.mock('@/components/GridComponent', () => ({
+vi.mock('@/components/GridComponent', () => ({
   __esModule: true,
   default: () => <div data-testid="grid-component">Grid</div>,
 }));
 
-jest.mock('@/components/keyboard', () => ({
+vi.mock('@/components/keyboard', () => ({
   KeyboardDesktopBadge: () => null,
   EnterKeyHint: () => null,
   KeyboardQuickTip: () => null,
 }));
 
-jest.mock('@/utils/utils', () => ({
+vi.mock('@/utils/utils', () => ({
   isWordOnBoard: () => true,
 }));
 
@@ -94,7 +96,7 @@ const mockAvailableWords = [
 describe('PatternSwitcher', () => {
   describe('word length limits', () => {
     it('should cap available word lengths at 5 letters', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       // Filter logic test - simulating what the component does
       const MAX_WORD_LENGTH = 5;
@@ -111,7 +113,7 @@ describe('PatternSwitcher', () => {
     });
 
     it('should render without crashing', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <PatternSwitcher
@@ -160,7 +162,7 @@ describe('RareGems', () => {
     });
 
     it('should render without crashing', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <RareGems
@@ -180,7 +182,7 @@ describe('RareGems', () => {
 describe('MemoryHunt', () => {
   describe('study modal and word replacement', () => {
     it('should render without crashing', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <MemoryHunt
@@ -196,7 +198,7 @@ describe('MemoryHunt', () => {
     });
 
     it('should show start button in ready phase', () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <MemoryHunt
@@ -208,11 +210,11 @@ describe('MemoryHunt', () => {
         />
       );
 
-      expect(screen.getByText('brain.drills.start')).toBeInTheDocument();
+      expect(screen.getByText('brain.briefing.letsTrain')).toBeInTheDocument();
     });
 
     it('should display study modal after starting game', async () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <MemoryHunt
@@ -225,7 +227,7 @@ describe('MemoryHunt', () => {
       );
 
       // Click start button
-      const startButton = screen.getByText('brain.drills.start');
+      const startButton = screen.getByText('brain.briefing.letsTrain');
       fireEvent.click(startButton);
 
       // Study modal should appear with study phase text
@@ -235,7 +237,7 @@ describe('MemoryHunt', () => {
     });
 
     it('should show "I\'m Ready" button in study modal', async () => {
-      const onComplete = jest.fn();
+      const onComplete = vi.fn();
 
       render(
         <MemoryHunt
@@ -248,7 +250,7 @@ describe('MemoryHunt', () => {
       );
 
       // Click start button
-      const startButton = screen.getByText('brain.drills.start');
+      const startButton = screen.getByText('brain.briefing.letsTrain');
       fireEvent.click(startButton);
 
       // Ready button should be in the modal

@@ -1,10 +1,21 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useSocket } from '@/utils/SocketContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
+import { connectionBannerCopy } from '@/utils/connectionBannerCopy';
+
+/**
+ * Graduated reconnection UX delay.
+ * Brief disconnections (< 1.5s) are silent — most mobile cellular handoffs
+ * resolve within 1-3 seconds. Lower than the prior 5s threshold so users on
+ * a real handoff see feedback well before the device feels frozen, while
+ * sub-second blips (typical socket retransmits) still don't flash a banner.
+ * See audit UX-CRIT-4 (multiplayer-comprehensive-audit-2026-04-27).
+ */
+const BANNER_DELAY_MS = 1500;
 
 /**
  * Connection status type for better semantics
@@ -66,7 +77,8 @@ function useStatusConfig(t: (key: string) => string) {
 
 /**
  * Minimal connection dot (just the indicator, no tooltip)
- * Only shows when there's a connection issue (not when connected)
+ * Shows prominently during initial connection, then hides when connected.
+ * Shows again if connection issues occur.
  */
 export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) => {
   const { isConnected, isReconnecting, connectionError } = useSocket();
@@ -82,19 +94,66 @@ export const ConnectionDot: React.FC<{ className?: string }> = ({ className }) =
 
   const status = getStatus();
 
-  // Only show indicator when there's a problem - don't show green dot for normal operation
-  if (status === 'connected') {
+  // Problem-only indicator. Surfacing the healthy ('connected') and initial
+  // ('connecting') states is redundant noise in the lobby — the user can see
+  // the rooms loaded. Only genuine trouble (reconnecting / disconnected) shows.
+  if (status === 'connected' || status === 'connecting') {
     return null;
   }
 
   const config = statusConfig[status];
+  const showExpandedState = status === 'reconnecting';
 
   return (
-    <div
-      className={cn('connection-indicator', config.className, className)}
-      role="status"
-      aria-label={`${config.label}`}
-    />
+    <AnimatePresence>
+      <m.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className={cn(
+          'fixed top-2 left-1/2 -translate-x-1/2 z-9998',
+          'flex items-center gap-2',
+          'px-3 py-1.5 rounded-full',
+          'border-2 border-neo-black shadow-hard-sm',
+          status === 'reconnecting' && 'bg-neo-cream',
+          status === 'disconnected' && 'bg-neo-red',
+          className
+        )}
+        role="status"
+        aria-live="polite"
+        aria-label={config.label}
+      >
+        {/* Pulsing dot */}
+        <m.div
+          animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
+          transition={{ type: 'tween', duration: 1, repeat: Infinity, ease: 'easeInOut' }}
+          className={cn(
+            'w-2.5 h-2.5 rounded-full',
+            status === 'disconnected' ? 'bg-neo-cream' : 'bg-neo-black'
+          )}
+        />
+
+        {/* Status text */}
+        <span className={cn(
+          'text-xs font-bold uppercase tracking-wide',
+          status === 'disconnected' ? 'text-neo-white' : 'text-neo-black'
+        )}>
+          {showExpandedState ? (
+            <>
+              {t('common.reconnecting')}
+              <m.span
+                animate={{ opacity: [1, 0, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                ...
+              </m.span>
+            </>
+          ) : (
+            config.label
+          )}
+        </span>
+      </m.div>
+    </AnimatePresence>
   );
 };
 
@@ -133,7 +192,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       className={cn(
         'relative inline-flex items-center gap-2 px-2 py-1 rounded-neo',
         'transition-colors duration-200',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan',
+        'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan',
         className
       )}
       onMouseEnter={() => setShowTooltip(true)}
@@ -150,8 +209,8 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
           'w-3 h-3 rounded-full border-2 border-neo-black',
           'transition-all duration-300',
           status === 'connected' && 'bg-neo-lime',
-          status === 'connecting' && 'bg-neo-yellow animate-pulse',
-          status === 'reconnecting' && 'bg-neo-yellow animate-pulse',
+          status === 'connecting' && 'bg-neo-cream animate-pulse',
+          status === 'reconnecting' && 'bg-neo-cream animate-pulse',
           status === 'disconnected' && 'bg-neo-red'
         )}
         aria-hidden="true"
@@ -163,8 +222,8 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
           className={cn(
             'text-xs font-bold uppercase tracking-wide',
             status === 'connected' && 'text-neo-lime',
-            status === 'connecting' && 'text-neo-yellow',
-            status === 'reconnecting' && 'text-neo-yellow',
+            status === 'connecting' && 'text-neo-white',
+            status === 'reconnecting' && 'text-neo-white',
             status === 'disconnected' && 'text-neo-red'
           )}
         >
@@ -175,7 +234,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
       {/* Tooltip */}
       <AnimatePresence>
         {showTooltip && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -4, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -4, scale: 0.95 }}
@@ -195,7 +254,7 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
               aria-hidden="true"
             />
             <span className="relative z-10">{config.description}</span>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>
@@ -208,18 +267,26 @@ export const ConnectionStatus: React.FC<ConnectionStatusProps> = ({
  */
 interface ConnectionBannerProps {
   className?: string;
+  /** Show "Your score is safe" reassurance during active game */
+  showScoreSafe?: boolean;
+  /** Callback to leave the game — shown as escape hatch when reconnection is failing */
+  onLeaveGame?: () => void;
 }
 
-export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className }) => {
+export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className, showScoreSafe, onLeaveGame }) => {
   const {
     isConnected,
     isReconnecting,
+    isServerUpdating,
     connectionError,
-    reconnectAttempt,
+    getReconnectAttempt,
     maxReconnectAttempts,
     manualReconnect
   } = useSocket();
+  const reconnectAttempt = getReconnectAttempt();
   const { t } = useLanguage();
+  const [showBanner, setShowBanner] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const getStatus = (): ConnectionStatus => {
     if (isConnected) return 'connected';
@@ -229,27 +296,91 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
   };
 
   const status = getStatus();
+  const copy = connectionBannerCopy(status, !!isServerUpdating);
 
-  // Don't show banner when connected
-  if (status === 'connected') {
+  // Retry double-tap guard + pending feedback. `manualReconnect` fires an async
+  // socket round-trip; without an immediate disabled/label change the tap looks
+  // ignored, so users hammer it (PostHog rage data, he/es/ja). `pendingRetry`
+  // is an optimistic bridge that flips the button to "reconnecting…" the instant
+  // it's clicked, then auto-clears so a genuinely failed retry can be retried.
+  const [pendingRetry, setPendingRetry] = useState(false);
+  const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Visual "we're on it" state: spinner + "reconnecting…" label while EITHER a
+  // tap is being absorbed OR socket.io is auto-retrying.
+  const showReconnecting = pendingRetry || status === 'reconnecting';
+
+  useEffect(() => {
+    // Reconnected → drop any pending bridge (banner is unmounting anyway).
+    if (status === 'connected' && pendingRetry) setPendingRetry(false);
+  }, [status, pendingRetry]);
+
+  useEffect(() => () => {
+    if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+  }, []);
+
+  const handleRetry = useCallback(() => {
+    if (pendingRetry) return; // absorb the rapid-fire mash (a rageclick is many taps in ~1s)
+    setPendingRetry(true);
+    manualReconnect();
+    if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    // 2s cooldown only: kills the mash but still lets a bad-network user
+    // deliberately force another retry (reset the backoff) during a slow
+    // auto-reconnect. Never sticks disabled.
+    retryTimerRef.current = setTimeout(() => setPendingRetry(false), 2000);
+  }, [pendingRetry, manualReconnect]);
+
+  // Graduated UX: delay banner appearance to avoid anxiety during brief drops.
+  // Phase 1 (0-5s): Silent reconnection — most mobile dropouts resolve here.
+  // Phase 2 (5s+): Show full banner with progress and retry button.
+  useEffect(() => {
+    if (status === 'connected') {
+      // Immediately hide on reconnect
+      setShowBanner(false);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      return;
+    }
+
+    // Start delay timer when disconnected
+    if (!timerRef.current) {
+      timerRef.current = setTimeout(() => {
+        setShowBanner(true);
+        timerRef.current = null;
+      }, BANNER_DELAY_MS);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    };
+  }, [status]);
+
+  // Don't show banner when connected or during silent grace period
+  if (status === 'connected' || !showBanner) {
     return null;
   }
 
   return (
     <AnimatePresence>
-      <motion.div
+      <m.div
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: -100, opacity: 0 }}
         transition={{ type: 'spring', stiffness: 300, damping: 30 }}
         className={cn(
           'fixed top-0 left-0 right-0 z-50',
-          'bg-neo-red border-b-4 border-neo-black',
+          // Calm tone for a planned deploy; alarm-red only for a real drop.
+          copy.isUpdate ? 'bg-neo-cyan' : 'bg-neo-red',
+          'border-b-4 border-neo-black',
           'shadow-hard-lg',
           className
         )}
-        role="alert"
-        aria-live="assertive"
+        role={copy.isUpdate ? 'status' : 'alert'}
+        aria-live={copy.isUpdate ? 'polite' : 'assertive'}
       >
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -257,36 +388,47 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
             <div className="flex items-center gap-3">
               {/* Pulsing indicator */}
               <div className="relative">
-                <motion.div
+                <m.div
                   animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
+                  transition={{ type: 'tween', duration: 1.5, repeat: Infinity }}
                   className={cn(
                     'w-4 h-4 rounded-full border-2 border-neo-black',
-                    status === 'reconnecting' && 'bg-neo-yellow',
+                    status === 'reconnecting' && 'bg-neo-cream',
                     status === 'disconnected' && 'bg-neo-red',
-                    status === 'connecting' && 'bg-neo-yellow'
+                    status === 'connecting' && 'bg-neo-cream'
                   )}
                 />
               </div>
 
               <div className="flex flex-col gap-0.5">
-                <span className="text-neo-white font-bold text-sm">
-                  {status === 'reconnecting'
-                    ? t('connection.reconnecting') || 'Reconnecting...'
-                    : t('connection.disconnected') || 'Connection Lost'
-                  }
+                <span className={cn('font-bold text-sm', copy.isUpdate ? 'text-neo-black' : 'text-neo-white')}>
+                  {t(copy.titleKey)}
                 </span>
 
+                {/* Reassuring hint during a planned deploy */}
+                {copy.isUpdate && copy.subtitleKey && (
+                  <span className="text-neo-black/80 text-xs font-bold">
+                    {t(copy.subtitleKey)}
+                  </span>
+                )}
+
                 {/* Progress indicator */}
-                {status === 'reconnecting' && reconnectAttempt > 0 && (
-                  <span className="text-neo-white/80 text-xs">
-                    {t('connection.attempt') || 'Attempt'} {reconnectAttempt}/{maxReconnectAttempts}
+                {!copy.isUpdate && status === 'reconnecting' && reconnectAttempt > 0 && (
+                  <span className="text-neo-white text-xs">
+                    {t('connection.attempt')} {reconnectAttempt}/{maxReconnectAttempts}
                   </span>
                 )}
 
                 {status === 'disconnected' && connectionError && (
-                  <span className="text-neo-white/80 text-xs">
-                    {t('connection.checkConnection') || 'Check your internet connection'}
+                  <span className="text-neo-white text-xs">
+                    {t('connection.checkConnection')}
+                  </span>
+                )}
+
+                {/* Reassurance during active game */}
+                {showScoreSafe && (
+                  <span className="text-neo-lime/90 text-xs font-bold">
+                    {t('connection.scoreSafe')}
                   </span>
                 )}
               </div>
@@ -294,9 +436,9 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
 
             {/* Progress bar (for reconnecting) */}
             {status === 'reconnecting' && reconnectAttempt > 0 && (
-              <div className="hidden sm:flex flex-1 max-w-[200px] items-center gap-2">
+              <div className="flex flex-1 max-w-[200px] items-center gap-2">
                 <div className="flex-1 h-2 bg-neo-black/30 rounded-full overflow-hidden">
-                  <motion.div
+                  <m.div
                     className="h-full bg-neo-lime"
                     initial={{ width: 0 }}
                     animate={{ width: `${(reconnectAttempt / maxReconnectAttempts) * 100}%` }}
@@ -308,31 +450,51 @@ export const ConnectionBanner: React.FC<ConnectionBannerProps> = ({ className })
 
             {/* Retry button */}
             <button
-              onClick={manualReconnect}
+              onClick={handleRetry}
+              disabled={pendingRetry}
+              aria-busy={showReconnecting}
               className={cn(
                 'px-4 py-2 rounded-neo',
                 'bg-neo-lime text-neo-black',
                 'font-bold text-sm uppercase tracking-wide',
                 'border-2 border-neo-black shadow-hard-sm',
-                'hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px]',
-                'active:shadow-none active:translate-x-[1px] active:translate-y-[1px]',
+                'hover:shadow-hard hover:-translate-x-px hover:-translate-y-px',
+                'active:shadow-none active:translate-x-px active:translate-y-px',
+                'disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-x-0 disabled:hover:translate-y-0 disabled:hover:shadow-hard-sm',
                 'transition-all duration-100',
                 'flex items-center gap-2'
               )}
-              aria-label={t('connection.retry') || 'Retry connection'}
+              aria-label={t(showReconnecting ? 'connection.reconnecting' : 'connection.retry')}
             >
-              <motion.span
-                animate={status === 'reconnecting' ? { rotate: 360 } : {}}
-                transition={{ duration: 1, repeat: status === 'reconnecting' ? Infinity : 0, ease: 'linear' }}
+              <m.span
+                animate={showReconnecting ? { rotate: 360 } : {}}
+                transition={{ duration: 1, repeat: showReconnecting ? Infinity : 0, ease: 'linear' }}
                 className="text-base"
               >
                 ↻
-              </motion.span>
-              <span>{t('connection.retryNow') || 'Retry Now'}</span>
+              </m.span>
+              <span>{t(showReconnecting ? 'connection.reconnecting' : 'connection.retryNow')}</span>
             </button>
+
+            {/* Leave Game escape hatch — visible after 3+ failed attempts */}
+            {onLeaveGame && reconnectAttempt >= 3 && (
+              <button
+                onClick={onLeaveGame}
+                className={cn(
+                  'px-4 py-2 rounded-neo',
+                  'bg-neo-black/50 text-neo-white',
+                  'font-bold text-xs uppercase tracking-wide',
+                  'border-2 border-neo-white/20',
+                  'hover:bg-neo-black/70 hover:text-neo-white',
+                  'transition-all duration-100'
+                )}
+              >
+                {t('adventure.leaveGame')}
+              </button>
+            )}
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 };

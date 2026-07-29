@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, MoveUpRight, RotateCw, Compass, Trophy } from 'lucide-react';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -148,10 +148,10 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
 
   const getHintText = (type: TrainingHintType): string => {
     const texts: Record<TrainingHintType, string> = {
-      diagonal: t('training.hints.tryDiagonal') || 'Try dragging diagonally! ↗️',
-      directionChange: t('training.hints.changeDirection') || 'Pro tip: Change direction mid-word!',
-      corners: t('training.hints.checkCorners') || 'Check the corners for hidden words!',
-      longWords: t('training.hints.longerWords') || 'Longer words = more points! Try 5+ letters',
+      diagonal: t('training.hints.tryDiagonal'),
+      directionChange: t('training.hints.changeDirection'),
+      corners: t('training.hints.checkCorners'),
+      longWords: t('training.hints.longerWords'),
     };
     return texts[type];
   };
@@ -164,36 +164,36 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
       <AnimatePresence>
         {shouldShow && currentHint && config && (
           <>
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 30, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.98 }}
               transition={{ type: 'spring', damping: 25, stiffness: 200, delay: HINT_DELAY_MS / 1000 }}
               className={cn(
-                'fixed inset-x-4 bottom-20 z-50',
+                'fixed inset-x-4 bottom-[calc(5rem+var(--admob-banner-height,0px))] z-50',
                 'max-w-sm mx-auto'
               )}
             >
               <div
                 className={cn(
                   'relative rounded-xl border-3 border-neo-black p-3 shadow-hard-lg',
-                  isDarkMode ? 'bg-slate-800' : 'bg-white'
+                  isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                 )}
               >
                 {/* Close button - appears after delay, less prominent */}
                 {showCloseButton && (
-                  <motion.button
+                  <m.button
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     onClick={handleDismiss}
                     className={cn(
                       'absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center',
-                      'bg-white/80 dark:bg-slate-700/80 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600',
-                      'hover:bg-white dark:hover:bg-slate-700 hover:scale-110 transition-all'
+                      'bg-white/80 dark:bg-neo-navy-elevated/80 text-gray-600 dark:text-gray-300 border border-gray-300 dark:border-gray-600',
+                      'hover:bg-white dark:hover:bg-neo-navy-elevated hover:scale-110 transition-all'
                     )}
                   >
                     <X size={12} />
-                  </motion.button>
+                  </m.button>
                 )}
 
                 {/* Colored accent bar */}
@@ -201,7 +201,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
 
                 <div className="flex items-start gap-3 mt-1">
                 {/* Icon with gentle animation */}
-                <motion.div
+                <m.div
                   animate={{
                     scale: [1, 1.05, 1],
                     rotate: currentHint === 'directionChange' ? [0, 45, 0] : [0, 5, -5, 0],
@@ -212,10 +212,10 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                     repeatDelay: 1,
                     ease: 'easeInOut',
                   }}
-                  className={cn('flex-shrink-0 p-2 rounded-lg', config.bgColor)}
+                  className={cn('shrink-0 p-2 rounded-lg', config.bgColor)}
                 >
                   <config.icon className={config.color} size={24} />
-                </motion.div>
+                </m.div>
 
                 {/* Hint text */}
                 <div className="flex-1 pt-0.5">
@@ -232,7 +232,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
 
               {/* Progress bar - starts when hint becomes visible */}
               {isVisible && (
-                <motion.div
+                <m.div
                   className={cn('absolute bottom-0 left-0 h-1 rounded-b-xl', config.color.replace('text-', 'bg-'))}
                   initial={{ width: '100%' }}
                   animate={{ width: '0%' }}
@@ -240,7 +240,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
                 />
               )}
             </div>
-          </motion.div>
+          </m.div>
           </>
         )}
       </AnimatePresence>
@@ -248,7 +248,7 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
       {/* Training Complete Celebration - Non-blocking toast style */}
       <AnimatePresence>
         {showCelebration && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -50, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.95 }}
@@ -258,35 +258,35 @@ const TrainingHints: React.FC<TrainingHintsProps> = ({
             <button
               onClick={() => setShowCelebration(false)}
               className={cn(
-                'rounded-xl border-2 px-4 py-2.5 shadow-lg backdrop-blur-sm pointer-events-auto cursor-pointer',
-                'bg-gradient-to-r from-green-50 to-emerald-50 border-green-300',
+                'rounded-xl border-2 px-4 py-2.5 shadow-lg pointer-events-auto cursor-pointer',
+                'bg-linear-to-r from-green-50 to-emerald-50 border-green-300',
                 'dark:from-green-900/50 dark:to-emerald-900/50 dark:border-green-500/50',
                 'hover:scale-105 transition-transform'
               )}
             >
               <div className="flex items-center gap-2">
-                <motion.div
+                <m.div
                   animate={{ rotate: [0, 15, -15, 0] }}
                   transition={{ duration: 0.5, repeat: 2 }}
                 >
                   <Trophy className="text-green-500" size={20} />
-                </motion.div>
+                </m.div>
                 <span className={cn(
                   'font-bold text-sm',
                   isDarkMode ? 'text-green-300' : 'text-green-700'
                 )}>
-                  {t('training.hints.skillsUnlocked') || 'Skills unlocked! You\'re ready!'}
+                  {t('training.hints.skillsUnlocked')}
                 </span>
               </div>
               {/* Progress bar showing auto-dismiss timer */}
-              <motion.div
+              <m.div
                 className="absolute bottom-0 left-0 h-0.5 bg-green-500 rounded-b-xl"
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: 4, ease: 'linear' }}
               />
             </button>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>

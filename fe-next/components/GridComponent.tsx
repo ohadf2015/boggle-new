@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect, memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
+import { m, AnimatePresence, LazyMotion, domAnimation } from 'framer-motion';
 import { cn } from '../lib/utils';
-import type { LetterGrid, GridPosition, Language } from '@/types';
+import type { LetterGrid, Language } from '@/types';
+import { useGridAriaLabels } from '@/hooks/useGridAriaLabels';
 
 // Import extracted utilities
 import {
@@ -9,26 +10,28 @@ import {
   useGridInteraction,
   getPerformanceMode,
   ComboIndicator,
-  ComboExplanationTooltip,
   type SelectedCell,
   type PerformanceMode,
 } from './grid';
-import { useDisableFireRoundLights, useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
+import { GRID_PADDING, GRID_GAP_CLASS } from './grid/gridLayoutConstants';
+import EarthquakeEffects from './grid/EarthquakeEffects';
+import { getSelectionEscalation } from './grid/selectionEscalation';
+import DragReleaseHint from './grid/DragReleaseHint';
+import GridConnectorOverlay from './grid/GridConnectorOverlay';
+import { useDisableEarthquakeEffects, useLargeLetters } from '@/contexts/AccessibilityContext';
 import { useDevicePerformance } from '../hooks/useDevicePerformance';
 import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { useEarthquakeAnimation } from '../hooks/useEarthquakeAnimation';
+import GridCell, { type HighlightedCell } from './grid/GridCell';
+import { useEquippedCosmetic } from '@/hooks/useEquippedCosmetic';
 
-/** Cell position for highlighted paths */
-export interface HighlightedCell {
-  row: number;
-  col: number;
-}
+export type { HighlightedCell } from './grid/GridCell';
 
 interface GridComponentProps {
   grid: LetterGrid;
   interactive?: boolean;
   onWordSubmit?: (word: string) => void;
-  /** Callback when word is submitted with its path - used for direction pattern detection */
   onPathSubmit?: (cells: SelectedCell[]) => void;
   selectedCells?: SelectedCell[];
   className?: string;
@@ -37,45 +40,32 @@ interface GridComponentProps {
   animateOnMount?: boolean;
   fireRoundActive?: boolean;
   earthquakeShaking?: boolean;
-  /** Callback when formed word changes - use for external word display */
   onWordChange?: (word: string, letterCount: number) => void;
-  /** Hide the internal word preview (when using external WordFormingArea) */
   hideWordPreview?: boolean;
-  /** Hide the internal combo indicator (when using external positioning) */
   hideComboIndicator?: boolean;
-  /** External highlighted path for revealed words */
   highlightedPath?: HighlightedCell[];
-  /** Letters that have been eliminated (not in target word) - shown dimmed on board */
   eliminatedLetters?: Set<string>;
-  /** Callback when user taps a single cell without dragging (for tap-to-drag tutorial) */
   onSingleTapDetected?: (cell: { row: number; col: number; letter: string }) => void;
-  /** Language for keyboard input validation */
   language?: Language;
+  disableLetterKeyInput?: boolean;
+  onSelectionChange?: (cells: SelectedCell[]) => void;
+  /** Whether keyboard typing mode is active (from useKeyboardWordInput) */
+  isTypingMode?: boolean;
+  /** Optional filter — return false to prevent a cell from being selected (e.g. ice tiles) */
+  cellFilter?: (row: number, col: number) => boolean;
+  /** Golden letter positions from backend startGame payload */
+  goldenLetters?: Array<{ row: number; col: number }>;
+  /** Round event tile states */
+  frozenTiles?: Set<string>;
+  chargedTiles?: Set<string>;
+  meteorTiles?: Set<string>;
+  /** Ghost mode: transparent bg + invisible cells (blast mode — overlay handles visuals) */
+  ghostCells?: boolean;
+  /** Optional adjacency override — return true if cell2 should be reachable from cell1 (e.g. portal teleportation) */
+  isAdjacent?: (cell1: { row: number; col: number }, cell2: { row: number; col: number }) => boolean;
+  /** Desktop idle auto-submit (ms). Submits a ≥3-letter selection that sits unchanged this long on non-touch devices. Used by practice. */
+  autoSubmitIdleMs?: number;
 }
-
-/**
- * GridComponent - Interactive letter grid for word game
- * Memoized to prevent unnecessary re-renders
- *
- * REFACTORED: Core logic extracted to components/grid/:
- * - comboColors.ts - Combo level color schemes
- * - useGridInteraction.ts - Touch/mouse interaction logic
- * - performanceUtils.ts - Device capability detection
- *
- * VERSION: 2025-01-01-FIXED - effectiveRenderMode TDZ fix
- */
-
-// Rainbow colors for dance floor effect - Soft pastels for gentle party atmosphere
-// Moved outside component to be a stable reference for useEffect dependencies
-const RAINBOW_COLORS = [
-  '#FFB3D9', // Soft pink
-  '#FFB380', // Peachy orange
-  '#FFE680', // Gentle yellow
-  '#B3FFB3', // Mint green
-  '#B3E5FF', // Sky blue
-  '#D9B3FF', // Lavender
-  '#FFD1DC', // Rose
-];
 
 const GridComponent = memo<GridComponentProps>(({
   grid,
@@ -96,40 +86,45 @@ const GridComponent = memo<GridComponentProps>(({
   eliminatedLetters,
   onSingleTapDetected,
   language = 'en',
+  disableLetterKeyInput = false,
+  onSelectionChange,
+  isTypingMode = false,
+  cellFilter,
+  goldenLetters = [],
+  frozenTiles,
+  chargedTiles,
+  meteorTiles,
+  ghostCells = false,
+  isAdjacent,
+  autoSubmitIdleMs,
 }) => {
+  const { t } = useLanguage();
   const [reduceMotion, setReduceMotion] = useState(false);
   const [performanceMode, setPerformanceMode] = useState<PerformanceMode>('full');
   const gridRef = useRef<HTMLDivElement>(null);
 
-  // Accessibility settings
-  const disableFireRoundLights = useDisableFireRoundLights();
+  const [dragSubmitCount, setDragSubmitCount] = useState(0);
+  const prevSelectedLengthRef = useRef(0);
+  const [hintAnimationPhase, setHintAnimationPhase] = useState<'blink' | 'fadeout' | null>(null);
+  const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const equippedBoardTheme = useEquippedCosmetic('boardTheme');
+  const equippedTileSkin = useEquippedCosmetic('tileSkin');
+
   const disableEarthquakeEffects = useDisableEarthquakeEffects();
   const accessibilityLargeLetters = useLargeLetters();
-
-  // Combine prop and accessibility setting - either can enable large text
   const effectiveLargeText = largeText || accessibilityLargeLetters;
 
-  // PERFORMANCE: Device capability detection for adaptive rendering
-  const { isLowEnd, enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
-
-  // Calculate effective render mode based on device capabilities
-  // Using inline calculation to avoid any TDZ/initialization issues
+  const { isLowEnd, prefersReducedMotion } = useDevicePerformance();
   const effectiveRenderMode: PerformanceMode =
     (isLowEnd || prefersReducedMotion) ? 'minimal' :
       performanceMode === 'minimal' ? 'minimal' :
         performanceMode === 'reduced' ? 'reduced' :
           'full';
 
-  // Sound effects for earthquake
   const { playEarthquakeRumble, playEarthquakeShake } = useSoundEffects();
-
-  // Disable fire round lights on low-end devices or when reduced motion is preferred
-  const shouldDisableFireRoundLights = disableFireRoundLights || isLowEnd || !enableComplexAnimations || prefersReducedMotion;
-
-  // Disable enhanced earthquake effects if user preference is set or device is low-end
   const shouldDisableEarthquakeEffects = disableEarthquakeEffects || isLowEnd || prefersReducedMotion;
 
-  // Use extracted interaction hook with desktop enhancements
   const {
     selectedCells,
     fadingCells,
@@ -156,24 +151,91 @@ const GridComponent = memo<GridComponentProps>(({
     fireRoundActive,
     onSingleTapDetected,
     language,
+    disableLetterKeyInput,
+    cellFilter,
+    isAdjacent,
+    autoSubmitIdleMs,
   });
 
-  // Calculate the word being formed from selected cells
-  const formedWord = useMemo(() => {
-    return selectedCells.map(c => c.letter).join('');
-  }, [selectedCells]);
+  // Stable handlers that read row/col from data attributes to avoid inline arrows per cell
+  const handleCellTouchStart = useCallback((e: React.TouchEvent) => {
+    const el = e.currentTarget as HTMLDivElement;
+    const row = Number(el.dataset.row);
+    const col = Number(el.dataset.col);
+    const letter = el.dataset.letter || '';
+    handleTouchStart(row, col, letter, e as React.TouchEvent<HTMLDivElement>);
+  }, [handleTouchStart]);
 
-  // Memoize selected cells length to prevent unnecessary effect runs
+  const handleCellMouseDown = useCallback((e: React.MouseEvent) => {
+    const el = e.currentTarget as HTMLDivElement;
+    const row = Number(el.dataset.row);
+    const col = Number(el.dataset.col);
+    const letter = el.dataset.letter || '';
+    handleMouseDown(row, col, letter, e as React.MouseEvent<HTMLDivElement>);
+  }, [handleMouseDown]);
+
+  const handleCellDoubleClick = useCallback((e: React.MouseEvent) => {
+    const el = e.currentTarget as HTMLDivElement;
+    const row = Number(el.dataset.row);
+    const col = Number(el.dataset.col);
+    handleDoubleClick(row, col);
+  }, [handleDoubleClick]);
+
+  const formedWord = useMemo(() => selectedCells.map(c => c.letter).join(''), [selectedCells]);
   const selectedCellsLength = useMemo(() => selectedCells.length, [selectedCells]);
 
-  // Notify parent of word changes (for external WordFormingArea)
+  // Track drag submissions (cells went from >1 to 0 = word submitted)
   useEffect(() => {
-    if (onWordChange) {
-      onWordChange(formedWord, selectedCellsLength);
+    if (prevSelectedLengthRef.current >= 2 && selectedCellsLength === 0) {
+      setDragSubmitCount(c => c + 1);
     }
+    prevSelectedLengthRef.current = selectedCellsLength;
+  }, [selectedCellsLength]);
+
+  // Guard onWordChange / onSelectionChange against same-value re-fires.
+  // Without these refs, every selectedCells ref change during drag fires the
+  // callbacks even when (word, count) and selection identity haven't shifted —
+  // each fire bubbles into useSelectionStore.setState and downstream
+  // consumers, doubling render cost on touch swipes.
+  const prevWordRef = useRef<{ word: string; count: number }>({ word: '', count: 0 });
+  useEffect(() => {
+    const prev = prevWordRef.current;
+    if (prev.word === formedWord && prev.count === selectedCellsLength) return;
+    prevWordRef.current = { word: formedWord, count: selectedCellsLength };
+    onWordChange?.(formedWord, selectedCellsLength);
   }, [formedWord, selectedCellsLength, onWordChange]);
 
-  // Calculate adjacent cells for highlighting hints
+  const prevSelectionRef = useRef<SelectedCell[] | null>(null);
+  useEffect(() => {
+    if (!onSelectionChange) return;
+    const prev = prevSelectionRef.current;
+    if (
+      prev &&
+      prev.length === selectedCells.length &&
+      prev.every((c, i) => c.row === selectedCells[i].row && c.col === selectedCells[i].col)
+    ) {
+      return;
+    }
+    prevSelectionRef.current = selectedCells;
+    onSelectionChange(selectedCells);
+  }, [selectedCells, onSelectionChange]);
+
+  // Pre-compute Sets for O(1) lookups instead of O(n) .some() per cell during render
+  const selectedCellsSet = useMemo(
+    () => new Set(selectedCells.map(c => `${c.row}-${c.col}`)),
+    [selectedCells],
+  );
+  const fadingCellsSet = useMemo(
+    () => new Set(fadingCells.map(c => `${c.row}-${c.col}`)),
+    [fadingCells],
+  );
+
+  // Map cell key → selection order index (0-based) for escalation effects
+  const selectionOrderMap = useMemo(
+    () => new Map(selectedCells.map((c, idx) => [`${c.row}-${c.col}`, idx])),
+    [selectedCells],
+  );
+
   const adjacentHintCells = useMemo(() => {
     if (selectedCells.length === 0) return new Set<string>();
     const lastCell = selectedCells[selectedCells.length - 1];
@@ -187,42 +249,58 @@ const GridComponent = memo<GridComponentProps>(({
         const newCol = lastCell.col + dc;
         if (newRow >= 0 && newRow < grid.length &&
           newCol >= 0 && newCol < (grid[0]?.length || 0)) {
-          // Only hint cells that aren't already selected
-          const isAlreadySelected = selectedCells.some(c => c.row === newRow && c.col === newCol);
-          if (!isAlreadySelected) {
+          if (!selectedCellsSet.has(`${newRow}-${newCol}`)) {
             hints.add(`${newRow}-${newCol}`);
           }
         }
       }
     }
     return hints;
-  }, [selectedCells, grid]);
+  }, [selectedCells, selectedCellsSet, grid]);
 
-  // Create set and order map for highlighted cells in revealed word path
+  const goldenCellsSet = useMemo(
+    () => new Set(goldenLetters.map(c => `${c.row}-${c.col}`)),
+    [goldenLetters],
+  );
+
   const { highlightedCellsSet, highlightedCellOrder } = useMemo(() => {
     const set = new Set<string>();
     const orderMap = new Map<string, number>();
     highlightedPath.forEach((cell, index) => {
       const key = `${cell.row}-${cell.col}`;
       set.add(key);
-      orderMap.set(key, index + 1); // 1-indexed for display
+      orderMap.set(key, index + 1);
     });
     return { highlightedCellsSet: set, highlightedCellOrder: orderMap };
   }, [highlightedPath]);
 
-  // OPTIMIZED: Earthquake animation using dedicated hook
-  // Performance improvements:
-  // - Reduced particle count: 30 → 12 (-60%)
-  // - Reduced dust clouds: 8 → 4 (-50%)
-  // - Optimized displacement: 600-1000px → 300-500px (-50%)
-  // - Removed 3D transforms and motion blur
-  // - Added screen crack effect
+  useEffect(() => {
+    if (hintTimeoutRef.current) {
+      clearTimeout(hintTimeoutRef.current);
+    }
+
+    if (highlightedPath.length > 0) {
+      setHintAnimationPhase('blink');
+      hintTimeoutRef.current = setTimeout(() => {
+        setHintAnimationPhase('fadeout');
+        hintTimeoutRef.current = setTimeout(() => {
+          setHintAnimationPhase(null);
+        }, 1000);
+      }, 1500);
+    } else {
+      setHintAnimationPhase(null);
+    }
+
+    return () => {
+      if (hintTimeoutRef.current) {
+        clearTimeout(hintTimeoutRef.current);
+      }
+    };
+  }, [highlightedPath]);
   const {
     earthquakePhase,
     earthquakeParticles,
     earthquakeDust,
-    showCracks,
-    dustPhase,
     getShakeOffset,
     getPhaseAnimation,
     useEnhancedMode,
@@ -236,104 +314,8 @@ const GridComponent = memo<GridComponentProps>(({
     playEarthquakeShake,
   });
 
-  // Fire Round: Random glowing cells with rainbow cycling
-  const [glowingCells, setGlowingCells] = useState<Set<string>>(new Set());
-  const [cellColorIndices, setCellColorIndices] = useState<Map<string, number>>(new Map());
+  useEffect(() => { if (interactive && gridRef.current) gridRef.current.focus(); }, [interactive]);
 
-  // Randomize glowing cells when fire round is active (optimized for performance)
-  // PERFORMANCE: Skip on low-end devices, reduced motion, or user accessibility setting
-  useEffect(() => {
-    if (!fireRoundActive || shouldDisableFireRoundLights) {
-      setGlowingCells(new Set());
-      setCellColorIndices(new Map());
-      return;
-    }
-
-    let animationFrameId: number;
-    let lastUpdate = 0;
-    const updateInterval = 1200; // Gentle: 1200ms for relaxed party feel
-    const MAX_GLOW_CELLS = 5; // Fewer cells for subtle, non-distracting effect
-
-    // Check if a cell is adjacent to any already-selected cells
-    const isAdjacentToSelected = (row: number, col: number, selected: Set<string>): boolean => {
-      // Check all 8 surrounding cells (including diagonals)
-      const neighbors = [
-        `${row - 1}-${col}`,     // top
-        `${row + 1}-${col}`,     // bottom
-        `${row}-${col - 1}`,     // left
-        `${row}-${col + 1}`,     // right
-        `${row - 1}-${col - 1}`, // top-left
-        `${row - 1}-${col + 1}`, // top-right
-        `${row + 1}-${col - 1}`, // bottom-left
-        `${row + 1}-${col + 1}`, // bottom-right
-      ];
-
-      return neighbors.some(neighbor => selected.has(neighbor));
-    };
-
-    // Select up to 8 cells that are NOT adjacent to each other (disco-style distribution)
-    const randomizeGlow = () => {
-      const rows = grid.length;
-      const cols = grid[0]?.length || 0;
-      const selected = new Set<string>();
-      const colorMap = new Map<string, number>();
-
-      // Create array of all possible positions
-      const allPositions: Array<{ row: number; col: number }> = [];
-      for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-          allPositions.push({ row: i, col: j });
-        }
-      }
-
-      // Shuffle positions for random selection
-      const shuffled = allPositions.sort(() => Math.random() - 0.5);
-
-      // Select cells ensuring they're not adjacent
-      for (const pos of shuffled) {
-        if (selected.size >= MAX_GLOW_CELLS) break;
-
-        if (!isAdjacentToSelected(pos.row, pos.col, selected)) {
-          const cellKey = `${pos.row}-${pos.col}`;
-          selected.add(cellKey);
-          // Assign random rainbow color index to each cell
-          colorMap.set(cellKey, Math.floor(Math.random() * RAINBOW_COLORS.length));
-        }
-      }
-
-      setGlowingCells(selected);
-      setCellColorIndices(colorMap);
-    };
-
-    // Initial randomization
-    randomizeGlow();
-
-    // Use requestAnimationFrame for smoother updates
-    const animate = (timestamp: number) => {
-      if (timestamp - lastUpdate >= updateInterval) {
-        randomizeGlow();
-        lastUpdate = timestamp;
-      }
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    animationFrameId = requestAnimationFrame(animate);
-
-    return () => {
-      if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId);
-      }
-    };
-  }, [fireRoundActive, shouldDisableFireRoundLights, grid]);
-
-  // Auto-focus on grid when game becomes interactive
-  useEffect(() => {
-    if (interactive && gridRef.current) {
-      gridRef.current.focus();
-    }
-  }, [interactive]);
-
-  // Detect reduced motion preference
   useEffect(() => {
     try {
       const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -341,31 +323,87 @@ const GridComponent = memo<GridComponentProps>(({
       const handler = (e: MediaQueryListEvent) => setReduceMotion(!!e.matches);
       mq.addEventListener?.('change', handler);
       return () => mq.removeEventListener?.('change', handler);
-    } catch {
-      setReduceMotion(false);
-      return undefined;
-    }
+    } catch { setReduceMotion(false); return undefined; }
   }, []);
 
-  // Detect device performance capabilities
-  useEffect(() => {
-    setPerformanceMode(getPerformanceMode());
-  }, []);
+  useEffect(() => { setPerformanceMode(getPerformanceMode()); }, []);
 
-  const isLargeGrid = useMemo(() => (grid[0]?.length || 0) > 8, [grid]);
   const comboColors = useMemo(() => getComboColors(comboLevel), [comboLevel]);
 
-  // Memoize grid dimensions to prevent recalculations
-  // Gap increased slightly for easier swiping without accidental adjacent touches
+  // Cooldown warmth — carries residual combo boost from previous word
+  // so the next word's escalation starts "warm" instead of cold-snapping to tier 0
+  const [cooldownCombo, setCooldownCombo] = useState(0);
+  const cooldownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const prevSelLenForCooldownRef = useRef(selectedCells.length);
+  useEffect(() => {
+    const wasSelecting = prevSelLenForCooldownRef.current > 0;
+    const nowEmpty = selectedCells.length === 0;
+    if (wasSelecting && nowEmpty) {
+      const lastTier = getSelectionEscalation(0, prevSelLenForCooldownRef.current, comboLevel).tier;
+      if (lastTier > 0 && !reduceMotion) {
+        setCooldownCombo(lastTier * 2);
+        if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current);
+        cooldownTimerRef.current = setTimeout(() => setCooldownCombo(0), 500);
+      }
+    }
+    prevSelLenForCooldownRef.current = selectedCells.length;
+  }, [selectedCells.length, comboLevel, reduceMotion]);
+  useEffect(() => {
+    return () => { if (cooldownTimerRef.current) clearTimeout(cooldownTimerRef.current); };
+  }, []);
+
+  // Effective combo includes cooldown warmth for smoother tier transitions
+  const effectiveCombo = comboLevel + cooldownCombo;
+
+  // Current escalation tier (based on total selected letters)
+  const currentTier = useMemo(
+    () => getSelectionEscalation(0, selectedCells.length, effectiveCombo).tier,
+    [selectedCells.length, effectiveCombo],
+  );
+  // Boolean view of currentTier for non-selected cells: only flips at the tier-3
+  // boundary, so cells skip re-render waves when escalation crosses tier 1→2.
+  const isHighTier = currentTier >= 3;
+
+  // Tier transition flash — fires once when crossing a tier boundary
+  const prevTierRef = useRef(0);
+  const [tierFlash, setTierFlash] = useState<number | null>(null);
+  useEffect(() => {
+    if (currentTier > prevTierRef.current && currentTier >= 2 && !reduceMotion) {
+      setTierFlash(currentTier);
+      const timeout = setTimeout(() => setTierFlash(null), 150);
+      prevTierRef.current = currentTier;
+      return () => clearTimeout(timeout);
+    }
+    prevTierRef.current = currentTier;
+    return undefined;
+  }, [currentTier, reduceMotion]);
+
+  // Clamp selection length for non-selected cells: they only need to know
+  // whether ANY selection exists (0 vs 1), not the exact count.
+  // This prevents all 16+ cells from re-rendering on every letter addition
+  // since memo() sees a stable prop (0 or 1) instead of 0→1→2→3→...
+  const hasAnySelection = selectedCells.length > 0 ? 1 : 0;
+
   const gridDimensions = useMemo(() => ({
     cols: grid[0]?.length || 4,
     rows: grid.length || 4,
-    gap: isLargeGrid ? "gap-1.5 sm:gap-1.5" : "gap-2 sm:gap-2.5",
-  }), [grid, isLargeGrid]);
+    gap: GRID_GAP_CLASS,
+  }), [grid]);
+
+  // Stable board seed for memoization — changes only when actual letters change
+  const boardSeed = useMemo(
+    () => grid.map(r => r.join('')).join('|'),
+    [grid],
+  );
+
+  // Per-cell aria-label memoized by board seed. Closes mp-perf H3:
+  // Previously fired 16 t() calls per render during drag selection.
+  // Now fires 16 t() calls per round (when boardSeed changes).
+  const cellAriaLabels = useGridAriaLabels(grid, boardSeed);
 
   return (
+    <LazyMotion features={domAnimation} strict>
     <div className="relative w-full h-full flex items-center justify-center">
-      {/* ARIA live region for screen reader announcements of word being formed */}
       <div
         className="sr-only"
         role="status"
@@ -375,12 +413,10 @@ const GridComponent = memo<GridComponentProps>(({
         {interactive && formedWord.length > 0 ? `Current word: ${formedWord}, ${selectedCells.length} letters` : ''}
       </div>
 
-      {/* Word Preview - Fixed below header, above the grid, doesn't affect grid layout */}
-      {/* Can be hidden when using external WordFormingArea component */}
       {!hideWordPreview && (
         <AnimatePresence>
           {interactive && selectedCells.length > 0 && (
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: -20, scale: 0.9 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -10, scale: 0.95 }}
@@ -396,26 +432,18 @@ const GridComponent = memo<GridComponentProps>(({
                   {selectedCells.length}
                 </span>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
       )}
 
-      {/* Combo Indicator - New juicy animation with particles and glow */}
-      {/* Can be hidden when using external positioning */}
       {!hideComboIndicator && (
         <ComboIndicator comboLevel={comboLevel} reduceMotion={reduceMotion} />
       )}
 
-      {/* First-time combo explanation tooltip */}
-      <ComboExplanationTooltip comboLevel={comboLevel} />
-
-
-      {/* NEO-BRUTALIST: Clean frame wrapper with OPTIMIZED screen shake during earthquake */}
-      <motion.div
-        className="game-board-frame relative"
+      <m.div
+        className={cn("game-board-frame relative", equippedBoardTheme && `cosmetic-board-${equippedBoardTheme.replace('board-', '')}`)}
         animate={earthquakePhase === 'quake' && useEnhancedMode ? {
-          // OPTIMIZED: Reduced shake intensity (50% reduction)
           x: [0, -8, 8, -6, 6, -4, 4, -2, 2, 0],
           y: [0, -4, 4, -3, 3, -2, 2, -1, 1, 0],
           rotate: [0, -1, 1, -0.5, 0.5, 0],
@@ -425,32 +453,36 @@ const GridComponent = memo<GridComponentProps>(({
           rotate: 0,
         }}
         transition={{
-          duration: 0.6, // Reduced from 0.8s
+          duration: 0.6,
           ease: 'easeInOut',
         }}
       >
-
-        {/* Inner grid container - using absolute positioning to ensure proper dimensions with container queries */}
         <div
           ref={gridRef}
           dir="ltr"
           data-tutorial="grid"
+          {...(equippedTileSkin && { 'data-tile-skin': equippedTileSkin.replace('tile-', '') })}
           className={cn(
             "grid touch-none select-none absolute rounded-neo",
             gridDimensions.gap,
-            "bg-neo-cream border-2 border-neo-black/20",
+            !ghostCells && "bg-neo-cream",
             earthquakeShaking && "earthquake-shake",
-            // Desktop cursor styles based on interaction state
             interactive && isSelecting && "cursor-crosshair",
             interactive && isDragging && "cursor-grabbing",
             className
           )}
           style={{
             inset: '0',
+            padding: GRID_PADDING,
             gridTemplateColumns: `repeat(${gridDimensions.cols}, minmax(0, 1fr))`,
             gridTemplateRows: `repeat(${gridDimensions.rows}, minmax(0, 1fr))`,
-            backgroundImage: 'var(--halftone-pattern)',
-            backgroundColor: 'var(--neo-cream)',
+            backgroundColor: ghostCells ? 'transparent' : 'var(--neo-cream)',
+            // Chromatic aberration on the whole board is a heavy compositor
+            // pass; suppress while the user is mid-drag so pointer moves don't
+            // re-rasterize the grid every frame. Re-applies after release.
+            ...(currentTier >= 3 && !reduceMotion && !isDragging ? {
+              filter: 'drop-shadow(2px 0 0 rgba(0,255,255,0.25)) drop-shadow(-2px 0 0 rgba(255,51,102,0.25))',
+            } : {}),
             ['--cell-font-size' as string]: `calc((100cqw / ${gridDimensions.cols}) * ${effectiveLargeText ? 0.70 : 0.50})`,
             containerType: 'size',
           }}
@@ -466,422 +498,119 @@ const GridComponent = memo<GridComponentProps>(({
           {grid.map((row, i) =>
             row.map((cell, j) => {
               const cellKey = `${i}-${j}`;
-              const isSelected = selectedCells.some(c => c.row === i && c.col === j);
+              const isSelected = selectedCellsSet.has(cellKey);
               const firstSelected = selectedCells[0];
               const isFirstSelected = firstSelected !== undefined && firstSelected.row === i && firstSelected.col === j;
-              const isFading = fadingCells.some(c => c.row === i && c.col === j);
+              const isFading = fadingCellsSet.has(cellKey);
               const isFocused = focusedCell?.row === i && focusedCell?.col === j;
               const isAdjacentHint = adjacentHintCells.has(cellKey);
-              const isGlowing = glowingCells.has(cellKey);
-              const glowColorIndex = cellColorIndices.get(cellKey) ?? 0;
-              const glowColor = RAINBOW_COLORS[glowColorIndex];
               const isHighlighted = highlightedCellsSet.has(cellKey);
               const highlightedOrder = highlightedCellOrder.get(cellKey);
+              const isGolden = goldenCellsSet.has(cellKey);
               const isEliminated = eliminatedLetters?.has(cell.toUpperCase()) ?? false;
-              // Desktop hover state
               const isHovered = hoveredCell?.row === i && hoveredCell?.col === j;
               const isLastSelected = selectedCells.length > 0 &&
                 selectedCells[selectedCells.length - 1]?.row === i &&
                 selectedCells[selectedCells.length - 1]?.col === j;
 
-              // OPTIMIZED: Get shake offset from hook (no 3D transforms)
               const shakeOffset = getShakeOffset(cellKey);
+              const selectionIdx = selectionOrderMap.get(cellKey) ?? 0;
+              const escalation = isSelected
+                ? getSelectionEscalation(selectionIdx, selectedCells.length, effectiveCombo)
+                : null;
+
+              const isFrozen = frozenTiles?.has(cellKey) ?? false;
+              const isCharged = chargedTiles?.has(cellKey) ?? false;
+              const isMeteor = meteorTiles?.has(cellKey) ?? false;
 
               return (
-                <motion.div
-                  key={`${i}-${j}`}
-                  data-row={i}
-                  data-col={j}
-                  data-letter={cell}
-                  role="gridcell"
-                  aria-selected={isSelected}
-                  aria-label={`Row ${i + 1}, Column ${j + 1}: Letter ${cell}`}
-                  tabIndex={interactive ? 0 : -1}
-                  onTouchStart={(e) => handleTouchStart(i, j, cell, e)}
-                  onMouseDown={(e) => handleMouseDown(i, j, cell, e)}
-                  onDoubleClick={() => handleDoubleClick(i, j)}
-                  initial={effectiveRenderMode === 'minimal' ? false : (animateOnMount
-                    ? { scale: 0, opacity: 0, rotateX: -90, y: -20 }
-                    : false
-                  )}
-                  animate={effectiveRenderMode === 'minimal'
-                    ? { opacity: 1, rotateX: 0 } // Minimal mode: no complex animations
-                    : earthquakePhase !== 'idle' ? (
-                      // OPTIMIZED MULTI-PHASE EARTHQUAKE ANIMATION
-                      earthquakePhase === 'rumble' ? {
-                        ...getPhaseAnimation.rumble.animate,
-                        rotateX: 0,
-                      } : earthquakePhase === 'quake' ? {
-                        // Phase 2: OPTIMIZED QUAKE - removed 3D transforms and motion blur
-                        x: shakeOffset.x,
-                        y: shakeOffset.y,
-                        rotate: shakeOffset.rotate,
-                        scale: shakeOffset.scale,
-                        opacity: 0.8, // Less transparent for better visibility
-                        rotateX: 0,
-                      } : earthquakePhase === 'settle' ? {
-                        ...getPhaseAnimation.settle.animate,
-                        rotateX: 0,
-                      } : {
-                        // Idle state
-                        x: 0,
-                        y: 0,
-                        rotate: 0,
-                        scale: 1,
-                        opacity: 1,
-                        rotateX: 0,
-                      }
-                    ) : {
-                      scale: isSelected ? 1.05 : (isFading ? 1.02 : 1),
-                      opacity: 1,
-                      rotate: 0,
-                      y: isSelected ? -2 : 0,
-                      x: 0,
-                      rotateX: 0,
-                    }
-                  }
-                  whileTap={effectiveRenderMode === 'minimal' ? undefined : { scale: 0.95 }}
-                  transition={effectiveRenderMode === 'minimal'
-                    ? { duration: 0 } // Instant transitions for low-end devices
-                    : earthquakePhase !== 'idle' ? (
-                      earthquakePhase === 'rumble' ? {
-                        ...getPhaseAnimation.rumble.transition,
-                        delay: shakeOffset.delay,
-                      } : earthquakePhase === 'quake' ? {
-                        // OPTIMIZED: Faster spring physics
-                        ...getPhaseAnimation.quake.transition,
-                        delay: shakeOffset.delay,
-                      } : earthquakePhase === 'settle' ? {
-                        ...getPhaseAnimation.settle.transition,
-                        delay: shakeOffset.delay,
-                      } : {
-                        duration: 0.1,
-                      }
-                    ) : {
-                      // Elastic snap-back after shake or normal animation
-                      type: 'spring',
-                      stiffness: 200,
-                      damping: 15,
-                      delay: reduceMotion ? 0 : (animateOnMount ? (i + j) * 0.03 : 0),
-                    }
-                  }
-                  className={cn(
-                    "aspect-square flex items-center justify-center font-black cursor-pointer relative overflow-hidden",
-                    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neo-cyan",
-                    isSelected
-                      ? comboColors.isRainbow
-                        ? `${comboColors.textColor || 'text-neo-black'} ${comboColors.border} z-10 ${comboColors.shadow}`
-                        : `${comboColors.bg} ${comboColors.textColor || 'text-neo-black'} border-3 ${comboColors.border} z-10 ${comboColors.shadow}`
-                      : isHighlighted
-                        ? "bg-neo-lime text-neo-black border-3 border-neo-black z-10 shadow-[0_0_20px_rgba(255,225,53,0.8),_0_0_40px_rgba(255,225,53,0.4)]"
-                        : isEliminated
-                          ? "bg-gray-400/60 text-gray-500/50 border-3 border-gray-400/40 shadow-none cursor-not-allowed"
-                          : "letter-tile-gradient text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-1px] hover:translate-y-[-1px] active:translate-x-[1px] active:translate-y-[1px] active:shadow-hard-pressed",
-                    // Adjacent cell hint - subtle glow indicating valid next selection
-                    isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-2 ring-neo-lime/70 ring-offset-1 ring-offset-neo-cream",
-                    // Desktop hover on adjacent hint - stronger glow when hovering over valid next cell
-                    isHovered && isAdjacentHint && !isSelected && !isHighlighted && !isEliminated && "ring-4 ring-neo-cyan/90 ring-offset-2 scale-105 z-10",
-                    // Hover on last selected cell - hint to click again to submit
-                    // NOTE: Removed animate-pulse - caused excessive blinking on desktop when mouse hovers over last selected letter
-                    isHovered && isLastSelected && selectedCells.length >= 2 && "ring-4 ring-neo-green/80 ring-offset-2",
-                    // Keyboard focus indicator - enhanced with glow animation
-                    isFocused && !isSelected && "z-20 animate-keyboard-focus",
-                    // Transition controls
-                    "transition-all",
-                    comboLevel > 0 ? "duration-300" : "duration-100"
-                  )}
-                  style={{
-                    borderRadius: '6px',
-                    fontSize: 'var(--cell-font-size)',
-                    // Rainbow dance floor effect during fire round (no solid fill)
-                    ...(isGlowing && fireRoundActive && !isSelected && !isHighlighted && {
-                      background: glowColor,
-                      boxShadow: `0 0 8px ${glowColor}60, 0 0 16px ${glowColor}30, 4px 4px 0 #000`,
-                      animation: 'rainbow-pulse 1.5s ease-in-out infinite',
-                      willChange: 'transform, box-shadow',
-                    }),
-                    // Dynamic glow based on combo level - ENHANCED for more prominent feedback
-                    ...(isSelected && {
-                      boxShadow: comboColors.isRainbow
-                        ? '0 0 25px rgba(255, 51, 102, 0.8), 0 0 50px rgba(0, 255, 255, 0.5), 0 0 75px rgba(255, 51, 102, 0.3), 6px 6px 0 #000'
-                        : comboLevel >= 7
-                          ? '0 0 22px rgba(255, 51, 102, 0.8), 0 0 40px rgba(255, 107, 53, 0.5), 0 0 60px rgba(255, 51, 102, 0.3), 5px 5px 0 #000'
-                          : comboLevel >= 5
-                            ? '0 0 18px rgba(255, 107, 53, 0.8), 0 0 35px rgba(255, 51, 102, 0.5), 5px 5px 0 #000'
-                            : comboLevel >= 3
-                              ? '0 0 15px rgba(255, 107, 53, 0.7), 0 0 25px rgba(255, 150, 50, 0.4), 4px 4px 0 #000'
-                              : '0 0 12px rgba(255, 200, 100, 0.6), 0 0 20px rgba(255, 150, 50, 0.3), 4px 4px 0 #000',
-                    }),
-                    ...(isSelected && comboColors.isRainbow ? {
-                      background: 'linear-gradient(135deg, #FF3366, #FF6B35, #FFE135, #BFFF00, #00FFFF, #FF1493, #8B5CF6)',
-                      backgroundSize: '300% 300%',
-                      // Removed strobe effects for accessibility - slow rainbow animation only
-                      animation: reduceMotion ? 'none' : 'rainbow-cell 2s ease infinite'
-                    } : isSelected && comboLevel >= 5 ? {
-                      background: 'linear-gradient(135deg, #FF6B35, #FF3366, #FF6B35)',
-                      backgroundSize: '200% 200%',
-                      animation: 'gradient-x 1.5s ease infinite'
-                    } : isSelected && comboLevel >= 3 ? {
-                      background: 'linear-gradient(135deg, #F97316, #EF4444)',
-                    } : isSelected && comboColors.flicker ? {
-                      animation: 'flicker 0.1s infinite alternate'
-                    } : {})
-                  }}
-                >
-                  {/* Ripple effect on selection - disabled on minimal mode for performance */}
-                  {isSelected && effectiveRenderMode !== 'minimal' && (
-                    <>
-                      {/* Primary ripple - shown in reduced and full modes - MORE PROMINENT */}
-                      <motion.div
-                        className="absolute inset-0"
-                        style={{
-                          borderRadius: '6px',
-                          background: comboColors.isRainbow
-                            ? 'radial-gradient(circle, rgba(255,51,102,0.7), rgba(0,255,255,0.4) 50%, transparent 75%)'
-                            : comboLevel >= 5
-                              ? 'radial-gradient(circle, rgba(255,107,53,0.7), rgba(255,51,102,0.4) 50%, transparent 75%)'
-                              : comboLevel >= 3
-                                ? 'radial-gradient(circle, rgba(255,150,50,0.6), transparent 70%)'
-                                : 'radial-gradient(circle, rgba(255,255,255,0.6), transparent 70%)',
-                        }}
-                        initial={{ scale: 0.3, opacity: 1 }}
-                        animate={{ scale: 3, opacity: 0 }}
-                        transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
-                      />
-                      {/* Secondary glow pulse - only in full mode - ENHANCED */}
-                      {effectiveRenderMode === 'full' && (
-                        <motion.div
-                          className="absolute inset-[-4px] pointer-events-none"
-                          style={{
-                            background: comboColors.isRainbow
-                              ? 'radial-gradient(circle at center, rgba(255, 51, 102, 0.9), rgba(0, 255, 255, 0.5) 40%, transparent 70%)'
-                              : comboLevel >= 5
-                                ? 'radial-gradient(circle at center, rgba(255, 107, 53, 0.9), rgba(255, 51, 102, 0.5) 40%, transparent 70%)'
-                                : comboLevel >= 3
-                                  ? 'radial-gradient(circle at center, rgba(255, 150, 50, 0.8), transparent 60%)'
-                                  : 'radial-gradient(circle at center, rgba(255, 255, 255, 0.95), transparent 60%)',
-                            filter: 'blur(4px)',
-                            borderRadius: '10px'
-                          }}
-                          initial={{ scale: 0, opacity: 1 }}
-                          animate={{ scale: [0, 1.5, 1.8], opacity: [1, 0.7, 0] }}
-                          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
-                        />
-                      )}
-                      {/* Combo level glow ring - reduced and full modes - ENHANCED with pulsing */}
-                      {comboLevel >= 3 && !reduceMotion && (
-                        <motion.div
-                          className="absolute inset-[-6px] pointer-events-none"
-                          style={{
-                            borderRadius: '12px',
-                            border: comboColors.isRainbow
-                              ? '3px solid rgba(255, 51, 102, 0.9)'
-                              : comboLevel >= 7
-                                ? '3px solid rgba(255, 51, 102, 0.8)'
-                                : comboLevel >= 5
-                                  ? '3px solid rgba(255, 107, 53, 0.8)'
-                                  : '2px solid rgba(255, 150, 50, 0.7)',
-                            boxShadow: comboColors.isRainbow
-                              ? '0 0 16px rgba(255, 51, 102, 0.7), inset 0 0 12px rgba(0, 255, 255, 0.4), 0 0 24px rgba(0, 255, 255, 0.3)'
-                              : comboLevel >= 7
-                                ? '0 0 14px rgba(255, 51, 102, 0.6), 0 0 20px rgba(255, 107, 53, 0.4)'
-                                : comboLevel >= 5
-                                  ? '0 0 12px rgba(255, 107, 53, 0.6), 0 0 18px rgba(255, 150, 50, 0.3)'
-                                  : '0 0 10px rgba(255, 150, 50, 0.5)',
-                          }}
-                          initial={{ scale: 0.8, opacity: 0 }}
-                          animate={{
-                            scale: [0.9, 1.15, 1.05],
-                            opacity: [0, 1, 0.8],
-                          }}
-                          transition={{ duration: 0.5, ease: 'easeOut' }}
-                        />
-                      )}
-
-                      {/* Sparkle burst - first letter gets extra flair (full mode only) - ENHANCED */}
-                      {isFirstSelected && !reduceMotion && effectiveRenderMode === 'full' && (
-                        <>
-                          {[...Array(6)].map((_, idx) => {
-                            const angle = (idx * 60) * (Math.PI / 180);
-                            const distance = 32;
-                            const colors = comboColors.isRainbow
-                              ? ['#FF3366', '#00FFFF', '#FFE135', '#FF1493', '#BFFF00', '#8B5CF6']
-                              : comboLevel >= 5
-                                ? ['#FF3366', '#FF6B35', '#FFE135', '#FF1493', '#FFA500', '#FFD700']
-                                : ['#FFD700', '#FF6B35', '#FF3366', '#FFA500', '#FFE135', '#FF9500'];
-                            return (
-                              <motion.div
-                                key={`first-burst-${idx}`}
-                                className="absolute pointer-events-none rounded-full"
-                                style={{
-                                  width: 8,
-                                  height: 8,
-                                  background: colors[idx],
-                                  left: '50%',
-                                  top: '50%',
-                                  marginLeft: -4,
-                                  marginTop: -4,
-                                  boxShadow: `0 0 6px ${colors[idx]}`,
-                                }}
-                                initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
-                                animate={{
-                                  scale: [0, 1.5, 0],
-                                  opacity: [0, 1, 0],
-                                  x: Math.cos(angle) * distance,
-                                  y: Math.sin(angle) * distance,
-                                }}
-                                transition={{
-                                  duration: 0.45,
-                                  ease: 'easeOut',
-                                }}
-                              />
-                            );
-                          })}
-                        </>
-                      )}
-
-                      {/* Center burst particles - full mode only - ENHANCED */}
-                      {!reduceMotion && effectiveRenderMode === 'full' && comboLevel >= 2 && (
-                        <>
-                          {[...Array(6)].map((_, idx) => {
-                            const angle = (idx * 60 + 30) * (Math.PI / 180);
-                            const distance = comboLevel >= 5 ? 24 : 20;
-                            const particleColors = comboColors.isRainbow
-                              ? ['#FF1493', '#00FFFF', '#FFE135', '#BFFF00', '#FF3366', '#8B5CF6']
-                              : comboLevel >= 5
-                                ? ['#FF3366', '#FF6B35', '#FFE135', '#FF1493', '#FFA500', '#FFD700']
-                                : ['#FF6B35', '#FFE135', '#FF3366', '#FFA500', '#FFD700', '#FF9500'];
-                            const particleColor = particleColors[idx % particleColors.length];
-                            return (
-                              <motion.div
-                                key={`burst-${idx}`}
-                                className="absolute rounded-full pointer-events-none"
-                                style={{
-                                  width: 6,
-                                  height: 6,
-                                  background: particleColor,
-                                  left: '50%',
-                                  top: '50%',
-                                  marginLeft: -3,
-                                  marginTop: -3,
-                                  boxShadow: `0 0 4px ${particleColor}`,
-                                }}
-                                initial={{ scale: 0, opacity: 1, x: 0, y: 0 }}
-                                animate={{
-                                  scale: [0, 1.3, 0],
-                                  opacity: [0, 1, 0],
-                                  x: Math.cos(angle) * distance,
-                                  y: Math.sin(angle) * distance
-                                }}
-                                transition={{
-                                  duration: 0.4,
-                                  ease: 'easeOut',
-                                }}
-                              />
-                            );
-                          })}
-                        </>
-                      )}
-                    </>
-                  )}
-
-                  {cell}
-
-                  {/* Path order indicator for highlighted cells */}
-                  {isHighlighted && highlightedOrder !== undefined && (
-                    <span
-                      className="absolute -top-1 -right-1 min-w-[18px] h-[18px] flex items-center justify-center bg-neo-black text-neo-lime text-[10px] font-black rounded-full border-2 border-neo-lime shadow-[0_0_8px_rgba(255,225,53,0.6)]"
-                      aria-hidden="true"
-                    >
-                      {highlightedOrder}
-                    </span>
-                  )}
-                </motion.div>
+                <GridCell
+                  key={cellKey}
+                  cell={cell}
+                  row={i}
+                  col={j}
+                  ghost={ghostCells}
+                  isSelected={isSelected}
+                  isFirstSelected={isFirstSelected}
+                  isLastSelected={isLastSelected}
+                  isFading={isFading}
+                  isFocused={isFocused}
+                  isAdjacentHint={isAdjacentHint}
+                  isHighlighted={isHighlighted}
+                  isGolden={isGolden}
+                  isEliminated={isEliminated}
+                  isHovered={isHovered}
+                  isFrozen={isFrozen}
+                  isCharged={isCharged}
+                  isMeteor={isMeteor}
+                  highlightedOrder={highlightedOrder}
+                  selectionIdx={selectionIdx}
+                  escalation={escalation}
+                  shakeOffset={shakeOffset}
+                  effectiveRenderMode={effectiveRenderMode}
+                  earthquakePhase={earthquakePhase}
+                  getPhaseAnimation={getPhaseAnimation}
+                  comboLevel={comboLevel}
+                  escalationCombo={effectiveCombo}
+                  comboColors={comboColors}
+                  reduceMotion={reduceMotion}
+                  animateOnMount={animateOnMount}
+                  interactive={interactive}
+                  isSelecting={isSelecting}
+                  isDragging={isDragging}
+                  isTypingMode={isTypingMode}
+                  hintAnimationPhase={hintAnimationPhase}
+                  isHighTier={isHighTier}
+                  selectedCellsLength={isSelected || isLastSelected ? selectedCells.length : hasAnySelection}
+                  onTouchStart={handleCellTouchStart}
+                  onMouseDown={handleCellMouseDown}
+                  onDoubleClick={handleCellDoubleClick}
+                  ariaLabel={cellAriaLabels[`${i},${j}`]}
+                />
               );
             })
           )}
         </div>
 
-        {/* Earthquake Particle Debris - scattered during quake phase */}
+        {/* Tier transition flash overlay */}
         <AnimatePresence>
-          {earthquakeParticles.map((particle) => (
-            <motion.div
-              key={particle.id}
-              className="absolute pointer-events-none rounded-full"
+          {tierFlash !== null && (
+            <m.div
+              key={`tier-flash-${tierFlash}`}
+              className="absolute inset-0 pointer-events-none z-30 rounded-neo"
               style={{
-                left: `${particle.x}%`,
-                top: `${particle.y}%`,
-                width: particle.size,
-                height: particle.size,
-                backgroundColor: particle.color,
-                border: '2px solid rgb(var(--neo-black))',
-                boxShadow: `0 0 ${particle.size}px ${particle.color}40`,
+                background: tierFlash >= 3
+                  ? 'radial-gradient(circle, rgba(0,255,255,0.6), rgba(255,51,102,0.3) 60%, transparent 85%)'
+                  : 'radial-gradient(circle, rgba(255,255,255,0.7), rgba(255,20,147,0.2) 60%, transparent 85%)',
               }}
-              initial={{
-                scale: 0,
-                opacity: 1,
-                x: 0,
-                y: 0,
-                rotate: 0,
-              }}
-              animate={{
-                scale: [0, 1.5, 1, 0],
-                opacity: [0, 1, 0.8, 0],
-                x: particle.vx,
-                y: particle.vy,
-                rotate: particle.rotation + 720,
-              }}
-              exit={{
-                opacity: 0,
-                scale: 0,
-              }}
-              transition={{
-                duration: 0.8,
-                ease: [0.25, 0.46, 0.45, 0.94],
-              }}
+              initial={{ opacity: 1 }}
+              animate={{ opacity: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15, ease: 'easeOut' }}
             />
-          ))}
+          )}
         </AnimatePresence>
 
-        {/* Earthquake Dust Clouds - rising from bottom during quake */}
-        <AnimatePresence>
-          {earthquakeDust.map((dust) => (
-            <motion.div
-              key={dust.id}
-              className="absolute pointer-events-none"
-              style={{
-                left: `${dust.x}%`,
-                bottom: '-10%',
-                width: dust.size,
-                height: dust.size,
-                background: 'radial-gradient(circle, rgba(139, 69, 19, 0.4) 0%, rgba(139, 69, 19, 0.2) 40%, transparent 70%)',
-                borderRadius: '50%',
-                filter: 'blur(8px)',
-              }}
-              initial={{
-                scale: 0,
-                opacity: 0,
-                y: 0,
-              }}
-              animate={{
-                scale: [0, 1.2, 1.5],
-                opacity: [0, 0.6, 0],
-                y: -200 - dust.size,
-              }}
-              exit={{
-                opacity: 0,
-                scale: 0.5,
-              }}
-              transition={{
-                duration: 1.2,
-                delay: dust.delay,
-                ease: 'easeOut',
-              }}
+        <EarthquakeEffects
+          particles={earthquakeParticles}
+          dust={earthquakeDust}
+        />
+
+        <GridConnectorOverlay selectedCells={selectedCells} gridEl={gridRef.current} comboLevel={effectiveCombo} />
+
+        {interactive && (
+          <>
+            <DragReleaseHint
+              isDragging={isDragging}
+              selectedCellCount={selectedCells.length}
+              wordSubmitted={dragSubmitCount > 0}
             />
-          ))}
-        </AnimatePresence>
-      </motion.div>
+            {/* InputModeIndicator removed — overlaps grid tiles and confuses players */}
+          </>
+        )}
+      </m.div>
     </div>
+    </LazyMotion>
   );
 });
 

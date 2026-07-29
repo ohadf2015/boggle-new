@@ -6,22 +6,23 @@
 import type { Server, Socket } from 'socket.io';
 import type { ActiveRoom } from '@/shared/types';
 
-const {
+import {
   getGame,
   deleteGame,
   getGameBySocketId,
   getActiveRooms
-} = require('../modules/gameStateManager');
+} from '../modules/gameStateManager.js';
 
-const {
+import {
   broadcastToRoom,
+  broadcastActiveRooms,
   getGameRoom
-} = require('../utils/socketHelpers');
+} from '../utils/socketHelpers.js';
 
-const { checkRateLimit } = require('../utils/rateLimiter');
-const timerManager = require('../utils/timerManager');
-const botManager = require('../modules/botManager');
-const logger = require('../utils/logger');
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import { clearGameTimer } from '../utils/timerManager.js';
+import { cleanupGameBots } from '../modules/botManager.js';
+import logger from '../utils/logger.js';
 
 // Types for payloads
 interface GridShufflingData {
@@ -48,19 +49,20 @@ function registerRoomManagementHandlers(io: Server, socket: Socket): void {
     const game = getGame(gameCode);
     if (!game || game.hostSocketId !== socket.id) return;
 
-    timerManager.clearGameTimer(gameCode);
-    botManager.cleanupGameBots(gameCode);
+    clearGameTimer(gameCode);
+    cleanupGameBots(gameCode);
 
     broadcastToRoom(io, getGameRoom(gameCode), 'roomClosed', {});
     deleteGame(gameCode);
-    io.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+    broadcastActiveRooms(io, getActiveRooms());
 
     logger.info('SOCKET', `Room ${gameCode} closed by host`);
   });
 
   // Handle get active rooms
   socket.on('getActiveRooms', () => {
-    socket.emit('activeRooms', { rooms: getActiveRooms() as ActiveRoom[] });
+    if (!checkRateLimit(socket.id)) return;
+    socket.emit('activeRooms', { rooms: getActiveRooms() });
   });
 
   // Handle grid shuffling broadcast
@@ -74,7 +76,5 @@ function registerRoomManagementHandlers(io: Server, socket: Socket): void {
     broadcastToRoom(io, getGameRoom(gameCode), 'gridShuffling', data);
   });
 }
-
-module.exports = { registerRoomManagementHandlers };
 
 export { registerRoomManagementHandlers };

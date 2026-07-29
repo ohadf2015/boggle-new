@@ -5,7 +5,8 @@
 
 import type { Game, WordDetail } from '@/shared/types/game';
 const { translations } = require('../../translations/index.js');
-const logger = require('../utils/logger');
+import logger from '../utils/logger';
+import { hasNoVowels, hasAllVowels, isQWithoutU, isLongIsogram, LEVIATHAN_MIN_LENGTH } from './achievements/wordFeats';
 
 // Achievement icons (language-independent)
 export const ACHIEVEMENT_ICONS: Record<string, string> = {
@@ -55,6 +56,20 @@ export const ACHIEVEMENT_ICONS: Record<string, string> = {
   POINT_KING: '💎',           // Accumulate 50000 total points
   DEDICATION: '🔥',           // Play games on 7 different days
   LOYAL_PLAYER: '⭐',         // Play games on 30 different days
+
+  // NEW
+  EARLY_BIRD: '🐦',           // First valid word within 2 seconds of game start
+  PALINDROME_HUNTER: '🪞',    // Submitted a palindrome word of 4+ letters
+  COMEBACK_CHAMPION: '🦾',    // Won MP after late-game push from behind
+  FIRST_GAME_WIN: '🌱',       // Win first ever game
+
+  // RARE "word feat" achievements — clever word properties (Hall of Fame)
+  CONSONANT_CULT: '🧩',       // A valid 4+ letter word with NO vowels (rhythm, crypt)
+  VOWEL_HOARDER: '🌀',        // One word containing every vowel A,E,I,O,U
+  ROGUE_Q: '🦂',              // A valid word with Q and no U (qi, qat, qoph)
+  LEVIATHAN: '🐋',            // A monster 12+ letter word
+  NO_REPEATS: '🔷',           // An 8+ letter isogram (every letter distinct)
+  FLAWLESS_VICTORY: '🛡️',     // Won a game without a single invalid submission
 };
 
 export interface Achievement {
@@ -99,7 +114,7 @@ interface GameWithAchievements extends Game {
  * Get localized achievements based on locale
  */
 export function getLocalizedAchievements(locale: string = 'he'): Record<string, Achievement> {
-  const supportedLocale = ['he', 'en', 'sv', 'ja'].includes(locale) ? locale : 'he';
+  const supportedLocale = ['he', 'en', 'sv', 'ja', 'es'].includes(locale) ? locale : 'he';
   const t = translations[supportedLocale].achievements;
 
   const achievements: Record<string, Achievement> = {};
@@ -310,6 +325,45 @@ export function checkLiveAchievements(
     }
   }
 
+  // Early Bird - first valid word within 2 seconds of game start
+  if (timeSinceStart <= 2 && isCurrentWordValid && !achievements.includes('EARLY_BIRD')) {
+    newAchievements.push(addAchievementAndReturn('EARLY_BIRD'));
+  }
+
+  // Palindrome Hunter - palindrome word of 4+ letters
+  if (word.length >= 4 && isCurrentWordValid && !achievements.includes('PALINDROME_HUNTER')) {
+    const lower = word.toLowerCase();
+    if (lower === lower.split('').reverse().join('')) {
+      newAchievements.push(addAchievementAndReturn('PALINDROME_HUNTER'));
+    }
+  }
+
+  // ── Rare "word feat" achievements (Hall of Fame) ──────────────────────────
+  // Consonant Cult - a valid 4+ letter word with NO vowels (rhythm, crypt, nymph)
+  if (isCurrentWordValid && !achievements.includes('CONSONANT_CULT') && hasNoVowels(word)) {
+    newAchievements.push(addAchievementAndReturn('CONSONANT_CULT'));
+  }
+
+  // Vowel Hoarder - one word containing every vowel A, E, I, O, U (sequoia)
+  if (isCurrentWordValid && !achievements.includes('VOWEL_HOARDER') && hasAllVowels(word)) {
+    newAchievements.push(addAchievementAndReturn('VOWEL_HOARDER'));
+  }
+
+  // Rogue Q - a valid word with Q and no U (qi, qat, qoph)
+  if (isCurrentWordValid && !achievements.includes('ROGUE_Q') && isQWithoutU(word)) {
+    newAchievements.push(addAchievementAndReturn('ROGUE_Q'));
+  }
+
+  // Leviathan - a monster 12+ letter word
+  if (isCurrentWordValid && !achievements.includes('LEVIATHAN') && word.length >= LEVIATHAN_MIN_LENGTH) {
+    newAchievements.push(addAchievementAndReturn('LEVIATHAN'));
+  }
+
+  // No Repeats - an 8+ letter isogram (every letter distinct)
+  if (isCurrentWordValid && !achievements.includes('NO_REPEATS') && isLongIsogram(word)) {
+    newAchievements.push(addAchievementAndReturn('NO_REPEATS'));
+  }
+
   return newAchievements;
 }
 
@@ -365,10 +419,13 @@ export function awardFinalAchievements(game: Game, users: string[]): void {
   if (!game.playerAchievements) {
     game.playerAchievements = {};
   }
+  if (!game.playerWordDetails) {
+    game.playerWordDetails = {};
+  }
 
   users.forEach(username => {
     if (!game.playerWordDetails[username]) {
-      logger.warn('ACHIEVEMENT', `Player ${username} missing word details during achievement calculation`);
+      logger.debug('ACHIEVEMENT', `Player ${username} missing word details during achievement calculation`);
       return;
     }
 
@@ -586,6 +643,41 @@ export function awardFinalAchievements(game: Game, users: string[]): void {
       if (myScore > maxOtherScore && myScore - maxOtherScore < 5 && !currentAchievements.includes('PHOTO_FINISH')) {
         currentAchievements.push('PHOTO_FINISH');
       }
+
+      // Flawless Victory - won the game without a single invalid submission
+      // (and put up a real game: 10+ valid words). Rare + deeply satisfying.
+      const myAllWords = (game.playerWordDetails[username] || []);
+      const myValidCount = myAllWords.filter(w => w.validated === true).length;
+      if (
+        myScore > maxOtherScore &&
+        myAllWords.length >= 10 &&
+        myValidCount >= 10 &&
+        myAllWords.every(w => w.validated === true) &&
+        !currentAchievements.includes('FLAWLESS_VICTORY')
+      ) {
+        currentAchievements.push('FLAWLESS_VICTORY');
+      }
+
+      // Comeback Champion - winner whose total points scored in last 25% of game
+      // exceeded their total from the first 75%, AND they won.
+      const myWords = (game.playerWordDetails[username] || [])
+        .filter(w => w.validated === true) as WordDetailWithTimestamp[];
+      const gameDuration = (gameWithAchievements.gameDuration || 180);
+      const lateThreshold = gameDuration * 0.75;
+      const lateScore = myWords
+        .filter(w => (w.timeSinceStart || 0) >= lateThreshold)
+        .reduce((sum, w) => sum + Math.max(w.word.length - 1, 0), 0);
+      const earlyScore = myWords
+        .filter(w => (w.timeSinceStart || 0) < lateThreshold)
+        .reduce((sum, w) => sum + Math.max(w.word.length - 1, 0), 0);
+
+      if (
+        myScore > maxOtherScore &&
+        lateScore > earlyScore &&
+        !currentAchievements.includes('COMEBACK_CHAMPION')
+      ) {
+        currentAchievements.push('COMEBACK_CHAMPION');
+      }
     });
   }
 }
@@ -624,6 +716,9 @@ export function checkLifetimeAchievements(
   }
 
   // Games won achievements
+  if ((userStats.gamesWon || 0) >= 1) {
+    addIfNew('FIRST_GAME_WIN');
+  }
   if ((userStats.gamesWon || 0) >= 25) {
     addIfNew('CHAMPION');
   }
@@ -658,6 +753,7 @@ export function checkLifetimeAchievements(
 
 // Export lifetime achievement thresholds for UI display
 export const LIFETIME_ACHIEVEMENT_THRESHOLDS: Record<string, LifetimeThreshold> = {
+  FIRST_GAME_WIN: { stat: 'gamesWon', threshold: 1 },
   VETERAN: { stat: 'gamesPlayed', threshold: 50 },
   CENTURION: { stat: 'gamesPlayed', threshold: 100 },
   WORD_COLLECTOR: { stat: 'totalWordsFound', threshold: 1000 },

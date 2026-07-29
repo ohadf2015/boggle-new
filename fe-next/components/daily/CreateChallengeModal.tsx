@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Copy, Check, Share2, Crown, Grid3X3, Grid2X2, Sparkles, Zap, X, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
@@ -138,7 +138,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(shareUrl);
+    navigator.clipboard.writeText(shareUrl).catch(() => {});
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
     neoSuccessToast(t('daily.linkCopied'));
@@ -195,29 +195,30 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
 
         <div className="max-h-[90vh] overflow-y-auto">
           {/* Header */}
-            <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-gradient-to-br from-neo-lime to-neo-orange sticky top-0 z-10">
-              <motion.div
+            <div className="relative flex items-center justify-between p-3 sm:p-4 border-b-neo-thick border-neo-black bg-linear-to-br from-neo-lime to-neo-pink sticky top-0 z-10">
+              <m.div
                 className="flex items-center gap-3"
                 initial={{ x: -20, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
+                transition={{ type: 'spring', stiffness: 380, damping: 26, delay: 0.2 }}
               >
                 <div className="relative">
-                  <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-neo-black drop-shadow-sm" strokeWidth={2.5} />
-                  <motion.div
+                  <Crown className="w-7 h-7 sm:w-8 sm:h-8 text-neo-black drop-shadow-xs" strokeWidth={2.5} />
+                  <m.div
                     className="absolute -top-1 -right-1"
                     animate={{ scale: [1, 1.2, 1], rotate: [0, 10, 0] }}
-                    transition={{ repeat: Infinity, duration: 2 }}
+                    transition={{ type: 'tween', repeat: Infinity, duration: 2 }}
                   >
                     <Sparkles className="w-4 h-4 text-neo-pink" fill="currentColor" />
-                  </motion.div>
+                  </m.div>
                 </div>
-                <h2 className="font-bold text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-sm">
+                <h2 className="font-bold text-xl sm:text-2xl uppercase tracking-tight text-neo-black drop-shadow-xs">
                   {t('daily.createChallengeTitle')}
                 </h2>
-              </motion.div>
+              </m.div>
               <button
                 onClick={handleClose}
+                aria-label={t('common.close')}
                 className="p-2 hover:bg-neo-black/10 rounded-lg transition-all hover:scale-110 active:scale-95"
               >
                 <X className="w-6 h-6 sm:w-7 sm:h-7 text-neo-black" strokeWidth={2.5} />
@@ -227,11 +228,11 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
             {/* Content */}
             <div className="p-4 sm:p-6 overflow-y-auto max-h-[calc(90vh-80px)]">
               {step === 'config' && (
-                <motion.div
+                <m.div
                   className="space-y-4"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: 0.1 }}
+                  transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.1 }}
                 >
                   {/* Board Size Selection */}
                   <div className="space-y-3">
@@ -242,7 +243,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300">{t('daily.pickDifficulty')}</p>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <motion.button
+                      <m.button
                         onClick={() => setBoardSize(5)}
                         whileHover={{ scale: 1.05, y: -4 }}
                         whileTap={{ scale: 0.95, y: 0 }}
@@ -260,57 +261,57 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                           <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">{t('daily.classic')}</span>
                         </div>
                         {boardSize === 5 && (
-                          <motion.div
+                          <m.div
                             className="absolute -top-2 -right-2"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1, rotate: 360 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1, rotate: 360 }}
                             transition={{ type: 'spring', bounce: 0.6 }}
                           >
                             <div className="bg-neo-pink border-3 border-neo-black rounded-full p-1 shadow-hard-sm">
                               <Check className="w-4 h-4 text-neo-white" strokeWidth={3} />
                             </div>
-                          </motion.div>
+                          </m.div>
                         )}
-                      </motion.button>
+                      </m.button>
 
-                      <motion.button
+                      <m.button
                         onClick={() => setBoardSize(7)}
                         whileHover={{ scale: 1.05, y: -4 }}
                         whileTap={{ scale: 0.95, y: 0 }}
                         className={`relative p-4 sm:p-5 rounded-xl border-neo-thick transition-all flex flex-col items-center gap-2 ${
                           boardSize === 7
-                            ? 'bg-neo-orange text-neo-black border-neo-black shadow-hard-lg'
-                            : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-orange hover:text-neo-orange shadow-hard-sm hover:shadow-hard'
+                            ? 'bg-neo-pink text-neo-black border-neo-black shadow-hard-lg'
+                            : 'bg-neo-white text-neo-black border-neo-black/30 hover:border-neo-pink hover:text-neo-pink shadow-hard-sm hover:shadow-hard'
                         }`}
                       >
-                        <div className={`p-3 rounded-lg ${boardSize === 7 ? 'bg-neo-white/20' : 'bg-neo-orange/10'}`}>
-                          <Grid3X3 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 7 ? 'text-neo-black' : 'text-neo-orange'}`} strokeWidth={2.5} />
+                        <div className={`p-3 rounded-lg ${boardSize === 7 ? 'bg-neo-white/20' : 'bg-neo-pink/10'}`}>
+                          <Grid3X3 className={`w-8 h-8 sm:w-10 sm:h-10 ${boardSize === 7 ? 'text-neo-black' : 'text-neo-pink'}`} strokeWidth={2.5} />
                         </div>
                         <div className="text-center">
                           <span className="font-black text-2xl sm:text-3xl block">7×7</span>
                           <span className="text-xs sm:text-sm font-bold uppercase tracking-wide">{t('daily.pro')}</span>
                         </div>
                         {boardSize === 7 && (
-                          <motion.div
+                          <m.div
                             className="absolute -top-2 -right-2"
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1, rotate: 360 }}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1, rotate: 360 }}
                             transition={{ type: 'spring', bounce: 0.6 }}
                           >
                             <div className="bg-neo-pink border-3 border-neo-black rounded-full p-1 shadow-hard-sm">
                               <Check className="w-4 h-4 text-neo-white" strokeWidth={3} />
                             </div>
-                          </motion.div>
+                          </m.div>
                         )}
-                      </motion.button>
+                      </m.button>
                     </div>
                   </div>
 
                   {/* Word Input */}
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.2 }}
                     className="space-y-2"
                   >
                     <label htmlFor="target-word" className="block text-sm sm:text-base font-black text-neo-black dark:text-neo-white uppercase tracking-tight">
@@ -328,7 +329,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                         min: 4,
                         max: 8
                       })}
-                      className={`w-full px-4 py-3 text-lg font-bold text-neo-black border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-none transition-all ${
+                      className={`w-full px-4 py-3 text-lg font-bold text-neo-black border-neo-thick rounded-xl shadow-hard-sm focus:shadow-hard focus:outline-hidden transition-all ${
                         wordError
                           ? 'border-red-500 bg-red-50'
                           : 'border-neo-black bg-neo-white focus:border-neo-cyan'
@@ -336,82 +337,82 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       dir={language === 'he' ? 'rtl' : 'ltr'}
                     />
                     {wordError && (
-                      <motion.p
+                      <m.p
                         initial={{ opacity: 0, y: -5 }}
                         animate={{ opacity: 1, y: 0 }}
                         className="text-sm font-bold text-red-600 flex items-center gap-2"
                       >
                         <span className="inline-block w-1 h-1 rounded-full bg-red-600" />
                         {wordError}
-                      </motion.p>
+                      </m.p>
                     )}
-                  </motion.div>
+                  </m.div>
 
                   {/* Generate Button */}
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
                   >
                     <Button
                       onClick={handleCreate}
-                      className="relative w-full h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-pink to-neo-pink/80 hover:from-neo-pink/90 hover:to-neo-pink/70 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide overflow-hidden group"
+                      className="relative w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-pink to-neo-pink/80 hover:from-neo-pink/90 hover:to-neo-pink/70 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide overflow-hidden group"
                     >
                       <span className="relative z-10 flex items-center justify-center gap-3">
                         <Zap className="w-6 h-6" strokeWidth={2.5} fill="currentColor" />
                         {t('daily.generateChallenge')}
                       </span>
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                      <m.div
+                        className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
                         animate={{ x: ['-100%', '200%'] }}
                         transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
                       />
                     </Button>
-                  </motion.div>
-                </motion.div>
+                  </m.div>
+                </m.div>
               )}
 
               {step === 'loading' && (
-                <motion.div
+                <m.div
                   className="flex flex-col items-center justify-center py-12 sm:py-16 space-y-6"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
                   {/* Animated Loader */}
                   <div className="relative">
-                    <motion.div
+                    <m.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                       className="relative"
                     >
                       <div className="w-20 h-20 sm:w-24 sm:h-24 border-neo-thick border-neo-pink rounded-full border-t-transparent" />
-                    </motion.div>
-                    <motion.div
+                    </m.div>
+                    <m.div
                       className="absolute inset-0 flex items-center justify-center"
                       animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
+                      transition={{ type: 'tween', duration: 1.5, repeat: Infinity }}
                     >
-                      <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-neo-orange" strokeWidth={2.5} />
-                    </motion.div>
+                      <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 text-neo-pink" strokeWidth={2.5} />
+                    </m.div>
                   </div>
 
                   {/* Loading Text */}
                   <div className="text-center space-y-2">
-                    <motion.p
+                    <m.p
                       className="text-lg sm:text-xl font-black text-neo-black dark:text-neo-white uppercase tracking-wide"
                       animate={{ opacity: [0.5, 1, 0.5] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                     >
                       {t('daily.generatingPuzzle')}
-                    </motion.p>
-                    <motion.div
+                    </m.p>
+                    <m.div
                       className="flex gap-1 justify-center"
                       initial="hidden"
                       animate="visible"
                     >
                       {[0, 1, 2].map((i) => (
-                        <motion.div
-                          key={i}
+                        <m.div
+                          key={`dot-${i}`}
                           className="w-2 h-2 bg-neo-pink rounded-full"
                           variants={{
                             hidden: { opacity: 0.3, scale: 0.8 },
@@ -425,13 +426,13 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                           }}
                         />
                       ))}
-                    </motion.div>
+                    </m.div>
                   </div>
-                </motion.div>
+                </m.div>
               )}
 
               {step === 'share' && (
-                <motion.div
+                <m.div
                   className="space-y-6 text-center"
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -440,34 +441,35 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                   {/* Success Mascot with 3D effect */}
                   <div className="relative flex items-center justify-center h-32 sm:h-40">
                     {/* Background circle */}
-                    <motion.div
-                      className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-neo-lime to-neo-orange rounded-full border-neo-thick border-neo-black shadow-hard-lg"
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
+                    <m.div
+                      className="absolute w-24 h-24 sm:w-32 sm:h-32 bg-linear-to-br from-neo-lime to-neo-pink rounded-full border-neo-thick border-neo-black shadow-hard-lg"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
                       transition={{ type: 'spring', bounce: 0.6, duration: 0.6 }}
                     />
 
                     {/* Mascot popping out of circle (3D effect) */}
-                    <motion.div
-                      initial={{ scale: 0, rotate: -180, y: 20 }}
-                      animate={{ scale: 1, rotate: 0, y: -8 }}
+                    <m.div
+                      initial={{ opacity: 0, scale: 0.95, rotate: -180, y: 20 }}
+                      animate={{ opacity: 1, scale: 1, rotate: 0, y: -8 }}
                       transition={{ type: 'spring', bounce: 0.6, duration: 0.8, delay: 0.1 }}
                       className="relative z-10"
                     >
                       <Mascot
-                        variant="holding_trophy"
+                        variant="happy"
                         size="2xl"
                         animated={true}
                         className="drop-shadow-2xl"
+                        clipBorder="none"
                       />
-                    </motion.div>
+                    </m.div>
 
                     {/* Confetti particles */}
                     {[...Array(8)].map((_, i) => (
-                      <motion.div
-                        key={i}
+                      <m.div
+                        key={`confetti-${i}`}
                         className="absolute top-1/2 left-1/2"
-                        initial={{ scale: 0, x: 0, y: 0 }}
+                        initial={{ scale: 0.95, x: 0, y: 0 }}
                         animate={{
                           scale: [0, 1, 0],
                           x: [0, (Math.cos((i * Math.PI) / 4) * 60)],
@@ -481,40 +483,40 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                           }`}
                           fill="currentColor"
                         />
-                      </motion.div>
+                      </m.div>
                     ))}
                   </div>
 
                   {/* Success Message */}
-                  <motion.div
+                  <m.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.3 }}
                   >
                     <h3 className="font-black text-2xl sm:text-3xl mb-2 text-neo-black dark:text-neo-white uppercase tracking-tight">
                       {t('daily.challengeCreated')}
                     </h3>
                     <p className="text-base text-slate-700 dark:text-slate-300 font-medium">{t('daily.challengeCreatedDesc')}</p>
-                  </motion.div>
+                  </m.div>
 
                   {/* Share URL Box */}
-                  <motion.div
+                  <m.div
                     className="flex items-center gap-2 bg-neo-cream border-3 border-neo-black rounded-xl p-3 shadow-hard-sm"
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
+                    transition={{ type: 'spring', stiffness: 300, damping: 26, delay: 0.4 }}
                   >
                     <div className="flex-1 overflow-hidden">
                       <p className="text-xs text-slate-600 dark:text-slate-400 font-bold uppercase mb-1">{t('daily.challengeLink')}</p>
                       <p className="text-sm font-mono truncate text-neo-black font-bold">{shareUrl}</p>
                     </div>
-                    <motion.button
+                    <m.button
                       onClick={handleCopy}
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       className={`shrink-0 p-3 rounded-lg border-3 border-neo-black transition-all ${
                         copied
-                          ? 'bg-neo-green text-neo-white shadow-hard-sm'
+                          ? 'bg-neo-lime text-neo-black shadow-hard-sm'
                           : 'bg-neo-white hover:bg-neo-lime shadow-hard-sm hover:shadow-hard'
                       }`}
                     >
@@ -523,58 +525,58 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                       ) : (
                         <Copy className="w-5 h-5 text-neo-black" strokeWidth={2.5} />
                       )}
-                    </motion.button>
-                  </motion.div>
+                    </m.button>
+                  </m.div>
 
                   {/* Share Button */}
-                  <motion.div
+                  <m.div
                     initial={{ y: 20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5 }}
+                    transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.5 }}
                     className="space-y-3"
                   >
                     <Button
                       onClick={handleNativeShare}
-                      className="w-full h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-cyan to-blue-500 hover:from-neo-cyan/90 hover:to-blue-500/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
+                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-cyan to-blue-500 hover:from-neo-cyan/90 hover:to-blue-500/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
                     >
-                      <Share2 className="w-6 h-6 mr-2" strokeWidth={2.5} />
+                      <Share2 className="w-6 h-6 me-2" strokeWidth={2.5} />
                       {t('daily.shareChallenge')}
                     </Button>
 
                     <Button
                       onClick={() => setStep('stats')}
-                      className="w-full h-14 sm:h-16 text-lg sm:text-xl font-black bg-gradient-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
+                      className="w-full max-w-btn h-14 sm:h-16 text-lg sm:text-xl font-black bg-linear-to-br from-neo-purple to-purple-600 hover:from-neo-purple/90 hover:to-purple-600/90 text-neo-white border-neo-thick border-neo-black shadow-hard-lg hover:shadow-hard-xl hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm rounded-xl transition-all uppercase tracking-wide"
                     >
-                      <BarChart3 className="w-6 h-6 mr-2" strokeWidth={2.5} />
+                      <BarChart3 className="w-6 h-6 me-2" strokeWidth={2.5} />
                       {t('daily.viewStats')}
                     </Button>
 
                     <Button
                       variant="ghost"
                       onClick={handleClose}
-                      className="w-full text-base font-bold text-slate-600 dark:text-slate-300 hover:text-neo-black hover:bg-gray-100 dark:hover:bg-slate-800 rounded-lg py-3"
+                      className="w-full max-w-btn text-base font-bold text-slate-600 dark:text-slate-300 hover:text-neo-black hover:bg-gray-100 dark:hover:bg-neo-navy-light rounded-lg py-3"
                     >
                       {t('daily.close')}
                     </Button>
-                  </motion.div>
+                  </m.div>
 
                   {/* Footer Hint */}
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
+                    transition={{ type: 'spring', stiffness: 280, damping: 26, delay: 0.6 }}
                     className="pt-4 border-t-3 border-gray-200"
                   >
                     <p className="text-sm text-slate-600 dark:text-slate-400 font-medium flex items-center justify-center gap-2">
-                      <Sparkles className="w-4 h-4 text-neo-orange" />
+                      <Sparkles className="w-4 h-4 text-neo-pink" />
                       {t('daily.canPlayYourself')}
                     </p>
-                  </motion.div>
-                </motion.div>
+                  </m.div>
+                </m.div>
               )}
 
               {step === 'stats' && puzzleCode && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className="space-y-4"
@@ -583,7 +585,7 @@ export const CreateChallengeModal: React.FC<CreateChallengeModalProps> = ({ isOp
                     puzzleCode={puzzleCode}
                     onClose={() => setStep('share')}
                   />
-                </motion.div>
+                </m.div>
               )}
             </div>
         </div>

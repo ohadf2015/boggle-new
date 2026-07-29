@@ -1,28 +1,25 @@
 import React, { useState, useMemo, memo, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { AchievementBadge } from '../AchievementBadge';
-import PlayerInsights from './PlayerInsights';
+
 import NoWordsFoundView from './NoWordsFoundView';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { cn } from '../../lib/utils';
 import { applyHebrewFinalLetters } from '../../utils/utils';
-import { calculatePlayerInsights } from '../../utils/gameInsights';
+
 import { ChevronDown, ChevronUp, Award } from 'lucide-react';
 import Avatar from '../Avatar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 import logger from '@/utils/logger';
-import XpBreakdownCard from './XpBreakdownCard';
+
 import PlayerArchetypeBadge from './PlayerArchetypeBadge';
 import { WordPointsGroup, SharedWordsSection, InvalidWordsSection } from './WordPointsGroup';
 import { getCardStyle } from '../../utils/rankingStyles';
 import { filterGameAchievements } from './utils';
 import type { WordObject, ResultsPlayerCardProps } from './types';
 
-const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, index, allPlayerWords, currentUsername, isWinner, xpGainedData, levelUpData, duplicateRuleDisabled, archetype }) => {
-  const { t, dir } = useLanguage();
-  // Arrow for level up indicator - use ← in RTL and → in LTR to show progression
-  // In RTL languages, left arrow indicates "going up/forward"
-  const levelArrow = dir === 'rtl' ? '←' : '→';
+const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, index, allPlayerWords, currentUsername, isWinner, archetype, compact = false }) => {
+  const { t } = useLanguage();
 
   // Check if this is the current player
   const isCurrentPlayer = currentUsername && player.username === currentUsername;
@@ -39,7 +36,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
   const avatar = player.avatar || null;
 
   // Memoize expensive word categorization and grouping at component level (not inside JSX)
-  const { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, totalFireRoundBonus, summaryStats } = useMemo(() => {
+  const { duplicateWords, invalidWords, validWords: _validWords, wordsByPoints, sortedPointGroups, totalComboBonus, totalFireRoundBonus, summaryStats } = useMemo(() => {
     if (!player.allWords || player.allWords.length === 0) {
       return {
         duplicateWords: [] as WordObject[],
@@ -122,32 +119,6 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
     return { duplicateWords, invalidWords, validWords, wordsByPoints, sortedPointGroups, totalComboBonus, totalFireRoundBonus, summaryStats };
   }, [player.allWords, player.username]);
 
-  // Calculate player insights (only for current player to avoid unnecessary computation)
-  const playerInsights = useMemo(() => {
-    if (!isCurrentPlayer || !player.allWords || player.allWords.length === 0) {
-      return null;
-    }
-
-    // Calculate effective game duration from word timing data
-    // Use the maximum timeSinceStart as a proxy for game duration
-    // This is more accurate than a fixed value since it reflects actual play time
-    let gameDuration = 180; // Default fallback
-    const timeSinceStartValues = player.allWords
-      .map(w => w.timeSinceStart)
-      .filter((t): t is number => typeof t === 'number' && t > 0);
-
-    if (timeSinceStartValues.length > 0) {
-      const maxTimeSinceStart = Math.max(...timeSinceStartValues);
-      // Round up to nearest 30 seconds to get a reasonable game duration estimate
-      // Add a small buffer (10 seconds) since last word might not be at the very end
-      gameDuration = Math.ceil((maxTimeSinceStart + 10) / 30) * 30;
-      // Ensure minimum of 60 seconds for pace calculation
-      gameDuration = Math.max(gameDuration, 60);
-    }
-
-    return calculatePlayerInsights(player.allWords, gameDuration, player.score);
-  }, [isCurrentPlayer, player.allWords, player.score]);
-
   // Filter out lifetime achievements and validate against player's actual round stats
   // This prevents showing stale achievements from previous games
   const gameAchievements = useMemo(() => {
@@ -172,17 +143,19 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
   const cardStyleClass = getCardStyle(index);
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ delay: Math.min(index * 0.05, 0.3), duration: 0.3 }}
-      style={{ transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)` }}
+      transition={{ delay: Math.min(index * 0.05, 0.3), type: 'spring', stiffness: 300, damping: 26 }}
+      style={compact ? undefined : { transform: `rotate(${index % 2 === 0 ? 1 : -1}deg)` }}
     >
       {/* Neo-Brutalist Card */}
       <div
         className={cn(
-          "p-3 sm:p-4 border-4 transition-all duration-200 rounded-neo-lg shadow-hard-lg relative overflow-hidden",
-          "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
+          "transition-all duration-200 rounded-neo-lg relative overflow-hidden",
+          compact
+            ? "p-2 border-2 shadow-hard-sm"
+            : "p-3 sm:p-4 border-4 shadow-hard-lg hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-xl",
           cardStyleClass,
           isWordsExpanded && "ring-4 ring-neo-cyan"
         )}
@@ -193,42 +166,38 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             "absolute inset-0 pointer-events-none",
             "opacity-0" // Texture disabled - only appears on body background
           )}
-          style={{
-            backgroundImage: `radial-gradient(circle, var(--neo-black) 1px, transparent 1px)`,
-            backgroundSize: '6px 6px',
-          }}
         />
         {/* Header: Rank, Name, Score - Neo-Brutalist - Organized */}
         <div className="relative z-10">
           {/* Main row: Avatar, Username (no rank/score for secondary cards) */}
-          <div className="flex items-center justify-between gap-2 sm:gap-3 mb-3">
+          <div className={cn("flex items-center justify-between gap-2 sm:gap-3", compact ? "mb-1" : "mb-3")}>
             {/* Left: Avatar + Username with key badges */}
             <div className="flex items-center gap-2 min-w-0 flex-1">
               <Avatar
-                profilePictureUrl={avatar?.profilePictureUrl}
-                avatarImage={avatar?.avatarImage}
-                size="2xl"
-                className="flex-shrink-0"
+                userId={player.username}
+                customAvatar={avatar?.customAvatar}
+                size={compact ? "md" : "2xl"}
+                className="shrink-0"
               />
               <div className="flex flex-col gap-1 min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 flex-wrap">
-                  <h3 className="text-base sm:text-xl font-black text-neo-black truncate">
+                  <h3 className={cn("font-black text-neo-black truncate", compact ? "text-sm" : "text-base sm:text-xl")} title={player.username}>
                     {player.username}
                   </h3>
                   {isCurrentPlayer && !showWinnerMessage && (
-                    <span className="text-xs bg-neo-black text-neo-cream px-1.5 py-0.5 rounded-neo font-bold">
+                    <span className="text-xs bg-neo-black text-neo-white px-1.5 py-0.5 rounded-neo font-bold">
                       ({t('playerView.me')})
                     </span>
                   )}
                   {showWinnerMessage && (
-                    <motion.span
+                    <m.span
                       initial={{ scale: 0, opacity: 0, rotate: -5 }}
                       animate={{ scale: 1, opacity: 1, rotate: 3 }}
-                      transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
-                      className="text-xs font-black bg-neo-pink text-neo-cream px-1.5 py-0.5 rounded-neo border-2 border-neo-black"
+                      transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
+                      className="text-xs font-black bg-neo-pink text-neo-white px-1.5 py-0.5 rounded-neo border-2 border-neo-black"
                     >
                       {t('results.youWon')}
-                    </motion.span>
+                    </m.span>
                   )}
                 </div>
                 {/* Title badge and Archetype badge - secondary row */}
@@ -237,23 +206,23 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                     <TooltipProvider delayDuration={0}>
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <motion.div
+                          <m.div
                             initial={{ scale: 0, opacity: 0, x: -10 }}
                             animate={{ scale: 1, opacity: 1, x: 0 }}
-                            transition={{ delay: 0.4, type: 'spring', stiffness: 300 }}
-                            className="flex items-center gap-1 cursor-help bg-neo-pink/10 text-white px-1.5 py-0.5 rounded-neo border border-neo-black w-fit"
+                            transition={{ delay: 0.4, type: 'spring', stiffness: 300, damping: 26 }}
+                            className="flex items-center gap-1 cursor-help bg-neo-black px-1.5 py-0.5 rounded-neo border border-neo-black w-fit"
                           >
                             <span className="text-sm">{player.title.icon}</span>
                             <span className="text-xs font-black text-neo-pink uppercase tracking-wide">
                               {player.title.name}
                             </span>
-                          </motion.div>
+                          </m.div>
                         </TooltipTrigger>
                         <TooltipContent
                           side="bottom"
                           className="bg-neo-pink text-white border-2 border-neo-black shadow-hard rounded-neo p-2"
                         >
-                          <p className="text-xs font-bold text-neo-cream">{player.title.description}</p>
+                          <p className="text-xs font-bold text-neo-white">{player.title.description}</p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>
@@ -272,26 +241,26 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             <div className="flex items-center gap-2 flex-wrap">
               {/* Combo bonus */}
               {totalComboBonus > 0 && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0, rotate: -10 }}
                   animate={{ scale: 1, rotate: 3 }}
-                  transition={{ delay: 0.2, type: 'spring', stiffness: 300 }}
+                  transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
                   className="bg-neo-lime border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-black flex items-center gap-1"
                 >
                   <span className="text-xs font-black">⚡ +{totalComboBonus}</span>
-                </motion.div>
+                </m.div>
               )}
 
               {/* Fire Round Bonus */}
               {totalFireRoundBonus > 0 && (
-                <motion.div
+                <m.div
                   initial={{ scale: 0, rotate: -10 }}
                   animate={{ scale: 1, rotate: 3 }}
-                  transition={{ delay: 0.25, type: 'spring', stiffness: 300 }}
-                  className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-cream flex items-center gap-1"
+                  transition={{ delay: 0.25, type: 'spring', stiffness: 300, damping: 26 }}
+                  className="bg-neo-red border-2 border-neo-black rounded-neo px-2 py-0.5 shadow-hard-sm text-neo-white flex items-center gap-1"
                 >
                   <span className="text-xs font-black">🔥 +{totalFireRoundBonus}</span>
-                </motion.div>
+                </m.div>
               )}
             </div>
           )}
@@ -302,7 +271,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
         <div className="mb-2 relative z-10">
           <button
             onClick={handleToggleExpand}
-            className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-cream uppercase border-2 border-neo-black bg-neo-cream dark:bg-slate-700 shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
+            className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-cream dark:bg-neo-navy-elevated shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"
           >
             <span>{t('hostView.words')}: ({player.allWords?.length || 0})</span>
             {isWordsExpanded ? (
@@ -313,7 +282,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
           </button>
           <AnimatePresence>
             {isWordsExpanded && (
-              <motion.div
+              <m.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
@@ -331,10 +300,11 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                 <div className="space-y-2 pt-2">
                   {/* Summary Stats Card - Quick glance performance overview */}
                   {summaryStats && (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="bg-slate-800 border-2 border-neo-cyan rounded-neo p-2"
+                      transition={{ type: 'spring', stiffness: 300, damping: 26 }}
+                      className="bg-neo-navy-light border-2 border-neo-cyan rounded-neo p-2"
                     >
                       <div className="grid grid-cols-3 gap-2 text-center">
                         <div>
@@ -342,7 +312,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                             {summaryStats.validCount}
                           </div>
                           <div className="text-[10px] sm:text-xs uppercase text-white font-bold">
-                            {t('results.validWords') || 'Valid'}
+                            {t('results.validWords')}
                           </div>
                         </div>
                         <div>
@@ -350,7 +320,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                             {summaryStats.longestWord}
                           </div>
                           <div className="text-[10px] sm:text-xs uppercase text-white font-bold">
-                            {t('results.longest') || 'Longest'}
+                            {t('results.longest')}
                           </div>
                         </div>
                         <div>
@@ -358,11 +328,11 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                             {summaryStats.accuracy}%
                           </div>
                           <div className="text-[10px] sm:text-xs uppercase text-white font-bold">
-                            {t('results.accuracy') || 'Accuracy'}
+                            {t('results.accuracy')}
                           </div>
                         </div>
                       </div>
-                    </motion.div>
+                    </m.div>
                   )}
 
                   {/* Valid Words Grouped by Points - Using reusable component */}
@@ -390,7 +360,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                   />
                 </div>
                 )}
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>
@@ -403,11 +373,11 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             <button
               onClick={() => setShowAchievements(!showAchievements)}
               aria-expanded={showAchievements}
-              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-cream uppercase border-2 border-neo-black bg-neo-lime/20 dark:bg-neo-lime/10 shadow-hard-sm hover:translate-x-[-1px] hover:translate-y-[-1px] hover:shadow-hard transition-all"
+              className="w-full flex items-center justify-between p-2 rounded-neo text-sm font-black text-neo-black dark:text-neo-white uppercase border-2 border-neo-black bg-neo-lime/20 dark:bg-neo-lime/10 shadow-hard-sm hover:-translate-x-px hover:-translate-y-px hover:shadow-hard transition-all"
             >
               <span className="flex items-center gap-2">
                 <Award className="w-4 h-4 text-neo-pink" />
-                {t('hostView.achievements') || 'Achievements'} ({gameAchievements.length})
+                {t('hostView.achievements')} ({gameAchievements.length})
               </span>
               {showAchievements ? (
                 <ChevronUp className="w-5 h-5" />
@@ -417,7 +387,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
             </button>
             <AnimatePresence>
               {showAchievements && (
-                <motion.div
+                <m.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: 'auto', opacity: 1 }}
                   exit={{ height: 0, opacity: 0 }}
@@ -426,10 +396,10 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
                 >
                   <div className="flex flex-wrap gap-2 pt-2">
                     {gameAchievements.map((ach, i) => (
-                      <AchievementBadge key={i} achievement={ach} index={i} />
+                      <AchievementBadge key={ach.key || ach.name || `ach-${i}`} achievement={ach} index={i} />
                     ))}
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </div>
@@ -437,7 +407,7 @@ const ResultsPlayerCard: React.FC<ResultsPlayerCardProps> = memo(({ player, inde
 
         {/* XP Breakdown - Disabled for current player (shown in ConsolidatedPlayerCard above) */}
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

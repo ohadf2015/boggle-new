@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { generateRandomTable } from '@/utils/utils';
+import { pickRichestBoardClient } from '@/lib/boardSelection';
 import { DIFFICULTIES } from '@/utils/consts';
 import {
   DEFAULT_EARTHQUAKE_CONFIG,
@@ -7,8 +8,8 @@ import {
   type UseEarthquakeFireRoundOptions,
   type UseEarthquakeFireRoundReturn,
   type EarthquakeConfig,
-  type TriggerEarthquakePayload,
 } from '@/shared/types/earthquake';
+import { useSafeTimeout, useSafeInterval } from './useSafeTimeout';
 
 /**
  * useEarthquakeFireRound
@@ -62,9 +63,11 @@ export function useEarthquakeFireRound(
   // Refs
   const earthquakeTriggeredRef = useRef(false);
   const triggerTimeRef = useRef<number | null>(null);
-  const fireRoundTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const warningTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Timer hooks (replaces manual timer refs)
+  const warningTimeout = useSafeTimeout();
+  const shakeTimeout = useSafeTimeout();
+  const fireRoundInterval = useSafeInterval();
 
   // Reset refs when game session changes (new game started)
   useEffect(() => {
@@ -75,14 +78,16 @@ export function useEarthquakeFireRound(
     setFireRoundRemaining(0);
 
     // Clear any pending timers from previous session
-    if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
-    if (shakeTimeoutRef.current) clearTimeout(shakeTimeoutRef.current);
-    if (fireRoundTimerRef.current) clearInterval(fireRoundTimerRef.current);
-  }, [gameSessionId]);
+    warningTimeout.clear();
+    shakeTimeout.clear();
+    fireRoundInterval.stop();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [gameSessionId /* Timer hooks intentionally excluded - they're stable */]);
 
   // Calculate trigger time (random time in last 24% of game, but at least 20 sec before end)
   useEffect(() => {
-    if (!enabled || triggerTimeRef.current !== null) return;
+    // Multiplayer earthquake is scheduled server-side (roundEventsManager) — never arm a client trigger.
+    if (!enabled || mode === 'multiplayer' || triggerTimeRef.current !== null) return;
 
     // Don't trigger for very short games
     if (gameDurationSeconds < config.minGameDurationSeconds) {
@@ -111,16 +116,19 @@ export function useEarthquakeFireRound(
     // Convert to "remaining time" for easier comparison
     const triggerTimeRemaining = gameDurationSeconds - randomElapsed;
     triggerTimeRef.current = Math.max(0, triggerTimeRemaining);
-  }, [enabled, gameDurationSeconds, config]);
+  }, [enabled, mode, gameDurationSeconds, config]);
 
   // Generate new grid for fire round
   const generateNewGrid = useCallback(() => {
     const difficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.MEDIUM;
-    const newGrid = generateRandomTable(
-      difficultyConfig.rows,
-      difficultyConfig.cols,
-      language,
-      [] // Empty array - let it generate random words to embed
+    const newGrid = pickRichestBoardClient(
+      () => generateRandomTable(
+        difficultyConfig.rows,
+        difficultyConfig.cols,
+        language,
+        []
+      ),
+      language
     );
 
     return { grid: newGrid, embeddedWords: [] };
@@ -134,12 +142,12 @@ export function useEarthquakeFireRound(
     onEarthquakeStart?.();
     onTimerPause?.(); // Pause game timer during warning
 
-    warningTimeoutRef.current = setTimeout(() => {
+    warningTimeout.set(() => {
       // Phase 2: SHAKING (1 second)
       setEarthquakeState('shaking');
       onEarthquakeShake?.();
 
-      shakeTimeoutRef.current = setTimeout(() => {
+      shakeTimeout.set(() => {
         // Phase 3: FIRE ROUND (15 seconds)
         const { grid, embeddedWords } = generateNewGrid();
         onGridRegenerate?.(grid, embeddedWords);
@@ -154,14 +162,12 @@ export function useEarthquakeFireRound(
 
         // Start fire round countdown
         let remaining = config.fireRoundDurationSeconds;
-        fireRoundTimerRef.current = setInterval(() => {
+        fireRoundInterval.start(() => {
           remaining -= 1;
           setFireRoundRemaining(remaining);
 
           if (remaining <= 0) {
-            if (fireRoundTimerRef.current) {
-              clearInterval(fireRoundTimerRef.current);
-            }
+            fireRoundInterval.stop();
             setEarthquakeState('idle');
             setFireRoundActive(false);
             setFireRoundRemaining(0);
@@ -170,6 +176,7 @@ export function useEarthquakeFireRound(
         }, 1000);
       }, config.shakeDurationMs);
     }, config.warningDurationMs);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     config,
     generateNewGrid,
@@ -180,10 +187,14 @@ export function useEarthquakeFireRound(
     onFireRoundEnd,
     onTimerPause,
     onTimerResume,
+    // Timer hooks intentionally excluded - they're stable references
   ]);
 
   // Trigger earthquake sequence
   const triggerEarthquake = useCallback((force = false) => {
+    // Multiplayer earthquake is server-driven; the client never triggers it.
+    if (mode === 'multiplayer') return;
+
     // Non-force triggers: check if already triggered or in progress
     if (!force) {
       if (earthquakeTriggeredRef.current || earthquakeState !== 'idle') {
@@ -193,19 +204,9 @@ export function useEarthquakeFireRound(
 
     earthquakeTriggeredRef.current = true;
 
-    // For multiplayer hosts, emit socket event instead of executing locally
-    if (mode === 'multiplayer' && isHost && socket) {
-      const payload: TriggerEarthquakePayload = {
-        gameSessionId: String(gameSessionId ?? ''),
-        triggerTime: currentTimeSeconds,
-      };
-      socket.emit('triggerEarthquake', payload);
-      return; // Backend will broadcast events back to all players including host
-    }
-
-    // Single-player or non-host: Execute earthquake sequence locally
+    // Single-player: execute earthquake sequence locally
     executeEarthquakeSequence();
-  }, [mode, isHost, socket, gameSessionId, currentTimeSeconds, executeEarthquakeSequence, earthquakeState]);
+  }, [mode, executeEarthquakeSequence, earthquakeState]);
 
   // Monitor time remaining and trigger earthquake at the right moment
   useEffect(() => {
@@ -218,15 +219,6 @@ export function useEarthquakeFireRound(
       triggerEarthquake();
     }
   }, [enabled, currentTimeSeconds, triggerEarthquake]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => {
-      if (warningTimeoutRef.current) clearTimeout(warningTimeoutRef.current);
-      if (shakeTimeoutRef.current) clearTimeout(shakeTimeoutRef.current);
-      if (fireRoundTimerRef.current) clearInterval(fireRoundTimerRef.current);
-    };
-  }, []);
 
   // Get score multiplier (2x during fire round, 1x otherwise)
   const getScoreMultiplier = useCallback((): number => {

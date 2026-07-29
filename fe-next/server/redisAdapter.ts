@@ -5,6 +5,7 @@
 
 import { createAdapter } from '@socket.io/redis-adapter';
 import { initRedis, createPubSubClients, closeRedis } from '../backend/redisClient';
+import { redisLogger } from './logger';
 
 import type { Server } from 'socket.io';
 import type { Redis as RedisClient } from 'ioredis';
@@ -23,22 +24,39 @@ export interface ExtendedSocketServer extends Server {
  * @returns Whether Redis adapter was successfully configured
  */
 export async function setupRedisAdapter(io: ExtendedSocketServer): Promise<boolean> {
+  const isProduction = process.env.NODE_ENV === 'production';
   const redisConnected = await initRedis();
 
   if (!redisConnected) {
-    console.log('[SOCKET.IO] Running in single instance mode (no Redis adapter)');
+    if (isProduction) {
+      redisLogger.error('Redis unavailable in production — running in degraded single-instance mode. Horizontal scaling disabled.');
+    } else {
+      redisLogger.info('Running in single instance mode (no Redis adapter) — OK for development');
+    }
     return false;
   }
 
   try {
     const clients = createPubSubClients();
     if (!clients) {
-      console.log('[SOCKET.IO] Running in single instance mode (no pub/sub clients)');
+      if (isProduction) {
+        redisLogger.error('Redis pub/sub clients failed — cannot run production without cross-instance communication');
+        throw new Error('Redis pub/sub clients required in production for Socket.IO adapter.');
+      }
+      redisLogger.info('Running in single instance mode (no pub/sub clients)');
       return false;
     }
 
     const { pubClient, subClient } = clients;
-    await Promise.all([pubClient.connect(), subClient.connect()]);
+
+    // Timeout pub/sub connection to prevent blocking startup indefinitely
+    const PUBSUB_TIMEOUT_MS = 10000;
+    await Promise.race([
+      Promise.all([pubClient.connect(), subClient.connect()]),
+      new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error(`Redis pub/sub connection timed out after ${PUBSUB_TIMEOUT_MS}ms`)), PUBSUB_TIMEOUT_MS)
+      ),
+    ]);
 
     io.adapter(createAdapter(pubClient, subClient));
 
@@ -46,11 +64,10 @@ export async function setupRedisAdapter(io: ExtendedSocketServer): Promise<boole
     io.pubClient = pubClient;
     io.subClient = subClient;
 
-    console.log('[SOCKET.IO] Redis adapter enabled - horizontal scaling ready');
+    redisLogger.info('Redis adapter enabled - horizontal scaling ready');
     return true;
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.warn('[SOCKET.IO] Could not set up Redis adapter:', errorMessage);
+    redisLogger.warn({ err: error }, 'Could not set up Redis adapter');
     return false;
   }
 }
@@ -63,20 +80,18 @@ export async function cleanupRedisAdapter(io: ExtendedSocketServer): Promise<voi
   if (io.pubClient) {
     try {
       await io.pubClient.quit();
-      console.log('[SHUTDOWN] Redis pub client closed');
+      redisLogger.info('Redis pub client closed');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('[SHUTDOWN] Error closing pub client:', errorMessage);
+      redisLogger.error({ err }, 'Error closing pub client');
     }
   }
 
   if (io.subClient) {
     try {
       await io.subClient.quit();
-      console.log('[SHUTDOWN] Redis sub client closed');
+      redisLogger.info('Redis sub client closed');
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
-      console.error('[SHUTDOWN] Error closing sub client:', errorMessage);
+      redisLogger.error({ err }, 'Error closing sub client');
     }
   }
 

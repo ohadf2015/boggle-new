@@ -82,7 +82,38 @@ export async function GET(request: Request, { params }: RouteParams) {
       attemptDistribution[i.toString()] = stats[`solved_in_${i}`] || 0;
     }
 
-    const response: any = {
+    interface PersonalStats {
+      solved: boolean;
+      attemptsUsed: number;
+      efficiencyScore: number;
+      percentile: number;
+      rank?: number | null;
+      beatCreator: boolean;
+      completedAt: string | null;
+    }
+    interface StatsResponse {
+      success: true;
+      stats: {
+        puzzleCode: string;
+        creatorDisplayName: string;
+        targetWord: string;
+        language: string;
+        createdAt: string;
+        creatorEfficiencyScore: number;
+        totalAttempts: number;
+        totalSolved: number;
+        solveRate: number;
+        avgAttemptsSolved: number | null;
+        avgEfficiencyScore: number | null;
+        maxEfficiencyScore: number | null;
+        avgLifeRemaining: number | null;
+        avgWordsDiscovered: number | null;
+        attemptDistribution: Record<string, number>;
+        beatCreatorCount: number;
+        yourStats?: PersonalStats;
+      };
+    }
+    const response: StatsResponse = {
       success: true,
       stats: {
         puzzleCode: stats.puzzle_code,
@@ -106,34 +137,31 @@ export async function GET(request: Request, { params }: RouteParams) {
 
     // If playerId or guestFingerprint provided, get their personal stats
     if (playerId || guestFingerprint) {
-      let query = supabase
-        .from('custom_puzzle_attempts')
-        .select('solved, attempts_used, efficiency_score, completed_at')
-        .eq('puzzle_code', puzzleCode.toLowerCase());
+      const code = puzzleCode.toLowerCase();
+      const idFilter = playerId
+        ? { column: 'player_id' as const, value: playerId }
+        : { column: 'guest_fingerprint' as const, value: guestFingerprint! };
 
-      if (playerId) {
-        query = query.eq('player_id', playerId);
-      } else {
-        query = query.eq('guest_fingerprint', guestFingerprint);
-      }
-
-      const { data: yourAttempt } = await query.single();
-
-      if (yourAttempt && yourAttempt.solved) {
-        // Get player's rank from leaderboard
-        let rankQuery = supabase
+      // Fetch attempt and rank in parallel
+      const [attemptResult, rankResult] = await Promise.all([
+        supabase
+          .from('custom_puzzle_attempts')
+          .select('solved, attempts_used, efficiency_score, completed_at')
+          .eq('puzzle_code', code)
+          .eq(idFilter.column, idFilter.value)
+          .single(),
+        supabase
           .from('custom_puzzle_leaderboard')
           .select('rank_position')
-          .eq('puzzle_code', puzzleCode.toLowerCase());
+          .eq('puzzle_code', code)
+          .eq(idFilter.column, idFilter.value)
+          .single(),
+      ]);
 
-        if (playerId) {
-          rankQuery = rankQuery.eq('player_id', playerId);
-        } else {
-          rankQuery = rankQuery.eq('guest_fingerprint', guestFingerprint);
-        }
+      const yourAttempt = attemptResult.data;
 
-        const { data: rankData } = await rankQuery.single();
-        const rank = rankData?.rank_position;
+      if (yourAttempt && yourAttempt.solved) {
+        const rank = rankResult.data?.rank_position;
 
         // Calculate percentile
         let percentile = 0;
@@ -167,9 +195,12 @@ export async function GET(request: Request, { params }: RouteParams) {
       }
     }
 
-    return NextResponse.json(response);
+    return NextResponse.json(response, {
+      headers: { 'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=30' },
+    });
   } catch (error) {
-    console.error('Custom puzzle stats error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Custom puzzle stats error:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

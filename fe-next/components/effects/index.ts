@@ -1,0 +1,1 @@
+export { InlineConfetti } from './InlineConfetti';

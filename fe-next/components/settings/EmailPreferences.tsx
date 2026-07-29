@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, Bell, BellOff, Globe, Check, Loader2 } from 'lucide-react';
+import { m } from 'framer-motion';
+import { Mail, Bell, BellOff, Globe, Check } from 'lucide-react';
+import { Loader } from '@/components/ui/Loader';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -96,7 +97,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
-        toast.error(t('error.notAuthenticated') || 'Please sign in to update preferences');
+        toast.error(t('error.notAuthenticated'));
         return;
       }
 
@@ -116,14 +117,14 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
         const data = await response.json();
         setDailyEmailSubscribed(data.daily_email_subscribed);
         setTimezone(data.timezone || tz);
-        toast.success(t('emailPreferences.saved') || 'Email preferences saved');
+        toast.success(t('emailPreferences.saved'));
       } else {
         const error = await response.json();
         toast.error(error.error || 'Failed to save preferences');
       }
     } catch (err) {
       console.error('Failed to save email preferences:', err);
-      toast.error(t('error.generic') || 'Something went wrong');
+      toast.error(t('error.generic'));
     } finally {
       setIsSaving(false);
     }
@@ -145,28 +146,28 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
 
   if (isLoading) {
     return (
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className={cn(
           'rounded-2xl p-6 mb-6',
-          isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+          isDarkMode ? 'bg-neo-navy-light/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
         )}
       >
         <div className="flex items-center justify-center py-4">
-          <Loader2 className="w-6 h-6 animate-spin text-neo-cyan" />
+          <Loader size="md" />
         </div>
-      </motion.div>
+      </m.div>
     );
   }
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
         'rounded-2xl p-6 mb-6',
-        isDarkMode ? 'bg-slate-800/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
+        isDarkMode ? 'bg-neo-navy-light/50 border border-slate-700' : 'bg-white border border-gray-200 shadow-lg'
       )}
     >
       <h2 className={cn(
@@ -174,7 +175,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
         isDarkMode ? 'text-white' : 'text-gray-900'
       )}>
         <Mail className="text-neo-cyan" />
-        {t('emailPreferences.title') || 'Email Notifications'}
+        {t('emailPreferences.title')}
       </h2>
 
       {/* Email address display */}
@@ -183,14 +184,14 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
           'text-sm mb-4',
           isDarkMode ? 'text-gray-400' : 'text-gray-600'
         )}>
-          {t('emailPreferences.sendingTo') || 'Sending to'}: <span className="font-medium">{userEmail}</span>
+          {t('emailPreferences.sendingTo')}: <span className="font-medium">{userEmail}</span>
         </p>
       )}
 
       {/* Daily Challenge Email Toggle */}
       <div className={cn(
         'flex items-center justify-between p-4 rounded-xl mb-4',
-        isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+        isDarkMode ? 'bg-neo-navy/50' : 'bg-gray-50'
       )}>
         <div className="flex items-center gap-3">
           {dailyEmailSubscribed ? (
@@ -203,13 +204,13 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
               'font-medium',
               isDarkMode ? 'text-white' : 'text-gray-900'
             )}>
-              {t('emailPreferences.dailyChallenge') || 'Daily Challenge Reminder'}
+              {t('emailPreferences.dailyChallenge')}
             </p>
             <p className={cn(
               'text-sm',
               isDarkMode ? 'text-gray-400' : 'text-gray-600'
             )}>
-              {t('emailPreferences.dailyChallengeDesc') || 'Get notified when a new daily puzzle is available'}
+              {t('emailPreferences.dailyChallengeDesc')}
             </p>
           </div>
         </div>
@@ -219,13 +220,15 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
           onClick={handleToggleSubscription}
           disabled={isSaving}
           className={cn(
-            'relative w-14 h-8 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-neo-cyan focus:ring-offset-2',
+            'relative w-14 h-8 rounded-full transition-colors duration-200 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
             dailyEmailSubscribed
               ? 'bg-neo-lime'
               : isDarkMode ? 'bg-slate-600' : 'bg-gray-300',
             isSaving && 'opacity-50 cursor-not-allowed'
           )}
-          aria-label={dailyEmailSubscribed ? 'Disable notifications' : 'Enable notifications'}
+          role="switch"
+          aria-checked={dailyEmailSubscribed}
+          aria-label={dailyEmailSubscribed ? (t('emailPreferences.disableNotifications')) : (t('emailPreferences.enableNotifications'))}
         >
           <span
             className={cn(
@@ -236,7 +239,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
             )}
           >
             {isSaving ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
+              <Loader size="sm" />
             ) : dailyEmailSubscribed ? (
               <Check className="w-3 h-3 text-neo-lime" />
             ) : null}
@@ -248,7 +251,7 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
       {dailyEmailSubscribed && (
         <div className={cn(
           'p-4 rounded-xl',
-          isDarkMode ? 'bg-slate-900/50' : 'bg-gray-50'
+          isDarkMode ? 'bg-neo-navy/50' : 'bg-gray-50'
         )}>
           <div className="flex items-center gap-3 mb-3">
             <Globe className="w-5 h-5 text-neo-orange" />
@@ -257,13 +260,13 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
                 'font-medium',
                 isDarkMode ? 'text-white' : 'text-gray-900'
               )}>
-                {t('emailPreferences.timezone') || 'Your Timezone'}
+                {t('emailPreferences.timezone')}
               </p>
               <p className={cn(
                 'text-sm',
                 isDarkMode ? 'text-gray-400' : 'text-gray-600'
               )}>
-                {t('emailPreferences.timezoneDesc') || "We'll send your daily reminder at 8 AM in your timezone"}
+                {t('emailPreferences.timezoneDesc')}
               </p>
             </div>
           </div>
@@ -272,10 +275,11 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
             value={timezone}
             onChange={handleTimezoneChange}
             disabled={isSaving}
+            aria-label={t('emailPreferences.selectTimezone')}
             className={cn(
-              'w-full px-4 py-2 rounded-lg border-2 transition-colors focus:outline-none focus:ring-2 focus:ring-neo-cyan',
+              'w-full px-4 py-2 rounded-lg border-2 transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
               isDarkMode
-                ? 'bg-slate-800 border-slate-600 text-white'
+                ? 'bg-neo-navy-light border-slate-600 text-white'
                 : 'bg-white border-gray-300 text-gray-900',
               isSaving && 'opacity-50 cursor-not-allowed'
             )}
@@ -298,9 +302,9 @@ export function EmailPreferences({ isDarkMode }: EmailPreferencesProps) {
         'text-xs mt-4 text-center',
         isDarkMode ? 'text-gray-500' : 'text-gray-500'
       )}>
-        {t('emailPreferences.unsubscribeInfo') || 'You can also unsubscribe anytime via the link in our emails'}
+        {t('emailPreferences.unsubscribeInfo')}
       </p>
-    </motion.div>
+    </m.div>
   );
 }
 

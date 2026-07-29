@@ -53,6 +53,8 @@ export function useContextualGuidance(): UseContextualGuidanceReturn {
     effectsPreferenceShown: false,
     dragTutorialShown: false,
     firstPlayTutorialCompleted: false,
+    multiplayerTutorialShown: false,
+    stuckCoachShown: false,
   });
 
   // Trigger combo guidance - called when combo reaches 2 or higher

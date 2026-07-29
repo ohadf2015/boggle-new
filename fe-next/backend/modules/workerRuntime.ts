@@ -8,11 +8,17 @@ declare const Bun: { Worker: new (path: string) => BunWorkerInstance } | undefin
 export const isBun = typeof Bun !== 'undefined';
 export const isNode = !isBun && typeof process !== 'undefined' && process.versions?.node;
 
+export interface WorkerEventMap {
+  message: [data: unknown];
+  error: [err: Error];
+  exit: [code: number];
+}
+
 export interface WorkerLike {
   postMessage(data: unknown): void;
   terminate(): Promise<number> | void;
-  on(event: string, listener: (...args: any[]) => void): void;
-  once(event: string, listener: (...args: any[]) => void): void;
+  on<E extends keyof WorkerEventMap>(event: E, listener: (...args: WorkerEventMap[E]) => void): void;
+  once<E extends keyof WorkerEventMap>(event: E, listener: (...args: WorkerEventMap[E]) => void): void;
 }
 
 export interface ParentPortLike {
@@ -24,8 +30,10 @@ export interface ParentPortLike {
 interface BunWorkerInstance {
   postMessage(data: unknown): void;
   terminate(): void;
-  addEventListener(event: string, listener: (e: any) => void): void;
-  removeEventListener(event: string, listener: (...args: any[]) => void): void;
+  addEventListener(event: 'message', listener: (e: MessageEvent) => void): void;
+  addEventListener(event: 'error', listener: (e: ErrorEvent) => void): void;
+  addEventListener(event: 'close', listener: (e: Event) => void): void;
+  removeEventListener(event: string, listener: (e: Event) => void): void;
 }
 
 interface BunWorkerSelf {
@@ -45,20 +53,26 @@ export async function createWorker(workerPath: string): Promise<WorkerLike> {
     const worker: WorkerLike = {
       postMessage: (data: unknown) => bunWorker.postMessage(data),
       terminate: () => bunWorker.terminate(),
-      on: (event: string, listener: (...args: any[]) => void) => {
+      on: <E extends keyof WorkerEventMap>(event: E, listener: (...args: WorkerEventMap[E]) => void) => {
         if (event === 'message') {
-          bunWorker.addEventListener('message', (e: MessageEvent) => listener(e.data));
+          bunWorker.addEventListener('message', (e: MessageEvent) =>
+            (listener as (...args: WorkerEventMap['message']) => void)(e.data)
+          );
         } else if (event === 'error') {
-          bunWorker.addEventListener('error', (e: ErrorEvent) => listener(new Error(e.message)));
+          bunWorker.addEventListener('error', (e: ErrorEvent) =>
+            (listener as (...args: WorkerEventMap['error']) => void)(new Error(e.message))
+          );
         } else if (event === 'exit') {
-          // Bun doesn't have native exit event, we simulate it on terminate
-          bunWorker.addEventListener('close', () => listener(0));
+          // Bun doesn't have native exit event, we simulate it on close
+          bunWorker.addEventListener('close', () =>
+            (listener as (...args: WorkerEventMap['exit']) => void)(0)
+          );
         }
       },
-      once: (event: string, listener: (...args: any[]) => void) => {
+      once: <E extends keyof WorkerEventMap>(event: E, listener: (...args: WorkerEventMap[E]) => void) => {
         if (event === 'exit') {
           const handler = () => {
-            listener(0);
+            (listener as (...args: WorkerEventMap['exit']) => void)(0);
             bunWorker.removeEventListener('close', handler);
           };
           bunWorker.addEventListener('close', handler);
@@ -74,11 +88,11 @@ export async function createWorker(workerPath: string): Promise<WorkerLike> {
     const worker: WorkerLike = {
       postMessage: (data: unknown) => nodeWorker.postMessage(data),
       terminate: () => nodeWorker.terminate(),
-      on: (event: string, listener: (...args: any[]) => void) => {
-        nodeWorker.on(event, listener);
+      on: <E extends keyof WorkerEventMap>(event: E, listener: (...args: WorkerEventMap[E]) => void) => {
+        nodeWorker.on(event, listener as (...args: unknown[]) => void);
       },
-      once: (event: string, listener: (...args: any[]) => void) => {
-        nodeWorker.once(event, listener);
+      once: <E extends keyof WorkerEventMap>(event: E, listener: (...args: WorkerEventMap[E]) => void) => {
+        nodeWorker.once(event, listener as (...args: unknown[]) => void);
       }
     };
     return worker;

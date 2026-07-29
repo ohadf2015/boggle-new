@@ -1,7 +1,8 @@
 'use client';
 
-import React, { memo, useEffect, useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { memo, useEffect, useState } from 'react';
+import { useScroll, useTransform } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { Star, Sparkles, Zap, Heart } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
@@ -186,15 +187,15 @@ export const PlayfulBackground = memo(function PlayfulBackground({
       {/* Gradient orbs with parallax - solid colors for Neo-Brutalist aesthetic */}
       {showGradientOrbs && enableComplexAnimations && (
         <>
-          <motion.div
+          <AdaptiveMotion.div
             className={`absolute -top-32 -left-32 w-[500px] h-[500px] rounded-full ${scheme.orb1}`}
             style={{ y: y1, rotate: rotate1, x: parallax.x * 0.5, scale: 1.2 }}
           />
-          <motion.div
+          <AdaptiveMotion.div
             className={`absolute top-1/3 -right-48 w-[400px] h-[400px] rounded-full ${scheme.orb2}`}
             style={{ y: y2, rotate: rotate2, x: parallax.x * -0.3 }}
           />
-          <motion.div
+          <AdaptiveMotion.div
             className={`absolute bottom-0 left-1/4 w-[350px] h-[350px] rounded-full ${scheme.orb3}`}
             style={{ y: y3, x: parallax.x * 0.4 }}
           />
@@ -203,10 +204,11 @@ export const PlayfulBackground = memo(function PlayfulBackground({
 
       {/* Floating icons with parallax - visible on both mobile and desktop */}
       {/* Neo-Brutalist: no glow shadows, clean solid colors */}
+      {/* Reduced elements for cleaner desktop experience */}
       {showFloatingIcons && enableComplexAnimations && (
         <>
           {/* Top left star */}
-          <motion.div
+          <AdaptiveMotion.div
             className={`absolute top-[8%] left-[5%] ${scheme.icon1}`}
             animate={{
               y: [0, -25, 0],
@@ -217,24 +219,24 @@ export const PlayfulBackground = memo(function PlayfulBackground({
             style={{ x: parallax.x * 0.6 }}
           >
             <Star className="w-8 h-8 sm:w-12 sm:h-12 fill-current" />
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Top right sparkles */}
-          <motion.div
+          <AdaptiveMotion.div
             className={`absolute top-[15%] right-[8%] ${scheme.icon2}`}
             animate={{
               y: [0, -20, 0],
               rotate: [0, -25, 0],
               scale: [1, 1.2, 1]
             }}
-            transition={{ duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+            transition={{ type: 'tween', duration: 3.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
             style={{ x: parallax.x * -0.4 }}
           >
             <Sparkles className="w-7 h-7 sm:w-10 sm:h-10" />
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Left side zap */}
-          <motion.div
+          <AdaptiveMotion.div
             className={`absolute top-[40%] left-[3%] ${scheme.icon3}`}
             animate={{
               y: [0, -30, 0],
@@ -244,23 +246,10 @@ export const PlayfulBackground = memo(function PlayfulBackground({
             style={{ x: parallax.x * 0.8 }}
           >
             <Zap className="w-6 h-6 sm:w-9 sm:h-9 fill-current" />
-          </motion.div>
-
-          {/* Right side star */}
-          <motion.div
-            className={`absolute top-[55%] right-[5%] ${scheme.icon1}`}
-            animate={{
-              y: [0, -15, 0],
-              scale: [1, 1.25, 1]
-            }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.8 }}
-            style={{ x: parallax.x * -0.7 }}
-          >
-            <Star className="w-5 h-5 sm:w-8 sm:h-8 fill-current" />
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Bottom left heart */}
-          <motion.div
+          <AdaptiveMotion.div
             className={`absolute bottom-[30%] left-[8%] ${scheme.icon2}`}
             animate={{
               y: [0, -22, 0],
@@ -271,39 +260,16 @@ export const PlayfulBackground = memo(function PlayfulBackground({
             style={{ x: parallax.x * 0.5 }}
           >
             <Heart className="w-5 h-5 sm:w-8 sm:h-8 fill-current" />
-          </motion.div>
-
-          {/* Bottom right sparkles */}
-          <motion.div
-            className={`absolute bottom-[20%] right-[12%] ${scheme.icon3}`}
-            animate={{
-              y: [0, -25, 0],
-              rotate: [0, 25, 0],
-              scale: [1, 1.15, 1]
-            }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-            style={{ x: parallax.x * -0.6 }}
-          >
-            <Sparkles className="w-6 h-6 sm:w-9 sm:h-9" />
-          </motion.div>
+          </AdaptiveMotion.div>
 
           {/* Pulsing dots - Neo-Brutalist solid colors without glow */}
-          <motion.div
+          {/* Reduced from 4 to 2 for cleaner appearance */}
+          <AdaptiveMotion.div
             className={`absolute top-[12%] left-[35%] w-2.5 h-2.5 sm:w-4 sm:h-4 rounded-full bg-neo-lime`}
             animate={{ scale: [1, 1.8, 1], opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
           />
-          <motion.div
-            className={`absolute top-[48%] left-[20%] w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-neo-pink`}
-            animate={{ scale: [1, 2, 1], opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
-          />
-          <motion.div
-            className={`absolute top-[65%] right-[25%] w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-neo-cyan`}
-            animate={{ scale: [1, 1.8, 1], opacity: [0.4, 1, 0.4] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-          />
-          <motion.div
+          <AdaptiveMotion.div
             className={`absolute bottom-[35%] left-[45%] w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 rounded-full bg-neo-purple`}
             animate={{ scale: [1, 1.9, 1], opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 1.5 }}

@@ -3,7 +3,8 @@
 import React, { memo, useMemo } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
 import { Users } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
+import { AnimatedCounter } from '../../../components/ui/AnimatedCounter';
 
 interface TvJoinBarProps {
   gameCode: string;
@@ -30,13 +31,13 @@ const TvJoinBar = memo<TvJoinBarProps>(({
   }, [baseUrl, gameCode]);
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-      className="w-full bg-neo-purple border-b-4 border-neo-black"
+      className="w-full bg-neo-purple border-b-4 border-neo-black relative z-40"
     >
-      <div className="max-w-7xl mx-auto px-4 py-3">
+      <div className="max-w-7xl mx-auto px-4 py-4 md:py-5">
         {/* Main row: Join info + Code + QR */}
         <div className="flex items-center justify-between gap-4">
           {/* Left: Join URL */}
@@ -50,20 +51,22 @@ const TvJoinBar = memo<TvJoinBarProps>(({
           </div>
 
           {/* Center: Game Code (HUGE) */}
-          <div className="flex-shrink-0 text-center px-6">
-            <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
+          <div className="shrink-0 text-center px-6">
+            <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1" id="game-code-label">
               {t('tvBroadcast.gameCode')}
             </p>
-            <motion.div
+            <m.div
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 400, damping: 20 }}
               className="bg-neo-cream text-neo-purple px-6 py-2 rounded-neo border-4 border-neo-black shadow-hard"
+              role="status"
+              aria-labelledby="game-code-label"
             >
-              <span className="text-5xl md:text-6xl lg:text-7xl font-black tracking-[0.15em] uppercase">
+              <span className="text-5xl md:text-6xl lg:text-7xl font-black tracking-[0.15em] uppercase" aria-label={`Game code: ${gameCode.split('').join(' ')}`}>
                 {gameCode}
               </span>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Right: QR Code */}
@@ -73,14 +76,26 @@ const TvJoinBar = memo<TvJoinBarProps>(({
               <p className="text-neo-cream/80 text-sm font-bold uppercase tracking-wider mb-1">
                 {t('tvBroadcast.players')}
               </p>
-              <div className="flex items-center gap-2 text-neo-cream">
+              <m.div
+                key={playerCount}
+                initial={{ scale: 1.15 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                className="flex items-center gap-2 text-neo-cream"
+                data-testid="player-count-wrapper"
+              >
                 <Users className="w-6 h-6" />
-                <span className="text-3xl font-black">{playerCount}</span>
-              </div>
+                <AnimatedCounter
+                  value={playerCount}
+                  className="text-3xl font-black text-neo-cream"
+                  size="xl"
+                  formatValue={(v) => String(Math.round(v))}
+                />
+              </m.div>
             </div>
 
             {/* QR Code */}
-            <motion.div
+            <m.div
               initial={{ rotate: -10, scale: 0.8 }}
               animate={{ rotate: 0, scale: 1 }}
               transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -93,7 +108,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
                 bgColor="#ffffff"
                 fgColor="#000000"
               />
-            </motion.div>
+            </m.div>
           </div>
         </div>
 
@@ -106,7 +121,7 @@ const TvJoinBar = memo<TvJoinBarProps>(({
           </div>
         )}
       </div>
-    </motion.div>
+    </m.div>
   );
 });
 

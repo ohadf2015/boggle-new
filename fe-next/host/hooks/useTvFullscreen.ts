@@ -57,6 +57,13 @@ export function useTvFullscreen({
     const isCurrentlyFullscreen = getFullscreenElement() !== null;
     setIsFullscreen(isCurrentlyFullscreen);
     onFullscreenChange?.(isCurrentlyFullscreen);
+
+    // Dispatch global event for layout components to react to fullscreen changes
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('tvFullscreenChange', {
+        detail: { isFullscreen: isCurrentlyFullscreen }
+      }));
+    }
   }, [getFullscreenElement, onFullscreenChange]);
 
   // Enter fullscreen

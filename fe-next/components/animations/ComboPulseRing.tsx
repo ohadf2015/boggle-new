@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -122,7 +122,7 @@ export const ComboPulseRing = memo(function ComboPulseRing({
     >
       <AnimatePresence>
         {rings.map((ring) => (
-          <motion.div
+          <m.div
             key={ring.id}
             className="absolute rounded-full"
             style={{
@@ -131,7 +131,7 @@ export const ComboPulseRing = memo(function ComboPulseRing({
               marginLeft: -initialSize / 2,
               marginTop: -initialSize / 2,
               border: `${ring.thickness}px solid ${ring.color}`,
-              boxShadow: !isLowEnd ? `0 0 8px ${ring.color}60` : undefined,
+              boxShadow: !isLowEnd ? `0 0 8px ${ring.color.startsWith('#') ? `${ring.color}60` : ring.color}` : undefined,
             }}
             initial={{ scale: 1, opacity: 0.8 }}
             animate={{
@@ -183,7 +183,7 @@ export function ScreenEdgeGlow({
   const opacity = Math.min(intensity * 0.3, 0.4);
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'fixed inset-0 pointer-events-none z-[70]',
         className
@@ -193,16 +193,16 @@ export function ScreenEdgeGlow({
       transition={{ duration: 0.3 }}
       style={{
         background: `
-          radial-gradient(ellipse at top, transparent 50%, ${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')} 100%),
-          radial-gradient(ellipse at bottom, transparent 50%, ${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')} 100%),
-          radial-gradient(ellipse at left, transparent 60%, ${color}${Math.round(opacity * 0.5 * 255).toString(16).padStart(2, '0')} 100%),
-          radial-gradient(ellipse at right, transparent 60%, ${color}${Math.round(opacity * 0.5 * 255).toString(16).padStart(2, '0')} 100%)
+          radial-gradient(ellipse at top, transparent 50%, ${color.startsWith('#') ? `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}` : color} 100%),
+          radial-gradient(ellipse at bottom, transparent 50%, ${color.startsWith('#') ? `${color}${Math.round(opacity * 255).toString(16).padStart(2, '0')}` : color} 100%),
+          radial-gradient(ellipse at left, transparent 60%, ${color.startsWith('#') ? `${color}${Math.round(opacity * 0.5 * 255).toString(16).padStart(2, '0')}` : color} 100%),
+          radial-gradient(ellipse at right, transparent 60%, ${color.startsWith('#') ? `${color}${Math.round(opacity * 0.5 * 255).toString(16).padStart(2, '0')}` : color} 100%)
         `,
       }}
     >
       {/* Pulse animation for high intensity */}
       {intensity > 0.5 && (
-        <motion.div
+        <m.div
           className="absolute inset-0"
           animate={{
             opacity: [0, 0.2, 0],
@@ -217,7 +217,7 @@ export function ScreenEdgeGlow({
           }}
         />
       )}
-    </motion.div>
+    </m.div>
   );
 }
 

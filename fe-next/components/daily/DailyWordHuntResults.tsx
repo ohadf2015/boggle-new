@@ -3,17 +3,24 @@
 /**
  * DailyWordHuntResults Component
  *
- * Main orchestrator component for displaying Word Hunt daily challenge results.
- * All sub-components and logic have been extracted to the results/ directory.
+ * Results page with improved UI and mobile tab bar for detailed stats.
+ * Results tab shows core metrics, Stats tab shows in-depth data.
  */
 
 import React, { useState, useCallback, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, BarChart3, Eye, Trophy, Wand2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import GameFeedback from '@/components/feedback/GameFeedback';
+import { m } from 'framer-motion';
+import dynamic from 'next/dynamic';
+import { ArrowLeft, Trophy, BarChart3 } from 'lucide-react';
+import { CoinSpendAnimation } from '@/components/animations/CoinSpendAnimation';
 import { MobileTabBar } from '@/components/layout/MobileTabBar';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useScreenshotProtection } from '@/hooks/useScreenshotProtection';
+import { useInterstitialAd } from '@/hooks/useInterstitialAd';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import {
   getGuestFingerprint,
   getGuestDailyPlayer,
@@ -22,16 +29,18 @@ import {
   findRarestWord,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
-import DailyChallengeInlineSignup from '@/components/auth/DailyChallengeInlineSignup';
+import { fireConfetti } from '@/utils/confettiUtils';
 import StreakMilestoneCelebration from './StreakMilestoneCelebration';
-import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
-import WatchAdButton from './WatchAdButton';
-import KeepPlayingSection from './KeepPlayingSection';
+import StreakSavedCelebration from './StreakSavedCelebration';
 import CustomPuzzleCreator from '@/components/custom-puzzle/CustomPuzzleCreator';
 import { useAuth } from '@/contexts/AuthContext';
 import { fetchGeolocation } from '@/contexts/auth/authUtils';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
+import { FLEXING_SCORE_THRESHOLD, ENCOURAGING_SCORE_THRESHOLD } from '@/utils/mascotConfig';
+import { WinCinematic } from './WinCinematic';
+import { WordHuntResultsContent } from './WordHuntResultsContent';
+import { usePracticeFlag } from '@/hooks/usePracticeFlag';
+import PracticeChainCta from '@/components/practice/PracticeChainCta';
 
 // Import from results module
 import {
@@ -42,16 +51,11 @@ import {
   useResultSubmission,
   useCoinActions,
   useConfettiEffects,
+  useSpendAnimation,
+  useStreakFreezeStatus,
   ScoreBadge,
-  ResultDisplay,
-  PerformanceSection,
-  CoinUnlockCard,
-  ShareSection,
   AttemptHistory,
   StatsSection,
-  DesktopStatsCard,
-  RankBadge,
-  TryAnotherLanguage,
   SharePanel,
 } from './results';
 
@@ -70,21 +74,39 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   onRetry,
   onGameLanguageChange,
 }) => {
-  const { t } = useLanguage();
+  const { t, language: uiLanguage } = useLanguage();
+  const isPractice = usePracticeFlag();
   const { user, profile, isAuthenticated } = useAuth();
-  const { isProtected } = useScreenshotProtection();
+
+  const { showInterstitial } = useInterstitialAd();
+  const { submitLeaderboardScore } = useCrazyGames();
+
+  // Ads + leaderboard on mount
+  useEffect(() => {
+    showInterstitial('word-hunt-complete');
+    if (result.efficiencyScore != null && result.efficiencyScore > 0) {
+      submitLeaderboardScore(result.efficiencyScore);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Show win cinematic for new completions before revealing results
+  const [showCinematic, setShowCinematic] = useState(() => Boolean(isNewCompletion && result.solved));
 
   // Local state
   const [guestFingerprint, setGuestFingerprint] = useState<string | null>(null);
   const [guestPlayer, setGuestPlayer] = useState<GuestDailyPlayer | null>(null);
   const [stats, setStats] = useState<WordHuntStats | null>(null);
   const [showMilestoneCelebration, setShowMilestoneCelebration] = useState(false);
+  const [showStreakSaved, setShowStreakSaved] = useState(false);
+  const [streakSavedFreezesLeft, setStreakSavedFreezesLeft] = useState<number | undefined>(undefined);
   const [leaderboardKey, setLeaderboardKey] = useState(0);
   const [activeTab, setActiveTab] = useState<ResultTab>('results');
   const [_countryCode, setCountryCode] = useState<string | null>(null);
   const [countryCodeReady, setCountryCodeReady] = useState(false);
   const [inlineSignupDismissed, setInlineSignupDismissed] = useState(false);
   const [showCreatePuzzle, setShowCreatePuzzle] = useState(false);
+  const spendAnimation = useSpendAnimation();
+  const { freezesAvailable, isStreakProtected } = useStreakFreezeStatus(isAuthenticated);
 
   // Derived values
   const streakMilestone = getStreakMilestone(result.streakDays);
@@ -95,6 +117,27 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     if (!result.wordsDiscovered || result.wordsDiscovered.length === 0) return 0;
     return result.wordsDiscovered.reduce((total, word) => total + (word.lifeGained || 0), 0);
   }, [result.wordsDiscovered]);
+
+  const emojiWords = useMemo(() => {
+    // For Word Hunt, use attempt history with per-letter feedback (green/yellow/gray)
+    if (result.attempts && result.attempts.length > 0) {
+      return result.attempts.map((attempt) => ({
+        word: attempt.word || '',
+        found: attempt.feedback?.every((f) => f.feedback === 'green') ?? false,
+        feedback: attempt.feedback,
+      }));
+    }
+    // Fallback: discovered words without feedback
+    if (!result.wordsDiscovered) return [];
+    return result.wordsDiscovered.map((w: { word: string }) => ({
+      word: w.word || '',
+      found: true,
+    }));
+  }, [result.attempts, result.wordsDiscovered]);
+
+  const efficiency = result.efficiencyScore ?? 0;
+  const showFlexing = efficiency >= FLEXING_SCORE_THRESHOLD;
+  const showEncouraging = efficiency < ENCOURAGING_SCORE_THRESHOLD;
 
   const displayName = isAuthenticated && profile
     ? profile.display_name || profile.username || 'Player'
@@ -143,7 +186,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [puzzleDate, language, isAuthenticated, profile, guestFingerprint]);
 
-  // Use result submission hook
+  // Use result submission hook (BUG-004: pass t for error toast translations)
   useResultSubmission({
     result,
     puzzleNumber,
@@ -159,6 +202,13 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
       setLeaderboardKey(prev => prev + 1);
       fetchStats();
     },
+    onFreezeBridged: ({ freezesRemaining }) => {
+      setStreakSavedFreezesLeft(freezesRemaining);
+      // Let the results / win-cinematic settle, then reveal the save.
+      setTimeout(() => setShowStreakSaved(true), 900);
+    },
+    extraTries: result.extraTries,
+    t,
   });
 
   // ============================================================================
@@ -202,6 +252,22 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     stats,
   });
 
+  // Confetti burst after results entrance (centered, timed after rank badge appears)
+  useEffect(() => {
+    if (isNewCompletion && result.solved) {
+      const timer = setTimeout(() => {
+        fireConfetti({
+          particleCount: 80,
+          spread: 120,
+          origin: { y: 0.5 },
+          colors: ['#BFFF00', '#00FFFF', '#FF1493', '#FFE135'],
+        });
+      }, 1200);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isNewCompletion, result.solved]);
+
   // Show streak milestone
   useEffect(() => {
     if (isNewCompletion && milestoneMessage) {
@@ -223,205 +289,81 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
     }
   }, [result.solved, stats?.yourStats?.rank, handleBadgeClickConfetti]);
 
-  // ============================================================================
-  // RENDER HELPERS
-  // ============================================================================
+  // Results content props for extracted component
+  const resultsContentProps = {
+    result,
+    puzzleNumber,
+    puzzleDate,
+    language,
+    countdown,
+    isNewCompletion,
+    showFlexing,
+    showEncouraging,
+    survivalBonusTime,
+    rarestWord,
+    emojiWords,
+    stats,
+    shareHandlers,
+    coinActions,
+    onRetryFree: onRetry,
+    isAuthenticated,
+    inlineSignupDismissed,
+    onInlineSignupDismiss: () => setInlineSignupDismissed(true),
+    leaderboardKey,
+    profile,
+    guestFingerprint,
+    onGameLanguageChange,
+    onShowCreatePuzzle: () => setShowCreatePuzzle(true),
+    onSpendStart: spendAnimation.start,
+    onBackToLobby: onBack,
+    freezesAvailable,
+    isStreakProtected,
+    t,
+  };
 
-  const renderResultsContent = () => (
-    <div className="space-y-4">
-      {/* Hero Result Display */}
-      <ResultDisplay
-        solved={result.solved}
-        attemptsUsed={result.attemptsUsed}
-        targetWord={result.targetWord}
-        streakDays={result.streakDays}
-        language={language}
-        puzzleNumber={puzzleNumber}
-        countdown={countdown}
-        t={t}
-      />
-
-      {/* Rank badge - shows for both WIN and FAIL */}
-      {stats && <RankBadge stats={stats} t={t} />}
-
-      {/* Inline signup for guests - positioned after score, before share */}
-      {!isAuthenticated && !inlineSignupDismissed && (
-        <DailyChallengeInlineSignup
-          pendingResult={{ result, puzzleNumber, puzzleDate, language }}
-          onDismiss={() => setInlineSignupDismissed(true)}
-        />
-      )}
-
-      {/* Share/Retry Section - order differs by result */}
-      <ShareSection
-        solved={result.solved}
-        onShare={shareHandlers.handleNativeShare}
-        onRetry={coinActions.handleRetryChallenge}
-        canAffordRetry={coinActions.canAffordRetry}
-        retryCost={coinActions.retryCost}
-        onWhatsApp={shareHandlers.handleWhatsApp}
-        onTwitter={shareHandlers.handleTwitter}
-        onTelegram={shareHandlers.handleTelegram}
-        onCopy={shareHandlers.handleCopy}
-        onDownloadImage={shareHandlers.handleDownloadShareImage}
-        copied={shareHandlers.copied}
-        isGeneratingImage={shareHandlers.isGeneratingImage}
-        t={t}
-      />
-
-      {/* FAIL state: Show reveal target word early + watch ad */}
-      {!result.solved && (
-        <>
-          {/* Reveal target word - now appears early for failed players */}
-          <div className="py-3 border-y border-gray-200 dark:border-gray-700">
-            {coinActions.targetWordRevealed ? (
-              <div className="space-y-2 text-center">
-                <div className="text-sm text-gray-600 dark:text-gray-400">{t('wordHunt.results.theTargetWordWas')}</div>
-                <div className="text-3xl font-black text-neo-lime tracking-wider">
-                  {language === 'he' ? applyHebrewFinalLetters(result.targetWord) : result.targetWord.toUpperCase()}
-                </div>
-              </div>
-            ) : (
-              <div className="max-w-xs mx-auto">
-                <CoinUnlockCard
-                  icon={<Eye className="w-6 h-6 text-white" />}
-                  title={t('wordHunt.results.revealTargetWord')}
-                  subtitle={t('wordHunt.results.seeTheAnswer') || 'See what you were looking for'}
-                  cost={coinActions.revealCost}
-                  currentCoins={coinActions.currentCoins}
-                  gradientFrom="from-neo-pink"
-                  gradientTo="to-neo-pink"
-                  onClick={coinActions.handleRevealTargetWord}
-                  t={t}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Watch Ad for Coins - only for failed players who can't afford retry */}
-          {!coinActions.canAffordRetry && (
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-gray-400">
-                <div className="flex-1 h-px bg-gray-600" />
-                <span>{t('wordHunt.ad.needMoreCoins') || 'Need more coins?'}</span>
-                <div className="flex-1 h-px bg-gray-600" />
-              </div>
-              <WatchAdButton onCoinsEarned={() => {/* Update handled by coinActions */ }} t={t} />
-            </div>
-          )}
-        </>
-      )}
-
-      {/* WIN state: Show rewards prominently */}
-      {result.solved && (
-        <PerformanceSection
-          coinReward={coinActions.coinReward}
-          coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
-          survivalBonusTime={survivalBonusTime}
-          rarestWord={rarestWord}
-          solved={result.solved}
-          efficiencyScore={result.efficiencyScore || 0}
-          lifeRemaining={result.lifeRemaining || 0}
-          unusedTokens={(result.clueTokensEarned || 0) - (result.clueTokensSpent || 0)}
-          wordsDiscovered={result.wordsDiscovered?.length || 0}
-          guessesUsed={result.attemptsUsed}
-          t={t}
-        />
-      )}
-
-      {/* Leaderboard - show to all users (guests see it with subtle signup hint in empty state) */}
-      <TabbedDailyLeaderboard
-        key={leaderboardKey}
-        puzzleDate={puzzleDate}
-        language={language}
-        currentPlayerId={isAuthenticated && profile ? profile.id : null}
-        currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-        maxVisible={3}
-        compact
-        t={t}
-        defaultTab="today"
-      />
-
-      {/* FAIL state: Show performance breakdown lower */}
-      {!result.solved && (
-        <PerformanceSection
-          coinReward={coinActions.coinReward}
-          coinRewardMode={isAuthenticated ? 'earned' : 'teasing'}
-          survivalBonusTime={survivalBonusTime}
-          rarestWord={rarestWord}
-          solved={result.solved}
-          efficiencyScore={result.efficiencyScore || 0}
-          lifeRemaining={result.lifeRemaining || 0}
-          unusedTokens={(result.clueTokensEarned || 0) - (result.clueTokensSpent || 0)}
-          wordsDiscovered={result.wordsDiscovered?.length || 0}
-          guessesUsed={result.attemptsUsed}
-          t={t}
-        />
-      )}
-
-      <TryAnotherLanguage currentLanguage={language} onGameLanguageChange={onGameLanguageChange} />
-
-      <KeepPlayingSection
-        isSuccess={result.solved}
-        timeSurvived={result.lifeRemaining !== undefined ? (10 - result.attemptsUsed) * 10 : undefined}
-        efficiencyScore={result.efficiencyScore}
-      />
-
-      {/* Create Your Own Puzzle - only show for authenticated winners */}
-      {result.solved && isAuthenticated && (
-        <button
-          onClick={() => setShowCreatePuzzle(true)}
-          className="w-full mt-4 p-4 bg-gradient-to-r from-neo-pink/20 via-neo-orange/20 to-neo-lime/20 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 transition-all cursor-pointer text-start group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 flex-shrink-0 bg-gradient-to-br from-neo-pink to-neo-orange rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm group-hover:scale-105 transition-transform">
-              <Wand2 className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-base text-white group-hover:text-neo-lime transition-colors">
-                {t('customPuzzle.createYourOwn') || 'Create Your Own Puzzle'}
-              </h3>
-              <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
-                {t('customPuzzle.createDescription') || 'Challenge friends with your own word puzzle'}
-              </p>
-            </div>
-            <div className="flex-shrink-0 text-neo-pink group-hover:text-neo-lime transition-colors">
-              <svg className="w-5 h-5 rtl:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </div>
-        </button>
-      )}
-    </div>
-  );
-
+  /** Stats tab - Shows immersive attempt history and animated statistics */
   const renderStatsContent = () => (
-    <div className="space-y-4">
+    <m.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-5 pb-4"
+    >
       <AttemptHistory attempts={result.attempts} attemptsUsed={result.attemptsUsed} t={t} />
       {stats && <StatsSection stats={stats} result={result} t={t} />}
-    </div>
+    </m.div>
   );
 
   // ============================================================================
   // RENDER
   // ============================================================================
 
+  // Show win cinematic before revealing results
+  if (showCinematic) {
+    return (
+      <WinCinematic
+        puzzleNumber={puzzleNumber}
+        finalScore={result.efficiencyScore ?? 0}
+        onComplete={() => setShowCinematic(false)}
+      />
+    );
+  }
+
   return (
-    <motion.div
+    <m.div
       key="word-hunt-results"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      className="flex-1 flex flex-col h-full overflow-hidden"
+      className="flex-1 flex flex-col min-h-0 overflow-hidden"
     >
-      {/* Header */}
-      <div className="flex-shrink-0 px-3 pt-1 pb-2 border-b border-gray-200 dark:border-gray-700 bg-slate-50 dark:bg-neo-navy">
-        <div className="max-w-md mx-auto lg:max-w-5xl">
+      {/* Compact Header */}
+      <div className="shrink-0 px-3 py-2 border-b border-slate-700/50 bg-neo-navy">
+        <div className="max-w-md mx-auto lg:max-w-5xl xl:max-w-6xl">
           <div className="flex items-center justify-between gap-2">
-            <Button variant="ghost" size="sm" onClick={onBack} className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white -ms-2 py-1">
+            <Button variant="ghost" size="sm" onClick={onBack} className="text-slate-400 hover:text-white -ms-2 py-1">
               <ArrowLeft className="w-4 h-4 me-1 rtl:rotate-180" />
-              {t('daily.home')}
+              {t('common.back')}
             </Button>
             <ScoreBadge
               solved={result.solved}
@@ -435,52 +377,57 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 overflow-y-auto px-3 pb-20 lg:pb-4 relative">
-        {/* Screenshot protection */}
-        {isProtected && (
-          <div className="absolute inset-0 flex items-center justify-center z-20 bg-black/40">
-            <div className="bg-neo-black/80 text-white px-6 py-4 rounded-neo border-3 border-neo-lime shadow-hard text-center">
-              <div className="text-2xl mb-2">👀</div>
-              <div className="font-bold text-sm">{t('daily.screenshotProtection') || 'Click here to continue'}</div>
-            </div>
+      {/* Main Content - flex-1 min-h-0 fills remaining space after compact header */}
+      {/* Bottom padding accounts for fixed MobileTabBar (--mobile-bottom-safe = 80px + safe-area) */}
+      <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scrollable-area px-3 pb-bottom-stack md:pb-6">
+        {isPractice && (
+          <div className="max-w-md mx-auto pt-3">
+            <PracticeChainCta currentMode="wordHunt" />
           </div>
         )}
-
-        {/* Desktop: Two-column layout */}
-        <div className="hidden md:flex md:flex-row md:gap-6 md:max-w-5xl md:mx-auto md:pt-4">
-          <div className={cn("flex-1 min-w-0 max-w-xl", isProtected && "blur-xl pointer-events-none select-none")}>
-            {renderResultsContent()}
-          </div>
-          <div className={cn("flex-1 min-w-0 max-w-xl space-y-4", isProtected && "blur-xl pointer-events-none select-none")}>
-            <DesktopStatsCard stats={stats} t={t} />
-            {/* Leaderboard - show to all users */}
-            <TabbedDailyLeaderboard
-              puzzleDate={puzzleDate}
-              language={language}
-              currentPlayerId={isAuthenticated && profile ? profile.id : null}
-              currentGuestFingerprint={!isAuthenticated ? guestFingerprint : null}
-              maxVisible={3}
-              compact
-              t={t}
-              defaultTab="today"
-            />
-          </div>
+        {/* Mobile: Tab-based content */}
+        <div className="max-w-md mx-auto pt-4 md:hidden">
+          {activeTab === 'results' && <WordHuntResultsContent {...resultsContentProps} />}
+          {activeTab === 'stats' && renderStatsContent()}
         </div>
 
-        {/* Mobile: Tab-based layout */}
-        <div className={cn("max-w-md mx-auto pt-3 md:hidden", isProtected && "blur-xl pointer-events-none select-none")}>
-          {activeTab === 'results' && renderResultsContent()}
-          {activeTab === 'stats' && renderStatsContent()}
+        {/* Desktop: Two-column layout — results left, stats right */}
+        <div className="hidden md:block max-w-md lg:max-w-5xl xl:max-w-6xl mx-auto pt-4">
+          <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-8 xl:gap-10 lg:items-start">
+            <WordHuntResultsContent {...resultsContentProps} />
+            <div className="hidden lg:block lg:sticky lg:top-4">
+              {renderStatsContent()}
+            </div>
+          </div>
+        </div>
+        {/* End-of-game sentiment (game_feedback, surface=word_hunt) — fresh
+            completion only; shared throttle keeps it rare across surfaces. */}
+        <div className="mt-4 max-w-md mx-auto">
+          <GameFeedback
+            surface="word_hunt"
+            eligible={isNewCompletion}
+            gameMode="word-hunt"
+            language={uiLanguage}
+            throttleKey={String(puzzleNumber)}
+          />
         </div>
       </div>
 
+      {/* Inline banner ad — CrazyGamesBanner covers web iframe; ResultsBannerSlot covers native AdMob. */}
+      <div className="hidden md:flex justify-center py-2">
+        <CrazyGamesBanner size="728x90" />
+      </div>
+      <div className="flex justify-center py-2 md:hidden">
+        <CrazyGamesBanner size="320x50" />
+      </div>
+      <ResultsBannerSlot placement="word-hunt-complete" className="px-4" />
+
       {/* Mobile Tab Bar */}
-      <div className="flex-shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black safe-area-bottom md:hidden text-neo-white">
+      <div className="shrink-0 fixed bottom-0 inset-x-0 z-50 bg-neo-navy border-t-4 border-neo-black md:hidden">
         <MobileTabBar
           tabs={[
-            { id: 'results', icon: <Trophy className="w-5 h-5" />, label: t('wordHunt.results.title') || 'Results' },
-            { id: 'stats', icon: <BarChart3 className="w-5 h-5" />, label: t('wordHunt.stats.title') || 'Stats' },
+            { id: 'results', icon: <Trophy className="w-5 h-5" />, label: t('wordHunt.results.title') },
+            { id: 'stats', icon: <BarChart3 className="w-5 h-5" />, label: t('wordHunt.stats.title') },
           ]}
           activeTab={activeTab}
           onTabChange={(id) => setActiveTab(id as ResultTab)}
@@ -506,7 +453,7 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         t={t}
       />
 
-      {/* Modals */}
+      {/* Streak Milestone Celebration Modal */}
       {milestoneMessage && (
         <StreakMilestoneCelebration
           isOpen={showMilestoneCelebration}
@@ -517,7 +464,14 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
           subtitle={milestoneMessage.subtitle}
         />
       )}
-      {/* Note: Removed DailyChallengeSignupModal popup - using inline signup CTA instead for less interruption */}
+
+      {/* Streak Saved (freeze bridge) Celebration Modal */}
+      <StreakSavedCelebration
+        isOpen={showStreakSaved}
+        onClose={() => setShowStreakSaved(false)}
+        freezesRemaining={streakSavedFreezesLeft}
+        t={t}
+      />
 
       {/* Custom Puzzle Creator Modal */}
       <CustomPuzzleCreator
@@ -525,7 +479,18 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
         onClose={() => setShowCreatePuzzle(false)}
         language={language}
       />
-    </motion.div>
+
+      {/* Spend animation portal */}
+      {typeof document !== 'undefined' && spendAnimation.isVisible && createPortal(
+        <CoinSpendAnimation
+          trigger={spendAnimation.isVisible}
+          position={spendAnimation.position}
+          amount={spendAnimation.amount}
+          onComplete={spendAnimation.hide}
+        />,
+        document.body
+      )}
+    </m.div>
   );
 };
 

@@ -8,9 +8,10 @@
  */
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Trophy, Lock, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Loader } from '@/components/ui/Loader';
 import { signInWithGoogle, signInWithDiscord } from '@/lib/supabase';
 
 export interface LeaderboardTeaserProps {
@@ -54,7 +55,7 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={`bg-neo-purple dark:from-indigo-900/20 dark:to-purple-900/20 rounded-neo border-2 border-indigo-200 dark:border-indigo-700 p-5 ${className}`}
@@ -79,20 +80,20 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
 
       {/* Blurred preview */}
       <div className="relative mb-4">
-        <div className="blur-sm pointer-events-none select-none">
+        <div className="blur-xs pointer-events-none select-none">
           <div className="space-y-2">
             {[1, 2, 3].map((rank) => (
               <div
                 key={rank}
                 className="flex items-center gap-3 bg-white/50 dark:bg-white/5 rounded-lg p-2"
               >
-                <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-xs font-bold">
+                <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-neo-navy-elevated flex items-center justify-center text-xs font-bold">
                   {rank}
                 </div>
                 <div className="flex-1">
-                  <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+                  <div className="h-3 w-20 bg-gray-200 dark:bg-neo-navy-elevated rounded" />
                 </div>
-                <div className="h-3 w-10 bg-gray-200 dark:bg-gray-700 rounded" />
+                <div className="h-3 w-10 bg-gray-200 dark:bg-neo-navy-elevated rounded" />
               </div>
             ))}
           </div>
@@ -110,7 +111,7 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
           className="w-full bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 rounded-neo shadow-hard-sm"
         >
           {isLoading === 'google' ? (
-            <span className="animate-spin w-4 h-4 border-2 border-gray-300 border-t-gray-600 rounded-full" />
+            <Loader size="sm" />
           ) : (
             <GoogleIcon className="w-4 h-4 me-2" />
           )}
@@ -122,14 +123,14 @@ export const LeaderboardTeaser: React.FC<LeaderboardTeaserProps> = ({
           className="w-full bg-brand-discord hover:bg-brand-discord-hover text-white border-2 border-brand-discord-hover rounded-neo shadow-hard-sm"
         >
           {isLoading === 'discord' ? (
-            <span className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full" />
+            <Loader size="sm" />
           ) : (
             <DiscordIcon className="w-4 h-4 me-2" />
           )}
           {t('auth.continueWithDiscord')}
         </Button>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

@@ -1,114 +1,15 @@
-'use client';
+// This page sits outside the [locale] route group. Locale is injected via the
+// PartyScreenLanguageProvider in layout.tsx (reads ?locale=xx).
+import type { Metadata } from 'next';
+import PartyScreenContent from './PartyScreenContent';
 
-import { useRouter } from 'next/navigation';
-import { LanguageProvider, useLanguage } from '@/contexts/LanguageContext';
-import { Monitor, QrCode, Users, ArrowRight } from 'lucide-react';
+export const dynamic = 'force-dynamic';
 
-/**
- * Party Screen Landing Page
- *
- * Shows instructions for setting up a TV/Party display.
- * Redirects to room-specific party screen when code is entered.
- */
-function PartyScreenContent() {
-  const { t } = useLanguage();
-  const router = useRouter();
+export const metadata: Metadata = {
+  title: 'Party TV Screen — Display Game on the Big Screen | LexiClash',
+  description: 'Cast LexiClash party games to your TV or big screen. Players join from their phones while the game displays here. Perfect for game nights and gatherings.',
+};
 
-  const handleJoinRoom = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const roomCode = formData.get('roomCode') as string;
-    if (roomCode?.trim()) {
-      router.push(`/party-screen/${roomCode.trim().toUpperCase()}`);
-    }
-  };
-
-  return (
-    <div className="min-h-dvh bg-neo-navy text-neo-cream p-6 flex flex-col items-center justify-center">
-      {/* Halftone texture */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.06]"
-        style={{
-          backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.5) 1px, transparent 1px)`,
-          backgroundSize: '10px 10px',
-        }}
-      />
-
-      <div className="relative z-10 max-w-lg w-full space-y-8 text-center">
-        {/* Header */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-center gap-3">
-            <Monitor className="w-12 h-12 text-neo-lime" />
-            <h1 className="text-4xl font-black uppercase tracking-tight">
-              {t('partyScreen.title') || 'Party Screen'}
-            </h1>
-          </div>
-          <p className="text-lg text-neo-cream/80">
-            {t('partyScreen.subtitle') || 'Display the game on your TV for everyone to see!'}
-          </p>
-        </div>
-
-        {/* Features */}
-        <div className="grid gap-4 text-left">
-          <div className="flex items-start gap-3 bg-neo-cream/10 p-4 rounded-neo border-2 border-neo-cream/20">
-            <QrCode className="w-6 h-6 text-neo-cyan flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-bold text-neo-lime">{t('partyScreen.qrJoin') || 'QR Code Join'}</h3>
-              <p className="text-sm text-neo-cream/70">{t('partyScreen.qrJoinDesc') || 'Friends scan the QR code to join instantly on their phones'}</p>
-            </div>
-          </div>
-          <div className="flex items-start gap-3 bg-neo-cream/10 p-4 rounded-neo border-2 border-neo-cream/20">
-            <Users className="w-6 h-6 text-neo-pink flex-shrink-0 mt-0.5" />
-            <div>
-              <h3 className="font-bold text-neo-lime">{t('partyScreen.liveLeaderboard') || 'Live Leaderboard'}</h3>
-              <p className="text-sm text-neo-cream/70">{t('partyScreen.liveLeaderboardDesc') || 'Watch scores update in real-time as players find words'}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Join Form */}
-        <form onSubmit={handleJoinRoom} className="space-y-4">
-          <div>
-            <label htmlFor="roomCode" className="block text-sm font-bold text-neo-cream/80 mb-2">
-              {t('partyScreen.enterRoomCode') || 'Enter Room Code'}
-            </label>
-            <input
-              type="text"
-              id="roomCode"
-              name="roomCode"
-              placeholder="ABCD"
-              maxLength={6}
-              className="w-full text-center text-3xl font-black uppercase tracking-widest bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo p-4 shadow-hard placeholder:text-neo-black/30"
-              autoComplete="off"
-              autoFocus
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-neo-lime text-neo-black font-black text-xl py-4 px-6 uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard transition-shadow flex items-center justify-center gap-2"
-          >
-            {t('partyScreen.startDisplay') || 'Start Party Display'}
-            <ArrowRight className="w-6 h-6" />
-          </button>
-        </form>
-
-        {/* Tip */}
-        <p className="text-xs text-neo-cream/50">
-          {t('partyScreen.tip') || 'Tip: Cast this page to your TV using Chrome or AirPlay for the best experience!'}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Wrapper component that provides the LanguageProvider context.
- * This page is outside the [locale] route group, so it needs its own provider.
- */
 export default function PartyScreenLanding() {
-  return (
-    <LanguageProvider initialLanguage="en">
-      <PartyScreenContent />
-    </LanguageProvider>
-  );
+  return <PartyScreenContent />;
 }

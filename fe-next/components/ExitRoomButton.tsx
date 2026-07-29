@@ -21,15 +21,15 @@ const ExitRoomButton: React.FC<ExitRoomButtonProps> = ({ onClick, label, classNa
     <Button
       type="button"
       onClick={onClick}
-      variant="destructive"
+      variant="ghost"
       size="sm"
-      className={`min-h-[44px] min-w-[44px] border-4 border-neo-black shadow-hard
-        hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-hard-lg
-        active:translate-x-[2px] active:translate-y-[2px] active:shadow-none
+      className={`min-h-[36px] min-w-[36px] w-9 h-9 p-0 rounded-full bg-neo-white/10 border-2 border-neo-white/20 shadow-none
+        hover:bg-neo-red/80 hover:border-neo-red hover:shadow-hard-sm
+        active:scale-95 active:shadow-none
         font-black transition-all ${className}`}
+      aria-label={label}
     >
-      <DoorOpen className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 me-2" />
-      {label}
+      <DoorOpen className="w-4 h-4 text-neo-white" aria-hidden="true" />
     </Button>
   );
 };

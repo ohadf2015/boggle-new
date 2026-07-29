@@ -1,16 +1,19 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Check, Hourglass, Bot } from 'lucide-react';
 import Avatar from '@/components/Avatar';
+import { MascotWithEntrance } from '@/components/ui/Mascot';
 import { useLanguage } from '@/contexts/LanguageContext';
+import useReducedMotion from '@/hooks/useReducedMotion';
 import type { Avatar as AvatarType } from '@/types';
 
 interface PlayerInfo {
   username: string;
-  avatar?: AvatarType & { profilePictureUrl?: string };
+  avatar?: AvatarType;
   isBot?: boolean;
+  isHost?: boolean;
 }
 
 interface PlayersReadyIndicatorProps {
@@ -21,8 +24,8 @@ interface PlayersReadyIndicatorProps {
 }
 
 /**
- * PlayersReadyIndicator - Shows which players are ready for the next round
- * Modern neo-brutalist design with avatar indicators
+ * PlayersReadyIndicator - Compact horizontal strip showing player ready status
+ * Uses inline avatar bubbles with check/waiting badges
  */
 const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
   players,
@@ -31,235 +34,188 @@ const PlayersReadyIndicator: React.FC<PlayersReadyIndicatorProps> = ({
   isHost = false,
 }) => {
   const { t } = useLanguage();
+  const reducedMotion = useReducedMotion();
+  const inf = reducedMotion ? 0 : Infinity;
   const readySet = useMemo(() => new Set(readyUsernames), [readyUsernames]);
 
+  // Exclude host from player list — host clicks "Start Game", not "Ready"
+  const nonHostPlayers = useMemo(() => players.filter(p => !p.isHost), [players]);
+
   // Bots are always ready - count them as ready automatically
-  const botCount = useMemo(() => players.filter(p => p.isBot).length, [players]);
+  const botCount = useMemo(() => nonHostPlayers.filter(p => p.isBot).length, [nonHostPlayers]);
   const humanReadyCount = readyUsernames.length;
   const effectiveReadyCount = humanReadyCount + botCount;
-  const totalPlayers = players.length;
+  const totalPlayers = nonHostPlayers.length;
   const allReady = effectiveReadyCount >= totalPlayers && totalPlayers > 0;
   const progressPercent = totalPlayers > 0 ? (effectiveReadyCount / totalPlayers) * 100 : 0;
 
   // Sort players: ready first (including bots), then by username
   const sortedPlayers = useMemo(() => {
-    return [...players].sort((a, b) => {
+    return [...nonHostPlayers].sort((a, b) => {
       const aReady = a.isBot || readySet.has(a.username);
       const bReady = b.isBot || readySet.has(b.username);
       if (aReady !== bReady) return bReady ? 1 : -1;
       return a.username.localeCompare(b.username);
     });
-  }, [players, readySet]);
+  }, [nonHostPlayers, readySet]);
 
-  if (players.length === 0) return null;
+  if (nonHostPlayers.length === 0) return null;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
+    <m.div
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: 'easeOut' }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       className="w-full"
     >
-      <div className="bg-neo-navy border-3 border-neo-black rounded-neo-lg shadow-hard-lg overflow-hidden">
-        {/* Header with progress bar */}
+      <div className="bg-neo-navy/80 border-2 border-neo-black rounded-neo shadow-hard overflow-hidden">
+        {/* Combined header + avatars in one compact row */}
         <div className="relative">
           {/* Progress bar background */}
-          <div className="absolute inset-0 bg-slate-700/50 text-white" />
+          <div className="absolute inset-0 bg-neo-navy-light/30" />
 
           {/* Animated progress fill */}
-          <motion.div
+          <m.div
             className={`absolute inset-y-0 left-0 ${
               allReady
-                ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
-                : 'bg-gradient-to-r from-neo-lime/80 to-amber-500/80'
+                ? 'bg-linear-to-r from-neo-lime/30 to-neo-cyan/30'
+                : 'bg-linear-to-r from-neo-lime/20 to-neo-pink/20'
             }`}
             initial={{ width: 0 }}
             animate={{ width: `${progressPercent}%` }}
             transition={{ duration: 0.5, ease: 'easeOut' }}
           />
 
-          {/* Header content */}
-          <div className="relative px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <motion.div
+          {/* Compact content: status + avatars + count */}
+          <div className="relative px-3 py-2 flex items-center gap-3">
+            {/* Status icon + label */}
+            <div className="flex items-center gap-1.5 shrink-0">
+              <m.div
                 animate={allReady ? { scale: [1, 1.2, 1] } : { rotate: [0, 10, -10, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 0.5 }}
+                transition={{ type: 'tween', duration: 1.5, repeat: inf, repeatDelay: 0.5 }}
               >
                 {allReady ? (
-                  <span className="text-lg">🎉</span>
+                  <span className="text-sm">🎉</span>
                 ) : (
-                  <Hourglass className="text-neo-lime text-sm" />
+                  <Hourglass className="text-neo-lime w-3.5 h-3.5" />
                 )}
-              </motion.div>
-              <h3 className="font-black text-sm uppercase tracking-wide text-white">
+              </m.div>
+              <span className="font-black text-[11px] uppercase tracking-wide text-neo-white">
                 {allReady ? t('results.everyoneReady') : t('results.waitingForPlayers')}
-              </h3>
-            </div>
-
-            <div className="flex items-center gap-1.5">
-              <span className={`font-black text-lg ${allReady ? 'text-emerald-400' : 'text-neo-lime'}`}>
-                {effectiveReadyCount}
               </span>
-              <span className="text-slate-400 font-bold">/</span>
-              <span className="text-slate-300 font-bold">{totalPlayers}</span>
             </div>
-          </div>
-        </div>
 
-        {/* Players grid */}
-        <div className="p-4">
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            <AnimatePresence mode="popLayout">
-              {sortedPlayers.map((player, index) => {
-                const isReady = player.isBot || readySet.has(player.username);
-                const isCurrentUser = player.username === currentUsername;
-                const isBot = player.isBot;
+            {/* Avatar strip */}
+            <div className="flex items-center -space-x-2 flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+              <AnimatePresence mode="popLayout">
+                {sortedPlayers.map((player, index) => {
+                  const isReady = player.isBot || readySet.has(player.username);
+                  const isCurrentUser = player.username === currentUsername;
+                  const isBot = player.isBot;
 
-                return (
-                  <motion.div
-                    key={player.username}
-                    layout
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{
-                      duration: 0.3,
-                      delay: index * 0.05,
-                      layout: { duration: 0.3 }
-                    }}
-                    className={`
-                      relative p-3 rounded-neo border-2 transition-all duration-300
-                      ${isReady
-                        ? 'bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border-emerald-500/60'
-                        : 'bg-slate-700/30 border-slate-600/40'
-                      }
-                      ${isCurrentUser ? 'ring-2 ring-neo-lime ring-offset-1 ring-offset-slate-900' : ''}
-                    `}
-                  >
-                    {/* Ready indicator badge */}
-                    <motion.div
-                      initial={false}
-                      animate={isReady ? { scale: [1, 1.3, 1] } : { scale: 1 }}
-                      transition={{ duration: 0.3 }}
-                      className={`
-                        absolute -top-1.5 -right-1.5 w-6 h-6 rounded-full
-                        flex items-center justify-center
-                        border-2 border-slate-900 shadow-md
-                        ${isReady
-                          ? 'bg-emerald-500'
-                          : 'bg-slate-600'
-                        }
-                      `}
+                  return (
+                    <m.div
+                      key={player.username}
+                      layout
+                      initial={{ opacity: 0, scale: 0, x: -10 }}
+                      animate={{ opacity: 1, scale: 1, x: 0 }}
+                      exit={{ opacity: 0, scale: 0 }}
+                      transition={{
+                        duration: 0.25,
+                        delay: index * 0.04,
+                        type: 'spring',
+                        stiffness: 400,
+                        damping: 25,
+                      }}
+                      className="relative shrink-0 group"
+                      title={`${player.username}${isCurrentUser ? ` ${t('results.you')}` : ''} — ${isReady ? t('results.ready') : t('results.waiting')}`}
                     >
-                      {isReady ? (
-                        <Check className="text-white text-xs" />
-                      ) : (
-                        <motion.div
-                          animate={{ opacity: [0.4, 1, 0.4] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
-                          className="w-2 h-2 rounded-full bg-slate-400"
-                        />
-                      )}
-                    </motion.div>
-
-                    {/* Player content */}
-                    <div className="flex flex-col items-center gap-2">
-                      {/* Avatar with glow effect when ready */}
-                      <div className={`relative ${isReady ? 'ready-glow' : ''}`}>
-                        <div className={`transition-all duration-300 ${!isReady ? 'opacity-50 grayscale' : ''}`}>
+                      {/* Avatar */}
+                      <div className={`
+                        relative rounded-full transition-all duration-200
+                        ${isCurrentUser ? 'ring-2 ring-neo-lime ring-offset-1 ring-offset-neo-navy z-10' : ''}
+                        ${!isReady ? 'opacity-40 grayscale' : ''}
+                      `}>
+                        {isBot ? (
+                          <div className="w-8 h-8 rounded-full bg-neo-navy-light border-2 border-neo-black flex items-center justify-center">
+                            <Bot className="text-neo-cyan w-3.5 h-3.5" />
+                          </div>
+                        ) : (
                           <Avatar
-                            profilePictureUrl={player.avatar?.profilePictureUrl}
-                            avatarImage={player.avatar?.avatarImage}
-                            size="lg"
-                            className={`border-2 ${isReady ? 'border-emerald-400' : 'border-slate-500'}`}
-                          />
-                        </div>
-
-                        {/* Pulse ring animation for ready players */}
-                        {isReady && (
-                          <motion.div
-                            className="absolute inset-0 rounded-full border-2 border-emerald-400"
-                            animate={{
-                              scale: [1, 1.3, 1],
-                              opacity: [0.8, 0, 0.8]
-                            }}
-                            transition={{
-                              duration: 2,
-                              repeat: Infinity,
-                              ease: 'easeInOut'
-                            }}
+                            userId={player.username}
+                            customAvatar={player.avatar?.customAvatar}
+                            size="sm"
+                            className="w-8 h-8 border-2 border-neo-black"
                           />
                         )}
+
+                        {/* Ready/waiting micro-badge */}
+                        <m.div
+                          initial={false}
+                          animate={isReady ? { scale: [0.8, 1.2, 1] } : { scale: 1 }}
+                          transition={{ duration: 0.2 }}
+                          className={`
+                            absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full
+                            flex items-center justify-center
+                            border-[1.5px] border-neo-navy
+                            ${isReady ? 'bg-neo-lime' : 'bg-neo-navy-light'}
+                          `}
+                        >
+                          {isReady ? (
+                            <Check className="text-neo-black w-2.5 h-2.5" />
+                          ) : (
+                            <m.div
+                              animate={{ opacity: [0.3, 1, 0.3] }}
+                              transition={{ duration: 1.5, repeat: inf }}
+                              className="w-1.5 h-1.5 rounded-full bg-neo-cream/40"
+                            />
+                          )}
+                        </m.div>
                       </div>
+                    </m.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
 
-                      {/* Username */}
-                      <span className={`
-                        text-xs font-bold truncate max-w-full text-center flex items-center justify-center gap-1
-                        ${isReady ? 'text-white' : 'text-slate-400'}
-                        ${isCurrentUser ? 'text-neo-lime' : ''}
-                      `}>
-                        {isBot && <Bot className="text-neo-cyan text-xs shrink-0" />}
-                        {player.username}
-                        {isCurrentUser && ` ${t('results.you')}`}
-                      </span>
-
-                      {/* Status text */}
-                      <span className={`
-                        text-[10px] uppercase tracking-wider font-bold
-                        ${isReady ? 'text-emerald-400' : 'text-slate-500'}
-                      `}>
-                        {isReady ? t('results.ready') : t('results.waiting')}
-                      </span>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
+            {/* Count badge */}
+            <div className={`
+              shrink-0 flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-black
+              ${allReady
+                ? 'bg-neo-lime/20 text-neo-lime'
+                : 'bg-neo-navy-light/50 text-neo-white'
+              }
+            `}>
+              <span className={allReady ? 'text-neo-lime' : 'text-neo-lime'}>{effectiveReadyCount}</span>
+              <span className="text-neo-white">/</span>
+              <span>{totalPlayers}</span>
+            </div>
           </div>
         </div>
 
-        {/* All ready celebration message OR waiting for host message */}
+        {/* All ready celebration / waiting message - ultra compact */}
         <AnimatePresence>
           {allReady && (
-            <motion.div
+            <m.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="px-4 py-3 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border-t-2 border-emerald-500/30">
-                <motion.p
-                  animate={{ scale: [1, 1.02, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                  className="text-center text-sm font-bold text-emerald-300"
-                >
+              <div className="px-3 py-1.5 bg-neo-lime/10 border-t border-neo-lime/20 flex items-center justify-center gap-2">
+                <MascotWithEntrance variant="celebration" size="xs" delay={0.2} clipBorder="none" />
+                <p className="text-center text-xs font-bold text-neo-lime">
                   {isHost
-                    ? (t('results.allReadyHostCanStart') || '🎉 All players ready! You can start the next round.')
-                    : (t('results.allPlayersReadyWaitingHost') || '✓ All players ready — waiting for host to start')}
-                </motion.p>
+                    ? (t('results.allReadyHostCanStart'))
+                    : (t('results.allPlayersReadyWaitingHost'))}
+                </p>
               </div>
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
-
-        {/* Waiting for more players message (for non-hosts) */}
-        {!allReady && !isHost && (
-          <div className="px-4 py-2 border-t-2 border-slate-700/50">
-            <p className="text-center text-xs text-slate-400 font-medium">
-              {t('results.hostWillStartWhenReady') || 'The host will start the next round when everyone is ready'}
-            </p>
-          </div>
-        )}
       </div>
-
-      {/* CSS for glow effect */}
-      <style jsx>{`
-        .ready-glow {
-          filter: drop-shadow(0 0 8px rgba(52, 211, 153, 0.5));
-        }
-      `}</style>
-    </motion.div>
+    </m.div>
   );
 };
 

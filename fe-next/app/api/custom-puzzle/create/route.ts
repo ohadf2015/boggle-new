@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/utils/supabase/server';
 import { generatePuzzleCode, calculateCustomPuzzleScore } from '@/utils/customPuzzle';
+import { normalizeHebrewFinalLetters } from '@/utils/dailyChallenge/constants';
 import type { LetterGrid, Language } from '@/types';
 
 interface CreatePuzzleRequest {
@@ -87,6 +88,12 @@ export async function POST(request: Request) {
       )
       : 0;
 
+    // Normalize Hebrew final letters before storing
+    // This ensures the stored target word matches the grid letters
+    const normalizedTargetWord = language === 'he'
+      ? normalizeHebrewFinalLetters(targetWord.toUpperCase())
+      : targetWord.toUpperCase();
+
     // Create the puzzle
     const { data: puzzle, error } = await supabase
       .from('custom_puzzles')
@@ -96,7 +103,7 @@ export async function POST(request: Request) {
         creator_guest_fingerprint: user ? null : (guestFingerprint || null),
         creator_display_name: displayName,
         language,
-        target_word: targetWord.toUpperCase(),
+        target_word: normalizedTargetWord,
         grid,
         creator_solved: creatorSolved || false,
         creator_attempts_used: creatorAttemptsUsed || 0,
@@ -106,7 +113,8 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error('Error creating puzzle:', error);
+      const errorMessage = error.message || 'Unknown error';
+      console.error('Error creating puzzle:', errorMessage);
       return NextResponse.json(
         { error: 'Failed to create puzzle' },
         { status: 500 }
@@ -120,7 +128,8 @@ export async function POST(request: Request) {
       creatorEfficiencyScore,
     });
   } catch (error) {
-    console.error('Create puzzle error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Create puzzle error:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

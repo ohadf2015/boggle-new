@@ -1,6 +1,7 @@
+import { vi, type MockedFunction, type MockedClass, type Mock } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import BrainTrainingPage from '../page';
+import BrainTrainingPage from '../PageClient';
 import { useAuth } from '@/contexts/AuthContext';
 import { useBrainScore } from '@/hooks/useBrainScore';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -8,57 +9,79 @@ import { useTheme } from '@/utils/ThemeContext';
 import { useRouter } from 'next/navigation';
 import { MusicProvider } from '@/contexts/MusicContext';
 import { SoundEffectsProvider } from '@/contexts/SoundEffectsContext';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 
 // Mock all dependencies
-jest.mock('@/contexts/AuthContext');
-jest.mock('@/hooks/useBrainScore');
-jest.mock('@/contexts/LanguageContext');
-jest.mock('@/utils/ThemeContext');
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
+vi.mock('@/contexts/AuthContext');
+vi.mock('@/hooks/useBrainScore');
+vi.mock('@/contexts/LanguageContext');
+vi.mock('@/utils/ThemeContext');
+vi.mock('@/contexts/HapticsContext', () => ({
+  useHapticsConfig: () => ({
+    isEnabled: true,
+    toggle: vi.fn(),
+  }),
+}));
+vi.mock('next/navigation', () => ({
+  useRouter: vi.fn(),
 }));
 
-const mockUseAuth = useAuth as jest.MockedFunction<typeof useAuth>;
-const mockUseBrainScore = useBrainScore as jest.MockedFunction<typeof useBrainScore>;
-const mockUseLanguage = useLanguage as jest.MockedFunction<typeof useLanguage>;
-const mockUseTheme = useTheme as jest.MockedFunction<typeof useTheme>;
-const mockUseRouter = useRouter as jest.MockedFunction<typeof useRouter>;
+// Mock NavigationContext - AutoHideHeader uses useNavigation
+vi.mock('@/contexts/NavigationContext', () => ({
+  useNavigation: () => ({
+    isInGame: false,
+    setIsInGame: vi.fn(),
+    activeTab: 'brain',
+    setActiveTab: vi.fn(),
+  }),
+  useHideNavigation: () => vi.fn(),
+  NavigationProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+const mockUseAuth = useAuth as MockedFunction<typeof useAuth>;
+const mockUseBrainScore = useBrainScore as MockedFunction<typeof useBrainScore>;
+const mockUseLanguage = useLanguage as MockedFunction<typeof useLanguage>;
+const mockUseTheme = useTheme as MockedFunction<typeof useTheme>;
+const mockUseRouter = useRouter as MockedFunction<typeof useRouter>;
 
 describe('BrainTrainingPage - Loading States', () => {
   const mockRouter = {
-    push: jest.fn(),
-    back: jest.fn(),
-    forward: jest.fn(),
-    refresh: jest.fn(),
-    replace: jest.fn(),
-    prefetch: jest.fn(),
+    push: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    replace: vi.fn(),
+    prefetch: vi.fn(),
   };
 
   // Wrapper component to provide necessary contexts
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   const AllTheProviders = ({ children }: { children: React.ReactNode }) => (
-    <MusicProvider>
-      <SoundEffectsProvider>
-        {children}
-      </SoundEffectsProvider>
-    </MusicProvider>
+    <QueryClientProvider client={queryClient}>
+      <MusicProvider>
+        <SoundEffectsProvider>
+          {children}
+        </SoundEffectsProvider>
+      </MusicProvider>
+    </QueryClientProvider>
   );
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
 
     // Mock matchMedia for framer-motion
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: jest.fn().mockImplementation((query) => ({
+      value: vi.fn().mockImplementation((query) => ({
         matches: false,
         media: query,
         onchange: null,
-        addListener: jest.fn(),
-        removeListener: jest.fn(),
-        addEventListener: jest.fn(),
-        removeEventListener: jest.fn(),
-        dispatchEvent: jest.fn(),
+        addListener: vi.fn(),
+        removeListener: vi.fn(),
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+        dispatchEvent: vi.fn(),
       })),
     });
 
@@ -66,19 +89,19 @@ describe('BrainTrainingPage - Loading States', () => {
     mockUseRouter.mockReturnValue(mockRouter as any);
     mockUseLanguage.mockReturnValue({
       language: 'en',
-      setLanguage: jest.fn(),
+      setLanguage: vi.fn(),
       t: (key: string) => key,
       dir: 'ltr',
       currentFlag: '🇺🇸',
     });
     mockUseTheme.mockReturnValue({
       theme: 'dark',
-      toggleTheme: jest.fn(),
+      toggleTheme: vi.fn(),
     });
   });
 
   describe('Auth Loading State', () => {
-    it('should show loading skeleton while auth is validating (auth loading)', () => {
+    it('should show PageLoader while auth is validating (auth loading)', () => {
       // Auth is still loading
       mockUseAuth.mockReturnValue({
         user: null,
@@ -89,12 +112,13 @@ describe('BrainTrainingPage - Loading States', () => {
         isAuthenticated: false,
         isGuest: true,
         isAdmin: false,
+      isTeacher: false,
         canPlayRanked: false,
         gamesUntilRanked: 10,
         needsProfileCustomization: false,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // Brain score is not loading
@@ -105,26 +129,22 @@ describe('BrainTrainingPage - Loading States', () => {
         brainScoreHistory: [],
         isLoading: false,
         error: null,
-        refresh: jest.fn(),
-        initializeBrainScore: jest.fn(),
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
       });
 
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });
 
-      // Should show loading skeleton, NOT the "Sign in" message
-      const loadingElements = screen.getAllByRole('generic');
-      const hasLoadingSkeleton = loadingElements.some(el =>
-        el.className.includes('animate-pulse')
-      );
-
-      expect(hasLoadingSkeleton).toBe(true);
+      // Should show PageLoader, NOT the "Sign in" message
+      expect(screen.getByTestId('page-loader')).toBeInTheDocument();
 
       // Should NOT show "Sign in to see your progress" message
       expect(screen.queryByText('brain.guestView.title')).not.toBeInTheDocument();
-      expect(screen.queryByText('common.signIn')).not.toBeInTheDocument();
+      expect(screen.queryByText('auth.signIn')).not.toBeInTheDocument();
+      expect(screen.queryByText('auth.signUp')).not.toBeInTheDocument();
     });
 
-    it('should show loading skeleton while brain score is loading', () => {
+    it('should show PageLoader while brain score is loading', () => {
       // Auth is done loading, user is authenticated
       mockUseAuth.mockReturnValue({
         user: { id: 'user-1' } as any,
@@ -135,12 +155,13 @@ describe('BrainTrainingPage - Loading States', () => {
         isAuthenticated: true,
         isGuest: false,
         isAdmin: false,
+      isTeacher: false,
         canPlayRanked: false,
         gamesUntilRanked: 10,
         needsProfileCustomization: false,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // Brain score is loading
@@ -151,19 +172,14 @@ describe('BrainTrainingPage - Loading States', () => {
         brainScoreHistory: [],
         isLoading: true, // Brain score is loading
         error: null,
-        refresh: jest.fn(),
-        initializeBrainScore: jest.fn(),
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
       });
 
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });
 
-      // Should show loading skeleton
-      const loadingElements = screen.getAllByRole('generic');
-      const hasLoadingSkeleton = loadingElements.some(el =>
-        el.className.includes('animate-pulse')
-      );
-
-      expect(hasLoadingSkeleton).toBe(true);
+      // Should show PageLoader
+      expect(screen.getByTestId('page-loader')).toBeInTheDocument();
     });
 
     it('should show "Sign in" message only after auth is done loading and user is not authenticated', async () => {
@@ -177,12 +193,13 @@ describe('BrainTrainingPage - Loading States', () => {
         isAuthenticated: false,
         isGuest: true,
         isAdmin: false,
+      isTeacher: false,
         canPlayRanked: false,
         gamesUntilRanked: 10,
         needsProfileCustomization: false,
-        setupProfile: jest.fn(),
-        updateProfile: jest.fn(),
-        refreshProfile: jest.fn(),
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
       });
 
       // Brain score is not loading
@@ -193,8 +210,8 @@ describe('BrainTrainingPage - Loading States', () => {
         brainScoreHistory: [],
         isLoading: false,
         error: null,
-        refresh: jest.fn(),
-        initializeBrainScore: jest.fn(),
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
       });
 
       render(<BrainTrainingPage />, { wrapper: AllTheProviders });
@@ -204,7 +221,96 @@ describe('BrainTrainingPage - Loading States', () => {
         expect(screen.getByText('brain.guestView.title')).toBeInTheDocument();
       });
 
-      expect(screen.getByText('common.signIn')).toBeInTheDocument();
+      expect(screen.getByText('auth.signIn')).toBeInTheDocument();
+      expect(screen.getByText('auth.signUp')).toBeInTheDocument();
+    });
+
+    it('shows the drill grid for anonymous users (audit H2 — conversion fix)', async () => {
+      // Audit 2026-05-02 finding H2: anonymous /brain showed only "Sign In to
+      // Track Your Gains" — no drill list, no value-prop, no preview. This
+      // test pins the fix: drill section must render alongside the sign-in
+      // CTA so guests can see what they'd unlock.
+      mockUseAuth.mockReturnValue({
+        user: null,
+        profile: null,
+        rankedProgress: null,
+        loading: false,
+        isSupabaseEnabled: true,
+        isAuthenticated: false,
+        isGuest: true,
+        isAdmin: false,
+      isTeacher: false,
+        canPlayRanked: false,
+        gamesUntilRanked: 10,
+        needsProfileCustomization: false,
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
+      });
+
+      mockUseBrainScore.mockReturnValue({
+        brainScore: null,
+        recentGameScores: [],
+        drillProgress: [],
+        brainScoreHistory: [],
+        isLoading: false,
+        error: null,
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
+      });
+
+      render(<BrainTrainingPage />, { wrapper: AllTheProviders });
+
+      // QuickDrillsSection's heading uses the t('brain.quickDrills') key.
+      await waitFor(() => {
+        expect(screen.getByText('brain.quickDrills')).toBeInTheDocument();
+      });
+      // Sign-in CTA still present — drill grid is a supplement, not a replacement.
+      expect(screen.getByText('auth.signIn')).toBeInTheDocument();
+    });
+
+    it('still surfaces the drill grid when the score fetch fails offline (graceful degrade)', async () => {
+      // On a flight the Supabase score fetch fails. The hub must NOT dead-end on
+      // an error card — the 5 drills are bundled + client-side, so they stay
+      // playable. Pins the offline graceful-degrade: drills render alongside the
+      // (still useful) error notice + retry.
+      mockUseAuth.mockReturnValue({
+        user: { id: 'user-1' } as any,
+        profile: { id: 'user-1', username: 'test' } as any,
+        rankedProgress: null,
+        loading: false,
+        isSupabaseEnabled: true,
+        isAuthenticated: true,
+        isGuest: false,
+        isAdmin: false,
+        isTeacher: false,
+        canPlayRanked: false,
+        gamesUntilRanked: 10,
+        needsProfileCustomization: false,
+        setupProfile: vi.fn(),
+        updateProfile: vi.fn(),
+        refreshProfile: vi.fn(),
+      });
+
+      mockUseBrainScore.mockReturnValue({
+        brainScore: null,
+        recentGameScores: [],
+        drillProgress: [],
+        brainScoreHistory: [],
+        isLoading: false,
+        error: 'Network request failed',
+        refresh: vi.fn(),
+        initializeBrainScore: vi.fn(),
+      });
+
+      render(<BrainTrainingPage />, { wrapper: AllTheProviders });
+
+      // Drills reachable despite the error.
+      await waitFor(() => {
+        expect(screen.getByText('brain.quickDrills')).toBeInTheDocument();
+      });
+      // Retry affordance is still there for when connectivity returns.
+      expect(screen.getByText('brain.errors.retry')).toBeInTheDocument();
     });
   });
 });

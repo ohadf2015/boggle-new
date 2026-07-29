@@ -8,9 +8,11 @@
  * - Cooldown between hints
  */
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { Socket } from 'socket.io-client';
 import type { HintPayload } from '@/shared/types/socket';
+import { useSoundEffects } from '@/contexts/SoundEffectsContext';
+import { trackHintUsed } from '@/utils/growthTracking';
 
 interface HintState {
   hint: string | null;
@@ -27,12 +29,14 @@ interface UseHintsOptions {
   socket: Socket | null;
   playerCount: number;
   gameActive: boolean;
+  mode?: string;
 }
 
 const MAX_HINTS = 3;
 const HINT_DISPLAY_DURATION = 8000; // Show hint for 8 seconds
 
-export function useHints({ socket, playerCount, gameActive }: UseHintsOptions) {
+export function useHints({ socket, playerCount, gameActive, mode = 'singleplayer' }: UseHintsOptions) {
+  const { playHintRevealSound } = useSoundEffects();
   const [state, setState] = useState<HintState>({
     hint: null,
     hintType: null,
@@ -67,11 +71,17 @@ export function useHints({ socket, playerCount, gameActive }: UseHintsOptions) {
     }));
   }, [isSinglePlayer, gameActive]);
 
+  // Timeout refs for cleanup
+  const hintDisplayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const errorClearTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // Listen for hint responses
   useEffect(() => {
     if (!socket) return;
 
     const handleHintResponse = (data: HintPayload) => {
+      playHintRevealSound();
+      trackHintUsed(mode, data.hintType);
       setState(prev => ({
         ...prev,
         hint: data.hint,
@@ -85,7 +95,9 @@ export function useHints({ socket, playerCount, gameActive }: UseHintsOptions) {
       }));
 
       // Auto-clear hint after duration
-      setTimeout(() => {
+      if (hintDisplayTimerRef.current) clearTimeout(hintDisplayTimerRef.current);
+      hintDisplayTimerRef.current = setTimeout(() => {
+        hintDisplayTimerRef.current = null;
         setState(prev => ({
           ...prev,
           hint: null,
@@ -104,7 +116,9 @@ export function useHints({ socket, playerCount, gameActive }: UseHintsOptions) {
       }));
 
       // Clear error after 3 seconds
-      setTimeout(() => {
+      if (errorClearTimerRef.current) clearTimeout(errorClearTimerRef.current);
+      errorClearTimerRef.current = setTimeout(() => {
+        errorClearTimerRef.current = null;
         setState(prev => ({
           ...prev,
           error: null,
@@ -128,8 +142,16 @@ export function useHints({ socket, playerCount, gameActive }: UseHintsOptions) {
       socket.off('hintResponse', handleHintResponse);
       socket.off('hintError', handleHintError);
       socket.off('hintAvailable', handleHintAvailable);
+      if (hintDisplayTimerRef.current) {
+        clearTimeout(hintDisplayTimerRef.current);
+        hintDisplayTimerRef.current = null;
+      }
+      if (errorClearTimerRef.current) {
+        clearTimeout(errorClearTimerRef.current);
+        errorClearTimerRef.current = null;
+      }
     };
-  }, [socket, gameActive]);
+  }, [socket, gameActive, playHintRevealSound, mode]);
 
   const requestHint = useCallback(() => {
     if (!socket || !state.isAvailable || state.isLoading) return;

@@ -55,16 +55,10 @@ export function useSafeSocketEvent<T = unknown>({
 }: UseSafeSocketEventOptions<T>): void {
   // Use refs to keep handlers stable and avoid stale closures
   const handlerRef = useRef(handler);
+  handlerRef.current = handler;
+
   const onErrorRef = useRef(onError);
-
-  // Update refs when handlers change
-  useEffect(() => {
-    handlerRef.current = handler;
-  }, [handler]);
-
-  useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
+  onErrorRef.current = onError;
 
   useEffect(() => {
     if (!socket || !enabled) return;
@@ -126,22 +120,36 @@ export function useSafeSocketEvents({
   onError,
 }: UseSafeSocketEventsOptions): void {
   const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
 
-  useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
+  // Store latest handlers in refs so registered callbacks always call current version
+  // (handlers are captured at registration time; this ref indirection prevents stale closures)
+  const handlersRef = useRef<Array<(data: unknown) => void | Promise<void>>>([]);
+  for (let i = 0; i < events.length; i++) {
+    handlersRef.current[i] = events[i].handler;
+  }
+  handlersRef.current.length = events.length;
+
+  // Build a stable config key to avoid JSON.stringify/map+join on every render
+  const prevConfigKeyRef = useRef('');
+  let configKey = '';
+  for (let i = 0; i < events.length; i++) {
+    if (i > 0) configKey += ',';
+    configKey += events[i].event + ':' + (events[i].enabled ?? true);
+  }
+  prevConfigKeyRef.current = configKey;
 
   useEffect(() => {
     if (!socket) return;
 
-    const handlers: Array<{ event: string; handler: (data: unknown) => void }> = [];
+    const registeredHandlers: Array<{ event: string; handler: (data: unknown) => void }> = [];
 
-    for (const { event, handler, enabled = true } of events) {
-      if (!enabled) continue;
+    events.forEach(({ event, enabled = true }, i) => {
+      if (!enabled) return;
 
       const safeHandler = async (data: unknown) => {
         try {
-          await handler(data);
+          await handlersRef.current[i](data);
         } catch (error) {
           console.error(`Error in socket handler for "${event}":`, error);
           onErrorRef.current?.(event, error instanceof Error ? error : new Error(String(error)));
@@ -149,16 +157,16 @@ export function useSafeSocketEvents({
       };
 
       socket.on(event, safeHandler);
-      handlers.push({ event, handler: safeHandler });
-    }
+      registeredHandlers.push({ event, handler: safeHandler });
+    });
 
     return () => {
-      for (const { event, handler } of handlers) {
+      for (const { event, handler } of registeredHandlers) {
         socket.off(event, handler);
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [socket, JSON.stringify(events.map(e => ({ event: e.event, enabled: e.enabled ?? true })))]); // JSON.stringify creates stable comparison for events array
+  }, [socket, configKey]);
 }
 
 /**
@@ -193,10 +201,7 @@ export function useSocketEmit({
   onError,
 }: UseSocketEmitOptions): UseSocketEmitReturn {
   const onErrorRef = useRef(onError);
-
-  useEffect(() => {
-    onErrorRef.current = onError;
-  }, [onError]);
+  onErrorRef.current = onError;
 
   const emit = useCallback(<T = unknown>(event: string, data?: T) => {
     if (!socket) {

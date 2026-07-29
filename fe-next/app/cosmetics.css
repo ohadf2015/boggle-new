@@ -1,0 +1,217 @@
+/* ============================================================
+   Cosmetics Preview Classes
+   Used in CosmeticCollection and CosmeticPreview thumbnails.
+   Each class matches the `preview` field in lib/cosmetics.ts.
+   ============================================================ */
+
+/* ── Tile Skins ─────────────────────────────────────────── */
+
+.tile-skin-default {
+  background: #fff5e6;
+  border: 2px solid #2a2a3e;
+}
+
+.tile-skin-neon {
+  background: linear-gradient(135deg, #0a1a2e 0%, #001a33 100%);
+  border: 2px solid #00ffff;
+  box-shadow: inset 0 0 12px rgba(0, 255, 255, 0.35);
+}
+
+.tile-skin-wooden {
+  background: linear-gradient(135deg, #8b5e3c 0%, #6b4226 50%, #7a4f30 100%);
+  border: 2px solid #3d1f0a;
+}
+
+.tile-skin-crystal {
+  background: linear-gradient(135deg, #cce8ff 0%, #a0d4ff 50%, #80c8ff 100%);
+  border: 2px solid #0066cc;
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.4);
+}
+
+.tile-skin-fire {
+  background: linear-gradient(135deg, #ff6b00 0%, #ff3300 40%, #ff1100 100%);
+  border: 2px solid #880000;
+  box-shadow: inset 0 0 14px rgba(255, 200, 0, 0.3);
+}
+
+/* ── Board Themes ────────────────────────────────────────── */
+
+.board-theme-classic {
+  background: #1a1a2e;
+  border: 2px solid #2a2a3e;
+}
+
+.board-theme-dark {
+  background: #0a0a14;
+  border: 2px solid #111122;
+}
+
+.board-theme-ocean {
+  background: linear-gradient(135deg, #001a33 0%, #002244 50%, #003366 100%);
+  border: 2px solid #0055aa;
+}
+
+.board-theme-galaxy {
+  background: radial-gradient(ellipse at 30% 30%, #2a0a4e 0%, #1a0a2e 40%, #0a0a1e 100%);
+  border: 2px solid #6622cc;
+}
+
+/* ── Victory Effects ─────────────────────────────────────── */
+
+.victory-effect-confetti {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.victory-effect-confetti::after {
+  content: '🎊';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+}
+
+.victory-effect-fireworks {
+  background: radial-gradient(ellipse at 50% 50%, #1a0a2e 0%, #0a0a14 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.victory-effect-fireworks::after {
+  content: '🎆';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+}
+
+.victory-effect-lightning {
+  background: linear-gradient(135deg, #0a1a1a 0%, #001a1a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.victory-effect-lightning::after {
+  content: '⚡';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2rem;
+}
+
+/* ── Profile Frames ──────────────────────────────────────── */
+
+.frame-none {
+  background: #1a1a2e;
+  border: 2px dashed #2a2a3e;
+  opacity: 0.6;
+}
+
+.frame-bronze-ring {
+  background: #1a1a2e;
+  border: 3px solid #cd7f32;
+  box-shadow: 0 0 0 2px #7a4a1a, inset 0 0 0 2px #7a4a1a;
+}
+
+.frame-silver-ring {
+  background: #1a1a2e;
+  border: 3px solid #c0c0c0;
+  box-shadow: 0 0 0 2px #888888, inset 0 0 0 2px #888888;
+}
+
+.frame-gold-crown {
+  background: #1a1a2e;
+  border: 3px solid #ffe135;
+  box-shadow: 0 0 8px rgba(255, 225, 53, 0.5), 0 0 0 2px #886600;
+}
+
+.frame-diamond-halo {
+  background: #0a1a2e;
+  border: 3px solid #00ffff;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.6), 0 0 0 2px #0066aa;
+}
+
+/* ============================================================
+   Board Theme — Applied on game grid wrapper
+   .board-theme-[x] on parent → all tile cells inherit vars
+   ============================================================ */
+
+.cosmetic-board-classic {
+  --board-bg: #1a1a2e;
+  --board-border: #2a2a3e;
+  background-color: var(--board-bg);
+}
+
+.cosmetic-board-dark {
+  --board-bg: #070710;
+  --board-border: #11111f;
+  background-color: var(--board-bg);
+}
+
+.cosmetic-board-ocean {
+  --board-bg: #001a33;
+  --board-border: #003366;
+  background: linear-gradient(160deg, #001a33 0%, #002a55 100%);
+}
+
+.cosmetic-board-galaxy {
+  --board-bg: #0e0720;
+  --board-border: #4a1a88;
+  background: radial-gradient(ellipse at 40% 30%, #1a0a3e 0%, #0a0618 100%);
+}
+
+/* ============================================================
+   Tile Skin — Applied on grid wrapper via data-tile-skin attr
+   Cells inside inherit the skin through child selectors.
+   ============================================================ */
+
+[data-tile-skin='neon'] .letter-tile-gradient {
+  background: #0a1828 !important;
+  border-color: #00ffff !important;
+  color: #00ffff !important;
+  text-shadow: 0 0 6px rgba(0, 255, 255, 0.8);
+}
+
+[data-tile-skin='wooden'] .letter-tile-gradient {
+  background: #7a4f30 !important;
+  border-color: #3d1f0a !important;
+  color: #ffe8cc !important;
+}
+
+[data-tile-skin='crystal'] .letter-tile-gradient {
+  background: #cce8ff !important;
+  border-color: #0066cc !important;
+  color: #003366 !important;
+}
+
+[data-tile-skin='fire'] .letter-tile-gradient {
+  background: #cc3300 !important;
+  border-color: #880000 !important;
+  color: #ffe8cc !important;
+  text-shadow: 0 0 4px rgba(255, 200, 0, 0.6);
+}
+
+/* ============================================================
+   Avatar Frames — applied via .avatar-{frameId} on rounded wrapper
+   Used by Avatar component when player equips a profileFrame.
+   ============================================================ */
+
+.avatar-frame-bronze {
+  box-shadow: 0 0 0 3px #cd7f32, 0 0 0 5px #5a3514, 2px 2px 0 5px #000;
+}
+
+.avatar-frame-silver {
+  box-shadow: 0 0 0 3px #d8d8d8, 0 0 0 5px #6e6e6e, 2px 2px 0 5px #000;
+}
+
+.avatar-frame-gold {
+  box-shadow: 0 0 0 3px #ffe135, 0 0 12px 4px rgba(255, 225, 53, 0.55), 2px 2px 0 5px #000;
+}
+
+.avatar-frame-diamond {
+  box-shadow: 0 0 0 3px #00ffff, 0 0 16px 4px rgba(0, 255, 255, 0.6), 2px 2px 0 5px #000;
+}

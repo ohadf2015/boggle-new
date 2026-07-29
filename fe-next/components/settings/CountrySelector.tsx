@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useRef, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useRef, useEffect } from 'react';
 import { ChevronDown, Search, X, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getCountryFlag } from '@/shared/utils/countryUtils';
@@ -137,11 +137,11 @@ export function CountrySelector({
     }
   }, [isOpen]);
 
-  const handleSelect = (code: string | null) => {
+  const handleSelect = useCallback((code: string | null) => {
     onChange(code);
     setIsOpen(false);
     setSearch('');
-  };
+  }, [onChange]);
 
   return (
     <div ref={dropdownRef} className={cn('relative', className)}>
@@ -150,12 +150,14 @@ export function CountrySelector({
         type="button"
         onClick={() => !disabled && setIsOpen(!isOpen)}
         disabled={disabled}
+        aria-label={t('profile.selectCountry')}
+        aria-expanded={isOpen}
         className={cn(
           'flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors w-full',
           'text-sm font-medium',
           disabled && 'opacity-50 cursor-not-allowed',
           isDarkMode
-            ? 'bg-slate-700 border-slate-600 text-gray-200 hover:bg-slate-600'
+            ? 'bg-neo-navy-elevated border-slate-600 text-gray-200 hover:bg-slate-600'
             : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50',
           isOpen && (isDarkMode ? 'ring-2 ring-cyan-500/50' : 'ring-2 ring-cyan-500/30')
         )}
@@ -169,7 +171,7 @@ export function CountrySelector({
           <>
             <Globe className="w-4 h-4 opacity-50" />
             <span className="flex-1 text-left opacity-70">
-              {t('profile.selectCountry') || 'Select country'}
+              {t('profile.selectCountry')}
             </span>
           </>
         )}
@@ -187,7 +189,7 @@ export function CountrySelector({
           className={cn(
             'absolute z-50 mt-1 w-full rounded-lg border shadow-lg overflow-hidden',
             isDarkMode
-              ? 'bg-slate-800 border-slate-700'
+              ? 'bg-neo-navy-light border-slate-700'
               : 'bg-white border-gray-200'
           )}
         >
@@ -204,13 +206,16 @@ export function CountrySelector({
               <input
                 ref={inputRef}
                 type="text"
+                role="searchbox"
+                aria-label={t('profile.searchCountry')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('profile.searchCountry') || 'Search...'}
+                placeholder={t('profile.searchCountry')}
                 className={cn(
-                  'w-full pl-8 pr-8 py-2 text-sm rounded-md border outline-none',
+                  'w-full ps-8 pe-8 py-2 text-sm rounded-md border',
+                  'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2',
                   isDarkMode
-                    ? 'bg-slate-700 border-slate-600 text-white placeholder:text-gray-500 focus:border-cyan-500'
+                    ? 'bg-neo-navy-elevated border-slate-600 text-white placeholder:text-gray-500 focus:border-cyan-500'
                     : 'bg-gray-50 border-gray-300 text-gray-900 placeholder:text-gray-400 focus:border-cyan-500'
                 )}
               />
@@ -218,12 +223,14 @@ export function CountrySelector({
                 <button
                   type="button"
                   onClick={() => setSearch('')}
+                  aria-label={t('common.clearSearch')}
                   className={cn(
                     'absolute right-2 rtl:right-auto rtl:left-2 top-1/2 -translate-y-1/2',
+                    'focus:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-2 rounded',
                     isDarkMode ? 'text-gray-500 hover:text-gray-400' : 'text-gray-400 hover:text-gray-500'
                   )}
                 >
-                  <X className="w-4 h-4" />
+                  <X className="w-4 h-4" aria-hidden="true" />
                 </button>
               )}
             </div>
@@ -237,12 +244,12 @@ export function CountrySelector({
               className={cn(
                 'w-full px-3 py-2 text-sm text-left border-b flex items-center gap-2',
                 isDarkMode
-                  ? 'border-slate-700 text-red-400 hover:bg-slate-700'
+                  ? 'border-slate-700 text-red-400 hover:bg-neo-navy-elevated'
                   : 'border-gray-200 text-red-600 hover:bg-gray-50'
               )}
             >
               <X className="w-4 h-4" />
-              {t('profile.clearCountry') || 'Clear selection'}
+              {t('profile.clearCountry')}
             </button>
           )}
 
@@ -253,7 +260,7 @@ export function CountrySelector({
                 'px-3 py-4 text-sm text-center',
                 isDarkMode ? 'text-gray-500' : 'text-gray-400'
               )}>
-                {t('profile.noCountryFound') || 'No country found'}
+                {t('profile.noCountryFound')}
               </div>
             ) : (
               filteredCountries.map((country) => (
@@ -268,7 +275,7 @@ export function CountrySelector({
                         ? 'bg-cyan-900/30 text-cyan-400'
                         : 'bg-cyan-50 text-cyan-700'
                       : isDarkMode
-                        ? 'text-gray-200 hover:bg-slate-700'
+                        ? 'text-gray-200 hover:bg-neo-navy-elevated'
                         : 'text-gray-700 hover:bg-gray-50'
                   )}
                 >
@@ -279,7 +286,7 @@ export function CountrySelector({
                       'text-xs px-1.5 py-0.5 rounded',
                       isDarkMode ? 'bg-cyan-800 text-cyan-300' : 'bg-cyan-100 text-cyan-700'
                     )}>
-                      {t('common.selected') || 'Selected'}
+                      {t('common.selected')}
                     </span>
                   )}
                 </button>

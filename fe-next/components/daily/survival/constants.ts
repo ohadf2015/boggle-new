@@ -30,6 +30,14 @@ export const NEW_PLAYER_LIFE_DRAIN_RATE = 0.8;
 export const NEW_PLAYER_THRESHOLD = 3;
 
 /**
+ * Minimum life floor for new players (percentage).
+ * New players' life will never drain below this value,
+ * so first-timers can't lose via the timer alone.
+ * Kept low (critical zone) so the bar doesn't look frozen.
+ */
+export const NEW_PLAYER_LIFE_FLOOR = 5;
+
+/**
  * Life bonus awarded for discovering long words
  * Key is word length, value is life points restored
  */
@@ -71,7 +79,14 @@ export const MIN_TOKENS_FOR_HINT = 1;
 /**
  * Duration to show feedback overlay in milliseconds
  */
-export const FEEDBACK_OVERLAY_DURATION = 3000;
+export const FEEDBACK_OVERLAY_DURATION = 1200;
+
+/**
+ * Delay before gray (non-clue) letters fade to '?' in the feedback overlay.
+ * Gray letters flash briefly so the player sees what they guessed,
+ * then fade out to keep focus on green/yellow clue letters.
+ */
+export const GRAY_LETTER_FADE_DELAY = 400;
 
 /**
  * Duration to auto-dismiss shop hint in milliseconds
@@ -83,3 +98,23 @@ export const SHOP_HINT_DISMISS_DELAY = 5000;
  * Duration to show clue unlock celebration in milliseconds
  */
 export const CLUE_UNLOCK_CELEBRATION_DURATION = 1500;
+
+/**
+ * Language-based life drain rate multipliers.
+ * Japanese kanji compounds are harder to type/find, so drain is slower.
+ * Hebrew is slightly slower due to RTL input complexity.
+ */
+export const LANGUAGE_DRAIN_MULTIPLIER: Record<string, number> = {
+  en: 1.0,
+  sv: 1.0,
+  es: 1.0,
+  he: 0.85,  // 15% slower — RTL input adds friction
+  ja: 0.7,   // 30% slower — kanji compounds are harder to find/type
+};
+
+/**
+ * Get drain rate multiplier for a language
+ */
+export function getLanguageDrainMultiplier(language: string): number {
+  return LANGUAGE_DRAIN_MULTIPLIER[language] ?? 1.0;
+}

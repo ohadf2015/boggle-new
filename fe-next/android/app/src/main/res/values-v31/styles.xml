@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ (API 31) SYSTEM splash override.
+
+  On API 31+ the platform draws its OWN splash and reads ONLY android:-prefixed
+  attributes here (the androidx non-prefixed ones in values/styles.xml don't apply
+  on 31+). By default the OS masks the LAUNCHER adaptive-icon into a circle on every
+  cold start — that was the original "navy bg with a circle of the stale wordmark"
+  that flashed when the evicted process is re-opened.
+
+  We now show an INTENTIONAL brand splash: @drawable/splash_icon is the colorful
+  LEXI CLASH brand art (same master as the launcher icon, resources/icon-only.png),
+  recolored to a navy bg and pre-padded to ~62% so it sits inside the circle safe-zone
+  and never gets clipped. windowSplashScreenIconBackgroundColor + background are both neo-navy
+  (#1a1a2e) — matching the launch + post-splash window backgrounds — so the mark reads
+  as a clean brand badge on seamless navy, and the navy→app handoff stays invisible.
+  This is the splash users expect, NOT the broken clipped flash.
+
+  NOTE (honest caveat): a few OEM skins (e.g. older Samsung One UI) render the system
+  splash icon at slightly different scale/margins — the safe-zone padding makes that a
+  cosmetic difference, not a clipped logo.
+
+  ⚠️ DO NOT run `npx capacitor-assets generate` — it can rewrite these themes back to
+  the full-wordmark @drawable/splash and reintroduce the flash.
+-->
+<resources>
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="android:windowSplashScreenBackground">#FF1A1A2E</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#FF1A1A2E</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+</resources>

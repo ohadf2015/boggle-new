@@ -6,14 +6,30 @@
  */
 import { useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { neoSuccessToast, neoErrorToast, neoInfoToast } from '../../../components/NeoToast';
+import { neoSuccessToast, neoErrorToast, neoInfoToast, TOAST_ICONS } from '../../../components/NeoToast';
 import { triggerTournamentCompleteCelebration } from '@/shared/utils/gameEventUtils';
-import { useGameStateContext } from '@/contexts/GameStateContext';
+import { useGameActions } from '@/hooks/gameState';
+import type { TournamentData, TournamentStanding } from '@/hooks/gameState/types';
 
 interface UsePlayerTournamentEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
 }
+
+interface TournamentCreatedPayload { tournament: TournamentData }
+interface TournamentRoundStartingPayload {
+  tournament?: TournamentData;
+  standings?: TournamentStanding[];
+}
+interface TournamentRoundCompletedPayload {
+  tournament?: TournamentData;
+  standings?: TournamentStanding[];
+}
+interface TournamentCompletePayload {
+  tournament?: TournamentData;
+  standings?: TournamentStanding[];
+}
+interface TournamentCancelledPayload { message?: string }
 
 /**
  * Hook for managing player tournament socket events
@@ -22,17 +38,17 @@ export function usePlayerTournamentEvents({
   socket,
   t,
 }: UsePlayerTournamentEventsProps): void {
-  // Get state setters from context (no more prop drilling!)
-  const { setTournamentData, setTournamentStandings, setShowTournamentStandings } = useGameStateContext();
+  // Get state setters from Zustand store (actions never trigger re-renders)
+  const { setTournamentData, setTournamentStandings, setShowTournamentStandings } = useGameActions();
   useEffect(() => {
     if (!socket) return;
 
-    const handleTournamentCreated = (data: any) => {
+    const handleTournamentCreated = (data: TournamentCreatedPayload) => {
       setTournamentData(data.tournament);
-      neoSuccessToast(t('hostView.tournamentCreated') || 'Tournament created!', { icon: '🏆', duration: 3000 });
+      neoSuccessToast(t('hostView.tournamentCreated') || 'Tournament created!', { icon: TOAST_ICONS.trophy, duration: 3000 });
     };
 
-    const handleTournamentRoundStarting = (data: any) => {
+    const handleTournamentRoundStarting = (data: TournamentRoundStartingPayload) => {
       if (data.tournament) {
         setTournamentData(data.tournament);
       }
@@ -41,10 +57,10 @@ export function usePlayerTournamentEvents({
       }
       const roundNum = data.tournament?.currentRound || 1;
       const totalRounds = data.tournament?.totalRounds || 3;
-      neoInfoToast(`${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`, { icon: '🎯', duration: 3000 });
+      neoInfoToast(`${t('hostView.tournamentRound')} ${roundNum}/${totalRounds}`, { icon: TOAST_ICONS.target, duration: 3000 });
     };
 
-    const handleTournamentRoundCompleted = (data: any) => {
+    const handleTournamentRoundCompleted = (data: TournamentRoundCompletedPayload) => {
       if (data.standings) {
         setTournamentStandings(data.standings);
         setShowTournamentStandings(true);
@@ -54,7 +70,7 @@ export function usePlayerTournamentEvents({
       }
     };
 
-    const handleTournamentComplete = (data: any) => {
+    const handleTournamentComplete = (data: TournamentCompletePayload) => {
       if (data.standings) {
         setTournamentStandings(data.standings);
         setShowTournamentStandings(true);
@@ -65,15 +81,15 @@ export function usePlayerTournamentEvents({
       const winner = data.standings?.[0];
       if (winner) {
         triggerTournamentCompleteCelebration();
-        neoSuccessToast(`🏆 ${winner.username} ${t('hostView.wonTournament')}!`, { duration: 5000 });
+        neoSuccessToast(`${winner.username} ${t('hostView.wonTournament')}!`, { icon: TOAST_ICONS.trophy, duration: 5000 });
       }
     };
 
-    const handleTournamentCancelled = (data: any) => {
+    const handleTournamentCancelled = (data: TournamentCancelledPayload) => {
       setTournamentData(null);
       setTournamentStandings([]);
       setShowTournamentStandings(false);
-      neoErrorToast(data?.message || t('hostView.tournamentCancelled'), { icon: '❌', duration: 3000 });
+      neoErrorToast(data?.message || t('hostView.tournamentCancelled'), { icon: TOAST_ICONS.xCircle, duration: 3000 });
     };
 
     // Register listeners

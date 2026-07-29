@@ -48,7 +48,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error getting themed words:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error getting themed words:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to get themed words' },
       { status: 500 }
@@ -77,7 +78,8 @@ export async function GET(request: NextRequest) {
     const result = await getThemedWordsWithTheme(language as Language, count, minLength, maxLength);
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error getting themed words:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error getting themed words:', errorMessage);
     return NextResponse.json(
       { error: 'Failed to get themed words' },
       { status: 500 }

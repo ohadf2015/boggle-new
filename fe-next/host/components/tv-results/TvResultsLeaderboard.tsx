@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Avatar from '../../../components/Avatar';
 import { cn } from '../../../lib/utils';
 import type { Avatar as AvatarType } from '@/shared/types/game';
@@ -50,23 +50,23 @@ const TvResultsLeaderboard = memo<TvResultsLeaderboardProps>(({
   return (
     <AnimatePresence>
       {visible && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: -20 }}
           className="space-y-3"
         >
-          <motion.h3
+          <m.h3
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className="text-lg font-black uppercase tracking-wide text-neo-cream/80"
           >
             {t('tvResults.fullRankings')}
-          </motion.h3>
+          </m.h3>
 
-          <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-neo-cream/30 scrollbar-track-transparent">
+          <div className="space-y-2 max-h-[400px] overflow-y-auto overscroll-contain scrollable-area pe-2 scrollbar-thin scrollbar-thumb-neo-cream/30 scrollbar-track-transparent">
             {displayPlayers.map((player, index) => (
-              <motion.div
+              <m.div
                 key={player.username}
                 initial={{ x: 30, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
@@ -89,8 +89,9 @@ const TvResultsLeaderboard = memo<TvResultsLeaderboardProps>(({
 
                 {/* Avatar */}
                 <Avatar
-                  profilePictureUrl={player.avatar?.profilePictureUrl ?? undefined}
+
                   avatarImage={player.avatar?.avatarImage}
+                  customAvatar={player.avatar?.customAvatar}
                   size="md"
                   className="border-2 border-neo-black"
                 />
@@ -107,33 +108,44 @@ const TvResultsLeaderboard = memo<TvResultsLeaderboardProps>(({
                   )}
                 </div>
 
-                {/* Score */}
-                <div className="text-right">
-                  <p className="font-black text-xl text-neo-black">
-                    {player.score}
-                  </p>
-                  <p className="text-xs font-bold uppercase text-neo-black/50">
-                    {t('tvResults.pts')}
-                  </p>
+                {/* Score with bar */}
+                <div className="text-right flex items-center gap-2">
+                  <m.div
+                    className="h-3 rounded-full bg-neo-lime/60 border border-neo-black/20"
+                    style={{ transformOrigin: 'right' }}
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ delay: index * 0.08 + 0.3, duration: 0.5, ease: [0.33, 1, 0.68, 1] }}
+                  >
+                    <div style={{ width: `${Math.max(20, (player.score / (players[0]?.score || 1)) * 80)}px` }} className="h-full" />
+                  </m.div>
+                  <div>
+                    <p className="font-black text-xl text-neo-black">
+                      {player.score}
+                    </p>
+                    <p className="text-xs font-bold uppercase text-neo-black/50">
+                      {t('tvResults.pts')}
+                    </p>
+                  </div>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
 
             {/* "And X more" indicator */}
             {remainingCount > 0 && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: displayPlayers.length * 0.08 + 0.2 }}
+                transition={{ type: 'spring', stiffness: 280, damping: 26, delay: displayPlayers.length * 0.08 + 0.2 }}
                 className="text-center py-2 text-neo-cream/60 font-bold"
               >
                 {remainingCount === 1
                   ? t('tvResults.andMore', { count: remainingCount })
                   : t('tvResults.andMorePlural', { count: remainingCount })}
-              </motion.div>
+              </m.div>
             )}
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

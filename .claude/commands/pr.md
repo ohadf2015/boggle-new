@@ -133,9 +133,9 @@ mcp__github__merge_pull_request(pull_number=[number], merge_method="squash")
 
 ## Rules
 
-1. Always verify build passes before creating PR
-2. Include meaningful description, not just "fixes bug"
-3. Link to related issues when applicable
-4. Add test plan with specific verification steps
-5. Use conventional commit format for titles
-6. Create draft PRs for incomplete work
+1. Include meaningful description, not just "fixes bug"
+2. Link to related issues when applicable
+3. Add test plan with specific verification steps
+4. Use conventional commit format for titles
+5. Create draft PRs for incomplete work
+6. Use `/commit-push` before creating PR to ensure all checks pass

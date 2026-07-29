@@ -1,23 +1,18 @@
 'use client';
 
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import type { Language } from '@/types';
 import { generateProgressiveHints, generateFallbackHints, CLUE_SHOP_ITEMS, type HintLevel, type ClueShopItem } from '@/utils/aiHintGenerator';
-import { getWordRarity } from '@/utils/dailyChallenge/wordRarity';
 import type { FeedbackType } from '../WordFeedbackToast';
 
-/**
- * Rarity threshold for auto-revealing first letter
- * Words with rarity >= 4 (RARE or LEGENDARY) get a free hint
- */
-const RARE_WORD_THRESHOLD = 4;
 
 export interface UseSurvivalHintsProps {
   targetWord: string;
   language: Language;
   playWordAcceptedSound?: () => void;
   showToast: (type: FeedbackType, message: string) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
+  accumulatedClues?: Map<number, { letter: string; type: string }>;
 }
 
 
@@ -42,6 +37,9 @@ export interface HintActions {
   autoRevealLetter: () => number;
   revealCategory: () => void;
   revealExample: () => void;
+  // Free auto-unlock (no token deduction). Reveals next available hint tier.
+  // Never reveals the final letter of the target word.
+  autoUnlockNextHint: () => ClueShopItem | null;
 }
 
 /**
@@ -53,12 +51,13 @@ export function useSurvivalHints({
   playWordAcceptedSound,
   showToast,
   t,
+  accumulatedClues,
 }: UseSurvivalHintsProps): [HintState, HintActions] {
   const [currentHint, setCurrentHint] = useState<HintLevel | null>(null);
   const [category, setCategory] = useState('');
   const [exampleSentence, setExampleSentence] = useState('');
   const [revealedLetters, setRevealedLetters] = useState<Set<number>>(new Set());
-  const [eliminatedLetters, setEliminatedLetters] = useState<Set<string>>(new Set());
+  const [eliminatedLetters] = useState<Set<string>>(new Set());
   const [showCategory, setShowCategory] = useState(false);
   const [showExample, setShowExample] = useState(false);
   const [tokensSpent, setTokensSpent] = useState(0);
@@ -72,41 +71,35 @@ export function useSurvivalHints({
     return generateFallbackHints(targetWord, language);
   }, [targetWord, language]);
 
-  // Check if target word is rare/legendary (rarity >= 4)
-  const targetWordRarity = useMemo(() => {
-    if (!targetWord || targetWord.length < 2) return 3;
-    return getWordRarity(targetWord, language);
-  }, [targetWord, language]);
-
-  const isRareWord = targetWordRarity >= RARE_WORD_THRESHOLD;
-
-  // Set initial hints on mount
+  // Set initial hints on mount (only when initialHints changes, not currentHint)
   useEffect(() => {
-    if (initialHints && initialHints.hints.length > 0 && !currentHint) {
-      setCurrentHint(initialHints.hints[0]);
+    if (initialHints && initialHints.hints.length > 0) {
+      setCurrentHint(prev => prev ?? initialHints.hints[0]);
       setCategory(initialHints.category);
       setExampleSentence(initialHints.exampleSentence);
     }
-  }, [initialHints, currentHint]);
+  }, [initialHints]);
 
-  // Track if we've already shown the rare word hint
-  const hasShownRareWordHint = useRef(false);
-
-  // Auto-reveal first letter for rare/legendary words
-  useEffect(() => {
-    if (isRareWord && targetWord.length > 0 && !hasShownRareWordHint.current) {
-      hasShownRareWordHint.current = true;
-      // Reveal first letter as a free hint for tricky words
-      setRevealedLetters(new Set([0]));
-      // Note: hintStage update is handled by effect below
-    }
-  }, [isRareWord, targetWord]);
+  // Positions still hidden from the player (excludes last index, shop reveals, gameplay greens)
+  const unrevealedPositions = useMemo(() => {
+    if (!targetWord) return [];
+    const hintChars = currentHint?.hint.split(' ').filter(c => c !== '') ?? [];
+    const lastIdx = targetWord.length - 1;
+    return [...Array(targetWord.length).keys()].filter(
+      i =>
+        i !== lastIdx &&
+        !revealedLetters.has(i) &&
+        !accumulatedClues?.has(i) &&
+        (hintChars[i] === '_' || hintChars[i] === undefined)
+    );
+  }, [targetWord, revealedLetters, accumulatedClues, currentHint]);
 
   // Determine hint availability based on state
   const unrevealedCount = useMemo(() => {
     if (!targetWord) return 0;
-    return targetWord.length - revealedLetters.size;
-  }, [targetWord, revealedLetters]);
+    const greenPositions = accumulatedClues ? accumulatedClues.size : 0;
+    return targetWord.length - revealedLetters.size - greenPositions;
+  }, [targetWord, revealedLetters, accumulatedClues]);
 
   // We can reveal letters until only 1 is left hidden
   const canRevealLetter = unrevealedCount > 1;
@@ -171,14 +164,12 @@ export function useSurvivalHints({
     let success = false;
     
     if (nextHintItem.id === 'reveal_letter') {
-         const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
-        // Keep 1 letter hidden logic
-        if (unrevealed.length > 1) { 
-             const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
-             setRevealedLetters(prev => new Set([...prev, randomIdx]));
+        if (unrevealedPositions.length > 0) {
+             const nextIdx = unrevealedPositions[0];
+             setRevealedLetters(prev => new Set([...prev, nextIdx]));
              success = true;
         } else {
-             showToast('invalid-word', 'All letters revealed!');
+             showToast('invalid-word', t('wordHunt.survival.allLettersRevealed'));
         }
     } else if (nextHintItem.id === 'reveal_category') {
         setShowCategory(true);
@@ -187,17 +178,25 @@ export function useSurvivalHints({
         setShowExample(true);
         success = true;
     }
-    
+
     if (success) {
         setClueTokens(prev => prev - nextHintItem.cost);
         setTokensSpent(prev => prev + nextHintItem.cost);
         playWordAcceptedSound?.();
-        
-        // Show clearer feedback that coins were spent
-        showToast('valid-word', `${nextHintItem.name} Unlocked! (-${nextHintItem.cost} Coins)`);
+
+        const clueNameKey =
+          nextHintItem.id === 'reveal_letter'
+            ? 'wordHunt.survival.revealLetter'
+            : nextHintItem.id === 'reveal_category'
+              ? 'wordHunt.survival.revealCategory'
+              : 'wordHunt.survival.exampleSentence';
+        showToast(
+          'clue-unlocked',
+          t('wordHunt.survival.clueUnlocked', { name: t(clueNameKey), cost: nextHintItem.cost }),
+        );
     }
     
-  }, [nextHintItem, targetWord, revealedLetters, playWordAcceptedSound, showToast, t]);
+  }, [nextHintItem, unrevealedPositions, playWordAcceptedSound, showToast, t]);
 
 
   // Auto-Unlock logic
@@ -236,14 +235,29 @@ export function useSurvivalHints({
   }, [nextHintItem, buyNextHint]);
 
   const autoRevealLetter = useCallback((): number => {
-      const unrevealed = [...Array(targetWord.length).keys()].filter(i => !revealedLetters.has(i));
-      if (unrevealed.length > 1) {
-        const randomIdx = unrevealed[Math.floor(Math.random() * unrevealed.length)];
-        setRevealedLetters(prev => new Set([...prev, randomIdx]));
-        return randomIdx;
+      if (unrevealedPositions.length > 0) {
+        const nextIdx = unrevealedPositions[0];
+        setRevealedLetters(prev => new Set([...prev, nextIdx]));
+        return nextIdx;
       }
       return -1;
-    }, [targetWord.length, revealedLetters]);
+    }, [unrevealedPositions]);
+
+  const autoUnlockNextHint = useCallback((): ClueShopItem | null => {
+      if (!nextHintItem) return null;
+      // Don't auto-unlock anything when only 1 letter remains — player must guess it
+      if (!canRevealLetter) return null;
+      if (nextHintItem.id === 'reveal_letter') {
+          if (unrevealedPositions.length === 0) return null;
+          setRevealedLetters(prev => new Set([...prev, unrevealedPositions[0]]));
+      } else if (nextHintItem.id === 'reveal_category') {
+          setShowCategory(true);
+      } else if (nextHintItem.id === 'example_sentence') {
+          setShowExample(true);
+      }
+      playWordAcceptedSound?.();
+      return nextHintItem;
+  }, [nextHintItem, canRevealLetter, unrevealedPositions, playWordAcceptedSound]);
 
   const revealCategory = useCallback(() => setShowCategory(true), []);
   const revealExample = useCallback(() => setShowExample(true), []);
@@ -261,14 +275,15 @@ export function useSurvivalHints({
     nextHintItem,
   };
 
-  const actions: HintActions = {
+  const actions: HintActions = useMemo(() => ({
     buyNextHint,
     getNextAffordableClue,
     handlePurchase,
     autoRevealLetter,
     revealCategory,
     revealExample,
-  };
+    autoUnlockNextHint,
+  }), [buyNextHint, getNextAffordableClue, handlePurchase, autoRevealLetter, revealCategory, revealExample, autoUnlockNextHint]);
 
   return [state, actions];
 }

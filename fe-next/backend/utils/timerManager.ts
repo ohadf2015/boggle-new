@@ -149,9 +149,14 @@ class TimerManager {
 const timerManager = new TimerManager();
 
 // Convenience functions for game timers
+// Registers an externally-created interval with the timer manager for proper tracking/cleanup
 export const setGameTimer = (gameCode: string, intervalId: ReturnType<typeof setInterval>): void => {
-  timerManager._timers.set(`game:${gameCode}`, {
-    type: 'interval',
+  const key = `game:${gameCode}`;
+  // Clear any existing timer first to prevent leaks
+  timerManager.clearTimer(key);
+  // Register via internal map (interval was already created externally)
+  timerManager['timers'].set(key, {
+    type: 'interval' as TimerType,
     id: intervalId,
     ref: intervalId
   });
@@ -160,6 +165,17 @@ export const setGameTimer = (gameCode: string, intervalId: ReturnType<typeof set
 export const clearGameTimer = (gameCode: string): boolean => {
   return timerManager.clearTimer(`game:${gameCode}`);
 };
+
+export const hasGameTimer = (gameCode: string): boolean => {
+  return timerManager.hasTimer(`game:${gameCode}`);
+};
+
+// Expose clearAll on globalThis for test cleanup across module instances.
+// Test-only — production bundles must not leak timer-control surface.
+if (process.env.NODE_ENV === 'test' || process.env.VITEST) {
+
+  (globalThis as any).__clearAllGameTimers = () => timerManager.clearAll();
+}
 
 export default timerManager;
 export { TimerManager };

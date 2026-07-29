@@ -1,10 +1,12 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Zap, Brain, Target, Shuffle, BookOpen, Lock, Info } from 'lucide-react';
+import Image from 'next/image';
+import { m } from 'framer-motion';
+import { Lock, Info } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { getDrillTheme } from '@/lib/drills/drillThemes';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
@@ -14,7 +16,6 @@ import type { DrillProgress, DrillType } from '@/shared/types/cognitive';
 
 interface Drill {
   id: DrillType;
-  icon: React.ElementType;
   domain: string;
   color: string;
   bgColor: string;
@@ -24,7 +25,6 @@ interface Drill {
 const DRILLS: Drill[] = [
   {
     id: 'lightning-round',
-    icon: Zap,
     domain: 'processingSpeed',
     color: 'text-neo-lime',
     bgColor: 'bg-yellow-400',
@@ -32,7 +32,6 @@ const DRILLS: Drill[] = [
   },
   {
     id: 'memory-hunt',
-    icon: Brain,
     domain: 'workingMemory',
     color: 'text-neo-purple',
     bgColor: 'bg-purple-400',
@@ -40,7 +39,6 @@ const DRILLS: Drill[] = [
   },
   {
     id: 'combo-master',
-    icon: Target,
     domain: 'attention',
     color: 'text-neo-orange',
     bgColor: 'bg-orange-400',
@@ -48,7 +46,6 @@ const DRILLS: Drill[] = [
   },
   {
     id: 'pattern-switcher',
-    icon: Shuffle,
     domain: 'flexibility',
     color: 'text-neo-cyan',
     bgColor: 'bg-cyan-400',
@@ -56,7 +53,6 @@ const DRILLS: Drill[] = [
   },
   {
     id: 'rare-gems',
-    icon: BookOpen,
     domain: 'vocabulary',
     color: 'text-lime-400',
     bgColor: 'bg-lime-400',
@@ -68,11 +64,13 @@ interface QuickDrillsSectionProps {
   drillProgress?: DrillProgress[];
 }
 
+const EMPTY_DRILL_PROGRESS: DrillProgress[] = [];
+
 /**
  * Quick Drills Section
  * Grid of brain training drills with unlock status.
  */
-export default function QuickDrillsSection({ drillProgress: _drillProgress = [] }: QuickDrillsSectionProps) {
+export default function QuickDrillsSection({ drillProgress: _drillProgress = EMPTY_DRILL_PROGRESS }: QuickDrillsSectionProps) {
   const router = useRouter();
   const { theme } = useTheme();
   const { t, language } = useLanguage();
@@ -104,7 +102,6 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
         {/* 2-Column Grid Layout */}
         <div className="grid grid-cols-2 gap-3 md:gap-4">
           {DRILLS.map((drill, index) => {
-            const Icon = drill.icon;
             const isUnlocked = gamesPlayed >= drill.unlockRequirement;
             const gamesRemaining = Math.max(0, drill.unlockRequirement - gamesPlayed);
 
@@ -113,7 +110,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
               : 100;
 
             const drillButton = (
-              <motion.button
+              <m.button
                 key={drill.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -126,16 +123,19 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
                   isUnlocked
                     ? 'shadow-hard-sm hover:translate-y-[-2px] hover:shadow-hard active:translate-y-[2px] active:shadow-none'
                     : 'opacity-75 cursor-not-allowed',
-                  isDarkMode ? 'bg-slate-800' : 'bg-white'
+                  isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
                 )}
               >
                 {/* Header row with icon and title */}
                 <div className="flex items-center gap-2 md:gap-4 w-full">
-                  <div className={cn(
-                    'w-10 h-10 md:w-14 md:h-14 rounded-md border-2 border-neo-black flex items-center justify-center relative shrink-0',
-                    drill.bgColor
-                  )}>
-                    <Icon className="w-5 h-5 md:w-7 md:h-7 text-neo-black" />
+                  <div className="w-10 h-10 md:w-14 md:h-14 rounded-md border-2 border-neo-black overflow-hidden relative shrink-0 bg-neo-white">
+                    <Image
+                      src={getDrillTheme(drill.id).emblem}
+                      alt=""
+                      fill
+                      sizes="56px"
+                      className="object-cover"
+                    />
                     {!isUnlocked && (
                       <div className="absolute inset-0 bg-black/50 rounded-md flex items-center justify-center">
                         <Lock className="w-3 h-3 md:w-4 md:h-4 text-white" />
@@ -145,7 +145,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
 
                   <div className="flex flex-col items-start min-w-0 flex-1">
                     <p className={cn(
-                      'text-sm md:text-base font-bold text-left line-clamp-1',
+                      'text-sm md:text-base font-bold text-start line-clamp-1',
                       isDarkMode ? 'text-neo-white' : 'text-neo-black'
                     )}>
                       {t(`brain.drills.${drill.id}.name`)}
@@ -153,7 +153,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
 
                     <p className={cn(
                       'text-[10px] md:text-sm uppercase',
-                      isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                      isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
                     )}>
                       {t(`brain.domains.${drill.domain}`)}
                     </p>
@@ -165,9 +165,9 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
                   <div className="w-full mt-2 md:mt-3">
                     <div className={cn(
                       'h-1.5 md:h-2 rounded-full border border-neo-black overflow-hidden',
-                      isDarkMode ? 'bg-slate-700' : 'bg-gray-200'
+                      isDarkMode ? 'bg-neo-navy-elevated' : 'bg-gray-200'
                     )}>
-                      <motion.div
+                      <m.div
                         className={cn('h-full', drill.bgColor)}
                         initial={{ width: 0 }}
                         animate={{ width: `${progressPercent}%` }}
@@ -176,13 +176,13 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
                     </div>
                     <p className={cn(
                       'text-[10px] md:text-xs text-center mt-1 font-bold',
-                      isDarkMode ? 'text-neo-white/60' : 'text-neo-black/60'
+                      isDarkMode ? 'text-neo-white' : 'text-neo-black/60'
                     )}>
                       {gamesPlayed}/{drill.unlockRequirement} {t('brain.drills.gamesToUnlock')}
                     </p>
                   </div>
                 )}
-              </motion.button>
+              </m.button>
             );
 
             // Wrap locked drills in enhanced tooltip
@@ -204,7 +204,7 @@ export default function QuickDrillsSection({ drillProgress: _drillProgress = [] 
                       <div className="flex items-center gap-1.5 pt-1 border-t border-neo-black/20">
                         <Info className="w-3 h-3" />
                         <p className="text-[10px] opacity-80">
-                          {t('brain.drills.unlockHint') || 'Play more games to unlock this drill!'}
+                          {t('brain.drills.unlockHint')}
                         </p>
                       </div>
                     </div>

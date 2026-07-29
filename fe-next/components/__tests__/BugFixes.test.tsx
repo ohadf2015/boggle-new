@@ -18,8 +18,8 @@ import { LanguageProvider } from '@/contexts/LanguageContext';
 import { getTextColor } from '../results/utils';
 
 // Mock framer-motion to avoid animation issues in tests
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, className, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div className={className as string} {...props}>{children}</div>
     ),
@@ -29,9 +29,9 @@ jest.mock('framer-motion', () => ({
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
   useAnimation: () => ({
-    start: jest.fn(),
-    stop: jest.fn(),
-    set: jest.fn(),
+    start: vi.fn(),
+    stop: vi.fn(),
+    set: vi.fn(),
   }),
 }));
 
@@ -76,7 +76,7 @@ describe('Bug Fixes', () => {
   describe('Z-Index Hierarchy', () => {
     it('defines correct z-index hierarchy for dropdowns', () => {
       // Header dropdowns should use z-[100] to appear above other elements
-      // but below modals at z-[101]
+      // but below modals at z-101
       const headerDropdownZIndex = 100;
       const modalZIndex = 101;
 

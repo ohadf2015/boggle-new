@@ -4,9 +4,10 @@
  */
 
 import React, { memo, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Lightbulb, Star } from 'lucide-react';
 import { Button } from './ui/button';
+import { Loader } from '@/components/ui/Loader';
 
 interface HintButtonProps {
   hint: string | null;
@@ -63,10 +64,10 @@ const HintButton = memo<HintButtonProps>(({
   // Build accessible label
   const getAriaLabel = () => {
     if (isLoading) {
-      return t('hints.loading') || 'Loading hint...';
+      return t('hints.loading');
     }
     if (hintsRemaining <= 0) {
-      return t('hints.noHintsLeft') || 'No hints remaining';
+      return t('hints.noHintsLeft');
     }
     return t('hints.requestHint', { remaining: hintsRemaining }) || `Request hint, ${hintsRemaining} remaining`;
   };
@@ -91,19 +92,19 @@ const HintButton = memo<HintButtonProps>(({
           border-3 rounded-neo font-bold text-sm transition-all shadow-hard-sm
         `}
       >
-        <Lightbulb className={`w-4 h-4 flex-shrink-0 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
+        {isLoading ? <Loader size="sm" /> : <Lightbulb className="w-4 h-4 shrink-0" aria-hidden="true" />}
         <div className="flex flex-col items-start min-w-0">
           <span className="text-[10px] opacity-80 whitespace-nowrap overflow-hidden text-ellipsis max-w-[70px]" aria-hidden="true">
             {isLoading
-              ? (t('hints.loading') || '...')
-              : (t('hints.hint') || 'Hint')
+              ? (t('hints.loading'))
+              : (t('hints.hint'))
             }
           </span>
           <div className="flex items-center gap-0.5" aria-hidden="true">
             {/* Visual star tokens */}
             {[...Array(3)].map((_, i) => (
               <Star
-                key={i}
+                key={`hint-star-${i}`}
                 className={`w-3 h-3 ${
                   i < hintsRemaining
                     ? 'text-neo-pink fill-neo-pink'
@@ -118,29 +119,32 @@ const HintButton = memo<HintButtonProps>(({
       {/* Hint Display Popup - pointer-events-none wrapper prevents blocking grid interaction */}
       <AnimatePresence>
         {hint && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -10, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -10, scale: 0.95 }}
-            className="absolute top-full right-0 mt-2 z-50 max-w-[calc(100vw-1rem)] w-64 md:w-80 pointer-events-none"
+            className="absolute top-full inset-x-0 mx-auto mt-2 z-50 max-w-[calc(100vw-1rem)] w-64 md:w-80 pointer-events-none"
           >
             <div
               id="hint-content"
-              role="tooltip"
+              role="status"
+              aria-live="polite"
               className="bg-neo-cream text-neo-black border-4 border-neo-black rounded-neo-lg p-4 shadow-hard-lg pointer-events-auto"
               onClick={onClearHint}
+              onKeyDown={(e) => e.key === 'Escape' && onClearHint()}
+              tabIndex={0}
             >
               {/* Header */}
               <div className="flex items-center gap-2 mb-2">
-                <Lightbulb className="w-5 h-5 text-neo-lime" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} />
+                <Lightbulb className="w-5 h-5 text-neo-lime" style={{ filter: 'drop-shadow(1px 1px 0px rgb(var(--neo-black)))' }} aria-hidden="true" />
                 <span className="font-black text-neo-black uppercase text-sm">
-                  {t('hints.hint') || 'Hint'}
+                  {t('hints.hint')}
                 </span>
-                {wordLength && (
-                  <span className="ml-auto text-xs bg-neo-pink text-white px-2 py-0.5 rounded-neo font-bold">
-                    {wordLength} {t('hints.letters') || 'letters'}
+                {wordLength ? (
+                  <span className="ms-auto text-xs bg-neo-pink text-white px-2 py-0.5 rounded-neo font-bold">
+                    {wordLength} {t('hints.letters')}
                   </span>
-                )}
+                ) : null}
               </div>
 
               {/* Hint Text */}
@@ -152,7 +156,7 @@ const HintButton = memo<HintButtonProps>(({
               {firstLetter && (
                 <div className="mt-2 flex items-center gap-2">
                   <span className="text-xs text-neo-black/70">
-                    {t('hints.startsWith') || 'Starts with:'}
+                    {t('hints.startsWith')}
                   </span>
                   <span className="bg-neo-cyan text-neo-black px-2 py-0.5 rounded-neo font-black text-lg">
                     {firstLetter}
@@ -162,17 +166,17 @@ const HintButton = memo<HintButtonProps>(({
 
               {/* Tap to dismiss */}
               <div className="mt-2 text-xs text-neo-black/70 text-center">
-                {t('hints.tapOrEscToDismiss') || 'Tap or press Escape to dismiss'}
+                {t('hints.tapOrEscToDismiss')}
               </div>
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
 
       {/* Error Display */}
       <AnimatePresence>
         {error && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
@@ -181,7 +185,7 @@ const HintButton = memo<HintButtonProps>(({
             <div className="bg-neo-red text-white px-3 py-2 rounded-neo border-2 border-neo-black text-sm font-medium shadow-hard-sm">
               {error}
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

@@ -25,12 +25,13 @@ export async function GET(request: Request, { params }: RouteParams) {
     }
 
     const supabase = await createClient();
+    const code = puzzleCode.toLowerCase();
 
     // Verify puzzle exists
     const { data: puzzle, error: puzzleError } = await supabase
       .from('custom_puzzles')
       .select('puzzle_code, creator_display_name, target_word, language, created_at')
-      .eq('puzzle_code', puzzleCode.toLowerCase())
+      .eq('puzzle_code', code)
       .single();
 
     if (puzzleError || !puzzle) {
@@ -40,14 +41,26 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Fetch leaderboard from view
-    const { data: leaderboardData, error: leaderboardError } = await supabase
-      .from('custom_puzzle_leaderboard')
-      .select('*')
-      .eq('puzzle_code', puzzleCode.toLowerCase())
-      .order('rank_position', { ascending: true })
-      .limit(limit);
+    // Fetch leaderboard, solved count, and total attempts in parallel
+    const [leaderboardResult, solvedCountResult, totalCountResult] = await Promise.all([
+      supabase
+        .from('custom_puzzle_leaderboard')
+        .select('*')
+        .eq('puzzle_code', code)
+        .order('rank_position', { ascending: true })
+        .limit(limit),
+      supabase
+        .from('custom_puzzle_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_code', code)
+        .eq('solved', true),
+      supabase
+        .from('custom_puzzle_attempts')
+        .select('*', { count: 'exact', head: true })
+        .eq('puzzle_code', code),
+    ]);
 
+    const { data: leaderboardData, error: leaderboardError } = leaderboardResult;
     if (leaderboardError) {
       console.error('Custom puzzle leaderboard error:', leaderboardError);
       return NextResponse.json(
@@ -56,26 +69,15 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
-    // Get total participant count (all who solved)
-    const { count: totalSolved, error: countError } = await supabase
-      .from('custom_puzzle_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_code', puzzleCode.toLowerCase())
-      .eq('solved', true);
-
-    if (countError) {
-      console.error('Custom puzzle count error:', countError);
+    if (solvedCountResult.error) {
+      console.error('Custom puzzle count error:', solvedCountResult.error);
+    }
+    if (totalCountResult.error) {
+      console.error('Custom puzzle total count error:', totalCountResult.error);
     }
 
-    // Get total attempts count (including failed attempts)
-    const { count: totalAttempts, error: totalError } = await supabase
-      .from('custom_puzzle_attempts')
-      .select('*', { count: 'exact', head: true })
-      .eq('puzzle_code', puzzleCode.toLowerCase());
-
-    if (totalError) {
-      console.error('Custom puzzle total count error:', totalError);
-    }
+    const totalSolved = solvedCountResult.count;
+    const totalAttempts = totalCountResult.count;
 
     return NextResponse.json({
       success: true,
@@ -89,9 +91,12 @@ export async function GET(request: Request, { params }: RouteParams) {
         language: puzzle.language,
         createdAt: puzzle.created_at,
       },
+    }, {
+      headers: { 'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60' },
     });
   } catch (error) {
-    console.error('Custom puzzle leaderboard error:', error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Custom puzzle leaderboard error:', errorMessage);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

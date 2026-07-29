@@ -4,6 +4,9 @@
 
 import React, { createContext, useContext, ReactNode, useMemo, useState, useEffect } from 'react';
 import { useLocalStorageObject } from '@/hooks/useLocalStorageState';
+import { resolveCosyPreferences } from '@/lib/cosy/cosyPreferences';
+import type { CelebrationIntensity } from '@/lib/cosy/celebrationScale';
+import { setCelebrationIntensity } from '@/utils/confettiUtils';
 
 /**
  * Accessibility settings for visual effects
@@ -19,6 +22,14 @@ interface AccessibilitySettings {
   disableHaptics: boolean;
   /** Use larger letters on the game grid for easier viewing */
   useLargeLetters: boolean;
+  /**
+   * Cosy / Calm Mode — global calm overlay. When on, it ORs every calming flag
+   * on (reduce motion, fire-round lights, earthquakes, large letters),
+   * suppresses timer urgency, and switches celebrations to calm (particle
+   * effects off, replaced by dignified quiet feedback). It can only make the
+   * game calmer, never louder. Haptics are deliberately untouched.
+   */
+  cosyMode: boolean;
 }
 
 interface AccessibilityContextType {
@@ -34,12 +45,24 @@ interface AccessibilityContextType {
   cycleReduceMotion: () => void;
   /** Toggle large letters mode on/off */
   toggleLargeLetters: () => void;
-  /** Whether animations should be reduced (combines setting + system preference) */
+  /** Toggle cosy / calm mode on/off */
+  toggleCosyMode: () => void;
+  /** Whether cosy / calm mode is enabled */
+  cosyMode: boolean;
+  /** Whether animations should be reduced (combines setting + system preference + cosy) */
   shouldReduceMotion: boolean;
+  /** Effective fire-round-lights suppression (setting OR cosy) */
+  disableFireRoundLights: boolean;
+  /** Effective earthquake suppression (setting OR cosy) */
+  disableEarthquakeEffects: boolean;
   /** Whether haptic feedback is enabled */
   hapticsEnabled: boolean;
-  /** Whether large letters are enabled */
+  /** Whether large letters are enabled (setting OR cosy) */
   largeLettersEnabled: boolean;
+  /** Whether the timer should stop escalating its urgency (cosy) */
+  suppressTimerUrgency: boolean;
+  /** Celebration intensity — 'calm' under cosy (effects off), else 'full' */
+  celebrationIntensity: CelebrationIntensity;
   /** Update a specific setting */
   updateSetting: <K extends keyof AccessibilitySettings>(
     key: K,
@@ -56,6 +79,7 @@ const DEFAULT_SETTINGS: AccessibilitySettings = {
   reduceMotion: 'system', // Respect system preference by default
   disableHaptics: false, // Enable haptics by default
   useLargeLetters: false, // Normal letter size by default
+  cosyMode: false, // Loud/competitive energy by default
 };
 
 interface AccessibilityProviderProps {
@@ -99,13 +123,59 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     return () => mediaQuery.removeListener(handleChange);
   }, []);
 
-  // Calculate whether to reduce motion based on setting + system preference
-  const shouldReduceMotion = useMemo(() => {
-    if (settings.reduceMotion === 'system') {
-      return systemPrefersReducedMotion;
+  // QA affordance: `?cosy=1`/`?cosy=0` forces cosy for the session (in-memory,
+  // not persisted; bypasses the admin gate — cosy is a calmer view, harmless).
+  const [cosyUrlOverride, setCosyUrlOverride] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const raw = new URLSearchParams(window.location.search).get('cosy');
+    if (raw === '1' || raw === 'true') setCosyUrlOverride(true);
+    else if (raw === '0' || raw === 'false') setCosyUrlOverride(false);
+  }, []);
+
+  // Resolve the EFFECTIVE preferences: cosy mode ORs every calming flag on.
+  // Existing consumers read these through the per-flag hooks below, so cosy
+  // propagates everywhere without touching any call site.
+  const effective = useMemo(
+    () =>
+      resolveCosyPreferences({
+        cosyMode: cosyUrlOverride ?? settings.cosyMode,
+        reduceMotion: settings.reduceMotion,
+        systemPrefersReducedMotion,
+        disableFireRoundLights: settings.disableFireRoundLights,
+        disableEarthquakeEffects: settings.disableEarthquakeEffects,
+        useLargeLetters: settings.useLargeLetters,
+      }),
+    [
+      cosyUrlOverride,
+      settings.cosyMode,
+      settings.reduceMotion,
+      systemPrefersReducedMotion,
+      settings.disableFireRoundLights,
+      settings.disableEarthquakeEffects,
+      settings.useLargeLetters,
+    ]
+  );
+  const shouldReduceMotion = effective.shouldReduceMotion;
+
+  // Sync the confetti module's global intensity so every burst (including
+  // non-React callers) scales down under cosy / calm mode.
+  useEffect(() => {
+    setCelebrationIntensity(effective.celebrationIntensity);
+  }, [effective.celebrationIntensity]);
+
+  // Reflect cosy mode on the <html> element so the calm palette
+  // (`html[data-cosy='true']` in globals.css) recolours the whole app.
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+    if (effective.cosyMode) {
+      root.dataset.cosy = 'true';
+    } else {
+      delete root.dataset.cosy;
     }
-    return settings.reduceMotion;
-  }, [settings.reduceMotion, systemPrefersReducedMotion]);
+  }, [effective.cosyMode]);
 
   const toggleFireRoundLights = useMemo(
     () => () => {
@@ -150,11 +220,18 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
     [settings.useLargeLetters, updateField]
   );
 
-  // Haptics are enabled if not disabled in settings
+  const toggleCosyMode = useMemo(
+    () => () => {
+      updateField('cosyMode', !settings.cosyMode);
+    },
+    [settings.cosyMode, updateField]
+  );
+
+  // Haptics are enabled if not disabled in settings (cosy does not touch haptics)
   const hapticsEnabled = !settings.disableHaptics;
 
-  // Large letters enabled
-  const largeLettersEnabled = settings.useLargeLetters;
+  // Large letters enabled (effective — cosy forces on)
+  const largeLettersEnabled = effective.largeLettersEnabled;
 
   const value = useMemo<AccessibilityContextType>(
     () => ({
@@ -164,12 +241,18 @@ export function AccessibilityProvider({ children }: AccessibilityProviderProps) 
       toggleHaptics,
       cycleReduceMotion,
       toggleLargeLetters,
+      toggleCosyMode,
+      cosyMode: effective.cosyMode,
       shouldReduceMotion,
+      disableFireRoundLights: effective.disableFireRoundLights,
+      disableEarthquakeEffects: effective.disableEarthquakeEffects,
       hapticsEnabled,
       largeLettersEnabled,
+      suppressTimerUrgency: effective.suppressTimerUrgency,
+      celebrationIntensity: effective.celebrationIntensity,
       updateSetting: updateField,
     }),
-    [settings, toggleFireRoundLights, toggleEarthquakeEffects, toggleHaptics, cycleReduceMotion, toggleLargeLetters, shouldReduceMotion, hapticsEnabled, largeLettersEnabled, updateField]
+    [settings, toggleFireRoundLights, toggleEarthquakeEffects, toggleHaptics, cycleReduceMotion, toggleLargeLetters, toggleCosyMode, effective, shouldReduceMotion, hapticsEnabled, largeLettersEnabled, updateField]
   );
 
   return (
@@ -197,7 +280,8 @@ export function useAccessibility(): AccessibilityContextType {
  */
 export function useDisableFireRoundLights(): boolean {
   const context = useContext(AccessibilityContext);
-  return context?.settings.disableFireRoundLights ?? false;
+  // Effective value (setting OR cosy mode).
+  return context?.disableFireRoundLights ?? false;
 }
 
 /**
@@ -206,7 +290,8 @@ export function useDisableFireRoundLights(): boolean {
  */
 export function useDisableEarthquakeEffects(): boolean {
   const context = useContext(AccessibilityContext);
-  return context?.settings.disableEarthquakeEffects ?? false;
+  // Effective value (setting OR cosy mode).
+  return context?.disableEarthquakeEffects ?? false;
 }
 
 /**
@@ -251,4 +336,31 @@ export function useHapticsEnabled(): boolean {
 export function useLargeLetters(): boolean {
   const context = useContext(AccessibilityContext);
   return context?.largeLettersEnabled ?? false;
+}
+
+/**
+ * Hook that returns whether cosy / calm mode is enabled.
+ * Safe to use outside of provider - returns false (loud/competitive default).
+ */
+export function useCosyMode(): boolean {
+  const context = useContext(AccessibilityContext);
+  return context?.cosyMode ?? false;
+}
+
+/**
+ * Hook that returns whether the timer should stop escalating its urgency.
+ * Safe to use outside of provider - returns false (urgency shown by default).
+ */
+export function useSuppressTimerUrgency(): boolean {
+  const context = useContext(AccessibilityContext);
+  return context?.suppressTimerUrgency ?? false;
+}
+
+/**
+ * Hook that returns the celebration intensity ('calm' under cosy, else 'full').
+ * Safe to use outside of provider - returns 'full'.
+ */
+export function useCelebrationIntensity(): CelebrationIntensity {
+  const context = useContext(AccessibilityContext);
+  return context?.celebrationIntensity ?? 'full';
 }

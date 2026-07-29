@@ -9,20 +9,23 @@ import { render, screen } from '@testing-library/react';
 import ComboDisplay from '../ComboDisplay';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, animate, initial, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
     ),
     span: ({ children, animate, initial, transition, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <span {...props}>{children}</span>
     ),
+    circle: ({ animate, initial, transition, ...props }: Record<string, unknown>) => (
+      <circle {...props} data-testid="timer-arc" />
+    ),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
 // Mock next/image
-jest.mock('next/image', () => ({
+vi.mock('next/image', () => ({
   __esModule: true,
   default: ({ priority, ...props }: Record<string, unknown>) => {
     return (
@@ -33,7 +36,7 @@ jest.mock('next/image', () => ({
 }));
 
 // Mock InteractiveMascot to avoid framer-motion deep mocking issues
-jest.mock('@/components/ui/InteractiveMascot', () => ({
+vi.mock('@/components/ui/InteractiveMascot', () => ({
   InteractiveMascot: ({ variant, 'data-testid': dataTestId }: { variant: string; 'data-testid'?: string }) => (
     <div data-testid={dataTestId || 'combo-mascot'} data-variant={variant}>
       Mascot
@@ -42,7 +45,7 @@ jest.mock('@/components/ui/InteractiveMascot', () => ({
 }));
 
 // Mock hooks
-jest.mock('@/hooks/useDevicePerformance', () => ({
+vi.mock('@/hooks/useDevicePerformance', () => ({
   useDevicePerformance: () => ({
     isLowEnd: false,
     enableComplexAnimations: true,
@@ -151,25 +154,25 @@ describe('ComboDisplay', () => {
     it('uses neon green for common rarity (levels 1-2)', () => {
       const { container } = render(<ComboDisplay comboLevel={2} />);
       // Check that the gradient class contains neon green colors
-      const comboText = container.querySelector('.bg-gradient-to-r');
+      const comboText = container.querySelector('.bg-linear-to-r');
       expect(comboText).toBeInTheDocument();
     });
 
     it('uses neon cyan for rare rarity (level 3)', () => {
       const { container } = render(<ComboDisplay comboLevel={3} />);
-      const comboText = container.querySelector('.bg-gradient-to-r');
+      const comboText = container.querySelector('.bg-linear-to-r');
       expect(comboText).toBeInTheDocument();
     });
 
     it('uses neon magenta for epic rarity (level 4)', () => {
       const { container } = render(<ComboDisplay comboLevel={4} />);
-      const comboText = container.querySelector('.bg-gradient-to-r');
+      const comboText = container.querySelector('.bg-linear-to-r');
       expect(comboText).toBeInTheDocument();
     });
 
     it('uses neon yellow/gold for legendary rarity (levels 5-6)', () => {
       const { container } = render(<ComboDisplay comboLevel={5} />);
-      const comboText = container.querySelector('.bg-gradient-to-r');
+      const comboText = container.querySelector('.bg-linear-to-r');
       expect(comboText).toBeInTheDocument();
     });
   });
@@ -187,6 +190,46 @@ describe('ComboDisplay', () => {
       const { container } = render(<ComboDisplay comboLevel={3} compact />);
       const outerDiv = container.firstChild as HTMLElement;
       expect(outerDiv.className).toContain('w-[100px]');
+    });
+  });
+
+  describe('timer indication', () => {
+    it('renders timer arc when timeRemaining is provided', () => {
+      const { container } = render(
+        <ComboDisplay comboLevel={3} timeRemaining={50} />
+      );
+      // Timer arc should be rendered as an SVG with specific viewBox
+      const timerArc = container.querySelector('svg[viewBox="0 0 36 36"]');
+      expect(timerArc).toBeInTheDocument();
+    });
+
+    it('does not render timer arc when timeRemaining is null', () => {
+      const { container } = render(
+        <ComboDisplay comboLevel={3} timeRemaining={null} />
+      );
+      // No timer arc SVG without timeRemaining (sparkle SVGs may still exist)
+      const timerArc = container.querySelector('svg[viewBox="0 0 36 36"]');
+      expect(timerArc).not.toBeInTheDocument();
+    });
+
+    it('applies danger styling when isDanger is true', () => {
+      const { container } = render(
+        <ComboDisplay comboLevel={3} timeRemaining={20} isDanger />
+      );
+      const timerArc = container.querySelector('svg[viewBox="0 0 36 36"]');
+      expect(timerArc).toBeInTheDocument();
+      // Danger state should apply red stroke color to the m.circle
+      const timerCircle = container.querySelector('[data-testid="timer-arc"]');
+      expect(timerCircle).toBeInTheDocument();
+      expect(timerCircle).toHaveAttribute('stroke', '#FF4444');
+    });
+
+    it('renders timer arc in compact mode', () => {
+      const { container } = render(
+        <ComboDisplay comboLevel={3} timeRemaining={75} compact />
+      );
+      const timerArc = container.querySelector('svg[viewBox="0 0 36 36"]');
+      expect(timerArc).toBeInTheDocument();
     });
   });
 });

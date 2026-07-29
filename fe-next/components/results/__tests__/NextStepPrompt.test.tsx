@@ -4,29 +4,29 @@ import userEvent from '@testing-library/user-event';
 import NextStepPrompt from '../NextStepPrompt';
 
 // Mock next/navigation
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: vi.fn(),
   }),
 }));
 
 // Mock session utility
-jest.mock('@/utils/session', () => ({
-  clearSessionPreservingUsername: jest.fn(),
+vi.mock('@/utils/session', () => ({
+  clearSessionPreservingUsername: vi.fn(),
 }));
 
 // Mock LanguageContext
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => {
     const translations: Record<string, string> = {
       'nextStep.challengeBots': 'Challenge the Bots!',
       'nextStep.challengeBotsDesc': 'Test your skills against AI opponents',
-      'nextStep.dailyChallenge': 'Daily Challenge',
-      'nextStep.dailyChallengeDesc': 'Same puzzle as everyone worldwide',
+      'nextStep.tryDailyChallenge': 'Try Daily Challenge',
+      'nextStep.tryDailyChallengeDesc': 'Same puzzle for everyone worldwide - compete globally!',
       'nextStep.goMultiplayer': 'Go Multiplayer!',
       'nextStep.goMultiplayerDesc': 'Compete with real players',
-      'nextStep.brainTraining': 'Train Your Brain',
-      'nextStep.brainTrainingDesc': 'Track your cognitive growth',
+      'nextStep.goMultiplayerFromDaily': 'Why Stop at One?',
+      'nextStep.goMultiplayerFromDailyDesc': 'Unlimited games, real opponents — no waiting until tomorrow',
       'nextStep.backToLobby': 'Back to Lobby',
       'nextStep.letsGo': "Let's Go!",
     };
@@ -39,8 +39,8 @@ jest.mock('@/contexts/LanguageContext', () => ({
 }));
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, className, style, onClick, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
       <div className={className} style={style} onClick={onClick} {...props}>{children}</div>
     ),
@@ -51,10 +51,10 @@ jest.mock('framer-motion', () => ({
 }));
 
 describe('NextStepPrompt', () => {
-  const mockOnBackToLobby = jest.fn();
+  const mockOnBackToLobby = vi.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Practice Mode', () => {
@@ -72,7 +72,7 @@ describe('NextStepPrompt', () => {
   });
 
   describe('Solo-Bots Mode', () => {
-    it('renders Daily Challenge CTA for solo-bots mode', () => {
+    it('renders Try Daily Challenge CTA for solo-bots mode', () => {
       render(
         <NextStepPrompt
           currentMode="solo-bots"
@@ -80,8 +80,27 @@ describe('NextStepPrompt', () => {
         />
       );
 
-      expect(screen.getByText('Daily Challenge')).toBeInTheDocument();
-      expect(screen.getByText('Same puzzle as everyone worldwide')).toBeInTheDocument();
+      expect(screen.getByText('Try Daily Challenge')).toBeInTheDocument();
+      expect(screen.getByText('Same puzzle for everyone worldwide - compete globally!')).toBeInTheDocument();
+    });
+
+    it('calls onAction callback when provided instead of navigating', async () => {
+      const user = userEvent.setup();
+      const mockOnAction = vi.fn();
+
+      render(
+        <NextStepPrompt
+          currentMode="solo-bots"
+          onBackToLobby={mockOnBackToLobby}
+          onAction={mockOnAction}
+        />
+      );
+
+      // Click the "Let's Go!" button
+      await user.click(screen.getByText("Let's Go!"));
+
+      // Verify onAction callback was called
+      expect(mockOnAction).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -94,13 +113,13 @@ describe('NextStepPrompt', () => {
         />
       );
 
-      expect(screen.getByText('Go Multiplayer!')).toBeInTheDocument();
-      expect(screen.getByText('Compete with real players')).toBeInTheDocument();
+      expect(screen.getByText('Why Stop at One?')).toBeInTheDocument();
+      expect(screen.getByText('Unlimited games, real opponents — no waiting until tomorrow')).toBeInTheDocument();
     });
   });
 
   describe('Multiplayer-Bots Mode', () => {
-    it('renders Brain Training CTA for multiplayer-bots mode', () => {
+    it('renders Try Daily Challenge CTA for multiplayer-bots mode', () => {
       render(
         <NextStepPrompt
           currentMode="multiplayer-bots"
@@ -108,8 +127,8 @@ describe('NextStepPrompt', () => {
         />
       );
 
-      expect(screen.getByText('Train Your Brain')).toBeInTheDocument();
-      expect(screen.getByText('Track your cognitive growth')).toBeInTheDocument();
+      expect(screen.getByText('Try Daily Challenge')).toBeInTheDocument();
+      expect(screen.getByText('Same puzzle for everyone worldwide - compete globally!')).toBeInTheDocument();
     });
   });
 

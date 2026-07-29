@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -127,7 +127,7 @@ export function ScorePopupFly({
   if (prefersReducedMotion && popup) {
     return (
       <div
-        className={cn('fixed pointer-events-none z-[150]', className)}
+        className={cn('fixed pointer-events-none z-150', className)}
         style={{ left: popup.x, top: popup.y, transform: 'translate(-50%, -50%)' }}
       >
         <div
@@ -145,9 +145,10 @@ export function ScorePopupFly({
   return (
     <AnimatePresence mode="wait" onExitComplete={onComplete}>
       {popup && targetPos && (
-        <motion.div
+        <m.div
           key={popup.id}
-          className={cn('fixed pointer-events-none z-[150]', className)}
+          className={cn('fixed pointer-events-none z-150', className)}
+          data-testid="score-popup-fly"
           style={{ left: popup.x, top: popup.y }}
           initial={{
             x: '-50%',
@@ -180,7 +181,7 @@ export function ScorePopupFly({
           <div className="flex flex-col items-center gap-0.5">
             {/* Word display */}
             {showWord && popup.word && (
-              <motion.div
+              <m.div
                 className={cn(
                   'font-bold text-neo-white uppercase tracking-wide',
                   sizeConfig[size].word
@@ -193,14 +194,14 @@ export function ScorePopupFly({
                 }}
               >
                 {popup.word}
-              </motion.div>
+              </m.div>
             )}
 
             {/* Score badge */}
-            <motion.div
+            <m.div
               className={cn(
                 'rounded-neo border-3 border-neo-black shadow-hard',
-                'bg-gradient-to-r from-neo-lime to-emerald-400',
+                'bg-linear-to-r from-neo-lime to-emerald-400',
                 sizeConfig[size].container
               )}
               animate={
@@ -229,14 +230,14 @@ export function ScorePopupFly({
                   </span>
                 )}
               </span>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Sparkle particles */}
           {enableGlowEffects && !isLowEnd && (
             <>
               {[0, 60, 120, 180, 240, 300].map((angle, i) => (
-                <motion.div
+                <m.div
                   key={`sparkle-${i}`}
                   className="absolute w-1.5 h-1.5 bg-neo-lime rounded-full"
                   style={{
@@ -261,7 +262,7 @@ export function ScorePopupFly({
               ))}
             </>
           )}
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { m, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ArrowRight, Rocket } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogBody, DialogFooter } from './ui/dialog';
 import { Button } from './ui/button';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -11,8 +11,8 @@ import { useMusic } from '../contexts/MusicContext';
 import { useAuth } from '../contexts/AuthContext';
 import OnboardingProgress from './onboarding/OnboardingProgress';
 import { markOnboardingComplete, markOnboardingSkipped } from '../utils/onboardingStorage';
-import { AVATARS } from '../utils/avatarConfig';
-import { hasCompleteStoredProfile, getStoredProfile } from '../utils/profileStorage';
+import { hasCompleteStoredProfile, getStoredProfile, setStoredCustomAvatar } from '../utils/profileStorage';
+import { type CustomAvatarConfig, getRandomAvatarConfig } from '@/shared/types/customAvatar';
 import { useSwipeGesture } from '../hooks/useSwipeGesture';
 import { triggerHaptic } from '../utils/hapticFeedback';
 
@@ -28,6 +28,7 @@ interface OnboardingModalProps {
 
 interface FormData {
   avatarId: string;
+  customAvatar: CustomAvatarConfig | null;
   displayName: string;
   selectedMode: 'single' | 'multi' | 'daily' | null;
 }
@@ -61,61 +62,27 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
 
   const [currentStep, setCurrentStep] = useState(0);
   const [demoCompleted, setDemoCompleted] = useState(false);
-  const [formData, setFormData] = useState<FormData>({
-    avatarId: '',
-    displayName: profile?.display_name || '',
-    selectedMode: null,
+  const [formData, setFormData] = useState<FormData>(() => {
+    // Priority: (1) stored guest custom avatar, (2) random
+    const storedProfile = getStoredProfile();
+    const initialAvatar = storedProfile.customAvatar ?? getRandomAvatarConfig();
+    return {
+      avatarId: storedProfile.avatarId || '',
+      customAvatar: initialAvatar,
+      displayName: profile?.display_name || storedProfile.username || '',
+      selectedMode: null,
+    };
   });
 
-  // Set avatar and name defaults on mount
-  // Priority: (1) authenticated profile, (2) stored guest profile, (3) random
+  // Sync from authenticated profile on mount
   useEffect(() => {
-    // If authenticated with complete profile, use that data
-    if (isAuthenticated && profile?.avatar_image && profile?.display_name) {
+    if (isAuthenticated && profile?.display_name) {
       setFormData((prev) => ({
         ...prev,
         avatarId: profile.avatar_image || prev.avatarId,
         displayName: profile.display_name || prev.displayName,
       }));
-      return;
     }
-
-    // If guest has stored profile, use that data
-    const storedProfile = getStoredProfile();
-    if (storedProfile.avatarId && storedProfile.username) {
-      setFormData((prev) => ({
-        ...prev,
-        avatarId: storedProfile.avatarId || prev.avatarId,
-        displayName: storedProfile.username || prev.displayName,
-      }));
-      return;
-    }
-
-    // Otherwise, use session storage to prevent re-selection within the same session
-    const sessionKey = 'lexiclash_onboarding_session_avatar';
-    const storedData = sessionStorage.getItem(sessionKey);
-
-    let avatarToUse: typeof AVATARS[0];
-
-    if (storedData) {
-      try {
-        const parsed = JSON.parse(storedData);
-        // Find the stored avatar or fallback to random
-        avatarToUse = AVATARS.find(a => a.id === parsed.avatarId) || AVATARS[Math.floor(Math.random() * AVATARS.length)];
-      } catch {
-        avatarToUse = AVATARS[Math.floor(Math.random() * AVATARS.length)];
-      }
-    } else {
-      // First time in session - pick random and store it
-      avatarToUse = AVATARS[Math.floor(Math.random() * AVATARS.length)];
-      sessionStorage.setItem(sessionKey, JSON.stringify({ avatarId: avatarToUse.id }));
-    }
-
-    setFormData((prev) => ({
-      ...prev,
-      avatarId: avatarToUse.id,
-      displayName: prev.displayName || avatarToUse.name,
-    }));
   }, [isAuthenticated, profile?.avatar_image, profile?.display_name]);
 
   // Play bossa music when modal opens (after audio unlock)
@@ -164,29 +131,27 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     }
   };
 
-  // Swipe gesture handlers
+  // Swipe gesture handlers - left=next, right=back
   const swipeHandlers = useSwipeGesture({
-    onSwipeLeft: () => {
-      // Swipe left = next (in LTR), prev (in RTL) - handled by hook
-      if (canAdvance()) {
+    onSwipe: (direction) => {
+      if (direction === 'left' && canAdvance()) {
         handleNext();
-      }
-    },
-    onSwipeRight: () => {
-      // Swipe right = prev (in LTR), next (in RTL) - handled by hook
-      if (currentStep > 0) {
+      } else if (direction === 'right' && currentStep > 0) {
         handleBack();
       }
     },
-    isRtl: dir === 'rtl',
-    enableHaptic: false, // We handle haptic manually for better control
     threshold: 50,
   });
 
   const handleComplete = async () => {
+    // Save custom avatar to localStorage
+    if (formData.customAvatar) {
+      setStoredCustomAvatar(formData.customAvatar);
+    }
+
     // Save to localStorage - always set to single/training mode
     markOnboardingComplete({
-      avatarId: formData.avatarId,
+      avatarId: formData.avatarId || 'custom',
       displayName: formData.displayName,
       selectedMode: 'single', // Always training mode
     });
@@ -194,13 +159,14 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     // Save to profile if authenticated
     if (profile && formData.displayName.trim()) {
       await updateProfile({
-        avatar_image: formData.avatarId,
+        avatar_image: formData.avatarId || 'custom',
         display_name: formData.displayName.trim(),
       });
     }
 
-    // Navigate directly to practice mode (no timer, relaxed exploration)
-    router.push(`/${language}/singleplayer?autoStart=practice`);
+    // Land in cozy practice hub — players pick a mode + see a guided tutorial
+    // before being dropped into the real engine. Replaces legacy autoStart flow.
+    router.push(`/${language}/practice`);
 
     onClose();
   };
@@ -226,10 +192,10 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         // Step 2: Profile setup - avatar + name combined (skipped for authenticated/stored users)
         return (
           <ProfileSetupStep
-            selectedAvatarId={formData.avatarId}
+            customAvatar={formData.customAvatar ?? getRandomAvatarConfig()}
             displayName={formData.displayName}
-            onAvatarSelect={(avatarId) =>
-              setFormData((prev) => ({ ...prev, avatarId }))
+            onAvatarSelect={(config) =>
+              setFormData((prev) => ({ ...prev, customAvatar: config }))
             }
             onNameChange={(name) =>
               setFormData((prev) => ({ ...prev, displayName: name }))
@@ -244,7 +210,6 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
             onModeSelect={(mode) =>
               setFormData((prev) => ({ ...prev, selectedMode: mode }))
             }
-            onComplete={handleComplete}
           />
         );
       default:
@@ -266,9 +231,9 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="max-w-2xl" dir={dir}>
         {/* Visually hidden title for accessibility */}
-        <DialogTitle className="sr-only">{t('onboarding.navigation.title') || 'Player Onboarding'}</DialogTitle>
+        <DialogTitle className="sr-only">{t('onboarding.navigation.title')}</DialogTitle>
         <DialogDescription className="sr-only">
-          {t('onboarding.navigation.description') || 'Learn how to play the game with this tutorial'}
+          {t('onboarding.navigation.description')}
         </DialogDescription>
 
         {/* Progress indicator */}
@@ -279,7 +244,7 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
         {/* Step content with animation and swipe support */}
         <DialogBody className="space-y-3 px-3 sm:px-6" {...swipeHandlers}>
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={currentStep}
               initial={{ opacity: 0, x: dir === 'rtl' ? -20 : 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -291,18 +256,18 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
               style={{ willChange: 'transform, opacity' }}
             >
               {renderStep()}
-            </motion.div>
+            </m.div>
           </AnimatePresence>
 
           {/* Swipe hint indicator - only shown on mobile */}
-          <div className="block sm:hidden text-center text-xs text-gray-400 mt-2">
-            {t('onboarding.swipeHint') || '← Swipe to navigate →'}
+          <div className="block sm:hidden text-center text-xs text-neo-white mt-2">
+            {t('onboarding.swipeHint')}
           </div>
         </DialogBody>
 
         {/* Navigation buttons */}
         <DialogFooter className="flex-col sm:flex-row gap-2 px-3 sm:px-6 pb-3 sm:pb-6">
-          {/* Back button (except first step) */}
+          {/* Back button (hidden on first step) */}
           {currentStep > 0 && (
             <Button
               variant="outline"
@@ -317,15 +282,23 @@ const OnboardingModal: React.FC<OnboardingModalProps> = ({ isOpen, onClose }) =>
           {/* Next/Complete button */}
           <Button
             variant={isLastStep ? 'default' : 'accent'}
+            size={isLastStep ? 'lg' : 'default'}
             onClick={handleNext}
             disabled={!canAdvance()}
-            className={`flex-1 text-sm sm:text-base ${
+            className={`flex-1 ${
               !canAdvance() ? 'opacity-50 cursor-not-allowed' : ''
             }`}
           >
-            {isLastStep ? t('onboarding.navigation.letsPlay') : t('onboarding.navigation.next')}
-            {!isLastStep && (
-              <ArrowRight className="ms-2 rtl:rotate-180" />
+            {isLastStep ? (
+              <>
+                <Rocket className="me-2" />
+                {t('onboarding.navigation.startPractice')}
+              </>
+            ) : (
+              <>
+                {t('onboarding.navigation.next')}
+                <ArrowRight className="ms-2 rtl:rotate-180" />
+              </>
             )}
           </Button>
         </DialogFooter>

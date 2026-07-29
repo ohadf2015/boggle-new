@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useCallback, useReducer } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -74,8 +74,20 @@ export function CoinBurstSource({
   className,
 }: CoinBurstSourceProps) {
   const { isLowEnd, prefersReducedMotion, enableGlowEffects, maxParticles } = useDevicePerformance();
-  const [isActive, setIsActive] = useState(false);
-  const [particles, setParticles] = useState<SparkleParticle[]>([]);
+  // Batch isActive + particles — they always change together on burst start/end
+  type BurstState = { isActive: boolean; particles: SparkleParticle[] };
+  type BurstAction = { type: 'start'; particles: SparkleParticle[] } | { type: 'end' };
+  const [burstState, dispatchBurst] = useReducer(
+    (state: BurstState, action: BurstAction): BurstState => {
+      switch (action.type) {
+        case 'start': return { isActive: true, particles: action.particles };
+        case 'end': return { isActive: false, particles: [] };
+        default: return state;
+      }
+    },
+    { isActive: false, particles: [] }
+  );
+  const { isActive, particles } = burstState;
 
   // Particle counts based on intensity and device capability
   const getParticleCount = useCallback(() => {
@@ -83,12 +95,9 @@ export function CoinBurstSource({
     return Math.min(base, isLowEnd ? 4 : maxParticles);
   }, [intensity, isLowEnd, maxParticles]);
 
-  // Generate particles when triggered
+  // Generate particles when triggered — dispatch batches isActive + particles in one update
   useEffect(() => {
     if (trigger && !isActive) {
-      setIsActive(true);
-      onBurstStart?.();
-
       const count = getParticleCount();
       const newParticles: SparkleParticle[] = Array.from({ length: count }, (_, i) => ({
         id: Date.now() + i,
@@ -99,12 +108,12 @@ export function CoinBurstSource({
         color: GOLD_COLORS[Math.floor(Math.random() * GOLD_COLORS.length)],
       }));
 
-      setParticles(newParticles);
+      dispatchBurst({ type: 'start', particles: newParticles });
+      onBurstStart?.();
 
       // Auto-cleanup after animation
       const timer = setTimeout(() => {
-        setIsActive(false);
-        setParticles([]);
+        dispatchBurst({ type: 'end' });
         onBurstComplete?.();
       }, 800);
 
@@ -118,7 +127,7 @@ export function CoinBurstSource({
     if (trigger && showAmount && amount !== undefined) {
       return (
         <div
-          className={cn('fixed pointer-events-none z-[200]', className)}
+          className={cn('fixed pointer-events-none z-60', className)}
           style={{ left: position.x, top: position.y, transform: 'translate(-50%, -50%)' }}
         >
           <div className="px-4 py-2 rounded-neo bg-neo-lime border-3 border-neo-black shadow-hard">
@@ -134,13 +143,13 @@ export function CoinBurstSource({
 
   return (
     <div
-      className={cn('fixed pointer-events-none z-[200]', className)}
+      className={cn('fixed pointer-events-none z-60', className)}
       style={{ left: position.x, top: position.y }}
     >
       {/* Expanding ring effect */}
       {enableGlowEffects && !isLowEnd && (
         <>
-          <motion.div
+          <m.div
             className="absolute rounded-full border-4 border-neo-lime"
             style={{
               left: '50%',
@@ -154,7 +163,7 @@ export function CoinBurstSource({
             animate={{ scale: 6, opacity: 0 }}
             transition={{ duration: 0.6, ease: 'easeOut' }}
           />
-          <motion.div
+          <m.div
             className="absolute rounded-full border-2 border-amber-400"
             style={{
               left: '50%',
@@ -173,7 +182,7 @@ export function CoinBurstSource({
 
       {/* Central glow */}
       {enableGlowEffects && !isLowEnd && (
-        <motion.div
+        <m.div
           className="absolute rounded-full"
           style={{
             left: '50%',
@@ -193,7 +202,7 @@ export function CoinBurstSource({
 
       {/* Amount badge */}
       {showAmount && amount !== undefined && (
-        <motion.div
+        <m.div
           className="absolute"
           style={{
             left: '50%',
@@ -211,8 +220,8 @@ export function CoinBurstSource({
             ease: 'backOut',
           }}
         >
-          <div className="px-4 py-2 rounded-neo-lg bg-gradient-to-br from-amber-300 via-yellow-400 to-amber-500 border-3 border-neo-black shadow-hard whitespace-nowrap">
-            <motion.span
+          <div className="px-4 py-2 rounded-neo-lg bg-linear-to-br from-amber-300 via-yellow-400 to-amber-500 border-3 border-neo-black shadow-hard whitespace-nowrap">
+            <m.span
               className="font-black text-neo-black text-xl flex items-center gap-1.5"
               animate={{
                 textShadow: enableGlowEffects
@@ -223,9 +232,9 @@ export function CoinBurstSource({
             >
               <span>💰</span>
               <span>+{amount}</span>
-            </motion.span>
+            </m.span>
           </div>
-        </motion.div>
+        </m.div>
       )}
 
       {/* Sparkle particles */}
@@ -236,7 +245,7 @@ export function CoinBurstSource({
           const endY = Math.sin(radians) * particle.distance;
 
           return (
-            <motion.div
+            <m.div
               key={particle.id}
               className="absolute"
               style={{
@@ -268,7 +277,7 @@ export function CoinBurstSource({
                   transform: `rotate(${particle.angle}deg)`,
                 }}
               />
-            </motion.div>
+            </m.div>
           );
         })}
       </AnimatePresence>
@@ -279,7 +288,7 @@ export function CoinBurstSource({
           {[0, 1, 2].map((i) => {
             const angle = (120 * i + 30) * (Math.PI / 180);
             return (
-              <motion.div
+              <m.div
                 key={`coin-${i}`}
                 className="absolute text-xl"
                 style={{
@@ -302,7 +311,7 @@ export function CoinBurstSource({
                 }}
               >
                 🪙
-              </motion.div>
+              </m.div>
             );
           })}
         </AnimatePresence>

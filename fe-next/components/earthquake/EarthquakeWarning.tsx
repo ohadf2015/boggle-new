@@ -1,10 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { shouldShowGuidance, markGuidanceShown } from '@/utils/contextualGuidanceStorage';
-import { EffectsPreferencePrompt } from './EffectsPreferencePrompt';
+import { useDisableEarthquakeEffects, useShouldReduceMotion } from '@/contexts/AccessibilityContext';
 
 interface EarthquakeWarningProps {
   isVisible: boolean;
@@ -21,37 +20,13 @@ interface EarthquakeWarningProps {
  */
 export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible }) => {
   const { t } = useLanguage();
+  const disableEarthquake = useDisableEarthquakeEffects();
+  const reduceMotion = useShouldReduceMotion();
 
   // Generate random distances for particle effects (once on mount)
   const [distances] = useState(() =>
     Array.from({ length: 8 }, () => 100 + Math.random() * 50)
   );
-
-  // Track if we should show the effects preference prompt (first earthquake only)
-  const [showPreferencePrompt, setShowPreferencePrompt] = useState(false);
-  const hasCheckedRef = useRef(false);
-
-  // Check if this is the user's first earthquake when warning appears
-  useEffect(() => {
-    if (isVisible && !hasCheckedRef.current) {
-      hasCheckedRef.current = true;
-      if (shouldShowGuidance('effectsPreferenceShown')) {
-        setShowPreferencePrompt(true);
-      }
-    }
-    // FIXED: Reset prompt when warning is hidden to prevent it from persisting during gameplay
-    // Also reset the check flag for next earthquake in different game
-    if (!isVisible) {
-      hasCheckedRef.current = false;
-      setShowPreferencePrompt(false);
-    }
-  }, [isVisible]);
-
-  // Handle dismissing the preference prompt
-  const handlePreferenceDismiss = useCallback(() => {
-    markGuidanceShown('effectsPreferenceShown');
-    setShowPreferencePrompt(false);
-  }, []);
 
   // Announce for screen readers when warning appears
   useEffect(() => {
@@ -61,7 +36,7 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
       announcement.setAttribute('role', 'alert');
       announcement.setAttribute('aria-live', 'assertive');
       announcement.className = 'sr-only';
-      announcement.textContent = t('earthquake.warning') || 'Earthquake incoming!';
+      announcement.textContent = t('earthquake.warning');
       document.body.appendChild(announcement);
 
       // Clean up
@@ -72,11 +47,28 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
     return undefined;
   }, [isVisible, t]);
 
+  if (disableEarthquake || reduceMotion) {
+    if (!isVisible) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none" role="alert" aria-live="assertive">
+        <div className="absolute inset-0 bg-neo-black/40" />
+        <div className="relative z-10 mx-4 max-w-lg bg-neo-red text-neo-white border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6">
+          <div className="text-center mb-3"><span className="text-6xl">⚠️</span></div>
+          <div className="text-center">
+            <h2 className="text-3xl font-black uppercase text-neo-white mb-2 tracking-wide">{t('earthquake.warning')}</h2>
+            <p className="text-lg font-bold text-neo-white">{t('earthquake.brace')}</p>
+            <p className="mt-2 text-sm font-bold text-neo-white leading-snug border-t-2 border-neo-cream/30 pt-2">{t('earthquake.effect')}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       <AnimatePresence>
         {isVisible && (
-          <motion.div
+          <m.div
             className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -84,15 +76,15 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             transition={{ duration: 0.2 }}
           >
             {/* Semi-transparent backdrop */}
-            <motion.div
-              className="absolute inset-0 bg-neo-black/40 text-white backdrop-blur-sm pointer-events-none"
+            <m.div
+              className="absolute inset-0 bg-neo-black/40 text-white backdrop-blur-xs pointer-events-none"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             />
 
           {/* Warning Card */}
-          <motion.div
+          <m.div
             className="relative z-10 mx-4 max-w-lg"
             initial={{ scale: 0.5, rotate: -10, y: 50 }}
             animate={{
@@ -113,39 +105,39 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             }}
           >
             <div
-              className="relative bg-neo-yellow text-neo-black border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6"
+              className="relative bg-neo-red text-neo-white border-4 border-neo-black rounded-neo-lg shadow-hard-xl px-8 py-6"
               style={{
                 animation: 'warning-pulse 0.8s ease-in-out infinite',
                 transform: 'rotate(-2deg)',
               }}
             >
               {/* Warning Icon */}
-              <motion.div
+              <m.div
                 className="text-center mb-3"
                 animate={{
                   scale: [1, 1.2, 1],
                   rotate: [0, -5, 5, 0],
                 }}
                 transition={{
+                  type: 'tween',
                   duration: 0.5,
                   repeat: Infinity,
                   repeatDelay: 0.3,
                 }}
               >
                 <span className="text-6xl">⚠️</span>
-              </motion.div>
+              </m.div>
 
               {/* Warning Text */}
               <div className="text-center">
-                <h2 className="text-3xl font-black uppercase text-neo-black mb-2 tracking-wide">
-                  {t('earthquake.warning') || 'Earthquake!'}
+                <h2 className="text-3xl font-black uppercase text-neo-white mb-2 tracking-wide">
+                  {t('earthquake.warning')}
                 </h2>
-                <p className="text-lg font-bold text-neo-black/80">
-                  {t('earthquake.brace') || 'Brace yourself!'}
+                <p className="text-lg font-bold text-neo-white">
+                  {t('earthquake.brace')}
                 </p>
-                {/* Photosensitivity Warning */}
-                <p className="text-xs font-bold text-neo-red mt-2 bg-neo-cream/80 rounded px-2 py-1 inline-block border-2 border-neo-black">
-                  ⚠️ {t('earthquake.photosensitivity') || 'Flashing lights ahead! Disable in Settings if sensitive'}
+                <p className="mt-2 text-sm font-bold text-neo-white leading-snug border-t-2 border-neo-cream/30 pt-2">
+                  {t('earthquake.effect')}
                 </p>
               </div>
 
@@ -163,15 +155,15 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
                 }}
               />
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Particle effects - warning sparkles */}
           {distances.map((distance, i) => {
             const angle = (i * 45) * (Math.PI / 180);
             return (
-              <motion.div
-                key={i}
-                className="absolute w-3 h-3 rounded-full bg-neo-yellow border-2 border-neo-black"
+              <m.div
+                key={`particle-${i}-${distance}`}
+                className="absolute w-3 h-3 rounded-full bg-neo-red border-2 border-neo-black"
                 style={{
                   left: '50%',
                   top: '50%',
@@ -199,16 +191,9 @@ export const EarthquakeWarning: React.FC<EarthquakeWarningProps> = ({ isVisible 
             );
           })}
 
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
-
-      {/* First-time effects preference prompt - rendered separately so it persists */}
-      <AnimatePresence>
-        {showPreferencePrompt && (
-          <EffectsPreferencePrompt onDismiss={handlePreferenceDismiss} />
-        )}
-      </AnimatePresence>
     </>
   );
 };

@@ -1,53 +1,75 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { getGuestFingerprint } from '@/utils/dailyChallenge';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AdaptiveMotion, AdaptiveAnimatePresence } from '@/components/motion/AdaptiveMotion';
 import { ArrowLeft, Share2, Trophy, Crown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 import Link from 'next/link';
 import DailyWordHuntSurvival from '@/components/daily/DailyWordHuntSurvival';
 import type { SurvivalGameResult } from '@/components/daily/survival';
-import type { LetterGrid, Language } from '@/types';
 import { buildPuzzleShareUrl, type LeaderboardEntry } from '@/utils/customPuzzle';
-import { NeoLoader } from '@/components/ui/NeoLoader';
-
-interface CustomPuzzleData {
-  id: string;
-  puzzleCode: string;
-  creatorDisplayName: string;
-  language: Language;
-  targetWord: string;
-  grid: LetterGrid;
-  creatorSolved: boolean;
-  creatorAttemptsUsed: number;
-  creatorEfficiencyScore: number;
-  totalPlays: number;
-}
+import { PageLoader } from '@/components/ui/PageLoader';
+import {
+  useCustomPuzzlePhase,
+  useCustomPuzzlePuzzle,
+  useCustomPuzzleError,
+  useCustomPuzzleGameResult,
+  useCustomPuzzleLeaderboard,
+  useCustomPuzzlePlayerRank,
+  useCustomPuzzleBeatCreator,
+  useCustomPuzzleActions,
+  useCustomPuzzleStore,
+} from '@/hooks/customPuzzleState';
 
 interface CustomPuzzleGameProps {
   puzzleCode: string;
 }
 
-type Phase = 'loading' | 'intro' | 'playing' | 'results';
-
 const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   const { t, language } = useLanguage();
   const { user, profile } = useAuth();
-  const [fingerprint, setFingerprint] = useState<string | null>(null);
 
-  const [phase, setPhase] = useState<Phase>('loading');
-  const [puzzle, setPuzzle] = useState<CustomPuzzleData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [gameResult, setGameResult] = useState<SurvivalGameResult | null>(null);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [playerRank, setPlayerRank] = useState<number | null>(null);
-  const [beatCreator, setBeatCreator] = useState(false);
+  // Zustand store selectors - components only re-render when subscribed state changes
+  const phase = useCustomPuzzlePhase();
+  const puzzle = useCustomPuzzlePuzzle();
+  const error = useCustomPuzzleError();
+  const gameResult = useCustomPuzzleGameResult();
+  const leaderboard = useCustomPuzzleLeaderboard();
+  const playerRank = useCustomPuzzlePlayerRank();
+  const beatCreator = useCustomPuzzleBeatCreator();
+  const {
+    setPhase,
+    setPuzzle,
+    setError,
+    setGameResult,
+    setLeaderboard,
+    setPlayerRank,
+    setBeatCreator,
+  } = useCustomPuzzleActions();
+  // Select resetAll directly from store for stable ref (useCustomPuzzleActions returns a new object each render)
+  const resetAll = useCustomPuzzleStore((s) => s.resetAll);
 
-  // Get display name
-  const displayName = profile?.display_name || user?.email?.split('@')[0] || 'Player';
+  // Local state for fingerprint (not game state)
+  const [fingerprint, setFingerprint] = React.useState<string | null>(null);
+
+  // Get display name — memoized to prevent handleGameComplete recreation on auth context re-renders
+  const displayName = useMemo(
+    () => profile?.display_name || user?.email?.split('@')[0] || 'Player',
+    [profile?.display_name, user?.email]
+  );
+
+  // Reset store when puzzle code changes or on mount
+  useEffect(() => {
+    resetAll();
+    return () => {
+      // Cleanup on unmount
+      resetAll();
+    };
+  }, [puzzleCode, resetAll]);
 
   // Get fingerprint for guest users
   useEffect(() => {
@@ -64,7 +86,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
         const data = await response.json();
 
         if (!response.ok) {
-          setError(data.error || 'Failed to load puzzle');
+          setError(data.error || t('common.errorOccurred'));
           setPhase('loading');
           return;
         }
@@ -73,15 +95,22 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
         setPhase('intro');
       } catch (err) {
         console.error('Error fetching puzzle:', err);
-        setError('Failed to load puzzle');
+        setError(t('common.errorOccurred'));
       }
     }
 
     fetchPuzzle();
-  }, [puzzleCode]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- t changes on language load, causing unnecessary refetch
+  }, [puzzleCode, setError, setPhase, setPuzzle]);
 
   // Handle game completion
   const handleGameComplete = useCallback(async (result: SurvivalGameResult) => {
+    // Defensive validation - ensure result has required fields
+    if (!result || typeof result !== 'object') {
+      console.error('[CustomPuzzle] Invalid game result received');
+      return;
+    }
+
     setGameResult(result);
     setPhase('results');
 
@@ -89,16 +118,21 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
 
     // Submit attempt to server
     try {
+      // Safely get wordsDiscovered count with fallback
+      const wordsDiscoveredCount = Array.isArray(result.wordsDiscovered)
+        ? result.wordsDiscovered.length
+        : 0;
+
       const submitResponse = await fetch(`/api/custom-puzzle/${puzzleCode}/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           displayName,
           guestFingerprint: user ? null : fingerprint,
-          solved: result.solved,
-          attemptsUsed: result.attemptsUsed,
-          wordsDiscovered: result.wordsDiscovered.length,
-          lifeRemaining: result.lifeRemaining,
+          solved: result.solved ?? false,
+          attemptsUsed: result.attemptsUsed ?? 0,
+          wordsDiscovered: wordsDiscoveredCount,
+          lifeRemaining: result.lifeRemaining ?? 0,
         }),
       });
 
@@ -129,12 +163,12 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
     } catch (err) {
       console.error('Error fetching leaderboard:', err);
     }
-  }, [puzzle, puzzleCode, displayName, user, fingerprint]);
+  }, [puzzle, puzzleCode, displayName, user, fingerprint, setGameResult, setPhase, setBeatCreator, setLeaderboard, setPlayerRank]);
 
   // Handle quit
   const handleQuit = useCallback(() => {
-    // Return to home or daily challenge
-    window.location.href = `/${language}/daily`;
+    // Return to custom puzzle browser
+    window.location.href = `/${language}/custom`;
   }, [language]);
 
   // Share puzzle
@@ -146,35 +180,35 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: t('customPuzzle.title') || 'Custom Puzzle',
+          title: t('customPuzzle.title'),
           text: shareText,
           url: shareUrl,
         });
-      } catch (err) {
-        // User cancelled or share failed
-        await navigator.clipboard.writeText(shareUrl);
+      } catch {
+        // User cancelled or share failed — clipboard fallback
+        try { await navigator.clipboard.writeText(shareUrl); } catch { /* not focused */ }
       }
     } else {
-      await navigator.clipboard.writeText(shareUrl);
+      try { await navigator.clipboard.writeText(shareUrl); } catch { /* not focused */ }
     }
   }, [puzzleCode, language, t]);
 
   // Loading state
   if (phase === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+      <div className="flex-1 flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
         {error ? (
           <div className="text-center p-8">
             <h2 className="text-xl font-bold text-red-500 mb-4">{error}</h2>
-            <Link href={`/${language}/daily`}>
+            <Link href={`/${language}/custom`}>
               <Button variant="outline">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                {t('common.back') || 'Back'}
+                <ArrowLeft className="w-4 h-4 me-2 rtl:scale-x-[-1]" />
+                {t('common.back')}
               </Button>
             </Link>
           </div>
         ) : (
-          <NeoLoader text={t('customPuzzle.loading') || 'Loading puzzle...'} />
+          <PageLoader text={t('customPuzzle.loading')} />
         )}
       </div>
     );
@@ -183,15 +217,15 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   // Intro screen
   if (phase === 'intro' && puzzle) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-        <motion.div
+      <div className="flex-1 flex flex-col items-center justify-center p-4 bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+        <AdaptiveMotion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md w-full bg-white dark:bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-6 text-center"
         >
           <div className="flex items-center justify-center gap-2 mb-4">
             <Crown className="w-6 h-6 text-neo-lime" />
-            <h1 className="text-2xl font-bold">{t('customPuzzle.title') || 'Custom Puzzle'}</h1>
+            <h1 className="text-2xl font-bold">{t('customPuzzle.title')}</h1>
           </div>
 
           <p className="text-gray-600 dark:text-gray-300 mb-4">
@@ -201,8 +235,8 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
 
           <div className="bg-neo-lime/20 border-2 border-neo-lime rounded-neo p-4 mb-6">
             <p className="text-sm font-medium">
-              {t('customPuzzle.creatorScore') || 'Creator\'s Score'}:{' '}
-              <span className="font-bold text-neo-navy dark:text-neo-cream">
+              {t('customPuzzle.creatorScore')}:{' '}
+              <span className="font-bold text-neo-navy dark:text-neo-white">
                 {puzzle.creatorEfficiencyScore} pts
               </span>
             </p>
@@ -223,16 +257,16 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
             onClick={() => setPhase('playing')}
             className="w-full bg-neo-green hover:bg-neo-green/90 text-white font-bold py-3"
           >
-            {t('customPuzzle.play') || 'Play Challenge'}
+            {t('customPuzzle.play')}
           </Button>
 
-          <Link href={`/${language}/daily`} className="block mt-4">
+          <Link href={`/${language}/custom`} className="block mt-4">
             <Button variant="ghost" size="sm">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              {t('common.back') || 'Back'}
+              <ArrowLeft className="w-4 h-4 me-2 rtl:scale-x-[-1]" />
+              {t('common.back')}
             </Button>
           </Link>
-        </motion.div>
+        </AdaptiveMotion.div>
       </div>
     );
   }
@@ -254,41 +288,52 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
   // Results phase
   if (phase === 'results' && puzzle && gameResult) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-        <AnimatePresence mode="wait">
-          <motion.div
+      <div className="flex-1 flex flex-col items-center justify-center p-4 bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
+        <AdaptiveAnimatePresence mode="wait">
+          <AdaptiveMotion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="max-w-md w-full bg-white dark:bg-neo-navy-light border-3 border-neo-black rounded-neo shadow-hard p-6"
           >
+            {/* Mascot - Celebration or encouragement based on result */}
+            <div className="flex justify-center mb-4">
+              <InteractiveMascot
+                variant={gameResult.solved ? 'holding_trophy' : 'encouraging'}
+                size="lg"
+                animated
+                enableHover
+                enableClick
+              />
+            </div>
+
             {/* Result Header */}
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold mb-2">
                 {gameResult.solved
-                  ? (t('customPuzzle.solved') || 'You solved it!')
-                  : (t('customPuzzle.failed') || 'Better luck next time!')}
+                  ? (t('customPuzzle.solved'))
+                  : (t('customPuzzle.failed'))}
               </h2>
 
               {beatCreator && (
-                <motion.div
+                <AdaptiveMotion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
                   className="inline-flex items-center gap-2 bg-neo-lime text-neo-black px-4 py-2 rounded-neo font-bold"
                 >
                   <Trophy className="w-5 h-5" />
-                  {t('customPuzzle.beatCreator') || 'You beat the creator!'}
-                </motion.div>
+                  {t('customPuzzle.beatCreator')}
+                </AdaptiveMotion.div>
               )}
             </div>
 
             {/* Score Comparison */}
             <div className="grid grid-cols-2 gap-4 mb-6">
               <div className="bg-neo-pink/20 border-2 border-neo-pink rounded-neo p-3 text-center">
-                <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.yourScore') || 'Your Score'}</p>
+                <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.yourScore')}</p>
                 <p className="text-2xl font-bold">{Math.round(gameResult.efficiencyScore)}</p>
               </div>
               <div className="bg-neo-lime/20 border-2 border-neo-lime rounded-neo p-3 text-center">
-                <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.creatorScore') || 'Creator'}</p>
+                <p className="text-xs text-gray-500 mb-1">{t('customPuzzle.creatorScore')}</p>
                 <p className="text-2xl font-bold">{Math.round(puzzle.creatorEfficiencyScore)}</p>
               </div>
             </div>
@@ -298,7 +343,7 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
               <div className="mb-6">
                 <h3 className="text-sm font-bold mb-2 flex items-center gap-2">
                   <Trophy className="w-4 h-4 text-neo-lime" />
-                  {t('customPuzzle.leaderboard') || 'Leaderboard'}
+                  {t('customPuzzle.leaderboard')}
                 </h3>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {leaderboard.slice(0, 5).map((entry) => (
@@ -330,18 +375,18 @@ const CustomPuzzleGame: React.FC<CustomPuzzleGameProps> = ({ puzzleCode }) => {
                 onClick={handleShare}
                 className="w-full bg-neo-pink hover:bg-neo-pink/90 text-white"
               >
-                <Share2 className="w-4 h-4 mr-2" />
-                {t('customPuzzle.share') || 'Share Challenge'}
+                <Share2 className="w-4 h-4 me-2" />
+                {t('customPuzzle.share')}
               </Button>
 
               <Link href={`/${language}/daily`} className="block">
                 <Button variant="outline" className="w-full">
-                  {t('customPuzzle.playDaily') || 'Play Daily Challenge'}
+                  {t('customPuzzle.playDaily')}
                 </Button>
               </Link>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </AdaptiveMotion.div>
+        </AdaptiveAnimatePresence>
       </div>
     );
   }

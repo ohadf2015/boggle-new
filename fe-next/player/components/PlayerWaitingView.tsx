@@ -1,23 +1,41 @@
-import React, { useCallback, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Users, QrCode, Crown, Bot, Info, MessageCircle } from 'lucide-react';
-import { QRCodeSVG } from 'qrcode.react';
-import { Button } from '../../components/ui/button';
-import { Card } from '../../components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../../components/ui/dialog';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
-import SlotMachineText from '../../components/SlotMachineText';
-import Avatar from '../../components/Avatar';
-import RoomChat from '../../components/RoomChat';
-import PresenceIndicator from '../../components/PresenceIndicator';
-import GameRoomHeader from '../../components/game/GameRoomHeader';
-import WaitingProgressBar from '../../components/game/WaitingProgressBar';
-import WaitingTips from '../../components/game/WaitingTips';
-import { getJoinUrl } from '../../utils/share';
-import { cn } from '../../lib/utils';
-import type { Language, LetterGrid, Avatar as AvatarType, PresenceStatus, GridPosition } from '@/shared/types/game';
+'use client';
 
-// ==================== Type Definitions ====================
+import React, { memo, useState, useCallback, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+import { m, AnimatePresence } from 'framer-motion';
+const CrazyGamesBanner = dynamic(() => import('@/components/CrazyGamesBanner'), { ssr: false });
+import { Users, Crown, Bot, LogOut, Plus, Check, Pencil, X, Camera, Zap, Crosshair, Grid3X3, Lightbulb, ChevronLeft, ChevronRight } from 'lucide-react';
+import Avatar from '../../components/Avatar';
+import AvatarBuilderModal from '../../components/avatar/AvatarBuilderModal';
+import { useAvatarPremium } from '@/hooks/useAvatarPremium';
+import RewardedAdGoldButton from '@/components/ads/RewardedAdGoldButton';
+import { QuickLanguageSwitcher } from '@/components/QuickLanguageSwitcher';
+import RoomChat from '../../components/RoomChat';
+import { LobbyTutorialPanel } from '../../components/lobby/LobbyTutorialPanel';
+import { LobbyReactions } from '../../components/lobby/LobbyReactions';
+import { EmoteTray } from './lobby/EmoteTray';
+import { useSocketOptional } from '@/utils/SocketContext';
+import { useLobbyEmotes } from '@/hooks/useLobbyEmotes';
+import { useLobbyAutoStart } from '@/hooks/useLobbyAutoStart';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import { MobileShareSection } from '../../host/components/pre-game/MobileShareSection';
+import { DesktopLobbyLayout, InviteCard } from '../../host/components/pre-game/desktop';
+// Shared how-to-play source — host renders the same component, so players and
+// host see IDENTICAL instructions (all modes incl. wheel-rush, localized images,
+// a11y). Previously the player inlined a degraded 3-mode/no-image copy.
+import { GameInstructions } from '../../host/components/pre-game/GameInstructions';
+import type { GameModeOption } from '@/components/GameModeSelector';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '../../components/ui/alert-dialog';
+import { cn } from '../../lib/utils';
+import { useAuth } from '../../contexts/AuthContext';
+import { getOrCreateStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
+import { type CustomAvatarConfig } from '@/shared/types/customAvatar';
+import { useGameMode } from '@/hooks/gameState';
+import { LANGUAGE_FLAGS, getLanguageName } from '@/lib/languageConfig';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
+import type { Language, Avatar as AvatarType, PresenceStatus } from '@/shared/types/game';
+
+// ==================== Types ====================
 
 interface PlayerReadyInfo {
   username: string;
@@ -34,15 +52,23 @@ interface PlayerWaitingViewProps {
   username: string;
   t: (path: string, params?: Record<string, string | number>) => string;
   playersReady: (string | PlayerReadyInfo)[];
-  shufflingGrid?: LetterGrid | null;
-  highlightedCells?: GridPosition[];
   showQR: boolean;
   setShowQR: (show: boolean) => void;
   showExitConfirm: boolean;
   setShowExitConfirm: (show: boolean) => void;
   onExitRoom: () => void;
   onConfirmExit: () => void;
+  onNameChange?: (newName: string) => void;
+  onAvatarChange?: (config: CustomAvatarConfig) => void;
+  /** Usernames the server reports as ready (non-host). Drives roster badges. */
+  readyUsernames?: string[];
+  /** Whether the local player is ready. */
+  isReady?: boolean;
+  /** Toggle local ready state (emits `lobbyReady`). Absent on host/spectator. */
+  onToggleReady?: () => void;
 }
+
+const MAX_PLAYERS = 8;
 
 // ==================== Component ====================
 
@@ -52,388 +78,467 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   username,
   t,
   playersReady,
-  showQR,
-  setShowQR,
   showExitConfirm,
   setShowExitConfirm,
   onExitRoom,
   onConfirmExit,
+  onNameChange,
+  onAvatarChange,
+  readyUsernames = [],
+  isReady = false,
+  onToggleReady,
 }): React.ReactElement => {
-  // Mobile tab state: 'info' | 'players' | 'chat'
-  const [mobileTab, setMobileTab] = useState<'info' | 'players' | 'chat'>('info');
+  const { isAuthenticated, updateProfile } = useAuth();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
+  const gameMode = useGameMode();
 
-  // Memoized handlers
-  const handleCloseQR = useCallback(() => {
-    setShowQR(false);
-  }, [setShowQR]);
+  // Lobby emotes — self-contained over the shared socket (no prop threading).
+  // The server echoes every emote to the whole room (sender included), so the
+  // sender's own avatar face-swap uses the same canonical username as its tile.
+  const socketCtx = useSocketOptional();
+  const { emotesByUsername, sendEmote, cooldownActive } = useLobbyEmotes({
+    socket: socketCtx?.socket ?? null,
+  });
 
-  // Waiting Info Card Content - render function to avoid static component warning
-  const renderWaitingInfoCard = () => (
-    <Card className="flex-1 p-4 sm:p-5 md:p-6 bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg flex flex-col gap-5">
-      {/* Header with hourglass */}
-      <div className="flex items-center justify-center gap-4">
-        <motion.div
-          initial={{ scale: 0.9, rotate: -3 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          className="relative flex-shrink-0"
-          aria-hidden="true"
+  // Mirror the host's server-owned auto-start countdown (display only — guests
+  // never fire the start) so everyone watches the same number tick down.
+  const { secondsLeft: autoStartSecondsLeft } = useLobbyAutoStart({
+    socket: socketCtx?.socket ?? null,
+  });
+
+  const [isAvatarBuilderOpen, setIsAvatarBuilderOpen] = useState(false);
+  const avatarPremium = useAvatarPremium();
+  const [currentAvatar, setCurrentAvatar] = useState<CustomAvatarConfig>(() => getOrCreateStoredCustomAvatar());
+
+  const handleAvatarSave = useCallback(async (config: CustomAvatarConfig) => {
+    setStoredCustomAvatar(config);
+    setCurrentAvatar(config);
+    onAvatarChange?.(config);
+    setIsAvatarBuilderOpen(false);
+    await updateProfile({ avatar_config: config }).catch(() => {});
+  }, [onAvatarChange, updateProfile]);
+
+  const nonHostPlayers = playersReady;
+  const emptySlots = Math.max(0, Math.min(5, MAX_PLAYERS) - nonHostPlayers.length);
+
+  // Ready-state lookups for roster badges + the "N/M ready" status line.
+  // Bots auto-count as ready; host clicks Start (never "Ready") so is excluded.
+  const readySet = new Set(readyUsernames);
+  const readyTotal = nonHostPlayers.filter((p) => {
+    const o = typeof p === 'object' ? p : null;
+    return !o?.isHost && !o?.isBot;
+  }).length;
+  const readyCount = nonHostPlayers.filter((p) => {
+    const o = typeof p === 'object' ? p : null;
+    const nm = typeof p === 'string' ? p : p.username;
+    // Match server `getPlayersReadyCount`: humans only, host + bots excluded.
+    if (o?.isHost || o?.isBot) return false;
+    return readySet.has(nm);
+  }).length;
+
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editNameValue, setEditNameValue] = useState(username);
+
+  const handleSaveName = useCallback(() => {
+    const trimmed = editNameValue.trim();
+    if (trimmed && trimmed !== username) {
+      onNameChange?.(trimmed);
+    }
+    setIsEditingName(false);
+  }, [editNameValue, username, onNameChange]);
+
+  // ==================== Hero Card ====================
+  const renderHeroCard = (): React.ReactElement => (
+    <m.div
+      data-testid="waiting-status"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={SPRING_PRESETS.balanced}
+      className="rounded-neo-lg border-3 border-neo-black bg-slate-800/80 shadow-hard-lg overflow-hidden"
+    >
+      <div className="h-1.5 bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime" />
+
+      <div className="p-4 sm:p-5 flex items-center gap-4 sm:gap-5">
+        {/* Large clickable avatar */}
+        <button
+          data-testid="edit-avatar-button"
+          onClick={() => setIsAvatarBuilderOpen(true)}
+          className="relative shrink-0 group"
         >
-          {/* Neo-Brutalist Hourglass - Compact */}
-          <motion.div
-            animate={{ rotate: [0, 10, -10, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-            className="bg-neo-yellow border-3 border-neo-black shadow-hard p-2 rotate-[2deg]"
-          >
-            <div className="relative w-6 h-10 flex flex-col items-center">
-              <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-t-[14px] border-l-transparent border-r-transparent border-t-neo-black" />
-              <div className="w-0.5 h-0.5 bg-neo-black -my-[1px] z-10" />
-              <div className="w-0 h-0 border-l-[10px] border-r-[10px] border-b-[14px] border-l-transparent border-r-transparent border-b-neo-black" />
-              <motion.div
-                animate={{ y: [0, 14, 0], opacity: [1, 1, 0] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                className="absolute top-[18px] w-0.5 h-1.5 bg-neo-pink"
-              />
-            </div>
-          </motion.div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          role="status"
-          aria-live="polite"
-        >
-          <div className="bg-neo-black text-neo-white px-4 py-2 font-black uppercase text-sm md:text-base tracking-wider rotate-[1deg] shadow-hard border-2 border-neo-black">
-            {t('playerView.waitForGameStart')}
+          <div className="w-20 h-20 rounded-full border-3 border-neo-black overflow-hidden shadow-hard ring-2 ring-neo-lime ring-offset-2 ring-offset-slate-800 transition-transform group-hover:scale-105 group-active:scale-95">
+            <Avatar
+              customAvatar={currentAvatar}
+              size="2xl"
+              className="w-full h-full"
+            />
           </div>
-          <motion.p
-            animate={{ opacity: [0.6, 1, 0.6] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="text-neo-cream/80 font-bold text-xs mt-1 uppercase tracking-wide text-center"
-          >
-            {t('playerView.waitingForHostToStart') || 'Waiting for host to start the game...'}
-          </motion.p>
-        </motion.div>
+          <div className="absolute inset-0 rounded-full bg-neo-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <Camera className="w-6 h-6 text-neo-cream" />
+          </div>
+          <div className="absolute -bottom-1 -inset-e-1 w-7 h-7 rounded-full bg-neo-cyan border-2 border-neo-black shadow-hard-sm flex items-center justify-center">
+            <Pencil className="w-3.5 h-3.5 text-neo-black" />
+          </div>
+        </button>
+
+        {/* Name + status */}
+        <div className="flex-1 min-w-0">
+          {isEditingName ? (
+            <div className="flex items-center gap-2">
+              <input
+                data-testid="name-edit-input"
+                type="text"
+                value={editNameValue}
+                onChange={(e) => setEditNameValue(e.target.value)}
+                maxLength={20}
+                className="bg-white/10 text-neo-cream border-2 border-neo-black rounded-neo px-3 py-1.5 text-lg font-black focus:outline-hidden focus:ring-2 focus:ring-neo-cyan w-full max-w-[200px]"
+                autoFocus
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSaveName();
+                  if (e.key === 'Escape') setIsEditingName(false);
+                }}
+              />
+              <button
+                data-testid="name-save-button"
+                onClick={handleSaveName}
+                className="w-8 h-8 flex items-center justify-center bg-neo-lime border-2 border-neo-black rounded-neo shadow-hard-sm shrink-0"
+              >
+                <Check className="w-4 h-4 text-neo-black" />
+              </button>
+              <button
+                onClick={() => { setIsEditingName(false); setEditNameValue(username); }}
+                className="w-8 h-8 flex items-center justify-center bg-white/10 border-2 border-neo-black rounded-neo shrink-0"
+              >
+                <X className="w-4 h-4 text-neo-cream" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <h2 className="text-xl font-black text-neo-cream truncate">
+                {username}
+              </h2>
+              {!isAuthenticated && (
+                <button
+                  data-testid="edit-name-button"
+                  onClick={() => { setEditNameValue(username); setIsEditingName(true); }}
+                  className="shrink-0 w-7 h-7 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  aria-label={t('playerView.editName')}
+                >
+                  <Pencil className="w-3.5 h-3.5 text-slate-400" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Ready toggle — lets a non-host signal the host they're set to go.
+              Advisory only: the host can still start whenever they like. */}
+          {onToggleReady ? (
+            <m.button
+              type="button"
+              data-testid="ready-button"
+              onClick={onToggleReady}
+              whileTap={{ scale: 0.96 }}
+              aria-pressed={isReady}
+              className={cn(
+                'mt-3 w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-neo border-3 border-neo-black font-black uppercase tracking-wide shadow-hard transition-colors',
+                isReady
+                  ? 'bg-neo-lime text-neo-black'
+                  : 'bg-neo-navy-light text-neo-cream hover:bg-white/10',
+              )}
+            >
+              {isReady ? <Check className="w-4 h-4 stroke-[3]" /> : <Zap className="w-4 h-4" />}
+              <span>{isReady ? t('playerView.readyConfirmed') : t('playerView.readyUp')}</span>
+            </m.button>
+          ) : null}
+
+          <div className="flex items-center justify-between gap-2 mt-1.5">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="w-2 h-2 rounded-full bg-neo-lime animate-pulse shrink-0" />
+              <p className={cn(
+                'text-sm truncate',
+                autoStartSecondsLeft !== null ? 'text-neo-lime font-bold' : 'text-slate-400'
+              )}>
+                {autoStartSecondsLeft !== null
+                  ? t('playerView.autoStartingSoon', { seconds: autoStartSecondsLeft })
+                  : readyCount > 0
+                    ? `${readyCount}/${readyTotal} ${t('hostView.playersReady')}`
+                    : t('playerView.hostWillStart')}
+              </p>
+            </div>
+            {/* Ambient social toy — fling emoji while waiting (reuses quickReaction) */}
+            <LobbyReactions username={username} />
+          </div>
+
+          <div className="mt-3">
+            <RewardedAdGoldButton goldAmount={20} surface="player_waiting" />
+          </div>
+        </div>
       </div>
-
-      {/* Progress Bar */}
-      <WaitingProgressBar
-        currentPlayers={playersReady.length}
-        t={t}
-        className="mt-2"
-      />
-
-      {/* Tips Section */}
-      <WaitingTips
-        t={t}
-        className="mt-2"
-      />
-    </Card>
+    </m.div>
   );
 
-  // Players List Card Content - render function to avoid static component warning
-  const renderPlayersListCard = (className = '') => (
-    <Card className={cn("h-auto p-3 sm:p-4 md:p-6 flex flex-col bg-slate-800/95 text-neo-white border-4 border-neo-black shadow-hard-lg", className)}>
-      <h3 className="text-base font-bold uppercase text-neo-cream/80 mb-3 flex items-center gap-2 flex-shrink-0">
-        <Users className="text-neo-pink/80" />
-        {t('hostView.playersJoined')} ({playersReady.length})
-      </h3>
-      <div className="flex flex-col gap-1.5 flex-1 overflow-y-auto">
+  // ==================== Player Roster ====================
+  const renderPlayerRoster = (): React.ReactElement => (
+    <section className="space-y-2">
+      <div className="flex items-center justify-between px-1">
+        <h3 className="text-xs font-bold uppercase tracking-widest text-slate-500">
+          {t('hostView.playersInRoom')}
+        </h3>
+        <span className="text-xs font-bold text-slate-500">
+          {nonHostPlayers.length}/{MAX_PLAYERS}
+        </span>
+      </div>
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
         <AnimatePresence>
-          {playersReady.map((player, index) => {
-            const playerUsername = typeof player === 'string' ? player : player.username;
+          {nonHostPlayers.map((player, index) => {
+            const name = typeof player === 'string' ? player : player.username;
             const avatar = typeof player === 'object' ? player.avatar : null;
             const isHostPlayer = typeof player === 'object' ? player.isHost : false;
-            const presenceStatus = typeof player === 'object' ? player.presenceStatus : 'active' as PresenceStatus;
-            const isWindowFocused = typeof player === 'object' ? player.isWindowFocused : true;
             const isBot = typeof player === 'object' ? player.isBot : false;
-            const isMe = playerUsername === username;
+            const isMe = name === username;
 
             return (
-              <motion.div
-                key={playerUsername}
-                initial={{ x: -10, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                exit={{ x: 10, opacity: 0 }}
-                transition={{ delay: index * 0.03, duration: 0.2 }}
+              <m.div
+                key={name}
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{
+                  type: 'spring', stiffness: 400, damping: 22, delay: index * 0.06,
+                }}
+                className="shrink-0 flex flex-col items-center gap-1.5"
               >
                 <div
-                  className={cn(
-                    "flex items-center justify-between px-3 py-2 rounded-lg transition-colors",
-                    "bg-white/5 hover:bg-white/10"
-                  )}
+                  className="relative animate-avatar-float"
+                  style={{ animationDelay: `${index * 200}ms` }}
                 >
-                  <div className="flex items-center gap-2.5">
+                  {isHostPlayer && (
+                    <m.div
+                      className="absolute -top-3 left-1/2 -translate-x-1/2 z-10"
+                      animate={{ rotate: [0, 5, -5, 0] }}
+                      transition={{ duration: 2, repeat: Infinity, repeatDelay: 4 }}
+                    >
+                      <Crown className="w-4 h-4 text-neo-yellow" />
+                    </m.div>
+                  )}
+                  <div className={cn(
+                    'w-16 h-16 rounded-full border-3 border-neo-black flex items-center justify-center overflow-hidden shadow-hard aspect-square',
+                    isMe ? 'ring-2 ring-neo-lime ring-offset-2 ring-offset-neo-navy' : '',
+                  )}>
+                    {/* Avatar handles full fallback chain (customAvatar → seeded face from userId).
+                        Don't gate on hasAvatar: backend may emit legacy `{emoji,color}` shape
+                        (userManager.ts) which has no customAvatar — Avatar still renders a
+                        deterministic seeded face from userId={name}. Stacking a colored bg
+                        disc + initial-letter span behind it caused a visible "two avatars" bug. */}
                     <Avatar
-                      profilePictureUrl={avatar?.profilePictureUrl ?? undefined}
-                      avatarImage={avatar?.avatarImage}
-                      size="lg"
+                      customAvatar={avatar?.customAvatar ?? undefined}
+                      userId={name}
+                      pixelSize={64}
+                      mode="multiplayer"
+                      className="w-full h-full"
+                      mood={emotesByUsername[name]?.emote}
                     />
-                    <span className="font-medium text-neo-cream/90">
-                      <SlotMachineText text={playerUsername} />
-                    </span>
-                    {isHostPlayer && <Crown className="text-neo-yellow/80 text-sm" />}
-                    {isBot && <Bot className="text-neo-cyan/70 text-sm" />}
-                    {isMe && (
-                      <span className="text-xs text-neo-cream/70 font-medium">
-                        ({t('playerView.me')})
-                      </span>
-                    )}
                   </div>
-                  {!isMe && !isBot && (
-                    <PresenceIndicator
-                      status={presenceStatus}
-                      isWindowFocused={isWindowFocused}
-                      size="lg"
-                    />
+                  {/* Lobby emote = avatar FACE-SWAP only (eyes/brows/mouth via the
+                      `mood` prop above). No floating emoji bubble — the face is the
+                      whole signal, mirrored to every player in the room. */}
+                  {isBot && (
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-cyan border-2 border-neo-black rounded-full flex items-center justify-center">
+                      <Bot className="w-3 h-3 text-neo-black" />
+                    </div>
+                  )}
+                  {/* Ready badge — non-host humans the server marked ready */}
+                  {!isHostPlayer && !isBot && readySet.has(name) && (
+                    <div
+                      data-testid="roster-ready-badge"
+                      className="absolute -bottom-1 -right-1 w-5 h-5 bg-neo-lime border-2 border-neo-black rounded-full flex items-center justify-center shadow-hard-sm"
+                      aria-label={t('playerView.readyConfirmed')}
+                    >
+                      <Check className="w-3 h-3 text-neo-black stroke-[3]" />
+                    </div>
                   )}
                 </div>
-              </motion.div>
+                <span className="text-[11px] font-bold truncate w-16 text-center text-neo-cream">
+                  {name}
+                </span>
+              </m.div>
             );
           })}
         </AnimatePresence>
+
+        {/* Empty Slots */}
+        {Array.from({ length: emptySlots }).map((_, i) => (
+          <div key={`empty-${i}`} className="shrink-0 flex flex-col items-center gap-1.5">
+            <div className="w-16 h-16 rounded-full border-2 border-dashed border-neo-cyan/30 bg-white/5 flex items-center justify-center">
+              <Plus className="w-5 h-5 text-neo-cyan/50" />
+            </div>
+            <span className="text-[10px] font-bold text-slate-600 uppercase">
+              {t('common.join')}
+            </span>
+          </div>
+        ))}
       </div>
-      {playersReady.length === 0 && (
-        <p className="text-sm text-center text-neo-cream/75 font-medium mt-2">
-          {t('hostView.waitingForPlayers')}
-        </p>
-      )}
-    </Card>
+
+      {/* Emote tray — tap a face and your own avatar (above) reacts for the room */}
+      <div className="space-y-1.5 pt-1">
+        <h4 className="px-1 text-xs font-bold uppercase tracking-widest text-slate-500">
+          {t('lobby.emote.title')}
+        </h4>
+        <EmoteTray onEmote={sendEmote} t={t} disabled={cooldownActive} />
+      </div>
+    </section>
   );
 
-  // Chat Card Content - render function to avoid static component warning
-  const renderChatCard = () => (
-    <div className="w-full">
-      <RoomChat
-        username={username}
-        isHost={false}
-        gameCode={gameCode}
-        className="h-full min-h-[350px]"
+  // ==================== Interactive Game Instructions ====================
+  // Render the SHARED GameInstructions component (same one the host uses) so the
+  // host and every player see IDENTICAL how-to-play content for every mode —
+  // including wheel-rush + localized step images that the old inline copy lacked.
+  const renderModeTips = (): React.ReactElement | null => {
+    // Always show How-to-Play to non-host players in the lobby. The host may not
+    // have locked in a mode yet (null/'random'), so fall back to classic rather
+    // than hiding the panel entirely.
+    const mode = (gameMode || 'classic') as GameModeOption;
+    return (
+      <GameInstructions
+        selectedGameMode={mode}
+        t={t}
+        lang={gameLanguage ?? 'en'}
       />
+    );
+  };
+
+  // ==================== Mobile Content ====================
+  const renderMobileContent = (): React.ReactElement => (
+    <div className="flex-1 overflow-y-auto overscroll-contain px-3 py-3 space-y-4 min-h-0">
+      <section>{renderHeroCard()}</section>
+      {renderPlayerRoster()}
+      {renderModeTips()}
+      <MobileShareSection gameCode={gameCode} t={t} />
+      <section className="pb-4">
+        <div className="bg-neo-navy/30 rounded-neo-lg border-2 border-neo-black/50 overflow-hidden h-64 sm:h-80">
+          {isOnCrazyGamesPlatform ? (
+            <LobbyTutorialPanel t={t} />
+          ) : (
+            <RoomChat
+              username={username}
+              isHost={false}
+              gameCode={gameCode}
+              className="h-full"
+              onNewMessage={() => {}}
+              variant="embedded"
+            />
+          )}
+        </div>
+      </section>
     </div>
   );
 
   return (
-    <div className="flex flex-col gap-3 sm:gap-4 md:gap-6 w-full max-w-6xl pb-20 lg:pb-0">
-      {/* Row 1: Room Code + Language + Share + Exit - Always visible */}
-      {gameLanguage && (
-        <GameRoomHeader
-          gameCode={gameCode}
-          roomLanguage={gameLanguage}
-          username={username}
-          t={t}
-          onExitRoom={onExitRoom}
-          isHost={false}
-          showRoomName={false}
-        />
-      )}
-
-      {/* Desktop Layout: Side by side + chat below */}
-      <div className="hidden lg:flex flex-col gap-6">
-        <div className="flex lg:items-stretch gap-6">
-          {renderWaitingInfoCard()}
-          {renderPlayersListCard("lg:w-[350px]")}
-        </div>
-        <div className="max-w-2xl mx-auto w-full">
-          {renderChatCard()}
-        </div>
-      </div>
-
-      {/* Mobile Layout: Tab-based */}
-      <div className="lg:hidden">
-        {mobileTab === 'info' && (
-          <motion.div
-            key="info"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {renderWaitingInfoCard()}
-          </motion.div>
-        )}
-        {mobileTab === 'players' && (
-          <motion.div
-            key="players"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {renderPlayersListCard()}
-          </motion.div>
-        )}
-        {mobileTab === 'chat' && (
-          <motion.div
-            key="chat"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {renderChatCard()}
-          </motion.div>
-        )}
-      </div>
-
-      {/* Mobile Bottom Tab Bar */}
-      <nav className={cn(
-        'fixed bottom-0 inset-x-0 z-50 lg:hidden',
-        'bg-neo-navy/95 backdrop-blur-sm',
-        'border-t-4 border-neo-black',
-        'pb-[env(safe-area-inset-bottom)]'
-      )}>
-        <div className="flex items-center justify-around h-16">
-          {/* Info Tab */}
-          <motion.button
-            onClick={() => setMobileTab('info')}
-            whileTap={{ scale: 0.95 }}
-            className={cn(
-              'flex flex-col items-center justify-center flex-1',
-              'py-2 transition-all duration-150',
-              mobileTab === 'info'
-                ? 'text-neo-yellow'
-                : 'text-neo-white/60 hover:text-neo-white/80'
-            )}
-          >
-            <motion.div
-              className="relative"
-              animate={mobileTab === 'info' ? { scale: 1.1 } : { scale: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              <Info className="w-6 h-6" />
-              {mobileTab === 'info' && (
-                <motion.div
-                  layoutId="waiting-nav-indicator"
-                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-neo-yellow rounded-full"
-                  initial={false}
-                />
-              )}
-            </motion.div>
-            <span className="text-[10px] font-bold uppercase tracking-wider mt-1">
-              {t('common.info') || 'Info'}
-            </span>
-          </motion.button>
-
-          {/* Players Tab */}
-          <motion.button
-            onClick={() => setMobileTab('players')}
-            whileTap={{ scale: 0.95 }}
-            className={cn(
-              'flex flex-col items-center justify-center flex-1',
-              'py-2 transition-all duration-150',
-              mobileTab === 'players'
-                ? 'text-neo-yellow'
-                : 'text-neo-white/60 hover:text-neo-white/80'
-            )}
-          >
-            <motion.div
-              className="relative"
-              animate={mobileTab === 'players' ? { scale: 1.1 } : { scale: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              <Users className="w-6 h-6" />
-              {playersReady.length > 0 && (
-                <span className="absolute -top-1 -right-2 bg-neo-pink text-neo-white text-[10px] font-bold rounded-full min-w-[16px] h-[16px] flex items-center justify-center border-2 border-neo-black">
-                  {playersReady.length > 9 ? '9+' : playersReady.length}
-                </span>
-              )}
-              {mobileTab === 'players' && (
-                <motion.div
-                  layoutId="waiting-nav-indicator"
-                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-neo-yellow rounded-full"
-                  initial={false}
-                />
-              )}
-            </motion.div>
-            <span className="text-[10px] font-bold uppercase tracking-wider mt-1">
-              {t('hostView.players') || 'Players'}
-            </span>
-          </motion.button>
-
-          {/* Chat Tab */}
-          <motion.button
-            onClick={() => setMobileTab('chat')}
-            whileTap={{ scale: 0.95 }}
-            className={cn(
-              'flex flex-col items-center justify-center flex-1',
-              'py-2 transition-all duration-150',
-              mobileTab === 'chat'
-                ? 'text-neo-yellow'
-                : 'text-neo-white/60 hover:text-neo-white/80'
-            )}
-          >
-            <motion.div
-              className="relative"
-              animate={mobileTab === 'chat' ? { scale: 1.1 } : { scale: 1 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-              <MessageCircle className="w-6 h-6" />
-              {mobileTab === 'chat' && (
-                <motion.div
-                  layoutId="waiting-nav-indicator"
-                  className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 bg-neo-yellow rounded-full"
-                  initial={false}
-                />
-              )}
-            </motion.div>
-            <span className="text-[10px] font-bold uppercase tracking-wider mt-1">
-              {t('common.chat') || 'Chat'}
-            </span>
-          </motion.button>
-        </div>
-      </nav>
-
-      {/* QR Code Dialog */}
-      <Dialog open={showQR} onOpenChange={setShowQR}>
-        <DialogContent noDescription className="sm:max-w-md bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
-          <DialogHeader>
-            <DialogTitle className="text-center text-neo-black flex items-center justify-center gap-2 font-black">
-              <QrCode />
-              {t('joinView.qrCodeTitle')}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col items-center gap-4 py-4">
-            <div className="p-6 bg-white text-neo-black rounded-neo shadow-hard border-3 border-neo-black">
-              <QRCodeSVG value={getJoinUrl(gameCode)} size={250} level="H" includeMargin />
-            </div>
-            <h4 className="text-3xl font-black text-neo-black">{gameCode}</h4>
-            <p className="text-sm text-center text-neo-black/70 font-bold">
-              {t('joinView.scanToJoin')} {gameCode}
-            </p>
-            <p className="text-xs text-center text-neo-black/70">
-              {getJoinUrl(gameCode)}
-            </p>
+    <div className="flex-1 flex flex-col min-h-0 bg-neo-navy lg:max-w-7xl lg:mx-auto">
+      {/* Header */}
+      <header className="shrink-0 px-3 py-2 bg-neo-navy/95 border-b-3 border-neo-black sticky z-20" style={{ top: 'var(--combined-safe-area-top, env(safe-area-inset-top, 0px))' }}>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <MobileShareSection gameCode={gameCode} t={t} compact />
           </div>
-          <DialogFooter className="sm:justify-center">
-            <Button
-              onClick={handleCloseQR}
-              className="w-full bg-neo-cyan text-neo-black font-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] transition-all duration-100"
+          <div className="flex items-center gap-2 shrink-0">
+            {gameLanguage && (
+              <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
+                <span className="text-sm">{LANGUAGE_FLAGS[gameLanguage] || '🌐'}</span>
+                <span className="text-xs font-black text-neo-cream uppercase">
+                  {getLanguageName(gameLanguage, true)}
+                </span>
+              </div>
+            )}
+            {/* UI-language pill — distinct from the board-language chip above; one tap. */}
+            <QuickLanguageSwitcher compact />
+            <div className="bg-black/40 border-2 border-neo-black px-2 py-1 rounded-md flex items-center gap-1.5">
+              <Users className="w-4 h-4 text-neo-cyan" />
+              <span className="text-xs font-black text-neo-cream">
+                {nonHostPlayers.length}/{MAX_PLAYERS}
+              </span>
+            </div>
+            <button
+              onClick={onExitRoom}
+              className="w-9 h-9 flex items-center justify-center bg-neo-red border-2 border-neo-black shadow-hard-sm active:translate-y-0.5 active:shadow-none transition-all rounded"
+              aria-label={t('common.exit')}
             >
-              {t('common.close')}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+              <LogOut className="w-4 h-4 text-neo-black rtl:scale-x-[-1]" />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="flex-1 min-h-0 overflow-hidden flex flex-col bg-neo-navy/95">
+        {/* Desktop Layout — triggers at 720px (tablet portrait+) for parity with HostPreGameView */}
+        <div className="hidden min-[720px]:block h-full">
+          <DesktopLobbyLayout
+            leftContent={
+              <>
+                {renderHeroCard()}
+                {renderPlayerRoster()}
+                {renderModeTips()}
+              </>
+            }
+            rightContent={
+              <>
+                <InviteCard gameCode={gameCode} t={t} desktop />
+                <div
+                  data-testid="desktop-chat-area"
+                  className="flex-1 min-h-0 bg-neo-navy/30 rounded-neo-lg border-3 border-neo-cyan/20 shadow-hard overflow-hidden"
+                >
+                  {isOnCrazyGamesPlatform ? (
+                    <LobbyTutorialPanel t={t} />
+                  ) : (
+                    <RoomChat
+                      username={username}
+                      isHost={false}
+                      gameCode={gameCode}
+                      className="h-full"
+                      onNewMessage={() => {}}
+                      variant="embedded"
+                    />
+                  )}
+                </div>
+              </>
+            }
+          />
+        </div>
+
+        {/* Mobile Layout — below 720px (phones) */}
+        <div className="min-[720px]:hidden flex flex-col flex-1 min-h-0">
+          {renderMobileContent()}
+        </div>
+      </main>
+
+      {/* B4 — CrazyGames waiting-room banner */}
+      <div className="w-full flex justify-center py-2">
+        <CrazyGamesBanner size="320x50" />
+      </div>
+
+      {/* Avatar Builder Modal */}
+      <AvatarBuilderModal
+        isOpen={isAvatarBuilderOpen}
+        onClose={() => setIsAvatarBuilderOpen(false)}
+        onSave={handleAvatarSave}
+        initialConfig={currentAvatar}
+        premium={avatarPremium}
+      />
 
       {/* Exit Confirmation Dialog */}
       <AlertDialog open={showExitConfirm} onOpenChange={setShowExitConfirm}>
         <AlertDialogContent className="bg-neo-cream text-neo-black border-4 border-neo-black shadow-hard">
           <AlertDialogHeader>
-            <AlertDialogTitle className="text-neo-black font-black">
-              {t('playerView.exitConfirmation')}
-            </AlertDialogTitle>
+            <AlertDialogTitle className="font-black">{t('playerView.exitConfirmation')}</AlertDialogTitle>
             <AlertDialogDescription className="text-neo-black/70 font-bold">
               {t('playerView.exitWarning')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm hover:shadow-hard font-bold">
+            <AlertDialogCancel className="bg-neo-cream text-neo-black border-3 border-neo-black shadow-hard-sm font-bold">
               {t('common.cancel')}
             </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={onConfirmExit}
-              className="bg-neo-red text-neo-white border-3 border-neo-black shadow-hard-sm hover:shadow-hard font-bold"
-            >
+            <AlertDialogAction onClick={onConfirmExit} className="bg-neo-red text-neo-white border-3 border-neo-black shadow-hard-sm font-bold">
               {t('common.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -443,4 +548,4 @@ const PlayerWaitingView: React.FC<PlayerWaitingViewProps> = ({
   );
 };
 
-export default PlayerWaitingView;
+export default memo(PlayerWaitingView);

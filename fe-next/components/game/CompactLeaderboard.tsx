@@ -1,21 +1,30 @@
 'use client';
 
-import { useMemo, useRef, useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Crown, Zap, TrendingUp, Flame } from 'lucide-react';
+import { useMemo, useRef, useEffect, useState, useCallback, memo } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import { Crown, Zap, TrendingUp, Flame, Gem, Snowflake, Bomb, Keyboard, MousePointer, Hand } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Avatar from '../Avatar';
+import PlayerProfileTooltip from '../ui/PlayerProfileTooltip';
+import { fireConfetti, NEO_BRUTALIST_COLORS, NEO_BRUTALIST_SHAPES } from '@/utils/confettiUtils';
 
 export interface CompactPlayer {
   username: string;
   score: number;
   rank: number;
   isCurrentUser?: boolean;
-  profilePictureUrl?: string | null;
   avatarImage?: string;
+  customAvatar?: import('@/shared/types/customAvatar').CustomAvatarConfig | null;
   avatarEmoji?: string;
   avatarColor?: string;
   previousRank?: number;
+  /** Last input method used by this player */
+  inputMethod?: 'keyboard' | 'click' | 'drag' | null;
+}
+
+export interface ComboEvent {
+  username: string;
+  comboType: string;
 }
 
 interface CompactLeaderboardProps {
@@ -23,6 +32,7 @@ interface CompactLeaderboardProps {
   currentUsername: string;
   className?: string;
   t: (key: string) => string;
+  comboEvent?: ComboEvent | null;
 }
 
 // Track previous scores for detecting changes
@@ -31,6 +41,13 @@ interface ScoreChange {
   delta: number;
   timestamp: number;
 }
+
+// Rapid scoring window — if 3+ scores within this window, show streak flame
+const STREAK_WINDOW_MS = 10000;
+const STREAK_THRESHOLD = 3;
+
+// Debounce interval for visual updates (ms) - prevents state cascade
+const VISUAL_UPDATE_DEBOUNCE = 100;
 
 /**
  * CompactLeaderboard - Race Track Style competitive leaderboard
@@ -42,17 +59,30 @@ interface ScoreChange {
  * - Pulse animations when opponents score
  * - Rank change indicators (up/down arrows)
  */
-export function CompactLeaderboard({
+/** Map combo type to icon */
+function getComboIcon(comboType: string) {
+  switch (comboType) {
+    case 'gem': return <Gem className="w-3 h-3 text-neo-pink" />;
+    case 'frozen': return <Snowflake className="w-3 h-3 text-neo-cyan" />;
+    case 'bomb': return <Bomb className="w-3 h-3 text-neo-red" />;
+    default: return <Zap className="w-3 h-3 text-neo-lime" />;
+  }
+}
+
+export const CompactLeaderboard = memo<CompactLeaderboardProps>(function CompactLeaderboard({
   players,
   currentUsername,
   className,
   t,
-}: CompactLeaderboardProps) {
+  comboEvent,
+}) {
   // Track previous scores and ranks for animations
   const prevScoresRef = useRef<Map<string, number>>(new Map());
   const prevRanksRef = useRef<Map<string, number>>(new Map());
   const [scoreChanges, setScoreChanges] = useState<ScoreChange[]>([]);
   const [rankChanges, setRankChanges] = useState<Map<string, 'up' | 'down'>>(new Map());
+  // Track score event history per opponent for streak detection
+  const scoreHistoryRef = useRef<Map<string, number[]>>(new Map());
 
   const { sortedPlayers, nextTarget, currentUser, totalPlayers, isLeading, maxScore } = useMemo(() => {
     const sorted = [...players].sort((a, b) => b.score - a.score);
@@ -82,48 +112,82 @@ export function CompactLeaderboard({
     };
   }, [players, currentUsername]);
 
-  // Detect score and rank changes for animations
+  // Refs to track pending updates and avoid state cascade
+  const pendingUpdateRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scoreCleanupRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const rankCleanupRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Detect score and rank changes for animations (debounced to prevent cascade)
   useEffect(() => {
-    const newScoreChanges: ScoreChange[] = [];
-    const newRankChanges = new Map<string, 'up' | 'down'>();
-
-    sortedPlayers.forEach(player => {
-      const prevScore = prevScoresRef.current.get(player.username);
-      const prevRank = prevRanksRef.current.get(player.username);
-
-      // Detect score change
-      if (prevScore !== undefined && player.score > prevScore) {
-        newScoreChanges.push({
-          username: player.username,
-          delta: player.score - prevScore,
-          timestamp: Date.now(),
-        });
-      }
-
-      // Detect rank change
-      if (prevRank !== undefined && player.rank !== prevRank) {
-        newRankChanges.set(player.username, player.rank < prevRank ? 'up' : 'down');
-      }
-
-      // Update refs
-      prevScoresRef.current.set(player.username, player.score);
-      prevRanksRef.current.set(player.username, player.rank);
-    });
-
-    if (newScoreChanges.length > 0) {
-      setScoreChanges(prev => [...prev, ...newScoreChanges]);
-      // Clear old score changes after animation
-      setTimeout(() => {
-        setScoreChanges(prev => prev.filter(c => Date.now() - c.timestamp < 1500));
-      }, 1500);
+    // Cancel any pending update to debounce rapid changes
+    if (pendingUpdateRef.current) {
+      clearTimeout(pendingUpdateRef.current);
     }
 
-    if (newRankChanges.size > 0) {
-      setRankChanges(newRankChanges);
-      // Clear rank changes after animation
-      setTimeout(() => setRankChanges(new Map()), 2000);
-    }
-  }, [sortedPlayers]);
+    pendingUpdateRef.current = setTimeout(() => {
+      const newScoreChanges: ScoreChange[] = [];
+      const newRankChanges = new Map<string, 'up' | 'down'>();
+
+      sortedPlayers.forEach(player => {
+        const prevScore = prevScoresRef.current.get(player.username);
+        const prevRank = prevRanksRef.current.get(player.username);
+
+        // Detect score change
+        if (prevScore !== undefined && player.score > prevScore) {
+          const now = Date.now();
+          newScoreChanges.push({
+            username: player.username,
+            delta: player.score - prevScore,
+            timestamp: now,
+          });
+
+          // Track score event for streak detection (opponents only)
+          if (player.username !== currentUsername) {
+            const history = scoreHistoryRef.current.get(player.username) || [];
+            history.push(now);
+            // Keep only events within the streak window
+            const cutoff = now - STREAK_WINDOW_MS;
+            scoreHistoryRef.current.set(player.username, history.filter(t => t > cutoff));
+          }
+        }
+
+        // Detect rank change
+        if (prevRank !== undefined && player.rank !== prevRank) {
+          newRankChanges.set(player.username, player.rank < prevRank ? 'up' : 'down');
+        }
+
+        // Update refs
+        prevScoresRef.current.set(player.username, player.score);
+        prevRanksRef.current.set(player.username, player.rank);
+      });
+
+      // Batch state updates together
+      if (newScoreChanges.length > 0 || newRankChanges.size > 0) {
+        if (newScoreChanges.length > 0) {
+          setScoreChanges(prev => [...prev, ...newScoreChanges]);
+          // Clear previous cleanup timeout
+          if (scoreCleanupRef.current) clearTimeout(scoreCleanupRef.current);
+          scoreCleanupRef.current = setTimeout(() => {
+            setScoreChanges(prev => prev.filter(c => Date.now() - c.timestamp < 1500));
+          }, 1500);
+        }
+
+        if (newRankChanges.size > 0) {
+          setRankChanges(newRankChanges);
+          // Clear previous cleanup timeout
+          if (rankCleanupRef.current) clearTimeout(rankCleanupRef.current);
+          rankCleanupRef.current = setTimeout(() => setRankChanges(new Map()), 2000);
+        }
+      }
+    }, VISUAL_UPDATE_DEBOUNCE);
+
+    // Cleanup on unmount
+    return () => {
+      if (pendingUpdateRef.current) clearTimeout(pendingUpdateRef.current);
+      if (scoreCleanupRef.current) clearTimeout(scoreCleanupRef.current);
+      if (rankCleanupRef.current) clearTimeout(rankCleanupRef.current);
+    };
+  }, [sortedPlayers, currentUsername]);
 
   // Calculate points needed to catch next target
   const pointsToTarget = useMemo(() => {
@@ -146,17 +210,37 @@ export function CompactLeaderboard({
     return Math.min(100, (score / maxScore) * 100);
   };
 
+  // Check if an opponent is on a scoring streak
+  const isOnStreak = useCallback((username: string): boolean => {
+    if (username === currentUsername) return false;
+    const history = scoreHistoryRef.current.get(username);
+    return !!history && history.length >= STREAK_THRESHOLD;
+  }, [currentUsername]);
+
+  // Fire a small ego-confetti burst when the player clicks on themselves
+  const handleSelfClick = useCallback((e: React.MouseEvent) => {
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+    fireConfetti({
+      particleCount: 25,
+      spread: 60,
+      origin: { x, y },
+      colors: NEO_BRUTALIST_COLORS,
+      shapes: NEO_BRUTALIST_SHAPES,
+      flat: true,
+      scalar: 1.3,
+      startVelocity: 35,
+      ticks: 120,
+    });
+  }, []);
+
+  // Get top 3 OTHER players for race visualization (exclude current user)
+  const raceParticipants = useMemo(
+    () => sortedPlayers.filter(p => p.username !== currentUsername).slice(0, 3),
+    [sortedPlayers, currentUsername],
+  );
+
   if (totalPlayers === 0 || !currentUser) return null;
-
-  // Get top 3 players for race visualization (or fewer if less players)
-  const raceParticipants = sortedPlayers.slice(0, Math.min(4, totalPlayers));
-  const userInTop = raceParticipants.some(p => p.username === currentUsername);
-
-  // If user not in top, add them to race view
-  if (!userInTop && currentUser) {
-    raceParticipants.pop(); // Remove last of top 3
-    raceParticipants.push(currentUser);
-  }
 
   return (
     <div className={cn(
@@ -164,30 +248,42 @@ export function CompactLeaderboard({
       className
     )}>
       {/* Header with Race Track theme */}
-      <div className="bg-neo-navy text-neo-cream px-2 py-1 flex items-center justify-between">
+      <div className="bg-neo-navy text-neo-white px-2 py-1 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <motion.div
-            animate={{ rotate: [0, 15, -15, 0] }}
-            transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 2 }}
+          <div
+            data-anim="zap-wiggle"
+            className="motion-safe:animate-zap-wiggle"
           >
             <Zap className="w-3.5 h-3.5 text-neo-lime" />
-          </motion.div>
-          <span className="text-[10px] font-black uppercase text-neo-cream tracking-wider">
-            {t('leaderboard.liveRace') || 'Live Race'}
+          </div>
+          <span className="text-[10px] font-black uppercase text-neo-white tracking-wider">
+            {t('leaderboard.liveRace')}
           </span>
         </div>
         <div className="flex items-center gap-1">
-          <span className="text-[10px] font-bold text-neo-cream/70">
-            {totalPlayers} {t('leaderboard.racing') || 'racing'}
+          <span className="text-[10px] font-bold text-neo-white">
+            {totalPlayers} {t('leaderboard.racing')}
           </span>
         </div>
       </div>
 
+      {/* First-time hint - shows briefly */}
+      {totalPlayers > 1 && (
+        <m.div
+          initial={{ opacity: 1, height: 'auto' }}
+          animate={{ opacity: 0, height: 0 }}
+          transition={{ delay: 5, duration: 0.5 }}
+          className="px-2 py-1 bg-neo-cyan/20 text-[9px] text-neo-black font-medium text-center overflow-hidden"
+        >
+          {t('leaderboard.hint')}
+        </m.div>
+      )}
+
       {/* Race Track Visualization */}
-      <div className="px-2 py-1.5 bg-gradient-to-b from-neo-navy/5 to-transparent">
+      <div className="px-2 py-1.5 bg-linear-to-b from-neo-navy/5 to-transparent">
         {/* Track lanes */}
-        <div className="relative space-y-1">
-          {raceParticipants.map((player, index) => {
+        <div className="relative space-y-1" role="list">
+          {raceParticipants.map((player) => {
             const isMe = player.username === currentUsername;
             const isLeader = player.rank === 1;
             const position = getRacePosition(player.score);
@@ -195,19 +291,17 @@ export function CompactLeaderboard({
             const rankChange = rankChanges.get(player.username);
 
             return (
-              <motion.div
+              <div
                 key={player.username}
-                layout
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{
-                  layout: { type: 'spring', stiffness: 300, damping: 30 },
-                  delay: index * 0.05
-                }}
+                role="listitem"
+                tabIndex={0}
+                onClick={isMe ? handleSelfClick : undefined}
                 className={cn(
-                  'relative flex items-center gap-1.5 h-8 rounded-neo overflow-hidden',
+                  'relative flex items-center gap-1.5 h-10 rounded-neo overflow-hidden transition-all duration-200',
+                  'focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-neo-cyan focus-visible:ring-offset-1',
+                  'hover:bg-neo-black/10',
                   isMe
-                    ? 'bg-neo-cyan/30 border-2 border-neo-cyan'
+                    ? 'bg-neo-cyan/30 border-2 border-neo-cyan hover:bg-neo-cyan/40 cursor-pointer active:scale-[0.98]'
                     : 'bg-neo-black/5 border border-neo-black/20'
                 )}
               >
@@ -216,18 +310,16 @@ export function CompactLeaderboard({
                   <div className="absolute right-0 top-0 bottom-0 w-2 bg-[repeating-linear-gradient(0deg,#000,#000_2px,#fff_2px,#fff_4px)]" />
                 </div>
 
-                {/* Position indicator (race car on track) */}
-                <motion.div
-                  className="absolute top-0 bottom-0 flex items-center"
-                  initial={{ left: '0%' }}
-                  animate={{ left: `${Math.max(0, position - 15)}%` }}
-                  transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+                {/* Position indicator (race car on track) — static, no spring animation */}
+                <div
+                  className="absolute top-0 bottom-0 flex items-center transition-[left] duration-500 ease-out"
+                  style={{ left: `${Math.max(0, position - 15)}%` }}
                 >
                   {/* Player marker */}
                   <div className={cn(
                     'flex items-center gap-1 px-1.5 py-0.5 rounded-neo',
                     isLeader
-                      ? 'bg-gradient-to-r from-neo-lime to-neo-orange border-2 border-neo-black shadow-hard-sm'
+                      ? 'bg-linear-to-r from-neo-lime to-neo-cyan border-2 border-neo-black shadow-hard-sm'
                       : isMe
                         ? 'bg-neo-cyan border-2 border-neo-black shadow-hard-sm'
                         : 'bg-neo-cream border border-neo-black/50'
@@ -241,37 +333,35 @@ export function CompactLeaderboard({
                       </span>
                     )}
 
-                    {/* Avatar - smaller for race view */}
+                    {/* Avatar */}
                     <Avatar
-                      profilePictureUrl={player.profilePictureUrl ?? undefined}
+
                       avatarImage={player.avatarImage}
-                      size="sm"
+                      customAvatar={player.customAvatar}
+                      size="md"
+                      disableEffects
                     />
 
                     {/* Score */}
-                    <motion.span
-                      key={player.score}
-                      initial={{ scale: 1.3 }}
-                      animate={{ scale: 1 }}
-                      className="text-xs font-black text-neo-black tabular-nums"
-                    >
+                    <span className="text-xs font-black text-neo-black tabular-nums">
                       {player.score}
-                    </motion.span>
+                    </span>
 
                     {/* Rank change indicator */}
                     <AnimatePresence>
                       {rankChange && (
-                        <motion.span
+                        <m.span
                           initial={{ opacity: 0, y: rankChange === 'up' ? 5 : -5 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0 }}
+                          transition={{ type: 'spring', stiffness: 380, damping: 26 }}
                           className={cn(
                             'text-[9px] font-black',
                             rankChange === 'up' ? 'text-neo-lime' : 'text-neo-red'
                           )}
                         >
                           {rankChange === 'up' ? '▲' : '▼'}
-                        </motion.span>
+                        </m.span>
                       )}
                     </AnimatePresence>
                   </div>
@@ -279,7 +369,7 @@ export function CompactLeaderboard({
                   {/* Score change floating indicator */}
                   <AnimatePresence>
                     {scoreChange && (
-                      <motion.div
+                      <m.div
                         initial={{ opacity: 0, y: 0, x: 5 }}
                         animate={{ opacity: 1, y: -15, x: 5 }}
                         exit={{ opacity: 0, y: -25 }}
@@ -287,21 +377,62 @@ export function CompactLeaderboard({
                         className="absolute -top-1 left-full text-[10px] font-black text-neo-lime whitespace-nowrap"
                       >
                         +{scoreChange.delta}
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
-                </motion.div>
-
-                {/* Player name (right side) */}
-                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-1">
-                  <span className={cn(
-                    'text-[10px] font-bold truncate max-w-[60px]',
-                    isMe ? 'text-neo-black' : 'text-neo-black/60'
-                  )}>
-                    {isMe ? (t('leaderboard.you') || 'YOU') : player.username}
-                  </span>
                 </div>
-              </motion.div>
+
+                {/* Player name (right side) + streak flame + combo badge */}
+                <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center gap-0.5">
+                  {/* Combo event badge */}
+                  <AnimatePresence>
+                    {comboEvent && comboEvent.username === player.username && comboEvent.username !== currentUsername && (
+                      <m.div
+                        key={`combo-${player.username}`}
+                        data-testid={`combo-badge-${player.username}`}
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: [1, 1.3, 1], opacity: 1 }}
+                        exit={{ scale: 0, opacity: 0 }}
+                        transition={{ duration: 0.5 }}
+                      >
+                        {getComboIcon(comboEvent.comboType)}
+                      </m.div>
+                    )}
+                  </AnimatePresence>
+                  {isOnStreak(player.username) && (
+                    <div className="motion-safe:animate-streak-pulse">
+                      <Flame className="w-3 h-3 text-neo-orange" />
+                    </div>
+                  )}
+                  {player.inputMethod && (
+                    <span className="text-neo-black/40" title={player.inputMethod}>
+                      {player.inputMethod === 'keyboard' ? <Keyboard className="w-2.5 h-2.5" /> :
+                       player.inputMethod === 'click' ? <MousePointer className="w-2.5 h-2.5" /> :
+                       <Hand className="w-2.5 h-2.5" />}
+                    </span>
+                  )}
+                  <PlayerProfileTooltip
+                    player={{
+                      username: player.username,
+                      avatarImage: player.avatarImage,
+                      customAvatar: player.customAvatar,
+                      score: player.score,
+                    }}
+                    isCurrentUser={isMe}
+                    side="bottom"
+                  >
+                    <span
+                      title={isMe ? undefined : player.username}
+                      className={cn(
+                        'text-[10px] font-bold truncate max-w-[60px]',
+                        isMe ? 'text-neo-black' : 'text-neo-black/80 cursor-pointer hover:text-neo-black hover:underline'
+                      )}
+                    >
+                      {isMe ? (t('leaderboard.you')) : player.username}
+                    </span>
+                  </PlayerProfileTooltip>
+                </div>
+              </div>
             );
           })}
         </div>
@@ -309,31 +440,28 @@ export function CompactLeaderboard({
 
       {/* Your Status Bar - Motivational section */}
       <div className="px-2 pb-1.5">
-        <motion.div
+        <div
+          data-anim={isCloseToOvertaking ? 'overtake-pulse' : undefined}
           className={cn(
             'relative flex items-center justify-between px-2 py-1.5 rounded-neo border-2',
             isLeading
-              ? 'bg-gradient-to-r from-neo-lime/50 to-neo-lime/50 border-neo-black'
+              ? 'bg-linear-to-r from-neo-lime/50 to-neo-lime/50 border-neo-black'
               : isCloseToOvertaking
-                ? 'bg-neo-pink/20 border-neo-pink'
+                ? 'bg-neo-pink/20 border-neo-pink motion-safe:animate-overtake-pulse'
                 : 'bg-neo-cyan/10 border-neo-cyan/50'
           )}
-          animate={isCloseToOvertaking ? {
-            boxShadow: ['0 0 0 0 rgba(255,20,147,0)', '0 0 0 4px rgba(255,20,147,0.3)', '0 0 0 0 rgba(255,20,147,0)']
-          } : {}}
-          transition={{ duration: 1.5, repeat: isCloseToOvertaking ? Infinity : 0 }}
         >
           {/* Left side - status */}
           <div className="flex items-center gap-1.5">
             {isLeading ? (
               <>
-                <Flame className="w-4 h-4 text-neo-orange" />
+                <Flame className="w-4 h-4 text-neo-pink" />
                 <span className="text-xs font-black text-neo-black">
-                  {t('leaderboard.leading') || 'Leading!'}
+                  {t('leaderboard.leading')}
                 </span>
                 {pointsAhead > 0 && (
-                  <span className="text-[10px] font-bold text-neo-black/70">
-                    +{pointsAhead} {t('leaderboard.ahead') || 'ahead'}
+                  <span className="text-[10px] font-bold text-neo-black/80">
+                    +{pointsAhead} {t('leaderboard.ahead')}
                   </span>
                 )}
               </>
@@ -348,8 +476,8 @@ export function CompactLeaderboard({
                   isCloseToOvertaking ? 'text-neo-pink' : 'text-neo-black/80'
                 )}>
                   {isCloseToOvertaking
-                    ? (t('leaderboard.almostThere') || 'Almost there!')
-                    : `${pointsToTarget} ${t('leaderboard.toCatch') || 'pts to pass'}`
+                    ? (t('leaderboard.almostThere'))
+                    : `${pointsToTarget} ${t('leaderboard.toCatch')}`
                   }
                 </span>
               </>
@@ -357,45 +485,45 @@ export function CompactLeaderboard({
           </div>
 
           {/* Right side - your score */}
-          <motion.div
+          <m.div
             key={currentUser.score}
             initial={{ scale: 1.4 }}
             animate={{ scale: 1 }}
             transition={{ type: 'spring', stiffness: 500, damping: 25 }}
             className="flex items-center gap-1"
           >
-            <span className="text-[10px] font-bold text-neo-black/60 uppercase">
-              {t('common.score') || 'Score'}
+            <span className="text-[10px] font-bold text-neo-black/80 uppercase">
+              {t('common.score')}
             </span>
             <span className="text-lg font-black text-neo-black tabular-nums">
               {currentUser.score}
             </span>
-          </motion.div>
+          </m.div>
 
           {/* Progress bar to next target */}
           {!isLeading && nextTarget && (
-            <motion.div
+            <div
               className="absolute -bottom-0.5 left-2 right-2 h-1 bg-neo-black/10 rounded-full overflow-hidden"
             >
-              <motion.div
+              <div
                 className={cn(
-                  'h-full rounded-full',
+                  'h-full rounded-full transition-[width] duration-500 ease-out',
                   isCloseToOvertaking
-                    ? 'bg-gradient-to-r from-neo-pink to-neo-orange'
-                    : 'bg-gradient-to-r from-neo-cyan to-neo-pink'
+                    ? 'bg-linear-to-r from-neo-pink to-neo-red'
+                    : 'bg-linear-to-r from-neo-cyan to-neo-pink'
                 )}
-                initial={{ width: '0%' }}
-                animate={{
-                  width: `${Math.min(100, Math.max(5, (currentUser.score / (nextTarget.score || 1)) * 100))}%`
+                style={{
+                  width: `${Math.min(100, Math.max(5, (currentUser.score / (nextTarget.score || 1)) * 100))}%`,
                 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
               />
-            </motion.div>
+            </div>
           )}
-        </motion.div>
+        </div>
       </div>
     </div>
   );
-}
+});
+
+CompactLeaderboard.displayName = 'CompactLeaderboard';
 
 export default CompactLeaderboard;

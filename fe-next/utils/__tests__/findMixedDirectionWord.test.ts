@@ -7,13 +7,13 @@
 import { findMixedDirectionWord } from '../findMixedDirectionWord';
 
 // Mock wordPathFinder
-jest.mock('../wordPathFinder', () => ({
-  findWordPath: jest.fn(),
+vi.mock('../wordPathFinder', () => ({
+  findWordPath: vi.fn(),
 }));
 
 // Mock directionPatternDetector
-jest.mock('../directionPatternDetector', () => ({
-  hasDirectionChange: jest.fn(),
+vi.mock('../directionPatternDetector', () => ({
+  hasDirectionChange: vi.fn(),
 }));
 
 import { findWordPath } from '../wordPathFinder';
@@ -24,7 +24,7 @@ const mockHasDirectionChange = hasDirectionChange as jest.Mock;
 
 describe('findMixedDirectionWord', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   const mockGrid = [

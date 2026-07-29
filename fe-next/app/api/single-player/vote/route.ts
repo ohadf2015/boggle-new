@@ -6,6 +6,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { checkApiRateLimit } from '@/lib/apiRateLimit';
+import { captureApiError } from '@/utils/sentry';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -48,6 +50,18 @@ interface VoteRequest {
 }
 
 export async function POST(request: NextRequest) {
+  // Rate limit: 30 votes per 60 seconds
+  const rateLimitResult = checkApiRateLimit(request, 'single-player-vote', {
+    maxRequests: 30,
+    windowMs: 60_000,
+  });
+  if (!rateLimitResult.success) {
+    return NextResponse.json(
+      { success: false, error: 'Too many requests' },
+      { status: 429 }
+    );
+  }
+
   try {
     const body: VoteRequest = await request.json();
     const { word, language, voteType, sessionId } = body;
@@ -74,9 +88,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!sessionId || typeof sessionId !== 'string') {
+    if (!sessionId || typeof sessionId !== 'string' || sessionId.length < 8 || sessionId.length > 128) {
       return NextResponse.json(
-        { success: false, error: 'Missing session ID' },
+        { success: false, error: 'Missing or invalid session ID' },
         { status: 400 }
       );
     }
@@ -139,7 +153,9 @@ export async function POST(request: NextRequest) {
       message: `Vote recorded: ${voteType} for "${word}"`
     });
   } catch (error) {
-    console.error('Error in single-player vote API:', error);
+    captureApiError(error instanceof Error ? error : new Error(String(error)), '/api/single-player/vote', { method: 'POST' });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Error in single-player vote API:', errorMessage);
     return NextResponse.json(
       { success: false, error: 'Internal server error' },
       { status: 500 }

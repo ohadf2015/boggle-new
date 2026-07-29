@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mascot Video Transparency Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            font-family: system-ui, -apple-system, sans-serif;
+            background: linear-gradient(45deg, #1a1a2e 25%, #16213e 25%, #16213e 50%, #1a1a2e 50%, #1a1a2e 75%, #16213e 75%, #16213e);
+            background-size: 40px 40px;
+            color: white;
+        }
+        h1 {
+            text-align: center;
+            color: #FFE135;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .mascot-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 3px solid #FFE135;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .mascot-card h3 {
+            color: #FFE135;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+        video {
+            width: 96px;
+            height: 96px;
+            display: block;
+            margin: 0 auto 15px;
+        }
+        .info {
+            font-size: 12px;
+            color: #ccc;
+            margin-top: 10px;
+        }
+        .size {
+            color: #00ff41;
+            font-weight: bold;
+        }
+        .fallback {
+            border-color: #ff6b35;
+        }
+        .fallback h3 {
+            color: #ff6b35;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 Mascot Video Transparency Test</h1>
+        <p style="text-align: center; color: #ccc;">
+            All videos should have transparent backgrounds on this checkered background.<br>
+            WebM (best compression) shown first, with MP4 fallback for Safari.
+        </p>
+
+        <div class="grid">
+            <!-- Happy Mascot -->
+            <div class="mascot-card">
+                <h3>Happy (main-nobg)</h3>
+                <video autoplay loop muted playsinline poster="/mascot/posters/main-nobg.jpg">
+                    <source src="/mascot/video/main-nobg.webm" type="video/webm">
+                    <source src="/mascot/video/main-nobg.mp4" type="video/mp4">
+                </video>
+                <div class="info">
+                    <div>WebM: <span class="size">28KB</span></div>
+                    <div>MP4: <span class="size">20KB</span></div>
+                    <div>GIF was: 936KB</div>
+                    <div>Savings: <span class="size">95%</span></div>
+                </div>
+            </div>
+
+            <!-- Gaming Mascot -->
+            <div class="mascot-card">
+                <h3>Gaming (play-nobg)</h3>
+                <video autoplay loop muted playsinline poster="/mascot/posters/play-nobg.jpg">
+                    <source src="/mascot/video/play-nobg.webm" type="video/webm">
+                    <source src="/mascot/video/play-nobg.mp4" type="video/mp4">
+                </video>
+                <div class="info">
+                    <div>WebM: <span class="size">80KB</span></div>
+                    <div>MP4: <span class="size">48KB</span></div>
+                    <div>GIF was: 2.1MB</div>
+                    <div>Savings: <span class="size">94%</span></div>
+                </div>
+            </div>
+
+            <!-- Thinking Mascot -->
+            <div class="mascot-card">
+                <h3>Thinking (study-nobg)</h3>
+                <video autoplay loop muted playsinline poster="/mascot/posters/study-nobg.jpg">
+                    <source src="/mascot/video/study-nobg.webm" type="video/webm">
+                    <source src="/mascot/video/study-nobg.mp4" type="video/mp4">
+                </video>
+                <div class="info">
+                    <div>WebM: <span class="size">68KB</span></div>
+                    <div>MP4: <span class="size">32KB</span></div>
+                    <div>GIF was: 1.3MB</div>
+                    <div>Savings: <span class="size">92%</span></div>
+                </div>
+            </div>
+
+            <!-- Oops Mascot -->
+            <div class="mascot-card">
+                <h3>Oops (oops-nobg)</h3>
+                <video autoplay loop muted playsinline poster="/mascot/posters/oops-nobg.jpg">
+                    <source src="/mascot/video/oops-nobg.webm" type="video/webm">
+                    <source src="/mascot/video/oops-nobg.mp4" type="video/mp4">
+                </video>
+                <div class="info">
+                    <div>WebM: <span class="size">52KB</span></div>
+                    <div>MP4: <span class="size">28KB</span></div>
+                    <div>GIF was: 1.6MB</div>
+                    <div>Savings: <span class="size">95%</span></div>
+                </div>
+            </div>
+
+            <!-- Celebration Mascot -->
+            <div class="mascot-card">
+                <h3>Celebration</h3>
+                <video autoplay loop muted playsinline poster="/mascot/posters/celebration-nobg.jpg">
+                    <source src="/mascot/video/celebration-nobg.webm" type="video/webm">
+                    <source src="/mascot/video/celebration-nobg.mp4" type="video/mp4">
+                </video>
+                <div class="info">
+                    <div>WebM: <span class="size">148KB</span></div>
+                    <div>MP4: <span class="size">56KB</span></div>
+                    <div>GIF was: 1.1MB</div>
+                    <div>Savings: <span class="size">82%</span></div>
+                </div>
+            </div>
+
+            <!-- DJ Mascot -->
+            <div class="mascot-card">
+                <h3>DJ (dj-nobg)</h3>
+                <video autoplay loop muted playsinline poster="/mascot/posters/dj-nobg.jpg">
+                    <source src="/mascot/video/dj-nobg.webm" type="video/webm">
+                    <source src="/mascot/video/dj-nobg.mp4" type="video/mp4">
+                </video>
+                <div class="info">
+                    <div>WebM: <span class="size">220KB</span></div>
+                    <div>MP4: <span class="size">64KB</span></div>
+                    <div>GIF was: 1.7MB</div>
+                    <div>Savings: <span class="size">84%</span></div>
+                </div>
+            </div>
+
+            <!-- Trophy Mascot -->
+            <div class="mascot-card">
+                <h3>Trophy</h3>
+                <video autoplay loop muted playsinline poster="/mascot/posters/trophy-nobg.jpg">
+                    <source src="/mascot/video/trophy-nobg.webm" type="video/webm">
+                    <source src="/mascot/video/trophy-nobg.mp4" type="video/mp4">
+                </video>
+                <div class="info">
+                    <div>WebM: <span class="size">68KB</span></div>
+                    <div>MP4: <span class="size">28KB</span></div>
+                    <div>GIF was: 1.1MB</div>
+                    <div>Savings: <span class="size">91%</span></div>
+                </div>
+            </div>
+
+            <!-- GIF Fallback Example -->
+            <div class="mascot-card fallback">
+                <h3>GIF Fallback (Old)</h3>
+                <img src="/mascot/main-nobg.gif" alt="Mascot GIF" style="width: 96px; height: 96px; display: block; margin: 0 auto 15px;">
+                <div class="info">
+                    <div>Format: GIF</div>
+                    <div>Size: <span style="color: #ff6b35;">936KB</span></div>
+                    <div>Used as fallback</div>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center; color: #ccc;">
+            <h2 style="color: #FFE135;">📊 Total Savings</h2>
+            <div style="font-size: 18px;">
+                <div>Total GIFs: <span style="color: #ff6b35;">9.8MB</span></div>
+                <div>Total Videos (WebM + MP4): <span class="size">940KB</span></div>
+                <div style="font-size: 24px; margin-top: 20px;">
+                    Savings: <span class="size">90.4%</span> 🎉
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Log video load events
+        document.querySelectorAll('video').forEach((video, index) => {
+            video.addEventListener('loadeddata', () => {
+                console.log(`Video ${index + 1} loaded successfully`);
+            });
+            video.addEventListener('error', (e) => {
+                console.error(`Video ${index + 1} failed to load:`, e);
+            });
+        });
+    </script>
+</body>
+</html>

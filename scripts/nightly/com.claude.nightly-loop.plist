@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.claude.nightly-loop</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/ohadfisher/git/boggle-new/scripts/nightly/run.sh</string>
+    </array>
+
+    <!-- Fire at 02:00 local. If mac asleep, launchd silently skips; launchd
+         fires the missed run on next wake. preflight dedups to ONE run per local
+         calendar day (+ a 4h floor) via ~/.cache/lexi-nightly/last-run mtime, so
+         a wake-deferred catch-up runs once and never double-fires. -->
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>2</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/ohadfisher/git/boggle-new</string>
+
+    <!-- launchd inherits no shell PATH. Includes nvm node + homebrew + gcloud. -->
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/Users/ohadfisher/.nvm/versions/node/v22.22.0/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+        <key>HOME</key>
+        <string>/Users/ohadfisher</string>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/Users/ohadfisher/logs/lexi-nightly/launchd-stdout.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ohadfisher/logs/lexi-nightly/launchd-stderr.log</string>
+
+    <key>LowPriorityIO</key>
+    <true/>
+
+    <!-- NOTE: launchd's TimeOut is ADVISORY (passed to the job), NOT a hard
+         SIGKILL deadline — launchd will not force-terminate a running run.sh at
+         3600s. The real caps are the per-lane `gtimeout` wrappers in headless.sh
+         (sum ~99 min worst-case after the 2026-05-21 ceiling raises). Lanes
+         normally finish well under their ceilings; the sequential sum is a
+         safety bound, not the expected runtime. -->
+    <key>TimeOut</key>
+    <integer>3600</integer>
+
+    <!-- Skip if mac asleep at trigger; do NOT wake from sleep. -->
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

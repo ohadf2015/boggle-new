@@ -31,8 +31,10 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": false, // TODO: Enable after fixing remaining array access patterns
 
+    "types": ["vitest/globals"],
     "skipLibCheck": true,
     "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
     "isolatedModules": true,
     "paths": {
       "@/*": [
@@ -54,7 +56,13 @@
   ],
   "exclude": [
     "node_modules",
+    "__mocks__",
+    "e2e",
     "playwright.config.ts",
-    "e2e/**/*"
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "**/__tests__/**",
+    "vitest.setup.ts",
+    "vitest.config.ts"
   ]
 }

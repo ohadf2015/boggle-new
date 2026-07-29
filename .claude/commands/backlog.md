@@ -13,11 +13,11 @@ description: Process bugs from Notion backlog - analyze, fix, and mark for valid
 4. **Analyze each** - Search codebase, identify affected files, root cause hypothesis
 5. **Create todos** - Use TodoWrite for all bugs
 6. **Fix** - Read context, identify root cause, apply minimal fix
-7. **Verify** - `npx tsc --noEmit`, `npm run lint`, `npm run build`
-8. **Document tests** - Steps to verify, expected result, how to reproduce
-9. **Store fix memory** - Record bug pattern and solution
-10. **Update Notion** - Mark as done, add validation section
-11. **Report** - Summary of bugs fixed and test instructions
+7. **Document tests** - Steps to verify, expected result, how to reproduce
+8. **Store fix memory** - Record bug pattern and solution
+9. **Update Notion** - Mark as done, add validation section
+10. **Report** - Summary of bugs fixed and test instructions
+11. **Commit & push** - Use `/commit-push` to verify all checks and push to remote (if user requests commit)
 
 ## Key Rules
 - Analyze in context before fixing
@@ -34,7 +34,7 @@ Search for related bugs and fixes:
 mcp__memory__memory_recall(query="bug [area] [symptom]")
 ```
 
-### Store (Step 9)
+### Store (Step 8)
 After each fix:
 ```
 mcp__memory__memory_store(

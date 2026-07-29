@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { Keyboard } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -78,13 +78,14 @@ export function KeyboardModeIndicator({
   return (
     <AnimatePresence>
       {isVisible && isActive && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -10, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: -10, scale: 0.9 }}
           transition={{ type: 'spring', stiffness: 300, damping: 25 }}
           className={cn(
             'fixed z-50 pointer-events-none',
+            'short:hidden',
             positionClasses[position]
           )}
           role="status"
@@ -116,7 +117,7 @@ export function KeyboardModeIndicator({
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );

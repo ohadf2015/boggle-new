@@ -5,13 +5,17 @@
  */
 
 import type { Avatar, WordDetail, LeaderboardEntry, GameUser, FirstFinderEntry } from '@/shared/types/game';
+import logger from '../utils/logger';
 
 // Base game interface for scoreManager - compatible with both Game and GameState
 
 export interface ScoreGameBase {
   users: Record<string, GameUser>;
   playerScores: Record<string, number>;
+  playerEventBonuses?: Record<string, number>;
   playerWords: Record<string, string[]>;
+  /** O(1) lookup set parallel to playerWords — used for duplicate checking */
+  playerWordsSet?: Record<string, Set<string>>;
 
   playerWordDetails?: Record<string, any[]>;
 
@@ -28,15 +32,63 @@ const leaderboardThrottleTimers: Record<string, ReturnType<typeof setTimeout>> =
 const leaderboardLastBroadcast: Record<string, number> = {};
 const leaderboardPendingUpdate: Record<string, boolean> = {};
 
+// Leaderboard sort cache with dirty flag
+const leaderboardCache: Record<string, LeaderboardPlayer[]> = {};
+const leaderboardDirty: Record<string, boolean> = {};
+// Signature of last broadcast — gate trailing emits when neither order nor scores changed
+const leaderboardLastSignature: Record<string, string> = {};
+
+function leaderboardSignature(lb: LeaderboardPlayer[]): string {
+  let sig = '';
+  for (const p of lb) sig += `${p.username}:${p.score}:${p.wordCount}|`;
+  return sig;
+}
+
+/**
+ * Periodic cleanup of stale leaderboard throttle state.
+ * Removes entries for game codes no longer in the provided active game set.
+ */
+let _staleCleanupInterval: ReturnType<typeof setInterval> | null = null;
+let _activeGamesRef: (() => Set<string>) | null = null;
+
+export function registerActiveGamesProvider(provider: () => Set<string>): void {
+  _activeGamesRef = provider;
+  if (!_staleCleanupInterval) {
+    _staleCleanupInterval = setInterval(() => {
+      if (!_activeGamesRef) return;
+      const activeGames = _activeGamesRef();
+      for (const key of Object.keys(leaderboardThrottleTimers)) {
+        if (!activeGames.has(key)) {
+          clearLeaderboardThrottle(key);
+          delete leaderboardCache[key];
+          delete leaderboardDirty[key];
+          delete leaderboardLastSignature[key];
+        }
+      }
+      for (const key of Object.keys(leaderboardLastBroadcast)) {
+        if (!activeGames.has(key)) {
+          delete leaderboardLastBroadcast[key];
+          delete leaderboardPendingUpdate[key];
+          delete leaderboardCache[key];
+          delete leaderboardDirty[key];
+          delete leaderboardLastSignature[key];
+        }
+      }
+    }, 5 * 60 * 1000); // Every 5 minutes
+  }
+}
+
 export interface AddWordOptions {
   autoValidated?: boolean;
   validated?: boolean | null;
   score?: number;
+  potentialScore?: number;
   comboBonus?: number;
   comboLevel?: number;
   fireRoundMultiplier?: number;
   fireRoundBonus?: number;
   isBot?: boolean;
+  fromLesson?: boolean;
 }
 
 export interface LeaderboardPlayer {
@@ -46,6 +98,7 @@ export interface LeaderboardPlayer {
   avatar?: Avatar;
   isHost: boolean;
   isBot: boolean;
+  comboLevel?: number;
 }
 
 /**
@@ -61,7 +114,7 @@ export function addPlayerWord(
 
   // Defensive check: ensure word is a valid string
   if (!word || typeof word !== 'string') {
-    console.warn(`[SCORE] addPlayerWord called with invalid word: ${word} for user ${username}`);
+    logger.warn('SCORE', 'addPlayerWord called with invalid word', { word, username });
     return;
   }
 
@@ -88,8 +141,16 @@ export function addPlayerWord(
     game.playerAchievements[username] = [];
   }
 
-  // Only add if not already present
-  if (!game.playerWords[username].includes(normalizedWord)) {
+  // Ensure the O(1) lookup set exists
+  if (!game.playerWordsSet) game.playerWordsSet = {};
+  if (!game.playerWordsSet[username]) {
+    // Bootstrap from existing array (handles mid-game initialization)
+    game.playerWordsSet[username] = new Set(game.playerWords[username]);
+  }
+
+  // Only add if not already present (O(1) Set lookup instead of O(n) array scan)
+  if (!game.playerWordsSet[username].has(normalizedWord)) {
+    game.playerWordsSet[username].add(normalizedWord);
     game.playerWords[username].push(normalizedWord);
 
     // Calculate time since game start
@@ -109,7 +170,10 @@ export function addPlayerWord(
       validatedStatus = undefined;
     }
 
-    // Add to playerWordDetails for achievement tracking
+    // Add to playerWordDetails for achievement tracking.
+    // `timestamp` is required for the scoreMultiplier boost to verify a word
+    // was submitted inside the boost window (audit SRV-CRIT-1). It's also used
+    // by pace/achievement analytics already declared on the WordDetail type.
     const wordDetail: WordDetail = {
       word: normalizedWord,
       score: options.score || 0,
@@ -121,6 +185,8 @@ export function addPlayerWord(
       isBot: options.isBot || false,
       fireRoundMultiplier: options.fireRoundMultiplier || 1,
       fireRoundBonus: options.fireRoundBonus || 0,
+      fromLesson: options.fromLesson || false,
+      timestamp: Date.now(),
     };
 
     game.playerWordDetails[username].push(wordDetail);
@@ -133,7 +199,12 @@ export function addPlayerWord(
 export function playerHasWord(game: ScoreGameBase | null, username: string, word: string): boolean {
   if (!game) return false;
   if (!word || typeof word !== 'string') return false;
-  return game.playerWords[username]?.includes(word.toLowerCase()) || false;
+  const normalized = word.toLowerCase();
+  // Use O(1) Set when available, fallback to array scan
+  if (game.playerWordsSet?.[username]) {
+    return game.playerWordsSet[username].has(normalized);
+  }
+  return game.playerWords[username]?.includes(normalized) || false;
 }
 
 /**
@@ -143,7 +214,8 @@ export function updatePlayerScore(
   game: ScoreGameBase | null,
   username: string,
   score: number,
-  isDelta: boolean = false
+  isDelta: boolean = false,
+  gameCode?: string
 ): void {
   if (!game) return;
 
@@ -156,32 +228,66 @@ export function updatePlayerScore(
   } else {
     game.playerScores[username] = score;
   }
+
+  // Mark leaderboard cache as dirty
+  if (gameCode) {
+    leaderboardDirty[gameCode] = true;
+  }
+}
+
+/**
+ * Accumulate a live-only event bonus for a player.
+ *
+ * Golden/lightning/special-word/word-hunt-board + target-finder bonuses are added
+ * to the running `playerScores` total but are NOT stored in per-word details, so the
+ * end-of-game word recompute (scoringEngine.calculateGameScores) can't reconstruct
+ * them. This separate accumulator survives the recompute and is added back into the
+ * final result score so the result page matches the in-game leaderboard.
+ */
+export function addPlayerEventBonus(
+  game: ScoreGameBase | null,
+  username: string,
+  amount: number
+): void {
+  if (!game || !amount) return;
+
+  if (!game.playerEventBonuses) {
+    game.playerEventBonuses = {};
+  }
+  game.playerEventBonuses[username] = (game.playerEventBonuses[username] || 0) + amount;
 }
 
 /**
  * Get leaderboard for a game
  */
-export function getLeaderboard(game: ScoreGameBase | null): LeaderboardPlayer[] {
+export function getLeaderboard(game: ScoreGameBase | null, gameCode?: string): LeaderboardPlayer[] {
   if (!game) return [];
 
-  return Object.entries(game.playerScores)
+  // Return cached result if not dirty
+  if (gameCode && leaderboardCache[gameCode] && !leaderboardDirty[gameCode]) {
+    return leaderboardCache[gameCode];
+  }
+
+  const result = Object.entries(game.playerScores)
     .map(([username, score]) => ({
       username,
       score,
       wordCount: game.playerWords[username]?.length || 0,
       avatar: game.users[username]?.avatar,
       isHost: game.users[username]?.isHost || false,
-      isBot: game.users[username]?.isBot || false
+      isBot: game.users[username]?.isBot || false,
+      comboLevel: game.playerCombos?.[username] || 0,
     }))
-    .filter(player => {
-      // Filter out Host from leaderboard if they haven't found any words
-      // This supports "Broadcast Mode" where the host manages the game but doesn't play
-      if (player.isHost && player.wordCount === 0) {
-        return false;
-      }
-      return true;
-    })
+    // Host is always visible as a player — no broadcast mode filtering
     .sort((a, b) => b.score - a.score);
+
+  // Cache the result
+  if (gameCode) {
+    leaderboardCache[gameCode] = result;
+    leaderboardDirty[gameCode] = false;
+  }
+
+  return result;
 }
 
 /**
@@ -208,6 +314,7 @@ export function getLeaderboardThrottled(
     if (broadcastFn && typeof broadcastFn === 'function') {
       broadcastFn(leaderboard);
     }
+    leaderboardLastSignature[gameCode] = leaderboardSignature(leaderboard);
     leaderboardLastBroadcast[gameCode] = now;
 
     // Clear any pending trailing update since we just broadcasted
@@ -225,13 +332,17 @@ export function getLeaderboardThrottled(
     if (!leaderboardThrottleTimers[gameCode]) {
       const remainingTime = throttleMs - timeSinceLastBroadcast;
       leaderboardThrottleTimers[gameCode] = setTimeout(() => {
-        // Only broadcast if there's actually a pending update
         if (leaderboardPendingUpdate[gameCode]) {
           const leaderboard = getLeaderboard(game);
-          if (broadcastFn && typeof broadcastFn === 'function') {
-            broadcastFn(leaderboard);
+          const sig = leaderboardSignature(leaderboard);
+          // Skip trailing emit if nothing actually changed since last broadcast
+          if (sig !== leaderboardLastSignature[gameCode]) {
+            if (broadcastFn && typeof broadcastFn === 'function') {
+              broadcastFn(leaderboard);
+            }
+            leaderboardLastSignature[gameCode] = sig;
+            leaderboardLastBroadcast[gameCode] = Date.now();
           }
-          leaderboardLastBroadcast[gameCode] = Date.now();
           leaderboardPendingUpdate[gameCode] = false;
         }
         delete leaderboardThrottleTimers[gameCode];
@@ -250,6 +361,9 @@ export function clearLeaderboardThrottle(gameCode: string): void {
   }
   delete leaderboardLastBroadcast[gameCode];
   delete leaderboardPendingUpdate[gameCode];
+  delete leaderboardCache[gameCode];
+  delete leaderboardDirty[gameCode];
+  delete leaderboardLastSignature[gameCode];
 }
 
 /**
@@ -260,7 +374,9 @@ export function resetScoresForNewRound(game: ScoreGameBase | null): void {
 
   // COMPLETELY clear all game data first to prevent stale data from previous games
   game.playerScores = {};
+  game.playerEventBonuses = {}; // pairs with playerScores — must reset so bonuses don't bleed into the next round
   game.playerWords = {};
+  game.playerWordsSet = {};
   game.playerWordDetails = {};
   game.playerAchievements = {};
   game.playerCombos = {}; // Reset combo tracking for new round
@@ -274,6 +390,7 @@ export function resetScoresForNewRound(game: ScoreGameBase | null): void {
     game.playerWordDetails[username] = [];
     game.playerAchievements[username] = [];
     game.playerCombos[username] = 0; // Initialize combo tracking
+    game.playerWordsSet[username] = new Set<string>();
   }
 }
 
@@ -307,7 +424,7 @@ export function recordFirstFinder(
   game: ScoreGameBase | null,
   word: string,
   username: string,
-  avatar?: Partial<Avatar> | null
+  avatar?: Partial<Avatar> | null | undefined
 ): boolean {
   if (!game || !word) return false;
 
@@ -368,6 +485,7 @@ module.exports = {
 
   // Reset
   resetScoresForNewRound,
+  registerActiveGamesProvider,
 
   // First-finder tracking (for first-to-find scoring)
   getFirstFinder,

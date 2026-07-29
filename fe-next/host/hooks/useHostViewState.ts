@@ -8,12 +8,13 @@
  * Provides both game settings state and game runtime state.
  */
 
-import { useState, useCallback, useMemo, useRef, MutableRefObject } from 'react';
+import { useState, useCallback, useMemo, useRef, useEffect, MutableRefObject } from 'react';
 import { generateRandomTable } from '@/utils/utils';
 import { DIFFICULTIES, DEFAULT_DIFFICULTY, DEFAULT_MIN_WORD_LENGTH } from '@/utils/consts';
-import type { Language, LetterGrid, DifficultyLevel, Avatar } from '@/types';
+import type { Language, LetterGrid, DifficultyLevel } from '@/types';
 import type { Player } from '@/hooks/useGameState';
 import type { BoardTheme } from '@/shared/types/socket';
+import type { FinalScoresState } from './socket/useHostGameEvents';
 import { useLocalStorageState } from '@/hooks/useLocalStorageState';
 
 // ==========================================
@@ -25,16 +26,6 @@ export interface TournamentData {
   totalRounds?: number;
   standings?: unknown[];
   isComplete?: boolean;
-}
-
-export interface FinalScoresData {
-  players: Array<{
-    username: string;
-    score: number;
-    wordsFound: number;
-    avatar?: Avatar;
-  }>;
-  gameCode: string;
 }
 
 export interface XpGainedData {
@@ -81,20 +72,20 @@ export interface PlayerTrackingState {
   playersReady: Player[];
   playerWordCounts: Record<string, number>;
   playerScores: Record<string, number>;
-  playerAchievements: Record<string, string[]>;
+  playerAchievements: Record<string, unknown[]>;
 }
 
 // Host-specific playing state
 export interface HostPlayingState {
   hostFoundWords: string[];
-  hostAchievements: string[];
+  hostAchievements: unknown[];
 }
 
 // Tournament state
 export interface TournamentState {
   tournamentData: TournamentData | null;
   tournamentCreating: boolean;
-  finalScores: FinalScoresData | null;
+  finalScores: FinalScoresState | null;
 }
 
 // Animation state
@@ -108,6 +99,7 @@ export interface HostUIState {
   showQR: boolean;
   showExitConfirm: boolean;
   showCancelTournamentDialog: boolean;
+  showSoloConfirm: boolean;
 }
 
 // Combo state (matching PlayerView pattern)
@@ -168,7 +160,7 @@ export interface UseHostViewStateReturn {
   tournament: TournamentState;
   setTournamentData: React.Dispatch<React.SetStateAction<TournamentData | null>>;
   setTournamentCreating: React.Dispatch<React.SetStateAction<boolean>>;
-  setFinalScores: React.Dispatch<React.SetStateAction<FinalScoresData | null>>;
+  setFinalScores: React.Dispatch<React.SetStateAction<FinalScoresState | null>>;
 
   // Animation
   animation: AnimationState;
@@ -180,6 +172,7 @@ export interface UseHostViewStateReturn {
   setShowQR: React.Dispatch<React.SetStateAction<boolean>>;
   setShowExitConfirm: React.Dispatch<React.SetStateAction<boolean>>;
   setShowCancelTournamentDialog: React.Dispatch<React.SetStateAction<boolean>>;
+  setShowSoloConfirm: React.Dispatch<React.SetStateAction<boolean>>;
 
   // Combo
   combo: ComboState;
@@ -234,9 +227,21 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   // ==========================================
   const [difficulty, setDifficulty] = useState<DifficultyLevel>(DEFAULT_DIFFICULTY);
   const [minWordLength, setMinWordLength] = useState<number>(DEFAULT_MIN_WORD_LENGTH);
-  const [timerValue, setTimerValue] = useState<number>(1);
+  const [timerValue, setTimerValue] = useState<number>(1.5); // 1:30 default (minutes)
   const [timerDirection, setTimerDirection] = useState<number>(0);
   const [hostPlayingEnabled, setHostPlayingEnabled] = useLocalStorageState<boolean>('host_broadcast_mode_enabled', true);
+
+  // On mobile devices, TV mode (broadcast) should always be off — force hostPlaying=true
+  // This prevents a desktop TV-mode toggle from carrying over to mobile via localStorage
+  const isMobileRef = useRef(
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches
+  );
+  useEffect(() => {
+    if (isMobileRef.current && !hostPlayingEnabled) {
+      setHostPlayingEnabled(true);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const [gameType, setGameType] = useState<'regular' | 'tournament'>('regular');
   const [tournamentRounds, setTournamentRounds] = useState<number>(3);
 
@@ -268,7 +273,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   // ==========================================
   const [tournamentData, setTournamentData] = useState<TournamentData | null>(null);
   const [tournamentCreating, setTournamentCreating] = useState<boolean>(false);
-  const [finalScores, setFinalScores] = useState<FinalScoresData | null>(null);
+  const [finalScores, setFinalScores] = useState<FinalScoresState | null>(null);
 
   // ==========================================
   // Animation State
@@ -282,6 +287,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
   const [showQR, setShowQR] = useState<boolean>(false);
   const [showExitConfirm, setShowExitConfirm] = useState<boolean>(false);
   const [showCancelTournamentDialog, setShowCancelTournamentDialog] = useState<boolean>(false);
+  const [showSoloConfirm, setShowSoloConfirm] = useState<boolean>(false);
 
   // ==========================================
   // Combo State
@@ -364,7 +370,8 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     showQR,
     showExitConfirm,
     showCancelTournamentDialog,
-  }), [showQR, showExitConfirm, showCancelTournamentDialog]);
+    showSoloConfirm,
+  }), [showQR, showExitConfirm, showCancelTournamentDialog, showSoloConfirm]);
 
   const combo = useMemo<ComboState>(() => ({
     level: comboLevel,
@@ -487,6 +494,7 @@ export function useHostViewState(options: UseHostViewStateOptions = {}): UseHost
     setShowQR,
     setShowExitConfirm,
     setShowCancelTournamentDialog,
+    setShowSoloConfirm,
 
     // Combo
     combo,

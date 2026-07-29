@@ -39,7 +39,8 @@ const HAPTIC_PATTERNS: Record<HapticPattern, HapticConfig> = {
  * triggerHaptic('light'); // Light tap for button press
  */
 export function triggerHaptic(pattern: HapticPattern): boolean {
-  if (!window.navigator?.vibrate) {
+  // Client components still render once on the server — bail before touching window.
+  if (typeof window === 'undefined' || !window.navigator?.vibrate) {
     return false;
   }
 
@@ -59,7 +60,7 @@ export function triggerHaptic(pattern: HapticPattern): boolean {
  * triggerCustomHaptic([100, 50, 100]); // Vibrate-pause-vibrate pattern
  */
 export function triggerCustomHaptic(duration: number | number[]): boolean {
-  if (!window.navigator?.vibrate) {
+  if (typeof window === 'undefined' || !window.navigator?.vibrate) {
     return false;
   }
 
@@ -71,6 +72,7 @@ export function triggerCustomHaptic(duration: number | number[]): boolean {
  * Check if haptic feedback is supported on the device
  */
 export function isHapticSupported(): boolean {
+  if (typeof window === 'undefined') return false;
   return !!(window.navigator?.vibrate);
 }
 
@@ -78,6 +80,7 @@ export function isHapticSupported(): boolean {
  * Stop any ongoing haptic feedback
  */
 export function stopHaptic(): void {
+  if (typeof window === 'undefined') return;
   if (window.navigator?.vibrate) {
     window.navigator.vibrate(0);
   }

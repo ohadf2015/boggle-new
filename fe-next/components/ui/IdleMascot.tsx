@@ -1,26 +1,44 @@
 'use client';
 
 import { memo } from 'react';
+import { m } from 'framer-motion';
 import InteractiveMascot, {
   type ExtendedMascotVariant,
   type ActivityVariant,
   type InteractiveMascotProps,
 } from './InteractiveMascot';
-import { useRandomMascotActivity, DEFAULT_IDLE_ACTIVITIES } from '@/hooks/useRandomMascotActivity';
+import type { MascotVariant } from './Mascot';
+import { useRandomMascotActivity, DEFAULT_IDLE_ACTIVITIES, DEFAULT_BASE_VARIANTS } from '@/hooks/useRandomMascotActivity';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
+
+/**
+ * NOTE: IdleMascot uses GIF-ONLY architecture
+ * ALL mascot variants are now animated GIFs (main-nobg.gif, play-nobg.gif, study-nobg.gif, oops-nobg.gif)
+ * Extended variants (activities, moods) automatically map to one of the 4 base GIF variants
+ * via getBaseVariant() in InteractiveMascot.tsx
+ */
 
 interface IdleMascotProps extends Omit<InteractiveMascotProps, 'variant'> {
   /** Base variant when not doing activities */
   baseVariant: ExtendedMascotVariant;
+  /** Additional base variants to cycle through for variety */
+  baseVariants?: MascotVariant[];
   /** List of activities to randomly choose from (defaults to all fun activities) */
   activities?: ActivityVariant[];
-  /** Min interval between activities in ms (default: 10000 = 10s) */
+  /** Min delay before first activity in ms (default: 8000 = 8s) */
+  initialDelayMin?: number;
+  /** Max delay before first activity in ms (default: 15000 = 15s) */
+  initialDelayMax?: number;
+  /** Min interval between subsequent activities in ms (default: 45000 = 45s) */
   minInterval?: number;
-  /** Max interval between activities in ms (default: 30000 = 30s) */
+  /** Max interval between subsequent activities in ms (default: 90000 = 90s) */
   maxInterval?: number;
   /** How long to show activity before returning to base in ms (default: 4000 = 4s) */
   activityDuration?: number;
   /** Whether to enable random activities (default: true) */
   enableIdleActivities?: boolean;
+  /** Enable cycling through different base variants (default: true for maximum variety) */
+  cycleBaseVariants?: boolean;
 }
 
 /**
@@ -56,21 +74,29 @@ interface IdleMascotProps extends Omit<InteractiveMascotProps, 'variant'> {
  */
 export const IdleMascot = memo(function IdleMascot({
   baseVariant,
+  baseVariants = DEFAULT_BASE_VARIANTS,
   activities = DEFAULT_IDLE_ACTIVITIES,
-  minInterval = 10000,
-  maxInterval = 30000,
+  initialDelayMin = 8000,
+  initialDelayMax = 15000,
+  minInterval = 45000,
+  maxInterval = 90000,
   activityDuration = 4000,
   enableIdleActivities = true,
+  cycleBaseVariants = true,
   onClick,
   ...interactiveMascotProps
 }: IdleMascotProps) {
   const { currentVariant, triggerActivity } = useRandomMascotActivity({
     baseVariant,
+    baseVariants,
     activities,
+    initialDelayMin,
+    initialDelayMax,
     minInterval,
     maxInterval,
     activityDuration,
     enabled: enableIdleActivities,
+    cycleBaseVariants,
   });
 
   const handleClick = () => {
@@ -85,6 +111,35 @@ export const IdleMascot = memo(function IdleMascot({
       onClick={handleClick}
       {...interactiveMascotProps}
     />
+  );
+});
+
+/**
+ * IdleMascotWithEntrance - IdleMascot with spring entrance animation
+ *
+ * Same as IdleMascot but with a nice pop-in effect on mount.
+ * Perfect for landing pages and sections where the mascot should appear with flair.
+ */
+export const IdleMascotWithEntrance = memo(function IdleMascotWithEntrance({
+  delay = 0,
+  ...props
+}: IdleMascotProps & { delay?: number }) {
+  const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
+  const shouldAnimate = !prefersReducedMotion && enableComplexAnimations;
+
+  return (
+    <m.div
+      initial={shouldAnimate ? { opacity: 0, y: 12 } : undefined}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        type: 'spring',
+        stiffness: 260,
+        damping: 20,
+        delay,
+      }}
+    >
+      <IdleMascot {...props} />
+    </m.div>
   );
 });
 

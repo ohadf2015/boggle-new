@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Target, Grid3X3, Share2, Trophy, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
@@ -34,22 +34,22 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
   };
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ delay: 0.35, type: 'spring' }}
       className="relative w-full"
     >
       {/* Main Card - Neo-Brutalist Style */}
-      <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-gradient-to-br from-neo-lime via-neo-orange to-neo-lime shadow-hard-lg">
+      <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-linear-to-br from-neo-lime via-neo-pink to-neo-lime shadow-hard-lg">
         {/* Sparkle Decoration */}
         <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2 z-10">
-          <motion.div
+          <m.div
             animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+            transition={{ type: 'tween', duration: 3, repeat: Infinity, ease: 'linear' }}
           >
             <Sparkles className="w-7 h-7 text-neo-pink drop-shadow-lg" fill="currentColor" />
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Content Container */}
@@ -57,11 +57,11 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
           {/* Header with Mascot */}
           <div className="flex items-start gap-4">
             {/* Mascot */}
-            <motion.div
+            <m.div
               initial={{ scale: 0, rotate: -20 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ delay: 0.4, type: 'spring', stiffness: 200 }}
-              className="flex-shrink-0"
+              className="shrink-0"
             >
               <InteractiveMascot
                 variant="excited"
@@ -71,10 +71,10 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
                 clickAnimation="bounce"
                 tooltip={t('daily.createChallengeFeature.title')}
               />
-            </motion.div>
+            </m.div>
 
             {/* Title & Subtitle */}
-            <motion.div
+            <m.div
               initial={{ x: -10, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.45 }}
@@ -86,48 +86,48 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
               <p className="text-sm font-bold text-neo-black/80">
                 {t('daily.createChallengeFeature.subtitle')}
               </p>
-            </motion.div>
+            </m.div>
           </div>
 
           {/* Benefits Grid */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
             className="grid grid-cols-1 sm:grid-cols-2 gap-2"
           >
             {benefits.map((benefit, idx) => (
-              <motion.div
+              <m.div
                 key={benefit.key}
                 initial={{ x: -10, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ delay: 0.55 + idx * 0.05 }}
-                className="flex items-start gap-2 bg-neo-black/10 rounded-lg p-2.5 backdrop-blur-sm"
+                className="flex items-start gap-2 bg-neo-black/10 rounded-lg p-2.5 backdrop-blur-xs"
               >
-                <benefit.icon className="w-5 h-5 text-neo-black flex-shrink-0 mt-0.5" strokeWidth={2.5} />
+                <benefit.icon className="w-5 h-5 text-neo-black shrink-0 mt-0.5" strokeWidth={2.5} />
                 <span className="text-sm font-bold text-neo-black leading-snug">
                   {t(`daily.createChallengeFeature.benefits.${benefit.key}`)}
                 </span>
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
 
           {/* CTA Button */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.75 }}
           >
             <Button
               onClick={handleSignUpClick}
-              className="w-full py-4 text-base font-black uppercase bg-neo-black text-neo-lime border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-black/90 hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm transition-all tracking-wide"
+              className="w-full max-w-btn py-4 text-base font-black uppercase bg-neo-black text-neo-lime border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:bg-neo-black/90 hover:-translate-y-1 active:translate-y-0 active:shadow-hard-sm transition-all tracking-wide"
             >
               {t('daily.createChallengeFeature.ctaButton')}
             </Button>
-          </motion.div>
+          </m.div>
 
           {/* Social Proof */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.85 }}
@@ -137,7 +137,7 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
               <span className="inline-block w-2 h-2 rounded-full bg-neo-lime animate-pulse" />
               {t('daily.createChallengeFeature.socialProof')}
             </p>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Decorative Background Pattern */}
@@ -147,7 +147,7 @@ export const UnauthenticatedCreateChallengeSection: React.FC<UnauthenticatedCrea
           <div className="absolute top-1/2 right-6 w-8 h-8 bg-neo-black rounded-full" />
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

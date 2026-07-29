@@ -26,6 +26,10 @@ export interface GuestStats {
   archetypeCounts?: Record<string, number>; // Track archetype frequency
   averageWordLength?: number;
   bestCombo?: number;
+  // Personal bests for results page badges
+  bestGameScore?: number;
+  bestWordCount?: number;
+  bestAccuracy?: number;
 }
 
 export interface GameResult {
@@ -71,7 +75,9 @@ export function getGuestSessionId(): string | null {
 
   let sessionId = getFromStorage(GUEST_SESSION_KEY);
   if (!sessionId) {
-    sessionId = crypto.randomUUID();
+    sessionId = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : Math.random().toString(36).substring(2) + Date.now().toString(36);
     saveToStorage(GUEST_SESSION_KEY, sessionId);
   }
   return sessionId;
@@ -108,10 +114,17 @@ export function getGuestStats(): GuestStats {
 }
 
 /**
- * Save guest stats to storage (both localStorage and sessionStorage)
+ * Save guest stats to storage (both localStorage and sessionStorage).
+ *
+ * Dispatches `guestStatsChanged` so provider-level subscribers (signup prompt,
+ * header chips) re-evaluate after a game updates stats. Without this, hooks
+ * that read stats once on mount never see post-game wins.
  */
 export function saveGuestStats(stats: GuestStats): void {
   saveJsonToStorage(GUEST_STATS_KEY, stats);
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('guestStatsChanged'));
+  }
 }
 
 /**
@@ -163,6 +176,14 @@ export function updateGuestStatsAfterGame(gameResult: GameResult): GuestStats {
   // Track best combo
   if (gameResult.maxCombo && gameResult.maxCombo > (stats.bestCombo || 0)) {
     stats.bestCombo = gameResult.maxCombo;
+  }
+
+  // Track personal bests for results page badges
+  if (gameResult.score && gameResult.score > (stats.bestGameScore || 0)) {
+    stats.bestGameScore = gameResult.score;
+  }
+  if (gameResult.wordCount && gameResult.wordCount > (stats.bestWordCount || 0)) {
+    stats.bestWordCount = gameResult.wordCount;
   }
 
   // Update average word length (running average)

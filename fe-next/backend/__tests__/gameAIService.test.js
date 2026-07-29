@@ -4,24 +4,24 @@
  */
 
 // Mock the dependencies before importing the module
-jest.mock('@google-cloud/vertexai', () => ({
-  VertexAI: jest.fn().mockImplementation(() => ({
-    getGenerativeModel: jest.fn().mockReturnValue({
-      generateContent: jest.fn(),
-    }),
+vi.mock('@google/genai', () => ({
+  GoogleGenAI: vi.fn().mockImplementation(() => ({
+    models: {
+      generateContent: vi.fn(),
+    },
   })),
 }));
 
-jest.mock('@supabase/supabase-js', () => ({
-  createClient: jest.fn().mockReturnValue({
-    from: jest.fn().mockReturnValue({
-      select: jest.fn().mockReturnThis(),
-      eq: jest.fn().mockReturnThis(),
-      limit: jest.fn().mockReturnThis(),
-      maybeSingle: jest.fn().mockResolvedValue({ data: null, error: null }),
-      insert: jest.fn().mockResolvedValue({ error: null }),
-      update: jest.fn().mockReturnThis(),
-      upsert: jest.fn().mockResolvedValue({ error: null }),
+vi.mock('@supabase/supabase-js', () => ({
+  createClient: vi.fn().mockReturnValue({
+    from: vi.fn().mockReturnValue({
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockReturnThis(),
+      maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+      insert: vi.fn().mockResolvedValue({ error: null }),
+      update: vi.fn().mockReturnThis(),
+      upsert: vi.fn().mockResolvedValue({ error: null }),
     }),
   }),
 }));
@@ -35,21 +35,19 @@ process.env.GOOGLE_CREDENTIALS_JSON = JSON.stringify({
 process.env.NEXT_PUBLIC_SUPABASE_URL = 'https://test.supabase.co';
 process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-key';
 
-const {
-  gameAIService,
+import { vi, describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import { gameAIService,
   GameAIService,
   getTokenUsage,
   resetTokenUsage,
   getCacheStats,
-  clearCache,
-} = require('../modules/gameAIService');
-
+  clearCache, } from '../modules/gameAIService';
 describe('GameAIService', () => {
   beforeEach(() => {
     // Reset state before each test
     resetTokenUsage();
     clearCache();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('WordValidationCache', () => {

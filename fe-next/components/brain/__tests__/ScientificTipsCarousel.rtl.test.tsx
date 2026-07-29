@@ -5,25 +5,33 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 
 // Mock dependencies BEFORE imports
-jest.mock('@/utils/ThemeContext', () => ({
+vi.mock('@/utils/ThemeContext', () => ({
   useTheme: () => ({ theme: 'dark' }),
 }));
 
 // Mock framer-motion to avoid matchMedia issues
-jest.mock('framer-motion', () => ({
-  motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+vi.mock('framer-motion', () => ({
+  m: {
+    div: ({ children, ...props }: any) => {
+      // Filter out framer-motion specific props
+      const { custom, variants, initial, animate, exit, transition, layoutId, ...htmlProps } = props;
+      return <div {...htmlProps}>{children}</div>;
+    },
+    span: ({ children, ...props }: any) => {
+      const { layoutId, transition, ...htmlProps } = props;
+      return <span {...htmlProps}>{children}</span>;
+    },
   },
   AnimatePresence: ({ children }: any) => children,
 }));
 
 const mockDir = { current: 'ltr' };
-jest.mock('@/contexts/LanguageContext', () => ({
+vi.mock('@/contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     dir: mockDir.current,
     language: mockDir.current === 'rtl' ? 'he' : 'en',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     currentFlag: '🇺🇸',
   }),
 }));
@@ -48,8 +56,8 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
 
     // After clicking previous from index 0, should be at index 4 (wrap around)
     const dots = screen.getAllByLabelText(/Go to tip/i);
-    // The 5th dot (index 4) should be active
-    expect(dots[4]).toHaveClass('scale-125');
+    // The 5th dot (index 4) should be active (w-6 for active state)
+    expect(dots[4]).toHaveClass('w-6');
   });
 
   it('should navigate to previous tip when LEFT arrow is clicked in RTL (arrows flip visually, not semantically)', () => {
@@ -65,8 +73,8 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
     fireEvent.click(leftVisualButton);
 
     const dots = screen.getAllByLabelText(/Go to tip/i);
-    // Should wrap to index 4
-    expect(dots[4]).toHaveClass('scale-125');
+    // Should wrap to index 4 (w-6 for active state)
+    expect(dots[4]).toHaveClass('w-6');
   });
 
   it('should navigate to next tip when RIGHT arrow is clicked in RTL', () => {
@@ -80,7 +88,8 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
     fireEvent.click(rightVisualButton);
 
     const dots = screen.getAllByLabelText(/Go to tip/i);
-    expect(dots[1]).toHaveClass('scale-125');
+    // Active dot has w-6 class
+    expect(dots[1]).toHaveClass('w-6');
   });
 
   it('should have consistent navigation behavior in LTR and RTL', () => {
@@ -92,7 +101,8 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
 
     fireEvent.click(leftButton);
     let dots = screen.getAllByLabelText(/Go to tip/i);
-    const ltrPreviousIndex = dots.findIndex(dot => dot.classList.contains('scale-125'));
+    // Active dot has w-6 class instead of scale-150
+    const ltrPreviousIndex = dots.findIndex(dot => dot.classList.contains('w-6'));
     unmount1();
 
     // Test RTL - fresh render
@@ -103,7 +113,7 @@ describe('ScientificTipsCarousel - RTL Arrow Direction', () => {
 
     fireEvent.click(leftButton);
     dots = screen.getAllByLabelText(/Go to tip/i);
-    const rtlPreviousIndex = dots.findIndex(dot => dot.classList.contains('scale-125'));
+    const rtlPreviousIndex = dots.findIndex(dot => dot.classList.contains('w-6'));
 
     // Both should navigate to the same semantic position (previous)
     expect(ltrPreviousIndex).toBe(rtlPreviousIndex);

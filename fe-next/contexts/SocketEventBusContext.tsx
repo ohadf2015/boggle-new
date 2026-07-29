@@ -21,6 +21,7 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useRef, ReactNode, useCallback, useMemo } from 'react';
+import logger from '@/utils/logger';
 
 // ==========================================
 // Event Emitter Implementation
@@ -78,7 +79,7 @@ class EventBus {
         try {
           handler(data);
         } catch (error) {
-          console.error(`Error in event handler for "${eventName}":`, error);
+          logger.error(`Error in event handler for "${eventName}":`, error);
         }
       });
     }
@@ -217,7 +218,7 @@ export function useSocketEventBus(): SocketEventBusContextValue {
  * @example
  * ```tsx
  * function MyComponent() {
- *   const { username } = useGameStateContext();
+ *   const username = useUsername(); // from @/hooks/gameState/store
  *
  *   useSocketEvent('wordAccepted', (data) => {
  *     console.log('Word accepted:', data.word);

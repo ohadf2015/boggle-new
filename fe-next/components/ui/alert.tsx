@@ -11,8 +11,8 @@ const alertVariants = cva(
     "rounded-neo-lg border-3 border-neo-black",
     "p-4",
     "shadow-hard",
-    "[&>svg~*]:pl-8 rtl:[&>svg~*]:pl-0 rtl:[&>svg~*]:pr-8 [&>svg+div]:translate-y-[-3px]",
-    "[&>svg]:absolute [&>svg]:left-4 rtl:[&>svg]:left-auto rtl:[&>svg]:right-4 [&>svg]:top-4 [&>svg]:h-5 [&>svg]:w-5 [&>svg]:stroke-[2.5]",
+    "[&>svg~*]:ps-8 [&>svg+div]:translate-y-[-3px]",
+    "[&>svg]:absolute [&>svg]:start-4 [&>svg]:top-4 [&>svg]:h-5 [&>svg]:w-5 [&>svg]:stroke-[2.5]",
   ].join(" "),
   {
     variants: {

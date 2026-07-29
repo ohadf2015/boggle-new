@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react';
 import { useReportWebVitals } from 'next/web-vitals';
 import { trackEvent } from './GoogleAnalytics';
+import { getPerfVariant } from '@/utils/perfVariant';
 
 /**
  * Web Vitals Reporter Component
@@ -34,10 +35,28 @@ function getDeviceType(): 'mobile' | 'tablet' | 'desktop' {
 function getConnectionType(): string | null {
   if (typeof window === 'undefined') return null;
   if ('connection' in navigator) {
-    const conn = (navigator as any).connection;
+    const conn = (navigator as Navigator & { connection?: { effectiveType?: string } }).connection;
     return conn?.effectiveType || null;
   }
   return null;
+}
+
+function getNavigationTiming(): Record<string, number> | null {
+  if (typeof performance === 'undefined') return null;
+  const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+  if (!nav) return null;
+
+  return {
+    redirect: nav.redirectEnd - nav.redirectStart,
+    dns: nav.domainLookupEnd - nav.domainLookupStart,
+    connect: nav.connectEnd - nav.connectStart,
+    tls: nav.secureConnectionStart > 0 ? nav.connectEnd - nav.secureConnectionStart : 0,
+    request: nav.responseStart - nav.requestStart,
+    response: nav.responseEnd - nav.responseStart,
+    domInteractive: nav.domInteractive,
+    domContentLoaded: nav.domContentLoadedEventEnd,
+    loadEventEnd: nav.loadEventEnd,
+  };
 }
 
 // Get or create session ID (persists for 30 minutes)
@@ -70,6 +89,7 @@ export function WebVitalsReporter() {
   const reported = useRef<Set<string>>(new Set());
 
   useReportWebVitals((metric) => {
+    const perfVariant = getPerfVariant();
     // Send to Google Analytics
     trackEvent('web_vitals', {
       metric_name: metric.name,
@@ -77,6 +97,7 @@ export function WebVitalsReporter() {
       metric_rating: metric.rating,
       metric_delta: Math.round(metric.delta),
       metric_id: metric.id,
+      perf_variant: perfVariant || 'control',
     });
 
     // Log to console in development for debugging
@@ -106,11 +127,13 @@ export function WebVitalsReporter() {
         connection_type: getConnectionType(),
         navigation_type: metric.navigationType,
         session_id: getSessionId(),
-        user_agent: navigator.userAgent,
+        user_agent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
         metadata: {
           id: metric.id,
           navigationType: metric.navigationType,
-          delta: metric.delta
+          delta: metric.delta,
+          perfVariant,
+          navigationTiming: getNavigationTiming(),
         }
       };
 
@@ -138,7 +161,7 @@ export function WebVitalsReporter() {
       });
 
       // Use sendBeacon if available, otherwise fetch
-      if (navigator.sendBeacon) {
+      if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
         navigator.sendBeacon(process.env.NEXT_PUBLIC_WEB_VITALS_ENDPOINT, body);
       } else {
         fetch(process.env.NEXT_PUBLIC_WEB_VITALS_ENDPOINT, {

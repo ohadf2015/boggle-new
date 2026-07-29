@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useCallback, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useMemo, useEffect, type ReactNode } from 'react';
 
 /**
  * Navigation Context
@@ -29,20 +29,23 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
   const [isInGame, setIsInGame] = useState(false);
   const [activeTab, setActiveTab] = useState<'home' | 'brain' | 'profile'>('home');
 
-  const handleSetIsInGame = useCallback((value: boolean) => {
-    setIsInGame(value);
-  }, []);
-
-  const handleSetActiveTab = useCallback((tab: 'home' | 'brain' | 'profile') => {
-    setActiveTab(tab);
-  }, []);
+  // Lock body scroll during gameplay to prevent content from scrolling behind sticky headers
+  useEffect(() => {
+    if (isInGame) {
+      document.body.classList.add('screen-fit-locked');
+      document.body.classList.remove('screen-fit');
+    } else {
+      document.body.classList.remove('screen-fit-locked');
+      document.body.classList.add('screen-fit');
+    }
+  }, [isInGame]);
 
   const value = useMemo(() => ({
     isInGame,
-    setIsInGame: handleSetIsInGame,
+    setIsInGame,
     activeTab,
-    setActiveTab: handleSetActiveTab,
-  }), [isInGame, handleSetIsInGame, activeTab, handleSetActiveTab]);
+    setActiveTab,
+  }), [isInGame, activeTab]);
 
   return (
     <NavigationContext.Provider value={value}>
@@ -63,13 +66,19 @@ export function useNavigation() {
   return context;
 }
 
+const NOOP_SET_IN_GAME = (_value: boolean) => {};
+
 /**
  * Hook to hide/show the bottom navigation during gameplay.
  * Call setIsInGame(true) when entering a game, and setIsInGame(false) when exiting.
+ *
+ * Degrades to a no-op when used outside a NavigationProvider (e.g. isolated
+ * component tests) instead of throwing — the worst case is the nav simply
+ * doesn't auto-hide. In the app the provider is always mounted by the layout.
  */
 export function useHideNavigation() {
-  const { setIsInGame } = useNavigation();
-  return setIsInGame;
+  const context = useContext(NavigationContext);
+  return context?.setIsInGame ?? NOOP_SET_IN_GAME;
 }
 
 export default NavigationContext;

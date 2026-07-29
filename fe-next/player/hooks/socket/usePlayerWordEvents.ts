@@ -9,14 +9,14 @@ import { useCallback, MutableRefObject, RefObject, useMemo } from 'react';
 import { Socket } from 'socket.io-client';
 import toast from 'react-hot-toast';
 import {
-  wordAIValidatingToast,
   wordErrorToast,
   neoSuccessToast,
   neoInfoToast,
   neoWarningToast,
+  TOAST_ICONS,
 } from '../../../components/NeoToast';
 import { calculateComboChainWindow, calculateComboTimeout, resetComboState } from '@/shared/utils/comboUtils';
-import { useGameStateContext } from '@/contexts/GameStateContext';
+import { useFoundWords, useGameActions, useGameStore } from '@/hooks/gameState';
 import { useSafeSocketEvents } from '@/hooks/useSafeSocketEvent';
 import { useHapticFeedback, GAME_HAPTICS } from '@/hooks/useHapticFeedback';
 import logger from '@/utils/logger';
@@ -29,6 +29,19 @@ import type {
   WordBlockedByCooldownPayload
 } from '@/shared/types/spam';
 
+import type { WordToVote } from '@/player/types';
+
+interface WordLifecyclePayload { word: string }
+interface WordFeedbackRequestPayload {
+  word: string;
+  submittedBy: string;
+  submitterAvatar?: { emoji?: string; color?: string };
+  timeoutSeconds?: number;
+  gameCode: string;
+  language: string;
+}
+interface VoteRecordedPayload { success?: boolean }
+
 interface UsePlayerWordEventsProps {
   socket: Socket | null;
   t: (key: string) => string;
@@ -38,9 +51,9 @@ interface UsePlayerWordEventsProps {
 
   // Word feedback state (local to PlayerView, not in GameState)
   setShowWordFeedback: React.Dispatch<React.SetStateAction<boolean>>;
-  setWordToVote: React.Dispatch<React.SetStateAction<any>>;
+  setWordToVote: React.Dispatch<React.SetStateAction<WordToVote | null>>;
 
-  // Combo refs and setters (TODO: refactor to use context actions)
+  // Combo refs and setters
   comboLevelRef: MutableRefObject<number>;
   lastWordTimeRef: MutableRefObject<number | null>;
   setComboLevel: React.Dispatch<React.SetStateAction<number>>;
@@ -70,8 +83,9 @@ export function usePlayerWordEvents({
   comboTimeoutRef,
   comboShieldsUsedRef,
 }: UsePlayerWordEventsProps): void {
-  // Get foundWords state from context (no more prop drilling!)
-  const { foundWords, setFoundWords } = useGameStateContext();
+  // Get foundWords state from Zustand store (selective subscription for performance)
+  const foundWords = useFoundWords();
+  const { setFoundWords } = useGameActions();
 
   // Haptic feedback for word events
   const { customHaptic } = useHapticFeedback();
@@ -137,6 +151,7 @@ export function usePlayerWordEvents({
               comboBonus: data.comboBonus ?? 0,
               fireRoundBonus: data.fireRoundBonus ?? 0,
               fireRoundMultiplier: data.fireRoundMultiplier ?? 1,
+              inputMethod: data.inputMethod ?? fw.inputMethod,
             }
           : fw
       ));
@@ -158,8 +173,13 @@ export function usePlayerWordEvents({
           customHaptic(GAME_HAPTICS.comboLevelUp);
         } else {
           newComboLevel = 0;
-          setComboLevel(0);
-          comboLevelRef.current = 0;
+          // Guard: avoid re-rendering ComboDisplay when already at 0.
+          // Without this, every non-chained word triggers setComboLevel(0)
+          // and re-paints the combo subtree mid-game.
+          if (currentComboLevel !== 0) {
+            setComboLevel(0);
+            comboLevelRef.current = 0;
+          }
         }
         setLastWordTime(now);
         lastWordTimeRef.current = now;
@@ -179,24 +199,19 @@ export function usePlayerWordEvents({
         resetCombo();
       }
 
+      // Handle merged blast data (Fix 2) — extract from wordAccepted instead of separate blastWordAccepted
+      if (data.blast) {
+        const store = useGameStore.getState();
+        // Note: blastMovesUsed removed (timer-era Blast tracks boardClears server-side)
+        store.setBlastTotalTileBonus((prev: number) => prev + (data.blast!.tileBonus || 0));
+        store.setBlastTotalTilesCleared((prev: number) => prev + (data.blast!.tilesCleared?.length || 0));
+      }
+
       // Note: WordFormingArea now handles word accepted feedback visually
       // Toast removed to avoid duplicate notifications
     }, [inputRef, setFoundWords, comboLevelRef, lastWordTimeRef, setComboLevel, setLastWordTime, comboTimeoutRef, playComboSound, resetCombo, customHaptic]);
 
-  const handleWordNeedsValidation = useCallback((data: any) => {
-    // Note: WordFormingArea now handles pending feedback visually
-    resetCombo();
-  }, [resetCombo]);
-
-  const handleWordValidatingWithAI = useCallback((data: any) => {
-    wordAIValidatingToast(data.word, {
-      aiValidatingLabel: t('playerView.aiValidating') || 'AI checking...',
-      duration: 15000
-    });
-    logger.log('[PLAYER] AI is validating word:', data.word);
-  }, [t]);
-
-  const handleWordAlreadyFound = useCallback((data: any) => {
+  const handleWordAlreadyFound = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for duplicate word (warning pattern)
     customHaptic(GAME_HAPTICS.invalidWord);
 
@@ -212,7 +227,30 @@ export function usePlayerWordEvents({
     resetCombo();
   }, [setFoundWords, resetCombo, customHaptic]);
 
-  const handleWordNotOnBoard = useCallback((data: any) => {
+  const handleWordAlreadyFoundByOther = useCallback((data: { word: string; foundBy: string; foundByAvatar?: unknown; confirmationScore?: number }) => {
+    // Haptic feedback - use info pattern (not error) since player gets partial credit
+    customHaptic(GAME_HAPTICS.invalidWord);
+
+    // Keep the word in found words with partial credit score (don't remove it)
+    if (data?.word) {
+      const hasPartialCredit = data.confirmationScore && data.confirmationScore > 0;
+      setFoundWords(prev => prev.map(fw => {
+        if (fw.word.toLowerCase() === data.word.toLowerCase() && !fw.validated) {
+          return {
+            ...fw,
+            validated: true,
+            score: hasPartialCredit ? data.confirmationScore! : 0,
+            foundBy: data.foundBy,
+          };
+        }
+        return fw;
+      }));
+    }
+    // Don't reset combo — player found a valid word, just not first
+    logger.log('[PLAYER] Word already found by another player:', data.foundBy);
+  }, [setFoundWords, customHaptic]);
+
+  const handleWordNotOnBoard = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for invalid word
     customHaptic(GAME_HAPTICS.invalidWord);
 
@@ -225,7 +263,7 @@ export function usePlayerWordEvents({
     resetCombo();
   }, [setFoundWords, resetCombo, customHaptic]);
 
-  const handleWordTooShort = useCallback((data: any) => {
+  const handleWordTooShort = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for too short word
     customHaptic(GAME_HAPTICS.invalidWord);
 
@@ -236,7 +274,7 @@ export function usePlayerWordEvents({
     resetCombo();
   }, [setFoundWords, resetCombo, customHaptic]);
 
-  const handleWordRejected = useCallback((data: any) => {
+  const handleWordRejected = useCallback((data: WordLifecyclePayload) => {
     // Haptic feedback for rejected word
     customHaptic(GAME_HAPTICS.invalidWord);
 
@@ -249,7 +287,7 @@ export function usePlayerWordEvents({
   }, [setFoundWords, resetCombo, customHaptic]);
 
   // Word feedback handlers
-  const handleShowWordFeedback = useCallback((data: any) => {
+  const handleShowWordFeedback = useCallback((data: WordFeedbackRequestPayload) => {
     logger.log('[PLAYER] Received word feedback request:', data);
     setWordToVote({
       word: data.word,
@@ -268,29 +306,29 @@ export function usePlayerWordEvents({
     setWordToVote(null);
   }, [setShowWordFeedback, setWordToVote]);
 
-  const handleVoteRecorded = useCallback((data: any) => {
+  const handleVoteRecorded = useCallback((data: VoteRecordedPayload) => {
     logger.log('[PLAYER] Vote recorded:', data);
     if (data.success) {
-      neoSuccessToast(t('wordFeedback.thankYou') || 'Thanks for voting!', { icon: '✓', duration: 2000 });
+      neoSuccessToast(t('wordFeedback.thankYou') || 'Thanks for voting!', { icon: TOAST_ICONS.check, duration: 2000 });
     }
   }, [t]);
 
-  const handleWordBecameValid = useCallback((data: any) => {
+  const handleWordBecameValid = useCallback((data: WordLifecyclePayload) => {
     logger.log('[PLAYER] Word became valid:', data);
-    neoInfoToast(`"${data.word}" ${t('wordFeedback.nowValid') || 'is now a valid word!'}`, { icon: '📖', duration: 3000 });
+    neoInfoToast(`"${data.word}" ${t('wordFeedback.nowValid') || 'is now a valid word!'}`, { icon: TOAST_ICONS.bookOpen, duration: 3000 });
   }, [t]);
 
   // Spam detection handlers
   const handleSpamWarning = useCallback((data: SpamWarningPayload) => {
-    logger.warn('[SPAM] Warning received:', data);
+    logger.log('[SPAM] Warning received:', data);
     neoWarningToast(t('spam.warning') || 'Slow down! Too many invalid words', {
-      icon: '⚠️',
+      icon: TOAST_ICONS.alertTriangle,
       duration: 4000
     });
   }, [t]);
 
   const handleSpamPenalty = useCallback((data: SpamPenaltyPayload) => {
-    logger.warn('[SPAM] Penalty applied:', data);
+    logger.log('[SPAM] Penalty applied:', data);
     wordErrorToast(
       (t('spam.penalty') || 'Points deducted: -${points}').replace('${points}', String(data.pointsDeducted)),
       { duration: 4000 }
@@ -299,7 +337,7 @@ export function usePlayerWordEvents({
   }, [t, resetCombo]);
 
   const handleSpamCooldown = useCallback((data: SpamCooldownPayload) => {
-    logger.warn('[SPAM] Cooldown started:', data);
+    logger.log('[SPAM] Cooldown started:', data);
     const seconds = Math.ceil(data.duration / 1000);
     wordErrorToast(
       (t('spam.cooldown') || 'Blocked for ${seconds}s - slow down!').replace('${seconds}', String(seconds)),
@@ -311,7 +349,7 @@ export function usePlayerWordEvents({
   const handleSpamCooldownEnd = useCallback((data: SpamCooldownEndPayload) => {
     logger.log('[SPAM] Cooldown ended:', data);
     neoInfoToast(t('spam.cooldownEnd') || 'You can submit words again', {
-      icon: '✓',
+      icon: TOAST_ICONS.check,
       duration: 2000
     });
   }, [t]);
@@ -327,9 +365,8 @@ export function usePlayerWordEvents({
   // Use useSafeSocketEvents to register all events automatically
   const events = useMemo(() => [
     { event: 'wordAccepted', handler: handleWordAccepted as (data: unknown) => void },
-    { event: 'wordNeedsValidation', handler: handleWordNeedsValidation as (data: unknown) => void },
-    { event: 'wordValidatingWithAI', handler: handleWordValidatingWithAI as (data: unknown) => void },
     { event: 'wordAlreadyFound', handler: handleWordAlreadyFound as (data: unknown) => void },
+    { event: 'wordAlreadyFoundByOther', handler: handleWordAlreadyFoundByOther as (data: unknown) => void },
     { event: 'wordNotOnBoard', handler: handleWordNotOnBoard as (data: unknown) => void },
     { event: 'wordTooShort', handler: handleWordTooShort as (data: unknown) => void },
     { event: 'wordRejected', handler: handleWordRejected as (data: unknown) => void },
@@ -344,9 +381,8 @@ export function usePlayerWordEvents({
     { event: 'wordBlockedByCooldown', handler: handleWordBlockedByCooldown as (data: unknown) => void },
   ], [
     handleWordAccepted,
-    handleWordNeedsValidation,
-    handleWordValidatingWithAI,
     handleWordAlreadyFound,
+    handleWordAlreadyFoundByOther,
     handleWordNotOnBoard,
     handleWordTooShort,
     handleWordRejected,

@@ -1,154 +1,98 @@
-'use client';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import LightningRoundPageClient from './PageClient';
 
-import React, { useCallback, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { ArrowLeft } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { useTheme } from '@/utils/ThemeContext';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useNavigation } from '@/contexts/NavigationContext';
-import LightningRound from '@/components/drills/LightningRound';
-import DrillProgressionOverlay from '@/components/brain/DrillProgressionOverlay';
-import { useDrillGrid } from '@/hooks/useDrillGrid';
-import { useSaveDrillResult, DrillBrainScoreUpdate } from '@/hooks/useSaveDrillResult';
+export const dynamic = 'force-dynamic';
 
-/**
- * Lightning Round Drill Page
- *
- * Processing Speed training drill where players must find
- * as many words as possible under time pressure.
- */
-export default function LightningRoundPage() {
-  const router = useRouter();
-  const { theme } = useTheme();
-  const { t, language } = useLanguage();
-  const { setIsInGame } = useNavigation();
-  const isDarkMode = theme === 'dark';
-  const { saveDrillResult } = useSaveDrillResult();
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'brainLightningRound', path: '/brain/drills/lightning-round', locale });
+}
 
-  // State for progression overlay
-  const [showProgressionOverlay, setShowProgressionOverlay] = useState(false);
-  const [brainScoreUpdate, setBrainScoreUpdate] = useState<DrillBrainScoreUpdate | null>(null);
-
-  // Generate drill grid
-  const { grid, availableWords, isLoading } = useDrillGrid(5, language);
-
-  // Hide bottom nav during drill
-  React.useEffect(() => {
-    setIsInGame(true);
-    return () => setIsInGame(false);
-  }, [setIsInGame]);
-
-  const handleComplete = useCallback(async (result: {
-    score: number;
-    wordsFound: number;
-    timeSpent: number;
-    level: number;
-    wordsPerMinute: number;
-  }) => {
-    const saveResult = await saveDrillResult({
-      drillType: 'lightning-round',
-      level: result.level,
-      score: result.score,
-      durationSeconds: result.timeSpent,
-      wordsFound: result.wordsFound,
-      extraData: {
-        wordsPerMinute: result.wordsPerMinute,
+const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
+  en: {
+    title: 'Lightning Round — Rapid-Fire Word Speed Drill',
+    description: 'Find words as fast as humanly possible in this rapid-fire brain drill. Lightning Round features an extremely short timer that resets with each word found — stop for a moment and the round ends. Perfect for training reaction speed and quick word recognition.',
+    features: [
+      'Ultra-short timer resets with every word submitted',
+      'Trains reaction speed and rapid word recognition',
+      'Progressive difficulty with shrinking time windows',
+      'Speed leaderboard ranks fastest word-finders globally',
+      'Available in 5 languages with instant feedback',
+    ],
+    faq: [
+      {
+        question: 'How fast is the Lightning Round timer?',
+        answer: 'The timer starts at a few seconds and shrinks as you find more words. Top players operate in sub-2-second windows. The drill is designed to push you to the absolute limit of your word-finding speed.',
       },
-    });
+      {
+        question: 'Does speed training help with word games?',
+        answer: 'Yes. Research shows that speed drills improve both reaction time and pattern recognition. Players who train with Lightning Round regularly report finding words faster in all other game modes — including multiplayer where speed is the difference between winning and losing.',
+      },
+      {
+        question: 'Is Lightning Round too hard for beginners?',
+        answer: 'The drill adapts to your level. Beginners start with generous time windows that gradually shrink as skills improve. Even finding 5-10 words in a session is great progress for new players.',
+      },
+    ],
+  },
+  he: {
+    title: 'סיבוב ברק — תרגיל מהירות מילים',
+    description: 'מצאו מילים כמה שיותר מהר בתרגיל מוח מהיר זה. סיבוב ברק כולל טיימר קצר במיוחד שמתאפס עם כל מילה — עצרו לרגע והסיבוב נגמר.',
+    features: [
+      'טיימר קצר מאוד שמתאפס עם כל מילה',
+      'מאמן מהירות תגובה וזיהוי מילים מהיר',
+      'קושי מתקדם עם חלונות זמן מתכווצים',
+      'טבלת מובילים מדרגת את מוצאי המילים המהירים ביותר',
+    ],
+    faq: [
+      {
+        question: 'כמה מהיר הטיימר בסיבוב ברק?',
+        answer: 'הטיימר מתחיל בכמה שניות ומתכווץ ככל שמוצאים יותר מילים. שחקנים מנוסים פועלים בחלונות של פחות מ-2 שניות. התרגיל מתוכנן לדחוף אתכם לגבול המהירות המוחלט.',
+      },
+    ],
+  },
+  ja: {
+    title: 'ライトニングラウンド — 高速ワードドリル',
+    description: '超短タイマーで可能な限り速く単語を見つける脳トレドリル。反応速度と素早い単語認識を鍛えます。',
+    features: [
+      '単語を送信するたびにリセットされる超短タイマー',
+      '反応速度と高速単語認識をトレーニング',
+      'スピードランキングで世界中のプレイヤーと競争',
+    ],
+    faq: [],
+  },
+  sv: {
+    title: 'Blixtrundan — Snabb Ordoevning',
+    description: 'Hitta ord saa snabbt som maenskligt moejligt. Extremt kort timer som aatersaetts med varje ord.',
+    features: ['Ultrakorttimer', 'Trainar reaktionshastighet', 'Progressiv svaarighet'],
+    faq: [],
+  },
+  es: {
+    title: 'Ronda Relampago — Ejercicio de Velocidad de Palabras',
+    description: 'Encuentra palabras lo mas rapido posible en este ejercicio cerebral de fuego rapido. Ronda Relampago presenta un temporizador ultra corto que se reinicia con cada palabra — detente un momento y la ronda termina.',
+    features: [
+      'Temporizador ultra corto que se reinicia con cada palabra',
+      'Entrena velocidad de reaccion y reconocimiento rapido de palabras',
+      'Dificultad progresiva con ventanas de tiempo cada vez menores',
+      'Tabla de lideres de velocidad clasifica los buscadores de palabras mas rapidos',
+    ],
+    faq: [
+      {
+        question: 'Que tan rapido es el temporizador de Ronda Relampago?',
+        answer: 'El temporizador comienza con unos pocos segundos y se reduce a medida que encuentras mas palabras. Los mejores jugadores operan en ventanas de menos de 2 segundos.',
+      },
+    ],
+  },
+};
 
-    // Show progression overlay if we got brainScore data back
-    if (saveResult.success && saveResult.brainScore) {
-      setBrainScoreUpdate(saveResult.brainScore);
-      setShowProgressionOverlay(true);
-    }
-  }, [saveDrillResult]);
-
-  const handleExit = useCallback(() => {
-    router.push(`/${language}/brain`);
-  }, [router, language]);
-
-  const handleBack = useCallback(() => {
-    router.push(`/${language}/brain`);
-  }, [router, language]);
-
-  if (isLoading || grid.length === 0) {
-    return (
-      <div className={cn(
-        'min-h-screen flex items-center justify-center',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className={cn(
-            'w-12 h-12 border-4 border-t-transparent rounded-full',
-            isDarkMode ? 'border-neo-lime' : 'border-neo-lime'
-          )}
-        />
-      </div>
-    );
-  }
-
+export default async function LightningRoundPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const content = seoContent[locale] || seoContent.en;
   return (
-    <div className={cn(
-      'min-h-screen flex flex-col',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-    )}>
-      {/* Header */}
-      <header className={cn(
-        'flex items-center justify-between px-4 py-3',
-        'border-b-4 border-neo-black',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <button
-          onClick={handleBack}
-          className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-neo',
-            'border-3 border-neo-black shadow-hard-sm',
-            'transition-all hover:translate-y-[-2px] hover:shadow-hard',
-            isDarkMode ? 'bg-neo-navy text-neo-white' : 'bg-neo-cream text-neo-black'
-          )}
-        >
-          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-          <span className="font-bold text-sm hidden sm:inline">{t('common.back')}</span>
-        </button>
-
-        <h1 className={cn(
-          'text-lg font-black uppercase tracking-wide',
-          isDarkMode ? 'text-neo-white' : 'text-neo-black'
-        )}>
-          {t('brain.drills.lightning-round.name')}
-        </h1>
-
-        <div className="w-10" /> {/* Spacer */}
-      </header>
-
-      {/* Drill Content */}
-      <div className="flex-1">
-        <LightningRound
-          grid={grid}
-          availableWords={availableWords}
-          level={1}
-          language={language}
-          onComplete={handleComplete}
-          onExit={handleExit}
-        />
-      </div>
-
-      {/* Brain Score Progression Overlay */}
-      {brainScoreUpdate && (
-        <DrillProgressionOverlay
-          isOpen={showProgressionOverlay}
-          onClose={() => setShowProgressionOverlay(false)}
-          targetDomain={brainScoreUpdate.targetDomain}
-          newDomainScore={brainScoreUpdate.domainScores[brainScoreUpdate.targetDomain]}
-          scoreDelta={brainScoreUpdate.scoreDelta}
-          overallScore={brainScoreUpdate.overallScore}
-          tier={brainScoreUpdate.tier}
-        />
-      )}
-    </div>
+    <>
+      <LightningRoundPageClient />
+      <GamePageSeoContent title={content.title} description={content.description} features={content.features} faq={content.faq} />
+    </>
   );
 }

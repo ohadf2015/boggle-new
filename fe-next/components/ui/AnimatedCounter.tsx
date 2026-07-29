@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { motion, useSpring, useTransform, useMotionValue } from 'framer-motion';
+import { useEffect, useState, useRef } from 'react';
+import NumberFlow from '@number-flow/react';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { cn } from '@/lib/utils';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 
@@ -30,39 +31,38 @@ interface AnimatedCounterProps {
   className?: string;
 }
 
+const sizeClasses = {
+  xs: 'text-xs',
+  sm: 'text-sm',
+  md: 'text-base',
+  lg: 'text-xl',
+  xl: 'text-3xl',
+};
+
+const variantClasses = {
+  default: 'text-neo-white',
+  gold: 'text-neo-lime',
+  success: 'text-neo-lime',
+  danger: 'text-neo-red',
+};
+
+const glowStyles = {
+  default: '0 0 10px rgba(255, 255, 255, 0.5)',
+  gold: '0 0 15px rgba(255, 225, 53, 0.6)',
+  success: '0 0 12px rgba(191, 255, 0, 0.5)',
+  danger: '0 0 12px rgba(239, 68, 68, 0.5)',
+};
+
 /**
- * AnimatedCounter - Rolling number animation component
+ * AnimatedCounter — Rolling digit animation using NumberFlow.
  *
- * Used for score displays, coin counters, XP bars, etc.
- * Automatically adapts to device performance.
- *
- * @example
- * ```tsx
- * // Basic usage
- * <AnimatedCounter value={1500} />
- *
- * // With formatting
- * <AnimatedCounter
- *   value={coins}
- *   formatValue={(v) => v.toLocaleString()}
- *   variant="gold"
- *   showGlow
- * />
- *
- * // Score with change indicator
- * <AnimatedCounter
- *   value={score}
- *   previousValue={previousScore}
- *   showChangePrefix
- *   variant="success"
- * />
- * ```
+ * Each digit animates independently with spring physics for a premium
+ * "slot machine" feel. Falls back to instant display on low-end devices.
  */
 export function AnimatedCounter({
   value,
-  duration = 1000,
   delay = 0,
-  formatValue = (v) => Math.round(v).toLocaleString(),
+  formatValue,
   showChangePrefix = false,
   previousValue,
   size = 'md',
@@ -72,167 +72,99 @@ export function AnimatedCounter({
   className,
 }: AnimatedCounterProps) {
   const { isLowEnd, prefersReducedMotion, enableGlowEffects } = useDevicePerformance();
-  const [displayValue, setDisplayValue] = useState(value);
+  const [displayValue, setDisplayValue] = useState(previousValue ?? value);
   const [isAnimating, setIsAnimating] = useState(false);
   const prevValueRef = useRef(previousValue ?? value);
-  const animationRef = useRef<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Calculate if value increased or decreased
   const change = value - prevValueRef.current;
   const isIncrease = change > 0;
-  const isDecrease = change < 0;
 
-  // Motion value for spring animation
-  const motionValue = useMotionValue(prevValueRef.current);
-  const springValue = useSpring(motionValue, {
-    stiffness: 100,
-    damping: 30,
-    restDelta: 0.001,
-  });
-
-  // Animate function for low-end devices (simple linear interpolation)
-  const animateSimple = useCallback((startValue: number, endValue: number) => {
-    if (prefersReducedMotion) {
-      setDisplayValue(endValue);
-      onAnimationComplete?.();
-      return;
-    }
-
-    const startTime = performance.now();
-    const diff = endValue - startValue;
-
-    const tick = (currentTime: number) => {
-      const elapsed = currentTime - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-
-      // Ease-out curve for smoother animation
-      const easeProgress = 1 - Math.pow(1 - progress, 3);
-      const currentValue = startValue + diff * easeProgress;
-
-      setDisplayValue(currentValue);
-
-      if (progress < 1) {
-        animationRef.current = requestAnimationFrame(tick);
-      } else {
-        setDisplayValue(endValue);
-        setIsAnimating(false);
-        onAnimationComplete?.();
-      }
-    };
-
-    setIsAnimating(true);
-    animationRef.current = requestAnimationFrame(tick);
-  }, [duration, prefersReducedMotion, onAnimationComplete]);
-
-  // Use spring animation for high-end devices
   useEffect(() => {
-    if (isLowEnd || prefersReducedMotion) {
-      // Simple animation for low-end devices
-      const timeoutId = setTimeout(() => {
-        animateSimple(prevValueRef.current, value);
+    if (delay > 0) {
+      timerRef.current = setTimeout(() => {
+        setDisplayValue(value);
+        setIsAnimating(true);
         prevValueRef.current = value;
       }, delay);
-
       return () => {
-        clearTimeout(timeoutId);
-        if (animationRef.current) {
-          cancelAnimationFrame(animationRef.current);
-        }
+        if (timerRef.current) clearTimeout(timerRef.current);
       };
     }
 
-    // Spring animation for capable devices
-    const timeoutId = setTimeout(() => {
-      setIsAnimating(true);
-      motionValue.set(value);
-      prevValueRef.current = value;
-    }, delay);
+    setDisplayValue(value);
+    setIsAnimating(true);
+    prevValueRef.current = value;
+    return undefined;
+  }, [value, delay]);
 
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [value, delay, isLowEnd, prefersReducedMotion, animateSimple, motionValue]);
-
-  // Subscribe to spring value changes
+  // Notify animation complete after transition settles
   useEffect(() => {
-    if (isLowEnd || prefersReducedMotion) return;
-
-    const unsubscribe = springValue.on('change', (latest) => {
-      setDisplayValue(latest);
-    });
-
-    const unsubscribeComplete = springValue.on('animationComplete', () => {
+    if (!isAnimating) return;
+    const timer = setTimeout(() => {
       setIsAnimating(false);
       onAnimationComplete?.();
-    });
-
-    return () => {
-      unsubscribe();
-      unsubscribeComplete();
-    };
-  }, [springValue, isLowEnd, prefersReducedMotion, onAnimationComplete]);
-
-  // Size classes
-  const sizeClasses = {
-    xs: 'text-xs',
-    sm: 'text-sm',
-    md: 'text-base',
-    lg: 'text-xl',
-    xl: 'text-3xl',
-  };
-
-  // Variant classes
-  const variantClasses = {
-    default: 'text-neo-white',
-    gold: 'text-neo-lime',
-    success: 'text-neo-lime',
-    danger: 'text-red-400',
-  };
-
-  // Glow styles
-  const glowStyles = {
-    default: '0 0 10px rgba(255, 255, 255, 0.5)',
-    gold: '0 0 15px rgba(255, 225, 53, 0.6)',
-    success: '0 0 12px rgba(191, 255, 0, 0.5)',
-    danger: '0 0 12px rgba(239, 68, 68, 0.5)',
-  };
+    }, 600);
+    return () => clearTimeout(timer);
+  }, [isAnimating, onAnimationComplete]);
 
   const shouldShowGlow = showGlow && enableGlowEffects && isAnimating;
 
-  // Determine prefix
   let prefix = '';
   if (showChangePrefix && change !== 0) {
     prefix = isIncrease ? '+' : '';
   }
 
+  // Low-end / reduced motion: instant display, no animation
+  if (isLowEnd || prefersReducedMotion) {
+    const formatted = formatValue ? formatValue(value) : Math.round(value).toLocaleString();
+    return (
+      <span
+        className={cn(
+          'font-black tabular-nums inline-block',
+          sizeClasses[size],
+          variantClasses[variant],
+          className
+        )}
+      >
+        {prefix}{formatted}
+      </span>
+    );
+  }
+
   return (
-    <motion.span
+    <AdaptiveMotion.span
       className={cn(
         'font-black tabular-nums inline-block',
         sizeClasses[size],
         variantClasses[variant],
         className
       )}
-      animate={isAnimating ? {
-        scale: [1, 1.05, 1],
-      } : undefined}
-      transition={{
-        duration: 0.3,
-        ease: 'easeOut',
-      }}
+      animate={isAnimating ? { scale: [1, 1.05, 1] } : undefined}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       style={{
         textShadow: shouldShowGlow ? glowStyles[variant] : undefined,
       }}
     >
-      {prefix}{formatValue(displayValue)}
-    </motion.span>
+      {prefix}
+      {formatValue ? (
+        formatValue(displayValue)
+      ) : (
+        <NumberFlow
+          value={displayValue}
+          locales="en-US"
+          animated={!prefersReducedMotion}
+          willChange
+          transformTiming={{ duration: 500, easing: 'ease-out' }}
+          spinTiming={{ duration: 500, easing: 'ease-out' }}
+        />
+      )}
+    </AdaptiveMotion.span>
   );
 }
 
 /**
- * AnimatedCounterWithImpact - Counter with visual impact effect when value changes
- *
- * Shows a burst/pulse effect when the value increases significantly.
+ * AnimatedCounterWithImpact — Counter with visual impact effect when value changes significantly.
  */
 export function AnimatedCounterWithImpact({
   value,
@@ -256,9 +188,8 @@ export function AnimatedCounterWithImpact({
 
   return (
     <div className="relative inline-block">
-      {/* Impact ring effect */}
       {showImpact && (
-        <motion.div
+        <AdaptiveMotion.div
           className="absolute inset-0 rounded-full border-2 border-neo-lime"
           initial={{ scale: 1, opacity: 0.8 }}
           animate={{ scale: 2.5, opacity: 0 }}

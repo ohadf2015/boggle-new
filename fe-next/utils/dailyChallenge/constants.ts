@@ -23,6 +23,9 @@ export const DAILY_CHALLENGE_DURATION = 120;
 // Minimum number of same-length words to embed (excluding target word)
 export const MIN_SAME_LENGTH_WORDS = 5;
 
+// Maximum letter count for target words (keeps puzzles accessible across all languages)
+export const MAX_TARGET_WORD_LENGTH = 6;
+
 // ==========================================
 // Hebrew Letter Normalization
 // ==========================================
@@ -37,14 +40,21 @@ export const HEBREW_FINAL_TO_REGULAR: Record<string, string> = {
   'ץ': 'צ', // final tsade → tsade
 };
 
+// Precompiled once at module load — avoids recompiling a RegExp on every
+// normalizeHebrewFinalLetters() call (was `new RegExp(...)` inside the loop).
+const HEBREW_FINAL_REPLACERS: ReadonlyArray<readonly [RegExp, string]> =
+  Object.entries(HEBREW_FINAL_TO_REGULAR).map(
+    ([final, regular]) => [new RegExp(final, 'g'), regular] as const
+  );
+
 /**
  * Normalize Hebrew final letters to regular forms for grid display
  * Final letters (ך, ם, ן, ף, ץ) are replaced with their regular forms
  */
 export function normalizeHebrewFinalLetters(text: string): string {
   let normalized = text;
-  for (const [final, regular] of Object.entries(HEBREW_FINAL_TO_REGULAR)) {
-    normalized = normalized.replace(new RegExp(final, 'g'), regular);
+  for (const [pattern, regular] of HEBREW_FINAL_REPLACERS) {
+    normalized = normalized.replace(pattern, regular);
   }
   return normalized;
 }
@@ -55,6 +65,10 @@ export function normalizeHebrewFinalLetters(text: string): string {
 
 export const DAILY_STORAGE_KEY = 'lexiclash_daily';
 export const WORD_HUNT_STORAGE_KEY = 'lexiclash_word_hunt';
+// Marks that the player bailed out of today's Word Hunt mid-game. Gates re-entry
+// behind a rewarded ad (native) without saving a result. Scoped per language+day.
+export const WORD_HUNT_FORFEIT_KEY = 'lexiclash_word_hunt_forfeit';
+export const WORD_WHEEL_STORAGE_KEY = 'lexiclash_word_wheel';
 export const DAILY_STREAK_KEY = 'lexiclash_daily_streak';
 export const GUEST_DAILY_PLAYER_KEY = 'lexiclash_guest_daily_player';
 export const GUEST_FINGERPRINT_KEY = 'lexiclash_guest_fingerprint';
@@ -77,6 +91,12 @@ export const getWordHuntTutorialKey = (lang: Language): string =>
  */
 export const getWordHuntResultKey = (lang: Language, date: string): string =>
   `${WORD_HUNT_STORAGE_KEY}_${lang}_${date}`;
+
+/**
+ * Get storage key for Word Wheel result by language and date
+ */
+export const getWordWheelResultKey = (lang: Language, date: string): string =>
+  `${WORD_WHEEL_STORAGE_KEY}_${lang}_${date}`;
 
 /**
  * Get storage key for daily coin award by date and language

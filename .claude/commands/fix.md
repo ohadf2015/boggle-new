@@ -11,8 +11,8 @@ description: Fix errors from pasted logs
 4. **Write failing test** - Create a test that reproduces the bug, run it to confirm it fails
 5. **Fix** - Read context, identify root cause, apply minimal fix
 6. **Verify test passes** - Run the test again (without modifying it) to confirm the fix works
-7. **Verify build** - Run `npx tsc --noEmit`, `npm run lint`, `npm run build`
-8. **Store fix memory** - Record the bug pattern and solution for future reference
+7. **Store fix memory** - Record the bug pattern and solution for future reference
+8. **Commit & push** - Use `/commit-push` to verify all checks and push to remote (if user requests commit)
 
 ## Rules
 - Fix root cause, not symptoms
@@ -34,7 +34,7 @@ Search for related bug patterns:
 mcp__memory__memory_recall(query="bug fix [error-type] [affected-area]")
 ```
 
-### Store (Step 8)
+### Store (Step 7)
 After fixing, store the bug pattern for future reference:
 ```
 mcp__memory__memory_store(

@@ -1,13 +1,26 @@
 /**
  * Scoring Calculation Utilities
- * Handles word scoring, combo bonuses, and final game score calculation
+ * Handles final game score calculation and player results
+ *
+ * IMPORTANT: Core scoring functions now imported from shared/utils/scoring.ts
+ * This ensures consistency across frontend and backend.
  */
 
 import type { Game, Avatar, WordDetail } from '@/shared/types/game';
 
+// Import canonical scoring functions from shared module
+import {
+  calculateWordScore,
+  getComboBonus,
+  getComboMultiplier,
+} from '@/shared/utils/scoring';
+
+// Re-export for backwards compatibility
+export { calculateWordScore, getComboBonus, getComboMultiplier };
+
 export interface WordDetailResult extends WordDetail {
-  // Additional fields not in base WordDetail
-  timestamp?: number | null;
+  // `timestamp` is inherited from base WordDetail (added for scoreMultiplier
+  // boost — see SRV-CRIT-1). Pace analytics keep the per-game-clock companion.
   timeSinceStart?: number | null;
 }
 
@@ -20,6 +33,7 @@ export interface PlayerScoreResult {
   wordCount: number;
   avatar: Avatar | null;
   isBot: boolean;
+  isHost: boolean;
   achievements: string[];
 }
 
@@ -32,76 +46,7 @@ export interface AiValidationResult {
 
 export interface CalculateScoresOptions {
   playerCount?: number;
-}
-
-/**
- * Get combo multiplier based on combo level
- * Higher combo levels give better multipliers
- * Combo 0-2: x1.0 (no bonus for small combos)
- * Combo 3-4: x1.25
- * Combo 5-6: x1.5
- * Combo 7-8: x1.75
- * Combo 9-10: x2.0
- * Combo 11+: x2.25 (max)
- */
-export function getComboMultiplier(comboLevel: number): number {
-  if (comboLevel <= 2) return 1.0;
-  if (comboLevel <= 4) return 1.25;
-  if (comboLevel <= 6) return 1.5;
-  if (comboLevel <= 8) return 1.75;
-  if (comboLevel <= 10) return 2.0;
-  return 2.25; // Max multiplier at combo 11+
-}
-
-/**
- * Get flat combo bonus based on combo level and word length
- * Combo bonus now scales with word length to reward longer words in combos
- * Formula: comboBonus = floor(comboLevel * wordLengthFactor)
- * Optimized to help slower/perfectionist players who find quality words
- * wordLengthFactor: 3 letters = 0.2, 4 letters = 0.5, 5 letters = 1.0, 6 letters = 1.5, 7+ letters = 2.0
- */
-export function getComboBonus(comboLevel: number, wordLength: number = 4): number {
-  if (comboLevel <= 0) return 0; // No bonus for combo 0
-
-  // Word length factor - longer words get significantly better combo bonuses
-  // This rewards perfectionist players who find quality words
-  // Short words still get minimal combo benefit to discourage short word spam
-  let wordLengthFactor: number;
-  if (wordLength <= 3) {
-    wordLengthFactor = 0.2;  // Very short words - minimal combo bonus
-  } else if (wordLength === 4) {
-    wordLengthFactor = 0.5;  // Short words - modest combo bonus
-  } else if (wordLength === 5) {
-    wordLengthFactor = 1.0;  // Medium words - full base bonus
-  } else if (wordLength === 6) {
-    wordLengthFactor = 1.5;  // Good words - 1.5x bonus
-  } else {
-    wordLengthFactor = 2.0;  // Long words (7+) - 2x bonus (perfectionist reward)
-  }
-
-  // Base bonus scales with combo level, starting from combo 1
-  // This helps slower players who build combos more deliberately
-  const baseBonus = Math.min(comboLevel, 10); // Caps at 10 bonus points base
-
-  return Math.floor(baseBonus * wordLengthFactor);
-}
-
-/**
- * Calculate score based on word length - 1 point per letter beyond the first
- * This gives every letter value: 2 letters = 1 point, 3 letters = 2 points, 4 letters = 3 points, etc.
- * Combo bonus is applied based on word length (longer words benefit more from combos)
- * Fire round multiplier (2x during earthquake fire round) is applied to the final score
- */
-export function calculateWordScore(
-  word: string,
-  comboLevel: number = 0,
-  fireRoundMultiplier: number = 1
-): number {
-  const length = word.length;
-  if (length === 1) return 0; // Single letters not allowed
-  const baseScore = length - 1; // Each letter beyond the first gets 1 point
-  const bonus = getComboBonus(comboLevel, length);
-  return (baseScore + bonus) * fireRoundMultiplier;
+  gameMode?: string;
 }
 
 /**
@@ -115,15 +60,32 @@ export function calculateGameScores(
   aiValidatedWords: Map<string, AiValidationResult> = new Map(),
   options: CalculateScoresOptions = {}
 ): PlayerScoreResult[] {
-  const { playerCount = 0 } = options;
+  const { playerCount = 0, gameMode } = options;
 
-  // Disable duplicate rule for large rooms (more than 7 players)
-  const duplicateRuleDisabled = playerCount > 7;
+  // Disable duplicate rule for large rooms (more than 7 players) or Word Hunt mode
+  // In Word Hunt, finding the same board words as opponents is fine — the goal is the target word
+  // In Wheel Rush, lock+steal mechanic means stealer and original locker both have the word
+  // in their playerWords with their own outcome scores; duplicate halving would corrupt totals.
+  const duplicateRuleDisabled = playerCount > 7 || gameMode === 'word-hunt' || gameMode === 'wheel-rush';
+
+  // Blast mode skips rarity multiplier — tile bonuses already reward unique paths
+  // Wheel Rush skips it too — first-finder multiplier + steal bonus already encode rarity
+  const rarityDisabled = gameMode === 'blast' || gameMode === 'wheel-rush';
   if (!game) return [];
 
   const results: PlayerScoreResult[] = [];
   const playerWords = game.playerWords || {};
   const playerWordDetails = game.playerWordDetails || {};
+
+  // Pre-build Map<word, WordDetail> per player for O(1) lookup
+  const playerWordDetailsMap: Record<string, Map<string, WordDetail>> = {};
+  for (const [username, details] of Object.entries(playerWordDetails)) {
+    const map = new Map<string, WordDetail>();
+    for (const d of (details || [])) {
+      map.set(d.word, d);
+    }
+    playerWordDetailsMap[username] = map;
+  }
 
   for (const [username, words] of Object.entries(playerWords)) {
     const uniqueWords = [...new Set(words)];
@@ -162,28 +124,32 @@ export function calculateGameScores(
       let rarityMultiplier = 1.0;
       let wordRarity: 'common' | 'uncommon' | 'rare' | 'legendary' = 'common';
 
-      if (playerCount > 1 && !duplicateRuleDisabled) {
+      if (playerCount > 1 && !duplicateRuleDisabled && !rarityDisabled) {
         const playersWhoFoundThis = wordCountMap[word] || 1;
         const percentageWhoFound = (playersWhoFoundThis / playerCount) * 100;
 
         if (percentageWhoFound <= 5) {
           // Only 1 player in 20 found this - legendary!
-          rarityMultiplier = 2.0;
+          rarityMultiplier = 1.5;   // GD-023: reduced from 2.0 (too swingy)
           wordRarity = 'legendary';
         } else if (percentageWhoFound <= 15) {
           // Less than 15% of players found this - rare
-          rarityMultiplier = 1.5;
+          rarityMultiplier = 1.3;   // GD-023: reduced from 1.5
           wordRarity = 'rare';
         } else if (percentageWhoFound <= 30) {
           // 15-30% of players found this - uncommon
-          rarityMultiplier = 1.25;
+          rarityMultiplier = 1.15;  // GD-023: reduced from 1.25
           wordRarity = 'uncommon';
         }
         // else: common word (50%+ found it), no bonus
       }
 
-      // Get pre-calculated score from word details if available
-      const existingDetails = (playerWordDetails[username] || []).find(d => d.word === word);
+      // Get pre-calculated score from word details if available.
+      // During live gameplay, scoreManager.addWord() always sets `score` (including combo bonus)
+      // in playerWordDetails, so the `existingDetails.score` branch is the normal path.
+      // The fallback with comboLevel=0 is defensive — it only triggers if word details are
+      // missing (e.g., migrated data or test scenarios), accepting that combo bonus is lost.
+      const existingDetails = playerWordDetailsMap[username]?.get(word);
       let score = 0;
 
       if (validated) {
@@ -230,15 +196,24 @@ export function calculateGameScores(
     // Get user data for avatar
     const userData = game.users?.[username];
 
+    // Event bonuses (golden/lightning/special-word/word-hunt board + target finder)
+    // are added to the LIVE running score (game.playerScores) but are NOT baked into
+    // per-word playerWordDetails[].score, so the word-by-word recompute above can't see
+    // them. Add the per-player accumulator back so the result page matches the in-game
+    // leaderboard instead of showing a lower number. See playerEventBonuses.
+    const eventBonus = game.playerEventBonuses?.[username] || 0;
+    const finalTotal = totalScore + eventBonus;
+
     results.push({
       username,
-      score: totalScore, // Frontend expects 'score' not 'totalScore'
-      totalScore, // Keep for backwards compatibility with other usages
+      score: finalTotal, // Frontend expects 'score' not 'totalScore'
+      totalScore: finalTotal, // Keep for backwards compatibility with other usages
       allWords: wordDetails, // Frontend expects 'allWords' not 'wordDetails'
       wordDetails, // Keep for backwards compatibility with other usages
       wordCount: uniqueWords.length,
       avatar: userData?.avatar || null,
       isBot: userData?.isBot || false,
+      isHost: username === game.hostUsername,
       achievements: game.playerAchievements?.[username] || []
     });
   }

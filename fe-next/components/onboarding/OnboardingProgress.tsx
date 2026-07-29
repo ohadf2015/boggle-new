@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
 interface OnboardingProgressProps {
@@ -26,8 +26,8 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
         const isPast = i < currentStep;
 
         return (
-          <motion.button
-            key={i}
+          <m.button
+            key={`step-${i}`}
             className="p-2 touch-target"
             aria-label={`Step ${i + 1} of ${totalSteps}`}
             aria-current={isActive ? 'step' : undefined}
@@ -35,7 +35,7 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
             tabIndex={-1} // Prevent keyboard navigation to dots
             disabled
           >
-            <motion.div
+            <m.div
               className={cn(
                 'rounded-full border-2 transition-all',
                 isActive && 'bg-neo-pink border-neo-black scale-125 shadow-hard-sm',
@@ -54,7 +54,7 @@ const OnboardingProgress: React.FC<OnboardingProgressProps> = ({
                 height: isActive ? '12px' : '10px',
               }}
             />
-          </motion.button>
+          </m.button>
         );
       })}
     </div>

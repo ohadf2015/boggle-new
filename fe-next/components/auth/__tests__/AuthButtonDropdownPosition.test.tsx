@@ -9,20 +9,20 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 
 // Mock the contexts and hooks before importing the component
-jest.mock('../../../utils/ThemeContext', () => ({
-  useTheme: () => ({ theme: 'dark', toggleTheme: jest.fn() }),
+vi.mock('../../../utils/ThemeContext', () => ({
+  useTheme: () => ({ theme: 'dark', toggleTheme: vi.fn() }),
 }));
 
-jest.mock('../../../contexts/LanguageContext', () => ({
+vi.mock('../../../contexts/LanguageContext', () => ({
   useLanguage: () => ({
     t: (key: string) => key,
     language: 'he',
-    setLanguage: jest.fn(),
+    setLanguage: vi.fn(),
     dir: 'rtl',
   }),
 }));
 
-jest.mock('../../../contexts/AuthContext', () => ({
+vi.mock('../../../contexts/AuthContext', () => ({
   useAuth: () => ({
     isAuthenticated: true,
     profile: {
@@ -30,7 +30,6 @@ jest.mock('../../../contexts/AuthContext', () => ({
       username: 'TestUser',
       display_name: 'Test User',
       total_xp: 1000,
-      profile_picture_url: null,
       avatar_emoji: '🧑',
       avatar_color: '#00CED1',
       avatar_image: null,
@@ -42,55 +41,56 @@ jest.mock('../../../contexts/AuthContext', () => ({
   }),
 }));
 
-jest.mock('../../../lib/supabase', () => ({
-  signOut: jest.fn(),
+vi.mock('../../../lib/supabase', () => ({
+  signOut: vi.fn(),
 }));
 
-jest.mock('next/navigation', () => ({
+vi.mock('next/navigation', () => ({
   useRouter: () => ({
-    push: jest.fn(),
+    push: vi.fn(),
   }),
 }));
 
-jest.mock('@/hooks/useCrazyGamesAuth', () => ({
+vi.mock('@/hooks/useCrazyGamesAuth', () => ({
   useCrazyGamesAuth: () => ({
     isCrazyGames: false,
+    isReady: true,
     user: null,
     isLoggedIn: false,
     isLoggingIn: false,
-    login: jest.fn(),
+    login: vi.fn(),
     isAccountAvailable: false,
   }),
 }));
 
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => <div {...props}>{children}</div>,
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
-jest.mock('../../Avatar', () => ({
+vi.mock('../../Avatar', () => ({
   __esModule: true,
   default: () => <div data-testid="avatar">Avatar</div>,
 }));
 
-jest.mock('../../LevelBadge', () => ({
+vi.mock('../../LevelBadge', () => ({
   __esModule: true,
   default: () => <div data-testid="level-badge">Level</div>,
 }));
 
-jest.mock('../../XpProgressBar', () => ({
+vi.mock('../../XpProgressBar', () => ({
   getLevelFromXp: () => 10,
 }));
 
-jest.mock('../../engagement/CalendarRewardsModal', () => ({
+vi.mock('../../engagement/CalendarRewardsModal', () => ({
   CalendarRewardsModal: () => null,
 }));
 
 // Mock createPortal to render in the document (allows us to inspect style)
-jest.mock('react-dom', () => {
-  const originalModule = jest.requireActual('react-dom');
+vi.mock('react-dom', () => {
+  const originalModule = vi.importActual('react-dom');
   return {
     ...originalModule,
     createPortal: (node: React.ReactNode) => node, // Render inline instead of portal
@@ -120,10 +120,10 @@ describe('AuthButton Dropdown Position', () => {
     });
 
     // Mock getBoundingClientRect for button
-    Element.prototype.getBoundingClientRect = jest.fn(() => mockButtonRect);
+    Element.prototype.getBoundingClientRect = vi.fn(() => mockButtonRect);
 
     // Mock fetch for calendar rewards
-    global.fetch = jest.fn(() =>
+    global.fetch = vi.fn(() =>
       Promise.resolve({
         ok: true,
         json: () => Promise.resolve({ canClaimToday: false }),
@@ -132,7 +132,7 @@ describe('AuthButton Dropdown Position', () => {
   });
 
   afterEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('positions dropdown under the button in RTL mode (not on opposite side)', async () => {

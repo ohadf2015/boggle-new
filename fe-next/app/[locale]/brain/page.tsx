@@ -1,516 +1,142 @@
-'use client';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
+import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import BrainTrainingPageClient from './PageClient';
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Brain, ArrowLeft } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/utils/ThemeContext';
-import { useAuth } from '@/contexts/AuthContext';
-import { useBrainScore } from '@/hooks/useBrainScore';
-import { cn } from '@/lib/utils';
-import BrainScoreHero from '@/components/brain/BrainScoreHero';
-import CognitiveDomainGrid from '@/components/brain/CognitiveDomainGrid';
-import CognitiveRadarChart from '@/components/brain/CognitiveRadarChart';
-import BrainScoreHistoryChart from '@/components/brain/BrainScoreHistoryChart';
-import QuickDrillsSection from '@/components/brain/QuickDrillsSection';
-import ScientificTipsCarousel from '@/components/brain/ScientificTipsCarousel';
-import FirstGameCelebration from '@/components/brain/FirstGameCelebration';
-import PersonalizedDrillRecommendation from '@/components/brain/PersonalizedDrillRecommendation';
-import WelcomeBackCard from '@/components/brain/WelcomeBackCard';
-import BrainScoreShareCard from '@/components/brain/BrainScoreShareCard';
-import AuthModal from '@/components/auth/AuthModal';
-import AutoHideHeader from '@/components/AutoHideHeader';
+export const dynamic = 'force-dynamic';
 
-/**
- * Header component for Brain Training page
- */
-interface HeaderProps {
-  isDarkMode: boolean;
-  onBack: () => void;
-  title: string;
-  backText: string;
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'brain', path: '/brain', locale });
 }
 
-function Header({ isDarkMode, onBack, title, backText }: HeaderProps) {
+const seoContent: Record<string, { title: string; description: string; features: string[]; faq: { question: string; answer: string }[] }> = {
+  en: {
+    title: 'Brain Training Word Games — 5 Cognitive Drills',
+    description: 'Sharpen your mind with five science-backed word drills designed to improve memory, pattern recognition, reaction time, and vocabulary depth. Each session adapts to your skill level for maximum cognitive benefit.',
+    features: [
+      'Memory Hunt — recall words from previous boards',
+      'Pattern Switcher — flex your cognitive flexibility',
+      'Combo Master — sustain focus under pressure',
+      'Rare Gems — expand your vocabulary with uncommon words',
+      'Lightning Round — build reaction speed with rapid-fire play',
+    ],
+    faq: [
+      {
+        question: 'Are these brain training word games free?',
+        answer: 'Yes — all five cognitive word drills are free to play. No download or account required to start.',
+      },
+      {
+        question: 'What cognitive skills do word games improve?',
+        answer: 'Regular word game practice strengthens working memory, processing speed, lexical retrieval, and executive function. Our drills target each area separately so you can track improvement.',
+      },
+      {
+        question: 'How long should I practice each day for brain health?',
+        answer: 'Research suggests 10–20 minutes of focused cognitive exercise per day produces measurable benefits. Try two or three drills back-to-back for a complete session.',
+      },
+      {
+        question: 'Do the drills get harder over time?',
+        answer: 'Yes. Each drill uses adaptive difficulty — as your performance improves the timer tightens, boards grow more complex, and scoring requirements increase.',
+      },
+    ],
+  },
+  he: {
+    title: 'משחקי מילים לאימון המוח — 5 תרגולים קוגניטיביים',
+    description: 'חדד את מוחך עם חמישה תרגולי מילים מבוססי מדע שנועדו לשפר זיכרון, זיהוי דפוסים, זמן תגובה ועומק אוצר המילים. כל סשן מסתגל לרמת המיומנות שלך להשפעה קוגניטיבית מרבית.',
+    features: [
+      'ציד זיכרון — אתר מילים שראית בלוחות קודמים',
+      'מחליף דפוסים — גמישות קוגניטיבית בכל סיבוב',
+      'מאסטר קומבו — שמור על ריכוז בלחץ גובר',
+      'אבני חן נדירות — העשר את אוצר המילים שלך',
+      'סיבוב ברק — בנה מהירות תגובה במשחק מהיר',
+    ],
+    faq: [
+      {
+        question: 'האם משחקי מילים לאימון מוח הם בחינם?',
+        answer: 'כן — כל חמשת תרגולי המילים הקוגניטיביים חינמיים לחלוטין. אין צורך בהורדה או יצירת חשבון כדי להתחיל.',
+      },
+      {
+        question: 'אילו כישורים קוגניטיביים משתפרים ממשחקי מילים?',
+        answer: 'תרגול קבוע במשחקי מילים מחזק זיכרון עבודה, מהירות עיבוד, שליפה לקסיקלית ותפקוד ניהולי. התרגולים שלנו מכוונים לכל תחום בנפרד.',
+      },
+    ],
+  },
+  sv: {
+    title: 'Hjärnträning med ordspel — 5 kognitiva övningar',
+    description: 'Träna hjärnan med fem vetenskapligt utformade ordövningar som förbättrar minne, mönsterigenkänning, reaktionstid och ordförråd.',
+    features: [
+      'Minnesjakt — hitta ord du sett tidigare',
+      'Mönsterväxlare — öva kognitiv flexibilitet',
+      'Kombomästaren — håll fokus under press',
+      'Sällsynta pärlor — utöka ditt ordförråd',
+      'Blixtronden — testa din reaktionshastighet',
+    ],
+    faq: [],
+  },
+  ja: {
+    title: '脳トレワードゲーム — 5つの認知ドリル',
+    description: '記憶力・パターン認識・反応速度・語彙力を鍛える5つの科学的根拠に基づくワードドリルで、毎日の脳トレを充実させましょう。',
+    features: [
+      'メモリーハント — 過去のボードで見た単語を探す',
+      'パターンスイッチャー — 認知の柔軟性を鍛える',
+      'コンボマスター — プレッシャー下で集中力を持続',
+      'レアジェム — 珍しい語彙を増やす',
+      'ライトニングラウンド — 素早い思考で反応速度アップ',
+    ],
+    faq: [
+      {
+        question: '脳トレワードゲームは無料ですか？',
+        answer: 'はい、5つのドリルはすべて無料でプレイできます。ダウンロードやアカウント登録も不要です。',
+      },
+    ],
+  },
+  es: {
+    title: 'Juegos de palabras para entrenar el cerebro — 5 ejercicios cognitivos',
+    description: 'Agudiza tu mente con cinco ejercicios de palabras respaldados por la ciencia, diseñados para mejorar la memoria, el reconocimiento de patrones, el tiempo de reacción y la profundidad del vocabulario. Cada sesión se adapta a tu nivel para un beneficio cognitivo máximo.',
+    features: [
+      'Caza de memoria — encuentra palabras que viste antes',
+      'Cambiador de patrones — ejercita la flexibilidad cognitiva',
+      'Maestro de combos — mantén el enfoque bajo presión',
+      'Gemas raras — amplía tu vocabulario con palabras poco comunes',
+      'Ronda relámpago — desarrolla velocidad de reacción',
+    ],
+    faq: [
+      {
+        question: '¿Son gratuitos estos juegos de palabras para el cerebro?',
+        answer: 'Sí, los cinco ejercicios cognitivos son completamente gratuitos. No se requiere descarga ni cuenta para empezar.',
+      },
+      {
+        question: '¿Qué habilidades cognitivas mejoran los juegos de palabras?',
+        answer: 'La práctica regular fortalece la memoria de trabajo, la velocidad de procesamiento, la recuperación léxica y la función ejecutiva.',
+      },
+    ],
+  },
+};
+
+export default async function BrainTrainingPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  const content = seoContent[locale] || seoContent.en;
+  const origin = 'https://www.lexiclash.live';
   return (
-    <header className={cn(
-      'sticky top-0 z-40',
-      'border-b-4 border-neo-black',
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-    )}>
-      <div className="flex items-center justify-between px-4 py-3">
-        <button
-          onClick={onBack}
-          className={cn(
-            'flex items-center gap-2 px-3 py-2 rounded-neo',
-            'border-3 border-neo-black shadow-hard-sm',
-            'transition-all hover:translate-y-[-2px] hover:shadow-hard',
-            isDarkMode ? 'bg-neo-navy text-neo-white' : 'bg-neo-cream text-neo-black'
-          )}
-        >
-          <ArrowLeft className="w-5 h-5 rtl:rotate-180" />
-          <span className="font-bold text-sm hidden sm:inline">{backText}</span>
-        </button>
-
-        <h1 className={cn(
-          'text-xl font-black uppercase tracking-wide',
-          isDarkMode ? 'text-neo-white' : 'text-neo-black'
-        )}>
-          {title}
-        </h1>
-
-        <div className="w-10" /> {/* Spacer for centering */}
-      </div>
-    </header>
-  );
-}
-
-/**
- * Brain Training Dashboard
- * Displays cognitive scores, progress, and quick access to brain drills.
- */
-export default function BrainTrainingPage() {
-  const router = useRouter();
-  const { t, language } = useLanguage();
-  const { theme } = useTheme();
-  const isDarkMode = theme === 'dark';
-  const { isAuthenticated, loading: authLoading } = useAuth();
-  const { brainScore, recentGameScores, drillProgress, brainScoreHistory, isLoading, error, refresh } = useBrainScore();
-
-  // State for first game celebration
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [hasShownCelebration, setHasShownCelebration] = useState(false);
-
-  // State for auth modal
-  const [showAuthModal, setShowAuthModal] = useState(false);
-
-  // State for share modal
-  const [showShareCard, setShowShareCard] = useState(false);
-
-  // Show celebration modal for first game (only once per session)
-  useEffect(() => {
-    if (brainScore && brainScore.gamesAnalyzed === 1 && !hasShownCelebration) {
-      const timer = setTimeout(() => {
-        setShowCelebration(true);
-        setHasShownCelebration(true);
-      }, 500); // Small delay for dramatic effect
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [brainScore, hasShownCelebration]);
-
-  const handleBack = () => {
-    router.push(`/${language}`);
-  };
-
-  // Calculate welcome back data (for returning users)
-  const [welcomeBackData, setWelcomeBackData] = useState<{
-    show: boolean;
-    daysSinceLastActivity: number;
-    personalBest: number | undefined;
-  }>({ show: false, daysSinceLastActivity: 0, personalBest: undefined });
-
-  useEffect(() => {
-    if (!brainScore?.lastActivityAt) {
-      setWelcomeBackData({ show: false, daysSinceLastActivity: 0, personalBest: undefined });
-      return;
-    }
-
-    const now = Date.now();
-    const lastActivity = new Date(brainScore.lastActivityAt).getTime();
-    const daysSinceLastActivity = Math.floor((now - lastActivity) / (1000 * 60 * 60 * 24));
-    const personalBest = brainScoreHistory.length > 0
-      ? Math.max(...brainScoreHistory.map(h => h.overallScore))
-      : undefined;
-
-    setWelcomeBackData({
-      show: daysSinceLastActivity >= 3,
-      daysSinceLastActivity,
-      personalBest,
-    });
-  }, [brainScore?.lastActivityAt, brainScoreHistory]);
-
-  // Loading state - show skeleton while auth is validating OR while brain score is loading
-  if (authLoading || isLoading) {
-    return (
-      <div className={cn(
-        'h-full flex flex-col page-content-safe',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <AutoHideHeader />
-        <Header
-          isDarkMode={isDarkMode}
-          onBack={handleBack}
-          title={t('brain.title')}
-          backText={t('common.back')}
-        />
-        <main className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
-          {/* Loading skeleton */}
-          <div className="space-y-6 animate-pulse">
-            <div className={cn(
-              'h-48 rounded-neo border-3 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-gray-200'
-            )} />
-            <div className={cn(
-              'h-64 rounded-neo border-3 border-neo-black',
-              isDarkMode ? 'bg-slate-800' : 'bg-gray-200'
-            )} />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {[1, 2, 3, 4, 5].map((i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    'h-32 rounded-neo border-3 border-neo-black',
-                    isDarkMode ? 'bg-slate-800' : 'bg-gray-200'
-                  )}
-                />
-              ))}
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div className={cn(
-        'h-full flex flex-col page-content-safe',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <AutoHideHeader />
-        <Header
-          isDarkMode={isDarkMode}
-          onBack={handleBack}
-          title={t('brain.title')}
-          backText={t('common.back')}
-        />
-        <main className="px-4 py-6 max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'text-center p-8 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}
-          >
-            <Brain className="w-16 h-16 mx-auto mb-4 text-red-500" />
-            <h2 className={cn(
-              'text-xl font-bold mb-2',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {t('brain.errors.loadFailed') || 'Failed to load brain score'}
-            </h2>
-            <p className={cn(
-              'text-sm mb-6',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-            )}>
-              {error}
-            </p>
-            <button
-              onClick={refresh}
-              className={cn(
-                'px-6 py-3 rounded-neo font-bold',
-                'border-3 border-neo-black shadow-hard',
-                'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
-                'bg-neo-cyan text-neo-black'
-              )}
-            >
-              {t('brain.errors.retry') || 'Retry'}
-            </button>
-          </motion.div>
-        </main>
-      </div>
-    );
-  }
-
-  // Unauthenticated user state
-  if (!isAuthenticated) {
-    return (
-      <div className={cn(
-        'h-full flex flex-col page-content-safe',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <AutoHideHeader />
-        <Header
-          isDarkMode={isDarkMode}
-          onBack={handleBack}
-          title={t('brain.title')}
-          backText={t('common.back')}
-        />
-        <main className="px-4 py-6 max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'text-center p-8 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}
-          >
-            <Brain className="w-16 h-16 mx-auto mb-4 text-neo-cyan" />
-            <h2 className={cn(
-              'text-xl font-bold mb-2',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {t('brain.guestView.title') || 'Track Your Cognitive Growth'}
-            </h2>
-            <p className={cn(
-              'text-sm mb-6',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-            )}>
-              {t('brain.guestView.description') || 'Sign in to track your brain training progress and unlock personalized cognitive insights'}
-            </p>
-            <button
-              onClick={() => setShowAuthModal(true)}
-              className={cn(
-                'px-6 py-3 rounded-neo font-bold',
-                'border-3 border-neo-black shadow-hard',
-                'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
-                'bg-neo-cyan text-neo-black'
-              )}
-            >
-              {t('common.signIn') || 'Sign In'}
-            </button>
-          </motion.div>
-
-          {/* Auth Modal */}
-          <AuthModal
-            isOpen={showAuthModal}
-            onClose={() => setShowAuthModal(false)}
-            showGuestStats={true}
-          />
-        </main>
-      </div>
-    );
-  }
-
-  // New user state (no brain score yet)
-  if (!brainScore) {
-    return (
-      <div className={cn(
-        'h-full flex flex-col page-content-safe',
-        isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-      )}>
-        <AutoHideHeader />
-        <Header
-          isDarkMode={isDarkMode}
-          onBack={handleBack}
-          title={t('brain.title')}
-          backText={t('common.back')}
-        />
-        <main className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'text-center p-8 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}
-          >
-            <Brain className="w-16 h-16 mx-auto mb-4 text-neo-cyan" />
-            <h2 className={cn(
-              'text-xl font-bold mb-2',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {t('brain.empty.title') || 'Start Your Brain Training Journey'}
-            </h2>
-            <p className={cn(
-              'text-sm mb-6',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-            )}>
-              {t('brain.empty.description') || 'Play your first game to unlock your Brain Score and start tracking your cognitive growth!'}
-            </p>
-            <button
-              onClick={() => router.push(`/${language}`)}
-              className={cn(
-                'px-6 py-3 rounded-neo font-bold',
-                'border-3 border-neo-black shadow-hard',
-                'transition-all hover:translate-y-[-2px] hover:shadow-hard-lg',
-                'bg-neo-cyan text-neo-black'
-              )}
-            >
-              {t('brain.empty.playNow') || 'Play Now'}
-            </button>
-          </motion.div>
-
-          {/* Show Quick Drills section even for new users */}
-          <QuickDrillsSection drillProgress={drillProgress} />
-        </main>
-      </div>
-    );
-  }
-
-  // Main dashboard with real data
-  return (
-    <div className={cn(
-      'h-full flex flex-col page-content-safe', // Extra padding for bottom nav
-      isDarkMode ? 'bg-neo-navy' : 'bg-neo-cream'
-    )}>
-      <AutoHideHeader />
-      <Header
-        isDarkMode={isDarkMode}
-        onBack={handleBack}
-        title={t('brain.title')}
-        backText={t('common.back')}
+    <>
+      <VideoGameJsonLd
+        mode="brain"
+        locale={locale}
+        name={content.title}
+        description={content.description}
+        playMode="SinglePlayer"
+        numberOfPlayers={{ minValue: 1, maxValue: 1 }}
       />
-
-      {/* Main Content */}
-      <main className="px-4 py-6 space-y-6 max-w-4xl mx-auto">
-        {/* Brain Score Hero */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <BrainScoreHero
-            score={brainScore.overallScore}
-            tier={brainScore.tier}
-            tierProgress={brainScore.tierProgress}
-            gamesAnalyzed={brainScore.gamesAnalyzed}
-            drillsCompleted={brainScore.drillsCompleted}
-            onShare={() => setShowShareCard(true)}
-          />
-        </motion.div>
-
-        {/* Welcome Back Card (for returning users after 3+ days) */}
-        {welcomeBackData.show && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.05 }}
-          >
-            <WelcomeBackCard
-              daysSinceLastActivity={welcomeBackData.daysSinceLastActivity}
-              currentScore={brainScore.overallScore}
-              personalBest={welcomeBackData.personalBest}
-              currentTier={brainScore.tier}
-              currentStreak={brainScore.currentStreak}
-              longestStreak={brainScore.longestStreak}
-            />
-          </motion.div>
-        )}
-
-        {/* Radar Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-        >
-          <CognitiveRadarChart domains={brainScore.domains} />
-        </motion.div>
-
-        {/* Progress History Chart - only show if there's meaningful history */}
-        {brainScoreHistory.length >= 2 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.12 }}
-          >
-            <BrainScoreHistoryChart history={brainScoreHistory} />
-          </motion.div>
-        )}
-
-        {/* Cognitive Domains */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.15 }}
-        >
-          <CognitiveDomainGrid
-            domains={brainScore.domains}
-            gamesAnalyzed={brainScore.gamesAnalyzed}
-            recentGameScores={recentGameScores}
-          />
-        </motion.div>
-
-        {/* Personalized Drill Recommendation */}
-        {brainScore.gamesAnalyzed >= 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.18 }}
-          >
-            <PersonalizedDrillRecommendation
-              domains={brainScore.domains}
-              gamesPlayed={brainScore.gamesAnalyzed}
-            />
-          </motion.div>
-        )}
-
-        {/* Quick Drills */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.2 }}
-        >
-          <QuickDrillsSection drillProgress={drillProgress} />
-        </motion.div>
-
-        {/* Scientific Tips */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3, delay: 0.3 }}
-        >
-          <ScientificTipsCarousel />
-        </motion.div>
-
-        {/* Empty State for Users with Zero Games */}
-        {brainScore.gamesAnalyzed === 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={cn(
-              'text-center p-8 rounded-neo border-3 border-neo-black shadow-hard',
-              isDarkMode ? 'bg-slate-800' : 'bg-white'
-            )}
-          >
-            <Brain className="w-16 h-16 mx-auto mb-4 text-neo-cyan" />
-            <h2 className={cn(
-              'text-xl font-bold mb-2',
-              isDarkMode ? 'text-neo-white' : 'text-neo-black'
-            )}>
-              {t('brain.empty.title') || 'Start Your Journey'}
-            </h2>
-            <p className={cn(
-              'text-sm',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
-            )}>
-              {t('brain.empty.description') || 'Play more games to see your cognitive growth!'}
-            </p>
-          </motion.div>
-        )}
-      </main>
-
-      {/* First Game Celebration Modal */}
-      {brainScore && (
-        <FirstGameCelebration
-          isOpen={showCelebration}
-          onClose={() => setShowCelebration(false)}
-          overallScore={brainScore.overallScore}
-          tier={brainScore.tier}
-          domains={{
-            processingSpeed: brainScore.domains.processingSpeed.score,
-            workingMemory: brainScore.domains.workingMemory.score,
-            attention: brainScore.domains.attention.score,
-            flexibility: brainScore.domains.flexibility.score,
-            vocabulary: brainScore.domains.vocabulary.score,
-          }}
-        />
-      )}
-
-      {/* Brain Score Share Card Modal */}
-      {brainScore && showShareCard && (
-        <BrainScoreShareCard
-          score={brainScore.overallScore}
-          tier={brainScore.tier}
-          domains={brainScore.domains}
-          gamesAnalyzed={brainScore.gamesAnalyzed}
-          onClose={() => setShowShareCard(false)}
-        />
-      )}
-    </div>
+      <BreadcrumbJsonLd
+        items={[
+          { name: 'LexiClash', url: `${origin}/${locale}` },
+          { name: content.title, url: `${origin}/${locale}/brain` },
+        ]}
+      />
+      <BrainTrainingPageClient />
+      <GamePageSeoContent title={content.title} description={content.description} features={content.features} faq={content.faq} />
+    </>
   );
 }

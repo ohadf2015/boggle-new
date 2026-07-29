@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useRef, FormEvent } from 'react';
-import { motion } from 'framer-motion';
-import { Gamepad2, RefreshCw } from 'lucide-react';
+import { m } from 'framer-motion';
+import { Gamepad2, RefreshCw, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -52,8 +52,8 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-neo-black text-white pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
-      <motion.div
+    <div className="flex-1 bg-neo-black text-white pt-4 flex flex-col items-center justify-center p-2 sm:p-4 md:p-6">
+      <m.div
         initial={{ scale: 0, rotate: -3 }}
         animate={{ scale: 1, rotate: 1 }}
         transition={{ type: 'spring', stiffness: 260, damping: 20 }}
@@ -63,10 +63,10 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
           <CardHeader className="text-center space-y-4">
             <div className="flex justify-center">
               <div className="p-4 bg-neo-cyan text-neo-black rounded-neo border-3 border-neo-black shadow-hard-sm rotate-3">
-                <Gamepad2 size={48} className="text-neo-black" />
+                <Gamepad2 size={48} className="text-neo-black" aria-hidden="true" />
               </div>
             </div>
-            <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-cream tracking-tight">
+            <CardTitle className="text-2xl sm:text-3xl font-black uppercase text-neo-white tracking-tight">
               {t('joinView.inviteTitle')}
             </CardTitle>
             {/* Room number prominently displayed */}
@@ -79,7 +79,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
           <CardContent className="space-y-3 sm:space-y-6">
             {/* Error Alert */}
             {error && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3 }}
@@ -87,7 +87,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
                 <div className="p-4 bg-neo-pink/20 text-white border-3 border-neo-pink rounded-neo">
                   <p className="text-neo-pink font-bold uppercase text-sm">{error}</p>
                 </div>
-              </motion.div>
+              </m.div>
             )}
 
             {/* Authenticated user - simplified view */}
@@ -104,37 +104,55 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
             ) : (
               /* Guest user - needs name input */
               <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-6">
-                <motion.div
+                <m.div
                   animate={usernameError ? { x: [-10, 10, -10, 10, 0] } : {}}
                   transition={{ duration: 0.4 }}
                   className="space-y-2"
                 >
-                  <Label htmlFor="username" className="text-base font-black uppercase text-neo-cream">
+                  <Label htmlFor="username" className="text-base font-black uppercase text-neo-white">
                     {t('joinView.enterNameToPlay')}
                   </Label>
-                  <Input
-                    ref={usernameInputRef}
-                    id="username"
-                    value={username}
-                    onChange={(e) => {
-                      setUsername(sanitizeInput(e.target.value, 20));
-                      if (usernameError) setUsernameError(false);
-                    }}
-                    required
-                    autoFocus
-                    className={cn(
-                      "h-14 text-lg bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/50 focus:border-neo-cyan focus:ring-0",
-                      usernameError && "border-neo-pink bg-neo-pink/20 text-neo-pink"
+                  <div className="relative">
+                    <Input
+                      ref={usernameInputRef}
+                      id="username"
+                      value={username}
+                      onChange={(e) => {
+                        setUsername(sanitizeInput(e.target.value, 20));
+                        if (usernameError) setUsernameError(false);
+                      }}
+                      required
+                      autoFocus
+                      className={cn(
+                        "h-14 text-lg pe-12 bg-neo-cream text-neo-black font-bold border-3 border-neo-black rounded-neo shadow-hard-sm placeholder:text-neo-black/50 focus:border-neo-cyan focus:ring-0",
+                        usernameError && "border-neo-pink bg-neo-pink/20 text-neo-pink"
+                      )}
+                      placeholder={t('joinView.playerNamePlaceholder')}
+                      maxLength={20}
+                    />
+                    {username && (
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => {
+                          setUsername('');
+                          if (usernameError) setUsernameError(false);
+                          usernameInputRef.current?.focus();
+                        }}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 text-neo-black/50 hover:text-neo-black"
+                        aria-label={t('common.clear')}
+                      >
+                        <X className="h-5 w-5" />
+                      </Button>
                     )}
-                    placeholder={t('joinView.playerNamePlaceholder')}
-                    maxLength={20}
-                  />
+                  </div>
                   {usernameError && (
                     <p className="text-sm text-neo-pink font-bold uppercase">
                       {t(usernameErrorKey || 'validation.usernameRequired')}
                     </p>
                   )}
-                </motion.div>
+                </m.div>
 
                 <JoinButton isJoining={isJoining} disabled={!username} t={t} />
 
@@ -143,7 +161,7 @@ export const QuickJoinForm: React.FC<QuickJoinFormProps> = ({
             )}
           </CardContent>
         </Card>
-      </motion.div>
+      </m.div>
     </div>
   );
 };
@@ -169,8 +187,8 @@ const AuthenticatedQuickJoin: React.FC<AuthenticatedQuickJoinProps> = ({
 }) => (
   <div className="space-y-4 sm:space-y-6">
     <div className="space-y-3">
-      <Label htmlFor="auth-display-name" className="text-base font-black uppercase text-neo-cream">
-        {t('joinView.joiningAs') || 'Joining as'}
+      <Label htmlFor="auth-display-name" className="text-base font-black uppercase text-neo-white">
+        {t('joinView.joiningAs')}
       </Label>
       <Input
         id="auth-display-name"
@@ -180,8 +198,8 @@ const AuthenticatedQuickJoin: React.FC<AuthenticatedQuickJoinProps> = ({
         placeholder={displayName}
         maxLength={20}
       />
-      <p className="text-neo-cream/90 text-xs font-bold uppercase text-center">
-        {t('joinView.tapToChangeDisplayName') || 'Tap to change display name'}
+      <p className="text-neo-white text-xs font-bold uppercase text-center">
+        {t('joinView.tapToChangeDisplayName')}
       </p>
     </div>
 
@@ -199,7 +217,7 @@ interface JoinButtonProps {
 }
 
 const JoinButton: React.FC<JoinButtonProps> = ({ isJoining, disabled, onClick, t }) => (
-  <motion.div whileHover={!isJoining ? { x: -2, y: -2 } : {}} whileTap={!isJoining ? { x: 2, y: 2 } : {}}>
+  <m.div whileHover={!isJoining ? { x: -2, y: -2 } : {}} whileTap={!isJoining ? { x: 2, y: 2 } : {}}>
     <Button
       type={onClick ? "button" : "submit"}
       onClick={onClick}
@@ -208,23 +226,23 @@ const JoinButton: React.FC<JoinButtonProps> = ({ isJoining, disabled, onClick, t
     >
       {isJoining ? (
         <>
-          <motion.span
+          <m.span
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="mr-3 inline-block"
+            className="me-3 inline-block"
           >
-            <RefreshCw size={24} />
-          </motion.span>
+            <RefreshCw size={24} aria-hidden="true" />
+          </m.span>
           {t('joinView.joining')}
         </>
       ) : (
         <>
-          <Gamepad2 className="mr-3" size={24} />
+          <Gamepad2 className="me-3" size={24} aria-hidden="true" />
           {t('joinView.joinGame')}
         </>
       )}
     </Button>
-  </motion.div>
+  </m.div>
 );
 
 interface SwitchToFullFormLinkProps {

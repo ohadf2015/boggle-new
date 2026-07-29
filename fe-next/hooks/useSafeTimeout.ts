@@ -1,4 +1,4 @@
-import { useRef, useEffect, useCallback } from 'react';
+import { useRef, useEffect, useCallback, useMemo } from 'react';
 
 /**
  * Hook for managing a timeout that automatically cleans up
@@ -48,7 +48,8 @@ export function useSafeTimeout() {
     timeoutRef.current = setTimeout(callback, delay);
   }, [clear]);
 
-  return { set, clear, timeoutRef };
+  // Memoize the return value to ensure stable reference for useEffect dependencies
+  return useMemo(() => ({ set, clear, timeoutRef }), [set, clear]);
 }
 
 /**
@@ -132,9 +133,20 @@ export function useSafeInterval() {
     intervalRef.current = setInterval(callback, interval);
   }, [stop]);
 
-  const isRunning = intervalRef.current !== null;
-
-  return { start, stop, isRunning, intervalRef };
+  // Memoize the return value to ensure stable reference for useEffect dependencies
+  // Without this, the returned object is a new reference on every render,
+  // which causes infinite effect re-runs when used in dependency arrays
+  return useMemo(
+    () => ({
+      start,
+      stop,
+      get isRunning() {
+        return intervalRef.current !== null;
+      },
+      intervalRef,
+    }),
+    [start, stop]
+  );
 }
 
 /**

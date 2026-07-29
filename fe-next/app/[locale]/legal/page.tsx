@@ -1,76 +1,15 @@
-'use client';
+import type { Metadata } from 'next';
+import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 
-import React from 'react';
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import LegalPageLayout from '@/components/legal/LegalPageLayout';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useTheme } from '@/utils/ThemeContext';
-import { cn } from '@/lib/utils';
+export const dynamic = 'force-dynamic';
 
-export default function LegalIndexPage(): React.ReactElement {
-  const { t } = useLanguage();
-  const { theme } = useTheme();
-  const params = useParams();
-  const locale = params.locale as string;
-  const isDarkMode = theme === 'dark';
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
+  const { locale } = await params;
+  return generatePageMetadata({ seoKey: 'legal', path: '/legal', locale });
+}
 
-  const legalPages = [
-    {
-      href: `/${locale}/legal/terms`,
-      titleKey: 'legal.terms.title',
-      descriptionKey: 'legal.index.termsDescription',
-      icon: '📜',
-    },
-    {
-      href: `/${locale}/legal/privacy`,
-      titleKey: 'legal.privacy.title',
-      descriptionKey: 'legal.index.privacyDescription',
-      icon: '🔒',
-    },
-  ];
+import LegalIndexPageClient from './PageClient';
 
-  return (
-    <LegalPageLayout title={t('legal.index.title')}>
-      <p className={cn(
-        'text-lg mb-8',
-        isDarkMode ? 'text-gray-300' : 'text-gray-600'
-      )}>
-        {t('legal.index.intro')}
-      </p>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        {legalPages.map((page) => (
-          <Link
-            key={page.href}
-            href={page.href}
-            className={cn(
-              'block p-6 rounded-lg border transition-all hover:scale-[1.02]',
-              isDarkMode
-                ? 'bg-gray-800 border-gray-700 hover:border-purple-500'
-                : 'bg-white border-gray-200 hover:border-purple-500 shadow-sm hover:shadow-md'
-            )}
-          >
-            <div className="flex items-start gap-4">
-              <span className="text-3xl">{page.icon}</span>
-              <div>
-                <h2 className={cn(
-                  'text-xl font-bold mb-2',
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                )}>
-                  {t(page.titleKey)}
-                </h2>
-                <p className={cn(
-                  'text-sm',
-                  isDarkMode ? 'text-gray-600' : 'text-gray-600'
-                )}>
-                  {t(page.descriptionKey)}
-                </p>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </LegalPageLayout>
-  );
+export default function LegalIndexPage() {
+  return <LegalIndexPageClient />;
 }

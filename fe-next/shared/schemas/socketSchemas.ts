@@ -7,6 +7,8 @@
  */
 
 import { z } from 'zod';
+import { customAvatarSchema } from '../types/customAvatar';
+import { BLAST_COMBO_TYPES } from '../types/blast';
 
 // ==================== Security Configuration ====================
 
@@ -72,36 +74,38 @@ export const AvatarSchema = z.object({
     }, 'Invalid emoji format'),
   color: z.string().regex(/^#[0-9A-Fa-f]{6}$/),
   avatarImage: z.string().max(100).regex(/^[a-z0-9_\-\/]+$/i).optional().nullable(),
-  profilePictureUrl: z.string()
-    .url()
-    .nullable()
-    .optional()
-    // SECURITY: HTTPS-only and domain whitelist to prevent SSRF/XSS
-    .refine((url) => {
-      if (!url) return true; // null/undefined is allowed
-      try {
-        const parsed = new URL(url);
-        // Only allow HTTPS (prevent data:, javascript:, file:, http: schemes)
-        if (parsed.protocol !== 'https:') return false;
-        // Check against whitelist
-        return ALLOWED_IMAGE_DOMAINS.some(domain =>
-          parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
-        );
-      } catch {
-        return false;
-      }
-    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
+  customAvatar: customAvatarSchema.optional().nullable(),
 });
 
 export const GameCodeSchema = z.string()
   .min(6, 'Game code must be at least 6 characters')
   .max(10, 'Game code must be at most 10 characters')
-  .regex(/^[A-Za-z0-9]+$/, 'Game code must be alphanumeric');
+  .regex(/^[A-Za-z0-9]+$/, 'Game code must be alphanumeric')
+  .transform(s => s.toUpperCase());
+
+export const RoomNameSchema = z.string()
+  .max(50, 'Room name must be at most 50 characters')
+  .regex(/^[a-zA-Z0-9\s._\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF]+$/, 'Room name can only contain letters, numbers, spaces, dots, underscores, and hyphens')
+  .transform(s => s.trim())
+  .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Room name contains invalid characters')
+  .optional();
+
+export const PlayerIdSchema = z.string()
+  .regex(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i, 'Player ID must be a valid UUID v4')
+  .optional()
+  .nullable();
+
+export const GuestTokenHashSchema = z.string()
+  .regex(/^[a-f0-9]{64}$/i, 'Guest token hash must be a valid SHA-256 hash')
+  .optional()
+  .nullable();
 
 export const UsernameSchema = z.string()
   .min(1, 'Username is required')
   .max(30, 'Username must be at most 30 characters')
-  .regex(/^[a-zA-Z0-9_\-\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
+  // Latin: a-zA-Z + Latin-1 Supplement/Extended (\u00C0-\u024F) covers Spanish/Swedish/French/German/Nordic accents.
+  // Sentry 139/142/138/143: non-ASCII names like "Andr\u00E9s", "Bj\u00F6rn", "Fran\u00E7ois" were rejected.
+  .regex(/^[a-zA-Z0-9._\-\u00C0-\u024F\u0590-\u05FF\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF\s]+$/)
   .transform(s => s.trim())
   // SECURITY: Reject control characters, zero-width characters, and BOM
   .refine((val) => !/[\u0000-\u001F\u007F-\u009F\u200B-\u200D\uFEFF]/.test(val), 'Username contains invalid characters');
@@ -130,30 +134,19 @@ export const PresenceStatusSchema = z.enum(['active', 'idle', 'afk']);
  */
 export const CreateGameSchema = z.object({
   gameCode: GameCodeSchema,
-  roomName: z.string().max(50).optional(),
+  roomName: RoomNameSchema,
   language: LanguageSchema.optional().default('en'),
   hostUsername: UsernameSchema.optional(),
-  playerId: z.string().max(64).optional().nullable(),
+  playerId: PlayerIdSchema,
   avatar: AvatarSchema.optional(),
   authUserId: z.string().uuid().optional().nullable(),
-  guestTokenHash: z.string().max(128).optional().nullable(),
+  guestTokenHash: GuestTokenHashSchema,
   isRanked: z.boolean().optional().default(false),
-  profilePictureUrl: z.string()
-    .url()
-    .optional()
-    .nullable()
-    .refine((url) => {
-      if (!url) return true;
-      try {
-        const parsed = new URL(url);
-        if (parsed.protocol !== 'https:') return false;
-        return ALLOWED_IMAGE_DOMAINS.some(domain =>
-          parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
-        );
-      } catch {
-        return false;
-      }
-    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
+  isPrivate: z.boolean().optional().default(false),
+  // Audit T4 (2026-05-10): when true, host disconnect must NOT auto-promote a
+  // student/player. Goes straight to grace period so the teacher can reclaim
+  // host. Set by the multiplayer client when ?classroom=true URL param is on.
+  isClassroom: z.boolean().optional().default(false),
 });
 
 /**
@@ -162,26 +155,10 @@ export const CreateGameSchema = z.object({
 export const JoinGameSchema = z.object({
   gameCode: GameCodeSchema,
   username: UsernameSchema,
-  playerId: z.string().max(64).optional().nullable(),
+  playerId: PlayerIdSchema,
   avatar: AvatarSchema.optional(),
   authUserId: z.string().uuid().optional().nullable(),
-  guestTokenHash: z.string().max(128).optional().nullable(),
-  profilePictureUrl: z.string()
-    .url()
-    .optional()
-    .nullable()
-    .refine((url) => {
-      if (!url) return true;
-      try {
-        const parsed = new URL(url);
-        if (parsed.protocol !== 'https:') return false;
-        return ALLOWED_IMAGE_DOMAINS.some(domain =>
-          parsed.hostname === domain || parsed.hostname.endsWith('.' + domain)
-        );
-      } catch {
-        return false;
-      }
-    }, 'Profile picture URL must be from an allowed domain (HTTPS only)'),
+  guestTokenHash: GuestTokenHashSchema,
 });
 
 /**
@@ -197,17 +174,38 @@ export const LeaveRoomSchema = z.object({
  */
 export const StartGameSchema = z.object({
   gameCode: GameCodeSchema.optional(),
-  letterGrid: z.array(z.array(z.string())),
-  timerSeconds: z.number().int().min(30).max(600).optional().default(180),
+  letterGrid: z.array(z.array(z.string().max(5)).max(15)).max(15).optional().default([]),
+  timerSeconds: z.number().int().optional().default(90),
   language: LanguageSchema.optional(),
   difficulty: DifficultySchema.optional().default('MEDIUM'),
-  minWordLength: z.number().int().min(2).max(5).optional().default(3),
+  minWordLength: z.number().int().min(2).max(5).optional().default(2),
+  boardTheme: z.object({
+    nameKey: z.string(),
+    emoji: z.string(),
+    isHoliday: z.boolean().optional(),
+  }).nullable().optional(),
+  gameMode: z.enum(['classic', 'blast', 'word-hunt', 'wheel-rush', 'shiritori', 'word-tower', 'random']).optional(),
+  tvMode: z.boolean().optional(),
+  /**
+   * Optional boost token bundled with startGame so the server can register
+   * the boost atomically with state transition (eliminates the prior race
+   * with a separate `boost:apply` emit).
+   */
+  boostToken: z.string().min(1).max(512).optional(),
 });
 
 /**
  * startGameAck event payload - client acknowledges game start
  */
 export const StartGameAckSchema = z.object({
+  messageId: z.string().min(1),
+});
+
+/**
+ * countdownComplete event payload - client signals pre-game countdown finished
+ * (independent of ack: ack = delivery confirmation, this = readiness to play)
+ */
+export const CountdownCompleteSchema = z.object({
   messageId: z.string().min(1),
 });
 
@@ -219,7 +217,42 @@ export const SubmitWordSchema = z.object({
   username: UsernameSchema.optional(),
   word: WordSchema,
   path: z.array(GridPositionSchema).optional(),
-  comboLevel: z.number().int().min(0).max(10).optional(),
+  // comboLevel and fireRoundActive deliberately omitted — derived server-side
+  // to prevent clients from spoofing score multipliers.
+  // comboType: server has no tile state to detect combos, so the value itself
+  // is client-supplied — but the surface is enum-restricted to canonical types
+  // to prevent arbitrary string injection (BLT-VAL-1, blast MP audit 2026-04-28).
+  comboType: z.enum(BLAST_COMBO_TYPES).optional().nullable(),
+  // inputMethod: tracks whether word was submitted via keyboard ('kb') or drag/tap ('drag')
+  inputMethod: z.enum(['kb', 'drag']).optional().default('drag'),
+});
+
+/**
+ * submitWheelWord event payload - Wheel Rush MP word submission
+ */
+export const SubmitWheelWordSchema = z.object({
+  word: z.string().min(1).max(20).transform(s => s.toUpperCase().trim()),
+});
+
+/** Word Tower (versus) MP word submission — built from tray + anchor. */
+export const SubmitTowerWordSchema = z.object({
+  word: z.string().min(1).max(40).transform(s => s.trim()),
+});
+
+/** Word Tower (versus) — reroll the tray. */
+export const ScrambleTowerSchema = z.object({}).strict();
+
+/** Word Tower (versus) — drop a bomb on a rival's tower. */
+export const SendTowerBombSchema = z.object({
+  targetPlayerId: z.string().min(1).max(64),
+});
+
+/**
+ * submitShiritoriWord event payload - Shiritori (しりとり) MP word-chain turn.
+ * Hiragana words; game is resolved from the socket, like wheel-rush.
+ */
+export const SubmitShiritoriWordSchema = z.object({
+  word: z.string().min(1).max(50).transform(s => s.trim()),
 });
 
 /**
@@ -233,7 +266,7 @@ export const SubmitWordVoteSchema = z.object({
   isValid: z.boolean().optional(),
   language: LanguageSchema.optional(),
   submittedBy: UsernameSchema.optional(),
-  isBot: z.boolean().optional(),
+  // isBot intentionally omitted — derived from server-side game.users state
 });
 
 /**
@@ -289,6 +322,8 @@ export const PresenceUpdateSchema = z.object({
   username: UsernameSchema.optional(),
   status: PresenceStatusSchema.optional(),
   isWindowFocused: z.boolean().optional(),
+  isActive: z.boolean().optional(),
+  isIdle: z.boolean().optional(),
   lastActivityAt: z.number().optional(),
 });
 
@@ -324,7 +359,7 @@ export const CreateTournamentSchema = z.object({
   name: z.string().min(1).max(100),
   totalRounds: z.number().int().min(2).max(10).default(3),
   settings: z.object({
-    timerSeconds: z.number().int().min(30).max(600).optional(),
+    timerSeconds: z.number().int().min(30).max(120).optional(),
     difficulty: DifficultySchema.optional(),
     minWordLength: z.number().int().min(2).max(5).optional(),
   }).optional(),
@@ -362,7 +397,7 @@ export const ReconnectSchema = z.object({
   gameCode: GameCodeSchema,
   username: UsernameSchema,
   authUserId: z.string().uuid().optional().nullable(),
-  guestTokenHash: z.string().max(128).optional().nullable(),
+  guestTokenHash: GuestTokenHashSchema,
 });
 
 /**
@@ -371,7 +406,7 @@ export const ReconnectSchema = z.object({
 export const UpdateGameSettingsSchema = z.object({
   gameCode: GameCodeSchema,
   settings: z.object({
-    timerSeconds: z.number().int().min(30).max(600).optional(),
+    timerSeconds: z.number().int().min(30).max(120).optional(),
     difficulty: DifficultySchema.optional(),
     minWordLength: z.number().int().min(2).max(5).optional(),
     language: LanguageSchema.optional(),
@@ -385,6 +420,14 @@ export const BroadcastShufflingGridSchema = z.object({
   gridState: z.unknown(),
 });
 
+/**
+ * scorecard:generate event payload
+ */
+export const GenerateScoreCardSchema = z.object({
+  gameCode: GameCodeSchema.optional(),
+  username: UsernameSchema.optional(),
+});
+
 // ==================== Schema Map for Validation ====================
 
 export const ClientEventSchemas = {
@@ -393,12 +436,16 @@ export const ClientEventSchemas = {
   leaveRoom: LeaveRoomSchema,
   startGame: StartGameSchema,
   startGameAck: StartGameAckSchema,
+  countdownComplete: CountdownCompleteSchema,
   resetGame: ResetGameSchema,
   closeRoom: CloseRoomSchema,
   submitWord: SubmitWordSchema,
+  submitWheelWord: SubmitWheelWordSchema,
+  submitShiritoriWord: SubmitShiritoriWordSchema,
   submitWordVote: SubmitWordVoteSchema,
   submitPeerValidationVote: SubmitPeerValidationVoteSchema,
   sendChatMessage: ChatMessageSchema,
+  chatMessage: ChatMessageSchema,
   addBot: AddBotSchema,
   removeBot: RemoveBotSchema,
   heartbeat: HeartbeatSchema,
@@ -411,6 +458,7 @@ export const ClientEventSchemas = {
   reconnect: ReconnectSchema,
   updateGameSettings: UpdateGameSettingsSchema,
   broadcastShufflingGrid: BroadcastShufflingGridSchema,
+  'scorecard:generate': GenerateScoreCardSchema,
 } as const;
 
 // ==================== Validation Helpers ====================
@@ -502,6 +550,11 @@ export type JoinGameData = z.infer<typeof JoinGameSchema>;
 export type LeaveRoomData = z.infer<typeof LeaveRoomSchema>;
 export type StartGameData = z.infer<typeof StartGameSchema>;
 export type SubmitWordData = z.infer<typeof SubmitWordSchema>;
+export type SubmitWheelWordData = z.infer<typeof SubmitWheelWordSchema>;
+export type SubmitTowerWordData = z.infer<typeof SubmitTowerWordSchema>;
+export type ScrambleTowerData = z.infer<typeof ScrambleTowerSchema>;
+export type SendTowerBombData = z.infer<typeof SendTowerBombSchema>;
+export type SubmitShiritoriWordData = z.infer<typeof SubmitShiritoriWordSchema>;
 export type ChatMessageData = z.infer<typeof ChatMessageSchema>;
 export type AddBotData = z.infer<typeof AddBotSchema>;
 export type RemoveBotData = z.infer<typeof RemoveBotSchema>;
@@ -511,3 +564,9 @@ export type KickPlayerData = z.infer<typeof KickPlayerSchema>;
 export type TransferHostData = z.infer<typeof TransferHostSchema>;
 export type CreateTournamentData = z.infer<typeof CreateTournamentSchema>;
 export type ReconnectData = z.infer<typeof ReconnectSchema>;
+
+// UGC Word Packs
+export const ApplyWordPackSchema = z.object({
+  packId: z.uuid(),
+});
+export type ApplyWordPackData = z.infer<typeof ApplyWordPackSchema>;

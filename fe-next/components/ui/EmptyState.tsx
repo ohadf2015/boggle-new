@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { AdaptiveMotion } from '@/components/motion/AdaptiveMotion';
 import { memo, ReactNode } from 'react';
 import { ArrowRight, Search, Users, Trophy, Gamepad2 } from 'lucide-react';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -32,19 +32,19 @@ interface EmptyStateProps {
 }
 
 const TYPE_CONFIG: Record<EmptyStateType, { icon: ReactNode; mascot: MascotVariant; emoji: string }> = {
-  'no-words': { icon: <Search className="w-full h-full" />, mascot: 'encouraging', emoji: '🔎' },
-  'waiting-players': { icon: <Users className="w-full h-full" />, mascot: 'happy', emoji: '👋' },
-  'no-games': { icon: <Gamepad2 className="w-full h-full" />, mascot: 'encouraging', emoji: '🎮' },
+  'no-words': { icon: <Search className="w-full h-full" />, mascot: 'explorer', emoji: '🔎' },
+  'waiting-players': { icon: <Users className="w-full h-full" />, mascot: 'waiting', emoji: '👋' },
+  'no-games': { icon: <Gamepad2 className="w-full h-full" />, mascot: 'sleepy', emoji: '🎮' },
   'no-results': { icon: <Trophy className="w-full h-full" />, mascot: 'thinking', emoji: '📊' },
   'error': { icon: null, mascot: 'oops', emoji: '😅' },
-  'custom': { icon: null, mascot: 'happy', emoji: '✨' },
+  'custom': { icon: null, mascot: 'encouraging', emoji: '✨' },
 };
 
 // Map size to mascot size
-const SIZE_TO_MASCOT: Record<'sm' | 'md' | 'lg', 'sm' | 'md' | 'lg'> = {
-  sm: 'sm',
-  md: 'md',
-  lg: 'lg',
+const SIZE_TO_MASCOT: Record<'sm' | 'md' | 'lg', 'xs' | 'sm' | 'md'> = {
+  sm: 'xs',
+  md: 'sm',
+  lg: 'md',
 };
 
 /**
@@ -116,19 +116,19 @@ export const EmptyState = memo(function EmptyState({
           />
         </div>
       ) : actualIcon ? (
-        <motion.div
+        <AdaptiveMotion.div
           className={`${sizeClasses[size].icon} mx-auto mb-4 text-neo-lime`}
           {...floatAnimation}
         >
           {actualIcon}
-        </motion.div>
+        </AdaptiveMotion.div>
       ) : (
-        <motion.div
+        <AdaptiveMotion.div
           className="text-5xl mb-4"
           {...floatAnimation}
         >
           {config.emoji}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
 
       {/* Title */}
@@ -138,31 +138,31 @@ export const EmptyState = memo(function EmptyState({
 
       {/* Description */}
       {description && (
-        <p className={`${sizeClasses[size].desc} text-neo-white/70 font-neo-body max-w-xs mx-auto`}>
+        <p className={`${sizeClasses[size].desc} text-neo-white font-neo-body max-w-xs mx-auto`}>
           {description}
         </p>
       )}
 
       {/* Arrow indicator */}
       {showArrow && (
-        <motion.div
+        <AdaptiveMotion.div
           className={`mt-4 text-neo-cyan ${arrowRotation[arrowDirection]}`}
           {...arrowAnimation}
         >
           <ArrowRight className="w-8 h-8 mx-auto" />
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
 
       {/* Action button */}
       {action && (
-        <motion.div
+        <AdaptiveMotion.div
           className="mt-4"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
           {action}
-        </motion.div>
+        </AdaptiveMotion.div>
       )}
     </div>
   );
@@ -178,7 +178,7 @@ export const WaitingDots = memo(function WaitingDots({ color = 'neo-cyan' }: { c
     return (
       <span className="inline-flex gap-1">
         {[0, 1, 2].map((i) => (
-          <span key={i} className={`w-2 h-2 bg-${color} rounded-full opacity-70`} />
+          <span key={`dot-${i}`} className={`w-2 h-2 bg-${color} rounded-full opacity-70`} />
         ))}
       </span>
     );
@@ -187,8 +187,8 @@ export const WaitingDots = memo(function WaitingDots({ color = 'neo-cyan' }: { c
   return (
     <span className="inline-flex gap-1">
       {[0, 1, 2].map((i) => (
-        <motion.span
-          key={i}
+        <AdaptiveMotion.span
+          key={`dot-${i}`}
           className={`w-2 h-2 bg-${color} rounded-full`}
           animate={{ y: [0, -6, 0] }}
           transition={{

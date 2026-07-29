@@ -119,18 +119,10 @@ Update the todo status to `in_progress`
 4. **Apply minimal fix** - no unrelated changes
 5. **Check if fix resolves** related errors
 
-### 4.3 Verify Fix
-Run relevant checks:
-```bash
-npx tsc --noEmit     # TypeScript errors
-npm run lint         # Linting
-npm run build        # Build verification
-```
-
-### 4.4 Mark as Completed
+### 4.3 Mark as Completed
 Update the todo status to `completed`
 
-### 4.5 Document Test Instructions
+### 4.4 Document Test Instructions
 For each fix:
 ```markdown
 ## Testing: [Error Title]
@@ -189,7 +181,14 @@ Use `mcp__notion__notion-update-page` with `command: "insert_content_after"` to 
 
 ---
 
-## Phase 6: Report to User
+## Phase 6: Commit & Push (Optional)
+
+If the user requests to commit the changes, use `/commit-push` to:
+- Run all verification checks (translations, linting, type checking, tests, build)
+- Fix any issues found
+- Commit and push to remote
+
+## Phase 7: Report to User
 
 Output a summary in chat:
 
@@ -203,12 +202,7 @@ Output a summary in chat:
 | [Error 1] | [count] | [users] | Fixed |
 | [Error 2] | [count] | [users] | Fixed |
 
-### Verification Commands
-```bash
-npm run build
-npm run lint
-npx tsc --noEmit
-```
+**Next Step:** Run `/commit-push` to verify all checks and push to remote.
 
 ### How to Test Each Fix
 
@@ -232,23 +226,39 @@ npx tsc --noEmit
 
 ---
 
-## Phase 7: Sentry Issue Management (Optional)
+## Phase 8: Resolve Fixed Issues in Sentry (MANDATORY)
 
-If fixes are confirmed working:
+After fixing issues, mark them as resolved in Sentry to keep the dashboard clean.
 
-### 7.1 Resolve Issues in Sentry
-```
-mcp__sentry__update_issue with issue_id: [id], status: "resolved"
+### 8.1 Resolve via Sentry Dashboard
+The Sentry MCP server is **read-only** — it cannot update issue status.
+Provide the user with direct links to resolve each fixed issue:
+
+```markdown
+### Issues to Resolve in Sentry
+
+Click each link → click "Resolve" button:
+- [ISSUE-ID](https://lexiclash.sentry.io/issues/ISSUE-ID/) — [brief description of fix]
 ```
 
-### 7.2 Add Resolution Comment
+### 8.2 Bulk Resolve Non-Actionable Issues
+For issues that are not code bugs (transient errors, third-party, stale deployments),
+recommend the user bulk-resolve or ignore them in the Sentry dashboard:
+
+```markdown
+### Issues to Ignore (not code bugs)
+- [ISSUE-ID](link) — transient Supabase 502
+- [ISSUE-ID](link) — browser extension / third-party
+- [ISSUE-ID](link) — already handled with graceful degradation
 ```
-mcp__sentry__add_issue_comment with issue_id: [id], comment: "Fixed in commit [hash]"
-```
+
+### 8.3 Noise Reduction
+When `logger.warn()` sends non-actionable errors to Sentry, downgrade to `logger.debug()`.
+This prevents future Sentry noise while keeping dev-mode visibility.
 
 ---
 
-## Phase 7.5: GitHub Integration (Optional)
+## Phase 9: GitHub Integration (Optional)
 
 ### Create GitHub Issue for Complex Bugs
 For bugs requiring further investigation or team discussion:
@@ -317,7 +327,7 @@ Search for similar past Sentry errors and their fixes:
 mcp__memory__memory_recall(query="sentry error [error-type] [affected-area]")
 ```
 
-### After Each Fix (Phase 4.5)
+### After Each Fix (Phase 4.4)
 Store the error pattern and fix for future reference:
 ```
 mcp__memory__memory_store(

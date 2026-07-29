@@ -7,25 +7,15 @@
 import type { DailyStreak } from './types';
 import { DAILY_STREAK_KEY } from './constants';
 import { getDailyChallengeDate, getYesterdayDate, getPreviousDate } from './dateUtils';
+import { getJsonFromLocalStorage, saveJsonToLocalStorage } from '@/utils/storageHelpers';
+import { emitStreakLifecycle } from './streakTelemetry';
 
 /**
  * Get the current daily streak
  */
 export function getDailyStreak(): DailyStreak {
-  if (typeof window === 'undefined') {
-    return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
-  }
-
-  const stored = localStorage.getItem(DAILY_STREAK_KEY);
-  if (!stored) {
-    return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
-  }
-
-  try {
-    return JSON.parse(stored);
-  } catch {
-    return { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
-  }
+  const defaultStreak = { currentStreak: 0, longestStreak: 0, lastPlayedDate: null, totalDailiesCompleted: 0 };
+  return getJsonFromLocalStorage<DailyStreak>(DAILY_STREAK_KEY, defaultStreak);
 }
 
 /**
@@ -46,13 +36,17 @@ export function updateDailyStreak(completionDate?: string): DailyStreak {
   }
 
   let newStreak: number;
+  let outcome: 'continued' | 'broken' | 'started';
 
   if (current.lastPlayedDate === previousDay) {
-    // Continue the streak
     newStreak = current.currentStreak + 1;
-  } else {
-    // Streak broken (or first time)
+    outcome = 'continued';
+  } else if (current.currentStreak > 0) {
     newStreak = 1;
+    outcome = 'broken';
+  } else {
+    newStreak = 1;
+    outcome = 'started';
   }
 
   const updated: DailyStreak = {
@@ -62,7 +56,8 @@ export function updateDailyStreak(completionDate?: string): DailyStreak {
     totalDailiesCompleted: current.totalDailiesCompleted + 1,
   };
 
-  localStorage.setItem(DAILY_STREAK_KEY, JSON.stringify(updated));
+  saveJsonToLocalStorage(DAILY_STREAK_KEY, updated);
+  emitStreakLifecycle({ outcome, newStreak, milestone: getStreakMilestone(newStreak) });
 
   return updated;
 }

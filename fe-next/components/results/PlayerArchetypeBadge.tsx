@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -20,7 +20,7 @@ interface PlayerArchetypeBadgeProps {
  * Neo-Brutalist Player Archetype Badge
  * Displays a player's personality archetype with icon and name
  */
-const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
+const PlayerArchetypeBadge = memo<PlayerArchetypeBadgeProps>(({
   archetype,
   size = 'md',
   showTooltip = true,
@@ -57,11 +57,17 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
   }, [isOpen]);
 
   useEffect(() => {
-    if (isOpen && badgeRef.current) {
+    if (!isOpen || !badgeRef.current) {
+      if (!isOpen) setTooltipPosition(null);
+      return;
+    }
+
+    const updatePosition = () => {
+      if (!badgeRef.current) return;
       const rect = badgeRef.current.getBoundingClientRect();
       const viewportHeight = window.innerHeight;
       const viewportWidth = window.innerWidth;
-      const tooltipEstimatedHeight = 120; // Increased for new layout
+      const tooltipEstimatedHeight = 140;
       const tooltipEstimatedWidth = 256; // w-64 = 16rem = 256px
 
       // Check if tooltip would go below viewport
@@ -78,11 +84,9 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
       const maxLeft = viewportWidth - tooltipEstimatedWidth / 2 - 16;
       leftPos = Math.max(minLeft, Math.min(maxLeft, leftPos));
 
-      // Calculate arrow offset when tooltip is clamped
-      // Arrow should still point at the badge center
-      // arrowOffset is the position of badge center relative to tooltip left edge, as percentage
+      // Calculate arrow offset - arrow should point at badge center
       const tooltipLeft = leftPos - tooltipEstimatedWidth / 2;
-      const arrowOffset = ((badgeCenter - tooltipLeft) / tooltipEstimatedWidth) * 100;
+      const arrowOffset = Math.max(10, Math.min(90, ((badgeCenter - tooltipLeft) / tooltipEstimatedWidth) * 100));
 
       setTooltipPosition({
         top: showAbove ? rect.top - 8 : rect.bottom + 8,
@@ -90,9 +94,17 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
         showAbove,
         arrowOffset,
       });
-    } else if (!isOpen) {
-      setTooltipPosition(null);
-    }
+    };
+
+    updatePosition();
+
+    // Recalculate on scroll to keep tooltip aligned
+    window.addEventListener('scroll', updatePosition, true);
+    window.addEventListener('resize', updatePosition);
+    return () => {
+      window.removeEventListener('scroll', updatePosition, true);
+      window.removeEventListener('resize', updatePosition);
+    };
   }, [isOpen]);
 
   // Touch/click handlers for mobile support
@@ -164,20 +176,20 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
   const textColorMap: Record<string, string> = {
     strategist: 'text-neo-black',
     speedster: 'text-neo-black',
-    scholar: 'text-neo-cream',
+    scholar: 'text-neo-white',
     explorer: 'text-neo-black',
     perfectionist: 'text-neo-black',
-    maverick: 'text-neo-cream',
+    maverick: 'text-neo-white',
     workhorse: 'text-neo-black',
     closer: 'text-neo-black',
-    trailblazer: 'text-neo-cream',
+    trailblazer: 'text-neo-white',
   };
 
   const bgColor = bgColorMap[archetype.id] || 'bg-neo-cyan';
   const textColor = textColorMap[archetype.id] || 'text-neo-black';
 
   const BadgeContent = (
-    <motion.div
+    <m.div
       ref={badgeRef}
       className={cn(
         'inline-flex items-center font-black uppercase tracking-wide',
@@ -199,7 +211,7 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
       transition={{ type: 'spring', stiffness: 300, damping: 15 }}
     >
       {/* Icon - Image or Emoji fallback */}
-      <div className={cn('flex-shrink-0 flex items-center justify-center', sizes.icon)}>
+      <div className={cn('shrink-0 flex items-center justify-center', sizes.icon)}>
         {archetype.icon && !imageError ? (
           <Image
             src={archetype.icon}
@@ -225,7 +237,7 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
           return translated !== translationKey ? translated : archetype.name;
         })()}
       </span>
-    </motion.div>
+    </m.div>
   );
 
   if (!showTooltip) {
@@ -248,13 +260,13 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
   const tooltipContent = (
     <AnimatePresence>
       {isOpen && isMounted && tooltipPosition && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: tooltipPosition.showAbove ? -5 : 5, scale: 0.95 }}
           transition={{ duration: 0.15 }}
           className={cn(
-            'fixed z-[9999] -translate-x-1/2',
+            'fixed z-30 -translate-x-1/2',
             'w-56 sm:w-64 px-3 py-2.5 rounded-neo border-3 border-neo-black',
             'bg-neo-cream shadow-hard-lg',
             tooltipPosition.showAbove && '-translate-y-full'
@@ -281,7 +293,7 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
           {/* Header: Icon + Name */}
           <div className="flex items-center gap-2 mb-1.5 relative z-10">
             <div className={cn(
-              'w-7 h-7 rounded-neo border-2 border-neo-black flex items-center justify-center flex-shrink-0',
+              'w-7 h-7 rounded-neo border-2 border-neo-black flex items-center justify-center shrink-0',
               bgColor
             )}>
               {archetype.icon && !imageError ? (
@@ -297,7 +309,7 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
                 <span className="text-base">{archetype.emoji}</span>
               )}
             </div>
-            <span className={cn('font-black text-sm uppercase tracking-wide', textColor === 'text-neo-cream' ? 'text-neo-black' : textColor)}>
+            <span className={cn('font-black text-sm uppercase tracking-wide', textColor === 'text-neo-white' ? 'text-neo-black' : textColor)}>
               {archetypeName}
             </span>
           </div>
@@ -308,10 +320,10 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
           </p>
 
           {/* Hint */}
-          <p className="text-[10px] text-neo-black/50 mt-1.5 pt-1.5 border-t border-neo-black/10 relative z-10">
-            {t('archetypes.hint') || 'Based on your play style'}
+          <p className="text-[10px] text-neo-black/70 mt-1.5 pt-1.5 border-t border-neo-black/10 relative z-10">
+            {t('archetypes.hint')}
           </p>
-        </motion.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
@@ -324,6 +336,8 @@ const PlayerArchetypeBadge: React.FC<PlayerArchetypeBadgeProps> = ({
       {showTooltip && isMounted && createPortal(tooltipContent, document.body)}
     </div>
   );
-};
+});
+
+PlayerArchetypeBadge.displayName = 'PlayerArchetypeBadge';
 
 export default PlayerArchetypeBadge;

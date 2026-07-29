@@ -1,0 +1,455 @@
+{
+  "locale": "sv",
+  "levels": [
+    {
+      "id": "sv-chain-01",
+      "levelNumber": 1,
+      "theme": "onboarding",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "SOL",
+        "ÄGG",
+        "BIL"
+      ]
+    },
+    {
+      "id": "sv-chain-02",
+      "levelNumber": 2,
+      "theme": "fruits",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "BÄR",
+        "KIWI",
+        "ÄPPLE"
+      ]
+    },
+    {
+      "id": "sv-chain-03",
+      "levelNumber": 3,
+      "theme": "animals",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "KO",
+        "RÄV",
+        "ORM"
+      ]
+    },
+    {
+      "id": "sv-chain-04",
+      "levelNumber": 4,
+      "theme": "food",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "RIS",
+        "OST",
+        "BRÖD"
+      ]
+    },
+    {
+      "id": "sv-chain-05",
+      "levelNumber": 5,
+      "theme": "colors",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "RÖD",
+        "BLÅ",
+        "GUL"
+      ]
+    },
+    {
+      "id": "sv-chain-06",
+      "levelNumber": 6,
+      "theme": "ocean",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "VÅG",
+        "HAJ",
+        "HAV",
+        "SÄL"
+      ]
+    },
+    {
+      "id": "sv-chain-07",
+      "levelNumber": 7,
+      "theme": "space",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "SOL",
+        "MÅNE",
+        "RYMD",
+        "MARS"
+      ]
+    },
+    {
+      "id": "sv-chain-08",
+      "levelNumber": 8,
+      "theme": "animals",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "KO",
+        "RÄV",
+        "ORM",
+        "VARG"
+      ]
+    },
+    {
+      "id": "sv-chain-09",
+      "levelNumber": 9,
+      "theme": "fruits",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "BÄR",
+        "KIWI",
+        "ÄPPLE",
+        "BANAN"
+      ]
+    },
+    {
+      "id": "sv-chain-10",
+      "levelNumber": 10,
+      "theme": "weather",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "IS",
+        "SNÖ",
+        "REGN",
+        "VIND"
+      ]
+    },
+    {
+      "id": "sv-chain-11",
+      "levelNumber": 11,
+      "theme": "animals",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "KO",
+        "RÄV",
+        "ORM",
+        "VARG",
+        "HÄST"
+      ]
+    },
+    {
+      "id": "sv-chain-12",
+      "levelNumber": 12,
+      "theme": "food",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "RIS",
+        "OST",
+        "BRÖD",
+        "KAKA",
+        "KÖTT"
+      ]
+    },
+    {
+      "id": "sv-chain-13",
+      "levelNumber": 13,
+      "theme": "nature",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "LÖV",
+        "ÄLV",
+        "SJÖ",
+        "TRÄD",
+        "STEN"
+      ]
+    },
+    {
+      "id": "sv-chain-14",
+      "levelNumber": 14,
+      "theme": "space",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "SOL",
+        "MÅNE",
+        "RYMD",
+        "MARS",
+        "KOMET"
+      ]
+    },
+    {
+      "id": "sv-chain-15",
+      "levelNumber": 15,
+      "theme": "animals",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "KO",
+        "RÄV",
+        "ORM",
+        "VARG",
+        "HÄST"
+      ]
+    },
+    {
+      "id": "sv-chain-16",
+      "levelNumber": 16,
+      "theme": "ocean",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "VÅG",
+        "HAJ",
+        "HAV",
+        "SÄL",
+        "VAL",
+        "ALG"
+      ]
+    },
+    {
+      "id": "sv-chain-17",
+      "levelNumber": 17,
+      "theme": "joy",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "KUL",
+        "GLAD",
+        "KRAM",
+        "DANS",
+        "FEST",
+        "LYCKA"
+      ]
+    },
+    {
+      "id": "sv-chain-18",
+      "levelNumber": 18,
+      "theme": "cozy",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "TE",
+        "HEM",
+        "VARM",
+        "MJUK",
+        "LUGN",
+        "SOVA"
+      ]
+    },
+    {
+      "id": "sv-chain-19",
+      "levelNumber": 19,
+      "theme": "fruits",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "BÄR",
+        "KIWI",
+        "ÄPPLE",
+        "BANAN",
+        "DRUVA",
+        "PÄRON"
+      ]
+    },
+    {
+      "id": "sv-chain-20",
+      "levelNumber": 20,
+      "theme": "spooky",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "BEN",
+        "HÄXA",
+        "MASK",
+        "NATT",
+        "MÖRK",
+        "GAST"
+      ]
+    },
+    {
+      "id": "sv-chain-21",
+      "levelNumber": 21,
+      "theme": "magic",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "FE",
+        "MAGI",
+        "STAV",
+        "DRÖM",
+        "ÄLVA",
+        "TROLL"
+      ]
+    },
+    {
+      "id": "sv-chain-22",
+      "levelNumber": 22,
+      "theme": "home",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "HUS",
+        "KÖK",
+        "DÖRR",
+        "STOL",
+        "BORD",
+        "SÄNG"
+      ]
+    },
+    {
+      "id": "sv-chain-23",
+      "levelNumber": 23,
+      "theme": "school",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "BOK",
+        "SUDD",
+        "RAST",
+        "PENNA",
+        "KLASS",
+        "KRITA"
+      ]
+    },
+    {
+      "id": "sv-chain-24",
+      "levelNumber": 24,
+      "theme": "space",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "SOL",
+        "MÅNE",
+        "RYMD",
+        "MARS",
+        "KOMET",
+        "RAKET"
+      ]
+    },
+    {
+      "id": "sv-chain-25",
+      "levelNumber": 25,
+      "theme": "transport",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "BIL",
+        "TÅG",
+        "BÅT",
+        "PLAN",
+        "BUSS",
+        "TAXI"
+      ]
+    },
+    {
+      "id": "sv-chain-26",
+      "levelNumber": 26,
+      "theme": "adventure",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "TÄLT",
+        "RESA",
+        "BERG",
+        "FLOD",
+        "STIG",
+        "SKOG"
+      ]
+    },
+    {
+      "id": "sv-chain-27",
+      "levelNumber": 27,
+      "theme": "ocean",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "VÅG",
+        "HAJ",
+        "HAV",
+        "SÄL",
+        "VAL",
+        "ALG"
+      ]
+    },
+    {
+      "id": "sv-chain-28",
+      "levelNumber": 28,
+      "theme": "mythology",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "GUD",
+        "TOR",
+        "ODEN",
+        "SAGA",
+        "DRAKE",
+        "JÄTTE"
+      ]
+    },
+    {
+      "id": "sv-chain-29",
+      "levelNumber": 29,
+      "theme": "music",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "LÅT",
+        "NOT",
+        "TON",
+        "KÖR",
+        "FIOL",
+        "PIANO"
+      ]
+    },
+    {
+      "id": "sv-chain-30",
+      "levelNumber": 30,
+      "theme": "science",
+      "locale": "sv",
+      "columns": 5,
+      "decoyTiles": 0,
+      "chain": [
+        "GAS",
+        "ATOM",
+        "CELL",
+        "SYRA",
+        "LASER",
+        "ROBOT"
+      ]
+    }
+  ]
+}

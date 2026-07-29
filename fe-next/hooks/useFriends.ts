@@ -11,14 +11,18 @@ import {
   sendFriendRequest,
   acceptFriendRequest,
   declineFriendRequest,
+  cancelFriendRequest,
   removeFriend,
   blockUser,
+  unblockUser,
+  getBlockedUsers,
   searchUsers,
   updateOnlineStatus,
   type Friend,
   type FriendRequest,
   type FriendChallenge,
 } from '@/utils/friends';
+import { useSocketOptional } from '@/utils/SocketContext';
 import logger from '@/utils/logger';
 
 interface UseFriendsState {
@@ -35,8 +39,12 @@ interface UseFriendsActions {
   sendRequest: (userId: string) => Promise<{ success: boolean; error?: string }>;
   acceptRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;
   declineRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;
+  cancelRequest: (requestId: string) => Promise<{ success: boolean; error?: string }>;
   unfriend: (friendUserId: string) => Promise<{ success: boolean; error?: string }>;
   block: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  unblock: (userId: string) => Promise<{ success: boolean; error?: string }>;
+  blockedUsers: Friend[];
+  refreshBlockedUsers: () => Promise<void>;
   search: (query: string) => Promise<Friend[]>;
 }
 
@@ -59,6 +67,9 @@ const FRIEND_LIST_REFRESH_INTERVAL = 30 * 1000;
  */
 export function useFriends(): UseFriendsReturn {
   const { isAuthenticated, user } = useAuth();
+  const socketContext = useSocketOptional();
+  const socket = socketContext?.socket ?? null;
+  const isSocketConnected = socketContext?.isConnected ?? false;
 
   const [state, setState] = useState<UseFriendsState>({
     friends: [],
@@ -112,7 +123,7 @@ export function useFriends(): UseFriendsReturn {
         });
       }
     } catch (err) {
-      logger.error('Error fetching friends:', err);
+      logger.debug('Error fetching friends:', err);
       if (isMounted.current) {
         setState(prev => ({
           ...prev,
@@ -155,23 +166,73 @@ export function useFriends(): UseFriendsReturn {
     return result;
   }, [refresh]);
 
-  // Unfriend
-  const unfriend = useCallback(async (friendUserId: string) => {
-    const result = await removeFriend(friendUserId);
+  // Cancel outgoing request
+  const cancelRequest = useCallback(async (requestId: string) => {
+    const result = await cancelFriendRequest(requestId);
     if (result.success) {
       await refresh();
     }
     return result;
   }, [refresh]);
 
+  // Unfriend — prefer Socket.IO to trigger server-side Redis cache invalidation (F-4)
+  const unfriend = useCallback(async (friendUserId: string) => {
+    if (socket && isSocketConnected) {
+      return new Promise<{ success: boolean; error?: string }>((resolve) => {
+        let resolved = false;
+        const done = () => {
+          if (resolved) return;
+          resolved = true;
+          refresh();
+          resolve({ success: true });
+        };
+        socket.emit('friends:unfriend', { friendUserId });
+        socket.once('friends:friendRemoved', done);
+        // Timeout fallback — only fires if socket event didn't arrive
+        setTimeout(done, 3000);
+      });
+    }
+    const result = await removeFriend(friendUserId);
+    if (result.success) {
+      await refresh();
+    }
+    return result;
+  }, [refresh, socket, isSocketConnected]);
+
+  // Blocked users state
+  const [blockedUsers, setBlockedUsers] = useState<Friend[]>([]);
+
+  const refreshBlockedUsers = useCallback(async () => {
+    if (!isAuthenticated) {
+      setBlockedUsers([]);
+      return;
+    }
+    try {
+      const blocked = await getBlockedUsers();
+      setBlockedUsers(blocked);
+    } catch {
+      // Silent fail
+    }
+  }, [isAuthenticated]);
+
   // Block user
   const block = useCallback(async (userId: string) => {
     const result = await blockUser(userId);
     if (result.success) {
       await refresh();
+      await refreshBlockedUsers();
     }
     return result;
-  }, [refresh]);
+  }, [refresh, refreshBlockedUsers]);
+
+  // Unblock user
+  const unblock = useCallback(async (userId: string) => {
+    const result = await unblockUser(userId);
+    if (result.success) {
+      await refreshBlockedUsers();
+    }
+    return result;
+  }, [refreshBlockedUsers]);
 
   // Search for users
   const search = useCallback(async (query: string): Promise<Friend[]> => {
@@ -227,14 +288,51 @@ export function useFriends(): UseFriendsReturn {
     }
   }, [isAuthenticated, fetchAll]);
 
+  // Realtime friend events — refresh on incoming/accepted/declined/removed
+  useEffect(() => {
+    if (!isAuthenticated || !socket || !isSocketConnected) return;
+
+    const onRefresh = () => { fetchAll(); };
+
+    socket.on('friends:requestReceived', onRefresh);
+    socket.on('friends:requestAccepted', onRefresh);
+    socket.on('friends:requestDeclined', onRefresh);
+    socket.on('friends:requestSent', onRefresh);
+    socket.on('friends:friendRemoved', onRefresh);
+    // Challenge events — without these, the rendered pendingChallenges list
+    // stays stale until the next 30s poll.
+    socket.on('friends:challengeReceived', onRefresh);
+    socket.on('friends:challengeAccepted', onRefresh);
+    socket.on('friends:challengeDeclined', onRefresh);
+    socket.on('friends:challengeExpired', onRefresh);
+    socket.on('friends:challengeResult', onRefresh);
+
+    return () => {
+      socket.off('friends:requestReceived', onRefresh);
+      socket.off('friends:requestAccepted', onRefresh);
+      socket.off('friends:requestDeclined', onRefresh);
+      socket.off('friends:requestSent', onRefresh);
+      socket.off('friends:friendRemoved', onRefresh);
+      socket.off('friends:challengeReceived', onRefresh);
+      socket.off('friends:challengeAccepted', onRefresh);
+      socket.off('friends:challengeDeclined', onRefresh);
+      socket.off('friends:challengeExpired', onRefresh);
+      socket.off('friends:challengeResult', onRefresh);
+    };
+  }, [isAuthenticated, socket, isSocketConnected, fetchAll]);
+
   return {
     ...state,
     refresh,
     sendRequest,
     acceptRequest,
     declineRequest,
+    cancelRequest,
     unfriend,
     block,
+    unblock,
+    blockedUsers,
+    refreshBlockedUsers,
     search,
   };
 }

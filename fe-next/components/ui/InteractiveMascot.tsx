@@ -1,148 +1,94 @@
 'use client';
 
-import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion';
-import { memo, useState, useCallback, useMemo } from 'react';
+import { m, AnimatePresence, type TargetAndTransition } from 'framer-motion';
+import { memo, useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
-import { MASCOT_IMAGES, MascotVariant } from './Mascot';
+import { haptics } from '@/utils/haptics';
+import { MascotVariant, getMascotImagePath, getMascotBgType, isVideoVariant, type MascotClipShape, type MascotBorderColor } from './Mascot';
+import { SilentVideo } from './SilentVideo';
+import {
+  getBaseVariant,
+  type ExtendedMascotVariant,
+  type MoodVariant,
+  type ActivityVariant,
+  VARIANT_MAP,
+  BASE_VARIANTS,
+} from './mascotUtils';
 
-/**
- * Mood-based variants (emotional states) - these use fallback images
- */
-export type MoodVariant = 'confused' | 'proud' | 'nervous' | 'sad' | 'winking';
-
-/**
- * Activity-based variants (mascot doing things)
- * These now have their own dedicated images
- */
-export type ActivityVariant =
-  | 'eating_pizza'
-  | 'drinking_coffee'
-  | 'reading'
-  | 'gaming'
-  | 'dancing'
-  | 'sleeping'
-  | 'waving'
-  | 'thumbs_up'
-  | 'holding_trophy'
-  | 'holding_sign'
-  | 'typing'
-  | 'cheering'
-  | 'training'
-  | 'playing_ball'
-  | 'skateboarding'
-  | 'juggling';
-
-/**
- * Extended mascot variants including interaction states and activities
- */
-export type ExtendedMascotVariant = MascotVariant | MoodVariant | ActivityVariant;
-
-/**
- * Fallback mapping for mood variants that don't have dedicated images
- */
-const MOOD_FALLBACKS: Record<MoodVariant, MascotVariant> = {
-  confused: 'thinking',
-  proud: 'victory',
-  nervous: 'oops',
-  sad: 'sleepy',
-  winking: 'happy',
-};
-
-/**
- * Get the base MascotVariant for any ExtendedMascotVariant
- * Most activity variants now have direct images
- */
-function getBaseVariant(variant: ExtendedMascotVariant): MascotVariant {
-  // If it's a mood variant, use fallback
-  if (variant in MOOD_FALLBACKS) {
-    return MOOD_FALLBACKS[variant as MoodVariant];
-  }
-  // For holding_sign (no image yet), fallback to pointing
-  if (variant === 'holding_sign') {
-    return 'pointing';
-  }
-  // All other variants have direct images
-  return variant as MascotVariant;
-}
+// Re-export types and utilities for backward compatibility
+export { getBaseVariant, VARIANT_MAP, BASE_VARIANTS };
+export type { ExtendedMascotVariant, MoodVariant, ActivityVariant };
 
 /**
  * Default state transitions for interactions
+ * All interactions transition between the 7 GIF variants
  */
-const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedMascotVariant>> = {
-  // Base emotions
-  happy: 'excited',
-  sleepy: 'surprised',
-  thinking: 'happy',
-  focused: 'excited',
-  encouraging: 'celebrating',
-  oops: 'nervous',
-  celebrating: 'victory',
-  victory: 'celebrating',
-  surprised: 'excited',
-  excited: 'celebrating',
-  pointing: 'happy',
-  // Mood variants
-  confused: 'thinking',
-  proud: 'celebrating',
-  nervous: 'oops',
-  sad: 'encouraging',
-  winking: 'excited',
-  // Activity variants - hover shows more energetic version
-  eating_pizza: 'excited',
-  drinking_coffee: 'happy',
-  reading: 'surprised',
-  gaming: 'celebrating',
-  dancing: 'cheering',
-  sleeping: 'surprised',
-  waving: 'excited',
-  thumbs_up: 'celebrating',
-  holding_trophy: 'celebrating',
-  holding_sign: 'excited',
-  typing: 'excited',
-  cheering: 'victory',
-  training: 'excited',
-  playing_ball: 'celebrating',
-  skateboarding: 'excited',
-  juggling: 'focused',
+const DEFAULT_HOVER_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVariant>> = {
+  // Base GIF variants
+  happy: 'gaming',        // Happy → Gaming (more energetic)
+  gaming: 'happy',        // Gaming → Happy (nice!)
+  thinking: 'happy',      // Thinking → Happy (done thinking)
+  oops: 'thinking',       // Oops → Thinking (figuring it out)
+  celebration: 'trophy',  // Celebration → Trophy (show off!)
+  dj: 'celebration',      // DJ → Celebration (party time!)
+  trophy: 'celebration',  // Trophy → Celebration (victory dance!)
+  panic: 'encouraging',   // Panic → Encouraging (calm down)
+  crying: 'encouraging',  // Crying → Encouraging (cheer up)
+  onfire: 'flexing',      // On Fire → Flexing (show strength)
+  bored: 'waving',        // Bored → Waving (perk up)
+  mindblown: 'happy',     // Mindblown → Happy (compose)
+  encouraging: 'happy',   // Encouraging → Happy (smile)
+  explorer: 'mindblown',  // Explorer → Mindblown (discover)
+  flexing: 'trophy',      // Flexing → Trophy (show off)
+  scared: 'encouraging',  // Scared → Encouraging (brave up)
+  shopkeeper: 'happy',    // Shopkeeper → Happy (welcome)
+  spectating: 'onfire',   // Spectating → On Fire (get hyped)
+  waving: 'happy',        // Waving → Happy (greet)
+  powerup: 'onfire',      // Powerup → On Fire (unleash)
+  dance: 'celebration',   // Dance → Celebration (party!)
+  question: 'happy',      // Question → Happy (figured it out)
 };
 
-const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedMascotVariant>> = {
-  // Base emotions
-  happy: 'celebrating',
-  sleepy: 'excited',
-  thinking: 'surprised',
-  focused: 'victory',
-  encouraging: 'excited',
-  oops: 'surprised',
-  celebrating: 'victory',
-  victory: 'excited',
-  surprised: 'happy',
-  excited: 'victory',
-  pointing: 'celebrating',
-  // Mood variants
-  confused: 'surprised',
-  proud: 'victory',
-  nervous: 'surprised',
-  sad: 'happy',
-  winking: 'celebrating',
-  // Activity variants - click shows celebratory reaction
-  eating_pizza: 'celebrating',
-  drinking_coffee: 'excited',
-  reading: 'happy',
-  gaming: 'victory',
-  dancing: 'victory',
-  sleeping: 'excited',
-  waving: 'celebrating',
-  thumbs_up: 'victory',
-  holding_trophy: 'victory',
-  holding_sign: 'celebrating',
-  typing: 'victory',
-  cheering: 'victory',
-  training: 'victory',
-  playing_ball: 'victory',
-  skateboarding: 'victory',
-  juggling: 'celebrating',
+const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, MascotVariant>> = {
+  // Base GIF variants
+  happy: 'celebration',   // Happy → Celebration (let's celebrate!)
+  gaming: 'trophy',       // Gaming → Trophy (victory!)
+  thinking: 'oops',       // Thinking → Oops (oh!)
+  oops: 'happy',          // Oops → Happy (recovered!)
+  celebration: 'dj',      // Celebration → DJ (party mode!)
+  dj: 'trophy',           // DJ → Trophy (winner!)
+  trophy: 'celebration',  // Trophy → Celebration (celebrate win!)
+  panic: 'happy',         // Panic → Happy (relief)
+  crying: 'celebration',  // Crying → Celebration (overcome)
+  onfire: 'celebration',  // On Fire → Celebration (peak!)
+  bored: 'gaming',        // Bored → Gaming (let's play!)
+  mindblown: 'celebration', // Mindblown → Celebration (amazement)
+  encouraging: 'celebration', // Encouraging → Celebration (success!)
+  explorer: 'trophy',     // Explorer → Trophy (found it!)
+  flexing: 'celebration', // Flexing → Celebration (victory!)
+  scared: 'onfire',       // Scared → On Fire (power through!)
+  shopkeeper: 'trophy',   // Shopkeeper → Trophy (sold!)
+  spectating: 'celebration', // Spectating → Celebration (impressed!)
+  waving: 'celebration',  // Waving → Celebration (let's go!)
+  powerup: 'trophy',      // Powerup → Trophy (powered up!)
+  dance: 'dj',            // Dance → DJ (mix it up!)
+  question: 'celebration', // Question → Celebration (eureka!)
+};
+
+const CLIP_CLASSES: Record<MascotClipShape, string> = {
+  none: '',
+  circle: 'rounded-full overflow-hidden',
+  'rounded-square': 'rounded-neo overflow-hidden',
+};
+
+const BORDER_CLASSES: Record<MascotBorderColor, string> = {
+  pink: 'border-3 border-neo-pink shadow-hard',
+  lime: 'border-3 border-neo-lime shadow-hard',
+  cyan: 'border-3 border-neo-cyan shadow-hard',
+  purple: 'border-3 border-neo-purple shadow-hard',
+  white: 'border-3 border-neo-white shadow-hard',
+  none: '',
 };
 
 /**
@@ -151,21 +97,21 @@ const DEFAULT_CLICK_TRANSITIONS: Partial<Record<ExtendedMascotVariant, ExtendedM
 type MascotSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 const SIZE_CLASSES: Record<MascotSize, string> = {
-  xs: 'w-10 h-10',
-  sm: 'w-16 h-16',
-  md: 'w-24 h-24',
-  lg: 'w-32 h-32',
-  xl: 'w-40 h-40',
-  '2xl': 'w-48 h-48',
+  xs: 'w-[100px] h-[100px]',
+  sm: 'w-28 h-28',
+  md: 'w-32 h-32',
+  lg: 'w-40 h-40',
+  xl: 'w-48 h-48',
+  '2xl': 'w-56 h-56',
 };
 
 const SIZE_PIXELS: Record<MascotSize, number> = {
-  xs: 40,
-  sm: 64,
-  md: 96,
-  lg: 128,
-  xl: 160,
-  '2xl': 192,
+  xs: 100,
+  sm: 112,
+  md: 128,
+  lg: 160,
+  xl: 192,
+  '2xl': 224,
 };
 
 /**
@@ -208,6 +154,10 @@ export interface InteractiveMascotProps {
   className?: string;
   /** Priority loading for above-the-fold mascots */
   priority?: boolean;
+  /** Fetch priority hint for the browser (high = LCP optimization) */
+  fetchPriority?: 'high' | 'low' | 'auto';
+  /** Override size classes with responsive Tailwind classes (e.g. "w-24 h-24 sm:w-32 sm:h-32") */
+  sizeClassName?: string;
   /** Alt text override */
   alt?: string;
   /** Enable hover interaction */
@@ -230,188 +180,236 @@ export interface InteractiveMascotProps {
   tooltip?: string;
   /** Accessibility label */
   ariaLabel?: string;
+  /** Clip shape to mask GIF background */
+  clipShape?: MascotClipShape;
+  /** Border color when using a clip shape */
+  clipBorder?: MascotBorderColor;
+  /** Background behind the GIF inside the clip */
+  clipBg?: string;
 }
 
 /**
  * Get the actual image source for a variant
  * Activity variants now have dedicated images, mood variants use fallbacks
+ * GIF variants use animated GIFs, others use PNGs
  */
 function getImageSource(variant: ExtendedMascotVariant): string {
   const baseVariant = getBaseVariant(variant);
-  return MASCOT_IMAGES[baseVariant];
+  return getMascotImagePath(baseVariant);
 }
 
 /**
  * Get idle animation based on variant
- * Activity variants have their own unique animations
+ * CSS animations that complement the GIF animation
  */
 function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
   const animations: Record<MascotVariant, TargetAndTransition> = {
-    // Base emotional variants
+    // Happy: Gentle floating bob (complements main-nobg.gif)
     happy: {
       y: [0, -6, 0],
       rotate: [0, -2, 2, 0],
       transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
     },
-    celebrating: {
-      y: [0, -12, 0, -6, 0],
-      scale: [1, 1.05, 1],
-      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
-    },
-    thinking: {
-      y: [0, -3, 0],
-      rotate: [0, 2, 0, -2, 0],
-      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
-    },
-    encouraging: {
-      y: [0, -5, 0],
-      x: [0, 2, -2, 0],
-      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-    },
-    oops: {
-      x: [0, -2, 2, -1, 1, 0],
-      transition: { duration: 0.5, repeat: Infinity, repeatDelay: 2, ease: 'easeInOut' },
-    },
-    victory: {
-      y: [0, -10, 0, -5, 0],
-      scale: [1, 1.05, 1],
-      transition: { duration: 1.8, repeat: Infinity, ease: 'easeOut' },
-    },
-    focused: {
-      scale: [1, 1.02, 1],
-      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
-    },
-    surprised: {
-      y: [0, -8, 0],
-      scale: [1, 1.1, 1],
-      transition: { duration: 0.6, repeat: Infinity, repeatDelay: 2, ease: 'easeOut' },
-    },
-    sleepy: {
-      y: [0, 2, 0],
-      rotate: [0, 1, 0, -1, 0],
-      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-    },
-    excited: {
-      y: [0, -15, 0, -8, 0],
-      scale: [1, 1.08, 1],
-      rotate: [0, -5, 5, 0],
-      transition: { duration: 1.2, repeat: Infinity, ease: 'easeOut' },
-    },
-    pointing: {
-      x: [0, 4, 0],
-      rotate: [0, 2, 0],
-      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
-    },
-    // Activity variants - expressive animations matching each mood
-    eating_pizza: {
-      // Munching motion - happy satisfied eating
-      y: [0, -4, 0, -2, 0],
-      rotate: [0, -3, 3, -2, 2, 0],
-      scale: [1, 1.05, 0.98, 1.03, 1],
-      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
-    },
-    drinking_coffee: {
-      // Cozy sipping - slow, relaxed, content
-      y: [0, -2, 0, -1, 0],
-      rotate: [0, 2, 0, -1, 0],
-      scale: [1, 1.02, 0.99, 1.01, 1],
-      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
-    },
-    reading: {
-      // Absorbed in book - subtle focused movement
-      y: [0, -1, 0],
-      rotate: [0, 0.5, 0, -0.5, 0],
-      scale: [1, 1.01, 1],
-      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
-    },
+    // Gaming: Intense reactive motion (complements play-nobg.gif)
     gaming: {
-      // Intense gaming - quick reactive movements
       x: [0, -3, 3, -2, 2, -1, 1, 0],
       y: [0, -5, -2, -4, 0],
       rotate: [0, -3, 3, -2, 0],
       transition: { duration: 0.6, repeat: Infinity, ease: 'easeOut' },
     },
-    dancing: {
-      // Groovy dance - rhythmic bouncy movement
-      y: [0, -12, 0, -8, 0, -10, 0],
-      rotate: [0, -10, 10, -8, 8, -5, 0],
-      scale: [1, 1.08, 0.95, 1.06, 0.97, 1.04, 1],
-      x: [0, 3, -3, 2, -2, 0],
-      transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
+    // Thinking: Slow thoughtful bob with head tilt (complements study-nobg.gif)
+    thinking: {
+      y: [0, -3, 0],
+      rotate: [0, 2, 0, -2, 0],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
     },
-    sleeping: {
-      // Peaceful sleep - gentle breathing rhythm
-      y: [0, 3, 0, 2, 0],
-      scale: [1, 0.96, 1, 0.98, 1],
-      rotate: [0, 1, 0, -1, 0],
-      transition: { duration: 5, repeat: Infinity, ease: 'easeInOut' },
+    // Oops: Nervous shake/wiggle (complements oops-nobg.gif)
+    oops: {
+      x: [0, -2, 2, -1, 1, 0],
+      transition: { duration: 0.5, repeat: Infinity, repeatDelay: 2, ease: 'easeInOut' },
     },
-    waving: {
-      // Friendly wave - energetic greeting
-      rotate: [0, -8, 8, -6, 6, -4, 4, 0],
-      y: [0, -5, -3, -5, -2, -4, 0],
-      scale: [1, 1.05, 1.02, 1.04, 1],
+    // Celebration: Bouncy victory dance (complements celebration-nobg.gif)
+    celebration: {
+      y: [0, -10, 0, -6, 0],
+      scale: [1, 1.05, 1, 1.03, 1],
+      rotate: [0, -4, 4, -2, 2, 0],
+      transition: { duration: 0.8, repeat: Infinity, ease: 'easeOut' },
+    },
+    // DJ: Rhythmic bounce (complements dj-nobg.gif)
+    dj: {
+      y: [0, -5, 0],
+      rotate: [0, -3, 3, 0],
+      scale: [1, 1.02, 1],
+      transition: { duration: 0.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Trophy: Proud pose with subtle sway (complements trophy-nobg.gif)
+    trophy: {
+      y: [0, -4, 0],
+      rotate: [0, 2, -2, 0],
+      scale: [1, 1.03, 1],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Panic: Fast jitter
+    panic: {
+      x: [0, -3, 3, -2, 2, -1, 1, 0],
+      y: [0, -2, 0, -1, 0],
+      transition: { duration: 0.4, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Crying: Slow heaving bob
+    crying: {
+      y: [0, -3, 0],
+      rotate: [0, -1, 1, 0],
       transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
     },
-    thumbs_up: {
-      // Confident approval - proud bounce
-      y: [0, -8, 0, -4, 0],
+    // On Fire: Intense upward energy
+    onfire: {
+      y: [0, -10, 0],
+      scale: [1, 1.08, 1],
+      transition: { duration: 0.5, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Bored: Slow lazy sway
+    bored: {
+      y: [0, -2, 0],
+      rotate: [0, 1, -1, 0],
+      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Mindblown: Dramatic scale pop
+    mindblown: {
+      scale: [1, 1.1, 1],
+      y: [0, -8, 0],
+      transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Encouraging: Gentle nod
+    encouraging: {
+      y: [0, -5, 0],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Explorer: Swaying walk
+    explorer: {
+      x: [0, -3, 3, 0],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Flexing: Proud sway
+    flexing: {
+      scale: [1, 1.05, 1],
+      y: [0, -3, 0],
+      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Scared: Rapid trembling
+    scared: {
+      x: [0, -4, 4, -3, 3, -1, 1, 0],
+      transition: { duration: 0.6, repeat: Infinity, repeatDelay: 1, ease: 'easeInOut' },
+    },
+    // Shopkeeper: Subtle lean
+    shopkeeper: {
+      y: [0, -3, 0],
+      rotate: [0, 2, -2, 0],
+      transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Spectating: Relaxed bob
+    spectating: {
+      y: [0, -4, 0],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Waving: Side-to-side tilt
+    waving: {
+      rotate: [0, -5, 5, 0],
+      transition: { duration: 1, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Powerup: Pulsing energy
+    powerup: {
       scale: [1, 1.08, 1, 1.04, 1],
-      rotate: [0, -2, 2, 0],
-      transition: { duration: 1.8, repeat: Infinity, ease: 'easeOut' },
+      y: [0, -8, 0],
+      transition: { duration: 0.8, repeat: Infinity, ease: 'easeOut' },
     },
-    holding_trophy: {
-      // Victorious celebration - proud sway with trophy
+    // Sleepy: Slow drowsy drift
+    sleepy: {
+      y: [0, -2, 0],
+      rotate: [0, 1, -1, 0],
+      transition: { duration: 4, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Waiting: Idle tap
+    waiting: {
+      y: [0, -3, 0],
+      transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // GG: Victory bounce
+    gg: {
+      y: [0, -8, 0],
+      scale: [1, 1.05, 1],
+      transition: { duration: 1, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Scholar: Thoughtful nod
+    scholar: {
+      y: [0, -3, 0],
+      rotate: [0, 2, 0, -2, 0],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Rage: Intense shaking
+    rage: {
+      x: [0, -4, 4, -3, 3, -1, 1, 0],
+      y: [0, -3, 0],
+      transition: { duration: 0.4, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Bomber: Recoil pulse
+    bomber: {
+      scale: [1, 1.06, 1],
+      y: [0, -5, 0],
+      transition: { duration: 0.7, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Winner: Proud float
+    winner: {
       y: [0, -10, 0, -6, 0],
+      scale: [1, 1.05, 1, 1.03, 1],
+      transition: { duration: 1, repeat: Infinity, ease: 'easeOut' },
+    },
+    // Knight: Stalwart sway
+    knight: {
+      y: [0, -4, 0],
+      rotate: [0, -2, 2, 0],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Sad: Slow droop
+    sad: {
+      y: [0, -2, 0],
+      rotate: [0, -1, 1, 0],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Ghostly: Ethereal float
+    ghostly: {
+      y: [0, -8, 0],
+      opacity: [1, 0.7, 1],
+      transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
+    },
+    // Dance: Rhythmic bounce
+    dance: {
+      y: [0, -8, 0, -5, 0],
       rotate: [0, -4, 4, -2, 0],
-      scale: [1, 1.1, 1, 1.05, 1],
-      transition: { duration: 2, repeat: Infinity, ease: 'easeOut' },
+      transition: { duration: 0.7, repeat: Infinity, ease: 'easeInOut' },
     },
-    typing: {
-      // Focused typing - subtle rapid movements
-      y: [0, -1, 0, -1, 0, -1, 0],
-      scale: [1, 1.01, 1, 1.01, 1],
-      x: [0, 0.5, -0.5, 0],
-      transition: { duration: 0.5, repeat: Infinity, ease: 'linear' },
+    // Question: Curious tilt
+    question: {
+      y: [0, -4, 0],
+      rotate: [0, 3, -3, 0],
+      transition: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
     },
-    cheering: {
-      // Enthusiastic cheer - high energy bouncing
-      y: [0, -18, 0, -12, 0, -8, 0],
-      rotate: [0, -8, 8, -6, 6, -3, 0],
-      scale: [1, 1.15, 1, 1.1, 1, 1.05, 1],
-      x: [0, -2, 2, -1, 1, 0],
-      transition: { duration: 1.4, repeat: Infinity, ease: 'easeOut' },
+    // TrophyNobg: Proud sway (same as trophy)
+    trophyNobg: {
+      y: [0, -4, 0],
+      rotate: [0, 2, -2, 0],
+      scale: [1, 1.03, 1],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
     },
-    training: {
-      // Workout pump - powerful lifting motion
-      y: [0, -8, -2, -6, 0],
-      scale: [1, 1.12, 1.05, 1.1, 1],
-      rotate: [0, -2, 0, 2, 0],
-      transition: { duration: 1.2, repeat: Infinity, ease: 'easeInOut' },
+    // ExplorerNobg: Walking sway
+    explorerNobg: {
+      x: [0, -3, 3, 0],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
     },
-    playing_ball: {
-      // Bouncy ball juggling motion - playful ball tracking
-      y: [0, -12, 0, -8, 0, -10, 0],
-      x: [0, 2, -2, 1, -1, 0],
-      rotate: [0, -4, 4, -3, 3, 0],
-      scale: [1, 1.05, 0.98, 1.03, 0.99, 1.02, 1],
-      transition: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' },
-    },
-    skateboarding: {
-      // Dynamic rolling motion - cool skateboarding vibes
-      x: [0, 3, -3, 2, -2, 0],
-      y: [0, -6, -2, -5, -1, -3, 0],
-      rotate: [0, -6, 6, -4, 4, -2, 0],
-      scale: [1, 1.06, 1.02, 1.04, 1],
-      transition: { duration: 1.6, repeat: Infinity, ease: 'easeOut' },
-    },
-    juggling: {
-      // Rhythmic up-down ball tracking - focused juggling
-      y: [0, -8, -4, -10, -2, -6, 0],
-      x: [0, -2, 2, -1, 1, 0],
-      rotate: [0, 3, -3, 2, -2, 0],
-      scale: [1, 1.04, 1.02, 1.05, 1.01, 1.03, 1],
-      transition: { duration: 2.2, repeat: Infinity, ease: 'easeInOut' },
+    // CryingNobg: Heaving bob
+    cryingNobg: {
+      y: [0, -3, 0],
+      rotate: [0, -1, 1, 0],
+      transition: { duration: 1.5, repeat: Infinity, ease: 'easeInOut' },
     },
   };
 
@@ -421,34 +419,60 @@ function getIdleAnimation(variant: ExtendedMascotVariant): TargetAndTransition {
 
 /**
  * Interactive Mascot component with hover and click state changes
+ * GIF-ONLY: All variants use animated GIFs, extended variants map to 4 base GIFs
  *
  * @example
- * // Basic interactive mascot
+ * // Basic interactive mascot with base GIF variant
  * <InteractiveMascot variant="happy" enableHover enableClick />
  *
- * // Custom interactions
+ * // Using extended semantic variant (maps to base GIF)
+ * <InteractiveMascot variant="celebrating" enableHover enableClick />
+ * // 'celebrating' → 'happy' GIF
+ *
+ * // Custom interactions with base GIF variants
  * <InteractiveMascot
  *   variant="thinking"
- *   hoverVariant="excited"
- *   clickVariant="celebrating"
+ *   hoverVariant="happy"
+ *   clickVariant="gaming"
  *   clickAnimation="bounce"
  *   onClick={() => console.log('Mascot clicked!')}
  * />
  *
- * // With tooltip
+ * // With tooltip and activity variant
  * <InteractiveMascot
- *   variant="encouraging"
+ *   variant="skateboarding"  // → gaming GIF
  *   enableHover
  *   enableClick
  *   tooltip="Click me!"
  * />
  */
+/**
+ * Lazy preload specific mascot images when needed
+ * Only preloads the image if it hasn't been preloaded before
+ */
+const preloadedImages = new Set<string>();
+
+function preloadMascotImage(src: string): void {
+  if (preloadedImages.has(src)) return;
+
+  const img = new window.Image();
+  img.onload = () => {
+    preloadedImages.add(src);
+  };
+  img.onerror = () => {
+    preloadedImages.add(src); // Mark as attempted to avoid retries
+  };
+  img.src = src;
+}
+
 export const InteractiveMascot = memo(function InteractiveMascot({
   variant,
   size = 'md',
   animated = true,
   className = '',
   priority = false,
+  fetchPriority,
+  sizeClassName,
   alt,
   enableHover = true,
   enableClick = true,
@@ -460,12 +484,58 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   onHover,
   tooltip,
   ariaLabel,
+  clipShape,
+  clipBorder,
+  clipBg,
 }: InteractiveMascotProps) {
   const { prefersReducedMotion, enableComplexAnimations } = useDevicePerformance();
 
   const [isHovered, setIsHovered] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
+  const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear click timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    };
+  }, []);
+
+  // Defer preloading hover/click variant GIFs until browser is idle.
+  // These GIFs are 500KB-1.7MB each — loading them eagerly on mount blocks
+  // LCP and wastes bandwidth if the user never interacts with the mascot.
+  useEffect(() => {
+    if (!enableHover && !enableClick) return;
+
+    const doPreload = () => {
+      if (enableHover) {
+        const hoverTarget = hoverVariant || DEFAULT_HOVER_TRANSITIONS[variant];
+        if (hoverTarget) {
+          preloadMascotImage(getImageSource(hoverTarget));
+        }
+      }
+      if (enableClick) {
+        const clickTarget = clickVariant || DEFAULT_CLICK_TRANSITIONS[variant];
+        if (clickTarget) {
+          preloadMascotImage(getImageSource(clickTarget));
+        }
+      }
+    };
+
+    // Use requestIdleCallback to defer until main thread is idle
+    const id = typeof requestIdleCallback !== 'undefined'
+      ? requestIdleCallback(doPreload, { timeout: 5000 })
+      : setTimeout(doPreload, 3000) as unknown as number;
+
+    return () => {
+      if (typeof cancelIdleCallback !== 'undefined') {
+        cancelIdleCallback(id);
+      } else {
+        clearTimeout(id);
+      }
+    };
+  }, [variant, enableHover, enableClick, hoverVariant, clickVariant]);
 
   const shouldAnimate = animated && !prefersReducedMotion && enableComplexAnimations;
   const isInteractive = (enableHover || enableClick) && !prefersReducedMotion;
@@ -482,8 +552,27 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   }, [variant, isHovered, isClicked, enableHover, hoverVariant, clickVariant]);
 
   const imageSrc = getImageSource(currentVariant);
+  const baseVariant = useMemo(() => getBaseVariant(currentVariant), [currentVariant]);
+  const isVideo = isVideoVariant(baseVariant);
   const altText = alt || ariaLabel || `Lexi mascot - ${currentVariant}`;
   const idleAnimation = useMemo(() => getIdleAnimation(currentVariant), [currentVariant]);
+
+  // Auto-resolve clip/border/bg based on mascot background type
+  const autoStyle = useMemo(() => {
+    const bgType = getMascotBgType(baseVariant);
+    // White bg: always enforce circle clip + border — callers cannot override to 'none'
+    if (bgType === 'white') {
+      return {
+        shape: (clipShape && clipShape !== 'none' ? clipShape : 'circle') as MascotClipShape,
+        border: (clipBorder && clipBorder !== 'none' ? clipBorder : 'pink') as MascotBorderColor,
+        bg: clipBg ?? 'bg-white',
+      };
+    }
+    if (clipShape !== undefined) {
+      return { shape: clipShape, border: clipBorder ?? 'pink' as MascotBorderColor, bg: clipBg ?? 'bg-neo-navy' };
+    }
+    return { shape: 'none' as MascotClipShape, border: clipBorder ?? 'none' as MascotBorderColor, bg: clipBg ?? '' };
+  }, [baseVariant, clipShape, clipBorder, clipBg]);
 
   const handleMouseEnter = useCallback(() => {
     if (enableHover) {
@@ -502,12 +591,15 @@ export const InteractiveMascot = memo(function InteractiveMascot({
   const handleClick = useCallback(() => {
     if (!enableClick) return;
 
+    haptics.tap();
     setIsClicked(true);
     onClick?.();
 
     // Reset after duration
-    setTimeout(() => {
+    if (clickTimeoutRef.current) clearTimeout(clickTimeoutRef.current);
+    clickTimeoutRef.current = setTimeout(() => {
       setIsClicked(false);
+      clickTimeoutRef.current = null;
     }, clickDuration);
   }, [enableClick, onClick, clickDuration]);
 
@@ -520,8 +612,10 @@ export const InteractiveMascot = memo(function InteractiveMascot({
 
   return (
     <div className={`relative inline-block ${className}`}>
-      <motion.div
-        className={`relative ${SIZE_CLASSES[size]} ${isInteractive ? 'cursor-pointer' : ''}`}
+      <m.div
+        data-testid="interactive-mascot"
+        data-variant={variant}
+        className={`relative ${sizeClassName || SIZE_CLASSES[size]} ${isInteractive ? 'cursor-pointer' : ''} focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-cyan focus-visible:ring-offset-2`}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onClick={handleClick}
@@ -534,36 +628,52 @@ export const InteractiveMascot = memo(function InteractiveMascot({
         animate={isClicked && shouldAnimate ? CLICK_ANIMATIONS[clickAnimation] : undefined}
       >
         {/* Idle animation wrapper */}
-        <motion.div
+        <m.div
           className="w-full h-full"
           animate={shouldAnimate && !isClicked ? idleAnimation : undefined}
         >
           {/* Image with crossfade on variant change */}
-          {/* Slower transition (400ms) for smoother mood changes */}
+          {/* Fast transition (200ms) for smoother, less noticeable changes */}
           <AnimatePresence mode="wait">
-            <motion.div
+            <m.div
               key={currentVariant}
-              initial={{ opacity: 0, scale: 0.95 }}
+              initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4, ease: 'easeInOut' }}
+              exit={{ opacity: 0, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: 'easeInOut' }}
               className="w-full h-full"
             >
-              <Image
-                src={imageSrc}
-                alt={altText}
-                width={SIZE_PIXELS[size]}
-                height={SIZE_PIXELS[size]}
-                className="object-contain drop-shadow-lg"
-                priority={priority}
-              />
-            </motion.div>
+              <div data-mascot-bg={getMascotBgType(baseVariant)} className={`w-full h-full ${CLIP_CLASSES[autoStyle.shape]} ${BORDER_CLASSES[autoStyle.border]} ${autoStyle.shape !== 'none' ? autoStyle.bg : ''}`}>
+                {isVideo ? (
+                  <SilentVideo
+                    key={imageSrc}
+                    src={imageSrc}
+                    aria-label={altText}
+                    width={SIZE_PIXELS[size]}
+                    height={SIZE_PIXELS[size]}
+                    className={`object-contain w-full h-full ${autoStyle.shape !== 'none' ? 'scale-110' : ''} drop-shadow-lg`}
+                    preload={priority ? 'auto' : 'metadata'}
+                  />
+                ) : (
+                  <Image
+                    src={imageSrc}
+                    alt={altText}
+                    width={SIZE_PIXELS[size]}
+                    height={SIZE_PIXELS[size]}
+                    className={`object-contain ${autoStyle.shape !== 'none' ? 'scale-110' : ''} drop-shadow-lg`}
+                    priority={priority}
+                    fetchPriority={fetchPriority}
+                    unoptimized
+                  />
+                )}
+              </div>
+            </m.div>
           </AnimatePresence>
-        </motion.div>
+        </m.div>
 
         {/* Hover glow effect */}
         {isInteractive && shouldAnimate && (
-          <motion.div
+          <m.div
             className="absolute inset-0 rounded-full bg-neo-lime/20 blur-xl -z-10"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{
@@ -578,8 +688,8 @@ export const InteractiveMascot = memo(function InteractiveMascot({
         {isClicked && shouldAnimate && (
           <>
             {[...Array(6)].map((_, i) => (
-              <motion.div
-                key={i}
+              <m.div
+                key={`sparkle-${i}`}
                 className="absolute w-2 h-2 bg-neo-lime rounded-full"
                 style={{
                   top: '50%',
@@ -606,11 +716,11 @@ export const InteractiveMascot = memo(function InteractiveMascot({
             ))}
           </>
         )}
-      </motion.div>
+      </m.div>
 
       {/* Tooltip */}
       {tooltip && showTooltip && (
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 5 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 5 }}
@@ -619,7 +729,7 @@ export const InteractiveMascot = memo(function InteractiveMascot({
           {tooltip}
           {/* Tooltip arrow */}
           <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-neo-black rotate-45" />
-        </motion.div>
+        </m.div>
       )}
     </div>
   );
@@ -636,7 +746,7 @@ export const InteractiveMascotWithEntrance = memo(function InteractiveMascotWith
   const shouldAnimate = !prefersReducedMotion && enableComplexAnimations;
 
   return (
-    <motion.div
+    <m.div
       initial={shouldAnimate ? { scale: 0, opacity: 0, y: 20 } : undefined}
       animate={{ scale: 1, opacity: 1, y: 0 }}
       transition={{
@@ -647,7 +757,7 @@ export const InteractiveMascotWithEntrance = memo(function InteractiveMascotWith
       }}
     >
       <InteractiveMascot {...props} />
-    </motion.div>
+    </m.div>
   );
 });
 

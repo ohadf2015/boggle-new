@@ -3,6 +3,7 @@
  */
 
 import type { WordDetail } from '@/shared/types/game';
+import logger from '../utils/logger';
 const { translations } = require('../../translations/index.js');
 
 export interface PlayerTitle {
@@ -61,8 +62,14 @@ export function calculatePlayerTitles(
     return {};
   }
 
-  const supportedLocale = ['he', 'en', 'sv', 'ja'].includes(locale) ? locale : 'he';
-  const titleTranslations = translations[supportedLocale].playerTitles;
+  const supportedLocale = ['he', 'en', 'sv', 'ja', 'es'].includes(locale) ? locale : 'he';
+  const titleTranslations = translations[supportedLocale]?.playerTitles;
+
+  // If playerTitles translations are missing, return empty (graceful degradation)
+  if (!titleTranslations) {
+    logger.warn('TITLES', 'playerTitles translations missing for locale', { locale: supportedLocale });
+    return {};
+  }
 
   // Calculate stats for each player
   const playerStats: PlayerStats[] = scoresArray.map(player => {
@@ -132,15 +139,34 @@ export function calculatePlayerTitles(
 
   // Helper to assign a title if not already taken
   const assignTitle = (username: string, titleKey: string): boolean => {
-    if (!usedTitles.has(titleKey) && !assignedTitles[username]) {
-      assignedTitles[username] = {
-        titleKey,
-        title: titleTranslations[titleKey]
-      };
-      usedTitles.add(titleKey);
-      return true;
+    // Double-check titleTranslations exists (defensive check for edge cases)
+    if (!titleTranslations || typeof titleTranslations !== 'object') {
+      logger.warn('TITLES', 'titleTranslations is invalid when assigning', { titleKey });
+      return false;
     }
-    return false;
+
+    // Safe property access - handle case where titleKey doesn't exist in translations
+    const titleData =
+      Object.prototype.hasOwnProperty.call(titleTranslations, titleKey)
+        ? titleTranslations[titleKey]
+        : undefined;
+
+    if (!titleData || usedTitles.has(titleKey) || assignedTitles[username]) {
+      return false;
+    }
+
+    // Validate titleData has required properties
+    if (typeof titleData !== 'object' || !titleData.name) {
+      logger.warn('TITLES', 'Invalid title data', { titleKey, titleData });
+      return false;
+    }
+
+    assignedTitles[username] = {
+      titleKey,
+      title: titleData,
+    };
+    usedTitles.add(titleKey);
+    return true;
   };
 
   // 1. Champion - winner (only if there's a clear winner with > 0 score)
@@ -218,9 +244,9 @@ export function calculatePlayerTitles(
     assignTitle(consistentPlayer.username, 'consistentPlayer');
   }
 
-  console.log(`[TITLES] Assigned titles for ${Object.keys(assignedTitles).length} players:`,
-    Object.entries(assignedTitles).map(([username, t]) => `${username}: ${t.titleKey}`).join(', ')
-  );
+  logger.info('TITLES', `Assigned titles for ${Object.keys(assignedTitles).length} players`, {
+    titles: Object.entries(assignedTitles).map(([username, t]) => `${username}: ${t.titleKey}`).join(', ')
+  });
 
   return assignedTitles;
 }

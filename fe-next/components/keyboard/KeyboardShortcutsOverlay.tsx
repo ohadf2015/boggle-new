@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Keyboard, MousePointer, Type } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -83,19 +83,19 @@ export function KeyboardShortcutsOverlay({
   return (
     <AnimatePresence>
       {isOpen && (
-        <motion.div
+        <m.div
           ref={overlayRef}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.2 }}
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neo-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-neo-black/80 backdrop-blur-xs"
           onClick={handleBackdropClick}
           role="dialog"
           aria-modal="true"
           aria-labelledby="keyboard-shortcuts-title"
         >
-          <motion.div
+          <m.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
@@ -130,7 +130,7 @@ export function KeyboardShortcutsOverlay({
                   'bg-white/20 hover:bg-white/30',
                   'rounded-neo border-2 border-white/30',
                   'transition-colors',
-                  'focus:outline-none focus:ring-2 focus:ring-neo-lime focus:ring-offset-2 focus:ring-offset-neo-pink'
+                  'focus:outline-hidden focus:ring-2 focus:ring-neo-lime focus:ring-offset-2 focus:ring-offset-neo-pink'
                 )}
                 aria-label="Close keyboard shortcuts"
               >
@@ -200,13 +200,13 @@ export function KeyboardShortcutsOverlay({
                 'text-sm'
               )}>
                 <span className="font-bold text-neo-cyan">TIP: </span>
-                <span className="text-neo-white/90">
+                <span className="text-neo-white">
                   {t('keyboardShortcuts.tip')}
                 </span>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>
   );
@@ -229,7 +229,7 @@ function ShortcutSection({ icon, title, children }: ShortcutSectionProps) {
           {title}
         </h3>
       </div>
-      <div className="space-y-2 pl-7">{children}</div>
+      <div className="space-y-2 ps-7">{children}</div>
     </div>
   );
 }
@@ -242,10 +242,10 @@ interface ShortcutRowProps {
 function ShortcutRow({ keys, description }: ShortcutRowProps) {
   return (
     <div className="flex items-center gap-3">
-      <div className="flex items-center gap-1 flex-shrink-0">
+      <div className="flex items-center gap-1 shrink-0">
         {keys.map((key, index) => (
           <kbd
-            key={index}
+            key={`key-${index}-${key}`}
             className={cn(
               'px-2 py-1',
               'bg-neo-cyan text-neo-black',
@@ -259,7 +259,7 @@ function ShortcutRow({ keys, description }: ShortcutRowProps) {
           </kbd>
         ))}
       </div>
-      <span className="text-sm text-neo-white/80">{description}</span>
+      <span className="text-sm text-neo-white">{description}</span>
     </div>
   );
 }

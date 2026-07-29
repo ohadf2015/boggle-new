@@ -1,62 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { regenerateDailyPuzzle } from '@/utils/dailyChallenge';
+import { verifyAdminAuth } from '@/lib/auth/adminAuth';
+import { regenerateDailyPuzzle } from '@/utils/dailyChallenge/gridGeneration.server';
+import { captureApiError } from '@/utils/sentry';
 import type { Language } from '@/types';
-
-/**
- * Get Supabase admin client for API key authentication
- */
-function getSupabaseAdmin() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    return null;
-  }
-
-  return createSupabaseClient(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  });
-}
-
-/**
- * Check admin authorization via Bearer token (Authorization header)
- */
-async function checkBearerTokenAuth(request: NextRequest): Promise<{ isAdmin: boolean; userId?: string }> {
-  const authHeader = request.headers.get('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return { isAdmin: false };
-  }
-
-  const token = authHeader.substring(7);
-  const supabase = getSupabaseAdmin();
-  if (!supabase) {
-    return { isAdmin: false };
-  }
-
-  // Verify token
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-  if (error || !user) {
-    return { isAdmin: false };
-  }
-
-  // Check if user is admin
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
-    .single();
-
-  if (profileError || !profile?.is_admin) {
-    return { isAdmin: false };
-  }
-
-  return { isAdmin: true, userId: user.id };
-}
 
 /**
  * POST /api/admin/daily-word/regenerate-board
@@ -64,41 +10,14 @@ async function checkBearerTokenAuth(request: NextRequest): Promise<{ isAdmin: bo
  * This generates a new grid with the current target word embedded
  * Only accessible to admin users
  *
- * Supports two authentication methods:
- * 1. Cookie-based session auth (default for dashboard)
- * 2. Authorization header with Bearer token (for API calls)
+ * Supports both cookie-based session auth and Bearer token auth
  */
 export async function POST(request: NextRequest) {
   try {
-    let isAuthorized = false;
-
-    // First try Authorization header (Bearer token)
-    const bearerAuth = await checkBearerTokenAuth(request);
-    if (bearerAuth.isAdmin) {
-      isAuthorized = true;
-    }
-
-    // Fall back to cookie-based auth
-    if (!isAuthorized) {
-      const supabase = await createClient();
-      const { data: { user }, error: authError } = await supabase.auth.getUser();
-
-      if (!authError && user) {
-        // Check if user is admin
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('is_admin')
-          .eq('id', user.id)
-          .single();
-
-        if (!profileError && profile?.is_admin) {
-          isAuthorized = true;
-        }
-      }
-    }
-
-    if (!isAuthorized) {
-      return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+    // Verify admin authentication (supports both Bearer token and cookie session)
+    const authResult = await verifyAdminAuth(request);
+    if (!authResult.success) {
+      return authResult.response!;
     }
 
     // Parse request body
@@ -147,9 +66,15 @@ export async function POST(request: NextRequest) {
       message: `Board regenerated successfully for ${puzzleDate}/${language}`
     });
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('Regenerate board error:', error);
+    captureApiError(
+      error instanceof Error ? error : new Error('Unknown error'),
+      '/api/admin/daily-word/regenerate-board',
+      { method: 'POST', statusCode: 500 }
+    );
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: errorMessage },
       { status: 500 }
     );
   }

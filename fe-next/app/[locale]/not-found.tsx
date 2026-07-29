@@ -1,14 +1,19 @@
 'use client';
 
+import { useEffect } from 'react';
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { InteractiveMascot } from '@/components/ui/InteractiveMascot';
 
 export default function NotFound() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  useEffect(() => {
+    document.title = '404 - ' + (t('notFound.heading') || 'Page Not Found') + ' | LexiClash';
+  }, [t]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 relative overflow-hidden">
+    <div className="flex-1 flex items-center justify-center bg-linear-to-br from-neo-navy via-neo-navy-light to-neo-navy px-4 relative overflow-hidden">
       {/* Animated background decoration - floating letters */}
       <div className="absolute inset-0 pointer-events-none opacity-10">
         <div className="absolute top-[10%] left-[10%] text-6xl font-black text-neo-lime animate-float font-neo-display">?</div>
@@ -33,9 +38,14 @@ export default function NotFound() {
           />
         </div>
 
-        {/* 404 Number with enhanced gradient and animation */}
-        <div className="text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-neo-cyan via-neo-pink to-neo-lime mb-6 font-neo-display animate-gradient-x" style={{ backgroundSize: '200% auto' }}>
-          404
+        {/* 404 as a rejected word tile with score */}
+        <div className="relative mb-6">
+          <div className="text-9xl font-black text-transparent bg-clip-text bg-linear-to-r from-neo-cyan via-neo-pink to-neo-lime font-neo-display animate-gradient-x" style={{ backgroundSize: '200% auto' }}>
+            404
+          </div>
+          <div className="text-neo-red font-black text-xl font-neo-display tracking-wider line-through decoration-neo-red decoration-4 inline-block">
+            0 pts
+          </div>
         </div>
 
         {/* Heading with neo-brutalist card style */}
@@ -50,7 +60,7 @@ export default function NotFound() {
 
         {/* Action Button */}
         <Link
-          href="/"
+          href={`/${language}`}
           className="inline-flex items-center justify-center px-8 py-4 bg-neo-cyan text-neo-black font-black uppercase border-4 border-neo-black rounded-neo shadow-hard-lg hover:shadow-hard-xl hover:translate-x-[-2px] hover:translate-y-[-2px] active:shadow-hard-pressed active:translate-x-[2px] active:translate-y-[2px] transition-all duration-150 text-lg font-neo-display"
         >
           {t('notFound.button')}

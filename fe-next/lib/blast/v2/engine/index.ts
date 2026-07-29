@@ -1,0 +1,18 @@
+export { reduceSelection } from './selection-state';
+export type { SelectionState, SelectionEvent, SelectionTransition } from './selection-state';
+export { validateSelection } from './validation';
+export type { ValidationResult, ValidationContext } from './validation';
+export { collapseCells, rebuildTileIds } from './collapse';
+export type { CollapseResult } from './collapse';
+export { detectCascade, detectAllCascades } from './cascade';
+export type { Cascade } from './cascade';
+export { computeCompletion } from './completion';
+export type { CompletionReason, CompletionResult } from './completion';
+export { detectAlmostWords } from './almost-word';
+export type { AlmostWord } from './almost-word';
+export { classifyOvation } from './ovation';
+export type { OvationTier } from './ovation';
+export { scoreForWord } from './score';
+export type { ScoreOutcome } from './score';
+export { parseCell, cellId } from './cell-id';
+export { findExtraWords } from './extra-word-check';

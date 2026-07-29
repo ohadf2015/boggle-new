@@ -1,0 +1,172 @@
+/**
+ * Word Tower (versus) handler tests — outcome → emit/broadcast mapping.
+ * The pure match brain is unit-tested in lib/wordTower; here it's mocked so we
+ * verify the socket plumbing only.
+ */
+import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
+import type { Server, Socket } from 'socket.io';
+
+vi.mock('../../utils/logger', () => {
+  const l = { info: vi.fn(), error: vi.fn(), debug: vi.fn(), warn: vi.fn() };
+  return { __esModule: true, default: l, ...l };
+});
+vi.mock('../../utils/socketHelpers', () => ({
+  broadcastToRoom: vi.fn(),
+  volatileBroadcastToRoom: vi.fn(),
+  getGameRoom: vi.fn((code: string) => `room:${code}`),
+}));
+vi.mock('../../utils/rateLimiter', () => ({ checkRateLimit: vi.fn(() => true) }));
+vi.mock('../../utils/socketValidation', () => ({ validatePayload: vi.fn() }));
+vi.mock('../../dictionary', () => ({ isValidWord: vi.fn(() => true) }));
+vi.mock('../../modules/gameStateManager', () => ({
+  getGame: vi.fn(),
+  getGameBySocketId: vi.fn(() => 'GAME1'),
+  getUsernameBySocketId: vi.fn(() => 'p1'),
+  updatePlayerScore: vi.fn(),
+}));
+vi.mock('@/lib/wordTower/versusMatch', () => ({
+  submitVersusWord: vi.fn(),
+  scrambleVersus: vi.fn((s: unknown) => s),
+  sendVersusBomb: vi.fn(),
+  versusStandings: vi.fn(() => []),
+}));
+vi.mock('@/lib/wordTower/wordTowerManager', () => ({
+  clientTowerView: vi.fn(() => ({ tray: ['A', 'B'], anchorLetter: 'A', scramblesLeft: 3, heightM: 0, combo: 0, floors: 0, bombCharge: 0 })),
+}));
+
+import { handleSubmitTowerWord, handleSendTowerBomb, handleRequestTowerState } from '../wordTowerHandler';
+import { broadcastToRoom, volatileBroadcastToRoom } from '../../utils/socketHelpers';
+import { getGame, updatePlayerScore } from '../../modules/gameStateManager';
+import { submitVersusWord, sendVersusBomb } from '@/lib/wordTower/versusMatch';
+
+const mkSocket = () => ({ id: 's1', emit: vi.fn() } as unknown as Socket);
+const mkIo = () => ({} as Server);
+
+const matchState = { players: { p1: { game: {} }, p2: { game: {} } }, endsAtMs: 1 };
+const gameBase = {
+  gameState: 'in-progress',
+  gameMode: 'word-tower',
+  language: 'en',
+  wordTowerVersusState: matchState,
+};
+
+describe('wordTowerHandler', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('emits accepted result + standings + score on a valid word', () => {
+    (getGame as unknown as Mock).mockReturnValue(gameBase);
+    (submitVersusWord as unknown as Mock).mockReturnValue({ state: matchState, accepted: true, result: { meters: 5, tier: 'highRise' } });
+    const sock = mkSocket();
+    handleSubmitTowerWord(mkIo(), sock, { word: 'CAT' });
+    expect(sock.emit).toHaveBeenCalledWith('towerWordResult', expect.objectContaining({ accepted: true }));
+    expect(updatePlayerScore).toHaveBeenCalledWith('GAME1', 'p1', 5, true);
+    expect(volatileBroadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'towerStandings', expect.anything());
+  });
+
+  it('emits rejection without scoring on an invalid word', () => {
+    (getGame as unknown as Mock).mockReturnValue(gameBase);
+    (submitVersusWord as unknown as Mock).mockReturnValue({ state: matchState, accepted: false, error: 'bad_chain' });
+    const sock = mkSocket();
+    handleSubmitTowerWord(mkIo(), sock, { word: 'XYZ' });
+    expect(sock.emit).toHaveBeenCalledWith('towerWordResult', { accepted: false, error: 'bad_chain' });
+    expect(updatePlayerScore).not.toHaveBeenCalled();
+  });
+
+  it('errors when not in a word-tower game', () => {
+    (getGame as unknown as Mock).mockReturnValue({ ...gameBase, gameMode: 'wheel-rush' });
+    const sock = mkSocket();
+    handleSubmitTowerWord(mkIo(), sock, { word: 'CAT' });
+    expect(sock.emit).toHaveBeenCalledWith('error', expect.objectContaining({ message: expect.stringContaining('word-tower') }));
+  });
+
+  it('broadcasts towerBombHit on a successful bomb', () => {
+    (getGame as unknown as Mock).mockReturnValue(gameBase);
+    (sendVersusBomb as unknown as Mock).mockReturnValue({ state: matchState, sent: true, targetId: 'p2', removed: 3, damage: 4 });
+    const sock = mkSocket();
+    handleSendTowerBomb(mkIo(), sock, { targetPlayerId: 'p2' });
+    expect(sock.emit).toHaveBeenCalledWith('towerBombResult', { sent: true, targetId: 'p2', removed: 3, damage: 4 });
+    expect(broadcastToRoom).toHaveBeenCalledWith(expect.anything(), 'room:GAME1', 'towerBombHit', expect.objectContaining({ fromId: 'p1', targetId: 'p2', removed: 3 }));
+  });
+
+  it('emits bomb failure reason when blocked', () => {
+    (getGame as unknown as Mock).mockReturnValue(gameBase);
+    (sendVersusBomb as unknown as Mock).mockReturnValue({ state: matchState, sent: false, error: 'no_lead' });
+    const sock = mkSocket();
+    handleSendTowerBomb(mkIo(), sock, { targetPlayerId: 'p2' });
+    expect(sock.emit).toHaveBeenCalledWith('towerBombResult', { sent: false, error: 'no_lead' });
+    expect(broadcastToRoom).not.toHaveBeenCalled();
+  });
+
+  it('records accepted words into playerWords[username][]', () => {
+    const game = { ...gameBase, playerWords: undefined };
+    (getGame as unknown as Mock).mockReturnValue(game);
+    (submitVersusWord as unknown as Mock).mockReturnValue({
+      state: matchState,
+      accepted: true,
+      result: { meters: 7, tier: 'tower' },
+    });
+    const sock = mkSocket();
+    handleSubmitTowerWord(mkIo(), sock, { word: 'HELLO' });
+    expect(game.playerWords).toEqual({ p1: ['HELLO'] });
+  });
+
+  it('does NOT record rejected words into playerWords', () => {
+    const game = { ...gameBase, playerWords: { p1: ['HELLO'] } };
+    (getGame as unknown as Mock).mockReturnValue(game);
+    (submitVersusWord as unknown as Mock).mockReturnValue({
+      state: matchState,
+      accepted: false,
+      error: 'bad_chain',
+    });
+    const sock = mkSocket();
+    handleSubmitTowerWord(mkIo(), sock, { word: 'XYZ' });
+    expect(game.playerWords).toEqual({ p1: ['HELLO'] });
+  });
+
+  it('accumulates words in order for same player', () => {
+    const game = { ...gameBase, playerWords: { p1: ['HELLO'] } };
+    (getGame as unknown as Mock).mockReturnValue(game);
+    (submitVersusWord as unknown as Mock).mockReturnValue({
+      state: matchState,
+      accepted: true,
+      result: { meters: 5, tier: 'highRise' },
+    });
+    const sock = mkSocket();
+    handleSubmitTowerWord(mkIo(), sock, { word: 'WORLD' });
+    expect(game.playerWords).toEqual({ p1: ['HELLO', 'WORLD'] });
+  });
+
+  it('separates words by player', () => {
+    const game = { ...gameBase, playerWords: { p1: ['HELLO'] } };
+    (getGame as unknown as Mock).mockReturnValue(game);
+    (submitVersusWord as unknown as Mock).mockReturnValue({
+      state: matchState,
+      accepted: true,
+      result: { meters: 3, tier: 'skyrise' },
+    });
+    const sock = mkSocket();
+    // Socket for p2
+    (require('../../modules/gameStateManager').getUsernameBySocketId as unknown as Mock).mockReturnValue('p2');
+    handleSubmitTowerWord(mkIo(), sock, { word: 'GOODBYE' });
+    expect(game.playerWords).toEqual({ p1: ['HELLO'], p2: ['GOODBYE'] });
+  });
+
+  // requestTowerState is a benign PULL: a client may poll before the per-player
+  // match is initialized (during the pre-game countdown). It must NOT surface a
+  // user-facing 'error' for that race — the server pushes 'towerMatchReady'.
+  it('stays silent (no error) when requestTowerState arrives before init', () => {
+    (getGame as unknown as Mock).mockReturnValue({ ...gameBase, wordTowerVersusState: undefined });
+    const sock = mkSocket();
+    handleRequestTowerState(sock);
+    expect(sock.emit).not.toHaveBeenCalledWith('error', expect.anything());
+    expect(sock.emit).not.toHaveBeenCalledWith('towerStateSync', expect.anything());
+  });
+
+  it('emits towerStateSync once the match is initialized', () => {
+    (getGame as unknown as Mock).mockReturnValue(gameBase);
+    const sock = mkSocket();
+    handleRequestTowerState(sock);
+    expect(sock.emit).toHaveBeenCalledWith('towerStateSync', expect.objectContaining({ endsAtMs: 1 }));
+    expect(sock.emit).not.toHaveBeenCalledWith('error', expect.anything());
+  });
+});

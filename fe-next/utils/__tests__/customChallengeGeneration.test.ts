@@ -9,13 +9,14 @@ import { isWordOnBoard } from '../utils';
 import type { Language } from '@/types';
 
 describe('Custom Challenge Grid Generation', () => {
-  const languages: Language[] = ['en', 'he', 'sv', 'ja'];
+  const languages: Language[] = ['en', 'he', 'sv', 'ja', 'es'];
   const boardSizes = [5, 7];
   const testWords: Partial<Record<Language, string[]>> = {
     en: ['CAT', 'DOG', 'BIRD', 'FISH', 'ELEPHANT'],
     he: ['חתול', 'כלב', 'ציפור', 'דג'],
     sv: ['KATT', 'HUND', 'FÅGEL', 'FISK'],
     ja: ['日本', '東京', '学校'],
+    es: ['GATO', 'PERRO', 'PÁJARO', 'PEZ'],
   };
 
   describe('Target Word Embedding', () => {

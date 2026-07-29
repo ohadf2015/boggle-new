@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Brain, TrendingUp, Sparkles, Share2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/utils/ThemeContext';
@@ -17,13 +16,41 @@ interface BrainScoreHeroProps {
 }
 
 const TIER_CONFIG = {
-  novice: { color: 'bg-slate-400', next: 'apprentice', min: 0, max: 19 },
-  apprentice: { color: 'bg-neo-green', next: 'intermediate', min: 20, max: 39 },
-  intermediate: { color: 'bg-neo-cyan', next: 'advanced', min: 40, max: 59 },
-  advanced: { color: 'bg-neo-purple', next: 'expert', min: 60, max: 79 },
-  expert: { color: 'bg-neo-orange', next: 'master', min: 80, max: 89 },
-  master: { color: 'bg-neo-lime', next: null, min: 90, max: 100 },
+  novice: { next: 'apprentice', min: 0, max: 19 },
+  apprentice: { next: 'intermediate', min: 20, max: 39 },
+  intermediate: { next: 'advanced', min: 40, max: 59 },
+  advanced: { next: 'expert', min: 60, max: 79 },
+  expert: { next: 'master', min: 80, max: 89 },
+  master: { next: null, min: 90, max: 100 },
 };
+
+/**
+ * Get progress bar gradient based on score
+ * Creates a vibrant gradient that evolves with brain score
+ * Low: Pink->Red, Medium: Orange->Yellow, High: Lime->Cyan
+ */
+function getProgressBarGradient(score: number): string {
+  if (score < 20) return 'bg-linear-to-r from-neo-pink to-neo-red';
+  if (score < 40) return 'bg-linear-to-r from-neo-red to-neo-orange';
+  if (score < 60) return 'bg-linear-to-r from-neo-orange to-neo-yellow';
+  if (score < 80) return 'bg-linear-to-r from-neo-yellow to-neo-lime';
+  return 'bg-linear-to-r from-neo-lime to-neo-cyan';
+}
+
+/**
+ * Get tier badge color
+ */
+function getTierBadgeColor(tier: string): string {
+  switch (tier) {
+    case 'novice': return 'bg-slate-400';
+    case 'apprentice': return 'bg-neo-green';
+    case 'intermediate': return 'bg-neo-cyan';
+    case 'advanced': return 'bg-neo-purple';
+    case 'expert': return 'bg-neo-orange';
+    case 'master': return 'bg-neo-lime';
+    default: return 'bg-slate-400';
+  }
+}
 
 /**
  * Brain Score Hero Component
@@ -42,6 +69,8 @@ export default function BrainScoreHero({
   const isDarkMode = theme === 'dark';
   const tierConfig = TIER_CONFIG[tier];
   const nextTier = tierConfig.next;
+  const progressBarGradient = getProgressBarGradient(score);
+  const tierBadgeColor = getTierBadgeColor(tier);
 
   // Total activities combines both games and drills for brain score
   const totalActivities = gamesAnalyzed + drillsCompleted;
@@ -49,16 +78,16 @@ export default function BrainScoreHero({
   return (
     <div className={cn(
       'rounded-neo border-4 border-neo-black shadow-hard p-4 sm:p-6 relative overflow-hidden',
-      isDarkMode ? 'bg-slate-800' : 'bg-white'
+      isDarkMode ? 'bg-neo-navy-light' : 'bg-white'
     )}>
       {/* Main Score Display */}
       <div className="flex items-center justify-between gap-2 mb-4 sm:mb-6">
         <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
           {/* Animated Brain Icon */}
-          <motion.div
+          <m.div
             className={cn(
               'w-12 h-12 sm:w-16 sm:h-16 rounded-neo border-3 border-neo-black flex items-center justify-center shrink-0',
-              tierConfig.color
+              tierBadgeColor
             )}
             animate={{
               scale: [1, 1.05, 1],
@@ -71,17 +100,17 @@ export default function BrainScoreHero({
             }}
           >
             <Brain className="w-7 h-7 sm:w-10 sm:h-10 text-neo-black" />
-          </motion.div>
+          </m.div>
 
           <div className="min-w-0">
             <p className={cn(
               'text-xs sm:text-sm font-bold uppercase tracking-wide',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}>
               {t('brain.score')}
             </p>
             <div className="flex items-baseline gap-1 sm:gap-2">
-              <motion.span
+              <m.span
                 className={cn(
                   'text-3xl sm:text-5xl font-black',
                   isDarkMode ? 'text-neo-white' : 'text-neo-black'
@@ -91,10 +120,10 @@ export default function BrainScoreHero({
                 transition={{ delay: 0.2 }}
               >
                 {score}
-              </motion.span>
+              </m.span>
               <span className={cn(
                 'text-base sm:text-xl font-bold',
-                isDarkMode ? 'text-neo-white/50' : 'text-neo-black/50'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
               )}>
                 /100
               </span>
@@ -106,7 +135,7 @@ export default function BrainScoreHero({
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           {/* Share Button */}
           {onShare && (
-            <motion.button
+            <m.button
               whileTap={{ scale: 0.95 }}
               onClick={onShare}
               className={cn(
@@ -119,17 +148,17 @@ export default function BrainScoreHero({
               title={t('common.share')}
             >
               <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
-            </motion.button>
+            </m.button>
           )}
 
           {/* Activities Analyzed Badge */}
           <div className={cn(
             'text-right px-2 sm:px-3 py-1.5 sm:py-2 rounded-neo border-2 border-neo-black',
-            isDarkMode ? 'bg-slate-700' : 'bg-neo-cream'
+            isDarkMode ? 'bg-neo-navy-elevated' : 'bg-neo-cream'
           )}>
             <p className={cn(
               'text-[10px] sm:text-xs font-bold uppercase leading-tight',
-              isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+              isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
             )}>
               {t('brain.activitiesAnalyzed')}
             </p>
@@ -163,25 +192,60 @@ export default function BrainScoreHero({
               <TrendingUp className="w-3 h-3 text-neo-green" />
               <span className={cn(
                 'text-xs font-medium',
-                isDarkMode ? 'text-neo-white/70' : 'text-neo-black/70'
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/70'
               )}>
-                {tierProgress}% {t('brain.toNextTier')} {t(`brain.tiers.${nextTier}`)}
+                {t(`brain.tiers.${nextTier}`)}
               </span>
             </div>
           )}
         </div>
 
-        {/* Progress Bar */}
-        <div className={cn(
-          'h-4 rounded-full border-2 border-neo-black overflow-hidden',
-          isDarkMode ? 'bg-slate-900' : 'bg-gray-200'
-        )}>
-          <motion.div
-            className={cn('h-full', tierConfig.color)}
-            initial={{ width: 0 }}
-            animate={{ width: `${tierProgress}%` }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          />
+        {/* Progress Bar with score markers */}
+        <div className="relative">
+          <div className={cn(
+            'h-5 rounded-full border-2 border-neo-black overflow-hidden',
+            isDarkMode ? 'bg-neo-navy' : 'bg-gray-300'
+          )}>
+            <m.div
+              className={cn('h-full', progressBarGradient)}
+              initial={{ width: 0 }}
+              animate={{ width: `${tierProgress}%` }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+            />
+          </div>
+          {/* Score markers showing current → next tier threshold */}
+          {nextTier && (
+            <div className="flex justify-between mt-1">
+              <span className={cn(
+                'text-xs font-bold',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black'
+              )}>
+                {score}
+              </span>
+              <span className={cn(
+                'text-xs font-medium px-2 py-0.5 rounded-full',
+                isDarkMode ? 'bg-neo-navy-elevated text-neo-lime' : 'bg-gray-200 text-neo-purple'
+              )}>
+                {tierConfig.max + 1 - score} {t('brain.pointsToGo')}
+              </span>
+              <span className={cn(
+                'text-xs font-bold',
+                isDarkMode ? 'text-neo-white' : 'text-neo-black/50'
+              )}>
+                {tierConfig.max + 1}
+              </span>
+            </div>
+          )}
+          {!nextTier && (
+            <div className="flex justify-center mt-1">
+              <span className={cn(
+                'text-xs font-bold px-2 py-0.5 rounded-full',
+                'bg-neo-lime text-neo-black'
+              )}>
+                {t('brain.maxTierReached')}
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

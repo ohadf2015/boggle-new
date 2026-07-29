@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { useTheme } from '@/utils/ThemeContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { cn } from '@/lib/utils';
@@ -27,10 +27,10 @@ export function BenefitsList({
   const isDarkMode = theme === 'dark';
 
   return (
-    <motion.div
+    <m.div
       className={cn(
         'p-4 rounded-xl',
-        isDarkMode ? 'bg-slate-700/50' : 'bg-gray-50',
+        isDarkMode ? 'bg-neo-navy-elevated/50' : 'bg-gray-50',
         className
       )}
     >
@@ -44,7 +44,7 @@ export function BenefitsList({
       )}
       <ul className="space-y-2">
         {benefits.map((benefit, index) => (
-          <motion.li
+          <m.li
             key={benefit.translationKey}
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -52,16 +52,16 @@ export function BenefitsList({
             className="flex items-center gap-2 text-sm"
           >
             <benefit.icon className={cn(
-              'flex-shrink-0 w-4 h-4',
+              'shrink-0 w-4 h-4',
               isDarkMode ? 'text-cyan-400' : 'text-cyan-600'
             )} />
             <span className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
               {t(benefit.translationKey)}
             </span>
-          </motion.li>
+          </m.li>
         ))}
       </ul>
-    </motion.div>
+    </m.div>
   );
 }
 

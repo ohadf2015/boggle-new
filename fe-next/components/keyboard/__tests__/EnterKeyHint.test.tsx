@@ -10,8 +10,8 @@ import { render, renderHook, act } from '@testing-library/react';
 import { EnterKeyHint, useEnterKeyHint } from '../EnterKeyHint';
 
 // Mock framer-motion
-jest.mock('framer-motion', () => ({
-  motion: {
+vi.mock('framer-motion', () => ({
+  m: {
     div: ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => (
       <div {...props}>{children}</div>
     ),
@@ -33,7 +33,7 @@ describe('EnterKeyHint Component', () => {
 
   beforeEach(() => {
     localStorage.clear();
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('rendering', () => {

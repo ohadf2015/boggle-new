@@ -1,184 +1,185 @@
 /**
  * PerformanceSection Component
- * Combined collapsible section for rewards and score breakdown
- * Merges CollapsibleDetails + ScoreBreakdownSection into one cleaner component
+ * Three mini gauge rings for Speed, Accuracy, and Exploration breakdown.
+ * Replaces the previous horizontal progress bar design.
  */
 
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Coins, Timer, BarChart3, Lock } from 'lucide-react';
-import { getSurvivalBonusMessage } from './constants';
+import React from 'react';
+import { m } from 'framer-motion';
+import { Zap, Target, BookOpen, Coins, Lock, RotateCcw } from 'lucide-react';
+import { getScoreBreakdown } from '@/utils/aiHintGenerator';
+import { ScoreGaugeRing } from './ScoreGaugeRing';
 import type { CoinRewardMode } from '@/components/results/CoinRewardDisplay';
 
+const EXTRA_TRY_PENALTY = 150;
+
 export interface PerformanceSectionProps {
-  // Rewards props (from CollapsibleDetails)
   coinReward: { awarded: number; breakdown: { base: number; efficiency: number; streak: number } } | null;
-  /** Coin reward mode: 'earned' for authenticated users, 'teasing' for guests */
   coinRewardMode?: CoinRewardMode;
   survivalBonusTime: number;
   rarestWord: { word: string; rarity: number; emoji: string; label: string } | null;
-  // Score breakdown props (from ScoreBreakdownSection)
   solved: boolean;
   efficiencyScore: number;
   lifeRemaining: number;
-  unusedTokens: number;
   wordsDiscovered: number;
   guessesUsed: number;
+  extraTries?: number;
   t: (key: string) => string;
+}
+
+interface MiniRingConfig {
+  icon: React.ReactNode;
+  label: string;
+  value: number;
+  max: number;
+  color: 'neo-cyan' | 'neo-lime' | 'neo-pink';
+  detail: string;
 }
 
 export const PerformanceSection: React.FC<PerformanceSectionProps> = ({
   coinReward,
   coinRewardMode = 'earned',
-  survivalBonusTime,
-  rarestWord,
   solved,
-  efficiencyScore,
   lifeRemaining,
-  unusedTokens,
   wordsDiscovered,
   guessesUsed,
+  extraTries = 0,
   t,
 }) => {
-  const [expanded, setExpanded] = useState(false);
   const isTeasing = coinRewardMode === 'teasing';
+  const breakdown = getScoreBreakdown(lifeRemaining, guessesUsed, wordsDiscovered, solved);
+  const retryPenalty = extraTries * EXTRA_TRY_PENALTY;
 
-  // Check if there's anything to show
-  const hasRewards = (coinReward && coinReward.awarded > 0) || survivalBonusTime > 0 || (rarestWord && rarestWord.rarity >= 4);
-  const hasScore = solved && efficiencyScore > 0;
+  if (!solved || breakdown.total === 0) return null;
 
-  if (!hasRewards && !hasScore) return null;
-
-  // Calculate score contributions for breakdown
-  const lifeContribution = Math.round(Math.max(0, lifeRemaining) * 10);
-  const tokenContribution = Math.round(Math.max(0, unusedTokens) * 5);
-  const wordsContribution = Math.round(Math.max(0, wordsDiscovered) * 3);
-  const guessPenalty = Math.round(Math.max(0, guessesUsed) * 2);
+  const rings: MiniRingConfig[] = [
+    {
+      icon: <Zap className="w-3.5 h-3.5 text-neo-cyan" />,
+      label: t('wordHunt.score.speed'),
+      value: breakdown.speed,
+      max: 400,
+      color: 'neo-cyan',
+      detail: `${breakdown.raw.lifeRemaining} ${t('wordHunt.score.lifeLeft')}`,
+    },
+    {
+      icon: <Target className="w-3.5 h-3.5 text-neo-lime" />,
+      label: t('wordHunt.score.accuracy'),
+      value: breakdown.accuracy,
+      max: 400,
+      color: 'neo-lime',
+      detail: breakdown.raw.guessesUsed === 1
+        ? (t('wordHunt.score.firstTry'))
+        : `${breakdown.raw.guessesUsed} ${t('wordHunt.score.guesses')}`,
+    },
+    {
+      icon: <BookOpen className="w-3.5 h-3.5 text-neo-pink" />,
+      label: t('wordHunt.score.exploration'),
+      value: breakdown.exploration,
+      max: 200,
+      color: 'neo-pink',
+      detail: `${breakdown.raw.wordsFound} ${t('wordHunt.score.wordsFound')}`,
+    },
+  ];
 
   return (
-    <div className="rounded-neo border-2 border-neo-black overflow-hidden">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between p-2.5 bg-gradient-to-r from-purple-100 to-amber-100 dark:from-purple-900/30 dark:to-amber-900/30 hover:from-purple-200 hover:to-amber-200 dark:hover:from-purple-900/50 dark:hover:to-amber-900/50 transition-colors"
-      >
-        <div className="flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-          <span className="text-xs font-bold text-gray-700 dark:text-gray-200 uppercase">
-            {t('wordHunt.results.performanceRewards') || 'Performance & Rewards'}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          {/* Preview badges when collapsed */}
-          {!expanded && (
-            <div className="flex items-center gap-1.5">
-              {hasScore && (
-                <span className="text-xs font-bold text-purple-600 dark:text-purple-400">{Math.round(efficiencyScore)} pts</span>
-              )}
-              {coinReward && coinReward.awarded > 0 && !isTeasing && (
-                <span className="text-xs font-bold text-amber-600 dark:text-amber-400">+{coinReward.awarded}🪙</span>
-              )}
-              {coinReward && coinReward.awarded > 0 && isTeasing && (
-                <span className="text-xs font-bold text-slate-400 flex items-center gap-0.5">
-                  <Lock className="w-2.5 h-2.5" />+{coinReward.awarded}🪙
-                </span>
-              )}
-              {survivalBonusTime > 0 && (
-                <span className="text-xs font-bold text-cyan-600 dark:text-cyan-400">+{survivalBonusTime}s</span>
-              )}
-            </div>
-          )}
-          <motion.div animate={{ rotate: expanded ? 180 : 0 }}>
-            <ChevronDown className="w-4 h-4 text-gray-500" />
-          </motion.div>
-        </div>
-      </button>
-
-      <AnimatePresence>
-        {expanded && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden"
+    <m.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.15, type: 'spring', stiffness: 300, damping: 26 }}
+      className="bg-neo-gray rounded-neo-lg border-3 border-neo-black shadow-hard p-4"
+    >
+      {/* Three Mini Gauge Rings — dramatic staggered entrance */}
+      <div className="flex justify-center gap-4 sm:gap-6">
+        {rings.map((ring, index) => (
+          <m.div
+            key={ring.label}
+            initial={{ opacity: 0, scale: 0.3, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{
+              delay: 0.3 + index * 0.2,
+              type: 'spring',
+              stiffness: 350,
+              damping: 15,
+            }}
+            className="flex flex-col items-center gap-1.5"
           >
-            <div className="p-3 space-y-3 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100">
-              {/* Efficiency Score Summary */}
-              {hasScore && (
-                <div className="text-center pb-3 border-b border-gray-200 dark:border-gray-700">
-                  <div className="text-3xl font-black text-purple-600 dark:text-purple-400">
-                    {Math.round(efficiencyScore)}
-                  </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 uppercase font-bold">
-                    {t('wordHunt.results.efficiencyScore') || 'Efficiency Score'}
-                  </div>
-                  {/* Simple formula breakdown */}
-                  <div className="mt-1 text-[10px] text-gray-400 font-mono">
-                    ❤️{lifeContribution} + 🪙{tokenContribution} + 📖{wordsContribution} - 🎯{guessPenalty}
-                  </div>
-                </div>
-              )}
+            <ScoreGaugeRing
+              score={ring.value}
+              maxScore={ring.max}
+              size={80}
+              strokeWidth={6}
+              color={ring.color}
+              delay={0.4 + index * 0.2}
+              label={undefined}
+              icon={ring.icon}
+            />
+            <m.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6 + index * 0.2 }}
+              className="text-[11px] font-bold text-slate-300"
+            >
+              {ring.label}
+            </m.span>
+            <m.span
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 + index * 0.2 }}
+              className="text-[10px] text-slate-500"
+            >
+              {ring.detail}
+            </m.span>
+          </m.div>
+        ))}
+      </div>
 
-              {/* Rewards Section */}
-              {hasRewards && (
-                <div className="space-y-2">
-                  {/* Coin rewards - earned mode */}
-                  {coinReward && coinReward.awarded > 0 && !isTeasing && (
-                    <div className="flex items-center justify-between p-2 bg-amber-50 dark:bg-amber-900/20 rounded-lg border border-amber-200 dark:border-amber-800">
-                      <div className="flex items-center gap-2">
-                        <Coins className="w-4 h-4 text-amber-600" />
-                        <span className="font-bold text-xs text-gray-700 dark:text-gray-200">{t('wordHunt.results.coinsEarned') || 'Coins Earned'}</span>
-                      </div>
-                      <span className="font-black text-amber-600 dark:text-amber-400">+{coinReward.awarded}</span>
-                    </div>
-                  )}
-
-                  {/* Coin rewards - teasing mode for guests */}
-                  {coinReward && coinReward.awarded > 0 && isTeasing && (
-                    <div className="flex items-center justify-between p-2 bg-slate-100 dark:bg-slate-700/30 rounded-lg border border-slate-300 dark:border-slate-600">
-                      <div className="flex items-center gap-2">
-                        <Lock className="w-3.5 h-3.5 text-amber-500/70" />
-                        <Coins className="w-4 h-4 text-amber-500/60" />
-                        <span className="font-bold text-xs text-slate-600 dark:text-slate-300">
-                          {(t('coins.guestTeasing') || 'Sign in to earn {amount} coins!').replace('{amount}', String(coinReward.awarded))}
-                        </span>
-                      </div>
-                      <span className="font-black text-amber-500/70">+{coinReward.awarded}</span>
-                    </div>
-                  )}
-
-                  {/* Survival bonus */}
-                  {survivalBonusTime > 0 && (
-                    <div className="flex items-center justify-between p-2 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border border-cyan-200 dark:border-cyan-800">
-                      <div className="flex items-center gap-2">
-                        <Timer className="w-4 h-4 text-cyan-600" />
-                        <span className="font-bold text-xs text-gray-700 dark:text-gray-200">{t('wordHunt.results.survivalBonus')}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span className="text-[10px]">{getSurvivalBonusMessage(survivalBonusTime).emoji}</span>
-                        <span className="font-black text-cyan-600 dark:text-cyan-400">+{survivalBonusTime}s</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Rarest word */}
-                  {rarestWord && rarestWord.rarity >= 4 && (
-                    <div className="flex items-center justify-between p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg border border-indigo-200 dark:border-indigo-800">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm">{rarestWord.emoji}</span>
-                        <span className="font-bold text-xs text-gray-700 dark:text-gray-200">{rarestWord.label} {t('wordHunt.results.find')}</span>
-                      </div>
-                      <span className="font-black text-indigo-600 dark:text-indigo-400 tracking-wide">{rarestWord.word.toUpperCase()}</span>
-                    </div>
-                  )}
-                </div>
-              )}
+      {/* Extra Try Penalty — visible deduction */}
+      {retryPenalty > 0 && (
+        <m.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.9, type: 'spring', stiffness: 300, damping: 26 }}
+          className="mt-3 pt-3 border-t border-neo-black/30"
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <RotateCcw className="w-4 h-4 text-neo-red" />
+              <span className="text-xs font-medium text-slate-300">
+                {t('wordHunt.score.extraTryPenalty')}
+              </span>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            <span className="font-black text-neo-red">
+              -{retryPenalty}
+            </span>
+          </div>
+          <div className="text-[10px] text-slate-500 mt-1">
+            {extraTries} {extraTries === 1 ? t('wordHunt.score.extraTry') : t('wordHunt.score.extraTries')} × {EXTRA_TRY_PENALTY} {t('wordHunt.score.points')}
+          </div>
+        </m.div>
+      )}
+
+      {/* Coin Reward — Compact inline display */}
+      {coinReward && coinReward.awarded > 0 && (
+        <div className="mt-3 pt-3 border-t border-neo-black/30">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              {isTeasing && <Lock className="w-3 h-3 text-slate-400" />}
+              <Coins className={`w-4 h-4 ${isTeasing ? 'text-amber-500/50' : 'text-amber-400'}`} />
+              <span className={`text-xs font-medium ${isTeasing ? 'text-slate-400' : 'text-slate-300'}`}>
+                {isTeasing
+                  ? (t('coins.guestTeasing') || '').replace('{amount}', String(coinReward.awarded))
+                  : (t('wordHunt.results.coinsEarned'))}
+              </span>
+            </div>
+            <span className={`font-black ${isTeasing ? 'text-amber-500/50' : 'text-amber-400'}`}>
+              +{coinReward.awarded}
+            </span>
+          </div>
+        </div>
+      )}
+    </m.div>
   );
 };
 

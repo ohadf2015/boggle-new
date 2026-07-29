@@ -1,15 +1,15 @@
 /**
  * Game Lifecycle Handler
- * Handles game lifecycle events: create, start, end, reset
+ * Handles game lifecycle events: create, end, reset, ready state
  */
 
 import type { Server, Socket } from 'socket.io';
-import type { Game, GameUser, LetterGrid, Language, DifficultyLevel, Avatar } from '@/shared/types';
+import type { Language, Avatar } from '@/shared/types';
+import type { GameState } from '../modules/gameState/types.js';
 
-const {
+import {
   createGame,
   getGame,
-  updateGame,
   deleteGame,
   gameExists,
   addUserToGame,
@@ -19,39 +19,51 @@ const {
   getActiveRooms,
   resetGameForNewRound,
   getAuthUserConnection,
-  transitionGameState,
-  canTransitionGameState,
   isRoomEmpty,
   markPlayerReadyForNextGame,
-  getPlayersReadyCount
-} = require('../modules/gameStateManager');
+  unmarkPlayerReady,
+  getPlayersReadyCount,
+  removeUserFromGame,
+  updateUsernameMapping,
+  getLeaderboard
+} from '../modules/gameStateManager.js';
 
-const {
+import {
   broadcastToRoom,
+  broadcastActiveRooms,
   getGameRoom,
   joinRoom,
   leaveRoom,
   safeEmit,
   getSocketById,
-  disconnectSocket
-} = require('../utils/socketHelpers');
+  disconnectSocket,
+  LOBBY_ROOM
+} from '../utils/socketHelpers.js';
 
-const { makePositionsMap } = require('../modules/wordValidator');
-const { emitError, ErrorMessages } = require('../utils/errorHandler');
-const { checkRateLimit } = require('../utils/rateLimiter');
-const gameStartCoordinator = require('../utils/gameStartCoordinator');
-const timerManager = require('../utils/timerManager');
-const redisClient = require('../redisClient');
-const { inc, ensureGame } = require('../utils/metrics');
-const { generateRandomAvatar } = require('../utils/gameUtils');
-const { getRandomLongWordsWithTheme, ensureLanguageLoaded } = require('../dictionary');
-const logger = require('../utils/logger');
-const { startGameTimer, endGame } = require('./shared');
-const { findAllWords, getCachedTrie } = require('../modules/boggleSolver');
-const { validatePayload, createGameSchema, startGameSchema } = require('../utils/socketValidation');
-const botManager = require('../modules/botManager');
-const { spamDetector } = require('../modules/spamDetector');
-const { notifyRoomCreated, notifyGameStarted } = require('../modules/notificationService');
+import { emitError, ErrorCodes } from '../utils/errorHandler.js';
+import {
+  shouldTriggerAutoStart,
+  startAutoStartCountdown,
+  cancelAutoStartCountdown,
+  clearAutoStartState,
+} from '../modules/lobbyAutoStart.js';
+import { checkRateLimit } from '../utils/rateLimiter.js';
+import { checkSocketRateLimit } from '../middleware/rateLimiterRedis.js';
+import gameStartCoordinator from '../utils/gameStartCoordinator.js';
+import { clearGameTimer, hasGameTimer } from '../utils/timerManager.js';
+import * as Sentry from '@sentry/nextjs';
+import { saveGameState } from '../redisClient.js';
+import { inc, ensureGame } from '../utils/metrics.js';
+import { generateRandomAvatar } from '../utils/gameUtils.js';
+import { getRandomLongWordsWithTheme, ensureLanguageLoaded } from '../dictionary.js';
+import logger from '../utils/logger.js';
+import { startGameTimer, endGame } from './shared.js';
+import { validatePayload, createGameSchema, getWordsForBoardSchema } from '../utils/socketValidation.js';
+import { stopAllBots } from '../modules/botManager.js';
+import { notifyRoomCreated } from '../modules/notificationService.js';
+import { isInProgress } from '../utils/gameStateMachine.js';
+import { registerStartGameHandler } from './gameStartHandler.js';
+import { renamePlayerInGame } from '../modules/playerRename.js';
 
 // Types for payloads
 interface CreateGamePayload {
@@ -65,19 +77,15 @@ interface CreateGamePayload {
   guestTokenHash?: string;
   guestSessionId?: string;
   isRanked?: boolean;
-  profilePictureUrl?: string;
-}
-
-interface StartGamePayload {
-  letterGrid: LetterGrid;
-  timerSeconds: number;
-  language?: Language;
-  minWordLength?: number;
-  difficulty?: DifficultyLevel;
-  boardTheme?: { nameKey: string; emoji: string; isHoliday: boolean } | null;
+  isPrivate?: boolean;
+  isClassroom?: boolean;
 }
 
 interface StartGameAckPayload {
+  messageId: string;
+}
+
+interface CountdownCompletePayload {
   messageId: string;
 }
 
@@ -97,10 +105,30 @@ interface AuthConnection {
   isHost: boolean;
 }
 
+// Guards against TOCTOU race in createGame: tracks game codes whose creation
+// is in-flight (between gameExists check and createGame call across async yields).
+const gamesBeingCreated = new Set<string>();
+
+/**
+ * Begin the server-owned lobby auto-start countdown for a game. Ticks are
+ * broadcast to the whole room (one synced clock for host + guests); at zero the
+ * host socket is told to fire its normal `startGame` path. Re-resolves the host
+ * socket at fire time so a host reconnect mid-countdown still receives it.
+ */
+function beginLobbyAutoStart(io: Server, gameCode: string): void {
+  startAutoStartCountdown(gameCode, {
+    onTick: (secondsLeft) =>
+      broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartTick', { secondsLeft }),
+    onFire: () => {
+      const game = getGame(gameCode);
+      if (!game || game.gameState !== 'waiting' || !game.hostSocketId) return;
+      io.to(game.hostSocketId).emit('lobbyAutoStartFire', {});
+    },
+  });
+}
+
 /**
  * Register game lifecycle socket event handlers
- * @param io - Socket.IO server instance
- * @param socket - Socket.IO socket instance
  */
 function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
@@ -113,15 +141,34 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         return;
       }
 
-      // Validate payload
-      const validation = validatePayload(createGameSchema, data);
-      if (!validation.success) {
-        logger.warn('SOCKET', `Create game validation failed: ${validation.error}`, { data });
-        emitError(socket, `Invalid request: ${validation.error}`);
+      // Per-action rate limit for room creation
+      const rl = await checkSocketRateLimit(socket.id, 'roomCreate');
+      if (!rl.allowed) {
+        logger.warn('RATE_LIMIT', 'Rate limited', { socketId: socket.id, action: 'roomCreate' });
+        socket.emit('rate-limited', { action: 'roomCreate', retryAfterMs: rl.retryAfterMs });
         return;
       }
 
-      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, profilePictureUrl } = validation.data as CreateGamePayload;
+      const validation = validatePayload(createGameSchema, data);
+      if (!validation.success) {
+        logger.warn('SOCKET', `Create game validation failed: ${validation.error}`, { data });
+        emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
+        return;
+      }
+
+      const { gameCode, roomName, language, hostUsername, playerId, avatar, authUserId, guestTokenHash, guestSessionId, isRanked, isPrivate, isClassroom } = validation.data as CreateGamePayload;
+
+      // Ranked rooms must be hosted by an authenticated user — guests can't
+      // submit results that update the ranked MMR leaderboard, so allowing
+      // them to flag their room as ranked would silently waste matchmaking
+      // intent and pollute lobby filters (audit SRV-CRIT-2).
+      if (isRanked && !authUserId) {
+        logger.warn('SOCKET', `Rejected ranked room ${gameCode}: host not authenticated`);
+        emitError(socket, ErrorCodes.AUTH_FORBIDDEN, {
+          message: 'Ranked rooms require a signed-in host',
+        });
+        return;
+      }
 
       logger.info('SOCKET', `Create game request: ${gameCode} by ${hostUsername}${isRanked ? ' (RANKED)' : ''}`, {
         socketId: socket.id,
@@ -129,22 +176,32 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         hasAuth: !!authUserId
       });
 
-      // playerId is already validated by schema (UUID v4 format) - use as is
-      const sanitizedPlayerId = playerId || null;
+      const sanitizedPlayerId = playerId || undefined;
 
-      // Check if game already exists
-      if (gameExists(gameCode)) {
-        logger.warn('SOCKET', `Game code already exists: ${gameCode}`);
-        emitError(socket, 'Game code already in use');
+      if (gameExists(gameCode) || gamesBeingCreated.has(gameCode)) {
+        // Expected dedup: client double-tapped Create or stale request retry.
+        // Server rejects via emitError; no need to ship to Sentry.
+        logger.info('SOCKET', `Game code already exists or in-flight: ${gameCode}`);
+        emitError(socket, ErrorCodes.GAME_ALREADY_EXISTS);
         return;
       }
 
-      // Handle multi-tab detection for authenticated users
+      // Lock the game code during async work to prevent TOCTOU races
+      gamesBeingCreated.add(gameCode);
+      try {
+
       if (authUserId) {
         await handleExistingAuthConnection(io, socket, authUserId, gameCode);
       }
 
-      // Create the game
+      // Re-check after async yield — another socket may have created it
+      if (gameExists(gameCode)) {
+        // Expected TOCTOU race; rejecting cleanly. Info-only.
+        logger.info('SOCKET', `Game code created by another socket during async: ${gameCode}`);
+        emitError(socket, ErrorCodes.GAME_ALREADY_EXISTS);
+        return;
+      }
+
       const game = createGame(gameCode, {
         hostSocketId: socket.id,
         hostUsername: hostUsername || 'Host',
@@ -152,23 +209,23 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         roomName: roomName || gameCode,
         language: language || 'en',
         isRanked: isRanked || false,
+        isPrivate: isPrivate || false,
+        isClassroom: isClassroom || false,
         allowLateJoin: isRanked ? false : true
       });
 
-      // Preload the language dictionary for this game
       const gameLang = language || 'en';
       try {
         await ensureLanguageLoaded(gameLang);
         logger.debug('DICT', `Language ${gameLang} preloaded for game ${gameCode}`);
       } catch (error) {
         logger.error('DICT', `Failed to preload language ${gameLang} for game ${gameCode}: ${error}`);
-        // Continue anyway - will try again when game starts
       }
 
-      // Add host as first user
       const hostAvatar = avatar || generateRandomAvatar();
+      logger.info('HOST_JOIN', `Adding host ${hostUsername || 'Host'} to game ${gameCode} with authUserId=${authUserId || 'NONE'}, guestHash=${guestTokenHash ? 'yes' : 'no'}`);
       addUserToGame(gameCode, hostUsername || 'Host', socket.id, {
-        avatar: { ...hostAvatar, profilePictureUrl: profilePictureUrl || null },
+        avatar: hostAvatar,
         isHost: true,
         playerId: sanitizedPlayerId,
         authUserId: authUserId || null,
@@ -176,10 +233,9 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         guestSessionId: guestSessionId || null
       });
 
-      // Join socket to game room
       joinRoom(socket, getGameRoom(gameCode));
+      leaveRoom(socket, LOBBY_ROOM); // Stop receiving lobby broadcasts while in-game
 
-      // Confirm game creation - CRITICAL: Always emit this before async operations
       socket.emit('joined', {
         success: true,
         gameCode,
@@ -187,24 +243,21 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         username: hostUsername || 'Host',
         roomName: roomName || gameCode,
         language: language || 'en',
+        isPrivate: isPrivate || false,
         users: getGameUsers(gameCode)
       });
 
       logger.info('SOCKET', `Game ${gameCode} created successfully by ${hostUsername}`);
 
       ensureGame(gameCode);
+      broadcastActiveRooms(io, getActiveRooms());
 
-      // Broadcast updated room list
-      io.emit('activeRooms', { rooms: getActiveRooms() });
-
-      // Broadcast user list update
       broadcastToRoom(io, getGameRoom(gameCode), 'updateUsers', {
         users: getGameUsers(gameCode)
       });
 
-      // Save to Redis
       try {
-        await redisClient.saveGameState(gameCode, game);
+        await saveGameState(gameCode, game as unknown as Parameters<typeof saveGameState>[1]);
       } catch (err: unknown) {
         const error = err as Error;
         logger.error('REDIS', 'Failed to save game state', error);
@@ -214,7 +267,6 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         });
       }
 
-      // Fire-and-forget notification
       notifyRoomCreated({
         gameCode,
         roomName: roomName || gameCode,
@@ -222,198 +274,59 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
         hostUsername: hostUsername || 'Host',
         isAuthenticated: !!authUserId,
         isRanked: isRanked || false
-      }).catch(() => {}); // Swallow errors - never block game flow
+      }).catch((err: Error) => {
+        logger.error('SOCKET', `Failed to notify room created for ${gameCode}: ${err.message}`);
+      });
+
+      } finally {
+        gamesBeingCreated.delete(gameCode);
+      }
     } catch (error: unknown) {
+      gamesBeingCreated.delete((data as CreateGamePayload)?.gameCode);
       const err = error as Error;
       logger.error('SOCKET', `Unhandled error in createGame handler: ${err.message}`, {
         stack: err.stack,
         socketId: socket.id,
         data
       });
-      emitError(socket, 'Failed to create game. Please try again.');
+      emitError(socket, ErrorCodes.INTERNAL_ERROR, { message: 'Failed to create game. Please try again.' });
     }
   });
 
   // Handle request for words to embed in board
-  // Returns themed words (50%) mixed with regular dictionary words (50%)
-  // Theme is based on current date (holidays, special events, or day-of-week)
   socket.on('getWordsForBoard', (data: GetWordsForBoardPayload) => {
-    const { language, boardSize } = data;
-    const rows = boardSize?.rows || 5;
-    const cols = boardSize?.cols || 5;
-    const totalCells = rows * cols;
-    const wordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
-    // Increased max word length from 8 to 12 to support longer themed words
-    const maxWordLen = Math.min(12, Math.max(rows, cols));
-    const result = getRandomLongWordsWithTheme(language || 'en', wordCount, 3, maxWordLen);
-    socket.emit('wordsForBoard', {
-      words: result.words,
-      theme: result.theme // { nameKey, emoji, isHoliday }
-    });
-  });
-
-  // Handle game start
-  socket.on('startGame', async (data: StartGamePayload) => {
     if (!checkRateLimit(socket.id)) {
       socket.emit('rateLimited');
       return;
     }
 
-    const { letterGrid, timerSeconds, language, minWordLength, difficulty, boardTheme } = data;
-    const gameCode = getGameBySocketId(socket.id);
-
-    if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+    const validation = validatePayload(getWordsForBoardSchema, data);
+    if (!validation.success) {
+      logger.warn('SOCKET', `getWordsForBoard validation failed: ${validation.error}`, { data });
+      emitError(socket, ErrorCodes.VALIDATION_INVALID_PAYLOAD, { message: `Invalid request: ${validation.error}` });
       return;
     }
 
-    const game = getGame(gameCode);
-    if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
-      return;
-    }
-
-    if (game.hostSocketId !== socket.id) {
-      emitError(socket, ErrorMessages.ONLY_HOST_CAN_START);
-      return;
-    }
-
-    // Check if game can be started (must be in 'waiting' state)
-    const currentGameState = game.gameState;
-    logger.info('SOCKET', `Starting game ${gameCode} - current state: ${currentGameState}`);
-
-    // Self-healing: if not in 'waiting' state, force a reset first
-    // This handles race conditions between async endGame and rapid reset/start clicks
-    if (!canTransitionGameState(gameCode, 'START')) {
-      logger.warn('SOCKET', `Game ${gameCode} in unexpected state ${currentGameState}, auto-resetting before start`);
-
-      // Clear any lingering timers/state from previous game
-      timerManager.clearGameTimer(gameCode);
-      gameStartCoordinator.cleanupSequence(gameCode);
-      botManager.stopAllBots(gameCode);
-
-      // Force reset to 'waiting' state - try proper reset first, fallback to direct state change
-      const resetSuccess = resetGameForNewRound(gameCode);
-      if (!resetSuccess) {
-        // Fallback: directly force state to 'waiting'
-        logger.warn('SOCKET', `resetGameForNewRound failed for ${gameCode}, forcing state to waiting`);
-        game.gameState = 'waiting';
-      }
-
-      logger.info('SOCKET', `Game ${gameCode} auto-reset successful, state now: ${game.gameState}`);
-    }
-
-    const validTimer = Math.max(30, Math.min(600, parseInt(String(timerSeconds), 10) || 180));
-
-    // Ensure the language dictionary is loaded before starting the game
-    const gameLang = language || game.language || 'en';
-    try {
-      await ensureLanguageLoaded(gameLang);
-      logger.debug('DICT', `Language ${gameLang} loaded for game ${gameCode}`);
-    } catch (error) {
-      logger.error('DICT', `Failed to load language ${gameLang} for game ${gameCode}: ${error}`);
-      // Continue anyway - word validation will use community validation as fallback
-    }
-
-    // Update game settings first
-    updateGame(gameCode, {
-      letterGrid,
-      timerSeconds: validTimer,
-      remainingTime: validTimer,
-      gameDuration: validTimer,
-      language: gameLang,
-      minWordLength: minWordLength || 2,
-      difficulty: difficulty || 'MEDIUM',
-      gameStartedAt: Date.now(),
-      boardTheme: boardTheme || null // Store theme for late joiners
+    const { language, boardSize } = validation.data as GetWordsForBoardPayload;
+    const rows = boardSize?.rows || 5;
+    const cols = boardSize?.cols || 5;
+    const totalCells = rows * cols;
+    const wordCount = Math.min(35, Math.max(5, Math.floor(totalCells / 3)));
+    const maxWordLen = Math.min(12, Math.max(rows, cols));
+    const result = getRandomLongWordsWithTheme(language || 'en', wordCount, 3, maxWordLen);
+    socket.emit('wordsForBoard', {
+      words: result.words,
+      theme: result.theme
     });
-
-    // Transition state using state machine
-    const transitionResult = transitionGameState(gameCode, 'START');
-    if (!transitionResult.success) {
-      logger.error('SOCKET', `Failed to start game ${gameCode}: ${transitionResult.error}`);
-      emitError(socket, 'Failed to start game');
-      return;
-    }
-
-    // Precompute letter positions
-    const positions = makePositionsMap(letterGrid);
-    const current = getGame(gameCode);
-    if (current) {
-      current.letterPositions = positions;
-    }
-    ensureGame(gameCode);
-
-    // Initialize player data
-    initializePlayerData(game, gameCode);
-
-    // Initialize game start coordination
-    const users: GameUser[] = getGameUsers(gameCode);
-    const playerUsernames = users.map(u => u.username);
-    const messageId = gameStartCoordinator.initializeSequence(gameCode, playerUsernames, timerSeconds);
-
-    // Broadcast start
-    broadcastToRoom(io, getGameRoom(gameCode), 'startGame', {
-      letterGrid,
-      timerSeconds: validTimer,
-      language: gameLang,
-      minWordLength: minWordLength || 2,
-      messageId,
-      gameSessionId: game.gameSessionId,
-      boardTheme: boardTheme || null
-    });
-
-    // Calculate and emit total words on board (async, non-blocking)
-    setImmediate(() => {
-      try {
-        const trie = getCachedTrie(gameLang);
-        const allWords = findAllWords(letterGrid, gameLang, {
-          minLength: minWordLength || 2,
-          maxLength: 15,
-          maxWords: 10000, // No practical limit - trie makes this fast
-          trie
-        });
-        // Only count 5+ letter words for "Words Remaining" display
-        // This prevents overwhelming numbers and focuses on meaningful words
-        const MIN_DISPLAY_WORD_LENGTH = 5;
-        const totalBoardWords = allWords.filter((word: string) => word.length >= MIN_DISPLAY_WORD_LENGTH).length;
-
-        // Store in game state for late joiners
-        const currentGame = getGame(gameCode);
-        if (currentGame) {
-          currentGame.totalBoardWords = totalBoardWords;
-        }
-
-        broadcastToRoom(io, getGameRoom(gameCode), 'totalBoardWords', {
-          count: totalBoardWords
-        });
-
-        logger.debug('SOCKET', `Game ${gameCode} has ${totalBoardWords} possible words on board`);
-      } catch (err: unknown) {
-        const error = err as Error;
-        logger.error('SOCKET', `Failed to calculate total board words for ${gameCode}`, error);
-      }
-    });
-
-    // Set acknowledgment timeout
-    gameStartCoordinator.setAcknowledgmentTimeout(gameCode, 2000, () => {
-      startGameTimer(io, gameCode, validTimer);
-    });
-
-    logger.info('SOCKET', `Game ${gameCode} starting with ${playerUsernames.length} players`);
-
-    // Fire-and-forget notification
-    notifyGameStarted({
-      gameCode,
-      roomName: game.roomName,
-      language: language || game.language,
-      playerCount: playerUsernames.length,
-      timerSeconds: validTimer,
-      isRanked: game.isRanked || false
-    }).catch(() => {}); // Swallow errors - never block game flow
   });
 
-  // Handle start game acknowledgment
+  // Register startGame handler from extracted module
+  registerStartGameHandler(io, socket);
+
+  // Handle start game acknowledgment — confirms delivery only.
+  // Timer start is now gated on `countdownComplete` (post-animation),
+  // not on ack (post-receipt), so the round timer doesn't tick down
+  // while players are still watching the 3-2-1-GO countdown.
   socket.on('startGameAck', (data: StartGameAckPayload) => {
     const { messageId } = data;
     const gameCode = getGameBySocketId(socket.id);
@@ -421,11 +334,23 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     if (!gameCode || !username) return;
 
-    const result = gameStartCoordinator.recordAcknowledgment(gameCode, username, messageId);
+    gameStartCoordinator.recordAcknowledgment(gameCode, username, messageId);
+  });
+
+  // Handle countdown completion — fires after client's pre-game animation
+  // finishes. When all expected players report, start the authoritative timer.
+  socket.on('countdownComplete', (data: CountdownCompletePayload) => {
+    const { messageId } = data;
+    const gameCode = getGameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
+
+    if (!gameCode || !username) return;
+
+    const result = gameStartCoordinator.recordCountdownComplete(gameCode, username, messageId);
 
     if (result.valid && result.allReady) {
       const game = getGame(gameCode);
-      startGameTimer(io, gameCode, game?.timerSeconds || 180);
+      startGameTimer(io, gameCode, game?.gameDuration || game?.timerSeconds || 180);
     }
   });
 
@@ -438,136 +363,397 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
 
     const gameCode = getGameBySocketId(socket.id);
     if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
+      emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
       return;
     }
 
     const game = getGame(gameCode);
     if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
+      emitError(socket, ErrorCodes.GAME_NOT_FOUND);
       return;
     }
 
     if (game.hostSocketId !== socket.id) {
-      emitError(socket, ErrorMessages.ONLY_HOST_CAN_END);
+      emitError(socket, ErrorCodes.PLAYER_NOT_HOST);
       return;
     }
 
     endGame(io, gameCode);
   });
 
-  // Debug: Get current game state (for debugging sync issues)
+  // Blast dead-end: client detected no valid moves remain, Sugar Crush played — end game now.
+  // Multiple players may emit this concurrently; endGame is idempotent.
+  socket.on('blastDeadEnd', () => {
+    if (!checkRateLimit(socket.id)) { socket.emit('rateLimited'); return; }
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+    const game = getGame(gameCode);
+    if (!game || game.gameMode !== 'blast') return;
+    endGame(io, gameCode);
+  });
+
+  // Debug: Get current game state (development only)
   socket.on('debugGameState', () => {
+    if (process.env.NODE_ENV === 'production') return;
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     const game = gameCode ? getGame(gameCode) : null;
+    const isHost = game?.hostSocketId === socket.id;
+    const isDev = process.env.NODE_ENV === 'development';
     socket.emit('debugGameStateResponse', {
       gameCode,
       gameState: game?.gameState || 'NO_GAME',
-      hostSocketId: game?.hostSocketId,
+      // Only expose hostSocketId to the host or in dev mode
+      ...(isHost || isDev ? { hostSocketId: game?.hostSocketId } : {}),
       mySocketId: socket.id,
       playerCount: game ? Object.keys(game.users || {}).length : 0,
       timestamp: Date.now()
     });
-    logger.info('DEBUG', `Game state query for ${gameCode}: ${game?.gameState || 'NO_GAME'}`);
+    logger.debug('SOCKET', `Game state query for ${gameCode}: ${game?.gameState || 'NO_GAME'}`);
+  });
+
+  // Handle requestGameState - recovery for players who missed startGame
+  socket.on('requestGameState', () => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+
+    const game = getGame(gameCode);
+    if (!game) return;
+
+    if (isInProgress(game.gameState)) {
+      logger.info('SOCKET', `Sending game state to player who requested it in game ${gameCode}`);
+      const recoveryGameMode = game.gameMode || 'classic';
+
+      // Orphan-timer recovery: state says in-progress but no setInterval is
+      // registered. Caused by a crash/race between `transitionGameState('START')`
+      // and `startGameTimer()`. Without this branch the client watchdog loops
+      // forever — server re-emits startGame with the same stale remainingTime
+      // and never restarts the clock. Defense-in-depth: idempotent, safe to
+      // call when timer is already running (`startGameTimer` clears first).
+      if (!hasGameTimer(gameCode)) {
+        const recoverySeconds = game.remainingTime ?? game.timerSeconds;
+        if (recoverySeconds && recoverySeconds > 0) {
+          logger.info('SOCKET', `Orphan timer recovery: restarting interval for ${gameCode} at ${recoverySeconds}s`);
+          Sentry.addBreadcrumb({
+            category: 'mp.timer',
+            message: 'mp_server_timer_orphan_recovered',
+            level: 'info',
+            data: {
+              gameCode,
+              gameState: game.gameState,
+              remainingTime: game.remainingTime,
+              timerSeconds: game.timerSeconds,
+              gameSessionId: game.gameSessionId,
+            },
+          });
+          startGameTimer(io, gameCode, recoverySeconds);
+        }
+      }
+
+
+      safeEmit(socket, 'startGame', {
+        letterGrid: game.letterGrid,
+        timerSeconds: game.remainingTime ?? game.timerSeconds,
+        language: game.language,
+        minWordLength: game.minWordLength || 2,
+        messageId: 'recovery-' + Date.now(),
+        reconnect: true,
+        skipAck: true,
+        boardTheme: game.boardTheme || null,
+        gameMode: recoveryGameMode,
+        gameSessionId: game.gameSessionId,
+        ...(recoveryGameMode === 'blast' && game.blastModeState ? {
+          blastTileOverlay: game.blastModeState.overlay || [],
+          blastSeed: game.blastModeState.seed ?? null,
+          blastWave: game.blastModeState.wave ?? 1,
+          blastPlayerMoves: game.blastModeState.playerMoves || {},
+          ...(game.blastModeState.grid ? { blastGrid: game.blastModeState.grid } : {}),
+          ...(game.blastModeState.tileStates ? { blastTileStates: game.blastModeState.tileStates } : {}),
+        } : {}),
+        ...(recoveryGameMode === 'word-hunt' && game.wordHuntState ? {
+          wordHuntTargetLength: game.wordHuntState.targetWordLength ?? 0,
+          wordHuntTargetCategory: game.wordHuntState.targetCategory ?? null,
+          wordHuntEliminatedPlayers: game.wordHuntState.eliminatedPlayers || [],
+          wordHuntPlayerLives: game.wordHuntState.playerLives || {},
+        } : {}),
+        ...(game.goldenLetters?.length ? { goldenLetters: game.goldenLetters } : {}),
+      });
+    } else if (game.gameState === 'finished') {
+      // Reconnecting to a finished game — resend results so the player sees the results screen
+      logger.info('SOCKET', `Resending results to reconnecting player in finished game ${gameCode}`);
+      const leaderboard = getLeaderboard(gameCode);
+      safeEmit(socket, 'validatedScores', {
+        leaderboard,
+        gameMode: game.gameMode || 'classic',
+        reconnect: true,
+      });
+    }
   });
 
   // Handle reset game
   socket.on('resetGame', (data: unknown, callback?: ResetGameCallback) => {
-    if (!checkRateLimit(socket.id)) {
-      socket.emit('rateLimited');
-      if (typeof callback === 'function') callback({ success: false, error: 'Rate limited' });
-      return;
-    }
+    try {
+      if (!checkRateLimit(socket.id)) {
+        socket.emit('rateLimited');
+        if (typeof callback === 'function') callback({ success: false, error: 'Rate limited' });
+        return;
+      }
 
-    const gameCode = getGameBySocketId(socket.id);
-    if (!gameCode) {
-      emitError(socket, ErrorMessages.NOT_IN_GAME);
-      if (typeof callback === 'function') callback({ success: false, error: 'Not in game' });
-      return;
-    }
+      // Only use server-side socket mapping — never trust client-supplied gameCode
+      const gameCode = getGameBySocketId(socket.id);
+      if (!gameCode) {
+        emitError(socket, ErrorCodes.PLAYER_NOT_IN_GAME);
+        if (typeof callback === 'function') callback({ success: false, error: 'Not in game' });
+        return;
+      }
 
-    const game = getGame(gameCode);
-    if (!game) {
-      emitError(socket, ErrorMessages.GAME_NOT_FOUND);
-      if (typeof callback === 'function') callback({ success: false, error: 'Game not found' });
-      return;
-    }
+      const game = getGame(gameCode);
+      if (!game) {
+        emitError(socket, ErrorCodes.GAME_NOT_FOUND);
+        if (typeof callback === 'function') callback({ success: false, error: 'Game not found' });
+        return;
+      }
 
-    if (game.hostSocketId !== socket.id) {
-      emitError(socket, 'Only host can reset the game');
-      if (typeof callback === 'function') callback({ success: false, error: 'Only host can reset' });
-      return;
-    }
+      // Verify host identity: primary check via hostSocketId; secondary check via auth ID
+      // for the legitimate case where a host reconnected and hostSocketId was restored but
+      // the in-memory pointer hasn't been updated yet.
+      const isHostBySocketId = game.hostSocketId === socket.id;
+      const verifiedUserId = socket.data?.verifiedUserId as string | undefined;
+      const hostUser = Object.values(game.users).find((u) => u.isHost);
+      const isHostByAuthId =
+        !!verifiedUserId &&
+        !!hostUser?.authUserId &&
+        hostUser.authUserId === verifiedUserId;
+      if (!isHostBySocketId && !isHostByAuthId) {
+        emitError(socket, ErrorCodes.PLAYER_NOT_HOST, { message: 'Only host can reset the game' });
+        if (typeof callback === 'function') callback({ success: false, error: 'Only host can reset' });
+        return;
+      }
 
-    const stateBeforeReset = game.gameState;
-    timerManager.clearGameTimer(gameCode);
+      const stateBeforeReset = game.gameState;
+      clearGameTimer(gameCode);
+      gameStartCoordinator.cleanupSequence(gameCode);
+      clearAutoStartState(gameCode);
+      stopAllBots(gameCode);
 
-    // Clean up game start coordinator to prevent stale acknowledgment state
-    gameStartCoordinator.cleanupSequence(gameCode);
+      const resetSuccess = resetGameForNewRound(gameCode);
+      const gameAfterReset = getGame(gameCode);
+      const stateAfterReset = gameAfterReset?.gameState;
 
-    // Stop bots but keep them in the game - they will be restarted when new game begins
-    // Note: cleanupGameBots would delete all bots, causing them to not play in subsequent games
-    botManager.stopAllBots(gameCode);
+      logger.info('SOCKET', `Game ${gameCode} reset: ${stateBeforeReset} -> ${stateAfterReset} (success: ${resetSuccess})`);
 
-    const resetSuccess = resetGameForNewRound(gameCode);
-    const gameAfterReset = getGame(gameCode);
-    const stateAfterReset = gameAfterReset?.gameState;
+      if (!resetSuccess) {
+        logger.error('SOCKET', `Failed to reset game ${gameCode} from state ${stateBeforeReset}`);
+        if (typeof callback === 'function') callback({ success: false, error: 'Reset failed' });
+        return;
+      }
 
-    logger.info('SOCKET', `Game ${gameCode} reset: ${stateBeforeReset} -> ${stateAfterReset} (success: ${resetSuccess})`);
+      broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
+        users: getGameUsers(gameCode),
+        gameSessionId: gameAfterReset?.gameSessionId
+      });
 
-    if (!resetSuccess) {
-      logger.error('SOCKET', `Failed to reset game ${gameCode} from state ${stateBeforeReset}`);
-      if (typeof callback === 'function') callback({ success: false, error: 'Reset failed' });
-      return;
-    }
-
-    broadcastToRoom(io, getGameRoom(gameCode), 'resetGame', {
-      users: getGameUsers(gameCode),
-      gameSessionId: gameAfterReset?.gameSessionId
-    });
-
-    // Acknowledge successful reset to the host
-    if (typeof callback === 'function') {
-      callback({ success: true, gameState: stateAfterReset });
+      if (typeof callback === 'function') {
+        callback({ success: true, gameState: stateAfterReset });
+      }
+    } catch (err) {
+      logger.error('SOCKET', `resetGame error: ${(err as Error).message}`);
+      if (typeof callback === 'function') callback({ success: false, error: 'Reset failed unexpectedly' });
     }
   });
 
-  // Handle player confirming they want to play again
+  // Handle player confirming ready for next game
   socket.on('confirmReadyForNextGame', () => {
+    if (!checkRateLimit(socket.id)) return;
     const gameCode = getGameBySocketId(socket.id);
     const username = getUsernameBySocketId(socket.id);
 
-    if (!gameCode || !username) {
-      logger.warn('SOCKET', `confirmReadyForNextGame: player not in game`, { socketId: socket.id });
-      return;
-    }
+    if (!gameCode || !username) return;
 
     const game = getGame(gameCode);
-    if (!game) {
-      logger.warn('SOCKET', `confirmReadyForNextGame: game not found`, { gameCode });
-      return;
-    }
+    if (!game || game.gameState !== 'finished') return;
 
-    // Only allow confirmation when game is in 'finished' state
-    if (game.gameState !== 'finished') {
-      logger.debug('SOCKET', `confirmReadyForNextGame: game not in finished state`, { gameCode, state: game.gameState });
-      return;
-    }
-
-    // Mark player as ready
     const result = markPlayerReadyForNextGame(gameCode, username);
-    if (!result) {
-      return;
-    }
+    if (!result) return;
 
     logger.info('SOCKET', `Player ${username} confirmed ready for next game in ${gameCode} (${result.readyCount}/${result.totalPlayers})`);
 
-    // Broadcast the updated ready count to all players in the room
     broadcastToRoom(io, getGameRoom(gameCode), 'playersReadyUpdate', {
       readyCount: result.readyCount,
       totalPlayers: result.totalPlayers,
-      username // Who just confirmed
+      readyUsernames: result.readyUsernames
     });
+
+    // Auto-advance: when ALL non-host players are ready, notify the host
+    if (result.readyCount >= result.totalPlayers && result.totalPlayers > 0) {
+      logger.info('SOCKET', `All non-host players ready in ${gameCode} — notifying host to auto-advance`);
+      broadcastToRoom(io, getGameRoom(gameCode), 'allPlayersReady', {
+        readyCount: result.readyCount,
+        totalPlayers: result.totalPlayers,
+      });
+    }
+  });
+
+  // Handle client requesting results after reconnection
+  // If the client missed 'validatedScores'/'validationComplete' due to a brief disconnect,
+  // this lets them retrieve the cached payload.
+  socket.on('requestResults', () => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+
+    const game = getGame(gameCode);
+    if (!game) return;
+
+    if (game.gameState === 'finished') {
+      const cached = game.cachedResultsPayload;
+      if (cached) {
+        logger.info('SOCKET', `Re-sending cached results to reconnected client in ${gameCode}`);
+        safeEmit(socket, 'validatedScores', cached);
+        safeEmit(socket, 'validationComplete', cached);
+      }
+      return;
+    }
+
+    // The client only asks for results once it believes the game ended (its
+    // 15s "waiting for results" watchdog fired). If the game is still
+    // in-progress but its server clock has genuinely run out, the end-trigger
+    // was lost (dropped in-memory timer / transition race). Force-finalize so
+    // the player isn't stuck on an empty "Calculating results" screen forever.
+    // Only 'in-progress' games are eligible: a 'waiting' (between-rounds lobby)
+    // game keeps a stale gameStartedAt from the prior round and must never be
+    // force-ended by a reconnecting client. Clock-expiry guard prevents ending
+    // a genuinely live game early.
+    if (game.gameState !== 'in-progress') return;
+    const durationSec = game.gameDuration || game.timerSeconds || 180;
+    const startedAt = game.gameStartedAt;
+    const clockExpired = !!startedAt && Date.now() - startedAt >= durationSec * 1000;
+    // A Redis-rehydrated game can lose gameStartedAt (persisted as `?? ''`,
+    // restored as `undefined`). With a falsy startedAt the clock-expiry check
+    // above can never recover it — yet if the game ALSO has no in-memory timer
+    // the round is genuinely orphaned (nothing will ever end it). The client
+    // only asks after its 15s end-watchdog fired, so force-finalize rather than
+    // leave it stuck on "Calculating results" forever. Requiring !hasGameTimer
+    // ensures a live game (timer ticking, merely missing a stamp) is never
+    // ended early.
+    const orphanedNoTimer = !startedAt && !hasGameTimer(gameCode);
+    if (clockExpired || orphanedNoTimer) {
+      logger.warn('SOCKET', `requestResults on ${clockExpired ? 'overdue' : 'orphaned (no start stamp + no timer)'} in-progress game ${gameCode} — forcing endGame`);
+      endGame(io, gameCode);
+    }
+  });
+
+  // Handle player toggling lobby ready state
+  socket.on('lobbyReady', (data: { ready: boolean }) => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
+
+    if (!gameCode || !username) return;
+
+    const game = getGame(gameCode);
+    if (!game || game.gameState !== 'waiting') return;
+
+    if (data?.ready) {
+      markPlayerReadyForNextGame(gameCode, username);
+    } else {
+      unmarkPlayerReady(gameCode, username);
+    }
+
+    const result = getPlayersReadyCount(gameCode);
+    if (result) {
+      broadcastToRoom(io, getGameRoom(gameCode), 'playersReadyUpdate', {
+        readyCount: result.readyCount,
+        totalPlayers: result.totalPlayers,
+        readyUsernames: result.readyUsernames,
+      });
+
+      // Everyone (non-host humans) is ready in the *waiting* lobby: nudge the
+      // host AND begin a short server-owned countdown so a stalled host no
+      // longer blocks the game. Any un-ready cancels it.
+      if (data?.ready && shouldTriggerAutoStart(result.readyCount, result.totalPlayers)) {
+        broadcastToRoom(io, getGameRoom(gameCode), 'allPlayersReady', {
+          readyCount: result.readyCount,
+          totalPlayers: result.totalPlayers,
+        });
+        beginLobbyAutoStart(io, gameCode);
+      } else if (!data?.ready) {
+        cancelAutoStartCountdown(gameCode, () =>
+          broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartCancelled', {})
+        );
+      }
+    }
+  });
+
+  // Host cancelled the auto-start countdown (wants to keep waiting / tweak settings).
+  socket.on('lobbyAutoStartCancel', () => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+    const game = getGame(gameCode);
+    // Only the host may cancel the lobby auto-start.
+    if (!game || game.hostSocketId !== socket.id) return;
+    cancelAutoStartCountdown(gameCode, () =>
+      broadcastToRoom(io, getGameRoom(gameCode), 'lobbyAutoStartCancelled', {})
+    );
+  });
+
+  // Handle guest name update in lobby
+  socket.on('updateGuestName', (data: { newName: string }) => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    const username = getUsernameBySocketId(socket.id);
+
+    if (!gameCode || !username || !data?.newName) return;
+
+    const game = getGame(gameCode);
+    if (!game || game.gameState !== 'waiting') return;
+
+    const trimmedName = data.newName.trim().slice(0, 20);
+    if (!trimmedName || !/^[\p{L}\p{N}\p{Emoji} _-]{1,30}$/u.test(trimmedName)) return;
+
+    const user = game.users[username];
+    if (!user) return;
+
+    if (trimmedName !== username && game.users[trimmedName]) {
+      socket.emit('error', { error: 'NAME_TAKEN', message: 'That name is already in use' });
+      return;
+    }
+
+    if (trimmedName !== username) {
+      // Re-key every username-keyed structure (users record, host identity,
+      // ready state, lobby chat, …) atomically — hosts included. Pre-fix this
+      // path rejected hosts (`user.isHost` guard) and migrated only a couple of
+      // maps, so a host's rename never broadcast and only applied on the next
+      // reconnect ("name not changed on the spot, takes multiple tries").
+      renamePlayerInGame(game, username, trimmedName);
+      updateUsernameMapping(gameCode, username, trimmedName, socket.id);
+    }
+
+    socket.emit('guestNameUpdated', { oldName: username, newName: trimmedName });
+
+    broadcastToRoom(io, getGameRoom(gameCode), 'playerListUpdate', {
+      users: getGameUsers(gameCode),
+    });
+
+    logger.info('SOCKET', `Guest ${username} changed name to ${trimmedName} in ${gameCode}`);
+  });
+
+  // Relay resultsRevealed from TV host to all players in room
+  socket.on('resultsRevealed', () => {
+    if (!checkRateLimit(socket.id)) return;
+    const gameCode = getGameBySocketId(socket.id);
+    if (!gameCode) return;
+
+    const game = getGame(gameCode);
+    if (!game) return;
+
+    // Only the host (TV) can trigger reveal
+    if (game.hostSocketId !== socket.id) return;
+
+    broadcastToRoom(io, getGameRoom(gameCode), 'resultsRevealed', {});
+    logger.info('SOCKET', `TV host revealed results in ${gameCode}`);
   });
 
   // Handle request to get current ready count
@@ -586,14 +772,10 @@ function registerGameLifecycleHandlers(io: Server, socket: Socket): void {
   });
 }
 
-// ==========================================
-// Helper Functions
-// ==========================================
-
 /**
  * Handle existing authenticated connection when creating a game
  */
-async function handleExistingAuthConnection(io: Server, socket: Socket, authUserId: string, gameCode: string): Promise<void> {
+async function handleExistingAuthConnection(io: Server, socket: Socket, authUserId: string, _gameCode: string): Promise<void> {
   const existingConnection: AuthConnection | null = getAuthUserConnection(authUserId);
   if (!existingConnection) return;
 
@@ -617,23 +799,24 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
         oldGame.reconnectionTimeout = null;
       }
       broadcastToRoom(io, getGameRoom(existingConnection.gameCode), 'hostLeftRoomClosing', {
-        message: 'Host started a new game. Room is closing.'
+        message: 'Host started a new game. Room is closing.',
+        i18nKey: 'multiplayerFlow.hostLeftReason.hostSwitchedRoom',
+        i18nParams: { host: existingConnection.username },
+        reason: 'host_switched_room'
       });
-      timerManager.clearGameTimer(existingConnection.gameCode);
+      clearGameTimer(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
     }
   } else {
-    const { removeUserFromGame } = require('../modules/gameStateManager');
     removeUserFromGame(existingConnection.gameCode, existingConnection.username);
 
-    // Check if old room is now empty and close it immediately
     if (isRoomEmpty(existingConnection.gameCode)) {
       logger.info('SOCKET', `Old room ${existingConnection.gameCode} is empty after player switch - closing immediately`);
-      timerManager.clearGameTimer(existingConnection.gameCode);
-      botManager.stopAllBots(existingConnection.gameCode);
+      clearGameTimer(existingConnection.gameCode);
+      stopAllBots(existingConnection.gameCode);
       deleteGame(existingConnection.gameCode);
-      io.emit('activeRooms', { rooms: getActiveRooms() });
+      broadcastActiveRooms(io, getActiveRooms());
     } else {
       const oldGame = getGame(existingConnection.gameCode);
       if (oldGame) {
@@ -652,40 +835,10 @@ async function handleExistingAuthConnection(io: Server, socket: Socket, authUser
 /**
  * Initialize player data structures for a new game
  */
-function initializePlayerData(game: Game, gameCode: string): void {
-  const users: GameUser[] = getGameUsers(gameCode);
-  const playerUsernames = users.map(u => u.username);
-  const gameForInit = getGame(gameCode);
-
-  // Clear spam detection data from previous game
-  spamDetector.clearGame(gameCode);
-
-  if (gameForInit) {
-    if (!gameForInit.playerWordDetails) gameForInit.playerWordDetails = {};
-    if (!gameForInit.playerAchievements) gameForInit.playerAchievements = {};
-    if (!gameForInit.playerScores) gameForInit.playerScores = {};
-    if (!gameForInit.playerWords) gameForInit.playerWords = {};
-
-    playerUsernames.forEach((username: string) => {
-      gameForInit.playerWordDetails[username] = [];
-      gameForInit.playerWords[username] = [];
-      gameForInit.playerScores[username] = 0;
-      gameForInit.playerAchievements[username] = [];
-    });
-
-    gameForInit.firstWordFound = false;
-    gameForInit.startTime = Date.now();
-  }
-}
-
-module.exports = {
-  registerGameLifecycleHandlers,
-  handleExistingAuthConnection,
-  initializePlayerData
-};
+// Re-export from playerDataInit (extracted to break circular dep with gameStartHandler)
+export { initializePlayerData, ensurePlayerState } from './playerDataInit.js';
 
 export {
   registerGameLifecycleHandlers,
   handleExistingAuthConnection,
-  initializePlayerData
 };

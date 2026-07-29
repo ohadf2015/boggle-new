@@ -1,10 +1,12 @@
 'use client';
 
 import React, { useEffect, useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { fireConfetti } from '@/utils/confettiUtils';
 import { Share } from 'lucide-react';
+import { Mascot } from '@/components/ui/Mascot';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { SPRING_PRESETS } from '@/lib/animation/presets';
 import { useSoundEffects } from '../../contexts/SoundEffectsContext';
 import { getAchievementShareUrl, shareWithOgImage } from '../../utils/ogShare';
 import { gameEvents } from '../GoogleAnalytics';
@@ -34,7 +36,7 @@ interface AchievementPopupProps {
  * Features: Thick borders, hard shadows, bold uppercase text, vibrant colors
  */
 const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): React.ReactElement | null => {
-  const { t, language } = useLanguage();
+  const { t, language, dir } = useLanguage();
   const { playAchievementSound } = useSoundEffects();
   const [progress, setProgress] = useState<number>(0);
   const [showShareHint, setShowShareHint] = useState(false);
@@ -56,9 +58,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
     // Generate share URL with OG image
     const ogImageUrl = getAchievementShareUrl(achievementKey, language);
 
-    const shareText = language === 'he'
-      ? `🏆 פתחתי את ההישג "${achievementName}" ב-LexiClash! בוא לשחק גם!`
-      : `🏆 I just unlocked "${achievementName}" in LexiClash! Come play!`;
+    const shareText = `🏆 ${t('achievements.shareText', { name: achievementName })}`;
 
     const shared = await shareWithOgImage({
       title: `LexiClash - ${achievementName}`,
@@ -87,7 +87,7 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
       return {
         icon: achievement.icon,
         name: t(`achievements.${achievement.key}.name`) || achievement.key,
-        description: t(`achievements.${achievement.key}.description`) || ''
+        description: t(`achievements.${achievement.key}.description`)
       };
     }
 
@@ -127,18 +127,21 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
 
   if (!localizedAchievement) return null;
 
+  // RTL-aware animation: slide from left in RTL, from right in LTR
+  const slideDirection = dir === 'rtl' ? -300 : 300;
+
   return (
     <AnimatePresence>
-      <motion.div
-        initial={{ x: 300, opacity: 0 }}
+      <m.div
+        initial={{ x: slideDirection, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 300, opacity: 0 }}
+        exit={{ x: slideDirection, opacity: 0 }}
         transition={{
           type: 'spring',
           stiffness: 300,
           damping: 25,
         }}
-        className="fixed top-20 right-4 z-[9999] w-80 max-w-[calc(100vw-2rem)]"
+        className="fixed top-20 inset-e-4 z-60 w-80 max-w-[calc(100vw-2rem)]"
         onClick={onComplete}
       >
         {/* Compact toast container - Neo-Brutalist */}
@@ -147,55 +150,60 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
           <div className="p-3">
             <div className="flex items-center gap-3">
               {/* Compact icon */}
-              <motion.div
-                initial={{ scale: 0, rotate: -90 }}
+              <m.div
+                initial={{ scale: 0.95, rotate: -90 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.1, type: 'spring', stiffness: 400, damping: 15 }}
               >
-                <div className="w-10 h-10 bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard rounded-md flex items-center justify-center flex-shrink-0">
-                  <span className="text-xl">
-                    {localizedAchievement.icon}
-                  </span>
+                <div className="relative shrink-0">
+                  <div className="w-10 h-10 bg-neo-cyan text-neo-black border-2 border-neo-black shadow-hard rounded-md flex items-center justify-center">
+                    <span className="text-xl">
+                      {localizedAchievement.icon}
+                    </span>
+                  </div>
+                  <div className="absolute -bottom-1 -right-1">
+                    <Mascot variant="trophy" size="xs" animated={false} clipBorder="none" />
+                  </div>
                 </div>
-              </motion.div>
+              </m.div>
 
               {/* Text content - more compact */}
               <div className="flex-1 min-w-0">
-                <motion.h3
+                <m.h3
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.15 }}
+                  transition={{ delay: 0.15, ...SPRING_PRESETS.balanced }}
                   className="text-sm font-black uppercase text-neo-lime truncate"
                 >
                   {localizedAchievement.name}
-                </motion.h3>
-                <motion.p
+                </m.h3>
+                <m.p
                   initial={{ x: 10, opacity: 0 }}
                   animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-xs font-bold text-neo-white/90 line-clamp-1"
+                  transition={{ delay: 0.2, ...SPRING_PRESETS.balanced }}
+                  className="text-xs font-bold text-neo-white line-clamp-1"
                 >
                   {localizedAchievement.description}
-                </motion.p>
+                </m.p>
               </div>
 
               {/* Action buttons */}
-              <motion.div
-                initial={{ scale: 0 }}
+              <m.div
+                initial={{ scale: 0.95 }}
                 animate={{ scale: 1 }}
-                transition={{ delay: 0.3 }}
-                className="flex-shrink-0 flex gap-1.5"
+                transition={{ delay: 0.3, type: 'spring', stiffness: 400, damping: 22 }}
+                className="shrink-0 flex gap-1.5"
               >
                 {/* Share button */}
                 <button
                   onClick={handleShare}
                   className="relative w-6 h-6 bg-neo-cyan border-2 border-neo-black rounded flex items-center justify-center text-xs font-black hover:bg-neo-lime transition-colors"
-                  title={language === 'he' ? 'שתף' : 'Share'}
+                  title={t('achievements.shareButton')}
                 >
                   <Share size={10} />
                   {showShareHint && (
                     <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] whitespace-nowrap bg-neo-black text-neo-white px-1.5 py-0.5 rounded">
-                      {language === 'he' ? 'הועתק!' : 'Copied!'}
+                      {t('achievements.copied')}
                     </span>
                   )}
                 </button>
@@ -203,25 +211,25 @@ const AchievementPopup = ({ achievement, onComplete }: AchievementPopupProps): R
                 <div className="w-6 h-6 bg-neo-pink border-2 border-neo-black rounded flex items-center justify-center text-xs font-black cursor-pointer hover:bg-neo-red transition-colors">
                   ✕
                 </div>
-              </motion.div>
+              </m.div>
             </div>
 
             {/* Compact progress bar */}
-            <motion.div
+            <m.div
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ delay: 0.25 }}
               className="mt-2 h-1.5 bg-neo-navy-light border border-neo-black rounded-sm overflow-hidden"
               style={{ transformOrigin: 'left' }}
             >
-              <motion.div
+              <m.div
                 className="h-full bg-neo-lime"
                 style={{ width: `${progress}%` }}
               />
-            </motion.div>
+            </m.div>
           </div>
         </div>
-      </motion.div>
+      </m.div>
     </AnimatePresence>
   );
 };

@@ -25,19 +25,6 @@ export type {
   // Note: LeaderboardEntry is now in shared/types/game.ts
 } from './user';
 
-// API types (frontend API calls)
-export type {
-  ApiResponse,
-  ApiError,
-  PaginatedResponse,
-  CreateGameResponse,
-  JoinGameResponse,
-  GetProfileResponse,
-  GetLeaderboardResponse,
-  GetActiveRoomsResponse,
-  ValidateWordResponse,
-} from './api';
-
 // Component prop types
 export type {
   JoinViewProps,
@@ -49,6 +36,21 @@ export type {
   LevelUpData,
   GridPosition,
 } from './components';
+
+// Adventure mode types
+export type {
+  TileType,
+  TileState,
+  SpecialTile,
+  ObjectiveType,
+  LevelObjective,
+  LevelConfig,
+  LevelCompletion,
+  PlayerProgression,
+  AdventureGameState,
+  WorldName,
+} from './adventure';
+export { WORLD_NAMES } from './adventure';
 
 // ==================== Re-exports for backwards compatibility ====================
 // These aliases ensure existing imports continue to work

@@ -1,8 +1,4 @@
 # Community-approved Spanish words
-# Words added here will be recognized as valid in Spanish games
 # Format: one word per line, lowercase
-quiz
-vintage
-nochevieja
-carino
-nochebuena
+# Words added here will be recognized as valid in Spanish games
+# Auto-promoted words (Wiktionary-verified) are added here by the pipeline

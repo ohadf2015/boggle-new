@@ -1,0 +1,38 @@
+.canvas[data-ovation-tier='small'] {
+  animation: ovation-flash-small 320ms ease-out;
+}
+
+.canvas[data-ovation-tier='big'] {
+  animation: ovation-flash-big 520ms ease-out;
+}
+
+.canvas[data-ovation-tier='mega'] {
+  animation: ovation-flash-mega 820ms ease-out;
+}
+
+@keyframes ovation-flash-small {
+  0% { background: transparent; }
+  20% { background: rgba(191, 255, 0, 0.18); }
+  100% { background: transparent; }
+}
+
+@keyframes ovation-flash-big {
+  0% { background: transparent; }
+  15% { background: rgba(255, 20, 147, 0.28); transform: scale(1.005); }
+  60% { background: rgba(255, 225, 53, 0.22); transform: scale(1.003); }
+  100% { background: transparent; transform: scale(1); }
+}
+
+@keyframes ovation-flash-mega {
+  0% { background: transparent; }
+  10% { background: rgba(255, 20, 147, 0.42); transform: scale(1.012); }
+  35% { background: rgba(0, 255, 255, 0.36); transform: scale(1.008); }
+  65% { background: rgba(255, 225, 53, 0.30); transform: scale(1.004); }
+  100% { background: transparent; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canvas[data-ovation-tier] {
+    animation: none;
+  }
+}

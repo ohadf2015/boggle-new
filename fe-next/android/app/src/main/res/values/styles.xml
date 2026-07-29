@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <!--
+          Solid brand-navy window background (#1a1a2e). This is the POST-SPLASH window
+          background (see postSplashScreenTheme on AppTheme.NoActionBarLaunch). It MUST NOT
+          be @null/transparent: with edge-to-edge transparent bars the WebView leaves the
+          top inset unpainted, and a transparent/leftover window background let the splash
+          image bleed through there (regression ed536b23a). Navy matches the app so the
+          inset is seamless; the opaque WebView draws on top everywhere else.
+
+          Edge-to-edge (transparent bars, WebView underneath) is configured at runtime in
+          MainActivity via androidx.activity EdgeToEdge.enable(). The status/navigation bar
+          color + contrast theme attributes were removed: they are deprecated in Android 15
+          (API 35) and flagged by Play Console's edge-to-edge pre-launch check.
+        -->
+        <item name="android:windowBackground">#FF1A1A2E</item>
+    </style>
+
+
+    <!--
+      LAUNCH / SPLASH THEME — branded LEXI mark on seamless navy.
+
+      History: the ORIGINAL bug was @drawable/splash (the full LEXICLASH wordmark on
+      its own background) being circle-masked by the Android 12 system splash into a
+      stray, clipped "old logo" that flashed on every cold start. Because this is a
+      remote-URL Capacitor app, the low-memory killer evicts the backgrounded process,
+      so re-opening = cold start = that flash before React can call SplashScreen.hide().
+      We first killed it by going fully logo-free (@drawable/splash_blank, navy-on-navy).
+
+      Now we restore an INTENTIONAL brand splash that does NOT reintroduce the flash,
+      because @drawable/splash_icon is purpose-built for this slot:
+        • it is the colorful LEXI CLASH brand art (same master as the launcher icon,
+          resources/icon-only.png, recolored to a navy bg), and
+        • the art is scaled to ~62% and centered with transparent padding, so it sits
+          well inside the Android 12 circle safe-zone (central ~2/3) and is never clipped.
+      The window background stays seamless navy (#1a1a2e), matching the post-splash
+      theme + runtime setBackgroundDrawable, so the only thing that appears/fades is the
+      brand badge — what users now correctly read as the splash, not a broken flash.
+
+      For the Android 12+ (API 31) SYSTEM splash — which masks the icon into a circle —
+      see values-v31/styles.xml (platform android:* attributes). The non-prefixed
+      windowSplashScreen* items below cover the androidx core-splashscreen backport on
+      API < 31. Keep splash_icon density buckets in drawable-{m,h,xh,xxh,xxxh}dpi.
+
+      ⚠️ DO NOT run `npx capacitor-assets generate` — it rewrites this style back to
+      @drawable/splash and regenerates the full-wordmark PNGs, reintroducing the bug.
+    -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <!-- Seamless navy launch window. Must stay opaque (not @null) so nothing
+             bleeds through the edge-to-edge top inset. -->
+        <item name="android:background">#FF1A1A2E</item>
+        <!-- androidx core-splashscreen backport (API < 31): navy bg, branded LEXI icon. -->
+        <item name="windowSplashScreenBackground">#FF1A1A2E</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <!--
+          Hand off to a normal theme once the splash is dismissed. Without this, the
+          activity stays on Theme.SplashScreen for the whole session.
+        -->
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+    </style>
+</resources>

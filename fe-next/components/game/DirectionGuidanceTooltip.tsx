@@ -1,34 +1,19 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, memo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback, memo, useMemo } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
 import { X, Route } from 'lucide-react';
+import { getDemoConfig } from '../onboarding/demoConfigs';
 
-const STORAGE_KEY = 'lexiclash_direction_guidance_seen';
 const AUTO_DISMISS_MS = 8000; // 8 seconds - longer for interactive demo
-
-// Demo grid letters
-const DEMO_GRID = [
-  ['C', 'A', 'R'],
-  ['O', 'T', 'S'],
-  ['W', 'N', 'E'],
-];
-
-// Zigzag path demonstrating direction changes: C -> A -> T -> S (right, diagonal-down, right)
-const DEMO_PATH: [number, number][] = [
-  [0, 0], // C
-  [0, 1], // A - horizontal right
-  [1, 1], // T - vertical down
-  [1, 2], // S - horizontal right
-];
-
-const DEMO_WORD = 'CATS';
 
 interface DirectionGuidanceTooltipProps {
   isVisible: boolean;
   onDismiss: () => void;
   t: (key: string) => string;
   dir?: 'ltr' | 'rtl';
+  /** Locale for the example word/grid. Defaults to 'en'. */
+  language?: string;
 }
 
 /**
@@ -38,11 +23,22 @@ interface DirectionGuidanceTooltipProps {
  * Features a mini animated grid that traces a zigzag path.
  */
 const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
-  ({ isVisible, onDismiss, t, dir = 'ltr' }) => {
+  ({ isVisible, onDismiss, t, dir = 'ltr', language = 'en' }) => {
     const [selectedCells, setSelectedCells] = useState<[number, number][]>([]);
     const [isAnimating, setIsAnimating] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [isPopping, setIsPopping] = useState(false);
+
+    // Locale-aware example: 3x3 grid with L-shape path (right + down) showing
+    // direction-change. Reuses the vetted demoConfigs vocabulary.
+    const { letters: DEMO_GRID, path: demoPathCfg, word: DEMO_WORD } = useMemo(
+      () => getDemoConfig(language),
+      [language],
+    );
+    const DEMO_PATH = useMemo<[number, number][]>(
+      () => demoPathCfg.map(p => [p.row, p.col] as [number, number]),
+      [demoPathCfg],
+    );
 
     // Handle dismiss with pop animation
     const handleDismiss = useCallback(() => {
@@ -80,7 +76,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
         },
         DEMO_PATH.length * 400 + 300
       );
-    }, [isAnimating]);
+    }, [isAnimating, DEMO_PATH]);
 
     // Auto-start animation when visible
     useEffect(() => {
@@ -136,7 +132,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
     return (
       <AnimatePresence>
         {isVisible && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 50, scale: 0.9 }}
             animate={isPopping
               ? { opacity: 0, scale: 1.15, y: -20 }
@@ -147,8 +143,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
               ? { duration: 0.25, ease: [0.36, 1.2, 0.5, 1] }
               : { type: 'spring', stiffness: 300, damping: 25 }
             }
-            className="fixed bottom-24 left-1/2 z-50 pointer-events-auto safe-area-bottom"
-            style={{ transform: 'translateX(-50%)' }}
+            className="fixed bottom-[calc(6rem+var(--admob-banner-height,0px))] left-1/2 -translate-x-1/2 z-50 pointer-events-auto safe-area-bottom"
           >
             <div
               className="
@@ -173,18 +168,18 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                   flex items-center justify-center
                   hover:scale-110 transition-transform
                 "
-                aria-label={t('common.close') || 'Close'}
+                aria-label={t('common.close')}
               >
                 <X className="w-3 h-3" />
               </button>
 
               {/* Header */}
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-neo-pink to-neo-pink rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
+                <div className="w-8 h-8 bg-linear-to-br from-neo-pink to-neo-pink rounded-neo border-2 border-neo-black flex items-center justify-center shadow-hard-sm">
                   <Route className="w-4 h-4 text-white" />
                 </div>
                 <h4 className="font-black text-neo-black text-sm uppercase tracking-wide">
-                  {t('guidance.directionPattern.title') || 'Change Directions!'}
+                  {t('guidance.directionPattern.title')}
                 </h4>
               </div>
 
@@ -209,7 +204,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                         const cellIndex = getCellIndex(rowIndex, colIndex);
 
                         return (
-                          <motion.div
+                          <m.div
                             key={`${rowIndex}-${colIndex}`}
                             className={`
                               flex items-center justify-center relative
@@ -232,15 +227,15 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                           >
                             {letter}
                             {isSelected && cellIndex >= 0 && (
-                              <motion.span
+                              <m.span
                                 initial={{ scale: 0 }}
                                 animate={{ scale: 1 }}
                                 className={`absolute -top-1 ${dir === 'rtl' ? '-left-1' : '-right-1'} w-4 h-4 bg-neo-pink text-white text-[8px] font-bold rounded-full flex items-center justify-center border border-neo-black`}
                               >
                                 {cellIndex + 1}
-                              </motion.span>
+                              </m.span>
                             )}
-                          </motion.div>
+                          </m.div>
                         );
                       })
                     )}
@@ -268,8 +263,8 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                           const y2 = getCenter(cell[0]);
 
                           return (
-                            <motion.line
-                              key={i}
+                            <m.line
+                              key={`line-${i}-${cell[0]}-${cell[1]}`}
                               x1={x1}
                               y1={y1}
                               x2={x2}
@@ -289,7 +284,7 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                 </div>
 
                 {/* Word display */}
-                <motion.div
+                <m.div
                   className={`
                     px-3 py-1 rounded-lg border-2 border-neo-black
                     font-black text-sm tracking-wider
@@ -303,37 +298,37 @@ const DirectionGuidanceTooltip = memo<DirectionGuidanceTooltipProps>(
                         .join('')
                     : DEMO_WORD}
                   {showSuccess && ' ✓'}
-                </motion.div>
+                </m.div>
               </div>
 
               {/* Tap to dismiss - more prominent with pulse animation */}
-              <motion.div
+              <m.div
                 className="flex items-center justify-center gap-1.5 mt-3 py-1.5 px-3 mx-auto w-fit
                   bg-neo-black/5 rounded-full border border-neo-black/20"
                 animate={{ scale: [1, 1.02, 1] }}
                 transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
               >
                 <span className="text-[11px] font-semibold text-neo-black/70 uppercase tracking-wide">
-                  {t('common.tapToDismiss') || 'Tap anywhere to dismiss'}
+                  {t('common.tapToDismiss')}
                 </span>
-                <motion.span
+                <m.span
                   className="text-neo-pink"
                   animate={{ y: [0, -2, 0] }}
                   transition={{ duration: 1, repeat: Infinity }}
                 >
                   <X className="w-3 h-3" />
-                </motion.span>
-              </motion.div>
+                </m.span>
+              </m.div>
 
               {/* Progress bar */}
-              <motion.div
+              <m.div
                 className="absolute bottom-0 left-0 h-1 bg-neo-pink/40 rounded-b-lg"
                 initial={{ width: '100%' }}
                 animate={{ width: '0%' }}
                 transition={{ duration: AUTO_DISMISS_MS / 1000, ease: 'linear' }}
               />
             </div>
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     );

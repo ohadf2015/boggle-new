@@ -1,14 +1,20 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 import { Calendar, Gift, Zap, Sparkles, Shield, Crown, Flame } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogBody, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { CalendarRewardCard, CalendarReward } from './CalendarRewardCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'react-hot-toast';
+import { Loader } from '@/components/ui/Loader';
+import { PageLoader } from '@/components/ui/PageLoader';
+import { fetchWithAuth, postWithAuth } from '@/utils/authFetch';
+
+const AuthModal = dynamic(() => import('@/components/auth/AuthModal'), { ssr: false });
 
 interface CalendarStatus {
   month: number;
@@ -37,6 +43,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
   const [isClaiming, setIsClaiming] = useState(false);
   const [claimedReward, setClaimedReward] = useState<CalendarReward | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const fetchCalendarStatus = useCallback(async () => {
     if (!user?.id) return;
@@ -44,7 +51,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
     try {
       setIsLoading(true);
       setFetchError(null);
-      const response = await fetch('/api/engagement/calendar');
+      const response = await fetchWithAuth('/api/engagement/calendar');
       if (response.ok) {
         const data = await response.json();
         setCalendarStatus(data);
@@ -54,7 +61,9 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
         setFetchError(response.status === 401 ? 'Session expired. Please refresh the page.' : 'Failed to load calendar. Please try again.');
       }
     } catch (error) {
-      console.error('[Calendar] Error fetching status:', error);
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[Calendar] Error fetching status:', errorMessage);
       setFetchError('Network error. Please check your connection.');
     } finally {
       setIsLoading(false);
@@ -77,9 +86,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
 
     try {
       setIsClaiming(true);
-      const response = await fetch('/api/engagement/calendar', {
-        method: 'POST',
-      });
+      const response = await postWithAuth('/api/engagement/calendar');
 
       if (response.ok) {
         const data = await response.json();
@@ -99,11 +106,13 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
           duration: 3000,
         });
       } else {
-        toast.error(t('calendar.claimError') || 'Failed to claim reward');
+        toast.error(t('calendar.claimError'));
       }
     } catch (error) {
-      console.error('[Calendar] Error claiming reward:', error);
-      toast.error(t('calendar.claimError') || 'Failed to claim reward');
+      // Serialize error properly - Error objects don't stringify well
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('[Calendar] Error claiming reward:', errorMessage);
+      toast.error(t('calendar.claimError'));
     } finally {
       setIsClaiming(false);
     }
@@ -141,10 +150,10 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
         <DialogHeader>
           <DialogTitle className="flex items-center justify-center gap-2">
             <Calendar className="w-5 h-5 sm:w-6 sm:h-6" />
-            {t('calendar.title') || 'Daily Rewards'}
+            {t('calendar.title')}
           </DialogTitle>
           <DialogDescription className="sr-only">
-            {t('calendar.description') || 'Claim daily rewards by playing regularly'}
+            {t('calendar.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -156,42 +165,55 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
               {monthName} {calendarStatus?.year}
             </h3>
             <p className="text-xs sm:text-sm text-neo-black/70">
-              {t('calendar.claimedCount') || 'Claimed'}: {calendarStatus?.daysClaimed.length || 0}/{daysInMonth}
+              {t('calendar.claimedCount')}: {calendarStatus?.daysClaimed.length || 0}/{daysInMonth}
             </p>
           </div>
 
           {/* Loading state */}
           {isLoading && (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin w-8 h-8 border-4 border-neo-cyan border-t-transparent rounded-full" />
+              <PageLoader size="sm" />
             </div>
           )}
 
           {/* Not logged in state */}
           {!isLoading && !user?.id && (
-            <div className="text-center py-8">
-              <Gift className="w-12 h-12 mx-auto mb-3 text-neo-pink/50" />
-              <h3 className="text-lg font-bold text-neo-black mb-2">
-                {t('calendar.loginRequired') || 'Login Required'}
+            <div className="text-center py-8 space-y-3">
+              <Gift className="w-12 h-12 mx-auto text-neo-pink/50" />
+              <h3 className="text-lg font-bold text-neo-black">
+                {t('calendar.loginRequired')}
               </h3>
-              <p className="text-sm text-neo-black/70 mb-4">
-                {t('calendar.loginToClaimRewards') || 'Sign in to claim your daily rewards and track your progress!'}
+              <p className="text-sm text-neo-black/70">
+                {t('calendar.loginToClaimRewards')}
               </p>
-              <Button
-                onClick={onClose}
-                className="bg-neo-cyan text-neo-black font-bold uppercase text-sm py-2 px-4 border-2 border-neo-black shadow-hard hover:shadow-hard-lg"
-              >
-                {t('common.close') || 'Close'}
-              </Button>
+              <div className="flex flex-col gap-2 items-center pt-1">
+                <Button
+                  onClick={() => setShowAuthModal(true)}
+                  className="bg-neo-pink text-white font-bold uppercase text-sm py-2 px-6 border-2 border-neo-black shadow-hard hover:shadow-hard-lg"
+                >
+                  {t('auth.signIn')}
+                </Button>
+                <button
+                  onClick={onClose}
+                  className="text-xs text-neo-black/50 hover:text-neo-black/80 underline underline-offset-2"
+                >
+                  {t('common.close')}
+                </button>
+              </div>
             </div>
           )}
+          <AuthModal
+            isOpen={showAuthModal}
+            onClose={() => setShowAuthModal(false)}
+            initialMode="signin"
+          />
 
           {/* Error state */}
           {!isLoading && user?.id && fetchError && (
             <div className="text-center py-8">
               <Gift className="w-12 h-12 mx-auto mb-3 text-neo-pink/50" />
               <h3 className="text-lg font-bold text-neo-black mb-2">
-                {t('calendar.loadError') || 'Oops!'}
+                {t('calendar.loadError')}
               </h3>
               <p className="text-sm text-neo-black/70 mb-4">
                 {fetchError}
@@ -200,7 +222,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                 onClick={() => fetchCalendarStatus()}
                 className="bg-neo-cyan text-neo-black font-bold uppercase text-sm py-2 px-4 border-2 border-neo-black shadow-hard hover:shadow-hard-lg"
               >
-                {t('common.retry') || 'Try Again'}
+                {t('common.retry')}
               </Button>
             </div>
           )}
@@ -224,7 +246,7 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
 
               {/* Claim button for today */}
               {calendarStatus.canClaimToday && (
-                <motion.div
+                <m.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="mt-3 sm:mt-4"
@@ -232,18 +254,18 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                   <Button
                     onClick={handleClaimReward}
                     disabled={isClaiming}
-                    className="w-full bg-neo-lime text-neo-black font-black uppercase text-sm sm:text-base md:text-lg py-3 sm:py-4 border-2 sm:border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
+                    className="w-full max-w-btn bg-neo-lime text-neo-black font-black uppercase text-sm sm:text-base md:text-lg py-3 sm:py-4 border-2 sm:border-3 border-neo-black shadow-hard hover:shadow-hard-lg"
                   >
                     {isClaiming ? (
-                      <div className="animate-spin w-5 h-5 border-2 border-neo-black border-t-transparent rounded-full" />
+                      <Loader size="sm" />
                     ) : (
                       <>
-                        <Gift className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-                        {t('calendar.claimToday') || "Claim Today's Reward"}
+                        <Gift className="w-4 h-4 sm:w-5 sm:h-5 me-2" />
+                        {t('calendar.claimToday')}
                       </>
                     )}
                   </Button>
-                </motion.div>
+                </m.div>
               )}
 
               {/* Already claimed message */}
@@ -251,10 +273,10 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
                 <div className="mt-3 sm:mt-4 text-center py-2 sm:py-3 bg-neo-lime/10 rounded-neo border-2 border-neo-lime/30">
                   <p className="text-neo-lime font-bold uppercase text-xs sm:text-sm flex items-center justify-center gap-2">
                     <Sparkles className="w-3 h-3 sm:w-4 sm:h-4" />
-                    {t('calendar.alreadyClaimed') || "Today's reward claimed!"}
+                    {t('calendar.alreadyClaimed')}
                   </p>
                   <p className="text-neo-black/60 text-[10px] sm:text-xs mt-1">
-                    {t('calendar.comeBackTomorrow') || 'Come back tomorrow for more rewards'}
+                    {t('calendar.comeBackTomorrow')}
                   </p>
                 </div>
               )}
@@ -262,31 +284,31 @@ export function CalendarRewardsModal({ isOpen, onClose }: CalendarRewardsModalPr
               {/* Legend - collapsible on mobile */}
               <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-neo-black/20">
                 <h4 className="text-[10px] sm:text-xs font-bold uppercase text-neo-black/70 mb-2">
-                  {t('calendar.rewardTypes') || 'Reward Types'}
+                  {t('calendar.rewardTypes')}
                 </h4>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5 sm:gap-2 text-[10px] sm:text-xs">
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Zap className="w-3 h-3 text-neo-lime flex-shrink-0" />
+                    <Zap className="w-3 h-3 text-neo-lime shrink-0" />
                     <span>XP Bonus</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Sparkles className="w-3 h-3 text-neo-cyan flex-shrink-0" />
+                    <Sparkles className="w-3 h-3 text-neo-cyan shrink-0" />
                     <span>Free Hints</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Shield className="w-3 h-3 text-neo-lime flex-shrink-0" />
+                    <Shield className="w-3 h-3 text-neo-lime shrink-0" />
                     <span>Streak Freeze</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Gift className="w-3 h-3 text-neo-pink flex-shrink-0" />
+                    <Gift className="w-3 h-3 text-neo-pink shrink-0" />
                     <span>Mystery Box</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Crown className="w-3 h-3 text-neo-pink flex-shrink-0" />
+                    <Crown className="w-3 h-3 text-neo-pink shrink-0" />
                     <span>Exclusive Title</span>
                   </div>
                   <div className="flex items-center gap-1 sm:gap-1.5 text-neo-black/80">
-                    <Flame className="w-3 h-3 text-neo-lime flex-shrink-0" />
+                    <Flame className="w-3 h-3 text-neo-lime shrink-0" />
                     <span>Milestone</span>
                   </div>
                 </div>

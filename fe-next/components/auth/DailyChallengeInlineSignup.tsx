@@ -1,16 +1,20 @@
 'use client';
 
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, Loader2, X, Sparkles, type LucideIcon } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { m, AnimatePresence } from 'framer-motion';
+import { Trophy, Shield, Smartphone, BarChart3, Mail, Eye, EyeOff, X, Sparkles, Wand2, AlertCircle, type LucideIcon } from 'lucide-react';
+import { Loader } from '@/components/ui/Loader';
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import { InteractiveMascot } from '../ui/InteractiveMascot';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { signInWithGoogle, signInWithDiscord, signUpWithEmail, signInWithEmail } from '../../lib/supabase';
+import { signUpWithEmail, signInWithEmail, signInWithMagicLink, sendOtpCode, verifyOtpCode } from '../../lib/supabase';
+import { useOAuthSignIn } from './hooks/useOAuthSignIn';
+import { isNative } from '../../utils/platform';
 import { cn } from '../../lib/utils';
 import { setPendingDailyResult, type WordHuntResult } from '../../utils/dailyChallenge';
 import { validateEmail, validatePassword } from '../../utils/validation';
+import { useCrazyGames } from '@/components/CrazyGamesSDK';
 import type { Language } from '@/types';
 
 // Brand icon SVG components
@@ -30,7 +34,13 @@ const DiscordIcon = ({ className }: { className?: string }) => (
 );
 
 interface DailyChallengeInlineSignupProps {
-  pendingResult: {
+  /**
+   * Word-Hunt daily result to re-save after the OAuth round-trip. Optional:
+   * other daily modes (e.g. Word Wheel) reuse this signup surface but persist
+   * their result server-side by guest fingerprint, so they pass nothing and the
+   * setPendingDailyResult calls are skipped.
+   */
+  pendingResult?: {
     result: WordHuntResult;
     puzzleNumber: number;
     puzzleDate: string;
@@ -62,11 +72,20 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
   className,
 }) => {
   const { t, language } = useLanguage();
+  const { isOnCrazyGamesPlatform } = useCrazyGames();
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showEmailForm, setShowEmailForm] = useState(false);
+  const [usePassword, setUsePassword] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode>('signup');
+  const [showOtpFlow, setShowOtpFlow] = useState(isNative);
+  const [otpCode, setOtpCode] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+
+  useEffect(() => {
+    if (!showOtpFlow && isNative()) setShowOtpFlow(true);
+  }, [showOtpFlow]);
 
   // Email form state
   const [email, setEmail] = useState('');
@@ -80,30 +99,22 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
     () => MASCOT_MESSAGES[Math.floor(Math.random() * MASCOT_MESSAGES.length)]
   );
 
+  // Persist the pending daily result before any auth redirect — skipped when the
+  // caller (e.g. Word Wheel) syncs its result server-side and passes nothing.
+  const savePending = () => { if (pendingResult) setPendingDailyResult(pendingResult); };
+
+  const { signIn: oauthSignIn } = useOAuthSignIn({
+    onBeforeRedirect: savePending,
+    onError: (msg) => setError(msg),
+  });
+
+  // Hide signup UI entirely on CrazyGames — they use their own auth
+  if (isOnCrazyGamesPlatform) return null;
+
   const handleOAuthSignIn = async (provider: 'google' | 'discord') => {
-    setIsLoading(provider);
     setError(null);
-
-    try {
-      // Store the pending result in localStorage before OAuth redirect
-      setPendingDailyResult(pendingResult);
-
-      let result;
-      if (provider === 'google') {
-        result = await signInWithGoogle();
-      } else {
-        result = await signInWithDiscord();
-      }
-
-      if (result.error) {
-        setError(result.error.message);
-        setIsLoading(null);
-      }
-      // OAuth will redirect, so no need to do anything else
-    } catch (err) {
-      setError((err as Error).message || 'An error occurred');
-      setIsLoading(null);
-    }
+    savePending();
+    await oauthSignIn(provider);
   };
 
   // Real-time validation handlers
@@ -151,7 +162,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
 
     try {
       // Store pending result before auth
-      setPendingDailyResult(pendingResult);
+      savePending();
 
       let result;
       if (authMode === 'signup') {
@@ -163,7 +174,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
       if (result.error) {
         // Handle specific errors
         if (result.error.message.includes('already registered') || result.error.message.includes('already exists')) {
-          setError(t('auth.inlineSignup.emailInUse') || 'This email is already registered. Try signing in instead.');
+          setError(t('auth.inlineSignup.emailInUse'));
           setAuthMode('signin');
         } else {
           setError(result.error.message);
@@ -171,12 +182,60 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
         setIsLoading(null);
       } else if (authMode === 'signup') {
         // Signup successful - show confirmation message
-        setSuccess(t('auth.inlineSignup.checkEmail') || 'Check your email to verify your account!');
+        setSuccess(t('auth.inlineSignup.checkEmail'));
         setIsLoading(null);
       }
       // For signin, the auth context will handle the redirect
     } catch (err) {
-      setError((err as Error).message || 'An error occurred');
+      setError((err as Error).message || t('common.errorOccurred'));
+      setIsLoading(null);
+    }
+  };
+
+  const handleMagicLinkSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const emailValidation = validateEmail(email);
+    if (!emailValidation.isValid) {
+      setEmailError(emailValidation.error ? t(emailValidation.error) : 'Invalid email');
+      return;
+    }
+
+    setIsLoading('magiclink');
+    setError(null);
+    setEmailError(null);
+
+    try {
+      savePending();
+
+      if (showOtpFlow && otpSent) {
+        // Verify OTP code
+        const result = await verifyOtpCode(email, otpCode);
+        if (result.error) {
+          setError(result.error.message);
+        }
+        // Auth context handles redirect on success
+      } else if (showOtpFlow) {
+        // Send OTP code (native — no browser redirect)
+        const result = await sendOtpCode(email);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          setOtpSent(true);
+          setSuccess(t('auth.otp.codeSent'));
+        }
+      } else {
+        // Web: magic link
+        const result = await signInWithMagicLink(email);
+        if (result.error) {
+          setError(result.error.message);
+        } else {
+          setSuccess(t('auth.magicLink.checkEmail'));
+        }
+      }
+      setIsLoading(null);
+    } catch (err) {
+      setError((err as Error).message || t('common.errorOccurred'));
       setIsLoading(null);
     }
   };
@@ -191,7 +250,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
   const isAnyLoading = isLoading !== null;
 
   return (
-    <motion.div
+    <m.div
       initial={{ y: 20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       className={cn(
@@ -201,24 +260,24 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
     >
       {/* Blurred background layer - mimics content behind */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-gradient-to-br from-neo-navy/95 via-slate-900/95 to-neo-navy/95 backdrop-blur-xl" />
+        <div className="absolute inset-0 bg-linear-to-br from-neo-navy/95 via-slate-900/95 to-neo-navy/95 backdrop-blur-xl" />
         {/* Decorative blurred "fake" content shapes */}
-        <div className="absolute top-4 left-4 right-4 h-8 bg-slate-700/30 rounded-lg blur-sm" />
+        <div className="absolute top-4 left-4 right-4 h-8 bg-neo-navy-light/30 rounded-lg blur-xs" />
         <div className="absolute top-16 left-4 w-24 h-24 bg-neo-lime/10 rounded-full blur-md" />
-        <div className="absolute top-20 right-8 w-16 h-4 bg-slate-600/30 rounded blur-sm" />
-        <div className="absolute bottom-8 left-8 right-8 h-12 bg-slate-700/20 rounded-lg blur-sm" />
+        <div className="absolute top-20 right-8 w-16 h-4 bg-neo-navy-light/30 rounded blur-xs" />
+        <div className="absolute bottom-8 left-8 right-8 h-12 bg-neo-navy-light/20 rounded-lg blur-xs" />
       </div>
 
       {/* Main card with glass effect */}
-      <div className="relative rounded-neo border-3 border-neo-lime/50 bg-neo-navy/90 shadow-hard-lg p-5 backdrop-blur-sm">
+      <div className="relative rounded-neo border-3 border-neo-lime/50 bg-neo-navy/90 shadow-hard-lg p-5 backdrop-blur-xs">
         {/* Sparkle decorations */}
         <div className="absolute -top-2 -right-2 rtl:-right-auto rtl:-left-2">
-          <motion.div
+          <m.div
             animate={{ rotate: 360, scale: [1, 1.2, 1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
+            transition={{ type: 'tween', duration: 3, repeat: Infinity, ease: 'linear' }}
           >
             <Sparkles className="w-6 h-6 text-neo-lime" />
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Dismiss button */}
@@ -228,18 +287,18 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
             className="absolute top-3 right-3 rtl:right-auto rtl:left-3 p-1.5 rounded-full hover:bg-white/10 transition-colors z-10"
             aria-label={t('common.dismiss')}
           >
-            <X className="w-4 h-4 text-gray-400 hover:text-white" />
+            <X className="w-4 h-4 text-neo-white hover:text-white" />
           </button>
         )}
 
         {/* Mascot with speech bubble */}
         <div className="flex items-start gap-3 mb-4">
           {/* Mascot */}
-          <motion.div
+          <m.div
             initial={{ scale: 0, rotate: -20 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-            className="flex-shrink-0"
+            className="shrink-0"
           >
             <InteractiveMascot
               variant="excited"
@@ -247,12 +306,12 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
               enableHover
               enableClick
               clickAnimation="wiggle"
-              tooltip={t('auth.inlineSignup.mascotTooltip') || 'Click me!'}
+              tooltip={t('auth.inlineSignup.mascotTooltip')}
             />
-          </motion.div>
+          </m.div>
 
           {/* Speech bubble */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -10, scale: 0.9 }}
             animate={{ opacity: 1, x: 0, scale: 1 }}
             transition={{ delay: 0.4, type: 'spring' }}
@@ -263,81 +322,82 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
             <div className="absolute left-0 rtl:left-auto rtl:right-0 top-4 -translate-x-[5px] rtl:translate-x-[5px] w-0 h-0 border-t-[6px] border-t-transparent border-b-[6px] border-b-transparent border-r-[6px] rtl:border-r-0 rtl:border-l-[6px] border-r-neo-lime rtl:border-l-neo-lime" />
 
             <p className="text-neo-black font-black text-sm leading-tight">
-              {t(`auth.inlineSignup.${randomMessage}`) || t('auth.inlineSignup.funnyMessages.dontLeaveHanging') || "Hey! Don't leave me hanging! Sign up and let's climb that leaderboard together!"}
+              {t(`auth.inlineSignup.${randomMessage}`) || t('auth.inlineSignup.funnyMessages.dontLeaveHanging')}
             </p>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Title */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
           className="text-center mb-4"
         >
           <h3 className="text-xl font-black text-white">
-            {t('auth.inlineSignup.title') || 'Join the Word Warriors!'}
+            {t('auth.inlineSignup.title')}
           </h3>
-          <p className="text-sm text-gray-400 mt-1">
-            {t('auth.inlineSignup.subtitle') || 'Your score is too good to lose!'}
+          <p className="text-sm text-neo-white mt-1">
+            {t('auth.inlineSignup.subtitle')}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Benefits Grid - compact */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="grid grid-cols-2 gap-2 mb-4 p-3 bg-slate-800/50 rounded-lg border border-slate-700/50"
+          className="grid grid-cols-2 gap-2 mb-4 p-3 bg-neo-navy-light/50 rounded-lg border border-neo-cream/15/50"
         >
           {benefits.map((benefit, idx) => (
-            <motion.div
+            <m.div
               key={benefit.key}
               initial={{ x: -10, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ delay: 0.5 + idx * 0.05 }}
               className="flex items-center gap-2 text-xs"
             >
-              <benefit.icon className="w-4 h-4 text-neo-cyan flex-shrink-0" />
-              <span className="text-gray-300">
+              <benefit.icon className="w-4 h-4 text-neo-cyan shrink-0" />
+              <span className="text-neo-white">
                 {t(`auth.dailyChallenge.benefits.${benefit.key}`) || benefit.key}
               </span>
-            </motion.div>
+            </m.div>
           ))}
-        </motion.div>
+        </m.div>
 
         {/* Success Message */}
         <AnimatePresence>
           {success && (
-            <motion.div
+            <m.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="bg-emerald-500/20 border-2 border-emerald-500 rounded-neo p-3 mb-4 text-center"
+              className="bg-neo-lime/20 border-2 border-neo-lime rounded-neo p-3 mb-4 text-center"
             >
-              <p className="text-sm font-bold text-emerald-300">{success}</p>
-            </motion.div>
+              <p className="text-sm font-bold text-neo-lime">{success}</p>
+            </m.div>
           )}
         </AnimatePresence>
 
         {/* Error Message */}
         <AnimatePresence>
           {error && (
-            <motion.div
+            <m.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               className="bg-red-500/20 border-2 border-red-500 rounded-neo p-3 mb-4 text-center"
+              role="alert"
             >
-              <p className="text-sm font-bold text-red-300">{error}</p>
-            </motion.div>
+              <p className="text-sm font-bold text-red-300 flex items-center gap-2"><AlertCircle className="w-4 h-4 shrink-0" />{error}</p>
+            </m.div>
           )}
         </AnimatePresence>
 
         {!success && (
           <>
             {/* OAuth Buttons */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
@@ -349,7 +409,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 className="w-full py-3 bg-white hover:bg-gray-100 text-gray-800 border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
               >
                 {isLoading === 'google' ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader size="sm" />
                 ) : (
                   <>
                     <GoogleIcon className="w-5 h-5" />
@@ -364,7 +424,7 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                 className="w-full py-3 bg-brand-discord hover:bg-brand-discord-hover text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold flex items-center justify-center gap-2"
               >
                 {isLoading === 'discord' ? (
-                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <Loader size="sm" />
                 ) : (
                   <>
                     <DiscordIcon className="w-5 h-5" />
@@ -372,140 +432,232 @@ export const DailyChallengeInlineSignup: React.FC<DailyChallengeInlineSignupProp
                   </>
                 )}
               </Button>
-            </motion.div>
+            </m.div>
 
             {/* Email Form Toggle */}
             {!showEmailForm ? (
-              <motion.button
+              <m.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.7 }}
                 onClick={() => setShowEmailForm(true)}
-                className="w-full text-sm text-gray-400 hover:text-gray-200 transition-colors flex items-center justify-center gap-2 py-2"
+                className="w-full text-sm text-neo-white hover:text-neo-white transition-colors flex items-center justify-center gap-2 py-2"
               >
                 <Mail className="w-4 h-4" />
-                <span>{t('auth.inlineSignup.orContinueWith') || 'or continue with email'}</span>
-              </motion.button>
+                <span>{t('auth.inlineSignup.orContinueWith')}</span>
+              </m.button>
             ) : (
-              <motion.form
+              <m.div
                 initial={{ height: 0, opacity: 0 }}
                 animate={{ height: 'auto', opacity: 1 }}
-                onSubmit={handleEmailSubmit}
                 className="space-y-3"
               >
                 {/* Divider */}
-                <div className="flex items-center gap-2 text-xs text-gray-500">
+                <div className="flex items-center gap-2 text-xs text-neo-white">
                   <div className="flex-1 h-px bg-gray-600" />
-                  <span>{authMode === 'signup' ? t('auth.signUp') : t('auth.signIn')}</span>
+                  <span>{t('auth.magicLink.divider')}</span>
                   <div className="flex-1 h-px bg-gray-600" />
                 </div>
 
-                {/* Email Input */}
-                <div>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => handleEmailChange(e.target.value)}
-                    placeholder={t('auth.inlineSignup.emailPlaceholder') || 'Email address'}
-                    className={cn(
-                      "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan",
-                      emailError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
-                    )}
-                    disabled={isAnyLoading}
-                  />
-                  {emailError && (
-                    <p className="mt-1 text-xs text-red-400">{emailError}</p>
-                  )}
-                </div>
-
-                {/* Password Input */}
-                <div>
-                  <div className="relative">
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={(e) => handlePasswordChange(e.target.value)}
-                      placeholder={t('auth.inlineSignup.passwordPlaceholder') || 'Password (8+ characters)'}
-                      className={cn(
-                        "w-full px-4 py-3 rounded-neo border-2 bg-slate-800 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-neo-cyan pe-12",
-                        passwordError ? "border-red-500" : "border-slate-600 focus:border-neo-cyan"
+                {!usePassword ? (
+                  /* Magic Link Form (default) */
+                  <form onSubmit={handleMagicLinkSubmit} className="space-y-3">
+                    <div>
+                      <label htmlFor="dc-magic-email" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
+                      <input
+                        id="dc-magic-email"
+                        type="email"
+                        autoComplete="email"
+                        value={email}
+                        onChange={(e) => handleEmailChange(e.target.value)}
+                        placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                        aria-invalid={emailError ? true : undefined}
+                        aria-describedby={emailError ? 'dc-magic-email-error' : undefined}
+                        className={cn(
+                          "w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-neo-cream/40 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan",
+                          emailError ? "border-red-500" : "border-neo-cream/20 focus:border-neo-cyan"
+                        )}
+                        disabled={isAnyLoading || otpSent}
+                      />
+                      {emailError && (
+                        <p id="dc-magic-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
                       )}
-                      disabled={isAnyLoading}
-                    />
+                    </div>
+
+                    {/* OTP code input (native only, after code sent) */}
+                    {showOtpFlow && otpSent && (
+                      <div>
+                        <label htmlFor="dc-otp-code" className="sr-only">{t('auth.otp.enterCode')}</label>
+                        <input
+                          id="dc-otp-code"
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          maxLength={6}
+                          value={otpCode}
+                          onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
+                          placeholder={t('auth.otp.enterCode')}
+                          className="w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-neo-cream/40 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan border-neo-cream/20 focus:border-neo-cyan text-center text-2xl tracking-[0.5em] font-mono"
+                          disabled={isAnyLoading}
+                        />
+                      </div>
+                    )}
+
+                    <Button
+                      type="submit"
+                      variant="secondary"
+                      disabled={isAnyLoading || !email || !!emailError || (otpSent && otpCode.length < 6)}
+                      className="w-full"
+                    >
+                      {isLoading === 'magiclink' ? (
+                        <Loader size="sm" />
+                      ) : (
+                        <>
+                          <Wand2 className="w-4 h-4" />
+                          <span className="ms-2">
+                            {otpSent
+                              ? t('auth.otp.verify')
+                              : showOtpFlow
+                                ? t('auth.otp.sendCode')
+                                : t('auth.magicLink.sendLink')}
+                          </span>
+                        </>
+                      )}
+                    </Button>
+
                     <button
                       type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200"
+                      onClick={() => setUsePassword(true)}
+                      className="w-full text-xs text-neo-white hover:text-neo-white"
                     >
-                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      {t('auth.magicLink.usePassword')}
                     </button>
-                  </div>
-                  {passwordError && (
-                    <p className="mt-1 text-xs text-red-400">{passwordError}</p>
-                  )}
-                </div>
+                  </form>
+                ) : (
+                  /* Password Form */
+                  <form onSubmit={handleEmailSubmit} className="space-y-3">
+                    <div>
+                      <label htmlFor="dc-pwd-email" className="sr-only">{t('auth.inlineSignup.emailPlaceholder')}</label>
+                      <input
+                        id="dc-pwd-email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => handleEmailChange(e.target.value)}
+                        placeholder={t('auth.inlineSignup.emailPlaceholder')}
+                        aria-invalid={emailError ? true : undefined}
+                        aria-describedby={emailError ? 'dc-pwd-email-error' : undefined}
+                        className={cn(
+                          "w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-neo-cream/40 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan",
+                          emailError ? "border-red-500" : "border-neo-cream/20 focus:border-neo-cyan"
+                        )}
+                        disabled={isAnyLoading}
+                      />
+                      {emailError && (
+                        <p id="dc-pwd-email-error" role="alert" className="mt-1 text-xs text-red-400">{emailError}</p>
+                      )}
+                    </div>
 
-                {/* Submit Button */}
-                <Button
-                  type="submit"
-                  disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
-                  className="w-full py-3 bg-neo-pink hover:bg-neo-pink/90 text-white border-3 border-neo-black rounded-neo shadow-hard hover:shadow-hard-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-hard-pressed transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading === 'email' ? (
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                  ) : (
-                    authMode === 'signup'
-                      ? (t('auth.inlineSignup.signUpButton') || 'Create Account')
-                      : t('auth.signIn')
-                  )}
-                </Button>
+                    <div>
+                      <label htmlFor="dc-pwd-password" className="sr-only">{t('auth.inlineSignup.passwordPlaceholder')}</label>
+                      <div className="relative">
+                        <input
+                          id="dc-pwd-password"
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => handlePasswordChange(e.target.value)}
+                          placeholder={t('auth.inlineSignup.passwordPlaceholder')}
+                          aria-invalid={passwordError ? true : undefined}
+                          aria-describedby={passwordError ? 'dc-pwd-password-error' : undefined}
+                          className={cn(
+                            "w-full px-4 py-3 rounded-neo border-2 bg-neo-navy-light text-white placeholder-neo-cream/40 focus:outline-hidden focus:ring-2 focus:ring-neo-cyan pe-12",
+                            passwordError ? "border-red-500" : "border-neo-cream/20 focus:border-neo-cyan"
+                          )}
+                          disabled={isAnyLoading}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute inset-e-3 top-1/2 -translate-y-1/2 text-neo-white hover:text-neo-white"
+                        >
+                          {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                        </button>
+                      </div>
+                      {passwordError && (
+                        <p id="dc-pwd-password-error" role="alert" className="mt-1 text-xs text-red-400">{passwordError}</p>
+                      )}
+                    </div>
 
-                {/* Toggle auth mode */}
-                <button
-                  type="button"
-                  onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
-                  className="w-full text-xs text-gray-500 hover:text-gray-300"
-                >
-                  {authMode === 'signup'
-                    ? t('auth.alreadyHaveAccount')
-                    : t('auth.noAccount')}
-                </button>
-              </motion.form>
+                    <Button
+                      type="submit"
+                      variant="secondary"
+                      disabled={isAnyLoading || !email || !password || !!emailError || !!passwordError}
+                      className="w-full"
+                    >
+                      {isLoading === 'email' ? (
+                        <Loader size="sm" />
+                      ) : (
+                        authMode === 'signup'
+                          ? (t('auth.inlineSignup.signUpButton'))
+                          : t('auth.signIn')
+                      )}
+                    </Button>
+
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => setAuthMode(authMode === 'signup' ? 'signin' : 'signup')}
+                        className="text-xs text-neo-white hover:text-neo-white"
+                      >
+                        {authMode === 'signup'
+                          ? t('auth.alreadyHaveAccount')
+                          : t('auth.noAccount')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setUsePassword(false)}
+                        className="text-xs text-neo-white hover:text-neo-white"
+                      >
+                        {t('auth.magicLink.useMagicLink')}
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </m.div>
             )}
 
             {/* Continue as Guest - more prominent with humor */}
             {onDismiss && (
-              <motion.button
+              <m.button
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
                 onClick={onDismiss}
-                className="w-full mt-4 text-sm text-gray-500 hover:text-gray-300 transition-colors group"
+                className="w-full mt-4 text-sm text-neo-white hover:text-neo-white transition-colors group"
               >
                 <span className="group-hover:hidden">
-                  {t('auth.inlineSignup.skipForNow') || 'Skip for now'}
+                  {t('auth.inlineSignup.skipForNow')}
                 </span>
                 <span className="hidden group-hover:inline text-neo-lime">
-                  {t('auth.inlineSignup.skipHover') || "(Lexi will be sad, but okay...)"}
+                  {t('auth.inlineSignup.skipHover')}
                 </span>
-              </motion.button>
+              </m.button>
             )}
           </>
         )}
 
         {/* Terms & Privacy */}
-        <div className="mt-4 text-center text-[10px] text-gray-500">
+        <div className="mt-4 text-center text-[10px] text-neo-white">
           {t('auth.termsPrefix')}{' '}
-          <Link href={`/${language}/legal/terms`} className="underline hover:text-gray-300 transition-colors">
+          <Link href={`/${language}/legal/terms`} className="underline hover:text-neo-white transition-colors">
             {t('auth.termsLink')}
           </Link>
           {' '}{t('auth.andText')}{' '}
-          <Link href={`/${language}/legal/privacy`} className="underline hover:text-gray-300 transition-colors">
+          <Link href={`/${language}/legal/privacy`} className="underline hover:text-neo-white transition-colors">
             {t('auth.privacyLink')}
           </Link>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

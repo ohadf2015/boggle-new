@@ -45,13 +45,8 @@ When you use `/refactor`, `/feature`, or manually edit multiplayer-related files
 - `gameState`
 
 **What Runs:**
-```bash
-cd fe-next && npx playwright test e2e/multiplayer-game-start.spec.ts --project=chromium --timeout=120000 --workers=1
-```
-
-**Expected Results:**
-- ✅ 5/6 tests should pass
-- ❌ Late join test may fail (known limitation, not related to main bug fix)
+E2E testing is now done via Playwriter CLI (see `/e2e-test` command).
+Use `playwriter session new` to start an interactive browser testing session.
 
 ### Stop Hook (Reminder)
 
@@ -64,31 +59,22 @@ When a session ends, Claude will check if multiplayer changes were made and remi
 3. **Fast Feedback:** Tests run automatically after significant changes
 4. **CI/CD Ready:** Same tests that run locally can run in CI
 
-## Test Coverage
-
-The multiplayer e2e tests verify:
-
-1. ✅ **First Game Start** - Players don't get stuck on waiting screen
-2. ✅ **Multiple Players** - All players transition simultaneously
-3. ✅ **Subsequent Games** - Games after results work correctly
-4. ✅ **Socket Events** - Event delivery and acknowledgments work
-5. ✅ **Stress Testing** - Rapid game starts handle correctly
-6. ❌ **Late Join** - Known issue, separate from main bug fix
-
 ## Manual Testing
 
-To run tests manually:
+To run E2E tests manually, use the Playwriter CLI:
 
 ```bash
-# Run all multiplayer tests
-cd fe-next && npx playwright test e2e/multiplayer-game-start.spec.ts --project=chromium
+# Start a new Playwriter session
+playwriter session new
 
-# Run with headed browser (see what's happening)
-cd fe-next && npx playwright test e2e/multiplayer-game-start.spec.ts --project=chromium --headed
+# Navigate to page under test
+playwriter -s 1 -e "state.page = await context.newPage(); await state.page.goto('http://localhost:3001', { waitUntil: 'domcontentloaded' })"
 
-# Run specific test
-cd fe-next && npx playwright test e2e/multiplayer-game-start.spec.ts --project=chromium --grep="First Game Start"
+# Take screenshot with accessibility labels
+playwriter -s 1 --timeout 20000 -e "await screenshotWithAccessibilityLabels({ page: state.page })"
 ```
+
+See `/e2e-test` command for full Playwriter testing workflow.
 
 ## Disabling Hooks
 
@@ -132,17 +118,15 @@ The hooks are also referenced in the following skills:
 
 ## CI/CD Integration
 
-To integrate in CI/CD pipeline:
+E2E testing is done interactively via Playwriter CLI. For CI/CD, use Jest unit/integration tests:
 
 ```yaml
 # GitHub Actions example
-- name: Run Multiplayer E2E Tests
+- name: Run Tests
   run: |
     cd fe-next
-    npx playwright test e2e/multiplayer-game-start.spec.ts --project=chromium --timeout=120000
+    npm run test
 ```
-
-Expected: 5/6 tests pass. If <5 tests pass, multiplayer synchronization is broken.
 
 ## Troubleshooting
 
@@ -217,4 +201,4 @@ mcp__memory__memory_forget(id="memory-id", reason="Why forgetting")
 
 - [MANUAL_TESTING_GUIDE.md](../MANUAL_TESTING_GUIDE.md) - Manual testing procedures
 - [Investigation Report](plans/adaptive-foraging-ripple.md) - Original bug investigation
-- [E2E Test Spec](../fe-next/e2e/multiplayer-game-start.spec.ts) - Test implementation
+- `/e2e-test` command - Playwriter testing workflow

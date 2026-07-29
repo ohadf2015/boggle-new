@@ -1,19 +1,34 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useInterval } from '@/hooks/useSafeTimeout';
 import Link from 'next/link';
-import { Target, Flame, Check, Clock } from 'lucide-react';
+import Image from 'next/image';
+import { m } from 'framer-motion';
+import { MODE_IMAGE_ENTRANCE } from '@/lib/landing/modeImageEntrance';
+import { Flame, Check, Clock, Sparkles, X, Star, Zap, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackLandingCtaClick } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
+import { useTiltEffect } from '@/hooks/useTiltEffect';
+import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import {
   getDailyChallengeDate,
   getPuzzleNumber,
   getSecondsUntilNextDaily,
   formatCountdown,
-  hasPlayedWordHuntToday,
+  getWordHuntStatusToday,
   getDailyStreak,
 } from '@/utils/dailyChallenge';
 import type { Language } from '@/types';
+
+interface PreloadedDailyStats {
+  hasPlayed: boolean;
+  hasSolved: boolean | null;
+  currentStreak: number;
+  puzzleNumber?: number;
+  loading?: boolean;
+}
 
 interface DailyChallengeBannerProps {
   className?: string;
@@ -21,72 +36,132 @@ interface DailyChallengeBannerProps {
   compact?: boolean;
   /** Optional mascot element to replace the icon (for mobile portrait) */
   mascot?: React.ReactNode;
+  /** Pre-loaded stats from parent to avoid duplicate fetching */
+  preloadedStats?: PreloadedDailyStats;
 }
 
 /**
- * DailyChallengeBanner - Subtle card promoting the Daily Challenge
- * Clean design with puzzle number, streak badge, and completion indicator
+ * DailyChallengeBanner - Hero mode card for the Daily Challenge.
+ * Shares the ModeCard visual language (navy→accent gradient, arrow affordance,
+ * badge row, bottom-end mascot) but uses the reserved `neo-yellow` celebration
+ * accent plus puzzle#/streak/countdown/win-loss chrome for daily identity.
  */
 const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   className = '',
   compact = false,
   mascot,
+  preloadedStats,
 }) => {
   const { t, language, dir } = useLanguage();
-  const [countdown, setCountdown] = useState<string>('');
-  const [hasPlayed, setHasPlayed] = useState<boolean>(false);
-  const [streak, setStreak] = useState<number>(0);
-  const [puzzleNumber, setPuzzleNumber] = useState<number>(0);
+  const [countdown, setCountdown] = useState<string>(() => {
+    if (typeof window === 'undefined') return '--:--:--';
+    return formatCountdown(getSecondsUntilNextDaily());
+  });
+  const [hasPlayed, setHasPlayed] = useState<boolean>(preloadedStats?.hasPlayed ?? false);
+  const [hasSolved, setHasSolved] = useState<boolean>(preloadedStats?.hasSolved ?? false);
+  const [streak, setStreak] = useState<number>(preloadedStats?.currentStreak ?? 0);
+  const [puzzleNumber, setPuzzleNumber] = useState<number>(preloadedStats?.puzzleNumber ?? 0);
   const [isClient, setIsClient] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const { enableComplexAnimations, prefersReducedMotion } = useDevicePerformance();
 
-  // Initialize state on client
+  // Match ModeCard tilt params for consistent feel
+  const { ref: tiltRef, style: tiltStyle, handlers: tiltHandlers } = useTiltEffect<HTMLDivElement>({
+    maxTilt: 18,
+    hoverScale: 1.06,
+    perspective: 700,
+  });
+
+  const combinedHandlers = {
+    ...tiltHandlers,
+    onMouseEnter: () => {
+      setIsHovered(true);
+      tiltHandlers.onMouseEnter();
+    },
+    onMouseLeave: () => {
+      setIsHovered(false);
+      tiltHandlers.onMouseLeave();
+    },
+  };
+
   useEffect(() => {
     setIsClient(true);
     const date = getDailyChallengeDate();
-    setPuzzleNumber(getPuzzleNumber(date));
-    setHasPlayed(hasPlayedWordHuntToday(language as Language));
-    setStreak(getDailyStreak().currentStreak);
-  }, [language]);
 
-  // Update countdown timer
+    if (preloadedStats && !preloadedStats.loading) {
+      setHasPlayed(preloadedStats.hasPlayed);
+      setHasSolved(preloadedStats.hasSolved ?? false);
+      setStreak(preloadedStats.currentStreak);
+      if (preloadedStats.puzzleNumber) {
+        setPuzzleNumber(preloadedStats.puzzleNumber);
+      } else {
+        setPuzzleNumber(getPuzzleNumber(date));
+      }
+      return;
+    }
+
+    setPuzzleNumber(getPuzzleNumber(date));
+
+    const status = getWordHuntStatusToday(language as Language);
+    setHasPlayed(!!status);
+    setHasSolved(status?.solved ?? false);
+
+    setStreak(getDailyStreak().currentStreak);
+  }, [language, preloadedStats]);
+
+  useInterval(() => {
+    if (document.visibilityState === 'hidden') return;
+    const seconds = getSecondsUntilNextDaily();
+    setCountdown(formatCountdown(seconds));
+  }, isClient ? 1000 : null);
+
   useEffect(() => {
     if (!isClient) return;
 
     const updateCountdown = () => {
+      if (document.visibilityState === 'hidden') return;
       const seconds = getSecondsUntilNextDaily();
       setCountdown(formatCountdown(seconds));
     };
 
     updateCountdown();
-    const interval = setInterval(updateCountdown, 1000);
 
-    return () => clearInterval(interval);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        updateCountdown();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [isClient]);
 
-  // Refresh has played status when language changes
   useEffect(() => {
     if (!isClient) return;
-    setHasPlayed(hasPlayedWordHuntToday(language as Language));
+    const status = getWordHuntStatusToday(language as Language);
+    setHasPlayed(!!status);
+    setHasSolved(status?.solved ?? false);
     setStreak(getDailyStreak().currentStreak);
   }, [language, isClient]);
 
-  // Refresh has played status when page becomes visible (handles navigation back)
   useEffect(() => {
     if (!isClient) return;
 
     const refreshStatus = () => {
-      setHasPlayed(hasPlayedWordHuntToday(language as Language));
+      const status = getWordHuntStatusToday(language as Language);
+      setHasPlayed(!!status);
+      setHasSolved(status?.solved ?? false);
       setStreak(getDailyStreak().currentStreak);
     };
 
-    // Refresh on page visibility change
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         refreshStatus();
       }
     };
 
-    // Refresh on window focus (handles tab switches and navigation)
     const handleFocus = () => {
       refreshStatus();
     };
@@ -101,94 +176,278 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   }, [isClient, language]);
 
   const isRTL = dir === 'rtl';
+  const ArrowIcon = isRTL ? ArrowLeft : ArrowRight;
+
+  // Navy → neo-yellow (celebration/gold) gradient, matching ModeCard pattern
+  const gradientClass = 'bg-linear-to-br from-neo-navy via-neo-navy-light/80 to-neo-yellow/70';
+  const hoverGradientClass = 'hover:to-neo-yellow/90';
+  const glowColor = 'rgba(255, 225, 53, 0.65)';
 
   if (!isClient) {
-    // SSR placeholder to prevent hydration mismatch
     return (
       <div className={cn(
-        "w-full p-3 rounded-neo border-3 border-neo-black shadow-hard bg-neo-lime",
+        'w-full h-full rounded-neo-lg border-3 border-neo-black shadow-hard-lg relative overflow-hidden',
+        gradientClass,
         className
-      )}>
-        <div className="h-10" />
+      )}
+      style={{ padding: compact ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)' }}
+      >
+        {/* Render the illustration at SSR (static, no client state) so it IS the
+            LCP element and paints before hydration — without this it would be
+            floored at hydration time. `priority` also emits the preload <link>
+            at SSR. The interactive banner swaps in on hydration with the image
+            in the same position, so there is no layout shift. */}
+        {!mascot && (
+          <div
+            className={cn('absolute pointer-events-none', isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0')}
+            style={{ width: 'clamp(5.5rem, 28cqw, 8rem)', height: 'clamp(5.5rem, 28cqw, 8rem)' }}
+          >
+            <Image
+              src="/modes/daily.png"
+              alt=""
+              fill
+              priority
+              className="object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]"
+              sizes="(max-width: 640px) 96px, 192px"
+            />
+          </div>
+        )}
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="rounded-neo border-2 border-neo-black bg-neo-yellow shrink-0 w-10 h-10 sm:w-14 sm:h-14" />
+          <div className="flex-1 min-w-0 space-y-2">
+            <div className="h-6 w-40 bg-neo-white/15 rounded" />
+            <div className="h-4 w-24 bg-neo-white/10 rounded" />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <Link href={`/${language}/daily`} className="block w-full group">
+    <Link
+      href={`/${language}/daily`}
+      className="block w-full h-full group focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime focus-visible:ring-offset-2 focus-visible:ring-offset-neo-navy rounded-neo-lg"
+      onClick={() => trackLandingCtaClick('daily_banner', { mode: 'daily', hasPlayed })}
+    >
       <div
+        ref={tiltRef}
         className={cn(
-          // Base card styles matching ModeCard
-          "relative w-full rounded-neo border-3 border-neo-black shadow-hard transition-all cursor-pointer",
-          // Hover/active effects matching ModeCard
+          'relative w-full h-full rounded-neo-lg border-3 border-neo-black shadow-hard-lg cursor-pointer overflow-hidden cq-container',
+          'transition-shadow duration-200 ease-out',
+          compact ? 'min-h-[80px] sm:min-h-[92px]' : 'min-h-[128px] sm:min-h-[148px]',
           isRTL
-            ? 'hover:translate-x-[2px] hover:translate-y-[-2px] hover:shadow-[-4px_4px_0px_black]'
-            : 'hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_black]',
-          isRTL
-            ? 'active:translate-x-[-1px] active:translate-y-[1px]'
-            : 'active:translate-x-[1px] active:translate-y-[1px]',
+            ? 'active:-translate-x-px active:translate-y-px'
+            : 'active:translate-x-px active:translate-y-px',
           'active:shadow-hard-pressed',
-          // Solid neo-lime for clean neo-brutalist look
-          "bg-neo-lime",
-          // Subtle glow effect for visual distinction - lime-dark ring when not played
-          !hasPlayed && "ring-2 ring-neo-lime-dark/60 ring-offset-2 ring-offset-transparent",
-          compact ? "p-2" : "p-2 sm:p-3",
+          gradientClass,
+          hoverGradientClass,
           className
         )}
+        style={{
+          padding: compact ? 'clamp(0.5rem, 3cqw, 1rem)' : 'clamp(0.75rem, 4cqw, 1.5rem)',
+          filter: isHovered ? `drop-shadow(0 0 20px ${glowColor})` : undefined,
+          ...tiltStyle,
+        }}
+        {...combinedHandlers}
       >
-        <div className="flex items-center gap-3">
-          {/* Icon or Mascot */}
-          {mascot ? (
-            <div className="flex-shrink-0">{mascot}</div>
-          ) : (
-            <div className={cn(
-              "flex items-center justify-center rounded-neo border-2 border-neo-black bg-neo-black",
-              compact ? "w-8 h-8" : "w-10 h-10 sm:w-12 sm:h-12"
-            )}>
-              <Target className={cn(
-                "text-neo-lime",
-                compact ? "w-4 h-4" : "w-5 h-5 sm:w-6 sm:h-6"
-              )} />
-            </div>
-          )}
+        {/* Sparkles for unplayed state - celebration accent */}
+        {!hasPlayed && enableComplexAnimations && !prefersReducedMotion && (
+          <>
+            <m.div
+              className="absolute top-2 right-20 rtl:right-auto rtl:left-20 pointer-events-none"
+              animate={{ rotate: [0, 15, -15, 0], scale: [1, 1.3, 1], opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <Sparkles className="w-4 h-4 text-neo-yellow" />
+            </m.div>
+            <m.div
+              className="absolute top-1 right-12 rtl:right-auto rtl:left-12 pointer-events-none"
+              animate={{ rotate: [0, -10, 10, 0], scale: [1, 1.2, 1], opacity: [0.5, 0.9, 0.5] }}
+              transition={{ type: 'tween', duration: 1.8, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
+            >
+              <Star className="w-3 h-3 text-neo-yellow fill-neo-yellow" />
+            </m.div>
+            <m.div
+              className="absolute bottom-12 right-4 rtl:right-auto rtl:left-4 pointer-events-none"
+              animate={{ rotate: [0, 20, -20, 0], scale: [0.8, 1.1, 0.8], opacity: [0.4, 0.8, 0.4] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+            >
+              <Zap className="w-3 h-3 text-neo-yellow fill-neo-yellow" />
+            </m.div>
+          </>
+        )}
 
-          {/* Content */}
+        {/* Mode character — matches ModeCard sizing */}
+        {!mascot && (
+          <m.div
+            className={cn(
+              'absolute pointer-events-none',
+              isRTL ? 'bottom-0 left-0' : 'bottom-0 right-0'
+            )}
+            style={{
+              width: 'clamp(5.5rem, 28cqw, 8rem)',
+              height: 'clamp(5.5rem, 28cqw, 8rem)',
+            }}
+            {...MODE_IMAGE_ENTRANCE}
+            animate={isHovered
+              ? { scale: 1.08, y: -6, rotate: isRTL ? -5 : 5 }
+              : { scale: 1, y: 0, rotate: 0 }
+            }
+            transition={{ type: 'spring', stiffness: 300, damping: 18 }}
+          >
+            <Image
+              src="/modes/daily.png"
+              alt=""
+              fill
+              priority
+              className={cn(
+                'object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.4)]',
+                isHovered ? 'brightness-110' : 'brightness-100'
+              )}
+              style={{
+                filter: isHovered ? 'drop-shadow(0 6px 16px rgba(0,0,0,0.5))' : undefined,
+                transition: 'filter 0.3s ease',
+              }}
+              sizes="(max-width: 640px) 96px, 192px"
+            />
+          </m.div>
+        )}
+
+        {/* Header: title + puzzle# chip + arrow/win-loss indicator */}
+        <div
+          className="flex items-center gap-2 sm:gap-3 lg:gap-4 relative z-10"
+          style={{ marginBottom: 'clamp(0.25rem, 1.5cqw, 0.75rem)' }}
+        >
+          {mascot && <div className="shrink-0">{mascot}</div>}
+
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className={cn(
-                "font-black uppercase text-neo-black leading-tight",
-                compact ? "text-sm" : "text-base sm:text-lg"
-              )}>
-                {t('daily.badge') || 'Daily Challenge'}
-              </h3>
-              <span className="font-bold text-neo-black/70 text-sm">
+              <h2
+                className="font-black uppercase tracking-tight text-neo-white leading-tight"
+                style={{ fontSize: 'clamp(1rem, 5cqw, 1.75rem)' }}
+              >
+                {t('daily.badge')}
+              </h2>
+              <span
+                className="font-black text-neo-navy bg-neo-yellow border-2 border-neo-black shadow-hard-xs rounded-neo"
+                style={{
+                  padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
+                  fontSize: 'clamp(0.625rem, 2.5cqw, 0.875rem)',
+                }}
+              >
                 #{puzzleNumber}
-              </span>
-              {streak > 0 && (
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-neo-lime-dark/40 text-neo-black">
-                  <Flame className="w-3 h-3" />
-                  <span className="text-xs font-bold">{streak}</span>
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-1.5 text-xs text-neo-black/70 font-medium mt-0.5">
-              <Clock className="w-3 h-3" />
-              <span className="tabular-nums min-w-[5ch]">
-                {hasPlayed
-                  ? <><span>{t('daily.nextPuzzleIn') || 'Next'}: </span><span className="inline-block min-w-[4.5em]">{countdown}</span></>
-                  : <span className="inline-block min-w-[4.5em]">{countdown}</span>
-                }
               </span>
             </div>
           </div>
 
-          {/* Completion indicator */}
-          {hasPlayed && (
-            <div className="flex items-center justify-center w-8 h-8 bg-neo-lime-light rounded-full border-2 border-neo-black text-neo-black">
-              <Check className="w-4 h-4 text-neo-black" strokeWidth={3} />
+          {/* Arrow (unplayed) or Win/Loss circular badge (played) — same slot */}
+          {hasPlayed ? (
+            <m.div
+              className={cn(
+                'flex items-center justify-center rounded-full border-2 border-neo-black shrink-0 shadow-hard-sm',
+                hasSolved ? 'bg-neo-lime text-neo-black' : 'bg-neo-pink text-neo-black'
+              )}
+              style={{
+                width: 'clamp(2.75rem, 8cqw, 3.25rem)',
+                height: 'clamp(2.75rem, 8cqw, 3.25rem)',
+              }}
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+              data-testid={hasSolved ? 'won-badge' : 'lost-badge'}
+            >
+              {hasSolved ? (
+                <Check style={{ width: 'clamp(1rem, 4cqw, 1.5rem)', height: 'clamp(1rem, 4cqw, 1.5rem)' }} strokeWidth={3} />
+              ) : (
+                <X style={{ width: 'clamp(1rem, 4cqw, 1.5rem)', height: 'clamp(1rem, 4cqw, 1.5rem)' }} strokeWidth={3} />
+              )}
+            </m.div>
+          ) : (
+            <div
+              className={cn(
+                'min-w-[44px] min-h-[44px] rounded-full border-2 border-neo-black bg-neo-yellow text-neo-navy',
+                'flex items-center justify-center shrink-0 transition-all duration-200 ease-out',
+                'opacity-100 lg:opacity-0 lg:group-hover:opacity-100',
+                isRTL ? 'lg:group-hover:-translate-x-1' : 'lg:group-hover:translate-x-1'
+              )}
+              style={{
+                width: 'clamp(2.75rem, 8cqw, 3.25rem)',
+                height: 'clamp(2.75rem, 8cqw, 3.25rem)',
+              }}
+            >
+              <ArrowIcon style={{ fontSize: 'clamp(0.75rem, 3.5cqw, 1rem)' }} />
             </div>
           )}
         </div>
+
+        {/* Badges row: streak + countdown (replaces duration/difficulty) */}
+        <div
+          className="flex flex-wrap items-center relative z-10"
+          style={{ gap: 'clamp(0.375rem, 1.5cqw, 0.5rem)' }}
+        >
+          {streak > 0 && (
+            <m.span
+              className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20"
+              style={{
+                gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
+                padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
+                fontSize: 'clamp(0.625rem, 2.5cqw, 0.75rem)',
+              }}
+              animate={{ scale: [1, 1.05, 1] }}
+              transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 2 }}
+            >
+              <Flame
+                className="text-neo-orange"
+                style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }}
+              />
+              {streak} {t('daily.dayStreak')}
+            </m.span>
+          )}
+          <span
+            className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20 tabular-nums"
+            style={{
+              gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
+              padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
+              fontSize: 'clamp(0.625rem, 2.5cqw, 0.75rem)',
+            }}
+          >
+            <Clock style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }} />
+            {hasPlayed
+              ? <><span className="opacity-80">{t('daily.nextPuzzleIn')}:</span>&nbsp;<span className="font-black tabular-nums" suppressHydrationWarning>{countdown}</span></>
+              : <span className="font-black tabular-nums" suppressHydrationWarning>{countdown}</span>
+            }
+          </span>
+        </div>
+
+        {/* Shine + corner accent — matches ModeCard */}
+        {enableComplexAnimations && !prefersReducedMotion && (
+          <>
+            <m.div
+              className="absolute inset-0 pointer-events-none overflow-hidden rounded-neo-lg"
+              initial={false}
+              animate={isHovered ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <m.div
+                className="absolute inset-0 bg-linear-to-r from-transparent via-white/40 to-transparent"
+                initial={{ x: '-100%' }}
+                animate={isHovered ? { x: '200%' } : { x: '-100%' }}
+                transition={{ duration: 0.5, ease: 'easeOut' }}
+              />
+            </m.div>
+
+            <m.div
+              className="absolute top-0 inset-e-0 w-16 h-16 pointer-events-none overflow-hidden rounded-neo-lg"
+              initial={false}
+            >
+              <m.div
+                className="absolute -top-8 -inset-e-8 w-16 h-16 bg-white/10 rotate-45"
+                animate={isHovered ? { scale: 1.2, opacity: 0.15 } : { scale: 1, opacity: 0.08 }}
+                transition={{ duration: 0.3 }}
+              />
+            </m.div>
+          </>
+        )}
       </div>
     </Link>
   );

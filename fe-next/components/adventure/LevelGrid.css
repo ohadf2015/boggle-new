@@ -1,0 +1,246 @@
+/**
+ * LevelGrid CSS Animations
+ *
+ * Performance-optimized CSS keyframe animations for multi-layer parallax,
+ * floating particles, and depth effects. Uses GPU-accelerated transforms
+ * and CSS custom properties for smooth 60fps animations.
+ */
+
+/* =============================================================================
+ * PARALLAX LAYER ANIMATIONS
+ * ============================================================================= */
+
+/* Base parallax layer - GPU-accelerated with smooth transitions */
+.level-grid-parallax-layer {
+  will-change: transform;
+  transition: transform 0.15s ease-out;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* CSS-driven parallax using custom properties from useParallax hook
+ * Avoids React re-renders by reading --parallax-x/--parallax-y from :root */
+.level-grid-parallax-css {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translate(
+    calc(var(--parallax-x, 0px) * var(--parallax-depth, 0.1)),
+    calc(var(--parallax-y, 0px) * var(--parallax-depth, 0.1))
+  );
+}
+
+.level-grid-parallax-css-scaled {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translate(
+    calc(var(--parallax-x, 0px) * var(--parallax-depth, 0.1)),
+    calc(var(--parallax-y, 0px) * var(--parallax-depth, 0.1))
+  ) scale(var(--parallax-scale, 1));
+}
+
+/* Glow orb breathing animation - subtle pulsing for atmosphere */
+/* Neo-brutalist: no blur filters, solid colors with opacity changes */
+@keyframes glow-orb-breathe {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+.level-grid-glow-orb {
+  pointer-events: none;
+  will-change: opacity, transform;
+  animation: glow-orb-breathe 8s ease-in-out infinite;
+}
+
+/* =============================================================================
+ * FOREGROUND DEPTH FRAME
+ * ============================================================================= */
+
+/* Edge shadows for depth framing */
+.level-grid-foreground-edge {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 0.2s ease-out;
+}
+
+.level-grid-foreground-edge--top {
+  top: 0;
+  height: 120px;
+}
+
+.level-grid-foreground-edge--bottom {
+  bottom: 0;
+  height: 150px;
+}
+
+/* Vignette overlay for depth effect */
+/* Neo-brutalist: replaced radial gradient with solid edge borders */
+.level-grid-foreground-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  will-change: transform;
+  transition: transform 0.2s ease-out;
+  /* Use box-shadow for vignette instead of gradient */
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.25);
+}
+
+/* =============================================================================
+ * FLOATING PARTICLES
+ * ============================================================================= */
+
+/* Enhanced particle animation with Lissajous-curve motion
+ * Uses --parallax-x/--parallax-y from :root (set by useParallax hook)
+ * Creates organic, non-repeating movement paths
+ */
+@keyframes particle-float {
+  0% {
+    transform: translate(
+      calc(var(--parallax-x, 0px) * 0.35),
+      calc(var(--parallax-y, 0px) * 0.35)
+    );
+    opacity: 0.4;
+  }
+  20% {
+    transform: translate(
+      calc(var(--parallax-x, 0px) * 0.35 + 12px),
+      calc(var(--parallax-y, 0px) * 0.35 - 18px)
+    );
+    opacity: 0.65;
+  }
+  40% {
+    transform: translate(
+      calc(var(--parallax-x, 0px) * 0.35 + 8px),
+      calc(var(--parallax-y, 0px) * 0.35 - 35px)
+    );
+    opacity: 0.5;
+  }
+  60% {
+    transform: translate(
+      calc(var(--parallax-x, 0px) * 0.35 - 6px),
+      calc(var(--parallax-y, 0px) * 0.35 - 28px)
+    );
+    opacity: 0.7;
+  }
+  80% {
+    transform: translate(
+      calc(var(--parallax-x, 0px) * 0.35 - 10px),
+      calc(var(--parallax-y, 0px) * 0.35 - 12px)
+    );
+    opacity: 0.55;
+  }
+  100% {
+    transform: translate(
+      calc(var(--parallax-x, 0px) * 0.35),
+      calc(var(--parallax-y, 0px) * 0.35)
+    );
+    opacity: 0.4;
+  }
+}
+
+.level-grid-particle {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform, opacity;
+  animation: particle-float var(--particle-duration, 20s) ease-in-out infinite;
+  animation-delay: var(--particle-delay, 0s);
+  filter: drop-shadow(0 0 6px currentColor);
+  text-shadow: 0 0 8px currentColor;
+}
+
+/* Gradient sweep animation for header */
+@keyframes gradient-sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.level-grid-gradient-sweep {
+  animation: gradient-sweep 8s ease-in-out infinite;
+}
+
+/* Shimmer effect for level cards */
+@keyframes card-shimmer {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.15;
+  }
+}
+
+.level-grid-card-shimmer {
+  animation: card-shimmer 3s ease-in-out infinite;
+}
+
+/* Pulse glow for completed levels */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow:
+      0 0 20px var(--glow-color, rgba(163, 230, 53, 0.3)),
+      6px 6px 0px black;
+  }
+  50% {
+    box-shadow:
+      0 0 35px var(--glow-color, rgba(163, 230, 53, 0.5)),
+      6px 6px 0px black;
+  }
+}
+
+.level-grid-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Star sparkle animation */
+@keyframes star-sparkle {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px rgba(255, 225, 53, 0.5));
+    transform: scale(1);
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(255, 225, 53, 0.8));
+    transform: scale(1.1);
+  }
+}
+
+.level-grid-star-sparkle {
+  animation: star-sparkle 1.5s ease-in-out infinite;
+}
+
+/* =============================================================================
+ * ACCESSIBILITY - REDUCED MOTION
+ * ============================================================================= */
+
+/* Disable all animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .level-grid-particle,
+  .level-grid-gradient-sweep,
+  .level-grid-card-shimmer,
+  .level-grid-glow-pulse,
+  .level-grid-star-sparkle,
+  .level-grid-glow-orb {
+    animation: none;
+  }
+
+  .level-grid-parallax-layer,
+  .level-grid-parallax-css,
+  .level-grid-parallax-css-scaled,
+  .level-grid-foreground-edge,
+  .level-grid-foreground-vignette {
+    transition: none;
+    transform: none !important;
+  }
+}

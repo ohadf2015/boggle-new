@@ -1,7 +1,7 @@
 'use client';
 
 import React, { memo } from 'react';
-import { motion } from 'framer-motion';
+import { m } from 'framer-motion';
 
 interface WordsRemainingProps {
   /** Total words available on the board */
@@ -46,16 +46,16 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
     // Compact version for landscape/mobile
     return (
       <div className="bg-neo-navy/80 text-white text-neo-cream border-2 border-neo-black rounded-neo shadow-hard-sm px-2 py-1 text-center">
-        <motion.div
+        <m.div
           key={remaining}
           initial={{ scale: 1.2 }}
           animate={{ scale: 1 }}
           className="text-sm font-black leading-tight"
         >
           {remaining}
-        </motion.div>
+        </m.div>
         <div className="text-[10px] font-bold uppercase text-neo-cream/90">
-          {minLength ? getLengthLabel() : (t('playerView.remaining') || 'Left')}
+          {minLength ? getLengthLabel() : (t('playerView.remaining'))}
         </div>
       </div>
     );
@@ -64,11 +64,11 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
   // Full version for desktop sidebar
   const headerTitle = minLength
     ? (t('playerView.longWordsOnBoard', { min: minLength }) || `${minLength}+ Letter Words`)
-    : (t('playerView.wordsOnBoard') || 'Words on Board');
+    : (t('playerView.wordsOnBoard'));
 
   const remainingLabel = minLength
     ? (t('playerView.longWordsRemaining', { min: minLength }) || `${minLength}+ letter words left`)
-    : (t('playerView.wordsRemaining') || 'words remaining');
+    : (t('playerView.wordsRemaining'));
 
   return (
     <div
@@ -86,14 +86,14 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
       <div className="p-3">
         {/* Remaining count */}
         <div className="text-center mb-2">
-          <motion.div
+          <m.div
             key={remaining}
             initial={{ scale: 1.3 }}
             animate={{ scale: 1 }}
             className="text-3xl font-black text-neo-cream leading-tight"
           >
             {remaining}
-          </motion.div>
+          </m.div>
           <div className="text-xs font-bold uppercase tracking-wide text-neo-cream/90">
             {remainingLabel}
           </div>
@@ -101,8 +101,8 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
 
         {/* Progress bar */}
         <div className="h-3 bg-neo-black/30 text-white rounded-full overflow-hidden border-2 border-neo-black">
-          <motion.div
-            className="h-full bg-gradient-to-r from-neo-lime to-neo-cyan rounded-full"
+          <m.div
+            className="h-full bg-linear-to-r from-neo-lime to-neo-cyan rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${progress}%` }}
             transition={{ type: 'spring', stiffness: 100, damping: 15 }}
@@ -111,8 +111,8 @@ export const WordsRemaining = memo<WordsRemainingProps>(({
 
         {/* Stats */}
         <div className="flex justify-between mt-2 text-xs font-bold text-neo-cream/90">
-          <span>{foundWordsCount} {t('playerView.found') || 'found'}</span>
-          <span>{totalWords} {t('playerView.total') || 'total'}</span>
+          <span>{foundWordsCount} {t('playerView.found')}</span>
+          <span>{totalWords} {t('playerView.total')}</span>
         </div>
       </div>
     </div>

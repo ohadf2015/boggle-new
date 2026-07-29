@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { m, AnimatePresence } from 'framer-motion';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
 import { cn } from '@/lib/utils';
 
@@ -65,7 +65,7 @@ export function WordPathTrail({
   isValid = false,
   wasSubmitted = false,
   color,
-  thickness = 4,
+  thickness = 6,
   showParticles = true,
   showGlow = true,
   fadeDuration = 300,
@@ -163,8 +163,8 @@ export function WordPathTrail({
         {shouldShowGlow && (
           <defs>
             <filter id="trail-glow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="4" result="blur" />
-              <feFlood floodColor={trailColor} floodOpacity="0.6" />
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feFlood floodColor={trailColor} floodOpacity="0.7" />
               <feComposite in2="blur" operator="in" />
               <feMerge>
                 <feMergeNode />
@@ -175,7 +175,7 @@ export function WordPathTrail({
         )}
 
         {/* Main trail path */}
-        <motion.path
+        <m.path
           ref={pathRef}
           d={pathString}
           fill="none"
@@ -199,7 +199,7 @@ export function WordPathTrail({
 
         {/* Secondary trail for depth */}
         {!isLowEnd && (
-          <motion.path
+          <m.path
             d={pathString}
             fill="none"
             stroke="white"
@@ -218,7 +218,7 @@ export function WordPathTrail({
       {shouldShowParticles && points.length > 1 && (
         <AnimatePresence>
           {points.slice(-3).map((point, index) => (
-            <motion.div
+            <m.div
               key={`particle-${point.timestamp}-${index}`}
               className="absolute w-2 h-2 rounded-full"
               style={{
@@ -239,7 +239,7 @@ export function WordPathTrail({
       {/* Submit flash effect */}
       <AnimatePresence>
         {isSubmitFlashing && shouldShowGlow && (
-          <motion.div
+          <m.div
             className="absolute inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 0.3, 0] }}

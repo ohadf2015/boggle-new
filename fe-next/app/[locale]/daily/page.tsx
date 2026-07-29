@@ -1,7 +1,9 @@
 import React, { Suspense } from 'react';
 import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
-import { translations } from '@/translations';
+import { loadTranslation } from '@/translations/loadTranslation';
+import { PageLoader } from '@/components/ui/PageLoader';
+
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es';
 
@@ -21,21 +23,15 @@ interface PageParams {
   }>;
 }
 
-// Loading fallback component
+// Loading fallback - flex-1 fills parent flex-col, centers loader vertically
 const LoadingFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-neo-navy dark:from-neo-navy dark:via-neo-navy-light dark:to-neo-navy">
-    <div className="text-center">
-      <div className="relative w-12 h-12 mx-auto mb-3">
-        <div className="absolute inset-0 border-4 border-neo-lime/30 rounded-full" />
-        <div className="absolute inset-0 border-4 border-transparent border-t-neo-lime rounded-full animate-spin" />
-      </div>
-      <p className="text-gray-600 dark:text-gray-300 text-sm">Loading Daily Challenge...</p>
-    </div>
+  <div className="flex-1 flex items-center justify-center bg-neo-navy">
+    <PageLoader size="lg" text="Loading Daily Challenge..." />
   </div>
 );
 
-// Dynamic import for code splitting (client component)
-const DailyChallenge = dynamicImport(() => import('@/components/daily/DailyChallenge'), {
+// Dynamic import for redirect component (client component)
+const DailyRedirect = dynamicImport(() => import('@/components/daily/DailyRedirect'), {
   loading: LoadingFallback,
 });
 
@@ -68,7 +64,9 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
   const { locale } = await params;
   const { share, wh, whSolved, whAttempts, whPuzzle, whName, whEmoji, whStreak, whAvatar } = await searchParams;
   const validLocale = (locale as Locale) || 'en';
-  const seo = translations[validLocale]?.seo?.daily || translations.en.seo.daily;
+  const t = await loadTranslation(validLocale) as Record<string, any>;
+  const enT = await loadTranslation('en') as Record<string, any>;
+  const seo = t?.seo?.daily || enT.seo.daily;
 
   const localePath = `/${locale}`;
   const baseUrl = 'https://www.lexiclash.live';
@@ -238,17 +236,27 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
 
   // Default metadata (no share parameter) - use locale-specific static OG images
   const ogImageMap: Record<string, string> = {
-    he: `${baseUrl}/og-image-he.jpg`,
-    en: `${baseUrl}/og-image-en.jpg`,
-    sv: `${baseUrl}/og-image-sv.jpg`,
-    ja: `${baseUrl}/og-image-ja.jpg`,
-    es: `${baseUrl}/og-image-es.jpg`,
+    he: `${baseUrl}/og-image-he.webp`,
+    en: `${baseUrl}/og-image-en.webp`,
+    sv: `${baseUrl}/og-image-sv.webp`,
+    ja: `${baseUrl}/og-image-ja.webp`,
+    es: `${baseUrl}/og-image-es.webp`,
   };
   const ogImage = ogImageMap[validLocale] || ogImageMap.en;
 
   return {
     title: seo.title,
     description: seo.description,
+    alternates: {
+      canonical: `${baseUrl}${localePath}/daily`,
+      languages: {
+        en: `${baseUrl}/en/daily`,
+        he: `${baseUrl}/he/daily`,
+        sv: `${baseUrl}/sv/daily`,
+        ja: `${baseUrl}/ja/daily`,
+        es: `${baseUrl}/es/daily`,
+      },
+    },
     openGraph: {
       type: 'website',
       url: `${baseUrl}${localePath}/daily`,
@@ -284,7 +292,7 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
 export default function DailyChallengePage(): React.JSX.Element {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <DailyChallenge />
+      <DailyRedirect />
     </Suspense>
   );
 }

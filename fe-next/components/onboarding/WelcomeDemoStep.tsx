@@ -1,92 +1,12 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useMemo, useCallback } from 'react';
+import { m } from 'framer-motion';
 import { Pointer } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import MiniGrid, { GridPosition } from './MiniGrid';
-
-interface DemoConfig {
-  letters: string[][];
-  path: GridPosition[];
-  word: string;
-}
-
-// Language-specific demo configurations
-// Each language has a localized word that makes sense in that language
-const demoConfigs: Record<string, DemoConfig> = {
-  // English: CAT
-  en: {
-    letters: [
-      ['C', 'A', 'P'],
-      ['D', 'T', 'O'],
-      ['E', 'R', 'S'],
-    ],
-    path: [
-      { row: 0, col: 0 }, // C
-      { row: 0, col: 1 }, // A
-      { row: 1, col: 1 }, // T
-    ],
-    word: 'CAT',
-  },
-  // Spanish: SOL (sun) - common 3-letter word
-  es: {
-    letters: [
-      ['S', 'O', 'P'],
-      ['D', 'L', 'I'],
-      ['E', 'R', 'N'],
-    ],
-    path: [
-      { row: 0, col: 0 }, // S
-      { row: 0, col: 1 }, // O
-      { row: 1, col: 1 }, // L
-    ],
-    word: 'SOL',
-  },
-  // Swedish: SOL (sun) - same word works in Swedish
-  sv: {
-    letters: [
-      ['S', 'O', 'P'],
-      ['D', 'L', 'I'],
-      ['E', 'R', 'N'],
-    ],
-    path: [
-      { row: 0, col: 0 }, // S
-      { row: 0, col: 1 }, // O
-      { row: 1, col: 1 }, // L
-    ],
-    word: 'SOL',
-  },
-  // Hebrew: שמש (sun) - using Hebrew letters for native experience
-  // RTL: path goes right-to-left (col 2 -> 1 -> 1)
-  he: {
-    letters: [
-      ['ל', 'מ', 'ש'],
-      ['ו', 'ש', 'ד'],
-      ['ס', 'ר', 'ת'],
-    ],
-    path: [
-      { row: 0, col: 2 }, // ש
-      { row: 0, col: 1 }, // מ
-      { row: 1, col: 1 }, // ש
-    ],
-    word: 'שמש',
-  },
-  // Japanese: Uses CAT with English letters (game uses romaji/English)
-  ja: {
-    letters: [
-      ['C', 'A', 'P'],
-      ['D', 'T', 'O'],
-      ['E', 'R', 'S'],
-    ],
-    path: [
-      { row: 0, col: 0 }, // C
-      { row: 0, col: 1 }, // A
-      { row: 1, col: 1 }, // T
-    ],
-    word: 'CAT',
-  },
-};
+import { Mascot } from '@/components/ui/Mascot';
+import MiniGrid from './MiniGrid';
+import { demoConfigs } from './demoConfigs';
 
 interface WelcomeDemoStepProps {
   onDemoComplete: () => void;
@@ -94,65 +14,76 @@ interface WelcomeDemoStepProps {
 }
 
 /**
- * WelcomeDemoStep - Welcome message with interactive word selection demo
- * Users learn by doing - swiping to form the demo word
+ * WelcomeDemoStep - Fast onboarding: fun in 15 seconds
+ * Phase 1 (0-2s): Auto-trace shows how to form a word
+ * Phase 2 (2-7s): Player traces ONE word
+ * Phase 3 (on success): Celebration + "Let's Play!" button
  */
 const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
   onDemoComplete,
   demoCompleted,
 }) => {
   const { t, language } = useLanguage();
+  const [autoTracing, setAutoTracing] = useState(true);
 
-  // Get the demo configuration for the current language, fallback to English
   const demoConfig = useMemo(() => {
     return demoConfigs[language] || demoConfigs.en;
   }, [language]);
 
+  const handleAutoTraceComplete = useCallback(() => {
+    setAutoTracing(false);
+  }, []);
+
   return (
     <div className="flex flex-col items-center space-y-3 sm:space-y-5">
-      {/* Welcome header */}
-      <motion.div
+      {/* Compact welcome header */}
+      <m.div
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 26 }}
         className="text-center space-y-1"
       >
+        <div className="flex justify-center mb-1">
+          <Mascot variant="waving" size="sm" />
+        </div>
         <h2 className="text-xl sm:text-2xl font-black text-neo-white uppercase">
           {t('onboarding.welcome.title')}
         </h2>
-        <p className="text-xs sm:text-sm text-neo-white/80">
-          {t('onboarding.welcome.subtitle')}
-        </p>
-      </motion.div>
+      </m.div>
 
-      {/* Instruction */}
+      {/* Phase indicator */}
       {!demoCompleted && (
-        <motion.div
+        <m.div
           initial={{ scale: 0.9, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.2, type: 'spring', stiffness: 300, damping: 26 }}
           className="bg-neo-lime border-3 border-neo-black rounded-neo p-2.5 sm:p-4 shadow-hard-md max-w-sm text-center"
         >
-          <div className="flex items-center justify-center gap-2 mb-1">
-            <Pointer className="text-xl text-neo-black animate-bounce" />
+          {autoTracing ? (
             <span className="font-bold text-neo-black text-xs sm:text-sm">
-              {t('onboarding.welcome.demoInstruction')}
+              {t('onboarding.welcome.watchMe', 'Watch this!')}
             </span>
-          </div>
-          <div className="text-2xl sm:text-3xl font-black text-neo-black">
-            {t('onboarding.welcome.demoWord')}
-          </div>
-          <div className="text-[10px] sm:text-xs text-neo-black/60 mt-1">
-            {t('onboarding.welcome.demoHint')}
-          </div>
-        </motion.div>
+          ) : (
+            <>
+              <div className="flex items-center justify-center gap-2 mb-1">
+                <Pointer className="text-xl text-neo-black animate-bounce" />
+                <span className="font-bold text-neo-black text-xs sm:text-sm">
+                  {t('onboarding.welcome.yourTurn', 'Your turn! Spell:')}
+                </span>
+              </div>
+              <div className="text-2xl sm:text-3xl font-black text-neo-black">
+                {t('onboarding.welcome.demoWord')}
+              </div>
+            </>
+          )}
+        </m.div>
       )}
 
       {/* Interactive demo grid */}
-      <motion.div
+      <m.div
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ delay: 0.5 }}
+        transition={{ delay: 0.3, type: 'spring', stiffness: 280, damping: 26 }}
         className="w-full"
       >
         <MiniGrid
@@ -161,9 +92,38 @@ const WelcomeDemoStep: React.FC<WelcomeDemoStepProps> = ({
           demoWord={demoConfig.word}
           demoPath={demoConfig.path}
           onDemoComplete={onDemoComplete}
-          showHints={true}
+          showHints={!autoTracing}
+          autoTrace={autoTracing}
+          onAutoTraceComplete={handleAutoTraceComplete}
         />
-      </motion.div>
+      </m.div>
+
+      {/* Celebration — auto-proceed after brief delay */}
+      {demoCompleted && (
+        <m.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          onAnimationComplete={() => {
+            setTimeout(onDemoComplete, 800);
+          }}
+          data-testid="lets-play-button"
+        />
+      )}
+
+      {/* Skip button - always visible */}
+      {!demoCompleted && (
+        <m.button
+          data-testid="skip-button"
+          onClick={onDemoComplete}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.7 }}
+          transition={{ delay: 1 }}
+          className="text-neo-white text-xs underline hover:text-neo-white transition-colors"
+        >
+          {t('onboarding.skip')}
+        </m.button>
+      )}
     </div>
   );
 };
