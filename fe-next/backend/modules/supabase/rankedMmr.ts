@@ -31,13 +31,21 @@ export interface RankedParticipant {
   priorWins?: number;
 }
 
+export interface MmdDelta {
+  oldMmr: number;
+  newMmr: number;
+  delta: number;
+}
+
 /**
  * Update MMR for ranked game participants using ELO calculation.
  * Updates both profiles.ranked_mmr (via batch RPC) and player_ratings table.
+ * Returns a map of playerId → MMR delta info for surfacing in post-game UI.
  */
-export async function updateRankedMmr(participants: RankedParticipant[]): Promise<void> {
+export async function updateRankedMmr(participants: RankedParticipant[]): Promise<Map<string, MmdDelta>> {
   const client = getSupabase();
-  if (!client || participants.length === 0) return;
+  const result = new Map<string, MmdDelta>();
+  if (!client || participants.length === 0) return result;
 
   // Build player rating objects for ELO calculation
   const playerInputs = participants.map(p => ({
@@ -59,6 +67,13 @@ export async function updateRankedMmr(participants: RankedParticipant[]): Promis
     const currentMmr = participant.currentMmr || DEFAULT_RATING;
     const peakMmr = participant.peakMmr || currentMmr;
     const newMmr = newRating ? newRating.rating : currentMmr;
+
+    // Record delta for post-game display
+    result.set(participant.playerId, {
+      oldMmr: currentMmr,
+      newMmr,
+      delta: newMmr - currentMmr,
+    });
 
     return {
       player_id: participant.playerId,
@@ -123,6 +138,7 @@ export async function updateRankedMmr(participants: RankedParticipant[]): Promis
   } catch (error) {
     logger.error('SUPABASE', 'Error updating ranked MMR', error);
   }
+  return result;
 }
 
 export interface RankedBaseline {

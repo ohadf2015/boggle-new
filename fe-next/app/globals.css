@@ -453,6 +453,37 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   to { transform: rotate(360deg); }
 }
 
+/* ── Golden-letter shimmer ── A gentle pulse of light sweeping across the tile
+   face so the daily mutator's golden letter feels special — it breathes like a
+   tiny treasure. Uses a pseudo-element gradient so the tile's own gradient
+   shows through between sweeps. */
+@utility wt-golden-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.wt-golden-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: -60%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(255, 255, 200, 0.3) 45%,
+    rgba(255, 245, 180, 0.45) 50%,
+    rgba(255, 255, 200, 0.3) 55%,
+    transparent 70%,
+    transparent 100%
+  );
+  animation: wt-golden-shimmer 3s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes wt-golden-shimmer {
+  0%   { transform: translateX(-100%) rotate(-20deg); }
+  60%  { transform: translateX(100%) rotate(-20deg); }
+  100% { transform: translateX(100%) rotate(-20deg); }
+}
+
 @utility letter-tile-gradient {
   /* Letter Tile Gradient - Bright, clean with subtle warmth */
   background: linear-gradient(165deg, #ffffff 0%, #fefefe 40%, #fafaf8 100%);

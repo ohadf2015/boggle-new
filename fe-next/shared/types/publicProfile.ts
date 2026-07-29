@@ -30,6 +30,8 @@ export interface PublicProfile {
   memberSince: string; // Month/year only (e.g., "2025-03")
   percentile: number; // Computed: top X% of players by score
   currentStreak?: number; // Daily challenge streak
+  rankedMmr?: number;
+  peakMmr?: number;
   xpByMode?: ModeXpSlice[]; // Estimated share of total XP per game mode
 }
 

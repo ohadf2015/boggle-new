@@ -253,7 +253,7 @@ export function WordTowerWheel({
               isSel
                 ? 'bg-neo-cyan text-black ring-2 ring-neo-cyan ring-offset-2 ring-offset-neo-navy'
                 : isGolden
-                  ? 'bg-gradient-to-b from-neo-yellow to-neo-orange text-black ring-2 ring-neo-yellow'
+                  ? 'bg-gradient-to-b from-neo-yellow to-neo-orange text-black ring-2 ring-neo-yellow wt-golden-shimmer'
                   : 'bg-gradient-to-b from-neo-lime-light to-neo-lime text-black active:translate-y-0.5',
             )}
             style={{ left: `${pos.x}%`, top: `${pos.y}%`, transform: 'translate(-50%,-50%)' }}

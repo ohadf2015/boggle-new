@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { router, loggedProcedure } from '../trpc';
 import { TRPCError } from '@trpc/server';
 import logger from '../../utils/logger';
-import { getTopPlayersByScore } from '../../db/queries/leaderboardQueries';
+import { getTopPlayersByScore, getTopPlayersByMmr } from '../../db/queries/leaderboardQueries';
 import { getCurrentSeasonDynamic, getSeasonRewards } from '@/lib/seasons';
 
 import { getSupabase, isSupabaseConfigured } from '../../modules/supabaseServer';
@@ -308,6 +308,23 @@ export const leaderboardRouter = router({
           tierId: row.tier_id as string,
         },
       };
+    }),
+
+  getRankedTop: loggedProcedure
+    .input(z.object({
+      limit: z.number().min(1).max(100).default(20),
+    }))
+    .query(async ({ input }) => {
+      if (!isSupabaseConfigured()) {
+        throw new TRPCError({ code: 'PRECONDITION_FAILED', message: 'Leaderboard service not available' });
+      }
+      try {
+        const entries = await getTopPlayersByMmr(input.limit);
+        return { data: entries, cached: false };
+      } catch (err) {
+        logger.error('TRPC', 'Ranked leaderboard fetch error', { error: (err as Error).message });
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to fetch ranked leaderboard' });
+      }
     }),
 });
 
