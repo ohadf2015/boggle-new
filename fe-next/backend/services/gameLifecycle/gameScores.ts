@@ -22,6 +22,9 @@ import { calculatePlayerTitles } from '../../modules/playerTitlesManager';
 import { broadcastToRoom, getGameRoom } from '../../utils/socketHelpers';
 import { isSupabaseConfigured } from '../../modules/supabaseServer';
 import { recordGameResultsToSupabase, applyBoostsToScores } from './gameResults';
+import { updateRankedMmr, fetchRankedBaselines, type RankedParticipant, type MmdDelta } from '../../modules/supabase/rankedMmr';
+import { DEFAULT_RATING, DEFAULT_RD } from '@/shared/utils/eloRating';
+import type { UserData } from './types';
 import logger from '../../utils/logger';
 
 /**
@@ -204,6 +207,57 @@ export async function calculateAndBroadcastFinalScores(
   // Broadcast results to all clients
   // Host expects 'validationComplete', players expect 'validatedScores'
   // Include duplicateRuleDisabled flag so frontend can display a notice
+  const isRanked = game.isRanked ?? false;
+
+  // Pre-calculate MMR changes for ranked games so we can include them
+  // in the broadcast payload before persisting to Supabase.
+  let mmrByUsername: Record<string, MmdDelta> = {};
+  if (isRanked && resultsWithIconAchievements.length >= 2) {
+    try {
+      const sortedForRanked = [...resultsWithIconAchievements].sort(
+        (a, b) => b.totalScore - a.totalScore
+      );
+      const playerIds = sortedForRanked
+        .map(p => (game.users?.[p.username] as UserData | undefined)?.authUserId)
+        .filter((id): id is string => !!id);
+      const baselines = await fetchRankedBaselines(playerIds);
+      const rankedParticipants: RankedParticipant[] = sortedForRanked.map((p, i) => {
+        const userData = game.users?.[p.username] as UserData | undefined;
+        const playerId = userData?.authUserId || '';
+        const baseline = baselines.get(playerId);
+        return {
+          playerId,
+          placement: i + 1,
+          score: p.totalScore,
+          currentMmr: baseline?.currentMmr ?? DEFAULT_RATING,
+          peakMmr: baseline?.peakMmr ?? DEFAULT_RATING,
+          rd: baseline?.rd ?? DEFAULT_RD,
+          gamesPlayed: baseline?.gamesPlayed ?? 0,
+          priorWins: baseline?.priorWins ?? 0,
+        };
+      }).filter(p => p.playerId);
+
+      if (rankedParticipants.length >= 2) {
+        const mmrMap = await updateRankedMmr(rankedParticipants);
+        // Convert playerId keyed map to username keyed for the client
+        mmrByUsername = Object.fromEntries(
+          [...rankedParticipants]
+            .filter(p => {
+              const username = sortedForRanked[rankedParticipants.indexOf(p)]?.username;
+              return !!username;
+            })
+            .map(p => {
+              const delta = mmrMap.get(p.playerId);
+              const username = sortedForRanked[rankedParticipants.indexOf(p)]!.username;
+              return [username, delta ?? { oldMmr: 0, newMmr: 0, delta: 0 }];
+            })
+        );
+      }
+    } catch (err) {
+      logger.warn('RANKED_MMR', `Failed to pre-calc MMR for ${gameCode}: ${(err as Error).message}`);
+    }
+  }
+
   const resultsPayload = {
     scores: resultsWithIconAchievements,
     letterGrid: game.letterGrid,
@@ -217,6 +271,8 @@ export async function calculateAndBroadcastFinalScores(
     blastSummary,
     wheelRushSummary,
     tvMode: game.tvMode ?? false,
+    isRanked,
+    mmrChanges: mmrByUsername,
   };
   // Cache results on game state so reconnecting clients can retrieve them
   game.cachedResultsPayload = resultsPayload;
@@ -226,6 +282,15 @@ export async function calculateAndBroadcastFinalScores(
 
   // Record to database
   if (isSupabaseConfigured()) {
-    await recordGameResultsToSupabase(io, gameCode, resultsWithIconAchievements, game);
+    // Convert mmrByUsername (username-keyed) to Map<string, MmdDelta> (playerId-keyed)
+    // for the recordGameResultsToSupabase function
+    const mmrDeltasByPlayerId = new Map<string, MmdDelta>();
+    for (const [username, delta] of Object.entries(mmrByUsername)) {
+      const userData = game.users?.[username] as UserData | undefined;
+      if (userData?.authUserId) {
+        mmrDeltasByPlayerId.set(userData.authUserId, delta);
+      }
+    }
+    await recordGameResultsToSupabase(io, gameCode, resultsWithIconAchievements, game, mmrDeltasByPlayerId);
   }
 }

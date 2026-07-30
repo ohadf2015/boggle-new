@@ -28,6 +28,7 @@ import { createEarthquakeSocketHandlers } from '@/shared/utils/earthquakeSocketH
 import logger from '@/utils/logger';
 import { addGameBreadcrumb } from '@/utils/sentry';
 import type { GameTimerReturn } from '@/hooks/useGameTimer';
+import { setMmdChanges } from '@/lib/results/rankedResultStore';
 
 interface StartGameBroadcastExt extends StartGameBroadcast {
   gameSessionId?: number;
@@ -57,6 +58,8 @@ interface ValidatedScoresPayload {
   blastSummary?: BlastSummary;
   wheelRushSummary?: WheelRushSummary;
   tvMode?: boolean;
+  isRanked?: boolean;
+  mmrChanges?: Record<string, { oldMmr: number; newMmr: number; delta: number }>;
 }
 
 interface WordHuntSummary {
@@ -103,6 +106,8 @@ export interface OnShowResultsData {
   wordHuntSummary?: WordHuntSummary;
   blastSummary?: BlastSummary;
   wheelRushSummary?: WheelRushSummary;
+  isRanked?: boolean;
+  mmrChanges?: Record<string, { oldMmr: number; newMmr: number; delta: number }>;
 }
 
 interface UsePlayerGameEventsProps {
@@ -633,6 +638,8 @@ export function usePlayerGameEvents({
           wordHuntSummary: data.wordHuntSummary,
           blastSummary: data.blastSummary,
           wheelRushSummary: data.wheelRushSummary,
+          isRanked: data.isRanked,
+          mmrChanges: data.mmrChanges,
         });
       }
     };
@@ -671,6 +678,11 @@ export function usePlayerGameEvents({
       if (resultsTimeoutId) { clearTimeout(resultsTimeoutId); resultsTimeoutId = null; }
 
       logger.log('[PLAYER] Received validatedScores event:', data);
+
+      // Store MMR changes for the results page to display
+      if (data.mmrChanges) {
+        setMmdChanges(data.mmrChanges);
+      }
 
       // If TV mode active, defer showing results until host signals reveal is done
       if (data.tvMode && !tvRevealedBeforeData) {

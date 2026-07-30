@@ -56,9 +56,22 @@ afterEach(() => {
 });
 
 describe('AndroidAppInstallPromo', () => {
+  // The auto-popup countdown is interaction-gated (LCP guard): it only arms
+  // after the visitor's first pointerdown/keydown. Tests simulate the tap.
+  const tap = () => {
+    act(() => {
+      fireEvent.pointerDown(window);
+    });
+  };
+
   it('shows the promo after the delay on an Android web browser', async () => {
     render(<AndroidAppInstallPromo />);
-    // Resolve the install probe + fire the delayed open.
+    // Resolve the install probe + arm the interaction listener.
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    tap();
+    // Fire the delayed open.
     await act(async () => {
       await vi.runAllTimersAsync();
     });
@@ -70,6 +83,10 @@ describe('AndroidAppInstallPromo', () => {
 
   it('navigates to the Play Store (with install referrer) and records dismissal on install click', async () => {
     render(<AndroidAppInstallPromo />);
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    tap();
     await act(async () => {
       await vi.runAllTimersAsync();
     });
@@ -87,6 +104,10 @@ describe('AndroidAppInstallPromo', () => {
 
   it('records a 14-day dismissal and collapses to the session pill on "not now"', async () => {
     render(<AndroidAppInstallPromo />);
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    tap();
     await act(async () => {
       await vi.runAllTimersAsync();
     });
@@ -136,5 +157,21 @@ describe('AndroidAppInstallPromo', () => {
       await vi.runAllTimersAsync();
     });
     expect(screen.queryByText('androidAppPromo.title')).not.toBeInTheDocument();
+  });
+
+  it('LCP guard: never opens for a passive visitor, opens after first interaction', async () => {
+    render(<AndroidAppInstallPromo />);
+    // Probe resolves and the full delay elapses with no interaction — the
+    // countdown never arms, so no popup (this is the PSI/Lighthouse visitor).
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    expect(screen.queryByText('androidAppPromo.title')).not.toBeInTheDocument();
+    // First tap arms the countdown; the popup opens after the delay.
+    tap();
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    expect(screen.getByText('androidAppPromo.title')).toBeInTheDocument();
   });
 });

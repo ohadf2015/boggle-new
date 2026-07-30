@@ -21,6 +21,7 @@ import { isHallOfFameAchievement } from '@/utils/achievementTiers';
 import { getAchievementIcon } from '@/constants/achievementIcons';
 import { createClient } from '@/utils/supabase/client';
 import type { PublicProfile } from '@/shared/types/publicProfile';
+import { RankBadge } from '@/components/results/MmrChangeBadge';
 
 type FriendshipState = 'none' | 'pending' | 'accepted' | 'blocked' | 'loading';
 
@@ -208,6 +209,13 @@ export default function PlayerProfilePageClient() {
                 </span>
               )}
             </div>
+
+            {/* Ranked MMR badge */}
+            {(profile.rankedMmr ?? 0) > 0 && (
+              <div className="mt-2">
+                <RankBadge mmr={profile.rankedMmr!} />
+              </div>
+            )}
 
             {/* Member since */}
             <div className="flex items-center gap-1.5 mt-2 text-xs text-slate-500">
