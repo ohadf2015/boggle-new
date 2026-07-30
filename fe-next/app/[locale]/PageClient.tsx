@@ -160,10 +160,19 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   // Instrument landing page views — fires once after hydration on the real
   // homepage (not redirects, not crawlers). Fills the funnel's top-step gap
   // (landing_view = 0 in PostHog because no call site existed here before).
+  //
+  // Also fires `return_visit` for returning users (the D1 retention funnel's
+  // terminal event). Without this, PostHog cannot compute signup→first-game→D1
+  // return — the retention funnel was blank (baseline ~20% D1 measured anecdotally
+  // from Supabase, not PostHog). Fires on every landing page view for returning
+  // users, so PostHog's retention/trends compute the daily active returning cohort.
   useEffect(() => {
     if (!mounted || inviteRedirectUrl || qrRedirectUrl) return;
     if (isCrawler()) return;
     trackGrowthEvent('landing_view', { is_new_user: isNewUser });
+    if (!isNewUser) {
+      trackGrowthEvent('return_visit', {});
+    }
   }, [mounted, inviteRedirectUrl, qrRedirectUrl, isNewUser]);
   // Defensive route allowlist: FTUE may only render on locale homepage.
   // PageClient is mounted only at /[locale]/page.tsx today, so this is dormant

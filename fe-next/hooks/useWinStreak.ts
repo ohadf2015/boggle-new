@@ -18,6 +18,7 @@ import {
   getStreakCoinBonusPercent,
   getNextTierInfo,
 } from '@/lib/streakTierRewards';
+import { emitStreakLifecycle } from '@/utils/dailyChallenge/streakTelemetry';
 
 const STREAK_KEY = 'lexiclash_win_streak';
 const STREAK_DATE_KEY = 'lexiclash_streak_date';
@@ -442,6 +443,17 @@ export const useWinStreak = () => {
     saveStreakData(newData);
     debugLogLocalStorage('After saveStreakData in recordWin');
     setStreakData(newData);
+
+    // Emit streak lifecycle to PostHog — the daily play streak was invisible
+    // to analytics (no `streak_continued`/`streak_broken` events). Without this,
+    // PostHog's retention graphs cannot correlate streak engagement with D1
+    // return. The existing `trackStreakMilestone` in useResultsSideEffects
+    // handles milestone events separately.
+    emitStreakLifecycle({
+      outcome: currentData.isStreakActive && !currentData.streakBroken ? 'continued' : 'started',
+      newStreak,
+      milestone: null,
+    });
 
     // Fire-and-forget server sync for authenticated users
     if (isAuthenticated && user?.id) {
