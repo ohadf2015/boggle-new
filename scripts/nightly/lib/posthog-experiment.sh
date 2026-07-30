@@ -97,10 +97,28 @@ ph_exp_ensure() {
   _err "create failed for $key: $(echo "$resp" | jq -rc '.detail // .type // "unknown"' 2>/dev/null | head -c 200)"
 }
 
+# ph_exp_deactivate <key> → idempotent PATCH active:false. For zombie flags (0 code
+# call sites, no typed experiment entry): reversible soft-kill, never a hard delete.
+ph_exp_deactivate() {
+  local key="$1" id resp
+  [ -n "$key" ] || _err "usage: deactivate <key>"
+  id=$("$PH_CURL" -s -m 30 "$HOST/api/projects/$PID/feature_flags/?limit=200" \
+        -H "Authorization: Bearer $KEY" 2>/dev/null | jq -r --arg k "$key" '.results[]? | select(.key == $k) | .id' | head -1)
+  [ -n "$id" ] || _out "{\"status\":\"not_found\",\"key\":\"$key\"}"
+  resp=$("$PH_CURL" -s -m 30 -X PATCH "$HOST/api/projects/$PID/feature_flags/$id/" \
+          -H "Authorization: Bearer $KEY" -H "Content-Type: application/json" \
+          -d '{"active":false}' 2>/dev/null)
+  if echo "$resp" | jq -e '.active == false' >/dev/null 2>&1; then
+    _out "{\"status\":\"deactivated\",\"key\":\"$key\",\"id\":$id}"
+  fi
+  _err "deactivate failed for $key: $(echo "$resp" | jq -rc '.detail // .type // "unknown"' 2>/dev/null | head -c 200)"
+}
+
 MODE="${1:-}"; shift || true
 case "$MODE" in
-  payload) _ph_exp_payload "${1:?key}" "${2:?variantA}" "${3:?variantB}" "${4:-}" ;;
-  exists)  [ -n "$KEY" ] || _err "POSTHOG_PERSONAL_API_KEY unset"; [ -n "$PID" ] || _err "POSTHOG_PROJECT_ID unset"; ph_exp_exists "${1:?key}" ;;
-  ensure)  [ -n "$KEY" ] || _err "POSTHOG_PERSONAL_API_KEY unset"; [ -n "$PID" ] || _err "POSTHOG_PROJECT_ID unset"; ph_exp_ensure "${1:-}" "${2:-}" "${3:-}" "${4:-}" ;;
-  *)       _err "usage: posthog-experiment.sh ensure <key> <vA> <vB> [desc] | exists <key> | payload <key> <vA> <vB> [d]" ;;
+  payload)     _ph_exp_payload "${1:?key}" "${2:?variantA}" "${3:?variantB}" "${4:-}" ;;
+  exists)      [ -n "$KEY" ] || _err "POSTHOG_PERSONAL_API_KEY unset"; [ -n "$PID" ] || _err "POSTHOG_PROJECT_ID unset"; ph_exp_exists "${1:?key}" ;;
+  ensure)      [ -n "$KEY" ] || _err "POSTHOG_PERSONAL_API_KEY unset"; [ -n "$PID" ] || _err "POSTHOG_PROJECT_ID unset"; ph_exp_ensure "${1:-}" "${2:-}" "${3:-}" "${4:-}" ;;
+  deactivate)  [ -n "$KEY" ] || _err "POSTHOG_PERSONAL_API_KEY unset"; [ -n "$PID" ] || _err "POSTHOG_PROJECT_ID unset"; ph_exp_deactivate "${1:-}" ;;
+  *)           _err "usage: posthog-experiment.sh ensure <key> <vA> <vB> [desc] | exists <key> | payload <key> <vA> <vB> [d] | deactivate <key>" ;;
 esac

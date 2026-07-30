@@ -210,7 +210,6 @@ export function startMemoryWatchdog(
         .map((s) => `${s.space_name.replace(/_space$/, '')}=${mb(s.space_used_size)}`)
         .join(' ');
       // Handle count catches interval/timer leaks (each leaked setInterval is a handle).
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const handles = (process as any)._getActiveHandles?.()?.length ?? -1;
       logger.info(
         'MEMWATCH',

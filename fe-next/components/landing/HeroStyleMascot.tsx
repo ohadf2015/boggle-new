@@ -32,6 +32,7 @@ function AnimatedHeroMascot({ isMobilePortrait, energetic }: HeroStyleMascotProp
       clickVariant="celebrating"
       clickAnimation="bounce"
       priority
+      fetchPriority="high"
       delay={0.1}
     />
   );

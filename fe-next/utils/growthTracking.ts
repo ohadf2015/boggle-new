@@ -16,6 +16,7 @@ import {
   saveJsonToLocalStorage,
 } from '@/utils/storageHelpers';
 import { incrementGamesCompletedCount } from '@/utils/gamesCompletedCount';
+import { incrementGamesPlayed } from '@/utils/pushNotifications';
 import posthog from '@/lib/analytics/lazyPosthog';
 import {
   setPostHogUserProps,
@@ -1048,6 +1049,7 @@ export const trackGameEnd = (
   // (e.g. "players with ≥10 games" × "first_mode_played = adventure").
   if (completed) {
     incrementGamesCompletedCount();
+    incrementGamesPlayed();
     incrementPostHogUserProp('total_games_played', 1);
     if (wordCount > 0) incrementPostHogUserProp('total_words_found', wordCount);
     setPostHogUserProps({
