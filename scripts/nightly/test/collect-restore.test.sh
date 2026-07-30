@@ -37,6 +37,22 @@ assert "evidence has restore cmd"    'jq -re ".signals[0].evidence" "$OUT" | gre
 assert "evidence has backup dir"     'jq -re ".signals[0].evidence" "$OUT" | grep -q "salvaged-code-20260702"'
 assert "fingerprint stable"          'jq -re ".signals[0].fingerprint" "$OUT" | grep -qx "restore:20260702-010005"'
 
+echo "collect-restore: age escalation (fresh vs stale)"
+Q2="$ROOT/restore-queue-age.ndjson"
+TODAY=$(date +%Y-%m-%d)
+OLD=$(date -j -v-5d +%Y-%m-%d 2>/dev/null || date -d "5 days ago" +%Y-%m-%d 2>/dev/null || echo "2000-01-01")
+cat > "$Q2" <<NDJSON
+{"tag":"fresh-tag","date":"$TODAY","files":["fe-next/f.tsx"],"backup":"/logs/salvaged-code-fresh","reason":"docs-only salvage: gate failed"}
+{"tag":"stale-tag","date":"$OLD","files":["fe-next/s.tsx"],"backup":"/logs/salvaged-code-stale","reason":"docs-only salvage: gate failed"}
+NDJSON
+rm -f "$OUT"
+RESTORE_QUEUE_FILE="$Q2" bash "$DIR/collect-restore.sh" >/dev/null 2>&1
+assert "fresh entry stays severity 0.95"  '[ "$(jq -r ".signals[] | select(.fingerprint==\"restore:fresh-tag\") | .severity" "$OUT")" = "0.95" ]'
+assert "fresh title not marked STALE"      '! jq -re ".signals[] | select(.fingerprint==\"restore:fresh-tag\") | .title" "$OUT" | grep -q "STALE"'
+assert "stale entry escalated to 0.99"     '[ "$(jq -r ".signals[] | select(.fingerprint==\"restore:stale-tag\") | .severity" "$OUT")" = "0.99" ]'
+assert "stale title marked STALE"          'jq -re ".signals[] | select(.fingerprint==\"restore:stale-tag\") | .title" "$OUT" | grep -q "STALE RESTORE"'
+assert "stale evidence flags Class 4"      'jq -re ".signals[] | select(.fingerprint==\"restore:stale-tag\") | .evidence" "$OUT" | grep -q "Class 4"'
+
 echo "collect-restore: missing queue file"
 rm -f "$OUT"
 RESTORE_QUEUE_FILE="$ROOT/none.ndjson" bash "$DIR/collect-restore.sh" >/dev/null 2>&1; rc=$?
