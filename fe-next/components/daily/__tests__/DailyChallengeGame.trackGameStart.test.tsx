@@ -30,6 +30,7 @@ vi.mock('framer-motion', () => {
           const { initial, animate, exit, whileHover, whileTap, transition, variants, ...rest } = props as Record<string, unknown>;
           return <div {...rest}>{children}</div>;
         };
+        Component.displayName = `motion.${String(tag)}`;
         cache.set(tag, Component);
       }
       return Component;
