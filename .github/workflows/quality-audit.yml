@@ -1,0 +1,131 @@
+name: Quality Audit (bundle + lighthouse)
+
+# Moved out of ci.yml 2026-07-31: these two jobs alone cost ~37min of Actions
+# runner time per CI run (bundle-analysis ~22.5min, lighthouse ~14.8min), and
+# ci.yml runs ~14x/day (mostly direct pushes from the nightly automation loop,
+# not PRs) -- that's roughly 40k of the account's 40k+ monthly Actions minutes.
+# They're audits of the current state of master, not per-commit gates, so a
+# nightly run is enough signal without paying per-push.
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch: {}
+
+env:
+  NODE_VERSION: '20'
+  CACHE_PREFIX: v1
+
+jobs:
+  bundle-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            fe-next/node_modules
+            ~/.npm
+          key: ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-${{ hashFiles('fe-next/package-lock.json') }}
+          restore-keys: |
+            ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-
+          fail-on-cache-miss: false
+
+      - name: Install if cache miss
+        working-directory: fe-next
+        run: |
+          if [ ! -d "node_modules" ]; then
+            npm ci --prefer-offline --no-audit
+          fi
+
+      - name: Cache Next.js build
+        uses: actions/cache@v4
+        with:
+          path: |
+            fe-next/.next/cache
+          key: ${{ runner.os }}-nextjs-analyze-${{ hashFiles('fe-next/package-lock.json') }}-${{ hashFiles('fe-next/**/*.ts', 'fe-next/**/*.tsx') }}
+          restore-keys: |
+            ${{ runner.os }}-nextjs-analyze-${{ hashFiles('fe-next/package-lock.json') }}-
+
+      - name: Build with bundle analysis
+        working-directory: fe-next
+        run: npm run build:analyze
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Check bundle sizes
+        working-directory: fe-next
+        run: |
+          # Find the largest chunks in the build
+          echo "## Bundle Size Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Find .js files in .next/static/chunks and report sizes
+          echo "### Top 10 Largest Chunks" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          find .next/static/chunks -type f -name "*.js" -exec ls -lh {} \; | \
+            awk '{print $5, $NF}' | sort -rh | head -10 >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload bundle analysis report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bundle-analysis
+          path: |
+            fe-next/.next/analyze/
+            fe-next/.next/static/
+          retention-days: 30
+        continue-on-error: true
+
+  lighthouse:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Restore node_modules cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            fe-next/node_modules
+            ~/.npm
+          key: ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-${{ hashFiles('fe-next/package-lock.json') }}
+          restore-keys: |
+            ${{ env.CACHE_PREFIX }}-deps-${{ runner.os }}-
+          fail-on-cache-miss: false
+
+      - name: Install if cache miss
+        working-directory: fe-next
+        run: |
+          if [ ! -d "node_modules" ]; then
+            npm ci --prefer-offline --no-audit
+          fi
+
+      - name: Build
+        working-directory: fe-next
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+      - name: Run Lighthouse CI
+        working-directory: fe-next
+        run: npm run lighthouse:ci
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
