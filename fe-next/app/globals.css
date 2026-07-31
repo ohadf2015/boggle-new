@@ -2478,7 +2478,7 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
        each is generous headroom while making a runaway reservation impossible.
        On web both vars are 0px, so the clamps are no-ops there. */
     --bottom-stack-height: calc(
-      min(var(--bottom-nav-height, 0px), 120px) +
+      max(16px, min(var(--bottom-nav-height, 0px), 120px)) +
         min(var(--admob-banner-height, 0px), 120px) +
         min(var(--web-anchor-ad-height, 0px), 120px)
     );
