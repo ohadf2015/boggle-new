@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/utils/growthTracking.ts, fe-next/app/[locale]/multiplayer/useMultiplayerJoin.ts, docs/nightly/impact-ledger.ndjson, docs/nightly/reports/2026-07-31.md
+next_steps: query mp_lobby_join_timeout vs mp_lobby_join_resolved after a few days to size the MP connecting-phase stall for the human-queued RoomListView skeleton fix (MP CLS 0.92). exp-mp-quickplay-eager-disable-v1 (created 07-29) is 2 days old — too early for hygiene decision, revisit in ~5 more nights. No new experiment flag shipped this run (chose root-cause instrumentation over another UI variant on an already-tried-and-reverted surface).
