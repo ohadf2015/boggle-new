@@ -1,6 +1,5 @@
 import {
   generateShareText,
-  generateEmojiGrid,
   type ShareParams,
 } from '../shareResultGenerator';
 
@@ -137,26 +136,29 @@ describe('generateShareText', () => {
   });
 });
 
-describe('generateEmojiGrid', () => {
-  it('should generate green squares for found words based on length', () => {
-    const result = generateEmojiGrid([
-      { word: 'CAT', found: true },
-      { word: 'DOG', found: true },
-    ]);
+/**
+ * LexiClash never ships a Wordle-style emoji grid. Our share artifact is the
+ * avatar-and-rival brag card (components/results/MpBragCard) — coloured squares
+ * are someone else's signature and say nothing about who you beat. The grid
+ * builder is gone; this fails if any of it grows back.
+ */
+describe('share text never contains a Wordle-style emoji grid', () => {
+  const t = (k: string) => k;
+  const GRID_GLYPHS = ['\u{1F7E9}', '\u{2B1B}', '\u{1F7E8}', '\u{2B1C}', '\u{1F7E6}', '\u{1F7EA}'];
 
-    expect(result).toBe('🟩🟩🟩\n🟩🟩🟩');
-  });
+  it.each(['singleplayer', 'multiplayer', 'blast', 'daily', 'adventure', 'wordHunt'] as const)(
+    'emits no grid squares for %s',
+    (gameMode) => {
+      const result = generateShareText(
+        { gameMode, score: 120, wordsFound: 9, longestWord: 'ELEPHANT', maxCombo: 4, won: true, opponentScore: 90 },
+        t
+      );
+      for (const glyph of GRID_GLYPHS) expect(result).not.toContain(glyph);
+    }
+  );
 
-  it('should generate black squares for missed words', () => {
-    const result = generateEmojiGrid([
-      { word: 'CAT', found: true },
-      { word: 'LONG', found: false },
-    ]);
-
-    expect(result).toBe('🟩🟩🟩\n⬛⬛⬛⬛');
-  });
-
-  it('should return empty string for empty array', () => {
-    expect(generateEmojiGrid([])).toBe('');
+  it('has no grid builder left to call', async () => {
+    const mod = await import('../shareResultGenerator');
+    expect('generateEmojiGrid' in mod).toBe(false);
   });
 });

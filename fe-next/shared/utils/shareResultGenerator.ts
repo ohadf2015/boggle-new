@@ -21,7 +21,6 @@ export interface ShareParams {
   opponentScore?: number;
   level?: number;
   puzzleNumber?: number;
-  words?: Array<{ word: string; found: boolean }>;
 }
 
 type TFunction = (key: string) => string;
@@ -45,12 +44,12 @@ export function generateShareText(params: ShareParams, t: TFunction): string {
 
   lines.push(header);
 
-  // Emoji grid if words provided. Multiplayer uses the screenshot-first BragCard
-  // instead — a Wordle-style grid is meaningless for head-to-head, so never emit
-  // it for MP (defensive: MP already passes no `words`).
-  if (params.words && params.words.length > 0 && params.gameMode !== 'multiplayer') {
-    lines.push(generateEmojiGrid(params.words));
-  }
+  // NO emoji grid. Coloured squares are Wordle's signature, not ours, and they
+  // say nothing about who you played or beat. Our share artifact is the
+  // avatar-and-rival brag card (components/results/MpBragCard) — the text here
+  // is only the caption that travels with it. The grid builder and the `words`
+  // param that fed it are deleted rather than left behind a flag; no caller ever
+  // passed `words`, so this emitted nothing anywhere. Guarded by a test.
 
   // Stats line
   const stats: string[] = [];
@@ -83,13 +82,4 @@ export function generateShareText(params: ShareParams, t: TFunction): string {
   lines.push('lexiclash.live');
 
   return lines.join('\n');
-}
-
-export function generateEmojiGrid(words: Array<{ word: string; found: boolean }>): string {
-  return words
-    .map((entry) => {
-      const square = entry.found ? '🟩' : '⬛';
-      return square.repeat(entry.word.length);
-    })
-    .join('\n');
 }
