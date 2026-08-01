@@ -4,6 +4,17 @@ Items deferred from automated nightly triage. Human review required.
 
 ---
 
+## 2026-08-01
+
+### [Flag Health] lane-03 sweep — all 21 `exp-*` keys already wired + flagged live
+- Swept every `'exp-...'` key in `lib/experiments.ts` (21 total) against live PostHog flag list (`posthog-query.sh flags`) and call-site grep. All 21 have a matching active PostHog flag AND ≥1 non-test call site — nothing unwired found tonight (prior "unwired" list from 2026-06-16 memory — `exp-practice-wheel-cta-v1`, `exp-game-abandon-confirm-v1`, `exp-mp-round-feedback-top-v1` — is now stale, all three wired: `hooks/usePracticeWheelRetryCta.ts`, `hooks/useQuitConfirmDescription.ts`, `components/results/ResultsMainContent.tsx`). No `ensure` calls needed.
+- 3 flags already `active:false` (decided/retired, no action): `exp-mp-lobby-connect-feedback-v1` (reverted 07-26, in memory), `exp-mp-room-join-loading-v1`, `exp-blast-wave-banner-v1`.
+- Recommended owner: none — informational, closes a stale memory item.
+
+### [Investigation needed] Rage clicks — ES `/multiplayer`, HE `/` homepage, EN `/multiplayer?room=W8T4WG`
+- Tonight's intelligence brief flagged 3 rage-click surfaces (score 0.75, 0.75, 0.51) but gave no session-recording/element detail — root cause needs a HogQL query against `$rageclick` events (element selector, session recording ID) before a safe code fix can be scoped. Ran out of lane time budget before that query.
+- Recommended owner: lane-02 (perf) or lane-03 tomorrow — pull `SELECT properties.$el_text, properties.$session_id FROM events WHERE event='$rageclick' AND properties.$current_url LIKE '%multiplayer%'` (last 24h) to identify the exact clicked element, then decide fix vs new experiment.
+
 ## 2026-07-13 (correction — stale doc, verified against live PostHog)
 
 ### [Correction] exp-mp-quickplay-wait-v1 / exp-invite-arrival-clarity-v1 — flags DO exist, do not re-flag
@@ -1895,3 +1906,68 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred — impact confirmed improved in last run (verdict: improved, 0 new occurrences). Monitor.
   - why: low reach (0 users), likely transient DB connection drop; monitor for recurrence
   - recommended owner: self
+
+## 2026-07-30
+- [PostHog] TypeError: Failed to fetch (issue 019f34a3-12d0-7820-a7d2-4b2d22556c1e)
+  - reach=2, severity=1, /en/practice/classic, Android Chrome, unhandled, no in-app stack frame captured
+  - link: https://eu.posthog.com/project/151059/error_tracking/019f34a3-12d0-7820-a7d2-4b2d22556c1e
+  - status: deferred
+  - why: generic network-fetch rejection with zero stack frames -- can't pinpoint which fetch() call lacks a catch without a source frame; reach too low (2) to justify a blind guess-fix
+  - recommended owner: review-by-eod (if reach grows next audit, escalate)
+- [Sentry|Supabase] MCP servers never connected this run (both absent from ToolSearch after repeated checks)
+  - status: deferred
+  - why: can't pull Sentry issue detail or Supabase advisors without the tool; matches known recurring issue (see nightly-learnings "Supabase MCP down" escalating watch)
+  - recommended owner: human (mint never-expire Supabase PAT per standing ask; check Sentry MCP npx boot)
+- [PostHog] Brain Drill `drill_completed` event stopped firing entirely since 2026-07-22 (was low but present: 1-5/day back to 07-10)
+  - status: shipped (impact-ledger verdict only, no code change -- see ledger id 01-triage-2026-07-26-brain-drill-word-replay)
+  - why: predates the 07-26 word-replay ship so not caused by tonight's brief item, but 8 straight zero-days on a mode's completion event is worth a look -- ambiguous whether it's a genuine bug in app/api/drills/submit or just Brain Drill traffic drying up
+  - recommended owner: review-by-eod
+
+## 2026-07-30
+
+### [Flag Retirement] exp-mp-room-join-loading-v1 — zombie, deactivated
+- Created 2026-07-05 (per 07-04 entry above, shipped that night), rollout 100%. Grepped 2026-07-30: **0 call sites** in `fe-next` (not in `experiments.ts`, not referenced anywhere) — the wiring was removed at some point without retiring the flag. Flagged unactioned 4 nights running (07-21..24 per nightly-learnings).
+- Action taken: deactivated via `posthog-experiment.sh deactivate exp-mp-room-join-loading-v1` (soft-kill, `active:false`, reversible — not deleted). id=219697.
+- Recommended owner: human — delete the flag entirely from PostHog once confirmed no dashboards reference it.
+
+### [Flag Retirement] exp-wordwheel-drag-hint-v1 — 31 days, inconclusive at current volume
+- Created 2026-06-29, active, rollout 100%, wired in `components/daily/WordWheelGame.tsx`. Targets exactly this run's #1 brief item (rage clicks on `/daily/word-wheel`).
+- 14-day rageclick count by variant: control=8, drag-hint=4 (directionally favors drag-hint but n=12 total events — nowhere near the 1000/arm significance bar for a retirement decision).
+- Recommended owner: human — check PostHog experiment-results panel for the actual primary metric (completion/abandonment) sample size; if still <1000/arm after 31 days, consider raising rollout share or picking a louder primary metric.
+
+## 2026-07-31
+- [Supabase] Signed-In Users Can Execute SECURITY DEFINER Function `upsert_push_token`
+  - advisor: authenticated_security_definer_function_executable
+  - status: verified safe, no change — checked function body: all INSERT/UPDATE scoped to `auth.uid()`, no caller-supplied user_id param, `search_path=''` already set. Advisor is a generic heuristic false-positive here; REVOKE would break push-token registration for all users (large blast radius, not reversible-cheap).
+  - recommended owner: none — close finding
+- [PostHog] TypeError: Load failed / Failed to fetch — /en/multiplayer
+  - issue 019f34a3-12d0-7820-a7d2-4b2d22556c1e, 17 occurrences/22d, 3 users, last seen 2026-07-30T22:06
+  - evidence: https://eu.posthog.com/project/151059/error_tracking/019f34a3-12d0-7820-a7d2-4b2d22556c1e
+  - 3 sampled events = same distinct_id, 2min apart (retry burst) on /en/multiplayer. Stack unresolvable (sourcemaps missing for chunks d320e741 + 32162). Looks like flaky-network fetch abort (socket.io polling or an API call), not a deterministic bug.
+  - status: deferred — needs sourcemap upload or app-code repro to pin the actual fetch call before a fix is safe
+  - why: ambiguous root cause, no resolvable stacktrace
+  - recommended owner: self (lane 01/02, next occurrence)
+- [PostHog] React error #418 (hydration mismatch) — 3 separate issues on `/`, `/he`, `/en/multiplayer`
+  - issues: 019f4747-c11b-7430-8ac2-882649b49cbd (reach 4), 019f185d-dc16-7bf0-8ff4-7390159a8048 (reach 2), 019f70e5-16a9-7522-a7bf-185c6b540003 (reach 3)
+  - Minified React prod errors carry no useful stack frames — can't localize the mismatching component from PostHog data alone. Spans both landing (/,/he) and MP lobby.
+  - status: deferred — needs local repro (throttled/SSR vs CSR diff) per page, out of scope for tonight's window
+  - why: needs design/repro time, ambiguous root cause
+  - recommended owner: self (lane 02 perf or lane 11 mode-qa, has more budget for repro)
+- [Sentry] Error: Connection is closed. (JAVASCRIPT-NEXTJS-1WM)
+  - 711 occurrences but STALE (last seen 2026-07-22, 0 users impacted) — ioredis `publish()` racing a Redis reconnect during `broadcastActiveRooms`. Brief's issues_24h reach=0 confirms no new impact.
+  - status: deferred — not actionable tonight (stale, 0 users), low priority
+  - recommended owner: self, low priority
+- [Sentry] Error: "CapacitorGameConnect.then()" is not implemented on android (JAVASCRIPT-NEXTJS-1PH)
+  - STALE — last seen 2026-07-05, predates the 2026-07-05 fix (`utils/nativePGS.ts` boolean-return guard, see memory sentry-capacitor-thenable-proxy-1PH-2026-07-05). Code already correct. Brief is surfacing an old unresolved-but-dead Sentry issue.
+  - status: no code change needed — issue is stale/already-fixed, just needs manual "Resolve" in Sentry UI (not done here, no write tool used)
+  - recommended owner: none
+- [Player report] "הכפתור של הווליום מסתיר את הניקוד" (volume button hides the score) — /he/daily/word-hunt
+  - `components/InGameAudioButton.tsx:47-50`: fixed top-left in RTL (`isRTL ? left-[...] : right-[...]`), z-[70]. Plausible overlap with a top-left score/HUD element in Hebrew daily Word Hunt, but couldn't visually confirm layout in time budget.
+  - status: deferred — needs a screenshot/live check (RTL) before a positioning fix, don't guess z-index/offset blind
+  - recommended owner: self (lane 05 landing or lane 11, has agent-browser access)
+
+## 2026-08-01
+- [Nightly gate] Missing `html2canvas` in node_modules despite package.json/lockfile entry — pre-existing baseline break, blocks whole-repo tsc every night this file is touched (`components/feedback/ReportBugModal.tsx` TS2307/TS2345)
+  - status: deferred
+  - why: repeated `npm install html2canvas` attempts hit ENOTEMPTY renaming stale `@rolldown`/`@unrs` wasm32-wasi optional-binding directories left over from a prior interrupted install — deeper node_modules repair (or a clean `npm ci`) needed, out of scope/time for this lane
+  - recommended owner: lane 02 perf or a dedicated `npm ci` pass (do NOT retry piecemeal `npm install <pkg>` — it re-triggers the same rename race)

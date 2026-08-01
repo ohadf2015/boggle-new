@@ -1,0 +1,3 @@
+status: shipped
+files_touched: docs/nightly/reports/2026-07-30.md, docs/nightly/impact-ledger.ndjson (no code changed by this lane — verified an existing uncommitted fix already present in fe-next/utils/growthTracking.ts + fe-next/utils/__tests__/growthTracking.pushPromptGamesPlayed.test.ts)
+next_steps: commit stage should pick up the pending growthTracking.ts push_prompt_shown fix (uncommitted at session start, verified correct by code inspection tonight). Next lane-12 priority: fix nightly_coverage_classify to probe growth:<event> volume before marking DEAD (backlog 33→~8 per learnings). shiritori/random per-mode completion holes too low-volume (n=1-2) to act on yet.
