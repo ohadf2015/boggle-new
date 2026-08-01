@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/utils/growthTracking.ts (wired session_start), fe-next/utils/__tests__/growthTracking.sessionStart.test.ts (new TDD test)
+next_steps: eslint on both changed files came back clean (exit 0, no errors). 36 DEAD events remain in backlog (first_word_found + hint_used checked tonight — both wired but legitimately low-traffic, not bugs). Connections impact-check verdict=neutral (1/9, unchanged) logged to impact-ledger; code already fires trackGameEnd on all terminal states, low volume is small-sample not a broken emitter. Next lane 12: diff DEAD list night-over-night to compute "newly-dead" (not done tonight, no baseline saved).
