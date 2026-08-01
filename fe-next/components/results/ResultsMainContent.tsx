@@ -398,7 +398,13 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   }, [isWordHunt, wordHuntSummary, username]);
 
   return (
-    <div className="space-y-6">
+    // Rhythm carries the hierarchy. Every block here is a bordered hard-shadow
+    // card on dark navy, so a uniform gap made ~9 of them read as one flat
+    // undifferentiated stack with nothing leading. Related blocks now sit tight
+    // (gap-3) inside a beat, and the beats are separated widely (gap-8), so the
+    // page reads as three statements — the verdict, how you played, what next —
+    // instead of nine equal cards.
+    <div className="flex flex-col gap-8">
       {/* Win streak now lives inside ImprovementPanel ("Your Progress") below —
           a single home for streak + XP + level avoids showing the streak twice. */}
 
@@ -447,9 +453,10 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           </div>
         )}
 
-      {/* ── 1. YOUR RESULT — the verdict: rank, score, gap to #1. The one big
-          standing statement; every block below references it, never restates it
-          at the same size. */}
+      {/* ══ BEAT 1 — THE VERDICT. Rank, score, where everyone landed, series
+          progress. One statement, so these sit tight together; every block
+          below references it and never restates it at the same size. */}
+      <div className="flex flex-col gap-3">
       {currentPlayerData && (
         <ResultsHeroSection
           rank={currentPlayerRank}
@@ -508,8 +515,13 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           t={t}
         />
       )}
+      </div>
 
-      {/* ── 3. HOW YOU PLAYED — best word / words found / only-you. */}
+      {/* ══ BEAT 2 — HOW YOU PLAYED + WHAT YOU EARNED. Small numbers about you:
+          the highlights strip and the XP/level/streak panel are the same kind of
+          thing, so they group as one unit rather than two separate announcements
+          competing with the verdict above. */}
+      <div className="flex flex-col gap-3">
       {currentPlayerData && (
         <HighlightsBar stats={highlightStats} />
       )}
@@ -536,6 +548,12 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           <ShareButton params={shareParams} t={t} className="shrink-0" />
         </div>
       )}
+      </div>
+
+      {/* ══ BEAT 3 — WHAT NEXT. Brag, round feedback, revenge framing and the
+          details drill-down. All optional/secondary: none of it competes with
+          the sticky play-again bar, which stays the one primary action. */}
+      <div className="flex flex-col gap-3">
 
       {/* ── 5. FLEX IT — the brag card lands AFTER result + stats + rewards, so
           sharing reads as the reward beat instead of interrupting the recap mid-
@@ -641,6 +659,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           )}
         </div>
       )}
+      </div>
     </div>
   );
 });
