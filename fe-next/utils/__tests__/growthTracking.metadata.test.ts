@@ -48,6 +48,18 @@ beforeEach(() => {
   global.fetch = vi.fn();
 });
 
+// getSessionId() fires a one-time 'session_start' event ahead of whichever
+// event a test triggers, whenever this is the first session-id generation of
+// the test run (sessionStorage isn't reset between tests). Skip it so
+// assertions target the event under test regardless of call order.
+function firstNonSessionStartCall(mockFetch: ReturnType<typeof vi.fn>) {
+  const call = mockFetch.mock.calls.find(
+    (c) => !(c[1]?.body as string | undefined)?.includes('"event_type":"session_start"')
+  );
+  if (!call) throw new Error('No non-session_start fetch call found');
+  return call;
+}
+
 describe('Analytics Metadata Enrichment', () => {
   describe('1. Platform Detection', () => {
     it('injects platform into metadata for game_completed events', async () => {
@@ -330,7 +342,7 @@ describe('Analytics Metadata Enrichment', () => {
 
       await new Promise(resolve => setTimeout(resolve, 10));
 
-      const callBody = mockFetch.mock.calls[0][1]?.body as string;
+      const callBody = firstNonSessionStartCall(mockFetch)[1]?.body as string;
       expect(callBody).toContain('"platform":"android"');
       expect(callBody).toContain('"guest_name":"Guest_Charlie"');
       expect(callBody).toContain('"errorReason":"disconnected"');
@@ -355,7 +367,7 @@ describe('Analytics Metadata Enrichment', () => {
       trackGameEnd('singleplayer', 100, 5, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const headers = mockFetch.mock.calls[0][1]?.headers as Record<string, string>;
+      const headers = firstNonSessionStartCall(mockFetch)[1]?.headers as Record<string, string>;
       expect(headers.Authorization).toBe('Bearer jwt-abc');
     });
 
@@ -376,7 +388,7 @@ describe('Analytics Metadata Enrichment', () => {
       trackGameEnd('singleplayer', 100, 5, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const headers = mockFetch.mock.calls[0][1]?.headers as Record<string, string>;
+      const headers = firstNonSessionStartCall(mockFetch)[1]?.headers as Record<string, string>;
       expect(headers.Authorization).toBeUndefined();
       expect(headers['Content-Type']).toBe('application/json');
     });
@@ -402,7 +414,7 @@ describe('Analytics Metadata Enrichment', () => {
       trackGameEnd('singleplayer', 100, 5, true);
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const body = mockFetch.mock.calls[0][1]?.body as string;
+      const body = firstNonSessionStartCall(mockFetch)[1]?.body as string;
       expect(body).toContain('"language":"he"');
     });
 
@@ -421,7 +433,7 @@ describe('Analytics Metadata Enrichment', () => {
       trackGameEnd('singleplayer', 100, 5, true, 60, { language: 'ja' });
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const body = mockFetch.mock.calls[0][1]?.body as string;
+      const body = firstNonSessionStartCall(mockFetch)[1]?.body as string;
       expect(body).toContain('"language":"ja"');
     });
   });
