@@ -109,9 +109,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
         </div>
 
         <m.div
-          initial={reduced ? false : { scale: 0.92, rotate: -2 }}
-          animate={reduced ? undefined : { scale: 1, rotate: 0 }}
-          transition={reduced ? undefined : { type: 'spring', stiffness: 180, damping: 18, delay: 0.25 }}
+          initial={false}
           className="relative mx-auto w-full max-w-sm lg:max-w-none"
         >
           <div className="relative overflow-hidden rounded-neo border-3 border-neo-black bg-gradient-to-br from-neo-navy-light to-neo-navy shadow-hard-xl">

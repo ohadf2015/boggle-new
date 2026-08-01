@@ -1,40 +1,145 @@
 {
-  "generatedAt": "2026-07-28T23:07:56.360Z",
+  "generatedAt": "2026-08-01T08:12:52.045Z",
   "commits": [
     {
-      "sha": "775a8b41d0d46dddccdcdbdebb8c116aaf68eb99",
-      "shortSha": "775a8b4",
-      "subject": "fix(mp): translate OpponentWordFeed keys in all 6 locales + keep items single-line",
+      "sha": "0ced0a276e54610f5bc496311431ad441d7dbdf1",
+      "shortSha": "0ced0a2",
+      "subject": "chore(nightly): autonomous improvement loop 2026-08-01",
       "author": "Ohad Fisher",
-      "date": "2026-07-28T21:41:06+00:00"
+      "date": "2026-08-01T05:57:11+03:00"
     },
     {
-      "sha": "b725b9e7b967bc767fdc1ce6559d6254ef7a054e",
-      "shortSha": "b725b9e",
-      "subject": "fix(feedback): raise FeedbackWidget above z-[100] full-screen layers",
+      "sha": "8000fc35b1382937985b2d7485f0aa916b6e792d",
+      "shortSha": "8000fc3",
+      "subject": "ci: move bundle-analysis + lighthouse to a nightly schedule",
       "author": "Ohad Fisher",
-      "date": "2026-07-28T21:03:11+00:00"
+      "date": "2026-07-31T13:15:22+03:00"
     },
     {
-      "sha": "cd089172295f97e259d163779e7eabe7487ce4d9",
-      "shortSha": "cd08917",
-      "subject": "fix(feedback): drop client-side feedback_submitted capture (now server-side)",
+      "sha": "75bec28535aa4b73f8f2ae26138ef8fc36248575",
+      "shortSha": "75bec28",
+      "subject": "fix: ensure last leaderboard item is fully visible on mobile",
       "author": "Ohad Fisher",
-      "date": "2026-07-28T20:56:04+00:00"
+      "date": "2026-07-31T09:15:05Z"
     },
     {
-      "sha": "e5de55068db1a982519891dd800c0a3af289d062",
-      "shortSha": "e5de550",
-      "subject": "feat(feedback): floating user-feedback widget piping into feedback-devtools",
+      "sha": "2ce178911eb3d460402582ff982dc35458575c68",
+      "shortSha": "2ce1789",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-31",
       "author": "Ohad Fisher",
-      "date": "2026-07-28T18:09:22+00:00"
+      "date": "2026-07-31T05:54:50+03:00"
     },
     {
-      "sha": "356377507c3bf5f88cded87522aaa88ac9e3fcad",
-      "shortSha": "3563775",
-      "subject": "fix(test): restore per-fork heap cap via Vitest 4 test.execArgv",
+      "sha": "7433104e4b8f71a973e048e9f5d58d73437c68f4",
+      "shortSha": "7433104",
+      "subject": "Merge branch 'perf/android-promo-lcp-guard'",
       "author": "Ohad Fisher",
-      "date": "2026-07-28T10:53:52+03:00"
+      "date": "2026-07-30T08:21:42Z"
+    },
+    {
+      "sha": "3aa0151812eb3c34c1c70c6fdaa80d7989655bfe",
+      "shortSha": "3aa0151",
+      "subject": "feat: wire D1 retention funnel — return_visit event + streak lifecycle to PostHog",
+      "author": "Ohad Fisher",
+      "date": "2026-07-30T08:20:24Z"
+    },
+    {
+      "sha": "1c2e05659708861fcf28b9e7ad926b76bc239522",
+      "shortSha": "1c2e056",
+      "subject": "fix(nightly): age-escalate stranded restore-queue work so it can't strand silently",
+      "author": "Ohad Fisher",
+      "date": "2026-07-30T09:16:44+03:00"
+    },
+    {
+      "sha": "fb449f84fcece1332c58f576abff81e8b61cb7a1",
+      "shortSha": "fb449f8",
+      "subject": "test: restore nightly TDD tests dropped by gate salvage (2026-07-30)",
+      "author": "Ohad Fisher",
+      "date": "2026-07-30T09:13:22+03:00"
+    },
+    {
+      "sha": "ef3df8473bbf9820ddadf93f6c5e2d4628c1457c",
+      "shortSha": "ef3df84",
+      "subject": "feat: ship nightly lane code — teacher district upsell, LCP fetchpriority, wordcraft score count-up, games-played push counter, posthog flag deactivate",
+      "author": "Ohad Fisher",
+      "date": "2026-07-30T07:56:44+03:00"
+    },
+    {
+      "sha": "da18d0d3233a6a103fcfb160498c1634df1384c4",
+      "shortSha": "da18d0d",
+      "subject": "fix(mem): right-size V8 heap cap below container to stop RSS riding to OOM",
+      "author": "Ohad Fisher",
+      "date": "2026-07-30T01:05:54+03:00"
+    },
+    {
+      "sha": "140142b8bc07ca5ab27572ea2b0d9754f7accce6",
+      "shortSha": "140142b",
+      "subject": "feat: ELO rating system full-stack implementation",
+      "author": "Ohad Fisher",
+      "date": "2026-07-29T20:52:29Z"
+    },
+    {
+      "sha": "a28b5dd5120b32840d5fdc08304048970e866184",
+      "shortSha": "a28b5dd",
+      "subject": "perf: optimize ad script loading — async/lazyOnload + preconnects + CLS observer",
+      "author": "Ohad Fisher",
+      "date": "2026-07-29T15:07:11Z"
+    },
+    {
+      "sha": "e72e6111d78a6a5515c017cd761cfa581b00d3cc",
+      "shortSha": "e72e611",
+      "subject": "perf(landing): interaction-gate Android install auto-popup — it was the LCP element",
+      "author": "Ohad Fisher",
+      "date": "2026-07-29T13:59:32Z"
+    },
+    {
+      "sha": "55008d6823299b169ba7e5a21e68059e625c4a95",
+      "shortSha": "55008d6",
+      "subject": "Merge remote-tracking branch 'origin/master'",
+      "author": "Ohad Fisher",
+      "date": "2026-07-29T13:01:29Z"
+    },
+    {
+      "sha": "c61820ced28abe633ddcb6d58db10558304b9e44",
+      "shortSha": "c61820c",
+      "subject": "Merge: landing CWV fixes (CLS 0.98→0.004, -2.3MB) — Growth Radar finding #1",
+      "author": "Ohad Fisher",
+      "date": "2026-07-29T13:01:17Z"
+    },
+    {
+      "sha": "89db3e94bc0f9b5b2105c65db728790f5e5f4729",
+      "shortSha": "89db3e9",
+      "subject": "perf(landing): eliminate CLS 1.0 — FTUE overlays landing instead of replacing it",
+      "author": "Ohad Fisher",
+      "date": "2026-07-29T12:57:53Z"
+    },
+    {
+      "sha": "04477ddb50fc53ef10f44b2281721e15a39cf2f8",
+      "shortSha": "04477dd",
+      "subject": "chore(nightly): autonomous improvement loop 2026-07-29",
+      "author": "Ohad Fisher",
+      "date": "2026-07-29T15:44:59+03:00"
+    },
+    {
+      "sha": "009f64290ad26c542597de879f40a2e46f8bfc71",
+      "shortSha": "009f642",
+      "subject": "seo: daily meta tag improvements 2026-07-29 (#768)",
+      "author": "ohadf2015",
+      "date": "2026-07-29T15:26:06+03:00"
+    },
+    {
+      "sha": "14752d178405a6af33e9c5b3b30c43109fa0a54d",
+      "shortSha": "14752d1",
+      "subject": "perf(landing): fix Core Web Vitals — CLS 1.0, 2.8MB dictionary, 1.1MB favicon",
+      "author": "Ohad Fisher",
+      "date": "2026-07-29T11:18:50Z"
+    },
+    {
+      "sha": "6de0c2e10365d2f9cf42f6005ba0a1f49312bfea",
+      "shortSha": "6de0c2e",
+      "subject": "fix(daily): Hebrew dictionary validation + hub landing for returning players",
+      "author": "Hermes (agent)",
+      "date": "2026-07-29T09:47:18Z"
     }
   ]
 }

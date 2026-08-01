@@ -267,6 +267,16 @@ export type GrowthEvent =
   //   Props: { locale: string, socketReady: boolean, action: 'create' | 'join' }.
   //   High socketReady=false rate = socket latency root cause for rage-clicks.
   | 'mp_lobby_join_attempted'
+  // MP lobby join stalled past the 10s safety timeout (server never replied to
+  // createGame/join). Root-cause signal for the pageview→game_started funnel
+  // drop and the confirmed-but-unfixed connecting→lobby CLS/rage-click issue.
+  //   Props: { isHostMode: boolean }.
+  | 'mp_lobby_join_timeout'
+  // MP lobby join resolved (joined / joinedAsSpectator / error / rateLimited)
+  // before the safety timeout. Pairs with mp_lobby_join_timeout to give a
+  // success-rate denominator for the join funnel.
+  //   Props: { result: 'joined' | 'joinedAsSpectator' | 'error' | 'rateLimited' }.
+  | 'mp_lobby_join_resolved'
   // exp-mp-round-issue-probe-v1 triage chip selection.
   //   Fires when player picks a follow-up chip after bad/ok mp_round rating.
   //   Props: { issue: 'bots_too_strong' | 'technical_issue', language: string }.
@@ -344,6 +354,10 @@ const getSessionId = (): string => {
   if (!sessionId) {
     sessionId = `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     sessionStorage.setItem('lexiclash_session_id', sessionId);
+    // Fires once per browser-tab session, on first-ever generation (never on
+    // an existing sessionStorage id) — the 'session_start' GrowthEvent had 0
+    // call sites anywhere in the codebase (2026-08-01 coverage audit).
+    trackGrowthEvent('session_start', {});
   }
 
   return sessionId;

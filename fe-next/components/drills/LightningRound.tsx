@@ -12,6 +12,7 @@ import { useDrillCompleteOnce } from './hooks/useDrillCompleteOnce';
 import { useDrillKeyboardSupport } from '@/hooks/useDrillKeyboardSupport';
 import { useDrillGameActive } from '@/hooks/useDrillGameActive';
 import { useDrillMusic } from '@/hooks/useDrillMusic';
+import { useComboSystem } from '@/hooks/useComboSystem';
 import { useSuppressTimerUrgency } from '@/contexts/AccessibilityContext';
 import { KeyboardDesktopBadge, EnterKeyHint, KeyboardQuickTip } from '@/components/keyboard';
 import LightningRoundCompletePhase from './LightningRoundCompletePhase';
@@ -70,9 +71,17 @@ export default function LightningRound({
     playDrillCompleteSound,
     playWordAcceptedSound,
     playTimerUrgentSound,
+    playComboMilestoneSound,
   } = useSoundEffects();
 
   const levelConfig = LEVEL_CONFIGS[Math.min(level - 1, LEVEL_CONFIGS.length - 1)];
+
+  // Variable-reward streak layer (reuses the shared combo hook — no break
+  // sound wired so a paused streak stays neutral, not punitive).
+  const combo = useComboSystem({
+    trackMaxCombo: false,
+    onComboMilestone: (lvl) => playComboMilestoneSound(lvl),
+  });
 
   const [phase, setPhase] = useState<GamePhase>('ready');
   const [timeRemaining, setTimeRemaining] = useState(levelConfig.timeLimit);
@@ -126,6 +135,7 @@ export default function LightningRound({
     setTimeRemaining(levelConfig.timeLimit);
     setWordsFound([]);
     setScore(0);
+    combo.resetAll();
     startTimeRef.current = Date.now();
 
     timerRef.current = setInterval(() => {
@@ -138,7 +148,7 @@ export default function LightningRound({
         return prev - 1;
       });
     }, 1000);
-  }, [levelConfig.timeLimit, playDrillStartSound]);
+  }, [levelConfig.timeLimit, playDrillStartSound, combo]);
 
   // Finish game early (saves progress)
   const finishGame = useCallback(() => {
@@ -163,13 +173,14 @@ export default function LightningRound({
     setScore(prev => prev + wordScore);
     setLastWordScore(wordScore);
     playWordAcceptedSound();
+    combo.incrementCombo();
 
     setFeedback({ message: `+${wordScore} ${t('brain.drills.points')}`, type: 'success' });
     setTimeout(() => {
       setLastWordScore(null);
       setFeedback(null);
     }, 1000);
-  }, [validateWord, t, playWordAcceptedSound]);
+  }, [validateWord, t, playWordAcceptedSound, combo]);
 
   // Calculate results
   const getResults = useCallback(() => {
@@ -261,6 +272,22 @@ export default function LightningRound({
             )}
           </AdaptiveAnimatePresence>
         </div>
+
+        {/* Streak badge — variable-reward layer, only surfaces once a real streak is on */}
+        <AdaptiveAnimatePresence>
+          {phase === 'playing' && combo.comboLevel >= 2 && (
+            <AdaptiveMotion.div
+              key={combo.comboLevel}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              aria-live="polite"
+              className="px-2 py-1 rounded-neo border-2 border-neo-black text-xs font-bold bg-neo-orange text-neo-black"
+            >
+              🔥 {t('brain.drills.comboStreak', '{{n}}x streak!', { n: combo.comboLevel })}
+            </AdaptiveMotion.div>
+          )}
+        </AdaptiveAnimatePresence>
       </div>
 
       {/* Game Area */}
@@ -300,7 +327,7 @@ export default function LightningRound({
               />
               <DrillRewardBurst
                 trigger={wordsFound.length}
-                magnitude={Math.min((lastWordScore ?? 5) / 18, 1)}
+                magnitude={Math.min((lastWordScore ?? 5) / 18 + combo.comboLevel * 0.04, 1)}
                 seedKey={`lr-${wordsFound.length}`}
                 label={lastWordScore ? `+${lastWordScore}` : undefined}
               />

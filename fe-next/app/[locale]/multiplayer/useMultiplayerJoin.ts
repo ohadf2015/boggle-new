@@ -218,6 +218,7 @@ export function useMultiplayerJoin({
         releaseInFlight();
         setIsJoining(false);
         logger.debug('[JOIN] Safety timeout triggered');
+        trackGrowthEvent('mp_lobby_join_timeout', { isHostMode });
         toast.error(t('errors.connectionTimeout'), { duration: 4000, icon: '⚠️', id: MP_TOAST_IDS.connectionTimeout });
       }, 10000);
 
@@ -225,18 +226,23 @@ export function useMultiplayerJoin({
       // .on + explicit .off of ALL four events so no stale listener leaks
       // across attempts — .once only auto-removes the one that fired, leaving
       // the other three registered forever (slow accumulation on retries).
-      const resolveJoin = (): void => {
+      const resolveJoin = (result: 'joined' | 'error' | 'joinedAsSpectator' | 'rateLimited'): void => {
         clearTimeout(safetyTimeout);
         releaseInFlight();
-        socket.off('joined', resolveJoin);
-        socket.off('error', resolveJoin);
-        socket.off('joinedAsSpectator', resolveJoin);
-        socket.off('rateLimited', resolveJoin);
+        trackGrowthEvent('mp_lobby_join_resolved', { result });
+        socket.off('joined', onJoined);
+        socket.off('error', onError);
+        socket.off('joinedAsSpectator', onSpectator);
+        socket.off('rateLimited', onRateLimited);
       };
-      socket.on('joined', resolveJoin);
-      socket.on('error', resolveJoin);
-      socket.on('joinedAsSpectator', resolveJoin);
-      socket.on('rateLimited', resolveJoin);
+      const onJoined = (): void => resolveJoin('joined');
+      const onError = (): void => resolveJoin('error');
+      const onSpectator = (): void => resolveJoin('joinedAsSpectator');
+      const onRateLimited = (): void => resolveJoin('rateLimited');
+      socket.on('joined', onJoined);
+      socket.on('error', onError);
+      socket.on('joinedAsSpectator', onSpectator);
+      socket.on('rateLimited', onRateLimited);
 
       // Sanitize at the emit chokepoint so EVERY entry path (typed input,
       // paste, ?room= URL param, auto-join) is covered before it hits the

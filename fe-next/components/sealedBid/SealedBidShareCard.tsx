@@ -97,7 +97,7 @@ export function SealedBidShareCard({ history, totalScore }: Props) {
               {r.botWord}
             </span>
             {r.points > 0 && (
-              <span className="font-neo-display font-black text-xs text-neo-cyan shrink-0">
+              <span dir="ltr" className="font-neo-display font-black text-xs text-neo-cyan shrink-0 tabular-nums">
                 +{r.points}
               </span>
             )}

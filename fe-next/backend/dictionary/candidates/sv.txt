@@ -822,3 +822,17 @@ tillbaka
 ner
 bredvid
 inuti
+annat
+framåt
+främst
+ingenstans
+inom
+kortare
+längre
+mindre
+möjlig
+större
+svår
+trots
+vidare
+väl
