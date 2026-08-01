@@ -845,6 +845,18 @@ export function WordTowerScene(props: SceneProps) {
   // True once the user has scrolled meaningfully below the build line → reveals
   // the back-to-top button. Reset whenever a committed word snaps us back up.
   const [pannedDown, setPannedDown] = useState(false);
+  // True while the camera is being moved (drag, fling or wheel). Handed to the
+  // backdrop so its altitude-driven layers drop their 900ms eases: `viewAlt`
+  // re-quantises every few metres during a scroll, and a long transition simply
+  // restarts on each step — every depth then chases a target it never reaches
+  // and the parallax visibly tears apart. Two renders per gesture, not per frame.
+  const [panning, setPanning] = useState(false);
+  // Wheel/trackpad has no "up" event — clear the flag after the scroll goes idle.
+  const wheelIdleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const endPanSoon = useCallback(() => {
+    if (wheelIdleRef.current) clearTimeout(wheelIdleRef.current);
+    wheelIdleRef.current = setTimeout(() => setPanning(false), 140);
+  }, []);
   const rafRef = useRef<number | null>(null);
   // Last quantised altitude actually pushed to state — lets the pan rAF skip the
   // setState/onViewAltChange churn when the view hasn't moved a whole grid step.
@@ -923,7 +935,10 @@ export function WordTowerScene(props: SceneProps) {
       last = now;
       vel = step.v;
       applyPan(step.y);
-      if (step.done) { momentumRaf.current = null; return; }
+      // The camera is still moving during the glide, so altitude transitions stay
+      // suppressed until it actually settles — restoring them mid-fling would
+      // re-introduce exactly the tearing this guards against.
+      if (step.done) { momentumRaf.current = null; setPanning(false); return; }
       momentumRaf.current = requestAnimationFrame(tick);
     };
     momentumRaf.current = requestAnimationFrame(tick);
@@ -931,6 +946,7 @@ export function WordTowerScene(props: SceneProps) {
   useEffect(() => () => {
     if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
     if (momentumRaf.current != null) cancelAnimationFrame(momentumRaf.current);
+    if (wheelIdleRef.current) clearTimeout(wheelIdleRef.current);
   }, []);
 
   // Glide the camera back to the build line (back-to-top button + minimap tap).
@@ -942,6 +958,8 @@ export function WordTowerScene(props: SceneProps) {
     if (c && !c.destroyed) snapContainerY(c, ps.shift, 340, () => ps.dragging);
     const bg = ps.bgEl;
     if (bg) { bg.style.transition = 'transform 340ms cubic-bezier(0.22,1,0.36,1)'; bg.style.transform = ''; }
+    if (wheelIdleRef.current) clearTimeout(wheelIdleRef.current);
+    setPanning(false); // the snap owns the motion — layers get their eases back
     setPanAltitude(null);
     setPannedDown(false);
     onViewAltChange?.(heightM); // rails snap back to the live top with the camera
@@ -980,15 +998,39 @@ export function WordTowerScene(props: SceneProps) {
           style={{ background: BIOME_THEME[blend.toId].bg, opacity: blend.t }}
         />
       </div>
+      {/* ── Screen-locked world band ──
+          The HORIZON (skylines, fog, ground plane) and the LENS washes (accent
+          glow, aurora, sun, vignette) live OUTSIDE the panned wrapper, next to
+          the sky gradient above. A bottom-anchored layer translated by
+          `pan × BG_PAN_DEPTH` lifts clean off the horizon and exposes bare sky in
+          a band as tall as 40% of the pan distance — hundreds of px on a real
+          tower. And the ground plane specifically is the surface the Pixi tower
+          STANDS on: it panned at 0.4× while the tower panned at 1.0×, so the base
+          detached from its own ground on every scroll. These layers still
+          parallax with ALTITUDE (their `slide()` offsets); they just don't move
+          with the camera. */}
+      <WordTowerBackdrop
+        band="horizon"
+        biomeId={viewBiome}
+        heightM={viewAlt}
+        reducedMotion={props.reducedMotion}
+        groundInsetPx={props.bottomInsetPx ?? 220}
+        panning={panning}
+      />
       {/* Parallax elements grouped in one wrapper the pan translates (at
           BG_PAN_DEPTH) so stars/clouds/props parallax with the user's scroll. They
           are transparent over the static sky above — no edge can reveal navy. */}
       <div ref={(el) => { pan.current.bgEl = el; }} className="absolute inset-0 will-change-transform">
-        {/* Solid ground plane — lowest parallax layer, anchors the tower base. */}
-        <WordTowerGroundPlane groundInsetPx={props.bottomInsetPx ?? 220} biomeId={viewBiome} />
-        {/* Parallax ascent backdrop (stars/clouds/skyline) — driven by the
-            *viewed* altitude so panning down reveals that altitude's sky. */}
-        <WordTowerBackdrop biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} groundInsetPx={props.bottomInsetPx ?? 220} />
+        {/* Parallax ascent sky (stars/clouds/planets) — driven by the *viewed*
+            altitude so panning down reveals that altitude's sky. */}
+        <WordTowerBackdrop
+          band="sky"
+          biomeId={viewBiome}
+          heightM={viewAlt}
+          reducedMotion={props.reducedMotion}
+          groundInsetPx={props.bottomInsetPx ?? 220}
+          panning={panning}
+        />
         {/* Lazy altitude-reference props behind the tower (viewed altitude). */}
         <WordTowerParallaxProps heightM={viewAlt} reducedMotion={props.reducedMotion} />
         {/* Rare drifting sightings (cosmic whale / satellite / shooting star). */}
@@ -996,6 +1038,21 @@ export function WordTowerScene(props: SceneProps) {
         {/* Ambient leaves / birds / ice crystals — disabled on low-end/reduced motion. */}
         <WordTowerAmbient biomeId={viewBiome} heightM={viewAlt} reducedMotion={props.reducedMotion} enableComplexAnimations={perf.enableComplexAnimations} />
       </div>
+      {/* Front slice — the near skyline the clouds must pass BEHIND, plus the
+          ground haze and the vignette, which have to sit on top of everything.
+          Drawn after the pan wrapper purely to keep the original paint order. */}
+      <WordTowerBackdrop
+        band="front"
+        biomeId={viewBiome}
+        heightM={viewAlt}
+        reducedMotion={props.reducedMotion}
+        groundInsetPx={props.bottomInsetPx ?? 220}
+        panning={panning}
+      />
+      {/* Ground plane last: it is the surface the Pixi tower stands on, so it
+          must never move independently of the tower's foot. It sat inside the
+          pan wrapper, drifting at 0.4× while the tower panned at 1.0×. */}
+      <WordTowerGroundPlane groundInsetPx={props.bottomInsetPx ?? 220} biomeId={viewBiome} />
       {/* Brand climb companion — pops in to cheer only when a word is built. */}
       <WordTowerMascot
         resultKey={props.resultKey}
@@ -1039,6 +1096,7 @@ export function WordTowerScene(props: SceneProps) {
           stopMomentum(); // grabbing the tower halts any glide in progress
           try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* */ }
           pan.current.dragging = true;
+          setPanning(true);
           drag.current = { y: e.clientY, pan: pan.current.y, prevY: e.clientY, prevT: e.timeStamp, vel: 0 };
         }}
         onPointerMove={(e) => {
@@ -1053,10 +1111,16 @@ export function WordTowerScene(props: SceneProps) {
           const d = drag.current;
           pan.current.dragging = false;
           drag.current = null;
-          if (d && Math.abs(d.vel) > 0) startMomentum(clampFlickVelocity(d.vel)); // let go with speed → glide
+          if (d && Math.abs(d.vel) > 0) {
+            startMomentum(clampFlickVelocity(d.vel)); // let go with speed → glide
+            // startMomentum clears `panning` itself when the glide settles — the
+            // camera is still moving until then.
+          } else {
+            endPanSoon();
+          }
         }}
-        onPointerCancel={() => { pan.current.dragging = false; drag.current = null; }}
-        onWheel={(e) => { stopMomentum(); applyPan(pan.current.y - e.deltaY * WHEEL_SCALE); }}
+        onPointerCancel={() => { pan.current.dragging = false; drag.current = null; endPanSoon(); }}
+        onWheel={(e) => { stopMomentum(); setPanning(true); applyPan(pan.current.y - e.deltaY * WHEEL_SCALE); endPanSoon(); }}
       />
     </div>
   );

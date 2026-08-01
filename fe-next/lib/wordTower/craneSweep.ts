@@ -19,10 +19,10 @@
  *  should be slower and stay more around the green placement." Slowed across the
  *  board so the trolley dwells longer over the centre and a relaxed tap reliably
  *  lands in the green window. */
-export const SWEEP_PERIOD_START_MS = 3400;
+export const SWEEP_PERIOD_START_MS = 2600;
 /** Floor on the period (ms) — the fastest the sweep ever gets, however tall.
  *  Raised so even a tall tower never sweeps faster than a comfortably-timed tap. */
-export const SWEEP_PERIOD_FLOOR_MS = 2200;
+export const SWEEP_PERIOD_FLOOR_MS = 1500;
 /** Ceiling on the EFFECTIVE period (ms) — the SLOWEST the sweep can ever get,
  *  however many crane-slowing upgrades/mutators stack. Founder ask (2026-07-17):
  *  "the crane speed shouldn't be so slow even with the upgrades — the minimum
@@ -31,6 +31,18 @@ export const SWEEP_PERIOD_FLOOR_MS = 2200;
  *  default means the crane never sweeps slower than its normal, unupgraded pace —
  *  upgrades now only claw the FASTER high-floor pace back toward comfortable. */
 export const SWEEP_PERIOD_CEILING_MS = SWEEP_PERIOD_START_MS;
+/**
+ * Absolute slowest sweep the crane may ever run (ms), whatever stacks on top.
+ *
+ * Founder ask (2026-08-01): "make sure the crane movement is never too slow so
+ * it will always be a bit of a challenge." The band had drifted upward over
+ * successive "it's too fast" passes until the ground period was 3400 ms — a
+ * 1.7 s traverse each way, which any unhurried tap clears. It is now 2600 ms
+ * start / 1500 ms floor, and this constant is the hard ceiling every modifier
+ * path clamps against, so no combination of upgrades and mutators can walk it
+ * back to a crawl.
+ */
+export const SWEEP_PERIOD_MAX_MS = SWEEP_PERIOD_START_MS;
 /** How many ms shorter (faster) the sweep gets per floor climbed. Gentled so the
  *  difficulty ramp is slower — the climb stays fair far higher up. */
 export const SWEEP_PERIOD_STEP_MS = 40;

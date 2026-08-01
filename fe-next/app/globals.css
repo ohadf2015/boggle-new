@@ -367,18 +367,10 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   80% { transform: translateX(3px); }
 }
 
-@utility crane-girder-land {
-  /* Landing squash — Tower Bloxx weight: compress hard on impact then rebound.
-     Pairs with the gravity-accelerate fall transition. */
-  transform-origin: bottom center;
-  animation: crane-girder-land 380ms cubic-bezier(0.5, 0, 0.3, 1);
-}
-@keyframes crane-girder-land {
-  0%, 62% { transform: scaleY(1) scaleX(1); }
-  78% { transform: scaleY(0.68) scaleX(1.14); }
-  90% { transform: scaleY(1.08) scaleX(0.95); }
-  100% { transform: scaleY(1) scaleX(1); }
-}
+/* (crane-girder-land removed: the landing squash is now integrated into the
+   crane's own rAF alongside the gravity fall and rebound, so the squash tracks
+   the real touchdown frame instead of a fixed 380ms keyframe that had to be
+   guessed into alignment with it. See WordTowerCrane's settle phase.) */
 
 @utility crane-girder-perfect {
   /* Perfect release — the landed girder flares a bright lime glow. */
@@ -443,14 +435,21 @@ html[data-player-style-active] .dark .focus-visible-ring:focus-visible {
   to { transform: rotate(360deg); }
 }
 
-@utility wt-dial-spin {
-  /* The crane steering dial the wheel morphs into — a slow, weighty turn that
-     reads as "this now drives the crane". */
-  animation: wt-dial-spin 8s linear infinite;
+/* (wt-dial-spin removed with the "crane steering dial" it span. The dial
+   implied a control the player never had — the hub now mirrors the crane's real
+   placement band instead, which is information they can actually act on.) */
+
+@utility wt-build-arm {
+  /* Word Tower — the auto-hand-off countdown drawn around the BUILD hub. The
+     word is passed to the crane after a short pause; this is that same timer
+     made visible, so the hand-off reads as "about to happen" (and stays
+     interruptible by picking another letter) instead of the UI changing on its
+     own mid-thought. Duration is set inline from AUTO_BUILD_MS. */
+  animation: wt-build-arm linear forwards;
 }
-@keyframes wt-dial-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+@keyframes wt-build-arm {
+  from { stroke-dashoffset: 289; }
+  to { stroke-dashoffset: 0; }
 }
 
 /* ── Golden-letter shimmer ── A gentle pulse of light sweeping across the tile

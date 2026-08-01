@@ -74,7 +74,11 @@ describe('craneGeometry', () => {
     expect(craneShadowOffsetFromOuterTop(meter)).toBe(
       meter + CRANE_OUTER_GAP_PX + CRANE_TROLLEY_TOP_PX + CRANE_SHADOW_Y_PX - CRANE_SHADOW_VISUAL_NUDGE_PX,
     );
-    // DOM extras beyond a naive meter+shadow model: 12+20-4 = 28
-    expect(craneShadowOffsetFromOuterTop(meter)).toBe(meter + CRANE_SHADOW_Y_PX + 28);
+    // The extras beyond a naive meter+shadow model are DERIVED, not a literal.
+    // They were pinned at 28 (gap 12 + trolley 20 − nudge 4) until the stability
+    // meter above the crane was removed and its flex gap went to 0 — a hardcoded
+    // number here just made a deliberate layout change look like a regression.
+    const extras = CRANE_OUTER_GAP_PX + CRANE_TROLLEY_TOP_PX - CRANE_SHADOW_VISUAL_NUDGE_PX;
+    expect(craneShadowOffsetFromOuterTop(meter)).toBe(meter + CRANE_SHADOW_Y_PX + extras);
   });
 });

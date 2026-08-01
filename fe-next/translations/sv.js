@@ -909,8 +909,8 @@ const sv = {
       }
     },
     "crane": {
+      "drop": "Släpp",
       "place": "Placera ditt ord",
-      "steer": "Styr & släpp",
       "tapToDrop": "Tryck för att släppa",
       "perfect": "Perfekt!",
       "good": "Snyggt!",

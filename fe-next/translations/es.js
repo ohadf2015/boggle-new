@@ -636,8 +636,8 @@ const es = {
       }
     },
     "crane": {
+      "drop": "Soltar",
       "place": "Coloca tu palabra",
-      "steer": "Dirige y suelta",
       "tapToDrop": "Toca para soltar",
       "perfect": "¡Perfecto!",
       "good": "¡Bien!",

@@ -100,14 +100,25 @@ describe('sweepPeriodMs — height-ramped difficulty', () => {
     expect(sweepPeriodMs(-3)).toBe(SWEEP_PERIOD_START_MS);
   });
 
-  // Founder ask 2026-06-20: "placing is moving too fast — slower, stay around
-  // green." Lock the relaxed pace so a future tweak can't silently speed it back
-  // up: the ground sweep is a leisurely ≥3s and even the tallest tower never
-  // sweeps faster than a comfortable ≥2s.
-  it('keeps the sweep comfortably slow at every height', () => {
-    expect(SWEEP_PERIOD_START_MS).toBeGreaterThanOrEqual(3000);
-    expect(SWEEP_PERIOD_FLOOR_MS).toBeGreaterThanOrEqual(2000);
-    expect(sweepPeriodMs(9999)).toBeGreaterThanOrEqual(2000);
+  // The 2026-06-20 "placing is moving too fast" pass pushed the band to
+  // 3400/2200 ms, i.e. a 1.7s traverse each way at ground level — slow enough
+  // that an unhurried tap always cleared the green window and the crane stopped
+  // being a skill check at all. Founder ask 2026-08-01: "make sure it is never
+  // too slow so it will always be a bit of a challenge."
+  //
+  // The contract is now a BAND, pinned from both sides: fast enough to demand
+  // timing, never so fast that the green window becomes a coin flip.
+  it('stays a timing challenge at every height', () => {
+    expect(SWEEP_PERIOD_START_MS).toBeLessThanOrEqual(2800);
+    expect(SWEEP_PERIOD_FLOOR_MS).toBeLessThanOrEqual(1700);
+    expect(sweepPeriodMs(9999)).toBeLessThanOrEqual(1700);
+  });
+
+  it('never becomes unfair — the green window stays reachable', () => {
+    // Below ~1.2s per full sweep the perfect band passes too quickly to aim at
+    // on a touchscreen; the floor must stay clear of that.
+    expect(SWEEP_PERIOD_FLOOR_MS).toBeGreaterThanOrEqual(1200);
+    expect(sweepPeriodMs(9999)).toBeGreaterThanOrEqual(1200);
   });
 
   it('is monotonically non-increasing in height', () => {

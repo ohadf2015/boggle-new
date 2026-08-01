@@ -11,8 +11,21 @@
  */
 
 /** Animation duration bounds (ms). Floor raised so a short hang still feels weighty. */
-export const FALL_MIN_MS = 300;
-export const FALL_MAX_MS = 520;
+export const FALL_MIN_MS = 360;
+export const FALL_MAX_MS = 600;
+
+/**
+ * Fraction of the drop window spent FALLING; the remainder is the touchdown
+ * settle (squash + rebound).
+ *
+ * The girder used to fall for the whole window and stop dead on the last frame,
+ * because the crane unmounts the instant the placement commits — so any settle
+ * appended AFTER the window was never rendered. Reserving the tail of the SAME
+ * window instead buys a visible landing beat at zero added latency: the block
+ * touches down early, squashes and rebounds, and the commit still fires exactly
+ * when it always did.
+ */
+export const FALL_PHASE_FRAC = 0.76;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 const clamp01 = (n: number) => clamp(n, 0, 1);
@@ -29,7 +42,7 @@ export function fallEase(k: number): number {
 /** Fall duration (ms) — deeper drops take a touch longer, within sane bounds. */
 export function fallDurationMs(depthFloors: number): number {
   const d = Math.max(0, depthFloors);
-  return clamp(FALL_MIN_MS + d * 18, FALL_MIN_MS, FALL_MAX_MS);
+  return clamp(FALL_MIN_MS + d * 20, FALL_MIN_MS, FALL_MAX_MS);
 }
 
 /**
@@ -39,6 +52,43 @@ export function fallDurationMs(depthFloors: number): number {
 export function settleOvershoot(depthFloors: number): number {
   const d = Math.max(0, depthFloors);
   return clamp(0.06 + d * 0.02, 0.06, 0.4);
+}
+
+/** Shortest settle (ms) after touchdown — even a stubby drop gets a rebound. */
+export const SETTLE_MIN_MS = 220;
+/** Longest settle (ms) — a deep drop rings a little longer, but never lingers. */
+export const SETTLE_MAX_MS = 420;
+
+/**
+ * How long the post-touchdown settle runs (ms) for a drop of `depthFloors`.
+ * Deeper drop = more energy to shed = a slightly longer ring-out.
+ */
+export function settleDurationMs(depthFloors: number): number {
+  const d = Math.max(0, depthFloors);
+  return clamp(SETTLE_MIN_MS + d * 14, SETTLE_MIN_MS, SETTLE_MAX_MS);
+}
+
+/** Rebounds packed into the settle window. Deliberately just under 2 — one
+ *  authoritative recovery plus a whisper. A whole-number count reads as a
+ *  bouncing ball; concrete does not bounce twice at the same height. */
+const SETTLE_REBOUNDS = 1.8;
+/** Damping exponent on the rebound envelope. Higher = the second hop dies
+ *  faster, i.e. heavier material. */
+const SETTLE_DAMPING = 1.9;
+
+/**
+ * Upward rebound of a just-landed girder, as a fraction of its peak rebound
+ * height, for settle progress `k` in 0..1.
+ *
+ * Always ≥ 0 — a block that has landed can only come back UP off its rest line,
+ * never sink through the tower it just landed on. Starts and ends at rest, with
+ * one clear rebound and a heavily-damped second. Multiply by
+ * `fallPx * settleOvershoot(depthFloors)` for the pixel offset.
+ */
+export function settleBounceFrac(k: number): number {
+  const t = clamp01(k);
+  const envelope = Math.pow(1 - t, SETTLE_DAMPING);
+  return Math.abs(Math.sin(Math.PI * SETTLE_REBOUNDS * t)) * envelope;
 }
 
 export interface ImpactParams {

@@ -35,6 +35,8 @@ import { useAutoDismiss } from './useAutoDismiss';
 import { useExitReveal } from './useExitReveal';
 import { effectiveSweepPeriodMs } from '@/lib/wordTower/craneSweep';
 import { isNearMiss } from '@/lib/wordTower/towerLean';
+import { swayInstability, swayHeightDampen, steadyHandsDampen } from '@/lib/wordTower/towerSway';
+import { BIOME_THEME } from './biomeTheme';
 import {
   mutatorForDate,
   mutatorModifiers,
@@ -57,7 +59,7 @@ import { WordTowerActionMenu } from './WordTowerActionMenu';
 import { textColorOn } from '@/lib/wordTower/towerColumn';
 import { dropFlavor } from '@/lib/wordTower/dropFlavor';
 import { buildDropVerdict, formatHeightGain, type DropVerdict } from '@/lib/wordTower/dropVerdict';
-import type { PlacementOutcome } from '@/lib/wordTower/cranePlacement';
+import type { PlacementOutcome, PlacementQuality } from '@/lib/wordTower/cranePlacement';
 import { playChromeFrame, DEFAULT_TOP_CHROME_PX } from '@/lib/wordTower/playChromeFrame';
 import { useWordTowerPerks } from './useWordTowerPerks';
 import { useRunStreakPerk } from '@/lib/wordTower/useRunStreakPerk';
@@ -492,6 +494,17 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   const craneRef = useRef<WordTowerCraneHandle | null>(null);
   const triggerCraneDrop = useCallback(() => craneRef.current?.drop(), []);
 
+  // The band the crane's aim would CURRENTLY score, mirrored down to the DROP
+  // control at the bottom of the screen.
+  //
+  // The crane sweeps at the top of the viewport while the player's thumb rests
+  // on the hub at the bottom — so timing the shot meant watching one end of the
+  // screen and tapping the other. The wheel's answer to this used to be a
+  // "crane steering dial": a rim with spokes that rotated and steered nothing.
+  // Mirroring the real band instead makes the drop a genuine skill shot the
+  // player can read where their thumb already is.
+  const [aimBand, setAimBand] = useState<PlacementQuality | null>(null);
+
   // Sweep period RAMPS with tower height (slow + learnable near the ground,
   // faster the taller you climb) — escalating challenge, not a flat speed.
   // Tailwind day slows the sweep (more dwell = easier perfects); other days = 1×.
@@ -507,10 +520,29 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
   );
   // How shaky the tower is (0..1) — drives the continuous SWING and, via the
   // crane's matching offset, makes placing on an unstable tower genuinely harder.
-  // Damped by height: a tall tower's top travels far at a given angle, so without
-  // is fed to BOTH the crane target and the Pixi tower angle, so WYSIWYG holds.
-    // DISABLED: tower sway was causing visual flickering and felt redundant.
-    const instability = 0;
+  // The SAME value feeds the crane target and the Pixi tower angle, so WYSIWYG
+  // holds: the swaying tower IS the moving target, and tracking it still lands
+  // perfect (only fighting it is punished — see towerSway.ts).
+  //
+  // This was hard-coded to 0 with the note "was causing visual flickering and
+  // felt redundant". The flicker was not the sway model, it was the delivery:
+  // the crane pushed a fresh sway value through `setState` on every animation
+  // frame. The crane now writes those transforms imperatively, so the sway can
+  // come back honestly — and the founder specifically wants imprecision to be
+  // felt ("make the tower a bit more shakey when you are not too precise").
+  //
+  // Three signals compose:
+  //   · swayInstability   — bad-drop streak OR current visible lean, worst wins
+  //   · swayHeightDampen  — a tall tower's top travels far at a given angle
+  //   · steadyHandsDampen — a run of perfect drops calms it back down (skill)
+  // then the biome's own instabilityMult, which until now was documented as
+  // "DATA ONLY... must be applied at the SHARED instability source" and never
+  // actually applied anywhere.
+  const instability = useMemo(() => {
+    const raw = swayInstability(crane.consecutiveSloppy, crane.leanDeg);
+    const damped = raw * swayHeightDampen(game.floors.length) * steadyHandsDampen(crane.perfectStreak);
+    return Math.max(0, Math.min(1, damped * (BIOME_THEME[biomeId]?.instabilityMult ?? 1)));
+  }, [crane.consecutiveSloppy, crane.leanDeg, crane.perfectStreak, game.floors.length, biomeId]);
 
   // The crane carries the block in the FINAL committed material colour of the
   // current build line, so it never "switches weird colours" on landing. Convert
@@ -1088,18 +1120,10 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           they can never overlap each other — or the centred banners — at
           hand-tuned absolute offsets again (the 390px pile-up, 2026-07-02). */}
       <div className="pointer-events-none absolute start-2 top-36 z-20 flex max-w-[45%] flex-col items-start gap-1" dir={dir}>
-        {/* Biome spine (#7) — a slim pixel-notched bar tinted with the current
-            biome's block colour, so the left rail reads as part of the world
-            you've climbed into (a lime city bar → gold galaxy bar) instead of a
-            loose stack of chips. Sits just outside the chips, full rail height. */}
-        <div
-          aria-hidden
-          className="absolute inset-y-0 -start-2.5 w-2 rounded-full border-neo border-black shadow-hard-sm"
-          style={{
-            backgroundColor: blockColorHex,
-            backgroundImage: 'repeating-linear-gradient(0deg, rgba(0,0,0,0.30) 0 2px, transparent 2px 9px), linear-gradient(90deg, rgba(255,255,255,0.35), transparent)',
-          }}
-        />
+        {/* (The decorative "biome spine" bar that used to run down this rail is
+            gone. It carried no information the tower, sky and block colours were
+            not already showing, and it drew a permanent stripe down the side of
+            the play surface for it.) */}
         {/* Wrecking Ball bay — rival-raid meta, endless-only. Hidden in the
             daily-only tower (no rivals to raid); keeps the left rail to the
             steady-hands / mutator / perk chips that matter to a daily climb. */}
@@ -1192,6 +1216,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
           consecutiveSloppy={crane.consecutiveSloppy}
           onDrop={handleCraneDrop}
           onSignedDrop={crane.pushSignedOffset}
+          onLiveBandChange={setAimBand}
           t={t}
           reducedMotion={reducedMotion}
           periodMs={sweepMs}
@@ -1340,6 +1365,7 @@ export function WordTowerPlay({ language, isInDictionary, dictionary, initialGam
               : undefined
           }
           pendingWord={tower.state.pendingWord}
+          aimBand={aimBand}
           onCraneDrop={triggerCraneDrop}
           onCancelPlacement={tower.cancelPlacement}
           accentHex={blockColorHex}

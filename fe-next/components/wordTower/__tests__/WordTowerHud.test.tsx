@@ -113,7 +113,7 @@ describe('WordTowerHud', () => {
       <WordTowerHud {...makeProps({ word: 'CAT', onSubmit, onCraneDrop })} />,
     );
     // Spelling a word: the wheel centre is the Build control, no Drop yet.
-    expect(screen.queryByRole('button', { name: /wordTower\.crane\.steer/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /wordTower\.crane\.drop/ })).toBeNull();
     expect(screen.getByRole('button', { name: /wordTower\.hud\.build/ })).toBeEnabled();
 
     rerender(
@@ -121,7 +121,7 @@ describe('WordTowerHud', () => {
     );
     // Word in flight: the same centre morphs into the Drop control.
     expect(screen.queryByRole('button', { name: /wordTower\.hud\.build/ })).toBeNull();
-    const dropBtn = screen.getByRole('button', { name: /wordTower\.crane\.steer/ });
+    const dropBtn = screen.getByRole('button', { name: /wordTower\.crane\.drop/ });
     fireEvent.click(dropBtn);
     expect(onCraneDrop).toHaveBeenCalledTimes(1);
     expect(onSubmit).not.toHaveBeenCalled();

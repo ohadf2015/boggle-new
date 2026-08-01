@@ -13,7 +13,7 @@ import {
 } from '@/lib/wordTower/cranePlacement';
 import { craneSwingFactor } from '@/lib/wordTower/craneSweep';
 import { landFeedback } from '@/lib/wordTower/landFeedback';
-import { CraneFooter, CraneSparkBurst, CraneStabilityMeter } from './WordTowerCraneBits';
+import { CraneFooter, CraneSparkBurst } from './WordTowerCraneBits';
 import { swayAngleAt, swayNormalizedOffset, effectiveDropError } from '@/lib/wordTower/towerSway';
 import { craneBeamBricks, craneBeamTilePx } from '@/lib/wordTower/craneBeamDisplay';
 import {
@@ -36,7 +36,14 @@ import {
   type PendulumState,
 } from '@/lib/wordTower/cranePendulum';
 import { landingOffset, driftFracAt, smoothVelocity } from '@/lib/wordTower/dropKinematics';
-import { fallDurationMs } from '@/lib/wordTower/fallProfile';
+import {
+  fallDurationMs,
+  fallEase,
+  settleBounceFrac,
+  settleOvershoot,
+  impactParams,
+  FALL_PHASE_FRAC,
+} from '@/lib/wordTower/fallProfile';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import { useDevicePerformance } from '@/hooks/useDevicePerformance';
@@ -56,6 +63,11 @@ interface WordTowerCraneProps {
   onDrop: (outcome: PlacementOutcome) => void;
   /** Sweep direction at drop time — fed to lean tracking by the parent. */
   onSignedDrop?: (signed: number) => void;
+  /** Fires whenever the LIVE placement band changes while aiming. Lets the
+   *  bottom-of-screen DROP control mirror the crane's aim, so the player can
+   *  time the shot without splitting their attention between the crane at the
+   *  top of the screen and their thumb at the bottom. `null` once released. */
+  onLiveBandChange?: (band: PlacementQuality | null) => void;
   t: (key: string) => string;
   reducedMotion?: boolean;
   /** Sweep period (ms). */
@@ -104,6 +116,13 @@ const BAND_GLOW: Record<PlacementQuality, string> = {
   miss: 'rgba(255,51,102,0.7)',
 };
 
+const BAND_GLOW_OPACITY: Record<PlacementQuality, number> = {
+  perfect: 0.85,
+  good: 0.55,
+  sloppy: 0.35,
+  miss: 0.2,
+};
+
 /** How far the trolley carriage slides along the jib (px from centre). */
 const TROLLEY_RANGE_PX = 110;
 
@@ -111,16 +130,25 @@ const TROLLEY_RANGE_PX = 110;
  * WordTowerCrane — Tower-Bloks placement overlay with a real crane chrome.
  *
  * A horizontal jib spans the top of the bay; a trolley carriage slides L↔R
- * along it; a cable drops from the trolley to a hook that carries the WORD
- * BEAM (length scales with word length so longer words read as bigger girders).
- * Tap to drop — beam detaches, falls, squashes on landing, then disappears.
+ * along it; a SHORT cable drops from the trolley to a hook that carries the
+ * WORD BEAM (length scales with word length so longer words read as bigger
+ * girders). Tap to drop — the beam detaches and falls under real, integrated
+ * gravity, then squashes and rebounds where it lands.
  *
- * Pure decision logic + a thin rAF sweep — the outcome is unit-tested and
- * the component stays presentational.
+ * ## Why this component is imperative
  *
- * The drop trigger is exposed via `useImperativeHandle` so the parent can
- * mount the CTA at the BOTTOM of the screen (where the player's thumb already
- * is) instead of forcing a finger trip to the top.
+ * Every per-frame value (trolley position, pendulum angle, cable stretch, fall
+ * offset, drift) is held in a REF and written straight to the element's
+ * `style`, exactly the way `WordTowerScene.applyPan` drives the camera. These
+ * used to be `useState`, which meant the whole crane subtree re-rendered on
+ * every animation frame for the entire time a word was held — the single
+ * biggest reason play felt sluggish, and (via `setSway`) the flicker that got
+ * tower sway switched off entirely. The only values that reach React are ones
+ * that change a handful of times per drop: `falling`, `result`, the scored
+ * quality, and the live placement band.
+ *
+ * The drop verdict still reads `posRef`/`swayRef`, so nothing about WYSIWYG or
+ * the scoring path changed — only who owns the pixels.
  *
  * A11y: reduced-motion holds the carriage at centre (a generous, skill-free
  * "good" placement) rather than animating.
@@ -132,6 +160,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     craneTopPx,
     onDrop,
     onSignedDrop,
+    onLiveBandChange,
     t,
     reducedMotion = false,
     periodMs = 1800,
@@ -144,11 +173,8 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   },
   ref,
 ) {
-  const [pos, setPos] = useState(0);
+  // ── per-frame state: refs only, never React ──
   const posRef = useRef(0);
-  // Sway offset of the landing target (signed, crane [-1,1] space). 0 when the
-  // tower is steady; oscillates once unstable so the target swings under the beam.
-  const [sway, setSway] = useState(0);
   const swayRef = useRef(0);
   const instabilityRef = useRef(instability);
   instabilityRef.current = instability;
@@ -156,30 +182,10 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   // from the current beam length so adding a letter widens the swing (#9).
   const swingKRef = useRef(1);
   const droppedRef = useRef(false);
-  const [result, setResult] = useState<PlacementOutcome | null>(null);
-  // Detach animation: once dropped, the beam drops straight down before the
-  // verdict pill replaces the tap button — gives the impact a real beat.
-  const [falling, setFalling] = useState(false);
-  // The band the drop actually scored — drives the release celebration (a clean
-  // "you nailed the spot" burst) shown DURING the fall, before the parent clears
-  // the word and unmounts the crane.
-  const [droppedQuality, setDroppedQuality] = useState<PlacementQuality | null>(null);
-
-  // Cosmetic pendulum: the carried girder LAGS the trolley as it sweeps, swings,
-  // and settles — sells "this block has weight + gravity". Render-only; never
-  // feeds the drop verdict (drop() reads posRef/swayRef only). On release the
-  // target snaps to 0 so the load hangs straight as it falls (so a perfect-aimed
-  // drop never *looks* offset at the landing moment — WYSIWYG stays honest).
-  const [pendulumDeg, setPendulumDeg] = useState(0);
   const pendulumRef = useRef<PendulumState>({ ...REST_PENDULUM });
   const prevPosRef = useRef(0);
   const prevNowRef = useRef(0);
   const fallingRef = useRef(false);
-  // Cosmetic cable stretch-and-snap: on release the freed load yanks the cable
-  // taut, then it snaps back as the girder falls — sells the block's weight.
-  // Render-only (cable height never feeds the verdict). Driven off the drop
-  // timestamp + the drop's quality intensity in the existing rAF below.
-  const [cableStretch, setCableStretch] = useState(0);
   const dropAtRef = useRef(0);
   // Ballistic momentum: the trolley's smoothed velocity (norm units/ms) at
   // release decides how far the freed girder DRIFTS during the fall — the
@@ -187,15 +193,41 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   // the visual both come from the same projection (WYSIWYG stays honest).
   const velPerMsRef = useRef(0);
   const driftPxRef = useRef(0);
-  const [fallDrift, setFallDrift] = useState(0);
   // Load tracking — the swinging girder (trolley + swung arm) is the SCORED
   // object; its smoothed velocity feeds the momentum projection at release.
   const prevLoadRef = useRef(0);
   const releaseAngleRef = useRef(0);
+  const dropQualityRef = useRef<PlacementQuality | null>(null);
+  const liveBandRef = useRef<PlacementQuality>('perfect');
+
+  // ── element refs the rAF writes to directly ──
+  const trolleyElRef = useRef<HTMLDivElement>(null);
+  const driftElRef = useRef<HTMLDivElement>(null);
+  const fallerElRef = useRef<HTMLDivElement>(null);
+  const pendulumElRef = useRef<HTMLDivElement>(null);
+  const cableElRef = useRef<HTMLDivElement>(null);
+  const beamElRef = useRef<HTMLDivElement>(null);
+  const shadowElRef = useRef<HTMLDivElement>(null);
+  const reticleElRef = useRef<HTMLDivElement>(null);
+  const glowElRef = useRef<HTMLDivElement>(null);
+
+  // ── React state: only what actually changes the rendered TREE ──
+  const [result, setResult] = useState<PlacementOutcome | null>(null);
+  // Detach animation: once dropped, the beam falls before the verdict pill
+  // replaces the tap button — gives the impact a real beat.
+  const [falling, setFalling] = useState(false);
+  // The band the drop actually scored — drives the release celebration (a clean
+  // "you nailed the spot" burst) shown DURING the fall, before the parent clears
+  // the word and unmounts the crane.
+  const [droppedQuality, setDroppedQuality] = useState<PlacementQuality | null>(null);
+  // The band the CURRENT sweep would score. Changes at most a few times per
+  // pass, so it is cheap to keep in React — and the reticle/sweet-spot styling
+  // plus the parent's DROP control both need it declaratively.
+  const [liveBand, setLiveBand] = useState<PlacementQuality>('perfect');
 
   // Adaptive hang geometry — cable, swing arm and fall distance all derive from
-  // the girder height so the load always hangs with clear air above the shadow
-  // and lands EXACTLY on it (craneGeometry owns the arithmetic).
+  // the girder height so the load hangs high under the jib and lands EXACTLY on
+  // the shadow (craneGeometry owns the arithmetic).
   const beamLen = craneBeamBricks(word).chars.length;
   const beamHPx = beamLen * craneBeamTilePx(beamLen);
   const cableLen = craneCableLenPx(beamHPx);
@@ -203,12 +235,36 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   const armPx = craneArmPx(beamHPx);
   const armPxRef = useRef(armPx);
   armPxRef.current = armPx;
+  const cableLenRef = useRef(cableLen);
+  cableLenRef.current = cableLen;
+  const fallPxRef = useRef(fallPx);
+  fallPxRef.current = fallPx;
   // Depth-scaled hang — longer words fall longer (Tower Bloxx weight). Shared
   // with landingOffset so projected drift matches the visual fall window.
   const fallMs = fallDurationMs(Math.max(0, beamLen - 2));
   const fallMsRef = useRef(fallMs);
   fallMsRef.current = fallMs;
-  const dropQualityRef = useRef<PlacementQuality | null>(null);
+  // Rebound height of the landed girder, in px. Depth-scaled and capped by
+  // `settleOvershoot` so a long drop lands heavier without ever pinging.
+  const settleUpPx = fallPx * settleOvershoot(Math.max(0, beamLen - 2));
+  const settleUpPxRef = useRef(settleUpPx);
+  settleUpPxRef.current = settleUpPx;
+  // Landing squash — how far the girder pancakes at touchdown, by drop depth.
+  const squashAmt = impactParams(Math.max(0, beamLen - 2)).squash;
+  const squashAmtRef = useRef(squashAmt);
+  squashAmtRef.current = squashAmt;
+  const perfectBandBonusRef = useRef(perfectBandBonus);
+  perfectBandBonusRef.current = perfectBandBonus;
+  const onLiveBandChangeRef = useRef(onLiveBandChange);
+  onLiveBandChangeRef.current = onLiveBandChange;
+
+  /** Publish a band change to React + the parent — only on an actual change. */
+  const pushBand = useCallback((band: PlacementQuality) => {
+    if (liveBandRef.current === band) return;
+    liveBandRef.current = band;
+    setLiveBand(band);
+    onLiveBandChangeRef.current?.(band);
+  }, []);
 
   useEffect(() => {
     if (reducedMotion) return;
@@ -217,60 +273,133 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     const tick = (now: number) => {
       if (!start) start = now;
       const elapsed = now - start;
-      // Freeze the trolley at the release position — the girder is ballistic
-      // now; only its inherited momentum (fallDrift below) moves it sideways.
-      // Each letter on the beam widens the swing, capped at the full sweep (#9).
-      // Scales the single source of the sweep, so the shown swing and the scored
-      // release offset stay identical (WYSIWYG).
-      const x = droppedRef.current ? posRef.current : craneOffsetAt(elapsed, periodMs) * swingKRef.current;
-      posRef.current = x;
-      setPos(x);
-      // Swing the landing target when the tower is unstable (0 = steady). Uses the
-      // ABSOLUTE timestamp (not `elapsed`, which resets each floor when periodMs
-      // changes) so it stays phase-locked with the Pixi tower's visible swing —
-      // the swaying tower IS the moving target the player aims at.
-      const s = swayNormalizedOffset(swayAngleAt(now, instabilityRef.current));
-      swayRef.current = s;
-      setSway(s);
       const dtMs = prevNowRef.current ? now - prevNowRef.current : 16;
-      const velNorm = (x - prevPosRef.current) / (Math.max(dtMs, 1) / 1000) / 2.5;
+
       if (fallingRef.current) {
-        const fk = Math.min(1, (now - dropAtRef.current) / fallMsRef.current);
-        // Deterministic straighten: the freed load pivots to hang straight in
-        // sync with the fall window, so at touchdown its visual x is exactly
-        // trolley + drift — the projected offset the verdict scored.
-        const straight = releaseAngleRef.current * Math.pow(1 - fk, 1.5);
-        pendulumRef.current = { angleDeg: straight, velDegPerSec: 0 };
-        setPendulumDeg(straight);
-        // Cable personality: whip (recoil) + load stretch scaled by drop quality
-        // (heavier miss yanks the cable harder — Tower Bloxx cable feel).
+        // ── released: ballistic girder ──────────────────────────────────────
+        // The drop window is split: FALL_PHASE_FRAC of it is the fall, the rest
+        // is the touchdown settle. Total time is unchanged, so the commit still
+        // fires exactly when it always did — the settle is bought from the tail
+        // of the same window rather than appended after it (the crane unmounts
+        // on commit, so anything appended would never be seen).
+        const total = fallMsRef.current;
+        const impactAt = total * FALL_PHASE_FRAC;
+        const tSince = now - dropAtRef.current;
         const qI = dropQualityIntensity(dropQualityRef.current ?? 'good');
-        setCableStretch(cableRecoilPx(fk) + cableStretchAt(fk, qI));
-        // Momentum carry — the freed girder keeps sliding sideways (ease-out)
-        // and lands exactly on the projected offset the verdict scored.
-        setFallDrift(driftPxRef.current * driftFracAt(fk));
+
+        if (tSince < impactAt) {
+          const k = Math.min(1, tSince / impactAt);
+          // TRUE GRAVITY: position integrates as k² (fallEase), so the girder is
+          // genuinely slow off the hook and genuinely fast at touchdown. This
+          // replaces a CSS cubic-bezier that only approximated the shape and
+          // could not be interrupted or followed by a settle.
+          if (fallerElRef.current) {
+            fallerElRef.current.style.transform = `translateY(${fallPxRef.current * fallEase(k)}px)`;
+          }
+          // Momentum carry — the freed girder keeps sliding sideways (ease-out)
+          // and lands exactly on the projected offset the verdict scored.
+          if (driftElRef.current) {
+            driftElRef.current.style.transform = `translateX(${driftPxRef.current * driftFracAt(k)}px)`;
+          }
+          // Deterministic straighten: the freed load pivots to hang straight in
+          // sync with the fall window, so at touchdown its visual x is exactly
+          // trolley + drift — the projected offset the verdict scored.
+          const straight = releaseAngleRef.current * Math.pow(1 - k, 1.5);
+          pendulumRef.current = { angleDeg: straight, velDegPerSec: 0 };
+          if (pendulumElRef.current) pendulumElRef.current.style.transform = `rotate(${straight}deg)`;
+          // Cable personality: whip (recoil) + load stretch scaled by drop quality
+          // (heavier miss yanks the cable harder — Tower Bloxx cable feel).
+          if (cableElRef.current) {
+            cableElRef.current.style.height = `${cableLenRef.current + cableRecoilPx(k) + cableStretchAt(k, qI)}px`;
+          }
+        } else {
+          // ── touchdown: squash, rebound, rest ──
+          const k2 = Math.min(1, (tSince - impactAt) / Math.max(1, total - impactAt));
+          const up = settleUpPxRef.current * settleBounceFrac(k2);
+          if (fallerElRef.current) {
+            fallerElRef.current.style.transform = `translateY(${fallPxRef.current - up}px)`;
+          }
+          if (driftElRef.current) driftElRef.current.style.transform = `translateX(${driftPxRef.current}px)`;
+          if (pendulumElRef.current) pendulumElRef.current.style.transform = 'rotate(0deg)';
+          // Pancake on contact and recover — the "catch" that makes the block
+          // read as heavy. Scaled by drop depth, origin at the girder's feet so
+          // it compresses onto the tower rather than sinking through it.
+          if (beamElRef.current) {
+            const rebound = Math.pow(1 - k2, 3);
+            const sy = 1 - squashAmtRef.current * rebound;
+            const sx = 1 + squashAmtRef.current * 0.6 * rebound;
+            beamElRef.current.style.transform = `scale(${sx}, ${sy})`;
+          }
+          if (cableElRef.current) cableElRef.current.style.height = `${cableLenRef.current}px`;
+        }
       } else {
+        // ── aiming: sweep + pendulum + live preview ─────────────────────────
+        // Each letter on the beam widens the swing, capped at the full sweep (#9).
+        // Scales the single source of the sweep, so the shown swing and the scored
+        // release offset stay identical (WYSIWYG).
+        const x = craneOffsetAt(elapsed, periodMs) * swingKRef.current;
+        posRef.current = x;
+        if (trolleyElRef.current) {
+          trolleyElRef.current.style.transform = `translateX(${x * TROLLEY_RANGE_PX}px)`;
+        }
+        // Swing the landing target when the tower is unstable (0 = steady). Uses the
+        // ABSOLUTE timestamp (not `elapsed`, which resets each floor when periodMs
+        // changes) so it stays phase-locked with the Pixi tower's visible swing —
+        // the swaying tower IS the moving target the player aims at.
+        const s = swayNormalizedOffset(swayAngleAt(now, instabilityRef.current));
+        swayRef.current = s;
+        if (reticleElRef.current) {
+          reticleElRef.current.style.transform = `translateX(${s * TROLLEY_RANGE_PX}px)`;
+        }
+
+        const velNorm = (x - prevPosRef.current) / (Math.max(dtMs, 1) / 1000) / 2.5;
         // Pendulum: the load trails the trolley's velocity (spring-damper).
         const p = stepPendulum(pendulumRef.current, pendulumTargetDeg(velNorm), dtMs);
         pendulumRef.current = p;
-        setPendulumDeg(p.angleDeg);
+        if (pendulumElRef.current) pendulumElRef.current.style.transform = `rotate(${p.angleDeg}deg)`;
         // Live cable stretch from swing load — the girder yanks the cable when
         // the pendulum is maxed (weight under gravity).
         const loadPull = Math.min(1, Math.abs(p.angleDeg) / 10);
-        setCableStretch(cableStretchAt(0.35, loadPull * 0.55));
+        if (cableElRef.current) {
+          cableElRef.current.style.height = `${cableLenRef.current + cableStretchAt(0.35, loadPull * 0.55)}px`;
+        }
         // The LOAD is what the player times — smooth ITS velocity (norm/ms) for
         // the momentum projection read at the moment of letting go.
         const load = loadOffsetNorm(x, p.angleDeg, armPxRef.current, TROLLEY_RANGE_PX);
         velPerMsRef.current = smoothVelocity(velPerMsRef.current, (load - prevLoadRef.current) / Math.max(dtMs, 1));
         prevLoadRef.current = load;
+
+        // Momentum-projected preview from the LOAD's live position — the exact
+        // same projection the verdict uses, so the preview can never disagree
+        // with the verdict that follows (WYSIWYG invariant). The depth-scaled
+        // `fallMs` MUST be passed here too: the preview used to fall back to the
+        // module default while `drop()` passed the real window, so the shadow
+        // marked one landing spot and the verdict scored a slightly different one.
+        const previewProjected = landingOffset(load, velPerMsRef.current, fallMsRef.current);
+        const band = alignmentBand(effectiveDropError(previewProjected, s), perfectBandBonusRef.current);
+        pushBand(band);
+        const previewDriftPx = (previewProjected - x) * TROLLEY_RANGE_PX;
+        if (shadowElRef.current) {
+          shadowElRef.current.style.transform = `translateX(calc(-50% + ${previewDriftPx}px))`;
+          shadowElRef.current.style.backgroundColor = BAND_SHADOW[band];
+        }
+        if (glowElRef.current) {
+          glowElRef.current.style.transform = `translateX(${x * TROLLEY_RANGE_PX}px)`;
+          glowElRef.current.style.background = `radial-gradient(circle at 50%, ${BAND_GLOW[band]} 0%, transparent 70%)`;
+          glowElRef.current.style.opacity = String(BAND_GLOW_OPACITY[band]);
+        }
+        prevPosRef.current = x;
       }
-      prevPosRef.current = x;
       prevNowRef.current = now;
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [reducedMotion, periodMs]);
+  }, [reducedMotion, periodMs, pushBand]);
+
+  // Stop mirroring the aim once this crane goes away — the parent's DROP control
+  // must not keep wearing a stale band after the word has been placed.
+  useEffect(() => () => onLiveBandChangeRef.current?.(null), []);
 
   const drop = useCallback(() => {
     if (droppedRef.current) return;
@@ -283,7 +412,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
       : loadOffsetNorm(posRef.current, pendulumRef.current.angleDeg, armPxRef.current, TROLLEY_RANGE_PX);
     releaseAngleRef.current = pendulumRef.current.angleDeg;
     const swayOffset = swayRef.current;
-    // Ballistic landing: same fallMs as the CSS/rAF window so carry matches visual.
+    // Ballistic landing: same fallMs as the rAF window so carry matches visual.
     const projected = landingOffset(signedOffset, velPerMsRef.current, fallMsRef.current);
     // Drift is applied inside the (frozen) trolley wrapper, so it spans from
     // the trolley to the projected landing — the straightening pendulum closes
@@ -297,9 +426,10 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     setDroppedQuality(outcome.quality);
     dropQualityRef.current = outcome.quality;
     dropAtRef.current = performance.now();
+    onLiveBandChangeRef.current?.(null); // aim is spent — clear the mirrored band
     setFalling(true);
-    // Let the girder fall most of the way (so the beam visibly lands) before the
-    // verdict pops + the tower commits — keeps the placement one continuous beat.
+    // Let the girder fall + settle before the verdict pops and the tower
+    // commits — keeps the placement one continuous beat.
     setTimeout(() => {
       setResult(outcome);
       onDrop(outcome);
@@ -311,18 +441,6 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   const { language } = useLanguage();
   const perf = useDevicePerformance();
   const enableGlowTrail = perf.enableGlowEffects && !reducedMotion;
-  const trolleyX = pos * TROLLEY_RANGE_PX;
-  // The band the CURRENT sweep position would score AGAINST THE SWAYING TOP —
-  // drives the live beam tint + landing shadow so the drop is a readable skill
-  // shot even while the target swings (WYSIWYG).
-  // Momentum-projected preview from the LOAD's live position — the exact same
-  // `loadOffsetNorm` + `landingOffset` projection the verdict uses, so the band
-  // + shadow show where the swinging girder WILL land, never where the trolley
-  // merely hangs (WYSIWYG invariant, see cranePendulum.ts).
-  const loadNow = loadOffsetNorm(pos, pendulumDeg, armPx, TROLLEY_RANGE_PX);
-  const previewProjected = landingOffset(loadNow, velPerMsRef.current);
-  const liveBand = alignmentBand(effectiveDropError(previewProjected, sway), perfectBandBonus);
-  const previewDriftPx = (previewProjected - pos) * TROLLEY_RANGE_PX;
   const aiming = !falling && !result;
   // Release celebration — event-driven landFeedback so perfect/good sparkles
   // + glow match the scene's land punch; reduced-motion zeroes continuous juice.
@@ -340,7 +458,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
   const { chars: beamChars, hiddenCount } = craneBeamBricks(beamWord);
   const beamTilePx = craneBeamTilePx(beamChars.length);
   // Glyph size tracks the brick so dense (small-brick) girders stay legible.
-  const beamFontPx = Math.max(11, Math.round(beamTilePx * 0.5));
+  const beamFontPx = Math.max(11, Math.round(beamTilePx * 0.52));
   // Feed the live beam length to the sweep so each added letter swings wider (#9).
   swingKRef.current = craneSwingFactor(beamChars.length);
 
@@ -348,11 +466,23 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
     <div
       data-testid="wt-crane"
       className="pointer-events-auto absolute inset-x-0 z-30 flex flex-col items-center px-4"
+      // `gap` is driven by the SAME constant `craneShadowOffsetFromOuterTop`
+      // uses, deliberately. It is 0 today (the chrome is the only child since
+      // the stability meter was removed), so it is inert — but anything mounted
+      // ABOVE the chrome later must bump that constant, or the gap it adds will
+      // push the landing shadow off the build line it is pinned to. Keeping the
+      // style bound to the constant means the two can never drift apart.
       style={{ top: craneTopPx ?? '20%', gap: `${CRANE_OUTER_GAP_PX}px` }}
       role="group"
       aria-label={t('wordTower.crane.place')}
     >
-      <CraneStabilityMeter consecutiveSloppy={consecutiveSloppy} t={t} />
+      {/* The STABILITY dot-meter that used to sit here is gone. It was an
+          always-on widget at the top of the screen restating something the
+          scene now says better and diegetically: the tower visibly leans and
+          sways as drops get imprecise, and the do-or-die state already gets its
+          own banner via the notice column's `critical` flag. Dropping it also
+          bought ~44px of headroom above the build line, which went straight
+          into a longer fall (see CRANE_SHADOW_Y_PX). */}
 
       {/* Crane chrome — mast + jib + cable + hook + beam */}
       <div
@@ -404,31 +534,25 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
           }}
           aria-hidden
         />
-        {/* Trolley sweep wrapper — translateX only. The landing shadow lives in
-            here too, so it shares the EXACT horizontal offset + centring as the
-            beam and stays glued under it (no abspos-in-flex drift). The inner div
-            owns the vertical fall so the ground shadow doesn't drop with it.
-            top offset is CRANE_TROLLEY_TOP_PX (SSoT with playChromeFrame). */}
+        {/* Trolley sweep wrapper — translateX only, written by the rAF. The
+            landing shadow lives in here too, so it shares the EXACT horizontal
+            offset + centring as the beam and stays glued under it (no
+            abspos-in-flex drift). The inner div owns the vertical fall so the
+            ground shadow doesn't drop with it. top offset is
+            CRANE_TROLLEY_TOP_PX (SSoT with playChromeFrame). */}
         <div
+          ref={trolleyElRef}
           className="absolute z-20 will-change-transform"
-          style={{ top: `${CRANE_TROLLEY_TOP_PX}px`, transform: `translateX(${trolleyX}px)` }}
+          style={{ top: `${CRANE_TROLLEY_TOP_PX}px` }}
         >
-          {/* Momentum drift — rAF-driven X, kept OUTSIDE the CSS-transitioned
-              faller so the ease-out sideways carry composes with the ease-in
-              gravity fall (one transition curve can't do both). */}
-          <div className="will-change-transform" style={{ transform: `translateX(${fallDrift}px)` }}>
+          {/* Momentum drift — its own wrapper so the ease-out sideways carry
+              composes with the ease-in gravity fall below (one transform can't
+              express both curves). */}
+          <div ref={driftElRef} className="will-change-transform">
           <div
-            style={{
-              transform: `translateY(${falling ? fallPx : 0}px)`,
-              // True gravity feel: an ease-IN curve so the girder ACCELERATES the
-              // whole way down (slow lift-off → fast slam) instead of the old
-              // ease-in-out that decelerated before landing. The landing squash on
-              // the girder below supplies the "catch", so the fall itself can hit
-              // hard. Tuned to land just as the verdict pops (drop() fires at 300ms).
-              // Gravity ease-in curve; duration = depth-scaled fallMs (Bloxx weight).
-              transition: falling ? `transform ${fallMs}ms cubic-bezier(0.55,0.06,0.9,0.28)` : 'none',
-              transformOrigin: 'top center',
-            }}
+            ref={fallerElRef}
+            className="will-change-transform"
+            style={{ transformOrigin: 'top center' }}
           >
             {/* Trolley carriage — the fixed joint the load hangs + swings from.
                 A pulley wheel riding on top sells "runs along the jib" instead
@@ -441,15 +565,17 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                 so the block reads as a heavy thing under gravity; it settles to
                 upright the moment it's released (drop straightens it). */}
             <div
+              ref={pendulumElRef}
               className="relative will-change-transform"
-              style={{ transform: `rotate(${pendulumDeg}deg)`, transformOrigin: 'top center' }}
+              style={{ transformOrigin: 'top center' }}
             >
-              {/* Cable — adapts to the girder height (long word = short drape),
-                  whips up on release, then settles as the load falls. */}
+              {/* Cable — a SHORT drape holding the load high under the jib.
+                  Whips up on release, then settles as the girder falls. */}
               <div
+                ref={cableElRef}
                 data-testid="crane-cable"
                 className="mx-auto w-[2px] bg-black"
-                style={{ height: `${cableLen + cableStretch}px` }}
+                style={{ height: `${cableLen}px` }}
                 aria-hidden
               />
               {/* Hook — snaps open the instant the load releases */}
@@ -462,24 +588,29 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                 }}
                 aria-hidden
               />
-              {/* Held WORD BEAM — up to 3 bricks stacked base-first (flex-col-reverse:
+              {/* Held WORD BEAM — bricks stacked base-first (flex-col-reverse:
                   word[0] at the bottom, exactly how it settles into the tower at pos 0).
                   The bricks wear the FINAL committed material colour, so the girder does
                   NOT change colour when it lands. The "stop here" skill cue lives on the
                   glow ring + the reticle/shadow below, not on the face. */}
               <div className="relative mx-auto" style={{ width: `${beamTilePx}px` }}>
                 <div
+                  ref={beamElRef}
                   data-testid="crane-block"
                   className={cn(
                     'flex flex-col-reverse items-stretch justify-center gap-px rounded-none',
                     !reducedMotion && !falling && 'animate-neo-pop',
-                    !reducedMotion && falling && 'crane-girder-land',
                     celebrating && release?.glow && 'crane-girder-perfect',
                     // Perfect-release cue: a lime glow ring (NOT a face recolour) so
                     // the skill shot stays readable while the colour stays honest.
                     onSweetSpot && 'ring-4 ring-neo-lime ring-offset-2 ring-offset-neo-navy',
                   )}
-                  style={{ width: `${beamTilePx}px`, height: `${beamHPx}px` }}
+                  style={{
+                    width: `${beamTilePx}px`,
+                    height: `${beamHPx}px`,
+                    // Squash on touchdown compresses the girder onto the tower.
+                    transformOrigin: 'bottom center',
+                  }}
                   dir={language === 'he' ? 'rtl' : 'ltr'}
                 >
                   {beamChars.map((ch, i) => (
@@ -502,8 +633,8 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
                     </span>
                   ))}
                 </div>
-                {/* "+N" badge — the carried girder is capped to 3 bricks; this keeps
-                    the word's true length legible without building a tall stack. */}
+                {/* "+N" badge — the carried girder is capped; this keeps the
+                    word's true length legible without building a tall stack. */}
                 {hiddenCount > 0 && (
                   <span
                     className="absolute -right-2 -top-2 z-20 rounded-full border border-black bg-neo-navy px-1 font-neo-display text-[9px] font-black leading-tight text-neo-white shadow-hard"
@@ -519,37 +650,40 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
           </div>
           {/* Predictive landing shadow — centred under the beam (shares this
               wrapper's translateX) PLUS the momentum drift, so it marks where
-              the girder will actually LAND; recolours by the live band.
+              the girder will actually LAND; recoloured per frame by the rAF.
               Sibling of the faller, so it stays on the ground. */}
           {aiming && (
             <div
-              className="absolute left-1/2 z-0 h-2 w-14 rounded-[50%] blur-[1px]"
+              ref={shadowElRef}
+              className="absolute left-1/2 z-0 h-2 w-14 -translate-x-1/2 rounded-[50%] blur-[1px] will-change-transform"
               style={{
                 top: `${CRANE_SHADOW_Y_PX - CRANE_SHADOW_VISUAL_NUDGE_PX}px`,
                 backgroundColor: BAND_SHADOW[liveBand],
-                transition: 'background-color 100ms linear',
-                transform: `translateX(calc(-50% + ${previewDriftPx}px))`,
               }}
               aria-hidden
             />
           )}
         </div>
 
-        {/* Glow trail along the jib — follows the trolley with a quality-tinted
-            luminous streak. Disabled on reduced-motion or low-end devices so the
-            effect never becomes a performance burden. */}
+        {/* Glow trail along the jib — a tinted puck that TRACKS the trolley via
+            transform. It used to repaint a full-width radial gradient every
+            frame (a new paint of the whole strip, 60×/s); a translated element
+            composites instead. Disabled on reduced-motion or low-end devices. */}
         {enableGlowTrail && aiming && (
           <div
-            className="pointer-events-none absolute inset-x-0 z-0 will-change-transform"
-            style={{
-              top: `${CRANE_TROLLEY_TOP_PX - 10}px`,
-              height: '22px',
-              background: `radial-gradient(circle at calc(50% + ${trolleyX}px), ${BAND_GLOW[liveBand]} 0%, transparent 70%)`,
-              opacity: liveBand === 'perfect' ? 0.85 : liveBand === 'good' ? 0.55 : liveBand === 'sloppy' ? 0.35 : 0.2,
-              transition: 'opacity 100ms linear',
-            }}
+            className="pointer-events-none absolute inset-x-0 z-0 overflow-hidden"
+            style={{ top: `${CRANE_TROLLEY_TOP_PX - 10}px`, height: '22px' }}
             aria-hidden
-          />
+          >
+            <div
+              ref={glowElRef}
+              className="absolute left-1/2 h-full w-40 -translate-x-1/2 will-change-transform"
+              style={{
+                background: `radial-gradient(circle at 50%, ${BAND_GLOW[liveBand]} 0%, transparent 70%)`,
+                opacity: BAND_GLOW_OPACITY[liveBand],
+              }}
+            />
+          </div>
         )}
 
         {/* Drop-target guide — the bullseye the beam should land on. It SWINGS
@@ -557,6 +691,7 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
             player aims the beam at where the top actually is. Brighter ring makes
             it a clear reticle, not just a faint dash. */}
         <div
+          ref={reticleElRef}
           className={cn(
             'absolute z-0 h-2 w-20 rounded-full border-neo border-dashed will-change-transform',
             // On the sweet spot the reticle goes SOLID + bright + pulses, so the
@@ -573,8 +708,6 @@ const WordTowerCrane = forwardRef<WordTowerCraneHandle, WordTowerCraneProps>(fun
             // so guide + shadow + touchdown are one mark, not three. Offsets
             // share SSoT with playChromeFrame / craneShadowOffsetFromOuterTop.
             top: `${CRANE_TROLLEY_TOP_PX + CRANE_SHADOW_Y_PX - CRANE_SHADOW_VISUAL_NUDGE_PX}px`,
-            transform: `translateX(${sway * TROLLEY_RANGE_PX}px)`,
-            transition: reducedMotion ? 'none' : 'transform 60ms linear',
           }}
           aria-hidden
         />

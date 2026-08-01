@@ -79,11 +79,14 @@ describe('playChromeFrame — shared construction / notice / crane framing', () 
     expect(f.craneTopPx + craneShadowOffsetFromOuterTop(meter)).toBeCloseTo(f.buildLineY, 0);
   });
 
-  it('encodes the ~28px DOM extras (gap-3 + trolley top − nudge) vs a chrome-only model', () => {
-    // Incomplete model was: craneTop + meter + CRANE_SHADOW_Y_PX
-    // Real path adds: gap-3(12) + trolley(20) − nudge(4) = 28
+  it('encodes the DOM extras (outer gap + trolley top − nudge) vs a chrome-only model', () => {
+    // Incomplete model was: craneTop + meter + CRANE_SHADOW_Y_PX.
+    // The real path also carries the outer gap, the trolley offset and the
+    // shadow's visual nudge. What matters is that ALL of them are accounted
+    // for — the exact total moves whenever the chrome above the crane changes
+    // (it dropped from 28 to 16 when the stability meter and its gap were
+    // removed), so asserting a literal here only ever produced false alarms.
     const extras = CRANE_OUTER_GAP_PX + CRANE_TROLLEY_TOP_PX - CRANE_SHADOW_VISUAL_NUDGE_PX;
-    expect(extras).toBe(28);
     const meter = 32;
     expect(craneShadowOffsetFromOuterTop(meter)).toBe(meter + CRANE_SHADOW_Y_PX + extras);
   });

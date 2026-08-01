@@ -45,13 +45,17 @@ export function WordTowerMinimap({ heightM, viewM, personalBestM, rivals, onScro
       type="button"
       onClick={onScrollTop}
       aria-label={t('wordTower.minimap.label', { m: Math.round(heightM) })}
-      className="pointer-events-auto absolute end-2 top-[18%] z-[8] flex h-[52%] w-11 flex-col items-center justify-end"
+      // Trimmed from h-[52%] w-11 (half the screen height for a rail that is
+      // mostly empty sky) down to a pocket strip. It still does its one real
+      // job — where you are on the climb relative to your best and to the zone
+      // bands — without dominating the play surface.
+      className="pointer-events-auto absolute end-2 top-[26%] z-[8] flex h-[30%] w-8 flex-col items-center justify-end"
     >
       {/* Enriched rail: wider bands, zone separators, stronger self/PB/rival hierarchy. */}
       <div
         data-minimap-rail
         data-enriched="true"
-        className="relative w-7 flex-1 overflow-hidden rounded-neo border-neo-thick border-black bg-neo-navy/80 shadow-hard"
+        className="relative w-5 flex-1 overflow-hidden rounded-neo border-neo border-black bg-neo-navy/80 shadow-hard-sm"
       >
         {zones.map((z, i) => (
           <div

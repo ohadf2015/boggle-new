@@ -8,6 +8,7 @@ import { useRewardedAd } from '@/hooks/useRewardedAd';
 import { canRequestClue, CLUE_RUN_CAP } from '@/lib/wordTower/clueGate';
 import { type ActiveRunPerk } from '@/lib/wordTower/useRunStreakPerk';
 import { WordTowerWheel } from './WordTowerWheel';
+import type { PlacementQuality } from '@/lib/wordTower/cranePlacement';
 
 export interface WordTowerHudProps {
   /** @deprecated chain retired — always '' now; kept for prop-shape stability. */
@@ -42,6 +43,9 @@ export interface WordTowerHudProps {
    *  truthy the BUILD CTA flips to a DROP CTA at the SAME screen position so
    *  the player's thumb never has to chase the crane. */
   pendingWord?: string | null;
+  /** The band the crane's aim would currently score, mirrored onto the DROP hub
+   *  so the shot can be timed from the bottom of the screen. `null` = not aiming. */
+  aimBand?: PlacementQuality | null;
   /** Pre-formatted height reward ("+3m") for the current word — shown on the
    *  wheel's BUILD hub so the payoff is visible before committing. */
   gainPreview?: string;
@@ -81,7 +85,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
     tray, selected, word, heightM, combo, scramblesLeft, scrambleCost = 0, coinBalance = 0,
     accentHex = '#7c8a99', reducedMotion = false,
     possibleWords, clueWord, onReroll, goldenLetter, lastError, errorKey, lastResult, resultKey,
-    pendingWord, gainPreview, onCraneDrop, onCancelPlacement,
+    pendingWord, aimBand, gainPreview, onCraneDrop, onCancelPlacement,
     onSelectTile, onDeselectTile, onBackspace, onClear, onSubmit, onScramble, onDeckHeight, runPerks, t, dir,
   } = props;
   void onClear;
@@ -354,6 +358,7 @@ export function WordTowerHud(props: WordTowerHudProps) {
               selected={selected}
               word={word}
               placing={isPlacing}
+              aimBand={aimBand}
               canBuild={canSubmit}
               gainPreview={gainPreview}
               intensity={intensity}

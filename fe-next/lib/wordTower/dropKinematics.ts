@@ -8,17 +8,25 @@
  * projection so the preview can never disagree with the verdict.
  */
 
+import { FALL_MIN_MS } from './fallProfile';
+
 /** Fraction of the ballistic drift actually applied. Bumped 0.5→0.58 so
  *  release-before-center (the Tower Bloxx skill) is legible without runaway. */
 export const CARRY_FACTOR = 0.58;
 /** Hard cap on momentum drift in normalized offset units. */
 export const MAX_DRIFT = 0.38;
 /**
- * Default fall duration (ms). Crane may use a depth-scaled value from
- * {@link fallDurationMs}; when it does, pass the same ms into
- * {@link landingOffset} so the visual and the verdict stay locked.
+ * Default fall duration (ms) — pinned to {@link FALL_MIN_MS} so this fallback can
+ * never drift below the shortest real drop. It used to be a hardcoded 320 while
+ * `fallDurationMs` returned 318–444, meaning a caller that omitted the argument
+ * projected drift over a different window than the drop actually used.
+ *
+ * Callers should still pass the SAME depth-scaled `fallDurationMs` they animate
+ * with; the live preview and the scored verdict must agree exactly or the
+ * WYSIWYG invariant breaks (the shadow marks one spot, the verdict scores
+ * another).
  */
-export const FALL_MS = 320;
+export const FALL_MS = FALL_MIN_MS;
 
 const clamp = (n: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, n));
 

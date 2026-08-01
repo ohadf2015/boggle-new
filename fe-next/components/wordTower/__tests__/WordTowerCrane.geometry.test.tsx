@@ -7,7 +7,13 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 import WordTowerCrane from '../WordTowerCrane';
 import { craneBeamBricks, craneBeamTilePx } from '@/lib/wordTower/craneBeamDisplay';
-import { CRANE_CHROME_H_PX, craneCableLenPx } from '@/lib/wordTower/craneGeometry';
+import {
+  CABLE_DRAPE_MAX_PX,
+  CRANE_CHROME_H_PX,
+  craneBeamBottomPx,
+  craneCableLenPx,
+  craneFallPx,
+} from '@/lib/wordTower/craneGeometry';
 
 const baseProps = {
   consecutiveSloppy: 0,
@@ -35,7 +41,23 @@ describe('WordTowerCrane adaptive hang geometry', () => {
     cleanup();
   });
 
-  it('a long word gets a shorter cable than a short word', () => {
-    expect(craneCableLenPx(beamHFor('STACKING'))).toBeLessThan(craneCableLenPx(beamHFor('CAT')));
+  // The old rule was "pay out as much cable as possible", so a long word had to
+  // be given a SHORTER cable to keep its girder off the shadow — this test
+  // pinned that. The crane now holds its load high on a short drape instead, so
+  // the meaningful invariant is no longer relative cable length between words;
+  // it is that a longer girder never steals the fall. (Drop distance per word
+  // length is covered in lib/wordTower/__tests__/craneDropPhysics.test.ts.)
+  it('never pays out more cable than the short jib drape, at any word length', () => {
+    for (const word of ['CAT', 'TOWER', 'STACKING', 'EXTRAORDINARY']) {
+      expect(craneCableLenPx(beamHFor(word))).toBeLessThanOrEqual(CABLE_DRAPE_MAX_PX);
+    }
+  });
+
+  it('a longer girder never hangs lower than a short one', () => {
+    expect(craneBeamBottomPx(beamHFor('STACKING'))).toBeGreaterThanOrEqual(
+      craneBeamBottomPx(beamHFor('CAT')),
+    );
+    // ...and both still clear the landing mark with room to fall.
+    expect(craneFallPx(beamHFor('STACKING'))).toBeGreaterThan(0);
   });
 });

@@ -22,8 +22,12 @@ import {
 export const DEFAULT_TOP_CHROME_PX = 112;
 /** Breathing room between the notice stack bottom and the construction zone. */
 export const NOTICE_CONSTRUCTION_GAP_PX = 12;
-/** Stability meter above the crane chrome (approx py-1 + 10px label + dots). */
-export const DEFAULT_CRANE_METER_H_PX = 32;
+/** Height reserved above the crane chrome. Now 0 — the stability dot-meter that
+ *  used to live there was removed (the tower's own lean/sway shows instability
+ *  better, and the do-or-die state has its own banner). Kept as a parameter
+ *  rather than deleted so callers that mount something above the crane can still
+ *  keep the landing shadow pinned to the build line. */
+export const DEFAULT_CRANE_METER_H_PX = 0;
 /** Floor for notice band height so a short phone still shows a verdict. */
 const NOTICE_MIN_H_PX = 48;
 

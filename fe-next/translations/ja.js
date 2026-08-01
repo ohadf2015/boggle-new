@@ -639,8 +639,8 @@ const ja = {
       }
     },
     "crane": {
+      "drop": "ドロップ",
       "place": "単語を置く",
-      "steer": "操作して落とす",
       "tapToDrop": "タップして落とす",
       "perfect": "パーフェクト！",
       "good": "ナイス！",
