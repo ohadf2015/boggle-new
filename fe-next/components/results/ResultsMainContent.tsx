@@ -106,6 +106,10 @@ export interface ResultsMainContentProps {
    *  where WheelRushResultsScene already shows every placement on the wheel, so
    *  the standings here would just duplicate names/scores/avatars/ranks. */
   hideStandings?: boolean;
+  /** Set by the page when a mode-specific scene below already prints the
+   *  current player's best word (blast), so the highlights strip drops its
+   *  duplicate chip. Same contract as hideStandings. */
+  hideBestWord?: boolean;
   allPlayerWords?: Record<string, WordObject[]>;
   gameDuration?: number;
   /** Callback for podium emoji reactions */
@@ -164,6 +168,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   isCurrentUserWinner,
   hideDetailsToggle,
   hideStandings,
+  hideBestWord,
   shareCardStats,
   onStartGame: _onStartGame,
 }) {
@@ -257,20 +262,32 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       ''
     );
     const displayWord = language === 'he' ? applyHebrewFinalLetters(longestWord) : longestWord;
-    const stats = [
-      {
+    const stats: Array<{ label: string; value: string | number; icon: React.ReactNode; color: string }> = [];
+    // Best word: blast prints it in its own stat card below the standings, and
+    // this component can't see that scene — so the page that renders it sets
+    // hideBestWord (same contract as hideStandings). Two "BEST WORD" rows on
+    // one screen is worse than one, especially since the two are computed
+    // differently (longest here, blast's own metric there) and can disagree.
+    if (!hideBestWord) {
+      stats.push({
         label: t('results.bestWord') || 'Best Word',
         value: displayWord.toUpperCase() || '—',
         icon: <Sparkles className="w-3 h-3" />,
         color: 'text-neo-pink',
-      },
-      {
+      });
+    }
+    // Words-found lives in exactly ONE place. In word-hunt the hero already
+    // shows it as a badge beside the target word ("TARGET / WORDS FOUND"), from
+    // this same count — restating it here is the same number twice, one section
+    // apart. Every other mode has nothing else carrying it, so it stays.
+    if (!isWordHunt) {
+      stats.push({
         label: t('results.wordsFound') || 'Words Found',
         value: currentPlayerValidWords.length,
         icon: <Type className="w-3 h-3" />,
         color: 'text-neo-lime',
-      },
-    ];
+      });
+    }
     // "Only You" lives in exactly ONE place. When the RivalsPanel renders (2p) it
     // already brags this count richer ("✨ Only you found N"), so showing it again
     // here is the same number twice, adjacent. Keep it for 3+ games (podium has no
@@ -313,7 +330,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
       }
     }
     return stats;
-  }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language, showRivals, isAuthenticated, coinReward, rivalBestWordVariant, allPlayerWords, username, sortedScores]);
+  }, [currentPlayerData, currentPlayerValidWords, uniqueWordsCount, t, language, showRivals, isWordHunt, hideBestWord, isAuthenticated, coinReward, rivalBestWordVariant, allPlayerWords, username, sortedScores]);
 
   // Share params for the share button
   const shareParams = useMemo(() => {

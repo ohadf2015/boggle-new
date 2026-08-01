@@ -904,6 +904,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
     hideStandings:
       (isWheelRush && hasWheelRushStats) ||
       (resolvedGameMode === 'blast' && sortedScores.length > 1),
+    // BlastResultsScene below prints the current player's best word in its own
+    // stat card; only it knows whether that row will actually render, so decide
+    // here rather than duplicating the chip in the highlights strip above.
+    hideBestWord:
+      resolvedGameMode === 'blast' && !!blastPlayerStats[username]?.bestWord,
   };
 
   // Word Hunt results data (shared between tabs) — memoized to avoid O(n²) per render

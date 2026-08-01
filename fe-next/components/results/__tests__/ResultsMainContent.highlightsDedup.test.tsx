@@ -79,3 +79,77 @@ describe('ResultsMainContent — "Only You" dedup', () => {
     expect(screen.getByTestId('highlights').textContent).toContain('results.uniqueWords.label');
   });
 });
+
+/**
+ * Same rule, next instance: in word-hunt the hero renders its own
+ * "WORDS FOUND: N" badge next to the target word, from the very same
+ * currentPlayerValidWords.length. HighlightsBar must not restate it.
+ */
+describe('ResultsMainContent — words-found dedup', () => {
+  it('word-hunt → HighlightsBar omits words-found (the hero badge carries it)', () => {
+    render(
+      <ResultsMainContent
+        {...baseProps}
+        gameMode="word-hunt"
+        sortedScores={[mk('alice', 500), mk('bob', 400), mk('cara', 300)]}
+        currentPlayerData={mk('bob', 400)}
+        currentPlayerRank={2}
+        isCurrentUserWinner={false}
+        username="bob"
+      />
+    );
+    expect(screen.getByTestId('highlights').textContent).not.toContain('results.wordsFound');
+  });
+
+  it('non-word-hunt → HighlightsBar keeps words-found (nothing else shows it)', () => {
+    render(
+      <ResultsMainContent
+        {...baseProps}
+        sortedScores={[mk('alice', 500), mk('bob', 400), mk('cara', 300)]}
+        currentPlayerData={mk('bob', 400)}
+        currentPlayerRank={2}
+        isCurrentUserWinner={false}
+        username="bob"
+      />
+    );
+    expect(screen.getByTestId('highlights').textContent).toContain('results.wordsFound');
+  });
+
+  it('word-hunt still shows the best-word stat (only the duplicated one drops)', () => {
+    render(
+      <ResultsMainContent
+        {...baseProps}
+        gameMode="word-hunt"
+        sortedScores={[mk('alice', 500), mk('bob', 400), mk('cara', 300)]}
+        currentPlayerData={mk('bob', 400)}
+        currentPlayerRank={2}
+        isCurrentUserWinner={false}
+        username="bob"
+      />
+    );
+    expect(screen.getByTestId('highlights').textContent).toContain('results.bestWord');
+  });
+
+  /**
+   * Blast renders its own stat card below the standings which already prints
+   * the current player's best word. ResultsMainContent can't see that, so the
+   * page that knows tells it — same shape as the existing hideStandings flag.
+   */
+  it('hideBestWord → HighlightsBar omits best-word (blast scene carries it)', () => {
+    render(
+      <ResultsMainContent
+        {...baseProps}
+        hideBestWord
+        sortedScores={[mk('alice', 500), mk('bob', 400), mk('cara', 300)]}
+        currentPlayerData={mk('bob', 400)}
+        currentPlayerRank={2}
+        isCurrentUserWinner={false}
+        username="bob"
+      />
+    );
+    const labels = screen.getByTestId('highlights').textContent;
+    expect(labels).not.toContain('results.bestWord');
+    // The strip must not collapse to nothing — the other stats still stand.
+    expect(labels).toContain('results.wordsFound');
+  });
+});
