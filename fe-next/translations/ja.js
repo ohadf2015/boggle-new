@@ -15294,6 +15294,9 @@ const ja = {
       "players": "本日{count}人がプレイ",
       "yourRank": "あなた: #{rank}",
       "cta": "デイリーチャレンジ",
+      "questTitle": "ワードブリッジ",
+      "questDesc": "両側をつなぐ言葉を見つけよう。毎日5問。",
+      "nextIn": "次の問題まで",
       "shareCallout": {
         "perfect": "完璧な連鎖！⚡ ミスゼロ。",
         "flawless": "すべての橋を架けた。🌉",
@@ -15354,6 +15357,7 @@ const ja = {
       "cta": "ピラミッド",
       "tagline": "謎は3つ、つなぐ言葉は1つ。",
       "finale": "フィナーレ",
+      "explainer": "下の3つの問題を解くと、頂上の言葉が明らかになる。",
       "finalePrompt": "3つ全てとつながる言葉は？",
       "cluesLabel": "各橋とつながる言葉を見つけよう:",
       "won": "ピラミッド完成！",

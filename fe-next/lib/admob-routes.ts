@@ -24,6 +24,7 @@ const GAME_ROUTES = [
   '/auth/callback',
   '/hebrew-multiplayer-word-game',
   '/admin',
+  '/connections',
 ];
 
 // Hub landings that share a prefix with a GAME_ROUTES entry but are themselves
@@ -32,7 +33,7 @@ const GAME_ROUTES = [
 // dashboard — instead of an in-flow slot that scrolls with the content. Matched
 // EXACTLY so the gameplay sub-routes (/brain/drills, /daily/word-hunt,
 // /daily/word-wheel, /daily/flow) stay blocked by GAME_ROUTES below.
-const ALLOWED_HUB_ROUTES = ['/brain', '/daily'];
+const ALLOWED_HUB_ROUTES = ['/brain', '/daily', '/connections'];
 
 const LOCALE_PREFIX = /^\/(en|he|sv|ja|es|ru)/;
 

@@ -64,3 +64,22 @@ describe('connections played-today marker — unconditional, works for authed + 
     expect(hasPlayedConnectionsToday()).toBe(true);
   });
 });
+
+describe('msUntilNextUtcDay — results-screen countdown', () => {
+  it('returns one hour at 23:00 UTC', async () => {
+    const { msUntilNextUtcDay } = await import('../dailyClient');
+    expect(msUntilNextUtcDay(new Date('2026-08-01T23:00:00.000Z'))).toBe(3_600_000);
+  });
+
+  it('returns a full day right at midnight UTC', async () => {
+    const { msUntilNextUtcDay } = await import('../dailyClient');
+    expect(msUntilNextUtcDay(new Date('2026-08-01T00:00:00.000Z'))).toBe(86_400_000);
+  });
+
+  it('counts down to the next UTC midnight, not local midnight', async () => {
+    const { msUntilNextUtcDay } = await import('../dailyClient');
+    expect(msUntilNextUtcDay(new Date('2026-08-01T21:15:30.500Z'))).toBe(
+      2 * 3_600_000 + 44 * 60_000 + 29_500,
+    );
+  });
+});

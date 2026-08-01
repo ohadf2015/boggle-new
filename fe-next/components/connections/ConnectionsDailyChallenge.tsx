@@ -36,6 +36,7 @@ import ConnectionsProgressTrack from './ConnectionsProgressTrack';
 import { MedalArt } from './ConnectionsRewardArt';
 import PuzzleCard from './PuzzleCard';
 import ConnectionsLeaderboard from './ConnectionsLeaderboard';
+import DailyResultRecap from './DailyResultRecap';
 
 type Action =
   | { type: 'SET_INPUT'; input: string }
@@ -199,11 +200,14 @@ export default function ConnectionsDailyChallenge() {
     if (puzzle) dispatch({ type: 'MARK_RATED', puzzleId: puzzle.id });
   }, [state.puzzles, state.currentIndex]);
 
-  const handleShare = useCallback(async () => {
-    // Build the spoiler-free "story of the chain" grid from per-bridge outcomes.
-    const outcomes: BridgeOutcome[] = Array.from({ length: total }, (_, i) =>
+  // Spoiler-free "story of the chain" — shared by the on-card recap + share text.
+  const collectOutcomes = useCallback((): BridgeOutcome[] =>
+    Array.from({ length: total }, (_, i) =>
       outcomesRef.current.get(i) ?? { reached: false, solved: false, wrongAttempts: 0, hintUsed: false },
-    );
+    ), [total]);
+
+  const handleShare = useCallback(async () => {
+    const outcomes = collectOutcomes();
     const url = typeof window !== 'undefined' ? `${window.location.origin}/connections/daily` : undefined;
     const text = buildDailyBridgeGrid({
       title: t('connections.title'),
@@ -224,7 +228,7 @@ export default function ConnectionsDailyChallenge() {
     } catch {
       /* user cancelled / unsupported */
     }
-  }, [t, today, total, results]);
+  }, [t, today, results, collectOutcomes]);
 
   if (isTerminal) {
     return (
@@ -261,6 +265,9 @@ export default function ConnectionsDailyChallenge() {
           <p className="mt-1 font-neo-body text-sm text-neo-white/70">
             {t('connections.score')}: <span className="font-bold text-neo-white">{state.score.toLocaleString()}</span>
           </p>
+          <div className="mt-3">
+            <DailyResultRecap outcomes={collectOutcomes()} nextLabel={t('connections.daily.nextIn')} />
+          </div>
           <m.button
             type="button"
             onClick={handleShare}

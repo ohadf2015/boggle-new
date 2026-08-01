@@ -17,17 +17,31 @@ vi.mock('@/lib/androidInstall/installEligibility', () => ({
   isAndroidInstallEntryEligible: () => eligible,
 }));
 
+// Route gate: the pill must never float over a gameplay surface.
+let pathname = '/en';
+vi.mock('next/navigation', () => ({
+  usePathname: () => pathname,
+}));
+
 const HIDDEN_KEY = 'android_app_install_pill_hidden';
 
 beforeEach(() => {
   captureMock.mockClear();
   sessionStorage.clear();
   eligible = true;
+  pathname = '/en';
   useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: false });
 });
 
 describe('AndroidInstallPill', () => {
   it('renders nothing when the pill is not active', () => {
+    render(<AndroidInstallPill />);
+    expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
+  });
+
+  it('renders nothing on gameplay routes (banner-blocked) even if active', () => {
+    pathname = '/he/connections/play';
+    useAndroidInstallStore.setState({ pillVisible: true });
     render(<AndroidInstallPill />);
     expect(screen.queryByText('androidAppPromo.pillLabel')).not.toBeInTheDocument();
   });

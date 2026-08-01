@@ -37,7 +37,16 @@ describe('dailyModes registry', () => {
 
   it('adminOnlyDailyModes returns the future-gated modes only', () => {
     const ids = adminOnlyDailyModes().map((m) => m.id);
-    expect(ids).toEqual(['word-tower']);
+    expect(ids).toEqual(['word-tower', 'connections']);
+  });
+
+  it('registers Connections as an admin-gated daily card pointing at the daily route', () => {
+    const connections = DAILY_MODES.find((m) => m.id === 'connections')!;
+    expect(connections).toBeDefined();
+    expect(connections.adminOnly).toBe(true);
+    expect(connections.path).toBe('/connections/daily');
+    expect(connections.accent).toBe('purple');
+    expect(dailyModeHref(connections, 'he')).toBe('/he/connections/daily');
   });
 
   it('prefixes the locale and preserves the daily query for the href', () => {

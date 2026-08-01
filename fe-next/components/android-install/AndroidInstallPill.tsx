@@ -15,10 +15,12 @@
  */
 
 import { useEffect, useMemo, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { Smartphone, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAndroidInstallStore } from '@/lib/androidInstall/androidInstallStore';
 import { isAndroidInstallEntryEligible } from '@/lib/androidInstall/installEligibility';
+import { isAllowedAdBannerRoute } from '@/lib/admob-routes';
 import {
   isCapacitorNative,
   isStandaloneDisplay,
@@ -54,7 +56,12 @@ export default function AndroidInstallPill() {
     setSessionHidden(Boolean(sessionStorage.getItem(HIDDEN_KEY)));
   }, []);
 
-  const shown = pillVisible && eligible && !sessionHidden;
+  // Same route gate as the ad banner: gameplay surfaces (on-screen keyboards,
+  // boards) must never be covered by a floating promo.
+  const pathname = usePathname();
+  const routeAllowed = isAllowedAdBannerRoute(pathname);
+
+  const shown = pillVisible && eligible && !sessionHidden && routeAllowed;
 
   // Track the impression once per appearance.
   useEffect(() => {

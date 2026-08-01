@@ -13356,6 +13356,9 @@ const en = {
       "players": "{count} players today",
       "yourRank": "You: #{rank}",
       "cta": "Daily Challenge",
+      "questTitle": "Word Bridge",
+      "questDesc": "Find the word that links both sides — 5 bridges a day.",
+      "nextIn": "Next bridge in",
       "shareCallout": {
         "perfect": "Perfect chain! ⚡ Not one slip.",
         "flawless": "Every bridge built. 🌉",
@@ -13416,6 +13419,7 @@ const en = {
       "cta": "Pyramid",
       "tagline": "3 riddles. 1 word connects them all.",
       "finale": "Finale",
+      "explainer": "Solve the 3 bottom riddles — their answers unlock the word at the top.",
       "finalePrompt": "Which word connects all three?",
       "cluesLabel": "Find the word that pairs with each bridge:",
       "won": "Pyramid complete!",

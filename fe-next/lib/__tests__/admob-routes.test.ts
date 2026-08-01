@@ -25,6 +25,16 @@ describe('isAllowedAdBannerRoute', () => {
     expect(isAllowedAdBannerRoute('/daily/')).toBe(true);
   });
 
+  it('allows the /connections landing (SEO hub) but blocks its gameplay sub-routes', () => {
+    expect(isAllowedAdBannerRoute('/connections')).toBe(true);
+    expect(isAllowedAdBannerRoute('/he/connections/')).toBe(true);
+    // Gameplay: the on-screen keyboard IS the play surface — nothing may cover it.
+    expect(isAllowedAdBannerRoute('/connections/play')).toBe(false);
+    expect(isAllowedAdBannerRoute('/connections/daily')).toBe(false);
+    expect(isAllowedAdBannerRoute('/connections/pyramid')).toBe(false);
+    expect(isAllowedAdBannerRoute('/he/connections/play')).toBe(false);
+  });
+
   it('still blocks the brain/daily GAMEPLAY sub-routes (banner must not cover play)', () => {
     expect(isAllowedAdBannerRoute('/brain/drills/word-recall')).toBe(false);
     expect(isAllowedAdBannerRoute('/daily/word-hunt')).toBe(false);

@@ -267,6 +267,9 @@ const sv = {
       "players": "{count} spelare idag",
       "yourRank": "Du: #{rank}",
       "cta": "Dagens utmaning",
+      "questTitle": "Ordbro",
+      "questDesc": "Hitta ordet som binder ihop båda sidorna — fem broar om dagen.",
+      "nextIn": "Nästa bro om",
       "shareCallout": {
         "perfect": "Perfekt kedja! ⚡ Inte ett snedsteg.",
         "flawless": "Alla broar byggda. 🌉",
@@ -316,6 +319,7 @@ const sv = {
       "cta": "Pyramid",
       "tagline": "3 gåtor. 1 ord binder ihop allt.",
       "finale": "Final",
+      "explainer": "Lös de tre gåtorna längst ner — deras svar låser upp ordet i toppen.",
       "finalePrompt": "Vilket ord förbinder alla tre?",
       "cluesLabel": "Hitta ordet som kopplar varje bro:",
       "won": "Pyramid slutförd!",

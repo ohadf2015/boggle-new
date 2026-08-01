@@ -46,6 +46,12 @@ export function markConnectionsPlayedToday(dateISO: string = todayUTC()): void {
   }
 }
 
+/** Milliseconds until the next UTC midnight — the results-screen countdown. */
+export function msUntilNextUtcDay(now: Date = new Date()): number {
+  const next = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1);
+  return next - now.getTime();
+}
+
 /** True if the player already completed today's Word Bridge daily. */
 export function hasPlayedConnectionsToday(): boolean {
   if (typeof window === 'undefined') return false;

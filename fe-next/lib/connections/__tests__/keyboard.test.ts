@@ -2,11 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { getKeyboardLetters, appendLetter, backspace, MAX_GUESS_LEN } from '../keyboard';
 
 describe('connections keyboard — pure logic', () => {
+  // Ordering follows physical-keyboard rows (see keyboardRows.test.ts) — these
+  // back-compat tests only assert the letter SET.
   it('returns the 22 Hebrew base letters for he (no sofit forms)', () => {
     const letters = getKeyboardLetters('he');
     expect(letters).toHaveLength(22);
-    expect(letters[0]).toBe('א');
-    expect(letters[letters.length - 1]).toBe('ת');
+    expect(new Set(letters).size).toBe(22);
     // no final/sofit glyphs
     for (const sofit of ['ך', 'ם', 'ן', 'ף', 'ץ']) {
       expect(letters).not.toContain(sofit);
@@ -16,8 +17,7 @@ describe('connections keyboard — pure logic', () => {
   it('returns A–Z for non-Hebrew locales', () => {
     const letters = getKeyboardLetters('en');
     expect(letters).toHaveLength(26);
-    expect(letters[0]).toBe('A');
-    expect(letters[25]).toBe('Z');
+    expect([...letters].sort().join('')).toBe('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
   });
 
   it('appends a tapped letter', () => {

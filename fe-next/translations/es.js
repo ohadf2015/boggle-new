@@ -15369,6 +15369,9 @@ const es = {
       "players": "{count} jugadores hoy",
       "yourRank": "Tú: #{rank}",
       "cta": "Desafío diario",
+      "questTitle": "Puente de palabras",
+      "questDesc": "Encuentra la palabra que une ambos lados: 5 puentes al día.",
+      "nextIn": "Próximo puente en",
       "shareCallout": {
         "perfect": "¡Cadena perfecta! ⚡ Sin fallos.",
         "flawless": "Todos los puentes, tendidos. 🌉",
@@ -15429,6 +15432,7 @@ const es = {
       "cta": "Pirámide",
       "tagline": "3 acertijos. 1 palabra los une a todos.",
       "finale": "Final",
+      "explainer": "Resuelve los 3 acertijos de abajo: sus respuestas desbloquean la palabra de arriba.",
       "finalePrompt": "¿Qué palabra conecta las tres?",
       "cluesLabel": "Encuentra la palabra que une cada puente:",
       "won": "¡Pirámide completada!",

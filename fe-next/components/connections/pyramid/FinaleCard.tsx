@@ -7,9 +7,11 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 import type { PyramidPuzzle } from '@/lib/connections/pyramid/types';
-import { localeNeedsIME, MAX_GUESS_LEN, getKeyboardLetters, appendLetter, backspace } from '@/lib/connections/keyboard';
+import { MAX_GUESS_LEN } from '@/lib/connections/keyboard';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
 import ConnectionsKeyboard from '../ConnectionsKeyboard';
+import AnswerSlots from '../AnswerSlots';
+import { useBridgeTyping } from '../useBridgeTyping';
 import { freeHintsRemaining, consumeFreeHint } from '@/lib/connections/freeHints';
 
 interface FinaleCardProps {
@@ -69,11 +71,18 @@ export default function FinaleCard({
   const isResolved = isCorrect || isGaveUp;
   const isDisabled = isResolved;
 
-  const keyboardLetters = getKeyboardLetters(language);
-  const needsIME = localeNeedsIME(language);
-  const handleLetter = (letter: string) => onInputChange(appendLetter(input, letter));
-  const handleBackspace = () => onInputChange(backspace(input));
+  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace } = useBridgeTyping({
+    input,
+    answer: pyramid.metaAnswer,
+    locale: language,
+    disabled: isDisabled,
+    status,
+    wrongAttempts,
+    onInputChange,
+    onSubmit,
+  });
   const bufferDisplay = isRTL ? applyHebrewFinalLetters(input) : input;
+  const slotsValue = isResolved ? pyramid.metaAnswer.replace(/[^\p{L}\p{N}]/gu, '') : bufferDisplay;
 
   // Free daily hint allowance comes before the ad gate (parity with PuzzleCard).
   const [freeHints, setFreeHints] = useState(() => freeHintsRemaining());
@@ -254,27 +263,16 @@ export default function FinaleCard({
             )
           ) : (
             <>
-              <div
-                aria-live="polite"
-                aria-label={t('connections.placeholder')}
-                className={[
-                  'min-h-[3.25rem] rounded-neo border-neo bg-neo-navy px-4 py-3 text-lg shadow-hard',
-                  'flex items-center font-neo-display font-bold tracking-[0.2em] transition-colors duration-200',
-                  isRTL ? 'justify-end text-right' : 'justify-start text-left',
-                  isCorrect ? 'border-neo-lime' : isWrong ? 'border-neo-red bg-neo-red/10' : 'border-neo-white/20',
-                ].join(' ')}
-              >
-                {bufferDisplay ? (
-                  <span className="text-neo-white">{bufferDisplay}</span>
-                ) : (
-                  <span className="text-neo-white/40 font-neo-body font-normal tracking-normal">
-                    {t('connections.placeholder')}
-                  </span>
-                )}
-              </div>
+              <AnswerSlots
+                value={slotsValue}
+                slotCount={slotCap}
+                state={isCorrect ? 'correct' : isWrong ? 'wrong' : 'idle'}
+                dir={isRTL ? 'rtl' : 'ltr'}
+                label={t('connections.placeholder')}
+              />
               {!isDisabled && (
                 <ConnectionsKeyboard
-                  letters={keyboardLetters}
+                  rows={keyboardRows}
                   dir={isRTL ? 'rtl' : 'ltr'}
                   onLetter={handleLetter}
                   onBackspace={handleBackspace}

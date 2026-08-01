@@ -18,7 +18,7 @@
  * `restoreWordTowerState`, keyed on the save blob's `gameCode`).
  */
 
-export type DailyModeId = 'word-hunt' | 'word-wheel' | 'word-tower';
+export type DailyModeId = 'word-hunt' | 'word-wheel' | 'word-tower' | 'connections';
 
 export interface DailyModeDef {
   id: DailyModeId;
@@ -31,7 +31,7 @@ export interface DailyModeDef {
   /** i18n key for the card tagline/description. */
   descKey: string;
   /** Accent family for the card chrome. */
-  accent: 'orange' | 'yellow' | 'cyan';
+  accent: 'orange' | 'yellow' | 'cyan' | 'purple';
 }
 
 export const DAILY_MODES: readonly DailyModeDef[] = [
@@ -58,6 +58,14 @@ export const DAILY_MODES: readonly DailyModeDef[] = [
     titleKey: 'wordTower.daily.questTitle',
     descKey: 'wordTower.daily.questDesc',
     accent: 'cyan',
+  },
+  {
+    id: 'connections',
+    path: '/connections/daily',
+    adminOnly: true,
+    titleKey: 'connections.daily.questTitle',
+    descKey: 'connections.daily.questDesc',
+    accent: 'purple',
   },
 ];
 

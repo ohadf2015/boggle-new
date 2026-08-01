@@ -1,15 +1,15 @@
 {
   "summary": {
-    "totalKeysInCode": 6150,
+    "totalKeysInCode": 6151,
     "keyCountByLanguage": {
-      "en": 11899,
-      "es": 12195,
-      "he": 12100,
-      "ja": 12154,
-      "ru": 11929,
-      "sv": 12150
+      "en": 11903,
+      "es": 12199,
+      "he": 12104,
+      "ja": 12158,
+      "ru": 11934,
+      "sv": 12154
     },
-    "missingFromEnglish": 14,
+    "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
     "runtimeRisks": {
       "templateLiterals": 323,
@@ -1108,21 +1108,21 @@
         "pattern": "`connections.daily.shareCallout.${gridCallout(outcomes)}`",
         "type": "template_literal",
         "file": "components/connections/ConnectionsDailyChallenge.tsx",
-        "line": 214,
+        "line": 218,
         "context": "callout: t(`connections.daily.shareCallout.${gridCallout(outcomes)}`),"
       },
       {
         "pattern": "`connections.daily.medal.${medal}`",
         "type": "template_literal",
         "file": "components/connections/ConnectionsDailyChallenge.tsx",
-        "line": 245,
+        "line": 249,
         "context": "{t(`connections.daily.medal.${medal}`)}"
       },
       {
         "pattern": "`connections.difficulty.${puzzle.difficulty}`",
         "type": "template_literal",
         "file": "components/connections/PuzzleCard.tsx",
-        "line": 174,
+        "line": 184,
         "context": "{t(`connections.difficulty.${puzzle.difficulty}`)}"
       },
       {
@@ -3345,15 +3345,6 @@
       ]
     },
     {
-      "key": "connections.pyramid.explainer",
-      "usages": [
-        {
-          "file": "components/connections/pyramid/PyramidChallenge.tsx",
-          "line": 311
-        }
-      ]
-    },
-    {
       "key": "daily.qrWelcome.badge",
       "usages": [
         {
@@ -3592,7 +3583,6 @@
       "seo.refund.description",
       "seo.refund.ogTitle",
       "seo.refund.ogDescription",
-      "brain.drills.comboStreak",
       "education.landing.furtherReading.title",
       "education.landing.furtherReading.guides",
       "education.landing.furtherReading.glossary",

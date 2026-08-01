@@ -1,7 +1,7 @@
 'use client';
 
 import { m } from 'framer-motion';
-import { Building2, FlaskConical, Check } from 'lucide-react';
+import { Building2, FlaskConical, Check, Link2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { dailyModeHref, type DailyModeDef } from '@/lib/dailyModes';
 
@@ -19,17 +19,20 @@ const ACCENT: Record<DailyModeDef['accent'], { bar: string; ring: string; cta: s
   orange: { bar: 'bg-neo-orange', ring: 'focus-visible:ring-neo-orange', cta: 'bg-neo-orange', tint: 'bg-neo-orange/[0.06] hover:bg-neo-orange/[0.1]' },
   yellow: { bar: 'bg-neo-yellow', ring: 'focus-visible:ring-neo-yellow', cta: 'bg-neo-yellow', tint: 'bg-neo-yellow/[0.06] hover:bg-neo-yellow/[0.1]' },
   cyan: { bar: 'bg-neo-cyan', ring: 'focus-visible:ring-neo-cyan', cta: 'bg-neo-cyan', tint: 'bg-neo-cyan/[0.06] hover:bg-neo-cyan/[0.1]' },
+  purple: { bar: 'bg-neo-purple', ring: 'focus-visible:ring-neo-purple', cta: 'bg-neo-purple', tint: 'bg-neo-purple/[0.06] hover:bg-neo-purple/[0.1]' },
 };
 
 /** Per-mode glyph (registry stays presentation-light). */
 const ICON: Partial<Record<DailyModeDef['id'], typeof Building2>> = {
   'word-tower': Building2,
+  connections: Link2,
 };
 
 /** Per-mode mascot preview — same full-bleed treatment the public QuestCards use,
  *  so a beta mode reads as a real quest (game 3), not a compact afterthought. */
 const PREVIEW: Partial<Record<DailyModeDef['id'], string>> = {
   'word-tower': '/daily/word-tower-mascot.jpg',
+  connections: '/daily/connections-mascot.jpg',
 };
 
 /**

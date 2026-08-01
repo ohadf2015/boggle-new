@@ -1,6 +1,27 @@
 {
-  "generatedAt": "2026-08-01T08:12:52.045Z",
+  "generatedAt": "2026-08-01T09:52:37.587Z",
   "commits": [
+    {
+      "sha": "d2ba8a60ef58c5044049527132e807b01a26ef1c",
+      "shortSha": "d2ba8a6",
+      "subject": "fix(test): make growthTracking.metadata assertions resistant to leading session_start call",
+      "author": "Ohad Fisher",
+      "date": "2026-08-01T11:37:52+03:00"
+    },
+    {
+      "sha": "6beb550023b7a91a239fbdf81b25c39b0de2884c",
+      "shortSha": "6beb550",
+      "subject": "chore(nightly): commit docs artifacts left dirty by 07-30 salvage run + mark 07-31/08-01 restores resolved",
+      "author": "Ohad Fisher",
+      "date": "2026-08-01T11:16:04+03:00"
+    },
+    {
+      "sha": "54cb63f494a570a9752f9b2cea380010d56634ab",
+      "shortSha": "54cb63f",
+      "subject": "fix(nightly): restore code stranded by 07-31 + 08-01 docs-only gate salvage",
+      "author": "Ohad Fisher",
+      "date": "2026-08-01T11:15:25+03:00"
+    },
     {
       "sha": "0ced0a276e54610f5bc496311431ad441d7dbdf1",
       "shortSha": "0ced0a2",
@@ -119,27 +140,6 @@
       "subject": "chore(nightly): autonomous improvement loop 2026-07-29",
       "author": "Ohad Fisher",
       "date": "2026-07-29T15:44:59+03:00"
-    },
-    {
-      "sha": "009f64290ad26c542597de879f40a2e46f8bfc71",
-      "shortSha": "009f642",
-      "subject": "seo: daily meta tag improvements 2026-07-29 (#768)",
-      "author": "ohadf2015",
-      "date": "2026-07-29T15:26:06+03:00"
-    },
-    {
-      "sha": "14752d178405a6af33e9c5b3b30c43109fa0a54d",
-      "shortSha": "14752d1",
-      "subject": "perf(landing): fix Core Web Vitals — CLS 1.0, 2.8MB dictionary, 1.1MB favicon",
-      "author": "Ohad Fisher",
-      "date": "2026-07-29T11:18:50Z"
-    },
-    {
-      "sha": "6de0c2e10365d2f9cf42f6005ba0a1f49312bfea",
-      "shortSha": "6de0c2e",
-      "subject": "fix(daily): Hebrew dictionary validation + hub landing for returning players",
-      "author": "Hermes (agent)",
-      "date": "2026-07-29T09:47:18Z"
     }
   ]
 }

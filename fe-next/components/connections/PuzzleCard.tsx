@@ -9,7 +9,9 @@ import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { useRewardedFeatureUnlock } from '@/hooks/useRewardedFeatureUnlock';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import ConnectionsKeyboard from './ConnectionsKeyboard';
-import { getKeyboardLetters, appendLetter, backspace, localeNeedsIME, MAX_GUESS_LEN } from '@/lib/connections/keyboard';
+import AnswerSlots from './AnswerSlots';
+import { useBridgeTyping } from './useBridgeTyping';
+import { MAX_GUESS_LEN } from '@/lib/connections/keyboard';
 import { whyItWorks } from '@/lib/connections/whyItWorks';
 import { freeHintsRemaining, consumeFreeHint } from '@/lib/connections/freeHints';
 import { applyHebrewFinalLetters } from '@/shared/utils/wordNormalization';
@@ -136,13 +138,21 @@ export default function PuzzleCard({
     prevStatus.current = state.status;
   }, [state.status, state.wrongAttempts, shakeControls]);
 
-  const keyboardLetters = getKeyboardLetters(language);
-  const needsIME = localeNeedsIME(language);
-  const handleLetter = (letter: string) => onInputChange(appendLetter(state.input, letter));
-  const handleBackspace = () => onInputChange(backspace(state.input));
+  const { keyboardRows, needsIME, slotCap, handleLetter, handleBackspace } = useBridgeTyping({
+    input: state.input,
+    answer: puzzle.bridge,
+    locale: language,
+    disabled: isDisabled,
+    status: state.status,
+    wrongAttempts: state.wrongAttempts,
+    onInputChange,
+    onSubmit,
+  });
   // WYSIWYG buffer: render the typed base letters, applying the sofit/final
   // glyph at word-end for Hebrew (the value compared against the bridge stays base).
   const bufferDisplay = isRTL ? applyHebrewFinalLetters(state.input) : state.input;
+  // On reveal (correct or gave-up) the slots settle on the actual bridge.
+  const slotsValue = bridgeRevealed ? puzzle.bridge.replace(/[^\p{L}\p{N}]/gu, '') : bufferDisplay;
 
   return (
     <AnimatePresence mode="wait">
@@ -165,7 +175,7 @@ export default function PuzzleCard({
         {puzzle.difficulty && (
           <span
             className={[
-              'absolute top-3 font-mono text-xs uppercase tracking-widest',
+              'absolute top-3 font-mono text-xs uppercase tracking-widest rtl:tracking-normal',
               'px-2 py-0.5 rounded border',
               isRTL ? 'left-3' : 'right-3',
               DIFFICULTY_STYLE[puzzle.difficulty] ?? 'border-neo-white/20 text-neo-white',
@@ -176,7 +186,22 @@ export default function PuzzleCard({
         )}
 
         <AnimatePresence mode="wait">
-          <div key={`chain-${puzzle.id}`} className="flex items-center justify-center gap-2 mb-4 flex-wrap">
+          <div key={`chain-${puzzle.id}`} className="relative flex items-center justify-center gap-2 mb-4 flex-wrap">
+            {/* The "bridge built" moment: a hard beam draws across the chain on reveal. */}
+            {bridgeRevealed && (
+              <m.div
+                data-testid="bridge-connector"
+                aria-hidden="true"
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: 1 }}
+                transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+                className={[
+                  'absolute inset-x-1 top-1/2 -z-10 h-2 -translate-y-1/2 rounded-full border border-black',
+                  'origin-left rtl:origin-right',
+                  isCorrect ? 'bg-neo-lime' : 'bg-neo-red/70',
+                ].join(' ')}
+              />
+            )}
             <m.span
               custom={0}
               variants={WORD_CHIP_VARIANTS}
@@ -381,28 +406,17 @@ export default function PuzzleCard({
             )
           ) : (
             <>
-              {/* Typed-buffer display — tappable on-screen keys feed this (no IME). */}
-              <div
-                aria-live="polite"
-                aria-label={t('connections.placeholder')}
-                className={[
-                  'min-h-[3.25rem] rounded-neo border-neo bg-neo-navy px-4 py-3 text-lg shadow-hard',
-                  'flex items-center font-neo-display font-bold tracking-[0.2em] transition-colors duration-200',
-                  isRTL ? 'justify-end text-right' : 'justify-start text-left',
-                  isCorrect ? 'border-neo-lime' : isWrong ? 'border-neo-red bg-neo-red/10' : 'border-neo-white/20',
-                ].join(' ')}
-              >
-                {bufferDisplay ? (
-                  <span className="text-neo-white">{bufferDisplay}</span>
-                ) : (
-                  <span className="text-neo-white/40 font-neo-body font-normal tracking-normal">
-                    {t('connections.placeholder')}
-                  </span>
-                )}
-              </div>
+              {/* Wordle-style slots — on-screen keys and physical keys both feed this. */}
+              <AnswerSlots
+                value={slotsValue}
+                slotCount={slotCap}
+                state={isCorrect ? 'correct' : isWrong ? 'wrong' : 'idle'}
+                dir={isRTL ? 'rtl' : 'ltr'}
+                label={t('connections.placeholder')}
+              />
               {!isDisabled && (
                 <ConnectionsKeyboard
-                  letters={keyboardLetters}
+                  rows={keyboardRows}
                   dir={isRTL ? 'rtl' : 'ltr'}
                   onLetter={handleLetter}
                   onBackspace={handleBackspace}
