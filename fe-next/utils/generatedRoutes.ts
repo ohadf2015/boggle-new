@@ -88,6 +88,7 @@ export const PUBLIC_ROUTES: string[] = [
   "/education/vocabulary-games-classroom",
   "/erudit-onlayn",
   "/faq",
+  "/filvordy-onlayn",
   "/free-multiplayer-word-game",
   "/friends",
   "/glossary",

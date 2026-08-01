@@ -5,6 +5,7 @@ import Link from 'next/link';
 // the page rendering it. Russian-only pages, so always rendered under /ru.
 const RU_LANDINGS: { slug: string; label: string }[] = [
   { slug: 'igry-v-slova-onlayn', label: 'Игры в слова онлайн' },
+  { slug: 'filvordy-onlayn', label: 'Филворды онлайн' },
   { slug: 'slovo-dnya', label: 'Слово дня' },
   { slug: 'balda-onlayn', label: 'Балда онлайн' },
   { slug: 'erudit-onlayn', label: 'Эрудит онлайн' },

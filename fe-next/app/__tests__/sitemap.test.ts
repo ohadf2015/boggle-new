@@ -173,6 +173,32 @@ describe('sitemap', () => {
     expect(urls.has('https://www.lexiclash.live/es/lexiclash-vs-apalabrados')).toBe(true);
   });
 
+  // The Russian keyword cluster has a Russian-only body. Emitting it under any
+  // other locale would ship an untranslated page as thin duplicate content.
+  it('lists the Russian keyword landing cluster for /ru only', () => {
+    const urls = new Set(sitemap().map((e) => e.url));
+    const ruOnlyPaths = [
+      '/igry-v-slova-onlayn',
+      '/balda-onlayn',
+      '/erudit-onlayn',
+      '/sostav-slova-iz-bukv',
+      '/filvordy-onlayn',
+      '/slovo-dnya',
+    ];
+    for (const path of ruOnlyPaths) {
+      expect(
+        urls.has(`https://www.lexiclash.live/ru${path}`),
+        `sitemap dropped RU landing ${path}`,
+      ).toBe(true);
+      for (const locale of ['en', 'he', 'sv', 'ja', 'es']) {
+        expect(
+          urls.has(`https://www.lexiclash.live/${locale}${path}`),
+          `sitemap leaked Russian-only ${path} into /${locale}`,
+        ).toBe(false);
+      }
+    }
+  });
+
   // Regression guard: genuinely-localized routes must STILL appear in all five
   // locales. Catches an over-eager refactor that narrows a localized route.
   it('still lists genuinely-localized routes for all five locales', () => {

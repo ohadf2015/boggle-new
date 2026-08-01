@@ -8,6 +8,7 @@ import type { FeedbackType } from '../WordFeedbackToast';
 import type { WordFeedback } from '@/components/game/WordFormingArea';
 import type { WordDiscovery, TargetAttempt, SurvivalGameResult, AccumulatedClue, ScoreEvent, AutoClueNotificationData } from './types';
 import { useLiveScoreTracker } from './useLiveScoreTracker';
+import { clearRejectedWords } from '@/utils/invalidWordTracker';
 import {
   LIFE_DRAIN_RATE,
   NEW_PLAYER_LIFE_DRAIN_RATE,
@@ -227,6 +228,10 @@ export function useSurvivalGameLogic({
   // Initialize game start time
   useEffect(() => {
     gameStartTimeRef.current = Date.now();
+    // Round boundary: drop the previous round's appealable rejections so the results
+    // screen never offers words from a game the player already finished
+    // (rules/60-recurring-pitfalls Class 2 — stale mutable state across rounds).
+    clearRejectedWords();
   }, []);
 
   // Funnel parity: emit game_started once on mount to pair with trackGameEnd('survival', ...)

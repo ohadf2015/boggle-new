@@ -45,6 +45,24 @@ export interface RecordInvalidWordParams {
 const recentlyRecorded = new Map<string, number>();
 const DEDUP_WINDOW_MS = 30000; // 30 seconds
 
+/** A word this round's dictionary refused — the player may want to appeal it. */
+export interface RejectedWord {
+  word: string;
+  language: Language;
+}
+
+// Words the dictionary refused during the current round, so results screens can
+// offer an appeal. Kept separate from the network dedupe cache above: that cache
+// throttles POSTs across rounds, but a player must still be able to appeal a word
+// in round N that they also tried in round N-1.
+const rejectedThisRound: RejectedWord[] = [];
+const MAX_REJECTED_TRACKED = 50;
+// The mode that owns the entries above. Only survival calls clearRejectedWords()
+// at its round boundary; solo and adventure never do. Scoping the list to a
+// single mode here means the tracker owns the invariant, instead of every mode
+// having to remember a reset call it currently doesn't make (rules/60 Class 2).
+let rejectedThisRoundMode: GameMode | undefined;
+
 function getDedupeKey(word: string, language: string): string {
   return `${word.toLowerCase()}_${language}`;
 }
@@ -96,6 +114,22 @@ export function recordInvalidWord(params: RecordInvalidWordParams): void {
     return;
   }
 
+  // Collect appealable words BEFORE the network dedupe check — a suppressed POST
+  // must not also suppress the player's chance to appeal. Only dictionary gaps are
+  // appealable; 'not_on_board' is the player's own misread, not a dictionary bug.
+  if (reason === 'not_in_dictionary') {
+    if (gameMode !== rejectedThisRoundMode) {
+      rejectedThisRound.length = 0;
+      rejectedThisRoundMode = gameMode;
+    }
+    const already = rejectedThisRound.some(
+      (r) => r.word.toLowerCase() === word.toLowerCase() && r.language === language
+    );
+    if (!already && rejectedThisRound.length < MAX_REJECTED_TRACKED) {
+      rejectedThisRound.push({ word, language });
+    }
+  }
+
   // Deduplicate within session
   if (!shouldRecord(word, language)) {
     return;
@@ -114,6 +148,28 @@ export function recordInvalidWord(params: RecordInvalidWordParams): void {
   }).catch(() => {
     // Silently ignore errors - this is non-critical functionality
   });
+}
+
+/**
+ * Words the dictionary refused during the current round.
+ *
+ * Results screens read this to offer an appeal, closing the loop on the single
+ * loudest complaint in the genre: "my real word was rejected and I can't argue".
+ * Returns a copy — callers must not mutate tracker state.
+ */
+export function getRejectedWords(): RejectedWord[] {
+  return rejectedThisRound.map((r) => ({ ...r }));
+}
+
+/**
+ * Resets the appealable-word list at a round boundary.
+ *
+ * Must be called when a round STARTS, not when results render — results screens
+ * can double-mount, and clearing on read would blank the list on the second pass.
+ */
+export function clearRejectedWords(): void {
+  rejectedThisRound.length = 0;
+  rejectedThisRoundMode = undefined;
 }
 
 /**

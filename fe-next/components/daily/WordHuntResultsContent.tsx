@@ -21,6 +21,7 @@ import WordHuntTipBadge from '@/components/results/WordHuntTipBadge';
 import CatchUpSuggestion from './CatchUpSuggestion';
 import { STICKY_CTA_WORD_HUNT } from './stickyCta';
 import { SuggestWordCard } from './SuggestWordCard';
+import { RejectedWordAppeal } from '@/components/results/RejectedWordAppeal';
 import MpModeCrossPromo from './MpModeCrossPromo';
 import WatchAdButton from './WatchAdButton';
 import WatchAdForRevealButton from '@/components/ads/WatchAdForRevealButton';
@@ -657,6 +658,11 @@ export const WordHuntResultsContent: React.FC<WordHuntResultsContentProps> = ({
         <DailyWordHuntFacts result={result} stats={stats} t={t} />
       </m.div>
     )}
+
+    {/* Appeal a word the dictionary refused this round — parity with multiplayer,
+        which has had this since WordPointsGroup. Renders nothing if nothing was
+        rejected. See docs/2026-08-02-word-game-player-complaints-research.md. */}
+    <RejectedWordAppeal language={language} t={t} />
 
     {/* Suggest tomorrow's word — community contribution */}
     <SuggestWordCard language={language} playerId={profile?.id} guestFingerprint={guestFingerprint} />

@@ -344,6 +344,7 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   addForLocaleOnly(routes, '/igry-v-slova-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
   addForLocaleOnly(routes, '/slovo-dnya', { lastModified: LAST_DEPLOYED, changeFrequency: 'daily', priority: 0.85 }, 'ru');
   addForLocaleOnly(routes, '/balda-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
+  addForLocaleOnly(routes, '/filvordy-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
   addForLocaleOnly(routes, '/erudit-onlayn', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
   addForLocaleOnly(routes, '/sostav-slova-iz-bukv', { lastModified: LAST_DEPLOYED, changeFrequency: 'weekly', priority: 0.85 }, 'ru');
 
