@@ -12636,6 +12636,7 @@ const en = {
     "cta": "YOUR MOVE →",
     "copied": "Link copied!",
     "screenshotHint": "Screenshot the flex",
+    "strip": "Brag about it",
     "others": "+{count} others",
     "share": "Share",
     "shareTextVs": "⚔️ {score}–{rivalScore} vs {name} — LexiClash",

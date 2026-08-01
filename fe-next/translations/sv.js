@@ -14194,6 +14194,7 @@ const sv = {
     "cta": "DIN TUR →",
     "copied": "Länk kopierad!",
     "screenshotHint": "Skärmdumpa skrytet",
+    "strip": "Skryt om det",
     "others": "+{count} FLER",
     "share": "Dela",
     "shareTextVs": "⚔️ {score}–{rivalScore} mot {name} — LexiClash",

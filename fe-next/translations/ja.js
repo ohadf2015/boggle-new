@@ -13920,6 +13920,7 @@ const ja = {
     "cta": "次はキミの番 →",
     "copied": "リンクをコピー！",
     "screenshotHint": "スクショして自慢",
+    "strip": "自慢する",
     "others": "+{count}人",
     "share": "シェア",
     "shareTextVs": "⚔️ {score}–{rivalScore} vs {name} — LexiClash",

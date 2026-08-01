@@ -3,7 +3,7 @@
 import React, { memo, useMemo, useState, useEffect, useCallback } from 'react';
 import { useReducedMotion } from 'framer-motion';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Sparkles, Type, Star, Coins, ChevronDown, ChevronUp } from 'lucide-react';
+import { Sparkles, Type, Star, Coins, ChevronDown, ChevronUp, Share2 } from 'lucide-react';
 import type { Player, WordObject } from '@/components/results/types';
 import { assignConsolationCrowns } from '@/utils/consolationCrowns';
 import { selectUniqueWords } from '@/lib/results/selectUniqueWords';
@@ -111,6 +111,11 @@ export interface ResultsMainContentProps {
    *  duplicate chip. Same contract as hideStandings. */
   hideBestWord?: boolean;
   allPlayerWords?: Record<string, WordObject[]>;
+  /** Extra word lists (other players' unique words, missed words, post-game
+   *  review) rendered INSIDE the single "show details" disclosure. Mobile passes
+   *  them here instead of stacking them expanded below the recap — they were the
+   *  longest content on the screen and none of it answers "did I win". */
+  detailsSlot?: React.ReactNode;
   gameDuration?: number;
   /** Callback for podium emoji reactions */
   onPodiumReaction?: (reactionId: string, targetUsername: string) => void;
@@ -170,11 +175,13 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
   hideStandings,
   hideBestWord,
   shareCardStats,
+  detailsSlot,
   onStartGame: _onStartGame,
 }) {
   const reducedMotion = useReducedMotion();
   const { dir: _dir, language } = useLanguage();
   const [showDetails, setShowDetails] = useState(false);
+  const [showBrag, setShowBrag] = useState(false);
 
   // Resolution-aware: `isAuthenticated` alone would flash the guest layout at a
   // logged-in player on first paint (rules/60 Class 1).
@@ -555,11 +562,34 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           the sticky play-again bar, which stays the one primary action. */}
       <div className="flex flex-col gap-3">
 
-      {/* ── 5. FLEX IT — the brag card lands AFTER result + stats + rewards, so
-          sharing reads as the reward beat instead of interrupting the recap mid-
-          stream (where it used to sit, between score and standings). MP-only,
-          screenshot-first: no Share button, the play link is printed on the card. */}
+      {/* ── 5. FLEX IT — a one-line strip, not a card. Expanded, MpBragCard is a
+          ~350px block that re-prints avatar + name + score + rival + rival score
+          (the verdict, again, two beats later) and carries a PRIMARY-styled
+          "Challenge a friend" button competing with the sticky play-again bar for
+          the same tap. Sharing is opt-in, so it costs one line until asked for.
+          mp_brag_card_viewed still fires on mount — the impression is the strip,
+          so the metric keeps meaning the same thing; opening is its own event. */}
       {bragData && (
+        <button
+          type="button"
+          onClick={() => {
+            setShowBrag(v => !v);
+            if (!showBrag) {
+              trackGrowthEvent('mp_brag_card_expanded', {
+                gameMode: gameMode ?? 'unknown',
+                outcome: bragData.data.outcome,
+                language,
+              });
+            }
+          }}
+          className="w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-black bg-neo-navy-light text-neo-white font-neo-body font-semibold rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+        >
+          <Share2 className="w-4 h-4 text-neo-pink" />
+          {t('brag.strip')}
+          {showBrag ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </button>
+      )}
+      {bragData && showBrag && (
         <MpBragCard
           data={bragData.data}
           current={bragData.current}
@@ -631,8 +661,17 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
         />
       )}
 
-      {/* 6. DETAILS (collapsed by default — hidden on mobile where details are already inline) */}
-      {currentPlayerData && !hideDetailsToggle && !isGuest && (
+      {/* 6. DETAILS — ONE disclosure for every word list on the screen, collapsed
+          by default. Your words, everyone else's unique words, the missed words
+          and the post-game review all live in here (mobile passes the latter
+          three through `detailsSlot`). They were the tallest content on the page
+          and none of it answers "did I win / play again", so it stays one tap
+          away instead of pushing the rematch bar off the bottom of a long scroll.
+          Gated on `currentPlayerData || detailsSlot`, not on currentPlayerData
+          alone: it is null whenever the username doesn't match a row in
+          finalScores (spectator, post-reconnect mismatch), and the slot content
+          is about the OTHER players — it must not vanish with your own row. */}
+      {(currentPlayerData || detailsSlot) && !hideDetailsToggle && !isGuest && (
         <div>
           <button
             type="button"
@@ -643,7 +682,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
             {t('results.showDetails')}
           </button>
           {showDetails && (
-            <div className="mt-4">
+            <div className="mt-4 space-y-4">
+              {currentPlayerData && (
               <ResultsWordsSection
                 currentPlayerData={currentPlayerData}
                 currentPlayerValidWords={currentPlayerValidWords}
@@ -655,6 +695,8 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
                 isWordsVisible
                 t={t}
               />
+              )}
+              {detailsSlot}
             </div>
           )}
         </div>

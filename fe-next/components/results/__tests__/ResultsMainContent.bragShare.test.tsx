@@ -47,6 +47,10 @@ vi.mock('@/utils/consolationCrowns', () => ({ assignConsolationCrowns: () => [] 
 
 import { ResultsMainContent } from '../ResultsMainContent';
 
+/** The card sits behind a one-line "brag" strip now (it used to re-print the
+ *  whole verdict inline). Open it before asserting on its wiring. */
+const openBrag = () => fireEvent.click(screen.getByRole('button', { name: /brag.strip/i }));
+
 const mk = (username: string, score: number) => ({ username, score, allWords: [] });
 const baseProps = {
   nearMisses: [], isHost: false, onStartGame: vi.fn(), onMarkReady: vi.fn(), onExit: vi.fn(),
@@ -74,6 +78,7 @@ beforeEach(() => {
 describe('ResultsMainContent — brag card share wiring', () => {
   it('passes the LIVE room join link as the brag share URL when a room code exists', () => {
     render(<ResultsMainContent {...baseProps} gameCode="ABC123" />);
+    openBrag();
     const props = bragProps.mock.calls.at(-1)?.[0];
     const parsed = new URL(props.shareUrl);
     expect(parsed.searchParams.get('room')).toBe('ABC123');
@@ -82,12 +87,14 @@ describe('ResultsMainContent — brag card share wiring', () => {
 
   it('falls back to the homepage URL without a room code', () => {
     render(<ResultsMainContent {...baseProps} gameCode={undefined} />);
+    openBrag();
     const props = bragProps.mock.calls.at(-1)?.[0];
     expect(props.shareUrl).toBe('https://lexiclash.live');
   });
 
   it('passes localized boast share text derived from the face-off', () => {
     render(<ResultsMainContent {...baseProps} gameCode="ABC123" />);
+    openBrag();
     const props = bragProps.mock.calls.at(-1)?.[0];
     // t() echoes the key in this harness — win vs the named rival.
     expect(props.shareText).toBe('brag.shareTextVs');
@@ -95,6 +102,7 @@ describe('ResultsMainContent — brag card share wiring', () => {
 
   it('tracks the native share as a growth event + unified share funnel', () => {
     render(<ResultsMainContent {...baseProps} gameCode="ABC123" />);
+    openBrag();
     fireEvent.click(screen.getByTestId('fake-native-share'));
     expect(trackGrowthEvent).toHaveBeenCalledWith(
       'mp_brag_card_native_share',

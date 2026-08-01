@@ -14001,6 +14001,7 @@ const es = {
     "cta": "TE TOCA →",
     "copied": "¡Enlace copiado!",
     "screenshotHint": "Captura y presume",
+    "strip": "Presume de esto",
     "others": "+{count} MÁS",
     "share": "Compartir",
     "shareTextVs": "⚔️ {score}–{rivalScore} vs {name} — LexiClash",

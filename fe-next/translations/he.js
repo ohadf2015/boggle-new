@@ -13911,6 +13911,7 @@ const he = {
     "cta": "תורך →",
     "copied": "הקישור הועתק!",
     "screenshotHint": "צלמו מסך והשוויצו",
+    "strip": "תתפאר בזה",
     "others": "+{count} עוד",
     "share": "שיתוף",
     "shareTextVs": "⚔️ {score}–{rivalScore} מול {name} — LexiClash",

@@ -235,8 +235,15 @@ export type GrowthEvent =
   // Brag-card share funnel (screenshot-first MP results card). NOTE: the web has
   // no screenshot API, so we can't fire on the actual screenshot — these are the
   // measurable proxies bracketing the intent.
-  //   mp_brag_card_viewed: card mounted/impression. Props: { gameMode, outcome, language }.
-  //     Denominator for "how many saw the shareable artifact".
+  //   mp_brag_card_viewed: impression of the shareable artifact. Props: { gameMode,
+  //     outcome, language }. Denominator for "how many saw it". Since the card was
+  //     demoted to a collapsed strip this fires on the STRIP's mount — deliberately
+  //     unchanged, so the historical impression denominator stays comparable (the
+  //     strip renders under exactly the same `bragData != null` condition the card
+  //     did, so it is the same population, just a smaller surface).
+  //   mp_brag_card_expanded: player opened the strip to see the card. Props:
+  //     { gameMode, outcome, language }. The new intent step between impression and
+  //     copy/share; expect viewed → expanded → copy_link to be the funnel now.
   //   mp_brag_card_copy_link: player tapped the explicit Copy-link affordance on the
   //     card. Props: { gameMode, outcome, language }. The one directly-measurable
   //     share action; best signal that an impression converted to share intent.
@@ -244,6 +251,7 @@ export type GrowthEvent =
   //     (fires on success only, not cancel). Props: { gameMode, outcome, language,
   //     hasRoomLink }.
   | 'mp_brag_card_viewed'
+  | 'mp_brag_card_expanded'
   | 'mp_brag_card_copy_link'
   | 'mp_brag_card_native_share'
   //   mp_results_challenge_cta: player tapped the explicit "Challenge a friend" CTA

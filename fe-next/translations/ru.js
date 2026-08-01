@@ -9932,6 +9932,7 @@ const ru = {
     "cta": "ТВОЙ ХОД →",
     "copied": "Ссылка скопирована!",
     "screenshotHint": "Заскринь и хвастайся",
+    "strip": "Похвастаться",
     "others": "+{count} других",
     "share": "Поделиться",
     "shareTextVs": "⚔️ {score}–{rivalScore} против {name} — LexiClash",

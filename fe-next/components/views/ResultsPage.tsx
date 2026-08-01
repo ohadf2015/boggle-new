@@ -42,6 +42,7 @@ const SignupToast = dynamic(() => import('@/components/auth/SignupToast'), { ssr
 // Shared result components
 import { ResultsModals } from '@/components/results/ResultsModals';
 import { ResultsMainContent, type ResultsMainContentProps } from '@/components/results/ResultsMainContent';
+import { shouldShowDailyInvite } from '@/lib/results/shouldShowDailyInvite';
 import { ResultsDetailsContent, type ResultsDetailsContentProps } from '@/components/results/ResultsDetailsContent';
 import { PostRoundSummary } from '@/components/results/PostRoundSummary';
 import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
@@ -95,6 +96,8 @@ interface DesktopResultsLayoutProps {
   currentPlayerRank: number;
   sortedScores: any[];
   marginToNext: number | null;
+  /** Computed once by the page so mobile and desktop can't disagree. */
+  showDailyInvite: boolean;
   /** Scroll effects only run for the active breakpoint (both trees mount). */
   scrollFxEnabled: boolean;
 }
@@ -120,6 +123,7 @@ function DesktopResultsLayout({
   currentPlayerRank,
   sortedScores,
   marginToNext,
+  showDailyInvite,
   scrollFxEnabled,
 }: DesktopResultsLayoutProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -229,7 +233,7 @@ function DesktopResultsLayout({
                 (PostGameEngagement self-hides on CG; this one stays).
                 Guests skip it: their one CTA is the signup card in the recap,
                 and a second "play this instead" competes with it. */}
-            {!isGuest && (
+            {showDailyInvite && (
               <ResultsSectionReveal index={4}>
                 <DailyChallengeInvite
                   isWinner={isCurrentUserWinner}
@@ -250,7 +254,12 @@ function DesktopResultsLayout({
           </div>
 
           {/* RIGHT: Other players expanded + achievements (registered players only —
-              a guest's screen stops at their own result + standings). */}
+              a guest's screen stops at their own result + standings).
+              DELIBERATELY NOT moved into ResultsMainContent's `detailsSlot` the
+              way mobile does. Mobile collapses it because there it is stacked
+              vertically and pushes the rematch bar off a long scroll; here it is
+              a parallel column beside the recap and costs zero extra scroll, so
+              expanded is strictly better. The two paths differ on purpose. */}
           {!isGuest && (
             <ResultsSectionReveal index={3} className="space-y-4">
               <ResultsDetailsContent {...detailsContentProps} />
@@ -797,6 +806,14 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
 
   // Series (best-of-3) completion detection
   const isSeriesComplete = (seriesRoundNumber ?? 0) >= SERIES_TOTAL_GAMES;
+  // One answer for both the mobile and desktop mount sites — two hand-written
+  // conditions on two paths is exactly how they drift (rules/60 Class 3).
+  const showDailyInvite = shouldShowDailyInvite({
+    isGuest,
+    gameCode,
+    isBotsOnlyGame,
+    isSeriesComplete,
+  });
   const seriesWinnerUsername = isSeriesComplete && seriesStandings?.[0]?.username
     ? seriesStandings[0].username : undefined;
 
@@ -972,10 +989,21 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
           <BlastMpResults results={blastMpResults} gameMode="blast" />
         </div>
       )}
+      {/* Mobile owns ONE word-list disclosure. Everyone else's unique words, the
+          missed words and the post-game review used to render fully expanded
+          below the recap — the tallest content on the screen, and none of it
+          answers "did I win". They now ride inside the same "show details"
+          collapse that already held the player's own words, so the recap ends at
+          the rematch bar instead of a long scroll of other people's vocabulary. */}
       <ResultsMainContent
         {...mainContentProps}
         hideInlineCta={!isBotsOnlyGame}
-        hideDetailsToggle
+        detailsSlot={
+          <>
+            {renderDetailsTab()}
+            {postGameWordReviewNode}
+          </>
+        }
       />
       {/* Game mode summary after hero banner — hero stays on top */}
       {resolvedGameMode === 'word-hunt' && wordHuntResultsData && (
@@ -1182,9 +1210,11 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
                 </div>
               </ResultsSectionReveal>
             ) : null}
-            {/* D1 retention CTA — Daily Challenge invite. Guests skip it; the
-                signup card in the recap is their single CTA. */}
-            {!isGuest && (
+            {/* D1 retention CTA — Daily Challenge invite, but only once the
+                rematch loop is over (see shouldShowDailyInvite). Between rounds
+                it offered a DIFFERENT mode directly above the sticky play-again
+                bar, competing for the same tap. */}
+            {showDailyInvite && (
               <ResultsSectionReveal index={2}>
                 <DailyChallengeInvite
                   isWinner={isCurrentUserWinner}
@@ -1201,19 +1231,10 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
               <CrazyGamesBanner size="320x50" />
             </ResultsSectionReveal>
             <ResultsBannerSlot placement="multiplayer-round-complete" />
-            {/* Other players' details (inline, no tab switch needed) —
-                registered players only; a guest's screen stops at their own
-                result + standings. */}
-            {!isGuest && (
-              <ResultsSectionReveal index={4}>
-                {renderDetailsTab()}
-              </ResultsSectionReveal>
-            )}
-            {postGameWordReviewNode && !isGuest && (
-              <ResultsSectionReveal index={5}>
-                {postGameWordReviewNode}
-              </ResultsSectionReveal>
-            )}
+            {/* Other players' details + post-game word review moved INTO the
+                recap's own "show details" disclosure (see renderResultsTab) —
+                same content, one tap away, instead of two more expanded cards
+                between the verdict and the rematch bar. */}
           </div>
         </div>
 
@@ -1288,6 +1309,7 @@ const ResultsPage: React.FC<ResultsPageProps> = ({ finalScores, gameCode, onRetu
         currentPlayerRank={currentPlayerRank}
         sortedScores={sortedScores}
         marginToNext={marginToNext}
+        showDailyInvite={showDailyInvite}
         scrollFxEnabled={isDesktopViewport}
       />
 
