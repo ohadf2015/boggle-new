@@ -18,11 +18,14 @@ describe('DailyResultRecap', () => {
   });
   afterEach(() => vi.useRealTimers());
 
-  it('renders one square per bridge with the share-grid emoji', () => {
+  it('renders one icon tile per bridge, mirroring the share-grid legend (no emoji in UI)', () => {
     render(<DailyResultRecap outcomes={outcomes} nextLabel="Next bridge in" />);
     const cells = screen.getAllByTestId('recap-square');
     expect(cells).toHaveLength(5);
-    expect(cells.map((c) => c.textContent)).toEqual(['🟩', '🟨', '💡', '🟥', '⬛']);
+    expect(cells.map((c) => c.getAttribute('data-kind'))).toEqual([
+      'clean', 'messy', 'hint', 'failed', 'unreached',
+    ]);
+    for (const cell of cells) expect(cell.textContent).not.toMatch(/[\u{1F300}-\u{1FAFF}\u{2B1B}-\u{2B1C}]/u);
   });
 
   it('shows an hh:mm countdown to the next UTC day', () => {

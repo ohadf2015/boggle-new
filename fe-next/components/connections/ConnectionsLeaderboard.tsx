@@ -1,6 +1,6 @@
 'use client';
 
-import { Flame, Trophy } from 'lucide-react';
+import { Flame, Trophy, Medal } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { LeaderboardRow } from '@/lib/connections/dailyClient';
 
@@ -14,7 +14,12 @@ interface ConnectionsLeaderboardProps {
   loading: boolean;
 }
 
-const MEDALS: Record<number, string> = { 1: '🥇', 2: '🥈', 3: '🥉' };
+/** Podium colors for the Medal icon — gold / silver / bronze. */
+const MEDAL_COLORS: Record<number, string> = {
+  1: 'text-neo-yellow',
+  2: 'text-neo-white/70',
+  3: 'text-neo-orange',
+};
 
 function fmtTime(s: number): string {
   const m = Math.floor(s / 60);
@@ -66,7 +71,11 @@ export default function ConnectionsLeaderboard({
                 ].join(' ')}
               >
                 <span className="w-7 shrink-0 text-center font-neo-display text-sm font-black text-neo-white/70">
-                  {MEDALS[r.rank_position] ?? r.rank_position}
+                  {MEDAL_COLORS[r.rank_position] ? (
+                    <Medal className={`h-4 w-4 ${MEDAL_COLORS[r.rank_position]}`} strokeWidth={2.5} aria-label={`#${r.rank_position}`} />
+                  ) : (
+                    r.rank_position
+                  )}
                 </span>
                 <span
                   className="grid h-7 w-7 shrink-0 place-items-center rounded-full text-base"

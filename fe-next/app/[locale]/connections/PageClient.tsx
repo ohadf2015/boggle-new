@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect } from 'react';
 import Link from 'next/link';
+import { Pyramid, Trophy, Users } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
@@ -66,28 +67,31 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
       <TopBackLink className="mb-4" />
       <ConnectionsHero locale={locale} copy={copy} />
 
-      {/* Competitive hooks surfaced right on the landing */}
+      {/* Competitive hooks surfaced right on the landing — pyramid is the flagship */}
       <div className="mx-auto mb-6 flex max-w-md flex-wrap justify-center gap-3 px-4">
+        {getPyramidsForLocale(locale).length > 0 && (
+          <Link
+            href={`/${locale}/connections/pyramid`}
+            className="flex w-full items-center justify-center gap-2 rounded-neo border-neo-thick border-neo-purple bg-neo-purple px-4 py-2.5 font-neo-display text-base font-black text-neo-white shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          >
+            <Pyramid className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
+            {t('connections.pyramid.cta', locale === 'he' ? 'פירמידה' : 'Pyramid')}
+          </Link>
+        )}
         <Link
           href={`/${locale}/connections/daily`}
           className="flex items-center gap-2 rounded-neo border-neo-thick border-neo-yellow bg-neo-yellow/15 px-4 py-2 font-neo-display text-sm font-black text-neo-yellow shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
-          🏆 {t('connections.daily.cta', locale === 'he' ? 'אתגר יומי' : 'Daily Challenge')}
+          <Trophy className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
+          {t('connections.daily.cta', locale === 'he' ? 'אתגר יומי' : 'Daily Challenge')}
         </Link>
         <Link
           href={`/${locale}/connections/community`}
           className="flex items-center gap-2 rounded-neo border-neo-thick border-neo-pink bg-neo-pink/15 px-4 py-2 font-neo-display text-sm font-black text-neo-pink shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
         >
-          👥 {t('connections.community.cta', locale === 'he' ? 'קהילה' : 'Community')}
+          <Users className="h-4 w-4" strokeWidth={2.5} aria-hidden="true" />
+          {t('connections.community.cta', locale === 'he' ? 'קהילה' : 'Community')}
         </Link>
-        {getPyramidsForLocale(locale).length > 0 && (
-          <Link
-            href={`/${locale}/connections/pyramid`}
-            className="flex items-center gap-2 rounded-neo border-neo-thick border-neo-purple bg-neo-purple/15 px-4 py-2 font-neo-display text-sm font-black text-neo-purple shadow-hard transition-transform hover:-translate-y-0.5 active:translate-y-0"
-          >
-            🔺 {t('connections.pyramid.cta', locale === 'he' ? 'פירמידה' : 'Pyramid')}
-          </Link>
-        )}
       </div>
       <ConnectionsSampleStrip locale={locale} copy={copy.samples} />
       <ConnectionsWhyPlay copy={copy.why} />

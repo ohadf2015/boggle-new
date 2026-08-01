@@ -43,3 +43,25 @@ describe('dailyPyramid', () => {
     expect(dailyPyramid('2026-07-03', 'xx')).toBeNull();
   });
 });
+
+describe('dailyPyramid — solved pyramids never reappear', () => {
+  it('excludes solved ids from the pick', () => {
+    const first = dailyPyramid('2026-08-01', 'en')!;
+    const again = dailyPyramid('2026-08-01', 'en', new Set([first.id]));
+    expect(again).not.toBeNull();
+    expect(again!.id).not.toBe(first.id);
+  });
+
+  it('falls back to the full pool when everything is solved', () => {
+    const first = dailyPyramid('2026-08-01', 'en')!;
+    const allIds = new Set<string>();
+    for (let i = 0; i < 500; i++) {
+      const d = `2026-0${(i % 8) + 1}-0${(i % 27) + 1}`;
+      const p = dailyPyramid(d, 'en');
+      if (p) allIds.add(p.id);
+    }
+    // Simulate "solved everything we could ever pick"
+    const result = dailyPyramid('2026-08-01', 'en', new Set([...allIds, first.id]));
+    expect(result).not.toBeNull();
+  });
+});

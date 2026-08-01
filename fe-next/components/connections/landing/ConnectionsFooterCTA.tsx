@@ -2,6 +2,7 @@
 
 import React, { useCallback } from 'react';
 import Link from 'next/link';
+import { connectionsPrimaryPath } from '@/lib/connections/primaryPath';
 import type { ConnectionsLandingCopy } from '@/app/[locale]/connections/content';
 import { trackLandingCtaClick } from '@/lib/connections/landingTelemetry';
 
@@ -23,7 +24,7 @@ export default function ConnectionsFooterCTA({ locale, copy }: Props): React.JSX
         </h2>
         <p className="mb-6 text-base text-neo-white">{copy.body}</p>
         <Link
-          href={`/${locale}/connections/play`}
+          href={connectionsPrimaryPath(locale)}
           onClick={handleClick}
           data-testid="footer-cta-button"
           className="inline-block rounded-neo border-4 border-neo-black bg-neo-navy px-8 py-4 font-neo-display text-base font-black uppercase tracking-widest text-neo-white shadow-hard transition-all hover:translate-y-[-2px] hover:shadow-hard-lg"

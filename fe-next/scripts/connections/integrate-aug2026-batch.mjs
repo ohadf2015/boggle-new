@@ -77,9 +77,14 @@ for (const locale of locales) {
     loadJson(join(dir, `sweep-${locale}-rigorous.json`)) ??
     loadJson(join(dir, `sweep-${locale}-fixed.json`)) ??
     loadJson(join(dir, `sweep-${locale}.json`));
+  // Verifiers write a flat id array, {"rejects":[{id,reason}]}, or {"rejected_ids":[...]}.
+  const rejectIds = (raw) => {
+    const list = Array.isArray(raw) ? raw : raw?.rejects ?? raw?.rejected_ids ?? [];
+    return list.map((x) => (typeof x === 'string' ? x : x?.id)).filter(Boolean);
+  };
   const rejects = new Set([
-    ...(loadJson(join(dir, `rejects-${locale}.json`)) ?? []),
-    ...(loadJson(join(dir, `rejects-${locale}-pyr.json`)) ?? []),
+    ...rejectIds(loadJson(join(dir, `rejects-${locale}.json`))),
+    ...rejectIds(loadJson(join(dir, `rejects-${locale}-pyr.json`))),
   ].map(String));
 
   console.log(`\n=== ${locale} (gen: ${genFile ?? 'NONE'}) ===`);
@@ -103,8 +108,13 @@ for (const locale of locales) {
   const havePyrMeta = new Set();
 
   // ── 1. Sweep: deactivate culls ────────────────────────────────────────
+  // Culls motivated by corrupt accepted_answers are handled by wiping the
+  // field, not deactivating the (usually fine) puzzle. Verifier unculls win.
+  const unculled = new Set(rejectIds(loadJson(join(dir, `uncull-${locale}.json`))));
   const cullIds = (sweep?.flags ?? [])
     .filter((f) => f.severity === 'cull' && byId.get(f.id)?.is_active)
+    .filter((f) => !/accept/i.test(f.reason ?? ''))
+    .filter((f) => !unculled.has(f.id))
     .map((f) => f.id);
   console.log(`sweep culls: ${cullIds.length}`, cullIds.join(', '));
   if (apply && cullIds.length) {

@@ -1,11 +1,12 @@
 import React from 'react';
+import { BookOpen, Brain, Zap } from 'lucide-react';
 import type { ConnectionsLandingCopy } from '@/app/[locale]/connections/content';
 
 interface Props {
   copy: ConnectionsLandingCopy['why'];
 }
 
-const ICONS = ['📚', '🧠', '⚡'];
+const ICONS = [BookOpen, Brain, Zap];
 const ACCENTS = ['bg-neo-lime', 'bg-neo-purple', 'bg-neo-cyan'];
 
 export default function ConnectionsWhyPlay({ copy }: Props): React.JSX.Element {
@@ -22,7 +23,7 @@ export default function ConnectionsWhyPlay({ copy }: Props): React.JSX.Element {
               className={`mb-3 inline-flex h-12 w-12 items-center justify-center rounded-neo border-3 border-neo-black text-2xl shadow-hard-sm ${ACCENTS[i] ?? 'bg-neo-lime'}`}
               aria-hidden
             >
-              {ICONS[i] ?? '✨'}
+              {React.createElement(ICONS[i] ?? Zap, { className: 'h-6 w-6 text-neo-navy', strokeWidth: 2.5 })}
             </div>
             <h3 className="mb-2 font-neo-display text-lg font-black">{card.title}</h3>
             <p className="text-sm leading-relaxed text-neo-gray-200">{card.body}</p>

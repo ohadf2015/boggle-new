@@ -2,6 +2,7 @@
 
 import React, { useCallback } from 'react';
 import Link from 'next/link';
+import { connectionsPrimaryPath } from '@/lib/connections/primaryPath';
 import type { ConnectionsLandingCopy } from '@/app/[locale]/connections/content';
 import { trackLandingCtaClick } from '@/lib/connections/landingTelemetry';
 
@@ -29,7 +30,7 @@ export default function ConnectionsStickyCTA({ locale, label }: Props): React.JS
       style={{ bottom: 'calc(var(--bottom-stack-height, 0px) + 12px)' }}
     >
       <Link
-        href={`/${locale}/connections/play`}
+        href={connectionsPrimaryPath(locale)}
         onClick={handleClick}
         className="pointer-events-auto inline-flex items-center justify-center rounded-neo border-4 border-neo-pink bg-neo-pink px-6 py-3 font-neo-display text-base font-black uppercase tracking-wide text-neo-white shadow-hard-lg"
       >

@@ -2,6 +2,7 @@
 
 import React, { useCallback, useState } from 'react';
 import Link from 'next/link';
+import { connectionsPrimaryPath } from '@/lib/connections/primaryPath';
 import type { ConnectionsLandingCopy } from '@/app/[locale]/connections/content';
 import {
   trackLandingCtaClick,
@@ -88,7 +89,7 @@ export default function ConnectionsHero({ locale, copy }: Props): React.JSX.Elem
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <Link
-          href={`/${locale}/connections/play`}
+          href={connectionsPrimaryPath(locale)}
           onClick={handlePrimary}
           data-testid="hero-cta-primary"
           className="inline-block rounded-neo border-4 border-neo-pink bg-neo-pink px-8 py-4 text-center font-neo-display font-black uppercase tracking-wide text-neo-white shadow-hard transition-all hover:shadow-hard-lg"

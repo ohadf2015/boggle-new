@@ -5,12 +5,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { AnimatePresence, m } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Heart, Flame, Trophy, Users, Pyramid } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { useGameExitGuard } from '@/hooks/useGameExitGuard';
 import { getPuzzleForLevel, getTotalLevels } from '@/lib/connections/puzzles';
+import { getPyramidsForLocale } from '@/lib/connections/pyramid/puzzles';
 import { getPlayerSeed } from '@/lib/connections/playerSeed';
 import {
   initGameState,
@@ -24,6 +25,7 @@ import {
   isCompletedTerminalStatus,
 } from '@/lib/connections/gameLogic';
 import { getCurrentLevel, setCurrentLevel } from '@/lib/connections/levelStore';
+import { getSolvedIds, markSolved, clearSolved, findFirstUnsolvedLevel } from '@/lib/connections/solvedStore';
 import { getCurrentLives, setCurrentLives, MAX_LIVES } from '@/lib/connections/livesStore';
 import type { ConnectionPuzzle, GameState, PuzzleRating } from '@/lib/connections/types';
 import { submitConnectionsFeedback } from '@/lib/connections/feedback';
@@ -94,8 +96,15 @@ export default function ConnectionsGame() {
   // Per-device shuffle seed — same puzzles, personal order (0 on SSR = legacy order).
   const [seed] = useState<number>(() => getPlayerSeed());
 
+  // Solved-id history: a solved (or revealed) puzzle never reappears, even
+  // after content drops reshuffle the seeded level order.
+  const [solvedInit] = useState<ReadonlySet<string>>(() => getSolvedIds('regular', language));
+  const solvedRef = useRef<ReadonlySet<string>>(solvedInit);
+
   // Each level renders one puzzle. Level number + lives persist in localStorage per locale.
-  const [level, setLevel] = useState<number>(() => getCurrentLevel(language));
+  const [level, setLevel] = useState<number>(
+    () => findFirstUnsolvedLevel(language, getCurrentLevel(language), bannedIds, solvedRef.current, seed).level,
+  );
   const totalLevels = getTotalLevels(language, bannedIds, seed);
   const initialPuzzle = getPuzzleForLevel(language, level, bannedIds, seed);
   const initialPuzzles: ConnectionPuzzle[] = initialPuzzle ? [initialPuzzle] : [];
@@ -164,12 +173,12 @@ export default function ConnectionsGame() {
   // resolves with a new Set ref every time, so coupling it here would wipe a
   // mid-typed input on every game start. Ban-list refresh handled separately.
   useEffect(() => {
-    const newLevel = getCurrentLevel(language);
-    setLevel(newLevel);
-    const puzzle = getPuzzleForLevel(language, newLevel, bannedIds, seed);
+    solvedRef.current = getSolvedIds('regular', language);
+    const resolved = findFirstUnsolvedLevel(language, getCurrentLevel(language), bannedIds, solvedRef.current, seed);
+    setLevel(resolved.level);
     dispatch({
       type: 'RESET',
-      puzzles: puzzle ? [puzzle] : [],
+      puzzles: resolved.puzzle ? [resolved.puzzle] : [],
       initialLives: getCurrentLives(language),
     });
     xpAwardedIdsRef.current = new Set();
@@ -239,6 +248,9 @@ export default function ConnectionsGame() {
     const puzzle = state.puzzles[state.currentIndex];
     if (puzzle && !xpAwardedIdsRef.current.has(puzzle.id)) {
       xpAwardedIdsRef.current.add(puzzle.id);
+      // Never serve this puzzle again (persists across sessions + reshuffles).
+      markSolved('regular', language, puzzle.id);
+      solvedRef.current = new Set([...solvedRef.current, puzzle.id]);
       // Satisfying feedback: chime + tap on every solve; a bigger burst on
       // streak milestones makes the next puzzle feel worth chasing.
       sfx.playMatchFoundSound();
@@ -259,7 +271,7 @@ export default function ConnectionsGame() {
         body: JSON.stringify({ xpAmount: xp, lessonId: 'connections-game', activityType: 'connections' }),
       }).catch(() => {});
     }
-  }, [state.status, state.currentIndex, state.puzzles, state.streak, state.score, prefersReducedMotion, sfx, customHaptic]);
+  }, [state.status, state.currentIndex, state.puzzles, state.streak, state.score, prefersReducedMotion, sfx, customHaptic, language]);
 
   useEffect(() => {
     if (state.status !== 'wrong') return;
@@ -272,13 +284,12 @@ export default function ConnectionsGame() {
   }, [state.status, state.wrongAttempts, prefersReducedMotion, sfx, haptic]);
 
   const advanceToNextLevel = useCallback(() => {
-    const nextLevel = level + 1;
-    setCurrentLevel(language, nextLevel);
-    setLevel(nextLevel);
-    const puzzle = getPuzzleForLevel(language, nextLevel, bannedIds, seed);
-    if (puzzle) {
+    const next = findFirstUnsolvedLevel(language, level + 1, bannedIds, solvedRef.current, seed);
+    setCurrentLevel(language, next.level);
+    setLevel(next.level);
+    if (next.puzzle) {
       // Carry surviving lives across levels so they actually gate progress.
-      dispatch({ type: 'RESET', puzzles: [puzzle], initialLives: state.lives });
+      dispatch({ type: 'RESET', puzzles: [next.puzzle], initialLives: state.lives });
     }
     // Level-up fanfare: a clear payoff for clearing a puzzle.
     sfx.playLevelUpSound();
@@ -289,7 +300,7 @@ export default function ConnectionsGame() {
       const containerRect = containerRef.current?.getBoundingClientRect();
       const x = rect && containerRect ? rect.left + rect.width / 2 - containerRect.left : 0;
       const y = rect && containerRect ? rect.top + rect.height / 2 - containerRect.top : 0;
-      window.dispatchEvent(new CustomEvent('connections:levelUp', { detail: { x, y, level: nextLevel } }));
+      window.dispatchEvent(new CustomEvent('connections:levelUp', { detail: { x, y, level: next.level } }));
     }
   }, [language, level, state.lives, prefersReducedMotion, bannedIds, seed, sfx, customHaptic]);
 
@@ -303,8 +314,14 @@ export default function ConnectionsGame() {
 
   const handleGiveUp = useCallback(() => {
     trackGrowthEvent('game_abandoned', { gameMode: 'connections', reason: 'give_up' });
+    // Answer gets revealed — treat as consumed so it never reappears either.
+    const puzzle = state.puzzles[state.currentIndex];
+    if (puzzle) {
+      markSolved('regular', language, puzzle.id);
+      solvedRef.current = new Set([...solvedRef.current, puzzle.id]);
+    }
     dispatch({ type: 'GIVE_UP' });
-  }, []);
+  }, [state.puzzles, state.currentIndex, language]);
 
   const handleRevealHint = useCallback(() => {
     trackGrowthEvent('hint_used', { gameMode: 'connections', hintType: 'text' });
@@ -355,6 +372,9 @@ export default function ConnectionsGame() {
   // getPuzzleForLevel returns null past the end → if the player has cleared
   // ≥1 level we treat this as terminal-success, otherwise as no-content.
   const handlePlayAgain = useCallback(() => {
+    // Explicit replay of a cleared pack — wipe the solved history for a fresh run.
+    clearSolved('regular', language);
+    solvedRef.current = new Set();
     setCurrentLevel(language, 1);
     setLevel(1);
     const puzzle = getPuzzleForLevel(language, 1, bannedIds, seed);
@@ -375,7 +395,7 @@ export default function ConnectionsGame() {
             transition={{ type: 'spring', stiffness: 320, damping: 22 }}
             className="w-full max-w-sm rounded-neo border-neo-thick border-neo-lime bg-neo-navy-light shadow-hard-lg p-6 text-center"
           >
-            <p className="text-5xl mb-3" aria-hidden="true">🏆</p>
+            <Trophy className="mx-auto mb-3 h-12 w-12 text-neo-yellow" strokeWidth={2} aria-hidden="true" />
             <h2 className="font-neo-display text-2xl text-neo-white font-bold mb-2">
               {t('connections.finished')}
             </h2>
@@ -461,13 +481,17 @@ export default function ConnectionsGame() {
                 key={`life-${i}`}
                 animate={
                   alive
-                    ? { scale: 1, opacity: 1, filter: 'grayscale(0) drop-shadow(0 0 4px rgba(255,20,147,0.6))' }
-                    : { scale: 0.55, opacity: 0.18, filter: 'grayscale(1)' }
+                    ? { scale: 1, opacity: 1, filter: 'drop-shadow(0 0 4px rgba(255,20,147,0.6))' }
+                    : { scale: 0.55, opacity: 0.25, filter: 'none' }
                 }
                 transition={{ type: 'spring' as const, stiffness: 420, damping: 16 }}
-                className="text-lg select-none leading-none"
+                className="select-none leading-none"
               >
-                {alive ? '❤️' : '🖤'}
+                <Heart
+                  className={alive ? 'h-5 w-5 fill-neo-pink text-neo-pink' : 'h-5 w-5 fill-neo-white/15 text-neo-white/25'}
+                  strokeWidth={2}
+                  aria-hidden="true"
+                />
               </m.span>
             );
           })}
@@ -504,9 +528,10 @@ export default function ConnectionsGame() {
                   animate={{ scale: 1, opacity: 1, y: 0 }}
                   exit={{ scale: 0.5, opacity: 0 }}
                   transition={{ type: 'spring' as const, stiffness: 400, damping: 16 }}
-                  className="text-neo-orange text-sm font-bold leading-none"
+                  className="inline-flex items-center gap-0.5 text-neo-orange text-sm font-bold leading-none"
                 >
-                  🔥{state.streak}
+                  <Flame className="h-4 w-4 fill-neo-orange/30" strokeWidth={2.5} aria-hidden="true" />
+                  {state.streak}
                 </m.span>
               )}
             </AnimatePresence>
@@ -526,20 +551,29 @@ export default function ConnectionsGame() {
         </div>
       </m.div>
 
-      {/* Daily + Community — lightweight secondary links, not full-width CTAs */}
+      {/* Pyramid (flagship) + Daily + Community — lightweight secondary links */}
       <div className="flex justify-center gap-2">
+        {getPyramidsForLocale(language).length > 0 && (
+          <Link
+            href={`/${language}/connections/pyramid`}
+            className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-purple/25 px-3 py-1 font-neo-body text-xs font-bold text-neo-purple shadow-hard-sm transition-all duration-100 hover:bg-neo-purple/40 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
+          >
+            <Pyramid className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
+            <span>{t('connections.pyramid.cta')}</span>
+          </Link>
+        )}
         <Link
           href={`/${language}/connections/daily`}
           className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-yellow/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-yellow shadow-hard-sm transition-all duration-100 hover:bg-neo-yellow/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
         >
-          <span aria-hidden="true">🏆</span>
+          <Trophy className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
           <span>{t('connections.daily.cta')}</span>
         </Link>
         <Link
           href={`/${language}/connections/community`}
           className="inline-flex items-center gap-1.5 rounded-neo border-neo border-black bg-neo-pink/15 px-3 py-1 font-neo-body text-xs font-bold text-neo-pink shadow-hard-sm transition-all duration-100 hover:bg-neo-pink/25 hover:shadow-hard active:translate-y-[1px] active:shadow-hard-pressed"
         >
-          <span aria-hidden="true">👥</span>
+          <Users className="h-3.5 w-3.5" strokeWidth={2.5} aria-hidden="true" />
           <span>{t('connections.community.cta')}</span>
         </Link>
       </div>

@@ -18,6 +18,7 @@ import {
   type PyramidState,
 } from '@/lib/connections/pyramid/gameLogic';
 import { dailyPyramid } from '@/lib/connections/pyramid/daily';
+import { getSolvedIds, markSolved } from '@/lib/connections/solvedStore';
 import { buildPyramidShareGrid } from '@/lib/connections/pyramid/shareGrid';
 import { todayUTC } from '@/lib/connections/dailyClient';
 import { gridCallout, type BridgeOutcome } from '@/lib/connections/shareGrid';
@@ -60,7 +61,8 @@ export default function PyramidChallenge() {
   // hooks mount (rules-of-hooks), so the actual game lives in PyramidRun.
   const { language } = useLanguage();
   const today = useRef(todayUTC()).current;
-  const pyramid = dailyPyramid(today, language);
+  const [solvedPyramids] = useState<ReadonlySet<string>>(() => getSolvedIds('pyramid', language));
+  const pyramid = dailyPyramid(today, language, solvedPyramids);
   if (!pyramid) return null;
   return <PyramidRun pyramid={pyramid} today={today} />;
 }
@@ -137,6 +139,8 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
     } else if (pyramidState.status === 'won' && prevStatusRef.current !== 'won') {
       sfx.playVictorySound();
       if (!prefersReducedMotion) fireVictoryConfetti();
+      // Beaten pyramids never come back — future days pick from unsolved ones.
+      if (pyramid) markSolved('pyramid', language, pyramid.id);
       outcomesRef.current.set(3, {
         reached: true,
         solved: true,
@@ -152,7 +156,7 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
       });
     }
     prevStatusRef.current = pyramidState.status;
-  }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion]);
+  }, [pyramidState.status, pyramidState.stage, pyramidState.hintRevealed, pyramidState.wrongAttempts, sfx, haptic, customHaptic, prefersReducedMotion, pyramid, language]);
 
   const handleInput = useCallback((value: string) => setInput(value), []);
   const handleSubmit = useCallback(() => {
