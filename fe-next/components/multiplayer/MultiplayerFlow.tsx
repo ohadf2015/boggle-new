@@ -8,6 +8,7 @@ import CgAwareLobbyChrome from './CgAwareLobbyChrome';
 import type { Language, ActiveRoom } from '@/shared/types/game';
 import {
   getStoredUsername,
+  getOrCreateStoredUsername,
   hasCompleteStoredProfile,
 } from '@/utils/profileStorage';
 import { useCrazyGamesInvite } from '@/hooks/useCrazyGamesInvite';
@@ -339,10 +340,13 @@ const MultiplayerFlow: React.FC<MultiplayerFlowProps> = ({
 
   // Handle quick play - dual mode with sensible defaults
   const handleQuickPlay = useCallback(() => {
-    // Get or generate username for quick play
+    // Get or generate username for quick play. Routed through the shared helper
+    // so a guest keeps ONE identity across the create modal, the join modal, the
+    // emit chokepoint and here — the inline `Player###` this replaced was never
+    // persisted, so quick play showed a different name every time (Class 3).
     const quickPlayUsername = isAuthenticated && displayName
       ? displayName
-      : getStoredUsername() || `Player${Math.floor(Math.random() * 1000)}`;
+      : getOrCreateStoredUsername(defaultLanguage) || `Player${Math.floor(Math.random() * 1000)}`;
 
     // Consolidation (room-management fix): before spawning yet another solo
     // public lobby, try to drop the player into an EXISTING compatible waiting

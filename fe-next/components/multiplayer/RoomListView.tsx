@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { ArrowLeft, RefreshCw, HelpCircle, Sword, Bomb, Search, CircleDot, ChevronRight, Eye, Users } from 'lucide-react';
+import { DirectionalIcon } from '@/components/ui/DirectionalIcon';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { PullToRefreshIndicator } from '@/components/ui/PullToRefreshIndicator';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
@@ -98,15 +99,8 @@ const MODE_CONFIG: Record<string, {
   },
 };
 
-const DEFAULT_MODE_CONFIG = {
-  icon: Sword,
-  borderColor: 'border-s-neo-cyan',
-  iconBg: 'bg-neo-cyan',
-  iconColor: 'text-neo-black',
-  textColor: 'text-neo-cyan',
-  labelKey: 'multiplayerFlow.roomList.gameModes.classic',
-  descKey: 'gameModes.classic.description',
-};
+/** An unknown mode falls back to how classic looks — same entry, not a copy of it. */
+const DEFAULT_MODE_CONFIG = MODE_CONFIG.classic;
 
 // ==================== Types ====================
 
@@ -211,7 +205,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                   aria-label={t('common.back')}
                   className="absolute top-2 inset-s-2 z-10 flex items-center justify-center w-10 h-10 min-w-[44px] min-h-[44px] rounded-lg border-2 border-neo-black bg-neo-navy/80 backdrop-blur-xs shadow-hard-sm hover:bg-neo-navy active:shadow-hard-pressed active:translate-y-0.5 transition-all focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime"
                 >
-                  <ArrowLeft className="w-5 h-5 text-neo-white rtl:rotate-180" />
+                  <DirectionalIcon icon={ArrowLeft} className="w-5 h-5 text-neo-white" />
                 </Link>
               )}
 
@@ -438,7 +432,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                               size="sm"
                             />
                           )}
-                          <ChevronRight className="w-4 h-4 text-white shrink-0 rtl:rotate-180 group-hover:text-white transition-colors" />
+                          <DirectionalIcon icon={ChevronRight} className="w-4 h-4 text-white shrink-0 group-hover:text-white transition-colors" />
                         </div>
                       </m.button>
                     );

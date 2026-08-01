@@ -180,18 +180,12 @@ export interface MultiplayerInGameViewProps {
   totalTime?: number;
 }
 
-/**
- * Teaching in multiplayer now happens on the board itself (BoardHandCoach),
- * not through a blocking overlay.
- *
- * The old DirectionsTutorialOverlay disabled its own continue button for ten
- * seconds and froze the LOCAL clock — but a multiplayer round is timed by the
- * server, so a first-time player was locked out of a competitive round while it
- * kept counting down against them.
- */
-function WithTutorial({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
-}
+// NOTE: multiplayer deliberately has NO blocking tutorial overlay. Teaching
+// happens on the board itself (BoardHandCoach). The old DirectionsTutorialOverlay
+// disabled its own continue button for ten seconds and froze the LOCAL clock —
+// but a multiplayer round is timed by the SERVER, so a first-time player was
+// locked out of a competitive round while it kept counting down against them.
+// Don't reintroduce one here.
 
 // ==================== Component ====================
 
@@ -395,7 +389,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
   // Mobile-only fallback: desktop path is handled by WheelRushDesktopAdapter below.
   if (gameMode === 'wheel-rush' && !shellEnabled) {
     return (
-      <WithTutorial>
         <WheelRushView
           socket={socket}
           username={username}
@@ -406,14 +399,12 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           totalTime={totalTime ?? undefined}
           gameLanguage={gameLanguage}
         />
-      </WithTutorial>
     );
   }
 
   // No grid placeholder (player-only edge case)
   if (!effectiveGrid) {
     return (
-      <WithTutorial>
         <div
           className="flex-1 flex flex-col min-h-0 bg-neo-navy p-4 items-center justify-center"
           role="status"
@@ -430,7 +421,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           ))}
         </div>
       </div>
-      </WithTutorial>
     );
   }
 
@@ -492,7 +482,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     };
 
     return (
-      <WithTutorial>
         <StandardDesktopAdapter
           roomId={gameCode}
           leaderboard={rosterPlayers}
@@ -503,7 +492,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           socket={socket}
           canvas={<InGameScreen {...inGameScreenProps} />}
         />
-      </WithTutorial>
     );
   }
 
@@ -525,7 +513,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     };
 
     return (
-      <WithTutorial>
         <WheelRushDesktopAdapter
           roomId={gameCode}
           leaderboard={rosterPlayers}
@@ -537,7 +524,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           socket={socket}
           canvas={<WheelRushView {...wheelRushProps} isDesktopCanvas />}
         />
-      </WithTutorial>
     );
   }
 
@@ -561,7 +547,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     };
 
     return (
-      <WithTutorial>
         <WordHuntDesktopAdapter
           roomId={gameCode}
           leaderboard={rosterPlayers}
@@ -573,7 +558,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           socket={socket}
           canvas={<WordHuntGame {...wordHuntGameProps} />}
         />
-      </WithTutorial>
     );
   }
 
@@ -599,7 +583,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
     if (shellEnabled) {
       // rosterPlayers + ladderWords memoized at top of component.
       return (
-        <WithTutorial>
           <BlastDesktopAdapter
             roomId={gameCode}
             leaderboard={rosterPlayers}
@@ -612,20 +595,14 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           comboMultiplier={getComboMultiplier(comboLevel)}
           canvas={blastCanvas}
         />
-        </WithTutorial>
       );
     }
-    return (
-      <WithTutorial>
-        {blastCanvas}
-      </WithTutorial>
-    );
+    return blastCanvas;
   }
 
   // Word Hunt mode
   if (gameMode === 'word-hunt') {
     return (
-      <WithTutorial>
         <WordHuntGame
           grid={effectiveGrid}
         gameLanguage={gameLanguage}
@@ -640,13 +617,11 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
           socket={socket}
           foundWords={foundWords}
         />
-      </WithTutorial>
     );
   }
 
   // Classic mode — InGameScreen. Subtle seasonal ambience on the wrapper bg.
   return (
-    <WithTutorial>
       <div
         className={cn(
           'flex-1 flex flex-col min-h-0 overflow-hidden transition-colors duration-300',
@@ -770,7 +745,6 @@ const MultiplayerInGameView = memo<MultiplayerInGameViewProps>(({
         </AlertDialog>
       )}
     </div>
-    </WithTutorial>
   );
 });
 
