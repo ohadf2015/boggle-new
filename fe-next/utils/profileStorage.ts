@@ -14,6 +14,8 @@
 
 import { getFromStorage, saveToStorage, removeFromStorage } from '@/utils/storageHelpers';
 import { type CustomAvatarConfig, isValidCustomAvatar, getRandomAvatarConfig } from '@/shared/types/customAvatar';
+import { getRandomDefaultNameWithAvatar } from '@/utils/defaultNames';
+import { validateUsername } from '@/utils/validation';
 
 // Storage key constants - single source of truth
 export const PROFILE_STORAGE_KEYS = {
@@ -56,6 +58,31 @@ export function setStoredUsername(username: string): void {
 /**
  * Clear the stored username
  */
+/**
+ * Stored guest username, or a generated one — persisted on first use.
+ *
+ * The room modals used to start a first-time guest with an empty name field,
+ * which left "Create Battle" inert until they typed something. The join path
+ * already invents a name when none is supplied, so the form was stricter than
+ * the system behind it. Persisting the generated name also keeps the create
+ * modal, the join modal and the emit chokepoint showing ONE identity instead
+ * of three different randoms.
+ *
+ * Falls back to the empty string if the generated name wouldn't pass the
+ * modals' own validator — a prefill the Create button rejects is worse than
+ * no prefill at all.
+ */
+export function getOrCreateStoredUsername(language: string = 'en'): string {
+  const existing = getStoredUsername();
+  if (existing?.trim()) return existing;
+
+  const { name } = getRandomDefaultNameWithAvatar(language);
+  if (!validateUsername(name).isValid) return '';
+
+  setStoredUsername(name);
+  return name;
+}
+
 export function clearStoredUsername(): void {
   removeFromStorage(PROFILE_STORAGE_KEYS.USERNAME);
 }

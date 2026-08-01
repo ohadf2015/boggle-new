@@ -89,8 +89,16 @@ function formatScore(score: number): string {
   return score.toLocaleString();
 }
 
-// Sequenced reveal delays: 2nd place, 1st place (dramatic), 3rd place
-const REVEAL_DELAYS = [0.1, 0.35, 0.2] as const;
+/**
+ * Sequenced reveal delays by layout slot: 2nd place, 1st place, 3rd place —
+ * so the winner lands last for the drama beat.
+ *
+ * Offset to begin as the hero's placement badge settles (~0.45s). These used
+ * to start at 0.1s, i.e. on top of the hero, which made the whole upper half
+ * of the results screen arrive as one simultaneous burst with no reading
+ * order. Ordering is asserted in __tests__/resultsChoreography.test.ts.
+ */
+export const REVEAL_DELAYS = [0.5, 0.75, 0.62] as const;
 
 /** Emoji speech bubble above a targeted podium player */
 function PodiumEmojiBubbleLocal({ emoji, onDone }: { emoji: string; onDone: () => void }) {

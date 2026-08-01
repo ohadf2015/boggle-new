@@ -12,7 +12,7 @@ import logger from '@/utils/logger';
 import { trackGrowthEvent } from '@/utils/growthTracking';
 import { MP_TOAST_IDS } from '@/utils/multiplayer/mpToastIds';
 import { getRandomDefaultNameWithAvatar, getAvatarForName } from '@/utils/defaultNames';
-import { setStoredUsername, getStoredAvatarId, getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
+import { getOrCreateStoredUsername, getStoredAvatarId, getStoredCustomAvatar, setStoredCustomAvatar } from '@/utils/profileStorage';
 import { getAvatarEmojiAndColor } from '@/utils/avatarConfig';
 import { getRandomAvatarConfig, type CustomAvatarConfig } from '@/shared/types/customAvatar';
 import { sanitizeRoomName } from '@/utils/consts';
@@ -127,6 +127,12 @@ export function useMultiplayerJoin({
   // check and double-emit. A ref flips synchronously, closing that window.
   const inFlightRef = useRef(false);
 
+  // Auth-sensitive values, re-read AFTER the await in the join body. The
+  // callback's closure copies go stale the instant we yield, and picking up the
+  // profile that just landed is the entire point of waiting for it.
+  const latestAuthRef = useRef({ user, profile, username, guestAvatar, loading });
+  latestAuthRef.current = { user, profile, username, guestAvatar, loading };
+
   return useCallback(
     async (
       isHostMode: boolean,
@@ -173,46 +179,66 @@ export function useMultiplayerJoin({
         return;
       }
 
-      // Wait for auth
+      // Wait for auth to settle rather than dropping the tap. This callback is
+      // the single emit chokepoint for EVERY entry path — create, join modal,
+      // quick-play, ?room= auto-join — so bailing here silently killed all of
+      // them whenever the Supabase profile was still in flight (cold load,
+      // deep link). The user saw a toast and had to tap again; auto-join had
+      // no one to re-tap for it, so it just never happened.
+      // Show the pending state BEFORE the wait, not after. The in-flight guard
+      // now holds for the duration of the wait, so without this the button
+      // looks idle while a join is genuinely under way and a second tap gets
+      // dropped with no explanation.
+      setError('');
+      setIsJoining(true);
+
       const AUTH_LOADING_TIMEOUT = 5000;
-      const authLoadingTooLong = authLoadingStartTime && Date.now() - authLoadingStartTime > AUTH_LOADING_TIMEOUT;
-
-      if (loading && !authLoadingTooLong) {
-        releaseInFlight();
-        toast.error(t('common.loadingProfile'), { duration: 2000, icon: '⏳', id: MP_TOAST_IDS.loadingProfile });
-        return;
+      const authDeadline = (authLoadingStartTime ?? Date.now()) + AUTH_LOADING_TIMEOUT;
+      while (latestAuthRef.current.loading && Date.now() < authDeadline) {
+        // ponytail: polling a ref beats wiring an auth-settled subscription for
+        // a wait that is normally one or two ticks. Swap for an event if this
+        // ever needs to be precise.
+        await new Promise((resolve) => setTimeout(resolve, 60));
+      }
+      if (latestAuthRef.current.loading) {
+        logger.info('[AUTH] Auth still loading after timeout, proceeding without profile');
       }
 
-      if (authLoadingTooLong) {
-        logger.info('[AUTH] Auth loading timed out, proceeding without profile');
-      }
+      // Live auth values — the closure's copies predate the await above.
+      const {
+        user: liveUser,
+        profile: liveProfile,
+        username: liveUsername,
+        guestAvatar: liveGuestAvatar,
+      } = latestAuthRef.current;
 
       // Compute effective username
       let effectiveUsername = overrideUsername?.trim()
         ? overrideUsername.trim()
-        : user
-          ? profile?.display_name || user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email?.split('@')[0] || username
-          : username;
+        : liveUser
+          ? liveProfile?.display_name || liveUser?.user_metadata?.full_name || liveUser?.user_metadata?.name || liveUser?.email?.split('@')[0] || liveUsername
+          : liveUsername;
 
       let generatedAvatar: { emoji: string; color: string } | null = null;
-      if (!effectiveUsername?.trim() && !user) {
-        const { name, avatar } = getRandomDefaultNameWithAvatar(language);
-        effectiveUsername = name;
+      if (!effectiveUsername?.trim() && !liveUser) {
+        // Same persisted identity the room modals show. Previously this
+        // invented a fresh random name every time and never stored it, so a
+        // guest who bypassed the modals (quick-play, ?room= deep link) got a
+        // different name each session than the one the modals displayed.
+        effectiveUsername = getOrCreateStoredUsername(language);
+        const { avatar } = getRandomDefaultNameWithAvatar(language);
         generatedAvatar = avatar;
         setGuestAvatar(avatar);
       }
 
-      if (effectiveUsername !== username) {
+      if (effectiveUsername !== liveUsername) {
         setUsername(effectiveUsername);
       }
 
       const avatarImageId = getStoredAvatarId();
-      const isGuest = !user;
-      const fallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(effectiveUsername);
-      const effectiveAvatar = buildAvatar(profile, fallbackAvatar, avatarImageId, isGuest);
-
-      setError('');
-      setIsJoining(true);
+      const isGuest = !liveUser;
+      const fallbackAvatar = generatedAvatar || liveGuestAvatar || getAvatarForName(effectiveUsername);
+      const effectiveAvatar = buildAvatar(liveProfile, fallbackAvatar, avatarImageId, isGuest);
 
       const safetyTimeout = setTimeout(() => {
         releaseInFlight();
@@ -256,8 +282,8 @@ export function useMultiplayerJoin({
       let guestSessionId: string | null = null;
 
       if (isSupabaseEnabled) {
-        if (user?.id) {
-          authUserId = user.id;
+        if (liveUser?.id) {
+          authUserId = liveUser.id;
         } else {
           guestSessionId = getGuestSessionId();
           if (guestSessionId) {
@@ -267,10 +293,10 @@ export function useMultiplayerJoin({
       }
 
       if (isHostMode) {
-        const finalHostUsername = user ? effectiveUsername : hostUsername || effectiveUsername;
+        const finalHostUsername = liveUser ? effectiveUsername : hostUsername || effectiveUsername;
         const finalRoomName = sanitizeRoomName(overrideRoomName || roomName || `${finalHostUsername} Room`);
-        const hostFallbackAvatar = generatedAvatar || guestAvatar || getAvatarForName(finalHostUsername);
-        const hostAvatar = buildAvatar(profile, hostFallbackAvatar, avatarImageId, isGuest);
+        const hostFallbackAvatar = generatedAvatar || liveGuestAvatar || getAvatarForName(finalHostUsername);
+        const hostAvatar = buildAvatar(liveProfile, hostFallbackAvatar, avatarImageId, isGuest);
 
         socket.emit('createGame', {
           gameCode: codeToUse,
@@ -333,10 +359,14 @@ export function useMultiplayerJoin({
         });
       }
     },
+    // user/profile/username/guestAvatar/loading deliberately absent: they are
+    // read through latestAuthRef (they change across the await anyway), so
+    // listing them here only churned handleJoin's identity on every auth
+    // render and re-rendered the whole lobby with it.
     [
-      socket, gameCode, username, roomName, language, t,
-      isSupabaseEnabled, user, profile, loading, authLoadingStartTime,
-      guestAvatar, hostUsername, setGuestAvatar, setUsername, setError, setIsJoining,
+      socket, gameCode, roomName, language, t,
+      isSupabaseEnabled, authLoadingStartTime,
+      hostUsername, setGuestAvatar, setUsername, setError, setIsJoining,
     ]
   );
 }

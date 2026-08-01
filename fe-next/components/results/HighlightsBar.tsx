@@ -13,12 +13,21 @@ interface HighlightsBarProps {
   }>;
 }
 
+/**
+ * Third beat of the results entrance: hero → podium → highlights. Follows the
+ * winner's reveal instead of colliding with it. Asserted in
+ * __tests__/resultsChoreography.test.ts.
+ */
+export const HIGHLIGHTS_REVEAL_DELAY = 0.95;
+
 const containerVariants = {
-  hidden: { opacity: 0 },
+  // Container carries no opacity tween — the stat children fade individually.
+  // A fade on this wrapper is the fullscreen-layer pattern that caused the
+  // results white-flash on the Chromium mobile renderer (pitfalls Class 5).
+  hidden: {},
   visible: {
-    opacity: 1,
     transition: {
-      delay: 0.5,
+      delay: HIGHLIGHTS_REVEAL_DELAY,
       staggerChildren: 0.12,
     },
   },

@@ -10,7 +10,7 @@ import {
 import { AvatarSelector } from '@/components/multiplayer/AvatarSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import {
-  getStoredUsername,
+  getOrCreateStoredUsername,
   getOrCreateStoredCustomAvatar,
   setStoredUsername,
   setStoredCustomAvatar,
@@ -91,8 +91,10 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
       setUsername(displayName);
       setCustomAvatar(profileAvatar ?? getRandomAvatarConfig());
     } else {
-      const storedUsername = getStoredUsername();
-      setUsername(storedUsername || '');
+      // Prefill a generated name for first-time guests so "Create Battle" is
+      // live on open instead of inert until they type. Same identity the join
+      // modal and the emit chokepoint will use.
+      setUsername(getOrCreateStoredUsername(defaultLanguage));
       setCustomAvatar(getOrCreateStoredCustomAvatar());
     }
   }, [isOpen, isAuthenticated, displayName, profileAvatar, defaultLanguage]);

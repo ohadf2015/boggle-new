@@ -20,6 +20,7 @@ import { hasCompleteStoredProfile, getStoredUsername, getStoredAvatarId } from '
 // Mock dependencies
 vi.mock('@/utils/profileStorage', () => ({
   getStoredUsername: vi.fn().mockReturnValue('TestPlayer'),
+  getOrCreateStoredUsername: vi.fn().mockReturnValue('TestPlayer'),
   getStoredAvatarId: vi.fn().mockReturnValue('avatar-1'),
   hasCompleteStoredProfile: vi.fn().mockReturnValue(true),
 }));

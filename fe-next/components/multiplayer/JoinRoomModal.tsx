@@ -17,7 +17,7 @@ import { AvatarSelector } from '@/components/multiplayer/AvatarSelector';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { LANGUAGE_FLAGS } from '@/lib/languageConfig';
 import {
-  getStoredUsername,
+  getOrCreateStoredUsername,
   getOrCreateStoredCustomAvatar,
   setStoredUsername,
   setStoredCustomAvatar,
@@ -71,11 +71,13 @@ const JoinRoomModal: React.FC<JoinRoomModalProps> = ({
       setUsername(displayName);
       setCustomAvatar(profileAvatar ?? getRandomAvatarConfig());
     } else {
-      const storedUsername = getStoredUsername();
-      setUsername(storedUsername || '');
+      // Prefill a generated name for first-time guests so "Join Battle" is
+      // live on open. Mirrors CreateRoomModal — both entry paths must resolve
+      // the guest identity identically or they diverge.
+      setUsername(getOrCreateStoredUsername(room?.language));
       setCustomAvatar(getOrCreateStoredCustomAvatar());
     }
-  }, [isOpen, isAuthenticated, displayName, profileAvatar]);
+  }, [isOpen, isAuthenticated, displayName, profileAvatar, room?.language]);
 
   const handleJoin = useCallback(() => {
     setHasAttemptedSubmit(true);

@@ -44,6 +44,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 vi.mock('@/utils/profileStorage', () => ({
   getStoredUsername: vi.fn().mockReturnValue('TestPlayer'),
+  getOrCreateStoredUsername: vi.fn().mockReturnValue('TestPlayer'),
   getStoredCustomAvatar: vi.fn().mockReturnValue(null),
   getOrCreateStoredCustomAvatar: vi.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4' }),
   setStoredUsername: vi.fn(),

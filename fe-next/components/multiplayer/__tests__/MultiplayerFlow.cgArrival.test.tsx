@@ -15,6 +15,7 @@ import type { ActiveRoom, Language } from '@/shared/types/game';
 
 vi.mock('@/utils/profileStorage', () => ({
   getStoredUsername: () => 'CGPlayer',
+  getOrCreateStoredUsername: () => 'CGPlayer',
   getStoredAvatarId: () => 'avatar-1',
   hasCompleteStoredProfile: () => true,
 }));

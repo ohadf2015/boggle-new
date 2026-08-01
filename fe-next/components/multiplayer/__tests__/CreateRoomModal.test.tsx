@@ -48,6 +48,7 @@ vi.mock('@/contexts/LanguageContext', () => ({
 
 vi.mock('@/utils/profileStorage', () => ({
   getStoredUsername: vi.fn().mockReturnValue('TestUser'),
+  getOrCreateStoredUsername: vi.fn().mockReturnValue('TestUser'),
   getStoredCustomAvatar: vi.fn().mockReturnValue(null),
   getOrCreateStoredCustomAvatar: vi.fn().mockReturnValue({ gender: 'male', base: 'round', skinColor: '#FFDBB4', hair: 'short', hairColor: '#2C1B18', eyes: 'normal', eyebrows: 'none', mouth: 'smile', accessory: 'none', accessoryColor: '#000000', bgColor: '#4ECDC4', shirtColor: '#4A90D9' }),
   setStoredUsername: vi.fn(),
@@ -161,7 +162,10 @@ describe('CreateRoomModal', () => {
   it('should show validation error on submit with empty name', async () => {
     const user = userEvent.setup();
     const mockOnCreate = vi.fn();
-    (profileStorage.getStoredUsername as ReturnType<typeof vi.fn>).mockReturnValueOnce('');
+    // Guests are normally prefilled; an empty box is still reachable (the
+    // generated name failed validation, or the user cleared the field) and
+    // must still be rejected.
+    (profileStorage.getOrCreateStoredUsername as ReturnType<typeof vi.fn>).mockReturnValueOnce('');
     render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
 
     const createButton = screen.getByRole('button', { name: /create room/i });
@@ -169,6 +173,21 @@ describe('CreateRoomModal', () => {
 
     expect(mockOnCreate).not.toHaveBeenCalled();
     expect(screen.getByRole('alert')).toBeInTheDocument();
+  });
+
+  it('prefills a guest name so a first-time player can create in one tap', async () => {
+    const user = userEvent.setup();
+    const mockOnCreate = vi.fn();
+    (profileStorage.getOrCreateStoredUsername as ReturnType<typeof vi.fn>).mockReturnValueOnce('Sneaky Potato');
+    render(<CreateRoomModal {...defaultProps} onCreate={mockOnCreate} />);
+
+    expect(screen.getByDisplayValue('Sneaky Potato')).toBeInTheDocument();
+
+    // No typing required — the primary CTA is live on open.
+    await user.click(screen.getByRole('button', { name: /create room/i }));
+    expect(mockOnCreate).toHaveBeenCalledWith(
+      expect.objectContaining({ hostUsername: 'Sneaky Potato' }),
+    );
   });
 
   it('should render room name input with optional label', () => {
