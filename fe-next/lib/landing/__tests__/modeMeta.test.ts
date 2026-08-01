@@ -15,7 +15,7 @@ describe('MODE_META — parity with control renderCard', () => {
     ['practice', '/practice', 'cyan'],
     ['blast', '/blast', 'orange'],
     ['adventure', '/adventure', 'lime'],
-    ['connections', '/connections/play', 'blue'],
+    ['connections', '/connections/pyramid', 'blue'],
     ['brainGym', '/brain', 'purple'],
     ['wordCraft', '/word-craft', 'orange'],
     ['crossword', '/crossword', 'cyan'],
@@ -86,7 +86,7 @@ describe('MODE_META — parity with control renderCard', () => {
   describe('modeRoute', () => {
     it('prefixes the active language', () => {
       expect(modeRoute('arena', 'he')).toBe('/he/multiplayer');
-      expect(modeRoute('connections', 'en')).toBe('/en/connections/play');
+      expect(modeRoute('connections', 'en')).toBe('/en/connections/pyramid');
     });
 
 

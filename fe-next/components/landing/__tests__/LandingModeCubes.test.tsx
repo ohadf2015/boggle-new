@@ -255,7 +255,7 @@ describe('LandingModeCubes', () => {
   describe('calm / no-timer section', () => {
     const calm = [
       model({ key: 'crossword', title: 'Crossword', href: '/en/crossword', variant: 'cyan' }),
-      model({ key: 'connections', title: 'Connections', href: '/en/connections/play', variant: 'blue' }),
+      model({ key: 'connections', title: 'Connections', href: '/en/connections/pyramid', variant: 'blue' }),
     ];
 
     it('renders a distinct calm section with its own heading + hint when calmModels are given', () => {

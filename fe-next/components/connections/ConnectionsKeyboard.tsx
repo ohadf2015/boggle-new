@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { m } from 'framer-motion';
 import { Delete, CornerDownLeft } from 'lucide-react';
 
@@ -31,6 +32,16 @@ const KEY_BASE =
 const KEY_SIZE = 'h-12 sm:h-14 min-w-0';
 
 /**
+ * One letter-key width for the WHOLE keyboard, derived from the widest row.
+ * Every letter key gets this flex-basis with grow disabled, so a 7-key row
+ * renders keys identical to a 10-key row (shorter rows just center) instead
+ * of each row stretching to its own width.
+ */
+function letterKeyStyle(maxLen: number): CSSProperties {
+  return { flexBasis: `calc(${(100 / maxLen).toFixed(4)}% - 0.375rem)`, flexGrow: 0, flexShrink: 1 };
+}
+
+/**
  * On-screen keyboard for Word Bridge, laid out in the 3 physical-keyboard rows
  * players already know (QWERTY / standard Hebrew / ЙЦУКЕН) — Wordle-family
  * ergonomics. Hebrew players never need an IME: every key is a base letter and
@@ -49,6 +60,7 @@ export default function ConnectionsKeyboard({
   disabled = false,
 }: ConnectionsKeyboardProps) {
   const lastRow = rows.length - 1;
+  const keyStyle = letterKeyStyle(Math.max(...rows.map((row) => row.length)));
   return (
     <div
       dir={dir}
@@ -81,7 +93,8 @@ export default function ConnectionsKeyboard({
               onClick={() => onLetter(ch)}
               disabled={disabled}
               aria-label={ch}
-              className={`${KEY_BASE} ${KEY_SIZE} flex-1 bg-neo-cream text-lg sm:text-xl uppercase text-neo-navy hover:bg-neo-white active:bg-neo-lime`}
+              style={keyStyle}
+              className={`${KEY_BASE} ${KEY_SIZE} bg-neo-cream text-lg sm:text-xl uppercase text-neo-navy hover:bg-neo-white active:bg-neo-lime`}
             >
               {ch}
             </button>

@@ -71,11 +71,18 @@ describe('ConnectionsKeyboard', () => {
     expect(screen.getByRole('button', { name: 'Submit' })).toHaveProperty('disabled', true);
   });
 
-  it('grows letter keys to fill the row width (flex-1, not fixed width)', () => {
+  it('keeps letter keys the same width across ALL rows (sized off the widest row)', () => {
     render(<ConnectionsKeyboard {...baseProps} rows={getKeyboardRows('en')} canSubmit />);
+    // Q lives in the 10-key row, A in the 9-key row, Z in the 7-key row —
+    // all three must share one flex-basis so no row's keys look squashed/fat.
+    const q = screen.getByRole('button', { name: 'Q' });
     const a = screen.getByRole('button', { name: 'A' });
-    // Letters must flex-grow to use the full screen width rather than a fixed width.
-    expect(a.className).toContain('flex-1');
+    const z = screen.getByRole('button', { name: 'Z' });
+    expect(q.style.flexBasis).toBeTruthy();
+    expect(a.style.flexBasis).toBe(q.style.flexBasis);
+    expect(z.style.flexBasis).toBe(q.style.flexBasis);
+    // Uniform width means no grow — otherwise shorter rows widen again.
+    expect(q.style.flexGrow).toBe('0');
     // No fixed-width utility (a min-w floor is fine; a hard w-9/w-10 is not).
     expect(a.className).not.toMatch(/(?<![a-z-])w-(?:9|10)\b/);
   });

@@ -91,7 +91,7 @@ export const MODE_META: Record<string, ModeMetaEntry> = {
     Icon: Zap, variant: 'orange', badge: 'BETA', genIcon: '/modes/cubes/quickplay.png',
   },
   connections: {
-    titleKey: 'landing.wordChainMode', descKey: 'landing.wordChainModeDesc', path: '/connections/play',
+    titleKey: 'landing.wordChainMode', descKey: 'landing.wordChainModeDesc', path: '/connections/pyramid',
     Icon: Link2, variant: 'blue', badge: 'NEW', category: 'calm', modeImage: '/modes/connections.png', genIcon: '/modes/cubes/connections.png',
     imgScale: 1.15, // subject ~50% framed; 1.6 over-grew it (hard sticker outline crammed the top edge) → gentle bump that reads full-bleed with margin
   },
