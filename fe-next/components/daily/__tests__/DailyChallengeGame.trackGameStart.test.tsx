@@ -26,11 +26,10 @@ vi.mock('framer-motion', () => {
     get: (_target, tag) => {
       let Component = cache.get(tag);
       if (!Component) {
-        Component = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
+        Component = function MotionTag({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) {
           const { initial, animate, exit, whileHover, whileTap, transition, variants, ...rest } = props as Record<string, unknown>;
           return <div {...rest}>{children}</div>;
         };
-        Component.displayName = `motion.${String(tag)}`;
         cache.set(tag, Component);
       }
       return Component;
