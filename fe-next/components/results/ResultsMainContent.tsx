@@ -61,6 +61,12 @@ const BRAG_MODE_LABEL: Record<string, string> = {
   'wheel-rush': 'WHEEL RUSH',
 };
 
+/** Shared by the two disclosure toggles below (flex-it strip + show-details).
+ *  They differ in icon order, analytics and child wrapping, so they stay two
+ *  buttons — only the chrome is common. */
+const DISCLOSURE_TOGGLE_CLASS =
+  'w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-black bg-neo-navy-light text-neo-white font-neo-body font-semibold rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all';
+
 export interface ResultsMainContentProps {
   sortedScores: Player[];
   nearMisses: NearMiss[];
@@ -582,7 +588,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
               });
             }
           }}
-          className="w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-black bg-neo-navy-light text-neo-white font-neo-body font-semibold rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+          className={DISCLOSURE_TOGGLE_CLASS}
         >
           <Share2 className="w-4 h-4 text-neo-pink" />
           {t('brag.strip')}
@@ -676,7 +682,7 @@ export const ResultsMainContent: React.FC<ResultsMainContentProps> = memo(functi
           <button
             type="button"
             onClick={() => setShowDetails(v => !v)}
-            className="w-full flex items-center justify-center gap-2 py-2 px-4 border-2 border-black bg-neo-navy-light text-neo-white font-neo-body font-semibold rounded-neo shadow-hard-sm hover:shadow-hard active:shadow-hard-pressed transition-all"
+            className={DISCLOSURE_TOGGLE_CLASS}
           >
             {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
             {t('results.showDetails')}

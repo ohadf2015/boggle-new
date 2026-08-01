@@ -28,13 +28,17 @@ vi.mock('framer-motion', () => ({
 
 import TabbedDailyLeaderboard from '../TabbedDailyLeaderboard';
 
-const t = (key: string) => {
+// Mirrors LanguageContext's `t`: it interpolates `{param}` itself, which is why
+// ChaseBanner has no interpolation helper of its own.
+const t = (key: string, params?: Record<string, string | number>) => {
   const dict: Record<string, string> = {
     'daily.chaseChasing': '{points} behind {name}',
     'daily.chaseChasingCta': 'One good word passes them',
     'daily.chaseRank': '#{rank} of {total}',
   };
-  return dict[key] ?? key;
+  return (dict[key] ?? key).replace(/\{(\w+)\}/g, (m, k) =>
+    params?.[k] !== undefined ? String(params[k]) : m
+  );
 };
 
 const board = [

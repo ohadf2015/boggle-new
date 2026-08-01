@@ -8,7 +8,9 @@ import { render, screen } from '@testing-library/react';
 import ChaseBanner from '../ChaseBanner';
 import type { ChaseParticipant } from '../chaseTarget';
 
-const t = (key: string) => {
+// Mirrors LanguageContext's `t`: it interpolates `{param}` itself, which is why
+// ChaseBanner has no interpolation helper of its own.
+const t = (key: string, params?: Record<string, string | number>) => {
   const dict: Record<string, string> = {
     'daily.chaseChasing': '{points} behind {name}',
     'daily.chaseChasingCta': 'One good word passes them',
@@ -18,7 +20,9 @@ const t = (key: string) => {
     'daily.chaseChasingNoGap': '{name} is next',
     'daily.chaseLeadingNoGap': '{name} is right behind you',
   };
-  return dict[key] ?? key;
+  return (dict[key] ?? key).replace(/\{(\w+)\}/g, (m, k) =>
+    params?.[k] !== undefined ? String(params[k]) : m
+  );
 };
 
 function p(over: Partial<ChaseParticipant> & { rank_position: number }): ChaseParticipant {

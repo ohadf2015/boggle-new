@@ -22,15 +22,9 @@ export interface ChaseBannerProps {
   totalPlayers?: number;
   /** Suppresses render until the board resolves — never show a rank we may flip. */
   loading?: boolean;
-  t: (key: string) => string;
+  /** Same signature as LanguageContext's `t` — it already interpolates `{name}`. */
+  t: (key: string, params?: Record<string, string | number>) => string;
   className?: string;
-}
-
-function fill(template: string, values: Record<string, string | number>): string {
-  return Object.entries(values).reduce(
-    (out, [key, value]) => out.replace(`{${key}}`, String(value)),
-    template,
-  );
 }
 
 const ChaseBanner: React.FC<ChaseBannerProps> = memo(({
@@ -61,13 +55,13 @@ const ChaseBanner: React.FC<ChaseBannerProps> = memo(({
     ? (leading ? 'daily.chaseLeadingNoGap' : 'daily.chaseChasingNoGap')
     : (leading ? 'daily.chaseLeading' : 'daily.chaseChasing');
 
-  const headline = fill(t(headlineKey), {
+  const headline = t(headlineKey, {
     name: target.targetName,
     points: target.pointsGap ?? 0,
   });
 
   const nudge = t(leading ? 'daily.chaseLeadingCta' : 'daily.chaseChasingCta');
-  const rankLabel = fill(t('daily.chaseRank'), {
+  const rankLabel = t('daily.chaseRank', {
     rank: target.rank,
     total: target.totalPlayers,
   });
