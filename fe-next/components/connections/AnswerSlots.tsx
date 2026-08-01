@@ -48,6 +48,8 @@ export default function AnswerSlots({ value, slotCount, state, dir, label }: Ans
       {Array.from({ length: slotCount }, (_, i) => {
         const ch = letters[i] ?? '';
         const filled = ch !== '';
+        // The next empty cell pulses so players see where the letter lands.
+        const active = state === 'idle' && !filled && i === letters.length;
         return (
           <m.span
             key={`slot-${i}`}
@@ -64,6 +66,7 @@ export default function AnswerSlots({ value, slotCount, state, dir, label }: Ans
               'flex h-12 w-10 items-center justify-center rounded-neo border-2 shadow-hard-sm',
               'font-neo-display text-2xl font-black uppercase transition-colors duration-150',
               filled ? styles.filled : styles.empty,
+              active ? 'animate-pulse border-neo-purple/80' : '',
             ].join(' ')}
           >
             {ch}

@@ -26,6 +26,7 @@ import type { GameState } from '@/lib/connections/types';
 import PyramidProgress from './PyramidProgress';
 import FinaleCard from './FinaleCard';
 import PuzzleCard from '../PuzzleCard';
+import ConnectionsMascot from '../ConnectionsMascot';
 
 type Action =
   | { type: 'GUESS'; input: string }
@@ -231,6 +232,7 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
             pyramidState.status === 'won' ? 'border-neo-lime' : 'border-neo-red',
           ].join(' ')}
         >
+          <ConnectionsMascot status={pyramidState.status} className="mb-3 h-24 w-24" />
           <PyramidProgress
             stage={3}
             solvedBridges={pyramidState.solvedBridges}
@@ -278,6 +280,7 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
           transition={{ type: 'spring', stiffness: 320, damping: 22 }}
           className="rounded-neo border-neo-thick border-neo-red bg-neo-navy-light p-5 text-center shadow-hard"
         >
+          <ConnectionsMascot status="outOfLives" className="mb-2 h-20 w-20" />
           <h1 className="font-neo-display text-2xl font-black text-neo-red">{t('connections.outOfLives')}</h1>
           <div className="mt-4 flex flex-col gap-3">
             <m.button
@@ -308,9 +311,12 @@ function PyramidRun({ pyramid, today }: { pyramid: NonNullable<ReturnType<typeof
   return (
     <div className="mx-auto flex w-full max-w-md flex-col gap-3 px-4 py-4" data-testid="pyramid-root">
       <header className="flex flex-col gap-2">
-        <h1 className="text-center font-neo-display text-lg font-black text-neo-white">
-          {t('connections.pyramid.title')}
-        </h1>
+        <div className="flex items-center justify-center gap-2">
+          <ConnectionsMascot status={pyramidState.status} className="h-12 w-12" />
+          <h1 className="text-center font-neo-display text-lg font-black text-neo-white">
+            {t('connections.pyramid.title')}
+          </h1>
+        </div>
         <p className="text-center font-neo-body text-xs text-neo-white/60">
           {baseStage ? t('connections.pyramid.explainer') : t('connections.pyramid.finalePrompt')}
         </p>

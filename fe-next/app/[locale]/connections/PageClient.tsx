@@ -7,6 +7,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { PageLoader } from '@/components/ui/PageLoader';
 import { TopBackLink } from '@/components/navigation/TopBackLink';
 import ConnectionsGame from '@/components/connections/ConnectionsGame';
+import PyramidChallenge from '@/components/connections/pyramid/PyramidChallenge';
 import ConnectionsHero from '@/components/connections/landing/ConnectionsHero';
 import ConnectionsSampleStrip from '@/components/connections/landing/ConnectionsSampleStrip';
 import ConnectionsWhyPlay from '@/components/connections/landing/ConnectionsWhyPlay';
@@ -52,11 +53,12 @@ export default function ConnectionsPageClient({ locale, copy, renderLanding }: P
   }
 
   if (!renderLanding) {
-    // Locale not supported for landing — render game directly so direct visitors aren't stranded.
+    // Locale not supported for landing — render game directly so direct visitors
+    // aren't stranded. Pyramid is the default mode when the locale has a pool.
     return (
       <div className="flex-1 flex flex-col min-h-0">
         <Suspense fallback={<LoadingFallback />}>
-          <ConnectionsGame />
+          {getPyramidsForLocale(locale).length > 0 ? <PyramidChallenge /> : <ConnectionsGame />}
         </Suspense>
       </div>
     );
