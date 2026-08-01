@@ -52,6 +52,7 @@ vi.mock('@/utils/dailyChallenge', () => ({
   }),
   getStreakMilestone: () => null,
   getStreakMilestoneMessage: () => null,
+  shouldCelebrateStreakMilestone: () => false,
   findRarestWord: () => null,
 }));
 

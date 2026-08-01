@@ -16,6 +16,15 @@ export interface RankBadgeProps {
   t: (key: string) => string;
 }
 
+/**
+ * Smallest board on which a percentile is worth showing. Live daily boards hold
+ * 2–8 players, where "Top 38%" (rank 3 of 8) or "Top 67%" (rank 2 of 3) is noise
+ * wearing a statistic's clothes — it reads as a demotion of a decent finish. The
+ * concrete "#N out of M" pill is honest at every board size and carries the
+ * placement on its own.
+ */
+export const MIN_PLAYERS_FOR_PERCENTILE = 20;
+
 export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
   if (!stats.yourStats?.solved || stats.yourStats.rank === undefined) {
     return null;
@@ -24,6 +33,11 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
   const percentile = stats.totalPlayers > 1
     ? Math.max(1, Math.round((stats.yourStats.rank / stats.totalPlayers) * 100))
     : 1;
+
+  const showPercentile =
+    stats.totalPlayers >= MIN_PLAYERS_FOR_PERCENTILE &&
+    percentile > 0 &&
+    percentile < 100;
 
   return (
     <m.div
@@ -69,9 +83,10 @@ export const RankBadge: React.FC<RankBadgeProps> = ({ stats, t }) => {
       </m.div>
 
       {/* Percentile pill with glow — extra excitement for top 5%.
-          Hidden at 100% (finished last): "Top 100%" is meaningless and reads
-          as a bug. The rank pill (#N out of M) still conveys the placement. */}
-      {percentile > 0 && percentile < 100 && (
+          Hidden at 100% (finished last), and hidden entirely on boards below
+          MIN_PLAYERS_FOR_PERCENTILE. The rank pill (#N out of M) always conveys
+          the placement. */}
+      {showPercentile && (
         <m.div
           initial={{ opacity: 0, scale: 0.5, y: 8 }}
           animate={

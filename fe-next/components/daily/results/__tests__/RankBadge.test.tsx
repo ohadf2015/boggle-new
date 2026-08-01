@@ -52,4 +52,31 @@ describe('RankBadge', () => {
     expect(screen.queryByText(/Top 100%/)).not.toBeInTheDocument();
     expect(screen.queryByText(/100%/)).not.toBeInTheDocument();
   });
+
+  // Live daily boards hold 2–8 players (measured 2026-08-01). A percentile over a
+  // population that small is noise dressed up as a statistic: rank 3 of 8 renders
+  // "Top 38%", rank 2 of 3 renders "Top 67%" — both read as an insult rather than a
+  // placement. The concrete "#N out of M" pill is honest at every N and stays.
+  describe('percentile population floor', () => {
+    it('hides the percentile pill on a tiny board even for a strong finish', () => {
+      // rank 3 of 8 → 38% — suppressed.
+      render(<RankBadge stats={makeStats({ totalPlayers: 8, yourStats: { solved: true, attemptsUsed: 2, percentile: 38, rank: 3 } })} t={tReal} />);
+      expect(screen.getByText('#3')).toBeInTheDocument();
+      expect(screen.queryByText(/Top \d+%/)).not.toBeInTheDocument();
+    });
+
+    it('hides the percentile pill for a winner on a tiny board', () => {
+      // rank 1 of 4 → 25%. "Top 25%" undersells an outright win; the #1 pill says it better.
+      render(<RankBadge stats={makeStats({ totalPlayers: 4, yourStats: { solved: true, attemptsUsed: 1, percentile: 25, rank: 1 } })} t={tReal} />);
+      expect(screen.getByText('#1')).toBeInTheDocument();
+      expect(screen.queryByText(/Top \d+%/)).not.toBeInTheDocument();
+    });
+
+    it('still shows the percentile pill once the board is large enough to mean something', () => {
+      // rank 4 of 20 → 20%, the smallest board where a percentile is kept.
+      render(<RankBadge stats={makeStats({ totalPlayers: 20, yourStats: { solved: true, attemptsUsed: 2, percentile: 20, rank: 4 } })} t={tReal} />);
+      expect(screen.getByText('#4')).toBeInTheDocument();
+      expect(screen.getByText('Top 20%')).toBeInTheDocument();
+    });
+  });
 });

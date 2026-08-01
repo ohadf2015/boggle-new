@@ -24,8 +24,8 @@ import ResultsBannerSlot from '@/components/ads/ResultsBannerSlot';
 import {
   getGuestFingerprint,
   getGuestDailyPlayer,
-  getStreakMilestone,
   getStreakMilestoneMessage,
+  shouldCelebrateStreakMilestone,
   findRarestWord,
   type GuestDailyPlayer,
 } from '@/utils/dailyChallenge';
@@ -123,8 +123,11 @@ const DailyWordHuntResults: React.FC<DailyWordHuntResultsProps> = ({
   const { freezesAvailable, isStreakProtected } = useStreakFreezeStatus(isAuthenticated);
 
   // Derived values
-  const streakMilestone = getStreakMilestone(result.streakDays);
-  const milestoneMessage = streakMilestone ? getStreakMilestoneMessage(result.streakDays) : null;
+  // Tracked at every milestone (analytics), celebrated on screen at only the rare
+  // ones — see CELEBRATED_STREAK_MILESTONES.
+  const milestoneMessage = shouldCelebrateStreakMilestone(result.streakDays)
+    ? getStreakMilestoneMessage(result.streakDays)
+    : null;
   const rarestWord = result.wordsDiscovered ? findRarestWord(result.wordsDiscovered, language) : null;
 
   const survivalBonusTime = useMemo(() => {

@@ -106,6 +106,8 @@ export {
   getStreakMilestone,
   isStreakAtRisk,
   getStreakMilestoneMessage,
+  shouldCelebrateStreakMilestone,
+  CELEBRATED_STREAK_MILESTONES,
 } from './dailyChallenge/streaks';
 
 // Streak Freeze

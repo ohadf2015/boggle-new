@@ -71,6 +71,22 @@ export function getStreakMilestone(streak: number): number | null {
 }
 
 /**
+ * Milestones that still earn a full-screen confetti modal.
+ *
+ * Deliberately narrower than the tracked list above: a modal that interrupts the
+ * results screen to congratulate a player on turning up seven days running is
+ * celebrating attendance, and doing it twice in a fortnight is what made the
+ * streak read as an obligation. The remaining three are rare enough to be worth
+ * stopping for. Everything below them still counts, still pays out, and still
+ * reports — it just no longer takes over the screen.
+ */
+export const CELEBRATED_STREAK_MILESTONES = [30, 100, 365] as const;
+
+export function shouldCelebrateStreakMilestone(streak: number): boolean {
+  return (CELEBRATED_STREAK_MILESTONES as readonly number[]).includes(streak);
+}
+
+/**
  * Check if the player's streak is at risk (hasn't played today but has an active streak)
  * Returns the hours remaining until streak expires, or null if no active streak at risk
  */

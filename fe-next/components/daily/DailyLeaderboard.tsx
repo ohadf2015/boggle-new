@@ -14,6 +14,7 @@ import type { Language } from '@/types';
 
 import ParticipantRow from './DailyLeaderboardParticipantRow';
 import VirtualizedParticipantList from './VirtualizedParticipantList';
+import ChaseBanner from './ChaseBanner';
 
 // ==========================================
 // Types
@@ -349,6 +350,18 @@ const DailyLeaderboard: React.FC<DailyLeaderboardProps> = ({
           </Button>
         )}
       </div>
+
+      {/* Who to beat — the single closable gap. Sits above the standings so the
+          board reads as a target rather than a record. */}
+      <ChaseBanner
+        participants={participants}
+        playerId={currentPlayerId}
+        guestFingerprint={currentGuestFingerprint}
+        totalPlayers={totalCount}
+        loading={loading}
+        t={t}
+        className="mb-3"
+      />
 
       {/* Current User Position Card - Shows when user is not in visible list */}
       {currentUserData && currentUserIndex >= maxVisible && !expanded && (

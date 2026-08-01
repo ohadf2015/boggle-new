@@ -46,6 +46,16 @@ interface DailyChallengeBannerProps {
  * badge row, bottom-end mascot) but uses the reserved `neo-yellow` celebration
  * accent plus puzzle#/streak/countdown/win-loss chrome for daily identity.
  */
+
+/**
+ * Streak length below which the flame chip is not worth the space.
+ *
+ * 78% of players hold a current streak of 0 or 1 (measured 2026-08-01), so a
+ * chip that fires from day one mostly renders a number nobody earned. Three
+ * consecutive days is the first point where the count reflects a habit.
+ */
+export const MIN_STREAK_TO_DISPLAY = 3;
+
 const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
   className = '',
   compact = false,
@@ -395,23 +405,23 @@ const DailyChallengeBanner: React.FC<DailyChallengeBannerProps> = ({
           className="flex flex-wrap items-center relative z-10"
           style={{ gap: 'clamp(0.375rem, 1.5cqw, 0.5rem)' }}
         >
-          {streak > 0 && (
-            <m.span
-              className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20"
+          {/* No looping pulse: an animation is a claim on attention, and a streak
+              is context, not the reason to play today. */}
+          {streak >= MIN_STREAK_TO_DISPLAY && (
+            <span
+              className="inline-flex items-center bg-neo-white/10 text-neo-white/70 font-bold rounded-neo border-2 border-neo-white/20"
               style={{
                 gap: 'clamp(0.25rem, 1cqw, 0.375rem)',
                 padding: 'clamp(0.125rem, 0.5cqw, 0.25rem) clamp(0.375rem, 1.5cqw, 0.5rem)',
                 fontSize: 'clamp(0.625rem, 2.5cqw, 0.75rem)',
               }}
-              animate={{ scale: [1, 1.05, 1] }}
-              transition={{ duration: 0.6, repeat: Infinity, repeatDelay: 2 }}
             >
               <Flame
-                className="text-neo-orange"
+                className="text-neo-orange/70"
                 style={{ width: 'clamp(0.625rem, 2.5cqw, 0.875rem)', height: 'clamp(0.625rem, 2.5cqw, 0.875rem)' }}
               />
               {streak} {t('daily.dayStreak')}
-            </m.span>
+            </span>
           )}
           <span
             className="inline-flex items-center bg-neo-white/10 text-neo-white font-bold rounded-neo border-2 border-neo-white/20 tabular-nums"

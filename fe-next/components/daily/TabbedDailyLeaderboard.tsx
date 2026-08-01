@@ -10,6 +10,8 @@ import type { Language } from '@/types';
 import { TodayParticipantRow, AllTimeParticipantRow, SkeletonRow } from './DailyLeaderboardRow';
 import { WordWheelWordsModal } from './WordWheelWordsModal';
 import { WordHuntWordsModal } from './WordHuntWordsModal';
+import ChaseBanner from './ChaseBanner';
+import type { ChaseParticipant } from './chaseTarget';
 
 // ==========================================
 // Types
@@ -734,6 +736,22 @@ const TabbedDailyLeaderboard: React.FC<TabbedDailyLeaderboardProps> = ({
           )}
         </div>
       </div>
+
+      {/* Who to beat — the single closable gap, above the standings so the board
+          reads as a target rather than a record. Today's tab only: the all-time
+          and friends tabs rank on cumulative totals, where "one good word passes
+          them" is not true. */}
+      {activeTab === 'today' && (
+        <ChaseBanner
+          participants={participants as ChaseParticipant[]}
+          playerId={currentPlayerId}
+          guestFingerprint={currentGuestFingerprint}
+          totalPlayers={totalCount}
+          loading={isLoading}
+          t={t}
+          className="mb-4"
+        />
+      )}
 
       {/* Tabs - always visible, outside loading area */}
       <div className="mb-4">
