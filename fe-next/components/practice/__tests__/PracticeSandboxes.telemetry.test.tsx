@@ -179,6 +179,7 @@ describe('practice sandbox telemetry', () => {
     tapWheel(['R', 'A', 'T']); // RAT
     await waitFor(() => expect(goalPill()).toHaveTextContent('2'));
     tapWheel(['A', 'C', 'E']); // ACE
+    await waitFor(() => expect(goalPill()).toHaveTextContent('3'));
     await waitFor(() => {
       expect(eventNames()).toContain('practice_completed');
     });
