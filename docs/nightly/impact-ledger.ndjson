@@ -217,3 +217,7 @@
 {"verdict_for":"12-telemetry-coverage-2026-07-29-connections-completion-fix","verdict":"neutral","measured":1,"date":"2026-08-01"}
 {"id":"12-telemetry-coverage-2026-08-01-session-start-wire","date":"2026-08-01","lane":"12-telemetry-coverage","change":"Wired never-called GrowthEvent session_start into getSessionId() first-ever-generation branch (fe-next/utils/growthTracking.ts)","metric":"posthog:session_start","source":"posthog","query_hint":"SELECT count() FROM events WHERE event IN ('session_start','growth:session_start') AND timestamp > now() - INTERVAL 3 DAY","baseline":0,"direction":"up","check_after_days":3}
 {"verdict_for":"09-monetization-2026-07-27-teacher-pro-impression","verdict":"neutral","measured":0,"date":"2026-08-01"}
+{"id":"11-mode-qa-2026-08-02-sealed-bid","date":"2026-08-02","lane":"11-mode-qa","change":"sealed-bid RTL results sign-order fix (+points -> points+ for RTL readers), mode promoted Released 90%","metric":"none","source":"none","why":"pure UI polish, no measurable funnel — mode is still admin-gated so no traffic to query","direction":"up","check_after_days":3}
+{"verdict_for":"02-perf-2026-07-30-rls-subscriptions","verdict":"improved","measured":0,"date":"2026-08-02"}
+{"verdict_for":"12-telemetry-coverage-2026-07-30-push-prompt-games-played","verdict":"regressed","measured":0,"date":"2026-08-02"}
+{"verdict_for":"09-monetization-2026-07-26-district-strip-circular-fix","verdict":"neutral","measured":0,"date":"2026-08-02"}

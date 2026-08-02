@@ -1,67 +1,40 @@
 {
-  "date": "2026-08-01",
-  "note": "08-01: supabase MCP never connected within lane window -- no REST/mgmt-API fallback script exists (scripts/nightly/lib/ only has posthog-*.sh), so backend brief items (unindexed FK on vocabulary_lessons, unused idx_word_pacts_player2_id, auth_db_connections_absolute) NOT actioned tonight -- speculative-index hard rule needs EXPLAIN ANALYZE which requires DB access. Deferred, not dropped. Frontend: shipped one fix -- ES multiplayer landing page (juego-de-palabras-multijugador, brief-adjacent to the /es/juego-de-palabras-multijugador 3848ms LCP entry) had its priority-loaded hero image (`/es-mp-hero-mascots.webp`) wrapped in a framer-motion m.div with a mount-time scale/rotate entrance tween (components/HeroAnimated.tsx:111-114) -- same anti-pattern the multiplayer RoomListView.tsx hero already had fixed (initial={false}, comment 'Hero appears statically -- NO opacity:0 entrance to preserve LCP'). Applied the identical fix here. Did not re-run PostHog LCP query to confirm delta (brief-first contract + time budget) -- verify next run via impact-ledger entry.",
+  "date": "2026-08-02",
+  "note": "IMPACT CHECK for 02-perf-2026-07-30 RLS-subscriptions fix: CONFIRMED improved (auth_rls_initplan lints 1->0, verified via /advisors/performance, 108 total perf lints all other categories). Verdict appended to impact-ledger.ndjson. Backend candidate 2 (unindexed_foreign_keys on vocabulary_lessons_classroom_id_fkey) checked and SKIPPED -- table has only 2 rows, an index there cannot show measurable benefit and the hard no-speculative-index rule requires EXPLAIN ANALYZE evidence of help, which is impossible to produce on a 2-row table. Frontend candidate (practice/[mode]/PageClient.tsx:7-9 eagerly imports all 3 sandboxes -- PracticeClassicSandbox/PracticeWordHuntSandbox/PracticeWheelSandbox -- only 1 used per mode, carried open from 07-31/08-01) measured against the local fresh build (BUILD_ID 2026-08-02 01:01): route chunk app/[locale]/practice/[mode]/page-*.js is only 140KB RAW (~35-45KB gzip est.) -- well under the 200KB-gzip code-splitting threshold. CLOSING this item as verified-not-worth-splitting, not just deferred -- do not re-flag unless the route chunk grows substantially. daily/word-wheel LCP (brief: 7086ms, up from 3936ms baseline 07-31) NOT re-investigated tonight beyond confirming the prior finding still holds structurally (page.tsx already dynamic-imports WordWheelChallenge with an SSR'd Suspense fallback -- see fe-next/app/[locale]/daily/word-wheel/page.tsx:16-19); the LCP element itself is canvas/DOM-drawn wheel content per 07-31 investigation, not Image-fixable. The near-doubling since 07-31 is unconfirmed as a real regression vs noise -- needs an n-count check next run before any fix attempt (sample-floor rule). Homepage hero mascot fetchPriority fix (07-30) confirmed still in place, no regression. No code shipped tonight -- both backend and frontend candidates correctly failed the hard-rule bar (unmeasurable index benefit; bundle below split threshold).",
   "backend": {
-    "advisor_warnings_count": 0,
     "advisor_performance_lints_total": 108,
-    "advisor_performance_breakdown": {
-      "unindexed_foreign_keys": 98,
-      "unused_index": 9,
-      "auth_db_connections_absolute": 1
-    },
-    "note": "auth_rls_initplan warnings on subscriptions confirmed resolved (2->0) via /advisors/performance. unindexed_foreign_keys (98) are INFO-level and not actioned tonight -- speculative-index hard rule, would need EXPLAIN ANALYZE against an actual slow query per table before adding any.",
-    "migrations_pending_apply": [],
-    "top_queries": []
+    "auth_rls_initplan_count": 0,
+    "vocabulary_lessons_row_count": 2,
+    "vocabulary_lessons_index_skip_reason": "2 rows -- cannot demonstrate EXPLAIN ANALYZE benefit, hard rule blocks speculative index",
+    "top_queries_note": "WAL->JSON realtime parser dominates pg_stat_statements total_exec_time (known/governed by 50-supabase-perf pg_cron audit, not app-fixable) -- not re-explored per brief-first contract"
   },
   "frontend": {
-    "note": "07-30's landing hero mascot fetchPriority fix still in place (components/landing/HeroStyleMascot.tsx:35). daily/word-wheel (brief target, 3936ms p75) investigated: LCP element is DOM/canvas-drawn wheel content, not an Image -- no priority-prop fix applies. Did not re-run PostHog LCP query (brief-first contract, sources marked STALE tonight). 07-30 baseline routes below carried forward unchanged.",
     "by_route": [
-      {
-        "route": "/en/multiplayer",
-        "p75_lcp_ms": 3228,
-        "p75_cls": 0.926,
-        "p75_inp_ms": 192,
-        "n_7d": 52,
-        "vs_baseline": "carried from 07-30 -- not re-measured tonight (brief-first contract, source marked stale)"
-      },
-      {
-        "route": "/es/multiplayer",
-        "p75_lcp_ms": 2652,
-        "p75_cls": 0.399,
-        "p75_inp_ms": 454,
-        "n_7d": 69,
-        "vs_baseline": "carried from 07-30 -- not re-measured tonight"
-      }
-    ]
-  },
-  "bundle": {
-    "note": "Local .next build present but stale (BUILD_ID mtime 2026-07-28, 3 days old) -- Railway is the authoritative build. Snapshot below is informational only, NOT a same-day regression baseline.",
-    "total_kb": 39956,
-    "build_id_date": "2026-07-28",
-    "top_chunks": [
-      { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6450 },
-      { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3284 },
-      { "name": "82055-affbfbb6ca395994.js", "kb": 854 },
-      { "name": "64789.4342db422b004f6b.js", "kb": 732 },
-      { "name": "68292.bb49bb9873fa2566.js", "kb": 647 }
-    ]
-  },
-  "cls_investigation": {
-    "multiplayer_cls_0926": {
-      "confirmed_not_cause": [
-        "AutoHideHeader spacer (07-20 fix applied)",
-        "NativeLanguageBanner (50px shift = CLS ~0.07, not 0.926 -- mathematically ruled out)",
-        "FirstGameLanguageNotice (same reasoning)"
-      ],
-      "root_cause_identified": "Socket state DOM swap: MultiplayerFlow initially renders connecting/seeking state (minimal DOM), then replaces full viewport with RoomListView on socket connect. Full-viewport DOM replacement = impact_fraction ~1.0, distance_fraction ~0.95 -> CLS ~0.95.",
-      "fix_required": "Render RoomListView skeleton at same dimensions as real lobby before socket connects. Estimated 4-6h refactor. Defer to Lane 11 or dedicated refactor lane.",
-      "action": "Logged in perf-watch.md for human review -- still open, not touched tonight"
+      { "route": "/en/multiplayer", "p75_lcp_ms": 3228, "p75_cls": 0.926, "p75_inp_ms": 192, "n_7d": 52, "vs_baseline": "carried from 07-30, not re-measured tonight" },
+      { "route": "/es/multiplayer", "p75_lcp_ms": 2652, "p75_cls": 0.399, "p75_inp_ms": 454, "n_7d": 69, "vs_baseline": "carried from 07-30, not re-measured tonight" }
+    ],
+    "practice_classic_investigation": {
+      "status": "CLOSED -- verified not worth splitting",
+      "chunk_kb_raw": 140,
+      "threshold_gzip_kb": 200,
+      "action": "no fix shipped, do not re-flag unless chunk grows"
+    },
+    "word_wheel_lcp": {
+      "brief_value_ms": 7086,
+      "prior_baseline_ms": 3936,
+      "status": "unconfirmed regression -- needs n-count check next run",
+      "lcp_element": "canvas/DOM-drawn wheel content, not an Image -- no priority-prop fix applies (confirmed 07-31, structurally re-verified tonight)"
     }
   },
-  "practice_classic_investigation": {
-    "lcp_candidate": "Eager import of all 3 sandbox components at PageClient.tsx:7-9 (Classic/WordHunt/WheelRush). Only 1 used per mode visit.",
-    "fix_candidate": "dynamic() import for unused 2 sandboxes. Needs bundle size >200KB gzip confirmation before shipping (hard rule).",
-    "null_render_note": "PageClient.tsx:127 null render only fires on tutorial step -- ?play=1 users (initialStep=play) are unaffected.",
-    "action": "Deferred -- needs local build to verify chunk sizes, still open"
+  "bundle": {
+    "build_id_date": "2026-08-02",
+    "total_kb_note": "top 2 chunks (7fd32332.*, 5ee60e17.*, 6452KB/3284KB) unchanged vs 08-01 baseline (same content hash) -- no new regression",
+    "top_chunks": [
+      { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6452 },
+      { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3284 },
+      { "name": "82055-affbfbb6ca395994.js", "kb": 856 },
+      { "name": "64789.cd0e09fa6af59d97.js", "kb": 736 },
+      { "name": "68292.6432fa305f73e0bf.js", "kb": 648 }
+    ]
   }
 }

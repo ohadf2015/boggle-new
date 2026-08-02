@@ -1971,3 +1971,28 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: deferred
   - why: repeated `npm install html2canvas` attempts hit ENOTEMPTY renaming stale `@rolldown`/`@unrs` wasm32-wasi optional-binding directories left over from a prior interrupted install — deeper node_modules repair (or a clean `npm ci`) needed, out of scope/time for this lane
   - recommended owner: lane 02 perf or a dedicated `npm ci` pass (do NOT retry piecemeal `npm install <pkg>` — it re-triggers the same rename race)
+
+## 2026-08-02
+- [PostHog] Sourcemaps missing for lexiclash.live production chunks — blocks all error triage
+  - every top-scored PostHog issue tonight (React #418, TypeError Load failed/Failed to fetch) resolved to `Could not find sourcemap for source url: .../_next/static/chunks/*.js` on every frame — stack traces are unusable minified line:col, can't map to source file:line
+  - status: deferred
+  - why: fixing requires verifying the Sentry/PostHog sourcemap upload step in the build pipeline (next.config.js / CI) — infra change, out of scope for a single-issue triage lane and risky to touch blind near a deadline
+  - recommended owner: lane 02 perf or a dedicated infra lane — high leverage, unblocks every future PostHog/Sentry triage
+- [PostHog] Error: Minified React error #418 (hydration mismatch) — reach 3 occurrences, same distinct_id, all on /he homepage
+  - https://eu.posthog.com/project/151059/error_tracking/019f4747-c11b-7430-8ac2-882649b49cbd
+  - status: deferred
+  - why: no resolvable stack trace (see sourcemap item above); #418 = server/client HTML mismatch, likely locale-conditional rendering on the `/he` homepage, but can't pinpoint file without sourcemaps
+  - recommended owner: self (next lane, once sourcemaps fixed) — re-pull this issue's stack trace first
+- [PostHog] TypeError: Load failed / Failed to fetch — reach 2, seen on /es/multiplayer and /en/practice/classic?play=1
+  - https://eu.posthog.com/project/151059/error_tracking/019f34a3-12d0-7820-a7d2-4b2d22556c1e
+  - status: deferred
+  - why: no resolvable stack trace; generic unhandled fetch/network-flake pattern (2 different pages, 2 different users) — could be an unguarded `fetch()` on either page, needs sourcemaps to confirm which
+  - recommended owner: self (next lane, once sourcemaps fixed)
+- [Feedback] Report: "scrolling down on daily leader board, last one seems cut off the bottom, add a little gap there" (he, /he/daily/word-wheel)
+  - status: deferred
+  - why: inspected `components/daily/DailyLeaderboard.tsx` — outer card has symmetric `p-4 sm:p-5` padding, list itself has no trailing-item cutoff in its own markup, so root cause is likely the PAGE-level scroll container (missing bottom safe-area padding / a bottom nav bar overlapping content) on `/daily/word-wheel`, not this component. Ran out of time budget to trace the page shell + verify visually.
+  - recommended owner: self (next lane) — check the `/daily/word-wheel` page wrapper for missing `pb-safe`/bottom padding before touching DailyLeaderboard.tsx
+- [Sentry] "Connection is closed." — reach 0, allowlisted Socket noise per SocketContext.tsx:311-318
+  - status: reviewed, no action — matches known allowlist, skip
+- [Sentry] "CapacitorGameConnect.then() is not implemented on android" — reach 7
+  - status: reviewed, no action — known/tracked in `.claude/notes/android-release-status.md` (native PGS bridge not device-verified yet, expected until a signed device build lands)
