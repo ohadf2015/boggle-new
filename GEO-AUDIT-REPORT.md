@@ -7,6 +7,40 @@
 
 ---
 
+## Status re-verified 2026-08-02 (live fetch, no code changed)
+
+The findings below are from **2026-04-18** and are partly stale. Re-checked against
+`https://www.lexiclash.live` on 2026-08-02:
+
+**Fixed** — 1 (`/sitemap.xml` → 200 `application/xml`, 456 `<url>` entries with `xhtml:link`
+alternates; regression-guarded by `fe-next/app/sitemap.test.ts`) · 3 (homepage has 1 `<h1>`) ·
+4 (`hrefLang` links present: 6 locales `en/he/sv/ja/es/ru` + `x-default` + `ru-RU` alias) ·
+6 (robots.txt names 24 crawlers; GPTBot / ClaudeBot / PerplexityBot each get
+`Allow: /` + `Disallow: /api/`, so the welcome signal is explicit) · 7 (`/en/multiplayer` has
+an `<h1>`) · 8 (single viewport meta) · 9 (title 56c, description ~152c) ·
+14 (`FAQPage` JSON-LD present on `/en/faq`) · 15 (`BreadcrumbList` present on the nested
+`/en/multiplayer`) · 18 (`/llms-full.txt` → 200, 15KB).
+
+**Partial** — 5: `sameAs` now 4 entries (self, Instagram, Play Store, CrazyGames); LinkedIn /
+YouTube / Product Hunt still absent.
+
+**Superseded — do not implement:**
+- **11 `aggregateRating`** — deliberately omitted. Hardcoded ratings risk a Google manual
+  action; see `fe-next/app/[locale]/layout.tsx:307` and the guard test
+  `fe-next/lib/seo/__tests__/teacherUpgradeJsonLd.test.ts`. Only real first-party reviews qualify.
+- **24 `X-Frame-Options: SAMEORIGIN`** — CSP `frame-ancestors` intentionally allows
+  `crazygames.com` and `poki.com`; an XFO header would break portal distribution.
+
+**Still open (verified absent in source):** 12 (`WebSite` + `potentialAction` SearchAction).
+
+**Appendix stale** — `/en/party` and `/en/ranked` now return 404 (those modes were removed);
+locale count is 6, not 5 (`ru` added).
+
+**Scores not recomputed** — the 41/100 table below still reflects the 2026-04-18 crawl.
+Off-site items (2, 19, 20) were not verifiable from here.
+
+---
+
 ## Executive Summary
 
 **Overall GEO Score: 41/100 (Poor — borderline Fair)**
