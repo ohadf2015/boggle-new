@@ -26,6 +26,7 @@ vi.mock('framer-motion', () => {
     get: (_target, tag) => {
       let Component = cache.get(tag);
       if (!Component) {
+        // eslint-disable-next-line react/display-name -- displayName set dynamically below
         Component = ({ children, ...props }: React.PropsWithChildren<Record<string, unknown>>) => {
           const { initial, animate, exit, whileHover, whileTap, transition, variants, ...rest } = props as Record<string, unknown>;
           return <div {...rest}>{children}</div>;
