@@ -59,8 +59,7 @@ vi.mock('framer-motion', () => ({
   },
 }));
 
-import DailyChallengeBanner from '../DailyChallengeBanner';
-import { MIN_STREAK_TO_DISPLAY } from '../DailyChallengeBanner';
+import DailyChallengeBanner, { MIN_STREAK_TO_DISPLAY } from '../DailyChallengeBanner';
 
 describe('DailyChallengeBanner streak chip threshold', () => {
   it.each([0, 1, 2])('hides the streak chip at a streak of %i', (streak) => {
