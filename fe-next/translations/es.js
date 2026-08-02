@@ -12748,6 +12748,17 @@ const es = {
       "teacherDashboard": "Mi panel",
       "title": "LexiClash Education"
     },
+    "home": {
+      "badge_teacher": "Profesor",
+      "badge_student": "Clase",
+      "teacher_title": "Tu clase está lista",
+      "teacher_subtitle": "Crea clases, asigna partidas y sigue el progreso de tus alumnos.",
+      "teacher_cta": "Abrir panel del profesor",
+      "student_title": "Tu clase te espera",
+      "student_subtitle": "Entra a las lecciones y practica con tu clase.",
+      "student_cta": "Abrir panel del alumno",
+      "trial_ended": "Prueba finalizada"
+    },
     "landing": {
       "duelTeaser": {
         "cta": "Reta a un amigo",

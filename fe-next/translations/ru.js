@@ -1427,6 +1427,17 @@ const ru = {
       "teacherDashboard": "Панель учителя",
       "title": "LexiClash Education"
     },
+    "home": {
+      "badge_teacher": "Учитель",
+      "badge_student": "Класс",
+      "teacher_title": "Ваш класс готов",
+      "teacher_subtitle": "Создавайте классы, назначайте игры и следите за прогрессом учеников.",
+      "teacher_cta": "Открыть панель учителя",
+      "student_title": "Ваш класс ждёт",
+      "student_subtitle": "Заходите на уроки и тренируйтесь вместе с классом.",
+      "student_cta": "Открыть панель ученика",
+      "trial_ended": "Пробный период истёк"
+    },
     "landing": {
       "duelTeaser": {
         "cta": "Вызови друга",
