@@ -6,10 +6,9 @@
  * Stores in scripts/connections/mine/corpora/<locale>.txt (one word per line, rank-ordered).
  */
 
-import { promises as fs } from 'fs';
+import { promises as fs, createWriteStream } from 'fs';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
