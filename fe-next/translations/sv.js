@@ -12969,6 +12969,17 @@ const sv = {
       "teacherDashboard": "Lärarpanel",
       "title": "LexiClash Utbildning"
     },
+    "home": {
+      "badge_teacher": "Lärare",
+      "badge_student": "Klassrum",
+      "teacher_title": "Ditt klassrum är redo",
+      "teacher_subtitle": "Skapa klasser, tilldela spel och följ elevernas framsteg.",
+      "teacher_cta": "Öppna lärarpanelen",
+      "student_title": "Din klass väntar",
+      "student_subtitle": "Hoppa in i lektioner och öva med din klass.",
+      "student_cta": "Öppna elevpanelen",
+      "trial_ended": "Provperioden är slut"
+    },
     "landing": {
       "duelTeaser": {
         "cta": "Utmana en vän",

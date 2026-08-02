@@ -12602,6 +12602,17 @@ const he = {
       "teacherDashboard": "לוח מורה",
       "title": "LexiClash חינוך"
     },
+    "home": {
+      "badge_teacher": "מורה",
+      "badge_student": "כיתה",
+      "teacher_title": "הכיתה שלך מוכנה",
+      "teacher_subtitle": "צרו כיתות, שבצו משחקים ועקבו אחר התקדמות התלמידים.",
+      "teacher_cta": "פתחו את לוח המורה",
+      "student_title": "הכיתה שלך מחכה",
+      "student_subtitle": "קפצו ישר לשיעורים ולתרגול עם הכיתה.",
+      "student_cta": "פתחו את לוח התלמיד",
+      "trial_ended": "הניסיון הסתיים"
+    },
     "landing": {
       "duelTeaser": {
         "cta": "אתגר חבר",

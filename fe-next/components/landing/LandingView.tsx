@@ -34,6 +34,12 @@ import { LandingChallengeCards } from './LandingChallengeCards';
 import { HomeHub } from './home/HomeHub';
 import { LandingSeasonHero } from './LandingSeasonHero';
 import { LandingBottomCTA } from './LandingBottomCTA';
+// Education entry point — self-gating: renders only for approved teachers (with a
+// live trial countdown) or students who've been added to a classroom.
+const HomeEducationCardConnected = dynamic(
+  () => import('@/components/education/HomeEducationCardConnected').then((m) => m.HomeEducationCardConnected),
+  { ssr: false }
+);
 
 // Below-the-fold sections — lazy load to speed up initial render
 // LiveActivityTicker moved out to reduce landing clutter
@@ -219,6 +225,12 @@ const LandingView: React.FC<LandingViewProps> = ({ initialData, onStartOnboardin
 
       {/* Main content — padding uses CSS breakpoints to avoid JS-driven CLS */}
       <section className="w-full max-w-7xl mx-auto overflow-x-clip relative z-20 flex flex-col gap-6 sm:gap-8 px-2 py-1.5 sm:px-3 sm:py-5 md:px-4 md:py-6 lg:px-6 lg:py-8 xl:px-8">
+        {/* Education access strip — one tap to the teacher/student dashboard for
+            users who have education access. Rendered once above both the mobile
+            Home Hub and the desktop tree; the component self-gates to nothing for
+            everyone else, so it never adds chrome for regular players. */}
+        {mounted && <HomeEducationCardConnected />}
+
         {/* ===== MOBILE: focused arcade Home Hub (CSS-gated `md:hidden`, never a JS
             branch → no hydration CLS). Reuses the same gated mode list + data hooks
             as the desktop tree below. ===== */}

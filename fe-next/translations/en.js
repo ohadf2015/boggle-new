@@ -11356,6 +11356,17 @@ const en = {
       "teacherDashboard": "Teacher Dashboard",
       "title": "LexiClash Education"
     },
+    "home": {
+      "badge_teacher": "Teacher",
+      "badge_student": "Classroom",
+      "teacher_title": "Your classroom is ready",
+      "teacher_subtitle": "Create classes, assign games, and track student progress.",
+      "teacher_cta": "Open teacher dashboard",
+      "student_title": "Your class is waiting",
+      "student_subtitle": "Jump into lessons and practice with your class.",
+      "student_cta": "Open student dashboard",
+      "trial_ended": "Trial ended"
+    },
     "landing": {
       "duelTeaser": {
         "cta": "Challenge a Friend",

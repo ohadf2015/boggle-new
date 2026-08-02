@@ -12746,6 +12746,17 @@ const ja = {
       "teacherDashboard": "先生ダッシュボード",
       "title": "LexiClash 教育"
     },
+    "home": {
+      "badge_teacher": "先生",
+      "badge_student": "クラス",
+      "teacher_title": "クラスの準備ができました",
+      "teacher_subtitle": "クラスを作成し、ゲームを割り当て、生徒の進捗を確認しましょう。",
+      "teacher_cta": "先生ダッシュボードを開く",
+      "student_title": "クラスが待っています",
+      "student_subtitle": "レッスンに参加して、クラスのみんなと練習しよう。",
+      "student_cta": "生徒ダッシュボードを開く",
+      "trial_ended": "トライアル終了"
+    },
     "landing": {
       "duelTeaser": {
         "cta": "友達に挑戦",
