@@ -10,10 +10,13 @@ interface Props {
   lang: Language;
 }
 
-// Locale landing roots ("/en", "/he/", ...). A first-time visitor here pays
-// 2.8MB for a dictionary they may never use — it was the single largest
-// transfer on the landing page. Game routes keep the eager warm.
-const LANDING_RE = /^\/[a-z]{2}(\/)?$/i;
+// Locale landing roots ("/", "/en", "/he/", ...). A first-time visitor here pays
+// ~700KB (gz) for a dictionary they may never use — it was the single largest
+// transfer on the landing page. The bare "/" matters: www.lexiclash.live/ is
+// served as the landing (server-side locale rewrite keeps the browser URL at
+// "/", so usePathname() returns "/"), and without it the warm fired on every
+// first-time landing visit. Game routes keep the eager warm.
+const LANDING_RE = /^\/([a-z]{2})?\/?$/i;
 
 function shouldSkipWarm(pathname: string | null): boolean {
   // Respect Save-Data / slow connections everywhere.

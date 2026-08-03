@@ -1,4 +1,6 @@
-import * as Sentry from "@sentry/nextjs";
+// Sentry SDK is loaded lazily via loadSentry() — never statically imported
+// here (this module sits in the client boot path; see utils/sentryLazy.ts).
+import { loadSentry } from "./sentryLazy";
 
 interface ProfileData {
   username?: string;
@@ -51,19 +53,21 @@ export function setSentryUser(
   if (process.env.NODE_ENV !== "production") return;
 
   if (user && profile) {
-    Sentry.setUser({
-      id: user.id,
-      username: profile.username,
-    });
+    void loadSentry().then((Sentry) => {
+      Sentry.setUser({
+        id: user.id,
+        username: profile.username,
+      });
 
-    // Set additional context
-    Sentry.setContext("profile", {
-      isAdmin: profile.is_admin || false,
-      totalGames: profile.total_games || 0,
-      countryCode: profile.country_code || null,
+      // Set additional context
+      Sentry.setContext("profile", {
+        isAdmin: profile.is_admin || false,
+        totalGames: profile.total_games || 0,
+        countryCode: profile.country_code || null,
+      });
     });
   } else {
-    Sentry.setUser(null);
+    void loadSentry().then((Sentry) => Sentry.setUser(null));
   }
 }
 
@@ -71,7 +75,7 @@ export function setSentryUser(
  * Clear user context on logout
  */
 export function clearSentryUser(): void {
-  Sentry.setUser(null);
+  void loadSentry().then((Sentry) => Sentry.setUser(null));
 }
 
 /**
@@ -86,11 +90,13 @@ export function captureError(
     return;
   }
 
-  Sentry.withScope((scope) => {
-    if (context) {
-      scope.setContext("additional", context);
-    }
-    Sentry.captureException(error);
+  void loadSentry().then((Sentry) => {
+    Sentry.withScope((scope) => {
+      if (context) {
+        scope.setContext("additional", context);
+      }
+      Sentry.captureException(error);
+    });
   });
 
   forwardToPostHog(
@@ -108,13 +114,17 @@ export function setGameContext(
   language?: string
 ): void {
   if (gameCode) {
-    Sentry.setTag("game_code", gameCode);
-    if (language) {
-      Sentry.setTag("game_language", language);
-    }
+    void loadSentry().then((Sentry) => {
+      Sentry.setTag("game_code", gameCode);
+      if (language) {
+        Sentry.setTag("game_language", language);
+      }
+    });
   } else {
-    Sentry.setTag("game_code", undefined);
-    Sentry.setTag("game_language", undefined);
+    void loadSentry().then((Sentry) => {
+      Sentry.setTag("game_code", undefined);
+      Sentry.setTag("game_language", undefined);
+    });
   }
 }
 
@@ -133,10 +143,12 @@ export function linkLogRocketSession(): void {
 
   if (LogRocket?.getSessionURL) {
     LogRocket.getSessionURL((sessionURL: string) => {
-      Sentry.setContext("logrocket", {
-        sessionURL,
+      void loadSentry().then((Sentry) => {
+        Sentry.setContext("logrocket", {
+          sessionURL,
+        });
+        Sentry.setTag("logrocket_session", sessionURL);
       });
-      Sentry.setTag("logrocket_session", sessionURL);
     });
   }
 }
@@ -365,28 +377,30 @@ export function captureApiError(
   // Don't capture expected errors
   if (isExpectedError(error)) return;
 
-  Sentry.withScope((scope) => {
-    scope.setTag("error.type", "api_error");
-    scope.setTag("api.route", route);
+  void loadSentry().then((Sentry) => {
+    Sentry.withScope((scope) => {
+      scope.setTag("error.type", "api_error");
+      scope.setTag("api.route", route);
 
-    if (context?.method) {
-      scope.setTag("api.method", context.method);
-    }
-    if (context?.statusCode) {
-      scope.setTag("api.status_code", String(context.statusCode));
-    }
-    if (context?.userId) {
-      scope.setUser({ id: context.userId });
-    }
+      if (context?.method) {
+        scope.setTag("api.method", context.method);
+      }
+      if (context?.statusCode) {
+        scope.setTag("api.status_code", String(context.statusCode));
+      }
+      if (context?.userId) {
+        scope.setUser({ id: context.userId });
+      }
 
-    scope.setContext("api_request", {
-      route,
-      method: context?.method,
-      statusCode: context?.statusCode,
-      body: context?.body,
+      scope.setContext("api_request", {
+        route,
+        method: context?.method,
+        statusCode: context?.statusCode,
+        body: context?.body,
+      });
+
+      Sentry.captureException(error);
     });
-
-    Sentry.captureException(error);
   });
 
   forwardToPostHog(
@@ -416,26 +430,28 @@ export function captureSocketError(
   // Don't capture expected errors
   if (isExpectedError(error)) return;
 
-  Sentry.withScope((scope) => {
-    scope.setTag("error.type", "socket_error");
-    scope.setTag("socket.event", context.event);
+  void loadSentry().then((Sentry) => {
+    Sentry.withScope((scope) => {
+      scope.setTag("error.type", "socket_error");
+      scope.setTag("socket.event", context.event);
 
-    if (context.gameCode) {
-      scope.setTag("socket.game_code", context.gameCode);
-    }
-    if (context.isHost !== undefined) {
-      scope.setTag("socket.is_host", String(context.isHost));
-    }
+      if (context.gameCode) {
+        scope.setTag("socket.game_code", context.gameCode);
+      }
+      if (context.isHost !== undefined) {
+        scope.setTag("socket.is_host", String(context.isHost));
+      }
 
-    scope.setContext("socket_event", {
-      event: context.event,
-      gameCode: context.gameCode,
-      socketId: context.socketId,
-      username: context.username,
-      isHost: context.isHost,
+      scope.setContext("socket_event", {
+        event: context.event,
+        gameCode: context.gameCode,
+        socketId: context.socketId,
+        username: context.username,
+        isHost: context.isHost,
+      });
+
+      Sentry.captureException(error);
     });
-
-    Sentry.captureException(error);
   });
 
   forwardToPostHog(
@@ -469,25 +485,27 @@ export function captureAIServiceError(
   // Don't capture rate limit errors (expected)
   if (context.isRateLimited || isExpectedError(error)) return;
 
-  Sentry.withScope((scope) => {
-    scope.setTag("error.type", "ai_service_error");
-    scope.setTag("ai.operation", context.operation);
+  void loadSentry().then((Sentry) => {
+    Sentry.withScope((scope) => {
+      scope.setTag("error.type", "ai_service_error");
+      scope.setTag("ai.operation", context.operation);
 
-    if (context.language) {
-      scope.setTag("ai.language", context.language);
-    }
-    if (context.retryAttempt !== undefined) {
-      scope.setTag("ai.retry_attempt", String(context.retryAttempt));
-    }
+      if (context.language) {
+        scope.setTag("ai.language", context.language);
+      }
+      if (context.retryAttempt !== undefined) {
+        scope.setTag("ai.retry_attempt", String(context.retryAttempt));
+      }
 
-    scope.setContext("ai_operation", {
-      operation: context.operation,
-      word: context.word,
-      language: context.language,
-      retryAttempt: context.retryAttempt,
+      scope.setContext("ai_operation", {
+        operation: context.operation,
+        word: context.word,
+        language: context.language,
+        retryAttempt: context.retryAttempt,
+      });
+
+      Sentry.captureException(error);
     });
-
-    Sentry.captureException(error);
   });
 
   forwardToPostHog(error, {
@@ -517,25 +535,27 @@ export function captureBackgroundError(
   // Don't capture expected errors
   if (isExpectedError(error)) return;
 
-  Sentry.withScope((scope) => {
-    scope.setTag("error.type", "background_error");
-    scope.setTag("background.operation", context.operation);
+  void loadSentry().then((Sentry) => {
+    Sentry.withScope((scope) => {
+      scope.setTag("error.type", "background_error");
+      scope.setTag("background.operation", context.operation);
 
-    if (context.service) {
-      scope.setTag("background.service", context.service);
-    }
-    if (context.userId) {
-      scope.setUser({ id: context.userId });
-    }
+      if (context.service) {
+        scope.setTag("background.service", context.service);
+      }
+      if (context.userId) {
+        scope.setUser({ id: context.userId });
+      }
 
-    scope.setContext("background_operation", {
-      operation: context.operation,
-      service: context.service,
-      userId: context.userId,
-      isRetryable: context.isRetryable,
+      scope.setContext("background_operation", {
+        operation: context.operation,
+        service: context.service,
+        userId: context.userId,
+        isRetryable: context.isRetryable,
+      });
+
+      Sentry.captureException(error);
     });
-
-    Sentry.captureException(error);
   });
 
   forwardToPostHog(
@@ -560,12 +580,14 @@ export function addGameBreadcrumb(
   action: string,
   data: Record<string, unknown>
 ): void {
-  Sentry.addBreadcrumb({
-    category: "game",
-    message: action,
-    data,
-    level: "info",
-  });
+  void loadSentry().then((Sentry) =>
+    Sentry.addBreadcrumb({
+      category: "game",
+      message: action,
+      data,
+      level: "info",
+    })
+  );
 }
 
 /**
@@ -576,12 +598,14 @@ export function addApiCallBreadcrumb(
   method: string,
   status?: number
 ): void {
-  Sentry.addBreadcrumb({
-    category: "api",
-    message: `${method} ${url}`,
-    data: { url, method, status },
-    level: status && status >= 400 ? "warning" : "info",
-  });
+  void loadSentry().then((Sentry) =>
+    Sentry.addBreadcrumb({
+      category: "api",
+      message: `${method} ${url}`,
+      data: { url, method, status },
+      level: status && status >= 400 ? "warning" : "info",
+    })
+  );
 }
 
 /**
@@ -591,10 +615,12 @@ export function addSocketEventBreadcrumb(
   event: string,
   direction: "sent" | "received"
 ): void {
-  Sentry.addBreadcrumb({
-    category: "socket",
-    message: `${direction}: ${event}`,
-    data: { event, direction },
-    level: "info",
-  });
+  void loadSentry().then((Sentry) =>
+    Sentry.addBreadcrumb({
+      category: "socket",
+      message: `${direction}: ${event}`,
+      data: { event, direction },
+      level: "info",
+    })
+  );
 }

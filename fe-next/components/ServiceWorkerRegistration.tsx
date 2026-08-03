@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import * as Sentry from '@sentry/nextjs';
+import { loadSentry } from '@/utils/sentryLazy';
 
 /**
  * Service Worker Registration Component
@@ -26,11 +26,13 @@ export function ServiceWorkerRegistration() {
       const onSwMessage = (e: MessageEvent) => {
         const data = e.data as { type?: string; message?: string; url?: string } | undefined;
         if (data?.type === 'sw:cache-error' && data.message) {
-          Sentry.captureMessage(`SW cache error: ${data.message}`, {
-            level: 'warning',
-            extra: { url: data.url },
-            tags: { source: 'service-worker' },
-          });
+          void loadSentry().then((Sentry) =>
+            Sentry.captureMessage(`SW cache error: ${data.message}`, {
+              level: 'warning',
+              extra: { url: data.url },
+              tags: { source: 'service-worker' },
+            })
+          );
         }
       };
       navigator.serviceWorker.addEventListener('message', onSwMessage);

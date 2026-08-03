@@ -293,6 +293,19 @@ export default async function HomePage({ params }: PageProps) {
           browser a head-start on the 402 KB animated WebP that is the LCP element.
           Mirrors the same pattern used on the multiplayer page (/mascot/play.webp). */}
       <link rel="preload" as="image" href="/mascot/winner.webp" type="image/webp" fetchPriority="high" />
+      {/* Preload the LCP element (anchor mode-cube image) from the very first
+          HTML bytes. next/image's own priority preload is emitted where the
+          client subtree renders — ~78% through the 900KB streamed document —
+          so discovery was delayed by ~3s (Lighthouse "LCP load delay 34%").
+          imageSrcSet/imageSizes must match the anchor <Image> exactly so the
+          browser reuses this preload instead of double-fetching. */}
+      <link
+        rel="preload"
+        as="image"
+        imageSrcSet="/_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=640&amp;q=75 640w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=750&amp;q=75 750w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=828&amp;q=75 828w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=1080&amp;q=75 1080w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=1200&amp;q=75 1200w, /_next/image?url=%2Fmodes%2Fcubes%2Farena.png&amp;w=1920&amp;q=75 1920w"
+        imageSizes="(max-width: 640px) min(100vw, 640px), (max-width: 768px) min(50vw, 384px), 50vw"
+        fetchPriority="high"
+      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: faqJsonLd }}

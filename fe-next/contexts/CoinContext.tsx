@@ -28,7 +28,7 @@ import {
 import { syncCoinsToDatabase, spendCoinsFromDatabase, getProfile } from '@/lib/supabase';
 import { emitCoinEarned, emitCoinSpent } from '@/utils/coinEarnedFx';
 import toast from 'react-hot-toast';
-import * as Sentry from '@sentry/nextjs';
+import { loadSentry } from '@/utils/sentryLazy';
 
 // Coin effect toasts — neo-brutalist styled visual feedback for earn/spend
 // The old "+X gold" earn toast was retired in favour of the casino-style
@@ -534,7 +534,9 @@ export function CoinProvider({ children }: { children: ReactNode }) {
 export function useCoinContext(): CoinContextValue {
   const context = useContext(CoinContext);
   if (!context) {
-    Sentry.captureMessage('useCoinContext used outside CoinProvider — returning defaults', 'warning');
+    void loadSentry().then((Sentry) =>
+      Sentry.captureMessage('useCoinContext used outside CoinProvider — returning defaults', 'warning')
+    );
     return {
       coins: 0,
       isLoading: false,
@@ -561,7 +563,9 @@ export function useCoinContext(): CoinContextValue {
 export function useCoinActions(): CoinActionsValue {
   const context = useContext(CoinActionsContext);
   if (!context) {
-    Sentry.captureMessage('useCoinActions used outside CoinProvider — returning defaults', 'warning');
+    void loadSentry().then((Sentry) =>
+      Sentry.captureMessage('useCoinActions used outside CoinProvider — returning defaults', 'warning')
+    );
     return {
       addCoins: async () => 0,
       spendCoins: async () => false,

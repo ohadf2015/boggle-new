@@ -22,6 +22,13 @@ vi.mock('@sentry/nextjs', () => ({
 
 const ORIGINAL_NODE_ENV = process.env.NODE_ENV;
 
+// Sentry capture is fire-and-forget async (lazy SDK load through several
+// dynamic-import rounds) — use vi.waitFor for positive assertions and a
+// generous multi-round flush before negative ones.
+const flush = async () => {
+  for (let i = 0; i < 10; i++) await new Promise((r) => setTimeout(r, 0));
+};
+
 async function loadLoggerInProduction() {
   vi.resetModules();
   captureException.mockClear();
@@ -43,6 +50,8 @@ describe('logger error serialization (production)', () => {
 
     logger.error('useChurnSignals: failed to report signals', realError);
 
+    await flush();
+
     // The actual Error object must reach Sentry so the stack/grouping survive.
     expect(captureException).toHaveBeenCalledTimes(1);
     expect(captureException.mock.calls[0][0]).toBe(realError);
@@ -57,6 +66,8 @@ describe('logger error serialization (production)', () => {
 
     logger.error('Auth callback exception:', realError);
 
+    await flush();
+
     expect(captureException).toHaveBeenCalledTimes(1);
     const [errArg, options] = captureException.mock.calls[0] as [unknown, Record<string, any>];
     expect(errArg).toBe(realError);
@@ -69,6 +80,8 @@ describe('logger error serialization (production)', () => {
 
     logger.error('plain message', { code: 42 });
 
+    await flush();
+
     expect(captureException).not.toHaveBeenCalled();
     expect(captureMessage).toHaveBeenCalledTimes(1);
   });
@@ -78,6 +91,8 @@ describe('logger error serialization (production)', () => {
     const realError = new Error('first-arg error');
 
     logger.error(realError, 'extra context');
+
+    await flush();
 
     expect(captureException).toHaveBeenCalledTimes(1);
     expect(captureException.mock.calls[0][0]).toBe(realError);
@@ -96,6 +111,8 @@ describe('logger warn serialization (production)', () => {
 
     logger.warn('[useLeaderboardSync] Failed to sync leaderboard:', realError);
 
+    await flush();
+
     expect(captureException).toHaveBeenCalledTimes(1);
     expect(captureException.mock.calls[0][0]).toBe(realError);
     // level should be downgraded to warning
@@ -108,6 +125,8 @@ describe('logger warn serialization (production)', () => {
     const logger = await loadLoggerInProduction();
 
     logger.warn('plain warning', { detail: true });
+
+    await flush();
 
     expect(captureException).not.toHaveBeenCalled();
     expect(captureMessage).toHaveBeenCalledTimes(1);

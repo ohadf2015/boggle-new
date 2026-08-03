@@ -4,7 +4,9 @@
  * In production, errors and warnings are sent to Sentry but not shown in console
  */
 
-import * as Sentry from "@sentry/nextjs";
+// Sentry SDK loads lazily — this module is in the client boot path (see
+// utils/sentryLazy.ts). Fire-and-forget: error reporting must never block.
+import { loadSentry } from "./sentryLazy";
 import { forwardToPostHog } from "./sentry";
 
 const isDevelopment = process.env.NODE_ENV === 'development';
@@ -42,16 +44,18 @@ class FrontendLogger {
       const errorArg = args.find((arg): arg is Error => arg instanceof Error);
 
       if (errorArg) {
-        Sentry.captureException(errorArg, {
-          level: 'warning',
-          contexts: {
-            warning_details: {
-              additional_args: args
-                .filter(arg => arg !== errorArg)
-                .map(arg => String(arg))
+        void loadSentry().then((Sentry) =>
+          Sentry.captureException(errorArg, {
+            level: 'warning',
+            contexts: {
+              warning_details: {
+                additional_args: args
+                  .filter(arg => arg !== errorArg)
+                  .map(arg => String(arg))
+              }
             }
-          }
-        });
+          })
+        );
         forwardToPostHog(errorArg, { 'log.level': 'warning', source: 'logger' });
         return;
       }
@@ -60,14 +64,16 @@ class FrontendLogger {
         typeof arg === 'string' ? arg : JSON.stringify(arg)
       ).join(' ');
 
-      Sentry.captureMessage(message, {
-        level: 'warning',
-        contexts: {
-          warning_details: {
-            args: args.map(arg => String(arg))
+      void loadSentry().then((Sentry) =>
+        Sentry.captureMessage(message, {
+          level: 'warning',
+          contexts: {
+            warning_details: {
+              args: args.map(arg => String(arg))
+            }
           }
-        }
-      });
+        })
+      );
     } else {
       console.warn(...args);
     }
@@ -90,15 +96,17 @@ class FrontendLogger {
       const errorArg = args.find((arg): arg is Error => arg instanceof Error);
 
       if (errorArg) {
-        Sentry.captureException(errorArg, {
-          contexts: {
-            error_details: {
-              additional_args: args
-                .filter(arg => arg !== errorArg)
-                .map(arg => String(arg))
+        void loadSentry().then((Sentry) =>
+          Sentry.captureException(errorArg, {
+            contexts: {
+              error_details: {
+                additional_args: args
+                  .filter(arg => arg !== errorArg)
+                  .map(arg => String(arg))
+              }
             }
-          }
-        });
+          })
+        );
         forwardToPostHog(errorArg, { 'log.level': 'error', source: 'logger' });
       } else {
         // Otherwise, capture as a message
@@ -106,14 +114,16 @@ class FrontendLogger {
           typeof arg === 'string' ? arg : JSON.stringify(arg)
         ).join(' ');
 
-        Sentry.captureMessage(message, {
-          level: 'error',
-          contexts: {
-            error_details: {
-              args: args.map(arg => String(arg))
+        void loadSentry().then((Sentry) =>
+          Sentry.captureMessage(message, {
+            level: 'error',
+            contexts: {
+              error_details: {
+                args: args.map(arg => String(arg))
+              }
             }
-          }
-        });
+          })
+        );
       }
     } else {
       console.error(...args);

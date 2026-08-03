@@ -9,7 +9,9 @@
  * even those not using the logger utility.
  */
 
-import * as Sentry from "@sentry/nextjs";
+// Sentry SDK loads lazily — this module is installed at client boot (see
+// utils/sentryLazy.ts). Fire-and-forget capture; never block the caller.
+import { loadSentry } from "./sentryLazy";
 
 const isProduction = typeof window !== 'undefined' && process.env.NODE_ENV === 'production';
 
@@ -148,29 +150,33 @@ export function initConsoleOverride(): void {
 
     if (firstArg instanceof Error) {
       // If it's an Error object, capture it properly
-      Sentry.captureException(firstArg, {
-        contexts: {
-          console_error: {
-            additional_args: args.slice(1).map(arg => String(arg)),
-            source: 'console.error'
+      void loadSentry().then((Sentry) =>
+        Sentry.captureException(firstArg, {
+          contexts: {
+            console_error: {
+              additional_args: args.slice(1).map(arg => String(arg)),
+              source: 'console.error'
+            }
           }
-        }
-      });
+        })
+      );
     } else {
       // Otherwise, capture as a message
       const message = args.map(arg =>
         typeof arg === 'string' ? arg : JSON.stringify(arg)
       ).join(' ');
 
-      Sentry.captureMessage(message, {
-        level: 'error',
-        contexts: {
-          console_error: {
-            args: args.map(arg => String(arg)),
-            source: 'console.error'
+      void loadSentry().then((Sentry) =>
+        Sentry.captureMessage(message, {
+          level: 'error',
+          contexts: {
+            console_error: {
+              args: args.map(arg => String(arg)),
+              source: 'console.error'
+            }
           }
-        }
-      });
+        })
+      );
     }
 
     // In production, we DON'T call the original console.error
@@ -191,15 +197,17 @@ export function initConsoleOverride(): void {
       return;
     }
 
-    Sentry.captureMessage(message, {
-      level: 'warning',
-      contexts: {
-        console_warn: {
-          args: args.map(arg => String(arg)),
-          source: 'console.warn'
+    void loadSentry().then((Sentry) =>
+      Sentry.captureMessage(message, {
+        level: 'warning',
+        contexts: {
+          console_warn: {
+            args: args.map(arg => String(arg)),
+            source: 'console.warn'
+          }
         }
-      }
-    });
+      })
+    );
 
     // In production, we DON'T call the original console.warn
     // This prevents the warning from appearing in the browser console
