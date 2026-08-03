@@ -133,6 +133,8 @@ export default async function BlogLayout({ children, params }: BlogLayoutProps):
     { slug: 'milat-hayom-habit', name: 'מילת היום: איך משחק קטן של שלוש דקות הופך להרגל של שנה שלמה' },
     { slug: 'mishachke-milim-chinuch', name: 'משחקי מילים בכיתה: מה קורה כשמורה לעברית מחליפה דף עבודה במשחק' },
     { slug: 'ordspel-familjer', name: 'Ordspel för Familjer: Hur Vi Hittade Något Att Göra Tillsammans Som Faktiskt Funkar' },
+    { slug: 'multiplayer-strategy-guide', name: 'The Multiplayer Strategy Guide: How to Actually Win Word Battles' },
+    { slug: 'leaderboard-elo-explained', name: 'How the LexiClash Leaderboard Actually Works: ELO, Tiers, and Seasons Explained' },
   ];
 
   // Safe: all content is from static article metadata, not user input

@@ -17,7 +17,7 @@ export interface DailySeoEntry {
 export const dailySeoContent: Record<string, DailySeoEntry> = {
   en: {
     title: 'Daily Word Wheel & Word Hunt — Free Daily Word Puzzle | LexiClash',
-    description: 'Play today\'s Daily Word Wheel and Word Hunt free — new puzzle every day at midnight UTC. Same board worldwide, no download, no signup. Track streaks, share results, climb the global leaderboard.',
+    description: 'Play today\'s Daily Word Wheel and Word Hunt free — a brand-new puzzle every day at midnight UTC, and every player worldwide gets the exact same board. Word Hunt Survival gives you ten attempts to uncover the hidden target word, with each wrong guess narrowing the field; the Daily Word Wheel deals a wheel of letters where every word you build must include the center letter, and longer words score higher. Results copy as an emoji grid you can share without spoilers, daily streaks reward consistent play, and the global leaderboard resets with each fresh puzzle. No download, no signup, no app store — open the page and you are playing today\'s challenge in seconds.',
     features: [
       'New puzzle every day at midnight UTC',
       'Same board for all players worldwide - fair competition',
@@ -106,6 +106,24 @@ export const dailySeoContent: Record<string, DailySeoEntry> = {
       { question: 'Cuando se reinicia el puzzle diario?', answer: 'Un nuevo puzzle se genera cada dia a medianoche UTC. Tu progreso se reinicia y un ranking fresco comienza.' },
       { question: 'Puedo compartir mis resultados?', answer: 'Si! Despues del puzzle, toca el boton compartir para copiar una cuadricula emoji. Compartela en redes sociales sin revelar la respuesta.' },
       { question: 'Que es la Rueda de Palabras Diaria?', answer: 'La Rueda de Palabras es un puzzle diario donde encuentras palabras usando letras en una rueda. Cada palabra debe incluir la letra central. Nueva rueda cada dia.' },
+    ],
+  },
+  ru: {
+    title: 'Ежедневное Колесо Слов и Охота за Словами — бесплатный пазл | LexiClash',
+    description: 'Играйте в ежедневное Колесо Слов и Охоту за Словами бесплатно — новый пазл каждый день в полночь по UTC. Одинаковое поле для всех игроков мира, без скачивания и регистрации. Соревнуйтесь в глобальном рейтинге.',
+    features: [
+      'Новый пазл каждый день в полночь по UTC',
+      'Одинаковое поле для всех игроков мира — честная конкуренция',
+      'Колесо Слов: составляйте слова из букв на колесе',
+      'Охота за Словами: найдите скрытое слово за 10 попыток',
+      'Делитесь результатами-эмодзи, как в Wordle',
+      'Ежедневные серии награждают регулярную игру',
+    ],
+    faq: [
+      { question: 'Когда обновляется ежедневный пазл?', answer: 'Новый пазл генерируется каждый день в полночь по UTC. Ваш прогресс обнуляется, и начинается новый рейтинг.' },
+      { question: 'Можно ли поделиться результатами?', answer: 'Да! После завершения пазла нажмите кнопку «Поделиться», чтобы скопировать сетку эмодзи. Делитесь в соцсетях и мессенджерах, не раскрывая ответ.' },
+      { question: 'Что такое Охота за Словами?', answer: 'Охота за Словами — ежедневный челлендж, где у вас есть 10 попыток, чтобы найти скрытое слово на поле. Представьте смесь Wordle и Боггла.' },
+      { question: 'Нужно ли скачивать приложение?', answer: 'Нет! Играйте прямо в браузере — без скачивания и регистрации. Работает на телефоне, планшете и компьютере.' },
     ],
   },
 };

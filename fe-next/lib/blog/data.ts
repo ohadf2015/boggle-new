@@ -153,6 +153,16 @@ export const blogPosts: BlogPost[] = [
     image: '/images/blog/ordspel-familjer.jpg',
     date: '2026-05-11',
   },
+  {
+    slug: 'multiplayer-strategy-guide',
+    image: '/images/blog/strategy-tactics.jpg',
+    date: '2026-08-03',
+  },
+  {
+    slug: 'leaderboard-elo-explained',
+    image: '/images/blog/top-player-secrets.jpg',
+    date: '2026-08-03',
+  },
 ];
 
 export const blogPostsContent: Record<string, PageContent> = {
@@ -161,6 +171,18 @@ export const blogPostsContent: Record<string, PageContent> = {
     pageSubtitle: 'Tips, strategies, and insights for word game enthusiasts',
     footerText: 'Join thousands of word game enthusiasts improving their skills with LexiClash. Play solo, compete with friends, or challenge daily puzzles in Hebrew, English, Swedish, and Japanese.',
     posts: {
+      'multiplayer-strategy-guide': {
+        title: 'The Multiplayer Strategy Guide: How to Actually Win Word Battles',
+        excerpt: 'Multiplayer is a different sport from solo play. Pacing, combo management, room-size tactics, fire rounds, and the mental game — the full playbook.',
+        readTime: '10 min read',
+        category: 'Strategy',
+      },
+      'leaderboard-elo-explained': {
+        title: 'How the LexiClash Leaderboard Actually Works: ELO, Tiers, and Seasons Explained',
+        excerpt: 'The real rating mechanics from the actual code: ELO for 1v1, Weng-Lin for multiplayer, K-factor calibration, and every tier threshold from Bronze to Grandmaster.',
+        readTime: '9 min read',
+        category: 'Guide',
+      },
       '10-surprising-benefits-word-games': {
         title: '10 Surprising Benefits of Playing Word Games Daily',
         excerpt: 'Science-backed reasons why word games are more than just fun—they\'re essential brain training that can slow aging by up to 5 years.',

@@ -16,6 +16,7 @@ const BLOG_IMAGE_MAP: Record<string, string> = {
     'word-games-for-brain-training': '/images/blog/brain-training-words.jpg',
     'netflix-word-game-2026-rise': '/images/blog/netflix-word-games.jpg',
     'most-popular-word-games-2026': '/images/blog/most-popular-word-games-2026.jpg',
+    'multiplayer-strategy-guide': '/images/blog/strategy-tactics.jpg',
 };
 
 const FALLBACK_IMAGE = '/og-image-en.webp';

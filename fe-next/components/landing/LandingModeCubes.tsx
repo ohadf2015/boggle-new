@@ -242,7 +242,11 @@ function Cube({ model, index, anchor = false, bigAnchor = true, tone = 'fast', w
             priority={anchor}
             placeholder="blur"
             blurDataURL={CUBE_BLUR_DATA_URL}
-            sizes={anchor ? '(max-width: 768px) 100vw, 50vw' : '(max-width: 768px) 50vw, 25vw'}
+            sizes={
+              anchor
+                ? '(max-width: 640px) min(100vw, 640px), (max-width: 768px) min(50vw, 384px), 50vw'
+                : '(max-width: 640px) min(50vw, 320px), (max-width: 768px) min(25vw, 192px), 25vw'
+            }
             onError={() => setImgFailed(true)}
             className={cn(
               // cover everywhere now (anchor included) → fills the tile, no navy bars.
