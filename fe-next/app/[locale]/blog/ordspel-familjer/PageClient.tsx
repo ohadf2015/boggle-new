@@ -107,6 +107,7 @@ export default function OrdspelFamiljerPageClient(): React.ReactElement {
               src="/images/blog/ordspel-familjer.jpg"
               alt="En svensk familj samlad runt köksbordet med kaffe och en surfplatta som visar ett ordspel"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

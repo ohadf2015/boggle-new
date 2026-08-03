@@ -120,6 +120,7 @@ export default function BenefitsPageClient(): React.ReactElement {
               src="/images/blog/10-benefits.jpg"
               alt="Word game tiles scattered on a table"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

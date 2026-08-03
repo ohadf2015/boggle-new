@@ -116,6 +116,7 @@ export default function LeaderboardEloPageClient(): React.ReactElement {
               src="/images/blog/top-player-secrets.jpg"
               alt="LexiClash leaderboard with ranked players and ELO ratings"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

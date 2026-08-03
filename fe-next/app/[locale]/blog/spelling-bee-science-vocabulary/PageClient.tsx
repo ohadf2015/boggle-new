@@ -91,6 +91,7 @@ export default function SpellingBeeSciencePageClient(): React.ReactElement {
               src="/images/blog/brain-health.jpg"
               alt="Spelling bee competition and memory science — vocabulary learning research"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

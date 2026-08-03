@@ -107,6 +107,7 @@ export default function FreeWordGamesOnlinePageClient(): React.ReactElement {
               src="/images/blog/free-word-games-online.jpg"
               alt="A phone displaying a word game grid with a coffee cup beside it on a wooden desk"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

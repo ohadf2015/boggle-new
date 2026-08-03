@@ -81,12 +81,12 @@ describe('getCurrentSeasonDynamic', () => {
 
   it('attaches themed art (image + accent + tagline) for seasons 1-6', () => {
     const cases: Array<{ date: string; theme: string; image: string; accent: string }> = [
-      { date: '2026-04-15T00:00:00Z', theme: 'Word Warriors',      image: '/seasons/season-1-word-warriors.jpg',     accent: '#BFFF00' },
-      { date: '2026-05-15T00:00:00Z', theme: 'Letter Legends',     image: '/seasons/season-2-letter-legends.jpg',    accent: '#FF1493' },
-      { date: '2026-06-15T00:00:00Z', theme: 'Vocab Victors',      image: '/seasons/season-3-vocab-victors.jpg',     accent: '#00FFFF' },
-      { date: '2026-07-15T00:00:00Z', theme: 'Syllable Champions', image: '/seasons/season-4-syllable-champions.jpg', accent: '#8B5CF6' },
-      { date: '2026-08-15T00:00:00Z', theme: 'Phonic Phenoms',     image: '/seasons/season-5-phonic-phenoms.jpg',    accent: '#FFE135' },
-      { date: '2026-09-15T00:00:00Z', theme: 'Lexicon Lords',      image: '/seasons/season-6-lexicon-lords.jpg',     accent: '#FF6B35' },
+      { date: '2026-04-15T00:00:00Z', theme: 'Word Warriors',      image: '/seasons/season-1-word-warriors.webp',     accent: '#BFFF00' },
+      { date: '2026-05-15T00:00:00Z', theme: 'Letter Legends',     image: '/seasons/season-2-letter-legends.webp',    accent: '#FF1493' },
+      { date: '2026-06-15T00:00:00Z', theme: 'Vocab Victors',      image: '/seasons/season-3-vocab-victors.webp',     accent: '#00FFFF' },
+      { date: '2026-07-15T00:00:00Z', theme: 'Syllable Champions', image: '/seasons/season-4-syllable-champions.webp', accent: '#8B5CF6' },
+      { date: '2026-08-15T00:00:00Z', theme: 'Phonic Phenoms',     image: '/seasons/season-5-phonic-phenoms.webp',    accent: '#FFE135' },
+      { date: '2026-09-15T00:00:00Z', theme: 'Lexicon Lords',      image: '/seasons/season-6-lexicon-lords.webp',     accent: '#FF6B35' },
     ];
     for (const { date, theme, image, accent } of cases) {
       const season = getCurrentSeasonDynamic(new Date(date));

@@ -107,6 +107,7 @@ export default function MishachkeMilimChinuchPageClient(): React.ReactElement {
               src="/images/blog/mishachke-milim-chinuch.jpg"
               alt="כיתה ישראלית עם תלמידים שמסתכלים על לוח חכם עם משחק מילים בעברית"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

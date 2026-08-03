@@ -122,6 +122,7 @@ export default function MultiplayerSocialPageClient(): React.ReactElement {
               src="/images/blog/multiplayer-social.jpg"
               alt="Friends playing word games together around a table"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

@@ -107,6 +107,7 @@ export default function BoggleVsScrabblePageClient(): React.ReactElement {
               src="/images/blog/boggle-vs-scrabble.jpg"
               alt="Boggle dice tray and Scrabble board side by side on a table"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

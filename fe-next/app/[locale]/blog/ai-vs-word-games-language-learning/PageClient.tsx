@@ -91,6 +91,7 @@ export default function AiVsWordGamesPageClient(): React.ReactElement {
               src="/images/blog/multilingual.jpg"
               alt="AI language apps versus word games comparison"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

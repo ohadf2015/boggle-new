@@ -116,6 +116,7 @@ export default function MultiplayerStrategyPageClient(): React.ReactElement {
               src="/images/blog/strategy-tactics.jpg"
               alt="Multiplayer word battle strategy on a shared letter grid"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

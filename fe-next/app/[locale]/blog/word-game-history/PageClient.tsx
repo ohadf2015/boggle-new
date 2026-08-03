@@ -121,6 +121,7 @@ export default function WordGameHistoryPageClient(): React.ReactElement {
               src="/images/blog/word-game-history.jpg"
               alt="Historical word game tiles and vintage board games"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

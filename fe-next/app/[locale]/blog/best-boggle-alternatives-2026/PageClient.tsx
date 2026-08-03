@@ -156,6 +156,7 @@ export default function BoggleAlternativesPageClient(): React.ReactElement {
               src="/images/blog/boggle-alternatives.jpg"
               alt="Various word games on a wooden table with a phone showing a modern word game app"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

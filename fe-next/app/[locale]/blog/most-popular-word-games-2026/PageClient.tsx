@@ -96,6 +96,7 @@ export default function MostPopularWordGamesPageClient(): React.ReactElement {
                 src={heroSection.image.src}
                 alt={heroSection.image.alt}
                 fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
                 className="object-cover"
                 priority
               />

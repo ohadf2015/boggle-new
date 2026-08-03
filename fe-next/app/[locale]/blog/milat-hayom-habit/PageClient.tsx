@@ -107,6 +107,7 @@ export default function MilatHayomHabitPageClient(): React.ReactElement {
               src="/images/blog/milat-hayom-habit.jpg"
               alt="טלפון מראה משחק מילים בעברית עם כוס קפה לידו על שולחן עץ"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

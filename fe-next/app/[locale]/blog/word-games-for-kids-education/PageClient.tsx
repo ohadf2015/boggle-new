@@ -121,6 +121,7 @@ export default function WordGamesEducationPageClient(): React.ReactElement {
               src="/images/blog/kids-education.jpg"
               alt="Children playing word games in a classroom setting"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

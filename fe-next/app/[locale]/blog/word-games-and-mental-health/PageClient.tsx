@@ -118,6 +118,7 @@ export default function MentalHealthPageClient(): React.ReactElement {
               src="/images/blog/mental-health.jpg"
               alt="Person relaxing while playing a word game on their phone"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />
