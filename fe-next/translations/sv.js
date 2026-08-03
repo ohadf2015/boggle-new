@@ -12331,6 +12331,8 @@ const sv = {
       "everythingInFree": "Allt i Free, plus:",
       "freeStartNote": "Perfekt för att testa — men de flesta lärare växer snabbt ur gränsen på 2 klasser.",
       "proCtaSubtext": "Klart på 30 sekunder · Avsluta när du vill",
+      "lifetimeCta": "Eller köp livstid — ${{price}} engångs",
+      "lifetimeSubtext": "Engångsbetalning · Pro för alltid, ingen prenumeration",
       "trustCancel": "Avsluta när du vill, ingen bindningstid",
       "trustDataSafe": "Dina data är säkra",
       "trustReminder": "Påminnelse via e-post före varje betalning",

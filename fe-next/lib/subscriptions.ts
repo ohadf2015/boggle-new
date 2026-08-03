@@ -221,6 +221,10 @@ export async function upsertSubscription({
       ...(polarCustomerId !== undefined && { polar_customer_id: polarCustomerId }),
       ...(polarProductId !== undefined && { polar_product_id: polarProductId }),
       ...(polarOrderId !== undefined && { polar_order_id: polarOrderId }),
+      // Any upsert carrying Polar ids comes from the Polar webhook — tag the
+      // row so reporting can tell providers apart (LS rows keep the default).
+      ...((polarSubscriptionId !== undefined || polarCustomerId !== undefined ||
+        polarProductId !== undefined || polarOrderId !== undefined) && { payment_provider: 'polar' }),
       current_period_end: currentPeriodEnd ?? null,
       cancel_at_period_end: cancelAtPeriodEnd ?? false,
     },

@@ -12110,6 +12110,8 @@ const es = {
       "everythingInFree": "Todo lo del plan Free, y además:",
       "freeStartNote": "Ideal para probar, pero la mayoría de docentes supera pronto el límite de 2 clases.",
       "proCtaSubtext": "Listo en 30 segundos · Cancela cuando quieras",
+      "lifetimeCta": "O compra de por vida — ${{price}} una vez",
+      "lifetimeSubtext": "Pago único · Pro para siempre, sin suscripción",
       "trustCancel": "Cancela cuando quieras, sin permanencia",
       "trustDataSafe": "Tus datos están a salvo",
       "trustReminder": "Correo de aviso antes de cada cobro",
