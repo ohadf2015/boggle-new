@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6151,
+    "totalKeysInCode": 6144,
     "keyCountByLanguage": {
-      "en": 11903,
-      "es": 12199,
-      "he": 12104,
-      "ja": 12158,
-      "ru": 11934,
-      "sv": 12154
+      "en": 11922,
+      "es": 12218,
+      "he": 12123,
+      "ja": 12177,
+      "ru": 11953,
+      "sv": 12173
     },
     "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
@@ -1129,7 +1129,7 @@
         "pattern": "`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]))}`",
         "type": "template_literal",
         "file": "components/connections/pyramid/PyramidChallenge.tsx",
-        "line": 202,
+        "line": 207,
         "context": "callout: t(`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]"
       },
       {
@@ -2095,7 +2095,7 @@
         "pattern": "`wordTower.error.${lastError}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerHud.tsx",
-        "line": 256,
+        "line": 260,
         "context": "{t(`wordTower.error.${lastError}`)}"
       },
       {
@@ -2123,14 +2123,14 @@
         "pattern": "`wordTower.biome.${biomeId}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 366,
+        "line": 368,
         "context": "setZoneText(t(`wordTower.biome.${biomeId}`));"
       },
       {
         "pattern": "`wordTower.hazard.${hz.kind}`",
         "type": "template_literal",
         "file": "components/wordTower/WordTowerPlay.tsx",
-        "line": 764,
+        "line": 796,
         "context": "setHazardText(t('wordTower.hazard.lost', { kind: t(`wordTower.hazard.${hz.kind}`), n: hz.removed }))"
       },
       {
@@ -2362,7 +2362,7 @@
         "variable": "q",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 273,
+        "line": 295,
         "context": "<h3 className=\"text-lg font-bold text-neo-cyan mb-2\">{t(q)}</h3>"
       },
       {
@@ -2370,7 +2370,7 @@
         "variable": "a",
         "type": "variable_key",
         "file": "app/[locale]/teacher/upgrade/PageClient.tsx",
-        "line": 275,
+        "line": 297,
         "context": "{t(a)}"
       },
       {
@@ -2834,7 +2834,7 @@
         "variable": "nameError",
         "type": "variable_key",
         "file": "components/multiplayer/CreateRoomModal.tsx",
-        "line": 231,
+        "line": 233,
         "context": "{t(nameError)}"
       },
       {
@@ -2842,7 +2842,7 @@
         "variable": "nameError",
         "type": "variable_key",
         "file": "components/multiplayer/JoinRoomModal.tsx",
-        "line": 177,
+        "line": 179,
         "context": "{t(nameError)}"
       },
       {
@@ -2978,7 +2978,7 @@
         "variable": "key",
         "type": "variable_key",
         "file": "components/results/ResultsMainContent.tsx",
-        "line": 539,
+        "line": 610,
         "context": "return t(key, params);"
       },
       {
@@ -3250,7 +3250,7 @@
         "variable": "modeKey",
         "type": "variable_key",
         "file": "shared/utils/shareResultGenerator.ts",
-        "line": 36,
+        "line": 35,
         "context": "let header = t(modeKey);"
       },
       {

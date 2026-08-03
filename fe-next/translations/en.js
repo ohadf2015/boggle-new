@@ -11144,6 +11144,8 @@ const en = {
       "everythingInFree": "Everything in Free, plus:",
       "freeStartNote": "Great for trying it out — most teachers outgrow the 2-class limit fast.",
       "proCtaSubtext": "Set up in 30 seconds · Cancel anytime",
+      "lifetimeCta": "Or buy Lifetime — ${{price}} once",
+      "lifetimeSubtext": "One-time payment · Pro forever, no subscription",
       "trustCancel": "Cancel anytime, no lock-in",
       "trustDataSafe": "Your data stays safe",
       "trustReminder": "Reminder email before every charge",

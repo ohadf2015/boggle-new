@@ -17,17 +17,22 @@ export default function UpgradePricingPageClient() {
   // Store is in test mode / pending KYC — keep the CTA inert until checkout is truly live.
   // The API enforces this too (503); this just avoids showing a button that can't work.
   const checkoutEnabled = process.env.NEXT_PUBLIC_CHECKOUT_ENABLED === 'true';
+  // Lifetime one-time purchase is offered only once Ohad sets the price env to
+  // match the Polar "LexiClash Pro Lifetime" product — no price, no button.
+  const lifetimePrice = process.env.NEXT_PUBLIC_LIFETIME_PRICE_USD;
 
   useEffect(() => {
     trackGrowthEvent('iap_viewed', { product: 'teacher_pro' });
   }, []);
 
-  const handleUpgrade = async () => {
+  const handleUpgrade = async (product: 'pro' | 'lifetime' = 'pro') => {
     if (!checkoutEnabled) return;
     setIsLoading(true);
     try {
       const response = await fetch('/api/subscription/checkout', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product }),
       });
 
       if (!response.ok) {
@@ -216,7 +221,7 @@ export default function UpgradePricingPageClient() {
             <div className="flex-1" />
 
             <Button
-              onClick={handleUpgrade}
+              onClick={() => handleUpgrade('pro')}
               disabled={isLoading || !checkoutEnabled}
               className="w-full bg-neo-black text-white font-black text-base border-2 border-black shadow-hard hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
             >
@@ -227,6 +232,23 @@ export default function UpgradePricingPageClient() {
             <p className="text-center text-xs font-bold text-neo-black/80 mt-3">
               {t('teacher.subscription.proCtaSubtext')}
             </p>
+
+            {/* Lifetime one-time alternative — rendered only when the price
+                env is configured, so no placeholder leaks to users. */}
+            {checkoutEnabled && lifetimePrice && (
+              <div className="mt-4 pt-4 border-t-3 border-black/20">
+                <button
+                  onClick={() => handleUpgrade('lifetime')}
+                  disabled={isLoading}
+                  className="w-full bg-neo-cream text-neo-black font-black text-sm border-2 border-black rounded-neo px-4 py-2.5 shadow-hard-sm hover:-translate-y-0.5 active:translate-y-0 transition-transform motion-reduce:transition-none"
+                >
+                  {t('teacher.subscription.lifetimeCta', { price: lifetimePrice })}
+                </button>
+                <p className="text-center text-xs font-bold text-neo-black/70 mt-2">
+                  {t('teacher.subscription.lifetimeSubtext')}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

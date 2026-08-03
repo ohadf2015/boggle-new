@@ -12108,6 +12108,8 @@ const ja = {
       "everythingInFree": "無料プランのすべてに加えて：",
       "freeStartNote": "お試しに最適ですが、多くの先生はすぐに2クラスの上限を超えます。",
       "proCtaSubtext": "30秒で設定 · いつでも解約可能",
+      "lifetimeCta": "または買い切り — ${{price}} 一度きり",
+      "lifetimeSubtext": "1回払い · ずっとPro、サブスク不要",
       "trustCancel": "いつでも解約、契約の縛りなし",
       "trustDataSafe": "データは安全に保たれます",
       "trustReminder": "各請求の前にリマインダーメール",

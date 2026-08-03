@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthedUser } from '@/lib/auth/getAuthedUser';
 import { checkTeacherSubscription } from '@/lib/subscriptions';
 import { getLemonSqueezyClient, LEMONSQUEEZY_API_BASE } from '@/lib/lemonsqueezy';
+import { getPolarClient } from '@/lib/polar';
+import { isPolarEnabled } from '@/lib/payments/config';
 import { createClient } from '@/utils/supabase/server';
 import logger from '@/utils/logger';
 
@@ -24,22 +26,38 @@ export async function GET(request: NextRequest) {
     // Get subscription status
     const subscription = await checkTeacherSubscription(user.id);
 
-    // If Pro, fetch the portal URL from Lemon Squeezy
+    // If Pro, fetch the "Manage subscription" portal URL from the active provider.
     let portalUrl: string | null = null;
     if (subscription.has_pro) {
       try {
         const supabase = await createClient();
-        const { data: subRecord } = await supabase
-          .from('subscriptions')
-          .select('lemon_squeezy_subscription_id')
-          .eq('user_id', user.id)
-          .single();
 
-        if (subRecord?.lemon_squeezy_subscription_id) {
-          const client = getLemonSqueezyClient();
-          const response = await client.getSubscription(subRecord.lemon_squeezy_subscription_id);
+        if (isPolarEnabled()) {
+          // Polar: mint a short-lived customer portal session.
+          const { data: subRecord } = await supabase
+            .from('subscriptions')
+            .select('polar_customer_id')
+            .eq('user_id', user.id)
+            .single();
 
-          portalUrl = response?.data?.attributes?.urls?.customer_portal || null;
+          if (subRecord?.polar_customer_id) {
+            const client = getPolarClient();
+            portalUrl = await client.createCustomerPortalSession(subRecord.polar_customer_id);
+          }
+        } else {
+          // Dormant Lemon Squeezy path.
+          const { data: subRecord } = await supabase
+            .from('subscriptions')
+            .select('lemon_squeezy_subscription_id')
+            .eq('user_id', user.id)
+            .single();
+
+          if (subRecord?.lemon_squeezy_subscription_id) {
+            const client = getLemonSqueezyClient();
+            const response = await client.getSubscription(subRecord.lemon_squeezy_subscription_id);
+
+            portalUrl = response?.data?.attributes?.urls?.customer_portal || null;
+          }
         }
       } catch (err) {
         logger.warn('Failed to fetch portal URL:', err);
