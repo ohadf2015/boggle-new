@@ -38,6 +38,15 @@ vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: mockIsOnCrazyGamesPlatform }),
 }));
 
+// The consent modal defers its initial mount to an idle slice (post-LCP perf
+// fix). These tests assert behavior, not timing — run the idle callback
+// synchronously.
+vi.stubGlobal('requestIdleCallback', (cb: () => void) => {
+  cb();
+  return 1;
+});
+vi.stubGlobal('cancelIdleCallback', () => {});
+
 describe('CookieConsent — CrazyGames gating', () => {
   beforeEach(() => {
     mockIsOnCrazyGamesPlatform = false;

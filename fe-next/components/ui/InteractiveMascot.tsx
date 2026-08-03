@@ -503,9 +503,10 @@ export const InteractiveMascot = memo(function InteractiveMascot({
     };
   }, []);
 
-  // Defer preloading hover/click variant GIFs until browser is idle.
-  // These GIFs are 500KB-1.7MB each — loading them eagerly on mount blocks
-  // LCP and wastes bandwidth if the user never interacts with the mascot.
+  // Defer preloading hover/click variant GIFs until browser is idle AND the
+  // window load event has fired. These GIFs are 500KB-1.7MB each — loading
+  // them during the initial load (ric can fire at ~1.3s on a momentarily-idle
+  // thread) competes with LCP content for bandwidth.
   useEffect(() => {
     if (!enableHover && !enableClick) return;
 
@@ -524,16 +525,30 @@ export const InteractiveMascot = memo(function InteractiveMascot({
       }
     };
 
-    // Use requestIdleCallback to defer until main thread is idle
-    const id = typeof requestIdleCallback !== 'undefined'
-      ? requestIdleCallback(doPreload, { timeout: 5000 })
-      : setTimeout(doPreload, 3000) as unknown as number;
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    const scheduleIdle = () => {
+      if (typeof requestIdleCallback !== 'undefined') {
+        idleId = requestIdleCallback(doPreload, { timeout: 8000 });
+      } else {
+        timeoutId = setTimeout(doPreload, 3000);
+      }
+    };
+
+    // Wait for full page load before scheduling the idle preload
+    if (document.readyState === 'complete') {
+      scheduleIdle();
+    } else {
+      window.addEventListener('load', scheduleIdle, { once: true });
+    }
 
     return () => {
-      if (typeof cancelIdleCallback !== 'undefined') {
-        cancelIdleCallback(id);
-      } else {
-        clearTimeout(id);
+      window.removeEventListener('load', scheduleIdle);
+      if (idleId !== undefined && typeof cancelIdleCallback !== 'undefined') {
+        cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) {
+        clearTimeout(timeoutId);
       }
     };
   }, [variant, enableHover, enableClick, hoverVariant, clickVariant]);

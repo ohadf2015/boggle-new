@@ -10,7 +10,7 @@
  */
 
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { vi } from 'vitest';
 import CookieConsent from '../CookieConsent';
 
@@ -30,6 +30,15 @@ vi.mock('@/utils/cookieConsent', () => ({
 vi.mock('@/components/CrazyGamesSDK', () => ({
   useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
 }));
+
+// The consent modal defers its initial mount to an idle slice (post-LCP perf
+// fix). These tests assert behavior, not timing — run the idle callback
+// synchronously.
+vi.stubGlobal('requestIdleCallback', (cb: () => void) => {
+  cb();
+  return 1;
+});
+vi.stubGlobal('cancelIdleCallback', () => {});
 
 describe('CookieConsent — blocking-modal layout guard', () => {
   beforeEach(() => {
@@ -57,5 +66,28 @@ describe('CookieConsent — blocking-modal layout guard', () => {
     expect(document.body.style.overflow).toBe('hidden');
     unmount();
     expect(document.body.style.overflow).toBe(prior);
+  });
+
+  it('defers the initial mount to an idle callback so it is not the LCP element', () => {
+    // Replace the module-level synchronous ric stub with a capturing one.
+    const callbacks: Array<() => void> = [];
+    vi.stubGlobal('requestIdleCallback', (cb: () => void) => {
+      callbacks.push(cb);
+      return callbacks.length;
+    });
+    try {
+      render(<CookieConsent />);
+      // Not mounted synchronously on first paint...
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      // ...but appears once the browser grants an idle slice (post-LCP).
+      act(() => callbacks.forEach((cb) => cb()));
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+    } finally {
+      // Restore the synchronous stub for any later tests in this file.
+      vi.stubGlobal('requestIdleCallback', (cb: () => void) => {
+        cb();
+        return 1;
+      });
+    }
   });
 });

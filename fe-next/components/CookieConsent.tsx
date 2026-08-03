@@ -36,12 +36,27 @@ export default function CookieConsent() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
+
+    let cancelShow = () => {};
     if (!hasConsentDecision()) {
-      setVisible(true);
+      // PERF: defer mounting the blocking modal until the underlying page has
+      // captured its LCP. Mounting immediately after hydration made this
+      // modal's text the LCP element — it painted last on a busy main thread
+      // (~16s mobile LCP). The gate itself is unchanged: still blocking, still
+      // requires a choice, and no non-essential scripts fire before a decision
+      // (ads/analytics are consent-gated independently). The modal simply
+      // appears ~1 idle slice later, once the hero has painted.
+      if (typeof window.requestIdleCallback === 'function') {
+        const id = window.requestIdleCallback(() => setVisible(true), { timeout: 1200 });
+        cancelShow = () => window.cancelIdleCallback(id);
+      } else {
+        const id = window.setTimeout(() => setVisible(true), 800);
+        cancelShow = () => window.clearTimeout(id);
+      }
     }
 
     // Listen for consent resets (from ManageCookiesButton) — re-open the modal.
-    return onConsentChange((state) => {
+    const unsubscribe = onConsentChange((state) => {
       if (state.timestamp === 0) {
         setVisible(true);
         setShowDetails(false);
@@ -49,6 +64,10 @@ export default function CookieConsent() {
         setAdvertising(false);
       }
     });
+    return () => {
+      cancelShow();
+      unsubscribe();
+    };
   }, []);
 
   // Lock background scroll while the blocking modal is up. Save/restore the
