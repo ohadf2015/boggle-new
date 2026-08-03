@@ -187,6 +187,10 @@ export async function upsertSubscription({
   lemonSqueezySubscriptionId,
   lemonSqueezyOrderId,
   lemonSqueezyVariantId,
+  polarSubscriptionId,
+  polarCustomerId,
+  polarProductId,
+  polarOrderId,
   currentPeriodEnd,
   cancelAtPeriodEnd,
 }: {
@@ -196,6 +200,10 @@ export async function upsertSubscription({
   lemonSqueezySubscriptionId?: string | null
   lemonSqueezyOrderId?: string | null
   lemonSqueezyVariantId?: string | null
+  polarSubscriptionId?: string | null
+  polarCustomerId?: string | null
+  polarProductId?: string | null
+  polarOrderId?: string | null
   currentPeriodEnd?: string | null
   cancelAtPeriodEnd?: boolean
 }): Promise<void> {
@@ -206,9 +214,13 @@ export async function upsertSubscription({
       user_id: userId,
       tier,
       status,
-      lemon_squeezy_subscription_id: lemonSqueezySubscriptionId ?? null,
-      lemon_squeezy_order_id: lemonSqueezyOrderId ?? null,
-      lemon_squeezy_variant_id: lemonSqueezyVariantId ?? null,
+      ...(lemonSqueezySubscriptionId !== undefined && { lemon_squeezy_subscription_id: lemonSqueezySubscriptionId }),
+      ...(lemonSqueezyOrderId !== undefined && { lemon_squeezy_order_id: lemonSqueezyOrderId }),
+      ...(lemonSqueezyVariantId !== undefined && { lemon_squeezy_variant_id: lemonSqueezyVariantId }),
+      ...(polarSubscriptionId !== undefined && { polar_subscription_id: polarSubscriptionId }),
+      ...(polarCustomerId !== undefined && { polar_customer_id: polarCustomerId }),
+      ...(polarProductId !== undefined && { polar_product_id: polarProductId }),
+      ...(polarOrderId !== undefined && { polar_order_id: polarOrderId }),
       current_period_end: currentPeriodEnd ?? null,
       cancel_at_period_end: cancelAtPeriodEnd ?? false,
     },
