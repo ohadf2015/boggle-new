@@ -13,6 +13,7 @@ import GoogleAnalytics from '@/components/GoogleAnalytics';
 import AdSenseLoader from '@/components/ads/AdSenseLoader';
 import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
+import FeedbackDevtoolsWidget from '@/components/feedback/FeedbackDevtoolsWidget';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
 import PagePresenceReporter from '@/components/PagePresenceReporter';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
@@ -738,6 +739,9 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <CookieConsent />
                     {/* Floating feedback launcher → ReportBugModal → /api/feedback (Supabase + Telegram + email) */}
                     <FeedbackFab />
+                    {/* feedback.devtools shared widget — left-edge launcher, posts via
+                        same-origin /api/v1/feedback proxy to the shared ingest API */}
+                    <FeedbackDevtoolsWidget />
                     {/* Google One Tap (web) — in-page ID-token sign-in so Google's
                         consent shows our domain, not <ref>.supabase.co. No redirect. */}
                     <GoogleOneTapInitializer />
