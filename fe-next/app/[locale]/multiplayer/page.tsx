@@ -3,6 +3,8 @@ import type { Metadata } from 'next';
 import { generatePageMetadata } from '@/lib/seo/generatePageMetadata';
 import { VideoGameJsonLd } from '@/components/seo/VideoGameJsonLd';
 import { BreadcrumbJsonLd } from '@/components/seo/BreadcrumbJsonLd';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
 import MultiplayerPageClient from './PageClient';
 
 export const revalidate = 3600;
@@ -98,6 +100,11 @@ const seoContent: Record<string, {
         answer:
           'כן — LexiClash מרובה משתתפים חינמי לחלוטין ללא צורך בהורדה. שחקו ישירות בדפדפן בכל מכשיר.',
       },
+      {
+        question: 'כמה שחקנים יכולים להצטרף לחדר?',
+        answer:
+          'חדרים מרובי משתתפים תומכים בעד 8 שחקנים שמתחרים בו-זמנית על אותו לוח. לקבוצות גדולות יותר, נסו את מצב המסיבה על מסך טלוויזיה משותף עם טלפונים כשלטים.',
+      },
     ],
   },
   sv: {
@@ -121,6 +128,11 @@ const seoContent: Record<string, {
         answer:
           'Ja — LexiClash multiplayer är helt gratis utan nedladdning. Spela direkt i webbläsaren på valfri enhet.',
       },
+      {
+        question: 'Hur många spelare kan gå med i ett rum?',
+        answer:
+          'Multiplayer-rum stöder upp till 8 spelare som tävlar samtidigt på samma rutnät. För större grupper, prova Party-läget på en delad TV-skärm med telefoner som handkontroller.',
+      },
     ],
   },
   ja: {
@@ -143,6 +155,11 @@ const seoContent: Record<string, {
         question: 'LexiClashマルチプレイヤーは無料ですか？',
         answer:
           'はい — LexiClashマルチプレイヤーはダウンロード不要で完全無料です。あらゆるデバイスのブラウザで直接プレイできます。',
+      },
+      {
+        question: '1つのルームに何人参加できますか？',
+        answer:
+          'マルチプレイヤールームでは最大8人が同じグリッドで同時に対戦できます。大人数の場合は、テレビ画面を共有してスマホをコントローラーにするパーティーモードがおすすめです。',
       },
     ],
   },
@@ -172,6 +189,41 @@ const seoContent: Record<string, {
         question: '¿Cuántos jugadores pueden unirse a una sala?',
         answer:
           'Las salas multijugador admiten hasta 8 jugadores compitiendo simultáneamente en el mismo tablero. Para grupos más grandes, prueba el Modo Fiesta.',
+      },
+    ],
+  },
+  ru: {
+    title: 'Мультиплеерная игра в слова — словесные битвы в реальном времени',
+    description:
+      'LexiClash Мультиплеер — это соревновательная игра в слова в реальном времени, где вы соревнуетесь с друзьями и соперниками, находя слова на общем поле. Создавайте приватные комнаты для вечеров игр, присоединяйтесь к публичным лобби, чтобы проверить себя против игроков со всего мира, или вызовите ИИ-бота, когда никого нет в сети. Четыре режима мультиплеера — Классика в стиле Боггл, Колесо, Охота за словами и Взрыв — каждый со своими правилами и темпом. Без скачивания и регистрации: откройте ссылку, выберите режим — и вы уже в игре.',
+    features: [
+      'Приватные комнаты с настраиваемыми параметрами — приглашайте друзей по ссылке или коду',
+      'Публичный подбор соперников — матчи с игроками вашего уровня за секунды',
+      'Подсчёт очков в реальном времени с живой лентой слов соперника',
+      'Настраиваемые таймеры раундов, размеры поля и правила подсчёта',
+      'Четыре режима: Классика, Колесо, Охота за словами, Взрыв',
+      'Кросс-девайс игра — телефоны, планшеты и ноутбуки в одном матче',
+    ],
+    faq: [
+      {
+        question: 'Как начать игру с друзьями?',
+        answer:
+          'Нажмите «Создать комнату» на странице мультиплеера, настройте параметры (таймер, размер поля, раунды, режим) и поделитесь ссылкой или кодом с друзьями. Они присоединяются мгновенно — аккаунт не нужен.',
+      },
+      {
+        question: 'LexiClash мультиплеер бесплатный?',
+        answer:
+          'Да — мультиплеер LexiClash полностью бесплатен и не требует скачивания. Играйте прямо в браузере на любом устройстве, без платных функций и ограничений.',
+      },
+      {
+        question: 'Сколько игроков может быть в комнате?',
+        answer:
+          'Комнаты поддерживают до 8 игроков, соревнующихся одновременно на одном поле. Для больших компаний есть режим вечеринки на общем экране телевизора с телефонами вместо контроллеров.',
+      },
+      {
+        question: 'Чем LexiClash отличается от Scrabble или Words With Friends?',
+        answer:
+          'В отличие от пошаговых игр, где вы ждёте хода соперника, LexiClash полностью в реальном времени: все играют на одном поле одновременно под давлением таймера, с живой лентой очков и комбо-цепочками.',
       },
     ],
   },
@@ -215,6 +267,19 @@ export default async function MultiplayerPage({ params }: { params: Promise<{ lo
         ]}
       />
       <MultiplayerPageClient />
+      {/* Below-the-fold SSR copy for AdSense content depth (was JSON-LD-only,
+          so /multiplayer audited at 53 visible words on 2026-08-03). Collapsible
+          per the game-screen pattern: full text stays in SSR HTML for reviewers
+          and crawlers without pushing the lobby below the fold. FAQPage schema
+          mirrors the visible FAQ exactly. */}
+      <GamePageSeoContent
+        title={content.title}
+        description={content.description}
+        features={content.features}
+        faq={content.faq}
+        collapsible
+      />
+      <FaqPageJsonLd faqs={content.faq.map((item) => ({ q: item.question, a: item.answer }))} />
     </>
   );
 }

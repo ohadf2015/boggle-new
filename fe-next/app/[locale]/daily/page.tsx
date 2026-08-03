@@ -3,6 +3,9 @@ import dynamicImport from 'next/dynamic';
 import type { Metadata } from 'next';
 import { loadTranslation } from '@/translations/loadTranslation';
 import { PageLoader } from '@/components/ui/PageLoader';
+import { GamePageSeoContent } from '@/components/seo/GamePageSeoContent';
+import { FaqPageJsonLd } from '@/components/seo/FaqPageJsonLd';
+import { dailySeoContent } from './dailySeo.data';
 
 
 type Locale = 'en' | 'he' | 'sv' | 'ja' | 'es' | 'ru';
@@ -291,12 +294,28 @@ export async function generateMetadata({ params, searchParams }: PageParams): Pr
  * Wrapped in Suspense boundary to properly handle useSearchParams
  * which can cause "Rendered fewer hooks than expected" errors without it.
  */
-export default async function DailyChallengePage(): Promise<React.JSX.Element> {
+export default async function DailyChallengePage({ params }: PageParams): Promise<React.JSX.Element> {
+  const { locale } = await params;
+  const content = dailySeoContent[locale] ?? dailySeoContent.en;
+
   return (
     <>
       <Suspense fallback={<LoadingFallback />}>
         <DailyRedirect />
       </Suspense>
+      {/* Below-the-fold SSR copy for AdSense content depth (/daily audited at
+          86 visible words on 2026-08-03). Collapsible per the game-screen
+          pattern: full text stays in SSR HTML for reviewers and crawlers
+          without pushing the daily landing below the fold. FAQPage schema
+          mirrors the visible FAQ exactly. */}
+      <GamePageSeoContent
+        title={content.title}
+        description={content.description}
+        features={content.features}
+        faq={content.faq}
+        collapsible
+      />
+      <FaqPageJsonLd faqs={content.faq.map((item) => ({ q: item.question, a: item.answer }))} />
     </>
   );
 }

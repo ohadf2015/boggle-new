@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { dailySeoContent } from './dailySeo.data';
 
 describe('dailySeoContent', () => {
-  const locales = ['en', 'he', 'sv', 'ja', 'es'] as const;
+  const locales = ['en', 'he', 'sv', 'ja', 'es', 'ru'] as const;
 
   it('has an entry for every supported locale', () => {
     for (const locale of locales) {
@@ -18,6 +18,15 @@ describe('dailySeoContent', () => {
         expect(qa.question.trim().length).toBeGreaterThan(0);
         expect(qa.answer.trim().length).toBeGreaterThan(0);
       }
+    }
+  });
+
+  // AdSense depth fix (2026-08-03): /daily rendered 86 visible words. The
+  // below-the-fold GamePageSeoContent card is the main copy source, so every
+  // locale needs enough FAQ items to carry real explanatory weight.
+  it('every locale has at least 3 FAQ questions', () => {
+    for (const locale of locales) {
+      expect(dailySeoContent[locale].faq.length).toBeGreaterThanOrEqual(3);
     }
   });
 
