@@ -429,7 +429,17 @@ function getAllRoutes(): MetadataRoute.Sitemap {
     'ordspel-familjer',
     'ai-vs-word-games-language-learning',
     'spelling-bee-science-vocabulary',
+    'multiplayer-strategy-guide',
+    'leaderboard-elo-explained',
   ];
+  // English-only articles (metaTitles has 'en' only → hasTranslation=false →
+  // every non-en locale is noindexed). Advertising noindexed locale URLs in
+  // the sitemap is the same negative signal as the ru case above, so these
+  // ship in the sitemap for /en only.
+  const EN_ONLY_BLOG = new Set([
+    'multiplayer-strategy-guide',
+    'leaderboard-elo-explained',
+  ]);
   // Articles with a native ru translation (contentByLocale.ru + ru metaTitles →
   // hasTranslation indexes them). Every other article serves the English body
   // on /ru noindexed — advertising those in the sitemap is a pure negative
@@ -453,6 +463,21 @@ function getAllRoutes(): MetadataRoute.Sitemap {
   ]);
   const blogLocalesNoRu = LOCALES.filter((l) => l !== 'ru');
   blogArticles.forEach((slug) => {
+    if (EN_ONLY_BLOG.has(slug)) {
+      routes.push({
+        url: `${BASE_URL}/en/blog/${slug}`,
+        lastModified: BLOG_UPDATED,
+        changeFrequency: 'monthly',
+        priority: 0.85,
+        alternates: {
+          languages: {
+            'x-default': `${BASE_URL}/en/blog/${slug}`,
+            en: `${BASE_URL}/en/blog/${slug}`,
+          },
+        },
+      });
+      return;
+    }
     const hasRu = RU_TRANSLATED_BLOG.has(slug);
     const alts = langAlternates(`/blog/${slug}`);
     if (!hasRu) {
