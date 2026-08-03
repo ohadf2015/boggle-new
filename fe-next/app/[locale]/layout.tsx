@@ -11,6 +11,7 @@ import InGameAudioButton from '@/components/InGameAudioButton';
 import GoogleConsentMode from '@/components/GoogleConsentMode';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import AdSenseLoader from '@/components/ads/AdSenseLoader';
+import { getAdSenseClient } from '@/lib/ads/adSensePolicy';
 import WebAnchorAdObserver from '@/components/ads/WebAnchorAdObserver';
 import CrazyGamesScriptServer from '@/components/CrazyGamesScriptServer';
 import WebVitalsReporter from '@/components/WebVitalsReporter';
@@ -588,6 +589,22 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                 <link rel="dns-prefetch" href="https://pagead2.googlesyndication.com" />
                 <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
                 <link rel="dns-prefetch" href="https://googleads.g.doubleclick.net" />
+                {/* AdSense loader — SSR'd unconditionally, site-wide and in every
+                    locale, so the AdSense review crawler and the Funding Choices
+                    CMP can verify the domain. (The crawler never grants cookie
+                    consent, so the consent-gated client-side AdSenseLoader never
+                    fires for it; the privacy-neutral `google-adsense-account`
+                    meta in the root layout is kept as belt-and-suspenders.)
+                    async + crossorigin per Google's snippet — non-render-blocking.
+                    No ad units are placed until approval (post-approval card).
+                    The id matches AdSenseLoader's injection guard so the
+                    consent-gated path never double-injects the script. */}
+                <script
+                    id="adsbygoogle-init"
+                    async
+                    src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(getAdSenseClient())}`}
+                    crossOrigin="anonymous"
+                />
                 {/* CrazyGames SDK — preconnect for game-distribution builds */}
                 <link rel="preconnect" href="https://sdk.crazygames.com" />
                 <link rel="dns-prefetch" href="https://sdk.crazygames.com" />
