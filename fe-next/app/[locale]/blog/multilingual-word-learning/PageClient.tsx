@@ -120,6 +120,7 @@ export default function MultilingualPageClient(): React.ReactElement {
               src="/images/blog/multilingual.jpg"
               alt="Word tiles in multiple languages scattered together"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

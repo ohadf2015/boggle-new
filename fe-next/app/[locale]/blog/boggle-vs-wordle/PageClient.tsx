@@ -107,6 +107,7 @@ export default function BoggleVsWordlePageClient(): React.ReactElement {
               src="/images/blog/boggle-vs-wordle.jpg"
               alt="Split screen showing a Boggle grid and a Wordle puzzle side by side"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

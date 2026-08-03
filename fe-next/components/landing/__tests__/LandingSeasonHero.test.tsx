@@ -56,7 +56,7 @@ const baseSeason = {
     id: 5,
     name: 'Season 5: Phonic Phenoms',
     theme: 'Phonic Phenoms',
-    imageUrl: '/seasons/season-5-phonic-phenoms.jpg',
+    imageUrl: '/seasons/season-5-phonic-phenoms.webp',
     accentColor: '#FFE135',
     tagline: 'Sound is the new strategy',
     gridSkinClass: 'season-skin-phonic',
@@ -77,7 +77,7 @@ describe('LandingSeasonHero', () => {
     render(<LandingSeasonHero />);
     const img = screen.getByTestId('season-hero-image');
     expect(img).toBeInTheDocument();
-    expect(img).toHaveAttribute('src', '/seasons/season-5-phonic-phenoms.jpg');
+    expect(img).toHaveAttribute('src', '/seasons/season-5-phonic-phenoms.webp');
   });
 
   it('renders the season name with number and theme', () => {

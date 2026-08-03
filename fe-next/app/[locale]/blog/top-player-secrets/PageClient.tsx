@@ -120,6 +120,7 @@ export default function SecretsPageClient(): React.ReactElement {
               src="/images/blog/top-secrets.jpg"
               alt="Competitive word game tournament with focused players"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

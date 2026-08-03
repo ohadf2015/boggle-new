@@ -121,6 +121,7 @@ export default function StrategiesPageClient(): React.ReactElement {
               src="/images/blog/daily-strategies.jpg"
               alt="Word game board with timer showing daily challenge"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

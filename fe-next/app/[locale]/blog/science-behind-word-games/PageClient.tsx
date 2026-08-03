@@ -121,6 +121,7 @@ export default function SciencePageClient(): React.ReactElement {
               src="/images/blog/science-brain.jpg"
               alt="Brain scan visualization showing word processing regions"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

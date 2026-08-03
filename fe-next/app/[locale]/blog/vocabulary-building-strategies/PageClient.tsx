@@ -122,6 +122,7 @@ export default function VocabularyPageClient(): React.ReactElement {
               src="/images/blog/vocabulary-building.jpg"
               alt="Notebook with vocabulary words and a word game board"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

@@ -118,6 +118,7 @@ export default function HebrewGuidePageClient(): React.ReactElement {
               src="/images/blog/hebrew-word-games.jpg"
               alt="Hebrew letter tiles arranged in a word game grid with right-to-left text"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

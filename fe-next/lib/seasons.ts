@@ -71,62 +71,62 @@ interface SeasonCatalogEntry {
 const SEASON_CATALOG: SeasonCatalogEntry[] = [
   {
     theme: 'Word Warriors', tagline: 'Forge your legacy, one word at a time', accentColor: '#BFFF00',
-    imageUrl: '/seasons/season-1-word-warriors.jpg', gridSkinClass: 'season-skin-warrior',
+    imageUrl: '/seasons/season-1-word-warriors.webp', gridSkinClass: 'season-skin-warrior',
     twist: { key: 'double-down', emoji: '⚔️', title: 'Double Down', blurb: 'Long words flex the hardest this season.', scoreMultiplier: 1 },
   },
   {
     theme: 'Letter Legends', tagline: 'Crowns earned, not inherited', accentColor: '#FF1493',
-    imageUrl: '/seasons/season-2-letter-legends.jpg', gridSkinClass: 'season-skin-legend',
+    imageUrl: '/seasons/season-2-letter-legends.webp', gridSkinClass: 'season-skin-legend',
     twist: { key: 'crown-rush', emoji: '👑', title: 'Crown Rush', blurb: 'Every letter is a weapon. Claim the throne.', scoreMultiplier: 1 },
   },
   {
     theme: 'Vocab Victors', tagline: 'Knowledge is your sharpest blade', accentColor: '#00FFFF',
-    imageUrl: '/seasons/season-3-vocab-victors.jpg', gridSkinClass: 'season-skin-vocab',
+    imageUrl: '/seasons/season-3-vocab-victors.webp', gridSkinClass: 'season-skin-vocab',
     twist: { key: 'rare-find', emoji: '💎', title: 'Rare Find', blurb: 'Dust off the rare words — this is their month.', scoreMultiplier: 1 },
   },
   {
     theme: 'Syllable Champions', tagline: 'Rhythm wins rounds', accentColor: '#8B5CF6',
-    imageUrl: '/seasons/season-4-syllable-champions.jpg', gridSkinClass: 'season-skin-syllable',
+    imageUrl: '/seasons/season-4-syllable-champions.webp', gridSkinClass: 'season-skin-syllable',
     twist: { key: 'combo-beat', emoji: '🥁', title: 'Combo Beat', blurb: 'Stack syllables, ride the combo, keep the tempo.', scoreMultiplier: 1 },
   },
   {
     theme: 'Phonic Phenoms', tagline: 'Sound is the new strategy', accentColor: '#FFE135',
-    imageUrl: '/seasons/season-5-phonic-phenoms.jpg', gridSkinClass: 'season-skin-phonic',
+    imageUrl: '/seasons/season-5-phonic-phenoms.webp', gridSkinClass: 'season-skin-phonic',
     twist: { key: 'sound-wave', emoji: '🎧', title: 'Sound Wave', blurb: 'Mix beats and letters into chart-topping plays.', scoreMultiplier: 1 },
   },
   {
     theme: 'Lexicon Lords', tagline: 'Rule the dictionary', accentColor: '#FF6B35',
-    imageUrl: '/seasons/season-6-lexicon-lords.jpg', gridSkinClass: 'season-skin-lexicon',
+    imageUrl: '/seasons/season-6-lexicon-lords.webp', gridSkinClass: 'season-skin-lexicon',
     twist: { key: 'throne-climb', emoji: '🏰', title: 'Throne Climb', blurb: 'Build your throne from every word you know.', scoreMultiplier: 1 },
   },
   {
     theme: 'Frost Lexicon', tagline: 'Cool letters, hot streaks', accentColor: '#7DD3FC',
-    imageUrl: '/seasons/season-7-frost-lexicon.jpg', gridSkinClass: 'season-skin-frost',
+    imageUrl: '/seasons/season-7-frost-lexicon.webp', gridSkinClass: 'season-skin-frost',
     twist: { key: 'frostbite', emoji: '❄️', title: 'Frostbite', blurb: 'Keep your streak warm while the board freezes over.', scoreMultiplier: 1 },
   },
   {
     theme: 'Neon Nights', tagline: 'The board comes alive after dark', accentColor: '#E040FB',
-    imageUrl: '/seasons/season-8-neon-nights.jpg', gridSkinClass: 'season-skin-neon',
+    imageUrl: '/seasons/season-8-neon-nights.webp', gridSkinClass: 'season-skin-neon',
     twist: { key: 'afterglow', emoji: '🌃', title: 'Afterglow', blurb: 'Neon trails follow every word you find.', scoreMultiplier: 1 },
   },
   {
     theme: 'Solar Surge', tagline: 'Burn bright, score brighter', accentColor: '#FF8A00',
-    imageUrl: '/seasons/season-9-solar-surge.jpg', gridSkinClass: 'season-skin-solar',
+    imageUrl: '/seasons/season-9-solar-surge.webp', gridSkinClass: 'season-skin-solar',
     twist: { key: 'heatwave', emoji: '☀️', title: 'Heatwave', blurb: 'The longer your run, the hotter the board glows.', scoreMultiplier: 1 },
   },
   {
     theme: 'Verdant Vault', tagline: 'Grow your lead, word by word', accentColor: '#34D399',
-    imageUrl: '/seasons/season-10-verdant-vault.jpg', gridSkinClass: 'season-skin-verdant',
+    imageUrl: '/seasons/season-10-verdant-vault.webp', gridSkinClass: 'season-skin-verdant',
     twist: { key: 'bloom', emoji: '🌿', title: 'Bloom', blurb: 'Every find plants the next. Watch your score blossom.', scoreMultiplier: 1 },
   },
   {
     theme: 'Cosmic Cipher', tagline: 'Decode the stars', accentColor: '#818CF8',
-    imageUrl: '/seasons/season-11-cosmic-cipher.jpg', gridSkinClass: 'season-skin-cosmic',
+    imageUrl: '/seasons/season-11-cosmic-cipher.webp', gridSkinClass: 'season-skin-cosmic',
     twist: { key: 'stardust', emoji: '🪐', title: 'Stardust', blurb: 'Letters drift like constellations across the grid.', scoreMultiplier: 1 },
   },
   {
     theme: 'Crimson Crown', tagline: 'The final ascent', accentColor: '#FB7185',
-    imageUrl: '/seasons/season-12-crimson-crown.jpg', gridSkinClass: 'season-skin-crimson',
+    imageUrl: '/seasons/season-12-crimson-crown.webp', gridSkinClass: 'season-skin-crimson',
     twist: { key: 'final-bell', emoji: '🔔', title: 'Final Bell', blurb: 'The year closes — every point writes the record books.', scoreMultiplier: 1 },
   },
 ];

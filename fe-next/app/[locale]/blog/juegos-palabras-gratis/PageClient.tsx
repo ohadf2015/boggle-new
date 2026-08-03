@@ -107,6 +107,7 @@ export default function JuegosPalabrasGratisPageClient(): React.ReactElement {
               src="/images/blog/juegos-palabras-gratis.jpg"
               alt="Una pantalla de celular mostrando un juego de palabras en español con la palabra del día"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

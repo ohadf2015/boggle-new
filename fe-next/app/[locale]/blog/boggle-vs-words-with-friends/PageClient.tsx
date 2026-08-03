@@ -106,6 +106,7 @@ export default function BoggleVsWwfPageClient(): React.ReactElement {
               src="/images/blog/boggle-vs-wwf.jpg"
               alt="Split screen showing a Boggle grid with timer on the left and Words With Friends board on the right"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

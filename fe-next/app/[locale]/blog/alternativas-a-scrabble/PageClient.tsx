@@ -107,6 +107,7 @@ export default function AlternativasAScrabblePageClient(): React.ReactElement {
               src="/images/blog/alternativas-a-scrabble.jpg"
               alt="Un teléfono con un juego de palabras moderno junto a fichas de letras sobre una mesa"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />

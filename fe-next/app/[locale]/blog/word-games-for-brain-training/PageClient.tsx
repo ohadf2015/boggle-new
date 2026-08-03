@@ -91,6 +91,7 @@ export default function BrainTrainingPageClient(): React.ReactElement {
               src="/images/blog/brain-training-words.jpg"
               alt="Word games and brain training research visualization"
               fill
+              sizes="(min-width: 768px) 736px, calc(100vw - 2rem)"
               className="object-cover"
               priority
             />
