@@ -308,7 +308,15 @@ const CreateRoomModal: React.FC<CreateRoomModalProps> = ({
         </div>
 
         {/* ── CTA ── */}
-        <div className="px-5 pt-1 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom, 1.25rem))' }}>
+        {/* Sticky footer: the dialog body is the scroll container (max-h-90dvh
+            overflow-y-auto), so on short viewports an in-flow CTA ends up below
+            the fold. Worse, the part of the button poking past the dialog box
+            is overlay territory — a center click hit the Radix overlay and
+            DISMISSED the modal instead of creating the room (prod dogfood
+            2026-08-03: "Create Private Battle" dead button). Pinning the CTA to
+            the scrollport bottom keeps it fully visible and clickable at any
+            viewport height, same pattern as JoinRoomModal's DialogFooter. */}
+        <div className="sticky bottom-0 z-10 bg-inherit px-5 pt-1 animate-in fade-in-0 slide-in-from-bottom-2 duration-300" style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom, 1.25rem))' }}>
           <button
             type="button"
             onClick={handleCreate}
