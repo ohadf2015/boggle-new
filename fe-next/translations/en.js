@@ -2637,6 +2637,7 @@ const en = {
     },
     "ftue": {
       "swipeToConnect": "Swipe to connect letters!",
+      "playNow": "Skip → Play Now",
       "findMultipleWords": "Find 3 words. Swipe to spell.",
       "wordsFound": "{{count}}/3 words found",
       "amazing": "AMAZING!",

@@ -3141,6 +3141,7 @@ const he = {
     },
     "ftue": {
       "swipeToConnect": "החליקו לחיבור אותיות!",
+      "playNow": "דלגו ושחקו עכשיו",
       "findMultipleWords": "מצאו 3 מילים. החליקו לאיות.",
       "wordsFound": "{{count}}/3 מילים נמצאו",
       "amazing": "מדהים!",

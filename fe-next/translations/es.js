@@ -5188,6 +5188,7 @@ const es = {
     },
     "ftue": {
       "swipeToConnect": "¡Desliza para conectar letras!",
+      "playNow": "Saltar → Jugar ahora",
       "findMultipleWords": "Encuentra 3 palabras. Desliza para deletrear.",
       "wordsFound": "{{count}}/3 palabras encontradas",
       "amazing": "¡INCREÍBLE!",

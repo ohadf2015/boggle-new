@@ -4380,6 +4380,7 @@ const ru = {
     },
     "ftue": {
       "swipeToConnect": "Свайп для соединения букв!",
+      "playNow": "Пропустить → Играть",
       "findMultipleWords": "Найди 3 слова. Свайпни, чтобы написать.",
       "wordsFound": "{{count}}/3 слов найдено",
       "amazing": "ПОТРЯСАЮЩЕ!",
