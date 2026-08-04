@@ -11,14 +11,31 @@
  * ingest only, rate-limited upstream) — safe to ship client-side by design,
  * same exposure model as every feedback-devtools customer embed.
  *
- * Placed data-side="left" so the launcher never overlaps the in-app
- * FeedbackFab (bottom-right) or the global bottom nav.
+ * This is the app's SINGLE feedback entry point (the old in-app FeedbackFab
+ * was removed). The launcher is themed to LexiClash neo-brutalism: neo-yellow
+ * fill, dark neo-black text (contrast), thick border + hard offset shadow,
+ * Fredoka font. On mobile (<=480px) the widget collapses to a small icon-only
+ * chip — no label text.
  *
  * SECURITY: All attribute values are static string literals — no user input.
  */
 
 import Script from 'next/script';
 import type { ReactNode } from 'react';
+
+// LexiClash brand tokens (see app/globals.css: --neo-yellow, --neo-black).
+// --neo-black is rgb(58 50 42) in the dark theme.
+const NEO_YELLOW = '#ffe135';
+const NEO_BLACK = '#3a322a';
+
+const LEXICLASH_THEME = JSON.stringify({
+    accent: NEO_YELLOW,
+    accentFg: NEO_BLACK,
+    launcherBorder: `3px solid ${NEO_BLACK}`,
+    launcherShadow: `2px 2px 0 ${NEO_BLACK}`,
+    launcherShadowHover: `3px 3px 0 ${NEO_BLACK}`,
+    font: 'Fredoka, Rubik, sans-serif',
+});
 
 export default function FeedbackDevtoolsWidget(): ReactNode {
     return (
@@ -28,7 +45,7 @@ export default function FeedbackDevtoolsWidget(): ReactNode {
             data-token="fdt_28ac691a628a0f801bdc8044d9783d105ec5d72bb85d62a2"
             data-side="left"
             data-label="Feedback"
-            data-accent="#ffe135"
+            data-theme={LEXICLASH_THEME}
             data-dir="auto"
             data-app-version="web"
             strategy="afterInteractive"
