@@ -12,6 +12,7 @@ vi.mock('@/utils/growthTracking', () => ({
   trackOnboardingStep: vi.fn(),
   trackOnboardingCompleted: vi.fn(),
   trackOnboardingSkipped: vi.fn(),
+  trackOnboardingQuickPlay: vi.fn(),
   trackInviteTutorialSkipped: vi.fn(),
   trackInviteConsumed: vi.fn(),
 }));
@@ -86,8 +87,11 @@ vi.mock('../ReturningUserStep', () => ({
 
 vi.mock('../LanguageSelect', () => ({
   __esModule: true,
-  default: ({ onSelect }: any) => (
-    <button data-testid="lang-btn" onClick={onSelect}>lang</button>
+  default: ({ onSelect, onPlayNow }: any) => (
+    <>
+      <button data-testid="lang-btn" onClick={onSelect}>lang</button>
+      {onPlayNow && <button data-testid="lang-play-now" onClick={onPlayNow}>play-now</button>}
+    </>
   ),
 }));
 
@@ -143,6 +147,7 @@ import OnboardingFlow from '../OnboardingFlow';
 import {
   trackOnboardingStart,
   trackOnboardingStep,
+  trackOnboardingQuickPlay,
 } from '@/utils/growthTracking';
 
 describe('OnboardingFlow analytics', () => {
@@ -203,5 +208,26 @@ describe('OnboardingFlow analytics', () => {
     expect(emitted).not.toContain('profile');
     expect(emitted).not.toContain('style');
     expect(emitted).not.toContain('tutorial');
+  });
+
+  // D1-retention lever: every FTUE exit that lands in an auto-started
+  // practice game must fire onboarding_quick_play so the lift is measurable
+  // against the return-visit funnel.
+  it('fires onboarding_quick_play (source=quick_start) when the one-screen PLAY starts a practice game', () => {
+    render(<OnboardingFlow onComplete={vi.fn()} />);
+    advanceToQuickStart();
+    play();
+    expect(trackOnboardingQuickPlay).toHaveBeenCalledTimes(1);
+    expect(trackOnboardingQuickPlay).toHaveBeenCalledWith({ source: 'quick_start' });
+  });
+
+  it('fires onboarding_quick_play (source=ftue_skip) when Play Now bails out of the language step', () => {
+    // Pending room invite forces the language-first flow, where the
+    // "Skip → Play Now" escape lives.
+    mockGetPendingRoom.mockReturnValue({ code: 'ROOM1', hostName: 'Host' });
+    render(<OnboardingFlow onComplete={vi.fn()} />);
+    fireEvent.click(screen.getByTestId('lang-play-now'));
+    expect(trackOnboardingQuickPlay).toHaveBeenCalledTimes(1);
+    expect(trackOnboardingQuickPlay).toHaveBeenCalledWith({ source: 'ftue_skip', at_step: 'language' });
   });
 });

@@ -149,6 +149,7 @@ export type GrowthEvent =
   | 'onboarding_first_word_found'
   | 'onboarding_completed'
   | 'onboarding_skipped'
+  | 'onboarding_quick_play'
   // Modals / confirmation dialogs
   | 'modal_interaction'
   // Friction / engagement
@@ -346,6 +347,9 @@ const CANONICAL_DUAL_EMIT: ReadonlySet<GrowthEvent> = new Set<GrowthEvent>([
   'first_win_signup_completed',
   // collect-revenue.sh queries unprefixed 'rewarded_ad_watched' — must dual-emit
   'rewarded_ad_watched',
+  // D1-retention lever: FTUE → auto-start practice game. Queried unprefixed
+  // against the t_cce75cc7 return-visit funnel.
+  'onboarding_quick_play',
 ]);
 
 /**
@@ -1342,6 +1346,20 @@ export const trackOnboardingSkipped = (
   extras: { at_step: OnboardingStep | 'unknown'; duration_ms: number } & Record<string, unknown>,
 ): void => {
   trackGrowthEvent('onboarding_skipped', extras);
+};
+
+/**
+ * Onboarding quick-play — fires when the user takes the FTUE fast lane that
+ * lands them in an auto-started classic practice game with zero extra taps:
+ * the one-screen quickStart PLAY, the "Skip → Play Now" escape on any FTUE
+ * step, or style-step completion (all route to /practice/classic?play=1).
+ * `source` discriminates which entry fired it. This is the D1-retention
+ * experiment metric — pair with the return_visit funnel from t_cce75cc7.
+ */
+export const trackOnboardingQuickPlay = (
+  extras: { source: 'quick_start' | 'ftue_skip' | 'style_complete' } & Record<string, unknown>,
+): void => {
+  trackGrowthEvent('onboarding_quick_play', extras);
 };
 
 /** Modal action discriminator for funnel analysis. */

@@ -3372,6 +3372,7 @@ const sv = {
     },
     "ftue": {
       "swipeToConnect": "Svep för att koppla bokstäver!",
+      "playNow": "Hoppa över → Spela nu",
       "findMultipleWords": "Hitta 3 ord. Svep för att stava.",
       "wordsFound": "{{count}}/3 ord hittade",
       "amazing": "FANTASTISKT!",

@@ -108,4 +108,18 @@ describe('trackGrowthEvent — canonical dual-emit', () => {
     expect(names).toContain('growth:rewarded_ad_watched');
     expect(names).toContain('rewarded_ad_watched');
   });
+
+  // D1-retention lever (t_ced821bf): FTUE → auto-start practice game.
+  // The retention funnel queries the canonical unprefixed event, so
+  // onboarding_quick_play must dual-emit like the other funnel anchors.
+  it('trackOnboardingQuickPlay dual-emits canonical onboarding_quick_play with source', async () => {
+    const { trackOnboardingQuickPlay } = await import('../growthTracking');
+    trackOnboardingQuickPlay({ source: 'quick_start' });
+
+    const names = capture.mock.calls.map(c => c[0]);
+    expect(names).toContain('growth:onboarding_quick_play');
+    expect(names).toContain('onboarding_quick_play');
+    const canonical = capture.mock.calls.find(c => c[0] === 'onboarding_quick_play');
+    expect(canonical?.[1]).toMatchObject({ source: 'quick_start' });
+  });
 });

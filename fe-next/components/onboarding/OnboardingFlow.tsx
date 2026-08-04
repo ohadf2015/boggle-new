@@ -12,6 +12,7 @@ import {
   trackOnboardingStep,
   trackOnboardingCompleted,
   trackOnboardingSkipped,
+  trackOnboardingQuickPlay,
   trackInviteTutorialSkipped,
   trackInviteConsumed,
 } from '@/utils/growthTracking';
@@ -214,6 +215,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     setIsNavigating(true);
     markOnboardingSkipped();
     emitSkipped(step);
+    trackOnboardingQuickPlay({ source: 'ftue_skip', at_step: step });
     router.push(`/${language}/practice/classic?play=1&firstGame=1`);
     onComplete();
   }, [isNavigating, language, router, onComplete, emitSkipped, step]);
@@ -295,6 +297,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     } else {
       // 🎯 Route FTUE completers straight into a practice game — eliminates
       // the 2-tap dead zone between onboarding and first play.
+      trackOnboardingQuickPlay({ source: 'style_complete' });
       router.push(`/${language}/practice/classic?play=1&firstGame=1`);
     }
     emitCompleted({ via: 'style' });
@@ -332,6 +335,7 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
           ? `/${language}/multiplayer?room=${pendingRoom}`
           : `/${language}/practice/classic?play=1`,
       );
+      if (!pendingRoom) trackOnboardingQuickPlay({ source: 'quick_start' });
       emitCompleted({ via: 'quick_start' });
       onComplete();
     },

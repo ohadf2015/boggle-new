@@ -3098,6 +3098,7 @@ const ja = {
     },
     "ftue": {
       "swipeToConnect": "スワイプで文字をつなげよう！",
+      "playNow": "スキップ → 今すぐプレイ",
       "findMultipleWords": "3単語を見つけよう。スワイプで綴る。",
       "wordsFound": "{{count}}/3 単語発見",
       "amazing": "すごい！",
