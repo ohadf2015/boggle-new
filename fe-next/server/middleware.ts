@@ -177,7 +177,11 @@ function cacheHeaders(): RequestHandler {
   return (req: Request, res: Response, next: NextFunction): void => {
     const path = req.path;
     
-    if (path.startsWith('/_next/static/') || STATIC_ASSET_RE.test(path)) {
+    if (path === '/widget.js' || path === '/sw.js') {
+      // Non-fingerprinted entry points that MUST revalidate — a stale cached
+      // widget.js silently freezes the feedback button for returning users.
+      res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+    } else if (path.startsWith('/_next/static/') || STATIC_ASSET_RE.test(path)) {
       res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     } else if (path === '/api/dictionary-words') {
       // Next.js route handler sets its own long-lived Cache-Control + ETag and
