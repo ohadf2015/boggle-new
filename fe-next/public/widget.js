@@ -68,11 +68,15 @@ ${(t.stack||"").slice(0,300)}`;if(typeof t=="string")return t;try{return JSON.st
 .fdw-launcher:hover { box-shadow: var(--fdt-launcher-shadow-hover, 0 6px 20px rgba(0,0,0,.35)); transform: translateY(-1px); }
 .fdw-launcher:active { cursor: grabbing; }
 .fdw-launcher:focus-visible { outline: 3px solid var(--fdt-accent, #93c5fd); outline-offset: 2px; }
-/* Mobile: icon-only chip \u2014 no label text, much smaller footprint. */
-@media (max-width: 480px) {
-  .fdw-launcher { padding: 8px; gap: 0; }
+/* Mobile: icon-only chip \u2014 no label text, compact round tap target.
+   Breakpoint is 600px (not 480px): many 1080px-wide Android phones render at
+   DPR 2 -> 540 CSS px, which slipped past a 480px query and kept the full-size
+   labelled pill on phones. 600px reliably catches portrait phones without
+   touching tablets/desktop. */
+@media (max-width: 600px) {
+  .fdw-launcher { padding: 10px; gap: 0; border-radius: 999px; }
   .fdw-launcher .fdw-label { display: none; }
-  .fdw-launcher svg { width: 16px; height: 16px; }
+  .fdw-launcher svg { width: 18px; height: 18px; }
 }
 
 .fdw-overlay {
