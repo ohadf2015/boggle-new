@@ -1996,3 +1996,10 @@ These flags are NOT in experiments.ts and are known zombies — separate from th
   - status: reviewed, no action — matches known allowlist, skip
 - [Sentry] "CapacitorGameConnect.then() is not implemented on android" — reach 7
   - status: reviewed, no action — known/tracked in `.claude/notes/android-release-status.md` (native PGS bridge not device-verified yet, expected until a signed device build lands)
+
+## 2026-08-04
+- [PostHog|Sentry|Supabase] Remaining brief items not reached this run
+  - React #418 (2 issues, occurrences 3 + 2), Connection-closed (Sentry JAVASCRIPT-NEXTJS-1WM), CapacitorGameConnect.then() not implemented on android (Sentry -1PH), Supabase upsert_push_token SECURITY DEFINER executable by authenticated
+  - status: deferred
+  - why: lane time budget consumed restoring+fixing the stale 20260802-010002 drop (score 0.444, top-ranked, restore-first per brief contract)
+  - recommended owner: self (lane 01, next run)

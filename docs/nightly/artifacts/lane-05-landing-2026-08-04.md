@@ -1,0 +1,3 @@
+status: shipped
+files_touched: fe-next/components/drills/PatternSwitcher.tsx, fe-next/components/drills/__tests__/PatternSwitcher.lastLife.test.tsx
+next_steps: eslint-clean on both changed files (npx eslint, zero output). vitest self-check was blocked by the finalize-window test cap (2/2 used) — one run failed on a missing `useLanguageSafe` mock export, fixed by mirroring components/grid/__tests__/DragReleaseHint.test.tsx's mock shape, but the fix itself is unverified by a second run. Gate will run it authoritatively; if dropped, re-check that mock first. Rotation note for tomorrow: brain-drill sub-modes touched recently = lightning-round (07-31), pattern-switcher (tonight) — rotate to memory-hunt or combo-master next.

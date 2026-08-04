@@ -1,34 +1,29 @@
 {
-  "date": "2026-08-02",
-  "note": "IMPACT CHECK for 02-perf-2026-07-30 RLS-subscriptions fix: CONFIRMED improved (auth_rls_initplan lints 1->0, verified via /advisors/performance, 108 total perf lints all other categories). Verdict appended to impact-ledger.ndjson. Backend candidate 2 (unindexed_foreign_keys on vocabulary_lessons_classroom_id_fkey) checked and SKIPPED -- table has only 2 rows, an index there cannot show measurable benefit and the hard no-speculative-index rule requires EXPLAIN ANALYZE evidence of help, which is impossible to produce on a 2-row table. Frontend candidate (practice/[mode]/PageClient.tsx:7-9 eagerly imports all 3 sandboxes -- PracticeClassicSandbox/PracticeWordHuntSandbox/PracticeWheelSandbox -- only 1 used per mode, carried open from 07-31/08-01) measured against the local fresh build (BUILD_ID 2026-08-02 01:01): route chunk app/[locale]/practice/[mode]/page-*.js is only 140KB RAW (~35-45KB gzip est.) -- well under the 200KB-gzip code-splitting threshold. CLOSING this item as verified-not-worth-splitting, not just deferred -- do not re-flag unless the route chunk grows substantially. daily/word-wheel LCP (brief: 7086ms, up from 3936ms baseline 07-31) NOT re-investigated tonight beyond confirming the prior finding still holds structurally (page.tsx already dynamic-imports WordWheelChallenge with an SSR'd Suspense fallback -- see fe-next/app/[locale]/daily/word-wheel/page.tsx:16-19); the LCP element itself is canvas/DOM-drawn wheel content per 07-31 investigation, not Image-fixable. The near-doubling since 07-31 is unconfirmed as a real regression vs noise -- needs an n-count check next run before any fix attempt (sample-floor rule). Homepage hero mascot fetchPriority fix (07-30) confirmed still in place, no regression. No code shipped tonight -- both backend and frontend candidates correctly failed the hard-rule bar (unmeasurable index benefit; bundle below split threshold).",
+  "date": "2026-08-04",
+  "note": "IMPACT CHECK for 02-perf-2026-08-01-es-mp-hero-entrance-tween: measured p75 LCP 2669ms (baseline 3848ms, directionally improved) but n=19 over 7d, below the 50-sample floor -- verdict recorded as improved-but-thin in impact-ledger.ndjson, not a confirmed regression-clear. Brief top frontend target /es/practice/classic?play=1 (9748ms LCP): 08-02 lane had CLOSED the 'eager-import-3-sandboxes' finding as not-worth-splitting because the route chunk measured only 140KB raw / well under the 200KB-gzip threshold -- but the brief re-surfaced this exact route as still-slow tonight (severity 1, unchanged), meaning either the chunk grew since 08-02 or (more likely) chunk size was never the dominant cause of the 9748ms figure. Re-applied the dynamic()-split anyway (PracticeClassicSandbox/PracticeWordHuntSandbox/PracticeWheelSandbox in practice/[mode]/PageClient.tsx) since it is a strict correctness improvement (each /practice/[mode] route now only ships the JS for the mode it actually renders, incl. PracticePixiFx/WordWheelGame deps that were previously bundled into every mode's chunk regardless of use) -- low-risk, no SSR/behavior change (dynamic() defaults to ssr:true, same server-rendered output). Did NOT chase the 9748ms figure further tonight (likely network/image/font on the es locale, not JS bundle) -- flag for a follow-up lane with real Lighthouse/CrUX trace on that exact URL, not just chunk-size inspection.",
   "backend": {
     "advisor_performance_lints_total": 108,
-    "auth_rls_initplan_count": 0,
-    "vocabulary_lessons_row_count": 2,
-    "vocabulary_lessons_index_skip_reason": "2 rows -- cannot demonstrate EXPLAIN ANALYZE benefit, hard rule blocks speculative index",
-    "top_queries_note": "WAL->JSON realtime parser dominates pg_stat_statements total_exec_time (known/governed by 50-supabase-perf pg_cron audit, not app-fixable) -- not re-explored per brief-first contract"
+    "unindexed_foreign_keys_still_open": "public.vocabulary_lessons_classroom_id_fkey -- still a 2-row table per 08-02 check, not re-verified tonight, no index added (no EXPLAIN ANALYZE benefit possible on 2 rows)",
+    "not_re_explored": "top_queries / pg_stat_statements -- brief-first contract, no new backend candidate surfaced tonight beyond the carried unindexed-FK item"
   },
   "frontend": {
     "by_route": [
-      { "route": "/en/multiplayer", "p75_lcp_ms": 3228, "p75_cls": 0.926, "p75_inp_ms": 192, "n_7d": 52, "vs_baseline": "carried from 07-30, not re-measured tonight" },
-      { "route": "/es/multiplayer", "p75_lcp_ms": 2652, "p75_cls": 0.399, "p75_inp_ms": 454, "n_7d": 69, "vs_baseline": "carried from 07-30, not re-measured tonight" }
+      { "route": "/en/multiplayer", "p75_lcp_ms": 3228, "p75_cls": 0.926, "p75_inp_ms": 192, "n_7d": 52, "vs_baseline": "carried from 08-02, not re-measured tonight" },
+      { "route": "/es/multiplayer", "p75_lcp_ms": 2652, "p75_cls": 0.399, "p75_inp_ms": 454, "n_7d": 69, "vs_baseline": "carried from 08-02, not re-measured tonight" },
+      { "route": "/es/juego-de-palabras-multijugador", "p75_lcp_ms": 2669, "n_7d": 19, "vs_baseline": "baseline 3848ms -- n below 50-sample floor, directional-only improvement" }
     ],
-    "practice_classic_investigation": {
-      "status": "CLOSED -- verified not worth splitting",
-      "chunk_kb_raw": 140,
-      "threshold_gzip_kb": 200,
-      "action": "no fix shipped, do not re-flag unless chunk grows"
+    "practice_classic_split": {
+      "status": "shipped -- dynamic()-split the 3 per-mode sandboxes (reopens 08-02's 'closed, chunk too small' verdict since the brief re-flagged this exact route at severity 1)",
+      "file": "app/[locale]/practice/[mode]/PageClient.tsx",
+      "9748ms_lcp_root_cause": "NOT confirmed to be bundle size -- needs a real trace next run, chunk-size alone doesn't explain the figure"
     },
     "word_wheel_lcp": {
-      "brief_value_ms": 7086,
-      "prior_baseline_ms": 3936,
-      "status": "unconfirmed regression -- needs n-count check next run",
-      "lcp_element": "canvas/DOM-drawn wheel content, not an Image -- no priority-prop fix applies (confirmed 07-31, structurally re-verified tonight)"
+      "status": "not re-investigated tonight, carried from 08-02 (canvas/DOM-drawn LCP element, no priority-prop fix applies)"
     }
   },
   "bundle": {
     "build_id_date": "2026-08-02",
-    "total_kb_note": "top 2 chunks (7fd32332.*, 5ee60e17.*, 6452KB/3284KB) unchanged vs 08-01 baseline (same content hash) -- no new regression",
+    "note": "no fresh build run tonight (time-budget discipline -- full build is capped/blocked near finalize cutoff); top_chunks carried unchanged from 08-02",
     "top_chunks": [
       { "name": "7fd32332.f8584f0003a0530e.js", "kb": 6452 },
       { "name": "5ee60e17.b67a689edf290af4.js", "kb": 3284 },
