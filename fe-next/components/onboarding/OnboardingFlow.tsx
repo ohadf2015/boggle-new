@@ -277,8 +277,9 @@ const OnboardingFlow: React.FC<OnboardingFlowProps> = ({ onComplete }) => {
     [recordStep, isInviteMode, isNavigating]
   );
 
-  // Final step: style picked (or skipped) → finish onboarding and route to the
-  // Daily Challenge (the priority first game, not Practice). The StylePicker
+  // Final step: style picked (or skipped) → finish onboarding and route
+  // straight into an auto-started classic practice game (D1-retention lever —
+  // no Daily Challenge mode-picker detour). The StylePicker
   // already persisted the chosen style; this only records completion and navigates.
   const handleStyleComplete = useCallback(() => {
     if (isNavigating) return;
