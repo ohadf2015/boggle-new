@@ -19,8 +19,19 @@
  * portrait phones: many 1080px-wide Android devices render at DPR 2 -> 540 CSS
  * px, which slipped past a 480px query and kept the oversized labelled pill.
  *
+ * CACHE-BUSTING: widget.js was previously served with `immutable, max-age=1yr`,
+ * which froze it in returning users' browsers — the neo-brutalist restyle and
+ * the mobile icon-only collapse never reached them (they kept seeing the old
+ * oversized, default-themed, text-labelled pill). The middleware now serves it
+ * `must-revalidate`, but an ALREADY-cached immutable copy is never revalidated,
+ * so the only reliable escape is a fresh URL. WIDGET_VERSION is appended as a
+ * `?v=` query the frozen cache entry does not cover — bump it whenever
+ * public/widget.js changes to force every browser to re-fetch.
+ *
  * SECURITY: All attribute values are static string literals — no user input.
  */
+// Bump on every public/widget.js change to bust returning users' frozen cache.
+const WIDGET_VERSION = '2';
 
 import Script from 'next/script';
 import type { ReactNode } from 'react';
@@ -43,7 +54,7 @@ export default function FeedbackDevtoolsWidget(): ReactNode {
     return (
         <Script
             id="fdw-widget"
-            src="/widget.js"
+            src={`/widget.js?v=${WIDGET_VERSION}`}
             data-token="fdt_28ac691a628a0f801bdc8044d9783d105ec5d72bb85d62a2"
             data-side="left"
             data-label="Feedback"
