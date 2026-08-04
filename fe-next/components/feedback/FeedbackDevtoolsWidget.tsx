@@ -14,8 +14,10 @@
  * This is the app's SINGLE feedback entry point (the old in-app FeedbackFab
  * was removed). The launcher is themed to LexiClash neo-brutalism: neo-yellow
  * fill, dark neo-black text (contrast), thick border + hard offset shadow,
- * Fredoka font. On mobile (<=480px) the widget collapses to a small icon-only
- * chip — no label text.
+ * Fredoka font. On mobile (<=600px) the widget collapses to a small icon-only
+ * chip — no label text. The 600px breakpoint (not 480px) reliably catches
+ * portrait phones: many 1080px-wide Android devices render at DPR 2 -> 540 CSS
+ * px, which slipped past a 480px query and kept the oversized labelled pill.
  *
  * SECURITY: All attribute values are static string literals — no user input.
  */
