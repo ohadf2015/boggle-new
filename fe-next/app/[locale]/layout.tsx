@@ -34,11 +34,6 @@ import type { Language } from '@/shared/types/game';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic } from '../fonts';
 
-// Dynamic import for EmailCaptureModal (shown conditionally, not needed immediately)
-const EmailCaptureModal = nextDynamic(() => import('@/components/EmailCaptureModal'), {
-  loading: () => null,
-});
-
 // Lazy-load push notification prompt — shown after engagement threshold
 const PushNotificationPrompt = nextDynamic(
   () => import('@/components/notifications/PushNotificationPrompt'),
@@ -727,7 +722,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     <AndroidInstallPill />
                     <PWAInstallPrompt />
                     <PushNotificationPrompt />
-                    <EmailCaptureModal />
                     <NewYearCountdown />
                     <CookieConsent />
                     {/* Single feedback entry point: feedback.devtools shared widget —
