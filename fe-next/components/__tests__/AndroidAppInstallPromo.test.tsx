@@ -17,12 +17,16 @@ vi.mock('next/image', () => ({
   ),
 }));
 
+// Mutable so a test can flip the Capacitor bridge on AFTER mount, reproducing
+// the remote-URL WebView race. (Name must be `mock*` to survive vi.mock hoisting.)
+let mockNative = false;
+
 // Keep the pure gate + isAndroidBrowser real; stub only the environment probes.
 vi.mock('@/utils/androidApp', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../../utils/androidApp')>();
   return {
     ...actual,
-    isCapacitorNative: () => false,
+    isCapacitorNative: () => mockNative,
     isStandaloneDisplay: () => false,
     hasLexiClashInstalled: () => Promise.resolve(false),
   };
@@ -41,6 +45,7 @@ beforeEach(() => {
   localStorage.clear();
   sessionStorage.clear();
   useAndroidInstallStore.setState({ open: false, source: 'auto_popup', pillVisible: false });
+  mockNative = false;
   setUA(ANDROID_UA);
   Object.defineProperty(window, 'location', {
     value: { href: 'https://www.lexiclash.live/' },
@@ -157,6 +162,27 @@ describe('AndroidAppInstallPromo', () => {
       await vi.runAllTimersAsync();
     });
     expect(screen.queryByText('androidAppPromo.title')).not.toBeInTheDocument();
+  });
+
+  it('does not open on native when the Capacitor bridge registers after mount', async () => {
+    // Remote-URL WebView race: the bridge is absent at mount (looks like web),
+    // so the countdown arms — but it registers before the delay elapses. The
+    // fire-time re-check must catch it so the popup never opens in the app.
+    mockNative = false;
+    render(<AndroidAppInstallPromo />);
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    tap();
+    // Bridge finishes registering during the show delay.
+    mockNative = true;
+    await act(async () => {
+      await vi.runAllTimersAsync();
+    });
+    expect(screen.queryByText('androidAppPromo.title')).not.toBeInTheDocument();
+    expect(captureMock).not.toHaveBeenCalledWith('android_install_promo_shown', {
+      source: 'auto_popup',
+    });
   });
 
   it('LCP guard: never opens for a passive visitor, opens after first interaction', async () => {

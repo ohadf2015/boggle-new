@@ -95,6 +95,11 @@ export default function AndroidAppInstallPromo() {
         if (cancelled || timer) return;
         timer = setTimeout(() => {
           if (cancelled) return;
+          // Re-check the native shell at fire time: on the remote-URL WebView,
+          // `window.Capacitor` can still be absent at mount (when `baseInput`
+          // was captured), so the bridge may only register during this delay.
+          // Without this, the app would flash the popup. (Class 1 / Class 3.)
+          if (isCapacitorNative()) return;
           sessionStorage.setItem(SESSION_FLAG, '1');
           openPromo('auto_popup');
           trackInstallPromoShown('auto_popup');
