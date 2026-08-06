@@ -10,104 +10,25 @@ import { checkApiRateLimit, rateLimitResponse } from '@/lib/apiRateLimit';
 import { createClient } from '@supabase/supabase-js';
 import { captureApiError } from '@/utils/sentry';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
+import {
+  getEnglishWordSet,
+  getSpanishBaseWordSet,
+  getHebrewWordSet,
+  getSwedishWordSet,
+} from '@/lib/server/sharedWordSets';
 import * as fs from 'fs';
 import * as path from 'path';
 
-// Lazy-loaded dictionaries for all languages (populated on first request)
-let englishDictionary: Set<string> | null = null;
-let spanishDictionary: Set<string> | null = null;
-let hebrewDictionary: Set<string> | null = null;
-let swedishDictionary: Set<string> | null = null;
+// en/es(base)/he/sv are served from the process-wide shared sets so each list
+// exists once in the heap; the loaders below just delegate. Japanese uses
+// kanji_compounds on this path (diverges from the shared hiragana set), so it
+// keeps a local cache. See lib/server/sharedWordSets.ts — OOM 2026-08-06.
 let japaneseDictionary: Set<string> | null = null;
 
-async function loadEnglishDictionary(): Promise<Set<string>> {
-  if (englishDictionary) return englishDictionary;
-  const englishWords = (await import('an-array-of-english-words', { with: { type: 'json' } })).default as string[];
-  englishDictionary = new Set(englishWords.map((w) => w.toLowerCase()));
-  return englishDictionary;
-}
-
-async function loadSpanishDictionary(): Promise<Set<string>> {
-  if (spanishDictionary) return spanishDictionary;
-  const spanishWords = (await import('an-array-of-spanish-words', { with: { type: 'json' } })).default as string[];
-  spanishDictionary = new Set(spanishWords.map((w) => w.toLowerCase()));
-  return spanishDictionary;
-}
-
-function loadHebrewDictionary(): Set<string> {
-  if (hebrewDictionary) return hebrewDictionary;
-
-  hebrewDictionary = new Set<string>();
-  const backendDir = path.join(process.cwd(), 'backend');
-
-  // Load main dictionary
-  const mainFile = path.join(backendDir, 'hebrew_words.txt');
-  if (fs.existsSync(mainFile)) {
-    const content = fs.readFileSync(mainFile, 'utf-8');
-    content.split('\n')
-      .map(w => normalizeHebrewWord(w.trim()))
-      .filter(w => w.length > 0)
-      .forEach(w => hebrewDictionary!.add(w));
-  }
-
-  // Load approved words
-  const approvedFile = path.join(backendDir, 'hebrew_words_approved.txt');
-  if (fs.existsSync(approvedFile)) {
-    const content = fs.readFileSync(approvedFile, 'utf-8');
-    content.split('\n')
-      .map(w => normalizeHebrewWord(w.trim()))
-      .filter(w => w.length > 0)
-      .forEach(w => hebrewDictionary!.add(w));
-  }
-
-  return hebrewDictionary;
-}
-
-function loadSwedishDictionary(): Set<string> {
-  if (swedishDictionary) return swedishDictionary;
-
-  swedishDictionary = new Set<string>();
-
-  // Load from npm package
-  const swedishWordsPath = path.join(process.cwd(), 'node_modules/@arvidbt/swedish-words/out/index.js');
-  if (fs.existsSync(swedishWordsPath)) {
-    const content = fs.readFileSync(swedishWordsPath, 'utf-8');
-    const arrayMatch = content.match(/var swedish_words = \[([\s\S]*?)\];/);
-
-    if (arrayMatch) {
-      const arrayContent = arrayMatch[1];
-      const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
-
-      arrayContent.split(',').forEach(line => {
-        const trimmed = line.trim();
-        if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-          try {
-            // Decode escape sequences
-            const jsonCompatible = trimmed.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
-            const word = JSON.parse(jsonCompatible);
-            if (word && word.length > 1 && validSwedishWordPattern.test(word)) {
-              swedishDictionary!.add(word.toLowerCase());
-            }
-          } catch {
-            // Skip invalid entries
-          }
-        }
-      });
-    }
-  }
-
-  // Load approved words
-  const approvedFile = path.join(process.cwd(), 'backend', 'swedish_words_approved.txt');
-  if (fs.existsSync(approvedFile)) {
-    const content = fs.readFileSync(approvedFile, 'utf-8');
-    content.split('\n')
-      .map(w => w.trim().toLowerCase())
-      .filter(w => w.length > 0)
-      .forEach(w => swedishDictionary!.add(w));
-  }
-
-  return swedishDictionary;
-}
+const loadEnglishDictionary = getEnglishWordSet;
+const loadSpanishDictionary = getSpanishBaseWordSet;
+const loadHebrewDictionary = getHebrewWordSet;
+const loadSwedishDictionary = getSwedishWordSet;
 
 function loadJapaneseDictionary(): Set<string> {
   if (japaneseDictionary) return japaneseDictionary;

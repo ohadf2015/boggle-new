@@ -5,7 +5,12 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
+import {
+  getEnglishWordSet,
+  getSpanishBaseWordSet,
+  getHebrewWordSet,
+  getSwedishWordSet,
+} from '@/lib/server/sharedWordSets';
 
 const cache: Record<string, string[]> = {};
 
@@ -23,16 +28,19 @@ export async function loadDictionaryWords(language: string): Promise<string[]> {
   let result: string[];
 
   switch (language) {
+    // en/he/sv share the process-wide canonical sets (same membership as before);
+    // Array.from() reuses the shared string objects, so only a lightweight pointer
+    // array is per-consumer (see lib/server/sharedWordSets.ts — OOM 2026-08-06).
     case 'en': {
-      const englishWords = require('an-array-of-english-words') as string[];
-      result = englishWords.map(w => w.toLowerCase());
+      result = Array.from(await getEnglishWordSet());
       cache[language] = result;
       return result;
     }
 
     case 'es': {
-      const spanishWords = require('an-array-of-spanish-words') as string[];
-      const wordSet = new Set<string>(spanishWords.map(w => w.toLowerCase()));
+      // Base (shared) + word-solver's community-approved additions, layered on a
+      // copy so the shared base set stays untouched.
+      const wordSet = new Set<string>(await getSpanishBaseWordSet());
       const approvedFile = path.join(process.cwd(), 'backend', 'spanish_words_approved.txt');
       const approvedContent = await readFileIfExists(approvedFile);
       if (approvedContent) {
@@ -48,62 +56,13 @@ export async function loadDictionaryWords(language: string): Promise<string[]> {
     }
 
     case 'he': {
-      const backendDir = path.join(process.cwd(), 'backend');
-      const mainFile = path.join(backendDir, 'hebrew_words.txt');
-      const approvedFile = path.join(backendDir, 'hebrew_words_approved.txt');
-      const wordSet = new Set<string>();
-
-      for (const filePath of [mainFile, approvedFile]) {
-        const content = await readFileIfExists(filePath);
-        if (content) {
-          content
-            .split('\n')
-            .map(w => normalizeHebrewWord(w.trim()))
-            .filter(w => w.length > 0)
-            .forEach(w => wordSet.add(w));
-        }
-      }
-      result = Array.from(wordSet);
+      result = Array.from(getHebrewWordSet());
       cache[language] = result;
       return result;
     }
 
     case 'sv': {
-      const swedishWordsPath = path.join(process.cwd(), 'node_modules/@arvidbt/swedish-words/out/index.js');
-      const approvedFile = path.join(process.cwd(), 'backend', 'swedish_words_approved.txt');
-      const wordSet = new Set<string>();
-      const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
-
-      const content = await readFileIfExists(swedishWordsPath);
-      if (content) {
-        const arrayMatch = content.match(/var swedish_words = \[([\s\S]*?)\];/);
-        if (arrayMatch) {
-          arrayMatch[1].split(',').forEach(line => {
-            const trimmed = line.trim();
-            if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-              try {
-                const jsonCompatible = trimmed.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
-                const word = JSON.parse(jsonCompatible);
-                if (word && word.length > 1 && validSwedishWordPattern.test(word)) {
-                  wordSet.add(word.toLowerCase());
-                }
-              } catch {
-                // Skip invalid entries
-              }
-            }
-          });
-        }
-      }
-
-      const approvedContent = await readFileIfExists(approvedFile);
-      if (approvedContent) {
-        approvedContent
-          .split('\n')
-          .map(w => w.trim().toLowerCase())
-          .filter(w => w.length > 0)
-          .forEach(w => wordSet.add(w));
-      }
-      result = Array.from(wordSet);
+      result = Array.from(getSwedishWordSet());
       cache[language] = result;
       return result;
     }
