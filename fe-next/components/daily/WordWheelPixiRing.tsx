@@ -43,8 +43,21 @@ export default function WordWheelPixiRing({
 
     let destroyed = false;
     let removeRectListeners: (() => void) | null = null;
+    let refreshCanvasRect: (() => void) | null = null;
     let rafId: number | null = null;
     let visibilityPaused = false;
+    // Canvas centre. The wheel box is sized by container queries (`100cqb`) and
+    // `svh` caps, so it resizes AFTER mount — short viewports, orientation
+    // change, or the word-builder row appearing above it. Reading the rect once
+    // in setup() left the canvas at its mount-time size while the letters
+    // re-laid out around a new centre, so every connector line, orbital dot and
+    // centre pulse drew off the tiles (measured: 176px box, 444px canvas).
+    // Kept mutable here and refreshed by the ResizeObserver below.
+    let cx = 0;
+    let cy = 0;
+    let lastW = 0;
+    let lastH = 0;
+    let setupStarted = false;
     // A ref to the per-frame closure so the visibilitychange handler (outer
     // scope) can re-schedule the loop; the closure itself is created inside
     // setup() once Pixi is ready.
@@ -56,6 +69,10 @@ export default function WordWheelPixiRing({
       const w = Math.floor(rect.width);
       const h = Math.floor(rect.height);
       if (w === 0 || h === 0) return;
+      lastW = w;
+      lastH = h;
+      cx = w / 2;
+      cy = h / 2;
 
       await app.init({
         width: w,
@@ -86,6 +103,7 @@ export default function WordWheelPixiRing({
       const canvasEl = app.canvas as HTMLCanvasElement;
       let canvasRect = canvasEl.getBoundingClientRect();
       const refreshRect = () => { canvasRect = canvasEl.getBoundingClientRect(); };
+      refreshCanvasRect = refreshRect;
       window.addEventListener('scroll', refreshRect, { passive: true, capture: true });
       window.addEventListener('resize', refreshRect, { passive: true });
       removeRectListeners = () => {
@@ -99,8 +117,6 @@ export default function WordWheelPixiRing({
       app.stage.addChild(glowGfx, lineGfx, orbitGfx);
 
       let angle = 0;
-      const cx = w / 2;
-      const cy = h / 2;
       let lastTime = performance.now();
 
       const frame = (time: number) => {
@@ -225,7 +241,33 @@ export default function WordWheelPixiRing({
       rafId = requestAnimationFrame(frame);
     };
 
-    setup();
+    // Track the host box for its whole life, not just at mount: it both starts
+    // at 0×0 (setup() bails, and without this nothing would ever retry) and
+    // changes size afterwards (container-query / svh caps, layout shifts above
+    // the wheel). One observer covers both.
+    const syncSize = () => {
+      if (destroyed) return;
+      const rect = el.getBoundingClientRect();
+      const w = Math.floor(rect.width);
+      const h = Math.floor(rect.height);
+      if (w === 0 || h === 0) return;
+      if (!setupStarted) {
+        setupStarted = true;
+        setup();
+        return;
+      }
+      if (w === lastW && h === lastH) return;
+      lastW = w;
+      lastH = h;
+      cx = w / 2;
+      cy = h / 2;
+      try { app.renderer?.resize(w, h); } catch { /* renderer torn down mid-resize */ }
+      refreshCanvasRect?.();
+    };
+
+    const sizeObserver = new ResizeObserver(syncSize);
+    sizeObserver.observe(el);
+    syncSize();
 
     const handleVisibility = () => {
       if (typeof document === 'undefined') return;
@@ -239,6 +281,7 @@ export default function WordWheelPixiRing({
 
     return () => {
       destroyed = true;
+      sizeObserver.disconnect();
       removeRectListeners?.();
       document.removeEventListener('visibilitychange', handleVisibility);
       // Cancel our own pending rAF frame directly, rather than relying solely

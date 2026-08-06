@@ -12,7 +12,9 @@ import { buildQuitDialogConfig } from './survival/quitDialogConfig';
 import logger from '@/utils/logger';
 import WordWheelGame, { type WordWheelGameResult } from './WordWheelGame';
 import WordWheelResults from './WordWheelResults';
-import TabbedDailyLeaderboard from './TabbedDailyLeaderboard';
+const TabbedDailyLeaderboard = dynamic(() => import('./TabbedDailyLeaderboard'), {
+  ssr: false,
+});
 import {
   generateWordWheelPuzzle,
   type WordWheelPuzzle,
@@ -181,19 +183,38 @@ const WordWheelChallenge: React.FC = () => {
   }, [phase, setIsInGame]);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const sizeObserverRef = useRef<ResizeObserver | null>(null);
 
-  // Measure container for effects canvas
-  useEffect(() => {
+  // Measure the stage for the Pixi effects canvas.
+  //
+  // This used to be a `useEffect([])` reading `containerRef.current`. That
+  // effect runs while the component is still in its `loading` early-return
+  // branch — a DIFFERENT element that never carries this ref — so the ref was
+  // null, the measurement silently no-opped, and nothing re-measured once the
+  // stage mounted. The canvas stayed at its 400×600 seed pinned to the stage's
+  // top-left, so every effect spawned at wheel coordinates fell outside it and
+  // no bubbles/particles were ever visible (measured: 1440×813 stage, 400×600
+  // canvas). A callback ref fires when the node actually mounts, and the
+  // observer keeps it correct across resize/orientation changes.
+  const attachContainer = useCallback((node: HTMLDivElement | null) => {
+    containerRef.current = node;
+    sizeObserverRef.current?.disconnect();
+    sizeObserverRef.current = null;
+    if (!node) return;
     const measure = () => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect();
-        setCanvasSize({ width: Math.floor(rect.width), height: Math.floor(rect.height) });
-      }
+      const rect = node.getBoundingClientRect();
+      const width = Math.floor(rect.width);
+      const height = Math.floor(rect.height);
+      if (width === 0 || height === 0) return;
+      setCanvasSize(prev => (prev.width === width && prev.height === height ? prev : { width, height }));
     };
     measure();
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    sizeObserverRef.current = observer;
   }, []);
+
+  useEffect(() => () => sizeObserverRef.current?.disconnect(), []);
 
   // Initialize puzzle
   useEffect(() => {
@@ -522,7 +543,7 @@ const WordWheelChallenge: React.FC = () => {
 
   return (
     <div
-      ref={containerRef}
+      ref={attachContainer}
       data-testid="word-wheel-stage"
       // h-dvh/max-h-dvh pins the stage to exactly one viewport. (The SEO card
       // that used to sit as a sibling below this component was removed on

@@ -11,14 +11,29 @@ import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import WordWheelChallenge from '../WordWheelChallenge';
 
-// --- next/dynamic: render children synchronously ---
+// --- next/dynamic: actually resolve the loader ---
+// TabbedDailyLeaderboard is loaded via dynamic() now, so a stub that renders
+// null would hide the very component under test. React.lazy resolves the real
+// loader, which vi.mock intercepts back to the capture stub below.
 vi.mock('next/dynamic', () => ({
   __esModule: true,
-  default: () => {
-    const Stub = () => null;
+  default: (loader: () => Promise<{ default: React.ComponentType<Record<string, unknown>> }>) => {
+    const Lazy = React.lazy(loader);
+    const Stub = (props: Record<string, unknown>) => (
+      <React.Suspense fallback={null}>
+        <Lazy {...props} />
+      </React.Suspense>
+    );
     Stub.displayName = 'DynamicStub';
     return Stub;
   },
+}));
+
+// The effects canvas is dynamic() too — keep real Pixi out of jsdom.
+vi.mock('../WordWheelEffectsCanvas', () => ({
+  __esModule: true,
+  default: () => null,
+  WordWheelEffectsCanvas: () => null,
 }));
 
 // --- framer-m: pass-through ---

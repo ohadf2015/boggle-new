@@ -30,8 +30,10 @@ const source = readFileSync(
 function tickerBody(src: string): string {
   const start = src.indexOf('const frame = (time: number) => {');
   expect(start).toBeGreaterThan(-1);
-  // Ends at the close of the setup() async fn that wraps the ticker.
-  const end = src.indexOf('    };\n\n    setup();');
+  // Ends where the frame closure is handed to the visibility-resume path —
+  // a stable anchor inside setup(), unlike the old `setup();` call site which
+  // moved when the ResizeObserver took over kicking off setup.
+  const end = src.indexOf('      frameRef = frame;');
   expect(end).toBeGreaterThan(start);
   return src.slice(start, end);
 }
