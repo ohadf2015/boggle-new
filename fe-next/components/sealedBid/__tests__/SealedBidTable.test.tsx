@@ -14,6 +14,7 @@ vi.mock('gsap', () => ({
 
 vi.mock('../../../lib/sealedBid/sp/wager', () => ({
   oddsMultiplier: (word: string) => (word && word.length >= 3 ? 2.5 : 1.5),
+  isHotOdds: (mult: number) => mult >= 4.5,
 }));
 
 vi.mock('../../../contexts/LanguageContext', () => ({

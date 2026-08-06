@@ -317,6 +317,25 @@ describe('gameStateManager', () => {
       expect(gsm.resetGameForNewRound('NOPE')).toBe(false);
     });
 
+    it('clears stale wheelRushState so a reconnect during the between-rounds window cannot rehydrate the prior round', () => {
+      gsm.createGame('G1', defaultCreationData());
+      gsm.addUserToGame('G1', 'P1', 's1');
+      gsm.transitionGameState('G1', 'START');
+      gsm.updateGame('G1', {
+        wheelRushState: {
+          puzzle: { centerLetter: 'A', outerLetters: ['B'], allLetters: ['A', 'B'] },
+          foundWords: { P1: ['AB'] },
+          firstFinders: { AB: 'P1' },
+          startedAt: Date.now(),
+        },
+      });
+      gsm.transitionGameState('G1', 'END');
+
+      gsm.resetGameForNewRound('G1');
+
+      expect(gsm.getGame('G1').wheelRushState).toBeNull();
+    });
+
     it('increments gameSessionId each reset', () => {
       gsm.createGame('G1', defaultCreationData());
       gsm.transitionGameState('G1', 'START');

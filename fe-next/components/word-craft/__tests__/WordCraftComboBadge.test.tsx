@@ -30,4 +30,18 @@ describe('WordCraftComboBadge', () => {
     });
     expect(screen.queryByRole('status')).toBeNull();
   });
+
+  it('stays on the base pink fire tier below the unstoppable threshold', () => {
+    render(<WordCraftComboBadge streak={4} t={t} />);
+    const badge = screen.getByRole('status');
+    expect(badge.className).toContain('bg-neo-pink');
+    expect(badge.textContent).toContain('🔥');
+  });
+
+  it('escalates to the orange "unstoppable" tier at a 5+ streak (variable-reward payoff)', () => {
+    render(<WordCraftComboBadge streak={5} t={t} />);
+    const badge = screen.getByRole('status');
+    expect(badge.className).toContain('bg-neo-orange');
+    expect(badge.textContent).toContain('⚡');
+  });
 });

@@ -1,7 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { trackGrowthEvent } from '@/utils/growthTracking';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -133,6 +135,24 @@ export default function ClassLimitUpsellModal({
               >
                 {t('common.cancel')}
               </Button>
+            </div>
+
+            <div className="border-t-2 border-black/10 pt-4 text-center">
+              <p className="text-xs font-bold text-black/60">
+                {t('education.landing.districtCta.title')} {t('education.landing.districtCta.body')}
+              </p>
+              <Link
+                href={`/${language}/education/for-schools`}
+                onClick={() =>
+                  trackGrowthEvent('landing_cta_clicked', {
+                    cta: 'district_upsell',
+                    source: 'class_limit_modal',
+                  })
+                }
+                className="mt-1 inline-block text-sm font-black text-neo-purple underline underline-offset-2 hover:text-black"
+              >
+                {t('education.landing.districtCta.button')}
+              </Link>
             </div>
           </div>
         </Dialog.Content>

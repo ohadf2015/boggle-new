@@ -157,9 +157,9 @@ const content: Record<EducationLocale, LocaleContent> = {
     ],
   },
   es: {
-    metaTitle: 'Juegos para Aprender Inglés Gratis Online — ESL | LexiClash',
-    metaDescription: 'Aprende inglés con juegos en vivo: vocabulario, ortografía, lectura. Gratis para estudiantes. Sala en 10 seg, sin descarga, 5 idiomas.',
-    ogTitle: 'Juegos de Inglés Gratis',
+    metaTitle: 'Juegos de Vocabulario en Inglés Gratis Online — ESL | LexiClash',
+    metaDescription: 'Juegos de vocabulario en inglés gratis y en vivo — ortografía, lectura, fluidez. Gratis para estudiantes. Sala en 10 seg, sin descarga, 5 idiomas.',
+    ogTitle: 'Juegos de Vocabulario en Inglés Gratis',
     ogDescription: 'Juegos de palabras en vivo para estudiantes de inglés. Cuentas gratis, 5 diccionarios, panel de maestro.',
     twitterDescription: 'Juegos de inglés multijugador gratis para la clase.',
     heroTag: '★ Inglés ESL/EFL ★ Gratis Siempre ★',
@@ -218,6 +218,10 @@ const content: Record<EducationLocale, LocaleContent> = {
       {
         q: '¿En programas bilingües?',
         a: 'Sí. 5 diccionarios: inglés, español, hebreo, sueco, japonés. Perfecto para inmersión.',
+      },
+      {
+        q: '¿Cuáles son los mejores juegos de vocabulario en inglés?',
+        a: 'Word Wheel y Boggle son los juegos de vocabulario en inglés más completos de LexiClash: cada palabra hallada suma al conteo de aciertos, y el panel de maestro marca los términos que más cuestan a la clase — ideal para repasar vocabulario jugando, gratis y sin descargas.',
       },
     ],
   },

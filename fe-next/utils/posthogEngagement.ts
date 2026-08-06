@@ -164,6 +164,26 @@ export function trackModalDismissed(args: {
   );
 }
 
+/** Room-list card tapped to join a public MP room. */
+export function trackMpRoomJoinClicked(args: { gameMode: string }): void {
+  safe(() =>
+    (posthog.capture as PHFn)('mp_room_join_clicked', {
+      game_mode: args.gameMode,
+    })
+  );
+}
+
+/** A room-card tap was suppressed because a join was already in flight —
+ *  the rage-click signal this guard exists to kill. Non-zero volume here
+ *  means players are still tapping through the disabled state. */
+export function trackMpRoomJoinBlocked(args: { gameMode: string }): void {
+  safe(() =>
+    (posthog.capture as PHFn)('mp_room_join_blocked', {
+      game_mode: args.gameMode,
+    })
+  );
+}
+
 /** MP drag-FTUE lifecycle: shown when 20s idle hits; dismissed when user
  *  taps the close button, hits Esc, or any pointer activity / first word. */
 export function trackMpFtue(args: {

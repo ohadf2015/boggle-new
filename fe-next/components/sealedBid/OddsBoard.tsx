@@ -3,7 +3,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import gsap from 'gsap';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { oddsMultiplier } from '@/lib/sealedBid/sp/wager';
+import { oddsMultiplier, isHotOdds } from '@/lib/sealedBid/sp/wager';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 export interface OddsBoardProps {
@@ -30,6 +30,7 @@ export default function OddsBoard({
   const shouldShow = Boolean(word && word.length >= 3);
   const mult = shouldShow ? oddsMultiplier(word) : 1.5;
   const payout = shouldShow ? Math.round(stake * mult) : 0;
+  const hot = shouldShow && isHotOdds(mult);
 
   useEffect(() => {
     if (!shouldShow) return;
@@ -67,7 +68,9 @@ export default function OddsBoard({
       >
         <div
           data-testid="odds-mult"
-          className="font-neo-display text-base font-black text-neo-yellow sm:text-lg"
+          className={`font-neo-display text-base font-black sm:text-lg ${
+            hot ? 'text-neo-orange' : 'text-neo-yellow'
+          } ${hot && !reducedMotion ? 'animate-neo-pop' : ''}`}
         >
           {multText}
         </div>
@@ -88,7 +91,9 @@ export default function OddsBoard({
     >
       <div
         data-testid="odds-mult"
-        className="text-center font-neo-display text-3xl font-bold leading-tight text-neo-yellow sm:text-5xl"
+        className={`text-center font-neo-display text-3xl font-bold leading-tight sm:text-5xl ${
+          hot ? 'text-neo-orange' : 'text-neo-yellow'
+        } ${hot && !reducedMotion ? 'animate-neo-pop' : ''}`}
       >
         {multText}
       </div>

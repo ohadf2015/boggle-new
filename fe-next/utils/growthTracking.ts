@@ -66,6 +66,12 @@ export type GrowthEvent =
   | 'daily_word_hunt_complete'
   | 'wordhunt_invalid_submitted'
   | 'daily_rival_landed' // Rival challenge link landed (beat-me loop invitation)
+  // exp-daily-chase-last-chance-v1: urgency variant of ChaseBanner shown when a
+  // chasing player is within the last hours of the daily reset window.
+  //   Props: { hoursRemaining: number; pointsGap: number | null }.
+  | 'daily_last_chance_shown'
+  // Player tapped the last-chance ChaseBanner CTA (routes into the day's puzzle).
+  | 'daily_last_chance_clicked'
   // Adventure
   | 'adventure_level_start'
   | 'adventure_level_pass'
@@ -150,6 +156,13 @@ export type GrowthEvent =
   | 'onboarding_completed'
   | 'onboarding_skipped'
   | 'onboarding_quick_play'
+  // FTUE-gate redirect (useFTUEGate bounces an unauthenticated play surface,
+  // e.g. /practice, to the homepage with ?next=). Instruments whether the
+  // bounce actually resumes the original destination after onboarding —
+  // targets rage clicks measured on the bounce URL (no prior signal existed
+  // for whether these sessions ever complete the round-trip).
+  | 'ftue_redirect_landed'
+  | 'ftue_redirect_resumed'
   // Modals / confirmation dialogs
   | 'modal_interaction'
   // Friction / engagement

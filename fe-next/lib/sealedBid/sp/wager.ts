@@ -13,6 +13,11 @@ export function oddsMultiplier(word: string): number {
   return Math.round(clamped * 10) / 10;
 }
 
+/** Near the 6x cap — used to trigger the "hot odds" visual cue, no scoring effect. */
+export function isHotOdds(mult: number): boolean {
+  return mult >= 4.5;
+}
+
 export interface Settlement {
   outcome: BidOutcome;
   stake: number;

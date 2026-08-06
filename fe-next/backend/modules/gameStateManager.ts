@@ -358,6 +358,7 @@ function resetGameForNewRound(gameCode: string): boolean {
   game.gameEndedAt = null;
   game.wordHuntState = null;
   game.blastModeState = null;
+  game.wheelRushState = null;
   // firstFinderMap is cleared by scoreManager.resetScoresForNewRound above
   game.playerCombos = {};
   game.gameSessionId = (game.gameSessionId || 0) + 1;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { oddsMultiplier, settleBid } from '../wager';
+import { oddsMultiplier, settleBid, isHotOdds } from '../wager';
 
 describe('oddsMultiplier', () => {
   it('rarer/longer word pays more than common short word', () => {
@@ -9,6 +9,19 @@ describe('oddsMultiplier', () => {
   it('is bounded 1.5..6', () => {
     expect(oddsMultiplier('CAT')).toBeGreaterThanOrEqual(1.5);
     expect(oddsMultiplier('QUIZZERS')).toBeLessThanOrEqual(6);
+  });
+});
+
+describe('isHotOdds', () => {
+  it('is false for a common short word (low multiplier)', () => {
+    expect(isHotOdds(oddsMultiplier('CAT'))).toBe(false);
+  });
+  it('is true once the multiplier nears the 6x cap', () => {
+    expect(isHotOdds(oddsMultiplier('QUIZZERS'))).toBe(true);
+  });
+  it('threshold is 4.5 inclusive', () => {
+    expect(isHotOdds(4.5)).toBe(true);
+    expect(isHotOdds(4.4)).toBe(false);
   });
 });
 

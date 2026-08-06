@@ -293,14 +293,16 @@ export default function PatternSwitcher({
             {requiredLength} {t('brain.drills.letters')}
           </div>
 
-          {/* Lives */}
-          <div className="flex items-center gap-1">
+          {/* Lives — last remaining life pulses so a miss never feels like a
+              silent, unforeshadowed cutoff. */}
+          <div data-testid="pattern-switcher-lives" className="flex items-center gap-1">
             {Array.from({ length: levelConfig.lives }).map((_, i) => (
               <div
                 key={`life-${i}`}
                 className={cn(
                   'w-3 h-3 rounded-full border border-neo-black',
-                  i < lives ? 'bg-neo-red' : 'bg-gray-300'
+                  i < lives ? 'bg-neo-red' : 'bg-gray-300',
+                  lives === 1 && i === 0 && 'motion-safe:animate-pulse ring-2 ring-neo-red'
                 )}
               />
             ))}

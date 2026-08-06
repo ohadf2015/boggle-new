@@ -19,6 +19,7 @@ vi.mock('../../../lib/sealedBid/sp/wager', () => ({
     // Simple mock: longer words pay more
     return Math.min(1.5 + word.length * 0.4, 6);
   },
+  isHotOdds: (mult: number) => mult >= 4.5,
 }));
 
 // Mock i18n context

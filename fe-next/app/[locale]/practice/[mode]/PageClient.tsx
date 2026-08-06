@@ -2,11 +2,9 @@
 
 import { useCallback, useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import { useLanguage } from '@/contexts/LanguageContext';
 import PracticeTutorialSheet from '@/components/practice/PracticeTutorialSheet';
-import PracticeClassicSandbox from '@/components/practice/PracticeClassicSandbox';
-import PracticeWordHuntSandbox from '@/components/practice/PracticeWordHuntSandbox';
-import PracticeWheelSandbox from '@/components/practice/PracticeWheelSandbox';
 import { useModeFirstSeen } from '@/hooks/useModeFirstSeen';
 import { isPracticeModeComplete } from '@/lib/practice/practiceProgress';
 import { useFTUEGate } from '@/lib/onboarding/useFTUEGate';
@@ -24,6 +22,14 @@ type Step = 'tutorial' | 'play';
 // SSR-safe alias: useLayoutEffect on the client (paints synchronously, no
 // tutorial flash before swap), no-op useEffect on the server.
 const useIsoLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+// Split per-mode: a route only ever renders ONE sandbox, but a static import of
+// all three bundled every mode's deps (incl. PracticePixiFx, WordWheelGame) into
+// every /practice/[mode] page. dynamic() code-splits each into its own chunk so
+// e.g. /practice/classic only ships the classic sandbox's JS.
+const PracticeClassicSandbox = dynamic(() => import('@/components/practice/PracticeClassicSandbox'));
+const PracticeWordHuntSandbox = dynamic(() => import('@/components/practice/PracticeWordHuntSandbox'));
+const PracticeWheelSandbox = dynamic(() => import('@/components/practice/PracticeWheelSandbox'));
 
 /**
  * Cozy practice flow:

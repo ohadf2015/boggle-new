@@ -10,6 +10,9 @@ interface Props {
 
 /** Streaks below this are not a "combo" — a single word shouldn't flash a badge. */
 const COMBO_THRESHOLD = 2;
+/** Streak at which the badge escalates to the rarer "unstoppable" tier — a
+ * variable-reward payoff so the badge keeps surprising instead of going flat. */
+const UNSTOPPABLE_THRESHOLD = 5;
 /** How long the affirmation badge stays on screen before it fades out. */
 const DISPLAY_MS = 2200;
 
@@ -35,14 +38,18 @@ export function WordCraftComboBadge({ streak, t }: Props) {
 
   if (shownFor === null) return null;
 
+  const isUnstoppable = shownFor >= UNSTOPPABLE_THRESHOLD;
+
   return (
     <div
       key={shownFor}
       role="status"
       aria-live="polite"
-      className="pointer-events-none absolute left-1/2 top-[88px] z-40 -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black bg-neo-pink px-4 py-2 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg"
+      className={`pointer-events-none absolute left-1/2 top-[88px] z-40 -translate-x-1/2 animate-neo-pop rounded-neo border-neo-thick border-black px-4 py-2 font-neo-display font-black uppercase tracking-wider text-neo-white shadow-hard-lg ${
+        isUnstoppable ? 'bg-neo-orange scale-110' : 'bg-neo-pink'
+      }`}
     >
-      <span aria-hidden className="mr-1">🔥</span>
+      <span aria-hidden className="mr-1">{isUnstoppable ? '⚡' : '🔥'}</span>
       {shownFor}× {t('wordcraft.combo')}
     </div>
   );

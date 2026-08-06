@@ -192,3 +192,10 @@ export const MIN_GAMES_BEFORE_PROMPT = 3;
  * Days to suppress prompt after "Not Now" is clicked
  */
 export const PROMPT_DISMISS_DAYS = 7;
+
+/**
+ * Window event fired after each games-played increment, so a mounted
+ * PushNotificationPrompt can re-check the threshold mid-session instead of
+ * only at mount (consent usually resolves before any game is played).
+ */
+export const GAMES_PLAYED_EVENT = 'lexiclash:games-played';

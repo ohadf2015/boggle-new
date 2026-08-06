@@ -119,6 +119,14 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
     return next;
   });
 
+  // Fires once per bounce so PostHog can measure whether these sessions ever
+  // resume the original destination (see ftue_redirect_resumed below) — this
+  // step previously had zero telemetry despite being a rage-click hotspot.
+  useEffect(() => {
+    if (!pendingNext) return;
+    trackGrowthEvent('ftue_redirect_landed', { destination: pendingNext });
+  }, [pendingNext]);
+
   // First-time visitors drop STRAIGHT into the short onboarding (language →
   // name/avatar → style), not the marketing LandingView. This reverses the
   // 2026-05-08 "landing-first" experiment: new users want to set up and play,
@@ -188,7 +196,10 @@ export default function HomePageClient({ initialData }: HomePageClientProps): Re
   }, [routeAllowsOnboarding]);
   const handleFTUEComplete = useCallback(() => {
     setShowFTUE(false);
-    if (pendingNext) router.push(pendingNext);
+    if (pendingNext) {
+      trackGrowthEvent('ftue_redirect_resumed', { destination: pendingNext });
+      router.push(pendingNext);
+    }
   }, [pendingNext, router]);
 
   useEffect(() => {

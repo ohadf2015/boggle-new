@@ -56,18 +56,7 @@ export function HeroAnimated({ locale }: HeroAnimatedProps) {
                 <m.span
                   key={`${tile.ch}-${i}`}
                   data-hero-tile
-                  initial={reduced ? false : { y: -40, opacity: 0, rotate: 0 }}
-                  animate={reduced ? undefined : { y: 0, opacity: 1 }}
-                  transition={
-                    reduced
-                      ? undefined
-                      : {
-                          type: 'spring',
-                          stiffness: 320,
-                          damping: 18,
-                          delay: 0.06 * i,
-                        }
-                  }
+                  initial={false}
                   className={cn(
                     'inline-flex h-10 w-10 items-center justify-center rounded-neo border-3 border-neo-black font-neo-display text-lg font-black shadow-hard sm:h-14 sm:w-14 sm:text-2xl lg:h-16 lg:w-16 lg:text-3xl',
                     tile.color,

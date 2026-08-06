@@ -159,6 +159,7 @@ export default function Showdown({
           </div>
           <div
             data-testid="showdown-delta"
+            dir="ltr"
             className="font-neo-display text-3xl font-black tabular-nums"
           >
             {deltaText}

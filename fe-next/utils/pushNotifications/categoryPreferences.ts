@@ -9,6 +9,7 @@ import {
   PROMPT_DISMISSED_UNTIL_KEY,
   PROMPT_DISMISS_DAYS,
   MIN_GAMES_BEFORE_PROMPT,
+  GAMES_PLAYED_EVENT,
   type NotificationCategoryPreferences,
 } from './types';
 
@@ -109,6 +110,9 @@ export function incrementGamesPlayed(): void {
   } catch {
     // localStorage not available
   }
+  // Let a mounted PushNotificationPrompt re-check the threshold now —
+  // its own mount effect only ran once, before this game was played.
+  window.dispatchEvent(new Event(GAMES_PLAYED_EVENT));
 }
 
 export function dismissPushPrompt(): void {

@@ -234,8 +234,8 @@ export function SealedBidVersus({ socket, username, onQuit }: SealedBidVersusPro
                     >
                       <span className="font-bold">{r.username}</span>
                       <span className="tabular-nums">
-                        {r.word ?? '—'} · {t(`sealedBidMp.outcome.${r.outcome}`)} · +
-                        {r.points}
+                        {r.word ?? '—'} · {t(`sealedBidMp.outcome.${r.outcome}`)} ·{' '}
+                        {dir === 'rtl' ? `${r.points}+` : `+${r.points}`}
                       </span>
                     </li>
                   ))}

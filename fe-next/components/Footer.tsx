@@ -90,6 +90,7 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               <li><Link prefetch={false} href={`/${language}/education/games-for-teachers`} className={footerLinkClass}>{t('footer.gamesForTeachers', 'Games for Teachers')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/education/esl-word-games`} className={footerLinkClass}>{t('footer.eslWordGames', 'ESL Word Games')}</Link></li>
               <li><Link prefetch={false} href={`/${language}/education/for-schools`} className={footerLinkClass}>{t('footer.forSchools', 'For Schools')}</Link></li>
+              <li><Link prefetch={false} href={`/${language}/education/spelling-bee-practice`} className={footerLinkClass}>{t('footer.spellingBeePractice', 'Spelling Bee Practice')}</Link></li>
             </ul>
           </nav>
 

@@ -8,11 +8,13 @@ import {
   saveCategoryPreferences,
   shouldShowPushPrompt,
   dismissPushPrompt,
+  incrementGamesPlayed,
 } from '../categoryPreferences';
 import {
   DEFAULT_CATEGORY_PREFERENCES,
   CATEGORY_PREFERENCES_KEY,
   PROMPT_DISMISSED_UNTIL_KEY,
+  GAMES_PLAYED_EVENT,
 } from '../types';
 
 // Mock localStorage
@@ -249,6 +251,21 @@ describe('categoryPreferences', () => {
 
       // THEN
       expect(result).toBe(true);
+    });
+  });
+
+  describe('incrementGamesPlayed', () => {
+    it('should dispatch GAMES_PLAYED_EVENT so a mounted prompt can re-check', () => {
+      // GIVEN
+      const listener = vi.fn();
+      window.addEventListener(GAMES_PLAYED_EVENT, listener);
+
+      // WHEN
+      incrementGamesPlayed();
+
+      // THEN
+      expect(listener).toHaveBeenCalledTimes(1);
+      window.removeEventListener(GAMES_PLAYED_EVENT, listener);
     });
   });
 

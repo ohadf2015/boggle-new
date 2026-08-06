@@ -23,6 +23,7 @@ import AvatarStack from '@/components/multiplayer/AvatarStack';
 import CrazyGamesFriendsStrip from '@/components/multiplayer/CrazyGamesFriendsStrip';
 import ArenaEmptyState from '@/components/multiplayer/ArenaEmptyState';
 import ArenaCTAStrip from '@/components/multiplayer/ArenaCTAStrip';
+import { trackMpRoomJoinClicked, trackMpRoomJoinBlocked } from '@/utils/posthogEngagement';
 
 // ==================== Animation Variants ====================
 
@@ -125,6 +126,7 @@ const RoomListView: React.FC<RoomListViewProps> = ({
   onCreateRoom,
   onQuickPlay,
   isQuickPlayLoading = false,
+  joiningRoomCode = null,
 }) => {
   const { t, dir, language } = useLanguage();
   const { isOnCrazyGamesPlatform } = useCrazyGames();
@@ -341,19 +343,32 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                   {activeRooms.map((room) => {
                     const mode = MODE_CONFIG[room.gameMode || ''] || DEFAULT_MODE_CONFIG;
                     const ModeIcon = mode.icon;
+                    const isJoiningThisRoom = joiningRoomCode === room.gameCode;
+                    const isJoinInFlight = joiningRoomCode != null;
 
                     return (
                       <m.button
                         key={room.gameCode}
                         role="listitem"
                         aria-label={t('multiplayerFlow.roomList.joinRoomAction', { roomName: room.roomName || room.gameCode })}
+                        aria-busy={isJoiningThisRoom}
+                        disabled={isJoinInFlight}
                         variants={roomCardVariants}
                         exit="exit"
                         layout
-                        onClick={() => onRoomClick(room)}
+                        onClick={() => {
+                          if (isJoinInFlight) {
+                            trackMpRoomJoinBlocked({ gameMode: room.gameMode || 'classic' });
+                            return;
+                          }
+                          trackMpRoomJoinClicked({ gameMode: room.gameMode || 'classic' });
+                          onRoomClick(room);
+                        }}
                         onKeyDown={(e: React.KeyboardEvent<HTMLButtonElement>) => {
+                          if (isJoinInFlight) return;
                           if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
+                            trackMpRoomJoinClicked({ gameMode: room.gameMode || 'classic' });
                             onRoomClick(room);
                           } else if (e.key === 'ArrowDown') {
                             e.preventDefault();
@@ -369,12 +384,12 @@ const RoomListView: React.FC<RoomListViewProps> = ({
                           transition: { type: 'spring' as const, stiffness: 400, damping: 20 },
                         }}
                         whileTap={{ scale: 0.98 }}
-                        className={`flex items-center gap-3 p-3 rounded-xl border-2 border-neo-black border-s-4 ${mode.borderColor} bg-neo-navy-light/40 hover:bg-neo-navy-light transition-colors text-start group relative overflow-hidden focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime cursor-pointer`}
+                        className={`flex items-center gap-3 p-3 rounded-xl border-2 border-neo-black border-s-4 ${mode.borderColor} bg-neo-navy-light/40 hover:bg-neo-navy-light transition-colors text-start group relative overflow-hidden focus-visible:outline-hidden focus-visible:ring-4 focus-visible:ring-neo-lime ${isJoinInFlight ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                       >
                         {/* Left: Mode icon + info */}
                         <div className="flex items-center gap-3 flex-1 min-w-0">
                           <div className={`w-10 h-10 ${mode.iconBg} border-2 border-neo-black rounded-lg flex items-center justify-center shrink-0 shadow-hard-sm`}>
-                            <ModeIcon className={`w-5 h-5 ${mode.iconColor}`} />
+                            {isJoiningThisRoom ? <Loader size="sm" /> : <ModeIcon className={`w-5 h-5 ${mode.iconColor}`} />}
                           </div>
 
                           {/* Room info */}
