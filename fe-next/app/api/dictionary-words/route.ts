@@ -14,13 +14,21 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { gzipSync } from 'zlib';
-import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
 import * as fsp from 'fs/promises';
 import * as path from 'path';
+import {
+  getEnglishWordSet,
+  getSpanishBaseWordSet,
+  getHebrewWordSet,
+  getSwedishWordSet,
+} from '@/lib/server/sharedWordSets';
 
-// Cache dictionaries at module level — populated lazily per language
-const dictionaries: Record<string, string[] | null> = {
+// Pre-gzipped payloads cached per language (dictionary content is static per
+// deploy). Once built, ALL requests are served from here — the intermediate word
+// array is NOT retained, so the full list only lives in the shared sets, not a
+// second time as a per-route array (see lib/server/sharedWordSets.ts, OOM 2026-08-06).
+const gzippedPayloads: Record<string, { gzip: Buffer; raw: string; count: number } | null> = {
   en: null,
   es: null,
   he: null,
@@ -28,98 +36,16 @@ const dictionaries: Record<string, string[] | null> = {
   ja: null,
 };
 
-// Pre-gzipped payloads cached per language (dictionary content is static per deploy)
-const gzippedPayloads: Record<string, { gzip: Buffer; raw: string } | null> = {
-  en: null,
-  es: null,
-  he: null,
-  sv: null,
-  ja: null,
-};
-
-async function loadDictionary(language: string): Promise<string[]> {
-  if (dictionaries[language]) {
-    return dictionaries[language]!;
-  }
-
-  let words: string[] = [];
-
+async function loadWords(language: string): Promise<string[]> {
   switch (language) {
-    case 'en': {
-      const { default: englishWords } = await import('an-array-of-english-words', { with: { type: 'json' } });
-      words = englishWords.map((w: string) => w.toLowerCase());
-      break;
-    }
-
-    case 'es': {
-      const { default: spanishWords } = await import('an-array-of-spanish-words', { with: { type: 'json' } });
-      words = spanishWords.map((w: string) => w.toLowerCase());
-      break;
-    }
-
-    case 'he': {
-      const backendDir = path.join(process.cwd(), 'backend');
-      const wordSet = new Set<string>();
-
-      const [mainContent, approvedContent] = await Promise.all([
-        fsp.readFile(path.join(backendDir, 'hebrew_words.txt'), 'utf-8').catch(() => ''),
-        fsp.readFile(path.join(backendDir, 'hebrew_words_approved.txt'), 'utf-8').catch(() => ''),
-      ]);
-
-      for (const content of [mainContent, approvedContent]) {
-        if (content) {
-          for (const line of content.split('\n')) {
-            const w = normalizeHebrewWord(line.trim());
-            if (w.length > 0) wordSet.add(w);
-          }
-        }
-      }
-
-      words = Array.from(wordSet);
-      break;
-    }
-
-    case 'sv': {
-      const swedishWordsPath = path.join(process.cwd(), 'node_modules/@arvidbt/swedish-words/out/index.js');
-      const approvedFile = path.join(process.cwd(), 'backend', 'swedish_words_approved.txt');
-      const wordSet = new Set<string>();
-      const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
-
-      const [content, approvedContent] = await Promise.all([
-        fsp.readFile(swedishWordsPath, 'utf-8').catch(() => ''),
-        fsp.readFile(approvedFile, 'utf-8').catch(() => ''),
-      ]);
-
-      if (content) {
-        const arrayMatch = content.match(/var swedish_words = \[([\s\S]*?)\];/);
-        if (arrayMatch) {
-          for (const line of arrayMatch[1].split(',')) {
-            const trimmed = line.trim();
-            if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-              try {
-                const jsonCompatible = trimmed.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
-                const word = JSON.parse(jsonCompatible);
-                if (word && word.length > 1 && validSwedishWordPattern.test(word)) {
-                  wordSet.add(word.toLowerCase());
-                }
-              } catch {
-                // Skip invalid entries
-              }
-            }
-          }
-        }
-      }
-
-      if (approvedContent) {
-        for (const line of approvedContent.split('\n')) {
-          const w = line.trim().toLowerCase();
-          if (w.length > 0) wordSet.add(w);
-        }
-      }
-
-      words = Array.from(wordSet);
-      break;
-    }
+    case 'en':
+      return Array.from(await getEnglishWordSet());
+    case 'es':
+      return Array.from(await getSpanishBaseWordSet());
+    case 'he':
+      return Array.from(getHebrewWordSet());
+    case 'sv':
+      return Array.from(getSwedishWordSet());
 
     case 'ja': {
       const backendDir = path.join(process.cwd(), 'backend');
@@ -137,17 +63,12 @@ async function loadDictionary(language: string): Promise<string[]> {
         for (const w of extractHiraganaWords(content)) wordSet.add(w);
       }
 
-      words = Array.from(wordSet);
-      break;
+      return Array.from(wordSet);
     }
 
     default:
-      words = [];
+      return [];
   }
-
-  // Cache the loaded dictionary
-  dictionaries[language] = words;
-  return words;
 }
 
 // Node.js runtime for dictionary caching efficiency
@@ -166,12 +87,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const words = await loadDictionary(language);
-
-    // Build (and cache) the newline-delimited payload + its gzip form once
+    // Build (and cache) the newline-delimited payload + its gzip form once. After
+    // this the intermediate word array is dropped — only the payload is retained.
     if (!gzippedPayloads[language]) {
+      const words = await loadWords(language);
       const raw = words.join('\n');
-      gzippedPayloads[language] = { gzip: gzipSync(raw, { level: 6 }), raw };
+      gzippedPayloads[language] = { gzip: gzipSync(raw, { level: 6 }), raw, count: words.length };
     }
     const payload = gzippedPayloads[language]!;
 
@@ -180,7 +101,7 @@ export async function GET(request: NextRequest) {
       // Aggressive caching - dictionary rarely changes
       'Cache-Control': 'public, max-age=86400, s-maxage=604800, stale-while-revalidate=86400',
       // ETag for conditional requests
-      'ETag': `"${language}-${words.length}"`,
+      'ETag': `"${language}-${payload.count}"`,
       'Vary': 'Accept-Encoding',
     };
 

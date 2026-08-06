@@ -6,125 +6,63 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { normalizeHebrewWord } from '@/shared/utils/wordNormalization';
 import * as fsp from 'fs/promises';
 import * as path from 'path';
+import {
+  getEnglishWordSet,
+  getSpanishBaseWordSet,
+  getHebrewWordSet,
+  getSwedishWordSet,
+} from '@/lib/server/sharedWordSets';
 
-// Reuse the same in-memory cache as dictionary-words route
-const dictionaries: Record<string, Set<string> | null> = {
-  en: null,
-  es: null,
-  he: null,
-  sv: null,
-  ja: null,
-};
+// Japanese is the only language whose membership on THIS path (hiragana base +
+// approved, raw-trimmed) diverges from the shared canonical sets, so it keeps a
+// local cache. en/es/he/sv are served from the process-wide shared sets so each
+// list exists once in the heap (see lib/server/sharedWordSets.ts — OOM 2026-08-06).
+let japaneseSet: Set<string> | null = null;
+
+async function loadJapaneseSet(): Promise<Set<string>> {
+  if (japaneseSet) return japaneseSet;
+
+  // Boards are hiragana-only, so the validation set is the base + approved
+  // HIRAGANA wordlists — mirroring backend/dictionaryLoaders.ts. Kanji
+  // compounds are seeding-only (never a playable word) and must NOT be loaded
+  // here, or the base ~9.6k hiragana corpus would be silently rejected.
+  const backendDir = path.join(process.cwd(), 'backend');
+  const [baseContent, approvedContent] = await Promise.all([
+    fsp.readFile(path.join(backendDir, 'japanese_words.txt'), 'utf-8').catch(() => ''),
+    fsp.readFile(path.join(backendDir, 'japanese_words_approved.txt'), 'utf-8').catch(() => ''),
+  ]);
+
+  const words: string[] = [];
+  for (const content of [baseContent, approvedContent]) {
+    if (content) {
+      for (const line of content.split('\n')) {
+        const w = line.trim();
+        if (w.length > 0) words.push(w);
+      }
+    }
+  }
+
+  japaneseSet = new Set(words);
+  return japaneseSet;
+}
 
 async function loadDictionarySet(language: string): Promise<Set<string>> {
-  if (dictionaries[language]) {
-    return dictionaries[language]!;
-  }
-
-  let words: string[] = [];
-
   switch (language) {
-    case 'en': {
-      const { default: englishWords } = await import('an-array-of-english-words', { with: { type: 'json' } });
-      words = (englishWords as string[]).map((w: string) => w.toLowerCase());
-      break;
-    }
-
-    case 'es': {
-      const { default: spanishWords } = await import('an-array-of-spanish-words', { with: { type: 'json' } });
-      words = (spanishWords as string[]).map((w: string) => w.toLowerCase());
-      break;
-    }
-
-    case 'he': {
-      const backendDir = path.join(process.cwd(), 'backend');
-      const [mainContent, approvedContent] = await Promise.all([
-        fsp.readFile(path.join(backendDir, 'hebrew_words.txt'), 'utf-8').catch(() => ''),
-        fsp.readFile(path.join(backendDir, 'hebrew_words_approved.txt'), 'utf-8').catch(() => ''),
-      ]);
-
-      for (const content of [mainContent, approvedContent]) {
-        if (content) {
-          for (const line of content.split('\n')) {
-            const w = normalizeHebrewWord(line.trim());
-            if (w.length > 0) words.push(w);
-          }
-        }
-      }
-      break;
-    }
-
-    case 'sv': {
-      const swedishWordsPath = path.join(process.cwd(), 'node_modules/@arvidbt/swedish-words/out/index.js');
-      const approvedFile = path.join(process.cwd(), 'backend', 'swedish_words_approved.txt');
-      const validSwedishWordPattern = /^[a-zåäöéàü]+$/i;
-
-      const [content, approvedContent] = await Promise.all([
-        fsp.readFile(swedishWordsPath, 'utf-8').catch(() => ''),
-        fsp.readFile(approvedFile, 'utf-8').catch(() => ''),
-      ]);
-
-      if (content) {
-        const arrayMatch = content.match(/var swedish_words = \[([\s\S]*?)\];/);
-        if (arrayMatch) {
-          for (const line of arrayMatch[1].split(',')) {
-            const trimmed = line.trim();
-            if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-              try {
-                const jsonCompatible = trimmed.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
-                const word = JSON.parse(jsonCompatible);
-                if (word && word.length > 1 && validSwedishWordPattern.test(word)) {
-                  words.push(word.toLowerCase());
-                }
-              } catch {
-                // Skip invalid entries
-              }
-            }
-          }
-        }
-      }
-
-      if (approvedContent) {
-        for (const line of approvedContent.split('\n')) {
-          const w = line.trim().toLowerCase();
-          if (w.length > 0) words.push(w);
-        }
-      }
-      break;
-    }
-
-    case 'ja': {
-      // Boards are hiragana-only, so the validation set is the base + approved
-      // HIRAGANA wordlists — mirroring backend/dictionaryLoaders.ts. Kanji
-      // compounds are seeding-only (never a playable word) and must NOT be loaded
-      // here, or the base ~9.6k hiragana corpus would be silently rejected.
-      const backendDir = path.join(process.cwd(), 'backend');
-      const [baseContent, approvedContent] = await Promise.all([
-        fsp.readFile(path.join(backendDir, 'japanese_words.txt'), 'utf-8').catch(() => ''),
-        fsp.readFile(path.join(backendDir, 'japanese_words_approved.txt'), 'utf-8').catch(() => ''),
-      ]);
-
-      for (const content of [baseContent, approvedContent]) {
-        if (content) {
-          for (const line of content.split('\n')) {
-            const w = line.trim();
-            if (w.length > 0) words.push(w);
-          }
-        }
-      }
-      break;
-    }
-
+    case 'en':
+      return getEnglishWordSet();
+    case 'es':
+      return getSpanishBaseWordSet();
+    case 'he':
+      return getHebrewWordSet();
+    case 'sv':
+      return getSwedishWordSet();
+    case 'ja':
+      return loadJapaneseSet();
     default:
-      break;
+      return new Set<string>();
   }
-
-  const wordSet = new Set(words);
-  dictionaries[language] = wordSet;
-  return wordSet;
 }
 
 export const runtime = 'nodejs';

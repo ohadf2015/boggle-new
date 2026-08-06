@@ -6,20 +6,19 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { normalizeHebrewWord, normalizeSpanishWord } from '@/shared/utils/wordNormalization';
 import { extractHiraganaWords } from '@/shared/constants/japaneseLetters';
+import {
+  getEnglishWordSet,
+  getHebrewWordSet,
+  getSwedishWordSet,
+  __resetSharedWordSetsForTest,
+} from '@/lib/server/sharedWordSets';
 
-let englishDict: Set<string> | null = null;
+// en/he/sv have byte-identical membership everywhere, so they come from the
+// process-wide shared sets (one copy in the heap). Only the Spanish-NORMALIZED
+// set (accent-stripped, distinct string data) and Japanese hiragana set stay
+// local here (see lib/server/sharedWordSets.ts — OOM 2026-08-06).
 let spanishDict: Set<string> | null = null;
-let hebrewDict: Set<string> | null = null;
-let swedishDict: Set<string> | null = null;
 let japaneseDict: Set<string> | null = null;
-
-async function loadEnglish(): Promise<Set<string>> {
-  if (englishDict) return englishDict;
-  const words = (await import('an-array-of-english-words', { with: { type: 'json' } }))
-    .default as string[];
-  englishDict = new Set(words.map((w) => w.toLowerCase()));
-  return englishDict;
-}
 
 async function loadSpanish(): Promise<Set<string>> {
   if (spanishDict) return spanishDict;
@@ -30,59 +29,6 @@ async function loadSpanish(): Promise<Set<string>> {
   // same word can't be valid live but rejected on offline-queue replay.
   spanishDict = new Set(words.map((w) => normalizeSpanishWord(w)));
   return spanishDict;
-}
-
-function loadHebrew(): Set<string> {
-  if (hebrewDict) return hebrewDict;
-  hebrewDict = new Set<string>();
-  const backendDir = path.join(process.cwd(), 'backend');
-  for (const file of ['hebrew_words.txt', 'hebrew_words_approved.txt']) {
-    const p = path.join(backendDir, file);
-    if (!fs.existsSync(p)) continue;
-    const content = fs.readFileSync(p, 'utf-8');
-    content
-      .split('\n')
-      .map((w) => normalizeHebrewWord(w.trim()))
-      .filter((w) => w.length > 0)
-      .forEach((w) => hebrewDict!.add(w));
-  }
-  return hebrewDict;
-}
-
-function loadSwedish(): Set<string> {
-  if (swedishDict) return swedishDict;
-  swedishDict = new Set<string>();
-  const swPath = path.join(process.cwd(), 'node_modules/@arvidbt/swedish-words/out/index.js');
-  if (fs.existsSync(swPath)) {
-    const content = fs.readFileSync(swPath, 'utf-8');
-    const arrayMatch = content.match(/var swedish_words = \[([\s\S]*?)\];/);
-    if (arrayMatch) {
-      const validPattern = /^[a-zåäöéàü]+$/i;
-      arrayMatch[1].split(',').forEach((line) => {
-        const trimmed = line.trim();
-        if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
-          try {
-            const jsonCompatible = trimmed.replace(/\\x([0-9A-Fa-f]{2})/g, '\\u00$1');
-            const word = JSON.parse(jsonCompatible);
-            if (word && word.length > 1 && validPattern.test(word)) {
-              swedishDict!.add(word.toLowerCase());
-            }
-          } catch {
-            // skip
-          }
-        }
-      });
-    }
-  }
-  const approvedFile = path.join(process.cwd(), 'backend', 'swedish_words_approved.txt');
-  if (fs.existsSync(approvedFile)) {
-    fs.readFileSync(approvedFile, 'utf-8')
-      .split('\n')
-      .map((w) => w.trim().toLowerCase())
-      .filter((w) => w.length > 0)
-      .forEach((w) => swedishDict!.add(w));
-  }
-  return swedishDict;
 }
 
 function loadJapanese(): Set<string> {
@@ -105,13 +51,13 @@ export async function validateWordOnServer(word: string, language: string): Prom
 
   switch (language) {
     case 'en':
-      return (await loadEnglish()).has(trimmed.toLowerCase());
+      return (await getEnglishWordSet()).has(trimmed.toLowerCase());
     case 'es':
       return (await loadSpanish()).has(normalizeSpanishWord(trimmed));
     case 'he':
-      return loadHebrew().has(normalizeHebrewWord(trimmed));
+      return getHebrewWordSet().has(normalizeHebrewWord(trimmed));
     case 'sv':
-      return loadSwedish().has(trimmed.toLowerCase());
+      return getSwedishWordSet().has(trimmed.toLowerCase());
     case 'ja':
       return loadJapanese().has(trimmed);
     default:
@@ -121,9 +67,7 @@ export async function validateWordOnServer(word: string, language: string): Prom
 
 // Test escape hatch — reset cached dicts between tests.
 export function __resetServerDictsForTest(): void {
-  englishDict = null;
   spanishDict = null;
-  hebrewDict = null;
-  swedishDict = null;
   japaneseDict = null;
+  __resetSharedWordSetsForTest();
 }
