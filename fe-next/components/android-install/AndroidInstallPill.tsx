@@ -14,7 +14,7 @@
  * routes. `end-*` auto-flips for RTL.
  */
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Smartphone, X } from 'lucide-react';
 import { useLanguage } from '@/contexts/LanguageContext';
@@ -33,22 +33,42 @@ import {
 
 const HIDDEN_KEY = 'android_app_install_pill_hidden';
 
+// The remote-URL Capacitor WebView injects `window.Capacitor` around page load,
+// but it can be absent for the first render(s) — an immediate check misreads the
+// native app as a web visitor. We render the pessimistic (hidden) state and
+// only reveal after this settle window, re-checking the bridge first. The
+// native bridge always registers well within this budget, so the app never
+// flashes the pill. See .claude/rules/60-recurring-pitfalls.md, Class 1.
+const NATIVE_SETTLE_MS = 1500;
+
 export default function AndroidInstallPill() {
   const { t } = useLanguage();
   const pillVisible = useAndroidInstallStore((s) => s.pillVisible);
   const openPromo = useAndroidInstallStore((s) => s.openPromo);
   const hidePill = useAndroidInstallStore((s) => s.hidePill);
 
-  const eligible = useMemo(
-    () =>
-      typeof navigator !== 'undefined' &&
-      isAndroidInstallEntryEligible({
-        ua: navigator.userAgent,
-        isCapacitorNative: isCapacitorNative(),
-        isStandalone: isStandaloneDisplay(),
-      }),
-    []
-  );
+  // Pessimistic default: assume we might be inside the native shell until the
+  // Capacitor bridge has had a chance to register. Never render an optimistic
+  // "web" default that a late-resolving native bridge would have to retract.
+  const [eligible, setEligible] = useState(false);
+  useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    // Bridge already present → definitively native, stay hidden.
+    if (isCapacitorNative()) return;
+
+    const webEligible = isAndroidInstallEntryEligible({
+      ua: navigator.userAgent,
+      isCapacitorNative: false,
+      isStandalone: isStandaloneDisplay(),
+    });
+    if (!webEligible) return;
+
+    // Wait out the bridge-registration race, then re-check before revealing.
+    const timer = setTimeout(() => {
+      if (!isCapacitorNative()) setEligible(true);
+    }, NATIVE_SETTLE_MS);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Session opt-out: once closed, stay gone until a new session.
   const [sessionHidden, setSessionHidden] = useState(false);
