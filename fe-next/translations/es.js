@@ -7885,6 +7885,9 @@ const es = {
     "benefitShort1": "Recordatorios de racha",
     "benefitShort2": "Puzzles diarios"
   },
+  "newsletter": {
+    "title": "Recibe el conjunto de letras de la Rueda de Palabras diaria en tu bandeja de entrada"
+  },
   "pwa": {
     "installTitle": "Instalar LexiClash",
     "installDescription": "¡Instala nuestra app para acceso más rápido, juego sin conexión y una mejor experiencia!",

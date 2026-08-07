@@ -7352,6 +7352,9 @@ const en = {
     "benefitShort1": "Streak saves",
     "benefitShort2": "Fresh puzzles"
   },
+  "newsletter": {
+    "title": "Get the Daily Word Wheel letter set delivered to your inbox"
+  },
   "pwa": {
     "installTitle": "Get the App",
     "installDescription": "Faster play, works offline, no app store needed!",

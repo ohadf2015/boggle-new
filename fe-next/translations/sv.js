@@ -8143,6 +8143,9 @@ const sv = {
     "benefitShort1": "Svitpåminnelser",
     "benefitShort2": "Dagliga pussel"
   },
+  "newsletter": {
+    "title": "Få det dagliga ordhjulets bokstäver levererade till din inkorg"
+  },
   "pwa": {
     "installTitle": "Installera LexiClash",
     "installDescription": "Installera vår app för snabbare åtkomst, offlinespel och en bättre upplevelse!",

@@ -7914,6 +7914,9 @@ const ja = {
     "benefitShort1": "ストリークリマインダー",
     "benefitShort2": "デイリーパズル"
   },
+  "newsletter": {
+    "title": "デイリーワードホイールの文字セットを受信トレイにお届け"
+  },
   "pwa": {
     "installTitle": "LexiClashをインストール",
     "installDescription": "より速いアクセス、オフラインプレイ、より良い体験のためにアプリをインストール！",

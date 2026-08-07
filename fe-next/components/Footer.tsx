@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { InstagramIcon } from '@/components/icons/SocialIcons';
 import { ManageCookiesButton } from '@/components/CookieConsent';
 import { useCrazyGames } from '@/components/CrazyGamesSDK';
+import EmailSignupForm from './EmailSignupForm';
 
 const KofiIcon = ({ className }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" width="1em" height="1em">
@@ -155,6 +156,16 @@ export default function Footer({ className }: FooterProps): React.ReactElement {
               </li>
             </ul>
           </div>
+        </div>
+
+        {/* Newsletter signup — sitewide email capture for ~300 daily organic
+            visitors. Passive, in-flow, no localStorage gates. Renders on every
+            public SEO page where the marketing footer is shown. */}
+        <div className="border-t border-neo-cream/20 pt-6 pb-4">
+          <h3 className="text-xs font-black uppercase tracking-widest text-neo-cyan mb-3">
+            {t('newsletter.title')}
+          </h3>
+          <EmailSignupForm />
         </div>
 
         {/* Bottom bar */}

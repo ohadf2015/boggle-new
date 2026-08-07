@@ -289,6 +289,14 @@ const mockLanguageContext = {
 }));
 
 // ==========================================
+// Mock SocialMediaPixels (used by EmailSignupForm in footer)
+// ==========================================
+
+vi.mock('@/components/SocialMediaPixels', () => ({
+  socialEvents: { completeRegistration: vi.fn() },
+}));
+
+// ==========================================
 // Mock useDevicePerformance Hook
 // ==========================================
 
