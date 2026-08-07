@@ -1,12 +1,27 @@
 'use client';
 
 import { useMemo, memo } from 'react';
+import nextDynamic from 'next/dynamic';
 import { getSeededAvatarConfig, hashString, type CustomAvatarConfig } from '@/shared/types/customAvatar';
-import AvatarRenderer, { type AvatarMode } from '@/components/avatar/AvatarRenderer';
+import type { AvatarMode } from '@/components/avatar/AvatarRenderer';
 import type { AvatarMood } from '@/lib/avatar/avatarMood';
 import type { AvatarOverlay } from '@/lib/avatar/avatarOverlay';
 import { cn } from '@/lib/utils';
 import { NeoSkeletonAvatar } from '@/components/ui/skeleton';
+
+/**
+ * The renderer drags in `avatar/parts/*` — ~8300 lines of inline SVG that minify
+ * to one 464kB module (91kB gz) webpack can't tree-shake, because parts are
+ * looked up dynamically. Avatar is mounted from the global header, so a static
+ * import put that on the shared chunk of every route, including pages that
+ * render no avatar at all. Lazy keeps it off `/legal`, `/about` and the SEO
+ * landings entirely, and off the critical path everywhere else.
+ * Guarded by `components/__tests__/Avatar.bundleGraph.test.ts`.
+ */
+const AvatarRenderer = nextDynamic(() => import('@/components/avatar/AvatarRenderer'), {
+  ssr: false,
+  loading: () => <div className="w-full h-full bg-neo-navy-light animate-pulse" />,
+});
 
 /** @deprecated No longer used — profile pictures removed in favor of custom avatars */
 export const PROFILE_AVATAR_ID = '__profile_avatar__';

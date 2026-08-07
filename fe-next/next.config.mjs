@@ -309,6 +309,18 @@ const nextConfig = {
   // Security headers and API caching
   async headers() {
     return [
+      // Message catalogues. Filenames carry a content hash (see
+      // scripts/build-i18n-assets.ts), so a stale copy is impossible and the
+      // browser never needs to revalidate. This is the entire point of moving
+      // them out of the RSC flight payload: inline data is re-downloaded on
+      // every page load, an immutable asset is fetched once.
+      {
+        source: '/i18n/:file*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Content-Type', value: 'application/javascript; charset=utf-8' },
+        ],
+      },
       // Service worker — must be served as JavaScript (not HTML fallback)
       {
         source: '/sw.js',
@@ -561,6 +573,15 @@ const sentryConfig = withSentryConfig(nextConfig, {
   authToken: process.env.SENTRY_AUTH_TOKEN,
   silent: true,
   hideSourceMaps: true,
+  // Sentry inlines a route manifest into the client bundle so transactions get
+  // parameterised names (/players/:id, not /players/123). Measured 2026-08-07:
+  // 215 entries, ~28kB raw on every page. Admin and blog are 52 of those and
+  // neither needs the grouping — admin is a handful of internal sessions, blog
+  // posts are static content — so they're excluded. Dropping the manifest
+  // wholesale would make every dynamic route report as its raw URL.
+  routeManifestInjection: {
+    exclude: [/\/admin(\/|$)/, /\/blog\//],
+  },
   sourcemaps: {
     disable: !hasSentryToken,
     deleteSourcemapsAfterUpload: true,

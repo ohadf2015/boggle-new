@@ -19,12 +19,38 @@ export type TranslationData = Record<string, unknown>;
 const cache = new Map<Language, TranslationData>();
 
 /**
+ * Global assigned by the hashed `public/i18n/<lang>.<hash>.js` asset that the
+ * locale layout loads in <head>. Catalogues used to travel as a prop from the
+ * server layout to a client provider, which serialised ~525kB of JSON into
+ * every page's RSC flight payload — uncacheable, and re-downloaded on every
+ * full page load. As a hashed asset it is fetched once and then read from disk
+ * cache. The script is a classic (non-module, non-defer) tag so the catalogue
+ * exists before hydration: `t()` returns raw key paths without it.
+ * Written by `scripts/build-i18n-assets.ts`.
+ */
+const MESSAGES_GLOBAL = '__LEXI_MESSAGES__';
+
+function readGlobalMessages(lang: Language): TranslationData | undefined {
+  const bag = (globalThis as Record<string, unknown>)[MESSAGES_GLOBAL] as
+    | Record<string, TranslationData>
+    | undefined;
+  return bag?.[lang];
+}
+
+/**
  * Dynamically import a single language file.
  * Each language becomes its own webpack chunk (~250KB instead of 1.26MB total).
  */
 export async function loadTranslation(lang: Language): Promise<TranslationData> {
   const cached = cache.get(lang);
   if (cached) return cached;
+
+  // Already in the page courtesy of the <head> asset — skip the network entirely.
+  const fromGlobal = readGlobalMessages(lang);
+  if (fromGlobal) {
+    cache.set(lang, fromGlobal);
+    return fromGlobal;
+  }
 
   let mod: Record<string, unknown>;
 
@@ -65,6 +91,13 @@ export async function loadTranslation(lang: Language): Promise<TranslationData> 
 export function getCachedTranslation(lang: Language): TranslationData | undefined {
   const cached = cache.get(lang);
   if (cached) return cached;
+
+  // The <head> asset runs before hydration, so this is the browser's fast path.
+  const fromGlobal = readGlobalMessages(lang);
+  if (fromGlobal) {
+    cache.set(lang, fromGlobal);
+    return fromGlobal;
+  }
 
   // In test/server environments, load synchronously via require()
   // This ensures tests don't need async setup to access translations

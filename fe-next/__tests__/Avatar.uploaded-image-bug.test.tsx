@@ -39,7 +39,7 @@ describe('Avatar - renders with customAvatar', () => {
     bgColor: '#FF1493',
   };
 
-  it('should render custom SVG avatar when customAvatar is provided', () => {
+  it('should render custom SVG avatar when customAvatar is provided', async () => {
     render(
       <Avatar
         customAvatar={SAMPLE_CUSTOM_AVATAR}
@@ -49,7 +49,8 @@ describe('Avatar - renders with customAvatar', () => {
 
     const avatar = screen.getByTestId('header-avatar');
     expect(avatar).toHaveAttribute('data-avatar-type', 'custom');
-    expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
+    // Renderer is behind next/dynamic (keeps the SVG part library off the shared chunk).
+    expect(await screen.findByTestId('custom-avatar')).toBeInTheDocument();
   });
 
   it('should show generated avatar when avatarImage is a character ID', () => {

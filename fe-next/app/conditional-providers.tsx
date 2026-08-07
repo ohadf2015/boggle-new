@@ -24,14 +24,12 @@ import { GameSpecificProviders } from './providers';
 import { EssentialProviders } from './essential-providers';
 
 const CommandPalette = lazy(() => import('@/components/CommandPalette'));
-import type { TranslationData } from '@/translations/loadTranslation';
+import { getCachedTranslation } from '@/translations/loadTranslation';
 import type { Language } from '@/shared/types/game';
 
 interface ConditionalProvidersProps {
   children: ReactNode;
   lang: Language;
-  /** Pre-loaded translations for the initial language */
-  initialTranslations?: TranslationData;
 }
 
 // Routes that need the full provider stack (Socket.IO, game state, etc.)
@@ -76,8 +74,16 @@ export function needsGameProviders(pathname: string | null): boolean {
  *
  * Game-specific providers are added conditionally inside EssentialProviders.
  */
-export function ConditionalProviders({ children, lang, initialTranslations }: ConditionalProvidersProps) {
+export function ConditionalProviders({ children, lang }: ConditionalProvidersProps) {
   const pathname = usePathname();
+
+  // Read the catalogue instead of receiving it as a prop. As a prop it crossed
+  // the server→client boundary, so React serialised ~525kB of JSON into every
+  // page's RSC flight payload. Both sides can source it locally: on the server
+  // getCachedTranslation() require()s the file, in the browser it reads the
+  // global set by the hashed <head> asset — which runs before hydration, so
+  // both renders see identical strings.
+  const initialTranslations = getCachedTranslation(lang);
 
   const needsGameStack = useMemo(() => {
     return needsGameProviders(pathname);

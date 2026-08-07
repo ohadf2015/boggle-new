@@ -103,3 +103,6 @@ public/sql/
 
 # Impeccable skill critique scratch output
 .impeccable/
+
+# Generated per build by scripts/build-i18n-assets.ts (content-hashed message catalogues)
+public/i18n/

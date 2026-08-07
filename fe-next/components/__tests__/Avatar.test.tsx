@@ -60,10 +60,12 @@ const SAMPLE_CUSTOM_AVATAR: CustomAvatarConfig = {
 
 describe('Avatar', () => {
   describe('custom avatar (highest priority)', () => {
-    it('renders custom SVG avatar when customAvatar is provided', () => {
+    it('renders custom SVG avatar when customAvatar is provided', async () => {
       render(<Avatar customAvatar={SAMPLE_CUSTOM_AVATAR} />);
 
-      expect(screen.getByTestId('custom-avatar')).toBeInTheDocument();
+      // The renderer is loaded through next/dynamic to keep the SVG part library
+      // off every route's shared chunk, so it arrives a tick after mount.
+      expect(await screen.findByTestId('custom-avatar')).toBeInTheDocument();
       expect(screen.getByTestId('header-avatar')).toHaveAttribute('data-avatar-type', 'custom');
     });
 

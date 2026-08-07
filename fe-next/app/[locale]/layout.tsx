@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import nextDynamic from 'next/dynamic';
 import { layoutTranslations as translations } from '@/translations/layout';
 import { ConditionalProviders } from '../conditional-providers';
-import { loadTranslation } from '@/translations/loadTranslation';
+import MESSAGES_MANIFEST from '@/lib/i18n/messagesManifest.json';
 import AutoHideFooter from '@/components/AutoHideFooter';
 import GlobalBottomNav from '@/components/GlobalBottomNav';
 import ScrollToTopOnNavigate from '@/components/ScrollToTopOnNavigate';
@@ -34,39 +34,15 @@ import type { Language } from '@/shared/types/game';
 
 import { fredokaLatin, fredokaHebrew, rubikLatin, rubikHebrew, heeboHebrew, fredokaCyrillic, rubikCyrillic } from '../fonts';
 
-// Lazy-load push notification prompt — shown after engagement threshold
-const PushNotificationPrompt = nextDynamic(
-  () => import('@/components/notifications/PushNotificationPrompt'),
-  { loading: () => null }
-);
-
-// Lazy-load cookie consent banner — only needed on first visit
-const CookieConsent = nextDynamic(() => import('@/components/CookieConsent'));
-
-// Non-critical components — deferred to keep landing-page JS small.
-// All are post-hydration effects that don't block first paint or LCP.
-const PWAInstallPrompt = nextDynamic(() => import('@/components/PWAInstallPrompt'), {
+// Install prompts, cookie banner, version checker, churn tracker and the
+// seasonal countdown all live in DeferredLayoutWidgets. They were declared here
+// with next/dynamic's default `ssr: true`, which keeps the modules in this
+// layout's own entry chunk — 175kB raw / 58kB gz on every route. `ssr: false`
+// actually splits them out but is rejected inside a Server Component, so they
+// moved to a client wrapper. See components/DeferredLayoutWidgets.tsx.
+const DeferredLayoutWidgets = nextDynamic(() => import('@/components/DeferredLayoutWidgets'), {
   loading: () => null,
 });
-const AndroidAppRedirect = nextDynamic(() => import('@/components/AndroidAppRedirect'), {
-  loading: () => null,
-});
-const AndroidAppInstallPromo = nextDynamic(() => import('@/components/AndroidAppInstallPromo'), {
-  loading: () => null,
-});
-const AndroidInstallPill = nextDynamic(() => import('@/components/android-install/AndroidInstallPill'), {
-  loading: () => null,
-});
-const VersionChecker = nextDynamic(() => import('@/components/VersionChecker'), {
-  loading: () => null,
-});
-const NewYearCountdown = nextDynamic(() => import('@/components/celebration/NewYearCountdown'), {
-  loading: () => null,
-});
-const ChurnSignalTracker = nextDynamic(
-  () => import('@/components/engagement/ChurnSignalTracker').then(m => ({ default: m.ChurnSignalTracker })),
-  { loading: () => null }
-);
 const SocialMediaPixels = nextDynamic(() => import('@/components/SocialMediaPixels'), {
   loading: () => null,
 });
@@ -257,10 +233,14 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         ? `${fredokaCyrillic.variable || ''} ${rubikCyrillic.variable || ''}`
         : `${fredokaLatin.variable || ''} ${rubikLatin.variable || ''}`;
 
-    // Load only the active language's full translations server-side (~250KB instead of 1.26MB)
-    // This is passed to ConditionalProviders → EssentialProviders → LanguageProvider
-    // so the client only downloads the language it needs
-    const initialTranslations = await loadTranslation(validLocale).catch(() => undefined);
+    // The active language's catalogue reaches the client as a hashed asset (see
+    // <head> below), not as a prop. Handing it to a client provider made React
+    // serialise ~525kB of JSON into every page's RSC flight payload — measured
+    // 2026-08-07 on production as ~165kB gz inlined in the HTML of every page,
+    // re-downloaded on every full load because inline data can't be cached.
+    // Server-side rendering still reads the catalogue directly (loadTranslation's
+    // require() path), so the SSR'd text is unchanged.
+    const messagesSrc = MESSAGES_MANIFEST[validLocale] ?? MESSAGES_MANIFEST.en;
 
     // IMPORTANT: The theme script below modifies the DOM before React hydration
     // To prevent hydration mismatches, we need to ensure the server-rendered className
@@ -564,6 +544,18 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         __html: STORAGE_SHIM_SCRIPT,
                     }}
                 />
+                {/* Message catalogue. A classic, non-deferred script so
+                    globalThis.__LEXI_MESSAGES__ exists before hydration — without it
+                    t() returns raw key paths and React repaints the SSR'd text.
+                    Content-hashed and served immutable (see next.config.mjs headers),
+                    so it costs one request on the first page and nothing after. */}
+                <link rel="preload" as="script" href={messagesSrc} />
+                {/* eslint-disable-next-line @next/next/no-sync-scripts -- synchronous is the
+                    whole point: async/defer would let hydration start without the catalogue,
+                    t() would return raw key paths, and React would repaint every string the
+                    server rendered. The preload above starts the fetch with the HTML, and the
+                    file is immutable so it only ever costs one request. */}
+                <script src={messagesSrc} />
                 {/* Preconnect hints for faster resource loading on slow connections */}
                 {/* Note: Google Fonts preconnects removed - now using next/font for zero CLS */}
                 <link rel="preconnect" href="https://www.lexiclash.live" />
@@ -687,14 +679,12 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                         <li><a href={`/${validLocale}/legal/disclaimer`}>{translations[validLocale]?.nav?.disclaimer || 'Disclaimer'}</a></li>
                     </ul>
                 </nav>
-                <ConditionalProviders lang={validLocale} initialTranslations={initialTranslations}>
+                <ConditionalProviders lang={validLocale}>
                     {/* Pin every new route to the top of the page — the app's scroll
                         container is <body class="screen-fit">, so without this a stale
                         offset (or a child's mount-time auto-scroll) can open a page at
                         the footer. */}
                     <ScrollToTopOnNavigate />
-                    {/* VersionChecker needs to be inside providers to access LanguageContext */}
-                    <VersionChecker />
                     {/* Auto-recovers stale-deploy chunk 404s that escape error boundaries
                         (prefetch / asset onerror / next/dynamic import rejections). */}
                     <ChunkErrorRecovery />
@@ -717,13 +707,10 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                             the header (and its MusicControls) is hidden. */}
                         <InGameAudioButton />
                     </div>
-                    <AndroidAppRedirect />
-                    <AndroidAppInstallPromo />
-                    <AndroidInstallPill />
-                    <PWAInstallPrompt />
-                    <PushNotificationPrompt />
-                    <NewYearCountdown />
-                    <CookieConsent />
+                    {/* Install prompts, cookie banner, version checker, churn tracker
+                        and the seasonal countdown — all post-hydration only, all
+                        ssr:false so they stay out of this layout's entry chunk. */}
+                    <DeferredLayoutWidgets />
                     {/* Single feedback entry point: feedback.devtools shared widget —
                         neo-brutalist launcher, posts via same-origin /api/v1/feedback
                         proxy to the shared ingest API */}
@@ -731,7 +718,6 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
                     {/* Google One Tap (web) — in-page ID-token sign-in so Google's
                         consent shows our domain, not <ref>.supabase.co. No redirect. */}
                     <GoogleOneTapInitializer />
-                    <ChurnSignalTracker />
                 </ConditionalProviders>
             </body>
         </html>
