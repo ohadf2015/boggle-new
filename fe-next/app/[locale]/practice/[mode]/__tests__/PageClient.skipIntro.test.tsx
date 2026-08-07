@@ -18,10 +18,21 @@ vi.mock('@/contexts/LanguageContext', () => ({
 vi.mock('@/components/GridComponent', () => ({
   default: () => <div data-testid="grid-component-stub" />,
 }));
+// PracticePixiFx reads Application AND Graphics off the module; a mock missing
+// either one rejects inside its async effect and vitest counts that as an
+// unhandled error even when every assertion passes.
 vi.mock('pixi.js', () => ({
   Application: class {
     canvas = document.createElement('canvas');
     init = vi.fn().mockResolvedValue(undefined);
+    destroy = vi.fn();
+    stage = { addChild: vi.fn(), removeChild: vi.fn() };
+    ticker = { add: vi.fn(), remove: vi.fn() };
+  },
+  Graphics: class {
+    circle = vi.fn().mockReturnThis();
+    fill = vi.fn().mockReturnThis();
+    clear = vi.fn().mockReturnThis();
     destroy = vi.fn();
   },
 }));
@@ -79,16 +90,18 @@ describe('PracticePageClient fluency: skip intro for completed modes', () => {
     expect(screen.getByTestId('practice-tutorial-sheet')).toBeInTheDocument();
   });
 
-  it('previously-completed mode: drops the player straight into the sandbox', () => {
+  it('previously-completed mode: drops the player straight into the sandbox', async () => {
     markPracticeMode('classic', 'en');
     render(<PracticePageClient mode="classic" locale="en" />);
-    expect(screen.getByTestId('practice-board')).toBeInTheDocument();
+    // The sandboxes are next/dynamic (one chunk each), so the board arrives a
+    // microtask after first paint — findBy, not getBy.
+    expect(await screen.findByTestId('practice-board')).toBeInTheDocument();
   });
 
-  it('explicit ?play=1 query param: skips intro even when not completed', () => {
+  it('explicit ?play=1 query param: skips intro even when not completed', async () => {
     searchParamsValue.set('play', '1');
     render(<PracticePageClient mode="wordHunt" locale="en" />);
-    expect(screen.getByTestId('practice-target')).toBeInTheDocument();
+    expect(await screen.findByTestId('practice-target')).toBeInTheDocument();
   });
 
   it('flips isInGame=true during the mobile tutorial step (no footer/nav leak before play)', () => {
@@ -99,7 +112,7 @@ describe('PracticePageClient fluency: skip intro for completed modes', () => {
     expect(mockSetIsInGame).toHaveBeenCalledWith(true);
   });
 
-  it('desktop viewport: skips tutorial and drops the player straight into the sandbox', () => {
+  it('desktop viewport: skips tutorial and drops the player straight into the sandbox', async () => {
     // Desktop players don't need the tap-by-tap walkthrough — the larger
     // viewport and pointer affordances make the sandbox self-evident, and the
     // tutorial sheet otherwise feels like a roadblock between the hub click
@@ -116,6 +129,6 @@ describe('PracticePageClient fluency: skip intro for completed modes', () => {
     })) as unknown as typeof window.matchMedia;
     render(<PracticePageClient mode="classic" locale="en" />);
     expect(screen.queryByTestId('practice-tutorial-sheet')).toBeNull();
-    expect(screen.getByTestId('practice-board')).toBeInTheDocument();
+    expect(await screen.findByTestId('practice-board')).toBeInTheDocument();
   });
 });
