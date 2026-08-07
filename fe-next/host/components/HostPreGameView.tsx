@@ -325,6 +325,14 @@ function HostPreGameView({
 
   // Auto-fill bots countdown
   const [botCountdown, setBotCountdown] = useState<number | null>(null);
+
+  // Held in refs, not the countdown effect's dep array: the parent re-creates
+  // these callbacks on every render, and depending on them would tear down and
+  // re-register the interval each time — the countdown would never reach 0.
+  const onAutoStartWithBotsRef = useRef(onAutoStartWithBots);
+  const onStartGameRef = useRef(onStartGame);
+  onAutoStartWithBotsRef.current = onAutoStartWithBots;
+  onStartGameRef.current = onStartGame;
   const aloneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -356,12 +364,19 @@ function HostPreGameView({
     };
   }, [humanGuestCount, isQuickPlay, isPrivate]);
 
-  // Passive rescue for a solo host (alone-timer + Quick Play countdown). This
-  // only FILLS the lobby with bots — it deliberately never starts the game.
-  // Starting is always the host's explicit action (product decision: MP mode
-  // must never auto-start without the host pressing Play). The bots simply give
-  // the abandoned host a populated lobby to start on demand, or via the explicit
-  // "Play vs Bots" card (handleSoloPlayVsBots → onAutoStartWithBots).
+  // Passive rescue for a solo host (alone-timer + Quick Play countdown).
+  //
+  // For a PUBLIC room this only FILLS the lobby with bots and deliberately never
+  // starts: that host chose to open a room and may still be waiting on a friend,
+  // so starting stays their explicit action.
+  //
+  // QUICK PLAY is the deliberate exception. A Quick Play tap means "give me a
+  // game now" — the player never asked to host anything and has no idea the
+  // Start button is theirs to press. Filling their lobby with bots and then
+  // waiting stranded 9 of the 29 quick-play sessions whose lobby actually
+  // auto-filled with bots (31%) in a populated lobby where nothing happened.
+  // 93% of solo-prompt sessions overall are players in their first 24 hours.
+  // See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
   useEffect(() => {
     if (botCountdown === null) return;
     if (botCountdown <= 0) {
@@ -373,6 +388,9 @@ function HostPreGameView({
       // It adds bots and broadcasts the roster — it does NOT start the game.
       socket?.emit('setAutoFill', { enabled: true, targetCount: 3 });
       setBotCountdown(null);
+      if (isQuickPlay) {
+        (onAutoStartWithBotsRef.current ?? onStartGameRef.current)();
+      }
       return;
     }
     countdownIntervalRef.current = setInterval(() => {
@@ -381,7 +399,7 @@ function HostPreGameView({
     return () => {
       if (countdownIntervalRef.current) clearInterval(countdownIntervalRef.current);
     };
-  }, [botCountdown, socket, gameCode]);
+  }, [botCountdown, socket, gameCode, isQuickPlay]);
 
   const handleRoomLanguageChange = useCallback((newLang: Language) => {
     socket?.emit('changeRoomLanguage', { gameCode, language: newLang });

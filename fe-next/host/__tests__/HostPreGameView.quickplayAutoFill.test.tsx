@@ -181,10 +181,13 @@ describe('HostPreGameView quickplay auto-fill timer', () => {
       targetCount: 3,
     });
 
-    // Bots are added, but the game must NOT auto-start — MP mode only ever
-    // starts on the host's explicit action (Play button / "Play vs Bots" card).
-    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
-    expect(baseProps.onStartGame).not.toHaveBeenCalled();
+    // Behaviour change (2026-08-07): bots are added AND the game starts. A
+    // Quick Play tap means "give me a game now" — the player never chose to
+    // host and does not know the Start button is theirs to press. 9 of the 29
+    // quick-play sessions whose lobby auto-filled (31%) never started anything.
+    // Public rooms keep the explicit-Start rule (covered by the sibling test).
+    // See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
+    expect(baseProps.onAutoStartWithBots).toHaveBeenCalledTimes(1);
   });
 
   it('tracks auto-fill with auto_filled: true when timer expires', () => {

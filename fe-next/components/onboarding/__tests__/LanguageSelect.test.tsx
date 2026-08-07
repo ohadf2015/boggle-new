@@ -93,10 +93,35 @@ describe('LanguageSelect', () => {
     expect(mockOnSelect).toHaveBeenCalled();
   });
 
-  it('tapping the already-selected language advances immediately', () => {
+  // A flag tap used to mean two different things: tapping a NEW flag only
+  // selected it, while tapping the ALREADY-selected flag advanced the step. Same
+  // gesture, different outcome depending on invisible state — one observed
+  // session tapped flags 8 times (IL, RU, US, US, IL, US, US, RU) without
+  // reliably getting anywhere. Tapping now always means "select"; Continue
+  // always means "go". See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
+  it('tapping the already-selected language selects without advancing', () => {
     render(<LanguageSelect onSelect={mockOnSelect} />);
     fireEvent.click(screen.getByTestId('lang-en')); // already selected
-    expect(mockOnSelect).toHaveBeenCalled();
+    expect(mockOnSelect).not.toHaveBeenCalled();
+  });
+
+  it('treats every flag tap the same way — select only, never advance', () => {
+    render(<LanguageSelect onSelect={mockOnSelect} />);
+    for (const id of ['lang-he', 'lang-he', 'lang-sv', 'lang-en', 'lang-en']) {
+      fireEvent.click(screen.getByTestId(id));
+    }
+    expect(mockOnSelect).not.toHaveBeenCalled();
+    expect(mockSetLanguage).not.toHaveBeenCalled();
+  });
+
+  it('still advances after repeated flag taps once Continue is pressed', () => {
+    render(<LanguageSelect onSelect={mockOnSelect} />);
+    fireEvent.click(screen.getByTestId('lang-he'));
+    fireEvent.click(screen.getByTestId('lang-he'));
+    fireEvent.click(screen.getByTestId('language-continue'));
+
+    expect(mockSetLanguage).toHaveBeenCalledWith('he', { skipNavigation: true });
+    expect(mockOnSelect).toHaveBeenCalledTimes(1);
   });
 
   it('has a continue button enabled by default (pre-selected language)', () => {

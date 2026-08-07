@@ -1,35 +1,27 @@
 import { vi } from 'vitest';
 import React from 'react';
 import { act, render } from '@testing-library/react';
-import HostPreGameView from '../components/HostPreGameView';
+import HostPreGameView, { QUICKPLAY_AUTO_FILL_SECONDS } from '../components/HostPreGameView';
 
 const emitMock = vi.fn();
 const mockSocket = { emit: emitMock, on: vi.fn(), off: vi.fn() } as unknown as { emit: (...args: unknown[]) => void };
 
-vi.mock('../../utils/SocketContext', () => ({
-  useSocket: () => ({ socket: mockSocket }),
+vi.mock('../components/pre-game/StartButton', () => ({
+  StartButton: (props: { disabled: boolean; onStartGame: () => void }) =>
+    React.createElement('button', { disabled: props.disabled, onClick: props.onStartGame }, 'start'),
 }));
 
+vi.mock('../../utils/SocketContext', () => ({ useSocket: () => ({ socket: mockSocket }) }));
+
 vi.mock('../../contexts/AuthContext', () => ({
-  useAuth: () => ({
-    isAdmin: false,
-    isAuthenticated: false,
-    updateProfile: vi.fn(),
-    profile: null,
-  }),
+  useAuth: () => ({ isAdmin: false, isAuthenticated: false, updateProfile: vi.fn(), profile: null }),
 }));
 
 vi.mock('../../hooks/useCrazyGamesInvite', () => ({
-  useCrazyGamesInvite: () => ({
-    showInviteButton: vi.fn(),
-    hideInviteButton: vi.fn(),
-    isInviteButtonVisible: false,
-  }),
+  useCrazyGamesInvite: () => ({ showInviteButton: vi.fn(), hideInviteButton: vi.fn(), isInviteButtonVisible: false }),
 }));
 
-vi.mock('../../hooks/useCrazyGames', () => ({
-  useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }),
-}));
+vi.mock('../../hooks/useCrazyGames', () => ({ useCrazyGames: () => ({ isOnCrazyGamesPlatform: false }) }));
 
 vi.mock('framer-motion', () => ({
   m: new Proxy({}, {
@@ -68,7 +60,6 @@ vi.mock('../components/pre-game/PresetSelector', () => ({
 }));
 vi.mock('../components/pre-game/PlayerRoster', () => ({ PlayerRoster: () => null }));
 vi.mock('../components/pre-game/BattleModeCard', () => ({ BattleModeCard: () => null }));
-vi.mock('../components/pre-game/StartButton', () => ({ StartButton: () => null }));
 vi.mock('../components/pre-game/MobileBottomNav', () => ({ MobileBottomNav: () => null }));
 vi.mock('../components/pre-game/MobileShareSection', () => ({ MobileShareSection: () => null }));
 vi.mock('../components/pre-game/LobbyAudioButton', () => ({ LobbyAudioButton: () => null }));
@@ -81,12 +72,11 @@ vi.mock('../components/pre-game/desktop', () => ({
 }));
 vi.mock('@/components/lobby/LobbyReactions', () => ({ LobbyReactions: () => null }));
 vi.mock('@/components/lobby/LobbyRewardCluster', () => ({ LobbyRewardCluster: () => null }));
-vi.mock('../components/HostPreGameView.useAvatarPremium', () => ({ useAvatarPremium: () => ({ allowed: true }) }), { virtual: true });
 
 const mockT = (key: string) => key;
 
 const baseProps = {
-  gameCode: 'QUICK1',
+  gameCode: 'QP0001',
   roomLanguage: 'en' as const,
   language: 'en' as const,
   username: 'Host',
@@ -104,9 +94,9 @@ const baseProps = {
   tournamentRounds: 3,
   setTournamentRounds: vi.fn(),
   tournamentData: null,
-  hostPlaying: true,
+  hostPlaying: false,
   setHostPlaying: vi.fn(),
-  playersReady: [{ username: 'Host', isHost: true }],
+  playersReady: [] as Array<{ username: string; isHost: boolean }>,
   playerWordCounts: {},
   shufflingGrid: null,
   highlightedCells: [],
@@ -119,7 +109,14 @@ const baseProps = {
   tournamentCreating: false,
 };
 
-describe('HostPreGameView Quick Play / bot auto-fill', () => {
+/**
+ * A Quick Play tap is an explicit request for "give me a game NOW". Filling the
+ * lobby with bots and then waiting for a Start press strands the player in a
+ * populated lobby with nothing happening — 41 of 117 such sessions (35%) never
+ * started anything (PostHog, 2026-07-27 -> 2026-08-07; 93% of them first-24h
+ * players). See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
+ */
+describe('HostPreGameView — Quick Play auto-start after bot fill', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.useFakeTimers();
@@ -129,46 +126,55 @@ describe('HostPreGameView Quick Play / bot auto-fill', () => {
     vi.useRealTimers();
   });
 
-  it('emits setAutoFill (NOT broken addBots) when bot countdown elapses — WITHOUT starting the game', () => {
-    // hostPlaying=true + only host in playersReady → actualPlayerCount === 0
-    render(<HostPreGameView {...baseProps} playersReady={[]} hostPlaying={false} />);
+  /**
+   * Advance one second per act() call. The countdown re-registers its interval
+   * from an effect keyed on the tick state, so a single bulk advance would run
+   * every queued timer before React ever re-rendered and only tick once.
+   */
+  const tickSeconds = (seconds: number): void => {
+    for (let i = 0; i < seconds; i += 1) {
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+    }
+  };
 
-    // Advance past the 15s alone-timer → starts the visible bot countdown.
-    // Separate act() boundaries let React flush the state update + create the
-    // countdown interval before it ticks (a single combined advance would set
-    // botCountdown mid-advance, after which the interval never ticks this call).
-    act(() => { vi.advanceTimersByTime(15_000); });
-    // Advance through the 20s "adding bots…" countdown to 0
-    act(() => { vi.advanceTimersByTime(20_000); });
+  const runCountdown = (): void => tickSeconds(QUICKPLAY_AUTO_FILL_SECONDS + 2);
 
-    const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
-    const addBots = emitMock.mock.calls.find(([evt]) => evt === 'addBots');
+  it('starts the game itself once the Quick Play bot-fill countdown expires', () => {
+    render(<HostPreGameView {...baseProps} isQuickPlay />);
 
-    expect(addBots).toBeUndefined();
-    expect(setAutoFill).toBeDefined();
-    expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
-    // The rescue fills the lobby with bots but MUST NOT auto-start the game —
-    // starting is always the host's explicit action (MP never auto-starts).
-    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
-    expect(baseProps.onStartGame).not.toHaveBeenCalled();
+    runCountdown();
+
+    expect(emitMock).toHaveBeenCalledWith('setAutoFill', { enabled: true, targetCount: 3 });
+    // The whole point of Quick Play: the player must not have to find a Start button.
+    expect(baseProps.onAutoStartWithBots).toHaveBeenCalledTimes(1);
   });
 
-  it('fills bots AND starts the game when isQuickPlay=true and alone', () => {
-    render(<HostPreGameView {...baseProps} playersReady={[]} hostPlaying={false} isQuickPlay />);
+  it('does NOT auto-start a normal public room — that host keeps the explicit Start', () => {
+    render(<HostPreGameView {...baseProps} isQuickPlay={false} />);
 
-    // No 15s alone-timer: only a ~5s countdown before emitting setAutoFill
-    act(() => { vi.advanceTimersByTime(5_000); });
+    // Alone-timer (15s) then the 20s "starting with bots" countdown.
+    tickSeconds(40);
 
-    const setAutoFill = emitMock.mock.calls.find(([evt]) => evt === 'setAutoFill');
-    expect(setAutoFill).toBeDefined();
-    expect(setAutoFill![1]).toEqual({ enabled: true, targetCount: 3 });
-    // Behaviour change (2026-08-07): this used to stop at filling bots and wait
-    // for the host to press Play. A Quick Play player never chose to host and
-    // does not know the Start button is theirs — 9 of the 29 quick-play
-    // sessions whose lobby auto-filled with bots (31%) never started anything.
-    // Quick Play now starts itself; a deliberate,
-    // Quick-Play-only exception to "MP never auto-starts".
-    // See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
-    expect(baseProps.onAutoStartWithBots).toHaveBeenCalledTimes(1);
+    expect(emitMock).toHaveBeenCalledWith('setAutoFill', { enabled: true, targetCount: 3 });
+    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
+  });
+
+  it('does not auto-start Quick Play when a human joined before the countdown expired', () => {
+    const { rerender } = render(<HostPreGameView {...baseProps} isQuickPlay />);
+
+    tickSeconds(2);
+    // A real human lands in the lobby — cancel the rescue, this is a real match now.
+    rerender(
+      <HostPreGameView
+        {...baseProps}
+        isQuickPlay
+        playersReady={[{ username: 'Rival', isHost: false }]}
+      />,
+    );
+    runCountdown();
+
+    expect(baseProps.onAutoStartWithBots).not.toHaveBeenCalled();
   });
 });

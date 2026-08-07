@@ -13,6 +13,7 @@ import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import { requiresNetworkToPlay } from '@/lib/offline/landingOfflineAwareness';
 import type { LandingGameMode } from '@/lib/landing/fetchGameModeStats';
 import { placeBlastAfterArena } from '@/lib/landing/blastPlacement';
+import { orderModesForNewcomer } from '@/lib/landing/newcomerModeOrder';
 import { LandingModeCubes } from './LandingModeCubes';
 import { MODE_META, modeRoute, isCalmMode, type ModeCubeModel } from '@/lib/landing/modeMeta';
 
@@ -182,7 +183,13 @@ export function LandingChallengeCards({
     ? serverOrder.filter((m) => m !== 'practice')
     : serverOrder;
   const orderedBeforeFeatured: LandingCardKey[] = isNewbie && !isVeteran
-    ? (['practice', 'daily', ...practiceFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[])
+    // A newcomer judges the whole game by the first mode they try, so lead with
+    // the ones they actually FINISH. orderModesForNewcomer undoes the
+    // blast-after-arena promotion above for this cohort only — blast completes
+    // at 31% for first-24h players vs 45% for classic and 56% for word-wheel.
+    ? orderModesForNewcomer(
+        ['practice', 'daily', ...practiceFiltered.filter((m) => m !== 'practice' && m !== 'daily')] as LandingCardKey[],
+      )
     : practiceFiltered[0] === 'daily'
     ? practiceFiltered
     : (['daily', ...practiceFiltered.filter((m) => m !== 'daily')] as LandingCardKey[]);

@@ -25,6 +25,13 @@ import type { Language, Avatar } from '@/shared/types/game';
 const HEX_COLOR_PATTERN = /^#[0-9A-Fa-f]{6}$/;
 const DEFAULT_AVATAR_COLOR = '#FF6B6B';
 
+// How long to wait for a cold socket before giving up. Was 5s, which a phone
+// waking its radio routinely misses — every one of the 50 recorded dead-socket
+// taps carried socketReady:false, and 26 of the 28 people affected were in
+// their first 24 hours. The wait is not idle time for the player: the pending
+// state is shown before it starts.
+const SOCKET_CONNECT_TIMEOUT_MS = 12_000;
+
 function sanitizeAvatarColor(
   color: string | undefined | null,
   avatarImage?: string | null
@@ -153,18 +160,56 @@ export function useMultiplayerJoin({
       inFlightRef.current = true;
       const releaseInFlight = (): void => { inFlightRef.current = false; };
 
-      // Wait for socket connection
+      const joinStartedAt = Date.now();
+
+      // One terminal outcome per attempt, emitted from the points where the
+      // attempt actually ENDS — the server's ack, the safety timeout, or a dead
+      // socket. Deliberately NOT emitted right after socket.emit('join'): that
+      // would only mean "the request was sent", and the server not replying is
+      // a known failure mode (see mp_lobby_join_timeout below), so it would
+      // score silently-stalled joins as successes. That name-vs-firing-point
+      // mismatch is exactly the defect this event exists to correct in
+      // `mp_lobby_join_attempted`.
+      let joinOutcomeEmitted = false;
+      const emitJoinOutcome = (outcome: string): void => {
+        if (joinOutcomeEmitted) return;
+        joinOutcomeEmitted = true;
+        trackGrowthEvent('mp_join_outcome', {
+          outcome,
+          wait_ms: Date.now() - joinStartedAt,
+          isHostMode,
+          quickPlay: !!options?.quickPlay,
+        });
+      };
+
+      // Show the pending state BEFORE any waiting. The socket wait below can
+      // take seconds on a cold mobile connection, and the button used to sit
+      // visibly idle for all of it — so the player tapped again, and again.
+      // Observed: one session tapped Quick Start 7 times, another hit "Let's
+      // Go!" 9 times ending in a rageclick.
+      setError('');
+      setIsJoining(true);
+
+      // Wait for socket connection.
       if (socket && !socket.connected) {
         logger.log('[JOIN] Socket exists but not connected, waiting...');
         trackGrowthEvent('mp_lobby_join_attempted', { socketReady: false });
+        // Ask socket.io to redial. It does NOT retry on its own once its
+        // reconnection budget is spent, so without this the wait below could
+        // only ever listen to a socket that had already stopped trying.
+        try { socket.connect(); } catch { /* already connecting — fine */ }
         const connected = await new Promise<boolean>((resolve) => {
-          const timeout = setTimeout(() => resolve(false), 5000);
+          // 5s was too short for a cold mobile radio: 50 dead-socket taps from
+          // 27 people in 11 days, 26 of them in their first 24 hours.
+          const timeout = setTimeout(() => resolve(false), SOCKET_CONNECT_TIMEOUT_MS);
           const onConnect = (): void => { clearTimeout(timeout); resolve(true); };
           socket.once('connect', onConnect);
           if (socket.connected) { clearTimeout(timeout); socket.off('connect', onConnect); resolve(true); }
         });
         if (!connected) {
           releaseInFlight();
+          setIsJoining(false);
+          emitJoinOutcome('not_connected');
           setError(t('errors.notConnected'));
           toast.error(t('common.notConnected'), { duration: 3000, icon: '⚠️', id: MP_TOAST_IDS.notConnected });
           return;
@@ -174,6 +219,8 @@ export function useMultiplayerJoin({
       if (!socket?.connected) {
         trackGrowthEvent('mp_lobby_join_attempted', { socketReady: false });
         releaseInFlight();
+        setIsJoining(false);
+        emitJoinOutcome('not_connected');
         setError(t('errors.notConnected'));
         toast.error(t('common.notConnected'), { duration: 3000, icon: '⚠️', id: MP_TOAST_IDS.notConnected });
         return;
@@ -185,12 +232,9 @@ export function useMultiplayerJoin({
       // them whenever the Supabase profile was still in flight (cold load,
       // deep link). The user saw a toast and had to tap again; auto-join had
       // no one to re-tap for it, so it just never happened.
-      // Show the pending state BEFORE the wait, not after. The in-flight guard
-      // now holds for the duration of the wait, so without this the button
-      // looks idle while a join is genuinely under way and a second tap gets
-      // dropped with no explanation.
-      setError('');
-      setIsJoining(true);
+      // The pending state is already showing — it is set at the very top of
+      // this callback, before the socket wait, so the button never looks idle
+      // while a join is genuinely under way.
 
       const AUTH_LOADING_TIMEOUT = 5000;
       const authDeadline = (authLoadingStartTime ?? Date.now()) + AUTH_LOADING_TIMEOUT;
@@ -245,6 +289,7 @@ export function useMultiplayerJoin({
         setIsJoining(false);
         logger.debug('[JOIN] Safety timeout triggered');
         trackGrowthEvent('mp_lobby_join_timeout', { isHostMode });
+        emitJoinOutcome('timeout');
         toast.error(t('errors.connectionTimeout'), { duration: 4000, icon: '⚠️', id: MP_TOAST_IDS.connectionTimeout });
       }, 10000);
 
@@ -256,6 +301,10 @@ export function useMultiplayerJoin({
         clearTimeout(safetyTimeout);
         releaseInFlight();
         trackGrowthEvent('mp_lobby_join_resolved', { result });
+        // The server answered — THIS is the attempt's real outcome. One emit
+        // here covers the create and join branches identically so they cannot
+        // drift (Class 3 in .claude/rules/60-recurring-pitfalls.md).
+        emitJoinOutcome(result);
         socket.off('joined', onJoined);
         socket.off('error', onError);
         socket.off('joinedAsSpectator', onSpectator);

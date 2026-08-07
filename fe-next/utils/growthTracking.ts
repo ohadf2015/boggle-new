@@ -289,6 +289,13 @@ export type GrowthEvent =
   //   Props: { locale: string, socketReady: boolean, action: 'create' | 'join' }.
   //   High socketReady=false rate = socket latency root cause for rage-clicks.
   | 'mp_lobby_join_attempted'
+  // Terminal outcome of a join/create attempt — the SUCCESS half that
+  // mp_lobby_join_attempted never had. That event fires only on the
+  // socket-not-ready branch, so it counts failures and cannot express a rate;
+  // this one fires on every terminal path so the join funnel is measurable.
+  //   Props: { outcome: 'joined' | 'not_connected', wait_ms: number,
+  //            isHostMode: boolean, quickPlay: boolean }.
+  | 'mp_join_outcome'
   // MP lobby join stalled past the 10s safety timeout (server never replied to
   // createGame/join). Root-cause signal for the pageview→game_started funnel
   // drop and the confirmed-but-unfixed connecting→lobby CLS/rage-click issue.

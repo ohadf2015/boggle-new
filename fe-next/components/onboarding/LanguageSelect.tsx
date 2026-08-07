@@ -22,20 +22,20 @@ const LanguageSelect: React.FC<LanguageSelectProps> = ({ onSelect, onPlayNow }) 
   const { language, setLanguage, t } = useLanguage();
   const [selected, setSelected] = useState<Language>(language);
 
+  // A tap always means "select this language" and never advances the step.
+  // It used to mean both: tapping a NEW flag only selected, while tapping the
+  // ALREADY-selected flag also advanced. Identical gesture, different outcome
+  // depending on state the player cannot see — one observed session tapped
+  // flags 8 times (IL, RU, US, US, IL, US, US, RU) without reliably getting
+  // through. Advancing is now exclusively the Continue button's job.
+  // See docs/onboarding/2026-08-07-onboarding-friction-audit.md.
   const handleSelect = useCallback((lang: Language) => {
-    if (lang === selected) {
-      // Tap-again confirms selection. Skip navigation so the router.push
-      // to `/{locale}` doesn't remount [locale]/PageClient and bounce the
-      // user back to this step.
-      if (lang !== language) {
-        setLanguage(lang, { skipNavigation: true });
-      }
-      onSelect();
-      return;
-    }
+    // Always acknowledge the tap, even when the language is already the chosen
+    // one — a tap that produces nothing at all is the very thing this change
+    // exists to remove.
     setSelected(lang);
     fireOnboardingBurst({ y: 0.45 });
-  }, [selected, onSelect, setLanguage, language]);
+  }, []);
 
   const handleConfirm = useCallback(() => {
     fireOnboardingBurst({ y: 0.7 }, ['#BFFF00', '#FFE135', '#00FFFF']);
