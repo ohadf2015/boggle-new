@@ -41,6 +41,10 @@ async function loadWords(language: string): Promise<string[]> {
     case 'en':
       return Array.from(await getEnglishWordSet());
     case 'es':
+      // ponytail: base only, unlike he/sv which merge their *_approved.txt.
+      // spanish_words_approved.txt is empty today so nothing is lost, but the
+      // promotion pipeline writes into it — the first promoted Spanish word will
+      // validate server-side and be rejected client-side. Merge it here then.
       return Array.from(await getSpanishBaseWordSet());
     case 'he':
       return Array.from(getHebrewWordSet());

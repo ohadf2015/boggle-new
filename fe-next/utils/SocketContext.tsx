@@ -380,6 +380,8 @@ export function SocketProvider({ children }: SocketProviderProps) {
         const msg = (error as Record<string, unknown>).message;
         if (
           isExpectedSocketErrorCode(code) ||
+          // INTERNAL_ERROR is log-only noise HERE but must still reach Sentry,
+          // so it deliberately stays out of the shared set. Don't fold it in.
           code === 'INTERNAL_ERROR' ||
           (typeof msg === 'string' && expectedMessages.includes(msg))
         ) {
