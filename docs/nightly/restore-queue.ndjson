@@ -52,3 +52,22 @@
 {"resolve":"20260803-010001"}
 {"resolve":"20260804-010003"}
 {"resolve":"20260806-010001"}
+{"note": "20260606..20260703 (18 pre-07-05 tags)", "restored": 2, "rejected": [], "reason": "MANUAL founder audit 2026-08-07: every pre-07-05 salvage/dropped dir on disk was diffed file-by-file against master. Verdict per class: (a) files absent from master belong to DELETED features (word-alchemy, word-forge, word-vault, components/shiritori, AnimatedSplash) or to orphan lane work with 0 consumers in master (SchoolLeadCta, lib/wordTower/towerWarp.ts, lib/shiritori/sp/comboStats.ts, lib/crossword/metaAnswer.ts) -- superseded, deliberately NOT restored; (b) files present-but-different are master having moved on over 5+ weeks, not stranded work. RESTORED 2: fe-next/supabase/migrations/20260630020000_word_club_members_fk_index_and_drop_unused.sql (verified by DB state -- idx_word_club_members_user_id EXISTS with idx_scan=2 and idx_word_wheel_attempts_catchup is already gone, i.e. the nightly applied it via MCP and only the FILE was stranded -> repo/DB parity fix, no new SQL) and components/practice/__tests__/PracticeWheelSandbox.retryCta.test.tsx (feature usePracticeWheelRetryCta IS live in master; test re-run green 4/4). Migration 20260623030000/20260629020000 both landed under different filenames (20260628020000_rls_initplan_fix_and_word_clubs_fk_index.sql) -- verified by diff + pg_indexes. Resolving all 18 tags so a future lane-01 auto-restore cannot re-lay 2-month-old dead-mode code over live files."}
+{"resolve": "20260606-010004"}
+{"resolve": "20260609-010003"}
+{"resolve": "20260609-084137"}
+{"resolve": "20260611-020004"}
+{"resolve": "20260612-013001"}
+{"resolve": "20260613-013000"}
+{"resolve": "20260614-013005"}
+{"resolve": "20260616-010000"}
+{"resolve": "20260617-010001"}
+{"resolve": "20260618-010006"}
+{"resolve": "20260622-084106"}
+{"resolve": "20260623-010835"}
+{"resolve": "20260626-010003"}
+{"resolve": "20260628-010001"}
+{"resolve": "20260629-010001"}
+{"resolve": "20260630-010001"}
+{"resolve": "20260702-010005"}
+{"resolve": "20260703-010754"}
