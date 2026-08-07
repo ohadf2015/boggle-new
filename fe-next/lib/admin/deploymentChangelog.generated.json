@@ -1,6 +1,48 @@
 {
-  "generatedAt": "2026-08-07T09:11:08.106Z",
+  "generatedAt": "2026-08-07T14:17:51.064Z",
   "commits": [
+    {
+      "sha": "39289b1ba2bf2997b9731e9f4601eff1a245ae55",
+      "shortSha": "39289b1",
+      "subject": "fix(react-doctor): unwedge duel loaders, fix render-phase callbacks, restore the linter's ignore lists",
+      "author": "Ohad Fisher",
+      "date": "2026-08-07T16:13:41+03:00"
+    },
+    {
+      "sha": "5adb1644d990aa18c8cda7864ad4fbd01906f195",
+      "shortSha": "5adb164",
+      "subject": "feat(footer): add inline email newsletter signup form (sitewide email capture)",
+      "author": "Ohad Fisher",
+      "date": "2026-08-07T13:10:10Z"
+    },
+    {
+      "sha": "c533d6211111950525363c705e355be28d1dab39",
+      "shortSha": "c533d62",
+      "subject": "perf(shell): stop inlining the message catalogue in every page's HTML",
+      "author": "Ohad Fisher",
+      "date": "2026-08-07T15:55:31+03:00"
+    },
+    {
+      "sha": "767feb7ccaefcad445277f7672ddb9ff0b40fd0e",
+      "shortSha": "767feb7",
+      "subject": "fix(onboarding): stop new players dead-ending right after the FTUE",
+      "author": "Ohad Fisher",
+      "date": "2026-08-07T15:32:57+03:00"
+    },
+    {
+      "sha": "48190619b0a2ddcb6363b61845f9507e568dbe0d",
+      "shortSha": "4819061",
+      "subject": "test(practice): await the now-lazy sandboxes in the skip-intro test",
+      "author": "Ohad Fisher",
+      "date": "2026-08-07T13:03:37+03:00"
+    },
+    {
+      "sha": "55fc22d6dfb7d47f34add079e3dddcb6ebc2286c",
+      "shortSha": "55fc22d",
+      "subject": "fix(connections): stop hints leaking answers and give players real attempts",
+      "author": "Ohad Fisher",
+      "date": "2026-08-07T12:33:11+03:00"
+    },
     {
       "sha": "e1add9bce11cf8c1f834adedc6227ba973d3cd92",
       "shortSha": "e1add9b",
@@ -98,48 +140,6 @@
       "subject": "fix(server): no-cache /widget.js and /sw.js — 1yr immutable header froze the feedback button for returning users",
       "author": "Ohad Fisher",
       "date": "2026-08-04T09:15:32Z"
-    },
-    {
-      "sha": "a8295daef1a5436aa76c43346f4388af63a800f7",
-      "shortSha": "a8295da",
-      "subject": "feat(onboarding): instrument FTUE fast-lane + localize Quick Play skip (D1 retention)",
-      "author": "Ohad Fisher",
-      "date": "2026-08-04T09:02:22Z"
-    },
-    {
-      "sha": "3e001355186fd67bbe556d7a2107095c046363c4",
-      "shortSha": "3e00135",
-      "subject": "feat(feedback): single neo-brutalist feedback button — drop in-app FAB, restyle shared widget",
-      "author": "Ohad Fisher",
-      "date": "2026-08-04T06:14:31Z"
-    },
-    {
-      "sha": "5294ce70722480055c9f832301e5b1f96f86b93d",
-      "shortSha": "5294ce7",
-      "subject": "chore(nightly): autonomous improvement loop 2026-08-04",
-      "author": "Ohad Fisher",
-      "date": "2026-08-04T07:01:44+03:00"
-    },
-    {
-      "sha": "5e6d00ec374a0d38c64b1f0830009d03ef075105",
-      "shortSha": "5e6d00e",
-      "subject": "perf(landing): lazy-load Sentry SDK, preload LCP cube image, skip dictionary warm on /",
-      "author": "Ohad Fisher",
-      "date": "2026-08-03T18:53:59Z"
-    },
-    {
-      "sha": "e2eb5643f97755695812f6cbd7ecfac3d6150840",
-      "shortSha": "e2eb564",
-      "subject": "feat(feedback): onboard feedback.devtools shared widget site-wide",
-      "author": "Ohad Fisher",
-      "date": "2026-08-03T18:44:48Z"
-    },
-    {
-      "sha": "c78b2b36bb57e4f7a79f3e95f44f45b65d374328",
-      "shortSha": "c78b2b3",
-      "subject": "perf(landing): stop CookieConsent modal from being the LCP element",
-      "author": "Ohad Fisher",
-      "date": "2026-08-03T17:34:03Z"
     }
   ]
 }

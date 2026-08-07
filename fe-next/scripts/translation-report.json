@@ -1,13 +1,13 @@
 {
   "summary": {
-    "totalKeysInCode": 6145,
+    "totalKeysInCode": 6147,
     "keyCountByLanguage": {
-      "en": 11926,
-      "es": 12222,
-      "he": 12127,
-      "ja": 12181,
-      "ru": 11957,
-      "sv": 12177
+      "en": 11927,
+      "es": 12223,
+      "he": 12128,
+      "ja": 12182,
+      "ru": 11958,
+      "sv": 12178
     },
     "missingFromEnglish": 13,
     "problematicFlatKeys": 0,
@@ -1129,7 +1129,7 @@
         "pattern": "`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]))}`",
         "type": "template_literal",
         "file": "components/connections/pyramid/PyramidChallenge.tsx",
-        "line": 214,
+        "line": 225,
         "context": "callout: t(`connections.daily.shareCallout.${gridCallout(Array.from([...baseOutcomes, finaleOutcome]"
       },
       {
@@ -2235,7 +2235,7 @@
         "pattern": "`joinView.${\n                ({ en: 'english', he: 'hebrew', sv: 'swedish', ja: 'japanese', es: 'spanish' } as Record<La",
         "type": "template_literal",
         "file": "host/components/HostPreGameView.tsx",
-        "line": 601,
+        "line": 619,
         "context": "{t(`joinView.${"
       },
       {
@@ -3376,7 +3376,7 @@
       "usages": [
         {
           "file": "components/Footer.tsx",
-          "line": 93
+          "line": 94
         }
       ]
     },
